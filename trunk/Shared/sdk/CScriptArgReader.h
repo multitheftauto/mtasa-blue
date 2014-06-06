@@ -153,6 +153,48 @@ public:
         m_iIndex++;
     }
 
+
+    //
+    // Read next Matrix
+    //
+    void ReadMatrix ( CMatrix& outValue )
+    {
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        if ( iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER )
+        {
+            ReadNumber ( outValue.vFront.fX );
+            ReadNumber ( outValue.vFront.fY );
+            ReadNumber ( outValue.vFront.fZ );
+            ReadNumber ( outValue.vPos.fX );
+            ReadNumber ( outValue.vPos.fY );
+            ReadNumber ( outValue.vPos.fZ );
+            ReadNumber ( outValue.vRight.fX );
+            ReadNumber ( outValue.vRight.fY );
+            ReadNumber ( outValue.vRight.fZ );
+            ReadNumber ( outValue.vUp.fX );
+            ReadNumber ( outValue.vUp.fY );
+            ReadNumber ( outValue.vUp.fZ );
+            return;
+        }
+        else if ( iArgument == LUA_TUSERDATA )
+        {
+            // we don't pass around the pointer as it may get destroyed any time
+            CLuaMatrix* pMatrix = NULL;
+            ReadUserData ( pMatrix );
+            if ( pMatrix )
+            {
+                outValue = *pMatrix;
+                return;
+            }
+            outValue = CMatrix();
+            return; // Error set in ReadUserData
+        }
+
+        outValue = CMatrix();
+        SetTypeError ( "matrix" );
+        m_iIndex++;
+    }
+
     //
     // Read next bool
     //
