@@ -179,6 +179,43 @@ public:
         }
     }
 
+    // Get matrix rotation as angles
+    // Should produce the same results as GTA function Matrix::ConvertToEulerAngles
+    CVector GetRotation( void ) const
+    {
+        float fRotY = atan2( vRight.fZ, sqrtf( Square( vRight.fX ) + Square( vRight.fY ) ) );
+        float fRotZ = atan2( vRight.fY, vRight.fX );
+
+        float fSinZ = -sin( fRotZ );
+        float fCosZ = cos( fRotZ );
+        float fRotX = atan2( vUp.fX * fSinZ + vUp.fY * fCosZ, vFront.fX * fSinZ + vFront.fY * fCosZ );
+        return CVector( fRotX, fRotY, -fRotZ );
+    }
+
+    // Set matrix rotational part
+    // Should produce the same results as GTA function Matrix::ConvertFromEulerAngles
+    void SetRotation( const CVector& vecRotation )
+    {
+        float fCosX = cos( vecRotation.fX );
+        float fCosY = cos( vecRotation.fY );
+        float fCosZ = cos( -vecRotation.fZ );
+        float fSinX = sin( vecRotation.fX );
+        float fSinY = sin( vecRotation.fY );
+        float fSinZ = sin( -vecRotation.fZ );
+
+        vRight.fX = fCosY * fCosZ;
+        vRight.fY = fCosY * fSinZ;
+        vRight.fZ = fSinY;
+
+        vFront.fX = fSinX * fSinY * fCosZ - fCosX * fSinZ;
+        vFront.fY = fSinX * fSinY * fSinZ + fCosX * fCosZ;
+        vFront.fZ = -fSinX * fCosY;
+
+        vUp.fX = -( fCosX * fSinY * fCosZ + fSinX * fSinZ );
+        vUp.fY = fCosZ * fSinX - fCosX * fSinY * fSinZ;
+        vUp.fZ = fCosX * fCosY;
+    }
+
     //
     // Get reference to component axis by index
     //
