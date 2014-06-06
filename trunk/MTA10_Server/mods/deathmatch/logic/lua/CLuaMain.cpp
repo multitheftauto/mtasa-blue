@@ -672,7 +672,9 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
     lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
     lua_classfunction ( luaVM, "logOut", "logOut" );
-
+    //lua_classfunction ( luaVM, "observeDisplay", "textDisplayAddObserver" ); // swap args
+    //lua_classfunction ( luaVM, "stopObservingDisplay", "textDisplayRemoveObserver" ); // swap args
+    //lua_classfunction ( luaVM, "isObservingDisplay", "textDisplayIsObserver" ); // swap args
     
     lua_classfunction ( luaVM, "forceMap", "forcePlayerMap" );
     lua_classfunction ( luaVM, "setTeam", "setPlayerTeam" );
@@ -821,14 +823,48 @@ void CLuaMain::AddTeamClass ( lua_State* luaVM )
 void CLuaMain::AddTextDisplayClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "textCreateDisplay" );
+    lua_classfunction ( luaVM, "destroy", "textDestroyDisplay" );
+    lua_classfunction ( luaVM, "addObserver", "textDisplayAddObserver" );
+    lua_classfunction ( luaVM, "removeObserver", "textDisplayRemoveObserver" );
+    lua_classfunction ( luaVM, "addText", "textDisplayAddText" );
+    lua_classfunction ( luaVM, "removeText", "textDisplayRemoveText" );
+    
+    lua_classfunction ( luaVM, "isObserver", "textDisplayIsObserver" );
+    lua_classfunction ( luaVM, "getObservers", "textDisplayGetObservers" );
+
+    lua_classvariable ( luaVM, "observers", NULL, "textDisplayGetObservers" );
 
     lua_registerclass ( luaVM, "TextDisplay" );
 }
 
 
+// TODO: color? vector?
 void CLuaMain::AddTextItemClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "create", "textCreateTextItem" );
+    lua_classfunction ( luaVM, "destroy", "textDestroyTextItem" );
+    
+    lua_classfunction ( luaVM, "getColor", "textItemGetColor" );
+    lua_classfunction ( luaVM, "getPosition", "textItemGetPosition" );
+    lua_classfunction ( luaVM, "getPriority", "textItemGetPriority" );
+    lua_classfunction ( luaVM, "getScale", "textItemGetScale" );
+    lua_classfunction ( luaVM, "getText", "textItemGetText" );
+    
+    lua_classfunction ( luaVM, "setColor", "textItemSetColor" );
+    lua_classfunction ( luaVM, "setPosition", "textItemSetPosition" );
+    lua_classfunction ( luaVM, "setPriority", "textItemSetPriority" );
+    lua_classfunction ( luaVM, "setScale", "textItemSetScale" );
+    lua_classfunction ( luaVM, "setText", "textItemSetText" );
+    
+    lua_classvariable ( luaVM, "priority", "textItemSetPriority", "textItemGetPriority" );
+    lua_classvariable ( luaVM, "scale", "textItemSetScale", "textItemGetScale" );
+    lua_classvariable ( luaVM, "text", "textItemSetText", "textItemGetText" );
+    //lua_classvariable ( luaVM, "color", "textItemSetColor", "textItemGetColor", CLuaOOPDefs::TextItemSetColor, CLuaOOPDefs::TextItemGetColor ); // color
+    //lua_classvariable ( luaVM, "position", "textItemSetPosition", "textItemGetPosition", CLuaOOPDefs::TextItemSetPosition, CLuaOOPDefs::TextItemGetPosition ); // vector 2
 
     lua_registerclass ( luaVM, "TextItem" );
 }
