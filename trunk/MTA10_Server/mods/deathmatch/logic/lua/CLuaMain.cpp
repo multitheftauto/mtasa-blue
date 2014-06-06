@@ -235,8 +235,6 @@ void CLuaMain::AddMatrixClass ( lua_State* luaVM )
     lua_classmetamethod ( luaVM, "__div", CLuaMatrixDefs::Div );
     
     lua_classfunction ( luaVM, "create", "", CLuaMatrixDefs::Create );
-    
-
     lua_classfunction ( luaVM, "transformPosition", "", CLuaMatrixDefs::TransformPosition );
     lua_classfunction ( luaVM, "transformDirection", "", CLuaMatrixDefs::TransformDirection );
     lua_classfunction ( luaVM, "inverse", "", CLuaMatrixDefs::Inverse );
@@ -424,10 +422,40 @@ void CLuaMain::AddACLGroupClass ( lua_State* luaVM )
 }
 
 
+// TODO: special
 void CLuaMain::AddAccountClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+    
+    lua_classfunction ( luaVM, "getAll", "getAllAccounts" );
+    lua_classfunction ( luaVM, "getAllBySerial", "getAccountsBySerial" );
+    lua_classfunction ( luaVM, "getFromPlayer", "getPlayerAccount" );
+    lua_classfunction ( luaVM, "logPlayerOut", "logOut" );
 
+    lua_classfunction ( luaVM, "create", "getAccount" );
+    lua_classfunction ( luaVM, "add", "addAccount" );
+    lua_classfunction ( luaVM, "copyDataFrom", "copyAccountData" );
+    //lua_classfunction ( luaVM, "copyDataTo", "copyAccountData" ); // swap args
+    //lua_classfunction ( luaVM, "logIn", "logIn" ); // swap args
+    lua_classfunction ( luaVM, "remove", "removeAccount" );
+
+    lua_classfunction ( luaVM, "setData", "setAccountData" );
+    lua_classfunction ( luaVM, "setPassword", "setAccountPassword" );
+
+    lua_classfunction ( luaVM, "getSerial", "getAccountSerial" );
+    lua_classfunction ( luaVM, "getData", "getAccountData" );
+    lua_classfunction ( luaVM, "getAllData", "getAllAccountData" );
+    lua_classfunction ( luaVM, "getName", "getAccountName" );
+    lua_classfunction ( luaVM, "getPlayer", "getAccountPlayer" );
+    lua_classfunction ( luaVM, "isGuest", "isGuestAccount" );
+
+    lua_classvariable ( luaVM, "serial", NULL, "getAccountSerial" );
+    lua_classvariable ( luaVM, "name", NULL, "getAccountName" );
+    lua_classvariable ( luaVM, "player", NULL, "getAccountPlayer" );
+    lua_classvariable ( luaVM, "guest", NULL, "isGuestAccount" );
+    lua_classvariable ( luaVM, "password", "setAccountPassword", NULL );
+    lua_classvariable ( luaVM, "data", NULL, "getAllAccountData" ); // allow setting
+    
     lua_registerclass ( luaVM, "Account" );
     
 }
@@ -643,6 +671,8 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "takeScreenshot", "takePlayerScreenShot" );
     lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
     lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
+    lua_classfunction ( luaVM, "logOut", "logOut" );
+
     
     lua_classfunction ( luaVM, "forceMap", "forcePlayerMap" );
     lua_classfunction ( luaVM, "setTeam", "setPlayerTeam" );
@@ -667,6 +697,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getName", "getPlayerName" );
     lua_classfunction ( luaVM, "getIdleTime", "getPlayerIdleTime" );
     lua_classfunction ( luaVM, "getPing", "getPlayerPing" );
+    lua_classfunction ( luaVM, "getAccount", "getPlayerAccount" );
     lua_classfunction ( luaVM, "getWantedLevel", "getPlayerWantedLevel" );
     lua_classfunction ( luaVM, "getSerial", "getPlayerSerial" );
     lua_classfunction ( luaVM, "getIP", "getPlayerIP" );
