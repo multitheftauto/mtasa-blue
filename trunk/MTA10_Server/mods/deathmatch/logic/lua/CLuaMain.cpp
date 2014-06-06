@@ -571,20 +571,85 @@ void CLuaMain::AddPickupClass ( lua_State* luaVM )
 }
 
 
+// TODO: color class, table specials
 void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "getAllAlive", "getAlivePlayers" );
+    lua_classfunction ( luaVM, "getAllDead", "getDeadPlayers" );
+    lua_classfunction ( luaVM, "getRandom", "getRandomPlayer" );
+    lua_classfunction ( luaVM, "getCount", "getPlayerCount" );
+    lua_classfunction ( luaVM, "isVoiceEnabled", "isVoiceEnabled" );
     
     lua_classfunction ( luaVM, "create", "getPlayerFromName" );
     lua_classfunction ( luaVM, "ban", "banPlayer" );
     lua_classfunction ( luaVM, "kick", "kickPlayer" );
+    lua_classfunction ( luaVM, "redirect", "redirectPlayer" );
+    lua_classfunction ( luaVM, "resendModInfo", "resendPlayerModInfo" );
+    lua_classfunction ( luaVM, "spawn", "spawnPlayer" );
+    lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
+    lua_classfunction ( luaVM, "takeScreenshot", "takePlayerScreenShot" );
+    lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
+    lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
     
+    lua_classfunction ( luaVM, "forceMap", "forcePlayerMap" );
     lua_classfunction ( luaVM, "setTeam", "setPlayerTeam" );
+    lua_classfunction ( luaVM, "setMuted", "setPlayerMuted" );
+    lua_classfunction ( luaVM, "setName", "setPlayerName" );
+    lua_classfunction ( luaVM, "setBlurLevel", "setPlayerBlurLevel" );
+    lua_classfunction ( luaVM, "setWantedLevel", "setPlayerWantedLevel" );
+    lua_classfunction ( luaVM, "setMoney", "setPlayerMoney" );
+    lua_classfunction ( luaVM, "setNametagText", "setPlayerNametagText" );
+    lua_classfunction ( luaVM, "setNametagShowing", "setPlayerNametagShowing" );
+    lua_classfunction ( luaVM, "setNametagColor", "setPlayerNametagColor" ); // color
+    lua_classfunction ( luaVM, "setAnnounceValue", "setPlayerAnnounceValue" );
+    lua_classfunction ( luaVM, "setVoiceBroadcastTo", "setPlayerVoiceBroadcastTo" );
+    lua_classfunction ( luaVM, "setVoiceIgnoreFrom", "setPlayerVoiceIgnoreFrom" );
+    lua_classfunction ( luaVM, "setHudComponentVisible", "setPlayerHudComponentVisible" );
     
+    lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
+    lua_classfunction ( luaVM, "isMuted", "isPlayerMuted" );
+    lua_classfunction ( luaVM, "isNametagShowing", "isPlayerNametagShowing" );
+    lua_classfunction ( luaVM, "getNametagText", "getPlayerNametagText" );
+    lua_classfunction ( luaVM, "getNametagColor", "getPlayerNametagColor" ); // color
+    lua_classfunction ( luaVM, "getName", "getPlayerName" );
+    lua_classfunction ( luaVM, "getIdleTime", "getPlayerIdleTime" );
+    lua_classfunction ( luaVM, "getPing", "getPlayerPing" );
+    lua_classfunction ( luaVM, "getWantedLevel", "getPlayerWantedLevel" );
+    lua_classfunction ( luaVM, "getSerial", "getPlayerSerial" );
+    lua_classfunction ( luaVM, "getIP", "getPlayerIP" );
     lua_classfunction ( luaVM, "getTeam", "getPlayerTeam" );
-    
-    lua_classvariable ( luaVM, "team", "setPlayerTeam", "getPlayerTeam" );
+    lua_classfunction ( luaVM, "getBlurLevel", "getPlayerBlurLevel" );
+    lua_classfunction ( luaVM, "getVersion", "getPlayerVersion" );
+    lua_classfunction ( luaVM, "getMoney", "getPlayerMoney" );
+    lua_classfunction ( luaVM, "getAnnounceValue", "getPlayerAnnounceValue" );
+    lua_classfunction ( luaVM, "getACInfo", "getPlayerACInfo" );
 
+    lua_classvariable ( luaVM, "ACInfo", NULL, "getPlayerACInfo" );
+    lua_classvariable ( luaVM, "voiceBroadcastTo", "setPlayerVoiceBroadcastTo", NULL );
+    lua_classvariable ( luaVM, "voiceIgnoreFrom", "setPlayerVoiceIgnoreFrom", NULL );
+    lua_classvariable ( luaVM, "money", "setPlayerMoney", "getPlayerMoney" );
+    lua_classvariable ( luaVM, "version", NULL, "getPlayerVersion" );
+    lua_classvariable ( luaVM, "wantedLevel", "setPlayerWantedLevel", "getPlayerWantedLevel" );
+    lua_classvariable ( luaVM, "blurLevel", "setPlayerBlurLevel", "getPlayerBlurLevel" );
+    lua_classvariable ( luaVM, "name", "setPlayerName", "getPlayerName" );
+    lua_classvariable ( luaVM, "muted", "setPlayerMuted", "isPlayerMuted" );
+    lua_classvariable ( luaVM, "idleTime", NULL, "getPlayerIdleTime" );
+    lua_classvariable ( luaVM, "ping", NULL, "getPlayerPing" );
+    lua_classvariable ( luaVM, "serial", NULL, "getPlayerSerial" );
+    lua_classvariable ( luaVM, "ip", NULL, "getPlayerIP" );
+    lua_classvariable ( luaVM, "team", "setPlayerTeam", "getPlayerTeam" );
+    lua_classvariable ( luaVM, "mapForced", "forcePlayerMap", "isPlayerMapForced" );
+    lua_classvariable ( luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText" );
+    lua_classvariable ( luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing" );
+    //lua_classvariable ( luaVM, "nametagColor", "setPlayerNametagColor", "getPlayerNametagColor", CLuaFunctionDefs::SetPlayerNametagColor, CLuaOOPDefs::GetPlayerNametagColor ); // color class
+    //lua_classvariable ( luaVM, "announceValue", "setPlayerAnnounceValue", "getPlayerAnnounceValue", CLuaFunctionDefs::SetPlayerAnnounceValue, CLuaOOPDefs::GetPlayerAnnounceValue ); // .announceValue[key]=value
+    //lua_classvariable ( luaVM, "hudComponent", "setHudComponentVisible", "", CLuaOOPDefs::SetHudComponentVisible, NULL ); .hudComponent["radar"]=true (a get function to needs to be implemented too)
+    lua_classvariable ( luaVM, "random", NULL, "getRandomPlayer" );
+    lua_classvariable ( luaVM, "count", NULL, "getPlayerCount" );
+    lua_classvariable ( luaVM, "voiceEnabled", NULL, "isVoiceEnabled" );
+    
     lua_registerclass ( luaVM, "Player", "Ped" );
 }
 
