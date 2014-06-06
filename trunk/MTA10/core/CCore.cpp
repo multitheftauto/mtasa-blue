@@ -2347,8 +2347,9 @@ void CCore::CallSetCursorPos( int X, int Y )
         m_pSetCursorPosHook->CallSetCursorPos(X,Y);
 }
 
-bool CCore::GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex )
+bool CCore::GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions )
 {
+    CVARS_GET( "show_unsafe_resolutions", bOutAllowUnsafeResolutions );
     return GetVideoModeManager()->GetRequiredDisplayResolution( iOutWidth, iOutHeight, iOutColorBits, iOutAdapterIndex );
 }
 

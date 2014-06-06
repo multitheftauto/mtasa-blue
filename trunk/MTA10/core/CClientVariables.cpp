@@ -315,6 +315,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "mute_mta_when_minimized",    0 );                            // 0-off 1-on
     DEFAULT ( "mute_voice_when_minimized",  0 );                            // 0-off 1-on
     DEFAULT ( "share_file_cache",           1 );                            // 0-no 1-share client resource file cache with other MTA installs
+    DEFAULT ( "show_unsafe_resolutions",    0 );                            // 0-off 1-show resolutions that are higher that the desktop
 
     if(!Exists("locale")) 
     {
