@@ -28,6 +28,10 @@ public:
 
     static int      ToString                        ( lua_State* luaVM );
 
+    static int      TransformDirection              ( lua_State* luaVM );
+    static int      TransformPosition               ( lua_State* luaVM );
+    static int      Inverse                         ( lua_State* luaVM );
+
     static int      GetPosition                     ( lua_State* luaVM );
     static int      GetRotation                     ( lua_State* luaVM );
     static int      GetFront                        ( lua_State* luaVM );

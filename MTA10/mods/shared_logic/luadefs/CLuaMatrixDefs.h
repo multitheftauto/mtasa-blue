@@ -28,6 +28,10 @@ public:
 
     LUA_DECLARE ( ToString );
 
+    LUA_DECLARE ( TransformDirection );
+    LUA_DECLARE ( TransformPosition );
+    LUA_DECLARE ( Inverse );
+
     LUA_DECLARE ( GetPosition );
     LUA_DECLARE ( GetRotation );
     LUA_DECLARE ( GetFront );
