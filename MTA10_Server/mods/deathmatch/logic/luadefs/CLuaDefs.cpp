@@ -182,7 +182,7 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
             const char* szName = lua_tostring ( luaVM, lua_upvalueindex ( 2 ) );
 
             // if it has no name do nothing
-            if ( strcmp ( szName , "" ) != 0 && szName != NULL )
+            if ( szName != NULL && strcmp ( szName , "" ) != 0 )
             {
                 // get the function by name
                 CLuaCFunction* pFunction = CLuaCFunctions::GetFunction ( szName );
