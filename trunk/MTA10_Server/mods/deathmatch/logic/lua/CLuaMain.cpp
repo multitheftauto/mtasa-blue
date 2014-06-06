@@ -164,6 +164,12 @@ void CLuaMain::InitSecurity ( void )
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefinitions::DisabledFunction );
 }
 
+void CLuaMain::AddVector4DClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_registerclass ( luaVM, "Vector4" );
+}
 
 
 void CLuaMain::AddVector3DClass ( lua_State* luaVM )

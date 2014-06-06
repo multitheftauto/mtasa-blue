@@ -126,6 +126,7 @@ private:
 
 public:
 
+    void                            AddVector4DClass        ( lua_State* luaVM );
     void                            AddVector3DClass        ( lua_State* luaVM );
     void                            AddVector2DClass        ( lua_State* luaVM );
     void                            AddMatrixClass          ( lua_State* luaVM );
