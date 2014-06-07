@@ -1549,7 +1549,6 @@ void CLuaMain::AddVector4DClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
-
     lua_classmetamethod ( luaVM, "__tostring", CLuaVector4Defs::ToString );
     lua_classmetamethod ( luaVM, "__gc", CLuaVector4Defs::Destroy );
 
@@ -1570,12 +1569,18 @@ void CLuaMain::AddVector4DClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getNormalized", CLuaVector4Defs::GetNormalized );
     lua_classfunction ( luaVM, "getX", CLuaVector4Defs::GetX );
     lua_classfunction ( luaVM, "getY", CLuaVector4Defs::GetY );
+    lua_classfunction ( luaVM, "getZ", CLuaVector4Defs::GetZ );
+    lua_classfunction ( luaVM, "getW", CLuaVector4Defs::GetW );
 
     lua_classfunction ( luaVM, "setX", CLuaVector4Defs::SetX );
     lua_classfunction ( luaVM, "setY", CLuaVector4Defs::SetY );
+    lua_classfunction ( luaVM, "setZ", CLuaVector4Defs::SetZ );
+    lua_classfunction ( luaVM, "setW", CLuaVector4Defs::SetW );
 
     lua_classvariable ( luaVM, "x", CLuaVector4Defs::SetX, CLuaVector4Defs::GetX );
     lua_classvariable ( luaVM, "y", CLuaVector4Defs::SetY, CLuaVector4Defs::GetY );
+    lua_classvariable ( luaVM, "z", CLuaVector4Defs::SetZ, CLuaVector4Defs::GetZ );
+    lua_classvariable ( luaVM, "w", CLuaVector4Defs::SetW, CLuaVector4Defs::GetW );
 
     lua_classvariable ( luaVM, "length", NULL, CLuaVector4Defs::GetLength );
     lua_classvariable ( luaVM, "squaredLength", NULL, CLuaVector4Defs::GetLengthSquared );

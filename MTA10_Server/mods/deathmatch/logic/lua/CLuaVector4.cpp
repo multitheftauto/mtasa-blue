@@ -13,19 +13,19 @@
 #include <StdInc.h>
 
 CLuaVector4D::CLuaVector4D ( void ) :
-    CVector ()
+    CVector4D ()
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::VECTOR4 );
 }
 
-CLuaVector4D::CLuaVector4D ( float fX, float fY, float fZ ) :
-    CVector ( fX, fY, fZ )
+CLuaVector4D::CLuaVector4D ( float fX, float fY, float fZ, float fW ) :
+    CVector4D ( fX, fY, fZ, fW )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::VECTOR4 );
 }
 
-CLuaVector4D::CLuaVector4D ( const CVector & vector ) :
-    CVector ( vector )
+CLuaVector4D::CLuaVector4D ( const CVector4D & vector ) :
+    CVector4D ( vector )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::VECTOR4 );
 }

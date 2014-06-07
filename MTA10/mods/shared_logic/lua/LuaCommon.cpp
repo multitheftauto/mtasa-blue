@@ -145,6 +145,12 @@ void lua_pushobject ( lua_State* luaVM, const char* szClass, void* pObject )
     lua_pushlightuserdata ( luaVM, pObject );
 }
 
+void lua_pushvector ( lua_State* luaVM, const CVector4D& vector )
+{
+    CLuaVector4D* pVector = new CLuaVector4D ( vector );
+    lua_pushobject ( luaVM, "Vector4", ( void* ) reinterpret_cast < unsigned int * > ( pVector->GetScriptID () ) );
+}
+
 void lua_pushvector ( lua_State* luaVM, const CVector& vector )
 {
     CLuaVector3D* pVector = new CLuaVector3D ( vector );

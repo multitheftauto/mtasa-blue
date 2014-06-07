@@ -34,6 +34,7 @@ struct SAclRequest;
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
 #include "CVector.h"
+#include "CVector4D.h"
 #include "CSphere.h"
 #include "CBox.h"
 #include "CMatrix.h"

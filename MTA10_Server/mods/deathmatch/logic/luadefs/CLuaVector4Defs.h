@@ -30,7 +30,6 @@ public:
     static int     GetLengthSquared                     ( lua_State * luaVM );
     static int     GetNormalized                        ( lua_State * luaVM );
     static int     Normalize                            ( lua_State * luaVM );
-    static int     Cross                                ( lua_State * luaVM );
     static int     Dot                                  ( lua_State * luaVM );
 
     static int     ToString                             ( lua_State * luaVM );
@@ -38,10 +37,12 @@ public:
     static int     SetX                                 ( lua_State * luaVM );
     static int     SetY                                 ( lua_State * luaVM );
     static int     SetZ                                 ( lua_State * luaVM );
+    static int     SetW                                 ( lua_State * luaVM );
 
     static int     GetX                                 ( lua_State * luaVM );
     static int     GetY                                 ( lua_State * luaVM );
     static int     GetZ                                 ( lua_State * luaVM );
+    static int     GetW                                 ( lua_State * luaVM );
 
     static int     Add                                  ( lua_State * luaVM );
     static int     Sub                                  ( lua_State * luaVM );

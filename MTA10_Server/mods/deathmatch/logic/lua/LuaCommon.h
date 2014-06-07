@@ -46,6 +46,7 @@ void                    lua_pushobject          ( lua_State* luaVM, const char* 
 
 void                    lua_pushvector          ( lua_State* luaVM, const CVector2D& vector );
 void                    lua_pushvector          ( lua_State* luaVM, const CVector& vector );
+void                    lua_pushvector          ( lua_State* luaVM, const CVector4D& vector );
 void                    lua_pushmatrix          ( lua_State* luaVM, const CMatrix& matrix );
 
 // Converts any type to string

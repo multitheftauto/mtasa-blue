@@ -30,7 +30,6 @@ public:
     LUA_DECLARE ( GetLengthSquared );
     LUA_DECLARE ( GetNormalized );
     LUA_DECLARE ( Normalize );
-    LUA_DECLARE ( Cross );
     LUA_DECLARE ( Dot );
 
     LUA_DECLARE ( ToString );
@@ -38,10 +37,12 @@ public:
     LUA_DECLARE ( SetX );
     LUA_DECLARE ( SetY );
     LUA_DECLARE ( SetZ );
+    LUA_DECLARE ( SetW );
 
     LUA_DECLARE ( GetX );
     LUA_DECLARE ( GetY );
     LUA_DECLARE ( GetZ );
+    LUA_DECLARE ( GetW );
 
     LUA_DECLARE ( Add );
     LUA_DECLARE ( Sub );
