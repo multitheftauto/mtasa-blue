@@ -44,7 +44,8 @@ CSettingsSA::CSettingsSA ( void )
     SetAspectRatio ( ASPECT_RATIO_4_3 );
     HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
     HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
-
+    m_iDesktopWidth = 0;
+    m_iDesktopHeight = 0;
     MemPut < BYTE > ( 0x6FF420, 0xC3 );     // Truncate CalculateAspectRatio
 }
 
@@ -492,6 +493,19 @@ bool CSettingsSA::HasUnsafeResolutions( void )
 ////////////////////////////////////////////////
 bool CSettingsSA::IsUnsafeResolution( int iWidth, int iHeight )
 {
+    // Check if we have gotten the desktop res yet
+    if ( m_iDesktopWidth == 0 )
+    {
+        m_iDesktopWidth = 800;
+        m_iDesktopHeight = 600;
+
+        VideoMode currentModeInfo;
+        if ( GetVideoModeInfo( &currentModeInfo, 0 ) )
+        {
+            m_iDesktopWidth = currentModeInfo.width;
+            m_iDesktopHeight = currentModeInfo.height;
+        }
+    }
     return iWidth > m_iDesktopWidth || iHeight > m_iDesktopHeight;
 }
 
