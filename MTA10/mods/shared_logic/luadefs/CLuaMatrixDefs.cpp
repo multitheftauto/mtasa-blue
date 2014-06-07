@@ -163,7 +163,7 @@ int CLuaMatrixDefs::GetRotation ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         CVector vecRotation;
-        g_pMultiplayer->ConvertMatrixToEulerAngles ( *pMatrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        vecRotation = pMatrix->GetRotation ( );
         ConvertRadiansToDegrees ( vecRotation );
 
         lua_pushvector ( luaVM, vecRotation );
@@ -263,6 +263,32 @@ int CLuaMatrixDefs::SetPosition ( lua_State* luaVM )
 
     lua_pushboolean( luaVM, false );
     return 1;
+}
+
+int CLuaMatrixDefs::SetRotation ( lua_State* luaVM )
+{
+    CLuaMatrix* pMatrix = NULL;
+    CVector vecRotation;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMatrix );
+    argStream.ReadVector3D ( vecRotation );
+
+    if ( !argStream.HasErrors () )
+    {
+        ConvertRadiansToDegrees ( vecRotation );
+        pMatrix->SetRotation ( vecRotation );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;    
 }
 
 int CLuaMatrixDefs::SetForward ( lua_State* luaVM )

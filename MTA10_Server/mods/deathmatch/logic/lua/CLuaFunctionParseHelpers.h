@@ -65,35 +65,37 @@ inline eEntityType GetClassType ( class CCustomWeapon* )  { return CElement::WEA
 
 
 // class -> class name
-inline SString GetClassTypeName ( CElement* )       { return "element"; }
-inline SString GetClassTypeName ( CPlayer* )        { return "player"; }
-inline SString GetClassTypeName ( CVehicle* )       { return "vehicle"; }
-inline SString GetClassTypeName ( CBlip* )          { return "blip"; }
-inline SString GetClassTypeName ( CObject* )        { return "object"; }
-inline SString GetClassTypeName ( CPickup* )        { return "pickup"; }
-inline SString GetClassTypeName ( CRadarArea* )     { return "radararea"; }
-inline SString GetClassTypeName ( CMarker* )        { return "marker"; }
-inline SString GetClassTypeName ( CTeam* )          { return "team"; }
-inline SString GetClassTypeName ( CPed* )           { return "ped"; }
-inline SString GetClassTypeName ( CColShape* )      { return "colshape"; }
-inline SString GetClassTypeName ( CDummy* )         { return "dummy"; }
-inline SString GetClassTypeName ( CScriptFile* )    { return "scriptfile"; }
-inline SString GetClassTypeName ( CWater* )         { return "water"; }
-inline SString GetClassTypeName ( CDatabaseConnectionElement* )  { return "db-connection"; }
+inline SString GetClassTypeName ( CElement* )                   { return "element"; }
+inline SString GetClassTypeName ( CPlayer* )                    { return "player"; }
+inline SString GetClassTypeName ( CVehicle* )                   { return "vehicle"; }
+inline SString GetClassTypeName ( CBlip* )                      { return "blip"; }
+inline SString GetClassTypeName ( CObject* )                    { return "object"; }
+inline SString GetClassTypeName ( CPickup* )                    { return "pickup"; }
+inline SString GetClassTypeName ( CRadarArea* )                 { return "radararea"; }
+inline SString GetClassTypeName ( CMarker* )                    { return "marker"; }
+inline SString GetClassTypeName ( CTeam* )                      { return "team"; }
+inline SString GetClassTypeName ( CPed* )                       { return "ped"; }
+inline SString GetClassTypeName ( CColShape* )                  { return "colshape"; }
+inline SString GetClassTypeName ( CDummy* )                     { return "dummy"; }
+inline SString GetClassTypeName ( CScriptFile* )                { return "scriptfile"; }
+inline SString GetClassTypeName ( CWater* )                     { return "water"; }
+inline SString GetClassTypeName ( CDatabaseConnectionElement* ) { return "db-connection"; }
 
-inline SString GetClassTypeName ( CResource* )      { return "resource-data"; }
-inline SString GetClassTypeName ( CXMLNode* )       { return "xml-node"; }
-inline SString GetClassTypeName ( CLuaTimer* )      { return "lua-timer"; }
-inline SString GetClassTypeName ( CAccount* )       { return "account"; }
-inline SString GetClassTypeName ( CDbJobData* )     { return "db-query"; }
+inline SString GetClassTypeName ( CResource* )                  { return "resource-data"; }
+inline SString GetClassTypeName ( CXMLNode* )                   { return "xml-node"; }
+inline SString GetClassTypeName ( CLuaTimer* )                  { return "lua-timer"; }
+inline SString GetClassTypeName ( CAccount* )                   { return "account"; }
+inline SString GetClassTypeName ( CDbJobData* )                 { return "db-query"; }
 inline SString GetClassTypeName ( CAccessControlList* )         { return "acl"; }
 inline SString GetClassTypeName ( CAccessControlListGroup* )    { return "acl-group"; }
-inline SString GetClassTypeName ( CCustomWeapon* )    { return "weapon"; }
-inline SString GetClassTypeName ( CBan* )    { return "ban"; }
-inline SString GetClassTypeName ( CTextItem* )    { return "text-item"; }
-inline SString GetClassTypeName ( CTextDisplay* )    { return "text-display"; }
-inline SString GetClassTypeName ( CLuaVector3D* )           { return "vector3"; }
-inline SString GetClassTypeName ( CLuaMatrix* )             { return "matrix"; }
+inline SString GetClassTypeName ( CCustomWeapon* )              { return "weapon"; }
+inline SString GetClassTypeName ( CBan* )                       { return "ban"; }
+inline SString GetClassTypeName ( CTextItem* )                  { return "text-item"; }
+inline SString GetClassTypeName ( CTextDisplay* )               { return "text-display"; }
+inline SString GetClassTypeName ( CLuaVector2D* )               { return "vector2"; }
+inline SString GetClassTypeName ( CLuaVector3D* )               { return "vector3"; }
+inline SString GetClassTypeName ( CLuaVector4D* )               { return "vector4"; }
+inline SString GetClassTypeName ( CLuaMatrix* )                 { return "matrix"; }
 
 
 
@@ -212,6 +214,16 @@ CBan* UserDataCast ( CBan*, void* ptr, lua_State* )
 }
 
 //
+// CLuaVector2D from userdata
+//
+template < class T >
+CLuaVector2D* UserDataCast ( CLuaVector2D*, void* ptr, lua_State* luaVM )
+{
+    return CLuaVector2D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+}
+
+
+//
 // CLuaVector3D from userdata
 //
 template < class T >
@@ -220,6 +232,15 @@ CLuaVector3D* UserDataCast ( CLuaVector3D*, void* ptr, lua_State* luaVM )
     return CLuaVector3D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
 }
 
+
+//
+// CLuaVector4D from userdata
+//
+template < class T >
+CLuaVector4D* UserDataCast ( CLuaVector4D*, void* ptr, lua_State* luaVM )
+{
+    return CLuaVector4D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+}
 
 //
 // CLuaMatrix from userdata

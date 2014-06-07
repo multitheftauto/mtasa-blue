@@ -228,6 +228,12 @@ void lua_pushvector ( lua_State* luaVM, const CVector& vector )
     lua_pushobject ( luaVM, "Vector3", ( void* ) reinterpret_cast < unsigned int * > ( pVector->GetScriptID () ) );
 }
 
+void lua_pushvector ( lua_State* luaVM, const CVector2D& vector )
+{
+    CLuaVector2D* pVector = new CLuaVector2D ( vector );
+    lua_pushobject ( luaVM, "Vector2", ( void* ) reinterpret_cast < unsigned int * > ( pVector->GetScriptID () ) );
+}
+
 void lua_pushmatrix ( lua_State* luaVM, const CMatrix& matrix )
 {
     CLuaMatrix* pMatrix = new CLuaMatrix ( matrix );
