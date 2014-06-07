@@ -126,14 +126,6 @@ CPlayer::~CPlayer ( void )
         m_pCamera = NULL;
     }    
 
-    // Make sure nobody's syncing us
-    RemoveAllSyncingVehicles ();
-    RemoveAllSyncingPeds ();
-    RemoveAllSyncingObjects ();
-
-    // Delete the player text manager
-    delete m_pPlayerTextManager;
-
     // Destroy our nick
     if ( m_szNametagText )
     {
@@ -141,34 +133,11 @@ CPlayer::~CPlayer ( void )
         m_szNametagText = NULL;
     }
 
-    SetTeam ( NULL, true );
-
     delete m_pPad;
 
     delete m_pKeyBinds;
 
     CSimControl::RemoveSimPlayer ( this );
-
-    // Unparent us (CElement's unparenting will crash because of the incomplete vtable at that point)
-    m_bDoNotSendEntities = true;
-    SetParentObject ( NULL );
-
-    // Do this
-    if ( m_pJackingVehicle )
-    {
-        if ( m_uiVehicleAction == VEHICLEACTION_JACKING )
-        {
-            CPed * pOccupant = m_pJackingVehicle->GetOccupant ( 0 );
-            if ( pOccupant )
-            {
-                m_pJackingVehicle->SetOccupant ( NULL, 0 );
-                pOccupant->SetOccupiedVehicle ( NULL, 0 );
-                pOccupant->SetVehicleAction ( VEHICLEACTION_NONE );
-            }
-        }
-        if ( m_pJackingVehicle->GetJackingPlayer () == this )
-            m_pJackingVehicle->SetJackingPlayer ( NULL );
-    }
 
     CElementRefManager::RemoveElementRefs ( ELEMENT_REF_DEBUG ( this, "CPlayer" ), &m_pTeam, NULL );
     CElementRefManager::RemoveElementListRef ( ELEMENT_REF_DEBUG ( this, "CPlayer m_lstBroadcastList" ), &m_lstBroadcastList );
@@ -178,6 +147,10 @@ CPlayer::~CPlayer ( void )
 
     // Unlink from manager
     Unlink ();
+
+    // Note: References from other elements to the player should be cleaned up in
+    //       CPlayer::PrepareForDeletion instead to avoid dangling element references
+    //       being returned by some scripting functions
 }
 
 
@@ -1213,6 +1186,45 @@ void CPlayer::UpdateFarVehiclePartsStateSync ( void )
         }
         ++it;
     }
+}
+
+
+void CPlayer::PrepareForDeletion()
+{
+    // Make sure we're no longer syncing
+    RemoveAllSyncingVehicles();
+    RemoveAllSyncingPeds();
+    RemoveAllSyncingObjects();
+
+    // Delete the player text manager
+    delete m_pPlayerTextManager;
+
+	// Remove us from our team
+    SetTeam(NULL, true);
+
+    // Unparent us (CElement's unparenting will crash because of the incomplete vtable at that point)
+    m_bDoNotSendEntities = true;
+    SetParentObject(NULL);
+
+    // Do this
+    if (m_pJackingVehicle)
+    {
+        if (m_uiVehicleAction == VEHICLEACTION_JACKING)
+        {
+            CPed * pOccupant = m_pJackingVehicle->GetOccupant(0);
+            if (pOccupant)
+            {
+                m_pJackingVehicle->SetOccupant(NULL, 0);
+                pOccupant->SetOccupiedVehicle(NULL, 0);
+                pOccupant->SetVehicleAction(VEHICLEACTION_NONE);
+            }
+        }
+        if (m_pJackingVehicle->GetJackingPlayer() == this)
+            m_pJackingVehicle->SetJackingPlayer(NULL);
+    }
+
+    // Cleanup our account
+    m_pAccount->SetClient(NULL);
 }
 
 
