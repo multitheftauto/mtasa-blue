@@ -767,13 +767,13 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "occupiedVehicleSeat", NULL, "getPedOccupiedVehicleSeat" );
     lua_classvariable ( luaVM, "contactElement", NULL, "getPedContactElement" );
     lua_classvariable ( luaVM, "totalAmmoInWeaponOfCurrentWeaponSlot", NULL, "getPedTotalAmmo" );
+    lua_classvariable ( luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle ); // what about removePedFromVehicle?
     lua_classvariable ( luaVM, "dead", "killPed", "isPedDead" ); // Discuss whether it is appropriate to require a nil value to actually make the ped dead, should a special be done here?
     //lua_classvariable ( luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle", CLuaOOPDefs::SetPedWalkingStyle, CLuaOOPDefs::GetPedWalkingStyle );
     //lua_classvariable ( luaVM, "stats", "setPedStat", "getPedStat", CLuaOOPDefs::SetPedStat, CLuaOOPDefs::GetPedStat ); // table
     //lua_classvariable ( luaVM, "controlState", "setPedControlState", "getPedControlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState ); // TODO: .controlState["control"] = value
     // This commented code will syntax error, a new method has to be implemented to support this
     //lua_classvariable ( luaVM, "jetpack", {"removePedJetPack","givePedJetPack}, "doesPedHaveJetPack", CLuaOOPDefs::SetJetpackActive, "doesPedHaveJetPack" ); // very specialised!
-    //lua_classvariable ( luaVM, "vehicle", {"warpPedIntoVehicle","removePedFromVehicle"}, "getPedOccupiedVehicle", CLuaOOPDefs::SetPlayerVehicle, "getPedOccupiedVehicle" ); // also very specialised!
 
     lua_registerclass ( luaVM, "Ped", "Element" );
 }
