@@ -276,6 +276,8 @@ public:
 
     CVehicle *                                  GetJackingVehicle           ( void )                        { return m_pJackingVehicle; }
     void                                        SetJackingVehicle           ( CVehicle * pVehicle );
+
+    void                                        PrepareForDeletion          ( void );
 public:
 
     //
