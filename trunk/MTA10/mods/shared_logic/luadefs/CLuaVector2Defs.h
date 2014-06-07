@@ -10,8 +10,8 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAMATRIXDEFS_H
-#define __CLUAMATRIXDEFS_H
+#ifndef __LUAVECTORDEFS_H
+#define __LUAVECTORDEFS_H
 
 extern "C"
 {
@@ -20,34 +20,33 @@ extern "C"
     #include "lauxlib.h"
 }
 
-class CLuaMatrixDefs: public CLuaDefs
+class CLuaVector2Defs : public CLuaDefs
 {
 public:
     LUA_DECLARE ( Create );
     LUA_DECLARE ( Destroy );
 
+    LUA_DECLARE ( GetLength );
+    LUA_DECLARE ( GetLengthSquared );
+    LUA_DECLARE ( GetNormalized );
+    LUA_DECLARE ( Normalize );
+    LUA_DECLARE ( Dot );
+
     LUA_DECLARE ( ToString );
 
-    LUA_DECLARE ( TransformDirection );
-    LUA_DECLARE ( TransformPosition );
-    LUA_DECLARE ( Inverse );
+    LUA_DECLARE ( SetX );
+    LUA_DECLARE ( SetY );
 
-    LUA_DECLARE ( GetPosition );
-    LUA_DECLARE ( GetRotation );
-    LUA_DECLARE ( GetForward );
-    LUA_DECLARE ( GetRight );
-    LUA_DECLARE ( GetUp );
-
-    LUA_DECLARE ( SetPosition );
-    LUA_DECLARE ( SetRotation );
-    LUA_DECLARE ( SetForward );
-    LUA_DECLARE ( SetRight );
-    LUA_DECLARE ( SetUp );
+    LUA_DECLARE ( GetX );
+    LUA_DECLARE ( GetY );
 
     LUA_DECLARE ( Add );
     LUA_DECLARE ( Sub );
     LUA_DECLARE ( Mul );
     LUA_DECLARE ( Div );
+    LUA_DECLARE ( Pow );
+    LUA_DECLARE ( Unm );
+    LUA_DECLARE ( Eq );
 };
 
 #endif

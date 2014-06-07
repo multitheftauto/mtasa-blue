@@ -38,6 +38,7 @@
 #include <net/packetenums.h>
 #include <game/CGame.h>
 #include <CVector.h>
+#include <CVector4D.h>
 #include <CMatrix4.h>
 #include <CQuat.h>
 #include <CSphere.h>
@@ -101,7 +102,9 @@
 #include <CScriptArgReader.h>
 #include <luadefs/CLuaDefs.h>
 #include <luadefs/CLuaClassDefs.h>
-#include <luadefs/CLuaVectorDefs.h>
+#include <luadefs/CLuaVector2Defs.h>
+#include <luadefs/CLuaVector3Defs.h>
+#include <luadefs/CLuaVector4Defs.h>
 #include <luadefs/CLuaMatrixDefs.h>
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>

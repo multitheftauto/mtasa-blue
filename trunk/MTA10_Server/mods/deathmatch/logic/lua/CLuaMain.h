@@ -21,7 +21,9 @@ class CLuaMain;
 #define __CLUAMAIN_H
 
 #include "CLuaTimerManager.h"
-#include "CLuaVector.h"
+#include "CLuaVector2.h"
+#include "CLuaVector3.h"
+#include "CLuaVector4.h"
 #include "CLuaMatrix.h"
 #include "CLuaModuleManager.h"
 #include "../CTextDisplay.h"

@@ -56,6 +56,11 @@ public:
         return sqrt ( fX * fX + fY * fY );
     }
 
+    float LengthSquared ( void ) const
+    {
+        return (fX*fX) + (fY*fY);
+    }
+
     void Normalize ( void ) 
     { 
         float fLength = Length ();
@@ -64,6 +69,17 @@ public:
             fX /= fLength;
             fY /= fLength;
         }
+    }
+
+    CVector2D operator * ( float fRight ) const
+    {
+        return CVector2D ( fX * fRight, fY * fRight );
+    }
+
+    CVector2D operator / ( float fRight ) const
+    {
+        float fRcpValue = 1 / fRight;
+        return CVector2D ( fX * fRcpValue, fY * fRcpValue );
     }
 
     CVector2D operator + ( const CVector2D& vecRight ) const

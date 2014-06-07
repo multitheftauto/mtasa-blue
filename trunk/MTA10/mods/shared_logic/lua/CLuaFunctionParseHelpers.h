@@ -128,7 +128,9 @@ inline SString GetClassTypeName ( CResource* )              { return "resource-d
 inline SString GetClassTypeName ( CXMLNode* )               { return "xml-node"; }
 inline SString GetClassTypeName ( CLuaTimer* )              { return "lua-timer"; }
 inline SString GetClassTypeName ( CEntity* )                { return "entity"; }
+inline SString GetClassTypeName ( CLuaVector2D* )           { return "vector2"; }
 inline SString GetClassTypeName ( CLuaVector3D* )           { return "vector3"; }
+inline SString GetClassTypeName ( CLuaVector4D* )           { return "vector4"; }
 inline SString GetClassTypeName ( CLuaMatrix* )             { return "matrix"; }
 
 
@@ -167,6 +169,15 @@ CLuaTimer* UserDataCast ( CLuaTimer*, void* ptr, lua_State* luaVM )
     return NULL;
 }
 
+//
+// CLuaVector2D from userdata
+//
+template < class T >
+CLuaVector2D* UserDataCast ( CLuaVector2D*, void* ptr, lua_State* luaVM )
+{
+    return CLuaVector2D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+}
+
 
 //
 // CLuaVector3D from userdata
@@ -175,6 +186,16 @@ template < class T >
 CLuaVector3D* UserDataCast ( CLuaVector3D*, void* ptr, lua_State* luaVM )
 {
     return CLuaVector3D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+}
+
+
+//
+// CLuaVector4D from userdata
+//
+template < class T >
+CLuaVector4D* UserDataCast ( CLuaVector4D*, void* ptr, lua_State* luaVM )
+{
+    return CLuaVector4D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
 }
 
 
