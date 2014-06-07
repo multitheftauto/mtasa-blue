@@ -779,7 +779,7 @@ void CSettings::CreateGUI ( void )
         fPosY -= 20.0f;
     }
 
-    m_pCheckBoxShowUnsafeResolutions = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Show all resolutions"), true ) );
+    m_pCheckBoxShowUnsafeResolutions = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Show unsafe resolutions"), true ) );
     m_pCheckBoxShowUnsafeResolutions->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 110.0f ) );
     m_pCheckBoxShowUnsafeResolutions->AutoSize ( NULL, 20.0f );
     if ( !CCore::GetSingleton ().GetGame ()->GetSettings ()->HasUnsafeResolutions () )
