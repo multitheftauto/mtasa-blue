@@ -438,10 +438,10 @@ public:
     static bool                 UsePickup                           ( CElement* pElement, CPlayer * pPlayer );
 
     // Shape create funcs
-    static CColCircle*          CreateColCircle                     ( CResource* pResource, const CVector& vecPosition, float fRadius );
+    static CColCircle*          CreateColCircle                     ( CResource* pResource, const CVector2D& vecPosition, float fRadius );
     static CColCuboid*          CreateColCuboid                     ( CResource* pResource, const CVector& vecPosition, const CVector& vecSize );
     static CColSphere*          CreateColSphere                     ( CResource* pResource, const CVector& vecPosition, float fRadius );
-    static CColRectangle*       CreateColRectangle                  ( CResource* pResource, const CVector& vecPosition, const CVector2D& vecSize );
+    static CColRectangle*       CreateColRectangle                  ( CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize );
     static CColPolygon*         CreateColPolygon                    ( CResource* pResource, const std::vector < CVector2D >& vecPointList );
     static CColTube*            CreateColTube                       ( CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight );
     static void                 RefreshColShapeColliders            ( CColShape *pColShape );

@@ -13,9 +13,11 @@
 
 #include "StdInc.h"
 
-CColRectangle::CColRectangle ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector2D& vecSize, CXMLNode* pNode ) : CColShape ( pManager, pParent, pNode )
+CColRectangle::CColRectangle ( CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, const CVector2D& vecSize, CXMLNode* pNode ) : CColShape ( pManager, pParent, pNode )
 {
-    m_vecPosition = vecPosition;
+    m_vecPosition.fX = vecPosition.fX;
+    m_vecPosition.fY = vecPosition.fY;
+    m_vecPosition.fZ = SPATIAL_2D_Z;
     m_vecSize = vecSize;
 
     UpdateSpatialData ();

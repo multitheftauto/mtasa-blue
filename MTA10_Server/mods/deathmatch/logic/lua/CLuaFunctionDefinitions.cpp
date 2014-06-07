@@ -1419,12 +1419,10 @@ int CLuaFunctionDefinitions::CreatePed ( lua_State* luaVM )
     bool bSynced;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(usModel);
-    argStream.ReadNumber(vecPosition.fX);
-    argStream.ReadNumber(vecPosition.fY);
-    argStream.ReadNumber(vecPosition.fZ);
-    argStream.ReadNumber(fRotation, 0.0f);
-    argStream.ReadBool(bSynced, true);
+    argStream.ReadNumber ( usModel );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( fRotation, 0.0f );
+    argStream.ReadBool ( bSynced, true );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -2999,15 +2997,13 @@ int CLuaFunctionDefinitions::SpawnPlayer ( lua_State* luaVM )
     CTeam * pTeam;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(vecPosition.fX);
-    argStream.ReadNumber(vecPosition.fY);
-    argStream.ReadNumber(vecPosition.fZ);
-    argStream.ReadNumber(fRotation, 0.0f);
-    argStream.ReadNumber(ulModel, 0);
-    argStream.ReadNumber(ucInterior, 0);
-    argStream.ReadNumber(usDimension, 0);
-    argStream.ReadUserData(pTeam, NULL);
+    argStream.ReadUserData ( pElement );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( fRotation, 0.0f );
+    argStream.ReadNumber ( ulModel, 0 );
+    argStream.ReadNumber ( ucInterior, 0 );
+    argStream.ReadNumber ( usDimension, 0 );
+    argStream.ReadUserData ( pTeam, NULL );
 
 
     if ( !argStream.HasErrors ( ) )
@@ -3760,12 +3756,8 @@ int CLuaFunctionDefinitions::CreateVehicle ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( usModel );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecRotation.fX, 0 );
-    argStream.ReadNumber ( vecRotation.fY, 0 );
-    argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecRotation, CVector ( ) );
     argStream.ReadString ( strNumberPlate, "" );
     if ( argStream.NextIsBool () )
     {
@@ -4069,14 +4061,12 @@ int CLuaFunctionDefinitions::SetVehicleSirens( lua_State* luaVM )
     {
         // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
         ucSirenID--;
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fX );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fY );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fZ );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha, 0 );
+        argStream.ReadVector3D ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha, 0 );
         if ( argStream.HasErrors ( ) == false )
         {
             if ( pVehicle )
@@ -5273,10 +5263,8 @@ int CLuaFunctionDefinitions::SetVehicleRotation ( lua_State* luaVM )
     CVector vecRotation;
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(vecRotation.fX); 
-    argStream.ReadNumber(vecRotation.fY); 
-    argStream.ReadNumber(vecRotation.fZ); 
+    argStream.ReadUserData ( pElement );
+    argStream.ReadVector3D ( vecRotation ); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -5299,10 +5287,8 @@ int CLuaFunctionDefinitions::SetVehicleTurnVelocity ( lua_State* luaVM )
     CVector vecTurnVelocity;
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(vecTurnVelocity.fX); 
-    argStream.ReadNumber(vecTurnVelocity.fY); 
-    argStream.ReadNumber(vecTurnVelocity.fZ); 
+    argStream.ReadUserData ( pElement );
+    argStream.ReadVector3D ( vecTurnVelocity ); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -5699,13 +5685,9 @@ int CLuaFunctionDefinitions::SetVehicleRespawnPosition ( lua_State* luaVM )
     CVector vecRotation; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
-    argStream.ReadNumber(vecRotation.fX, 0.0f); 
-    argStream.ReadNumber(vecRotation.fY, 0.0f); 
-    argStream.ReadNumber(vecRotation.fZ, 0.0f); 
+    argStream.ReadUserData ( pElement );
+    argStream.ReadVector3D ( vecPosition ); 
+    argStream.ReadVector3D ( vecRotation, CVector ( ) ); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -5822,13 +5804,9 @@ int CLuaFunctionDefinitions::SpawnVehicle ( lua_State* luaVM )
     CVector vecRotation; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
-    argStream.ReadNumber(vecRotation.fX, 0.0f); 
-    argStream.ReadNumber(vecRotation.fY, 0.0f); 
-    argStream.ReadNumber(vecRotation.fZ, 0.0f); 
+    argStream.ReadUserData ( pElement );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecRotation, CVector ( ) ); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -6306,15 +6284,13 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
     CElement* pVisibleTo; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
-    argStream.ReadString(strType, "default"); 
-    argStream.ReadNumber(fSize, 4.0f); 
-    argStream.ReadNumber(color.R, color.R); 
-    argStream.ReadNumber(color.G, color.G); 
-    argStream.ReadNumber(color.B, color.B); 
-    argStream.ReadNumber(color.A, color.A); 
+    argStream.ReadVector3D ( vecPosition ); 
+    argStream.ReadString ( strType, "default "); 
+    argStream.ReadNumber ( fSize, 4.0f ); 
+    argStream.ReadNumber (color.R, color.R ); 
+    argStream.ReadNumber (color.G, color.G ); 
+    argStream.ReadNumber (color.B, color.B ); 
+    argStream.ReadNumber (color.A, color.A ); 
 
     if ( argStream.NextIsBool() || argStream.NextIsNil () )
     {
@@ -6573,15 +6549,12 @@ int CLuaFunctionDefinitions::SetMarkerTarget ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pElement);
 
-    if ( argStream.NextCouldBeNumber(0) &&
-         argStream.NextCouldBeNumber(1) &&
-         argStream.NextCouldBeNumber(2) )
+    if ( argStream.NextIsVector3D() )
     {
-        argStream.ReadNumber(vecTarget.fX); 
-        argStream.ReadNumber(vecTarget.fY); 
-        argStream.ReadNumber(vecTarget.fZ); 
+        argStream.ReadVector3D ( vecTarget ); 
         pvecTarget = &vecTarget;
     }
+    
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -6633,17 +6606,15 @@ int CLuaFunctionDefinitions::CreateBlip ( lua_State* luaVM )
     CElement* pVisibleTo; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
-    argStream.ReadNumber(ucIcon, 0); 
-    argStream.ReadNumber(ucSize, 2); 
-    argStream.ReadNumber(color.R, color.R); 
-    argStream.ReadNumber(color.G, color.G); 
-    argStream.ReadNumber(color.B, color.B); 
-    argStream.ReadNumber(color.A, color.A); 
-    argStream.ReadNumber(sOrdering, 0);
-    argStream.ReadNumber(usVisibleDistance, 16383);
+    argStream.ReadVector3D ( vecPosition ); 
+    argStream.ReadNumber ( ucIcon, 0 ); 
+    argStream.ReadNumber ( ucSize, 2 ); 
+    argStream.ReadNumber ( color.R, color.R ); 
+    argStream.ReadNumber ( color.G, color.G ); 
+    argStream.ReadNumber ( color.B, color.B ); 
+    argStream.ReadNumber ( color.A, color.A ); 
+    argStream.ReadNumber ( sOrdering, 0 );
+    argStream.ReadNumber ( usVisibleDistance, 16383 );
     if ( argStream.NextIsBool() || argStream.NextIsNil())
         pVisibleTo = NULL;
     else
@@ -6984,12 +6955,8 @@ int CLuaFunctionDefinitions::CreateObject ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( usModelID );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
-    argStream.ReadNumber ( vecRotation.fX, 0 );
-    argStream.ReadNumber ( vecRotation.fY, 0 );
-    argStream.ReadNumber ( vecRotation.fZ, 0 );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadVector3D ( vecRotation, CVector ( ) );
     argStream.ReadBool ( bIsLowLod, false );
 
     if ( !argStream.HasErrors () )
@@ -7083,10 +7050,8 @@ int CLuaFunctionDefinitions::SetObjectRotation ( lua_State* luaVM )
     CVector vecRotation; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(vecRotation.fX); 
-    argStream.ReadNumber(vecRotation.fY); 
-    argStream.ReadNumber(vecRotation.fZ); 
+    argStream.ReadUserData ( pElement );
+    argStream.ReadVector3D ( vecRotation );
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -7109,9 +7074,24 @@ int CLuaFunctionDefinitions::SetObjectScale ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pObject );
-    argStream.ReadNumber ( vecScale.fX );
-    argStream.ReadNumber ( vecScale.fY, vecScale.fX );
-    argStream.ReadNumber ( vecScale.fZ, vecScale.fX );
+
+
+    // Caz - This function looks totally wrong
+    // the function is designed to support the following syntaxes
+    // setObjectScale ( obj, 2 ) -- all other components are set to 2
+    // setObjectScale ( obj, 2, 1, 5 ) -- custom scaling on 3 axis
+
+    if ( argStream.NextIsVector3D ( ) )
+    {
+        argStream.ReadVector3D ( vecScale );
+    }
+    else
+    {
+        // Caz - Here is what I am talking about.
+        argStream.ReadNumber ( vecScale.fX );
+        argStream.ReadNumber ( vecScale.fY, vecScale.fX );
+        argStream.ReadNumber ( vecScale.fZ, vecScale.fX );
+    }
 
     if ( !argStream.HasErrors () )
     {
@@ -7142,12 +7122,8 @@ int CLuaFunctionDefinitions::MoveObject ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
     argStream.ReadNumber ( iTime );
-    argStream.ReadNumber ( vecTargetPosition.fX );
-    argStream.ReadNumber ( vecTargetPosition.fY );
-    argStream.ReadNumber ( vecTargetPosition.fZ );
-    argStream.ReadNumber ( vecTargetRotation.fX, 0 );
-    argStream.ReadNumber ( vecTargetRotation.fY, 0 );
-    argStream.ReadNumber ( vecTargetRotation.fZ, 0 );
+    argStream.ReadVector3D ( vecTargetPosition );
+    argStream.ReadVector3D ( vecTargetRotation, CVector ( ) );
     argStream.ReadEnumString ( easingType, CEasingCurve::Linear );
     argStream.ReadNumber ( fEasingPeriod, 0.3f );
     argStream.ReadNumber ( fEasingAmplitude, 1.0f );
@@ -7206,10 +7182,8 @@ int CLuaFunctionDefinitions::CreateRadarArea ( lua_State* luaVM )
     CVector2D vecPosition; CVector2D vecSize; float dRed; float dGreen; float dBlue; float dAlpha; CElement* pVisibleTo;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecSize.fX );
-    argStream.ReadNumber ( vecSize.fY );
+    argStream.ReadVector2D ( vecPosition );
+    argStream.ReadVector2D ( vecSize );
     argStream.ReadNumber ( dRed, 255 );
     argStream.ReadNumber ( dGreen, 0 );
     argStream.ReadNumber ( dBlue, 0 );
@@ -7328,8 +7302,7 @@ int CLuaFunctionDefinitions::IsInsideRadarArea ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pRadarArea );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadVector2D ( vecPosition );
 
     if ( !argStream.HasErrors () )
     {
@@ -7355,8 +7328,7 @@ int CLuaFunctionDefinitions::SetRadarAreaSize ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
-    argStream.ReadNumber ( vecSize.fX );
-    argStream.ReadNumber ( vecSize.fY );
+    argStream.ReadVector2D ( vecSize );
 
     if ( !argStream.HasErrors () )
     {
@@ -7434,11 +7406,9 @@ int CLuaFunctionDefinitions::CreateExplosion ( lua_State* luaVM )
     CElement* pCreator; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
-    argStream.ReadNumber(ucType); 
-    argStream.ReadUserData(pCreator, NULL); 
+    argStream.ReadVector3D ( vecPosition ); 
+    argStream.ReadNumber ( ucType ); 
+    argStream.ReadUserData ( pCreator, NULL ); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -7463,11 +7433,9 @@ int CLuaFunctionDefinitions::CreateFire ( lua_State* luaVM )
     CElement* pCreator; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
-    argStream.ReadNumber(fSize, 1.8f); 
-    argStream.ReadUserData(pCreator, NULL); 
+    argStream.ReadVector3D ( vecPosition ); 
+    argStream.ReadNumber ( fSize, 1.8f ); 
+    argStream.ReadUserData ( pCreator, NULL ); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -7497,9 +7465,7 @@ int CLuaFunctionDefinitions::PlayMissionAudio ( lua_State* luaVM )
 
     if ( argStream.NextCouldBeNumber() )
     {
-        argStream.ReadNumber(vecPosition.fX); 
-        argStream.ReadNumber(vecPosition.fY); 
-        argStream.ReadNumber(vecPosition.fZ); 
+        argStream.ReadVector3D ( vecPosition ); 
     
         if ( !argStream.HasErrors ( ) )
         {
@@ -8325,21 +8291,13 @@ int CLuaFunctionDefinitions::CreateWater ( lua_State* luaVM )
     CVector v1, v2, v3, v4;
     CVector* pv4 = NULL;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(v1.fX); 
-    argStream.ReadNumber(v1.fY); 
-    argStream.ReadNumber(v1.fZ); 
-    argStream.ReadNumber(v2.fX); 
-    argStream.ReadNumber(v2.fY); 
-    argStream.ReadNumber(v2.fZ); 
-    argStream.ReadNumber(v3.fX); 
-    argStream.ReadNumber(v3.fY); 
-    argStream.ReadNumber(v3.fZ); 
+    argStream.ReadVector3D ( v1 ); 
+    argStream.ReadVector3D ( v2 );  
+    argStream.ReadVector3D ( v3 ); 
 
     if ( argStream.NextCouldBeNumber () )
-    {
-        argStream.ReadNumber(v4.fX); 
-        argStream.ReadNumber(v4.fY); 
-        argStream.ReadNumber(v4.fZ); 
+    { 
+        argStream.ReadVector3D ( v4 );
         pv4 = &v4;
     }
     
@@ -8465,11 +8423,9 @@ int CLuaFunctionDefinitions::SetWaterVertexPosition ( lua_State* luaVM )
     CVector vecPosition; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(iVertex); 
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
+    argStream.ReadUserData ( pElement );
+    argStream.ReadNumber ( iVertex ); 
+    argStream.ReadVector3D ( vecPosition ); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -8548,17 +8504,15 @@ int CLuaFunctionDefinitions::ResetWaterColor ( lua_State *luaVM )
 
 int CLuaFunctionDefinitions::CreateColCircle ( lua_State* luaVM )
 {
-    CVector vecPosition; 
+    CVector2D vecPosition;
     float fRadius; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(fRadius); 
+    argStream.ReadVector2D ( vecPosition ); 
+    argStream.ReadNumber ( fRadius ); 
     
     if ( !argStream.HasErrors ( ) )
     {
-        vecPosition.fZ = 0.0f;
         if(fRadius < 0.0f) fRadius = 0.1f;
        
         CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
@@ -8597,12 +8551,8 @@ int CLuaFunctionDefinitions::CreateColCuboid ( lua_State* luaVM )
     CVector vecSize; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
-    argStream.ReadNumber(vecSize.fX); 
-    argStream.ReadNumber(vecSize.fY); 
-    argStream.ReadNumber(vecSize.fZ); 
+    argStream.ReadVector3D ( vecPosition ); 
+    argStream.ReadVector3D ( vecSize ); 
 
     
     if ( !argStream.HasErrors ( ) )
@@ -8647,10 +8597,8 @@ int CLuaFunctionDefinitions::CreateColSphere ( lua_State* luaVM )
     float fRadius; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
-    argStream.ReadNumber(fRadius); 
+    argStream.ReadVector3D ( vecPosition ); 
+    argStream.ReadNumber ( fRadius ); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -8688,14 +8636,12 @@ int CLuaFunctionDefinitions::CreateColSphere ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::CreateColRectangle ( lua_State* luaVM )
 { 
-    CVector vecPosition; 
+    CVector2D vecPosition; 
     CVector2D vecSize; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecSize.fX); 
-    argStream.ReadNumber(vecSize.fY); 
+    argStream.ReadVector2D ( vecPosition );
+    argStream.ReadVector2D ( vecSize );
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -8740,8 +8686,7 @@ int CLuaFunctionDefinitions::CreateColPolygon ( lua_State* luaVM )
     for( uint i = 0 ; i < 4 || argStream.NextCouldBeNumber() ; i++ )
     {
         CVector2D vecPoint;
-        argStream.ReadNumber( vecPoint.fX ); 
-        argStream.ReadNumber( vecPoint.fY );
+        argStream.ReadVector2D ( vecPoint );
         vecPointList.push_back( vecPoint );
     }
 
@@ -8781,11 +8726,9 @@ int CLuaFunctionDefinitions::CreateColTube ( lua_State* luaVM )
     float fHeight, fRadius;
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecPosition.fX); 
-    argStream.ReadNumber(vecPosition.fY); 
-    argStream.ReadNumber(vecPosition.fZ); 
-    argStream.ReadNumber(fRadius); 
-    argStream.ReadNumber(fHeight); 
+    argStream.ReadVector3D ( vecPosition ); 
+    argStream.ReadNumber ( fRadius ); 
+    argStream.ReadNumber ( fHeight ); 
     
     if ( !argStream.HasErrors ( ) )
     {
@@ -8875,9 +8818,7 @@ int CLuaFunctionDefinitions::CreateWeapon ( lua_State* luaVM )
     eWeaponType weaponType;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadEnumStringOrNumber ( weaponType );
-    argStream.ReadNumber ( vecPos.fX );
-    argStream.ReadNumber ( vecPos.fY );
-    argStream.ReadNumber ( vecPos.fZ );
+    argStream.ReadVector3D ( vecPos );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -8997,9 +8938,7 @@ int CLuaFunctionDefinitions::SetWeaponTarget ( lua_State* luaVM )
     else if ( argStream.NextIsNumber() )
     {
         CVector vecTarget;
-        argStream.ReadNumber( vecTarget.fX );
-        argStream.ReadNumber( vecTarget.fY );
-        argStream.ReadNumber( vecTarget.fZ );
+        argStream.ReadVector3D( vecTarget );
         if ( !argStream.HasErrors () )
         {
             if ( CStaticFunctionDefinitions::SetWeaponTarget ( pWeapon, vecTarget ) )
@@ -9774,13 +9713,11 @@ int CLuaFunctionDefinitions::OutputServerLog ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetDistanceBetweenPoints2D ( lua_State* luaVM )
 {
-    CVector vecA, vecB;
+    CVector2D vecA, vecB;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecA.fX);
-    argStream.ReadNumber(vecA.fY);
-    argStream.ReadNumber(vecB.fX);
-    argStream.ReadNumber(vecB.fY);
+    argStream.ReadVector2D ( vecA );
+    argStream.ReadVector2D ( vecB );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -9800,12 +9737,8 @@ int CLuaFunctionDefinitions::GetDistanceBetweenPoints3D ( lua_State* luaVM )
     CVector vecA, vecB;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber(vecA.fX);
-    argStream.ReadNumber(vecA.fY);
-    argStream.ReadNumber(vecA.fZ);
-    argStream.ReadNumber(vecB.fX);
-    argStream.ReadNumber(vecB.fY);
-    argStream.ReadNumber(vecB.fZ);
+    argStream.ReadVector3D ( vecA );
+    argStream.ReadVector3D ( vecB );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -9856,12 +9789,8 @@ int CLuaFunctionDefinitions::InterpolateBetween ( lua_State* luaVM )
     float fEasingPeriod; float fEasingAmplitude; float fEasingOvershoot;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPointA.fX );
-    argStream.ReadNumber ( vecPointA.fY );
-    argStream.ReadNumber ( vecPointA.fZ );
-    argStream.ReadNumber ( vecPointB.fX );
-    argStream.ReadNumber ( vecPointB.fY );
-    argStream.ReadNumber ( vecPointB.fZ );
+    argStream.ReadVector3D ( vecPointA );
+    argStream.ReadVector3D ( vecPointB );
     argStream.ReadNumber ( fProgress );
     argStream.ReadEnumString ( easingType );
     argStream.ReadNumber ( fEasingPeriod, 0.3f );
