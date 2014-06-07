@@ -573,6 +573,15 @@ void CSettings::CreateGUI ( void )
         fPosY -= 16.0f;
     }
 
+    m_pCheckBoxShowUnsafeResolutions = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Show unsafe resolutions"), true ) );
+    m_pCheckBoxShowUnsafeResolutions->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, fPosY - 35.0f ) );
+    m_pCheckBoxShowUnsafeResolutions->SetSize ( CVector2D ( 224.0f, 16.0f ) );
+    if ( !CCore::GetSingleton ().GetGame ()->GetSettings ()->HasUnsafeResolutions () )
+    {
+        m_pCheckBoxShowUnsafeResolutions->SetVisible ( false );
+        fPosY -= 16.0f;
+    }
+
     m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Mip Mapping"), true ) );
     m_pCheckBoxMipMapping->SetPosition ( CVector2D ( vecTemp.fX + 340.0f, vecTemp.fY + 45.0f ) );
     m_pCheckBoxMipMapping->SetSize ( CVector2D ( 224.0f, 16.0f ) );
@@ -1128,6 +1137,7 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
     m_pCheckBoxAllowScreenUpload->SetClickHandler ( GUI_CALLBACK( &CSettings::OnAllowScreenUploadClick, this ) );
     m_pCheckBoxCustomizedSAFiles->SetClickHandler ( GUI_CALLBACK( &CSettings::OnCustomizedSAFilesClick, this ) );
+    m_pCheckBoxShowUnsafeResolutions->SetClickHandler ( GUI_CALLBACK( &CSettings::ShowUnsafeResolutionsClick, this ) );
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, _("Multi Theft Auto: Community settings"), MB_ICON_WARNING );
@@ -1289,6 +1299,11 @@ void CSettings::UpdateVideoTab ( void )
     bool bDeviceSelectionDialogEnabled = GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
     m_pCheckBoxDeviceSelectionDialog->SetSelected ( bDeviceSelectionDialogEnabled );
 
+    // Show unsafe resolutions
+    bool bShowUnsafeResolutions;
+    CVARS_GET("show_unsafe_resolutions", bShowUnsafeResolutions);
+    m_pCheckBoxShowUnsafeResolutions->SetSelected ( bShowUnsafeResolutions );
+
     // Allow screen upload
     bool bAllowScreenUploadEnabled;
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
@@ -1308,6 +1323,44 @@ void CSettings::UpdateVideoTab ( void )
     bool bHeatHazeEnabled;
     CVARS_GET ( "heat_haze", bHeatHazeEnabled );
     m_pCheckBoxHeatHaze->SetSelected ( bHeatHazeEnabled );
+
+    PopulateResolutionComboBox();
+    
+    // Fullscreen style
+    if ( iNextFullscreenStyle == FULLSCREEN_STANDARD ) m_pFullscreenStyleCombo->SetText ( _("Standard") );
+    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS ) m_pFullscreenStyleCombo->SetText ( _("Borderless window") );
+    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS_KEEP_RES ) m_pFullscreenStyleCombo->SetText ( _("Borderless keep res") );
+
+    // Streaming memory
+    unsigned int uiStreamingMemory = 0;
+    CVARS_GET ( "streaming_memory", uiStreamingMemory );
+    uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
+    float fPos = SharedUtil::Unlerp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
+    m_pStreamingMemory->SetScrollPosition ( fPos );
+
+    int iVar = 0;
+    CVARS_GET ( "mapalpha", iVar );
+    int iAlphaPercent = ceil( ( (float)Clamp ( 0, iVar, 255 ) / 255 ) * 100 );
+    m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlphaPercent).c_str() );
+    float sbPos = (float)iAlphaPercent / 100.0f;
+    m_pMapAlpha->SetScrollPosition ( sbPos );
+
+}
+
+
+//
+// PopulateResolutionComboBox
+//
+void CSettings::PopulateResolutionComboBox( void )
+{
+    bool bNextWindowed;
+    bool bNextFSMinimize;
+    int iNextVidMode;
+    int iNextFullscreenStyle;
+    GetVideoModeManager ()->GetNextVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
+    bool bShowUnsafeResolutions = m_pCheckBoxShowUnsafeResolutions->GetSelected ();
+
+    CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
 
     VideoMode           vidModemInfo;
     int                 vidMode, numVidModes;
@@ -1335,6 +1388,10 @@ void CSettings::UpdateVideoTab ( void )
         if ( bDuplicate )
             continue;
 
+        // Check resolution is below desktop res unless that is allowed
+        if ( gameSettings->IsUnsafeResolution( vidModemInfo.width, vidModemInfo.height ) && !bShowUnsafeResolutions )
+            continue;
+
         SString strMode ( "%lu x %lu x %lu", vidModemInfo.width, vidModemInfo.height, vidModemInfo.depth );
 
         if ( vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE )
@@ -1346,26 +1403,6 @@ void CSettings::UpdateVideoTab ( void )
         if ( currentInfo.width == vidModemInfo.width && currentInfo.height == vidModemInfo.height && currentInfo.depth == vidModemInfo.depth )
             m_pComboResolution->SetText ( strMode );
     }    
-    
-    // Fullscreen style
-    if ( iNextFullscreenStyle == FULLSCREEN_STANDARD ) m_pFullscreenStyleCombo->SetText ( _("Standard") );
-    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS ) m_pFullscreenStyleCombo->SetText ( _("Borderless window") );
-    else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS_KEEP_RES ) m_pFullscreenStyleCombo->SetText ( _("Borderless keep res") );
-
-    // Streaming memory
-    unsigned int uiStreamingMemory = 0;
-    CVARS_GET ( "streaming_memory", uiStreamingMemory );
-    uiStreamingMemory = SharedUtil::Clamp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
-    float fPos = SharedUtil::Unlerp ( g_pCore->GetMinStreamingMemory (), uiStreamingMemory, g_pCore->GetMaxStreamingMemory () );
-    m_pStreamingMemory->SetScrollPosition ( fPos );
-
-    int iVar = 0;
-    CVARS_GET ( "mapalpha", iVar );
-    int iAlphaPercent = ceil( ( (float)Clamp ( 0, iVar, 255 ) / 255 ) * 100 );
-    m_pMapAlphaValueLabel->SetText ( SString("%i%%", iAlphaPercent).c_str() );
-    float sbPos = (float)iAlphaPercent / 100.0f;
-    m_pMapAlpha->SetScrollPosition ( sbPos );
-
 }
 
 //
@@ -2545,6 +2582,10 @@ void CSettings::SaveData ( void )
     bool bDeviceSelectionDialogEnabled = m_pCheckBoxDeviceSelectionDialog->GetSelected ();
     SetApplicationSettingInt ( "device-selection-disabled", bDeviceSelectionDialogEnabled ? 0 : 1 );
 
+    // Show unsafe resolutions
+    bool bShowUnsafeResolutions = m_pCheckBoxShowUnsafeResolutions->GetSelected ();
+    CVARS_SET("show_unsafe_resolutions", bShowUnsafeResolutions);
+
     // Allow screen upload
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected ();
     CVARS_SET ( "allow_screen_upload", bAllowScreenUploadEnabled );
@@ -3289,6 +3330,15 @@ bool CSettings::OnCustomizedSAFilesClick ( CGUIElement* pElement )
     return true;
 }
 
+//
+// ShowUnsafeResolutionsClick
+//
+bool CSettings::ShowUnsafeResolutionsClick ( CGUIElement* pElement )
+{
+    // Change list of available resolutions
+    PopulateResolutionComboBox();
+    return true;
+}
 
 void NewNicknameCallback ( void* ptr, unsigned int uiButton, std::string strNick )
 {

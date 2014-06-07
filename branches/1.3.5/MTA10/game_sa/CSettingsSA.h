@@ -82,6 +82,8 @@ private:
     bool                    m_bVolumetricShadowsEnabled;
     bool                    m_bVolumetricShadowsSuspended;
     eAspectRatio            m_AspectRatio;
+    int                     m_iDesktopWidth;
+    int                     m_iDesktopHeight;
 
 public:
                             CSettingsSA                 ( void );
@@ -94,6 +96,8 @@ public:
     void                    SetCurrentVideoMode         ( unsigned int modeIndex, bool bOnRestart );
     unsigned int            GetNumAdapters              ( void );
     void                    SetAdapter                  ( unsigned int uiAdapterIndex );
+    bool                    HasUnsafeResolutions        ( void );
+    bool                    IsUnsafeResolution          ( int iWidth, int iHeight );
     unsigned char           GetRadioVolume              ( void );
     void                    SetRadioVolume              ( unsigned char ucVolume );
     unsigned char           GetSFXVolume                ( void );
@@ -106,7 +110,6 @@ public:
     void                    SetRadioEqualizerEnabled    ( bool bEnable );
     bool                    IsRadioAutotuneEnabled      ( void );
     void                    SetRadioAutotuneEnabled     ( bool bEnable );
-
 
     float                   GetDrawDistance             ( void );
     void                    SetDrawDistance             ( float fDrawDistance );

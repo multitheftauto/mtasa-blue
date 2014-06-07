@@ -125,6 +125,7 @@ public:
     void                UpdateAudioTab          ();
 
     void                UpdateVideoTab          ( void );
+    void                PopulateResolutionComboBox( void );
 
     void                AddKeyBindSection       ( char * szSectionName );
     void                RemoveKeyBindSection    ( char * szSectionName );
@@ -165,6 +166,7 @@ protected:
     CGUILabel*          m_pAspectRatioLabel;
 	CGUICheckBox*       m_pCheckBoxVolumetricShadows;
 	CGUICheckBox*       m_pCheckBoxDeviceSelectionDialog;
+	CGUICheckBox*       m_pCheckBoxShowUnsafeResolutions;
 	CGUICheckBox*       m_pCheckBoxAllowScreenUpload;
 	CGUICheckBox*       m_pCheckBoxCustomizedSAFiles;
 	CGUICheckBox*       m_pCheckBoxGrass;
@@ -347,6 +349,7 @@ protected:
     bool                OnVolumetricShadowsClick ( CGUIElement* pElement );
     bool                OnAllowScreenUploadClick ( CGUIElement* pElement );
     bool                OnCustomizedSAFilesClick ( CGUIElement* pElement );
+    bool                ShowUnsafeResolutionsClick ( CGUIElement* pElement );
 
 private:
     void                ProcessKeyBinds         ( void );
