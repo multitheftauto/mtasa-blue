@@ -12,10 +12,12 @@
 
 #include <StdInc.h>
 
-CClientColRectangle::CClientColRectangle ( CClientManager* pManager, ElementID ID, const CVector& vecPosition, const CVector2D& vecSize ) : ClassInit ( this ), CClientColShape ( pManager, ID )
+CClientColRectangle::CClientColRectangle ( CClientManager* pManager, ElementID ID, const CVector2D& vecPosition, const CVector2D& vecSize ) : ClassInit ( this ), CClientColShape ( pManager, ID )
 {
     m_pManager = pManager;
-    m_vecPosition = vecPosition;
+    m_vecPosition.fX = vecPosition.fX;
+    m_vecPosition.fY = vecPosition.fY;
+    m_vecPosition.fZ = SPATIAL_2D_Z;
     m_vecSize = vecSize;
 
     UpdateSpatialData ();

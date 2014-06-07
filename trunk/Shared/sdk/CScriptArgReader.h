@@ -992,6 +992,13 @@ public:
                NextIsUserDataOfType < CLuaVector4D > ();
     }
 
+    bool NextIsVector2D ( void ) const
+    {
+        return ( NextCouldBeNumber() && NextCouldBeNumber( 1 ) )
+            || NextIsUserDataOfType < CLuaVector2D > ();
+    }
+
+
 
     //
     // Conditional reads. Default required in case condition is not met.

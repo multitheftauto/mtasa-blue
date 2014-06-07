@@ -25,6 +25,7 @@
 
 bool            CheckNickProvided           ( const char* szNick );
 float           DistanceBetweenPoints2D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
+float           DistanceBetweenPoints2D     ( const CVector2D& vecPosition1, const CVector2D& vecPosition2 );
 float           DistanceBetweenPoints3D     ( const CVector& vecPosition1, const CVector& vecPosition2 );
 bool            IsPointNearPoint2D          ( const CVector& vecPosition1, const CVector& vecPosition2, float fDistance );
 bool            IsPointNearPoint3D          ( const CVector& vecPosition1, const CVector& vecPosition2, float fDistance );

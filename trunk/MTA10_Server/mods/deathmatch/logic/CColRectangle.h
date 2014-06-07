@@ -19,7 +19,7 @@
 class CColRectangle : public CColShape
 {
 public:
-                            CColRectangle   ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector2D& vecSize, CXMLNode* pNode = NULL );
+                            CColRectangle   ( CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, const CVector2D& vecSize, CXMLNode* pNode = NULL );
 
     virtual CSphere         GetWorldBoundingSphere  ( void );
 

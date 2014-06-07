@@ -27,6 +27,16 @@ inline float DistanceBetweenPoints2D ( const CVector& vecPosition1, const CVecto
 
     return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
 }
+
+// Vector math
+inline float DistanceBetweenPoints2D ( const CVector2D& vecPosition1, const CVector2D& vecPosition2 )
+{
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+
+    return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
+}
+
 inline float HorizontalAngleBetweenPoints3D ( const CVector &vecPosition1, const CVector &vecPosition2 )
 {
     CVector zeroVec;
