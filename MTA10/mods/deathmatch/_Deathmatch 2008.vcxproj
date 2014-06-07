@@ -204,6 +204,12 @@
   <ItemGroup>
     <ClCompile Include="..\shared_logic\CClientEffect.cpp" />
     <ClCompile Include="..\shared_logic\CClientEffectManager.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaVector4Defs.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaVector3.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaVector4.cpp" />
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCommands.cpp" />
@@ -421,7 +427,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaMatrix.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaTimer.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaTimerManager.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaVector.cpp" />
     <ClCompile Include="..\shared_logic\lua\LuaCommon.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp" />
@@ -434,7 +439,6 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaFxDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaMatrixDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaTaskDefs.cpp" />
-    <ClCompile Include="..\shared_logic\luadefs\CLuaVectorDefs.cpp" />
     <ClCompile Include="..\..\..\vendor\bob_withers\base64.cpp" />
     <ClCompile Include="..\..\..\vendor\portaudio\pa_allocation.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -586,6 +590,12 @@
   <ItemGroup>
     <ClInclude Include="..\shared_logic\CClientEffect.h" />
     <ClInclude Include="..\shared_logic\CClientEffectManager.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaVector4Defs.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaVector2.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaVector3.h" />
+    <ClInclude Include="..\shared_logic\lua\CLuaVector4.h" />
     <ClInclude Include="CClient.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientCommands.h" />
@@ -795,7 +805,6 @@
     <ClInclude Include="..\shared_logic\lua\CLuaModuleManager.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaTimer.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaTimerManager.h" />
-    <ClInclude Include="..\shared_logic\lua\CLuaVector.h" />
     <ClInclude Include="..\shared_logic\lua\LuaCommon.h" />
     <ClInclude Include="..\..\..\vendor\bochs\bochs_internal\crc32.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaClassDefs.h" />
@@ -804,7 +813,6 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaFxDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaMatrixDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaTaskDefs.h" />
-    <ClInclude Include="..\shared_logic\luadefs\CLuaVectorDefs.h" />
     <ClInclude Include="..\shared_logic\lua\oopdefs\CLuaOOPDefs.h" />
     <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CDebugHookManager.h" />
     <ClInclude Include="..\..\..\Shared\mods\deathmatch\logic\CIdArray.h" />

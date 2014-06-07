@@ -888,9 +888,6 @@
     <ClCompile Include="logic\lua\CLuaMatrix.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\CLuaVector.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp">
       <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>
@@ -906,7 +903,22 @@
     <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
-    <ClCompile Include="logic\luadefs\CLuaVectorDefs.cpp">
+    <ClCompile Include="logic\lua\CLuaVector2.cpp">
+      <Filter>Source Files\logic\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\lua\CLuaVector3.cpp">
+      <Filter>Source Files\logic\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\lua\CLuaVector4.cpp">
+      <Filter>Source Files\logic\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaVector3Defs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaVector4Defs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaVector2Defs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1754,7 +1766,22 @@
     <ClInclude Include="logic\luadefs\CLuaMatrixDefs.h">
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
-    <ClInclude Include="logic\luadefs\CLuaVectorDefs.h">
+    <ClInclude Include="logic\lua\CLuaVector2.h">
+      <Filter>Header Files\logic\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\lua\CLuaVector3.h">
+      <Filter>Header Files\logic\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\lua\CLuaVector4.h">
+      <Filter>Header Files\logic\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaVector3Defs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaVector4Defs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaVector2Defs.h">
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>

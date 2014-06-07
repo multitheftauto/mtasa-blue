@@ -671,9 +671,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaTimerManager.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaVector.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\LuaCommon.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
@@ -708,9 +705,6 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaTaskDefs.cpp">
-      <Filter>Source Files\shared_logic\luadefs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\luadefs\CLuaVectorDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vendor\bob_withers\base64.cpp">
@@ -802,6 +796,24 @@
     </ClCompile>
     <ClCompile Include="..\shared_logic\CClientEffectManager.cpp">
       <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaVector4Defs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\lua\CLuaVector3.cpp">
+      <Filter>Source Files\shared_logic\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\lua\CLuaVector4.cpp">
+      <Filter>Source Files\shared_logic\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp">
+      <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1429,9 +1441,6 @@
     <ClInclude Include="..\shared_logic\lua\CLuaTimerManager.h">
       <Filter>Header Files\shared_logic\lua</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared_logic\lua\CLuaVector.h">
-      <Filter>Header Files\shared_logic\lua</Filter>
-    </ClInclude>
     <ClInclude Include="..\shared_logic\lua\LuaCommon.h">
       <Filter>Header Files\shared_logic\lua</Filter>
     </ClInclude>
@@ -1454,9 +1463,6 @@
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaTaskDefs.h">
-      <Filter>Header Files\shared_logic\luadefs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared_logic\luadefs\CLuaVectorDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\lua\oopdefs\CLuaOOPDefs.h">
@@ -1500,6 +1506,24 @@
     </ClInclude>
     <ClInclude Include="..\shared_logic\CClientEffectManager.h">
       <Filter>Header Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaVector4Defs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\lua\CLuaVector3.h">
+      <Filter>Header Files\shared_logic\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\lua\CLuaVector4.h">
+      <Filter>Header Files\shared_logic\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\lua\CLuaVector2.h">
+      <Filter>Header Files\shared_logic\lua</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
