@@ -13,13 +13,13 @@
 #ifndef __CLUAVECTOR4_H
 #define __CLUAVECTOR4_H
 
-class CLuaVector4D : public CVector
+class CLuaVector4D : public CVector4D
 {
 public:
 
                             CLuaVector4D        ( void );
-                            CLuaVector4D        ( const CVector & vector );
-                            CLuaVector4D        ( float fX, float fY, float fZ );
+                            CLuaVector4D        ( const CVector4D & vector );
+                            CLuaVector4D        ( float fX, float fY, float fZ, float fW );
 
                             ~CLuaVector4D       ( void );
 
