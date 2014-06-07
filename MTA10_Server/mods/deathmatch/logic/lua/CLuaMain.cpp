@@ -18,7 +18,6 @@
 #include "StdInc.h"
 
 #include "CLuaFunctionDefinitions.h"
-
 #include <clocale>
 
 static CLuaManager* m_pLuaManager;
@@ -381,8 +380,8 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getAllData", "getAllElementData" );
     lua_classfunction ( luaVM, "getColShape", "getElementColShape" );
     lua_classfunction ( luaVM, "getData", "getElementData" );
-    //lua_classfunction ( luaVM, "getPosition", "getElementPosition", CLuaOOPDefs::GetElementPosition );
-    //lua_classfunction ( luaVM, "getRotation", "getElementRotation", CLuaOOPDefs::GetElementRotation );
+    lua_classfunction ( luaVM, "getPosition", "getElementPosition", CLuaOOPDefs::GetElementPosition );
+    lua_classfunction ( luaVM, "getRotation", "getElementRotation", CLuaOOPDefs::GetElementRotation );
     lua_classfunction ( luaVM, "getPosition", "getElementPosition" );
     lua_classfunction ( luaVM, "getRotation", "getElementRotation" );
     lua_classfunction ( luaVM, "getType", "getElementType" );
@@ -420,9 +419,9 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
     lua_classvariable ( luaVM, "colShape", NULL, "getElementColShape" );
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
-    //lua_classvariable ( luaVM, "position", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
-    //lua_classvariable ( luaVM, "rotation", CLuaFunctionDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
-    //lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity", CLuaFunctionDefs::SetElementVelocity, CLuaOOPDefs::GetElementVelocity );
+    lua_classvariable ( luaVM, "position", "setElementPosition", "getElementPosition", CLuaElementDefs::setElementPosition, CLuaOOPDefs::GetElementPosition );
+    lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", CLuaElementDefs::setElementRotation, CLuaOOPDefs::GetElementRotation );
+    lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity" ); // TODO return Vector3
     //lua_classvariable ( luaVM, "data", "setElementData", "getElementData", CLuaOOPDefs::SetElementData, CLuaOOPDefs::GetElementData );
     //lua_classvariable ( luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", CLuaOOPDefs::SetElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo ); // .visibility[john]=false
     
@@ -767,7 +766,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "occupiedVehicleSeat", NULL, "getPedOccupiedVehicleSeat" );
     lua_classvariable ( luaVM, "contactElement", NULL, "getPedContactElement" );
     lua_classvariable ( luaVM, "totalAmmoInWeaponOfCurrentWeaponSlot", NULL, "getPedTotalAmmo" );
-    lua_classvariable ( luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle ); // what about removePedFromVehicle?
+    lua_classvariable ( luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefinitions::GetPedOccupiedVehicle ); // what about removePedFromVehicle?
     lua_classvariable ( luaVM, "dead", "killPed", "isPedDead" ); // Discuss whether it is appropriate to require a nil value to actually make the ped dead, should a special be done here?
     //lua_classvariable ( luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle", CLuaOOPDefs::SetPedWalkingStyle, CLuaOOPDefs::GetPedWalkingStyle );
     //lua_classvariable ( luaVM, "stats", "setPedStat", "getPedStat", CLuaOOPDefs::SetPedStat, CLuaOOPDefs::GetPedStat ); // table
@@ -1119,7 +1118,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
 
     // Element
     lua_newclass ( luaVM );
-    //AddVector4DClass         ( luaVM );
+    AddVector4DClass         ( luaVM );
     AddVector3DClass            ( luaVM );
     AddVector2DClass            ( luaVM );
     AddMatrixClass              ( luaVM );

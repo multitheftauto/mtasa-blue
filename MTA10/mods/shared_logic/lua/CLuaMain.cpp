@@ -1716,7 +1716,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
 {
     lua_initclasses             ( luaVM );
 
-    //AddVector4DClass            ( luaVM );
+    AddVector4DClass            ( luaVM );
     AddVector3DClass            ( luaVM );
     AddVector2DClass          ( luaVM );
     AddMatrixClass              ( luaVM );

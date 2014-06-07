@@ -46,6 +46,13 @@ public:
         return *this;
     }
 
+    CVector2D& operator = ( const CVector4D& vec )
+    {
+        fX = vec.fX;
+        fY = vec.fY;
+        return *this;
+    }
+
     float DotProduct ( CVector2D& other ) const
     {
         return fX*other.fX + fY*other.fY;
