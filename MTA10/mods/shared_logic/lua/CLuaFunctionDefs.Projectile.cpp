@@ -23,12 +23,11 @@ int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
 {
     CVector vecOrigin;
     CClientEntity* pCreator = NULL;
-    CClientEntity* pTemp = NULL;
     unsigned char ucWeaponType = 0;
     CScriptArgReader argStream ( luaVM );
     float fForce = 1.0f;
     CClientEntity* pTarget = NULL;
-    CVector *pvecRotation = new CVector ( 0, 0, 0 ), *pvecMoveSpeed = new CVector ( 0, 0, 0 );
+    CVector vecRotation, vecMoveSpeed;
     unsigned short usModel = 0;
     argStream.ReadUserData ( pCreator );
     if ( pCreator )
@@ -37,9 +36,9 @@ int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
     argStream.ReadNumber ( ucWeaponType );
     argStream.ReadVector3D ( vecOrigin, vecOrigin );
     argStream.ReadNumber ( fForce, 1.0f );
-    argStream.ReadUserData ( pTemp, NULL );
-    argStream.ReadVector3D ( *pvecRotation, *pvecRotation );
-    argStream.ReadVector3D ( *pvecMoveSpeed, *pvecMoveSpeed );
+    argStream.ReadUserData( pTarget, NULL);
+    argStream.ReadVector3D ( vecRotation, vecRotation );
+    argStream.ReadVector3D ( vecMoveSpeed, vecMoveSpeed );
     argStream.ReadNumber ( usModel, 0 );
 
     if ( !argStream.HasErrors ( ) )
@@ -52,24 +51,13 @@ int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
                 CResource * pResource = pLuaMain->GetResource();
                 if ( pResource )
                 {
-                    CClientProjectile * pProjectile = CStaticFunctionDefinitions::CreateProjectile ( *pResource, *pCreator, ucWeaponType, vecOrigin, fForce, pTarget, pvecRotation, pvecMoveSpeed, usModel );
+                    CClientProjectile * pProjectile = CStaticFunctionDefinitions::CreateProjectile ( *pResource, *pCreator, ucWeaponType, vecOrigin, fForce, pTarget, vecRotation, vecMoveSpeed, usModel );
                     if ( pProjectile )
                     {
                         CElementGroup * pGroup = pResource->GetElementGroup();
                         if ( pGroup )
                         {
                             pGroup->Add ( ( CClientEntity* ) pProjectile );
-                        }
-
-                        if ( pvecRotation )
-                        {
-                            delete pvecRotation;
-                            pvecRotation = NULL;
-                        }
-                        if ( pvecMoveSpeed )
-                        {
-                            delete pvecMoveSpeed;
-                            pvecMoveSpeed = NULL;
                         }
 
                         lua_pushelement ( luaVM, pProjectile );
@@ -84,16 +72,6 @@ int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    if ( pvecRotation )
-    {
-        delete pvecRotation;
-        pvecRotation = NULL;
-    }
-    if ( pvecMoveSpeed )
-    {
-        delete pvecMoveSpeed;
-        pvecMoveSpeed = NULL;
-    }
     lua_pushboolean ( luaVM, false );
     return 1;
 }
