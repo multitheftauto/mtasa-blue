@@ -26,10 +26,8 @@ int CLuaFunctionDefs::CreateRadarArea ( lua_State* luaVM )
     CVector2D vecPosition; CVector2D vecSize; float dRed; float dGreen; float dBlue; float dAlpha;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecSize.fX );
-    argStream.ReadNumber ( vecSize.fY );
+    argStream.ReadVector2D ( vecPosition );
+    argStream.ReadVector2D ( vecSize );
     argStream.ReadNumber ( dRed, 255 );
     argStream.ReadNumber ( dGreen, 0 );
     argStream.ReadNumber ( dBlue, 0 );
@@ -179,8 +177,7 @@ int CLuaFunctionDefs::SetRadarAreaSize ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pRadarArea );
-    argStream.ReadNumber ( vecSize.fX );
-    argStream.ReadNumber ( vecSize.fY );
+    argStream.ReadVector2D ( vecSize );
 
     if ( !argStream.HasErrors () )
     {
@@ -230,8 +227,7 @@ int CLuaFunctionDefs::IsInsideRadarArea ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pRadarArea );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadVector2D ( vecPosition );
 
     if ( !argStream.HasErrors () )
     {

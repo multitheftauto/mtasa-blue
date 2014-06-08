@@ -1597,9 +1597,7 @@ int CLuaFunctionDefs::SetPedLookAt ( lua_State* luaVM )
     CClientEntity * pTarget = NULL;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadNumber ( iTime, 3000 );
     if ( argStream.NextIsUserData ( ) )
     {
@@ -1754,9 +1752,7 @@ int CLuaFunctionDefs::SetPedAimTarget ( lua_State* luaVM )
     CVector vecTarget;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecTarget.fX );
-    argStream.ReadNumber ( vecTarget.fY );
-    argStream.ReadNumber ( vecTarget.fZ );
+    argStream.ReadVector3D ( vecTarget );
 
     if ( !argStream.HasErrors ( ) )
     {

@@ -35,17 +35,11 @@ int CLuaFunctionDefs::CreateProjectile ( lua_State* luaVM )
         pCreator->GetPosition ( vecOrigin );
 
     argStream.ReadNumber ( ucWeaponType );
-    argStream.ReadNumber ( vecOrigin.fX, vecOrigin.fX );
-    argStream.ReadNumber ( vecOrigin.fY, vecOrigin.fY );
-    argStream.ReadNumber ( vecOrigin.fZ, vecOrigin.fZ );
+    argStream.ReadVector3D ( vecOrigin, vecOrigin );
     argStream.ReadNumber ( fForce, 1.0f );
     argStream.ReadUserData ( pTemp, NULL );
-    argStream.ReadNumber ( pvecRotation->fX, pvecRotation->fX );
-    argStream.ReadNumber ( pvecRotation->fY, pvecRotation->fY );
-    argStream.ReadNumber ( pvecRotation->fZ, pvecRotation->fZ );
-    argStream.ReadNumber ( pvecMoveSpeed->fX, pvecMoveSpeed->fX );
-    argStream.ReadNumber ( pvecMoveSpeed->fY, pvecMoveSpeed->fY );
-    argStream.ReadNumber ( pvecMoveSpeed->fZ, pvecMoveSpeed->fZ );
+    argStream.ReadVector3D ( *pvecRotation, *pvecRotation );
+    argStream.ReadVector3D ( *pvecMoveSpeed, *pvecMoveSpeed );
     argStream.ReadNumber ( usModel, 0 );
 
     if ( !argStream.HasErrors ( ) )

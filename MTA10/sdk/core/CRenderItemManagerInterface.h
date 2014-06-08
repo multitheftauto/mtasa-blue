@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include <CVector.h>
+#include <CVector2D.h>
 
 struct ID3DXFont;
 struct IDirect3DBaseTexture9;
@@ -190,7 +191,7 @@ struct SShaderTransform
     CVector vecRotCenOffset;
     bool bRotCenOffsetOriginIsScreen;
 
-    CVector vecPersCenOffset;
+    CVector2D vecPersCenOffset;
     bool bPersCenOffsetOriginIsScreen;
 };
 

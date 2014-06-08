@@ -240,18 +240,21 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
 {
 //  bool dxDrawImage ( float posX, float posY, float width, float height, string filepath [, float rotation = 0, float rotationCenterOffsetX = 0, 
 //      float rotationCenterOffsetY = 0, int color = white, bool postGUI = false ] )
-    float fPosX; float fPosY; float fWidth; float fHeight; CClientMaterial* pMaterialElement; float fRotation;
-        float fRotCenOffX; float fRotCenOffY; uint ulColor; bool bPostGUI;
+
+    CVector2D vecPosition;
+    CVector2D vecSize;
+    CClientMaterial* pMaterialElement; 
+    float fRotation;
+    CVector2D vecRotationCenter;
+    uint ulColor; 
+    bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( fPosX );
-    argStream.ReadNumber ( fPosY );
-    argStream.ReadNumber ( fWidth );
-    argStream.ReadNumber ( fHeight );
+    argStream.ReadVector2D ( vecPosition );
+    argStream.ReadVector2D ( vecSize );
     MixedReadMaterialString ( argStream, pMaterialElement );
     argStream.ReadNumber ( fRotation, 0 );
-    argStream.ReadNumber ( fRotCenOffX, 0 );
-    argStream.ReadNumber ( fRotCenOffY, 0 );
+    argStream.ReadVector2D ( vecRotationCenter, CVector2D ( ) );
     argStream.ReadNumber ( ulColor, 0xffffffff );
     argStream.ReadBool ( bPostGUI, false );
 
@@ -259,7 +262,7 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
     {
         if ( pMaterialElement )
         {
-            g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, 0, 0, 1, 1, true, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI );
+            g_pCore->GetGraphics ()->DrawTextureQueued ( vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, 0, 0, 1, 1, true, pMaterialElement->GetMaterialItem (), fRotation, vecRotationCenter.fX, vecRotationCenter.fY, ulColor, bPostGUI );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
@@ -277,22 +280,24 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
 {
 //  bool dxDrawImageSection ( float posX, float posY, float width, float height, float u, float v, float usize, float vsize, string filepath, 
 //      [ float rotation = 0, float rotationCenterOffsetX = 0, float rotationCenterOffsetY = 0, int color = white, bool postGUI = false ] )
-    float fPosX; float fPosY; float fWidth; float fHeight; float fU; float fV; float fSizeU; float fSizeV; CClientMaterial* pMaterialElement;
-         float fRotation; float fRotCenOffX; float fRotCenOffY; uint ulColor; bool bPostGUI;
+    CVector2D vecPosition;
+    CVector2D vecSize;
+    CVector2D vecSectionPosition;
+    CVector2D vecSectionSize;
+    CClientMaterial* pMaterialElement;
+    float fRotation; 
+    CVector2D vecRotationCenter;
+    uint ulColor;
+    bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( fPosX );
-    argStream.ReadNumber ( fPosY );
-    argStream.ReadNumber ( fWidth );
-    argStream.ReadNumber ( fHeight );
-    argStream.ReadNumber ( fU );
-    argStream.ReadNumber ( fV );
-    argStream.ReadNumber ( fSizeU );
-    argStream.ReadNumber ( fSizeV );
+    argStream.ReadVector2D ( vecPosition );
+    argStream.ReadVector2D ( vecSize );
+    argStream.ReadVector2D ( vecSectionPosition );
+    argStream.ReadVector2D ( vecSectionSize );
     MixedReadMaterialString ( argStream, pMaterialElement );
     argStream.ReadNumber ( fRotation, 0 );
-    argStream.ReadNumber ( fRotCenOffX, 0 );
-    argStream.ReadNumber ( fRotCenOffY, 0 );
+    argStream.ReadVector2D ( vecRotationCenter, CVector2D ( ) );
     argStream.ReadNumber ( ulColor, 0xffffffff );
     argStream.ReadBool ( bPostGUI, false );
 
@@ -300,7 +305,7 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
     {
         if ( pMaterialElement )
         {
-            g_pCore->GetGraphics ()->DrawTextureQueued ( fPosX, fPosY, fWidth, fHeight, fU, fV, fSizeU, fSizeV, false, pMaterialElement->GetMaterialItem (), fRotation, fRotCenOffX, fRotCenOffY, ulColor, bPostGUI );
+            g_pCore->GetGraphics ()->DrawTextureQueued ( vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, vecSectionPosition.fX, vecSectionPosition.fY, vecSectionSize.fX, vecSectionSize.fY, false, pMaterialElement->GetMaterialItem (), fRotation, vecRotationCenter.fX, vecRotationCenter.fY, ulColor, bPostGUI );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
@@ -762,15 +767,10 @@ int CLuaFunctionDefs::dxSetShaderTransform ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
 
-    argStream.ReadNumber ( transform.vecRot.fX, 0 );
-    argStream.ReadNumber ( transform.vecRot.fY, 0 );
-    argStream.ReadNumber ( transform.vecRot.fZ, 0 );
-    argStream.ReadNumber ( transform.vecRotCenOffset.fX, 0 );
-    argStream.ReadNumber ( transform.vecRotCenOffset.fY, 0 );
-    argStream.ReadNumber ( transform.vecRotCenOffset.fZ, 0 );
+    argStream.ReadVector3D ( transform.vecRot, CVector ( ) );
+    argStream.ReadVector3D ( transform.vecRotCenOffset, CVector ( ) );
     argStream.ReadBool ( transform.bRotCenOffsetOriginIsScreen, false );
-    argStream.ReadNumber ( transform.vecPersCenOffset.fX, 0 );
-    argStream.ReadNumber ( transform.vecPersCenOffset.fY, 0 );
+    argStream.ReadVector2D ( transform.vecPersCenOffset, CVector2D ( ) );
     argStream.ReadBool ( transform.bPersCenOffsetOriginIsScreen, false );
 
     if ( !argStream.HasErrors () )
