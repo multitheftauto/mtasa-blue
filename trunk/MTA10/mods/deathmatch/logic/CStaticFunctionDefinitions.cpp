@@ -6623,14 +6623,9 @@ bool CStaticFunctionDefinitions::ToggleAllControls ( bool bGTAControls, bool bMT
 }
 
 
-CClientProjectile * CStaticFunctionDefinitions::CreateProjectile ( CResource& Resource, CClientEntity& Creator, unsigned char ucWeaponType, CVector& vecOrigin, float fForce, CClientEntity* pTarget, CVector* pvecRotation, CVector* pvecVelocity, unsigned short usModel )
+CClientProjectile * CStaticFunctionDefinitions::CreateProjectile ( CResource& Resource, CClientEntity& Creator, unsigned char ucWeaponType, CVector& vecOrigin, float fForce, CClientEntity* pTarget, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel )
 {
-    // Do we have a rotation vector?
-    if ( pvecRotation )
-    {
-        // It should be in degrees, so convert it to radians
-        ConvertDegreesToRadians ( *pvecRotation );
-    }
+    ConvertDegreesToRadians ( vecRotation );
 
     // Valid creator type?
     switch ( Creator.GetType () )
@@ -6656,7 +6651,7 @@ CClientProjectile * CStaticFunctionDefinitions::CreateProjectile ( CResource& Re
                     if ( pProjectile )
                     {
                         // Set our intiation data, which will be used on the next frame
-                        pProjectile->Initiate ( &vecOrigin, pvecRotation, pvecVelocity, usModel );
+                        pProjectile->Initiate ( vecOrigin, vecRotation, vecVelocity, usModel );
                         pProjectile->SetParent ( Resource.GetResourceDynamicEntity() );
                         return pProjectile;
                     }
