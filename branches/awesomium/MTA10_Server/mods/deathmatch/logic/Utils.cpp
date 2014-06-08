@@ -90,6 +90,14 @@ float DistanceBetweenPoints2D ( const CVector& vecPosition1, const CVector& vecP
     return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
 }
 
+float DistanceBetweenPoints2D ( const CVector2D& vecPosition1, const CVector2D& vecPosition2 )
+{
+    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
+    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
+
+    return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
+}
+
 
 float DistanceBetweenPoints3D ( const CVector& vecPosition1, const CVector& vecPosition2 )
 {

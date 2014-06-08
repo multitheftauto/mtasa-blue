@@ -12,9 +12,9 @@
 
 #include "StdInc.h"
 
-int CLuaVectorDefs::Create ( lua_State* luaVM )
+int CLuaVector2Defs::Create ( lua_State* luaVM )
 {
-    CVector vector;
+    CVector2D vector;
 
     CScriptArgReader argStream ( luaVM );
     if ( argStream.NextIsTable () )
@@ -52,22 +52,6 @@ int CLuaVectorDefs::Create ( lua_State* luaVM )
                 vector.fY = ( float ) lua_tonumber ( luaVM, -1 );
             lua_pop ( luaVM, 1 );
         }
-
-        lua_pushstring ( luaVM, "z" );
-        lua_rawget ( luaVM, -2 );
-        if ( lua_isnumber ( luaVM, -1 ) )
-        {
-            vector.fZ = ( float ) lua_tonumber ( luaVM, -1 );
-            lua_pop ( luaVM, 1 );
-        }
-        else
-        {
-            lua_pop ( luaVM, 1 );
-            lua_rawgeti ( luaVM, -1, 3 );
-            if ( lua_isnumber ( luaVM, -1 ) )
-                vector.fZ = ( float ) lua_tonumber ( luaVM, -1 );
-            lua_pop ( luaVM, 1 );
-        }
     }
     else if ( argStream.NextIsNumber () )
     {
@@ -75,17 +59,16 @@ int CLuaVectorDefs::Create ( lua_State* luaVM )
         if ( argStream.NextIsNumber () )
         {
             argStream.ReadNumber ( vector.fY );
-            if ( argStream.NextIsNumber () )
-                argStream.ReadNumber ( vector.fZ );
         }
     }
+
     lua_pushvector ( luaVM, vector );
     return 1;
 }
 
-int CLuaVectorDefs::Destroy ( lua_State* luaVM )
+int CLuaVector2Defs::Destroy ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector );
@@ -93,13 +76,22 @@ int CLuaVectorDefs::Destroy ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         delete pVector;
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
-    return 0;
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::GetLength ( lua_State* luaVM )
+int CLuaVector2Defs::GetLength ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector );
@@ -109,12 +101,18 @@ int CLuaVectorDefs::GetLength ( lua_State* luaVM )
         lua_pushnumber ( luaVM, pVector->Length () );
         return 1;
     }
-    return 0;      
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1; 
 }
 
-int CLuaVectorDefs::GetLengthSquared ( lua_State* luaVM )
+int CLuaVector2Defs::GetLengthSquared ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector );
@@ -124,30 +122,42 @@ int CLuaVectorDefs::GetLengthSquared ( lua_State* luaVM )
         lua_pushnumber ( luaVM, pVector->LengthSquared () );
         return 1;
     }
-    return 0;      
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::GetNormalized ( lua_State* luaVM )
+int CLuaVector2Defs::GetNormalized ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector );
 
     if ( !argStream.HasErrors () )
     {
-        CVector vector ( *pVector );
+        CVector2D vector ( *pVector );
         vector.Normalize ();
 
         lua_pushvector ( luaVM, vector );
         return 1;
     }
-    return 0;      
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;   
 }
 
-int CLuaVectorDefs::Normalize ( lua_State* luaVM )
+int CLuaVector2Defs::Normalize ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector );
@@ -158,14 +168,19 @@ int CLuaVectorDefs::Normalize ( lua_State* luaVM )
         lua_pushboolean ( luaVM, true );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
     lua_pushboolean ( luaVM, false );
     return 1;      
 }
 
-int CLuaVectorDefs::Cross ( lua_State* luaVM )
+int CLuaVector2Defs::Dot ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CLuaVector2D* pVector1 = NULL;
+    CLuaVector2D* pVector2 = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector1 );
@@ -173,56 +188,46 @@ int CLuaVectorDefs::Cross ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CVector vector ( *pVector1 );
-        vector.CrossProduct ( pVector2 );
+        CVector2D vector ( *pVector1 );
+        vector.DotProduct ( *pVector2 );
         
         lua_pushvector ( luaVM, vector );
         return 1;
     }
-
-    return 0;
-}
-
-int CLuaVectorDefs::Dot ( lua_State* luaVM )
-{
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVector1 );
-    argStream.ReadUserData ( pVector2 );
-
-    if ( !argStream.HasErrors () )
+    else
     {
-        CVector vector ( *pVector1 );
-        vector.DotProduct ( pVector2 );
-        
-        lua_pushvector ( luaVM, vector );
-        return 1;
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::ToString ( lua_State* luaVM )
+int CLuaVector2Defs::ToString ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector );
 
     if ( !argStream.HasErrors () )
     {
-        SString string = SString ( "vector3: { x = %.3f, y = %.3f, z = %.3f }", pVector->fX, pVector->fY, pVector->fZ );
+        SString string = SString ( "vector2: { x = %.3f, y = %.3f }", pVector->fX, pVector->fY );
         lua_pushstring ( luaVM, string.c_str () );
         return 1;
     }
-    return 0;
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::SetX ( lua_State* luaVM )
+int CLuaVector2Defs::SetX ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
     float fValue = 0.0f;
 
     CScriptArgReader argStream ( luaVM );
@@ -230,14 +235,24 @@ int CLuaVectorDefs::SetX ( lua_State* luaVM )
     argStream.ReadNumber ( fValue );
 
     if ( !argStream.HasErrors () )
+    {
         pVector->fX = fValue;
 
-    return !argStream.HasErrors ();
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::SetY ( lua_State* luaVM )
+int CLuaVector2Defs::SetY ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
     float fValue = 0.0f;
 
     CScriptArgReader argStream ( luaVM );
@@ -245,29 +260,24 @@ int CLuaVectorDefs::SetY ( lua_State* luaVM )
     argStream.ReadNumber ( fValue );
 
     if ( !argStream.HasErrors () )
+    {
         pVector->fY = fValue;
 
-    return !argStream.HasErrors ();
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::SetZ ( lua_State* luaVM )
+int CLuaVector2Defs::GetX ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
-    float fValue = 0.0f;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVector );
-    argStream.ReadNumber ( fValue );
-
-    if ( !argStream.HasErrors () )
-        pVector->fZ = fValue;
-    
-    return !argStream.HasErrors ();
-}
-
-int CLuaVectorDefs::GetX ( lua_State* luaVM )
-{
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector );
@@ -277,12 +287,18 @@ int CLuaVectorDefs::GetX ( lua_State* luaVM )
         lua_pushnumber ( luaVM, pVector->fX );
         return 1;
     }
-    return 0;        
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;    
 }
 
-int CLuaVectorDefs::GetY ( lua_State* luaVM )
+int CLuaVector2Defs::GetY ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector );
@@ -292,28 +308,19 @@ int CLuaVectorDefs::GetY ( lua_State* luaVM )
         lua_pushnumber ( luaVM, pVector->fY );
         return 1;
     }
-    return 0; 
-}
-
-int CLuaVectorDefs::GetZ ( lua_State* luaVM )
-{
-    CLuaVector3D* pVector = NULL;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVector );
-
-    if ( !argStream.HasErrors () )
+    else
     {
-        lua_pushnumber ( luaVM, pVector->fZ );
-        return 1;
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     }
-    return 0; 
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::Add ( lua_State* luaVM )
+int CLuaVector2Defs::Add ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CLuaVector2D* pVector1 = NULL;
+    CLuaVector2D* pVector2 = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector1 );
@@ -324,14 +331,19 @@ int CLuaVectorDefs::Add ( lua_State* luaVM )
         lua_pushvector ( luaVM, *pVector1 + *pVector2 );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::Sub ( lua_State* luaVM )
+int CLuaVector2Defs::Sub ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CLuaVector2D* pVector1 = NULL;
+    CLuaVector2D* pVector2 = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector1 );
@@ -342,14 +354,19 @@ int CLuaVectorDefs::Sub ( lua_State* luaVM )
         lua_pushvector ( luaVM, *pVector1 - *pVector2 );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::Mul ( lua_State* luaVM )
+int CLuaVector2Defs::Mul ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CLuaVector2D* pVector1 = NULL;
+    CLuaVector2D* pVector2 = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector1 );
@@ -371,15 +388,20 @@ int CLuaVectorDefs::Mul ( lua_State* luaVM )
             lua_pushvector ( luaVM, *pVector1 * *pVector2 );
             return 1;
         }
+        else
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        }
     }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::Div ( lua_State* luaVM )
+int CLuaVector2Defs::Div ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CLuaVector2D* pVector1 = NULL;
+    CLuaVector2D* pVector2 = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector1 );
@@ -401,15 +423,20 @@ int CLuaVectorDefs::Div ( lua_State* luaVM )
             lua_pushvector ( luaVM, *pVector1 / *pVector2 );
             return 1;
         }
+        else
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        }
     }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::Pow ( lua_State* luaVM )
+int CLuaVector2Defs::Pow ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CLuaVector2D* pVector1 = NULL;
+    CLuaVector2D* pVector2 = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector1 );
@@ -419,10 +446,9 @@ int CLuaVectorDefs::Pow ( lua_State* luaVM )
         float fValue = 0.0f;
         argStream.ReadNumber ( fValue );
 
-        CVector vector ( *pVector1 );
+        CVector2D vector ( *pVector1 );
         vector.fX = pow ( vector.fX, fValue );
         vector.fY = pow ( vector.fY, fValue );
-        vector.fZ = pow ( vector.fZ, fValue );
 
         lua_pushvector ( luaVM, vector );
         return 1;
@@ -433,39 +459,48 @@ int CLuaVectorDefs::Pow ( lua_State* luaVM )
 
         if ( !argStream.HasErrors () )
         {
-            CVector vector ( *pVector1 );
+            CVector2D vector ( *pVector1 );
             vector.fX = pow ( vector.fX, pVector2->fX );
             vector.fY = pow ( vector.fY, pVector2->fY );
-            vector.fZ = pow ( vector.fZ, pVector2->fZ );
 
             lua_pushvector ( luaVM, vector );
             return 1;
         }
+        else
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        }
     }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::Unm ( lua_State* luaVM )
+int CLuaVector2Defs::Unm ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector = NULL;
+    CLuaVector2D* pVector = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector );
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushvector ( luaVM, CVector () - *pVector );
+        lua_pushvector ( luaVM, CVector2D () - *pVector );
         return 1;
     }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return 0;
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
-int CLuaVectorDefs::Eq ( lua_State* luaVM )
+int CLuaVector2Defs::Eq ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CLuaVector2D* pVector1 = NULL;
+    CLuaVector2D* pVector2 = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVector1 );
@@ -475,6 +510,10 @@ int CLuaVectorDefs::Eq ( lua_State* luaVM )
     {
         lua_pushboolean ( luaVM, pVector1 == pVector2 );
         return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     }
 
     lua_pushboolean ( luaVM, false );

@@ -30,8 +30,16 @@ int CLuaMatrixDefs::Destroy ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         delete pMatrix;
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
-    return 0;
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaMatrixDefs::ToString ( lua_State* luaVM )
@@ -47,7 +55,81 @@ int CLuaMatrixDefs::ToString ( lua_State* luaVM )
         lua_pushstring ( luaVM, string.c_str () );
         return 1;
     }
-    return 0;
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaMatrixDefs::TransformPosition ( lua_State* luaVM )
+{
+    CLuaMatrix* pMatrix1 = NULL;
+    CVector vector;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMatrix1 );
+    argStream.ReadVector3D ( vector );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushvector( luaVM, pMatrix1->TransformVector ( vector ) );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaMatrixDefs::TransformDirection ( lua_State* luaVM )
+{
+    CLuaMatrix* pMatrix1 = NULL;
+    CVector vector;
+
+    CScriptArgReader argStream ( luaVM );
+
+    argStream.ReadUserData ( pMatrix1 );
+    argStream.ReadVector3D ( vector );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushvector ( luaVM, *pMatrix1 * vector );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaMatrixDefs::Inverse ( lua_State* luaVM )
+{
+    CLuaMatrix* pMatrix1 = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMatrix1 );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushmatrix ( luaVM, pMatrix1->Inverse ( ) );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaMatrixDefs::GetPosition ( lua_State* luaVM )
@@ -62,7 +144,13 @@ int CLuaMatrixDefs::GetPosition ( lua_State* luaVM )
         lua_pushvector ( luaVM, pMatrix->vPos );
         return 1;
     }
-    return 0;        
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1; 
 }
 
 int CLuaMatrixDefs::GetRotation ( lua_State* luaVM )
@@ -75,16 +163,22 @@ int CLuaMatrixDefs::GetRotation ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         CVector vecRotation;
-        g_pMultiplayer->ConvertMatrixToEulerAngles ( *pMatrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        vecRotation = pMatrix->GetRotation ( );
         ConvertRadiansToDegrees ( vecRotation );
 
         lua_pushvector ( luaVM, vecRotation );
         return 1;
     }
-    return 0;        
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;    
 }
 
-int CLuaMatrixDefs::GetFront ( lua_State* luaVM )
+int CLuaMatrixDefs::GetForward ( lua_State* luaVM )
 {
     CLuaMatrix* pMatrix = NULL;
 
@@ -96,7 +190,13 @@ int CLuaMatrixDefs::GetFront ( lua_State* luaVM )
         lua_pushvector ( luaVM, pMatrix->vFront );
         return 1;
     }
-    return 0;        
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaMatrixDefs::GetRight ( lua_State* luaVM )
@@ -111,7 +211,13 @@ int CLuaMatrixDefs::GetRight ( lua_State* luaVM )
         lua_pushvector ( luaVM, pMatrix->vRight );
         return 1;
     }
-    return 0;        
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;     
 }
 
 int CLuaMatrixDefs::GetUp ( lua_State* luaVM )
@@ -126,7 +232,13 @@ int CLuaMatrixDefs::GetUp ( lua_State* luaVM )
         lua_pushvector ( luaVM, pMatrix->vUp );
         return 1;
     }
-    return 0;        
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;  
 }
 
 int CLuaMatrixDefs::SetPosition ( lua_State* luaVM )
@@ -139,12 +251,47 @@ int CLuaMatrixDefs::SetPosition ( lua_State* luaVM )
     argStream.ReadVector3D ( vecPosition );
 
     if ( !argStream.HasErrors () )
+    {
         pMatrix->vPos = vecPosition;
+        lua_pushboolean( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return !argStream.HasErrors ();
+    lua_pushboolean( luaVM, false );
+    return 1;
 }
 
-int CLuaMatrixDefs::SetFront ( lua_State* luaVM )
+int CLuaMatrixDefs::SetRotation ( lua_State* luaVM )
+{
+    CLuaMatrix* pMatrix = NULL;
+    CVector vecRotation;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pMatrix );
+    argStream.ReadVector3D ( vecRotation );
+
+    if ( !argStream.HasErrors () )
+    {
+        ConvertRadiansToDegrees ( vecRotation );
+        pMatrix->SetRotation ( vecRotation );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;    
+}
+
+int CLuaMatrixDefs::SetForward ( lua_State* luaVM )
 {
     CLuaMatrix* pMatrix = NULL;
     CVector vecFront;
@@ -154,9 +301,18 @@ int CLuaMatrixDefs::SetFront ( lua_State* luaVM )
     argStream.ReadVector3D ( vecFront );
 
     if ( !argStream.HasErrors () )
+    {
         pMatrix->vFront = vecFront;
+        lua_pushboolean( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return !argStream.HasErrors ();
+    lua_pushboolean( luaVM, false );
+    return 1;
 }
 
 int CLuaMatrixDefs::SetRight ( lua_State* luaVM )
@@ -169,9 +325,18 @@ int CLuaMatrixDefs::SetRight ( lua_State* luaVM )
     argStream.ReadVector3D ( vecRight );
 
     if ( !argStream.HasErrors () )
+    {
         pMatrix->vRight = vecRight;
+        lua_pushboolean( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return !argStream.HasErrors ();
+    lua_pushboolean( luaVM, false );
+    return 1;
 }
 
 int CLuaMatrixDefs::SetUp ( lua_State* luaVM )
@@ -184,9 +349,18 @@ int CLuaMatrixDefs::SetUp ( lua_State* luaVM )
     argStream.ReadVector3D ( vecUp );
 
     if ( !argStream.HasErrors () )
+    {
         pMatrix->vUp = vecUp;
+        lua_pushboolean( luaVM, true );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return !argStream.HasErrors ();
+    lua_pushboolean( luaVM, false );
+    return 1;
 }
 
 int CLuaMatrixDefs::Add ( lua_State* luaVM )
@@ -199,9 +373,17 @@ int CLuaMatrixDefs::Add ( lua_State* luaVM )
     argStream.ReadUserData ( pMatrix2 );
 
     if ( !argStream.HasErrors () )
+    {
         lua_pushmatrix ( luaVM, *pMatrix1 + *pMatrix2 );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return !argStream.HasErrors ();
+    lua_pushboolean( luaVM, false );
+    return 1;
 }
 
 int CLuaMatrixDefs::Sub ( lua_State* luaVM )
@@ -214,42 +396,40 @@ int CLuaMatrixDefs::Sub ( lua_State* luaVM )
     argStream.ReadUserData ( pMatrix2 );
 
     if ( !argStream.HasErrors () )
+    {
         lua_pushmatrix ( luaVM, *pMatrix1 - *pMatrix2 );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return !argStream.HasErrors ();
+    lua_pushboolean( luaVM, false );
+    return 1;
 }
 
 int CLuaMatrixDefs::Mul ( lua_State* luaVM )
 {
     CLuaMatrix* pMatrix1 = NULL;
+    CLuaMatrix* pMatrix2 = NULL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pMatrix1 );
+    argStream.ReadUserData ( pMatrix2 );
 
-    if ( argStream.NextIsUserDataOfType < CLuaMatrix > () )
+    if ( !argStream.HasErrors () )
     {
-        CLuaMatrix* pMatrix2 = NULL;
-        argStream.ReadUserData ( pMatrix2 );
-
-        if ( !argStream.HasErrors () )
-        {
-            lua_pushmatrix ( luaVM, *pMatrix1 * *pMatrix2 );
-            return 1;
-        }
+        lua_pushmatrix ( luaVM, *pMatrix1 * *pMatrix2 );
+        return 1;
     }
     else
     {
-        CVector vector;
-        argStream.ReadVector3D ( vector );
-        
-        if ( !argStream.HasErrors () )
-        {
-            lua_pushvector ( luaVM, *pMatrix1 * vector );
-            return 1;
-        }
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
     }
 
-    return 0;
+    lua_pushboolean( luaVM, false );
+    return 1;
 }
 
 int CLuaMatrixDefs::Div ( lua_State* luaVM )
@@ -262,7 +442,15 @@ int CLuaMatrixDefs::Div ( lua_State* luaVM )
     argStream.ReadUserData ( pMatrix2 );
 
     if ( !argStream.HasErrors () )
+    {
         lua_pushmatrix ( luaVM, *pMatrix1 / *pMatrix2 );
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+    }
 
-    return !argStream.HasErrors ();
+    lua_pushboolean( luaVM, false );
+    return 1;
 }

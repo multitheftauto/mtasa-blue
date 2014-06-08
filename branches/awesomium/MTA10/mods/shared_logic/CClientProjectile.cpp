@@ -142,7 +142,7 @@ void CClientProjectile::DoPulse ( void )
 }
 
 
-void CClientProjectile::Initiate ( CVector * pvecPosition, CVector * pvecRotation, CVector * pvecVelocity, unsigned short usModel )
+void CClientProjectile::Initiate ( CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel )
 {
 #ifdef MTA_DEBUG
     if ( m_pInitiateData ) _asm int 3
@@ -150,12 +150,12 @@ void CClientProjectile::Initiate ( CVector * pvecPosition, CVector * pvecRotatio
 
     // Store our initiation data
     m_pInitiateData = new CProjectileInitiateData;
-    if ( pvecPosition ) m_pInitiateData->pvecPosition = new CVector ( *pvecPosition );
-    else m_pInitiateData->pvecPosition = NULL;
-    if ( pvecRotation ) m_pInitiateData->pvecRotation = new CVector ( *pvecRotation );
-    else m_pInitiateData->pvecRotation = NULL;
-    if ( pvecVelocity ) m_pInitiateData->pvecVelocity = new CVector ( *pvecVelocity );
-    else m_pInitiateData->pvecVelocity = NULL;
+    m_pInitiateData->pvecPosition = new CVector ( vecPosition );
+    m_pInitiateData->pvecRotation = new CVector ( vecRotation );
+    if ( vecVelocity != CVector(0,0,0) ) 
+        m_pInitiateData->pvecVelocity = new CVector ( vecVelocity );
+    else 
+        m_pInitiateData->pvecVelocity = NULL;
     m_pInitiateData->usModel = usModel;
 }
 

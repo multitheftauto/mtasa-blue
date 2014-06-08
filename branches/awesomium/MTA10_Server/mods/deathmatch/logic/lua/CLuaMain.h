@@ -21,7 +21,9 @@ class CLuaMain;
 #define __CLUAMAIN_H
 
 #include "CLuaTimerManager.h"
-#include "CLuaVector.h"
+#include "CLuaVector2.h"
+#include "CLuaVector3.h"
+#include "CLuaVector4.h"
 #include "CLuaMatrix.h"
 #include "CLuaModuleManager.h"
 #include "../CTextDisplay.h"
@@ -126,20 +128,36 @@ private:
 
 public:
 
+    void                            AddVector4DClass        ( lua_State* luaVM );
     void                            AddVector3DClass        ( lua_State* luaVM );
     void                            AddVector2DClass        ( lua_State* luaVM );
     void                            AddMatrixClass          ( lua_State* luaVM );
 
     void                            AddElementClass         ( lua_State* luaVM );
-    void                            AddVehicleClass         ( lua_State* luaVM );
-    void                            AddPedClass             ( lua_State* luaVM );
-    void                            AddPlayerClass          ( lua_State* luaVM );
-    void                            AddObjectClass          ( lua_State* luaVM );
-    void                            AddMarkerClass          ( lua_State* luaVM );
+    void                            AddACLClass             ( lua_State* luaVM );
+    void                            AddACLGroupClass        ( lua_State* luaVM );
+    void                            AddAccountClass         ( lua_State* luaVM );
+    void                            AddBanClass             ( lua_State* luaVM );
     void                            AddBlipClass            ( lua_State* luaVM );
-    void                            AddPickupClass          ( lua_State* luaVM );
     void                            AddColShapeClass        ( lua_State* luaVM );
-
+    void                            AddFileClass            ( lua_State* luaVM );
+    void                            AddMarkerClass          ( lua_State* luaVM );
+    void                            AddObjectClass          ( lua_State* luaVM );
+    void                            AddPedClass             ( lua_State* luaVM );
+    void                            AddPickupClass          ( lua_State* luaVM );
+    void                            AddPlayerClass          ( lua_State* luaVM );
+    void                            AddRadarAreaClass       ( lua_State* luaVM );
+    void                            AddResourceClass        ( lua_State* luaVM );
+    void                            AddConnectionClass      ( lua_State* luaVM );
+    void                            AddQueryHandleClass     ( lua_State* luaVM );
+    void                            AddTeamClass            ( lua_State* luaVM );
+    void                            AddTextDisplayClass     ( lua_State* luaVM );
+    void                            AddTextItemClass        ( lua_State* luaVM );
+    void                            AddVehicleClass         ( lua_State* luaVM );
+    void                            AddWaterClass           ( lua_State* luaVM );
+    void                            AddXMLClass             ( lua_State* luaVM );
+    void                            AddTimerClass           ( lua_State* luaVM );
+    
     bool                            IsOOPEnabled            ( void )                        { return m_bEnableOOP; }
 private:
 

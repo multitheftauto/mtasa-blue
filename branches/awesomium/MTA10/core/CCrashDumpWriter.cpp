@@ -417,6 +417,20 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
                 GetMemoryInfo ( memInfo );
                 AppendToDumpFile ( strPathFilename, memInfo, 'MEMs', 'MEMe' );
                 SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-mem" );
+
+                // Try to logfile.txt to dump file
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-logfile" );
+                CBuffer logfileContent;
+                logfileContent.LoadFromFile( CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) ) );
+                AppendToDumpFile ( strPathFilename, logfileContent, 'LOGs', 'LOGe' );
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-logfile" );
+
+                // Try to report.log to dump file
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-report" );
+                CBuffer reportLogContent;
+                reportLogContent.LoadFromFile( PathJoin( GetMTADataPath(), "report.log" ) );
+                AppendToDumpFile ( strPathFilename, reportLogContent, 'REPs', 'REPe' );
+                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-report" );
             }
         }
 

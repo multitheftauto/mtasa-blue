@@ -24,7 +24,7 @@
 using std::list;
 
 extern CClientGame* g_pClientGame;
-
+std::set < const CClientEntity* > ms_AttachedVehiclesToIgnore;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
 #pragma warning(disable:4311)
@@ -259,7 +259,10 @@ void CClientVehicle::GetPosition ( CVector& vecPosition ) const
         if ( !m_pVehicle || !m_pVehicle->GetTowedByVehicle () )
         {
             // Grab the position behind the vehicle (should take X/Y rotation into acount)
+            // Prevent infinte recursion by ignoring attach link back to this towed vehicle (during GetPosition call)
+            MapInsert( ms_AttachedVehiclesToIgnore, this );
             m_pTowedByVehicle->GetPosition ( vecPosition );
+            MapRemove( ms_AttachedVehiclesToIgnore, this );
 
             CVector vecRotation;
             m_pTowedByVehicle->GetRotationRadians ( vecRotation );
@@ -277,7 +280,7 @@ void CClientVehicle::GetPosition ( CVector& vecPosition ) const
         vecPosition = *m_pVehicle->GetPosition ();
     }
     // Attached to something?
-    else if ( m_pAttachedToEntity )
+    else if ( m_pAttachedToEntity && !MapContains( ms_AttachedVehiclesToIgnore, m_pAttachedToEntity ) )
     {
         m_pAttachedToEntity->GetPosition ( vecPosition );
         vecPosition += m_vecAttachedPosition;

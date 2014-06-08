@@ -19,6 +19,7 @@
 #include <math.h>
 
 #define FLOAT_EPSILON 0.0001f
+#include "CVector4D.h"
 
 /**
  * CVector Structure used to store a 3D vertex.
@@ -208,6 +209,14 @@ public:
         return ( ( fabs ( fX - param.fX ) >= FLOAT_EPSILON ) ||
                  ( fabs ( fY - param.fY ) >= FLOAT_EPSILON ) ||
                  ( fabs ( fZ - param.fZ ) >= FLOAT_EPSILON ) );
+    }
+
+    CVector& operator = ( const CVector4D& vec )
+    {
+        fX = vec.fX;
+        fY = vec.fY;
+        fZ = vec.fZ;
+        return *this;
     }
 };
 

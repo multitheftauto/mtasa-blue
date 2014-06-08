@@ -21,11 +21,10 @@
 
 int CLuaFunctionDefs::CreateColCircle ( lua_State* luaVM )
 {
-    CVector vecPosition;
+    CVector2D vecPosition;
     float fRadius = 0.1f;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadVector2D ( vecPosition );
     argStream.ReadNumber ( fRadius );
 
     if ( fRadius < 0.0f )
@@ -157,13 +156,11 @@ int CLuaFunctionDefs::CreateColSphere ( lua_State* luaVM )
 
 int CLuaFunctionDefs::CreateColRectangle ( lua_State* luaVM )
 {
-    CVector vecPosition;
+    CVector2D vecPosition;
     CVector2D vecSize;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecSize.fX );
-    argStream.ReadNumber ( vecSize.fY );
+    argStream.ReadVector2D ( vecPosition );
+    argStream.ReadVector2D ( vecSize );
 
     if ( vecSize.fX < 0.0f )
     {
@@ -207,10 +204,9 @@ int CLuaFunctionDefs::CreateColRectangle ( lua_State* luaVM )
 
 int CLuaFunctionDefs::CreateColPolygon ( lua_State* luaVM )
 { 
-    CVector vecPosition;
+    CVector2D vecPosition;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
+    argStream.ReadVector2D ( vecPosition );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -227,10 +223,8 @@ int CLuaFunctionDefs::CreateColPolygon ( lua_State* luaVM )
                     // Get the points
                     while ( argStream.NextCouldBeNumber ( ) && argStream.NextCouldBeNumber ( 1 ) )
                     {
-                        float fX = 0.0f, fY = 0.0f;
-                        argStream.ReadNumber ( fX );
-                        argStream.ReadNumber ( fY );
-                        pShape->AddPoint ( CVector2D ( fX, fY ) );
+                        argStream.ReadVector2D ( vecPosition );
+                        pShape->AddPoint ( vecPosition );
                     }
 
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -257,9 +251,7 @@ int CLuaFunctionDefs::CreateColTube ( lua_State* luaVM )
     CVector vecPosition;
     float fRadius = 0.1f, fHeight = 0.1f;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadNumber ( fRadius );
     argStream.ReadNumber ( fHeight );
 

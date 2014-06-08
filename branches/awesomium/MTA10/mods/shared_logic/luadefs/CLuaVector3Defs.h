@@ -10,8 +10,8 @@
 *
 *****************************************************************************/
 
-#ifndef __LUAVECTORDEFS_H
-#define __LUAVECTORDEFS_H
+#ifndef __LUAVECTOR3DEFS_H
+#define __LUAVECTOR3DEFS_H
 
 extern "C"
 {
@@ -20,7 +20,7 @@ extern "C"
     #include "lauxlib.h"
 }
 
-class CLuaVectorDefs: public CLuaDefs
+class CLuaVector3Defs: public CLuaDefs
 {
 public:
     LUA_DECLARE ( Create );

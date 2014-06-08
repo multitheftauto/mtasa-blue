@@ -479,7 +479,7 @@ void CTileBatcher::MakeCustomMatrices ( const SShaderTransform& t
 
 
     // Perspective
-    CVector useCenOfPers = t.vecPersCenOffset * vecHalfScreenSize;
+    CVector2D useCenOfPers = t.vecPersCenOffset * vecHalfScreenSize;
     if ( !t.bPersCenOffsetOriginIsScreen )
     {
         useCenOfPers += vecCenterOfTile - vecCenterOfScreen;

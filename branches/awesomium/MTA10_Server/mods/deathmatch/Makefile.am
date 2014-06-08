@@ -196,7 +196,9 @@ LOGIC = \
 ./logic/lua/CLuaModuleManager.cpp \
 ./logic/lua/CLuaTimer.cpp \
 ./logic/lua/CLuaTimerManager.cpp \
-./logic/lua/CLuaVector.cpp \
+./logic/lua/CLuaVector2.cpp \
+./logic/lua/CLuaVector3.cpp \
+./logic/lua/CLuaVector4.cpp \
 ./logic/lua/LuaCommon.cpp \
 ./logic/lua/LuaUtils.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Camera.cpp \
@@ -216,7 +218,9 @@ LOGIC = \
 ./logic/luadefs/CLuaPickupDefs.cpp \
 ./logic/luadefs/CLuaResourceDefs.cpp \
 ./logic/luadefs/CLuaTextDefs.cpp \
-./logic/luadefs/CLuaVectorDefs.cpp \
+./logic/luadefs/CLuaVector2Defs.cpp \
+./logic/luadefs/CLuaVector3Defs.cpp \
+./logic/luadefs/CLuaVector4Defs.cpp \
 ./logic/luadefs/CLuaVoiceDefs.cpp \
 ./logic/luadefs/CLuaWorldDefs.cpp \
 ./logic/luadefs/CLuaXMLDefs.cpp \

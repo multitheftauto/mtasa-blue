@@ -15,16 +15,19 @@
 
 #include "StdInc.h"
 HRESULT HandleCreateDeviceResult( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface );
+std::vector < IDirect3D9* > ms_CreatedDirect3D9List;
 
 CProxyDirect3D9::CProxyDirect3D9 ( IDirect3D9* pInterface )
 {
     WriteDebugEvent ( SString( "CProxyDirect3D9::CProxyDirect3D9 %08x", this ) );
     m_pDevice       = pInterface;
+    ms_CreatedDirect3D9List.push_back( m_pDevice );
 }
 
 CProxyDirect3D9::~CProxyDirect3D9             ( )
 {
     WriteDebugEvent ( SString( "CProxyDirect3D9::~CProxyDirect3D9 %08x", this ) );
+    ListRemove( ms_CreatedDirect3D9List, m_pDevice );
     m_pDevice       = NULL;
 }
 
@@ -112,6 +115,13 @@ HRESULT    CProxyDirect3D9::GetDeviceCaps               ( UINT Adapter, D3DDEVTY
 HMONITOR   CProxyDirect3D9::GetAdapterMonitor           ( UINT Adapter )
 {
     return m_pDevice->GetAdapterMonitor ( Adapter );
+}
+
+HMONITOR  CProxyDirect3D9::StaticGetAdapterMonitor      ( UINT Adapter )
+{
+    if ( ms_CreatedDirect3D9List.empty() )
+        return NULL;
+    return ms_CreatedDirect3D9List[0]->GetAdapterMonitor ( Adapter );
 }
 
 HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )

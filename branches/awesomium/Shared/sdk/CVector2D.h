@@ -46,6 +46,13 @@ public:
         return *this;
     }
 
+    CVector2D& operator = ( const CVector4D& vec )
+    {
+        fX = vec.fX;
+        fY = vec.fY;
+        return *this;
+    }
+
     float DotProduct ( CVector2D& other ) const
     {
         return fX*other.fX + fY*other.fY;
@@ -56,6 +63,11 @@ public:
         return sqrt ( fX * fX + fY * fY );
     }
 
+    float LengthSquared ( void ) const
+    {
+        return (fX*fX) + (fY*fY);
+    }
+
     void Normalize ( void ) 
     { 
         float fLength = Length ();
@@ -64,6 +76,17 @@ public:
             fX /= fLength;
             fY /= fLength;
         }
+    }
+
+    CVector2D operator * ( float fRight ) const
+    {
+        return CVector2D ( fX * fRight, fY * fRight );
+    }
+
+    CVector2D operator / ( float fRight ) const
+    {
+        float fRcpValue = 1 / fRight;
+        return CVector2D ( fX * fRcpValue, fY * fRcpValue );
     }
 
     CVector2D operator + ( const CVector2D& vecRight ) const

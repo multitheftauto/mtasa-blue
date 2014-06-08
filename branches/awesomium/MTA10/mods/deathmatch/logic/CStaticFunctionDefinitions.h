@@ -345,7 +345,7 @@ public:
     static bool                         GetCameraInterior                   ( unsigned char & ucInterior );
 
     // Camera set funcs
-    static bool                         SetCameraMatrix                     ( const CVector& vecPosition, const CVector& vecLookAt, float fRoll, float fFOV );
+    static bool                         SetCameraMatrix                     ( const CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV );
     static bool                         SetCameraTarget                     ( CClientEntity * pEntity );
     static bool                         SetCameraTarget                     ( const CVector& vecTarget );
     static bool                         SetCameraInterior                   ( unsigned char ucInterior );
@@ -551,14 +551,14 @@ public:
     static bool                         ToggleAllControls                   ( bool bGTAControls, bool bMTAControls, bool bEnabled );
 
     // Projectile functions
-    static CClientProjectile *          CreateProjectile                    ( CResource& Resource, CClientEntity& Creator, unsigned char ucWeaponType, CVector& vecOrigin, float fForce, CClientEntity* pTarget, CVector* pvecRotation = NULL, CVector* pvecVelocity = NULL, unsigned short usModel = 0 );
+    static CClientProjectile *          CreateProjectile                    ( CResource& Resource, CClientEntity& Creator, unsigned char ucWeaponType, CVector& vecOrigin, float fForce, CClientEntity* pTarget,  CVector& vecRotation, CVector& vecVelocity, unsigned short usModel = 0 );
 
     // Shape create funcs
-    static CClientColCircle*            CreateColCircle                     ( CResource& Resource, const CVector& vecPosition, float fRadius );
+    static CClientColCircle*            CreateColCircle                     ( CResource& Resource, const CVector2D& vecPosition, float fRadius );
     static CClientColCuboid*            CreateColCuboid                     ( CResource& Resource, const CVector& vecPosition, const CVector& vecSize );
     static CClientColSphere*            CreateColSphere                     ( CResource& Resource, const CVector& vecPosition, float fRadius );
-    static CClientColRectangle*         CreateColRectangle                  ( CResource& Resource, const CVector& vecPosition, const CVector2D& vecSize );
-    static CClientColPolygon*           CreateColPolygon                    ( CResource& Resource, const CVector& vecPosition );
+    static CClientColRectangle*         CreateColRectangle                  ( CResource& Resource, const CVector2D& vecPosition, const CVector2D& vecSize );
+    static CClientColPolygon*           CreateColPolygon                    ( CResource& Resource, const CVector2D& vecPosition );
     static CClientColTube*              CreateColTube                       ( CResource& Resource, const CVector& vecPosition, float fRadius, float fHeight );
     static CClientColShape*             GetElementColShape                  ( CClientEntity* pEntity );
     static void                         RefreshColShapeColliders            ( CClientColShape *pColShape );

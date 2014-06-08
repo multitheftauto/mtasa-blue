@@ -233,7 +233,7 @@ bool CStaticFunctionDefinitions::WasEventCancelled ( void )
 bool CStaticFunctionDefinitions::DownloadFile ( CResource* pResource, const char* szFile, CChecksum checksum )
 {
     SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile );
-    SString strPath ( "%s\\resources\\%s\\%s", g_pClientGame->GetModRoot (),pResource->GetName(), szFile ); 
+    SString strPath ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (),pResource->GetName(), szFile ); 
     // Call SingularFileDownloadManager
     g_pClientGame->GetSingularFileDownloadManager()->AddFile ( pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum );
     return true;
@@ -1172,7 +1172,7 @@ bool CStaticFunctionDefinitions::SetElementParent ( CClientEntity& Entity, CClie
             CClientEntity* pTemp = &Parent;
             CClientEntity* pRoot = m_pRootEntity;
             bool bValidParent = false;
-            while ( pTemp != pRoot )
+            while ( pTemp != pRoot && pTemp != NULL )
             {
                 const char * szTypeName = pTemp->GetTypeName();
                 if ( szTypeName && strcmp(szTypeName, "map") == 0 )
@@ -4343,7 +4343,7 @@ bool CStaticFunctionDefinitions::GetCameraInterior ( unsigned char & ucInterior 
 }
 
 
-bool CStaticFunctionDefinitions::SetCameraMatrix ( const CVector& vecPosition, const CVector& vecLookAt, float fRoll, float fFOV )
+bool CStaticFunctionDefinitions::SetCameraMatrix ( const CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV )
 {
     if ( !m_pCamera->IsInFixedMode () )        
     {
@@ -4352,7 +4352,14 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( const CVector& vecPosition, c
 
     // Put the camera there
     m_pCamera->SetPosition ( vecPosition );
-    m_pCamera->SetFixedTarget ( vecLookAt, fRoll );
+    if ( pvecLookAt )
+        m_pCamera->SetFixedTarget ( *pvecLookAt, fRoll );
+    else
+    {
+        CVector vecPrevLookAt;
+        m_pCamera->GetFixedTarget ( vecPrevLookAt );
+        m_pCamera->SetFixedTarget ( vecPrevLookAt, fRoll );
+    }
     m_pCamera->SetFOV ( fFOV );
     return true;
 }
@@ -6616,14 +6623,9 @@ bool CStaticFunctionDefinitions::ToggleAllControls ( bool bGTAControls, bool bMT
 }
 
 
-CClientProjectile * CStaticFunctionDefinitions::CreateProjectile ( CResource& Resource, CClientEntity& Creator, unsigned char ucWeaponType, CVector& vecOrigin, float fForce, CClientEntity* pTarget, CVector* pvecRotation, CVector* pvecVelocity, unsigned short usModel )
+CClientProjectile * CStaticFunctionDefinitions::CreateProjectile ( CResource& Resource, CClientEntity& Creator, unsigned char ucWeaponType, CVector& vecOrigin, float fForce, CClientEntity* pTarget, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel )
 {
-    // Do we have a rotation vector?
-    if ( pvecRotation )
-    {
-        // It should be in degrees, so convert it to radians
-        ConvertDegreesToRadians ( *pvecRotation );
-    }
+    ConvertDegreesToRadians ( vecRotation );
 
     // Valid creator type?
     switch ( Creator.GetType () )
@@ -6649,7 +6651,7 @@ CClientProjectile * CStaticFunctionDefinitions::CreateProjectile ( CResource& Re
                     if ( pProjectile )
                     {
                         // Set our intiation data, which will be used on the next frame
-                        pProjectile->Initiate ( &vecOrigin, pvecRotation, pvecVelocity, usModel );
+                        pProjectile->Initiate ( vecOrigin, vecRotation, vecVelocity, usModel );
                         pProjectile->SetParent ( Resource.GetResourceDynamicEntity() );
                         return pProjectile;
                     }
@@ -6667,7 +6669,7 @@ CClientProjectile * CStaticFunctionDefinitions::CreateProjectile ( CResource& Re
 }
 
 
-CClientColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource& Resource, const CVector& vecPosition, float fRadius )
+CClientColCircle* CStaticFunctionDefinitions::CreateColCircle ( CResource& Resource, const CVector2D& vecPosition, float fRadius )
 {
     CClientColCircle* pShape = new CClientColCircle ( m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius );
     pShape->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -6694,7 +6696,7 @@ CClientColSphere* CStaticFunctionDefinitions::CreateColSphere ( CResource& Resou
 }
 
 
-CClientColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource& Resource, const CVector& vecPosition, const CVector2D& vecSize )
+CClientColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource& Resource, const CVector2D& vecPosition, const CVector2D& vecSize )
 {
     CClientColRectangle* pShape = new CClientColRectangle ( m_pManager, INVALID_ELEMENT_ID, vecPosition, vecSize );
     pShape->SetParent ( Resource.GetResourceDynamicEntity () );
@@ -6703,7 +6705,7 @@ CClientColRectangle* CStaticFunctionDefinitions::CreateColRectangle ( CResource&
 }
 
 
-CClientColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource& Resource, const CVector& vecPosition )
+CClientColPolygon* CStaticFunctionDefinitions::CreateColPolygon ( CResource& Resource, const CVector2D& vecPosition )
 {
     CClientColPolygon * pShape = new CClientColPolygon ( m_pManager, INVALID_ELEMENT_ID, vecPosition );
     pShape->SetParent ( Resource.GetResourceDynamicEntity () );

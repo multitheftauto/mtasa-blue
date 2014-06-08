@@ -21,10 +21,12 @@ unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
 unsigned long CSettingsSA::FUNC_SetDrawDistance;
 unsigned long CSettingsSA::FUNC_GetNumSubSystems;
+unsigned long CSettingsSA::FUNC_GetCurrentSubSystem;
 unsigned long CSettingsSA::FUNC_SetSubSystem;
 
 #define VAR_CurVideoMode            (*((uint*)(0x08D6220)))
 #define VAR_SavedVideoMode          (*((uint*)(0x0BA6820)))
+#define VAR_CurAdapter              (*((uint*)(0x0C920F4)))
 
 #define HOOKPOS_GetFxQuality                0x49EA50
 void HOOK_GetFxQuality ();
@@ -42,7 +44,8 @@ CSettingsSA::CSettingsSA ( void )
     SetAspectRatio ( ASPECT_RATIO_4_3 );
     HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
     HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
-
+    m_iDesktopWidth = 0;
+    m_iDesktopHeight = 0;
     MemPut < BYTE > ( 0x6FF420, 0xC3 );     // Truncate CalculateAspectRatio
 }
 
@@ -127,6 +130,17 @@ void CSettingsSA::SetAdapter ( unsigned int uiAdapterIndex )
         call    FUNC_SetSubSystem
         add     esp, 4
     }
+}
+
+unsigned int CSettingsSA::GetCurrentAdapter ( void )
+{
+    unsigned int uiReturn = 0;
+    _asm
+    {
+        call    FUNC_GetCurrentSubSystem
+        mov     uiReturn, eax
+    }
+    return uiReturn;
 }
 
 unsigned char CSettingsSA::GetRadioVolume ( void )
@@ -447,6 +461,57 @@ void CSettingsSA::SetGrassEnabled ( bool bEnable )
 
 ////////////////////////////////////////////////
 //
+// CSettingsSA::HasUnsafeResolutions
+//
+// Return true if DirectX says we have resolutions available that are higher that the desktop
+//
+////////////////////////////////////////////////
+bool CSettingsSA::HasUnsafeResolutions( void )
+{
+    uint numVidModes = GetNumVideoModes();
+    for ( uint vidMode = 0; vidMode < numVidModes; vidMode++ )
+    {
+        VideoMode vidModeInfo;
+        GetVideoModeInfo( &vidModeInfo, vidMode );
+
+        if ( vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE )
+        {
+            if ( IsUnsafeResolution( vidModeInfo.width, vidModeInfo.height ) )
+                return true;
+        }
+    }
+    return false;
+}
+
+
+////////////////////////////////////////////////
+//
+// CSettingsSA::IsUnsafeResolution
+//
+// Check if supplied resolution is higher than the desktop
+//
+////////////////////////////////////////////////
+bool CSettingsSA::IsUnsafeResolution( int iWidth, int iHeight )
+{
+    // Check if we have gotten the desktop res yet
+    if ( m_iDesktopWidth == 0 )
+    {
+        m_iDesktopWidth = 800;
+        m_iDesktopHeight = 600;
+
+        VideoMode currentModeInfo;
+        if ( GetVideoModeInfo( &currentModeInfo, 0 ) )
+        {
+            m_iDesktopWidth = currentModeInfo.width;
+            m_iDesktopHeight = currentModeInfo.height;
+        }
+    }
+    return iWidth > m_iDesktopWidth || iHeight > m_iDesktopHeight;
+}
+
+
+////////////////////////////////////////////////
+//
 // CSettingsSA::FindVideoMode
 //
 // Find best matching video mode
@@ -511,11 +576,12 @@ void CSettingsSA::SetValidVideoMode( void )
 {
     bool bValid = false;
     int iWidth, iHeight, iColorBits, iAdapterIndex;
+    bool bAllowUnsafeResolutions = false;
 
     // First, try to get MTA saved info
     if ( !bValid )
     {
-        bValid = g_pCore->GetRequiredDisplayResolution( iWidth, iHeight, iColorBits, iAdapterIndex );
+        bValid = g_pCore->GetRequiredDisplayResolution( iWidth, iHeight, iColorBits, iAdapterIndex, bAllowUnsafeResolutions );
     }
 
     // Otherwise deduce from GTA saved video mode
@@ -552,14 +618,36 @@ void CSettingsSA::SetValidVideoMode( void )
         iAdapterIndex = 0;
     SetAdapter( iAdapterIndex );
 
-    // Ensure res is no bigger than currently being used by windows
-    VideoMode currentModeInfo;
-    if ( GetVideoModeInfo( &currentModeInfo, GetCurrentVideoMode() ) )
+    // Save desktop resolution
     {
-        if ( currentModeInfo.width < iWidth || currentModeInfo.height < iHeight )
+        m_iDesktopWidth = 800;
+        m_iDesktopHeight = 600;
+
+        VideoMode currentModeInfo;
+        if ( GetVideoModeInfo( &currentModeInfo, GetCurrentVideoMode() ) )
         {
-            iWidth = currentModeInfo.width;
-            iHeight = currentModeInfo.height;
+            m_iDesktopWidth = currentModeInfo.width;
+            m_iDesktopHeight = currentModeInfo.height;
+        }
+    }
+
+    // Handle 'unsafe' resolution stuff
+    if ( IsUnsafeResolution( iWidth, iHeight ) )
+    {
+        if ( bAllowUnsafeResolutions )
+        {
+            // Confirm that res should be used
+            SString strMessage = _("Are you sure you want to use this screen resolution?" );
+            strMessage += SString( "\n\n%d x %d", iWidth, iHeight );
+            if ( MessageBoxUTF8( NULL, strMessage, _("MTA: San Andreas"), MB_YESNO | MB_TOPMOST | MB_ICONQUESTION ) == IDNO )
+                bAllowUnsafeResolutions = false;
+        }
+
+        if ( !bAllowUnsafeResolutions )
+        {
+            // Force down to desktop res if required
+            iWidth = m_iDesktopWidth;
+            iHeight = m_iDesktopHeight;
         }
     }
 
@@ -573,6 +661,7 @@ void CSettingsSA::SetValidVideoMode( void )
     // Set for GTA to use
     VAR_CurVideoMode = uiUseVideoMode;
     VAR_SavedVideoMode = uiUseVideoMode;
+    VAR_CurAdapter = iAdapterIndex;
 }
 
 

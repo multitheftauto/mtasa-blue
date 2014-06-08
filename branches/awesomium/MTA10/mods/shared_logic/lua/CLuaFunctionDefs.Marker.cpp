@@ -335,9 +335,7 @@ int CLuaFunctionDefs::SetMarkerTarget ( lua_State* luaVM )
     CVector vecTarget;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecTarget.fX );
-    argStream.ReadNumber ( vecTarget.fY );
-    argStream.ReadNumber ( vecTarget.fZ );
+    argStream.ReadVector3D ( vecTarget );
 
     if ( !argStream.HasErrors ( ) )
     {

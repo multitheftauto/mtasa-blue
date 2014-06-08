@@ -4496,7 +4496,6 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
             // Read the velocity
             if ( !bitStream.Read ( &velocity ) )
                 return;
-            pvecVelocity = &( velocity.data.vecVelocity );
             bCreateProjectile = true;
 
             break;
@@ -4519,12 +4518,10 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
             // Read out the velocity
             if ( !bitStream.Read ( &velocity ) )
                 return;
-            pvecVelocity = &( velocity.data.vecVelocity );
 
             // Read out the rotation
             if ( !bitStream.Read ( &rotation ) )
                 return;
-            pvecRotation = &( rotation.data.vecRotation );
 
             if ( TargetID != INVALID_ELEMENT_ID )
             {
@@ -4557,7 +4554,7 @@ void CPacketHandler::Packet_ProjectileSync ( NetBitStreamInterface& bitStream )
             CClientProjectile * pProjectile = g_pClientGame->m_pManager->GetProjectileManager ()->Create ( pCreator, weaponType, origin.data.vecPosition, fForce, NULL, pTargetEntity );
             if ( pProjectile )
             {
-                pProjectile->Initiate ( &origin.data.vecPosition, pvecRotation, pvecVelocity, usModel );
+                pProjectile->Initiate(origin.data.vecPosition, rotation.data.vecRotation, velocity.data.vecVelocity, usModel);
             }
         }
     }

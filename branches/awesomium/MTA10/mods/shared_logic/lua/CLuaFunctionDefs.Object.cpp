@@ -189,12 +189,8 @@ int CLuaFunctionDefs::MoveObject ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
     argStream.ReadNumber ( iTime );
-    argStream.ReadNumber ( vecTargetPosition.fX );
-    argStream.ReadNumber ( vecTargetPosition.fY );
-    argStream.ReadNumber ( vecTargetPosition.fZ );
-    argStream.ReadNumber ( vecTargetRotation.fX, 0 );
-    argStream.ReadNumber ( vecTargetRotation.fY, 0 );
-    argStream.ReadNumber ( vecTargetRotation.fZ, 0 );
+    argStream.ReadVector3D ( vecTargetPosition );
+    argStream.ReadVector3D ( vecTargetRotation, CVector ( ) );
     argStream.ReadEnumString ( easingType, CEasingCurve::Linear );
     argStream.ReadNumber ( fEasingPeriod, 0.3f );
     argStream.ReadNumber ( fEasingAmplitude, 1.0f );
@@ -248,10 +244,24 @@ int CLuaFunctionDefs::SetObjectScale ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( vecScale.fX );
-    argStream.ReadNumber ( vecScale.fY, vecScale.fX );
-    argStream.ReadNumber ( vecScale.fZ, vecScale.fX );
 
+
+    // Caz - This function looks totally wrong
+    // the function is designed to support the following syntaxes
+    // setObjectScale ( obj, 2 ) -- all other components are set to 2
+    // setObjectScale ( obj, 2, 1, 5 ) -- custom scaling on 3 axis
+
+    if ( argStream.NextIsVector3D ( ) )
+    {
+        argStream.ReadVector3D ( vecScale );
+    }
+    else
+    {
+        // Caz - Here is what I am talking about.
+        argStream.ReadNumber ( vecScale.fX );
+        argStream.ReadNumber ( vecScale.fY, vecScale.fX );
+        argStream.ReadNumber ( vecScale.fZ, vecScale.fX );
+    }
     if ( !argStream.HasErrors () )
     {
         if ( CStaticFunctionDefinitions::SetObjectScale ( *pEntity, vecScale ) )

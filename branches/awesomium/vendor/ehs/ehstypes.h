@@ -47,5 +47,14 @@ typedef std::map < int, HttpResponse * > HttpResponseMap;
 typedef std::list < HttpRequest * > HttpRequestList;
 
 
+struct SAllocationStats
+{
+    unsigned int uiActiveNumRequests;
+    unsigned int uiActiveNumResponses;
+    unsigned int uiActiveKBAllocated;
+    unsigned int uiTotalNumRequests;
+    unsigned int uiTotalNumResponses;
+    unsigned int uiTotalKBAllocated;
+};
 
 #endif

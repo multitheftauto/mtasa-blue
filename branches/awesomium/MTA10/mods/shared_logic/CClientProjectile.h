@@ -73,7 +73,7 @@ public:
 
 
     void                                DoPulse                 ( void );
-    void                                Initiate                ( CVector * pvecPosition, CVector * pvecRotation, CVector * pvecVelocity, unsigned short usModel );
+    void                                Initiate                ( CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel );
     void                                Destroy                 ( bool bBlow = true );
 
     bool                                IsActive                ( void );

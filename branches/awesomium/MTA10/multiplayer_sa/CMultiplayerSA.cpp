@@ -6418,6 +6418,8 @@ void _declspec(naked) HOOK_CObject_ProcessDamage ( )
         _asm
         {
             popad
+            ffree   st(0)
+            fdecstp
             jmp     RETURN_CObject_ProcessDamage_Cancel
         }
     }

@@ -1802,13 +1802,9 @@ int CLuaFunctionDefs::SetElementInterior ( lua_State* luaVM )
             bool bSetPosition = false;
             CVector vecPosition;
 
-            if ( argStream.NextIsNumber ( ) && 
-                 argStream.NextIsNumber ( 1 ) && 
-                 argStream.NextIsNumber ( 2 ) )
+            if ( argStream.NextIsVector3D ( ) )
             {
-                argStream.ReadNumber ( vecPosition.fX );
-                argStream.ReadNumber ( vecPosition.fY );
-                argStream.ReadNumber ( vecPosition.fZ );
+                argStream.ReadVector3D ( vecPosition );
                 if ( !argStream.HasErrors ( ) )
                 {
                     bSetPosition = true;

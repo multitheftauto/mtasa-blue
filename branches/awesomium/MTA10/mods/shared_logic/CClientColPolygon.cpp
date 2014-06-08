@@ -12,10 +12,12 @@
 
 #include "StdInc.h"
 
-CClientColPolygon::CClientColPolygon ( CClientManager* pManager, ElementID ID, const CVector& vecPosition ) : ClassInit ( this ), CClientColShape ( pManager, ID )
+CClientColPolygon::CClientColPolygon ( CClientManager* pManager, ElementID ID, const CVector2D& vecPosition ) : ClassInit ( this ), CClientColShape ( pManager, ID )
 {
     m_pManager = pManager;
-    m_vecPosition = vecPosition;
+    m_vecPosition.fX = vecPosition.fX;
+    m_vecPosition.fY = vecPosition.fY;
+    m_vecPosition.fZ = SPATIAL_2D_Z;
 
     // That's only to speed up things by not checking the polygon collision,
     // if the point is not even in the bounds

@@ -1960,9 +1960,7 @@ int CLuaFunctionDefs::AttachTrailerToVehicle ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
     argStream.ReadUserData ( pTrailer );
-    argStream.ReadNumber ( vecRotationOffsetDegrees.fX, 0.0f );
-    argStream.ReadNumber ( vecRotationOffsetDegrees.fY, 0.0f );
-    argStream.ReadNumber ( vecRotationOffsetDegrees.fZ, 0.0f );
+    argStream.ReadVector3D ( vecRotationOffsetDegrees, CVector ( ) );
     
     if ( !argStream.HasErrors () )
     {
@@ -2463,9 +2461,7 @@ int CLuaFunctionDefs::SetVehicleGravity ( lua_State* luaVM )
     CVector vecGravity;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
-    argStream.ReadNumber ( vecGravity.fX );
-    argStream.ReadNumber ( vecGravity.fY );
-    argStream.ReadNumber ( vecGravity.fZ );
+    argStream.ReadVector3D ( vecGravity );
 
     if ( !argStream.HasErrors ( ) ) 
     {
@@ -3015,14 +3011,12 @@ int CLuaFunctionDefs::SetVehicleSirens ( lua_State* luaVM )
     {
         // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
         ucSirenID--;
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fX );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fY );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions.fZ );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
-        argStream.ReadNumber( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha, 0 );
+        argStream.ReadVector3D ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
+        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha, 0 );
         if ( argStream.HasErrors ( ) == false )
         {
             if ( pVehicle )
@@ -3084,9 +3078,8 @@ int CLuaFunctionDefs::SetVehicleComponentPosition ( lua_State* luaVM )
     CVector vecPosition;
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
+
     if ( !argStream.HasErrors() )
     {
         if ( pVehicle )
@@ -3142,9 +3135,8 @@ int CLuaFunctionDefs::SetVehicleComponentRotation ( lua_State* luaVM )
     CVector vecRotation;
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
-    argStream.ReadNumber ( vecRotation.fX );
-    argStream.ReadNumber ( vecRotation.fY );
-    argStream.ReadNumber ( vecRotation.fZ );
+    argStream.ReadVector3D ( vecRotation );
+
     if ( !argStream.HasErrors() )
     {
         if ( pVehicle )
