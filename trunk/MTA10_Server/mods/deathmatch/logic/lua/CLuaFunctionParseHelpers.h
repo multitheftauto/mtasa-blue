@@ -219,7 +219,7 @@ CBan* UserDataCast ( CBan*, void* ptr, lua_State* )
 template < class T >
 CLuaVector2D* UserDataCast ( CLuaVector2D*, void* ptr, lua_State* luaVM )
 {
-    return CLuaVector2D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+    return CLuaVector2D::GetFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 
@@ -229,7 +229,7 @@ CLuaVector2D* UserDataCast ( CLuaVector2D*, void* ptr, lua_State* luaVM )
 template < class T >
 CLuaVector3D* UserDataCast ( CLuaVector3D*, void* ptr, lua_State* luaVM )
 {
-    return CLuaVector3D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+    return CLuaVector3D::GetFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 
@@ -239,7 +239,7 @@ CLuaVector3D* UserDataCast ( CLuaVector3D*, void* ptr, lua_State* luaVM )
 template < class T >
 CLuaVector4D* UserDataCast ( CLuaVector4D*, void* ptr, lua_State* luaVM )
 {
-    return CLuaVector4D::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+    return CLuaVector4D::GetFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 //
@@ -248,7 +248,7 @@ CLuaVector4D* UserDataCast ( CLuaVector4D*, void* ptr, lua_State* luaVM )
 template < class T >
 CLuaMatrix* UserDataCast ( CLuaMatrix*, void* ptr, lua_State* luaVM )
 {
-    return CLuaMatrix::GetFromScriptID ( reinterpret_cast < unsigned int > ( ptr ) );
+    return CLuaMatrix::GetFromScriptID ( reinterpret_cast < unsigned long > ( ptr ) );
 }
 
 
