@@ -28,6 +28,7 @@ This can be found in the 'COPYING' file.
 #include <assert.h>
 
 long long ms_HttpTotalBytesSent = 0;
+SAllocationStats ms_AllocationStats = { 0 };
 
 // Returns true if lock succeeded
 static bool MUTEX_TRY_LOCK( MUTEX_TYPE& x )
@@ -1580,4 +1581,9 @@ SSL_CTX * SecureSocket::poCtx;
 long long EHS::StaticGetTotalBytesSent ( void )
 {
     return ms_HttpTotalBytesSent;
+}
+
+void EHS::StaticGetAllocationStats ( SAllocationStats& outAllocationStats )
+{
+    outAllocationStats = ms_AllocationStats;
 }
