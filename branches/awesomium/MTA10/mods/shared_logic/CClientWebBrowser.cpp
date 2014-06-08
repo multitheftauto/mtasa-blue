@@ -14,6 +14,8 @@
 CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, CWebViewInterface* pWebView )
     : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem ), m_pWebView ( pWebView )
 {
+    // Set events interface
+    m_pWebView->SetWebBrowserEvents ( this );
 }
 
 CClientWebBrowser::~CClientWebBrowser ()
@@ -98,4 +100,25 @@ void CClientWebBrowser::SetTempURL ( const SString& strTempURL )
 bool CClientWebBrowser::SetAudioVolume ( float fVolume )
 {
     return m_pWebView->SetAudioVolume ( fVolume );
+}
+
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//            CWebBrowserEventsInterface implementation                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+void CClientWebBrowser::Events_OnDocumentReady ( const SString& strURL )
+{
+    CLuaArguments Arguments;
+    Arguments.PushString ( strURL );
+    CallEvent ( "onClientBrowserDocumentReady", Arguments, false );
+}
+
+void CClientWebBrowser::Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription )
+{
+    CLuaArguments Arguments;
+    Arguments.PushString ( strURL );
+    Arguments.PushNumber ( errorCode );
+    Arguments.PushString ( errorDescription );
+    CallEvent ( "onClientBrowserLoadingFailed", Arguments, false );
 }

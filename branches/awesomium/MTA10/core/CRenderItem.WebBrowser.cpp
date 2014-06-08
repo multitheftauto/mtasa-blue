@@ -18,7 +18,7 @@
 ////////////////////////////////////////////////////////////////
 void CWebBrowserItem::PostConstruct ( CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY, bool bIsLocal )
 {
-    Super::PostConstruct(pRenderItemManager);
+    Super::PostConstruct ( pRenderItemManager );
     m_uiSizeX = uiSizeX;
     m_uiSizeY = uiSizeY;
     m_uiSurfaceSizeX = uiSizeX;
@@ -110,13 +110,10 @@ void CWebBrowserItem::CreateUnderlyingData ( bool bIsLocal )
     m_uiSurfaceSizeX = desc.Width;
     m_uiSurfaceSizeY = desc.Height;
 
-    // Clear incase it gets used before first copy
-    m_pDevice->ColorFill( m_pD3DRenderTargetSurface, NULL, 0xFFFFFFFF );
-
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DRenderTargetSurface );
 
     // Create the web view
-    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( m_uiSizeX, m_uiSizeY, m_pD3DRenderTargetSurface, bIsLocal );
+    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( m_uiSizeX, m_uiSizeY, bIsLocal );
 }
 
 

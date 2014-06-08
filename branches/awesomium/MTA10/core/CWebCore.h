@@ -24,9 +24,9 @@ class CWebCore : public CWebCoreInterface, public Awesomium::ResourceInterceptor
 public:
     CWebCore();
     ~CWebCore();
-    bool                Initialise();
+    bool                Initialise          ();
 
-    CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface, bool bIsLocal );
+    CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal );
     void                DestroyWebView      ( CWebViewInterface* pWebViewInterface );
     void                Update              ();
     

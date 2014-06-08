@@ -12,16 +12,17 @@
 #define __CCLIENTWEBBROWSER_H
 
 #include <core/CWebViewInterface.h>
+#include <core/CWebBrowserEventsInterface.h>
 
-class CClientWebBrowser : public CClientTexture
+class CClientWebBrowser : public CClientTexture, public CWebBrowserEventsInterface
 {
     DECLARE_CLASS(CClientWebBrowser, CClientTexture)
 public:
     CClientWebBrowser           ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, CWebViewInterface* pWebView );
     ~CClientWebBrowser          ();
 
-    inline CWebBrowserItem*     GetWebBrowserItem  ()    { return (CWebBrowserItem*)m_pRenderItem; }
-    inline CWebViewInterface*   GetWebView         ()    { return m_pWebView; }
+    inline CWebBrowserItem*     GetWebBrowserItem   ()    { return (CWebBrowserItem*)m_pRenderItem; }
+    inline CWebViewInterface*   GetWebView          ()    { return m_pWebView; }
 
     bool                        IsLoading           ();
     bool                        LoadURL             ( const SString& strURL, bool bFilterEnabled = true );
@@ -41,6 +42,11 @@ public:
     void                        SetTempURL          ( const SString& strTempURL );
 
     bool                        SetAudioVolume      ( float fVolume );
+
+    
+    // CWebBrowserEventsInterface implementation
+    void                        Events_OnDocumentReady ( const SString& strURL );
+    void                        Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription );
 
 private:
     CWebViewInterface* m_pWebView;

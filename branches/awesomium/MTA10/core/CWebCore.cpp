@@ -56,10 +56,10 @@ bool CWebCore::Initialise ()
     return m_pWebCore != NULL;
 }
 
-CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface, bool bIsLocal )
+CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal )
 {
     // Create our webview implementation
-    CWebView* pWebView = new CWebView ( uiWidth, uiHeight, pD3DSurface, bIsLocal );
+    CWebView* pWebView = new CWebView ( uiWidth, uiHeight, bIsLocal );
     m_WebViewMap[pWebView->GetAwesomiumView ()->process_id ()] = pWebView;
 
     return pWebView;

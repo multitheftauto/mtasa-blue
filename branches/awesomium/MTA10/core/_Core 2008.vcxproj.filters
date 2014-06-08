@@ -1300,5 +1300,8 @@
     <ClInclude Include="WebBrowserHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\sdk\core\CWebBrowserEventsInterface.h">
+      <Filter>Header Files\sdk\core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

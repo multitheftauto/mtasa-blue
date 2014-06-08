@@ -12,6 +12,7 @@
 #define __CWEBVIEW_H
 
 #include <core/CWebViewInterface.h>
+#include <core/CWebBrowserEventsInterface.h>
 #include <Awesomium/WebView.h>
 #include <Awesomium/WebViewListener.h>
 #include <Awesomium/STLHelpers.h>
@@ -23,12 +24,11 @@
 
 class CWebView : public CWebViewInterface, public Awesomium::WebViewListener::Load
 {
-    friend class CRenderItemManager;
-
 public:
-    CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface, bool bIsLocal );
+    CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal );
     ~CWebView                   ();
     Awesomium::WebView*         GetAwesomiumView () { return m_pWebView; };
+    void                        SetWebBrowserEvents ( CWebBrowserEventsInterface* pInterface ) { m_pEventsInterface = pInterface; };
 
     // Exported methods
     bool LoadURL                ( const SString& strURL, bool bFilterEnabled = true );
@@ -52,22 +52,22 @@ public:
 
 
     // Implementation: Awesomium::WebViewListener::Load
-    virtual void OnBeginLoadingFrame    ( Awesomium::WebView *caller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL &url, bool is_error_page ) {};
-    virtual void OnFailLoadingFrame     ( Awesomium::WebView *caller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL &url, int error_code, const Awesomium::WebString &error_desc ) {};
+    virtual void OnBeginLoadingFrame    ( Awesomium::WebView* pCaller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL& url, bool is_error_page ) {};
+    virtual void OnFailLoadingFrame     ( Awesomium::WebView* pCaller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL& url, int error_code, const Awesomium::WebString& error_desc );
     virtual void OnFinishLoadingFrame   ( Awesomium::WebView* pCaller, int64 iFrameId, bool bMainFrame, const Awesomium::WebURL& url );
-    virtual void OnDocumentReady(Awesomium::WebView *caller, const Awesomium::WebURL &url) {};
+    virtual void OnDocumentReady        ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url );
 
     // Static javascript method implementations
     static void Javascript_triggerEvent(Awesomium::WebView* pWebView, const Awesomium::JSArray& args);
     
 private:
     Awesomium::WebView* m_pWebView;
-    IDirect3DSurface9*  m_pD3DSurface;
 
     bool                m_bIsLocal;
     SString             m_strTempURL;
 
     CJSMethodHandler    m_JSMethodHandler;
+    CWebBrowserEventsInterface* m_pEventsInterface;
 };
 
 #endif

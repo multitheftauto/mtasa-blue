@@ -10,9 +10,8 @@
 #include "StdInc.h"
 #include "CWebView.h"
 
-CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, IDirect3DSurface9* pD3DSurface, bool bIsLocal )
+CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal )
 {
-    m_pD3DSurface = pD3DSurface;
     m_bIsLocal = bIsLocal;
 
     // Initialise the web session (which holds the actual settings) in in-memory mode
@@ -62,7 +61,7 @@ void CWebView::GetURL ( SString& outURL )
 
 void CWebView::GetTitle(SString& outTitle)
 {
-    outTitle = static_cast<SString> ( CWebCore::ToSString ( m_pWebView->title() ) );
+    outTitle = static_cast<SString> ( CWebCore::ToSString ( m_pWebView->title () ) );
 }
 
 void CWebView::SetRenderingPaused ( bool bPaused )
@@ -148,7 +147,7 @@ bool CWebView::SetAudioVolume ( float fVolume )
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-//      Implementation: Awesomium::WebViewListener::Load          //
+// Implementation: Awesomium::WebViewListener::Load:OnFinishLoadingFrame //
 // http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#a3cb1ee5563db02f90cd5562c6d8342b1 //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -164,12 +163,23 @@ void CWebView::OnFinishLoadingFrame ( Awesomium::WebView* pCaller, int64 iFrameI
         Awesomium::JSObject& mtaObject = jsMTA.ToObject ();
         m_JSMethodHandler.Bind ( mtaObject, Awesomium::WSLit ("triggerEvent"), Javascript_triggerEvent );
     }
-
-    // Todo: Trigger an event
-
 }
 
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: Awesomium::WebViewListener::Load:OnDocumentReady //
+// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#aed2fe4f10d72079ecd1b0d3006cdb8c2 //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnDocumentReady ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url )
+{
+    m_pEventsInterface->Events_OnDocumentReady ( CWebCore::ToSString ( url.spec () ) );
+}
 
+void CWebView::OnFailLoadingFrame ( Awesomium::WebView* pCaller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL& url, int error_code, const Awesomium::WebString& error_desc )
+{
+    m_pEventsInterface->Events_OnLoadingFailed ( CWebCore::ToSString ( url.spec () ), error_code, CWebCore::ToSString ( error_desc ) );
+}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //

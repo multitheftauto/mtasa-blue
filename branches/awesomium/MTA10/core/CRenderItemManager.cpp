@@ -464,7 +464,7 @@ void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceIt
 void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
 {
     // Don't copy texture data if buffer has not yet been updated
-    if ( !pWebBrowserItem->IsValid() || pWebBrowserItem->m_pWebView->IsLoading () )
+    if ( !pWebBrowserItem->IsValid () || pWebBrowserItem->m_pWebView->IsLoading () )
         return;
 
     // Get BitmapSurface and check if it is available (it's not available if the website is blocked for example)
@@ -472,7 +472,7 @@ void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
     if ( !pWebView )
         return;
 
-    Awesomium::BitmapSurface* pAwSurface = static_cast < Awesomium::BitmapSurface* > ( pWebView->m_pWebView->surface () );
+    Awesomium::BitmapSurface* pAwSurface = static_cast < Awesomium::BitmapSurface* > ( pWebView->GetAwesomiumView ()->surface () );
     if ( !pAwSurface )
         return;
 

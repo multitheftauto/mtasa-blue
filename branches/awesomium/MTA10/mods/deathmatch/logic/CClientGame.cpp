@@ -2884,6 +2884,8 @@ void CClientGame::AddBuiltInEvents ( void )
 
     // Web events
     m_Events.AddEvent ( "onClientBrowserRequestsChange", "newPages", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserDocumentReady", "url", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserLoadingFailed", "url, errorcode, errordescription", NULL, false );
 
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );

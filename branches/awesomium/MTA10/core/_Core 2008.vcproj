@@ -1501,6 +1501,10 @@
 						RelativePath="..\sdk\core\CSetCursorPosHookInterface.h"
 						>
 					</File>
+					<File
+						RelativePath="..\sdk\core\CWebBrowserEventsInterface.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="net"
