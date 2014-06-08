@@ -394,6 +394,19 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_InfoList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_DatabaseThreadCPUTimes.uiProcessorNumber ) ) );
 
         m_InfoList.push_back ( StringPair ( "Lowest connected player version",  g_pGame->GetPlayerManager()->GetLowestConnectedPlayerVersion() ) );
+    }
+
+    SAllocationStats httpAllocationStats;
+    EHS::StaticGetAllocationStats( httpAllocationStats );
+    m_InfoList.push_back ( StringPair ( "HTTP allocated active",    SString ( "%d KB", httpAllocationStats.uiActiveKBAllocated ) ) );
+
+    if ( bIncludeDebugInfo )
+    {
+        m_InfoList.push_back ( StringPair ( "HTTP requests active",     SString ( "%d", httpAllocationStats.uiActiveNumRequests ) ) );
+        m_InfoList.push_back ( StringPair ( "HTTP responses active",    SString ( "%d", httpAllocationStats.uiActiveNumResponses ) ) );
+        m_InfoList.push_back ( StringPair ( "HTTP allocated total",     SString ( "%d MB", httpAllocationStats.uiTotalKBAllocated / 1024 ) ) );
+        m_InfoList.push_back ( StringPair ( "HTTP requests total",      SString ( "%d", httpAllocationStats.uiTotalNumRequests ) ) );
+        m_InfoList.push_back ( StringPair ( "HTTP responses total",     SString ( "%d", httpAllocationStats.uiTotalNumResponses ) ) );
 
         // Get net performance stats
         if ( m_NetPerformanceStatsUpdateTimer.Get() > 2000 )

@@ -2139,7 +2139,7 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
 {
     // Find existing
     SString* pTag = MapFind ( m_FunctionTagMap, iLuaFunction );
-#ifndef MTA_DEBUG
+#ifndef CHECK_FUNCTION_TAG
     if ( !pTag )
 #endif
     {
@@ -2172,7 +2172,7 @@ const SString& CLuaMain::GetFunctionTag ( int iLuaFunction )
             strText = SString ( "@func_%d NULL", iLuaFunction );
         }
 
-    #ifdef MTA_DEBUG
+    #ifdef CHECK_FUNCTION_TAG
         if ( pTag )
         {
             // Check tag remains unchanged

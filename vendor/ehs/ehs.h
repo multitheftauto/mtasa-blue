@@ -333,6 +333,7 @@ class EHS {
 	void HandleData ( int inTimeoutMilliseconds = 0 );
 
     static long long StaticGetTotalBytesSent ( void );    // For stats
+    static void StaticGetAllocationStats ( SAllocationStats& outAllocationStats );
 };
 
 
