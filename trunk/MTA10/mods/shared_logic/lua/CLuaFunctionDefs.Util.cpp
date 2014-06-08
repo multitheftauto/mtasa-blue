@@ -494,13 +494,11 @@ int CLuaFunctionDefs::GetValidPedModels ( lua_State* luaVM )
 int CLuaFunctionDefs::GetDistanceBetweenPoints2D ( lua_State* luaVM )
 {
 //  float getDistanceBetweenPoints2D ( float x1, float y1, float x2, float y2 )
-    CVector vecPointA; CVector vecPointB;
+    CVector2D vecPointA; CVector2D vecPointB;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPointA.fX );
-    argStream.ReadNumber ( vecPointA.fY );
-    argStream.ReadNumber ( vecPointB.fX );
-    argStream.ReadNumber ( vecPointB.fY );
+    argStream.ReadVector2D ( vecPointA );
+    argStream.ReadVector2D ( vecPointB );
 
     if ( !argStream.HasErrors () )
     {
@@ -522,12 +520,8 @@ int CLuaFunctionDefs::GetDistanceBetweenPoints3D ( lua_State* luaVM )
     CVector vecPointA; CVector vecPointB;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPointA.fX );
-    argStream.ReadNumber ( vecPointA.fY );
-    argStream.ReadNumber ( vecPointA.fZ );
-    argStream.ReadNumber ( vecPointB.fX );
-    argStream.ReadNumber ( vecPointB.fY );
-    argStream.ReadNumber ( vecPointB.fZ );
+    argStream.ReadVector3D ( vecPointA );
+    argStream.ReadVector3D ( vecPointB );
 
     if ( !argStream.HasErrors () )
     {
@@ -578,12 +572,8 @@ int CLuaFunctionDefs::InterpolateBetween ( lua_State* luaVM )
     float fEasingPeriod; float fEasingAmplitude; float fEasingOvershoot;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( vecPointA.fX );
-    argStream.ReadNumber ( vecPointA.fY );
-    argStream.ReadNumber ( vecPointA.fZ );
-    argStream.ReadNumber ( vecPointB.fX );
-    argStream.ReadNumber ( vecPointB.fY );
-    argStream.ReadNumber ( vecPointB.fZ );
+    argStream.ReadVector3D ( vecPointA );
+    argStream.ReadVector3D ( vecPointB );
     argStream.ReadNumber ( fProgress );
     argStream.ReadEnumString ( easingType );
     argStream.ReadNumber ( fEasingPeriod, 0.3f );

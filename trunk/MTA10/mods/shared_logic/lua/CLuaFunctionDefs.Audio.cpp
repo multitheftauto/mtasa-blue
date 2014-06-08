@@ -76,9 +76,7 @@ int CLuaFunctionDefs::PlaySound3D ( lua_State* luaVM )
     bool bLoop = false;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strSound );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadBool ( bLoop, false );
 
     if ( !argStream.HasErrors() )
@@ -1444,9 +1442,7 @@ int CLuaFunctionDefs::PlaySFX3D ( lua_State* luaVM )
         argStream.ReadNumber(iBankIndex);
 
     argStream.ReadNumber ( iAudioIndex );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadBool ( bLoop, false );
 
     if ( !argStream.HasErrors () )
