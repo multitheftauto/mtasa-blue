@@ -287,7 +287,7 @@ const char* CLuaClassDefs::GetEntityClass ( CClientEntity* pEntity )
     assert ( pEntity );
     switch ( pEntity->GetType () )
     {
-        case CCLIENTCAMERA: return NULL;
+        case CCLIENTCAMERA: return "Camera";
         case CCLIENTPLAYER: return "Player";
         case CCLIENTVEHICLE: return "Vehicle";
         case CCLIENTRADARMARKER: return "Blip";
