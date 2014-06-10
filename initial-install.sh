@@ -15,7 +15,7 @@ autoreconf -fiv
 #export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
 #./configure LDFLAGS="-m32" CPPFLAGS="-m32" CFLAGS="-m32" CXXFLAGS="-m32" --enable-silent-rules $@
 
-./configure CFLAGS='-O3 -fPIC -DPIC' CXXFLAGS='-O3 -fPIC -DPIC' CPPFLAGS='-O3 -fPIC -DPIC' --with-pic --disable-system-pcre
+./configure CFLAGS='-O2 -fPIC -DPIC' CXXFLAGS='-O2 -fPIC -DPIC' CPPFLAGS='-O2 -fPIC -DPIC' --with-pic --disable-system-pcre
 
 # Remove previous build files #2
 make clean
@@ -27,4 +27,4 @@ rm ./MTA10_Server/net/net.la
 
 # then you have makefiles and the source can be compiled :)
 # building in parallel mode (use -j<JOBS>)
-make CFLAGS='-O3 -fPIC -DPIC' CXXFLAGS='-O3 -fPIC -DPIC' CPPFLAGS='-O3 -fPIC -DPIC' >_make.log
+make CFLAGS='-O2 -fPIC -DPIC' CXXFLAGS='-O2 -fPIC -DPIC' CPPFLAGS='-O2 -fPIC -DPIC' >_make.log
