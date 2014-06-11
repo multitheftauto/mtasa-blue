@@ -30,6 +30,7 @@ CMessageLoopHook::CMessageLoopHook ( )
     m_HookedWindowProc      = NULL;
     m_HookedWindowHandle    = NULL;
     m_bRefreshMsgQueueEnabled = true;
+    m_MovementDummyWindow   = NULL;
 }
 
 
@@ -53,6 +54,23 @@ void CMessageLoopHook::ApplyHook ( HWND hFocusWindow )
 
         // Enable Unicode (UTF-16) characters in WM_CHAR messages
         SetWindowLongW ( hFocusWindow, GWL_WNDPROC, GetWindowLong ( hFocusWindow, GWL_WNDPROC ) );
+
+
+        // Register window class for dummy movement window
+        WNDCLASSEX wcDummy;
+        wcDummy.cbSize        = sizeof(WNDCLASSEX);
+        wcDummy.style         = 0;
+        wcDummy.lpfnWndProc   = ProcessDummyWindowMessage;
+        wcDummy.cbClsExtra    = 0;
+        wcDummy.cbWndExtra    = 0;
+        wcDummy.hInstance     = GetModuleHandle(NULL);
+        wcDummy.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+        wcDummy.hCursor       = LoadCursor(NULL, IDC_ARROW);
+        wcDummy.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+        wcDummy.lpszMenuName  = NULL;
+        wcDummy.lpszClassName = "MovementDummy";
+        wcDummy.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
+        RegisterClassEx(&wcDummy);
     }
 }
 
@@ -422,6 +440,12 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                 }
                 */
 
+                if ( uMsg == WM_SYSCOMMAND && wParam == 0xF012 ) // SC_DRAGMOVE
+                {
+                    CMessageLoopHook::GetSingleton().StartWindowMovement ();
+                    return true;
+                }
+
 
                 // If we handled mouse steering, don't let GTA.
                 //if ( !CCore::GetSingleton ().GetMouseControl()->ProcessMouseMove ( uMsg, wParam, lParam ) )
@@ -438,6 +462,92 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
     return DefWindowProcW ( hwnd, uMsg, wParam, lParam );
 }
 
+void CMessageLoopHook::StartWindowMovement()
+{
+    RECT ClientRect;
+    GetWindowRect ( m_HookedWindowHandle, &ClientRect );
+    POINT CursorPos;
+    GetCursorPos ( &CursorPos );
+
+    m_MoveOffset.x = ClientRect.left - CursorPos.x;
+    m_MoveOffset.y = ClientRect.top - CursorPos.y;
+
+    m_MovementDummyWindow = CreateWindowEx ( 0, "MovementDummy", "", 0, CW_USEDEFAULT, CW_USEDEFAULT,
+        ClientRect.right - ClientRect.left, ClientRect.bottom - ClientRect.top, NULL, NULL, GetModuleHandle(NULL), NULL);
+
+    LONG lStyle = GetWindowLong ( m_MovementDummyWindow, GWL_STYLE );
+    lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_SYSMENU);
+    SetWindowLong ( m_MovementDummyWindow, GWL_STYLE, lStyle );
+
+    LONG lExStyle = GetWindowLong ( m_MovementDummyWindow, GWL_EXSTYLE );
+    lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
+    SetWindowLong ( m_MovementDummyWindow, GWL_EXSTYLE, lExStyle );
+
+    SetWindowPos ( m_MovementDummyWindow, NULL, ClientRect.left, ClientRect.top, 0, 0, SWP_DRAWFRAME | SWP_NOZORDER | SWP_NOSIZE );
+    //ShowWindow ( m_HookedWindowHandle, SW_HIDE );
+    ShowWindow ( m_MovementDummyWindow, SW_SHOW );
+    UpdateWindow ( m_MovementDummyWindow );
+
+    // Set mouse capture to handle mouse event also if the cursor is not on the window (due to a too fast mouse)
+    SetCapture ( m_MovementDummyWindow );
+}
+
+LRESULT CALLBACK CMessageLoopHook::ProcessDummyWindowMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    CMessageLoopHook* pThis = CMessageLoopHook::GetSingletonPtr ();
+
+    switch (uMsg)
+    {
+        case WM_NCMOUSEMOVE:
+        case WM_MOUSEMOVE:
+        {
+            POINT CursorPos;
+            GetCursorPos ( &CursorPos );
+            SetWindowPos ( hwnd, NULL, CursorPos.x + pThis->m_MoveOffset.x, CursorPos.y + pThis->m_MoveOffset.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE );
+            break;
+        }
+        case WM_LBUTTONUP:
+        {
+            // Destroy the dummy window
+            DestroyWindow ( hwnd );
+            pThis->m_MovementDummyWindow = NULL;
+
+            POINT CursorPos;
+            GetCursorPos ( &CursorPos );
+            
+            // Move the main window to the last position of the dummy window
+            SetWindowPos ( pThis->m_HookedWindowHandle, NULL, CursorPos.x + pThis->m_MoveOffset.x, CursorPos.y + pThis->m_MoveOffset.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE );
+            //ShowWindow ( pThis->m_HookedWindowHandle, SW_SHOW );
+
+            // Release mouse capture
+            ReleaseCapture ();
+
+            break;
+        }
+        case WM_PAINT:
+        {
+            PAINTSTRUCT PS;
+            BeginPaint ( hwnd, &PS );
+            RECT ClientRect;
+            GetClientRect ( hwnd, &ClientRect );
+            RECT BorderRect = { 5, 5, ClientRect.right - 5, ClientRect.bottom - 5 };
+
+            // Give it some color
+            HBRUSH BorderBrush = CreateSolidBrush ( 0x00000000 );
+            HBRUSH FillBrush = CreateSolidBrush ( 0x00ADA424 );
+            FillRect( PS.hdc, &ClientRect, BorderBrush );
+            FillRect ( PS.hdc, &BorderRect, FillBrush );
+            DeleteObject ( BorderBrush );
+            DeleteObject ( FillBrush );
+            EndPaint ( hwnd, &PS );
+
+            break;
+        }
+        default:
+            return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
 
 HWND CMessageLoopHook::GetHookedWindowHandle ( ) const
 {
