@@ -754,6 +754,8 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 			SetOverwrite ifnewer
 			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[admin]\admin.zip"
 			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[admin]\runcode.zip"
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[admin]\acpanel.zip"
+			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[admin]\ipb.zip"
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[play]"
 			File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[play]\*.zip"
 			SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gameplay]"
