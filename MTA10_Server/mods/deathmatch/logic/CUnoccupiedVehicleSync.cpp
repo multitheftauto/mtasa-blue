@@ -102,11 +102,18 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
     // If someones driving it, or its being towed by someone driving (and not just entering/exiting)
     if ( pController && IS_PLAYER ( pController ) && pController->GetVehicleAction () == CPlayer::VEHICLEACTION_NONE )
     {
-        // Got a syncer too?
-        if ( pSyncer )
+        // if we have a syncer and he is not the controller
+        if ( pSyncer && pSyncer != pController )
         {
             // Tell the syncer to stop syncing
             StopSync ( pVehicle );
+            // if the controller is a player we should set them as the syncer
+            if ( pController->IsPlayer ( ) )
+            {
+                CPlayer * pControllingPlayer = static_cast <CPlayer *> ( pController );
+                // Update our syncer
+                pVehicle->SetSyncer ( pControllingPlayer );
+            }
         }
     }
     else
