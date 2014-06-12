@@ -181,6 +181,7 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)xmll_d.dll" "$(MyTargetDir)\mta\" &amp;&amp; xcopy /y "$(OutDir)xmll_d.dll" "$(MyTargetDir)\server\"</Command>
