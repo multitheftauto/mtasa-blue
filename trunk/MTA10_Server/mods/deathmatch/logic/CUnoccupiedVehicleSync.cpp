@@ -113,6 +113,11 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
                 CPlayer * pControllingPlayer = static_cast <CPlayer *> ( pController );
                 // Update our syncer
                 pVehicle->SetSyncer ( pControllingPlayer );
+
+                // Call the onElementStartSync event
+                CLuaArguments Arguments;
+                Arguments.PushElement ( pControllingPlayer );  // New syncer
+                pVehicle->CallEvent ( "onElementStartSync", Arguments );
             }
         }
     }
