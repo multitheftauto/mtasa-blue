@@ -1164,6 +1164,13 @@ bool CStaticFunctionDefinitions::SetElementParent ( CElement* pElement, CElement
 }
 
 
+bool CStaticFunctionDefinitions::GetElementMatrix ( CElement* pElement, CMatrix& matrix )
+{
+    pElement->GetMatrix ( matrix );
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetElementPosition ( CElement* pElement, CVector& vecPosition )
 {
     assert ( pElement );
@@ -1248,6 +1255,16 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CElement* pElement, CVecto
         }
         default: return false;
     }
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetElementMatrix ( CElement* pElement, const CMatrix& matrix )
+{
+    RUN_CHILDREN( SetElementMatrix ( *iter, matrix ) )
+
+    pElement->SetMatrix ( matrix );
 
     return true;
 }

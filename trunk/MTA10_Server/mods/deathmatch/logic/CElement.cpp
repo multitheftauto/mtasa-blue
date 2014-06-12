@@ -151,6 +151,49 @@ const CVector & CElement::GetPosition ( void )
 }
 
 
+void CElement::GetMatrix( CMatrix& matrix )
+{
+    CVector vecPosition = GetPosition();
+    CVector vecRotation;
+    GetRotation( vecRotation );
+    matrix.SetRotation( vecRotation );
+    matrix.vPos = vecPosition;
+}
+
+
+void CElement::SetMatrix( const CMatrix& matrix )
+{
+    SetPosition( matrix.vPos );
+    CVector vecRotation = matrix.GetRotation();
+    switch( GetType() )
+    {
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast < CObject* > ( this );
+            pObject->SetRotation( vecRotation );
+        }
+        break;
+
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast < CVehicle* > ( this );
+            pVehicle->SetRotationDegrees( vecRotation );
+        }
+        break;
+
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            CPed* pPed = static_cast < CPed* > ( this );
+            pPed->SetRotation( vecRotation.fZ );
+        }
+        break;
+
+        default:
+            break;
+    }
+}
+
 // Static function
 uint CElement::GetTypeHashFromString ( const SString& strTypeName )
 {

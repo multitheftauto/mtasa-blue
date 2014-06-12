@@ -59,6 +59,7 @@ public:
     static CLuaArgument*        GetElementData                      ( CElement* pElement, const char* szName, bool bInherit );
     static CLuaArguments*       GetAllElementData                   ( CElement* pElement, CLuaArguments * table );
     static CElement*            GetElementParent                    ( CElement* pElement );
+    static bool                 GetElementMatrix                    ( CElement* pElement, CMatrix& matrix );
     static bool                 GetElementPosition                  ( CElement* pElement, CVector& vecPosition );
     static bool                 GetElementRotation                  ( CElement* pElement, CVector& vecRotation, const char* szRotationOrder );
     static bool                 GetElementVelocity                  ( CElement* pElement, CVector& vecVelocity );
@@ -89,6 +90,7 @@ public:
     static bool                 SetElementData                      ( CElement* pElement, const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronize );
     static bool                 RemoveElementData                   ( CElement* pElement, const char* szName );
     static bool                 SetElementParent                    ( CElement* pElement, CElement* pParent );
+    static bool                 SetElementMatrix                    ( CElement* pElement, const CMatrix& matrix );
     static bool                 SetElementPosition                  ( CElement* pElement, const CVector& vecPosition, bool bWarp = true );
     static bool                 SetElementRotation                  ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay );
     static bool                 SetElementVelocity                  ( CElement* pElement, const CVector& vecVelocity );
