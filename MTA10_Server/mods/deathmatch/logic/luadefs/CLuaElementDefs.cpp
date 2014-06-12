@@ -46,6 +46,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getAllElementData", CLuaElementDefs::getAllElementData );
     CLuaCFunctions::AddFunction ( "getElementID", CLuaElementDefs::getElementID );
     CLuaCFunctions::AddFunction ( "getElementParent", CLuaElementDefs::getElementParent );
+    CLuaCFunctions::AddFunction ( "getElementMatrix", CLuaElementDefs::getElementMatrix );
     CLuaCFunctions::AddFunction ( "getElementPosition", CLuaElementDefs::getElementPosition );
     CLuaCFunctions::AddFunction ( "getElementRotation", CLuaElementDefs::getElementRotation );
     CLuaCFunctions::AddFunction ( "getElementVelocity", CLuaElementDefs::getElementVelocity );
@@ -81,6 +82,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     // Set
     CLuaCFunctions::AddFunction ( "setElementID", CLuaElementDefs::setElementID );
     CLuaCFunctions::AddFunction ( "setElementParent", CLuaElementDefs::setElementParent );
+    CLuaCFunctions::AddFunction ( "setElementMatrix", CLuaElementDefs::setElementMatrix );
     CLuaCFunctions::AddFunction ( "setElementPosition", CLuaElementDefs::setElementPosition );
     CLuaCFunctions::AddFunction ( "setElementRotation", CLuaElementDefs::setElementRotation );
     CLuaCFunctions::AddFunction ( "setElementVelocity", CLuaElementDefs::setElementVelocity );
@@ -492,6 +494,88 @@ int CLuaElementDefs::getElementPosition ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaElementDefs::getElementMatrix ( lua_State* luaVM )
+{
+    CElement* pElement = NULL;
+    bool bBadSyntax;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadBool ( bBadSyntax, true );
+
+    // Verify the arguments
+    if ( !argStream.HasErrors ( ) )
+    {
+        // Grab the position
+        CMatrix matrix;
+        if ( CStaticFunctionDefinitions::GetElementMatrix ( pElement, matrix ) )
+        {
+            // Apparently some scripts like the dirty syntax... should be 0.0f but was 1.0f post 1.3.2
+            float fData = bBadSyntax == true ? 1.0f : 0.0f;
+
+            // Return it
+            lua_createtable ( luaVM, 4, 0 );
+
+            // First row
+            lua_createtable ( luaVM, 4, 0 );
+            lua_pushnumber ( luaVM, matrix.vRight.fX );
+            lua_rawseti ( luaVM, -2, 1 );
+            lua_pushnumber ( luaVM, matrix.vRight.fY );
+            lua_rawseti ( luaVM, -2, 2 );
+            lua_pushnumber ( luaVM, matrix.vRight.fZ );
+            lua_rawseti ( luaVM, -2, 3 );
+            lua_pushnumber ( luaVM, fData );
+            lua_rawseti ( luaVM, -2, 4 );
+            lua_rawseti ( luaVM, -2, 1 );
+
+            // Second row
+            lua_createtable ( luaVM, 4, 0 );
+            lua_pushnumber ( luaVM, matrix.vFront.fX );
+            lua_rawseti ( luaVM, -2, 1 );
+            lua_pushnumber ( luaVM, matrix.vFront.fY );
+            lua_rawseti ( luaVM, -2, 2 );
+            lua_pushnumber ( luaVM, matrix.vFront.fZ );
+            lua_rawseti ( luaVM, -2, 3 );
+            lua_pushnumber ( luaVM, fData );
+            lua_rawseti ( luaVM, -2, 4 );
+            lua_rawseti ( luaVM, -2, 2 );
+
+            // Third row
+            lua_createtable ( luaVM, 4, 0 );
+            lua_pushnumber ( luaVM, matrix.vUp.fX );
+            lua_rawseti ( luaVM, -2, 1 );
+            lua_pushnumber ( luaVM, matrix.vUp.fY );
+            lua_rawseti ( luaVM, -2, 2 );
+            lua_pushnumber ( luaVM, matrix.vUp.fZ );
+            lua_rawseti ( luaVM, -2, 3 );
+            lua_pushnumber ( luaVM, fData );
+            lua_rawseti ( luaVM, -2, 4 );
+            lua_rawseti ( luaVM, -2, 3 );
+
+            // Fourth row
+            lua_createtable ( luaVM, 4, 0 );
+            lua_pushnumber ( luaVM, matrix.vPos.fX );
+            lua_rawseti ( luaVM, -2, 1 );
+            lua_pushnumber ( luaVM, matrix.vPos.fY );
+            lua_rawseti ( luaVM, -2, 2 );
+            lua_pushnumber ( luaVM, matrix.vPos.fZ );
+            lua_rawseti ( luaVM, -2, 3 );
+            lua_pushnumber ( luaVM, 1.0f );
+            lua_rawseti ( luaVM, -2, 4 );
+            lua_rawseti ( luaVM, -2, 4 );
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -1286,6 +1370,35 @@ int CLuaElementDefs::removeElementData ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaElementDefs::setElementMatrix ( lua_State* luaVM )
+{
+//  setElementMatrix ( element theElement, table matrix )
+    CElement* pElement; CMatrix matrix;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+
+    if ( !ReadMatrix ( luaVM, argStream.m_iIndex, matrix ) )
+        argStream.SetCustomError ( "Matrix is not 4 x 4" );
+
+    // Verify the arguments
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( CStaticFunctionDefinitions::SetElementMatrix ( pElement, matrix ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }

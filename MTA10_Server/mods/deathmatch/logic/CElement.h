@@ -103,6 +103,8 @@ public:
     virtual void                                SetPosition                 ( const CVector& vecPosition );
 
     virtual void                                GetRotation                 ( CVector & vecRotation )       { vecRotation = CVector (); }
+    void                                        GetMatrix                   ( CMatrix& matrix );
+    void                                        SetMatrix                   ( const CMatrix& matrix );
 
     virtual bool                                IsPerPlayerEntity           ( void )                        { return false; };
 
