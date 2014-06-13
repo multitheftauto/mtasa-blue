@@ -11,6 +11,28 @@
 
 #include "StdInc.h"
 
+int CLuaOOPDefs::GetElementMatrix(lua_State* luaVM)
+{
+    CElement* pEntity = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        CMatrix matrix;
+        pEntity->GetMatrix ( matrix );
+
+        lua_pushmatrix ( luaVM, matrix );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaOOPDefs::GetElementPosition ( lua_State* luaVM )
 {
     CElement* pElement = NULL;
@@ -53,3 +75,4 @@ int CLuaOOPDefs::GetElementRotation ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+

@@ -26,10 +26,16 @@ class CLuaOOPDefs : public CLuaDefs
 public:
     LUA_DECLARE ( SetPedOccupiedVehicle );
 
+    LUA_DECLARE ( GetElementMatrix );
     LUA_DECLARE ( GetElementPosition );
     LUA_DECLARE ( GetElementRotation );
 
     LUA_DECLARE ( GetCameraMatrix );
+
+    LUA_DECLARE ( GetCameraPosition );
+    LUA_DECLARE ( SetCameraPosition );
+    LUA_DECLARE ( GetCameraRotation );
+    LUA_DECLARE ( SetCameraRotation );
 };
 
 #endif
