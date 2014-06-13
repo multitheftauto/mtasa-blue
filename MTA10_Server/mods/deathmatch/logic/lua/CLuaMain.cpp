@@ -421,7 +421,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "colShape", NULL, "getElementColShape" );
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classvariable ( luaVM, "position", "setElementPosition", "getElementPosition", CLuaElementDefs::setElementPosition, CLuaOOPDefs::GetElementPosition );
-    lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", CLuaElementDefs::setElementRotation, CLuaOOPDefs::GetElementRotation );
+    lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
     lua_classvariable ( luaVM, "matrix", "", "getElementMatrix", NULL, CLuaOOPDefs::GetElementMatrix );
     lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity" ); // TODO return Vector3
     //lua_classvariable ( luaVM, "data", "setElementData", "getElementData", CLuaOOPDefs::SetElementData, CLuaOOPDefs::GetElementData );
