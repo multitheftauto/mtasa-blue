@@ -63,11 +63,14 @@ int CLuaOOPDefs::GetElementRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CVector vector;
-        pElement->GetRotation ( vector );
-        ConvertRadiansToDegrees ( vector );
+        CMatrix matrix;
+        CVector vecRotation;
+        pElement->GetMatrix ( matrix );
 
-        lua_pushvector ( luaVM, vector );
+        vecRotation = matrix.GetRotation ( );
+        ConvertRadiansToDegrees ( vecRotation );
+
+        lua_pushvector ( luaVM, vecRotation );
         return 1;
     }
     else
