@@ -176,6 +176,8 @@ public:
     void                            GetRotation             ( CVector& vecRotation );
     void                            GetRotationDegrees      ( CVector& vecRotation );
     void                            SetRotationDegrees      ( const CVector& vecRotation );
+    void                            GetMatrix               ( CMatrix& matrix );
+    void                            SetMatrix               ( const CMatrix& matrix );
 
     inline const CVector&           GetVelocity             ( void )                        { return m_vecVelocity; };
     inline void                     SetVelocity             ( const CVector& vecVelocity )  { m_vecVelocity = vecVelocity; };

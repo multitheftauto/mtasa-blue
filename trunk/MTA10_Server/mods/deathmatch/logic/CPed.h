@@ -215,6 +215,9 @@ public:
     inline float                                GetRotation                 ( void )                        { return m_fRotation; }
     inline void                                 SetRotation                 ( float fRotation )             { m_fRotation = fRotation; }
 
+    void                                        GetMatrix                   ( CMatrix& matrix );
+    void                                        SetMatrix                   ( const CMatrix& matrix );
+
     inline CElement*                            GetTargetedElement          ( void )                        { return m_pTargetedEntity; }
     inline void                                 SetTargetedElement          ( CElement* pEntity )           { m_pTargetedEntity = pEntity; }
     

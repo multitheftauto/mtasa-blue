@@ -178,6 +178,25 @@ bool CObject::ReadSpecialData ( void )
 }
 
 
+void CObject::GetMatrix( CMatrix& matrix )
+{
+    CVector vecRotation;
+    GetRotation( vecRotation );
+    // Turn inverted rotation into non-inverted
+    matrix.SetRotation( -vecRotation );
+    matrix.vPos = GetPosition();
+}
+
+
+void CObject::SetMatrix( const CMatrix& matrix )
+{
+    SetPosition( matrix.vPos );
+    CVector vecRotation = matrix.GetRotation();
+    // Turn non-inverted rotation into inverted
+    SetRotation( -vecRotation );
+}
+
+
 const CVector& CObject::GetPosition ( void )
 {
     CVector vecOldPosition = m_vecPosition;
