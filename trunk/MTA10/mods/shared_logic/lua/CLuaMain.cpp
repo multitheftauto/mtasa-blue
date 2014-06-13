@@ -182,7 +182,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setID", "setElementID" );
     lua_classfunction ( luaVM, "setParent", "setElementParent" );
     lua_classfunction ( luaVM, "setPosition", "setElementPosition" );
-    lua_classfunction ( luaVM, "setRotation", "setElementRotation" );
+    lua_classfunction ( luaVM, "setRotation", CLuaOOPDefs::SetElementRotation );
     lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
     lua_classfunction ( luaVM, "setVisibleTo", "setElementVisibleTo" );
     lua_classfunction ( luaVM, "clearVisibleTo", "clearElementVisibleTo" );
@@ -217,7 +217,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "GetElementDistanceFromCentreOfMassToBaseOfModel" );
     lua_classvariable ( luaVM, "childrenCount", NULL, "getElementChildrenCount" );
     lua_classvariable ( luaVM, "position", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
-    lua_classvariable ( luaVM, "rotation", CLuaFunctionDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
+    lua_classvariable ( luaVM, "rotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
     lua_classvariable ( luaVM, "matrix", NULL, CLuaOOPDefs::GetElementMatrix );
     //lua_classvariable ( luaVM, "velocity", CLuaFunctionDefs::SetElementVelocity, CLuaOOPDefs::GetElementVelocity );
     lua_classvariable ( luaVM, "data", NULL, "getAllElementData" ); // neeed to support setting of values
