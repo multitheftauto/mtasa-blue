@@ -739,8 +739,14 @@ bool CStaticFunctionDefinitions::GetElementAlpha ( CElement* pElement, unsigned 
         }
         case CElement::OBJECT:
         {
-            CObject * pObject = static_cast < CObject* > ( pElement );
+            CObject* pObject = static_cast < CObject* > ( pElement );
             ucAlpha = pObject->GetAlpha ();
+            break;
+        }
+        case CElement::MARKER:
+        {
+            CMarker* pMarker = static_cast < CMarker* > ( pElement );
+            ucAlpha = pMarker->GetColor ().A;
             break;
         }
         default: return false;

@@ -654,8 +654,14 @@ bool CStaticFunctionDefinitions::GetElementAlpha ( CClientEntity& Entity, unsign
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
-            CClientObject & Object = static_cast < CClientObject & > ( Entity );
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
             ucAlpha = Object.GetAlpha ();
+            break;
+        }
+        case CCLIENTMARKER:
+        {
+            CClientMarker& Marker = static_cast< CClientMarker& > ( Entity );
+            ucAlpha = Marker.GetColor ().A;
             break;
         }
         default: return false;
