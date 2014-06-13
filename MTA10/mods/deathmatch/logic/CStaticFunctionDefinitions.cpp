@@ -7581,6 +7581,26 @@ bool CStaticFunctionDefinitions::SetSoundEffectEnabled ( CClientPlayer& Player, 
     return false;
 }
 
+
+bool CStaticFunctionDefinitions::SetSoundPan ( CClientPlayer& Player, float fPan )
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice ();
+    if ( pVoice )
+        return pVoice->SetPan ( fPan );
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundPan ( CClientPlayer& Player, float& fPan )
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice ();
+    if ( pVoice )
+        return pVoice->GetPan ( fPan );
+
+    return false;
+}
+
+
 /** Version functions **/
 unsigned long CStaticFunctionDefinitions::GetVersion ()
 {

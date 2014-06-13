@@ -665,6 +665,8 @@ public:
     static bool                         GetSoundMaxDistance                 ( CClientPlayer& Player, float& fDistance );
     static bool                         GetSoundMetaTags                    ( CClientPlayer& Player, const SString& strFormat, SString& strMetaTags );
     static bool                         SetSoundEffectEnabled               ( CClientPlayer& Player, const SString& strEffectName, bool bEnable );
+    static bool                         SetSoundPan                         ( CClientPlayer& Player, float fPan );
+    static bool                         GetSoundPan                         ( CClientPlayer& Player, float& fPan );
     
 
     // Handling funcs 
