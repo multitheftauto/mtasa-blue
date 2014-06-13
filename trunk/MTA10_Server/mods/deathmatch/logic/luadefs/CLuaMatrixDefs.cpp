@@ -168,7 +168,7 @@ int CLuaMatrixDefs::GetRotation ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         CVector vecRotation;
-        //g_pMultiplayer->ConvertMatrixToEulerAngles ( *pMatrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        vecRotation = pMatrix->GetRotation ( );
         ConvertRadiansToDegrees ( vecRotation );
 
         lua_pushvector ( luaVM, vecRotation );

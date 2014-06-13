@@ -249,17 +249,20 @@ bool CStaticFunctionDefinitions::OutputConsole ( const char* szText )
 
 bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded )
 {
-    CLuaArguments Arguments;
-    Arguments.PushString ( szText );
-    Arguments.PushNumber ( ucRed );
-    Arguments.PushNumber ( ucGreen );
-    Arguments.PushNumber ( ucBlue );
-
-    bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
-    if ( !bCancelled )
+    if ( strlen ( szText ) <= MAX_OUTPUTCHATBOX_LENGTH )
     {
-        m_pCore->ChatPrintfColor ( "%s", bColorCoded, ucRed, ucGreen, ucBlue, szText );
-        return true;
+        CLuaArguments Arguments;
+        Arguments.PushString ( szText );
+        Arguments.PushNumber ( ucRed );
+        Arguments.PushNumber ( ucGreen );
+        Arguments.PushNumber ( ucBlue );
+
+        bool bCancelled = !g_pClientGame->GetRootEntity ( )->CallEvent ( "onClientChatMessage", Arguments, false );
+        if ( !bCancelled )
+        {
+            m_pCore->ChatPrintfColor ( "%s", bColorCoded, ucRed, ucGreen, ucBlue, szText );
+            return true;
+        }
     }
     return false;
 }
