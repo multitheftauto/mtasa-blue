@@ -382,6 +382,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getData", "getElementData" );
     lua_classfunction ( luaVM, "getPosition", "getElementPosition", CLuaOOPDefs::GetElementPosition );
     lua_classfunction ( luaVM, "getRotation", "getElementRotation", CLuaOOPDefs::GetElementRotation );
+    lua_classfunction ( luaVM, "getMatrix", "getElementMatrix", CLuaOOPDefs::GetElementMatrix );
     lua_classfunction ( luaVM, "getPosition", "getElementPosition" );
     lua_classfunction ( luaVM, "getRotation", "getElementRotation" );
     lua_classfunction ( luaVM, "getType", "getElementType" );
@@ -421,6 +422,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classvariable ( luaVM, "position", "setElementPosition", "getElementPosition", CLuaElementDefs::setElementPosition, CLuaOOPDefs::GetElementPosition );
     lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", CLuaElementDefs::setElementRotation, CLuaOOPDefs::GetElementRotation );
+    lua_classvariable ( luaVM, "matrix", "", "getElementMatrix", NULL, CLuaOOPDefs::GetElementMatrix );
     lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity" ); // TODO return Vector3
     //lua_classvariable ( luaVM, "data", "setElementData", "getElementData", CLuaOOPDefs::SetElementData, CLuaOOPDefs::GetElementData );
     //lua_classvariable ( luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", CLuaOOPDefs::SetElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo ); // .visibility[john]=false
