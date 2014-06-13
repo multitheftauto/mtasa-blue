@@ -65,6 +65,7 @@ int CLuaOOPDefs::GetElementRotation ( lua_State* luaVM )
     {
         CVector vector;
         pElement->GetRotation ( vector );
+        ConvertRadiansToDegrees ( vector );
 
         lua_pushvector ( luaVM, vector );
         return 1;

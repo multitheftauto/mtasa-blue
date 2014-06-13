@@ -63,6 +63,10 @@ public:
 #define MIN_CHATECHO_LENGTH 1
 #define MAX_CHATECHO_LENGTH 128
 
+// Min and max number of characters in outputChatBox from the server
+#define MIN_OUTPUTCHATBOX_LENGTH 1
+#define MAX_OUTPUTCHATBOX_LENGTH 256
+
 // Min and max number of characters in debug echos
 #define MIN_DEBUGECHO_LENGTH 1
 #define MAX_DEBUGECHO_LENGTH 256
