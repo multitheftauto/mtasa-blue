@@ -1618,14 +1618,23 @@ int CLuaFunctionDefs::RemoveElementData ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetElementMatrix ( lua_State* luaVM )
 {
-//  setElementMatrix ( element theElement, table matrix )
+    //  setElementMatrix ( element theElement, table matrix )
     CClientEntity* pEntity; CMatrix matrix;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
 
-    if ( !ReadMatrix ( luaVM, argStream.m_iIndex, matrix ) )
-        argStream.SetCustomError ( "Matrix is not 4 x 4" );
+    if ( argStream.NextIsTable ( ) )
+    {
+        if ( !ReadMatrix ( luaVM, argStream.m_iIndex, matrix ) )
+        {
+            argStream.SetCustomError ( "Matrix is not 4 x 4" );
+        }
+    }
+    else
+    {
+        argStream.ReadMatrix ( matrix );
+    }
 
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )

@@ -1383,8 +1383,17 @@ int CLuaElementDefs::setElementMatrix ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
 
-    if ( !ReadMatrix ( luaVM, argStream.m_iIndex, matrix ) )
-        argStream.SetCustomError ( "Matrix is not 4 x 4" );
+    if ( argStream.NextIsTable ( ) )
+    {
+        if ( !ReadMatrix ( luaVM, argStream.m_iIndex, matrix ) )
+        {
+            argStream.SetCustomError ( "Matrix is not 4 x 4" );
+        }
+    }
+    else
+    {
+        argStream.ReadMatrix ( matrix );
+    }
 
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )
