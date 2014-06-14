@@ -205,6 +205,26 @@ bool CAudioContainerSA::ValidateContainer ( eAudioLookupIndex lookupIndex )
 
     return true;
 }
+bool CAudioContainerSA::GetAudioSizeFromHeader ( const SRadioTrackHeader &header, int &iSize )
+{
+    // find our track length
+    // each header contains 8 lengths
+    for ( int i = 0; i < NUM_LENGTH_ENTRIES; i++ )
+    {
+        // find the length that isn't "default"
+        // default is 0xCDCDCDCD (ignoring this will result in a crash.)
+        if ( header.lengths[i].length != 0xCDCDCDCD )
+        {
+            // that's our size
+            iSize = header.lengths[i].length;
+        }
+    }
+    // if we haven't found a size we can't continue
+    if ( iSize == 0 )
+        return false;
+
+    return true;
+}
 
 bool CAudioContainerSA::GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, unsigned int& length)
 {
@@ -218,12 +238,25 @@ bool CAudioContainerSA::GetRadioAudioData(eRadioStreamIndex streamIndex, int tra
     // A track consist of a header and is followed by the actual ogg stream
 
     // Since there is no index, we need to move through the tracks until we reach the desired one
+
+    // header
     SRadioTrackHeader header;
     int trackid = 1;
+    
+    int iSize = 0;
+
     while (trackid < trackIndex)
     {
-        ReadRadioArchive(archive, header);
-        archive.seekg(header.length, std::ios_base::cur);
+        // Read our header
+        ReadRadioArchive ( archive, header );
+
+        // if we haven't found a size we can't continue
+        if ( GetAudioSizeFromHeader ( header, iSize ) == false )
+            return false;
+
+        // seek forward to the next header
+        archive.seekg ( iSize, std::ios_base::cur );
+
         ++trackid;
 
         if (archive.fail())
@@ -231,13 +264,22 @@ bool CAudioContainerSA::GetRadioAudioData(eRadioStreamIndex streamIndex, int tra
     }
 
     // We now have reached the right track
-    ReadRadioArchive(archive, header);
+    ReadRadioArchive ( archive, header );
+
+
+    // if we haven't found a size we can't continue
+    if ( GetAudioSizeFromHeader ( header, iSize ) == false )
+        return false;
+
+    // if we haven't found a size we can't continue
+    if ( iSize == 0 )
+        return false;
 
     if (archive.fail())
         return false;
 
-    uint8 *pData = new uint8[header.length];
-    ReadRadioArchive(archive, * pData, header.length);
+    uint8 *pData = new uint8[iSize];
+    ReadRadioArchive ( archive, *pData, iSize );
 
     if (archive.fail())
     {
@@ -256,7 +298,7 @@ bool CAudioContainerSA::GetRadioAudioData(eRadioStreamIndex streamIndex, int tra
     }
 
     pMemory = pData;
-    length = header.length;
+    length = iSize;
 
     return true;
 }

@@ -19,47 +19,9 @@
 #include <fstream>
 
 #define VALIDATE_BUFFER_SIZE 4096
+#define NUM_BEAT_ENTRIES 1000
+#define NUM_LENGTH_ENTRIES 8
 
-class CAudioContainerSA : public CAudioContainer
-{
-public:
-    CAudioContainerSA(void);
-    ~CAudioContainerSA(void);
-    
-    bool GetAudioData ( eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length );
-    bool ValidateContainer ( eAudioLookupIndex lookupIndex );
-
-    bool GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, unsigned int& length);
-
-private:
-    CAudioContainerLookupTableSA* m_pLookupTable;
-
-protected:
-    bool GetRawAudioData ( eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, uint8*& dataOut, unsigned int& lengthOut, int& iSampleRateOut );
-    const SString GetAudioArchiveName ( eAudioLookupIndex );
-
-    const SString GetRadioStreamArchiveName(eRadioStreamIndex streamIndex);
-    
-    template<typename T> void ReadRadioArchive(std::ifstream& stream, T& value, std::size_t len = 1)
-    {
-        static uint8 xor[] = { 0xEA, 0x3A, 0xC4, 0xA1, 0x9A, 0xA8, 0x14, 0xF3, 0x48, 0xB0, 0xD7, 0x23, 0x9D, 0xE8, 0xFF, 0xF1 };
-        uint8 xorPosition = stream.tellg() % sizeof(xor);
-
-        stream.read((char*) &value, sizeof(T) * len);
-
-        // for some reason R* decided to xor the radio streams
-        // see gta_sa.exe @ 0x4F17D0
-        for (unsigned int i = 0; i < sizeof(T) * len; ++i)
-        {
-            ((char*) &value)[i] ^= xor[xorPosition];
-
-            xorPosition++;
-            if (xorPosition >= sizeof(xor))
-                xorPosition = 0;
-
-        }
-    }
-};
 
 struct SAudioEntrySA
 {
@@ -96,13 +58,71 @@ struct SRiffWavePCMHeader
 }; // size = 44 = 0x2C
 C_ASSERT ( sizeof ( SRiffWavePCMHeader ) == 0x2C );
 
-struct SRadioTrackHeader
-{
-    char unk[8000]; // 0
-    int length;     // 8000 (length of the ogg stream)
-    int unk2;       // 8004 (sample rate?)
-    char unk3[60];  // 8008
+// Documentation by SAAT //
+// http://pdescobar.home.comcast.net/~pdescobar/gta/saat/ //
+struct SBeatEntry {
+    int32_t timing;
+    int32_t control;
 };
-C_ASSERT(sizeof(SRadioTrackHeader) == 8068);
+C_ASSERT ( sizeof ( SBeatEntry ) == 8 );
+
+struct SLengthEntry {
+    uint32_t length;
+    uint32_t extra;
+};
+C_ASSERT ( sizeof ( SBeatEntry ) == 8 );
+
+struct SRadioTrackHeader {
+    SBeatEntry beats[NUM_BEAT_ENTRIES];
+    SLengthEntry lengths[NUM_LENGTH_ENTRIES];
+    uint32_t trailer;
+};
+C_ASSERT ( sizeof ( SRadioTrackHeader ) == 8068 );
+
+// End of documentation by SAAT //
+// http://pdescobar.home.comcast.net/~pdescobar/gta/saat/ //
+
+class CAudioContainerSA : public CAudioContainer
+{
+public:
+    CAudioContainerSA(void);
+    ~CAudioContainerSA(void);
+    
+    bool GetAudioData ( eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length );
+    bool ValidateContainer ( eAudioLookupIndex lookupIndex );
+
+    bool GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, unsigned int& length);
+
+private:
+    CAudioContainerLookupTableSA* m_pLookupTable;
+
+protected:
+    bool GetRawAudioData ( eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, uint8*& dataOut, unsigned int& lengthOut, int& iSampleRateOut );
+    const SString GetAudioArchiveName ( eAudioLookupIndex );
+
+    const SString GetRadioStreamArchiveName(eRadioStreamIndex streamIndex);
+    
+    bool GetAudioSizeFromHeader ( const SRadioTrackHeader &header, int &iSize );
+
+    template<typename T> void ReadRadioArchive(std::ifstream& stream, T& value, std::size_t len = 1)
+    {
+        static uint8 xor[] = { 0xEA, 0x3A, 0xC4, 0xA1, 0x9A, 0xA8, 0x14, 0xF3, 0x48, 0xB0, 0xD7, 0x23, 0x9D, 0xE8, 0xFF, 0xF1 };
+        uint8 xorPosition = stream.tellg() % sizeof(xor);
+
+        stream.read((char*) &value, sizeof(T) * len);
+
+        // for some reason R* decided to xor the radio streams
+        // see gta_sa.exe @ 0x4F17D0
+        for (unsigned int i = 0; i < sizeof(T) * len; ++i)
+        {
+            ((char*) &value)[i] ^= xor[xorPosition];
+
+            xorPosition++;
+            if (xorPosition >= sizeof(xor))
+                xorPosition = 0;
+
+        }
+    }
+};
 
 #endif
