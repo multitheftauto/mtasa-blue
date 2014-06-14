@@ -1149,12 +1149,24 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
         CClientEntity * pKiller = ( KillerID != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement ( KillerID ) : NULL;
         if ( pPed )
         {
-            // Mark him as dead?
+            // assume we aren't already dead on the network
+            bool bAlreadyDeadOnNetwork = false;
+            // Here
+            // if we are a player do some special steps
             if ( IS_PLAYER ( pPed ) )
-                static_cast < CClientPlayer * > ( pPed )->SetDeadOnNetwork ( true );
-
+            {
+                // cast us to a player
+                CClientPlayer * pPlayer = static_cast < CClientPlayer * > ( pPed );
+                // store our dead on the network state
+                bAlreadyDeadOnNetwork = pPlayer->IsDeadOnNetwork ( );
+                // update our dead on the network state
+                pPlayer->SetDeadOnNetwork ( true );
+            }
             // Update our sync-time context
             pPed->SetSyncTimeContext ( ucTimeContext );
+
+            // To at least here needs to be done on the local player to avoid desync
+            // Caz: Issue 8148 - Desync when calling spawnPlayer from an event handler remotely triggered from within onClientPlayerWasted
 
             // Is this a stealth kill? and do we have a killer ped?
             if ( bStealth && pKiller && IS_PED ( pKiller ) )
@@ -1168,19 +1180,24 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
                          bodyPart.data.uiBodypart,
                          bStealth, false, animGroup, animID );
 
-            // Call the onClientPlayerWasted event
-            CLuaArguments Arguments;
-            if ( pKiller ) Arguments.PushElement ( pKiller );
-            else Arguments.PushBoolean ( false );
-            if ( weapon.data.ucWeaponType != 0xFF ) Arguments.PushNumber ( weapon.data.ucWeaponType );
-            else Arguments.PushBoolean ( false );
-            if ( bodyPart.data.uiBodypart != 0xFF ) Arguments.PushNumber ( bodyPart.data.uiBodypart );
-            else Arguments.PushBoolean ( false );
-            Arguments.PushBoolean ( bStealth );
-            if ( IS_PLAYER ( pPed ) )
-                pPed->CallEvent ( "onClientPlayerWasted", Arguments, true );
-            else
-                pPed->CallEvent ( "onClientPedWasted", Arguments, true );
+            // Local player triggers himself when sending the death packet to the server, this one will be delayed by network delay so disable it unless it's sent by the server.
+            // if we were not already dead on the network trigger it anyway because this is also called by KillPed server side and that will not trigger the event locally.
+            if ( pPed->IsLocalPlayer ( ) == false || bAlreadyDeadOnNetwork == false )
+            {
+                // Call the onClientPlayerWasted event
+                CLuaArguments Arguments;
+                if ( pKiller ) Arguments.PushElement ( pKiller );
+                else Arguments.PushBoolean ( false );
+                if ( weapon.data.ucWeaponType != 0xFF ) Arguments.PushNumber ( weapon.data.ucWeaponType );
+                else Arguments.PushBoolean ( false );
+                if ( bodyPart.data.uiBodypart != 0xFF ) Arguments.PushNumber ( bodyPart.data.uiBodypart );
+                else Arguments.PushBoolean ( false );
+                Arguments.PushBoolean ( bStealth );
+                if ( IS_PLAYER ( pPed ) )
+                    pPed->CallEvent ( "onClientPlayerWasted", Arguments, true );
+                else
+                    pPed->CallEvent ( "onClientPedWasted", Arguments, true );
+            }
         }
     }
     else
