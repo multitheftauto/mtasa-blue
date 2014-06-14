@@ -16,6 +16,22 @@ int CLuaMatrixDefs::Create ( lua_State* luaVM )
 {
     CMatrix matrix;
 
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsVector3D ( ) )
+    {
+        CVector vecPosition;
+        argStream.ReadVector3D ( vecPosition );
+        if ( argStream.NextIsVector3D ( ) )
+        {
+            CVector vecRotation;
+            argStream.ReadVector3D ( vecRotation );
+            matrix = CMatrix ( vecPosition, vecRotation );
+        }
+        else
+        {
+            matrix = CMatrix ( vecPosition );
+        }
+    }
     lua_pushmatrix ( luaVM, matrix );
     return 1;
 }
