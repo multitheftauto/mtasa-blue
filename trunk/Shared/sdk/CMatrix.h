@@ -29,6 +29,20 @@ public:
         vPos   = CVector ( 0.0f, 0.0f, 0.0f );
     }
 
+    CMatrix ( const CVector& vecPosition )
+    {
+        vRight = CVector ( 1.0f, 0.0f, 0.0f );
+        vFront = CVector ( 0.0f, 1.0f, 0.0f );
+        vUp    = CVector ( 0.0f, 0.0f, 1.0f );
+        SetPosition( vecPosition );
+    }
+
+    CMatrix ( const CVector& vecPosition, const CVector& vecRotation )
+    {
+        SetRotation( vecRotation );
+        SetPosition( vecPosition );
+    }
+
     CMatrix operator+ ( const CMatrix& other ) const
     {
         CMatrix matResult;
@@ -215,6 +229,19 @@ public:
         vUp.fY = fCosZ * fSinX - fCosX * fSinY * fSinZ;
         vUp.fZ = fCosX * fCosY;
     }
+
+    // Get matrix translational part
+    const CVector& GetPosition( void ) const
+    {
+        return vPos;
+    }
+
+    // Set matrix translational part
+    void SetPosition( const CVector& vecPosition )
+    {
+        vPos = vecPosition;
+    }
+
 
     //
     // Get reference to component axis by index
