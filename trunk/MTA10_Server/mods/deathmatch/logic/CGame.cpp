@@ -1922,7 +1922,8 @@ void CGame::Packet_PlayerWasted ( CPlayerWastedPacket& Packet )
 
         // Create a new packet to send to everyone
         CPlayerWastedPacket ReturnWastedPacket ( pPlayer, pKiller, Packet.m_ucKillerWeapon, Packet.m_ucBodyPart, false, Packet.m_AnimGroup, Packet.m_AnimID );
-        m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket, pPlayer );
+        // Caz: send this to the local player to avoid issue #8148 - "Desync when calling spawnPlayer from an event handler remotely triggered from within onClientPlayerWasted"
+        m_pPlayerManager->BroadcastOnlyJoined ( ReturnWastedPacket );
 
         // Tell our scripts the player has died
         CLuaArguments Arguments;
