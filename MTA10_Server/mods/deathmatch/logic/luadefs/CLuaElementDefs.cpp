@@ -584,17 +584,17 @@ int CLuaElementDefs::getElementMatrix ( lua_State* luaVM )
 int CLuaElementDefs::getElementRotation ( lua_State* luaVM )
 {
 //  float float float getElementRotation ( element theElement [, string rotOrder = "default" ] )
-    CElement* pElement; SString strRotationOrder;
+    CElement* pElement; eEulerRotationOrder rotationOrder;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
-    argStream.ReadString ( strRotationOrder, "default" );
+    argStream.ReadEnumString ( rotationOrder, EULER_DEFAULT );
 
     if ( !argStream.HasErrors () )
     {
         // Grab the rotation
         CVector vecRotation;
-        if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation, strRotationOrder ) )
+        if ( CStaticFunctionDefinitions::GetElementRotation ( pElement, vecRotation, rotationOrder ) )
         {
             // Return it
             lua_pushnumber ( luaVM, vecRotation.fX );
@@ -1478,18 +1478,18 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
 int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
 {
 //  bool setElementRotation ( element theElement, float rotX, float rotY, float rotZ [, string rotOrder = "default", bool fixPedRotation = false ] )
-    CElement* pElement; CVector vecRotation; SString strRotationOrder; bool bNewWay;
+    CElement* pElement; CVector vecRotation; eEulerRotationOrder rotationOrder; bool bNewWay;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
     argStream.ReadVector3D ( vecRotation );
-    argStream.ReadString ( strRotationOrder, "default" );
+    argStream.ReadEnumString ( rotationOrder, EULER_DEFAULT );
     argStream.ReadBool ( bNewWay, false );
 
     if ( !argStream.HasErrors () )
     {
         // Set the rotation
-        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, strRotationOrder, bNewWay ) )
+        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, bNewWay ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

@@ -373,14 +373,8 @@ bool CStaticFunctionDefinitions::GetElementPosition ( CClientEntity& Entity, CVe
 }
 
 
-bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVector& vecRotation, const char* szRotationOrder)
+bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVector& vecRotation, eEulerRotationOrder desiredRotOrder )
 {
-    eEulerRotationOrder desiredRotOrder = EulerRotationOrderFromString(szRotationOrder);
-    if (desiredRotOrder == EULER_INVALID)
-    {
-        return false;
-    }
-
     int iType = Entity.GetType ();
     switch ( iType )
     {
@@ -391,7 +385,7 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             Ped.GetRotationDegrees ( vecRotation );
 
             // Correct the rotation
-            vecRotation.fZ = fmod( -vecRotation.fZ, 360);
+            vecRotation.fZ = fmodf( -vecRotation.fZ, 360 );
             if ( vecRotation.fZ < 0 )
                 vecRotation.fZ = 360 + vecRotation.fZ;
 
@@ -1027,15 +1021,9 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, con
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay )
+bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder argumentRotOrder, bool bNewWay )
 {
-    RUN_CHILDREN SetElementRotation ( **iter, vecRotation, szRotationOrder, bNewWay );
-
-    eEulerRotationOrder argumentRotOrder = EulerRotationOrderFromString ( szRotationOrder );
-    if (argumentRotOrder == EULER_INVALID)
-    {
-        return false;
-    }
+    RUN_CHILDREN SetElementRotation ( **iter, vecRotation, argumentRotOrder, bNewWay );
 
     int iType = Entity.GetType ();
     switch ( iType )

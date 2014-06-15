@@ -548,26 +548,6 @@ bool BitStreamReadUsString( class NetBitStreamInterface& bitStream, SString& str
     return bResult;
 }
 
-eEulerRotationOrder	EulerRotationOrderFromString(const char* szString)
-{
-    // We don't provide a conversion for EULER_MINUS_ZYZ since it's only meant to be used internally, not via scripts
-    if ( stricmp ( szString, "default" ) == 0)
-    {
-        return EULER_DEFAULT;
-    }
-    else if ( stricmp ( szString, "ZXY" ) == 0 )
-    {
-        return EULER_ZXY;
-    }
-    else if ( stricmp ( szString, "ZYX" ) == 0 )
-    {
-        return EULER_ZYX;
-    }
-    else
-    {
-        return EULER_INVALID;
-    }
-}
 
 // RX(theta)
 // | 1              0               0       |
@@ -661,9 +641,7 @@ CVector    ConvertEulerRotationOrder    ( const CVector& a_vRotation, eEulerRota
 {
     if (a_eSrcOrder == a_eDstOrder      ||
         a_eSrcOrder == EULER_DEFAULT    ||
-        a_eSrcOrder == EULER_INVALID    ||
-        a_eDstOrder == EULER_DEFAULT    ||
-        a_eDstOrder == EULER_INVALID)
+        a_eDstOrder == EULER_DEFAULT)
     {
         return a_vRotation;
     }

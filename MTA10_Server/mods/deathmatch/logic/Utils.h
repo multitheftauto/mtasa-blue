@@ -196,16 +196,6 @@ inline SString SQLEscape ( const SString& strEscapeString, bool bSingleQuotes, b
 }
 
 // Maths utility functions
-enum eEulerRotationOrder
-{
-    EULER_DEFAULT,
-    EULER_ZXY,
-    EULER_ZYX,
-    EULER_MINUS_ZYX,
-    EULER_INVALID = 0xFF,
-};
-
-eEulerRotationOrder EulerRotationOrderFromString( const char* szString );
 CVector             ConvertEulerRotationOrder   ( const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder );
 
 // Clear list of object pointers

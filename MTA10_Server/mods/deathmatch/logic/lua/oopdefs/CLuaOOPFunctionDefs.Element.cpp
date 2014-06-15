@@ -84,8 +84,8 @@ int CLuaOOPDefs::SetElementRotation ( lua_State* luaVM )
 {
     CElement* pElement = NULL;
     CVector vecRotation;
-    SString strRotationOrder;
-    bool bNewWay;
+    eEulerRotationOrder rotationOrder = EULER_DEFAULT;
+    bool bNewWay = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
     argStream.ReadVector3D ( vecRotation );
@@ -114,7 +114,7 @@ int CLuaOOPDefs::SetElementRotation ( lua_State* luaVM )
         // convert radians to degrees
         ConvertRadiansToDegrees ( vecRotation );
 
-        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, strRotationOrder, bNewWay ) )
+        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, bNewWay ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
