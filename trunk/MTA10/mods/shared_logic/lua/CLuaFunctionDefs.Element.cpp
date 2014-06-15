@@ -292,12 +292,13 @@ int CLuaFunctionDefs::GetElementPosition ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetElementRotation ( lua_State* luaVM )
 {
-    // Verify the argument
+//  float float float getElementRotation ( element theElement [, string rotOrder = "default" ] )
     CClientEntity* pEntity = NULL;
-    SString strRotationOrder = "default";
+    eEulerRotationOrder rotationOrder;
+
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadString ( strRotationOrder, "default" );
+    argStream.ReadEnumString ( rotationOrder, EULER_DEFAULT );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -305,7 +306,7 @@ int CLuaFunctionDefs::GetElementRotation ( lua_State* luaVM )
         {
             // Grab the rotation
             CVector vecRotation;
-            if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation, strRotationOrder ) )
+            if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation, rotationOrder ) )
             {
                 // Return it
                 lua_pushnumber ( luaVM, vecRotation.fX );
@@ -1692,17 +1693,17 @@ int CLuaFunctionDefs::SetElementPosition ( lua_State* luaVM )
 int CLuaFunctionDefs::SetElementRotation ( lua_State* luaVM )
 {
 //  bool setElementRotation ( element theElement, float rotX, float rotY, float rotZ [, string rotOrder = "default", bool fixPedRotation = false ] )
-    CClientEntity* pEntity; CVector vecRotation; SString strRotationOrder; bool bNewWay;
+    CClientEntity* pEntity; CVector vecRotation; eEulerRotationOrder rotationOrder; bool bNewWay;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
     argStream.ReadVector3D ( vecRotation );
-    argStream.ReadString ( strRotationOrder, "default" );
+    argStream.ReadEnumString ( rotationOrder, EULER_DEFAULT );
     argStream.ReadBool ( bNewWay, false );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetElementRotation ( *pEntity, vecRotation, strRotationOrder, bNewWay ) )
+        if ( CStaticFunctionDefinitions::SetElementRotation ( *pEntity, vecRotation, rotationOrder, bNewWay ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
