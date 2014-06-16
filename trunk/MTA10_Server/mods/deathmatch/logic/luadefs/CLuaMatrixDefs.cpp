@@ -25,6 +25,7 @@ int CLuaMatrixDefs::Create ( lua_State* luaVM )
         {
             CVector vecRotation;
             argStream.ReadVector3D ( vecRotation );
+            ConvertDegreesToRadiansNoWrap( vecRotation );
             matrix = CMatrix ( vecPosition, vecRotation );
         }
         else
@@ -297,7 +298,7 @@ int CLuaMatrixDefs::SetRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        ConvertRadiansToDegrees ( vecRotation );
+        ConvertRadiansToDegreesNoWrap ( vecRotation );
         pMatrix->SetRotation ( vecRotation );
 
         lua_pushboolean ( luaVM, true );

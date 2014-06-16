@@ -118,22 +118,27 @@ void CPed::Unlink ( void )
 }
 
 
+void CPed::GetRotation( CVector & vecRotation )
+{
+    vecRotation = CVector( 0, 0, GetRotation() );
+}
+
+
 void CPed::GetMatrix( CMatrix& matrix )
 {
     CVector vecRotation;
     vecRotation.fZ = GetRotation();
-    // Turn inverted rotation into non-inverted
-    matrix.SetRotation( -vecRotation );
+    matrix.SetRotation( vecRotation );
     matrix.vPos = GetPosition();
 }
 
 
 void CPed::SetMatrix( const CMatrix& matrix )
 {
+    // Set position and rotation from matrix
     SetPosition( matrix.vPos );
     CVector vecRotation = matrix.GetRotation();
-    // Turn non-inverted rotation into inverted
-    SetRotation( -vecRotation.fZ );
+    SetRotation( vecRotation.fZ );
 }
 
 

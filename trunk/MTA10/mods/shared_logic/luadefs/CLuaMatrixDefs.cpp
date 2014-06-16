@@ -25,6 +25,7 @@ int CLuaMatrixDefs::Create ( lua_State* luaVM )
         {
             CVector vecRotation;
             argStream.ReadVector3D ( vecRotation );
+            ConvertDegreesToRadiansNoWrap( vecRotation );
             matrix = CMatrix ( vecPosition, vecRotation );
         }
         else

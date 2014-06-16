@@ -1265,9 +1265,67 @@ bool CStaticFunctionDefinitions::SetElementMatrix ( CElement* pElement, const CM
     RUN_CHILDREN( SetElementMatrix ( *iter, matrix ) )
 
     pElement->SetMatrix ( matrix );
+    //CVector vecPosition = matrix.GetPosition();
+    //CVector vecRotation = matrix.GetRotation();
+
+    // Send new position to clients
+    CStaticFunctionDefinitions::SetElementPosition ( pElement, pElement->GetPosition(), true );
+
+    // Send new rotation to clients
+    CVector vecRotation;
+    pElement->GetRotation( vecRotation );
+
+    // convert radians to degrees
+    ConvertRadiansToDegrees ( vecRotation );
+
+    eEulerRotationOrder rotationOrder = EULER_DEFAULT;
+    if ( pElement->GetType() == CElement::OBJECT )
+        rotationOrder = EULER_ZYX;
+
+    CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, true );
 
     return true;
 }
+
+#if 0
+    CVector vecPosition = matrix.GetPosition();
+    CVector vecRotation = matrix.GetRotation();
+    ConvertRadiansToDegreesNoWrap( vecRotation );
+    SetElementPosition ( pElement, vecPosition, true );
+
+    //if ( !argStream.HasErrors ( ) )
+    {
+        CMatrix matrix2;
+
+        // fill in our matrix
+        pElement->GetMatrix ( matrix2 );
+
+        // degrees to radians
+        ConvertDegreesToRadiansNoWrap ( vecRotation );
+
+        // set the matrix rotation (takes radians)
+        matrix2.SetRotation ( vecRotation );
+
+        // set the element matrix using the element specific SetMatrix function
+        pElement->SetMatrix ( matrix2 );
+
+        // get the rotation (outputs radians)
+        pElement->GetRotation( vecRotation );
+
+        // convert radians to degrees
+        ConvertRadiansToDegrees ( vecRotation );
+
+        eEulerRotationOrder rotationOrder = EULER_DEFAULT;
+        if ( pElement->GetType() == CElement::OBJECT )
+            rotationOrder = EULER_ZYX;
+
+        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, true ) )
+        {
+//            lua_pushboolean ( luaVM, true );
+ //           return 1;
+        }
+    }
+#endif
 
 
 bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const CVector& vecPosition, bool bWarp )
