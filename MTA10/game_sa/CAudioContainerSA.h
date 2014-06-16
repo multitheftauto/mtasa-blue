@@ -61,21 +61,21 @@ C_ASSERT ( sizeof ( SRiffWavePCMHeader ) == 0x2C );
 // Documentation by SAAT //
 // http://pdescobar.home.comcast.net/~pdescobar/gta/saat/ //
 struct SBeatEntry {
-    int32_t timing;
-    int32_t control;
+    int32 timing;
+    int32 control;
 };
 C_ASSERT ( sizeof ( SBeatEntry ) == 8 );
 
 struct SLengthEntry {
-    uint32_t length;
-    uint32_t extra;
+    uint32 length;
+    uint32 extra;
 };
 C_ASSERT ( sizeof ( SBeatEntry ) == 8 );
 
 struct SRadioTrackHeader {
     SBeatEntry beats[NUM_BEAT_ENTRIES];
     SLengthEntry lengths[NUM_LENGTH_ENTRIES];
-    uint32_t trailer;
+    uint32 trailer;
 };
 C_ASSERT ( sizeof ( SRadioTrackHeader ) == 8068 );
 
