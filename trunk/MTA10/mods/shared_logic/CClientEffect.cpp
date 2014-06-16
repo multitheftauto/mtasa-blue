@@ -32,6 +32,7 @@ CClientEffect::~CClientEffect ( )
 
 void CClientEffect::Unlink()
 {
+    m_pFxSystem = NULL;
     m_pManager->GetEffectManager()->RemoveFromList ( this );
 }
 
