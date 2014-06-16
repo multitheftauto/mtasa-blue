@@ -180,20 +180,35 @@ bool CObject::ReadSpecialData ( void )
 
 void CObject::GetMatrix( CMatrix& matrix )
 {
+    matrix.vPos = GetPosition();
     CVector vecRotation;
     GetRotation( vecRotation );
-    // Turn inverted rotation into non-inverted
-    matrix.SetRotation( -vecRotation );
-    matrix.vPos = GetPosition();
+
+    // Do extra calculation to change rotation order if it will make a difference
+    if ( vecRotation.fX != 0 && vecRotation.fY != 0 )
+    {
+        CElement* pAttachedToBase = this;
+        while( pAttachedToBase->GetAttachedToElement() )
+            pAttachedToBase = pAttachedToBase->GetAttachedToElement();
+
+        // Only change rotation order if base is an object
+        if ( pAttachedToBase->GetType() == CElement::OBJECT )
+        {
+            ConvertRadiansToDegreesNoWrap( vecRotation );
+            vecRotation = ConvertEulerRotationOrder( vecRotation, EULER_ZXY, EULER_ZYX );
+            ConvertDegreesToRadiansNoWrap( vecRotation );
+        }
+    }
+    matrix.SetRotation( vecRotation );
 }
 
 
 void CObject::SetMatrix( const CMatrix& matrix )
 {
+    // Set position and rotation from matrix
     SetPosition( matrix.vPos );
     CVector vecRotation = matrix.GetRotation();
-    // Turn non-inverted rotation into inverted
-    SetRotation( -vecRotation );
+    SetRotation( vecRotation );
 }
 
 

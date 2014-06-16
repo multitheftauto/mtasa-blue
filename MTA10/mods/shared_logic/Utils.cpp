@@ -204,7 +204,7 @@ void RotateVector ( CVector& vecLine, const CVector& vecRotation )
 
 void AttachedMatrix ( const CMatrix& matrix, CMatrix& returnMatrix, const CVector& vecPosition, const CVector& vecRotation )
 {
-    returnMatrix = CRotationMatrix( vecRotation ) * CTranslationMatrix( vecPosition ) * matrix;
+    returnMatrix = CMatrix( vecPosition, vecRotation ) * matrix;
 }
 
 void LongToDottedIP ( unsigned long ulIP, char* szDottedIP )

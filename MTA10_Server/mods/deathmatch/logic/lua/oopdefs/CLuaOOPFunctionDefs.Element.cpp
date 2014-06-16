@@ -82,15 +82,13 @@ int CLuaOOPDefs::GetElementRotation ( lua_State* luaVM )
 
 int CLuaOOPDefs::SetElementRotation ( lua_State* luaVM )
 {
+    // element.rotation = Vector3
     CElement* pElement = NULL;
     CVector vecRotation;
-    eEulerRotationOrder rotationOrder = EULER_DEFAULT;
-    bool bNewWay = true;
+
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
     argStream.ReadVector3D ( vecRotation );
-    /*argStream.ReadString ( strRotationOrder, "default" );
-    argStream.ReadBool ( bNewWay, false );*/
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -100,7 +98,7 @@ int CLuaOOPDefs::SetElementRotation ( lua_State* luaVM )
         pElement->GetMatrix ( matrix );
 
         // degrees to radians
-        ConvertDegreesToRadians ( vecRotation );
+        ConvertDegreesToRadiansNoWrap ( vecRotation );
 
         // set the matrix rotation (takes radians)
         matrix.SetRotation ( vecRotation );
@@ -114,7 +112,11 @@ int CLuaOOPDefs::SetElementRotation ( lua_State* luaVM )
         // convert radians to degrees
         ConvertRadiansToDegrees ( vecRotation );
 
-        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, bNewWay ) )
+        eEulerRotationOrder rotationOrder = EULER_DEFAULT;
+        if ( pElement->GetType() == CElement::OBJECT )
+            rotationOrder = EULER_ZYX;
+
+        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, true ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

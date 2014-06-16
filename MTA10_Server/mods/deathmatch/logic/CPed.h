@@ -215,6 +215,7 @@ public:
     inline float                                GetRotation                 ( void )                        { return m_fRotation; }
     inline void                                 SetRotation                 ( float fRotation )             { m_fRotation = fRotation; }
 
+    void                                        GetRotation                 ( CVector & vecRotation );
     void                                        GetMatrix                   ( CMatrix& matrix );
     void                                        SetMatrix                   ( const CMatrix& matrix );
 

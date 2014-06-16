@@ -358,19 +358,18 @@ void CVehicle::GetMatrix( CMatrix& matrix )
 {
     CVector vecRotation;
     GetRotation( vecRotation );
-    // Turn inverted rotation into non-inverted
-    matrix.SetRotation( -vecRotation );
+    matrix.SetRotation( vecRotation );
     matrix.vPos = GetPosition();
 }
 
 
 void CVehicle::SetMatrix( const CMatrix& matrix )
 {
+    // Set position and rotation from matrix
     SetPosition( matrix.vPos );
     CVector vecRotation = matrix.GetRotation();
-    // Turn non-inverted rotation into inverted
     ConvertRadiansToDegreesNoWrap( vecRotation );
-    SetRotationDegrees( -vecRotation );
+    SetRotationDegrees( vecRotation );
 }
 
 

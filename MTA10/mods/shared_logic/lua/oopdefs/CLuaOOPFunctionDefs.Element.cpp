@@ -101,8 +101,17 @@ int CLuaOOPDefs::SetElementRotation ( lua_State* luaVM )
 
         pEntity->SetMatrix ( matrix );
 
-        lua_pushboolean ( luaVM, true );
-        return 1;
+        ConvertRadiansToDegrees ( vecRotation );
+
+        eEulerRotationOrder rotationOrder = EULER_DEFAULT;
+        if ( pEntity->GetType() == CCLIENTOBJECT )
+            rotationOrder = EULER_ZYX;
+
+        if ( CStaticFunctionDefinitions::SetElementRotation ( *pEntity, vecRotation, rotationOrder, true ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );

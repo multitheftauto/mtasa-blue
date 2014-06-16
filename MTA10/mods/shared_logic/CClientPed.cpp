@@ -408,6 +408,12 @@ bool CClientPed::SetMatrix ( const CMatrix& Matrix )
         m_pPlayerPed->SetMatrix ( const_cast < CMatrix* > ( &Matrix ) );
     }
 
+    // Update rotation
+    CVector vecRotation = Matrix.GetRotation();
+    SetCurrentRotation ( vecRotation.fZ );
+    if ( !IS_PLAYER ( this ) )
+        SetCameraRotation ( -vecRotation.fZ );
+
     if ( m_Matrix.vPos != Matrix.vPos )
     {
         UpdateStreamPosition ( Matrix.vPos );
