@@ -28,6 +28,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal 
     // Set handlers
     m_pWebView->set_load_listener ( this );
     m_pWebView->set_js_method_handler ( &m_JSMethodHandler );
+    m_pWebView->set_view_listener ( this );
 }
 
 CWebView::~CWebView()
@@ -147,6 +148,21 @@ bool CWebView::SetAudioVolume ( float fVolume )
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
+// Implementation: Awesomium::WebViewListener::Load:OnBeginLoadingFrame //
+// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#ab511ebd71dc641c5df5fea8c30b58335 //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnBeginLoadingFrame ( Awesomium::WebView* pCaller, int64 frame_id, bool bMainFrame, const Awesomium::WebURL& url, bool bErrorPage )
+{
+    SString strURL;
+    ConvertURL ( url, strURL );
+
+    // Trigger navigate event
+    m_pEventsInterface->Events_OnNavigate ( strURL, bMainFrame );
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
 // Implementation: Awesomium::WebViewListener::Load:OnFinishLoadingFrame //
 // http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#a3cb1ee5563db02f90cd5562c6d8342b1 //
 //                                                                //
@@ -157,11 +173,14 @@ void CWebView::OnFinishLoadingFrame ( Awesomium::WebView* pCaller, int64 iFrameI
     m_JSMethodHandler.Clear ();
 
     // Bind javascript global object
-    Awesomium::JSValue jsMTA = pCaller->CreateGlobalJavascriptObject ( Awesomium::WSLit ("mta") );
-    if ( jsMTA.IsObject () )
+    if ( IsLocal () )
     {
-        Awesomium::JSObject& mtaObject = jsMTA.ToObject ();
-        m_JSMethodHandler.Bind ( mtaObject, Awesomium::WSLit ("triggerEvent"), Javascript_triggerEvent );
+        Awesomium::JSValue jsMTA = pCaller->CreateGlobalJavascriptObject ( Awesomium::WSLit("mta")) ;
+        if ( jsMTA.IsObject () )
+        {
+            Awesomium::JSObject& mtaObject = jsMTA.ToObject();
+            m_JSMethodHandler.Bind ( mtaObject, Awesomium::WSLit("triggerEvent"), Javascript_triggerEvent );
+        }
     }
 }
 
@@ -173,12 +192,40 @@ void CWebView::OnFinishLoadingFrame ( Awesomium::WebView* pCaller, int64 iFrameI
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnDocumentReady ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url )
 {
-    m_pEventsInterface->Events_OnDocumentReady ( CWebCore::ToSString ( url.spec () ) );
+    SString strURL;
+    ConvertURL ( url, strURL );
+    m_pEventsInterface->Events_OnDocumentReady ( strURL );
 }
 
-void CWebView::OnFailLoadingFrame ( Awesomium::WebView* pCaller, int64 frame_id, bool is_main_frame, const Awesomium::WebURL& url, int error_code, const Awesomium::WebString& error_desc )
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: Awesomium::WebViewListener::Load:OnFailLoadingFrame //
+// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#add78ed509fbf9ae9428371bc5ef00323 //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnFailLoadingFrame ( Awesomium::WebView* pCaller, int64 frame_id, bool bMainFrame, const Awesomium::WebURL& url, int error_code, const Awesomium::WebString& error_desc )
 {
-    m_pEventsInterface->Events_OnLoadingFailed ( CWebCore::ToSString ( url.spec () ), error_code, CWebCore::ToSString ( error_desc ) );
+    SString strURL;
+    ConvertURL ( url, strURL );
+    m_pEventsInterface->Events_OnLoadingFailed ( strURL, error_code, CWebCore::ToSString ( error_desc ) );
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: Awesomium::WebViewListener::View:OnShowCreatedWebView //
+// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_view.html#af42b69bd383b5b69130feb990ad235e2 //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnShowCreatedWebView ( Awesomium::WebView* pCaller, Awesomium::WebView* pNewView, const Awesomium::WebURL& opener_url, const Awesomium::WebURL& target_url, const Awesomium::Rect& initial_pos, bool is_popup )
+{
+    // Trigger the popup/new tab event
+    SString strTagetURL, strOpenerURL;
+    ConvertURL ( target_url, strTagetURL );
+    ConvertURL ( opener_url, strOpenerURL );
+    m_pEventsInterface->Events_OnPopup ( strTagetURL, strOpenerURL, is_popup );
+
+    // Destroy the new view immediately since we want the scripter to handle the popup event via Lua
+    pNewView->Destroy ();
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -194,14 +241,14 @@ void CWebView::Javascript_triggerEvent ( Awesomium::WebView* pWebView, const Awe
     // Convert JSArray to string array
     std::vector<SString> stringArray;
 
-    for ( unsigned int i = 1; i < args.size (); ++i ) // Ignore first arg as it is the event name
+    for ( unsigned int i = 1; i < args.size(); ++i ) // Ignore first arg as it is the event name
     {
-        stringArray.push_back ( CWebCore::ToSString ( args[i].ToString() ) );
+        stringArray.push_back ( CWebCore::ToSString ( args[i].ToString () ) );
     }
 
     // Pass string array to real triggerEvent
-    SString strEventName = CWebCore::ToSString ( args[0].ToString() );
-    CModManager::GetSingleton().GetCurrentMod ()->WebsiteTriggerEventHandler ( strEventName, stringArray ); // Does anybody know a better way to trigger an event in the deathmatch module?
+    SString strEventName = CWebCore::ToSString(args[0].ToString());
+    CModManager::GetSingleton ().GetCurrentMod ()->WebsiteTriggerEventHandler ( strEventName, stringArray ); // Does anybody know a better way to trigger an event in the deathmatch module?
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -219,3 +266,17 @@ void CWebView::Javascript_triggerEvent ( Awesomium::WebView* pWebView, const Awe
     CModManager::GetSingleton().GetCurrentMod()->WebsiteAlertHandler ( message );
 }
 */
+
+
+void CWebView::ConvertURL ( const Awesomium::WebURL& url, SString& convertedURL )
+{
+    bool isHTTP = url.scheme ().Compare ( Awesomium::WSLit("http") ) == 0 || url.scheme ().Compare ( Awesomium::WSLit("https") ) == 0;
+    if ( !isHTTP )
+    {
+        convertedURL = CWebCore::ToSString ( url.filename () );
+    }
+    else
+    {
+        convertedURL = CWebCore::ToSString ( url.spec () );
+    }
+}

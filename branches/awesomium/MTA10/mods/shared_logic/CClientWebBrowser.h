@@ -47,6 +47,8 @@ public:
     // CWebBrowserEventsInterface implementation
     void                        Events_OnDocumentReady ( const SString& strURL );
     void                        Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription );
+    void                        Events_OnNavigate      ( const SString& strURL, bool bMainFrame );
+    void                        Events_OnPopup         ( const SString& strTargetURL, const SString& strOpenerURL, bool bPopup );
 
 private:
     CWebViewInterface* m_pWebView;

@@ -122,3 +122,20 @@ void CClientWebBrowser::Events_OnLoadingFailed ( const SString& strURL, int erro
     Arguments.PushString ( errorDescription );
     CallEvent ( "onClientBrowserLoadingFailed", Arguments, false );
 }
+
+void CClientWebBrowser::Events_OnNavigate ( const SString& strURL, bool bMainFrame )
+{
+    CLuaArguments Arguments;
+    Arguments.PushString ( strURL );
+    Arguments.PushBoolean ( bMainFrame );
+    CallEvent ( "onClientBrowserNavigate", Arguments, false );
+}
+
+void CClientWebBrowser::Events_OnPopup ( const SString& strTargetURL, const SString& strOpenerURL, bool bPopup )
+{
+    CLuaArguments Arguments;
+    Arguments.PushString ( strTargetURL );
+    Arguments.PushString ( strOpenerURL );
+    Arguments.PushBoolean ( bPopup );
+    CallEvent ( "onClientBrowserPopup", Arguments, false );
+}

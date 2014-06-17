@@ -86,9 +86,9 @@ eURLState CWebCore::GetURLState ( const SString& strURL )
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
     static SString wildcardWhitelist[] = { "*.googlevideo.com", "*.google.com", "*.youtube.com", "*.vimeocdn.com" };
 
-    for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
+    for ( int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i )
     {
-        if (WildcardMatch(wildcardWhitelist[i], strURL))
+        if ( WildcardMatch ( wildcardWhitelist[i], strURL ) )
             return eURLState::WEBPAGE_ALLOWED;
     }
 
