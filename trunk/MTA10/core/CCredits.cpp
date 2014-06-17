@@ -49,6 +49,8 @@ CCredits::CCredits ( void )
                               "Kevin \"Kevuwk\" Whiteside\n"
                               "Richard \"Cazomino05\" Whitlock\n"
                               "Gamesnert\n"
+                              "Jusonex\n"
+                              "sbx320\n"
                               "\n"
                               "\n";
 
@@ -61,8 +63,7 @@ CCredits::CCredits ( void )
                               "Iztas\n"
                               "impulze\n"
                               "JoeBullet\n"
-                              "sbx320\n"
-                              "Jusonex\n"
+                              "qaisjp\n"
                               "\n";
 
     m_strCredits +=           _("Game Design / Scripting");
@@ -109,7 +110,6 @@ CCredits::CCredits ( void )
                               "mickdermack\n"
                               "Fabio(GNR)\n"
                               "LarSoWiTsH\n"
-                              "qaisjp\n"
                               "dvarnai\n"
                               "Loooop\n"
                               "Lex128\n"

@@ -680,7 +680,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     CLogger::LogPrintfNoStamp ( "\n" );
     CLogger::LogPrintfNoStamp ( "                     Experimental 64 bit server\n" );
     CLogger::LogPrintfNoStamp ( "\n" );
-    CLogger::LogPrintfNoStamp ( "                            DO NOT USE!\n" );
+    CLogger::LogPrintfNoStamp ( "            Report any problems to http://bugs.mtasa.com/\n" );
     CLogger::LogPrintfNoStamp ( "\n");
     CLogger::LogPrintfNoStamp ( "==================================================================\n" );
 #endif
