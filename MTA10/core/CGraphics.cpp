@@ -1047,12 +1047,12 @@ bool CGraphics::LoadStandardDXFonts ( void )
 
         // Normal size
         if( SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight, 0, fontInfos[i].uiWeight, 1,
-            FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
+            FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
             &m_pDXFonts[i] ) ) )
         {
             // Big size (4x)
             if( SUCCEEDED ( D3DXCreateFont ( m_pDevice, fontInfos[i].uiHeight*4, 0, fontInfos[i].uiWeight, 1,
-                FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
+                FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontInfos[i].szName,
                 &m_pBigDXFonts[i] ) ) )
             {
                 continue;
@@ -1081,7 +1081,7 @@ bool CGraphics::CreateStandardDXFontWithCustomScale ( eFontType fontType, float 
     const sFontInfo& info = fontInfos[ fontType ];
 
     if( FAILED ( D3DXCreateFont ( m_pDevice, info.uiHeight * fScale, 0, info.uiWeight, 1,
-        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, info.szName,
+        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_DONTCARE, info.szName,
         ppD3DXFont ) ) )
     {
         return false;
@@ -1101,7 +1101,7 @@ bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strF
     bool bSuccess = true;
     // Normal size
     if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight, 0, iWeight, 1,
-        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
+        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
         ppD3DXFont ) ) )
     {
         WriteErrorEvent( SString( "Could not create Direct3D font '%s'", strFontName.c_str() ) );
