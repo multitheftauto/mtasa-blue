@@ -125,7 +125,12 @@ void BeginD3DStuff( void )
             )
         {
             bDetectedOptimus = true;
-            WriteDebugEvent( SString( "D3DStuff %d - Detected Optimus", i ) );
+            WriteDebugEvent( SString( "D3DStuff %d - Detected Optimus Combo", i ) );
+        }
+        if ( GetModuleHandle( "nvd3d9wrap.dll" ) != NULL )
+        {
+            bDetectedOptimus = true;
+            WriteDebugEvent( SString( "D3DStuff %d - Detected nvd3d9wrap", i ) );
         }
 
         WriteDebugEvent( SString( "D3DStuff %d Identifier - %s", i, *ToString( Identifier ) ) );
