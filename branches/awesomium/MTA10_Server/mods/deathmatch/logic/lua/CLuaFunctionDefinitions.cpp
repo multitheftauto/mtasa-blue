@@ -3685,42 +3685,46 @@ int CLuaFunctionDefinitions::SetWeaponAmmo ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
-    if ( pElement->GetType() != CElement::WEAPON )
-    {
-        argStream.ReadEnumStringOrNumber ( weaponType );
-        argStream.ReadNumber ( usAmmo );
-        argStream.ReadNumber ( usAmmoInClip, 0 );
 
-        if ( !argStream.HasErrors () )
+    if ( !argStream.HasErrors () )
+    {
+        if ( pElement->GetType() != CElement::WEAPON )
         {
-            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, weaponType, usAmmo, usAmmoInClip ) )
+            argStream.ReadEnumStringOrNumber ( weaponType );
+            argStream.ReadNumber ( usAmmo );
+            argStream.ReadNumber ( usAmmoInClip, 0 );
+
+            if ( !argStream.HasErrors () )
             {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, weaponType, usAmmo, usAmmoInClip ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
         }
         else
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        {
+            pWeapon = static_cast < CCustomWeapon * > ( pElement );
+            argStream.ReadNumber ( usAmmo );
+
+            if ( !argStream.HasErrors () )
+            {
+                if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pWeapon, usAmmo ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        }
     }
     else
-    {
-        pWeapon = static_cast < CCustomWeapon * > ( pElement );
-        argStream.ReadNumber ( usAmmo );
-
-        if ( !argStream.HasErrors() )
-        {
-            if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pWeapon, usAmmo ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-        lua_pushboolean ( luaVM, false );
-        return 1;
-    }
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    
     lua_pushboolean ( luaVM, false );
     return 1;
 }

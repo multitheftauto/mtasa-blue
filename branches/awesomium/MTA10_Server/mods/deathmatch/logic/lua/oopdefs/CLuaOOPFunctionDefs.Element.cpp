@@ -11,6 +11,28 @@
 
 #include "StdInc.h"
 
+int CLuaOOPDefs::GetElementMatrix(lua_State* luaVM)
+{
+    CElement* pEntity = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        CMatrix matrix;
+        pEntity->GetMatrix ( matrix );
+
+        lua_pushmatrix ( luaVM, matrix );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaOOPDefs::GetElementPosition ( lua_State* luaVM )
 {
     CElement* pElement = NULL;
@@ -41,14 +63,67 @@ int CLuaOOPDefs::GetElementRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CVector vector;
-        pElement->GetRotation ( vector );
+        CMatrix matrix;
+        CVector vecRotation;
+        pElement->GetMatrix ( matrix );
 
-        lua_pushvector ( luaVM, vector );
+        vecRotation = matrix.GetRotation ( );
+        ConvertRadiansToDegrees ( vecRotation );
+
+        lua_pushvector ( luaVM, vecRotation );
         return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaOOPDefs::SetElementRotation ( lua_State* luaVM )
+{
+    // element.rotation = Vector3
+    CElement* pElement = NULL;
+    CVector vecRotation;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadVector3D ( vecRotation );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        CMatrix matrix;
+
+        // fill in our matrix
+        pElement->GetMatrix ( matrix );
+
+        // degrees to radians
+        ConvertDegreesToRadiansNoWrap ( vecRotation );
+
+        // set the matrix rotation (takes radians)
+        matrix.SetRotation ( vecRotation );
+
+        // set the element matrix using the element specific SetMatrix function
+        pElement->SetMatrix ( matrix );
+
+        // get the rotation (outputs radians)
+        pElement->GetRotation( vecRotation );
+
+        // convert radians to degrees
+        ConvertRadiansToDegrees ( vecRotation );
+
+        eEulerRotationOrder rotationOrder = EULER_DEFAULT;
+        if ( pElement->GetType() == CElement::OBJECT )
+            rotationOrder = EULER_ZYX;
+
+        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, true ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

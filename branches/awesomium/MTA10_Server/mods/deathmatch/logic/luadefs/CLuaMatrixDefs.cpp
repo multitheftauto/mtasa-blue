@@ -16,6 +16,23 @@ int CLuaMatrixDefs::Create ( lua_State* luaVM )
 {
     CMatrix matrix;
 
+    CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsVector3D ( ) )
+    {
+        CVector vecPosition;
+        argStream.ReadVector3D ( vecPosition );
+        if ( argStream.NextIsVector3D ( ) )
+        {
+            CVector vecRotation;
+            argStream.ReadVector3D ( vecRotation );
+            ConvertDegreesToRadiansNoWrap( vecRotation );
+            matrix = CMatrix ( vecPosition, vecRotation );
+        }
+        else
+        {
+            matrix = CMatrix ( vecPosition );
+        }
+    }
     lua_pushmatrix ( luaVM, matrix );
     return 1;
 }
@@ -51,7 +68,12 @@ int CLuaMatrixDefs::ToString ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString string = "matrix";
+        SString string = SString ( "Matrix: { %.3f, %.3f, %.3f } { %.3f, %.3f, %.3f } { %.3f, %.3f, %.3f } { %.3f, %.3f, %.3f }", 
+            pMatrix->vRight.fX, pMatrix->vRight.fY, pMatrix->vRight.fZ,
+            pMatrix->vFront.fX, pMatrix->vFront.fY, pMatrix->vFront.fZ,
+            pMatrix->vUp.fX, pMatrix->vUp.fY, pMatrix->vUp.fZ,
+            pMatrix->vPos.fX, pMatrix->vPos.fY, pMatrix->vPos.fZ );
+
         lua_pushstring ( luaVM, string.c_str () );
         return 1;
     }
@@ -163,7 +185,7 @@ int CLuaMatrixDefs::GetRotation ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         CVector vecRotation;
-        //g_pMultiplayer->ConvertMatrixToEulerAngles ( *pMatrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        vecRotation = pMatrix->GetRotation ( );
         ConvertRadiansToDegrees ( vecRotation );
 
         lua_pushvector ( luaVM, vecRotation );
@@ -276,7 +298,7 @@ int CLuaMatrixDefs::SetRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        ConvertRadiansToDegrees ( vecRotation );
+        ConvertRadiansToDegreesNoWrap ( vecRotation );
         pMatrix->SetRotation ( vecRotation );
 
         lua_pushboolean ( luaVM, true );

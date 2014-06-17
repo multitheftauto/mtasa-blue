@@ -739,8 +739,14 @@ bool CStaticFunctionDefinitions::GetElementAlpha ( CElement* pElement, unsigned 
         }
         case CElement::OBJECT:
         {
-            CObject * pObject = static_cast < CObject* > ( pElement );
+            CObject* pObject = static_cast < CObject* > ( pElement );
             ucAlpha = pObject->GetAlpha ();
+            break;
+        }
+        case CElement::MARKER:
+        {
+            CMarker* pMarker = static_cast < CMarker* > ( pElement );
+            ucAlpha = pMarker->GetColor ().A;
             break;
         }
         default: return false;
@@ -1164,6 +1170,13 @@ bool CStaticFunctionDefinitions::SetElementParent ( CElement* pElement, CElement
 }
 
 
+bool CStaticFunctionDefinitions::GetElementMatrix ( CElement* pElement, CMatrix& matrix )
+{
+    pElement->GetMatrix ( matrix );
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::GetElementPosition ( CElement* pElement, CVector& vecPosition )
 {
     assert ( pElement );
@@ -1173,15 +1186,9 @@ bool CStaticFunctionDefinitions::GetElementPosition ( CElement* pElement, CVecto
 }
 
 
-bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVector& vecRotation, const char* szRotationOrder )
+bool CStaticFunctionDefinitions::GetElementRotation ( CElement* pElement, CVector& vecRotation, eEulerRotationOrder desiredRotOrder )
 {
     assert ( pElement );
-
-    eEulerRotationOrder desiredRotOrder = EulerRotationOrderFromString(szRotationOrder);
-    if (desiredRotOrder == EULER_INVALID)
-    {
-        return false;
-    }
 
     int iType = pElement->GetType ();
     switch ( iType )
@@ -1253,6 +1260,32 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CElement* pElement, CVecto
 }
 
 
+bool CStaticFunctionDefinitions::SetElementMatrix ( CElement* pElement, const CMatrix& matrix )
+{
+    RUN_CHILDREN( SetElementMatrix ( *iter, matrix ) )
+
+    pElement->SetMatrix ( matrix );
+
+    // Send new position to clients
+    CStaticFunctionDefinitions::SetElementPosition ( pElement, pElement->GetPosition(), true );
+
+    // Send new rotation to clients
+    CVector vecRotation;
+    pElement->GetRotation( vecRotation );
+
+    // convert radians to degrees
+    ConvertRadiansToDegrees ( vecRotation );
+
+    eEulerRotationOrder rotationOrder = EULER_DEFAULT;
+    if ( pElement->GetType() == CElement::OBJECT )
+        rotationOrder = EULER_ZYX;
+
+    CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, true );
+
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const CVector& vecPosition, bool bWarp )
 {
     assert ( pElement );
@@ -1291,15 +1324,9 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay )
+bool CStaticFunctionDefinitions::SetElementRotation ( CElement* pElement, const CVector& vecRotation, eEulerRotationOrder argumentRotOrder, bool bNewWay )
 {
     assert ( pElement );
-
-    eEulerRotationOrder argumentRotOrder = EulerRotationOrderFromString(szRotationOrder);
-    if (argumentRotOrder == EULER_INVALID)
-    {
-        return false;
-    }
 
     int iType = pElement->GetType ();
     switch ( iType )

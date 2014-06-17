@@ -147,12 +147,12 @@ void ASE::DoPulse ( void )
     m_llCurrentTime = GetTickCount64_ ();
     m_uiCurrentPlayerCount = m_pPlayerManager->Count ();
 
+    char szBuffer[100];     // Extra bytes for future use
+
     for ( uint i = 0 ; i < 100 ; i++ )
     {
-        char szBuffer[2];
-
         // We set the socket to non-blocking so we can just keep reading
-        int iBuffer = recvfrom ( m_Socket, szBuffer, 1, 0, (sockaddr*)&SockAddr, &nLen );
+        int iBuffer = recvfrom ( m_Socket, szBuffer, sizeof( szBuffer ), 0, (sockaddr*)&SockAddr, &nLen );
         if ( iBuffer < 1 )
             break;
 

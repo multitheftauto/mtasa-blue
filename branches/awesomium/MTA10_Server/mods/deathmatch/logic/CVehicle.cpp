@@ -354,6 +354,25 @@ bool CVehicle::ReadSpecialData ( void )
 }
 
 
+void CVehicle::GetMatrix( CMatrix& matrix )
+{
+    CVector vecRotation;
+    GetRotation( vecRotation );
+    matrix.SetRotation( vecRotation );
+    matrix.vPos = GetPosition();
+}
+
+
+void CVehicle::SetMatrix( const CMatrix& matrix )
+{
+    // Set position and rotation from matrix
+    SetPosition( matrix.vPos );
+    CVector vecRotation = matrix.GetRotation();
+    ConvertRadiansToDegreesNoWrap( vecRotation );
+    SetRotationDegrees( vecRotation );
+}
+
+
 const CVector & CVehicle::GetPosition ( void )
 {
     // Are we attached to something?

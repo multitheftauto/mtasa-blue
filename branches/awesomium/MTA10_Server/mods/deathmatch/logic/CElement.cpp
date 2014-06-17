@@ -151,6 +151,18 @@ const CVector & CElement::GetPosition ( void )
 }
 
 
+void CElement::GetMatrix( CMatrix& matrix )
+{
+    matrix = CMatrix();
+    matrix.vPos = GetPosition();
+}
+
+
+void CElement::SetMatrix( const CMatrix& matrix )
+{
+    SetPosition( matrix.vPos );
+}
+
 // Static function
 uint CElement::GetTypeHashFromString ( const SString& strTypeName )
 {

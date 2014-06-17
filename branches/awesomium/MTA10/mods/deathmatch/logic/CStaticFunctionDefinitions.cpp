@@ -249,17 +249,20 @@ bool CStaticFunctionDefinitions::OutputConsole ( const char* szText )
 
 bool CStaticFunctionDefinitions::OutputChatBox ( const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded )
 {
-    CLuaArguments Arguments;
-    Arguments.PushString ( szText );
-    Arguments.PushNumber ( ucRed );
-    Arguments.PushNumber ( ucGreen );
-    Arguments.PushNumber ( ucBlue );
-
-    bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
-    if ( !bCancelled )
+    if ( strlen ( szText ) <= MAX_OUTPUTCHATBOX_LENGTH )
     {
-        m_pCore->ChatPrintfColor ( "%s", bColorCoded, ucRed, ucGreen, ucBlue, szText );
-        return true;
+        CLuaArguments Arguments;
+        Arguments.PushString ( szText );
+        Arguments.PushNumber ( ucRed );
+        Arguments.PushNumber ( ucGreen );
+        Arguments.PushNumber ( ucBlue );
+
+        bool bCancelled = !g_pClientGame->GetRootEntity ( )->CallEvent ( "onClientChatMessage", Arguments, false );
+        if ( !bCancelled )
+        {
+            m_pCore->ChatPrintfColor ( "%s", bColorCoded, ucRed, ucGreen, ucBlue, szText );
+            return true;
+        }
     }
     return false;
 }
@@ -370,14 +373,8 @@ bool CStaticFunctionDefinitions::GetElementPosition ( CClientEntity& Entity, CVe
 }
 
 
-bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVector& vecRotation, const char* szRotationOrder)
+bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVector& vecRotation, eEulerRotationOrder desiredRotOrder )
 {
-    eEulerRotationOrder desiredRotOrder = EulerRotationOrderFromString(szRotationOrder);
-    if (desiredRotOrder == EULER_INVALID)
-    {
-        return false;
-    }
-
     int iType = Entity.GetType ();
     switch ( iType )
     {
@@ -388,7 +385,7 @@ bool CStaticFunctionDefinitions::GetElementRotation ( CClientEntity& Entity, CVe
             Ped.GetRotationDegrees ( vecRotation );
 
             // Correct the rotation
-            vecRotation.fZ = fmod( -vecRotation.fZ, 360);
+            vecRotation.fZ = fmodf( -vecRotation.fZ, 360 );
             if ( vecRotation.fZ < 0 )
                 vecRotation.fZ = 360 + vecRotation.fZ;
 
@@ -651,8 +648,14 @@ bool CStaticFunctionDefinitions::GetElementAlpha ( CClientEntity& Entity, unsign
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
-            CClientObject & Object = static_cast < CClientObject & > ( Entity );
+            CClientObject& Object = static_cast < CClientObject& > ( Entity );
             ucAlpha = Object.GetAlpha ();
+            break;
+        }
+        case CCLIENTMARKER:
+        {
+            CClientMarker& Marker = static_cast< CClientMarker& > ( Entity );
+            ucAlpha = Marker.GetColor ().A;
             break;
         }
         default: return false;
@@ -1018,15 +1021,9 @@ bool CStaticFunctionDefinitions::SetElementPosition ( CClientEntity& Entity, con
 }
 
 
-bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation, const char* szRotationOrder, bool bNewWay )
+bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder argumentRotOrder, bool bNewWay )
 {
-    RUN_CHILDREN SetElementRotation ( **iter, vecRotation, szRotationOrder, bNewWay );
-
-    eEulerRotationOrder argumentRotOrder = EulerRotationOrderFromString ( szRotationOrder );
-    if (argumentRotOrder == EULER_INVALID)
-    {
-        return false;
-    }
+    RUN_CHILDREN SetElementRotation ( **iter, vecRotation, argumentRotOrder, bNewWay );
 
     int iType = Entity.GetType ();
     switch ( iType )
@@ -7571,6 +7568,26 @@ bool CStaticFunctionDefinitions::SetSoundEffectEnabled ( CClientPlayer& Player, 
     }
     return false;
 }
+
+
+bool CStaticFunctionDefinitions::SetSoundPan ( CClientPlayer& Player, float fPan )
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice ();
+    if ( pVoice )
+        return pVoice->SetPan ( fPan );
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundPan ( CClientPlayer& Player, float& fPan )
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice ();
+    if ( pVoice )
+        return pVoice->GetPan ( fPan );
+
+    return false;
+}
+
 
 /** Version functions **/
 unsigned long CStaticFunctionDefinitions::GetVersion ()

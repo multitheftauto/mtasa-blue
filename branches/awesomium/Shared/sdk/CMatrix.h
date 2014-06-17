@@ -29,6 +29,20 @@ public:
         vPos   = CVector ( 0.0f, 0.0f, 0.0f );
     }
 
+    CMatrix ( const CVector& vecPosition )
+    {
+        vRight = CVector ( 1.0f, 0.0f, 0.0f );
+        vFront = CVector ( 0.0f, 1.0f, 0.0f );
+        vUp    = CVector ( 0.0f, 0.0f, 1.0f );
+        SetPosition( vecPosition );
+    }
+
+    CMatrix ( const CVector& vecPosition, const CVector& vecRotation )
+    {
+        SetRotation( vecRotation );
+        SetPosition( vecPosition );
+    }
+
     CMatrix operator+ ( const CMatrix& other ) const
     {
         CMatrix matResult;
@@ -180,7 +194,8 @@ public:
     }
 
     // Get matrix rotation as angles
-    // Should produce the same results as GTA function Matrix::ConvertToEulerAngles
+    // Inverted to match MTAized rotations for vehicles and players (and objects on the server)
+    // Should produce the same results as ( CVector(0,0,0) - ConvertToEulerAngles() )
     CVector GetRotation( void ) const
     {
         float fRotY = atan2( vRight.fZ, sqrtf( Square( vRight.fX ) + Square( vRight.fY ) ) );
@@ -189,19 +204,20 @@ public:
         float fSinZ = -sin( fRotZ );
         float fCosZ = cos( fRotZ );
         float fRotX = atan2( vUp.fX * fSinZ + vUp.fY * fCosZ, vFront.fX * fSinZ + vFront.fY * fCosZ );
-        return CVector( fRotX, fRotY, -fRotZ );
+        return CVector( -fRotX, -fRotY, fRotZ );
     }
 
     // Set matrix rotational part
-    // Should produce the same results as GTA function Matrix::ConvertFromEulerAngles
+    // Inverted to match MTAized rotations for vehicles and players (and objects on the server)
+    // Should produce the same results as ( CVector(0,0,0) - ConvertFromEulerAngles() )
     void SetRotation( const CVector& vecRotation )
     {
-        float fCosX = cos( vecRotation.fX );
-        float fCosY = cos( vecRotation.fY );
-        float fCosZ = cos( -vecRotation.fZ );
-        float fSinX = sin( vecRotation.fX );
-        float fSinY = sin( vecRotation.fY );
-        float fSinZ = sin( -vecRotation.fZ );
+        float fCosX = cos( -vecRotation.fX );
+        float fCosY = cos( -vecRotation.fY );
+        float fCosZ = cos( vecRotation.fZ );
+        float fSinX = sin( -vecRotation.fX );
+        float fSinY = sin( -vecRotation.fY );
+        float fSinZ = sin( vecRotation.fZ );
 
         vRight.fX = fCosY * fCosZ;
         vRight.fY = fCosY * fSinZ;
@@ -215,6 +231,19 @@ public:
         vUp.fY = fCosZ * fSinX - fCosX * fSinY * fSinZ;
         vUp.fZ = fCosX * fCosY;
     }
+
+    // Get matrix translational part
+    const CVector& GetPosition( void ) const
+    {
+        return vPos;
+    }
+
+    // Set matrix translational part
+    void SetPosition( const CVector& vecPosition )
+    {
+        vPos = vecPosition;
+    }
+
 
     //
     // Get reference to component axis by index
@@ -240,40 +269,6 @@ public:
     CVector vFront;
     CVector vUp;
     CVector vPos;
-};
-
-
-class CTranslationMatrix : public CMatrix
-{
-public:
-    CTranslationMatrix( const CVector& vecTranslation )
-    {
-        vPos = vecTranslation;
-    }
-};
-
-
-class CRotationMatrix : public CMatrix
-{
-public:
-    CRotationMatrix( const CVector& vecRotation )
-    {
-        float cosx = cos( vecRotation.fX );
-        float cosy = cos( vecRotation.fY );
-        float cosz = cos( vecRotation.fZ );
-        float sinx = sin( vecRotation.fX );
-        float siny = sin( vecRotation.fY );
-        float sinz = sin( vecRotation.fZ );
-	    vRight.fX = cosz * cosy - sinz * sinx * siny;
-	    vRight.fY = cosy * sinz + cosz * sinx * siny;
-	    vRight.fZ = -cosx * siny;
-	    vFront.fX = -cosx * sinz;
-	    vFront.fY = cosz * cosx;
-	    vFront.fZ = sinx;
-	    vUp.fX = cosz * siny + cosy * sinz * sinx;
-	    vUp.fY = sinz * siny - cosz * cosy * sinx;
-	    vUp.fZ = cosx * cosy;
-    }
 };
 
 #endif

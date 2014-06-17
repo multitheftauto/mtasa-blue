@@ -118,6 +118,30 @@ void CPed::Unlink ( void )
 }
 
 
+void CPed::GetRotation( CVector & vecRotation )
+{
+    vecRotation = CVector( 0, 0, GetRotation() );
+}
+
+
+void CPed::GetMatrix( CMatrix& matrix )
+{
+    CVector vecRotation;
+    vecRotation.fZ = GetRotation();
+    matrix.SetRotation( vecRotation );
+    matrix.vPos = GetPosition();
+}
+
+
+void CPed::SetMatrix( const CMatrix& matrix )
+{
+    // Set position and rotation from matrix
+    SetPosition( matrix.vPos );
+    CVector vecRotation = matrix.GetRotation();
+    SetRotation( vecRotation.fZ );
+}
+
+
 bool CPed::ReadSpecialData ( void )
 {
     // Grab the "posX" data
