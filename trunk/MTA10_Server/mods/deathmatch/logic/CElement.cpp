@@ -1269,7 +1269,10 @@ unsigned char CElement::GenerateSyncTimeContext ( void )
     ++m_ucSyncTimeContext;
 
     #ifdef MTA_DEBUG
+    if ( GetType ( ) == EElementType::PLAYER )
+    {
         CLogger::LogPrintf ( "Sync Context Updated from %i to %i.\n", m_ucSyncTimeContext - 1, m_ucSyncTimeContext );
+    }
     #endif
     // It can't be 0 because that will make it not work when wraps around
     if ( m_ucSyncTimeContext == 0 )

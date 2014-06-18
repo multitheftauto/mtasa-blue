@@ -172,7 +172,10 @@ public:
     inline void                                 SetSyncTimeContext      ( unsigned char ucContext ) 
     {
         #ifdef MTA_DEBUG
-                g_pCore->GetConsole ( )->Printf ( "Sync Context Updated from %i to %i.", m_ucSyncTimeContext, ucContext );
+        if ( GetType ( ) == eClientEntityType::CCLIENTPLAYER )
+        {
+            g_pCore->GetConsole ( )->Printf ( "Player Sync Context Updated from %i to %i.", m_ucSyncTimeContext, ucContext );
+        }
         #endif
         m_ucSyncTimeContext = ucContext;
     };
