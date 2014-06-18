@@ -3816,8 +3816,12 @@ int CLuaFunctionDefinitions::GetVehicleType ( lua_State* luaVM )
     if ( !argStream.NextIsNumber ( ) )
     {
         CVehicle* pVehicle;
-        argStream.ReadUserData(pVehicle);
-        ulModel = pVehicle->GetModel ( );
+        argStream.ReadUserData ( pVehicle );
+
+        if ( !argStream.HasErrors ( ) )
+        {
+            ulModel = pVehicle->GetModel ( );
+        }
     }
     else
         argStream.ReadNumber(ulModel); 
