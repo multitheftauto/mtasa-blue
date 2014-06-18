@@ -6288,13 +6288,13 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
     CElement* pVisibleTo; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition ); 
-    argStream.ReadString ( strType, "default "); 
-    argStream.ReadNumber ( fSize, 4.0f ); 
-    argStream.ReadNumber (color.R, color.R ); 
-    argStream.ReadNumber (color.G, color.G ); 
-    argStream.ReadNumber (color.B, color.B ); 
-    argStream.ReadNumber (color.A, color.A ); 
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadString ( strType, "default" );
+    argStream.ReadNumber ( fSize, 4.0f );
+    argStream.ReadNumber ( color.R, color.R );
+    argStream.ReadNumber ( color.G, color.G );
+    argStream.ReadNumber ( color.B, color.B );
+    argStream.ReadNumber ( color.A, color.A );
 
     if ( argStream.NextIsBool() || argStream.NextIsNil () )
     {
