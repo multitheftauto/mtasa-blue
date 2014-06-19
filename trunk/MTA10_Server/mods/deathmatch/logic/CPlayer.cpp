@@ -171,7 +171,7 @@ void CPlayer::DoPulse ( void )
 {
     if ( GetStatus () == STATUS_JOINED )
     {
-        if (m_pPlayerManager != NULL)
+        if (m_pPlayerTextManager != NULL)
             m_pPlayerTextManager->Process ();
 
         // Do dist update if too long since last one
