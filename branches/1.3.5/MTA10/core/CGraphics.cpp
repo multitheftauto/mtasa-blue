@@ -1101,7 +1101,7 @@ bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strF
     bool bSuccess = true;
     // Normal size
     if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight, 0, iWeight, 1,
-        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
+        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
         ppD3DXFont ) ) )
     {
         WriteErrorEvent( SString( "Could not create Direct3D font '%s'", strFontName.c_str() ) );
