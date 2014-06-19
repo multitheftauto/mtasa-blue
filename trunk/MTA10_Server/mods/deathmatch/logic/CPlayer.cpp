@@ -114,6 +114,9 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
 CPlayer::~CPlayer ( void )
 {
+    // Prepare for deletion
+    PrepareForDeletion();
+
     // Make sure the script debugger doesn't reference us
     SetScriptDebugLevel ( 0 );    
 
@@ -168,7 +171,8 @@ void CPlayer::DoPulse ( void )
 {
     if ( GetStatus () == STATUS_JOINED )
     {
-        m_pPlayerTextManager->Process ();
+        if (m_pPlayerManager != NULL)
+            m_pPlayerTextManager->Process ();
 
         // Do dist update if too long since last one
         if ( m_UpdateNearListTimer.Get () > (uint)g_TickRateSettings.iNearListUpdate + 300 )
@@ -1197,7 +1201,11 @@ void CPlayer::PrepareForDeletion()
     RemoveAllSyncingObjects();
 
     // Delete the player text manager
-    delete m_pPlayerTextManager;
+    if (m_pPlayerTextManager != NULL)
+    {
+        delete m_pPlayerTextManager;
+        m_pPlayerTextManager = NULL;
+    }
 
 	// Remove us from our team
     SetTeam(NULL, true);
