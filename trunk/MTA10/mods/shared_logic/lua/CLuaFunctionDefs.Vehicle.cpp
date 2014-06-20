@@ -1728,25 +1728,22 @@ int CLuaFunctionDefs::AddVehicleUpgrade ( lua_State* luaVM )
             {
                 SString strUpgrade = "";
                 argStream.ReadString ( strUpgrade );
-                if ( strUpgrade.Contains ( "all" ) )
+                if ( strUpgrade == "all" )
                 {
-                    if ( CStaticFunctionDefinitions::AddAllVehicleUpgrades ( *pEntity ) )
-                    {
-                        lua_pushboolean ( luaVM, true );
-                        return 1;
-                    }
-                }
-            }
-            else
-            {
-                argStream.ReadNumber ( usUpgrade );
-                if ( argStream.HasErrors ( ) ) 
-                {
-                    m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-                    lua_pushboolean ( luaVM, false );
+                    lua_pushboolean ( luaVM, CStaticFunctionDefinitions::AddAllVehicleUpgrades ( *pEntity ) );
                     return 1;
                 }
+                else
+                    argStream.m_iIndex--;
             }
+            
+            argStream.ReadNumber ( usUpgrade );
+            if ( argStream.HasErrors ( ) ) 
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }            
 
             if ( CStaticFunctionDefinitions::AddVehicleUpgrade ( *pEntity, usUpgrade ) )
             {
