@@ -1084,7 +1084,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getOccupants", "getVehicleOccupants" );
     lua_classfunction ( luaVM, "getOverrideLights", "getVehicleOverrideLights" );
     lua_classfunction ( luaVM, "getPlateText", "getVehiclePlateText" );
-    lua_classfunction ( luaVM, "getPaintJob", "getVehiclePaintjob" );
+    lua_classfunction ( luaVM, "getPaintjob", "getVehiclePaintjob" );
     lua_classfunction ( luaVM, "getPanelState", "getVehiclePanelState" );
     lua_classfunction ( luaVM, "areSirensOn", "getVehicleSirensOn" );
     lua_classfunction ( luaVM, "getTowedByVehicle", "getVehicleTowedByVehicle" );
