@@ -176,7 +176,7 @@ void CClientWeapon::DoPulse ( void )
             }
         }
     }
-    if ( m_nAmmoInClip > 0 && ( !IsLocalEntity ( ) && m_pOwner == g_pClientGame->GetLocalPlayer ( ) ) )
+    if ( m_nAmmoInClip > 0 && ( IsLocalEntity ( ) || m_pOwner == g_pClientGame->GetLocalPlayer ( ) ) )
     {
         if ( m_State == WEAPONSTATE_FIRING && m_fireTimer.Get() >= m_iWeaponFireRate ) 
         {
