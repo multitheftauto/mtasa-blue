@@ -1229,6 +1229,29 @@ void CPlayer::PrepareForDeletion()
 
     // Cleanup our account
     m_pAccount->SetClient(NULL);
+
+    // Make sure we no longer occupy any vehicle
+    if (m_pVehicle)
+        m_pVehicle->SetOccupant(NULL, m_uiVehicleSeat);
+    SetOccupiedVehicle(NULL, 0);
+
+    // Make sure we're no longer attached to any element
+    if (m_pAttachedTo)
+    {
+        m_pAttachedTo->RemoveAttachedElement(this);
+        m_pAttachedTo = NULL;
+    }
+
+    // Remove all attached elements
+    list < CElement* > ::iterator iterAttached = m_AttachedElements.begin();
+    for (; iterAttached != m_AttachedElements.end(); iterAttached++)
+    {
+        // Make sure our attached element stores it's current position
+        (*iterAttached)->GetPosition();
+        // Unlink it
+        (*iterAttached)->m_pAttachedTo = NULL;
+    }
+    m_AttachedElements.clear();
 }
 
 

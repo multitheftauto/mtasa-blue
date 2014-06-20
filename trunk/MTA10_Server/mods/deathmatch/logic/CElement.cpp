@@ -982,6 +982,12 @@ CElement* CElement::FindChildIndex ( const char* szName, unsigned int uiIndex, u
             CElement* pElement = (*iter)->FindChildIndex ( szName, uiIndex, uiCurrentIndex, true );
             if ( pElement )
             {
+                if ( pElement->IsBeingDeleted() )
+                {
+                    // If it's being deleted right now we cannot return it. 
+                    // Since we found a match we have to abort the search here.
+                    return NULL;
+                }
                 return pElement;
             }
         }
@@ -1018,6 +1024,12 @@ CElement* CElement::FindChildByTypeIndex ( unsigned int uiTypeHash, unsigned int
             CElement* pElement = (*iter)->FindChildByTypeIndex ( uiTypeHash, uiIndex, uiCurrentIndex, true );
             if ( pElement )
             {
+                if (pElement->IsBeingDeleted())
+                {
+                    // If it's being deleted right now we cannot return it. 
+                    // Since we found a match we have to abort the search here.
+                    return NULL;
+                }
                 return pElement;
             }
         }

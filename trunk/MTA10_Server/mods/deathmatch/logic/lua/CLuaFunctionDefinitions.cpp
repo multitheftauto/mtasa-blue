@@ -2439,7 +2439,7 @@ int CLuaFunctionDefinitions::GetAlivePlayers ( lua_State* luaVM )
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
         for ( ; iter != m_pPlayerManager->IterEnd () ; ++iter )
         {
-            if ( (*iter)->IsSpawned () )
+            if ( (*iter)->IsSpawned () && !(*iter)->IsBeingDeleted() )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
                 lua_pushelement ( luaVM, *iter );
@@ -2466,7 +2466,7 @@ int CLuaFunctionDefinitions::GetDeadPlayers ( lua_State* luaVM )
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
         for ( ; iter != m_pPlayerManager->IterEnd () ; ++iter )
         {
-            if ( !(*iter)->IsSpawned () )
+            if ( !(*iter)->IsSpawned () && !(*iter)->IsBeingDeleted() )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
                 lua_pushelement ( luaVM, *iter );
