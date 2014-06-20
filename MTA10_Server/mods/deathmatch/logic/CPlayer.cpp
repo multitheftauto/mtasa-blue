@@ -1201,11 +1201,7 @@ void CPlayer::PrepareForDeletion()
     RemoveAllSyncingObjects();
 
     // Delete the player text manager
-    if (m_pPlayerTextManager != NULL)
-    {
-        delete m_pPlayerTextManager;
-        m_pPlayerTextManager = NULL;
-    }
+    SAFE_DELETE(m_pPlayerTextManager);
 
 	// Remove us from our team
     SetTeam(NULL, true);
