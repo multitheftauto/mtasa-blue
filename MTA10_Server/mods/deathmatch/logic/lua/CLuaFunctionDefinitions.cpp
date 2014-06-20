@@ -5463,40 +5463,42 @@ int CLuaFunctionDefinitions::AddVehicleUpgrade ( lua_State* luaVM )
 {
     CElement* pElement;
     unsigned short usUpgrade; 
-    bool bAll = false;
     
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pElement);
 
-    if ( argStream.NextIsString ( ) )
+    if (!argStream.HasErrors())
     {
-        SString strAll;
-        argStream.ReadString(strAll);
-        bAll = strAll == "all";
-        usUpgrade = 0;
-    }
-    else
-        argStream.ReadNumber(usUpgrade);
-    
-    if ( !argStream.HasErrors ( ) )
-    {
-        if ( bAll)
+        if (argStream.NextIsString())
         {
-            if ( CStaticFunctionDefinitions::AddAllVehicleUpgrades ( pElement ) )
+            SString strUpgrade = "";
+            argStream.ReadString(strUpgrade);
+            if (strUpgrade == "all")
             {
-                lua_pushboolean ( luaVM, true );
+                lua_pushboolean(luaVM, CStaticFunctionDefinitions::AddAllVehicleUpgrades(pElement));
+                return 1;
+            }
+            else
+                argStream.m_iIndex--;
+        }
+
+        argStream.ReadNumber(usUpgrade);
+
+        if (!argStream.HasErrors())
+        {
+            if (CStaticFunctionDefinitions::AddVehicleUpgrade(pElement, usUpgrade))
+            {
+                lua_pushboolean(luaVM, true);
                 return 1;
             }
         }
-        else if ( CStaticFunctionDefinitions::AddVehicleUpgrade( pElement, usUpgrade) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    
     lua_pushboolean ( luaVM, false );
     return 1;
 }
