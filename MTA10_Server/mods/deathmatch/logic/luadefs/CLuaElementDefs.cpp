@@ -456,7 +456,7 @@ int CLuaElementDefs::getElementParent ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         CElement* pParent = CStaticFunctionDefinitions::GetElementParent ( pElement );
-        if ( pParent )
+        if ( pParent && !pParent->IsBeingDeleted() )
         {
             lua_pushelement ( luaVM, pParent );
             return 1;
@@ -782,7 +782,7 @@ int CLuaElementDefs::getElementsWithinColShape ( lua_State* luaVM )
         list < CElement* > ::iterator iter = pColShape->CollidersBegin ();
         for ( ; iter != pColShape->CollidersEnd (); ++iter )
         {
-            if ( strType.empty () || strType == (*iter)->GetTypeName () )
+            if ( (strType.empty () || strType == (*iter)->GetTypeName ()) && !(*iter)->IsBeingDeleted() )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
                 lua_pushelement ( luaVM, *iter );

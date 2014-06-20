@@ -2894,7 +2894,7 @@ CPlayer* CStaticFunctionDefinitions::GetRandomPlayer ( void )
         for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
         {
             // Check status
-            if ( (*iter)->IsJoined () )
+            if ( (*iter)->IsJoined () && !(*iter)->IsBeingDeleted() )
             {
                 // This is the given index?
                 if ( i++ == uiRandom )
