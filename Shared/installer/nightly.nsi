@@ -1644,6 +1644,9 @@ LangString INST_MTA_CONFLICT ${LANG_ENGLISH}	"A different major version of MTA (
 			MTA is designed for major versions to be installed in different paths.$\n \
             Are you sure you want to overwrite MTA $1 at \
             $INSTDIR ?"
+LangString INST_GTA_CONFLICT ${LANG_ENGLISH}	"MTA cannot be installed into the same directory as GTA:SA.$\n$\n\ 
+			Do you want to use the default install directory$\n\
+            $DEFAULT_INSTDIR ?"
 LangString INST_GTA_ERROR1 ${LANG_ENGLISH} "The selected directory does not exist.$\n$\n\
             Please select the GTA:SA install directory"
 LangString INST_GTA_ERROR2 ${LANG_ENGLISH} "Could not find GTA:SA installed at $GTA_DIR $\n$\n\
@@ -1651,6 +1654,29 @@ LangString INST_GTA_ERROR2 ${LANG_ENGLISH} "Could not find GTA:SA installed at $
 			
 Function "DirectoryLeaveProc"
     Call CustomDirectoryPageUpdateINSTDIR
+
+    # Check if user is trying to install MTA into GTA directory
+	Push $INSTDIR 
+	Call IsGtaDirectory
+	Pop $0
+	${If} $0 == "gta"
+
+        # Don't allow install into GTA directory unless MTA is already there
+        Push $INSTDIR 
+        Call GetInstallType
+        Pop $0
+        Pop $1
+        ${If} $0 != "upgrade"
+            MessageBox MB_OKCANCEL|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
+                "$(INST_GTA_CONFLICT)" \
+                IDOK cont2
+                Abort
+            cont2:
+            StrCpy $INSTDIR $DEFAULT_INSTDIR
+        ${Endif}
+    ${Endif}
+
+    # Check if user is trying to install over a different major version of MTA
 	Push $INSTDIR 
 	Call GetInstallType
 	Pop $0
@@ -1685,6 +1711,32 @@ Function "GTADirectoryLeaveProc"
 
 FunctionEnd
 
+;****************************************************************
+;
+; Determine if gta is installed at supplied directory path
+;
+;****************************************************************
+
+; In <stack> = directory path
+; Out <stack> = "" - gta not detected at path
+;               "gta" - gta detected at path
+Function IsGtaDirectory
+    Pop $0
+    StrCpy $1 "gta"
+
+    ; gta_sa.exe or gta-sa.exe should exist
+    IfFileExists "$0\gta_sa.exe" cont1
+        IfFileExists "$0\gta-sa.exe" cont1
+            StrCpy $1 ""
+    cont1:
+
+    ; data subdirectory should exist
+    IfFileExists "$0\data\*.*" cont2
+        StrCpy $1 ""
+    cont2:
+
+    Push $1
+FunctionEnd
 
 ;****************************************************************
 ;
@@ -1912,7 +1964,7 @@ Function CustomDirectoryPageSetUpgradeMessage
 
     ${NSD_SetText} $UpgradeLabel ""
 	${If} $0 == "overwrite"
-        ${NSD_SetText} $UpgradeLabel "Warning: A different major version of MTA ($1) already exists at that path."
+        ${NSD_SetText} $UpgradeLabel "$(INST_LOC_OW)"
 	${Endif}
 	${If} $0 == "upgrade"
         ${NSD_SetText} $UpgradeLabel "$(INST_LOC_UPGRADE)"
