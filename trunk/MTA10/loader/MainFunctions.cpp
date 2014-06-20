@@ -48,10 +48,9 @@ void InitLocalization( bool bNoFail )
     if ( bDone )
         return;
 
-    const SString strMTASAPath = GetMTASAPath ();
-
     // Check for and load core.dll for localization
-    SString strCoreDLL = PathJoin( strMTASAPath, "mta", MTA_DLL_NAME );
+    // Use launch relative path so core.dll can get updated
+    SString strCoreDLL = PathJoin( GetLaunchPath(), "mta", MTA_DLL_NAME );
     if ( !FileExists ( strCoreDLL ) )
     {
         if ( !bNoFail )
@@ -63,6 +62,8 @@ void InitLocalization( bool bNoFail )
         return ExitProcess( EXIT_ERROR );
     }
 
+    // Use registry setting of mta path for dlls, as they will not be present in update files
+    const SString strMTASAPath = GetMTASAPath ();
     SetDllDirectory( PathJoin( strMTASAPath, "mta" ) );
 
     // See if xinput is loadable (XInput9_1_0.dll is core.dll dependency)
