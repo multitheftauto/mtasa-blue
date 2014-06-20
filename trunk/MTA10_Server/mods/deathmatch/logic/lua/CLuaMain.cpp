@@ -1043,9 +1043,9 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getUpgradeSlotName", "getVehicleUpgradeSlotName" );
 
     lua_classfunction ( luaVM, "create", "createVehicle" );
-    lua_classfunction ( luaVM, "blow", "blowblowVehicle" );
+    lua_classfunction ( luaVM, "blow", "blowVehicle" );
     lua_classfunction ( luaVM, "fix", "fixVehicle" );
-    lua_classfunction ( luaVM, "detatchTrailer", "detachTrailerFromVehicle" );
+    lua_classfunction ( luaVM, "detachTrailer", "detachTrailerFromVehicle" );
     lua_classfunction ( luaVM, "addUpgrade", "addVehicleUpgrade" );
     lua_classfunction ( luaVM, "attachTrailer", "attachTrailerToVehicle" );
     lua_classfunction ( luaVM, "removeUpgrade", "removeVehicleUpgrade" );
@@ -1066,7 +1066,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isBlown", "isVehicleBlown" );
     lua_classfunction ( luaVM, "isTaxiLightOn", "isVehicleTaxiLightOn" );
     lua_classfunction ( luaVM, "getSirenParams", "getVehicleSirenParams" );
-    lua_classfunction ( luaVM, "getVarient", "getVehicleVariant" );
+    lua_classfunction ( luaVM, "getVariant", "getVehicleVariant" );
     lua_classfunction ( luaVM, "getSirens", "getVehicleSirens" );
     lua_classfunction ( luaVM, "getDirection", "getTrainDirection" );
     lua_classfunction ( luaVM, "getSpeed", "getTrainSpeed" );
@@ -1084,7 +1084,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getOccupants", "getVehicleOccupants" );
     lua_classfunction ( luaVM, "getOverrideLights", "getVehicleOverrideLights" );
     lua_classfunction ( luaVM, "getPlateText", "getVehiclePlateText" );
-    lua_classfunction ( luaVM, "getPainjob", "getVehiclePaintjob" );
+    lua_classfunction ( luaVM, "getPaintJob", "getVehiclePaintjob" );
     lua_classfunction ( luaVM, "getPanelState", "getVehiclePanelState" );
     lua_classfunction ( luaVM, "areSirensOn", "getVehicleSirensOn" );
     lua_classfunction ( luaVM, "getTowedByVehicle", "getVehicleTowedByVehicle" );
