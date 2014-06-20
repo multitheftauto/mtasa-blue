@@ -10425,32 +10425,32 @@ bool CStaticFunctionDefinitions::ResetFogDistance ( )
     return true;
 }
 
-bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior )
+bool CStaticFunctionDefinitions::RemoveWorldModel ( unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior )
 {
-    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, CVector ( fX, fY, fZ ), cInterior );
+    g_pGame->GetBuildingRemovalManager ( )->CreateBuildingRemoval( usModel, fRadius, vecPosition, cInterior );
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( usModel );
     BitStream.pBitStream->Write ( fRadius );
-    BitStream.pBitStream->Write ( fX );
-    BitStream.pBitStream->Write ( fY );
-    BitStream.pBitStream->Write ( fZ );
+    BitStream.pBitStream->Write ( vecPosition.fX );
+    BitStream.pBitStream->Write ( vecPosition.fY );
+    BitStream.pBitStream->Write ( vecPosition.fZ );
     BitStream.pBitStream->Write ( cInterior );      // Only used by clients with bitstream version >= 0x039
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( REMOVE_WORLD_MODEL, *BitStream.pBitStream ) );
 
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, float fRadius, float fX, float fY, float fZ, char cInterior )
+bool CStaticFunctionDefinitions::RestoreWorldModel ( unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior )
 {
-    g_pGame->GetBuildingRemovalManager ( )->RestoreWorldModel( usModel, fRadius, CVector ( fX, fY, fZ ), cInterior );
+    g_pGame->GetBuildingRemovalManager ( )->RestoreWorldModel( usModel, fRadius, vecPosition, cInterior );
 
     CBitStream BitStream;
     BitStream.pBitStream->Write ( usModel );
     BitStream.pBitStream->Write ( fRadius );
-    BitStream.pBitStream->Write ( fX );
-    BitStream.pBitStream->Write ( fY );
-    BitStream.pBitStream->Write ( fZ );
+    BitStream.pBitStream->Write ( vecPosition.fX );
+    BitStream.pBitStream->Write ( vecPosition.fY );
+    BitStream.pBitStream->Write ( vecPosition.fZ );
     BitStream.pBitStream->Write ( cInterior );      // Only used by clients with bitstream version >= 0x039
 
     m_pPlayerManager->BroadcastOnlyJoined ( CLuaPacket ( RESTORE_WORLD_MODEL, *BitStream.pBitStream ) );
