@@ -1343,6 +1343,21 @@ void CVersionUpdater::_CheckSidegradeRequirements ( void )
 
     if ( bVersionMatch && bLaunchPathValid )
     {
+        // Check core.dll version in case user has installed over different major version
+        SString strCoreDll = PathJoin( ExtractPath( m_strSidegradePath ), "mta", "core.dll" );
+        SLibVersionInfo versionInfo;
+        if ( GetLibVersionInfo( strCoreDll, &versionInfo ) )
+        {
+            SString strVersion( "%d.%d", versionInfo.dwProductVersionMS >> 16, versionInfo.dwProductVersionMS & 0xffff );
+            if ( strVersion != m_strSidegradeVersion )
+                bVersionMatch = false;
+        }
+        else
+            bLaunchPathValid = false;
+    }
+
+    if ( bVersionMatch && bLaunchPathValid )
+    {
         m_ConditionMap.SetCondition ( "ProcessResponse", "installed" );
     }
     else
