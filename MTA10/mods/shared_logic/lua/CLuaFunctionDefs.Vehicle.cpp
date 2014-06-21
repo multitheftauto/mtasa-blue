@@ -41,6 +41,7 @@ int CLuaFunctionDefs::GetVehicleType ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         lua_pushstring ( luaVM, CVehicleNames::GetVehicleTypeName ( ucModel ) ); // Range check will be done by GetVehicleTypeName
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
