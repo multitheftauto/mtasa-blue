@@ -265,10 +265,20 @@ PostVC90Check:
         StrCpy $WhichRadio "default"
         StrCpy $ShowLastUsed "0"
 	${Else}
-        StrCpy $WhichRadio "last"
-        StrCpy $ShowLastUsed "1"
+        Push $LAST_INSTDIR 
+        Call GetInstallType
+        Pop $0
+        Pop $1
+        ${If} $0 == "overwrite"
+            # Ignore last used if it contains different major MTA version
+            StrCpy $WhichRadio "default"
+            StrCpy $ShowLastUsed "0"
+        ${Else}
+            StrCpy $WhichRadio "last"
+            StrCpy $ShowLastUsed "1"
+        ${EndIf}
 	${EndIf}
-
+    
 	; Try to find previously saved GTA:SA install path
 	ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
 	${If} $2 == "" 
