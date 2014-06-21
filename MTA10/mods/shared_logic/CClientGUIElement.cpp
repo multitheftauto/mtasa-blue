@@ -181,3 +181,19 @@ bool CClientGUIElement::SetFont ( const SString& strInFontName, CClientGuiFont* 
     return false;
 }
 
+
+//
+// Change call propagation behaviour (overrides CClientEntity::SetCallPropagationEnabled)
+void CClientGUIElement::SetCallPropagationEnabled ( bool bEnabled )
+{
+    CClientEntity::SetCallPropagationEnabled ( bEnabled );
+
+    for ( CFastList<CClientEntity*>::iterator iter = m_Children.begin (); iter != m_Children.end (); ++iter )
+    {
+        if ( (*iter)->GetType () == CCLIENTGUI )
+        {
+            CClientGUIElement* pGUIElement = static_cast < CClientGUIElement* > ( *iter );
+            pGUIElement->GetCGUIElement()->SetInheritsAlpha ( bEnabled );
+        }
+    }
+}

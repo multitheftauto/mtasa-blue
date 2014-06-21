@@ -4585,7 +4585,12 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& 
             delete pGUIElement;
             pGUIElement = NULL;
         }
-    }    
+    }
+
+    if ( pParent && !pParent->IsCallPropagationEnabled () )
+    {
+        pGUIElement->GetCGUIElement ()->SetInheritsAlpha ( false );
+    }
 
     return pGUIElement;
 }

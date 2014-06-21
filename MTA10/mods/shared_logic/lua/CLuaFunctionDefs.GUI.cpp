@@ -1262,15 +1262,16 @@ int CLuaFunctionDefs::GUISetAlpha ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUIGetAlpha ( lua_State* luaVM )
 {
-//  int guiGetAlpha ( element guiElement )
-    CClientGUIElement* guiElement;
+//  int guiGetAlpha ( element guiElement [, bool effectiveAlpha = false] )
+    CClientGUIElement* guiElement; bool bEffectiveAlpha;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( guiElement );
+    argStream.ReadBool ( bEffectiveAlpha, false );
 
     if ( !argStream.HasErrors () )
     {
-        float fAlpha = guiElement->GetCGUIElement ()->GetAlpha ();
+        float fAlpha = !bEffectiveAlpha ? guiElement->GetCGUIElement ()->GetAlpha () : guiElement->GetCGUIElement ()->GetEffectiveAlpha ();
         lua_pushnumber ( luaVM, fAlpha );
         return 1;
     }

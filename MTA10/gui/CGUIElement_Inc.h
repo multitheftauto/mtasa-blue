@@ -65,6 +65,7 @@ std::string GetText ( void )                                { return CGUIElement
 
 void SetAlpha ( float fAlpha )                              { CGUIElement_Impl::SetAlpha ( fAlpha ); };
 float GetAlpha ( void )                                     { return CGUIElement_Impl::GetAlpha (); };
+float GetEffectiveAlpha ( void )                            { return CGUIElement_Impl::GetEffectiveAlpha (); };
 void SetInheritsAlpha ( bool bInheritsAlpha )               { CGUIElement_Impl::SetInheritsAlpha ( bInheritsAlpha ); };
 bool GetInheritsAlpha ( void )                              { return CGUIElement_Impl::GetInheritsAlpha (); };
 

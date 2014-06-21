@@ -324,7 +324,7 @@ public:
     float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
     bool                                        IsCallPropagationEnabled    ( void )                { return m_bCallPropagationEnabled; }
-    void                                        SetCallPropagationEnabled   ( bool bEnabled )       { m_bCallPropagationEnabled = bEnabled; }
+    virtual void                                SetCallPropagationEnabled   ( bool bEnabled )       { m_bCallPropagationEnabled = bEnabled; }
 
 protected:
     CClientManager*                             m_pManager;

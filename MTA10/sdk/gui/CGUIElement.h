@@ -85,6 +85,7 @@ public:
 
     virtual void                SetAlpha                    ( float fAlpha ) = 0;
     virtual float               GetAlpha                    ( void ) = 0;
+    virtual float               GetEffectiveAlpha           ( void ) = 0;
     virtual void                SetInheritsAlpha            ( bool bInheritsAlpha ) = 0;
     virtual bool                GetInheritsAlpha            ( void ) = 0;
 
