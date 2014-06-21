@@ -711,8 +711,8 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     // Write the ordering id
                     BitStream.WriteCompressed ( pBlip->m_sOrdering );
 
-                    // Write the visible distance
-                    SIntegerSync < unsigned short, 14 > visibleDistance ( pBlip->m_usVisibleDistance );
+                    // Write the visible distance - 14 bits allows 16383.
+                    SIntegerSync < unsigned short, 14 > visibleDistance ( Min ( pBlip->m_usVisibleDistance, (unsigned short)16383 ) );
                     BitStream.Write ( &visibleDistance );
 
                     // Write the icon
