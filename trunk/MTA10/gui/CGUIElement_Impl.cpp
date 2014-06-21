@@ -260,6 +260,12 @@ float CGUIElement_Impl::GetAlpha ( void )
 }
 
 
+float CGUIElement_Impl::GetEffectiveAlpha ( void )
+{
+    return m_pWindow->getEffectiveAlpha ();
+}
+
+
 void CGUIElement_Impl::SetInheritsAlpha ( bool bInheritsAlpha )
 {
     m_pWindow->setInheritsAlpha ( bInheritsAlpha );
