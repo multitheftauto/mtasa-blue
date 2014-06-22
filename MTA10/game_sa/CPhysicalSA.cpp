@@ -102,7 +102,7 @@ VOID CPhysicalSA::SetMoveSpeed(CVector * vecMoveSpeed)
     
     if ( GetInterface ()->nType == ENTITY_TYPE_OBJECT )
     {
-        AddToControlProcessList ();
+        AddToMovingList ();
         SetStatic ( false );
     }
 }
@@ -184,9 +184,9 @@ VOID CPhysicalSA::ProcessCollision()
 }
 
 
-void CPhysicalSA::AddToControlProcessList ( void )
+void CPhysicalSA::AddToMovingList ( void )
 {
-    DWORD dwFunc = FUNC_AddToControlProcessList;
+    DWORD dwFunc = FUNC_CPhysical_AddToMovingList;
     DWORD dwThis = (DWORD)GetInterface ();
 
     _asm
