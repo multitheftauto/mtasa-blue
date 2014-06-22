@@ -481,7 +481,9 @@ void CMessageLoopHook::StartWindowMovement()
 
     LONG lExStyle = GetWindowLong ( m_MovementDummyWindow, GWL_EXSTYLE );
     lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
+    lExStyle |= WS_EX_LAYERED;
     SetWindowLong ( m_MovementDummyWindow, GWL_EXSTYLE, lExStyle );
+    SetLayeredWindowAttributes ( m_MovementDummyWindow, 0, 140, LWA_ALPHA );
 
     SetWindowPos ( m_MovementDummyWindow, NULL, ClientRect.left, ClientRect.top, 0, 0, SWP_DRAWFRAME | SWP_NOZORDER | SWP_NOSIZE );
     //ShowWindow ( m_HookedWindowHandle, SW_HIDE );
@@ -534,8 +536,8 @@ LRESULT CALLBACK CMessageLoopHook::ProcessDummyWindowMessage(HWND hwnd, UINT uMs
 
             // Give it some color
             HBRUSH BorderBrush = CreateSolidBrush ( 0x00000000 );
-            HBRUSH FillBrush = CreateSolidBrush ( 0x00ADA424 );
-            FillRect( PS.hdc, &ClientRect, BorderBrush );
+            HBRUSH FillBrush = CreateSolidBrush ( RGB(255,255,255) );
+            FillRect ( PS.hdc, &ClientRect, BorderBrush );
             FillRect ( PS.hdc, &BorderRect, FillBrush );
             DeleteObject ( BorderBrush );
             DeleteObject ( FillBrush );
