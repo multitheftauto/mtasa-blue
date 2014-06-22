@@ -21,8 +21,8 @@ public:
 
     virtual CVector *   GetMoveSpeed                ( CVector * vecMoveSpeed )=0;
     virtual CVector *   GetTurnSpeed                ( CVector * vecTurnSpeed )=0;
-    virtual VOID        SetMoveSpeed                ( CVector * vecMoveSpeed )=0;
-    virtual VOID        SetTurnSpeed                ( CVector * vecTurnSpeed )=0;
+    virtual void        SetMoveSpeed                ( CVector * vecMoveSpeed )=0;
+    virtual void        SetTurnSpeed                ( CVector * vecTurnSpeed )=0;
 
     virtual float       GetMass                     ( void ) = 0;
     virtual void        SetMass                     ( float fMass ) = 0;
@@ -33,8 +33,8 @@ public:
     virtual float       GetBuoyancyConstant         ( void ) = 0;
     virtual void        SetBuoyancyConstant         ( float fBuoyancyConstant ) = 0;
 
-    virtual VOID        ProcessCollision            ( void ) = 0;
-    virtual void        AddToControlProcessList     ( void ) = 0;
+    virtual void        ProcessCollision            ( void ) = 0;
+    virtual void        AddToMovingList             ( void ) = 0;
 
     virtual float       GetDamageImpulseMagnitude   ( void ) = 0;
     virtual void        SetDamageImpulseMagnitude   ( float fMagnitude ) = 0;
