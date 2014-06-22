@@ -3079,18 +3079,17 @@ int CLuaFunctionDefinitions::AddPedClothes ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::RemovePedClothes ( lua_State* luaVM )
 {
+//  bool removePedClothes ( ped thePed, int clothesType, [ string clothesTexture, string clothesModel ] )
     CElement* pElement;
     unsigned char ucType; 
     SString strTexture; 
     SString strModel; 
-    
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(ucType); 
-    argStream.ReadString(strTexture); 
-    argStream.ReadString(strModel); 
-    
+    argStream.ReadString( strTexture, "" ); 
+    argStream.ReadString( strModel, "" ); 
 
     if ( !argStream.HasErrors ( ) )
     {
