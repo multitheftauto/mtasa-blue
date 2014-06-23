@@ -49,7 +49,15 @@ public:
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
         {
-            outValue = static_cast < T > ( lua_tonumber ( m_luaVM, m_iIndex++ ) );
+            lua_Number number = lua_tonumber(m_luaVM, m_iIndex++);
+
+            if (std::isnan(number))
+            {
+                SetCustomError("Expected number, got NaN", "Bad argument");
+                return;
+            }
+
+            outValue = static_cast < T > (number);
             return;
         }
 
@@ -67,7 +75,16 @@ public:
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
         {
-            outValue = static_cast < T > ( lua_tonumber ( m_luaVM, m_iIndex++ ) );
+            lua_Number number = lua_tonumber(m_luaVM, m_iIndex++);
+
+            if (std::isnan(number))
+            {
+                SetCustomError("Expected number, got NaN", "Bad argument");
+                return;
+            }
+
+            outValue = static_cast < T > ( number );
+
             return;
         }
         else
