@@ -51,7 +51,7 @@ public:
         {
             lua_Number number = lua_tonumber(m_luaVM, m_iIndex++);
 
-            if (std::isnan(number))
+            if (isnan(number))
             {
                 SetCustomError("Expected number, got NaN", "Bad argument");
                 return;
@@ -77,7 +77,7 @@ public:
         {
             lua_Number number = lua_tonumber(m_luaVM, m_iIndex++);
 
-            if (std::isnan(number))
+            if (isnan(number))
             {
                 SetCustomError("Expected number, got NaN", "Bad argument");
                 return;

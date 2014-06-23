@@ -98,6 +98,14 @@
     #define PRIx64  "llx"
 #endif
 
+#if defined(WIN32)
+    #if _MSC_VER <= 1500
+        // VS08 does not have isnan, but _isnan
+        #include <float.h>
+        #define isnan _isnan
+    #endif
+#endif
+
 //
 // Macro for counting the number of elements in a static array
 //
