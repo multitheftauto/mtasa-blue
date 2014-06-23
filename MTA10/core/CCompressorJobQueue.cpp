@@ -400,10 +400,35 @@ void* CCompressorJobQueueImpl::ThreadProc ( void )
     shared.m_Mutex.Lock ();
     while ( !shared.m_bTerminateThread )
     {
+        // Temp debug code to cause crash with key combo
+        static bool bEnableKeyCrash2 = false;
+        static bool bEnableKeyCrash2Init = false;
+        if ( !bEnableKeyCrash2Init )
+        {
+            bEnableKeyCrash2Init = true;
+            bEnableKeyCrash2 = FileExists( CalcMTASAPath( "debug.txt" ) );
+        }
+
+        bool bEnableKeyCrash = ( g_pCore && g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::LUA_TRACE_0000 );
+        if ( bEnableKeyCrash || bEnableKeyCrash2 )
+        {
+            bool bHoldingCtrlL = ( GetAsyncKeyState ( VK_LCONTROL ) & 0x8000 ) != 0;
+            bool bHoldingCtrlR = ( GetAsyncKeyState ( VK_RCONTROL ) & 0x8000 ) != 0;
+            if ( bHoldingCtrlL && bHoldingCtrlR )
+            {
+                // Cause crash dump generation
+                int* ptr = NULL;
+                *ptr = 0;
+            }
+        }
+
         // Is there a waiting command?
         if ( shared.m_CommandQueue.empty () )
         {
-            shared.m_Mutex.Wait ( -1 );
+            if ( bEnableKeyCrash )
+                shared.m_Mutex.Wait ( 10 );
+            else
+                shared.m_Mutex.Wait ( 1000 );
         }
         else
         {
