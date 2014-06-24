@@ -125,6 +125,13 @@ HMONITOR  CProxyDirect3D9::StaticGetAdapterMonitor      ( UINT Adapter )
     return ms_CreatedDirect3D9List[0]->GetAdapterMonitor ( Adapter );
 }
 
+IDirect3D9*  CProxyDirect3D9::StaticGetDirect3D      ( void )
+{
+    if ( ms_CreatedDirect3D9List.empty() )
+        return NULL;
+    return ms_CreatedDirect3D9List[0];
+}
+
 HRESULT    CProxyDirect3D9::CreateDevice                ( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
 {
 // Do not change the code at the start of this function.

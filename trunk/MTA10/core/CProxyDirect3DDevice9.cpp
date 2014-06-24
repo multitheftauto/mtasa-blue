@@ -38,8 +38,9 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     m_pDevice->GetCreationParameters ( &creationParameters );
     int iAdapter = creationParameters.AdapterOrdinal;
 
-    IDirect3D9* pD3D9 = NULL;
-    m_pDevice->GetDirect3D ( &pD3D9 );
+    IDirect3D9* pD3D9 = CProxyDirect3D9::StaticGetDirect3D();
+    if ( !pD3D9 )
+        m_pDevice->GetDirect3D ( &pD3D9 );
 
     D3DADAPTER_IDENTIFIER9 adaptIdent;
     ZeroMemory( &adaptIdent, sizeof( D3DADAPTER_IDENTIFIER9 ) );
