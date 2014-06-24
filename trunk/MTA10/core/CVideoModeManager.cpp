@@ -171,6 +171,12 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
         pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
     }
 
+    if ( pp->SwapEffect == D3DSWAPEFFECT_FLIP )
+    {
+        pp->SwapEffect = D3DSWAPEFFECT_DISCARD;
+        WriteDebugEvent( "Changed SwapEffect From D3DSWAPEFFECT_FLIP to D3DSWAPEFFECT_DISCARD" );
+    }
+
     m_ulForceBackBufferWidth  = pp->BackBufferWidth;
     m_ulForceBackBufferHeight = pp->BackBufferHeight;
     m_ulForceBackBufferColorDepth = ( pp->BackBufferFormat == D3DFMT_R5G6B5 ) ? 16 : 32;
