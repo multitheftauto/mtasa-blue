@@ -17,7 +17,7 @@ from optparse import OptionParser
 
 parser = OptionParser()
 parser.add_option("-e", "--exe", dest="exe",
-                  help="xgettext executable location", default="C:/Program Files (x86)/Poedit/bin/xgettext.exe" )
+                  help="xgettext executable location", default="C:/Program Files (x86)/Poedit/GettextTools/bin/xgettext.exe" )
 #parser.add_option("-f", "--file", dest="output",
 #                  help="POT File output directory", default="messages")
 parser.add_option("-v", "--version", dest="version",
