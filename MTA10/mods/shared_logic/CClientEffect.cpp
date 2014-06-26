@@ -18,22 +18,23 @@ CClientEffect::CClientEffect ( CClientManager * pManager, CFxSystem * pFx, Eleme
     m_pManager->GetEffectManager ()->AddToList ( this );
     SetTypeName ( "effect" );
 
-
     m_pFxSystem->PlayAndKill();
 }
 
 CClientEffect::~CClientEffect ( )
 {
-    if(m_pFxSystem != NULL)
-        g_pGame->GetFxManager()->DestroyFxSystem(m_pFxSystem);
-
     Unlink();
 }
 
 void CClientEffect::Unlink()
 {
-    m_pFxSystem = NULL;
-    m_pManager->GetEffectManager()->RemoveFromList ( this );
+    m_pManager->GetEffectManager ( )->RemoveFromList ( this );
+
+    if ( m_pFxSystem != NULL )
+    {
+        g_pGame->GetFxManager ( )->DestroyFxSystem ( m_pFxSystem );
+        m_pFxSystem = NULL;
+    }
 }
 
 void CClientEffect::GetPosition(CVector &vecPosition) const
