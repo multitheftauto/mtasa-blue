@@ -87,5 +87,6 @@ void CClientEffectManager::SAEffectDestroyed ( void *pFxSAInterface )
     if(pFx == NULL)
         return; // We didn't create that effect
 
+    pFx->SetFxSystem ( NULL );
     g_pClientGame->GetElementDeleter()->Delete(pFx);
 }
