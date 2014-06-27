@@ -166,6 +166,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // Prepare the sirens
     RemoveVehicleSirens();
+
+    // reset our fall through map count
+    m_ucFellThroughMapCount = 1;
 }
 
 
@@ -2523,7 +2526,14 @@ void CClientVehicle::Create ( void )
 
         // Add XRef
         g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pVehicle );
-        
+
+        // if we are not in water we should probably do some ground checks
+        if ( m_LastSyncedData != NULL && m_LastSyncedData->bIsInWater == false )
+        {
+            // waiting for ground to load
+            SetFrozenWaitingForGroundToLoad ( true );
+        }
+
         // Jump straight to the target position if we have one
         if ( HasTargetPosition () )
         {
@@ -2568,6 +2578,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetTaxiLightOn ( m_bTaxiLightOn );
         m_pVehicle->SetCanBeTargettedByHeatSeekingMissiles ( m_bCanBeTargettedByHeatSeekingMissiles );
         CalcAndUpdateTyresCanBurstFlag ();
+
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
         {
             m_pVehicle->SetDerailed ( m_bIsDerailed );
@@ -2805,6 +2816,8 @@ void CClientVehicle::Create ( void )
             // set our visibility
             SetComponentVisible ( strTemp, (*iter).second.m_bVisible );
         }
+        // store our spawn position in case we fall through the map
+        m_matCreate = m_Matrix;
 
         // Tell the streamer we've created this object
         NotifyCreate ();
@@ -2935,6 +2948,9 @@ void CClientVehicle::Destroy ( void )
 
         // Remove reference to its model
         m_pModelInfo->RemoveRef ();
+
+        // reset our fall through map count
+        m_ucFellThroughMapCount = 1;
 
         NotifyDestroy ();
     }
@@ -4579,4 +4595,27 @@ bool CClientVehicle::DoesSupportUpgrade ( SString strFrameName )
         return m_pVehicle->DoesSupportUpgrade ( strFrameName );
     }
     return true;
+}
+
+bool CClientVehicle::OnVehicleFallThroughMap ( )
+{
+    // if we have fallen through the map a small number of times
+    if ( m_ucFellThroughMapCount <= 2 )
+    {
+        // make sure we haven't moved much if at all
+        if ( IsFrozen ( ) == false &&
+            DistanceBetweenPoints2D ( m_matCreate.GetPosition ( ), m_Matrix.GetPosition ( ) ) < 3 )
+        {
+            // increase our fell through map count
+            m_ucFellThroughMapCount++;
+            // warp us to our initial position of creation
+            SetPosition ( m_matCreate.GetPosition ( ) );
+            // warp us to our initial position of creation
+            SetRotationRadians ( m_matCreate.GetRotation ( ) );
+            // handled
+            return true;
+        }
+    }
+    // unhandled
+    return false;
 }
