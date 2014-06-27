@@ -106,7 +106,7 @@ public:
     bool                        PlayLoadedMissionAudio          ( int slot = 1 );
     VOID                        PauseAllSound                   ( bool bPaused );
     VOID                        StopRadio                       ( void );
-    VOID                        StartRadio                      ( unsigned int station );
+    VOID                        StartRadio                      ( unsigned char ucStation );
     void                        PauseAmbientSounds              ( bool bPaused );
     VOID                        SetAmbientSoundEnabled          ( eAmbientSoundType eType, bool bEnabled );
     bool                        IsAmbientSoundEnabled           ( eAmbientSoundType eType );

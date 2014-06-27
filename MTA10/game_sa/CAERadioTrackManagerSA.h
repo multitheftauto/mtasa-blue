@@ -40,6 +40,8 @@
 
 #define CLASS_CAERadioTrackManager      0x8CB6F8
 
+#define FUNC_RetuneRadio                0x4E8290
+
 #endif
 
 class CAERadioTrackManagerSA : public CAERadioTrackManager
@@ -51,7 +53,7 @@ public:
     BOOL    IsRadioOn();
     VOID    SetBassSetting(DWORD dwBass);
     VOID    Reset();
-    VOID    StartRadio(BYTE bStationID, BYTE bUnknown);
+    VOID    RetuneRadio(BYTE bStationID);
 };
 
 #endif

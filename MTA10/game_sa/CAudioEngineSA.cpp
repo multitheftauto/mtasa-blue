@@ -87,9 +87,9 @@ VOID CAudioEngineSA::StopRadio()
     }
 }
 
-VOID CAudioEngineSA::StartRadio(unsigned int station)
+VOID CAudioEngineSA::StartRadio(unsigned char ucStation)
 {
-    m_ucRadioChannel = station;
+    m_ucRadioChannel = ucStation;
     m_bRadioOn = true;
 
     // Make sure we have the correct muted state
@@ -97,54 +97,7 @@ VOID CAudioEngineSA::StartRadio(unsigned int station)
     if ( m_bRadioMuted )
         return;
 
-    DWORD dwFunc = 0x4DBEC3;
-    DWORD dwFunc2 = 0x4EB3C3;
-    _asm 
-    {
-        // We can't do this anymore as we've returned out StartRadio
-        /*
-        push    0
-        push    station
-        mov     ecx, CLASS_CAudioEngine
-        call    dwFunc
-        */
-
-        // Push our arguments onto the stack
-        push        0
-        push        station
-
-        // Call something, skip 3 bytes that we have our return instruction on (no arguments)
-        mov         ecx,CLASS_AECutsceneTrackManager 
-        mov         eax,dword ptr [ecx+8] 
-        call        dwFunc
-
-        // Check the return value, eventually skip
-        test        al,al 
-        jne         skip
-
-        mov         eax,dword ptr [esp+4] 
-        mov         ecx,dword ptr [esp] 
-
-        // Push arguments to some other function
-        push        0
-        push        0
-        push        eax  
-        push        ecx  
-
-        // Call it (emulate call instruction)
-        mov         ecx,8CB6F8h 
-        push        done
-        push        ebx  
-        mov         bl,byte ptr [esp+8] 
-        jmp         dwFunc2
-
-        // Pop our arguments back
-        done:
-        pop         eax
-        pop         eax
-
-        skip:
-    }
+    pGame->GetAERadioTrackManager ( )->RetuneRadio ( ucStation );
 }
 
 // 43 = race one
