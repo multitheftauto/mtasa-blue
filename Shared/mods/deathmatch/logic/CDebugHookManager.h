@@ -42,13 +42,14 @@ public:
     void                OnPreEvent                  ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
     void                OnPostEvent                 ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
 
-    bool                HasPostFunctionHooks        ( void ) const      { return !m_PostFunctionHookList.empty(); }
+    bool                HasPostFunctionHooks        ( void ) const      { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
 
 protected:
     std::vector < SDebugHookCallInfo >& GetHookInfoListForType ( EDebugHookType hookType );
     void                CallHook                    ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments );
     bool                IsNameAllowed               ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList );
 
+    uint                                m_uiPostFunctionOverride;
     std::vector < SDebugHookCallInfo >  m_PreEventHookList;
     std::vector < SDebugHookCallInfo >  m_PostEventHookList;
     std::vector < SDebugHookCallInfo >  m_PreFunctionHookList;
