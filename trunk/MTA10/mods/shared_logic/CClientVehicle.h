@@ -466,6 +466,8 @@ public:
 
     void                        SetHeliBladeCollisionsEnabled              ( bool bEnable )                    { m_bEnableHeliBladeCollisions = bEnable; }
 
+    bool                        OnVehicleFallThroughMap                    ( );
+
 protected:
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
@@ -630,6 +632,9 @@ protected:
     uint                        m_uiForceLocalZCounter;
 
     bool                        m_bEnableHeliBladeCollisions;
+    CMatrix                     m_matCreate;
+    unsigned char               m_ucFellThroughMapCount;
+
 public:
 #ifdef MTA_DEBUG
     CClientPlayer *             m_pLastSyncer;

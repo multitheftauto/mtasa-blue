@@ -268,6 +268,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetObjectDamageHandler ( CClientGame::StaticObjectDamageHandler );
     g_pMultiplayer->SetObjectBreakHandler ( CClientGame::StaticObjectBreakHandler );
     g_pMultiplayer->SetWaterCannonHitHandler ( CClientGame::StaticWaterCannonHandler );
+    g_pMultiplayer->SetVehicleFellThroughMapHandler ( CClientGame::StaticVehicleFellThroughMapHandler );
     g_pMultiplayer->SetGameObjectDestructHandler( CClientGame::StaticGameObjectDestructHandler );
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
@@ -3724,6 +3725,11 @@ bool CClientGame::StaticWaterCannonHandler ( CVehicleSAInterface* pCannonVehicle
     return g_pClientGame->WaterCannonHitHandler ( pCannonVehicle, pHitPed );
 }
 
+bool CClientGame::StaticVehicleFellThroughMapHandler ( CVehicleSAInterface* pVehicle )
+{
+    return g_pClientGame->VehicleFellThroughMapHandler ( pVehicle );
+}
+
 void CClientGame::StaticGameObjectDestructHandler ( CEntitySAInterface* pObject )
 {
     g_pClientGame->GameObjectDestructHandler ( pObject );
@@ -4758,6 +4764,23 @@ bool CClientGame::WaterCannonHitHandler ( CVehicleSAInterface* pCannonVehicle, C
             return bContinue;
         }
     }
+    return false;
+}
+
+bool CClientGame::VehicleFellThroughMapHandler ( CVehicleSAInterface* pVehicleInterface )
+{
+    if ( pVehicleInterface )
+    {
+        // Get our vehicle and client vehicle
+        CVehicle * pVehicle = g_pGame->GetPools ( )->GetVehicle ( (DWORD *) pVehicleInterface );
+        CClientVehicle * pClientVehicle = m_pManager->GetVehicleManager ( )->GetSafe ( pVehicle );
+        if ( pClientVehicle )
+        {
+            // handle or don't
+            return pClientVehicle->OnVehicleFallThroughMap ( );
+        }
+    }
+    // unhandled
     return false;
 }
 

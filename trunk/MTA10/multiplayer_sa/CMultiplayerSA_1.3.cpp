@@ -16,6 +16,8 @@
 
 WaterCannonHitHandler* m_pWaterCannonHitHandler = NULL;
 
+VehicleFellThroughMapHandler* m_pVehicleFellThroughMapHandler = NULL;
+
 #define HOOKPOS_CEventHitByWaterCannon                      0x729899
 DWORD RETURN_CWaterCannon_PushPeds_RETN = 0x7298A7;
 DWORD CALL_CEventHitByWaterCannon = 0x4B1290;
@@ -88,6 +90,10 @@ DWORD RETURN_CObject_PreRender =                    0x59FE6F;
 DWORD RETURN_CWorld_RemoveFallenPeds_Cont               =   0x565D13;
 DWORD RETURN_CWorld_RemoveFallenPeds_Cancel             =   0x565E6F;
 
+#define HOOKPOS_CWorld_RemoveFallenCars                     0x565F52
+DWORD RETURN_CWorld_RemoveFallenCars_Cont               =   0x565F59;
+DWORD RETURN_CWorld_RemoveFallenCars_Cancel             =   0x56609B;
+
 #define HOOKPOS_CVehicleModelInterface_SetClump             0x4C9606
 DWORD RETURN_CVehicleModelInterface_SetClump            =   0x4C9611;
 
@@ -116,6 +122,7 @@ void HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( );
 void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( );
 void HOOK_CObject_PreRender ( );
 void HOOK_CWorld_RemoveFallenPeds ( );
+void HOOK_CWorld_RemoveFallenCars ( );
 void HOOK_CVehicleModelInterface_SetClump ( );
 void HOOK_CBoat_ApplyDamage ( );
 
@@ -156,7 +163,9 @@ void CMultiplayerSA::InitHooks_13 ( void )
 
     HookInstall ( HOOKPOS_CObject_PreRender, (DWORD)HOOK_CObject_PreRender, 6 );
 
-    HookInstall ( HOOKPOS_CWorld_RemoveFallenPeds, (DWORD)HOOK_CWorld_RemoveFallenPeds, 6 );
+    HookInstall ( HOOKPOS_CWorld_RemoveFallenPeds, (DWORD) HOOK_CWorld_RemoveFallenPeds, 6 );
+
+    HookInstall ( HOOKPOS_CWorld_RemoveFallenCars, (DWORD) HOOK_CWorld_RemoveFallenCars, 5 );
 
     HookInstall ( HOOKPOS_CVehicleModelInterface_SetClump, (DWORD)HOOK_CVehicleModelInterface_SetClump, 7 );
 
@@ -1364,6 +1373,54 @@ RemoveFallenPeds_Cancel:
         jmp RETURN_CWorld_RemoveFallenPeds_Cont
     }
 }
+
+void CMultiplayerSA::SetVehicleFellThroughMapHandler ( VehicleFellThroughMapHandler * pHandler )
+{
+    m_pVehicleFellThroughMapHandler = pHandler;
+}
+
+CVehicleSAInterface * pFallingVehicleInterface;
+bool CWorld_Remove_FallenVehiclesCheck ( )
+{
+    CVehicle* pVehicle = pGameInterface->GetPools ( )->GetVehicle ( (DWORD *) pFallingVehicleInterface );
+    if ( pVehicle &&
+        m_pVehicleFellThroughMapHandler ( pFallingVehicleInterface ) )
+    {
+        // Disallow
+        return true;
+    }
+    // Allow
+    return false;
+}
+
+DWORD HOOK_CWorld_RemoveFallenCars_Cont1 = 0x565F57;
+
+void _declspec( naked ) HOOK_CWorld_RemoveFallenCars ( )
+{
+    // If the vehicle fell through the map give it another try to respawn.
+    _asm
+    {
+        pushad
+        mov pFallingVehicleInterface, esi
+    }
+    if ( CWorld_Remove_FallenVehiclesCheck ( ) )
+    {
+        _asm
+        {
+            popad
+            jmp RETURN_CWorld_RemoveFallenCars_Cancel
+        }
+    }
+    _asm
+    {
+        popad
+        mov eax, [esi + 14h]
+        test eax, eax
+        jz 565F57h
+        jmp RETURN_CWorld_RemoveFallenCars_Cont
+    }
+}
+
 
 void CMultiplayerSA::SetPedTargetingMarkerEnabled(bool bEnable)
 {
