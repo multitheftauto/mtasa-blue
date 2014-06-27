@@ -12011,11 +12011,17 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
 int CLuaFunctionDefinitions::RemoveBan ( lua_State* luaVM )
 {
     CBan* pBan;
-    CPlayer* pResponsible;
+    CPlayer* pResponsible = NULL;
 
-    CScriptArgReader argStream( luaVM );
-    argStream.ReadUserData ( pBan );
-    argStream.ReadUserData ( pResponsible, NULL );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pBan);
+
+    if ( argStream.NextIsUserData() )
+    {
+        CElement* pResponsibleElement;
+        argStream.ReadUserData( pResponsibleElement );
+        pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement );
+    }
 
     if ( !argStream.HasErrors( ) )
     {
