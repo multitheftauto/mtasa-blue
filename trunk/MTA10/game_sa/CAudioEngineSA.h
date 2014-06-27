@@ -107,6 +107,7 @@ public:
     VOID                        PauseAllSound                   ( bool bPaused );
     VOID                        StopRadio                       ( void );
     VOID                        StartRadio                      ( unsigned char ucStation );
+    VOID                        RetuneRadio                     ( unsigned char ucStation );
     void                        PauseAmbientSounds              ( bool bPaused );
     VOID                        SetAmbientSoundEnabled          ( eAmbientSoundType eType, bool bEnabled );
     bool                        IsAmbientSoundEnabled           ( eAmbientSoundType eType );

@@ -51,9 +51,10 @@ public:
     BYTE    IsVehicleRadioActive();
     char    * GetRadioStationName(BYTE bStationID);
     BOOL    IsRadioOn();
-    VOID    SetBassSetting(DWORD dwBass);
-    VOID    Reset();
-    VOID    RetuneRadio(BYTE bStationID);
+    void    SetBassSetting ( DWORD dwBass );
+    void    Reset ( );
+    void    RetuneRadio ( BYTE bStationID );
+    void    StartRadio ( BYTE bStationID );
 };
 
 #endif

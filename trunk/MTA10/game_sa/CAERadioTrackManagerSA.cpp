@@ -111,3 +111,19 @@ VOID CAERadioTrackManagerSA::RetuneRadio ( BYTE bStationID )
         call    dwFunc
     }
 }
+
+VOID CAERadioTrackManagerSA::StartRadio ( BYTE bStationID )
+{
+    DEBUG_TRACE ( "VOID CAERadioTrackManagerSA::StartRadio(BYTE bStationID)" );
+    DWORD dwFunc = FUNC_StartRadio2;
+    DWORD dwStationID = bStationID;
+
+    _asm
+    {
+        mov     ecx, CLASS_CAERadioTrackManager
+        push    1
+        push    dwStationID
+        call    dwFunc
+    }
+}
+
