@@ -24,6 +24,7 @@ public:
     virtual void        SetBassSetting                  ( DWORD dwBass ) = 0;
     virtual void        Reset                           ( void ) = 0;
     virtual void        RetuneRadio                     ( BYTE bStationID ) = 0;
+    virtual void        StartRadio                      ( BYTE bStationID ) = 0;
 };
 
 #endif
