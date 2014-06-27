@@ -15,6 +15,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define DECLARE_PROFILER_SECTION_CResource
+#include "profiler/SharedUtil.Profiler.h"
 #include "CServerIdManager.h"
 
 using namespace std;
@@ -310,6 +312,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
             FileLoad ( pResourceFile->GetName (), buffer );
             unsigned int iSize = buffer.size();
 
+            DECLARE_PROFILER_SECTION( OnPreLoadScript )
             // Check the contents
             if ( iSize > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), iSize ).CompareWithLegacy ( pResourceFile->GetServerChecksum () ) )
             {
@@ -319,6 +322,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
             {
                 HandleDownloadedFileTrouble( pResourceFile, true );
             }
+            DECLARE_PROFILER_SECTION( OnPostLoadScript )
         }
         else
         if ( CheckFileForCorruption ( pResourceFile->GetName () ) )
@@ -441,7 +445,9 @@ void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len, c
     if ( m_usRemainingNoClientCacheScripts > 0 )
     {
         --m_usRemainingNoClientCacheScripts;
+        DECLARE_PROFILER_SECTION( OnPreLoadNoClientCacheScript )
         GetVM()->LoadScriptFromBuffer ( chunk, len, strFilename );
+        DECLARE_PROFILER_SECTION( OnPostLoadNoClientCacheScript )
 
         if ( m_usRemainingNoClientCacheScripts == 0 && m_bLoadAfterReceivingNoClientCacheScripts )
         {
