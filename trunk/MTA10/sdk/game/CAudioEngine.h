@@ -52,7 +52,7 @@ public:
     virtual bool                        PlayLoadedMissionAudio          ( int slot = 1 ) = 0;
     virtual VOID                        PauseAllSound                   ( bool bPaused ) = 0;
     virtual VOID                        StopRadio                       ( void ) = 0;
-    virtual VOID                        StartRadio                      ( unsigned int station ) = 0;
+    virtual VOID                        StartRadio                      ( unsigned char ucStation ) = 0;
     virtual void                        PauseAmbientSounds              ( bool bPaused ) = 0;
     virtual VOID                        SetAmbientSoundEnabled          ( eAmbientSoundType eType, bool bEnabled ) = 0;
     virtual bool                        IsAmbientSoundEnabled           ( eAmbientSoundType eType ) = 0;
