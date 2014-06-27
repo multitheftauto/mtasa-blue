@@ -2261,6 +2261,16 @@ void CClientVehicle::StreamedInPulse ( void )
             RemoveTargetRotation ();
         }
 
+        // Remove link in CClientVehicle structure if SA does it
+        if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
+        {
+            if ( !GetNextTrainCarriage () )
+                m_pNextLink = NULL;
+
+            if ( !GetPreviousTrainCarriage () )
+                m_pPreviousLink = NULL;
+        }
+
         CClientPed* pControllingPed = GetControllingPlayer ();
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN && ( !pControllingPed || pControllingPed->GetType () != CCLIENTPLAYER ) )
         {
@@ -2567,14 +2577,18 @@ void CClientVehicle::Create ( void )
             if ( m_ucTrackID >= 0 )
                 m_pVehicle->SetRailTrack ( m_ucTrackID );
 
-            if ( m_fTrainPosition >= 0 )
+            if ( m_fTrainPosition >= 0 && !m_bIsDerailed )
                 m_pVehicle->SetTrainPosition ( m_fTrainPosition, true );
+
+            // Set matrix once more (to ensure that the rotation has been set properly)
+            if ( m_bIsDerailed )
+                m_pVehicle->SetMatrix ( &m_Matrix );
 
             if ( m_bChainEngine )
                 SetIsChainEngine ( true );
 
             // Train carriages
-            if ( m_pNextLink )
+            if ( m_pNextLink && !m_bIsDerailed && !m_pNextLink->IsDerailed () )
             {
                 m_pVehicle->SetNextTrainCarriage ( m_pNextLink->m_pVehicle );
                 m_pNextLink->SetTrainTrack ( GetTrainTrack () );
@@ -2586,7 +2600,7 @@ void CClientVehicle::Create ( void )
                     m_pVehicle->AttachTrainCarriage ( m_pNextLink->GetGameVehicle () );
                 }
             }
-            if ( m_pPreviousLink )
+            if ( m_pPreviousLink && !m_bIsDerailed && !m_pPreviousLink->IsDerailed () )
             {
                 m_pVehicle->SetPreviousTrainCarriage ( m_pPreviousLink->m_pVehicle );
                 this->SetTrainTrack ( m_pPreviousLink->GetTrainTrack () );
