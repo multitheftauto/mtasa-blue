@@ -4561,14 +4561,24 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
                 return false;
             }
         }
+        // if the previous was zero
+        if ( m_ucRadioChannel == 0 )
+        {
+            // turn us back on
+            g_pGame->GetAudioEngine ( )->StartRadio ( ucChannel );
+        }
 
+        // update our radio channel
         m_ucRadioChannel = ucChannel;
+        // police radio only
         if ( m_pOccupiedVehicle && m_pOccupiedVehicle->HasPoliceRadio ( ) )
         {
+            // police radio
             g_pGame->GetAudioEngine ( )->StartRadio ( 0 );
         }
         else
         {
+            // normal radio
             g_pGame->GetAudioEngine ( )->RetuneRadio ( m_ucRadioChannel );
         }
 
