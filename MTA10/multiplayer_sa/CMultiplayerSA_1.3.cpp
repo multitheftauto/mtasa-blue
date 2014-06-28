@@ -100,6 +100,10 @@ DWORD RETURN_CVehicleModelInterface_SetClump            =   0x4C9611;
 #define HOOKPOS_CBoat_ApplyDamage                           0x6F1C32
 DWORD RETURN_CBoat_ApplyDamage                          =   0x6F1C3E;
 
+#define HOOKPOS_CProjectile_FixTearGasCrash                 0x4C0403
+DWORD RETURN_CProjectile_FixTearGasCrash_Fix              = 0x4C05B9;
+DWORD RETURN_CProjectile_FixTearGasCrash_Cont             = 0x4C0409;
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -125,7 +129,7 @@ void HOOK_CWorld_RemoveFallenPeds ( );
 void HOOK_CWorld_RemoveFallenCars ( );
 void HOOK_CVehicleModelInterface_SetClump ( );
 void HOOK_CBoat_ApplyDamage ( );
-
+void HOOK_CProjectile_FixTearGasCrash ( );
 void CMultiplayerSA::Init_13 ( void )
 {
     InitHooks_13 ( );
@@ -170,6 +174,8 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CVehicleModelInterface_SetClump, (DWORD)HOOK_CVehicleModelInterface_SetClump, 7 );
 
     HookInstall ( HOOKPOS_CBoat_ApplyDamage, (DWORD)HOOK_CBoat_ApplyDamage, 12 );
+
+    HookInstall ( HOOKPOS_CProjectile_FixTearGasCrash, (DWORD) HOOK_CProjectile_FixTearGasCrash, 6 );
     
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
@@ -1499,5 +1505,23 @@ boatCanBeDamaged:
     {
         pop eax
         jmp RETURN_CBoat_ApplyDamage
+    }
+}
+
+// fixes a crash where a vehicle is the source of a tear gas projectile.
+void _declspec( naked ) HOOK_CProjectile_FixTearGasCrash ( )
+{
+    _asm
+    {
+        cmp ebp, 0h
+        je cont
+        mov ecx, [ebp+47Ch]
+        // no terminators in this time period
+        jmp RETURN_CProjectile_FixTearGasCrash_Cont
+    cont :
+        // come with me if you want to live
+        jmp RETURN_CProjectile_FixTearGasCrash_Fix
+        // dundundundundun
+        // dundundundundun
     }
 }
