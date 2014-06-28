@@ -3859,6 +3859,8 @@ bool CClientVehicle::HasPoliceRadio ( void )
         case VT_POLMAV:
         case VT_COPBIKE:
         case VT_SWATVAN:
+        case VT_FBIRANCH:
+        case VT_FBITRUCK:
             return true;
             break;
         default:
