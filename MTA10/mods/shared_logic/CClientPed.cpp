@@ -4561,8 +4561,8 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
                 return false;
             }
         }
-        // if the previous was zero
-        if ( m_ucRadioChannel == 0 )
+        // if the previous was zero or 13 (pseudo 0 for rolling backwards)
+        if ( m_ucRadioChannel == 0 || m_ucRadioChannel == 13 )
         {
             // turn us back on
             g_pGame->GetAudioEngine ( )->StartRadio ( ucChannel );
