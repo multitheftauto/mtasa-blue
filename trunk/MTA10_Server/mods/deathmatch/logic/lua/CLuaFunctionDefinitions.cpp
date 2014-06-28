@@ -7808,7 +7808,6 @@ int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
     
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPlayer); 
-    argStream.ReadString(strKey); 
 
     if (!argStream.HasErrors ( ) )
     {
