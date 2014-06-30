@@ -53,6 +53,17 @@ extern float fLocalPlayerGravity;
 extern PreContextSwitchHandler* m_pPreContextSwitchHandler;
 extern PostContextSwitchHandler* m_pPostContextSwitchHandler;
 
+#define HOOKPOS_CAudioEngine_Service                        0x50778C
+DWORD RETURN_CAudioEngine_Service_Cont                    = 0x507791;
+DWORD RETURN_CAudioEngine_Service_Fix                     = 0x50780A;
+
+#define HOOKPOS_CAEVehicleAudioEntity_Service               0x502284
+DWORD RETURN_CAEVehicleAudioEntity_Service_Cont           = 0x50228C;
+DWORD RETURN_CAEVehicleAudioEntity_Service_Fix            = 0x5023C5;
+
+void HOOK_CAudioEngine_Service ( );
+void HOOK_CAEVehicleAudioEntity_Service ( );
+
 VOID InitKeysyncHooks()
 {
     //OutputDebugString("InitKeysyncHooks");
@@ -80,6 +91,9 @@ VOID InitKeysyncHooks()
     // and this is to fix bike sync (I hope)
     //006BC9EB   9090               NOP NOP
     MemSet ((void *)0x6BC9EB, 0x90, 2);
+
+    HookInstall ( HOOKPOS_CAudioEngine_Service, (DWORD) HOOK_CAudioEngine_Service, 5 );
+    HookInstall ( HOOKPOS_CAEVehicleAudioEntity_Service, (DWORD) HOOK_CAEVehicleAudioEntity_Service, 6 );
 }
 
 extern CPed* pContextSwitchedPed;
@@ -163,13 +177,37 @@ void PostContextSwitch ( void )
         // 00729B97   E9 75010000      JMP gta_sa.00729D11
         MemPutFast < BYTE > ( 0x729B96, 0x0F );
         MemPutFast < BYTE > ( 0x729B97, 0x85 );
-        
-        // Prevent the game making remote players vehicle's audio behave like locals (and deleting 
-        // radio etc when they are removed) - issue #95
-        MemPutFast < BYTE > ( 0x50230C, 0x1 );
 
         bRadioHackInstalled = FALSE;
     }
+
+    
+    // Prevent the game making remote players vehicle's audio behave like locals (and deleting 
+    // radio etc when they are removed) - issue #95
+    MemPutFast < BYTE > ( 0x50230C, 0x1 );
+
+    // Re-Enable 0x5022C9 - PlayerAboutToExitVehicleAsDriver
+    MemPut < BYTE > ( 0x5022C9, 0xE8 );
+    MemPut < BYTE > ( 0x5022CA, 0xD2 );
+    MemPut < BYTE > ( 0x5022CB, 0x38 );
+    MemPut < BYTE > ( 0x5022CC, 0xFF );
+    MemPut < BYTE > ( 0x5022CD, 0xFF );
+
+    // Re-Enable 0x5022ED - JustWreckedVehicle
+    MemPut < BYTE > ( 0x5022ED, 0xE8 );
+    MemPut < BYTE > ( 0x5022EE, 0xBE );
+    MemPut < BYTE > ( 0x5022EF, 0xAD );
+    MemPut < BYTE > ( 0x5022F0, 0xFF );
+    MemPut < BYTE > ( 0x5022F1, 0xFF );
+
+    // Re-Enable 0x4EB9A0 - CAERadioTrackManager::Service
+    MemPut < BYTE > ( 0x4EB9A0, 0x55 ); 
+
+    // Fix our JNZ/JZ's - these are inverted such that is player is considered false
+    MemPut < BYTE > ( 0x6420F8, 0x75 );
+    MemPut < BYTE > ( 0x648A2A, 0x75 );
+    MemPut < BYTE > ( 0x64CA98, 0x74 );
+    MemPut < BYTE > ( 0x5022C5, 0x75 );
 
     /*
     // ChrML: Force as high stats as we can go before screwing up. Players can't have different
@@ -247,11 +285,6 @@ VOID ReturnContextToLocalPlayer()
             MemCpyFast ( &localStatsData.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS );
         }
     }
-
-    // radio change on startup hack
-    //0050237C   90               NOP
-    MemSetFast ((void *)0x50237C, 0x90, 5);
-    MemSetFast ((void *)0x5023A3, 0x90, 5);
 
     // We need to set this back, even if its the local player
     pGameInterface->SetGravity ( fGlobalGravity );
@@ -406,6 +439,33 @@ void SwitchContext ( CPed* thePed )
                     pfStats [ 79 ] = 999.0f;
                     */
 
+                    // Prevent the game making remote players vehicle's audio behave like locals (and deleting 
+                    // radio etc when they are removed) - issue #95
+                    MemPutFast < BYTE > ( 0x50230C, 0x0 );
+
+                    // Disable 0x5022C9 - PlayerAboutToExitVehicleAsDriver
+                    MemPut < BYTE > ( 0x5022C9, 0x90 );
+                    MemPut < BYTE > ( 0x5022CA, 0x90 );
+                    MemPut < BYTE > ( 0x5022CB, 0x90 );
+                    MemPut < BYTE > ( 0x5022CC, 0x90 );
+                    MemPut < BYTE > ( 0x5022CD, 0x90 );
+
+                    // Disable 0x5022ED - JustWreckedVehicle
+                    MemPut < BYTE > ( 0x5022ED, 0x90 );
+                    MemPut < BYTE > ( 0x5022EE, 0x90 );
+                    MemPut < BYTE > ( 0x5022EF, 0x90 );
+                    MemPut < BYTE > ( 0x5022F0, 0x90 );
+                    MemPut < BYTE > ( 0x5022F1, 0x90 );
+                    
+                    // Disable 0x4EB9A0 - CAERadioTrackManager::Service
+                    MemPut < BYTE > ( 0x4EB9A0, 0xC2 );
+                    
+                    // Invert some JNZ/JZ's - these are inverted such that is player is considered false
+                    MemPut < BYTE > ( 0x6420F8, 0x74 );
+                    MemPut < BYTE > ( 0x648A2A, 0x74 );
+                    MemPut < BYTE > ( 0x64CA98, 0x75 );
+                    MemPut < BYTE > ( 0x5022C5, 0x74 );
+
                     CPedSA* thePedSA = dynamic_cast < CPedSA* > ( thePed );
                     if ( thePedSA )
                     {
@@ -466,10 +526,6 @@ void SwitchContext ( CVehicle* pVehicle )
         SwitchContext ( thePed );
         if ( bNotInLocalContext )
         {
-            // Prevent the game making remote players vehicle's audio behave like locals (and deleting 
-            // radio etc when they are removed) - issue #95
-            MemPutFast < BYTE > ( 0x50230C, 0x0 );
-
             MemPutFast < BYTE > ( dwVehicle + 312 + 0xA5, 0 );
 
             // For tanks, to prevent our mouse movement affecting remote tanks
@@ -506,6 +562,14 @@ void SwitchContext ( CVehicle* pVehicle )
             MemPutFast < BYTE > ( 0x5023A3 + 2, 0x37 );
             MemPutFast < BYTE > ( 0x5023A3 + 3, 0xFF );
             MemPutFast < BYTE > ( 0x5023A3 + 4, 0xFF );
+
+            //0x5023E1
+            MemPutFast < BYTE > ( 0x5023E1 + 0, 0xE8 );
+            MemPutFast < BYTE > ( 0x5023E1 + 1, 0x1A );
+            MemPutFast < BYTE > ( 0x5023E1 + 2, 0x33 );
+            MemPutFast < BYTE > ( 0x5023E1 + 3, 0xFF );
+            MemPutFast < BYTE > ( 0x5023E1 + 4, 0xFF );
+
         }
     }
 }
@@ -884,5 +948,43 @@ VOID _declspec(naked) HOOK_CHeli__ProcessControl()
     {
         popad
         retn
+    }
+}
+
+DWORD dwCutsceneTrackManagerService = 0x4DBFB0;
+DWORD dwAmbienceTrackManagerService = 0x4D76C0;
+void _declspec ( naked ) HOOK_CAudioEngine_Service ( )
+{
+    _asm
+    {
+        cmp bNotInLocalContext, 1
+        je cont
+        mov ecx, 0B5F8B8h
+        jmp RETURN_CAudioEngine_Service_Cont
+
+cont:
+        push edi
+        mov ecx, 8AE554h
+        call dwCutsceneTrackManagerService
+        push edi
+        mov ecx, 8AC15Ch
+        call dwAmbienceTrackManagerService
+        jmp RETURN_CAudioEngine_Service_Fix
+
+    }
+}
+
+void _declspec ( naked ) HOOK_CAEVehicleAudioEntity_Service ( )
+{
+    _asm
+    {
+        cmp bNotInLocalContext, 1
+        je cont
+        mov al, [esi+0A5h]
+        jmp RETURN_CAEVehicleAudioEntity_Service_Cont
+
+cont:
+        jmp RETURN_CAEVehicleAudioEntity_Service_Fix
+
     }
 }
