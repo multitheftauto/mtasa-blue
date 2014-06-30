@@ -1625,6 +1625,11 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
         if ( pClient->GetNick () )
             CLogger::LogPrintf ( "loadmodule: Requested by %s\n", GetAdminNameForLog ( pClient ).c_str () );
 
+        if ( !IsValidFilePath ( szArguments ) )
+        {
+            pEchoClient->SendConsole ( "loadmodule: Invalid module path" );
+            return false;
+        }
         SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
 
         // These modules are late loaded
