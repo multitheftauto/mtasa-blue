@@ -22,6 +22,10 @@
     extern "C" WINDOW* m_wndMenu;
     extern "C" WINDOW* m_wndInput;
     extern "C" bool g_bNoCurses;
+    #include <client/linux/handler/exception_handler.h>
+    bool DumpCallback( const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded );
+    static SString ms_strDumpPath;
+    static SString ms_strDumpPathFilename;
 #endif
 
 #ifdef WIN32
@@ -37,17 +41,64 @@ typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hF
 
 #endif
 
-void CCrashHandler::Init ( void )
+void CCrashHandler::Init ( const SString& strInServerPath )
 {
     // Set a global filter
     #ifdef WIN32
-    SetCrashHandlerFilter ( HandleExceptionGlobal );
+        SetCrashHandlerFilter ( HandleExceptionGlobal );
     #else
-    signal ( SIGSEGV, HandleExceptionGlobal );
+        // Prepare initial dumpfile name
+        SString strServerPath = strInServerPath;
+        if ( strServerPath == "" )
+            strServerPath = GetSystemCurrentDirectory();
+        ms_strDumpPath = PathJoin( strServerPath, "mods", "deathmatch", "dumps" );
+        time_t pTime = time( NULL );
+        struct tm* tm = localtime( &pTime );
+        SString strFilename( "server_%s_%04d%02d%02d_%02d%02d.dmp",
+                                        MTA_DM_BUILDTAG_LONG,
+                                        tm->tm_year + 1900,
+                                        tm->tm_mon + 1,
+                                        tm->tm_mday,
+                                        tm->tm_hour,
+                                        tm->tm_min
+                                    );
+        ms_strDumpPathFilename = PathJoin( ms_strDumpPath, strFilename );
+        MakeSureDirExists( ms_strDumpPathFilename );
+
+        #ifdef WITH_BACKTRACE_ONLY
+            signal ( SIGSEGV, HandleExceptionGlobal );
+        #else
+            google_breakpad::MinidumpDescriptor descriptor( ms_strDumpPath );
+            static google_breakpad::ExceptionHandler eh( descriptor, NULL, DumpCallback, NULL, true, -1 );
+        #endif
     #endif
 }
 
 #ifndef WIN32
+
+// Linux crash callback when using google-breakpad
+bool DumpCallback( const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded )
+{
+    // Set inital dump file name (Safeish)
+    rename( descriptor.path(), ms_strDumpPathFilename );
+
+    // Set final dump file name (Not so safe)
+    time_t pTime = time( NULL );
+    struct tm* tm = localtime( &pTime );
+    SString strFilename( "server_%s_%04d%02d%02d_%02d%02d.dmp",
+                                    MTA_DM_BUILDTAG_LONG,
+                                    tm->tm_year + 1900,
+                                    tm->tm_mon + 1,
+                                    tm->tm_mday,
+                                    tm->tm_hour,
+                                    tm->tm_min
+                                );
+    SString strFinalDumpPathFilename = PathJoin( ms_strDumpPath, strFilename );
+    rename( ms_strDumpPathFilename, strFinalDumpPathFilename );
+
+    // Return false to indicate exception has not been handled (and allow core dump?)
+    return false;
+}
 
 void CCrashHandler::HandleExceptionGlobal ( int iSig )
 {
