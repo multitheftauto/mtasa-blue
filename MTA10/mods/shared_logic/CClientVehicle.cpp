@@ -2553,8 +2553,8 @@ void CClientVehicle::Create ( void )
         // Got any settings to restore?
         m_pVehicle->SetMatrix ( &m_Matrix );
         m_matFrozen = m_Matrix;
-        m_pVehicle->SetMoveSpeed ( &m_vecMoveSpeed );
-        m_pVehicle->SetTurnSpeed ( &m_vecTurnSpeed );
+        SetMoveSpeed ( m_vecMoveSpeed );
+        SetTurnSpeed ( m_vecTurnSpeed );
         m_pVehicle->SetVisible ( m_bVisible );
         m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
         m_pVehicle->SetEngineBroken ( m_bEngineBroken );
