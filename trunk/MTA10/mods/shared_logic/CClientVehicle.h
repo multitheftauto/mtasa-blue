@@ -477,6 +477,7 @@ protected:
 
     bool                        DoCheckHasLandingGear   ( void );
     void                        HandleWaitingForGroundToLoad ( void );
+    bool                        DoesNeedToWaitForGroundToLoad ( void );
 
     void                        StreamedInPulse         ( void );
 

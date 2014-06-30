@@ -2527,8 +2527,7 @@ void CClientVehicle::Create ( void )
         // Add XRef
         g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pVehicle );
 
-        // if we are not in water we should probably do some ground checks
-        if ( m_LastSyncedData != NULL && m_LastSyncedData->bIsInWater == false )
+        if ( DoesNeedToWaitForGroundToLoad() )
         {
             // waiting for ground to load
             SetFrozenWaitingForGroundToLoad ( true );
@@ -4620,4 +4619,25 @@ bool CClientVehicle::OnVehicleFallThroughMap ( )
     }
     // unhandled
     return false;
+}
+
+bool CClientVehicle::DoesNeedToWaitForGroundToLoad ( )
+{
+    if ( !g_pGame->IsASyncLoadingEnabled ( ) )
+        return false;
+
+    // Let CClientPed handle it if our driver is the local player
+    if ( m_pDriver == g_pClientGame->GetLocalPlayer ( ) )
+        return false;
+
+    // If we're in water we won't need to wait for the ground to load
+    if ( m_LastSyncedData != NULL && m_LastSyncedData->bIsInWater == true )
+        return false;
+
+    // Check for MTA objects around our position
+    CVector vecPosition;
+    GetPosition ( vecPosition );
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ( );
+    
+    return !pObjectManager->ObjectsAroundPointLoaded ( vecPosition, 50.0f, m_usDimension );
 }
