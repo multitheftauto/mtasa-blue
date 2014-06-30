@@ -187,27 +187,27 @@ void PostContextSwitch ( void )
     MemPutFast < BYTE > ( 0x50230C, 0x1 );
 
     // Re-Enable 0x5022C9 - PlayerAboutToExitVehicleAsDriver
-    MemPut < BYTE > ( 0x5022C9, 0xE8 );
-    MemPut < BYTE > ( 0x5022CA, 0xD2 );
-    MemPut < BYTE > ( 0x5022CB, 0x38 );
-    MemPut < BYTE > ( 0x5022CC, 0xFF );
-    MemPut < BYTE > ( 0x5022CD, 0xFF );
+    MemPutFast < BYTE > ( 0x5022C9, 0xE8 );
+    MemPutFast < BYTE > ( 0x5022CA, 0xD2 );
+    MemPutFast < BYTE > ( 0x5022CB, 0x38 );
+    MemPutFast < BYTE > ( 0x5022CC, 0xFF );
+    MemPutFast < BYTE > ( 0x5022CD, 0xFF );
 
     // Re-Enable 0x5022ED - JustWreckedVehicle
-    MemPut < BYTE > ( 0x5022ED, 0xE8 );
-    MemPut < BYTE > ( 0x5022EE, 0xBE );
-    MemPut < BYTE > ( 0x5022EF, 0xAD );
-    MemPut < BYTE > ( 0x5022F0, 0xFF );
-    MemPut < BYTE > ( 0x5022F1, 0xFF );
+    MemPutFast < BYTE > ( 0x5022ED, 0xE8 );
+    MemPutFast < BYTE > ( 0x5022EE, 0xBE );
+    MemPutFast < BYTE > ( 0x5022EF, 0xAD );
+    MemPutFast < BYTE > ( 0x5022F0, 0xFF );
+    MemPutFast < BYTE > ( 0x5022F1, 0xFF );
 
     // Re-Enable 0x4EB9A0 - CAERadioTrackManager::Service
-    MemPut < BYTE > ( 0x4EB9A0, 0x55 ); 
+    MemPutFast < BYTE > ( 0x4EB9A0, 0x55 ); 
 
     // Fix our JNZ/JZ's - these are inverted such that is player is considered false
-    MemPut < BYTE > ( 0x6420F8, 0x75 );
-    MemPut < BYTE > ( 0x648A2A, 0x75 );
-    MemPut < BYTE > ( 0x64CA98, 0x74 );
-    MemPut < BYTE > ( 0x5022C5, 0x75 );
+    MemPutFast < BYTE > ( 0x6420F8, 0x75 );
+    MemPutFast < BYTE > ( 0x648A2A, 0x75 );
+    MemPutFast < BYTE > ( 0x64CA98, 0x74 );
+    MemPutFast < BYTE > ( 0x5022C5, 0x75 );
 
     /*
     // ChrML: Force as high stats as we can go before screwing up. Players can't have different
@@ -444,27 +444,27 @@ void SwitchContext ( CPed* thePed )
                     MemPutFast < BYTE > ( 0x50230C, 0x0 );
 
                     // Disable 0x5022C9 - PlayerAboutToExitVehicleAsDriver
-                    MemPut < BYTE > ( 0x5022C9, 0x90 );
-                    MemPut < BYTE > ( 0x5022CA, 0x90 );
-                    MemPut < BYTE > ( 0x5022CB, 0x90 );
-                    MemPut < BYTE > ( 0x5022CC, 0x90 );
-                    MemPut < BYTE > ( 0x5022CD, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022C9, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022CA, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022CB, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022CC, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022CD, 0x90 );
 
                     // Disable 0x5022ED - JustWreckedVehicle
-                    MemPut < BYTE > ( 0x5022ED, 0x90 );
-                    MemPut < BYTE > ( 0x5022EE, 0x90 );
-                    MemPut < BYTE > ( 0x5022EF, 0x90 );
-                    MemPut < BYTE > ( 0x5022F0, 0x90 );
-                    MemPut < BYTE > ( 0x5022F1, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022ED, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022EE, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022EF, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022F0, 0x90 );
+                    MemPutFast < BYTE > ( 0x5022F1, 0x90 );
                     
                     // Disable 0x4EB9A0 - CAERadioTrackManager::Service
-                    MemPut < BYTE > ( 0x4EB9A0, 0xC2 );
+                    MemPutFast < BYTE > ( 0x4EB9A0, 0xC2 );
                     
                     // Invert some JNZ/JZ's - these are inverted such that is player is considered false
-                    MemPut < BYTE > ( 0x6420F8, 0x74 );
-                    MemPut < BYTE > ( 0x648A2A, 0x74 );
-                    MemPut < BYTE > ( 0x64CA98, 0x75 );
-                    MemPut < BYTE > ( 0x5022C5, 0x74 );
+                    MemPutFast < BYTE > ( 0x6420F8, 0x74 );
+                    MemPutFast < BYTE > ( 0x648A2A, 0x74 );
+                    MemPutFast < BYTE > ( 0x64CA98, 0x75 );
+                    MemPutFast < BYTE > ( 0x5022C5, 0x74 );
 
                     CPedSA* thePedSA = dynamic_cast < CPedSA* > ( thePed );
                     if ( thePedSA )
