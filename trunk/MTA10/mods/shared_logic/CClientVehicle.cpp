@@ -2527,14 +2527,12 @@ void CClientVehicle::Create ( void )
         // Add XRef
         g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pVehicle );
 
-#if 0
         // if we are not in water we should probably do some ground checks
         if ( m_LastSyncedData != NULL && m_LastSyncedData->bIsInWater == false )
         {
             // waiting for ground to load
             SetFrozenWaitingForGroundToLoad ( true );
         }
-#endif
 
         // Jump straight to the target position if we have one
         if ( HasTargetPosition () )
