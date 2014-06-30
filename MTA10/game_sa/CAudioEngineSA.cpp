@@ -63,7 +63,7 @@ VOID CAudioEngineSA::StopRadio()
     }
 }
 
-VOID CAudioEngineSA::RetuneRadio(unsigned char ucStation)
+void CAudioEngineSA::RetuneRadio ( unsigned char ucStation )
 {
     m_ucRadioChannel = ucStation;
     m_bRadioOn = true;
@@ -76,7 +76,7 @@ VOID CAudioEngineSA::RetuneRadio(unsigned char ucStation)
     pGame->GetAERadioTrackManager ( )->RetuneRadio ( ucStation );
 }
 
-VOID CAudioEngineSA::StartRadio ( unsigned char ucStation )
+void CAudioEngineSA::StartRadio ( unsigned char ucStation )
 {
     m_ucRadioChannel = ucStation;
     m_bRadioOn = true;
@@ -87,6 +87,11 @@ VOID CAudioEngineSA::StartRadio ( unsigned char ucStation )
         return;
     
     pGame->GetAERadioTrackManager ( )->StartRadio ( ucStation );
+}
+
+bool CAudioEngineSA::IsVehicleRadioActive ( )
+{
+    return pGame->GetAERadioTrackManager ( )->IsVehicleRadioActive ( );
 }
 
 // 43 = race one
