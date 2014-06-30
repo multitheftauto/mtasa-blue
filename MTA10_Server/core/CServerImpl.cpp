@@ -209,7 +209,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
     {
         // Init our crashhandler if not being run within the client
         // (and enabled for Linux)
-        CCrashHandler::Init ();
+        CCrashHandler::Init ( m_strServerPath );
     }
 
 #ifndef WIN32
