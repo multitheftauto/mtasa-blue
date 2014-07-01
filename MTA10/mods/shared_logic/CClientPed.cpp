@@ -4386,6 +4386,7 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
             CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat, ucDoor );
         }
     }
+    g_pGame->GetAudioEngine ( )->RetuneRadio ( m_ucRadioChannel );
 }
 
 
