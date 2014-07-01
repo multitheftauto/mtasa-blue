@@ -102,6 +102,7 @@ public:
     void                        SetObjectBreakHandler       ( ObjectBreakHandler * pHandler );
     void                        SetWaterCannonHitHandler    ( WaterCannonHitHandler * pHandler );
     void                        SetVehicleFellThroughMapHandler ( VehicleFellThroughMapHandler * pHandler );
+    void                        SetRadioStateChangedHandler     ( RadioStateChangedHandler * pHandler );
     void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler );
     void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler );
     void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler );
