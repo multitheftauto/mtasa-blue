@@ -151,11 +151,21 @@ void CClientProjectile::Initiate ( CVector& vecPosition, CVector& vecRotation, C
     // Store our initiation data
     m_pInitiateData = new CProjectileInitiateData;
     m_pInitiateData->pvecPosition = new CVector ( vecPosition );
-    m_pInitiateData->pvecRotation = new CVector ( vecRotation );
+
+    if ( vecRotation != CVector ( 0, 0, 0 ) )
+    {
+        m_pInitiateData->pvecRotation = new CVector ( vecRotation );
+    }
+    else
+    {
+        m_pInitiateData->pvecRotation = NULL;
+    }
+
     if ( vecVelocity != CVector(0,0,0) ) 
         m_pInitiateData->pvecVelocity = new CVector ( vecVelocity );
     else 
         m_pInitiateData->pvecVelocity = NULL;
+
     m_pInitiateData->usModel = usModel;
 }
 
