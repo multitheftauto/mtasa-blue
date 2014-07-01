@@ -25,29 +25,28 @@ int CLuaFunctionDefs::GetVehicleType ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
 
     unsigned long ucModel = 0;
+
     if ( argStream.NextIsUserData ( ) )
     {
         argStream.ReadUserData ( pVehicle );
-        if ( pVehicle )
-            ucModel = pVehicle -> GetModel ( );
+
+        if ( !argStream.HasErrors () )
+            ucModel = pVehicle->GetModel ();
     }
-    else if ( argStream.NextIsNumber ( ) )
+    else
     {
         argStream.ReadNumber ( ucModel );
     }
-    else
-    {
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-    }
-    if ( ucModel >= 400 && ucModel <= 611 )
-    {
-        lua_pushstring ( luaVM, CVehicleNames::GetVehicleTypeName ( ucModel ) );
-    }
-    else
-    {
-        lua_pushboolean ( luaVM, false );
-    }
 
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushstring ( luaVM, CVehicleNames::GetVehicleTypeName ( ucModel ) ); // Range check will be done by GetVehicleTypeName
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
@@ -59,20 +58,15 @@ int CLuaFunctionDefs::IsVehicleTaxiLightOn ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        if ( pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420 )
         {
-            if ( pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420 )
+            bool bLightState = pVehicle->IsTaxiLightOn ();
+            if ( bLightState )
             {
-                bool bLightState = pVehicle->IsTaxiLightOn ();
-                if ( bLightState )
-                {
-                    lua_pushboolean ( luaVM, bLightState );
-                    return 1;
-                }
+                lua_pushboolean ( luaVM, bLightState );
+                return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -91,17 +85,12 @@ int CLuaFunctionDefs::SetVehicleTaxiLightOn ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        if ( pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420 )
         {
-            if ( pVehicle->GetModel() == 438 || pVehicle->GetModel() == 420 )
-            {
-                pVehicle->SetTaxiLightOn ( bLightState );
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            pVehicle->SetTaxiLightOn ( bLightState );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -119,19 +108,14 @@ int CLuaFunctionDefs::GetVehicleVariant ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        unsigned char ucVariant = -1;
+        unsigned char ucVariant2 = -1;
+        if ( CStaticFunctionDefinitions::GetVehicleVariant ( pVehicle, ucVariant, ucVariant2 ) )
         {
-            unsigned char ucVariant = -1;
-            unsigned char ucVariant2 = -1;
-            if ( CStaticFunctionDefinitions::GetVehicleVariant ( pVehicle, ucVariant, ucVariant2 ) )
-            {
-                lua_pushnumber ( luaVM, ucVariant );
-                lua_pushnumber ( luaVM, ucVariant2 );
-                return 2;
-            }
+            lua_pushnumber ( luaVM, ucVariant );
+            lua_pushnumber ( luaVM, ucVariant2 );
+            return 2;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -220,19 +204,14 @@ int CLuaFunctionDefs::GetVehicleLandingGearDown ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        // Does the vehicle have landing gears?
+        if ( CClientVehicleManager::HasLandingGears ( pVehicle->GetModel () ) )
         {
-            // Does the vehicle have landing gears?
-            if ( CClientVehicleManager::HasLandingGears ( pVehicle->GetModel () ) )
-            {
-                // Return whether it has landing gears or not
-                bool bLandingGear = pVehicle->IsLandingGearDown ();
-                lua_pushboolean ( luaVM, bLandingGear );
-                return 1;
-            }
+            // Return whether it has landing gears or not
+            bool bLandingGear = pVehicle->IsLandingGearDown ();
+            lua_pushboolean ( luaVM, bLandingGear );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -248,51 +227,28 @@ int CLuaFunctionDefs::GetVehicleMaxPassengers ( lua_State* luaVM )
     unsigned short usModel = 0;
     CScriptArgReader argStream ( luaVM );
 
-    if ( argStream.NextIsUserData ( ) )
+    if ( argStream.NextIsUserData () )
     {
         argStream.ReadUserData ( pVehicle );
 
-        if ( pVehicle )
-        {
-            usModel = pVehicle->GetModel();
-        }
-        else
-        {
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-
-        if ( !CClientVehicleManager::IsValidModel ( usModel ) )
-        {
-            m_pScriptDebugging->LogBadType ( luaVM );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-
-        unsigned int uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( usModel );
-        if ( uiMaxPassengers != 0xFF )
-        {
-            lua_pushnumber ( luaVM, uiMaxPassengers );
-            return 1;
-        }
+        if ( !argStream.HasErrors () )
+            usModel = pVehicle->GetModel ();
     }
-    else if ( argStream.NextIsNumber ( ) )
+    else
     {
         argStream.ReadNumber ( usModel );
+    }
 
-        if ( !CClientVehicleManager::IsValidModel ( usModel ) )
+    if ( !argStream.HasErrors () )
+    {
+        if ( CClientVehicleManager::IsValidModel ( usModel ) )
         {
-            m_pScriptDebugging->LogBadType ( luaVM );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-        
-        unsigned int uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( usModel );
-        if ( uiMaxPassengers != 0xFF )
-        {
-            lua_pushnumber ( luaVM, uiMaxPassengers );
-            return 1;
+            unsigned int uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( usModel );
+            if ( uiMaxPassengers != 0xFF )
+            {
+                lua_pushnumber ( luaVM, uiMaxPassengers );
+                return 1;
+            }
         }
     }
     else
@@ -313,17 +269,12 @@ int CLuaFunctionDefs::GetVehicleOccupant ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        CClientPed* pPed = pVehicle->GetOccupant ( uiSeat );
+        if ( pPed )
         {
-            CClientPed* pPed = pVehicle->GetOccupant ( uiSeat );
-            if ( pPed )
-            {
-                lua_pushelement ( luaVM, pPed );
-                return 1;
-            }
+            lua_pushelement ( luaVM, pPed );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -340,36 +291,31 @@ int CLuaFunctionDefs::GetVehicleOccupants ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        // Create a new table
+        lua_newtable ( luaVM );
+
+        // Get the maximum amount of passengers
+        unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( pVehicle->GetModel ( ) );
+
+        // Make sure that if the vehicle doesn't have any seats, the function returns false
+        if ( ucMaxPassengers == 255 )
         {
-            // Create a new table
-            lua_newtable ( luaVM );
-
-            // Get the maximum amount of passengers
-            unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount ( pVehicle->GetModel ( ) );
-
-            // Make sure that if the vehicle doesn't have any seats, the function returns false
-            if ( ucMaxPassengers == 255 )
-            {
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
-
-            // Add All Occupants
-            for ( unsigned char ucSeat = 0; ucSeat <= ucMaxPassengers; ++ ucSeat )
-            {
-                CClientPed* pPed = pVehicle->GetOccupant ( ucSeat );
-                if ( pPed )
-                {
-                    lua_pushnumber ( luaVM, ucSeat );
-                    lua_pushelement ( luaVM, pPed );
-                    lua_settable ( luaVM, -3 );
-                }
-            }
+            lua_pushboolean ( luaVM, false );
             return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+
+        // Add All Occupants
+        for ( unsigned char ucSeat = 0; ucSeat <= ucMaxPassengers; ++ ucSeat )
+        {
+            CClientPed* pPed = pVehicle->GetOccupant ( ucSeat );
+            if ( pPed )
+            {
+                lua_pushnumber ( luaVM, ucSeat );
+                lua_pushelement ( luaVM, pPed );
+                lua_settable ( luaVM, -3 );
+            }
+        }
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -387,17 +333,12 @@ int CLuaFunctionDefs::GetVehicleController ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        CClientPed* pPed = pVehicle->GetControllingPlayer ();
+        if ( pPed )
         {
-            CClientPed* pPed = pVehicle->GetControllingPlayer ();
-            if ( pPed )
-            {
-                lua_pushelement ( luaVM, pPed );
-                return 1;
-            }
+            lua_pushelement ( luaVM, pPed );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -415,19 +356,14 @@ int CLuaFunctionDefs::GetVehicleSirensOn ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        // Does the vehicle have Sirens?
+        if ( CClientVehicleManager::HasSirens ( pVehicle->GetModel () ) || pVehicle->DoesVehicleHaveSirens ( ) )
         {
-            // Does the vehicle have Sirens?
-            if ( CClientVehicleManager::HasSirens ( pVehicle->GetModel () ) || pVehicle->DoesVehicleHaveSirens ( ) )
-            {
-                // Return whether it has its Sirens on or not
-                bool bSirensOn = pVehicle->IsSirenOrAlarmActive ();
-                lua_pushboolean ( luaVM, bSirensOn );
-                return 1;
-            }
+            // Return whether it has its Sirens on or not
+            bool bSirensOn = pVehicle->IsSirenOrAlarmActive ();
+            lua_pushboolean ( luaVM, bSirensOn );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -445,18 +381,13 @@ int CLuaFunctionDefs::GetVehicleTurnVelocity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            CVector vecTurnVelocity;
-            pVehicle->GetTurnSpeed ( vecTurnVelocity );
+        CVector vecTurnVelocity;
+        pVehicle->GetTurnSpeed ( vecTurnVelocity );
 
-            lua_pushnumber ( luaVM, vecTurnVelocity.fX );
-            lua_pushnumber ( luaVM, vecTurnVelocity.fY );
-            lua_pushnumber ( luaVM, vecTurnVelocity.fZ );
-            return 3;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        lua_pushnumber ( luaVM, vecTurnVelocity.fX );
+        lua_pushnumber ( luaVM, vecTurnVelocity.fY );
+        lua_pushnumber ( luaVM, vecTurnVelocity.fZ );
+        return 3;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -474,17 +405,12 @@ int CLuaFunctionDefs::GetVehicleTurretPosition ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            CVector2D vecPosition;
-            pVehicle->GetTurretRotation ( vecPosition.fX, vecPosition.fY );
+        CVector2D vecPosition;
+        pVehicle->GetTurretRotation ( vecPosition.fX, vecPosition.fY );
 
-            lua_pushnumber ( luaVM, vecPosition.fX );
-            lua_pushnumber ( luaVM, vecPosition.fY );
-            return 2;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        lua_pushnumber ( luaVM, vecPosition.fX );
+        lua_pushnumber ( luaVM, vecPosition.fY );
+        return 2;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -502,14 +428,9 @@ int CLuaFunctionDefs::IsVehicleLocked ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            bool bLocked = pVehicle->AreDoorsLocked ();
-            lua_pushboolean ( luaVM, bLocked );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        bool bLocked = pVehicle->AreDoorsLocked ();
+        lua_pushboolean ( luaVM, bLocked );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -529,18 +450,13 @@ int CLuaFunctionDefs::GetVehicleUpgradeOnSlot ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
+        if ( pUpgrades )
         {
-            CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
-            if ( pUpgrades )
-            {
-                unsigned short usUpgrade = pUpgrades->GetSlotState ( ucSlot );
-                lua_pushnumber ( luaVM, usUpgrade );
-                return 1;
-            }
+            unsigned short usUpgrade = pUpgrades->GetSlotState ( ucSlot );
+            lua_pushnumber ( luaVM, usUpgrade );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -558,35 +474,29 @@ int CLuaFunctionDefs::GetVehicleUpgrades ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        // If the vehicle is valid
-        if ( pVehicle )
+        CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
+        if ( pUpgrades )
         {
-            CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
-            if ( pUpgrades )
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            // Add all the upgrades to the table
+            const SSlotStates& usSlotStates = pUpgrades->GetSlotStates ();
+
+            unsigned int uiIndex = 0;
+            unsigned char ucSlot = 0;
+            for ( ; ucSlot < VEHICLE_UPGRADE_SLOTS ; ucSlot++ )
             {
-                // Create a new table
-                lua_newtable ( luaVM );
-
-                // Add all the upgrades to the table
-                const SSlotStates& usSlotStates = pUpgrades->GetSlotStates ();
-
-                unsigned int uiIndex = 0;
-                unsigned char ucSlot = 0;
-                for ( ; ucSlot < VEHICLE_UPGRADE_SLOTS ; ucSlot++ )
+                if ( usSlotStates [ucSlot] != 0 )
                 {
-                    if ( usSlotStates [ucSlot] != 0 )
-                    {
-                        lua_pushnumber ( luaVM, ++uiIndex );
-                        lua_pushnumber ( luaVM, usSlotStates [ ucSlot ] );
-                        lua_settable ( luaVM, -3 );
-                    }
+                    lua_pushnumber ( luaVM, ++uiIndex );
+                    lua_pushnumber ( luaVM, usSlotStates [ ucSlot ] );
+                    lua_settable ( luaVM, -3 );
                 }
-
-                return 1;
             }
+
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -644,40 +554,35 @@ int CLuaFunctionDefs::GetVehicleCompatibleUpgrades ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
+        if ( pUpgrades )
         {
-            CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades ();
-            if ( pUpgrades )
+            // Create a new table
+            lua_newtable ( luaVM );
+
+            unsigned int uiIndex = 0;
+            for ( unsigned short usUpgrade = 1000 ; usUpgrade <= 1193 ; usUpgrade++ )
             {
-                // Create a new table
-                lua_newtable ( luaVM );
-
-                unsigned int uiIndex = 0;
-                for ( unsigned short usUpgrade = 1000 ; usUpgrade <= 1193 ; usUpgrade++ )
+                if ( pUpgrades->IsUpgradeCompatible ( usUpgrade ) )
                 {
-                    if ( pUpgrades->IsUpgradeCompatible ( usUpgrade ) )
+                    if ( ucSlot != 0xFF )
                     {
-                        if ( ucSlot != 0xFF )
-                        {
-                            unsigned char ucUpgradeSlot;
-                            if ( !pUpgrades->GetSlotFromUpgrade ( usUpgrade, ucUpgradeSlot ) )
-                                continue;
+                        unsigned char ucUpgradeSlot;
+                        if ( !pUpgrades->GetSlotFromUpgrade ( usUpgrade, ucUpgradeSlot ) )
+                            continue;
 
-                            if ( ucUpgradeSlot != ucSlot )
-                                continue;
-                        }
-
-                        // Add this one to a list                        
-                        lua_pushnumber ( luaVM, ++uiIndex );
-                        lua_pushnumber ( luaVM, usUpgrade );
-                        lua_settable ( luaVM, -3 );
+                        if ( ucUpgradeSlot != ucSlot )
+                            continue;
                     }
+
+                    // Add this one to a list                        
+                    lua_pushnumber ( luaVM, ++uiIndex );
+                    lua_pushnumber ( luaVM, usUpgrade );
+                    lua_settable ( luaVM, -3 );
                 }
-                return 1;
             }
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -695,21 +600,16 @@ int CLuaFunctionDefs::GetVehicleWheelStates ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            unsigned char ucFrontLeft = pVehicle->GetWheelStatus ( FRONT_LEFT_WHEEL );
-            unsigned char ucRearLeft = pVehicle->GetWheelStatus ( REAR_LEFT_WHEEL );
-            unsigned char ucFrontRight = pVehicle->GetWheelStatus ( FRONT_RIGHT_WHEEL );
-            unsigned char ucRearRight = pVehicle->GetWheelStatus ( REAR_RIGHT_WHEEL );
+        unsigned char ucFrontLeft = pVehicle->GetWheelStatus ( FRONT_LEFT_WHEEL );
+        unsigned char ucRearLeft = pVehicle->GetWheelStatus ( REAR_LEFT_WHEEL );
+        unsigned char ucFrontRight = pVehicle->GetWheelStatus ( FRONT_RIGHT_WHEEL );
+        unsigned char ucRearRight = pVehicle->GetWheelStatus ( REAR_RIGHT_WHEEL );
 
-            lua_pushnumber ( luaVM, ucFrontLeft );
-            lua_pushnumber ( luaVM, ucRearLeft );
-            lua_pushnumber ( luaVM, ucFrontRight );
-            lua_pushnumber ( luaVM, ucRearRight );
-            return 4;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        lua_pushnumber ( luaVM, ucFrontLeft );
+        lua_pushnumber ( luaVM, ucRearLeft );
+        lua_pushnumber ( luaVM, ucFrontRight );
+        lua_pushnumber ( luaVM, ucRearRight );
+        return 4;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -729,14 +629,9 @@ int CLuaFunctionDefs::GetVehicleDoorState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            unsigned char ucState = pVehicle->GetDoorStatus ( ucDoor );
-            lua_pushnumber ( luaVM, ucState );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        unsigned char ucState = pVehicle->GetDoorStatus ( ucDoor );
+        lua_pushnumber ( luaVM, ucState );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -756,14 +651,9 @@ int CLuaFunctionDefs::GetVehicleLightState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            unsigned char ucState = pVehicle->GetLightStatus ( ucLight );
-            lua_pushnumber ( luaVM, ucState );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        unsigned char ucState = pVehicle->GetLightStatus ( ucLight );
+        lua_pushnumber ( luaVM, ucState );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -783,14 +673,9 @@ int CLuaFunctionDefs::GetVehiclePanelState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            unsigned char ucState = pVehicle->GetPanelStatus ( ucPanel );
-            lua_pushnumber ( luaVM, ucState );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        unsigned char ucState = pVehicle->GetPanelStatus ( ucPanel );
+        lua_pushnumber ( luaVM, ucState );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -808,14 +693,9 @@ int CLuaFunctionDefs::GetVehicleOverrideLights ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            unsigned char ucLights = pVehicle->GetOverrideLights ();
-            lua_pushnumber ( luaVM, ucLights );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        unsigned char ucLights = pVehicle->GetOverrideLights ();
+        lua_pushnumber ( luaVM, ucLights );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -833,22 +713,17 @@ int CLuaFunctionDefs::GetVehicleTowedByVehicle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            CClientVehicle* pTowedVehicle;
-            if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
-                pTowedVehicle = pVehicle->GetNextTrainCarriage ();
-            else
-                pTowedVehicle = pVehicle->GetTowedVehicle ();
-
-            if ( pTowedVehicle )
-            {
-                lua_pushelement ( luaVM, pTowedVehicle );
-                return 1;
-            }
-        }
+        CClientVehicle* pTowedVehicle;
+        if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+            pTowedVehicle = pVehicle->GetNextTrainCarriage ();
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            pTowedVehicle = pVehicle->GetTowedVehicle ();
+
+        if ( pTowedVehicle )
+        {
+            lua_pushelement ( luaVM, pTowedVehicle );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -866,22 +741,17 @@ int CLuaFunctionDefs::GetVehicleTowingVehicle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            CClientVehicle* pTowedByVehicle;
-            if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
-                pTowedByVehicle = pVehicle->GetPreviousTrainCarriage ();
-            else
-                pTowedByVehicle = pVehicle->GetTowedByVehicle ();
-
-            if ( pTowedByVehicle )
-            {
-                lua_pushelement ( luaVM, pTowedByVehicle );
-                return 1;
-            }
-        }
+        CClientVehicle* pTowedByVehicle;
+        if ( pVehicle->GetVehicleType () == CLIENTVEHICLE_TRAIN )
+            pTowedByVehicle = pVehicle->GetPreviousTrainCarriage ();
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            pTowedByVehicle = pVehicle->GetTowedByVehicle ();
+
+        if ( pTowedByVehicle )
+        {
+            lua_pushelement ( luaVM, pTowedByVehicle );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -899,14 +769,9 @@ int CLuaFunctionDefs::GetVehiclePaintjob ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            unsigned char ucPaintjob = pVehicle->GetPaintjob ();
-            lua_pushnumber ( luaVM, ucPaintjob );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        unsigned char ucPaintjob = pVehicle->GetPaintjob ();
+        lua_pushnumber ( luaVM, ucPaintjob );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -924,19 +789,12 @@ int CLuaFunctionDefs::GetVehiclePlateText ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        const char* szRegPlate = pVehicle->GetRegPlate ();
+        if ( szRegPlate )
         {
-            const char* szRegPlate = pVehicle->GetRegPlate ();
-            if ( szRegPlate )
-            {
-                lua_pushstring ( luaVM, szRegPlate );
-                return 1;
-            }
-
-            return false;
+            lua_pushstring ( luaVM, szRegPlate );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -954,17 +812,12 @@ int CLuaFunctionDefs::IsVehicleDamageProof ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        bool bDamageProof;
+        if ( CStaticFunctionDefinitions::IsVehicleDamageProof ( *pVehicle, bDamageProof ) )
         {
-            bool bDamageProof;
-            if ( CStaticFunctionDefinitions::IsVehicleDamageProof ( *pVehicle, bDamageProof ) )
-            {
-                lua_pushboolean ( luaVM, bDamageProof );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bDamageProof );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -982,14 +835,9 @@ int CLuaFunctionDefs::IsVehicleFuelTankExplodable ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            bool bExplodable = pVehicle->GetCanShootPetrolTank ();
-            lua_pushboolean ( luaVM, bExplodable );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        bool bExplodable = pVehicle->GetCanShootPetrolTank ();
+        lua_pushboolean ( luaVM, bExplodable );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1007,14 +855,9 @@ int CLuaFunctionDefs::IsVehicleFrozen ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            bool bFrozen = pVehicle->IsFrozen ();
-            lua_pushboolean ( luaVM, bFrozen );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        bool bFrozen = pVehicle->IsFrozen ();
+        lua_pushboolean ( luaVM, bFrozen );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1032,14 +875,9 @@ int CLuaFunctionDefs::IsVehicleOnGround ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            bool bOnGround = pVehicle->IsOnGround ();
-            lua_pushboolean ( luaVM, bOnGround );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        bool bOnGround = pVehicle->IsOnGround ();
+        lua_pushboolean ( luaVM, bOnGround );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1057,17 +895,12 @@ int CLuaFunctionDefs::GetVehicleName ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        const char* szVehicleName = CVehicleNames::GetVehicleName ( pVehicle->GetModel () );
+        if ( szVehicleName )
         {
-            const char* szVehicleName = CVehicleNames::GetVehicleName ( pVehicle->GetModel () );
-            if ( szVehicleName )
-            {
-                lua_pushstring ( luaVM, szVehicleName );
-                return 1;
-            }
+            lua_pushstring ( luaVM, szVehicleName );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1085,17 +918,12 @@ int CLuaFunctionDefs::GetVehicleAdjustableProperty ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        if ( pVehicle->HasAdjustableProperty () )
         {
-            if ( pVehicle->HasAdjustableProperty () )
-            {
-                unsigned short usAdjustableProperty = pVehicle->GetAdjustablePropertyValue ();
-                lua_pushnumber ( luaVM, usAdjustableProperty );
-                return 1;
-            }
+            unsigned short usAdjustableProperty = pVehicle->GetAdjustablePropertyValue ();
+            lua_pushnumber ( luaVM, usAdjustableProperty );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1113,17 +941,12 @@ int CLuaFunctionDefs::GetHelicopterRotorSpeed ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        float fSpeed;
+        if ( CStaticFunctionDefinitions::GetHelicopterRotorSpeed ( *pVehicle, fSpeed ) )
         {
-            float fSpeed;
-            if ( CStaticFunctionDefinitions::GetHelicopterRotorSpeed ( *pVehicle, fSpeed ) )
-            {
-                lua_pushnumber ( luaVM, fSpeed );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, fSpeed );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1141,17 +964,12 @@ int CLuaFunctionDefs::IsTrainDerailed ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        bool bDerailed;
+        if ( CStaticFunctionDefinitions::IsTrainDerailed ( *pVehicle, bDerailed ) )
         {
-            bool bDerailed;
-            if ( CStaticFunctionDefinitions::IsTrainDerailed ( *pVehicle, bDerailed ) )
-            {
-                lua_pushboolean ( luaVM, bDerailed );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bDerailed );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1168,17 +986,12 @@ int CLuaFunctionDefs::IsTrainDerailable ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        bool bIsDerailable;
+        if ( CStaticFunctionDefinitions::IsTrainDerailable ( *pVehicle, bIsDerailable ) )
         {
-            bool bIsDerailable;
-            if ( CStaticFunctionDefinitions::IsTrainDerailable ( *pVehicle, bIsDerailable ) )
-            {
-                lua_pushboolean ( luaVM, bIsDerailable );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bIsDerailable );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1195,17 +1008,12 @@ int CLuaFunctionDefs::GetTrainDirection ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        bool bDirection;
+        if ( CStaticFunctionDefinitions::GetTrainDirection ( *pVehicle, bDirection ) )
         {
-            bool bDirection;
-            if ( CStaticFunctionDefinitions::GetTrainDirection ( *pVehicle, bDirection ) )
-            {
-                lua_pushboolean ( luaVM, bDirection );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bDirection );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1223,17 +1031,12 @@ int CLuaFunctionDefs::GetTrainSpeed ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        float fSpeed;
+        if ( CStaticFunctionDefinitions::GetTrainSpeed ( *pVehicle, fSpeed ) )
         {
-            float fSpeed;
-            if ( CStaticFunctionDefinitions::GetTrainSpeed ( *pVehicle, fSpeed ) )
-            {
-                lua_pushnumber ( luaVM, fSpeed );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, fSpeed );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1273,17 +1076,12 @@ int CLuaFunctionDefs::GetVehicleEngineState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        bool bState;
+        if ( CStaticFunctionDefinitions::GetVehicleEngineState ( *pVehicle, bState ) )
         {
-            bool bState;
-            if ( CStaticFunctionDefinitions::GetVehicleEngineState ( *pVehicle, bState ) )
-            {
-                lua_pushboolean ( luaVM, bState );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bState );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1374,16 +1172,11 @@ int CLuaFunctionDefs::FixVehicle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::FixVehicle ( *pEntity ) )
         {
-            if ( CStaticFunctionDefinitions::FixVehicle ( *pEntity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1401,16 +1194,11 @@ int CLuaFunctionDefs::BlowVehicle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::BlowVehicle ( *pEntity ) )
         {
-            if ( CStaticFunctionDefinitions::BlowVehicle ( *pEntity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1427,17 +1215,12 @@ int CLuaFunctionDefs::IsVehicleBlown ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle ) 
+        bool bBlown;
+        if ( CStaticFunctionDefinitions::IsVehicleBlown ( *pVehicle, bBlown ) ) 
         {
-            bool bBlown;
-            if ( CStaticFunctionDefinitions::IsVehicleBlown ( *pVehicle, bBlown ) ) 
-            {
-                lua_pushboolean ( luaVM, bBlown );
-                return 1;
-            }
-        } 
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            lua_pushboolean ( luaVM, bBlown );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1454,19 +1237,14 @@ int CLuaFunctionDefs::GetVehicleHeadLightColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        SColor color;
+        if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( *pVehicle, color ) )
         {
-            SColor color;
-            if ( CStaticFunctionDefinitions::GetVehicleHeadLightColor ( *pVehicle, color ) )
-            {
-                lua_pushnumber ( luaVM, color.R );
-                lua_pushnumber ( luaVM, color.G );
-                lua_pushnumber ( luaVM, color.B );
-                return 3;
-            }
+            lua_pushnumber ( luaVM, color.R );
+            lua_pushnumber ( luaVM, color.G );
+            lua_pushnumber ( luaVM, color.B );
+            return 3;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1483,17 +1261,12 @@ int CLuaFunctionDefs::GetVehicleCurrentGear ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        unsigned short currentGear;
+        if ( CStaticFunctionDefinitions::GetVehicleCurrentGear ( *pVehicle, currentGear ) )
         {
-            unsigned short currentGear;
-            if ( CStaticFunctionDefinitions::GetVehicleCurrentGear ( *pVehicle, currentGear ) )
-            {
-                lua_pushnumber ( luaVM, currentGear );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, currentGear );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1513,16 +1286,11 @@ int CLuaFunctionDefs::SetVehicleTurnVelocity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleTurnVelocity ( *pEntity, vecTurnVelocity ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleTurnVelocity ( *pEntity, vecTurnVelocity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1554,32 +1322,27 @@ int CLuaFunctionDefs::SetVehicleColor ( lua_State* luaVM )
 
     if ( i == 3 || i == 4 || i == 6 || i == 9 || i == 12 )
     {
-        if ( pEntity )
+        CVehicleColor color;
+
+        if ( i == 4 )
         {
-            CVehicleColor color;
-
-            if ( i == 4 )
-            {
-                // 4 args mean palette colours
-                color.SetPaletteColors ( ucParams[0], ucParams[1], ucParams[2], ucParams[3] );
-            }
-            else
-            {
-                // 3,6,9 or 12 args mean rgb colours
-                color.SetRGBColors ( SColorRGBA ( ucParams[0], ucParams[1], ucParams[2], 0 ),
-                                     SColorRGBA ( ucParams[3], ucParams[4], ucParams[5], 0 ),
-                                     SColorRGBA ( ucParams[6], ucParams[7], ucParams[8], 0 ),
-                                     SColorRGBA ( ucParams[9], ucParams[10], ucParams[11], 0 ) );
-            }
-
-            if ( CStaticFunctionDefinitions::SetVehicleColor ( *pEntity, color ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            // 4 args mean palette colours
+            color.SetPaletteColors ( ucParams[0], ucParams[1], ucParams[2], ucParams[3] );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        {
+            // 3,6,9 or 12 args mean rgb colours
+            color.SetRGBColors ( SColorRGBA ( ucParams[0], ucParams[1], ucParams[2], 0 ),
+                                    SColorRGBA ( ucParams[3], ucParams[4], ucParams[5], 0 ),
+                                    SColorRGBA ( ucParams[6], ucParams[7], ucParams[8], 0 ),
+                                    SColorRGBA ( ucParams[9], ucParams[10], ucParams[11], 0 ) );
+        }
+
+        if ( CStaticFunctionDefinitions::SetVehicleColor ( *pEntity, color ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1599,23 +1362,18 @@ int CLuaFunctionDefs::SetVehicleLandingGearDown ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        if ( CClientVehicleManager::HasLandingGears ( pVehicle->GetModel () ) )
         {
-            if ( CClientVehicleManager::HasLandingGears ( pVehicle->GetModel () ) )
-            {
-                // Do it
-                if ( CStaticFunctionDefinitions::SetVehicleLandingGearDown ( *pVehicle, bLandingGearDown ) )
-                    lua_pushboolean ( luaVM, true );
-                else
-                    lua_pushboolean ( luaVM, false );
-            }
+            // Do it
+            if ( CStaticFunctionDefinitions::SetVehicleLandingGearDown ( *pVehicle, bLandingGearDown ) )
+                lua_pushboolean ( luaVM, true );
             else
                 lua_pushboolean ( luaVM, false );
-
-            return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            lua_pushboolean ( luaVM, false );
+
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1635,16 +1393,11 @@ int CLuaFunctionDefs::SetVehicleLocked ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleLocked ( *pEntity, bLocked ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleLocked ( *pEntity, bLocked ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1664,16 +1417,11 @@ int CLuaFunctionDefs::SetVehicleDoorsUndamageable ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleDoorsUndamageable ( *pEntity, bDoorsUndamageable ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleDoorsUndamageable ( *pEntity, bDoorsUndamageable ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1722,40 +1470,32 @@ int CLuaFunctionDefs::AddVehicleUpgrade ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( argStream.NextIsString ( ) )
         {
-            if ( argStream.NextIsString ( ) )
+            SString strUpgrade = "";
+            argStream.ReadString ( strUpgrade );
+            if ( strUpgrade == "all" )
             {
-                SString strUpgrade = "";
-                argStream.ReadString ( strUpgrade );
-                if ( strUpgrade.Contains ( "all" ) )
-                {
-                    if ( CStaticFunctionDefinitions::AddAllVehicleUpgrades ( *pEntity ) )
-                    {
-                        lua_pushboolean ( luaVM, true );
-                        return 1;
-                    }
-                }
-            }
-            else
-            {
-                argStream.ReadNumber ( usUpgrade );
-                if ( argStream.HasErrors ( ) ) 
-                {
-                    m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-                    lua_pushboolean ( luaVM, false );
-                    return 1;
-                }
-            }
-
-            if ( CStaticFunctionDefinitions::AddVehicleUpgrade ( *pEntity, usUpgrade ) )
-            {
-                lua_pushboolean ( luaVM, true );
+                lua_pushboolean ( luaVM, CStaticFunctionDefinitions::AddAllVehicleUpgrades ( *pEntity ) );
                 return 1;
             }
+            else
+                argStream.m_iIndex--;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            
+        argStream.ReadNumber ( usUpgrade );
+        if ( argStream.HasErrors ( ) ) 
+        {
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }            
+
+        if ( CStaticFunctionDefinitions::AddVehicleUpgrade ( *pEntity, usUpgrade ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1775,17 +1515,11 @@ int CLuaFunctionDefs::RemoveVehicleUpgrade ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::RemoveVehicleUpgrade ( *pEntity, usUpgrade ) )
         {
-            // Do it
-            if ( CStaticFunctionDefinitions::RemoveVehicleUpgrade ( *pEntity, usUpgrade ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1806,17 +1540,11 @@ int CLuaFunctionDefs::SetVehicleDoorState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleDoorState ( *pEntity, ucDoor, ucState ) )
         {
-            // Do it
-            if ( CStaticFunctionDefinitions::SetVehicleDoorState ( *pEntity, ucDoor, ucState ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1840,16 +1568,11 @@ int CLuaFunctionDefs::SetVehicleWheelStates ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleWheelStates ( *pEntity, iFrontLeft, iRearLeft, iFrontRight, iRearRight ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleWheelStates ( *pEntity, iFrontLeft, iRearLeft, iFrontRight, iRearRight ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1870,17 +1593,11 @@ int CLuaFunctionDefs::SetVehicleLightState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleLightState ( *pEntity, ucLight, ucState ) )
         {
-            // Do it
-            if ( CStaticFunctionDefinitions::SetVehicleLightState ( *pEntity, ucLight, ucState ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1901,17 +1618,11 @@ int CLuaFunctionDefs::SetVehiclePanelState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehiclePanelState ( *pEntity, ucPanel, ucState ) )
         {
-            // Do it
-            if ( CStaticFunctionDefinitions::SetVehiclePanelState ( *pEntity, ucPanel, ucState ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1931,19 +1642,14 @@ int CLuaFunctionDefs::SetVehicleOverrideLights ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( ucLights <= 2 )
         {
-            if ( ucLights <= 2 )
+            if ( CStaticFunctionDefinitions::SetVehicleOverrideLights ( *pEntity, ucLights ) )
             {
-                if ( CStaticFunctionDefinitions::SetVehicleOverrideLights ( *pEntity, ucLights ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -1964,21 +1670,11 @@ int CLuaFunctionDefs::AttachTrailerToVehicle ( lua_State* luaVM )
     
     if ( !argStream.HasErrors () )
     {
-        if ( pVehicle )
+        if ( CStaticFunctionDefinitions::AttachTrailerToVehicle ( *pVehicle, *pTrailer, vecRotationOffsetDegrees ) )
         {
-            if ( pTrailer )
-            {
-                if ( CStaticFunctionDefinitions::AttachTrailerToVehicle ( *pVehicle, *pTrailer, vecRotationOffsetDegrees ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "trailer", 2 );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1998,16 +1694,11 @@ int CLuaFunctionDefs::DetachTrailerFromVehicle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
+        if ( CStaticFunctionDefinitions::DetachTrailerFromVehicle ( *pVehicle, pTrailer ) )
         {
-            if ( CStaticFunctionDefinitions::DetachTrailerFromVehicle ( *pVehicle, pTrailer ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2027,16 +1718,11 @@ int CLuaFunctionDefs::SetVehicleEngineState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleEngineState ( *pEntity, bState ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleEngineState ( *pEntity, bState ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2056,16 +1742,11 @@ int CLuaFunctionDefs::SetVehicleDirtLevel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleDirtLevel ( *pEntity, fDirtLevel ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleDirtLevel ( *pEntity, fDirtLevel ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2085,16 +1766,11 @@ int CLuaFunctionDefs::SetVehicleDamageProof ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleDamageProof ( *pEntity, bDamageProof ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleDamageProof ( *pEntity, bDamageProof ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2114,16 +1790,11 @@ int CLuaFunctionDefs::SetVehiclePaintjob ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehiclePaintjob ( *pEntity, ucPaintjob ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehiclePaintjob ( *pEntity, ucPaintjob ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2143,16 +1814,11 @@ int CLuaFunctionDefs::SetVehicleFuelTankExplodable ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleFuelTankExplodable ( *pEntity, bExplodable ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleFuelTankExplodable ( *pEntity, bExplodable ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2172,16 +1838,11 @@ int CLuaFunctionDefs::SetVehicleFrozen ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
+        if ( CStaticFunctionDefinitions::SetVehicleFrozen ( *pVehicle, bFrozen ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleFrozen ( *pVehicle, bFrozen ) )
-            {
-                lua_pushboolean ( luaVM, true );
-            }
+            lua_pushboolean ( luaVM, true );
             return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2201,16 +1862,11 @@ int CLuaFunctionDefs::SetVehicleAdjustableProperty ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleAdjustableProperty ( *pEntity, usAdjustableProperty ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleAdjustableProperty ( *pEntity, usAdjustableProperty ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2230,16 +1886,11 @@ int CLuaFunctionDefs::SetHelicopterRotorSpeed ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
+        if ( CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( *pVehicle, fSpeed ) )
         {
-            if ( CStaticFunctionDefinitions::SetHelicopterRotorSpeed ( *pVehicle, fSpeed ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2259,16 +1910,11 @@ int CLuaFunctionDefs::SetTrainDerailed ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
+        if ( CStaticFunctionDefinitions::SetTrainDerailed ( *pVehicle, bDerailed ) )
         {
-            if ( CStaticFunctionDefinitions::SetTrainDerailed ( *pVehicle, bDerailed ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2287,16 +1933,11 @@ int CLuaFunctionDefs::SetTrainDerailable ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {;
-        if ( pVehicle )
+        if ( CStaticFunctionDefinitions::SetTrainDerailable ( *pVehicle, bDerailable ) )
         {
-            if ( CStaticFunctionDefinitions::SetTrainDerailable ( *pVehicle, bDerailable ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2315,16 +1956,11 @@ int CLuaFunctionDefs::SetTrainDirection ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
+        if ( CStaticFunctionDefinitions::SetTrainDirection ( *pVehicle, bDirection ) )
         {
-            if ( CStaticFunctionDefinitions::SetTrainDirection ( *pVehicle, bDirection ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2344,16 +1980,11 @@ int CLuaFunctionDefs::SetTrainSpeed ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
+        if ( CStaticFunctionDefinitions::SetTrainSpeed ( *pVehicle, fSpeed ) )
         {
-            if ( CStaticFunctionDefinitions::SetTrainSpeed ( *pVehicle, fSpeed ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2436,17 +2067,12 @@ int CLuaFunctionDefs::GetVehicleGravity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
-        {
-            CVector vecGravity;
-            pVehicle->GetGravity ( vecGravity );
-            lua_pushnumber ( luaVM, vecGravity.fX );
-            lua_pushnumber ( luaVM, vecGravity.fY );
-            lua_pushnumber ( luaVM, vecGravity.fZ );
-            return 3;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        CVector vecGravity;
+        pVehicle->GetGravity ( vecGravity );
+        lua_pushnumber ( luaVM, vecGravity.fX );
+        lua_pushnumber ( luaVM, vecGravity.fY );
+        lua_pushnumber ( luaVM, vecGravity.fZ );
+        return 3;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2465,14 +2091,9 @@ int CLuaFunctionDefs::SetVehicleGravity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
-        {
-            pVehicle->SetGravity ( vecGravity );
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        pVehicle->SetGravity ( vecGravity );
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2495,16 +2116,11 @@ int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pEntity, color ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleHeadLightColor ( *pEntity, color ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2524,13 +2140,9 @@ int CLuaFunctionDefs::SetVehicleTurretPosition ( lua_State *luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
-        {
-            pVehicle->SetTurretRotation ( fHorizontal, fVertical );
-
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
+        pVehicle->SetTurretRotation ( fHorizontal, fVertical );
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2547,155 +2159,150 @@ int CLuaFunctionDefs::GetVehicleHandling ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
-        {
-            CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
+        CHandlingEntry* pEntry = pVehicle->GetHandlingData ();
 
-            lua_newtable ( luaVM );
+        lua_newtable ( luaVM );
 
-            lua_pushnumber ( luaVM, pEntry->GetMass() );
-            lua_setfield ( luaVM, -2, "mass" );
+        lua_pushnumber ( luaVM, pEntry->GetMass() );
+        lua_setfield ( luaVM, -2, "mass" );
 
-            lua_pushnumber ( luaVM, pEntry->GetTurnMass() );
-            lua_setfield ( luaVM, -2, "turnMass" );
+        lua_pushnumber ( luaVM, pEntry->GetTurnMass() );
+        lua_setfield ( luaVM, -2, "turnMass" );
 
-            lua_pushnumber ( luaVM, pEntry->GetDragCoeff() );
-            lua_setfield ( luaVM, -2, "dragCoeff" );
+        lua_pushnumber ( luaVM, pEntry->GetDragCoeff() );
+        lua_setfield ( luaVM, -2, "dragCoeff" );
 
-            lua_createtable ( luaVM, 3, 0 );
-            CVector vecCenter = pEntry->GetCenterOfMass ();
-            lua_pushnumber ( luaVM, 1 );
-            lua_pushnumber ( luaVM, vecCenter.fX );
-            lua_settable ( luaVM, -3 );
-            lua_pushnumber ( luaVM, 2 );
-            lua_pushnumber ( luaVM, vecCenter.fY );
-            lua_settable ( luaVM, -3 );
-            lua_pushnumber ( luaVM, 3 );
-            lua_pushnumber ( luaVM, vecCenter.fZ );
-            lua_settable ( luaVM, -3 );
-            lua_setfield ( luaVM, -2, "centerOfMass" );
+        lua_createtable ( luaVM, 3, 0 );
+        CVector vecCenter = pEntry->GetCenterOfMass ();
+        lua_pushnumber ( luaVM, 1 );
+        lua_pushnumber ( luaVM, vecCenter.fX );
+        lua_settable ( luaVM, -3 );
+        lua_pushnumber ( luaVM, 2 );
+        lua_pushnumber ( luaVM, vecCenter.fY );
+        lua_settable ( luaVM, -3 );
+        lua_pushnumber ( luaVM, 3 );
+        lua_pushnumber ( luaVM, vecCenter.fZ );
+        lua_settable ( luaVM, -3 );
+        lua_setfield ( luaVM, -2, "centerOfMass" );
 
-            lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged() );
-            lua_setfield ( luaVM, -2, "percentSubmerged" );
+        lua_pushnumber ( luaVM, pEntry->GetPercentSubmerged() );
+        lua_setfield ( luaVM, -2, "percentSubmerged" );
 
-            lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
-            lua_setfield ( luaVM, -2, "tractionMultiplier" );
+        lua_pushnumber ( luaVM, pEntry->GetTractionMultiplier() );
+        lua_setfield ( luaVM, -2, "tractionMultiplier" );
 
-            CHandlingEntry::eDriveType eDriveType = pEntry->GetCarDriveType ();
-            if ( eDriveType == CHandlingEntry::FWD )
-                lua_pushstring ( luaVM, "fwd" );
-            else if ( eDriveType==CHandlingEntry::RWD )
-                lua_pushstring ( luaVM, "rwd" );
-            else if ( eDriveType==CHandlingEntry::FOURWHEEL )
-                lua_pushstring ( luaVM, "awd" );
-            else // What the ... (yeah, security)
-                lua_pushnil ( luaVM );
-            lua_setfield ( luaVM, -2, "driveType" );
-            CHandlingEntry::eEngineType eEngineType = pEntry->GetCarEngineType ();
-            if ( eEngineType == CHandlingEntry::PETROL )
-                lua_pushstring ( luaVM, "petrol" );
-            else if ( eEngineType == CHandlingEntry::DIESEL )
-                lua_pushstring ( luaVM, "diesel" );
-            else if ( eEngineType == CHandlingEntry::ELECTRIC )
-                lua_pushstring ( luaVM, "electric" );
-            else
-                lua_pushnil ( luaVM );
-            lua_setfield ( luaVM, -2, "engineType" );
-
-            lua_pushnumber ( luaVM, pEntry->GetNumberOfGears () );
-            lua_setfield ( luaVM, -2, "numberOfGears" );
-
-            lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration () );
-            lua_setfield ( luaVM, -2, "engineAcceleration" );
-
-            lua_pushnumber ( luaVM, pEntry->GetEngineInertia () );
-            lua_setfield ( luaVM, -2, "engineInertia" );
-
-            lua_pushnumber ( luaVM, pEntry->GetMaxVelocity () );
-            lua_setfield ( luaVM, -2, "maxVelocity" );
-
-            lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration () );
-            lua_setfield ( luaVM, -2, "brakeDeceleration" );
-
-            lua_pushnumber ( luaVM, pEntry->GetBrakeBias () );
-            lua_setfield ( luaVM, -2, "brakeBias" );
-
-            lua_pushboolean ( luaVM, pEntry->GetABS () );
-            lua_setfield ( luaVM, -2, "ABS" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSteeringLock () );
-            lua_setfield ( luaVM, -2, "steeringLock" );
-
-            lua_pushnumber ( luaVM, pEntry->GetTractionLoss () );
-            lua_setfield ( luaVM, -2, "tractionLoss" );
-
-            lua_pushnumber ( luaVM, pEntry->GetTractionBias () );
-            lua_setfield ( luaVM, -2, "tractionBias" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel () );
-            lua_setfield ( luaVM, -2, "suspensionForceLevel" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping () );
-            lua_setfield ( luaVM, -2, "suspensionDamping" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping () );
-            lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit () );
-            lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit () );
-            lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias () );
-            lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSuspensionAntiDiveMultiplier () );
-            lua_setfield ( luaVM, -2, "suspensionAntiDiveMultiplier" );
-
-            lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier () );
-            lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
-
-            lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance () );
-            lua_setfield ( luaVM, -2, "seatOffsetDistance" );
-
-            lua_pushnumber ( luaVM, pEntry->GetHandlingFlags () );
-            lua_setfield ( luaVM, -2, "handlingFlags" );
-
-            lua_pushnumber ( luaVM, pEntry->GetModelFlags () );
-            lua_setfield ( luaVM, -2, "modelFlags" );
-
-            lua_pushnumber ( luaVM, pEntry->GetMonetary () );
-            lua_setfield ( luaVM, -2, "monetary" );
-
-            CHandlingEntry::eLightType eHeadType = pEntry->GetHeadLight ();
-            if ( eHeadType == CHandlingEntry::LONG )
-                lua_pushstring ( luaVM, "long" );
-            else if ( eHeadType == CHandlingEntry::SMALL )
-                lua_pushstring ( luaVM, "small" );
-            else if ( eHeadType == CHandlingEntry::BIG )
-                lua_pushstring ( luaVM, "big" );
-            else
-                lua_pushnil( luaVM );
-            lua_setfield ( luaVM, -2, "headLight" );
-
-            CHandlingEntry::eLightType eTailType = pEntry->GetTailLight ();
-            if ( eTailType == CHandlingEntry::LONG )
-                lua_pushstring ( luaVM, "long" );
-            else if ( eTailType == CHandlingEntry::SMALL )
-                lua_pushstring ( luaVM, "small" );
-            else if ( eTailType == CHandlingEntry::BIG )
-                lua_pushstring ( luaVM, "big" );
-            else
-                lua_pushnil( luaVM );
-            lua_setfield ( luaVM, -2, "tailLight" );
-
-            lua_pushnumber ( luaVM, pEntry->GetAnimGroup () );
-            lua_setfield ( luaVM, -2, "animGroup" );
-            return 1;
-        }
+        CHandlingEntry::eDriveType eDriveType = pEntry->GetCarDriveType ();
+        if ( eDriveType == CHandlingEntry::FWD )
+            lua_pushstring ( luaVM, "fwd" );
+        else if ( eDriveType==CHandlingEntry::RWD )
+            lua_pushstring ( luaVM, "rwd" );
+        else if ( eDriveType==CHandlingEntry::FOURWHEEL )
+            lua_pushstring ( luaVM, "awd" );
+        else // What the ... (yeah, security)
+            lua_pushnil ( luaVM );
+        lua_setfield ( luaVM, -2, "driveType" );
+        CHandlingEntry::eEngineType eEngineType = pEntry->GetCarEngineType ();
+        if ( eEngineType == CHandlingEntry::PETROL )
+            lua_pushstring ( luaVM, "petrol" );
+        else if ( eEngineType == CHandlingEntry::DIESEL )
+            lua_pushstring ( luaVM, "diesel" );
+        else if ( eEngineType == CHandlingEntry::ELECTRIC )
+            lua_pushstring ( luaVM, "electric" );
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+            lua_pushnil ( luaVM );
+        lua_setfield ( luaVM, -2, "engineType" );
+
+        lua_pushnumber ( luaVM, pEntry->GetNumberOfGears () );
+        lua_setfield ( luaVM, -2, "numberOfGears" );
+
+        lua_pushnumber ( luaVM, pEntry->GetEngineAcceleration () );
+        lua_setfield ( luaVM, -2, "engineAcceleration" );
+
+        lua_pushnumber ( luaVM, pEntry->GetEngineInertia () );
+        lua_setfield ( luaVM, -2, "engineInertia" );
+
+        lua_pushnumber ( luaVM, pEntry->GetMaxVelocity () );
+        lua_setfield ( luaVM, -2, "maxVelocity" );
+
+        lua_pushnumber ( luaVM, pEntry->GetBrakeDeceleration () );
+        lua_setfield ( luaVM, -2, "brakeDeceleration" );
+
+        lua_pushnumber ( luaVM, pEntry->GetBrakeBias () );
+        lua_setfield ( luaVM, -2, "brakeBias" );
+
+        lua_pushboolean ( luaVM, pEntry->GetABS () );
+        lua_setfield ( luaVM, -2, "ABS" );
+
+        lua_pushnumber ( luaVM, pEntry->GetSteeringLock () );
+        lua_setfield ( luaVM, -2, "steeringLock" );
+
+        lua_pushnumber ( luaVM, pEntry->GetTractionLoss () );
+        lua_setfield ( luaVM, -2, "tractionLoss" );
+
+        lua_pushnumber ( luaVM, pEntry->GetTractionBias () );
+        lua_setfield ( luaVM, -2, "tractionBias" );
+
+        lua_pushnumber ( luaVM, pEntry->GetSuspensionForceLevel () );
+        lua_setfield ( luaVM, -2, "suspensionForceLevel" );
+
+        lua_pushnumber ( luaVM, pEntry->GetSuspensionDamping () );
+        lua_setfield ( luaVM, -2, "suspensionDamping" );
+
+        lua_pushnumber ( luaVM, pEntry->GetSuspensionHighSpeedDamping () );
+        lua_setfield ( luaVM, -2, "suspensionHighSpeedDamping" );
+
+        lua_pushnumber ( luaVM, pEntry->GetSuspensionUpperLimit () );
+        lua_setfield ( luaVM, -2, "suspensionUpperLimit" );
+
+        lua_pushnumber ( luaVM, pEntry->GetSuspensionLowerLimit () );
+        lua_setfield ( luaVM, -2, "suspensionLowerLimit" );
+
+        lua_pushnumber ( luaVM, pEntry->GetSuspensionFrontRearBias () );
+        lua_setfield ( luaVM, -2, "suspensionFrontRearBias" );
+
+        lua_pushnumber ( luaVM, pEntry->GetSuspensionAntiDiveMultiplier () );
+        lua_setfield ( luaVM, -2, "suspensionAntiDiveMultiplier" );
+
+        lua_pushnumber ( luaVM, pEntry->GetCollisionDamageMultiplier () );
+        lua_setfield ( luaVM, -2, "collisionDamageMultiplier" );
+
+        lua_pushnumber ( luaVM, pEntry->GetSeatOffsetDistance () );
+        lua_setfield ( luaVM, -2, "seatOffsetDistance" );
+
+        lua_pushnumber ( luaVM, pEntry->GetHandlingFlags () );
+        lua_setfield ( luaVM, -2, "handlingFlags" );
+
+        lua_pushnumber ( luaVM, pEntry->GetModelFlags () );
+        lua_setfield ( luaVM, -2, "modelFlags" );
+
+        lua_pushnumber ( luaVM, pEntry->GetMonetary () );
+        lua_setfield ( luaVM, -2, "monetary" );
+
+        CHandlingEntry::eLightType eHeadType = pEntry->GetHeadLight ();
+        if ( eHeadType == CHandlingEntry::LONG )
+            lua_pushstring ( luaVM, "long" );
+        else if ( eHeadType == CHandlingEntry::SMALL )
+            lua_pushstring ( luaVM, "small" );
+        else if ( eHeadType == CHandlingEntry::BIG )
+            lua_pushstring ( luaVM, "big" );
+        else
+            lua_pushnil( luaVM );
+        lua_setfield ( luaVM, -2, "headLight" );
+
+        CHandlingEntry::eLightType eTailType = pEntry->GetTailLight ();
+        if ( eTailType == CHandlingEntry::LONG )
+            lua_pushstring ( luaVM, "long" );
+        else if ( eTailType == CHandlingEntry::SMALL )
+            lua_pushstring ( luaVM, "small" );
+        else if ( eTailType == CHandlingEntry::BIG )
+            lua_pushstring ( luaVM, "big" );
+        else
+            lua_pushnil( luaVM );
+        lua_setfield ( luaVM, -2, "tailLight" );
+
+        lua_pushnumber ( luaVM, pEntry->GetAnimGroup () );
+        lua_setfield ( luaVM, -2, "animGroup" );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2857,16 +2464,11 @@ int CLuaFunctionDefs::SetVehicleDoorOpenRatio ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( *pEntity, ucDoor, fRatio, ulTime ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleDoorOpenRatio ( *pEntity, ucDoor, fRatio, ulTime ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2883,46 +2485,41 @@ int CLuaFunctionDefs::GetVehicleSirenParams( lua_State* luaVM )
     SSirenInfo tSirenInfo;
 
     argStream.ReadUserData ( pVehicle );
-    if ( argStream.HasErrors ( ) == false )
+    if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
-        {
-            tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Grab the siren structure data
-            lua_newtable ( luaVM );
+        tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Grab the siren structure data
+        lua_newtable ( luaVM );
 
-            lua_pushstring( luaVM, "SirenCount" );
-            lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenCount );
-            lua_settable ( luaVM, -3 ); // End of SirenCount Property
+        lua_pushstring( luaVM, "SirenCount" );
+        lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenCount );
+        lua_settable ( luaVM, -3 ); // End of SirenCount Property
 
-            lua_pushstring( luaVM, "SirenType" );
-            lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenType );
-            lua_settable ( luaVM, -3 ); // End of SirenType Property
+        lua_pushstring( luaVM, "SirenType" );
+        lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenType );
+        lua_settable ( luaVM, -3 ); // End of SirenType Property
 
-            lua_pushstring( luaVM, "Flags" );
-            lua_newtable ( luaVM );
+        lua_pushstring( luaVM, "Flags" );
+        lua_newtable ( luaVM );
 
-            lua_pushstring ( luaVM, "360" );
-            lua_pushboolean ( luaVM, tSirenInfo.m_b360Flag );
-            lua_settable ( luaVM, -3 ); // End of 360 Property
+        lua_pushstring ( luaVM, "360" );
+        lua_pushboolean ( luaVM, tSirenInfo.m_b360Flag );
+        lua_settable ( luaVM, -3 ); // End of 360 Property
 
-            lua_pushstring ( luaVM, "DoLOSCheck" );
-            lua_pushboolean ( luaVM, tSirenInfo.m_bDoLOSCheck );
-            lua_settable ( luaVM, -3 ); // End of DoLOSCheck Property
+        lua_pushstring ( luaVM, "DoLOSCheck" );
+        lua_pushboolean ( luaVM, tSirenInfo.m_bDoLOSCheck );
+        lua_settable ( luaVM, -3 ); // End of DoLOSCheck Property
 
-            lua_pushstring ( luaVM, "UseRandomiser" );
-            lua_pushboolean ( luaVM, tSirenInfo.m_bUseRandomiser );
-            lua_settable ( luaVM, -3 ); // End of UseRandomiser Property
+        lua_pushstring ( luaVM, "UseRandomiser" );
+        lua_pushboolean ( luaVM, tSirenInfo.m_bUseRandomiser );
+        lua_settable ( luaVM, -3 ); // End of UseRandomiser Property
 
-            lua_pushstring ( luaVM, "Silent" );
-            lua_pushboolean ( luaVM, tSirenInfo.m_bSirenSilent );
-            lua_settable ( luaVM, -3 ); // End of Silent Property
+        lua_pushstring ( luaVM, "Silent" );
+        lua_pushboolean ( luaVM, tSirenInfo.m_bSirenSilent );
+        lua_settable ( luaVM, -3 ); // End of Silent Property
 
-            lua_settable ( luaVM, -3 ); // End of table
+        lua_settable ( luaVM, -3 ); // End of table
 
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        return 1;
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM );
@@ -2939,57 +2536,52 @@ int CLuaFunctionDefs::GetVehicleSirens( lua_State* luaVM )
     SSirenInfo tSirenInfo;
 
     argStream.ReadUserData ( pVehicle );
-    if ( argStream.HasErrors ( ) == false )
+    if ( !argStream.HasErrors ( ) )
     {
-        if ( pVehicle )
+        tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Grab the siren structure data
+        lua_newtable ( luaVM );
+
+        for ( int i = 0; i < tSirenInfo.m_ucSirenCount;i++ )
         {
-            tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Grab the siren structure data
+            lua_pushnumber ( luaVM, i+1 );
             lua_newtable ( luaVM );
 
-            for ( int i = 0; i < tSirenInfo.m_ucSirenCount;i++ )
-            {
-                lua_pushnumber ( luaVM, i+1 );
-                lua_newtable ( luaVM );
+            lua_pushstring( luaVM, "Min_Alpha" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
+            lua_settable ( luaVM, -3 ); // End of Min_Alpha property
 
-                lua_pushstring( luaVM, "Min_Alpha" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha );
-                lua_settable ( luaVM, -3 ); // End of Min_Alpha property
+            lua_pushstring( luaVM, "Red" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R );
+            lua_settable ( luaVM, -3 ); // End of Red property
 
-                lua_pushstring( luaVM, "Red" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.R );
-                lua_settable ( luaVM, -3 ); // End of Red property
+            lua_pushstring( luaVM, "Green" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G );
+            lua_settable ( luaVM, -3 ); // End of Green property
 
-                lua_pushstring( luaVM, "Green" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.G );
-                lua_settable ( luaVM, -3 ); // End of Green property
+            lua_pushstring( luaVM, "Blue" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B );
+            lua_settable ( luaVM, -3 ); // End of Blue property
 
-                lua_pushstring( luaVM, "Blue" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.B );
-                lua_settable ( luaVM, -3 ); // End of Blue property
+            lua_pushstring( luaVM, "Alpha" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A );
+            lua_settable ( luaVM, -3 ); // End of Alpha property
 
-                lua_pushstring( luaVM, "Alpha" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour.A );
-                lua_settable ( luaVM, -3 ); // End of Alpha property
+            lua_pushstring( luaVM, "x" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX );
+            lua_settable ( luaVM, -3 ); // End of X property
 
-                lua_pushstring( luaVM, "x" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fX );
-                lua_settable ( luaVM, -3 ); // End of X property
+            lua_pushstring( luaVM, "y" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY );
+            lua_settable ( luaVM, -3 ); // End of Y property
 
-                lua_pushstring( luaVM, "y" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fY );
-                lua_settable ( luaVM, -3 ); // End of Y property
+            lua_pushstring( luaVM, "z" );
+            lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ );
+            lua_settable ( luaVM, -3 ); // End of Z property
 
-                lua_pushstring( luaVM, "z" );
-                lua_pushnumber ( luaVM, tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions.fZ );
-                lua_settable ( luaVM, -3 ); // End of Z property
-
-                lua_settable ( luaVM, -3 ); // End of Table
-            }
-
-            return 1;
+            lua_settable ( luaVM, -3 ); // End of Table
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+
+        return 1;
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM );
@@ -3007,19 +2599,21 @@ int CLuaFunctionDefs::SetVehicleSirens ( lua_State* luaVM )
 
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucSirenID );
-    if ( ucSirenID > 0 && ucSirenID < 9 )
+
+    if ( !argStream.HasErrors () )
     {
-        // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
-        ucSirenID--;
-        argStream.ReadVector3D ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions );
-        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
-        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
-        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
-        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
-        argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha, 0 );
-        if ( argStream.HasErrors ( ) == false )
+        if ( ucSirenID > 0 && ucSirenID < 9 )
         {
-            if ( pVehicle )
+            // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
+            ucSirenID--;
+            argStream.ReadVector3D ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_vecSirenPositions );
+            argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.R );
+            argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.G );
+            argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.B );
+            argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_RGBBeaconColour.A, 255 );
+            argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ ucSirenID ].m_dwMinSirenAlpha, 0 );
+       
+            if ( !argStream.HasErrors () )
             {
                 if ( CStaticFunctionDefinitions::SetVehicleSirens ( *pVehicle, ucSirenID, tSirenInfo ) )
                 {
@@ -3027,14 +2621,11 @@ int CLuaFunctionDefs::SetVehicleSirens ( lua_State* luaVM )
                     return 1;
                 }
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
         }
-        else
-            m_pScriptDebugging->LogBadType ( luaVM );
     }
-    else
-        m_pScriptDebugging->LogBadType ( luaVM );
+
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3050,19 +2641,14 @@ int CLuaFunctionDefs::GetVehicleDoorOpenRatio ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) ) 
     {
-        if ( pVehicle )
+        if ( ucDoor <= 5 )
         {
-            if ( ucDoor <= 5 )
-            {
-                lua_pushnumber ( luaVM, pVehicle->GetDoorOpenRatio ( ucDoor ) );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, pVehicle->GetDoorOpenRatio ( ucDoor ) );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -3082,13 +2668,10 @@ int CLuaFunctionDefs::SetVehicleComponentPosition ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
-        { 
-            if ( pVehicle->SetComponentPosition ( strComponent, vecPosition ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+        if ( pVehicle->SetComponentPosition ( strComponent, vecPosition ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else
@@ -3107,17 +2690,15 @@ int CLuaFunctionDefs::GetVehicleComponentPosition ( lua_State* luaVM )
     CVector vecPosition;
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
+    
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
+        if ( pVehicle->GetComponentPosition ( strComponent, vecPosition ) )
         {
-            if ( pVehicle->GetComponentPosition ( strComponent, vecPosition ) )
-            {
-                lua_pushnumber ( luaVM, vecPosition.fX );
-                lua_pushnumber ( luaVM, vecPosition.fY );
-                lua_pushnumber ( luaVM, vecPosition.fZ );
-                return 3;
-            }
+            lua_pushnumber ( luaVM, vecPosition.fX );
+            lua_pushnumber ( luaVM, vecPosition.fY );
+            lua_pushnumber ( luaVM, vecPosition.fZ );
+            return 3;
         }
     }
     else
@@ -3139,12 +2720,9 @@ int CLuaFunctionDefs::SetVehicleComponentRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
-        {
-            pVehicle->SetComponentRotation ( strComponent, vecRotation );
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
+        pVehicle->SetComponentRotation ( strComponent, vecRotation );
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -3161,17 +2739,15 @@ int CLuaFunctionDefs::GetVehicleComponentRotation ( lua_State* luaVM )
     CVector vecRotation;
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
+    
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
+        if ( pVehicle->GetComponentRotation ( strComponent, vecRotation ) )
         {
-            if ( pVehicle->GetComponentRotation ( strComponent, vecRotation ) )
-            {
-                lua_pushnumber ( luaVM, vecRotation.fX );
-                lua_pushnumber ( luaVM, vecRotation.fY );
-                lua_pushnumber ( luaVM, vecRotation.fZ );
-                return 3;
-            }
+            lua_pushnumber ( luaVM, vecRotation.fX );
+            lua_pushnumber ( luaVM, vecRotation.fY );
+            lua_pushnumber ( luaVM, vecRotation.fZ );
+            return 3;
         }
     }
     else
@@ -3188,15 +2764,13 @@ int CLuaFunctionDefs::ResetVehicleComponentPosition ( lua_State* luaVM )
     CClientVehicle * pVehicle = NULL;
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
+    
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
+        if ( pVehicle->ResetComponentPosition ( strComponent ) )
         {
-            if ( pVehicle->ResetComponentPosition ( strComponent ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else
@@ -3213,15 +2787,13 @@ int CLuaFunctionDefs::ResetVehicleComponentRotation ( lua_State* luaVM )
     CClientVehicle * pVehicle = NULL;
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
+    
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
+        if ( pVehicle->ResetComponentRotation ( strComponent ) )
         {
-            if ( pVehicle->ResetComponentRotation ( strComponent ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else
@@ -3240,15 +2812,13 @@ int CLuaFunctionDefs::SetVehicleComponentVisible ( lua_State* luaVM )
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
     argStream.ReadBool ( bVisible );
+
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
+        if ( pVehicle->SetComponentVisible ( strComponent, bVisible ) )
         {
-            if ( pVehicle->SetComponentVisible ( strComponent, bVisible ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else
@@ -3266,15 +2836,13 @@ int CLuaFunctionDefs::GetVehicleComponentVisible ( lua_State* luaVM )
     bool bVisible = false;
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
+    
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
+        if ( pVehicle->GetComponentVisible ( strComponent, bVisible ) )
         {
-            if ( pVehicle->GetComponentVisible ( strComponent, bVisible ) )
-            {
-                lua_pushboolean ( luaVM, bVisible );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bVisible );
+            return 1;
         }
     }
     else
@@ -3295,18 +2863,15 @@ int CLuaFunctionDefs::GetVehicleComponents ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
+        std::map < SString, SVehicleComponentData > ::iterator iter = pVehicle->ComponentsBegin ( );
+        lua_newtable ( luaVM );
+        for ( ;iter != pVehicle->ComponentsEnd ( ); iter++ )
         {
-            std::map < SString, SVehicleComponentData > ::iterator iter = pVehicle->ComponentsBegin ( );
-            lua_newtable ( luaVM );
-            for ( ;iter != pVehicle->ComponentsEnd ( ); iter++ )
-            {
-                lua_pushstring( luaVM, (*iter).first );
-                lua_pushboolean( luaVM, (*iter).second.m_bVisible );
-                lua_settable ( luaVM, -3 ); // End of Table
-            }
-            return 1;
+            lua_pushstring( luaVM, (*iter).first );
+            lua_pushboolean( luaVM, (*iter).second.m_bVisible );
+            lua_settable ( luaVM, -3 ); // End of Table
         }
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -3325,15 +2890,12 @@ int CLuaFunctionDefs::IsVehicleNitroRecharging ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
-        {
-            bool bRecharging;
+        bool bRecharging;
 
-            if ( CStaticFunctionDefinitions::IsVehicleNitroRecharging ( *pVehicle, bRecharging ) )
-            {
-                lua_pushboolean ( luaVM, bRecharging );
-                return 1;
-            }
+        if ( CStaticFunctionDefinitions::IsVehicleNitroRecharging ( *pVehicle, bRecharging ) )
+        {
+            lua_pushboolean ( luaVM, bRecharging );
+            return 1;
         }
     }
     else
@@ -3353,15 +2915,12 @@ int CLuaFunctionDefs::IsVehicleNitroActivated ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
-        {
-            bool bActivated;
+        bool bActivated;
 
-            if ( CStaticFunctionDefinitions::IsVehicleNitroActivated ( *pVehicle, bActivated ) )
-            {
-                lua_pushboolean ( luaVM, bActivated );
-                return 1;
-            }
+        if ( CStaticFunctionDefinitions::IsVehicleNitroActivated ( *pVehicle, bActivated ) )
+        {
+            lua_pushboolean ( luaVM, bActivated );
+            return 1;
         }
     }
     else
@@ -3381,15 +2940,12 @@ int CLuaFunctionDefs::GetVehicleNitroCount ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
-        {
-            char cNitroCount;
+        char cNitroCount;
 
-            if ( CStaticFunctionDefinitions::GetVehicleNitroCount ( *pVehicle, cNitroCount ) )
-            {
-                lua_pushnumber ( luaVM, cNitroCount );
-                return 1;
-            }
+        if ( CStaticFunctionDefinitions::GetVehicleNitroCount ( *pVehicle, cNitroCount ) )
+        {
+            lua_pushnumber ( luaVM, cNitroCount );
+            return 1;
         }
     }
     else
@@ -3409,15 +2965,12 @@ int CLuaFunctionDefs::GetVehicleNitroLevel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle )
-        {
-            float fNitroLevel;
+        float fNitroLevel;
 
-            if ( CStaticFunctionDefinitions::GetVehicleNitroLevel ( *pVehicle, fNitroLevel ) )
-            {
-                lua_pushnumber ( luaVM, fNitroLevel );
-                return 1;
-            }
+        if ( CStaticFunctionDefinitions::GetVehicleNitroLevel ( *pVehicle, fNitroLevel ) )
+        {
+            lua_pushnumber ( luaVM, fNitroLevel );
+            return 1;
         }
     }
     else
@@ -3438,13 +2991,10 @@ int CLuaFunctionDefs::SetVehicleNitroActivated ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleNitroActivated ( *pEntity, bActivated ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleNitroActivated ( *pEntity, bActivated ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else
@@ -3465,13 +3015,10 @@ int CLuaFunctionDefs::SetVehicleNitroCount ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleNitroCount ( *pEntity, cCount ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleNitroCount ( *pEntity, cCount ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else
@@ -3492,13 +3039,10 @@ int CLuaFunctionDefs::SetVehicleNitroLevel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetVehicleNitroLevel ( *pEntity, fLevel ) )
         {
-            if ( CStaticFunctionDefinitions::SetVehicleNitroLevel ( *pEntity, fLevel ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     else

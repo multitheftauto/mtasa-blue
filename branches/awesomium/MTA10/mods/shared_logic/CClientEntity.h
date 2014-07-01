@@ -170,7 +170,16 @@ public:
     // ignored. Note that if this value is 0, all sync packets should be accepted. This is
     // so we don't need this byte when the element is created first.
     inline unsigned char                        GetSyncTimeContext      ( void )                    { return m_ucSyncTimeContext; };
-    inline void                                 SetSyncTimeContext      ( unsigned char ucContext ) { m_ucSyncTimeContext = ucContext; };
+    inline void                                 SetSyncTimeContext      ( unsigned char ucContext ) 
+    {
+        #ifdef MTA_DEBUG
+        if ( GetType ( ) == eClientEntityType::CCLIENTPLAYER )
+        {
+            g_pCore->GetConsole ( )->Printf ( "Player Sync Context Updated from %i to %i.", m_ucSyncTimeContext, ucContext );
+        }
+        #endif
+        m_ucSyncTimeContext = ucContext;
+    };
     bool                                        CanUpdateSync           ( unsigned char ucRemote );
 
     inline const char*                          GetName                 ( void )                    { return m_strName; }
@@ -316,7 +325,7 @@ public:
     float                                       GetDistanceBetweenBoundingSpheres   ( CClientEntity* pOther );
 
     bool                                        IsCallPropagationEnabled    ( void )                { return m_bCallPropagationEnabled; }
-    void                                        SetCallPropagationEnabled   ( bool bEnabled )       { m_bCallPropagationEnabled = bEnabled; }
+    virtual void                                SetCallPropagationEnabled   ( bool bEnabled )       { m_bCallPropagationEnabled = bEnabled; }
 
 protected:
     CClientManager*                             m_pManager;

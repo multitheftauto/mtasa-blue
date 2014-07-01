@@ -25,6 +25,7 @@
 #define FUNC_CObject_Create             0x5A1F60
 #define FUNC_CObject_Explode            0x5A1340
 #define FUNC_CGlass_WindowRespondsToCollision 0x71BC40
+#define FUNC_CObject_AddToControlCodeList 0x59F400 // Dynamic objects-combinations like garage doors, train crossings, cranes use this to be processed
 
 class CObjectInfo
 {
@@ -74,11 +75,11 @@ public:
     uint32 b0x100 : 1; // 321
     uint32 b0x200 : 1;
     uint32 b0x400 : 1;
-    uint32 b0x800 : 1;
+    uint32 bIsTrainNearCrossing : 1; // Train crossing will be opened if flag is set (distance < 120.0f)
     uint32 b0x1000 : 1;
     uint32 b0x2000 : 1;
-    uint32 b0x4000 : 1;
-    uint32 b0x8000 : 1;
+    uint32 bIsDoorMoving : 1;
+    uint32 bIsDoorOpen : 1;
 
     uint32 b0x10000 : 1; // 322
     uint32 bUpdateScale : 1;
@@ -114,11 +115,11 @@ public:
     uint32 pad15; // 344
     float fScale; // 348
     CObjectInfo* pObjectInfo; // 352
-    uint32 pad16; // 356
+    CFireSAInterface* pFire; // 356
     uint16 pad17; // 360
     uint16 pad18; // 362
     uint32 pad19; // 364
-    CEntitySAInterface* pGarageDoorDummy; // 368  CDummyObject - Might be used for other dynamic objects
+    CEntitySAInterface* pLinkedObjectDummy; // 368  CDummyObject - Is used for dynamic objects like garage doors, train crossings etc.
     uint32 pad21; // 372
     uint32 pad22; // 376
 };

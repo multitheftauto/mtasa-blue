@@ -2439,7 +2439,7 @@ int CLuaFunctionDefinitions::GetAlivePlayers ( lua_State* luaVM )
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
         for ( ; iter != m_pPlayerManager->IterEnd () ; ++iter )
         {
-            if ( (*iter)->IsSpawned () )
+            if ( (*iter)->IsSpawned () && !(*iter)->IsBeingDeleted() )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
                 lua_pushelement ( luaVM, *iter );
@@ -2466,7 +2466,7 @@ int CLuaFunctionDefinitions::GetDeadPlayers ( lua_State* luaVM )
         list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
         for ( ; iter != m_pPlayerManager->IterEnd () ; ++iter )
         {
-            if ( !(*iter)->IsSpawned () )
+            if ( !(*iter)->IsSpawned () && !(*iter)->IsBeingDeleted() )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
                 lua_pushelement ( luaVM, *iter );
@@ -3079,18 +3079,17 @@ int CLuaFunctionDefinitions::AddPedClothes ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::RemovePedClothes ( lua_State* luaVM )
 {
+//  bool removePedClothes ( ped thePed, int clothesType, [ string clothesTexture, string clothesModel ] )
     CElement* pElement;
     unsigned char ucType; 
     SString strTexture; 
     SString strModel; 
-    
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(ucType); 
-    argStream.ReadString(strTexture); 
-    argStream.ReadString(strModel); 
-    
+    argStream.ReadString( strTexture, "" ); 
+    argStream.ReadString( strModel, "" ); 
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -3816,8 +3815,12 @@ int CLuaFunctionDefinitions::GetVehicleType ( lua_State* luaVM )
     if ( !argStream.NextIsNumber ( ) )
     {
         CVehicle* pVehicle;
-        argStream.ReadUserData(pVehicle);
-        ulModel = pVehicle->GetModel ( );
+        argStream.ReadUserData ( pVehicle );
+
+        if ( !argStream.HasErrors ( ) )
+        {
+            ulModel = pVehicle->GetModel ( );
+        }
     }
     else
         argStream.ReadNumber(ulModel); 
@@ -5459,40 +5462,42 @@ int CLuaFunctionDefinitions::AddVehicleUpgrade ( lua_State* luaVM )
 {
     CElement* pElement;
     unsigned short usUpgrade; 
-    bool bAll = false;
     
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pElement);
 
-    if ( argStream.NextIsString ( ) )
+    if (!argStream.HasErrors())
     {
-        SString strAll;
-        argStream.ReadString(strAll);
-        bAll = strAll == "all";
-        usUpgrade = 0;
-    }
-    else
-        argStream.ReadNumber(usUpgrade);
-    
-    if ( !argStream.HasErrors ( ) )
-    {
-        if ( bAll)
+        if (argStream.NextIsString())
         {
-            if ( CStaticFunctionDefinitions::AddAllVehicleUpgrades ( pElement ) )
+            SString strUpgrade = "";
+            argStream.ReadString(strUpgrade);
+            if (strUpgrade == "all")
             {
-                lua_pushboolean ( luaVM, true );
+                lua_pushboolean(luaVM, CStaticFunctionDefinitions::AddAllVehicleUpgrades(pElement));
+                return 1;
+            }
+            else
+                argStream.m_iIndex--;
+        }
+
+        argStream.ReadNumber(usUpgrade);
+
+        if (!argStream.HasErrors())
+        {
+            if (CStaticFunctionDefinitions::AddVehicleUpgrade(pElement, usUpgrade))
+            {
+                lua_pushboolean(luaVM, true);
                 return 1;
             }
         }
-        else if ( CStaticFunctionDefinitions::AddVehicleUpgrade( pElement, usUpgrade) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -6288,13 +6293,13 @@ int CLuaFunctionDefinitions::CreateMarker ( lua_State* luaVM )
     CElement* pVisibleTo; 
     
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition ); 
-    argStream.ReadString ( strType, "default "); 
-    argStream.ReadNumber ( fSize, 4.0f ); 
-    argStream.ReadNumber (color.R, color.R ); 
-    argStream.ReadNumber (color.G, color.G ); 
-    argStream.ReadNumber (color.B, color.B ); 
-    argStream.ReadNumber (color.A, color.A ); 
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadString ( strType, "default" );
+    argStream.ReadNumber ( fSize, 4.0f );
+    argStream.ReadNumber ( color.R, color.R );
+    argStream.ReadNumber ( color.G, color.G );
+    argStream.ReadNumber ( color.B, color.B );
+    argStream.ReadNumber ( color.A, color.A );
 
     if ( argStream.NextIsBool() || argStream.NextIsNil () )
     {
@@ -7803,7 +7808,6 @@ int CLuaFunctionDefinitions::GetKeyBoundToFunction ( lua_State* luaVM )
     
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData(pPlayer); 
-    argStream.ReadString(strKey); 
 
     if (!argStream.HasErrors ( ) )
     {
@@ -12006,10 +12010,11 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
 int CLuaFunctionDefinitions::RemoveBan ( lua_State* luaVM )
 {
     CBan* pBan;
-    CPlayer* pResponsible;
+    CPlayer* pResponsible = NULL;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pBan);
+
     if ( argStream.NextIsUserData() )
     {
         CElement* pResponsibleElement;

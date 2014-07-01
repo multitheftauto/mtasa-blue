@@ -38,8 +38,9 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     m_pDevice->GetCreationParameters ( &creationParameters );
     int iAdapter = creationParameters.AdapterOrdinal;
 
-    IDirect3D9* pD3D9 = NULL;
-    m_pDevice->GetDirect3D ( &pD3D9 );
+    IDirect3D9* pD3D9 = CProxyDirect3D9::StaticGetDirect3D();
+    if ( !pD3D9 )
+        m_pDevice->GetDirect3D ( &pD3D9 );
 
     D3DADAPTER_IDENTIFIER9 adaptIdent;
     ZeroMemory( &adaptIdent, sizeof( D3DADAPTER_IDENTIFIER9 ) );
@@ -75,6 +76,12 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
 
     // Clipping is required for some graphic configurations
     g_pDeviceState->AdapterState.bRequiresClipping = SStringX( adaptIdent.Description ).Contains( "Intel" );
+
+    WriteDebugEvent( SString( "*** Using adapter: %s (Mem:%d KB, MaxAnisotropy:%d)"
+                            , (const char*)g_pDeviceState->AdapterState.Name
+                            , g_pDeviceState->AdapterState.InstalledMemoryKB
+                            , g_pDeviceState->AdapterState.MaxAnisotropicSetting
+                            ) );
 
     // Call event handler
     CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );

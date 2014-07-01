@@ -403,7 +403,7 @@ void CClientSoundManager::ProcessStopQueues( bool bFlush )
         std::vector < DWORD > channelStopList = m_ChannelStopQueue;
         m_ChannelStopQueue.clear();
         m_CS.Unlock ();
-        for( int i = 0 ; i < channelStopList.size() ; i++ )
+        for( unsigned int i = 0 ; i < channelStopList.size() ; i++ )
         {
             BASS_ChannelStop( channelStopList[i] );
         }

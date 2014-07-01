@@ -16,6 +16,8 @@
 
 WaterCannonHitHandler* m_pWaterCannonHitHandler = NULL;
 
+VehicleFellThroughMapHandler* m_pVehicleFellThroughMapHandler = NULL;
+
 #define HOOKPOS_CEventHitByWaterCannon                      0x729899
 DWORD RETURN_CWaterCannon_PushPeds_RETN = 0x7298A7;
 DWORD CALL_CEventHitByWaterCannon = 0x4B1290;
@@ -88,11 +90,19 @@ DWORD RETURN_CObject_PreRender =                    0x59FE6F;
 DWORD RETURN_CWorld_RemoveFallenPeds_Cont               =   0x565D13;
 DWORD RETURN_CWorld_RemoveFallenPeds_Cancel             =   0x565E6F;
 
+#define HOOKPOS_CWorld_RemoveFallenCars                     0x565F52
+DWORD RETURN_CWorld_RemoveFallenCars_Cont               =   0x565F59;
+DWORD RETURN_CWorld_RemoveFallenCars_Cancel             =   0x56609B;
+
 #define HOOKPOS_CVehicleModelInterface_SetClump             0x4C9606
 DWORD RETURN_CVehicleModelInterface_SetClump            =   0x4C9611;
 
 #define HOOKPOS_CBoat_ApplyDamage                           0x6F1C32
 DWORD RETURN_CBoat_ApplyDamage                          =   0x6F1C3E;
+
+#define HOOKPOS_CProjectile_FixTearGasCrash                 0x4C0403
+DWORD RETURN_CProjectile_FixTearGasCrash_Fix              = 0x4C05B9;
+DWORD RETURN_CProjectile_FixTearGasCrash_Cont             = 0x4C0409;
 
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
@@ -116,9 +126,10 @@ void HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire ( );
 void HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2 ( );
 void HOOK_CObject_PreRender ( );
 void HOOK_CWorld_RemoveFallenPeds ( );
+void HOOK_CWorld_RemoveFallenCars ( );
 void HOOK_CVehicleModelInterface_SetClump ( );
 void HOOK_CBoat_ApplyDamage ( );
-
+void HOOK_CProjectile_FixTearGasCrash ( );
 void CMultiplayerSA::Init_13 ( void )
 {
     InitHooks_13 ( );
@@ -156,11 +167,15 @@ void CMultiplayerSA::InitHooks_13 ( void )
 
     HookInstall ( HOOKPOS_CObject_PreRender, (DWORD)HOOK_CObject_PreRender, 6 );
 
-    HookInstall ( HOOKPOS_CWorld_RemoveFallenPeds, (DWORD)HOOK_CWorld_RemoveFallenPeds, 6 );
+    HookInstall ( HOOKPOS_CWorld_RemoveFallenPeds, (DWORD) HOOK_CWorld_RemoveFallenPeds, 6 );
+
+    HookInstall ( HOOKPOS_CWorld_RemoveFallenCars, (DWORD) HOOK_CWorld_RemoveFallenCars, 5 );
 
     HookInstall ( HOOKPOS_CVehicleModelInterface_SetClump, (DWORD)HOOK_CVehicleModelInterface_SetClump, 7 );
 
     HookInstall ( HOOKPOS_CBoat_ApplyDamage, (DWORD)HOOK_CBoat_ApplyDamage, 12 );
+
+    HookInstall ( HOOKPOS_CProjectile_FixTearGasCrash, (DWORD) HOOK_CProjectile_FixTearGasCrash, 6 );
     
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
@@ -1365,6 +1380,54 @@ RemoveFallenPeds_Cancel:
     }
 }
 
+void CMultiplayerSA::SetVehicleFellThroughMapHandler ( VehicleFellThroughMapHandler * pHandler )
+{
+    m_pVehicleFellThroughMapHandler = pHandler;
+}
+
+CVehicleSAInterface * pFallingVehicleInterface;
+bool CWorld_Remove_FallenVehiclesCheck ( )
+{
+    CVehicle* pVehicle = pGameInterface->GetPools ( )->GetVehicle ( (DWORD *) pFallingVehicleInterface );
+    if ( pVehicle &&
+        m_pVehicleFellThroughMapHandler ( pFallingVehicleInterface ) )
+    {
+        // Disallow
+        return true;
+    }
+    // Allow
+    return false;
+}
+
+DWORD HOOK_CWorld_RemoveFallenCars_Cont1 = 0x565F57;
+
+void _declspec( naked ) HOOK_CWorld_RemoveFallenCars ( )
+{
+    // If the vehicle fell through the map give it another try to respawn.
+    _asm
+    {
+        pushad
+        mov pFallingVehicleInterface, esi
+    }
+    if ( CWorld_Remove_FallenVehiclesCheck ( ) )
+    {
+        _asm
+        {
+            popad
+            jmp RETURN_CWorld_RemoveFallenCars_Cancel
+        }
+    }
+    _asm
+    {
+        popad
+        mov eax, [esi + 14h]
+        test eax, eax
+        jz 565F57h
+        jmp RETURN_CWorld_RemoveFallenCars_Cont
+    }
+}
+
+
 void CMultiplayerSA::SetPedTargetingMarkerEnabled(bool bEnable)
 {
     static const uint8 original = 0x83;
@@ -1442,5 +1505,23 @@ boatCanBeDamaged:
     {
         pop eax
         jmp RETURN_CBoat_ApplyDamage
+    }
+}
+
+// fixes a crash where a vehicle is the source of a tear gas projectile.
+void _declspec( naked ) HOOK_CProjectile_FixTearGasCrash ( )
+{
+    _asm
+    {
+        cmp ebp, 0h
+        je cont
+        mov ecx, [ebp+47Ch]
+        // no terminators in this time period
+        jmp RETURN_CProjectile_FixTearGasCrash_Cont
+    cont :
+        // come with me if you want to live
+        jmp RETURN_CProjectile_FixTearGasCrash_Fix
+        // dundundundundun
+        // dundundundundun
     }
 }

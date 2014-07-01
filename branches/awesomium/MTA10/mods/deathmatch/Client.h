@@ -14,6 +14,8 @@
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
-#define MTAEXPORT extern "C" _declspec(dllexport)
+#ifndef MTAEXPORT
+    #define MTAEXPORT extern "C" _declspec(dllexport)
+#endif
 
 #endif

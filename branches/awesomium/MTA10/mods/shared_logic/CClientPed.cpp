@@ -4108,10 +4108,25 @@ void CClientPed::StartRadio ( void )
     // it's not already on
     if ( !m_bDontChangeRadio && !m_bRadioOn )
     {
+        if ( m_pOccupiedVehicle && m_pOccupiedVehicle->HasPoliceRadio ( ) )
+        {
+            // police radio
+            g_pGame->GetAudioEngine ( )->StartRadio ( 0 );
+        }
         // Turn it on if we're not on channel none
-        if ( m_ucRadioChannel != 0 )
-            g_pGame->GetAudioEngine ()->StartRadio ( m_ucRadioChannel );
-
+        else if ( m_ucRadioChannel != 0 )
+        {
+            // if the radio is on retune it
+            if ( m_bRadioOn == true )
+            {
+                g_pGame->GetAudioEngine ( )->RetuneRadio ( m_ucRadioChannel );
+            }
+            // if the radio is off it needs turning back on
+            else
+            {
+                g_pGame->GetAudioEngine ( )->StartRadio ( m_ucRadioChannel );
+            }
+        }
         m_bRadioOn = true;
     }
 }
@@ -4546,10 +4561,27 @@ bool CClientPed::SetCurrentRadioChannel ( unsigned char ucChannel )
                 return false;
             }
         }
+        // if the previous was zero or 13 (pseudo 0 for rolling backwards)
+        if ( m_ucRadioChannel == 0 || m_ucRadioChannel == 13 )
+        {
+            // turn us back on
+            g_pGame->GetAudioEngine ( )->StartRadio ( ucChannel );
+        }
 
+        // update our radio channel
         m_ucRadioChannel = ucChannel;
+        // police radio only
+        if ( m_pOccupiedVehicle && m_pOccupiedVehicle->HasPoliceRadio ( ) )
+        {
+            // police radio
+            g_pGame->GetAudioEngine ( )->StartRadio ( 0 );
+        }
+        else
+        {
+            // normal radio
+            g_pGame->GetAudioEngine ( )->RetuneRadio ( m_ucRadioChannel );
+        }
 
-        g_pGame->GetAudioEngine ()->StartRadio ( m_ucRadioChannel );
         if ( m_ucRadioChannel == 0 )
             g_pGame->GetAudioEngine ()->StopRadio ();
 

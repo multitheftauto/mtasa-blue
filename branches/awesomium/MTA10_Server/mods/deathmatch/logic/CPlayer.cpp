@@ -114,6 +114,9 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
 CPlayer::~CPlayer ( void )
 {
+    // Prepare for deletion
+    PrepareForDeletion();
+
     // Make sure the script debugger doesn't reference us
     SetScriptDebugLevel ( 0 );    
 
@@ -168,7 +171,8 @@ void CPlayer::DoPulse ( void )
 {
     if ( GetStatus () == STATUS_JOINED )
     {
-        m_pPlayerTextManager->Process ();
+        if (m_pPlayerTextManager != NULL)
+            m_pPlayerTextManager->Process ();
 
         // Do dist update if too long since last one
         if ( m_UpdateNearListTimer.Get () > (uint)g_TickRateSettings.iNearListUpdate + 300 )
@@ -1197,7 +1201,7 @@ void CPlayer::PrepareForDeletion()
     RemoveAllSyncingObjects();
 
     // Delete the player text manager
-    delete m_pPlayerTextManager;
+    SAFE_DELETE(m_pPlayerTextManager);
 
 	// Remove us from our team
     SetTeam(NULL, true);
@@ -1225,6 +1229,29 @@ void CPlayer::PrepareForDeletion()
 
     // Cleanup our account
     m_pAccount->SetClient(NULL);
+
+    // Make sure we no longer occupy any vehicle
+    if (m_pVehicle)
+        m_pVehicle->SetOccupant(NULL, m_uiVehicleSeat);
+    SetOccupiedVehicle(NULL, 0);
+
+    // Make sure we're no longer attached to any element
+    if (m_pAttachedTo)
+    {
+        m_pAttachedTo->RemoveAttachedElement(this);
+        m_pAttachedTo = NULL;
+    }
+
+    // Remove all attached elements
+    list < CElement* > ::iterator iterAttached = m_AttachedElements.begin();
+    for (; iterAttached != m_AttachedElements.end(); iterAttached++)
+    {
+        // Make sure our attached element stores it's current position
+        (*iterAttached)->GetPosition();
+        // Unlink it
+        (*iterAttached)->m_pAttachedTo = NULL;
+    }
+    m_AttachedElements.clear();
 }
 
 

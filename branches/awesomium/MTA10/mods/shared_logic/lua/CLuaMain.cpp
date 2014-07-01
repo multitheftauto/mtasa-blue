@@ -1825,7 +1825,9 @@ void CLuaMain::InitVM ( void )
     lua_setglobal ( m_luaVM, "localPlayer" );
 
     // Load pre-loaded lua code
+    DECLARE_PROFILER_SECTION( OnPreLoadScript )
     LoadScript ( szPreloadedScript );
+    DECLARE_PROFILER_SECTION( OnPostLoadScript )
 }
 
 

@@ -1208,6 +1208,32 @@ inner:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// Train crossings: Detach barrier from post (to be able to create objects 1373 and 1374 separately)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CObject_Destructor_TrainCrossing_Check 0x59F7A8
+#define HOOKSIZE_CObject_Destructor_TrainCrossing_Check 5
+DWORD RETURN_CObject_Destructor_TrainCross_Check = 0x59F7AD;
+DWORD RETURN_CObject_Destructor_TrainCross_INVALID = 0x59F811;
+void _declspec(naked) HOOK_CObject_Destructor_TrainCrossing_Check ()
+{
+    _asm
+    {
+        test eax, eax // Check if pLinkedBarrierPost exists
+        jz jmp_invalid // Skip the barrier stuff
+
+        mov ecx, [eax+14h] // Execute replaced code
+        test ecx, ecx
+        jmp RETURN_CObject_Destructor_TrainCross_Check
+
+    jmp_invalid:
+        jmp RETURN_CObject_Destructor_TrainCross_INVALID
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1245,4 +1271,5 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CClumpModelInfo_GetFrameFromId );
     EZHookInstall ( CEntity_GetBoundRect );
     EZHookInstall ( CVehicle_AddUpgrade );
+    EZHookInstall ( CObject_Destructor_TrainCrossing_Check );
 }

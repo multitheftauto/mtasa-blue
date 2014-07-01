@@ -21,21 +21,7 @@ extern CGameSA * pGame;
 extern CCoreInterface * g_pCore;
 
 //
-// Use MemSet/Cpy/Put/Add for the following memory regions:
-//
-// 0x401000 - 0x4C02FF
-// 0x4C0400 - 0x5022FF
-// 0x502400 - 0x50AAFF
-// 0x50AC00 - 0x50BEFF
-// 0x50C000 - 0x5331FF
-// 0x533300 - 0x60D7FF
-// 0x60D900 - 0x609BFF
-// 0x609D00 - 0x60F1FF
-// 0x60F300 - 0x686FFF
-// 0x687100 - 0x6AE9FF
-// 0x6AEB00 - 0x729AFF
-// 0x729C00 - 0x742AFF
-// 0x742C00 - 0x8A4000
+// Use MemSet/Cpy/Put for non Mem*Fast memory regions
 //
 
 void MemSet ( void* dwDest, int cValue, uint uiAmount );
@@ -59,7 +45,25 @@ void MemAdd ( U ptr, const T value )
 
 
 //
-// Use Mem*Fast for everything else
+// Use Mem*Fast for the following memory regions:
+//
+// 0x4C0300 - 0x4C03FF
+// 0x4EB900 - 0x4EB9FF
+// 0x502200 - 0x5023FF
+// 0x50AB00 - 0x50ABFF
+// 0x50BF00 - 0x50BFFF
+// 0x533200 - 0x5332FF
+// 0x609C00 - 0x609CFF
+// 0x60D800 - 0x60D8FF
+// 0x60F200 - 0x60F2FF
+// 0x642000 - 0x6420FF
+// 0x648A00 - 0x648AFF
+// 0x64CA00 - 0x64CAFF
+// 0x687000 - 0x6870FF
+// 0x6A0700 - 0x6A07FF
+// 0x6AEA00 - 0x6AEAFF
+// 0x729B00 - 0x729BFF
+// 0x742B00 - 0x742BFF
 //
 inline void MemCpyFast ( void* dwDest, const void* dwSrc, uint uiAmount )
 {

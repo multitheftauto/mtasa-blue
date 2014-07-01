@@ -982,6 +982,12 @@ CElement* CElement::FindChildIndex ( const char* szName, unsigned int uiIndex, u
             CElement* pElement = (*iter)->FindChildIndex ( szName, uiIndex, uiCurrentIndex, true );
             if ( pElement )
             {
+                if ( pElement->IsBeingDeleted() )
+                {
+                    // If it's being deleted right now we cannot return it. 
+                    // Since we found a match we have to abort the search here.
+                    return NULL;
+                }
                 return pElement;
             }
         }
@@ -1018,6 +1024,12 @@ CElement* CElement::FindChildByTypeIndex ( unsigned int uiTypeHash, unsigned int
             CElement* pElement = (*iter)->FindChildByTypeIndex ( uiTypeHash, uiIndex, uiCurrentIndex, true );
             if ( pElement )
             {
+                if (pElement->IsBeingDeleted())
+                {
+                    // If it's being deleted right now we cannot return it. 
+                    // Since we found a match we have to abort the search here.
+                    return NULL;
+                }
                 return pElement;
             }
         }
@@ -1268,6 +1280,12 @@ unsigned char CElement::GenerateSyncTimeContext ( void )
     // Increment the sync time index
     ++m_ucSyncTimeContext;
 
+    #ifdef MTA_DEBUG
+    if ( GetType ( ) == EElementType::PLAYER )
+    {
+        CLogger::LogPrintf ( "Sync Context Updated from %i to %i.\n", m_ucSyncTimeContext - 1, m_ucSyncTimeContext );
+    }
+    #endif
     // It can't be 0 because that will make it not work when wraps around
     if ( m_ucSyncTimeContext == 0 )
         ++m_ucSyncTimeContext;

@@ -1444,7 +1444,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         pVehicle->SetHealth ( health.data.fValue );
 
         // Set the target position and rotation
-        if ( pVehicle->GetVehicleType() != CLIENTVEHICLE_TRAIN )
+        if ( pVehicle->GetVehicleType() != CLIENTVEHICLE_TRAIN || pVehicle->IsDerailed () )
         {
             // Vehicles use the position and rotation
             pVehicle->SetTargetPosition ( position.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ );

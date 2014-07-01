@@ -40,6 +40,7 @@ public:
 protected:
     friend class CClientEffectManager;
     inline CFxSystem*        GetFxSystem( void ) const { return m_pFxSystem; }
+    inline void              SetFxSystem ( CFxSystem* pFx ) { m_pFxSystem = pFx; }
 
 private:
     

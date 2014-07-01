@@ -166,6 +166,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // Prepare the sirens
     RemoveVehicleSirens();
+
+    // reset our fall through map count
+    m_ucFellThroughMapCount = 1;
 }
 
 
@@ -2261,6 +2264,16 @@ void CClientVehicle::StreamedInPulse ( void )
             RemoveTargetRotation ();
         }
 
+        // Remove link in CClientVehicle structure if SA does it
+        if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
+        {
+            if ( !GetNextTrainCarriage () )
+                m_pNextLink = NULL;
+
+            if ( !GetPreviousTrainCarriage () )
+                m_pPreviousLink = NULL;
+        }
+
         CClientPed* pControllingPed = GetControllingPlayer ();
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN && ( !pControllingPed || pControllingPed->GetType () != CCLIENTPLAYER ) )
         {
@@ -2513,7 +2526,13 @@ void CClientVehicle::Create ( void )
 
         // Add XRef
         g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pVehicle );
-        
+
+        if ( DoesNeedToWaitForGroundToLoad() )
+        {
+            // waiting for ground to load
+            SetFrozenWaitingForGroundToLoad ( true );
+        }
+
         // Jump straight to the target position if we have one
         if ( HasTargetPosition () )
         {
@@ -2531,8 +2550,8 @@ void CClientVehicle::Create ( void )
         // Got any settings to restore?
         m_pVehicle->SetMatrix ( &m_Matrix );
         m_matFrozen = m_Matrix;
-        m_pVehicle->SetMoveSpeed ( &m_vecMoveSpeed );
-        m_pVehicle->SetTurnSpeed ( &m_vecTurnSpeed );
+        SetMoveSpeed ( m_vecMoveSpeed );
+        SetTurnSpeed ( m_vecTurnSpeed );
         m_pVehicle->SetVisible ( m_bVisible );
         m_pVehicle->SetUsesCollision ( m_bIsCollisionEnabled );
         m_pVehicle->SetEngineBroken ( m_bEngineBroken );
@@ -2558,6 +2577,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetTaxiLightOn ( m_bTaxiLightOn );
         m_pVehicle->SetCanBeTargettedByHeatSeekingMissiles ( m_bCanBeTargettedByHeatSeekingMissiles );
         CalcAndUpdateTyresCanBurstFlag ();
+
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
         {
             m_pVehicle->SetDerailed ( m_bIsDerailed );
@@ -2567,14 +2587,18 @@ void CClientVehicle::Create ( void )
             if ( m_ucTrackID >= 0 )
                 m_pVehicle->SetRailTrack ( m_ucTrackID );
 
-            if ( m_fTrainPosition >= 0 )
+            if ( m_fTrainPosition >= 0 && !m_bIsDerailed )
                 m_pVehicle->SetTrainPosition ( m_fTrainPosition, true );
+
+            // Set matrix once more (to ensure that the rotation has been set properly)
+            if ( m_bIsDerailed )
+                m_pVehicle->SetMatrix ( &m_Matrix );
 
             if ( m_bChainEngine )
                 SetIsChainEngine ( true );
 
             // Train carriages
-            if ( m_pNextLink )
+            if ( m_pNextLink && !m_bIsDerailed && !m_pNextLink->IsDerailed () )
             {
                 m_pVehicle->SetNextTrainCarriage ( m_pNextLink->m_pVehicle );
                 m_pNextLink->SetTrainTrack ( GetTrainTrack () );
@@ -2586,7 +2610,7 @@ void CClientVehicle::Create ( void )
                     m_pVehicle->AttachTrainCarriage ( m_pNextLink->GetGameVehicle () );
                 }
             }
-            if ( m_pPreviousLink )
+            if ( m_pPreviousLink && !m_bIsDerailed && !m_pPreviousLink->IsDerailed () )
             {
                 m_pVehicle->SetPreviousTrainCarriage ( m_pPreviousLink->m_pVehicle );
                 this->SetTrainTrack ( m_pPreviousLink->GetTrainTrack () );
@@ -2791,6 +2815,8 @@ void CClientVehicle::Create ( void )
             // set our visibility
             SetComponentVisible ( strTemp, (*iter).second.m_bVisible );
         }
+        // store our spawn position in case we fall through the map
+        m_matCreate = m_Matrix;
 
         // Tell the streamer we've created this object
         NotifyCreate ();
@@ -2921,6 +2947,9 @@ void CClientVehicle::Destroy ( void )
 
         // Remove reference to its model
         m_pModelInfo->RemoveRef ();
+
+        // reset our fall through map count
+        m_ucFellThroughMapCount = 1;
 
         NotifyDestroy ();
     }
@@ -3829,6 +3858,8 @@ bool CClientVehicle::HasPoliceRadio ( void )
         case VT_POLMAV:
         case VT_COPBIKE:
         case VT_SWATVAN:
+        case VT_FBIRANCH:
+        case VT_FBITRUCK:
             return true;
             break;
         default:
@@ -4565,4 +4596,48 @@ bool CClientVehicle::DoesSupportUpgrade ( SString strFrameName )
         return m_pVehicle->DoesSupportUpgrade ( strFrameName );
     }
     return true;
+}
+
+bool CClientVehicle::OnVehicleFallThroughMap ( )
+{
+    // if we have fallen through the map a small number of times
+    if ( m_ucFellThroughMapCount <= 2 )
+    {
+        // make sure we haven't moved much if at all
+        if ( IsFrozen ( ) == false &&
+            DistanceBetweenPoints2D ( m_matCreate.GetPosition ( ), m_Matrix.GetPosition ( ) ) < 3 )
+        {
+            // increase our fell through map count
+            m_ucFellThroughMapCount++;
+            // warp us to our initial position of creation
+            SetPosition ( m_matCreate.GetPosition ( ) );
+            // warp us to our initial position of creation
+            SetRotationRadians ( m_matCreate.GetRotation ( ) );
+            // handled
+            return true;
+        }
+    }
+    // unhandled
+    return false;
+}
+
+bool CClientVehicle::DoesNeedToWaitForGroundToLoad ( )
+{
+    if ( !g_pGame->IsASyncLoadingEnabled ( ) )
+        return false;
+
+    // Let CClientPed handle it if our driver is the local player
+    if ( m_pDriver == g_pClientGame->GetLocalPlayer ( ) )
+        return false;
+
+    // If we're in water we won't need to wait for the ground to load
+    if ( m_LastSyncedData != NULL && m_LastSyncedData->bIsInWater == true )
+        return false;
+
+    // Check for MTA objects around our position
+    CVector vecPosition;
+    GetPosition ( vecPosition );
+    CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ( );
+    
+    return !pObjectManager->ObjectsAroundPointLoaded ( vecPosition, 50.0f, m_usDimension );
 }

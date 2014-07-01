@@ -10,7 +10,11 @@
 
 #include "StdInc.h"
 #ifdef MTA_CLIENT
+    #define DECLARE_PROFILER_SECTION_CDebugHookManager
+    #include "profiler/SharedUtil.Profiler.h"
     #define g_pGame g_pClientGame
+#else
+    #define DECLARE_PROFILER_SECTION(tag)
 #endif
 
 ///////////////////////////////////////////////////////////////
@@ -177,6 +181,8 @@ void GetDebugInfo( lua_State* luaVM, lua_Debug& debugInfo, const char*& szFilena
 ///////////////////////////////////////////////////////////////
 void CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool bAllowed )
 {
+    DECLARE_PROFILER_SECTION( OnPreFunction )
+
     if ( m_PreFunctionHookList.empty() )
         return;
 
@@ -231,6 +237,8 @@ void CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool b
 ///////////////////////////////////////////////////////////////
 void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
 {
+    DECLARE_PROFILER_SECTION( OnPostFunction )
+
     if ( m_PostFunctionHookList.empty() )
         return;
 

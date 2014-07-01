@@ -27,13 +27,17 @@ namespace SharedUtil
     {
         DWORD oldProt;
         VirtualProtect((LPVOID)0x4C0000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
+        VirtualProtect((LPVOID)0x4EB000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x502000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x50A000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x50B000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x533000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
-        VirtualProtect((LPVOID)0x60D000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x609000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
+        VirtualProtect((LPVOID)0x60D000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x60F000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
+        VirtualProtect((LPVOID)0x642000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
+        VirtualProtect((LPVOID)0x648000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
+        VirtualProtect((LPVOID)0x64C000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x687000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x6A0000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x6AE000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
@@ -52,13 +56,18 @@ namespace SharedUtil
             if ( uiAddr < 0x4010
                 || uiAddr > 0x8A40
                 || uiAddr == 0x4C03
+                || uiAddr == 0x4EB9
+                || uiAddr == 0x5022
                 || uiAddr == 0x5023
                 || uiAddr == 0x50AB
                 || uiAddr == 0x50BF
                 || uiAddr == 0x5332
-                || uiAddr == 0x60D8
                 || uiAddr == 0x609C
+                || uiAddr == 0x60D8
                 || uiAddr == 0x60F2
+                || uiAddr == 0x6420
+                || uiAddr == 0x648A
+                || uiAddr == 0x64CA
                 || uiAddr == 0x6870
                 || uiAddr == 0x6A07
                 || uiAddr == 0x6AEA
@@ -76,13 +85,17 @@ namespace SharedUtil
         if ( uiAddr >= 0x401
             && uiAddr < 0x8A4
             && uiAddr != 0x4C0
+            && uiAddr != 0x4EB
             && uiAddr != 0x502
             && uiAddr != 0x50A
             && uiAddr != 0x50B
             && uiAddr != 0x533
-            && uiAddr != 0x60D
             && uiAddr != 0x609
+            && uiAddr != 0x60D
             && uiAddr != 0x60F
+            && uiAddr != 0x642
+            && uiAddr != 0x648
+            && uiAddr != 0x64C
             && uiAddr != 0x687
             && uiAddr != 0x6A0
             && uiAddr != 0x6AE

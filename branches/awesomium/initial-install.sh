@@ -25,6 +25,12 @@ rm ./MTA10_Server/mods/deathmatch/deathmatch.la
 rm ./Shared/XML/xmll.la
 rm ./MTA10_Server/net/net.la
 
+# Build breakpad
+cd ./vendor/google-breakpad
+./configure
+make
+cd ../..
+
 # then you have makefiles and the source can be compiled :)
 # building in parallel mode (use -j<JOBS>)
 make CFLAGS='-O2 -fPIC -DPIC' CXXFLAGS='-O2 -fPIC -DPIC' CPPFLAGS='-O2 -fPIC -DPIC' >_make.log

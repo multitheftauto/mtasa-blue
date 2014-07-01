@@ -58,8 +58,7 @@ int main()
   AllowRange(table, 910, 998, true);
   AllowRange(table, 1000, 1085, true);
   AllowRange(table, 1088, 1193, true);
-  AllowRange(table, 1207, 1372, true);
-  AllowRange(table, 1374, 1381, true);
+  AllowRange(table, 1207, 1381, true);
   AllowRange(table, 1383, 1384, true);
   AllowRange(table, 1386, 1395, true);
   AllowRange(table, 1407, 1698, true);
