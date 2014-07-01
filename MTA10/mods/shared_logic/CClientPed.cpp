@@ -4112,9 +4112,10 @@ void CClientPed::StartRadio ( void )
         {
             // police radio
             g_pGame->GetAudioEngine ( )->StartRadio ( 0 );
+            m_bRadioOn = true;
         }
         // Turn it on if we're not on channel none
-        else if ( m_ucRadioChannel != 0 )
+        else if ( m_ucRadioChannel != 0 && m_ucRadioChannel != 13 )
         {
             // if the radio is on retune it
             if ( m_bRadioOn == true )
@@ -4126,8 +4127,8 @@ void CClientPed::StartRadio ( void )
             {
                 g_pGame->GetAudioEngine ( )->StartRadio ( m_ucRadioChannel );
             }
+            m_bRadioOn = true;
         }
-        m_bRadioOn = true;
     }
 }
 
@@ -4140,6 +4141,33 @@ void CClientPed::StopRadio ( void )
         // Stop the radio and mark it as off
         g_pGame->GetAudioEngine ()->StopRadio ();
         m_bRadioOn = false;
+    }
+}
+
+void CClientPed::SetRadioOn ( bool bRadioOn )
+{
+    // make sure we are the local player
+    if ( m_bIsLocalPlayer )
+    {
+        // update radio on
+        m_bRadioOn = bRadioOn;
+
+        // handle station saving code
+        unsigned char ucCurrentRadioStationID = g_pGame->GetAERadioTrackManager ( )->GetCurrentRadioStationID ( );
+        if ( m_bRadioOn )
+        {
+            unsigned char ucCurrentRadioStationID = g_pGame->GetAERadioTrackManager ( )->GetCurrentRadioStationID ( );
+            // 13 loops back to 0 so might as well just use 0 here
+            if ( ucCurrentRadioStationID == 13 )
+                ucCurrentRadioStationID = 0;
+
+            // don't retune the same station it causes issues.
+            if ( m_ucRadioChannel != ucCurrentRadioStationID )
+            {
+                // retune into our previously selected station
+                g_pGame->GetAudioEngine ( )->RetuneRadio ( m_ucRadioChannel );
+            }
+        }
     }
 }
 
@@ -4386,7 +4414,6 @@ void CClientPed::_GetIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
             CClientVehicle::SetPedOccupyingVehicle ( this, pVehicle, uiSeat, ucDoor );
         }
     }
-    g_pGame->GetAudioEngine ( )->RetuneRadio ( m_ucRadioChannel );
 }
 
 
@@ -4521,7 +4548,8 @@ bool CClientPed::IsClimbing ( void )
 void CClientPed::NextRadioChannel ( void )
 {
     // Is our radio on?
-    if ( m_bRadioOn )
+    if ( m_bRadioOn || 
+       ( m_bRadioOn == false && g_pGame->GetAERadioTrackManager()->IsVehicleRadioActive ( ) ) )
     {
         SetCurrentRadioChannel ( ( m_ucRadioChannel + 1 ) % 13 );
     }
@@ -4531,7 +4559,8 @@ void CClientPed::NextRadioChannel ( void )
 void CClientPed::PreviousRadioChannel ( void )
 {
     // Is our radio on?
-    if ( m_bRadioOn )
+    if ( m_bRadioOn || 
+       ( m_bRadioOn == false && g_pGame->GetAERadioTrackManager ( )->IsVehicleRadioActive ( ) ) )
     {
         if ( m_ucRadioChannel == 0 )
         {

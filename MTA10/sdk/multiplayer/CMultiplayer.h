@@ -72,6 +72,7 @@ typedef bool ( ObjectDamageHandler ) ( class CObjectSAInterface* pObject, float 
 typedef bool ( ObjectBreakHandler ) ( class CObjectSAInterface* pObject, class CEntitySAInterface* pAttacker );
 typedef bool ( WaterCannonHitHandler ) ( class CVehicleSAInterface* pCannonVehicle, class CPedSAInterface* pHitPed );
 typedef bool ( VehicleFellThroughMapHandler ) ( class CVehicleSAInterface* pVehicle );
+typedef void ( RadioStateChangedHandler ) ( bool bIsStop );
 typedef void ( GameObjectDestructHandler ) ( CEntitySAInterface* pObject );
 typedef void ( GameVehicleDestructHandler ) ( CEntitySAInterface* pVehicle );
 typedef void ( GamePlayerDestructHandler ) ( CEntitySAInterface* pPlayer );
@@ -185,6 +186,7 @@ public:
     virtual void                        SetObjectBreakHandler       ( ObjectBreakHandler * pHandler ) = 0;
     virtual void                        SetWaterCannonHitHandler ( WaterCannonHitHandler * pHandler ) = 0;
     virtual void                        SetVehicleFellThroughMapHandler ( VehicleFellThroughMapHandler * pHandler ) = 0;
+    virtual void                        SetRadioStateChangedHandler     ( RadioStateChangedHandler * pHandler ) = 0;
     virtual void                        SetGameObjectDestructHandler    ( GameObjectDestructHandler * pHandler ) = 0;
     virtual void                        SetGameVehicleDestructHandler   ( GameVehicleDestructHandler * pHandler ) = 0;
     virtual void                        SetGamePlayerDestructHandler    ( GamePlayerDestructHandler * pHandler ) = 0;
