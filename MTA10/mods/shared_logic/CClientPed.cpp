@@ -3048,20 +3048,21 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
         if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DUCK )
         {
             // Check for left/right
-            if ( Current.LeftStickX == 0 )
-                m_ulLastTimePressedLeftOrRight = 0;
-            else
+            if ( Current.LeftStickX != 0 )
                 m_ulLastTimePressedLeftOrRight = ulNow;
 
             // If crouching and aiming, don't allow uncrouch button if just pressed left/right, or just aimed
             pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
-            if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
+            if ( ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN ) || ( Current.RightShoulder1 != 0 ) )
                 m_ulLastTimeUseGunCrouched = ulNow;
 
-            // Maybe cancel crouch
+            // Maybe cancel crouch/sprint to prevent quickstand
             if ( ( ulNow - m_ulLastTimePressedLeftOrRight < 500.f * fSpeedRatio ) && 
                  ( ulNow - m_ulLastTimeUseGunCrouched < 500.f * fSpeedRatio ) )
+            {
                 Current.ShockButtonL = 0; 
+                Current.ButtonCross = 0;
+            }
 
         }
     }
