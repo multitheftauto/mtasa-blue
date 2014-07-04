@@ -1,0 +1,22 @@
+* 08-03-2007 Alberto Alonso
+cvs import
+
+* 14-06-2007 Alberto Alonso
+- Added socket clients support, servers are missing
+- Added IRC client support
+- Added INI parser support
+
+* 08-05-2008 Alberto Alonso
+- Reorganized directory tree
+- Added streams and converted socket functions to use streams
+- Implemented SSL TCP sockets
+- Implemented socket selection and support for different selection engines
+- Moved the source code in SocketClientUDP::Connect to SocketClientUDP::Create
+since UDP sockets don't need to connect
+
+* 09-05-2008 Alberto Alonso
+- Added a very simple http client
+
+* 14-07-2008 Alberto Alonso
+- Added compatibility for gcc 4.3.1
+- Fixed a bug in the http client

@@ -1,0 +1,225 @@
+Awesomium 1.7.4.1 Mar 08 2014
+
+    API Changes:
+        - [Added] WebConfig::asset_protocol.
+        - [Added] Added catch-all rule to WebSession::AddDataSource.
+        - [Added] Added host and request parameters to 
+                  DataSource::OnRequest.
+
+    Major Core Changes:
+        - [Removed] Removed quota limit on local storage and session 
+                    storage.
+
+    Bug Fixes:
+        - [Bugfix] Fixed issue with WebConfig::user_script on Mac OSX.
+        - [Bugfix] Fixed issue with about:blank being added to history
+                   at beginning of WebView lifetime.
+        - [Bugfix] Fixed issue with PDF files not being downloaded when 
+                   Adobe Reader is installed.
+        - [Bugfix] Fixed crash that occurs when JSObject::Invoke fails.
+                   on executing a callback with invalid JavaScript.
+        - [Bugfix] Fixed crash issue when JavaScript is disabled.
+        - [Bugfix] Fixed crash issue with requestQuota.
+        - [Bugfix] Fixed crash when users hit CTRL+LEFT at beginning 
+                   of line.
+
+
+Awesomium.NET 1.7.4.1 Mar 20 2014
+
+    API Changes:
+        - [Added] WebCore.Run
+        - [Added] WebCore.UpdateState
+        - [Added] WebCore.QueueWork
+        - [Added] WebCore.IsInitialized
+        - [Obsolete] WebCore.IsRunning
+        - [Obsolete] WebCore.Update
+        - [Obsolete] WebCore.IsAutoUpdateEnabled
+        - [Added] WebCore.IsChildProcess
+        - [Added] WebCore.ChildProcessMain
+        - [Added] WebConfig.AssetProtocol
+        - [Added] WebConfig.DEBUGGING_HOST_DEFAULT
+        - [Added] WebCoreUpdateState
+        - [Added] IWebView.SaveImageAt
+        - [Added] IWebView.HTML
+        - [Added] IWebView.RenderProcess
+        - [Modified] IWebView+ISynchronizeInvoke
+        - [Added] WebSession.ReservedAssetHosts
+        - [Modified] ViewModel.OnPropertyChanged (removed sender)
+        - [Added] IResourceRequest
+        - [Added] Utilities.ToWebRequest (IResourceRequest extension)
+        - [Modified] DataSourceRequest+IResourceRequest
+        - [Added] DataSource.CATCH_ALL
+        - [Added] DownloadCollection.Remove
+        - [Added] DownloadItem.Remove
+        - [Added] DownloadItem.OriginViewId
+        - [Added] ThreadAffinityEnsuredAttribute        
+        - [Added] (WPF) WebDialogsLayer
+        - [Added] (WPF) SourceBinding.Converter
+        - [Added] (WPF) SourceBinding.ConverterParameter
+        - [Added] (WPF) WebControlCommands.SaveImageAs
+
+    Core Changes:
+        - [Feature] Created a synchronization model with internal 
+                    SynchronizationContext, ISynchronizeInvoke 
+                    implementation by views, WebCore.QueueWork and 
+                    WebCore.Run that allows cross-thread interaction 
+                    with Awesomium.
+        - [Feature] Added support for creating custom (native or 
+                    managed) child process.
+        - [Feature] Made it so unwrapped native child views are 
+                    properly destroyed when ShowCreatedWebView 
+                    is not handled.
+        - [Feature] Added the ability access the current rendering 
+                    (child) Process through IWebView.RenderProcess.
+        - [Feature] Added support for specifying a different protocol
+                    for DataSource (other then "asset").
+        - [Feature] You can now easily revive from Crashed by GoBack,
+                    GoForward, GoHome and Reload.
+        - [Feature] Applied new thread-affinity insurance model.
+                    Users can bypass with 
+                    ThreadAffinityEnsuredAttribute
+        - [Feature] Made so the child process's priority is lowered 
+                    when the view is not rendering.
+        - [Feature] Redesigned our JSObject references model.
+        - [Feature] Added support for specifying a "catch all" 
+                    DataSource for handling requests to any asset host.
+        - [Feature] DataSourceRequests now implement the new 
+                    IResourceRequest providing the OnRequest call 
+                    with important information about the request.
+        - [Feature] Added support for downloading an image at 
+                    specified coordinates in a page, with 
+                    IWebView.SaveImageAt.
+        - [Feature] Added commands relevant to the new SaveImageAt,
+                    to predefined context-menus.
+        - [Feature] Made it so users can remove certain items 
+                    from WebCore.Downloads.
+        - [Feature] Added support for acquiring the HTML of the 
+                    currently loaded page through IWebView.HTML
+        - [Feature] Added design-time support for
+                    Visual Studio 2013.
+        - [Modified] Significantly improved and added more, 
+                     documentation.
+        - [Feature] (WPF/WinForms) Made it so that the address in a 
+                    WPF TextBox bound with SourceBinding or in a 
+                    WinForms AddressBox, is not updated when they 
+                    have keyboard focus.
+        - [Feature] (WPF) Improved performance of the WPF WebControl 
+                    by utilizing features of the new synchronization model.
+        - [Feature] (WPF) Added the WPF WebDialogsLayer decorator 
+                    for presenting JS dialogs.
+        - [Feature] (WPF) Redesigned WPF JS dialogs.
+        - [Feature] (WPF) Added full localization support for 
+                    WPF context menus and commands.
+        - [Feature] (WPF) Made it so SourceBinding can target any 
+                    type with a Source Uri property.
+        - [Feature] (WPF) Users can now provide custom handling of 
+                    String->Uri conversion when using a SourceBinding, 
+                    with a custom UriValueConverter.
+        - [Modified] (WPF) Improved appearance of WPF WebPopupMenu.
+        - [Modified] (WPF) Improved WebViewPresenter rendering in 
+                     high DPI.
+        - [Feature] (WPF) Added support for small and extra large 
+                    icons in WPF DownloadItem.
+        - [Feature] (WPF) Added default "awe" and "data" XAML 
+                    namespace prefixes.
+        - [Feature] (WPF) Made it so users can customize the 
+                    "crashed" layer ("Sad Tab") and all relevant 
+                    predefined UI.
+        - [Modified] (Unity) Updated Unity sample scripts.
+        - [Feature] (MonoMac/Xamarin) Created the Awesomium.Xamarin.Mac
+                    assembly, targeting XamMac, to be used by Xamarin 
+                    clients for producing applications that can be 
+                    distributed to the Apple Store.
+        - [Feature] (MonoMac/Xamarin) Created OsmMonoMac assembly 
+                    (our build of MonoMac). This replaces the previous 
+                    Awesomium.MonoMac assembly (with ambiguous name).
+
+    Bug Fixes:
+        - [Bugfix] (Native) Fixed issue that would cause a crash when 
+                   WebPreferences.Javascript was set to false. (#12)
+        - [Bugfix] (Native) Fixed issue with about:blank being added 
+                   to history at beginning of view's lifetime. (#30)
+        - [Bugfix] (Native) Fixed issue with PDF files not being 
+                   downloaded when Adobe Reader is installed. (#11)
+        - [Bugfix] (Native) Fixed crash that occurs when 
+                   JSObject.Invoke fails on executing a callback 
+                   with invalid JavaScript.
+        - [Bugfix] (Native) Fixed crash issue with requestQuota.
+        - [Bugfix] (Native) Fixed crash when users hit CTRL+LEFT 
+                   at beginning of line.
+        - [Bugfix] Fixed incorrect rendering when scrolling iFrames 
+                   with managed Offscreen views. (#22)
+        - [Bugfix] Fixed occasional NullReferenceException in WebCore's 
+                   static constructor which causes a 
+                   TypeInitializationException and crash. (#33)
+        - [Bugfix] Fixed issues in JIF that would cause 
+                   IWebView.Selection to not update. (#24)
+        - [Bugfix] Made it so IWebView.Selection contents are cleared
+                   upon navigation. (#34)
+        - [Bugfix] Fixed issues with reviving from Crashed.
+        - [Bugfix] Fixed issue that would cause requests from views 
+                   with invalid/special identifier (0), be canceled.
+                   This affected login procedure in certain sites. (#38)
+        - [Bugfix] Fixed issue that would cause a JSObject instance
+                   be prematurely released.
+        - [Bugfix] Fixed issue that would cause ResourceDataSource
+                   not be able to access resources when there are 
+                   numbers in the path. (#23)        
+        - [Bugfix] Fixed some bugs in DirectoryDataSource (#39)
+        - [Bugfix] Made it so OnDocumentReady is fired on 
+                   'window.open' child views (#25)
+        - [Bugfix] Made it so full-screen Flash windows, do not appear
+                   to the background of the application when using 
+                   Offscreen views. (#37)
+        - [Bugfix] Fixed issue with Zoom not being applied to newly 
+                   created views navigating to a Zoomed host.
+        - [Bugfix] (WPF) Fixed issue with WebControlCommands handling
+                   keyboard shortcuts already handled by native 
+                   Awesomium.
+        - [Bugfix] (WPF) WebControls no longer scrolls when a drop-down
+                   (popup) menu is open.
+        - [Bugfix] (WPF) Made it so WebViewHost (windowed WebControls) 
+                   properly handles Modifier + Key. (#29)
+        - [Bugfix] (WPF) Made it so tool-tips and drop-down (popup)
+                   menus in WPF WebControl, close when the container 
+                   Window is moved. (#36)
+        - [Bugfix] (WPF) Made it so that text in WPF WebControl 
+                   tool-tips, is properly wrapped. (#20)
+        - [Bugfix] (WPF) Few fixes and improvements that prevent memory
+                   leaks on WPF.
+        - [Bugfix] (WPF) Made it so that buttons in WPF dialogs properly
+                   handle mouse clicks.
+        - [Bugfix] (WinForms) Made it so users can handle key-related 
+                   events and override default handling, on WinForms 
+                   Offscreen WebControl. (#35)
+        - [Bugfix] (MonoMac/Xamarin) Fixed issues that would cause a 
+                   crash when a new OSMWebView is created, with newer 
+                   versions of MonoMac and XamMac.
+        - [Bugfix] (Samples) Fixed issue with UpdateFavicon code in 
+                   samples, that would cause a WebCore shutdown.
+
+    Samples Major Changes:
+        - [Added] Added new BasicAsyncSample that demonstrates all 
+                  features of the new synchronization model.
+        - [Modified] Redesigned BasicSample to use the new 
+                     synchronization model.
+        - [Added] Added Awesomium (C++) sample; a custom native child
+                  process.
+        - [Added] Added CustomProcess (C#) sample; a custom managed 
+                  child process.
+        - [Modified] (Unity) Upgraded Awesomium.Unity sample project 
+                     to Unity 4.3.x.
+        - [Modified] (WPF) Updated all WPF samples to reflect changes 
+                     and new features.
+        - [Modified] (WPF) Completely redesigned the TabbedWPFSample 
+                     using fresh Metro look and feel.
+        - [Modified] (WPF) Removed Microsoft.Widows.Shell dependency 
+                     from WPF samples.
+        - [Added] (MonoMac/Xamarin) Added XamMac (equivalent to the 
+                  MonoMac) samples, for use by Xamarin clients.
+
+
+------------------------------------------------------------------------------
+Awesomium.NET 1.7.3.0 Oct 25 2013
+
+    Please visit: http://wiki.awesomium.net/changelogs/whats-new-1-7-3.html

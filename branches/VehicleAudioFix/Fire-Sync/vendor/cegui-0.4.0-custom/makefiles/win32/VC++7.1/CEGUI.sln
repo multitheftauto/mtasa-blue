@@ -1,0 +1,53 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEGUIBase", "BaseSystem\BaseSystem.vcproj", "{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectX9GUIRenderer", "Renderers\DirectX9Renderer\DirectX9GUIRenderer.vcproj", "{7582B608-D92F-4FCB-B682-2214B48D1596}"
+	ProjectSection(ProjectDependencies) = postProject
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54} = {232B1F48-87C1-4EF9-98A2-CF675BAC7A54}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FalagardBase", "WidgetSets\Falagard\Falagard.vcproj", "{04E4A944-225A-4BFB-B7B5-F23AEE884989}"
+	ProjectSection(ProjectDependencies) = postProject
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54} = {232B1F48-87C1-4EF9-98A2-CF675BAC7A54}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Debug - Librarian = Debug - Librarian
+		Release = Release
+		Release - Librarian = Release - Librarian
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Debug.ActiveCfg = Debug|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Debug.Build.0 = Debug|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Debug - Librarian.ActiveCfg = Debug - Librarian|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Debug - Librarian.Build.0 = Debug - Librarian|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Release.ActiveCfg = Release|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Release.Build.0 = Release|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Release - Librarian.ActiveCfg = Release - Librarian|Win32
+		{232B1F48-87C1-4EF9-98A2-CF675BAC7A54}.Release - Librarian.Build.0 = Release - Librarian|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Debug.ActiveCfg = Debug|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Debug.Build.0 = Debug|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Debug - Librarian.ActiveCfg = Debug - Librarian|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Debug - Librarian.Build.0 = Debug - Librarian|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Release.ActiveCfg = Release|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Release.Build.0 = Release|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Release - Librarian.ActiveCfg = Release - Librarian|Win32
+		{7582B608-D92F-4FCB-B682-2214B48D1596}.Release - Librarian.Build.0 = Release - Librarian|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Debug.ActiveCfg = Debug|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Debug.Build.0 = Debug|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Debug - Librarian.ActiveCfg = Debug - Librarian|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Debug - Librarian.Build.0 = Debug - Librarian|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release.ActiveCfg = Release|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release.Build.0 = Release|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release - Librarian.ActiveCfg = Release - Librarian|Win32
+		{04E4A944-225A-4BFB-B7B5-F23AEE884989}.Release - Librarian.Build.0 = Release - Librarian|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

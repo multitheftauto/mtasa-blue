@@ -1,0 +1,72 @@
+<chatboxpresets>
+	<preset name="MTA Blue (default)">
+		<color_text>255 255 255</color_text>
+		<color_background>0 0 128 100</color_background>
+		<color_input_text>172 213 254 255</color_input_text>
+		<color_input_background>0 0 129 110</color_input_background>
+		<font>0</font>
+		<lines>7</lines>
+		<scale>1 1</scale>
+		<width>1</width>
+		<css_text>0</css_text>
+		<css_background>0</css_background>
+		<line_life>12000</line_life>
+		<line_fadeout>3000</line_fadeout>
+	</preset>
+	<preset name="MTA Black">
+		<color_text>255 255 255</color_text>
+		<color_background>0 0 0 100</color_background>
+		<color_input_text>172 213 254 255</color_input_text>
+		<color_input_background>0 0 0 110</color_input_background>
+		<font>0</font>
+		<lines>7</lines>
+		<scale>1 1</scale>
+		<width>1</width>
+		<css_text>0</css_text>
+		<css_background>0</css_background>
+		<line_life>12000</line_life>
+		<line_fadeout>3000</line_fadeout>
+	</preset>
+	<preset name="Transparent">
+		<color_text>255 255 255</color_text>
+		<color_background>0 0 0 0</color_background>
+		<color_input_text>172 213 254 255</color_input_text>
+		<color_input_background>0 0 0 0</color_input_background>
+		<font>2</font>
+		<lines>10</lines>
+		<scale>1 1</scale>
+		<width>1.5</width>
+		<css_text>0</css_text>
+		<css_background>0</css_background>
+		<line_life>12000</line_life>
+		<line_fadeout>3000</line_fadeout>
+	</preset>
+	<preset name="Race Oversized">
+		<color_text>172 213 254 255</color_text>
+		<color_background>0 0 128 100</color_background>
+		<color_input_text>172 213 254 255</color_input_text>
+		<color_input_background>0 0 191 110</color_input_background>
+		<font>3</font>
+		<lines>10</lines>
+		<scale>1.65 1.17</scale>
+		<width>1.2</width>
+		<css_text>0</css_text>
+		<css_background>0</css_background>
+		<line_life>12000</line_life>
+		<line_fadeout>3000</line_fadeout>
+	</preset>
+	<preset name="iRace 2009">
+		<color_text>172 213 254 255</color_text>
+		<color_background>0 0 128 0</color_background>
+		<color_input_text>172 213 254 255</color_input_text>
+		<color_input_background>0 0 191 110</color_input_background>
+		<font>0</font>
+		<lines>10</lines>
+		<scale>1.5 1.1</scale>
+		<width>1.2</width>
+		<css_text>1</css_text>
+		<css_background>0</css_background>
+		<line_life>30000</line_life>
+		<line_fadeout>300000</line_fadeout>
+	</preset>
+</chatboxpresets>

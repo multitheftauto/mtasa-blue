@@ -1,0 +1,9 @@
+ACLOCAL_AMFLAGS = -I m4
+AUTOMAKE_OPTIONS = foreign
+EXTRA_DIST = configure
+
+if WANT_IRCBOTS
+IRCBOTS_DIR = irc
+endif
+
+SUBDIRS = vendor Shared MTA10_Server $(IRCBOTS_DIR)

@@ -1,0 +1,17 @@
+Just modifying:
+--------------
+1. Check this directory out of the svn
+2. Change the files in 'MTA San Andreas' as you want
+3. If you changed the directory tree layout, update the installer script to reflect this, or ask your mom to do it for you
+4. Commit back to the svn
+
+Making installer:
+----------------
+1. Check this directory out of the svn
+2. Update BUILD_NUMBER in 'data files installer.nsi'
+3. Run the script (with NSIS 2)
+4. Commit back to the svn
+5. Upload data_files.exe to somewhere
+
+
+Note: Uses the same NSIS plugins as the main installer.

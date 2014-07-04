@@ -1,0 +1,98 @@
+Crazy Eddie's GUI System Mk-2
+http://www.cegui.org.uk
+
+Copyright ©2004 - 2005 CEGUI Team & Contributing Authors
+
+
+The following is a list of primary authors and contributors for Crazy Eddie's
+GUI System Mk-2.
+
+
+CEGUI Team
+---------
+James O'Sullivan (_mental_)
+Tomas Lindquist Olsen (lindquist)
+Paul D Turner (crayzed / CrazyEddie)
+Patrick Kooman (scriptkid)
+Paul Schifferer (Exsortis)
+
+
+Main Contributors
+-----------------
+The following have made large, important, or on-going contributions to the
+system (these people may have made additional contributions than those
+specifically mentioned)...
+
+Lars Rinde:
+- Original TaharezLook graphics design.
+
+'Blakharaz':
+- Initial XmlHandlerHelper class and general cleanup of original XML parsing
+code.
+
+Jeff Leigh:
+- Original CEGUI::ColourManipulator class (now re-factored into CEGUI::colour
+class) and related fixes.
+
+Gerald Lindsly:
+- Event system re-implementation.
+
+Jose A Milan:
+- Refactoring of XML handling classes to remove public dependency on Xerces-C++.
+- Initial updates to Ogre renderer to support Ogre 1.0.
+
+Magnus Osterlind:
+- Direct3D 9 GUI renderer module.
+
+Steve Streeting:
+- TabControl widget base classes & related 'TaharezLook' classes.
+
+Mark Strom:
+- OpenGL GUI renderer module.
+
+Thomas Suter:
+- Irrlicht GUI renderer module.
+
+
+Other Contributors
+------------------
+The following have contributed patches, bug reports, and other such valuable
+things...
+
+Geoff Carlton
+Clay Culver
+Paul Downey
+Jeff Doyle
+Jan Eickmann
+Erik Hjortsberg
+Rafal Jastrzebski
+Chris Kang
+Peter Newman
+Chris Osborn
+Shane Parker
+James Turner
+Chris Weaver
+Christopher Wedman
+armaduck
+genva
+Te'ja
+
+
+Special Thanks
+--------------
+Shawn Carroll	- For his tutorial series.
+Chris McGuirk	- For his C#.Net port.
+Shane Parker	- For giving permission to use his "Vanilla GUI" imagery.
+
+Everyone on the GameDev.Net forums who looked at earlier versions of the system
+and gave constructive criticism.
+
+Everyone on the Ogre forums who encouraged the development of this Mk-2 version
+of the system.
+
+
+Have I Missed You?
+------------------
+If you feel that I have missed you from some section of this list, then please
+contact me (crayzed@users.sourceforge.net) and let me know who you are and what
+you did, and I'll correct the mistake as soon as possible.

@@ -1,0 +1,363 @@
+<HTML>
+
+<HEAD>
+<title>Implementation notes: sparse_hash, dense_hash, sparsetable</title>
+</HEAD>
+
+<BODY>
+
+<h1>Implementation of sparse_hash_map, dense_hash_map, and
+sparsetable</h1>
+
+This document contains a few notes on how the data structures in this
+package are implemented.  This discussion refers at several points to
+the classic text in this area: Knuth, <i>The Art of Computer
+Programming</i>, Vol 3, Hashing.
+
+
+<hr>
+<h2><tt>sparsetable</tt></h2>
+
+<p>For specificity, consider the declaration </p>
+
+<pre>
+   sparsetable&lt;Foo&gt; t(100);        // a sparse array with 100 elements
+</pre>
+
+<p>A sparsetable is a random container that implements a sparse array,
+that is, an array that uses very little memory to store unassigned
+indices (in this case, between 1-2 bits per unassigned index).  For
+instance, if you allocate an array of size 5 and assign a[2] = [big
+struct], then a[2] will take up a lot of memory but a[0], a[1], a[3],
+and a[4] will not.  Array elements that have a value are called
+"assigned".  Array elements that have no value yet, or have had their
+value cleared using erase() or clear(), are called "unassigned".
+For assigned elements, lookups return the assigned value; for
+unassigned elements, they return the default value, which for t is
+Foo().</p>
+
+<p>sparsetable is implemented as an array of "groups".  Each group is
+responsible for M array indices.  The first group knows about
+t[0]..t[M-1], the second about t[M]..t[2M-1], and so forth.  (M is 48
+by default.)  At construct time, t creates an array of (99/M + 1)
+groups.  From this point on, all operations -- insert, delete, lookup
+-- are passed to the appropriate group.  In particular, any operation
+on t[i] is actually performed on (t.group[i / M])[i % M].</p>
+
+<p>Each group contains of a vector, which holds assigned values, and a
+bitmap of size M, which indicates which indices are assigned.  A
+lookup works as follows: the group is asked to look up index i, where
+i &lt; M.  The group looks at bitmap[i].  If it's 0, the lookup fails.
+If it's 1, then the group has to find the appropriate value in the
+vector.</p>
+
+<h3><tt>find()</tt></h3>
+
+<p>Finding the appropriate vector element is the most expensive part of
+the lookup.  The code counts all bitmap entries &lt;= i that are set to
+1.  (There's at least 1 of them, since bitmap[i] is 1.)  Suppose there
+are 4 such entries.  Then the right value to return is the 4th element
+of the vector: vector[3].  This takes time O(M), which is a constant
+since M is a constant.</p>
+
+<h3><tt>insert()</tt></h3>
+
+<p>Insert starts with a lookup.  If the lookup succeeds, the code merely
+replaces vector[3] with the new value.  If the lookup fails, then the
+code must insert a new entry into the middle of the vector.  Again, to
+insert at position i, the code must count all the bitmap entries &lt;= i
+that are set to i.  This indicates the position to insert into the
+vector.  All vector entries above that position must be moved to make
+room for the new entry.  This takes time, but still constant time
+since the vector has size at most M.</p>
+
+<p>(Inserts could be made faster by using a list instead of a vector to
+hold group values, but this would use much more memory, since each
+list element requires a full pointer of overhead.)</p>
+
+<p>The only metadata that needs to be updated, after the actual value is
+inserted, is to set bitmap[i] to 1.  No other counts must be
+maintained.</p>
+
+<h3><tt>delete()</tt></h3>
+
+<p>Deletes are similar to inserts.  They start with a lookup.  If it
+fails, the delete is a noop.  Otherwise, the appropriate entry is
+removed from the vector, all the vector elements above it are moved
+down one, and bitmap[i] is set to 0.</p>
+
+<h3>iterators</h3>
+
+<p>Sparsetable iterators pose a special burden.  They must iterate over
+unassigned array values, but the act of iterating should not cause an
+assignment to happen -- otherwise, iterating over a sparsetable would
+cause it to take up much more room.  For const iterators, the matter
+is simple: the iterator is merely programmed to return the default
+value -- Foo() -- when dereferenced while pointing to an unassigned
+entry.</p>
+
+<p>For non-const iterators, such simple techniques fail.  Instead,
+dereferencing a sparsetable_iterator returns an opaque object that
+acts like a Foo in almost all situations, but isn't actually a Foo.
+(It does this by defining operator=(), operator value_type(), and,
+most sneakily, operator&().)  This works in almost all cases.  If it
+doesn't, an explicit cast to value_type will solve the problem:</p>
+
+<pre>
+   printf("%d", static_cast&lt;Foo&gt;(*t.find(0)));
+</pre>
+
+<p>To avoid such problems, consider using get() and set() instead of an
+iterator:</p>
+
+<pre>
+   for (int i = 0; i &lt; t.size(); ++i)
+      if (t.get(i) == ...)  t.set(i, ...);
+</pre>
+
+<p>Sparsetable also has a special class of iterator, besides normal and
+const: nonempty_iterator.  This only iterates over array values that
+are assigned.  This is particularly fast given the sparsetable
+implementation, since it can ignore the bitmaps entirely and just
+iterate over the various group vectors.</p>
+
+<h3>Resource use</h3>
+
+<p>The space overhead for an sparsetable of size N is N + 48N/M bits.
+For the default value of M, this is exactly 2 bits per array entry.
+A larger M would use less overhead -- approaching 1 bit per array
+entry -- but take longer for inserts, deletes, and lookups.  A smaller
+M would use more overhead but make operations somewhat faster.</p>
+
+<p>You can also look at some specific <A
+HREF="performance.html">performance numbers</A>.</p>
+
+
+<hr>
+<h2><tt>sparse_hash_set</tt></h2>
+
+<p>For specificity, consider the declaration </p>
+
+<pre>
+   sparse_hash_set&lt;Foo&gt; t;
+</pre>
+
+<p>sparse_hash_set is a hashtable.  For more information on hashtables,
+see Knuth.  Hashtables are basically arrays with complicated logic on
+top of them.  sparse_hash_set uses a sparsetable to implement the
+underlying array.</p>
+
+<p>In particular, sparse_hash_set stores its data in a sparsetable using
+quadratic internal probing (see Knuth).  Many hashtable
+implementations use external probing, so each table element is
+actually a pointer chain, holding many hashtable values.
+sparse_hash_set, on the other hand, always stores at most one value in
+each table location.  If the hashtable wants to store a second value
+at a given table location, it can't; it's forced to look somewhere
+else.</p>
+
+<h3><tt>insert()</tt></h3>
+
+<p>As a specific example, suppose t is a new sparse_hash_set.  It then
+holds a sparsetable of size 32.  The code for t.insert(foo) works as
+follows:</p>
+
+<p>
+1) Call hash&lt;Foo&gt;(foo) to convert foo into an integer i.  (hash&lt;Foo&gt; is
+   the default hash function; you can specify a different one in the
+   template arguments.)
+
+</p><p>
+2a) Look at t.sparsetable[i % 32].  If it's unassigned, assign it to
+    foo.  foo is now in the hashtable.
+
+</p><p>
+2b) If t.sparsetable[i % 32] is assigned, and its value is foo, then
+    do nothing: foo was already in t and the insert is a noop.
+
+</p><p>
+2c) If t.sparsetable[i % 32] is assigned, but to a value other than
+    foo, look at t.sparsetable[(i+1) % 32].  If that also fails, try
+    t.sparsetable[(i+3) % 32], then t.sparsetable[(i+6) % 32].  In
+    general, keep trying the next triangular number.
+
+</p><p>
+3) If the table is now "too full" -- say, 25 of the 32 table entries
+   are now assigned -- grow the table by creating a new sparsetable
+   that's twice as big, and rehashing every single element from the
+   old table into the new one.  This keeps the table from ever filling
+   up.
+
+</p><p>
+4) If the table is now "too empty" -- say, only 3 of the 32 table
+   entries are now assigned -- shrink the table by creating a new
+   sparsetable that's half as big, and rehashing every element as in
+   the growing case.  This keeps the table overhead proportional to
+   the number of elements in the table.
+</p>
+
+<p>Instead of using triangular numbers as offsets, one could just use
+regular integers: try i, then i+1, then i+2, then i+3.  This has bad
+'clumping' behavior, as explored in Knuth.  Quadratic probing, using
+the triangular numbers, avoids the clumping while keeping cache
+coherency in the common case.  As long as the table size is a power of
+2, the quadratic-probing method described above will explore every
+table element if necessary, to find a good place to insert.</p>
+
+<p>(As a side note, using a table size that's a power of two has several
+advantages, including the speed of calculating (i % table_size).  On
+the other hand, power-of-two tables are not very forgiving of a poor
+hash function.  Make sure your hash function is a good one!  There are
+plenty of dos and don'ts on the web (and in Knuth), for writing hash
+functions.)</p>
+
+<p>The "too full" value, also called the "maximum occupancy", determines
+a time-space tradeoff: in general, the higher it is, the less space is
+wasted but the more probes must be performed for each insert.
+sparse_hash_set uses a high maximum occupancy, since space is more
+important than speed for this data structure.</p>
+
+<p>The "too empty" value is not necessary for performance but helps with
+space use.  It's rare for hashtable implementations to check this
+value at insert() time -- after all, how will inserting cause a
+hashtable to get too small?  However, the sparse_hash_set
+implementation never resizes on erase(); it's nice to have an erase()
+that does not invalidate iterators.  Thus, the first insert() after a
+long string of erase()s could well trigger a hashtable shrink.</p>
+
+<h3><tt>find()</tt></h3>
+
+<p>find() works similarly to insert.  The only difference is in step
+(2a): if the value is unassigned, then the lookup fails immediately.</p>
+
+<h3><tt>delete()</tt></h3>
+
+<p>delete() is tricky in an internal-probing scheme.  The obvious
+implementation of just "unassigning" the relevant table entry doesn't
+work.  Consider the following scenario:</p>
+
+<pre>
+    t.insert(foo1);         // foo1 hashes to 4, is put in table[4]
+    t.insert(foo2);         // foo2 hashes to 4, is put in table[5]
+    t.erase(foo1);          // table[4] is now 'unassigned'
+    t.lookup(foo2);         // fails since table[hash(foo2)] is unassigned
+</pre>
+
+<p>To avoid these failure situations, delete(foo1) is actually
+implemented by replacing foo1 by a special 'delete' value in the
+hashtable.  This 'delete' value causes the table entry to be
+considered unassigned for the purposes of insertion -- if foo3 hashes
+to 4 as well, it can go into table[4] no problem -- but assigned for
+the purposes of lookup.</p>
+
+<p>What is this special 'delete' value?  The delete value has to be an
+element of type Foo, since the table can't hold anything else.  It
+obviously must be an element the client would never want to insert on
+its own, or else the code couldn't distinguish deleted entries from
+'real' entries with the same value.  There's no way to determine a
+good value automatically.  The client has to specify it explicitly.
+This is what the set_deleted_key() method does.</p>
+
+<p>Note that set_deleted_key() is only necessary if the client actually
+wants to call t.erase().  For insert-only hash-sets, set_deleted_key()
+is unnecessary.</p>
+
+<p>When copying the hashtable, either to grow it or shrink it, the
+special 'delete' values are <b>not</b> copied into the new table.  The
+copy-time rehash makes them unnecessary.</p>
+
+<h3>Resource use</h3>
+
+<p>The data is stored in a sparsetable, so space use is the same as
+for sparsetable.  Time use is also determined in large part by the
+sparsetable implementation.  However, there is also an extra probing
+cost in hashtables, which depends in large part on the "too full"
+value.  It should be rare to need more than 4-5 probes per lookup, and
+usually significantly less will suffice.</p>
+
+<p>A note on growing and shrinking the hashtable: all hashtable
+implementations use the most memory when growing a hashtable, since
+they must have room for both the old table and the new table at the
+same time.  sparse_hash_set is careful to delete entries from the old
+hashtable as soon as they're copied into the new one, to minimize this
+space overhead.  (It does this efficiently by using its knowledge of
+the sparsetable class and copying one sparsetable group at a time.)</p>
+
+<p>You can also look at some specific <A
+HREF="performance.html">performance numbers</A>.</p>
+
+
+<hr>
+<h2><tt>sparse_hash_map</tt></h2>
+
+<p>sparse_hash_map is implemented identically to sparse_hash_set.  The
+only difference is instead of storing just Foo in each table entry,
+the data structure stores pair&lt;Foo, Value&gt;.</p>
+
+
+<hr>
+<h2><tt>dense_hash_set</tt></h2>
+
+<p>The hashtable aspects of dense_hash_set are identical to
+sparse_hash_set: it uses quadratic internal probing, and resizes
+hashtables in exactly the same way.  The difference is in the
+underlying array: instead of using a sparsetable, dense_hash_set uses
+a C array.  This means much more space is used, especially if Foo is
+big.  However, it makes all operations faster, since sparsetable has
+memory management overhead that C arrays do not.</p>
+
+<p>The use of C arrays instead of sparsetables points to one immediate
+complication dense_hash_set has that sparse_hash_set does not: the
+need to distinguish assigned from unassigned entries.  In a
+sparsetable, this is accomplished by a bitmap.  dense_hash_set, on the
+other hand, uses a dedicated value to specify unassigned entries.
+Thus, dense_hash_set has two special values: one to indicate deleted
+table entries, and one to indicated unassigned table entries.  At
+construct time, all table entries are initialized to 'unassigned'.</p>
+
+<p>dense_hash_set provides the method set_empty_key() to indicate the
+value that should be used for unassigned entries.  Like
+set_deleted_key(), set_empty_key() requires a value that will not be
+used by the client for any legitimate purpose.  Unlike
+set_deleted_key(), set_empty_key() is always required, no matter what
+hashtable operations the client wishes to perform.</p>
+
+<h3>Resource use</h3>
+
+<p>This implementation is fast because even though dense_hash_set may not
+be space efficient, most lookups are localized: a single lookup may
+need to access table[i], and maybe table[i+1] and table[i+3], but
+nothing other than that.  For all but the biggest data structures,
+these will frequently be in a single cache line.</p>
+
+<p>This implementation takes, for every unused bucket, space as big as
+the key-type.  Usually between half and two-thirds of the buckets are
+empty.</p>
+
+<p>The doubling method used by dense_hash_set tends to work poorly
+with most memory allocators.  This is because memory allocators tend
+to have memory 'buckets' which are a power of two.  Since each
+doubling of a dense_hash_set doubles the memory use, a single
+hashtable doubling will require a new memory 'bucket' from the memory
+allocator, leaving the old bucket stranded as fragmented memory.
+Hence, it's not recommended this data structure be used with many
+inserts in memory-constrained situations.</p>
+
+<p>You can also look at some specific <A
+HREF="performance.html">performance numbers</A>.</p>
+
+
+<hr>
+<h2><tt>dense_hash_map</tt></h2>
+
+<p>dense_hash_map is identical to dense_hash_set except for what values
+are stored in each table entry.</p>
+
+<hr>
+<author>
+Craig Silverstein<br>
+Thu Jan  6 20:15:42 PST 2005
+</author>
+
+</body>
+</html>
