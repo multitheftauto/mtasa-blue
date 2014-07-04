@@ -941,7 +941,6 @@ void CLuaMain::AddConnectionClass ( lua_State* luaVM )
 }
 
 
-// TODO: We need code to integrate this class into the handles returned by the db functions
 void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
