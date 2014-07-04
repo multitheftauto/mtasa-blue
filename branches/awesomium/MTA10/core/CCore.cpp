@@ -226,6 +226,9 @@ CCore::~CCore ( void )
     delete m_pLocalGUI;
     delete m_pGraphics;
 
+    // Delete the web
+    delete m_pWebCore;
+
     // Delete lazy subsystems
     DestroyGUI ();
     DestroyXML ();
@@ -238,9 +241,6 @@ CCore::~CCore ( void )
 
     // Delete the logger
     delete m_pConsoleLogger;
-
-    // Delete the web
-    delete m_pWebCore;
 
     //Delete the Current Server
     delete m_pCurrentServer;
@@ -993,6 +993,9 @@ void CCore::InitGUI ( IDirect3DDevice9* pDevice )
     std::string strScreenShotPath = CalcMTASAPath ( "screenshots" );
     CVARS_SET ( "screenshot_path", strScreenShotPath );
     CScreenShot::SetPath ( strScreenShotPath.c_str() );
+
+    // Load Awesomium
+    InitialiseWeb ();
 }
 
 
@@ -1137,7 +1140,7 @@ void CCore::DestroyNetwork ( )
 void CCore::InitialiseWeb ()
 {
     // Don't initialise webcore twice
-    if (m_pWebCore)
+    if ( m_pWebCore )
         return;
 
     m_pWebCore = new CWebCore;
@@ -1305,6 +1308,7 @@ void CCore::DoPostFramePulse ( )
 
     GetJoystickManager ()->DoPulse ();      // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse ();
+    m_pWebCore->DoPulse ();
 
     // Notify the mod manager and the connect manager
     TIMING_CHECKPOINT( "-CorePostFrame1" );

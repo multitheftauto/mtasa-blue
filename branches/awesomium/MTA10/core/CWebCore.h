@@ -13,6 +13,9 @@
 
 #include <core/CWebCoreInterface.h>
 #include <Awesomium/WebCore.h>
+#define MTA_BROWSERDATA_PATH "mta/browserdata.xml"
+#define BROWSER_LIST_UPDATE_INTERVAL (24*60*60)
+#define BROWSER_UPDATE_URL "http://jusonex.net/aw/getlist.php"
 
 class CWebBrowserItem;
 class CWebsiteRequests;
@@ -28,12 +31,13 @@ public:
 
     CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal );
     void                DestroyWebView      ( CWebViewInterface* pWebViewInterface );
-    void                Update              ();
+    void                DoPulse             ();
     
     eURLState           GetURLState         ( const SString& strURL );
     void                ClearWhitelist      ();
     void                InitialiseWhiteAndBlacklist ();
     void                AddAllowedPage      ( const SString& strURL );
+    void                AddBlockedPage      ( const SString& strURL );
     void                RequestPages        ( const std::vector<SString>& pages );
     void                AllowPendingPages   ();
     void                DenyPendingPages    ();
@@ -45,6 +49,13 @@ public:
 
     bool                InitialiseCoreAudio ();
     bool                SetGlobalAudioVolume( float fVolume );
+
+    bool                UpdateListsFromMaster();
+    bool                MakeSureXMLNodesExist  ();
+    void                LoadListsFromXML     ( bool bWhitelist, bool bBlacklist );
+    static bool         StaticFetchRevisionProgress  ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
+    static bool         StaticFetchWhitelistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
+    static bool         StaticFetchBlacklistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
 
 
 
@@ -66,6 +77,10 @@ private:
     std::vector<SString>                    m_PendingRequests;
 
     IAudioSessionManager2*                  m_pAudioSessionManager;
+
+    CXMLFile*                               m_pXmlConfig;
+    int                                     m_iWhitelistRevision;
+    int                                     m_iBlacklistRevision;
 };
 
 #endif
