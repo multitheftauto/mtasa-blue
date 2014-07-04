@@ -20,6 +20,7 @@ void    SharedUtil_ClassIdent_Tests     ( void );
 void 	SharedUtil_WildcardMatch_Tests  ( void );
 void    SharedUtil_Collection_Tests     ( void );
 void    SharedUtil_String_Tests         ( void );
+void    SharedUtil_Hash_Tests           ( void );
 
 ///////////////////////////////////////////////////////////////
 //
@@ -36,6 +37,7 @@ void SharedUtil_Tests ( void )
     SharedUtil_WildcardMatch_Tests ();
     SharedUtil_Collection_Tests ();
     SharedUtil_String_Tests ();
+    SharedUtil_Hash_Tests ();
 }
 
 
@@ -724,7 +726,18 @@ void SharedUtil_String_Tests ( void )
             { L"##123456#125G##123456#12345",            L"##125G##12345" },
         TEST_END
     }
+}
 
+
+///////////////////////////////////////////////////////////////
+//
+// SharedUtil_Hash_Tests
+//
+// Test behaviour of hashing/crypt related functions
+//
+///////////////////////////////////////////////////////////////
+void SharedUtil_Hash_Tests ( void )
+{
     // ConvertHexStringToData/ConvertDataToHexString
     {
         TEST_FUNCTION
@@ -741,6 +754,57 @@ void SharedUtil_String_Tests ( void )
             { "E7C7253C74275F2DC2DC8C6828816C18301636949369F3bad87666C81E71B309", "E7C7253C74275F2DC2DC8C6828816C18301636949369F3BAD87666C81E71B309" },
             { "61", "61" },
             { "\x01""A""\x1F\x80""BC""\xFE\xFF", "0A00BC00" },
+        TEST_END
+    }
+
+    // TeaEncode/TeaDecode
+    {
+        TEST_FUNCTION
+            SString strEncoded;
+            TeaEncode( a, b, &strEncoded );
+            if ( !result.empty() )
+                assert ( strEncoded == result );
+            SString strDecoded;
+            TeaDecode( strEncoded, b, &strDecoded );
+            assert ( a == *strDecoded );
+        TEST_VARS
+            const SString a;
+            const SString b;
+            const SString result;
+        TEST_DATA
+            { "1234", "AB12£$_ ", "\xD2\xB4\x75\x5C\xDC\x15\x54\xC9" },
+            { "Hello thereHello there", "78111E998C42243285635E39AFDD614B\0 AB12£$_ ", "" },
+            { "78111E998C42243285635E39AFD\0D614B AB12£$_ ", "Hello thereHello there", "" },
+        TEST_END
+    }
+
+    // MD5
+    {
+        TEST_FUNCTION
+            SString strResult = CMD5Hasher::CalculateHexString( a.c_str(), a.length() );
+            assert ( strResult == result );
+        TEST_VARS
+            const SString a;
+            const char* result;
+        TEST_DATA
+            { "",               "D41D8CD98F00B204E9800998ECF8427E" },
+            { "Hello there",    "E8EA7A8D1E93E8764A84A0F3DF4644DE" },
+            { "AB12£$_\0 ",     "78111E998C42243285635E39AFDD614B" },
+        TEST_END
+    }
+
+    // SHA256
+    {
+        TEST_FUNCTION
+            SString strResult = GenerateSha256HexString( a );
+            assert ( strResult == result );
+        TEST_VARS
+            const SString a;
+            const char* result;
+        TEST_DATA
+            { "",               "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855" },
+            { "Hello there",    "4E47826698BB4630FB4451010062FADBF85D61427CBDFAED7AD0F23F239BED89" },
+            { "AB12£$_\0 ",     "A427AEDD32E652FED23901406BCC49BF78B906E69699A68932638502E8C1138B" },
         TEST_END
     }
 

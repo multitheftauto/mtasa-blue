@@ -334,6 +334,7 @@ const char* CLuaClassDefs::GetElementClass ( CElement* pElement )
         case CElement::WATER: return "Water";
         case CElement::WEAPON: return "Weapon";
         case CElement::DATABASE_CONNECTION: return "Connection";
+        default: break;
     }
     return "Element";
 }
