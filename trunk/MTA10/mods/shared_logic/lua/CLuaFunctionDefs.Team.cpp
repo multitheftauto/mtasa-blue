@@ -144,9 +144,12 @@ int CLuaFunctionDefs::GetPlayersInTeam ( lua_State* luaVM )
             for ( ; iter != pTeam->IterEnd () ; iter++ )
             {
                 CClientPlayer* pPlayer = *iter;
-                lua_pushnumber ( luaVM, ++uiIndex );
-                lua_pushelement ( luaVM, pPlayer );
-                lua_settable ( luaVM, -3 );
+                if ( !pPlayer->IsBeingDeleted ( ) )
+                {
+                    lua_pushnumber ( luaVM, ++uiIndex );
+                    lua_pushelement ( luaVM, pPlayer );
+                    lua_settable ( luaVM, -3 );
+                }
             }
 
             return 1;

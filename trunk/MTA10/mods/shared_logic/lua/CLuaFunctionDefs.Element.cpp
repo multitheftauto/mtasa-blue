@@ -724,9 +724,12 @@ int CLuaFunctionDefs::GetElementsWithinColShape ( lua_State* luaVM )
                 {
                     if ( szType == NULL || strcmp ( (*iter)->GetTypeName (), szType ) == 0 )
                     {
-                        lua_pushnumber ( luaVM, ++uiIndex );
-                        lua_pushelement ( luaVM, *iter );
-                        lua_settable ( luaVM, -3 );
+                        if ( !( *iter )->IsBeingDeleted ( ) )
+                        {
+                            lua_pushnumber ( luaVM, ++uiIndex );
+                            lua_pushelement ( luaVM, *iter );
+                            lua_settable ( luaVM, -3 );
+                        }
                     }
                 }
 
@@ -920,10 +923,13 @@ int CLuaFunctionDefs::GetAttachedElements ( lua_State* luaVM )
             for ( uint i = 0 ; i < pEntity->GetAttachedEntityCount() ; i++ )
             {
                 CClientEntity * pAttached = pEntity->GetAttachedEntity( i );
-                assert ( pAttached->GetAttachedTo () == pEntity );
-                lua_pushnumber ( luaVM, i + 1 );
-                lua_pushelement ( luaVM, pAttached );
-                lua_settable ( luaVM, -3 );
+                assert ( pAttached->GetAttachedTo ( ) == pEntity );
+                if ( !pAttached->IsBeingDeleted ( ) )
+                {
+                    lua_pushnumber ( luaVM, i + 1 );
+                    lua_pushelement ( luaVM, pAttached );
+                    lua_settable ( luaVM, -3 );
+                }
             }
             return 1;
         }

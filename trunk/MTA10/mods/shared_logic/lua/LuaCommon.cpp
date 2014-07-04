@@ -48,6 +48,12 @@ void lua_pushelement ( lua_State* luaVM, CClientEntity* pElement )
 {
     if ( pElement )
     {
+        if ( pElement->IsBeingDeleted ( ) )
+        {
+            lua_pushboolean ( luaVM, false );
+            return;
+        }
+
         ElementID ID = pElement->GetID ();
         if ( ID != INVALID_ELEMENT_ID )
         {

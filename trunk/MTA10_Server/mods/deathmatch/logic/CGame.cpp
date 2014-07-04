@@ -1414,9 +1414,6 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 
     // Unregister them from the lightweight sync manager
     m_lightsyncManager.UnregisterPlayer ( &Player );
-
-    // Clean up some now invalid references to the player from other entities
-    Player.PrepareForDeletion();
 }
 
 
