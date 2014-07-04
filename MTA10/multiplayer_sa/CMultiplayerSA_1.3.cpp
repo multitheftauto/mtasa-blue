@@ -18,8 +18,6 @@ WaterCannonHitHandler* m_pWaterCannonHitHandler = NULL;
 
 VehicleFellThroughMapHandler* m_pVehicleFellThroughMapHandler = NULL;
 
-RadioStateChangedHandler* m_pRadioStateChangedHandler = NULL;
-
 #define HOOKPOS_CEventHitByWaterCannon                      0x729899
 DWORD RETURN_CWaterCannon_PushPeds_RETN = 0x7298A7;
 DWORD CALL_CEventHitByWaterCannon = 0x4B1290;
@@ -106,12 +104,6 @@ DWORD RETURN_CBoat_ApplyDamage                          =   0x6F1C3E;
 DWORD RETURN_CProjectile_FixTearGasCrash_Fix              = 0x4C05B9;
 DWORD RETURN_CProjectile_FixTearGasCrash_Cont             = 0x4C0409;
 
-#define HOOKPOS_CAERadioTrackManager_StopRadio              0x4E9823
-DWORD RETURN_CAERadioTrackManager_StopRadio               = 0x4E9828;
-
-#define HOOKPOS_CAERadioTrackManager_StartRadio             0x4EB3C5
-DWORD RETURN_CAERadioTrackManager_StartRadio              = 0x4EB3CB;
-
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -138,9 +130,6 @@ void HOOK_CWorld_RemoveFallenCars ( );
 void HOOK_CVehicleModelInterface_SetClump ( );
 void HOOK_CBoat_ApplyDamage ( );
 void HOOK_CProjectile_FixTearGasCrash ( );
-void HOOK_CAERadioTrackManager_StopRadio ( ); 
-void HOOK_CAERadioTrackManager_StartRadio ( );
-
 void CMultiplayerSA::Init_13 ( void )
 {
     InitHooks_13 ( );
@@ -187,10 +176,6 @@ void CMultiplayerSA::InitHooks_13 ( void )
     HookInstall ( HOOKPOS_CBoat_ApplyDamage, (DWORD)HOOK_CBoat_ApplyDamage, 12 );
 
     HookInstall ( HOOKPOS_CProjectile_FixTearGasCrash, (DWORD) HOOK_CProjectile_FixTearGasCrash, 6 );
-
-    HookInstall ( HOOKPOS_CAERadioTrackManager_StopRadio, (DWORD) HOOK_CAERadioTrackManager_StopRadio, 5 );
-
-    HookInstall ( HOOKPOS_CAERadioTrackManager_StartRadio, (DWORD) HOOK_CAERadioTrackManager_StartRadio, 6 );
     
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
@@ -1538,53 +1523,5 @@ void _declspec( naked ) HOOK_CProjectile_FixTearGasCrash ( )
         jmp RETURN_CProjectile_FixTearGasCrash_Fix
         // dundundundundun
         // dundundundundun
-    }
-}
-
-void CMultiplayerSA::SetRadioStateChangedHandler ( RadioStateChangedHandler * pHandler )
-{
-    m_pRadioStateChangedHandler = pHandler;
-}
-
-void SetRadioState ( bool bIsStop )
-{
-    if ( m_pRadioStateChangedHandler )
-    {
-        m_pRadioStateChangedHandler ( bIsStop );
-    }
-}
-
-// hook the audio stop radio function
-void _declspec( naked ) HOOK_CAERadioTrackManager_StopRadio ( )
-{
-    _asm
-    {
-        pushad
-    }
-    SetRadioState ( true );
-    _asm
-    {
-        popad
-        mov esi, ecx
-        mov eax, [esi+68h]
-        jmp RETURN_CAERadioTrackManager_StopRadio
-    }
-}
-
-// hook the audio start radio function
-void _declspec( naked ) HOOK_CAERadioTrackManager_StartRadio ( )
-{
-    _asm
-    {
-        pushad
-    }
-    SetRadioState ( false );
-    _asm
-    {
-        popad
-        cmp bl, 0Eh
-        push esi
-        mov esi, ecx
-        jmp RETURN_CAERadioTrackManager_StartRadio
     }
 }

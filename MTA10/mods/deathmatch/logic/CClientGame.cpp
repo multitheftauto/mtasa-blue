@@ -269,7 +269,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetObjectBreakHandler ( CClientGame::StaticObjectBreakHandler );
     g_pMultiplayer->SetWaterCannonHitHandler ( CClientGame::StaticWaterCannonHandler );
     g_pMultiplayer->SetVehicleFellThroughMapHandler ( CClientGame::StaticVehicleFellThroughMapHandler );
-    g_pMultiplayer->SetRadioStateChangedHandler ( CClientGame::StaticRadioStateChangedHandler );
     g_pMultiplayer->SetGameObjectDestructHandler( CClientGame::StaticGameObjectDestructHandler );
     g_pMultiplayer->SetGameVehicleDestructHandler( CClientGame::StaticGameVehicleDestructHandler );
     g_pMultiplayer->SetGamePlayerDestructHandler( CClientGame::StaticGamePlayerDestructHandler );
@@ -423,9 +422,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetHeliKillHandler( NULL );
     g_pMultiplayer->SetObjectDamageHandler ( NULL );
     g_pMultiplayer->SetObjectBreakHandler ( NULL );
-    g_pMultiplayer->SetWaterCannonHitHandler ( NULL );
-    g_pMultiplayer->SetVehicleFellThroughMapHandler ( NULL );
-    g_pMultiplayer->SetRadioStateChangedHandler ( NULL );
+    g_pMultiplayer->SetWaterCannonHitHandler( NULL );
     g_pMultiplayer->SetGameObjectDestructHandler( NULL );
     g_pMultiplayer->SetGameVehicleDestructHandler( NULL );
     g_pMultiplayer->SetGamePlayerDestructHandler( NULL );
@@ -3733,11 +3730,6 @@ bool CClientGame::StaticVehicleFellThroughMapHandler ( CVehicleSAInterface* pVeh
     return g_pClientGame->VehicleFellThroughMapHandler ( pVehicle );
 }
 
-void CClientGame::StaticRadioStateChangedHandler ( bool bIsStop )
-{
-    g_pClientGame->RadioStateChangedHandler ( bIsStop );
-}
-
 void CClientGame::StaticGameObjectDestructHandler ( CEntitySAInterface* pObject )
 {
     g_pClientGame->GameObjectDestructHandler ( pObject );
@@ -4790,18 +4782,6 @@ bool CClientGame::VehicleFellThroughMapHandler ( CVehicleSAInterface* pVehicleIn
     }
     // unhandled
     return false;
-}
-
-
-void CClientGame::RadioStateChangedHandler ( bool bIsStop )
-{
-    CClientPed * pPed = m_pManager->GetPlayerManager ( )->GetLocalPlayer ( );
-    // this really can't fail...
-    if ( pPed )
-    {
-        // Update our radio state
-        pPed->SetRadioOn ( !bIsStop );
-    }
 }
 
 // Validate known objects

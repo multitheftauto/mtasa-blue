@@ -1037,6 +1037,10 @@ void CKeyBinds::CallGTAControlBind ( CGTAControlBind* pBind, bool bState )
         if ( m_bMouseWheel && ( pBind->control->action == ZOOM_IN || pBind->control->action == ZOOM_OUT ) )
             return;
 
+        // Don't allow custom track skips. Crashes for some reason.
+        if ( pBind->control->action == RADIO_USER_TRACK_SKIP )
+            return;
+
         // Set this binds state
         pBind->bState = bState;
 
