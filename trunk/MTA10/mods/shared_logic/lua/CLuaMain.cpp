@@ -136,6 +136,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "clone", "cloneElement" );
     lua_classfunction ( luaVM, "attach", "attachElements" );
     lua_classfunction ( luaVM, "detach", "detachElements" );
+    lua_classfunction ( luaVM, "destroy", "destroyElement" );
     lua_classfunction ( luaVM, "removeData", "removeElementData" );
     lua_classfunction ( luaVM, "clearVisibleTo", "clearElementVisibleTo" );
 
@@ -409,7 +410,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getContactElement", "getPedContactElement" );
     lua_classfunction ( luaVM, "getControlState", "getPedControlState" );
     lua_classfunction ( luaVM, "getMoveState", "getPedMoveState" );
-    lua_classfunction ( luaVM, "getOccupiedVehicle", "GetPedOccupiedVehicle" );
+    lua_classfunction ( luaVM, "getOccupiedVehicle", "getPedOccupiedVehicle" );
     lua_classfunction ( luaVM, "getOxygenLevel", "getPedOxygenLevel" );
     lua_classfunction ( luaVM, "getStat", "getPedStat" );
     lua_classfunction ( luaVM, "getTarget", "getPedTarget" );
@@ -1518,7 +1519,7 @@ void CLuaMain::AddDxShaderClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setTessellation", "dxSetShaderTessellation");
     lua_classfunction ( luaVM, "setTransform", "dxSetShaderTransform");
     
-    //lua_classfunction ( luaVM, "value", "dxGetFontHeight"); // .value["param"] = value
+    //lua_classvariable ( luaVM, "value", CLuaOOPDefs::SetShaderValue, NULL); // .value["param"] = value
     
     lua_registerclass ( luaVM, "DxShader", "DxMaterial" );
 }
@@ -1531,7 +1532,7 @@ void CLuaMain::AddDxScreenSourceClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "dxCreateScreenSource");
     lua_classfunction ( luaVM, "update", "dxUpdateScreenSource");
     
-    lua_registerclass ( luaVM, "DxScreenSource" );
+    lua_registerclass ( luaVM, "DxScreenSource", "DxTexture" );
 }
 
 
@@ -1543,7 +1544,7 @@ void CLuaMain::AddDxRenderTargetClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "setAsTarget", "dxSetRenderTarget");
     
-    lua_registerclass ( luaVM, "DxRenderTarget" );
+    lua_registerclass ( luaVM, "DxRenderTarget", "DxTexture" );
 }
 
 
