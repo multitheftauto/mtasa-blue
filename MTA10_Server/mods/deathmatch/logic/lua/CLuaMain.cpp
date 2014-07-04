@@ -837,7 +837,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     //lua_classfunction ( luaVM, "isObservingDisplay", "textDisplayIsObserver" ); // swap args
     
     lua_classfunction ( luaVM, "forceMap", "forcePlayerMap" );
-    lua_classfunction ( luaVM, "fadeCamera", "fadeCamera" )
+    lua_classfunction ( luaVM, "fadeCamera", "fadeCamera" );
     lua_classfunction ( luaVM, "setTeam", "setPlayerTeam" );
     lua_classfunction ( luaVM, "setMuted", "setPlayerMuted" );
     lua_classfunction ( luaVM, "setName", "setPlayerName" );
