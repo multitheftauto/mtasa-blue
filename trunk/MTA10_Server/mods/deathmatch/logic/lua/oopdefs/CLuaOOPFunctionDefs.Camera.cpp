@@ -106,6 +106,8 @@ int CLuaOOPDefs::GetCameraRotation(lua_State* luaVM)
         lua_pushvector ( luaVM, vecRotation );
         return 1;
     }
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaOOPDefs::SetCameraRotation(lua_State* luaVM)

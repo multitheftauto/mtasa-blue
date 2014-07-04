@@ -11911,7 +11911,7 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
     {
         CElement* pResponsibleElement;
         argStream.ReadUserData( pResponsibleElement );
-        if( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) )
+        if( ( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) ) )
             strResponsible = pResponsible->GetNick();
         else
             strResponsible = "Console";
@@ -11970,7 +11970,7 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
     {
         CElement* pResponsibleElement;
         argStream.ReadUserData( pResponsibleElement );
-        if ( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) )
+        if ( ( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) ) )
             strResponsible = pResponsible->GetNick();
     }
     else
