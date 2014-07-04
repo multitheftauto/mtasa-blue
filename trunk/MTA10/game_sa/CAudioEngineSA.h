@@ -93,27 +93,25 @@ class CAudioEngineSA : public CAudioEngine
 public:
                                 CAudioEngineSA                  ( CAudioEngineSAInterface * pInterface );
 
-    void                        PlayFrontEndSound               ( DWORD dwSound );
-    void                        PlayBeatTrack                   ( short iTrack );
-    void                        SetEffectsMasterVolume          ( BYTE bVolume ); // 64 = max volume
-    void                        SetMusicMasterVolume            ( BYTE bVolume );
-    void                        ClearMissionAudio               ( int slot = 1 );
-    void                        PreloadMissionAudio             ( unsigned short usAudioEvent, int slot = 1 );
+    VOID                        PlayFrontEndSound               ( DWORD dwSound );
+    VOID                        PlayBeatTrack                   ( short iTrack );
+    VOID                        SetEffectsMasterVolume          ( BYTE bVolume ); // 64 = max volume
+    VOID                        SetMusicMasterVolume            ( BYTE bVolume );
+    VOID                        ClearMissionAudio               ( int slot = 1);
+    VOID                        PreloadMissionAudio             ( unsigned short usAudioEvent, int slot = 1 );
     unsigned char               GetMissionAudioLoadingStatus    ( int slot = 1 );
     bool                        IsMissionAudioSampleFinished    ( int slot = 1 );
-    void                        AttachMissionAudioToPhysical    ( CPhysical * physical, int slot = 1 );
-    void                        SetMissionAudioPosition         ( CVector * position, int slot = 1 );
+    VOID                        AttachMissionAudioToPhysical    ( CPhysical * physical, int slot = 1 );
+    VOID                        SetMissionAudioPosition         ( CVector * position, int slot = 1 );
     bool                        PlayLoadedMissionAudio          ( int slot = 1 );
-    void                        PauseAllSound                   ( bool bPaused );
-    void                        StopRadio                       ( void );
-    void                        StartRadio                      ( unsigned char ucStation );
-    void                        RetuneRadio                     ( unsigned char ucStation );
-    bool                        IsVehicleRadioActive            ( void );
+    VOID                        PauseAllSound                   ( bool bPaused );
+    VOID                        StopRadio                       ( void );
+    VOID                        StartRadio                      ( unsigned int station );
     void                        PauseAmbientSounds              ( bool bPaused );
-    void                        SetAmbientSoundEnabled          ( eAmbientSoundType eType, bool bEnabled );
+    VOID                        SetAmbientSoundEnabled          ( eAmbientSoundType eType, bool bEnabled );
     bool                        IsAmbientSoundEnabled           ( eAmbientSoundType eType );
     void                        ResetAmbientSounds              ( void );
-    void                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled );
+    VOID                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled );
     bool                        IsWorldSoundEnabled             ( uint uiGroup, uint uiIndex );
     void                        ResetWorldSounds                ( void );
     void                        SetWorldSoundHandler            ( WorldSoundHandler * pHandler );

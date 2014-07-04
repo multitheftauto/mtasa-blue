@@ -151,7 +151,7 @@ unsigned char CSettingsSA::GetRadioVolume ( void )
 void CSettingsSA::SetRadioVolume ( unsigned char ucVolume )
 {
     m_pInterface->ucRadioVolume = ucVolume;
-    pGame->GetAudioEngine ( )->SetMusicMasterVolume ( ucVolume );
+    pGame->GetAudioEngine ()->SetMusicMasterVolume ( ucVolume );
 }
 
 unsigned char CSettingsSA::GetSFXVolume ( void )

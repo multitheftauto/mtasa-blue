@@ -711,7 +711,7 @@ void CMultiplayerSA::InitHooks()
     // Increase double link limit from 3200 ro 8000
     MemPut < int > ( 0x00550F82, 8000 );
 
-    /*
+
     // Disable GTA being able to call CAudio::StopRadio ()
     // Well this isn't really CAudio::StopRadio, it's some global class
     // func that StopRadio just jumps to.
@@ -728,16 +728,6 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x4EB3C1, 0x10 );
     MemPut < BYTE > ( 0x4EB3C2, 0x00 );
     
-    */
-
-    // disable track next so we can handle it
-    MemPut < BYTE > ( 0x5405B8, 0x90 );
-    MemPut < BYTE > ( 0x5405B9, 0x90 );
-
-    // disable track previous so we can handle it
-    MemPut < BYTE > ( 0x5405E8, 0x90 );
-    MemPut < BYTE > ( 0x5405E9, 0x90 );
-
     // DISABLE cinematic camera for trains
     MemPut < BYTE > ( 0x52A535, 0 );
 

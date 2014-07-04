@@ -495,9 +495,6 @@ public:
     void                        NotifyCreate            ( void );
     void                        NotifyDestroy           ( void );
 
-    void                        SetRadioOn              ( bool bRadioOn );
-
-
     CClientModelRequestManager* m_pRequester;
     CPlayerPed*                 m_pPlayerPed;
     CTaskManager*               m_pTaskManager;

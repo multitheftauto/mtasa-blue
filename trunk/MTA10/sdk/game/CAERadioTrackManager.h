@@ -21,10 +21,9 @@ public:
     virtual BYTE        IsVehicleRadioActive            ( void ) = 0;
     virtual char *      GetRadioStationName             ( BYTE bStationID ) = 0;
     virtual BOOL        IsRadioOn                       ( void ) = 0;
-    virtual void        SetBassSetting                  ( DWORD dwBass ) = 0;
-    virtual void        Reset                           ( void ) = 0;
-    virtual void        RetuneRadio                     ( BYTE bStationID ) = 0;
-    virtual void        StartRadio                      ( BYTE bStationID ) = 0;
+    virtual VOID        SetBassSetting                  ( DWORD dwBass ) = 0;
+    virtual VOID        Reset                           ( void ) = 0;
+    virtual VOID        StartRadio                      ( BYTE bStationID, BYTE bUnknown ) = 0;
 };
 
 #endif
