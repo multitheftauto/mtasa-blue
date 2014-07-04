@@ -311,7 +311,7 @@ const char* CLuaClassDefs::GetBanClass ( CBan* pBan )
 
 const char* CLuaClassDefs::GetQueryClass ( CDbJobData* pJobData )
 {
-    return "Query";
+    return "QueryHandle";
 }
 
 // absolutely ugly, need a better way
@@ -333,6 +333,7 @@ const char* CLuaClassDefs::GetElementClass ( CElement* pElement )
         case CElement::SCRIPTFILE: return "File";
         case CElement::WATER: return "Water";
         case CElement::WEAPON: return "Weapon";
+        case CElement::DATABASE_CONNECTION: return "Connection";
     }
     return "Element";
 }
