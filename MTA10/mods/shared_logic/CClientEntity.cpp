@@ -1041,6 +1041,10 @@ void CClientEntity::FindAllChildrenByTypeIndex ( unsigned int uiTypeHash, lua_St
 {
     assert ( luaVM );
 
+    // If we're being deleted, skip this
+    if ( IsBeingDeleted ( ) )
+        return;
+
     // Our type matches?
     if ( m_uiTypeHash == uiTypeHash )
     {
@@ -1073,10 +1077,13 @@ void CClientEntity::GetChildren ( lua_State* luaVM )
     CChildListType ::const_iterator iter = m_Children.begin ();
     for ( ; iter != m_Children.end (); iter++ )
     {
-        // Add it to the table
-        lua_pushnumber ( luaVM, ++uiIndex );
-        lua_pushelement ( luaVM, *iter );
-        lua_settable ( luaVM, -3 );
+        if ( !( *iter )->IsBeingDeleted ( ) )
+        {
+            // Add it to the table
+            lua_pushnumber ( luaVM, ++uiIndex );
+            lua_pushelement ( luaVM, *iter );
+            lua_settable ( luaVM, -3 );
+        }
     }
 }
 
@@ -1093,7 +1100,7 @@ void CClientEntity::GetChildrenByType ( const char* szType, lua_State* luaVM )
     for ( ; iter != m_Children.end (); iter++ )
     {
         // Name matches?
-        if ( (*iter)->GetTypeHash() == uiTypeHash )
+        if ( (*iter)->GetTypeHash() == uiTypeHash && !(*iter)->IsBeingDeleted())
         {
             // Add it to the table
             lua_pushnumber ( luaVM, ++uiIndex );
@@ -1483,10 +1490,13 @@ void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* lu
             if ( !bStreamedIn || !pEntity->IsStreamingCompatibleClass() || 
                  reinterpret_cast < CClientStreamElement* > ( pEntity )->IsStreamedIn() )
             {
-                // Add it to the table
-                lua_pushnumber ( luaVM, ++uiIndex );
-                lua_pushelement ( luaVM, pEntity );
-                lua_settable ( luaVM, -3 );
+                if ( !pEntity->IsBeingDeleted ( ) )
+                {
+                    // Add it to the table
+                    lua_pushnumber ( luaVM, ++uiIndex );
+                    lua_pushelement ( luaVM, pEntity );
+                    lua_settable ( luaVM, -3 );
+                }
             }
         }
     }    
