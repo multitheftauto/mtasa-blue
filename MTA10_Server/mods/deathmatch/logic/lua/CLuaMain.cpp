@@ -837,6 +837,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     //lua_classfunction ( luaVM, "isObservingDisplay", "textDisplayIsObserver" ); // swap args
     
     lua_classfunction ( luaVM, "forceMap", "forcePlayerMap" );
+    lua_classfunction ( luaVM, "fadeCamera", "fadeCamera" )
     lua_classfunction ( luaVM, "setTeam", "setPlayerTeam" );
     lua_classfunction ( luaVM, "setMuted", "setPlayerMuted" );
     lua_classfunction ( luaVM, "setName", "setPlayerName" );
@@ -850,6 +851,9 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setVoiceBroadcastTo", "setPlayerVoiceBroadcastTo" );
     lua_classfunction ( luaVM, "setVoiceIgnoreFrom", "setPlayerVoiceIgnoreFrom" );
     lua_classfunction ( luaVM, "setHudComponentVisible", "setPlayerHudComponentVisible" );
+    lua_classfunction ( luaVM, "setCameraMatrix", "setCameraMatrix" );
+    lua_classfunction ( luaVM, "setCameraInterior", "setCameraInterior" );
+    lua_classfunction ( luaVM, "setCameraTarget", "setCameraTarget" );
     
     lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
     lua_classfunction ( luaVM, "isMuted", "isPlayerMuted" );
@@ -869,7 +873,13 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getMoney", "getPlayerMoney" );
     lua_classfunction ( luaVM, "getAnnounceValue", "getPlayerAnnounceValue" );
     lua_classfunction ( luaVM, "getACInfo", "getPlayerACInfo" );
+    lua_classfunction ( luaVM, "getCameraInterior", "getCameraInterior" );
+    lua_classfunction ( luaVM, "getCameraMatrix", "getCameraMatrix" );
+    lua_classfunction ( luaVM, "getCameraTarget", "getCameraTarget" );
 
+    lua_classvariable ( luaVM, "cameraInterior", "setCameraInterior", "getCameraInterior" );
+    lua_classvariable ( luaVM, "cameraMatrix", "setCameraMatrix", "getCameraMatrix" );
+    lua_classvariable ( luaVM, "cameraTarget", "setCameraTarget", "getCameraTarget" );
     lua_classvariable ( luaVM, "ACInfo", NULL, "getPlayerACInfo" );
     lua_classvariable ( luaVM, "voiceBroadcastTo", "setPlayerVoiceBroadcastTo", NULL );
     lua_classvariable ( luaVM, "voiceIgnoreFrom", "setPlayerVoiceIgnoreFrom", NULL );
