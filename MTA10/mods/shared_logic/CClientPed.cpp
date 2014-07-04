@@ -3056,12 +3056,13 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
             if ( ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN ) || ( Current.RightShoulder1 != 0 ) )
                 m_ulLastTimeUseGunCrouched = ulNow;
 
-            // Maybe cancel crouch/sprint to prevent quickstand
+            // Maybe cancel crouch/sprint/jump to prevent quickstand
             if ( ( ulNow - m_ulLastTimePressedLeftOrRight < 500.f * fSpeedRatio ) && 
                  ( ulNow - m_ulLastTimeUseGunCrouched < 500.f * fSpeedRatio ) )
             {
                 Current.ShockButtonL = 0; 
                 Current.ButtonCross = 0;
+                Current.ButtonSquare = 0;
             }
 
         }
