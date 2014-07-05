@@ -1222,7 +1222,7 @@ void CLuaMain::AddGuiGridlistClass ( lua_State* luaVM )
 //    lua_classvariable ( luaVM, "itemColor", "setItemColor", "getItemColor" ); table
 //    lua_classvariable ( luaVM, "columnTitle", "setColumnTitle", "getColumnTitle" ); table
 
-    lua_registerclass ( luaVM, "GuiGridlist", "GuiElement" );
+    lua_registerclass ( luaVM, "GuiGridList", "GuiElement" );
 }
 
 
