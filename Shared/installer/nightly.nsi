@@ -592,6 +592,7 @@ DontInstallRedist:
         File "${FILES_ROOT}\MTA San Andreas\mta\pthread.dll"
         ; The files below can be moved out of the LIGHTBUILD zone at some point
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\bassopus.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
