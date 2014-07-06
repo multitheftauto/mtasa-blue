@@ -508,10 +508,12 @@ void CWorldSA::SetOcclusionsEnabled ( bool bEnabled )
     {
         MemPut < BYTE > ( FUNC_COcclusion_ProcessBeforeRendering, 0xC3 );   // retn
         MemPutFast < int > ( VAR_COcclusion_NumActiveOccluders, 0 );
+        MemCpy ( (void*)CALL_CCullZones_FindTunnelAttributesForCoors, "\xB8\x80\x28\x00\x00", 5 );  // mov eax, 0x2880
     }
     else
     {
         MemPut < BYTE > ( FUNC_COcclusion_ProcessBeforeRendering, 0x51 );   // Standard value
+        MemCpy ( (void*)CALL_CCullZones_FindTunnelAttributesForCoors, "\xE8\xDE\x82\x1D\x00", 5 );   // call 0x72D9F0
     }
 }
 
