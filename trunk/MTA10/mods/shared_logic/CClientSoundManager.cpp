@@ -37,7 +37,9 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
     if (!BASS_PluginLoad ( "bass_aac.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
         g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad AAC", BASS_ErrorGetCode() );
     if (!BASS_PluginLoad ( "bass_ac3.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad AC3", BASS_ErrorGetCode() );
+        g_pCore->GetConsole ( )->Printf ( "BASS ERROR %d in PluginLoad AC3", BASS_ErrorGetCode ( ) );
+    if ( !BASS_PluginLoad ( "bassopus.dll", 0 ) && BASS_ErrorGetCode ( ) != BASS_ERROR_ALREADY )
+        g_pCore->GetConsole ( )->Printf ( "BASS ERROR %d in PluginLoad OPUS", BASS_ErrorGetCode ( ) );
 
     BASS_SetConfig ( BASS_CONFIG_NET_PREBUF, 0 );
     BASS_SetConfig ( BASS_CONFIG_NET_PLAYLIST, 1 ); // Allow playlists
