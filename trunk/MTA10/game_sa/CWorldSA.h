@@ -29,6 +29,7 @@
 #define FUNC_RemoveReferencesToDeletedObject                0x565510 // ##SA##
 #define FUNC_COcclusion_ProcessBeforeRendering              0x7201C0
 #define VAR_COcclusion_NumActiveOccluders                   0xC73CC0
+#define CALL_CCullZones_FindTunnelAttributesForCoors        0x55570D
 #define FUNC_CWorld_FindPositionForTrackPosition            0x6F59E0
 
 // CCol...
