@@ -5506,7 +5506,8 @@ void CClientPed::SetDoingGangDriveby ( bool bDriveby )
         }
         else if ( bDriveby )
         {
-            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleGangDriveBy ( NULL, NULL, 0.0f, 0, 0, false );
+            bool bRight = ( GetOccupiedVehicleSeat ( ) % 2 == 0 ) ? false : true;
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleGangDriveBy ( NULL, NULL, 0.0f, 0, 0, bRight );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
