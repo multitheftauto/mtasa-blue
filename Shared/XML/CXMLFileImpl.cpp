@@ -66,7 +66,7 @@ void CXMLFileImpl::SetFilename ( const char* szFilename )
 }
 
 
-bool CXMLFileImpl::Parse ( void )
+bool CXMLFileImpl::Parse ( std::vector < char >* pOutFileContents )
 {
     // Do we have a filename?
     if ( m_strFilename != "" )
@@ -75,7 +75,7 @@ bool CXMLFileImpl::Parse ( void )
         Reset ();
 
         // Parse from the current file
-        if ( m_pDocument->LoadFile ( m_strFilename.c_str () ) )
+        if ( m_pDocument->LoadFile ( m_strFilename.c_str (), TIXML_DEFAULT_ENCODING, pOutFileContents ) )
         {
             // Build our wrapper
             if ( BuildWrapperTree () )

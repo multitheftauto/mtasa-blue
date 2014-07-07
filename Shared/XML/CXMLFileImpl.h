@@ -29,7 +29,7 @@ public:
     const char*                     GetFilename         ( void );
     void                            SetFilename         ( const char* szFilename );
 
-    bool                            Parse               ( void );
+    bool                            Parse               ( std::vector < char >* pOutFileContents = NULL );
     bool                            Write               ( void );
     void                            Clear               ( void );
     void                            Reset               ( void );

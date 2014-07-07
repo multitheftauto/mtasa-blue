@@ -950,7 +950,7 @@ bool TiXmlDocument::SaveFile() const
 	return SaveFile( Value() );
 }
 
-bool TiXmlDocument::LoadFile( const char* _filename, TiXmlEncoding encoding )
+bool TiXmlDocument::LoadFile( const char* _filename, TiXmlEncoding encoding, std::vector < char >* pOutFileContents )
 {
 	// There was a really terrifying little bug here. The code:
 	//		value = filename
@@ -968,6 +968,19 @@ bool TiXmlDocument::LoadFile( const char* _filename, TiXmlEncoding encoding )
 	if ( file )
 	{
 		bool result = LoadFile( file, encoding );
+
+        // Also read the file bytes to a buffer if requested
+        if ( pOutFileContents )
+        {
+            fseek( file, 0, SEEK_END );
+            long size = ftell ( file );
+            fseek( file, 0, SEEK_SET );
+            if ( size > 0 )
+            {
+                pOutFileContents->resize( size );
+                fread( &pOutFileContents->at(0), 1, size, file );
+            }
+        }
 		fclose( file );
 		return result;
 	}
