@@ -26,7 +26,7 @@ CBan::~CBan ( void )
     CBanManager::SetBansModified();
 }
 
-time_t CBan::GetBanTimeRemaing( void )
+time_t CBan::GetBanTimeRemaining( void )
 {
     time_t End = GetTimeOfUnban ();
     if ( End > 0 )

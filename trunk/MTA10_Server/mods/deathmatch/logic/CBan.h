@@ -46,7 +46,7 @@ public:
     inline const std::string&   GetAccount              ( void )                        { return m_strAccount; };
     void                        SetAccount              ( const std::string& strAccount ){ CBanManager::SetBansModified(); m_strAccount = strAccount; };
 
-    time_t                      GetBanTimeRemaing       ( void );
+    time_t                      GetBanTimeRemaining     ( void );
     SString                     GetDurationDesc         ( void );
     SString                     GetReasonText           ( void ) const;
     uint                        GetScriptID             ( void ) const                  { return m_uiScriptID; }
