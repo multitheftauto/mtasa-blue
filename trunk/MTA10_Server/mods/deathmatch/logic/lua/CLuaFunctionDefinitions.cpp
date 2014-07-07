@@ -11892,6 +11892,7 @@ int CLuaFunctionDefinitions::KickPlayer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
 {
+//  ban banPlayer ( player bannedPlayer, [ bool IP = true, bool Username = false, bool Serial = false, player responsiblePlayer = nil, string reason = nil, int seconds = 0 ] )
     CPlayer* pPlayer;
     SString strResponsible;
     SString strReason;
@@ -11928,7 +11929,10 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
         tUnban = atoi(strTime);
     }
     else
-        argStream.ReadNumber(tUnban, 0);
+    if ( argStream.NextIsNumber() )
+        argStream.ReadNumber( tUnban );
+    else
+        tUnban = 0;
 
     if ( tUnban > 0 )
         tUnban += time ( NULL );
@@ -11953,6 +11957,7 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
 {
+//  ban addBan ( [ string IP, string Username, string Serial, player responsibleElement, string reason, int seconds = 0 ] )
     SString strIP          = "";
     SString strUsername    = "";
     SString strSerial      = "";
@@ -11985,7 +11990,10 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
         tUnban = atoi(strTime);
     }
     else
-        argStream.ReadNumber(tUnban, 0);
+    if ( argStream.NextIsNumber() )
+        argStream.ReadNumber( tUnban );
+    else
+        tUnban = 0;
 
     if ( tUnban > 0 )
         tUnban += time ( NULL );
