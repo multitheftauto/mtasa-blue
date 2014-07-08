@@ -1054,6 +1054,32 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxBrowserPluginsEnabled->GetPosition ( vecTemp );
     m_pCheckBoxBrowserPluginsEnabled->AutoSize ( NULL, 20.0f );
 
+    m_pLabelBrowserCustomBlacklist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("Custom blacklist") ) );
+    m_pLabelBrowserCustomBlacklist->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+    m_pLabelBrowserCustomBlacklist->GetPosition ( vecTemp );
+    m_pLabelBrowserCustomBlacklist->AutoSize ( NULL, 5.0f );
+    m_pLabelBrowserCustomBlacklist->SetFont ( "default-bold-small" );
+
+    m_pEditBrowserBlacklistAdd = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabBrowser ) );
+    m_pEditBrowserBlacklistAdd->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
+    m_pEditBrowserBlacklistAdd->GetPosition ( vecTemp );
+    m_pEditBrowserBlacklistAdd->SetSize ( CVector2D ( 250.0f, 22.0f ) );
+    m_pEditBrowserBlacklistAdd->SetText ( "nsa.gov" );
+
+    m_pButtonBrowserBlacklistAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Block domain") ) );
+    m_pButtonBrowserBlacklistAdd->SetPosition ( CVector2D ( vecTemp.fX + m_pEditBrowserBlacklistAdd->GetSize ().fX + 7.0f, vecTemp.fY ) );
+    m_pButtonBrowserBlacklistAdd->SetSize ( CVector2D ( 140.0f, 22.0f ) );
+
+    m_pGridBrowserBlacklist = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( pTabBrowser ) );
+    m_pGridBrowserBlacklist->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
+    m_pGridBrowserBlacklist->GetPosition ( vecTemp );
+    m_pGridBrowserBlacklist->SetSize ( CVector2D ( 250.0f, 150.0f ) );
+    m_pGridBrowserBlacklist->AddColumn ( _("Domain"), 0.9f );
+
+    m_pButtonBrowserBlacklistRemove = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Unblock domain") ) );
+    m_pButtonBrowserBlacklistRemove->SetPosition ( CVector2D ( vecTemp.fX + m_pGridBrowserBlacklist->GetSize ().fX + 7.0f, vecTemp.fY ) );
+    m_pButtonBrowserBlacklistRemove->SetSize ( CVector2D ( 140.0f, 22.0f ) );
+
     /**
      *  Advanced tab
      **/
@@ -1279,6 +1305,8 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxAllowScreenUpload->SetClickHandler ( GUI_CALLBACK( &CSettings::OnAllowScreenUploadClick, this ) );
     m_pCheckBoxCustomizedSAFiles->SetClickHandler ( GUI_CALLBACK( &CSettings::OnCustomizedSAFilesClick, this ) );
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler ( GUI_CALLBACK( &CSettings::ShowUnsafeResolutionsClick, this ) );
+    m_pButtonBrowserBlacklistAdd->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserBlacklistAdd, this ) );
+    m_pButtonBrowserBlacklistRemove->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserBlacklistRemove, this ) );
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, _("Multi Theft Auto: Community settings"), MB_ICON_WARNING );
@@ -2703,6 +2731,14 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "browser_remote_websites", bVar ); m_pCheckBoxRemoteBrowser->SetSelected ( bVar );
     CVARS_GET ( "browser_remote_javascript", bVar ); m_pCheckBoxRemoteJavascript->SetSelected ( bVar );
     CVARS_GET ( "browser_plugins", bVar ); m_pCheckBoxBrowserPluginsEnabled->SetSelected ( bVar );
+
+    std::vector<std::pair<SString, bool>> customBlacklist;
+    CCore::GetSingleton ().GetWebCore ()->GetFilterEntriesByType ( customBlacklist, eWebFilterType::WEBFILTER_USER );
+    for ( std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end (); ++iter )
+    {
+        if ( iter->second == false )
+            m_pGridBrowserBlacklist->SetItemText ( m_pGridBrowserBlacklist->AddRow (), 1, iter->first );
+    }
 }
 
 void CSettings::SaveData ( void )
@@ -2976,6 +3012,15 @@ void CSettings::SaveData ( void )
         CVARS_SET ( "browser_remote_javascript", m_pCheckBoxRemoteJavascript->GetSelected () );
         CVARS_SET ("browser_plugins", m_pCheckBoxBrowserPluginsEnabled->GetSelected () );
     }
+
+    std::vector<SString> customBlacklist;
+    for ( int i = 0; i < m_pGridBrowserBlacklist->GetRowCount (); ++i )
+    {
+        customBlacklist.push_back ( m_pGridBrowserBlacklist->GetItemText ( i, 1 ) );
+    }
+    CCore::GetSingleton ().GetWebCore ()->WriteCustomBlacklist ( customBlacklist );
+    if ( customBlacklist.size () > 0 )
+        bBrowserSettingChanged = true;
 
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues ();
@@ -3614,6 +3659,37 @@ bool CSettings::ShowUnsafeResolutionsClick ( CGUIElement* pElement )
 {
     // Change list of available resolutions
     PopulateResolutionComboBox();
+    return true;
+}
+
+bool CSettings::OnBrowserBlacklistAdd ( CGUIElement* pElement )
+{
+    SString strDomain = m_pEditBrowserBlacklistAdd->GetText ();
+    if ( !strDomain.empty () )
+    {
+        bool bExists = false;
+        for ( int i = 0; i < m_pGridBrowserBlacklist->GetRowCount (); ++i )
+        {
+            if ( m_pGridBrowserBlacklist->GetItemText ( i, 1 ) == strDomain )
+            {
+                bExists = true;
+                break;
+            }
+        }
+
+        if ( !bExists )
+            m_pGridBrowserBlacklist->SetItemText ( m_pGridBrowserBlacklist->AddRow (), 1, strDomain );
+    }
+    return true;
+}
+
+bool CSettings::OnBrowserBlacklistRemove ( CGUIElement* pElement )
+{
+    int iSelectedRow = m_pGridBrowserBlacklist->GetSelectedItemRow ();
+    if ( iSelectedRow > -1 )
+    {
+        m_pGridBrowserBlacklist->RemoveRow ( iSelectedRow );
+    }
     return true;
 }
 

@@ -21,6 +21,14 @@ enum eURLState
     WEBPAGE_DISALLOWED
 };
 
+enum eWebFilterType
+{
+    WEBFILTER_HARDCODED,
+    WEBFILTER_DYNAMIC,
+    WEBFILTER_USER,
+    WEBFILTER_REQUEST
+};
+
 enum eAwesomiumMouseButton
 {
     AWESOMIUM_MOUSEBUTTON_LEFT = 0,
@@ -35,8 +43,8 @@ public:
     virtual void                DestroyWebView      ( CWebViewInterface* pWebView ) = 0;
     
     virtual eURLState           GetURLState        ( const SString& strURL ) = 0;
-    virtual void                ClearWhitelist     () = 0;
-    virtual void                AddAllowedPage     ( const SString& strURL ) = 0;
+    virtual void                ResetFilter        ( bool bResetRequestsOnly ) = 0;
+    //virtual void                AddAllowedPage     ( const SString& strURL ) = 0;
     virtual void                RequestPages       ( const std::vector<SString>& pages ) = 0;
     virtual void                AllowPendingPages  () = 0;
     virtual void                DenyPendingPages   () = 0;
@@ -46,7 +54,10 @@ public:
 
     virtual bool                CanLoadRemotePages () = 0;
 
-    virtual bool                SetGlobalAudioVolume( float fVolume ) = 0;
+    virtual bool                SetGlobalAudioVolume    ( float fVolume ) = 0;
+
+    virtual void                WriteCustomBlacklist    ( const std::vector<SString>& customBlacklist ) = 0;
+    virtual void                GetFilterEntriesByType  ( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType ) = 0;
 };
 
 #endif

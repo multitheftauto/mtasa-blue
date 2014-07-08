@@ -1370,7 +1370,7 @@ void CCore::OnModUnload ( )
     m_uiClientScriptFrameRateLimit = 0;
 
     // Clear web whitelist
-    m_pWebCore->ClearWhitelist ();
+    m_pWebCore->ResetFilter ();
 }
 
 

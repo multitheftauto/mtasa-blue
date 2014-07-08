@@ -311,6 +311,11 @@ protected:
     CGUICheckBox*       m_pCheckBoxRemoteBrowser;
     CGUICheckBox*       m_pCheckBoxRemoteJavascript;
     CGUICheckBox*       m_pCheckBoxBrowserPluginsEnabled;
+    CGUILabel*          m_pLabelBrowserCustomBlacklist;
+    CGUIEdit*           m_pEditBrowserBlacklistAdd;
+    CGUIButton*         m_pButtonBrowserBlacklistAdd;
+    CGUIGridList*       m_pGridBrowserBlacklist;
+    CGUIButton*         m_pButtonBrowserBlacklistRemove;
 
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );
@@ -338,6 +343,8 @@ protected:
     bool                OnUpdateButtonClick     ( CGUIElement* pElement );
     bool                OnMouseSensitivityChanged ( CGUIElement* pElement );
     bool                OnVerticalAimSensitivityChanged ( CGUIElement* pElement );
+    bool                OnBrowserBlacklistAdd   ( CGUIElement* pElement );
+    bool                OnBrowserBlacklistRemove( CGUIElement* pElement );
 
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 

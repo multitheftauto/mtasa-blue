@@ -34,10 +34,10 @@ public:
     void                DoPulse             ();
     
     eURLState           GetURLState         ( const SString& strURL );
-    void                ClearWhitelist      ();
-    void                InitialiseWhiteAndBlacklist ();
-    void                AddAllowedPage      ( const SString& strURL );
-    void                AddBlockedPage      ( const SString& strURL );
+    void                ResetFilter         ( bool bResetRequestsOnly = true );
+    void                InitialiseWhiteAndBlacklist ( bool bAddHardcoded = true, bool bAddDynamic = true );
+    void                AddAllowedPage      ( const SString& strURL, eWebFilterType filterType );
+    void                AddBlockedPage      ( const SString& strURL, eWebFilterType filterType );
     void                RequestPages        ( const std::vector<SString>& pages );
     void                AllowPendingPages   ();
     void                DenyPendingPages    ();
@@ -51,8 +51,10 @@ public:
     bool                SetGlobalAudioVolume( float fVolume );
 
     bool                UpdateListsFromMaster();
-    bool                MakeSureXMLNodesExist  ();
-    void                LoadListsFromXML     ( bool bWhitelist, bool bBlacklist );
+    bool                MakeSureXMLNodesExist();
+    void                LoadListsFromXML     ( bool bWhitelist, bool bBlacklist, bool bCustomBlacklist );
+    void                WriteCustomBlacklist ( const std::vector<SString>& customBlacklist );
+    void                GetFilterEntriesByType( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType );
     static bool         StaticFetchRevisionProgress  ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
     static bool         StaticFetchWhitelistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
     static bool         StaticFetchBlacklistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
@@ -68,12 +70,14 @@ public:
     static SString                        ToSString   ( const Awesomium::WebString& webString );
 
 private:
+    typedef std::pair<bool, eWebFilterType> WebFilterPair;
+
     Awesomium::WebCore*                     m_pWebCore;
     CWebsiteRequests*                       m_pRequestsGUI;
     std::map<int, CWebView*>                m_WebViewMap;
     bool                                    m_bTestmodeEnabled;
 
-    CFastHashMap<SString, bool>             m_Whitelist;
+    CFastHashMap<SString, WebFilterPair>    m_Whitelist;
     std::vector<SString>                    m_PendingRequests;
 
     IAudioSessionManager2*                  m_pAudioSessionManager;
