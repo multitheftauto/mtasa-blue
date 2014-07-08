@@ -1398,6 +1398,12 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const 
 
             break;
         }
+        case CElement::OBJECT:
+        case CElement::WEAPON:
+        {
+            // Don't store velocity serverside (requires potentially needless additional sizeof(CVector) bytes per object)
+            break;
+        }
         default: return false;
     }
 
