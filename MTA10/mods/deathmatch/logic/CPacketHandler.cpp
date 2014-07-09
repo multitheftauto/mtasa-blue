@@ -613,7 +613,7 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
 
     if ( bShowMessageBox )
     {
-        if ( bitStream.GetNumberOfUnreadBits() > 0 ) // We have our string left to read
+        if ( bitStream.GetNumberOfUnreadBits() > 7 ) // We have our string left to read
         {
             SString strMessage;
             bitStream.ReadString ( strMessage );
