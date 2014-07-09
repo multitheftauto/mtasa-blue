@@ -17,12 +17,16 @@
 #include <StdInc.h>
 
 #define MAX_STRING_LENGTH 2048
+
+FILE* CScriptDebugging::m_pLogFile;
+
 CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
 {
     m_pLuaManager = pLuaManager;
     m_uiLogFileLevel = 0;
     m_pLogFile = NULL;
     m_bTriggeringOnClientDebugMessage = false;
+    m_flushTimerHandle = NULL;
 }
 
 CScriptDebugging::~CScriptDebugging ( void )
@@ -32,6 +36,13 @@ CScriptDebugging::~CScriptDebugging ( void )
     {
         fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
         fclose ( m_pLogFile );
+
+        // if we have a flush timer
+        if ( m_flushTimerHandle != NULL )
+        {
+            // delete our flush timer
+            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, NULL );
+        }
         m_pLogFile = NULL;
     }
 }
@@ -186,6 +197,15 @@ void CScriptDebugging::LogBadLevel ( lua_State* luaVM, unsigned int uiRequiredLe
     LogWarning ( luaVM, "Requires level '%d' @ '%s", uiRequiredLevel, lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
 }
 
+void CALLBACK TimerProc( void* lpParametar, BOOLEAN TimerOrWaitFired )
+{
+    // Got a logfile?
+    if ( CScriptDebugging::m_pLogFile != NULL )
+    {
+        // flush our log file
+        fflush ( (FILE*)CScriptDebugging::m_pLogFile );
+    }
+}
 
 bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel )
 {
@@ -196,6 +216,12 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
     {
         fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
         fclose ( m_pLogFile );
+        // if we have a flush timer
+        if ( m_flushTimerHandle != NULL )
+        {
+            // delete our flush timer
+            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, NULL );
+        }
         m_pLogFile = NULL;
     }
 
@@ -218,9 +244,31 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
     FILE* pFile = fopen ( szFilename, "a+" );
     if ( pFile )
     {
+        // [2014-07-09 14:39:31] WARNING: Bad argument @ 'setElementPosition' [Expected element at argument 1, got nil] [string "return addEventHandler("onClientRender", ro..."]
+        // length = 158
+
+        // set our buffer size
+
+        // assumed message length of 158
+
+        // if we pulse at 150FPS (unrealistic but whatever)
+        // that's 1 update every 6.66666666ms
+        // pulse rate is 50 so 50 / 6.6666666 = 7.5 (close enough)
+        // if we are doing 5 error messages a pulse that's 5 * 7.5
+        // 5 * 7.5 = 37.5
+        // we need room for at least 37.5 messages in this buffer
+        // round 37.5 to 38 because we can't have half a message
+        // 8 * 256 bytes = 6004B
+        // round 6004 up to the nearest divisible by 1024 = 6144
+        // we have our buffer size.
+        setvbuf ( pFile , NULL , _IOFBF , 6144 );
+
         // Set the new pointer and level and return true
         m_uiLogFileLevel = uiLevel;
         m_pLogFile = pFile;
+
+        // Create a timer
+        ::CreateTimerQueueTimer( &m_flushTimerHandle, NULL, TimerProc, NULL, 50, 50, WT_EXECUTEINTIMERTHREAD );
         return true;
     }
 
@@ -342,10 +390,12 @@ void CScriptDebugging::PrintLog ( const char* szText )
         char szBuffer [64];
         time_t timeNow;
         time ( &timeNow );
-        strftime ( szBuffer, 32, "[%Y-%m-%d %H:%M:%S]", localtime ( &timeNow ) );
+        SString strInput;
 
-        fprintf ( m_pLogFile, "%s %s\n", szBuffer, szText );
-        fflush ( m_pLogFile );
+        strftime ( szBuffer, 32, "[%Y-%m-%d %H:%M:%S]", localtime ( &timeNow ) );
+        strInput.Format ( "%s %s\n", szBuffer, szText );
+
+        fwrite( strInput.c_str(), strInput.length(), 1, m_pLogFile );
     }
 }
 
