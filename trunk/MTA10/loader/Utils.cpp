@@ -1934,6 +1934,7 @@ void ForbodenProgramsMessage ( void )
 {
     std::vector < SString > forbodenList;
     forbodenList.push_back( "ProcessHacker" );
+    forbodenList.push_back( "CheatEngine" );
 
     SString strResult;
     std::vector < DWORD > processIdList = MyEnumProcesses ();
