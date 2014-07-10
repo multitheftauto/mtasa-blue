@@ -644,6 +644,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                             for ( int i = 0; i < ucSirenCount; i++ )
                             {
                                 SVehicleSirenSync syncData;
+                                syncData.data.m_bOverrideSirens = true;
                                 syncData.data.m_b360Flag = pVehicle->m_tSirenBeaconInfo.m_b360Flag;
                                 syncData.data.m_bDoLOSCheck = pVehicle->m_tSirenBeaconInfo.m_bDoLOSCheck;
                                 syncData.data.m_bUseRandomiser = pVehicle->m_tSirenBeaconInfo.m_bUseRandomiser;
