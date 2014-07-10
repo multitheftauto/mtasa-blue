@@ -1765,7 +1765,7 @@ struct SVehicleSirenSync : public ISyncStructure
         bool                        m_bOverrideSirens;
         CVector                     m_vecSirenPositions;
         SColor                      m_colSirenColour;
-        DWORD                       m_dwSirenMinAlpha;
+        uint                        m_dwSirenMinAlpha;
         unsigned char               m_ucSirenID;
     } data;
 };
