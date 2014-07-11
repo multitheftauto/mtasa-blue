@@ -2688,9 +2688,12 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
         return;
     }
 
+    EntityAddDebugBegin( NumEntities, &bitStream );
+
     for ( uint EntityIndex = 0 ; EntityIndex < NumEntities ; EntityIndex++ )
     {
         g_pCore->UpdateDummyProgress( EntityIndex * 100 / NumEntities, "%" );
+        EntityAddDebugNext( EntityIndex, bitStream.GetReadOffsetAsBits() );
 
         // Read out the entity type id and the entity id
         ElementID EntityID;
@@ -2761,7 +2764,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         delete pCustomData;
                         pCustomData = NULL;
 
-                        RaiseFatalError ( 6 );
+                        RaiseEntityAddError ( 6 );
                         return;
                     }
                 }
@@ -2776,7 +2779,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     delete pCustomData;
                     pCustomData = NULL;
 
-                    RaiseFatalError ( 7 );
+                    RaiseEntityAddError ( 7 );
                     return;
                 }
             }
@@ -2812,7 +2815,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 assert ( !pEntity->IsSystemEntity () );
                 if ( pEntity->IsSystemEntity () )
                 {
-                    RaiseFatalError ( 8 );
+                    RaiseEntityAddError ( 8 );
                     return;
                 }
 
@@ -2882,7 +2885,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
                         else
                         {
-                            RaiseFatalError ( 9 );
+                            RaiseEntityAddError ( 9 );
                             return;
                         }
 
@@ -3041,7 +3044,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
                     else
                     {
-                        RaiseProtocolError ( 55 );
+                        RaiseEntityAddError ( 55 );
                         return;
                     }
 
@@ -3065,7 +3068,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntity = pPickup;
                         if ( !pPickup )
                         {
-                            RaiseFatalError ( 10 );
+                            RaiseEntityAddError ( 10 );
                             return;
                         }
 
@@ -3107,7 +3110,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
                     else
                     {
-                        RaiseProtocolError ( 38 );
+                        RaiseEntityAddError ( 38 );
                         return;
                     }
 
@@ -3137,7 +3140,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     unsigned short usModel = ucModel + 400;
                     if ( !CClientVehicleManager::IsValidModel ( usModel ) )
                     {
-                        RaiseProtocolError ( 39 );
+                        RaiseEntityAddError ( 39 );
                         return;
                     }
 
@@ -3145,7 +3148,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     SVehicleHealthSync health;
                     if ( !bitStream.Read ( &health ) )
                     {
-                        RaiseProtocolError ( 40 );
+                        RaiseEntityAddError ( 40 );
                         return;
                     }
 
@@ -3153,7 +3156,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     CVehicleColor vehColor;
                     uchar ucNumColors = 0;
                     if ( !bitStream.ReadBits ( &ucNumColors, 2 ) )
-                        return RaiseProtocolError ( 41 );
+                        return RaiseEntityAddError ( 41 );
 
                     for ( uint i = 0 ; i <= ucNumColors ; i++ )
                     {
@@ -3162,7 +3165,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                              !bitStream.Read ( RGBColor.G ) ||
                              !bitStream.Read ( RGBColor.B ) )
                         {
-                            return RaiseProtocolError ( 41 );
+                            return RaiseEntityAddError ( 41 );
                         }
                         vehColor.SetRGBColor ( i, RGBColor );
                     }
@@ -3170,27 +3173,27 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     // Read out the paintjob
                     SPaintjobSync paintjob;
                     if ( !bitStream.Read ( &paintjob ) )
-                        return RaiseProtocolError ( 41 );
+                        return RaiseEntityAddError ( 41 );
 
                     // Read out the vehicle damage sync model
                     SVehicleDamageSync damage ( true, true, true, true, false );
                     if ( !bitStream.Read ( &damage ) )
                     {
-                        RaiseProtocolError ( 42 );
+                        RaiseEntityAddError ( 42 );
                         return;
                     }
 
                     unsigned char ucVariant = 5;
                     if ( !bitStream.Read ( ucVariant ) )
                     {
-                        RaiseProtocolError ( 42 );
+                        RaiseEntityAddError ( 42 );
                         return;
                     }
 
                     unsigned char ucVariant2 = 5;
                     if ( !bitStream.Read ( ucVariant2 ) )
                     {
-                        RaiseProtocolError ( 42 );
+                        RaiseEntityAddError ( 42 );
                         return;
                     }
 
@@ -3199,7 +3202,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pEntity = pVehicle;
                     if ( !pVehicle )
                     {
-                        RaiseFatalError ( 11 );
+                        RaiseEntityAddError ( 11 );
                         return;
                     }
 
@@ -3472,12 +3475,12 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
                         else
                         {
-                            RaiseProtocolError ( 123 );
+                            RaiseEntityAddError ( 123 );
                         }
                     }
                     else
                     {
-                        RaiseProtocolError ( 44 );
+                        RaiseEntityAddError ( 44 );
                     }
 
                     break;
@@ -3556,7 +3559,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
                     else
                     {
-                        RaiseProtocolError ( 56 );
+                        RaiseEntityAddError ( 56 );
                         return;
                     }
 
@@ -3588,7 +3591,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     }
                     else
                     {
-                        RaiseProtocolError ( 57 );
+                        RaiseEntityAddError ( 57 );
                         return;
                     }
 
@@ -3604,7 +3607,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.ReadCompressed ( usNameLength );
                     if ( usNameLength > MAX_TEAM_NAME_LENGTH )
                     {
-                        RaiseFatalError ( 12 );
+                        RaiseEntityAddError ( 12 );
                         return;
                     }
 
@@ -3653,7 +3656,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.ReadCompressed ( usModel );
                     if ( !CClientPlayerManager::IsValidModel ( usModel ) )
                     {
-                        RaiseProtocolError ( 51 );
+                        RaiseEntityAddError ( 51 );
                         return;
                     }
 
@@ -3868,7 +3871,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
                         default:
                         {
-                            RaiseProtocolError ( 54 );
+                            RaiseEntityAddError ( 54 );
                             break;
                         }
                     }
@@ -5156,4 +5159,189 @@ void CPacketHandler::Packet_PedTask ( NetBitStreamInterface& bitStream )
         default:
             break;
     };
+}
+
+
+//
+//
+//
+// EntityAdd debugging
+//
+//
+//
+
+///////////////////////////////////////////////////////////////
+//
+// CPacketHandler::EntityAddDebugBegin
+//
+// Called at start of entity add packet processing
+//
+///////////////////////////////////////////////////////////////
+void CPacketHandler::EntityAddDebugBegin( uint uiNumEntities, NetBitStreamInterface* pBitStream )
+{
+    m_uiEntityAddNumEntities = uiNumEntities;
+    m_pEntityAddBitStream = pBitStream;
+    m_EntityAddReadOffsetStore.clear();
+    m_EntityAddReadOffsetStore.reserve( m_uiEntityAddNumEntities );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPacketHandler::EntityAddDebugNext
+//
+// Called when processing next entity in entity add packet
+//
+///////////////////////////////////////////////////////////////
+void CPacketHandler::EntityAddDebugNext( uint uiEntityIndex, int iReadOffset )
+{
+    m_EntityAddReadOffsetStore.push_back( iReadOffset );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPacketHandler::EntityAddDebugNext
+//
+// Called when entity add packet processing fails
+//
+///////////////////////////////////////////////////////////////
+void CPacketHandler::RaiseEntityAddError( uint uiCode )
+{
+    SString strLine( "ProtocolError %d", uiCode );
+    WriteDebugEvent( strLine );
+    AddReportLog( 8331, strLine );
+
+    NetBitStreamInterface& bitStream = *m_pEntityAddBitStream;
+    for ( uint i = Max ( 0, (int)m_EntityAddReadOffsetStore.size() - 5 ) ; i < m_EntityAddReadOffsetStore.size() ; i++ )
+    {
+        m_pEntityAddBitStream->SetReadOffsetAsBits( m_EntityAddReadOffsetStore[i] );
+        SString strStatus = EntityAddDebugRead( *m_pEntityAddBitStream );
+
+        SString strLine( "%d/%d Offset:%-6d %s"
+                                 ,i
+                                 ,m_uiEntityAddNumEntities
+                                 ,m_EntityAddReadOffsetStore[i]
+                                 ,*strStatus
+                                );
+        WriteDebugEvent( strLine );
+        AddReportLog( 8332, strLine );
+    }
+    RaiseProtocolError( uiCode );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPacketHandler::EntityAddDebugRead
+//
+// Read one entity from the bitstream and return description
+// Similar to entity reading code in Packet_EntityAdd
+//
+///////////////////////////////////////////////////////////////
+SString CPacketHandler::EntityAddDebugRead( NetBitStreamInterface& bitStream )
+{
+    // Attached
+    bool bIsAttached;
+    SPositionSync attachedPosition ( false );
+    SRotationDegreesSync attachedRotation ( false );
+    ElementID EntityAttachedToID;
+
+    // Read out the entity type id and the entity id
+    ElementID EntityID;
+    unsigned char ucEntityTypeID;
+    ElementID ParentID;
+    unsigned char ucInterior;
+    unsigned short usDimension;
+    bool bCollisonsEnabled;
+    bool bCallPropagationEnabled;
+
+    if ( bitStream.Read ( EntityID ) &&
+            bitStream.Read ( ucEntityTypeID ) &&
+            bitStream.Read ( ParentID ) &&
+            bitStream.Read ( ucInterior ) &&
+            bitStream.ReadCompressed ( usDimension ) &&
+            bitStream.ReadBit ( bIsAttached ) )
+    {
+
+        if ( bIsAttached )
+        {
+            bitStream.Read ( EntityAttachedToID );
+            bitStream.Read ( &attachedPosition );
+            bitStream.Read ( &attachedRotation );
+        }
+
+        // Check element collisions enabled ( for use later on )
+        bitStream.ReadBit ( bCollisonsEnabled );
+
+        if ( bitStream.Version() >= 0x56 )
+            bitStream.ReadBit ( bCallPropagationEnabled );
+        else
+            bCallPropagationEnabled = true;
+
+        // Read custom data
+        //CCustomData* pCustomData = new CCustomData;
+        unsigned short usNumData = 0;
+        bitStream.ReadCompressed ( usNumData );
+
+        SString strStatus( "ID:%05x Type:%d ParID:%05x Int:%d Dim:%d Attach:%d NumData:%d "
+                                    ,EntityID
+                                    ,ucEntityTypeID
+                                    ,ParentID
+                                    ,ucInterior
+                                    ,usDimension
+                                    ,bIsAttached
+                                    ,usNumData
+                            );
+
+        for ( unsigned short us = 0 ; us < usNumData ; us++ )
+        {
+            unsigned char ucNameLength = 0;
+
+            // Read the custom data name length
+            if ( bitStream.Read ( ucNameLength ) )
+            {
+                // Was a valid custom data name length found?
+                if ( ucNameLength <= MAX_CUSTOMDATA_NAME_LENGTH )
+                {
+                    SString strName;
+                    bitStream.ReadStringCharacters ( strName, ucNameLength );
+
+                    CLuaArgument Argument;
+                    Argument.ReadFromBitStream ( bitStream );
+
+                    //pCustomData->Set ( strName, Argument, NULL );
+                }
+                else
+                {
+                    return strStatus + "Error 6";
+                }
+            }
+            else
+            {
+                return strStatus + "Error 7";
+            }
+        }
+
+        // Read out the name length
+        unsigned short usNameLength;
+        bitStream.ReadCompressed ( usNameLength );
+
+        // Create the name string and 0 terminate it
+        char* szName = new char [ usNameLength + 1 ];
+        szName [ usNameLength ] = 0;
+
+        // Read out the name if it's longer than empty
+        if ( usNameLength > 0 )
+        {
+            bitStream.Read ( szName, usNameLength );
+        }
+
+        strStatus += SString( "NameLen:%d Name:'%s'"
+                                    ,usNameLength
+                                    ,*SStringX( szName ).Left( 40 )
+                            );
+        return strStatus;
+    }
+    return "Read error";
 }

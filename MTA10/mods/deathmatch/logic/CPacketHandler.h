@@ -101,6 +101,16 @@ public:
     void                Packet_LatentTransfer           ( NetBitStreamInterface& bitStream );
     void                Packet_SyncSettings             ( NetBitStreamInterface& bitStream );
     void                Packet_PedTask                  ( NetBitStreamInterface& bitStream );
+
+    // For debugging protocol errors during ENTITY_ADD packet
+    void                EntityAddDebugBegin             ( uint uiNumEntities, NetBitStreamInterface* pBitStream );
+    void                EntityAddDebugNext              ( uint uiEntityIndex, int iReadOffset );
+    void                RaiseEntityAddError             ( uint uiCode );
+    SString             EntityAddDebugRead              ( NetBitStreamInterface& bitStream );
+
+    std::vector < int >         m_EntityAddReadOffsetStore;
+    NetBitStreamInterface*      m_pEntityAddBitStream;
+    uint                        m_uiEntityAddNumEntities;
 };
 
 #endif
