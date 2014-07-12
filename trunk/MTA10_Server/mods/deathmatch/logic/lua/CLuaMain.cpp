@@ -680,6 +680,7 @@ void CLuaMain::AddObjectClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "createObject" );
     lua_classfunction ( luaVM, "move", "moveObject" );
     lua_classfunction ( luaVM, "stop", "stopObject" );
+    lua_classfunction ( luaVM, "hasPermissionTo", "hasObjectPermissionTo" );
     
     lua_classfunction ( luaVM, "getScale", "getObjectScale" );
     lua_classfunction ( luaVM, "setScale", "setObjectScale" );
