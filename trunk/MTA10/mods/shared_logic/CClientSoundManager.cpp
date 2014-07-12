@@ -118,7 +118,7 @@ void CClientSoundManager::DoPulse ( void )
             g_pClientGame->GetElementDeleter()->Delete ( pSound );
         }
     }
-    UpdateDistanceStreaming ( vecPosition );
+    UpdateDistanceStreaming ( vecCameraPosition );
     ProcessStopQueues();
 }
 
