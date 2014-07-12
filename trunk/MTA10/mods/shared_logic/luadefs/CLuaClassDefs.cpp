@@ -278,7 +278,7 @@ const char* CLuaClassDefs::GetTimerClass ( CLuaTimer* pTimer )
 
 const char* CLuaClassDefs::GetXmlNodeClass ( CXMLNode* pXmlNode )
 {
-    return "XmlNode";
+    return "XML";
 }
 
 // absolutely ugly, need a better way

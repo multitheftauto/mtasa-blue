@@ -275,7 +275,7 @@ const char* CLuaClassDefs::GetTimerClass ( CLuaTimer* pTimer )
 
 const char* CLuaClassDefs::GetXmlNodeClass ( CXMLNode* pXmlNode )
 {
-    return "XmlNode";
+    return "XML";
 }
 
 const char* CLuaClassDefs::GetACLClass ( CAccessControlList* pACL )
