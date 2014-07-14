@@ -50,6 +50,10 @@ public:
     bool                            IsValid             ( void )    { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
     bool                            IsUsingIDs          ( void )    { return m_bUsingIDs; }
 
+    static void                     InitFileRecovery    ( const char* szSaveFlagDirectory );
+    void                            FileRecoveryPreSave ( const SString& strFilename );
+    void                            FileRecoveryPostSave( void );
+
 private:
     bool                            BuildWrapperTree    ( void );
     bool                            BuildSubElements    ( class CXMLNodeImpl* pNode );
@@ -66,6 +70,8 @@ private:
     class CXMLNodeImpl*             m_pRootNode;
     unsigned long                   m_ulID;
     const bool                      m_bUsingIDs;
+
+    static SString                  ms_strSaveFlagFile;
 };
 
 #endif

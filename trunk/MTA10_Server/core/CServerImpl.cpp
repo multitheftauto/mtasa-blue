@@ -366,7 +366,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             {
                 // Call it to grab the network interface class
                 m_pNetwork = pfnInitNetServerInterface ();
-                m_pXML = pfnInitXMLInterface ();
+                m_pXML = pfnInitXMLInterface ( *m_strServerModPath );
                 if ( m_pNetwork && m_pXML )
                 {
                     // Make the modmanager load our mod

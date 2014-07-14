@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+SString CXMLFileImpl::ms_strSaveFlagFile;
 
 CXMLFileImpl::CXMLFileImpl ( const char* szFilename, bool bUseIDs ) :
     m_ulID ( INVALID_XML_ID ),
@@ -140,6 +141,9 @@ bool CXMLFileImpl::WriteSafer ( void )
         // Delete any leftover backup
         unlink ( strBackup );
 
+        // Save filename being saved
+        FileRecoveryPreSave( strFilename );
+
         // Rename current to backup
         rename ( strFilename, strBackup );
 
@@ -149,6 +153,9 @@ bool CXMLFileImpl::WriteSafer ( void )
             SetLastError ( CXMLErrorCodes::OtherError, "Could not rename temporary to current" );
             return false;
         }
+
+        // Unsave filename being saved
+        FileRecoveryPostSave();
 
         // Delete backup
         unlink ( strBackup );
@@ -311,3 +318,55 @@ void CXMLFileImpl::ClearWrapperTree ( void )
         m_pRootNode = NULL;
     }
 }
+
+//
+// Initialize and do any file recovery as necessary
+//
+void CXMLFileImpl::InitFileRecovery( const char* szSaveFlagDirectory )
+{
+    if ( !szSaveFlagDirectory )
+        return;
+    ms_strSaveFlagFile = PathJoin( szSaveFlagDirectory, "_xml_save.info" );
+
+    // Check if recover is required
+    SString strFilename;
+    FileLoad( ms_strSaveFlagFile, strFilename );
+    if ( strFilename.empty() )
+        return;
+
+    if ( !FileExists( strFilename ) )
+    {
+        // Try to recover from new file
+        SString strTemp = strFilename + "_new_";
+        if ( FileExists( strTemp ) )
+        {
+            rename( strTemp, strFilename );
+        }
+    }
+
+    if ( !FileExists( strFilename ) )
+    {
+        // Try to recover from old file
+        SString strBackup = strFilename + "_old_";
+        if ( FileExists( strBackup ) )
+        {
+            rename( strBackup, strFilename );
+        }
+    }
+    FileDelete( ms_strSaveFlagFile );
+}
+
+// Store filename in case of problems during save
+void CXMLFileImpl::FileRecoveryPreSave( const SString& strFilename )
+{
+    if ( !ms_strSaveFlagFile.empty() )
+        FileSave( ms_strSaveFlagFile, strFilename );
+}
+
+// Unstore filename in case of problems during save
+void CXMLFileImpl::FileRecoveryPostSave( void )
+{
+    if ( !ms_strSaveFlagFile.empty() )
+        FileDelete( ms_strSaveFlagFile );
+}
+

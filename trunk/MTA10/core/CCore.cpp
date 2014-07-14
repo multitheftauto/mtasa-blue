@@ -1044,7 +1044,7 @@ void CCore::CreateNetwork ( )
 void CCore::CreateXML ( )
 {
     if ( !m_pXML )
-        m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", this );
+        m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", *CalcMTASAPath ( "MTA" ) );
 
     if ( !m_pConfigFile )
     {

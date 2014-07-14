@@ -36,7 +36,7 @@ class CServerImpl;
 
 #define SERVER_RESET_RETURN 500
 
-typedef CXML* (*InitXMLInterface) ( void );
+typedef CXML* (*InitXMLInterface) ( const char* szSaveFlagDirectory );
 typedef CNetServer* (*InitNetServerInterface) ( void );
 
 #ifdef WIN32
