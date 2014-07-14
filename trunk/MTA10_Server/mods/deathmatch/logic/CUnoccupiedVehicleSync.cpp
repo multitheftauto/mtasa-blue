@@ -107,18 +107,9 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
         {
             // Tell the syncer to stop syncing
             StopSync ( pVehicle );
-            // if the controller is a player we should set them as the syncer
-            if ( pController->IsPlayer ( ) )
-            {
-                CPlayer * pControllingPlayer = static_cast <CPlayer *> ( pController );
-                // Update our syncer
-                pVehicle->SetSyncer ( pControllingPlayer );
 
-                // Call the onElementStartSync event
-                CLuaArguments Arguments;
-                Arguments.PushElement ( pControllingPlayer );  // New syncer
-                pVehicle->CallEvent ( "onElementStartSync", Arguments );
-            }
+            // Set the controlling player as syncer (for 'ElementSyncer' scripting functions/events)
+            StartSync ( static_cast < CPlayer* > ( pController ), pVehicle );
         }
     }
     else
