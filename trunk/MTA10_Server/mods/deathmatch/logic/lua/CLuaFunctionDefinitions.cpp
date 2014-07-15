@@ -5349,15 +5349,18 @@ int CLuaFunctionDefinitions::SetVehicleColor ( lua_State* luaVM )
                 SColorRGBA ( ucParams[9], ucParams[10], ucParams[11], 0 ) );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            argStream.SetCustomError( "Incorrect number of color arguments" );
 
-        if ( CStaticFunctionDefinitions::SetVehicleColor ( pElement, color ) )
+        if ( !argStream.HasErrors ( ) )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( CStaticFunctionDefinitions::SetVehicleColor ( pElement, color ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
-    else
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
