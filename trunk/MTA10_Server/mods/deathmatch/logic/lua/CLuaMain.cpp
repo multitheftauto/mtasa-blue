@@ -878,6 +878,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getCameraMatrix", "getCameraMatrix" );
     lua_classfunction ( luaVM, "getCameraTarget", "getCameraTarget" );
 
+    lua_classvariable ( luaVM, "account", NULL, "getPlayerAccount" );
     lua_classvariable ( luaVM, "cameraInterior", "setCameraInterior", "getCameraInterior" );
     lua_classvariable ( luaVM, "cameraMatrix", "setCameraMatrix", "getCameraMatrix" );
     lua_classvariable ( luaVM, "cameraTarget", "setCameraTarget", "getCameraTarget" );
