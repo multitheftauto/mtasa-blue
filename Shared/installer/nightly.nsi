@@ -665,12 +665,12 @@ DontInstallRedist:
 
             SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
             File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
-			
-			SetOutPath "$INSTDIR\MTA\locale\"
-			File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.png"
-			File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.po"
 
 		!endif
+			
+        SetOutPath "$INSTDIR\MTA\locale\"
+        File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.png"
+        File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.po"
 
 		SetOutPath "$INSTDIR"
         File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe"
