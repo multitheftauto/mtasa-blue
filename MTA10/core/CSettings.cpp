@@ -897,14 +897,28 @@ void CSettings::CreateGUI ( void )
     m_pChatLoadPreset->SetZOrderingEnabled ( false );
 
     // Color selection
+    SString strChatBG = _("Chat BG");
+    SString strChatText = _("Chat Text");
+    SString strInputBG = _("Input BG");
+    SString strInputText = _("Input Text");
+
+    float fColorTabsTextWidth = pManager->GetTextExtent( strChatBG )
+                                + pManager->GetTextExtent( strChatText )
+                                + pManager->GetTextExtent( strInputBG )
+                                + pManager->GetTextExtent( strInputText );
+
+    // Add 20 for each tab
+    fColorTabsTextWidth += 20 * 4;
+    float fColorTabPanelWidth = Max( 320.f, fColorTabsTextWidth );
+
     CGUITabPanel* pColorTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( pTabInterface ) );
     pColorTabPanel->SetPosition ( CVector2D ( 10.0f, 150.0f ) );
-    pColorTabPanel->SetSize ( CVector2D ( 320.0f, 150.0f ) );
+    pColorTabPanel->SetSize ( CVector2D ( fColorTabPanelWidth, 150.0f ) );
 
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_BG, _("Chat BG"), pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_TEXT, _("Chat Text"), pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_BG, _("Input BG"), pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, _("Input Text"), pColorTabPanel );
+    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_BG, strChatBG, pColorTabPanel );
+    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_TEXT, strChatText, pColorTabPanel );
+    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_BG, strInputBG, pColorTabPanel );
+    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, strInputText, pColorTabPanel );
 
     // Font Selection
     m_pPaneChatFont = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabInterface ) ); 
@@ -945,41 +959,73 @@ void CSettings::CreateGUI ( void )
             _("Width:")
         );
 
+        // Sizes of things
+        float fLabelsWidth = fIndentX;
+        float fEditsWidth = 80;
+        float fLineSizeY = 24;
+        float fLineGapY = 4;
+
+        // Position
+        vecTemp.fX = 522 - fEditsWidth - fLabelsWidth;
+        vecTemp.fY = 199;
+
+        // Background pane in case of overlap with the color panel
+        float fBGSizeX = fEditsWidth + fLabelsWidth;
+        float fBGSizeY = fLineSizeY * 3 + fLineGapY * 2;       
+        float fBGBorder = 10;
+        CGUITabPanel* pMiscOptionsBG = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( pTabInterface ) );
+        pMiscOptionsBG->SetPosition( CVector2D( vecTemp.fX - fBGBorder, vecTemp.fY - fBGBorder - 5 ) );
+        pMiscOptionsBG->SetSize( CVector2D( fBGSizeX + fBGBorder * 2, fBGSizeY + fBGBorder * 2 + 2 ) );
+        pMiscOptionsBG->SetAlpha( 1 );
+        pMiscOptionsBG->SetZOrderingEnabled( false );
+        pMiscOptionsBG->SetAlwaysOnTop( true );
+
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Lines:") ) );
-        pLabel->SetPosition ( CVector2D ( 360.0f, 160.0f ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( );
+        pLabel->SetAlwaysOnTop ( true );
 
         m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
         m_pChatLines->SetSize ( CVector2D ( 80.0f, 24.0f ) );
+        m_pChatLines->SetAlwaysOnTop ( true );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Scale:") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( );
+        pLabel->SetAlwaysOnTop ( true );
 
         m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
         m_pChatScaleX->SetSize ( CVector2D ( 35.0f, 24.0f ) );
+        m_pChatScaleX->SetAlwaysOnTop ( true );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "x" ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 37.0f, vecTemp.fY + 2.0f ) );
         pLabel->AutoSize ( );
+        pLabel->SetAlwaysOnTop ( true );
 
         m_pChatScaleY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 45.0f, vecTemp.fY - 2.0f ) );
         m_pChatScaleY->SetSize ( CVector2D ( 35.0f, 24.0f ) );
+        m_pChatScaleY->SetAlwaysOnTop ( true );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Width:") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( );
+        pLabel->SetAlwaysOnTop ( true );
 
         m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
         m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
         m_pChatWidth->SetSize ( CVector2D ( 80.0f, 24.0f ) );
+        m_pChatWidth->SetAlwaysOnTop ( true );
 
+
+        vecTemp.fX = 360;
+        vecTemp.fY = 216;
         fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
             _("after"),
             _("for")
