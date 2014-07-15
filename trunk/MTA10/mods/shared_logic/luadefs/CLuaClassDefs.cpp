@@ -313,7 +313,7 @@ const char* CLuaClassDefs::GetEntityClass ( CClientEntity* pEntity )
                     case CGUI_MEMO: return "GuiMemo";
                     case CGUI_PROGRESSBAR: return "GuiProgressBar";
                     case CGUI_RADIOBUTTON: return "GuiButton";
-                    case CGUI_STATICIMAGE: return "GuiImage";
+                    case CGUI_STATICIMAGE: return "GuiStaticImage";
                     case CGUI_TAB: return "GuiTab";
                     case CGUI_TABPANEL: return "GuiTabPanel";
                     case CGUI_WINDOW: return "GuiWindow";
