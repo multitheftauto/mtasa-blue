@@ -827,7 +827,7 @@ void CSettings::CreateGUI ( void )
     {
         CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("General") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 12.0f ) );
-        pLabel->AutoSize ( _("General  ") );
+        pLabel->AutoSize ( NULL, 5.0f );
         pLabel->SetFont ( "default-bold-small" );
     }
 
