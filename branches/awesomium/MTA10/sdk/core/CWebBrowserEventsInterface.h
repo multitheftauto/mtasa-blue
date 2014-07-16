@@ -18,6 +18,7 @@ public:
     virtual void Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription ) = 0;
     virtual void Events_OnNavigate ( const SString& strURL, bool bMainFrame ) = 0;
     virtual void Events_OnPopup ( const SString& strTargetURL, const SString& strOpenerURL, bool bPopup ) = 0;
+    virtual void Events_OnChangeCursor ( unsigned char ucCursor ) = 0;
 };
 
 #endif

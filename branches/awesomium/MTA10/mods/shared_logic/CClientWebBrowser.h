@@ -30,6 +30,7 @@ public:
     void                        GetURL              ( SString& outURL );
     void                        SetRenderingPaused  ( bool bPaused );
     void                        SetTransparent      ( bool bTransparent );
+    void                        Focus               ();
 
     bool                        ExecuteJavascript   ( const SString& strJavascriptCode );
 
@@ -50,6 +51,7 @@ public:
     void                        Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription );
     void                        Events_OnNavigate      ( const SString& strURL, bool bMainFrame );
     void                        Events_OnPopup         ( const SString& strTargetURL, const SString& strOpenerURL, bool bPopup );
+    void                        Events_OnChangeCursor  ( unsigned char ucCursor );
 
 private:
     CWebViewInterface* m_pWebView;

@@ -450,3 +450,24 @@ int CLuaFunctionDefs::IsBrowserURLBlocked ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::FocusBrowser ( lua_State* luaVM )
+{
+//  focusBrowser ( browser webBrowser )
+    CClientWebBrowser* pWebBrowser;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+
+    if ( !argStream.HasErrors () )
+    {
+        pWebBrowser->Focus ();
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

@@ -57,6 +57,11 @@ void CClientWebBrowser::SetTransparent ( bool bTransparent )
     m_pWebView->SetTransparent ( bTransparent );
 }
 
+void CClientWebBrowser::Focus ()
+{
+    m_pWebView->Focus ();
+}
+
 bool CClientWebBrowser::ExecuteJavascript ( const SString& strJavascriptCode )
 {
     // Don't allow javascript code execution on remote websites
@@ -143,4 +148,11 @@ void CClientWebBrowser::Events_OnPopup ( const SString& strTargetURL, const SStr
     Arguments.PushString ( strOpenerURL );
     Arguments.PushBoolean ( bPopup );
     CallEvent ( "onClientBrowserPopup", Arguments, false );
+}
+
+void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
+{
+    CLuaArguments Arguments;
+    Arguments.PushNumber ( ucCursor );
+    CallEvent ( "onClientBrowserCursorChange", Arguments, false );
 }

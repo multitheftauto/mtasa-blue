@@ -37,6 +37,7 @@ public:
     void GetTitle               ( SString& outTitle );
     void SetRenderingPaused     ( bool bPaused );
     void SetTransparent         ( bool bTransparent );
+    void Focus                  ();
 
     void ExecuteJavascript      ( const SString& strJavascriptCode );
 
@@ -63,7 +64,7 @@ public:
     virtual void OnChangeAddressBar     ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url ) {};
     virtual void OnChangeTooltip        ( Awesomium::WebView* pCaller, const Awesomium::WebString& tooltip ) {};
     virtual void OnChangeTargetURL      ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url ) {};
-    virtual void OnChangeCursor         ( Awesomium::WebView* pCaller, Awesomium::Cursor cursor ) {};
+    virtual void OnChangeCursor         ( Awesomium::WebView* pCaller, Awesomium::Cursor cursor );
     virtual void OnChangeFocus          ( Awesomium::WebView* pCaller, Awesomium::FocusedElementType focused_type ) {};
     virtual void OnAddConsoleMessage    ( Awesomium::WebView* pCaller, const Awesomium::WebString& message, int line_number, const Awesomium::WebString& source ) {};
     virtual void OnShowCreatedWebView   ( Awesomium::WebView* pCaller, Awesomium::WebView* new_view, const Awesomium::WebURL& opener_url, const Awesomium::WebURL& target_url, const Awesomium::Rect& initial_pos, bool is_popup );

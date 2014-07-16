@@ -78,6 +78,11 @@ void CWebView::SetTransparent ( bool bTransparent )
     m_pWebView->SetTransparent ( bTransparent );
 }
 
+void CWebView::Focus ()
+{
+    m_pWebView->Focus ();
+}
+
 void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
 {
     m_pWebView->ExecuteJavascript ( CWebCore::ToWebString ( strJavascriptCode ), CWebCore::ToWebString("") );
@@ -213,6 +218,12 @@ void CWebView::OnFailLoadingFrame ( Awesomium::WebView* pCaller, int64 frame_id,
     SString strURL;
     ConvertURL ( url, strURL );
     m_pEventsInterface->Events_OnLoadingFailed ( strURL, error_code, CWebCore::ToSString ( error_desc ) );
+}
+
+
+void CWebView::OnChangeCursor ( Awesomium::WebView* pCaller, Awesomium::Cursor cursor )
+{
+    m_pEventsInterface->Events_OnChangeCursor ( static_cast < unsigned char > ( cursor ) );
 }
 
 ////////////////////////////////////////////////////////////////////
