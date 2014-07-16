@@ -5349,15 +5349,18 @@ int CLuaFunctionDefinitions::SetVehicleColor ( lua_State* luaVM )
                 SColorRGBA ( ucParams[9], ucParams[10], ucParams[11], 0 ) );
         }
         else
-            m_pScriptDebugging->LogBadType ( luaVM );
+            argStream.SetCustomError( "Incorrect number of color arguments" );
 
-        if ( CStaticFunctionDefinitions::SetVehicleColor ( pElement, color ) )
+        if ( !argStream.HasErrors ( ) )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( CStaticFunctionDefinitions::SetVehicleColor ( pElement, color ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
-    else
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -11892,6 +11895,7 @@ int CLuaFunctionDefinitions::KickPlayer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
 {
+//  ban banPlayer ( player bannedPlayer, [ bool IP = true, bool Username = false, bool Serial = false, player responsiblePlayer = nil, string reason = nil, int seconds = 0 ] )
     CPlayer* pPlayer;
     SString strResponsible;
     SString strReason;
@@ -11911,7 +11915,7 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
     {
         CElement* pResponsibleElement;
         argStream.ReadUserData( pResponsibleElement );
-        if( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) )
+        if( ( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) ) )
             strResponsible = pResponsible->GetNick();
         else
             strResponsible = "Console";
@@ -11928,7 +11932,10 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
         tUnban = atoi(strTime);
     }
     else
-        argStream.ReadNumber(tUnban, 0);
+    if ( argStream.NextIsNumber() )
+        argStream.ReadNumber( tUnban );
+    else
+        tUnban = 0;
 
     if ( tUnban > 0 )
         tUnban += time ( NULL );
@@ -11953,6 +11960,7 @@ int CLuaFunctionDefinitions::BanPlayer ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
 {
+//  ban addBan ( [ string IP, string Username, string Serial, player responsibleElement, string reason, int seconds = 0 ] )
     SString strIP          = "";
     SString strUsername    = "";
     SString strSerial      = "";
@@ -11970,7 +11978,7 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
     {
         CElement* pResponsibleElement;
         argStream.ReadUserData( pResponsibleElement );
-        if ( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) )
+        if ( ( pResponsible = dynamic_cast < CPlayer* > ( pResponsibleElement ) ) )
             strResponsible = pResponsible->GetNick();
     }
     else
@@ -11985,7 +11993,10 @@ int CLuaFunctionDefinitions::AddBan ( lua_State* luaVM )
         tUnban = atoi(strTime);
     }
     else
-        argStream.ReadNumber(tUnban, 0);
+    if ( argStream.NextIsNumber() )
+        argStream.ReadNumber( tUnban );
+    else
+        tUnban = 0;
 
     if ( tUnban > 0 )
         tUnban += time ( NULL );

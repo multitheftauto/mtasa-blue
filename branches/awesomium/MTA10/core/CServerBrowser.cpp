@@ -190,6 +190,13 @@ CServerBrowser::CServerBrowser ( void )
         pLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP );
         pLabel->SetProperty( "BackgroundEnabled", "True" );
 
+        // Create second slightly smaller label so wrapped text looks better
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pQuickConnectHelpWindow, "" ) );
+        pLabel->SetPosition ( CVector2D ( 5 + 10, 0 ) );
+        pLabel->SetSize ( CVector2D ( 310 - 10 * 2, 150 ) );
+        pLabel->SetVerticalAlign ( CGUI_ALIGN_VERTICALCENTER );
+        pLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP );
+
         SString strHelpMessage = _(
                             "FOR QUICK CONNECT:\n"
                             "\n"
@@ -2215,7 +2222,7 @@ void CServerBrowser::OnQuickConnectButtonClick ( void )
 {
     // Show help text
     if ( m_uiShownQuickConnectHelpCount < 1 )
-    {
+        {
         m_pQuickConnectHelpWindow->SetVisible ( true );
         m_pQuickConnectHelpWindow->BringToFront ();
         m_uiShownQuickConnectHelpCount++;

@@ -1414,9 +1414,6 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
 
     // Unregister them from the lightweight sync manager
     m_lightsyncManager.UnregisterPlayer ( &Player );
-
-    // Clean up some now invalid references to the player from other entities
-    Player.PrepareForDeletion();
 }
 
 
@@ -1704,7 +1701,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 // Check the serial for validity
                                 if ( CBan* pBan = m_pBanManager->GetBanFromSerial ( pPlayer->GetSerial ().c_str () ) )
                                 {
-                                    time_t Duration = pBan->GetTimeOfUnban() - time ( NULL );
+                                    time_t Duration = pBan->GetBanTimeRemaining();
                                     SString strBanMessage = "Serial is banned";
                                     SString strDurationDesc = pBan->GetDurationDesc ();
                                     if ( strDurationDesc.length () )
@@ -1721,7 +1718,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 // Check the ip for banness
                                 if ( CBan* pBan = m_pBanManager->GetBanFromIP ( strIP ) )
                                 {
-                                    time_t Duration = pBan->GetTimeOfUnban() - time ( NULL );
+                                    time_t Duration = pBan->GetBanTimeRemaining();
                                     SString strBanMessage;// = "Serial is banned";
                                     SString strDurationDesc = pBan->GetDurationDesc ();
                                     if ( strDurationDesc.length () )
@@ -1747,7 +1744,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                     if ( pBan )
                                     {
                                         strReason = pBan->GetReason();
-                                        Duration = pBan->GetTimeOfUnban() - time ( NULL );
+                                        Duration = pBan->GetBanTimeRemaining();
                                     }
 
                                     // Tell the player he's banned

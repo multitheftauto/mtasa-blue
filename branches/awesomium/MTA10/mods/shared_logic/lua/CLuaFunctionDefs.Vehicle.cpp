@@ -1320,7 +1320,7 @@ int CLuaFunctionDefs::SetVehicleColor ( lua_State* luaVM )
             break;
     }
 
-    if ( i == 3 || i == 4 || i == 6 || i == 9 || i == 12 )
+    if ( !argStream.HasErrors ( ) )
     {
         CVehicleColor color;
 
@@ -1330,6 +1330,7 @@ int CLuaFunctionDefs::SetVehicleColor ( lua_State* luaVM )
             color.SetPaletteColors ( ucParams[0], ucParams[1], ucParams[2], ucParams[3] );
         }
         else
+        if ( i == 3 || i == 6 || i == 9 || i == 12 )
         {
             // 3,6,9 or 12 args mean rgb colours
             color.SetRGBColors ( SColorRGBA ( ucParams[0], ucParams[1], ucParams[2], 0 ),
@@ -1337,14 +1338,19 @@ int CLuaFunctionDefs::SetVehicleColor ( lua_State* luaVM )
                                     SColorRGBA ( ucParams[6], ucParams[7], ucParams[8], 0 ),
                                     SColorRGBA ( ucParams[9], ucParams[10], ucParams[11], 0 ) );
         }
+        else
+            argStream.SetCustomError( "Incorrect number of color arguments" );
 
-        if ( CStaticFunctionDefinitions::SetVehicleColor ( *pEntity, color ) )
+        if ( !argStream.HasErrors ( ) )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( CStaticFunctionDefinitions::SetVehicleColor ( *pEntity, color ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
-    else
+    if ( argStream.HasErrors ( ) )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );

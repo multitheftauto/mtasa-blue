@@ -501,7 +501,7 @@ void CLuaMain::AddAccountClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "getAll", "getAllAccounts" );
+    lua_classfunction ( luaVM, "getAll", "getAccounts" );
     lua_classfunction ( luaVM, "getAllBySerial", "getAccountsBySerial" );
     lua_classfunction ( luaVM, "getFromPlayer", "getPlayerAccount" );
     lua_classfunction ( luaVM, "logPlayerOut", "logOut" );
@@ -831,12 +831,14 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "takeScreenshot", "takePlayerScreenShot" );
     lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
     lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
+    lua_classfunction ( luaVM, "hasPermissionTo", "hasObjectPermissionTo" );
     lua_classfunction ( luaVM, "logOut", "logOut" );
     //lua_classfunction ( luaVM, "observeDisplay", "textDisplayAddObserver" ); // swap args
     //lua_classfunction ( luaVM, "stopObservingDisplay", "textDisplayRemoveObserver" ); // swap args
     //lua_classfunction ( luaVM, "isObservingDisplay", "textDisplayIsObserver" ); // swap args
     
     lua_classfunction ( luaVM, "forceMap", "forcePlayerMap" );
+    lua_classfunction ( luaVM, "fadeCamera", "fadeCamera" );
     lua_classfunction ( luaVM, "setTeam", "setPlayerTeam" );
     lua_classfunction ( luaVM, "setMuted", "setPlayerMuted" );
     lua_classfunction ( luaVM, "setName", "setPlayerName" );
@@ -850,6 +852,9 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setVoiceBroadcastTo", "setPlayerVoiceBroadcastTo" );
     lua_classfunction ( luaVM, "setVoiceIgnoreFrom", "setPlayerVoiceIgnoreFrom" );
     lua_classfunction ( luaVM, "setHudComponentVisible", "setPlayerHudComponentVisible" );
+    lua_classfunction ( luaVM, "setCameraMatrix", "setCameraMatrix" );
+    lua_classfunction ( luaVM, "setCameraInterior", "setCameraInterior" );
+    lua_classfunction ( luaVM, "setCameraTarget", "setCameraTarget" );
     
     lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
     lua_classfunction ( luaVM, "isMuted", "isPlayerMuted" );
@@ -869,7 +874,14 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getMoney", "getPlayerMoney" );
     lua_classfunction ( luaVM, "getAnnounceValue", "getPlayerAnnounceValue" );
     lua_classfunction ( luaVM, "getACInfo", "getPlayerACInfo" );
+    lua_classfunction ( luaVM, "getCameraInterior", "getCameraInterior" );
+    lua_classfunction ( luaVM, "getCameraMatrix", "getCameraMatrix" );
+    lua_classfunction ( luaVM, "getCameraTarget", "getCameraTarget" );
 
+    lua_classvariable ( luaVM, "account", NULL, "getPlayerAccount" );
+    lua_classvariable ( luaVM, "cameraInterior", "setCameraInterior", "getCameraInterior" );
+    lua_classvariable ( luaVM, "cameraMatrix", "setCameraMatrix", "getCameraMatrix" );
+    lua_classvariable ( luaVM, "cameraTarget", "setCameraTarget", "getCameraTarget" );
     lua_classvariable ( luaVM, "ACInfo", NULL, "getPlayerACInfo" );
     lua_classvariable ( luaVM, "voiceBroadcastTo", "setPlayerVoiceBroadcastTo", NULL );
     lua_classvariable ( luaVM, "voiceIgnoreFrom", "setPlayerVoiceIgnoreFrom", NULL );
@@ -925,6 +937,59 @@ void CLuaMain::AddResourceClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
+    // These have been separated for their abnormal argument scheme
+    // Their first arg take a path from which a resource is determined
+    // For now, they are static-classes, and if the scheme is fixed
+    // Then they will also be able to serve use when in an instance
+    lua_classfunction ( luaVM, "addConfig", "addResourceConfig" );
+    lua_classfunction ( luaVM, "addMap", "addResourceMap" );
+    lua_classfunction ( luaVM, "getConfig", "getResourceConfig" );
+    
+    lua_classfunction ( luaVM, "getFromName", "getResourceFromName" );
+    lua_classfunction ( luaVM, "getAll", "getResources" );
+    lua_classfunction ( luaVM, "getThis", "getThisResource" );
+    lua_classfunction ( luaVM, "refresh", "refreshResources" ); // Can't use "all" here because that's an argument
+    
+    lua_classfunction ( luaVM, "create", "createResource" );
+    lua_classfunction ( luaVM, "start", "startResource" );
+    lua_classfunction ( luaVM, "stop", "stopResource" );
+    lua_classfunction ( luaVM, "copy", "copyResource" );
+    lua_classfunction ( luaVM, "rename", "renameResource" );
+    lua_classfunction ( luaVM, "delete", "deleteResource" );
+    lua_classfunction ( luaVM, "call", "call" );
+    lua_classfunction ( luaVM, "removeDefaultSetting", "removeResourceDefaultSetting" );
+    lua_classfunction ( luaVM, "removeFile", "removeResourceFile" );
+    lua_classfunction ( luaVM, "restart", "restartResource" );
+    lua_classfunction ( luaVM, "hasPermissionTo", "hasObjectPermissionTo" );
+    lua_classfunction ( luaVM, "updateACLRequest", "updateResourceACLRequest" );
+    
+    lua_classfunction ( luaVM, "setInfo", "setResourceInfo" );
+    lua_classfunction ( luaVM, "setDefaultSetting", "setResourceDefaultSetting" );
+
+    lua_classfunction ( luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot" );
+    lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
+    lua_classfunction ( luaVM, "getExportedFunctions", "getResourceExportedFunctions" );
+    lua_classfunction ( luaVM, "getLastStartTime", "getResourceLastStartTime" );
+    lua_classfunction ( luaVM, "getLoadTime", "getResourceLoadTime" );
+    lua_classfunction ( luaVM, "getInfo", "getResourceInfo" );
+    lua_classfunction ( luaVM, "getLoadFailureReason", "getResourceLoadFailureReason" );
+    lua_classfunction ( luaVM, "getMapRootElement", "getResourceMapRootElement" );
+    lua_classfunction ( luaVM, "getName", "getResourceName" );
+    lua_classfunction ( luaVM, "getState", "getResourceState" );
+    lua_classfunction ( luaVM, "getACLRequests", "getResourceACLRequests" );
+    
+    lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
+    lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
+    lua_classvariable ( luaVM, "lastStartTime", NULL, "getResourceLastStartTime" );
+    lua_classvariable ( luaVM, "aclRequests", NULL, "getResourceACLRequests" );
+    lua_classvariable ( luaVM, "loadTime", NULL, "getResourceLoadTime" );
+    lua_classvariable ( luaVM, "name", "renameResource", "getResourceName" );
+    lua_classvariable ( luaVM, "rootElement", NULL, "getResourceRootElement" );
+    lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
+    lua_classvariable ( luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason" );
+    //lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
+    //lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
+
     lua_registerclass ( luaVM, "Resource" );
 }
 
@@ -941,7 +1006,6 @@ void CLuaMain::AddConnectionClass ( lua_State* luaVM )
 }
 
 
-// TODO: We need code to integrate this class into the handles returned by the db functions
 void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1215,7 +1279,7 @@ void CLuaMain::AddXMLClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "loadMapData", "loadMapData" );
     lua_classfunction ( luaVM, "saveMapData", "saveMapData" );
     
-    lua_classfunction ( luaVM, "setValue", "xmlNodeGetValue" );
+    lua_classfunction ( luaVM, "getValue", "xmlNodeGetValue" );
     lua_classfunction ( luaVM, "setAttribute", "xmlNodeSetAttribute" );
     lua_classfunction ( luaVM, "setValue", "xmlNodeSetValue" );
     lua_classfunction ( luaVM, "saveFile", "xmlSaveFile" );

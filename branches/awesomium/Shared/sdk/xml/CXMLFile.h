@@ -28,7 +28,7 @@ public:
     virtual const char*             GetFilename         ( void ) = 0;
     virtual void                    SetFilename         ( const char* szFilename ) = 0;
 
-    virtual bool                    Parse               ( void ) = 0;
+    virtual bool                    Parse               ( std::vector < char >* pOutFileContents = NULL ) = 0;
     virtual bool                    Write               ( void ) = 0;
     virtual void                    Clear               ( void ) = 0;
     virtual void                    Reset               ( void ) = 0;

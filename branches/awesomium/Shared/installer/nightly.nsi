@@ -592,6 +592,7 @@ DontInstallRedist:
         File "${FILES_ROOT}\MTA San Andreas\mta\pthread.dll"
         ; The files below can be moved out of the LIGHTBUILD zone at some point
         File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
+        File "${FILES_ROOT}\MTA San Andreas\mta\bassopus.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
@@ -672,12 +673,12 @@ DontInstallRedist:
 
             SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
             File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
-			
-			SetOutPath "$INSTDIR\MTA\locale\"
-			File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.png"
-			File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.po"
 
 		!endif
+			
+        SetOutPath "$INSTDIR\MTA\locale\"
+        File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.png"
+        File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.po"
 
 		SetOutPath "$INSTDIR"
         File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe"

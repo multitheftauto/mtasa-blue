@@ -618,6 +618,7 @@ void CVehicleRPCs::SetVehicleSirens ( CClientEntity* pSourceEntity, NetBitStream
             pVehicle->SetVehicleSirenPosition ( sirenData.data.m_ucSirenID, sirenData.data.m_vecSirenPositions );
             pVehicle->SetVehicleSirenMinimumAlpha ( sirenData.data.m_ucSirenID, sirenData.data.m_dwSirenMinAlpha );
             pVehicle->SetVehicleSirenColour ( sirenData.data.m_ucSirenID, sirenData.data.m_colSirenColour );
+            pVehicle->SetVehicleFlags ( sirenData.data.m_b360Flag, sirenData.data.m_bUseRandomiser, sirenData.data.m_bDoLOSCheck, sirenData.data.m_bEnableSilent );
         }
     }
 }

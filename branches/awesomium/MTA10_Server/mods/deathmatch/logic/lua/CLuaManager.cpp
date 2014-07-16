@@ -516,6 +516,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefinitions::GetWeaponNameFromID );
     CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefinitions::GetWeaponIDFromName );
+#if MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE
     CLuaCFunctions::AddFunction ( "createWeapon", CLuaFunctionDefinitions::CreateWeapon );
     CLuaCFunctions::AddFunction ( "fireWeapon", CLuaFunctionDefinitions::FireWeapon );
     CLuaCFunctions::AddFunction ( "setWeaponState", CLuaFunctionDefinitions::SetWeaponState );
@@ -533,6 +534,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getWeaponClipAmmo", CLuaFunctionDefinitions::GetWeaponClipAmmo );
     CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefinitions::SetWeaponAmmo );
     CLuaCFunctions::AddFunction ( "setWeaponClipAmmo", CLuaFunctionDefinitions::SetWeaponClipAmmo );
+#endif
 
     // Console funcs
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefinitions::AddCommandHandler );

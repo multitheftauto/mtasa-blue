@@ -36,16 +36,6 @@ public:
         return !operator == ( other );
     }
 
-    // If other MD5 is 0, only compare the CRC portions
-    bool CompareWithLegacy ( const CChecksum& other ) const
-    {
-        if ( operator == ( other ) )
-            return true;
-        CChecksum legacy = CChecksum ();
-        legacy.ulCRC = ulCRC;
-        return legacy.operator == ( other );
-    }
-
     // static generators
     static CChecksum GenerateChecksumFromFile ( const SString& strFilename )
     {

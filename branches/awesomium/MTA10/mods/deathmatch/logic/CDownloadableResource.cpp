@@ -47,7 +47,7 @@ CDownloadableResource::~CDownloadableResource ( void )
 
 bool CDownloadableResource::DoesClientAndServerChecksumMatch ( void )
 {
-    return ( m_LastClientChecksum.CompareWithLegacy ( m_ServerChecksum ) );
+    return ( m_LastClientChecksum == m_ServerChecksum );
 }
 
 CChecksum CDownloadableResource::GenerateClientChecksum ( void )

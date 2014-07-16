@@ -27,6 +27,7 @@ public:
     virtual operator NetBitStreamInterface&         ( void ) = 0;
 
     virtual int         GetReadOffsetAsBits         ( void ) = 0;
+    virtual void        SetReadOffsetAsBits         ( int iOffset ) = 0;
 
     virtual void        Reset                       ( void ) = 0;
     virtual void        ResetReadPointer            ( void ) = 0;

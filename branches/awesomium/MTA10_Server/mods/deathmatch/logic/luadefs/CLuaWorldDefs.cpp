@@ -1110,7 +1110,7 @@ int CLuaWorldDefs::RestoreWorldModel ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
 
     unsigned short usModel = 0;
-    float fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
+    float fRadius = 0.0f;
     char cInterior = -1;
     CVector vecPosition;
     argStream.ReadNumber ( usModel );

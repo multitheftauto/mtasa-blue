@@ -582,20 +582,17 @@ namespace SharedUtil
         memcpy ( strbuf, str.c_str(), str.length() );
 
         // Encode it!
-        char output [ 4 ];
         v[1] = 0;
         for ( int i = 0; i < strbuflen; i += 4 )
         {
             v[0] = *(unsigned int*)&strbuf[i];
 
             encodeXtea ( &v[0], &w[0], &k[0] );
-            *(unsigned int*)&output[0] = w[0];
-            out->append ( output, 4 );
+            out->append ( (char*)&w[0], 4 );
 
             v[1] = w[1];
         }
-        *(unsigned int*)&output[0] = v[1];
-        out->append ( output, 4 );
+        out->append ( (char*)&v[1], 4 );
 
         delete [] strbuf;
     }

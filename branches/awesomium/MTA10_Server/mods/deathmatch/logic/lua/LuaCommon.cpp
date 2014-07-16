@@ -42,6 +42,12 @@ void lua_pushelement ( lua_State* luaVM, CElement* pElement )
 {
     if ( pElement )
     {
+        if ( pElement->IsBeingDeleted ( ) )
+        {
+            lua_pushboolean ( luaVM, false );
+            return;
+        }
+
         ElementID ID = pElement->GetID ();
         if ( ID != INVALID_ELEMENT_ID )
         {
@@ -180,6 +186,14 @@ void lua_pushuserdata ( lua_State* luaVM, void* pData )
         return lua_pushxmlnode ( luaVM, pNode );
     else if ( CLuaTimer* pTimer = UserDataCast < CLuaTimer > ( ( CLuaTimer* ) NULL, pData, luaVM ) )
         return lua_pushtimer ( luaVM, pTimer );
+    else if ( CLuaVector2D* pVector = UserDataCast < CLuaVector2D > ( (CLuaVector2D*) NULL, pData, luaVM ) )
+        return lua_pushvector ( luaVM, *pVector );
+    else if ( CLuaVector3D* pVector = UserDataCast < CLuaVector3D > ( (CLuaVector3D*) NULL, pData, luaVM ) )
+        return lua_pushvector ( luaVM, *pVector );
+    else if ( CLuaVector4D* pVector = UserDataCast < CLuaVector4D > ( (CLuaVector4D*) NULL, pData, luaVM ) )
+        return lua_pushvector ( luaVM, *pVector );
+    else if ( CLuaMatrix* pMatrix = UserDataCast < CLuaMatrix > ( (CLuaMatrix*) NULL, pData, luaVM ) )
+        return lua_pushmatrix ( luaVM, *pMatrix );
 
     lua_pushobject ( luaVM, NULL, pData );
 }

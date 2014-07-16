@@ -80,7 +80,7 @@ void CSingularFileDownload::CallFinished ( bool bSuccess )
 
 bool CSingularFileDownload::DoesClientAndServerChecksumMatch ( void )
 {
-    return ( m_LastClientChecksum.CompareWithLegacy ( m_ProvidedChecksum ) );
+    return ( m_LastClientChecksum == m_ProvidedChecksum );
 }
 
 CChecksum CSingularFileDownload::GenerateClientChecksum ( void )
