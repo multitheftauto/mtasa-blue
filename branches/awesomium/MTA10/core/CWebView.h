@@ -36,6 +36,7 @@ public:
     void GetURL                 ( SString& outURL );
     void GetTitle               ( SString& outTitle );
     void SetRenderingPaused     ( bool bPaused );
+    void SetTransparent         ( bool bTransparent );
 
     void ExecuteJavascript      ( const SString& strJavascriptCode );
 

@@ -12,6 +12,7 @@
 #include "CWebCore.h"
 #include "CWebView.h"
 #include "CWebsiteRequests.h"
+#include <Audiopolicy.h>
 
 CWebCore::CWebCore ()
 {

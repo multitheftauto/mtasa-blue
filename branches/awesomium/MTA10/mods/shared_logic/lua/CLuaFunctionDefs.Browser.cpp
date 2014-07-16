@@ -12,13 +12,14 @@
 
 int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
 {
-//  texture createBrowser ( int width, int height, bool isLocal )
-    int width; int height; bool bIsLocal;
+//  texture createBrowser ( int width, int height, bool isLocal [, bool transparent = false] )
+    int width; int height; bool bIsLocal; bool bTransparent;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( width );
     argStream.ReadNumber ( height );
     argStream.ReadBool ( bIsLocal );
+    argStream.ReadBool ( bTransparent, false );
     
     if ( !argStream.HasErrors () )
     {
@@ -38,6 +39,9 @@ int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                 pBrowserTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+
+                if ( bTransparent )
+                    pBrowserTexture->SetTransparent ( true );
             }
             lua_pushelement ( luaVM, pBrowserTexture );
             return 1;

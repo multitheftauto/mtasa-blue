@@ -52,6 +52,11 @@ void CClientWebBrowser::SetRenderingPaused ( bool bPaused )
     m_pWebView->SetRenderingPaused ( bPaused );
 }
 
+void CClientWebBrowser::SetTransparent ( bool bTransparent )
+{
+    m_pWebView->SetTransparent ( bTransparent );
+}
+
 bool CClientWebBrowser::ExecuteJavascript ( const SString& strJavascriptCode )
 {
     // Don't allow javascript code execution on remote websites

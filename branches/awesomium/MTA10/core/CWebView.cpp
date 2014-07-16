@@ -60,7 +60,7 @@ void CWebView::GetURL ( SString& outURL )
         outURL = m_strTempURL;
 }
 
-void CWebView::GetTitle(SString& outTitle)
+void CWebView::GetTitle ( SString& outTitle )
 {
     outTitle = static_cast<SString> ( CWebCore::ToSString ( m_pWebView->title () ) );
 }
@@ -73,7 +73,12 @@ void CWebView::SetRenderingPaused ( bool bPaused )
         m_pWebView->ResumeRendering ();
 }
 
-void CWebView::ExecuteJavascript(const SString& strJavascriptCode)
+void CWebView::SetTransparent ( bool bTransparent )
+{
+    m_pWebView->SetTransparent ( bTransparent );
+}
+
+void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
 {
     m_pWebView->ExecuteJavascript ( CWebCore::ToWebString ( strJavascriptCode ), CWebCore::ToWebString("") );
 }

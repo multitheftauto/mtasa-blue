@@ -29,6 +29,7 @@ public:
     void                        GetTitle            ( SString& outPageTitle );
     void                        GetURL              ( SString& outURL );
     void                        SetRenderingPaused  ( bool bPaused );
+    void                        SetTransparent      ( bool bTransparent );
 
     bool                        ExecuteJavascript   ( const SString& strJavascriptCode );
 

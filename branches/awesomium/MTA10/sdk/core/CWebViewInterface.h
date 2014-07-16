@@ -23,6 +23,7 @@ public:
     virtual void GetURL             ( SString& outURL ) = 0;
     virtual void GetTitle           ( SString& outTitle ) = 0;
     virtual void SetRenderingPaused ( bool bPaused ) = 0;
+    virtual void SetTransparent     ( bool bTransparent ) = 0;
 
     virtual void ExecuteJavascript  ( const SString& strJavascriptCode ) = 0;
 
