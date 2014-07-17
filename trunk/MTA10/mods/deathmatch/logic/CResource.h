@@ -28,6 +28,16 @@
 #define MAX_FUNCTION_NAME_LENGTH    50
 #define INVALID_COMPILED_SCRIPT_CUTOFF_DATE     "2014-06-10"
 
+
+
+#define TXD_ARCHIVE_CORRUPT_MESSAGE "Texture archive corrupt - File size mismatch with section headers, Re-exporting the file is recommended."
+#define DFF_ARCHIVE_CORRUPT_MESSAGE "DFF file corrupt - File size mismatch with section headers, Re-exporting the file is recommended."
+#define DFF_FRAME_NAME_CORRUPT "DFF file corrupt - frame with name"
+#define DFF_FRAME_NAME_CORRUPT_END "is over the 24 character limit"
+#define DFF_BUFFER_OVERFLOW_ATTEMPT "DFF Tried to read beyond the file size, Re-exporting the file is recommended."
+//#define DebugFileParsing
+//#define DebugFileParseTiming
+
 class CExportedFunction
 {
 private:
@@ -39,6 +49,21 @@ public:
     };
 
     const char* GetFunctionName ( void ) { return m_strFunctionName; }
+};
+
+
+
+struct SRenderWareHeader 
+{
+    SRenderWareHeader ( )
+    {
+        id = 0;
+        size = 0;
+        ver = 0;
+    }
+    long id;
+    long size;
+    long ver;
 };
 
 class CResource
@@ -102,7 +127,7 @@ public:
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
     bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
-    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch );
+    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch, const SString &strAppendix );
 
 private:
     unsigned short          m_usNetID;
