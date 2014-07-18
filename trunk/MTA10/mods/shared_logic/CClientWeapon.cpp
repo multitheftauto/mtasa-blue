@@ -236,21 +236,9 @@ void CClientWeapon::Fire ( bool bServerFire )
         case WEAPONTYPE_SNIPERRIFLE:
         case WEAPONTYPE_MINIGUN:
         {
-            CVector vecOrigin, vecRotation;
-            GetPosition ( vecOrigin );
+            CMatrix matOrigin;
+            GetMatrix ( matOrigin );
 
-            if ( m_pAttachedToEntity )
-            {
-
-                GetRotationRadians ( vecRotation );
-
-            }
-            else
-            {
-                GetRotationRadians ( vecRotation );
-
-                vecRotation = -vecRotation;
-            }
             CVector vecTarget;
             float fDistance = m_pWeaponInfo->GetWeaponRange ();
             if ( m_targetType == TARGET_TYPE_ENTITY )
@@ -277,7 +265,7 @@ void CClientWeapon::Fire ( bool bServerFire )
                         else
                             m_pTarget->GetPosition( vecTarget );
                     }
-                    if ( m_weaponConfig.bShootIfTargetOutOfRange == false && (vecOrigin - vecTarget).Length() >= fDistance )
+                    if ( m_weaponConfig.bShootIfTargetOutOfRange == false && (matOrigin.GetPosition() - vecTarget).Length() >= fDistance )
                     {
                         return;
                     }
@@ -290,22 +278,20 @@ void CClientWeapon::Fire ( bool bServerFire )
             else if ( m_targetType == TARGET_TYPE_VECTOR )
             {
                 vecTarget = m_vecTarget;
-                if ( m_weaponConfig.bShootIfTargetOutOfRange == false && (vecOrigin - vecTarget).Length() >= fDistance )
+                if ( m_weaponConfig.bShootIfTargetOutOfRange == false && (matOrigin.GetPosition() - vecTarget).Length() >= fDistance )
                 {
                     return;
                 }
             }
             else
             {
-                CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
-                RotateVector ( vecFireOffset, vecRotation );
 #ifndef SHOTGUN_TEST
-                vecOrigin += vecFireOffset;
+                CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
+                matOrigin = CMatrix( vecFireOffset ) * matOrigin;
 #endif
                 CVector vecDirection ( 1, 0, 0 );
                 vecDirection *= fDistance;
-                RotateVector ( vecDirection, vecRotation );
-                vecTarget = vecOrigin + vecDirection;
+                vecTarget = matOrigin.TransformVector( vecDirection );
             }
 
 
@@ -322,24 +308,21 @@ void CClientWeapon::Fire ( bool bServerFire )
             m_pWeaponInfo->SetWeaponRange ( m_pWeaponStat->GetWeaponRange ( ) );
 
 #ifdef SHOTGUN_TEST
-            CVector vecTemp;
             CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
-            RotateVector ( vecFireOffset, vecRotation );
-            vecTemp = vecFireOffset;
-            vecTemp += vecOrigin;
+            CMatrix matTemp = CMatrix( vecFireOffset ) * matOrigin;
 #ifdef MARKER_DEBUG
             // Process
-            m_pMarker->SetPosition ( vecOrigin );
+            m_pMarker->SetPosition ( matOrigin.GetPosition() );
 #endif
             CVector vecTemp2;
             GetRotationDegrees(vecTemp2);
             vecTemp2.fZ -= 84.6f;
             SetRotationDegrees(vecTemp2);
-            FireInstantHit ( vecOrigin, vecTarget-vecOrigin, vecTemp );
+            FireInstantHit ( matOrigin.GetPosition(), vecTarget-matOrigin.GetPosition(), matTemp.GetPosition() );
             vecTemp2.fZ += 84.6f;
             SetRotationDegrees(vecTemp2);
 #else
-            FireInstantHit ( vecOrigin, vecTarget, bServerFire );
+            FireInstantHit ( matOrigin.GetPosition(), vecTarget, bServerFire );
 #endif
             // Restore
             m_pWeaponInfo->SetDamagePerHit ( sDamage );
@@ -357,7 +340,7 @@ void CClientWeapon::Fire ( bool bServerFire )
 #ifdef SHOTGUN_TEST
 void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation, bool bRemote )
 #else
-void CClientWeapon::FireInstantHit ( CVector & vecOrigin, CVector & vecTarget, bool bServerFire, bool bRemote )
+void CClientWeapon::FireInstantHit ( CVector vecOrigin, CVector vecTarget, bool bServerFire, bool bRemote )
 #endif
 {
     CVector vecDirection = vecTarget - vecOrigin;
