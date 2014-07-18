@@ -71,7 +71,7 @@ public:
 #ifdef SHOTGUN_TEST
     void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation, bool bRemote = false );
 #else
-    void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget, bool bServerFire = false, bool bRemote = false );
+    void                    FireInstantHit          ( CVector vecOrigin, CVector vecTarget, bool bServerFire = false, bool bRemote = false );
 #endif
     void                    FireShotgun             ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, CVector & vecRotation );
 
