@@ -169,6 +169,20 @@ int CLuaFunctionDefs::SetWeaponProperty ( lua_State* luaVM )
             }
         }
         else
+        if ( weaponProperty == WEAPON_FIRE_ROTATION )
+        {
+            CVector vecRotation;
+            argStream.ReadVector3D ( vecRotation );
+            if ( !argStream.HasErrors () )
+            {
+                if ( CStaticFunctionDefinitions::SetWeaponProperty ( pWeapon, weaponProperty, vecRotation ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+        }
+        else
         {
             float fData = 0.0f;
             argStream.ReadNumber( fData );

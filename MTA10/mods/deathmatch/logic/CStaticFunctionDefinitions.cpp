@@ -6813,6 +6813,21 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( CClientWeapon * pWeapon, eW
     return false;
 }
 
+
+bool CStaticFunctionDefinitions::GetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, CVector& vecData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_FIRE_ROTATION )
+        {
+            vecData = pWeapon->GetFireRotationNoTarget();
+            ConvertRadiansToDegrees( vecData );
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float &fData )
 {
     if ( pWeapon )
@@ -6843,6 +6858,21 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eW
         if ( eProperty == WEAPON_DAMAGE )
         {
             pWeapon->GetWeaponStat ( )->SetDamagePerHit ( sData );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, const CVector& vecData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_FIRE_ROTATION )
+        {
+            CVector vecRotationRadians = vecData;
+            ConvertDegreesToRadians( vecRotationRadians );
+            pWeapon->SetFireRotationNoTarget( vecRotationRadians );
             return true;
         }
     }

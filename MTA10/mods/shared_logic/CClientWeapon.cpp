@@ -287,7 +287,7 @@ void CClientWeapon::Fire ( bool bServerFire )
             {
 #ifndef SHOTGUN_TEST
                 CVector vecFireOffset = *m_pWeaponInfo->GetFireOffset ();
-                matOrigin = CMatrix( vecFireOffset ) * matOrigin;
+                matOrigin = CMatrix( vecFireOffset, m_vecFireRotationNoTarget ) * matOrigin;
 #endif
                 CVector vecDirection ( 1, 0, 0 );
                 vecDirection *= fDistance;

@@ -1453,6 +1453,8 @@ enum eWeaponProperty
     WEAPON_FLAG_SHOT_ANIM_ABRUPT,               // 0x040000 - force the anim to finish player after aim/fire rather than blending out   (ie rpgs)
     WEAPON_FLAG_SHOT_EXPANDS,                   // 0x080000 - expands
     WEAPON_FLAG_LAST = WEAPON_FLAG_SHOT_EXPANDS,
+
+    WEAPON_FIRE_ROTATION,
 };
 
 enum eVehicleComponent

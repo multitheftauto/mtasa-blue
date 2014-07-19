@@ -281,7 +281,9 @@ IMPLEMENT_ENUM_BEGIN( eWeaponProperty )
     ADD_ENUM ( WEAPON_FLAG_SHOT_SLOWS,                  "flag_shot_slows" ) 
     ADD_ENUM ( WEAPON_FLAG_SHOT_RAND_SPEED,             "flag_shot_rand_speed" ) 
     ADD_ENUM ( WEAPON_FLAG_SHOT_ANIM_ABRUPT,            "flag_shot_anim_abrupt" ) 
-    ADD_ENUM ( WEAPON_FLAG_SHOT_EXPANDS,                "flag_shot_expands" ) 
+    ADD_ENUM ( WEAPON_FLAG_SHOT_EXPANDS,                "flag_shot_expands" )
+
+    ADD_ENUM ( WEAPON_FIRE_ROTATION,                    "fire_rotation" ) 
 IMPLEMENT_ENUM_END( "weapon-property" )
 
 IMPLEMENT_ENUM_BEGIN( eWeaponSkill )
