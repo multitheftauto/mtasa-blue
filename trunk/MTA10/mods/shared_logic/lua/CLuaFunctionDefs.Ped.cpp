@@ -2069,6 +2069,18 @@ int CLuaFunctionDefs::GetWeaponProperty ( lua_State* luaVM )
                 }
             }
             else
+            if ( eProp == WEAPON_FIRE_ROTATION )
+            {
+                CVector vecWeaponInfo;
+                if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, vecWeaponInfo ) )
+                {
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fX );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fY );
+                    lua_pushnumber ( luaVM, vecWeaponInfo.fZ );
+                    return 1;
+                }
+            }
+            else
             {
                 float fData = 0;
                 if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, fData ) )

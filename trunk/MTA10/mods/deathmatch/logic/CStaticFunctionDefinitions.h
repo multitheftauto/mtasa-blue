@@ -572,6 +572,8 @@ public:
     static bool                         GetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short &sData );
     static bool                         GetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float &fData );
     static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float fData );
+    static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, const CVector& vecData );
+    static bool                         GetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, CVector& vecData );
     static bool                         SetWeaponState                      ( CClientWeapon * pWeapon, eWeaponState weaponState );
     static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CClientEntity * pTarget, int boneTarget );
     static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CVector vecTarget );
