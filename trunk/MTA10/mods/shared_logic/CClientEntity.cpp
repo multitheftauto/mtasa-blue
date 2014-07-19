@@ -716,6 +716,7 @@ void CClientEntity::InternalAttachTo ( CClientEntity* pEntity )
                     break;
                 }
                 case CCLIENTOBJECT:
+                case CCLIENTWEAPON:
                 {
                     CObject * pGameObject = static_cast < CClientObject* > ( pEntity )->GetGameObject ();
                     if ( pGameObject )
