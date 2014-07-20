@@ -318,6 +318,9 @@ public:
     virtual void                        GetClothesCacheStats        ( SClothesCacheStats& outStats ) = 0;
     virtual void                        SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected ) = 0;
     virtual void                        SetMirrorsEnabled           ( bool bEnabled ) = 0;
+
+    virtual void                        SetBoatWaterSplashEnabled   ( bool bEnabled ) = 0;
+    virtual void                        SetTyreSmokeEnabled         ( bool bEnabled ) = 0;
 };
 
 #endif
