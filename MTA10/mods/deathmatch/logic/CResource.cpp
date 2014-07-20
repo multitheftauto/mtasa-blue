@@ -201,7 +201,7 @@ bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArgument
     return false;
 }
 
-static bool CheckForDFFCorruption ( SRenderWareHeader OriginalHeader, char * pData, int &iErrorCode, SString &strError )
+static bool CheckForDFFCorruption ( SRenderWareHeader OriginalHeader, char * pData, SString &strError )
 {
     // Renderware header struct
     SRenderWareHeader header;
@@ -219,8 +219,6 @@ static bool CheckForDFFCorruption ( SRenderWareHeader OriginalHeader, char * pDa
         // check we aren't reading beyond the buffer
         if ( header.size > OriginalHeader.size - iPosition )
         {
-            // Custom error
-            iErrorCode = 1;
             // Invalid header, tried to read beyond buffer
             strError = DFF_BUFFER_OVERFLOW_ATTEMPT;
             // corrupt
@@ -237,7 +235,7 @@ static bool CheckForDFFCorruption ( SRenderWareHeader OriginalHeader, char * pDa
              || header.id == 0x08 || header.id == 0x07 || header.id == 0x06 )
         {
             // parse our children
-            if ( CheckForDFFCorruption ( header, pPosition + sizeof ( header ), iErrorCode, strError ) )
+            if ( CheckForDFFCorruption ( header, pPosition + sizeof ( header ), strError ) )
             {
                 // corrupt
                 return true;
@@ -257,8 +255,8 @@ static bool CheckForDFFCorruption ( SRenderWareHeader OriginalHeader, char * pDa
                 memcpy ( pName, pPosition, header.size );
                 // add a null terminator
                 pName[ header.size ] = '\0';
-                // generate a frame name string
-                strError = SString ( "%s (%i)", pName, header.size );
+                // set our error
+                strError = SString ("%s %s (%i) %s.", TXD_FRAME_NAME_CORRUPT, pName, header.size, TXD_NAME_CORRUPT_END );
                 // delete our array
                 delete [] pName;
                 // corrupt
@@ -271,7 +269,7 @@ static bool CheckForDFFCorruption ( SRenderWareHeader OriginalHeader, char * pDa
                 // print we detected a renderware frame
                 g_pCore->GetConsole()->Printf("Frame detected: Header ID %i, Size: %i\n", header.id, header.size, header.ver );
             #endif
-            // if we are greater than 32 we are corrupt
+            // if we are greater than 23 we are corrupt
             if ( header.size > RW_FRAME_NAME_LENGTH )
             {
                 // advance the stream by one header that was just read
@@ -282,8 +280,8 @@ static bool CheckForDFFCorruption ( SRenderWareHeader OriginalHeader, char * pDa
                 memcpy ( pName, pPosition, header.size );
                 // add a null terminator
                 pName[ header.size ] = '\0';
-                // generate a frame name string
-                strError = SString ( "%s (%i)", pName, header.size );
+                // set our error
+                strError = SString ("%s %s (%i) %s.", DFF_FRAME_NAME_CORRUPT, pName, header.size, DFF_FRAME_NAME_CORRUPT_END );
                 // delete our array
                 delete [] pName;
                 // corrupt
@@ -298,8 +296,6 @@ static bool CheckForDFFCorruption ( SRenderWareHeader OriginalHeader, char * pDa
     // make sure we read the right amount of bytes
     if ( iPosition != OriginalHeader.size )
     {
-        // Custom error
-        iErrorCode = 1;
         // Invalid header, tried to read beyond buffer
         strError = DFF_ARCHIVE_CORRUPT_MESSAGE;
         // Corrupt because our position doesn't match our size
@@ -389,24 +385,12 @@ static bool CheckFileForCorruption( const SString &strPath, SString &strAppendix
                         SString strError = "";
                         int iErrorCode = 0;
                         // check the child nodes for corruption
-                        if ( CheckForDFFCorruption ( header, pData, iErrorCode, strError ) == true )
+                        if ( CheckForDFFCorruption ( header, pData, strError ) == true )
                         {
                             // corrupt file
                             bIsBad = true;
-                            // Bad frame
-                            if ( iErrorCode == 0 )
-                            {
-                                // set our error
-                                strAppendix = SString ("%s %s %s.", DFF_FRAME_NAME_CORRUPT, *strError, DFF_FRAME_NAME_CORRUPT_END );
-                            }
-                            // Custom error
-                            else
-                            {
-                                // set our error
-                                strAppendix = SString ("%s.", *strError );
-                            }
-                            // delete our array
-                            delete [] pData;
+                            // set our error
+                            strAppendix = strError;
                             // break
                             break;
                         }

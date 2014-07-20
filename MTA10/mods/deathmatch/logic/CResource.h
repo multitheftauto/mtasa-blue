@@ -33,8 +33,11 @@
 #define TXD_ARCHIVE_CORRUPT_MESSAGE "Texture archive corrupt - File size mismatch with section headers, Re-exporting the file is recommended."
 #define DFF_ARCHIVE_CORRUPT_MESSAGE "DFF file corrupt - File size mismatch with section headers, Re-exporting the file is recommended."
 #define DFF_FRAME_NAME_CORRUPT "DFF file corrupt - frame with name"
-#define DFF_FRAME_NAME_CORRUPT_END "is over the 24 character limit"
+#define TXD_FRAME_NAME_CORRUPT "DFF file corrupt - texture with name"
+#define DFF_FRAME_NAME_CORRUPT_END "is over the 23 character limit"
+#define TXD_NAME_CORRUPT_END "is over the 31 character limit"
 #define DFF_BUFFER_OVERFLOW_ATTEMPT "DFF Tried to read beyond the file size, Re-exporting the file is recommended."
+
 //#define DebugFileParsing
 //#define DebugFileParseTiming
 
