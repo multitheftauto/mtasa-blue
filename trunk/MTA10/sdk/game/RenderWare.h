@@ -20,8 +20,8 @@
 
 // RenderWare definitions
 #define RW_STRUCT_ALIGN           ((int)((~((unsigned int)0))>>1))
-#define RW_TEXTURE_NAME_LENGTH    32
-#define RW_FRAME_NAME_LENGTH      24
+#define RW_TEXTURE_NAME_LENGTH    31
+#define RW_FRAME_NAME_LENGTH      23
 #define RW_MAX_TEXTURE_COORDS     8
 
 typedef struct RwV2d RwV2d;
@@ -180,7 +180,7 @@ struct RwFrame
 
     // Rockstar Frame extension (0x253F2FE) (24 bytes)
     unsigned char    pluginData[8];                       // padding
-    char             szName[RW_FRAME_NAME_LENGTH];        // name (as stored in the frame extension)
+    char             szName[RW_FRAME_NAME_LENGTH+1];        // name (as stored in the frame extension)
 };
 struct RwTexDictionary
 {
@@ -193,8 +193,8 @@ struct RwTexture
     RwRaster           *raster;
     RwTexDictionary    *txd;
     RwListEntry        TXDList;
-    char               name[RW_TEXTURE_NAME_LENGTH];
-    char               mask[RW_TEXTURE_NAME_LENGTH];
+    char               name[RW_TEXTURE_NAME_LENGTH+1];
+    char               mask[RW_TEXTURE_NAME_LENGTH+1];
     unsigned int       flags;
     int                refs;
 };
