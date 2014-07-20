@@ -194,6 +194,20 @@ void lua_pushuserdata ( lua_State* luaVM, void* pData )
         return lua_pushvector ( luaVM, *pVector );
     else if ( CLuaMatrix* pMatrix = UserDataCast < CLuaMatrix > ( (CLuaMatrix*) NULL, pData, luaVM ) )
         return lua_pushmatrix ( luaVM, *pMatrix );
+    else if ( CAccount* pAccount = UserDataCast < CAccount > ( (CAccount*) NULL, pData, luaVM ) )
+        return lua_pushaccount ( luaVM, pAccount );
+    else if ( CAccessControlList* pACL = UserDataCast < CAccessControlList > ( (CAccessControlList*) NULL, pData, luaVM ) )
+        return lua_pushacl ( luaVM, pACL );
+    else if ( CAccessControlListGroup* pACLGroup = UserDataCast < CAccessControlListGroup > ( (CAccessControlListGroup*) NULL, pData, luaVM ) )
+        return lua_pushaclgroup ( luaVM, pACLGroup );
+    else if ( CBan* pBan = UserDataCast < CBan > ( (CBan*) NULL, pData, luaVM ) )
+        return lua_pushban ( luaVM, pBan );
+    else if ( CTextDisplay* pTextDisplay = UserDataCast < CTextDisplay > ( (CTextDisplay*) NULL, pData, luaVM ) )
+        return lua_pushtextdisplay ( luaVM, pTextDisplay );
+    else if ( CTextItem* pTextItem = UserDataCast < CTextItem > ( (CTextItem*) NULL, pData, luaVM ) )
+        return lua_pushtextitem ( luaVM, pTextItem );
+    else if ( CDbJobData* pQuery = UserDataCast < CDbJobData > ( (CDbJobData*) NULL, pData, luaVM ) )
+        return lua_pushquery ( luaVM, pQuery );
 
     lua_pushobject ( luaVM, NULL, pData );
 }
