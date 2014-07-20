@@ -104,6 +104,11 @@ DWORD RETURN_CBoat_ApplyDamage                          =   0x6F1C3E;
 DWORD RETURN_CProjectile_FixTearGasCrash_Fix              = 0x4C05B9;
 DWORD RETURN_CProjectile_FixTearGasCrash_Cont             = 0x4C0409;
 
+#define HOOKPOS_CVehicle_ProcessTyreSmoke_Initial           0x6DE8A2
+#define HOOKPOS_CVehicle_ProcessTyreSmoke_Burnouts          0x6DF197
+#define HOOKPOS_CVehicle_ProcessTyreSmoke_Braking           0x6DECED
+#define HOOKPOS_CVehicle_ProcessTyreSmoke_HookAddress       0x6DF308
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -1523,5 +1528,116 @@ void _declspec( naked ) HOOK_CProjectile_FixTearGasCrash ( )
         jmp RETURN_CProjectile_FixTearGasCrash_Fix
         // dundundundundun
         // dundundundundun
+    }
+}
+
+void CMultiplayerSA::SetBoatWaterSplashEnabled ( bool bEnabled )
+{
+    if ( bEnabled )
+    {    
+        // Enable water splashing by restoring the original code
+        MemPut < BYTE > ( 0x6DD167, 0x0F );
+        MemPut < BYTE > ( 0x6DD168, 0x85 );
+        MemPut < BYTE > ( 0x6DD169, 0x6D );
+        MemPut < BYTE > ( 0x6DD16A, 0x05 );
+        MemPut < BYTE > ( 0x6DD16B, 0x00 );
+        MemPut < BYTE > ( 0x6DD16C, 0x00 );
+    }
+    else
+    {  
+        // Disable water splashing by forcing a jump to the end of the function
+        MemPut < BYTE > ( 0x6DD167, 0xE9 );
+        MemPut < BYTE > ( 0x6DD168, 0x6E );
+        MemPut < BYTE > ( 0x6DD169, 0x05 );
+        MemPut < BYTE > ( 0x6DD16A, 0x00 );
+        MemPut < BYTE > ( 0x6DD16B, 0x00 );
+        MemPut < BYTE > ( 0x6DD16C, 0x00 );
+    }
+}
+
+DWORD dwReturnAddressTyreSmoke = 0x6DE8A8;
+DWORD dwReturnIgnorePed = 0x6DF3B9;
+CPedSAInterface * pTyreSmokePed = NULL;
+
+bool IsPlayerPedLocal ( )
+{
+    CPed * pPed = pGameInterface->GetPools ()->GetPed ( (DWORD*) pTyreSmokePed );
+    if ( pPed )
+    {
+        CPed* pLocalPlayerPed = pGameInterface->GetPools ()->GetPedFromRef ( (DWORD)1 );
+        if ( pPed != NULL && pLocalPlayerPed != NULL )
+        {
+            if ( pLocalPlayerPed == pPed )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+// makes sure remote player tyre smoke isn't processed when tyre smoke is in the "off" position
+void _declspec( naked ) HOOK_CMultiplayerSA_ToggleTyreSmoke ( )
+{
+    _asm
+    {
+        pushad
+        mov pTyreSmokePed, ecx
+    }
+
+    if ( !IsPlayerPedLocal ( ) )
+    {
+        _asm
+        {
+            popad
+            jmp dwReturnIgnorePed
+        }
+    }
+
+    _asm
+    {
+        popad
+        test eax, 20000h
+        jnz 06DF3B9h
+        jmp dwReturnAddressTyreSmoke
+    }
+}
+
+void CMultiplayerSA::SetTyreSmokeEnabled ( bool bEnabled )
+{
+    SetBoatWaterSplashEnabled ( bEnabled );
+    if ( bEnabled )
+    {      
+        // revert changes made by disable. 
+        // this is the start of the function and ensures that remote vehicles aren't processed for tyre smoke
+        MemPut < BYTE > ( 0x6DE8A2, 0x0F );
+        MemPut < BYTE > ( 0x6DE8A3, 0x85 );
+        MemPut < BYTE > ( 0x6DE8A4, 0x11 );
+        MemPut < BYTE > ( 0x6DE8A5, 0x0B );
+        MemPut < BYTE > ( 0x6DE8A6, 0x00 );
+        MemPut < BYTE > ( 0x6DE8A7, 0x00 );
+
+        // This ensures that the local vehicle tyre smoke while doing burnouts isn't rendered
+        MemPut < BYTE > ( 0x6DF197, 0x8B );
+        MemPut < BYTE > ( 0x6DF198, 0x44 );
+        MemPut < BYTE > ( 0x6DF199, 0x24 );
+        MemPut < BYTE > ( 0x6DF19A, 0x28 );
+        MemPut < BYTE > ( 0x6DF19B, 0x50 );
+
+        // This ensures that the local vehicle tyre smoke under braking isn't rendered
+        MemPut < BYTE > ( 0x6DECED, 0x0F );
+        MemPut < BYTE > ( 0x6DECEE, 0x85 );
+        MemPut < BYTE > ( 0x6DECEF, 0xA2 );
+        MemPut < BYTE > ( 0x6DECF0, 0x01 );
+        MemPut < BYTE > ( 0x6DECF1, 0x00 );
+    }
+    else
+    {
+        // this is the start of the function and ensures that remote vehicles aren't processed for tyre smoke
+        HookInstall ( HOOKPOS_CVehicle_ProcessTyreSmoke_Initial, (DWORD)HOOK_CMultiplayerSA_ToggleTyreSmoke, 6 );
+        // This ensures that the local vehicle tyre smoke while doing burnouts isn't rendered
+        HookInstall ( HOOKPOS_CVehicle_ProcessTyreSmoke_Burnouts, HOOKPOS_CVehicle_ProcessTyreSmoke_HookAddress, 5 );
+        // This ensures that the local vehicle tyre smoke under braking isn't rendered
+        HookInstall ( HOOKPOS_CVehicle_ProcessTyreSmoke_Braking, HOOKPOS_CVehicle_ProcessTyreSmoke_HookAddress, 5 );
     }
 }

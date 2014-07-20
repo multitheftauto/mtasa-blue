@@ -30,6 +30,8 @@ class CSettings;
 #define CHAT_PRESETS_PATH             "mta/chatboxpresets.xml"
 #define CHAT_PRESETS_ROOT             "chatboxpresets"
 
+//#define SHOWALLSETTINGS
+
 struct SKeyBindSection
 {
     SKeyBindSection ( char * szTitle )
@@ -171,6 +173,7 @@ protected:
 	CGUICheckBox*       m_pCheckBoxCustomizedSAFiles;
 	CGUICheckBox*       m_pCheckBoxGrass;
 	CGUICheckBox*       m_pCheckBoxHeatHaze;
+    CGUICheckBox*       m_pCheckBoxTyreSmokeParticles;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;
     CGUILabel*          m_pDrawDistanceValueLabel;
