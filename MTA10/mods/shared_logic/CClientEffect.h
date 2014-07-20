@@ -20,7 +20,7 @@ class CClientEffect : public CClientEntity
 {
     DECLARE_CLASS( CClientEffect, CClientEntity )
 public:
-            CClientEffect ( CClientManager * pManager, CFxSystem * pFx, ElementID ID );
+            CClientEffect ( CClientManager * pManager, CFxSystem * pFx, SString strEffectName, ElementID ID );
             ~CClientEffect ( void );
     void    Unlink( void );
     
@@ -33,7 +33,7 @@ public:
     bool    SetMatrix(const CMatrix &matrix);
     void    SetEffectSpeed( float fSpeed );
     float   GetEffectSpeed( void ) const;
-    void    SetEffectDensity( float fDensity );
+    bool    SetEffectDensity( float fDensity );
     float   GetEffectDensity( void ) const;
 
     inline eClientEntityType GetType ( void ) const     { return CCLIENTEFFECT; };
@@ -46,6 +46,8 @@ private:
     
     CClientManager *        m_pManager;
     CFxSystem *             m_pFxSystem;
+    SString                 m_strEffectName;
+    float                   m_fMaxDensity;
 };
 
 #endif
