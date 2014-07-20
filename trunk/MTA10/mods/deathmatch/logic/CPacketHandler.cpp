@@ -3372,8 +3372,19 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
                             pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );
                             pEntry->SetSuspensionHighSpeedDamping ( handling.data.fSuspensionHighSpdDamping );
-                            pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
-                            pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
+
+
+                            // Ensure suspension isn't within a certain threshold and isn't too close to eachother
+                            if ( handling.data.fSuspensionLowerLimit >= -50 && handling.data.fSuspensionLowerLimit <= 50 && handling.data.fSuspensionLowerLimit < handling.data.fSuspensionUpperLimit - 0.01 &&
+                                 handling.data.fSuspensionUpperLimit >= -50 && handling.data.fSuspensionUpperLimit <= 50 && handling.data.fSuspensionUpperLimit > handling.data.fSuspensionLowerLimit + 0.01  )
+                            {
+                                if ( ( handling.data.fSuspensionUpperLimit >= 0.0001 || handling.data.fSuspensionUpperLimit <= -0.0001 )
+                                    && ( handling.data.fSuspensionLowerLimit >= 0.0001 || handling.data.fSuspensionLowerLimit <= -0.0001 ))
+                                {
+                                    pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
+                                    pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
+                                }
+                            }
                             pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
                             pEntry->SetSuspensionAntiDiveMultiplier ( handling.data.fSuspensionAntiDiveMultiplier );
                         }
