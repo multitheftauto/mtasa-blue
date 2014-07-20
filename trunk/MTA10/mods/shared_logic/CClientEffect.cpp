@@ -9,7 +9,7 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-CClientEffect::CClientEffect ( CClientManager * pManager, CFxSystem * pFx, ElementID ID )
+CClientEffect::CClientEffect ( CClientManager * pManager, CFxSystem * pFx, SString strEffectName, ElementID ID )
     : ClassInit ( this )
     , CClientEntity ( ID )
 {
@@ -19,6 +19,8 @@ CClientEffect::CClientEffect ( CClientManager * pManager, CFxSystem * pFx, Eleme
     SetTypeName ( "effect" );
 
     m_pFxSystem->PlayAndKill();
+    m_strEffectName = strEffectName;
+    m_fMaxDensity = pFx->GetEffectDensity ( ) * 2;
 }
 
 CClientEffect::~CClientEffect ( )
@@ -69,9 +71,17 @@ float CClientEffect::GetEffectSpeed ( ) const
     return m_pFxSystem->GetEffectSpeed();
 }
 
-void CClientEffect::SetEffectDensity ( float fDensity )
+bool CClientEffect::SetEffectDensity ( float fDensity )
 {
-    m_pFxSystem->SetEffectDensity(fDensity);
+    if ( fDensity >= 0 )
+    {
+        if ( fDensity <= m_fMaxDensity )
+        {
+            m_pFxSystem->SetEffectDensity ( fDensity );
+            return true;
+        }
+    }
+    return false;
 }
 
 float CClientEffect::GetEffectDensity ( ) const
