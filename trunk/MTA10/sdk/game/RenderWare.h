@@ -20,7 +20,7 @@
 
 // RenderWare definitions
 #define RW_STRUCT_ALIGN           ((int)((~((unsigned int)0))>>1))
-#define RW_TEXTURE_NAME_LENGTH    31
+#define RW_TEXTURE_NAME_LENGTH    32
 #define RW_FRAME_NAME_LENGTH      23
 #define RW_MAX_TEXTURE_COORDS     8
 
@@ -193,8 +193,8 @@ struct RwTexture
     RwRaster           *raster;
     RwTexDictionary    *txd;
     RwListEntry        TXDList;
-    char               name[RW_TEXTURE_NAME_LENGTH+1];
-    char               mask[RW_TEXTURE_NAME_LENGTH+1];
+    char               name[RW_TEXTURE_NAME_LENGTH];
+    char               mask[RW_TEXTURE_NAME_LENGTH];
     unsigned int       flags;
     int                refs;
 };
