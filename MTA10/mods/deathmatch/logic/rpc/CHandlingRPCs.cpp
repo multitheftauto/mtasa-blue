@@ -260,7 +260,13 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                     bitStream.Read ( fFloat );
                     if ( bReadSuspension )
                     {
-                        pHandlingEntry->SetSuspensionUpperLimit ( fFloat );
+                        if ( fFloat >= -50 && fFloat <= 50 && fFloat > pHandlingEntry->GetSuspensionLowerLimit ( ) + 0.01  )
+                        {
+                            if ( fFloat >= 0.0001 || fFloat <= -0.0001 )
+                            {
+                                pHandlingEntry->SetSuspensionUpperLimit ( fFloat );
+                            }
+                        }
                     }
                     break;
                 }
@@ -270,7 +276,13 @@ void CHandlingRPCs::SetVehicleHandlingProperty ( CClientEntity* pSource, NetBitS
                     bitStream.Read ( fFloat );
                     if ( bReadSuspension )
                     {
-                        pHandlingEntry->SetSuspensionLowerLimit ( fFloat );
+                        if ( fFloat >= -50 && fFloat <= 50 && fFloat < pHandlingEntry->GetSuspensionUpperLimit ( ) - 0.01  )
+                        {
+                            if ( fFloat >= 0.0001 || fFloat <= -0.0001 )
+                            {
+                                pHandlingEntry->SetSuspensionLowerLimit ( fFloat );
+                            }
+                        }
                     }
                     break;
                 }

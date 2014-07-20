@@ -6061,19 +6061,25 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
             {
-                if ( fValue >= -50.0 && fValue <= 50 )
+                if ( fValue >= -50 && fValue <= 50 && fValue > pEntry->GetSuspensionLowerLimit ( ) + 0.01  )
                 {
-                    pEntry->SetSuspensionUpperLimit ( fValue );
-                    return true;
-                }
+                    if ( fValue >= 0.0001 || fValue <= -0.0001 )
+                    {
+                         pEntry->SetSuspensionUpperLimit ( fValue );
+                         return true;
+                     }
+                 }
                 break;
             }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
             {
-                if ( fValue >= -50.0 && fValue <= 50 )
+                if ( fValue >= -50 && fValue <= 50 && fValue < pEntry->GetSuspensionUpperLimit ( ) - 0.01  )
                 {
-                    pEntry->SetSuspensionLowerLimit ( fValue );
-                    return true;
+                    if ( fValue >= 0.0001 || fValue <= -0.0001 )
+                    {
+                        pEntry->SetSuspensionLowerLimit ( fValue );
+                        return true;
+                    }
                 }
                 break;
             }
