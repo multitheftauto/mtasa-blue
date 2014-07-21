@@ -1353,7 +1353,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         if ( IsFrozenWaitingForGroundToLoad () )
         {
             SetFrozenWaitingForGroundToLoad ( false );
-            pVehicle->SetFrozenWaitingForGroundToLoad ( true );
+            pVehicle->SetFrozenWaitingForGroundToLoad ( true, true );
         }
         CVector vecPosition;
         GetPosition ( vecPosition );
@@ -1362,7 +1362,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         float fDist = ( vecPosition - vecVehiclePosition ).Length ();
         if ( fDist > 50 && !pVehicle->IsFrozen () )
         {
-            pVehicle->SetFrozenWaitingForGroundToLoad ( true );
+            pVehicle->SetFrozenWaitingForGroundToLoad ( true, true );
         }
     }
 

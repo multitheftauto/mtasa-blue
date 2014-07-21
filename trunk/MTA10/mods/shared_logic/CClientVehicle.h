@@ -291,7 +291,7 @@ public:
     void                        SetFrozen               ( bool bFrozen );
     void                        SetScriptFrozen         ( bool bFrozen )                    { m_bScriptFrozen = bFrozen; };
     bool                        IsFrozenWaitingForGroundToLoad      ( void ) const;
-    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen );
+    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen, bool bDisableAsyncLoading );
 
     CClientVehicle*             GetPreviousTrainCarriage( void );
     CClientVehicle*             GetNextTrainCarriage    ( void );
@@ -646,6 +646,7 @@ public:
     SLastSyncedVehData*         m_LastSyncedData;
     SSirenInfo                  m_tSirenBeaconInfo;
     std::map<SString, SVehicleComponentData>  m_ComponentData;
+    bool                        m_bAsyncLoadingDisabled;
 
 };
 

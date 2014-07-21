@@ -303,7 +303,7 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
         // If move is big enough, do ground checks
         float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ( );
         if ( DistanceMoved > 50 && !IsFrozen ( ) )
-            SetFrozenWaitingForGroundToLoad ( true );
+            SetFrozenWaitingForGroundToLoad ( true, true );
     }
 
     if ( m_pVehicle )
@@ -1873,7 +1873,7 @@ bool CClientVehicle::IsFrozenWaitingForGroundToLoad ( void ) const
 }
 
 
-void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
+void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen, bool bSuspendAsyncLoading )
 {
     if ( !g_pGame->IsASyncLoadingEnabled ( true ) )
         return;
@@ -1884,7 +1884,10 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
 
         if ( bFrozen )
         {
-            g_pGame->SuspendASyncLoading ( true );
+            if ( bSuspendAsyncLoading )
+            {
+                g_pGame->SuspendASyncLoading ( true );
+            }
             m_fGroundCheckTolerance = 0.f;
             m_fObjectsAroundTolerance = -1.f;
 
@@ -1900,10 +1903,15 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
                 m_vecWaitingForGroundSavedMoveSpeed = m_vecMoveSpeed;
                 m_vecWaitingForGroundSavedTurnSpeed = m_vecTurnSpeed;
             }
+            m_bAsyncLoadingDisabled = bSuspendAsyncLoading;
         }
         else
         {
-            g_pGame->SuspendASyncLoading ( false );
+            // use the member variable here and ignore Suspend Async loading
+            if ( m_bAsyncLoadingDisabled )
+            {
+                g_pGame->SuspendASyncLoading ( false );
+            }
             m_vecMoveSpeed = m_vecWaitingForGroundSavedMoveSpeed;
             m_vecTurnSpeed = m_vecWaitingForGroundSavedTurnSpeed;
             if ( m_pVehicle )
@@ -1911,6 +1919,7 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
                 m_pVehicle->SetMoveSpeed ( &m_vecMoveSpeed );
                 m_pVehicle->SetTurnSpeed ( &m_vecTurnSpeed );
             }
+            m_bAsyncLoadingDisabled = false;
         }
     }
 }
@@ -2549,7 +2558,7 @@ void CClientVehicle::Create ( void )
         if ( DoesNeedToWaitForGroundToLoad() )
         {
             // waiting for ground to load
-            SetFrozenWaitingForGroundToLoad ( true );
+            SetFrozenWaitingForGroundToLoad ( true, false );
         }
 
         // Jump straight to the target position if we have one
@@ -4291,7 +4300,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
     if ( !bNearObject )
     {
         // If not near any MTA objects, then don't bother waiting
-        SetFrozenWaitingForGroundToLoad ( false );
+        SetFrozenWaitingForGroundToLoad ( false, true );
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
             OutputDebugLine ( "[AsyncLoading]   FreezeUntilCollisionLoaded - Early stop" );
         #endif 
@@ -4350,7 +4359,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
         float fDist = GetDistanceFromGround ();
         float fUseDist = fDist * ( 1.f - m_fGroundCheckTolerance );
         if ( fUseDist > -0.2f && fUseDist < 1.5f )
-            SetFrozenWaitingForGroundToLoad ( false );
+            SetFrozenWaitingForGroundToLoad ( false, true );
 
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
             status += ( SString ( "  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist ) );
@@ -4358,7 +4367,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
 
         // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here) 
         if ( m_fGroundCheckTolerance > 0.03f /*&& !bMTAObjLimit*/ && !bASync )
-            SetFrozenWaitingForGroundToLoad ( false );
+            SetFrozenWaitingForGroundToLoad ( false, true );
     }
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
