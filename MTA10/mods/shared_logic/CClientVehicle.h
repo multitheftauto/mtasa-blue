@@ -300,6 +300,7 @@ public:
     inline bool                 IsChainEngine           ( void )                            { return m_bChainEngine; };
     void                        SetIsChainEngine        ( bool bChainEngine = true, bool bTemporary = false );
     CClientVehicle*             GetChainEngine          ( void );
+    bool                        IsTrainConnectedTo      ( CClientVehicle * pTrailer );
 
     bool                        IsDerailed              ( void );
     void                        SetDerailed             ( bool bDerailed );
