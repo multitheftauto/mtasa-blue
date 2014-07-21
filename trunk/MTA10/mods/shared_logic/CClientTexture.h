@@ -30,6 +30,8 @@ class CClientRenderTarget : public CClientTexture
 public:
                             CClientRenderTarget         ( CClientManager* pManager, ElementID ID, CRenderTargetItem* pRenderTargetItem ) : ClassInit ( this ), CClientTexture ( pManager, ID, pRenderTargetItem ) {}
 
+    eClientEntityType       GetType                     ( void ) const                      { return CCLIENTRENDERTARGET; }
+                            
     // CClientRenderTarget methods
     CRenderTargetItem*      GetRenderTargetItem          ( void )                       { return (CRenderTargetItem*)m_pRenderItem; }
 };
@@ -41,6 +43,8 @@ class CClientScreenSource : public CClientTexture
 public:
                             CClientScreenSource         ( CClientManager* pManager, ElementID ID, CScreenSourceItem* pScreenSourceItem ) : ClassInit ( this ), CClientTexture ( pManager, ID, pScreenSourceItem ) {}
 
+    eClientEntityType       GetType                     ( void ) const                      { return CCLIENTSCREENSOURCE; }
+                            
     // CClientScreenSource methods
     CScreenSourceItem*      GetScreenSourceItem          ( void )                       { return (CScreenSourceItem*)m_pRenderItem; }
 };
