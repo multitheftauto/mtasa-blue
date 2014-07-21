@@ -2,7 +2,7 @@
 #
 #  PROJECT:     Multi Theft Auto v1.0
 #  LICENSE:     See LICENSE in the top level directory
-#  FILE:        utils/build_gettext_catalog.py
+#  FILE:        utils/pull_pootle_catalogs.py
 #  PURPOSE:     Pull translation files from a Pootle web server into a directory
 #  DEVELOPERS:  Dan Chowdhury <>
 #
@@ -51,12 +51,19 @@ for lang in (options.languages).replace(" ","").split(","):
         url = urlparse.urljoin(options.url, "export/%s/%s/%s.po"%(options.project,lang,options.project))
         output = os.path.join(options.output,"%s/%s.po"%(lang,options.project))
 
-    u = urllib2.urlopen(url)
+    # Get file twice and compare to defeat truncated downloads
+    while True:
+        u = urllib2.urlopen(url)
+        content = u.read()
+        u = urllib2.urlopen(url)
+        if ( content == u.read() ):
+            break
+
     path,tail = os.path.split(output)
     if ( not os.path.exists(path) ):
         os.makedirs(path)
     
     localFile = open(output, 'w')
-    localFile.write(u.read())
+    localFile.write(content)
     localFile.close()
     print ( "Read '%s' and written to '%s'"%(url,output) )
