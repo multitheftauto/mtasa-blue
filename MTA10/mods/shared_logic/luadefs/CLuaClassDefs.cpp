@@ -312,7 +312,7 @@ const char* CLuaClassDefs::GetEntityClass ( CClientEntity* pEntity )
                     case CGUI_LABEL: return "GuiLabel";
                     case CGUI_MEMO: return "GuiMemo";
                     case CGUI_PROGRESSBAR: return "GuiProgressBar";
-                    case CGUI_RADIOBUTTON: return "GuiButton";
+                    case CGUI_RADIOBUTTON: return "GuiRadioButton";
                     case CGUI_STATICIMAGE: return "GuiStaticImage";
                     case CGUI_TAB: return "GuiTab";
                     case CGUI_TABPANEL: return "GuiTabPanel";
@@ -327,17 +327,19 @@ const char* CLuaClassDefs::GetEntityClass ( CClientEntity* pEntity )
         }
         case CCLIENTCOLSHAPE: return "ColShape";
         case SCRIPTFILE: return "File";
-        case CCLIENTDFF: return NULL;
-        case CCLIENTCOL: return NULL;
-        case CCLIENTTXD: return NULL;
+        case CCLIENTDFF: return "EngineDFF";
+        case CCLIENTCOL: return "EngineCOL";
+        case CCLIENTTXD: return "EngineTXD";
         case CCLIENTSOUND: return "Sound";
         case CCLIENTWATER: return "Water";
-        case CCLIENTDXFONT: return NULL;
-        case CCLIENTGUIFONT: return NULL;
-        case CCLIENTTEXTURE: return NULL;
-        case CCLIENTSHADER: return NULL;
+        case CCLIENTDXFONT: return "DxFont";
+        case CCLIENTGUIFONT: return "GuiFont";
+        case CCLIENTTEXTURE: return "DxTexture";
+        case CCLIENTSHADER: return "DxShader";
         case CCLIENTWEAPON: return "Weapon";
         case CCLIENTEFFECT: return "Effect";
+        case CCLIENTSCREENSOURCE: return "DxScreenSource";
+        case CCLIENTRENDERTARGET: return "DxRenderTarget";
     }
     return "Element";
 }
