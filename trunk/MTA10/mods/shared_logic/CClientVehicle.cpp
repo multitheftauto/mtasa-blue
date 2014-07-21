@@ -2008,6 +2008,28 @@ void CClientVehicle::SetIsChainEngine ( bool bChainEngine, bool bTemporary )
 }
 
 
+bool CClientVehicle::IsTrainConnectedTo ( CClientVehicle * pTrailer )
+{
+    CClientVehicle* pVehicle = this;
+    while ( pVehicle )
+    {
+        if ( pTrailer == pVehicle )
+            return true;
+
+        pVehicle = pVehicle->m_pNextLink;
+    }
+
+    pVehicle = this;
+    while ( pVehicle )
+    {
+        if ( pTrailer == pVehicle )
+            return true;
+
+        pVehicle = pVehicle->m_pPreviousLink;
+    }
+    return false;
+}
+
 CClientVehicle* CClientVehicle::GetChainEngine ()
 {
     CClientVehicle* pChainEngine = this;
@@ -3018,6 +3040,13 @@ bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle, const CVector* 
     {
         if ( m_pVehicle && m_pNextLink && m_pNextLink->GetGameVehicle () )
             m_pVehicle->DetachTrainCarriage ( m_pNextLink->GetGameVehicle () );
+
+
+        // Deattach our trailer
+        if ( m_pNextLink != NULL )
+        {
+            m_pNextLink->SetPreviousTrainCarriage ( NULL );
+        }
 
         SetNextTrainCarriage ( NULL );
     }

@@ -2895,12 +2895,17 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CClientVehicle& Vehicl
     // Are they both free to be attached?
     if ( !Vehicle.GetTowedVehicle () && !Trailer.GetTowedByVehicle () )
     {
-        CVector vecRotationDegrees;
-        Vehicle.GetRotationDegrees ( vecRotationDegrees );
-        vecRotationDegrees += vecRotationOffsetDegrees;
+        // trains don't set the "towed" or "towed by" variables so check them properly
+        if ( Vehicle.GetVehicleType ( ) != CLIENTVEHICLE_TRAIN || !Vehicle.IsTrainConnectedTo ( &Trailer ) )
+        {
 
-        // Attach them
-        return Vehicle.SetTowedVehicle ( &Trailer, &vecRotationDegrees );
+            CVector vecRotationDegrees;
+            Vehicle.GetRotationDegrees ( vecRotationDegrees );
+            vecRotationDegrees += vecRotationOffsetDegrees;
+
+            // Attach them
+            return Vehicle.SetTowedVehicle ( &Trailer, &vecRotationDegrees );
+        }
     }
 
     return false;
@@ -2926,6 +2931,11 @@ bool CStaticFunctionDefinitions::DetachTrailerFromVehicle ( CClientVehicle& Vehi
         if ( pTempCarriage && ( !pTrailer || pTempCarriage == pTrailer ) )
         {
             Vehicle.SetTowedVehicle ( NULL );
+
+            if ( pTrailer != NULL )
+            {
+                pTrailer->SetPreviousTrainCarriage ( NULL );
+            }
             return true;
         }
     }
