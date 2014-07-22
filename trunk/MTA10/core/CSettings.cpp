@@ -866,7 +866,7 @@ void CSettings::CreateGUI ( void )
 
     m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface, "English" ) );
     m_pInterfaceLanguageSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 33.0f ) );
-    m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 400.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
+    m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 350.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
     m_pInterfaceLanguageSelector->SetReadOnly ( true );
 
     // Grab languages and populate
@@ -887,7 +887,7 @@ void CSettings::CreateGUI ( void )
 
     m_pInterfaceSkinSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
     m_pInterfaceSkinSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 63.0f ) );
-    m_pInterfaceSkinSelector->SetSize ( CVector2D ( 400.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
+    m_pInterfaceSkinSelector->SetSize ( CVector2D ( 350.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
     m_pInterfaceSkinSelector->SetReadOnly ( true );
 
     {
@@ -908,11 +908,11 @@ void CSettings::CreateGUI ( void )
 
     m_pChatPresets = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
     m_pChatPresets->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 110.0f ) );
-    m_pChatPresets->SetSize ( CVector2D ( 400.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
+    m_pChatPresets->SetSize ( CVector2D ( 350.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
     m_pChatPresets->SetReadOnly ( true );
 
     m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabInterface, _("Load") ) );
-    m_pChatLoadPreset->SetPosition ( CVector2D ( 410.0f, 110.0f ) );
+    m_pChatLoadPreset->SetPosition ( CVector2D ( 360.0f, 110.0f ) );
     m_pChatLoadPreset->SetSize ( CVector2D ( 100.0f, 24.0f ) );
     m_pChatLoadPreset->SetZOrderingEnabled ( false );
 
@@ -1126,7 +1126,7 @@ void CSettings::CreateGUI ( void )
 
     m_pFastClothesCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pFastClothesCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pFastClothesCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pFastClothesCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pFastClothesCombo->AddItem ( _("Off") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_OFF );
     m_pFastClothesCombo->AddItem ( _("On") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_ON );
     m_pFastClothesCombo->AddItem ( _("Auto") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
@@ -1140,7 +1140,7 @@ void CSettings::CreateGUI ( void )
 
     m_pBrowserSpeedCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pBrowserSpeedCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pBrowserSpeedCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pBrowserSpeedCombo->AddItem ( _("Very slow") )->SetData ( (void*)0 );
     m_pBrowserSpeedCombo->AddItem ( _("Slow") )->SetData ( (void*)1 );
     m_pBrowserSpeedCombo->AddItem ( _("Fast") )->SetData ( (void*)2 );
@@ -1154,7 +1154,7 @@ void CSettings::CreateGUI ( void )
 
     m_pSingleDownloadCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pSingleDownloadCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pSingleDownloadCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pSingleDownloadCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pSingleDownloadCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pSingleDownloadCombo->SetReadOnly ( true );
@@ -1167,7 +1167,7 @@ void CSettings::CreateGUI ( void )
 
     m_pFullscreenStyleCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pFullscreenStyleCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pFullscreenStyleCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pFullscreenStyleCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pFullscreenStyleCombo->AddItem ( _("Standard") )->SetData ( (void*)FULLSCREEN_STANDARD );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless window") )->SetData ( (void*)FULLSCREEN_BORDERLESS );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless keep res") )->SetData ( (void*)FULLSCREEN_BORDERLESS_KEEP_RES );
@@ -1181,7 +1181,7 @@ void CSettings::CreateGUI ( void )
 
     m_pPriorityCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pPriorityCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pPriorityCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pPriorityCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pPriorityCombo->AddItem ( "Normal" )->SetData ( (void*)0 );
     m_pPriorityCombo->AddItem ( "Above normal" )->SetData ( (void*)1 );
     m_pPriorityCombo->AddItem ( "High" )->SetData ( (void*)2 );
@@ -1195,7 +1195,7 @@ void CSettings::CreateGUI ( void )
 
     m_pDebugSettingCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 20.0f * ( EDiagnosticDebug::MAX + 1 ) ) );
+    m_pDebugSettingCombo->SetSize ( CVector2D ( 190.0f, 20.0f * ( EDiagnosticDebug::MAX + 1 ) ) );
     m_pDebugSettingCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pDebugSettingCombo->AddItem ( "#6734 Graphics" )->SetData ( (void*)EDiagnosticDebug::GRAPHICS_6734 );
     //m_pDebugSettingCombo->AddItem ( "#6778 BIDI" )->SetData ( (void*)EDiagnosticDebug::BIDI_6778 );
@@ -1275,7 +1275,7 @@ void CSettings::CreateGUI ( void )
 
     m_pUpdateBuildTypeCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pUpdateBuildTypeCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pUpdateBuildTypeCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pUpdateBuildTypeCombo->AddItem ( "Beta" )->SetData ( (void*)1 );
     m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
