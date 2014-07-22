@@ -295,14 +295,14 @@ void CClientVehicle::GetPosition ( CVector& vecPosition ) const
 }
 
 
-void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
+void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze )
 {
     // Is the local player in the vehicle
     if ( g_pClientGame->GetLocalPlayer ( )->GetOccupiedVehicle ( ) == this )
     {
         // If move is big enough, do ground checks
         float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ( );
-        if ( DistanceMoved > 50 && !IsFrozen ( ) )
+        if ( DistanceMoved > 50 && !IsFrozen ( ) && bAllowGroundLoadFreeze )
             SetFrozenWaitingForGroundToLoad ( true, true );
     }
 
