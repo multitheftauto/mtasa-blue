@@ -186,6 +186,17 @@ void ShowSplash ( HINSTANCE hInstance )
     if ( !hwndSplash )
     {
         hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
+
+        HWND hBitmap = GetDlgItem ( hwndSplash, IDC_SPLASHBITMAP );
+        RECT splashRect;
+        GetWindowRect ( hBitmap, &splashRect );
+        int iScreenWidth = GetSystemMetrics ( SM_CXSCREEN );
+        int iScreenHeight = GetSystemMetrics ( SM_CYSCREEN );
+        int iWindowWidth = splashRect.right - splashRect.left;
+        int iWindowHeight = splashRect.bottom - splashRect.top;
+
+        // Adjust and center the window (to be DPI-aware)
+        SetWindowPos ( hwndSplash, NULL, (iScreenWidth-iWindowWidth)/2, (iScreenHeight-iWindowHeight)/2, iWindowWidth, iWindowHeight, 0 );
     }
     SetForegroundWindow ( hwndSplash );
     SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
