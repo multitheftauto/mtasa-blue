@@ -826,11 +826,10 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, CFastHashMap < 
         }
         case LUA_TSTRING:
         {
-            const char* szTemp = GetString ();
-            unsigned short usLength = static_cast < unsigned short > ( strlen ( szTemp ) );
-            if ( strlen ( szTemp ) == usLength )
+            SString strTemp = GetString ();
+            if ( strTemp.length() <= USHRT_MAX )
             {
-                return json_object_new_string_len ( (char *)szTemp, usLength );
+                return json_object_new_string_len ( strTemp.c_str(), strTemp.length() );
             }
             else
             {
@@ -1003,14 +1002,16 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                 break;
             case json_type_string:
                 {
-                const char * szString = json_object_get_string ( object );
-                if ( strlen(szString) > 3 && szString[0] == '^' && szString[2] == '^' && szString[1] != '^' )
+                int iLength = json_object_get_string_len ( object );
+                SString strString;
+                strString.assign ( json_object_get_string ( object ), iLength );
+                if ( iLength > 3 && strString [0] == '^' && strString [2] == '^' && strString [1] != '^' )
                 {
-                    switch ( szString[1] )
+                    switch ( strString [1] )
                     {
                         case 'E': // element
                         {
-                            int id = atoi ( szString + 3 );
+                            int id = atoi ( strString.c_str() + 3 );
                             CClientEntity * element = NULL;
                             if ( id != INT_MAX && id != INT_MIN && id != 0 )
                                 element = CElementIDs::GetElement(id);
@@ -1028,21 +1029,21 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                         }
                         case 'R': // resource
                         {
-                            CResource * resource = g_pClientGame->GetResourceManager()->GetResource(szString+3);
+                            CResource * resource = g_pClientGame->GetResourceManager ( )->GetResource ( strString .c_str()+ 3 );
                             if ( resource )
                             {
                                 ReadScriptID ( resource->GetScriptID () );
                             }
                             else 
                             {
-                                g_pClientGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid resource specified in JSON string '%s'.", szString ) );
+                                g_pClientGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid resource specified in JSON string '%s'.", strString ) );
                                 m_iType = LUA_TNIL;
                             }
                             break;
                         }
                         case 'T':   // Table reference
                         {
-                            unsigned long ulTableID = static_cast < unsigned long > ( atol ( szString + 3 ) );
+                            unsigned long ulTableID = static_cast < unsigned long > ( atol ( strString.c_str() + 3 ) );
                             if ( pKnownTables && ulTableID < pKnownTables->size () )
                             {
                                 m_pTableData = pKnownTables->at ( ulTableID );
@@ -1051,7 +1052,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                             }
                             else
                             {
-                                g_pClientGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid table reference specified in JSON string '%s'.", szString ) );
+                                g_pClientGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid table reference specified in JSON string '%s'.", strString ) );
                                 m_iType = LUA_TNIL;
                             }
                             break;
@@ -1059,7 +1060,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                     }
                 }
                 else
-                    ReadString ( szString );
+                    ReadString ( strString );
                 break;
                 }
             default:
