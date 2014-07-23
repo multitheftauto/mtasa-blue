@@ -1886,7 +1886,8 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen, bool bSuspe
         {
             if ( bSuspendAsyncLoading )
             {
-                g_pGame->SuspendASyncLoading ( true );
+                // Set auto unsuspend time in case changes prevent second call
+                g_pGame->SuspendASyncLoading ( true, 5000 );
             }
             m_fGroundCheckTolerance = 0.f;
             m_fObjectsAroundTolerance = -1.f;

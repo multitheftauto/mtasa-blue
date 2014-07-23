@@ -5055,7 +5055,7 @@ bool CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed, bool bStopIfUsingBulle
                     else
                     {
                         pLocalPlayer->GetPosition ( vecWeaponFirePosition );
-                        pLocalPlayer->SetPosition ( vecPosition );
+                        pLocalPlayer->SetPosition ( vecPosition, false, false );
                     }
                 }
             }
@@ -5084,7 +5084,7 @@ void CClientGame::PostWeaponFire ( void )
                         CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
                         if ( !pVehicle )
                         {
-                            pLocalPlayer->SetPosition ( vecWeaponFirePosition );
+                            pLocalPlayer->SetPosition ( vecWeaponFirePosition, false, false );
                         }
                         else if ( pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
                         {

@@ -640,13 +640,28 @@ void CGameSA::SetAsyncLoadingFromScript ( bool bScriptEnabled, bool bScriptForce
     m_bAsyncScriptForced = bScriptForced;
 }
 
-void CGameSA::SuspendASyncLoading ( bool bSuspend )
+void CGameSA::SuspendASyncLoading ( bool bSuspend, uint uiAutoUnsuspendDelay )
 {
     m_bASyncLoadingSuspended = bSuspend;
+    // Setup auto unsuspend time if required
+    if ( uiAutoUnsuspendDelay && bSuspend )
+        m_llASyncLoadingAutoUnsuspendTime = CTickCount::Now() + CTickCount( (long long)uiAutoUnsuspendDelay );
+    else
+        m_llASyncLoadingAutoUnsuspendTime = CTickCount();
 }
 
 bool CGameSA::IsASyncLoadingEnabled ( bool bIgnoreSuspend )
 {
+    // Process auto unsuspend time if set
+    if ( m_llASyncLoadingAutoUnsuspendTime.ToLongLong() != 0 )
+    {
+        if ( CTickCount::Now() > m_llASyncLoadingAutoUnsuspendTime )
+        {
+            m_llASyncLoadingAutoUnsuspendTime = CTickCount();
+            m_bASyncLoadingSuspended = false;
+        }
+    }
+
     if ( m_bASyncLoadingSuspended && !bIgnoreSuspend )
         return false;
 
