@@ -217,7 +217,7 @@ public:
 
 
     void                    SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced );
-    void                    SuspendASyncLoading             ( bool bSuspend );
+    void                    SuspendASyncLoading             ( bool bSuspend, uint uiAutoUnsuspendDelay = 0 );
     bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
 
     bool                    HasCreditScreenFadedOut         ( void );
@@ -319,6 +319,7 @@ private:
     SFixedArray < bool, WEAPONTYPE_LAST_WEAPONTYPE > m_JetpackWeapons;
 
     CPed*                   m_pPedContext;
+    CTickCount              m_llASyncLoadingAutoUnsuspendTime;
 };
 
 #endif

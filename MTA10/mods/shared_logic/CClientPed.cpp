@@ -458,7 +458,7 @@ void CClientPed::GetPosition ( CVector& vecPosition ) const
 }
 
 
-void CClientPed::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
+void CClientPed::SetPosition ( const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze )
 {
     // We have a player ped?
     if ( m_pPlayerPed )
@@ -474,7 +474,7 @@ void CClientPed::SetPosition ( const CVector& vecPosition, bool bResetInterpolat
                 {
                     // If move is big enough, do ground checks
                     float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
-                    if ( DistanceMoved > 50 && !IsFrozen () )
+                    if ( DistanceMoved > 50 && !IsFrozen () && bAllowGroundLoadFreeze )
                         SetFrozenWaitingForGroundToLoad ( true );
                 }
 
@@ -1900,6 +1900,9 @@ bool CClientPed::IsFrozenWaitingForGroundToLoad ( void ) const
 
 void CClientPed::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
 {
+    // Currently only for local player
+    dassert( m_bIsLocalPlayer );
+
     if ( !g_pGame->IsASyncLoadingEnabled ( true ) )
         return;
 
@@ -1909,7 +1912,8 @@ void CClientPed::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
 
         if ( bFrozen )
         {
-            g_pGame->SuspendASyncLoading ( true );
+            // Set auto unsuspend time in case changes prevent second call
+            g_pGame->SuspendASyncLoading ( true, 5000 );
 
             m_fGroundCheckTolerance = 0.f;
             m_fObjectsAroundTolerance = -1.f;
