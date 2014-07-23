@@ -6925,6 +6925,19 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CVehicle* pVehicle, CV
                 return false;
             }
 
+            if ( pTrailer->GetVehicleType() == VEHICLE_TRAIN )
+            {
+                // Set the position near the chain engine (doesn't influence visual appearance, but will allow entering)
+                pTrailer->SetPosition ( pVehicle->GetPosition () );
+
+                // Find a syncer to get a more correct position
+                CPlayer* pPlayer = g_pGame->GetUnoccupiedVehicleSync ()->FindPlayerCloseToVehicle ( pTrailer, 250.0f );
+                if ( pPlayer )
+                {
+                    g_pGame->GetUnoccupiedVehicleSync ()->OverrideSyncer ( pTrailer, pPlayer );
+                }
+            }
+
             // Tell everyone to attach them
             CVehicleTrailerPacket AttachPacket ( pVehicle, pTrailer, true );
             m_pPlayerManager->BroadcastOnlyJoined ( AttachPacket );
