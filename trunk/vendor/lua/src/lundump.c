@@ -20,6 +20,13 @@
 #include "lundump.h"
 #include "lzio.h"
 
+// MTA Specific
+lua_UndumpHook pUndumpHook = NULL;
+void lua_registerUndumpHook ( lua_UndumpHook f )
+{
+    pUndumpHook = f;
+}
+
 typedef struct {
  lua_State* L;
  ZIO* Z;
@@ -195,6 +202,10 @@ static void LoadHeader(LoadState* S)
 Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
 {
  LoadState S;
+
+    // MTA Specific
+    int bUnexpected = pUndumpHook && !pUndumpHook( Z->p, Z->n );
+
  if (*name=='@' || *name=='=')
   S.name=name+1;
  else if (*name==LUA_SIGNATURE[0])
@@ -205,6 +216,11 @@ Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
  S.Z=Z;
  S.b=buff;
  LoadHeader(&S);
+
+    // MTA Specific
+    if ( bUnexpected )
+        error(&S,"unexpected");
+
  return LoadFunction(&S,luaS_newliteral(L,"=?"));
 }
 

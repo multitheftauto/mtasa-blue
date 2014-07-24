@@ -21,6 +21,7 @@
 #include <clocale>
 
 static CLuaManager* m_pLuaManager;
+SString CLuaMain::ms_strExpectedUndumpHash;
 
 #define HOOK_INSTRUCTION_COUNT 1000000
 #define HOOK_MAXIMUM_TIME 5000
@@ -1445,19 +1446,9 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
     uint uiSize;
     if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename ) )
     {
-        // Problems problems
-        if ( GetTimeString( true ) <= INVALID_COMPILED_SCRIPT_CUTOFF_DATE )
-        {
-            SString strMessage( "%s is invalid and will not work after %s. Please re-compile at http://luac.mtasa.com/", *strNiceFilename, INVALID_COMPILED_SCRIPT_CUTOFF_DATE ); 
-            g_pGame->GetScriptDebugging()->LogWarning ( m_luaVM, "Script warning: %s", *strMessage );
-            // cpBuffer is always valid after call to DecryptScript
-        }
-        else
-        {
-            SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
-            g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );
-            return false;
-        }
+        SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
+        g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );
+        return false;
     }
 
     bool bUTF8;
@@ -1504,7 +1495,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
             strUTFScript = std::string(cpBuffer, uiSize);
 
         // Run the script
-        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", *strNiceFilename ) ) )
+        if ( CLuaMain::LuaLoadBuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", *strNiceFilename ) ) )
         {
             // Print the error
             std::string strRes = lua_tostring( m_luaVM, -1 );
@@ -1562,10 +1553,10 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
 
 bool CLuaMain::LoadScript ( const char* szLUAScript )
 {
-    if ( m_luaVM )
+    if ( m_luaVM && !IsLuaCompiledScript( szLUAScript, strlen( szLUAScript ) ) )
     {
         // Run the script
-        if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
+        if ( !CLuaMain::LuaLoadBuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
             int luaSavedTop = lua_gettop ( m_luaVM );
@@ -1875,4 +1866,46 @@ void CLuaMain::CheckExecutionTime( void )
 
     // Issue warning about script execution time
     CLogger::LogPrintf ( "WARNING: Long execution (%s)\n", GetScriptName () );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::LuaLoadBuffer
+//
+// luaL_loadbuffer call wrapper
+//
+///////////////////////////////////////////////////////////////
+int CLuaMain::LuaLoadBuffer( lua_State *L, const char *buff, size_t sz, const char *name )
+{
+    if ( IsLuaCompiledScript( buff, sz ) )
+    {
+        ms_strExpectedUndumpHash = GenerateSha256HexString( buff, sz );
+    }
+
+    int iResult = luaL_loadbuffer( L, buff, sz, name );
+
+    ms_strExpectedUndumpHash = "";
+    return iResult;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::OnUndump
+//
+// Callback from Lua when loading compiled bytes
+//
+///////////////////////////////////////////////////////////////
+int CLuaMain::OnUndump( const char* p, size_t n )
+{
+    SString strGotHash = GenerateSha256HexString( p, n );
+    SString strExpectedHash = ms_strExpectedUndumpHash;
+    ms_strExpectedUndumpHash = "";
+    if ( strExpectedHash != strGotHash )
+    {
+        // Not right
+        return 0;
+    }
+    return 1;
 }

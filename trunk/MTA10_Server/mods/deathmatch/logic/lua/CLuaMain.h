@@ -121,6 +121,8 @@ public:
     const SString&                  GetFunctionTag          ( int iFunctionNumber );
     int                             PCall                   ( lua_State *L, int nargs, int nresults, int errfunc );
     void                            CheckExecutionTime      ( void );
+    static int                      LuaLoadBuffer           ( lua_State *L, const char *buff, size_t sz, const char *name );
+    static int                      OnUndump                ( const char* p, size_t n );
 
 private:
     void                            InitSecurity            ( void );
@@ -191,6 +193,7 @@ private:
     std::vector < SString >         m_OpenFilenameList;
     uint                            m_uiOpenFileCountWarnThresh;
     uint                            m_uiOpenXMLFileCountWarnThresh;
+    static SString                  ms_strExpectedUndumpHash;
 
 public:
     std::map < const void*, CRefInfo >      m_CallbackTable;

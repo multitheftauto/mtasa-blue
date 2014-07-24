@@ -438,7 +438,7 @@ int CLuaFunctionDefs::LoadString( lua_State* luaVM )
 
         if ( !argStream.HasErrors() )
         {
-            if ( !luaL_loadbuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
+            if ( !CLuaMain::LuaLoadBuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
             {
                 // Ok
                 return 1;
@@ -510,7 +510,7 @@ int CLuaFunctionDefs::Load( lua_State* luaVM )
 
         if ( !argStream.HasErrors() )
         {
-            if ( !luaL_loadbuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
+            if ( !CLuaMain::LuaLoadBuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
             {
                 // Ok
                 return 1;

@@ -59,6 +59,10 @@ LUA_API void lua_registerPreCallHook ( lua_PreCallHook f );
 typedef void (*lua_PostCallHook) ( lua_CFunction f, lua_State* L );
 LUA_API void lua_registerPostCallHook ( lua_PostCallHook f );
 
+// MTA Specific
+typedef int (*lua_UndumpHook) ( const char* p, size_t n );
+LUA_API void lua_registerUndumpHook ( lua_UndumpHook f );
+
 /*
 ** functions that read/write blocks when loading/dumping Lua chunks
 */

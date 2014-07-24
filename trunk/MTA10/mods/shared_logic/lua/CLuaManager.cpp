@@ -41,6 +41,7 @@ CLuaManager::CLuaManager ( CClientGame* pClientGame )
     // Load the C functions
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
+    lua_registerUndumpHook ( CLuaMain::OnUndump );
 }
 
 

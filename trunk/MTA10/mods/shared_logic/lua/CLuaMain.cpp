@@ -22,6 +22,7 @@ using std::list;
 extern CClientGame* g_pClientGame;
 
 static CLuaManager* m_pLuaManager;
+SString CLuaMain::ms_strExpectedUndumpHash;
 
 #define HOOK_INSTRUCTION_COUNT 1000000
 #define HOOK_MAXIMUM_TIME 5000
@@ -1908,7 +1909,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
             strUTFScript = std::string(cpBuffer, uiSize);
 
         // Run the script
-        if ( luaL_loadbuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", *strNiceFilename ) ) )
+        if ( CLuaMain::LuaLoadBuffer ( m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString ( "@%s", *strNiceFilename ) ) )
         {
             // Print the error
             std::string strRes = lua_tostring( m_luaVM, -1 );
@@ -1966,10 +1967,10 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
 
 bool CLuaMain::LoadScript ( const char* szLUAScript )
 {
-    if ( m_luaVM )
+    if ( m_luaVM && !IsLuaCompiledScript( szLUAScript, strlen( szLUAScript ) ) )
     {
         // Run the script
-        if ( !luaL_loadbuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
+        if ( !CLuaMain::LuaLoadBuffer ( m_luaVM, szLUAScript, strlen(szLUAScript), NULL ) )
         {
             ResetInstructionCount ();
             int luaSavedTop = lua_gettop ( m_luaVM );
@@ -2200,4 +2201,47 @@ int CLuaMain::PCall ( lua_State *L, int nargs, int nresults, int errfunc )
 
     TIMING_CHECKPOINT( "-pcall" );
     return iret;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::LuaLoadBuffer
+//
+// luaL_loadbuffer call wrapper
+//
+///////////////////////////////////////////////////////////////
+int CLuaMain::LuaLoadBuffer( lua_State *L, const char *buff, size_t sz, const char *name )
+{
+    if ( IsLuaCompiledScript( buff, sz ) )
+    {
+        ms_strExpectedUndumpHash = GenerateSha256HexString( buff, sz );
+    }
+
+    int iResult = luaL_loadbuffer( L, buff, sz, name );
+
+    ms_strExpectedUndumpHash = "";
+    return iResult;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::OnUndump
+//
+// Callback from Lua when loading compiled bytes
+//
+///////////////////////////////////////////////////////////////
+int CLuaMain::OnUndump( const char* p, size_t n )
+{
+    SString strGotHash = GenerateSha256HexString( p, n );
+    SString strExpectedHash = ms_strExpectedUndumpHash;
+    ms_strExpectedUndumpHash = "";
+    if ( strExpectedHash != strGotHash )
+    {
+        // I was not expecting that
+        AddReportLog( 7555, SString( "Unexpected undump hash for buffer size %d. Got:%s Expected:%s", n, *strExpectedHash, *strGotHash ) );
+        return 0;
+    }
+    return 1;
 }
