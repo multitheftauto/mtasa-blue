@@ -53,7 +53,10 @@ RpClump* CClientDFF::GetLoadedClump ( ushort usModelId )
         m_pManager->GetModelRequestManager ()->RequestBlocking ( usModelId, "CClientDFF::LoadDFF" );
 
         // Attempt loading it
-        info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( m_strDffFilename, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
+        CBuffer buffer;
+        buffer.LoadFromFile( m_strDffFilename );
+        g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strDffFilename, buffer );
+        info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( buffer, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
     }
 
     return info.pClump;

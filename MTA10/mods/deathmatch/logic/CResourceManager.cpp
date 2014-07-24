@@ -199,3 +199,44 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     }
     return false;
 }
+
+// When a resource file is created
+void CResourceManager::OnAddResourceFile( CDownloadableResource* pResourceFile )
+{
+    SString strFilename = PathConform( pResourceFile->GetName() ).ToLower();
+    assert( !MapContains( m_ResourceFileMap, strFilename ) );
+    MapSet( m_ResourceFileMap, strFilename, pResourceFile );
+}
+
+// When a resource file is delected
+void CResourceManager::OnRemoveResourceFile( CDownloadableResource* pResourceFile )
+{
+    SString strFilename = PathConform( pResourceFile->GetName() ).ToLower();
+    assert( MapFindRef( m_ResourceFileMap, strFilename ) == pResourceFile );
+    MapRemove( m_ResourceFileMap, strFilename );
+}
+
+// Check given file name is a resource file
+bool CResourceManager::IsResourceFile( const SString& strInFilename )
+{
+    SString strFilename = PathConform( strInFilename ).ToLower();
+    return MapContains( m_ResourceFileMap, strFilename );
+}
+
+// Check resource file data matches server checksum
+void CResourceManager::ValidateResourceFile( const SString& strInFilename, const CBuffer& fileData )
+{
+    SString strFilename = PathConform( strInFilename ).ToLower();
+    CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
+    if ( pResourceFile )
+    {
+        CChecksum checksum = CChecksum::GenerateChecksumFromBuffer( fileData.GetData(), fileData.GetSize() );
+        if ( checksum != pResourceFile->GetServerChecksum() )
+        {
+            SString strMessage( "Resource file checksum failed: %s", *ConformResourcePath( strFilename ) );
+            g_pClientGame->TellServerSomethingImportant( 1007, strMessage, true );
+            g_pCore->GetConsole ()->Print( strMessage );
+            AddReportLog( 7057, strMessage, 10 );
+        }
+    }
+}

@@ -26,9 +26,6 @@
 
 #define MAX_RESOURCE_NAME_LENGTH    255
 #define MAX_FUNCTION_NAME_LENGTH    50
-#define INVALID_COMPILED_SCRIPT_CUTOFF_DATE     "2014-06-10"
-
-
 
 #define TXD_ARCHIVE_CORRUPT_MESSAGE "Texture archive corrupt - File size mismatch with section headers, Re-exporting the file is recommended."
 #define DFF_ARCHIVE_CORRUPT_MESSAGE "DFF file corrupt - File size mismatch with section headers, Re-exporting the file is recommended."

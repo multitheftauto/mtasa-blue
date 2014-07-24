@@ -59,9 +59,12 @@ public:
     long                    Write                   ( unsigned long ulSize, const char* pData );
 
 private:
+    void                    DoResourceFileCheck     ( void );
+
     CBinaryFileInterface*   m_pFile;
     std::string             m_strFilename;
     unsigned long           m_ulMaxSize;
+    bool                    m_bDoneResourceFileCheck;
 };
 
 #endif

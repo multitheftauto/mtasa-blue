@@ -35,6 +35,7 @@ bool CScriptFile::Load ( eMode Mode )
     // If we haven't already got a file
     if ( !m_pFile )
     {
+        m_bDoneResourceFileCheck = false;
         m_pFile = g_pNet->AllocateBinaryFile ();
         bool bOk = false;
         switch ( Mode )
@@ -160,6 +161,8 @@ long CScriptFile::Read ( unsigned long ulSize, char* pData )
     if ( !m_pFile )
         return -1;
 
+    DoResourceFileCheck();
+
     // Try to read data into the given block. Return number of bytes we read.
     return m_pFile->FRead ( pData, ulSize );
 }
@@ -172,4 +175,35 @@ long CScriptFile::Write ( unsigned long ulSize, const char* pData )
 
     // Write the data into the given block. Return number of bytes we wrote.
     return m_pFile->FWrite ( pData, ulSize );
+}
+
+
+// If file was downloaded with a resource, validate checksum
+void CScriptFile::DoResourceFileCheck ( void )
+{
+    if ( !m_pFile || m_bDoneResourceFileCheck )
+        return;
+    m_bDoneResourceFileCheck = true;
+
+    if ( g_pClientGame->GetResourceManager()->IsResourceFile( m_strFilename ) )
+    {
+        // Remember current position and seek to the end
+        long lCurrentPos = m_pFile->FTell ();
+        m_pFile->FSeek ( 0, SEEK_END );
+
+        // Retrieve size of file
+        long lSize = m_pFile->FTell ();
+
+        // Read data
+        CBuffer buffer;
+        buffer.SetSize( lSize );
+        m_pFile->FSeek ( 0, SEEK_SET );
+        m_pFile->FRead ( buffer.GetData(), buffer.GetSize() );
+
+        // Seek back to where the pointer was
+        m_pFile->FSeek ( lCurrentPos, SEEK_SET );
+
+        // Check file content
+        g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strFilename, buffer );
+    }
 }

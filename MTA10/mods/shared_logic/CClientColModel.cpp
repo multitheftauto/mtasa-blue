@@ -43,8 +43,15 @@ bool CClientColModel::LoadCol ( const char* szFile )
     // Not already got a col model?
     if ( !m_pColModel )
     {
+        CBuffer buffer;
+        buffer.LoadFromFile( szFile );
+        g_pClientGame->GetResourceManager()->ValidateResourceFile( szFile, buffer );
+
+        if ( !g_pCore->GetNetwork ()->CheckFile ( "col", szFile ) )
+            return false;
+
         // Load the collision file
-        m_pColModel = g_pGame->GetRenderWare ()->ReadCOL ( szFile );
+        m_pColModel = g_pGame->GetRenderWare ()->ReadCOL ( buffer );
 
         // Success if the col model is != NULL
         return ( m_pColModel != NULL );
