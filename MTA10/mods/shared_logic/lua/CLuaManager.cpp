@@ -300,6 +300,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getLowLODElement", CLuaFunctionDefs::GetLowLodElement );
     CLuaCFunctions::AddFunction ( "isElementLowLOD", CLuaFunctionDefs::IsElementLowLod );
     CLuaCFunctions::AddFunction ( "isElementCallPropagationEnabled", CLuaFunctionDefs::IsElementCallPropagationEnabled );
+    CLuaCFunctions::AddFunction ( "isElementWaitingForGroundToLoad", CLuaFunctionDefs::IsElementWaitingForGroundToLoad );
 
     // Element set funcs
     CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );

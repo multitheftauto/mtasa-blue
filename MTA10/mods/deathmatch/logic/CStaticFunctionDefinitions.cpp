@@ -3492,6 +3492,29 @@ bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( CClientEntit
     return false;
 }
 
+bool CStaticFunctionDefinitions::IsElementFrozenWaitingForGroundToLoad ( CClientEntity& Entity, bool &bWaitingForGroundToLoad )
+{
+    switch ( Entity.GetType ( ) )
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+            {
+                CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+                bWaitingForGroundToLoad = Ped.IsFrozenWaitingForGroundToLoad ( );
+                return true;
+            }
+        case CCLIENTVEHICLE:
+            {
+                CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+                bWaitingForGroundToLoad = Vehicle.IsFrozenWaitingForGroundToLoad ( );
+                return true;
+            }
+        default:
+            return false;
+    }
+    return false;
+}
+
 
 CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod )
 {

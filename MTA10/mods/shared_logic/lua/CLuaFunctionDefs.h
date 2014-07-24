@@ -159,6 +159,7 @@ public:
     LUA_DECLARE ( GetLowLodElement );
     LUA_DECLARE ( IsElementLowLod );
     LUA_DECLARE ( IsElementCallPropagationEnabled );
+    LUA_DECLARE ( IsElementWaitingForGroundToLoad );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
