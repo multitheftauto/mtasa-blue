@@ -204,7 +204,7 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
 void CResourceManager::OnAddResourceFile( CDownloadableResource* pResourceFile )
 {
     SString strFilename = PathConform( pResourceFile->GetName() ).ToLower();
-    assert( !MapContains( m_ResourceFileMap, strFilename ) );
+    dassert( !MapContains( m_ResourceFileMap, strFilename ) );
     MapSet( m_ResourceFileMap, strFilename, pResourceFile );
 }
 
@@ -212,7 +212,7 @@ void CResourceManager::OnAddResourceFile( CDownloadableResource* pResourceFile )
 void CResourceManager::OnRemoveResourceFile( CDownloadableResource* pResourceFile )
 {
     SString strFilename = PathConform( pResourceFile->GetName() ).ToLower();
-    assert( MapFindRef( m_ResourceFileMap, strFilename ) == pResourceFile );
+    dassert( MapFindRef( m_ResourceFileMap, strFilename ) == pResourceFile );
     MapRemove( m_ResourceFileMap, strFilename );
 }
 
