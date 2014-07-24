@@ -24,6 +24,7 @@ class CResourceManager;
 
 class CClientEntity;
 class CResource;
+class CDownloadableResource;
 
 enum eAccessType
 {
@@ -51,6 +52,11 @@ public:
 
     void                        LoadUnavailableResources    ( CClientEntity* pRootEntity );
 
+    void                        OnAddResourceFile           ( CDownloadableResource* pResourceFile );
+    void                        OnRemoveResourceFile        ( CDownloadableResource* pResourceFile );
+    bool                        IsResourceFile              ( const SString& strFilename );
+    void                        ValidateResourceFile        ( const SString& strFilename, const CBuffer& fileData );
+
     static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath );
     static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath );
 
@@ -58,6 +64,7 @@ private:
 
     CMappedList < CResource* >          m_resources;
     std::map < ushort, CResource* >     m_NetIdResourceMap;
+    std::map < SString, CDownloadableResource* > m_ResourceFileMap;
 };
 
 #endif

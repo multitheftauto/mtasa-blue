@@ -39,10 +39,12 @@ CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const
     }
 
     m_bAutoDownload = bAutoDownload;
+    g_pClientGame->GetResourceManager()->OnAddResourceFile( this );
 }
 
 CDownloadableResource::~CDownloadableResource ( void )
 {
+    g_pClientGame->GetResourceManager()->OnRemoveResourceFile( this );
 }
 
 bool CDownloadableResource::DoesClientAndServerChecksumMatch ( void )

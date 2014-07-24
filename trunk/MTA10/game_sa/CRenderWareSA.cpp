@@ -195,10 +195,13 @@ CRenderWareSA::~CRenderWareSA ( void )
 
 
 // Reads and parses a TXD file specified by a path (szTXD)
-RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD )
+RwTexDictionary * CRenderWareSA::ReadTXD ( const CBuffer& fileData )
 {
     // open the stream
-    RwStream * streamTexture = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szTXD );
+    RwBuffer buffer;
+    buffer.ptr = (void*)fileData.GetData();
+    buffer.size = fileData.GetSize();
+    RwStream * streamTexture = RwStreamOpen ( STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer );
 
     // check for errors
     if ( streamTexture == NULL )
@@ -226,7 +229,7 @@ RwTexDictionary * CRenderWareSA::ReadTXD ( const char *szTXD )
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
-RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions )
+RpClump * CRenderWareSA::ReadDFF ( const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions )
 {
     // Set correct TXD as materials are processed at the same time
     if ( usModelID != 0 )
@@ -236,7 +239,10 @@ RpClump * CRenderWareSA::ReadDFF ( const char *szDFF, unsigned short usModelID, 
     }
 
     // open the stream
-    RwStream * streamModel = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, szDFF );
+    RwBuffer buffer;
+    buffer.ptr = (void*)fileData.GetData();
+    buffer.size = fileData.GetSize();
+    RwStream * streamModel = RwStreamOpen ( STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer );
 
     // get the modelinfo array
     DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
@@ -405,27 +411,20 @@ void CRenderWareSA::ReplacePedModel ( RpClump * pNew, unsigned short usModelID )
 }
 
 // Reads and parses a COL3 file
-CColModel * CRenderWareSA::ReadCOL ( const char * szCOLFile )
+CColModel * CRenderWareSA::ReadCOL ( const CBuffer& fileData )
 {
-    if ( !szCOLFile )
+    if ( fileData.GetSize() < sizeof( ColModelFileHeader ) + 16 )
         return NULL;
 
-    // Read the file
-    FILE* pFile = fopen ( szCOLFile, "rb" );
-    if ( !pFile )
-        return NULL;
+    const ColModelFileHeader& header = *(ColModelFileHeader*)fileData.GetData();
 
-    // Create a new CColModel
-    CColModelSA* pColModel = new CColModelSA ();
-
-    ColModelFileHeader header = { 0 };
-    fread ( &header, sizeof(ColModelFileHeader), 1, pFile );
-    
     // Load the col model
     if ( header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L' )
     {
-        unsigned char* pModelData = new unsigned char [ header.size - 0x18 ];
-        fread ( pModelData, header.size - 0x18, 1, pFile );
+        unsigned char* pModelData = (unsigned char*)fileData.GetData() + sizeof( ColModelFileHeader );
+
+        // Create a new CColModel
+        CColModelSA* pColModel = new CColModelSA ();
 
         if ( header.version[3] == 'L' )
         {
@@ -440,19 +439,11 @@ CColModel * CRenderWareSA::ReadCOL ( const char * szCOLFile )
             LoadCollisionModelVer3 ( pModelData, header.size - 0x18, pColModel->GetInterface (), NULL );
         }
 
-        delete[] pModelData;
-    }
-    else
-    {
-        delete pColModel;
-        fclose ( pFile );
-        return NULL;
+        // Return the collision model
+        return pColModel;
     }
 
-    fclose ( pFile );
-
-    // Return the collision model
-    return pColModel;
+    return NULL;
 }
 
 // Positions the front seat by reading out the vector from the 'ped_frontseat' atomic in the clump (RpClump*)

@@ -33,7 +33,7 @@ public:
                         CRenderWareSA               ( enum eGameVersion version );
                         ~CRenderWareSA              ( void );
     void                Initialize                  ( void );
-    bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& szFilename, bool bFilteringEnabled );
+    bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const CBuffer& fileData, bool bFilteringEnabled );
     bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId );
     void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures );
     void                ClothesAddReplacementTxd    ( char* pFileData, ushort usFileId );
@@ -41,10 +41,10 @@ public:
     bool                HasClothesReplacementChanged( void );
 
     // Reads and parses a TXD file specified by a path (szTXD)
-    RwTexDictionary *   ReadTXD                     ( const char *szTXD );
+    RwTexDictionary *   ReadTXD                     ( const CBuffer& fileData );
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    RpClump *           ReadDFF                     ( const char * szDFF, unsigned short usModelID, bool bLoadEmbeddedCollisions );
+    RpClump *           ReadDFF                     ( const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions );
 
     // Destroys a DFF instance
     void                DestroyDFF                  ( RpClump * pClump );
@@ -56,7 +56,7 @@ public:
     void                DestroyTexture              ( RwTexture* pTex );
 
     // Reads and parses a COL3 file with an optional collision key name
-    CColModel *         ReadCOL                     ( const char * szCOLFile );
+    CColModel *         ReadCOL                     ( const CBuffer& fileData );
 
     // Replaces a CColModel for a specific object identified by the object id (usModelID)
     void                ReplaceCollisions           ( CColModel * pColModel, unsigned short usModelID );
