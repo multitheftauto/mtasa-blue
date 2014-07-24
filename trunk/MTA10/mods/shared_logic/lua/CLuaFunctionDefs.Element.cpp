@@ -2393,3 +2393,27 @@ int CLuaFunctionDefs::IsElementCallPropagationEnabled ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::IsElementWaitingForGroundToLoad ( lua_State* luaVM )
+{
+    CClientEntity* pEntity;
+
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        bool bEnabled;
+        if ( CStaticFunctionDefinitions::IsElementFrozenWaitingForGroundToLoad ( *pEntity, bEnabled ) )
+        {
+            lua_pushboolean ( luaVM, bEnabled );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

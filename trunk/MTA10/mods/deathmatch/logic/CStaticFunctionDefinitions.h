@@ -109,6 +109,7 @@ public:
     static bool                         SetElementFrozen                    ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetLowLodElement                    ( CClientEntity& Entity, CClientEntity* pLowLodEntity );
     static bool                         SetElementCallPropagationEnabled    ( CClientEntity& Entity, bool bEnabled );
+    static bool                         IsElementFrozenWaitingForGroundToLoad ( CClientEntity& Entity, bool& bWaitingForGroundToLoad );
 
     // Radio funcs
     static bool                         SetRadioChannel                     ( unsigned char& ucChannel );
