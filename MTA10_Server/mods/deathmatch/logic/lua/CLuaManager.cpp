@@ -46,6 +46,7 @@ CLuaManager::CLuaManager ( CObjectManager* pObjectManager,
     // Load our C Functions into LUA and hook callback
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
+    lua_registerUndumpHook ( CLuaMain::OnUndump );
 }
 
 CLuaManager::~CLuaManager ( void )
