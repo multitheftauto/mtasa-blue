@@ -298,11 +298,11 @@ void CClientVehicle::GetPosition ( CVector& vecPosition ) const
 void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze )
 {
     // Is the local player in the vehicle
-    if ( g_pClientGame->GetLocalPlayer ( )->GetOccupiedVehicle ( ) == this )
+    if ( g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == this )
     {
         // If move is big enough, do ground checks
-        float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ( );
-        if ( DistanceMoved > 50 && !IsFrozen ( ) && bAllowGroundLoadFreeze )
+        float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
+        if ( DistanceMoved > 50 && !IsFrozen () && bAllowGroundLoadFreeze )
             SetFrozenWaitingForGroundToLoad ( true, true );
     }
 
@@ -1892,18 +1892,21 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen, bool bSuspe
             m_fGroundCheckTolerance = 0.f;
             m_fObjectsAroundTolerance = -1.f;
 
+            CVector vecTemp;
             if ( m_pVehicle )
             {
                 m_pVehicle->GetMatrix ( &m_matFrozen );
-                m_pVehicle->GetMoveSpeed ( &m_vecWaitingForGroundSavedMoveSpeed );
-                m_pVehicle->GetTurnSpeed ( &m_vecWaitingForGroundSavedTurnSpeed );
+                m_pVehicle->SetMoveSpeed ( &vecTemp );
+                m_pVehicle->SetTurnSpeed ( &vecTemp );
             }
             else
             {
                 m_matFrozen = m_Matrix;
-                m_vecWaitingForGroundSavedMoveSpeed = m_vecMoveSpeed;
-                m_vecWaitingForGroundSavedTurnSpeed = m_vecTurnSpeed;
+                m_vecMoveSpeed = vecTemp;
+                m_vecTurnSpeed = vecTemp;
             }
+            m_vecWaitingForGroundSavedMoveSpeed = vecTemp;
+            m_vecWaitingForGroundSavedTurnSpeed = vecTemp;
             m_bAsyncLoadingDisabled = bSuspendAsyncLoading;
         }
         else
