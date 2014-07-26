@@ -517,11 +517,24 @@ void CResource::Load ( CClientEntity *pRootEntity )
         }
         else
         {
-            SString strError = "";
-            bool bIsBad = CheckFileForCorruption ( pResourceFile->GetName ( ), strError );
-            if ( bIsBad )
+            // Load the file
+            std::vector < char > buffer;
+            FileLoad ( pResourceFile->GetName (), buffer );
+            unsigned int iSize = buffer.size();
+
+            // Check the contents
+            if ( iSize > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), iSize ) == pResourceFile->GetServerChecksum () )
             {
-                HandleDownloadedFileTrouble( pResourceFile, false, strError );
+                SString strError = "";
+                bool bIsBad = CheckFileForCorruption ( pResourceFile->GetName ( ), strError );
+                if ( bIsBad )
+                {
+                    HandleDownloadedFileTrouble( pResourceFile, false, strError );
+                }
+            }
+            else
+            {
+                HandleDownloadedFileTrouble( pResourceFile, true, "" );
             }
         }
     }
