@@ -233,10 +233,12 @@ void CResourceManager::ValidateResourceFile( const SString& strInFilename, const
         CChecksum checksum = CChecksum::GenerateChecksumFromBuffer( fileData.GetData(), fileData.GetSize() );
         if ( checksum != pResourceFile->GetServerChecksum() )
         {
-            SString strMessage( "Resource file checksum failed: %s", *ConformResourcePath( strFilename ) );
+            char szMd5[33];
+            CMD5Hasher::ConvertToHex( checksum.md5, szMd5 );
+            SString strMessage( "Resource file checksum failed: %s [Size:%d MD5:%s] %08x ", *ConformResourcePath( strFilename ), fileData.GetSize(), szMd5, fileData.GetData() );
             g_pClientGame->TellServerSomethingImportant( 1007, strMessage, true );
             g_pCore->GetConsole ()->Print( strMessage );
-            AddReportLog( 7057, strMessage, 10 );
+            AddReportLog( 7057, strMessage + g_pNet->GetConnectedServer( true ), 10 );
         }
     }
 }
