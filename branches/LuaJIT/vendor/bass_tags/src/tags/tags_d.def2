@@ -1,0 +1,6 @@
+LIBRARY	tags_d
+
+EXPORTS
+TAGS_Read
+TAGS_GetVersion
+TAGS_GetLastErrorDesc
