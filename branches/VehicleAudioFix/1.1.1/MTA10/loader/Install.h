@@ -1,3 +1,0 @@
-
-
-bool InstallFiles ( bool bSilent );
