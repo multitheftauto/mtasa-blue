@@ -60,7 +60,6 @@ bool CClientTXD::Import ( unsigned short usModelID )
         {
             if ( !LoadFileData( m_FileData ) )
                 return false;
-            g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strFilename, m_FileData );
         }
         g_pGame->GetRenderWare ()->ClothesAddReplacementTxd( m_FileData.GetData(), usModelID - CLOTHES_MODEL_ID_FIRST );
         return true;
