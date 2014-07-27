@@ -1,6 +1,6 @@
 ZIPDIR=$(srcdir)/../../../vendor/zip/
-LUADIR=$(srcdir)/../../../vendor/lua
-LUABDIR=$(builddir)/../../../vendor/lua
+LUADIR=$(srcdir)/../../../vendor/luajit
+LUABDIR=$(builddir)/../../../vendor/luajit
 
 INCLUDES += -I$(srcdir)/logic/
 INCLUDES += -I$(srcdir)/../../sdk/
@@ -332,7 +332,7 @@ deathmatch_la_SOURCES = \
 deathmatch_la_LIBADD = \
 	../../sdk/libplatform.la \
 	$(top_builddir)/vendor/ehs/libehs.la \
-	$(LUABDIR)/src/liblua.la \
+	$(LUABDIR)/src/libluajit.a \
 	$(top_builddir)/vendor/json-c/libjson-c.la \
 	$(SPARSEHASH_LIBS)
 
