@@ -57,6 +57,9 @@ public:
     void SetServerChecksum           ( CChecksum serverChecksum );
 
     bool     IsAutoDownload         ( void )    { return m_bAutoDownload; };
+    void     SetDownloaded          ( void )    { m_bDownloaded = true; };
+    bool     IsDownloaded           ( void )    { return m_bDownloaded; };
+
 protected:
     eResourceType       m_resourceType;
 
@@ -67,6 +70,7 @@ protected:
     CChecksum           m_ServerChecksum;
 
     bool                m_bAutoDownload;
+    bool                m_bDownloaded;        // File has been downloaded and is ready to use
 };
 
 #endif

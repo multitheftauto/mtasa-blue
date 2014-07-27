@@ -216,6 +216,15 @@ void CResourceManager::OnRemoveResourceFile( CDownloadableResource* pResourceFil
     MapRemove( m_ResourceFileMap, strFilename );
 }
 
+// Update downloaded flag for this file
+void CResourceManager::OnDownloadedResourceFile( const SString& strInFilename )
+{
+    SString strFilename = PathConform( strInFilename ).ToLower();
+    CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
+    if ( pResourceFile )
+        pResourceFile->SetDownloaded();
+}
+
 // Check given file name is a resource file
 bool CResourceManager::IsResourceFile( const SString& strInFilename )
 {
@@ -233,12 +242,24 @@ void CResourceManager::ValidateResourceFile( const SString& strInFilename, const
         CChecksum checksum = CChecksum::GenerateChecksumFromBuffer( fileData.GetData(), fileData.GetSize() );
         if ( checksum != pResourceFile->GetServerChecksum() )
         {
-            char szMd5[33];
-            CMD5Hasher::ConvertToHex( checksum.md5, szMd5 );
-            SString strMessage( "Resource file checksum failed: %s [Size:%d MD5:%s] %08x ", *ConformResourcePath( strFilename ), fileData.GetSize(), szMd5, fileData.GetData() );
-            g_pClientGame->TellServerSomethingImportant( 1007, strMessage, true );
-            g_pCore->GetConsole ()->Print( strMessage );
-            AddReportLog( 7057, strMessage + g_pNet->GetConnectedServer( true ), 10 );
+            if ( pResourceFile->IsDownloaded() )
+            {
+                char szMd5[33];
+                CMD5Hasher::ConvertToHex( checksum.md5, szMd5 );
+                SString strMessage( "Resource file checksum failed: %s [Size:%d MD5:%s] %08x ", *ConformResourcePath( strInFilename ), fileData.GetSize(), szMd5, fileData.GetData() );
+                g_pClientGame->TellServerSomethingImportant( 1007, strMessage, true );
+                g_pCore->GetConsole ()->Print( strMessage );
+                AddReportLog( 7057, strMessage + g_pNet->GetConnectedServer( true ), 10 );
+            }
+            else
+            {
+                char szMd5[33];
+                CMD5Hasher::ConvertToHex( checksum.md5, szMd5 );
+                SString strMessage( "Attempt to load resource file before it is ready: %s [Size:%d MD5:%s] %08x ", *ConformResourcePath( strInFilename ), fileData.GetSize(), szMd5, fileData.GetData() );
+                g_pClientGame->TellServerSomethingImportant( 1008, strMessage, true );
+                g_pCore->GetConsole ()->Print( strMessage );
+                AddReportLog( 7058, strMessage + g_pNet->GetConnectedServer( true ), 10 );
+            }
         }
     }
 }
