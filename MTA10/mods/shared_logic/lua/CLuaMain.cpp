@@ -1800,6 +1800,7 @@ void CLuaMain::InitVM ( void )
     luaopen_string ( m_luaVM );
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
+    luaopen_jit ( m_luaVM );
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity();
