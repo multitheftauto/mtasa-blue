@@ -489,6 +489,16 @@ void CResource::Load ( CClientEntity *pRootEntity )
         }
     }
 
+    // Load the no cache scripts first
+    for ( std::list < SNoClientCacheScript >::iterator iter = m_NoClientCacheScriptList.begin() ; iter != m_NoClientCacheScriptList.end() ; ++iter )
+    {
+        DECLARE_PROFILER_SECTION( OnPreLoadNoClientCacheScript )
+        const SNoClientCacheScript& item = *iter;
+        GetVM()->LoadScriptFromBuffer ( item.buffer.GetData(), item.buffer.GetSize(), item.strFilename );
+        DECLARE_PROFILER_SECTION( OnPostLoadNoClientCacheScript )
+    }
+    m_NoClientCacheScriptList.clear();
+
     // Load the files that are queued in the list "to be loaded"
     list < CResourceFile* > ::iterator iter = m_ResourceFiles.begin ();
     for ( ; iter != m_ResourceFiles.end (); ++iter )
@@ -653,9 +663,12 @@ void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len, c
     if ( m_usRemainingNoClientCacheScripts > 0 )
     {
         --m_usRemainingNoClientCacheScripts;
-        DECLARE_PROFILER_SECTION( OnPreLoadNoClientCacheScript )
-        GetVM()->LoadScriptFromBuffer ( chunk, len, strFilename );
-        DECLARE_PROFILER_SECTION( OnPostLoadNoClientCacheScript )
+
+        // Store for later
+        m_NoClientCacheScriptList.push_back( SNoClientCacheScript() );
+        SNoClientCacheScript& item = m_NoClientCacheScriptList.back();
+        item.buffer = CBuffer( chunk, len );
+        item.strFilename = strFilename;
 
         if ( m_usRemainingNoClientCacheScripts == 0 && m_bLoadAfterReceivingNoClientCacheScripts )
         {
