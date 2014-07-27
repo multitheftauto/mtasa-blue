@@ -12,6 +12,8 @@
 #include <limits.h>
 #include <stddef.h>
 
+#define LUA_USE_APICHECK
+
 /* Default path for loading Lua and C modules with require(). */
 #if defined(_WIN32)
 /*
@@ -148,6 +150,12 @@
 #define lua_assert(x)		assert(x)
 #endif
 #ifdef LUA_USE_APICHECK
+/////////////////////////////////////////////////////////////////////////
+// MTA addition for testing if apicheck will function as expected, and generating more useful crash dumps
+    #undef assert
+    #define assert(_Expression) (void)( (!!(_Expression)) || ( *((int*)NULL) = 0) )
+    LUA_API int luaX_is_apicheck_enabled();
+/////////////////////////////////////////////////////////////////////////
 #define luai_apicheck(L, o)	{ (void)L; assert(o); }
 #else
 #define luai_apicheck(L, o)	{ (void)L; }
