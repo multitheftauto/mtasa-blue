@@ -39,6 +39,7 @@ CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const
     }
 
     m_bAutoDownload = bAutoDownload;
+    m_bDownloaded = false;
     g_pClientGame->GetResourceManager()->OnAddResourceFile( this );
 }
 
