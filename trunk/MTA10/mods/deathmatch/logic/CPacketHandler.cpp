@@ -4893,7 +4893,12 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
 
                                 // Delete the file that already exists
-                                unlink ( pDownloadableResource->GetName () );
+                                FileDelete ( pDownloadableResource->GetName () );
+                                if ( FileExists( pDownloadableResource->GetName () ) )
+                                {
+                                    SString strMessage( "Unable to delete old file %s", *ConformResourcePath( pDownloadableResource->GetName () ) );
+                                    g_pClientGame->TellServerSomethingImportant( 1009, strMessage, false );
+                                }
 
                                 // Queue the file to be downloaded
                                 bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, 10000, true );
@@ -5352,6 +5357,7 @@ SString CPacketHandler::EntityAddDebugRead( NetBitStreamInterface& bitStream )
                                     ,usNameLength
                                     ,*SStringX( szName ).Left( 40 )
                             );
+
         return strStatus;
     }
     return "Read error";
