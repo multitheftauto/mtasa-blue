@@ -480,6 +480,15 @@ void CResource::Load ( CClientEntity *pRootEntity )
 
     CLogger::LogPrintf ( "> Starting resource '%s'", *m_strResourceName );
 
+    // Flag resource files as readable
+    for ( std::list < CResourceConfigItem* >::iterator iter = m_ConfigFiles.begin ( ); iter != m_ConfigFiles.end () ; ++iter )
+        (*iter)->SetDownloaded();
+
+    for ( std::list < CResourceFile* >::iterator iter = m_ResourceFiles.begin ( ); iter != m_ResourceFiles.end () ; ++iter )
+        if ( (*iter)->IsAutoDownload() )
+            (*iter)->SetDownloaded();
+
+    // Load config files
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
     for ( ; iterc != m_ConfigFiles.end (); ++iterc )
     {

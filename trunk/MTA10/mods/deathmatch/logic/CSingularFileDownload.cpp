@@ -66,6 +66,9 @@ bool CSingularFileDownload::ProgressCallBack ( double sizeJustDownloaded, double
 
 void CSingularFileDownload::CallFinished ( bool bSuccess )
 {
+    // Flag file as loadable
+    g_pClientGame->GetResourceManager()->OnDownloadedResourceFile( GetName() );
+
     if ( m_pResource )
     {
         // Call the onClientbFileDownloadComplete event
