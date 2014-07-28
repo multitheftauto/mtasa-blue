@@ -16,7 +16,51 @@ import urllib2
 import urlparse
 import time
 import sys
+import socket
 from optparse import OptionParser
+
+# urlopen with which returns empty string on error
+def myurlopen(url,urltimeout):
+    content = ""
+    try:
+        u = urllib2.urlopen(url, timeout = urltimeout)
+        content = u.read()
+    except urllib2.URLError as e:
+        print type(e)
+    except socket.timeout as e:
+        print type(e)
+    return content
+
+# urlopen with over complex handling of connection issues
+def myurlopenDeluxe(url,urltimeout):
+    print ( "Trying '%s'"%(url) )
+    for x in range(0, 3):
+        # Get file first
+        content = myurlopen(url,urltimeout)
+        if ( len(content) > 0 ):
+            print ( "content size %d"%(len(content)) )
+            for y in range(0, 3):
+                # Get file second
+                content2 = myurlopen(url,urltimeout)
+                if ( len(content2) > 0 ):
+                    print ( "content2 size %d"%(len(content2)) )
+                    # Check both downloads got the same result
+                    if ( content == content2 ):
+                        print ( "Download success" )
+                        return content
+                    break;
+                # try again
+                time.sleep(0.25)
+            print ( "Downloads did no match" )
+        else:
+            print ( "Download failed" )
+        # try again
+        time.sleep(0.5)
+
+    # It's all gone pear shaped
+    print ( "ERROR: Download total failure" )
+    sys.exit(1)
+
 
 parser = OptionParser()
 parser.add_option("-u", "--url", dest="url",
@@ -31,6 +75,8 @@ parser.add_option("-L", "--languages",dest="languages",
             help="A comma delimited list of languages to pull from Pootle", default='de,fr')
 parser.add_option("-r", "--rmdir",action="store_true", dest="rmdir", default=False,
             help="Clear the output directory before starting")
+parser.add_option("-t", "--timeout",type="float", dest="urltimeout", default=30,
+            help="HTTP fetch timeout")
 
 (options, args) = parser.parse_args()
 
@@ -53,46 +99,7 @@ for lang in (options.languages).replace(" ","").split(","):
         url = urlparse.urljoin(options.url, "export/%s/%s/%s.po"%(options.project,lang,options.project))
         output = os.path.join(options.output,"%s/%s.po"%(lang,options.project))
 
-    print ( "Trying '%s'"%(url) )
-
-    # Get file twice and compare to defeat truncated downloads
-    success = False
-    for x in range(0, 3):
-        content = ""
-        content2 = ""
-        # Get file first
-        try:
-            u = urllib2.urlopen(url, timeout = 30)
-            content = u.read()
-        except urllib2.URLError as e:
-            print type(e)
-        except socket.timeout as e:
-            print type(e)
-        if ( len(content) > 1 ):
-            # Get file second
-            try:
-                u = urllib2.urlopen(url, timeout = 30)
-                content2 = u.read()
-            except urllib2.URLError as e:
-                print type(e)
-            except socket.timeout as e:
-                print type(e)
-            # Check both downloads got the same result
-            if ( content == content2 ):
-                success = True
-                break
-            print ( "Downloads did no match" )
-        else:
-            print ( "Download failed" )
-        # try again
-        time.sleep(1)
-
-    # Win or lose?
-    if success != True:
-        print ( "ERROR: Download total failure" )
-        sys.exit(1)
-
-    print ( "Download success " )
+    content = myurlopenDeluxe(url,options.urltimeout)
 
     path,tail = os.path.split(output)
     if ( not os.path.exists(path) ):
@@ -102,3 +109,6 @@ for lang in (options.languages).replace(" ","").split(","):
     localFile.write(content)
     localFile.close()
     print ( "Read '%s' and written to '%s'"%(url,output) )
+
+
+
