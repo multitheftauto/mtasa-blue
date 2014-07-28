@@ -156,6 +156,13 @@ CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceTy
     // Create the resource file and add it to the list
     SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName, szFileName );
 
+    // Reject duplicates
+    if ( g_pClientGame->GetResourceManager()->IsResourceFile( strBuffer ) )
+    {
+        g_pClientGame->GetScriptDebugging()->LogError( NULL, "Ignoring duplicate file in resource '%s': '%s'", *m_strResourceName, szFileName );
+        return NULL;
+    }
+
     CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, strBuffer, serverChecksum, bAutoDownload );
     if ( pResourceFile )
     {
@@ -170,7 +177,14 @@ CDownloadableResource* CResource::AddConfigFile ( const char *szFileName, CCheck
 {
     // Create the config file and add it to the list
     SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName, szFileName );
-    
+
+    // Reject duplicates
+    if ( g_pClientGame->GetResourceManager()->IsResourceFile( strBuffer ) )
+    {
+        g_pClientGame->GetScriptDebugging()->LogError( NULL, "Ignoring duplicate file in resource '%s': '%s'", *m_strResourceName, szFileName );
+        return NULL;
+    }
+
     CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, strBuffer, serverChecksum );
     if ( pConfig )
     {
