@@ -14,6 +14,8 @@ import os
 import shutil
 import urllib2
 import urlparse
+import time
+import sys
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -51,13 +53,46 @@ for lang in (options.languages).replace(" ","").split(","):
         url = urlparse.urljoin(options.url, "export/%s/%s/%s.po"%(options.project,lang,options.project))
         output = os.path.join(options.output,"%s/%s.po"%(lang,options.project))
 
+    print ( "Trying '%s'"%(url) )
+
     # Get file twice and compare to defeat truncated downloads
-    while True:
-        u = urllib2.urlopen(url)
-        content = u.read()
-        u = urllib2.urlopen(url)
-        if ( content == u.read() ):
-            break
+    success = False
+    for x in range(0, 3):
+        content = ""
+        content2 = ""
+        # Get file first
+        try:
+            u = urllib2.urlopen(url, timeout = 30)
+            content = u.read()
+        except urllib2.URLError as e:
+            print type(e)
+        except socket.timeout as e:
+            print type(e)
+        if ( len(content) > 1 ):
+            # Get file second
+            try:
+                u = urllib2.urlopen(url, timeout = 30)
+                content2 = u.read()
+            except urllib2.URLError as e:
+                print type(e)
+            except socket.timeout as e:
+                print type(e)
+            # Check both downloads got the same result
+            if ( content == content2 ):
+                success = True
+                break
+            print ( "Downloads did no match" )
+        else:
+            print ( "Download failed" )
+        # try again
+        time.sleep(1)
+
+    # Win or lose?
+    if success != True:
+        print ( "ERROR: Download total failure" )
+        sys.exit(1)
+
+    print ( "Download success " )
 
     path,tail = os.path.split(output)
     if ( not os.path.exists(path) ):
