@@ -104,7 +104,6 @@ SDialogItemInfo g_NoAvDialogItems[] = {
             { -1 },
             };
 
-
 ///////////////////////////////////////////////////////////////////////////
 //
 // InitDialogStrings
@@ -128,7 +127,7 @@ void InitDialogStrings( HWND hwndDialog, const SDialogItemInfo* dialogItems )
 
         if ( hwndItem )
         {
-            SString strItemText = PadLeft( item.szItemText, item.iLeadingSpaces, ' ' );
+            SString strItemText = PadLeft( _(item.szItemText), item.iLeadingSpaces, ' ' );
 #if MTA_DEBUG
             char szPrevText[200] = "";
             GetWindowText( hwndItem, szPrevText, NUMELMS( szPrevText ) );
@@ -137,7 +136,7 @@ void InitDialogStrings( HWND hwndDialog, const SDialogItemInfo* dialogItems )
                 OutputDebugLine( SString( "Possible text mismatch for dialog item (idx:%d id:%d) '%s' (orig:'%s')", i, item.iItemId, item.szItemText, szPrevText ) );
             }
 #endif
-            SetWindowText( hwndItem, _(strItemText) );
+            SetWindowTextW( hwndItem, FromUTF8( strItemText ) );
         }
         else
             OutputDebugLine( SString( "No dialog item for (idx:%d id:%d) '%s' ", i, item.iItemId, item.szItemText ) );
@@ -253,10 +252,10 @@ void ShowProgressDialog( HINSTANCE hInstance, const SString& strTitle, bool bAll
     {
         HideSplash ();
         bCancelPressed = false;
-        hwndProgressDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_PROGRESS_DIALOG), 0, DialogProc );
+        hwndProgressDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_PROGRESS_DIALOG), 0, DialogProc );
         dassert( ( GetWindowLong( hwndProgressDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
         InitDialogStrings( hwndProgressDialog, g_ProgressDialogItems );
-        SetWindowText ( hwndProgressDialog, strTitle );
+        SetWindowTextW ( hwndProgressDialog, FromUTF8( strTitle ) );
         ShowWindow( GetDlgItem( hwndProgressDialog, IDCANCEL ), bAllowCancel ? SW_SHOW : SW_HIDE );
         ulProgressStartTime = GetTickCount32 ();
     }
@@ -291,7 +290,7 @@ bool UpdateProgress( int iPos, int iMax, const SString& strMsg )
         char buffer[ 1024 ] = "";
         GetWindowText ( hwndText, buffer, NUMELMS(buffer) );
         if ( strMsg.length () > 0 && strMsg != buffer )
-            SetWindowText ( hwndText, strMsg );
+            SetWindowTextW ( hwndText, FromUTF8( strMsg ) );
         HWND hwndBar = GetDlgItem( hwndProgressDialog, IDC_PROGRESS_BAR );
         PostMessage(hwndBar, PBM_SETPOS, iPos * 100 / Max ( 1, iMax ), 0 );
         MSG msg;
@@ -353,10 +352,10 @@ SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = 0;
-        hwndCrashedDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_CRASHED_DIALOG), 0, DialogProc );
+        hwndCrashedDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_CRASHED_DIALOG), 0, DialogProc );
         dassert( ( GetWindowLong( hwndCrashedDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
         InitDialogStrings( hwndCrashedDialog, g_CrashedDialogItems );
-        SetWindowText ( GetDlgItem( hwndCrashedDialog, IDC_CRASH_INFO_EDIT ), strMessage );
+        SetWindowTextW ( GetDlgItem( hwndCrashedDialog, IDC_CRASH_INFO_EDIT ), FromUTF8( strMessage ) );
         SendDlgItemMessage( hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK, GetApplicationSetting ( "diagnostics", "send-dumps" ) != "no" ? BST_CHECKED : BST_UNCHECKED, 0 );
     }
     SetForegroundWindow ( hwndCrashedDialog );
@@ -434,10 +433,10 @@ void ShowD3dDllDialog( HINSTANCE hInstance, const SString& strPath )
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_SHOW_DIR;
-        hwndD3dDllDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_D3DDLL_DIALOG), 0, DialogProc );
+        hwndD3dDllDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_D3DDLL_DIALOG), 0, DialogProc );
         dassert( ( GetWindowLong( hwndD3dDllDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
         InitDialogStrings( hwndD3dDllDialog, g_D3dDllDialogItems );
-        SetWindowText ( GetDlgItem( hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH ), strPath );
+        SetWindowTextW ( GetDlgItem( hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH ), FromUTF8( strPath ) );
     }
     SetForegroundWindow ( hwndD3dDllDialog );
     SetWindowPos ( hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
@@ -516,7 +515,7 @@ void ShowOptimusDialog( HINSTANCE hInstance )
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_HELP;
-        hwndOptimusDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_OPTIMUS_DIALOG), 0, DialogProc );
+        hwndOptimusDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_OPTIMUS_DIALOG), 0, DialogProc );
         dassert( ( GetWindowLong( hwndOptimusDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
         InitDialogStrings( hwndOptimusDialog, g_OptimusDialogItems );
         uint uiStartupOption = GetApplicationSettingInt( "nvhacks", "optimus-startup-option" ) % NUMELMS( RadioButtons );
@@ -627,8 +626,8 @@ void ShowNoAvDialog( HINSTANCE hInstance, bool bEnableScaremongering )
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_HELP;
-        hwndNoAvDialog = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_NOAV_DIALOG), 0, DialogProc );
-        dassert( ( GetWindowLong( hwndNoAvDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
+        hwndNoAvDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_NOAV_DIALOG), 0, DialogProc );
+        dassert( ( GetWindowLongW( hwndNoAvDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
         InitDialogStrings( hwndNoAvDialog, g_NoAvDialogItems );
         ShowWindow( GetDlgItem( hwndNoAvDialog, IDC_NOAV_OPT_SKIP ), bEnableScaremongering ? SW_HIDE : SW_SHOW );
         ShowWindow( GetDlgItem( hwndNoAvDialog, IDC_NOAV_OPT_BOTNET ), bEnableScaremongering ? SW_SHOW : SW_HIDE );
@@ -688,32 +687,69 @@ void HideNoAvDialog ( void )
 void TestDialogs( void )
 {
 #if 0
-    ShowProgressDialog( g_hInstance, "test1" );
+#if 1
+    ShowProgressDialog( g_hInstance, _("Searching for Grand Theft Auto San Andreas"), true );
     for ( uint i = 0 ; i < 100 ; i++ )
     {
-        UpdateProgress( i, 100, SString( "%d", i ) );
+        UpdateProgress ( i, 100, _("Please start Grand Theft Auto San Andreas") );
+        Sleep( 10 );
+    }
+    HideProgressDialog();
+
+    ShowProgressDialog( g_hInstance, "MTA: San Andreas" );
+    for ( uint i = 0 ; i < 100 ; i++ )
+    {
+        UpdateProgress( i, 100, _("Installing update...") );
+        Sleep( 10 );
+    }
+    HideProgressDialog();
+
+    ShowProgressDialog( g_hInstance, "MTA: San Andreas" );
+    for ( uint i = 0 ; i < 100 ; i++ )
+    {
+        UpdateProgress( i, 100, _("Extracting files..." ) );
+        Sleep( 10 );
+    }
+    HideProgressDialog();
+
+    ShowProgressDialog( g_hInstance, _("Copying files..."), true );
+    for ( uint i = 0 ; i < 100 ; i++ )
+    {
+        if ( i > 66 )
+        {
+            UpdateProgress ( i, 100, _("Copy finished early. Everything OK.") );
+        }
+        else
+        if ( i > 66 )
+        {
+            UpdateProgress ( i, 100, _("Finishing...") );
+        }
+        else
+        {
+            UpdateProgress ( i, 100, _("Done!") );
+        }
         Sleep( 10 );
     }
     HideProgressDialog();
 #endif
 
-#if 0
+#if 1
     ShowCrashedDialog( g_hInstance, "test2" );
     HideCrashedDialog();
 #endif
 
-#if 0
+#if 1
     SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", "123" );
     ShowD3dDllDialog( g_hInstance, "c:\\dummy path\\" );
     HideD3dDllDialog();
 #endif
 
-#if 0
+#if 1
     ShowOptimusDialog( g_hInstance );
     HideOptimusDialog();
 #endif
 
-#if 0
+#if 1
     // Friendly option
     SetApplicationSettingInt( "noav-last-asked-time", 1 );
     SetApplicationSettingInt( "noav-user-says-skip", 0 );
@@ -721,12 +757,13 @@ void TestDialogs( void )
     HideNoAvDialog();
 #endif
 
-#if 0
+#if 1
     // Scaremongering option option
     SetApplicationSettingInt( "noav-last-asked-time", 1 );
     SetApplicationSettingInt( "noav-user-says-skip", 0 );
     ShowNoAvDialog( g_hInstance, false );
     HideNoAvDialog();
+#endif
 #endif
 }
 #endif
