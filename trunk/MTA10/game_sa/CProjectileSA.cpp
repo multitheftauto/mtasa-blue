@@ -113,19 +113,13 @@ bool CProjectileSA::CorrectPhysics ( void )
                 GetAttachedOffsets ( vecTemp, vecRotation );
                 // store our hit position in vecTemp
                 vecTemp = pColPoint->GetPosition ( );
-                // if we have a matrix we can use
-                if ( pCollidedWithInterface->Placeable.matrix )
-                {
-                    // calculate our collision offset
-                    vecCollisionOffset = ( vecTemp - pCollidedWithInterface->Placeable.matrix->vPos );
-                }
-                else
-                {
-                    // calculate our collision offset
-                    vecCollisionOffset = ( vecTemp - pCollidedWithInterface->Placeable.m_transform.m_translate );
-                }
+
+                CMatrix attachedToMatrix;
+                pInterface->m_pAttachedEntity->Placeable.matrix->ConvertToMatrix ( attachedToMatrix );
+                CVector vecPosition = attachedToMatrix.Inverse ().TransformVector ( vecTemp );
+
                 // set our attached offsets
-                SetAttachedOffsets ( vecCollisionOffset, vecRotation );
+                SetAttachedOffsets ( vecPosition, vecRotation );
             }
             return true;
         }
