@@ -139,6 +139,13 @@ void CClientProjectile::DoPulse ( void )
 
     // Update our position/rotation if we're attached
     DoAttaching ();
+
+    if ( m_bCorrected == false &&
+        m_pProjectile != NULL && 
+        GetWeaponType ( ) == eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
+    {
+        m_bCorrected = m_pProjectile->CorrectPhysics ( );
+    }
 }
 
 

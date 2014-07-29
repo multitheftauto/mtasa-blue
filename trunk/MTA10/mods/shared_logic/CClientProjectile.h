@@ -117,6 +117,7 @@ protected:
 
     bool                                m_bInitiate;
     CProjectileInitiateData *           m_pInitiateData;
+    bool                                m_bCorrected;
 };
 
 #endif
