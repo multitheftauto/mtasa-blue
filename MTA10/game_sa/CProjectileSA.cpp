@@ -73,3 +73,62 @@ void CProjectileSA::Destroy( bool bBlow )
         m_bDestroyed = true;
     }
 }
+
+// Corrects errors in the physics engine that cause projectiles to be far away from the objects they attached to
+// issue #8122
+bool CProjectileSA::CorrectPhysics ( void )
+{
+    // make sure we have an interface
+    CObjectSAInterface * pInterface = static_cast < CObjectSAInterface * > ( m_pInterface );
+    // make sure we have an interface
+    if ( pInterface != NULL )
+    {
+        // make sure we have an attached entity
+        if ( pInterface->m_pAttachedEntity )
+        {
+            // get our position
+            CVector vecStart = *GetPosition ( );
+            // get the entity we collided with
+            CEntitySAInterface * pCollidedWithInterface = pInterface->m_pAttachedEntity;
+            // get our reported end position
+            CVector vecEnd = pInterface->m_vecCollisionPosition;
+            // grab the difference between our reported and actual end position
+            CVector diff = vecEnd - vecStart;
+            // normalize our difference
+            diff.Normalize ( );
+            // project forward another unit
+            vecEnd = vecEnd + diff * 1;
+            // create a variable to store our collision data
+            CColPoint * pColPoint;
+            // create a variable to store our collision entity
+            CEntity * pCollisionEntity;
+            // process forward another 1 unit
+            if ( pGame->GetWorld ( )->ProcessLineOfSight ( &vecStart, &vecEnd, &pColPoint, &pCollisionEntity ) )
+            {
+                // setup some variables
+                CVector vecRotation;
+                CVector vecTemp;
+                CVector vecCollisionOffset;
+                // get our current offset ( we want the rotation! )
+                GetAttachedOffsets ( vecTemp, vecRotation );
+                // store our hit position in vecTemp
+                vecTemp = pColPoint->GetPosition ( );
+                // if we have a matrix we can use
+                if ( pCollidedWithInterface->Placeable.matrix )
+                {
+                    // calculate our collision offset
+                    vecCollisionOffset = ( vecTemp - pCollidedWithInterface->Placeable.matrix->vPos );
+                }
+                else
+                {
+                    // calculate our collision offset
+                    vecCollisionOffset = ( vecTemp - pCollidedWithInterface->Placeable.m_transform.m_translate );
+                }
+                // set our attached offsets
+                SetAttachedOffsets ( vecCollisionOffset, vecRotation );
+            }
+            return true;
+        }
+    }
+    return false;
+}

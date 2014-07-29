@@ -35,6 +35,7 @@ public:
     void            Destroy( bool bBlow = true );
     
     void            SetProjectileInfo ( CProjectileInfo* pProjectileInfo ) { projectileInfo = pProjectileInfo; }
+    bool            CorrectPhysics ( void );
 };
 
 #endif
