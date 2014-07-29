@@ -114,10 +114,20 @@ bool CProjectileSA::CorrectPhysics ( void )
                 // store our hit position in vecTemp
                 vecTemp = pColPoint->GetPosition ( );
 
+                // create a matrix variable
                 CMatrix attachedToMatrix;
-                pInterface->m_pAttachedEntity->Placeable.matrix->ConvertToMatrix ( attachedToMatrix );
+                if ( pCollidedWithInterface->Placeable.matrix != NULL )
+                {
+                    // get our matrix
+                    pCollidedWithInterface->Placeable.matrix->ConvertToMatrix ( attachedToMatrix );
+                }
+                else
+                {
+                    // get our matrix
+                    attachedToMatrix = CMatrix ( pCollidedWithInterface->Placeable.m_transform.m_translate );
+                }
+                // transform our matrix into local (attached) space
                 CVector vecPosition = attachedToMatrix.Inverse ().TransformVector ( vecTemp );
-
                 // set our attached offsets
                 SetAttachedOffsets ( vecPosition, vecRotation );
             }
