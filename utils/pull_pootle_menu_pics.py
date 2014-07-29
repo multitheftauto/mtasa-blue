@@ -46,17 +46,25 @@ for lang in (options.languages).replace(" ","").split(","):
     url = ""
     output = ""
     if options.gnu:
-        url = urlparse.urljoin(options.url, "download/%s/%s.po"%(lang,options.project))
+        url = urlparse.urljoin(options.url, "export/%s/%s.po"%(options.project,lang))
         output = os.path.join(options.output,"%s.po"%(lang))
     else:
-        url = urlparse.urljoin(options.url, "download/%s/%s/%s.po"%(lang,options.project,options.project))
+        url = urlparse.urljoin(options.url, "export/%s/%s/%s.po"%(options.project,lang,options.project))
         output = os.path.join(options.output,"%s/%s.po"%(lang,options.project))
 
     # Get file twice and compare to defeat truncated downloads
     while True:
-        u = urllib2.urlopen(url)
+        header = {"pragma-directive" : "no-cache"}
+        req = urllib2.Request(url, headers=header)
+        u = urllib2.urlopen(req)
         content = u.read()
-        u = urllib2.urlopen(url)
+
+        localFile = open("aa.txt", 'wb')
+        localFile.write(content)
+        localFile.close()
+
+        sys.exit(1);
+        u = urllib2.urlopen(req)
         if ( content == u.read() ):
             break
 
@@ -74,7 +82,9 @@ for lang in (options.languages).replace(" ","").split(","):
         url = entry.msgstr
         try:
             # Get pic
-            u = urllib2.urlopen(url)
+            header = {"pragma-directive" : "no-cache"}
+            req = urllib2.Request(url, headers=header)
+            u = urllib2.urlopen(req)
             content = u.read()
             if ( content[:1] == "<" ):
                 print ( "Content error with '%s'"%(url) )
