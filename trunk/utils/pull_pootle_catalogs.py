@@ -23,7 +23,9 @@ from optparse import OptionParser
 def myurlopen(url,urltimeout):
     content = ""
     try:
-        u = urllib2.urlopen(url, timeout = urltimeout)
+        header = {"pragma-directive" : "no-cache"}
+        req = urllib2.Request(url, headers=header)
+        u = urllib2.urlopen(req, timeout = urltimeout)
         content = u.read()
     except urllib2.URLError as e:
         print type(e)
@@ -85,6 +87,7 @@ parser.add_option("-a", "--attempts",type="int", dest="attempts", default=3,
 (options, args) = parser.parse_args()
 
 # e.g http://translate.multitheftauto.com/export/client/nl/client.po
+
 if options.rmdir:
     # Clear our output directory first
     if os.path.exists(options.output):
