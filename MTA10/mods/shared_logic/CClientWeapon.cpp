@@ -381,12 +381,12 @@ void CClientWeapon::FireInstantHit ( CVector vecOrigin, CVector vecTarget, bool 
                         if ( pVehicle )
                         {
                             pVehicle->GetPosition ( vecWeaponFirePosition );
-                            pVehicle->SetPosition ( vecPosition );
+                            pVehicle->SetPosition ( vecPosition, false, false );
                         }
                         else
                         {
                             pLocalPlayer->GetPosition ( vecWeaponFirePosition );
-                            pLocalPlayer->SetPosition ( vecPosition );
+                            pLocalPlayer->SetPosition ( vecPosition, false, false );
                         }
                     }
                 }
@@ -458,11 +458,11 @@ void CClientWeapon::FireInstantHit ( CVector vecOrigin, CVector vecTarget, bool 
                     CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
                     if ( !pVehicle )
                     {
-                        pLocalPlayer->SetPosition ( vecWeaponFirePosition );
+                        pLocalPlayer->SetPosition ( vecWeaponFirePosition, false, false );
                     }
                     else if ( pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
                     {
-                        pVehicle->SetPosition ( vecWeaponFirePosition );
+                        pVehicle->SetPosition ( vecWeaponFirePosition, false, false );
                     }
                 }
             }

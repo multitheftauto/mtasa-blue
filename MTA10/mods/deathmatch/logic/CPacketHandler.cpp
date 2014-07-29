@@ -4336,7 +4336,7 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
             if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
             {
                 pMovedEntity->GetPosition ( vecRestorePosition );
-                pMovedEntity->SetPosition ( vecWarpPosition );
+                pMovedEntity->SetPosition ( vecWarpPosition, false, false );
             }
             else
                 pMovedEntity = NULL;
@@ -4407,7 +4407,7 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
     if ( pMovedEntity )
     {
         // Restore its position
-        pMovedEntity->SetPosition ( vecRestorePosition );
+        pMovedEntity->SetPosition ( vecRestorePosition, false, false );
     }
 }
 
