@@ -199,6 +199,17 @@ void ShowSplash ( HINSTANCE hInstance )
     }
     SetForegroundWindow ( hwndSplash );
     SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+
+    // Drain messages to allow for repaint in case picture bits were lost during previous operations
+    MSG msg;
+    while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+    {
+        if( GetMessage( &msg, NULL, 0, 0 ) )
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+    }
 #endif
 }
 
