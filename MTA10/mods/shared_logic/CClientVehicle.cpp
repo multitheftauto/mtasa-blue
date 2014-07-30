@@ -142,6 +142,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_ucVariation = ucVariation;
     m_ucVariation2 = ucVariation2;
     m_bEnableHeliBladeCollisions = true;
+    m_fNitroLevel = 0.0f;
+    m_cNitroCount = 0;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -2659,6 +2661,8 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
         m_pVehicle->SetGravity ( &m_vecGravity );
         m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
+        m_pVehicle->SetNitroCount ( m_cNitroCount );
+        m_pVehicle->SetNitroLevel ( m_fNitroLevel );
 
         if ( m_eVehicleType == CLIENTVEHICLE_HELI )
         {
@@ -4678,3 +4682,41 @@ bool CClientVehicle::DoesNeedToWaitForGroundToLoad ( )
     
     return !pObjectManager->ObjectsAroundPointLoaded ( vecPosition, 50.0f, m_usDimension );
 }
+
+
+void CClientVehicle::SetNitroLevel ( float fNitroLevel )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetNitroLevel ( fNitroLevel );
+    }
+    m_fNitroLevel = fNitroLevel;
+}
+
+float CClientVehicle::GetNitroLevel ( )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetNitroLevel ( );
+    }
+    return m_fNitroLevel;
+}
+
+void CClientVehicle::SetNitroCount ( char cNitroCount )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetNitroCount ( cNitroCount );
+    }
+    m_cNitroCount = cNitroCount;
+}
+
+char CClientVehicle::GetNitroCount ( )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetNitroCount ( );
+    }
+    return m_cNitroCount;
+}
+
