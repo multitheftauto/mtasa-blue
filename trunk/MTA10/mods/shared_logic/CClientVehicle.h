@@ -352,10 +352,10 @@ public:
     float                       GetDirtLevel            ( void );
     void                        SetDirtLevel            ( float fDirtLevel );
 	
-    inline char                 GetNitroCount           ( void )                            { return m_pVehicle->GetNitroCount (); }
-    inline float                GetNitroLevel           ( void )                            { return m_pVehicle->GetNitroLevel (); }
-    inline void                 SetNitroCount           ( char cCount )                     { m_pVehicle->SetNitroCount ( cCount ); }
-    inline void                 SetNitroLevel           ( float fLevel )                    { m_pVehicle->SetNitroLevel ( fLevel ); }
+    char                        GetNitroCount           ( void );
+    float                       GetNitroLevel           ( void );
+    void                        SetNitroCount           ( char cCount );
+    void                        SetNitroLevel           ( float fLevel );
 
     bool                        IsNitroInstalled        ( void );
 
@@ -573,6 +573,8 @@ protected:
     float                       m_fHeliRotorSpeed;
     const CHandlingEntry*       m_pOriginalHandlingEntry;
     CHandlingEntry*             m_pHandlingEntry;
+    float                       m_fNitroLevel;
+    char                        m_cNitroCount;
 
     bool                        m_bChainEngine;
     bool                        m_bIsDerailed;
