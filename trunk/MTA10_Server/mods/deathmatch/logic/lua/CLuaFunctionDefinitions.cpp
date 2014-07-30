@@ -2643,7 +2643,7 @@ int CLuaFunctionDefinitions::GetPedFightingStyle ( lua_State* luaVM )
         unsigned char ucStyle;
         if ( CStaticFunctionDefinitions::GetPedFightingStyle ( pPed, ucStyle ) )
         {
-            lua_pushboolean ( luaVM, ucStyle );
+            lua_pushnumber ( luaVM, ucStyle );
             return 1;
         }
     }
