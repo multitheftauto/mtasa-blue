@@ -2661,8 +2661,8 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
         m_pVehicle->SetGravity ( &m_vecGravity );
         m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
-        m_pVehicle->SetNitroCount ( m_cNitroCount );
-        m_pVehicle->SetNitroLevel ( m_fNitroLevel );
+        //m_pVehicle->SetNitroCount ( m_cNitroCount );
+        //m_pVehicle->SetNitroLevel ( m_fNitroLevel );
 
         if ( m_eVehicleType == CLIENTVEHICLE_HELI )
         {
