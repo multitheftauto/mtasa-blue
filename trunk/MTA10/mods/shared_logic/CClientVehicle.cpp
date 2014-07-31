@@ -142,7 +142,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_ucVariation = ucVariation;
     m_ucVariation2 = ucVariation2;
     m_bEnableHeliBladeCollisions = true;
-    m_fNitroLevel = 0.0f;
+    m_fNitroLevel = 1.0f;
     m_cNitroCount = 0;
 
 #ifdef MTA_DEBUG
@@ -2661,8 +2661,12 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
         m_pVehicle->SetGravity ( &m_vecGravity );
         m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
-        //m_pVehicle->SetNitroCount ( m_cNitroCount );
-        //m_pVehicle->SetNitroLevel ( m_fNitroLevel );
+
+        if ( IsNitroInstalled() )
+        {
+            m_pVehicle->SetNitroCount ( m_cNitroCount );
+            m_pVehicle->SetNitroLevel ( m_fNitroLevel );
+        }
 
         if ( m_eVehicleType == CLIENTVEHICLE_HELI )
         {
