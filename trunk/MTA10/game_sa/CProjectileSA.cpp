@@ -78,9 +78,10 @@ void CProjectileSA::Destroy( bool bBlow )
 // issue #8122
 bool CProjectileSA::CorrectPhysics ( void )
 {
+    // make sure we have an interface for our bomb/satchel
+    CPhysicalSAInterface * pInterface = static_cast < CPhysicalSAInterface * > ( m_pInterface );
     // make sure we have an interface
-    CObjectSAInterface * pInterface = static_cast < CObjectSAInterface * > ( m_pInterface );
-    // make sure we have an interface
+
     if ( pInterface != NULL )
     {
         // make sure we have an attached entity
@@ -90,8 +91,8 @@ bool CProjectileSA::CorrectPhysics ( void )
             CVector vecStart = *GetPosition ( );
             // get the entity we collided with
             CEntitySAInterface * pCollidedWithInterface = pInterface->m_pAttachedEntity;
-            // get our reported end position
-            CVector vecEnd = pInterface->m_vecCollisionPosition;
+            // get our end position by projecting forward a few velocities more
+            CVector vecEnd = vecStart - ( pInterface->m_vecCollisionImpactVelocity * 3 );
             // grab the difference between our reported and actual end position
             CVector diff = vecEnd - vecStart;
             // normalize our difference
@@ -102,8 +103,12 @@ bool CProjectileSA::CorrectPhysics ( void )
             CColPoint * pColPoint;
             // create a variable to store our collision entity
             CEntity * pCollisionEntity;
+            SLineOfSightFlags flags;
+            flags.bCheckCarTires = false;
+            flags.bIgnoreSomeObjectsForCamera = true;
+
             // process forward another 1 unit
-            if ( pGame->GetWorld ( )->ProcessLineOfSight ( &vecStart, &vecEnd, &pColPoint, &pCollisionEntity ) )
+            if ( pGame->GetWorld ( )->ProcessLineOfSight ( &vecStart, &vecEnd, &pColPoint, &pCollisionEntity, flags ) )
             {
                 // setup some variables
                 CVector vecRotation;
@@ -111,8 +116,6 @@ bool CProjectileSA::CorrectPhysics ( void )
                 CVector vecCollisionOffset;
                 // get our current offset ( we want the rotation! )
                 GetAttachedOffsets ( vecTemp, vecRotation );
-                // store our hit position in vecTemp
-                vecTemp = pColPoint->GetPosition ( );
 
                 // create a matrix variable
                 CMatrix attachedToMatrix;
@@ -126,8 +129,13 @@ bool CProjectileSA::CorrectPhysics ( void )
                     // get our matrix
                     attachedToMatrix = CMatrix ( pCollidedWithInterface->Placeable.m_transform.m_translate );
                 }
+                
                 // transform our matrix into local (attached) space
-                CVector vecPosition = attachedToMatrix.Inverse ().TransformVector ( vecTemp );
+                CVector vecPosition = attachedToMatrix.Inverse ().TransformVector ( pColPoint->GetPosition ( ) );
+                
+                // offset by enough that it isn't sticking inside anything
+                vecPosition += attachedToMatrix.Inverse () * ( pInterface->m_vecCollisionImpactVelocity * CVector ( 0.2f, 0.2f, 0.25f ) );
+                
                 // set our attached offsets
                 SetAttachedOffsets ( vecPosition, vecRotation );
             }
