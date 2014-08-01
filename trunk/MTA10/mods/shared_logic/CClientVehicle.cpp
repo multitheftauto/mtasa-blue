@@ -2561,11 +2561,11 @@ void CClientVehicle::Create ( void )
         // Add XRef
         g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pVehicle );
 
-        if ( DoesNeedToWaitForGroundToLoad() )
+        /*if ( DoesNeedToWaitForGroundToLoad() )
         {
             // waiting for ground to load
             SetFrozenWaitingForGroundToLoad ( true, false );
-        }
+        }*/
 
         // Jump straight to the target position if we have one
         if ( HasTargetPosition () )
