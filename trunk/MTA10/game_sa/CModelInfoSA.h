@@ -160,8 +160,8 @@ public:
     unsigned char           bHasBeenPreRendered: 1;     // +18
     unsigned char           bAlphaTransparency: 1;
     unsigned char           bIsLod: 1;
-    unsigned char           bDontCastShadowsOn: 1;
     unsigned char           bDontWriteZBuffer: 1;
+    unsigned char           bDontCastShadowsOn: 1;
     unsigned char           bDrawAdditive: 1;
     unsigned char           bDrawLast: 1;
     unsigned char           bDoWeOwnTheColModel: 1;
