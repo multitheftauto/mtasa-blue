@@ -222,6 +222,7 @@ public:
     virtual void                                GetPosition             ( CVector& vecPosition ) const = 0;
     void                                        GetPositionRelative     ( CClientEntity * pOrigin, CVector& vecPosition ) const;
     virtual void                                SetPosition             ( const CVector& vecPosition ) = 0;
+    virtual void                                SetPosition             ( const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze = true ) { SetPosition( vecPosition ); }
     void                                        SetPositionRelative     ( CClientEntity * pOrigin, const CVector& vecPosition );
     virtual void                                Teleport                ( const CVector& vecPosition ) { SetPosition(vecPosition); }
 

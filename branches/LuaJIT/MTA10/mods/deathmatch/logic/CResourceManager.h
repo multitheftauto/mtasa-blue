@@ -54,6 +54,7 @@ public:
 
     void                        OnAddResourceFile           ( CDownloadableResource* pResourceFile );
     void                        OnRemoveResourceFile        ( CDownloadableResource* pResourceFile );
+    void                        OnDownloadedResourceFile    ( const SString& strFilename );
     bool                        IsResourceFile              ( const SString& strFilename );
     void                        ValidateResourceFile        ( const SString& strFilename, const CBuffer& fileData );
 

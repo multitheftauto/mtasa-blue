@@ -25,6 +25,7 @@
 
 #define VAR_ucFxQuality         0xA9AE54
 #define VAR_fMouseSensitivity   0xB6EC1C
+#define VAR_RadarMode           0xBA676C
 
 #define CLASS_CAudioEngine 0xB6BC90
 #define FUNC_CAudioEngine_SetEffectsMasterVolume 0x506E10
@@ -140,6 +141,9 @@ public:
 
     bool                    IsGrassEnabled              ( void );
     void                    SetGrassEnabled             ( bool bEnable );
+
+    eRadarMode              GetRadarMode                ( void );
+    void                    SetRadarMode                ( eRadarMode hudMode );
 
     void                    Save                        ( void );
 
