@@ -52,7 +52,6 @@ public:
 };
 
 
-
 struct SRenderWareHeader 
 {
     SRenderWareHeader ( )
@@ -65,6 +64,13 @@ struct SRenderWareHeader
     long size;
     long ver;
 };
+
+struct SNoClientCacheScript
+{
+    CBuffer buffer;
+    SString strFilename;
+};
+
 
 class CResource
 {  
@@ -164,6 +170,7 @@ private:
     std::list < class CResourceConfigItem* >    m_ConfigFiles;
     std::list<CExportedFunction *>              m_exportedFunctions;
     CElementGroup *                             m_pDefaultElementGroup;     // stores elements created by scripts in this resource
+    std::list < SNoClientCacheScript >          m_NoClientCacheScriptList;
 };
 
 #endif
