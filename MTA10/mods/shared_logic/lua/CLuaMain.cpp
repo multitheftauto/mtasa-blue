@@ -85,6 +85,7 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner, bool b
 
 CLuaMain::~CLuaMain ( void )
 {
+    g_pClientGame->GetRemoteCalls()->Remove ( this );
     g_pClientGame->GetLatentTransferManager ()->OnLuaMainDestroy ( this );
     g_pClientGame->GetDebugHookManager()->OnLuaMainDestroy ( this );
     g_pClientGame->GetScriptDebugging()->OnLuaMainDestroy ( this );
