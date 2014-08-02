@@ -86,7 +86,9 @@ typedef int                 (__cdecl *RwStreamFindChunk_t)                  (RwS
 typedef RpClump*                (__cdecl *RpClumpStreamRead_t)                  (RwStream *stream);
 typedef RwError*                (__cdecl *RwErrorGet_t)                         (RwError *code);
 typedef RwStream*               (__cdecl *RwStreamOpen_t)                       (RwStreamType type, RwStreamMode mode, const void *pData);
-typedef int                 (__cdecl *RwStreamClose_t)                      (RwStream *stream, void *pData);
+typedef int                     (__cdecl *RwStreamClose_t)                      (RwStream *stream, void *pData);
+typedef int                     (__cdecl *RwStreamRead_t)                       (RwStream* stream, void *pData, uint size);
+typedef int                     (__cdecl *RwStreamSkip_t)                       (RwStream* stream, uint size);
 typedef int                 (__cdecl *RpClumpDestroy_t)                     (RpClump *clump);
 typedef RpClump*                (__cdecl *RpClumpForAllAtomics_t)               (RpClump *clump, void* callback, void* pData);
 typedef RwTexDictionary*        (__cdecl *RwTexDictionaryStreamRead_t)          (RwStream *stream);
@@ -96,7 +98,6 @@ typedef RwRaster*               (__cdecl *RwRasterLock_t)                       
 typedef RwRaster*               (__cdecl *RwRasterCreate_t)                     (int width, int height, int depth, int flags);
 typedef RwTexture*              (__cdecl *RwTextureCreate_t)                    (RwRaster *raster);
 typedef RpMaterial*             (__cdecl *RpMaterialSetTexture_t)               (RpMaterial * mat, RwTexture * tex);
-
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
 /*****************************************************************************/
@@ -113,6 +114,8 @@ RWFUNC ( RpClumpStreamRead_t                     RpClumpStreamRead              
 RWFUNC ( RwErrorGet_t                            RwErrorGet                              , (RwErrorGet_t)                            0xDEAD )
 RWFUNC ( RwStreamOpen_t                          RwStreamOpen                            , (RwStreamOpen_t)                          0xDEAD )
 RWFUNC ( RwStreamClose_t                         RwStreamClose                           , (RwStreamClose_t)                         0xDEAD )
+RWFUNC ( RwStreamRead_t                          RwStreamRead                            , (RwStreamRead_t)                          0xDEAD )
+RWFUNC ( RwStreamSkip_t                          RwStreamSkip                            , (RwStreamSkip_t)                          0xDEAD )
 RWFUNC ( RpClumpDestroy_t                        RpClumpDestroy                          , (RpClumpDestroy_t)                        0xDEAD )
 RWFUNC ( RpClumpGetNumAtomics_t                  RpClumpGetNumAtomics                    , (RpClumpGetNumAtomics_t)                  0xDEAD )
 RWFUNC ( RwFrameTranslate_t                      RwFrameTranslate                        , (RwFrameTranslate_t)                      0xDEAD )
