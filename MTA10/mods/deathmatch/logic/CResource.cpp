@@ -215,116 +215,14 @@ bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArgument
     return false;
 }
 
-static bool CheckForDFFCorruption ( SRenderWareHeader OriginalHeader, char * pData, SString &strError )
-{
-    // Renderware header struct
-    SRenderWareHeader header;
-    // pPosition contains the data offset to where we are currently reading
-    char * pPosition = pData;
-    // iPosition contains our position to work out when we need to stop reading
-    int iPosition = 0;
 
-    // while our position is less than the size of our parent header we can't have read it all
-    while ( iPosition < OriginalHeader.size )
-    {
-        // copy a header from the position
-        memcpy ( &header, pPosition, sizeof ( header ) );
-
-        // check we aren't reading beyond the buffer
-        if ( header.size > OriginalHeader.size - iPosition )
-        {
-            // Invalid header, tried to read beyond buffer
-            strError = DFF_BUFFER_OVERFLOW_ATTEMPT;
-            // corrupt
-            return true;
-        }
-        #ifdef DebugFileParsing
-            // print what we are parsing
-            g_pCore->GetConsole()->Printf("Parsing Header type: %i with size: %i and version: %i\n", header.id, header.size, header.ver );
-        #endif
-
-
-        // these are the header IDs we need to look at the children of
-        if ( header.id == 0x3 || header.id == 0x1A || header.id == 0x0F
-             || header.id == 0x08 || header.id == 0x07 || header.id == 0x06 )
-        {
-            // parse our children
-            if ( CheckForDFFCorruption ( header, pPosition + sizeof ( header ), strError ) )
-            {
-                // corrupt
-                return true;
-            }
-        }
-        // this is the header ID of a texture (be sure to check parent because strings can appear in other places)
-        else if ( OriginalHeader.id == 0x6 && header.id == 0x02 )
-        {
-            // if we are greater than 32 we are corrupt
-            if ( header.size > RW_TEXTURE_NAME_LENGTH )
-            {
-                // advance the stream by one header that was just read
-                pPosition += sizeof ( header );
-                // the name is the header size + 1 character for a null terminator
-                char* pName = new char [ header.size + 1 ];
-                // copy the data from our buffer into the name
-                memcpy ( pName, pPosition, header.size );
-                // add a null terminator
-                pName[ header.size ] = '\0';
-                // set our error
-                strError = SString ("%s %s (%i) %s.", TXD_FRAME_NAME_CORRUPT, pName, header.size, TXD_NAME_CORRUPT_END );
-                // delete our array
-                delete [] pName;
-                // corrupt
-                return true;
-            }
-        }
-        else if ( header.id == 0x253F2FE )
-        {
-            #ifdef DebugFileParsing
-                // print we detected a renderware frame
-                g_pCore->GetConsole()->Printf("Frame detected: Header ID %i, Size: %i\n", header.id, header.size, header.ver );
-            #endif
-            // if we are greater than 23 we are corrupt
-            if ( header.size > RW_FRAME_NAME_LENGTH )
-            {
-                // advance the stream by one header that was just read
-                pPosition += sizeof ( header );
-                // the name is the header size + 1 character for a null terminator
-                char* pName = new char [ header.size + 1 ];
-                // copy the data from our buffer into the name
-                memcpy ( pName, pPosition, header.size );
-                // add a null terminator
-                pName[ header.size ] = '\0';
-                // set our error
-                strError = SString ("%s %s (%i) %s.", DFF_FRAME_NAME_CORRUPT, pName, header.size, DFF_FRAME_NAME_CORRUPT_END );
-                // delete our array
-                delete [] pName;
-                // corrupt
-                return true;
-            }
-        }
-        // advance our position based on the size of the read data and the size of a standard renderware header
-        iPosition += header.size + sizeof ( header );
-        // advance our position based on the size of the read data and the size of a standard renderware header
-        pPosition += header.size + sizeof ( header );
-    }
-    // make sure we read the right amount of bytes
-    if ( iPosition != OriginalHeader.size )
-    {
-        // Invalid header, tried to read beyond buffer
-        strError = DFF_ARCHIVE_CORRUPT_MESSAGE;
-        // Corrupt because our position doesn't match our size
-        return true;
-    }
-    // not corrupt since the loop finished cleanly
-    return false;
-}
 //
 // Quick integrity check of png, dff and txd files
 //
 static bool CheckFileForCorruption( const SString &strPath, SString &strAppendix )
 {
-    const char* szExt = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
-    bool bIsBad = false;
+    const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
+    bool bIsBad         = false;
 
     if ( stricmp ( szExt, ".PNG" ) == 0 )
     {
@@ -346,100 +244,17 @@ static bool CheckFileForCorruption( const SString &strPath, SString &strAppendix
             fclose ( pFile );
         }
     }
-    else if ( stricmp ( szExt, ".DFF" ) == 0 )
+    else
+    if ( stricmp ( szExt, ".TXD" ) == 0 || stricmp ( szExt, ".DFF" ) == 0 )
     {
-        #ifdef DebugFileParseTiming
-            // Output timings
-            TIMEUS lTime = GetTimeUs ( );
-        #endif
         // Open the file
         if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
         {
-            // Structure to store our initial header
-            SRenderWareHeader header;
-
-            // Load the first header
-            fread ( &header, 1, sizeof(header), pFile );
-            // our position is now at the sizeof header
-            long pos = sizeof(header);
-            // a valid size is the size of this header + the file size
-            long validSize = header.size + pos;
-
-            // Step through the child sections of the root node
-            while ( pos < validSize )
-            {
-                // read the next header or break
-                if ( fread ( &header, 1, sizeof(header), pFile ) != sizeof(header) )
-                {
-                    // break
-                    break;
-                }
-                if ( header.size != 0 )
-                {
-                    // allocate an array of char for our header
-                    char* pData = new char [ header.size ];
-
-                    // Read our header
-                    if ( fread ( pData, header.size, 1, pFile ) != 1 )
-                    {
-                        // delete our array
-                        delete [] pData;
-                        // break
-                        break;
-                    }
-
-
-                    // if we are sections
-                    // 0xE - frame list
-                    // 0x1A - Geometry list
-                    // parse and process as we need to check string sizes for frames and textures
-                    if ( header.id == 0xE || header.id == 0x1A )
-                    {
-                        // initialise some variables
-                        SString strError = "";
-                        int iErrorCode = 0;
-                        // check the child nodes for corruption
-                        if ( CheckForDFFCorruption ( header, pData, strError ) == true )
-                        {
-                            // corrupt file
-                            bIsBad = true;
-                            // set our error
-                            strAppendix = strError;
-                            // break
-                            break;
-                        }
-                    }
-                    // delete our array
-                    delete [] pData;
-                }
-                // move us along our file
-                pos += header.size + sizeof(header);
-            }
-
-            // Check integrity
-            if ( pos != validSize && 
-                bIsBad == false )
-            {
-                strAppendix = SString ( "%s Expected: %i got %i", DFF_ARCHIVE_CORRUPT_MESSAGE, validSize, pos );
-                bIsBad = true;
-            }
-            // Close the file
-            fclose ( pFile );
-        }
-        #ifdef DebugFileParseTiming
-            // get our delta time
-            TIMEUS lDelta = GetTimeUs ( ) - lTime;
-            // print how long we took
-            g_pCore->GetConsole ( )->Printf ("Parse Time for dff: %s is %i\n", strPath.c_str(), lDelta );
-        #endif
-    }
-    else if ( stricmp ( szExt, ".TXD" ) == 0 )
-    {
-        // could parse this like a dff but these sizes can get fairly big and take up lots of time on read calls, seeking is far quicker
-        // Open the file
-        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
-        {
-            SRenderWareHeader header;
+            struct {
+                long id;
+                long size;
+                long ver;
+            } header = {0,0,0};
 
             // Load the first header
             fread ( &header, 1, sizeof(header), pFile );
@@ -451,18 +266,13 @@ static bool CheckFileForCorruption( const SString &strPath, SString &strAppendix
             {
                 if ( fread ( &header, 1, sizeof(header), pFile ) != sizeof(header) )
                     break;
-
                 fseek ( pFile, header.size, SEEK_CUR );
                 pos += header.size + sizeof(header);
             }
 
             // Check integrity
-            if ( pos != validSize && 
-                bIsBad == false )
-            {
-                strAppendix = TXD_ARCHIVE_CORRUPT_MESSAGE;
+            if ( pos != validSize )
                 bIsBad = true;
-            }
                
             // Close the file
             fclose ( pFile );
@@ -543,8 +353,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
             }
             else
             {
-                SString strError = "";
-                HandleDownloadedFileTrouble( pResourceFile, true, strError );
+                HandleDownloadedFileTrouble( pResourceFile, true );
             }
             DECLARE_PROFILER_SECTION( OnPostLoadScript )
         }
