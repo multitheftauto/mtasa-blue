@@ -117,6 +117,8 @@ public:
     bool                IsObjectRemoved                 ( CEntitySAInterface * pInterface );
     bool                IsDataModelRemoved              ( unsigned short usModelID );
     bool                IsEntityRemoved                 ( CEntitySAInterface * pInterface );
+    bool                CalculateImpactPosition         ( const CVector &vecInputStart, CVector &vecInputEnd );
+
 private:
     std::multimap< unsigned short, SBuildingRemoval* >          *m_pBuildingRemovals;
     std::multimap < unsigned short, sDataBuildingRemovalItem* > *m_pDataBuildings;
