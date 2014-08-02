@@ -43,7 +43,24 @@ void CLuaTimer::ExecuteTimer ( CLuaMain* pLuaMain )
 {
     if ( VERIFY_FUNCTION ( m_iLuaFunction ) )
     {
+        lua_State* pState = pLuaMain->GetVM ();
+
+        LUA_CHECKSTACK ( pState, 1 );   // Ensure some room
+
+        // Store the current values of the globals
+        lua_getglobal ( pState, "sourceTimer" );
+        CLuaArgument OldSource ( pState, -1 );
+        lua_pop( pState, 1 );
+
+        // Set the "sourceTimer" global
+        lua_pushtimer ( pState, this );
+        lua_setglobal ( pState, "sourceTimer" );
+
         m_Arguments.Call ( pLuaMain, m_iLuaFunction );
+
+        // Reset the globals on that VM
+        OldSource.Push ( pState );
+        lua_setglobal ( pState, "sourceTimer" );
     }
 }
 
