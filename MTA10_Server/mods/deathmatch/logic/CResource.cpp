@@ -876,7 +876,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
 
                 if ( stricmp ( szExt, ".DFF" ) == 0 )
                 {
-                    int iErrorCode = g_pRealNetServer->CheckDFF ( strPath );
+                    int iErrorCode = g_pRealNetServer->CheckDFF ( strPath.c_str ( ) );
                     if ( iErrorCode != 0 )
                     {
                         if ( iErrorCode == -1 )
