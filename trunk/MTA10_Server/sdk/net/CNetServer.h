@@ -139,8 +139,6 @@ public:
     virtual bool                            ValidateHttpCacheFileName       ( const char* szFilename ) { return false; }
     virtual bool                            GetScriptInfo                   ( const char* cpInBuffer, uint uiInSize, SScriptInfo* pOutInfo ) { return false; }
     virtual bool                            DecryptScript                   ( const char* cpInBuffer, uint uiInSize, const char** pcpOutBuffer, uint* puiOutSize, const char* szScriptName ) { return false; }
-
-    virtual int                             CheckDFF                        ( const char* szPath ) { return 0; }
 };
 
 #endif
