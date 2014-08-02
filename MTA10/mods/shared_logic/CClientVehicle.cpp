@@ -241,6 +241,7 @@ CClientVehicle::~CClientVehicle ( void )
 
     delete m_pUpgrades;
     delete m_pHandlingEntry;
+    delete m_LastSyncedData;
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, NULL );
 }
 
