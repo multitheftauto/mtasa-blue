@@ -377,6 +377,7 @@ public:
     bool                IsOOPEnabledInMetaXml           ( void )                                { return m_bOOPEnabledInMetaXml; }
     bool                CheckFunctionRightCache         ( lua_CFunction f, bool* pbOutAllowed );
     void                UpdateFunctionRightCache        ( lua_CFunction f, bool bAllowed );
+    bool                IsFilenameUsed                  ( const SString& strFilename, bool bClient );
 
 protected:
     SString             GetAutoGroupName                ( void );

@@ -63,6 +63,7 @@ public:
 
     inline eResourceType        GetType() { return m_type; }
     inline const char *         GetName() { return m_strShortName.c_str (); }
+    inline const char *         GetFullName() { return m_strResourceFileName.c_str (); }
     inline const char *         GetWindowsName() { return m_strWindowsName.c_str (); }
 
     inline CChecksum            GetLastChecksum ( void ) { return m_checksum; }
