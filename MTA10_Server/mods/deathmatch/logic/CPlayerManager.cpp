@@ -54,6 +54,14 @@ void CPlayerManager::DoPulse ( void )
 
 CPlayer* CPlayerManager::Create ( const NetServerPlayerID& PlayerSocket )
 {
+    // Check socket is free
+    CPlayer* pOtherPlayer = MapFindRef( m_SocketPlayerMap, PlayerSocket );
+    if ( pOtherPlayer )
+    {
+        CLogger::ErrorPrintf ( "Attempt to re-use existing connection for player '%s'\n", pOtherPlayer->GetName().c_str() );
+        return NULL;     
+    }
+
     // Create the new player
     CPlayer* pPlayer = new CPlayer ( this, m_pScriptDebugging, PlayerSocket );
 

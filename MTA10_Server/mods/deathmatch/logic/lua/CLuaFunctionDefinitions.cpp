@@ -2643,7 +2643,7 @@ int CLuaFunctionDefinitions::GetPedFightingStyle ( lua_State* luaVM )
         unsigned char ucStyle;
         if ( CStaticFunctionDefinitions::GetPedFightingStyle ( pPed, ucStyle ) )
         {
-            lua_pushboolean ( luaVM, ucStyle );
+            lua_pushnumber ( luaVM, ucStyle );
             return 1;
         }
     }
@@ -10276,6 +10276,7 @@ int CLuaFunctionDefinitions::UtfLen ( lua_State* luaVM )
     if ( !argStream.HasErrors ( ) )
     {
        lua_pushnumber ( luaVM, MbUTF8ToUTF16(strInput).size() );
+       return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
