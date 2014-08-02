@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+extern CCoreInterface* g_pCore;
+
 #define FUNC_CPed__RenderTargetMarker                       0x60BA80
 
 WaterCannonHitHandler* m_pWaterCannonHitHandler = NULL;
@@ -109,6 +111,10 @@ DWORD RETURN_CProjectile_FixTearGasCrash_Cont             = 0x4C0409;
 #define HOOKPOS_CVehicle_ProcessTyreSmoke_Braking           0x6DECED
 #define HOOKPOS_CVehicle_ProcessTyreSmoke_HookAddress       0x6DF308
 
+#define HOOKPOS_CProjectile_FixExplosionLocation            0x738A77
+DWORD   RETURN_CProjectile_FixExplosionLocation           = 0x738A86;
+
+
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle ( );
 void HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle ( );
 void HOOK_CVehicle_ProcessStuff_TestSirenTypeDual ( );
@@ -135,6 +141,8 @@ void HOOK_CWorld_RemoveFallenCars ( );
 void HOOK_CVehicleModelInterface_SetClump ( );
 void HOOK_CBoat_ApplyDamage ( );
 void HOOK_CProjectile_FixTearGasCrash ( );
+void HOOK_CProjectile_FixExplosionLocation ( );
+
 void CMultiplayerSA::Init_13 ( void )
 {
     InitHooks_13 ( );
@@ -182,6 +190,8 @@ void CMultiplayerSA::InitHooks_13 ( void )
 
     HookInstall ( HOOKPOS_CProjectile_FixTearGasCrash, (DWORD) HOOK_CProjectile_FixTearGasCrash, 6 );
     
+    HookInstall ( HOOKPOS_CProjectile_FixExplosionLocation, (DWORD)HOOK_CProjectile_FixExplosionLocation, 12 );
+
     InitHooks_ClothesSpeedUp ();
     EnableHooks_ClothesMemFix ( true );
     InitHooks_FixBadAnimId ();
@@ -1639,5 +1649,52 @@ void CMultiplayerSA::SetTyreSmokeEnabled ( bool bEnabled )
         HookInstall ( HOOKPOS_CVehicle_ProcessTyreSmoke_Burnouts, HOOKPOS_CVehicle_ProcessTyreSmoke_HookAddress, 5 );
         // This ensures that the local vehicle tyre smoke under braking isn't rendered
         HookInstall ( HOOKPOS_CVehicle_ProcessTyreSmoke_Braking, HOOKPOS_CVehicle_ProcessTyreSmoke_HookAddress, 5 );
+    }
+}
+CPhysicalSAInterface * pExplosionEntity;
+
+void UpdateExplosionLocation ( )
+{
+    if ( pExplosionEntity )
+    {
+        // project backwards 20% of our velocity just to catch us going too far
+        CVector vecStart = pExplosionEntity->Placeable.matrix->vPos + ( pExplosionEntity->m_vecLinearVelocity * 0.20f );
+        // project forwards 120% to look for collisions forwards
+        CVector vecEnd = vecStart - ( pExplosionEntity->m_vecLinearVelocity * 1.20f );
+        // calculate our actual impact position
+        if ( pGameInterface->GetWorld()->CalculateImpactPosition ( vecStart, vecEnd ) )
+        {            
+            // Apply it
+            if ( pExplosionEntity->Placeable.matrix )
+            {
+                pExplosionEntity->Placeable.matrix->vPos = vecEnd;
+            }
+            else
+            {
+                pExplosionEntity->Placeable.m_transform.m_translate = vecEnd;
+            }
+        }
+    }
+}
+
+void _declspec(naked) HOOK_CProjectile_FixExplosionLocation ( )
+{
+    _asm
+    {
+        mov pExplosionEntity, esi
+        pushad
+    }
+    UpdateExplosionLocation ( );
+    _asm
+    {
+        popad
+        mov eax, [esi+14h]
+        test eax, eax
+        jz skip
+        add eax, 30h
+        jmp RETURN_CProjectile_FixExplosionLocation
+skip:
+        lea eax, [esi+4]
+        jmp RETURN_CProjectile_FixExplosionLocation
     }
 }

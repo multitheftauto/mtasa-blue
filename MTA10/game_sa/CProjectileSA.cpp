@@ -93,22 +93,9 @@ bool CProjectileSA::CorrectPhysics ( void )
             CEntitySAInterface * pCollidedWithInterface = pInterface->m_pAttachedEntity;
             // get our end position by projecting forward a few velocities more
             CVector vecEnd = vecStart - ( pInterface->m_vecCollisionImpactVelocity * 3 );
-            // grab the difference between our reported and actual end position
-            CVector diff = vecEnd - vecStart;
-            // normalize our difference
-            diff.Normalize ( );
-            // project forward another unit
-            vecEnd = vecEnd + diff * 1;
-            // create a variable to store our collision data
-            CColPoint * pColPoint;
-            // create a variable to store our collision entity
-            CEntity * pCollisionEntity;
-            SLineOfSightFlags flags;
-            flags.bCheckCarTires = false;
-            flags.bIgnoreSomeObjectsForCamera = true;
 
             // process forward another 1 unit
-            if ( pGame->GetWorld ( )->ProcessLineOfSight ( &vecStart, &vecEnd, &pColPoint, &pCollisionEntity, flags ) )
+            if ( pGame->GetWorld ( )->CalculateImpactPosition ( vecStart, vecEnd )  )
             {
                 // setup some variables
                 CVector vecRotation;
@@ -131,10 +118,10 @@ bool CProjectileSA::CorrectPhysics ( void )
                 }
                 
                 // transform our matrix into local (attached) space
-                CVector vecPosition = attachedToMatrix.Inverse ().TransformVector ( pColPoint->GetPosition ( ) );
+                CVector vecPosition = attachedToMatrix.Inverse ().TransformVector ( vecEnd );
                 
                 // offset by enough that it isn't sticking inside anything
-                vecPosition += attachedToMatrix.Inverse () * ( pInterface->m_vecCollisionImpactVelocity * CVector ( 0.2f, 0.2f, 0.25f ) );
+                vecPosition += attachedToMatrix.Inverse () * ( pInterface->m_vecCollisionImpactVelocity * CVector ( 0.2f, 0.2f, 0.3f ) );
                 
                 // set our attached offsets
                 SetAttachedOffsets ( vecPosition, vecRotation );

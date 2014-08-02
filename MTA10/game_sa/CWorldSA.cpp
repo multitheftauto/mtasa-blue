@@ -1229,3 +1229,51 @@ void CWorldSA::RemoveWorldBuildingFromLists ( CEntitySAInterface * pInterface )
     m_pAddedEntities[(DWORD)pInterface] = false;
 
 }
+
+bool CWorldSA::CalculateImpactPosition ( const CVector &vecInputStart, CVector &vecInputEnd )
+{
+    // get our position
+    CVector vecStart = vecInputStart;
+    // get our end position by projecting forward a few velocities more
+    CVector vecEnd = vecInputEnd;
+    // grab the difference between our reported and actual end position
+    CVector diff = vecEnd - vecStart;
+    // normalize our difference
+    diff.Normalize ( );
+    // project forward another unit
+    vecEnd = vecEnd + diff * 1;
+    // create a variable to store our collision data
+    CColPoint * pColPoint;
+    // create a variable to store our collision entity
+    CEntity * pCollisionEntity;
+
+    // flags
+    SLineOfSightFlags flags;
+    flags.bCheckCarTires = false;
+    flags.bIgnoreSomeObjectsForCamera = true;
+    flags.bCheckBuildings = true;
+    flags.bCheckPeds = true;
+    flags.bCheckObjects = true;
+    flags.bCheckDummies = true;
+
+    // Include dead peds
+    MemPutFast < DWORD > ( 0xB7CD71, 1 );
+
+    SLineOfSightBuildingResult result;
+    // process forward another 1 unit
+    if ( ProcessLineOfSight ( &vecStart, &vecEnd, &pColPoint, &pCollisionEntity, flags, &result ) )
+    {
+        // set our collision position
+        vecInputEnd = pColPoint->GetPosition ( );
+
+        // destroy our colshape
+        pColPoint->Destroy ( );
+
+        // reset include dead peds
+        MemPutFast < DWORD > ( 0xB7CD71, 0 );
+        return true;
+    }
+    // Include dead peds
+    MemPutFast < DWORD > ( 0xB7CD71, 0 );
+    return false;
+}
