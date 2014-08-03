@@ -358,6 +358,7 @@ void CResource::Load ( CClientEntity *pRootEntity )
             DECLARE_PROFILER_SECTION( OnPostLoadScript )
         }
         else
+        if ( pResourceFile->IsAutoDownload() )
         {
             // Load the file
             std::vector < char > buffer;
