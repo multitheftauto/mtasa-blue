@@ -553,9 +553,9 @@ int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, uchar& ucOu
         {
             for ( int i = 0; i < aNumTrackNodes[ucTrackId]; ++i )
             {
-                SRailNodeSA pRailNode = aTrackNodes[ucTrackId][i];
+                SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
 
-                float fDistance = sqrt ( pow(vecPosition.fZ - pRailNode.sZ * 0.125f, 2) + pow(vecPosition.fY - pRailNode.sY * 0.125f, 2) + pow(vecPosition.fX - pRailNode.sX * 0.125f, 2) );
+                float fDistance = sqrt ( pow(vecPosition.fZ - railNode.sZ * 0.125f, 2) + pow(vecPosition.fY - railNode.sY * 0.125f, 2) + pow(vecPosition.fX - railNode.sX * 0.125f, 2) );
                 if ( fDistance < fMinDistance )
                 {
                     fMinDistance = fDistance;
