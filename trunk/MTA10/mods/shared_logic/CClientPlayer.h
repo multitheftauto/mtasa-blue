@@ -94,7 +94,7 @@ public:
     inline unsigned int             GetVehicleSyncCount     ( void )                                { return m_uiVehicleSyncCount; }
     
     inline CClientTeam*             GetTeam                 ( void )                                { return m_pTeam; }
-    void                            SetTeam                 ( CClientTeam* pTeam, bool bChangeTeam = false);
+    void                            SetTeam                 ( CClientTeam* pTeam, bool bChangeTeam );
     bool                            IsOnMyTeam              ( CClientPlayer* pPlayer );
 
     CClientPlayerVoice*             GetVoice                ( void )                                { return m_voice; }

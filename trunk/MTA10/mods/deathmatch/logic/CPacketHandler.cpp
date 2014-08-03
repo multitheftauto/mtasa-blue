@@ -3648,7 +3648,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             CClientPlayer * pPlayer = g_pClientGame->m_pManager->GetPlayerManager ( )->Get ( PlayerId );
                             if ( pPlayer )
                             {
-                                pPlayer->SetTeam ( pTeam );
+                                pPlayer->SetTeam ( pTeam, true );
                             }
                         }
                     }
