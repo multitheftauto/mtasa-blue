@@ -4875,11 +4875,19 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 break;
                         }
 
-                        // Is it a valid downloadable resource?
-                        if ( pDownloadableResource && pDownloadableResource->IsAutoDownload() )
+                        // Does the Client and Server checksum differ?
+                        if ( pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch () )
                         {
-                            // Does the Client and Server checksum Match?
-                            if ( !pDownloadableResource->DoesClientAndServerChecksumMatch () )
+                            // Delete the file that already exists
+                            FileDelete ( pDownloadableResource->GetName () );
+                            if ( FileExists( pDownloadableResource->GetName () ) )
+                            {
+                                SString strMessage( "Unable to delete old file %s", *ConformResourcePath( pDownloadableResource->GetName () ) );
+                                g_pClientGame->TellServerSomethingImportant( 1009, strMessage, false );
+                            }
+
+                            // Is it downloadable now?
+                            if ( pDownloadableResource->IsAutoDownload() )
                             {
                                 // Make sure the directory exists
                                 const char* szTempName = pDownloadableResource->GetName ();
@@ -4892,13 +4900,6 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 // Combine the HTTP Download URL, the Resource Name and the Resource File
                                 SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
 
-                                // Delete the file that already exists
-                                FileDelete ( pDownloadableResource->GetName () );
-                                if ( FileExists( pDownloadableResource->GetName () ) )
-                                {
-                                    SString strMessage( "Unable to delete old file %s", *ConformResourcePath( pDownloadableResource->GetName () ) );
-                                    g_pClientGame->TellServerSomethingImportant( 1009, strMessage, false );
-                                }
 
                                 // Queue the file to be downloaded
                                 bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, 10000, true );
