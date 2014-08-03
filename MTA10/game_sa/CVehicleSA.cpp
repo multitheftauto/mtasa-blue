@@ -545,7 +545,7 @@ void CVehicleSA::SetDerailed ( bool bDerailed )
                 MemOrFast < DWORD > ( dwThis + 64, ( DWORD ) 0x20004 );
 
                 // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
-                DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
+                DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
                 _asm
                 {
                     mov     ecx, dwThis
@@ -605,7 +605,7 @@ void CVehicleSA::SetRailTrack ( BYTE ucTrackID )
         pInterf->m_ucRailTrackID = ucTrackID;
         if ( !IsDerailed () )
         {
-            DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
+            DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
             _asm
             {
                 mov ecx, pInterf
@@ -624,12 +624,12 @@ float CVehicleSA::GetTrainPosition ()
 void CVehicleSA::SetTrainPosition ( float fPosition, bool bRecalcOnRailDistance )
 {
     CVehicleSAInterface* pInterface = GetVehicleInterface ();
-    if ( pInterface->m_fTrainRailDistance <= fPosition - 0.1 || pInterface->m_fTrainRailDistance >= fPosition + 0.1 )
+    //if ( pInterface->m_fTrainRailDistance <= fPosition - 0.1 || pInterface->m_fTrainRailDistance >= fPosition + 0.1 )
     {
         pInterface->m_fTrainRailDistance = fPosition;
         if ( bRecalcOnRailDistance && !IsDerailed () )
         {
-            DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
+            DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
             _asm
             {
                 mov ecx, pInterface

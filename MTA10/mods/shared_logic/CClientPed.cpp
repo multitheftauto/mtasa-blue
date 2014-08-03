@@ -305,6 +305,8 @@ CClientPed::~CClientPed ( void )
     delete m_pClothes;
     m_pClothes = NULL;
 
+    delete m_LastSyncedData;
+
     // Remove us from any occupied vehicle
     CClientVehicle::UnpairPedAndVehicle ( this );
 
