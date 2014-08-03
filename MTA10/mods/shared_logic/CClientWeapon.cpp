@@ -405,8 +405,12 @@ void CClientWeapon::FireInstantHit ( CVector vecOrigin, CVector vecTarget, bool 
 
         // return if shoot if target is blocked is false and we aren't pointing at our target
         if ( ( m_pTarget != NULL && m_pTarget->GetGameEntity ( ) != NULL && m_pTarget->GetGameEntity()->GetInterface ( ) != pEntity ) && m_weaponConfig.bShootIfTargetBlocked == false && bRemote == false )
-            return;
+        {
+            if ( pColPoint )
+                pColPoint->Destroy ();
 
+            return;
+        }
         // Execute our weapon fire event
         CClientEntity * pClientEntity = m_pManager->FindEntitySafe ( pColEntity );
         CLuaArguments Arguments;
@@ -425,6 +429,8 @@ void CClientWeapon::FireInstantHit ( CVector vecOrigin, CVector vecTarget, bool 
         Arguments.PushNumber ( pColPoint->GetPieceTypeB ( ) ); // Piece
         if ( !CallEvent ( "onClientWeaponFire", Arguments, true ) )
         {
+            if ( pColPoint )
+                pColPoint->Destroy ();
             return;
         }
 
