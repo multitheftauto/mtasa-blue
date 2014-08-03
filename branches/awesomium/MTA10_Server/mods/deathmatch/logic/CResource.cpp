@@ -1371,6 +1371,25 @@ bool CResource::GetFilePath ( const char * szFilename, string& strPath )
     return false;
 }
 
+// Return true if file name is used by this resource
+bool CResource::IsFilenameUsed( const SString& strFilename, bool bClient )
+{
+    for ( std::list <CResourceFile*> ::iterator iter = m_resourceFiles.begin() ; iter != m_resourceFiles.end() ; iter++ )
+    {
+        CResourceFile* pFile = *iter;
+        if ( strFilename.CompareI( pFile->GetName() ) )
+        {
+            bool bIsClientFile = ( pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT
+                                   || pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG
+                                   || pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE );
+            if ( bIsClientFile == bClient )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 bool CResource::ReadIncludedHTML ( CXMLNode * root )
 {
@@ -1431,6 +1450,11 @@ bool CResource::ReadIncludedHTML ( CXMLNode * root )
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 
+                if ( IsFilenameUsed( strFilename, false ) )
+                {
+                    CLogger::LogPrintf( "WARNING: Duplicate html file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str() );
+                }
+
                 // Try to find the file
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
@@ -1485,17 +1509,22 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
         CXMLAttributes * attributes = &(inc->GetAttributes());
         if ( attributes )
         {
-            // Find the type attribute (server / client)
-            int iType = CResourceScriptItem::RESOURCE_FILE_TYPE_CONFIG;
+            bool bServer = true;
+            bool bClient = false;
             CXMLAttribute * type = attributes->Find("type");
             if ( type )
             {
+                // Grab the type. Client or server or shared
                 const char *szType = type->GetValue ().c_str ();
-                if ( stricmp ( szType, "server" ) == 0 )
-                    iType = CResourceScriptItem::RESOURCE_FILE_TYPE_CONFIG;
-                else if ( stricmp ( szType, "client" ) == 0 )
-                    iType = CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG;
-                else
+                if ( stricmp ( szType, "client" ) == 0 )
+                {
+                    bServer = false;
+                    bClient = true;
+                }
+                else if ( stricmp ( szType, "shared" ) == 0 )
+                    bClient = true;
+                else 
+                if ( stricmp ( szType, "server" ) != 0 )
                     CLogger::LogPrintf ( "Unknown config type specified in %s. Assuming 'server'\n", m_strResourceName.c_str () );
             }
 
@@ -1508,13 +1537,23 @@ bool CResource::ReadIncludedConfigs ( CXMLNode * root )
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 
+                if ( bClient && IsFilenameUsed( strFilename, true ) )
+                {
+                    CLogger::LogPrintf( "WARNING: Ignoring duplicate client config file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str() );
+                    bClient = false;
+                }
+                if ( bServer && IsFilenameUsed( strFilename, false ) )
+                {
+                    CLogger::LogPrintf( "WARNING: Duplicate config file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str() );
+                }
+
                 // Extract / grab the filepath
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
                     // Create it and push it to the list over resource files. Depending on if it's client or server type
-                    if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CONFIG )
+                    if ( bServer )
                         m_resourceFiles.push_back ( new CResourceConfigItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
-                    else if ( iType == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG )
+                    if ( bClient )
                         m_resourceFiles.push_back ( new CResourceClientConfigItem ( this, strFilename.c_str (), strFullFilename.c_str (), attributes ) );
                 }
                 else
@@ -1554,6 +1593,12 @@ bool CResource::ReadIncludedFiles ( CXMLNode * root )
                 string strFilename = src->GetValue ();
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
+
+                if ( IsFilenameUsed( strFilename, true ) )
+                {
+                    CLogger::LogPrintf( "WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str() );
+                    continue;
+                }
 
                 bool bDownload = true;
                 CXMLAttribute * download = attributes->Find("download");
@@ -1715,6 +1760,16 @@ bool CResource::ReadIncludedScripts ( CXMLNode * root )
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
 
+                if ( bClient && IsFilenameUsed( strFilename, true ) )
+                {
+                    CLogger::LogPrintf( "WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str() );
+                    bClient = false;
+                }
+                if ( bServer && IsFilenameUsed( strFilename, false ) )
+                {
+                    CLogger::LogPrintf( "WARNING: Duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str() );
+                }
+
                 // Extract / get the filepath of the file
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {
@@ -1772,6 +1827,12 @@ bool CResource::ReadIncludedMaps ( CXMLNode * root )
                 string strFilename = src->GetValue ();
                 string strFullFilename;
                 ReplaceSlashes ( strFilename );
+
+                if ( IsFilenameUsed( strFilename, false ) )
+                {
+                    CLogger::LogPrintf( "WARNING: Duplicate map file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str() );
+                }
+
                 // Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
                 if ( IsValidFilePath ( strFilename.c_str () ) && GetFilePath ( strFilename.c_str (), strFullFilename ) )
                 {

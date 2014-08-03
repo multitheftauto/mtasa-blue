@@ -142,6 +142,8 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_ucVariation = ucVariation;
     m_ucVariation2 = ucVariation2;
     m_bEnableHeliBladeCollisions = true;
+    m_fNitroLevel = 1.0f;
+    m_cNitroCount = 0;
 
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
@@ -239,6 +241,7 @@ CClientVehicle::~CClientVehicle ( void )
 
     delete m_pUpgrades;
     delete m_pHandlingEntry;
+    delete m_LastSyncedData;
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, NULL );
 }
 
@@ -295,15 +298,15 @@ void CClientVehicle::GetPosition ( CVector& vecPosition ) const
 }
 
 
-void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation )
+void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze )
 {
     // Is the local player in the vehicle
-    if ( g_pClientGame->GetLocalPlayer ( )->GetOccupiedVehicle ( ) == this )
+    if ( g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == this )
     {
         // If move is big enough, do ground checks
-        float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ( );
-        if ( DistanceMoved > 50 && !IsFrozen ( ) )
-            SetFrozenWaitingForGroundToLoad ( true );
+        float DistanceMoved = ( m_Matrix.vPos - vecPosition ).Length ();
+        if ( DistanceMoved > 50 && !IsFrozen () && bAllowGroundLoadFreeze )
+            SetFrozenWaitingForGroundToLoad ( true, true );
     }
 
     if ( m_pVehicle )
@@ -1873,7 +1876,7 @@ bool CClientVehicle::IsFrozenWaitingForGroundToLoad ( void ) const
 }
 
 
-void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
+void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen, bool bSuspendAsyncLoading )
 {
     if ( !g_pGame->IsASyncLoadingEnabled ( true ) )
         return;
@@ -1884,26 +1887,38 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
 
         if ( bFrozen )
         {
-            g_pGame->SuspendASyncLoading ( true );
+            if ( bSuspendAsyncLoading )
+            {
+                // Set auto unsuspend time in case changes prevent second call
+                g_pGame->SuspendASyncLoading ( true, 5000 );
+            }
             m_fGroundCheckTolerance = 0.f;
             m_fObjectsAroundTolerance = -1.f;
 
+            CVector vecTemp;
             if ( m_pVehicle )
             {
                 m_pVehicle->GetMatrix ( &m_matFrozen );
-                m_pVehicle->GetMoveSpeed ( &m_vecWaitingForGroundSavedMoveSpeed );
-                m_pVehicle->GetTurnSpeed ( &m_vecWaitingForGroundSavedTurnSpeed );
+                m_pVehicle->SetMoveSpeed ( &vecTemp );
+                m_pVehicle->SetTurnSpeed ( &vecTemp );
             }
             else
             {
                 m_matFrozen = m_Matrix;
-                m_vecWaitingForGroundSavedMoveSpeed = m_vecMoveSpeed;
-                m_vecWaitingForGroundSavedTurnSpeed = m_vecTurnSpeed;
+                m_vecMoveSpeed = vecTemp;
+                m_vecTurnSpeed = vecTemp;
             }
+            m_vecWaitingForGroundSavedMoveSpeed = vecTemp;
+            m_vecWaitingForGroundSavedTurnSpeed = vecTemp;
+            m_bAsyncLoadingDisabled = bSuspendAsyncLoading;
         }
         else
         {
-            g_pGame->SuspendASyncLoading ( false );
+            // use the member variable here and ignore Suspend Async loading
+            if ( m_bAsyncLoadingDisabled )
+            {
+                g_pGame->SuspendASyncLoading ( false );
+            }
             m_vecMoveSpeed = m_vecWaitingForGroundSavedMoveSpeed;
             m_vecTurnSpeed = m_vecWaitingForGroundSavedTurnSpeed;
             if ( m_pVehicle )
@@ -1911,6 +1926,7 @@ void CClientVehicle::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
                 m_pVehicle->SetMoveSpeed ( &m_vecMoveSpeed );
                 m_pVehicle->SetTurnSpeed ( &m_vecTurnSpeed );
             }
+            m_bAsyncLoadingDisabled = false;
         }
     }
 }
@@ -2007,6 +2023,28 @@ void CClientVehicle::SetIsChainEngine ( bool bChainEngine, bool bTemporary )
     }
 }
 
+
+bool CClientVehicle::IsTrainConnectedTo ( CClientVehicle * pTrailer )
+{
+    CClientVehicle* pVehicle = this;
+    while ( pVehicle )
+    {
+        if ( pTrailer == pVehicle )
+            return true;
+
+        pVehicle = pVehicle->m_pNextLink;
+    }
+
+    pVehicle = this;
+    while ( pVehicle )
+    {
+        if ( pTrailer == pVehicle )
+            return true;
+
+        pVehicle = pVehicle->m_pPreviousLink;
+    }
+    return false;
+}
 
 CClientVehicle* CClientVehicle::GetChainEngine ()
 {
@@ -2524,11 +2562,11 @@ void CClientVehicle::Create ( void )
         // Add XRef
         g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pVehicle );
 
-        if ( DoesNeedToWaitForGroundToLoad() )
+        /*if ( DoesNeedToWaitForGroundToLoad() )
         {
             // waiting for ground to load
-            SetFrozenWaitingForGroundToLoad ( true );
-        }
+            SetFrozenWaitingForGroundToLoad ( true, false );
+        }*/
 
         // Jump straight to the target position if we have one
         if ( HasTargetPosition () )
@@ -2624,6 +2662,12 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
         m_pVehicle->SetGravity ( &m_vecGravity );
         m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
+
+        if ( IsNitroInstalled() )
+        {
+            m_pVehicle->SetNitroCount ( m_cNitroCount );
+            m_pVehicle->SetNitroLevel ( m_fNitroLevel );
+        }
 
         if ( m_eVehicleType == CLIENTVEHICLE_HELI )
         {
@@ -3018,6 +3062,13 @@ bool CClientVehicle::SetTowedVehicle ( CClientVehicle* pVehicle, const CVector* 
     {
         if ( m_pVehicle && m_pNextLink && m_pNextLink->GetGameVehicle () )
             m_pVehicle->DetachTrainCarriage ( m_pNextLink->GetGameVehicle () );
+
+
+        // Deattach our trailer
+        if ( m_pNextLink != NULL )
+        {
+            m_pNextLink->SetPreviousTrainCarriage ( NULL );
+        }
 
         SetNextTrainCarriage ( NULL );
     }
@@ -4262,7 +4313,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
     if ( !bNearObject )
     {
         // If not near any MTA objects, then don't bother waiting
-        SetFrozenWaitingForGroundToLoad ( false );
+        SetFrozenWaitingForGroundToLoad ( false, true );
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
             OutputDebugLine ( "[AsyncLoading]   FreezeUntilCollisionLoaded - Early stop" );
         #endif 
@@ -4321,7 +4372,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
         float fDist = GetDistanceFromGround ();
         float fUseDist = fDist * ( 1.f - m_fGroundCheckTolerance );
         if ( fUseDist > -0.2f && fUseDist < 1.5f )
-            SetFrozenWaitingForGroundToLoad ( false );
+            SetFrozenWaitingForGroundToLoad ( false, true );
 
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
             status += ( SString ( "  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist ) );
@@ -4329,7 +4380,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
 
         // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here) 
         if ( m_fGroundCheckTolerance > 0.03f /*&& !bMTAObjLimit*/ && !bASync )
-            SetFrozenWaitingForGroundToLoad ( false );
+            SetFrozenWaitingForGroundToLoad ( false, true );
     }
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
@@ -4636,3 +4687,41 @@ bool CClientVehicle::DoesNeedToWaitForGroundToLoad ( )
     
     return !pObjectManager->ObjectsAroundPointLoaded ( vecPosition, 50.0f, m_usDimension );
 }
+
+
+void CClientVehicle::SetNitroLevel ( float fNitroLevel )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetNitroLevel ( fNitroLevel );
+    }
+    m_fNitroLevel = fNitroLevel;
+}
+
+float CClientVehicle::GetNitroLevel ( )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetNitroLevel ( );
+    }
+    return m_fNitroLevel;
+}
+
+void CClientVehicle::SetNitroCount ( char cNitroCount )
+{
+    if ( m_pVehicle )
+    {
+        m_pVehicle->SetNitroCount ( cNitroCount );
+    }
+    m_cNitroCount = cNitroCount;
+}
+
+char CClientVehicle::GetNitroCount ( )
+{
+    if ( m_pVehicle )
+    {
+        return m_pVehicle->GetNitroCount ( );
+    }
+    return m_cNitroCount;
+}
+

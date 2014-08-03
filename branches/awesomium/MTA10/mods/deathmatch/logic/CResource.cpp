@@ -156,6 +156,13 @@ CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceTy
     // Create the resource file and add it to the list
     SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName, szFileName );
 
+    // Reject duplicates
+    if ( g_pClientGame->GetResourceManager()->IsResourceFile( strBuffer ) )
+    {
+        g_pClientGame->GetScriptDebugging()->LogError( NULL, "Ignoring duplicate file in resource '%s': '%s'", *m_strResourceName, szFileName );
+        return NULL;
+    }
+
     CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, strBuffer, serverChecksum, bAutoDownload );
     if ( pResourceFile )
     {
@@ -170,7 +177,14 @@ CDownloadableResource* CResource::AddConfigFile ( const char *szFileName, CCheck
 {
     // Create the config file and add it to the list
     SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName, szFileName );
-    
+
+    // Reject duplicates
+    if ( g_pClientGame->GetResourceManager()->IsResourceFile( strBuffer ) )
+    {
+        g_pClientGame->GetScriptDebugging()->LogError( NULL, "Ignoring duplicate file in resource '%s': '%s'", *m_strResourceName, szFileName );
+        return NULL;
+    }
+
     CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, strBuffer, serverChecksum );
     if ( pConfig )
     {
@@ -205,7 +219,7 @@ bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArgument
 //
 // Quick integrity check of png, dff and txd files
 //
-static bool CheckFileForCorruption( string strPath )
+static bool CheckFileForCorruption( const SString &strPath, SString &strAppendix )
 {
     const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
     bool bIsBad         = false;
@@ -262,7 +276,7 @@ static bool CheckFileForCorruption( string strPath )
                
             // Close the file
             fclose ( pFile );
-        }        
+        }
     }
 
     return bIsBad;
@@ -290,6 +304,15 @@ void CResource::Load ( CClientEntity *pRootEntity )
 
     CLogger::LogPrintf ( "> Starting resource '%s'", *m_strResourceName );
 
+    // Flag resource files as readable
+    for ( std::list < CResourceConfigItem* >::iterator iter = m_ConfigFiles.begin ( ); iter != m_ConfigFiles.end () ; ++iter )
+        (*iter)->SetDownloaded();
+
+    for ( std::list < CResourceFile* >::iterator iter = m_ResourceFiles.begin ( ); iter != m_ResourceFiles.end () ; ++iter )
+        if ( (*iter)->IsAutoDownload() )
+            (*iter)->SetDownloaded();
+
+    // Load config files
     list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
     for ( ; iterc != m_ConfigFiles.end (); ++iterc )
     {
@@ -298,6 +321,16 @@ void CResource::Load ( CClientEntity *pRootEntity )
             CLogger::LogPrintf ( "Failed to start resource item %s in %s\n", (*iterc)->GetName(), *m_strResourceName );
         }
     }
+
+    // Load the no cache scripts first
+    for ( std::list < SNoClientCacheScript >::iterator iter = m_NoClientCacheScriptList.begin() ; iter != m_NoClientCacheScriptList.end() ; ++iter )
+    {
+        DECLARE_PROFILER_SECTION( OnPreLoadNoClientCacheScript )
+        const SNoClientCacheScript& item = *iter;
+        GetVM()->LoadScriptFromBuffer ( item.buffer.GetData(), item.buffer.GetSize(), item.strFilename );
+        DECLARE_PROFILER_SECTION( OnPostLoadNoClientCacheScript )
+    }
+    m_NoClientCacheScriptList.clear();
 
     // Load the files that are queued in the list "to be loaded"
     list < CResourceFile* > ::iterator iter = m_ResourceFiles.begin ();
@@ -325,9 +358,26 @@ void CResource::Load ( CClientEntity *pRootEntity )
             DECLARE_PROFILER_SECTION( OnPostLoadScript )
         }
         else
-        if ( CheckFileForCorruption ( pResourceFile->GetName () ) )
         {
-            HandleDownloadedFileTrouble( pResourceFile, false );
+            // Load the file
+            std::vector < char > buffer;
+            FileLoad ( pResourceFile->GetName (), buffer );
+            unsigned int iSize = buffer.size();
+
+            // Check the contents
+            if ( iSize > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), iSize ) == pResourceFile->GetServerChecksum () )
+            {
+                SString strError = "";
+                bool bIsBad = CheckFileForCorruption ( pResourceFile->GetName ( ), strError );
+                if ( bIsBad )
+                {
+                    HandleDownloadedFileTrouble( pResourceFile, false, strError );
+                }
+            }
+            else
+            {
+                HandleDownloadedFileTrouble( pResourceFile, true, "" );
+            }
         }
     }
 
@@ -445,9 +495,12 @@ void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len, c
     if ( m_usRemainingNoClientCacheScripts > 0 )
     {
         --m_usRemainingNoClientCacheScripts;
-        DECLARE_PROFILER_SECTION( OnPreLoadNoClientCacheScript )
-        GetVM()->LoadScriptFromBuffer ( chunk, len, strFilename );
-        DECLARE_PROFILER_SECTION( OnPostLoadNoClientCacheScript )
+
+        // Store for later
+        m_NoClientCacheScriptList.push_back( SNoClientCacheScript() );
+        SNoClientCacheScript& item = m_NoClientCacheScriptList.back();
+        item.buffer = CBuffer( chunk, len );
+        item.strFilename = strFilename;
 
         if ( m_usRemainingNoClientCacheScripts == 0 && m_bLoadAfterReceivingNoClientCacheScripts )
         {
@@ -473,7 +526,7 @@ void CResource::AddToElementGroup ( CClientEntity* pElement )
 //
 // Handle when things go wrong 
 //
-void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile, bool bCRCMismatch )
+void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile, bool bCRCMismatch, const SString &strAppendix )
 {
     // Compose message
     SString strMessage;
@@ -486,7 +539,7 @@ void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile, bool 
     else
         strMessage += "Invalid file";
     SString strFilename = ExtractFilename( PathConform( pResourceFile->GetShortName() ) );
-    strMessage += SString( " (%s) %s", GetName(), *strFilename );
+    strMessage += SString( " (%s) %s %s", GetName(), *strFilename, *strAppendix );
 
     if ( !bCRCMismatch )
     {

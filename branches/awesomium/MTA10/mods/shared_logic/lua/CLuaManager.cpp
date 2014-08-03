@@ -41,6 +41,7 @@ CLuaManager::CLuaManager ( CClientGame* pClientGame )
     // Load the C functions
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
+    lua_registerUndumpHook ( CLuaMain::OnUndump );
 }
 
 
@@ -299,6 +300,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getLowLODElement", CLuaFunctionDefs::GetLowLodElement );
     CLuaCFunctions::AddFunction ( "isElementLowLOD", CLuaFunctionDefs::IsElementLowLod );
     CLuaCFunctions::AddFunction ( "isElementCallPropagationEnabled", CLuaFunctionDefs::IsElementCallPropagationEnabled );
+    CLuaCFunctions::AddFunction ( "isElementWaitingForGroundToLoad", CLuaFunctionDefs::IsElementWaitingForGroundToLoad );
 
     // Element set funcs
     CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );

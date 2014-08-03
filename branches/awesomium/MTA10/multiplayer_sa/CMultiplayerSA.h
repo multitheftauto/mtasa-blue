@@ -235,6 +235,11 @@ public:
     virtual void                SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected );
     virtual void                SetMirrorsEnabled           ( bool bEnabled );
 
+
+    void                        SetBoatWaterSplashEnabled   ( bool bEnabled );
+    void                        SetTyreSmokeEnabled         ( bool bEnabled );
+
+
     CVector                     m_vecAkimboTarget;
     bool                        m_bAkimboTargetUp;
     static char*                ms_PlayerImgCachePtr;

@@ -26,7 +26,6 @@
 
 #define MAX_RESOURCE_NAME_LENGTH    255
 #define MAX_FUNCTION_NAME_LENGTH    50
-#define INVALID_COMPILED_SCRIPT_CUTOFF_DATE     "2014-06-10"
 
 class CExportedFunction
 {
@@ -40,6 +39,13 @@ public:
 
     const char* GetFunctionName ( void ) { return m_strFunctionName; }
 };
+
+struct SNoClientCacheScript
+{
+    CBuffer buffer;
+    SString strFilename;
+};
+
 
 class CResource
 {  
@@ -102,7 +108,7 @@ public:
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
     bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
-    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch );
+    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch, const SString &strAppendix = "" );
 
 private:
     unsigned short          m_usNetID;
@@ -139,6 +145,7 @@ private:
     std::list < class CResourceConfigItem* >    m_ConfigFiles;
     std::list<CExportedFunction *>              m_exportedFunctions;
     CElementGroup *                             m_pDefaultElementGroup;     // stores elements created by scripts in this resource
+    std::list < SNoClientCacheScript >          m_NoClientCacheScriptList;
 };
 
 #endif

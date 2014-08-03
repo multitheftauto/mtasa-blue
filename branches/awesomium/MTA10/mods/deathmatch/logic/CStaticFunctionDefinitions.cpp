@@ -2895,12 +2895,17 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CClientVehicle& Vehicl
     // Are they both free to be attached?
     if ( !Vehicle.GetTowedVehicle () && !Trailer.GetTowedByVehicle () )
     {
-        CVector vecRotationDegrees;
-        Vehicle.GetRotationDegrees ( vecRotationDegrees );
-        vecRotationDegrees += vecRotationOffsetDegrees;
+        // trains don't set the "towed" or "towed by" variables so check them properly
+        if ( Vehicle.GetVehicleType ( ) != CLIENTVEHICLE_TRAIN || !Vehicle.IsTrainConnectedTo ( &Trailer ) )
+        {
 
-        // Attach them
-        return Vehicle.SetTowedVehicle ( &Trailer, &vecRotationDegrees );
+            CVector vecRotationDegrees;
+            Vehicle.GetRotationDegrees ( vecRotationDegrees );
+            vecRotationDegrees += vecRotationOffsetDegrees;
+
+            // Attach them
+            return Vehicle.SetTowedVehicle ( &Trailer, &vecRotationDegrees );
+        }
     }
 
     return false;
@@ -2926,6 +2931,11 @@ bool CStaticFunctionDefinitions::DetachTrailerFromVehicle ( CClientVehicle& Vehi
         if ( pTempCarriage && ( !pTrailer || pTempCarriage == pTrailer ) )
         {
             Vehicle.SetTowedVehicle ( NULL );
+
+            if ( pTrailer != NULL )
+            {
+                pTrailer->SetPreviousTrainCarriage ( NULL );
+            }
             return true;
         }
     }
@@ -3478,6 +3488,29 @@ bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( CClientEntit
             Entity.SetCallPropagationEnabled( bEnabled );
             return true;
         }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::IsElementFrozenWaitingForGroundToLoad ( CClientEntity& Entity, bool &bWaitingForGroundToLoad )
+{
+    switch ( Entity.GetType ( ) )
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+            {
+                CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+                bWaitingForGroundToLoad = Ped.IsFrozenWaitingForGroundToLoad ( );
+                return true;
+            }
+        case CCLIENTVEHICLE:
+            {
+                CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
+                bWaitingForGroundToLoad = Vehicle.IsFrozenWaitingForGroundToLoad ( );
+                return true;
+            }
+        default:
+            return false;
     }
     return false;
 }
@@ -6813,6 +6846,21 @@ bool CStaticFunctionDefinitions::GetWeaponProperty ( CClientWeapon * pWeapon, eW
     return false;
 }
 
+
+bool CStaticFunctionDefinitions::GetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, CVector& vecData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_FIRE_ROTATION )
+        {
+            vecData = pWeapon->GetFireRotationNoTarget();
+            ConvertRadiansToDegrees( vecData );
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float &fData )
 {
     if ( pWeapon )
@@ -6843,6 +6891,21 @@ bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eW
         if ( eProperty == WEAPON_DAMAGE )
         {
             pWeapon->GetWeaponStat ( )->SetDamagePerHit ( sData );
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetWeaponProperty ( CClientWeapon * pWeapon, eWeaponProperty eProperty, const CVector& vecData )
+{
+    if ( pWeapon )
+    {
+        if ( eProperty == WEAPON_FIRE_ROTATION )
+        {
+            CVector vecRotationRadians = vecData;
+            ConvertDegreesToRadians( vecRotationRadians );
+            pWeapon->SetFireRotationNoTarget( vecRotationRadians );
             return true;
         }
     }

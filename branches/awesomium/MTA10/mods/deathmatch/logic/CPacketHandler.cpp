@@ -3372,8 +3372,19 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             pEntry->SetSuspensionForceLevel ( handling.data.fSuspensionForceLevel );
                             pEntry->SetSuspensionDamping ( handling.data.fSuspensionDamping );
                             pEntry->SetSuspensionHighSpeedDamping ( handling.data.fSuspensionHighSpdDamping );
-                            pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
-                            pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
+
+
+                            // Ensure suspension isn't within a certain threshold and isn't too close to eachother
+                            if ( handling.data.fSuspensionLowerLimit >= -50 && handling.data.fSuspensionLowerLimit <= 50 && handling.data.fSuspensionLowerLimit < handling.data.fSuspensionUpperLimit - 0.01 &&
+                                 handling.data.fSuspensionUpperLimit >= -50 && handling.data.fSuspensionUpperLimit <= 50 && handling.data.fSuspensionUpperLimit > handling.data.fSuspensionLowerLimit + 0.01  )
+                            {
+                                if ( ( handling.data.fSuspensionUpperLimit >= 0.0001 || handling.data.fSuspensionUpperLimit <= -0.0001 )
+                                    && ( handling.data.fSuspensionLowerLimit >= 0.0001 || handling.data.fSuspensionLowerLimit <= -0.0001 ))
+                                {
+                                    pEntry->SetSuspensionUpperLimit ( handling.data.fSuspensionUpperLimit );
+                                    pEntry->SetSuspensionLowerLimit ( handling.data.fSuspensionLowerLimit );
+                                }
+                            }
                             pEntry->SetSuspensionFrontRearBias ( handling.data.fSuspensionFrontRearBias );
                             pEntry->SetSuspensionAntiDiveMultiplier ( handling.data.fSuspensionAntiDiveMultiplier );
                         }
@@ -4325,7 +4336,7 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
             if ( g_pClientGame->m_pNetAPI->GetInterpolation ( vecWarpPosition, usLatency ) )
             {
                 pMovedEntity->GetPosition ( vecRestorePosition );
-                pMovedEntity->SetPosition ( vecWarpPosition );
+                pMovedEntity->SetPosition ( vecWarpPosition, false, false );
             }
             else
                 pMovedEntity = NULL;
@@ -4396,7 +4407,7 @@ void CPacketHandler::Packet_ExplosionSync ( NetBitStreamInterface& bitStream )
     if ( pMovedEntity )
     {
         // Restore its position
-        pMovedEntity->SetPosition ( vecRestorePosition );
+        pMovedEntity->SetPosition ( vecRestorePosition, false, false );
     }
 }
 
@@ -4882,7 +4893,12 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
 
                                 // Delete the file that already exists
-                                unlink ( pDownloadableResource->GetName () );
+                                FileDelete ( pDownloadableResource->GetName () );
+                                if ( FileExists( pDownloadableResource->GetName () ) )
+                                {
+                                    SString strMessage( "Unable to delete old file %s", *ConformResourcePath( pDownloadableResource->GetName () ) );
+                                    g_pClientGame->TellServerSomethingImportant( 1009, strMessage, false );
+                                }
 
                                 // Queue the file to be downloaded
                                 bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, 10000, true );
@@ -5341,6 +5357,7 @@ SString CPacketHandler::EntityAddDebugRead( NetBitStreamInterface& bitStream )
                                     ,usNameLength
                                     ,*SStringX( szName ).Left( 40 )
                             );
+
         return strStatus;
     }
     return "Read error";

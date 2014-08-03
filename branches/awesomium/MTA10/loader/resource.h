@@ -30,6 +30,7 @@
 #define IDC_CHECK_FORCE_WINDOWED        1023
 #define IDC_STATIC_BODY1                1026
 #define IDC_NOAV_TEXT1                  1026
+#define IDC_SPLASHBITMAP                1026
 #define IDC_STATIC_BODY2                1027
 #define IDC_NOAV_TEXT2                  1027
 #define IDC_CRASH_HEAD                  1028

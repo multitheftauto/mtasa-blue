@@ -1420,6 +1420,9 @@ void CMultiplayerSA::InitHooks()
     // Disable setting the occupied's vehicles health to 75.0f when a burning ped enters it
     // in CFire::ProcessFire
     MemSet((void*)0x53A651, 0x90, 0xA);
+
+    // Prevent money change (+12$) when entering a taxi/cabbie (fix for #8332)
+    MemSet ( (void*)0x6D1741, 0x90, 0x6D175F-0x6D1741 );
     
     InitHooks_CrashFixHacks ();
 

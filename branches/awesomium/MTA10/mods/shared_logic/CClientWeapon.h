@@ -71,7 +71,7 @@ public:
 #ifdef SHOTGUN_TEST
     void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget, CVector & vecRotation, bool bRemote = false );
 #else
-    void                    FireInstantHit          ( CVector & vecOrigin, CVector & vecTarget, bool bServerFire = false, bool bRemote = false );
+    void                    FireInstantHit          ( CVector vecOrigin, CVector vecTarget, bool bServerFire = false, bool bRemote = false );
 #endif
     void                    FireShotgun             ( CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, CVector & vecRotation );
 
@@ -82,6 +82,8 @@ public:
     CWeaponStat *           GetWeaponStat           ( void )   { return m_pWeaponStat; }
     CClientPlayer *         GetOwner                ( void )                { return m_pOwner; }
     void                    SetOwner                ( CClientPlayer * pOwner )  { m_pOwner = pOwner; }
+    void                    SetFireRotationNoTarget ( const CVector& vecRotation )                  { m_vecFireRotationNoTarget = vecRotation; }
+    const CVector&          GetFireRotationNoTarget ( void )                                        { return m_vecFireRotationNoTarget; }
 
     bool                    SetFlags                ( eWeaponFlags flags, bool bData );
     bool                    SetFlags                ( const SLineOfSightFlags flags );
@@ -131,6 +133,7 @@ private:
     CElapsedTime            m_reloadTimer;
     unsigned char           m_ucCounter;
     int                     m_iWeaponFireRate;
+    CVector                 m_vecFireRotationNoTarget;      // Rotation adjustment when firing directly forward
 };
 
 #endif

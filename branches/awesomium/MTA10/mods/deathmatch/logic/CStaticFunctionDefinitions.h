@@ -109,6 +109,7 @@ public:
     static bool                         SetElementFrozen                    ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetLowLodElement                    ( CClientEntity& Entity, CClientEntity* pLowLodEntity );
     static bool                         SetElementCallPropagationEnabled    ( CClientEntity& Entity, bool bEnabled );
+    static bool                         IsElementFrozenWaitingForGroundToLoad ( CClientEntity& Entity, bool& bWaitingForGroundToLoad );
 
     // Radio funcs
     static bool                         SetRadioChannel                     ( unsigned char& ucChannel );
@@ -572,6 +573,8 @@ public:
     static bool                         GetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, short &sData );
     static bool                         GetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float &fData );
     static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, float fData );
+    static bool                         SetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, const CVector& vecData );
+    static bool                         GetWeaponProperty                   ( CClientWeapon * pWeapon, eWeaponProperty eProperty, CVector& vecData );
     static bool                         SetWeaponState                      ( CClientWeapon * pWeapon, eWeaponState weaponState );
     static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CClientEntity * pTarget, int boneTarget );
     static bool                         SetWeaponTarget                     ( CClientWeapon * pWeapon, CVector vecTarget );

@@ -20,6 +20,16 @@
 #include "lundump.h"
 #include "lzio.h"
 
+// MTA Specific
+lua_UndumpHook pUndumpHook = NULL;
+void lua_registerUndumpHook ( lua_UndumpHook f )
+{
+    pUndumpHook = f;
+}
+
+// precompiled chunk for MTA always uses 4 byte size_t
+#define SIZE_T_PRECOMPILED_CHUNK 4
+
 typedef struct {
  lua_State* L;
  ZIO* Z;
@@ -75,8 +85,12 @@ static lua_Number LoadNumber(LoadState* S)
 
 static TString* LoadString(LoadState* S)
 {
- size_t size;
- LoadVar(S,size);
+ size_t size = 0;
+ if ( sizeof(size_t) <= SIZE_T_PRECOMPILED_CHUNK )
+  LoadVar(S,size);
+ else
+  LoadMem(S,&size,1,SIZE_T_PRECOMPILED_CHUNK);
+
  if (size==0)
   return NULL;
  else
@@ -185,6 +199,8 @@ static void LoadHeader(LoadState* S)
  char h[LUAC_HEADERSIZE];
  char s[LUAC_HEADERSIZE];
  luaU_header(h);
+ if ( h[8] > SIZE_T_PRECOMPILED_CHUNK )
+    h[8] = SIZE_T_PRECOMPILED_CHUNK;
  LoadBlock(S,s,LUAC_HEADERSIZE);
  IF (memcmp(h,s,LUAC_HEADERSIZE)!=0, "bad header");
 }
@@ -195,6 +211,10 @@ static void LoadHeader(LoadState* S)
 Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
 {
  LoadState S;
+
+    // MTA Specific
+    int bUnexpected = pUndumpHook && !pUndumpHook( Z->p, Z->n );
+
  if (*name=='@' || *name=='=')
   S.name=name+1;
  else if (*name==LUA_SIGNATURE[0])
@@ -205,6 +225,11 @@ Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
  S.Z=Z;
  S.b=buff;
  LoadHeader(&S);
+
+    // MTA Specific
+    if ( bUnexpected )
+        error(&S,"unexpected");
+
  return LoadFunction(&S,luaS_newliteral(L,"=?"));
 }
 

@@ -199,3 +199,76 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     }
     return false;
 }
+
+// When a resource file is created
+void CResourceManager::OnAddResourceFile( CDownloadableResource* pResourceFile )
+{
+    SString strFilename = PathConform( pResourceFile->GetName() ).ToLower();
+    dassert( !MapContains( m_ResourceFileMap, strFilename ) );
+    MapSet( m_ResourceFileMap, strFilename, pResourceFile );
+}
+
+// When a resource file is delected
+void CResourceManager::OnRemoveResourceFile( CDownloadableResource* pResourceFile )
+{
+    SString strFilename = PathConform( pResourceFile->GetName() ).ToLower();
+    dassert( MapFindRef( m_ResourceFileMap, strFilename ) == pResourceFile );
+    MapRemove( m_ResourceFileMap, strFilename );
+}
+
+// Update downloaded flag for this file
+void CResourceManager::OnDownloadedResourceFile( const SString& strInFilename )
+{
+    SString strFilename = PathConform( strInFilename ).ToLower();
+    CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
+    if ( pResourceFile )
+        pResourceFile->SetDownloaded();
+}
+
+// Check given file name is a resource file
+bool CResourceManager::IsResourceFile( const SString& strInFilename )
+{
+    SString strFilename = PathConform( strInFilename ).ToLower();
+    return MapContains( m_ResourceFileMap, strFilename );
+}
+
+// Check resource file data matches server checksum
+void CResourceManager::ValidateResourceFile( const SString& strInFilename, const CBuffer& fileData )
+{
+    SString strFilename = PathConform( strInFilename ).ToLower();
+    CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
+    if ( pResourceFile )
+    {
+        if ( pResourceFile->IsAutoDownload() && !pResourceFile->IsDownloaded() )
+        {
+            // Scripting error
+            g_pClientGame->GetScriptDebugging()->LogError( NULL, "Attempt to load '%s' before onClientFileDownloadComplete event", *ConformResourcePath( strInFilename ) );
+        }
+        else
+        {
+            CChecksum checksum = CChecksum::GenerateChecksumFromBuffer( fileData.GetData(), fileData.GetSize() );
+            if ( checksum != pResourceFile->GetServerChecksum() )
+            {
+                if ( pResourceFile->IsDownloaded() )
+                {
+                    char szMd5[33];
+                    CMD5Hasher::ConvertToHex( checksum.md5, szMd5 );
+                    SString strMessage( "Resource file checksum failed: %s [Size:%d MD5:%s] %08x ", *ConformResourcePath( strInFilename ), fileData.GetSize(), szMd5, fileData.GetData() );
+                    g_pClientGame->TellServerSomethingImportant( 1007, strMessage, false );
+                    g_pCore->GetConsole ()->Print( strMessage );
+                    AddReportLog( 7057, strMessage + g_pNet->GetConnectedServer( true ), 10 );
+                }
+                else
+                if ( !pResourceFile->IsAutoDownload() )
+                {
+                    char szMd5[33];
+                    CMD5Hasher::ConvertToHex( checksum.md5, szMd5 );
+                    SString strMessage( "Attempt to load resource file before it is ready: %s [Size:%d MD5:%s] %08x ", *ConformResourcePath( strInFilename ), fileData.GetSize(), szMd5, fileData.GetData() );
+                    g_pClientGame->TellServerSomethingImportant( 1008, strMessage, false );
+                    g_pCore->GetConsole ()->Print( strMessage );
+                    AddReportLog( 7058, strMessage + g_pNet->GetConnectedServer( true ), 10 );
+                }
+            }
+        }
+    }
+}

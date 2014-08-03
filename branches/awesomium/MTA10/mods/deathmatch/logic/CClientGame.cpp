@@ -5058,12 +5058,12 @@ bool CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed, bool bStopIfUsingBulle
                     if ( pVehicle )
                     {
                         pVehicle->GetPosition ( vecWeaponFirePosition );
-                        pVehicle->SetPosition ( vecPosition );
+                        pVehicle->SetPosition ( vecPosition, false, false );
                     }
                     else
                     {
                         pLocalPlayer->GetPosition ( vecWeaponFirePosition );
-                        pLocalPlayer->SetPosition ( vecPosition );
+                        pLocalPlayer->SetPosition ( vecPosition, false, false );
                     }
                 }
             }
@@ -5092,11 +5092,11 @@ void CClientGame::PostWeaponFire ( void )
                         CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle ();
                         if ( !pVehicle )
                         {
-                            pLocalPlayer->SetPosition ( vecWeaponFirePosition );
+                            pLocalPlayer->SetPosition ( vecWeaponFirePosition, false, false );
                         }
                         else if ( pLocalPlayer->GetOccupiedVehicleSeat() == 0 )
                         {
-                            pVehicle->SetPosition ( vecWeaponFirePosition );
+                            pVehicle->SetPosition ( vecWeaponFirePosition, false, false );
                         }
                     }
                 }
@@ -6483,29 +6483,13 @@ void CClientGame::OutputServerInfo( void )
 //////////////////////////////////////////////////////////////////
 void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId )
 {
-    // Force message only once if will be spamming chat
-    if ( g_pNet->GetServerBitStreamVersion() < 0x48 )
-        bOnlyOnceForThisId = true;
-
     if ( bOnlyOnceForThisId && MapContains( m_SentMessageIds, uiId ) )
         return;
     MapInsert( m_SentMessageIds, uiId );
 
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-
-    if ( pBitStream->Version() >= 0x48 )
-    {
-        pBitStream->WriteString( SString( "%d,%s", uiId, *strMessage ) );
-        g_pNet->SendPacket( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE );
-    }
-    else
-    {
-        // Spam chat for older servers
-        SString strTemp( "say %s", *strMessage );
-        pBitStream->Write( strTemp.c_str(), strTemp.length() );
-        g_pNet->SendPacket( PACKET_ID_COMMAND, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE );
-    }
-
+    pBitStream->WriteString( SString( "%d,%s", uiId, *strMessage ) );
+    g_pNet->SendPacket( PACKET_ID_PLAYER_DIAGNOSTIC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE );
     g_pNet->DeallocateNetBitStream( pBitStream );
 }
 

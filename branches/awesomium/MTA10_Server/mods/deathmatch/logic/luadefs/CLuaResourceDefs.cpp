@@ -1235,24 +1235,14 @@ int CLuaResourceDefs::LoadString( lua_State* luaVM )
         uint uiSize;
         if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/loadstring" ) )
         {
-            // Problems problems
-            if ( GetTimeString( true ) <= INVALID_COMPILED_SCRIPT_CUTOFF_DATE )
-            {
-                SString strMessage( "loadstring argument 1 is invalid and will not work after %s. Please re-compile at http://luac.mtasa.com/", INVALID_COMPILED_SCRIPT_CUTOFF_DATE ); 
-                m_pScriptDebugging->LogCustom( luaVM, strMessage );
-                // cpBuffer is always valid after call to DecryptScript
-            }
-            else
-            {
-                SString strMessage( "argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
-                argStream.SetCustomError( strMessage );
-                cpBuffer = NULL;
-            }
+            SString strMessage( "argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
+            argStream.SetCustomError( strMessage );
+            cpBuffer = NULL;
         }
 
         if ( !argStream.HasErrors() )
         {
-            if ( !luaL_loadbuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
+            if ( !CLuaMain::LuaLoadBuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
             {
                 // Ok
                 if ( g_pGame->GetConfig()->GetLoadstringLogEnabled() )
@@ -1317,24 +1307,14 @@ int CLuaResourceDefs::Load( lua_State* luaVM )
         uint uiSize;
         if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/load" ) )
         {
-            // Problems problems
-            if ( GetTimeString( true ) <= INVALID_COMPILED_SCRIPT_CUTOFF_DATE )
-            {
-                SString strMessage( "load argument 2 is invalid and will not work after %s. Please re-compile at http://luac.mtasa.com/", INVALID_COMPILED_SCRIPT_CUTOFF_DATE ); 
-                m_pScriptDebugging->LogCustom( luaVM, strMessage );
-                // cpBuffer is always valid after call to DecryptScript
-            }
-            else
-            {
-                SString strMessage( "argument 2 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
-                argStream.SetCustomError( strMessage );
-                cpBuffer = NULL;
-            }
+            SString strMessage( "argument 2 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
+            argStream.SetCustomError( strMessage );
+            cpBuffer = NULL;
         }
 
         if ( !argStream.HasErrors() )
         {
-            if ( !luaL_loadbuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
+            if ( !CLuaMain::LuaLoadBuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
             {
                 // Ok
                 if ( g_pGame->GetConfig()->GetLoadstringLogEnabled() )

@@ -47,6 +47,9 @@ CSettingsSA::CSettingsSA ( void )
     m_iDesktopWidth = 0;
     m_iDesktopHeight = 0;
     MemPut < BYTE > ( 0x6FF420, 0xC3 );     // Truncate CalculateAspectRatio
+
+    // Set "radar map and radar" as default radar mode
+    SetRadarMode ( RADAR_MODE_ALL );
 }
 
 bool CSettingsSA::IsWideScreenEnabled ( void )
@@ -458,6 +461,21 @@ void CSettingsSA::SetGrassEnabled ( bool bEnable )
     MemPut < BYTE > ( 0x05DBAED, bEnable ? 0x85 : 0x33 );
 }
 
+
+////////////////////////////////////////////////
+//
+// HUD mode (radar map + blips, blips only, nothing)
+//
+////////////////////////////////////////////////
+eRadarMode CSettingsSA::GetRadarMode ( void )
+{
+    return *(eRadarMode*)VAR_RadarMode;
+}
+
+void CSettingsSA::SetRadarMode ( eRadarMode hudMode )
+{
+    MemPutFast < DWORD > ( VAR_RadarMode, hudMode );
+}
 
 ////////////////////////////////////////////////
 //

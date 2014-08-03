@@ -150,8 +150,8 @@ public:
     virtual CSphere             GetWorldBoundingSphere      ( void );
 
     void                        GetPosition                 ( CVector& vecPosition ) const;
-    void                        SetPosition                 ( const CVector& vecPosition )              { SetPosition ( vecPosition, true ); }
-    void                        SetPosition                 ( const CVector& vecPosition, bool bResetInterpolation );
+    void                        SetPosition                 ( const CVector& vecPosition )              { SetPosition ( vecPosition, true, true ); }
+    void                        SetPosition                 ( const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze = true );
 
     void                        SetInterior                 ( unsigned char ucInterior );
 

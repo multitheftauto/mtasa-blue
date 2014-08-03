@@ -41,7 +41,6 @@
 #define MAX_RESOURCE_NAME_LENGTH    255
 #define MAX_FUNCTION_NAME_LENGTH    50
 #define MAX_RESOURCE_VERSION_LENGTH 100
-#define INVALID_COMPILED_SCRIPT_CUTOFF_DATE     "2014-06-10"
 
 struct SVersion
 {
@@ -378,6 +377,7 @@ public:
     bool                IsOOPEnabledInMetaXml           ( void )                                { return m_bOOPEnabledInMetaXml; }
     bool                CheckFunctionRightCache         ( lua_CFunction f, bool* pbOutAllowed );
     void                UpdateFunctionRightCache        ( lua_CFunction f, bool bAllowed );
+    bool                IsFilenameUsed                  ( const SString& strFilename, bool bClient );
 
 protected:
     SString             GetAutoGroupName                ( void );

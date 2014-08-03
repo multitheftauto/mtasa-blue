@@ -2,7 +2,7 @@
 #
 #  PROJECT:     Multi Theft Auto v1.0
 #  LICENSE:     See LICENSE in the top level directory
-#  FILE:        utils/build_gettext_catalog.py
+#  FILE:        utils/build_locale_nsi.py
 #  PURPOSE:     Build a multi-language .NSI script based upon input PO files
 #  DEVELOPERS:  Dan Chowdhury <>
 #

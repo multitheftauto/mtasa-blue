@@ -220,7 +220,12 @@ void CWebView::OnFailLoadingFrame ( Awesomium::WebView* pCaller, int64 frame_id,
     m_pEventsInterface->Events_OnLoadingFailed ( strURL, error_code, CWebCore::ToSString ( error_desc ) );
 }
 
-
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: Awesomium::WebViewListener::View:OnChangeCursor //
+// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_view.html#a47bcb396275c917b17358e1ddd0ef771 //
+//                                                                //
+////////////////////////////////////////////////////////////////////
 void CWebView::OnChangeCursor ( Awesomium::WebView* pCaller, Awesomium::Cursor cursor )
 {
     m_pEventsInterface->Events_OnChangeCursor ( static_cast < unsigned char > ( cursor ) );

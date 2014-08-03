@@ -81,6 +81,13 @@ enum eAspectRatio
     ASPECT_RATIO_16_9,
 };
 
+enum eRadarMode
+{
+    RADAR_MODE_ALL = 0,
+    RADAR_MODE_BLIPS_ONLY,
+    RADAR_MODE_NO_HUD
+};
+
 class CGameSettings
 {
 public:
@@ -136,6 +143,9 @@ public:
 
     virtual bool            IsGrassEnabled          ( void ) = 0;
     virtual void            SetGrassEnabled         ( bool bEnable ) = 0;
+
+    virtual eRadarMode      GetRadarMode            ( void ) = 0;
+    virtual void            SetRadarMode            ( eRadarMode hudMode ) = 0;
 
     virtual void            Save                    ( void ) = 0;
 };

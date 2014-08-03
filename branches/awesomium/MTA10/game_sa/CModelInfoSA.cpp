@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "gamesa_renderware.h"
 
 extern CGameSA * pGame;
 
@@ -1213,10 +1214,61 @@ skip:
 }
 
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Hook for NodeNameStreamRead
+//
+// Ignore extra characters in dff frame name
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_NodeNameStreamRead( RwStream* stream, char* pDest, uint uiSize )
+{
+    // Calc sizes
+    const uint uiMaxBufferSize = 24;
+    uint uiAmountToRead = Min( uiMaxBufferSize - 1, uiSize );
+    uint uiAmountToSkip = uiSize - uiAmountToRead;
+
+    // Read good bit
+    RwStreamRead( stream, pDest, uiAmountToRead );
+    pDest[ uiAmountToRead ] = 0;
+
+    // Skip bad bit (this might not be required)
+    if ( uiAmountToSkip > 0 )
+        RwStreamSkip( stream, uiAmountToSkip );
+}
+
+// Hook info
+#define HOOKPOS_NodeNameStreamRead                         0x072FA68
+#define HOOKSIZE_NodeNameStreamRead                        15
+DWORD RETURN_NodeNameStreamRead =                          0x072FA77;
+void _declspec(naked) HOOK_NodeNameStreamRead ()
+{
+    _asm
+    {
+        pushad
+        push    edi
+        push    esi
+        push    ebx
+        call    OnMY_NodeNameStreamRead
+        add     esp, 4*3
+        popad
+
+        jmp     RETURN_NodeNameStreamRead
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Setup hooks
+//
+//////////////////////////////////////////////////////////////////////////////////////////
 void CModelInfoSA::StaticSetHooks ( void )
 {
     HookInstall( HOOKPOS_CFileLoader_LoadCollisionFile_Mid, (DWORD)HOOK_CFileLoader_LoadCollisionFile_Mid, HOOKSIZE_CFileLoader_LoadCollisionFile_Mid );
+    EZHookInstall( NodeNameStreamRead );
 }
+
 
 // Recursive RwFrame children searching function
 void CModelInfoSA::RwSetSupportedUpgrades ( RwFrame * parent, DWORD dwModel ) 

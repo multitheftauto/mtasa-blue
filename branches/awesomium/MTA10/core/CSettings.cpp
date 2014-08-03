@@ -413,6 +413,30 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxCustomizedSAFiles->GetPosition ( vecTemp, false );
     m_pCheckBoxCustomizedSAFiles->AutoSize ( NULL, 20.0f );
 
+    m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, _("Map rendering options") ) );
+    m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
+    m_pMapRenderingLabel->GetPosition ( vecTemp, false );
+    m_pMapRenderingLabel->SetFont ( "default-bold-small" );
+    m_pMapRenderingLabel->AutoSize ( );
+
+    m_pMapAlphaLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, _("Opacity:") ) );
+    m_pMapAlphaLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pMapAlphaLabel->GetPosition ( vecTemp, false );
+    m_pMapAlphaLabel->AutoSize ( );
+
+    m_pMapAlpha = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabMultiplayer ) );
+    m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
+    m_pMapAlpha->GetPosition ( vecTemp, false );
+    m_pMapAlpha->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pMapAlpha->GetSize ( vecSize );
+    m_pMapAlpha->SetProperty ( "StepSize", "0.01" );
+
+    m_pMapAlphaValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, "0%") );
+    m_pMapAlphaValueLabel->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pMapAlphaValueLabel->GetPosition ( vecTemp, false );
+    m_pMapAlphaValueLabel->AutoSize ( "100% " );
+
+
     /**
      *  Audio tab
      **/
@@ -743,75 +767,71 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxHeatHaze->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 70.0f ) );
     m_pCheckBoxHeatHaze->AutoSize ( NULL, 20.0f );
 
+    m_pCheckBoxTyreSmokeParticles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Tyre Smoke etc"), true ) );
+    m_pCheckBoxTyreSmokeParticles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 90.0f ) );
+    m_pCheckBoxTyreSmokeParticles->AutoSize ( NULL, 20.0f );
+
     float fPosY =  vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Full Screen Minimize"), true ) );
     m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 30.0f ) );
     m_pCheckBoxMinimize->AutoSize ( NULL, 20.0f );
+
+#ifndef SHOWALLSETTINGS
     if ( !GetVideoModeManager ()->IsMultiMonitor () )
     {
         m_pCheckBoxMinimize->SetVisible ( false );
         fPosY -= 20.0f;
     }
+#endif
 
     m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Disable Aero Desktop"), true ) );
     m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 50.0f ) );
     m_pCheckBoxDisableAero->AutoSize ( NULL, 20.0f );
+
+#ifndef SHOWALLSETTINGS
     if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
     {
         m_pCheckBoxDisableAero->SetVisible ( false );
         fPosY -= 20.0f;
     }
+#endif
 
     m_pCheckBoxDisableDriverOverrides = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Disable Driver Overrides"), true ) );
     m_pCheckBoxDisableDriverOverrides->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 70.0f ) );
     m_pCheckBoxDisableDriverOverrides->AutoSize ( NULL, 20.0f );
+
+#ifndef SHOWALLSETTINGS
     if ( GetApplicationSettingInt ( "nvhacks", "optimus" ) )
     {
         m_pCheckBoxDisableDriverOverrides->SetVisible ( false );
         fPosY -= 20.0f;
     }
+#endif
 
     m_pCheckBoxDeviceSelectionDialog = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Enable Device Selection Dialog"), true ) );
     m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 90.0f ) );
     m_pCheckBoxDeviceSelectionDialog->AutoSize ( NULL, 20.0f );
+
+#ifndef SHOWALLSETTINGS
     if ( !GetVideoModeManager ()->IsMultiMonitor () )
     {
         m_pCheckBoxDeviceSelectionDialog->SetVisible ( false );
         fPosY -= 20.0f;
     }
+#endif
 
     m_pCheckBoxShowUnsafeResolutions = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Show unsafe resolutions"), true ) );
     m_pCheckBoxShowUnsafeResolutions->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 110.0f ) );
     m_pCheckBoxShowUnsafeResolutions->AutoSize ( NULL, 20.0f );
+
+#ifndef SHOWALLSETTINGS
     if ( !CCore::GetSingleton ().GetGame ()->GetSettings ()->HasUnsafeResolutions () )
     {
         m_pCheckBoxShowUnsafeResolutions->SetVisible ( false );
         fPosY -= 20.0f;
     }
-
+#endif
     vecTemp.fY += 10;
-    m_pMapRenderingLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Map rendering options") ) );
-    m_pMapRenderingLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 104.0f ) );
-    m_pMapRenderingLabel->GetPosition ( vecTemp, false );
-    m_pMapRenderingLabel->SetFont ( "default-bold-small" );
-    m_pMapRenderingLabel->AutoSize ( );
-
-    m_pMapAlphaLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Opacity:") ) );
-    m_pMapAlphaLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
-    m_pMapAlphaLabel->GetPosition ( vecTemp, false );
-    m_pMapAlphaLabel->AutoSize ( );
-
-    m_pMapAlpha = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
-    m_pMapAlpha->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
-    m_pMapAlpha->GetPosition ( vecTemp, false );
-    m_pMapAlpha->SetSize ( CVector2D ( 160.0f, 20.0f ) );
-    m_pMapAlpha->GetSize ( vecSize );
-    m_pMapAlpha->SetProperty ( "StepSize", "0.01" );
-
-    m_pMapAlphaValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "0%") );
-    m_pMapAlphaValueLabel->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
-    m_pMapAlphaValueLabel->GetPosition ( vecTemp, false );
-    m_pMapAlphaValueLabel->AutoSize ( "100% " );
 
     m_pTabs->GetSize ( vecTemp );
 
@@ -847,7 +867,7 @@ void CSettings::CreateGUI ( void )
 
     m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface, "English" ) );
     m_pInterfaceLanguageSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 33.0f ) );
-    m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 400.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
+    m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 350.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
     m_pInterfaceLanguageSelector->SetReadOnly ( true );
 
     // Grab languages and populate
@@ -868,7 +888,7 @@ void CSettings::CreateGUI ( void )
 
     m_pInterfaceSkinSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
     m_pInterfaceSkinSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 63.0f ) );
-    m_pInterfaceSkinSelector->SetSize ( CVector2D ( 400.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
+    m_pInterfaceSkinSelector->SetSize ( CVector2D ( 350.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
     m_pInterfaceSkinSelector->SetReadOnly ( true );
 
     {
@@ -889,11 +909,11 @@ void CSettings::CreateGUI ( void )
 
     m_pChatPresets = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
     m_pChatPresets->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 110.0f ) );
-    m_pChatPresets->SetSize ( CVector2D ( 400.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
+    m_pChatPresets->SetSize ( CVector2D ( 350.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
     m_pChatPresets->SetReadOnly ( true );
 
     m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabInterface, _("Load") ) );
-    m_pChatLoadPreset->SetPosition ( CVector2D ( 410.0f, 110.0f ) );
+    m_pChatLoadPreset->SetPosition ( CVector2D ( 360.0f, 110.0f ) );
     m_pChatLoadPreset->SetSize ( CVector2D ( 100.0f, 24.0f ) );
     m_pChatLoadPreset->SetZOrderingEnabled ( false );
 
@@ -1157,7 +1177,7 @@ void CSettings::CreateGUI ( void )
 
     m_pFastClothesCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pFastClothesCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pFastClothesCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pFastClothesCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pFastClothesCombo->AddItem ( _("Off") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_OFF );
     m_pFastClothesCombo->AddItem ( _("On") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_ON );
     m_pFastClothesCombo->AddItem ( _("Auto") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
@@ -1171,7 +1191,7 @@ void CSettings::CreateGUI ( void )
 
     m_pBrowserSpeedCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pBrowserSpeedCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pBrowserSpeedCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pBrowserSpeedCombo->AddItem ( _("Very slow") )->SetData ( (void*)0 );
     m_pBrowserSpeedCombo->AddItem ( _("Slow") )->SetData ( (void*)1 );
     m_pBrowserSpeedCombo->AddItem ( _("Fast") )->SetData ( (void*)2 );
@@ -1185,7 +1205,7 @@ void CSettings::CreateGUI ( void )
 
     m_pSingleDownloadCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pSingleDownloadCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pSingleDownloadCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pSingleDownloadCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pSingleDownloadCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pSingleDownloadCombo->SetReadOnly ( true );
@@ -1198,7 +1218,7 @@ void CSettings::CreateGUI ( void )
 
     m_pFullscreenStyleCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pFullscreenStyleCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pFullscreenStyleCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pFullscreenStyleCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pFullscreenStyleCombo->AddItem ( _("Standard") )->SetData ( (void*)FULLSCREEN_STANDARD );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless window") )->SetData ( (void*)FULLSCREEN_BORDERLESS );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless keep res") )->SetData ( (void*)FULLSCREEN_BORDERLESS_KEEP_RES );
@@ -1212,7 +1232,7 @@ void CSettings::CreateGUI ( void )
 
     m_pPriorityCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pPriorityCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pPriorityCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pPriorityCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pPriorityCombo->AddItem ( "Normal" )->SetData ( (void*)0 );
     m_pPriorityCombo->AddItem ( "Above normal" )->SetData ( (void*)1 );
     m_pPriorityCombo->AddItem ( "High" )->SetData ( (void*)2 );
@@ -1226,7 +1246,7 @@ void CSettings::CreateGUI ( void )
 
     m_pDebugSettingCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pDebugSettingCombo->SetSize ( CVector2D ( 148.0f, 20.0f * ( EDiagnosticDebug::MAX + 1 ) ) );
+    m_pDebugSettingCombo->SetSize ( CVector2D ( 190.0f, 20.0f * ( EDiagnosticDebug::MAX + 1 ) ) );
     m_pDebugSettingCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pDebugSettingCombo->AddItem ( "#6734 Graphics" )->SetData ( (void*)EDiagnosticDebug::GRAPHICS_6734 );
     //m_pDebugSettingCombo->AddItem ( "#6778 BIDI" )->SetData ( (void*)EDiagnosticDebug::BIDI_6778 );
@@ -1306,7 +1326,7 @@ void CSettings::CreateGUI ( void )
 
     m_pUpdateBuildTypeCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pUpdateBuildTypeCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( 148.0f, 95.0f ) );
+    m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
     m_pUpdateBuildTypeCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pUpdateBuildTypeCombo->AddItem ( "Beta" )->SetData ( (void*)1 );
     m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
@@ -1621,6 +1641,11 @@ void CSettings::UpdateVideoTab ( void )
     CVARS_GET ( "heat_haze", bHeatHazeEnabled );
     m_pCheckBoxHeatHaze->SetSelected ( bHeatHazeEnabled );
 
+    // Tyre smoke
+    bool bTyreSmokeEnabled;
+    CVARS_GET ( "tyre_smoke_enabled", bTyreSmokeEnabled );
+    m_pCheckBoxTyreSmokeParticles->SetSelected ( bTyreSmokeEnabled );
+
     PopulateResolutionComboBox();
     
     // Fullscreen style
@@ -1831,6 +1856,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     CVARS_SET ("volumetric_shadows", false );
     CVARS_SET ( "grass", true );
     CVARS_SET ( "heat_haze", true );
+    CVARS_SET ( "tyre_smoke_enabled", true );
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false, FULLSCREEN_STANDARD );
@@ -2918,12 +2944,17 @@ void CSettings::SaveData ( void )
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected ();
     CVARS_SET ( "grass", bGrassEnabled );
-	gameSettings->SetGrassEnabled ( bGrassEnabled );
+    gameSettings->SetGrassEnabled ( bGrassEnabled );
 
     // Heat haze
     bool bHeatHazeEnabled = m_pCheckBoxHeatHaze->GetSelected ();
     CVARS_SET ( "heat_haze", bHeatHazeEnabled );
-	g_pCore->GetMultiplayer ()->SetHeatHazeEnabled ( bHeatHazeEnabled );
+    g_pCore->GetMultiplayer ()->SetHeatHazeEnabled ( bHeatHazeEnabled );
+
+    // Tyre smoke particles
+    bool bTyreSmokeEnabled = m_pCheckBoxTyreSmokeParticles->GetSelected ();
+    CVARS_SET ( "tyre_smoke_enabled", bTyreSmokeEnabled );
+    g_pCore->GetMultiplayer ()->SetTyreSmokeEnabled ( bTyreSmokeEnabled );
 
     // Fast clothes loading
     if ( CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem () )

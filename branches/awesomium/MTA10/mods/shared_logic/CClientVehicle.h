@@ -133,7 +133,7 @@ public:
 
     void                        GetPosition             ( CVector& vecPosition ) const;
     void                        SetPosition             ( const CVector& vecPosition )      { SetPosition ( vecPosition, true ); }
-    void                        SetPosition             ( const CVector& vecPosition, bool bResetInterpolation );
+    void                        SetPosition             ( const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze = true );
 
     void                        UpdatePedPositions      ( const CVector& vecPosition );
 
@@ -291,7 +291,7 @@ public:
     void                        SetFrozen               ( bool bFrozen );
     void                        SetScriptFrozen         ( bool bFrozen )                    { m_bScriptFrozen = bFrozen; };
     bool                        IsFrozenWaitingForGroundToLoad      ( void ) const;
-    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen );
+    void                        SetFrozenWaitingForGroundToLoad     ( bool bFrozen, bool bDisableAsyncLoading );
 
     CClientVehicle*             GetPreviousTrainCarriage( void );
     CClientVehicle*             GetNextTrainCarriage    ( void );
@@ -300,6 +300,7 @@ public:
     inline bool                 IsChainEngine           ( void )                            { return m_bChainEngine; };
     void                        SetIsChainEngine        ( bool bChainEngine = true, bool bTemporary = false );
     CClientVehicle*             GetChainEngine          ( void );
+    bool                        IsTrainConnectedTo      ( CClientVehicle * pTrailer );
 
     bool                        IsDerailed              ( void );
     void                        SetDerailed             ( bool bDerailed );
@@ -351,10 +352,10 @@ public:
     float                       GetDirtLevel            ( void );
     void                        SetDirtLevel            ( float fDirtLevel );
 	
-    inline char                 GetNitroCount           ( void )                            { return m_pVehicle->GetNitroCount (); }
-    inline float                GetNitroLevel           ( void )                            { return m_pVehicle->GetNitroLevel (); }
-    inline void                 SetNitroCount           ( char cCount )                     { m_pVehicle->SetNitroCount ( cCount ); }
-    inline void                 SetNitroLevel           ( float fLevel )                    { m_pVehicle->SetNitroLevel ( fLevel ); }
+    char                        GetNitroCount           ( void );
+    float                       GetNitroLevel           ( void );
+    void                        SetNitroCount           ( char cCount );
+    void                        SetNitroLevel           ( float fLevel );
 
     bool                        IsNitroInstalled        ( void );
 
@@ -572,6 +573,8 @@ protected:
     float                       m_fHeliRotorSpeed;
     const CHandlingEntry*       m_pOriginalHandlingEntry;
     CHandlingEntry*             m_pHandlingEntry;
+    float                       m_fNitroLevel;
+    char                        m_cNitroCount;
 
     bool                        m_bChainEngine;
     bool                        m_bIsDerailed;
@@ -645,6 +648,7 @@ public:
     SLastSyncedVehData*         m_LastSyncedData;
     SSirenInfo                  m_tSirenBeaconInfo;
     std::map<SString, SVehicleComponentData>  m_ComponentData;
+    bool                        m_bAsyncLoadingDisabled;
 
 };
 

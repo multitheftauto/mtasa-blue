@@ -6061,19 +6061,25 @@ bool CStaticFunctionDefinitions::SetEntryHandling ( CHandlingEntry* pEntry, eHan
             }
             case HANDLING_SUSPENSION_UPPER_LIMIT:
             {
-                if ( fValue >= -50.0 && fValue <= 50 )
+                if ( fValue >= -50 && fValue <= 50 && fValue > pEntry->GetSuspensionLowerLimit ( ) + 0.01  )
                 {
-                    pEntry->SetSuspensionUpperLimit ( fValue );
-                    return true;
-                }
+                    if ( fValue >= 0.0001 || fValue <= -0.0001 )
+                    {
+                         pEntry->SetSuspensionUpperLimit ( fValue );
+                         return true;
+                     }
+                 }
                 break;
             }
             case HANDLING_SUSPENSION_LOWER_LIMIT:
             {
-                if ( fValue >= -50.0 && fValue <= 50 )
+                if ( fValue >= -50 && fValue <= 50 && fValue < pEntry->GetSuspensionUpperLimit ( ) - 0.01  )
                 {
-                    pEntry->SetSuspensionLowerLimit ( fValue );
-                    return true;
+                    if ( fValue >= 0.0001 || fValue <= -0.0001 )
+                    {
+                        pEntry->SetSuspensionLowerLimit ( fValue );
+                        return true;
+                    }
                 }
                 break;
             }
@@ -6917,6 +6923,19 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle ( CVehicle* pVehicle, CV
                 pVehicle->SetTowedVehicle ( NULL );
                 pTrailer->SetTowedByVehicle ( NULL );
                 return false;
+            }
+
+            if ( pTrailer->GetVehicleType() == VEHICLE_TRAIN )
+            {
+                // Set the position near the chain engine (doesn't influence visual appearance, but will allow entering)
+                pTrailer->SetPosition ( pVehicle->GetPosition () );
+
+                // Find a syncer to get a more correct position
+                CPlayer* pPlayer = g_pGame->GetUnoccupiedVehicleSync ()->FindPlayerCloseToVehicle ( pTrailer, 250.0f );
+                if ( pPlayer )
+                {
+                    g_pGame->GetUnoccupiedVehicleSync ()->OverrideSyncer ( pTrailer, pPlayer );
+                }
             }
 
             // Tell everyone to attach them
