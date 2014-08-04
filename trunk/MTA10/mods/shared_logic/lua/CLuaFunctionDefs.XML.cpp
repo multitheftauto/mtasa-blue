@@ -130,15 +130,17 @@ int CLuaFunctionDefs::XMLNodeSetValue ( lua_State* luaVM )
     // pNode, Value
     CXMLNode* pNode = NULL;
     SString strValue = "";
+    bool bUseCDATA;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pNode );
     argStream.ReadString ( strValue );
+    argStream.ReadBool ( bUseCDATA, false );
 
     if ( !argStream.HasErrors ( ) )
     {
         if ( pNode )
         {
-            pNode->SetTagContent ( strValue );
+            pNode->SetTagContent ( strValue, bUseCDATA );
             lua_pushboolean ( luaVM, true );
             return 1;
         }

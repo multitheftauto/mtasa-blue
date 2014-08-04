@@ -281,10 +281,11 @@ bool CXMLNodeImpl::GetTagContent ( float& fContent )
 }
 
 
-void CXMLNodeImpl::SetTagContent ( const char* szText )
+void CXMLNodeImpl::SetTagContent ( const char* szText, bool bCDATA )
 {
     m_pNode->Clear();
     TiXmlText* pNewNode = new TiXmlText ( szText );
+    pNewNode->SetCDATA ( bCDATA );
     m_pNode->LinkEndChild ( pNewNode );
     m_Children.clear();
 }

@@ -499,15 +499,17 @@ int CLuaXMLDefs::xmlNodeSetValue ( lua_State* luaVM )
 {
     CXMLNode* pNode;
     SString strData;
+    bool bUseCDATA;
         
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pNode );
     argStream.ReadString ( strData );
+    argStream.ReadBool ( bUseCDATA, false );
 
     if ( !argStream.HasErrors () )
     {
-        pNode->SetTagContent ( strData );
-        lua_pushboolean(luaVM, true); 
+        pNode->SetTagContent ( strData, bUseCDATA );
+        lua_pushboolean ( luaVM, true ); 
         return 1;
     }
     else
