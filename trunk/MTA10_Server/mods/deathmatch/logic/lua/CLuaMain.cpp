@@ -703,6 +703,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "warpIntoVehicle", "warpPedIntoVehicle" );
     lua_classfunction ( luaVM, "addClothes", "addPedClothes" );
     lua_classfunction ( luaVM, "giveJetPack", "givePedJetPack" );
+    lua_classfunction ( luaVM, "giveWeapon", "giveWeapon" );
     lua_classfunction ( luaVM, "reloadWeapon", "reloadPedWeapon" );
     lua_classfunction ( luaVM, "removeClothes", "removePedClothes" );
     lua_classfunction ( luaVM, "removeFromVehicle", "removePedFromVehicle" );
