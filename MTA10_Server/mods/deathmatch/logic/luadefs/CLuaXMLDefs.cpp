@@ -413,16 +413,14 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
         
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pNode );
-    argStream.ReadNumber ( uiIndex, 0 );
-
-    bool bGetAllChildren = uiIndex == 0;
+    argStream.ReadNumber ( uiIndex, -1 );
 
     if ( !argStream.HasErrors () )
     {
-        CXMLNode * pFoundNode = NULL;
+        bool bGetAllChildren = uiIndex == -1;
         if ( !bGetAllChildren )
         {
-            pFoundNode = pNode->GetSubNode ( uiIndex );
+            CXMLNode* pFoundNode = pNode->GetSubNode ( uiIndex );
             if ( pFoundNode )
             {
                 lua_pushxmlnode ( luaVM, pFoundNode );
