@@ -430,6 +430,7 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
         else
         {
             lua_newtable ( luaVM );
+            uiIndex = 0;
             list < CXMLNode * > ::iterator iter = pNode->ChildrenBegin ();
             for ( ; iter != pNode->ChildrenEnd () ; ++iter )
             {
