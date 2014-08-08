@@ -750,7 +750,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setGravity", "setPedGravity" );
     lua_classfunction ( luaVM, "setStat", "setPedStat" );
     lua_classfunction ( luaVM, "setWeaponSlot", "setPedWeaponSlot" );
-    //lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
+    lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
 
     lua_classfunction ( luaVM, "setAnimation", "setPedAnimation" );
     lua_classfunction ( luaVM, "setAnimationProgress", "setPedAnimationProgress" );
