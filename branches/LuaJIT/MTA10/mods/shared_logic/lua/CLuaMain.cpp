@@ -85,6 +85,7 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner, bool b
 
 CLuaMain::~CLuaMain ( void )
 {
+    g_pClientGame->GetRemoteCalls()->Remove ( this );
     g_pClientGame->GetLatentTransferManager ()->OnLuaMainDestroy ( this );
     g_pClientGame->GetDebugHookManager()->OnLuaMainDestroy ( this );
     g_pClientGame->GetScriptDebugging()->OnLuaMainDestroy ( this );
@@ -455,7 +456,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "removeFromVehicle", "removePedFromVehicle" );
     lua_classfunction ( luaVM, "setAimTarget", "setPedAimTarget" ); // vector3
     lua_classfunction ( luaVM, "setLookAt", "setPedLookAt" ); // vector3
-    //lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
+    lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
 
     lua_classvariable ( luaVM, "vehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle );
     lua_classvariable ( luaVM, "canBeKnockedOffBike", "setPedCanBeKnockedOffBike", "canPedBeKnockedOffBike" );

@@ -22,6 +22,8 @@ void InitRwFunctions( eGameVersion version )
             RwErrorGet                          = (RwErrorGet_t)                            0x008088C0;
             RwStreamOpen                        = (RwStreamOpen_t)                          0x007ECF30;
             RwStreamClose                       = (RwStreamClose_t)                         0x007ECE60;
+            RwStreamRead                        = (RwStreamRead_t)                          0x007ECA10; // check
+            RwStreamSkip                        = (RwStreamSkip_t)                          0x007ECD40; // check
             RpClumpDestroy                      = (RpClumpDestroy_t)                        0x0074A360;
             RpClumpGetNumAtomics                = (RpClumpGetNumAtomics_t)                  0x00749930;
             RwFrameTranslate                    = (RwFrameTranslate_t)                      0x007F0E70;
@@ -107,6 +109,8 @@ void InitRwFunctions( eGameVersion version )
             RwErrorGet                          = (RwErrorGet_t)                            0x00808880;
             RwStreamOpen                        = (RwStreamOpen_t)                          0x007ECEF0;
             RwStreamClose                       = (RwStreamClose_t)                         0x007ECE20;
+            RwStreamRead                        = (RwStreamRead_t)                          0x007EC9D0;
+            RwStreamSkip                        = (RwStreamSkip_t)                          0x007ECD00;
             RpClumpDestroy                      = (RpClumpDestroy_t)                        0x0074A310;
             RpClumpGetNumAtomics                = (RpClumpGetNumAtomics_t)                  0x007498E0;
             RwFrameTranslate                    = (RwFrameTranslate_t)                      0x007F0E30;

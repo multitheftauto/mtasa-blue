@@ -53,7 +53,7 @@ public:
     bool                    GetTagContent       ( unsigned int& uiContent );
     bool                    GetTagContent       ( float& fContent );
 
-    void                    SetTagContent       ( const char* szContent );
+    void                    SetTagContent       ( const char* szContent, bool bCDATA = false );
     void                    SetTagContent       ( bool bContent );
     void                    SetTagContent       ( int iContent );
     void                    SetTagContent       ( unsigned int uiContent );

@@ -551,15 +551,15 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             strReason = _("Disconnect from server"); strErrorCode = _E("CD31");
             break;
         case ePlayerDisconnectType::BANNED_SERIAL:
-            strReason = _("Disconnected: Serial is banned.\nReason: %s"); strErrorCode = _E("CD32");
+            strReason = _("Disconnected: Serial is banned."); strErrorCode = _E("CD32");
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::BANNED_IP:
-            strReason = _("Disconnected: You are banned.\nReason: %s"); strErrorCode = _E("CD33");
+            strReason = _("Disconnected: You are banned."); strErrorCode = _E("CD33");
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::BANNED_ACCOUNT:
-            strReason = _("Disconnected: Account is banned.\nReason: %s"); strErrorCode = _E("CD34");
+            strReason = _("Disconnected: Account is banned."); strErrorCode = _E("CD34");
             break;
         case ePlayerDisconnectType::VERSION_MISMATCH:
             strReason = _("Disconnected: Version mismatch"); strErrorCode = _E("CD35");
@@ -615,12 +615,15 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
     {
         if ( bitStream.GetNumberOfUnreadBits() > 7 ) // We have our string left to read
         {
+            if ( ucType == BANNED_SERIAL || ucType == BANNED_IP || ucType == BANNED_ACCOUNT )
+                strReason += _("\nReason: %s");
+
             SString strMessage;
             bitStream.ReadString ( strMessage );
             strReason = SString(strReason,strMessage.c_str());
         }
 
-        if ( !strDuration.empty() )
+        if ( !strDuration.empty() && strDuration != "0")
         {
             time_t Duration;
             std::istringstream ( strDuration ) >> Duration;
@@ -3648,7 +3651,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                             CClientPlayer * pPlayer = g_pClientGame->m_pManager->GetPlayerManager ( )->Get ( PlayerId );
                             if ( pPlayer )
                             {
-                                pPlayer->SetTeam ( pTeam );
+                                pPlayer->SetTeam ( pTeam, true );
                             }
                         }
                     }
@@ -4875,11 +4878,19 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 break;
                         }
 
-                        // Is it a valid downloadable resource?
-                        if ( pDownloadableResource && pDownloadableResource->IsAutoDownload() )
+                        // Does the Client and Server checksum differ?
+                        if ( pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch () )
                         {
-                            // Does the Client and Server checksum Match?
-                            if ( !pDownloadableResource->DoesClientAndServerChecksumMatch () )
+                            // Delete the file that already exists
+                            FileDelete ( pDownloadableResource->GetName () );
+                            if ( FileExists( pDownloadableResource->GetName () ) )
+                            {
+                                SString strMessage( "Unable to delete old file %s", *ConformResourcePath( pDownloadableResource->GetName () ) );
+                                g_pClientGame->TellServerSomethingImportant( 1009, strMessage, false );
+                            }
+
+                            // Is it downloadable now?
+                            if ( pDownloadableResource->IsAutoDownload() )
                             {
                                 // Make sure the directory exists
                                 const char* szTempName = pDownloadableResource->GetName ();
@@ -4892,13 +4903,6 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 // Combine the HTTP Download URL, the Resource Name and the Resource File
                                 SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
 
-                                // Delete the file that already exists
-                                FileDelete ( pDownloadableResource->GetName () );
-                                if ( FileExists( pDownloadableResource->GetName () ) )
-                                {
-                                    SString strMessage( "Unable to delete old file %s", *ConformResourcePath( pDownloadableResource->GetName () ) );
-                                    g_pClientGame->TellServerSomethingImportant( 1009, strMessage, false );
-                                }
 
                                 // Queue the file to be downloaded
                                 bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, 10000, true );

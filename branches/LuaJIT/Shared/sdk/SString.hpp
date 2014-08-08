@@ -23,7 +23,17 @@ SString& SString::vFormat ( const char* szFormat, va_list vl )
 
     // Calc size
     va_copy ( vlLocal, vl );
-    int iRequiredCapacity = _vscprintf ( szFormat, vlLocal );
+    int iRequiredCapacity;
+    __try
+    {
+        iRequiredCapacity = _vscprintf ( szFormat, vlLocal );
+    }
+    __except ( EXCEPTION_EXECUTE_HANDLER )
+    {
+        // Clean up and indicate problem
+        OnFormatException( szFormat );
+        return *this;
+    }
 
     if ( iRequiredCapacity < 1 )
     {
@@ -37,7 +47,18 @@ SString& SString::vFormat ( const char* szFormat, va_list vl )
 
     // Try to format the string into the buffer.
     va_copy ( vlLocal, vl );
-    int iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
+    int iSize;
+    __try
+    {
+        iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
+    }
+    __except ( EXCEPTION_EXECUTE_HANDLER )
+    {
+        // Clean up and indicate problem
+        free ( szDest );
+        OnFormatException( szFormat );
+        return *this;
+    }
 
     if ( iSize < 1 )
     {
@@ -112,6 +133,17 @@ SString& SString::vFormat ( const char* szFormat, va_list vl )
     // Done
     return *this;
 #endif
+}
+
+
+//
+// Handle format exception
+//
+void SString::OnFormatException ( const char* szFormat )
+{
+    dassert( 0 );
+    // Replace format characters because it seems like a good idea
+    *this = ( SStringX( "[Format exception] " ) + szFormat ).Replace( "%", "#" );
 }
 
 

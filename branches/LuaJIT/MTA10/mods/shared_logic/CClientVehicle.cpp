@@ -131,7 +131,7 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
     m_fTrainPosition = -1.0f;
-    m_ucTrackID = -1;
+    m_ucTrackID = 0xFF;
     m_bChainEngine = false;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
@@ -241,6 +241,7 @@ CClientVehicle::~CClientVehicle ( void )
 
     delete m_pUpgrades;
     delete m_pHandlingEntry;
+    delete m_LastSyncedData;
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink, &m_pTowedVehicle, &m_pTowedByVehicle, &m_pPickedUpWinchEntity, NULL );
 }
 
@@ -342,7 +343,16 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
 
     // Reset interpolation
     if ( bResetInterpolation )
+    {
         RemoveTargetPosition ();
+
+        // Tell GTA it should update the train rail position (set this here since we don't want to call this on interpolation)
+        if ( GetVehicleType () == CLIENTVEHICLE_TRAIN && !IsDerailed () && !IsStreamedIn () )
+        {
+            m_fTrainPosition = -1.0f;
+            m_ucTrackID = 0xFF;
+        }
+    }
 }
 
 void CClientVehicle::UpdatePedPositions ( const CVector& vecPosition )

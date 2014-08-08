@@ -33,6 +33,7 @@ public:
                     CProjectileSA(class CProjectileSAInterface * projectileInterface);
                     ~CProjectileSA( );
     void            Destroy( bool bBlow = true );
+    bool            CalculateImpactPosition ( CEntitySAInterface * pCollidedWith, CVector vecInputStart, CVector &vecInputEnd );
     
     void            SetProjectileInfo ( CProjectileInfo* pProjectileInfo ) { projectileInfo = pProjectileInfo; }
     bool            CorrectPhysics ( void );
