@@ -107,8 +107,8 @@ class CVehicleSA;
 //0041BDD0  public: void __thiscall CVehicle::SetEngineOn(bool)
 #define FUNC_CVehicle_SetEngineOn               0x41BDD0
 
-//006F6CC0  public: void __thiscall CVehicle::RecalcOnRailDistance(void)
-#define FUNC_CVehicle_RecalcOnRailDistance           0x6F6CC0
+//006F6CC0  public: void __thiscall CTrain::FindPositionOnTrackFromCoors(void)
+#define FUNC_CTrain_FindPositionOnTrackFromCoors           0x6F6CC0
 
 //006F6BD0  int GetTrainNodeNearPoint(float x, float y, float z, int* pTrackID) places track ID in *pTrackID and returns node ID
 #define FUNC_GetTrainNodeNearPoint              0x6F6BD0
@@ -168,14 +168,14 @@ class CVehicleSA;
 
 
 
-typedef struct
+struct SRailNodeSA
 {
     short sX;               // x coordinate times 8
     short sY;               // y coordinate times 8
     short sZ;               // z coordinate times 8
     WORD  sRailDistance;    // on-rail distance times 3.33333334
     WORD  padding;
-} SRailNodeSA;
+};
 
 class CVehicleSAInterfaceVTBL : public CEntitySAInterfaceVTBL
 {

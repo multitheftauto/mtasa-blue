@@ -1204,7 +1204,7 @@ bool CServerBrowser::OnClick ( CGUIElement* pElement )
             }
 
             SetAddressBarText ( "mtasa://" + pServer->strEndpoint );
-
+            m_pLabelAddressDescription [ Type ]->SetVisible ( false );
         }
 
         // save the selected server

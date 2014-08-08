@@ -553,9 +553,9 @@ int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, uchar& ucOu
         {
             for ( int i = 0; i < aNumTrackNodes[ucTrackId]; ++i )
             {
-                SRailNodeSA pRailNode = aTrackNodes[ucTrackId][i];
+                SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
 
-                float fDistance = sqrt ( pow(vecPosition.fZ - pRailNode.sZ * 0.125f, 2) + pow(vecPosition.fY - pRailNode.sY * 0.125f, 2) + pow(vecPosition.fX - pRailNode.sX * 0.125f, 2) );
+                float fDistance = sqrt ( pow(vecPosition.fZ - railNode.sZ * 0.125f, 2) + pow(vecPosition.fY - railNode.sY * 0.125f, 2) + pow(vecPosition.fX - railNode.sX * 0.125f, 2) );
                 if ( fDistance < fMinDistance )
                 {
                     fMinDistance = fDistance;
@@ -1228,4 +1228,52 @@ void CWorldSA::RemoveWorldBuildingFromLists ( CEntitySAInterface * pInterface )
     m_pRemovedEntities[(DWORD)pInterface] = false;
     m_pAddedEntities[(DWORD)pInterface] = false;
 
+}
+
+bool CWorldSA::CalculateImpactPosition ( const CVector &vecInputStart, CVector &vecInputEnd )
+{
+    // get our position
+    CVector vecStart = vecInputStart;
+    // get our end position by projecting forward a few velocities more
+    CVector vecEnd = vecInputEnd;
+    // grab the difference between our reported and actual end position
+    CVector diff = vecEnd - vecStart;
+    // normalize our difference
+    diff.Normalize ( );
+    // project forward another unit
+    vecEnd = vecEnd + diff * 1;
+    // create a variable to store our collision data
+    CColPoint * pColPoint;
+    // create a variable to store our collision entity
+    CEntity * pCollisionEntity;
+
+    // flags
+    SLineOfSightFlags flags;
+    flags.bCheckCarTires = false;
+    flags.bIgnoreSomeObjectsForCamera = true;
+    flags.bCheckBuildings = true;
+    flags.bCheckPeds = true;
+    flags.bCheckObjects = true;
+    flags.bCheckDummies = true;
+
+    // Include dead peds
+    MemPutFast < DWORD > ( 0xB7CD71, 1 );
+
+    SLineOfSightBuildingResult result;
+    // process forward another 1 unit
+    if ( ProcessLineOfSight ( &vecStart, &vecEnd, &pColPoint, &pCollisionEntity, flags, &result ) )
+    {
+        // set our collision position
+        vecInputEnd = pColPoint->GetPosition ( );
+
+        // destroy our colshape
+        pColPoint->Destroy ( );
+
+        // reset include dead peds
+        MemPutFast < DWORD > ( 0xB7CD71, 0 );
+        return true;
+    }
+    // Include dead peds
+    MemPutFast < DWORD > ( 0xB7CD71, 0 );
+    return false;
 }

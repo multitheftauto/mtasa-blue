@@ -64,7 +64,7 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
     {
         // If it's a train, recalculate its rail position parameter (does not affect derailed state)
         DWORD dwThis = (DWORD) m_pInterface;
-        DWORD dwFunc = FUNC_CVehicle_RecalcOnRailDistance;
+        DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
         _asm
         {
             mov     ecx, dwThis

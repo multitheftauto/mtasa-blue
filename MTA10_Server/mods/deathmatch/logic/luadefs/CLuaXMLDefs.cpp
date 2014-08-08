@@ -413,16 +413,14 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
         
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pNode );
-    argStream.ReadNumber ( uiIndex, 0 );
-
-    bool bGetAllChildren = uiIndex == 0;
+    argStream.ReadNumber ( uiIndex, -1 );
 
     if ( !argStream.HasErrors () )
     {
-        CXMLNode * pFoundNode = NULL;
+        bool bGetAllChildren = uiIndex == -1;
         if ( !bGetAllChildren )
         {
-            pFoundNode = pNode->GetSubNode ( uiIndex );
+            CXMLNode* pFoundNode = pNode->GetSubNode ( uiIndex );
             if ( pFoundNode )
             {
                 lua_pushxmlnode ( luaVM, pFoundNode );
@@ -432,6 +430,7 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
         else
         {
             lua_newtable ( luaVM );
+            uiIndex = 0;
             list < CXMLNode * > ::iterator iter = pNode->ChildrenBegin ();
             for ( ; iter != pNode->ChildrenEnd () ; ++iter )
             {
@@ -499,15 +498,17 @@ int CLuaXMLDefs::xmlNodeSetValue ( lua_State* luaVM )
 {
     CXMLNode* pNode;
     SString strData;
+    bool bUseCDATA;
         
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pNode );
     argStream.ReadString ( strData );
+    argStream.ReadBool ( bUseCDATA, false );
 
     if ( !argStream.HasErrors () )
     {
-        pNode->SetTagContent ( strData );
-        lua_pushboolean(luaVM, true); 
+        pNode->SetTagContent ( strData, bUseCDATA );
+        lua_pushboolean ( luaVM, true ); 
         return 1;
     }
     else

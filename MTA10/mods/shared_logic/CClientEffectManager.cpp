@@ -35,6 +35,9 @@ void CClientEffectManager::DeleteAll( )
 
 CClientEffect * CClientEffectManager::Create(const SString& strEffectName, const CVector &vecPosition, ElementID ID)
 {
+    if ( strEffectName.length () >= 0x60 )
+        return NULL;
+
     CFxSystem * pFxSA = g_pGame->GetFxManager()->CreateFxSystem ( strEffectName, vecPosition, NULL, 0 );
     if ( pFxSA == NULL )
         return NULL; // GTA was unable to create the effect (e.g. wrong effect name)

@@ -397,6 +397,8 @@ CGUIFont* CGUI_Impl::CreateFntFromWinFont ( const char* szFontName, const char* 
 
     // Compile a list of places to look
     std::vector < SString > lookList;
+    if ( strFontWinRegName.Contains( ":" ) || strFontWinRegName.BeginsWith( "\\" ) || strFontWinRegName.BeginsWith( "/" ) )
+        lookList.push_back ( strFontWinRegName );
     lookList.push_back ( PathJoin ( strWinFontsPath, strFontWinRegName ) );
     lookList.push_back ( PathJoin ( "cgui", szFontWinFile ) );
     lookList.push_back ( PathJoin ( strWinFontsPath, szFontWinFile ) );

@@ -869,36 +869,6 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         {
             bool bAbortStart = false;
 
-            SString strPath;
-            if ( GetFilePath ( (*iterf)->GetName(), strPath ) )
-            {
-                const char* szExt = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
-
-                if ( stricmp ( szExt, ".DFF" ) == 0 )
-                {
-                    int iErrorCode = g_pRealNetServer->CheckDFF ( strPath.c_str ( ) );
-                    if ( iErrorCode != 0 )
-                    {
-                        if ( iErrorCode == -1 )
-                        {
-                            CLogger::LogPrintf ( "DFF '%s' could not be parsed.\n", (*iterf)->GetName ( ) );
-                        }
-                        else if ( iErrorCode == -2 )
-                        {
-                            CLogger::LogPrintf ( "DFF '%s' is not a valid DFF file.\n", (*iterf)->GetName ( ) );
-                        }
-                        else if ( iErrorCode == -3 )
-                        {
-                            CLogger::LogPrintf ( "DFF '%s' could not be opened.\n", (*iterf)->GetName ( ) );
-                        }
-                        else if ( iErrorCode == 1 )
-                        {
-                            CLogger::LogPrintf ( "DFF '%s' has been automatically fixed, the initial file is in the resource directory with the name suffix _bak.dff.\n", (*iterf)->GetName ( ) );
-                        }
-                    }
-                }
-            }
-
             // Check if file is blocked
             char szHashResult[33];
             CMD5Hasher::ConvertToHex( (*iterf)->GetLastChecksum().md5, szHashResult );
