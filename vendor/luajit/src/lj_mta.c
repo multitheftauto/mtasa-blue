@@ -6,7 +6,6 @@
 #include "lua.h"
 #include "luajit.h"
 
-typedef struct lua_State lua_State;
 lua_PreCallHook pPreCallHook = NULL;
 void lua_registerPreCallHook ( lua_PreCallHook f )
 {
