@@ -2019,7 +2019,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Shared\sdk\CVector4D.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Shared\sdk\RTree.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\sha1.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\sdk\sha1.hpp"
 					>
 				</File>
 				<File
