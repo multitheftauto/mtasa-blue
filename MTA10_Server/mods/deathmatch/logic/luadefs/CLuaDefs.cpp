@@ -145,25 +145,14 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
     if ( !pLuaMain )
         return true;
 
-    CResource * pResource = pLuaMain->GetResource ( );
 
-    // just double check what we have is right
-    if ( pResource->GetVirtualMachine ( )->GetVM ( ) != luaVM )
-    {
-        // probably coroutine so revert to old code
-        // This does happen, see admin resource for a reliable way to reproduce this section of code
-
-        // get the resource from the Lua state
-        pResource = m_pResourceManager->GetResourceFromLuaState ( luaVM );
-        if ( pResource != NULL )
-        {
-            // update our lua main
-            pLuaMain = pResource->GetVirtualMachine ( );
-        }
-    }
+    // Get associated resource
+    CResource* pResource = m_pResourceManager->GetResourceFromLuaState( luaVM );
+    if ( !pResource )
+        return true;
 
     // Update execution time check
-    pLuaMain->CheckExecutionTime();
+    pResource->GetVirtualMachine()->CheckExecutionTime();
 
     // Check function right cache in resource
     bool bAllowed;
