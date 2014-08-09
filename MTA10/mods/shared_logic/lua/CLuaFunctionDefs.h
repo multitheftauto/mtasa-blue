@@ -948,6 +948,7 @@ public:
     // Utility
     LUA_DECLARE ( Md5 );
     LUA_DECLARE ( Sha256 );
+    LUA_DECLARE ( Hash );
     LUA_DECLARE ( TeaEncode );
     LUA_DECLARE ( TeaDecode );
     LUA_DECLARE ( Base64encode );
