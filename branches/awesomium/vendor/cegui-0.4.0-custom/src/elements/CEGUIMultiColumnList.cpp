@@ -759,6 +759,10 @@ void MultiColumnList::removeColumn(uint col_idx)
 		// remove header segment
 		d_header->removeColumn(col_idx);
 
+        // remove all rows entirely if no column is remaining (mta fix)
+        if (getColumnCount() == 0)
+            d_grid.clear();
+
 		// signal a change to the list contents
 		WindowEventArgs args(this);
 		onListContentsChanged(args);

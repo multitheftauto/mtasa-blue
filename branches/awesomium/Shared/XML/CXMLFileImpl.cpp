@@ -76,8 +76,23 @@ bool CXMLFileImpl::Parse ( std::vector < char >* pOutFileContents )
         Reset ();
 
         // Parse from the current file
-        if ( m_pDocument->LoadFile ( m_strFilename.c_str (), TIXML_DEFAULT_ENCODING, pOutFileContents ) )
-        {
+        FILE* file;
+        if ( m_pDocument->LoadFile ( m_strFilename.c_str (), TIXML_DEFAULT_ENCODING, &file ) )
+        {        
+            // Also read the file bytes to a buffer if requested
+            if ( pOutFileContents )
+            {
+                fseek( file, 0, SEEK_END );
+                long size = ftell ( file );
+                fseek( file, 0, SEEK_SET );
+                if ( size > 0 )
+                {
+                    pOutFileContents->resize( size );
+                    fread( &pOutFileContents->at(0), 1, size, file );
+                }
+            }
+		    fclose( file );
+
             // Build our wrapper
             if ( BuildWrapperTree () )
             {

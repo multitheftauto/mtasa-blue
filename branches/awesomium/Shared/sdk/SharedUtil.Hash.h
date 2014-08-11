@@ -10,6 +10,20 @@
 *
 *****************************************************************************/
 
+namespace EHashFunction
+{
+    enum EHashFunctionType
+    {
+        MD5,
+        SHA1,
+        SHA224,
+        SHA256,
+        SHA384,
+        SHA512,
+    };
+}
+using EHashFunction::EHashFunctionType;
+
 namespace SharedUtil
 {
     struct MD5
@@ -70,4 +84,6 @@ namespace SharedUtil
     void            GenerateSha256              ( const void* pData, uint uiLength, uchar output[32] );
     SString         GenerateSha256HexString     ( const void* pData, uint uiLength );
     SString         GenerateSha256HexString     ( const SString& strData );
+    SString         GenerateHashHexString       ( EHashFunctionType hashFunction, const void* pData, uint uiLength );
+    SString         GenerateHashHexString       ( EHashFunctionType hashFunction, const SString& strData );
 }

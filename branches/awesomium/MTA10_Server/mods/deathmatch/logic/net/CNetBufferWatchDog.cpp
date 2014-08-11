@@ -171,7 +171,7 @@ void CNetBufferWatchDog::DoChecks ( void )
     if ( m_InResultQueueInfo.status == EQueueStatus::STATUS_OK )
         AllowIncomingSyncPackets ();
     else
-    if ( m_OutCommandQueueInfo.status == EQueueStatus::SUSPEND_SYNC )
+    if ( m_InResultQueueInfo.status == EQueueStatus::SUSPEND_SYNC )
         BlockIncomingSyncPackets ();
 
     // Copy sizes for stats only (Unsafe)

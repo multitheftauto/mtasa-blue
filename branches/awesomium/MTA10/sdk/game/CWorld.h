@@ -191,11 +191,11 @@ public:
     virtual void        FindWorldPositionForRailTrackPosition ( float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition ) = 0;
     virtual int         FindClosestRailTrackNode    ( const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance ) = 0;
 
-    virtual void        RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior) = 0;
+    virtual void        RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL ) = 0;
     virtual bool        IsRemovedModelInRadius      ( SIPLInst* pInst ) = 0;
     virtual bool        IsModelRemoved              ( unsigned short usModelID ) = 0;
-    virtual void        ClearRemovedBuildingLists   ( void ) = 0;
-    virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior ) = 0;
+    virtual void        ClearRemovedBuildingLists   ( uint* pOutAmount = NULL ) = 0;
+    virtual bool        RestoreBuilding             ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL ) = 0;
     virtual SBuildingRemoval*   GetBuildingRemoval  ( CEntitySAInterface * pInterface ) = 0;
     virtual void        AddDataBuilding             ( CEntitySAInterface * pInterface ) = 0;
     virtual void        AddBinaryBuilding           ( CEntitySAInterface * pInterface ) = 0;
