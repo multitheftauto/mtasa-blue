@@ -167,6 +167,10 @@ void CWebView::OnBeginLoadingFrame ( Awesomium::WebView* pCaller, int64 frame_id
     SString strURL;
     ConvertURL ( url, strURL );
 
+    // Exclude blank page
+    if ( strURL == "blank" )
+        return;
+
     // Trigger navigate event
     m_pEventsInterface->Events_OnNavigate ( strURL, bMainFrame );
 }

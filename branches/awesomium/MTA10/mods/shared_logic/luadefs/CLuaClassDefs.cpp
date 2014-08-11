@@ -340,6 +340,7 @@ const char* CLuaClassDefs::GetEntityClass ( CClientEntity* pEntity )
         case CCLIENTEFFECT: return "Effect";
         case CCLIENTSCREENSOURCE: return "DxScreenSource";
         case CCLIENTRENDERTARGET: return "DxRenderTarget";
+        case CCLIENTBROWSER: return "Browser";
     }
     return "Element";
 }

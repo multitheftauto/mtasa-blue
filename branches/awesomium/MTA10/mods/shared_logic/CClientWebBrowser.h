@@ -20,6 +20,7 @@ class CClientWebBrowser : public CClientTexture, public CWebBrowserEventsInterfa
 public:
     CClientWebBrowser           ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, CWebViewInterface* pWebView );
     ~CClientWebBrowser          ();
+    eClientEntityType           GetType             ( ) const { return CCLIENTBROWSER; }
 
     inline CWebBrowserItem*     GetWebBrowserItem   ()    { return (CWebBrowserItem*)m_pRenderItem; }
     inline CWebViewInterface*   GetWebView          ()    { return m_pWebView; }
