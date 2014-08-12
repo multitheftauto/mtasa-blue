@@ -3694,6 +3694,16 @@ bool CSettings::OnHideAdvancedSettingDescription ( CGUIElement* pElement )
     return true;
 }
 
+void CSettings::SetSelectedIndex ( unsigned int uiIndex )
+{
+    unsigned int uiTabCount = m_pTabs->GetTabCount ( );
+
+    if ( uiIndex < uiTabCount )
+    {
+        m_pTabs->SetSelectedIndex ( uiIndex );
+    }
+}
+
 void CSettings::TabSkip ( bool bBackwards )
 {
     unsigned int uiTabCount = m_pTabs->GetTabCount ( );
@@ -3707,14 +3717,14 @@ void CSettings::TabSkip ( bool bBackwards )
             uiIndex = uiTabCount - 1;
         }
 
-        m_pTabs->SetSelectedIndex ( uiIndex );
+        SetSelectedIndex ( uiIndex );
     }
     else
     {
         unsigned int uiIndex = m_pTabs->GetSelectedIndex ( ) + 1;
         unsigned int uiNewIndex = uiIndex % uiTabCount;
 
-        m_pTabs->SetSelectedIndex ( uiNewIndex );
+        SetSelectedIndex ( uiNewIndex );
     }
 }
 

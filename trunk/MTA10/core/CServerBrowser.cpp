@@ -2272,6 +2272,16 @@ bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
     return true;
 }
 
+void CServerBrowser::SetSelectedIndex ( unsigned int uiIndex )
+{
+    unsigned int uiTabCount = m_pPanel->GetTabCount ( );
+
+    if ( uiIndex < uiTabCount )
+    {
+        m_pPanel->SetSelectedIndex ( uiIndex );
+    }
+}
+
 void CServerBrowser::TabSkip ( bool bBackwards )
 {
     unsigned int uiTabCount = m_pPanel->GetTabCount ( );
@@ -2279,20 +2289,20 @@ void CServerBrowser::TabSkip ( bool bBackwards )
     if ( bBackwards )
     {
         unsigned int uiIndex = m_pPanel->GetSelectedIndex ( ) - 1;
-        unsigned int uiNewIndex = uiIndex % uiTabCount;
-        if ( uiNewIndex < 0 )
+
+        if ( m_pPanel->GetSelectedIndex ( ) == 0 )
         {
-            uiNewIndex = uiTabCount;
+            uiIndex = uiTabCount - 1;
         }
 
-        m_pPanel->SetSelectedIndex ( uiNewIndex );
+        SetSelectedIndex ( uiIndex );
     }
     else
     {
         unsigned int uiIndex = m_pPanel->GetSelectedIndex ( ) + 1;
         unsigned int uiNewIndex = uiIndex % uiTabCount;
 
-        m_pPanel->SetSelectedIndex ( uiNewIndex );
+        SetSelectedIndex ( uiNewIndex );
     }
 }
 

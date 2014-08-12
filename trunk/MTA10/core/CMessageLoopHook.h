@@ -19,6 +19,8 @@
 #include "CSingleton.h"
 
 #define URI_CONNECT 1
+#define VK_1    0x30
+#define VK_9    0x39
 
 class CMessageLoopHook : public CSingleton < CMessageLoopHook >
 {
