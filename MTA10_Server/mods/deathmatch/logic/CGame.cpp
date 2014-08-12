@@ -674,17 +674,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 strVoice.c_str(),
                                 *strBandwidthSaving );
 
-#ifdef ANY_x64
-    CLogger::LogPrintfNoStamp ( "\n" );
-    CLogger::LogPrintfNoStamp ( "*********** WARNING *** WARNING *** WARNING *** WARNING **********\n" );
-    CLogger::LogPrintfNoStamp ( "\n" );
-    CLogger::LogPrintfNoStamp ( "                     Experimental 64 bit server\n" );
-    CLogger::LogPrintfNoStamp ( "\n" );
-    CLogger::LogPrintfNoStamp ( "            Report any problems to http://bugs.mtasa.com/\n" );
-    CLogger::LogPrintfNoStamp ( "\n");
-    CLogger::LogPrintfNoStamp ( "==================================================================\n" );
-#endif
-
     if ( !bLogFile )
         CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );
 
