@@ -143,6 +143,8 @@ public:
 
     bool                IsActive                ( void );
 
+    void                SetSelectedIndex        ( unsigned int uiIndex );
+
 protected:
     const static int    SecKeyNum = 3;     // Number of secondary keys
 
