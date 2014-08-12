@@ -93,9 +93,9 @@ void CSettings::CreateGUI ( void )
     pTabAudio = m_pTabs->CreateTab ( _("Audio") );
     pTabBinds = m_pTabs->CreateTab ( _("Binds") );
     pTabControls = m_pTabs->CreateTab ( _("Controls") );
-    pTabCommunity = m_pTabs->CreateTab ( _("Community") );
     pTabInterface = m_pTabs->CreateTab ( _("Interface") );
     pTabAdvanced = m_pTabs->CreateTab ( _("Advanced") );
+    pTabCommunity = m_pTabs->CreateTab ( _("Community") );
 
     // Create buttons
     //  OK button
@@ -3692,4 +3692,33 @@ bool CSettings::OnHideAdvancedSettingDescription ( CGUIElement* pElement )
     m_pAdvancedSettingDescriptionLabel->SetText ( "" );
 
     return true;
+}
+
+void CSettings::TabSkip ( bool bBackwards )
+{
+    unsigned int uiTabCount = m_pTabs->GetTabCount ( );
+
+    if ( bBackwards )
+    {
+        unsigned int uiIndex = m_pTabs->GetSelectedIndex ( ) - 1;
+
+        if ( m_pTabs->GetSelectedIndex ( ) == 0 )
+        {
+            uiIndex = uiTabCount - 1;
+        }
+
+        m_pTabs->SetSelectedIndex ( uiIndex );
+    }
+    else
+    {
+        unsigned int uiIndex = m_pTabs->GetSelectedIndex ( ) + 1;
+        unsigned int uiNewIndex = uiIndex % uiTabCount;
+
+        m_pTabs->SetSelectedIndex ( uiNewIndex );
+    }
+}
+
+bool CSettings::IsActive ( void )
+{
+    return m_pWindow->IsActive ();
 }
