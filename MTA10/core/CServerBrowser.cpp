@@ -780,7 +780,7 @@ void CServerBrowser::SetVisible ( bool bVisible )
 
 bool CServerBrowser::IsVisible ( void )
 {
-    return m_pTopWindow->IsVisible ();
+    return m_pTopWindow && m_pTopWindow->IsVisible ();
 }
 
 //
@@ -2308,5 +2308,6 @@ void CServerBrowser::TabSkip ( bool bBackwards )
 
 bool CServerBrowser::IsActive ( void )
 {
-    return m_pFrame->IsActive ();
+    return ( m_pFrame && m_pFrame->IsActive ( ) )
+        || ( m_pPanel && m_pPanel->IsActive ( ) );
 }
