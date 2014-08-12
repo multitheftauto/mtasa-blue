@@ -2271,3 +2271,32 @@ bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
 
     return true;
 }
+
+void CServerBrowser::TabSkip ( bool bBackwards )
+{
+    unsigned int uiTabCount = m_pPanel->GetTabCount ( );
+
+    if ( bBackwards )
+    {
+        unsigned int uiIndex = m_pPanel->GetSelectedIndex ( ) - 1;
+        unsigned int uiNewIndex = uiIndex % uiTabCount;
+        if ( uiNewIndex < 0 )
+        {
+            uiNewIndex = uiTabCount;
+        }
+
+        m_pPanel->SetSelectedIndex ( uiNewIndex );
+    }
+    else
+    {
+        unsigned int uiIndex = m_pPanel->GetSelectedIndex ( ) + 1;
+        unsigned int uiNewIndex = uiIndex % uiTabCount;
+
+        m_pPanel->SetSelectedIndex ( uiNewIndex );
+    }
+}
+
+bool CServerBrowser::IsActive ( void )
+{
+    return m_pFrame->IsActive ();
+}

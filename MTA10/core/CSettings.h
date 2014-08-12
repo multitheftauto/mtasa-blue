@@ -139,6 +139,10 @@ public:
     void                RequestNewNickname      ( void );
     void                ShowRestartQuestion     ( void );
 
+    void                TabSkip                 ( bool bBackwards );
+
+    bool                IsActive                ( void );
+
 protected:
     const static int    SecKeyNum = 3;     // Number of secondary keys
 
