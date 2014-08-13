@@ -105,6 +105,37 @@ void CGUITabPanel_Impl::SetSelectedTab ( CGUITab* pTab )
 }
 
 
+void CGUITabPanel_Impl::SetSelectedIndex ( unsigned int uiIndex )
+{
+    try
+    {
+        reinterpret_cast < CEGUI::TabControl* > ( m_pWindow )->setSelectedTabAtIndex ( uiIndex );
+    }
+    catch ( CEGUI::Exception ) {};
+}
+
+unsigned int CGUITabPanel_Impl::GetSelectedIndex ( void )
+{
+    unsigned int uiIndex = 0;
+    try
+    {
+        uiIndex = reinterpret_cast < CEGUI::TabControl* > ( m_pWindow )->getSelectedTabIndex ( );
+    }
+    catch ( CEGUI::Exception ) {};
+    return uiIndex;
+}
+
+unsigned int CGUITabPanel_Impl::GetTabCount ( void )
+{
+    unsigned int uiIndex = 0;
+    try
+    {
+        uiIndex = reinterpret_cast < CEGUI::TabControl* > ( m_pWindow )->getTabCount ( );
+    }
+    catch ( CEGUI::Exception ) {};
+    return uiIndex;
+}
+
 bool CGUITabPanel_Impl::IsTabSelected ( CGUITab* pTab )
 {
     return reinterpret_cast < CEGUI::TabControl* > ( m_pWindow )->isTabContentsSelected ( reinterpret_cast < CGUITab_Impl* > ( pTab )->GetWindow () );

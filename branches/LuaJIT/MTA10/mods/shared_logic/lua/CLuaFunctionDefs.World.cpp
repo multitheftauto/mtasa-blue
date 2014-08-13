@@ -1289,10 +1289,12 @@ int CLuaFunctionDefs::RemoveWorldBuilding ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                CStaticFunctionDefinitions::RemoveWorldBuilding ( iModelToRemove, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior );
+                uint uiAmount;
+                CStaticFunctionDefinitions::RemoveWorldBuilding ( iModelToRemove, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior, uiAmount );
 
                 lua_pushboolean ( luaVM, true );
-                return 1;
+                lua_pushnumber ( luaVM, uiAmount );
+                return 2;
             }
         }
     }
@@ -1311,10 +1313,12 @@ int CLuaFunctionDefs::RestoreWorldBuildings ( lua_State* luaVM )
         CResource* pResource = pLuaMain->GetResource ();
         if ( pResource )
         {
-            CStaticFunctionDefinitions::RestoreWorldBuildings ( );
+            uint uiAmount;
+            CStaticFunctionDefinitions::RestoreWorldBuildings ( uiAmount );
 
             lua_pushboolean ( luaVM, true );
-            return 1;
+            lua_pushnumber ( luaVM, uiAmount );
+            return 2;
         }
     }
     lua_pushboolean ( luaVM, false );
@@ -1341,10 +1345,12 @@ int CLuaFunctionDefs::RestoreWorldBuilding ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                CStaticFunctionDefinitions::RestoreWorldBuilding ( iModelToRestore, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior );
+                uint uiAmount;
+                CStaticFunctionDefinitions::RestoreWorldBuilding ( iModelToRestore, fRadius, vecPosition.fX, vecPosition.fY, vecPosition.fZ, cInterior, uiAmount );
 
                 lua_pushboolean ( luaVM, true );
-                return 1;
+                lua_pushnumber ( luaVM, uiAmount );
+                return 2;
             }
         }
     }

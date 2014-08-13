@@ -115,6 +115,11 @@ public:
     void                OnQuickConnectButtonClick ( void );
     void                NotifyServerExists      ( in_addr Address, ushort usPort );
 
+    void                TabSkip                 ( bool bBackwards );
+
+    bool                IsActive                ( void );
+
+    void                SetSelectedIndex        ( unsigned int uiIndex );
 protected:
     bool                OnMouseClick            ( CGUIMouseEventArgs Args );
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );

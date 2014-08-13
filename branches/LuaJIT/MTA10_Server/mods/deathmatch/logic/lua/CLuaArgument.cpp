@@ -977,111 +977,107 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
 
 bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaArguments* > * pKnownTables )
 {
-    if ( !is_error ( object ) )
-    {
-        DeleteTableData ( );
+    DeleteTableData ( );
 
-        if ( !object )
-            m_iType = LUA_TNIL;
-        else
+    if ( !object )
+        m_iType = LUA_TNIL;
+    else
+    {
+        switch ( json_object_get_type ( object ) )
         {
-            switch ( json_object_get_type ( object ) )
+        case json_type_null:
+            m_iType = LUA_TNIL;
+            break;
+        case json_type_boolean:
+            if ( json_object_get_boolean ( object ) == TRUE )
+                ReadBool ( true );
+            else
+                ReadBool ( false );
+            break;
+        case json_type_double:
+            ReadNumber ( json_object_get_double ( object ) );
+            break;
+        case json_type_int:
+            ReadNumber ( json_object_get_int ( object ) );
+            break;
+        case json_type_object:
+            m_pTableData = new CLuaArguments ( );
+            m_pTableData->ReadFromJSONObject ( object, pKnownTables );
+            m_bWeakTableRef = false;
+            m_iType = LUA_TTABLE;
+            break;
+        case json_type_array:
+            m_pTableData = new CLuaArguments ( );
+            m_pTableData->ReadFromJSONArray ( object, pKnownTables );
+            m_bWeakTableRef = false;
+            m_iType = LUA_TTABLE;
+            break;
+        case json_type_string:
             {
-                case json_type_null:
-                m_iType = LUA_TNIL;
-                break;
-                case json_type_boolean:
-                if ( json_object_get_boolean ( object ) == TRUE )
-                    ReadBool ( true );
-                else
-                    ReadBool ( false );
-                break;
-                case json_type_double:
-                ReadNumber ( json_object_get_double ( object ) );
-                break;
-                case json_type_int:
-                ReadNumber ( json_object_get_int ( object ) );
-                break;
-                case json_type_object:
-                m_pTableData = new CLuaArguments ( );
-                m_pTableData->ReadFromJSONObject ( object, pKnownTables );
-                m_bWeakTableRef = false;
-                m_iType = LUA_TTABLE;
-                break;
-                case json_type_array:
-                m_pTableData = new CLuaArguments ( );
-                m_pTableData->ReadFromJSONArray ( object, pKnownTables );
-                m_bWeakTableRef = false;
-                m_iType = LUA_TTABLE;
-                break;
-                case json_type_string:
+                int iLength = json_object_get_string_len ( object );
+                SString strString;
+                strString.assign ( json_object_get_string ( object ), iLength );
+                if ( iLength > 3 && strString [0] == '^' && strString [2] == '^' && strString [1] != '^' )
                 {
-                    int iLength = json_object_get_string_len ( object );
-                    SString strString;;
-                    strString.assign ( json_object_get_string ( object ), iLength );
-                    if ( iLength > 3 && strString [0] == '^' && strString [2] == '^' && strString [1] != '^' )
+                    switch ( strString [1] )
                     {
-                        switch ( strString [1] )
+                    case 'E': // element
                         {
-                            case 'E': // element
+                            int id = atoi ( strString.c_str ( ) + 3 );
+                            CElement * element = NULL;
+                            if ( id != INT_MAX && id != INT_MIN && id != 0 )
+                                element = CElementIDs::GetElement ( id );
+                            if ( element )
                             {
-                                int id = atoi ( strString.c_str ( ) + 3 );
-                                CElement * element = NULL;
-                                if ( id != INT_MAX && id != INT_MIN && id != 0 )
-                                    element = CElementIDs::GetElement ( id );
-                                if ( element )
-                                {
-                                    ReadElement ( element );
-                                }
-                                else
-                                {
-                                    // Appears sometimes when a player quits
-                                    //g_pClientGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid element specified in JSON string '%s'.", szString ) );
-                                    m_iType = LUA_TNIL;
-                                }
-                                break;
+                                ReadElement ( element );
                             }
-                            case 'R': // resource
+                            else
                             {
-                                CResource * resource = g_pGame->GetResourceManager ( )->GetResource ( strString.c_str ( ) + 3 );
-                                if ( resource )
-                                {
-                                    ReadScriptID ( resource->GetScriptID ( ) );
-                                }
-                                else
-                                {
-                                    g_pGame->GetScriptDebugging ( )->LogError ( NULL, SString ( "Invalid resource specified in JSON string '%s'.", strString.c_str ( ) ) );
-                                    m_iType = LUA_TNIL;
-                                }
-                                break;
+                                // Appears sometimes when a player quits
+                                //g_pClientGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid element specified in JSON string '%s'.", szString ) );
+                                m_iType = LUA_TNIL;
                             }
-                            case 'T':   // Table reference
+                            break;
+                        }
+                    case 'R': // resource
+                        {
+                            CResource * resource = g_pGame->GetResourceManager ( )->GetResource ( strString.c_str ( ) + 3 );
+                            if ( resource )
                             {
-                                unsigned long ulTableID = static_cast < unsigned long > ( atol ( strString.c_str ( ) + 3 ) );
-                                if ( pKnownTables && ulTableID < pKnownTables->size ( ) )
-                                {
-                                    m_pTableData = pKnownTables->at ( ulTableID );
-                                    m_bWeakTableRef = true;
-                                    m_iType = LUA_TTABLE;
-                                }
-                                else
-                                {
-                                    g_pGame->GetScriptDebugging ( )->LogError ( NULL, SString ( "Invalid table reference specified in JSON string '%s'.", strString.c_str ( ) ) );
-                                    m_iType = LUA_TNIL;
-                                }
-                                break;
+                                ReadScriptID ( resource->GetScriptID ( ) );
                             }
+                            else
+                            {
+                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, SString ( "Invalid resource specified in JSON string '%s'.", strString.c_str ( ) ) );
+                                m_iType = LUA_TNIL;
+                            }
+                            break;
+                        }
+                    case 'T':   // Table reference
+                        {
+                            unsigned long ulTableID = static_cast < unsigned long > ( atol ( strString.c_str ( ) + 3 ) );
+                            if ( pKnownTables && ulTableID < pKnownTables->size ( ) )
+                            {
+                                m_pTableData = pKnownTables->at ( ulTableID );
+                                m_bWeakTableRef = true;
+                                m_iType = LUA_TTABLE;
+                            }
+                            else
+                            {
+                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, SString ( "Invalid table reference specified in JSON string '%s'.", strString.c_str ( ) ) );
+                                m_iType = LUA_TNIL;
+                            }
+                            break;
                         }
                     }
-                    else
-                        ReadString ( strString );
-                    break;
                 }
-                default:
-                return false;
+                else
+                    ReadString ( strString );
+                break;
             }
+        default:
+            return false;
         }
-        return true;
     }
-    return false;
+    return true;
 }

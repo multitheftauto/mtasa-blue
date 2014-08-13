@@ -551,15 +551,15 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             strReason = _("Disconnect from server"); strErrorCode = _E("CD31");
             break;
         case ePlayerDisconnectType::BANNED_SERIAL:
-            strReason = _("Disconnected: Serial is banned."); strErrorCode = _E("CD32");
+            strReason = _("Disconnected: Serial is banned.\nReason: %s"); strErrorCode = _E("CD32");
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::BANNED_IP:
-            strReason = _("Disconnected: You are banned."); strErrorCode = _E("CD33");
+            strReason = _("Disconnected: You are banned.\nReason: %s"); strErrorCode = _E("CD33");
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::BANNED_ACCOUNT:
-            strReason = _("Disconnected: Account is banned."); strErrorCode = _E("CD34");
+            strReason = _("Disconnected: Account is banned.\nReason: %s"); strErrorCode = _E("CD34");
             break;
         case ePlayerDisconnectType::VERSION_MISMATCH:
             strReason = _("Disconnected: Version mismatch"); strErrorCode = _E("CD35");
@@ -615,9 +615,6 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
     {
         if ( bitStream.GetNumberOfUnreadBits() > 7 ) // We have our string left to read
         {
-            if ( ucType == BANNED_SERIAL || ucType == BANNED_IP || ucType == BANNED_ACCOUNT )
-                strReason += _("\nReason: %s");
-
             SString strMessage;
             bitStream.ReadString ( strMessage );
             strReason = SString(strReason,strMessage.c_str());

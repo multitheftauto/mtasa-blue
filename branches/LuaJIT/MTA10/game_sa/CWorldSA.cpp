@@ -592,7 +592,7 @@ int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, uchar& ucOu
     return iNodeId;*/
 }
 
-void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior )
+void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior, uint* pOutAmount )
 {    
     // New building Removal
     SBuildingRemoval* pRemoval = new SBuildingRemoval();
@@ -606,6 +606,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
     m_pBuildingRemovals->insert ( std::pair<unsigned short, SBuildingRemoval*> ( usModelToRemove, pRemoval ) );
 
     bool bFound = false;
+    uint uiAmount = 0;
     // Init loop variables
     std::pair < std::multimap < unsigned short, sDataBuildingRemovalItem*>::iterator, std::multimap < unsigned short, sDataBuildingRemovalItem* >::iterator> iterators = m_pDataBuildings->equal_range ( usModelToRemove );
     std::multimap < unsigned short, sDataBuildingRemovalItem* > ::const_iterator iter = iterators.first;
@@ -708,6 +709,7 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
                                 Remove ( pInterface, BuildingRemoval2 );
                                 m_pRemovedEntities[(DWORD)pInterface] = true;
                                 bFound = true;
+                                ++uiAmount;
                             }
                         }
                         // Get next LOD ( LOD's can have LOD's so we keep checking pInterface )
@@ -721,11 +723,16 @@ void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, fl
     }
     if ( bFound )
         pGame->GetModelInfo ( usModelToRemove )->RestreamIPL ();
+
+    if ( pOutAmount )
+        *pOutAmount = uiAmount;
 }
 
-bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, float fX, float fY, float fZ, char cInterior )
+bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, float fX, float fY, float fZ, char cInterior, uint* pOutAmount  )
 {        
     bool bSuccess = false;
+    uint uiAmount = 0;
+
     // Init some variables
     std::pair < std::multimap < unsigned short, SBuildingRemoval* >::iterator, std::multimap < unsigned short, SBuildingRemoval* >::iterator> iterators = m_pBuildingRemovals->equal_range ( usModelToRestore );
     std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = iterators.first;
@@ -770,6 +777,7 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
                                     m_pRemovedEntities[(DWORD)pEntity] = false;
                                     // If the building isn't streamed in, we won't find the building in the list (because the hook wasn't called) -> removeWorldModel doesn't work next time
                                     AddBinaryBuilding ( pEntity );
+                                    ++uiAmount;
                                 }
                             }
                         }
@@ -880,6 +888,9 @@ bool CWorldSA::RestoreBuilding ( unsigned short usModelToRestore, float fRange, 
         }
     }
 
+    if ( pOutAmount )
+        *pOutAmount = uiAmount;
+
     return bSuccess;
 }
 
@@ -971,10 +982,12 @@ bool CWorldSA::IsEntityRemoved ( CEntitySAInterface * pInterface )
 }
 
 // Resets deleted list
-void CWorldSA::ClearRemovedBuildingLists ( )
+void CWorldSA::ClearRemovedBuildingLists ( uint* pOutAmount )
 {
     // Ensure no memory leaks by deleting items.
+    uint uiAmount = 0;
     std::multimap < unsigned short, SBuildingRemoval* > ::const_iterator iter = m_pBuildingRemovals->begin ( );
+
     for ( ; iter != m_pBuildingRemovals->end ( ); )
     {
         SBuildingRemoval * pFind = (*iter).second;
@@ -1001,6 +1014,7 @@ void CWorldSA::ClearRemovedBuildingLists ( )
                             {
                                 Add ( pEntity, BuildingRemovalReset );
                                 m_pRemovedEntities[(DWORD)pEntity] = false;
+                                ++uiAmount;
                             }
                         }
                     }
@@ -1064,6 +1078,9 @@ void CWorldSA::ClearRemovedBuildingLists ( )
     // Create new
     m_pBuildingRemovals = new std::multimap< unsigned short, SBuildingRemoval* >;
     m_pRemovedEntities.clear ( );
+
+    if ( pOutAmount )
+        *pOutAmount = uiAmount;
 }
 
 
