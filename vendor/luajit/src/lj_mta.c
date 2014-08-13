@@ -31,7 +31,7 @@ static int ACLWrapper(lua_State *L, lua_CFunction f)
 	return 0;
 }
 
-void lua_RegisterHook(lua_State* L)
+LUA_API void lua_RegisterHook(lua_State* L)
 {
     lua_pushlightuserdata(L, (void *)ACLWrapper);
     luaJIT_setmode(L, -1, LUAJIT_MODE_WRAPCFUNC|LUAJIT_MODE_ON);
