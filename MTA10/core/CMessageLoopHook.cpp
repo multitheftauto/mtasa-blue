@@ -308,6 +308,53 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
                         CLocalGUI::GetSingleton ().GetMainMenu ()->OnEscapePressedOffLine ();
                     }
 
+                    // If CTRL and Tab are pressed, Trigger a skip
+                    if ( ( uMsg == WM_KEYDOWN && wParam == VK_TAB ) )
+                    {
+                        eSystemState systemState = g_pCore->GetGame ()->GetSystemState ();
+                        if ( systemState == 7 || systemState == 8 || systemState == 9 )
+                        {
+                            short sCtrlState = GetKeyState ( VK_CONTROL );
+                            short sShiftState = GetKeyState ( VK_SHIFT );
+                            if ( sCtrlState & 0x8000 )
+                            {
+                                CSettings * pSettings = CLocalGUI::GetSingleton ().GetMainMenu ()->GetSettingsWindow ();
+                                CServerBrowser * pServerBrowser = CLocalGUI::GetSingleton ().GetMainMenu ()->GetServerBrowser ();
+
+                                if ( pSettings && pSettings->IsVisible ( ) && pSettings->IsActive ( ) )
+                                {
+                                    pSettings->TabSkip ( sShiftState & 0x8000 );
+                                }
+                                else if ( pServerBrowser && pServerBrowser->IsVisible ( ) && pServerBrowser->IsActive ( ) )
+                                {
+                                    pServerBrowser->TabSkip ( sShiftState & 0x8000 );
+                                }
+                            }
+                        }
+                    }
+                    if ( ( uMsg == WM_KEYDOWN && ( wParam >= VK_1 && wParam <= VK_9 ) ) )
+                    {
+                        eSystemState systemState = g_pCore->GetGame ()->GetSystemState ();
+                        if ( systemState == 7 || systemState == 8 || systemState == 9 )
+                        {
+                            short sCtrlState = GetKeyState ( VK_CONTROL );
+                            if ( sCtrlState & 0x8000 )
+                            {
+                                CSettings * pSettings = CLocalGUI::GetSingleton ().GetMainMenu ()->GetSettingsWindow ();
+                                CServerBrowser * pServerBrowser = CLocalGUI::GetSingleton ().GetMainMenu ()->GetServerBrowser ();
+
+                                if ( pSettings && pSettings->IsVisible ( ) && pSettings->IsActive ( ) )
+                                {
+                                    pSettings->SetSelectedIndex ( ( wParam - VK_1 ) - 1 );
+                                }
+                                else if ( pServerBrowser && pServerBrowser->IsVisible ( ) && pServerBrowser->IsActive ( ) )
+                                {
+                                    pServerBrowser->SetSelectedIndex ( ( wParam - VK_1 ) - 1 );
+                                }
+                            }
+                        }
+                    }
+
                     // If F8 is pressed, we show/hide the console
                     if ( ( uMsg == WM_KEYDOWN && wParam == VK_F8 ) || ( uMsg == WM_CHAR && wParam == '`' ) )
                     {

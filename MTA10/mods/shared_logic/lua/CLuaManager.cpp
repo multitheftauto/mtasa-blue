@@ -1122,6 +1122,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefs::Md5 );
     CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefs::Sha256 );
+    CLuaCFunctions::AddFunction ( "hash", CLuaFunctionDefs::Hash );
     CLuaCFunctions::AddFunction ( "teaEncode", CLuaFunctionDefs::TeaEncode );
     CLuaCFunctions::AddFunction ( "teaDecode", CLuaFunctionDefs::TeaDecode );
     CLuaCFunctions::AddFunction ( "base64Encode", CLuaFunctionDefs::Base64encode );

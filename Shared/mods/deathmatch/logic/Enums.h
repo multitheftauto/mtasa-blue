@@ -61,3 +61,5 @@ enum eEulerRotationOrder
 };
 
 DECLARE_ENUM( eEulerRotationOrder );
+
+DECLARE_ENUM( EHashFunction::EHashFunctionType );

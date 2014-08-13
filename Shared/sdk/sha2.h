@@ -1,167 +1,108 @@
-/**
- * \file sha2.h
+/*
+ * FIPS 180-2 SHA-224/256/384/512 implementation
+ * Last update: 02/02/2007
+ * Issue date:  04/30/2005
  *
- * \brief SHA-224 and SHA-256 cryptographic hash function
+ * Copyright (C) 2005, 2007 Olivier Gay <olivier.gay@a3.epfl.ch>
+ * All rights reserved.
  *
- *  Copyright (C) 2006-2010, Brainspark B.V.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the project nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
-#ifndef POLARSSL_SHA2_H
-#define POLARSSL_SHA2_H
 
-#include <string.h>
+#ifndef SHA2_H
+#define SHA2_H
 
-#ifdef _MSC_VER
-#include <basetsd.h>
-typedef UINT32 uint32_t;
-#else
-#include <inttypes.h>
+#define SHA224_DIGEST_SIZE ( 224 / 8)
+#define SHA256_DIGEST_SIZE ( 256 / 8)
+#define SHA384_DIGEST_SIZE ( 384 / 8)
+#define SHA512_DIGEST_SIZE ( 512 / 8)
+
+#define SHA256_BLOCK_SIZE  ( 512 / 8)
+#define SHA512_BLOCK_SIZE  (1024 / 8)
+#define SHA384_BLOCK_SIZE  SHA512_BLOCK_SIZE
+#define SHA224_BLOCK_SIZE  SHA256_BLOCK_SIZE
+
+#ifndef SHA2_TYPES
+#define SHA2_TYPES
+typedef unsigned char uint8;
+typedef unsigned int  uint32;
+typedef unsigned long long uint64;
 #endif
-
-#define POLARSSL_ERR_SHA2_FILE_IO_ERROR                -0x0078  /**< Read/write error in file. */
-
-/**
- * \brief          SHA-256 context structure
- */
-typedef struct
-{
-    uint32_t total[2];          /*!< number of bytes processed  */
-    uint32_t state[8];          /*!< intermediate digest state  */
-    unsigned char buffer[64];   /*!< data block being processed */
-
-    unsigned char ipad[64];     /*!< HMAC: inner padding        */
-    unsigned char opad[64];     /*!< HMAC: outer padding        */
-    int is224;                  /*!< 0 => SHA-256, else SHA-224 */
-}
-sha2_context;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * \brief          SHA-256 context setup
- *
- * \param ctx      context to be initialized
- * \param is224    0 = use SHA256, 1 = use SHA224
- */
-void sha2_starts( sha2_context *ctx, int is224 );
+typedef struct {
+    unsigned int tot_len;
+    unsigned int len;
+    unsigned char block[2 * SHA256_BLOCK_SIZE];
+    uint32 h[8];
+} sha256_ctx;
 
-/**
- * \brief          SHA-256 process buffer
- *
- * \param ctx      SHA-256 context
- * \param input    buffer holding the  data
- * \param ilen     length of the input data
- */
-void sha2_update( sha2_context *ctx, const unsigned char *input, size_t ilen );
+typedef struct {
+    unsigned int tot_len;
+    unsigned int len;
+    unsigned char block[2 * SHA512_BLOCK_SIZE];
+    uint64 h[8];
+} sha512_ctx;
 
-/**
- * \brief          SHA-256 final digest
- *
- * \param ctx      SHA-256 context
- * \param output   SHA-224/256 checksum result
- */
-void sha2_finish( sha2_context *ctx, unsigned char output[32] );
+typedef sha512_ctx sha384_ctx;
+typedef sha256_ctx sha224_ctx;
 
-/**
- * \brief          Output = SHA-256( input buffer )
- *
- * \param input    buffer holding the  data
- * \param ilen     length of the input data
- * \param output   SHA-224/256 checksum result
- * \param is224    0 = use SHA256, 1 = use SHA224
- */
-void sha2( const unsigned char *input, size_t ilen,
-           unsigned char output[32], int is224 );
+void sha224_init(sha224_ctx *ctx);
+void sha224_update(sha224_ctx *ctx, const unsigned char *message,
+                   unsigned int len);
+void sha224_final(sha224_ctx *ctx, unsigned char *digest);
+void sha224(const unsigned char *message, unsigned int len,
+            unsigned char *digest);
 
-/**
- * \brief          Output = SHA-256( file contents )
- *
- * \param path     input file name
- * \param output   SHA-224/256 checksum result
- * \param is224    0 = use SHA256, 1 = use SHA224
- *
- * \return         0 if successful, or POLARSSL_ERR_SHA2_FILE_IO_ERROR
- */
-int sha2_file( const char *path, unsigned char output[32], int is224 );
+void sha256_init(sha256_ctx * ctx);
+void sha256_update(sha256_ctx *ctx, const unsigned char *message,
+                   unsigned int len);
+void sha256_final(sha256_ctx *ctx, unsigned char *digest);
+void sha256(const unsigned char *message, unsigned int len,
+            unsigned char *digest);
 
-/**
- * \brief          SHA-256 HMAC context setup
- *
- * \param ctx      HMAC context to be initialized
- * \param key      HMAC secret key
- * \param keylen   length of the HMAC key
- * \param is224    0 = use SHA256, 1 = use SHA224
- */
-void sha2_hmac_starts( sha2_context *ctx, const unsigned char *key, size_t keylen,
-                       int is224 );
+void sha384_init(sha384_ctx *ctx);
+void sha384_update(sha384_ctx *ctx, const unsigned char *message,
+                   unsigned int len);
+void sha384_final(sha384_ctx *ctx, unsigned char *digest);
+void sha384(const unsigned char *message, unsigned int len,
+            unsigned char *digest);
 
-/**
- * \brief          SHA-256 HMAC process buffer
- *
- * \param ctx      HMAC context
- * \param input    buffer holding the  data
- * \param ilen     length of the input data
- */
-void sha2_hmac_update( sha2_context *ctx, const unsigned char *input, size_t ilen );
-
-/**
- * \brief          SHA-256 HMAC final digest
- *
- * \param ctx      HMAC context
- * \param output   SHA-224/256 HMAC checksum result
- */
-void sha2_hmac_finish( sha2_context *ctx, unsigned char output[32] );
-
-/**
- * \brief          SHA-256 HMAC context reset
- *
- * \param ctx      HMAC context to be reset
- */
-void sha2_hmac_reset( sha2_context *ctx );
-
-/**
- * \brief          Output = HMAC-SHA-256( hmac key, input buffer )
- *
- * \param key      HMAC secret key
- * \param keylen   length of the HMAC key
- * \param input    buffer holding the  data
- * \param ilen     length of the input data
- * \param output   HMAC-SHA-224/256 result
- * \param is224    0 = use SHA256, 1 = use SHA224
- */
-void sha2_hmac( const unsigned char *key, size_t keylen,
-                const unsigned char *input, size_t ilen,
-                unsigned char output[32], int is224 );
-
-/**
- * \brief          Checkup routine
- *
- * \return         0 if successful, or 1 if the test failed
- */
-int sha2_self_test( int verbose );
+void sha512_init(sha512_ctx *ctx);
+void sha512_update(sha512_ctx *ctx, const unsigned char *message,
+                   unsigned int len);
+void sha512_final(sha512_ctx *ctx, unsigned char *digest);
+void sha512(const unsigned char *message, unsigned int len,
+            unsigned char *digest);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* sha2.h */
+#endif /* !SHA2_H */
+
