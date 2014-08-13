@@ -2700,16 +2700,21 @@ CClientPlayer * CClientGame::GetClosestRemotePlayer ( const CVector & vecPositio
     for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
     {
         pPlayer = *iter;
-        if ( !pPlayer->IsLocalPlayer () )
-        {            
-            pPlayer->GetPosition ( vecTemp );
-            fTemp = DistanceBetweenPoints3D ( vecPosition, vecTemp );
-            if ( fTemp < fMaxDistance )
+        if ( !pPlayer->IsLocalPlayer () && !pPlayer->IsDeadOnNetwork () && pPlayer->GetHealth () > 0 )
+        {
+            // Ensure remote player is alive and sending position updates
+            ulong ulTimeSinceLastPuresync = CClientTime::GetTime () - pPlayer->GetLastPuresyncTime ();
+            if ( ulTimeSinceLastPuresync < g_TickRateSettings.iPureSync * 2 )
             {
-                if ( !pClosest || fTemp < fDistance )
+                pPlayer->GetPosition ( vecTemp );
+                fTemp = DistanceBetweenPoints3D ( vecPosition, vecTemp );
+                if ( fTemp < fMaxDistance )
                 {
-                    pClosest = pPlayer;
-                    fDistance = fTemp;
+                    if ( !pClosest || fTemp < fDistance )
+                    {
+                        pClosest = pPlayer;
+                        fDistance = fTemp;
+                    }
                 }
             }
         }
