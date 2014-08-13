@@ -90,7 +90,7 @@ int CLuaFunctionDefs::dxDrawMaterialLine3D ( lua_State* luaVM )
     argStream.ReadUserData ( pMaterial );
     argStream.ReadNumber ( fWidth );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
-    if ( argStream.NextCouldBeNumber () )
+    if ( argStream.NextCouldBeVector ( ) )
     {
         argStream.ReadVector3D ( vecFaceToward );
         bUseFaceToward = true;
@@ -128,7 +128,7 @@ int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
     argStream.ReadUserData ( pMaterial );
     argStream.ReadNumber ( fWidth );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
-    if ( argStream.NextCouldBeNumber () )
+    if ( argStream.NextCouldBeVector ( ) )
     {
         argStream.ReadVector3D ( vecFaceToward );
         bUseFaceToward = true;
