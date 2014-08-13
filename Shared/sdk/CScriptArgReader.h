@@ -971,6 +971,7 @@ public:
     bool NextIsFunction     ( int iOffset = 0 ) const  { return NextIs ( LUA_TFUNCTION, iOffset ); }
     bool NextCouldBeNumber  ( int iOffset = 0 ) const  { return NextIsNumber ( iOffset ) || NextIsString ( iOffset ); }
     bool NextCouldBeString  ( int iOffset = 0 ) const  { return NextIsNumber ( iOffset ) || NextIsString ( iOffset ); }
+    bool NextCouldBeVector  ( int iOffset = 0 ) const { return NextCouldBeNumber ( iOffset ) || NextIsUserData ( iOffset ); }
 
     template < class T >
     bool NextIsEnumString ( T&, int iOffset = 0 )
