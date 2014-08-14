@@ -11,7 +11,7 @@
 ------------------------------------------------------------------------------
 
 local jit = require("jit")
-assert(jit.version_num == 20003, "LuaJIT core/library version mismatch")
+assert(jit.version_num == 20100, "LuaJIT core/library version mismatch")
 local bit = require("bit")
 
 -- Symbol name prefix for LuaJIT bytecode.
@@ -653,7 +653,7 @@ end
 ------------------------------------------------------------------------------
 
 -- Public module functions.
-module(...)
-
-start = docmd -- Process -b command line option.
+return {
+  start = docmd -- Process -b command line option.
+}
 

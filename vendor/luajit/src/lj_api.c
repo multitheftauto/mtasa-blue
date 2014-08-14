@@ -24,6 +24,7 @@
 #include "lj_trace.h"
 #include "lj_vm.h"
 #include "lj_strscan.h"
+#include "lj_strfmt.h"
 
 /* -- Common helper functions --------------------------------------------- */
 
@@ -434,7 +435,7 @@ LUA_API const char *lua_tolstring(lua_State *L, int idx, size_t *len)
   } else if (tvisnumber(o)) {
     lj_gc_check(L);
     o = index2adr(L, idx);  /* GC may move the stack. */
-    s = lj_str_fromnumber(L, o);
+    s = lj_strfmt_number(L, o);
     setstrV(L, o, s);
   } else {
     if (len != NULL) *len = 0;
@@ -453,7 +454,7 @@ LUALIB_API const char *luaL_checklstring(lua_State *L, int idx, size_t *len)
   } else if (tvisnumber(o)) {
     lj_gc_check(L);
     o = index2adr(L, idx);  /* GC may move the stack. */
-    s = lj_str_fromnumber(L, o);
+    s = lj_strfmt_number(L, o);
     setstrV(L, o, s);
   } else {
     lj_err_argt(L, idx, LUA_TSTRING);
@@ -475,7 +476,7 @@ LUALIB_API const char *luaL_optlstring(lua_State *L, int idx,
   } else if (tvisnumber(o)) {
     lj_gc_check(L);
     o = index2adr(L, idx);  /* GC may move the stack. */
-    s = lj_str_fromnumber(L, o);
+    s = lj_strfmt_number(L, o);
     setstrV(L, o, s);
   } else {
     lj_err_argt(L, idx, LUA_TSTRING);
@@ -507,7 +508,7 @@ LUA_API size_t lua_objlen(lua_State *L, int idx)
   } else if (tvisudata(o)) {
     return udataV(o)->len;
   } else if (tvisnumber(o)) {
-    GCstr *s = lj_str_fromnumber(L, o);
+    GCstr *s = lj_strfmt_number(L, o);
     setstrV(L, o, s);
     return s->len;
   } else {
@@ -545,17 +546,7 @@ LUA_API lua_State *lua_tothread(lua_State *L, int idx)
 
 LUA_API const void *lua_topointer(lua_State *L, int idx)
 {
-  cTValue *o = index2adr(L, idx);
-  if (tvisudata(o))
-    return uddata(udataV(o));
-  else if (tvislightud(o))
-    return lightudV(o);
-  else if (tviscdata(o))
-    return cdataptr(cdataV(o));
-  else if (tvisgcv(o))
-    return gcV(o);
-  else
-    return NULL;
+  return lj_obj_ptr(index2adr(L, idx));
 }
 
 /* -- Stack setters (object creation) ------------------------------------- */
@@ -606,7 +597,7 @@ LUA_API const char *lua_pushvfstring(lua_State *L, const char *fmt,
 				     va_list argp)
 {
   lj_gc_check(L);
-  return lj_str_pushvf(L, fmt, argp);
+  return lj_strfmt_pushvf(L, fmt, argp);
 }
 
 LUA_API const char *lua_pushfstring(lua_State *L, const char *fmt, ...)
@@ -615,7 +606,7 @@ LUA_API const char *lua_pushfstring(lua_State *L, const char *fmt, ...)
   va_list argp;
   lj_gc_check(L);
   va_start(argp, fmt);
-  ret = lj_str_pushvf(L, fmt, argp);
+  ret = lj_strfmt_pushvf(L, fmt, argp);
   va_end(argp);
   return ret;
 }
@@ -649,10 +640,8 @@ LUA_API void lua_pushlightuserdata(lua_State *L, void *p)
 
 LUA_API void lua_createtable(lua_State *L, int narray, int nrec)
 {
-  GCtab *t;
   lj_gc_check(L);
-  t = lj_tab_new(L, (uint32_t)(narray > 0 ? narray+1 : 0), hsize2hbits(nrec));
-  settabV(L, L->top, t);
+  settabV(L, L->top, lj_tab_new_ah(L, narray, nrec));
   incr_top(L);
 }
 
@@ -1197,6 +1186,7 @@ LUA_API void lua_setallocf(lua_State *L, lua_Alloc f, void *ud)
   g->allocd = ud;
   g->allocf = f;
 }
+
 // MTA addition to validate inclusion of working apichecks
 #if defined(LUA_USE_APICHECK)
 LUA_API int luaX_is_apicheck_enabled()

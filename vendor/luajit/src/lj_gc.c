@@ -12,6 +12,7 @@
 #include "lj_obj.h"
 #include "lj_gc.h"
 #include "lj_err.h"
+#include "lj_buf.h"
 #include "lj_str.h"
 #include "lj_tab.h"
 #include "lj_func.h"
@@ -348,15 +349,6 @@ static size_t gc_propagate_gray(global_State *g)
 
 /* -- Sweep phase --------------------------------------------------------- */
 
-/* Try to shrink some common data structures. */
-static void gc_shrink(global_State *g, lua_State *L)
-{
-  if (g->strnum <= (g->strmask >> 2) && g->strmask > LJ_MIN_STRTAB*2-1)
-    lj_str_resize(L, g->strmask >> 1);  /* Shrink string table. */
-  if (g->tmpbuf.sz > LJ_MIN_SBUF*2)
-    lj_str_resizebuf(L, &g->tmpbuf, g->tmpbuf.sz >> 1);  /* Shrink temp buf. */
-}
-
 /* Type of GC free functions. */
 typedef void (LJ_FASTCALL *GCFreeFunc)(global_State *g, GCobj *o);
 
@@ -483,7 +475,7 @@ static void gc_finalize(lua_State *L)
   global_State *g = G(L);
   GCobj *o = gcnext(gcref(g->gc.mmudata));
   cTValue *mo;
-  lua_assert(gcref(g->jit_L) == NULL);  /* Must not be called on trace. */
+  lua_assert(tvref(g->jit_base) == NULL);  /* Must not be called on trace. */
   /* Unchain from list of userdata to be finalized. */
   if (o == gcref(g->gc.mmudata))
     setgcrefnull(g->gc.mmudata);
@@ -592,6 +584,8 @@ static void atomic(global_State *g, lua_State *L)
   /* All marking done, clear weak tables. */
   gc_clearweak(gcref(g->gc.weak));
 
+  lj_buf_shrink(L, &g->tmpbuf);  /* Shrink temp buffer. */
+
   /* Prepare for sweep phase. */
   g->gc.currentwhite = (uint8_t)otherwhite(g);  /* Flip current white. */
   g->strempty.marked = g->gc.currentwhite;
@@ -613,7 +607,7 @@ static size_t gc_onestep(lua_State *L)
     g->gc.state = GCSatomic;  /* End of mark phase. */
     return 0;
   case GCSatomic:
-    if (gcref(g->jit_L))  /* Don't run atomic phase on trace. */
+    if (tvref(g->jit_base))  /* Don't run atomic phase on trace. */
       return LJ_MAX_MEM;
     atomic(g, L);
     g->gc.state = GCSsweepstring;  /* Start of sweep phase. */
@@ -631,8 +625,11 @@ static size_t gc_onestep(lua_State *L)
   case GCSsweep: {
     MSize old = g->gc.total;
     setmref(g->gc.sweep, gc_sweep(g, mref(g->gc.sweep, GCRef), GCSWEEPMAX));
+    lua_assert(old >= g->gc.total);
+    g->gc.estimate -= old - g->gc.total;
     if (gcref(*mref(g->gc.sweep, GCRef)) == NULL) {
-      gc_shrink(g, L);
+      if (g->strnum <= (g->strmask >> 2) && g->strmask > LJ_MIN_STRTAB*2-1)
+	lj_str_resize(L, g->strmask >> 1);  /* Shrink string table. */
       if (gcref(g->gc.mmudata)) {  /* Need any finalizations? */
 	g->gc.state = GCSfinalize;
 #if LJ_HASFFI
@@ -643,13 +640,11 @@ static size_t gc_onestep(lua_State *L)
 	g->gc.debt = 0;
       }
     }
-    lua_assert(old >= g->gc.total);
-    g->gc.estimate -= old - g->gc.total;
     return GCSWEEPMAX*GCSWEEPCOST;
     }
   case GCSfinalize:
     if (gcref(g->gc.mmudata) != NULL) {
-      if (gcref(g->jit_L))  /* Don't call finalizers on trace. */
+      if (tvref(g->jit_base))  /* Don't call finalizers on trace. */
 	return LJ_MAX_MEM;
       gc_finalize(L);  /* Finalize one userdata object. */
       if (g->gc.estimate > GCFINALIZECOST)
@@ -711,8 +706,8 @@ void LJ_FASTCALL lj_gc_step_fixtop(lua_State *L)
 /* Perform multiple GC steps. Called from JIT-compiled code. */
 int LJ_FASTCALL lj_gc_step_jit(global_State *g, MSize steps)
 {
-  lua_State *L = gco2th(gcref(g->jit_L));
-  L->base = mref(G(L)->jit_base, TValue);
+  lua_State *L = gco2th(gcref(g->cur_L));
+  L->base = tvref(G(L)->jit_base);
   L->top = curr_topL(L);
   while (steps-- > 0 && lj_gc_step(L) == 0)
     ;

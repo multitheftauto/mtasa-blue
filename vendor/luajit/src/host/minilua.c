@@ -1682,40 +1682,85 @@ setsvalue(L,&k,key);
 return newkey(L,t,&k);
 }
 }
-static int unbound_search(Table*t,unsigned int j){
-unsigned int i=j;
-j++;
-while(!ttisnil(luaH_getnum(t,j))){
-i=j;
-j*=2;
-if(j>cast(unsigned int,(INT_MAX-2))){
-i=1;
-while(!ttisnil(luaH_getnum(t,i)))i++;
-return i-1;
+/*static int unbound_search(Table*t,unsigned int j)
+{
+    unsigned int i=j;
+    j++;
+    while(!ttisnil(luaH_getnum(t,j)))
+    {
+        i=j;
+        j*=2;
+        if(j>cast(unsigned int,(INT_MAX-2)))
+        {
+            i=1;
+            while(!ttisnil(luaH_getnum(t,i)))
+                i++;
+            return i-1;
+        }
+    }
+    while(j-i>1)
+    {
+        unsigned int m=(i+j)/2;
+        if(ttisnil(luaH_getnum(t,m)))
+            j=m;
+        else 
+            i=m;
+    }
+    return i;
 }
-}
-while(j-i>1){
-unsigned int m=(i+j)/2;
-if(ttisnil(luaH_getnum(t,m)))j=m;
-else i=m;
-}
-return i;
-}
+// MTA change -> just return j... don't check for nils please.
 static int luaH_getn(Table*t){
-unsigned int j=t->sizearray;
-if(j>0&&ttisnil(&t->array[j-1])){
-unsigned int i=0;
-while(j-i>1){
-unsigned int m=(i+j)/2;
-if(ttisnil(&t->array[m-1]))j=m;
-else i=m;
+    unsigned int j=t->sizearray;
+    return j;
+}*/
+
+static int unbound_search (Table *t, unsigned int j) {
+  unsigned int i = j;  /* i is zero or a present index */
+  j++;
+  /* find `i' and `j' such that i is present and j is not */
+  while (!ttisnil(luaH_getnum(t, j))) {
+    i = j;
+    j *= 2;
+    if (j > cast(unsigned int, INT_MAX)) {  /* overflow? */
+      /* table was built with bad purposes: resort to linear search */
+      i = 1;
+      while (!ttisnil(luaH_getnum(t, i))) i++;
+      return i - 1;
+    }
+  }
+  /* now do a binary search between them */
+  while (j - i > 1) {
+    unsigned int m = (i+j)/2;
+    if (ttisnil(luaH_getnum(t, m))) j = m;
+    else i = m;
+  }
+  return i;
 }
-return i;
+
+
+/*
+** Try to find a boundary in table `t'. A `boundary' is an integer index
+** such that t[i] is non-nil and t[i+1] is nil (and 0 if t[1] is nil).
+*/
+int luaH_getn (Table *t) {
+  unsigned int j = t->sizearray;
+  if (j > 0 && ttisnil(&t->array[j - 1])) {
+    /* there is a boundary in the array part: (binary) search for it */
+    unsigned int i = 0;
+    while (j - i > 1) {
+      unsigned int m = (i+j)/2;
+      if (ttisnil(&t->array[m - 1])) j = m;
+      else i = m;
+    }
+    return i;
+  }
+  /* else must find a boundary in hash part */
+  else if (t->node == (&dummynode_))  /* hash part is empty? */
+    return j;  /* that is easy... */
+  else return unbound_search(t, j);
 }
-else if(t->node==(&dummynode_))
-return j;
-else return unbound_search(t,j);
-}
+
+
 #define makewhite(g,x)((x)->gch.marked=cast_byte(((x)->gch.marked&cast_byte(~(bitmask(2)|bit2mask(0,1))))|luaC_white(g)))
 #define white2gray(x)reset2bits((x)->gch.marked,0,1)
 #define black2gray(x)resetbit((x)->gch.marked,2)

@@ -289,6 +289,81 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Nightly server only|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="0"
+				OmitFramePointers="true"
+				WholeProgramOptimization="true"
+				PreprocessorDefinitions="RARDLL;UNRAR;SILENT;NOCRYPT"
+				MinimalRebuild="false"
+				RuntimeLibrary="2"
+				StructMemberAlignment="0"
+				BufferSecurityCheck="true"
+				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="0"
+				FloatingPointModel="0"
+				RuntimeTypeInfo="false"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="rar.hpp"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CallingConvention="0"
+				DisableSpecificWarnings="4007;4996"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -393,6 +468,14 @@
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly server only|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="isnt.cpp"
@@ -439,6 +522,14 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly server only|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

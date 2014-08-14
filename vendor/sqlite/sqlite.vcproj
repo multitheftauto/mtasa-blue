@@ -245,6 +245,83 @@
 				CommandLine=""
 			/>
 		</Configuration>
+		<Configuration
+			Name="Nightly server only|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SQLITE_EXPORTS;SQLITE_API=__declspec(dllexport)"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\sqlite3.dll"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				ImportLibrary="$(OutDir)\$(TargetName).lib"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine=""
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>

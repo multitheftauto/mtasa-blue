@@ -14,18 +14,15 @@
 
 /* CPU-specific JIT engine flags. */
 #if LJ_TARGET_X86ORX64
-#define JIT_F_CMOV		0x00000010
-#define JIT_F_SSE2		0x00000020
-#define JIT_F_SSE3		0x00000040
-#define JIT_F_SSE4_1		0x00000080
-#define JIT_F_P4		0x00000100
-#define JIT_F_PREFER_IMUL	0x00000200
-#define JIT_F_SPLIT_XMM		0x00000400
-#define JIT_F_LEA_AGU		0x00000800
+#define JIT_F_SSE2		0x00000010
+#define JIT_F_SSE3		0x00000020
+#define JIT_F_SSE4_1		0x00000040
+#define JIT_F_PREFER_IMUL	0x00000080
+#define JIT_F_LEA_AGU		0x00000100
 
 /* Names for the CPU-specific flags. Must match the order above. */
-#define JIT_F_CPU_FIRST		JIT_F_CMOV
-#define JIT_F_CPUSTRING		"\4CMOV\4SSE2\4SSE3\6SSE4.1\2P4\3AMD\2K8\4ATOM"
+#define JIT_F_CPU_FIRST		JIT_F_SSE2
+#define JIT_F_CPUSTRING		"\4SSE2\4SSE3\6SSE4.1\3AMD\4ATOM"
 #elif LJ_TARGET_ARM
 #define JIT_F_ARMV6_		0x00000010
 #define JIT_F_ARMV6T2_		0x00000020
@@ -100,6 +97,7 @@
   _(\012, maxirconst,	500)	/* Max. # of IR constants of a trace. */ \
   _(\007, maxside,	100)	/* Max. # of side traces of a root trace. */ \
   _(\007, maxsnap,	500)	/* Max. # of snapshots for a trace. */ \
+  _(\011, minstitch,	0)	/* Min. # of IR ins for a stitched trace. */ \
   \
   _(\007, hotloop,	56)	/* # of iter. to detect a hot loop/call. */ \
   _(\007, hotexit,	10)	/* # of taken exits to start a side trace. */ \
@@ -205,7 +203,8 @@ typedef enum {
   LJ_TRLINK_UPREC,		/* Up-recursion. */
   LJ_TRLINK_DOWNREC,		/* Down-recursion. */
   LJ_TRLINK_INTERP,		/* Fallback to interpreter. */
-  LJ_TRLINK_RETURN		/* Return to interpreter. */
+  LJ_TRLINK_RETURN,		/* Return to interpreter. */
+  LJ_TRLINK_STITCH		/* Trace stitching. */
 } TraceLink;
 
 /* Trace object. */
@@ -279,6 +278,7 @@ typedef struct BPropEntry {
 
 /* Scalar evolution analysis cache. */
 typedef struct ScEvEntry {
+  MRef pc;		/* Bytecode PC of FORI. */
   IRRef1 idx;		/* Index reference. */
   IRRef1 start;		/* Constant start reference. */
   IRRef1 stop;		/* Constant stop reference. */
@@ -399,6 +399,12 @@ typedef struct jit_State {
   size_t szallmcarea;	/* Total size of all allocated mcode areas. */
 
   TValue errinfo;	/* Additional info element for trace errors. */
+
+#if LJ_HASPROFILE
+  GCproto *prev_pt;	/* Previous prototype. */
+  BCLine prev_line;	/* Previous line. */
+  int prof_mode;	/* Profiling mode: 0, 'f', 'l'. */
+#endif
 }
 #if LJ_TARGET_ARM
 LJ_ALIGN(16)		/* For DISPATCH-relative addresses in assembler part. */

@@ -43,18 +43,21 @@ LJ_ASMF void lj_vm_record(void);
 LJ_ASMF void lj_vm_inshook(void);
 LJ_ASMF void lj_vm_rethook(void);
 LJ_ASMF void lj_vm_callhook(void);
+LJ_ASMF void lj_vm_profhook(void);
 
 /* Trace exit handling. */
 LJ_ASMF void lj_vm_exit_handler(void);
 LJ_ASMF void lj_vm_exit_interp(void);
 
 /* Internal math helper functions. */
-#if LJ_TARGET_X86ORX64 || LJ_TARGET_PPC
+#if LJ_TARGET_PPC
 #define lj_vm_floor	floor
 #define lj_vm_ceil	ceil
 #else
 LJ_ASMF double lj_vm_floor(double);
+#if !LJ_TARGET_X86ORX64
 LJ_ASMF double lj_vm_ceil(double);
+#endif
 #if LJ_TARGET_ARM
 LJ_ASMF double lj_vm_floor_sf(double);
 LJ_ASMF double lj_vm_ceil_sf(double);
@@ -104,6 +107,7 @@ LJ_ASMF void lj_cont_nop(void);  /* Do nothing, just continue execution. */
 LJ_ASMF void lj_cont_condt(void);  /* Branch if result is true. */
 LJ_ASMF void lj_cont_condf(void);  /* Branch if result is false. */
 LJ_ASMF void lj_cont_hook(void);  /* Continue from hook yield. */
+LJ_ASMF void lj_cont_stitch(void);  /* Trace stitching. */
 
 enum { LJ_CONT_TAILCALL, LJ_CONT_FFI_CALLBACK };  /* Special continuations. */
 

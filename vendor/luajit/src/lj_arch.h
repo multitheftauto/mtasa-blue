@@ -111,6 +111,11 @@
 #define NULL ((void*)0)
 #endif
 
+#ifdef __psp2__
+#define LJ_TARGET_PSVITA	1
+#define LJ_TARGET_CONSOLE	1
+#endif
+
 #if _XBOX_VER >= 200
 #define LJ_TARGET_XBOX360	1
 #define LJ_TARGET_CONSOLE	1
@@ -234,6 +239,7 @@
 
 #elif LUAJIT_TARGET == LUAJIT_ARCH_PPCSPE
 
+#error "The PPC/e500 port is broken and will be abandoned with LuaJIT 2.1"
 #define LJ_ARCH_NAME		"ppcspe"
 #define LJ_ARCH_BITS		32
 #define LJ_ARCH_ENDIAN		LUAJIT_BE
@@ -370,6 +376,21 @@
 #define LJ_HASFFI		0
 #else
 #define LJ_HASFFI		1
+#endif
+
+#if defined(LUAJIT_DISABLE_PROFILE)
+#define LJ_HASPROFILE		0
+#elif LJ_TARGET_POSIX
+#define LJ_HASPROFILE		1
+#define LJ_PROFILE_SIGPROF	1
+#elif LJ_TARGET_PS3
+#define LJ_HASPROFILE		1
+#define LJ_PROFILE_PTHREAD	1
+#elif LJ_TARGET_WINDOWS || LJ_TARGET_XBOX360
+#define LJ_HASPROFILE		1
+#define LJ_PROFILE_WTHREAD	1
+#else
+#define LJ_HASPROFILE		0
 #endif
 
 #ifndef LJ_ARCH_HASFPU

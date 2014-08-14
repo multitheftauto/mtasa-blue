@@ -12,6 +12,7 @@
 #include "lj_obj.h"
 #include "lj_gc.h"
 #include "lj_err.h"
+#include "lj_buf.h"
 #include "lj_str.h"
 #include "lj_tab.h"
 #include "lj_func.h"
@@ -26,6 +27,7 @@
 #include "lj_vm.h"
 #include "lj_lex.h"
 #include "lj_alloc.h"
+#include "luajit.h"
 
 /* -- Stack handling ------------------------------------------------------ */
 
@@ -59,7 +61,7 @@ static void resizestack(lua_State *L, MSize n)
   GCobj *up;
   lua_assert((MSize)(tvref(L->maxstack)-oldst)==L->stacksize-LJ_STACK_EXTRA-1);
   st = (TValue *)lj_mem_realloc(L, tvref(L->stack),
-				(MSize)(L->stacksize*sizeof(TValue)),
+				(MSize)(oldsize*sizeof(TValue)),
 				(MSize)(realsize*sizeof(TValue)));
   setmref(L->stack, st);
   delta = (char *)st - (char *)oldst;
@@ -67,12 +69,12 @@ static void resizestack(lua_State *L, MSize n)
   while (oldsize < realsize)  /* Clear new slots. */
     setnilV(st + oldsize++);
   L->stacksize = realsize;
+  if ((size_t)(mref(G(L)->jit_base, char) - (char *)oldst) < oldsize)
+    setmref(G(L)->jit_base, mref(G(L)->jit_base, char) + delta);
   L->base = (TValue *)((char *)L->base + delta);
   L->top = (TValue *)((char *)L->top + delta);
   for (up = gcref(L->openupval); up != NULL; up = gcnext(up))
     setmref(gco2uv(up)->v, (TValue *)((char *)uvval(gco2uv(up)) + delta));
-  if (obj2gco(L) == gcref(G(L)->jit_L))
-    setmref(G(L)->jit_base, mref(G(L)->jit_base, char) + delta);
 }
 
 /* Relimit stack after error, in case the limit was overdrawn. */
@@ -89,7 +91,8 @@ void lj_state_shrinkstack(lua_State *L, MSize used)
     return;  /* Avoid stack shrinking while handling stack overflow. */
   if (4*used < L->stacksize &&
       2*(LJ_STACK_START+LJ_STACK_EXTRA) < L->stacksize &&
-      obj2gco(L) != gcref(G(L)->jit_L))  /* Don't shrink stack of live trace. */
+      /* Don't shrink stack of live trace. */
+      (tvref(G(L)->jit_base) == NULL || obj2gco(L) != gcref(G(L)->cur_L)))
     resizestack(L, L->stacksize >> 1);
 }
 
@@ -164,7 +167,7 @@ static void close_state(lua_State *L)
   lj_ctype_freestate(g);
 #endif
   lj_mem_freevec(g, g->strhash, g->strmask+1, GCRef);
-  lj_str_freebuf(g, &g->tmpbuf);
+  lj_buf_free(g, &g->tmpbuf);
   lj_mem_freevec(g, tvref(L->stack), L->stacksize, TValue);
   lua_assert(g->gc.total == sizeof(GG_State));
 #ifndef LUAJIT_USE_SYSMALLOC
@@ -175,7 +178,7 @@ static void close_state(lua_State *L)
     g->allocf(g->allocd, G2GG(g), sizeof(GG_State), 0);
 }
 
-#if LJ_64
+#if LJ_64 && !(defined(LUAJIT_USE_VALGRIND) && defined(LUAJIT_USE_SYSMALLOC))
 lua_State *lj_state_newstate(lua_Alloc f, void *ud)
 #else
 LUA_API lua_State *lua_newstate(lua_Alloc f, void *ud)
@@ -203,7 +206,7 @@ LUA_API lua_State *lua_newstate(lua_Alloc f, void *ud)
   setnilV(&g->nilnode.val);
   setnilV(&g->nilnode.key);
   setmref(g->nilnode.freetop, &g->nilnode);
-  lj_str_initbuf(&g->tmpbuf);
+  lj_buf_init(NULL, &g->tmpbuf);
   g->gc.state = GCSpause;
   setgcref(g->gc.root, obj2gco(L));
   setmref(g->gc.sweep, &g->gc.root);
@@ -236,6 +239,10 @@ LUA_API void lua_close(lua_State *L)
   global_State *g = G(L);
   int i;
   L = mainthread(g);  /* Only the main thread can be closed. */
+#if LJ_HASPROFILE
+  luaJIT_profile_stop(L);
+#endif
+  setgcrefnull(g->cur_L);
   lj_func_closeuv(L, tvref(L->stack));
   lj_gc_separateudata(g, 1);  /* Separate udata which have GC metamethods. */
 #if LJ_HASJIT
@@ -246,8 +253,8 @@ LUA_API void lua_close(lua_State *L)
   for (i = 0;;) {
     hook_enter(g);
     L->status = 0;
-    L->cframe = NULL;
     L->base = L->top = tvref(L->stack) + 1;
+    L->cframe = NULL;
     if (lj_vm_cpcall(L, NULL, NULL, cpfinalize) == 0) {
       if (++i >= 10) break;
       lj_gc_separateudata(g, 1);  /* Separate udata again. */
@@ -279,11 +286,14 @@ lua_State *lj_state_new(lua_State *L)
 void LJ_FASTCALL lj_state_free(global_State *g, lua_State *L)
 {
   lua_assert(L != mainthread(g));
+  if (obj2gco(L) == gcref(g->cur_L))
+    setgcrefnull(g->cur_L);
   lj_func_closeuv(L, tvref(L->stack));
   lua_assert(gcref(L->openupval) == NULL);
   lj_mem_freevec(g, tvref(L->stack), L->stacksize, TValue);
   lj_mem_freet(g, L);
 }
+
 
 // MTA specific
 LUA_API lua_State* lua_getmainstate (lua_State *L) {
