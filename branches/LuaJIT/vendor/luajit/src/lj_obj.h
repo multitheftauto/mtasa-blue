@@ -119,11 +119,12 @@ typedef int32_t BCLine;  /* Bytecode line number. */
 /* Internal assembler functions. Never call these directly from C. */
 typedef void (*ASMFunction)(void);
 
-/* Resizable string buffer. Need this here, details in lj_str.h. */
+/* Resizable string buffer. Need this here, details in lj_buf.h. */
 typedef struct SBuf {
-  char *buf;		/* String buffer base. */
-  MSize n;		/* String buffer length. */
-  MSize sz;		/* String buffer size. */
+  MRef p;		/* String buffer pointer. */
+  MRef e;		/* String buffer end pointer. */
+  MRef b;		/* String buffer base. */
+  MRef L;		/* lua_State, used for buffer resizing. */
 } SBuf;
 
 /* -- Tags and values ----------------------------------------------------- */
@@ -516,8 +517,8 @@ typedef struct global_State {
   lua_Alloc allocf;	/* Memory allocator. */
   void *allocd;		/* Memory allocator data. */
   GCState gc;		/* Garbage collector. */
-  SBuf tmpbuf;		/* Temporary buffer for string concatenation. */
-  Node nilnode;		/* Fallback 1-element hash part (nil key and value). */
+  volatile int32_t vmstate;  /* VM state or current JIT code trace number. */
+  SBuf tmpbuf;		/* Temporary string buffer. */
   GCstr strempty;	/* Empty string. */
   uint8_t stremptyz;	/* Zero terminator of empty string. */
   uint8_t hookmask;	/* Hook mask. */
@@ -526,17 +527,17 @@ typedef struct global_State {
   GCRef mainthref;	/* Link to main thread. */
   TValue registrytv;	/* Anchor for registry. */
   TValue tmptv, tmptv2;	/* Temporary TValues. */
+  Node nilnode;		/* Fallback 1-element hash part (nil key and value). */
   GCupval uvhead;	/* Head of double-linked list of all open upvalues. */
   int32_t hookcount;	/* Instruction hook countdown. */
   int32_t hookcstart;	/* Start count for instruction hook counter. */
   lua_Hook hookf;	/* Hook function. */
   lua_CFunction wrapf;	/* Wrapper for C function calls. */
   lua_CFunction panic;	/* Called as a last resort for errors. */
-  volatile int32_t vmstate;  /* VM state or current JIT code trace number. */
   BCIns bc_cfunc_int;	/* Bytecode for internal C function calls. */
   BCIns bc_cfunc_ext;	/* Bytecode for external C function calls. */
-  GCRef jit_L;		/* Current JIT code lua_State or NULL. */
-  MRef jit_base;	/* Current JIT code L->base. */
+  GCRef cur_L;		/* Currently executing lua_State. */
+  MRef jit_base;	/* Current JIT code L->base or NULL. */
   MRef ctype_state;	/* Pointer to C type state. */
   GCRef gcroot[GCROOT_MAX];  /* GC roots. */
 } global_State;
@@ -553,6 +554,7 @@ typedef struct global_State {
 #define HOOK_ACTIVE_SHIFT	4
 #define HOOK_VMEVENT		0x20
 #define HOOK_GC			0x40
+#define HOOK_PROFILE		0x80
 #define hook_active(g)		((g)->hookmask & HOOK_ACTIVE)
 #define hook_enter(g)		((g)->hookmask |= HOOK_ACTIVE)
 #define hook_entergc(g)		((g)->hookmask |= (HOOK_ACTIVE|HOOK_GC))
@@ -810,11 +812,7 @@ static LJ_AINLINE int32_t lj_num2bit(lua_Number n)
 #endif
 }
 
-#if LJ_TARGET_X86 && !defined(__SSE2__)
-#define lj_num2int(n)   lj_num2bit((n))
-#else
 #define lj_num2int(n)   ((int32_t)(n))
-#endif
 
 static LJ_AINLINE uint64_t lj_num2u64(lua_Number n)
 {
@@ -851,6 +849,7 @@ LJ_DATA const char *const lj_obj_itypename[~LJ_TNUMX+1];
 #define lj_typename(o)	(lj_obj_itypename[itypemap(o)])
 
 /* Compare two objects without calling metamethods. */
-LJ_FUNC int lj_obj_equal(cTValue *o1, cTValue *o2);
+LJ_FUNC int LJ_FASTCALL lj_obj_equal(cTValue *o1, cTValue *o2);
+LJ_FUNC const void * LJ_FASTCALL lj_obj_ptr(cTValue *o);
 
 #endif

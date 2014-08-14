@@ -229,6 +229,76 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Nightly server only|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				InlineFunctionExpansion="1"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				AdditionalIncludeDirectories="../../../;../../../zlib"
+				PreprocessorDefinitions="WIN32;NDEBUG;PNG_SETJMP_NOT_SUPPORTED;WIN32_LEAN_AND_MEAN"
+				StringPooling="true"
+				ExceptionHandling="0"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableFunctionLevelLinking="false"
+				PrecompiledHeaderThrough=""
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4996"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\libpng.lib"
+				IgnoreAllDefaultLibraries="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -258,6 +328,14 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly server only|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -326,6 +404,14 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly server only|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -437,6 +523,14 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Nightly server only|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="DLL Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -482,6 +576,14 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Nightly|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly server only|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
@@ -552,6 +654,14 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Nightly|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly server only|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool

@@ -6,6 +6,7 @@
 #include "lua.h"
 #include "luajit.h"
 
+typedef struct lua_State lua_State;
 lua_PreCallHook pPreCallHook = NULL;
 void lua_registerPreCallHook ( lua_PreCallHook f )
 {
@@ -31,7 +32,7 @@ static int ACLWrapper(lua_State *L, lua_CFunction f)
 	return 0;
 }
 
-LUA_API void lua_RegisterHook(lua_State* L)
+void lua_RegisterHook(lua_State* L)
 {
     lua_pushlightuserdata(L, (void *)ACLWrapper);
     luaJIT_setmode(L, -1, LUAJIT_MODE_WRAPCFUNC|LUAJIT_MODE_ON);

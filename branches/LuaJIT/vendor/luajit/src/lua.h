@@ -15,6 +15,7 @@
 
 #include "luaconf.h"
 
+
 #define LUA_VERSION	"Lua 5.1"
 #define LUA_RELEASE	"Lua 5.1.4"
 #define LUA_VERSION_NUM	501
@@ -62,6 +63,7 @@ LUA_API void lua_RegisterHook ( lua_State* L );
 // MTA Specific
 typedef int (*lua_UndumpHook) ( const char* p, size_t n );
 LUA_API void lua_registerUndumpHook ( lua_UndumpHook f );
+
 
 /*
 ** functions that read/write blocks when loading/dumping Lua chunks
@@ -127,6 +129,7 @@ LUA_API lua_CFunction (lua_atpanic) (lua_State *L, lua_CFunction panicf);
 // MTA Specific functions.
 // ChrML: Added function to get the main state from a lua state that is a coroutine - lstate.c
 LUA_API lua_State* (lua_getmainstate) (lua_State* L);
+
 
 /*
 ** basic stack manipulation

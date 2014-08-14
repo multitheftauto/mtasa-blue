@@ -16,6 +16,7 @@
 #include "lj_ff.h"
 #include "lj_trace.h"
 #include "lj_vm.h"
+#include "lj_strfmt.h"
 
 /*
 ** LuaJIT can either use internal or external frame unwinding:
@@ -98,8 +99,8 @@ static void *err_unwind(lua_State *L, void *stopcf, int errcode)
       TValue *top = restorestack(L, -nres);
       if (frame < top) {  /* Frame reached? */
 	if (errcode) {
-	  L->cframe = cframe_prev(cf);
 	  L->base = frame+1;
+	  L->cframe = cframe_prev(cf);
 	  unwindstack(L, top);
 	}
 	return cf;
@@ -118,8 +119,8 @@ static void *err_unwind(lua_State *L, void *stopcf, int errcode)
 #endif
 #if LJ_UNWIND_EXT
       if (errcode) {
-	L->cframe = cframe_prev(cf);
 	L->base = frame_prevd(frame) + 1;
+	L->cframe = cframe_prev(cf);
 	unwindstack(L, frame);
       } else if (cf != stopcf) {
 	cf = cframe_prev(cf);
@@ -143,8 +144,8 @@ static void *err_unwind(lua_State *L, void *stopcf, int errcode)
 	return cf;
       }
       if (errcode) {
-	L->cframe = cframe_prev(cf);
 	L->base = frame_prevd(frame) + 1;
+	L->cframe = cframe_prev(cf);
 	unwindstack(L, frame);
       }
       return cf;
@@ -165,8 +166,8 @@ static void *err_unwind(lua_State *L, void *stopcf, int errcode)
 	}
 	if (frame_typep(frame) == FRAME_PCALL)
 	  hook_leave(G(L));
-	L->cframe = cf;
 	L->base = frame_prevd(frame) + 1;
+	L->cframe = cf;
 	unwindstack(L, L->base);
       }
       return (void *)((intptr_t)cf | CFRAME_UNWIND_FF);
@@ -174,8 +175,8 @@ static void *err_unwind(lua_State *L, void *stopcf, int errcode)
   }
   /* No C frame. */
   if (errcode) {
-    L->cframe = NULL;
     L->base = tvref(L->stack)+1;
+    L->cframe = NULL;
     unwindstack(L, L->base);
     if (G(L)->panic)
       G(L)->panic(L);
@@ -378,7 +379,7 @@ typedef struct UndocumentedDispatcherContext {
   ULONG64 EstablisherFrame;
   ULONG64 TargetIp;
   PCONTEXT ContextRecord;
-  PEXCEPTION_ROUTINE LanguageHandler;
+  void (*LanguageHandler)(void);
   PVOID HandlerData;
   PUNWIND_HISTORY_TABLE HistoryTable;
   ULONG ScopeIndex;
@@ -452,7 +453,7 @@ LJ_NOINLINE void LJ_FASTCALL lj_err_throw(lua_State *L, int errcode)
 {
   global_State *g = G(L);
   lj_trace_abort(g);
-  setgcrefnull(g->jit_L);
+  setmref(g->jit_base, NULL);
   L->status = 0;
 #if LJ_UNWIND_EXT
   err_raise_ext(errcode);
@@ -518,12 +519,14 @@ static ptrdiff_t finderrfunc(lua_State *L)
     case FRAME_C:
       cf = cframe_prev(cf);
       /* fallthrough */
+    case FRAME_VARG:
+      frame = frame_prevd(frame);
+      break;
     case FRAME_CONT:
 #if LJ_HASFFI
       if ((frame-1)->u32.lo == LJ_CONT_FFI_CALLBACK)
 	cf = cframe_prev(cf);
 #endif
-    case FRAME_VARG:
       frame = frame_prevd(frame);
       break;
     case FRAME_CP:
@@ -573,7 +576,7 @@ LJ_NORET LJ_NOINLINE static void err_msgv(lua_State *L, ErrMsg em, ...)
   va_list argp;
   va_start(argp, em);
   if (curr_funcisL(L)) L->top = curr_topL(L);
-  msg = lj_str_pushvf(L, err2msg(em), argp);
+  msg = lj_strfmt_pushvf(L, err2msg(em), argp);
   va_end(argp);
   lj_debug_addloc(L, msg, L->base-1, NULL);
   lj_err_run(L);
@@ -591,11 +594,11 @@ LJ_NOINLINE void lj_err_lex(lua_State *L, GCstr *src, const char *tok,
 {
   char buff[LUA_IDSIZE];
   const char *msg;
-  lj_debug_shortname(buff, src);
-  msg = lj_str_pushvf(L, err2msg(em), argp);
-  msg = lj_str_pushf(L, "%s:%d: %s", buff, line, msg);
+  lj_debug_shortname(buff, src, line);
+  msg = lj_strfmt_pushvf(L, err2msg(em), argp);
+  msg = lj_strfmt_pushf(L, "%s:%d: %s", buff, line, msg);
   if (tok)
-    lj_str_pushf(L, err2msg(LJ_ERR_XNEAR), msg, tok);
+    lj_strfmt_pushf(L, err2msg(LJ_ERR_XNEAR), msg, tok);
   lj_err_throw(L, LUA_ERRSYNTAX);
 }
 
@@ -679,7 +682,7 @@ LJ_NOINLINE void lj_err_callerv(lua_State *L, ErrMsg em, ...)
   const char *msg;
   va_list argp;
   va_start(argp, em);
-  msg = lj_str_pushvf(L, err2msg(em), argp);
+  msg = lj_strfmt_pushvf(L, err2msg(em), argp);
   va_end(argp);
   lj_err_callermsg(L, msg);
 }
@@ -699,9 +702,9 @@ LJ_NORET LJ_NOINLINE static void err_argmsg(lua_State *L, int narg,
   if (narg < 0 && narg > LUA_REGISTRYINDEX)
     narg = (int)(L->top - L->base) + narg + 1;
   if (ftype && ftype[3] == 'h' && --narg == 0)  /* Check for "method". */
-    msg = lj_str_pushf(L, err2msg(LJ_ERR_BADSELF), fname, msg);
+    msg = lj_strfmt_pushf(L, err2msg(LJ_ERR_BADSELF), fname, msg);
   else
-    msg = lj_str_pushf(L, err2msg(LJ_ERR_BADARG), narg, fname, msg);
+    msg = lj_strfmt_pushf(L, err2msg(LJ_ERR_BADARG), narg, fname, msg);
   lj_err_callermsg(L, msg);
 }
 
@@ -711,7 +714,7 @@ LJ_NOINLINE void lj_err_argv(lua_State *L, int narg, ErrMsg em, ...)
   const char *msg;
   va_list argp;
   va_start(argp, em);
-  msg = lj_str_pushvf(L, err2msg(em), argp);
+  msg = lj_strfmt_pushvf(L, err2msg(em), argp);
   va_end(argp);
   err_argmsg(L, narg, msg);
 }
@@ -727,7 +730,7 @@ LJ_NOINLINE void lj_err_argtype(lua_State *L, int narg, const char *xname)
 {
   TValue *o = narg < 0 ? L->top + narg : L->base + narg-1;
   const char *tname = o < L->top ? lj_typename(o) : lj_obj_typename[0];
-  const char *msg = lj_str_pushf(L, err2msg(LJ_ERR_BADTYPE), xname, tname);
+  const char *msg = lj_strfmt_pushf(L, err2msg(LJ_ERR_BADTYPE), xname, tname);
   err_argmsg(L, narg, msg);
 }
 
@@ -777,7 +780,7 @@ LUALIB_API int luaL_error(lua_State *L, const char *fmt, ...)
   const char *msg;
   va_list argp;
   va_start(argp, fmt);
-  msg = lj_str_pushvf(L, fmt, argp);
+  msg = lj_strfmt_pushvf(L, fmt, argp);
   va_end(argp);
   lj_err_callermsg(L, msg);
   return 0;  /* unreachable */

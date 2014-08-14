@@ -32,6 +32,7 @@
 #include "lj_dispatch.h"
 #include "lj_char.h"
 #include "lj_strscan.h"
+#include "lj_strfmt.h"
 #include "lj_lib.h"
 
 /* -- Base library: checks ------------------------------------------------ */
@@ -100,7 +101,7 @@ static int ffh_pairs(lua_State *L, MMS mm)
 #endif
 
 LJLIB_PUSH(lastcl)
-LJLIB_ASM(pairs)
+LJLIB_ASM(pairs)		LJLIB_REC(xpairs 0)
 {
   return ffh_pairs(L, MM_pairs);
 }
@@ -113,7 +114,7 @@ LJLIB_NOREGUV LJLIB_ASM(ipairs_aux)	LJLIB_REC(.)
 }
 
 LJLIB_PUSH(lastcl)
-LJLIB_ASM(ipairs)		LJLIB_REC(.)
+LJLIB_ASM(ipairs)		LJLIB_REC(xpairs 1)
 {
   return ffh_pairs(L, MM_ipairs);
 }
@@ -135,7 +136,7 @@ LJLIB_ASM(setmetatable)		LJLIB_REC(.)
   return FFH_RES(1);
 }
 
-LJLIB_CF(getfenv)
+LJLIB_CF(getfenv)		LJLIB_REC(.)
 {
   GCfunc *fn;
   cTValue *o = L->base;
@@ -301,9 +302,6 @@ LJLIB_ASM(tonumber)		LJLIB_REC(.)
   return FFH_RES(1);
 }
 
-LJLIB_PUSH("nil")
-LJLIB_PUSH("false")
-LJLIB_PUSH("true")
 LJLIB_ASM(tostring)		LJLIB_REC(.)
 {
   TValue *o = lj_lib_checkany(L, 1);
@@ -312,23 +310,10 @@ LJLIB_ASM(tostring)		LJLIB_REC(.)
   if (!tvisnil(mo = lj_meta_lookup(L, o, MM_tostring))) {
     copyTV(L, L->base-1, mo);  /* Replace callable. */
     return FFH_TAILCALL;
-  } else {
-    GCstr *s;
-    if (tvisnumber(o)) {
-      s = lj_str_fromnumber(L, o);
-    } else if (tvispri(o)) {
-      s = strV(lj_lib_upvalue(L, -(int32_t)itype(o)));
-    } else {
-      if (tvisfunc(o) && isffunc(funcV(o)))
-	lua_pushfstring(L, "function: builtin#%d", funcV(o)->c.ffid);
-      else
-	lua_pushfstring(L, "%s: %p", lj_typename(o), lua_topointer(L, 1));
-      /* Note: lua_pushfstring calls the GC which may invalidate o. */
-      s = strV(L->top-1);
-    }
-    setstrV(L, L->base-1, s);
-    return FFH_RES(1);
   }
+  lj_gc_check(L);
+  setstrV(L, L->base-1, lj_strfmt_obj(L, L->base));
+  return FFH_RES(1);
 }
 
 /* -- Base library: throw and catch errors -------------------------------- */
@@ -506,21 +491,13 @@ LJLIB_CF(print)
   }
   shortcut = (tvisfunc(tv) && funcV(tv)->c.ffid == FF_tostring);
   for (i = 0; i < nargs; i++) {
+    cTValue *o = &L->base[i];
+    char buf[STRFMT_MAXBUF_NUM];
     const char *str;
     size_t size;
-    cTValue *o = &L->base[i];
-    if (shortcut && tvisstr(o)) {
-      str = strVdata(o);
-      size = strV(o)->len;
-    } else if (shortcut && tvisint(o)) {
-      char buf[LJ_STR_INTBUF];
-      char *p = lj_str_bufint(buf, intV(o));
-      size = (size_t)(buf+LJ_STR_INTBUF-p);
-      str = p;
-    } else if (shortcut && tvisnum(o)) {
-      char buf[LJ_STR_NUMBUF];
-      size = lj_str_bufnum(buf, o);
-      str = buf;
+    MSize len;
+    if (shortcut && (str = lj_strfmt_wstrnum(buf, o, &len)) != NULL) {
+      size = len;
     } else {
       copyTV(L, L->top+1, o);
       copyTV(L, L->top, L->top-1);
@@ -642,9 +619,10 @@ static void setpc_wrap_aux(lua_State *L, GCfunc *fn);
 
 LJLIB_CF(coroutine_wrap)
 {
+  GCfunc *fn;
   lj_cf_coroutine_create(L);
-  lj_lib_pushcc(L, lj_ffh_coroutine_wrap_aux, FF_coroutine_wrap_aux, 1);
-  setpc_wrap_aux(L, funcV(L->top-1));
+  fn = lj_lib_pushcc(L, lj_ffh_coroutine_wrap_aux, FF_coroutine_wrap_aux, 1);
+  setpc_wrap_aux(L, fn);
   return 1;
 }
 

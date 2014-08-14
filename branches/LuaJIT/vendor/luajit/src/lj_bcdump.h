@@ -36,7 +36,7 @@
 /* If you perform *any* kind of private modifications to the bytecode itself
 ** or to the dump format, you *must* set BCDUMP_VERSION to 0x80 or higher.
 */
-#define BCDUMP_VERSION		1
+#define BCDUMP_VERSION		2
 
 /* Compatibility flags. */
 #define BCDUMP_F_BE		0x01
@@ -61,6 +61,7 @@ enum {
 
 LJ_FUNC int lj_bcwrite(lua_State *L, GCproto *pt, lua_Writer writer,
 		       void *data, int strip);
+LJ_FUNC GCproto *lj_bcread_proto(LexState *ls);
 LJ_FUNC GCproto *lj_bcread(LexState *ls);
 
 #endif

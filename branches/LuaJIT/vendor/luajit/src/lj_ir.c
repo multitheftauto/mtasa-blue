@@ -15,6 +15,7 @@
 #if LJ_HASJIT
 
 #include "lj_gc.h"
+#include "lj_buf.h"
 #include "lj_str.h"
 #include "lj_tab.h"
 #include "lj_ir.h"
@@ -29,6 +30,7 @@
 #endif
 #include "lj_vm.h"
 #include "lj_strscan.h"
+#include "lj_strfmt.h"
 #include "lj_lib.h"
 
 /* Some local macros to save typing. Undef'd at the end. */
@@ -443,7 +445,8 @@ TRef LJ_FASTCALL lj_ir_tostr(jit_State *J, TRef tr)
   if (!tref_isstr(tr)) {
     if (!tref_isnumber(tr))
       lj_trace_err(J, LJ_TRERR_BADTYPE);
-    tr = emitir(IRT(IR_TOSTR, IRT_STR), tr, 0);
+    tr = emitir(IRT(IR_TOSTR, IRT_STR), tr,
+		tref_isnum(tr) ? IRTOSTR_NUM : IRTOSTR_INT);
   }
   return tr;
 }

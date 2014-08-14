@@ -322,6 +322,109 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Nightly server only|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="2"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Release/Race.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				AdditionalIncludeDirectories=".;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/luajit/src;../../../vendor/pcre/shipped_for_mta;&quot;../../../vendor/json-c/shipped_for_mta&quot;;../../../Shared/mods/deathmatch/logic"
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="StdInc.h"
+				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996;4482"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="2057"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="lua51.lib wsock32.lib zlib.lib ehs.lib pthread.lib pme.lib pcre3.lib json.lib psapi.lib"
+				OutputFile="../../../output/MTA San Andreas/server/mods/deathmatch/deathmatch.dll"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="logic/lib;../../../vendor/luajit/x86/;&quot;../../../vendor/json-c/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/ehs/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/pme/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/pcre/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/pthreads/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/zlib/x86/$(ConfigurationName)&quot;"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="../../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
+				MapFileName=""
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				ImportLibrary="$(OutDir)\$(TargetFileName).lib"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				ExcludedFromBuild="false"
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
@@ -670,6 +773,16 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Nightly|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+						PrecompiledHeaderThrough="StdInc.h"
+						PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Nightly server only|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1788,6 +1901,14 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Nightly server only|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|x64"
 						>
 						<Tool
@@ -1837,6 +1958,14 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Nightly|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Nightly server only|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -1900,6 +2029,14 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Nightly server only|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|x64"
 						>
 						<Tool
@@ -1948,6 +2085,14 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly server only|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2007,6 +2152,14 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
+							Name="Nightly server only|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -2052,6 +2205,14 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly server only|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -2111,6 +2272,14 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
+							Name="Nightly server only|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -2156,6 +2325,14 @@
 						</FileConfiguration>
 						<FileConfiguration
 							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly server only|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
