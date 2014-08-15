@@ -16,7 +16,7 @@ bool CCommandPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Read out the command
     int iNumberOfBytesUsed = BitStream.GetNumberOfBytesUsed ();
-    if ( iNumberOfBytesUsed >= MIN_COMMAND_LENGTH )
+    if ( iNumberOfBytesUsed >= MIN_COMMAND_LENGTH && iNumberOfBytesUsed <= MAX_COMMAND_LENGTH * 4 )
     {
         char* szBuffer = new char[iNumberOfBytesUsed+1];
         BitStream.Read ( szBuffer, iNumberOfBytesUsed );

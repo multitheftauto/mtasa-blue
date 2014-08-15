@@ -21,9 +21,16 @@ CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket ( void )
 
 bool CUnoccupiedVehicleSyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
+    uint uiMaxCount = g_pGame->GetVehicleManager()->Count() * 2 + 10;
     // While we're not out of bytes
-    while ( BitStream.GetNumberOfUnreadBits () >= 8 )
+    for( uint i = 0 ; BitStream.GetNumberOfUnreadBits () >= 8 ; i++ )
     {
+        if ( i > uiMaxCount )
+        {
+            CLogger::LogPrintf( "WARN: Received excess unoccupied vehicle sync data (%d bytes)", BitStream.GetNumberOfUnreadBits() / 8 );
+            break;
+        }
+
         // Read out the sync data
         SyncData data;
         data.bSend = false;
