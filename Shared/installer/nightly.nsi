@@ -534,6 +534,7 @@ DontInstallRedist:
 				${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
 				${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
 				${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
+				${Case} "185f0970f5913d0912a89789af175ffe" #?? ?.?? 4,496,063 bytes
 					#Create a backup of the GTA exe before patching
 					CopyFiles "$GTA_DIR\gta_sa.exe" "$GTA_DIR\gta_sa.exe.bak"
 					Call InstallPatch
