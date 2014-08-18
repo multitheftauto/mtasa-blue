@@ -215,6 +215,7 @@ Function .onInstFailed
 FunctionEnd
 
 Function .onInit
+
 	${IfNot} ${UAC_IsInnerInstance}
 		!insertmacro MUI_LANGDLL_DISPLAY  # Only display our language selection in the outer (non-admin) instance
 	${Else}
@@ -1775,7 +1776,8 @@ Var PosY
 !define LT_GREY "0xf0f0f0"
 !define MID_GREY "0xb0b0b0"
 !define BLACK "0x000000"
-!define WHITE "0xF0F0F0"
+!define MID_GREY2K "0x808080"
+!define LT_GREY2K "0xD1CEC9"
 
 LangString INST_CHOOSE_LOC_TOP ${LANG_ENGLISH}	"Choose Install Location"
 LangString INST_CHOOSE_LOC ${LANG_ENGLISH}	"Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
@@ -1897,9 +1899,18 @@ FunctionEnd
 # Ensure GUI reflects $WhichRadio
 Function CustomDirectoryPageShowWhichRadio
     # Set all options as not selected
-    SetCtlColors $LabelDefault ${MID_GREY} ${LT_GREY}
-    SetCtlColors $LabelLastUsed ${MID_GREY} ${LT_GREY}
-    SetCtlColors $DirRequest ${MID_GREY} ${WHITE}
+	Call IsWindowsClassicTheme
+	Pop $0
+	${If} $0 == 1
+        SetCtlColors $LabelDefault ${MID_GREY2K} ${LT_GREY2K}
+        SetCtlColors $LabelLastUsed ${MID_GREY2K} ${LT_GREY2K}
+        SetCtlColors $DirRequest ${MID_GREY2K} ${LT_GREY2K}
+    ${Else}
+        SetCtlColors $LabelDefault ${MID_GREY} ${LT_GREY}
+        SetCtlColors $LabelLastUsed ${MID_GREY} ${LT_GREY}
+        SetCtlColors $DirRequest ${MID_GREY} ${LT_GREY}
+	${EndIf}
+
     SendMessage $DirRequest ${EM_SETREADONLY} 1 0
     EnableWindow $BrowseButton 0
 
@@ -1908,17 +1919,17 @@ Function CustomDirectoryPageShowWhichRadio
         ${Case} "default"
             StrCpy $INSTDIR $DEFAULT_INSTDIR
             ${NSD_SetState} $RadioDefault ${BST_CHECKED}
-            SetCtlColors $LabelDefault ${BLACK} ${LT_GREY}
+            SetCtlColors $LabelDefault ${BLACK}
             ${Break}
         ${Case} "last"
             StrCpy $INSTDIR $LAST_INSTDIR
             ${NSD_SetState} $RadioLastUsed ${BST_CHECKED}
-            SetCtlColors $LabelLastUsed ${BLACK} ${LT_GREY}
+            SetCtlColors $LabelLastUsed ${BLACK}
             ${Break}
         ${Case} "custom"
             StrCpy $INSTDIR $CUSTOM_INSTDIR
             ${NSD_SetState} $RadioCustom ${BST_CHECKED}
-            SetCtlColors $DirRequest ${WHITE}
+            SetCtlColors $DirRequest ${BLACK}
             SendMessage $DirRequest ${EM_SETREADONLY} 0 0
             EnableWindow $BrowseButton 1
             ${Break}
@@ -1998,6 +2009,15 @@ Function CustomDirectoryPageUpdateINSTDIR
     ${EndSwitch}
 FunctionEnd
 
+; Out <stack> = "1" - Is Windows Classic
+Function IsWindowsClassicTheme
+	System::Call "UxTheme::IsThemeActive() i .r3"
+    StrCpy $1 "1"
+    ${If} $3 == 1
+        StrCpy $1 "0"
+    ${EndIf}
+    Push $1
+FunctionEnd
 
 ;****************************************************************
 ;
