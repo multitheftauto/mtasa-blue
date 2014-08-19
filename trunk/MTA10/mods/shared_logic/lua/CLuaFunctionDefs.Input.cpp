@@ -572,7 +572,7 @@ int CLuaFunctionDefs::GetKeyBoundToFunction ( lua_State* luaVM )
                             // ACHTUNG: DOES IT FIND THE CORRECT LUA REF HERE?
                             if ( iLuaFunction == pBind->m_iLuaFunction )
                             {
-                                lua_pushstring ( luaVM, pBind->boundKey->szKey );
+                                lua_pushstring ( luaVM, pBind->boundControl->szControl );
                                 return 1;
                             }
                             break;
