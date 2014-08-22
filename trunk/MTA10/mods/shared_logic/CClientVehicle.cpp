@@ -848,7 +848,27 @@ void CClientVehicle::Fix ( void )
     for ( int i = 0 ; i < MAX_DOORS ; i++ ) SetDoorStatus ( i, ucDoorStates [ i ] );
     for ( int i = 0 ; i < MAX_PANELS ; i++ ) SetPanelStatus ( i, 0 );
     for ( int i = 0 ; i < MAX_LIGHTS ; i++ ) SetLightStatus ( i, 0 );
-    for ( int i = 0 ; i < MAX_WHEELS ; i++ ) SetWheelStatus ( i, 0 );    
+    for ( int i = 0 ; i < MAX_WHEELS ; i++ ) SetWheelStatus ( i, 0 );
+
+    // These components get a funny rotation when calling Fix() (unknown reason)
+    struct {
+        ushort usModelId;
+        const char* szComponentName;
+    } const static fixRotationsList [] = {  { 422, "exhaust_ok" },
+                                            { 436, "exhaust_ok" },
+                                            { 440, "bump_front_dummy" },
+                                            { 458, "exhaust_ok" },
+                                            { 483, "exhaust_ok" },
+                                            { 485, "misc_b" },
+                                            { 499, "exhaust_ok" },
+                                            { 545, "exhaust_ok" },
+                                            { 568, "misc_e" },
+                                            { 603, "misc_a" }, };
+
+    const char* szFixComponentName = NULL;
+    for ( uint i = 0 ; i < NUMELMS( fixRotationsList ) ; i++ )
+        if ( GetModel() == fixRotationsList[i].usModelId )
+            szFixComponentName = fixRotationsList[i].szComponentName;
 
     // Grab our component data
     std::map < SString, SVehicleComponentData > ::iterator iter = m_ComponentData.begin ();
@@ -857,9 +877,13 @@ void CClientVehicle::Fix ( void )
     {
         // store our string in a temporary variable
         SString strTemp = (*iter).first;
-        // get our poisition and rotation and store it into 
-        //GetComponentPosition ( strTemp, (*iter).second.m_vecComponentPosition );
-        //GetComponentRotation ( strTemp, (*iter).second.m_vecComponentRotation );
+
+        // Do rotation fix if required
+        if ( szFixComponentName && strTemp == szFixComponentName )
+        {
+            SetComponentRotation( strTemp, (*iter).second.m_vecComponentRotation );
+        }
+
         // is our position changed?
         if ( (*iter).second.m_bPositionChanged )
         {
@@ -870,13 +894,13 @@ void CClientVehicle::Fix ( void )
                 SetComponentPosition( strTemp, (*iter).second.m_vecComponentPosition );
             }
         }
-        // is our position changed?
+        // is our rotation changed?
         if ( (*iter).second.m_bRotationChanged )
         {
             // Make sure it's different
             if ( (*iter).second.m_vecOriginalComponentRotation != (*iter).second.m_vecComponentRotation )
             {
-                // apple our new position
+                // apply our new rotation
                 SetComponentRotation( strTemp, (*iter).second.m_vecComponentRotation );
             }
         }
