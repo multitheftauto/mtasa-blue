@@ -968,7 +968,7 @@ bool TiXmlDocument::LoadFile( const char* _filename, TiXmlEncoding encoding, FIL
 	{
 		bool result = LoadFile( file, encoding );
 
-        // Return file handle instead of closing, if requested and no errors!
+        // Return file handle instead of closing, if requested and no errors
         if ( pFile && result )
             *pFile = file;
         else
