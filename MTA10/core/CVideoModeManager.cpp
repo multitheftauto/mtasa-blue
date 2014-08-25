@@ -171,7 +171,7 @@ void CVideoModeManager::PreCreateDevice ( D3DPRESENT_PARAMETERS* pp )
         pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
     }
 
-    if ( pp->SwapEffect == D3DSWAPEFFECT_FLIP )
+    if ( pp->SwapEffect == D3DSWAPEFFECT_FLIP && IsDisplayModeWindowed() )
     {
         pp->SwapEffect = D3DSWAPEFFECT_DISCARD;
         WriteDebugEvent( "Changed SwapEffect From D3DSWAPEFFECT_FLIP to D3DSWAPEFFECT_DISCARD" );
