@@ -2704,7 +2704,7 @@ CClientPlayer * CClientGame::GetClosestRemotePlayer ( const CVector & vecPositio
         {
             // Ensure remote player is alive and sending position updates
             ulong ulTimeSinceLastPuresync = CClientTime::GetTime () - pPlayer->GetLastPuresyncTime ();
-            if ( ulTimeSinceLastPuresync < g_TickRateSettings.iPureSync * 2 )
+            if ( ulTimeSinceLastPuresync < static_cast < ulong > ( g_TickRateSettings.iPureSync ) * 2 )
             {
                 pPlayer->GetPosition ( vecTemp );
                 fTemp = DistanceBetweenPoints3D ( vecPosition, vecTemp );

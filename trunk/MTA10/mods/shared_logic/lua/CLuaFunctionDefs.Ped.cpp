@@ -1887,11 +1887,9 @@ int CLuaFunctionDefs::SetPedAnimation ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetPedAnimationProgress( lua_State* luaVM )
 {
-    // Verify the argument
-    CClientEntity* pEntity = NULL;
-    SString strBlockName = "";
-    SString strAnimName = "";
-    float fProgress = 0.0f;
+//  bool setPedAnimationProgress ( ped thePed, string animName, float progress )
+    CClientEntity* pEntity; SString strAnimName; float fProgress;
+
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
     argStream.ReadString ( strAnimName, "" );
@@ -1899,29 +1897,11 @@ int CLuaFunctionDefs::SetPedAnimationProgress( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, strAnimName, fProgress ) )
         {
-            const char * szAnimName = strAnimName.c_str ( );
-            float fProgress = 0.0f;
-            if ( strAnimName != "" ) 
-            {
-                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, szAnimName, fProgress ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
-            else
-            {
-                if ( CStaticFunctionDefinitions::SetPedAnimationProgress ( *pEntity, NULL, fProgress ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
