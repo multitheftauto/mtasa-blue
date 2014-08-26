@@ -10,7 +10,7 @@
 #ifndef __WEBBROWSERHELPERS
 #define __WEBBROWSERHELPERS
 
-typedef void (*JavascriptCallback)(Awesomium::WebView*, const Awesomium::JSArray& args); // C++98 :(
+/*typedef void (*JavascriptCallback)(Awesomium::WebView*, const Awesomium::JSArray& args); // C++98 :(
 
 class CJSMethodHandler : public Awesomium::JSMethodHandler
 {
@@ -45,6 +45,6 @@ public:
     }
 private:
     std::map<std::pair<uint, Awesomium::WebString>, JavascriptCallback> m_FunctionMap;
-};
+};*/
 
 #endif

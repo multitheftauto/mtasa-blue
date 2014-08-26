@@ -11,7 +11,6 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 #include "CRenderItem.EffectCloner.h"
-#include <Awesomium/BitmapSurface.h>
 
 // Type of vertex used to emulate StretchRect for SwiftShader bug
 struct SRTVertex
@@ -464,7 +463,7 @@ void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceIt
 void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
 {
     // Don't copy texture data if buffer has not yet been updated
-    if ( !pWebBrowserItem->IsValid () || pWebBrowserItem->m_pWebView->IsLoading () )
+    /*if ( !pWebBrowserItem->IsValid () || pWebBrowserItem->m_pWebView->IsLoading () )
         return;
 
     // Get BitmapSurface and check if it is available (it's not available if the website is blocked for example)
@@ -498,7 +497,7 @@ void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
     }
 
     // Finally, unlock the surface
-    pDXSurface->UnlockRect ();
+    pDXSurface->UnlockRect ();*/
 }
 
 

@@ -11,23 +11,25 @@
 #ifndef __CWEBVIEW_H
 #define __CWEBVIEW_H
 
+#undef GetNextSibling
 #include <core/CWebViewInterface.h>
 #include <core/CWebBrowserEventsInterface.h>
-#include <Awesomium/WebView.h>
-#include <Awesomium/WebViewListener.h>
-#include <Awesomium/STLHelpers.h>
+#include <cef3/include/cef_app.h>
+#include <cef3/include/cef_browser.h>
+#include <cef3/include/cef_client.h>
+#include <cef3/include/cef_render_handler.h>
 #include <d3d9.h>
 #include <SString.h>
-#include "WebBrowserHelpers.h"
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
+#define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 
-class CWebView : public CWebViewInterface, public Awesomium::WebViewListener::Load, public Awesomium::WebViewListener::View
+class CWebView : public CWebViewInterface, public CefClient, public CefRenderHandler //, public Awesomium::WebViewListener::Load, public Awesomium::WebViewListener::View
 {
 public:
-    CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal );
+    CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem );
     ~CWebView                   ();
-    Awesomium::WebView*         GetAwesomiumView () { return m_pWebView; };
+    //Awesomium::WebView*         GetAwesomiumView () { return m_pWebView; };
     void                        SetWebBrowserEvents ( CWebBrowserEventsInterface* pInterface ) { m_pEventsInterface = pInterface; };
 
     // Exported methods
@@ -53,14 +55,21 @@ public:
     bool SetAudioVolume         ( float fVolume );
 
 
+    // CefClient methods
+    virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override { return this; };
+    
+    // CefRenderHandler methods
+    virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) override;
+    virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height) override;
+
     // Implementation: Awesomium::WebViewListener::Load
-    virtual void OnBeginLoadingFrame    ( Awesomium::WebView* pCaller, int64 frame_id, bool bMainFrame, const Awesomium::WebURL& url, bool bErrorPage );
+    /*virtual void OnBeginLoadingFrame    ( Awesomium::WebView* pCaller, int64 frame_id, bool bMainFrame, const Awesomium::WebURL& url, bool bErrorPage );
     virtual void OnFailLoadingFrame     ( Awesomium::WebView* pCaller, int64 frame_id, bool bMainFrame, const Awesomium::WebURL& url, int error_code, const Awesomium::WebString& error_desc );
     virtual void OnFinishLoadingFrame   ( Awesomium::WebView* pCaller, int64 iFrameId, bool bMainFrame, const Awesomium::WebURL& url );
-    virtual void OnDocumentReady        ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url );
+    virtual void OnDocumentReady        ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url );*/
 
     // Implementation: Awesomium::WebViewListener::View
-    virtual void OnChangeTitle          ( Awesomium::WebView* pCaller, const Awesomium::WebString& title ) {};
+    /*virtual void OnChangeTitle          ( Awesomium::WebView* pCaller, const Awesomium::WebString& title ) {};
     virtual void OnChangeAddressBar     ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url ) {};
     virtual void OnChangeTooltip        ( Awesomium::WebView* pCaller, const Awesomium::WebString& tooltip ) {};
     virtual void OnChangeTargetURL      ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url ) {};
@@ -70,19 +79,25 @@ public:
     virtual void OnShowCreatedWebView   ( Awesomium::WebView* pCaller, Awesomium::WebView* new_view, const Awesomium::WebURL& opener_url, const Awesomium::WebURL& target_url, const Awesomium::Rect& initial_pos, bool is_popup );
 
     // Static javascript method implementations
-    static void Javascript_triggerEvent(Awesomium::WebView* pWebView, const Awesomium::JSArray& args);
+    static void Javascript_triggerEvent(Awesomium::WebView* pWebView, const Awesomium::JSArray& args);*/
 
 protected:
-    void ConvertURL ( const Awesomium::WebURL& url, SString& convertedURL );
+    //void ConvertURL ( const Awesomium::WebURL& url, SString& convertedURL );
     
 private:
-    Awesomium::WebView* m_pWebView;
+    CefRefPtr<CefBrowser> m_pWebView;
+    CWebBrowserItem*    m_pWebBrowserRenderItem;
 
     bool                m_bIsLocal;
     SString             m_strTempURL;
+    POINT               m_vecMousePosition;
 
-    CJSMethodHandler    m_JSMethodHandler;
+    //CJSMethodHandler    m_JSMethodHandler;
     CWebBrowserEventsInterface* m_pEventsInterface;
+
+public:
+    // Implement smartpointer methods (all Cef-classes require that since they are derived from CefBase)
+    IMPLEMENT_REFCOUNTING(CWebView);
 };
 
 #endif

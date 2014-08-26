@@ -86,7 +86,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/awesomium/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/cef3/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -110,10 +110,10 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>strmiids.lib;libv2.lib;awesomium.lib;zlib_d.lib;libpng_d.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;winmm.lib;Imagehlp.lib;ws2_32.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread_d.lib;jpeg_d.lib;Psapi.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib_d.lib;libpng_d.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;winmm.lib;Imagehlp.lib;ws2_32.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread_d.lib;jpeg_d.lib;Psapi.lib;xinput.lib;libcef.lib;..\..\vendor\cef3\out\Debug\lib\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);../../vendor/awesomium/build/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);../../vendor/cef3/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <MapFileName />
@@ -135,7 +135,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/awesomium/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/cef3/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -154,9 +154,9 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>strmiids.lib;libv2.lib;awesomium.lib;zlib.lib;libpng.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;wsock32.lib;winmm.lib;Imagehlp.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread.lib;jpeg.lib;Psapi.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib.lib;libpng.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;wsock32.lib;winmm.lib;Imagehlp.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread.lib;jpeg.lib;Psapi.lib;xinput.lib;libcef.lib;..\..\vendor\cef3\out\Release\lib\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);../../vendor/awesomium/build/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);../../vendor/cef3/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>

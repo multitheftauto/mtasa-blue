@@ -39,7 +39,7 @@ enum eAwesomiumMouseButton
 class CWebCoreInterface
 {
 public:
-    virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal ) = 0;
+    virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem ) = 0;
     virtual void                DestroyWebView      ( CWebViewInterface* pWebView ) = 0;
     
     virtual eURLState           GetURLState        ( const SString& strURL ) = 0;

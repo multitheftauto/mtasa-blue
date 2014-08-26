@@ -13,10 +13,11 @@
 #include "CWebView.h"
 #include "CWebsiteRequests.h"
 #include <Audiopolicy.h>
+#include <cef3/include/cef_app.h>
 
 CWebCore::CWebCore ()
 {
-    m_pWebCore = NULL;
+    //m_pWebCore = NULL;
     m_pRequestsGUI = NULL;
     m_bTestmodeEnabled = false;
     m_pAudioSessionManager = NULL;
@@ -37,8 +38,8 @@ CWebCore::CWebCore ()
 
 CWebCore::~CWebCore ()
 {
-    // Shutdown Awesomium
-    m_pWebCore->Shutdown ();
+    // Shutdown CEF
+    CefShutdown();
 
     if ( m_pAudioSessionManager )
         m_pAudioSessionManager->Release ();
@@ -49,23 +50,38 @@ CWebCore::~CWebCore ()
 
 bool CWebCore::Initialise ()
 {
-    Awesomium::WebConfig webConfig;
-    webConfig.user_agent = Awesomium::WSLit ( "Multi Theft Auto: San Andreas Client; Chromium" ); // Needs testing (Chromium adjustments might not work anymore)
-    // webConfig.user_script = Awesomium::WSLit(""); // Todo: Implement a watermark within editboxes
+    CefMainArgs mainArgs;
+    void* sandboxInfo = NULL;
 
-    m_pWebCore = Awesomium::WebCore::Initialize ( webConfig );
+#if CEF_ENABLE_SANDBOX
+    CefScopedSandboxInfo scopedSandbox;
+    sandboxInfo = scopedSandbox.sandbox_info();
+#endif
 
-    // Set all the handlers
-    m_pWebCore->set_resource_interceptor ( this );
+    if (CefExecuteProcess(mainArgs, NULL, NULL) >= 0)
+        return false;
 
-    return m_pWebCore != NULL;
+    CefSettings settings;
+#if !CEF_ENABLE_SANDBOX
+    settings.no_sandbox = true;
+#endif
+
+    // Specifiy sub process executable path
+    CefString ( &settings.browser_subprocess_path ).FromASCII( CalcMTASAPath ( CEF_SUBPROCESS_PATH ) );
+    CefString ( &settings.user_agent ).FromASCII ( "Multi Theft Auto: San Andreas Client; Chromium" );
+    CefString ( &settings.resources_dir_path ).FromASCII ( CalcMTASAPath( "mta") );
+    
+    // Todo: Implement multi-threading
+    settings.multi_threaded_message_loop = false;
+
+    return CefInitialize ( mainArgs, settings, NULL, sandboxInfo );
 }
 
-CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal )
+CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem )
 {
     // Create our webview implementation
-    CWebView* pWebView = new CWebView ( uiWidth, uiHeight, bIsLocal );
-    m_WebViewMap[pWebView->GetAwesomiumView ()->process_id ()] = pWebView;
+    CWebView* pWebView = new CWebView ( uiWidth, uiHeight, bIsLocal, pWebBrowserRenderItem );
+    //m_WebViewMap[pWebView->GetAwesomiumView ()->process_id ()] = pWebView;
 
     return pWebView;
 }
@@ -75,7 +91,7 @@ void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
     CWebView* pWebView = dynamic_cast<CWebView*> ( pWebViewInterface );
     if ( pWebView )
     {
-        m_WebViewMap.erase ( pWebView->GetAwesomiumView ()->process_id () );
+        //m_WebViewMap.erase ( pWebView->GetAwesomiumView ()->process_id () );
         delete pWebView;
     }
 }
@@ -86,7 +102,7 @@ void CWebCore::DoPulse ()
     g_pCore->GetNetwork()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->ProcessQueuedFiles ();
 
     // Update Awesomium rendering etc.
-    m_pWebCore->Update ();
+    CefDoMessageLoopWork();
 }
 
 eURLState CWebCore::GetURLState ( const SString& strURL )
@@ -287,7 +303,7 @@ bool CWebCore::SetGlobalAudioVolume ( float fVolume )
             PWSTR szIdentifier;
             pSessionControl->GetSessionIdentifier(&szIdentifier);
 
-            if ( std::wstring(szIdentifier).find(L"awesomium") != std::string::npos )
+            if ( std::wstring(szIdentifier).find(L"CEFLauncher") != std::string::npos )
             {
                 ISimpleAudioVolume* pSimpleAudioVolume;
                 pSessionControl->QueryInterface ( &pSimpleAudioVolume );
@@ -626,7 +642,7 @@ bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownl
 // http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_resource_interceptor.html#aceecadf1ddd8e3fe42cd56bc74d6ec6c //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame )
+/*bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame )
 {
     std::map<int, CWebView*>::iterator iter = m_WebViewMap.find ( origin_process_id );
     assert ( iter != m_WebViewMap.end () );
@@ -648,7 +664,7 @@ bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id
 
     // Don't do anything
     return false;
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -656,7 +672,7 @@ bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id
 // http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_resource_interceptor.html#ac275121fdb030ff432c79d0337f0c19c //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-Awesomium::ResourceResponse* CWebCore::OnRequest ( Awesomium::ResourceRequest* pRequest )
+/*Awesomium::ResourceResponse* CWebCore::OnRequest ( Awesomium::ResourceRequest* pRequest )
 {
     std::map<int, CWebView*>::iterator iter = m_WebViewMap.find ( pRequest->origin_process_id () );
     int i = pRequest->origin_process_id ();
@@ -690,10 +706,10 @@ Awesomium::ResourceResponse* CWebCore::OnRequest ( Awesomium::ResourceRequest* p
 
     // We don't want to modify anything
     return NULL;
-}
+}*/
 
 
-Awesomium::WebString CWebCore::ToWebString ( const SString& strString )
+/*Awesomium::WebString CWebCore::ToWebString ( const SString& strString )
 {
     return Awesomium::WSLit ( strString.c_str () );
 }
@@ -702,3 +718,4 @@ SString CWebCore::ToSString ( const Awesomium::WebString& webString )
 {
     return SharedUtil::ToUTF8 ( std::wstring( (wchar_t*)webString.data () ) );
 }
+*/

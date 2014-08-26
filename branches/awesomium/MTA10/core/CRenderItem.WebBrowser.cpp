@@ -113,7 +113,7 @@ void CWebBrowserItem::CreateUnderlyingData ( bool bIsLocal )
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DRenderTargetSurface );
 
     // Create the web view
-    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( m_uiSizeX, m_uiSizeY, bIsLocal );
+    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( m_uiSizeX, m_uiSizeY, bIsLocal, this );
 }
 
 
