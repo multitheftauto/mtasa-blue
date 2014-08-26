@@ -2010,16 +2010,16 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimationProgress ( CClientEntity& Entity, const char * szAnimName, float fProgress )
+bool CStaticFunctionDefinitions::SetPedAnimationProgress ( CClientEntity& Entity, const SString& strAnimName, float fProgress )
 {    
-    RUN_CHILDREN ( SetPedAnimationProgress ( **iter, szAnimName, fProgress ) )
+    RUN_CHILDREN ( SetPedAnimationProgress ( **iter, strAnimName, fProgress ) )
 
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        if ( szAnimName )
+        if ( !strAnimName.empty () )
         {
-            CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( Ped.GetClump (), szAnimName );
+            CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( Ped.GetClump (), strAnimName );
 
             if ( pA )
             {
