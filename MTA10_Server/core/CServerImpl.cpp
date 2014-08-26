@@ -166,6 +166,8 @@ void CServerImpl::Daemonize () const
 bool CServerImpl::CheckLibVersions( void )
 {
 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+// define MTASA_SKIP_VERSION_CHECKS in "build_overrides_s.h" to skip version checks
+#ifndef MTASA_SKIP_VERSION_CHECKS
 
     char buffer[256];
     buffer[0] = 0;
@@ -189,6 +191,7 @@ bool CServerImpl::CheckLibVersions( void )
         }
     }
 
+#endif
 #endif
     return true;
 }
