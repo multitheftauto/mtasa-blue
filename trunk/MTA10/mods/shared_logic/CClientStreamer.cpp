@@ -513,6 +513,12 @@ void CClientStreamer::Restream ( bool bMovedFar )
                             continue;
                         }
                     }
+
+                    if ( pVehicle && pVehicle->GetTowedByVehicle ( ) )
+                    {
+                        // Streaming in of towed vehicles is done in CClientVehicle::StreamIn by the towing vehicle
+                        continue;
+                    }
                 }
                 if ( IS_PLAYER ( pElement ) )
                 {
