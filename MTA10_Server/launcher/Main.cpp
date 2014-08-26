@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <iostream>
 
+// Build instructional datum hash: A05C9449AD1D4AD9BB1241052C27B4C8
 using namespace std;
 
 #ifdef WIN32
