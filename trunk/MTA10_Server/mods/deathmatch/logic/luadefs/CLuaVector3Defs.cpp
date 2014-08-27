@@ -232,9 +232,9 @@ int CLuaVector3Defs::Dot ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         CVector vector ( *pVector1 );
-        vector.DotProduct ( pVector2 );
+        float fProduct = vector.DotProduct ( pVector2 );
         
-        lua_pushvector ( luaVM, vector );
+        lua_pushnumber ( luaVM, fProduct );
         return 1;
     }
     else
