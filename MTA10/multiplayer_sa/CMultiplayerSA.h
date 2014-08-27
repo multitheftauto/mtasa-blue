@@ -191,6 +191,7 @@ public:
     void                        SetTrafficLightsLocked      ( bool bLocked );
 
     void                        SetLocalStatValue           ( unsigned short usStat, float fValue );
+    float                       GetLocalStatValue           ( unsigned short usStat );
     void                        SetLocalStatsStatic         ( bool bStatic );
 
     void                        SetLocalCameraRotation      ( float fRotation );
