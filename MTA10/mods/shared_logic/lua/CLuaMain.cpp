@@ -431,6 +431,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isOnFire", "isPedOnFire" );
     lua_classfunction ( luaVM, "isOnGround", "isPedOnGround" );
     lua_classfunction ( luaVM, "isTargetingMarkerEnabled", "isPedTargetingMarkerEnabled" );
+    lua_classfunction ( luaVM, "isDead", "isPedDead" );
     lua_classfunction ( luaVM, "setFootBloodEnabled", "setPedFootBloodEnabled" );
     lua_classfunction ( luaVM, "getTargetEnd", "getPedTargetEnd" ); // vector
     lua_classfunction ( luaVM, "getTargetStart", "getPedTargetStart" ); //vector
@@ -475,6 +476,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "inVehicle", NULL, "isPedInVehicle" );
     lua_classvariable ( luaVM, "onFire", "setPedOnFire", "isPedOnFire" );
     lua_classvariable ( luaVM, "onGround", NULL, "isOnGround" );
+    lua_classvariable ( luaVM, "dead", NULL, "isPedDead" );
     lua_classvariable ( luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled" );
     lua_classvariable ( luaVM, "footBlood", "setPedFootBloodEnabled", NULL );
 
@@ -1386,7 +1388,8 @@ void CLuaMain::AddCameraClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getTarget", "getCameraTarget" );
     lua_classfunction ( luaVM, "getInterior", "getCameraInterior" );
     lua_classfunction ( luaVM, "getViewMode", "getCameraViewMode" );
-    lua_classvariable ( luaVM, "getMatrix", NULL, CLuaOOPDefs::GetCameraMatrix );
+    lua_classfunction ( luaVM, "getMatrix", CLuaOOPDefs::GetCameraMatrix );
+    lua_classfunction ( luaVM, "setMatrix", "setCameraMatrix" );
     lua_classfunction ( luaVM, "getGoggleEffect", "getCameraGoggleEffect" );
     
     lua_classfunction ( luaVM, "setPosition", CLuaOOPDefs::SetCameraPosition );
