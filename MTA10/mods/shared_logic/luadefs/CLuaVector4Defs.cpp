@@ -224,9 +224,9 @@ int CLuaVector4Defs::Dot ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         CVector4D vector ( *pVector1 );
-        vector.DotProduct ( *pVector2 );
-
-        lua_pushvector ( luaVM, vector );
+        float fProduct = vector.DotProduct ( *pVector2 );
+        
+        lua_pushnumber ( luaVM, fProduct );
         return 1;
     }
     else
