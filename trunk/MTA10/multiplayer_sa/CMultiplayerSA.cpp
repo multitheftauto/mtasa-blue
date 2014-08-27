@@ -3939,6 +3939,15 @@ void CMultiplayerSA::SetLocalStatValue ( unsigned short usStat, float fValue )
 }
 
 
+float CMultiplayerSA::GetLocalStatValue ( unsigned short usStat )
+{
+    if ( usStat < MAX_FLOAT_STATS )
+        return localStatsData.StatTypesFloat [usStat];
+    else if ( usStat >= STATS_OFFSET && usStat < MAX_INT_FLOAT_STATS )
+        return localStatsData.StatTypesInt [usStat - STATS_OFFSET];
+}
+
+
 void CMultiplayerSA::SetLocalStatsStatic ( bool bStatic )
 {
     bLocalStatsStatic = bStatic;

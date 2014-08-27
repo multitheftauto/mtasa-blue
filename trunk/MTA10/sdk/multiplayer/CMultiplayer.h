@@ -276,6 +276,7 @@ public:
     virtual void                        SetTrafficLightsLocked      ( bool bLocked ) = 0;
 
     virtual void                        SetLocalStatValue           ( unsigned short usStat, float fValue ) = 0;
+    virtual float                       GetLocalStatValue           ( unsigned short usStat ) = 0;
     virtual void                        SetLocalStatsStatic         ( bool bStatic ) = 0;
 
     virtual void                        SetLocalCameraRotation      ( float fRotation ) = 0;

@@ -4355,7 +4355,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 m_pDamageEntity = pInflictingEntity;
                 m_ulDamageTime = CClientTime::GetTime ();
                 m_DamagerID = INVALID_ELEMENT_ID;
-                if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
+                if ( pInflictingEntity && !pInflictingEntity->IsLocalEntity ( ) ) m_DamagerID = pInflictingEntity->GetID ( );
                 m_bDamageSent = false;
             }
             // Does this damage kill the player?
@@ -4400,7 +4400,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         AnimationId animID = pEvent->GetAnimId ();
                         m_ulDamageTime = CClientTime::GetTime ();
                         m_DamagerID = INVALID_ELEMENT_ID;
-                        if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
+                        if ( pInflictingEntity && !pInflictingEntity->IsLocalEntity() ) m_DamagerID = pInflictingEntity->GetID ();
 
                         // Check if we're dead
                         SendPedWastedPacket ( pDamagedPed, m_DamagerID, weaponUsed, hitZone, animGroup, animID );
