@@ -163,7 +163,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getPosition", CLuaOOPDefs::GetElementPosition );
     lua_classfunction ( luaVM, "getRotation", CLuaOOPDefs::GetElementRotation );
     lua_classfunction ( luaVM, "getMatrix", CLuaOOPDefs::GetElementMatrix );
-    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" ); // vector3
+    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" );
     lua_classfunction ( luaVM, "getByType", "getElementsByType" );
     lua_classfunction ( luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "GetElementDistanceFromCentreOfMassToBaseOfModel" );
     lua_classfunction ( luaVM, "getType", "getElementType" );
@@ -226,7 +226,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "rotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
     lua_classvariable ( luaVM, "matrix", CLuaFunctionDefs::SetElementMatrix, CLuaOOPDefs::GetElementMatrix );
     lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocit" );
-    lua_classvariable ( luaVM, "data", NULL, "getAllElementData" ); // neeed to support setting of values
+    lua_classvariable ( luaVM, "data", NULL, "getAllElementData" ); // TODO: .data["age"] = 1337;
     
     lua_registerclass ( luaVM, "Element" );
 }
@@ -377,13 +377,13 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     
     //lua_classvariable ( luaVM, "color", CLuaFunctionDefs::SetVehicleColor, CLuaOOPDefs::GetVehicleColor );
     //lua_classvariable ( luaVM, "headlightColor", CLuaFunctionDefs::SetHeadLightColor, CLuaOOPDefs::GetHeadLightColor );
-    //lua_classvariable ( luaVM, "gravity", CLuaFunctionDefs::SetVehicleGravity, CLuaOOPDefs::GetVehicleGravity ); vector
+    lua_classvariable ( luaVM, "gravity", "setVehicleGravity", "getVehicleGravity" );
 
     lua_registerclass ( luaVM, "Vehicle", "Element" );
 }
 
 
-// TODO: vectors, and special tables
+// TODO: special tables
 void CLuaMain::AddPedClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -433,11 +433,15 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isTargetingMarkerEnabled", "isPedTargetingMarkerEnabled" );
     lua_classfunction ( luaVM, "isDead", "isPedDead" );
     lua_classfunction ( luaVM, "setFootBloodEnabled", "setPedFootBloodEnabled" );
-    lua_classfunction ( luaVM, "getTargetEnd", "getPedTargetEnd" ); // vector
-    lua_classfunction ( luaVM, "getTargetStart", "getPedTargetStart" ); //vector
-    lua_classfunction ( luaVM, "getWeaponMuzzlePosition", "getPedWeaponMuzzlePosition" ); //vector
-    lua_classfunction ( luaVM, "getBonePosition", "getPedBonePosition" ); // vector
-    lua_classfunction ( luaVM, "getCameraRotation", "getPedCameraRotation" ); // vector
+    lua_classfunction ( luaVM, "getTargetEnd", "getPedTargetEnd" );
+    lua_classfunction ( luaVM, "getTargetStart", "getPedTargetStart" );
+    lua_classfunction ( luaVM, "getWeaponMuzzlePosition", "getPedWeaponMuzzlePosition" );
+    lua_classfunction ( luaVM, "getBonePosition", "getPedBonePosition" );
+    lua_classfunction ( luaVM, "getCameraRotation", "getPedCameraRotation" );
+    lua_classvariable ( luaVM, "targetCollision", NULL, "getPedTargetCollision" );
+    lua_classvariable ( luaVM, "targetEnd", NULL, "getPedTargetEnd" );
+    lua_classvariable ( luaVM, "targetStart", NULL, "getPedTargetStart" );
+    lua_classvariable ( luaVM, "muzzlePosition", NULL, "getPedMuzzlePosition" );
     //lua_classfunction ( luaVM, "getWalkingStyle", "getPedWalkingStyle" );
 
     lua_classfunction ( luaVM, "setCanBeKnockedOffBike", "setPedCanBeKnockedOffBike" );
@@ -455,8 +459,8 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setTargetingMarkerEnabled", "setPedTargetingMarkerEnabled" );
     lua_classfunction ( luaVM, "setVoice", "setPedVoice" );
     lua_classfunction ( luaVM, "removeFromVehicle", "removePedFromVehicle" );
-    lua_classfunction ( luaVM, "setAimTarget", "setPedAimTarget" ); // vector3
-    lua_classfunction ( luaVM, "setLookAt", "setPedLookAt" ); // vector3
+    lua_classfunction ( luaVM, "setAimTarget", "setPedAimTarget" );
+    lua_classfunction ( luaVM, "setLookAt", "setPedLookAt" );
     lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
 
     lua_classvariable ( luaVM, "vehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle );
@@ -485,10 +489,6 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     //lua_classvariable ( luaVM, "controlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState ); // TODO: .controlState["control"] = value
     //lua_classvariable ( luaVM, "stats", NULL, CLuaOOPDefs::GetPedStat ); // table (readonly)
     //lua_classvariable ( luaVM, "doingTask", NULL, CLuaOOPDefs::IsPedDoingTask ); // table (readonly)
-    //lua_classvariable ( luaVM, "targetCollision", NULL, CLuaDefs::GetPedTargetCollision ); // vector3
-    //lua_classvariable ( luaVM, "targetEnd", NULL, CLuaDefs::GetPedTargetEnd ); // vector3
-    //lua_classvariable ( luaVM, "targetStart", NULL, CLuaDefs::GetPedTargetStart ); // vector3
-    //lua_classvariable ( luaVM, "muzzlePosition", NULL, CLuaDefs::GetPedMuzzlePosition ); // vector3
     //lua_classvariable ( luaVM, "totalAmmo", NULL, CLuaDefs::GetPedTotalAmmo ); // table readonly
     //lua_classvariable ( luaVM, "controlState", CLuaOOPDefs::SetPedWeaponSlot, CLuaOOPDefs::GetPedWeaponSlot ); //table
     
@@ -509,7 +509,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getMoney", "getPlayerMoney" );
     lua_classfunction ( luaVM, "getSerial", "getPlayerSerial" );
     lua_classfunction ( luaVM, "getWantedLevel", "getPlayerWantedLevel" );
-    lua_classfunction ( luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox" ); //
+    lua_classfunction ( luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox" );
     lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
     lua_classfunction ( luaVM, "isMapVisible", "isPlayerMapVisible" );
     lua_classfunction ( luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible" );
@@ -588,20 +588,20 @@ void CLuaMain::AddMarkerClass( lua_State* luaVM )
     lua_classfunction ( luaVM, "getType", "getMarkerType" );
     lua_classfunction ( luaVM, "getIcon", "getMarkerIcon" );
     lua_classfunction ( luaVM, "getSize", "getMarkerSize" );
-    lua_classfunction ( luaVM, "getTarget", "getMarkerTarget" ); // vector
+    lua_classfunction ( luaVM, "getTarget", "getMarkerTarget" );
     lua_classfunction ( luaVM, "getColor", "getMarkerColor" ); // color
 
     lua_classfunction ( luaVM, "setType", "setMarkerType" );
     lua_classfunction ( luaVM, "setIcon", "setMarkerIcon" );
     lua_classfunction ( luaVM, "setSize", "setMarkerSize" );
-    lua_classfunction ( luaVM, "setTarget", "setMarkerTarget" ); // vector
+    lua_classfunction ( luaVM, "setTarget", "setMarkerTarget" );
     lua_classfunction ( luaVM, "setColor", "setMarkerColor" ); // color
 
     lua_classvariable ( luaVM, "type", "setMarkerType", "getMarkerType" );
     lua_classvariable ( luaVM, "icon", "setMarkerIcon", "getMarkerIcon" );
     lua_classvariable ( luaVM, "size", "setMarkerSize", "getMarkerSize" );
 
-    //lua_classvariable ( luaVM, "target", CLuaOOPDefs::SetMarkerTarget, CLuaOOPDefs::GetMarkerTarget ); vector
+    lua_classvariable ( luaVM, "target", "setMarkerTarget", "getMarkerTarget" );
     //lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor ); color
 
     lua_registerclass ( luaVM, "Marker", "Element" );
@@ -705,7 +705,7 @@ void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "createRadarArea" );
-    lua_classfunction ( luaVM, "isInside", "isInsideRadarArea" ); // vector2
+    lua_classfunction ( luaVM, "isInside", "isInsideRadarArea" );
 
     lua_classfunction ( luaVM, "isFlashing", "isRadarAreaFlashing" );
     lua_classfunction ( luaVM, "getSize", "getRadarAreaSize" );
@@ -717,7 +717,7 @@ void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "flashing", "isRadarAreaFlashing", "setRadarAreaFlashing" );
     //lua_classvariable ( luaVM, "color", "getRadarAreaColor", "setRadarAreaColor" ); color
-    //lua_classvariable ( luaVM, "size", "getRadarAreaSize", "setRadarAreaSize" ); vector2
+    lua_classvariable ( luaVM, "size", "getRadarAreaSize", "setRadarAreaSize" );
     
     lua_registerclass ( luaVM, "RadarArea", "Element" );
 }
@@ -754,13 +754,13 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     
     lua_classfunction ( luaVM, "isDrawnLast", "isWaterDrawnLast" );
     lua_classfunction ( luaVM, "getLevel", "getWaterLevel" );
-    lua_classfunction ( luaVM, "getVertexPosition", "getWaterVertexPosition" ); // vector3
+    lua_classfunction ( luaVM, "getVertexPosition", "getWaterVertexPosition" );
     lua_classfunction ( luaVM, "getWaveHeight", "getWaveHeight" );
     lua_classfunction ( luaVM, "getColor", "getWaterColor" ); // color
     
     lua_classfunction ( luaVM, "setWaveHeight", "setWaveHeight" );
     lua_classfunction ( luaVM, "setColor", "setWaterColor" ); // color
-    lua_classfunction ( luaVM, "setVertexPosition", "setWaterVertexPosition" ); // vector3
+    lua_classfunction ( luaVM, "setVertexPosition", "setWaterVertexPosition" );
     lua_classfunction ( luaVM, "setLevel", "setWaterLevel" ); // vector3d
     lua_classfunction ( luaVM, "setDrawnLast", "setWaterDrawnLast" );
 
@@ -931,8 +931,8 @@ void CLuaMain::AddGuiElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getEnabled", "guiGetEnabled" );
     lua_classfunction ( luaVM, "getVisible", "guiGetVisible" );
     lua_classfunction ( luaVM, "getText", "guiGetText" );
-    lua_classfunction ( luaVM, "getPosition", "guiGetPosition" ); // vector2, variable
-    lua_classfunction ( luaVM, "getSize", "guiGetSize" ); // vector2, variable
+    lua_classfunction ( luaVM, "getPosition", "guiGetPosition" );
+    lua_classfunction ( luaVM, "getSize", "guiGetSize" );
     lua_classfunction ( luaVM, "getProperty", "guiGetProperty" );
     
     lua_classfunction ( luaVM, "setInputEnabled", "guiSetInputEnabled" );
@@ -943,8 +943,8 @@ void CLuaMain::AddGuiElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setText", "guiSetText" );
     lua_classfunction ( luaVM, "setInputMode", "guiSetInputMode" );
     lua_classfunction ( luaVM, "setProperty", "guiSetProperty" );
-    lua_classfunction ( luaVM, "setPosition", "guiSetPosition" ); // vector2
-    lua_classfunction ( luaVM, "setSize", "guiSetSize" ); // vector2
+    lua_classfunction ( luaVM, "setPosition", "guiSetPosition" );
+    lua_classfunction ( luaVM, "setSize", "guiSetSize" );
 
     lua_classvariable ( luaVM, "chatBoxInputActive", NULL, "isChatBoxInputActive" );
     lua_classvariable ( luaVM, "consoleActive", NULL, "isConsoleActive" );
@@ -961,7 +961,9 @@ void CLuaMain::AddGuiElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "alpha", "guiSetAlpha", "guiGetAlpha" );
     lua_classvariable ( luaVM, "enabled", "guiSetEnabled", "guiGetEnabled" );
     lua_classvariable ( luaVM, "text", "guiSetText", "guiGetText" );
-    //lua_classvariable ( luaVM, "screenSize", NULL, "guiGetScreenSize" ); vector2
+    lua_classvariable ( luaVM, "size", "guiSetSize", "guiGetSize" );
+    lua_classvariable ( luaVM, "position", "guiSetPosition", "guiGetPosition" );
+    lua_classvariable ( luaVM, "screenSize", NULL, "guiGetScreenSize" );
     //lua_classvariable ( luaVM, "property" "guiSetProperty", "guiGetProperty" ); todo: .property[name] = value
     
     lua_registerclass ( luaVM, "GuiElement", "Element" );
