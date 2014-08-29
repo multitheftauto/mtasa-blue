@@ -29,10 +29,9 @@ public:
     virtual void ExecuteJavascript  ( const SString& strJavascriptCode ) = 0;
 
     virtual void InjectMouseMove    ( int iPosX, int iPosY ) = 0;
-    virtual void InjectMouseDown    ( int mouseButton ) = 0;
-    virtual void InjectMouseUp      ( int mouseButton ) = 0;
+    virtual void InjectMouseDown    ( eWebBrowserMouseButton mouseButton ) = 0;
+    virtual void InjectMouseUp      ( eWebBrowserMouseButton mouseButton ) = 0;
     virtual void InjectMouseWheel   ( int iScrollVert, int iScrollHorz ) = 0;
-    virtual void InjectKeyboardEvent( const SString& strKey, bool bKeyDown = true, bool bCharacter = false ) = 0;
 
     virtual bool IsLocal            () = 0;
     virtual void SetTempURL         ( const SString& strTempURL ) = 0;

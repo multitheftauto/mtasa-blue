@@ -1008,9 +1008,6 @@ public:
     LUA_DECLARE ( InjectBrowserMouseDown );
     LUA_DECLARE ( InjectBrowserMouseUp );
     LUA_DECLARE ( InjectBrowserMouseWheel );
-    LUA_DECLARE ( InjectBrowserKeyDown );
-    LUA_DECLARE ( InjectBrowserKeyUp );
-    LUA_DECLARE ( InjectBrowserCharacter );
     LUA_DECLARE ( GetBrowserTitle );
     LUA_DECLARE ( GetBrowserURL );
     LUA_DECLARE ( SetBrowserRenderingPaused );

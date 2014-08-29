@@ -1562,9 +1562,6 @@ void CLuaMain::AddBrowserClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "injectMouseDown", "injectBrowserMouseDown" );
     lua_classfunction ( luaVM, "injectMouseUp", "injectBrowserMouseUp" );
     lua_classfunction ( luaVM, "injectMouseWheel", "injectBrowserMouseWheel" );
-    lua_classfunction ( luaVM, "injectKeyDown", "injectBrowserKeyDown" );
-    lua_classfunction ( luaVM, "injectKeyUp", "injectBrowserKeyUp" );
-    lua_classfunction ( luaVM, "injectCharacter", "injectBrowserCharacter" );
     lua_classfunction ( luaVM, "getTitle", "getBrowserTitle" );
     lua_classfunction ( luaVM, "getURL", "getBrowserURL" );
     lua_classfunction ( luaVM, "setRenderingPaused", "setBrowserRenderingPaused" );

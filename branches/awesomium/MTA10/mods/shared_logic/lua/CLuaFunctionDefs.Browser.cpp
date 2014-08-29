@@ -183,7 +183,7 @@ int CLuaFunctionDefs::InjectBrowserMouseMove ( lua_State* luaVM )
 int CLuaFunctionDefs::InjectBrowserMouseDown ( lua_State* luaVM )
 {
 //  bool injectBrowserMouseDown ( browser webBrowser, string mouseButton )
-    CClientWebBrowser* pWebBrowser; eAwesomiumMouseButton mouseButton;
+    CClientWebBrowser* pWebBrowser; eWebBrowserMouseButton mouseButton;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
@@ -205,7 +205,7 @@ int CLuaFunctionDefs::InjectBrowserMouseDown ( lua_State* luaVM )
 int CLuaFunctionDefs::InjectBrowserMouseUp ( lua_State* luaVM )
 {
 //  bool injectBrowserMouseUp ( browser webBrowser, string mouseButton )
-    CClientWebBrowser* pWebBrowser; eAwesomiumMouseButton mouseButton;
+    CClientWebBrowser* pWebBrowser; eWebBrowserMouseButton mouseButton;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
@@ -237,72 +237,6 @@ int CLuaFunctionDefs::InjectBrowserMouseWheel ( lua_State* luaVM )
     if ( !argStream.HasErrors() )
     {
         pWebBrowser->InjectMouseWheel ( iScrollVert, iScrollHorz );
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::InjectBrowserKeyDown ( lua_State* luaVM )
-{
-//  bool injectBrowserKeyDown ( browser webBrowser, string key )
-    CClientWebBrowser* pWebBrowser; SString strKey;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadString ( strKey );
-
-    if ( !argStream.HasErrors () )
-    {
-        pWebBrowser->InjectKeyboardEvent ( strKey, true );
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::InjectBrowserKeyUp ( lua_State* luaVM )
-{
-//  bool injectBrowserKeyDown ( browser webBrowser, string key )
-    CClientWebBrowser* pWebBrowser; SString strKey;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadString ( strKey );
-
-    if ( !argStream.HasErrors () )
-    {
-        pWebBrowser->InjectKeyboardEvent ( strKey, false );
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::InjectBrowserCharacter ( lua_State* luaVM )
-{
-//  bool injectBrowserCharacter ( browser webBrowser, string character )
-    CClientWebBrowser* pWebBrowser; SString strCharacter;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadString ( strCharacter );
-
-    if ( !argStream.HasErrors () )
-    {
-        pWebBrowser->InjectKeyboardEvent ( strCharacter, true, true );
         lua_pushboolean ( luaVM, true );
         return 1;
     }

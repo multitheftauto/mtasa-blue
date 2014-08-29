@@ -49,6 +49,11 @@ public:
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
     inline void         SetTestModeEnabled  ( bool bEnabled ) { m_bTestmodeEnabled = bEnabled; };
 
+    inline CWebView*    GetFocusedWebView   () { return m_pFocusedWebView; };
+    inline void         SetFocusedWebView   ( CWebView* pWebView ) { m_pFocusedWebView = pWebView; };
+    void                ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam );
+    int                 GetCefKeyboardModifiers ( WPARAM wParam, LPARAM lParam );
+
     bool                CanLoadRemotePages  ();
 
     bool                InitialiseCoreAudio ();
@@ -80,6 +85,7 @@ private:
     CWebsiteRequests*                       m_pRequestsGUI;
     std::map<int, CWebView*>                m_WebViewMap;
     bool                                    m_bTestmodeEnabled;
+    CWebView*                               m_pFocusedWebView;
 
     CFastHashMap<SString, WebFilterPair>    m_Whitelist;
     std::vector<SString>                    m_PendingRequests;

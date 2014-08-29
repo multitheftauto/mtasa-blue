@@ -13,6 +13,7 @@
 
 class CWebBrowserItem;
 class CWebViewInterface;
+class CWebView;
 
 enum eURLState
 {
@@ -29,11 +30,11 @@ enum eWebFilterType
     WEBFILTER_REQUEST
 };
 
-enum eAwesomiumMouseButton
+enum eWebBrowserMouseButton
 {
-    AWESOMIUM_MOUSEBUTTON_LEFT = 0,
-    AWESOMIUM_MOUSEBUTTON_MIDDLE = 1,
-    AWESOMIUM_MOUSEBUTTON_RIGHT = 2
+    BROWSER_MOUSEBUTTON_LEFT = 0,
+    BROWSER_MOUSEBUTTON_MIDDLE = 1,
+    BROWSER_MOUSEBUTTON_RIGHT = 2
 };
 
 class CWebCoreInterface
@@ -51,6 +52,10 @@ public:
 
     virtual bool                IsTestModeEnabled  () = 0;
     virtual void                SetTestModeEnabled ( bool bEnabled ) = 0;
+
+    virtual CWebView*           GetFocusedWebView  () = 0;
+    virtual void                SetFocusedWebView  (CWebView* pWebView) = 0;
+    virtual void                ProcessInputMessage( UINT uMsg, WPARAM wParam, LPARAM lParam ) = 0;
 
     virtual bool                CanLoadRemotePages () = 0;
 

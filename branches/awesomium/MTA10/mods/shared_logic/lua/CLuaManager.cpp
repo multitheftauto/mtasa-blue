@@ -1184,9 +1184,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "injectBrowserMouseDown", CLuaFunctionDefs::InjectBrowserMouseDown );
     CLuaCFunctions::AddFunction ( "injectBrowserMouseUp", CLuaFunctionDefs::InjectBrowserMouseUp );
     CLuaCFunctions::AddFunction ( "injectBrowserMouseWheel", CLuaFunctionDefs::InjectBrowserMouseWheel );
-    CLuaCFunctions::AddFunction ( "injectBrowserKeyDown", CLuaFunctionDefs::InjectBrowserKeyDown );
-    CLuaCFunctions::AddFunction ( "injectBrowserKeyUp", CLuaFunctionDefs::InjectBrowserKeyUp );
-    CLuaCFunctions::AddFunction ( "injectBrowserCharacter", CLuaFunctionDefs::InjectBrowserCharacter );
     CLuaCFunctions::AddFunction ( "getBrowserTitle", CLuaFunctionDefs::GetBrowserTitle );
     CLuaCFunctions::AddFunction ( "getBrowserURL", CLuaFunctionDefs::GetBrowserURL );
     CLuaCFunctions::AddFunction ( "setBrowserRenderingPaused", CLuaFunctionDefs::SetBrowserRenderingPaused );

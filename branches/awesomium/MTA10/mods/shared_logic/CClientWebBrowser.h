@@ -36,10 +36,9 @@ public:
     bool                        ExecuteJavascript   ( const SString& strJavascriptCode );
 
     void                        InjectMouseMove     ( int iPosX, int iPosY );
-    void                        InjectMouseDown     ( int mouseButton );
-    void                        InjectMouseUp       ( int mouseButton );
+    void                        InjectMouseDown     ( eWebBrowserMouseButton mouseButton );
+    void                        InjectMouseUp       ( eWebBrowserMouseButton mouseButton );
     void                        InjectMouseWheel    ( int iScrollVert, int iScrollHorz );
-    void                        InjectKeyboardEvent ( const SString& strKey, bool bKeyDown = true, bool bCharacter = false );
 
     bool                        IsLocal             ();
     void                        SetTempURL          ( const SString& strTempURL );

@@ -30,10 +30,9 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     }
 
     CefWindowInfo windowInfo;
-    windowInfo.SetAsWindowless(NULL, true);
+    windowInfo.SetAsWindowless ( NULL, true );
     
-    
-    m_pWebView = CefBrowserHost::CreateBrowserSync ( windowInfo, this, "http://google.de/", browserSettings, NULL );
+    m_pWebView = CefBrowserHost::CreateBrowserSync ( windowInfo, this, "", browserSettings, NULL );
 
     /*Awesomium::WebPreferences preferences;
     CVARS_GET ( "browser_plugins", preferences.enable_plugins );
@@ -74,7 +73,7 @@ bool CWebView::IsLoading ()
 void CWebView::GetURL ( SString& outURL )
 {
     if ( !m_bIsLocal )
-        outURL = static_cast < SString > ( m_pWebView->GetMainFrame ()->GetURL () ); //static_cast<SString> ( CWebCore::ToSString ( m_pWebView->url ().spec () ) );
+        outURL = static_cast < SString > ( m_pWebView->GetMainFrame ()->GetURL () );
     else
         outURL = m_strTempURL;
 }
@@ -86,10 +85,7 @@ void CWebView::GetTitle ( SString& outTitle )
 
 void CWebView::SetRenderingPaused ( bool bPaused )
 {
-    /*if ( bPaused )
-        m_pWebView->PauseRendering ();
-    else
-        m_pWebView->ResumeRendering ();*/
+    m_pWebView->GetHost ()->WasHidden ( bPaused );
 }
 
 void CWebView::SetTransparent ( bool bTransparent )
@@ -100,11 +96,12 @@ void CWebView::SetTransparent ( bool bTransparent )
 void CWebView::Focus ()
 {
     m_pWebView->GetHost ()->SetFocus ( true );
+    g_pCore->GetWebCore()->SetFocusedWebView ( this );
 }
 
 void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
 {
-    m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJavascriptCode, "", 1 );
+    m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJavascriptCode, "", 0 );
 }
 
 void CWebView::InjectMouseMove ( int iPosX, int iPosY )
@@ -117,22 +114,22 @@ void CWebView::InjectMouseMove ( int iPosX, int iPosY )
     m_vecMousePosition.y = iPosY;
 }
 
-void CWebView::InjectMouseDown ( int mouseButton )
+void CWebView::InjectMouseDown ( eWebBrowserMouseButton mouseButton )
 {
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
 
-    m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, CefBrowserHost::MouseButtonType::MBT_LEFT, false, 1 );
+    m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, static_cast < CefBrowserHost::MouseButtonType > ( mouseButton ), false, 1 );
 }
 
-void CWebView::InjectMouseUp ( int mouseButton )
+void CWebView::InjectMouseUp ( eWebBrowserMouseButton mouseButton )
 {
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
 
-    m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, CefBrowserHost::MouseButtonType::MBT_LEFT, true, 1 );
+    m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, static_cast < CefBrowserHost::MouseButtonType > ( mouseButton ), true, 1 );
 }
 
 void CWebView::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
@@ -144,9 +141,11 @@ void CWebView::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
     m_pWebView->GetHost ()->SendMouseWheelEvent ( mouseEvent, iScrollHorz, iScrollVert );
 }
 
-void CWebView::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool bCharacter )
+void CWebView::InjectKeyboardEvent ( const CefKeyEvent& keyEvent )
 {
-    SString key = strKey;
+    m_pWebView->GetHost ()->SendKeyEvent ( keyEvent );
+
+    /*SString key = strKey;
     if (key == " ")
         key = "space";
 
@@ -174,7 +173,7 @@ void CWebView::InjectKeyboardEvent ( const SString& strKey, bool bKeyDown, bool 
         keyEvent.type = cef_key_event_type_t::KEYEVENT_CHAR;
     }
     
-    m_pWebView->GetHost ()->SendKeyEvent ( keyEvent );
+    m_pWebView->GetHost ()->SendKeyEvent ( keyEvent );*/
 }
 
 bool CWebView::SetAudioVolume ( float fVolume )

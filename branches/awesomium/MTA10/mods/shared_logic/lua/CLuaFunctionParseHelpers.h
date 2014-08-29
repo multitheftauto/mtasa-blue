@@ -39,7 +39,7 @@ DECLARE_ENUM( eFontType );
 DECLARE_ENUM( eAudioLookupIndex );
 DECLARE_ENUM( eAspectRatio );
 DECLARE_ENUM( eRadioStreamIndex );
-DECLARE_ENUM( eAwesomiumMouseButton );
+DECLARE_ENUM( eWebBrowserMouseButton );
 
 enum eDXHorizontalAlign
 {
