@@ -6343,7 +6343,7 @@ bool CStaticFunctionDefinitions::SetVehicleLocked ( CElement* pElement, bool bLo
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
 
-        //if ( bLocked != pVehicle->IsLocked () )   // this lock check is redundant
+        if ( bLocked != pVehicle->IsLocked () )
         {
             // Set the new locked state
             pVehicle->SetLocked ( bLocked );

@@ -18,14 +18,7 @@ CPacket::CPacket ( void )
 {
     // Init
     m_pSourceElement = NULL;
-
-    // Should this even be set to zero? VC++ std::string survives a memset(0), 
-    // GCC's doesn't. It's naughty regardless!
-    m_Source.m_uiBinaryAddress = 0;
-    m_Source.m_usPort = 0;
-
-    // This line will crash unix.
-    //memset ( &m_Source, 0, sizeof ( NetServerPlayerID ) );
+    m_Source = NetServerPlayerID( 0, 0 );
 }
 
 
