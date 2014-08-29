@@ -204,6 +204,9 @@ void CScreenGrabber::ProcessScreenShotQueue ( void )
     PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback = item.pfnScreenShotCallback;
     m_ScreenShotQueue.pop_front ();
 
+    // Clear web browser textures
+    g_pCore->GetWebCore ()->ClearTextures ();
+
     CBuffer buffer;
     SString strError;
     if ( GetBackBufferPixels ( uiSizeX, uiSizeY, buffer, strError ) )

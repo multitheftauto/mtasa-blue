@@ -11,9 +11,11 @@
 #include "StdInc.h"
 #include "CClientWebBrowser.h"
 
-CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, CWebViewInterface* pWebView )
-    : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem ), m_pWebView ( pWebView )
+CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, bool bLocal, bool bTransparent )
+    : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem )
 {
+    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( pWebBrowserItem->m_uiSizeX, pWebBrowserItem->m_uiSizeY, bLocal, pWebBrowserItem, bTransparent );
+
     // Set events interface
     m_pWebView->SetWebBrowserEvents ( this );
     SetTypeName ( "webbrowser" );
@@ -21,7 +23,7 @@ CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, C
 
 CClientWebBrowser::~CClientWebBrowser ()
 {
-    // We can't release the memory here since we deal with an interface
+    g_pCore->GetWebCore()->DestroyWebView ( m_pWebView );
     m_pWebView = NULL;
 
     // Unlink from tree
@@ -51,11 +53,6 @@ void CClientWebBrowser::GetURL ( SString& outURL )
 void CClientWebBrowser::SetRenderingPaused ( bool bPaused )
 {
     m_pWebView->SetRenderingPaused ( bPaused );
-}
-
-void CClientWebBrowser::SetTransparent ( bool bTransparent )
-{
-    m_pWebView->SetTransparent ( bTransparent );
 }
 
 void CClientWebBrowser::Focus ()

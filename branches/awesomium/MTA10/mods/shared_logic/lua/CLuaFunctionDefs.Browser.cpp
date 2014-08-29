@@ -34,39 +34,15 @@ int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
         {
             CResource* pParentResource = pLuaMain->GetResource ();
 
-            CClientWebBrowser* pBrowserTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, bIsLocal );
+            CClientWebBrowser* pBrowserTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, bIsLocal, bTransparent );
             if ( pBrowserTexture )
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                 pBrowserTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
-
-                if ( bTransparent )
-                    pBrowserTexture->SetTransparent ( true );
             }
             lua_pushelement ( luaVM, pBrowserTexture );
             return 1;
         }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::UpdateBrowser ( lua_State* luaVM )
-{
-//  bool updateBrowser ( browser webBrowser )
-    CClientWebBrowser* pWebBrowser;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWebBrowser );
-
-    if ( !argStream.HasErrors () )
-    {
-        g_pCore->GetGraphics ()->GetRenderItemManager ()->UpdateWebBrowser ( pWebBrowser->GetWebBrowserItem () );
-        lua_pushboolean ( luaVM, true );
-        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -391,6 +367,13 @@ int CLuaFunctionDefs::FocusBrowser ( lua_State* luaVM )
     CClientWebBrowser* pWebBrowser;
 
     CScriptArgReader argStream ( luaVM );
+    if ( argStream.NextIsNil () || argStream.NextIsNone () )
+    {
+        g_pCore->GetWebCore ()->SetFocusedWebView ( NULL );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
     argStream.ReadUserData ( pWebBrowser );
 
     if ( !argStream.HasErrors () )

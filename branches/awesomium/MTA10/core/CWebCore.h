@@ -33,7 +33,7 @@ public:
     ~CWebCore();
     bool                Initialise          ();
 
-    CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem );
+    CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent );
     void                DestroyWebView      ( CWebViewInterface* pWebViewInterface );
     void                DoPulse             ();
     
@@ -53,6 +53,7 @@ public:
     inline void         SetFocusedWebView   ( CWebView* pWebView ) { m_pFocusedWebView = pWebView; };
     void                ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam );
     int                 GetCefKeyboardModifiers ( WPARAM wParam, LPARAM lParam );
+    void                ClearTextures       ();
 
     bool                CanLoadRemotePages  ();
 
@@ -83,7 +84,7 @@ private:
 
     //CefRefPtr<CefBrowser>                   m_pWebCore;
     CWebsiteRequests*                       m_pRequestsGUI;
-    std::map<int, CWebView*>                m_WebViewMap;
+    std::list<CWebView*>                    m_WebViews;
     bool                                    m_bTestmodeEnabled;
     CWebView*                               m_pFocusedWebView;
 

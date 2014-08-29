@@ -23,6 +23,7 @@ CWebCore::CWebCore ()
     m_bTestmodeEnabled = false;
     m_pAudioSessionManager = NULL;
     m_pXmlConfig = NULL;
+    m_pFocusedWebView = NULL;
 
     Initialise ();
     InitialiseWhiteAndBlacklist ();
@@ -59,7 +60,7 @@ bool CWebCore::Initialise ()
     sandboxInfo = scopedSandbox.sandbox_info();
 #endif
 
-    if (CefExecuteProcess(mainArgs, NULL, NULL) >= 0)
+    if ( CefExecuteProcess(mainArgs, NULL, NULL) >= 0 )
         return false;
 
     CefSettings settings;
@@ -78,11 +79,11 @@ bool CWebCore::Initialise ()
     return CefInitialize ( mainArgs, settings, NULL, sandboxInfo );
 }
 
-CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem )
+CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
 {
     // Create our webview implementation
-    CWebView* pWebView = new CWebView ( uiWidth, uiHeight, bIsLocal, pWebBrowserRenderItem );
-    //m_WebViewMap[pWebView->GetAwesomiumView ()->process_id ()] = pWebView;
+    CWebView* pWebView = new CWebView ( uiWidth, uiHeight, bIsLocal, pWebBrowserRenderItem, bTransparent );
+    m_WebViews.push_back ( pWebView );
 
     return pWebView;
 }
@@ -92,7 +93,10 @@ void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
     CWebView* pWebView = dynamic_cast<CWebView*> ( pWebViewInterface );
     if ( pWebView )
     {
-        //m_WebViewMap.erase ( pWebView->GetAwesomiumView ()->process_id () );
+        std::list<CWebView*>::iterator iter = std::find(m_WebViews.begin(), m_WebViews.end(), pWebView);
+        if ( iter != m_WebViews.end () )
+            m_WebViews.erase ( iter );
+
         delete pWebView;
     }
 }
@@ -269,7 +273,7 @@ void CWebCore::ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
     m_pFocusedWebView->InjectKeyboardEvent ( keyEvent );
 }
 
-bool isKeyDown(WPARAM wParam)
+bool isKeyDown ( WPARAM wParam )
 {
     return (GetKeyState(wParam) & 0x8000) != 0;
 }
@@ -355,6 +359,14 @@ int CWebCore::GetCefKeyboardModifiers ( WPARAM wParam, LPARAM lParam )
     return modifiers;
 }
 
+void CWebCore::ClearTextures ()
+{
+    for ( std::list<CWebView*>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
+    {
+        (*iter)->ClearTexture ();
+    }
+}
+
 bool CWebCore::InitialiseCoreAudio()
 {
     const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
@@ -389,9 +401,9 @@ bool CWebCore::SetGlobalAudioVolume ( float fVolume )
 
     if ( GetApplicationSetting ( "os-version" ) < "6.2" || !m_pAudioSessionManager )
     {
-        for ( std::map<int, CWebView*>::iterator iter = m_WebViewMap.begin (); iter != m_WebViewMap.end (); ++iter )
+        for ( std::list<CWebView*>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
         {
-            iter->second->SetAudioVolume ( fVolume );
+            (*iter)->SetAudioVolume ( fVolume );
         }
     }
     else

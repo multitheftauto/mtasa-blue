@@ -227,17 +227,17 @@ CClientScreenSource* CClientRenderElementManager::CreateScreenSource ( uint uiSi
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientWebBrowser* CClientRenderElementManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY, bool bIsLocal )
+CClientWebBrowser* CClientRenderElementManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent )
 {
     // Create the item
-    CWebBrowserItem* pWebBrowserItem = m_pRenderItemManager->CreateWebBrowser ( uiSizeX, uiSizeY, bIsLocal );
+    CWebBrowserItem* pWebBrowserItem = m_pRenderItemManager->CreateWebBrowser ( uiSizeX, uiSizeY );
 
     // Check create worked
     if ( !pWebBrowserItem )
         return NULL;
 
     // Create the element
-    CClientWebBrowser* pWebBrowserElement = new CClientWebBrowser ( m_pClientManager, INVALID_ELEMENT_ID, pWebBrowserItem, pWebBrowserItem->m_pWebView );
+    CClientWebBrowser* pWebBrowserElement = new CClientWebBrowser ( m_pClientManager, INVALID_ELEMENT_ID, pWebBrowserItem, bIsLocal, bTransparent );
 
     // Add to this manager's list
     MapSet ( m_ItemElementMap, pWebBrowserItem, pWebBrowserElement );

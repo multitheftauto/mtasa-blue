@@ -40,7 +40,7 @@ enum eWebBrowserMouseButton
 class CWebCoreInterface
 {
 public:
-    virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem ) = 0;
+    virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent ) = 0;
     virtual void                DestroyWebView      ( CWebViewInterface* pWebView ) = 0;
     
     virtual eURLState           GetURLState        ( const SString& strURL ) = 0;
@@ -56,6 +56,7 @@ public:
     virtual CWebView*           GetFocusedWebView  () = 0;
     virtual void                SetFocusedWebView  (CWebView* pWebView) = 0;
     virtual void                ProcessInputMessage( UINT uMsg, WPARAM wParam, LPARAM lParam ) = 0;
+    virtual void                ClearTextures      () = 0;
 
     virtual bool                CanLoadRemotePages () = 0;
 

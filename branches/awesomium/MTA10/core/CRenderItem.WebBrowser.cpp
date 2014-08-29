@@ -16,17 +16,16 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::PostConstruct ( CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY, bool bIsLocal )
+void CWebBrowserItem::PostConstruct ( CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY )
 {
     Super::PostConstruct ( pRenderItemManager );
     m_uiSizeX = uiSizeX;
     m_uiSizeY = uiSizeY;
     m_uiSurfaceSizeX = uiSizeX;
     m_uiSurfaceSizeY = uiSizeY;
-    m_pWebView = NULL;
 
     // Initial creation of d3d data
-    CreateUnderlyingData ( bIsLocal );
+    CreateUnderlyingData ();
 }
 
 
@@ -53,7 +52,7 @@ void CWebBrowserItem::PreDestruct ( void )
 ////////////////////////////////////////////////////////////////
 bool CWebBrowserItem::IsValid ( void )
 {
-    return m_pD3DTexture && m_pD3DRenderTargetSurface && m_pWebView;
+    return m_pD3DTexture && m_pD3DRenderTargetSurface;
 }
 
 
@@ -90,7 +89,7 @@ void CWebBrowserItem::OnResetDevice ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::CreateUnderlyingData ( bool bIsLocal )
+void CWebBrowserItem::CreateUnderlyingData ()
 {
     assert ( !m_pD3DRenderTargetSurface );
     assert ( !m_pD3DTexture );
@@ -111,9 +110,6 @@ void CWebBrowserItem::CreateUnderlyingData ( bool bIsLocal )
     m_uiSurfaceSizeY = desc.Height;
 
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DRenderTargetSurface );
-
-    // Create the web view
-    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( m_uiSizeX, m_uiSizeY, bIsLocal, this );
 }
 
 
@@ -128,7 +124,4 @@ void CWebBrowserItem::ReleaseUnderlyingData ( void )
 {
     SAFE_RELEASE( m_pD3DRenderTargetSurface )
     SAFE_RELEASE( m_pD3DTexture )
-    
-    g_pCore->GetWebCore ()->DestroyWebView ( m_pWebView );
-    m_pWebView = NULL;
 }

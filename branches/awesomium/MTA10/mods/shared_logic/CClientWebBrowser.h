@@ -18,7 +18,7 @@ class CClientWebBrowser : public CClientTexture, public CWebBrowserEventsInterfa
 {
     DECLARE_CLASS(CClientWebBrowser, CClientTexture)
 public:
-    CClientWebBrowser           ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, CWebViewInterface* pWebView );
+    CClientWebBrowser           ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, bool bLocal, bool bTransparent );
     ~CClientWebBrowser          ();
     eClientEntityType           GetType             ( ) const { return CCLIENTBROWSER; }
 
@@ -30,7 +30,6 @@ public:
     void                        GetTitle            ( SString& outPageTitle );
     void                        GetURL              ( SString& outURL );
     void                        SetRenderingPaused  ( bool bPaused );
-    void                        SetTransparent      ( bool bTransparent );
     void                        Focus               ();
 
     bool                        ExecuteJavascript   ( const SString& strJavascriptCode );

@@ -1000,7 +1000,6 @@ public:
 
     // Webbrowser functions
     LUA_DECLARE ( CreateBrowser );
-    LUA_DECLARE ( UpdateBrowser );
     LUA_DECLARE ( RequestBrowserPages );
     LUA_DECLARE ( LoadBrowserURL );
     LUA_DECLARE ( IsBrowserLoading );

@@ -27,7 +27,7 @@
 class CWebView : public CWebViewInterface, public CefClient, public CefRenderHandler //, public Awesomium::WebViewListener::Load, public Awesomium::WebViewListener::View
 {
 public:
-    CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem );
+    CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false );
     ~CWebView                   ();
     //Awesomium::WebView*         GetAwesomiumView () { return m_pWebView; };
     void                        SetWebBrowserEvents ( CWebBrowserEventsInterface* pInterface ) { m_pEventsInterface = pInterface; };
@@ -38,8 +38,8 @@ public:
     void GetURL                 ( SString& outURL );
     void GetTitle               ( SString& outTitle );
     void SetRenderingPaused     ( bool bPaused );
-    void SetTransparent         ( bool bTransparent );
     void Focus                  ();
+    void ClearTexture           ();
 
     void ExecuteJavascript      ( const SString& strJavascriptCode );
 

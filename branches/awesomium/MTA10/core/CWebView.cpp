@@ -10,7 +10,7 @@
 #include "StdInc.h"
 #include "CWebView.h"
 
-CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem )
+CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
 {
     m_bIsLocal = bIsLocal;
     m_pWebBrowserRenderItem = pWebBrowserRenderItem;
@@ -30,7 +30,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     }
 
     CefWindowInfo windowInfo;
-    windowInfo.SetAsWindowless ( NULL, true );
+    windowInfo.SetAsWindowless ( NULL, bTransparent );
     
     m_pWebView = CefBrowserHost::CreateBrowserSync ( windowInfo, this, "", browserSettings, NULL );
 
@@ -88,15 +88,26 @@ void CWebView::SetRenderingPaused ( bool bPaused )
     m_pWebView->GetHost ()->WasHidden ( bPaused );
 }
 
-void CWebView::SetTransparent ( bool bTransparent )
-{
-    //m_pWebView->SetTransparent ( bTransparent );
-}
-
 void CWebView::Focus ()
 {
     m_pWebView->GetHost ()->SetFocus ( true );
     g_pCore->GetWebCore()->SetFocusedWebView ( this );
+}
+
+void CWebView::ClearTexture ()
+{
+    IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
+    if ( !pD3DSurface )
+        return;
+
+    D3DLOCKED_RECT LockedRect;
+    D3DSURFACE_DESC SurfaceDesc;
+
+    pD3DSurface->GetDesc ( &SurfaceDesc );
+    pD3DSurface->LockRect ( &LockedRect, NULL, 0 );
+
+    memset ( LockedRect.pBits, 0xFF, SurfaceDesc.Width * SurfaceDesc.Height * 4 );
+    pD3DSurface->UnlockRect();
 }
 
 void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
@@ -144,36 +155,6 @@ void CWebView::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
 void CWebView::InjectKeyboardEvent ( const CefKeyEvent& keyEvent )
 {
     m_pWebView->GetHost ()->SendKeyEvent ( keyEvent );
-
-    /*SString key = strKey;
-    if (key == " ")
-        key = "space";
-
-    CefKeyEvent keyEvent;
-    keyEvent.is_system_key = false;
-    //keyboardEvent.modifiers = Awesomium::WebKeyboardEvent::kModIsAutorepeat;
-
-    if ( !bCharacter )
-    {
-        // Get BindableKey structure (to be able to process MTA's key names correctly)
-        const SBindableKey* pBindableKey = g_pCore->GetKeyBinds ()->GetBindableFromKey ( key.c_str () );
-        if ( !pBindableKey )
-            return;
-
-        keyEvent.windows_key_code = pBindableKey->ulCode;
-        //keyEvent.native_key_code = pBindableKey->ulCode;
-        keyEvent.type = bKeyDown ? cef_key_event_type_t::KEYEVENT_KEYDOWN : cef_key_event_type_t::KEYEVENT_KEYUP;
-    }
-    else
-    {
-        std::wstring strCharacter ( MbUTF8ToUTF16 ( strKey ) );
-       
-        keyEvent.character = strCharacter[0];
-        keyEvent.unmodified_character = strCharacter[0];
-        keyEvent.type = cef_key_event_type_t::KEYEVENT_CHAR;
-    }
-    
-    m_pWebView->GetHost ()->SendKeyEvent ( keyEvent );*/
 }
 
 bool CWebView::SetAudioVolume ( float fVolume )
@@ -186,8 +167,7 @@ bool CWebView::SetAudioVolume ( float fVolume )
         "tags = document.getElementsByTagName('video'); for (var i=0; i<tags.length; ++i) { tags[i].volume = %f;}",
         fVolume, fVolume );
 
-    /*m_pWebView->ExecuteJavascript ( CWebCore::ToWebString ( strJSCode ), Awesomium::WSLit("") );
-    return m_pWebView->session ()->preferences ().enable_javascript;*/
+    m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJSCode, "", 0 );
     return true;
 }
 
@@ -219,11 +199,8 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
 
     pD3DSurface->GetDesc ( &SurfaceDesc );
     pD3DSurface->LockRect ( &LockedRect, NULL, 0 );
-    // TODO: Clear surface when taking a screenshot
-    // memset ( LockedRect.pBits, 0xFF, SurfaceDesc.Width * SurfaceDesc.Height * 4 );
-
+    
     memcpy ( LockedRect.pBits, buffer, width * height * 4 );
-
     pD3DSurface->UnlockRect ();
 }
 

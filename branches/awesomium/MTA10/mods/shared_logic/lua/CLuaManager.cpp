@@ -1176,7 +1176,6 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Browser functions
     CLuaCFunctions::AddFunction ( "createBrowser", CLuaFunctionDefs::CreateBrowser );
-    CLuaCFunctions::AddFunction ( "updateBrowser", CLuaFunctionDefs::UpdateBrowser );
     CLuaCFunctions::AddFunction ( "requestBrowserPages", CLuaFunctionDefs::RequestBrowserPages );
     CLuaCFunctions::AddFunction ( "loadBrowserURL", CLuaFunctionDefs::LoadBrowserURL );
     CLuaCFunctions::AddFunction ( "isBrowserLoading", CLuaFunctionDefs::IsBrowserLoading );

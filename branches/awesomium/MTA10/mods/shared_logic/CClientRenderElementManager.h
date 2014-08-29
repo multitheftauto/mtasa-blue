@@ -32,7 +32,7 @@ public:
     CClientShader*          CreateShader                ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask );
     CClientRenderTarget*    CreateRenderTarget          ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
     CClientScreenSource*    CreateScreenSource          ( uint uiSizeX, uint uiSizeY );
-    CClientWebBrowser*      CreateWebBrowser            ( uint uiSizeX, uint uiSizeY, bool bIsLocal );
+    CClientWebBrowser*      CreateWebBrowser            ( uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent );
     CClientTexture*         FindAutoTexture             ( const SString& strFullFilePath, const SString& strUniqueName );
     void                    Remove                      ( CClientRenderElement* pElement );
 

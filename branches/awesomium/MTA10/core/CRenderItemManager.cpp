@@ -209,13 +209,13 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
 //
 //
 ////////////////////////////////////////////////////////////////
-CWebBrowserItem* CRenderItemManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY, bool bIsLocal )
+CWebBrowserItem* CRenderItemManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY )
 {
     if ( !CanCreateRenderItem ( CWebBrowserItem::GetClassId () ) )
         return NULL;
 
     CWebBrowserItem* pWebBrowserItem = new CWebBrowserItem;
-    pWebBrowserItem->PostConstruct ( this, uiSizeX, uiSizeY, bIsLocal );
+    pWebBrowserItem->PostConstruct ( this, uiSizeX, uiSizeY );
 
     if ( !pWebBrowserItem->IsValid () )
     {
@@ -450,54 +450,6 @@ void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceIt
         D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
         m_pDevice->StretchRect( m_pBackBufferCopy->m_pD3DRenderTargetSurface, NULL, pScreenSourceItem->m_pD3DRenderTargetSurface, NULL, FilterType );
     }
-}
-
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderItemManager::UpdateWebBrowser
-//
-// Copy from Awesomium BitmapSurface to DirectX surface (Todo: An own implementation of BitmapSurface might be better tho)
-//
-////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateWebBrowser ( CWebBrowserItem* pWebBrowserItem )
-{
-    // Don't copy texture data if buffer has not yet been updated
-    /*if ( !pWebBrowserItem->IsValid () || pWebBrowserItem->m_pWebView->IsLoading () )
-        return;
-
-    // Get BitmapSurface and check if it is available (it's not available if the website is blocked for example)
-    CWebView* pWebView = dynamic_cast < CWebView* > ( pWebBrowserItem->m_pWebView );
-    if ( !pWebView )
-        return;
-
-    Awesomium::BitmapSurface* pAwSurface = static_cast < Awesomium::BitmapSurface* > ( pWebView->GetAwesomiumView ()->surface () );
-    if ( !pAwSurface )
-        return;
-
-    // Update our DX surface
-    D3DLOCKED_RECT LockedRect;
-    D3DSURFACE_DESC SurfaceDesc;
-    IDirect3DSurface9* pDXSurface = pWebBrowserItem->m_pD3DRenderTargetSurface;
-
-    // First, lock the surface and request some information
-    pDXSurface->GetDesc ( &SurfaceDesc );
-    pDXSurface->LockRect ( &LockedRect, NULL, 0 );
-
-    // Don't draw anything if we're going to take a screenshot (using takePlayerScreenShot)
-    if ( !g_pCore->GetGraphics()->GetScreenGrabber()->IsQueueEmpty() )
-    {
-        // m_pDevice->ColorFill doesn't work for D3DPOOL_MANAGED allocated surfaces --> lock the rect and set the color manually
-        memset ( LockedRect.pBits, 0xFF, SurfaceDesc.Width * SurfaceDesc.Height * 4 );
-    }
-    else
-    {
-        // Copy Awesomium buffer to our DX surface (format: ARGB)
-        pAwSurface->CopyTo ( reinterpret_cast<unsigned char*>(LockedRect.pBits), SurfaceDesc.Width * 4, 4, false, false );
-    }
-
-    // Finally, unlock the surface
-    pDXSurface->UnlockRect ();*/
 }
 
 

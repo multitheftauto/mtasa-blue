@@ -1555,7 +1555,6 @@ void CLuaMain::AddBrowserClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "createBrowser" );
-    lua_classfunction ( luaVM, "update", "updateBrowser" );
     lua_classfunction ( luaVM, "loadURL", "loadBrowserURL" );
     lua_classfunction ( luaVM, "isLoading", "isBrowserLoading" );
     lua_classfunction ( luaVM, "injectMouseMove", "injectBrowserMouseMove" );
