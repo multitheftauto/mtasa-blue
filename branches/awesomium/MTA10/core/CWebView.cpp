@@ -9,6 +9,7 @@
 *****************************************************************************/
 #include "StdInc.h"
 #include "CWebView.h"
+#include <cef3/include/cef_url.h>
 
 CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
 {
@@ -47,9 +48,11 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
 
 CWebView::~CWebView()
 {
-    // Explicitly free m_pWebView (operator= is implemented in CefRefPtr)
-    //m_pWebView = NULL;
-    //m_pWebView->Release();
+    if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
+        g_pCore->GetWebCore ()->SetFocusedWebView ( NULL );
+
+    // Ensure that m_pWebView was freed
+    //m_pWebView->Release ();
 }
 
 bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled )
@@ -172,6 +175,12 @@ bool CWebView::SetAudioVolume ( float fVolume )
 }
 
 
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefRenderHandler::GetViewRect                  //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#GetViewRect(CefRefPtr%3CCefBrowser%3E,CefRect&) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
 bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
 {
     IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
@@ -188,6 +197,12 @@ bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
     return true;
 }
 
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefRenderHandler::OnPaint                      //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPaint(CefRefPtr%3CCefBrowser%3E,PaintElementType,constRectList&,constvoid*,int,int) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
 void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height )
 {
     IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
@@ -206,82 +221,76 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-// Implementation: Awesomium::WebViewListener::Load:OnBeginLoadingFrame //
-// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#ab511ebd71dc641c5df5fea8c30b58335 //
+// Implementation: CefRenderHandler::OnCursorChange               //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnCursorChange(CefRefPtr%3CCefBrowser%3E,CefCursorHandle) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-/*void CWebView::OnBeginLoadingFrame ( Awesomium::WebView* pCaller, int64 frame_id, bool bMainFrame, const Awesomium::WebURL& url, bool bErrorPage )
+void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor )
+{
+    m_pEventsInterface->Events_OnChangeCursor ( reinterpret_cast < unsigned char > ( cursor ) );
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefLoadHandler::OnLoadStart                    //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadStart(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame )
 {
     SString strURL;
-    ConvertURL ( url, strURL );
+    ConvertURL ( frame->GetURL (), strURL );
 
-    // Exclude blank page
     if ( strURL == "blank" )
         return;
 
     // Trigger navigate event
-    m_pEventsInterface->Events_OnNavigate ( strURL, bMainFrame );
-}*/
+    m_pEventsInterface->Events_OnNavigate ( strURL, frame->IsMain () );
+}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-// Implementation: Awesomium::WebViewListener::Load:OnFinishLoadingFrame //
-// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#a3cb1ee5563db02f90cd5562c6d8342b1 //
+// Implementation: CefLoadHandler::OnLoadEnd                      //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadEnd(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,int) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-/*void CWebView::OnFinishLoadingFrame ( Awesomium::WebView* pCaller, int64 iFrameId, bool bMainFrame, const Awesomium::WebURL& url )
+void CWebView::OnLoadEnd ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode )
 {
+    // TODO: Check if we've to move this to OnLoadStart
     // Clear the old list
-    m_JSMethodHandler.Clear ();
+    //m_JSMethodHandler.Clear ();
 
     // Bind javascript global object
     if ( IsLocal () )
     {
-        Awesomium::JSValue jsMTA = pCaller->CreateGlobalJavascriptObject ( Awesomium::WSLit("mta")) ;
+        /*Awesomium::JSValue jsMTA = pCaller->CreateGlobalJavascriptObject ( Awesomium::WSLit("mta")) ;
         if ( jsMTA.IsObject () )
         {
             Awesomium::JSObject& mtaObject = jsMTA.ToObject();
             m_JSMethodHandler.Bind ( mtaObject, Awesomium::WSLit("triggerEvent"), Javascript_triggerEvent );
-        }
+        }*/
     }
-}*/
+
+    if ( frame->IsMain () )
+    {
+	    SString strURL;
+	    ConvertURL ( frame->GetURL (), strURL );
+	    m_pEventsInterface->Events_OnDocumentReady ( strURL );
+    }
+}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-// Implementation: Awesomium::WebViewListener::Load:OnDocumentReady //
-// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#aed2fe4f10d72079ecd1b0d3006cdb8c2 //
+// Implementation: CefLoadHandler::OnLoadError                    //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadError(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,ErrorCode,constCefString&,constCefString&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-/*void CWebView::OnDocumentReady ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url )
+void CWebView::OnLoadError ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedURL )
 {
     SString strURL;
-    ConvertURL ( url, strURL );
-    m_pEventsInterface->Events_OnDocumentReady ( strURL );
-}*/
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
-// Implementation: Awesomium::WebViewListener::Load:OnFailLoadingFrame //
-// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_load.html#add78ed509fbf9ae9428371bc5ef00323 //
-//                                                                //
-////////////////////////////////////////////////////////////////////
-/*void CWebView::OnFailLoadingFrame ( Awesomium::WebView* pCaller, int64 frame_id, bool bMainFrame, const Awesomium::WebURL& url, int error_code, const Awesomium::WebString& error_desc )
-{
-    SString strURL;
-    ConvertURL ( url, strURL );
-    m_pEventsInterface->Events_OnLoadingFailed ( strURL, error_code, CWebCore::ToSString ( error_desc ) );
-}*/
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
-// Implementation: Awesomium::WebViewListener::View:OnChangeCursor //
-// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_view.html#a47bcb396275c917b17358e1ddd0ef771 //
-//                                                                //
-////////////////////////////////////////////////////////////////////
-/*void CWebView::OnChangeCursor ( Awesomium::WebView* pCaller, Awesomium::Cursor cursor )
-{
-    m_pEventsInterface->Events_OnChangeCursor ( static_cast < unsigned char > ( cursor ) );
-}*/
+    ConvertURL ( failedURL, strURL );
+    m_pEventsInterface->Events_OnLoadingFailed ( strURL, errorCode, SString ( errorText ) );
+}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -300,6 +309,66 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
     // Destroy the new view immediately since we want the scripter to handle the popup event via Lua
     pNewView->Destroy ();
 }*/
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefRequestHandler::OnBeforeBrowe               //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeBrowse(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E,bool) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect )
+{
+    /*
+        From documentation:
+        The |request| object cannot be modified in this callback.
+        CefLoadHandler::OnLoadingStateChange will be called twice in all cases. If the navigation is allowed CefLoadHandler::OnLoadStart and CefLoadHandler::OnLoadEnd will be called.
+        If the navigation is canceled CefLoadHandler::OnLoadError will be called with an |errorCode| value of ERR_ABORTED. 
+    */
+
+    CefURLParts urlParts;
+    if ( !CefParseURL ( request->GetURL(), urlParts ) )
+        return true; // Cancel if invalid URL (this line will normally not be executed)
+    
+    WString scheme = urlParts.scheme.str;
+    if ( scheme == L"http" || scheme == L"https" )
+    {
+        if ( IsLocal () )
+            return true; // Block remote here requests generally
+
+        if ( g_pCore->GetWebCore ()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
+            return true;
+    }
+    
+    // Do not block local websites
+    return false;
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefRequestHandler::OnBeforeResourceLoad        //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeResourceLoad(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request )
+{
+    // Mostly the same as CWebView::OnBeforeBrowse
+    CefURLParts urlParts;
+    if ( !CefParseURL ( request->GetURL(), urlParts ) )
+        return true; // Cancel if invalid URL (this line will normally not be executed)
+
+    WString scheme = urlParts.scheme.str;
+    if ( scheme == L"http" || scheme == L"https" )
+    {
+        if ( IsLocal () )
+            return true; // Block remote requests in local mode generally
+
+        if ( g_pCore->GetWebCore()->GetURLState(UTF16ToMbUTF8(urlParts.host.str)) != eURLState::WEBPAGE_ALLOWED )
+            return true;
+    }
+
+    // Do not block local websites
+    return false;
+}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -341,16 +410,18 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
 */
 
 
-/*void CWebView::ConvertURL ( const Awesomium::WebURL& url, SString& convertedURL )
+void CWebView::ConvertURL ( const CefString& url, SString& convertedURL )
 {
-    bool isHTTP = url.scheme ().Compare ( Awesomium::WSLit("http") ) == 0 || url.scheme ().Compare ( Awesomium::WSLit("https") ) == 0;
-    if ( !isHTTP )
+    CefURLParts urlParts;
+    CefParseURL ( url, urlParts );
+    WString scheme = urlParts.scheme.str;
+    
+    if ( scheme == L"http" || scheme == L"https" )
     {
-        convertedURL = CWebCore::ToSString ( url.filename () );
+        convertedURL = UTF16ToMbUTF8 ( urlParts.spec.str );
     }
     else
     {
-        convertedURL = CWebCore::ToSString ( url.spec () );
+        convertedURL = UTF16ToMbUTF8 ( urlParts.path.str ); // TODO: Probably only the filename
     }
 }
-*/

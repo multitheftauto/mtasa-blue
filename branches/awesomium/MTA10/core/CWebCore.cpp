@@ -18,7 +18,6 @@
 
 CWebCore::CWebCore ()
 {
-    //m_pWebCore = NULL;
     m_pRequestsGUI = NULL;
     m_bTestmodeEnabled = false;
     m_pAudioSessionManager = NULL;
@@ -755,87 +754,3 @@ bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownl
 #endif
     return true;
 }
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
-//    Implementation: ResourceInterceptor::OnFilterNavigation     //
-// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_resource_interceptor.html#aceecadf1ddd8e3fe42cd56bc74d6ec6c //
-//                                                                //
-////////////////////////////////////////////////////////////////////
-/*bool CWebCore::OnFilterNavigation ( int origin_process_id, int origin_routing_id, const Awesomium::WebString& method, const Awesomium::WebURL& url, bool is_main_frame )
-{
-    std::map<int, CWebView*>::iterator iter = m_WebViewMap.find ( origin_process_id );
-    assert ( iter != m_WebViewMap.end () );
-
-    CWebView* pWebView = iter->second;
-    if ( !pWebView )
-        return true; // Block
-
-    if ( url.scheme().Compare ( ToWebString("http") ) == 0 || url.scheme().Compare ( ToWebString("https") ) == 0 ) // Todo: Check how Awesomium reacts to other protocols
-    {
-        // Block if we're dealing with a remote page in local mode
-        if ( pWebView->IsLocal () )
-            return true; // Block
-
-        if ( GetURLState ( ToSString(url.host()) ) != eURLState::WEBPAGE_ALLOWED )
-            // Block the action
-            return true;
-    }
-
-    // Don't do anything
-    return false;
-}*/
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
-//    Implementation: ResourceInterceptor::OnRequest              //
-// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_resource_interceptor.html#ac275121fdb030ff432c79d0337f0c19c //
-//                                                                //
-////////////////////////////////////////////////////////////////////
-/*Awesomium::ResourceResponse* CWebCore::OnRequest ( Awesomium::ResourceRequest* pRequest )
-{
-    std::map<int, CWebView*>::iterator iter = m_WebViewMap.find ( pRequest->origin_process_id () );
-    int i = pRequest->origin_process_id ();
-    if (iter == m_WebViewMap.end ())
-    {
-        pRequest->Cancel ();
-        return NULL;
-    }
-
-    CWebView* pWebView = iter->second;
-    if ( !pWebView )
-    {
-        pRequest->Cancel (); // Block
-        return NULL;
-    }
-
-    Awesomium::WebURL url = pRequest->url ();
-
-    if ( url.scheme().Compare ( ToWebString("http") ) == 0 || url.scheme().Compare ( ToWebString("https") ) == 0 )
-    {
-        if (pWebView->IsLocal())
-        {
-            pRequest->Cancel (); // Block
-            return NULL;
-        }
-
-        if ( GetURLState ( ToSString(url.host()) ) != eURLState::WEBPAGE_ALLOWED )
-            // Block the action
-            pRequest->Cancel ();
-    }
-
-    // We don't want to modify anything
-    return NULL;
-}*/
-
-
-/*Awesomium::WebString CWebCore::ToWebString ( const SString& strString )
-{
-    return Awesomium::WSLit ( strString.c_str () );
-}
-
-SString CWebCore::ToSString ( const Awesomium::WebString& webString )
-{
-    return SharedUtil::ToUTF8 ( std::wstring( (wchar_t*)webString.data () ) );
-}
-*/

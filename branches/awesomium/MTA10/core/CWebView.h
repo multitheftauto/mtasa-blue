@@ -24,7 +24,7 @@
 #include <audiopolicy.h>
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 
-class CWebView : public CWebViewInterface, public CefClient, public CefRenderHandler //, public Awesomium::WebViewListener::Load, public Awesomium::WebViewListener::View
+class CWebView : public CWebViewInterface, private CefClient, private CefRenderHandler, private CefLoadHandler, private CefRequestHandler
 {
 public:
     CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false );
@@ -57,32 +57,28 @@ public:
 
     // CefClient methods
     virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override { return this; };
+    virtual CefRefPtr<CefLoadHandler>   GetLoadHandler() override { return this; };
+    virtual CefRefPtr<CefRequestHandler>GetRequestHandler() override { return this; };
     
     // CefRenderHandler methods
-    virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) override;
-    virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height) override;
+    virtual bool GetViewRect    ( CefRefPtr<CefBrowser> browser, CefRect& rect ) override;
+    virtual void OnPaint        ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height ) override;
+    virtual void OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor ) override;
 
-    // Implementation: Awesomium::WebViewListener::Load
-    /*virtual void OnBeginLoadingFrame    ( Awesomium::WebView* pCaller, int64 frame_id, bool bMainFrame, const Awesomium::WebURL& url, bool bErrorPage );
-    virtual void OnFailLoadingFrame     ( Awesomium::WebView* pCaller, int64 frame_id, bool bMainFrame, const Awesomium::WebURL& url, int error_code, const Awesomium::WebString& error_desc );
-    virtual void OnFinishLoadingFrame   ( Awesomium::WebView* pCaller, int64 iFrameId, bool bMainFrame, const Awesomium::WebURL& url );
-    virtual void OnDocumentReady        ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url );*/
-
-    // Implementation: Awesomium::WebViewListener::View
-    /*virtual void OnChangeTitle          ( Awesomium::WebView* pCaller, const Awesomium::WebString& title ) {};
-    virtual void OnChangeAddressBar     ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url ) {};
-    virtual void OnChangeTooltip        ( Awesomium::WebView* pCaller, const Awesomium::WebString& tooltip ) {};
-    virtual void OnChangeTargetURL      ( Awesomium::WebView* pCaller, const Awesomium::WebURL& url ) {};
-    virtual void OnChangeCursor         ( Awesomium::WebView* pCaller, Awesomium::Cursor cursor );
-    virtual void OnChangeFocus          ( Awesomium::WebView* pCaller, Awesomium::FocusedElementType focused_type ) {};
-    virtual void OnAddConsoleMessage    ( Awesomium::WebView* pCaller, const Awesomium::WebString& message, int line_number, const Awesomium::WebString& source ) {};
-    virtual void OnShowCreatedWebView   ( Awesomium::WebView* pCaller, Awesomium::WebView* new_view, const Awesomium::WebURL& opener_url, const Awesomium::WebURL& target_url, const Awesomium::Rect& initial_pos, bool is_popup );
+    // CefLoadHandler methods
+    virtual void OnLoadStart    ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame ) override;
+    virtual void OnLoadEnd      ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode ) override;
+    virtual void OnLoadError    ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedURL ) override;
+    
+    // CefRequestHandler implementation
+    virtual bool OnBeforeBrowse( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect ) override;
+    virtual bool OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request ) override;
 
     // Static javascript method implementations
-    static void Javascript_triggerEvent(Awesomium::WebView* pWebView, const Awesomium::JSArray& args);*/
+    //static void Javascript_triggerEvent(Awesomium::WebView* pWebView, const Awesomium::JSArray& args);
 
 protected:
-    //void ConvertURL ( const Awesomium::WebURL& url, SString& convertedURL );
+    void ConvertURL ( const CefString& url, SString& convertedURL );
     
 private:
     CefRefPtr<CefBrowser> m_pWebView;
