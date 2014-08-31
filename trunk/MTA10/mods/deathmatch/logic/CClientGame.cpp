@@ -5402,6 +5402,7 @@ void CClientGame::ResetMapInfo ( void )
     m_pCamera->FadeOut ( 0.0f, 0, 0, 0 );    
     g_pGame->GetWorld ()->SetCurrentArea ( 0 );
     m_pCamera->SetFocusToLocalPlayer ();
+    m_pCamera->SetCameraClip ( true, true );
 
     // Dimension
     SetAllDimensions ( 0 );
