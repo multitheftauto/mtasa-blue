@@ -1808,6 +1808,12 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
             pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL );
         }
 
+        // Make sure to remove the jetpack task before setting death tasks (Issue #7860)
+        if ( HasJetPack ( ) )
+        {
+            SetHasJetPack ( false );
+        }
+
         if ( bSetDirectlyDead )
         {
             // TODO: Avoid the animation, try to make it go directly to the last animation frame.
