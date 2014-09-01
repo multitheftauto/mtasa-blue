@@ -1176,7 +1176,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setLightState", "setVehicleLightState" );
     lua_classfunction ( luaVM, "setLocked", "setVehicleLocked" );
     lua_classfunction ( luaVM, "setOverrideLights", "setVehicleOverrideLights" );
-    lua_classfunction ( luaVM, "setPaintJob", "setVehiclePaintjob" );
+    lua_classfunction ( luaVM, "setPaintjob", "setVehiclePaintjob" );
     lua_classfunction ( luaVM, "setPanelState", "setVehiclePanelState" );
     lua_classfunction ( luaVM, "setRespawnDelay", "setVehicleRespawnDelay" );
     lua_classfunction ( luaVM, "setRespawnPosition", "setVehicleRespawnPosition" );

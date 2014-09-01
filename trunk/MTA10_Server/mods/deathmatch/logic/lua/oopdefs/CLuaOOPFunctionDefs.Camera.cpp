@@ -28,6 +28,8 @@ int CLuaOOPDefs::GetCameraMatrix ( lua_State* luaVM )
         lua_pushmatrix ( luaVM, matrix );
         return 1;
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -52,6 +54,8 @@ int CLuaOOPDefs::GetCameraPosition(lua_State* luaVM)
             return 1;
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -82,6 +86,9 @@ int CLuaOOPDefs::SetCameraPosition ( lua_State* luaVM )
             return 1;
         }
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -97,7 +104,6 @@ int CLuaOOPDefs::GetCameraRotation(lua_State* luaVM)
 
     if ( !argStream.HasErrors ( ) )
     {
-
         CPlayerCamera * pCamera = pPlayer->GetCamera ( );
         if ( pCamera )
         {
@@ -106,6 +112,9 @@ int CLuaOOPDefs::GetCameraRotation(lua_State* luaVM)
         lua_pushvector ( luaVM, vecRotation );
         return 1;
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -121,9 +130,8 @@ int CLuaOOPDefs::SetCameraRotation(lua_State* luaVM)
 
     argStream.ReadVector3D ( vecRotation );
 
-    if (!argStream.HasErrors())
+    if ( !argStream.HasErrors() )
     {
-
         CPlayerCamera * pCamera = pPlayer->GetCamera ( );
         /*if (!pCamera->IsInFixedMode())
         {
@@ -136,6 +144,9 @@ int CLuaOOPDefs::SetCameraRotation(lua_State* luaVM)
         lua_pushboolean(luaVM, true);
         return 1;
     }
-    lua_pushboolean(luaVM, false);
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
