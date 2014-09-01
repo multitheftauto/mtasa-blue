@@ -227,7 +227,7 @@ namespace SharedUtil
         bool CanReadNumberOfBytes( int iLength )
         {
             Seek( Tell() );
-            return iLength <= ( GetSize() - Tell() );
+            return iLength >= 0 && iLength <= ( GetSize() - Tell() );
         }
 
         bool ReadBytes ( void* pData, int iLength, bool bToFromNetwork = false )

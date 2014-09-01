@@ -202,7 +202,7 @@ public:
     // Return true if enough bytes left in the bitstream
     bool CanReadNumberOfBytes( int iLength ) const
     {
-        return iLength <= ( GetNumberOfUnreadBits() + 7 ) / 8;
+        return iLength >= 0 && iLength <= ( GetNumberOfUnreadBits() + 7 ) / 8;
     }
 
     // Write characters from a std::string
