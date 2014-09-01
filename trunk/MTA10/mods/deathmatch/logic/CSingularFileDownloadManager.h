@@ -34,7 +34,8 @@ public:
                                 ~CSingularFileDownloadManager   ( void );
 
     CSingularFileDownload*      AddFile                         ( CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum checksum = CChecksum () );
-    
+    void                        CancelResourceDownloads         ( CResource* pResource );
+
     void                        ClearList                       ( void );
 
     bool                        AllComplete                     ( void );
