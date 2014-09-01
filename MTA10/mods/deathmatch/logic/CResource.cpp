@@ -120,6 +120,10 @@ CResource::~CResource ( void )
     // Undo all changes to water
     g_pGame->GetWaterManager ()->UndoChanges ( this );
 
+    // Cancel all downloads started by this resource
+    if ( g_pClientGame->GetSingularFileDownloadManager () )
+        g_pClientGame->GetSingularFileDownloadManager ()->CancelResourceDownloads ( this );
+
     // Destroy the element group attached directly to this resource
     if ( m_pDefaultElementGroup )
         delete m_pDefaultElementGroup;

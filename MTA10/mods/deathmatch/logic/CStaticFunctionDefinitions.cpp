@@ -240,9 +240,14 @@ bool CStaticFunctionDefinitions::DownloadFile ( CResource* pResource, const char
 {
     SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile );
     SString strPath ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (),pResource->GetName(), szFile ); 
+    
     // Call SingularFileDownloadManager
-    g_pClientGame->GetSingularFileDownloadManager()->AddFile ( pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum );
-    return true;
+    if ( g_pClientGame->GetSingularFileDownloadManager () )
+    {
+        g_pClientGame->GetSingularFileDownloadManager ()->AddFile ( pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum );
+        return true;
+    }
+    return false;
 }
 
 
