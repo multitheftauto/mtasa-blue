@@ -363,34 +363,55 @@ int CLuaVector2Defs::Sub ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaVector2Defs::Mul ( lua_State* luaVM )
 {
-    CLuaVector2D* pVector1 = NULL;
-    CLuaVector2D* pVector2 = NULL;
-
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVector1 );
+    CLuaVector2D* pVector1 = NULL;
 
-    if ( argStream.NextIsNumber () )
+    if ( argStream.NextIsNumber ( ) )
     {
+        // number * vector3
         float fValue = 0.0f;
         argStream.ReadNumber ( fValue );
+        argStream.ReadUserData ( pVector1 );
 
-        lua_pushvector ( luaVM, *pVector1 * fValue );
-        return 1;
-    }
-    else
-    {
-        argStream.ReadUserData ( pVector2 );
-
-        if ( !argStream.HasErrors () )
+        if ( !argStream.HasErrors ( ) )
         {
-            lua_pushvector ( luaVM, *pVector1 * *pVector2 );
+            lua_pushvector ( luaVM, *pVector1 * fValue );
             return 1;
         }
         else
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+    }
+    else
+    {
+        // vector2 * ?
+        argStream.ReadUserData ( pVector1 );
+        if ( argStream.NextIsNumber ( ) )
         {
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+            float fValue = 0.0f;
+            argStream.ReadNumber ( fValue );
+            if ( !argStream.HasErrors ( ) )
+            {
+                lua_pushvector ( luaVM, *pVector1 * fValue );
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+        }
+        else
+        {
+            CLuaVector2D* pVector2 = NULL;
+            argStream.ReadUserData ( pVector2 );
+
+            if ( !argStream.HasErrors ( ) )
+            {
+                lua_pushvector ( luaVM, *pVector1 * *pVector2 );
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
         }
     }
 
