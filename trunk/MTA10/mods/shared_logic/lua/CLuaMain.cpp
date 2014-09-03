@@ -1569,6 +1569,7 @@ void CLuaMain::AddVector4DClass ( lua_State* luaVM )
     lua_classmetamethod ( luaVM, "__pow", CLuaVector4Defs::Pow );
     lua_classmetamethod ( luaVM, "__unm", CLuaVector4Defs::Unm );
     lua_classmetamethod ( luaVM, "__eq", CLuaVector4Defs::Eq );
+    lua_classmetamethod ( luaVM, "__len", CLuaVector4Defs::GetLength );
 
     lua_classfunction ( luaVM, "create", CLuaVector4Defs::Create );
     lua_classfunction ( luaVM, "normalize", CLuaVector4Defs::Normalize );
@@ -1614,6 +1615,7 @@ void CLuaMain::AddVector3DClass ( lua_State* luaVM )
     lua_classmetamethod ( luaVM, "__pow", CLuaVector3Defs::Pow );
     lua_classmetamethod ( luaVM, "__unm", CLuaVector3Defs::Unm );
     lua_classmetamethod ( luaVM, "__eq", CLuaVector3Defs::Eq );
+    lua_classmetamethod ( luaVM, "__len", CLuaVector3Defs::GetLength );
 
     lua_classfunction ( luaVM, "create", CLuaVector3Defs::Create );
     lua_classfunction ( luaVM, "normalize", CLuaVector3Defs::Normalize );
@@ -1657,6 +1659,7 @@ void CLuaMain::AddVector2DClass ( lua_State* luaVM )
     lua_classmetamethod ( luaVM, "__pow", CLuaVector2Defs::Pow );
     lua_classmetamethod ( luaVM, "__unm", CLuaVector2Defs::Unm );
     lua_classmetamethod ( luaVM, "__eq", CLuaVector2Defs::Eq );
+    lua_classmetamethod ( luaVM, "__len", CLuaVector2Defs::GetLength );
 
     lua_classfunction ( luaVM, "create", CLuaVector2Defs::Create );
     lua_classfunction ( luaVM, "normalize", CLuaVector2Defs::Normalize );
