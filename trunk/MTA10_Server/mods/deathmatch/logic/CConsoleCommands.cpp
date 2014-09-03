@@ -1443,15 +1443,13 @@ bool CConsoleCommands::WhoWas ( CConsole* pConsole, const char* szArguments, CCl
                     if ( ++uiCount <= 20 )
                     {
                         // Convert the IP to a string
-                        char szIP [32];
-                        szIP[0] = '\0';
-                        LongToDottedIP ( iter->ulIP, szIP );
+                        SString strIP = LongToDottedIP ( iter->ulIP );
 
                         // Populate a line about him
                         SString strName = iter->strNick;
                         if ( iter->strAccountName != GUEST_ACCOUNT_NAME )
                             strName += SString ( " (%s)", *iter->strAccountName );
-                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", *strName, szIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
+                        pClient->SendEcho ( SString ( "%s  -  IP:%s  serial:%s  version:%s", *strName, *strIP, iter->strSerial.c_str (), iter->strPlayerVersion.c_str () ) );
                     }
                     else
                     {

@@ -921,6 +921,9 @@
     <ClCompile Include="logic\luadefs\CLuaVector2Defs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
+    <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logic\CLightsyncManager.h">
