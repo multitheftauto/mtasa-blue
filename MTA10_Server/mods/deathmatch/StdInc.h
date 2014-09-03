@@ -39,6 +39,7 @@ struct SAclRequest;
 #include "CBox.h"
 #include "CMatrix.h"
 #include "CQuat.h"
+#include "net/Packets.h"
 #include "Enums.h"
 #include <bochs_internal/crc32.h>
 #include "CChecksum.h"
@@ -46,7 +47,6 @@ struct SAclRequest;
 #include "pcrecpp.h"
 
 // Packet includes
-#include "net/Packets.h"
 #include "packets/CCameraSyncPacket.h"
 #include "packets/CChatEchoPacket.h"
 #include "packets/CCommandPacket.h"

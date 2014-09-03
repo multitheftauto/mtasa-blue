@@ -793,19 +793,11 @@ void RotateVector ( CVector& vecLine, const CVector& vecRotation )
 }
 
 
-void LongToDottedIP ( unsigned long ulIP, char* szDottedIP )
+SString LongToDottedIP ( unsigned long ulIP )
 {
     in_addr in;
-    in.s_addr = ulIP;;
-    char* szTemp = inet_ntoa ( in );
-    if ( szTemp )
-    {
-        strncpy ( szDottedIP, szTemp, 22 );
-    }
-    else
-    {
-        szDottedIP [0] = 0;
-    }
+    in.s_addr = ulIP;
+    return inet_ntoa ( in );
 }
 
 const char* HTMLEscapeString ( const char *szSource )

@@ -81,6 +81,13 @@ struct SScriptInfo
     const char* szMinClientRunVer;
 };
 
+struct SPlayerPacketUsage
+{
+    NetServerPlayerID playerId;
+    uint uiPktsPerSec;
+    uint uiBytesPerSec;
+};
+
 class CNetServer
 {
 public:
@@ -139,6 +146,7 @@ public:
     virtual bool                            ValidateHttpCacheFileName       ( const char* szFilename ) { return false; }
     virtual bool                            GetScriptInfo                   ( const char* cpInBuffer, uint uiInSize, SScriptInfo* pOutInfo ) { return false; }
     virtual bool                            DecryptScript                   ( const char* cpInBuffer, uint uiInSize, const char** pcpOutBuffer, uint* puiOutSize, const char* szScriptName ) { return false; }
+    virtual bool                            GetPlayerPacketUsageStats       ( uchar* packetIdList, uint uiNumPacketIds, SPlayerPacketUsage* pOutStats, uint uiTopCount ) { return false; }
 };
 
 #endif

@@ -23,7 +23,6 @@ class CClientPed;
 #include "CClientStreamElement.h"
 
 #include <multiplayer/CMultiplayer.h>
-#include "net/Packets.h"
 #include "CClientPad.h"
 
 class CClientCamera;
