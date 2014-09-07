@@ -56,7 +56,7 @@ void CPlayerStatsPacket::Add ( unsigned short usID, float fValue )
         }
         else
         {
-            sPlayerStat stat = (*iter).second;
+            sPlayerStat& stat = (*iter).second;
             stat.value = fValue;
         }
     }
