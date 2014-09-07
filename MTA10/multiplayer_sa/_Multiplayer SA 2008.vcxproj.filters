@@ -89,6 +89,9 @@
     <ClCompile Include="StdInc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CMultiplayerSA_VehicleLights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLimitsSA.h">
