@@ -5009,7 +5009,7 @@ bool CStaticFunctionDefinitions::GetVehicleName ( CVehicle* pVehicle, SString& s
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usModel, SString& strOutName )
 {
     strOutName = CVehicleNames::GetVehicleName ( usModel );
-    return true;
+    return strOutName != "";
 }
 
 
