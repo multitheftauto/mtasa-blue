@@ -1423,7 +1423,10 @@ void CMultiplayerSA::InitHooks()
 
     // Prevent money change (+12$) when entering a taxi/cabbie (fix for #8332)
     MemSet ( (void*)0x6D1741, 0x90, 0x6D175F-0x6D1741 );
-    
+
+    // Increase intensity of vehicle tail light corona
+    MemPut < BYTE > ( 0x6E1A22, 0xF0 );
+
     InitHooks_CrashFixHacks ();
 
     // Init our 1.3 hooks.
@@ -1432,6 +1435,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_Direct3D();
     InitHooks_FixLineOfSightArgs();
     InitHooks_VehicleDamage();
+    InitHooks_VehicleLights();
 }
 
 
