@@ -2391,7 +2391,7 @@ bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName ( unsigned short usUp
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel ( unsigned short usModel, SString& strOutName )
 {
     strOutName = CVehicleNames::GetVehicleName ( usModel );
-    return strOutName != "";
+    return true;
 }
 
 
