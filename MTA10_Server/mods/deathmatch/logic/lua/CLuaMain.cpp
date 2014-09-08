@@ -834,7 +834,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "resendModInfo", "resendPlayerModInfo" );
     lua_classfunction ( luaVM, "spawn", "spawnPlayer" );
     lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
-    lua_classfunction ( luaVM, "takeScreenshot", "takePlayerScreenShot" );
+    lua_classfunction ( luaVM, "takeScreenShot", "takePlayerScreenShot" );
     lua_classfunction ( luaVM, "giveMoney", "givePlayerMoney" );
     lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
     lua_classfunction ( luaVM, "hasPermissionTo", "hasObjectPermissionTo" );
