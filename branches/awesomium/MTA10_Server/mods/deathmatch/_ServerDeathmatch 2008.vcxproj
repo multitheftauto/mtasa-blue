@@ -317,6 +317,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4996;4482;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ShowIncludes>false</ShowIncludes>
+      <AdditionalOptions>-Zm114 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -441,6 +442,7 @@
   <ItemGroup>
     <ClCompile Include="CServer.cpp" />
     <ClCompile Include="..\..\sdk\MTAPlatform.cpp" />
+    <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp" />
     <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVector3Defs.cpp" />

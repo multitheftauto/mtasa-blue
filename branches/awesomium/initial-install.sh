@@ -1,5 +1,10 @@
 #! /bin/sh
 
+#
+# To compile with symbols:
+#   ./initial-install.sh -g
+#
+
 # Remove previous build files
 make clean
 
@@ -15,7 +20,11 @@ autoreconf -fiv
 #export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
 #./configure LDFLAGS="-m32" CPPFLAGS="-m32" CFLAGS="-m32" CXXFLAGS="-m32" --enable-silent-rules $@
 
-./configure CFLAGS='-O2 -fPIC -DPIC' CXXFLAGS='-O2 -fPIC -DPIC' CPPFLAGS='-O2 -fPIC -DPIC' --with-pic --disable-system-pcre
+if [ $1 = "-g" ]; then
+    ./configure CFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' CPPFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' --with-pic --disable-system-pcre
+else
+    ./configure CFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' CXXFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' CPPFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' --with-pic --disable-system-pcre
+fi
 
 # Remove previous build files #2
 make clean
@@ -33,4 +42,9 @@ cd ../..
 
 # then you have makefiles and the source can be compiled :)
 # building in parallel mode (use -j<JOBS>)
-make CFLAGS='-O2 -fPIC -DPIC' CXXFLAGS='-O2 -fPIC -DPIC' CPPFLAGS='-O2 -fPIC -DPIC' >_make.log
+if [ $1 = "-g" ]; then
+    make CFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' CPPFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
+else
+    make CFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' CXXFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' CPPFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
+fi
+

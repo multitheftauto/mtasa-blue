@@ -93,10 +93,10 @@ void CSettings::CreateGUI ( void )
     pTabAudio = m_pTabs->CreateTab ( _("Audio") );
     pTabBinds = m_pTabs->CreateTab ( _("Binds") );
     pTabControls = m_pTabs->CreateTab ( _("Controls") );
-    pTabCommunity = m_pTabs->CreateTab ( _("Community") );
     pTabInterface = m_pTabs->CreateTab ( _("Interface") );
     pTabBrowser = m_pTabs->CreateTab ( _("Browser") );
     pTabAdvanced = m_pTabs->CreateTab ( _("Advanced") );
+    pTabCommunity = m_pTabs->CreateTab ( _("Community") );
 
     // Create buttons
     //  OK button
@@ -3843,4 +3843,43 @@ bool CSettings::OnHideAdvancedSettingDescription ( CGUIElement* pElement )
     m_pAdvancedSettingDescriptionLabel->SetText ( "" );
 
     return true;
+}
+
+void CSettings::SetSelectedIndex ( unsigned int uiIndex )
+{
+    unsigned int uiTabCount = m_pTabs->GetTabCount ( );
+
+    if ( uiIndex < uiTabCount )
+    {
+        m_pTabs->SetSelectedIndex ( uiIndex );
+    }
+}
+
+void CSettings::TabSkip ( bool bBackwards )
+{
+    unsigned int uiTabCount = m_pTabs->GetTabCount ( );
+
+    if ( bBackwards )
+    {
+        unsigned int uiIndex = m_pTabs->GetSelectedIndex ( ) - 1;
+
+        if ( m_pTabs->GetSelectedIndex ( ) == 0 )
+        {
+            uiIndex = uiTabCount - 1;
+        }
+
+        SetSelectedIndex ( uiIndex );
+    }
+    else
+    {
+        unsigned int uiIndex = m_pTabs->GetSelectedIndex ( ) + 1;
+        unsigned int uiNewIndex = uiIndex % uiTabCount;
+
+        SetSelectedIndex ( uiNewIndex );
+    }
+}
+
+bool CSettings::IsActive ( void )
+{
+    return m_pWindow->IsActive ();
 }

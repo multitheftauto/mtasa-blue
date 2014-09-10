@@ -240,9 +240,14 @@ bool CStaticFunctionDefinitions::DownloadFile ( CResource* pResource, const char
 {
     SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile );
     SString strPath ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (),pResource->GetName(), szFile ); 
+    
     // Call SingularFileDownloadManager
-    g_pClientGame->GetSingularFileDownloadManager()->AddFile ( pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum );
-    return true;
+    if ( g_pClientGame->GetSingularFileDownloadManager () )
+    {
+        g_pClientGame->GetSingularFileDownloadManager ()->AddFile ( pResource, strPath.c_str(), szFile, strHTTPDownloadURLFull, checksum );
+        return true;
+    }
+    return false;
 }
 
 
@@ -2010,16 +2015,16 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimationProgress ( CClientEntity& Entity, const char * szAnimName, float fProgress )
+bool CStaticFunctionDefinitions::SetPedAnimationProgress ( CClientEntity& Entity, const SString& strAnimName, float fProgress )
 {    
-    RUN_CHILDREN ( SetPedAnimationProgress ( **iter, szAnimName, fProgress ) )
+    RUN_CHILDREN ( SetPedAnimationProgress ( **iter, strAnimName, fProgress ) )
 
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        if ( szAnimName )
+        if ( !strAnimName.empty () )
         {
-            CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( Ped.GetClump (), szAnimName );
+            CAnimBlendAssociation* pA = g_pGame->GetAnimManager ()->RpAnimBlendClumpGetAssociation ( Ped.GetClump (), strAnimName );
 
             if ( pA )
             {

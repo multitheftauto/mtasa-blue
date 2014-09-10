@@ -219,6 +219,7 @@
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <ImportLibrary />
       <TargetMachine>MachineX86</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -251,6 +252,7 @@
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <ImportLibrary />
       <TargetMachine>MachineX64</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
@@ -280,6 +282,7 @@
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <ImportLibrary />
       <TargetMachine>MachineX86</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
@@ -312,6 +315,7 @@
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <ImportLibrary />
       <TargetMachine>MachineX64</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

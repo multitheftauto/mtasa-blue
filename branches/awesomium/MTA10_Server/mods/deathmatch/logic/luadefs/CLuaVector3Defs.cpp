@@ -232,9 +232,9 @@ int CLuaVector3Defs::Dot ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         CVector vector ( *pVector1 );
-        vector.DotProduct ( pVector2 );
+        float fProduct = vector.DotProduct ( pVector2 );
         
-        lua_pushvector ( luaVM, vector );
+        lua_pushnumber ( luaVM, fProduct );
         return 1;
     }
     else
@@ -452,34 +452,55 @@ int CLuaVector3Defs::Sub ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaVector3Defs::Mul ( lua_State* luaVM )
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
-
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVector1 );
+    CLuaVector3D* pVector1 = NULL;
 
-    if ( argStream.NextIsNumber () )
+    if ( argStream.NextIsNumber ( ) )
     {
+        // number * vector3
         float fValue = 0.0f;
         argStream.ReadNumber ( fValue );
+        argStream.ReadUserData ( pVector1 );
 
-        lua_pushvector ( luaVM, *pVector1 * fValue );
-        return 1;
-    }
-    else
-    {
-        argStream.ReadUserData ( pVector2 );
-
-        if ( !argStream.HasErrors () )
+        if ( !argStream.HasErrors ( ) )
         {
-            lua_pushvector ( luaVM, *pVector1 * *pVector2 );
+            lua_pushvector ( luaVM, *pVector1 * fValue );
             return 1;
         }
         else
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+    }
+    else
+    {
+        // vector3 * ?
+        argStream.ReadUserData ( pVector1 );
+        if ( argStream.NextIsNumber ( ) )
         {
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+            float fValue = 0.0f;
+            argStream.ReadNumber ( fValue );
+            if ( !argStream.HasErrors ( ) )
+            {
+                lua_pushvector ( luaVM, *pVector1 * fValue );
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+        }
+        else
+        {
+            CLuaVector3D* pVector2 = NULL;
+            argStream.ReadUserData ( pVector2 );
+
+            if ( !argStream.HasErrors ( ) )
+            {
+                lua_pushvector ( luaVM, *pVector1 * *pVector2 );
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
         }
     }
 

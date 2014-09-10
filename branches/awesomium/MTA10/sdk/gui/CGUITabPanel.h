@@ -26,6 +26,11 @@ public:
     virtual CGUITab*                GetSelectedTab          ( void ) = 0;
     virtual void                    SetSelectedTab          ( CGUITab* pTab ) = 0;
 
+    virtual void                    SetSelectedIndex        ( unsigned int uiIndex ) = 0;
+    virtual unsigned int            GetSelectedIndex        ( void ) = 0;
+
+    virtual unsigned int            GetTabCount             ( void ) = 0;
+
     virtual void                    SetSelectionHandler     ( GUI_CALLBACK Callback ) = 0;
 
     virtual bool                    IsTabSelected           ( CGUITab* pTab ) = 0;

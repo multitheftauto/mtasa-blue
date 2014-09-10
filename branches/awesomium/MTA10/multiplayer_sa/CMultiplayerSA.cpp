@@ -1423,7 +1423,10 @@ void CMultiplayerSA::InitHooks()
 
     // Prevent money change (+12$) when entering a taxi/cabbie (fix for #8332)
     MemSet ( (void*)0x6D1741, 0x90, 0x6D175F-0x6D1741 );
-    
+
+    // Increase intensity of vehicle tail light corona
+    MemPut < BYTE > ( 0x6E1A22, 0xF0 );
+
     InitHooks_CrashFixHacks ();
 
     // Init our 1.3 hooks.
@@ -1432,6 +1435,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_Direct3D();
     InitHooks_FixLineOfSightArgs();
     InitHooks_VehicleDamage();
+    InitHooks_VehicleLights();
 }
 
 
@@ -3936,6 +3940,15 @@ void CMultiplayerSA::SetLocalStatValue ( unsigned short usStat, float fValue )
         localStatsData.StatTypesInt [ usStat - STATS_OFFSET ] = (int)fValue;
     else if ( usStat == 0x2329 )
         dwEAEG = !dwEAEG;
+}
+
+
+float CMultiplayerSA::GetLocalStatValue ( unsigned short usStat )
+{
+    if ( usStat < MAX_FLOAT_STATS )
+        return localStatsData.StatTypesFloat [usStat];
+    else if ( usStat >= STATS_OFFSET && usStat < MAX_INT_FLOAT_STATS )
+        return localStatsData.StatTypesInt [usStat - STATS_OFFSET];
 }
 
 

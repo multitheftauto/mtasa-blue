@@ -52,6 +52,7 @@ public:
     void                        InitHooks_Weapons ( void );
     void                        InitHooks_Rendering ( void );
     void                        InitHooks_LicensePlate ( void );
+    void                        InitHooks_VehicleLights ( void );
     void                        InitHooks_VehicleDamage ( void );
     void                        InitHooks_Direct3D ( void );
     void                        InitHooks_FixLineOfSightArgs ( void );
@@ -191,6 +192,7 @@ public:
     void                        SetTrafficLightsLocked      ( bool bLocked );
 
     void                        SetLocalStatValue           ( unsigned short usStat, float fValue );
+    float                       GetLocalStatValue           ( unsigned short usStat );
     void                        SetLocalStatsStatic         ( bool bStatic );
 
     void                        SetLocalCameraRotation      ( float fRotation );

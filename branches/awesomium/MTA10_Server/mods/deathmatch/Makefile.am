@@ -123,6 +123,7 @@ LOGIC = \
 ./logic/CPerfStat.LuaMemory.cpp \
 ./logic/CPerfStat.LuaTiming.cpp \
 ./logic/CPerfStat.PacketUsage.cpp \
+./logic/CPerfStat.PlayerPacketUsage.cpp \
 ./logic/CPerfStat.RPCPacketUsage.cpp \
 ./logic/CPerfStat.EventPacketUsage.cpp \
 ./logic/CPerfStat.ServerInfo.cpp \

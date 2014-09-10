@@ -995,10 +995,8 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                 ReadBool ( false );
             break;
         case json_type_double:
-            ReadNumber ( json_object_get_double ( object ) );
-            break;
         case json_type_int:
-            ReadNumber ( json_object_get_int ( object ) );
+            ReadNumber ( json_object_get_double ( object ) );
             break;
         case json_type_object:
             m_pTableData = new CLuaArguments ( );

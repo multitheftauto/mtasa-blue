@@ -2700,16 +2700,21 @@ CClientPlayer * CClientGame::GetClosestRemotePlayer ( const CVector & vecPositio
     for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
     {
         pPlayer = *iter;
-        if ( !pPlayer->IsLocalPlayer () )
-        {            
-            pPlayer->GetPosition ( vecTemp );
-            fTemp = DistanceBetweenPoints3D ( vecPosition, vecTemp );
-            if ( fTemp < fMaxDistance )
+        if ( !pPlayer->IsLocalPlayer () && !pPlayer->IsDeadOnNetwork () && pPlayer->GetHealth () > 0 )
+        {
+            // Ensure remote player is alive and sending position updates
+            ulong ulTimeSinceLastPuresync = CClientTime::GetTime () - pPlayer->GetLastPuresyncTime ();
+            if ( ulTimeSinceLastPuresync < static_cast < ulong > ( g_TickRateSettings.iPureSync ) * 2 )
             {
-                if ( !pClosest || fTemp < fDistance )
+                pPlayer->GetPosition ( vecTemp );
+                fTemp = DistanceBetweenPoints3D ( vecPosition, vecTemp );
+                if ( fTemp < fMaxDistance )
                 {
-                    pClosest = pPlayer;
-                    fDistance = fTemp;
+                    if ( !pClosest || fTemp < fDistance )
+                    {
+                        pClosest = pPlayer;
+                        fDistance = fTemp;
+                    }
                 }
             }
         }
@@ -4358,7 +4363,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 m_pDamageEntity = pInflictingEntity;
                 m_ulDamageTime = CClientTime::GetTime ();
                 m_DamagerID = INVALID_ELEMENT_ID;
-                if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
+                if ( pInflictingEntity && !pInflictingEntity->IsLocalEntity ( ) ) m_DamagerID = pInflictingEntity->GetID ( );
                 m_bDamageSent = false;
             }
             // Does this damage kill the player?
@@ -4403,7 +4408,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         AnimationId animID = pEvent->GetAnimId ();
                         m_ulDamageTime = CClientTime::GetTime ();
                         m_DamagerID = INVALID_ELEMENT_ID;
-                        if ( pInflictingEntity ) m_DamagerID = pInflictingEntity->GetID ();
+                        if ( pInflictingEntity && !pInflictingEntity->IsLocalEntity() ) m_DamagerID = pInflictingEntity->GetID ();
 
                         // Check if we're dead
                         SendPedWastedPacket ( pDamagedPed, m_DamagerID, weaponUsed, hitZone, animGroup, animID );
@@ -5405,6 +5410,7 @@ void CClientGame::ResetMapInfo ( void )
     m_pCamera->FadeOut ( 0.0f, 0, 0, 0 );    
     g_pGame->GetWorld ()->SetCurrentArea ( 0 );
     m_pCamera->SetFocusToLocalPlayer ();
+    m_pCamera->SetCameraClip ( true, true );
 
     // Dimension
     SetAllDimensions ( 0 );

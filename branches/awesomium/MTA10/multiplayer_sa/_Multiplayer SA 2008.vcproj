@@ -387,6 +387,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMultiplayerSA_VehicleLights.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CMultiplayerSA_Weapons.cpp"
 				>
 			</File>

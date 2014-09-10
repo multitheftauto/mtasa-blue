@@ -780,7 +780,7 @@ void CServerBrowser::SetVisible ( bool bVisible )
 
 bool CServerBrowser::IsVisible ( void )
 {
-    return m_pTopWindow->IsVisible ();
+    return m_pTopWindow && m_pTopWindow->IsVisible ();
 }
 
 //
@@ -2270,4 +2270,44 @@ bool CServerBrowser::OnServerListChangeRow ( CGUIKeyEventArgs Args )
     }
 
     return true;
+}
+
+void CServerBrowser::SetSelectedIndex ( unsigned int uiIndex )
+{
+    unsigned int uiTabCount = m_pPanel->GetTabCount ( );
+
+    if ( uiIndex < uiTabCount )
+    {
+        m_pPanel->SetSelectedIndex ( uiIndex );
+    }
+}
+
+void CServerBrowser::TabSkip ( bool bBackwards )
+{
+    unsigned int uiTabCount = m_pPanel->GetTabCount ( );
+
+    if ( bBackwards )
+    {
+        unsigned int uiIndex = m_pPanel->GetSelectedIndex ( ) - 1;
+
+        if ( m_pPanel->GetSelectedIndex ( ) == 0 )
+        {
+            uiIndex = uiTabCount - 1;
+        }
+
+        SetSelectedIndex ( uiIndex );
+    }
+    else
+    {
+        unsigned int uiIndex = m_pPanel->GetSelectedIndex ( ) + 1;
+        unsigned int uiNewIndex = uiIndex % uiTabCount;
+
+        SetSelectedIndex ( uiNewIndex );
+    }
+}
+
+bool CServerBrowser::IsActive ( void )
+{
+    return ( m_pFrame && m_pFrame->IsActive ( ) )
+        || ( m_pPanel && m_pPanel->IsActive ( ) );
 }

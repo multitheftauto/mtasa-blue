@@ -172,7 +172,7 @@ bool            IsNametagValid              ( const char* szNick );
 void            RotateVector                ( CVector& vecLine, const CVector& vecRotation );
 
 // Network funcs
-void            LongToDottedIP              ( unsigned long ulIP, char* szDottedIP );
+SString         LongToDottedIP              ( unsigned long ulIP );
 
 
 inline bool IsVisibleCharacter ( unsigned char c )

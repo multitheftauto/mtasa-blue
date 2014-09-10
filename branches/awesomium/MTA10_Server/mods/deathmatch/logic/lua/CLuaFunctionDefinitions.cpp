@@ -11523,14 +11523,20 @@ int CLuaFunctionDefinitions::GetAccount ( lua_State* luaVM )
 {
 //  account getAccount ( string username, [ string password ] )
     SString strName; SString strPassword;
+    bool bUsePassword = false;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strName );
-    argStream.ReadString ( strPassword, "" );
+
+    if ( !argStream.NextIsNil ( ) && !argStream.NextIsNone() )
+    {
+        argStream.ReadString ( strPassword );
+        bUsePassword = true;
+    }
 
     if ( !argStream.HasErrors () )
     {
-        CAccount* pAccount = CStaticFunctionDefinitions::GetAccount ( strName, strPassword.empty () ? NULL : strPassword.c_str() );
+        CAccount* pAccount = CStaticFunctionDefinitions::GetAccount ( strName, bUsePassword ? strPassword.c_str() : NULL );
         if ( pAccount )
         {
             lua_pushaccount ( luaVM, pAccount );

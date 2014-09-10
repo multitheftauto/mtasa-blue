@@ -52,18 +52,27 @@ for lang in (options.languages).replace(" ","").split(","):
         url = urlparse.urljoin(options.url, "export/%s/%s/%s.po"%(options.project,lang,options.project))
         output = os.path.join(options.output,"%s/%s.po"%(lang,options.project))
 
+    # Show HTTP headers if required
+    if False:
+        print ( "Trying '%s'"%(url) )
+        opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1))
+        opener.open(url)
+
     # Get file twice and compare to defeat truncated downloads
     while True:
-        header = {"pragma-directive" : "no-cache"}
+        header = {"pragma-directive" : "no-cache","PRAGMA" : "NO-CACHE","CACHE-CONTROL" : "NO-CACHE"}
         req = urllib2.Request(url, headers=header)
         u = urllib2.urlopen(req)
         content = u.read()
 
-        localFile = open("aa.txt", 'wb')
+        path,tail = os.path.split(output)
+        if ( not os.path.exists(path) ):
+            os.makedirs(path)
+
+        localFile = open(output, 'wb')
         localFile.write(content)
         localFile.close()
 
-        sys.exit(1);
         u = urllib2.urlopen(req)
         if ( content == u.read() ):
             break
@@ -82,7 +91,7 @@ for lang in (options.languages).replace(" ","").split(","):
         url = entry.msgstr
         try:
             # Get pic
-            header = {"pragma-directive" : "no-cache"}
+            header = {"pragma-directive" : "no-cache","PRAGMA" : "NO-CACHE","CACHE-CONTROL" : "NO-CACHE"}
             req = urllib2.Request(url, headers=header)
             u = urllib2.urlopen(req)
             content = u.read()

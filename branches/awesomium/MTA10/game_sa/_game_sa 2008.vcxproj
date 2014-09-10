@@ -474,6 +474,7 @@
     <ClInclude Include="Dma.h" />
     <ClInclude Include="gamesa_init.h" />
     <ClInclude Include="gamesa_renderware.h" />
+    <ClInclude Include="gamesa_renderware.hpp" />
     <ClInclude Include="HeapTrace.h" />
     <ClInclude Include="HookSystem.h" />
     <ClInclude Include="StdInc.h" />

@@ -351,7 +351,14 @@ float CClientPed::GetStat ( unsigned short usStat )
 {
     if ( m_bIsLocalPlayer )
     {
-        return g_pGame->GetStats()->GetStatValue ( usStat );
+        if ( g_pGame->GetPedContext ( ) == NULL )
+        {
+            return g_pGame->GetStats ( )->GetStatValue ( usStat );
+        }
+        else
+        {
+            return g_pMultiplayer->GetLocalStatValue ( usStat );
+        }
     }
     else
     {
@@ -1799,6 +1806,12 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
         {
             // Kill the task
             pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL );
+        }
+
+        // Make sure to remove the jetpack task before setting death tasks (Issue #7860)
+        if ( HasJetPack ( ) )
+        {
+            SetHasJetPack ( false );
         }
 
         if ( bSetDirectlyDead )
@@ -4581,7 +4594,7 @@ bool CClientPed::GetShotData ( CVector * pvecOrigin, CVector * pvecTarget, CVect
     float fRotation = GetCurrentRotation ();
 
     // Grab the target range of the current weapon
-    float fSkill = GetStat ( g_pGame->GetStats ()->GetSkillStatIndex ( pWeapon->GetType () ) );
+    float fSkill = 1000.0f; //  GetStat ( g_pGame->GetStats ( )->GetSkillStatIndex ( pWeapon->GetType ( ) ) );
     CWeaponStat* pCurrentWeaponInfo = g_pGame->GetWeaponStatManager ( )->GetWeaponStatsFromSkillLevel ( pWeapon->GetType (), fSkill );
     float fRange = pCurrentWeaponInfo->GetWeaponRange ();
 

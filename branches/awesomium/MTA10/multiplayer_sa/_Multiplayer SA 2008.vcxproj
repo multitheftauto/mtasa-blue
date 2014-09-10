@@ -229,6 +229,7 @@
     <ClCompile Include="CMultiplayerSA_Rendering.cpp" />
     <ClCompile Include="CMultiplayerSA_RwResources.cpp" />
     <ClCompile Include="CMultiplayerSA_VehicleDamage.cpp" />
+    <ClCompile Include="CMultiplayerSA_VehicleLights.cpp" />
     <ClCompile Include="CMultiplayerSA_Weapons.cpp" />
     <ClCompile Include="COffsets.cpp" />
     <ClCompile Include="CPopulationSA.cpp" />
