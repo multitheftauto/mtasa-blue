@@ -462,7 +462,7 @@
     <ResourceCompile Include="cefclient\cefclient.rc"/>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="binary_distrib\cef_binary_3.2062.1809_windows32\cefclient.gyp">
+    <CustomBuild Include="binary_distrib\cef_binary_3.2062.1826_windows32\cefclient.gyp">
       <FileType>Document</FileType>
       <Command>call call xcopy /efy &quot;Resources\*&quot; &quot;$(OutDir)&quot;&#xD;&#xA;if %errorlevel% neq 0 exit /b %errorlevel%&#xD;&#xA;call call xcopy /efy &quot;$(Configuration)\*.dll&quot; &quot;$(OutDir)&quot;</Command>
       <Message>copy_resources, and also copy_libraries</Message>

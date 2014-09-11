@@ -52,6 +52,7 @@ CWebView::~CWebView()
         g_pCore->GetWebCore ()->SetFocusedWebView ( NULL );
 
     // Ensure that m_pWebView was freed
+    m_pWebView->GetHost ()->CloseBrowser ( true );
     //m_pWebView->Release ();
 }
 

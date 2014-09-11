@@ -28,8 +28,7 @@ class CWebView : public CWebViewInterface, private CefClient, private CefRenderH
 {
 public:
     CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false );
-    ~CWebView                   ();
-    //Awesomium::WebView*         GetAwesomiumView () { return m_pWebView; };
+    virtual ~CWebView           ();
     void                        SetWebBrowserEvents ( CWebBrowserEventsInterface* pInterface ) { m_pEventsInterface = pInterface; };
 
     // Exported methods

@@ -84,7 +84,7 @@ private:
 
     //CefRefPtr<CefBrowser>                   m_pWebCore;
     CWebsiteRequests*                       m_pRequestsGUI;
-    std::list<CWebView*>                    m_WebViews;
+    std::list<CefRefPtr<CWebView>>          m_WebViews;
     bool                                    m_bTestmodeEnabled;
     CWebView*                               m_pFocusedWebView;
 

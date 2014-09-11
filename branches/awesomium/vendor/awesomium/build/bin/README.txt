@@ -1,1 +1,0 @@
-You can find the binaries in Shared\data\MTA San Andreas\MTA\

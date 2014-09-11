@@ -74,6 +74,7 @@ bool CWebCore::Initialise ()
     
     // Todo: Implement multi-threading
     settings.multi_threaded_message_loop = false;
+    settings.windowless_rendering_enabled = true;
 
     return CefInitialize ( mainArgs, settings, NULL, sandboxInfo );
 }
@@ -89,14 +90,11 @@ CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int 
 
 void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
 {
-    CWebView* pWebView = dynamic_cast<CWebView*> ( pWebViewInterface );
+    CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*> ( pWebViewInterface );
     if ( pWebView )
     {
-        std::list<CWebView*>::iterator iter = std::find(m_WebViews.begin(), m_WebViews.end(), pWebView);
-        if ( iter != m_WebViews.end () )
-            m_WebViews.erase ( iter );
-
-        delete pWebView;
+        m_WebViews.remove ( pWebView );
+        //pWebView->Release(); // Do not release since other references get corrupted then
     }
 }
 
@@ -105,8 +103,9 @@ void CWebCore::DoPulse ()
     // Check for queued whitelist/blacklist downloads
     g_pCore->GetNetwork()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->ProcessQueuedFiles ();
 
-    // Update Awesomium rendering etc.
-    CefDoMessageLoopWork();
+    // Perform a single CEF message loop iteration (only if minimized to prevent corrupted renderstates (?))
+    if ( !g_pCore->IsWindowMinimized () )
+        CefDoMessageLoopWork ();
 }
 
 eURLState CWebCore::GetURLState ( const SString& strURL )
@@ -360,7 +359,7 @@ int CWebCore::GetCefKeyboardModifiers ( WPARAM wParam, LPARAM lParam )
 
 void CWebCore::ClearTextures ()
 {
-    for ( std::list<CWebView*>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
+    for ( std::list<CefRefPtr<CWebView>>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
     {
         (*iter)->ClearTexture ();
     }
@@ -400,7 +399,7 @@ bool CWebCore::SetGlobalAudioVolume ( float fVolume )
 
     if ( GetApplicationSetting ( "os-version" ) < "6.2" || !m_pAudioSessionManager )
     {
-        for ( std::list<CWebView*>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
+        for ( std::list<CefRefPtr<CWebView>>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
         {
             (*iter)->SetAudioVolume ( fVolume );
         }
