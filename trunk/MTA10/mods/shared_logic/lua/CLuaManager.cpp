@@ -1134,6 +1134,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode );
     CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefs::AddDebugHook );
     CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefs::RemoveDebugHook );
+    CLuaCFunctions::AddFunction ( "isOOPEnabled", CLuaFunctionDefs::IsOOPEnabled );
 
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );
