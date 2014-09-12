@@ -285,7 +285,7 @@ const char* CLuaClassDefs::GetACLClass ( CAccessControlList* pACL )
 
 const char* CLuaClassDefs::GetACLGroupClass ( CAccessControlListGroup* pACLGroup )
 {
-    return "ACL-Group";
+    return "ACLGroup";
 }
 
 const char* CLuaClassDefs::GetAccountClass ( CAccount* pAccount )
@@ -295,13 +295,13 @@ const char* CLuaClassDefs::GetAccountClass ( CAccount* pAccount )
 
 const char* CLuaClassDefs::GetTextDisplayClass ( CTextDisplay* pDisplay )
 {
-    return "Text-Display";
+    return "TextDisplay";
 }
 
 
 const char* CLuaClassDefs::GetTextItemClass ( CTextItem* pItem )
 {
-    return "Text-Item";
+    return "TextItem";
 }
 
 const char* CLuaClassDefs::GetBanClass ( CBan* pBan )

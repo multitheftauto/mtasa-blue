@@ -605,6 +605,7 @@ public:
     static int      GetVersion                          ( lua_State* luaVM );
     static int      GetModules                          ( lua_State* luaVM );
     static int      GetModuleInfo                       ( lua_State* luaVM );
+    static int      IsOOPEnabled                        ( lua_State* luaVM );
 };
 
 #endif

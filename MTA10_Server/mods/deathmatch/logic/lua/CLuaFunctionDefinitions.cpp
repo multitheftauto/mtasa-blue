@@ -12978,6 +12978,17 @@ int CLuaFunctionDefinitions::GetModules ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefinitions::IsOOPEnabled ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+        lua_pushboolean ( luaVM, pLuaMain->IsOOPEnabled () );
+    else
+        lua_pushnil ( luaVM );
+
+    return 1;
+}
+
 int CLuaFunctionDefinitions::GetPerformanceStats ( lua_State* luaVM )
 {
     SString strCategory, strOptions, strFilter;

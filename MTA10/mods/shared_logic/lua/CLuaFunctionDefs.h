@@ -958,6 +958,7 @@ public:
     LUA_DECLARE ( GetPerformanceStats );
     LUA_DECLARE ( AddDebugHook );
     LUA_DECLARE ( RemoveDebugHook );
+    LUA_DECLARE ( IsOOPEnabled );
 
     LUA_DECLARE ( GetVersion );
 
