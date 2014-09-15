@@ -230,7 +230,7 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
     g_pCore->GetCVars ()->Get ( "max_clientscript_log_kb", uiMaxSizeKB );
     if ( uiMaxSizeKB > 0 )
     {
-        uint uiCurrentSizeKB = FileSize ( szFilename ) / 1024;
+        uint64 uiCurrentSizeKB = FileSize ( szFilename ) / 1024;
         if ( uiCurrentSizeKB > uiMaxSizeKB )
         {
             SString strFilenameBackup ( "%s.bak", szFilename );

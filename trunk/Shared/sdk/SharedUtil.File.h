@@ -39,7 +39,7 @@ namespace SharedUtil
     //
     // Get a file size
     //
-    uint            FileSize                        ( const SString& strFilename );
+    uint64          FileSize                        ( const SString& strFilename );
 
     //
     // Ensure all directories exist to the file
