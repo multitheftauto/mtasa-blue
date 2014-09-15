@@ -178,7 +178,7 @@ bool SharedUtil::FileAppend ( const SString& strFilename, const void* pBuffer, u
 //
 // Get a file size
 //
-uint SharedUtil::FileSize ( const SString& strFilename  )
+uint64 SharedUtil::FileSize ( const SString& strFilename  )
 {
     // Open
     FILE* fh = fopen ( strFilename, "rb" );
@@ -186,7 +186,11 @@ uint SharedUtil::FileSize ( const SString& strFilename  )
         return 0;
     // Get size
     fseek ( fh, 0, SEEK_END );
-    uint size = ftell ( fh );
+#ifdef WIN32
+    uint64 size = _ftelli64 ( fh );
+#else
+    uint64 size = ftello64 ( fh );
+#endif
     // Close
     fclose ( fh );
     return size;
