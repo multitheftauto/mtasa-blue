@@ -455,15 +455,27 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
     }
 
     unsigned int uiNumArgs;
+    unsigned short usNumArgs;
     bool bResult;
     if ( bitStream.Version () < 0x05B )
     {
-        unsigned short usNumArgs;
+        // We got the old version
         bResult = bitStream.ReadCompressed ( usNumArgs );
         uiNumArgs = usNumArgs;
     }
     else
-        bResult = bitStream.ReadCompressed ( uiNumArgs );
+    {
+        // Check if we got the new version
+        if ( ( bResult = bitStream.ReadCompressed ( usNumArgs ) ) )
+        {
+            if ( usNumArgs == 0xFFFF )
+                // We got the new version
+                bResult = bitStream.ReadCompressed ( uiNumArgs );
+            else
+                // We got the old version
+                uiNumArgs = usNumArgs;
+        }
+    }
 
     if ( bResult )
     {
