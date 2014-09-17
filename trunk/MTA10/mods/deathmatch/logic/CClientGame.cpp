@@ -3563,6 +3563,7 @@ void CClientGame::Event_OnIngame ( void )
     ResetMapInfo ();
     g_pGame->GetWaterManager ()->Reset ();      // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
     g_pGame->GetWaterManager ()->SetWaterDrawnLast ( true );
+    m_pCamera->SetCameraClip ( true, true );
 
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer ( m_pManager, m_LocalID, true );
@@ -5402,7 +5403,6 @@ void CClientGame::ResetMapInfo ( void )
     m_pCamera->FadeOut ( 0.0f, 0, 0, 0 );    
     g_pGame->GetWorld ()->SetCurrentArea ( 0 );
     m_pCamera->SetFocusToLocalPlayer ();
-    m_pCamera->SetCameraClip ( true, true );
 
     // Dimension
     SetAllDimensions ( 0 );
