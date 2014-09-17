@@ -20,12 +20,6 @@
     #include "SharedUtil.Win32Utf8FileHooks.hpp"
 #endif
 
-#if WIN32
-    #define MTAEXPORT extern "C" __declspec(dllexport)
-#else
-    #define MTAEXPORT extern "C"
-#endif
-
 #ifdef WIN32
 CThreadCommandQueue g_CommandQueue;
 #endif

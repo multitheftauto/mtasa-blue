@@ -820,9 +820,6 @@
     <ClInclude Include="CClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ClientCommands.h">
       <Filter>Header Files</Filter>
     </ClInclude>

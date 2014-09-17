@@ -597,7 +597,6 @@
     <ClInclude Include="..\shared_logic\lua\CLuaVector3.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaVector4.h" />
     <ClInclude Include="CClient.h" />
-    <ClInclude Include="Client.h" />
     <ClInclude Include="ClientCommands.h" />
     <ClInclude Include="CVoiceRecorder.h" />
     <ClInclude Include="HeapTrace.h" />
