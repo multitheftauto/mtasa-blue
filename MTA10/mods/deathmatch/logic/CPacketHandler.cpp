@@ -408,7 +408,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     // Can't be 0
     if ( ucNumberOfPlayers == 0 )
     {
-        RaiseProtocolError ( 6 );
+        RaiseProtocolError ( 14 );
         return;
     }
 
@@ -2764,7 +2764,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         delete pCustomData;
                         pCustomData = NULL;
 
-                        RaiseEntityAddError ( 6 );
+                        RaiseEntityAddError ( 60 );
                         return;
                     }
                 }
@@ -2779,7 +2779,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     delete pCustomData;
                     pCustomData = NULL;
 
-                    RaiseEntityAddError ( 7 );
+                    RaiseEntityAddError ( 61 );
                     return;
                 }
             }
@@ -2815,7 +2815,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 assert ( !pEntity->IsSystemEntity () );
                 if ( pEntity->IsSystemEntity () )
                 {
-                    RaiseEntityAddError ( 8 );
+                    RaiseEntityAddError ( 62 );
                     return;
                 }
 
@@ -2885,7 +2885,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
                         else
                         {
-                            RaiseEntityAddError ( 9 );
+                            RaiseEntityAddError ( 63 );
                             return;
                         }
 
@@ -3068,7 +3068,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntity = pPickup;
                         if ( !pPickup )
                         {
-                            RaiseEntityAddError ( 10 );
+                            RaiseEntityAddError ( 64 );
                             return;
                         }
 
@@ -3202,7 +3202,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pEntity = pVehicle;
                     if ( !pVehicle )
                     {
-                        RaiseEntityAddError ( 11 );
+                        RaiseEntityAddError ( 65 );
                         return;
                     }
 
@@ -3618,7 +3618,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.ReadCompressed ( usNameLength );
                     if ( usNameLength > MAX_TEAM_NAME_LENGTH )
                     {
-                        RaiseEntityAddError ( 12 );
+                        RaiseEntityAddError ( 66 );
                         return;
                     }
 
