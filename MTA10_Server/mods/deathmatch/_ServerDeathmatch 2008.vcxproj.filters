@@ -924,6 +924,9 @@
     <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp">
       <Filter>Source Files\logic</Filter>
     </ClCompile>
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp">
+      <Filter>Source Files\logic\oopdefs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logic\CLightsyncManager.h">

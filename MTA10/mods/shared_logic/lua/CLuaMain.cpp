@@ -165,7 +165,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getMatrix", CLuaOOPDefs::GetElementMatrix );
     lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" );
     lua_classfunction ( luaVM, "getByType", "getElementsByType" );
-    lua_classfunction ( luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "GetElementDistanceFromCentreOfMassToBaseOfModel" );
+    lua_classfunction ( luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "getElementDistanceFromCentreOfMassToBaseOfModel" );
     lua_classfunction ( luaVM, "getType", "getElementType" );
     lua_classfunction ( luaVM, "getInterior", "getElementInterior" );
     lua_classfunction ( luaVM, "getWithinColShape", "getElementsWithinColShape" );
@@ -198,6 +198,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setHealth", "setElementHealth" );
     lua_classfunction ( luaVM, "setModel", "setElementModel" );
     lua_classfunction ( luaVM, "setCollisionsEnabled", "setElementCollisionsEnabled" );
+    lua_classfunction ( luaVM, "setCollidableWith", "setElementCollidableWith" );
     lua_classfunction ( luaVM, "setFrozen", "setElementFrozen" );
     lua_classfunction ( luaVM, "setLowLOD", "setLowLOD" );
     lua_classfunction ( luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled" );
@@ -220,7 +221,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "lowLOD", "setLowLODElement", "getLowLODElement" );
     lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
     lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
-    lua_classvariable ( luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "GetElementDistanceFromCentreOfMassToBaseOfModel" );
+    lua_classvariable ( luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "getElementDistanceFromCentreOfMassToBaseOfModel" );
     lua_classvariable ( luaVM, "childrenCount", NULL, "getElementChildrenCount" );
     lua_classvariable ( luaVM, "position", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
     lua_classvariable ( luaVM, "rotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
