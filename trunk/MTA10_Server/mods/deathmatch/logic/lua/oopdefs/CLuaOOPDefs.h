@@ -24,13 +24,19 @@ class CRegisteredCommands;
 class CLuaOOPDefs : public CLuaDefs
 {
 public:
+    // Ped
     LUA_DECLARE ( SetPedOccupiedVehicle );
 
+    // Player
+    LUA_DECLARE ( OutputChat );
+
+    // Element
     LUA_DECLARE ( GetElementMatrix );
     LUA_DECLARE ( GetElementPosition );
     LUA_DECLARE ( GetElementRotation );
     LUA_DECLARE ( SetElementRotation );
 
+    // Camera
     LUA_DECLARE ( GetCameraMatrix );
 
     LUA_DECLARE ( GetCameraPosition );

@@ -1189,6 +1189,14 @@ public:
         return SString ( "%s @ '%s' [%s]", *m_strErrorCategory, lua_tostring ( m_luaVM, lua_upvalueindex ( 1 ) ), *GetErrorMessage () );
     }
 
+    //
+    // Skip n arguments
+    //
+    void Skip ( int n )
+    {
+        m_iIndex += n;
+    }
+
     bool                    m_bError;
     int                     m_iErrorIndex;
     SString                 m_strErrorExpectedType;

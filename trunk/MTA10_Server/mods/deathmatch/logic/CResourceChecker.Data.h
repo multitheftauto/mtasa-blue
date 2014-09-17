@@ -294,7 +294,6 @@ namespace
                 { false, "setPedSkin",                     "setElementModel" },
                 { false, "getObjectRotation",              "getElementRotation" },
                 { false, "setObjectRotation",              "setElementRotation" },
-                { false, "getModel",                       "getElementModel" },
                 { false, "getVehicleIDFromName",           "getVehicleModelFromName" },
                 { false, "getVehicleID",                   "getElementModel" },
                 { false, "getVehicleRotation",             "getElementRotation" },

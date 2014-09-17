@@ -9597,7 +9597,7 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
         argStream.ReadNumber ( ucBlue );
     }
     else
-        argStream.m_iIndex = argStream.m_iIndex + 3;
+        argStream.Skip ( 3 );
 
     argStream.ReadBool ( bColorCoded, false );
 
@@ -9615,7 +9615,7 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
-    return 1;   
+    return 1;
 }
 
 int CLuaFunctionDefinitions::OutputConsole ( lua_State* luaVM )
