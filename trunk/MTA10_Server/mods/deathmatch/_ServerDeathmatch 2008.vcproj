@@ -2275,10 +2275,6 @@
 				>
 			</File>
 			<File
-				RelativePath="Server.h"
-				>
-			</File>
-			<File
 				RelativePath=".\StdInc.h"
 				>
 			</File>

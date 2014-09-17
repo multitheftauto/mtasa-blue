@@ -862,7 +862,6 @@
     <ClInclude Include="utils\CZipMaker.h" />
     <ClInclude Include="..\EXECryptor\EXECryptor.h" />
     <ClInclude Include="gccHashSupport.h" />
-    <ClInclude Include="Server.h" />
     <ClInclude Include="StdInc.h" />
     <ClInclude Include="..\..\version.h" />
     <ClInclude Include="logic\ASE.h" />

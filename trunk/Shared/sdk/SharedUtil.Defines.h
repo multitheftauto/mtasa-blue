@@ -194,3 +194,10 @@
 #define TICKS_FROM_MINUTES(m)   (TICKS_FROM_SECONDS(m)*60)
 #define TICKS_FROM_HOURS(m)     (TICKS_FROM_MINUTES(m)*60)
 #define TICKS_FROM_DAYS(m)      (TICKS_FROM_HOURS(m)*24)
+
+// Export function
+#if defined _WIN32
+    #define MTAEXPORT extern "C" __declspec(dllexport)
+#else
+    #define MTAEXPORT extern "C" __attribute__ ((visibility ("default")))
+#endif
