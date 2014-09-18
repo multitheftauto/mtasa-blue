@@ -218,10 +218,10 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats ( CPerfStatResult* pResult, const
         if ( m_LibraryList.size () == 0 )
         {
             const char* libs [] = {
-                            { SERVER_BIN_PATH "core", },
-                            { SERVER_BIN_PATH_MOD "deathmatch", },
-                            { SERVER_BIN_PATH "net", },
-                            { SERVER_BIN_PATH "xmll", },
+                            SERVER_BIN_PATH "core",
+                            SERVER_BIN_PATH_MOD "deathmatch",
+                            SERVER_BIN_PATH "net",
+                            SERVER_BIN_PATH "xmll",
                         };
 
             for ( unsigned int i = 0 ; i < NUMELMS ( libs ) ; i++ )
