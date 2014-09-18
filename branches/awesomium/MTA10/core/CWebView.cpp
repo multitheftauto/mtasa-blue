@@ -34,38 +34,43 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     windowInfo.SetAsWindowless ( NULL, bTransparent );
     
     m_pWebView = CefBrowserHost::CreateBrowserSync ( windowInfo, this, "", browserSettings, NULL );
-
-    /*Awesomium::WebPreferences preferences;
-    CVARS_GET ( "browser_plugins", preferences.enable_plugins );
-    if ( !bIsLocal )
-        CVARS_GET ( "browser_remote_javascript", preferences.enable_javascript );*/
+    m_bBeingDestroyed = false;
 
     // Set handlers
-    /*m_pWebView->set_load_listener ( this );
-    m_pWebView->set_js_method_handler ( &m_JSMethodHandler );
-    m_pWebView->set_view_listener ( this );*/
+    //m_pWebView->set_js_method_handler ( &m_JSMethodHandler );
 }
 
 CWebView::~CWebView()
 {
-    if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
-        g_pCore->GetWebCore ()->SetFocusedWebView ( NULL );
+    if ( IsMainThread () )
+    {
+        if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
+            g_pCore->GetWebCore ()->SetFocusedWebView ( NULL );
+    }
 
-    // Ensure that m_pWebView was freed
+    // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
+    m_pWebView = NULL;
+}
+
+void CWebView::CloseBrowser ()
+{
+    // CefBrowserHost::CloseBrowser calls the destructor after the browser has been destroyed
+    m_bBeingDestroyed = true;
     m_pWebView->GetHost ()->CloseBrowser ( true );
-    //m_pWebView->Release ();
 }
 
 bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled )
 {
-    m_pWebView->GetMainFrame ()->LoadURL ( strURL );
+    CefURLParts urlParts;
+    if ( !CefParseURL ( strURL, urlParts ) )
+        return false; // Invalid URL
 
-    /*Awesomium::WebURL webURL ( CWebCore::ToWebString ( strURL ) );
-    if ( bFilterEnabled && g_pCore->GetWebCore ()->GetURLState ( CWebCore::ToSString ( webURL.host() ) ) != eURLState::WEBPAGE_ALLOWED )
+    // Are we allowed to browse this website?
+    if ( bFilterEnabled && g_pCore->GetWebCore()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
         return false;
 
-    m_pWebView->LoadURL ( webURL );
-    return true;*/
+    // Load it!
+    m_pWebView->GetMainFrame ()->LoadURL ( strURL );
     return true;
 }
 
@@ -184,6 +189,9 @@ bool CWebView::SetAudioVolume ( float fVolume )
 ////////////////////////////////////////////////////////////////////
 bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
 {
+    if ( m_bBeingDestroyed )
+        return false;
+
     IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
     if ( !pD3DSurface )
         return false;
@@ -206,6 +214,9 @@ bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height )
 {
+    if ( m_bBeingDestroyed )
+        return;
+
     IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
     if ( !pD3DSurface )
         return;
@@ -354,7 +365,7 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
 {
     // Mostly the same as CWebView::OnBeforeBrowse
     CefURLParts urlParts;
-    if ( !CefParseURL ( request->GetURL(), urlParts ) )
+    if ( !CefParseURL ( request->GetURL (), urlParts ) )
         return true; // Cancel if invalid URL (this line will normally not be executed)
 
     WString scheme = urlParts.scheme.str;
@@ -363,12 +374,24 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
         if ( IsLocal () )
             return true; // Block remote requests in local mode generally
 
-        if ( g_pCore->GetWebCore()->GetURLState(UTF16ToMbUTF8(urlParts.host.str)) != eURLState::WEBPAGE_ALLOWED )
+        if ( g_pCore->GetWebCore()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
             return true;
     }
 
     // Do not block local websites
     return false;
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefLifeSpanHandler::OnBeforeClose              //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforeClose(CefRefPtr%3CCefBrowser%3E) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
+{
+    m_pWebView = NULL;
+    //Release ();
 }
 
 ////////////////////////////////////////////////////////////////////

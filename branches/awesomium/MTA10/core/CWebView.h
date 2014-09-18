@@ -18,18 +18,20 @@
 #include <cef3/include/cef_browser.h>
 #include <cef3/include/cef_client.h>
 #include <cef3/include/cef_render_handler.h>
+#include <cef3/include/cef_life_span_handler.h>
 #include <d3d9.h>
 #include <SString.h>
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 
-class CWebView : public CWebViewInterface, private CefClient, private CefRenderHandler, private CefLoadHandler, private CefRequestHandler
+class CWebView : public CWebViewInterface, private CefClient, private CefRenderHandler, private CefLoadHandler, private CefRequestHandler, private CefLifeSpanHandler
 {
 public:
     CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false );
     virtual ~CWebView           ();
     void                        SetWebBrowserEvents ( CWebBrowserEventsInterface* pInterface ) { m_pEventsInterface = pInterface; };
+    void                        CloseBrowser ();
 
     // Exported methods
     bool LoadURL                ( const SString& strURL, bool bFilterEnabled = true );
@@ -58,6 +60,7 @@ public:
     virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override { return this; };
     virtual CefRefPtr<CefLoadHandler>   GetLoadHandler() override { return this; };
     virtual CefRefPtr<CefRequestHandler>GetRequestHandler() override { return this; };
+    virtual CefRefPtr<CefLifeSpanHandler>GetLifeSpanHandler() override { return this; };
     
     // CefRenderHandler methods
     virtual bool GetViewRect    ( CefRefPtr<CefBrowser> browser, CefRect& rect ) override;
@@ -73,6 +76,9 @@ public:
     virtual bool OnBeforeBrowse( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect ) override;
     virtual bool OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request ) override;
 
+    // CefLifeSpawnHandler
+    virtual void OnBeforeClose ( CefRefPtr<CefBrowser> browser );
+
     // Static javascript method implementations
     //static void Javascript_triggerEvent(Awesomium::WebView* pWebView, const Awesomium::JSArray& args);
 
@@ -83,6 +89,7 @@ private:
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*    m_pWebBrowserRenderItem;
 
+    bool                m_bBeingDestroyed;
     bool                m_bIsLocal;
     SString             m_strTempURL;
     POINT               m_vecMousePosition;

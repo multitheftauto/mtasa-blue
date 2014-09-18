@@ -82,10 +82,10 @@ bool CWebCore::Initialise ()
 CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
 {
     // Create our webview implementation
-    CWebView* pWebView = new CWebView ( uiWidth, uiHeight, bIsLocal, pWebBrowserRenderItem, bTransparent );
+    CefRefPtr<CWebView> pWebView = new CWebView ( uiWidth, uiHeight, bIsLocal, pWebBrowserRenderItem, bTransparent );
     m_WebViews.push_back ( pWebView );
 
-    return pWebView;
+    return static_cast < CWebViewInterface* > ( pWebView.get () );
 }
 
 void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
@@ -95,6 +95,7 @@ void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
     {
         m_WebViews.remove ( pWebView );
         //pWebView->Release(); // Do not release since other references get corrupted then
+        pWebView->CloseBrowser ();
     }
 }
 
