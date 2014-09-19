@@ -10377,11 +10377,12 @@ int CLuaFunctionDefinitions::UtfChar ( lua_State* luaVM )
         SString strANSI = UTF16ToMbUTF8(wUNICODE);
 
         lua_pushstring ( luaVM, strANSI.c_str() );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushnil ( luaVM );
     return 1;
 }
 
