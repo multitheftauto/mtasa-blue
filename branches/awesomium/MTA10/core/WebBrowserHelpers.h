@@ -9,42 +9,93 @@
 *****************************************************************************/
 #ifndef __WEBBROWSERHELPERS
 #define __WEBBROWSERHELPERS
+#include <cef3/include/cef_v8.h>
+#include <SString.h>
 
-/*typedef void (*JavascriptCallback)(Awesomium::WebView*, const Awesomium::JSArray& args); // C++98 :(
-
-class CJSMethodHandler : public Awesomium::JSMethodHandler
+bool isKeyDown ( WPARAM wParam )
 {
-public:
-    void Bind ( Awesomium::JSObject& object, const Awesomium::WebString& name, JavascriptCallback callback )
-    {
-        // Don't handle local jsobjects
-        if ( object.type() == Awesomium::kJSObjectType_Local )
-            return;
+    return (GetKeyState(wParam) & 0x8000) != 0;
+}
 
-        object.SetCustomMethod ( name, false );
-        std::pair<uint, Awesomium::WebString> key ( object.remote_id (), name );
-        m_FunctionMap[key] = callback;
+int GetCefKeyboardModifiers ( WPARAM wParam, LPARAM lParam )
+{
+    int modifiers;
+    if (isKeyDown(VK_SHIFT))
+        modifiers |= EVENTFLAG_SHIFT_DOWN;
+    if (isKeyDown(VK_CONTROL))
+        modifiers |= EVENTFLAG_CONTROL_DOWN;
+    if (isKeyDown(VK_MENU))
+        modifiers |= EVENTFLAG_ALT_DOWN;
+
+    // Low bit set from GetKeyState indicates "toggled".
+    if (::GetKeyState(VK_NUMLOCK) & 1)
+        modifiers |= EVENTFLAG_NUM_LOCK_ON;
+    if (::GetKeyState(VK_CAPITAL) & 1)
+        modifiers |= EVENTFLAG_CAPS_LOCK_ON;
+
+    switch (wParam) {
+    case VK_RETURN:
+        if ((lParam >> 16) & KF_EXTENDED)
+            modifiers |= EVENTFLAG_IS_KEY_PAD;
+        break;
+    case VK_INSERT:
+    case VK_DELETE:
+    case VK_HOME:
+    case VK_END:
+    case VK_PRIOR:
+    case VK_NEXT:
+    case VK_UP:
+    case VK_DOWN:
+    case VK_LEFT:
+    case VK_RIGHT:
+        if (!((lParam >> 16) & KF_EXTENDED))
+            modifiers |= EVENTFLAG_IS_KEY_PAD;
+        break;
+    case VK_NUMLOCK:
+    case VK_NUMPAD0:
+    case VK_NUMPAD1:
+    case VK_NUMPAD2:
+    case VK_NUMPAD3:
+    case VK_NUMPAD4:
+    case VK_NUMPAD5:
+    case VK_NUMPAD6:
+    case VK_NUMPAD7:
+    case VK_NUMPAD8:
+    case VK_NUMPAD9:
+    case VK_DIVIDE:
+    case VK_MULTIPLY:
+    case VK_SUBTRACT:
+    case VK_ADD:
+    case VK_DECIMAL:
+    case VK_CLEAR:
+        modifiers |= EVENTFLAG_IS_KEY_PAD;
+        break;
+    case VK_SHIFT:
+        if (isKeyDown(VK_LSHIFT))
+            modifiers |= EVENTFLAG_IS_LEFT;
+        else if (isKeyDown(VK_RSHIFT))
+            modifiers |= EVENTFLAG_IS_RIGHT;
+        break;
+    case VK_CONTROL:
+        if (isKeyDown(VK_LCONTROL))
+            modifiers |= EVENTFLAG_IS_LEFT;
+        else if (isKeyDown(VK_RCONTROL))
+            modifiers |= EVENTFLAG_IS_RIGHT;
+        break;
+    case VK_MENU:
+        if (isKeyDown(VK_LMENU))
+            modifiers |= EVENTFLAG_IS_LEFT;
+        else if (isKeyDown(VK_RMENU))
+            modifiers |= EVENTFLAG_IS_RIGHT;
+        break;
+    case VK_LWIN:
+        modifiers |= EVENTFLAG_IS_LEFT;
+        break;
+    case VK_RWIN:
+        modifiers |= EVENTFLAG_IS_RIGHT;
+        break;
     }
-    void OnMethodCall ( Awesomium::WebView* pCaller, uint remote_object_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args )
-    {
-        std::pair<uint, Awesomium::WebString> key ( remote_object_id, method_name );
-        std::map<std::pair<uint, Awesomium::WebString>, JavascriptCallback>::iterator iter = m_FunctionMap.find ( key );
-        if ( iter != m_FunctionMap.end () )
-        {
-            iter->second ( pCaller, args );
-        }
-    }
-    Awesomium::JSValue OnMethodCallWithReturnValue ( Awesomium::WebView* pCaller, unsigned int remote_object_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args )
-    {
-        // Todo: Implement this
-        return Awesomium::JSValue ( Awesomium::WSLit ("Not implemented") );
-    }
-    void Clear ()
-    {
-        m_FunctionMap.clear ();
-    }
-private:
-    std::map<std::pair<uint, Awesomium::WebString>, JavascriptCallback> m_FunctionMap;
-};*/
+    return modifiers;
+}
 
 #endif

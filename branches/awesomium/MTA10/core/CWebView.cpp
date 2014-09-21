@@ -10,6 +10,8 @@
 #include "StdInc.h"
 #include "CWebView.h"
 #include <cef3/include/cef_url.h>
+#include <cef3/include/cef_task.h>
+#include <cef3/include/cef_runnable.h>
 
 CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
 {
@@ -124,6 +126,11 @@ void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
     m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJavascriptCode, "", 0 );
 }
 
+void CWebView::TriggerLuaEvent ( const SString& strEventName, const std::vector<std::string> arguments )
+{
+    m_pEventsInterface->Events_OnTriggerEvent ( strEventName, arguments );
+}
+
 void CWebView::InjectMouseMove ( int iPosX, int iPosY )
 {
     CefMouseEvent mouseEvent;
@@ -180,6 +187,41 @@ bool CWebView::SetAudioVolume ( float fVolume )
     return true;
 }
 
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefClient::OnProcessMessageReceived            //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefClient.html#OnProcessMessageReceived(CefRefPtr%3CCefBrowser%3E,CefProcessId,CefRefPtr%3CCefProcessMessage%3E) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message )
+{
+    CefRefPtr<CefListValue> argList = message->GetArgumentList ();
+    if ( message->GetName () == "TriggerLuaEvent" )
+    {
+        // Get event name
+        CefString eventName = argList->GetString ( 0 );
+
+        // Get number of arguments from IPC process message
+        int numArgs = argList->GetInt ( 1 );
+
+        // Get args
+        std::vector<std::string> args;
+        for ( int i = 2; i < numArgs + 2; ++i )
+        {
+            args.push_back ( argList->GetString ( i ) );
+        }
+
+        // Trigger Lua event now
+        TriggerLuaEvent ( SString ( eventName ), args );
+
+        // The message was handled
+        return true;
+    }
+
+    // The message wasn't handled
+    return false;
+}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -268,21 +310,6 @@ void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnLoadEnd ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode )
 {
-    // TODO: Check if we've to move this to OnLoadStart
-    // Clear the old list
-    //m_JSMethodHandler.Clear ();
-
-    // Bind javascript global object
-    if ( IsLocal () )
-    {
-        /*Awesomium::JSValue jsMTA = pCaller->CreateGlobalJavascriptObject ( Awesomium::WSLit("mta")) ;
-        if ( jsMTA.IsObject () )
-        {
-            Awesomium::JSObject& mtaObject = jsMTA.ToObject();
-            m_JSMethodHandler.Bind ( mtaObject, Awesomium::WSLit("triggerEvent"), Javascript_triggerEvent );
-        }*/
-    }
-
     if ( frame->IsMain () )
     {
 	    SString strURL;
@@ -396,26 +423,21 @@ void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-//        Static Javascript methods: triggerEvent                 //
+// Implementation: CefLifeSpanHandler::OnBeforePopup              //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforePopup(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,constCefString&,constCefString&,constCefPopupFeatures&,CefWindowInfo&,CefRefPtr%3CCefClient%3E&,CefBrowserSettings&,bool*) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-/*void CWebView::Javascript_triggerEvent ( Awesomium::WebView* pWebView, const Awesomium::JSArray& args )
+bool CWebView::OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access )
 {
-    if ( args.size() == 0 )
-        return;
+    // Trigger the popup/new tab event
+    SString strTagetURL, strOpenerURL;
+    ConvertURL ( target_url, strTagetURL );
+    ConvertURL ( frame->GetURL (), strOpenerURL );
+    m_pEventsInterface->Events_OnPopup ( strTagetURL, strOpenerURL );
 
-    // Convert JSArray to string array
-    std::vector<SString> stringArray;
-
-    for ( unsigned int i = 1; i < args.size(); ++i ) // Ignore first arg as it is the event name
-    {
-        stringArray.push_back ( CWebCore::ToSString ( args[i].ToString () ) );
-    }
-
-    // Pass string array to real triggerEvent
-    SString strEventName = CWebCore::ToSString(args[0].ToString());
-    CModManager::GetSingleton ().GetCurrentMod ()->WebsiteTriggerEventHandler ( strEventName, stringArray ); // Does anybody know a better way to trigger an event in the deathmatch module?
-}*/
+    // Block popups
+    return false;
+}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -437,7 +459,11 @@ void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
 void CWebView::ConvertURL ( const CefString& url, SString& convertedURL )
 {
     CefURLParts urlParts;
-    CefParseURL ( url, urlParts );
+    if ( !CefParseURL ( url, urlParts ) )
+    {
+        convertedURL = "";
+        return;
+    }
     WString scheme = urlParts.scheme.str;
     
     if ( scheme == L"http" || scheme == L"https" )

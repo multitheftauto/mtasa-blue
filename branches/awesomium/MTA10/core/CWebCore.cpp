@@ -15,6 +15,7 @@
 #include <Audiopolicy.h>
 #include <cef3/include/cef_app.h>
 #include <cef3/include/cef_browser.h>
+#include "WebBrowserHelpers.h"
 
 CWebCore::CWebCore ()
 {
@@ -24,7 +25,6 @@ CWebCore::CWebCore ()
     m_pXmlConfig = NULL;
     m_pFocusedWebView = NULL;
 
-    Initialise ();
     InitialiseWhiteAndBlacklist ();
 
     // Update dynamic lists from QA server
@@ -59,7 +59,7 @@ bool CWebCore::Initialise ()
     sandboxInfo = scopedSandbox.sandbox_info();
 #endif
 
-    if ( CefExecuteProcess(mainArgs, NULL, NULL) >= 0 )
+    if ( CefExecuteProcess ( mainArgs, NULL, sandboxInfo ) >= 0 )
         return false;
 
     CefSettings settings;
@@ -68,11 +68,15 @@ bool CWebCore::Initialise ()
 #endif
 
     // Specifiy sub process executable path
-    CefString ( &settings.browser_subprocess_path ).FromASCII( CalcMTASAPath ( CEF_SUBPROCESS_PATH ) );
+#ifndef MTA_DEBUG
+    CefString ( &settings.browser_subprocess_path ).FromASCII( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher.exe" ) );
+#else
+    CefString ( &settings.browser_subprocess_path ).FromASCII( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher_d.exe" ) );
+#endif
     CefString ( &settings.user_agent ).FromASCII ( "Multi Theft Auto: San Andreas Client; Chromium" );
-    CefString ( &settings.resources_dir_path ).FromASCII ( CalcMTASAPath( "mta") );
+    CefString ( &settings.resources_dir_path ).FromASCII ( CalcMTASAPath( "MTA\\CEF") );
+    CefString ( &settings.locales_dir_path ).FromASCII( CalcMTASAPath( "MTA\\CEF\\locales" ) );
     
-    // Todo: Implement multi-threading
     settings.multi_threaded_message_loop = false;
     settings.windowless_rendering_enabled = true;
 
@@ -107,6 +111,16 @@ void CWebCore::DoPulse ()
     // Perform a single CEF message loop iteration (only if minimized to prevent corrupted renderstates (?))
     if ( !g_pCore->IsWindowMinimized () )
         CefDoMessageLoopWork ();
+}
+
+CWebView* CWebCore::FindWebView ( CefRefPtr<CefBrowser> browser )
+{
+    for ( std::list<CefRefPtr<CWebView>>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
+    {
+        if ( (*iter)->GetCefBrowser () == browser )
+            return iter->get();
+    }
+    return NULL;
 }
 
 eURLState CWebCore::GetURLState ( const SString& strURL )
@@ -270,92 +284,6 @@ void CWebCore::ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
         keyEvent.type = cef_key_event_type_t::KEYEVENT_CHAR;
 
     m_pFocusedWebView->InjectKeyboardEvent ( keyEvent );
-}
-
-bool isKeyDown ( WPARAM wParam )
-{
-    return (GetKeyState(wParam) & 0x8000) != 0;
-}
-
-int CWebCore::GetCefKeyboardModifiers ( WPARAM wParam, LPARAM lParam )
-{
-    int modifiers;
-    if (isKeyDown(VK_SHIFT))
-        modifiers |= EVENTFLAG_SHIFT_DOWN;
-    if (isKeyDown(VK_CONTROL))
-        modifiers |= EVENTFLAG_CONTROL_DOWN;
-    if (isKeyDown(VK_MENU))
-        modifiers |= EVENTFLAG_ALT_DOWN;
-
-    // Low bit set from GetKeyState indicates "toggled".
-    if (::GetKeyState(VK_NUMLOCK) & 1)
-        modifiers |= EVENTFLAG_NUM_LOCK_ON;
-    if (::GetKeyState(VK_CAPITAL) & 1)
-        modifiers |= EVENTFLAG_CAPS_LOCK_ON;
-
-    switch (wParam) {
-    case VK_RETURN:
-        if ((lParam >> 16) & KF_EXTENDED)
-            modifiers |= EVENTFLAG_IS_KEY_PAD;
-        break;
-    case VK_INSERT:
-    case VK_DELETE:
-    case VK_HOME:
-    case VK_END:
-    case VK_PRIOR:
-    case VK_NEXT:
-    case VK_UP:
-    case VK_DOWN:
-    case VK_LEFT:
-    case VK_RIGHT:
-        if (!((lParam >> 16) & KF_EXTENDED))
-            modifiers |= EVENTFLAG_IS_KEY_PAD;
-        break;
-    case VK_NUMLOCK:
-    case VK_NUMPAD0:
-    case VK_NUMPAD1:
-    case VK_NUMPAD2:
-    case VK_NUMPAD3:
-    case VK_NUMPAD4:
-    case VK_NUMPAD5:
-    case VK_NUMPAD6:
-    case VK_NUMPAD7:
-    case VK_NUMPAD8:
-    case VK_NUMPAD9:
-    case VK_DIVIDE:
-    case VK_MULTIPLY:
-    case VK_SUBTRACT:
-    case VK_ADD:
-    case VK_DECIMAL:
-    case VK_CLEAR:
-        modifiers |= EVENTFLAG_IS_KEY_PAD;
-        break;
-    case VK_SHIFT:
-        if (isKeyDown(VK_LSHIFT))
-            modifiers |= EVENTFLAG_IS_LEFT;
-        else if (isKeyDown(VK_RSHIFT))
-            modifiers |= EVENTFLAG_IS_RIGHT;
-        break;
-    case VK_CONTROL:
-        if (isKeyDown(VK_LCONTROL))
-            modifiers |= EVENTFLAG_IS_LEFT;
-        else if (isKeyDown(VK_RCONTROL))
-            modifiers |= EVENTFLAG_IS_RIGHT;
-        break;
-    case VK_MENU:
-        if (isKeyDown(VK_LMENU))
-            modifiers |= EVENTFLAG_IS_LEFT;
-        else if (isKeyDown(VK_RMENU))
-            modifiers |= EVENTFLAG_IS_RIGHT;
-        break;
-    case VK_LWIN:
-        modifiers |= EVENTFLAG_IS_LEFT;
-        break;
-    case VK_RWIN:
-        modifiers |= EVENTFLAG_IS_RIGHT;
-        break;
-    }
-    return modifiers;
 }
 
 void CWebCore::ClearTextures ()

@@ -32,6 +32,7 @@ public:
     virtual ~CWebView           ();
     void                        SetWebBrowserEvents ( CWebBrowserEventsInterface* pInterface ) { m_pEventsInterface = pInterface; };
     void                        CloseBrowser ();
+    inline CefRefPtr<CefBrowser>GetCefBrowser() { return m_pWebView; };
 
     // Exported methods
     bool LoadURL                ( const SString& strURL, bool bFilterEnabled = true );
@@ -43,7 +44,8 @@ public:
     void ClearTexture           ();
 
     void ExecuteJavascript      ( const SString& strJavascriptCode );
-
+    void TriggerLuaEvent        ( const SString& strEventName, const std::vector<std::string> arguments );
+    
     void InjectMouseMove        ( int iPosX, int iPosY );
     void InjectMouseDown        ( eWebBrowserMouseButton mouseButton );
     void InjectMouseUp          ( eWebBrowserMouseButton mouseButton );
@@ -61,7 +63,8 @@ public:
     virtual CefRefPtr<CefLoadHandler>   GetLoadHandler() override { return this; };
     virtual CefRefPtr<CefRequestHandler>GetRequestHandler() override { return this; };
     virtual CefRefPtr<CefLifeSpanHandler>GetLifeSpanHandler() override { return this; };
-    
+    virtual bool OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message ) override;
+
     // CefRenderHandler methods
     virtual bool GetViewRect    ( CefRefPtr<CefBrowser> browser, CefRect& rect ) override;
     virtual void OnPaint        ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height ) override;
@@ -72,15 +75,13 @@ public:
     virtual void OnLoadEnd      ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode ) override;
     virtual void OnLoadError    ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedURL ) override;
     
-    // CefRequestHandler implementation
-    virtual bool OnBeforeBrowse( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect ) override;
+    // CefRequestHandler methods
+    virtual bool OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect ) override;
     virtual bool OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request ) override;
 
-    // CefLifeSpawnHandler
+    // CefLifeSpawnHandler methods
     virtual void OnBeforeClose ( CefRefPtr<CefBrowser> browser );
-
-    // Static javascript method implementations
-    //static void Javascript_triggerEvent(Awesomium::WebView* pWebView, const Awesomium::JSArray& args);
+    virtual bool OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access );
 
 protected:
     void ConvertURL ( const CefString& url, SString& convertedURL );

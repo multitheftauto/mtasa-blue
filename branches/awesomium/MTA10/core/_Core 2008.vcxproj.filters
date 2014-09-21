@@ -374,6 +374,18 @@
     <ClCompile Include="..\..\vendor\tinygettext\unix_file_system.cpp">
       <Filter>Source Files\utils\tinygettext</Filter>
     </ClCompile>
+    <ClCompile Include="CRenderItem.WebBrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWebCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWebsiteRequests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWebView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CAdditionalVertexStreamManager.h">
@@ -1270,14 +1282,26 @@
     <ClInclude Include="..\..\vendor\tinygettext\unix_file_system.hpp">
       <Filter>Header Files\utils\tinygettext</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Shared\sdk\sha1.h">
-      <Filter>Header Files\shared</Filter>
+    <ClInclude Include="CWebCore.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Shared\sdk\sha1.hpp">
-      <Filter>Header Files\shared</Filter>
+    <ClInclude Include="CWebsiteRequests.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Shared\sdk\CVector4D.h">
-      <Filter>Header Files\shared</Filter>
+    <ClInclude Include="CWebView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WebBrowserHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\core\CWebBrowserEventsInterface.h">
+      <Filter>Header Files\sdk\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\core\CWebViewInterface.h">
+      <Filter>Header Files\sdk\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\core\CWebCoreInterface.h">
+      <Filter>Header Files\sdk\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

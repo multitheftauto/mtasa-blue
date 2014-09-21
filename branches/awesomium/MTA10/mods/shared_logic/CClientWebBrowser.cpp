@@ -134,12 +134,11 @@ void CClientWebBrowser::Events_OnNavigate ( const SString& strURL, bool bMainFra
     CallEvent ( "onClientBrowserNavigate", Arguments, false );
 }
 
-void CClientWebBrowser::Events_OnPopup ( const SString& strTargetURL, const SString& strOpenerURL, bool bPopup )
+void CClientWebBrowser::Events_OnPopup ( const SString& strTargetURL, const SString& strOpenerURL )
 {
     CLuaArguments Arguments;
     Arguments.PushString ( strTargetURL );
     Arguments.PushString ( strOpenerURL );
-    Arguments.PushBoolean ( bPopup );
     CallEvent ( "onClientBrowserPopup", Arguments, false );
 }
 
@@ -148,4 +147,16 @@ void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
     CLuaArguments Arguments;
     Arguments.PushNumber ( ucCursor );
     CallEvent ( "onClientBrowserCursorChange", Arguments, false );
+}
+
+void CClientWebBrowser::Events_OnTriggerEvent ( const SString& strEventName, const std::vector<std::string>& arguments )
+{
+    CLuaArguments Arguments;
+    for ( std::vector<std::string>::const_iterator iter = arguments.begin (); iter != arguments.end (); ++iter )
+    {
+        Arguments.PushString ( *iter );
+    }
+
+    bool bWasCancelled;
+    CStaticFunctionDefinitions::TriggerEvent ( strEventName, *this, Arguments, bWasCancelled );
 }

@@ -32,7 +32,6 @@ public:
     void        IdleHandler                     ( void );
 
     bool        WebsiteRequestResultHandler     ( const std::vector<SString>& newPages );
-    void        WebsiteTriggerEventHandler      ( const SString& strEventName, const std::vector<SString>& args );
 
     bool        ProcessCommand                  ( const char* szCommandLine );
     //bool        ProcessInput                    ( CInputMessage* pInputMessage );

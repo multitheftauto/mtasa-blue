@@ -228,8 +228,7 @@ CCore::~CCore ( void )
     delete m_pGraphics;
 
     // Delete the web
-    if ( m_pWebCore )
-        delete m_pWebCore;
+    delete m_pWebCore;
 
     // Delete lazy subsystems
     DestroyGUI ();
@@ -1144,6 +1143,7 @@ void CCore::InitialiseWeb ()
         return;
 
     m_pWebCore = new CWebCore;
+    m_pWebCore->Initialise ();
 }
 
 

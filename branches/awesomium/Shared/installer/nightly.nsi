@@ -603,6 +603,8 @@ DontInstallRedist:
         File "${FILES_ROOT}\MTA San Andreas\mta\vvof.dll"
         SetOutPath "$INSTDIR\MTA\cgui\images"
         File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\busy_spinner.png"
+		SetOutPath "$INSTDIR\MTA\CEF"
+		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher.exe"
 
 
 		${If} "$(LANGUAGE_CODE)" != ""
@@ -624,14 +626,19 @@ DontInstallRedist:
 			File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 			File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
-			File "${FILES_ROOT}\MTA San Andreas\mta\avcodec-53.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\avformat-53.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\avutil-51.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\awesomium.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\awesomium_process.exe"
-			File "${FILES_ROOT}\MTA San Andreas\mta\icudt.dll"
+
+			File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_46.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\ffmpegsumo.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\libcef.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\icudtl.dat"
+			
+			SetOutPath "$INSTDIR\MTA\CEF"
+			File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef.pak"
+			File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_100_percent.pak"
+			File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_200_percent.pak"
 
             SetOutPath "$INSTDIR\skins\Classic"
             File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"

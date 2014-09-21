@@ -46,11 +46,12 @@ public:
 
     
     // CWebBrowserEventsInterface implementation
-    void                        Events_OnDocumentReady ( const SString& strURL );
-    void                        Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription );
-    void                        Events_OnNavigate      ( const SString& strURL, bool bMainFrame );
-    void                        Events_OnPopup         ( const SString& strTargetURL, const SString& strOpenerURL, bool bPopup );
-    void                        Events_OnChangeCursor  ( unsigned char ucCursor );
+    void                        Events_OnDocumentReady ( const SString& strURL ) override;
+    void                        Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription ) override;
+    void                        Events_OnNavigate      ( const SString& strURL, bool bMainFrame ) override;
+    void                        Events_OnPopup         ( const SString& strTargetURL, const SString& strOpenerURL ) override;
+    void                        Events_OnChangeCursor  ( unsigned char ucCursor ) override;
+    void                        Events_OnTriggerEvent ( const SString& strEventName, const std::vector<std::string>& arguments ) override;
 
 private:
     CWebViewInterface* m_pWebView;

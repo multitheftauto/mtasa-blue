@@ -27,7 +27,6 @@ public:
     virtual void    IdleHandler                 ( void ) = 0;
 
     virtual bool    WebsiteRequestResultHandler ( const std::vector<SString>& newPages ) = 0;
-    virtual void    WebsiteTriggerEventHandler  ( const SString& strEventName, const std::vector<SString>& args ) = 0;
 
     virtual bool    ProcessCommand              ( const char* szCommandLine ) = 0;
     //virtual bool    ProcessInput                ( CInputMessage* pInputMessage ) = 0  *TODO*

@@ -42,11 +42,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <OutDir>C:\Program Files\MTA San Andreas 1.4\mta\</OutDir>
+    <OutDir>C:\Program Files\MTA San Andreas 1.4\mta\cef\</OutDir>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\vendor\cef3\include;$(IncludePath)</IncludePath>
+    <OutDir>C:\Program Files\MTA San Andreas 1.4\mta\cef\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
