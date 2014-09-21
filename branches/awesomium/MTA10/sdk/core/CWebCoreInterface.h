@@ -53,6 +53,8 @@ public:
     virtual bool                IsTestModeEnabled  () = 0;
     virtual void                SetTestModeEnabled ( bool bEnabled ) = 0;
 
+    virtual unsigned char       FindCursorByHandle  ( HCURSOR hCursor ) = 0;
+
     virtual CWebView*           GetFocusedWebView  () = 0;
     virtual void                SetFocusedWebView  (CWebView* pWebView) = 0;
     virtual void                ProcessInputMessage( UINT uMsg, WPARAM wParam, LPARAM lParam ) = 0;

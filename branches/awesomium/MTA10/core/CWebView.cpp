@@ -21,10 +21,17 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     // Initialise the web session (which holds the actual settings) in in-memory mode
     CefBrowserSettings browserSettings;
     browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit ();
+    browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
+    browserSettings.java = cef_state_t::STATE_DISABLED;
+    browserSettings.caret_browsing = cef_state_t::STATE_ENABLED;
+    browserSettings.universal_access_from_file_urls = cef_state_t::STATE_DISABLED; // Also filtered by resource interceptor, but set this nevertheless
+    browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
+    browserSettings.webgl = cef_state_t::STATE_ENABLED;
+    //browserSettings.javascript_open_windows = cef_state_t::STATE_DISABLED;
+
     bool bEnabledPlugins;
     CVARS_GET ( "browser_plugins", bEnabledPlugins );
     browserSettings.plugins = bEnabledPlugins ? cef_state_t::STATE_ENABLED : cef_state_t::STATE_DISABLED;
-    browserSettings.java = cef_state_t::STATE_DISABLED;
     if ( !bIsLocal )
     {
         bool bEnabledJavascript;
@@ -91,7 +98,7 @@ void CWebView::GetURL ( SString& outURL )
 
 void CWebView::GetTitle ( SString& outTitle )
 {
-    outTitle = static_cast < SString > ( m_pWebView->GetMainFrame ()->GetName () );
+    outTitle = m_CurrentTitle;
 }
 
 void CWebView::SetRenderingPaused ( bool bPaused )
@@ -281,7 +288,10 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor )
 {
-    m_pEventsInterface->Events_OnChangeCursor ( reinterpret_cast < unsigned char > ( cursor ) );
+    // Find the cursor index by the cursor handle
+    unsigned char cursorIndex = g_pCore->GetWebCore ()->FindCursorByHandle ( cursor );
+    if ( cursorIndex != -1 )
+        m_pEventsInterface->Events_OnChangeCursor ( cursorIndex );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -330,24 +340,6 @@ void CWebView::OnLoadError ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
     ConvertURL ( failedURL, strURL );
     m_pEventsInterface->Events_OnLoadingFailed ( strURL, errorCode, SString ( errorText ) );
 }
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
-// Implementation: Awesomium::WebViewListener::View:OnShowCreatedWebView //
-// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_web_view_listener_1_1_view.html#af42b69bd383b5b69130feb990ad235e2 //
-//                                                                //
-////////////////////////////////////////////////////////////////////
-/*void CWebView::OnShowCreatedWebView ( Awesomium::WebView* pCaller, Awesomium::WebView* pNewView, const Awesomium::WebURL& opener_url, const Awesomium::WebURL& target_url, const Awesomium::Rect& initial_pos, bool is_popup )
-{
-    // Trigger the popup/new tab event
-    SString strTagetURL, strOpenerURL;
-    ConvertURL ( target_url, strTagetURL );
-    ConvertURL ( opener_url, strOpenerURL );
-    m_pEventsInterface->Events_OnPopup ( strTagetURL, strOpenerURL, is_popup );
-
-    // Destroy the new view immediately since we want the scripter to handle the popup event via Lua
-    pNewView->Destroy ();
-}*/
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -429,31 +421,58 @@ void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
 ////////////////////////////////////////////////////////////////////
 bool CWebView::OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access )
 {
+    // ATTENTION: This method is called on the IO thread
+    
     // Trigger the popup/new tab event
     SString strTagetURL, strOpenerURL;
     ConvertURL ( target_url, strTagetURL );
     ConvertURL ( frame->GetURL (), strOpenerURL );
-    m_pEventsInterface->Events_OnPopup ( strTagetURL, strOpenerURL );
+    
+    // Post event call task on the UI thread (will be called during the next CefDoMessageLoopWork call)
+    CefPostTask ( TID_UI, NewCefRunnableMethod ( this, &CWebView::TriggerPopupEvent, strTagetURL, strOpenerURL ) );
 
-    // Block popups
+    // Block popups generally
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefJSDialogHandler::OnJSDialog                 //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefJSDialogHandler.html#OnJSDialog(CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,JSDialogType,constCefString&,constCefString&,CefRefPtr%3CCefJSDialogCallback%3E,bool&) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+bool CWebView::OnJSDialog ( CefRefPtr<CefBrowser> browser, const CefString& origin_url, const CefString& accept_lang, CefJSDialogHandler::JSDialogType dialog_type, const CefString& message_text, const CefString& default_prompt_text, CefRefPtr< CefJSDialogCallback > callback, bool& suppress_message )
+{
+    // TODO: Provide a way to influence Javascript dialogs via Lua
+    // e.g. addEventHandler("onClientBrowserDialog", browser, function(message, defaultText) continueBrowserDialog("My input") end)
+
+    // Suppress the dialog
+    suppress_message = true;
     return false;
 }
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-//        Static Javascript methods: alert                        //
-//        Exports the javascript alert to Lua                     //
+// Implementation: CefDialogHandler::OnFileDialog                 //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDialogHandler.html#OnFileDialog(CefRefPtr%3CCefBrowser%3E,FileDialogMode,constCefString&,constCefString&,conststd::vector%3CCefString%3E&,CefRefPtr%3CCefFileDialogCallback%3E) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-/*void CWebView::Javascript_alert ( Awesomium::WebView* pWebView, const Awesomium::JSArray& args )
+bool CWebView::OnFileDialog ( CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name, const std::vector< CefString >& accept_types, CefRefPtr< CefFileDialogCallback > callback )
 {
-    SString message = "";
-    if ( args.size() > 0 )
-        message = CWebCore::ToSString ( args[0].ToString () );
-
-    CModManager::GetSingleton().GetCurrentMod()->WebsiteAlertHandler ( message );
+    // Don't show the dialog
+    return true;
 }
-*/
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefDisplayHandler::OnTitleChange               //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDisplayHandler.html#OnTitleChange(CefRefPtr%3CCefBrowser%3E,constCefString&) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& title )
+{
+    m_CurrentTitle = UTF16ToMbUTF8 ( title );
+}
 
 
 void CWebView::ConvertURL ( const CefString& url, SString& convertedURL )
@@ -472,6 +491,13 @@ void CWebView::ConvertURL ( const CefString& url, SString& convertedURL )
     }
     else
     {
-        convertedURL = UTF16ToMbUTF8 ( urlParts.path.str ); // TODO: Probably only the filename
+        // Get the file name (charsequence after last /)
+        WString tempStr = urlParts.path.str;
+        size_t pos = tempStr.find_last_of ( L"/" );
+
+        if ( pos != std::wstring::npos && pos < tempStr.size () )
+            convertedURL = UTF16ToMbUTF8 ( tempStr.SubStr ( pos + 1 ) );
+        else
+            convertedURL = "";
     }
 }

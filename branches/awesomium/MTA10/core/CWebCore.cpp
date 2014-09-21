@@ -26,6 +26,7 @@ CWebCore::CWebCore ()
     m_pFocusedWebView = NULL;
 
     InitialiseWhiteAndBlacklist ();
+    InitialiseCursors ();
 
     // Update dynamic lists from QA server
     UpdateListsFromMaster ();
@@ -256,6 +257,27 @@ void CWebCore::AllowPendingPages ()
 void CWebCore::DenyPendingPages ()
 {
     m_PendingRequests.clear ();
+}
+
+void CWebCore::InitialiseCursors ()
+{
+    // Load standard cursors
+    LPCSTR cursorIDs[] = { IDC_APPSTARTING, IDC_ARROW, IDC_CROSS, IDC_HAND, IDC_HELP, IDC_IBEAM, IDC_ICON, IDC_NO, IDC_SIZE, IDC_SIZEALL, IDC_SIZENESW, IDC_SIZENS, IDC_SIZENWSE, IDC_SIZEWE, IDC_UPARROW, IDC_WAIT };
+    for ( int i = 0; i < NUMELMS ( cursorIDs ); ++i )
+    {
+        // Get cursor handle (LoadCursor loads the cursor only if it has not been loaded yet)
+        m_aCursors[i] = LoadCursor ( NULL, cursorIDs[i] );
+    }
+}
+
+unsigned char CWebCore::FindCursorByHandle ( HCURSOR hCursor )
+{
+    for ( int i = 0; i < NUMELMS ( m_aCursors ); ++i )
+    {
+        if ( hCursor == m_aCursors[i] )
+            return i;
+    }
+    return 0xFF;
 }
 
 bool CWebCore::CanLoadRemotePages ()

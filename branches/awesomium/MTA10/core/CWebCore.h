@@ -12,6 +12,7 @@
 #define __CWEBCORE_H
 
 #undef GetNextSibling
+#undef GetFirstChild
 #include <core/CWebCoreInterface.h>
 #include <cef3/include/cef_app.h>
 #define MTA_BROWSERDATA_PATH "mta/browserdata.xml"
@@ -19,6 +20,7 @@
 #define BROWSER_UPDATE_URL "http://jusonex.net/aw/getlist.php"
 #define CEF_ENABLE_SANDBOX 0
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
+#define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
 class CWebBrowserItem;
 class CWebsiteRequests;
@@ -45,6 +47,9 @@ public:
     void                RequestPages        ( const std::vector<SString>& pages );
     void                AllowPendingPages   ();
     void                DenyPendingPages    ();
+    
+    void                InitialiseCursors   ();
+    unsigned char       FindCursorByHandle  ( HCURSOR hCursor );
 
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
     inline void         SetTestModeEnabled  ( bool bEnabled ) { m_bTestmodeEnabled = bEnabled; };
@@ -75,6 +80,7 @@ private:
     std::list<CefRefPtr<CWebView>>          m_WebViews;
     bool                                    m_bTestmodeEnabled;
     CWebView*                               m_pFocusedWebView;
+    HCURSOR                                 m_aCursors[16];
 
     CFastHashMap<SString, WebFilterPair>    m_Whitelist;
     std::vector<SString>                    m_PendingRequests;

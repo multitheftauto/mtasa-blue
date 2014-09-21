@@ -12,6 +12,7 @@
 #define __CWEBVIEW_H
 
 #undef GetNextSibling
+#undef GetFirstChild
 #include <core/CWebViewInterface.h>
 #include <core/CWebBrowserEventsInterface.h>
 #include <cef3/include/cef_app.h>
@@ -24,8 +25,9 @@
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
+#define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
-class CWebView : public CWebViewInterface, private CefClient, private CefRenderHandler, private CefLoadHandler, private CefRequestHandler, private CefLifeSpanHandler
+class CWebView : public CWebViewInterface, private CefClient, private CefRenderHandler, private CefLoadHandler, private CefRequestHandler, private CefLifeSpanHandler, private CefJSDialogHandler, private CefDialogHandler, private CefDisplayHandler
 {
 public:
     CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false );
@@ -45,6 +47,7 @@ public:
 
     void ExecuteJavascript      ( const SString& strJavascriptCode );
     void TriggerLuaEvent        ( const SString& strEventName, const std::vector<std::string> arguments );
+    void TriggerPopupEvent      ( const SString& strTargetURL, const SString& strOpenerURL ) { m_pEventsInterface->Events_OnPopup ( strTargetURL, strOpenerURL ); };
     
     void InjectMouseMove        ( int iPosX, int iPosY );
     void InjectMouseDown        ( eWebBrowserMouseButton mouseButton );
@@ -59,10 +62,13 @@ public:
 
 
     // CefClient methods
-    virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override { return this; };
-    virtual CefRefPtr<CefLoadHandler>   GetLoadHandler() override { return this; };
-    virtual CefRefPtr<CefRequestHandler>GetRequestHandler() override { return this; };
-    virtual CefRefPtr<CefLifeSpanHandler>GetLifeSpanHandler() override { return this; };
+    virtual CefRefPtr<CefRenderHandler>     GetRenderHandler() override { return this; };
+    virtual CefRefPtr<CefLoadHandler>       GetLoadHandler() override { return this; };
+    virtual CefRefPtr<CefRequestHandler>    GetRequestHandler() override { return this; };
+    virtual CefRefPtr<CefLifeSpanHandler>   GetLifeSpanHandler() override { return this; };
+    virtual CefRefPtr<CefJSDialogHandler>   GetJSDialogHandler() override { return this; };
+    virtual CefRefPtr<CefDialogHandler>     GetDialogHandler() override { return this; };
+    virtual CefRefPtr<CefDisplayHandler>    GetDisplayHandler() override { return this; };
     virtual bool OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message ) override;
 
     // CefRenderHandler methods
@@ -80,8 +86,17 @@ public:
     virtual bool OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request ) override;
 
     // CefLifeSpawnHandler methods
-    virtual void OnBeforeClose ( CefRefPtr<CefBrowser> browser );
-    virtual bool OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access );
+    virtual void OnBeforeClose ( CefRefPtr<CefBrowser> browser ) override;
+    virtual bool OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access ) override;
+
+    // CefJSDialogHandler methods
+    virtual bool OnJSDialog ( CefRefPtr<CefBrowser> browser, const CefString& origin_url, const CefString& accept_lang, CefJSDialogHandler::JSDialogType dialog_type, const CefString& message_text, const CefString& default_prompt_text, CefRefPtr< CefJSDialogCallback > callback, bool& suppress_message ) override;
+
+    // CefDialogHandler methods
+    virtual bool OnFileDialog ( CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name, const std::vector< CefString >& accept_types, CefRefPtr< CefFileDialogCallback > callback ) override;
+
+    // CefDisplayHandler methods
+    virtual void OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& title ) override;
 
 protected:
     void ConvertURL ( const CefString& url, SString& convertedURL );
@@ -94,6 +109,7 @@ private:
     bool                m_bIsLocal;
     SString             m_strTempURL;
     POINT               m_vecMousePosition;
+    SString             m_CurrentTitle;
 
     //CJSMethodHandler    m_JSMethodHandler;
     CWebBrowserEventsInterface* m_pEventsInterface;
