@@ -831,9 +831,9 @@ void CMapManager::DoVehicleRespawning ( void )
 
     // Loop through all the vehicles
     list < CVehicle* > ::const_iterator iter = m_pVehicleManager->IterBegin ();
-    for ( ; iter != m_pVehicleManager->IterEnd (); iter++ )
+    while ( iter != m_pVehicleManager->IterEnd () )
     {
-        CVehicle* pVehicle = *iter;
+        CVehicle* pVehicle = *iter++;
 
         // It's been set to respawn
         if ( pVehicle->GetRespawnEnabled () )
