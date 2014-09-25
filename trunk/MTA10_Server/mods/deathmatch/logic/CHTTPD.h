@@ -28,12 +28,14 @@ public:
 
                                 CHTTPD      ( void ); // start the initial server
                                 ~CHTTPD     ();
-
+    // EHS interface
+    HttpResponse* RouteRequest ( HttpRequest * ipoHttpRequest );
     ResponseCode HandleRequest ( HttpRequest * ipoHttpRequest,
                                  HttpResponse * ipoHttpResponse );
     void         HttpPulse     ( void );
     bool         ShouldAllowConnection ( const char * szAddress );
-    
+
+    // CHTTPD methods   
     bool                        StartHTTPD ( const char* szIP, unsigned int port );
     bool                        StopHTTPD ( void );
     inline void                 SetResource ( CResource * resource ) { m_resource = resource; }

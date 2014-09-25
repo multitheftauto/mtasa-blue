@@ -291,7 +291,7 @@ class EHS {
 		UnregisterEHS ( const char * ipsRegisterPath );
 
 	/// this is responsible for routing a request through the EHS tree and sending the request to the final destination.  It returns the HttpResponse object to be sent back to the client
-	HttpResponse * RouteRequest ( HttpRequest * ipoHttpRequest );
+	virtual HttpResponse * RouteRequest ( HttpRequest * ipoHttpRequest );
 
 	/// This function should be defined by the subclass
 	virtual ResponseCode HandleRequest ( HttpRequest * ipoHttpRequest,
