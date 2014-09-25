@@ -3808,7 +3808,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
             // event cancelled, disconnect the player
             CLogger::LogPrintf ( "CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
             const char* szError = g_pGame->GetEvents()->GetLastError ();
-            if ( szError )
+            if ( szError && szError[0] )
             {
                 DisconnectPlayer ( g_pGame, *pPlayer, szError );
                 return;
