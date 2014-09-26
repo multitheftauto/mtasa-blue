@@ -8,8 +8,8 @@
     <MyTargetDir>C:\Program Files\MTA San Andreas 1.4</MyTargetDir>
   </PropertyGroup>
   <PropertyGroup>
-    <IncludePath>$(DirectXIncludePath);$(IncludePath)</IncludePath>
-    <LibraryPath>$(DirectXLibPath);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath);$(DirectXIncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DirectXLibPath)</LibraryPath>
     <IntDir>$(SolutionDir)\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>

@@ -109,6 +109,7 @@ void CWebView::SetRenderingPaused ( bool bPaused )
 void CWebView::Focus ()
 {
     m_pWebView->GetHost ()->SetFocus ( true );
+    m_pWebView->GetHost ()->SendFocusEvent ( true );
     g_pCore->GetWebCore()->SetFocusedWebView ( this );
 }
 
@@ -290,7 +291,7 @@ void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle c
 {
     // Find the cursor index by the cursor handle
     unsigned char cursorIndex = g_pCore->GetWebCore ()->FindCursorByHandle ( cursor );
-    if ( cursorIndex != -1 )
+    if ( cursorIndex != 0xFF )
         m_pEventsInterface->Events_OnChangeCursor ( cursorIndex );
 }
 

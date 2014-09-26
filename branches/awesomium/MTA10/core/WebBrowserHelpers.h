@@ -19,7 +19,7 @@ bool isKeyDown ( WPARAM wParam )
 
 int GetCefKeyboardModifiers ( WPARAM wParam, LPARAM lParam )
 {
-    int modifiers;
+    int modifiers = 0;
     if (isKeyDown(VK_SHIFT))
         modifiers |= EVENTFLAG_SHIFT_DOWN;
     if (isKeyDown(VK_CONTROL))

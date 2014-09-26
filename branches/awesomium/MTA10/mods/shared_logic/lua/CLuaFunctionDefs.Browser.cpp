@@ -135,7 +135,7 @@ int CLuaFunctionDefs::IsBrowserLoading ( lua_State* luaVM )
 
 int CLuaFunctionDefs::InjectBrowserMouseMove ( lua_State* luaVM )
 {
-//  bool injectBrowserMove(browser webBrowser, int x, int y)
+//  bool injectBrowserMouseMove(browser webBrowser, int x, int y)
     CClientWebBrowser* pWebBrowser; int posX; int posY;
 
     CScriptArgReader argStream ( luaVM );

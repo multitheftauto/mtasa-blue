@@ -45,7 +45,10 @@ void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
     CGraphics::GetSingleton ().OnDeviceCreate ( pDevice );
 
     // Create the GUI elements
-    CLocalGUI::GetSingleton().CreateObjects ( pDevice );    
+    CLocalGUI::GetSingleton().CreateObjects ( pDevice );
+
+    // Init webbrowser
+    CCore::GetSingleton ().InitialiseWeb ();
 }
 
 void CDirect3DEvents9::OnDirect3DDeviceDestroy ( IDirect3DDevice9 *pDevice )

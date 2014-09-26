@@ -298,11 +298,11 @@ void CWebCore::ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
     keyEvent.modifiers = GetCefKeyboardModifiers ( wParam, lParam );
     keyEvent.is_system_key = uMsg == WM_SYSCHAR || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP;
 
-    if ( uMsg == WM_KEYDOWN )
+    if ( uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN )
         keyEvent.type = cef_key_event_type_t::KEYEVENT_RAWKEYDOWN;
-    else if ( uMsg == WM_KEYUP )
+    else if ( uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP )
         keyEvent.type = cef_key_event_type_t::KEYEVENT_KEYUP;
-    else if ( uMsg == WM_CHAR )
+    else if ( uMsg == WM_CHAR || uMsg == WM_SYSCHAR )
         keyEvent.type = cef_key_event_type_t::KEYEVENT_CHAR;
 
     m_pFocusedWebView->InjectKeyboardEvent ( keyEvent );
