@@ -1110,6 +1110,43 @@ SString GetRealOSVersion ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// GetRealOSBuildNumber
+//
+// Ignoring compatibility mode
+//
+///////////////////////////////////////////////////////////////
+SString GetRealOSBuildNumber( void )
+{
+    uint uiBuild = 0;
+    uint uiRev = 0;
+
+    SLibVersionInfo fileInfo;
+    if ( GetLibVersionInfo( "ntdll.dll", &fileInfo ) )
+    {
+        uiBuild = HIWORD( fileInfo.dwFileVersionLS );
+        uiRev = LOWORD( fileInfo.dwFileVersionLS );
+    }
+
+    return SString( "%u.%u", uiBuild, uiRev );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// IsVS2013RuntimeInstalled
+//
+// Only checks registry settings, so install could still be invalid
+//
+///////////////////////////////////////////////////////////////
+bool IsVS2013RuntimeInstalled( void )
+{
+    SString strInstall = GetSystemRegistryValue( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\12.0\\RuntimeMinimum", "Install" );
+    return strInstall == "\x01";
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // IsUserAdmin
 //
 //
