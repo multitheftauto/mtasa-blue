@@ -2953,6 +2953,14 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
                              , GetApplicationSettingInt( DIAG_MINIDUMP_CONFIRMED_COUNT )
                            );
 
+    SString strSystemStats3 ( "3_%d"
+                             "_%s"
+                             "_%s"
+                             , GetApplicationSettingInt( "vs2013-runtime-installed" )
+                             , *GetApplicationSetting ( "real-os-build" )
+                             , *GetApplicationSetting ( "locale" ).Replace( "_", "-" )
+                           );
+
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );
     SString strOptimusInfo = SString("%i_%i_%i", GetApplicationSettingInt ( "nvhacks", "optimus" ), GetApplicationSettingInt ( "nvhacks", "optimus-startup-option" ), GetApplicationSettingInt ( "nvhacks", "optimus-force-windowed" ) );
 
@@ -2971,6 +2979,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "_FILE_", m_JobInfo.strPostFilename );
     strQueryURL = strQueryURL.Replace ( "_SYS_", strSystemStats );
     strQueryURL = strQueryURL.Replace ( "_SYS2_", strSystemStats2 );
+    strQueryURL = strQueryURL.Replace ( "_SYS3_", strSystemStats3 );
     strQueryURL = strQueryURL.Replace ( "_VID_", strVideoCard );
     strQueryURL = strQueryURL.Replace ( "_USAGE_", strConnectUsage );
     strQueryURL = strQueryURL.Replace ( "_SCUT_", strSoundCut );
