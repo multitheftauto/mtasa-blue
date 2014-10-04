@@ -20,6 +20,7 @@ Var CreateDesktopIcon
 Var RegisterProtocol
 Var AddToGameExplorer
 Var RedistInstalled
+Var RedistVC12Installed
 Var ExeMD5
 Var PatchInstalled
 Var DEFAULT_INSTDIR
@@ -247,6 +248,17 @@ Function .onInit
 DontInstallVC9Redist:
 	StrCpy $RedistInstalled "1"
 PostVC90Check:
+
+	; Check if we must install the Microsoft Visual Studio 2013 redistributable
+	ClearErrors
+	ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum" "Install"
+	StrCmp "$0" "1" DontInstallVC12Redist
+	StrCpy $RedistVC12Installed "0"
+	Goto PostVC12Check
+DontInstallVC12Redist:
+	StrCpy $RedistVC12Installed "1"
+PostVC12Check:
+
 	
 	; Try to find previously saved MTA:SA install path
 	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
@@ -441,6 +453,13 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 		StrCmp "$RedistInstalled" "1" DontInstallRedist
 		Abort
 DontInstallRedist:
+
+		StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
+		Call InstallVC12Redistributable
+		StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
+		Abort
+DontInstallRedistVC12:
+
 		SetShellVarContext all
 
 		#############################################################
@@ -711,6 +730,12 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 		StrCmp "$RedistInstalled" "1" DontInstallRedist
 		Abort
 	DontInstallRedist:
+
+		StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
+		Call InstallVC12Redistributable
+		StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
+		Abort
+    DontInstallRedistVC12:
 
 		SetOutPath "$INSTDIR\server"
 		SetOverwrite on
@@ -1032,6 +1057,9 @@ Function SkipDirectoryPage
 	Abort
 FunctionEnd
 
+;====================================================================================
+; Download and install Microsoft Visual Studio 2008 SP1 redistributable
+;====================================================================================
 Var REDIST
 
 LangString MSGBOX_VSRED_ERROR1 ${LANG_ENGLISH}	"Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
@@ -1041,7 +1069,7 @@ $\r$\nHowever installation will continue.\
 $\r$\nPlease reinstall if there are problems later."
 Function InstallVC90Redistributable
 	DetailPrint "Installing Microsoft Visual Studio 2008 SP1 redistributable ..."
-	StrCpy $REDIST "$TEMP\vcredist_x86.exe"
+	StrCpy $REDIST "$TEMP\vcredist9_x86.exe"
 	NSISdl::download "http://download.microsoft.com/download/d/d/9/dd9a82d0-52ef-40db-8dab-795376989c03/vcredist_x86.exe" $REDIST
 	Pop $0
 	StrCmp "$0" "success" DownloadSuccessful
@@ -1053,7 +1081,8 @@ Function InstallVC90Redistributable
 	Goto InstallEnd
 	
 DownloadSuccessful:
-	ExecWait '"$REDIST"'
+    ; /qb! = "Unattended install with no cancel button"
+	ExecWait '"$REDIST" /qb!'
 	ClearErrors
 	ReadRegDWORD $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{9A25302D-30C0-39D9-BD6F-21E6EC160475}" "Version"
 	IfErrors VC90RedistInstallFailed
@@ -1074,6 +1103,58 @@ InstallEnd:
 	StrCmp "$RedistInstalled" "1" InstallEnd2
 	MessageBox MB_ICONSTOP "$(MSGBOX_VSRED_ERROR3)"
 	StrCpy $RedistInstalled "1"
+
+InstallEnd2:
+FunctionEnd
+
+
+;====================================================================================
+; Download and install Microsoft Visual Studio 2013 redistributable
+;====================================================================================
+Var REDISTVC12
+
+LangString MSGBOX_VC12RED_ERROR1 ${LANG_ENGLISH}	"Unable to download Microsoft Visual Studio 2013 redistributable"
+LangString MSGBOX_VC12RED_ERROR2 ${LANG_ENGLISH}	"Unable to install Microsoft Visual Studio 2013 redistributable"
+LangString MSGBOX_VC12RED_ERROR3 ${LANG_ENGLISH}	"Unable to download Microsoft Visual Studio 2013 redistributable.\
+$\r$\nHowever installation will continue.\
+$\r$\nPlease reinstall if there are problems later."
+Function InstallVC12Redistributable
+	DetailPrint "Installing Microsoft Visual Studio 2013 redistributable ..."
+	StrCpy $REDISTVC12 "$TEMP\vcredist12_x86.exe"
+	NSISdl::download "http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe" $REDISTVC12
+	Pop $0
+	StrCmp "$0" "success" DownloadSuccessful
+	
+	DetailPrint "* Download of Microsoft Visual Studio 2013 redistributable failed:"
+	DetailPrint "* $0"
+	DetailPrint "* Installation continuing anyway"
+	MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR1)"
+	Goto InstallEnd
+	
+DownloadSuccessful:
+    ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
+    ; /quiet = 'This option will suppress all UI and perform an install.'
+	ExecWait '"$REDISTVC12" /quiet'
+	ClearErrors
+	ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum" "Install"
+	StrCmp "$0" "1" 0 VC12RedistInstallFailed
+	
+	StrCpy $RedistVC12Installed "1"
+	Goto InstallEnd
+
+VC12RedistInstallFailed:
+	StrCpy $RedistVC12Installed "0"
+	DetailPrint "* Some error occured installing Microsoft Visual Studio 2013 redistributable"
+	DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
+	DetailPrint "* Installation continuing anyway"
+	MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR2)"
+
+	
+InstallEnd:
+
+	StrCmp "$RedistVC12Installed" "1" InstallEnd2
+	MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR3)"
+	StrCpy $RedistVC12Installed "1"
 
 InstallEnd2:
 FunctionEnd
