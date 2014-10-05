@@ -287,6 +287,21 @@ bool CWebCore::CanLoadRemotePages ()
     return bCanLoadRemotePages;
 }
 
+void CWebCore::OnPreScreenshot ()
+{
+    // Clear all textures
+    g_pCore->GetWebCore ()->ClearTextures ();
+}
+
+void CWebCore::OnPostScreenshot ()
+{
+    // Re-draw textures
+    for ( std::list<CefRefPtr<CWebView>>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
+    {
+        (*iter)->GetCefBrowser ()->GetHost ()->Invalidate ( CefBrowserHost::PaintElementType::PET_VIEW );
+    }
+}
+
 void CWebCore::ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
     if ( !m_pFocusedWebView || !( uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_CHAR || uMsg == WM_SYSCHAR || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP ) )

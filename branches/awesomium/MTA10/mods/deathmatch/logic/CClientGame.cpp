@@ -2895,6 +2895,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientBrowserNavigate", "url, mainframe", NULL, false );
     m_Events.AddEvent ( "onClientBrowserPopup", "targeturl, openerurl, ispopup", NULL, false );
     m_Events.AddEvent ( "onClientBrowserCursorChange", "cursor", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserTooltip", "text", NULL, false );
 
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );

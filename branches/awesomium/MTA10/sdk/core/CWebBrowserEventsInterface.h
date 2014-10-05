@@ -20,6 +20,7 @@ public:
     virtual void Events_OnPopup ( const SString& strTargetURL, const SString& strOpenerURL ) = 0;
     virtual void Events_OnChangeCursor ( unsigned char ucCursor ) = 0;
     virtual void Events_OnTriggerEvent ( const SString& strEventName, const std::vector<std::string>& arguments ) = 0;
+    virtual void Events_OnTooltip( const SString& strTooltip ) = 0;
 };
 
 #endif

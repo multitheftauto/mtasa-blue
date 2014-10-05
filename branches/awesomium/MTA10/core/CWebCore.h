@@ -61,6 +61,9 @@ public:
 
     bool                CanLoadRemotePages  ();
 
+    void                OnPreScreenshot     ();
+    void                OnPostScreenshot    ();
+
     bool                InitialiseCoreAudio ();
     bool                SetGlobalAudioVolume( float fVolume );
 

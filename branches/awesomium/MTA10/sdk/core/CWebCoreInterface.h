@@ -62,6 +62,9 @@ public:
 
     virtual bool                CanLoadRemotePages () = 0;
 
+    virtual void                OnPreScreenshot    () = 0;
+    virtual void                OnPostScreenshot   () = 0;
+
     virtual bool                SetGlobalAudioVolume    ( float fVolume ) = 0;
 
     virtual void                WriteCustomBlacklist    ( const std::vector<SString>& customBlacklist ) = 0;

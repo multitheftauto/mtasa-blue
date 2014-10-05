@@ -160,3 +160,10 @@ void CClientWebBrowser::Events_OnTriggerEvent ( const SString& strEventName, con
     bool bWasCancelled;
     CStaticFunctionDefinitions::TriggerEvent ( strEventName, *this, Arguments, bWasCancelled );
 }
+
+void CClientWebBrowser::Events_OnTooltip ( const SString& strTooltip )
+{
+    CLuaArguments Arguments;
+    Arguments.PushString ( strTooltip );
+    CallEvent ( "onClientBrowserTooltip", Arguments, false );
+}

@@ -140,11 +140,21 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Restore in case script forgets
     CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
+    bool bTookScreenShot = false;
+    if ( !CGraphics::GetSingleton ().GetScreenGrabber ()->IsQueueEmpty () )
+    {
+        g_pCore->GetWebCore ()->OnPreScreenshot ();
+        bTookScreenShot = true;
+    }
+
     // Draw pre-GUI primitives
     CGraphics::GetSingleton ().DrawPreGUIQueue ();
 
     // Maybe grab screen for upload
     CGraphics::GetSingleton ().GetScreenGrabber ()->DoPulse ();
+
+    if ( bTookScreenShot )
+        g_pCore->GetWebCore ()->OnPostScreenshot ();
 
     // Draw the GUI
     CLocalGUI::GetSingleton().Draw ();

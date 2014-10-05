@@ -44,9 +44,6 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     
     m_pWebView = CefBrowserHost::CreateBrowserSync ( windowInfo, this, "", browserSettings, NULL );
     m_bBeingDestroyed = false;
-
-    // Set handlers
-    //m_pWebView->set_js_method_handler ( &m_JSMethodHandler );
 }
 
 CWebView::~CWebView()
@@ -473,6 +470,18 @@ bool CWebView::OnFileDialog ( CefRefPtr<CefBrowser> browser, CefDialogHandler::F
 void CWebView::OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& title )
 {
     m_CurrentTitle = UTF16ToMbUTF8 ( title );
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefDisplayHandler::OnTooltip                   //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDisplayHandler.html#OnTooltip(CefRefPtr%3CCefBrowser%3E,CefString&) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+bool CWebView::OnTooltip ( CefRefPtr<CefBrowser> browser, CefString& title )
+{
+    m_pEventsInterface->Events_OnTooltip ( UTF16ToMbUTF8 ( title ) );
+    return true;
 }
 
 
