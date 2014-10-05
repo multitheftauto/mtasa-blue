@@ -766,7 +766,7 @@ bool CKeyBinds::SetCommandActive ( const char* szKey, const char* szCommand, boo
     {
         if ( (*iter)->GetType () == KEY_BIND_COMMAND )
         {
-            if ( !szKey || ( strcmp ( (*iter)->boundKey->szKey, szKey ) == 0 ) )
+            if ( !szKey || ( stricmp ( (*iter)->boundKey->szKey, szKey ) == 0 ) )
             {
                 CCommandBind* pBind = static_cast < CCommandBind* > ( *iter );
                 if ( pBind->szResource && ( strcmp ( pBind->szResource, szResource ) == 0 ) )
