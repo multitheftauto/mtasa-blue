@@ -417,7 +417,7 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        bool bGetAllChildren = uiIndex == -1;
+        bool bGetAllChildren = ( uiIndex == (uint)-1 );
         if ( !bGetAllChildren )
         {
             CXMLNode* pFoundNode = pNode->GetSubNode ( uiIndex );

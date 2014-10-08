@@ -171,12 +171,8 @@ public:
     float                                       GetMaxHealth                ( void );
     inline float                                GetHealth                   ( void )                            { return m_fHealth; }
     inline void                                 SetHealth                   ( float fHealth )                   { m_fHealth = fHealth; }
-    inline unsigned long                        GetHealthChangeTime         ( void )                            { return m_ulHealthChangeTime; }
-    inline void                                 SetHealthChangeTime         ( unsigned long ulTime )            { m_ulHealthChangeTime = ulTime; }
     inline float                                GetArmor                    ( void )                            { return m_fArmor; }
     inline void                                 SetArmor                    ( float fArmor )                    { m_fArmor = fArmor; }
-    inline unsigned long                        GetArmorChangeTime          ( void )                            { return m_ulArmorChangeTime; }
-    inline void                                 SetArmorChangeTime          ( unsigned long ulTime )            { m_ulArmorChangeTime = ulTime; }
     
     inline float                                GetPlayerStat               ( unsigned short usStat )       { return ( usStat < NUM_PLAYER_STATS ) ? m_fStats [ usStat ] : 0; }
     inline void                                 SetPlayerStat               ( unsigned short usStat, float fValue ) { if ( usStat < NUM_PLAYER_STATS ) m_fStats [ usStat ] = fValue; } 
@@ -274,9 +270,7 @@ protected:
     bool                                        m_bWearingGoggles;
     bool                                        m_bIsOnFire;
     float                                       m_fHealth;
-    unsigned long                               m_ulHealthChangeTime;
     float                                       m_fArmor;
-    unsigned long                               m_ulArmorChangeTime;
     SFixedArray < float, NUM_PLAYER_STATS >    m_fStats;
     CPlayerClothes*                             m_pClothes;
     bool                                        m_bHasJetPack;
