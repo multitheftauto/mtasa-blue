@@ -82,13 +82,6 @@ void CPedSync::RemovePed ( CClientPed* pPed )
 }
 
 
-void CPedSync::ClearPeds ( void )
-{
-    // Clear the list
-    m_List.clear ();
-}
-
-
 bool CPedSync::Exists ( CClientPed* pPed )
 {
     return m_List.Contains ( pPed );

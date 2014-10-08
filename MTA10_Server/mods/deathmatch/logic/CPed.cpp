@@ -34,9 +34,7 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_bWearingGoggles = false;
 
     m_fHealth = 0.0f;
-    m_ulHealthChangeTime = 0;
     m_fArmor = 0.0f;
-    m_ulArmorChangeTime = 0;
     
     memset ( &m_fStats[0], 0, sizeof ( m_fStats ) );
     m_fStats [ 24 ] = 569.0f;           // default max_health

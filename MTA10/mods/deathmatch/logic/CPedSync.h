@@ -27,7 +27,6 @@ public:
 
     void                            AddPed                              ( CClientPed* pPed );
     void                            RemovePed                           ( CClientPed* pPed );
-    void                            ClearPeds                           ( void );
 
     inline std::list < CClientPed* > ::const_iterator
                                     IterBegin                           ( void )    { return m_List.begin (); };

@@ -95,12 +95,12 @@ HttpResponse * CHTTPD::RouteRequest ( HttpRequest * ipoHttpRequest )
 {
     if ( !g_pGame->IsServerFullyUp () )
     {
-		// create an HttpRespose object for the message
-		HttpResponse* poHttpResponse = new HttpResponse ( ipoHttpRequest->m_nRequestId, ipoHttpRequest->m_poSourceEHSConnection );
+        // create an HttpRespose object for the message
+        HttpResponse* poHttpResponse = new HttpResponse ( ipoHttpRequest->m_nRequestId, ipoHttpRequest->m_poSourceEHSConnection );
         SStringX strWait ( "The server is not ready. Please try again in a minute." );
         poHttpResponse->SetBody ( strWait.c_str (), strWait.size () );
-		poHttpResponse->m_nResponseCode = HTTPRESPONSECODE_200_OK;
-		return poHttpResponse;
+        poHttpResponse->m_nResponseCode = HTTPRESPONSECODE_200_OK;
+        return poHttpResponse;
     }
 
     // Sync with main thread before routing (to a resource)
