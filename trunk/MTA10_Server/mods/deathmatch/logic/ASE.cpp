@@ -458,7 +458,7 @@ std::string ASE::QueryLight ( void )
     CPlayer* pPlayer = NULL;
 
     // Keep the packet under 1350 bytes to try to avoid fragmentation 
-    int iBytesLeft = 1340 - reply.tellp ();
+    int iBytesLeft = 1340 - (int)reply.tellp ();
     int iPlayersLeft = iJoinedPlayers;
 
     list < CPlayer* > ::const_iterator pIter = m_pPlayerManager->IterBegin ();
