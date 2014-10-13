@@ -328,6 +328,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setTrainDerailed", "setTrainDerailed" );
     lua_classfunction ( luaVM, "setHeadLightColor", "setVehicleHeadLightColor" );
     lua_classfunction ( luaVM, "setColor", "setVehicleColor" );
+	lua_classfunction ( luaVM, "setPlateText", "setVehiclePlateText" );
     lua_classfunction ( luaVM, "setGravity", "setVehicleGravity" );
     
     lua_classfunction ( luaVM, "resetComponentPosition", "resetVehicleComponentPosition" );
@@ -356,7 +357,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "compatibleUpgrades", NULL, "getVehicleCompatibleUpgrades" );
     lua_classvariable ( luaVM, "adjustableProperty", "setVehicleAdjustableProperty", "getVehicleAdjustableProperty" );
     lua_classvariable ( luaVM, "dirtLevel", "setVehicleDirtLevel", NULL );
-    lua_classvariable ( luaVM, "plateText", NULL, "getVehiclePlateText" );
+    lua_classvariable ( luaVM, "plateText", "setVehiclePlateText", "getVehiclePlateText" );
     lua_classvariable ( luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable" );
     lua_classvariable ( luaVM, "engineState", "setVehicleEngineState", "getVehicleEngineState" );
     lua_classvariable ( luaVM, "landingGearDown", "setVehicleLandingGearDown", "getVehicleLandingGearDown" );
