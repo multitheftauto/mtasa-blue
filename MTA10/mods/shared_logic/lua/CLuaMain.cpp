@@ -328,7 +328,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setTrainDerailed", "setTrainDerailed" );
     lua_classfunction ( luaVM, "setHeadLightColor", "setVehicleHeadLightColor" );
     lua_classfunction ( luaVM, "setColor", "setVehicleColor" );
-	lua_classfunction ( luaVM, "setPlateText", "setVehiclePlateText" );
+    lua_classfunction ( luaVM, "setPlateText", "setVehiclePlateText" );
     lua_classfunction ( luaVM, "setGravity", "setVehicleGravity" );
     
     lua_classfunction ( luaVM, "resetComponentPosition", "resetVehicleComponentPosition" );
