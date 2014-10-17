@@ -900,6 +900,7 @@ HRESULT CProxyDirect3DDevice9::GetStreamSourceFreq            ( UINT StreamNumbe
 
 HRESULT CProxyDirect3DDevice9::SetIndices                     ( IDirect3DIndexBuffer9* pIndexData )
 {
+    CloseActiveShader();
     DeviceState.IndexBufferData = pIndexData;
     return m_pDevice->SetIndices ( CDirect3DEvents9::GetRealIndexBuffer ( pIndexData ) );
 }
