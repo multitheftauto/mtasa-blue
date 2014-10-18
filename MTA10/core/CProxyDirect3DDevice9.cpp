@@ -16,6 +16,7 @@ bool g_bInGTAScene = false;
 CProxyDirect3DDevice9* g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
 void CloseActiveShader( void );
+void OnSetRenderState( D3DRENDERSTATETYPE State );
 
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
@@ -633,7 +634,10 @@ HRESULT CProxyDirect3DDevice9::GetClipPlane                   ( DWORD Index,floa
 HRESULT CProxyDirect3DDevice9::SetRenderState                 ( D3DRENDERSTATETYPE State,DWORD Value )
 {
     if ( State < NUMELMS( DeviceState.RenderState.Raw ) )
+    {
+        OnSetRenderState( State );
         DeviceState.RenderState.Raw[State] = Value;
+    }
     return m_pDevice->SetRenderState ( State, Value );
 }
 

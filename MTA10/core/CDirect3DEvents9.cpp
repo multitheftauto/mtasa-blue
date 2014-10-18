@@ -33,6 +33,7 @@ static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
 
 // To reuse shader setups between calls to DrawIndexedPrimitive
 CShaderItem* g_pActiveShader = NULL;
+static std::set < D3DRENDERSTATETYPE > ms_StatesToRestoreMap;
 void CloseActiveShader( void );
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
@@ -577,6 +578,41 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
 
 /////////////////////////////////////////////////////////////
 //
+// OnSetRenderState
+//
+// Remember what states were set while a shader is active,
+// because when the shader is ended, they might be lost.
+//
+/////////////////////////////////////////////////////////////
+void OnSetRenderState( D3DRENDERSTATETYPE State )
+{
+    if ( g_pActiveShader )
+        MapInsert( ms_StatesToRestoreMap, State );
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// RestoreRenderStates
+//
+// Re-poke render states that might have been lost
+//
+/////////////////////////////////////////////////////////////
+void RestoreRenderStates( void )
+{
+    IDirect3DDevice9* pDevice = g_pGraphics->GetDevice();
+    for( std::set < D3DRENDERSTATETYPE >::iterator iter = ms_StatesToRestoreMap.begin() ; iter != ms_StatesToRestoreMap.end() ; ++iter )
+    {
+        D3DRENDERSTATETYPE State = *iter;
+        DWORD Value = g_pDeviceState->RenderState.Raw[State];
+        pDevice->SetRenderState ( State, Value );
+    }
+    ms_StatesToRestoreMap.clear();
+}
+
+
+/////////////////////////////////////////////////////////////
+//
 // CloseActiveShader
 //
 // Finish the active shader if there is one
@@ -603,6 +639,8 @@ void CloseActiveShader( void )
     CAdditionalVertexStreamManager::GetSingleton ()->MaybeUnsetAdditionalVertexStream ();
 
     g_pDeviceState->CallState.strShaderName = "";
+
+    RestoreRenderStates();
 }
 
 
