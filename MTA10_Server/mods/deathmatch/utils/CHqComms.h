@@ -48,7 +48,12 @@ public:
             strUrlParams += SString( "&gport=%d", g_pGame->GetConfig()->GetServerPort() );
             strUrlParams += SString( "&version=%s", *CStaticFunctionDefinitions::GetVersionSortable() );
             strUrlParams += SString( "&minclientautoupdate=%d", g_pGame->GetConfig()->GetMinClientVersionAutoUpdate() );
+            strUrlParams += SString( "&minclientversion=%s", *g_pGame->GetConfig()->GetMinClientVersion() );
             strUrlParams += SString( "&badscriptrev=%d", m_iPrevBadFileHashesRev );
+            strUrlParams += SString( "&maxplayers=%d", g_pGame->GetConfig()->GetHardMaxPlayers() );
+            strUrlParams += SString( "&numplayers=%d", g_pGame->GetPlayerManager()->Count() );
+            strUrlParams += SString( "&asepush=%d", g_pGame->GetConfig()->GetAseInternetPushEnabled() );
+            strUrlParams += SString( "&aselisten=%d", g_pGame->GetConfig()->GetAseInternetListenEnabled() );
 
             SString strCrashInfo;
             FileLoad( m_strCrashInfoFilename, strCrashInfo );

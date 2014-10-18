@@ -1232,6 +1232,7 @@ void CVehicleSA::SetColor ( SColor color1, SColor color2, SColor color3, SColor 
             || color == 0x00FFFF
             || color == 0xFF00AF
             || color == 0xFFAF00
+            || color == 0xB9FF00
             || color == 0xFF3C00
             || color == 0x3CFF00 )
             m_RGBColorsFixed[i].ulARGB |= 0x010101;
