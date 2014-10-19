@@ -15,8 +15,6 @@
 bool g_bInGTAScene = false;
 CProxyDirect3DDevice9* g_pProxyDevice = NULL;
 CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState = NULL;
-void CloseActiveShader( void );
-void OnSetRenderState( D3DRENDERSTATETYPE State );
 
 // Proxy constructor and destructor.
 CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
@@ -291,7 +289,6 @@ HRESULT DoResetDevice( IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresen
 
 HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAMETERS* pPresentationParameters )
 {
-    CloseActiveShader();
     WriteDebugEvent ( "CProxyDirect3DDevice9::Reset" );
 
     // Save presentation parameters
@@ -367,8 +364,10 @@ HRESULT CProxyDirect3DDevice9::Reset                          ( D3DPRESENT_PARAM
 
 HRESULT CProxyDirect3DDevice9::Present                        ( CONST RECT* pSourceRect,CONST RECT* pDestRect,HWND hDestWindowOverride,CONST RGNDATA* pDirtyRegion )
 {
-    CloseActiveShader();
     CDirect3DEvents9::OnPresent ( m_pDevice );
+
+    // Reset frame stat counters
+    memset( &DeviceState.FrameStats, 0, sizeof( DeviceState.FrameStats ) );
 
     // A fog flicker fix for some ATI cards
     D3DMATRIX projMatrix;
@@ -479,7 +478,6 @@ HRESULT CProxyDirect3DDevice9::CreateOffscreenPlainSurface    ( UINT Width,UINT 
 
 HRESULT CProxyDirect3DDevice9::SetRenderTarget                ( DWORD RenderTargetIndex,IDirect3DSurface9* pRenderTarget )
 {
-    CloseActiveShader();
     return m_pDevice->SetRenderTarget ( RenderTargetIndex, pRenderTarget );
 }
 
@@ -500,7 +498,6 @@ HRESULT CProxyDirect3DDevice9::GetDepthStencilSurface         ( IDirect3DSurface
 
 HRESULT CProxyDirect3DDevice9::BeginScene                     ( VOID )
 {
-    CloseActiveShader();
     HRESULT hResult;
 
     // Call the real routine.
@@ -527,7 +524,6 @@ HRESULT CProxyDirect3DDevice9::BeginScene                     ( VOID )
 
 HRESULT CProxyDirect3DDevice9::EndScene                       ( VOID )
 {
-    CloseActiveShader();
     // Call our event handler.
     if ( CDirect3DEvents9::OnEndScene ( m_pDevice ) )
     {
@@ -634,10 +630,7 @@ HRESULT CProxyDirect3DDevice9::GetClipPlane                   ( DWORD Index,floa
 HRESULT CProxyDirect3DDevice9::SetRenderState                 ( D3DRENDERSTATETYPE State,DWORD Value )
 {
     if ( State < NUMELMS( DeviceState.RenderState.Raw ) )
-    {
-        OnSetRenderState( State );
         DeviceState.RenderState.Raw[State] = Value;
-    }
     return m_pDevice->SetRenderState ( State, Value );
 }
 
@@ -678,7 +671,7 @@ HRESULT CProxyDirect3DDevice9::GetTexture                     ( DWORD Stage,IDir
 
 HRESULT CProxyDirect3DDevice9::SetTexture                     ( DWORD Stage,IDirect3DBaseTexture9* pTexture )
 {
-    CloseActiveShader();
+    CDirect3DEvents9::CloseActiveShader();
     if ( Stage < NUMELMS( DeviceState.TextureState ) )
         DeviceState.TextureState[Stage].Texture = pTexture;
     return m_pDevice->SetTexture ( Stage, CDirect3DEvents9::GetRealTexture ( pTexture ) );
@@ -686,13 +679,11 @@ HRESULT CProxyDirect3DDevice9::SetTexture                     ( DWORD Stage,IDir
 
 HRESULT CProxyDirect3DDevice9::GetTextureStageState           ( DWORD Stage,D3DTEXTURESTAGESTATETYPE Type,DWORD* pValue )
 {
-    CloseActiveShader();
     return m_pDevice->GetTextureStageState ( Stage, Type, pValue );
 }
 
 HRESULT CProxyDirect3DDevice9::SetTextureStageState           ( DWORD Stage,D3DTEXTURESTAGESTATETYPE Type,DWORD Value )
 {
-    CloseActiveShader();
     if ( Stage < NUMELMS( DeviceState.StageState ) )
         if ( Type < NUMELMS( DeviceState.StageState[Stage].Raw ) )
             DeviceState.StageState[Stage].Raw[Type] = Value;
@@ -706,7 +697,6 @@ HRESULT CProxyDirect3DDevice9::GetSamplerState                ( DWORD Sampler,D3
 
 HRESULT CProxyDirect3DDevice9::SetSamplerState                ( DWORD Sampler,D3DSAMPLERSTATETYPE Type,DWORD Value )
 {
-    CloseActiveShader();
     if ( Sampler < NUMELMS( DeviceState.SamplerState ) )
         if ( Type < NUMELMS( DeviceState.SamplerState[Sampler].Raw ) )
             DeviceState.SamplerState[Sampler].Raw[Type] = Value;
@@ -807,7 +797,6 @@ HRESULT CProxyDirect3DDevice9::CreateVertexDeclaration        ( CONST D3DVERTEXE
 
 HRESULT CProxyDirect3DDevice9::SetVertexDeclaration           ( IDirect3DVertexDeclaration9* pDecl )
 {
-    CloseActiveShader();
     DeviceState.VertexDeclaration = pDecl;
     return CDirect3DEvents9::SetVertexDeclaration ( m_pDevice, pDecl );
 }
@@ -819,7 +808,6 @@ HRESULT CProxyDirect3DDevice9::GetVertexDeclaration           ( IDirect3DVertexD
 
 HRESULT CProxyDirect3DDevice9::SetFVF                         ( DWORD FVF )
 {
-    CloseActiveShader();
     return m_pDevice->SetFVF ( FVF );
 }
 
@@ -835,7 +823,6 @@ HRESULT CProxyDirect3DDevice9::CreateVertexShader             ( CONST DWORD* pFu
 
 HRESULT CProxyDirect3DDevice9::SetVertexShader                ( IDirect3DVertexShader9* pShader )
 {
-    CloseActiveShader();
     DeviceState.VertexShader = pShader;
     return m_pDevice->SetVertexShader ( pShader );
 }
@@ -877,7 +864,6 @@ HRESULT CProxyDirect3DDevice9::GetVertexShaderConstantB       ( UINT StartRegist
 
 HRESULT CProxyDirect3DDevice9::SetStreamSource                ( UINT StreamNumber,IDirect3DVertexBuffer9* pStreamData,UINT OffsetInBytes,UINT Stride )
 {
-    CloseActiveShader();
     if ( StreamNumber < NUMELMS( DeviceState.VertexStreams ) )
     {
         DeviceState.VertexStreams[StreamNumber].StreamData = pStreamData;
@@ -904,7 +890,6 @@ HRESULT CProxyDirect3DDevice9::GetStreamSourceFreq            ( UINT StreamNumbe
 
 HRESULT CProxyDirect3DDevice9::SetIndices                     ( IDirect3DIndexBuffer9* pIndexData )
 {
-    CloseActiveShader();
     DeviceState.IndexBufferData = pIndexData;
     return m_pDevice->SetIndices ( CDirect3DEvents9::GetRealIndexBuffer ( pIndexData ) );
 }
@@ -921,7 +906,6 @@ HRESULT CProxyDirect3DDevice9::CreatePixelShader              ( CONST DWORD* pFu
 
 HRESULT CProxyDirect3DDevice9::SetPixelShader                 ( IDirect3DPixelShader9* pShader )
 {
-    CloseActiveShader();
     DeviceState.PixelShader = pShader;
     return m_pDevice->SetPixelShader ( pShader );
 }

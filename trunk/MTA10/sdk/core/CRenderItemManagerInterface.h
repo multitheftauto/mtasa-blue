@@ -302,8 +302,8 @@ class CEffectWrap : public CRenderItem
 {
     DECLARE_CLASS( CEffectWrap, CRenderItem )
                     CEffectWrap             ( void ) : ClassInit ( this ) {}
-    virtual void    ApplyCommonHandles      ( void ) = 0;
-    virtual void    ApplyMappedHandles      ( void ) = 0;
+    virtual bool    ApplyCommonHandles      ( void ) = 0;
+    virtual bool    ApplyMappedHandles      ( void ) = 0;
     virtual void    ReadParameterHandles    ( void ) = 0;
 
     ID3DXEffect*    m_pD3DEffect;
@@ -314,6 +314,7 @@ class CEffectWrap : public CRenderItem
     D3DXHANDLE      hLightAmbient, hLightDiffuse, hLightSpecular, hLightDirection;
     D3DXHANDLE      hDepthBuffer;
     D3DXHANDLE      hViewMainScene, hWorldMainScene, hProjectionMainScene;
+    bool            m_bUsesCommonHandles;
 
     std::map < SString, D3DXHANDLE > m_texureHandleMap;
     std::map < SString, D3DXHANDLE > m_valueHandleMap;

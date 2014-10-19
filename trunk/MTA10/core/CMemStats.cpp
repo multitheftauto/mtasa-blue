@@ -441,6 +441,7 @@ void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
     // Update 'now' state
     //
     memStatsInfo.d3dMemory = g_pDeviceState->MemoryState;
+    memStatsInfo.frameStats = g_pDeviceState->FrameStats;
 
     g_pGraphics->GetRenderItemManager ()->GetDxStatus ( memStatsInfo.dxStatus );
 
@@ -894,6 +895,8 @@ void CMemStats::CreateTables ( void )
         table.AddRow ( HEADER1( "World shader replacements" ) "|" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
         table.AddRow ( SString ( "World texture draws|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiNumReplacementRequests, m_MemStatsNow.shaderReplacementStats.uiNumReplacementRequests ) );
         table.AddRow ( SString ( "World shader draws|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiNumReplacementMatches, m_MemStatsNow.shaderReplacementStats.uiNumReplacementMatches ) );
+        table.AddRow ( SString ( "World shader full setup|^1~ %d|%d", m_MemStatsDelta.frameStats.iNumShadersFullSetup, m_MemStatsNow.frameStats.iNumShadersFullSetup ) );
+        table.AddRow ( SString ( "World shader reuse setup|^1~ %d|%d", m_MemStatsDelta.frameStats.iNumShadersReuseSetup, m_MemStatsNow.frameStats.iNumShadersReuseSetup ) );
         table.AddRow ( SString ( "World texture total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalTextures, m_MemStatsNow.shaderReplacementStats.uiTotalTextures ) );
         table.AddRow ( SString ( "World shader total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalShaders, m_MemStatsNow.shaderReplacementStats.uiTotalShaders ) );
         table.AddRow ( SString ( "Known entities|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalEntitesRefed, m_MemStatsNow.shaderReplacementStats.uiTotalEntitesRefed ) );

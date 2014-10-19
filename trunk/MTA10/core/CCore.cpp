@@ -2358,3 +2358,9 @@ bool CCore::GetDeviceSelectionEnabled( void )
 {
     return GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
 }
+
+void CCore::NotifyRenderingGrass( bool bIsRenderingGrass )
+{
+    m_bIsRenderingGrass = bIsRenderingGrass;
+    CDirect3DEvents9::CloseActiveShader();
+}

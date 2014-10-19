@@ -148,7 +148,11 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
             if ( !phHandle )
                 phHandle = MapFind ( m_pEffectWrap->m_texureHandleMap, parts[n] );
         }
-        handleNames[h].hHandle = phHandle ? *phHandle : NULL;
+        if ( phHandle )
+        {
+            handleNames[h].hHandle = *phHandle;
+            m_pEffectWrap->m_bUsesCommonHandles = true;
+        }
     }
 
     m_pManager->NotifyShaderItemUsesDepthBuffer ( this, m_pEffectWrap->m_bUsesDepthBuffer );
