@@ -33,8 +33,6 @@ static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
 
 // To reuse shader setups between calls to DrawIndexedPrimitive
 CShaderItem* g_pActiveShader = NULL;
-static std::set < D3DRENDERSTATETYPE > ms_StatesToRestoreMap;
-void CloseActiveShader( void );
 
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
 {
@@ -406,16 +404,14 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
             pDevice->SetSamplerState ( 0, D3DSAMP_MAXANISOTROPY, ms_RequiredAnisotropicLevel );
     }
 
-    // Any shader for this texture ?
-    SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
-
     // See if we can continue using the active shader
     if ( g_pActiveShader )
     {
-        if ( pLayers && g_pActiveShader == pLayers->pBase && pLayers->layerList.empty() )
-            return DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, g_pActiveShader, false, false );
-        CloseActiveShader();
+        return DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, g_pActiveShader, false, false );
     }
+
+    // Any shader for this texture ?
+    SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
     // Skip draw if there is a vertex shader conflict
     if ( pLayers && pLayers->bUsesVertexShader && g_pDeviceState->VertexShader )
@@ -502,8 +498,18 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
         if ( g_pActiveShader )
         {
             dassert( pShaderItem == g_pActiveShader );
+            g_pDeviceState->FrameStats.iNumShadersReuseSetup++;
+
+            // Transfer any state changes to the active shader
+            CShaderInstance* pShaderInstance = g_pActiveShader->m_pShaderInstance;
+            bool bChanged = pShaderInstance->m_pEffectWrap->ApplyCommonHandles ();
+            bChanged |= pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
+            if ( bChanged )
+                pShaderInstance->m_pEffectWrap->m_pD3DEffect->CommitChanges();
+
             return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
         }
+        g_pDeviceState->FrameStats.iNumShadersFullSetup++;
 
         // Yes shader for this texture
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
@@ -547,7 +553,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
 
             DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
 
-            if ( uiNumPasses == 1 && bCanBecomeActiveShader && pOriginalVertexShader == NULL )
+            if ( uiNumPasses == 1 && bCanBecomeActiveShader && pOriginalVertexShader == NULL && g_pCore->IsRenderingGrass() )
             {
                 // Make this the active shader for possible reuse
                 dassert( dwFlags == D3DXFX_DONOTSAVESHADERSTATE );
@@ -578,47 +584,12 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
 
 /////////////////////////////////////////////////////////////
 //
-// OnSetRenderState
-//
-// Remember what states were set while a shader is active,
-// because when the shader is ended, they might be lost.
-//
-/////////////////////////////////////////////////////////////
-void OnSetRenderState( D3DRENDERSTATETYPE State )
-{
-    if ( g_pActiveShader )
-        MapInsert( ms_StatesToRestoreMap, State );
-}
-
-
-/////////////////////////////////////////////////////////////
-//
-// RestoreRenderStates
-//
-// Re-poke render states that might have been lost
-//
-/////////////////////////////////////////////////////////////
-void RestoreRenderStates( void )
-{
-    IDirect3DDevice9* pDevice = g_pGraphics->GetDevice();
-    for( std::set < D3DRENDERSTATETYPE >::iterator iter = ms_StatesToRestoreMap.begin() ; iter != ms_StatesToRestoreMap.end() ; ++iter )
-    {
-        D3DRENDERSTATETYPE State = *iter;
-        DWORD Value = g_pDeviceState->RenderState.Raw[State];
-        pDevice->SetRenderState ( State, Value );
-    }
-    ms_StatesToRestoreMap.clear();
-}
-
-
-/////////////////////////////////////////////////////////////
-//
-// CloseActiveShader
+// CDirect3DEvents9::CloseActiveShader
 //
 // Finish the active shader if there is one
 //
 /////////////////////////////////////////////////////////////
-void CloseActiveShader( void )
+void CDirect3DEvents9::CloseActiveShader( void )
 {
     if ( !g_pActiveShader )
         return;
@@ -639,8 +610,6 @@ void CloseActiveShader( void )
     CAdditionalVertexStreamManager::GetSingleton ()->MaybeUnsetAdditionalVertexStream ();
 
     g_pDeviceState->CallState.strShaderName = "";
-
-    RestoreRenderStates();
 }
 
 

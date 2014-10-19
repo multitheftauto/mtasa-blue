@@ -167,6 +167,7 @@ public:
     virtual HRESULT                 OnPostCreateDevice              ( HRESULT hResult, IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface ) = 0;
     virtual bool                    GetDeviceSelectionEnabled       ( void ) = 0;
     virtual bool                    GetRequiredDisplayResolution    ( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions ) = 0;
+    virtual void                    NotifyRenderingGrass            ( bool bIsRenderingGrass ) = 0;
 };
 
 class CClientTime

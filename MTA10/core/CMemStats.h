@@ -24,6 +24,7 @@ struct SMemStatsInfo
     ZERO_ON_NEW
 
     CProxyDirect3DDevice9::SMemoryState d3dMemory;
+    CProxyDirect3DDevice9::SFrameStats frameStats;
     SDxStatus dxStatus;
     int iProcessMemSizeKB;
     int iProcessTotalVirtualKB;
