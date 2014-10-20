@@ -30,6 +30,13 @@ enum eWebFilterType
     WEBFILTER_REQUEST
 };
 
+enum eWebFilterState
+{
+    WEBFILTER_ALL,
+    WEBFILTER_ALLOWED,
+    WEBFILTER_DISALLOWED
+};
+
 enum eWebBrowserMouseButton
 {
     BROWSER_MOUSEBUTTON_LEFT = 0,
@@ -47,7 +54,7 @@ public:
     virtual void                ResetFilter        ( bool bResetRequestsOnly ) = 0;
     //virtual void                AddAllowedPage     ( const SString& strURL ) = 0;
     virtual void                RequestPages       ( const std::vector<SString>& pages ) = 0;
-    virtual void                AllowPendingPages  () = 0;
+    virtual void                AllowPendingPages  ( bool bRemember ) = 0;
     virtual void                DenyPendingPages   () = 0;
 
     virtual bool                IsTestModeEnabled  () = 0;
@@ -67,8 +74,8 @@ public:
 
     virtual bool                SetGlobalAudioVolume    ( float fVolume ) = 0;
 
-    virtual void                WriteCustomBlacklist    ( const std::vector<SString>& customBlacklist ) = 0;
-    virtual void                GetFilterEntriesByType  ( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType ) = 0;
+    virtual void                WriteCustomList    ( const SString& strListName, const std::vector<SString>& customList, bool bReset = true ) = 0;
+    virtual void                GetFilterEntriesByType  ( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType, eWebFilterState state = eWebFilterState::WEBFILTER_ALL ) = 0;
 };
 
 #endif

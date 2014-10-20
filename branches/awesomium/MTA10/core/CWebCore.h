@@ -45,7 +45,7 @@ public:
     void                AddAllowedPage      ( const SString& strURL, eWebFilterType filterType );
     void                AddBlockedPage      ( const SString& strURL, eWebFilterType filterType );
     void                RequestPages        ( const std::vector<SString>& pages );
-    void                AllowPendingPages   ();
+    void                AllowPendingPages   ( bool bRemember );
     void                DenyPendingPages    ();
     
     void                InitialiseCursors   ();
@@ -69,9 +69,9 @@ public:
 
     bool                UpdateListsFromMaster();
     bool                MakeSureXMLNodesExist();
-    void                LoadListsFromXML     ( bool bWhitelist, bool bBlacklist, bool bCustomBlacklist );
-    void                WriteCustomBlacklist ( const std::vector<SString>& customBlacklist );
-    void                GetFilterEntriesByType( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType );
+    void                LoadListsFromXML     ( bool bWhitelist, bool bBlacklist, bool bCustomLists );
+    void                WriteCustomList     ( const SString& strListName, const std::vector<SString>& customList, bool bReset = true );
+    void                GetFilterEntriesByType( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType, eWebFilterState state = eWebFilterState::WEBFILTER_ALL );
     static bool         StaticFetchRevisionProgress  ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
     static bool         StaticFetchWhitelistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
     static bool         StaticFetchBlacklistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );

@@ -25,6 +25,7 @@ CWebCore::CWebCore ()
     m_pXmlConfig = NULL;
     m_pFocusedWebView = NULL;
 
+    MakeSureXMLNodesExist ();
     InitialiseWhiteAndBlacklist ();
     InitialiseCursors ();
 
@@ -242,16 +243,27 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages )
     }
 }
 
-void CWebCore::AllowPendingPages ()
+void CWebCore::AllowPendingPages ( bool bRemember )
 {
     for ( std::vector<SString>::iterator iter = m_PendingRequests.begin(); iter != m_PendingRequests.end(); ++iter )
     {
-        AddAllowedPage ( *iter, eWebFilterType::WEBFILTER_REQUEST );
+        AddAllowedPage ( *iter, !bRemember ? eWebFilterType::WEBFILTER_REQUEST : eWebFilterType::WEBFILTER_USER );
     }
 
     // Trigger an event now
-    CModManager::GetSingleton().GetCurrentMod()->WebsiteRequestResultHandler ( m_PendingRequests );
+    CModManager::GetSingleton ().GetCurrentMod ()->WebsiteRequestResultHandler ( m_PendingRequests );
     m_PendingRequests.clear ();
+
+    if ( bRemember )
+    {
+        std::vector<std::pair<SString, bool>> result; // Contains only allowed entries
+        CCore::GetSingleton ().GetWebCore ()->GetFilterEntriesByType ( result, eWebFilterType::WEBFILTER_USER, eWebFilterState::WEBFILTER_ALLOWED );
+        std::vector<SString> customWhitelist;
+        for ( std::vector<std::pair<SString, bool>>::iterator iter = result.begin (); iter != result.end (); ++iter )
+            customWhitelist.push_back ( iter->first );
+
+        WriteCustomList ( "customwhitelist", customWhitelist, false );
+    }
 }
 
 void CWebCore::DenyPendingPages ()
@@ -402,18 +414,8 @@ bool CWebCore::SetGlobalAudioVolume ( float fVolume )
 
 bool CWebCore::UpdateListsFromMaster ()
 {
-    m_pXmlConfig = g_pCore->GetXML()->CreateXML ( CalcMTASAPath ( MTA_BROWSERDATA_PATH ) );
     if ( !m_pXmlConfig )
         return false;
-
-    // Try parsing the xml file (create a new one if something went wrong)
-    if ( !m_pXmlConfig->Parse () )
-    {
-        // Start with an entire new one
-        m_pXmlConfig->Clear ();
-        if ( !m_pXmlConfig->CreateRootNode ( "browserdata" ) )
-            return false;
-    }
 
     CXMLNode* pRootNode = m_pXmlConfig->GetRootNode ();
     if ( !pRootNode || !MakeSureXMLNodesExist () )
@@ -463,7 +465,7 @@ bool CWebCore::MakeSureXMLNodesExist ()
     {
         m_pXmlConfig = g_pCore->GetXML ()->CreateXML ( CalcMTASAPath ( MTA_BROWSERDATA_PATH ) );
 
-        if ( !m_pXmlConfig )
+        if ( !m_pXmlConfig || !m_pXmlConfig->Parse () )
             return false;
     }
 
@@ -514,10 +516,16 @@ bool CWebCore::MakeSureXMLNodesExist ()
             return false;
     }
 
+    if ( !pRootNode->FindSubNode ( "customwhitelist" ) )
+    {
+        if ( !pRootNode->CreateSubNode ( "customwhitelist" ) )
+            return false;
+    }
+
     return true;
 }
 
-void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustomBlacklist )
+void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustomLists )
 {
     if ( !m_pXmlConfig )
         return;
@@ -550,7 +558,7 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
         }
     }
 
-    if ( bCustomBlacklist )
+    if ( bCustomLists )
     {
         CXMLNode* pBlackSubNode = pRootNode->FindSubNode ( "customblacklist" );
         if ( pBlackSubNode )
@@ -560,10 +568,18 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
                 AddBlockedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_USER );
             }
         }
+        CXMLNode* pWhiteSubNode = pRootNode->FindSubNode ( "customwhitelist" );
+        if ( pWhiteSubNode )
+        {
+            for ( std::list<CXMLNode*>::iterator iter = pWhiteSubNode->ChildrenBegin (); iter != pWhiteSubNode->ChildrenEnd (); ++iter )
+            {
+                AddAllowedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_USER );
+            }
+        }
     }
 }
 
-void CWebCore::WriteCustomBlacklist ( const std::vector<SString>& customBlacklist )
+void CWebCore::WriteCustomList ( const SString& strListName, const std::vector<SString>& customList, bool bReset )
 {
     if ( !m_pXmlConfig || !MakeSureXMLNodesExist () )
         return;
@@ -572,30 +588,38 @@ void CWebCore::WriteCustomBlacklist ( const std::vector<SString>& customBlacklis
     if ( !pRootNode )
         return;
 
-    CXMLNode* pCustomBlacklistNode = pRootNode->FindSubNode ( "customblacklist" );
-    if ( !pCustomBlacklistNode )
+    CXMLNode* pCustomListNode = pRootNode->FindSubNode ( strListName );
+    if ( !pCustomListNode )
         return;
 
-    pCustomBlacklistNode->DeleteAllSubNodes();
-    for ( std::vector<SString>::const_iterator iter = customBlacklist.begin (); iter != customBlacklist.end (); ++iter )
+    pCustomListNode->DeleteAllSubNodes();
+    for ( std::vector<SString>::const_iterator iter = customList.begin (); iter != customList.end (); ++iter )
     {
-        CXMLNode* pNode = pCustomBlacklistNode->CreateSubNode ( "url" );
+        CXMLNode* pNode = pCustomListNode->CreateSubNode ( "url" );
         if ( pNode )
             pNode->SetTagContent ( *iter );
     }
 
     // Write custom blacklist and reload from XML
     m_pXmlConfig->Write ();
-    ResetFilter ( true );
+    if ( bReset )
+        ResetFilter ( false );
 }
 
-void CWebCore::GetFilterEntriesByType ( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType )
+void CWebCore::GetFilterEntriesByType ( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType, eWebFilterState state )
 {
     google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.begin ();
     for ( ; iter != m_Whitelist.end(); ++iter )
     {
         if ( iter->second.second == filterType )
-            outEntries.push_back ( std::pair<SString, bool> ( iter->first, iter->second.first ) );
+        {
+            if ( state == eWebFilterState::WEBFILTER_ALL )
+                outEntries.push_back ( std::pair<SString, bool> ( iter->first, iter->second.first ) );
+            else if ( state == eWebFilterState::WEBFILTER_ALLOWED && iter->second.first == true )
+                outEntries.push_back ( std::pair<SString, bool> ( iter->first, iter->second.first ) );
+            else
+                outEntries.push_back ( std::pair<SString, bool> ( iter->first, iter->second.first ) );
+        }
     }
 }
 
@@ -715,7 +739,7 @@ bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownl
     pWebCore->LoadListsFromXML ( false, true, false );
 
 #ifdef MTA_DEBUG
-    OutputDebugLine ( "Updated blacklist!" );
+    OutputDebugLine ( "Updated browser blacklist!" );
 #endif
     return true;
 }

@@ -32,8 +32,10 @@ public:
 
 protected:
     CGUIWindow*     m_pWindow;
-    CGUILabel*      m_pLabel;
+    CGUILabel*      m_pLabel1;
+    CGUILabel*      m_pLabel2;
     CGUIMemo*       m_pAddressMemo;
+    CGUICheckBox*   m_pCheckRemember;
     CGUIButton*     m_pButtonAllow;
     CGUIButton*     m_pButtonDeny;
 
