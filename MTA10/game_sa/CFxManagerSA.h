@@ -62,9 +62,11 @@ public:
                     CFxManagerSA( CFxManagerSAInterface * pInterface )    { m_pInterface = pInterface; }
     CFxSystem*      CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char ucFlag);
     void            DestroyFxSystem( CFxSystem* pFxSystem );
+    CFxSystemSA*    GetFxSystem( CFxSystemSAInterface* pFxSystemSAInterface );
 
 private:
     CFxManagerSAInterface *   m_pInterface;
+    CFastHashMap < CFxSystemSAInterface*, CFxSystemSA* > m_FxInterfaceMap;
 };
 
 #endif

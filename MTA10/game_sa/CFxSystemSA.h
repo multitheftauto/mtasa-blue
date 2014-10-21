@@ -77,7 +77,7 @@ C_ASSERT(sizeof(CFxSystemSAInterface) == 0x104);
 class CFxSystemSA : public CFxSystem
 {
 public:
-    CFxSystemSA::CFxSystemSA(CFxSystemSAInterface * pInterface) { m_pInterface = pInterface; }
+    CFxSystemSA::CFxSystemSA(CFxSystemSAInterface * pInterface) { m_pInterface = pInterface; m_fDrawDistance = 0; }
     void PlayAndKill ( void );
 
     void SetEffectSpeed ( float fSpeed );
@@ -92,9 +92,37 @@ public:
     void GetMatrix ( CMatrix & matrix );
     void SetMatrix ( const CMatrix & matrix );
 
+    void SetDrawDistance ( float fDrawDistance );
+    float GetDrawDistance ( void );
+    bool HasCustomDrawDistance( void );
+
     void * GetInterface( void ) { return (void*)m_pInterface; }
+
+    static void StaticSetHooks ( void );
+
 protected:
     CFxSystemSAInterface *   m_pInterface;
+    float m_fDrawDistance;
+};
+
+// FxEmitter stuff
+class CFxEmitterBPSAInterface
+{
+public:
+    void* vtbl;                 // 0x00
+    char pad[0x34];             // 0x04
+    ushort  usFadeNearDistance; // 0x38
+    ushort  usFadeFarDistance;  // 0x3A
+    // TODO the rest
+};
+
+class CFxEmitterSAInterface
+{
+public:
+    void* vtbl;                         // 0x00
+    CFxEmitterBPSAInterface* pBlueprint;// 0x04
+    CFxSystemSAInterface* pOwner;       // 0x08
+    // TODO the rest
 };
 
 #endif

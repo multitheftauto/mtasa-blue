@@ -24,10 +24,10 @@ public:
     float fLength;                  // 0x0C
     float fLoopIntervalMinimum;     // 0x10
     float fLoopIntervalLength;      // 0x14
-    short sCullDistance;            // 0x18
+    ushort usCullDistance;          // 0x18
     char cPlayMode;                 // 0x1A
-    char cSizeOfPrims;              // 0x1B (This is actually the size in bytes of the following array of pointers)
-    void ** pPrims;                 // 0x1C (pPrims[0] to pPrims[(cSizeOfPrims/4)-1])
+    char cNumOfPrims;               // 0x1B
+    void ** pPrims;                 // 0x1C (pPrims[0] to pPrims[cNumOfPrims-1])
     void * pBoundingSphere;         // 0x20
 };
 C_ASSERT(sizeof(CFxSystemBPSAInterface) == 0x24);
