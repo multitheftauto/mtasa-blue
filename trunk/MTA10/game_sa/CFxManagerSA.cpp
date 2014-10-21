@@ -29,7 +29,11 @@ CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector
         mov     dwReturn, eax
     }
     if ( dwReturn != 0 )
-        return new CFxSystemSA((CFxSystemSAInterface*)dwReturn);
+    {
+        CFxSystemSA* pFxSystemSA = new CFxSystemSA((CFxSystemSAInterface*)dwReturn);
+        MapSet( m_FxInterfaceMap, (CFxSystemSAInterface*)dwReturn, pFxSystemSA );
+        return pFxSystemSA;
+    }
     else
         return NULL;
 }
@@ -47,4 +51,11 @@ void CFxManagerSA::DestroyFxSystem(CFxSystem* pFxSystem)
         push    pFxSA
         call    dwFunc
     }
+
+    MapRemoveByValue( m_FxInterfaceMap, pFxSystem );
+}
+
+CFxSystemSA* CFxManagerSA::GetFxSystem( CFxSystemSAInterface* pFxSystemSAInterface )
+{
+    return MapFindRef( m_FxInterfaceMap, pFxSystemSAInterface );
 }

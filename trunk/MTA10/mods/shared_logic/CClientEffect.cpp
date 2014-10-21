@@ -66,6 +66,7 @@ void CClientEffect::SetEffectSpeed ( float fSpeed )
     m_pFxSystem->SetEffectSpeed(fSpeed);
 }
 
+
 float CClientEffect::GetEffectSpeed ( ) const
 {
     return m_pFxSystem->GetEffectSpeed();
@@ -87,6 +88,16 @@ bool CClientEffect::SetEffectDensity ( float fDensity )
 float CClientEffect::GetEffectDensity ( ) const
 {
     return m_pFxSystem->GetEffectDensity();
+}
+
+void CClientEffect::SetDrawDistance ( float fDrawDistance )
+{
+    m_pFxSystem->SetDrawDistance( fDrawDistance );
+}
+
+float CClientEffect::GetDrawDistance ( ) const
+{
+    return m_pFxSystem->GetDrawDistance();
 }
 
 void CClientEffect::SetRotationRadians ( const CVector& vecRotation )

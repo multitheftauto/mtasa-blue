@@ -189,6 +189,7 @@ CGameSA::CGameSA()
     CTasksSA::StaticSetHooks ();
     CPedSA::StaticSetHooks ();
     CSettingsSA::StaticSetHooks ();
+    CFxSystemSA::StaticSetHooks ();
 }
 
 CGameSA::~CGameSA ( void )
