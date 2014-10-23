@@ -3948,7 +3948,8 @@ float CMultiplayerSA::GetLocalStatValue ( unsigned short usStat )
     if ( usStat < MAX_FLOAT_STATS )
         return localStatsData.StatTypesFloat [usStat];
     else if ( usStat >= STATS_OFFSET && usStat < MAX_INT_FLOAT_STATS )
-        return localStatsData.StatTypesInt [usStat - STATS_OFFSET];
+        return (float)localStatsData.StatTypesInt [usStat - STATS_OFFSET];
+    return 0;
 }
 
 
