@@ -85,7 +85,7 @@ namespace CEGUI
         std::streampos size = dataFile.tellg();
         dataFile.seekg (0, std::ios::beg);
 
-        unsigned char* buffer = new unsigned char [size];
+        unsigned char* buffer = new unsigned char [(uint)size];
 
         try {
             dataFile.read(reinterpret_cast<char*>(buffer), size);
@@ -100,7 +100,7 @@ namespace CEGUI
 
         //memcpy(container->getDataPtr(), buffer, size);
         output.setData(buffer);
-        output.setSize(size);
+        output.setSize((size_t)size);
         //delete [] buffer;
     }
 

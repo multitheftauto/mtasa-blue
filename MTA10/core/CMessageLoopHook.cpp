@@ -323,11 +323,11 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
 
                                 if ( pSettings && pSettings->IsVisible ( ) && pSettings->IsActive ( ) )
                                 {
-                                    pSettings->TabSkip ( sShiftState & 0x8000 );
+                                    pSettings->TabSkip ( ( sShiftState & 0x8000 ) ? true : false );
                                 }
                                 else if ( pServerBrowser && pServerBrowser->IsVisible ( ) && pServerBrowser->IsActive ( ) )
                                 {
-                                    pServerBrowser->TabSkip ( sShiftState & 0x8000 );
+                                    pServerBrowser->TabSkip ( ( sShiftState & 0x8000 ) ? true : false );
                                 }
                             }
                         }
