@@ -1228,13 +1228,14 @@ void CVehicleSA::SetColor ( SColor color1, SColor color2, SColor color3, SColor 
     {
         m_RGBColorsFixed[i] = m_RGBColors[i];
         const SColor color = m_RGBColorsFixed[i];
-        if ( color == 0xFF00FF
-            || color == 0x00FFFF
-            || color == 0xFF00AF
-            || color == 0xFFAF00
-            || color == 0xB9FF00
-            || color == 0xFF3C00
-            || color == 0x3CFF00 )
+        if ( color == 0xFF00FF          // 255,   0, 255
+            || color == 0x00FFFF        //   0,   0, 255
+            || color == 0xFF00AF        // 255,   0, 175
+            || color == 0xFFAF00        // 255, 175,   0
+            || color == 0xB9FF00        // 185, 255,   0
+            || color == 0x00FFC8        //   0, 255, 200
+            || color == 0xFF3C00        // 255,  60,   0
+            || color == 0x3CFF00 )      //  60, 255,   0
             m_RGBColorsFixed[i].ulARGB |= 0x010101;
     }
 }
