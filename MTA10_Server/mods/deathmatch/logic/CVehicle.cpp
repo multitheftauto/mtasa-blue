@@ -117,6 +117,35 @@ CVehicle::~CVehicle ( void )
         m_pJackingPlayer->SetJackingVehicle ( NULL );
     }
 
+    // loop through players and fix their in out state
+    
+    for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
+    {
+        CPed * pPed = m_pOccupants [i];
+        if ( pPed && pPed->IsPlayer ( ) )
+        {
+            CPlayer * pPlayer = static_cast < CPlayer * > ( pPed );
+            // Is he already getting out?
+            if ( pPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_EXITING )
+            {
+                // Does it have an occupant and is the occupant the requesting player?
+                unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat ();
+                if ( pPlayer == GetOccupant ( ucOccupiedSeat ) )
+                {
+                    // Mark the player/vehicle as empty
+                    SetOccupant ( NULL, ucOccupiedSeat );
+                    pPlayer->SetOccupiedVehicle ( NULL, 0 );
+                    pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+
+                    // Tell everyone he can start exiting the vehicle
+                    CVehicleInOutPacket Reply ( GetID ( ), ucOccupiedSeat, 4 );
+                    Reply.SetSourceElement ( pPlayer );
+                    g_pGame->GetPlayerManager ( )->BroadcastOnlyJoined ( Reply );
+                }
+            }
+        }
+    }
+
     // Unset any tow links
     if ( m_pTowedVehicle )
         m_pTowedVehicle->SetTowedByVehicle ( NULL );
