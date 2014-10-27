@@ -19,6 +19,7 @@
 class CFxSystemBPSAInterface;
 class CFxSystemSAInterface;
 class CFxEmitterSAInterface;
+class CFxSystemSA;
 
 class CFxMemoryPoolSAInterface 
 {
@@ -60,9 +61,15 @@ class CFxManagerSA : public CFxManager
 {
 public:
                     CFxManagerSA( CFxManagerSAInterface * pInterface )    { m_pInterface = pInterface; }
-    CFxSystem*      CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char ucFlag);
+    // CFxManager interface
+    CFxSystem*      CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char bSkipCameraFrustumCheck );
     void            DestroyFxSystem( CFxSystem* pFxSystem );
-    CFxSystemSA*    GetFxSystem( CFxSystemSAInterface* pFxSystemSAInterface );
+    void            OnFxSystemSAInterfaceDestroyed ( CFxSystemSAInterface* pFxSystemSAInterface );
+
+    // CFxManagerSA methods
+    CFxSystemSA*    GetFxSystem                     ( CFxSystemSAInterface* pFxSystemSAInterface );
+    void            AddToList                       ( CFxSystemSAInterface* pFxSystemSAInterface, CFxSystemSA* pFxSystemSA );
+    void            RemoveFromList                  ( CFxSystemSA* pFxSystemSA );
 
 private:
     CFxManagerSAInterface *   m_pInterface;

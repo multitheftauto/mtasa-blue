@@ -35,6 +35,11 @@
 #define FUNC_FxSystem_c__SetRateMult            0x004AA6F0
 #define FUNC_FxSystem_c__Stop                   0x004AA390
 #define FUNC_FxSystem_c__Update                 0x004AAF70
+#define VAR_FxSystemUpdateCullDistMultiplier            0x4AB032
+#define VAR_FxCreateParticleCullDistMultiplierA         0x4A4247
+#define VAR_FxCreateParticleCullDistMultiplierB         0x4A4255
+#define FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT   ( 1 / 256.f )
+#define FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT ( 1 / 64.f )
 
 class CAEFireAudioEntitySAInterface
 {
@@ -77,7 +82,9 @@ C_ASSERT(sizeof(CFxSystemSAInterface) == 0x104);
 class CFxSystemSA : public CFxSystem
 {
 public:
-    CFxSystemSA::CFxSystemSA(CFxSystemSAInterface * pInterface) { m_pInterface = pInterface; m_fDrawDistance = 0; }
+    CFxSystemSA(CFxSystemSAInterface * pInterface);
+    ~CFxSystemSA();
+
     void PlayAndKill ( void );
 
     void SetEffectSpeed ( float fSpeed );

@@ -2899,7 +2899,7 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem ()
         mov         [esp+12], eax
 
         // The original code we replaced
-        mov         eax, [esp+10]
+        mov         eax, [esp+16]
         mov         edx, [esp+8]
 
         // Jump back to the rest of the function we hooked
