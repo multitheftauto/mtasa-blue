@@ -18,7 +18,21 @@ static ushort                   ms_usFxSystemSavedCullDistance = 0;
 static CFxEmitterSAInterface*   ms_pUsingFxEmitterSAInterface = NULL;
 static ushort                   ms_usFxEmitterSavedFadeFarDistance = 0;
 static ushort                   ms_usFxEmitterSavedFadeNearDistance = 0;
+static float                    ms_fFxSystemUpdateCullDistMultiplier = FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT;
+static float                    ms_fFxCreateParticleCullDistMultiplier = FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT;
 
+
+CFxSystemSA::CFxSystemSA(CFxSystemSAInterface * pInterface)
+{
+    m_pInterface = pInterface;
+    m_fDrawDistance = 0;
+    pGame->GetFxManagerSA()->AddToList( m_pInterface, this );
+}
+
+CFxSystemSA::~CFxSystemSA()
+{
+    pGame->GetFxManagerSA()->RemoveFromList( this );
+}
 
 void CFxSystemSA::PlayAndKill ( )
 {
@@ -87,7 +101,7 @@ void CFxSystemSA::SetEffectSpeed(float fSpeed)
 
 void CFxSystemSA::SetDrawDistance( float fDrawDistance )
 {
-    m_fDrawDistance = Clamp( 0.f, fDrawDistance, 255.f );
+    m_fDrawDistance = Clamp( 0.f, fDrawDistance, 8191.f );
 }
 
 float CFxSystemSA::GetDrawDistance( void )
@@ -113,13 +127,14 @@ bool CFxSystemSA::HasCustomDrawDistance( void )
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_FxSystem_c_Update_MidA_Pre( CFxSystemSAInterface* pFxSystemSAInterface )
 {
-    CFxSystemSA* pFxSystemSA = ((CFxManagerSA*)pGame->GetFxManager())->GetFxSystem( pFxSystemSAInterface );
+    CFxSystemSA* pFxSystemSA = pGame->GetFxManagerSA()->GetFxSystem( pFxSystemSAInterface );
     if ( pFxSystemSA && pFxSystemSA->HasCustomDrawDistance() )
     {
         ms_pUsingFxSystemSAInterface = pFxSystemSAInterface;
         ms_usFxSystemSavedCullDistance = pFxSystemSAInterface->pBlueprint->usCullDistance;
         ms_fUsingDrawDistance = pFxSystemSA->GetDrawDistance();
-        pFxSystemSAInterface->pBlueprint->usCullDistance = (ushort)( ms_fUsingDrawDistance * 256 );
+        pFxSystemSAInterface->pBlueprint->usCullDistance = (ushort)( ms_fUsingDrawDistance * 8 );
+        ms_fFxSystemUpdateCullDistMultiplier = 1 / 8.f;
     }
     else
         ms_fUsingDrawDistance = 0;
@@ -133,6 +148,7 @@ void OnMY_FxSystem_c_Update_MidA_Post( void )
         ms_pUsingFxSystemSAInterface->pBlueprint->usCullDistance = ms_usFxSystemSavedCullDistance;
         ms_fUsingDrawDistance = 0;
         ms_pUsingFxSystemSAInterface = NULL;
+        ms_fFxSystemUpdateCullDistMultiplier = FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT;
     }
 }
 
@@ -186,9 +202,10 @@ void OnMY_FxSystem_c_Update_MidB_Pre( CFxEmitterSAInterface* pFxEmitterSAInterfa
         ms_usFxEmitterSavedFadeFarDistance = pFxEmitterSAInterface->pBlueprint->usFadeFarDistance;
         ms_usFxEmitterSavedFadeNearDistance = pFxEmitterSAInterface->pBlueprint->usFadeNearDistance;
 
-        pFxEmitterSAInterface->pBlueprint->usFadeFarDistance = (ushort)( ms_fUsingDrawDistance * 64 );
+        pFxEmitterSAInterface->pBlueprint->usFadeFarDistance = (ushort)( ms_fUsingDrawDistance * 8 );
         float fNearDistanceRatio = ms_usFxEmitterSavedFadeNearDistance / (float)ms_usFxEmitterSavedFadeFarDistance;
-        pFxEmitterSAInterface->pBlueprint->usFadeNearDistance = (ushort)( ms_fUsingDrawDistance * fNearDistanceRatio * 64 );
+        pFxEmitterSAInterface->pBlueprint->usFadeNearDistance = (ushort)( ms_fUsingDrawDistance * fNearDistanceRatio * 8 );
+        ms_fFxCreateParticleCullDistMultiplier = 1 / 8.f;
     }
 }
 
@@ -200,6 +217,7 @@ void OnMY_FxSystem_c_Update_MidB_Post( void )
         ms_pUsingFxEmitterSAInterface->pBlueprint->usFadeFarDistance = ms_usFxEmitterSavedFadeFarDistance;
         ms_pUsingFxEmitterSAInterface->pBlueprint->usFadeNearDistance = ms_usFxEmitterSavedFadeNearDistance;
         ms_pUsingFxEmitterSAInterface = NULL;
+        ms_fFxCreateParticleCullDistMultiplier = FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT;
     }
 }
 
@@ -242,4 +260,9 @@ void CFxSystemSA::StaticSetHooks ( void )
 {
     EZHookInstall ( FxSystem_c_Update_MidA );
     EZHookInstall ( FxSystem_c_Update_MidB );
+
+    // Redirect these constants so we can change them
+    MemPut < float* > ( VAR_FxSystemUpdateCullDistMultiplier, &ms_fFxSystemUpdateCullDistMultiplier );
+    MemPut < float* > ( VAR_FxCreateParticleCullDistMultiplierA, &ms_fFxCreateParticleCullDistMultiplier );
+    MemPut < float* > ( VAR_FxCreateParticleCullDistMultiplierB, &ms_fFxCreateParticleCullDistMultiplier );
 }

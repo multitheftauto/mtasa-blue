@@ -551,6 +551,8 @@
     <ClInclude Include="..\sdk\game\CFireManager.h" />
     <ClInclude Include="..\sdk\game\CFont.h" />
     <ClInclude Include="..\sdk\game\CFx.h" />
+    <ClInclude Include="..\sdk\game\CFxManager.h" />
+    <ClInclude Include="..\sdk\game\CFxSystem.h" />
     <ClInclude Include="..\sdk\game\CGame.h" />
     <ClInclude Include="..\sdk\game\CGarage.h" />
     <ClInclude Include="..\sdk\game\CGarages.h" />
@@ -638,7 +640,10 @@
     <ClInclude Include="..\..\Shared\sdk\CSphere.h" />
     <ClInclude Include="..\..\Shared\sdk\CVector.h" />
     <ClInclude Include="..\..\Shared\sdk\CVector2D.h" />
+    <ClInclude Include="..\..\Shared\sdk\CVector4D.h" />
     <ClInclude Include="..\..\Shared\sdk\RTree.h" />
+    <ClInclude Include="..\..\Shared\sdk\sha1.h" />
+    <ClInclude Include="..\..\Shared\sdk\sha1.hpp" />
     <ClInclude Include="..\..\Shared\sdk\sha2.h" />
     <ClInclude Include="..\..\Shared\sdk\sha2.hpp" />
     <ClInclude Include="..\..\Shared\sdk\SharedUtil.AllocTracking.h" />

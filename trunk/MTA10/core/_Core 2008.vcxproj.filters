@@ -847,6 +847,12 @@
     <ClInclude Include="..\sdk\game\CFx.h">
       <Filter>Header Files\sdk\game</Filter>
     </ClInclude>
+    <ClInclude Include="..\sdk\game\CFxSystem.h">
+      <Filter>Header Files\sdk\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\game\CFxManager.h">
+      <Filter>Header Files\sdk\game</Filter>
+    </ClInclude>
     <ClInclude Include="..\sdk\game\CGame.h">
       <Filter>Header Files\sdk\game</Filter>
     </ClInclude>
@@ -1108,7 +1114,16 @@
     <ClInclude Include="..\..\Shared\sdk\CVector2D.h">
       <Filter>Header Files\shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\sdk\CVector4D.h">
+      <Filter>Header Files\shared</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Shared\sdk\RTree.h">
+      <Filter>Header Files\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\sdk\sha1.h">
+      <Filter>Header Files\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\sdk\sha1.hpp">
       <Filter>Header Files\shared</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\sdk\sha2.h">
@@ -1269,15 +1284,6 @@
     </ClInclude>
     <ClInclude Include="..\..\vendor\tinygettext\unix_file_system.hpp">
       <Filter>Header Files\utils\tinygettext</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Shared\sdk\sha1.h">
-      <Filter>Header Files\shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Shared\sdk\sha1.hpp">
-      <Filter>Header Files\shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Shared\sdk\CVector4D.h">
-      <Filter>Header Files\shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

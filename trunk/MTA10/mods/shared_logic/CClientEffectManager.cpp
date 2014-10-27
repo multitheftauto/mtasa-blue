@@ -38,7 +38,7 @@ CClientEffect * CClientEffectManager::Create(const SString& strEffectName, const
     if ( strEffectName.length () >= 0x60 )
         return NULL;
 
-    CFxSystem * pFxSA = g_pGame->GetFxManager()->CreateFxSystem ( strEffectName, vecPosition, NULL, 0 );
+    CFxSystem * pFxSA = g_pGame->GetFxManager()->CreateFxSystem ( strEffectName, vecPosition, NULL, true );
     if ( pFxSA == NULL )
         return NULL; // GTA was unable to create the effect (e.g. wrong effect name)
 
@@ -87,6 +87,9 @@ CClientEffect* CClientEffectManager::Get( void* pFxSAInterface )
 void CClientEffectManager::SAEffectDestroyed ( void *pFxSAInterface )
 {
     CClientEffect * pFx = Get(pFxSAInterface);
+
+    g_pGame->GetFxManager()->OnFxSystemSAInterfaceDestroyed( (CFxSystemSAInterface*)pFxSAInterface );
+
     if(pFx == NULL)
         return; // We didn't create that effect
 
