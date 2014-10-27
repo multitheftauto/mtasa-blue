@@ -10,13 +10,23 @@
 *
 *****************************************************************************/
 
+/*
+    IMPORTANT (Windows only)
+
+    If this project changes, a new release build should be copied into
+    the launcher/output diectory.
+
+    The 'MTA Server.exe' in launcher/output will be used by the installer and updater.
+
+    (set flag.new_server_exe on the build server to generate a new 'MTA Server.exe')
+*/
+
+
 #include "CDynamicLibrary.h"
-#include "../version.h"
 #include "../../Shared/sdk/SharedUtil.Defines.h"
 #include <cstdio>
 #include <iostream>
 
-// Build instructional datum hash: 8AA29E05CD777B5C1080A90E3A3353E1
 using namespace std;
 
 #ifdef WIN32
@@ -86,11 +96,6 @@ int main ( int argc, char* argv [] )
             printf ( "  --httpport [PORT]    Set http port\n" );
             printf ( "  --maxplayers [max]   Set maxplayers\n" );
             printf ( "  --novoice            Disable voice communication\n" );
-            return 1;
-        }
-        else if ( strcmp ( argv[1], "--version" ) == 0 || strcmp ( argv[1], "-v" ) == 0 )
-        {
-            printf ( MTA_DM_FULL_STRING " v" MTA_DM_BUILDTAG_LONG "\n" );
             return 1;
         }
     }
