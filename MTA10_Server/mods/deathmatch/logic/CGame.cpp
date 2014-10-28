@@ -3780,22 +3780,22 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
 
             if ( in.bHasHashInfo )
             {
-                resultItem.PushString ( "fileLength" );
+                resultItem.PushString ( "length" );
                 resultItem.PushNumber ( in.uiShortBytes );
 
-                resultItem.PushString ( "fileMd5" );
+                resultItem.PushString ( "md5" );
                 resultItem.PushString ( in.strShortMd5 );
 
-                resultItem.PushString ( "fileSha256" );
+                resultItem.PushString ( "sha256" );
                 resultItem.PushString ( in.strShortSha256 );
 
-                resultItem.PushString ( "paddedFileLength" );
+                resultItem.PushString ( "paddedLength" );
                 resultItem.PushNumber ( in.uiLongBytes );
 
-                resultItem.PushString ( "paddedFileMd5" );
+                resultItem.PushString ( "paddedMd5" );
                 resultItem.PushString ( in.strLongMd5 );
 
-                resultItem.PushString ( "paddedFileSha256" );
+                resultItem.PushString ( "paddedSha256" );
                 resultItem.PushString ( in.strLongSha256 );
             }
 
