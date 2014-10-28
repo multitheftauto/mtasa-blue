@@ -108,6 +108,8 @@ public:
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
     CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
 
+    CBassManager *          GetBassManager                  ( void )                { return m_pBassManager; };
+
     void                    SaveConfig                      ( void );
 
     // Debug
@@ -294,6 +296,8 @@ private:
     //CFileSystemHook *           m_pFileSystemHook;
     CSetCursorPosHook *         m_pSetCursorPosHook;
     CTCPManager *               m_pTCPManager;
+
+    CBassManager *              m_pBassManager;
 
     bool                        m_bLastFocused;
     int                         m_iUnminimizeFrameCounter;

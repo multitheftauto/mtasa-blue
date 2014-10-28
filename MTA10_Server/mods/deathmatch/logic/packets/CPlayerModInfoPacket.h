@@ -18,13 +18,6 @@ struct SModInfoItem
     bool        bHasSize;
     CVector     vecSize;
     CVector     vecOriginalSize;
-    bool        bHasHashInfo;
-    uint        uiShortBytes;
-    SString     strShortMd5;
-    SString     strShortSha256;
-    uint        uiLongBytes;
-    SString     strLongMd5;
-    SString     strLongSha256;
 };
 
 class CPlayerModInfoPacket : public CPacket

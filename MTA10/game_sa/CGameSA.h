@@ -20,7 +20,6 @@
 #define __CGAMESA
 
 #include "CModelInfoSA.h"
-#include "CFxManagerSA.h"
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
 
@@ -157,7 +156,6 @@ public:
     inline CWeaponStatManager       * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
     inline CPointLights             * GetPointLights ()          { return m_pPointLights; }
     CRenderWareSA*                  GetRenderWareSA()            { return m_pRenderWare; }
-    CFxManagerSA*                   GetFxManagerSA ()            { return m_pFxManager; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
     CModelInfo              * GetModelInfo( DWORD dwModelID );
@@ -274,7 +272,7 @@ private:
     CKeyGen                 * m_pKeyGen;
     CRopes                  * m_pRopes;
     CFx                     * m_pFx;
-    CFxManagerSA            * m_pFxManager;
+    CFxManager              * m_pFxManager;
     CWaterManager           * m_pWaterManager;
     CWeaponStatManager      * m_pWeaponStatsManager;
     CPointLights            * m_pPointLights;

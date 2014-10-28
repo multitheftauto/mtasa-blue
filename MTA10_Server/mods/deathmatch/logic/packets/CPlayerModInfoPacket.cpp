@@ -42,18 +42,7 @@ bool CPlayerModInfoPacket::Read ( NetBitStreamInterface& BitStream )
 
         BitStream.Read ( item.vecOriginalSize.fX );
         BitStream.Read ( item.vecOriginalSize.fY );
-        BitStream.Read ( item.vecOriginalSize.fZ );
-
-        int iHashInfo;
-        BitStream.Read ( iHashInfo );
-        item.bHasHashInfo = iHashInfo != 0;
-
-        BitStream.Read ( item.uiShortBytes );
-        BitStream.ReadString ( item.strShortMd5 );
-        BitStream.ReadString ( item.strShortSha256 );
-        BitStream.Read ( item.uiLongBytes );
-        BitStream.ReadString ( item.strLongMd5 );
-        if ( !BitStream.ReadString ( item.strLongSha256 ) )
+        if ( !BitStream.Read ( item.vecOriginalSize.fZ ) )
             return false;
 
         m_ModInfoItemList.push_back ( item );

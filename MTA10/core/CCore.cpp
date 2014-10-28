@@ -1199,8 +1199,15 @@ void CCore::DoPostFramePulse ( )
         m_pGUI->SelectInputHandlers( INPUT_CORE );
 
         m_Community.Initialize ();
-    }
 
+        m_pBassManager = new CBassManager ( );
+    }
+    
+    if ( m_pBassManager != NULL )
+    {
+        m_pBassManager->DoPulse ( );
+    }
+    
     if ( m_pGame->GetSystemState () == 5 ) // GS_INIT_ONCE
     {
         WatchDogCompletedSection ( "L2" );      // gta_sa.set seems ok

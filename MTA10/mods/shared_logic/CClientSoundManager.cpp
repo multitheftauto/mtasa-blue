@@ -23,30 +23,6 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
 {
     m_pClientManager = pClientManager;
 
-    // Initialize BASS audio library
-    if (!BASS_Init ( -1,44100,NULL,NULL,NULL ))
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in Init", BASS_ErrorGetCode() );
-    
-    // Load the Plugins
-    if (!BASS_PluginLoad ( "basswma.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad WMA", BASS_ErrorGetCode() );
-    if (!BASS_PluginLoad ( "bassflac.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad FLAC", BASS_ErrorGetCode() );
-    if (!BASS_PluginLoad ( "bassmidi.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad MIDI", BASS_ErrorGetCode() );
-    if (!BASS_PluginLoad ( "bass_aac.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PluginLoad AAC", BASS_ErrorGetCode() );
-    if (!BASS_PluginLoad ( "bass_ac3.dll", 0 ) && BASS_ErrorGetCode () != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole ( )->Printf ( "BASS ERROR %d in PluginLoad AC3", BASS_ErrorGetCode ( ) );
-    if ( !BASS_PluginLoad ( "bassopus.dll", 0 ) && BASS_ErrorGetCode ( ) != BASS_ERROR_ALREADY )
-        g_pCore->GetConsole ( )->Printf ( "BASS ERROR %d in PluginLoad OPUS", BASS_ErrorGetCode ( ) );
-
-    BASS_SetConfig ( BASS_CONFIG_NET_PREBUF, 0 );
-    BASS_SetConfig ( BASS_CONFIG_NET_PLAYLIST, 1 ); // Allow playlists
-
-    m_strUserAgent = SString( "MTA:SA Server %s - See http://mtasa.com/agent/", g_pNet->GetConnectedServer( true ) );
-    BASS_SetConfigPtr ( BASS_CONFIG_NET_AGENT, (void*)*m_strUserAgent );
-    
     UpdateVolume ();
 
     m_FxEffectNames["chorus"] =         BASS_FX_DX8_CHORUS;
@@ -69,8 +45,8 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
 CClientSoundManager::~CClientSoundManager ( void )
 {
     ProcessStopQueues( true );
-    BASS_Stop();
-    BASS_Free();
+    //BASS_Stop();
+    //BASS_Free();
 }
 
 void CClientSoundManager::DoPulse ( void )

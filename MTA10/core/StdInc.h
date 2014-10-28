@@ -49,6 +49,10 @@
 #include <multiplayer/CMultiplayer.h>
 #include <game/CGame.h>
 
+// Bass includes
+#include "../../vendor/bass/bass.h"
+#include "CBassManager.h"
+
 // Core-level includes
 #include "CrashHandler.h"
 #include "CCore.h"

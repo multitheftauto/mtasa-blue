@@ -3778,27 +3778,6 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
                 resultItem.PushNumber ( in.vecOriginalSize.fZ - fmod ( (double)in.vecOriginalSize.fZ, 0.01 ) );
             }
 
-            if ( in.bHasHashInfo )
-            {
-                resultItem.PushString ( "length" );
-                resultItem.PushNumber ( in.uiShortBytes );
-
-                resultItem.PushString ( "md5" );
-                resultItem.PushString ( in.strShortMd5 );
-
-                resultItem.PushString ( "sha256" );
-                resultItem.PushString ( in.strShortSha256 );
-
-                resultItem.PushString ( "paddedLength" );
-                resultItem.PushNumber ( in.uiLongBytes );
-
-                resultItem.PushString ( "paddedMd5" );
-                resultItem.PushString ( in.strLongMd5 );
-
-                resultItem.PushString ( "paddedSha256" );
-                resultItem.PushString ( in.strLongSha256 );
-            }
-
             resultItemList.PushNumber ( resultItemList.Count () / 2 + 1 );
             resultItemList.PushTable ( &resultItem );
         }
