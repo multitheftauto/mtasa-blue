@@ -78,7 +78,13 @@ bool CWebCore::Initialise ()
     CefString ( &settings.user_agent ).FromASCII ( "Multi Theft Auto: San Andreas Client; Chromium" );
     CefString ( &settings.resources_dir_path ).FromASCII ( CalcMTASAPath( "MTA\\CEF") );
     CefString ( &settings.locales_dir_path ).FromASCII( CalcMTASAPath( "MTA\\CEF\\locales" ) );
-    
+    CefString ( &settings.log_file ).FromASCII ( CalcMTASAPath ( "MTA\\CEF\\cefdebug.txt" ) );
+#ifdef MTA_DEBUG
+    settings.log_severity = cef_log_severity_t::LOGSEVERITY_INFO;
+#else
+    settings.log_severity = cef_log_severity_t::LOGSEVERITY_WARNING;
+#endif
+
     settings.multi_threaded_message_loop = false;
     settings.windowless_rendering_enabled = true;
 

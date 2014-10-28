@@ -27,7 +27,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     browserSettings.universal_access_from_file_urls = cef_state_t::STATE_DISABLED; // Also filtered by resource interceptor, but set this nevertheless
     browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
-    //browserSettings.javascript_open_windows = cef_state_t::STATE_DISABLED;
+    browserSettings.javascript_open_windows = cef_state_t::STATE_DISABLED;
 
     bool bEnabledPlugins;
     CVARS_GET ( "browser_plugins", bEnabledPlugins );
@@ -408,7 +408,9 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
 void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
 {
     m_pWebView = NULL;
-    //Release ();
+    
+    if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
+        g_pCore->GetWebCore ()->SetFocusedWebView ( NULL );
 }
 
 ////////////////////////////////////////////////////////////////////
