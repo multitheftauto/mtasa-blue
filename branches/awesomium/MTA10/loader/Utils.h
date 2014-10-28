@@ -54,6 +54,8 @@ bool            HasGTAPath                          ( void );
 void            FindFilesRecursive                  ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
 SString         GetOSVersion                        ( void );
 SString         GetRealOSVersion                    ( void );
+SString         GetRealOSBuildNumber                ( void );
+bool            IsVS2013RuntimeInstalled            ( void );
 bool            IsVistaOrHigher                     ( void );
 bool            IsWin8OrHigher                      ( void );
 BOOL            IsUserAdmin                         ( void );

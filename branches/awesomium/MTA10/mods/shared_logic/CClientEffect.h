@@ -35,6 +35,8 @@ public:
     float   GetEffectSpeed( void ) const;
     bool    SetEffectDensity( float fDensity );
     float   GetEffectDensity( void ) const;
+    void    SetDrawDistance( float fDrawDistance );
+    float   GetDrawDistance( void ) const;
 
     inline eClientEntityType GetType ( void ) const     { return CCLIENTEFFECT; };
 protected:

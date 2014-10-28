@@ -2899,7 +2899,7 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem ()
         mov         [esp+12], eax
 
         // The original code we replaced
-        mov         eax, [esp+10]
+        mov         eax, [esp+16]
         mov         edx, [esp+8]
 
         // Jump back to the rest of the function we hooked
@@ -3948,7 +3948,8 @@ float CMultiplayerSA::GetLocalStatValue ( unsigned short usStat )
     if ( usStat < MAX_FLOAT_STATS )
         return localStatsData.StatTypesFloat [usStat];
     else if ( usStat >= STATS_OFFSET && usStat < MAX_INT_FLOAT_STATS )
-        return localStatsData.StatTypesInt [usStat - STATS_OFFSET];
+        return (float)localStatsData.StatTypesInt [usStat - STATS_OFFSET];
+    return 0;
 }
 
 
@@ -5112,6 +5113,20 @@ void CMultiplayerSA::SetAltWaterOrderEnabled ( bool bEnable )
     }
 }
 
+
+//
+// Notify core when rendering grass so we can do optimal things
+//
+void CPlantMgr_Render_Pre( void )
+{
+    g_pCore->NotifyRenderingGrass( true );
+}
+
+void CPlantMgr_Render_Post( void )
+{
+    g_pCore->NotifyRenderingGrass( false );
+}
+
 // The purpose of these hooks is to divide plant (grass) rendering in two:
 // rather than render *all* grass before or after the water like SA does, we render
 // underwater plants before the water and above-water plants after. This way, we have
@@ -5123,12 +5138,20 @@ void _declspec(naked) HOOK_RenderScene_Plants ()
 {
     _asm
     {
+        pushad
+        call    CPlantMgr_Render_Pre
+        popad
+        
         push 1                  // bRenderingBeforeWater
         movzx eax, bl           // bCamBelowWater
         push eax
         mov eax, 0x5DBAE0       // CPlantMgr::Render
         call eax
         add esp, 8
+
+        pushad
+        call    CPlantMgr_Render_Post
+        popad
         ret
     }
 }
@@ -5137,12 +5160,20 @@ void _declspec(naked) HOOK_RenderScene_end ()
 {
     _asm
     {
+        pushad
+        call    CPlantMgr_Render_Pre
+        popad
+
         push 0                  // bRenderingBeforeWater
         movzx eax, bl           // bCamBelowWater
         push eax
         mov eax, 0x5DBAE0       // CPlantMgr::Render
         call eax
         add esp, 8
+
+        pushad
+        call    CPlantMgr_Render_Post
+        popad
 
         pop ebx
         add esp, 8

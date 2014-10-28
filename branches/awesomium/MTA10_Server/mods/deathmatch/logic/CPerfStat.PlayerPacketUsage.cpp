@@ -223,8 +223,8 @@ void CPerfStatPlayerPacketUsageImpl::UpdatePlayerPacketUsage ( void )
 {
     // Get stats from net module
     uchar packetIdList[] = { PACKET_ID_COMMAND, PACKET_ID_LUA_EVENT, PACKET_ID_CUSTOM_DATA };
-    const int uiNumPacketIds = NUMELMS( packetIdList );
-    const int uiTopCount = TOP_COUNT;
+    const uint uiNumPacketIds = NUMELMS( packetIdList );
+    const uint uiTopCount = TOP_COUNT;
 
     SPlayerPacketUsage stats[ uiNumPacketIds * uiTopCount ];
     if ( !g_pRealNetServer->GetPlayerPacketUsageStats( packetIdList, uiNumPacketIds, stats, uiTopCount ) )

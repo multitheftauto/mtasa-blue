@@ -366,6 +366,9 @@ HRESULT CProxyDirect3DDevice9::Present                        ( CONST RECT* pSou
 {
     CDirect3DEvents9::OnPresent ( m_pDevice );
 
+    // Reset frame stat counters
+    memset( &DeviceState.FrameStats, 0, sizeof( DeviceState.FrameStats ) );
+
     // A fog flicker fix for some ATI cards
     D3DMATRIX projMatrix;
     m_pData->GetTransform ( D3DTS_PROJECTION, &projMatrix );
@@ -668,6 +671,7 @@ HRESULT CProxyDirect3DDevice9::GetTexture                     ( DWORD Stage,IDir
 
 HRESULT CProxyDirect3DDevice9::SetTexture                     ( DWORD Stage,IDirect3DBaseTexture9* pTexture )
 {
+    CDirect3DEvents9::CloseActiveShader();
     if ( Stage < NUMELMS( DeviceState.TextureState ) )
         DeviceState.TextureState[Stage].Texture = pTexture;
     return m_pDevice->SetTexture ( Stage, CDirect3DEvents9::GetRealTexture ( pTexture ) );

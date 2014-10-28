@@ -3778,6 +3778,27 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
                 resultItem.PushNumber ( in.vecOriginalSize.fZ - fmod ( (double)in.vecOriginalSize.fZ, 0.01 ) );
             }
 
+            if ( in.bHasHashInfo )
+            {
+                resultItem.PushString ( "fileLength" );
+                resultItem.PushNumber ( in.uiShortBytes );
+
+                resultItem.PushString ( "fileMd5" );
+                resultItem.PushString ( in.strShortMd5 );
+
+                resultItem.PushString ( "fileSha256" );
+                resultItem.PushString ( in.strShortSha256 );
+
+                resultItem.PushString ( "paddedFileLength" );
+                resultItem.PushNumber ( in.uiLongBytes );
+
+                resultItem.PushString ( "paddedFileMd5" );
+                resultItem.PushString ( in.strLongMd5 );
+
+                resultItem.PushString ( "paddedFileSha256" );
+                resultItem.PushString ( in.strLongSha256 );
+            }
+
             resultItemList.PushNumber ( resultItemList.Count () / 2 + 1 );
             resultItemList.PushTable ( &resultItem );
         }
@@ -3808,7 +3829,7 @@ void CGame::PlayerCompleteConnect ( CPlayer* pPlayer, bool bSuccess, const char*
             // event cancelled, disconnect the player
             CLogger::LogPrintf ( "CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str () );
             const char* szError = g_pGame->GetEvents()->GetLastError ();
-            if ( szError )
+            if ( szError && szError[0] )
             {
                 DisconnectPlayer ( g_pGame, *pPlayer, szError );
                 return;

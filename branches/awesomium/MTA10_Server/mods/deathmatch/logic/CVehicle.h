@@ -188,8 +188,6 @@ public:
 
     inline float                    GetHealth               ( void )                        { return m_fHealth; };
     inline void                     SetHealth               ( float fHealth )               { m_fHealth = fHealth; };
-    inline unsigned long            GetHealthChangeTime     ( void )                        { return m_ulHealthChangeTime; }
-    inline void                     SetHealthChangeTime     ( unsigned long ulTime )        { m_ulHealthChangeTime = ulTime; }
     inline float                    GetLastSyncedHealth     ( void )                        { return m_fLastSyncedHealthHealth; };
     inline void                     SetLastSyncedHealth     ( float fHealth )               { m_fLastSyncedHealthHealth = fHealth; };
     
@@ -363,7 +361,6 @@ private:
     CVector                         m_vecTurnSpeed;
     float                           m_fHealth;
     float                           m_fLastSyncedHealthHealth;
-    unsigned long                   m_ulHealthChangeTime;
     CTickCount                      m_llBlowTime;
     CTickCount                      m_llIdleTime;
 

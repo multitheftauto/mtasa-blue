@@ -1635,6 +1635,10 @@
 							>
 						</File>
 						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp"
+							>
+						</File>
+						<File
 							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp"
 							>
 						</File>
@@ -2272,10 +2276,6 @@
 			</File>
 			<File
 				RelativePath=".\gccHashSupport.h"
-				>
-			</File>
-			<File
-				RelativePath="Server.h"
 				>
 			</File>
 			<File

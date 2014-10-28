@@ -531,11 +531,21 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
         bKnownTablesCreated = true;
     }
 
-    unsigned short usNumArgs;
-    if ( bitStream.ReadCompressed ( usNumArgs ) )
+    unsigned int uiNumArgs;
+    bool bResult;
+    if ( bitStream.Version () < 0x05B )
+    {
+        unsigned short usNumArgs;
+        bResult = bitStream.ReadCompressed ( usNumArgs );
+        uiNumArgs = usNumArgs;
+    }
+    else
+        bResult = bitStream.ReadCompressed ( uiNumArgs );
+
+    if ( bResult )
     {
         pKnownTables->push_back ( this );
-        for ( unsigned short us = 0 ; us < usNumArgs ; us++ )
+        for ( unsigned int ui = 0; ui < uiNumArgs; ++ui )
         {
             CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
             m_Arguments.push_back ( pArgument );
@@ -560,7 +570,16 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHa
 
     bool bSuccess = true;
     pKnownTables->insert ( make_pair ( (CLuaArguments *)this, pKnownTables->size () ) );
-    bitStream.WriteCompressed ( static_cast < unsigned short > ( m_Arguments.size () ) );
+    
+    if ( ExtractVersionStringBuildNumber ( g_pGame->GetPlayerManager ()->GetLowestConnectedPlayerVersion () ) < ExtractVersionStringBuildNumber( "1.4.0-9.06858" ) && MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM )
+        bitStream.WriteCompressed ( static_cast < unsigned short > ( m_Arguments.size () ) );
+    else
+    {
+        // Send 0xFFFF to indicate that we're using the new version | TODO: Remove this in 1.5
+        bitStream.WriteCompressed ( static_cast < unsigned short > ( 0xFFFF ) );
+        bitStream.WriteCompressed ( static_cast < unsigned int > ( m_Arguments.size () ) );
+    }
+    
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
     for ( ; iter != m_Arguments.end () ; ++iter )
     {

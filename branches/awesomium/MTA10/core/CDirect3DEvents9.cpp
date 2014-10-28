@@ -31,6 +31,9 @@ static long long           ms_LastSaveTime      = 0;
 static uint                ms_RequiredAnisotropicLevel = 1;
 static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
 
+// To reuse shader setups between calls to DrawIndexedPrimitive
+CShaderItem* g_pActiveShader = NULL;
+
 void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
 {
     WriteDebugEvent ( "CDirect3DEvents9::OnDirect3DDeviceCreate" );
@@ -267,6 +270,8 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive ( IDirect3DDevice9 *pDevice, D3DPRIMIT
     if ( ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734 )
         return pDevice->DrawPrimitive ( PrimitiveType, StartVertex, PrimitiveCount );
 
+    CloseActiveShader();
+
     // Any shader for this texture ?
     SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
@@ -412,6 +417,12 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
             pDevice->SetSamplerState ( 0, D3DSAMP_MAXANISOTROPY, ms_RequiredAnisotropicLevel );
     }
 
+    // See if we can continue using the active shader
+    if ( g_pActiveShader )
+    {
+        return DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, g_pActiveShader, false, false );
+    }
+
     // Any shader for this texture ?
     SShaderItemLayers* pLayers = CGraphics::GetSingleton ().GetRenderItemManager ()->GetAppliedShaderForD3DData ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
 
@@ -427,7 +438,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
     else
     {
         // Draw base shader
-        DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->pBase, false );
+        DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->pBase, false, pLayers->layerList.empty() );
 
         // Draw each layer
         if ( !pLayers->layerList.empty () )
@@ -447,7 +458,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
 
             for ( uint i = 0 ; i < pLayers->layerList.size () ; i++ )
             {
-                DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->layerList[i], true );
+                DrawIndexedPrimitiveShader ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->layerList[i], true, false );
             }
 
             RESTORE_RENDERSTATE( SLOPESCALEDEPTHBIAS );
@@ -474,7 +485,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive ( IDirect3DDevice9 *pDevice, D3
 //
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount, CShaderItem* pShaderItem, bool bIsLayer )
+HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount, CShaderItem* pShaderItem, bool bIsLayer, bool bCanBecomeActiveShader )
 {
     if ( pShaderItem && pShaderItem->m_fMaxDistanceSq > 0 )
     {
@@ -488,12 +499,31 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
 
     if ( !pShaderItem )
     {
+        CloseActiveShader();
+
         // No shader for this texture
         if ( !bIsLayer )
             return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
     }
     else
     {
+        // See if we should use the previously setup shader
+        if ( g_pActiveShader )
+        {
+            dassert( pShaderItem == g_pActiveShader );
+            g_pDeviceState->FrameStats.iNumShadersReuseSetup++;
+
+            // Transfer any state changes to the active shader
+            CShaderInstance* pShaderInstance = g_pActiveShader->m_pShaderInstance;
+            bool bChanged = pShaderInstance->m_pEffectWrap->ApplyCommonHandles ();
+            bChanged |= pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
+            if ( bChanged )
+                pShaderInstance->m_pEffectWrap->m_pD3DEffect->CommitChanges();
+
+            return DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+        }
+        g_pDeviceState->FrameStats.iNumShadersFullSetup++;
+
         // Yes shader for this texture
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
 
@@ -535,6 +565,15 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
                 pDevice->SetVertexShader( pOriginalVertexShader );
 
             DrawIndexedPrimitiveGuarded ( pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount );
+
+            if ( uiNumPasses == 1 && bCanBecomeActiveShader && pOriginalVertexShader == NULL && g_pCore->IsRenderingGrass() )
+            {
+                // Make this the active shader for possible reuse
+                dassert( dwFlags == D3DXFX_DONOTSAVESHADERSTATE );
+                g_pActiveShader = pShaderItem;
+                return D3D_OK;
+            }
+
             pD3DEffect->EndPass ();
         }
         pD3DEffect->End ();
@@ -553,6 +592,37 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
     }
 
     return D3D_OK;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CDirect3DEvents9::CloseActiveShader
+//
+// Finish the active shader if there is one
+//
+/////////////////////////////////////////////////////////////
+void CDirect3DEvents9::CloseActiveShader( void )
+{
+    if ( !g_pActiveShader )
+        return;
+
+    ID3DXEffect* pD3DEffect = g_pActiveShader->m_pShaderInstance->m_pEffectWrap->m_pD3DEffect;
+    g_pActiveShader = NULL;
+
+    pD3DEffect->EndPass ();
+
+    pD3DEffect->End ();
+
+    // We didn't get the effect to save the shader state, clear some things here
+    IDirect3DDevice9* pDevice = g_pGraphics->GetDevice();
+    pDevice->SetVertexShader( NULL );
+    pDevice->SetPixelShader( NULL );
+
+    // Unset additional vertex stream
+    CAdditionalVertexStreamManager::GetSingleton ()->MaybeUnsetAdditionalVertexStream ();
+
+    g_pDeviceState->CallState.strShaderName = "";
 }
 
 

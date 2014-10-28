@@ -131,7 +131,7 @@ SString GetPatchExeAdminReason( bool bUseExeCopy, const SExePatchedStatus& reqSt
 //
 //
 //////////////////////////////////////////////////////////
-uint GetExeFileSize( bool bUseExeCopy )
+uint64 GetExeFileSize( bool bUseExeCopy )
 {
     SString strGTAEXEPath = GetExePathFilename( bUseExeCopy );
     return FileSize( strGTAEXEPath );

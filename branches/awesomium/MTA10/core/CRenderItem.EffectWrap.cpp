@@ -455,8 +455,8 @@ public:
     virtual void    OnResetDevice           ( void );
     void            CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
     void            ReleaseUnderlyingData   ( void );
-    void            ApplyCommonHandles      ( void );
-    void            ApplyMappedHandles      ( void );
+    bool            ApplyCommonHandles      ( void );
+    bool            ApplyMappedHandles      ( void );
     void            ReadParameterHandles    ( void );
 
     static void             InitMaps                        ( void );
@@ -472,6 +472,7 @@ public:
     SString                 m_strWarnings;
     bool                    m_bVerboseWarnings;
     bool                    m_bSkipUnusedParameters;
+    bool                    m_bUsesMappedHandles;
     std::set < D3DXHANDLE >  m_ReferencedParameterMap;
 
     std::vector < SStateVar > renderStateVarList;
@@ -660,8 +661,11 @@ void CEffectWrapImpl::InitMaps ( void )
 // Called before render
 //
 ////////////////////////////////////////////////////////////////
-void CEffectWrapImpl::ApplyCommonHandles ( void )
+bool CEffectWrapImpl::ApplyCommonHandles ( void )
 {
+    if ( !m_bUsesCommonHandles )
+        return false;
+
     CEffectWrap& m_CommonHandles = *this;
 
     LPDIRECT3DDEVICE9 pDevice;
@@ -811,6 +815,8 @@ void CEffectWrapImpl::ApplyCommonHandles ( void )
 
     if ( m_CommonHandles.hProjectionMainScene )
         m_pD3DEffect->SetMatrix ( m_CommonHandles.hProjectionMainScene, (D3DXMATRIX*)&g_pDeviceState->MainSceneState.TransformState.PROJECTION );
+
+    return true;
 };
 
 
@@ -830,8 +836,11 @@ void BOUNDS_CHECK ( const void* ptr, int ptrsize, const void* bufstart, int bufs
 // Called before render
 //
 ////////////////////////////////////////////////////////////////
-void CEffectWrapImpl::ApplyMappedHandles ( void )
+bool CEffectWrapImpl::ApplyMappedHandles ( void )
 {
+    if ( !m_bUsesMappedHandles )
+        return false;
+
 	//////////////////////////////////////////
     //
     // RenderState
@@ -1067,6 +1076,8 @@ void CEffectWrapImpl::ApplyMappedHandles ( void )
 
         BOUNDS_CHECK( pdwValue, sizeof ( *pdwValue ), &g_pDeviceState->VertexDeclState, sizeof ( g_pDeviceState->VertexDeclState ) );
     }
+
+    return true;
 }
 
 
@@ -1268,6 +1279,7 @@ bool CEffectWrapImpl::TryMappingParameterToRegister ( D3DXHANDLE hParameter, con
         var.iType = pTypeMapping->OutType;
         var.iSize = pTypeMapping->OutSize;
         AddStateMappedParameter ( stateGroup, var );
+        m_bUsesMappedHandles = true;
         return true;      // We have a weiner
     }
 

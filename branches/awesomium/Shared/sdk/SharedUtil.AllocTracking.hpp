@@ -409,13 +409,6 @@ void myDelete (void* ptr)
     myFree ( ptr );
 }
 
-// Set up export type definition for Win32
-#ifdef WIN32
-    #define MTAEXPORT extern "C" __declspec(dllexport)
-#else
-    #define MTAEXPORT extern "C"
-#endif
-
 //
 // Get memory stats from this dll
 //

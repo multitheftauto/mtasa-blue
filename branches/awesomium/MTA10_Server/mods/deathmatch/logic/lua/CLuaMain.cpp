@@ -389,8 +389,6 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getPosition", "getElementPosition", CLuaOOPDefs::GetElementPosition );
     lua_classfunction ( luaVM, "getRotation", "getElementRotation", CLuaOOPDefs::GetElementRotation );
     lua_classfunction ( luaVM, "getMatrix", "getElementMatrix", CLuaOOPDefs::GetElementMatrix );
-    lua_classfunction ( luaVM, "getPosition", "getElementPosition" );
-    lua_classfunction ( luaVM, "getRotation", "getElementRotation" );
     lua_classfunction ( luaVM, "getType", "getElementType" );
     lua_classfunction ( luaVM, "getInterior", "getElementInterior" );
     lua_classfunction ( luaVM, "getDimension", "getElementDimension" );
@@ -839,6 +837,8 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
     lua_classfunction ( luaVM, "hasPermissionTo", "hasObjectPermissionTo" );
     lua_classfunction ( luaVM, "logOut", "logOut" );
+    lua_classfunction ( luaVM, "triggerEvent", "triggerClientEvent" );
+    lua_classfunction ( luaVM, "outputChat", "outputChatBox", CLuaOOPDefs::OutputChat );
     //lua_classfunction ( luaVM, "observeDisplay", "textDisplayAddObserver" ); // swap args
     //lua_classfunction ( luaVM, "stopObservingDisplay", "textDisplayRemoveObserver" ); // swap args
     //lua_classfunction ( luaVM, "isObservingDisplay", "textDisplayIsObserver" ); // swap args

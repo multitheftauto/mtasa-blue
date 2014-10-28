@@ -11,7 +11,7 @@
 #include "StdInc.h"
 #include "../game_sa/CWeaponInfoSA.h"
 extern EDamageReasonType g_GenerateDamageEventReason;
-
+static CElapsedTime ms_LastFxTimer;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -158,6 +158,54 @@ void _declspec(naked) HOOK_CShotInfo_Update()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// Fx_AddBulletImpact
+//
+// Modify bullet impact effect type
+//
+// 1 = sparks
+// 2 = sand
+// 3 = wood
+// 4 = dust
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+int OnMY_Fx_AddBulletImpact( int iType )
+{
+    // Limit sand or dust effect due to performance issues
+    if ( iType == 2 || iType == 4 )
+    {
+        if ( ms_LastFxTimer.Get() > 500 )
+            ms_LastFxTimer.Reset();     // Allow once every 500ms
+        else
+            iType = 1;                  // Otherwise replace with spark
+    }
+    return iType;
+}
+
+// Hook info
+#define HOOKPOS_Fx_AddBulletImpact                         0x049F3E8
+#define HOOKSIZE_Fx_AddBulletImpact                        5
+DWORD RETURN_Fx_AddBulletImpact =                          0x049F3ED;
+
+void _declspec(naked) HOOK_Fx_AddBulletImpact( void )
+{
+    _asm
+    {
+        pushad
+        push    eax
+        call    OnMY_Fx_AddBulletImpact
+        mov     [esp+0], eax         // Put result temp
+        add     esp, 4*1
+        popad
+
+        mov     esi, [esp-32-4*1]    // Get result temp
+        mov     eax, ds:0x0B6F03C
+        jmp     RETURN_Fx_AddBulletImpact
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Weapons
 //
 // Setup hooks
@@ -167,4 +215,5 @@ void CMultiplayerSA::InitHooks_Weapons ( void )
 {
     EZHookInstall ( CWeapon_GenerateDamageEvent );
     EZHookInstall ( CShotInfo_Update );
+    EZHookInstall ( Fx_AddBulletImpact );
 }

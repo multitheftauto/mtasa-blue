@@ -199,7 +199,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedSkin", CLuaFunctionDefs::SetElementModel );
     CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaFunctionDefs::GetElementRotation );
     CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaFunctionDefs::SetElementRotation );
-    CLuaCFunctions::AddFunction ( "getModel", CLuaFunctionDefs::GetElementModel );
     CLuaCFunctions::AddFunction ( "getVehicleIDFromName", CLuaFunctionDefs::GetVehicleModelFromName );    
     CLuaCFunctions::AddFunction ( "getVehicleID", CLuaFunctionDefs::GetElementModel );    
     CLuaCFunctions::AddFunction ( "getVehicleRotation", CLuaFunctionDefs::GetElementRotation );
@@ -1134,6 +1133,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode );
     CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefs::AddDebugHook );
     CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefs::RemoveDebugHook );
+    CLuaCFunctions::AddFunction ( "isOOPEnabled", CLuaFunctionDefs::IsOOPEnabled );
 
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );

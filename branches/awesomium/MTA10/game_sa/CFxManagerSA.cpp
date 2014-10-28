@@ -12,7 +12,7 @@
 #include "StdInc.h"
 
 
-CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char ucFlag )
+CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char bSkipCameraFrustumCheck )
 {
     const CVector * pvecPosition = &vecPosition;
     DWORD dwThis = ( DWORD ) m_pInterface;
@@ -21,7 +21,7 @@ CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector
     _asm
     {
         mov     ecx, dwThis
-        push    ucFlag
+        push    bSkipCameraFrustumCheck
         push    pRwMatrixTag
         push    pvecPosition
         push    szBlueprint
@@ -29,7 +29,10 @@ CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector
         mov     dwReturn, eax
     }
     if ( dwReturn != 0 )
-        return new CFxSystemSA((CFxSystemSAInterface*)dwReturn);
+    {
+        CFxSystemSA* pFxSystemSA = new CFxSystemSA((CFxSystemSAInterface*)dwReturn);
+        return pFxSystemSA;
+    }
     else
         return NULL;
 }
@@ -47,4 +50,36 @@ void CFxManagerSA::DestroyFxSystem(CFxSystem* pFxSystem)
         push    pFxSA
         call    dwFunc
     }
+}
+
+//
+// Called when GTA deletes an FxSystem
+//
+void CFxManagerSA::OnFxSystemSAInterfaceDestroyed ( CFxSystemSAInterface* pFxSystemSAInterface )
+{
+    // Delete our wrapper object if we have one
+    CFxSystemSA* pFxSystemSA = GetFxSystem( pFxSystemSAInterface );
+    if ( pFxSystemSA )
+        delete pFxSystemSA;
+}
+
+//
+// AddToList/RemoveFromList called from CFxSystemSA constructor/destructor
+//
+void CFxManagerSA::AddToList( CFxSystemSAInterface* pFxSystemSAInterface, CFxSystemSA* pFxSystemSA )
+{
+    MapSet( m_FxInterfaceMap, pFxSystemSAInterface, pFxSystemSA );
+}
+
+void CFxManagerSA::RemoveFromList( CFxSystemSA* pFxSystemSA )
+{
+    MapRemoveByValue( m_FxInterfaceMap, pFxSystemSA );
+}
+
+//
+// Find our wrapper object for the GTA object
+//
+CFxSystemSA* CFxManagerSA::GetFxSystem( CFxSystemSAInterface* pFxSystemSAInterface )
+{
+    return MapFindRef( m_FxInterfaceMap, pFxSystemSAInterface );
 }

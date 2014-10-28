@@ -388,8 +388,11 @@ void CElementRPCs::SetElementHealth ( CClientEntity* pSource, NetBitStreamInterf
             case CCLIENTPED:
             case CCLIENTPLAYER:
             {
-                CClientPed* pPed = static_cast < CClientPed * > ( pSource );                    
-                pPed->SetHealth ( fHealth );
+                CClientPed* pPed = static_cast < CClientPed * > ( pSource );
+                if ( pPed->IsHealthLocked() )
+                    pPed->LockHealth ( fHealth );
+                else
+                    pPed->SetHealth ( fHealth );
                 break;
             }
 

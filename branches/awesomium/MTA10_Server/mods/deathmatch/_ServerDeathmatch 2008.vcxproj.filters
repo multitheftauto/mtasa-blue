@@ -924,6 +924,9 @@
     <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp">
       <Filter>Source Files\logic</Filter>
     </ClCompile>
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp">
+      <Filter>Source Files\logic\oopdefs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logic\CLightsyncManager.h">
@@ -945,9 +948,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gccHashSupport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StdInc.h">
@@ -1786,6 +1786,12 @@
     </ClInclude>
     <ClInclude Include="logic\luadefs\CLuaVector2Defs.h">
       <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\CCallRemoteQueue.h">
+      <Filter>NewFilter1</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\CCallRemoteQueueManager.h">
+      <Filter>NewFilter1</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -873,6 +873,17 @@ int CLuaFunctionDefs::GetNetworkStats ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::IsOOPEnabled ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+        lua_pushboolean ( luaVM, pLuaMain->IsOOPEnabled () );
+    else
+        lua_pushnil ( luaVM );
+
+    return 1;
+}
+
 
 int CLuaFunctionDefs::GetVersion ( lua_State* luaVM )
 {
@@ -943,7 +954,7 @@ int CLuaFunctionDefs::UtfLen ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     
-    lua_pushnil ( luaVM );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
@@ -1045,7 +1056,7 @@ int CLuaFunctionDefs::UtfChar ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    lua_pushnil ( luaVM );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
@@ -1066,7 +1077,7 @@ int CLuaFunctionDefs::UtfCode ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    lua_pushnil ( luaVM );
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 

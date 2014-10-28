@@ -2487,25 +2487,9 @@ void CResource::RemoveDependent ( CResource * resource )
     CheckState();
 }
 
+// Called on another thread, but g_pGame->Lock() has been called, so everything is going to be OK
 ResponseCode CResource::HandleRequest ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
-    if ( !g_pGame->IsServerFullyUp () )
-    {
-        SStringX strWait ( "The server is not ready. Please try again in a minute." );
-        ipoHttpResponse->SetBody ( strWait.c_str (), strWait.size () );
-        return HTTPRESPONSECODE_200_OK;
-    }
-
-    // if the mutex is already locked (i.e. the resource is being deleted), we return from this asap
-    // otherwise, we get the mutex and can handle the request
-
-  /*  if ( pthread_mutex_trylock(&m_mutex) == EBUSY ) {
-        ipoHttpResponse->SetBody("Resource shutting down",strlen("Resource shutting down"));
-        printf(" X\n");
-        return HTTPRESPONSECODE_500_INTERNALSERVERERROR;
-    }*/
-    g_pGame->Lock(); // get the mutex (blocking)
-
     std::string strAccessType;
     const char* szRequest = ipoHttpRequest->sOriginalUri.c_str();
     if ( *szRequest )
@@ -2528,10 +2512,9 @@ ResponseCode CResource::HandleRequest ( HttpRequest * ipoHttpRequest, HttpRespon
         else
             response = HandleRequestActive ( ipoHttpRequest, ipoHttpResponse, account );
 
-        g_pGame->Unlock();
         return response;
     }
-   g_pGame->Unlock();
+
    return HTTPRESPONSECODE_200_OK;
 
 }

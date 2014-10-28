@@ -408,7 +408,7 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     // Can't be 0
     if ( ucNumberOfPlayers == 0 )
     {
-        RaiseProtocolError ( 6 );
+        RaiseProtocolError ( 14 );
         return;
     }
 
@@ -539,6 +539,7 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
     SString strReason;
     SString strErrorCode;
     bool bShowMessageBox = true;
+    bool bExpectExtraString = false;
 
     bitStream.ReadBits ( &ucType, 5 );
 
@@ -552,14 +553,17 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             break;
         case ePlayerDisconnectType::BANNED_SERIAL:
             strReason = _("Disconnected: Serial is banned.\nReason: %s"); strErrorCode = _E("CD32");
+            bExpectExtraString = true;
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::BANNED_IP:
             strReason = _("Disconnected: You are banned.\nReason: %s"); strErrorCode = _E("CD33");
+            bExpectExtraString = true;
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::BANNED_ACCOUNT:
             strReason = _("Disconnected: Account is banned.\nReason: %s"); strErrorCode = _E("CD34");
+            bExpectExtraString = true;
             break;
         case ePlayerDisconnectType::VERSION_MISMATCH:
             strReason = _("Disconnected: Version mismatch"); strErrorCode = _E("CD35");
@@ -569,15 +573,19 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             break;
         case ePlayerDisconnectType::DIFFERENT_BRANCH:
             strReason = _("Disconnected: Server from different branch.\nInformation: %s"); strErrorCode = _E("CD37");
+            bExpectExtraString = true;
             break;
         case ePlayerDisconnectType::BAD_VERSION:
             strReason = _("Disconnected: Bad version.\nInformation: %s"); strErrorCode = _E("CD38");
+            bExpectExtraString = true;
             break;
         case ePlayerDisconnectType::SERVER_NEWER:
             strReason = _("Disconnected: Server is running a newer build.\nInformation: %s"); strErrorCode = _E("CD39");
+            bExpectExtraString = true;
             break;
         case ePlayerDisconnectType::SERVER_OLDER:
             strReason = _("Disconnected: Server is running an older build.\nInformation: %s"); strErrorCode = _E("CD40");
+            bExpectExtraString = true;
             break;
         case ePlayerDisconnectType::NICK_CLASH:
             strReason = _("Disconnected: Nick already in use"); strErrorCode = _E("CD41");
@@ -587,12 +595,14 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             break;
         case ePlayerDisconnectType::GENERAL_REFUSED:
             strReason = _("Disconnected: Server refused the connection: %s"); strErrorCode = _E("CD43");
+            bExpectExtraString = true;
             break;
         case ePlayerDisconnectType::SERIAL_VERIFICATION:
             strReason = _("Disconnected: Serial verification failed"); strErrorCode = _E("CD44");
             break;
         case ePlayerDisconnectType::CONNECTION_DESYNC:
             strReason = _("Disconnected: Connection desync %s"); strErrorCode = _E("CD45");
+            bExpectExtraString = true;
             break;
         case ePlayerDisconnectType::INVALID_PASSWORD:
             g_pCore->ShowServerInfo ( 2 );
@@ -600,24 +610,31 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             break;
         case ePlayerDisconnectType::KICK:
             strReason = _("Disconnected: You were kicked by %s"); strErrorCode = _E("CD46");
+            bExpectExtraString = true;
             break;
         case ePlayerDisconnectType::BAN:
             strReason = _("Disconnected: You were banned by %s"); strErrorCode = _E("CD47");
+            bExpectExtraString = true;
             bitStream.ReadString ( strDuration );
             break;
         case ePlayerDisconnectType::CUSTOM:
             strReason = "%s"; strErrorCode = _E("CD48"); // Custom disconnect reason
+            bExpectExtraString = true;
             break;
         default: break;
     }
 
     if ( bShowMessageBox )
     {
+        // Read and insert extra string if required
+        SString strMessage;
         if ( bitStream.GetNumberOfUnreadBits() > 7 ) // We have our string left to read
         {
-            SString strMessage;
             bitStream.ReadString ( strMessage );
-            strReason = SString(strReason,strMessage.c_str());
+        }
+        if ( bExpectExtraString )
+        {
+            strReason = SString( strReason, strMessage.c_str() );
         }
 
         if ( !strDuration.empty() && strDuration != "0")
@@ -790,11 +807,17 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         bool bIsFrozen = bitStream.ReadBit ();
 
         // Player nametag text
-        char szNametagText [MAX_PLAYER_NICK_LENGTH + 1];
+        char szNametagText [MAX_PLAYER_NAMETAG_LENGTH + 1];
         szNametagText[0] = '\0';
 
         unsigned char ucNametagTextLength;
-        bitStream.Read ( ucNametagTextLength );
+        if ( !bitStream.Read ( ucNametagTextLength ) || ucNametagTextLength > MAX_PLAYER_NAMETAG_LENGTH )
+        {
+            // Nametag length all wrong
+            RaiseProtocolError ( 9 );
+            return;
+        }
+
         if ( ucNametagTextLength > 0 )
         {
             bitStream.Read ( szNametagText, ucNametagTextLength );
@@ -2764,7 +2787,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         delete pCustomData;
                         pCustomData = NULL;
 
-                        RaiseEntityAddError ( 6 );
+                        RaiseEntityAddError ( 60 );
                         return;
                     }
                 }
@@ -2779,7 +2802,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     delete pCustomData;
                     pCustomData = NULL;
 
-                    RaiseEntityAddError ( 7 );
+                    RaiseEntityAddError ( 61 );
                     return;
                 }
             }
@@ -2815,7 +2838,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                 assert ( !pEntity->IsSystemEntity () );
                 if ( pEntity->IsSystemEntity () )
                 {
-                    RaiseEntityAddError ( 8 );
+                    RaiseEntityAddError ( 62 );
                     return;
                 }
 
@@ -2885,7 +2908,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
                         else
                         {
-                            RaiseEntityAddError ( 9 );
+                            RaiseEntityAddError ( 63 );
                             return;
                         }
 
@@ -3068,7 +3091,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         pEntity = pPickup;
                         if ( !pPickup )
                         {
-                            RaiseEntityAddError ( 10 );
+                            RaiseEntityAddError ( 64 );
                             return;
                         }
 
@@ -3202,7 +3225,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     pEntity = pVehicle;
                     if ( !pVehicle )
                     {
-                        RaiseEntityAddError ( 11 );
+                        RaiseEntityAddError ( 65 );
                         return;
                     }
 
@@ -3618,7 +3641,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     bitStream.ReadCompressed ( usNameLength );
                     if ( usNameLength > MAX_TEAM_NAME_LENGTH )
                     {
-                        RaiseEntityAddError ( 12 );
+                        RaiseEntityAddError ( 66 );
                         return;
                     }
 

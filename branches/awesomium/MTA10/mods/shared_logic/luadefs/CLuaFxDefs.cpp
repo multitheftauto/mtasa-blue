@@ -474,16 +474,18 @@ int CLuaFxDefs::fxAddFootSplash ( lua_State* luaVM )
 
 int CLuaFxDefs::CreateEffect ( lua_State* luaVM )
 {
-    // bool createEffect ( string fxName, float posX, float posY, float posZ[, float rotX, float rotY, float rotZ] )
+    // bool createEffect ( string fxName, float posX, float posY, float posZ[, float rotX, float rotY, float rotZ, float drawDistance] )
 
     CVector vecPosition;
     CVector vecRotation;
     SString strFxName;
+    float fDrawDistance;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strFxName );
     argStream.ReadVector3D ( vecPosition );
     argStream.ReadVector3D ( vecRotation, CVector(0, 0, 0) );
+    argStream.ReadNumber ( fDrawDistance, 0 );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -498,6 +500,7 @@ int CLuaFxDefs::CreateEffect ( lua_State* luaVM )
                 if ( pFx != NULL )
                 {
                     pFx->SetRotationDegrees ( vecRotation );
+                    pFx->SetDrawDistance ( fDrawDistance );
                     lua_pushelement ( luaVM, pFx );
                     return 1;
                 }

@@ -47,7 +47,7 @@ SExePatchedStatus   GetExePatchRequirements         ( void );
 bool                SetExePatchedStatus             ( bool bUseExeCopy, const SExePatchedStatus& reqStatus );
 bool                ShouldUseExeCopy                ( void );
 SString             GetPatchExeAdminReason          ( bool bUseExeCopy, const SExePatchedStatus& reqStatus );
-uint                GetExeFileSize                  ( bool bUseExeCopy );
+uint64              GetExeFileSize                  ( bool bUseExeCopy );
 bool                CopyExe                         ( void );
 SString             GetExePathFilename              ( bool bUseExeCopy );
 SString             GetUsingExePathFilename         ( void );

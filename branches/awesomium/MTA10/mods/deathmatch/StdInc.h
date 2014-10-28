@@ -122,7 +122,6 @@
 #include "CLuaShared.h"
 
 // Deathmatch includes
-#include "Client.h"
 #include "ClientCommands.h"
 #include "CClient.h"
 #include "CEvents.h"

@@ -30,6 +30,8 @@ namespace
         SetApplicationSetting ( "real-os-version",  GetRealOSVersion () );
         SetApplicationSetting ( "is-admin",         IsUserAdmin () ? "1" : "0" );
         SetApplicationSettingInt ( "last-server-ip", 0 );
+        SetApplicationSetting ( "real-os-build",    GetRealOSBuildNumber () );
+        SetApplicationSettingInt ( "vs2013-runtime-installed",  IsVS2013RuntimeInstalled () ? 1 : 0 );
     }
 
     // Comms between 'Admin' and 'User' processes
@@ -757,7 +759,7 @@ SString CInstallManager::MaybeRenameExe( const SString& strGTAPath )
     {
         // See if exe copy seems usable
         SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
-        uint uiStdFileSize = FileSize( strGTAEXEPath );
+        uint64 uiStdFileSize = FileSize( strGTAEXEPath );
         if ( uiStdFileSize && uiStdFileSize == FileSize( strHTAEXEPath ) )
             strGTAEXEPath = strHTAEXEPath;
     }

@@ -9597,7 +9597,7 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
         argStream.ReadNumber ( ucBlue );
     }
     else
-        argStream.m_iIndex = argStream.m_iIndex + 3;
+        argStream.Skip ( 3 );
 
     argStream.ReadBool ( bColorCoded, false );
 
@@ -9615,7 +9615,7 @@ int CLuaFunctionDefinitions::OutputChatBox ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
-    return 1;   
+    return 1;
 }
 
 int CLuaFunctionDefinitions::OutputConsole ( lua_State* luaVM )
@@ -10377,6 +10377,7 @@ int CLuaFunctionDefinitions::UtfChar ( lua_State* luaVM )
         SString strANSI = UTF16ToMbUTF8(wUNICODE);
 
         lua_pushstring ( luaVM, strANSI.c_str() );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -12975,6 +12976,17 @@ int CLuaFunctionDefinitions::GetModules ( lua_State* luaVM )
         lua_pushstring ( luaVM, (*iter)->_GetFunctions().szFileName );
         lua_settable ( luaVM, -3 );
     }
+    return 1;
+}
+
+int CLuaFunctionDefinitions::IsOOPEnabled ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+        lua_pushboolean ( luaVM, pLuaMain->IsOOPEnabled () );
+    else
+        lua_pushnil ( luaVM );
+
     return 1;
 }
 

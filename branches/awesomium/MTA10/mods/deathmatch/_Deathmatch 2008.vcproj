@@ -1864,10 +1864,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Client.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ClientCommands.h"
 				>
 			</File>

@@ -463,11 +463,33 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
         bKnownTablesCreated = true;
     }
 
+    unsigned int uiNumArgs;
     unsigned short usNumArgs;
-    if ( bitStream.ReadCompressed ( usNumArgs ) )
+    bool bResult;
+    if ( bitStream.Version () < 0x05B )
+    {
+        // We got the old version
+        bResult = bitStream.ReadCompressed ( usNumArgs );
+        uiNumArgs = usNumArgs;
+    }
+    else
+    {
+        // Check if we got the new version
+        if ( ( bResult = bitStream.ReadCompressed ( usNumArgs ) ) )
+        {
+            if ( usNumArgs == 0xFFFF )
+                // We got the new version
+                bResult = bitStream.ReadCompressed ( uiNumArgs );
+            else
+                // We got the old version
+                uiNumArgs = usNumArgs;
+        }
+    }
+
+    if ( bResult )
     {
         pKnownTables->push_back ( this );
-        for ( unsigned short us = 0 ; us < usNumArgs ; us++ )
+        for ( unsigned int ui = 0; ui < uiNumArgs; ++ui )
         {
             CLuaArgument* pArgument = new CLuaArgument ( bitStream, pKnownTables );
             m_Arguments.push_back ( pArgument );
@@ -492,7 +514,12 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHa
 
     bool bSuccess = true;
     pKnownTables->insert ( make_pair ( (CLuaArguments *)this, pKnownTables->size () ) );
-    bitStream.WriteCompressed ( static_cast < unsigned short > ( m_Arguments.size () ) );
+
+    if ( bitStream.Version () < 0x05B )
+        bitStream.WriteCompressed ( static_cast < unsigned short > ( m_Arguments.size () ) );
+    else
+        bitStream.WriteCompressed ( static_cast < unsigned int > ( m_Arguments.size () ) );
+
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
     for ( ; iter != m_Arguments.end () ; iter++ )
     {

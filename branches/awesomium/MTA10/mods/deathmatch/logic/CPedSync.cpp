@@ -82,13 +82,6 @@ void CPedSync::RemovePed ( CClientPed* pPed )
 }
 
 
-void CPedSync::ClearPeds ( void )
-{
-    // Clear the list
-    m_List.clear ();
-}
-
-
 bool CPedSync::Exists ( CClientPed* pPed )
 {
     return m_List.Contains ( pPed );
@@ -131,13 +124,13 @@ void CPedSync::Packet_PedStartSync ( NetBitStreamInterface& BitStream )
             pPed->SetCurrentRotation ( fRotation );
             pPed->SetMoveSpeed ( vecVelocity );
 
-            // Set the new health
-            pPed->SetHealth ( fHealth );
-            pPed->SetArmor ( fArmor );
-
             // Unlock health and armour for the syncer
             pPed->UnlockHealth ();
             pPed->UnlockArmor ();
+
+            // Set the new health
+            pPed->SetHealth ( fHealth );
+            pPed->SetArmor ( fArmor );
 
             AddPed ( pPed );
         }

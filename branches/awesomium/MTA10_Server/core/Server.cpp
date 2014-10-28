@@ -20,18 +20,21 @@
     #include "SharedUtil.Win32Utf8FileHooks.hpp"
 #endif
 
-#if WIN32
-    #define MTAEXPORT extern "C" __declspec(dllexport)
-#else
-    #define MTAEXPORT extern "C"
-#endif
-
 #ifdef WIN32
 CThreadCommandQueue g_CommandQueue;
 #endif
 
 MTAEXPORT int Run ( int iArgumentCount, char* szArguments [] )
 {
+    if ( iArgumentCount > 1 )
+    {
+        if ( strcmp ( szArguments[1], "--version" ) == 0 || strcmp ( szArguments[1], "-v" ) == 0 )
+        {
+            printf ( MTA_DM_FULL_STRING " v" MTA_DM_BUILDTAG_LONG "\n" );
+            return 1;
+        }
+    }
+
     SharedUtil_Tests ();
 
     #ifdef WIN32
