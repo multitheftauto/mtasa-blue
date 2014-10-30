@@ -128,6 +128,8 @@ CCore::CCore ( void )
     g_pGraphics                 = m_pGraphics;
     m_pGUI                      = NULL;
 
+    m_pBassManager              = NULL;
+
     // Create the mod manager
     m_pModManager               = new CModManager;
 
