@@ -13,20 +13,25 @@
 #define __CBASSMANAGER_H
 
 #include "CBassAudio.h"
+#include <core/CBassManagerInterface.h>
 
-//#define TEST_URL ""
-
-class CBassManager
+class CBassManager : public CBassManagerInterface
 {
 public:
-                    CBassManager    ( );
+                    CBassManager                ( void );
 
-    void            SetUserAgent    ( SString strConnectedServer );
+    void            SetUserAgent                ( SString strConnectedServer );
     
-    void            DoPulse         ( );
+    void            DoPulse                     ( void );
+
+    void            SetCreditsMusicPaused       ( bool bPaused );
+    bool            IsCreditsMusicPaused        ( void );
+
+    void            SetCreditsOpen              ( bool bOpen );
+
 private:
     SString         m_strUserAgent;
-    CBassAudio *    m_pTestStream;
+    CBassAudio *    m_pCreditsStream;
 };
 
 #endif

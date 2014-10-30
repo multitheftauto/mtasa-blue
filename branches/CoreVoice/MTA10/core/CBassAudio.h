@@ -85,6 +85,9 @@ public:
     float                   GetSoundBPM             ( void );
     void                    SetSoundBPM             ( float fBPM )                                              { m_fBPM = fBPM;}
 
+    bool                    IsPaused                ( void )                                                    { return m_bPaused; }
+
+
 protected:
     HSTREAM                 ConvertFileToMono       ( const SString& strPath );
     static void             PlayStreamIntern        ( void* arguments );
