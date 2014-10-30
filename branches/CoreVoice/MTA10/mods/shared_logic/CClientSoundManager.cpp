@@ -23,6 +23,8 @@ CClientSoundManager::CClientSoundManager ( CClientManager* pClientManager )
 {
     m_pClientManager = pClientManager;
 
+    g_pCore->GetBassManager ( )->SetUserAgent ( g_pNet->GetConnectedServer( true ) );
+
     UpdateVolume ();
 
     m_FxEffectNames["chorus"] =         BASS_FX_DX8_CHORUS;
@@ -47,6 +49,7 @@ CClientSoundManager::~CClientSoundManager ( void )
     ProcessStopQueues( true );
     //BASS_Stop();
     //BASS_Free();
+    g_pCore->GetBassManager ( )->SetUserAgent ( "" );
 }
 
 void CClientSoundManager::DoPulse ( void )

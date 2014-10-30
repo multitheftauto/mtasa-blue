@@ -13,6 +13,7 @@
 #define __CCOREINTERFACE_H
 
 #include "CConsoleInterface.h"
+#include "CBassManagerInterface.h"
 #include "CCommandsInterface.h"
 #include "CCommunityInterface.h"
 #include "CRenderItemManagerInterface.h"
@@ -168,6 +169,8 @@ public:
     virtual bool                    GetDeviceSelectionEnabled       ( void ) = 0;
     virtual bool                    GetRequiredDisplayResolution    ( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions ) = 0;
     virtual void                    NotifyRenderingGrass            ( bool bIsRenderingGrass ) = 0;
+
+    virtual CBassManagerInterface*  GetBassManager                  ( void ) = 0;
 };
 
 class CClientTime
