@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 #include "CVoiceRecorder.h"
+#include <core/CVoiceManagerInterface.h>
 
 CVoiceRecorder::CVoiceRecorder( void )
 {
@@ -21,7 +22,6 @@ CVoiceRecorder::CVoiceRecorder( void )
     m_VoiceState = VOICESTATE_AWAITING_INPUT;
     m_SampleRate = SAMPLERATE_WIDEBAND;
 
-    m_pAudioStream = NULL;
 
     m_pSpeexEncoderState = NULL;
 
@@ -46,12 +46,20 @@ int CVoiceRecorder::PACallback( const void *inputBuffer, void *outputBuffer, uns
 {
     // This assumes that PACallback will only be called when userData is a valid CVoiceRecorder pointer
     CVoiceRecorder* pVoiceRecorder = static_cast < CVoiceRecorder* > ( userData );
-    pVoiceRecorder->m_CS.Lock ();
 
-    if ( pVoiceRecorder->IsEnabled() )
-        pVoiceRecorder->SendFrame(inputBuffer);
+    CVoiceManagerInterface * pVoiceManager = g_pCore->GetVoiceManager ( );
 
-    pVoiceRecorder->m_CS.Unlock ();
+    pVoiceManager->Lock ( );
+
+    if ( !pVoiceManager->IsInTestMode ( ) )
+    {
+        if ( pVoiceRecorder != NULL )
+        {
+            pVoiceRecorder->SendFrame ( inputBuffer );
+        }
+    }
+
+    pVoiceManager->Unlock ( );
     return 0;
 }
 
@@ -62,15 +70,14 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
     if ( !bEnabled ) // If we aren't enabled, don't bother continuing
         return;
 
-    m_CS.Lock ();
+    CVoiceManagerInterface * pVoiceManager = g_pCore->GetVoiceManager ( );
+
+    pVoiceManager->Lock ();
 
     // Convert the sample rate we received from the server (0-2) into an actual sample rate
     m_SampleRate = convertServerSampleRate( uiServerSampleRate );
     m_ucQuality = ucQuality;
 
-    // State is awaiting input
-    m_VoiceState = VOICESTATE_AWAITING_INPUT;
- 
     // Calculate how many frames we are storing and then the buffer size in bytes
     unsigned int iFramesPerBuffer = ( 2048 / ( 32000 / m_SampleRate ));
     m_uiBufferSizeBytes = iFramesPerBuffer * sizeof(short);
@@ -79,33 +86,10 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
     m_ulTimeOfLastSend = 0;
 
     // Get the relevant speex mode for the servers sample rate
-    const SpeexMode* speexMode = getSpeexModeFromSampleRate();
+    const SpeexMode* speexMode = getSpeexModeFromSampleRate( );
     m_pSpeexEncoderState = speex_encoder_init(speexMode);
 
-    Pa_Initialize();
-
-    int count = Pa_GetHostApiCount();
-
-    PaStreamParameters inputDevice;
-    inputDevice.channelCount = 1;
-    inputDevice.device = Pa_GetDefaultInputDevice();
-    inputDevice.sampleFormat = paInt16;
-    inputDevice.hostApiSpecificStreamInfo = NULL;
-    inputDevice.suggestedLatency = 0;
-
-
-    Pa_OpenStream (
-            &m_pAudioStream, 
-            &inputDevice, 
-            NULL, 
-            m_SampleRate, 
-            iFramesPerBuffer, 
-            paNoFlag, 
-            PACallback, 
-            this );
     
-    Pa_StartStream( m_pAudioStream );
-
     // Initialize our outgoing buffer
     speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexOutgoingFrameSampleCount);
     speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_QUALITY, &m_ucQuality);
@@ -132,9 +116,20 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
 
     speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_BITRATE, &iBitRate );
 
-    g_pCore->GetConsole()->Printf( "Server Voice Chat Quality [%i];  Sample Rate: [%ikHz]; Bitrate [%ibps]", m_ucQuality, iSamplingRate, iBitRate );
+    // State is awaiting input
+    m_VoiceState = VOICESTATE_AWAITING_INPUT;
 
-    m_CS.Unlock ();
+    // unlock here
+    pVoiceManager->Unlock ();
+
+    // this is locked from inside the callback, register our callback here to be called if not in test mode
+    pVoiceManager->RegisterCallback ( PACallback );
+
+    // Initialise our voice manager with a pointer to this class for reference in our callback above
+    pVoiceManager->Init ( this, uiServerSampleRate, uiBitrate );
+
+    // Tell the user the information
+    g_pCore->GetConsole()->Printf( "Server Voice Chat Quality [%i];  Sample Rate: [%ikHz]; Bitrate [%ibps]", m_ucQuality, iSamplingRate, iBitRate );
 }
 
 void CVoiceRecorder::DeInit( void )
@@ -143,38 +138,47 @@ void CVoiceRecorder::DeInit( void )
     {
         m_bEnabled = false;
 
-        Pa_CloseStream( m_pAudioStream );
-        Pa_Terminate();
+        // get our voice manager
+        CVoiceManagerInterface * pVoiceManager = g_pCore->GetVoiceManager ( );
 
         // Assumes now that PACallback will not be called in this context
-        m_CS.Lock ();
-        m_CS.Unlock ();
+        pVoiceManager->Lock ();
+        pVoiceManager->Unlock ();
         // Assumes now that PACallback is not executing in this context
 
-        m_pAudioStream = NULL;
-
+        // reset the outgoing frame sample count
         m_iSpeexOutgoingFrameSampleCount = 0;
 
+        // destroy our speex encoder
         speex_encoder_destroy(m_pSpeexEncoderState);
         m_pSpeexEncoderState = NULL;
 
+        // destroy our speex preprocessor
         speex_preprocess_state_destroy(m_pSpeexPreprocState);
         m_pSpeexPreprocState = NULL;
 
+        // free up our audio buffer
         free(m_pOutgoingBuffer);
         m_pOutgoingBuffer = NULL;
 
+        // reset our voice and sample states
         m_VoiceState = VOICESTATE_AWAITING_INPUT;
         m_SampleRate = SAMPLERATE_WIDEBAND;
 
-        m_pAudioStream = NULL;
 
+        // reset our state variables
         m_iSpeexOutgoingFrameSampleCount = 0;
         m_uiOutgoingReadIndex = 0;
         m_uiOutgoingWriteIndex = 0;
         m_bIsSendingVoiceData = false;
         m_ulTimeOfLastSend = 0;
         m_uiBufferSizeBytes = 0;
+
+        // deinitialise port audio
+        pVoiceManager->DeInit ( );
+
+        // unregister our callback
+        pVoiceManager->RegisterCallback ( NULL );
     }
 }
 
@@ -211,7 +215,8 @@ void CVoiceRecorder::UpdatePTTState( unsigned int uiState )
     if ( !m_bEnabled )
         return;
 
-    m_CS.Lock ();
+    CVoiceManagerInterface * pVoiceManager = g_pCore->GetVoiceManager ( );
+    pVoiceManager->Lock ();
 
     if ( uiState == 1 )
     {
@@ -220,7 +225,7 @@ void CVoiceRecorder::UpdatePTTState( unsigned int uiState )
             // Call event on the local player for starting to talk
             if ( g_pClientGame->GetLocalPlayer () )
             {
-                m_CS.Unlock ();
+                pVoiceManager->Unlock ();
                 CLuaArguments Arguments;
                 bool bEventTriggered = g_pClientGame->GetLocalPlayer ()->CallEvent ( "onClientPlayerVoiceStart", Arguments, true );
 
@@ -228,7 +233,7 @@ void CVoiceRecorder::UpdatePTTState( unsigned int uiState )
                 {
                     return;
                 }
-                m_CS.Lock ();
+                pVoiceManager->Lock ();
                 m_VoiceState = VOICESTATE_RECORDING;
             }
         }
@@ -242,19 +247,20 @@ void CVoiceRecorder::UpdatePTTState( unsigned int uiState )
             // Call event on the local player for stopping to talk
             if ( g_pClientGame->GetLocalPlayer () )
             {
-                m_CS.Unlock ();
+                pVoiceManager->Unlock ();
                 CLuaArguments Arguments;
                 g_pClientGame->GetLocalPlayer ()->CallEvent ( "onClientPlayerVoiceStop", Arguments, true );
-                m_CS.Lock ();
+                pVoiceManager->Lock ();
             }
         }
     }
-    m_CS.Unlock ();
+    pVoiceManager->Unlock ();
 }
 
 void CVoiceRecorder::DoPulse( void )
 {
-    m_CS.Lock ();
+    CVoiceManagerInterface * pVoiceManager = g_pCore->GetVoiceManager ( );
+    pVoiceManager->Lock ();
 
     char *pInputBuffer;
     char bufTempOutput[2048];
@@ -346,7 +352,7 @@ void CVoiceRecorder::DoPulse( void )
             }
         }
     }
-    m_CS.Unlock ();
+    pVoiceManager->Unlock ();
 }
 
 // Called from other thread. Critical section is already locked.

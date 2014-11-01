@@ -74,10 +74,11 @@ private:
 
     static int                          PACallback                  ( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData );
 
+    eSampleRate                         convertServerSampleRate         ( unsigned int uiServerSampleRate );
+
+
     bool                                m_bEnabled;
     eVoiceState                         m_VoiceState;
-
-    PaStream*                           m_pAudioStream;
 
     void*                               m_pSpeexEncoderState;
     SpeexPreprocessState*               m_pSpeexPreprocState;
@@ -91,12 +92,10 @@ private:
     unsigned long                       m_ulTimeOfLastSend;
 
     unsigned int                        m_uiBufferSizeBytes;
-    eSampleRate                         convertServerSampleRate         ( unsigned int uiServerSampleRate );
 
     eSampleRate                         m_SampleRate;
     unsigned char                       m_ucQuality;
 
     std::list < SString >               m_EventQueue;
-    CCriticalSection                    m_CS;
 };
 #endif
