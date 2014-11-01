@@ -21,7 +21,7 @@ class CCore;
 #define __CCORE_H
 
 #include "../version.h"
-
+#include "Voice/CVoiceManager.h"
 #include "CClientVariables.h"
 #include "CCommands.h"
 #include "CFileSystemHook.h"
@@ -109,6 +109,8 @@ public:
     CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
 
     CBassManager *          GetBassManager                  ( void )                { return m_pBassManager; };
+
+    CVoiceManager *         GetVoiceManager                 ( void )                { return m_pVoiceManager; };
 
     void                    SaveConfig                      ( void );
 
@@ -298,6 +300,7 @@ private:
     CTCPManager *               m_pTCPManager;
 
     CBassManager *              m_pBassManager;
+    CVoiceManager *             m_pVoiceManager;
 
     bool                        m_bLastFocused;
     int                         m_iUnminimizeFrameCounter;

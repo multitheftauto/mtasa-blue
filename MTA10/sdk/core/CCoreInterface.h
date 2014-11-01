@@ -14,6 +14,7 @@
 
 #include "CConsoleInterface.h"
 #include "CBassManagerInterface.h"
+#include "CVoiceManagerInterface.h"
 #include "CCommandsInterface.h"
 #include "CCommunityInterface.h"
 #include "CRenderItemManagerInterface.h"
@@ -171,6 +172,7 @@ public:
     virtual void                    NotifyRenderingGrass            ( bool bIsRenderingGrass ) = 0;
 
     virtual CBassManagerInterface*  GetBassManager                  ( void ) = 0;
+    virtual CVoiceManagerInterface* GetVoiceManager                 ( void ) = 0;
 };
 
 class CClientTime

@@ -25,6 +25,7 @@
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
+#include "Voice/CVoiceManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -129,6 +130,8 @@ CCore::CCore ( void )
     m_pGUI                      = NULL;
 
     m_pBassManager              = NULL;
+
+    m_pVoiceManager              = NULL;
 
     // Create the mod manager
     m_pModManager               = new CModManager;
@@ -1203,6 +1206,7 @@ void CCore::DoPostFramePulse ( )
         m_Community.Initialize ();
 
         m_pBassManager = new CBassManager ( );
+        m_pVoiceManager = new CVoiceManager ( );
     }
     
     if ( m_pBassManager != NULL )
