@@ -534,7 +534,7 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_pIncludeOtherVersions [ type ]->SetPosition ( CVector2D ( fX, fY ), false );
     m_pIncludeOtherVersions [ type ]->AutoSize ( m_pIncludeOtherVersions [ type ]->GetText ().c_str (), 20.0f );
     m_pIncludeOtherVersions [ type ]->SetClickHandler ( GUI_CALLBACK ( &CServerBrowser::OnFilterChanged, this ) );
-    m_pIncludeOtherVersions [ type ]->SetVisible ( false );
+    m_pIncludeOtherVersions [ type ]->SetSelected ( true );
 
     // Status bar
 	fX = 5;
@@ -863,7 +863,7 @@ void CServerBrowser::UpdateServerList ( ServerBrowserType Type, bool bClearServe
             AddServerToList ( pServer, Type );
         }
     }
-    bool bIncludeOtherVersions = m_pIncludeOtherVersions [ Type ]->IsVisible () && m_pIncludeOtherVersions [ Type ]->GetSelected ();
+    bool bIncludeOtherVersions = m_pIncludeOtherVersions [ Type ]->GetSelected ();
     ServerBrowserType type = Type;
 
     if ( bIncludeOtherVersions )
@@ -971,7 +971,7 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
     bool bIncludeFull   = m_pIncludeFull [ Type ]->GetSelected ();
     bool bIncludeLocked = m_pIncludeLocked [ Type ]->GetSelected ();
     bool bIncludeOffline = m_pIncludeOffline [ Type ] && m_pIncludeOffline [ Type ]->GetSelected ();
-    bool bIncludeOtherVersions = m_pIncludeOtherVersions [ Type ]->IsVisible () && m_pIncludeOtherVersions [ Type ]->GetSelected ();
+    bool bIncludeOtherVersions = m_pIncludeOtherVersions [ Type ]->GetSelected ();
     bool bServerSearchFound = true;
 
     std::string strServerSearchText = m_pEditSearch [ Type ]->GetText ();
@@ -1021,16 +1021,6 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
     bool bIsLocked          = pServer->bPassworded;
     bool bIsBlockedVersion  = bIsOtherVersion && !CanBrowseVersion ( pServer->strVersion );
     bool bIsBlockedServer   = ( pServer->uiMasterServerSaysRestrictions & ASE_FLAG_RESTRICTIONS ) != false;
-
-    // Maybe switch on 'Other version' checkbox
-    if ( bIsOtherVersion && !bIsBlockedVersion )
-    {
-        if ( !m_pIncludeOtherVersions [ Type ]->IsVisible () )
-        {
-            m_pIncludeOtherVersions [ Type ]->SetSelected ( true );
-            m_pIncludeOtherVersions [ Type ]->SetVisible ( true );
-        }
-    }
 
     if (
         ( !pServer->strVersion.empty () || bIsOffline ) &&
