@@ -32,6 +32,20 @@ class CSettings;
 
 //#define SHOWALLSETTINGS
 
+enum eTabIndex
+{
+    UNKNOWN_TAB,
+    TAB_MULTIPLAYER,
+    TAB_VIDEO,
+    TAB_AUDIO,
+    TAB_MICROPHONE,
+    TAB_BINDS,
+    TAB_CONTROLS,
+    TAB_INTERFACE,
+    TAB_ADVANCED,
+    TAB_COMMUNITY,
+};
+
 struct SKeyBindSection
 {
     SKeyBindSection ( char * szTitle )
@@ -121,10 +135,12 @@ public:
     void                LoadData                ( void );
 
     inline bool         IsCapturingKey          ( void )            { return m_bCaptureKey; }
-    void                UpdateCaptureAxis       ();
-    void                UpdateJoypadTab         ();
+    void                UpdateCaptureAxis       ( void );
+    void                UpdateJoypadTab         ( void );
 
-    void                UpdateAudioTab          ();
+    void                UpdateAudioTab          ( void );
+
+    void                UpdateMicrophoneTab     ( void );
 
     void                UpdateVideoTab          ( void );
     void                PopulateResolutionComboBox( void );
@@ -144,7 +160,6 @@ public:
     bool                IsActive                ( void );
 
     void                SetSelectedIndex        ( unsigned int uiIndex );
-
 protected:
     const static int    SecKeyNum = 3;     // Number of secondary keys
 
@@ -249,6 +264,33 @@ protected:
     CGUIComboBox*       m_pComboUsertrackMode;
     CGUIButton*         m_pAudioDefButton;
 
+
+    CGUIButton*         m_pMicrophoneTestButton;
+    CGUIButton*         m_pMicrophoneStopTestButton;
+    CGUILabel*          m_pMicrophoneLabel;
+    CGUILabel*          m_pMicrophoneDeviceLabel;
+    CGUILabel*          m_pMicrophoneQualityLabel;
+    CGUILabel*          m_pMicrophoneLocalPlaybackLabel;
+    CGUICheckBox*       m_pMicrophoneLocalPlaybackCheckbox;
+
+    CGUIStaticImage*    m_pImageRed;
+    CGUIStaticImage*    m_pImageRed2;
+    CGUIStaticImage*    m_pImageYellow1;
+    CGUIStaticImage*    m_pImageYellow2;
+    CGUIStaticImage*    m_pImageYellow3;
+    CGUIStaticImage*    m_pImageGreen1;
+    CGUIStaticImage*    m_pImageGreen2;
+    CGUIStaticImage*    m_pImageGreen3;
+    CGUIStaticImage*    m_pImageGreen4;
+
+    CGUITexture *       m_pRedTexture;
+    CGUITexture *       m_pYellowTexture;
+    CGUITexture *       m_pGreenTexture;
+    CGUITexture *       m_pBlankTexture;
+    int                 m_iLastCase;
+
+    CGUIComboBox*       m_pDeviceSelection;
+
     CGUIGridList*       m_pBindsList;
     CGUIButton*         m_pBindsDefButton;
     CGUIHandle          m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
@@ -318,6 +360,8 @@ protected:
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );
     bool                OnAudioDefaultClick     ( CGUIElement* pElement );
+    bool                OnMicrophoneTestClick   ( CGUIElement* pElement );
+    bool                OnMicrophoneStopTestClick   ( CGUIElement* pElement );
     bool                OnControlsDefaultClick  ( CGUIElement* pElement );
     bool                OnBindsDefaultClick     ( CGUIElement* pElement );
     bool                OnVideoDefaultClick     ( CGUIElement* pElement );
@@ -328,7 +372,7 @@ protected:
     bool                OnRegisterButtonClick   ( CGUIElement* pElement );
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );
-    bool                OnAnisotropicChanged     ( CGUIElement* pElement );
+    bool                OnAnisotropicChanged    ( CGUIElement* pElement );
     bool                OnMapAlphaChanged       ( CGUIElement* pElement );
     bool                OnRadioVolumeChanged    ( CGUIElement* pElement );
     bool                OnSFXVolumeChanged      ( CGUIElement* pElement );
@@ -342,19 +386,25 @@ protected:
     bool                OnMouseSensitivityChanged ( CGUIElement* pElement );
     bool                OnVerticalAimSensitivityChanged ( CGUIElement* pElement );
 
-    bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
+    bool                OnMouseDoubleClick              ( CGUIMouseEventArgs Args );
 
-    bool                OnChatLoadPresetClick   ( CGUIElement* pElement );
+    bool                OnChatLoadPresetClick           ( CGUIElement* pElement );
 
-    bool                OnSkinChanged ( CGUIElement* pElement );
+    bool                OnSkinChanged                   ( CGUIElement* pElement );
 
-    bool                OnFxQualityChanged      ( CGUIElement* pElement );
-    bool                OnVolumetricShadowsClick ( CGUIElement* pElement );
-    bool                OnAllowScreenUploadClick ( CGUIElement* pElement );
-    bool                OnCustomizedSAFilesClick ( CGUIElement* pElement );
-    bool                ShowUnsafeResolutionsClick ( CGUIElement* pElement );
+    bool                OnFxQualityChanged              ( CGUIElement* pElement );
+    bool                OnVolumetricShadowsClick        ( CGUIElement* pElement );
+    bool                OnAllowScreenUploadClick        ( CGUIElement* pElement );
+    bool                OnCustomizedSAFilesClick        ( CGUIElement* pElement );
+    bool                ShowUnsafeResolutionsClick      ( CGUIElement* pElement );
     bool                OnShowAdvancedSettingDescription ( CGUIElement* pElement );
     bool                OnHideAdvancedSettingDescription ( CGUIElement* pElement );
+   
+
+    bool                OnAudioInputDeviceChanged       ( CGUIElement * pElement );
+    bool                OnLocalPlaybackClick            ( CGUIElement * pElement );
+    bool                OnTabChange                     ( CGUIElement * pElement );
+
 
 private:
     void                ProcessKeyBinds         ( void );
@@ -396,6 +446,8 @@ private:
     bool                m_bMuteRadio;
     bool                m_bMuteMTA;
     bool                m_bMuteVoice;
+
+    eTabIndex           m_eCurrentTab;
 
     std::list < SKeyBindSection *> m_pKeyBindSections;
 

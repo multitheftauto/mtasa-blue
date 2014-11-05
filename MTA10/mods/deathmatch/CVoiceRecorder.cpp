@@ -126,7 +126,10 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
     pVoiceManager->RegisterCallback ( PACallback );
 
     // Initialise our voice manager with a pointer to this class for reference in our callback above
-    pVoiceManager->Init ( this, uiServerSampleRate, uiBitrate );
+    pVoiceManager->Init ( this, uiServerSampleRate, false );
+
+    // set voice enabled in this server
+    pVoiceManager->SetServerVoiceEnabled ( true );
 
     // Tell the user the information
     g_pCore->GetConsole()->Printf( "Server Voice Chat Quality [%i];  Sample Rate: [%ikHz]; Bitrate [%ibps]", m_ucQuality, iSamplingRate, iBitRate );
@@ -174,11 +177,27 @@ void CVoiceRecorder::DeInit( void )
         m_ulTimeOfLastSend = 0;
         m_uiBufferSizeBytes = 0;
 
-        // deinitialise port audio
-        pVoiceManager->DeInit ( );
+        if ( pVoiceManager->IsInTestMode ( ) == false )
+        {
+            // deinitialise port audio
+            pVoiceManager->DeInit ( );
 
-        // unregister our callback
-        pVoiceManager->RegisterCallback ( NULL );
+            // disable server voice
+            pVoiceManager->SetServerVoiceEnabled ( false );
+
+            // unregister our callback
+            pVoiceManager->RegisterCallback ( NULL );
+        }
+        else
+        {
+            // Don't deinitialise here, wait for test mode to disable but unregister any hooks and make sure the game knows we don't have voice enabled in this server
+
+            // disable server voice
+            pVoiceManager->SetServerVoiceEnabled ( false );
+
+            // unregister our callback
+            pVoiceManager->RegisterCallback ( NULL );
+        }
     }
 }
 

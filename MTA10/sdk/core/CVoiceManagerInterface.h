@@ -19,8 +19,9 @@ class CVoiceManagerInterface
 public:
 
     virtual void            RegisterCallback            ( PaStreamCallback * pCallback ) = 0;
-    virtual void            Init                        ( void* user, unsigned int uiServerSampleRate, unsigned int uiBitrate ) = 0;
 
+    virtual void            SetServerVoiceEnabled       ( bool bEnabled ) = 0;
+    virtual void            Init                        ( void* user, unsigned int uiServerSampleRate, bool bTestMode ) = 0;
     virtual void            DeInit                      ( void ) = 0;
 
     virtual bool            IsInTestMode                ( void ) = 0;

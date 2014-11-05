@@ -27,7 +27,7 @@
 
 // Uncomment this to hear yourself speak locally (Voice is still encoded & decoded to simulate network transmission)
 #define VOICE_DEBUG_LOCAL_PLAYBACK
-
+#define VOICE_DEBUG_LOCAL_PLAYBACK_LATENCY 15000
 enum eVoiceState
 {
     VOICESTATE_AWAITING_INPUT = 0,
@@ -49,35 +49,63 @@ enum eServerSampleRate
     SERVERSAMPLERATE_ULTRAWIDEBAND
 };
 
+struct tVoiceManagerInitFlags
+{
+    tVoiceManagerInitFlags ( )
+    {
+        m_user = NULL;
+        m_uiServerSampleRate = SAMPLERATE_ULTRAWIDEBAND;
+        m_bInTestMode = false;
+    }
+    tVoiceManagerInitFlags ( void* user, unsigned int uiServerSampleRate, bool bInTestMode )
+    {
+        m_user = user;
+        m_uiServerSampleRate = uiServerSampleRate;
+        m_bInTestMode = bInTestMode;
+    }
+    void*           m_user;
+    unsigned int    m_uiServerSampleRate;
+    bool            m_bInTestMode;
+};
+
 class CVoiceManager : public CVoiceManagerInterface
 {
 public:
                     CVoiceManager               ( void );
+                    ~CVoiceManager              ( void );
 
+    bool            IsInTestMode                ( void )                { return m_bInTestMode; };
+    void            SetTestMode                 ( bool bTestMode );
+    void            BufferAudioFrame              ( const void *inputBuffer, unsigned long framecount );
 
-    bool            IsInTestMode                ( void )               { return m_bInTestMode; };
+    void            SetServerVoiceEnabled       ( bool bEnabled );
+    bool            IsServerVoiceEnabled        ( void )                { return m_bServerVoiceEnabled; };
 
-    void            Init                        ( void* user, unsigned int uiServerSampleRate, unsigned int uiBitrate );
-
+    bool            IsInitialised               ( void )                { return m_bInitialised; };
+    void            Init                        ( void* user, unsigned int uiServerSampleRate, bool bTestMode );
     void            DeInit                      ( void );
 
-    static int      PACallback                  ( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, 
-                                                  PaStreamCallbackFlags statusFlags, void *userData );
     void            TriggerCallback             ( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, 
                                                   PaStreamCallbackFlags statusFlags, void *userData );
-
     void            RegisterCallback            ( PaStreamCallback * pCallback );
 
 
-    void            HandleTestMode              ( const void *inputBuffer, unsigned long framecount );
-
-    static eSampleRate          convertServerSampleRate                 ( unsigned int uiServerSampleRate );
-
     // Exported to deathmatch to share a critical section ensuring that the code is locked at the right times
-    void            Lock                        ( void )                                { m_CS.Lock ( ); };
-    void            Unlock                      ( void )                                { m_CS.Unlock ( ); };
+    void            Lock                            ( void )            { m_CS.Lock ( ); };
+    void            Unlock                          ( void )            { m_CS.Unlock ( ); };
 
 
+    DWORD           GetLevelData                    ( void );
+
+    std::map < int, SString > GetAvailableDevices   ( void );
+
+    void                    SetAudioInputDevice             ( int iAudioDeviceID );
+    void                    SetLocalPlaybackEnabled         ( bool bEnabled );
+
+    static eSampleRate      convertServerSampleRate         ( unsigned int uiServerSampleRate );
+
+    static int              PACallback                      ( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, 
+                                                             PaStreamCallbackFlags statusFlags, void *userData );
 
 private:
     bool                                m_bInTestMode;
@@ -95,6 +123,19 @@ private:
 
     HSTREAM                             m_pBassPlaybackStream;
     unsigned int                        m_uiBufferSizeBytes;
+
+    bool                                m_bInitialised;
+    bool                                m_bServerVoiceEnabled;
+    bool                                m_bLocalPlaybackEnabled;
+
+    PaDeviceIndex                       m_iDeviceIndex;
+
+    tVoiceManagerInitFlags              m_tVoiceManagerInitFlags;
+
+#ifdef VOICE_DEBUG_LOCAL_PLAYBACK
+    bool                                m_bPaused;
+    CElapsedTime                        m_tElapsedTime;
+#endif
 
 };
 

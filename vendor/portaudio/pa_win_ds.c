@@ -2685,6 +2685,13 @@ static PaError StopStream( PaStream *s )
 
     if( stream->timerID != 0 )
     {
+        /* MTA Comment - Cazomino05
+        A freeze/crash here indicates another thread owns a shared lock which is currently locking out the callback function that is being called
+
+        the callback function is waiting for the shared lock and this code is waiting for the callback to return before killing the timer
+
+        ergo deadlock
+        */
         timeKillEvent(stream->timerID);  /* Stop callback timer. */
         stream->timerID = 0;
     }
