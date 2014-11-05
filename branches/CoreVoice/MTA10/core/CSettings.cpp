@@ -57,7 +57,7 @@ void CSettings::CreateGUI ( void )
     if ( m_pWindow )
         DestroyGUI ();
 
-    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabInterface, *pTabAdvanced;
+    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabMicrophone, *pTabBinds, *pTabControls, *pTabCommunity, *pTabInterface, *pTabAdvanced;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -88,14 +88,33 @@ void CSettings::CreateGUI ( void )
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
     m_pTabs->SetPosition ( CVector2D ( 0, 20.0f ) );
     m_pTabs->SetSize ( CVector2D ( 560.0f, 420.0f ) );
+
     pTabMultiplayer = m_pTabs->CreateTab ( _("Multiplayer") );
+    pTabMultiplayer->SetUserData ( (void*) TAB_MULTIPLAYER );
+
     pTabVideo = m_pTabs->CreateTab ( _("Video") );
+    pTabVideo->SetUserData ( (void*) TAB_VIDEO );
+
     pTabAudio = m_pTabs->CreateTab ( _("Audio") );
+    pTabAudio->SetUserData ( (void*) TAB_AUDIO );
+
+    pTabMicrophone = m_pTabs->CreateTab ( _("Microphone") );
+    pTabMicrophone->SetUserData ( (void*) TAB_MICROPHONE );
+
     pTabBinds = m_pTabs->CreateTab ( _("Binds") );
+    pTabBinds->SetUserData ( (void*) TAB_BINDS );
+
     pTabControls = m_pTabs->CreateTab ( _("Controls") );
+    pTabControls->SetUserData ( (void*) TAB_CONTROLS );
+
     pTabInterface = m_pTabs->CreateTab ( _("Interface") );
+    pTabInterface->SetUserData ( (void*) TAB_INTERFACE );
+
     pTabAdvanced = m_pTabs->CreateTab ( _("Advanced") );
+    pTabAdvanced->SetUserData ( (void*) TAB_ADVANCED );
+
     pTabCommunity = m_pTabs->CreateTab ( _("Community") );
+    pTabCommunity->SetUserData ( (void*) TAB_COMMUNITY );
 
     // Create buttons
     //  OK button
@@ -593,6 +612,141 @@ void CSettings::CreateGUI ( void )
     m_pAudioDefButton->GetSize ( vecSize );
     m_pAudioDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
     m_pAudioDefButton->SetZOrderingEnabled ( false );
+
+    /**
+     *  Microphone tab
+     **/
+
+    m_pTabs->GetSize ( vecTemp );
+
+    m_pMicrophoneTestButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabMicrophone, _("Test") ) );
+    m_pMicrophoneTestButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnMicrophoneTestClick, this ) );
+    m_pMicrophoneTestButton->AutoSize ( NULL, 20.0f, 8.0f );
+    m_pMicrophoneTestButton->GetSize ( vecSize );
+    m_pMicrophoneTestButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 110.0f, 365 ) );
+    m_pMicrophoneTestButton->SetZOrderingEnabled ( false );
+    m_pMicrophoneTestButton->SetEnabled ( true );
+
+    m_pMicrophoneStopTestButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabMicrophone, _("Stop Testing") ) );
+    m_pMicrophoneStopTestButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnMicrophoneStopTestClick, this ) );
+    m_pMicrophoneStopTestButton->AutoSize ( NULL, 20.0f, 8.0f );
+    m_pMicrophoneStopTestButton->GetSize ( vecSize );
+    m_pMicrophoneStopTestButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
+    m_pMicrophoneStopTestButton->SetZOrderingEnabled ( false );
+    m_pMicrophoneStopTestButton->SetEnabled ( false );
+
+    m_pMicrophoneLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMicrophone, _("Microphone - Input level") ) );
+    m_pMicrophoneLabel->SetPosition ( CVector2D ( 11, 13 ) );
+    m_pMicrophoneLabel->GetPosition ( vecTemp, false );
+    m_pMicrophoneLabel->AutoSize ( NULL, 5.0f );
+    m_pMicrophoneLabel->SetFont ( "default-bold-small" );
+
+
+    m_pRedTexture = reinterpret_cast < CGUITexture* > ( pManager->CreateTexture ( ) ); 
+    m_pRedTexture->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon2.png" ) );
+
+    m_pYellowTexture = reinterpret_cast < CGUITexture* > ( pManager->CreateTexture ( ) ); 
+    m_pYellowTexture->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+
+    m_pGreenTexture = reinterpret_cast < CGUITexture* > ( pManager->CreateTexture ( ) ); 
+    m_pGreenTexture->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+
+    m_pBlankTexture = reinterpret_cast < CGUITexture* > ( pManager->CreateTexture ( ) ); 
+    m_pBlankTexture->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    
+    vecTemp.fX += 20.0f;
+
+    m_pImageRed2 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
+    m_pImageRed2->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageRed2->SetSize ( CVector2D ( 32, 22 ) );
+    m_pImageRed2->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pImageRed2->GetPosition ( vecTemp, false );
+
+    m_pImageRed = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
+    m_pImageRed->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageRed->SetSize ( CVector2D ( 32, 22 ) );
+    m_pImageRed->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pImageRed->GetPosition ( vecTemp, false );
+
+    m_pImageYellow3 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
+    m_pImageYellow3->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageYellow3->SetSize ( CVector2D ( 32, 22 ) );
+    m_pImageYellow3->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pImageYellow3->GetPosition ( vecTemp, false );
+    
+    m_pImageYellow2 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
+    m_pImageYellow2->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageYellow2->SetSize ( CVector2D ( 32, 22 ) );
+    m_pImageYellow2->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pImageYellow2->GetPosition ( vecTemp, false );
+    
+    m_pImageYellow1 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
+    m_pImageYellow1->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageYellow1->SetSize ( CVector2D ( 32, 22 ) );
+    m_pImageYellow1->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pImageYellow1->GetPosition ( vecTemp, false );
+
+    m_pImageGreen4 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) );
+    m_pImageGreen4->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageGreen4->SetSize ( CVector2D ( 32, 22 ) );
+    m_pImageGreen4->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pImageGreen4->GetPosition ( vecTemp, false );
+
+    m_pImageGreen3 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) );
+    m_pImageGreen3->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageGreen3->SetSize ( CVector2D ( 32, 22 ) );
+    m_pImageGreen3->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pImageGreen3->GetPosition ( vecTemp, false );
+
+    m_pImageGreen2 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) );
+    m_pImageGreen2->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageGreen2->SetSize ( CVector2D ( 32, 22 ) );
+    m_pImageGreen2->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pImageGreen2->GetPosition ( vecTemp, false );
+
+
+    m_pImageGreen1 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) );
+    m_pImageGreen1->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageGreen1->SetSize ( CVector2D ( 32, 22 ) );
+    m_pImageGreen1->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
+    m_pImageGreen1->GetPosition ( vecTemp, false );
+
+
+    /*m_pMicrophoneQualityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMicrophone, _("Too quiet") ) );
+    m_pMicrophoneQualityLabel->SetPosition ( CVector2D ( 70, vecTemp.fY - 20 ) );
+    m_pMicrophoneQualityLabel->AutoSize ( NULL, 5.0f );
+    m_pMicrophoneQualityLabel->SetFont ( "default-bold-small" );*/
+
+
+    vecTemp.fX -= 20.0f;
+
+    m_pMicrophoneDeviceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMicrophone, _("Microphone - Input device") ) );
+    m_pMicrophoneDeviceLabel->SetPosition ( CVector2D ( 11, vecTemp.fY + 24 ) );
+    m_pMicrophoneDeviceLabel->GetPosition ( vecTemp, false );
+    m_pMicrophoneDeviceLabel->AutoSize ( NULL, 5.0f );
+    m_pMicrophoneDeviceLabel->SetFont ( "default-bold-small" );
+
+    m_pDeviceSelection = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabMicrophone, _("Input device") ) );
+    m_pDeviceSelection->SetPosition ( CVector2D ( 11, vecTemp.fY + 24 ) );
+    m_pDeviceSelection->SetSize ( CVector2D ( 350.0f, 95.0f ) );
+    m_pDeviceSelection->GetPosition ( vecTemp, false );
+    m_pDeviceSelection->SetReadOnly ( true );
+
+
+    m_pMicrophoneLocalPlaybackLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMicrophone, _("Microphone - Local playback") ) );
+    m_pMicrophoneLocalPlaybackLabel->SetPosition ( CVector2D ( 11, vecTemp.fY + 29 ) );
+    m_pMicrophoneLocalPlaybackLabel->GetPosition ( vecTemp, false );
+    m_pMicrophoneLocalPlaybackLabel->AutoSize ( NULL, 5.0f );
+    m_pMicrophoneLocalPlaybackLabel->SetFont ( "default-bold-small" );
+
+    m_pMicrophoneLocalPlaybackCheckbox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMicrophone, _("Local playback enabled"), false ) );
+    m_pMicrophoneLocalPlaybackCheckbox->SetPosition ( CVector2D ( 11, vecTemp.fY + 24 ) );
+    m_pMicrophoneLocalPlaybackCheckbox->GetPosition ( vecTemp, false );
+    m_pMicrophoneLocalPlaybackCheckbox->AutoSize ( NULL, 20.0f );
+
+    bool bMicrophoneLocalPlaybackEnabled = false;
+    CVARS_GET ( "localvoiceplayback", bMicrophoneLocalPlaybackEnabled );
+    m_pMicrophoneLocalPlaybackCheckbox->SetSelected ( bMicrophoneLocalPlaybackEnabled );
 
     /**
      *  Video tab
@@ -1320,6 +1474,12 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxAllowScreenUpload->SetClickHandler ( GUI_CALLBACK( &CSettings::OnAllowScreenUploadClick, this ) );
     m_pCheckBoxCustomizedSAFiles->SetClickHandler ( GUI_CALLBACK( &CSettings::OnCustomizedSAFilesClick, this ) );
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler ( GUI_CALLBACK( &CSettings::ShowUnsafeResolutionsClick, this ) );
+
+    m_pDeviceSelection->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnAudioInputDeviceChanged, this ) );
+    m_pMicrophoneLocalPlaybackCheckbox->SetClickHandler ( GUI_CALLBACK( &CSettings::OnLocalPlaybackClick, this ) );
+
+    m_pTabs->SetSelectionHandler ( GUI_CALLBACK( &CSettings::OnTabChange, this ) );
+
     /*
     // Give a warning if no community account settings were stored in config
     CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, _("Multi Theft Auto: Community settings"), MB_ICON_WARNING );
@@ -1435,22 +1595,259 @@ bool CSettings::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
     return false;
 }
 
-
 void CSettings::Update ( void )
 {
     // Once each 30 frames
     if ( m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL ) {
 
-        UpdateJoypadTab ();
-
+        if ( m_eCurrentTab == TAB_CONTROLS )
+        {
+            UpdateJoypadTab ();
+        }
         m_dwFrameCount = 0;
     }
     m_dwFrameCount++;
 
     UpdateCaptureAxis ();
 
+    if ( m_eCurrentTab == TAB_MICROPHONE )
+    {
+        UpdateMicrophoneTab ( );
+    }
 }
 
+// These are the peak levels for each "bar"
+// so bar 0 is from 0-0.2, bar 1 is from 0.2-0.8 etc
+// starts at 0.2 to filter out background noise, typically static on line in accounted for about 0.01-0.02
+float pVolumeLevels[] = { 
+    0.2f, // 0 - blank
+    0.8f, // 1 - Green
+    1.6f, // 2 - Green
+    2.4f, // 3 - Green
+    3.2f, // 4 - Green
+    4.0f, // 5 - Yellow
+    5.8f, // 6 - Yellow
+    6.4f, // 7 - Yellow
+    7.2f, // 8 - Red
+    8.0f, // 9 - Red
+};
+
+void CSettings::UpdateMicrophoneTab ( void )
+{
+    // get our voice manager
+    CVoiceManager * pVoiceManager = CCore::GetSingleton ().GetVoiceManager ( );
+
+    // if we are not in test mode
+    if ( !pVoiceManager->IsInTestMode ( ) )
+    {
+        // return out here
+        return;
+    }
+    // get our level data
+    DWORD dwReturn = pVoiceManager->GetLevelData ( );
+
+    // left channel is in the low byte, right in the high byte though honestly we probably don't need the right channel at all.
+    WORD wLeft = LOWORD ( dwReturn ) ;
+    //WORD wRight = HIWORD ( dwReturn );
+
+    // 0.000244140625f isn't a random number I promise!
+    // result of 8 / 32768 gives us 8 states 
+    // 32768 is the maximum possible value that GetLevelData returns
+    float fDecibels = wLeft * 0.000244140625f;
+    
+    // Uses load from file because CEGUI deletes textures when you change texture so I can't reuse texture elements for different entities
+    if ( fDecibels <= pVolumeLevels[0] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 0 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        }
+        m_iLastCase = 0;
+    }
+    else if ( fDecibels <= pVolumeLevels[1] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 1 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        }
+        m_iLastCase = 1;
+    }
+    else if ( fDecibels <= pVolumeLevels[2] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 2 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        }
+        m_iLastCase = 2;
+    }
+
+    else if ( fDecibels <= pVolumeLevels[3] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 3 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        }
+        m_iLastCase = 3;
+    }
+    else if ( fDecibels <= pVolumeLevels[4] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 4 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        }
+        m_iLastCase = 4;
+    }
+    else if ( fDecibels <= pVolumeLevels[5] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 5 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        }
+        m_iLastCase = 5;
+    }
+    else if ( fDecibels <= pVolumeLevels[6] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 6 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        }
+        m_iLastCase = 6;
+    }
+    else if ( fDecibels <= pVolumeLevels[7] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 7 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        }
+        m_iLastCase = 7;
+    }
+    else if ( fDecibels <= pVolumeLevels[8] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 8 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon2.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        }
+        m_iLastCase = 8;
+    }
+    else if ( fDecibels <= pVolumeLevels[9] )
+    {
+        // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
+        if ( m_iLastCase != 9 )
+        {
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon2.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon2.png" ) );
+        }
+        m_iLastCase = 9;
+    }
+}
 
 void CSettings::UpdateAudioTab ()
 {
@@ -1826,6 +2223,79 @@ bool CSettings::OnAudioDefaultClick ( CGUIElement* pElement )
     return true;
 }
 
+//
+// Called when the user clicks on the microphone 'Test' button.
+//
+bool CSettings::OnMicrophoneTestClick ( CGUIElement* pElement )
+{   
+    // get our voice manager
+    CVoiceManager * pVoiceManager = CCore::GetSingleton ( ).GetVoiceManager ( );
+    // ensure our voice manager is valid
+    if ( pVoiceManager )
+    {
+        // are we initialised?
+        if ( pVoiceManager->IsInitialised ( ) == false )
+        {
+            // initialise our voice manager in test mode
+            pVoiceManager->Init ( NULL, 2, true );
+        }
+        else
+        {
+            // enable test mode and redirect output to the menu rather than deathmatch
+            pVoiceManager->SetTestMode ( true );
+        }
+        // Enable stop testing
+        m_pMicrophoneStopTestButton->SetEnabled ( true );
+        // disable test
+        m_pMicrophoneTestButton->SetEnabled ( false );
+        // set the local playback state
+        pVoiceManager->SetLocalPlaybackEnabled ( m_pMicrophoneLocalPlaybackCheckbox->GetSelected ( ) );
+    }
+    return true;
+}
+
+
+//
+// Called when the user clicks on the microphone 'Stop testing' button.
+//
+bool CSettings::OnMicrophoneStopTestClick ( CGUIElement* pElement )
+{   
+    // get our voice manager
+    CVoiceManager * pVoiceManager = CCore::GetSingleton ( ).GetVoiceManager ( );
+    // ensure our voice manager is valid
+    if ( pVoiceManager )
+    {
+        // if this server does not use voice
+        if ( pVoiceManager->IsServerVoiceEnabled ( ) == false )
+        {
+            // deinitialise our voice manager
+            pVoiceManager->DeInit ( );
+        }
+        else
+        {
+            // disable test mode and send output to deathmatch
+            pVoiceManager->SetTestMode ( false );
+        }
+        // Enable test
+        m_pMicrophoneTestButton->SetEnabled ( true );
+        // disable stop testing
+        m_pMicrophoneStopTestButton->SetEnabled ( false );
+
+        // update the UI as all blank        
+        m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+        m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+
+        m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    }
+    return true;
+}
 
 //
 // Called when the user clicks on an map axis button. Starts the capture axis process.
@@ -3706,24 +4176,32 @@ void CSettings::SetSelectedIndex ( unsigned int uiIndex )
 
 void CSettings::TabSkip ( bool bBackwards )
 {
+    // get the tab count
     unsigned int uiTabCount = m_pTabs->GetTabCount ( );
 
+    // if backwards
     if ( bBackwards )
     {
+        // get the selected index and subtract one
         unsigned int uiIndex = m_pTabs->GetSelectedIndex ( ) - 1;
 
+        // handle wrap around logic - 0 is an invalid index
         if ( m_pTabs->GetSelectedIndex ( ) == 0 )
         {
+            // start at the last index
             uiIndex = uiTabCount - 1;
         }
-
+        // set the selected index
         SetSelectedIndex ( uiIndex );
     }
     else
     {
+        // add one to the index
         unsigned int uiIndex = m_pTabs->GetSelectedIndex ( ) + 1;
+        // index mod tab count will handle wrap around logic
         unsigned int uiNewIndex = uiIndex % uiTabCount;
 
+        // set the selected index
         SetSelectedIndex ( uiNewIndex );
     }
 }
@@ -3731,4 +4209,90 @@ void CSettings::TabSkip ( bool bBackwards )
 bool CSettings::IsActive ( void )
 {
     return m_pWindow->IsActive ();
+}
+
+bool CSettings::OnAudioInputDeviceChanged ( CGUIElement * pElement )
+{
+    // get our voice manager
+    CVoiceManager * pVoiceManager = CCore::GetSingleton ( ).GetVoiceManager ( );
+    // ensure our voice manager is valid
+    if ( pVoiceManager )
+    {
+        // get our selected device
+        CGUIListItem * pSelectedItem = m_pDeviceSelection->GetSelectedItem ( );
+
+        // make sure we have a selected device, could happen if there aren't any valid input devices in the system
+        if ( pSelectedItem )
+        {
+            // set the selected device
+            pVoiceManager->SetAudioInputDevice ( (int) pSelectedItem->GetData ( ) );
+        }
+    }
+    return true;
+}
+
+bool CSettings::OnLocalPlaybackClick ( CGUIElement * pElement )
+{
+    // get our voice manager
+    CVoiceManager * pVoiceManager = CCore::GetSingleton ( ).GetVoiceManager ( );
+    // ensure our voice manager is valid
+    if ( pVoiceManager )
+    {
+        // set the local playback state
+        pVoiceManager->SetLocalPlaybackEnabled ( m_pMicrophoneLocalPlaybackCheckbox->GetSelected ( ) );
+    }
+    return true;
+}
+
+bool CSettings::OnTabChange ( CGUIElement * pElement )
+{
+    // if the tabs panel exists
+    if ( m_pTabs )
+    {
+        // get the selected tab
+        CGUITab * pTab = m_pTabs->GetSelectedTab ( );
+        
+        // if the tab exists
+        if ( pTab )
+        {
+            // user data pointer is actually just a tab index, cast to a tab index
+            // this is safe since user data isn't used elsewhere it's purely to store data about a specific UI element
+            m_eCurrentTab = (eTabIndex) reinterpret_cast < int > ( pTab->GetUserData ( ) );
+        }
+        else
+        {
+            // no selected tab at all? o.O
+            m_eCurrentTab = UNKNOWN_TAB;
+        }
+    }
+    else
+    {
+        // new tab perhaps, unknown type
+        m_eCurrentTab = UNKNOWN_TAB;
+    }
+
+    // Load devices when we swap to the microphone tab
+    if ( m_eCurrentTab == TAB_MICROPHONE )
+    {
+        // get our voice manager
+        CVoiceManager * pVoiceManager = CCore::GetSingleton ( ).GetVoiceManager ( );
+        // ensure our voice manager is valid
+        if ( pVoiceManager )
+        {
+            // get the available devices map
+            std::map < int, SString > mapDevices = pVoiceManager->GetAvailableDevices ( );
+
+            // get a const iterator 
+            map < int, SString > ::const_iterator iter = mapDevices.begin();
+            // loop through our iterator
+            for ( ; iter != mapDevices.end(); iter++ )
+            {
+                // add an item with the name port audio provided and set the user data as the device ID
+                m_pDeviceSelection->AddItem ( iter->second )->SetData ( (void*)iter->first );
+            }
+            // select item 0, that'l be our default device
+            m_pDeviceSelection->SetSelectedItemByIndex ( 0 );
+        }
+    }
+    return true;
 }
