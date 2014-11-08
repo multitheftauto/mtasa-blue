@@ -1427,19 +1427,6 @@ void CMultiplayerSA::InitHooks()
     // Increase intensity of vehicle tail light corona
     MemPut < BYTE > ( 0x6E1A22, 0xF0 );
 
-
-    // Steam SA Fix need to add a setting for this eventually, just gotta get a fix tested first
-    MemPutFast < DWORD > ( 0x8C9014, 0xB ); // playback fm
-    MemPutFast < DWORD > ( 0x8C9014+4, 0xF ); // k-rose 
-    MemPutFast < DWORD > ( 0x8C9014+8, 0xF ); // k-dst
-    MemPutFast < DWORD > ( 0x8C9014+12, 0xE ); // bounce fm
-    MemPutFast < DWORD > ( 0x8C9014+16, 0x10 ); // sf-ur
-    MemPutFast < DWORD > ( 0x8C9014+20, 0xE ); // radio los santos
-    MemPutFast < DWORD > ( 0x8C9014+24, 0xD ); // radio x
-    MemPutFast < DWORD > ( 0x8C9014+28, 0xD ); // csr 103.9
-    MemPutFast < DWORD > ( 0x8C9014+32, 0xE ); // k-jah west
-    MemPutFast < DWORD > ( 0x8C9014+36, 0xD ); // master sounds 98.3
-
     InitHooks_CrashFixHacks ();
 
     // Init our 1.3 hooks.
