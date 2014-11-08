@@ -66,7 +66,7 @@ namespace
     //
     // CLuaMainTiming
     //
-    typedef std::map < SString, CTimingBlock > CEventTimingMap;
+    typedef CFastHashMap < SString, CTimingBlock > CEventTimingMap;
     class CLuaMainTiming
     {
     public:
@@ -85,7 +85,7 @@ namespace
 
     };
 
-    typedef std::map < CLuaMain*, CLuaMainTiming > CLuaMainTimingMap;
+    typedef CFastHashMap < CLuaMain*, CLuaMainTiming > CLuaMainTimingMap;
     class CAllLuaTiming
     {
     public:
@@ -135,7 +135,7 @@ public:
     CAllLuaTiming                   AllLuaTiming;
     long long                       m_LastTickCount;
     unsigned long                   m_SecondCounter;
-    std::map < CLuaMain*, int >     m_LuaMainMap;
+    CFastHashMap < CLuaMain*, int > m_LuaMainMap;
 };
 
 

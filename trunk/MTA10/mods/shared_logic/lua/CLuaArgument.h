@@ -78,8 +78,10 @@ private:
     CLuaArguments*          m_pTableData;
     bool                    m_bWeakTableRef;
 
+#ifdef MTA_DEBUG
     std::string             m_strFilename;
     int                     m_iLine;
+#endif
 
     void                    CopyRecursive       ( const CLuaArgument& Argument, CFastHashMap < CLuaArguments*, CLuaArguments* > * pKnownTables = NULL );
     bool                    CompareRecursive    ( const CLuaArgument& Argument, std::set < CLuaArguments* > * pKnownTables = NULL );
