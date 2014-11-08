@@ -321,9 +321,7 @@ TIMEUS SharedUtil::GetTimeUs()
 
     LARGE_INTEGER lEnd;
     QueryPerformanceCounter(&lEnd);
-	double duration = double(lEnd.QuadPart - lStart.QuadPart) / lFreq.QuadPart;
-    duration *= 1000000;
-    LONGLONG llDuration = static_cast < LONGLONG > ( duration );
+    LONGLONG llDuration = ( lEnd.QuadPart - lStart.QuadPart ) * 1000000LL / lFreq.QuadPart;
     return llDuration & 0xffffffff;
 }
 #else
@@ -347,11 +345,10 @@ TIMEUS SharedUtil::GetTimeUs()
     gettimeofday(&t2, NULL);
 
     // compute elapsed time in us
-    double elapsedTime;
-    elapsedTime =  (t2.tv_sec  - t1.tv_sec) * 1000000.0;    // sec to us
-    elapsedTime += (t2.tv_usec - t1.tv_usec);               // us to us
+    LONGLONG llDuration;
+    llDuration = (t2.tv_sec - t1.tv_sec) * 1000000LL;    // sec to us
+    llDuration += (t2.tv_usec - t1.tv_usec);             // us to us
 
-    LONGLONG llDuration = static_cast < LONGLONG > ( elapsedTime );
     return llDuration & 0xffffffff;
 }
 #endif

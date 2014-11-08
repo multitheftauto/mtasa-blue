@@ -165,7 +165,7 @@ private:
 
     bool                            m_bEnableOOP;
 public:
-    std::map < const void*, CRefInfo >      m_CallbackTable;
+    CFastHashMap < const void*, CRefInfo >  m_CallbackTable;
     std::map < int, SString >               m_FunctionTagMap;
 };
 
