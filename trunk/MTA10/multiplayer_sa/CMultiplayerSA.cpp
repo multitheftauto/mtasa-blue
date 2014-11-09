@@ -6722,12 +6722,12 @@ bool ChooseMusicTrackIndex_SteamFix ( )
     case RLS:
         {
             // "I Don't Give A f*ck"
-            if ( bTrackID == 2 )
+            if ( bTrackID == 1 )
             {
                 return true;
             }
             // disable "Express Yourself"
-            else if ( bTrackID == 14 )
+            else if ( bTrackID == 6 )
             {
                 return true;
             }
@@ -6800,6 +6800,9 @@ bool ChooseMusicTrackIndex_SteamFix ( )
     case WCTR:
         break;
     }
+#ifdef PRINT_SONGID
+    OutputDebugLine(SString("%i %i", dwStationID, bTrackID ));
+#endif
     // song is allowed
     return false;
 }
