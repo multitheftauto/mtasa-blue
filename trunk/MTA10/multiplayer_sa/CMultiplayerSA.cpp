@@ -288,6 +288,10 @@ DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
 #define HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed          0x62D5A7
 DWORD RETURN_CTaskSimplyGangDriveBy__ProcessPed = 0x62D5AC;
 
+#define HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex 0x4EA296
+DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex             = 0x4EA2A0;
+DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex_Regenerate  = 0x04EA286;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -500,6 +504,8 @@ void HOOK_FxManager_c__DestroyFxSystem ();
 
 void HOOK_CTaskSimpleGangDriveBy__ProcessPed();
 
+void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( );
+
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
@@ -704,6 +710,13 @@ void CMultiplayerSA::InitHooks()
 
     // CTaskSimpleGangDriveBy::ProcessPed hook for disabling certain animations
     HookInstall(HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed, (DWORD) HOOK_CTaskSimpleGangDriveBy__ProcessPed, 5);
+
+    SString strTrakLkupMd5 = CMD5Hasher::CalculateHexString( PathJoin( GetLaunchPath(), "audio", "CONFIG", "TrakLkup.dat" ) );
+    if ( strTrakLkupMd5 != "528E75D663B8BAE072A01351081A2145" )
+    {
+        // CAERadioTrackManager::ChooseMusicTrackIndex hook for fixing a crash with the steam audio files
+        HookInstall(HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex, (DWORD) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex, 10);
+    }
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -1427,14 +1440,6 @@ void CMultiplayerSA::InitHooks()
     // Increase intensity of vehicle tail light corona
     MemPut < BYTE > ( 0x6E1A22, 0xF0 );
 
-    // Check for non-standard TrakLkup.dat
-    SString strTrakLkupMd5 = CMD5Hasher::CalculateHexString( PathJoin( GetLaunchPath(), "audio", "CONFIG", "TrakLkup.dat" ) );
-    if ( strTrakLkupMd5 != "528E75D663B8BAE072A01351081A2145" )
-    {
-        // Bodgingly increase stream length by 1ms to avoid div by zero crash at 0x04F1464
-        MemCpy ( (void *)0x0502631, "\xDC\x05\x10\xA3\x85\x00", 6 );    // fadd qword ptr ds:[85A310h]  // add 1.0
-        MemCpy ( (void *)0x0502637, "\xE9\x04\xF5\x31\x00", 5 );        // jmp 00821B40
-    }
 
     InitHooks_CrashFixHacks ();
 
@@ -6636,4 +6641,211 @@ void _declspec(naked) HOOK_CTaskSimpleGangDriveBy__ProcessPed()
         jmp RETURN_CTaskSimplyGangDriveBy__ProcessPed;
     }
      
+}
+
+
+eRadioStationID dwStationID = UNKNOWN;
+BYTE bTrackID = 0;
+DWORD dwNumberOfTracks = 0;
+
+DWORD pTrackNumbers[] = {
+    0x2, // radio off, somewhere 2 is subtracted from this so that's why it's 2
+    0xB, // playback fm
+    0xF, // k-rose
+    0xF, // k-dst
+    0xE, // bounce fm
+    0x10, // sf-ur
+    0xE, // rls
+    0xD, // radio x
+    0xD, // csr
+    0xE, // k-jah
+    0xC, // master sounds
+    0x1F,
+};
+
+
+bool ChooseMusicTrackIndex_SteamFix ( )
+{
+    // update the number of tracks from the array above as it has the new values
+    dwNumberOfTracks = pTrackNumbers[dwStationID];
+
+    // switch contains all radio stations and music that has been removed from the game
+
+    switch ( dwStationID )
+    {
+    case Playback_FM:
+        {
+            // disable "Critical Beatdown"
+            if ( bTrackID == 9 )
+            {
+                return true;
+            }
+        }
+        break;
+    case K_Rose:
+        break;
+    case K_DST:
+        {
+            // disable "Running Down A Dream"
+            if ( bTrackID == 0 )
+            {
+                return true;
+            }
+            // disable "Woman To Woman"
+            else if ( bTrackID == 2 )
+            {
+                return true;
+            }
+        }
+        break;
+    case BOUNCE_FM:
+        {
+            // disable "You Dropped A Bomb On Me"
+            if ( bTrackID == 3 )
+            {
+                return true;
+            }
+            // disable "Yum Yum"
+            else if ( bTrackID == 8 )
+            {
+                return true;
+            }
+            // disable "Running Away"
+            else if ( bTrackID == 15 )
+            {
+                return true;
+            }
+        }
+        break;
+    case SF_UR:
+        break;
+    case RLS:
+        {
+            // "I Don't Give A f*ck"
+            if ( bTrackID == 2 )
+            {
+                return true;
+            }
+            // disable "Express Yourself"
+            else if ( bTrackID == 14 )
+            {
+                return true;
+            }
+        }
+        break;
+    case RADIO_X:
+        {
+            // disable "Hellraiser"
+            if ( bTrackID == 6 )
+            {
+                return true;
+            }
+            // disable "Killing in the Name of"
+            else if ( bTrackID == 7 )
+            {
+                return true;
+            }
+        }
+        break;
+    case CSR_1039:
+        break;
+    case K_JAH_WEST:
+        {
+            // disable "Ring My Bell"
+            if ( bTrackID == 2 )
+            {
+                return true;
+            }
+            // disable "Don't Let It Go To Your Head"
+            else if ( bTrackID == 3 )
+            {
+                return true;
+            }
+        }
+        break;
+    case Master_Sounds:
+        {
+            // disable "Express Yourself"
+            if ( bTrackID == 0 )
+            {
+                return true;
+            }
+            // disable "Rock Creek Park"
+            else if ( bTrackID == 5 )
+            {
+                return true;
+            }
+            // disable "Funky President"
+            else if ( bTrackID == 7 )
+            {
+                return true;
+            }
+            // disable "Grunt"
+            else if ( bTrackID == 8 )
+            {
+                return true;
+            }
+            // disable "Soul power"
+            else if ( bTrackID == 11 )
+            {
+                return true;
+            }
+            // disable "The payback"
+            else if ( bTrackID == 16 )
+            {
+                return true;
+            }
+        }
+        break;
+    case WCTR:
+        break;
+    }
+    // song is allowed
+    return false;
+}
+/*
+    This hook is ultra important as of 09/11/2014 as steam has released a patch which changes the audio files and causes the following consequenses:
+        1) a division by zero when trying to start deleted songs due to the track list being malformed
+        2) the game getting stuck on a specific song and never carrying on as the game tries to play 15 songs before restarting on a channel that only has 12
+
+    These are as a result of the fact that steam updated gta-sa.exe and gta_sa.exe is our old exe which contains the arrays the game had originally for audio files
+    All the files related to the deleted audio are zeroed and decompress to 5kb 0 length files which includes intros and outros.
+*/
+void _declspec(naked) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( )
+{
+    // esi is our station id    
+    // al has the random number picked (music id the game wants to play)
+
+
+    _asm
+    {
+        add esp, 8              // fix the stack from the function call above as we overrote this instruction
+        pushad                  // save our registers
+        mov dwStationID, esi    // save esi, we need the station ID above
+        mov bTrackID, al        // save our track ID which we need to figure out if we can play it.
+    }
+
+    // returns true if this is a restricted song
+    if ( ChooseMusicTrackIndex_SteamFix ( ) )
+    {
+        _asm
+        {
+            // pop the stack
+            popad
+            // go back to generating a number again, this is so that we don't get stuck in an infinite loop if we tried to increment or decrement
+            // SA tries to avoid playing the same songs close together so it won't play anything that's already played once until we have done a full loop
+            // as such generating a new ID is better than trying to fix it (this is how the game naturally works anyway)
+            jmp RETURN_CAERadioTrackManager__ChooseMusicTrackIndex_Regenerate
+        }
+    }
+    // looks good, carry on
+    _asm
+    {
+        // pop the stack
+        popad
+        // this number of tracks needs fixing because we need the game to know about the deletions here as it is used for the wrap around logic of radio 
+        mov ecx, dwNumberOfTracks
+        // jump back to normal processing
+        jmp RETURN_CAERadioTrackManager__ChooseMusicTrackIndex
+    }
 }
