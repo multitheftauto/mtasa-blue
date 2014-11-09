@@ -40,7 +40,12 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
         // Is the time up and is not being deleted
         if ( llCurrentTime >= ( llStartTime + llDelay ) )
         {
+            // Set our debug info
+            g_pClientGame->GetScriptDebugging()->SaveLuaDebugInfo ( m_pProcessingTimer->GetLuaDebugInfo ( ) );
+            
             m_pProcessingTimer->ExecuteTimer ( pLuaMain );
+            // Reset
+            g_pClientGame->GetScriptDebugging()->SaveLuaDebugInfo ( SLuaDebugInfo() );
 
             // If this is the last repeat, remove
             if ( uiRepeats == 1 )
