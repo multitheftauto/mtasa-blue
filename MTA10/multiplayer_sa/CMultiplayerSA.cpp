@@ -1427,6 +1427,15 @@ void CMultiplayerSA::InitHooks()
     // Increase intensity of vehicle tail light corona
     MemPut < BYTE > ( 0x6E1A22, 0xF0 );
 
+    // Check for non-standard TrakLkup.dat
+    SString strTrakLkupMd5 = CMD5Hasher::CalculateHexString( PathJoin( GetLaunchPath(), "audio", "CONFIG", "TrakLkup.dat" ) );
+    if ( strTrakLkupMd5 != "528E75D663B8BAE072A01351081A2145" )
+    {
+        // Bodgingly increase stream length by 1ms to avoid div by zero crash at 0x04F1464
+        MemCpy ( (void *)0x0502631, "\xDC\x05\x10\xA3\x85\x00", 6 );    // fadd qword ptr ds:[85A310h]  // add 1.0
+        MemCpy ( (void *)0x0502637, "\xE9\x04\xF5\x31\x00", 5 );        // jmp 00821B40
+    }
+
     InitHooks_CrashFixHacks ();
 
     // Init our 1.3 hooks.
