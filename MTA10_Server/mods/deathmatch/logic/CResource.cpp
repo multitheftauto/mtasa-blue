@@ -2806,8 +2806,13 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 					OldUser.Push ( m_pVM->GetVM() );
 					lua_setglobal ( m_pVM->GetVM(), "user" );
 
+                    // Set debug info in case error occurs in WriteToJSONString
+                    g_pGame->GetScriptDebugging()->SaveLuaDebugInfo( SLuaDebugInfo( m_strResourceName, INVALID_LINE_NUMBER, SString( "[HTTP:%s]", strFuncName.c_str () ) ) );
+
                     std::string strJSON;
                     luaReturns.WriteToJSONString ( strJSON, true );
+
+                    g_pGame->GetScriptDebugging()->SaveLuaDebugInfo( SLuaDebugInfo() );
 
                     ipoHttpResponse->SetBody ( strJSON.c_str (), strJSON.length () );
                     bAlreadyCalling = false;

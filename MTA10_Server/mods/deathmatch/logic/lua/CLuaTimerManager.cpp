@@ -43,11 +43,11 @@ void CLuaTimerManager::DoPulse ( CLuaMain* pLuaMain )
         if ( llCurrentTime >= ( llStartTime + llDelay ) )
         {
             // Set our debug info
-            g_pGame->GetScriptDebugging()->SetErrorLineAndFile ( m_pProcessingTimer->GetDebugInfo ( ) );
+            g_pGame->GetScriptDebugging()->SaveLuaDebugInfo ( m_pProcessingTimer->GetLuaDebugInfo ( ) );
             
             m_pProcessingTimer->ExecuteTimer ( pLuaMain );
             // Reset
-            g_pGame->GetScriptDebugging()->SetErrorLineAndFile ( "" );
+            g_pGame->GetScriptDebugging()->SaveLuaDebugInfo ( SLuaDebugInfo() );
 
             // If this is the last repeat, remove
             if ( uiRepeats == 1 )

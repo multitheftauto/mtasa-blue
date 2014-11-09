@@ -1038,7 +1038,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                             else
                             {
                                 // Appears sometimes when a player quits
-                                //g_pClientGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid element specified in JSON string '%s'.", szString ) );
+                                //g_pClientGame->GetScriptDebugging()->LogError ( NULL, "Invalid element specified in JSON string '%s'.", szString );
                                 m_iType = LUA_TNIL;
                             }
                             break;
@@ -1052,7 +1052,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                             }
                             else
                             {
-                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, SString ( "Invalid resource specified in JSON string '%s'.", strString.c_str ( ) ) );
+                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, "Invalid resource specified in JSON string '%s'.", strString.c_str ( ) );
                                 m_iType = LUA_TNIL;
                             }
                             break;
@@ -1068,7 +1068,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                             }
                             else
                             {
-                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, SString ( "Invalid table reference specified in JSON string '%s'.", strString.c_str ( ) ) );
+                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, "Invalid table reference specified in JSON string '%s'.", strString.c_str ( ) );
                                 m_iType = LUA_TNIL;
                             }
                             break;

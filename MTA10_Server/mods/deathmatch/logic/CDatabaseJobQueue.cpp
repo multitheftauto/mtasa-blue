@@ -327,7 +327,7 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
             CTickCount age = timeNow - pJobData->result.timeReady;
             if ( age.ToLongLong () > 1000 * 60 * 5 )
             {
-                CLogger::LogPrintf ( "WARNING: %s: Database result uncollected after 5 minutes. [Query: %s]\n", *pJobData->m_strDebugInfo, *pJobData->command.strData );
+                g_pGame->GetScriptDebugging()->LogWarning( pJobData->m_LuaDebugInfo, "Database result uncollected after 5 minutes. [Query: %s]", *pJobData->command.strData );
                 pJobData->result.bLoggedWarning = true;
                 break;
             }

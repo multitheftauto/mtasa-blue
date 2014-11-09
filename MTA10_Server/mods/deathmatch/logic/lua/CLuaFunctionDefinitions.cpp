@@ -10023,31 +10023,12 @@ int CLuaFunctionDefinitions::SetTimer ( lua_State* luaVM )
             }
             else
             {
-                lua_Debug debugInfo;
-                SString strDebugOutput = "";
-                // Check our luaVM and get a debug info from the stack
-                if ( luaVM && lua_getstack ( luaVM, 1, &debugInfo ) )
-                {
-                    // Get name line and... no idea. for debug
-                    lua_getinfo ( luaVM, "nlS", &debugInfo );
-                    if ( debugInfo.source[0] == '@' )
-                    {
-                        SString strFile = ConformResourcePath ( debugInfo.source );
-                        // Get and store the location of the setTimer call in case the contents error
-                        strDebugOutput = SString ( "%s:%i ", strFile.c_str ( ), debugInfo.currentline );
-                    }
-                    else
-                    {
-                        // Get and store the location of the setTimer call in case the contents error
-                        strDebugOutput = SString ( "%s ", debugInfo.short_src );
-                    }
-                }
                 CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, CTickCount ( dTimeInterval ), uiTimesToExecute, Arguments );
 
                 if ( pLuaTimer )
                 {
                     // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
-                    pLuaTimer->SetDebugInfo ( strDebugOutput );
+                    pLuaTimer->SetLuaDebugInfo ( g_pGame->GetScriptDebugging()->GetLuaDebugInfo( luaVM ) );
 
                     lua_pushtimer ( luaVM, pLuaTimer );
                     return 1;
@@ -10806,7 +10787,7 @@ int CLuaFunctionDefinitions::ExecuteSQLDelete ( lua_State* luaVM )
         else
         {
             SString strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
-            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
+            m_pScriptDebugging->LogError ( luaVM, "%s", strError.c_str () );
             
             lua_pushstring ( luaVM, strError );
             lua_pushboolean ( luaVM, false );
@@ -10843,7 +10824,7 @@ int CLuaFunctionDefinitions::ExecuteSQLInsert ( lua_State* luaVM )
         else
         {
             SString strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
-            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
+            m_pScriptDebugging->LogError ( luaVM, "%s", strError.c_str () );
             
             lua_pushstring ( luaVM, strError );
             lua_pushboolean ( luaVM, false );
@@ -10881,7 +10862,7 @@ static void DbExecCallback ( CDbJobData* pJobData, void* pContext )
     if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
     {
         if ( !pJobData->result.bErrorSuppressed )
-            m_pScriptDebugging->LogWarning ( NULL, "%s: dbExec failed; (%d) %s", *pJobData->m_strDebugInfo, pJobData->result.uiErrorCode, *pJobData->result.strReason );
+            m_pScriptDebugging->LogWarning ( pJobData->m_LuaDebugInfo, "dbExec failed; (%d) %s", pJobData->result.uiErrorCode, *pJobData->result.strReason );
     }
 }
 
@@ -10892,7 +10873,7 @@ static void DbFreeCallback ( CDbJobData* pJobData, void* pContext )
     if ( pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL )
     {
         if ( !pJobData->result.bErrorSuppressed )
-            m_pScriptDebugging->LogWarning ( NULL, "%s: dbFree failed; (%d) %s", *pJobData->m_strDebugInfo, pJobData->result.uiErrorCode, *pJobData->result.strReason );
+            m_pScriptDebugging->LogWarning ( pJobData->m_LuaDebugInfo, "dbExec failed; (%d) %s", pJobData->result.uiErrorCode, *pJobData->result.strReason );
     }
 }
 
@@ -11048,7 +11029,7 @@ int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
             }
         }
         // Add debug info incase query result does not get collected
-        pJobData->SetDebugInfo ( GetDebugMessage ( luaVM ) );
+        pJobData->SetLuaDebugInfo ( g_pGame->GetScriptDebugging()->GetLuaDebugInfo( luaVM ) );
         lua_pushquery ( luaVM, pJobData );
         return 1;
     }
@@ -11083,7 +11064,7 @@ int CLuaFunctionDefinitions::DbExec ( lua_State* luaVM )
         }
         // Add callback for tracking errors
         pJobData->SetCallback ( DbExecCallback, NULL );
-        pJobData->SetDebugInfo ( GetDebugMessage ( luaVM ) );
+        pJobData->SetLuaDebugInfo ( g_pGame->GetScriptDebugging()->GetLuaDebugInfo( luaVM ) );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -11108,7 +11089,7 @@ int CLuaFunctionDefinitions::DbFree ( lua_State* luaVM )
     {
         // Add callback for tracking errors
         pJobData->SetCallback ( DbFreeCallback, NULL );
-        pJobData->SetDebugInfo ( GetDebugMessage ( luaVM ) );
+        pJobData->SetLuaDebugInfo ( g_pGame->GetScriptDebugging()->GetLuaDebugInfo( luaVM ) );
 
         bool bResult = g_pGame->GetDatabaseManager ()->QueryFree ( pJobData );
         lua_pushboolean ( luaVM, bResult );
@@ -11272,7 +11253,7 @@ int CLuaFunctionDefinitions::ExecuteSQLQuery ( lua_State* luaVM )
         else
         {
             SString strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
-            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
+            m_pScriptDebugging->LogError ( luaVM, "%s", strError.c_str () );
             
             lua_pushstring ( luaVM, strError );
             lua_pushboolean ( luaVM, false );
@@ -11350,7 +11331,7 @@ int CLuaFunctionDefinitions::ExecuteSQLSelect ( lua_State* luaVM )
         else
         {
             strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
-            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
+            m_pScriptDebugging->LogError ( luaVM, "%s", strError.c_str () );
                         
             lua_pushstring ( luaVM, strError );
             lua_pushboolean ( luaVM, false );
@@ -11387,7 +11368,7 @@ int CLuaFunctionDefinitions::ExecuteSQLUpdate ( lua_State* luaVM )
             return 1;
         } else {
             strError = "Database query failed: " + CStaticFunctionDefinitions::SQLGetLastError ();
-            m_pScriptDebugging->LogError ( luaVM, strError.c_str () );
+            m_pScriptDebugging->LogError ( luaVM, "%s", strError.c_str () );
         }
     }
     else

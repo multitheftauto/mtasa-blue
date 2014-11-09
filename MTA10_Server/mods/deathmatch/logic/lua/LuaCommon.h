@@ -75,4 +75,24 @@ enum
     AUDIO_MISSION_PLAY
 };
 
+// Lua debug info for logging
+enum
+{
+    DEBUG_INFO_NONE,
+    DEBUG_INFO_FILE_AND_LINE,
+    DEBUG_INFO_SHORT_SRC,
+};
+
+#define INVALID_LINE_NUMBER (-1)
+
+struct SLuaDebugInfo
+{
+    SLuaDebugInfo( void ) : iLine( INVALID_LINE_NUMBER ), infoType( DEBUG_INFO_NONE ) {}
+    SLuaDebugInfo( const SString& strFile, int iLine, const SString& strShortSrc = "" ) : strFile( strFile ), iLine( iLine ), strShortSrc( strShortSrc ), infoType( DEBUG_INFO_FILE_AND_LINE ) {}
+    SString     strFile;
+    SString     strShortSrc;
+    int         iLine;
+    int         infoType;
+};
+
 #endif

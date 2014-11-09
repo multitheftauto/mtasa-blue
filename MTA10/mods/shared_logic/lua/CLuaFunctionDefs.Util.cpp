@@ -164,6 +164,9 @@ int CLuaFunctionDefs::SetTimer ( lua_State* luaVM )
                 CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, CTickCount ( dTimeInterval ), uiTimesToExecute, Arguments );
                 if ( pLuaTimer )
                 {
+                    // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
+                    pLuaTimer->SetLuaDebugInfo ( g_pClientGame->GetScriptDebugging()->GetLuaDebugInfo( luaVM ) );
+
                     lua_pushtimer ( luaVM, pLuaTimer );
                     return 1;
                 }

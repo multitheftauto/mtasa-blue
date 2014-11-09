@@ -47,8 +47,8 @@ public:
     CTickCount              GetTimeLeft                 ( void );
 
     uint                    GetScriptID                 ( void ) const                  { return m_uiScriptID; }
-    const SString&          GetDebugInfo                ( void )                        { return m_strDebugInfo; }
-    void                    SetDebugInfo                ( const SString& strDebugInfo ) { m_strDebugInfo = strDebugInfo; }
+    const SLuaDebugInfo&    GetLuaDebugInfo             ( void )                        { return m_LuaDebugInfo; }
+    void                    SetLuaDebugInfo             ( const SLuaDebugInfo& luaDebugInfo ) { m_LuaDebugInfo = luaDebugInfo; }
 
 private:
     CLuaFunctionRef         m_iLuaFunction;
@@ -57,7 +57,7 @@ private:
     CTickCount              m_llDelay;
     unsigned int            m_uiRepeats;
     uint                    m_uiScriptID;
-    SString                 m_strDebugInfo;
+    SLuaDebugInfo           m_LuaDebugInfo;
 };
 
 #endif

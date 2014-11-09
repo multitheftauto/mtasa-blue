@@ -30,22 +30,23 @@ public:
     bool                            RemovePlayer                    ( class CPlayer& Player );
     void                            ClearPlayers                    ( void );
 
-    void                            OutputDebugInfo                 ( lua_State* luaVM, int iLevel, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
-
     void                            LogCustom                       ( lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ... );
     void                            LogInformation                  ( lua_State* luaVM, const char* szFormat, ... );
     void                            LogWarning                      ( lua_State* luaVM, const char* szFormat, ... );
     void                            LogError                        ( lua_State* luaVM, const char* szFormat, ... );
-    void                            LogError                        ( SString strFile, int iLine, SString strMsg );
     void                            LogBadPointer                   ( lua_State* luaVM, const char* szArgumentType, unsigned int uiArgument );
     void                            LogBadType                      ( lua_State* luaVM );
     void                            LogBadAccess                    ( lua_State* luaVM );
     void                            LogCustom                       ( lua_State* luaVM, const char* szMessage );
+    void                            LogWarning                      ( const SLuaDebugInfo& luaDebugInfo, const char* szFormat, ... );
+    void                            LogError                        ( const SLuaDebugInfo& luaDebugInfo, const char* szFormat, ... );
+    void                            LogPCallError                   ( lua_State* luaVM, const SString& strRes, const SString& strNiceFilename = "" );
 
     bool                            SetLogfile                      ( const char* szFilename, unsigned int uiLevel );
     inline void                     SetHTMLLogLevel                 ( unsigned int uiLevel ) { m_uiHtmlLogLevel = uiLevel; }
 
-    inline void                     SetErrorLineAndFile             ( SString strOutput ) { m_strLineAndFile = strOutput; }
+    const SLuaDebugInfo&            GetLuaDebugInfo                 ( lua_State* luaVM );
+    void                            SaveLuaDebugInfo                ( const SLuaDebugInfo& luaDebugInfo ) { m_SavedLuaDebugInfo = luaDebugInfo; }
 
     void                            PushLuaMain                     ( CLuaMain* pLuaMain );
     void                            PopLuaMain                      ( CLuaMain* pLuaMain );
@@ -53,7 +54,8 @@ public:
     CLuaMain*                       GetTopLuaMain                   ( void );
 
 private:
-    void                            LogString                       ( const char* szPrePend, lua_State * luaVM, const char* szMessage, unsigned int uiMinimumDebugLevelunsigned, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
+    SString                         ComposeErrorMessage             ( const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage );
+    void                            LogString                       ( const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255 );
 
     void                            PrintLog                        ( const char* szText );
     void                            Broadcast                       ( const CPacket& Packet, unsigned int uiMinimumDebugLevel );
@@ -64,7 +66,7 @@ private:
     FILE*                           m_pLogFile;
     list < class CPlayer* >         m_Players;
     bool                            m_bTriggeringOnDebugMessage;
-    SString                         m_strLineAndFile;
+    SLuaDebugInfo                   m_SavedLuaDebugInfo;
     std::list < CLuaMain* >         m_LuaMainStack;
 };
 
