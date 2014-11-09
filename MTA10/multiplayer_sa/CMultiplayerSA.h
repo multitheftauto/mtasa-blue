@@ -27,6 +27,22 @@
 #include "CRemoteDataSA.h"
 class CRemoteDataSA;
 
+enum eRadioStationID
+{
+    UNKNOWN = 0,
+    Playback_FM,
+    K_Rose,
+    K_DST,
+    BOUNCE_FM,
+    SF_UR,
+    RLS,
+    RADIO_X,
+    CSR_1039,
+    K_JAH_WEST,
+    Master_Sounds,
+    WCTR,
+};
+
 class CMultiplayerSA : public CMultiplayer
 {
     friend class COffsetsMP;
