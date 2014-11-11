@@ -1099,6 +1099,7 @@ void CSettings::CreateGUI ( void )
      *  Advanced tab
      **/
     vecTemp = CVector2D ( 12.f, 12.f );
+    float fComboWidth = 170.f;
 
     // Misc section label
     m_pAdvancedMiscLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Misc") ) );
@@ -1115,8 +1116,10 @@ void CSettings::CreateGUI ( void )
         _("Process priority:"),
         _("Debug setting:"),
         _("Streaming memory:"),
-        _("Update build type:")
+        _("Update build type:"),
+        _("Install important updates:")
     ) + 5.0f;
+
 
     vecTemp.fX += 10.0f;
     // Fast clothes loading
@@ -1126,7 +1129,7 @@ void CSettings::CreateGUI ( void )
 
     m_pFastClothesCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pFastClothesCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pFastClothesCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
+    m_pFastClothesCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
     m_pFastClothesCombo->AddItem ( _("Off") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_OFF );
     m_pFastClothesCombo->AddItem ( _("On") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_ON );
     m_pFastClothesCombo->AddItem ( _("Auto") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
@@ -1140,9 +1143,9 @@ void CSettings::CreateGUI ( void )
 
     m_pBrowserSpeedCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pBrowserSpeedCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pBrowserSpeedCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
+    m_pBrowserSpeedCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
     m_pBrowserSpeedCombo->AddItem ( _("Very slow") )->SetData ( (void*)0 );
-    m_pBrowserSpeedCombo->AddItem ( _("Slow") )->SetData ( (void*)1 );
+    m_pBrowserSpeedCombo->AddItem ( _("Default") )->SetData ( (void*)1 );
     m_pBrowserSpeedCombo->AddItem ( _("Fast") )->SetData ( (void*)2 );
     m_pBrowserSpeedCombo->SetReadOnly ( true );
     vecTemp.fY += 29;
@@ -1154,7 +1157,7 @@ void CSettings::CreateGUI ( void )
 
     m_pSingleDownloadCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pSingleDownloadCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pSingleDownloadCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
+    m_pSingleDownloadCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
     m_pSingleDownloadCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pSingleDownloadCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pSingleDownloadCombo->SetReadOnly ( true );
@@ -1167,7 +1170,7 @@ void CSettings::CreateGUI ( void )
 
     m_pFullscreenStyleCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pFullscreenStyleCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pFullscreenStyleCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
+    m_pFullscreenStyleCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
     m_pFullscreenStyleCombo->AddItem ( _("Standard") )->SetData ( (void*)FULLSCREEN_STANDARD );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless window") )->SetData ( (void*)FULLSCREEN_BORDERLESS );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless keep res") )->SetData ( (void*)FULLSCREEN_BORDERLESS_KEEP_RES );
@@ -1181,7 +1184,7 @@ void CSettings::CreateGUI ( void )
 
     m_pPriorityCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pPriorityCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pPriorityCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
+    m_pPriorityCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
     m_pPriorityCombo->AddItem ( "Normal" )->SetData ( (void*)0 );
     m_pPriorityCombo->AddItem ( "Above normal" )->SetData ( (void*)1 );
     m_pPriorityCombo->AddItem ( "High" )->SetData ( (void*)2 );
@@ -1195,7 +1198,7 @@ void CSettings::CreateGUI ( void )
 
     m_pDebugSettingCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pDebugSettingCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pDebugSettingCombo->SetSize ( CVector2D ( 190.0f, 20.0f * ( EDiagnosticDebug::MAX + 1 ) ) );
+    m_pDebugSettingCombo->SetSize ( CVector2D ( fComboWidth, 20.0f * ( EDiagnosticDebug::MAX + 1 ) ) );
     m_pDebugSettingCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pDebugSettingCombo->AddItem ( "#6734 Graphics" )->SetData ( (void*)EDiagnosticDebug::GRAPHICS_6734 );
     //m_pDebugSettingCombo->AddItem ( "#6778 BIDI" )->SetData ( (void*)EDiagnosticDebug::BIDI_6778 );
@@ -1255,10 +1258,12 @@ void CSettings::CreateGUI ( void )
 
     if ( GetApplicationSetting ( "os-version" ) < "6.2" )
     {
+#ifndef MTA_DEBUG   // Don't hide when debugging
         m_pWin8Label->SetVisible ( false );
         m_pWin8ColorCheckBox->SetVisible ( false );
         m_pWin8MouseCheckBox->SetVisible ( false );
         vecTemp.fY -= 29;
+#endif
     }
 
     // Auto updater section label
@@ -1268,6 +1273,19 @@ void CSettings::CreateGUI ( void )
     m_pAdvancedUpdaterLabel->AutoSize ( _("Auto updater") );
     vecTemp.fY += 20;
 
+    // UpdateAutoInstall
+    m_pUpdateAutoInstallLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Install important updates:") ) );
+    m_pUpdateAutoInstallLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pUpdateAutoInstallLabel->AutoSize ( );
+
+    m_pUpdateAutoInstallCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pUpdateAutoInstallCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+    m_pUpdateAutoInstallCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
+    m_pUpdateAutoInstallCombo->AddItem ( _("Off") )->SetData ( (void*)0 );
+    m_pUpdateAutoInstallCombo->AddItem ( _("Default") )->SetData ( (void*)1 );
+    m_pUpdateAutoInstallCombo->SetReadOnly ( true );
+    vecTemp.fY += 29;
+
     // Update build type
     m_pUpdateBuildTypeLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Update build type:") ) );
     m_pUpdateBuildTypeLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
@@ -1275,19 +1293,21 @@ void CSettings::CreateGUI ( void )
 
     m_pUpdateBuildTypeCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pUpdateBuildTypeCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( 190.0f, 95.0f ) );
+    m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
     m_pUpdateBuildTypeCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pUpdateBuildTypeCombo->AddItem ( "Beta" )->SetData ( (void*)1 );
     m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
     m_pUpdateBuildTypeCombo->SetReadOnly ( true );
-    vecTemp.fY += 29;
+    vecTemp.fX += fComboWidth + 15;
 
     // Check for updates
     m_pButtonUpdate = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, _("Check for update now") ) );
-    m_pButtonUpdate->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pButtonUpdate->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY ) );
     m_pButtonUpdate->AutoSize ( NULL, 20.0f, 8.0f );
     m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );
     m_pButtonUpdate->SetZOrderingEnabled ( false );
+    vecTemp.fY += 29;
+    vecTemp.fX -= fComboWidth + 15;
 
     // Description label
     vecTemp.fY = 354;
@@ -1380,6 +1400,11 @@ void CSettings::CreateGUI ( void )
     m_pWin8MouseCheckBox->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
     m_pWin8MouseCheckBox->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
 
+    m_pUpdateAutoInstallLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pUpdateAutoInstallLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pUpdateAutoInstallCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pUpdateAutoInstallCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
 
     // Load Chat presets
     LoadChatPresets ();
@@ -2658,7 +2683,7 @@ void CSettings::LoadData ( void )
     // Browser speed
     CVARS_GET ( "browser_speed", iVar );
     if ( iVar == 0 ) m_pBrowserSpeedCombo->SetText ( _("Very slow") );
-    else if ( iVar == 1 ) m_pBrowserSpeedCombo->SetText ( _("Slow") );
+    else if ( iVar == 1 ) m_pBrowserSpeedCombo->SetText ( _("Default") );
     else if ( iVar == 2 ) m_pBrowserSpeedCombo->SetText ( _("Fast") );
 
     // Single download
@@ -2679,6 +2704,11 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( _("Default") );
     else if ( iVar == 1 ) m_pUpdateBuildTypeCombo->SetText ( "Beta" );
     else if ( iVar == 2 ) m_pUpdateBuildTypeCombo->SetText ( "Nightly" );
+
+    // Update auto install
+    CVARS_GET ( "update_auto_install", iVar );
+    if ( iVar == 0 ) m_pUpdateAutoInstallCombo->SetText ( _("Off") );
+    else if ( iVar == 1 ) m_pUpdateAutoInstallCombo->SetText ( "Default" );
 
     // Chat
     LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_BG, "chat_color" );
@@ -2923,6 +2953,13 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "update_build_type", iSelected );
+    }
+
+    // Update auto install
+    if ( CGUIListItem* pSelected = m_pUpdateAutoInstallCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "update_auto_install", iSelected );
     }
 
     // Map alpha
@@ -3676,6 +3713,8 @@ bool CSettings::OnShowAdvancedSettingDescription ( CGUIElement* pElement )
         strText = std::string( _( "Streaming memory:" ) ) + " " + std::string( _( "Maximum is usually best" ) );
     else if ( pLabel && pLabel == m_pUpdateBuildTypeLabel || pComboBox && pComboBox == m_pUpdateBuildTypeCombo )
         strText = std::string( _( "Auto updater:" ) ) + " " + std::string( _( "Select default unless you like filling out bug reports." ) );
+    else if ( pLabel && pLabel == m_pUpdateAutoInstallLabel || pComboBox && pComboBox == m_pUpdateAutoInstallCombo )
+        strText = std::string( _( "Auto updater:" ) ) + " " + std::string( _( "Select default to automatically install important updates." ) );
     else if ( pCheckBox && pCheckBox == m_pWin8ColorCheckBox )
         strText = std::string( _( "16-bit color:" ) ) + " " + std::string( _( "Enable 16 bit color modes - Requires MTA restart" ) );
     else if ( pCheckBox && pCheckBox == m_pWin8MouseCheckBox )

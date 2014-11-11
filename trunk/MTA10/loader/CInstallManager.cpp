@@ -431,7 +431,7 @@ SString CInstallManager::_CheckOnRestartCommand ( void )
     {
         // New settings for install
         m_pSequencer->SetVariable ( INSTALL_LOCATION, strResult.Contains ( "far" )    ? "far" : "near" );
-        m_pSequencer->SetVariable ( SILENT_OPT,       strResult.Contains ( "silent" ) ? "yes" : "no" );
+        m_pSequencer->SetVariable ( HIDE_PROGRESS,    strResult.Contains ( "hideprogress" ) ? "yes" : "no" );
         return "ok";
     }
     else
@@ -502,7 +502,7 @@ SString CInstallManager::_InstallFiles ( void )
     WatchDogReset ();
 
     // Install new files
-    if ( !InstallFiles ( m_pSequencer->GetVariable ( SILENT_OPT ) != "no" ) )
+    if ( !InstallFiles ( m_pSequencer->GetVariable ( HIDE_PROGRESS ) != "no" ) )
     {
         if ( !IsUserAdmin () )
             AddReportLog ( 3048, SString ( "_InstallFiles: Install - trying as admin %s", "" ) );
