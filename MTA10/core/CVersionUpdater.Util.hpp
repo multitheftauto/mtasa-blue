@@ -841,6 +841,7 @@ namespace
         // Result
         std::vector < char >    downloadBuffer;
         SString                 strStatus;
+        SString                 strParameters;
         SString                 strTitle;
         SString                 strMsg;
         SString                 strMsg2;

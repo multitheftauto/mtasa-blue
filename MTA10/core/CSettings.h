@@ -221,6 +221,8 @@ protected:
     CGUICheckBox*       m_pWin8MouseCheckBox;
     CGUILabel*          m_pUpdateBuildTypeLabel;
     CGUIComboBox*       m_pUpdateBuildTypeCombo;
+    CGUILabel*          m_pUpdateAutoInstallLabel;
+    CGUIComboBox*       m_pUpdateAutoInstallCombo;
     CGUIButton*         m_pButtonUpdate;
     CGUILabel*          m_pAdvancedMiscLabel;
     CGUILabel*          m_pAdvancedUpdaterLabel;
