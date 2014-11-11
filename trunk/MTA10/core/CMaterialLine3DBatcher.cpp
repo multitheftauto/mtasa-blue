@@ -114,7 +114,7 @@ void CMaterialLine3DBatcher::Flush ( void )
     // Sort by distance
     //
 
-    const float fMaxDrawDistance = 400;     // TODO - Calculate current far clip value
+    const float fMaxDrawDistance = CCore::GetSingleton().GetMultiplayer()->GetFarClipDistance();
     const float fSmallLineTolerance = 20;
     const float fMaxDrawDistanceIncTol = fMaxDrawDistance + fSmallLineTolerance;
 
