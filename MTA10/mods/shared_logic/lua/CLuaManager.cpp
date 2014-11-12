@@ -793,6 +793,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiGridListAddColumn", CLuaFunctionDefs::GUIGridListAddColumn );
     CLuaCFunctions::AddFunction ( "guiGridListRemoveColumn", CLuaFunctionDefs::GUIGridListRemoveColumn );
     CLuaCFunctions::AddFunction ( "guiGridListSetColumnWidth", CLuaFunctionDefs::GUIGridListSetColumnWidth );
+    CLuaCFunctions::AddFunction ( "guiGridListGetColumnWidth", CLuaFunctionDefs::GUIGridListGetColumnWidth );
     CLuaCFunctions::AddFunction ( "guiGridListSetColumnTitle", CLuaFunctionDefs::GUIGridListSetColumnTitle );
     CLuaCFunctions::AddFunction ( "guiGridListGetColumnTitle", CLuaFunctionDefs::GUIGridListGetColumnTitle );
     CLuaCFunctions::AddFunction ( "guiGridListSetScrollBars", CLuaFunctionDefs::GUIGridListSetScrollBars );

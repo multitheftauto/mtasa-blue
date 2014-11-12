@@ -654,6 +654,7 @@ public:
     LUA_DECLARE ( GUIGridListAddColumn );
     LUA_DECLARE ( GUIGridListRemoveColumn );
     LUA_DECLARE ( GUIGridListSetColumnWidth );
+    LUA_DECLARE ( GUIGridListGetColumnWidth );
     LUA_DECLARE ( GUIGridListSetColumnTitle );
     LUA_DECLARE ( GUIGridListGetColumnTitle );
     LUA_DECLARE ( GUIGridListSetScrollBars );

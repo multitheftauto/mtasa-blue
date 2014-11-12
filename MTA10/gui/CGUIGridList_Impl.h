@@ -31,6 +31,7 @@ public:
     void                                RemoveColumn            ( unsigned int uiColumn );
     void                                AutoSizeColumn          ( unsigned int hColumn );
     void                                SetColumnWidth          ( int hColumn, float fWidth, bool bRelative = true );
+    bool                                GetColumnWidth          ( int hColumn, float& fOutWidth, bool bRelative = true );
     void                                SetColumnTitle          ( int hColumn, const char* szTitle );
     const char*                         GetColumnTitle          ( int hColumn );
 

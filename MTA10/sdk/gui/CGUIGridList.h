@@ -55,6 +55,7 @@ public:
     virtual void                    RemoveColumn            ( unsigned int uiColumn ) = 0;
     virtual void                    AutoSizeColumn          ( unsigned int hColumn ) = 0;
     virtual void                    SetColumnWidth          ( int hColumn, float fWidth, bool bRelative = true ) = 0;
+    virtual bool                    GetColumnWidth          ( int hColumn, float& fOutWidth, bool bRelative = true ) = 0;
     virtual void                    SetColumnTitle          ( int hColumn, const char* szTitle ) = 0;
     virtual const char*             GetColumnTitle          ( int hColumn ) = 0;
 
