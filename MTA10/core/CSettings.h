@@ -283,10 +283,6 @@ protected:
     CGUIStaticImage*    m_pImageGreen3;
     CGUIStaticImage*    m_pImageGreen4;
 
-    CGUITexture *       m_pRedTexture;
-    CGUITexture *       m_pYellowTexture;
-    CGUITexture *       m_pGreenTexture;
-    CGUITexture *       m_pBlankTexture;
     int                 m_iLastCase;
 
     CGUIComboBox*       m_pDeviceSelection;
