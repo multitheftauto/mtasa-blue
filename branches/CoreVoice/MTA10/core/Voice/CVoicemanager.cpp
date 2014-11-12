@@ -24,6 +24,8 @@ CVoiceManager::CVoiceManager ( void )
     Pa_Initialize();
     // assume that voice isn't enabled
     m_bServerVoiceEnabled = false;
+    // not de-initializing
+    m_bDeinitialising = false;
 }
 
 CVoiceManager::~CVoiceManager ( void )
@@ -39,6 +41,10 @@ int CVoiceManager::PACallback( const void *inputBuffer, void *outputBuffer, unsi
     // This assumes that PACallback will only be called when userData is a valid CVoiceRecorder pointer
     CVoiceManager* pVoiceManager = g_pCore->GetVoiceManager ( );
 
+    // if we are shutting down don't carry on and risk locking the critical section
+    if ( pVoiceManager->IsDeinitialising ( ) )
+        return 0;
+
     // handle test mode/local only playback
     pVoiceManager->BufferAudioFrame ( inputBuffer, frameCount );
 
@@ -48,7 +54,12 @@ int CVoiceManager::PACallback( const void *inputBuffer, void *outputBuffer, unsi
         // trigger the callback in deathmatch
         pVoiceManager->TriggerCallback ( inputBuffer, outputBuffer, frameCount, timeInfo, statusFlags, userData );
     }
-    
+#ifdef MTA_DEBUG
+    if ( statusFlags != 0 )
+    {
+        g_pCore->GetConsole()->Printf("[Voice Error] Status flags %i", statusFlags);
+    }
+#endif
 
     return 0;
 }
@@ -56,6 +67,9 @@ int CVoiceManager::PACallback( const void *inputBuffer, void *outputBuffer, unsi
 void CALLBACK BASS_VoiceStateChange ( HSYNC handle, DWORD channel, DWORD data, void* user )
 {
     // stub
+#ifdef MTA_DEBUG
+    g_pCore->GetConsole()->Printf("[Voice Error] Voice state change %i", data);
+#endif
 }
 
 void CVoiceManager::TriggerCallback ( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData )
@@ -88,6 +102,10 @@ void CVoiceManager::SetTestMode ( bool bTestMode )
 
 void CVoiceManager::BufferAudioFrame ( const void *inputBuffer, unsigned long frameCount )
 {
+    // ensure we have an input buffer, apparently this can happen but hasn't so far
+    if ( inputBuffer == NULL )
+        return;
+
     // lock our critical section
     m_CS.Lock ( );
 
@@ -98,9 +116,14 @@ void CVoiceManager::BufferAudioFrame ( const void *inputBuffer, unsigned long fr
         if ( m_bLocalPlaybackEnabled || m_bInTestMode )
         {
             // push our buffer to the playback stream, each frame is 2 bytes.
-            BASS_StreamPutData ( m_pBassPlaybackStream, inputBuffer, frameCount * 2 );
-
-    #ifdef VOICE_DEBUG_LOCAL_PLAYBACK
+            BASS_StreamPutData ( m_pBassPlaybackStream, inputBuffer, frameCount * 4 );
+#ifdef MTA_DEBUG
+            if ( frameCount * 4 != m_uiBufferSizeBytes )
+            {
+                g_pCore->GetConsole()->Printf("[Voice Error] Buffer mismatch %i %i", frameCount * 4, m_uiBufferSizeBytes);
+            }
+#endif
+            #ifdef VOICE_DEBUG_LOCAL_PLAYBACK
             // if we are paused
             if ( m_bPaused )
             {
@@ -110,9 +133,10 @@ void CVoiceManager::BufferAudioFrame ( const void *inputBuffer, unsigned long fr
                     // unpause, don't reset
                     BASS_ChannelPlay ( m_pBassPlaybackStream, false );
                 }
+                m_bPaused = false;
             }
+            #endif
         }
-#endif
     }
 
     // unlock our critical section
@@ -164,8 +188,8 @@ void CVoiceManager::Init ( void* user, unsigned int uiServerSampleRate, bool bTe
     m_SampleRate = convertServerSampleRate( uiServerSampleRate );
 
     // Calculate how many frames we are storing and then the buffer size in bytes
-    unsigned int iFramesPerBuffer = ( 2048 / ( 32000 / m_SampleRate ));
-    m_uiBufferSizeBytes = iFramesPerBuffer * sizeof(short);
+    unsigned int iFramesPerBuffer = ( 4096 / ( 44100 / m_SampleRate ));
+    m_uiBufferSizeBytes = iFramesPerBuffer * 4;
 
     // initialise our audio device - Moved to constructor so that we can get device info neatly
     //Pa_Initialize();
@@ -188,15 +212,17 @@ void CVoiceManager::Init ( void* user, unsigned int uiServerSampleRate, bool bTe
         }
     }
 
+    const PaDeviceInfo * pDeviceInfo = Pa_GetDeviceInfo ( deviceIndex );
+
     //int count = Pa_GetHostApiCount();
 
     // setup our stream parameters
     PaStreamParameters inputDevice;
     inputDevice.channelCount = 1;
     inputDevice.device = deviceIndex;
-    inputDevice.sampleFormat = paInt16;
+    inputDevice.sampleFormat = paFloat32;
     inputDevice.hostApiSpecificStreamInfo = NULL;
-    inputDevice.suggestedLatency = 0;
+    inputDevice.suggestedLatency = 1;
 
 
     // open the audio stream
@@ -216,18 +242,15 @@ void CVoiceManager::Init ( void* user, unsigned int uiServerSampleRate, bool bTe
     // get our stream information
     const PaStreamInfo *pStreamInfo = Pa_GetStreamInfo ( m_pAudioStream );
 
-    // set a sample rate
-    double dSampleRate = m_SampleRate;
 
-    // if we have our stream info
-    if ( pStreamInfo )
-    {
-        // use that sample rate
-        dSampleRate = pStreamInfo->sampleRate;
-    }
-
+#ifdef VOICE_USE_FLOAT
     // Setup our BASS playback device
-    m_pBassPlaybackStream = BASS_StreamCreate ( (DWORD)dSampleRate, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL );
+    m_pBassPlaybackStream = BASS_StreamCreate ( (DWORD)pStreamInfo->sampleRate, 1, BASS_STREAM_AUTOFREE|BASS_SAMPLE_FLOAT|BASS_SAMPLE_MONO, STREAMPROC_PUSH, NULL );
+#else
+    // Setup our BASS playback device
+    m_pBassPlaybackStream = BASS_StreamCreate ( m_SampleRate * 2, 1, BASS_STREAM_AUTOFREE|BASS_SAMPLE_MONO, STREAMPROC_PUSH, NULL );
+#endif
+
     // not sure if this is strictly required to make it a stall stream
     BASS_ChannelSetSync ( m_pBassPlaybackStream, BASS_SYNC_STALL, 0, &BASS_VoiceStateChange, this );
 
@@ -237,15 +260,17 @@ void CVoiceManager::Init ( void* user, unsigned int uiServerSampleRate, bool bTe
     // set the volume
     BASS_ChannelSetAttribute( m_pBassPlaybackStream, BASS_ATTRIB_VOL, m_bLocalPlaybackEnabled == true ? 1.0f : 0.0f );
 
+    // not de-initializing
+    m_bDeinitialising = false;
+
     // unlock our critical section
     m_CS.Unlock ( );
 }
 
 void CVoiceManager::DeInit ( void )
 {
-    // Flush the critical section to make sure nothing is waiting, causes a deadlock in Pa_StopStream if the handler is currently locked in a critical section
-    m_CS.Lock ( );
-    m_CS.Unlock ( );
+    // De-initialising
+    m_bDeinitialising = true;
 
     // Lock the critical section
     m_CS.Lock ( );
@@ -297,14 +322,8 @@ eSampleRate CVoiceManager::convertServerSampleRate( unsigned int uiServerSampleR
 
 DWORD CVoiceManager::GetLevelData ( void )
 {
-    // lock the critical section
-    m_CS.Lock ( );
-
     // get our return value (level data in both channels) and store it temporarily so we can unlock before we return
     DWORD dwReturn = BASS_ChannelGetLevel ( m_pBassPlaybackStream );
-
-    // unlock the critical section
-    m_CS.Unlock ( );
 
     // return our level data
     return dwReturn;

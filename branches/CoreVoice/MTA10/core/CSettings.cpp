@@ -618,20 +618,21 @@ void CSettings::CreateGUI ( void )
      **/
 
     m_pTabs->GetSize ( vecTemp );
-
+    fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal", _("Stop Testing") ) + 85.0f;
     m_pMicrophoneTestButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabMicrophone, _("Test") ) );
     m_pMicrophoneTestButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnMicrophoneTestClick, this ) );
     m_pMicrophoneTestButton->AutoSize ( NULL, 20.0f, 8.0f );
     m_pMicrophoneTestButton->GetSize ( vecSize );
-    m_pMicrophoneTestButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 110.0f, 365 ) );
+    m_pMicrophoneTestButton->SetPosition ( CVector2D ( vecTemp.fX - fIndentX, 365 ) );
     m_pMicrophoneTestButton->SetZOrderingEnabled ( false );
     m_pMicrophoneTestButton->SetEnabled ( true );
 
+    fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal", _("Test") ) + 80.0f;
     m_pMicrophoneStopTestButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabMicrophone, _("Stop Testing") ) );
     m_pMicrophoneStopTestButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnMicrophoneStopTestClick, this ) );
     m_pMicrophoneStopTestButton->AutoSize ( NULL, 20.0f, 8.0f );
     m_pMicrophoneStopTestButton->GetSize ( vecSize );
-    m_pMicrophoneStopTestButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
+    m_pMicrophoneStopTestButton->SetPosition ( CVector2D ( vecTemp.fX - fIndentX, 365 ) );
     m_pMicrophoneStopTestButton->SetZOrderingEnabled ( false );
     m_pMicrophoneStopTestButton->SetEnabled ( false );
 
@@ -4279,6 +4280,9 @@ bool CSettings::OnTabChange ( CGUIElement * pElement )
         // ensure our voice manager is valid
         if ( pVoiceManager )
         {
+            // Clear the device selection list
+            m_pDeviceSelection->Clear();
+
             // get the available devices map
             std::map < int, SString > mapDevices = pVoiceManager->GetAvailableDevices ( );
 

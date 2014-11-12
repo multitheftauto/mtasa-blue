@@ -278,9 +278,6 @@ void CVoiceRecorder::UpdatePTTState( unsigned int uiState )
 
 void CVoiceRecorder::DoPulse( void )
 {
-    CVoiceManagerInterface * pVoiceManager = g_pCore->GetVoiceManager ( );
-    pVoiceManager->Lock ();
-
     char *pInputBuffer;
     char bufTempOutput[2048];
     unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
@@ -371,7 +368,6 @@ void CVoiceRecorder::DoPulse( void )
             }
         }
     }
-    pVoiceManager->Unlock ();
 }
 
 // Called from other thread. Critical section is already locked.
