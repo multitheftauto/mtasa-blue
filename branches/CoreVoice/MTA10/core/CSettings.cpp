@@ -642,72 +642,60 @@ void CSettings::CreateGUI ( void )
     m_pMicrophoneLabel->AutoSize ( NULL, 5.0f );
     m_pMicrophoneLabel->SetFont ( "default-bold-small" );
 
-
-    m_pRedTexture = reinterpret_cast < CGUITexture* > ( pManager->CreateTexture ( ) ); 
-    m_pRedTexture->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon2.png" ) );
-
-    m_pYellowTexture = reinterpret_cast < CGUITexture* > ( pManager->CreateTexture ( ) ); 
-    m_pYellowTexture->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-
-    m_pGreenTexture = reinterpret_cast < CGUITexture* > ( pManager->CreateTexture ( ) ); 
-    m_pGreenTexture->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-
-    m_pBlankTexture = reinterpret_cast < CGUITexture* > ( pManager->CreateTexture ( ) ); 
-    m_pBlankTexture->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
     
     vecTemp.fX += 20.0f;
 
     m_pImageRed2 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
-    m_pImageRed2->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageRed2->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     m_pImageRed2->SetSize ( CVector2D ( 32, 22 ) );
     m_pImageRed2->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pImageRed2->GetPosition ( vecTemp, false );
 
     m_pImageRed = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
-    m_pImageRed->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageRed->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     m_pImageRed->SetSize ( CVector2D ( 32, 22 ) );
     m_pImageRed->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pImageRed->GetPosition ( vecTemp, false );
 
     m_pImageYellow3 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
-    m_pImageYellow3->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageYellow3->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     m_pImageYellow3->SetSize ( CVector2D ( 32, 22 ) );
     m_pImageYellow3->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pImageYellow3->GetPosition ( vecTemp, false );
     
     m_pImageYellow2 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
-    m_pImageYellow2->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageYellow2->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     m_pImageYellow2->SetSize ( CVector2D ( 32, 22 ) );
     m_pImageYellow2->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pImageYellow2->GetPosition ( vecTemp, false );
     
     m_pImageYellow1 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) ); 
-    m_pImageYellow1->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageYellow1->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     m_pImageYellow1->SetSize ( CVector2D ( 32, 22 ) );
     m_pImageYellow1->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pImageYellow1->GetPosition ( vecTemp, false );
 
     m_pImageGreen4 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) );
-    m_pImageGreen4->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageGreen4->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     m_pImageGreen4->SetSize ( CVector2D ( 32, 22 ) );
     m_pImageGreen4->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pImageGreen4->GetPosition ( vecTemp, false );
 
     m_pImageGreen3 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) );
-    m_pImageGreen3->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageGreen3->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     m_pImageGreen3->SetSize ( CVector2D ( 32, 22 ) );
     m_pImageGreen3->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pImageGreen3->GetPosition ( vecTemp, false );
 
     m_pImageGreen2 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) );
-    m_pImageGreen2->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageGreen2->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     m_pImageGreen2->SetSize ( CVector2D ( 32, 22 ) );
     m_pImageGreen2->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pImageGreen2->GetPosition ( vecTemp, false );
 
 
     m_pImageGreen1 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( pTabMicrophone ) );
-    m_pImageGreen1->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+    m_pImageGreen1->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     m_pImageGreen1->SetSize ( CVector2D ( 32, 22 ) );
     m_pImageGreen1->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 24.0f ) );
     m_pImageGreen1->GetPosition ( vecTemp, false );
@@ -1662,17 +1650,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 0 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
         }
         m_iLastCase = 0;
     }
@@ -1681,17 +1669,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 1 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
         }
         m_iLastCase = 1;
     }
@@ -1700,17 +1688,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 2 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
         }
         m_iLastCase = 2;
     }
@@ -1720,17 +1708,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 3 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
         }
         m_iLastCase = 3;
     }
@@ -1739,17 +1727,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 4 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
         }
         m_iLastCase = 4;
     }
@@ -1758,17 +1746,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 5 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
         }
         m_iLastCase = 5;
     }
@@ -1777,17 +1765,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 6 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
         }
         m_iLastCase = 6;
     }
@@ -1796,17 +1784,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 7 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
         }
         m_iLastCase = 7;
     }
@@ -1815,17 +1803,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 8 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon2.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\red.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
         }
         m_iLastCase = 8;
     }
@@ -1834,17 +1822,17 @@ void CSettings::UpdateMicrophoneTab ( void )
         // don't reload for no reason - CEGUI will absolutely try and load the image again if we aren't careful
         if ( m_iLastCase != 9 )
         {
-            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
-            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon3.png" ) );
+            m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
+            m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\green.png" ) );
 
-            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
-            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon4.png" ) );
+            m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
+            m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
+            m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\yellow.png" ) );
 
-            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon2.png" ) );
-            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon2.png" ) );
+            m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\red.png" ) );
+            m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\red.png" ) );
         }
         m_iLastCase = 9;
     }
@@ -2283,17 +2271,17 @@ bool CSettings::OnMicrophoneStopTestClick ( CGUIElement* pElement )
         m_pMicrophoneStopTestButton->SetEnabled ( false );
 
         // update the UI as all blank        
-        m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-        m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-        m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-        m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        m_pImageGreen1->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+        m_pImageGreen2->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+        m_pImageGreen3->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+        m_pImageGreen4->LoadFromFile    ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-        m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-        m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-        m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        m_pImageYellow1->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+        m_pImageYellow2->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+        m_pImageYellow3->LoadFromFile   ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
 
-        m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
-        m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\icon1.png" ) );
+        m_pImageRed->LoadFromFile       ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
+        m_pImageRed2->LoadFromFile      ( CalcMTASAPath ( "MTA\\cgui\\images\\blank.png" ) );
     }
     return true;
 }
