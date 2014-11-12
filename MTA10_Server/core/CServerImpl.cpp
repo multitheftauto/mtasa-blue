@@ -71,6 +71,8 @@ CServerImpl::CServerImpl ( void )
     memset(&m_szInputBuffer, 0, sizeof ( m_szInputBuffer ));
     memset(&m_szTag, 0, sizeof ( m_szTag ) * sizeof ( char ) );
     m_uiInputCount = 0;
+    m_dLastTimeMs = 0;
+    m_dPrevOverrun = 0;
 
     // Create our stuff
     m_pModManager = new CModManagerImpl ( this );
@@ -506,27 +508,7 @@ void CServerImpl::MainLoop ( void )
             m_bRequestedQuit = true;
         }
 
-        // Limit the pulses to avoid heavy CPU usage
-        int iSleepBusyMs;
-        int iSleepIdleMs;
-        m_pModManager->GetSleepIntervals( iSleepBusyMs, iSleepIdleMs );
-
-        CTickCount sleepLimit = CTickCount::Now() + CTickCount( (long long)iSleepIdleMs );
-
-        // Initial sleep period
-        int iInitialMs = Min( iSleepIdleMs, iSleepBusyMs );
-        Sleep( Clamp ( 1, iInitialMs, 50 ) );
-
-        // Remaining idle sleep period
-        int iFinalMs = Clamp ( 1, iSleepIdleMs - iInitialMs, 50 );
-        for( int i = 0 ; i < iFinalMs ; i++ )
-        {
-            if ( m_pModManager->PendingWorkToDo() )
-                break;
-            Sleep( 1 );
-            if ( CTickCount::Now() >= sleepLimit )
-                break;
-        }
+        HandlePulseSleep();
     }
 
 #ifdef WIN32
@@ -536,6 +518,86 @@ void CServerImpl::MainLoop ( void )
     // Unload the current mod
     m_pModManager->Unload ();
 }
+
+
+//
+// Limit the pulses to avoid heavy CPU usage
+//
+void CServerImpl::HandlePulseSleep( void )
+{
+    // Get settings
+    int iSleepBusyMs;
+    int iSleepIdleMs;
+    int iLogicFpsLimit;
+    m_pModManager->GetSleepIntervals( iSleepBusyMs, iSleepIdleMs, iLogicFpsLimit );
+
+    CTickCount sleepLimit = CTickCount::Now() + CTickCount( (long long)iSleepIdleMs );
+
+    // Initial sleep period
+    int iInitialMs = Min( iSleepIdleMs, iSleepBusyMs );
+    Sleep( Clamp ( 1, iInitialMs, 50 ) );
+
+    // Apply logic FPS limit if set
+    if ( iLogicFpsLimit > 0 )
+        ApplyFrameRateLimit( iLogicFpsLimit );
+
+    // Remaining idle sleep period
+    int iFinalMs = Clamp ( 1, iSleepIdleMs - iInitialMs, 50 );
+    for( int i = 0 ; i < iFinalMs ; i++ )
+    {
+        if ( m_pModManager->PendingWorkToDo() )
+            break;
+        Sleep( 1 );
+        if ( CTickCount::Now() >= sleepLimit )
+            break;
+    }
+}
+
+
+//
+// Do FPS limiting
+//
+void CServerImpl::ApplyFrameRateLimit ( uint uiUseRate )
+{
+    if ( uiUseRate < 1 )
+        return;
+
+    // Calc required time in ms between frames
+    const double dTargetTimeToUse = 1000.0 / uiUseRate;
+
+    // Time now
+    double dTimeMs = CTickCount::Now().ToDouble();   //GetTickCount32 ();
+
+    // Get delta time in ms since last frame
+    double dTimeUsed = dTimeMs - m_dLastTimeMs;
+
+    // Apply any over/underrun carried over from the previous frame
+    dTimeUsed += m_dPrevOverrun;
+
+    if ( dTimeUsed < dTargetTimeToUse )
+    {
+        // Have time spare - maybe eat some of that now
+        double dSpare = dTargetTimeToUse - dTimeUsed;
+
+        double dUseUpNow = dSpare - dTargetTimeToUse * 0.2f;
+        if ( dUseUpNow >= 1 )
+            Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
+
+        // Redo timing calcs
+        dTimeMs = CTickCount::Now().ToDouble();
+        dTimeUsed = dTimeMs - m_dLastTimeMs;
+        dTimeUsed += m_dPrevOverrun;
+    }
+
+    // Update over/underrun for next frame
+    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
+
+    // Limit carry over
+    m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f );
+
+    m_dLastTimeMs = dTimeMs;
+}
+
 
 /*************************/
 /* Tag color interpreter */

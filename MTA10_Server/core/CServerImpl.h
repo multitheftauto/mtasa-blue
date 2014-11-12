@@ -79,6 +79,8 @@ private:
 
     void                ShowInfoTag         ( char *szTag );
     void                HandleInput         ( void );
+    void                HandlePulseSleep    ( void );
+    void                ApplyFrameRateLimit ( uint uiUseRate );
 
     void                DestroyWindow       ( void );
 
@@ -102,6 +104,9 @@ private:
     unsigned int        m_uiInputCount;
     
     char                m_szTag[80];
+
+    double              m_dLastTimeMs;
+    double              m_dPrevOverrun;
 
 #ifdef WIN32
     HANDLE              m_hConsole;
