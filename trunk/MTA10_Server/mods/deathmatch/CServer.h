@@ -32,7 +32,7 @@ public:
 
     bool                IsFinished          ( void );
     bool                PendingWorkToDo     ( void );
-    bool                GetSleepIntervals   ( int& iSleepBusyMs, int& iSleepIdleMs );
+    bool                GetSleepIntervals   ( int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit );
 
 private:
     CServerInterface*   m_pServerInterface;

@@ -27,7 +27,7 @@ public:
 
     virtual bool        IsFinished                  ( void ) = 0;
     virtual bool        PendingWorkToDo             ( void ) = 0;
-    virtual bool        GetSleepIntervals           ( int& iSleepBusyMs, int& iSleepIdleMs ) = 0;
+    virtual bool        GetSleepIntervals           ( int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit ) = 0;
 };
 
 #endif
