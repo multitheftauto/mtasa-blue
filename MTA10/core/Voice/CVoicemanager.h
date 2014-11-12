@@ -18,16 +18,19 @@
 
 #include <core/CVoiceManagerInterface.h>
 
-#define VOICE_BUFFER_LENGTH             200000
-#define VOICE_FREQUENCY                 44100
-#define VOICE_SAMPLE_SIZE               2
+#define VOICE_SAMPLE_TYPE paInt16
 
-#define FRAME_OUTGOING_BUFFER_COUNT 100
-#define FRAME_INCOMING_BUFFER_COUNT 100
+#define VOICE_USE_FLOAT
+
+#ifdef VOICE_USE_FLOAT
+    #undef VOICE_SAMPLE_TYPE
+    #define VOICE_SAMPLE_TYPE paFloat32
+#endif
 
 // Uncomment this to hear yourself speak locally (Voice is still encoded & decoded to simulate network transmission)
-#define VOICE_DEBUG_LOCAL_PLAYBACK
-#define VOICE_DEBUG_LOCAL_PLAYBACK_LATENCY 15000
+//#define VOICE_DEBUG_LOCAL_PLAYBACK
+#define VOICE_DEBUG_LOCAL_PLAYBACK_LATENCY 150
+
 enum eVoiceState
 {
     VOICESTATE_AWAITING_INPUT = 0,
@@ -78,6 +81,8 @@ public:
     void            SetTestMode                 ( bool bTestMode );
     void            BufferAudioFrame              ( const void *inputBuffer, unsigned long framecount );
 
+    bool            IsDeinitialising            ( void )                { return m_bDeinitialising; };
+
     void            SetServerVoiceEnabled       ( bool bEnabled );
     bool            IsServerVoiceEnabled        ( void )                { return m_bServerVoiceEnabled; };
 
@@ -118,6 +123,7 @@ private:
     PaStreamCallback   *                m_pCallback;
 
     CCriticalSection                    m_CS;
+    bool                                m_bDeinitialising;
 
     CBassAudio *                        m_pBassAudioStream;
 
