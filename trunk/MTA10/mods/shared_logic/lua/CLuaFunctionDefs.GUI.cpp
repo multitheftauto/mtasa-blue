@@ -1609,6 +1609,33 @@ int CLuaFunctionDefs::GUIGridListSetColumnWidth ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::GUIGridListGetColumnWidth ( lua_State* luaVM )
+{
+//  float guiGridListGetColumnWidth ( element gridList, int columnIndex, bool relative )
+    CClientGUIElement* pGridList; int columnIndex; bool relative;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData < CGUIGridList > ( pGridList );
+    argStream.ReadNumber ( columnIndex );
+    argStream.ReadBool ( relative );
+
+    if ( !argStream.HasErrors () )
+    {
+        float width;
+        if ( static_cast <CGUIGridList*> ( pGridList->GetCGUIElement () )->GetColumnWidth ( columnIndex, width, relative ) )
+        {
+            lua_pushnumber ( luaVM, width );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GUIGridListSetColumnTitle ( lua_State* luaVM )
 {
 //  bool guiGridListSetColumnTitle ( element guiGridlist, int columnIndex, string title )
