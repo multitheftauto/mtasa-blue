@@ -4033,6 +4033,14 @@ void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
         // Reset whatever task
         m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
 
+        // check we aren't in the fall and get up task
+        CTask * pTaskPhysicalResponse = m_pTaskManager->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+        // check our physical response task
+        if ( pTaskPhysicalResponse && strcmp ( pTaskPhysicalResponse->GetTaskName ( ), "TASK_COMPLEX_FALL_AND_GET_UP" ) == 0 )
+        {
+            m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+        }
+
         // Create a task to warp the player in and execute it
         CTaskSimpleCarSetPedInAsDriver* pInTask = g_pGame->GetTasks ()->CreateTaskSimpleCarSetPedInAsDriver ( pGameVehicle );
         if ( pInTask )
