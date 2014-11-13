@@ -10,6 +10,7 @@ typedef int (*lua_CFunction) (lua_State *L);
 class CPlayer;
 class CResource;
 class CLuaArguments;
+class CLuaMain;
 
 namespace __gnu_cxx
 {
@@ -53,6 +54,15 @@ namespace __gnu_cxx
     struct hash < CLuaArguments* >
     {
         size_t operator()( const CLuaArguments* pArguments ) const
+        {
+            return (size_t)pArguments;
+        }
+    };
+
+    template <>
+    struct hash < CLuaMain* >
+    {
+        size_t operator()( const CLuaMain* pArguments ) const
         {
             return (size_t)pArguments;
         }
