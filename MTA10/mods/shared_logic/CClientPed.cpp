@@ -5055,7 +5055,7 @@ float CClientPed::GetDistanceFromCentreOfMassToBaseOfModel ( void )
     {
         return m_pPlayerPed->GetDistanceFromCentreOfMassToBaseOfModel ();
     }
-   return 0.0f;;
+   return 0.0f;
 }
 
 

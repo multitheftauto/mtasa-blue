@@ -437,7 +437,7 @@ void CClientPad::ProcessSetAnalogControlState ( CControllerState & cs, bool bOnF
         
         ProcessControl ( cs.LeftStickX, uiIndex, false ); uiIndex++; //Left
         ProcessControl ( cs.LeftStickX, uiIndex, true ); uiIndex++; //Right
-        ProcessControl ( cs.LeftStickY, uiIndex, false ); uiIndex++;; //Up
+        ProcessControl ( cs.LeftStickY, uiIndex, false ); uiIndex++; //Up
         ProcessControl ( cs.LeftStickY, uiIndex, true ); uiIndex++; //Down
     }
     else
@@ -446,7 +446,7 @@ void CClientPad::ProcessSetAnalogControlState ( CControllerState & cs, bool bOnF
 
         ProcessControl ( cs.LeftStickX, uiIndex, false ); uiIndex++; //Left
         ProcessControl ( cs.LeftStickX, uiIndex, true ); uiIndex++; //Right
-        ProcessControl ( cs.LeftStickY, uiIndex, false ); uiIndex++;; //Up
+        ProcessControl ( cs.LeftStickY, uiIndex, false ); uiIndex++; //Up
         ProcessControl ( cs.LeftStickY, uiIndex, true ); uiIndex++; //Down
         ProcessControl ( cs.ButtonCross, uiIndex, true ); uiIndex++; //Accel
         ProcessControl ( cs.ButtonSquare, uiIndex, true ); uiIndex++; //Brake

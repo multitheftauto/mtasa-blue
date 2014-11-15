@@ -210,7 +210,7 @@ void AttachedMatrix ( const CMatrix& matrix, CMatrix& returnMatrix, const CVecto
 void LongToDottedIP ( unsigned long ulIP, char* szDottedIP )
 {
     in_addr in;
-    in.s_addr = ulIP;;
+    in.s_addr = ulIP;
     char* szTemp = inet_ntoa ( in );
     if ( szTemp )
     {

@@ -986,7 +986,7 @@ int CLuaFunctionDefs::IsElementLocal ( lua_State* luaVM )
         if ( pEntity )
         {
             // Return whether it's local or not
-            bool bLocal = pEntity->IsLocalEntity ();;
+            bool bLocal = pEntity->IsLocalEntity ();
             lua_pushboolean ( luaVM, bLocal );
             return 1;
         }
@@ -1589,7 +1589,7 @@ int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
 int CLuaFunctionDefs::RemoveElementData ( lua_State* luaVM )
 {
 //  bool removeElementData ( element theElement, string key )
-    CClientEntity* pEntity; SString strKey;;
+    CClientEntity* pEntity; SString strKey;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );

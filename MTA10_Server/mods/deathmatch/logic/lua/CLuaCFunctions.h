@@ -45,6 +45,7 @@ public:
                                 ~CLuaCFunctions             ();
 
     static CLuaCFunction*       AddFunction                 ( const char* szName, lua_CFunction f, bool bRestricted = false );
+    static void                 RemoveFunction              ( const SString& strName );
     static CLuaCFunction*       GetFunction                 ( lua_CFunction f );
     static CLuaCFunction*       GetFunction                 ( const char* szName );
     static bool                 IsNotFunction               ( lua_CFunction f );

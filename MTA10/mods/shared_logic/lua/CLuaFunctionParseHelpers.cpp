@@ -576,7 +576,7 @@ bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix )
                     if ( iArgumentType == LUA_TNUMBER || iArgumentType == LUA_TSTRING )
                     {
                         if ( uiRow < 4 && uiCol < 4 )
-                            m[uiRow][uiCol] = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );;
+                            m[uiRow][uiCol] = static_cast < float > ( lua_tonumber ( luaVM, -1 ) );
                     }
                 }
 

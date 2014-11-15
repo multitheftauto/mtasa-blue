@@ -10191,7 +10191,7 @@ int CLuaFunctionDefinitions::GetColorFromString ( lua_State* luaVM )
 {
     SString strColor;
     
-    CScriptArgReader argStream ( luaVM );;
+    CScriptArgReader argStream ( luaVM );
     argStream.ReadString(strColor); 
     
     if ( !argStream.HasErrors ( ) )

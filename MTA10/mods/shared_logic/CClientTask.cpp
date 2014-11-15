@@ -116,7 +116,7 @@ bool CClientTask::ReadElements ( lua_State* luaVM, int iTableIndex, bool bClear 
             if ( bClear )
             {
                 // Store it
-                m_Elements.push_back ( ID );;
+                m_Elements.push_back ( ID );
             }
             else
             {

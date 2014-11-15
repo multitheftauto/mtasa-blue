@@ -63,6 +63,18 @@ CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f
 }
 
 
+void CLuaCFunctions::RemoveFunction ( const SString& strName )
+{
+    CFastHashMap < SString, CLuaCFunction* >::iterator iter = ms_FunctionsByName.find ( strName );
+    if ( iter != ms_FunctionsByName.end () )
+    {
+        ms_Functions.erase ( iter->second->GetAddress () );
+        ms_FunctionsByName.erase ( iter );
+        delete iter->second;
+    }
+}
+
+
 CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 {
     // Quick cull of unknown pointer range
