@@ -5907,7 +5907,7 @@ bool CStaticFunctionDefinitions::GetScreenFromWorldPosition ( CVector& vecWorld,
 bool CStaticFunctionDefinitions::GetWeather ( unsigned char& ucWeather, unsigned char& ucWeatherBlendingTo )
 {
     // Grab the current weather
-    CBlendedWeather* pWeather = g_pClientGame->GetBlendedWeather ();;
+    CBlendedWeather* pWeather = g_pClientGame->GetBlendedWeather ();
     ucWeather = pWeather->GetWeather ();
 
     // If we're blending to some weather, also return which. Otherwize just return 0xFF which will return false

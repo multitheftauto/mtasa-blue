@@ -142,7 +142,7 @@ float CClientCivilian::GetDistanceFromCentreOfMassToBaseOfModel ( void )
     {
         return m_pCivilianPed->GetDistanceFromCentreOfMassToBaseOfModel ();
     }
-   return 0.0f;;
+   return 0.0f;
 }
 
 

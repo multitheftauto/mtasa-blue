@@ -304,7 +304,7 @@ bool CWaterZoneSA::RemovePoly ( EWaterPolyType type, WORD wID )
                     for ( ; pEntry < pEnd; pEntry++ )
                         (pEntry - 1)->m_wValue = pEntry->m_wValue;
 
-                    CWaterPolyEntrySAInterface* pZoneInterface = (CWaterPolyEntrySAInterface *)ARRAY_WaterZones;;
+                    CWaterPolyEntrySAInterface* pZoneInterface = (CWaterPolyEntrySAInterface *)ARRAY_WaterZones;
                     for ( ; pZoneInterface < &((CWaterPolyEntrySAInterface *)ARRAY_WaterZones) [ NUM_WaterZones ]; pZoneInterface++ )
                     {
                         if ( POLYENTRY_TYPE ( pZoneInterface ) == WATER_POLY_LIST &&

@@ -2821,13 +2821,13 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
                 else
                 {
                     bAlreadyCalling = false;
-                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
                 }
             }
             else
             {
                 bAlreadyCalling = false;
-                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
             }
         }
     }

@@ -73,7 +73,7 @@ CAdditionalVertexStreamManager::~CAdditionalVertexStreamManager ( void )
 CAdditionalVertexStreamManager* CAdditionalVertexStreamManager::GetSingleton ( void )
 {
     if ( !ms_Singleton )
-        ms_Singleton = new CAdditionalVertexStreamManager ();;
+        ms_Singleton = new CAdditionalVertexStreamManager ();
     return ms_Singleton;
 }
 
