@@ -89,15 +89,15 @@ void CClientPickup::SetModel ( unsigned short usModel )
 
 void CClientPickup::SetVisible ( bool bVisible )
 {
+    // Update the flag
+    m_bVisible = bVisible;
+
     // Only update visible state if we're streamed in
     if ( IsStreamedIn () )
     {
         if ( bVisible ) Create ();
         else Destroy ();
     }
-
-    // Update the flag
-    m_bVisible = bVisible;
 }
 
 
@@ -120,7 +120,7 @@ void CClientPickup::StreamOut ( void )
 
 void CClientPickup::Create ( void )
 {
-    if ( !m_pPickup )
+    if ( !m_pPickup && m_bVisible )
     {
         // Create the pickup
         m_pPickup = g_pGame->GetPickups ()->CreatePickup ( &m_vecPosition, m_usModel, PICKUP_ONCE );
