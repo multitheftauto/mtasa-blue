@@ -18,14 +18,8 @@ using SharedUtil::CalcMTASAPath;
 
 extern CClientGame* g_pClientGame;
 
-#define CGUI_ICON_NETWORK_TROUBLE       "mta\\cgui\\images\\16-message-warn.png"
-
 CClientManager::CClientManager ( void )
 {
-    // Load the connection trouble texture
-    m_pConnectionTroubleTexture = g_pCore->GetGUI ()->CreateTexture ();
-    m_pConnectionTroubleTexture->LoadFromFile ( CalcMTASAPath( CGUI_ICON_NETWORK_TROUBLE ) );
-
     m_pMarkerStreamer = new CClientStreamer ( CClientMarker::IsLimitReached, 600.0f, 300, 300 );
     m_pObjectStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 500.0f, 300, 300 );
     m_pObjectLodStreamer = new CClientStreamer ( CClientObjectManager::IsObjectLimitReached, 1700.0f, 1500, 1500 );
@@ -176,10 +170,6 @@ CClientManager::~CClientManager ( void )
 
     delete m_pWeaponManager;
     m_pWeaponManager = NULL;
-
-    // Delete the connection trouble texture
-    delete m_pConnectionTroubleTexture;
-    m_pConnectionTroubleTexture = NULL;
 }
 
 //

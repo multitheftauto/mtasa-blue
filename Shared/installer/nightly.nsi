@@ -623,6 +623,7 @@ DontInstallRedistVC12:
         File "${FILES_ROOT}\MTA San Andreas\mta\vvof.dll"
         SetOutPath "$INSTDIR\MTA\cgui\images"
         File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\busy_spinner.png"
+        File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\rect_edge.png"
 
 
 		${If} "$(LANGUAGE_CODE)" != ""

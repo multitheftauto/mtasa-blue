@@ -55,6 +55,7 @@ private:
     bool                    m_bDrawFromAim;
     unsigned short          m_usDimension;
     bool                    m_bVisible;
+    CTextureItem*           m_pConnectionTroubleIcon;
 };
 
 #endif

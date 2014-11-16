@@ -82,18 +82,6 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     m_ucNametagColorB = 255;
     m_ulLastNametagShow = 0;
     SetNametagText ( m_strNick );
-    
-    // Create the static icon (defaults to a warning icon for network trouble)
-    m_pStatusIcon = g_pCore->GetGUI ()->CreateStaticImage ();
-    m_pStatusIcon->SetSize ( CVector2D ( 16, 16 ) );
-    m_pStatusIcon->SetVisible ( false );
-
-    // Could a connection trouble texture be loaded? Load it into the status icon.
-    CGUITexture* pTexture = m_pManager->GetConnectionTroubleTexture ();
-    if ( pTexture )
-    {
-        m_pStatusIcon->LoadFromTexture ( pTexture );
-    }   
 
     // Add us to the player list
     m_pManager->GetPlayerManager ()->AddToList ( this );
@@ -113,15 +101,6 @@ CClientPlayer::~CClientPlayer ( void )
 
     // Remove us from the player list
     Unlink ();
-
-    // Remove the icon
-    if ( m_pStatusIcon )
-    {
-        m_pStatusIcon->SetVisible ( false );
-
-        delete m_pStatusIcon;
-        m_pStatusIcon = NULL;
-    }
 
     if ( m_voice )
         delete m_voice;
@@ -268,11 +247,6 @@ void CClientPlayer::Reset ( void )
     m_bNametagColorOverridden = false;
 
     SetAlpha ( 255 );
-
-    if ( m_pStatusIcon )
-    {
-        m_pStatusIcon->SetVisible ( false );
-    }
 }
 
 

@@ -97,8 +97,6 @@ public:
     inline CClientWeaponManager*        GetWeaponManager            ( void )        { return m_pWeaponManager; }
     inline CClientEffectManager*        GetEffectManager            ( void )        { return m_pEffectManager; }
 
-    inline CGUITexture*                 GetConnectionTroubleTexture ( void )        { return m_pConnectionTroubleTexture; }
-
     inline bool                         IsGameLoaded                ( void )        { return g_pGame->GetSystemState () == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork ()->GetServerBitStreamVersion (); }
     inline bool                         IsBeingDeleted              ( void )        { return m_bBeingDeleted; }
     void                                SetGameUnloadedFlag         ( void )        { m_bGameUnloadedFlag = true; }
@@ -148,7 +146,6 @@ private:
     CClientExplosionManager*            m_pExplosionManager;
     CClientWeaponManager*               m_pWeaponManager;
     CClientEffectManager*               m_pEffectManager;
-    CGUITexture*                        m_pConnectionTroubleTexture;
     CClientPacketRecorder*              m_pPacketRecorder;
     bool                                m_bBeingDeleted;
     bool                                m_bGameUnloadedFlag;
