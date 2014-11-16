@@ -26,11 +26,6 @@ using namespace std;
 
 template<> CGraphics * CSingleton< CGraphics >::m_pSingleton = NULL;
 
-const unsigned char g_szPixel [] = { 0x42, 0x4D, 0x3A, 0, 0, 0, 0, 0, 0, 0, 0x36, 0, 0, 0, 0x28, 0, 0,
-                                    0, 0x1, 0, 0, 0, 0x1, 0, 0, 0, 0x1, 0, 0x18, 0, 0, 0, 0, 0,
-                                    0x4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                    0, 0, 0, 0xFF, 0xFF, 0xFF, 0 };
-
 CGraphics::CGraphics ( CLocalGUI* pGUI )
 {
     m_pGUI = pGUI;
@@ -67,6 +62,7 @@ CGraphics::~CGraphics ( void )
     DestroyStandardDXFonts ();
 
     SAFE_RELEASE ( m_ProgressSpinnerTexture );
+    SAFE_RELEASE ( m_RectangleEdgeTexture );
     SAFE_DELETE ( m_pRenderItemManager );
     SAFE_DELETE ( m_pTileBatcher );
     SAFE_DELETE ( m_pLine3DBatcherPreGUI );
@@ -142,20 +138,69 @@ void CGraphics::DrawLine3D ( const CVector& vecBegin, const CVector& vecEnd, uns
 }
 
 
-void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor )
+void CGraphics::DrawRectangleInternal( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning )
+{
+    // Adjust size to account for sub pixel borders
+    if ( bSubPixelPositioning )
+    {
+        fX += 0.5f;
+        fY += 0.5f;
+        fWidth -= 1.0f;
+        fHeight -= 1.0f;
+    }
+
+    // 9 sections of the rectangle
+    struct SSection
+    {
+        RECT cutImagePos;
+        int posOffsetX;
+        int posOffsetY;
+        int overrideWidth;
+        int overrideHeight;
+    } static sectionList[] = { 
+             { {3,3, 5,5},  0,  0, 0, 0 }   // Center
+            ,{ {3,0, 5,2},  0, -2, 0, 2 }   // Top
+            ,{ {0,0, 2,2}, -2, -2, 2, 2 }   // Top left
+            ,{ {0,3, 2,5}, -2,  0, 2, 0 }   // Left
+            ,{ {0,6, 2,8}, -2,  2, 2, 2 }   // Bottom left
+            ,{ {3,6, 5,8},  0,  2, 0, 2 }   // Bottom
+            ,{ {6,6, 8,8},  2,  2, 2, 2 }   // Bottom right
+            ,{ {6,3, 8,5},  2,  0, 2, 0 }   // Right
+            ,{ {6,0, 8,2},  2, -2, 2, 2 }   // Top right
+        };
+
+    D3DXMATRIX matrix;
+    const D3DXVECTOR2 scalingCentre( 0.5f, 0.5f );
+    for ( uint i = 0 ; i < NUMELMS( sectionList ) ; i++ )
+    {
+        const SSection& section = sectionList[i];
+        const float useWidth = section.overrideWidth ? section.overrideWidth : fWidth;
+        const float useHeight = section.overrideHeight ? section.overrideHeight : fHeight;
+        const float useX = section.posOffsetX > 0 ? fX + fWidth : fX + section.posOffsetX;
+        const float useY = section.posOffsetY > 0 ? fY + fHeight : fY + section.posOffsetY;
+
+        // Scaling is: size / cutSize
+        const D3DXVECTOR2 scaling( useWidth * 0.5f, useHeight * 0.5f );
+        const D3DXVECTOR2 position( useX, useY );
+        D3DXMatrixTransformation2D( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
+        m_pDXSprite->SetTransform( &matrix );
+        m_pDXSprite->Draw( (IDirect3DTexture9*)m_RectangleEdgeTexture->m_pD3DTexture, &section.cutImagePos, NULL, NULL, ulColor );
+
+        // Only draw first part if SubPixelPositioning is not required
+        if( i == 0 && !bSubPixelPositioning )
+            break;
+    }
+}
+
+
+void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning )
 {
     if ( g_pCore->IsWindowMinimized () )
         return;
-      
+
     BeginDrawBatch ();
-    D3DXMATRIX matrix;
-    D3DXVECTOR2 scalingCentre ( 0.5f, 0.5f );
-    D3DXVECTOR2 scaling ( fWidth, fHeight );
-    D3DXVECTOR2 position ( fX, fY );
-    D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
     CheckModes ( EDrawMode::DX_SPRITE, m_ActiveBlendMode );
-    m_pDXSprite->SetTransform ( &matrix );
-    m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, ulColor );
+    DrawRectangleInternal ( fX, fY, fWidth, fHeight, ulColor, bSubPixelPositioning );
     EndDrawBatch ();
 }
 
@@ -685,7 +730,8 @@ void CGraphics::DrawMaterialLine3DQueued ( const CVector& vecBegin,
 void CGraphics::DrawRectQueued ( float fX, float fY,
                                  float fWidth, float fHeight,
                                  unsigned long ulColor,
-                                 bool bPostGUI )
+                                 bool bPostGUI,
+                                 bool bSubPixelPositioning )
 {
     m_pAspectRatioConverter->ConvertSideForAspectRatio( &fY, &fHeight );
 
@@ -698,6 +744,7 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
     Item.Rect.fWidth = fWidth;
     Item.Rect.fHeight = fHeight;
     Item.Rect.ulColor = ulColor;
+    Item.Rect.bSubPixelPositioning = bSubPixelPositioning;
 
     // Add it to the queue
     AddQueueItem ( Item, bPostGUI );
@@ -1183,7 +1230,6 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
 
     // Create drawing devices
     D3DXCreateLine ( pDevice, &m_pLineInterface );
-    D3DXCreateTextureFromFileInMemory ( pDevice, g_szPixel, sizeof ( g_szPixel ), &m_pDXPixelTexture );
 
     m_pTileBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pLine3DBatcherPreGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
@@ -1193,6 +1239,7 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     m_pScreenGrabber->OnDeviceCreate ( pDevice );
     m_pPixelsManager->OnDeviceCreate ( pDevice );
     m_ProgressSpinnerTexture = GetRenderItemManager ()->CreateTexture ( CalcMTASAPath( "MTA\\cgui\\images\\busy_spinner.png" ), NULL, false, -1, -1, RFORMAT_DXT3, TADDRESS_CLAMP );
+    m_RectangleEdgeTexture = GetRenderItemManager ()->CreateTexture ( CalcMTASAPath( "MTA\\cgui\\images\\rect_edge.png" ), NULL, false, 8, 8, RFORMAT_ARGB, TADDRESS_CLAMP );
     m_pAspectRatioConverter->Init( GetViewportHeight () );
 }
 
@@ -1356,13 +1403,8 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
         // Rectangle type?
         case QUEUE_RECT:
         {
-            D3DXMATRIX matrix;
-            D3DXVECTOR2 scaling ( Item.Rect.fWidth, Item.Rect.fHeight );
-            D3DXVECTOR2 position ( Item.Rect.fX, Item.Rect.fY );
-            D3DXMatrixTransformation2D ( &matrix, NULL, 0.0f, &scaling, NULL, 0.0f, &position );
             CheckModes ( EDrawMode::DX_SPRITE, Item.blendMode );
-            m_pDXSprite->SetTransform ( &matrix );
-            m_pDXSprite->Draw ( m_pDXPixelTexture, NULL, NULL, NULL, /*ModifyColorForBlendMode (*/ Item.Rect.ulColor/*, Item.blendMode )*/ );
+            DrawRectangleInternal ( Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning );
             break;
         }
         case QUEUE_TEXT:

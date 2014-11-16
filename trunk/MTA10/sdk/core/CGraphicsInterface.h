@@ -58,7 +58,7 @@ public:
     virtual void                    DrawText            ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... ) = 0;
 
     virtual void                    DrawLine3D          ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f ) = 0;
-    virtual void                    DrawRectangle       ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor ) = 0;
+    virtual void                    DrawRectangle       ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false ) = 0;
 
     virtual void                    SetBlendMode        ( EBlendModeType blendMode ) = 0;
     virtual EBlendModeType          GetBlendMode        ( void ) = 0;
@@ -112,7 +112,8 @@ public:
     virtual void                    DrawRectQueued      ( float fX, float fY,
                                                           float fWidth, float fHeight,
                                                           unsigned long ulColor,
-                                                          bool bPostGUI ) = 0;
+                                                          bool bPostGUI,
+                                                          bool bSubPixelPositioning = false ) = 0;
 
     virtual void                    DrawTextureQueued   ( float fX, float fY,
                                                           float fWidth, float fHeight,

@@ -38,11 +38,13 @@ CNametags::CNametags ( CClientManager* pManager )
     m_bDrawFromAim = false;
     m_usDimension = 0;
     m_bVisible = true;
+    m_pConnectionTroubleIcon = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture( CalcMTASAPath( "MTA\\cgui\\images\\16-message-warn.png" ), NULL, false );
 }
 
 
 CNametags::~CNametags ( void )
 {
+    SAFE_RELEASE( m_pConnectionTroubleIcon );
 }
 
 
@@ -365,8 +367,6 @@ void CNametags::DrawDefault ( void )
         pPlayer = static_cast < CClientPlayer * > ( pElement );
         if ( pPlayer->IsLocalPlayer () ) continue;
 
-        if ( pPlayer->GetStatusIcon ()->IsVisible () )
-            pPlayer->GetStatusIcon ()->SetVisible ( false );
 
         // Get the distance from the camera
         pPlayer->GetPosition ( vecPlayerPosition );
@@ -434,9 +434,6 @@ void CNametags::DrawDefault ( void )
 
 void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha )
 {
-    // Get the nametag widget
-    CGUIStaticImage * pIcon = pPlayer->GetStatusIcon ();
-
     // If they aren't in the same dimension, dont draw
     if ( pPlayer->GetDimension () != m_usDimension || !pPlayer->IsNametagShowing () )
         return;
@@ -470,13 +467,6 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
     // Allow up to 50 pixels off screen to avoid nametags suddenly disappearing
     if ( fHealth > 0 && vecScreenPosition.fX > -50.0f && vecScreenPosition.fX < fResWidth + 50.f && vecScreenPosition.fY > -50.0f && vecScreenPosition.fY < fResHeight + 50.f && vecScreenPosition.fZ > 0.1f )
     {
-        // Draw the player nametag and status icon
-        if ( pPlayer->HasConnectionTrouble () )
-        {
-            pIcon->SetVisible ( true );
-            pIcon->SetPosition ( CVector2D ( vecScreenPosition.fX - 20, vecScreenPosition.fY ), false );
-        }
-
         // Grab the nick to show
         const char* szNick = pPlayer->GetNametagText ();
         if ( !szNick || !szNick [0] ) szNick = pPlayer->GetNick ();
@@ -536,7 +526,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             pGraphics->DrawRectangle ( 
                             vecTopLeft.fX,  vecTopLeft.fY,
                             vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                            COLOR_ABGR ( ucAlpha, 0, 0, 0 ) );
+                            COLOR_ABGR ( ucAlpha, 0, 0, 0 ), true );
 
             if ( fArmor > 0.0f )
             {
@@ -546,7 +536,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
                 pGraphics->DrawRectangle ( 
                                 vecTopLeft.fX,  vecTopLeft.fY,
                                 vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                                ARMOR_BORDER_COLOR );
+                                ARMOR_BORDER_COLOR, true );
 
                 // Right side of armor indicator
                 vecTopLeft  = vecTopLeftBase  + CVector ( +fWidth,              -fSizeIncreaseBorder, 0 );
@@ -554,7 +544,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
                 pGraphics->DrawRectangle ( 
                                 vecTopLeft.fX,  vecTopLeft.fY,
                                 vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                                ARMOR_BORDER_COLOR );
+                                ARMOR_BORDER_COLOR, true );
 
                 // Top armor indicator
                 vecTopLeft  = vecTopLeftBase  + CVector ( +0,                   -fSizeIncreaseBorder, 0 );
@@ -562,7 +552,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
                 pGraphics->DrawRectangle ( 
                                 vecTopLeft.fX,  vecTopLeft.fY,
                                 vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                                ARMOR_BORDER_COLOR );
+                                ARMOR_BORDER_COLOR, true );
 
                 // Bottom armor indicator
                 vecTopLeft  = vecTopLeftBase  + CVector ( +0,                   +fHeight, 0 );
@@ -570,7 +560,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
                 pGraphics->DrawRectangle ( 
                                 vecTopLeft.fX,  vecTopLeft.fY,
                                 vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                                ARMOR_BORDER_COLOR );
+                                ARMOR_BORDER_COLOR, true );
            }
 
             // the colored bit
@@ -579,7 +569,7 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             pGraphics->DrawRectangle ( 
                             vecTopLeft.fX,  vecTopLeft.fY,
                             vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                            COLOR_ABGR ( ucAlpha, 0, static_cast < unsigned char > ( lGreen ), static_cast < unsigned char > ( lRed ) ) );
+                            COLOR_ABGR ( ucAlpha, 0, static_cast < unsigned char > ( lGreen ), static_cast < unsigned char > ( lRed ) ), true );
 
             // the black bit
             vecTopLeft  = vecTopLeftBase  + CVector ( +fWidth - fRemovedWidth,  +0, 0 );
@@ -587,7 +577,13 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
             pGraphics->DrawRectangle ( 
                             vecTopLeft.fX,  vecTopLeft.fY,
                             vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                            COLOR_ABGR ( ucAlpha, 0, static_cast < unsigned char > ( lGreenBlack ), static_cast < unsigned char > ( lRedBlack ) ) );
+                            COLOR_ABGR ( ucAlpha, 0, static_cast < unsigned char > ( lGreenBlack ), static_cast < unsigned char > ( lRedBlack ) ), true );
+
+            // Draw the player status icon
+            if ( pPlayer->HasConnectionTrouble() )
+            {
+                pGraphics->DrawTexture( m_pConnectionTroubleIcon, vecScreenPosition.fX - 20, vecScreenPosition.fY+20 );
+            }
         }
     }
 }

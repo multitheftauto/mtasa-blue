@@ -209,8 +209,8 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
 {
-// bool dxDrawRectangle ( int startX, int startY, float width, float height [, int color = white, bool postGUI = false] )
-    float fStartX; float fStartY; float fWidth; float fHeight; uint ulColor; bool bPostGUI;
+// bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false] )
+    float fStartX; float fStartY; float fWidth; float fHeight; uint ulColor; bool bPostGUI; bool bSubPixelPositioning;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( fStartX );
@@ -219,11 +219,11 @@ int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
     argStream.ReadNumber ( fHeight );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     argStream.ReadBool ( bPostGUI, false );
-
+    argStream.ReadBool ( bSubPixelPositioning, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->DrawRectQueued ( fStartX, fStartY, fWidth, fHeight, ulColor, bPostGUI );
+        g_pCore->GetGraphics ()->DrawRectQueued ( fStartX, fStartY, fWidth, fHeight, ulColor, bPostGUI, bSubPixelPositioning );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
