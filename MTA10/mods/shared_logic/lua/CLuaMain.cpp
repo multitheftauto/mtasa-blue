@@ -521,14 +521,14 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     
     lua_classfunction ( luaVM, "setNametagText", "setPlayerNametagText" );
     lua_classfunction ( luaVM, "setNametagShowing", "setPlayerNametagShowing" );
-    lua_classfunction ( luaVM, "setNametagColor", "setPlayerNametagColor" ); // color
+    lua_classfunction ( luaVM, "setNametagColor", "setPlayerNametagColor" );
     lua_classfunction ( luaVM, "setBlurLevel", "setPlayerBlurLevel" );
     
     lua_classfunction ( luaVM, "getPing", "getPlayerPing" );
     lua_classfunction ( luaVM, "getName", "getPlayerName" );
     lua_classfunction ( luaVM, "getTeam", "getPlayerTeam" );
     lua_classfunction ( luaVM, "getNametagText", "getPlayerNametagText" );
-    lua_classfunction ( luaVM, "getNametagColor", "getPlayerNametagColor" ); // color
+    lua_classfunction ( luaVM, "getNametagColor", "getPlayerNametagColor" );
     lua_classfunction ( luaVM, "getBlurLevel", "getPlayerBlurLevel" );
     
     lua_classfunction ( luaVM, "isNametagShowing", "isPlayerNametagShowing" );
@@ -539,7 +539,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "team", NULL, "getPlayerTeam" );
     lua_classvariable ( luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText" );
     lua_classvariable ( luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing" );
-    //lua_classvariable ( luaVM, "nametagColor", CLuaFunctionDefs::SetPlayerNametagColor, CLuaOOPDefs::GetPlayerNametagColor ); color
+    //lua_classvariable ( luaVM, "nametagColor", CLuaFunctionDefs::SetPlayerNametagColor, CLuaOOPDefs::GetPlayerNametagColor );
     
     
     lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
@@ -579,7 +579,7 @@ void CLuaMain::AddObjectClass ( lua_State* luaVM )
 }
 
 
-// TODO: color and vector classes, and function special
+// TODO: Specials
 void CLuaMain::AddMarkerClass( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -592,20 +592,20 @@ void CLuaMain::AddMarkerClass( lua_State* luaVM )
     lua_classfunction ( luaVM, "getIcon", "getMarkerIcon" );
     lua_classfunction ( luaVM, "getSize", "getMarkerSize" );
     lua_classfunction ( luaVM, "getTarget", "getMarkerTarget" );
-    lua_classfunction ( luaVM, "getColor", "getMarkerColor" ); // color
+    lua_classfunction ( luaVM, "getColor", "getMarkerColor" );
 
     lua_classfunction ( luaVM, "setType", "setMarkerType" );
     lua_classfunction ( luaVM, "setIcon", "setMarkerIcon" );
     lua_classfunction ( luaVM, "setSize", "setMarkerSize" );
     lua_classfunction ( luaVM, "setTarget", "setMarkerTarget" );
-    lua_classfunction ( luaVM, "setColor", "setMarkerColor" ); // color
+    lua_classfunction ( luaVM, "setColor", "setMarkerColor" );
 
     lua_classvariable ( luaVM, "type", "setMarkerType", "getMarkerType" );
     lua_classvariable ( luaVM, "icon", "setMarkerIcon", "getMarkerIcon" );
     lua_classvariable ( luaVM, "size", "setMarkerSize", "getMarkerSize" );
 
     lua_classvariable ( luaVM, "target", "setMarkerTarget", "getMarkerTarget" );
-    //lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor ); color
+    //lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor );
 
     lua_registerclass ( luaVM, "Marker", "Element" );
 }
@@ -618,13 +618,13 @@ void CLuaMain::AddBlipClass( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "createBlip" );
     lua_classfunction ( luaVM, "createAttachedTo", "createBlipAttachedTo" );
     
-    lua_classfunction ( luaVM, "getColor", "getBlipColor" ); // color
+    lua_classfunction ( luaVM, "getColor", "getBlipColor" );
     lua_classfunction ( luaVM, "getVisibleDistance", "getBlipVisibleDistance" );
     lua_classfunction ( luaVM, "getOrdering", "getBlipOrdering" );
     lua_classfunction ( luaVM, "getSize", "getBlipSize" );
     lua_classfunction ( luaVM, "getIcon", "getBlipIcon" );
     
-    lua_classfunction ( luaVM, "setColor", "setBlipColor" ); // color
+    lua_classfunction ( luaVM, "setColor", "setBlipColor" );
     lua_classfunction ( luaVM, "setVisibleDistance", "setBlipVisibleDistance" );
     lua_classfunction ( luaVM, "setOrdering", "setBlipOrdering" );
     lua_classfunction ( luaVM, "setSize", "setBlipSize" );
@@ -634,7 +634,7 @@ void CLuaMain::AddBlipClass( lua_State* luaVM )
     lua_classvariable ( luaVM, "size", "setBlipSize", "getBlipSize" );
     lua_classvariable ( luaVM, "ordering", "setBlipOrdering", "getBlipOrdering" );
     lua_classvariable ( luaVM, "visibleDistance", "setBlipVisibleDistance", "getBlipVisibleDistance" );
-    //lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor" ); color
+    //lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor" );
 
     lua_registerclass ( luaVM, "Blip", "Element" );
 }
@@ -702,7 +702,7 @@ void CLuaMain::AddProjectileClass ( lua_State* luaVM )
 }
 
 
-// TODO: vector and colors integration
+// TODO: specials
 void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -719,14 +719,14 @@ void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setColor", "setRadarAreaColor" );
 
     lua_classvariable ( luaVM, "flashing", "isRadarAreaFlashing", "setRadarAreaFlashing" );
-    //lua_classvariable ( luaVM, "color", "getRadarAreaColor", "setRadarAreaColor" ); color
+    //lua_classvariable ( luaVM, "color", "getRadarAreaColor", "setRadarAreaColor" );
     lua_classvariable ( luaVM, "size", "getRadarAreaSize", "setRadarAreaSize" );
     
     lua_registerclass ( luaVM, "RadarArea", "Element" );
 }
 
 
-// TODO: color classes
+// TODO: specials
 void CLuaMain::AddTeamClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -736,18 +736,18 @@ void CLuaMain::AddTeamClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "countPlayers", "countPlayersInTeam" );
     lua_classfunction ( luaVM, "getFriendlyFire", "getTeamFriendlyFire" );
     lua_classfunction ( luaVM, "getName", "getTeamName" );
-    lua_classfunction ( luaVM, "getColor", "getTeamColor" ); // color
+    lua_classfunction ( luaVM, "getColor", "getTeamColor" );
     
     lua_classvariable ( luaVM, "playerCount", NULL, "countPlayersInTeam" );
     lua_classvariable ( luaVM, "friendlyFire", NULL, "getTeamFriendlyFire" );
     lua_classvariable ( luaVM, "name", NULL, "getTeamName" );
-    //lua_classvariable ( luaVM, "color", NULL, "getTeamColor" ); color
+    //lua_classvariable ( luaVM, "color", NULL, "getTeamColor" );
     
     lua_registerclass ( luaVM, "Team", "Element" );
 }
 
 
-// color and vector integration
+// TODO: specials
 void CLuaMain::AddWaterClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -759,12 +759,12 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getLevel", "getWaterLevel" );
     lua_classfunction ( luaVM, "getVertexPosition", "getWaterVertexPosition" );
     lua_classfunction ( luaVM, "getWaveHeight", "getWaveHeight" );
-    lua_classfunction ( luaVM, "getColor", "getWaterColor" ); // color
+    lua_classfunction ( luaVM, "getColor", "getWaterColor" );
     
     lua_classfunction ( luaVM, "setWaveHeight", "setWaveHeight" );
-    lua_classfunction ( luaVM, "setColor", "setWaterColor" ); // color
+    lua_classfunction ( luaVM, "setColor", "setWaterColor" );
     lua_classfunction ( luaVM, "setVertexPosition", "setWaterVertexPosition" );
-    lua_classfunction ( luaVM, "setLevel", "setWaterLevel" ); // vector3d
+    lua_classfunction ( luaVM, "setLevel", "setWaterLevel" );
     lua_classfunction ( luaVM, "setDrawnLast", "setWaterDrawnLast" );
 
     lua_classfunction ( luaVM, "resetColor", "resetWaterColor" );
@@ -773,7 +773,7 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "level", "setWaterLevel", "getWaterLevel" );
     lua_classvariable ( luaVM, "height", "setWaveHeight", "getWaveHeight" );
     lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
-    //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" ); // color
+    //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" );
 
     lua_registerclass ( luaVM, "Water", "Element" );
 }
@@ -1018,7 +1018,7 @@ void CLuaMain::AddGuiEditClass ( lua_State* luaVM )
 }
 
 
-// TODO: color class
+// TODO: specials
 void CLuaMain::AddGuiLabelClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1037,7 +1037,7 @@ void CLuaMain::AddGuiLabelClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "verticalAlign", "guiLabelSetVerticalAlign", NULL );
     lua_classvariable ( luaVM, "fontHeight", NULL, "guiLabelGetFontHeight" );
     lua_classvariable ( luaVM, "textExtent", NULL, "guiLabelGetTextExtent" );
-//    lua_classvariable ( luaVM, "color", "guiLabelGetColor", "guiLabelSetColor" ); color
+//    lua_classvariable ( luaVM, "color", "guiLabelGetColor", "guiLabelSetColor" );
     
     lua_registerclass ( luaVM, "GuiLabel", "GuiElement" );
 }
