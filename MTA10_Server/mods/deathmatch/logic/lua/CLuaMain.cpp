@@ -837,7 +837,9 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "showHudComponent", "showPlayerHudComponent" );
     lua_classfunction ( luaVM, "hasPermissionTo", "hasObjectPermissionTo" );
     lua_classfunction ( luaVM, "logOut", "logOut" );
-    lua_classfunction ( luaVM, "triggerEvent", "triggerClientEvent" );
+    lua_classfunction ( luaVM, "toggleControl", "toggleControl" );
+
+	lua_classfunction ( luaVM, "triggerEvent", "triggerClientEvent" );
     lua_classfunction ( luaVM, "outputChat", "outputChatBox", CLuaOOPDefs::OutputChat );
     //lua_classfunction ( luaVM, "observeDisplay", "textDisplayAddObserver" ); // swap args
     //lua_classfunction ( luaVM, "stopObservingDisplay", "textDisplayRemoveObserver" ); // swap args
