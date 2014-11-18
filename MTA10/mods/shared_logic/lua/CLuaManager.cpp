@@ -456,6 +456,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "warpPedIntoVehicle", CLuaFunctionDefs::WarpPedIntoVehicle );
     CLuaCFunctions::AddFunction ( "removePedFromVehicle", CLuaFunctionDefs::RemovePedFromVehicle );
     CLuaCFunctions::AddFunction ( "setPedOxygenLevel", CLuaFunctionDefs::SetPedOxygenLevel );
+    CLuaCFunctions::AddFunction ( "givePedWeapon", CLuaFunctionDefs::GivePedWeapon );
 
     // Clothes and body functions
     CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefs::GetBodyPartName );

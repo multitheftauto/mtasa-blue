@@ -167,6 +167,7 @@ public:
     static bool                         GetPedOxygenLevel                   ( CClientPed& Ped, float& fOxygen );
     
     static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
+    static bool                         GivePedWeapon                       ( CClientEntity& Entity, uchar ucWeaponID, ushort usWeaponAmmo, bool bSetAsCurrent );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation, bool bNewWay );
     static bool                         SetPedCanBeKnockedOffBike           ( CClientEntity& Entity, bool bCanBeKnockedOffBike );
     static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame );
