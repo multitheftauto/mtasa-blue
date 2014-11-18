@@ -2155,6 +2155,7 @@ void CClientPed::RemoveWeapon ( eWeaponType weaponType )
         if ( m_WeaponTypes [ i ] == weaponType )
         {
             m_WeaponTypes [ i ] = WEAPONTYPE_UNARMED;
+            m_usWeaponAmmo [ i ] = 0;
             if ( m_CurrentWeaponSlot == ( eWeaponSlot ) i )
             {
                 m_CurrentWeaponSlot = WEAPONSLOT_TYPE_UNARMED;
@@ -2178,7 +2179,10 @@ void CClientPed::RemoveAllWeapons ( void )
     }
 
     for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
+    {
         m_WeaponTypes [ i ] = WEAPONTYPE_UNARMED;
+        m_usWeaponAmmo [ i ] = 0;
+    }
     m_CurrentWeaponSlot = WEAPONSLOT_TYPE_UNARMED;
 }
 
@@ -3524,7 +3528,9 @@ void CClientPed::_CreateModel ( void )
         for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
         {
             if ( m_WeaponTypes [ i ] != WEAPONTYPE_UNARMED )
-                GiveWeapon ( m_WeaponTypes [ i ], 1 );   // TODO: store ammo for each weapon
+            {
+                GiveWeapon ( m_WeaponTypes [ i ], m_usWeaponAmmo [ i ] );
+            }
         }
 
         m_pPlayerPed->SetCurrentWeaponSlot ( m_CurrentWeaponSlot );
@@ -3629,6 +3635,22 @@ void CClientPed::_CreateLocalModel ( void )
 
 void CClientPed::_DestroyModel ()
 {
+    // Store ped ammo
+    if ( GetType () == CCLIENTPED )
+    {
+        for ( uchar i = 0 ; i < (uchar)WEAPONSLOT_MAX ; i++ )
+        {
+            if ( m_WeaponTypes [ i ] != WEAPONTYPE_UNARMED )
+            {
+                CWeapon * pWeapon = GetWeapon ( m_WeaponTypes [ i ] );
+                if ( pWeapon )
+                {
+                    m_usWeaponAmmo [ i ] = pWeapon->GetAmmoTotal ( );
+                }
+            }
+        }
+    }
+
     // Remove our linked contact entity
     if ( m_pCurrentContactEntity )
     {

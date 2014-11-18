@@ -461,6 +461,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setAimTarget", "setPedAimTarget" );
     lua_classfunction ( luaVM, "setLookAt", "setPedLookAt" );
     lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
+    lua_classfunction ( luaVM, "giveWeapon", "givePedWeapon" );
 
     lua_classvariable ( luaVM, "vehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle );
     lua_classvariable ( luaVM, "canBeKnockedOffBike", "setPedCanBeKnockedOffBike", "canPedBeKnockedOffBike" );
