@@ -373,9 +373,11 @@ void PreLaunchWatchDogs ( void )
     //
 
     // Check for unclean stop on previous run
+#ifndef MTA_DEBUG
     if ( WatchDogIsSectionOpen ( "L0" ) )
         WatchDogSetUncleanStop ( true );    // Flag to maybe do things differently if MTA exit code on last run was not 0
     else
+#endif
         WatchDogSetUncleanStop ( false );
 
     SString strCrashFlagFilename = CalcMTASAPath( "mta\\core.log.flag" );
@@ -635,6 +637,7 @@ void CheckDataFiles( void )
     const char* dataFilesFiles [] = { "MTA\\cgui\\images\\background_logo.png"
                                      ,"MTA\\cgui\\images\\radarset\\up.png"
                                      ,"MTA\\cgui\\images\\busy_spinner.png"
+                                     ,"MTA\\cgui\\images\\rect_edge.png"
                                      ,"MTA\\D3DX9_42.dll"
                                      ,"MTA\\D3DCompiler_42.dll"
                                      ,"MTA\\bass.dll"

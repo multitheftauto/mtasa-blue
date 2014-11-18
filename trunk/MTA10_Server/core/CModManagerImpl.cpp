@@ -182,6 +182,7 @@ bool CModManagerImpl::GetSleepIntervals( int& iSleepBusyMs, int& iSleepIdleMs, i
 {
     iSleepBusyMs = 20;
     iSleepIdleMs = 40;
+    iLogicFpsLimit = 0;
 
     if ( m_pBase )
     {
