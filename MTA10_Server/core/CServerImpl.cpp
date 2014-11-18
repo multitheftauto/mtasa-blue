@@ -531,15 +531,18 @@ void CServerImpl::HandlePulseSleep( void )
     int iLogicFpsLimit;
     m_pModManager->GetSleepIntervals( iSleepBusyMs, iSleepIdleMs, iLogicFpsLimit );
 
+    // Apply logic FPS limit if set
+    if ( iLogicFpsLimit > 0 )
+    {
+        ApplyFrameRateLimit( iLogicFpsLimit );
+        return;
+    }
+
     CTickCount sleepLimit = CTickCount::Now() + CTickCount( (long long)iSleepIdleMs );
 
     // Initial sleep period
     int iInitialMs = Min( iSleepIdleMs, iSleepBusyMs );
     Sleep( Clamp ( 1, iInitialMs, 50 ) );
-
-    // Apply logic FPS limit if set
-    if ( iLogicFpsLimit > 0 )
-        ApplyFrameRateLimit( iLogicFpsLimit );
 
     // Remaining idle sleep period
     int iFinalMs = Clamp ( 1, iSleepIdleMs - iInitialMs, 50 );
@@ -579,7 +582,7 @@ void CServerImpl::ApplyFrameRateLimit ( uint uiUseRate )
         // Have time spare - maybe eat some of that now
         double dSpare = dTargetTimeToUse - dTimeUsed;
 
-        double dUseUpNow = dSpare - dTargetTimeToUse * 0.2f;
+        double dUseUpNow = dSpare - dTargetTimeToUse * 0.3f;
         if ( dUseUpNow >= 1 )
             Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
 

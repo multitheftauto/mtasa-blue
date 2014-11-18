@@ -140,6 +140,9 @@ void CGraphics::DrawLine3D ( const CVector& vecBegin, const CVector& vecEnd, uns
 
 void CGraphics::DrawRectangleInternal( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning )
 {
+    if ( !m_RectangleEdgeTexture )
+        return;
+
     // Adjust size to account for sub pixel borders
     if ( bSubPixelPositioning )
     {
