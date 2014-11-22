@@ -10,3 +10,25 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+
+int CLuaOOPDefs::GetVehicleGravity ( lua_State* luaVM )
+{
+    CClientVehicle* pVehicle = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors () )
+    {
+        CVector vecGravity;
+        pVehicle->GetGravity ( vecGravity );
+
+        lua_pushvector ( luaVM, vecGravity );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

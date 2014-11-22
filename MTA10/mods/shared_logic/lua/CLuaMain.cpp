@@ -233,7 +233,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
 }
 
 
-// TODO: color, velocity, gravity
+// TODO: color
 void CLuaMain::AddVehicleClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -284,7 +284,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getComponents", "getVehicleComponents" );
     lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
     lua_classfunction ( luaVM, "getColor", "getVehicleColor" );
-    lua_classfunction ( luaVM, "getGravity", "getVehicleGravity" );
+    lua_classfunction ( luaVM, "getGravity", CLuaOOPDefs::GetVehicleGravity );
     lua_classfunction ( luaVM, "getSirens", "getVehicleSirens" );
     lua_classfunction ( luaVM, "getSirensOn", "getVehicleSirensOn" );
     lua_classfunction ( luaVM, "getComponentPosition", "getVehicleComponentPosition" );
@@ -376,11 +376,11 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "nitroCount", "setVehicleNitroCount", "getVehicleNitroCount" );
     lua_classvariable ( luaVM, "nitroActivated", "setVehicleNitroActivated", "isVehicleNitroActivated" );
     lua_classvariable ( luaVM, "nitroRecharging", NULL, "isVehicleNitroRecharging" );
-    
+    lua_classvariable ( luaVM, "gravity", CLuaFunctionDefs::SetVehicleGravity, CLuaOOPDefs::GetVehicleGravity );
+
     //lua_classvariable ( luaVM, "color", CLuaFunctionDefs::SetVehicleColor, CLuaOOPDefs::GetVehicleColor );
     //lua_classvariable ( luaVM, "headlightColor", CLuaFunctionDefs::SetHeadLightColor, CLuaOOPDefs::GetHeadLightColor );
-    lua_classvariable ( luaVM, "gravity", "setVehicleGravity", "getVehicleGravity" );
-
+    
     lua_registerclass ( luaVM, "Vehicle", "Element" );
 }
 
