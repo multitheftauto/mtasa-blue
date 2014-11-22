@@ -54,6 +54,28 @@ int CLuaOOPDefs::GetElementPosition ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaOOPDefs::GetElementVelocity( lua_State* luaVM )
+{
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadUserData( pElement );
+
+    if ( !argStream.HasErrors() )
+    {
+        CVector vecVelocity;
+        CStaticFunctionDefinitions::GetElementVelocity( pElement, vecVelocity );
+
+        lua_pushvector( luaVM, vecVelocity );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean( luaVM, false );
+    return 1;
+}
+
 int CLuaOOPDefs::GetElementRotation ( lua_State* luaVM )
 {
     CElement* pElement = NULL;

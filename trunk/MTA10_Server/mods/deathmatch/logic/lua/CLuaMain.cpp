@@ -375,7 +375,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getParent", "getElementParent" );
     lua_classfunction ( luaVM, "getAttachedElements", "getAttachedElements" );
     lua_classfunction ( luaVM, "getAttachedTo", "getAttachedTo" );
-    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" );
+    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity", CLuaOOPDefs::GetElementVelocity );
     lua_classfunction ( luaVM, "getID", "getElementID" );
     lua_classfunction ( luaVM, "getZoneName", "getElementZoneName" );
     lua_classfunction ( luaVM, "getAlpha", "getElementAlpha" );
@@ -429,7 +429,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "position", "setElementPosition", "getElementPosition", CLuaElementDefs::setElementPosition, CLuaOOPDefs::GetElementPosition );
     lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
     lua_classvariable ( luaVM, "matrix", "setElementMatrix", "getElementMatrix", CLuaElementDefs::setElementMatrix, CLuaOOPDefs::GetElementMatrix );
-    lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity" );
+    lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity", CLuaElementDefs::setElementVelocity, CLuaOOPDefs::GetElementVelocity );
     //lua_classvariable ( luaVM, "data", "setElementData", "getElementData", CLuaOOPDefs::SetElementData, CLuaOOPDefs::GetElementData );
     //lua_classvariable ( luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", CLuaOOPDefs::SetElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo ); // .visibility[john]=false
     
@@ -838,7 +838,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "hasPermissionTo", "hasObjectPermissionTo" );
     lua_classfunction ( luaVM, "logOut", "logOut" );
     lua_classfunction ( luaVM, "toggleControl", "toggleControl" );
-	lua_classfunction ( luaVM, "triggerEvent", "triggerClientEvent" );
+    lua_classfunction ( luaVM, "triggerEvent", "triggerClientEvent" );
     
 	lua_classfunction ( luaVM, "outputChat", "outputChatBox", CLuaOOPDefs::OutputChat );
     //lua_classfunction ( luaVM, "observeDisplay", "textDisplayAddObserver" ); // swap args

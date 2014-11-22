@@ -42,16 +42,38 @@ int CLuaOOPDefs::GetElementPosition ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CVector vector;
-        pEntity->GetPosition ( vector );
+        CVector vecPosition;
+        pEntity->GetPosition ( vecPosition );
 
-        lua_pushvector ( luaVM, vector );
+        lua_pushvector ( luaVM, vecPosition );
         return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaOOPDefs::GetElementVelocity( lua_State* luaVM )
+{
+    CClientEntity* pEntity = NULL;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadUserData( pEntity );
+
+    if ( !argStream.HasErrors() )
+    {
+        CVector vecVelocity;
+        CStaticFunctionDefinitions::GetElementVelocity( *pEntity, vecVelocity );
+
+        lua_pushvector( luaVM, vecVelocity );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean( luaVM, false );
     return 1;
 }
 
