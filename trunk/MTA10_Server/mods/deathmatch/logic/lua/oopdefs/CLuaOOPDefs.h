@@ -39,11 +39,13 @@ public:
 
     // Camera
     LUA_DECLARE ( GetCameraMatrix );
-
     LUA_DECLARE ( GetCameraPosition );
     LUA_DECLARE ( SetCameraPosition );
     LUA_DECLARE ( GetCameraRotation );
     LUA_DECLARE ( SetCameraRotation );
+
+    // Marker
+    LUA_DECLARE ( GetMarkerTarget );
 };
 
 #endif
