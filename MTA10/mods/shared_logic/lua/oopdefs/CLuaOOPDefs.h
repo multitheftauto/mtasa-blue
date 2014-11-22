@@ -43,6 +43,9 @@ public:
 
     // Vehicle
     LUA_DECLARE ( GetVehicleGravity );
+
+    // Marker
+    LUA_DECLARE ( GetMarkerTarget );
 };
 
 #endif

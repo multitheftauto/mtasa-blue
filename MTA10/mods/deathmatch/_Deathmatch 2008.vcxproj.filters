@@ -815,6 +815,9 @@
     <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp">
+      <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CClient.h">

@@ -927,6 +927,9 @@
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp">
       <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp">
+      <Filter>Source Files\logic\oopdefs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logic\CLightsyncManager.h">
@@ -1786,12 +1789,6 @@
     </ClInclude>
     <ClInclude Include="logic\luadefs\CLuaVector2Defs.h">
       <Filter>Header Files\logic\luadefs</Filter>
-    </ClInclude>
-    <ClInclude Include="logic\CCallRemoteQueue.h">
-      <Filter>NewFilter1</Filter>
-    </ClInclude>
-    <ClInclude Include="logic\CCallRemoteQueueManager.h">
-      <Filter>NewFilter1</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
