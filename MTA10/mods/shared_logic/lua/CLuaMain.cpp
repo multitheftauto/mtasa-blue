@@ -163,7 +163,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getPosition", CLuaOOPDefs::GetElementPosition );
     lua_classfunction ( luaVM, "getRotation", CLuaOOPDefs::GetElementRotation );
     lua_classfunction ( luaVM, "getMatrix", CLuaOOPDefs::GetElementMatrix );
-    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity" );
+    lua_classfunction ( luaVM, "getVelocity", CLuaOOPDefs::GetElementVelocity );
     lua_classfunction ( luaVM, "getByType", "getElementsByType" );
     lua_classfunction ( luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "getElementDistanceFromCentreOfMassToBaseOfModel" );
     lua_classfunction ( luaVM, "getType", "getElementType" );
@@ -226,7 +226,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "position", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
     lua_classvariable ( luaVM, "rotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
     lua_classvariable ( luaVM, "matrix", CLuaFunctionDefs::SetElementMatrix, CLuaOOPDefs::GetElementMatrix );
-    lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocit" );
+    lua_classvariable ( luaVM, "velocity", CLuaFunctionDefs::SetElementVelocity, CLuaOOPDefs::GetElementVelocity );
     lua_classvariable ( luaVM, "data", NULL, "getAllElementData" ); // TODO: .data["age"] = 1337;
     
     lua_registerclass ( luaVM, "Element" );

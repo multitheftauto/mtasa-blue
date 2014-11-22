@@ -35,6 +35,7 @@ public:
     LUA_DECLARE ( GetElementPosition );
     LUA_DECLARE ( GetElementRotation );
     LUA_DECLARE ( SetElementRotation );
+    LUA_DECLARE ( GetElementVelocity );
 
     // Camera
     LUA_DECLARE ( GetCameraMatrix );
