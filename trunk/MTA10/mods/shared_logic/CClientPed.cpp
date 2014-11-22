@@ -3645,7 +3645,7 @@ void CClientPed::_DestroyModel ()
                 CWeapon * pWeapon = GetWeapon ( m_WeaponTypes [ i ] );
                 if ( pWeapon )
                 {
-                    m_usWeaponAmmo [ i ] = pWeapon->GetAmmoTotal ( );
+                    m_usWeaponAmmo [ i ] = static_cast < ushort > ( pWeapon->GetAmmoTotal ( ) );
                 }
             }
         }
