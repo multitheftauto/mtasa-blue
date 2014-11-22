@@ -233,6 +233,17 @@ int CLuaFunctionDefs::GetPedTotalAmmo ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, usAmmo );
                 return 1;
             }
+            else if ( pPed->m_usWeaponAmmo [ ucSlot ] )
+            {
+                // The ped musn't be streamed in, so we can get the stored value instead
+                ushort usAmmo = 1;
+                
+                if ( CWeaponNames::DoesSlotHaveAmmo ( ucSlot ) )
+                    usAmmo = pPed->m_usWeaponAmmo [ ucSlot ];
+                
+                lua_pushnumber ( luaVM, usAmmo );
+                return 1;
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
