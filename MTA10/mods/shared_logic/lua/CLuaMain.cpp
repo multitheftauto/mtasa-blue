@@ -587,7 +587,6 @@ void CLuaMain::AddMarkerClass( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "create", "createMarker" );
     lua_classfunction ( luaVM, "getCount", "getMarkerCount" );
-    //lua_classfunction ( luaVM, "isElementWithin", CLuaOOPDefs::isElementWithinMarker ); TODO: swap args
 
     lua_classfunction ( luaVM, "getType", "getMarkerType" );
     lua_classfunction ( luaVM, "getIcon", "getMarkerIcon" );
@@ -673,8 +672,7 @@ void CLuaMain::AddColShapeClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "Tube", "createColTube" );
     lua_classfunction ( luaVM, "Polygon", "createColPolygon" );
     lua_classfunction ( luaVM, "getElementsWithin", "getElementsWithinColShape" );
-    //lua_classfunction ( luaVM, "isElementWithin", "isElementWithinColShape" ); TODO: swap args around.
-    
+
     lua_classvariable ( luaVM, "elementsWithin", NULL, "getElementsWithinColShape" );    
     
     lua_registerclass ( luaVM, "ColShape", "Element" );
@@ -1508,9 +1506,9 @@ void CLuaMain::AddDxFontClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
     
     lua_classfunction ( luaVM, "create", "dxCreateFont");
-    
-    //lua_classfunction ( luaVM, "getHeight", "dxGetFontHeight"); // swap arguments
-    //lua_classfunction ( luaVM, "getTextWidth", "dxGetTextWidth"); // swap arguments
+
+    lua_classfunction ( luaVM, "getHeight", CLuaOOPDefs::DxGetFontHeight );
+    lua_classfunction ( luaVM, "getTextWidth", CLuaOOPDefs::DxGetTextWidth );
     
     //lua_classvariable ( luaVM, "height", NULL, "dxGetFontHeight"); // swap arguments, .height[scale] = int(height);
     
