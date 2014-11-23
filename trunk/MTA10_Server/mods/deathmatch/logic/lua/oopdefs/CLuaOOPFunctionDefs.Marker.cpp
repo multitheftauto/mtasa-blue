@@ -36,28 +36,3 @@ int CLuaOOPDefs::GetMarkerTarget ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
-int CLuaOOPDefs::IsElementWithinMarker ( lua_State* luaVM )
-{
-    //  bool isWithinMarker ( marker theMarker, element theElement )
-    CElement* pElement; CMarker* pMarker;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pMarker );
-    argStream.ReadUserData ( pElement );
-
-    if ( !argStream.HasErrors () )
-    {
-        bool bWithin;
-        if ( CStaticFunctionDefinitions::IsElementWithinMarker ( pElement, pMarker, bWithin ) )
-        {
-            lua_pushboolean ( luaVM, bWithin );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
