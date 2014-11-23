@@ -441,7 +441,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getBonePosition", "getPedBonePosition" );
     lua_classfunction ( luaVM, "getCameraRotation", "getPedCameraRotation" );
     lua_classfunction ( luaVM, "getWeaponSlot", "getPedWeaponSlot" );
-    //lua_classfunction ( luaVM, "getWalkingStyle", "getPedWalkingStyle" );
+    lua_classfunction ( luaVM, "getWalkingStyle", "getPedWalkingStyle" );
 
     lua_classfunction ( luaVM, "setCanBeKnockedOffBike", "setPedCanBeKnockedOffBike" );
     lua_classfunction ( luaVM, "setAnalogControlState", "setPedAnalogControlState" );
@@ -488,6 +488,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "targetStart", NULL, "getPedTargetStart" );
     lua_classvariable ( luaVM, "muzzlePosition", NULL, "getPedMuzzlePosition" );
     lua_classvariable ( luaVM, "weaponSlot", "setPedWeaponSlot", "getPedWeaponSlot" );
+    lua_classvariable ( luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle" );
 
     //lua_classvariable ( luaVM, "ammoInClip", NULL, CLuaOOPDefs::GetPedAmmoInClip ); // .ammoInClip["slot"] (readonly)
     //lua_classvariable ( luaVM, "analogControlState", CLuaOOPDefs::SetPedAnalogControlState, CLuaOOPDefs::GetPedAnalogControlState ); //TODO: .analogControlState["control"] = value
