@@ -1642,6 +1642,10 @@
 							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp"
 							>
 						</File>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp"
+							>
+						</File>
 					</Filter>
 				</Filter>
 				<Filter
