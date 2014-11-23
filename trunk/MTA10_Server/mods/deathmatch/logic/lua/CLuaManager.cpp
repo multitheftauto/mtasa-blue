@@ -242,7 +242,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "doesPedHaveJetPack", CLuaFunctionDefinitions::DoesPedHaveJetPack );
     CLuaCFunctions::AddFunction ( "isPedOnGround", CLuaFunctionDefinitions::IsPedOnGround );
     CLuaCFunctions::AddFunction ( "getPedFightingStyle", CLuaFunctionDefinitions::GetPedFightingStyle );
-    //CLuaCFunctions::AddFunction ( "getPedWalkingStyle", CLuaFunctionDefinitions::GetPedMoveAnim );
+    CLuaCFunctions::AddFunction ( "getPedWalkingStyle", CLuaFunctionDefinitions::GetPedMoveAnim );
     CLuaCFunctions::AddFunction ( "getPedGravity", CLuaFunctionDefinitions::GetPedGravity );
     CLuaCFunctions::AddFunction ( "getPedContactElement", CLuaFunctionDefinitions::GetPedContactElement );
     CLuaCFunctions::AddFunction ( "isPedDoingGangDriveby", CLuaFunctionDefinitions::IsPedDoingGangDriveby );
