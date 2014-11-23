@@ -248,6 +248,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isBlown", "isVehicleBlown" );
     lua_classfunction ( luaVM, "isFuelTankExplodable", "isVehicleFuelTankExplodable" );
     lua_classfunction ( luaVM, "isTrainDerailed", "isTrainDerailed" );
+    lua_classfunction ( luaVM, "isTrainChainEngine", "isTrainChainEngine" );
     lua_classfunction ( luaVM, "isTrainDerailable", "setTrainDerailable" );
     lua_classfunction ( luaVM, "isNitroRecharging", "isVehicleNitroRecharging" );
     lua_classfunction ( luaVM, "isNitroActivated", "isVehicleNitroActivated" );
@@ -372,6 +373,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed" );
     lua_classvariable ( luaVM, "trainDerailable", "setTrainDerailable", "isTrainDerailable" );
     lua_classvariable ( luaVM, "trainDerailed", "setTrainDerailed", "isTrainDerailed" );
+    lua_classvariable ( luaVM, "trainChainEngine", NULL, "isTrainChainEngine" );
     lua_classvariable ( luaVM, "nitroLevel", "setVehicleNitroLevel", "getVehicleNitroLevel" );
     lua_classvariable ( luaVM, "nitroCount", "setVehicleNitroCount", "getVehicleNitroCount" );
     lua_classvariable ( luaVM, "nitroActivated", "setVehicleNitroActivated", "isVehicleNitroActivated" );
