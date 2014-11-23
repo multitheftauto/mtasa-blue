@@ -447,10 +447,6 @@ void CLuaMain::AddACLClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "list", "aclList" );
     lua_classfunction ( luaVM, "hasObjectPermissionTo", "hasObjectPermissionTo" );
 
-    
-    //lua_classfunction ( luaVM, "addToGroup", "aclGroupAddACL" ); // swap args
-    //lua_classfunction ( luaVM, "removeFromGroup", "aclGroupRemoveACL" ); // swap args
-    
     lua_classfunction ( luaVM, "create", "aclCreate" );
     lua_classfunction ( luaVM, "destroy", "aclDestroy" );
     lua_classfunction ( luaVM, "listRights", "aclListRights" );
@@ -485,10 +481,7 @@ void CLuaMain::AddACLGroupClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "removeObject", "aclGroupRemoveObject" );
     lua_classfunction ( luaVM, "listACL", "aclGroupListACL" );
     lua_classfunction ( luaVM, "listObjects", "aclGroupListObjects" );
-
     lua_classfunction ( luaVM, "getName", "aclGroupGetName" );
-    //lua_classfunction ( luaVM, "doesContainObject", "isObjectInACLGroup" ); // swap args
-
     
     lua_classvariable ( luaVM, "name", NULL, "aclGroupGetName" );
     lua_classvariable ( luaVM, "aclList", NULL, "aclGroupListACL" ); // value nil = remove acl
@@ -511,8 +504,6 @@ void CLuaMain::AddAccountClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "getAccount" );
     lua_classfunction ( luaVM, "add", "addAccount" );
     lua_classfunction ( luaVM, "copyDataFrom", "copyAccountData" );
-    //lua_classfunction ( luaVM, "copyDataTo", "copyAccountData" ); // swap args
-    //lua_classfunction ( luaVM, "logIn", "logIn" ); // swap args
     lua_classfunction ( luaVM, "remove", "removeAccount" );
 
     lua_classfunction ( luaVM, "setData", "setAccountData" );
@@ -609,8 +600,6 @@ void CLuaMain::AddColShapeClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "Polygon", "createColPolygon" );
 
     lua_classfunction ( luaVM, "getElementsWithin", "getElementsWithinColShape" );
-    //lua_classfunction ( luaVM, "isElementWithin", "isElementWithinColShape" ); TODO: swap args around.
-    
     lua_registerclass ( luaVM, "ColShape", "Element" );
 }
 
@@ -650,7 +639,6 @@ void CLuaMain::AddMarkerClass ( lua_State* luaVM )
     
     lua_classfunction ( luaVM, "create", "createMarker" );
     lua_classfunction ( luaVM, "getCount", "getMarkerCount" );
-    //lua_classfunction ( luaVM, "isElementWithin", "isElementWithinMarker", CLuaOOPDefs::isElementWithinMarker ); TODO: swap args
     
     lua_classfunction ( luaVM, "getType", "getMarkerType" );
     lua_classfunction ( luaVM, "getIcon", "getMarkerIcon" );
@@ -839,11 +827,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "logOut", "logOut" );
     lua_classfunction ( luaVM, "toggleControl", "toggleControl" );
     lua_classfunction ( luaVM, "triggerEvent", "triggerClientEvent" );
-    
-	lua_classfunction ( luaVM, "outputChat", "outputChatBox", CLuaOOPDefs::OutputChat );
-    //lua_classfunction ( luaVM, "observeDisplay", "textDisplayAddObserver" ); // swap args
-    //lua_classfunction ( luaVM, "stopObservingDisplay", "textDisplayRemoveObserver" ); // swap args
-    //lua_classfunction ( luaVM, "isObservingDisplay", "textDisplayIsObserver" ); // swap args
+    lua_classfunction ( luaVM, "outputChat", "outputChatBox", CLuaOOPDefs::OutputChat );
     
     lua_classfunction ( luaVM, "forceMap", "forcePlayerMap" );
     lua_classfunction ( luaVM, "fadeCamera", "fadeCamera" );

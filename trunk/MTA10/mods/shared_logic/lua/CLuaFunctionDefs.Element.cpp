@@ -668,22 +668,10 @@ int CLuaFunctionDefs::IsElementWithinMarker( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        // Valid element?
-        if ( pEntity )
-        {
-            // Valid colshape?
-            if ( pMarker )
-            {
-                // Check if it's within
-                bool bWithin = pEntity->CollisionExists ( pMarker->GetColShape() );
-                lua_pushboolean ( luaVM, bWithin );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 2 );
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        // Check if it's within
+        bool bWithin = pEntity->CollisionExists ( pMarker->GetColShape() );
+        lua_pushboolean ( luaVM, bWithin );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );

@@ -46,6 +46,10 @@ public:
 
     // Marker
     LUA_DECLARE ( GetMarkerTarget );
+
+    // Drawing
+    LUA_DECLARE ( DxGetFontHeight );
+    LUA_DECLARE ( DxGetTextWidth );
 };
 
 #endif
