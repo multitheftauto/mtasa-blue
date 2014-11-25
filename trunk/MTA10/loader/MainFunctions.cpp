@@ -710,7 +710,7 @@ void CheckDataFiles( void )
     if ( !VerifyEmbeddedSignature( PathJoin( strMTASAPath, MTA_EXE_NAME ) ) )
     {
         SString strMessage( _("Main file is unsigned. Possible virus activity.\n\nSee online help if MTA does not work correctly.") );
-        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_CONNECT_TO_PUBLIC)
+        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_CONNECT_TO_PUBLIC) && !defined(MTA_DEBUG)
             DisplayErrorMessageBox( strMessage, _E("CL29"), "maybe-virus1" );
         #endif
     }
@@ -990,9 +990,11 @@ int LaunchGame ( SString strCmdLine )
                 if ( stuckProcessDetector.UpdateIsStuck() )
                 {
                     WriteDebugEvent( "Detected stuck process at quit" );
+                #ifndef MTA_DEBUG
                     TerminateProcess( piLoadee.hProcess, 1 );
                     status = WAIT_FAILED;
                     break;
+                #endif
                 }
                 status = WaitForSingleObject( piLoadee.hProcess, 1000 );
             }
