@@ -5444,6 +5444,9 @@ void CClientGame::ResetMapInfo ( void )
     // Far clip distance
     g_pMultiplayer->RestoreFarClipDistance ( );
 
+    // Near clip distance
+    g_pMultiplayer->RestoreNearClipDistance ( );
+
     // Fog distance
     g_pMultiplayer->RestoreFogDistance ( );
 

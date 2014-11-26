@@ -423,6 +423,73 @@ void _declspec(naked) HOOK_CClouds_RenderSkyPolys ()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// RwCameraSetNearClipPlane
+//
+// Called multiple times, with varying distances from 2.0f down to 0.05f
+//  - The lower values are used when near walls and peds
+//  - The higher values are used to reduce z-flicker when flying etc
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+float OnMY_RwCameraSetNearClipPlane( DWORD dwCalledFrom, void* pUnknown, float fDistance )
+{
+    float fSetting = pMultiplayer->GetNearClipDistance();
+    if ( fSetting == DEFAULT_NEAR_CLIP_DISTANCE )
+    {
+        // Do nothing if setting is default value
+        return fDistance;
+    }
+
+    // Don't process calls from RenderScene as they are restoring saved values (which have already been processed here)
+    if ( dwCalledFrom > 0x53DF40 && dwCalledFrom < 0x53E160 )
+    {
+        return fDistance;
+    }
+
+    if ( fSetting < DEFAULT_NEAR_CLIP_DISTANCE )
+    {
+        // If required setting is lower than default, ensure value used is not higher.
+        return Min( fSetting, fDistance );
+    }
+    else
+    {
+        // If required setting is higher than default, converge value towards it.
+        float fAlpha = UnlerpClamped( DEFAULT_NEAR_CLIP_DISTANCE, fSetting, DEFAULT_NEAR_CLIP_DISTANCE * 3 );
+        return Lerp( fDistance, fAlpha, fSetting );
+    }
+}
+
+// Hook info
+#define HOOKCHECK_RwCameraSetNearClipPlane_US       0xD9
+#define HOOKCHECK_RwCameraSetNearClipPlane_EU       0xD9
+#define HOOKPOS_RwCameraSetNearClipPlane_US         0x7EE1D0
+#define HOOKPOS_RwCameraSetNearClipPlane_EU         0x7EE210
+#define HOOKSIZE_RwCameraSetNearClipPlane_US        5
+#define HOOKSIZE_RwCameraSetNearClipPlane_EU        5
+DWORD RETURN_RwCameraSetNearClipPlane_US =          0x7EE1D5;
+DWORD RETURN_RwCameraSetNearClipPlane_EU =          0x7EE215;
+DWORD RETURN_RwCameraSetNearClipPlane_BOTH =        0;
+void _declspec(naked) HOOK_RwCameraSetNearClipPlane ()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        push    [esp+32+4*2]
+        call    OnMY_RwCameraSetNearClipPlane
+        add     esp, 4*3
+        popad
+
+        // Result is on fp stack
+        //fld     [esp+8]
+        push    esi
+        jmp     RETURN_RwCameraSetNearClipPlane_BOTH
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetGameEntityRenderHandler
 //
 //
@@ -510,4 +577,5 @@ void CMultiplayerSA::InitHooks_Rendering ( void )
     EZHookInstall ( WinLoop );
     EZHookInstall ( psGrabScreen );
     EZHookInstallChecked ( CClouds_RenderSkyPolys );
+    EZHookInstallChecked ( RwCameraSetNearClipPlane );
 }
