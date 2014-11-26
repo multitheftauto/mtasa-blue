@@ -815,6 +815,9 @@ public:
     LUA_DECLARE ( GetFarClipDistance );
     LUA_DECLARE ( SetFarClipDistance );
     LUA_DECLARE ( ResetFarClipDistance );
+    LUA_DECLARE ( GetNearClipDistance );
+    LUA_DECLARE ( SetNearClipDistance );
+    LUA_DECLARE ( ResetNearClipDistance );
     LUA_DECLARE ( GetFogDistance );
     LUA_DECLARE ( SetFogDistance );
     LUA_DECLARE ( ResetFogDistance );

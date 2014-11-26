@@ -26,6 +26,7 @@
 
 #include "CRemoteDataSA.h"
 class CRemoteDataSA;
+#define DEFAULT_NEAR_CLIP_DISTANCE  ( 0.3f )
 
 enum eRadioStationID
 {
@@ -155,6 +156,9 @@ public:
     float                       GetFarClipDistance          ( void );
     void                        SetFarClipDistance          ( float fDistance );
     void                        RestoreFarClipDistance      ( void );
+    float                       GetNearClipDistance         ( void );
+    void                        SetNearClipDistance         ( float fDistance );
+    void                        RestoreNearClipDistance     ( void );
     float                       GetFogDistance              ( void );
     void                        SetFogDistance              ( float fDistance );
     void                        RestoreFogDistance          ( void );
@@ -275,6 +279,7 @@ private:
     float                       m_fAircraftMaxVelocity_Sq;
     bool                        m_bHeatHazeEnabled;
     bool                        m_bHeatHazeCustomized;
+    float                       m_fNearClipDistance;
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
     VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

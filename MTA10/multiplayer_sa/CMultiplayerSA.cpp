@@ -554,6 +554,7 @@ void CMultiplayerSA::InitHooks()
     vehicle_lights_init ();
     bSetCenterOfWorld = false;
     bHasProcessedScript = false;
+    m_fNearClipDistance = DEFAULT_NEAR_CLIP_DISTANCE;
 
     eGameVersion version = pGameInterface->GetGameVersion ();
 
@@ -1835,6 +1836,21 @@ void CMultiplayerSA::RestoreFarClipDistance ( )
         MemCpy ( (LPVOID)0x560EDD, &originalFstp, 3 );
         MemCpy ( (LPVOID)0x560F18, &originalFstp, 3 );
     }
+}
+
+float CMultiplayerSA::GetNearClipDistance ( void )
+{
+    return m_fNearClipDistance;
+}
+
+void CMultiplayerSA::SetNearClipDistance ( float fDistance )
+{
+    m_fNearClipDistance = Clamp( 0.1f, fDistance, 20.f );
+}
+
+void CMultiplayerSA::RestoreNearClipDistance ( void )
+{
+    m_fNearClipDistance = DEFAULT_NEAR_CLIP_DISTANCE;
 }
 
 float CMultiplayerSA::GetFogDistance ( )
