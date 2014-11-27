@@ -1389,6 +1389,8 @@ void CLuaMain::AddCameraClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "fade", "fadeCamera" );
+    lua_classfunction ( luaVM, "resetFarClipDistance", "resetFarClipDistance" );
+    lua_classfunction ( luaVM, "resetNearClipDistance", "resetNearClipDistance" );
     
     lua_classfunction ( luaVM, "getPosition", CLuaOOPDefs::GetCameraPosition );
     lua_classfunction ( luaVM, "getRotation", CLuaOOPDefs::GetCameraRotation );
@@ -1398,6 +1400,9 @@ void CLuaMain::AddCameraClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getMatrix", CLuaOOPDefs::GetCameraMatrix );
     lua_classfunction ( luaVM, "setMatrix", "setCameraMatrix" );
     lua_classfunction ( luaVM, "getGoggleEffect", "getCameraGoggleEffect" );
+    lua_classfunction ( luaVM, "getClip", "getCameraClip" );
+    lua_classfunction ( luaVM, "getFarClipDistance", "getFarClipDistance" );
+    lua_classfunction ( luaVM, "getNearClipDistance", "getNearClipDistance" );
     
     lua_classfunction ( luaVM, "setPosition", CLuaOOPDefs::SetCameraPosition );
     lua_classfunction ( luaVM, "setRotation", CLuaOOPDefs::SetCameraRotation );
@@ -1406,11 +1411,15 @@ void CLuaMain::AddCameraClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setViewMode", "setCameraViewMode" );
     lua_classfunction ( luaVM, "setGoggleEffect", "setCameraGoggleEffect" );
     lua_classfunction ( luaVM, "setClip", "setCameraClip" );
+    lua_classfunction ( luaVM, "setFarClipDistance", "setFarClipDistance" );
+    lua_classfunction ( luaVM, "setNearClipDistance", "setNearClipDistance" );
 
     lua_classvariable ( luaVM, "interior", "setCameraInterior", "getCameraInterior" );
     lua_classvariable ( luaVM, "target", "setCameraTarget", "getCameraTarget" );
     lua_classvariable ( luaVM, "viewMode", "setViewMode", "getViewMode" );
     lua_classvariable ( luaVM, "goggleEffect", "setGoggleEffect", "getGoggleEffect" );
+    lua_classvariable ( luaVM, "farClipDistance", "setFarClipDistance", "getFarClipDistance" );
+    lua_classvariable ( luaVM, "nearClipDistance", "setNearClipDistance", "getNearClipDistance" );
 
     lua_classvariable ( luaVM, "position", CLuaOOPDefs::SetCameraPosition, CLuaOOPDefs::GetCameraPosition );
     lua_classvariable ( luaVM, "rotation", CLuaOOPDefs::SetCameraRotation, CLuaOOPDefs::GetCameraRotation );

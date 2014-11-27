@@ -253,6 +253,16 @@ int CLuaFunctionDefs::SetCameraClip ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetCameraClip (lua_State* luaVM)
+{
+    bool bObjects, bVehicles;
+    m_pManager->GetCamera ()->GetCameraClip ( bObjects, bVehicles );
+
+    lua_pushboolean ( luaVM, bObjects );
+    lua_pushboolean ( luaVM, bVehicles );
+    return 2;
+}
+
 int CLuaFunctionDefs::SetCameraViewMode ( lua_State* luaVM )
 {
     unsigned short usViewMode = 0;
