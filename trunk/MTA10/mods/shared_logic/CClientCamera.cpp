@@ -517,6 +517,10 @@ void CClientCamera::SetCameraClip ( bool bObjects, bool bVehicles )
     m_pCamera->SetCameraClip ( bObjects, bVehicles );
 }
 
+void CClientCamera::GetCameraClip( bool &bObjects, bool &bVehicles )
+{
+    m_pCamera->GetCameraClip ( bObjects, bVehicles );
+}
 
 void CClientCamera::ToggleCameraFixedMode ( bool bEnabled )
 {    

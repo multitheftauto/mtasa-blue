@@ -66,12 +66,12 @@ public:
     void                        SetFocus                    ( CClientPlayer* pPlayer, eCamMode eMode, bool bSmoothTransition = false );
     void                        SetFocusToLocalPlayer       ( void );
 
-    void                        SetCameraViewMode               ( eVehicleCamMode eMode );
-    eVehicleCamMode             GetCameraViewMode               ( void );
+    void                        SetCameraViewMode           ( eVehicleCamMode eMode );
+    eVehicleCamMode             GetCameraViewMode           ( void );
     void                        SetCameraClip               ( bool bObjects, bool bVehicles );
+    void                        GetCameraClip               ( bool &bObjects, bool &bVehicles );
 
     inline bool                 IsInFixedMode               ( void )                        { return m_bFixed; }
-
     void                        ToggleCameraFixedMode       ( bool bEnabled );
 
     CClientEntity *             GetTargetEntity             ( void );
