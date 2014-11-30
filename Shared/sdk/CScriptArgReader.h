@@ -1002,6 +1002,12 @@ public:
         return false;
     }
 
+    bool NextIsVector4D ( void ) const
+    {
+        return (NextCouldBeNumber () && NextCouldBeNumber ( 1 ) && NextCouldBeNumber ( 2 ) && NextCouldBeNumber ( 4 ))
+            || NextIsUserDataOfType < CLuaVector4D > ();
+    }
+
     bool NextIsVector3D ( void ) const
     {
         return ( NextCouldBeNumber() && NextCouldBeNumber( 1 ) && NextCouldBeNumber( 2 ) )

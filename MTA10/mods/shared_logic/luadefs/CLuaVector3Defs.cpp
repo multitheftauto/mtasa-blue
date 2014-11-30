@@ -79,6 +79,11 @@ int CLuaVector3Defs::Create ( lua_State* luaVM )
                 argStream.ReadNumber ( vector.fZ );
         }
     }
+    else if ( argStream.NextIsVector3D() )
+    {
+        argStream.ReadVector3D ( vector );
+    }
+
     lua_pushvector ( luaVM, vector );
     return 1;
 }
