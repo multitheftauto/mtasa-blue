@@ -430,6 +430,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
     lua_classvariable ( luaVM, "matrix", "setElementMatrix", "getElementMatrix", CLuaElementDefs::setElementMatrix, CLuaOOPDefs::GetElementMatrix );
     lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity", CLuaElementDefs::setElementVelocity, CLuaOOPDefs::GetElementVelocity );
+    lua_classvariable ( luaVM, "isElement", NULL, "isElement" );
     //lua_classvariable ( luaVM, "data", "setElementData", "getElementData", CLuaOOPDefs::SetElementData, CLuaOOPDefs::GetElementData );
     //lua_classvariable ( luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", CLuaOOPDefs::SetElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo ); // .visibility[john]=false
     

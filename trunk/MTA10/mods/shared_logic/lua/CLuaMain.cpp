@@ -227,6 +227,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "rotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
     lua_classvariable ( luaVM, "matrix", CLuaFunctionDefs::SetElementMatrix, CLuaOOPDefs::GetElementMatrix );
     lua_classvariable ( luaVM, "velocity", CLuaFunctionDefs::SetElementVelocity, CLuaOOPDefs::GetElementVelocity );
+    lua_classvariable ( luaVM, "isElement", NULL, "isElement" );
     lua_classvariable ( luaVM, "data", NULL, "getAllElementData" ); // TODO: .data["age"] = 1337;
     
     lua_registerclass ( luaVM, "Element" );

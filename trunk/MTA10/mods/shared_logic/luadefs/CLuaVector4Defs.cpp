@@ -97,6 +97,11 @@ int CLuaVector4Defs::Create ( lua_State* luaVM )
                 argStream.ReadNumber ( vector.fW );
         }
     }
+    else if ( argStream.NextIsVector4D () )
+    {
+        argStream.ReadVector4D ( vector );
+    }
+
     lua_pushvector ( luaVM, vector );
     return 1;
 }
