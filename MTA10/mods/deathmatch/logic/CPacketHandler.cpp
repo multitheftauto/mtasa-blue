@@ -1044,6 +1044,9 @@ void CPacketHandler::Packet_PlayerSpawn ( NetBitStreamInterface& bitStream )
         // Reset weapons
         pPlayer->RemoveAllWeapons ();
 
+        // Remove jetpack
+        pPlayer->SetHasJetPack ( false );
+
         // Spawn him
         pPlayer->Spawn ( vecPosition,
                          fRotation,
