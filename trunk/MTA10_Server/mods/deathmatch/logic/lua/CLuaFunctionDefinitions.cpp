@@ -2999,7 +2999,16 @@ int CLuaFunctionDefinitions::SpawnPlayer ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
     argStream.ReadVector3D ( vecPosition );
-    argStream.ReadNumber ( fRotation, 0.0f );
+
+    if ( argStream.NextIsVector3D () )
+    {
+        CVector vecRotation;
+        argStream.ReadVector3D (vecRotation);
+        fRotation = vecRotation.fZ;
+    }
+    else
+        argStream.ReadNumber ( fRotation, 0.0f );
+    
     argStream.ReadNumber ( ulModel, 0 );
     argStream.ReadNumber ( ucInterior, 0 );
     argStream.ReadNumber ( usDimension, 0 );
