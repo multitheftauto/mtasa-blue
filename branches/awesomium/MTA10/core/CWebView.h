@@ -46,7 +46,7 @@ public:
     void ClearTexture           ();
 
     void ExecuteJavascript      ( const SString& strJavascriptCode );
-    void TriggerLuaEvent        ( const SString& strEventName, const std::vector<std::string> arguments );
+    void TriggerLuaEvent        ( const SString& strEventName, const std::vector<std::string> arguments, bool bIsServer = false );
     void TriggerPopupEvent      ( const SString& strTargetURL, const SString& strOpenerURL ) { m_pEventsInterface->Events_OnPopup ( strTargetURL, strOpenerURL ); };
     
     void InjectMouseMove        ( int iPosX, int iPosY );

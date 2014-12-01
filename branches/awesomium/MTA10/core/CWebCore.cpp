@@ -15,7 +15,12 @@
 #include <Audiopolicy.h>
 #include <cef3/include/cef_app.h>
 #include <cef3/include/cef_browser.h>
+#include <cef3/include/cef_sandbox_win.h>
 #include "WebBrowserHelpers.h"
+
+#ifdef CEF_ENABLE_SANDBOX
+    #pragma comment(lib, "cef_sandbox.lib")
+#endif
 
 CWebCore::CWebCore ()
 {

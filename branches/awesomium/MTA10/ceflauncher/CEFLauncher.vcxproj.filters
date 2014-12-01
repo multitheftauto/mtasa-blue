@@ -19,4 +19,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="V8Helpers.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="CCefApp.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

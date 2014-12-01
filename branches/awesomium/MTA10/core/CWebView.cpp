@@ -131,9 +131,9 @@ void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
     m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJavascriptCode, "", 0 );
 }
 
-void CWebView::TriggerLuaEvent ( const SString& strEventName, const std::vector<std::string> arguments )
+void CWebView::TriggerLuaEvent ( const SString& strEventName, const std::vector<std::string> arguments, bool bIsServer )
 {
-    m_pEventsInterface->Events_OnTriggerEvent ( strEventName, arguments );
+    m_pEventsInterface->Events_OnTriggerEvent ( strEventName, arguments, bIsServer );
 }
 
 void CWebView::InjectMouseMove ( int iPosX, int iPosY )
@@ -202,7 +202,7 @@ bool CWebView::SetAudioVolume ( float fVolume )
 bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message )
 {
     CefRefPtr<CefListValue> argList = message->GetArgumentList ();
-    if ( message->GetName () == "TriggerLuaEvent" )
+    if ( message->GetName () == "TriggerLuaEvent" || message->GetName () == "TriggerServerLuaEvent" )
     {
         // Get event name
         CefString eventName = argList->GetString ( 0 );
@@ -218,7 +218,7 @@ bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProc
         }
 
         // Trigger Lua event now
-        TriggerLuaEvent ( SString ( eventName ), args );
+        TriggerLuaEvent ( SString ( eventName ), args, message->GetName () == "TriggerServerLuaEvent" );
 
         // The message was handled
         return true;

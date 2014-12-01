@@ -51,7 +51,7 @@ public:
     void                        Events_OnNavigate      ( const SString& strURL, bool bMainFrame ) override;
     void                        Events_OnPopup         ( const SString& strTargetURL, const SString& strOpenerURL ) override;
     void                        Events_OnChangeCursor  ( unsigned char ucCursor ) override;
-    void                        Events_OnTriggerEvent  ( const SString& strEventName, const std::vector<std::string>& arguments ) override;
+    void                        Events_OnTriggerEvent  ( const SString& strEventName, const std::vector<std::string>& arguments, bool bIsServer = false ) override;
     void                        Events_OnTooltip       ( const SString& strTooltip ) override;
 
 private:
