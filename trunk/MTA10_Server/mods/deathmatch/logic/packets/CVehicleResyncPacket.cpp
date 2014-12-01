@@ -35,20 +35,35 @@ bool CVehicleResyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     m_pVehicle->GetRotationDegrees ( rotation.data.vecRotation );
     BitStream.Write ( &rotation );
 
-    // Read out the movespeed
+    // Write the movespeed
     SVelocitySync velocity;
     velocity.data.vecVelocity = m_pVehicle->GetVelocity ();
     BitStream.Write ( &velocity );
 
-    // Read out the turnspeed
+    // Write the turnspeed
     SVelocitySync turnSpeed;
     turnSpeed.data.vecVelocity = m_pVehicle->GetTurnSpeed ();
     BitStream.Write ( &turnSpeed );
 
-    // Read out the vehicle health
+    // Write the vehicle health
     SVehicleHealthSync health;
     health.data.fValue = m_pVehicle->GetHealth ();
     BitStream.Write ( &health );
+
+    // Write parts state
+    if ( BitStream.Version() >= 0x5D )
+    {
+        SVehicleDamageSyncMethodeB damage;
+        damage.data.bSyncDoors = true;
+        damage.data.bSyncWheels = true;
+        damage.data.bSyncPanels = true;
+        damage.data.bSyncLights = true;
+        damage.data.doors.data.ucStates = m_pVehicle->m_ucDoorStates;
+        damage.data.wheels.data.ucStates = m_pVehicle->m_ucWheelStates;
+        damage.data.panels.data.ucStates = m_pVehicle->m_ucPanelStates;
+        damage.data.lights.data.ucStates = m_pVehicle->m_ucLightStates;
+        BitStream.Write ( &damage );
+    }
 
     return true;
 }

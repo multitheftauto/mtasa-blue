@@ -1511,6 +1511,129 @@ private:
 };
 
 
+//////////////////////////////////////////
+//                                      //
+//           Vehicle damage v2          //
+//                                      //
+//////////////////////////////////////////
+template < unsigned int MAXELEMENTS, unsigned int NUMBITS >
+struct SVehiclePartStateSyncMethodeB : public ISyncStructure
+{
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        bool bIsNonZero;
+        if ( !bitStream.ReadBit ( bIsNonZero ) )
+            return false;
+
+        if ( bIsNonZero )
+        {
+            for ( unsigned int i = 0; i < MAXELEMENTS; ++i )
+            {
+                struct
+                {
+                    unsigned int uiState : NUMBITS;
+                } privateData;
+
+                if ( !bitStream.ReadBits ( reinterpret_cast < char* > ( &privateData ), NUMBITS ) )
+                    return false;
+
+                data.ucStates [ i ] = privateData.uiState;
+            }
+        }
+        else
+        {
+            memset( &data.ucStates[ 0 ], 0, MAXELEMENTS );
+        }
+        return true;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        // Check if all zeros
+        bool bIsNonZero = false;
+        for ( unsigned int i = 0; i < MAXELEMENTS; ++i )
+        {
+            bIsNonZero |= ( data.ucStates [ i ] != 0 );
+        }
+        bitStream.WriteBit ( bIsNonZero );
+
+        if ( bIsNonZero )
+        {
+            for ( unsigned int i = 0; i < MAXELEMENTS; ++i )
+            {
+                struct
+                {
+                    unsigned int uiState : NUMBITS;
+                } privateData;
+
+                privateData.uiState = data.ucStates [ i ];
+
+                bitStream.WriteBits ( reinterpret_cast < const char* > ( &privateData ), NUMBITS );
+            }
+        }
+    }
+
+    struct
+    {
+        SFixedArray < unsigned char, MAXELEMENTS > ucStates;
+    } data;
+
+};
+
+
+struct SVehicleDamageSyncMethodeB : public ISyncStructure
+{
+    enum { FLAG_BITCOUNT = 4 };
+
+    bool Read ( NetBitStreamInterface& bitStream )
+    {
+        bitStream.ReadBits( (char*)&data, FLAG_BITCOUNT );
+
+        if ( data.bSyncDoors )
+            bitStream.Read ( &data.doors );
+
+        if ( data.bSyncWheels )
+            bitStream.Read ( &data.wheels );
+
+        if ( data.bSyncPanels )
+            bitStream.Read ( &data.panels );
+
+        if ( data.bSyncLights )
+            bitStream.Read ( &data.lights );
+
+        return true;
+    }
+
+    void Write ( NetBitStreamInterface& bitStream ) const
+    {
+        bitStream.WriteBits( (const char*)&data, FLAG_BITCOUNT );
+
+        if ( data.bSyncDoors )
+            bitStream.Write ( &data.doors );
+
+        if ( data.bSyncWheels )
+            bitStream.Write ( &data.wheels );
+
+        if ( data.bSyncPanels )
+            bitStream.Write ( &data.panels );
+
+        if ( data.bSyncLights )
+            bitStream.Write ( &data.lights );
+    }
+
+    struct
+    {
+        bool bSyncDoors : 1;
+        bool bSyncWheels : 1;
+        bool bSyncPanels : 1;
+        bool bSyncLights : 1;
+        SVehiclePartStateSyncMethodeB < MAX_DOORS, 3 > doors;
+        SVehiclePartStateSyncMethodeB < MAX_WHEELS, 2 > wheels;
+        SVehiclePartStateSyncMethodeB < MAX_PANELS, 2 > panels;
+        SVehiclePartStateSyncMethodeB < MAX_LIGHTS, 2 > lights;
+    } data;
+};
+
 
 //////////////////////////////////////////
 //                                      //

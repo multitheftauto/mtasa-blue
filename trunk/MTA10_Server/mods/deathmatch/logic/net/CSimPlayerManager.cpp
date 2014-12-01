@@ -145,6 +145,14 @@ void CSimPlayerManager::UpdateSimPlayer ( CPlayer* pPlayer )
     pSim->m_sharedControllerState.Copy ( pPlayer->GetPad ()->GetCurrentControllerState () );
     pSim->m_fCameraRotation         = pPlayer->GetCameraRotation ();
     pSim->m_fPlayerRotation         = pPlayer->GetRotation ();
+    if ( pVehicle )
+    {
+        pSim->m_uiVehicleDamageInfoSendPhase = pVehicle->m_uiDamageInfoSendPhase;
+        pSim->m_VehicleDamageInfo.m_ucDoorStates = pVehicle->m_ucDoorStates;
+        pSim->m_VehicleDamageInfo.m_ucWheelStates = pVehicle->m_ucWheelStates;
+        pSim->m_VehicleDamageInfo.m_ucPanelStates = pVehicle->m_ucPanelStates;
+        pSim->m_VehicleDamageInfo.m_ucLightStates = pVehicle->m_ucLightStates;
+    }
 
     // Update Puresync send list
     if ( pPlayer->m_bPureSyncSimSendListDirty )
@@ -289,7 +297,9 @@ bool CSimPlayerManager::HandleVehiclePureSync ( const NetServerPlayerID& Socket,
                                                                              pSourceSimPlayer->m_ucOccupiedVehicleSeat,
                                                                              pSourceSimPlayer->m_ucWeaponType,
                                                                              pSourceSimPlayer->m_fWeaponRange,
-                                                                             pSourceSimPlayer->m_sharedControllerState );
+                                                                             pSourceSimPlayer->m_sharedControllerState,
+                                                                             pSourceSimPlayer->m_uiVehicleDamageInfoSendPhase,
+                                                                             pSourceSimPlayer->m_VehicleDamageInfo );
         if ( pPacket->Read ( *BitStream ) )
         {
             // Relay it to nearbyers

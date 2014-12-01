@@ -1421,7 +1421,6 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   50,     130,    400,    "unoccupied_vehicle_syncer_distance",   &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance,   &CMainConfig::OnTickRateChange },
             { false, false, 0,      1,      2,      "compact_internal_databases",           &m_iCompactInternalDatabases,               NULL },
             { true, true,   0,      1,      2,      "minclientversion_auto_update",         &m_iMinClientVersionAutoUpdate,             NULL },
-            { true, true,   0,      0,      1,      "alt_veh_parts_state_sync",             &g_TickRateSettings.bAltVehPartsStateSync,  NULL },
             { true, true,   0,      0,      100,    "server_logic_fps_limit",               &m_iServerLogicFpsLimit,                    NULL },
         };
 

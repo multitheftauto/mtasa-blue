@@ -100,6 +100,8 @@ private:
     void                    GetLastSentControllerState      ( CControllerState* pControllerState, float* pfCameraRotation, float* pfLastAimY );
     void                    SetLastSentControllerState      ( const CControllerState& ControllerState, float fCameraRotation, float fLastAimY );
 
+    void                    ReadVehiclePartsState           ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
+
 public:
     bool                    IsCameraSyncNeeded              ( void );
     void                    WriteCameraSync                 ( NetBitStreamInterface& BitStream );

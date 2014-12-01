@@ -17,6 +17,9 @@
 
 extern CGame* g_pGame;
 
+//
+// NOTE: Any changes to this function will require similar changes to CSimVehiclePuresyncPacket::Read()
+//
 bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 {
     // Got a player to read?
@@ -424,6 +427,9 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
 }
 
 
+//
+// NOTE: Any changes to this function will require similar changes to CSimVehiclePuresyncPacket::Write()
+//
 bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
     // Got a player to send?
@@ -596,6 +602,23 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             {
                 BitStream.WriteBit ( ControllerState.LeftShoulder2 != 0 );
                 BitStream.WriteBit ( ControllerState.RightShoulder2 != 0 );
+            }
+
+            // Write parts state
+            if ( BitStream.Version() >= 0x5D )
+            {
+                SVehicleDamageSyncMethodeB damage;
+                // Check where we are in the cycle
+                uchar ucMode = ( pVehicle->m_uiDamageInfoSendPhase & 3 );
+                damage.data.bSyncDoors = ( ucMode == 0 );
+                damage.data.bSyncWheels = ( ucMode == 1 );
+                damage.data.bSyncPanels = ( ucMode == 2 );
+                damage.data.bSyncLights = ( ucMode == 3 );
+                damage.data.doors.data.ucStates = pVehicle->m_ucDoorStates;
+                damage.data.wheels.data.ucStates = pVehicle->m_ucWheelStates;
+                damage.data.panels.data.ucStates = pVehicle->m_ucPanelStates;
+                damage.data.lights.data.ucStates = pVehicle->m_ucLightStates;
+                BitStream.Write ( &damage );
             }
 
             // Success

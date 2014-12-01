@@ -1641,6 +1641,9 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         ControllerState.RightShoulder2 = BitStream.ReadBit () * 255;
     }
 
+    // Read parts state
+    ReadVehiclePartsState ( pVehicle, BitStream );
+
     pPlayer->SetControllerState ( ControllerState );
 
     // Remember now as the last puresync time
@@ -2281,6 +2284,10 @@ void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterfac
     SVehicleHealthSync health;
     if ( !BitStream.Read ( &health ) )
         return;
+
+    // Read parts state
+    ReadVehiclePartsState ( pVehicle, BitStream );
+
     pVehicle->SetHealth ( health.data.fValue );
 
     // Set the target position and rotation
@@ -2290,6 +2297,34 @@ void CNetAPI::ReadVehicleResync ( CClientVehicle* pVehicle, NetBitStreamInterfac
     // Apply the correct move and turnspeed
     pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );
     pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
+}
+
+
+void CNetAPI::ReadVehiclePartsState ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream )
+{
+    if ( BitStream.Version() < 0x5D )
+        return;
+
+    SVehicleDamageSyncMethodeB damage;
+    BitStream.Read ( &damage );
+
+    if ( damage.data.bSyncDoors )
+        for ( unsigned int i = 0 ; i < MAX_DOORS ; ++i )
+            pVehicle->SetDoorStatus ( i, damage.data.doors.data.ucStates [ i ] );
+
+    if ( damage.data.bSyncWheels )
+        for ( unsigned int i = 0 ; i < MAX_WHEELS ; ++i )
+            pVehicle->SetWheelStatus ( i, damage.data.wheels.data.ucStates [ i ] );
+
+    if ( damage.data.bSyncPanels )
+        for ( unsigned int i = 0 ; i < MAX_PANELS ; ++i )
+            pVehicle->SetPanelStatus ( i, damage.data.panels.data.ucStates [ i ] );
+
+    if ( damage.data.bSyncLights )
+        for ( unsigned int i = 0 ; i < MAX_LIGHTS ; ++i )
+            pVehicle->SetLightStatus ( i, damage.data.lights.data.ucStates [ i ] );
+
+    static_cast < CDeathmatchVehicle* > ( pVehicle )->ResetDamageModelSync ();
 }
 
 

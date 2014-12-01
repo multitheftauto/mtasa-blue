@@ -368,8 +368,6 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Ped syncer distance",      SString ( "%d", g_TickRateSettings.iPedSyncerDistance ) ) );
     if ( defaultRates.iUnoccupiedVehicleSyncerDistance != g_TickRateSettings.iUnoccupiedVehicleSyncerDistance )
         m_OptionsList.push_back ( StringPair ( "Unoccupied vehicle syncer distance",      SString ( "%d", g_TickRateSettings.iUnoccupiedVehicleSyncerDistance ) ) );
-    if ( defaultRates.bAltVehPartsStateSync != g_TickRateSettings.bAltVehPartsStateSync )
-        m_OptionsList.push_back ( StringPair ( "Alt vehicle parts state sync",  SString ( "%d", g_TickRateSettings.bAltVehPartsStateSync ) ) );
 
     m_InfoList.push_back ( StringPair ( "Logic thread CPU",  MakeCPUUsageString( m_MainThreadCPUTimes ) ) );
     m_InfoList.push_back ( StringPair ( "Sync thread CPU",   MakeCPUUsageString( g_SyncThreadCPUTimes ) ) );

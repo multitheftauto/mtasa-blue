@@ -144,6 +144,7 @@ class CVehicle : public CElement
     friend class CPlayer;
 
 public:
+    ZERO_ON_NEW
                                     CVehicle                ( class CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2 );
                                     ~CVehicle               ( void );
 
@@ -431,6 +432,7 @@ private:
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;
+    uint                            m_uiDamageInfoSendPhase;
     SFixedArray < unsigned char, MAX_DOORS >   m_ucDoorStates;
     SFixedArray < unsigned char, MAX_WHEELS >  m_ucWheelStates;
     SFixedArray < unsigned char, MAX_PANELS >  m_ucPanelStates;
