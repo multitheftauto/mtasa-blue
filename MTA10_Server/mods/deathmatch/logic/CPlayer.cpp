@@ -107,8 +107,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
 
     m_UpdateNearListTimer.SetMaxIncrement ( 500, true );
     m_LastReceivedSyncTimer.SetMaxIncrement( 2000, true );
-    m_VehiclePartsStateSyncTimer.SetUseModuleTickCount ( true );
-    m_FarVehiclePartsStateSyncTimer.SetUseModuleTickCount ( true );
 }
 
 
@@ -201,9 +199,6 @@ void CPlayer::DoPulse ( void )
         // Do dist update if too long since last one
         if ( m_UpdateNearListTimer.Get () > (uint)g_TickRateSettings.iNearListUpdate + 300 )
             MaybeUpdateOthersNearList ();
-
-        // Maybe update vehicle damage sync for far away vehicles
-        UpdateFarVehiclePartsStateSync();
     }
 }
 
@@ -1153,69 +1148,6 @@ void CPlayer::SetPlayerVersion ( const SString& strPlayerVersion )
 {
     m_strPlayerVersion = strPlayerVersion;
 }
-
-
-
-/////////////////////////////////////////////////////////////////
-//
-// CPlayer::UpdateFarVehiclePartsStateSync
-//
-// Maybe send pending vehicle parts state sync updates to this player
-//
-/////////////////////////////////////////////////////////////////
-void CPlayer::UpdateFarVehiclePartsStateSync ( void )
-{
-    // Check list once every 200ms
-    if ( m_VehiclePartsStateSyncTimer.Get() < (uint)g_TickRateSettings.iPureSync + 100 )
-        return;
-    m_VehiclePartsStateSyncTimer.Reset();
-
-    // Force far sync every 2000ms
-    bool bDoFarSync = false;
-    if ( m_FarVehiclePartsStateSyncTimer.Get() > (uint)Max( g_TickRateSettings.iLightSync, 2000 ) )
-    {
-        bDoFarSync = true;
-        m_FarVehiclePartsStateSyncTimer.Reset();
-    }
-
-    // Check this sync system is enabled
-    if ( !g_TickRateSettings.bAltVehPartsStateSync )
-    {
-        m_VehiclesWithPartsStateSyncDirty.clear();
-        return;
-    }
-
-    // Check each pending vehicle to see if it's time to send the damage info to this player
-    for ( std::set < ElementID > ::iterator it = m_VehiclesWithPartsStateSyncDirty.begin (); it != m_VehiclesWithPartsStateSyncDirty.end (); )
-    {
-        // Might get the wrong element - Should be ok
-        CElement* pElement = CElementIDs::GetElement ( *it );
-        if ( pElement && pElement->GetType() == CElement::VEHICLE )
-        {
-            CVehicle* pVehicle = (CVehicle*)pElement;
-
-            bool bDoSync = bDoFarSync;
-            if ( !bDoSync )
-            {
-                // Do sync more often if vehicle is near
-                float fDist2DSq = ( pVehicle->GetPosition() - GetPosition() ).LengthSquared();
-                if ( fDist2DSq < 300 * 300 )
-                    bDoSync = true;
-            }
-
-            if ( bDoSync )
-            {
-                CVehicleDamageSyncPacket Packet;
-                Packet.SetFromVehicle( pVehicle );
-                Send( Packet );
-                m_VehiclesWithPartsStateSyncDirty.erase( it++ );
-                continue;
-            }
-        }
-        ++it;
-    }
-}
-
 
 
 /////////////////////////////////////////////////////////////////

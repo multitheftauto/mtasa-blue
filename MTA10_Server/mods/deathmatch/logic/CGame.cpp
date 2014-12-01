@@ -2185,43 +2185,23 @@ void CGame::Packet_VehicleDamageSync ( CVehicleDamageSyncPacket& Packet )
                         pVehicle->m_ucLightStates [ i ] = Packet.m_damage.data.ucLightStates [ i ];
                 }
 
-                if ( !g_TickRateSettings.bAltVehPartsStateSync )
+                // Make a list of players to relay this packet to
+                CSendList sendList;
+                list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin( );
+                for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
                 {
-                    // Broadcast the packet to everyone
-                    m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
-                }
-                else
-                {
-                    // Remember far players that will need sync later
-                    SViewerMapType& farList = pPlayer->GetFarPlayerList ();
-                    for ( SViewerMapType ::iterator it = farList.begin (); it != farList.end (); ++it )
+                    CPlayer* pOther = *iter;
+                    if ( pOther != pPlayer && pOther->IsJoined () )
                     {
-                        CPlayer* pFarPlayer = it->first;
-                        MapInsert( pFarPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle );
-                    }
-
-                    // Send to near players
-                    SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
-                    CSendList sendList;
-                    for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
-                    {
-                        CPlayer* pNearPlayer = it->first;
-                        if ( MapContains( pNearPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle ) )
+                        // Newer clients only need sync if vehicle has no driver
+                        if ( pOther->GetBitStreamVersion() < 0x5D || pVehicle->GetOccupant( 0 ) == NULL )
                         {
-                            // Flush full update for this player if has pending damage info for vehicle
-                            CVehicleDamageSyncPacket Packet;
-                            Packet.SetFromVehicle( pVehicle );
-                            pNearPlayer->Send( Packet );
-                            MapRemove( pNearPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle );
-                        }
-                        else
-                        {
-                            sendList.push_back ( pNearPlayer );
+                            sendList.push_back ( pOther );
                         }
                     }
-
-                    CPlayerManager::Broadcast ( Packet, sendList );
                 }
+
+                CPlayerManager::Broadcast ( Packet, sendList );
             }
         }
     }
@@ -2242,6 +2222,9 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
         {
             // Send a returnsync packet to the player that sent it
             pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
+
+            // Increment counter to spread out damage info sends
+            pVehicle->m_uiDamageInfoSendPhase++;
 
             CLOCK( "VehiclePuresync", "RelayPlayerPuresync" );
             // Relay to other players

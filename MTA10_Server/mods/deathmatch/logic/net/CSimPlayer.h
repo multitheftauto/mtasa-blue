@@ -7,6 +7,14 @@
 *
 *****************************************************************************/
 
+struct SSimVehicleDamageInfo
+{
+    SFixedArray < unsigned char, MAX_DOORS > m_ucDoorStates;
+    SFixedArray < unsigned char, MAX_WHEELS > m_ucWheelStates;
+    SFixedArray < unsigned char, MAX_PANELS > m_ucPanelStates;
+    SFixedArray < unsigned char, MAX_LIGHTS > m_ucLightStates;
+};
+
 //
 // Copy of enough data from CPlayer to enable autonomous relaying of pure sync packets
 //
@@ -42,6 +50,8 @@ public:
     ushort                      m_usVehicleModel;
     uchar                       m_ucOccupiedVehicleSeat;
     float                       m_fWeaponRange;
+    uint                        m_uiVehicleDamageInfoSendPhase;
+    SSimVehicleDamageInfo       m_VehicleDamageInfo;
 
     // Used in CSimKeysyncPacket
     bool                        m_bVehicleHasHydraulics;

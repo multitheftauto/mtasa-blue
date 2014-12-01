@@ -27,7 +27,9 @@ public:
                                                               uchar ucPlayerGotOccupiedVehicleSeat,
                                                               uchar ucPlayerGotWeaponType,
                                                               float fPlayerGotWeaponRange,
-                                                              CControllerState& sharedControllerState );
+                                                              CControllerState& sharedControllerState,
+                                                              uint m_uiDamageInfoSendPhase,
+                                                              const SSimVehicleDamageInfo& damageInfo );
 
     inline ePacketID            GetPacketID                 ( void ) const                  { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
     inline unsigned long        GetFlags                    ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
@@ -59,6 +61,8 @@ private:
     const uchar     m_ucPlayerGotWeaponType;
     const float     m_fPlayerGotWeaponRange;
     CControllerState& m_sharedControllerState;
+    const uint      m_uiDamageInfoSendPhase;
+    const SSimVehicleDamageInfo& m_DamageInfo;
 
     // Set in Read()
     struct
