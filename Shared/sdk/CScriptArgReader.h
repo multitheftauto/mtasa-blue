@@ -1010,15 +1010,17 @@ public:
 
     bool NextIsVector3D ( void ) const
     {
-        return ( NextCouldBeNumber() && NextCouldBeNumber( 1 ) && NextCouldBeNumber( 2 ) )
-               || NextIsUserDataOfType < CLuaVector3D > () || 
-               NextIsUserDataOfType < CLuaVector4D > ();
+        return (NextCouldBeNumber () && NextCouldBeNumber ( 1 ) && NextCouldBeNumber ( 2 ))
+            || NextIsUserDataOfType < CLuaVector3D > () ||
+            NextIsUserDataOfType < CLuaVector4D > ();
     }
 
     bool NextIsVector2D ( void ) const
     {
-        return ( NextCouldBeNumber() && NextCouldBeNumber( 1 ) )
-            || NextIsUserDataOfType < CLuaVector2D > ();
+        return (NextCouldBeNumber () && NextCouldBeNumber ( 1 ))
+            || NextIsUserDataOfType < CLuaVector2D > () ||
+            NextIsUserDataOfType < CLuaVector3D > () ||
+            NextIsUserDataOfType <CLuaVector4D> ();
     }
 
 
