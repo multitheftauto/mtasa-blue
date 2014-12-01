@@ -17,18 +17,16 @@ CPedSync::CPedSync ( CPlayerManager* pPlayerManager, CPedManager* pPedManager )
 {
     m_pPlayerManager = pPlayerManager;
     m_pPedManager = pPedManager;
-    m_ulLastSweepTime = 0;
 }
 
 
 void CPedSync::DoPulse ( void )
 {
     // Time to check for players that should no longer be syncing a ped or peds that should be synced?
-    unsigned long ulCurrentTime = GetTime ();
-    if ( ulCurrentTime >= m_ulLastSweepTime + 500 )
+    if ( m_UpdateTimer.Get() > 500 )
     {
-        m_ulLastSweepTime = ulCurrentTime;
-        Update ( ulCurrentTime );
+        m_UpdateTimer.Reset();
+        Update ();
     }
 }
 
@@ -61,7 +59,7 @@ void CPedSync::OverrideSyncer ( CPed* pPed, CPlayer* pPlayer )
 }
 
 
-void CPedSync::Update ( unsigned long ulCurrentTime )
+void CPedSync::Update ( void )
 {
     // Update all the ped's sync states
     list < CPed* > ::const_iterator iter = m_pPedManager->IterBegin ();

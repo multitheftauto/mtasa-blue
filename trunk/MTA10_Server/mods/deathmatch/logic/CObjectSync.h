@@ -43,7 +43,7 @@ private:
     CPlayerManager*         m_pPlayerManager;
     CObjectManager*         m_pObjectManager;
 
-    unsigned long           m_ulLastSweepTime;
+    CElapsedTime            m_UpdateTimer;
 };
 
 #endif
