@@ -490,9 +490,6 @@ bool CNetAPI::IsSmallKeySyncNeeded ( CClientPed* pPlayerModel )
             ControllerState.m_bPedWalk != LastControllerState.m_bPedWalk )
         return true;
 
-    if ( g_pNet->GetServerBitStreamVersion () < 0x2C )
-        return false;
-
     // Movement direction buttons change ?
     short LeftStickXDelta = abs ( ControllerState.LeftStickX - LastControllerState.LeftStickX );
     short LeftStickYDelta = abs ( ControllerState.LeftStickY - LastControllerState.LeftStickY );
@@ -628,33 +625,10 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     ReadSmallKeysync ( ControllerState, BitStream );
 
     // Read the rotations
-    float fPlayerRotation;
-    float fCameraRotation;
-    if ( BitStream.Version () >= 0x2C )
-    {
-        SKeysyncRotation rotation;
-        BitStream.Read ( &rotation );
-        fPlayerRotation = rotation.data.fPlayerRotation;
-        fCameraRotation = rotation.data.fCameraRotation;
-    }
-    else
-    {
-        // Older versions don't sync these, so we set them to the current values.
-        fPlayerRotation = pPlayer->GetCurrentRotation ();
-        fCameraRotation = pPlayer->GetCameraRotation ();
-        CControllerState CurrentControllerState;
-        pPlayer->GetControllerState ( CurrentControllerState );
-        ControllerState.LeftStickX = CurrentControllerState.LeftStickX;
-        ControllerState.LeftStickY = CurrentControllerState.LeftStickY;
-    }
-
-    // Skip old bullet sync data
-    if ( BitStream.Version () == 0x2D )
-    {
-        bool bDummy;
-        BitStream.ReadBit ( bDummy );
-        BitStream.ReadBit ( bDummy );
-    }
+    SKeysyncRotation rotation;
+    BitStream.Read ( &rotation );
+    float fPlayerRotation = rotation.data.fPlayerRotation;
+    float fCameraRotation = rotation.data.fCameraRotation;
 
     // Flags
     SKeysyncFlags flags;
@@ -664,7 +638,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
 
     // If he's shooting or aiming
-    if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
+    if ( ControllerState.ButtonCircle || ControllerState.RightShoulder1 )
     {
         // Read out his current weapon slot
         SWeaponSlotSync slot;
@@ -794,11 +768,8 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     }
 
     pPlayer->SetControllerState ( ControllerState );
-    if ( BitStream.Version () >= 0x2C )
-    {
-        pPlayer->SetCameraRotation ( fCameraRotation );
-        pPlayer->SetTargetRotation ( fPlayerRotation );
-    }
+    pPlayer->SetCameraRotation ( fCameraRotation );
+    pPlayer->SetTargetRotation ( fPlayerRotation );
 
     // Increment keysync counter
     pPlayer->IncrementKeySync ();
@@ -816,21 +787,10 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
     WriteSmallKeysync ( ControllerState, BitStream );
 
     // Write the rotations
-    if ( BitStream.Version () >= 0x2C )
-    {
-        SKeysyncRotation rotation;
-        rotation.data.fPlayerRotation = pPlayerModel->GetCurrentRotation ();
-        rotation.data.fCameraRotation = pPlayerModel->GetCameraRotation ();
-        BitStream.Write ( &rotation );
-    }
-
-    // Skip old bullet sync data
-    if ( BitStream.Version () == 0x2D )
-    {
-        bool bDummy = 0;
-        BitStream.WriteBit ( bDummy );
-        BitStream.WriteBit ( bDummy );
-    }
+    SKeysyncRotation rotation;
+    rotation.data.fPlayerRotation = pPlayerModel->GetCurrentRotation ();
+    rotation.data.fCameraRotation = pPlayerModel->GetCameraRotation ();
+    BitStream.Write ( &rotation );
 
     // Flags
     SKeysyncFlags flags;
@@ -843,7 +803,7 @@ void CNetAPI::WriteKeysync ( CClientPed* pPlayerModel, NetBitStreamInterface& Bi
     BitStream.Write ( &flags );
 
     // Are we shooting or aiming ?
-    if ( ControllerState.ButtonCircle || ( ControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
+    if ( ControllerState.ButtonCircle || ControllerState.RightShoulder1 )
     {
         // Grab the current weapon
         CWeapon * pPlayerWeapon = pPlayerModel->GetWeapon ();
@@ -1884,11 +1844,8 @@ bool CNetAPI::ReadSmallKeysync ( CControllerState& ControllerState, NetBitStream
     ControllerState.ButtonTriangle  = 255 * keys.data.bButtonTriangle;
     ControllerState.ShockButtonL    = 255 * keys.data.bShockButtonL;
     ControllerState.m_bPedWalk      = 255 * keys.data.bPedWalk;
-    if ( BitStream.Version () >= 0x2C )
-    {
-        ControllerState.LeftStickX      = keys.data.sLeftStickX;
-        ControllerState.LeftStickY      = keys.data.sLeftStickY;
-    }
+    ControllerState.LeftStickX      = keys.data.sLeftStickX;
+    ControllerState.LeftStickY      = keys.data.sLeftStickY;
     return true;
 }
 
@@ -2333,11 +2290,6 @@ void CNetAPI::ReadVehiclePartsState ( CClientVehicle* pVehicle, NetBitStreamInte
 //
 void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
 {
-    // Ignore old bullet sync stuff
-
-    if ( BitStream.Version () < 0x02E )
-        return;
-
     // Read the bulletsync data
     uchar ucWeapon = 0;
     BitStream.Read ( ucWeapon );
@@ -2348,8 +2300,7 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
     BitStream.Read ( (char*)&vecEnd, sizeof ( CVector ) );
 
     uchar ucOrderCounter = 0;
-    if ( g_pNet->GetServerBitStreamVersion () >= 0x34 )
-        BitStream.Read ( ucOrderCounter );
+    BitStream.Read ( ucOrderCounter );
 
     // Duplicate bullet check
     {
@@ -2364,14 +2315,11 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
        pPlayer->m_vecPrevBulletSyncEnd = vecEnd;
    
        // Verify if duplicate by comparing order counter
-       if ( pPlayer->GetRemoteBitstreamVersion () >= 0x34 )
-       {
-           char cDif = ucOrderCounter - pPlayer->m_ucPrevBulletSyncOrderCounter;
-           if ( cDif > 0 )
-               bIsDuplicate = false;
+        char cDif = ucOrderCounter - pPlayer->m_ucPrevBulletSyncOrderCounter;
+        if ( cDif > 0 )
+            bIsDuplicate = false;
    
-           pPlayer->m_ucPrevBulletSyncOrderCounter = ucOrderCounter;
-       }
+        pPlayer->m_ucPrevBulletSyncOrderCounter = ucOrderCounter;
 
         if ( bIsDuplicate )
             return;
@@ -2386,11 +2334,6 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
 //
 void CNetAPI::ReadWeaponBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream )
 {
-    // Ignore old bullet sync stuff
-
-    if ( BitStream.Version () < 0x03C )
-        return;
-
     // Read the bulletsync data
     ElementID elementID;
     BitStream.Read ( elementID );
@@ -2413,10 +2356,6 @@ void CNetAPI::ReadWeaponBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterfa
 //
 void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd )
 {
-    // Ignore old bullet sync stuff
-    if ( g_pNet->GetServerBitStreamVersion () < 0x2E )
-        return;
-
     // Send a bulletsync packet
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
 
@@ -2426,10 +2365,7 @@ void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecSta
     pBitStream->Write ( (const char*)&vecStart, sizeof ( CVector ) );
     pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
 
-    if ( g_pNet->GetServerBitStreamVersion () >= 0x34 )
-    {
-        pBitStream->Write ( m_ucBulletSyncOrderCounter++ );
-    }
+    pBitStream->Write ( m_ucBulletSyncOrderCounter++ );
 
     // Send the packet
     g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );
@@ -2443,7 +2379,7 @@ void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecSta
 void CNetAPI::SendBulletSyncCustomWeaponFire ( CClientWeapon * pWeapon, const CVector& vecStart, const CVector& vecEnd )
 {
     // Ignore old bullet sync stuff
-    if ( g_pNet->GetServerBitStreamVersion () < 0x03C || pWeapon->IsLocalEntity ( ) )
+    if ( pWeapon->IsLocalEntity ( ) )
         return;
 
     // Send a bulletsync packet

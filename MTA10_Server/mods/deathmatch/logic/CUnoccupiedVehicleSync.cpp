@@ -19,18 +19,16 @@ CUnoccupiedVehicleSync::CUnoccupiedVehicleSync ( CPlayerManager* pPlayerManager,
 {
     m_pPlayerManager = pPlayerManager;
     m_pVehicleManager = pVehicleManager;
-    m_ulLastSweepTime = 0;
 }
 
 
 void CUnoccupiedVehicleSync::DoPulse ( void )
 {
     // Time to check for players that should no longer be syncing a vehicle or vehicles that should be synced?
-    unsigned long ulCurrentTime = GetTime ();
-    if ( ulCurrentTime >= m_ulLastSweepTime + 500 )
+    if ( m_UpdateTimer.Get() > 500 )
     {
-        m_ulLastSweepTime = ulCurrentTime;
-        Update ( ulCurrentTime );
+        m_UpdateTimer.Reset();
+        Update ();
     }
 }
 
@@ -68,10 +66,8 @@ void CUnoccupiedVehicleSync::OverrideSyncer ( CVehicle* pVehicle, CPlayer* pPlay
 }
 
 
-void CUnoccupiedVehicleSync::Update ( unsigned long ulCurrentTime )
+void CUnoccupiedVehicleSync::Update ( void )
 {
-    // TODO: needs speeding up (no good looping through thousands of vehicles each frame)
-
     // Update all the vehicle's sync states
     list < CVehicle* > ::const_iterator iter = m_pVehicleManager->IterBegin ();
     for ( ; iter != m_pVehicleManager->IterEnd (); )
