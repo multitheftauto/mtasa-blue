@@ -2226,6 +2226,9 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
             // Increment counter to spread out damage info sends
             pVehicle->m_uiDamageInfoSendPhase++;
 
+            // Increment counter to spread out damage info sends
+            pVehicle->m_uiDamageInfoSendPhase++;
+
             CLOCK( "VehiclePuresync", "RelayPlayerPuresync" );
             // Relay to other players
             RelayPlayerPuresync ( Packet );
