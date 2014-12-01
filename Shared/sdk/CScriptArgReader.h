@@ -1004,7 +1004,8 @@ public:
 
     bool NextIsVector4D ( void ) const
     {
-        return ( NextCouldBeNumber () && NextCouldBeNumber ( 1 ) && NextCouldBeNumber ( 2 ) && NextCouldBeNumber ( 4 ) )
+        return ( NextCouldBeNumber () && NextCouldBeNumber ( 1 ) && NextCouldBeNumber ( 2 )
+            && NextCouldBeNumber ( 3 ) )
             || NextIsUserDataOfType < CLuaVector4D > ();
     }
 

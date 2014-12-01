@@ -3000,10 +3000,10 @@ int CLuaFunctionDefinitions::SpawnPlayer ( lua_State* luaVM )
     argStream.ReadUserData ( pElement );
     argStream.ReadVector3D ( vecPosition );
 
-    if ( argStream.NextIsVector3D () )
+    if ( argStream.NextIsUserDataOfType < CLuaVector3D > () || argStream.NextIsUserDataOfType < CLuaVector4D > () )
     {
         CVector vecRotation;
-        argStream.ReadVector3D (vecRotation);
+        argStream.ReadVector3D ( vecRotation );
         fRotation = vecRotation.fZ;
     }
     else
