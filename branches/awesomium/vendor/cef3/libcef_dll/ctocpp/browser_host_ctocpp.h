@@ -57,11 +57,16 @@ class CefBrowserHostCToCpp
       bool matchCase, bool findNext) OVERRIDE;
   virtual void StopFinding(bool clearSelection) OVERRIDE;
   virtual void ShowDevTools(const CefWindowInfo& windowInfo,
-      CefRefPtr<CefClient> client,
-      const CefBrowserSettings& settings) OVERRIDE;
+      CefRefPtr<CefClient> client, const CefBrowserSettings& settings,
+      const CefPoint& inspect_element_at) OVERRIDE;
   virtual void CloseDevTools() OVERRIDE;
+  virtual void GetNavigationEntries(
+      CefRefPtr<CefNavigationEntryVisitor> visitor,
+      bool current_only) OVERRIDE;
   virtual void SetMouseCursorChangeDisabled(bool disabled) OVERRIDE;
   virtual bool IsMouseCursorChangeDisabled() OVERRIDE;
+  virtual void ReplaceMisspelling(const CefString& word) OVERRIDE;
+  virtual void AddWordToDictionary(const CefString& word) OVERRIDE;
   virtual bool IsWindowRenderingDisabled() OVERRIDE;
   virtual void WasResized() OVERRIDE;
   virtual void WasHidden(bool hidden) OVERRIDE;
@@ -76,6 +81,7 @@ class CefBrowserHostCToCpp
       int deltaY) OVERRIDE;
   virtual void SendFocusEvent(bool setFocus) OVERRIDE;
   virtual void SendCaptureLostEvent() OVERRIDE;
+  virtual void NotifyMoveOrResizeStarted() OVERRIDE;
   virtual CefTextInputContext GetNSTextInputContext() OVERRIDE;
   virtual void HandleKeyEventBeforeTextInputClient(
       CefEventHandle keyEvent) OVERRIDE;

@@ -915,6 +915,16 @@ typedef enum {
   // XMLHttpRequest.
   ///
   RT_XHR,
+
+  ///
+  // A request for a <ping>
+  ///
+  RT_PING,
+
+  ///
+  // Main resource of a service worker.
+  ///
+  RT_SERVICE_WORKER,
 } cef_resource_type_t;
 
 ///
@@ -1044,11 +1054,6 @@ typedef enum {
   UR_FLAG_REPORT_UPLOAD_PROGRESS    = 1 << 3,
 
   ///
-  // If set load timing info will be collected for the request.
-  ///
-  UR_FLAG_REPORT_LOAD_TIMING        = 1 << 4,
-
-  ///
   // If set the headers sent and received for the request will be recorded.
   ///
   UR_FLAG_REPORT_RAW_HEADERS        = 1 << 5,
@@ -1096,6 +1101,14 @@ typedef enum {
   ///
   UR_FAILED,
 } cef_urlrequest_status_t;
+
+///
+// Structure representing a point.
+///
+typedef struct _cef_point_t {
+  int x;
+  int y;
+} cef_point_t;
 
 ///
 // Structure representing a rectangle.
@@ -1287,6 +1300,16 @@ typedef enum {
   MENU_ID_PRINT               = 131,
   MENU_ID_VIEW_SOURCE         = 132,
 
+  // Spell checking word correction suggestions.
+  MENU_ID_SPELLCHECK_SUGGESTION_0        = 200,
+  MENU_ID_SPELLCHECK_SUGGESTION_1        = 201,
+  MENU_ID_SPELLCHECK_SUGGESTION_2        = 202,
+  MENU_ID_SPELLCHECK_SUGGESTION_3        = 203,
+  MENU_ID_SPELLCHECK_SUGGESTION_4        = 204,
+  MENU_ID_SPELLCHECK_SUGGESTION_LAST     = 204,
+  MENU_ID_NO_SPELLING_SUGGESTIONS        = 205,
+  MENU_ID_ADD_TO_DICTIONARY              = 206,
+
   // All user-defined menu IDs should come between MENU_ID_USER_FIRST and
   // MENU_ID_USER_LAST to avoid overlapping the Chromium and CEF ID ranges
   // defined in the tools/gritsettings/resource_ids file.
@@ -1464,9 +1487,28 @@ typedef enum {
 // Key event types.
 ///
 typedef enum {
+  ///
+  // Notification that a key transitioned from "up" to "down".
+  ///
   KEYEVENT_RAWKEYDOWN = 0,
+
+  ///
+  // Notification that a key was pressed. This does not necessarily correspond
+  // to a character depending on the key and language. Use KEYEVENT_CHAR for
+  // character input.
+  ///
   KEYEVENT_KEYDOWN,
+
+  ///
+  // Notification that a key was released.
+  ///
   KEYEVENT_KEYUP,
+
+  ///
+  // Notification that a character was typed. Use this for text input. Key
+  // down events may generate 0, 1, or more than one character event depending
+  // on the key, locale, and operating system.
+  ///
   KEYEVENT_CHAR
 } cef_key_event_type_t;
 
@@ -1797,6 +1839,68 @@ typedef struct _cef_page_range_t {
   int from;
   int to;
 } cef_page_range_t;
+
+///
+// Cursor type values.
+///
+typedef enum {
+  CT_POINTER = 0,
+  CT_CROSS,
+  CT_HAND,
+  CT_IBEAM,
+  CT_WAIT,
+  CT_HELP,
+  CT_EASTRESIZE,
+  CT_NORTHRESIZE,
+  CT_NORTHEASTRESIZE,
+  CT_NORTHWESTRESIZE,
+  CT_SOUTHRESIZE,
+  CT_SOUTHEASTRESIZE,
+  CT_SOUTHWESTRESIZE,
+  CT_WESTRESIZE,
+  CT_NORTHSOUTHRESIZE,
+  CT_EASTWESTRESIZE,
+  CT_NORTHEASTSOUTHWESTRESIZE,
+  CT_NORTHWESTSOUTHEASTRESIZE,
+  CT_COLUMNRESIZE,
+  CT_ROWRESIZE,
+  CT_MIDDLEPANNING,
+  CT_EASTPANNING,
+  CT_NORTHPANNING,
+  CT_NORTHEASTPANNING,
+  CT_NORTHWESTPANNING,
+  CT_SOUTHPANNING,
+  CT_SOUTHEASTPANNING,
+  CT_SOUTHWESTPANNING,
+  CT_WESTPANNING,
+  CT_MOVE,
+  CT_VERTICALTEXT,
+  CT_CELL,
+  CT_CONTEXTMENU,
+  CT_ALIAS,
+  CT_PROGRESS,
+  CT_NODROP,
+  CT_COPY,
+  CT_NONE,
+  CT_NOTALLOWED,
+  CT_ZOOMIN,
+  CT_ZOOMOUT,
+  CT_GRAB,
+  CT_GRABBING,
+  CT_CUSTOM,
+} cef_cursor_type_t;
+
+///
+// Structure representing cursor information. |buffer| will be
+// |size.width|*|size.height|*4 bytes in size and represents a BGRA image with
+// an upper-left origin.
+///
+typedef struct _cef_cursor_info_t {
+  cef_point_t hotspot;
+  float image_scale_factor;
+  void* buffer;
+  cef_size_t size;
+} cef_cursor_info_t;
 
 #ifdef __cplusplus
 }

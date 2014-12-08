@@ -76,6 +76,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\vendor\pthreads\pthread 2013.vcxproj", "{1D25E2E6-65D7-4AD2-BB6F-CA2605E0D2DE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEFLauncher", "..\MTA10\ceflauncher\CEFLauncher.vcxproj", "{C5076389-A166-4FB8-A083-AC5443482C31}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9} = {A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcef_dll_wrapper", "..\vendor\cef3\libcef_dll_wrapper.vcxproj", "{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}"
 EndProject

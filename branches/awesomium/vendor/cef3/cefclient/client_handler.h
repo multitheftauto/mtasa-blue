@@ -237,7 +237,9 @@ class ClientHandler : public CefClient,
                        int width,
                        int height) OVERRIDE;
   virtual void OnCursorChange(CefRefPtr<CefBrowser> browser,
-                              CefCursorHandle cursor) OVERRIDE;
+                              CefCursorHandle cursor,
+                              CursorType type,
+                              const CefCursorInfo& custom_cursor_info) OVERRIDE;
   virtual bool StartDragging(CefRefPtr<CefBrowser> browser,
                              CefRefPtr<CefDragData> drag_data,
                              CefRenderHandler::DragOperationsMask allowed_ops,
@@ -282,7 +284,8 @@ class ClientHandler : public CefClient,
   };
   void SendNotification(NotificationType type);
 
-  void ShowDevTools(CefRefPtr<CefBrowser> browser);
+  void ShowDevTools(CefRefPtr<CefBrowser> browser,
+                    const CefPoint& inspect_element_at);
   void CloseDevTools(CefRefPtr<CefBrowser> browser);
 
   // Returns the startup URL.

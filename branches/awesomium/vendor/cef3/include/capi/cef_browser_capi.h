@@ -41,6 +41,7 @@
 #include "include/capi/cef_base_capi.h"
 #include "include/capi/cef_drag_data_capi.h"
 #include "include/capi/cef_frame_capi.h"
+#include "include/capi/cef_navigation_entry_capi.h"
 #include "include/capi/cef_process_message_capi.h"
 #include "include/capi/cef_request_context_capi.h"
 
@@ -205,6 +206,29 @@ typedef struct _cef_run_file_dialog_callback_t {
 
 
 ///
+// Callback structure for cef_browser_host_t::GetNavigationEntries. The
+// functions of this structure will be called on the browser process UI thread.
+///
+typedef struct _cef_navigation_entry_visitor_t {
+  ///
+  // Base structure.
+  ///
+  cef_base_t base;
+
+  ///
+  // Method that will be executed. Do not keep a reference to |entry| outside of
+  // this callback. Return true (1) to continue visiting entries or false (0) to
+  // stop. |current| is true (1) if this entry is the currently loaded
+  // navigation entry. |index| is the 0-based index of this entry and |total| is
+  // the total number of entries.
+  ///
+  int (CEF_CALLBACK *visit)(struct _cef_navigation_entry_visitor_t* self,
+      struct _cef_navigation_entry_t* entry, int current, int index,
+      int total);
+} cef_navigation_entry_visitor_t;
+
+
+///
 // Structure used to represent the browser process aspects of a browser window.
 // The functions of this structure can only be called in the browser process.
 // They may be called on any thread in that process unless otherwise indicated
@@ -333,18 +357,30 @@ typedef struct _cef_browser_host_t {
       int clearSelection);
 
   ///
-  // Open developer tools in its own window.
+  // Open developer tools in its own window. If |inspect_element_at| is non-
+  // NULL the element at the specified (x,y) location will be inspected.
   ///
   void (CEF_CALLBACK *show_dev_tools)(struct _cef_browser_host_t* self,
       const struct _cef_window_info_t* windowInfo,
       struct _cef_client_t* client,
-      const struct _cef_browser_settings_t* settings);
+      const struct _cef_browser_settings_t* settings,
+      const cef_point_t* inspect_element_at);
 
   ///
   // Explicitly close the developer tools window if one exists for this browser
   // instance.
   ///
   void (CEF_CALLBACK *close_dev_tools)(struct _cef_browser_host_t* self);
+
+  ///
+  // Retrieve a snapshot of current navigation entries as values sent to the
+  // specified visitor. If |current_only| is true (1) only the current
+  // navigation entry will be sent, otherwise all navigation entries will be
+  // sent.
+  ///
+  ///
+  void (CEF_CALLBACK *get_navigation_entries)(struct _cef_browser_host_t* self,
+      struct _cef_navigation_entry_visitor_t* visitor, int current_only);
 
   ///
   // Set whether mouse cursor change is disabled.
@@ -357,6 +393,19 @@ typedef struct _cef_browser_host_t {
   ///
   int (CEF_CALLBACK *is_mouse_cursor_change_disabled)(
       struct _cef_browser_host_t* self);
+
+  ///
+  // If a misspelled word is currently selected in an editable node calling this
+  // function will replace it with the specified |word|.
+  ///
+  void (CEF_CALLBACK *replace_misspelling)(struct _cef_browser_host_t* self,
+      const cef_string_t* word);
+
+  ///
+  // Add the specified |word| to the spelling dictionary.
+  ///
+  void (CEF_CALLBACK *add_word_to_dictionary)(struct _cef_browser_host_t* self,
+      const cef_string_t* word);
 
   ///
   // Returns true (1) if window rendering is disabled.
@@ -439,6 +488,13 @@ typedef struct _cef_browser_host_t {
   // Send a capture lost event to the browser.
   ///
   void (CEF_CALLBACK *send_capture_lost_event)(
+      struct _cef_browser_host_t* self);
+
+  ///
+  // Notify the browser that the window hosting it is about to be moved or
+  // resized. This function is only used on Windows and Linux.
+  ///
+  void (CEF_CALLBACK *notify_move_or_resize_started)(
       struct _cef_browser_host_t* self);
 
   ///

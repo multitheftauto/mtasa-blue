@@ -454,6 +454,9 @@
     <Filter Include="include">
       <UniqueIdentifier>{57CA55B8-BCC5-4000-CE3A-58972F82E9CB}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{57CA55B8-BCC5-4000-CE3A-58972F82E9CB}</UniqueIdentifier>
+    </Filter>
     <Filter Include="include\wrapper">
       <UniqueIdentifier>{6EC44E64-2A08-7BA1-DD52-37662FF8BB3A}</UniqueIdentifier>
     </Filter>
@@ -787,6 +790,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\cef_menu_model.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cef_navigation_entry.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\cef_origin_whitelist.h">

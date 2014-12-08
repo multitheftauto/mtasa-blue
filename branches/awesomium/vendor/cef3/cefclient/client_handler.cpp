@@ -24,7 +24,6 @@
 #include "cefclient/client_renderer.h"
 #include "cefclient/client_switches.h"
 #include "cefclient/dialog_test.h"
-#include "cefclient/dom_test.h"
 #include "cefclient/resource_util.h"
 #include "cefclient/string_util.h"
 #include "cefclient/window_test.h"
@@ -35,6 +34,7 @@ namespace {
 enum client_menu_ids {
   CLIENT_ID_SHOW_DEVTOOLS   = MENU_ID_USER_FIRST,
   CLIENT_ID_CLOSE_DEVTOOLS,
+  CLIENT_ID_INSPECT_ELEMENT,
   CLIENT_ID_TESTMENU_SUBMENU,
   CLIENT_ID_TESTMENU_CHECKITEM,
   CLIENT_ID_TESTMENU_RADIOITEM1,
@@ -159,6 +159,8 @@ void ClientHandler::OnBeforeContextMenu(
     // Add DevTools items to all context menus.
     model->AddItem(CLIENT_ID_SHOW_DEVTOOLS, "&Show DevTools");
     model->AddItem(CLIENT_ID_CLOSE_DEVTOOLS, "Close DevTools");
+    model->AddSeparator();
+    model->AddItem(CLIENT_ID_INSPECT_ELEMENT, "Inspect Element");
 
     // Test context menu features.
     BuildTestMenu(model);
@@ -175,10 +177,13 @@ bool ClientHandler::OnContextMenuCommand(
 
   switch (command_id) {
     case CLIENT_ID_SHOW_DEVTOOLS:
-      ShowDevTools(browser);
+      ShowDevTools(browser, CefPoint());
       return true;
     case CLIENT_ID_CLOSE_DEVTOOLS:
       CloseDevTools(browser);
+      return true;
+    case CLIENT_ID_INSPECT_ELEMENT:
+      ShowDevTools(browser, CefPoint(params->GetXCoord(), params->GetYCoord()));
       return true;
     default:  // Allow default handling, if any.
       return ExecuteTestMenu(command_id);
@@ -462,12 +467,6 @@ void ClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 
   SetLoading(isLoading);
   SetNavState(canGoBack, canGoForward);
-
-  if (!isLoading) {
-    // Continue the DOM test.
-    if (browser->GetMainFrame()->GetURL() == dom_test::kTestUrl)
-      dom_test::OnLoadEnd(browser);
-  }
 }
 
 void ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
@@ -650,11 +649,13 @@ void ClientHandler::OnPaint(CefRefPtr<CefBrowser> browser,
 }
 
 void ClientHandler::OnCursorChange(CefRefPtr<CefBrowser> browser,
-                                   CefCursorHandle cursor) {
+                                   CefCursorHandle cursor,
+                                   CursorType type,
+                                   const CefCursorInfo& custom_cursor_info) {
   CEF_REQUIRE_UI_THREAD();
   if (!osr_handler_.get())
     return;
-  osr_handler_->OnCursorChange(browser, cursor);
+  osr_handler_->OnCursorChange(browser, cursor, type, custom_cursor_info);
 }
 
 bool ClientHandler::StartDragging(CefRefPtr<CefBrowser> browser,
@@ -732,7 +733,6 @@ void ClientHandler::SetOSRHandler(CefRefPtr<RenderHandler> handler) {
 }
 
 CefRefPtr<ClientHandler::RenderHandler> ClientHandler::GetOSRHandler() const {
-  CEF_REQUIRE_UI_THREAD();
   return osr_handler_; 
 }
 
@@ -787,7 +787,8 @@ std::string ClientHandler::GetLastDownloadFile() const {
   return last_download_file_;
 }
 
-void ClientHandler::ShowDevTools(CefRefPtr<CefBrowser> browser) {
+void ClientHandler::ShowDevTools(CefRefPtr<CefBrowser> browser,
+                                 const CefPoint& inspect_element_at) {
   CefWindowInfo windowInfo;
   CefBrowserSettings settings;
 
@@ -795,7 +796,8 @@ void ClientHandler::ShowDevTools(CefRefPtr<CefBrowser> browser) {
   windowInfo.SetAsPopup(browser->GetHost()->GetWindowHandle(), "DevTools");
 #endif
 
-  browser->GetHost()->ShowDevTools(windowInfo, this, settings);
+  browser->GetHost()->ShowDevTools(windowInfo, this, settings,
+                                   inspect_element_at);
 }
 
 void ClientHandler::CloseDevTools(CefRefPtr<CefBrowser> browser) {

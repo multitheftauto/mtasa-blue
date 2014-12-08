@@ -454,6 +454,15 @@
     <Filter Include="include">
       <UniqueIdentifier>{57CA55B8-BCC5-4000-CE3A-58972F82E9CB}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{57CA55B8-BCC5-4000-CE3A-58972F82E9CB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\capi">
+      <UniqueIdentifier>{907BD885-F750-8BFF-433D-6153B0C8239B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{57CA55B8-BCC5-4000-CE3A-58972F82E9CB}</UniqueIdentifier>
+    </Filter>
     <Filter Include="include\capi">
       <UniqueIdentifier>{907BD885-F750-8BFF-433D-6153B0C8239B}</UniqueIdentifier>
     </Filter>
@@ -1198,30 +1207,6 @@
     <Filter Include="libcef_dll">
       <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
     </Filter>
-    <Filter Include="libcef_dll\ctocpp">
-      <UniqueIdentifier>{DB43CDD1-2824-1B32-3992-B9BA77D7F6A1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libcef_dll">
-      <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libcef_dll\ctocpp">
-      <UniqueIdentifier>{DB43CDD1-2824-1B32-3992-B9BA77D7F6A1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libcef_dll">
-      <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libcef_dll\cpptoc">
-      <UniqueIdentifier>{FF3D12EC-282F-D293-DF6C-6D7938C94540}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libcef_dll">
-      <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libcef_dll\cpptoc">
-      <UniqueIdentifier>{FF3D12EC-282F-D293-DF6C-6D7938C94540}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libcef_dll">
-      <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
-    </Filter>
     <Filter Include="libcef_dll\cpptoc">
       <UniqueIdentifier>{FF3D12EC-282F-D293-DF6C-6D7938C94540}</UniqueIdentifier>
     </Filter>
@@ -1482,6 +1467,30 @@
     </Filter>
     <Filter Include="libcef_dll\ctocpp">
       <UniqueIdentifier>{DB43CDD1-2824-1B32-3992-B9BA77D7F6A1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libcef_dll">
+      <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libcef_dll\ctocpp">
+      <UniqueIdentifier>{DB43CDD1-2824-1B32-3992-B9BA77D7F6A1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libcef_dll">
+      <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libcef_dll\ctocpp">
+      <UniqueIdentifier>{DB43CDD1-2824-1B32-3992-B9BA77D7F6A1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libcef_dll">
+      <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libcef_dll\cpptoc">
+      <UniqueIdentifier>{FF3D12EC-282F-D293-DF6C-6D7938C94540}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libcef_dll">
+      <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libcef_dll\cpptoc">
+      <UniqueIdentifier>{FF3D12EC-282F-D293-DF6C-6D7938C94540}</UniqueIdentifier>
     </Filter>
     <Filter Include="libcef_dll">
       <UniqueIdentifier>{BF7B5B1F-32D7-CA57-2F5C-5CFFA7F0BF7D}</UniqueIdentifier>
@@ -2199,6 +2208,9 @@
     <ClInclude Include="include\cef_menu_model.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\cef_navigation_entry.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="include\cef_origin_whitelist.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -2356,6 +2368,9 @@
       <Filter>include\capi</Filter>
     </ClInclude>
     <ClInclude Include="include\capi\cef_menu_model_capi.h">
+      <Filter>include\capi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capi\cef_navigation_entry_capi.h">
       <Filter>include\capi</Filter>
     </ClInclude>
     <ClInclude Include="include\capi\cef_origin_whitelist_capi.h">
@@ -2643,18 +2658,6 @@
     <ClInclude Include="libcef_dll\ctocpp\domdocument_ctocpp.h">
       <Filter>libcef_dll\ctocpp</Filter>
     </ClInclude>
-    <ClCompile Include="libcef_dll\ctocpp\domevent_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp</Filter>
-    </ClCompile>
-    <ClInclude Include="libcef_dll\ctocpp\domevent_ctocpp.h">
-      <Filter>libcef_dll\ctocpp</Filter>
-    </ClInclude>
-    <ClCompile Include="libcef_dll\cpptoc\domevent_listener_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc</Filter>
-    </ClCompile>
-    <ClInclude Include="libcef_dll\cpptoc\domevent_listener_cpptoc.h">
-      <Filter>libcef_dll\cpptoc</Filter>
-    </ClInclude>
     <ClCompile Include="libcef_dll\ctocpp\domnode_ctocpp.cc">
       <Filter>libcef_dll\ctocpp</Filter>
     </ClCompile>
@@ -2798,6 +2801,18 @@
     </ClCompile>
     <ClInclude Include="libcef_dll\ctocpp\menu_model_ctocpp.h">
       <Filter>libcef_dll\ctocpp</Filter>
+    </ClInclude>
+    <ClCompile Include="libcef_dll\ctocpp\navigation_entry_ctocpp.cc">
+      <Filter>libcef_dll\ctocpp</Filter>
+    </ClCompile>
+    <ClInclude Include="libcef_dll\ctocpp\navigation_entry_ctocpp.h">
+      <Filter>libcef_dll\ctocpp</Filter>
+    </ClInclude>
+    <ClCompile Include="libcef_dll\cpptoc\navigation_entry_visitor_cpptoc.cc">
+      <Filter>libcef_dll\cpptoc</Filter>
+    </ClCompile>
+    <ClInclude Include="libcef_dll\cpptoc\navigation_entry_visitor_cpptoc.h">
+      <Filter>libcef_dll\cpptoc</Filter>
     </ClInclude>
     <ClCompile Include="libcef_dll\ctocpp\post_data_ctocpp.cc">
       <Filter>libcef_dll\ctocpp</Filter>

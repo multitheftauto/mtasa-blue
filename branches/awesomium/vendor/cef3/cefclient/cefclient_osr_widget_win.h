@@ -19,13 +19,17 @@ class OSRBrowserProvider {
   virtual ~OSRBrowserProvider() {}
 };
 
-class OSRWindow : public ClientHandler::RenderHandler,
-                  public DragEvents {
+class OSRWindow : public ClientHandler::RenderHandler
+#if defined(CEF_USE_ATL)
+                  , public DragEvents
+#endif
+{
  public:
   // Create a new OSRWindow instance. |browser_provider| must outlive this
   // object.
   static CefRefPtr<OSRWindow> Create(OSRBrowserProvider* browser_provider,
-                                     bool transparent);
+                                     bool transparent,
+                                     bool show_update_rect);
 
   static CefRefPtr<OSRWindow> From(
       CefRefPtr<ClientHandler::RenderHandler> renderHandler);
@@ -65,7 +69,9 @@ class OSRWindow : public ClientHandler::RenderHandler,
                        int width,
                        int height) OVERRIDE;
   virtual void OnCursorChange(CefRefPtr<CefBrowser> browser,
-                              CefCursorHandle cursor) OVERRIDE;
+                              CefCursorHandle cursor,
+                              CursorType type,
+                              const CefCursorInfo& custom_cursor_info) OVERRIDE;
   virtual bool StartDragging(CefRefPtr<CefBrowser> browser,
                              CefRefPtr<CefDragData> drag_data,
                              CefRenderHandler::DragOperationsMask allowed_ops,
@@ -75,6 +81,7 @@ class OSRWindow : public ClientHandler::RenderHandler,
       CefRefPtr<CefBrowser> browser,
       CefRenderHandler::DragOperation operation) OVERRIDE;
 
+#if defined(CEF_USE_ATL)
   // DragEvents methods
   virtual CefBrowserHost::DragOperationsMask OnDragEnter(
       CefRefPtr<CefDragData> drag_data,
@@ -85,6 +92,7 @@ class OSRWindow : public ClientHandler::RenderHandler,
   virtual void OnDragLeave() OVERRIDE;
   virtual CefBrowserHost::DragOperationsMask OnDrop(CefMouseEvent ev,
       CefBrowserHost::DragOperationsMask effect) OVERRIDE;
+#endif  // defined(CEF_USE_ATL)
 
   void Invalidate();
   void WasHidden(bool hidden);
@@ -93,7 +101,9 @@ class OSRWindow : public ClientHandler::RenderHandler,
   static int GetCefMouseModifiers(WPARAM wparam);
 
  private:
-  OSRWindow(OSRBrowserProvider* browser_provider, bool transparent);
+  OSRWindow(OSRBrowserProvider* browser_provider,
+            bool transparent,
+            bool show_update_rect);
   virtual ~OSRWindow();
 
   void Render();
@@ -115,8 +125,10 @@ class OSRWindow : public ClientHandler::RenderHandler,
   HDC hDC_;
   HGLRC hRC_;
 
+#if defined(CEF_USE_ATL)
   CComPtr<DropTargetWin> drop_target_;
   CefRenderHandler::DragOperation current_drag_op_;
+#endif
 
   bool painting_popup_;
   bool render_task_pending_;
