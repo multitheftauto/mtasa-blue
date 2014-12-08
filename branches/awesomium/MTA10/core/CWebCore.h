@@ -47,9 +47,6 @@ public:
     void                RequestPages        ( const std::vector<SString>& pages );
     void                AllowPendingPages   ( bool bRemember );
     void                DenyPendingPages    ();
-    
-    void                InitialiseCursors   ();
-    unsigned char       FindCursorByHandle  ( HCURSOR hCursor );
 
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
     inline void         SetTestModeEnabled  ( bool bEnabled ) { m_bTestmodeEnabled = bEnabled; };

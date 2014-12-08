@@ -7,7 +7,6 @@
 *  PURPOSE:     CEF launcher entry point
 *
 *****************************************************************************/
-
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include "CCefApp.h"
@@ -15,7 +14,7 @@
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdShow, int nCmdShow )
 {
     CefMainArgs mainArgs ( hInstance );
-    CefRefPtr<CApp> app ( new CApp );
+    CefRefPtr<CCefApp> app ( new CCefApp );
 
     return CefExecuteProcess ( mainArgs, app, NULL );
 }

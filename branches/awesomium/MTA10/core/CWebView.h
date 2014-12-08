@@ -74,7 +74,7 @@ public:
     // CefRenderHandler methods
     virtual bool GetViewRect    ( CefRefPtr<CefBrowser> browser, CefRect& rect ) override;
     virtual void OnPaint        ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height ) override;
-    virtual void OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor ) override;
+    virtual void OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo ) override;
 
     // CefLoadHandler methods
     virtual void OnLoadStart    ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame ) override;

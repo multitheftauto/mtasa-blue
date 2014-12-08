@@ -284,12 +284,11 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnCursorChange(CefRefPtr%3CCefBrowser%3E,CefCursorHandle) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor )
+void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo )
 {
     // Find the cursor index by the cursor handle
-    unsigned char cursorIndex = g_pCore->GetWebCore ()->FindCursorByHandle ( cursor );
-    if ( cursorIndex != 0xFF )
-        m_pEventsInterface->Events_OnChangeCursor ( cursorIndex );
+    unsigned char cursorIndex = static_cast < unsigned char > ( type );
+    m_pEventsInterface->Events_OnChangeCursor ( cursorIndex );
 }
 
 ////////////////////////////////////////////////////////////////////

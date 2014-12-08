@@ -13,10 +13,10 @@
 #include "V8Helpers.h"
 using V8Helpers::CV8Handler;
 
-class CApp : public CefApp, public CefRenderProcessHandler
+class CCefApp : public CefApp, public CefRenderProcessHandler
 {
 public:
-    CApp()
+    CCefApp()
     {
     }
     virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler () override { return this; };
@@ -58,5 +58,5 @@ public:
     }
 
 public:
-    IMPLEMENT_REFCOUNTING(CApp);
+    IMPLEMENT_REFCOUNTING(CCefApp);
 };
