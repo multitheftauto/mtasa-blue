@@ -577,6 +577,7 @@ DontInstallRedistVC12:
                 ${Switch} $ExeMD5
                     ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam
                     ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update)
+                    ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update)
                         #Copy gta-sa.exe to gta_sa.exe and commence patching process
                         CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
                         Call InstallPatch
