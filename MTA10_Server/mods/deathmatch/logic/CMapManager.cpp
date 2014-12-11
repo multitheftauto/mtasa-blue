@@ -57,7 +57,7 @@ CMapManager::CMapManager ( CBlipManager* pBlipManager,
     m_pRootElement = new CDummy ( NULL, NULL, NULL );
     m_pRootElement->SetTypeName ( "root" );
 
-    m_ulLastRespawnTime = 0;
+    m_llLastRespawnTime = 0;
 
     // Create the weather manager
     m_pBlendedWeather = new CBlendedWeather ( m_pServerClock );
@@ -691,10 +691,10 @@ void CMapManager::SpawnPlayer ( CPlayer& Player, const CVector& vecPosition, flo
 void CMapManager::DoRespawning ( void )
 {
     // Time to do the next search for respawnable things?
-    if ( GetTickCount32 () >= m_ulLastRespawnTime + 1000 )
+    if ( SharedUtil::GetModuleTickCount64 () >= m_llLastRespawnTime + 1000 )
     {
         // Update the time
-        m_ulLastRespawnTime = GetTickCount32 ();
+        m_llLastRespawnTime = SharedUtil::GetModuleTickCount64 ();
 
         // Do the respawning
         DoPickupRespawning ();
