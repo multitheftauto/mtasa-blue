@@ -1571,6 +1571,12 @@ namespace SharedUtil
             store.ullPrevUserTimeUs = ullUserTimeUs;
             store.ullPrevKernelTimeUs = ullKernelTimeUs;
             store.ullPrevCPUMeasureTimeMs = ullCPUMeasureTimeMs;
+
+            // Updated smoothed values
+            float fAlpha = 1.f / store.fAvgTimeSeconds;
+            store.fUserPercentAvg = Lerp( store.fUserPercentAvg, fAlpha, store.fUserPercent );
+            store.fKernelPercentAvg = Lerp( store.fKernelPercentAvg, fAlpha, store.fKernelPercent );
+            store.fTotalCPUPercentAvg = Lerp( store.fTotalCPUPercentAvg, fAlpha, store.fTotalCPUPercent );
         }  
     }
 

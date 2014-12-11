@@ -133,6 +133,26 @@ void CUnoccupiedVehicleSync::UpdateVehicle ( CVehicle* pVehicle )
             FindSyncer ( pVehicle );
         }
     }
+
+    pVehicle->HandleDimensionResync();
+}
+
+
+// Resync all unoccupied vehicles with same dimension as player
+// Called when a player changes dimension
+void CUnoccupiedVehicleSync::ResyncForPlayer ( CPlayer* pPlayer )
+{
+    list < CVehicle* > ::const_iterator iter = m_pVehicleManager->IterBegin ();
+    for ( ; iter != m_pVehicleManager->IterEnd (); ++iter )
+    {
+        CVehicle* pVehicle = *iter;
+        if ( pVehicle->GetDimension() == pPlayer->GetDimension()
+          && !pVehicle->GetFirstOccupant()
+          && pVehicle->IsUnoccupiedSyncable() )
+        {
+            pPlayer->Send ( CVehicleResyncPacket( pVehicle ) );
+        }
+    }
 }
 
 
@@ -428,15 +448,22 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync ( CUnoccupiedVehicleSy
 
                         // Send this sync if something important changed or one of the flags has changed since last sync.
                         data.bSend = vehicle.HasChanged ( ) || ( bEngineOn != vehicle.data.bEngineOn || bDerailed != vehicle.data.bDerailed || bInWater != vehicle.data.bIsInWater );
+
+                        if ( data.bSend )
+                        {
+                            pVehicle->OnRelayUnoccupiedSync();
+                        }
                     }
                 }
             }
         }
 
-        // Tell everyone
-        m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
+        // Tell everyone in the same dimension
+       m_pPlayerManager->BroadcastDimensionOnlyJoined ( Packet, pPlayer->GetDimension(), pPlayer );
     }
 }
+
+
 void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync ( CUnoccupiedVehiclePushPacket& Packet )
 {
     // Grab the player

@@ -199,6 +199,13 @@ void CPlayer::DoPulse ( void )
         // Do dist update if too long since last one
         if ( m_UpdateNearListTimer.Get () > (uint)g_TickRateSettings.iNearListUpdate + 300 )
             MaybeUpdateOthersNearList ();
+
+        if ( GetDimension() != m_usPrevDimension )
+        {
+            // Get resync from unoccupied vehicles in new dimension
+            m_usPrevDimension = GetDimension();
+            g_pGame->GetUnoccupiedVehicleSync()->ResyncForPlayer( this );
+        }
     }
 }
 
