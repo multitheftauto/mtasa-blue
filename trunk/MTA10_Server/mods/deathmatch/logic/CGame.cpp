@@ -165,7 +165,7 @@ CGame::CGame ( void )
     ResetMapInfo();
     m_usFPS = 0;
     m_usFrames = 0;
-    m_ulLastFPSTime = 0;
+    m_llLastFPSTime = 0;
     m_szCurrentFileName = NULL;
     m_pConsoleClient = NULL;
     m_bIsFinished = false;
@@ -201,7 +201,7 @@ CGame::CGame ( void )
 
     m_bTrafficLightsLocked = false;
     m_ucTrafficLightState = 0;
-    m_ulLastTrafficUpdate = 0;
+    m_llLastTrafficUpdate = 0;
 
     m_bOcclusionsEnabled = true;
 
@@ -235,7 +235,7 @@ void CGame::ResetMapInfo ( void )
 
     m_bTrafficLightsLocked = false;
     m_ucTrafficLightState = 0;
-    m_ulLastTrafficUpdate = 0;
+    m_llLastTrafficUpdate = 0;
 
     g_pGame->SetHasWaterColor ( false );
     g_pGame->SetInteriorSoundsEnabled ( true );
@@ -381,26 +381,26 @@ void CGame::DoPulse ( void )
     UpdateModuleTickCount64 ();
 
     // Calculate FPS
-    unsigned long ulCurrentTime = GetTickCount32 ();
-    unsigned long ulDiff = ulCurrentTime - m_ulLastFPSTime;
+    long long llCurrentTime = SharedUtil::GetModuleTickCount64 ();
+    long long ulDiff = llCurrentTime - m_llLastFPSTime;
 
     // Calculate the server-side fps
     if ( ulDiff >= 1000 )
     {
         m_usFPS = m_usFrames;
         m_usFrames = 0;
-        m_ulLastFPSTime = ulCurrentTime;
+        m_llLastFPSTime = llCurrentTime;
     }
     m_usFrames++;
 
     // Update the progress rotator
-    uchar ucDelta = (uchar)ulCurrentTime - ucProgressSkip;
+    uchar ucDelta = (uchar)llCurrentTime - ucProgressSkip;
     ushort usReqDelta = 80 - ( 100 - Min < ushort > ( 100, m_usFPS ) ) / 5;
     
     if ( ucDelta > usReqDelta ) {
         // Clamp ucProgress between 0 and 3
         ucProgress = ( ucProgress + 1 ) & 3;
-        ucProgressSkip = (uchar)ulCurrentTime;
+        ucProgressSkip = (uchar)llCurrentTime;
     }
 
     // Handle critical things
@@ -438,7 +438,7 @@ void CGame::DoPulse ( void )
     // Handle the traffic light sync
     if (m_bTrafficLightsLocked == false)
     {
-        CLOCK_CALL1( ProcessTrafficLights (ulCurrentTime); );
+        CLOCK_CALL1( ProcessTrafficLights ( llCurrentTime ); );
     }
 
     // Pulse ASE
@@ -1513,9 +1513,9 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onWeaponFire", "", NULL, false );
 }
 
-void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
+void CGame::ProcessTrafficLights ( long long llCurrentTime )
 {
-    unsigned long ulDiff = static_cast < unsigned long > ( (ulCurrentTime - m_ulLastTrafficUpdate)*m_fGameSpeed );
+    long long ulDiff = static_cast < long long > ( (llCurrentTime - m_llLastTrafficUpdate)*m_fGameSpeed );
     unsigned char ucNewState = 0xFF;
 
     if ( ulDiff >= 1000 )
@@ -1535,8 +1535,8 @@ void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
 
         if ( ucNewState != 0xFF )
         {
-            CStaticFunctionDefinitions::SetTrafficLightState (ucNewState);
-            m_ulLastTrafficUpdate = GetTickCount32 ();
+            CStaticFunctionDefinitions::SetTrafficLightState ( ucNewState );
+            m_llLastTrafficUpdate = SharedUtil::GetModuleTickCount64 ();
         }
     }
 }
