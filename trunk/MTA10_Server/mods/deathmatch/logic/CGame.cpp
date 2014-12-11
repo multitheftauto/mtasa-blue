@@ -2193,10 +2193,13 @@ void CGame::Packet_VehicleDamageSync ( CVehicleDamageSyncPacket& Packet )
                     CPlayer* pOther = *iter;
                     if ( pOther != pPlayer && pOther->IsJoined () )
                     {
-                        // Newer clients only need sync if vehicle has no driver
-                        if ( pOther->GetBitStreamVersion() < 0x5D || pVehicle->GetOccupant( 0 ) == NULL )
+                        if ( pOther->GetDimension() == pPlayer->GetDimension() )
                         {
-                            sendList.push_back ( pOther );
+                            // Newer clients only need sync if vehicle has no driver
+                            if ( pOther->GetBitStreamVersion() < 0x5D || pVehicle->GetOccupant( 0 ) == NULL )
+                            {
+                                sendList.push_back ( pOther );
+                            }
                         }
                     }
                 }

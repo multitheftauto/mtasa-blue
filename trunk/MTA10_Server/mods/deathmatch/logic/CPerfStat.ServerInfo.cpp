@@ -40,11 +40,11 @@ namespace
 
     SString MakeCPUUsageString( const SThreadCPUTimes& info )
     {
-        if ( info.fKernelPercent < 1 )
-            return SString( "%s%%", *CPerfStatManager::GetScaledFloatString( info.fUserPercent ) );
-    
-        return SString( "%s%% (Sys: %d%%)", *CPerfStatManager::GetScaledFloatString( info.fUserPercent )
-                                          , (int)info.fKernelPercent );
+        SString strResult( "%s%% (Avg: %s%%)", *CPerfStatManager::GetScaledFloatString( info.fUserPercent ), *CPerfStatManager::GetScaledFloatString( info.fUserPercentAvg ) );
+        if ( info.fKernelPercent >= 1 )
+            strResult += SString( " (Sys: %d%%)", (int)info.fKernelPercent );
+
+        return strResult;
     }
 
     #define UDP_PACKET_OVERHEAD (28LL)

@@ -346,6 +346,8 @@ public:
     bool                            IsIdleTimerRunning      ( void );
     bool                            IsIdleTimerFinished     ( void );
     bool                            IsStationary            ( void );
+    void                            OnRelayUnoccupiedSync   ( void );
+    void                            HandleDimensionResync   ( void );
 
 private:
     class CVehicleManager*          m_pVehicleManager;
@@ -429,6 +431,8 @@ private:
 
     CTickCount                      m_LastPushedTime;
     CVector                         m_vecStationaryCheckPosition;
+    bool                            m_bNeedsDimensionResync;
+    ushort                          m_usLastUnoccupiedSyncDimension;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;

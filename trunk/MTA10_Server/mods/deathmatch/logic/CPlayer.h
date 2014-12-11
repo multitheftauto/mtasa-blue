@@ -465,6 +465,8 @@ private:
     float                                       m_fWeaponRangeLastSkill;
     eWeaponType                                 m_eWeaponRangeLastWeapon;
     uint                                        m_uiWeaponRangeLastStatsRevision;
+
+    ushort                                      m_usPrevDimension;
 };
 
 #endif

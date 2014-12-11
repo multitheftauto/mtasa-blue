@@ -30,6 +30,7 @@ public:
 
     void                    OverrideSyncer                      ( CVehicle* pVehicle, CPlayer* pPlayer );
     CPlayer*                FindPlayerCloseToVehicle            ( CVehicle* pVehicle, float fMaxDistance );
+    void                    ResyncForPlayer                     ( CPlayer* pPlayer );
 
 private:
     void                    Update                              ( void );

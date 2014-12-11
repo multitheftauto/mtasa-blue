@@ -150,13 +150,17 @@ namespace SharedUtil
         float fUserPercent;
         float fKernelPercent;
         float fTotalCPUPercent;
+        float fUserPercentAvg;
+        float fKernelPercentAvg;
+        float fTotalCPUPercentAvg;
     };
     struct SThreadCPUTimesStore : SThreadCPUTimes
     {
-        SThreadCPUTimesStore( void ) { ZERO_POD_STRUCT( this ); }
+        SThreadCPUTimesStore( void ) { ZERO_POD_STRUCT( this ); fAvgTimeSeconds = 5; }
         uint64 ullPrevCPUMeasureTimeMs;
         uint64 ullPrevUserTimeUs;
         uint64 ullPrevKernelTimeUs;
+        float fAvgTimeSeconds;
     };
     DWORD           _GetCurrentProcessorNumber      ( void );
     void            GetThreadCPUTimes               ( uint64& outUserTime, uint64& outKernelTime );

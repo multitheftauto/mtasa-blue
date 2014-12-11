@@ -950,3 +950,22 @@ void CVehicle::SetJackingPlayer ( CPlayer* pPlayer )
     if ( m_pJackingPlayer )
         m_pJackingPlayer->SetJackingVehicle ( this );
 }
+
+
+void CVehicle::OnRelayUnoccupiedSync ( void )
+{
+    // Detect dimension change
+    m_bNeedsDimensionResync |= ( GetDimension() != m_usLastUnoccupiedSyncDimension );
+    m_usLastUnoccupiedSyncDimension = GetDimension();
+}
+
+
+void CVehicle::HandleDimensionResync ( void )
+{
+    if ( m_bNeedsDimensionResync )
+    {
+        // Unoccupied vehicle might be desynced because of dimension optimizations, so resync to players in new dimension
+        g_pGame->GetPlayerManager()->BroadcastDimensionOnlyJoined( CVehicleResyncPacket( this ), GetDimension() );
+        m_bNeedsDimensionResync = false;
+    }
+}
