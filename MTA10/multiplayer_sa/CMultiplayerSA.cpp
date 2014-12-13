@@ -1441,10 +1441,6 @@ void CMultiplayerSA::InitHooks()
     // Increase intensity of vehicle tail light corona
     MemPut < BYTE > ( 0x6E1A22, 0xF0 );
 
-    // Fix crash occuring when teleporting between dynamically furnished interiors (Fix for #5285)
-    MemPut < BYTE > ( 0x593C5E, 0x90 );
-    MemPut < BYTE > ( 0x593C5F, 0xE9 ); // replace 2byte jz by nop+jmp
-
 
     InitHooks_CrashFixHacks ();
 
