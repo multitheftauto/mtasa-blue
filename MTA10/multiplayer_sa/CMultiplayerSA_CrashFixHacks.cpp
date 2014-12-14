@@ -1234,6 +1234,27 @@ void _declspec(naked) HOOK_CObject_Destructor_TrainCrossing_Check ()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// GTA doesn't reset the furniture object counter, so do it manually everytime before GTA furnishes an interior (Interior_c::Init)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_ResetFurnitureObjectCounter 0x593BF0
+#define HOOKSIZE_ResetFurnitureObjectCounter 6
+DWORD RETURN_ResetFurnitureObjectCounter = 0x593BF6;
+void _declspec(naked) HOOK_ResetFurnitureObjectCounter ()
+{
+    *(int*)0xBB3A18 = 0; // InteriorManager_c::ms_objectCounter
+
+    _asm
+    {
+        // original instruction
+        mov eax, fs:[0]
+        jmp RETURN_ResetFurnitureObjectCounter
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1272,4 +1293,5 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CEntity_GetBoundRect );
     EZHookInstall ( CVehicle_AddUpgrade );
     EZHookInstall ( CObject_Destructor_TrainCrossing_Check );
+    EZHookInstall ( ResetFurnitureObjectCounter );
 }
