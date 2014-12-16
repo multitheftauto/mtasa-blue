@@ -70,9 +70,14 @@ CResourceManager::~CResourceManager ( void )
 // Load the complete list of resources and create their objects
 // DOES NOT reload already loaded resources, we need a special function for lua for that (e.g. reloadResource)
 // Talidan: yes it did, noob.  Not as of r897 - use bRefreshAll to do already loaded resources.
-bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisResource )
+bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisResource, bool bShowTiming )
 {
+    CTimeUsMarker < 20 > marker;
+    marker.Set( "Start" );
+
     UnloadRemovedResources();
+
+    marker.Set( "UnloadRemoved" );
 
     // Make list of potential active resources
     std::map < SString, SResInfo > resInfoMap;
@@ -163,6 +168,8 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
         }
     }
 
+    marker.Set( "SearchDir" );
+
     // Process potential resource list
     for ( std::map < SString, SResInfo >::const_iterator iter = resInfoMap.begin () ; iter != resInfoMap.end () ; ++iter )
     {
@@ -185,8 +192,11 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
         }
     }
 
+    marker.Set( "AddNew" );
 
     CheckResourceDependencies();
+
+    marker.Set( "CheckDep" );
 
     // Print important errors
     for ( std::map < SString, SResInfo >::const_iterator iter = resInfoMap.begin () ; iter != resInfoMap.end () ; ++iter )
@@ -211,6 +221,7 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
         }
     }
 
+    marker.Set( "CheckErrors" );
 
     if ( m_bResourceListChanged )
     {
@@ -225,6 +236,11 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
         m_resourcesToStartAfterRefresh.pop_front();
         pResource->Start();
     }
+
+    marker.Set( "StartChanged" );
+
+    if ( bShowTiming )
+        CLogger::LogPrintf( "Timing info: %s\n", *marker.GetString() );
 
     s_bNotFirstTime = true;
 
