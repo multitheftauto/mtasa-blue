@@ -1300,6 +1300,19 @@ bool CResource::DoesFileExistInZip ( const char * szFilename )
     return bRes;
 }
 
+// Return true if is looks like the resource files have been removed
+bool CResource::HasGoneAway ( void )
+{
+    if ( !IsResourceZip () )
+    {
+        return !FileExists( PathJoin( m_strResourceDirectoryPath, "meta.xml" ) );
+    }
+    else
+    {
+        return !FileExists( m_strResourceZip );
+    }
+}
+
 // gets the path of the file specified, may extract it from the zip
 bool CResource::GetFilePath ( const char * szFilename, string& strPath )
 {
