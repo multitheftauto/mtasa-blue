@@ -75,10 +75,6 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
     CTimeUsMarker < 20 > marker;
     marker.Set( "Start" );
 
-    UnloadRemovedResources();
-
-    marker.Set( "UnloadRemoved" );
-
     // Make list of potential active resources
     std::map < SString, SResInfo > resInfoMap;
 
@@ -169,6 +165,10 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
     }
 
     marker.Set( "SearchDir" );
+
+    UnloadRemovedResources();
+
+    marker.Set( "UnloadRemoved" );
 
     // Process potential resource list
     for ( std::map < SString, SResInfo >::const_iterator iter = resInfoMap.begin () ; iter != resInfoMap.end () ; ++iter )
@@ -348,7 +348,7 @@ void CResourceManager::UnloadRemovedResources ( void )
     string strPath;
     for ( ; iter != m_resources.end (); iter++ )
     {
-        if ( ! (*iter)->GetFilePath ( "meta.xml", strPath ) )
+        if ( (*iter)->HasGoneAway() )
         {
             if ( (*iter)->IsActive() )
                 CLogger::ErrorPrintf ( "Resource '%s' has been removed while running! Stopping resource.\n", (*iter)->GetName().c_str () );
