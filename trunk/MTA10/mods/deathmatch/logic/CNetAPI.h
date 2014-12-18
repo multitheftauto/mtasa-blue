@@ -120,11 +120,7 @@ private:
     CVector                 m_vecLastReturnPosition;
     CVector                 m_vecLastReturnRotation;
 
-    unsigned long           m_ulLastCameraSyncTime;
-    bool                    m_bLastSentCameraMode;
-    CClientEntity*          m_pLastSentCameraTarget;
-    CVector                 m_vecLastSentCameraPosition;
-    CVector                 m_vecLastSentCameraLookAt;
+    CElapsedTime            m_CameraSyncTimer;
 
     CInterpolator<CVector>  m_Interpolator;
 
