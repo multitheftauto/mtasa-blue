@@ -3562,7 +3562,6 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
     {
         pPlayer->NotifyReceivedSync ();
 
-        // This might need to be time-contexted
         CPlayerCamera * pCamera = pPlayer->GetCamera ();
 
         if ( Packet.m_bFixed )

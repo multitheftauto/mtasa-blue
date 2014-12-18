@@ -33,9 +33,6 @@ CNetAPI::CNetAPI ( CClientManager* pManager )
 
     m_ulLastPuresyncTime = 0;
     m_ulLastSyncReturnTime = 0;
-    m_bLastSentCameraMode = true;       // start out in fixed mode
-    m_pLastSentCameraTarget = NULL;
-    m_ulLastCameraSyncTime = 0;
     m_bStoredReturnSync = false;
     m_bIncreaseTimeoutTime = false;
 }
@@ -574,45 +571,11 @@ bool CNetAPI::IsPureSyncNeeded ( void )
 
 bool CNetAPI::IsCameraSyncNeeded ()
 {
-    CClientCamera * pCamera = m_pManager->GetCamera ();
-    if ( pCamera->IsInFixedMode () )
+    // Camera sync is sent at a constant rate even if there are no changes because the server does not issue a receipt
+    if ( m_CameraSyncTimer.Get() > CAM_SYNC_RATE )
     {
-        CVector vecPosition, vecLookAt;
-        pCamera->GetPosition ( vecPosition );
-        pCamera->GetFixedTarget ( vecLookAt );
-        // Is the camera at a different place?
-        if ( m_vecLastSentCameraPosition != vecPosition || m_vecLastSentCameraLookAt != vecLookAt )
-        {
-            // Has it been long enough since our last sync?
-            unsigned long ulCurrentTime = CClientTime::GetTime ();
-            if ( ulCurrentTime >= m_ulLastCameraSyncTime + CAM_SYNC_RATE )
-            {
-                m_ulLastCameraSyncTime = ulCurrentTime;
-                m_bLastSentCameraMode = true;
-                m_vecLastSentCameraPosition = vecPosition;
-                m_vecLastSentCameraLookAt = vecLookAt;
-                
-                return true;
-            }
-        }
-    }
-    else
-    {
-        // We're in player mode.
-        if ( m_bLastSentCameraMode == true ||
-             pCamera->GetFocusedPlayer () != m_pLastSentCameraTarget )
-        {
-            // Something changed (mode has become "player", or different target)
-            // Has it been long enough since our last sync?
-            unsigned long ulCurrentTime = CClientTime::GetTime ();
-            if ( ulCurrentTime >= m_ulLastCameraSyncTime + CAM_SYNC_RATE )
-            {
-                m_ulLastCameraSyncTime = ulCurrentTime;
-                m_bLastSentCameraMode = false;
-                m_pLastSentCameraTarget = pCamera->GetFocusedPlayer ();
-                return true;
-            }
-        }
+        m_CameraSyncTimer.Reset();
+        return true;
     }
 
     return false;
@@ -2011,6 +1974,9 @@ void CNetAPI::WriteFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamI
 void CNetAPI::WriteCameraSync ( NetBitStreamInterface& BitStream )
 {
     CClientCamera* pCamera = m_pManager->GetCamera ();
+
+    if ( BitStream.Version() >= 0x05E )
+        BitStream.Write ( pCamera->GetSyncTimeContext() );
 
     // Are we in fixed mode?
     bool bFixed = pCamera->IsInFixedMode ();

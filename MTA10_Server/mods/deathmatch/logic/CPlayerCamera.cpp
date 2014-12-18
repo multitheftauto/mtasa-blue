@@ -18,6 +18,7 @@ CPlayerCamera::CPlayerCamera ( CPlayer * pPlayer )
     m_fRotation = 0.0f;
     m_ucInterior = 0;
     m_pTarget = pPlayer;
+    m_ucSyncTimeContext = 0;
 
     // We start off at chilliad
     m_Mode = CAMERAMODE_FIXED;
@@ -118,9 +119,12 @@ void CPlayerCamera::SetTarget ( CElement* pElement )
     if ( !pElement )
         pElement = m_pPlayer;
 
-    if ( m_pTarget ) m_pTarget->m_FollowingCameras.remove ( this );
-    if ( pElement ) pElement->m_FollowingCameras.push_back ( this );
-    m_pTarget = pElement;
+    if ( m_pTarget != pElement )
+    {
+        if ( m_pTarget ) m_pTarget->m_FollowingCameras.remove ( this );
+        if ( pElement ) pElement->m_FollowingCameras.push_back ( this );
+        m_pTarget = pElement;
+    }
 }
 
 
@@ -139,3 +143,20 @@ void CPlayerCamera::SetRotation ( CVector & vecRotation )
     m_vecLookAt = vecNormal;
 }
 
+
+uchar CPlayerCamera::GenerateSyncTimeContext( void )
+{
+    // Increment the sync time index (skipping 0)
+    m_ucSyncTimeContext = Max( 1, m_ucSyncTimeContext + 1 );
+    return m_ucSyncTimeContext;
+}
+
+
+bool CPlayerCamera::CanUpdateSync( uchar ucRemote )
+{
+    // We can update this camera's sync only if the sync time
+    // matches or either of them are 0 (ignore).
+    return ( m_ucSyncTimeContext == ucRemote ||
+             ucRemote == 0 ||
+             m_ucSyncTimeContext == 0 );
+}

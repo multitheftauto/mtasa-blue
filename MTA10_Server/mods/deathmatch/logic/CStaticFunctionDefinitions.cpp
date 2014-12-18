@@ -4506,6 +4506,8 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CElement* pElement, const CVe
         
         // Tell the player
         CBitStream BitStream;
+        if ( pPlayer->GetBitStreamVersion() >= 0x5E )
+            BitStream.pBitStream->Write ( pCamera->GenerateSyncTimeContext() );
         BitStream.pBitStream->Write ( vecPosition.fX );
         BitStream.pBitStream->Write ( vecPosition.fY );
         BitStream.pBitStream->Write ( vecPosition.fZ );
@@ -4549,6 +4551,8 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CElement* pElement, CElement*
             pCamera->SetFOV ( 70.0f );
 
             CBitStream BitStream;
+            if ( pPlayer->GetBitStreamVersion() >= 0x5E )
+                BitStream.pBitStream->Write ( pCamera->GenerateSyncTimeContext() );
             BitStream.pBitStream->Write ( pTarget->GetID () );
             pPlayer->Send ( CLuaPacket ( SET_CAMERA_TARGET, *BitStream.pBitStream ) );
             return true;

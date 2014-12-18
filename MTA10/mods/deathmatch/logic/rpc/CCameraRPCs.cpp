@@ -24,6 +24,13 @@ void CCameraRPCs::LoadFunctions ( void )
 
 void CCameraRPCs::SetCameraMatrix ( NetBitStreamInterface& bitStream )
 {
+    if ( bitStream.Version() >= 0x5E )
+    {
+        uchar ucTimeContext;
+        if ( bitStream.Read( ucTimeContext ) )
+            m_pCamera->SetSyncTimeContext( ucTimeContext );
+    }
+
     CVector vecPosition, vecLookAt;
     float fRoll = 0.0f;
     float fFOV = 70.0f;
@@ -50,6 +57,13 @@ void CCameraRPCs::SetCameraMatrix ( NetBitStreamInterface& bitStream )
 
 void CCameraRPCs::SetCameraTarget ( NetBitStreamInterface& bitStream )
 {
+    if ( bitStream.Version() >= 0x5E )
+    {
+        uchar ucTimeContext;
+        if ( bitStream.Read( ucTimeContext ) )
+            m_pCamera->SetSyncTimeContext( ucTimeContext );
+    }
+
     ElementID targetID;
     if ( bitStream.Read ( targetID ) )
     {
