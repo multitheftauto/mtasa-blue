@@ -147,7 +147,7 @@ void CPlayerCamera::SetRotation ( CVector & vecRotation )
 uchar CPlayerCamera::GenerateSyncTimeContext( void )
 {
     // Increment the sync time index (skipping 0)
-    m_ucSyncTimeContext = Max( 1, m_ucSyncTimeContext + 1 );
+    m_ucSyncTimeContext = Max < uchar > ( 1, m_ucSyncTimeContext + 1 );
     return m_ucSyncTimeContext;
 }
 
