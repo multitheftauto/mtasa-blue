@@ -2445,6 +2445,45 @@ bool CVehicleSA::GetComponentPosition ( SString vehicleComponent, CVector &vecPo
             vecPositionModelling += CVector ( pParent->modelling.pos.x, pParent->modelling.pos.y, pParent->modelling.pos.z );
         }
 
+        ///////////////////////////////////////////////////
+        // Test theorem 3000
+        std::vector < RwFrame* > frameList;
+
+        // Get frame list from this component down to the base
+        {
+            RwFrame* pFrame = Component.pFrame;
+            frameList.push_back( pFrame );
+
+            RwFrame* pParent = (RwFrame*)pFrame->object.parent;
+            for( ; pParent && pParent != pParent->root ; pParent = (RwFrame*)pParent->object.parent )
+            {
+                // Get parent frame by name from our list instead of the RwFrame structure
+                SVehicleFrame realVehicleFrame;
+                if ( GetVehicleComponent ( pParent->szName, realVehicleFrame ) && realVehicleFrame.pFrame != NULL )
+                {
+                    frameList.push_back( realVehicleFrame.pFrame );
+                }
+            }
+        }
+
+        CMatrix matCombo;
+        // Step though frames backwards
+        for( uint i = 0 ; i < frameList.size() ; i++ )
+        {
+            RwFrame* pFrame = frameList[ frameList.size() - i - 1 ];
+            CMatrix matFrame;
+            matFrame.vRight = CVector( pFrame->modelling.right.x, pFrame->modelling.right.y, pFrame->modelling.right.z );
+            matFrame.vFront = CVector( pFrame->modelling.up.x, pFrame->modelling.up.y, pFrame->modelling.up.z );
+            matFrame.vUp = CVector( pFrame->modelling.at.x, pFrame->modelling.at.y, pFrame->modelling.at.z );
+            matFrame.vPos = CVector( pFrame->modelling.pos.x, pFrame->modelling.pos.y, pFrame->modelling.pos.z );
+
+            matCombo = matFrame * matCombo;
+        }
+
+        vecPositionModelling = matCombo.GetPosition();
+        // Test theorem 3000 END
+        ///////////////////////////////////////////////////
+
         return true;
     }
     return false;
