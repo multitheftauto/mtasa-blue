@@ -9840,9 +9840,10 @@ int CLuaFunctionDefinitions::GetTickCount_ ( lua_State* luaVM )
 
 int CLuaFunctionDefinitions::GetCTime ( lua_State* luaVM )
 {
-    // table getRealTime( [int seconds = current] )
+    // table getRealTime( [int seconds = current], bool localTime = true )
     time_t timer;
     time ( &timer );
+    bool bLocalTime = true;
     CScriptArgReader argStream ( luaVM );
 
     if ( argStream.NextCouldBeNumber ( ) )
@@ -9854,7 +9855,15 @@ int CLuaFunctionDefinitions::GetCTime ( lua_State* luaVM )
         }
     }
 
-    tm * time = localtime ( &timer );
+    if ( argStream.NextIsBool() )
+        argStream.ReadBool( bLocalTime );
+
+    tm * time;
+    if ( bLocalTime )
+        time = localtime( &timer );
+    else
+        time = gmtime( &timer );
+
     if ( time == NULL )
         argStream.SetCustomError ( "seconds is out of range" );
 
