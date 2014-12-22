@@ -447,13 +447,23 @@ void CClientStreamer::Restream ( bool bMovedFar )
             if ( IS_VEHICLE ( pElement ) )
             {
                 CClientVehicle* pVehicle = DynamicCast < CClientVehicle > ( pElement );
-                if ( pVehicle && pVehicle->GetOccupant ( ) && IS_PLAYER ( pVehicle->GetOccupant ( ) ))
+                if ( pVehicle )
                 {
-                    CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pVehicle->GetOccupant ( ) );
-                    if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
+                    if ( pVehicle->GetOccupant ( ) && IS_PLAYER ( pVehicle->GetOccupant ( ) ) )
                     {
-                        // if the last packet was ls he shouldn't be streamed in
-                        m_ToStreamOut.push_back ( pElement );
+                        CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pVehicle->GetOccupant ( ) );
+                        if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
+                        {
+                            // if the last packet was ls he shouldn't be streamed in
+                            m_ToStreamOut.push_back ( pElement );
+                        }
+                    }
+
+                    // Is this a trailer?
+                    if ( pVehicle->GetTowedByVehicle ( ) != NULL )
+                    {
+                        // Don't stream it out (this is handled by the towing vehicle)
+                        continue;
                     }
                 }
             }
@@ -462,7 +472,7 @@ void CClientStreamer::Restream ( bool bMovedFar )
                 CClientPlayer* pPlayer = DynamicCast < CClientPlayer > ( pElement );
                 if ( pPlayer->GetLastPuresyncType ( ) == PURESYNC_TYPE_LIGHTSYNC )
                 {
-                    // if the last packet was ls he isn'tshouldn't be streamed in
+                    // if the last packet was ls he isn't/shouldn't be streamed in
                     m_ToStreamOut.push_back ( pElement );
                 }
             }
