@@ -316,7 +316,7 @@ public:
     inline float                    GetRespawnHealth        ( void )                        { return m_fRespawnHealth; };
     inline void                     SetRespawnHealth        ( float fHealth )               { m_fRespawnHealth = fHealth; };
     inline bool                     GetRespawnEnabled       ( void )                        { return m_bRespawnEnabled; }
-    void                            SetRespawnEnabled       ( bool bEnabled )               { m_bRespawnEnabled = bEnabled; }
+    void                            SetRespawnEnabled       ( bool bEnabled );
     void                            SetBlowRespawnInterval  ( unsigned long ulTime )        { m_ulBlowRespawnInterval = ulTime; }
     void                            SetIdleRespawnInterval  ( unsigned long ulTime )        { m_ulIdleRespawnInterval = ulTime; }
 

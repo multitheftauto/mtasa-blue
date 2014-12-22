@@ -825,67 +825,67 @@ bool CMapManager::ParseVisibleToData ( CPerPlayerEntity& Entity, char* szData )
 
 void CMapManager::DoVehicleRespawning ( void )
 {
-    // TODO: needs speeding up (no good looping through thousands of vehicles each frame)
-
     CVehicleSpawnPacket VehicleSpawnPacket;
 
-    // Loop through all the vehicles
-    list < CVehicle* > ::const_iterator iter = m_pVehicleManager->IterBegin ();
-    while ( iter != m_pVehicleManager->IterEnd () )
+    // Loop through all vehicles with respawn enabled
+    list < CVehicle* >& respawnEnabledList = m_pVehicleManager->GetRespawnEnabledVehicles ( );
+
+    list < CVehicle* > ::const_iterator iter = respawnEnabledList.begin ( );
+    for ( ; iter != respawnEnabledList.end ( ); ++iter )
     {
-        CVehicle* pVehicle = *iter++;
+        CVehicle* pVehicle = *iter;
 
-        // It's been set to respawn
-        if ( pVehicle->GetRespawnEnabled () )
+        // No need to respawn vehicles if they're being deleted anyway
+        if ( pVehicle->IsBeingDeleted ( ) )
+            continue;
+
+        // Did we get deserted?
+        bool bDeserted = ( !pVehicle->GetFirstOccupant ( ) );
+        bool bRespawn = false;
+        bool bExploded = false;
+
+        if ( bDeserted )
         {
-            // Did we get deserted?
-            bool bDeserted = ( !pVehicle->GetFirstOccupant () );
-            bool bRespawn = false;
-            bool bExploded = false;
-
-            if ( bDeserted )
-            {
-                // If moved, or idle timer not running, restart idle timer
-                if ( !pVehicle->IsStationary () || !pVehicle->IsIdleTimerRunning () )
-                    pVehicle->RestartIdleTimer ();
-            }
-            else
-            {
-                // Stop idle timer if car is occupied
-                pVehicle->StopIdleTimer ();
-            }
+            // If moved, or idle timer not running, restart idle timer
+            if ( !pVehicle->IsStationary ( ) || !pVehicle->IsIdleTimerRunning ( ) )
+                pVehicle->RestartIdleTimer ( );
+        }
+        else
+        {
+            // Stop idle timer if car is occupied
+            pVehicle->StopIdleTimer ( );
+        }
 
 
-            // Been blown long enough?
-            if ( pVehicle->IsBlowTimerFinished () )
-            {
+        // Been blown long enough?
+        if ( pVehicle->IsBlowTimerFinished ( ) )
+        {
+            bRespawn = true;
+            bExploded = true;
+        }
+
+        // Been deserted long enough?
+        else if ( bDeserted && pVehicle->IsIdleTimerFinished ( ) )
+        {
+            // Check is far enough away from respawn point (Ignore first 20 units on z)
+            CVector vecDif = pVehicle->GetRespawnPosition ( ) - pVehicle->GetPosition ( );
+            vecDif.fZ = Max ( 0.f, fabsf ( vecDif.fZ ) - 20.f );
+            if ( vecDif.LengthSquared ( ) > 2 * 2 )
                 bRespawn = true;
-                bExploded = true;
-            }
+            pVehicle->StopIdleTimer ( );
+        }
 
-            // Been deserted long enough?
-            else if ( bDeserted && pVehicle->IsIdleTimerFinished () )
-            {
-                // Check is far enough away from respawn point (Ignore first 20 units on z)
-                CVector vecDif = pVehicle->GetRespawnPosition () - pVehicle->GetPosition ();
-                vecDif.fZ = Max ( 0.f, fabsf ( vecDif.fZ ) - 20.f );
-                if ( vecDif.LengthSquared () > 2 * 2 )
-                    bRespawn = true;
-                pVehicle->StopIdleTimer ();
-            }
+        // Need to respawn?
+        if ( bRespawn )
+        {
+            // Respawn it and add it to the packet
+            pVehicle->Respawn ( );
+            VehicleSpawnPacket.Add ( pVehicle );
 
-            // Need to respawn?
-            if ( bRespawn )
-            {
-                // Respawn it and add it to the packet
-                pVehicle->Respawn ();
-                VehicleSpawnPacket.Add ( pVehicle );
-    
-                // Call the respawn event
-                CLuaArguments Arguments;
-                Arguments.PushBoolean ( bExploded );
-                pVehicle->CallEvent ( "onVehicleRespawn", Arguments );
-            }
+            // Call the respawn event
+            CLuaArguments Arguments;
+            Arguments.PushBoolean ( bExploded );
+            pVehicle->CallEvent ( "onVehicleRespawn", Arguments );
         }
     }
 

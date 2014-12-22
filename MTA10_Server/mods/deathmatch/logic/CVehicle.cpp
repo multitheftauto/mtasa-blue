@@ -170,6 +170,10 @@ CVehicle::~CVehicle ( void )
 
     CElementRefManager::RemoveElementRefs ( ELEMENT_REF_DEBUG ( this, "CVehicle" ), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL );
 
+    // Notify the vehicle manager that we are not to be respawned anymore if neccessary
+    if ( m_bRespawnEnabled )
+        m_pVehicleManager->GetRespawnEnabledVehicles ( ).remove ( this );
+
     // Remove us from the vehicle manager
     Unlink ();
 }
@@ -967,5 +971,19 @@ void CVehicle::HandleDimensionResync ( void )
         // Unoccupied vehicle might be desynced because of dimension optimizations, so resync to players in new dimension
         g_pGame->GetPlayerManager()->BroadcastDimensionOnlyJoined( CVehicleResyncPacket( this ), GetDimension() );
         m_bNeedsDimensionResync = false;
+    }
+}
+
+void CVehicle::SetRespawnEnabled ( bool bEnabled )
+{ 
+    // If we changed the state, update the internal var and notify the vehicle manager
+    if ( bEnabled != m_bRespawnEnabled )
+    {
+        if ( bEnabled ) 
+            m_pVehicleManager->GetRespawnEnabledVehicles ( ).push_back ( this );
+        else 
+            m_pVehicleManager->GetRespawnEnabledVehicles ( ).remove ( this );
+
+        m_bRespawnEnabled = bEnabled;
     }
 }
