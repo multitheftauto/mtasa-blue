@@ -64,6 +64,8 @@ public:
     list < CVehicle* > ::const_iterator IterBegin                   ( void )                            { return m_List.begin (); };
     list < CVehicle* > ::const_iterator IterEnd                     ( void )                            { return m_List.end (); };
 
+    list < CVehicle* >&                 GetRespawnEnabledVehicles   ( void )                            { return m_RespawnEnabledVehicles; };
+
 private:
     inline void                         AddToList                   ( CVehicle* pVehicle )              { m_List.push_back ( pVehicle ); };
     void                                RemoveFromList              ( CVehicle* pVehicle );
@@ -71,6 +73,7 @@ private:
     CVehicleColorManager                m_ColorManager;
 
     list < CVehicle* >                  m_List;
+    list < CVehicle* >                  m_RespawnEnabledVehicles;
 };
 
 #endif
