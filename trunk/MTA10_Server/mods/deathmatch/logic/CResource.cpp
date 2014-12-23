@@ -385,9 +385,9 @@ void ReplaceSlashes ( char* szPath )
 
 bool CResource::Unload ( void )
 {
-    Stop(true);
+    Stop ( true );
 
-    TidyUp();
+    TidyUp ( );
     m_bLoaded = false;
     m_bHasStarted = false;
 
@@ -395,6 +395,12 @@ bool CResource::Unload ( void )
     {
         delete m_pNodeStorage;
         m_pNodeStorage = NULL;
+    }
+
+    if ( m_pNodeSettings )
+    {
+        delete m_pNodeSettings;
+        m_pNodeSettings = NULL;
     }
 
     m_strResourceZip = "";
