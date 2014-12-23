@@ -775,8 +775,8 @@ public:
     bool                        SetComponentPosition            ( SString vehicleComponent, CVector vecPosition );
     bool                        GetComponentPosition            ( SString vehicleComponent, CVector &vecPositionModelling ); 
     bool                        IsComponentPresent              ( SString vehicleComponent );
-    bool                        GetComponentMatrix              ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
-    bool                        SetComponentMatrix              ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling );
+    bool                        SetComponentMatrix              ( const SString& vehicleComponent, const CMatrix& matOrientation );
+    bool                        GetComponentMatrix              ( const SString& vehicleComponent, CMatrix& matOutOrientation );
     bool                        SetComponentVisible             ( SString vehicleComponent, bool bVisible );
     void                        AddComponent                    ( RwFrame * pFrame, bool bReadOnly );
     bool                        GetComponentVisible             ( SString vehicleComponent, bool &bVisible );
@@ -788,8 +788,8 @@ public:
 private:
     void                        RecalculateSuspensionLines          ( void );
     void                        CopyGlobalSuspensionLinesToPrivate  ( void );
-    bool                        GetVehicleComponent                 ( SString vehicleComponent, SVehicleFrame &Frame );
-
+    SVehicleFrame*              GetVehicleComponent                 ( const SString& vehicleComponent );
+    void                        FinalizeFramesList                  ( void );
 };
 
 #endif
