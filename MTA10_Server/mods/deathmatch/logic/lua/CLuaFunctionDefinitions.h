@@ -513,6 +513,7 @@ public:
     static int      ResendPlayerModInfo                 ( lua_State* luaVM );
 
     // Database funcs
+    static void     DbQueryCallback                     ( CDbJobData* pJobData, void* pContext );
     static int      DbConnect                           ( lua_State* luaVM );
     static int      DbExec                              ( lua_State* luaVM );
     static int      DbQuery                             ( lua_State* luaVM );

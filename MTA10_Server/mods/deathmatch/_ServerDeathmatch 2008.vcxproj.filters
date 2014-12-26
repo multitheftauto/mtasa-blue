@@ -897,9 +897,6 @@
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp">
       <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
@@ -928,6 +925,9 @@
       <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp">
+      <Filter>Source Files\logic\oopdefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp">
       <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>
   </ItemGroup>

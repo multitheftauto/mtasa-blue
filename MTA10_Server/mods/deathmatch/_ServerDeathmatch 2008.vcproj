@@ -1639,7 +1639,7 @@
 							>
 						</File>
 						<File
-							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp"
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp"
 							>
 						</File>
 						<File

@@ -456,7 +456,7 @@
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp" />
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp" />
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="StdInc.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
