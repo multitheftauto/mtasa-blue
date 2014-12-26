@@ -10862,7 +10862,7 @@ int CLuaFunctionDefinitions::ExecuteSQLInsert ( lua_State* luaVM )
 //
 
 // Handle directing callback for DbQuery
-static void DbQueryCallback ( CDbJobData* pJobData, void* pContext )
+void CLuaFunctionDefinitions::DbQueryCallback ( CDbJobData* pJobData, void* pContext )
 {
     CLuaCallback* pLuaCallback = (CLuaCallback*)pContext;
     if ( pJobData->stage == EJobStage::RESULT )
@@ -10997,7 +10997,7 @@ int CLuaFunctionDefinitions::DbConnect ( lua_State* luaVM )
     return 1;
 }
 
-
+// This method has an OOP counterpart - don't forget to update the OOP code too!
 int CLuaFunctionDefinitions::DbQuery ( lua_State* luaVM )
 {
 //  handle dbQuery ( [ function callbackFunction, [ table callbackArguments, ] ] element connection, string query, ... )

@@ -46,6 +46,9 @@ public:
 
     // Marker
     LUA_DECLARE ( GetMarkerTarget );
+
+    // Connection
+    LUA_DECLARE ( DbQuery );
 };
 
 #endif
