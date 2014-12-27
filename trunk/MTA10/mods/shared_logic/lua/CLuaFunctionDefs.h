@@ -947,6 +947,7 @@ public:
     LUA_DECLARE ( InterpolateBetween );
 
     // Map funcs
+    LUA_DECLARE ( ForcePlayerMap );
     LUA_DECLARE ( IsPlayerMapForced );
     LUA_DECLARE ( IsPlayerMapVisible );
     LUA_DECLARE ( GetPlayerMapBoundingBox );
