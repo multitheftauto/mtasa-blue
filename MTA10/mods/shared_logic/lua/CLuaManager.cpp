@@ -1120,6 +1120,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "interpolateBetween", CLuaFunctionDefs::InterpolateBetween );
 
     // Map funcs
+    CLuaCFunctions::AddFunction ( "forcePlayerMap", CLuaFunctionDefs::ForcePlayerMap );
     CLuaCFunctions::AddFunction ( "isPlayerMapForced", CLuaFunctionDefs::IsPlayerMapForced );
     CLuaCFunctions::AddFunction ( "isPlayerMapVisible", CLuaFunctionDefs::IsPlayerMapVisible );
     CLuaCFunctions::AddFunction ( "getPlayerMapBoundingBox", CLuaFunctionDefs::GetPlayerMapBoundingBox );

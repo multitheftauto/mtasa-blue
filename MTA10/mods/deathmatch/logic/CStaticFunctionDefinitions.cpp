@@ -7121,6 +7121,13 @@ bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 }
 
 
+bool CStaticFunctionDefinitions::ForcePlayerMap ( bool & bForced )
+{
+    m_pClientGame->GetRadarMap ()->SetForcedState ( bForced );
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::IsPlayerMapForced ( bool & bForced )
 {
     bForced = m_pRadarMap->GetForcedState ();

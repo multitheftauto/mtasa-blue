@@ -598,6 +598,7 @@ public:
     static bool                         GetTickCount_                       ( double& dCount );
 
     // Map funcs
+    static bool                         ForcePlayerMap                      ( bool & bForced );
     static bool                         IsPlayerMapForced                   ( bool & bForced );
     static bool                         IsPlayerMapVisible                  ( bool & bVisible );
     static bool                         GetPlayerMapBoundingBox             ( CVector &vecMin, CVector &vecMax );

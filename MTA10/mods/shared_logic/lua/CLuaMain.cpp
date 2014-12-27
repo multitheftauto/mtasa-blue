@@ -517,6 +517,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getSerial", "getPlayerSerial" );
     lua_classfunction ( luaVM, "getWantedLevel", "getPlayerWantedLevel" );
     lua_classfunction ( luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox" );
+    lua_classfunction ( luaVM, "forceMap", "forcePlayerMap" );
     lua_classfunction ( luaVM, "isMapForced", "isPlayerMapForced" );
     lua_classfunction ( luaVM, "isMapVisible", "isPlayerMapVisible" );
     lua_classfunction ( luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible" );
