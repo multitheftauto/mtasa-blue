@@ -151,8 +151,14 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isLowLOD", "isElementLowLOD" );
     lua_classfunction ( luaVM, "isDoubleSided", "isElementDoubleSided" );
     lua_classfunction ( luaVM, "isVisibleTo", "isElementVisibleTo" );
+    lua_classfunction ( luaVM, "isCollidableWith", "isElementCollidableWith" );
     lua_classfunction ( luaVM, "isAttached", "isElementAttached" );
     lua_classfunction ( luaVM, "isCallPropagationEnabled", "isElementCallPropagationEnabled" );
+    lua_classfunction ( luaVM, "isWaitingForGroundToLoad", "isElementWaitingForGroundToLoad" );
+    lua_classfunction ( luaVM, "isOnScreen", "isElementOnScreen" );
+    lua_classfunction ( luaVM, "isStreamable", "isElementStreamable" );
+    lua_classfunction ( luaVM, "isLocal", "isElementLocal" );
+    lua_classfunction ( luaVM, "isSyncer", "isElementSyncer" );
     lua_classfunction ( luaVM, "getChildren", "getElementChildren" );
     lua_classfunction ( luaVM, "getChild", "getElementChild" );
     lua_classfunction ( luaVM, "getChildrenCount", "getElementChildrenCount" );
@@ -166,6 +172,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getVelocity", CLuaOOPDefs::GetElementVelocity );
     lua_classfunction ( luaVM, "getByType", "getElementsByType" );
     lua_classfunction ( luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "getElementDistanceFromCentreOfMassToBaseOfModel" );
+    lua_classfunction ( luaVM, "getRadius", "getElementRadius" );
     lua_classfunction ( luaVM, "getType", "getElementType" );
     lua_classfunction ( luaVM, "getInterior", "getElementInterior" );
     lua_classfunction ( luaVM, "getWithinColShape", "getElementsWithinColShape" );
@@ -175,7 +182,6 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getAlpha", "getElementAlpha" );
     lua_classfunction ( luaVM, "getHealth", "getElementHealth" );
     lua_classfunction ( luaVM, "getModel", "getElementModel" );
-    lua_classfunction ( luaVM, "getSyncer", "getElementSyncer" );
     lua_classfunction ( luaVM, "getLowLOD", "getLowLODElement" );
     lua_classfunction ( luaVM, "getAttachedElements", "getAttachedElements" );
     lua_classfunction ( luaVM, "getAttachedTo", "getElementAttachedTo" );
@@ -200,10 +206,15 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setCollisionsEnabled", "setElementCollisionsEnabled" );
     lua_classfunction ( luaVM, "setCollidableWith", "setElementCollidableWith" );
     lua_classfunction ( luaVM, "setFrozen", "setElementFrozen" );
-    lua_classfunction ( luaVM, "setLowLOD", "setLowLOD" );
+    lua_classfunction ( luaVM, "setLowLOD", "setLowLODElement" );
     lua_classfunction ( luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled" );
+    lua_classfunction ( luaVM, "setStreamable", "setElementStreamable" );
 
     lua_classvariable ( luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled" );
+    lua_classvariable ( luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad" );
+    lua_classvariable ( luaVM, "onScreen", NULL, "isElementOnScreen" );
+    lua_classvariable ( luaVM, "streamable", "setElementStreamable", "isElementStreamable" );
+    lua_classvariable ( luaVM, "localElement", NULL, "isElementLocal" );
     lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
     lua_classvariable ( luaVM, "type", NULL, "getElementType" );
     lua_classvariable ( luaVM, "colShape", NULL, "getElementColShape" );
@@ -214,7 +225,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "alpha", "setElementAlpha", "getElementAlpha" );
     lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
     lua_classvariable ( luaVM, "model", "setElementModel", "getElementModel" );
-    lua_classvariable ( luaVM, "syncer", NULL, "isElementSyncer" );
+    lua_classvariable ( luaVM, "syncer", NULL, "isElementSyncer" ); // misleading!
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classvariable ( luaVM, "frozen", "setElementFrozen", "isElementFrozen" );
     lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
@@ -222,6 +233,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
     lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
     lua_classvariable ( luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "getElementDistanceFromCentreOfMassToBaseOfModel" );
+    lua_classvariable ( luaVM, "radius", NULL, "getElementRadius" );
     lua_classvariable ( luaVM, "childrenCount", NULL, "getElementChildrenCount" );
     lua_classvariable ( luaVM, "position", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
     lua_classvariable ( luaVM, "rotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
@@ -268,6 +280,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getPlateText", "getVehiclePlateText" );
     lua_classfunction ( luaVM, "getOccupants", "getVehicleOccupants" );
     lua_classfunction ( luaVM, "getHelicopterRotorSpeed", "getHelicopterRotorSpeed" );
+    lua_classfunction ( luaVM, "areHeliBladeCollisionsEnabled", "getHeliBladeCollisionsEnabled" );
     lua_classfunction ( luaVM, "getPaintjob", "getVehiclePaintjob" );
     lua_classfunction ( luaVM, "getTurretPosition", "getVehicleTurretPosition" );
     lua_classfunction ( luaVM, "getWheelStates", "getVehicleWheelStates" );
@@ -304,6 +317,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setLocked", "setVehicleLocked" );
     lua_classfunction ( luaVM, "setDamageProof", "setVehicleDamageProof" );
     lua_classfunction ( luaVM, "setHelicopterRotorSpeed", "setHelicopterRotorSpeed" );
+    lua_classfunction ( luaVM, "setHeliBladeCollisionsEnabled", "setHeliBladeCollisionsEnabled" );
     lua_classfunction ( luaVM, "setPaintjob", "setVehiclePaintjob" );
     lua_classfunction ( luaVM, "setTurretPosition", "setVehicleTurretPosition" );
     lua_classfunction ( luaVM, "setWheelStates", "setVehicleWheelStates" );
@@ -351,6 +365,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "onGround", NULL, "isVehicleOnGround" );
     lua_classvariable ( luaVM, "damageProof", NULL, "isVehicleDamageProof" );
     lua_classvariable ( luaVM, "helicopterRotorSpeed", "setHelicopterRotorSpeed", "getHelicopterRotorSpeed" );
+    lua_classvariable ( luaVM, "heliBladeCollisionsEnabled", "setHeliBladeCollisionsEnabled", "areHeliBladeCollisionsEnabled" );
     lua_classvariable ( luaVM, "sirensOn", "setVehicleSirensOn", "getVehicleSirensOn" );
     lua_classvariable ( luaVM, "sirens", NULL, "getVehicleSirens" );
     lua_classvariable ( luaVM, "upgrades", NULL, "getVehicleUpgrades" );
@@ -452,7 +467,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setAnimationProgress", "setPedAnimationProgress" );
     lua_classfunction ( luaVM, "setCameraRotation", "setPedCameraRotation" );
     lua_classfunction ( luaVM, "setControlState", "setPedControlState" );
-    lua_classfunction ( luaVM, "warpIntoVehicle", "warpIntoVehicle" );
+    lua_classfunction ( luaVM, "warpIntoVehicle", "warpPedIntoVehicle" );
     lua_classfunction ( luaVM, "setOxygenLevel", "setPedOxygenLevel" );
     lua_classfunction ( luaVM, "setWeaponSlot", "setPedWeaponSlot" );
     lua_classfunction ( luaVM, "setDoingGangDriveby", "setPedDoingGangDriveby" );
@@ -482,7 +497,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "headless", "setPedHeadless", "isPedHeadless" );
     lua_classvariable ( luaVM, "inVehicle", NULL, "isPedInVehicle" );
     lua_classvariable ( luaVM, "onFire", "setPedOnFire", "isPedOnFire" );
-    lua_classvariable ( luaVM, "onGround", NULL, "isOnGround" );
+    lua_classvariable ( luaVM, "onGround", NULL, "isPedOnGround" );
     lua_classvariable ( luaVM, "dead", NULL, "isPedDead" );
     lua_classvariable ( luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled" );
     lua_classvariable ( luaVM, "footBlood", "setPedFootBloodEnabled", NULL );
@@ -759,8 +774,12 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     
     lua_classfunction ( luaVM, "create", "createWater" );
     lua_classfunction ( luaVM, "testLineAgainst", "testLineAgainstWater" );
+    lua_classfunction ( luaVM, "isDrawnLast", "isWaterDrawnLast" ); // Drawn last property affects all water instances
+    lua_classfunction ( luaVM, "setDrawnLast", "setWaterDrawnLast" );
     
-    lua_classfunction ( luaVM, "isDrawnLast", "isWaterDrawnLast" );
+    // Static variables (not implemented yet!)
+    //lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
+
     lua_classfunction ( luaVM, "getLevel", "getWaterLevel" );
     lua_classfunction ( luaVM, "getVertexPosition", "getWaterVertexPosition" );
     lua_classfunction ( luaVM, "getWaveHeight", "getWaveHeight" );
@@ -770,14 +789,12 @@ void CLuaMain::AddWaterClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setColor", "setWaterColor" );
     lua_classfunction ( luaVM, "setVertexPosition", "setWaterVertexPosition" );
     lua_classfunction ( luaVM, "setLevel", "setWaterLevel" );
-    lua_classfunction ( luaVM, "setDrawnLast", "setWaterDrawnLast" );
 
     lua_classfunction ( luaVM, "resetColor", "resetWaterColor" );
     lua_classfunction ( luaVM, "resetLevel", "resetWaterLevel" );
     
     lua_classvariable ( luaVM, "level", "setWaterLevel", "getWaterLevel" );
     lua_classvariable ( luaVM, "height", "setWaveHeight", "getWaveHeight" );
-    lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
     //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" );
 
     lua_registerclass ( luaVM, "Water", "Element" );
@@ -790,6 +807,7 @@ void CLuaMain::AddSoundClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
     
     lua_classfunction ( luaVM, "create", "playSound" );
+    lua_classfunction ( luaVM, "playFrontEnd", "playSoundFrontEnd" );
     lua_classfunction ( luaVM, "stop", "stopSound" );
 
     lua_classfunction ( luaVM, "isPaused", "isSoundPaused" );
@@ -799,6 +817,7 @@ void CLuaMain::AddSoundClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setVolume", "setSoundVolume" );
     lua_classfunction ( luaVM, "setPaused", "setSoundPaused" );
     lua_classfunction ( luaVM, "setPan", "setSoundPan" );
+    lua_classfunction ( luaVM, "setPannningEnabled", "setSoundPanningEnabled" );
     lua_classfunction ( luaVM, "setProperties", "setSoundProperties" );
 
     lua_classfunction ( luaVM, "getLength", "getSoundLength" );
@@ -812,6 +831,7 @@ void CLuaMain::AddSoundClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getSpeed", "getSoundSpeed" );
     lua_classfunction ( luaVM, "getVolume", "getSoundVolume" );
     lua_classfunction ( luaVM, "getPan", "getSoundPan" );
+    lua_classfunction ( luaVM, "isPanningEnabled", "isSoundPanningEnabled" );
     lua_classfunction ( luaVM, "getProperties", "getSoundProperties" );
     
     lua_classvariable ( luaVM, "playbackPosition", "setSoundPosition", "getSoundPosition" );
@@ -819,6 +839,7 @@ void CLuaMain::AddSoundClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "volume", "setSoundVolume", "getSoundVolume" );
     lua_classvariable ( luaVM, "paused", "setSoundPaused", "isSoundPaused" );
     lua_classvariable ( luaVM, "pan", "setSoundPan", "getSoundPan" );
+    lua_classvariable ( luaVM, "panningEnabled", "setSoundPanningEnabled", "isSoundPanningEnabled" );
     lua_classvariable ( luaVM, "length", NULL, "getSoundLength" );
 
     lua_registerclass ( luaVM, "Sound", "Element" );
@@ -1537,11 +1558,13 @@ void CLuaMain::AddDxShaderClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
     
-    lua_classfunction ( luaVM, "create", "dxCreateShader");
+    lua_classfunction ( luaVM, "create", "dxCreateShader" );
+    lua_classfunction ( luaVM, "applyToWorldTexture", "engineApplyShaderToWorldTexture" );
+    lua_classfunction ( luaVM, "removeFromWorldTexture", "engineRemoveShaderFromWorldTexture" );
     
-    lua_classfunction ( luaVM, "setValue", "dxSetShaderValue");
-    lua_classfunction ( luaVM, "setTessellation", "dxSetShaderTessellation");
-    lua_classfunction ( luaVM, "setTransform", "dxSetShaderTransform");
+    lua_classfunction ( luaVM, "setValue", "dxSetShaderValue" );
+    lua_classfunction ( luaVM, "setTessellation", "dxSetShaderTessellation" );
+    lua_classfunction ( luaVM, "setTransform", "dxSetShaderTransform" );
     
     //lua_classvariable ( luaVM, "value", CLuaOOPDefs::SetShaderValue, NULL); // .value["param"] = value
     
@@ -1748,7 +1771,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
 
     AddVector4DClass            ( luaVM );
     AddVector3DClass            ( luaVM );
-    AddVector2DClass          ( luaVM );
+    AddVector2DClass            ( luaVM );
     AddMatrixClass              ( luaVM );
 
     if ( !m_bEnableOOP )

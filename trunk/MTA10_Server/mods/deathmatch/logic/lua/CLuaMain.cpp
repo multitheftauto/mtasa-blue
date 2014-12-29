@@ -366,6 +366,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setID", "setElementID" );
     lua_classfunction ( luaVM, "setInterior", "setElementInterior" );
     lua_classfunction ( luaVM, "setDimension", "setElementDimension" );
+    lua_classfunction ( luaVM, "setLowLOD", "setLowLODElement" );
     lua_classfunction ( luaVM, "setAttachedOffsets", "setElementAttachedOffsets" );
     lua_classfunction ( luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled" );
     
@@ -374,7 +375,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getChildren", "getElementChildren" );
     lua_classfunction ( luaVM, "getParent", "getElementParent" );
     lua_classfunction ( luaVM, "getAttachedElements", "getAttachedElements" );
-    lua_classfunction ( luaVM, "getAttachedTo", "getAttachedTo" );
+    lua_classfunction ( luaVM, "getAttachedTo", "getElementAttachedTo" );
     lua_classfunction ( luaVM, "getVelocity", "getElementVelocity", CLuaOOPDefs::GetElementVelocity );
     lua_classfunction ( luaVM, "getID", "getElementID" );
     lua_classfunction ( luaVM, "getZoneName", "getElementZoneName" );
@@ -396,6 +397,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     
     lua_classfunction ( luaVM, "areCollisionsEnabled", "areElementCollisionsEnabled" );
     lua_classfunction ( luaVM, "isCallPropagationEnabled", "isElementCallPropagationEnabled" );
+    lua_classfunction ( luaVM, "isWaitingForGroundToLoad", "isElementWaitingForGroundToLoad" );
     lua_classfunction ( luaVM, "isWithinMarker", "isElementWithinMarker" );
     lua_classfunction ( luaVM, "isWithinColShape", "isElementWithinColShape" );
     lua_classfunction ( luaVM, "isFrozen", "isElementFrozen" );
@@ -407,6 +409,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
     lua_classvariable ( luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled" );
+    lua_classvariable ( luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad" );
     lua_classvariable ( luaVM, "parent", "setElementParent", "getElementParent" );
     lua_classvariable ( luaVM, "zoneName", NULL, "getElementZoneName" );
     lua_classvariable ( luaVM, "attachedTo", "attachElements", "getElementAttachedTo" );
