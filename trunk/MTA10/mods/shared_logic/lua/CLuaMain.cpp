@@ -548,11 +548,12 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     //lua_classvariable ( luaVM, "nametagColor", CLuaFunctionDefs::SetPlayerNametagColor, CLuaOOPDefs::GetPlayerNametagColor );
     
     
-    lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
+    // Find a way to make this only work for the local player.
+    /*lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
     lua_classvariable ( luaVM, "mapVisible", NULL, "isPlayerMapVisible" );
     lua_classvariable ( luaVM, "money", "setPlayerMoney", "getPlayerMoney" );
     lua_classvariable ( luaVM, "serial", NULL, "getPlayerSerial" );
-    lua_classvariable ( luaVM, "wantedLevel", NULL, "getPlayerWantedLevel" );
+    lua_classvariable ( luaVM, "wantedLevel", NULL, "getPlayerWantedLevel" );*/
     
     lua_registerclass ( luaVM, "Player", "Ped" );
 }

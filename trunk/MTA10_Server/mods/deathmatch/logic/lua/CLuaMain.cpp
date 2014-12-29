@@ -895,9 +895,6 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     //lua_classvariable ( luaVM, "nametagColor", "setPlayerNametagColor", "getPlayerNametagColor", CLuaFunctionDefs::SetPlayerNametagColor, CLuaOOPDefs::GetPlayerNametagColor );
     //lua_classvariable ( luaVM, "announceValue", "setPlayerAnnounceValue", "getPlayerAnnounceValue", CLuaFunctionDefs::SetPlayerAnnounceValue, CLuaOOPDefs::GetPlayerAnnounceValue ); // .announceValue[key]=value
     //lua_classvariable ( luaVM, "hudComponent", "setHudComponentVisible", "", CLuaOOPDefs::SetHudComponentVisible, NULL ); .hudComponent["radar"]=true (a get function to needs to be implemented too)
-    lua_classvariable ( luaVM, "random", NULL, "getRandomPlayer" );
-    lua_classvariable ( luaVM, "count", NULL, "getPlayerCount" );
-    lua_classvariable ( luaVM, "voiceEnabled", NULL, "isVoiceEnabled" );
     
     lua_registerclass ( luaVM, "Player", "Ped" );
 }
