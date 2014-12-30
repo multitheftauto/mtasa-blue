@@ -1567,7 +1567,8 @@ void CLuaMain::AddDxShaderClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setTransform", "dxSetShaderTransform" );
     
     //lua_classvariable ( luaVM, "value", CLuaOOPDefs::SetShaderValue, NULL); // .value["param"] = value
-    
+    lua_classvariable ( luaVM, "tessellation", "dxSetShaderTessellation", NULL );
+
     lua_registerclass ( luaVM, "DxShader", "DxMaterial" );
 }
 
