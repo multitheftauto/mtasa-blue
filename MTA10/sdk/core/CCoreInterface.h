@@ -154,6 +154,7 @@ public:
     virtual uint                    GetMinStreamingMemory           ( void ) = 0;
     virtual uint                    GetMaxStreamingMemory           ( void ) = 0;
     virtual void                    OnCrashAverted                  ( uint uiId ) = 0;
+    virtual void                    OnEnterCrashZone                ( uint uiId ) = 0;
     virtual void                    LogEvent                        ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0 ) = 0;
     virtual bool                    GetDebugIdEnabled               ( uint uiDebugId ) = 0;
     virtual EDiagnosticDebugType    GetDiagnosticDebug              ( void ) = 0;

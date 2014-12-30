@@ -42,6 +42,7 @@ void CPlayerPed__ProcessControl_Abort();
 // Support for crash stats
 //
 void OnCrashAverted ( uint uiId );
+void OnEnterCrashZone ( uint uiId );
 
 void _cdecl CrashAverted ( DWORD id )
 {
@@ -1255,6 +1256,101 @@ void _declspec(naked) HOOK_ResetFurnitureObjectCounter ()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVolumetricShadowMgr_Render
+//
+// Custom models can cause problems for volumetric shadows.
+// Record when volumetric shadows are being rendered so we can disable them if a crash occurs.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CVolumetricShadowMgr_Render_Pre( void )
+{
+    OnEnterCrashZone( 1 );
+}
+
+void OnMY_CVolumetricShadowMgr_Render_Post( void )
+{
+    OnEnterCrashZone( 0 );
+}
+
+// Hook info
+#define HOOKPOS_CVolumetricShadowMgr_Render                 0x7113B0
+#define HOOKSIZE_CVolumetricShadowMgr_Render                8
+#define HOOKCHECK_CVolumetricShadowMgr_Render               0x83
+DWORD RETURN_CVolumetricShadowMgr_Render =                  0x7113B8;
+void _declspec(naked) HOOK_CVolumetricShadowMgr_Render()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_CVolumetricShadowMgr_Render_Pre
+        popad
+
+        call inner
+
+        pushad
+        call    OnMY_CVolumetricShadowMgr_Render_Post
+        popad
+        retn
+
+inner:
+        // Replaced code
+        sub     esp, 18h  
+        mov     ecx, 0A9AE00h 
+        jmp     RETURN_CVolumetricShadowMgr_Render
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CVolumetricShadowMgr_Update
+//
+// Custom models can cause problems for volumetric shadows.
+// Record when volumetric shadows are being updated so we can disable them if a crash occurs.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CVolumetricShadowMgr_Update_Pre( void )
+{
+    OnEnterCrashZone( 2 );
+}
+
+void OnMY_CVolumetricShadowMgr_Update_Post( void )
+{
+    OnEnterCrashZone( 0 );
+}
+
+// Hook info
+#define HOOKPOS_CVolumetricShadowMgr_Update                 0x711D90
+#define HOOKSIZE_CVolumetricShadowMgr_Update                5
+#define HOOKCHECK_CVolumetricShadowMgr_Update               0xB9
+DWORD RETURN_CVolumetricShadowMgr_Update =                  0x711D95;
+void _declspec(naked) HOOK_CVolumetricShadowMgr_Update()
+{
+    _asm
+    {
+        pushad
+        call    OnMY_CVolumetricShadowMgr_Update_Pre
+        popad
+
+        push    [esp+4*1]
+        call inner
+        add     esp, 4*1
+
+        pushad
+        call    OnMY_CVolumetricShadowMgr_Update_Post
+        popad
+        retn
+
+inner:
+        // Replaced code
+        mov     ecx, 0A9AE00h  
+        jmp     RETURN_CVolumetricShadowMgr_Update
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1290,8 +1386,10 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc28 );
     EZHookInstall ( CrashFix_Misc29 );
     EZHookInstall ( CClumpModelInfo_GetFrameFromId );
-    EZHookInstall ( CEntity_GetBoundRect );
-    EZHookInstall ( CVehicle_AddUpgrade );
+    EZHookInstallChecked ( CEntity_GetBoundRect );
+    EZHookInstallChecked ( CVehicle_AddUpgrade );
     EZHookInstall ( CObject_Destructor_TrainCrossing_Check );
     EZHookInstall ( ResetFurnitureObjectCounter );
+    EZHookInstallChecked ( CVolumetricShadowMgr_Render );
+    EZHookInstallChecked ( CVolumetricShadowMgr_Update );
 }

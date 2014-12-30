@@ -48,6 +48,7 @@ public:
     static void         GetMemoryInfo           ( CBuffer& buffer );
     static void         GetMiscInfo             ( CBuffer& buffer );
     static void         OnCrashAverted          ( uint uiId );
+    static void         OnEnterCrashZone        ( uint uiId );
     static void         LogEvent                ( const char* szType, const char* szContext, const char* szBody );
     static SString      GetCrashAvertedStatsSoFar ( void );
     static void         ReserveMemoryKBForCrashDumpProcessing ( uint uiMemoryKB );
