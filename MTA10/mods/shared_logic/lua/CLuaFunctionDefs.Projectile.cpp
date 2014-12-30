@@ -115,6 +115,11 @@ int CLuaFunctionDefs::GetProjectileTarget ( lua_State* luaVM )
             {
                 lua_pushelement ( luaVM, pProjectile->GetTargetEntity ( ) );
                 return 1;
+            } 
+            else if ( ucWeapon == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
+            {
+                lua_pushelement ( luaVM, pProjectile->GetSatchelAttachedTo ( ) );
+                return 1;
             }
         }
         else
