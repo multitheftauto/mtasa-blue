@@ -2126,6 +2126,15 @@ void CCore::OnCrashAverted ( uint uiId )
 
 
 //
+// OnEnterCrashZone
+// 
+void CCore::OnEnterCrashZone ( uint uiId )
+{
+    CCrashDumpWriter::OnEnterCrashZone ( uiId );
+}
+
+
+//
 // LogEvent
 // 
 void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId )
