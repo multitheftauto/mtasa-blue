@@ -737,16 +737,16 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
 int CLuaFunctionDefs::dxSetShaderTessellation ( lua_State* luaVM )
 {
 //  bool dxSetShaderTessellation( element shader, int tessellationX, int tessellationY )
-    CClientShader* pShader; uint uiTessellationX; uint uiTessellationY;
+//  bool shader:setShaderTessellation( element shader, Vector2 tessellation )
+    CClientShader* pShader; CVector2D vecTessellation;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
-    argStream.ReadNumber ( uiTessellationX );
-    argStream.ReadNumber ( uiTessellationY );
+    argStream.ReadVector2D ( vecTessellation );
 
     if ( !argStream.HasErrors () )
     {
-        pShader->GetShaderItem ()->SetTessellation ( uiTessellationX, uiTessellationY );
+        pShader->GetShaderItem ()->SetTessellation ( (uint)vecTessellation.fX, (uint)vecTessellation.fY );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
