@@ -17,15 +17,15 @@ int CLuaMatrixDefs::Create ( lua_State* luaVM )
     CMatrix matrix;
 
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsVector3D ( ) )
+    if ( argStream.NextIsVector3D () )
     {
         CVector vecPosition;
         argStream.ReadVector3D ( vecPosition );
-        if ( argStream.NextIsVector3D ( ) )
+        if ( argStream.NextIsVector3D () )
         {
             CVector vecRotation;
             argStream.ReadVector3D ( vecRotation );
-            ConvertDegreesToRadiansNoWrap( vecRotation );
+            ConvertDegreesToRadiansNoWrap ( vecRotation );
             matrix = CMatrix ( vecPosition, vecRotation );
         }
         else
@@ -33,6 +33,19 @@ int CLuaMatrixDefs::Create ( lua_State* luaVM )
             matrix = CMatrix ( vecPosition );
         }
     }
+    else if ( argStream.NextIsUserDataOfType<CLuaMatrix> () )
+    {
+        argStream.ReadMatrix ( matrix );
+        matrix = CMatrix ( matrix );
+    }
+    else if ( !argStream.NextIsNone () ) {
+        argStream.SetCustomError ( "Expected vector3, matrix or nothing" );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
     lua_pushmatrix ( luaVM, matrix );
     return 1;
 }
