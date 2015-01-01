@@ -49,6 +49,9 @@ public:
 
     // Connection
     LUA_DECLARE ( DbQuery );
+
+    // ACL
+    LUA_DECLARE ( DoesACLGroupContainObject );
 };
 
 #endif
