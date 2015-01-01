@@ -1623,6 +1623,10 @@
 						Name="oopdefs"
 						>
 						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.ACL.cpp"
+							>
+						</File>
+						<File
 							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp"
 							>
 						</File>

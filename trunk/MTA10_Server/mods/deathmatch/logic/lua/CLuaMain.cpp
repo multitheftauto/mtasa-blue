@@ -504,6 +504,7 @@ void CLuaMain::AddAccountClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getAllBySerial", "getAccountsBySerial" );
     lua_classfunction ( luaVM, "getFromPlayer", "getPlayerAccount" );
     lua_classfunction ( luaVM, "logPlayerOut", "logOut" );
+    lua_classfunction ( luaVM, "doesContainObject", "isObjectInACLGroup", CLuaOOPDefs::DoesACLGroupContainObject );
 
     lua_classfunction ( luaVM, "create", "getAccount" );
     lua_classfunction ( luaVM, "add", "addAccount" );
