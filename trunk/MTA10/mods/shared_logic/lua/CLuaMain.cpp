@@ -225,7 +225,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "alpha", "setElementAlpha", "getElementAlpha" );
     lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
     lua_classvariable ( luaVM, "model", "setElementModel", "getElementModel" );
-    lua_classvariable ( luaVM, "syncer", NULL, "isElementSyncer" ); // misleading!
+    lua_classvariable ( luaVM, "syncedByLocalPlayer", NULL, "isElementSyncer" );
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classvariable ( luaVM, "frozen", "setElementFrozen", "isElementFrozen" );
     lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
@@ -554,7 +554,6 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     
     lua_classfunction ( luaVM, "isNametagShowing", "isPlayerNametagShowing" );
     
-    lua_classvariable ( luaVM, "blurLevel", "setPlayerBlurLevel", "getPlayerBlurLevel" );
     lua_classvariable ( luaVM, "ping", NULL, "getPlayerPing" );
     lua_classvariable ( luaVM, "name", NULL, "getPlayerName" );
     lua_classvariable ( luaVM, "team", NULL, "getPlayerTeam" );
@@ -563,8 +562,10 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     //lua_classvariable ( luaVM, "nametagColor", CLuaFunctionDefs::SetPlayerNametagColor, CLuaOOPDefs::GetPlayerNametagColor );
     
     
-    // Find a way to make this only work for the local player.
-    /*lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
+    // Static class variables or local only variable
+    /*
+    lua_classvariable ( luaVM, "blurLevel", "setPlayerBlurLevel", "getPlayerBlurLevel" );
+    lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
     lua_classvariable ( luaVM, "mapVisible", NULL, "isPlayerMapVisible" );
     lua_classvariable ( luaVM, "money", "setPlayerMoney", "getPlayerMoney" );
     lua_classvariable ( luaVM, "serial", NULL, "getPlayerSerial" );
