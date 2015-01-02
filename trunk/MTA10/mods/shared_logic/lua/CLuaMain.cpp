@@ -1464,7 +1464,7 @@ void CLuaMain::AddEngineClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading" );
     lua_classfunction ( luaVM, "setModelLODDistance", "engineSetModelLODDistance" );
     
-    lua_classfunction ( luaVM, "getVisibleTextureName", "engineGetVisibleTextureName" );
+    lua_classfunction ( luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames" );
     lua_classfunction ( luaVM, "getModelLODDistance", "engineGetModelLODDistance" );
     lua_classfunction ( luaVM, "getModelTextureNames", "engineGetModelTextureNames" );
     lua_classfunction ( luaVM, "getModelIDFromName", "engineGetModelIDFromName" );
