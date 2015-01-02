@@ -202,12 +202,13 @@ LOGIC = \
 ./logic/lua/CLuaVector4.cpp \
 ./logic/lua/LuaCommon.cpp \
 ./logic/lua/LuaUtils.cpp \
+./logic/lua/oopdefs/CLuaOOPFunctionDefs.ACL.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Camera.cpp \
+./logic/lua/oopdefs/CLuaOOPFunctionDefs.Connection.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Element.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Marker.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Ped.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Player.cpp \
-./logic/lua/oopdefs/CLuaOOPFunctionDefs.Vehicle.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaBitDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
