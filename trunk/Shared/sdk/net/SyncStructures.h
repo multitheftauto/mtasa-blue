@@ -120,19 +120,7 @@ struct SFloatAsBitsSyncBase : public ISyncStructure
         : m_uiBits ( uiBits )
         , ulValueMax ( ( 1 << uiBits ) - 1 )
         , m_fMin ( fMin )
-        , m_fMaxOldVer ( fMax )
-        , m_fMaxNewVer ( fMax )
-        , m_bPreserveGreaterThanMin ( bPreserveGreaterThanMin )
-        , m_bWrapInsteadOfClamp ( bWrapInsteadOfClamp )
-    {
-    }
-
-    SFloatAsBitsSyncBase ( uint uiBits, float fMin, float fMaxOldVer, float fMaxNewVer, bool bPreserveGreaterThanMin, bool bWrapInsteadOfClamp )
-        : m_uiBits ( uiBits )
-        , ulValueMax ( ( 1 << uiBits ) - 1 )
-        , m_fMin ( fMin )
-        , m_fMaxOldVer ( fMaxOldVer )
-        , m_fMaxNewVer ( fMaxNewVer )
+        , m_fMax ( fMax )
         , m_bPreserveGreaterThanMin ( bPreserveGreaterThanMin )
         , m_bWrapInsteadOfClamp ( bWrapInsteadOfClamp )
     {
@@ -140,15 +128,13 @@ struct SFloatAsBitsSyncBase : public ISyncStructure
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        const float fMax = bitStream.Version() < 0x54 ? m_fMaxOldVer : m_fMaxNewVer;
-
         unsigned long ulValue = 0;
         if ( bitStream.ReadBits ( &ulValue, m_uiBits ) )
         {
             // Convert bits to position in range
             float fAlpha = ulValue / (float)ulValueMax;
             // Find value in range
-            data.fValue = Lerp ( m_fMin, fAlpha, fMax );
+            data.fValue = Lerp ( m_fMin, fAlpha, m_fMax );
             return true;
         }
         return false;
@@ -156,13 +142,11 @@ struct SFloatAsBitsSyncBase : public ISyncStructure
 
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        const float fMax = bitStream.Version() < 0x54 ? m_fMaxOldVer : m_fMaxNewVer;
-
         float fValue = data.fValue;
         if ( m_bWrapInsteadOfClamp )
-            fValue = WrapAround ( m_fMin, data.fValue, fMax );
+            fValue = WrapAround ( m_fMin, data.fValue, m_fMax );
         // Find position in range
-        float fAlpha = UnlerpClamped ( m_fMin, fValue, fMax );
+        float fAlpha = UnlerpClamped ( m_fMin, fValue, m_fMax );
         // Convert to bits
         unsigned long ulValue = Round ( ulValueMax * fAlpha );
 
@@ -182,8 +166,7 @@ private:
     const uint m_uiBits;
     const ulong ulValueMax;
     const float m_fMin;
-    const float m_fMaxOldVer;
-    const float m_fMaxNewVer;
+    const float m_fMax;
     const bool  m_bPreserveGreaterThanMin;
     const bool  m_bWrapInsteadOfClamp;
 };
@@ -193,12 +176,7 @@ template < unsigned int bits >
 struct SFloatAsBitsSync : public SFloatAsBitsSyncBase
 {
     SFloatAsBitsSync ( float fMin, float fMax, bool bPreserveGreaterThanMin, bool bWrapInsteadOfClamp = false )
-        : SFloatAsBitsSyncBase ( bits, fMin, fMax, fMax, bPreserveGreaterThanMin, bWrapInsteadOfClamp )
-    {
-    }
-
-    SFloatAsBitsSync ( float fMin, float fMaxOldVer, float fMaxNewVer, bool bPreserveGreaterThanMin, bool bWrapInsteadOfClamp )
-        : SFloatAsBitsSyncBase ( bits, fMin, fMaxOldVer, fMaxNewVer, bPreserveGreaterThanMin, bWrapInsteadOfClamp )
+        : SFloatAsBitsSyncBase ( bits, fMin, fMax, bPreserveGreaterThanMin, bWrapInsteadOfClamp )
     {
     }
 };
@@ -207,32 +185,32 @@ struct SFloatAsBitsSync : public SFloatAsBitsSyncBase
 // Declare specific health and armor sync structures
 struct SPlayerHealthSync : public SFloatAsBitsSync < 8 >
 {
-    // 0 - 200 step 1                                      255 = ( 2^8 - 1 ) * 1
-    SPlayerHealthSync () : SFloatAsBitsSync<8> ( 0.f, 200, 255.0f, true, false ) {}
+    // 0 - 200 step 1                                 255 = ( 2^8 - 1 ) * 1
+    SPlayerHealthSync () : SFloatAsBitsSync<8> ( 0.f, 255.0f, true, false ) {}
 };
 
 struct SPlayerArmorSync : public SFloatAsBitsSync < 8 >
 {
-    // 0 - 100 step 0.5                                   127.5 = ( 2^8 - 1 ) * 0.5
-    SPlayerArmorSync () : SFloatAsBitsSync<8> ( 0.f, 100, 127.5f, true, false ) {}
+    // 0 - 100 step 0.5                              127.5 = ( 2^8 - 1 ) * 0.5
+    SPlayerArmorSync () : SFloatAsBitsSync<8> ( 0.f, 127.5f, true, false ) {}
 };
 
 struct SVehicleHealthSync : public SFloatAsBitsSync < 12 >
 {
-    // 0 - 2000 step 0.5                                      2047.5 = ( 2^12 - 1 ) * 0.5
-    SVehicleHealthSync () : SFloatAsBitsSync<12> ( 0.f, 2000, 2047.5f, true, false ) {}
+    // 0 - 2000 step 0.5                                2047.5 = ( 2^12 - 1 ) * 0.5
+    SVehicleHealthSync () : SFloatAsBitsSync<12> ( 0.f, 2047.5f, true, false ) {}
 };
 
 struct SLowPrecisionVehicleHealthSync : public SFloatAsBitsSync < 8 >
 {
-    // 0 - 2000 step 8                                                    2040 = ( 2^8 - 1 ) * 8
-    SLowPrecisionVehicleHealthSync () : SFloatAsBitsSync<8> ( 0.0f, 2000, 2040.0f, true, false ) {}
+    // 0 - 2000 step 8                                              2040 = ( 2^8 - 1 ) * 8
+    SLowPrecisionVehicleHealthSync () : SFloatAsBitsSync<8> ( 0.0f, 2040.0f, true, false ) {}
 };
 
 struct SObjectHealthSync : public SFloatAsBitsSync < 11 >
 {
-    // 0 - 1000 step 0.5                                     1023.5 = ( 2^11 - 1 ) * 0.5
-    SObjectHealthSync () : SFloatAsBitsSync<11> ( 0.f, 1000, 1023.5f, true, false ) {}
+    // 0 - 1000 step 0.5                               1023.5 = ( 2^11 - 1 ) * 0.5
+    SObjectHealthSync () : SFloatAsBitsSync<11> ( 0.f, 1023.5f, true, false ) {}
 };
 
 
@@ -649,9 +627,6 @@ struct SCameraRotationSync : public ISyncStructure
 {
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        if ( bitStream.Version () < 0x2C )
-            return bitStream.Read ( data.fRotation );
-
         SFloatAsBitsSync < 12 > rotation ( -PI, PI, false, true );
         if ( bitStream.Read ( &rotation ) )
         {
@@ -662,9 +637,6 @@ struct SCameraRotationSync : public ISyncStructure
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
-        if ( bitStream.Version () < 0x2C )
-            return bitStream.Write ( data.fRotation );
-
         SFloatAsBitsSync < 12 > rotation ( -PI, PI, false, true );
         rotation.data.fValue = data.fRotation;
         bitStream.Write ( &rotation );
@@ -942,21 +914,18 @@ struct SFullKeysyncSync : public ISyncStructure
     // one byte of bandwidth per stick.
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        bool bState;
         char cLeftStickX;
         char cLeftStickY;
 
-        if ( ( bState = bitStream.ReadBits ( (char *)&data, 8 ) ) )
+        bitStream.ReadBits ( (char *)&data, 8 );
+        bitStream.Read ( cLeftStickX );
+        if ( bitStream.Read ( cLeftStickY ) )
         {
-            if ( ( bState = bitStream.Read ( cLeftStickX ) ) )
-            {
-                data.sLeftStickX = static_cast < short > ( (float)cLeftStickX * 128.0f/127.0f );
-                if ( ( bState = bitStream.Read ( cLeftStickY ) ) )
-                    data.sLeftStickY = static_cast < short > ( (float)cLeftStickY * 128.0f/127.0f );
-            }
+            data.sLeftStickX = static_cast < short > ( (float)cLeftStickX * 128.0f/127.0f );
+            data.sLeftStickY = static_cast < short > ( (float)cLeftStickY * 128.0f/127.0f );
+            return true;
         }
-
-        return bState;
+        return false;
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
@@ -982,6 +951,7 @@ struct SFullKeysyncSync : public ISyncStructure
     } data;
 };
 
+// TODO: SSmallKeysyncSync is now the same as SFullKeysyncSync ?
 struct SSmallKeysyncSync : public ISyncStructure
 {
     // Stick values vary from -128 to 128, but char range is from -128 to 127, so we stretch
@@ -989,35 +959,26 @@ struct SSmallKeysyncSync : public ISyncStructure
     // one byte of bandwidth per stick.
     bool Read ( NetBitStreamInterface& bitStream )
     {
-        bool bState;
         char cLeftStickX;
         char cLeftStickY;
 
-        if ( ( bState = bitStream.ReadBits ( (char *)&data, 8 ) ) )
+        bitStream.ReadBits ( (char *)&data, 8 );
+        bitStream.Read ( cLeftStickX );
+        if ( bitStream.Read ( cLeftStickY ) )
         {
-            if ( bitStream.Version () >= 0x2C )
-            {
-                if ( ( bState = bitStream.Read ( cLeftStickX ) ) )
-                {
-                    data.sLeftStickX = static_cast < short > ( (float)cLeftStickX * 128.0f/127.0f );
-                    if ( ( bState = bitStream.Read ( cLeftStickY ) ) )
-                        data.sLeftStickY = static_cast < short > ( (float)cLeftStickY * 128.0f/127.0f );
-                }
-            }
+            data.sLeftStickX = static_cast < short > ( (float)cLeftStickX * 128.0f/127.0f );
+            data.sLeftStickY = static_cast < short > ( (float)cLeftStickY * 128.0f/127.0f );
+            return true;
         }
-
-        return bState;
+        return false;
     }
     void Write ( NetBitStreamInterface& bitStream ) const
     {
         bitStream.WriteBits ( (const char* )&data, 8 );
-        if ( bitStream.Version () >= 0x2C )
-        {
-            char cLeftStickX = static_cast < char > ( (float)data.sLeftStickX * 127.0f/128.0f );
-            bitStream.Write ( cLeftStickX );
-            char cLeftStickY = static_cast < char > ( (float)data.sLeftStickY * 127.0f/128.0f );
-            bitStream.Write ( cLeftStickY );
-        }
+        char cLeftStickX = static_cast < char > ( (float)data.sLeftStickX * 127.0f/128.0f );
+        bitStream.Write ( cLeftStickX );
+        char cLeftStickY = static_cast < char > ( (float)data.sLeftStickY * 127.0f/128.0f );
+        bitStream.Write ( cLeftStickY );
     }
 
     struct
@@ -1973,6 +1934,13 @@ struct SFunBugsStateSync : public ISyncStructure
             bOk &= bitStream.ReadBits(reinterpret_cast < char* > (&data4), BITCOUNT4);
         else
             data4.bBadDrivebyHitboxes = 0;
+
+        //// Example for adding item:
+        // if ( bitStream.Version() >= 0x999 )
+        //     bOk &= bitStream.ReadBits ( reinterpret_cast < char* > ( &data9 ), BITCOUNT9 );
+        // else
+        //     data9.bItemName = 0;
+
         return bOk;
     }
     void Write ( NetBitStreamInterface& bitStream ) const
@@ -1984,6 +1952,11 @@ struct SFunBugsStateSync : public ISyncStructure
             bitStream.WriteBits ( reinterpret_cast < const char* > ( &data3 ), BITCOUNT3 );
         if (bitStream.Version() >= 0x059)
             bitStream.WriteBits(reinterpret_cast < const char* > (&data4), BITCOUNT4);
+
+        //// Example for adding item:
+        // if ( bitStream.Version() >= 0x999 )
+        //     bitStream.WriteBits ( reinterpret_cast < const char* > ( &data9 ), BITCOUNT9 );
+
     }
 
     struct

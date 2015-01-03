@@ -439,8 +439,11 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
     }
 
     unsigned int uiNumArgs;
-    unsigned short usNumArgs;
     bool bResult;
+#if MTA_DM_VERSION >= 0x150
+    bResult = bitStream.ReadCompressed ( uiNumArgs );
+#else
+    unsigned short usNumArgs;
     if ( bitStream.Version () < 0x05B )
     {
         // We got the old version
@@ -460,6 +463,7 @@ bool CLuaArguments::ReadFromBitStream ( NetBitStreamInterface& bitStream, std::v
                 uiNumArgs = usNumArgs;
         }
     }
+#endif
 
     if ( bResult )
     {
@@ -490,10 +494,14 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHa
     bool bSuccess = true;
     pKnownTables->insert ( make_pair ( (CLuaArguments *)this, pKnownTables->size () ) );
 
+#if MTA_DM_VERSION >= 0x150
+    bitStream.WriteCompressed ( static_cast < unsigned int > ( m_Arguments.size () ) );
+#else
     if ( bitStream.Version () < 0x05B )
         bitStream.WriteCompressed ( static_cast < unsigned short > ( m_Arguments.size () ) );
     else
         bitStream.WriteCompressed ( static_cast < unsigned int > ( m_Arguments.size () ) );
+#endif
 
     vector < CLuaArgument* > ::const_iterator iter = m_Arguments.begin ();
     for ( ; iter != m_Arguments.end () ; iter++ )
