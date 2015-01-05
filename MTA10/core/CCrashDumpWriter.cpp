@@ -608,6 +608,9 @@ namespace
             case POINT_ROUTE_POOL:          cPtr = 0x5511AF; break;
             case POINTER_DOUBLE_LINK_POOL:  iPtr = 0x550F82; break;
             case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
+            case ENV_MAP_MATERIAL_POOL:     iPtr = 0x5DA08E; break;
+            case ENV_MAP_ATOMIC_POOL:       iPtr = 0x5DA0CA; break;
+            case SPEC_MAP_MATERIAL_POOL:    iPtr = 0x5DA106; break;
         }
         if ( iPtr )
             return *(int*)iPtr;
