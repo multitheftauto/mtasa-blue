@@ -1516,6 +1516,11 @@ bool CServerBrowser::OnGeneralHelpClick ( CGUIElement* pElement )
     {
         if ( GetTickCount64_ () - m_llLastGeneralHelpTime > 500 )
         {
+            CVector2D helpButtonSize = m_pButtonGeneralHelp [ 0 ]->GetSize ();
+            CVector2D helpButtonPos = CalcScreenPosition ( m_pButtonGeneralHelp [ 0 ] ) + CVector2D ( 0, 24 );
+            CVector2D generalHelpSize = m_pGeneralHelpWindow->GetSize ();
+            CVector2D generalHelpPos = helpButtonPos - generalHelpSize + CVector2D ( helpButtonSize.fX, 0 );
+            m_pGeneralHelpWindow->SetPosition ( generalHelpPos );
             m_pGeneralHelpWindow->SetVisible ( true );
             m_pGeneralHelpWindow->BringToFront ();
         }
