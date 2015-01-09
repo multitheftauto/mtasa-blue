@@ -394,6 +394,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\lutf8lib.c"
+				>
+			</File>
+			<File
 				RelativePath="..\src\lvm.c"
 				>
 			</File>
@@ -499,6 +503,10 @@
 			</File>
 			<File
 				RelativePath="..\src\lzio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\unidata.h"
 				>
 			</File>
 		</Filter>

@@ -10,7 +10,8 @@ liblua_la_SOURCES = \
 	lstrlib.c loadlib.c linit.c \
 	lapi.h ldebug.h lgc.h lmem.h lparser.h ltable.h lzio.h ldo.h llex.h \
 	lobject.h lstate.h ltm.h lundump.h lcode.h lfunc.h llimits.h lopcodes.h \
-	lstring.h lvm.h
+	lstring.h lvm.h \
+	unidata.h lutf8lib.c
 
 EXTRA_DIST = luaconf.h.template.in
 BUILT_SOURCES = luaconf.h
