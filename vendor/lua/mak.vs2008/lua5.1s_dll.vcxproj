@@ -376,6 +376,7 @@
     <ClCompile Include="..\src\ltablib.c" />
     <ClCompile Include="..\src\ltm.c" />
     <ClCompile Include="..\src\lundump.c" />
+    <ClCompile Include="..\src\lutf8lib.c" />
     <ClCompile Include="..\src\lvm.c" />
     <ClCompile Include="..\src\lzio.c" />
     <ClCompile Include="..\src\print.c" />
@@ -404,6 +405,7 @@
     <ClInclude Include="..\src\lundump.h" />
     <ClInclude Include="..\src\lvm.h" />
     <ClInclude Include="..\src\lzio.h" />
+    <ClInclude Include="..\src\unidata.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
