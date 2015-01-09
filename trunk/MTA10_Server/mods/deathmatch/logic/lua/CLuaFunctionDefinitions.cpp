@@ -9717,7 +9717,7 @@ int CLuaFunctionDefinitions::OutputServerLog ( lua_State* luaVM )
     if ( !argStream.HasErrors ( ) )
     {
         // Print it
-        CLogger::LogPrintf ( LOGLEVEL_LOW, "%s\n", strMessage.c_str() );
+        CLogger::LogPrintf ( LOGLEVEL_MEDIUM, "%s\n", strMessage.c_str() );
         lua_pushboolean ( luaVM, true );
 
         return 1;
