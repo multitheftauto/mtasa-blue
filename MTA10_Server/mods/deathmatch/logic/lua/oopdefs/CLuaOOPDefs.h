@@ -9,7 +9,7 @@
 *
 *****************************************************************************/
 
-class CLuaFunctionDefinitions;
+class CLuaFunctionDefs;
 
 #ifndef __CLUAOOPDEFINITIONS_H
 #define __CLUAOOPDEFINITIONS_H

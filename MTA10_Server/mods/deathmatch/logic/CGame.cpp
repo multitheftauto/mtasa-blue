@@ -745,43 +745,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pZoneNames = new CZoneNames;
 
     CStaticFunctionDefinitions ( this );
-    CLuaFunctionDefinitions::SetBlipManager ( m_pBlipManager );
-    CLuaFunctionDefinitions::SetLuaManager ( m_pLuaManager );
-    CLuaFunctionDefinitions::SetMarkerManager ( m_pMarkerManager );
-    CLuaFunctionDefinitions::SetObjectManager ( m_pObjectManager );
-    CLuaFunctionDefinitions::SetPickupManager ( m_pPickupManager );
-    CLuaFunctionDefinitions::SetPlayerManager ( m_pPlayerManager );
-    CLuaFunctionDefinitions::SetRadarAreaManager ( m_pRadarAreaManager );
-    CLuaFunctionDefinitions::SetTeamManager ( m_pTeamManager );
-    CLuaFunctionDefinitions::SetAccountManager ( m_pAccountManager );
-    CLuaFunctionDefinitions::SetRegisteredCommands ( m_pRegisteredCommands );
-    CLuaFunctionDefinitions::SetRootElement ( m_pMapManager->GetRootElement () );
-    CLuaFunctionDefinitions::SetScriptDebugging ( m_pScriptDebugging );
-    CLuaFunctionDefinitions::SetVehicleManager ( m_pVehicleManager );
-    CLuaFunctionDefinitions::SetColManager ( m_pColManager );
-    CLuaFunctionDefinitions::SetResourceManager ( m_pResourceManager );
-    CLuaFunctionDefinitions::SetACL ( m_pACLManager );
-
-    // Initialize the lua function definition dependancies
-    CLuaDefs::Initialize ( m_pMapManager->GetRootElement (),
-                           &m_ElementDeleter,
-                           m_pBlipManager,
-                           m_pHandlingManager,
-                           m_pLuaManager,
-                           m_pMarkerManager,
-                           m_pObjectManager,
-                           m_pPickupManager,
-                           m_pPlayerManager,
-                           m_pRadarAreaManager,
-                           m_pRegisteredCommands,
-                           m_pScriptDebugging,
-                           m_pVehicleManager,
-                           m_pTeamManager,
-                           m_pAccountManager,
-                           m_pColManager,
-                           m_pResourceManager,
-                           m_pACLManager,
-                           m_pMainConfig );
+    CLuaFunctionDefs::Initialize ( m_pLuaManager, this );
+    CLuaDefs::Initialize ( this );
 
     m_pPlayerManager->SetScriptDebugging ( m_pScriptDebugging );
 
@@ -3178,7 +3143,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
 
                                     // Execute the player->vehicle script function
                                     CLuaArguments ArgumentsEnter;
-                                    ArgumentsEnter.PushElement ( pVehicle );        // vehice
+                                    ArgumentsEnter.PushElement ( pVehicle );        // vehicle
                                     ArgumentsEnter.PushNumber ( 0 );                 // seat
                                     ArgumentsEnter.PushElement ( pJacked );         // jacked
                                     pPlayer->CallEvent ( "onPlayerVehicleEnter", ArgumentsEnter );
