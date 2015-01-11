@@ -17,7 +17,7 @@
 
 #include "StdInc.h"
 
-#include "CLuaFunctionDefinitions.h"
+#include "CLuaFunctionDefs.h"
 #include <clocale>
 
 static CLuaManager* m_pLuaManager;
@@ -156,12 +156,12 @@ void CLuaMain::ResetInstructionCount ( void )
 
 void CLuaMain::InitSecurity ( void )
 {
-    lua_register ( m_luaVM, "dofile", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "loadfile", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "require", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "loadlib", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "getfenv", CLuaFunctionDefinitions::DisabledFunction );
-    lua_register ( m_luaVM, "newproxy", CLuaFunctionDefinitions::DisabledFunction );
+    lua_register ( m_luaVM, "dofile", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "loadfile", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "require", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "loadlib", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "getfenv", CLuaFunctionDefs::DisabledFunction );
+    lua_register ( m_luaVM, "newproxy", CLuaFunctionDefs::DisabledFunction );
 }
 
 void CLuaMain::AddVector4DClass ( lua_State* luaVM )
@@ -661,7 +661,7 @@ void CLuaMain::AddMarkerClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "icon", "setMarkerIcon", "getMarkerIcon" );
     lua_classvariable ( luaVM, "size", "setMarkerSize", "getMarkerSize" );
     
-    lua_classvariable ( luaVM, "target", "setMarkerTarget", "getMarkerTarget", CLuaFunctionDefinitions::SetMarkerTarget, CLuaOOPDefs::GetMarkerTarget );
+    lua_classvariable ( luaVM, "target", "setMarkerTarget", "getMarkerTarget", CLuaFunctionDefs::SetMarkerTarget, CLuaOOPDefs::GetMarkerTarget );
     //lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor ); color
 
     lua_registerclass ( luaVM, "Marker", "Element" );
@@ -768,7 +768,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "occupiedVehicleSeat", NULL, "getPedOccupiedVehicleSeat" );
     lua_classvariable ( luaVM, "contactElement", NULL, "getPedContactElement" );
     lua_classvariable ( luaVM, "totalAmmoInWeaponOfCurrentWeaponSlot", NULL, "getPedTotalAmmo" );
-    lua_classvariable ( luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefinitions::GetPedOccupiedVehicle ); // what about removePedFromVehicle?
+    lua_classvariable ( luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle ); // what about removePedFromVehicle?
     lua_classvariable ( luaVM, "dead", "killPed", "isPedDead" ); // Setting this to any value will still kill the ped. Should we special case this?
     lua_classvariable ( luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle" );
     //lua_classvariable ( luaVM, "stats", "setPedStat", "getPedStat", CLuaOOPDefs::SetPedStat, CLuaOOPDefs::GetPedStat ); // table

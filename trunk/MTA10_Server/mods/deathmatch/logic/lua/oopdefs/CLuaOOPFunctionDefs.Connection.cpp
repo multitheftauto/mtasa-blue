@@ -57,7 +57,7 @@ int CLuaOOPDefs::DbQuery ( lua_State* luaVM )
                 CLuaArguments Arguments;
                 Arguments.PushDbQuery ( pJobData );
                 Arguments.PushArguments ( callbackArgs );
-                pJobData->SetCallback ( CLuaFunctionDefinitions::DbQueryCallback, g_pGame->GetLuaCallbackManager ()->CreateCallback ( pLuaMain, iLuaFunction, Arguments ) );
+                pJobData->SetCallback ( CLuaFunctionDefs::DbQueryCallback, g_pGame->GetLuaCallbackManager ()->CreateCallback ( pLuaMain, iLuaFunction, Arguments ) );
             }
         }
         // Add debug info incase query result does not get collected
