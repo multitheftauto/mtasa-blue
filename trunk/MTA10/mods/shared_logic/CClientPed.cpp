@@ -290,6 +290,14 @@ CClientPed::~CClientPed ( void )
     // We have a player model?
     if ( m_pPlayerPed )
     {
+        // Do we have the in_water task? #3973: Peds destroyed in water leave water circles
+        CTask * pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+        if ( pTask && pTask->GetTaskType () == TASK_COMPLEX_IN_WATER )
+        {
+            // Kill the task immediately
+            pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_IMMEDIATE, NULL );
+        }
+        
         // Destroy the player model
         if ( m_bIsLocalPlayer )
         {
