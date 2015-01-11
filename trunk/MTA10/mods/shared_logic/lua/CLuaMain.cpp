@@ -1304,7 +1304,7 @@ void CLuaMain::AddResourceClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
     
     lua_classfunction ( luaVM, "create", "getResourceFromName" );
-    lua_classfunction ( luaVM, "fromName", "getResourceFromName" );
+    lua_classfunction ( luaVM, "getfromName", "getResourceFromName" );
     
     lua_classfunction ( luaVM, "getGuiElement", "getResourceGUIElement" );
     lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
@@ -1851,7 +1851,7 @@ void CLuaMain::InitVM ( void )
     luaopen_string ( m_luaVM );
     luaopen_table ( m_luaVM );
     luaopen_debug ( m_luaVM );
-	luaopen_utf8 ( m_luaVM );
+    luaopen_utf8 ( m_luaVM );
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity();
