@@ -19,6 +19,7 @@
         <right name="function.setResourceDefaultSetting" access="true" />
         <right name="function.removeResourceDefaultSetting" access="true" />
         <right name="function.xmlLoadFile" access="true" />
+        <right name="function.refreshResources" access="true" />
         <right name="general.adminpanel" access="true" />
         <right name="general.tab_players" access="true" />
         <right name="general.tab_resources" access="true" />
