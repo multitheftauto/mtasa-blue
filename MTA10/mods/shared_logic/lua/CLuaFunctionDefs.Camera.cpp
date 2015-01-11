@@ -114,14 +114,22 @@ int CLuaFunctionDefs::GetCameraGoggleEffect ( lua_State *luaVM )
 
 int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 {
-    CVector vecPosition;
-    CVector vecLookAt;
-    float fRoll = 0.0f;
-    float fFOV = 70.0f;
+    CVector vecPosition; CVector vecLookAt; float fRoll = 0.0f; float fFOV = 70.0f;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadVector3D ( vecPosition );
-    bool bLookAtValid = argStream.NextCouldBeNumber();
-    argStream.ReadVector3D ( vecLookAt, CVector() );
+
+    if ( argStream.NextIsUserDataOfType <CLuaMatrix> () ) {
+        CLuaMatrix* pMatrix;
+        argStream.ReadUserData ( pMatrix );
+
+        vecPosition = pMatrix->GetPosition ();
+        vecLookAt = pMatrix->GetRotation ();
+    }
+    else
+    {
+        argStream.ReadVector3D ( vecPosition );
+        argStream.ReadVector3D ( vecLookAt, CVector () );
+    }
+
     argStream.ReadNumber ( fRoll, 0.0f );
     argStream.ReadNumber ( fFOV, 70.0f );
     if ( fFOV <= 0.0f || fFOV >= 180.0f )
@@ -129,7 +137,7 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::SetCameraMatrix ( vecPosition, bLookAtValid ? &vecLookAt : NULL, fRoll, fFOV ) )
+        if ( CStaticFunctionDefinitions::SetCameraMatrix ( vecPosition, &vecLookAt, fRoll, fFOV ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
