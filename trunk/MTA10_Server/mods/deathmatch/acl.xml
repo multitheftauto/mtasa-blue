@@ -241,6 +241,7 @@
       <right name="function.setResourceDefaultSetting" access="true"/>
       <right name="function.removeResourceDefaultSetting" access="true"/>
       <right name="function.xmlLoadFile" access="true"/>
+      <right name="function.refreshResources" access="true" />
    </acl>
    <acl name="raceACL">
       <right name="general.ModifyOtherObjects" access="true"/>
