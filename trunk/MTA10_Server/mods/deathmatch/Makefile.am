@@ -233,6 +233,7 @@ LOGIC = \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Marker.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Ped.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Player.cpp \
+./logic/lua/oopdefs/CLuaOOPFunctionDefs.RadarArea.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaBitDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \

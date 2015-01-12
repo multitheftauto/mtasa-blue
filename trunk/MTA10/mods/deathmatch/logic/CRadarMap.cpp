@@ -291,7 +291,14 @@ void CRadarMap::DoRender ( void )
                 // Calculate the size of the area
                 vecSize.fX = static_cast < float > ( fX / fRatio );
                 vecSize.fY = static_cast < float > ( fY / fRatio );
-                g_pCore->GetGraphics ()->DrawRectangle ( vecPos.fX, vecPos.fY, vecSize.fX, -vecSize.fY, pArea->GetColor () );
+
+                SColor color = pArea->GetColor ();
+                if ( pArea->IsFlashing () )
+                {
+                    color.A = static_cast < unsigned char > ( color.A * pArea->GetAlphaFactor () );
+                }
+
+                g_pCore->GetGraphics ()->DrawRectangle ( vecPos.fX, vecPos.fY, vecSize.fX, -vecSize.fY, color );
             }
         }
 
