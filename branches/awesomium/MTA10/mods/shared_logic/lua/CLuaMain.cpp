@@ -1574,6 +1574,7 @@ void CLuaMain::AddBrowserClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "executeJavascript", "executeBrowserJavascript" );
     lua_classfunction ( luaVM, "setVolume", "setBrowserVolume" );
     lua_classfunction ( luaVM, "focus", "focusBrowser" );
+    lua_classfunction ( luaVM, "isFocussed", "isBrowserFocussed" );
 
     lua_classfunction ( luaVM, "requestPages", "requestBrowserPages" );
     lua_classfunction ( luaVM, "isURLBlocked", "isBrowserURLBlocked" );

@@ -1190,6 +1190,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setBrowserVolume", CLuaFunctionDefs::SetBrowserVolume );
     CLuaCFunctions::AddFunction ( "isBrowserURLBlocked", CLuaFunctionDefs::IsBrowserURLBlocked );
     CLuaCFunctions::AddFunction ( "focusBrowser", CLuaFunctionDefs::FocusBrowser );
+    CLuaCFunctions::AddFunction ( "isBrowserFocussed", CLuaFunctionDefs::IsBrowserFocussed );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();

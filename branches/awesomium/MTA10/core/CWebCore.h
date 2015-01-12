@@ -51,7 +51,7 @@ public:
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
     inline void         SetTestModeEnabled  ( bool bEnabled ) { m_bTestmodeEnabled = bEnabled; };
 
-    inline CWebView*    GetFocusedWebView   () { return m_pFocusedWebView; };
+    inline CWebViewInterface* GetFocusedWebView () { return (CWebViewInterface*) m_pFocusedWebView; };
     inline void         SetFocusedWebView   ( CWebView* pWebView ) { m_pFocusedWebView = pWebView; };
     void                ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam );
     void                ClearTextures       ();

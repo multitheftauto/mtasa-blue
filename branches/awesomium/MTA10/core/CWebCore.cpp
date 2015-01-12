@@ -138,7 +138,7 @@ CWebView* CWebCore::FindWebView ( CefRefPtr<CefBrowser> browser )
 eURLState CWebCore::GetURLState ( const SString& strURL )
 {
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
-    static SString wildcardWhitelist[] = { "*.googlevideo.com", "*.google.com", "*.youtube.com", "*.vimeocdn.com" };
+    static SString wildcardWhitelist[] = { "*.googlevideo.com", "*.google.com", "*.youtube.com", "*.ytimg.com", "*.vimeocdn.com" };
 
     for ( int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i )
     {
@@ -194,8 +194,8 @@ void CWebCore::InitialiseWhiteAndBlacklist ( bool bAddHardcoded, bool bAddDynami
     {
         // Hardcoded whitelist
         static SString whitelist[] = { 
-            "google.com", "youtube.com", "www.youtube-nocookie.com", "s.ytimg.com", "vimeo.com", "player.vimeo.com",
-            "myvideo.com", "reddit.com", "mtasa.com", "multitheftauto.com", "mtavc.com", "www.googleapis.com"
+            "google.com", "youtube.com", "www.youtube-nocookie.com", "vimeo.com", "player.vimeo.com",
+            "myvideo.com", "mtasa.com", "multitheftauto.com", "mtavc.com", "www.googleapis.com"
         };
 
         // Hardcoded blacklist

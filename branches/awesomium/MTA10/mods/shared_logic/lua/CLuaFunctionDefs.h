@@ -1015,6 +1015,7 @@ public:
     LUA_DECLARE ( SetBrowserVolume );
     LUA_DECLARE ( IsBrowserURLBlocked );
     LUA_DECLARE ( FocusBrowser );
+    LUA_DECLARE ( IsBrowserFocussed );
 
 private:
     // Static references to objects

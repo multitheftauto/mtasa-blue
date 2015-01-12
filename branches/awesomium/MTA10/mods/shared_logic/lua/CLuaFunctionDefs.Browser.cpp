@@ -388,3 +388,24 @@ int CLuaFunctionDefs::FocusBrowser ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::IsBrowserFocussed ( lua_State* luaVM )
+{
+//  browser isBrowserFocussed ()
+    CClientWebBrowser* pWebBrowser;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+
+    if ( !argStream.HasErrors () )
+    {
+        CWebViewInterface* pWebView = g_pCore->GetWebCore ()->GetFocusedWebView ();
+        lua_pushboolean ( luaVM, pWebBrowser->GetWebView () == pWebView );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushnil ( luaVM );
+    return 1;
+}
