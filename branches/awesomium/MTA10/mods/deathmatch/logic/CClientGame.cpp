@@ -4356,6 +4356,10 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
             pDamagedPed->m_fHealth = fCurrentHealth;
             pDamagedPed->m_fArmor = fCurrentArmor;
 
+            ElementID damagerID = INVALID_ELEMENT_ID;
+            if ( pInflictingEntity && !pInflictingEntity->IsLocalEntity ( ) )
+                damagerID = pInflictingEntity->GetID ( );
+
             // Is it the local player?
             if ( pDamagedPed->IsLocalPlayer () )
             {  
@@ -4364,8 +4368,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 m_ucDamageBodyPiece = static_cast < unsigned char > ( hitZone );
                 m_pDamageEntity = pInflictingEntity;
                 m_ulDamageTime = CClientTime::GetTime ();
-                m_DamagerID = INVALID_ELEMENT_ID;
-                if ( pInflictingEntity && !pInflictingEntity->IsLocalEntity ( ) ) m_DamagerID = pInflictingEntity->GetID ( );
+                m_DamagerID = damagerID;
                 m_bDamageSent = false;
             }
             // Does this damage kill the player?
@@ -4382,7 +4385,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         AnimationId animID = pEvent->GetAnimId ();
 
                         // Check if we're dead
-                        DoWastedCheck ( m_DamagerID, m_ucDamageWeapon, m_ucDamageBodyPiece, animGroup, animID );                
+                        DoWastedCheck ( damagerID, weaponUsed, hitZone, animGroup, animID );                
                     }
 
                     // Allow GTA to kill us if we've fell to our death
@@ -4395,6 +4398,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                 {
                     if ( pDamagedPed->IsLocalEntity () && fPreviousHealth > 0.0f )
                     {
+                        // Client-side ped
                         pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
@@ -4408,12 +4412,8 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
                         pEvent->ComputeDeathAnim ( pDamagePed, true );
                         AssocGroupId animGroup = pEvent->GetAnimGroup ();
                         AnimationId animID = pEvent->GetAnimId ();
-                        m_ulDamageTime = CClientTime::GetTime ();
-                        m_DamagerID = INVALID_ELEMENT_ID;
-                        if ( pInflictingEntity && !pInflictingEntity->IsLocalEntity() ) m_DamagerID = pInflictingEntity->GetID ();
 
-                        // Check if we're dead
-                        SendPedWastedPacket ( pDamagedPed, m_DamagerID, weaponUsed, hitZone, animGroup, animID );
+                        SendPedWastedPacket ( pDamagedPed, damagerID, weaponUsed, hitZone, animGroup, animID );
                     }
                 }
             }
@@ -5452,6 +5452,9 @@ void CClientGame::ResetMapInfo ( void )
 
     // Far clip distance
     g_pMultiplayer->RestoreFarClipDistance ( );
+
+    // Near clip distance
+    g_pMultiplayer->RestoreNearClipDistance ( );
 
     // Fog distance
     g_pMultiplayer->RestoreFogDistance ( );

@@ -1753,8 +1753,6 @@ CClientPed* CClientVehicle::GetControllingPlayer ( void )
         CClientVehicle* pChainEngine = GetChainEngine ();
         if ( pChainEngine )
             pControllingPlayer = pChainEngine->GetOccupant ( 0 );
-        else
-            pControllingPlayer = NULL;
     }
 
     return pControllingPlayer;

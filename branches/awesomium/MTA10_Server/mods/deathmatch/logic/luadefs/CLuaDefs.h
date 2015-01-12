@@ -59,25 +59,7 @@
 class CLuaDefs
 {
 public:
-    static void         Initialize      (   CElement* pRootElement,
-                                            CElementDeleter* pElementDeleter,
-                                            CBlipManager* pBlipManager,
-                                            CHandlingManager* pHandlingManager,
-                                            CLuaManager* pLuaManager,
-                                            CMarkerManager* pMarkers,
-                                            CObjectManager* pObjectManager,
-                                            CPickupManager* pPickupManager,
-                                            CPlayerManager* pPlayerManager,
-                                            CRadarAreaManager* pRadarAreaManager,
-                                            CRegisteredCommands* pRegisteredCommands,
-                                            CScriptDebugging* pScriptDebugging,
-                                            CVehicleManager* pVehicleManager,
-                                            CTeamManager* pTeamManager,
-                                            CAccountManager* pAccountManager,
-                                            CColManager* pColManager,
-                                            CResourceManager* pResourceManager,
-                                            CAccessControlListManager* pACLManager,
-                                            CMainConfig* pMainConfig );
+    static void         Initialize      (   class CGame* pGame );
 
     static bool         CanUseFunction      ( const char* szFunction, lua_State* luaVM, bool bRestricted );
     static int          CanUseFunction      ( lua_CFunction f, lua_State* luaVM );

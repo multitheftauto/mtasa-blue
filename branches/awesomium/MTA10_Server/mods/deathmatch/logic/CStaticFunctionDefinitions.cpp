@@ -1089,9 +1089,6 @@ bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, const char
     CLuaArgument * pCurrentVariable = pElement->GetCustomData ( szName, false, &bIsSynced );
     if ( !pCurrentVariable || *pCurrentVariable != Variable || bIsSynced != bSynchronize )
     {
-        // Set its custom data
-        pElement->SetCustomData ( szName, Variable, pLuaMain, bSynchronize );
-
         if ( bSynchronize )
         {
             // Tell our clients to update their data
@@ -1104,6 +1101,9 @@ bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, const char
 
             CPerfStatEventPacketUsage::GetSingleton ()->UpdateElementDataUsageOut ( szName, m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed() );
         }
+
+        // Set its custom data
+        pElement->SetCustomData ( szName, Variable, pLuaMain, bSynchronize );
         return true;
     }
     return false;
@@ -4506,6 +4506,8 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( CElement* pElement, const CVe
         
         // Tell the player
         CBitStream BitStream;
+        if ( pPlayer->GetBitStreamVersion() >= 0x5E )
+            BitStream.pBitStream->Write ( pCamera->GenerateSyncTimeContext() );
         BitStream.pBitStream->Write ( vecPosition.fX );
         BitStream.pBitStream->Write ( vecPosition.fY );
         BitStream.pBitStream->Write ( vecPosition.fZ );
@@ -4549,6 +4551,8 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CElement* pElement, CElement*
             pCamera->SetFOV ( 70.0f );
 
             CBitStream BitStream;
+            if ( pPlayer->GetBitStreamVersion() >= 0x5E )
+                BitStream.pBitStream->Write ( pCamera->GenerateSyncTimeContext() );
             BitStream.pBitStream->Write ( pTarget->GetID () );
             pPlayer->Send ( CLuaPacket ( SET_CAMERA_TARGET, *BitStream.pBitStream ) );
             return true;

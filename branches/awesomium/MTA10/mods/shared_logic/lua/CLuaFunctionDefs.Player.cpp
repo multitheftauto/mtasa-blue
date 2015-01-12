@@ -491,6 +491,28 @@ int CLuaFunctionDefs::GetPlayerSerial ( lua_State* luaVM )
 
 // Player Map
 
+int CLuaFunctionDefs::ForcePlayerMap ( lua_State* luaVM )
+{    
+    bool bForced;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bForced );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Force the map to open or close
+        if ( CStaticFunctionDefinitions::ForcePlayerMap ( bForced ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::IsPlayerMapForced ( lua_State* luaVM )
 {    
     bool bForced;

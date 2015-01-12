@@ -57,6 +57,13 @@ void CWeaponRPCs::GiveWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
                             pPlayerWeapon = pPed->GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usAmmo );
                             if ( pPlayerWeapon && bGiveWeapon )
                                 pPlayerWeapon->SetAsCurrentWeapon ();
+                            
+                            // Store the ammo so it's not lost if a ped is streamed out
+                            if ( pPed->GetType () == CCLIENTPED )
+                            {
+                                uchar ucSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+                                pPed->m_usWeaponAmmo [ ucSlot ] += usAmmo;
+                            }
                         }
                         else
                         {
@@ -135,6 +142,19 @@ void CWeaponRPCs::TakeWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
 
                     // Do we have the weapon?
                     CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
+
+                    // Store the ammo so it's not lost if a ped is streamed out
+                    if ( pPed->GetType () == CCLIENTPED )
+                    {
+                        char cSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+                        if ( cSlot != -1 )
+                        {
+                            if ( usAmmo > pPed->m_usWeaponAmmo [ cSlot ] )
+                                pPed->m_usWeaponAmmo [ cSlot ] = 0;
+                            else
+                                pPed->m_usWeaponAmmo [ cSlot ] -= usAmmo;
+                        }
+                    }
                     if ( pPlayerWeapon == NULL ) return;
 
                     unsigned char ucAmmoInClip = static_cast < unsigned char > ( pPlayerWeapon->GetAmmoInClip () );
@@ -216,6 +236,16 @@ void CWeaponRPCs::SetWeaponAmmo ( CClientEntity* pSource, NetBitStreamInterface&
 
                 // Do we have it?
                 CWeapon* pPlayerWeapon = pPed->GetWeapon ( (eWeaponType) ucWeaponID );
+
+                // Store the ammo so it's not lost if a ped is streamed out
+                if ( pPed->GetType () == CCLIENTPED )
+                {
+                    char cSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+                    if ( cSlot != -1 )
+                    {
+                        pPed->m_usWeaponAmmo [ cSlot ] = usAmmo;
+                    }
+                }
                 if ( pPlayerWeapon == NULL ) return;
 
                 unsigned char ucAmmoInClip = static_cast < unsigned char > ( pPlayerWeapon->GetAmmoInClip () );

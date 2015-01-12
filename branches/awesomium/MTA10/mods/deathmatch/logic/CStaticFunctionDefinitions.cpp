@@ -1843,6 +1843,33 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot ( CClientEntity& Entity, int i
 }
 
 
+bool CStaticFunctionDefinitions::GivePedWeapon ( CClientEntity& Entity, uchar ucWeaponID, ushort usWeaponAmmo, bool bSetAsCurrent )
+{
+    RUN_CHILDREN ( GivePedWeapon ( **iter, ucWeaponID, usWeaponAmmo, bSetAsCurrent ) )
+    
+    if ( IS_PED ( &Entity ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        // Make sure it's a ped and not a player
+        if ( Ped.GetType () == CCLIENTPED )
+        {
+            CWeapon* pPlayerWeapon = NULL;
+            pPlayerWeapon = Ped.GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usWeaponAmmo );
+            
+            // Set as current weapon?
+            if ( pPlayerWeapon && bSetAsCurrent )
+                pPlayerWeapon->SetAsCurrentWeapon ();
+            
+            // Store the ammo so it's not lost if a ped is streamed out
+            uchar ucSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
+            Ped.m_usWeaponAmmo [ ucSlot ] += usWeaponAmmo;
+            return true;
+        }
+    }
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( eHudComponent component, bool bShow )
 {
     g_pGame->GetHud ()->SetComponentVisible ( component, bShow );
@@ -5907,7 +5934,7 @@ bool CStaticFunctionDefinitions::GetScreenFromWorldPosition ( CVector& vecWorld,
 bool CStaticFunctionDefinitions::GetWeather ( unsigned char& ucWeather, unsigned char& ucWeatherBlendingTo )
 {
     // Grab the current weather
-    CBlendedWeather* pWeather = g_pClientGame->GetBlendedWeather ();;
+    CBlendedWeather* pWeather = g_pClientGame->GetBlendedWeather ();
     ucWeather = pWeather->GetWeather ();
 
     // If we're blending to some weather, also return which. Otherwize just return 0xFF which will return false
@@ -7090,6 +7117,13 @@ bool CStaticFunctionDefinitions::SetWeaponClipAmmo ( CClientWeapon * pWeapon, in
 bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
 {
     dCount = static_cast < double > ( GetTickCount64_() );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::ForcePlayerMap ( bool & bForced )
+{
+    m_pClientGame->GetRadarMap ()->SetForcedState ( bForced );
     return true;
 }
 

@@ -67,9 +67,11 @@ void CLuaArgument::CopyRecursive ( const CLuaArgument& Argument, CFastHashMap < 
     // Destroy our old tabledata if neccessary
     DeleteTableData ();
 
+#ifdef MTA_DEBUG
     // Copy over line and filename too
     m_strFilename = Argument.m_strFilename;
     m_iLine = Argument.m_iLine;
+#endif
 
     // Set our variable equally to the copy class
     m_iType = Argument.m_iType;
@@ -197,6 +199,7 @@ bool CLuaArgument::CompareRecursive ( const CLuaArgument& Argument, std::set < C
 
 void CLuaArgument::Read ( lua_State* luaVM, int iArgument, CFastHashMap < const void*, CLuaArguments* > * pKnownTables )
 {
+#ifdef MTA_DEBUG
     // Store debug data for later retrieval
     m_iLine = 0;
     m_strFilename = "";
@@ -208,6 +211,7 @@ void CLuaArgument::Read ( lua_State* luaVM, int iArgument, CFastHashMap < const 
         m_strFilename = debugInfo.source;
         m_iLine = debugInfo.currentline;
     }
+#endif
 
     // Eventually delete our previous string
     m_strString = "";
@@ -776,11 +780,13 @@ bool CLuaArgument::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHas
 
 void CLuaArgument::LogUnableToPacketize ( const char* szMessage ) const
 {
+#ifdef MTA_DEBUG
     if ( m_strFilename.length () > 0 )
     {
         g_pGame->GetScriptDebugging ()->LogWarning ( NULL, "%s:%d: %s\n", ConformResourcePath ( m_strFilename.c_str () ).c_str (), m_iLine, szMessage );
     }
     else
+#endif
     {
         g_pGame->GetScriptDebugging ()->LogWarning ( NULL, "Unknown: %s\n", szMessage );
     }
@@ -1032,7 +1038,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                             else
                             {
                                 // Appears sometimes when a player quits
-                                //g_pClientGame->GetScriptDebugging()->LogError ( NULL, SString ( "Invalid element specified in JSON string '%s'.", szString ) );
+                                //g_pClientGame->GetScriptDebugging()->LogError ( NULL, "Invalid element specified in JSON string '%s'.", szString );
                                 m_iType = LUA_TNIL;
                             }
                             break;
@@ -1046,7 +1052,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                             }
                             else
                             {
-                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, SString ( "Invalid resource specified in JSON string '%s'.", strString.c_str ( ) ) );
+                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, "Invalid resource specified in JSON string '%s'.", strString.c_str ( ) );
                                 m_iType = LUA_TNIL;
                             }
                             break;
@@ -1062,7 +1068,7 @@ bool CLuaArgument::ReadFromJSONObject ( json_object* object, std::vector < CLuaA
                             }
                             else
                             {
-                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, SString ( "Invalid table reference specified in JSON string '%s'.", strString.c_str ( ) ) );
+                                g_pGame->GetScriptDebugging ( )->LogError ( NULL, "Invalid table reference specified in JSON string '%s'.", strString.c_str ( ) );
                                 m_iType = LUA_TNIL;
                             }
                             break;

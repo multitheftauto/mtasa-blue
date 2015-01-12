@@ -721,13 +721,12 @@ void CLocalGUI::UpdateCursor ( void )
 
     static DWORD dwWidth = CDirect3DData::GetSingleton().GetViewportWidth();
     static DWORD dwHeight = CDirect3DData::GetSingleton().GetViewportHeight();
-    static POINT pointStoredPosition;
     static bool bFirstRun = true;
 
     if ( bFirstRun )
     {
-        pointStoredPosition.x = dwWidth / 2;
-        pointStoredPosition.y = dwHeight / 2;
+        m_StoredMousePosition.x = dwWidth / 2;
+        m_StoredMousePosition.y = dwHeight / 2;
         bFirstRun = false;
     }
     // Called in each frame to make sure the mouse is only visible when a GUI control that uses the
@@ -742,7 +741,7 @@ void CLocalGUI::UpdateCursor ( void )
             CCore::GetSingleton ().GetGame ()->GetPad ()->Clear ();*/
 
             // Restore the mouse cursor to its old position
-            SetCursorPos ( pointStoredPosition.x, pointStoredPosition.y );
+            SetCursorPos ( m_StoredMousePosition.x, m_StoredMousePosition.y );
 
             // Enable our mouse cursor
             CSetCursorPosHook::GetSingleton ( ).DisableSetCursorPos ();
@@ -759,9 +758,6 @@ void CLocalGUI::UpdateCursor ( void )
             /* Restore the controller state
             CCore::GetSingleton ().GetGame ()->GetPad ()->Disable ( false );
             CCore::GetSingleton ().GetGame ()->GetPad ()->Clear ();*/
-
-            // Save the mouse cursor position
-            GetCursorPos ( &pointStoredPosition );
 
             // Set the mouse back to the center of the screen (to prevent the game from reacting to its movement)
             SetCursorPos ( dwWidth / 2, dwHeight / 2 );
@@ -806,4 +802,14 @@ DWORD CLocalGUI::TranslateScanCodeToGUIKey ( DWORD dwCharacter )
         case 0x41:          return DIK_A;           // A
         default:            return 0;
     }
+}
+
+void CLocalGUI::SetCursorPos ( int iX, int iY )
+{
+	// Update the stored position
+    m_StoredMousePosition.x = iX;
+    m_StoredMousePosition.y = iY;
+
+	// Apply the position
+    ::SetCursorPos ( iX, iY );
 }

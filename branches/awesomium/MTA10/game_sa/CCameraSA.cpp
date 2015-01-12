@@ -571,6 +571,11 @@ void CCameraSA::SetCameraClip ( bool bObjects, bool bVehicles )
     bCameraClipVehicles = bVehicles;
 }
 
+void CCameraSA::GetCameraClip( bool &bObjects, bool &bVehicles )
+{
+    bObjects = bCameraClipObjects;
+    bVehicles = bCameraClipVehicles;
+}
 
 void _cdecl DoCameraCollisionDetectionPokes ()
 {

@@ -167,6 +167,7 @@ public:
     static bool                         GetPedOxygenLevel                   ( CClientPed& Ped, float& fOxygen );
     
     static bool                         SetPedWeaponSlot                    ( CClientEntity& Entity, int iSlot );
+    static bool                         GivePedWeapon                       ( CClientEntity& Entity, uchar ucWeaponID, ushort usWeaponAmmo, bool bSetAsCurrent );
     static bool                         SetPedRotation                      ( CClientEntity& Entity, float fRotation, bool bNewWay );
     static bool                         SetPedCanBeKnockedOffBike           ( CClientEntity& Entity, bool bCanBeKnockedOffBike );
     static bool                         SetPedAnimation                     ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame );
@@ -597,6 +598,7 @@ public:
     static bool                         GetTickCount_                       ( double& dCount );
 
     // Map funcs
+    static bool                         ForcePlayerMap                      ( bool & bForced );
     static bool                         IsPlayerMapForced                   ( bool & bForced );
     static bool                         IsPlayerMapVisible                  ( bool & bVisible );
     static bool                         GetPlayerMapBoundingBox             ( CVector &vecMin, CVector &vecMax );

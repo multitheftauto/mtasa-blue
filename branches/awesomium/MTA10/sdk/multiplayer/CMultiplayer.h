@@ -219,6 +219,9 @@ public:
     virtual void                        SetFarClipDistance          ( float fDistance ) = 0;
     virtual float                       GetFarClipDistance          ( void ) = 0;
     virtual void                        RestoreFarClipDistance      ( void ) = 0;
+    virtual void                        SetNearClipDistance         ( float fDistance ) = 0;
+    virtual float                       GetNearClipDistance         ( void ) = 0;
+    virtual void                        RestoreNearClipDistance     ( void ) = 0;
     virtual void                        SetFogDistance              ( float fDistance ) = 0;
     virtual float                       GetFogDistance              ( void ) = 0;
     virtual void                        RestoreFogDistance          ( void ) = 0;

@@ -389,9 +389,9 @@ int CLuaFunctionDefs::FocusBrowser ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::IsBrowserFocussed ( lua_State* luaVM )
+int CLuaFunctionDefs::IsBrowserFocused ( lua_State* luaVM )
 {
-//  browser isBrowserFocussed ()
+//  browser isBrowserFocused ()
     CClientWebBrowser* pWebBrowser;
 
     CScriptArgReader argStream ( luaVM );

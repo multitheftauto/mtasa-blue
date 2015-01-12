@@ -290,6 +290,14 @@ CClientPed::~CClientPed ( void )
     // We have a player model?
     if ( m_pPlayerPed )
     {
+        // Do we have the in_water task? #3973: Peds destroyed in water leave water circles
+        CTask * pTask = m_pTaskManager->GetTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+        if ( pTask && pTask->GetTaskType () == TASK_COMPLEX_IN_WATER )
+        {
+            // Kill the task immediately
+            pTask->MakeAbortable ( m_pPlayerPed, ABORT_PRIORITY_IMMEDIATE, NULL );
+        }
+        
         // Destroy the player model
         if ( m_bIsLocalPlayer )
         {
@@ -2155,6 +2163,7 @@ void CClientPed::RemoveWeapon ( eWeaponType weaponType )
         if ( m_WeaponTypes [ i ] == weaponType )
         {
             m_WeaponTypes [ i ] = WEAPONTYPE_UNARMED;
+            m_usWeaponAmmo [ i ] = 0;
             if ( m_CurrentWeaponSlot == ( eWeaponSlot ) i )
             {
                 m_CurrentWeaponSlot = WEAPONSLOT_TYPE_UNARMED;
@@ -2178,7 +2187,10 @@ void CClientPed::RemoveAllWeapons ( void )
     }
 
     for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
+    {
         m_WeaponTypes [ i ] = WEAPONTYPE_UNARMED;
+        m_usWeaponAmmo [ i ] = 0;
+    }
     m_CurrentWeaponSlot = WEAPONSLOT_TYPE_UNARMED;
 }
 
@@ -3524,7 +3536,9 @@ void CClientPed::_CreateModel ( void )
         for ( int i = 0 ; i < (int)WEAPONSLOT_MAX ; i++ )
         {
             if ( m_WeaponTypes [ i ] != WEAPONTYPE_UNARMED )
-                GiveWeapon ( m_WeaponTypes [ i ], 1 );   // TODO: store ammo for each weapon
+            {
+                GiveWeapon ( m_WeaponTypes [ i ], m_usWeaponAmmo [ i ] );
+            }
         }
 
         m_pPlayerPed->SetCurrentWeaponSlot ( m_CurrentWeaponSlot );
@@ -3629,6 +3643,22 @@ void CClientPed::_CreateLocalModel ( void )
 
 void CClientPed::_DestroyModel ()
 {
+    // Store ped ammo
+    if ( GetType () == CCLIENTPED )
+    {
+        for ( uchar i = 0 ; i < (uchar)WEAPONSLOT_MAX ; i++ )
+        {
+            if ( m_WeaponTypes [ i ] != WEAPONTYPE_UNARMED )
+            {
+                CWeapon * pWeapon = GetWeapon ( m_WeaponTypes [ i ] );
+                if ( pWeapon )
+                {
+                    m_usWeaponAmmo [ i ] = static_cast < ushort > ( pWeapon->GetAmmoTotal ( ) );
+                }
+            }
+        }
+    }
+
     // Remove our linked contact entity
     if ( m_pCurrentContactEntity )
     {
@@ -4032,6 +4062,14 @@ void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
     {
         // Reset whatever task
         m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
+
+        // check we aren't in the fall and get up task
+        CTask * pTaskPhysicalResponse = m_pTaskManager->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+        // check our physical response task
+        if ( pTaskPhysicalResponse && strcmp ( pTaskPhysicalResponse->GetTaskName ( ), "TASK_COMPLEX_FALL_AND_GET_UP" ) == 0 )
+        {
+            m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+        }
 
         // Create a task to warp the player in and execute it
         CTaskSimpleCarSetPedInAsDriver* pInTask = g_pGame->GetTasks ()->CreateTaskSimpleCarSetPedInAsDriver ( pGameVehicle );
@@ -5047,7 +5085,7 @@ float CClientPed::GetDistanceFromCentreOfMassToBaseOfModel ( void )
     {
         return m_pPlayerPed->GetDistanceFromCentreOfMassToBaseOfModel ();
     }
-   return 0.0f;;
+   return 0.0f;
 }
 
 

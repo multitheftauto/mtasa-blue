@@ -226,6 +226,7 @@ public:
     inline CTeamManager*            GetTeamManager              ( void )        { return m_pTeamManager; }
     inline CUnoccupiedVehicleSync*  GetUnoccupiedVehicleSync    ( void )        { return m_pUnoccupiedVehicleSync; }
     inline CPedSync*                GetPedSync                  ( void )        { return m_pPedSync; }
+    inline CRegisteredCommands*     GetRegisteredCommands       ( void )        { return m_pRegisteredCommands; }
 #ifdef WITH_OBJECT_SYNC
     inline CObjectSync*             GetObjectSync               ( void )        { return m_pObjectSync; }
 #endif
@@ -404,7 +405,7 @@ private:
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
     void                        RelayNearbyPacket           ( class CPacket& Packet );
 
-    void                        ProcessTrafficLights        ( unsigned long ulCurrentTime );
+    void                        ProcessTrafficLights        ( long long llCurrentTime );
 
     void                        Packet_PlayerJoin           ( const NetServerPlayerID& Source );
     void                        Packet_PlayerJoinData       ( class CPlayerJoinDataPacket& Packet );
@@ -512,7 +513,7 @@ private:
 
     unsigned char               m_ucTrafficLightState;
     bool                        m_bTrafficLightsLocked;
-    unsigned long               m_ulLastTrafficUpdate;
+    long long                   m_llLastTrafficUpdate;
 
     unsigned char               m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     unsigned char               m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
@@ -550,7 +551,7 @@ private:
     SGarageStates               m_bGarageStates;
 
     // FPS statistics
-    unsigned long               m_ulLastFPSTime;
+    long long                   m_llLastFPSTime;
     unsigned short              m_usFrames;
     unsigned short              m_usFPS;
     int                         m_iSyncFPS;

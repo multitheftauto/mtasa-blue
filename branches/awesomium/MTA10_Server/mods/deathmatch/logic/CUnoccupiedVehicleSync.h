@@ -30,9 +30,10 @@ public:
 
     void                    OverrideSyncer                      ( CVehicle* pVehicle, CPlayer* pPlayer );
     CPlayer*                FindPlayerCloseToVehicle            ( CVehicle* pVehicle, float fMaxDistance );
+    void                    ResyncForPlayer                     ( CPlayer* pPlayer );
 
 private:
-    void                    Update                              ( unsigned long ulCurrentTime );
+    void                    Update                              ( void );
     void                    UpdateVehicle                       ( CVehicle* pVehicle );
     void                    FindSyncer                          ( CVehicle* pVehicle );
     
@@ -45,7 +46,7 @@ private:
     CPlayerManager*         m_pPlayerManager;
     CVehicleManager*        m_pVehicleManager;
 
-    unsigned long           m_ulLastSweepTime;
+    CElapsedTime            m_UpdateTimer;
 };
 
 #endif

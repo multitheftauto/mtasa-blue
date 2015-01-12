@@ -164,7 +164,7 @@ void CPad::UpdateKeys ( void )
 
         }
         m_ControlStates [ 9 ].bState = ( m_csCurrentState.ButtonTriangle ); // Enter Exit
-        m_ControlStates [ 10 ].bState = ( m_csCurrentState.Select ) ? true : false;; // Change View
+        m_ControlStates [ 10 ].bState = ( m_csCurrentState.Select ) ? true : false; // Change View
     }
 }
 

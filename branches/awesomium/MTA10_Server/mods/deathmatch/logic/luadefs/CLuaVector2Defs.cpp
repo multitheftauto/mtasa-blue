@@ -61,6 +61,10 @@ int CLuaVector2Defs::Create ( lua_State* luaVM )
             argStream.ReadNumber ( vector.fY );
         }
     }
+    else if ( argStream.NextIsVector2D () )
+    {
+        argStream.ReadVector2D ( vector );
+    }
 
     lua_pushvector ( luaVM, vector );
     return 1;

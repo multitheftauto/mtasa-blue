@@ -144,6 +144,7 @@ class CVehicle : public CElement
     friend class CPlayer;
 
 public:
+    ZERO_ON_NEW
                                     CVehicle                ( class CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2 );
                                     ~CVehicle               ( void );
 
@@ -315,7 +316,7 @@ public:
     inline float                    GetRespawnHealth        ( void )                        { return m_fRespawnHealth; };
     inline void                     SetRespawnHealth        ( float fHealth )               { m_fRespawnHealth = fHealth; };
     inline bool                     GetRespawnEnabled       ( void )                        { return m_bRespawnEnabled; }
-    void                            SetRespawnEnabled       ( bool bEnabled )               { m_bRespawnEnabled = bEnabled; }
+    void                            SetRespawnEnabled       ( bool bEnabled );
     void                            SetBlowRespawnInterval  ( unsigned long ulTime )        { m_ulBlowRespawnInterval = ulTime; }
     void                            SetIdleRespawnInterval  ( unsigned long ulTime )        { m_ulIdleRespawnInterval = ulTime; }
 
@@ -345,6 +346,8 @@ public:
     bool                            IsIdleTimerRunning      ( void );
     bool                            IsIdleTimerFinished     ( void );
     bool                            IsStationary            ( void );
+    void                            OnRelayUnoccupiedSync   ( void );
+    void                            HandleDimensionResync   ( void );
 
 private:
     class CVehicleManager*          m_pVehicleManager;
@@ -428,9 +431,12 @@ private:
 
     CTickCount                      m_LastPushedTime;
     CVector                         m_vecStationaryCheckPosition;
+    bool                            m_bNeedsDimensionResync;
+    ushort                          m_usLastUnoccupiedSyncDimension;
 
 public: // 'Safe' variables (that have no need for accessors)
     bool                            m_bDamageProof;
+    uint                            m_uiDamageInfoSendPhase;
     SFixedArray < unsigned char, MAX_DOORS >   m_ucDoorStates;
     SFixedArray < unsigned char, MAX_WHEELS >  m_ucWheelStates;
     SFixedArray < unsigned char, MAX_PANELS >  m_ucPanelStates;

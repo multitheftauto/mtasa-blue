@@ -116,6 +116,23 @@ void CGUIGridList_Impl::SetColumnWidth ( int hColumn, float fWidth, bool bRelati
     {}
 }
 
+bool CGUIGridList_Impl::GetColumnWidth ( int hColumn, float& fOutWidth, bool bRelative )
+{
+    try
+    {
+        fOutWidth = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> getColumnHeaderWidth ( GetColumnIndex ( hColumn ) );
+
+        if ( !bRelative )
+            fOutWidth = m_pWindow->relativeToAbsoluteX ( fOutWidth );
+
+        return true;
+    }
+    catch ( CEGUI::Exception )
+    {
+    }
+    return false;
+}
+
 void CGUIGridList_Impl::SetColumnTitle ( int hColumn, const char *szTitle )
 {
     reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> setColumnHeaderTitle ( GetColumnIndex ( hColumn ), szTitle );

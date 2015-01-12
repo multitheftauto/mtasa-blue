@@ -271,6 +271,7 @@ public:
     LUA_DECLARE ( SetPedAnimationProgress );
     LUA_DECLARE ( SetPedMoveAnim );
     LUA_DECLARE ( SetPedWeaponSlot );
+    LUA_DECLARE ( GivePedWeapon );
     LUA_DECLARE ( AddPedClothes );
     LUA_DECLARE ( RemovePedClothes );
     LUA_DECLARE ( SetPedControlState );
@@ -514,6 +515,7 @@ public:
     LUA_DECLARE ( SetCameraInterior );
     LUA_DECLARE ( FadeCamera );
     LUA_DECLARE ( SetCameraClip );
+    LUA_DECLARE ( GetCameraClip );
     LUA_DECLARE ( SetCameraViewMode );
     LUA_DECLARE ( SetCameraGoggleEffect );
 
@@ -654,6 +656,7 @@ public:
     LUA_DECLARE ( GUIGridListAddColumn );
     LUA_DECLARE ( GUIGridListRemoveColumn );
     LUA_DECLARE ( GUIGridListSetColumnWidth );
+    LUA_DECLARE ( GUIGridListGetColumnWidth );
     LUA_DECLARE ( GUIGridListSetColumnTitle );
     LUA_DECLARE ( GUIGridListGetColumnTitle );
     LUA_DECLARE ( GUIGridListSetScrollBars );
@@ -813,6 +816,9 @@ public:
     LUA_DECLARE ( GetFarClipDistance );
     LUA_DECLARE ( SetFarClipDistance );
     LUA_DECLARE ( ResetFarClipDistance );
+    LUA_DECLARE ( GetNearClipDistance );
+    LUA_DECLARE ( SetNearClipDistance );
+    LUA_DECLARE ( ResetNearClipDistance );
     LUA_DECLARE ( GetFogDistance );
     LUA_DECLARE ( SetFogDistance );
     LUA_DECLARE ( ResetFogDistance );
@@ -941,6 +947,7 @@ public:
     LUA_DECLARE ( InterpolateBetween );
 
     // Map funcs
+    LUA_DECLARE ( ForcePlayerMap );
     LUA_DECLARE ( IsPlayerMapForced );
     LUA_DECLARE ( IsPlayerMapVisible );
     LUA_DECLARE ( GetPlayerMapBoundingBox );
@@ -1015,7 +1022,7 @@ public:
     LUA_DECLARE ( SetBrowserVolume );
     LUA_DECLARE ( IsBrowserURLBlocked );
     LUA_DECLARE ( FocusBrowser );
-    LUA_DECLARE ( IsBrowserFocussed );
+    LUA_DECLARE ( IsBrowserFocused );
 
 private:
     // Static references to objects

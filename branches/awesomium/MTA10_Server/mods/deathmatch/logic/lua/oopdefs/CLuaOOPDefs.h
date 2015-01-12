@@ -9,7 +9,7 @@
 *
 *****************************************************************************/
 
-class CLuaFunctionDefinitions;
+class CLuaFunctionDefs;
 
 #ifndef __CLUAOOPDEFINITIONS_H
 #define __CLUAOOPDEFINITIONS_H
@@ -35,14 +35,26 @@ public:
     LUA_DECLARE ( GetElementPosition );
     LUA_DECLARE ( GetElementRotation );
     LUA_DECLARE ( SetElementRotation );
+    LUA_DECLARE ( GetElementVelocity );
 
     // Camera
     LUA_DECLARE ( GetCameraMatrix );
-
     LUA_DECLARE ( GetCameraPosition );
     LUA_DECLARE ( SetCameraPosition );
     LUA_DECLARE ( GetCameraRotation );
     LUA_DECLARE ( SetCameraRotation );
+
+    // Marker
+    LUA_DECLARE ( GetMarkerTarget );
+
+    // Connection
+    LUA_DECLARE ( DbQuery );
+
+    // ACL
+    LUA_DECLARE ( DoesACLGroupContainObject );
+
+    // RadarArea
+    LUA_DECLARE ( GetRadarAreaSize );
 };
 
 #endif

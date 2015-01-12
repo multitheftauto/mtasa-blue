@@ -34,7 +34,7 @@ CLanguage::~CLanguage ( void )
 
 SString CLanguage::Translate ( const SString& strMessage )
 {
-    return SString(m_Dict.translate ( strMessage ));;
+    return SString(m_Dict.translate ( strMessage ));
 }
 
 SString CLanguage::TranslateWithContext ( const SString& strContext, const SString& strMessage )

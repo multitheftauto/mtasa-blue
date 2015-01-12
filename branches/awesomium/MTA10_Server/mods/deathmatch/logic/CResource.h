@@ -333,6 +333,7 @@ public:
     inline void             SetPersistent ( bool bPersistent ) { m_bIsPersistent = bPersistent; }
     bool                    ExtractFile ( const char * szFilename );
     bool                    DoesFileExistInZip ( const char * szFilename );
+    bool                    HasGoneAway ( void );
     bool                    GetFilePath ( const char * szFilename, string& strPath );
     inline const std::string&   GetResourceDirectoryPath () { return m_strResourceDirectoryPath; };
     inline const std::string&   GetResourceCacheDirectoryPath () { return m_strResourceCachePath; };

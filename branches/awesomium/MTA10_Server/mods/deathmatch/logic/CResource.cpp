@@ -385,9 +385,9 @@ void ReplaceSlashes ( char* szPath )
 
 bool CResource::Unload ( void )
 {
-    Stop(true);
+    Stop ( true );
 
-    TidyUp();
+    TidyUp ( );
     m_bLoaded = false;
     m_bHasStarted = false;
 
@@ -395,6 +395,12 @@ bool CResource::Unload ( void )
     {
         delete m_pNodeStorage;
         m_pNodeStorage = NULL;
+    }
+
+    if ( m_pNodeSettings )
+    {
+        delete m_pNodeSettings;
+        m_pNodeSettings = NULL;
     }
 
     m_strResourceZip = "";
@@ -1298,6 +1304,19 @@ bool CResource::DoesFileExistInZip ( const char * szFilename )
         m_zipfile = NULL;
     }
     return bRes;
+}
+
+// Return true if is looks like the resource files have been removed
+bool CResource::HasGoneAway ( void )
+{
+    if ( !IsResourceZip () )
+    {
+        return !FileExists( PathJoin( m_strResourceDirectoryPath, "meta.xml" ) );
+    }
+    else
+    {
+        return !FileExists( m_strResourceZip );
+    }
 }
 
 // gets the path of the file specified, may extract it from the zip
@@ -2806,8 +2825,13 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 					OldUser.Push ( m_pVM->GetVM() );
 					lua_setglobal ( m_pVM->GetVM(), "user" );
 
+                    // Set debug info in case error occurs in WriteToJSONString
+                    g_pGame->GetScriptDebugging()->SaveLuaDebugInfo( SLuaDebugInfo( m_strResourceName, INVALID_LINE_NUMBER, SString( "[HTTP:%s]", strFuncName.c_str () ) ) );
+
                     std::string strJSON;
                     luaReturns.WriteToJSONString ( strJSON, true );
+
+                    g_pGame->GetScriptDebugging()->SaveLuaDebugInfo( SLuaDebugInfo() );
 
                     ipoHttpResponse->SetBody ( strJSON.c_str (), strJSON.length () );
                     bAlreadyCalling = false;
@@ -2816,13 +2840,13 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
                 else
                 {
                     bAlreadyCalling = false;
-                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
                 }
             }
             else
             {
                 bAlreadyCalling = false;
-                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );;
+                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
             }
         }
     }

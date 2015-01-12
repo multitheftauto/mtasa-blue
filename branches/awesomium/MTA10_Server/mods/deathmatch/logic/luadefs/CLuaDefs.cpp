@@ -49,45 +49,27 @@ CResourceManager* CLuaDefs::m_pResourceManager = NULL;
 CAccessControlListManager* CLuaDefs::m_pACLManager = NULL;
 CMainConfig* CLuaDefs::m_pMainConfig = NULL;
 
-void CLuaDefs::Initialize ( CElement* pRootElement,
-                            CElementDeleter* pElementDeleter,
-                            CBlipManager* pBlipManager,
-                            CHandlingManager* pHandlingManager,
-                            CLuaManager* pLuaManager,
-                            CMarkerManager* pMarkerManager,
-                            CObjectManager* pObjectManager,
-                            CPickupManager* pPickupManager,
-                            CPlayerManager* pPlayerManager,
-                            CRadarAreaManager* pRadarAreaManager,
-                            CRegisteredCommands* pRegisteredCommands,
-                            CScriptDebugging* pScriptDebugging,
-                            CVehicleManager* pVehicleManager,
-                            CTeamManager* pTeamManager,
-                            CAccountManager* pAccountManager,
-                            CColManager* pColManager,
-                            CResourceManager* pResourceManager,
-                            CAccessControlListManager* pACLManager,
-                            CMainConfig* pMainConfig )
+void CLuaDefs::Initialize ( CGame *pGame )
 {
-    m_pRootElement = pRootElement;
-    m_pElementDeleter = pElementDeleter;
-    m_pBlipManager = pBlipManager;
-    m_pHandlingManager = pHandlingManager;
-    m_pLuaManager = pLuaManager;
-    m_pMarkerManager = pMarkerManager;
-    m_pObjectManager = pObjectManager;
-    m_pPickupManager = pPickupManager;
-    m_pPlayerManager = pPlayerManager;
-    m_pRadarAreaManager = pRadarAreaManager;
-    m_pRegisteredCommands = pRegisteredCommands;
-    m_pScriptDebugging = pScriptDebugging;
-    m_pVehicleManager = pVehicleManager;
-    m_pTeamManager = pTeamManager;
-    m_pAccountManager = pAccountManager;
-    m_pColManager = pColManager;
-    m_pResourceManager = pResourceManager;
-    m_pACLManager = pACLManager;
-    m_pMainConfig = pMainConfig;
+    m_pRootElement = pGame->GetMapManager()->GetRootElement();
+    m_pElementDeleter = pGame->GetElementDeleter();
+    m_pBlipManager = pGame->GetBlipManager();
+    m_pHandlingManager = pGame->GetHandlingManager();
+    m_pLuaManager = pGame->GetLuaManager();
+    m_pMarkerManager = pGame->GetMarkerManager();
+    m_pObjectManager = pGame->GetObjectManager();
+    m_pPickupManager = pGame->GetPickupManager();
+    m_pPlayerManager = pGame->GetPlayerManager();
+    m_pRadarAreaManager = pGame->GetRadarAreaManager();
+    m_pRegisteredCommands = pGame->GetRegisteredCommands();
+    m_pScriptDebugging = pGame->GetScriptDebugging();
+    m_pVehicleManager = pGame->GetVehicleManager();
+    m_pTeamManager = pGame->GetTeamManager();
+    m_pAccountManager = pGame->GetAccountManager();
+    m_pColManager = pGame->GetColManager();
+    m_pResourceManager = pGame->GetResourceManager();
+    m_pACLManager = pGame->GetACLManager();
+    m_pMainConfig = pGame->GetConfig();
 }
 
 

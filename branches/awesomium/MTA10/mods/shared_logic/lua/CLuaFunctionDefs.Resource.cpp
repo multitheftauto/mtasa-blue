@@ -253,11 +253,13 @@ int CLuaFunctionDefs::GetResourceRootElement ( lua_State* luaVM )
     CResource* pResource = NULL;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pResource, NULL );
-
+    
     // No resource given, get this resource's root
-        if ( pResource == NULL )
+    if ( !argStream.HasErrors() )
+    {
+        if ( !pResource )
         {
-        // Find our vm and get the root
+            // Find our vm and get the root
             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( pLuaMain )
             {
@@ -276,8 +278,9 @@ int CLuaFunctionDefs::GetResourceRootElement ( lua_State* luaVM )
                 return 1;
             }
         }
+    }
     else
-        m_pScriptDebugging->LogBadType ( luaVM );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
     lua_pushboolean ( luaVM, false );

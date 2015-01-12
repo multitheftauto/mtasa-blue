@@ -1857,6 +1857,42 @@ int CLuaFunctionDefs::ResetFarClipDistance ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetNearClipDistance ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pMultiplayer->GetNearClipDistance ( ) );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetNearClipDistance ( lua_State* luaVM )
+{
+//  bool setNearClipDistance ( float distance )
+    float fDistance;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fDistance );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pMultiplayer->SetNearClipDistance ( fDistance );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetNearClipDistance ( lua_State* luaVM )
+{
+    g_pMultiplayer->RestoreNearClipDistance ();
+
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetFogDistance ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pMultiplayer->GetFogDistance());

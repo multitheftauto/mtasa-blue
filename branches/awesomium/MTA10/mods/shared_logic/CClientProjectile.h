@@ -98,6 +98,7 @@ public:
     inline CVector *                    GetTarget               ( void )        { return m_pvecTarget; }
     inline float                        GetForce                ( void )        { return m_fForce; }
     inline bool                         IsLocal                 ( void )        { return m_bLocal; }
+    CClientEntity*                      GetSatchelAttachedTo    ( void );
     
 protected:
     CClientProjectileManager*           m_pProjectileManager;

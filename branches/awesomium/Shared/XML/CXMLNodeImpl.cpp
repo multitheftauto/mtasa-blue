@@ -359,7 +359,7 @@ CXMLNode* CXMLNodeImpl::CopyNode ( CXMLNode *pParent )
     list < CXMLNode* > ::iterator iter;
     for ( iter = ChildrenCopy.begin (); iter != ChildrenCopy.end (); iter++ )
     {
-        pNew->AddToList ( (*iter)->CopyNode ( pNew ) );
+        (*iter)->CopyNode ( pNew );
     }
 
     return dynamic_cast < CXMLNode* > ( pNew );

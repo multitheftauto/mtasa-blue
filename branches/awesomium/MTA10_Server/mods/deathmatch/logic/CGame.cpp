@@ -165,7 +165,7 @@ CGame::CGame ( void )
     ResetMapInfo();
     m_usFPS = 0;
     m_usFrames = 0;
-    m_ulLastFPSTime = 0;
+    m_llLastFPSTime = 0;
     m_szCurrentFileName = NULL;
     m_pConsoleClient = NULL;
     m_bIsFinished = false;
@@ -201,7 +201,7 @@ CGame::CGame ( void )
 
     m_bTrafficLightsLocked = false;
     m_ucTrafficLightState = 0;
-    m_ulLastTrafficUpdate = 0;
+    m_llLastTrafficUpdate = 0;
 
     m_bOcclusionsEnabled = true;
 
@@ -235,7 +235,7 @@ void CGame::ResetMapInfo ( void )
 
     m_bTrafficLightsLocked = false;
     m_ucTrafficLightState = 0;
-    m_ulLastTrafficUpdate = 0;
+    m_llLastTrafficUpdate = 0;
 
     g_pGame->SetHasWaterColor ( false );
     g_pGame->SetInteriorSoundsEnabled ( true );
@@ -381,26 +381,26 @@ void CGame::DoPulse ( void )
     UpdateModuleTickCount64 ();
 
     // Calculate FPS
-    unsigned long ulCurrentTime = GetTickCount32 ();
-    unsigned long ulDiff = ulCurrentTime - m_ulLastFPSTime;
+    long long llCurrentTime = SharedUtil::GetModuleTickCount64 ();
+    long long ulDiff = llCurrentTime - m_llLastFPSTime;
 
     // Calculate the server-side fps
     if ( ulDiff >= 1000 )
     {
         m_usFPS = m_usFrames;
         m_usFrames = 0;
-        m_ulLastFPSTime = ulCurrentTime;
+        m_llLastFPSTime = llCurrentTime;
     }
     m_usFrames++;
 
     // Update the progress rotator
-    uchar ucDelta = (uchar)ulCurrentTime - ucProgressSkip;
+    uchar ucDelta = (uchar)llCurrentTime - ucProgressSkip;
     ushort usReqDelta = 80 - ( 100 - Min < ushort > ( 100, m_usFPS ) ) / 5;
     
     if ( ucDelta > usReqDelta ) {
         // Clamp ucProgress between 0 and 3
         ucProgress = ( ucProgress + 1 ) & 3;
-        ucProgressSkip = (uchar)ulCurrentTime;
+        ucProgressSkip = (uchar)llCurrentTime;
     }
 
     // Handle critical things
@@ -438,7 +438,7 @@ void CGame::DoPulse ( void )
     // Handle the traffic light sync
     if (m_bTrafficLightsLocked == false)
     {
-        CLOCK_CALL1( ProcessTrafficLights (ulCurrentTime); );
+        CLOCK_CALL1( ProcessTrafficLights ( llCurrentTime ); );
     }
 
     // Pulse ASE
@@ -745,43 +745,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pZoneNames = new CZoneNames;
 
     CStaticFunctionDefinitions ( this );
-    CLuaFunctionDefinitions::SetBlipManager ( m_pBlipManager );
-    CLuaFunctionDefinitions::SetLuaManager ( m_pLuaManager );
-    CLuaFunctionDefinitions::SetMarkerManager ( m_pMarkerManager );
-    CLuaFunctionDefinitions::SetObjectManager ( m_pObjectManager );
-    CLuaFunctionDefinitions::SetPickupManager ( m_pPickupManager );
-    CLuaFunctionDefinitions::SetPlayerManager ( m_pPlayerManager );
-    CLuaFunctionDefinitions::SetRadarAreaManager ( m_pRadarAreaManager );
-    CLuaFunctionDefinitions::SetTeamManager ( m_pTeamManager );
-    CLuaFunctionDefinitions::SetAccountManager ( m_pAccountManager );
-    CLuaFunctionDefinitions::SetRegisteredCommands ( m_pRegisteredCommands );
-    CLuaFunctionDefinitions::SetRootElement ( m_pMapManager->GetRootElement () );
-    CLuaFunctionDefinitions::SetScriptDebugging ( m_pScriptDebugging );
-    CLuaFunctionDefinitions::SetVehicleManager ( m_pVehicleManager );
-    CLuaFunctionDefinitions::SetColManager ( m_pColManager );
-    CLuaFunctionDefinitions::SetResourceManager ( m_pResourceManager );
-    CLuaFunctionDefinitions::SetACL ( m_pACLManager );
-
-    // Initialize the lua function definition dependancies
-    CLuaDefs::Initialize ( m_pMapManager->GetRootElement (),
-                           &m_ElementDeleter,
-                           m_pBlipManager,
-                           m_pHandlingManager,
-                           m_pLuaManager,
-                           m_pMarkerManager,
-                           m_pObjectManager,
-                           m_pPickupManager,
-                           m_pPlayerManager,
-                           m_pRadarAreaManager,
-                           m_pRegisteredCommands,
-                           m_pScriptDebugging,
-                           m_pVehicleManager,
-                           m_pTeamManager,
-                           m_pAccountManager,
-                           m_pColManager,
-                           m_pResourceManager,
-                           m_pACLManager,
-                           m_pMainConfig );
+    CLuaFunctionDefs::Initialize ( m_pLuaManager, this );
+    CLuaDefs::Initialize ( this );
 
     m_pPlayerManager->SetScriptDebugging ( m_pScriptDebugging );
 
@@ -1513,9 +1478,9 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onWeaponFire", "", NULL, false );
 }
 
-void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
+void CGame::ProcessTrafficLights ( long long llCurrentTime )
 {
-    unsigned long ulDiff = static_cast < unsigned long > ( (ulCurrentTime - m_ulLastTrafficUpdate)*m_fGameSpeed );
+    long long ulDiff = static_cast < long long > ( (llCurrentTime - m_llLastTrafficUpdate)*m_fGameSpeed );
     unsigned char ucNewState = 0xFF;
 
     if ( ulDiff >= 1000 )
@@ -1535,8 +1500,8 @@ void CGame::ProcessTrafficLights ( unsigned long ulCurrentTime )
 
         if ( ucNewState != 0xFF )
         {
-            CStaticFunctionDefinitions::SetTrafficLightState (ucNewState);
-            m_ulLastTrafficUpdate = GetTickCount32 ();
+            CStaticFunctionDefinitions::SetTrafficLightState ( ucNewState );
+            m_llLastTrafficUpdate = SharedUtil::GetModuleTickCount64 ();
         }
     }
 }
@@ -2185,43 +2150,26 @@ void CGame::Packet_VehicleDamageSync ( CVehicleDamageSyncPacket& Packet )
                         pVehicle->m_ucLightStates [ i ] = Packet.m_damage.data.ucLightStates [ i ];
                 }
 
-                if ( !g_TickRateSettings.bAltVehPartsStateSync )
+                // Make a list of players to relay this packet to
+                CSendList sendList;
+                list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin( );
+                for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
                 {
-                    // Broadcast the packet to everyone
-                    m_pPlayerManager->BroadcastOnlyJoined ( Packet, pPlayer );
-                }
-                else
-                {
-                    // Remember far players that will need sync later
-                    SViewerMapType& farList = pPlayer->GetFarPlayerList ();
-                    for ( SViewerMapType ::iterator it = farList.begin (); it != farList.end (); ++it )
+                    CPlayer* pOther = *iter;
+                    if ( pOther != pPlayer && pOther->IsJoined () )
                     {
-                        CPlayer* pFarPlayer = it->first;
-                        MapInsert( pFarPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle );
-                    }
-
-                    // Send to near players
-                    SViewerMapType& nearList = pPlayer->GetNearPlayerList ();
-                    CSendList sendList;
-                    for ( SViewerMapType ::iterator it = nearList.begin (); it != nearList.end (); ++it )
-                    {
-                        CPlayer* pNearPlayer = it->first;
-                        if ( MapContains( pNearPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle ) )
+                        if ( pOther->GetDimension() == pPlayer->GetDimension() )
                         {
-                            // Flush full update for this player if has pending damage info for vehicle
-                            CVehicleDamageSyncPacket Packet;
-                            Packet.SetFromVehicle( pVehicle );
-                            pNearPlayer->Send( Packet );
-                            MapRemove( pNearPlayer->m_VehiclesWithPartsStateSyncDirty, Packet.m_Vehicle );
-                        }
-                        else
-                        {
-                            sendList.push_back ( pNearPlayer );
+                            // Newer clients only need sync if vehicle has no driver
+                            if ( pOther->GetBitStreamVersion() < 0x5D || pVehicle->GetOccupant( 0 ) == NULL )
+                            {
+                                sendList.push_back ( pOther );
+                            }
                         }
                     }
-
-                    CPlayerManager::Broadcast ( Packet, sendList );
                 }
+
+                CPlayerManager::Broadcast ( Packet, sendList );
             }
         }
     }
@@ -2242,6 +2190,12 @@ void CGame::Packet_VehiclePuresync ( CVehiclePuresyncPacket& Packet )
         {
             // Send a returnsync packet to the player that sent it
             pPlayer->Send ( CReturnSyncPacket ( pPlayer ) );
+
+            // Increment counter to spread out damage info sends
+            pVehicle->m_uiDamageInfoSendPhase++;
+
+            // Increment counter to spread out damage info sends
+            pVehicle->m_uiDamageInfoSendPhase++;
 
             CLOCK( "VehiclePuresync", "RelayPlayerPuresync" );
             // Relay to other players
@@ -2416,7 +2370,6 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
                 CLogger::ErrorPrintf( "Received oversized custom data name from %s (%s)", Packet.GetSourcePlayer ()->GetNick (), *SStringX ( szName ).Left ( MAX_CUSTOMDATA_NAME_LENGTH + 1 ) );
                 return;
             }
-            pElement->SetCustomData ( szName, Value, NULL, true, pSourcePlayer );
 
             // Tell our clients to update their data. Send to everyone but the one we got this packet from.
             unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
@@ -2427,6 +2380,8 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
             m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_DATA, *BitStream.pBitStream ), pSourcePlayer );
 
             CPerfStatEventPacketUsage::GetSingleton ()->UpdateElementDataUsageRelayed ( szName, m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed() );
+
+            pElement->SetCustomData ( szName, Value, NULL, true, pSourcePlayer );
         }
     }
 }
@@ -3189,7 +3144,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
 
                                     // Execute the player->vehicle script function
                                     CLuaArguments ArgumentsEnter;
-                                    ArgumentsEnter.PushElement ( pVehicle );        // vehice
+                                    ArgumentsEnter.PushElement ( pVehicle );        // vehicle
                                     ArgumentsEnter.PushNumber ( 0 );                 // seat
                                     ArgumentsEnter.PushElement ( pJacked );         // jacked
                                     pPlayer->CallEvent ( "onPlayerVehicleEnter", ArgumentsEnter );
@@ -3573,7 +3528,6 @@ void CGame::Packet_CameraSync ( CCameraSyncPacket & Packet )
     {
         pPlayer->NotifyReceivedSync ();
 
-        // This might need to be time-contexted
         CPlayerCamera * pCamera = pPlayer->GetCamera ();
 
         if ( Packet.m_bFixed )
@@ -3780,22 +3734,22 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
 
             if ( in.bHasHashInfo )
             {
-                resultItem.PushString ( "fileLength" );
+                resultItem.PushString ( "length" );
                 resultItem.PushNumber ( in.uiShortBytes );
 
-                resultItem.PushString ( "fileMd5" );
+                resultItem.PushString ( "md5" );
                 resultItem.PushString ( in.strShortMd5 );
 
-                resultItem.PushString ( "fileSha256" );
+                resultItem.PushString ( "sha256" );
                 resultItem.PushString ( in.strShortSha256 );
 
-                resultItem.PushString ( "paddedFileLength" );
+                resultItem.PushString ( "paddedLength" );
                 resultItem.PushNumber ( in.uiLongBytes );
 
-                resultItem.PushString ( "paddedFileMd5" );
+                resultItem.PushString ( "paddedMd5" );
                 resultItem.PushString ( in.strLongMd5 );
 
-                resultItem.PushString ( "paddedFileSha256" );
+                resultItem.PushString ( "paddedSha256" );
                 resultItem.PushString ( in.strLongSha256 );
             }
 

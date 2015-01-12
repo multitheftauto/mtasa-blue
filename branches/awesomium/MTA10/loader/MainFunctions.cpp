@@ -373,9 +373,11 @@ void PreLaunchWatchDogs ( void )
     //
 
     // Check for unclean stop on previous run
+#ifndef MTA_DEBUG
     if ( WatchDogIsSectionOpen ( "L0" ) )
         WatchDogSetUncleanStop ( true );    // Flag to maybe do things differently if MTA exit code on last run was not 0
     else
+#endif
         WatchDogSetUncleanStop ( false );
 
     SString strCrashFlagFilename = CalcMTASAPath( "mta\\core.log.flag" );
@@ -635,6 +637,7 @@ void CheckDataFiles( void )
     const char* dataFilesFiles [] = { "MTA\\cgui\\images\\background_logo.png"
                                      ,"MTA\\cgui\\images\\radarset\\up.png"
                                      ,"MTA\\cgui\\images\\busy_spinner.png"
+                                     ,"MTA\\cgui\\images\\rect_edge.png"
                                      ,"MTA\\D3DX9_42.dll"
                                      ,"MTA\\D3DCompiler_42.dll"
                                      ,"MTA\\bass.dll"
@@ -707,7 +710,7 @@ void CheckDataFiles( void )
     if ( !VerifyEmbeddedSignature( PathJoin( strMTASAPath, MTA_EXE_NAME ) ) )
     {
         SString strMessage( _("Main file is unsigned. Possible virus activity.\n\nSee online help if MTA does not work correctly.") );
-        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_CONNECT_TO_PUBLIC)
+        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_CONNECT_TO_PUBLIC) && !defined(MTA_DEBUG)
             DisplayErrorMessageBox( strMessage, _E("CL29"), "maybe-virus1" );
         #endif
     }
@@ -987,9 +990,11 @@ int LaunchGame ( SString strCmdLine )
                 if ( stuckProcessDetector.UpdateIsStuck() )
                 {
                     WriteDebugEvent( "Detected stuck process at quit" );
+                #ifndef MTA_DEBUG
                     TerminateProcess( piLoadee.hProcess, 1 );
                     status = WAIT_FAILED;
                     break;
+                #endif
                 }
                 status = WaitForSingleObject( piLoadee.hProcess, 1000 );
             }

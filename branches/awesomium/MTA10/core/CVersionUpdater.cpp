@@ -1839,7 +1839,7 @@ void CVersionUpdater::_QUpdateResult ( void )
         if ( m_JobInfo.strStatus == "silent" )
         {
             // 'silent' - Self extracting archive 
-            SetOnRestartCommand ( "silent", m_JobInfo.strSaveLocation );
+            SetOnRestartCommand ( "silent", m_JobInfo.strSaveLocation, m_JobInfo.strParameters );
         }
 #if MTA_DEBUG
         else
@@ -2070,6 +2070,7 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
 
     CXMLAccess XMLAccess ( XMLBuffer.m_pRoot );
     XMLAccess.GetSubNodeValue ( "status",                       m_JobInfo.strStatus );
+    XMLAccess.GetSubNodeValue ( "parameters",                   m_JobInfo.strParameters );
     XMLAccess.GetSubNodeValue ( "priority",                     m_JobInfo.strPriority );
     XMLAccess.GetSubNodeValue ( "dialog.title",                 m_JobInfo.strTitle );
     XMLAccess.GetSubNodeValue ( "dialog.msg",                   m_JobInfo.strMsg );
@@ -2104,6 +2105,16 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
         m_JobInfo.iFilesize     = m_JobInfo.exe.iFilesize;
         m_JobInfo.strMD5        = m_JobInfo.exe.strMD5;
         m_JobInfo.serverInfoMap = m_JobInfo.exe.serverInfoMap;
+    }
+
+    // Change from 'silent' if user has disabled automatic install
+    if ( m_JobInfo.strStatus == "silent" && m_JobInfo.strParameters.Contains( "allowuseroverride" ) )
+    {
+        if ( CVARS_GET_VALUE < bool > ( "update_auto_install" ) == false )
+        {
+            m_JobInfo.strStatus = "files";
+            m_JobInfo.strParameters = m_JobInfo.strParameters.Replace( "hideprogress", "" );
+        }
     }
 
     // Process

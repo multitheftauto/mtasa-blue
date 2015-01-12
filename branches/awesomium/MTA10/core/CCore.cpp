@@ -2147,6 +2147,15 @@ void CCore::OnCrashAverted ( uint uiId )
 
 
 //
+// OnEnterCrashZone
+// 
+void CCore::OnEnterCrashZone ( uint uiId )
+{
+    CCrashDumpWriter::OnEnterCrashZone ( uiId );
+}
+
+
+//
 // LogEvent
 // 
 void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId )
@@ -2365,8 +2374,8 @@ void CCore::UpdateDummyProgress( int iValue, const char* szType )
 //
 void CCore::CallSetCursorPos( int X, int Y )
 {
-    if ( CCore::GetSingleton ().IsFocused () && !CLocalGUI::GetSingleton ().IsMainMenuVisible () )
-        m_pSetCursorPosHook->CallSetCursorPos(X,Y);
+    if ( CCore::GetSingleton ( ).IsFocused ( ) && !CLocalGUI::GetSingleton ( ).IsMainMenuVisible ( ) )
+        m_pLocalGUI->SetCursorPos ( X, Y );
 }
 
 bool CCore::GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions )

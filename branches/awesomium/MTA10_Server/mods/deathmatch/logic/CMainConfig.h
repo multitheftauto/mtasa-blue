@@ -115,6 +115,7 @@ public:
     bool                            SetFPSLimit                     ( unsigned short usFPS, bool bSave );
     int                             GetPendingWorkToDoSleepTime     ( void );
     int                             GetNoWorkToDoSleepTime          ( void );
+    int                             GetServerLogicFpsLimit          ( void )                    { return m_iServerLogicFpsLimit; };
     const SString&                  GetDbLogFilename                ( void )                    { return m_strDbLogFilename; }
     bool                            GetSyncMapElementData           ( void ) const              { return m_bSyncMapElementData; }
     void                            SetSyncMapElementData           ( bool bOn )                { m_bSyncMapElementData = bOn; }
@@ -213,6 +214,7 @@ private:
     int                             m_bNetAutoFilter;
     SString                         m_strLoadstringLogFilename;
     int                             m_iMinClientVersionAutoUpdate;
+    int                             m_iServerLogicFpsLimit;
 };
 
 #endif

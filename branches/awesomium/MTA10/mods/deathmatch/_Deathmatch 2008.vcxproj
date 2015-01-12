@@ -210,6 +210,9 @@
     <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector4.cpp" />
+    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp" />
+    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp" />
+    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp" />
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp" />
     <ClCompile Include="CClient.cpp" />

@@ -66,22 +66,14 @@ struct SSirenInfo
 
 struct SVehicleFrame
 {
-    SVehicleFrame ( RwFrame * pFrame )
-    {
-        this->pFrame = pFrame;
-        this->bReadOnly = true;
-    }
-    SVehicleFrame ( RwFrame * pFrame, bool bReadOnly )
-    {
-        this->pFrame = pFrame;
-        this->bReadOnly = bReadOnly;
-    }
-    SVehicleFrame ( )
-    {
-        this->pFrame = NULL;
-    }
+    SVehicleFrame ( RwFrame * pFrame = NULL, bool bReadOnly = true )
+        : pFrame( pFrame )
+        , bReadOnly( bReadOnly )
+    {}
+
     RwFrame * pFrame;
     bool bReadOnly;
+    std::vector < RwFrame* > frameList; // Frames from root to parent
 };
 
 class CVehicle : public virtual CPhysical
@@ -315,13 +307,13 @@ public:
     virtual bool                 SetComponentPosition                   ( SString vehicleComponent, CVector vecPosition ) = 0;
     virtual bool                 GetComponentPosition                   ( SString vehicleComponent, CVector &vecPositionModelling ) = 0;
     virtual bool                 IsComponentPresent                     ( SString vehicleComponent ) = 0;
-    virtual bool                 GetComponentMatrix                     ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
-    virtual bool                 SetComponentMatrix                     ( SString vehicleComponent, RwMatrix &ltm, RwMatrix &modelling ) = 0;
+    virtual bool                 SetComponentMatrix                     ( const SString& vehicleComponent, const CMatrix& matOrientation ) = 0;
+    virtual bool                 GetComponentMatrix                     ( const SString& vehicleComponent, CMatrix& matOutOrientation ) = 0;
     virtual bool                 SetComponentVisible                    ( SString vehicleComponent, bool bVisible ) = 0;
     virtual bool                 GetComponentVisible                    ( SString vehicleComponent, bool &bVisible ) = 0;
     virtual std::map < SString, SVehicleFrame > & GetComponentMap       ( void ) = 0;
     virtual void                 UpdateLandingGearPosition              ( void ) = 0;
-    virtual bool                 SetPlateText                            ( const SString& strText ) = 0;
+    virtual bool                 SetPlateText                           ( const SString& strText ) = 0;
 };
 
 #endif

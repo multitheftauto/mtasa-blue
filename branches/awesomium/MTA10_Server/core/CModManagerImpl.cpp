@@ -178,14 +178,15 @@ bool CModManagerImpl::PendingWorkToDo ( void )
 }
 
 
-bool CModManagerImpl::GetSleepIntervals( int& iSleepBusyMs, int& iSleepIdleMs )
+bool CModManagerImpl::GetSleepIntervals( int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit )
 {
     iSleepBusyMs = 20;
     iSleepIdleMs = 40;
+    iLogicFpsLimit = 0;
 
     if ( m_pBase )
     {
-        return m_pBase->GetSleepIntervals( iSleepBusyMs, iSleepIdleMs );
+        return m_pBase->GetSleepIntervals( iSleepBusyMs, iSleepIdleMs, iLogicFpsLimit );
     }
 
     return false;

@@ -61,6 +61,7 @@ public:
     void                Restore                     ( void );
 
     void                DrawMouseCursor             ( void );
+    void                SetCursorPos                ( int iX, int iY );
 
     CConsole*           GetConsole                  ( void );
     void                SetConsoleVisible           ( bool bVisible );
@@ -115,6 +116,7 @@ private:
     bool                    m_pDebugViewVisible;
     bool                    m_bGUIHasInput;
     int                     m_uiActiveCompositionSize;
+    POINT                   m_StoredMousePosition;
 
     int                     m_LastSettingsRevision; // the revision number the last time we saw the skin change
     SString                 m_LastSkinName;

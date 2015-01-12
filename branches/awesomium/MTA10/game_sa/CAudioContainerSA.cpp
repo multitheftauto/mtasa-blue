@@ -297,6 +297,13 @@ bool CAudioContainerSA::GetRadioAudioData(eRadioStreamIndex streamIndex, int tra
         return false;
     }
 
+    // handle steam deleted files cleanly by not playing.
+    if ( iSize <= 4500 )
+    {
+        delete[] pData;
+        return false;
+    }
+
     pMemory = pData;
     length = iSize;
 

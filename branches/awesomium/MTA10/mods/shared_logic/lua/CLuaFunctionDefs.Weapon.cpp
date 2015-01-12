@@ -405,7 +405,7 @@ int CLuaFunctionDefs::SetWeaponFlags ( lua_State* luaVM )
             argStream.ReadBool ( bData );
             if ( CStaticFunctionDefinitions::SetWeaponFlags( pWeapon, flag, bData ) )
             {
-                lua_pushboolean( luaVM, bData );
+                lua_pushboolean( luaVM, true );
                 return 1;
             }
         }
@@ -424,6 +424,7 @@ int CLuaFunctionDefs::SetWeaponFlags ( lua_State* luaVM )
                 if ( CStaticFunctionDefinitions::SetWeaponFlags( pWeapon, flags ) )
                 {
                     lua_pushboolean( luaVM, true );
+                    return 1;
                 }
             }
         }

@@ -44,7 +44,9 @@ void CObjectRespawner::DoRespawnAll ( void )
     for ( uint i = 0; i < m_List.size (); i++ )
     {
         CClientObject* pObject = m_List[i];
-        if ( pObject && !pObject->IsBeingDeleted () )
+
+        // Only recreate if we're still valid and streamed in
+        if ( pObject && !pObject->IsBeingDeleted ( ) && pObject->IsStreamedIn ( ) )
         {
             pObject->ReCreate ();
             pObject->SetBeingRespawned ( false );

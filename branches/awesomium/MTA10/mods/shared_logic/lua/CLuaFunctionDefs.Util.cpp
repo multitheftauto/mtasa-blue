@@ -164,6 +164,9 @@ int CLuaFunctionDefs::SetTimer ( lua_State* luaVM )
                 CLuaTimer* pLuaTimer = luaMain->GetTimerManager ()->AddTimer ( iLuaFunction, CTickCount ( dTimeInterval ), uiTimesToExecute, Arguments );
                 if ( pLuaTimer )
                 {
+                    // Set our timer debug info (in case we don't have any debug info which is usually when you do setTimer(destroyElement, 50, 1) or such)
+                    pLuaTimer->SetLuaDebugInfo ( g_pClientGame->GetScriptDebugging()->GetLuaDebugInfo( luaVM ) );
+
                     lua_pushtimer ( luaVM, pLuaTimer );
                     return 1;
                 }
@@ -335,9 +338,10 @@ int CLuaFunctionDefs::GetTickCount_ ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetCTime ( lua_State* luaVM )
 {
-    // table getRealTime( [int seconds = current] )
+    // table getRealTime( [int seconds = current], bool localTime = true )
     time_t timer;
     time ( &timer );
+    bool bLocalTime = true;
     CScriptArgReader argStream ( luaVM );
 
     if ( argStream.NextCouldBeNumber ( ) )
@@ -349,7 +353,15 @@ int CLuaFunctionDefs::GetCTime ( lua_State* luaVM )
         }
     }
 
-    tm * time = localtime ( &timer );
+    if ( argStream.NextIsBool() )
+        argStream.ReadBool( bLocalTime );
+
+    tm * time;
+    if ( bLocalTime )
+        time = localtime( &timer );
+    else
+        time = gmtime( &timer );
+
     if ( time == NULL )
         argStream.SetCustomError ( "seconds is out of range" );
 

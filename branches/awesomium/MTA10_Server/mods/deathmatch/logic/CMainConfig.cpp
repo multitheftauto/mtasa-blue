@@ -1413,7 +1413,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      150,    500,    "vehext_ping_limit",                    &m_iVehExtrapolatePingLimit,                &CMainConfig::OnTickRateChange },
             { true, true,   0,      0,      1,      "latency_reduction",                    &m_bUseAltPulseOrder,                       &CMainConfig::OnTickRateChange },
             { true, true,   0,      1,      2,      "ase",                                  &m_iAseMode,                                &CMainConfig::OnAseSettingChange },
-            { true, true,   0,      1,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &CMainConfig::OnAseSettingChange },
+            { true, true,   0,      0,      1,      "donotbroadcastlan",                    &m_bDontBroadcastLan,                       &CMainConfig::OnAseSettingChange },
             { true, true,   0,      1,      1,      "net_auto_filter",                      &m_bNetAutoFilter,                          &CMainConfig::ApplyNetOptions },
             { true, true,   1,      4,      100,    "update_cycle_datagrams_limit",         &m_iUpdateCycleDatagramsLimit,              &CMainConfig::ApplyNetOptions },
             { true, true,   10,     50,     1000,   "update_cycle_messages_limit",          &m_iUpdateCycleMessagesLimit,               &CMainConfig::ApplyNetOptions },
@@ -1421,7 +1421,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   50,     130,    400,    "unoccupied_vehicle_syncer_distance",   &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance,   &CMainConfig::OnTickRateChange },
             { false, false, 0,      1,      2,      "compact_internal_databases",           &m_iCompactInternalDatabases,               NULL },
             { true, true,   0,      1,      2,      "minclientversion_auto_update",         &m_iMinClientVersionAutoUpdate,             NULL },
-            { true, true,   0,      0,      1,      "alt_veh_parts_state_sync",             &g_TickRateSettings.bAltVehPartsStateSync,  NULL },
+            { true, true,   0,      0,      100,    "server_logic_fps_limit",               &m_iServerLogicFpsLimit,                    NULL },
         };
 
     static std::vector < SIntSetting > settingsList;

@@ -17,7 +17,9 @@
                                                         uchar ucPlayerGotOccupiedVehicleSeat,
                                                         uchar ucPlayerGotWeaponType,
                                                         float fPlayerGotWeaponRange,
-                                                        CControllerState& sharedControllerState )
+                                                        CControllerState& sharedControllerState,
+                                                        uint uiDamageInfoSendPhase,
+                                                        const SSimVehicleDamageInfo& damageInfo )
     : m_PlayerID ( PlayerID )
     , m_usPlayerLatency ( usPlayerLatency )
     , m_ucPlayerSyncTimeContext ( ucPlayerSyncTimeContext )
@@ -27,6 +29,8 @@
     , m_ucPlayerGotWeaponType ( ucPlayerGotWeaponType )
     , m_fPlayerGotWeaponRange ( fPlayerGotWeaponRange )
     , m_sharedControllerState ( sharedControllerState )
+    , m_uiDamageInfoSendPhase ( uiDamageInfoSendPhase )
+    , m_DamageInfo ( damageInfo )
 {
 }
 
@@ -404,6 +408,23 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         {
             BitStream.WriteBit ( m_sharedControllerState.LeftShoulder2 != 0 );
             BitStream.WriteBit ( m_sharedControllerState.RightShoulder2 != 0 );
+        }
+
+        // Write parts state
+        if ( BitStream.Version() >= 0x5D )
+        {
+            SVehicleDamageSyncMethodeB damage;
+            // Check where we are in the cycle
+            uint uiPhase = ( m_uiDamageInfoSendPhase & 3 );
+            damage.data.bSyncDoors = ( uiPhase == 0 );
+            damage.data.bSyncWheels = ( uiPhase == 1 );
+            damage.data.bSyncPanels = ( uiPhase == 2 );
+            damage.data.bSyncLights = ( uiPhase == 3 );
+            damage.data.doors.data.ucStates = m_DamageInfo.m_ucDoorStates;
+            damage.data.wheels.data.ucStates = m_DamageInfo.m_ucWheelStates;
+            damage.data.panels.data.ucStates = m_DamageInfo.m_ucPanelStates;
+            damage.data.lights.data.ucStates = m_DamageInfo.m_ucLightStates;
+            BitStream.Write ( &damage );
         }
 
         // Success

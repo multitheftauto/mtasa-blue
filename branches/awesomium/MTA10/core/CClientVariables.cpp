@@ -293,9 +293,10 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "mtavolume",                  1.0f );                         // custom sound's volume
     DEFAULT ( "voicevolume",                1.0f );                         // voice chat output volume
     DEFAULT ( "mapalpha",                   155 );                          // map alpha
-    DEFAULT ( "browser_speed",              2 );                            // Browser speed
+    DEFAULT ( "browser_speed",              1 );                            // Browser speed
     DEFAULT ( "single_download",            0 );                            // Single connection for downloads
     DEFAULT ( "update_build_type",          0 );                            // 0-stable 1-test 2-nightly
+    DEFAULT ( "update_auto_install",        1 );                            // 0-off 1-on
     DEFAULT ( "volumetric_shadows",         0 );                            // Enable volumetric shadows
     DEFAULT ( "aspect_ratio",               0 );                            // Display aspect ratio
     DEFAULT ( "hud_match_aspect_ratio",     1 );                            // GTA HUD should match the display aspect ratio

@@ -40,11 +40,11 @@ namespace
 
     SString MakeCPUUsageString( const SThreadCPUTimes& info )
     {
-        if ( info.fKernelPercent < 1 )
-            return SString( "%s%%", *CPerfStatManager::GetScaledFloatString( info.fUserPercent ) );
-    
-        return SString( "%s%% (Sys: %d%%)", *CPerfStatManager::GetScaledFloatString( info.fUserPercent )
-                                          , (int)info.fKernelPercent );
+        SString strResult( "%s%% (Avg: %s%%)", *CPerfStatManager::GetScaledFloatString( info.fUserPercent ), *CPerfStatManager::GetScaledFloatString( info.fUserPercentAvg ) );
+        if ( info.fKernelPercent >= 1 )
+            strResult += SString( " (Sys: %d%%)", (int)info.fKernelPercent );
+
+        return strResult;
     }
 
     #define UDP_PACKET_OVERHEAD (28LL)
@@ -341,6 +341,8 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_OptionsList.push_back ( StringPair ( "VoiceEnabled",              SString ( "%d", pConfig->IsVoiceEnabled () ) ) );
     m_OptionsList.push_back ( StringPair ( "Busy sleep time",           SString ( "%d ms", pConfig->GetPendingWorkToDoSleepTime () ) ) );
     m_OptionsList.push_back ( StringPair ( "Idle sleep time",           SString ( "%d ms", pConfig->GetNoWorkToDoSleepTime () ) ) );
+    if ( pConfig->GetServerLogicFpsLimit () )
+        m_OptionsList.push_back ( StringPair ( "Logic FPS limit",           SString ( "%d", pConfig->GetServerLogicFpsLimit () ) ) );
     m_OptionsList.push_back ( StringPair ( "BandwidthReductionMode",    pConfig->GetSetting ( "bandwidth_reduction" ) ) );
     m_OptionsList.push_back ( StringPair ( "LightSyncEnabled",          SString ( "%d", g_pBandwidthSettings->bLightSyncEnabled ) ) );
     m_OptionsList.push_back ( StringPair ( "ThreadNetEnabled",          SString ( "%d", pConfig->GetThreadNetEnabled () ) ) );
@@ -366,8 +368,6 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_OptionsList.push_back ( StringPair ( "Ped syncer distance",      SString ( "%d", g_TickRateSettings.iPedSyncerDistance ) ) );
     if ( defaultRates.iUnoccupiedVehicleSyncerDistance != g_TickRateSettings.iUnoccupiedVehicleSyncerDistance )
         m_OptionsList.push_back ( StringPair ( "Unoccupied vehicle syncer distance",      SString ( "%d", g_TickRateSettings.iUnoccupiedVehicleSyncerDistance ) ) );
-    if ( defaultRates.bAltVehPartsStateSync != g_TickRateSettings.bAltVehPartsStateSync )
-        m_OptionsList.push_back ( StringPair ( "Alt vehicle parts state sync",  SString ( "%d", g_TickRateSettings.bAltVehPartsStateSync ) ) );
 
     m_InfoList.push_back ( StringPair ( "Logic thread CPU",  MakeCPUUsageString( m_MainThreadCPUTimes ) ) );
     m_InfoList.push_back ( StringPair ( "Sync thread CPU",   MakeCPUUsageString( g_SyncThreadCPUTimes ) ) );

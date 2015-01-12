@@ -18,9 +18,7 @@ CSimKeysyncPacket::CSimKeysyncPacket (    ElementID PlayerID,
                                           float fPlayerGotWeaponRange,
                                           bool bVehicleHasHydraulics,
                                           bool bVehicleIsPlaneOrHeli,
-                                          CControllerState& sharedControllerState,
-                                          float fPlayerGotCameraRotation,
-                                          float fPlayerGotPlayerRotation )
+                                          CControllerState& sharedControllerState )
     : m_PlayerID ( PlayerID )
     , m_bPlayerHasOccupiedVehicle ( bPlayerHasOccupiedVehicle )
     , m_usVehicleGotModel ( usVehicleGotModel )
@@ -29,8 +27,6 @@ CSimKeysyncPacket::CSimKeysyncPacket (    ElementID PlayerID,
     , m_bVehicleHasHydraulics ( bVehicleHasHydraulics )
     , m_bVehicleIsPlaneOrHeli ( bVehicleIsPlaneOrHeli )
     , m_sharedControllerState ( sharedControllerState )
-    , m_fPlayerGotCameraRotation ( fPlayerGotCameraRotation )
-    , m_fPlayerGotPlayerRotation ( fPlayerGotPlayerRotation )
 {
 }
 
@@ -45,33 +41,17 @@ bool CSimKeysyncPacket::Read ( NetBitStreamInterface& BitStream )
         return false;
 
     // Read rotations
-    if ( BitStream.Version () >= 0x2C )
-    {
-        SKeysyncRotation rotation;
-        BitStream.Read ( &rotation );
-        m_Cache.fPlayerRotation = rotation.data.fPlayerRotation;
-        m_Cache.fCameraRotation = rotation.data.fCameraRotation;
-    }
-    else
-    {
-        m_Cache.fPlayerRotation = m_fPlayerGotPlayerRotation;
-        m_Cache.fCameraRotation = m_fPlayerGotCameraRotation;
-    }
-
-    // Skip old bullet sync data
-    if ( BitStream.Version () == 0x2D )
-    {
-        bool bDummy;
-        BitStream.ReadBit ( bDummy );
-        BitStream.ReadBit ( bDummy );
-    }
+    SKeysyncRotation rotation;
+    BitStream.Read ( &rotation );
+    m_Cache.fPlayerRotation = rotation.data.fPlayerRotation;
+    m_Cache.fCameraRotation = rotation.data.fCameraRotation;
 
     // Flags
     if ( !BitStream.Read ( &m_Cache.flags ) )
         return false;
 
     // If he's shooting or aiming
-    if ( m_sharedControllerState.ButtonCircle || ( m_sharedControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
+    if ( m_sharedControllerState.ButtonCircle || m_sharedControllerState.RightShoulder1 )
     {
         bool bHasWeapon = BitStream.ReadBit ();
 
@@ -183,27 +163,16 @@ bool CSimKeysyncPacket::Write ( NetBitStreamInterface& BitStream ) const
     WriteSmallKeysync ( m_sharedControllerState, BitStream );
 
     // Write the rotations
-    if ( BitStream.Version () >= 0x2C )
-    {
-        SKeysyncRotation rotation;
-        rotation.data.fPlayerRotation = m_Cache.fPlayerRotation;
-        rotation.data.fCameraRotation = m_Cache.fCameraRotation;
-        BitStream.Write ( &rotation );
-    }
-
-    // Skip old bullet sync data
-    if ( BitStream.Version () == 0x2D )
-    {
-        bool bDummy = 0;
-        BitStream.WriteBit ( bDummy );
-        BitStream.WriteBit ( bDummy );
-    }
+    SKeysyncRotation rotation;
+    rotation.data.fPlayerRotation = m_Cache.fPlayerRotation;
+    rotation.data.fCameraRotation = m_Cache.fCameraRotation;
+    BitStream.Write ( &rotation );
 
     // Write the flags
     BitStream.Write ( &m_Cache.flags );
 
     // If he's shooting or aiming
-    if ( m_sharedControllerState.ButtonCircle || ( m_sharedControllerState.RightShoulder1 && BitStream.Version () >= 0x2C ) )
+    if ( m_sharedControllerState.ButtonCircle || ( m_sharedControllerState.RightShoulder1 ) )
     {
         // Write his current weapon slot
         unsigned int uiSlot = m_Cache.ucWeaponSlot;   // check m_Cache.bWeaponCorrect ! 

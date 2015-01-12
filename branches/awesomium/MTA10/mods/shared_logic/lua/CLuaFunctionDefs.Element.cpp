@@ -668,22 +668,10 @@ int CLuaFunctionDefs::IsElementWithinMarker( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        // Valid element?
-        if ( pEntity )
-        {
-            // Valid colshape?
-            if ( pMarker )
-            {
-                // Check if it's within
-                bool bWithin = pEntity->CollisionExists ( pMarker->GetColShape() );
-                lua_pushboolean ( luaVM, bWithin );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 2 );
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        // Check if it's within
+        bool bWithin = pEntity->CollisionExists ( pMarker->GetColShape() );
+        lua_pushboolean ( luaVM, bWithin );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -986,7 +974,7 @@ int CLuaFunctionDefs::IsElementLocal ( lua_State* luaVM )
         if ( pEntity )
         {
             // Return whether it's local or not
-            bool bLocal = pEntity->IsLocalEntity ();;
+            bool bLocal = pEntity->IsLocalEntity ();
             lua_pushboolean ( luaVM, bLocal );
             return 1;
         }
@@ -1589,7 +1577,7 @@ int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
 int CLuaFunctionDefs::RemoveElementData ( lua_State* luaVM )
 {
 //  bool removeElementData ( element theElement, string key )
-    CClientEntity* pEntity; SString strKey;;
+    CClientEntity* pEntity; SString strKey;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );

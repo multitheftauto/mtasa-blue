@@ -81,22 +81,20 @@ void CClientRadarArea::DoPulse ( bool bRender )
             }
 
             // Calculate the alpha based on the last cycle time and the cycle intervals
-            float fAlphaFactor;
-
             // We're in the fade in part of the cycle?
             if ( ulCurrentTime >= m_ulFlashCycleStart + RADAR_FLASH_CYCLETIME / 2 )
             {
                 // Calculate the alpha-factor
-                fAlphaFactor = static_cast < float > ( ulCurrentTime - m_ulFlashCycleStart - RADAR_FLASH_CYCLETIME / 2 ) / ( RADAR_FLASH_CYCLETIME / 2 );
+                m_fAlphaFactor = static_cast < float > ( ulCurrentTime - m_ulFlashCycleStart - RADAR_FLASH_CYCLETIME / 2 ) / ( RADAR_FLASH_CYCLETIME / 2 );
             }
             else
             {
                 // Calculate the alpha-factor
-                fAlphaFactor = 1.0f - static_cast < float > ( ulCurrentTime - m_ulFlashCycleStart ) / ( RADAR_FLASH_CYCLETIME / 2 );
+                m_fAlphaFactor = 1.0f - static_cast < float > ( ulCurrentTime - m_ulFlashCycleStart ) / ( RADAR_FLASH_CYCLETIME / 2 );
             }
 
             // Multiply the alpha-factor with the alpha we're supposed to have to find what alpha to use and set it
-            color.A = static_cast < unsigned char > ( fAlphaFactor * static_cast < float > ( color.A ) );
+            color.A = static_cast < unsigned char > ( m_fAlphaFactor * static_cast < float > ( color.A ) );
         }
 
         // Only render the radar area if we are told to

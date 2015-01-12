@@ -1594,11 +1594,11 @@ int CLuaElementDefs::setElementDimension ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-            if ( CStaticFunctionDefinitions::SetElementDimension ( pElement, usDimension ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+        if ( CStaticFunctionDefinitions::SetElementDimension ( pElement, usDimension ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );

@@ -28,7 +28,7 @@ class CLuaMain;
 #include "CLuaModuleManager.h"
 #include "../CTextDisplay.h"
 
-#include "CLuaFunctionDefinitions.h"
+#include "CLuaFunctionDefs.h"
 
 #define MAX_SCRIPTNAME_LENGTH 64
 
@@ -196,7 +196,7 @@ private:
     static SString                  ms_strExpectedUndumpHash;
 
 public:
-    std::map < const void*, CRefInfo >      m_CallbackTable;
+    CFastHashMap < const void*, CRefInfo >  m_CallbackTable;
     std::map < int, SString >       m_FunctionTagMap;
 };
 

@@ -186,10 +186,10 @@ bool DoInstallFiles ( void )
 // Returns false on fail
 //
 ///////////////////////////////////////////////////////////////
-bool InstallFiles ( bool bSilent )
+bool InstallFiles ( bool bHideProgress )
 {
     // Start progress bar
-    if ( !bSilent )
+    if ( !bHideProgress )
        StartPseudoProgress( g_hInstance, "MTA: San Andreas", _("Installing update...") );
 
     bool bResult = DoInstallFiles ();
@@ -291,7 +291,7 @@ SString CheckOnRestartCommand ( void )
                 return "FileError2";
 
             // Start progress bar
-            if ( strOperation != "silent" )
+            if ( !strParameters.Contains( "hideprogress" ) )
                StartPseudoProgress( g_hInstance, "MTA: San Andreas", _("Extracting files...") );
 
             // Try to extract the files
@@ -307,10 +307,10 @@ SString CheckOnRestartCommand ( void )
 
             // If a new "Multi Theft Auto.exe" exists, let that complete the install
             if ( FileExists ( MTA_EXE_NAME_RELEASE ) )
-                return "install from far " + strOperation;
+                return "install from far " + strOperation + " " + strParameters;
 
             // Otherwise use the current exe to install
-            return "install from near " + strOperation;
+            return "install from near " + strOperation + " " + strParameters;
         }
         else
         {

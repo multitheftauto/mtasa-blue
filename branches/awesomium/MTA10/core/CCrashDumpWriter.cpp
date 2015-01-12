@@ -33,6 +33,7 @@ static std::list < SLogEventInfo >              ms_LogEventList;
 static std::map < int, SCrashAvertedInfo >      ms_CrashAvertedMap;
 static uint                                     ms_uiTickCountBase = 0;
 static void*                                    ms_pReservedMemory = NULL;
+static uint                                     ms_uiInCrashZone = 0;
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
                                     CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
@@ -59,6 +60,19 @@ void CCrashDumpWriter::OnCrashAverted ( uint uiId )
     }
     pInfo->uiTickCount = GetTickCount32 ();
     pInfo->uiUsageCount++;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::OnEnterCrashZone
+//
+// Static function. Called when entering possible crash zone
+//
+///////////////////////////////////////////////////////////////
+void CCrashDumpWriter::OnEnterCrashZone( uint uiId )
+{
+    ms_uiInCrashZone = uiId;
 }
 
 
@@ -437,6 +451,16 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
         // Free the DLL again
         FreeLibrary ( hDll );
     }
+
+    // Auto-fixes
+
+    // Check if crash was in volumetric shadow code
+    if ( ms_uiInCrashZone == 1 || ms_uiInCrashZone == 2 )
+    {
+        CVARS_SET( "volumetric_shadows", false );
+        CCore::GetSingleton().SaveConfig();
+        AddReportLog( 9205, "Disabled volumetric shadows" );
+    }
 }
 
 
@@ -584,6 +608,9 @@ namespace
             case POINT_ROUTE_POOL:          cPtr = 0x5511AF; break;
             case POINTER_DOUBLE_LINK_POOL:  iPtr = 0x550F82; break;
             case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
+            case ENV_MAP_MATERIAL_POOL:     iPtr = 0x5DA08E; break;
+            case ENV_MAP_ATOMIC_POOL:       iPtr = 0x5DA0CA; break;
+            case SPEC_MAP_MATERIAL_POOL:    iPtr = 0x5DA106; break;
         }
         if ( iPtr )
             return *(int*)iPtr;
@@ -826,13 +853,16 @@ void CCrashDumpWriter::GetMiscInfo ( CBuffer& buffer )
     CBufferWriteStream stream ( buffer );
 
     // Write info version
-    stream.Write ( 1 );
+    stream.Write ( 2 );
 
     // US/Euro gta_sa.exe
     unsigned char ucA = *reinterpret_cast < unsigned char* > ( 0x748ADD );
     unsigned char ucB = *reinterpret_cast < unsigned char* > ( 0x748ADE );
     stream.Write ( ucA );
     stream.Write ( ucB );
+
+    // Crash zone if any
+    stream.Write ( ms_uiInCrashZone );
 }
 
 

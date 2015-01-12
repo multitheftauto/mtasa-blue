@@ -321,3 +321,16 @@ DWORD CClientProjectile::GetCounter ( void )
         return m_pProjectileInfo->GetCounter ( );
     return 0;
 }
+
+CClientEntity* CClientProjectile::GetSatchelAttachedTo ( void )
+{
+    if ( !m_pProjectile )
+        return NULL;
+
+    CEntity* pAttachedToSA = m_pProjectile->GetAttachedEntity ( );
+
+    if ( !pAttachedToSA )
+        return NULL;
+
+    return m_pManager->FindEntity ( pAttachedToSA, false );
+}

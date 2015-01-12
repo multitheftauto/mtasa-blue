@@ -233,6 +233,17 @@ int CLuaFunctionDefs::GetPedTotalAmmo ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, usAmmo );
                 return 1;
             }
+            else if ( pPed->m_usWeaponAmmo [ ucSlot ] )
+            {
+                // The ped musn't be streamed in, so we can get the stored value instead
+                ushort usAmmo = 1;
+                
+                if ( CWeaponNames::DoesSlotHaveAmmo ( ucSlot ) )
+                    usAmmo = pPed->m_usWeaponAmmo [ ucSlot ];
+                
+                lua_pushnumber ( luaVM, usAmmo );
+                return 1;
+            }
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
@@ -928,6 +939,40 @@ int CLuaFunctionDefs::SetPedWeaponSlot ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::GivePedWeapon ( lua_State* luaVM )
+{
+    // Verify the argument
+    CClientEntity* pEntity = NULL;
+    uchar ucWeaponType = 0;
+    ushort usAmmo = 0;
+    bool bSetAsCurrent = false;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( ucWeaponType );
+    argStream.ReadNumber ( usAmmo, 30 );
+    argStream.ReadBool ( bSetAsCurrent, false );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        if ( pEntity )
+        {
+            if ( CStaticFunctionDefinitions::GivePedWeapon ( *pEntity, ucWeaponType, usAmmo, bSetAsCurrent ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }

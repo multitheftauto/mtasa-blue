@@ -24,18 +24,35 @@ class CRegisteredCommands;
 class CLuaOOPDefs : public CLuaDefs
 {
 public:
+    // Ped
     LUA_DECLARE ( SetPedOccupiedVehicle );
 
+    // Element
     LUA_DECLARE ( GetElementMatrix );
     LUA_DECLARE ( GetElementPosition );
     LUA_DECLARE ( GetElementRotation );
     LUA_DECLARE ( SetElementRotation );
+    LUA_DECLARE ( GetElementVelocity );
 
+    // Camera
     LUA_DECLARE ( GetCameraMatrix );
     LUA_DECLARE ( GetCameraPosition );
     LUA_DECLARE ( SetCameraPosition );
     LUA_DECLARE ( GetCameraRotation );
     LUA_DECLARE ( SetCameraRotation );
+
+    // Vehicle
+    LUA_DECLARE ( GetVehicleGravity );
+
+    // Marker
+    LUA_DECLARE ( GetMarkerTarget );
+
+    // Drawing
+    LUA_DECLARE ( DxGetFontHeight );
+    LUA_DECLARE ( DxGetTextWidth );
+
+    // Radar Area
+    LUA_DECLARE ( GetRadarAreaSize );
 };
 
 #endif

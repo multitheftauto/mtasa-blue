@@ -48,6 +48,7 @@ public:
     inline std::list < CPlayer* > ::const_iterator  IterEnd                     ( void )                                            { return m_Players.end (); };
 
     void                                        BroadcastOnlyJoined             ( const CPacket& Packet, CPlayer* pSkip = NULL );
+    void                                        BroadcastDimensionOnlyJoined    ( const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL );
 
     static void                                 Broadcast                       ( const CPacket& Packet, const std::set < CPlayer* >& sendList );
     static void                                 Broadcast                       ( const CPacket& Packet, const std::list < CPlayer* >& sendList );

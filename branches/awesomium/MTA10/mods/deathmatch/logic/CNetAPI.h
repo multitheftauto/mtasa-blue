@@ -100,6 +100,8 @@ private:
     void                    GetLastSentControllerState      ( CControllerState* pControllerState, float* pfCameraRotation, float* pfLastAimY );
     void                    SetLastSentControllerState      ( const CControllerState& ControllerState, float fCameraRotation, float fLastAimY );
 
+    void                    ReadVehiclePartsState           ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
+
 public:
     bool                    IsCameraSyncNeeded              ( void );
     void                    WriteCameraSync                 ( NetBitStreamInterface& BitStream );
@@ -118,11 +120,7 @@ private:
     CVector                 m_vecLastReturnPosition;
     CVector                 m_vecLastReturnRotation;
 
-    unsigned long           m_ulLastCameraSyncTime;
-    bool                    m_bLastSentCameraMode;
-    CClientEntity*          m_pLastSentCameraTarget;
-    CVector                 m_vecLastSentCameraPosition;
-    CVector                 m_vecLastSentCameraLookAt;
+    CElapsedTime            m_CameraSyncTimer;
 
     CInterpolator<CVector>  m_Interpolator;
 

@@ -79,7 +79,7 @@ int CLuaVector4Defs::Create ( lua_State* luaVM )
         else
         {
             lua_pop ( luaVM, 1 );
-            lua_rawgeti ( luaVM, -1, 3 );
+            lua_rawgeti ( luaVM, -1, 4 );
             if ( lua_isnumber ( luaVM, -1 ) )
                 vector.fW = ( float ) lua_tonumber ( luaVM, -1 );
             lua_pop ( luaVM, 1 );
@@ -97,6 +97,11 @@ int CLuaVector4Defs::Create ( lua_State* luaVM )
                 argStream.ReadNumber ( vector.fW );
         }
     }
+    else if ( argStream.NextIsVector4D () )
+    {
+        argStream.ReadVector4D ( vector );
+    }
+
     lua_pushvector ( luaVM, vector );
     return 1;
 }

@@ -75,7 +75,7 @@ CVertexStreamBoundingBoxManager::~CVertexStreamBoundingBoxManager ( void )
 CVertexStreamBoundingBoxManager* CVertexStreamBoundingBoxManager::GetSingleton ( void )
 {
     if ( !ms_Singleton )
-        ms_Singleton = new CVertexStreamBoundingBoxManager ();;
+        ms_Singleton = new CVertexStreamBoundingBoxManager ();
     return ms_Singleton;
 }
 

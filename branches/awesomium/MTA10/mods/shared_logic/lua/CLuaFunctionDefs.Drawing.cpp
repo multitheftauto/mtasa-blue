@@ -209,8 +209,8 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
 {
-// bool dxDrawRectangle ( int startX, int startY, float width, float height [, int color = white, bool postGUI = false] )
-    float fStartX; float fStartY; float fWidth; float fHeight; uint ulColor; bool bPostGUI;
+// bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false] )
+    float fStartX; float fStartY; float fWidth; float fHeight; uint ulColor; bool bPostGUI; bool bSubPixelPositioning;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( fStartX );
@@ -219,11 +219,11 @@ int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
     argStream.ReadNumber ( fHeight );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     argStream.ReadBool ( bPostGUI, false );
-
+    argStream.ReadBool ( bSubPixelPositioning, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->DrawRectQueued ( fStartX, fStartY, fWidth, fHeight, ulColor, bPostGUI );
+        g_pCore->GetGraphics ()->DrawRectQueued ( fStartX, fStartY, fWidth, fHeight, ulColor, bPostGUI, bSubPixelPositioning );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -737,16 +737,16 @@ int CLuaFunctionDefs::dxSetShaderValue ( lua_State* luaVM )
 int CLuaFunctionDefs::dxSetShaderTessellation ( lua_State* luaVM )
 {
 //  bool dxSetShaderTessellation( element shader, int tessellationX, int tessellationY )
-    CClientShader* pShader; uint uiTessellationX; uint uiTessellationY;
+//  bool shader:setShaderTessellation( element shader, Vector2 tessellation )
+    CClientShader* pShader; CVector2D vecTessellation;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pShader );
-    argStream.ReadNumber ( uiTessellationX );
-    argStream.ReadNumber ( uiTessellationY );
+    argStream.ReadVector2D ( vecTessellation );
 
     if ( !argStream.HasErrors () )
     {
-        pShader->GetShaderItem ()->SetTessellation ( uiTessellationX, uiTessellationY );
+        pShader->GetShaderItem ()->SetTessellation ( (uint)vecTessellation.fX, (uint)vecTessellation.fY );
         lua_pushboolean ( luaVM, true );
         return 1;
     }

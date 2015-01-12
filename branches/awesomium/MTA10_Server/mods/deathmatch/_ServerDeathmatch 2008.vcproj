@@ -1560,7 +1560,103 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\lua\CLuaFunctionDefinitions.cpp"
+						RelativePath=".\logic\lua\CLuaFunctionDefs.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Account.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Ban.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Blip.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Clothing.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.ColShape.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Crypt.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Database.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Event.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Marker.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Misc.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Object.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Ped.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Player.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.PREG.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.RadarArea.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Server.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Team.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Timer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.UTF.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Utility.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Vehicle.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Water.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.Weapon.cpp"
 						>
 					</File>
 					<File
@@ -1623,6 +1719,10 @@
 						Name="oopdefs"
 						>
 						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.ACL.cpp"
+							>
+						</File>
+						<File
 							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp"
 							>
 						</File>
@@ -1639,7 +1739,15 @@
 							>
 						</File>
 						<File
-							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp"
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp"
 							>
 						</File>
 					</Filter>

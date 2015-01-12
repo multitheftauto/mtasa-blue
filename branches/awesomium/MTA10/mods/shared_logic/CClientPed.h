@@ -572,6 +572,7 @@ public:
     CVector                     m_vecTurnSpeed;
     eWeaponSlot                 m_CurrentWeaponSlot;
     SFixedArray < eWeaponType, WEAPONSLOT_MAX > m_WeaponTypes;
+    SFixedArray < ushort, WEAPONSLOT_MAX > m_usWeaponAmmo;
     bool                        m_bHasJetPack;
     CClientPlayerClothes*       m_pClothes;
     eFightingStyle              m_FightingStyle;

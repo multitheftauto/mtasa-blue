@@ -69,6 +69,11 @@ void OnCrashAverted ( uint uiId )
     g_pCore->OnCrashAverted ( uiId );  
 }
 
+void OnEnterCrashZone ( uint uiId )
+{
+    g_pCore->OnEnterCrashZone ( uiId );  
+}
+
 bool GetDebugIdEnabled ( uint uiDebugId )
 {
     return g_pCore->GetDebugIdEnabled ( uiDebugId );  
