@@ -1746,6 +1746,10 @@
 							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp"
 							>
 						</File>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp"
+							>
+						</File>
 					</Filter>
 				</Filter>
 				<Filter

@@ -50,6 +50,9 @@ public:
     // Drawing
     LUA_DECLARE ( DxGetFontHeight );
     LUA_DECLARE ( DxGetTextWidth );
+
+    // Radar Area
+    LUA_DECLARE ( GetRadarAreaSize );
 };
 
 #endif

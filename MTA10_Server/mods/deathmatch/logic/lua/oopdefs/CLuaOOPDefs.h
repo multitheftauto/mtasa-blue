@@ -52,6 +52,9 @@ public:
 
     // ACL
     LUA_DECLARE ( DoesACLGroupContainObject );
+
+    // RadarArea
+    LUA_DECLARE ( GetRadarAreaSize );
 };
 
 #endif

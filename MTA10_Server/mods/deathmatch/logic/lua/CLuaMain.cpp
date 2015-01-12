@@ -919,9 +919,9 @@ void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setFlashing", "setRadarAreaFlashing" );
     lua_classfunction ( luaVM, "setColor", "setRadarAreaColor" );
     
-    lua_classvariable ( luaVM, "flashing", "isRadarAreaFlashing", "setRadarAreaFlashing" );
-    //lua_classvariable ( luaVM, "color", "getRadarAreaColor", "setRadarAreaColor", "" );
-    lua_classvariable ( luaVM, "size", "getRadarAreaSize", "setRadarAreaSize" );
+    lua_classvariable ( luaVM, "flashing", "setRadarAreaFlashing", "isRadarAreaFlashing" );
+    //lua_classvariable ( luaVM, "color", "setRadarAreaColor", "getRadarAreaColor" );
+    lua_classvariable ( luaVM, "size", "setRadarAreaSize", "getRadarAreaSize", CLuaFunctionDefs::SetRadarAreaSize, CLuaOOPDefs::GetRadarAreaSize );
 
     lua_registerclass ( luaVM, "RadarArea", "Element" );
 }

@@ -1002,6 +1002,9 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Misc.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
+    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp">
+      <Filter>Source Files\logic\oopdefs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logic\CLightsyncManager.h">

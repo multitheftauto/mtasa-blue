@@ -1266,6 +1266,10 @@
 							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp"
 							>
 						</File>
+						<File
+							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp"
+							>
+						</File>
 					</Filter>
 				</Filter>
 				<Filter
