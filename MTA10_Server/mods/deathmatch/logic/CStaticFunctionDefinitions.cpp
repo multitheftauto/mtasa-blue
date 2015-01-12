@@ -1089,9 +1089,6 @@ bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, const char
     CLuaArgument * pCurrentVariable = pElement->GetCustomData ( szName, false, &bIsSynced );
     if ( !pCurrentVariable || *pCurrentVariable != Variable || bIsSynced != bSynchronize )
     {
-        // Set its custom data
-        pElement->SetCustomData ( szName, Variable, pLuaMain, bSynchronize );
-
         if ( bSynchronize )
         {
             // Tell our clients to update their data
@@ -1104,6 +1101,9 @@ bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, const char
 
             CPerfStatEventPacketUsage::GetSingleton ()->UpdateElementDataUsageOut ( szName, m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed() );
         }
+
+        // Set its custom data
+        pElement->SetCustomData ( szName, Variable, pLuaMain, bSynchronize );
         return true;
     }
     return false;
