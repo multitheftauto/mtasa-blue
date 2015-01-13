@@ -24,20 +24,18 @@ extern bool g_bAllowAspectRatioAdjustment;
 int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 {
 //  bool dxDrawLine ( int startX, int startY, int endX, int endY, int color, [float width=1, bool postGUI=false] )
-    float fStartX; float fStartY; float fEndX; float fEndY; uint ulColor; float fWidth; bool bPostGUI;
+    CVector2D vecStart; CVector2D vecEnd; uint ulColor; float fWidth; bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( fStartX );
-    argStream.ReadNumber ( fStartY );
-    argStream.ReadNumber ( fEndX );
-    argStream.ReadNumber ( fEndY );
+    argStream.ReadVector2D ( vecStart );
+    argStream.ReadVector2D ( vecEnd );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     argStream.ReadNumber ( fWidth, 1 );
     argStream.ReadBool ( bPostGUI, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->DrawLineQueued ( fStartX, fStartY, fEndX, fEndY, fWidth, ulColor, bPostGUI );
+        g_pCore->GetGraphics ()->DrawLineQueued ( vecStart.fX, vecStart.fY, vecEnd.fX, vecEnd.fY, fWidth, ulColor, bPostGUI );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -52,7 +50,7 @@ int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
 {
-// bool dxDrawLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, int color[, int width, bool postGUI ] )
+//  bool dxDrawLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, int color[, int width, bool postGUI ] )
     CVector vecBegin; CVector vecEnd; uint ulColor; float fWidth; bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
@@ -79,7 +77,7 @@ int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawMaterialLine3D ( lua_State* luaVM )
 {
-// bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, element material, int width [, int color = white,
+//  bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, element material, int width [, int color = white,
 //                          float faceX, float faceY, float faceZ ] )
     CVector vecBegin; CVector vecEnd; CClientMaterial* pMaterial; float fWidth; uint ulColor;
     CVector vecFaceToward; bool bUseFaceToward = false;
@@ -113,7 +111,7 @@ int CLuaFunctionDefs::dxDrawMaterialLine3D ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
 {
-// bool dxDrawMaterialSectionLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float vsize,
+//  bool dxDrawMaterialSectionLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float vsize,
 //                                  element material, int width, [ int color = white, float faceX, float faceY, float faceZ ] )
     CVector vecBegin; CVector vecEnd; float fU; float fV; float fSizeU; float fSizeV;
     CClientMaterial* pMaterial; float fWidth; uint ulColor; CVector vecFaceToward; bool bUseFaceToward = false;
@@ -209,21 +207,19 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 
 int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
 {
-// bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false] )
-    float fStartX; float fStartY; float fWidth; float fHeight; uint ulColor; bool bPostGUI; bool bSubPixelPositioning;
+//  bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false] )
+    CVector2D vecPosition; CVector2D vecSize; uint ulColor; bool bPostGUI; bool bSubPixelPositioning;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( fStartX );
-    argStream.ReadNumber ( fStartY );
-    argStream.ReadNumber ( fWidth );
-    argStream.ReadNumber ( fHeight );
+    argStream.ReadVector2D ( vecPosition );
+    argStream.ReadVector2D ( vecSize );
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     argStream.ReadBool ( bPostGUI, false );
     argStream.ReadBool ( bSubPixelPositioning, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->DrawRectQueued ( fStartX, fStartY, fWidth, fHeight, ulColor, bPostGUI, bSubPixelPositioning );
+        g_pCore->GetGraphics ()->DrawRectQueued ( vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, ulColor, bPostGUI, bSubPixelPositioning );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
