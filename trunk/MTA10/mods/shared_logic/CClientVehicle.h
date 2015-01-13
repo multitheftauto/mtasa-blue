@@ -63,6 +63,17 @@ enum eDelayedSyncVehicleData
     DELAYEDSYNC_VEHICLE_TURNSPEED,
 };
 
+namespace EComponentBase
+{
+    enum EComponentBaseType
+    {
+        WORLD,
+        ROOT,
+        PARENT,
+    };
+}
+using EComponentBase::EComponentBaseType;
+
 struct SDelayedSyncVehicleData
 {
     unsigned long       ulTime;
@@ -99,10 +110,11 @@ struct SVehicleComponentData
         m_bRotationChanged = false;
         m_bVisible = true;
     }
-    CVector m_vecComponentPosition;
-    CVector m_vecComponentRotation;
-    CVector m_vecOriginalComponentPosition;
-    CVector m_vecOriginalComponentRotation;
+    SString m_strParentName;
+    CVector m_vecComponentPosition;         // Parent relative
+    CVector m_vecComponentRotation;         // Parent relative radians
+    CVector m_vecOriginalComponentPosition; // Parent relative
+    CVector m_vecOriginalComponentRotation; // Parent relative radians
     bool m_bPositionChanged;
     bool m_bRotationChanged;
     bool m_bVisible;
@@ -448,20 +460,20 @@ public:
     void                        SetVehicleFlags             ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
     void                        RemoveVehicleSirens         ( void );
 
-    bool                        ResetComponentPosition  ( SString vehicleComponent );
-    bool                        SetComponentPosition    ( SString vehicleComponent, CVector vecPosition );
-    bool                        GetComponentPosition    ( SString vehicleComponent, CVector &vecPosition );
+    bool                        ResetComponentPosition  ( const SString& vehicleComponent );
+    bool                        SetComponentPosition    ( const SString& vehicleComponent, CVector vecPosition, EComponentBaseType base = EComponentBase::PARENT );
+    bool                        GetComponentPosition    ( const SString& vehicleComponent, CVector &vecPosition, EComponentBaseType base = EComponentBase::PARENT );
     
-    bool                        ResetComponentRotation  ( SString vehicleComponent );
-    bool                        SetComponentRotation    ( SString vehicleComponent, CVector vecRotation );
-    bool                        GetComponentRotation    ( SString vehicleComponent, CVector &vecRotation );
+    bool                        ResetComponentRotation  ( const SString& vehicleComponent );
+    bool                        SetComponentRotation    ( const SString& vehicleComponent, CVector vecRotation, EComponentBaseType base = EComponentBase::PARENT );
+    bool                        GetComponentRotation    ( const SString& vehicleComponent, CVector &vecRotation, EComponentBaseType base = EComponentBase::PARENT );
 
-    bool                        SetComponentVisible     ( SString vehicleComponent, bool bVisible );
-    bool                        GetComponentVisible     ( SString vehicleComponent, bool &bVisible );
+    bool                        SetComponentVisible     ( const SString& vehicleComponent, bool bVisible );
+    bool                        GetComponentVisible     ( const SString& vehicleComponent, bool &bVisible );
     std::map < SString, SVehicleComponentData > ::iterator ComponentsBegin ( void )                               { return m_ComponentData.begin (); }
     std::map < SString, SVehicleComponentData > ::iterator ComponentsEnd   ( void )                               { return m_ComponentData.end (); }
     
-    bool                        DoesSupportUpgrade      ( SString strFrameName );
+    bool                        DoesSupportUpgrade      ( const SString& strFrameName );
 
     bool                        AreHeliBladeCollisionsEnabled              ( void )                              { return m_bEnableHeliBladeCollisions; }
 
@@ -470,6 +482,11 @@ public:
     bool                        OnVehicleFallThroughMap                    ( );
 
 protected:
+    void                        ConvertComponentRotationBase        ( const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase );
+    void                        ConvertComponentPositionBase        ( const SString& vehicleComponent, CVector& vecInOutPosition, EComponentBaseType inputBase, EComponentBaseType outputBase );
+    void                        ConvertComponentMatrixBase          ( const SString& vehicleComponent, CMatrix& matInOutOrientation, EComponentBaseType inputBase, EComponentBaseType outputBase );
+    void                        GetComponentParentToRootMatrix      ( const SString& vehicleComponent, CMatrix& matOutParentToRoot );
+
     void                        StreamIn                ( bool bInstantly );
     void                        StreamOut               ( void );
 

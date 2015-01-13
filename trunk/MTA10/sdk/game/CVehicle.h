@@ -114,7 +114,7 @@ public:
     virtual bool                CanPedJumpOutCar            ( CPed* pPed ) = 0;
     virtual void                AddVehicleUpgrade           ( DWORD dwModelID ) = 0;
     virtual void                RemoveVehicleUpgrade        ( DWORD dwModelID ) = 0;
-    virtual bool                DoesSupportUpgrade          ( SString strFrameName ) = 0;
+    virtual bool                DoesSupportUpgrade          ( const SString& strFrameName ) = 0;
     virtual bool                CanPedLeanOut               ( CPed* pPed ) = 0;
     virtual bool                CanPedStepOutCar            ( bool bUnknown ) = 0;
 
@@ -302,15 +302,16 @@ public:
     virtual bool                 IsSirenRandomiserEnabled               ( void ) = 0;
     virtual bool                 IsSirenSilentEffectEnabled             ( void ) = 0;
     virtual void                 SetVehicleFlags                        ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent ) = 0;
-    virtual bool                 SetComponentRotation                   ( SString vehicleComponent, CVector vecRotation ) = 0;
-    virtual bool                 GetComponentRotation                   ( SString vehicleComponent, CVector &vecRotation ) = 0;
-    virtual bool                 SetComponentPosition                   ( SString vehicleComponent, CVector vecPosition ) = 0;
-    virtual bool                 GetComponentPosition                   ( SString vehicleComponent, CVector &vecPositionModelling ) = 0;
-    virtual bool                 IsComponentPresent                     ( SString vehicleComponent ) = 0;
+    virtual bool                 SetComponentRotation                   ( const SString& vehicleComponent, const CVector& vecRotation ) = 0;
+    virtual bool                 GetComponentRotation                   ( const SString& vehicleComponent, CVector &vecRotation ) = 0;
+    virtual bool                 SetComponentPosition                   ( const SString& vehicleComponent, const CVector& vecPosition ) = 0;
+    virtual bool                 GetComponentPosition                   ( const SString& vehicleComponent, CVector &vecPositionModelling ) = 0;
+    virtual bool                 IsComponentPresent                     ( const SString& vehicleComponent ) = 0;
     virtual bool                 SetComponentMatrix                     ( const SString& vehicleComponent, const CMatrix& matOrientation ) = 0;
     virtual bool                 GetComponentMatrix                     ( const SString& vehicleComponent, CMatrix& matOutOrientation ) = 0;
-    virtual bool                 SetComponentVisible                    ( SString vehicleComponent, bool bVisible ) = 0;
-    virtual bool                 GetComponentVisible                    ( SString vehicleComponent, bool &bVisible ) = 0;
+    virtual bool                 GetComponentParentToRootMatrix         ( const SString& vehicleComponent, CMatrix& matOutParentToRoot ) = 0;
+    virtual bool                 SetComponentVisible                    ( const SString& vehicleComponent, bool bVisible ) = 0;
+    virtual bool                 GetComponentVisible                    ( const SString& vehicleComponent, bool &bVisible ) = 0;
     virtual std::map < SString, SVehicleFrame > & GetComponentMap       ( void ) = 0;
     virtual void                 UpdateLandingGearPosition              ( void ) = 0;
     virtual bool                 SetPlateText                           ( const SString& strText ) = 0;

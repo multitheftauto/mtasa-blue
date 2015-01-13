@@ -1063,6 +1063,15 @@ public:
             outValue = defaultValue;
     }
 
+    template < class T >
+    void ReadIfNextIsEnumString ( T& outValue, const T& defaultValue )
+    {
+        if ( NextIsEnumString ( outValue ) )
+            ReadEnumString ( outValue, defaultValue );
+        else
+            outValue = defaultValue;
+    }
+
     template < class T, class U >
     void ReadIfNextCouldBeNumber ( T& outValue, const U& defaultValue )
     {
