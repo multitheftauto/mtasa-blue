@@ -572,7 +572,7 @@ public:
     bool                        CanPedJumpOutCar                ( CPed* pPed );
     void                        AddVehicleUpgrade               ( DWORD dwModelID );
     void                        RemoveVehicleUpgrade            ( DWORD dwModelID );
-    bool                        DoesSupportUpgrade              ( SString strFrameName );
+    bool                        DoesSupportUpgrade              ( const SString& strFrameName );
     bool                        CanPedLeanOut                   ( CPed* pPed );
     bool                        CanPedStepOutCar                ( bool bUnknown );
 
@@ -770,16 +770,17 @@ public:
     bool                        IsSirenRandomiserEnabled        ( void )  { return m_tSirenInfo.m_bUseRandomiser; }
     bool                        IsSirenSilentEffectEnabled      ( void )  { return m_tSirenInfo.m_bSirenSilent; }
     void                        SetVehicleFlags                 ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent );
-    bool                        SetComponentRotation            ( SString vehicleComponent, CVector vecRotation );
-    bool                        GetComponentRotation            ( SString vehicleComponent, CVector &vecPositionModelling ); 
-    bool                        SetComponentPosition            ( SString vehicleComponent, CVector vecPosition );
-    bool                        GetComponentPosition            ( SString vehicleComponent, CVector &vecPositionModelling ); 
-    bool                        IsComponentPresent              ( SString vehicleComponent );
+    bool                        SetComponentRotation            ( const SString& vehicleComponent, const CVector& vecRotation );
+    bool                        GetComponentRotation            ( const SString& vehicleComponent, CVector &vecPositionModelling ); 
+    bool                        SetComponentPosition            ( const SString& vehicleComponent, const CVector& vecPosition );
+    bool                        GetComponentPosition            ( const SString& vehicleComponent, CVector &vecPositionModelling ); 
+    bool                        IsComponentPresent              ( const SString& vehicleComponent );
     bool                        SetComponentMatrix              ( const SString& vehicleComponent, const CMatrix& matOrientation );
     bool                        GetComponentMatrix              ( const SString& vehicleComponent, CMatrix& matOutOrientation );
-    bool                        SetComponentVisible             ( SString vehicleComponent, bool bVisible );
+    bool                        GetComponentParentToRootMatrix  ( const SString& vehicleComponent, CMatrix& matOutParentToRoot );
+    bool                        SetComponentVisible             ( const SString& vehicleComponent, bool bVisible );
     void                        AddComponent                    ( RwFrame * pFrame, bool bReadOnly );
-    bool                        GetComponentVisible             ( SString vehicleComponent, bool &bVisible );
+    bool                        GetComponentVisible             ( const SString& vehicleComponent, bool &bVisible );
     std::map < SString, SVehicleFrame > & GetComponentMap       ( void )                                                            { return m_ExtraFrames; }
     bool                        SetPlateText                    ( const SString& strText );
 

@@ -432,6 +432,12 @@ IMPLEMENT_ENUM_BEGIN(eRadioStreamIndex)
     ADD_ENUM(RADIO_STREAM_WCTR, "WCTR")
 IMPLEMENT_ENUM_END("radio-stream-index")
 
+IMPLEMENT_ENUM_BEGIN( EComponentBase::EComponentBaseType )
+    ADD_ENUM( EComponentBaseType::WORLD,    "world" )
+    ADD_ENUM( EComponentBaseType::ROOT,     "root" )
+    ADD_ENUM( EComponentBaseType::PARENT,   "parent" )
+IMPLEMENT_ENUM_END( "component-base" )
+
 //
 // Get best guess at name of userdata type
 //

@@ -2835,7 +2835,25 @@ void CClientVehicle::Create ( void )
             // loop through all the components.... we don't care about the RwFrame we just want the names.
             for ( ; iter != componentMap.end () ; iter++ )
             {
+                const SString& strName = iter->first;
+                const SVehicleFrame& frame = iter->second;
+
                 SVehicleComponentData vehicleComponentData;
+
+                // Find parent component name
+                if ( !frame.frameList.empty() )
+                {
+                    RwFrame* pParentRwFrame = frame.frameList.back();
+                    for ( std::map < SString, SVehicleFrame >::const_iterator iter2 = componentMap.begin() ; iter2 != componentMap.end () ; iter2++ )
+                    {
+                        if ( iter2->second.pFrame == pParentRwFrame )
+                        {
+                            vehicleComponentData.m_strParentName = iter2->first;
+                            break;
+                        }
+                    }
+                }
+
                 // Grab our start position
                 GetComponentPosition ( (*iter).first, vehicleComponentData.m_vecComponentPosition );
                 GetComponentRotation ( (*iter).first, vehicleComponentData.m_vecComponentRotation );
@@ -4494,8 +4512,11 @@ void CClientVehicle::RemoveVehicleSirens ( void )
 }
 
 
-bool CClientVehicle::SetComponentPosition ( SString vehicleComponent, CVector vecPosition )
+bool CClientVehicle::SetComponentPosition ( const SString& vehicleComponent, CVector vecPosition, EComponentBaseType inputBase )
 {
+    // Ensure position is parent relative
+    ConvertComponentPositionBase ( vehicleComponent, vecPosition, inputBase, EComponentBase::PARENT );
+
     if ( m_pVehicle )
     {
         // set our position on the model
@@ -4521,12 +4542,17 @@ bool CClientVehicle::SetComponentPosition ( SString vehicleComponent, CVector ve
     return false;
 }
 
-bool CClientVehicle::GetComponentPosition ( SString vehicleComponent, CVector &vecPosition )
+bool CClientVehicle::GetComponentPosition ( const SString& vehicleComponent, CVector &vecPosition, EComponentBaseType outputBase )
 {
     if ( m_pVehicle )
     {
         // fill our position from the actual position
-        return m_pVehicle->GetComponentPosition ( vehicleComponent, vecPosition );
+        if ( m_pVehicle->GetComponentPosition ( vehicleComponent, vecPosition ) )
+        {
+            // Convert to required base
+            ConvertComponentPositionBase ( vehicleComponent, vecPosition, EComponentBase::PARENT, outputBase );
+            return true;
+        }
     }
     else
     {
@@ -4534,22 +4560,24 @@ bool CClientVehicle::GetComponentPosition ( SString vehicleComponent, CVector &v
         {
             // fill our position from the cached position
             vecPosition = m_ComponentData[vehicleComponent].m_vecComponentPosition;
+
+            // Convert to required base
+            ConvertComponentPositionBase ( vehicleComponent, vecPosition, EComponentBase::PARENT, outputBase );
             return true;
         }
     }
     return false;
 }
 
-bool CClientVehicle::SetComponentRotation ( SString vehicleComponent, CVector vecRotation )
+bool CClientVehicle::SetComponentRotation ( const SString& vehicleComponent, CVector vecRotation, EComponentBaseType inputBase )
 {
+    // Ensure rotation is parent relative
+    ConvertComponentRotationBase ( vehicleComponent, vecRotation, inputBase, EComponentBase::PARENT );
+
     if ( m_pVehicle )
     {
-        // convert degrees to radians so users don't need to use radians
-        CVector vecTemp = vecRotation;
-        ConvertDegreesToRadians ( vecTemp );
-
         // set our rotation on the model
-        if ( m_pVehicle->SetComponentRotation ( vehicleComponent, vecTemp ) )
+        if ( m_pVehicle->SetComponentRotation ( vehicleComponent, vecRotation ) )
         {
             // update our cache
             m_ComponentData[vehicleComponent].m_vecComponentRotation = vecRotation;
@@ -4571,15 +4599,16 @@ bool CClientVehicle::SetComponentRotation ( SString vehicleComponent, CVector ve
     return false;
 }
 
-bool CClientVehicle::GetComponentRotation ( SString vehicleComponent, CVector &vecRotation )
+bool CClientVehicle::GetComponentRotation ( const SString& vehicleComponent, CVector &vecRotation, EComponentBaseType outputBase )
 {
     if ( m_pVehicle )
     {
         // fill our rotation from the actual rotation
         bool bResult = m_pVehicle->GetComponentRotation ( vehicleComponent, vecRotation );
 
-        // convert to degrees... none of our functions use radians.
-        ConvertRadiansToDegrees ( vecRotation );
+        // Convert to required base
+        ConvertComponentRotationBase ( vehicleComponent, vecRotation, EComponentBase::PARENT, outputBase );
+
         return bResult;
     }
     else
@@ -4588,13 +4617,16 @@ bool CClientVehicle::GetComponentRotation ( SString vehicleComponent, CVector &v
         {
             // fill our rotation from the cached rotation
             vecRotation = m_ComponentData[vehicleComponent].m_vecComponentRotation;
+
+            // Convert to required base
+            ConvertComponentRotationBase ( vehicleComponent, vecRotation, EComponentBase::PARENT, outputBase );
             return true;
         }
     }
     return false;
 }
 
-bool CClientVehicle::ResetComponentRotation ( SString vehicleComponent )
+bool CClientVehicle::ResetComponentRotation ( const SString& vehicleComponent )
 {
     // set our rotation on the model
     if ( SetComponentRotation ( vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentRotation ) )
@@ -4605,7 +4637,7 @@ bool CClientVehicle::ResetComponentRotation ( SString vehicleComponent )
     }
     return false;
 }
-bool CClientVehicle::ResetComponentPosition ( SString vehicleComponent )
+bool CClientVehicle::ResetComponentPosition ( const SString& vehicleComponent )
 {
     // set our position on the model
     if ( SetComponentPosition ( vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentPosition ) )
@@ -4617,7 +4649,138 @@ bool CClientVehicle::ResetComponentPosition ( SString vehicleComponent )
     return false;
 }
 
-bool CClientVehicle::SetComponentVisible ( SString vehicleComponent, bool bVisible )
+//
+// Get transform from component parent to the model root
+//
+void CClientVehicle::GetComponentParentToRootMatrix( const SString& vehicleComponent, CMatrix& matOutParentToRoot )
+{
+    if ( m_pVehicle )
+    {
+        if ( m_pVehicle->GetComponentParentToRootMatrix ( vehicleComponent, matOutParentToRoot ) )
+        {
+            return;
+        }
+    }
+    else
+    {
+        // Get first parent
+        SVehicleComponentData* pComponentData = MapFind( m_ComponentData, vehicleComponent );
+        if ( pComponentData )
+        {
+            pComponentData = MapFind( m_ComponentData, pComponentData->m_strParentName );
+        }
+
+        // Combine transforms of parent components (limit to 10 in case of problems)
+        CMatrix matCombo;
+        for( uint i = 0 ; pComponentData && i < 10 ; i++ )
+        {
+            CMatrix matFrame( pComponentData->m_vecComponentPosition, pComponentData->m_vecComponentRotation );
+            matCombo = matCombo * matFrame;
+            pComponentData = MapFind( m_ComponentData, pComponentData->m_strParentName );
+        }
+
+        matOutParentToRoot = matCombo;
+    }
+}
+
+
+//
+// Change what a component rotation/position/matrix is relative to
+//
+void CClientVehicle::ConvertComponentRotationBase( const SString& vehicleComponent, CVector& vecRotation, EComponentBaseType inputBase, EComponentBaseType outputBase )
+{
+    if ( inputBase != outputBase )
+    {
+        CMatrix matTemp( CVector(), vecRotation );
+        ConvertComponentMatrixBase( vehicleComponent, matTemp, inputBase, outputBase );
+        vecRotation = matTemp.GetRotation();
+    }
+}
+
+void CClientVehicle::ConvertComponentPositionBase( const SString& vehicleComponent, CVector& vecPosition, EComponentBaseType inputBase, EComponentBaseType outputBase )
+{
+    if ( inputBase != outputBase )
+    {
+        CMatrix matTemp( vecPosition );
+        ConvertComponentMatrixBase( vehicleComponent, matTemp, inputBase, outputBase );
+        vecPosition = matTemp.GetPosition();
+    }
+}
+
+void CClientVehicle::ConvertComponentMatrixBase( const SString& vehicleComponent, CMatrix& matOrientation, EComponentBaseType inputBase, EComponentBaseType outputBase )
+{
+    if ( inputBase == outputBase )
+        return;
+
+    if ( inputBase == EComponentBaseType::PARENT )
+    {
+        if ( outputBase == EComponentBaseType::ROOT )
+        {
+            // Parent relative to root relative
+            CMatrix matParentToRoot;
+            GetComponentParentToRootMatrix( vehicleComponent, matParentToRoot );
+            matOrientation = matOrientation * matParentToRoot;
+        }
+        else
+        if ( outputBase == EComponentBaseType::WORLD )
+        {
+            // Parent relative to world
+            CMatrix matParentToRoot;
+            GetComponentParentToRootMatrix( vehicleComponent, matParentToRoot );
+            matOrientation = matOrientation * matParentToRoot;
+
+            CMatrix matRootToWorld;
+            GetMatrix( matRootToWorld );
+            matOrientation = matOrientation * matRootToWorld;
+        }
+    }
+    else
+    if ( inputBase == EComponentBaseType::ROOT )
+    {
+        if ( outputBase == EComponentBaseType::PARENT )
+        {
+            // Root relative to parent relative
+            CMatrix matParentToRoot;
+            GetComponentParentToRootMatrix( vehicleComponent, matParentToRoot );
+            matOrientation = matOrientation * matParentToRoot.Inverse();
+        }
+        else
+        if ( outputBase == EComponentBaseType::WORLD )
+        {
+            // Root relative to world
+            CMatrix matRootToWorld;
+            GetMatrix( matRootToWorld );
+            matOrientation = matOrientation * matRootToWorld;
+        }
+    }
+    else
+    if ( inputBase == EComponentBaseType::WORLD )
+    {
+        if ( outputBase == EComponentBaseType::PARENT )
+        {
+            // World to parent relative
+            CMatrix matRootToWorld;
+            GetMatrix( matRootToWorld );
+            matOrientation = matOrientation * matRootToWorld.Inverse();
+
+            CMatrix matParentToRoot;
+            GetComponentParentToRootMatrix( vehicleComponent, matParentToRoot );
+            matOrientation = matOrientation * matParentToRoot.Inverse();
+        }
+        else
+        if ( outputBase == EComponentBaseType::ROOT )
+        {
+            // World to root relative
+            CMatrix matRootToWorld;
+            GetMatrix( matRootToWorld );
+            matOrientation = matOrientation * matRootToWorld.Inverse();
+        }
+    }
+}
+
+
+
+bool CClientVehicle::SetComponentVisible ( const SString& vehicleComponent, bool bVisible )
 {
     // Check if wheel invisibility override is in operation due to setting of wheel states
     if ( bVisible && GetWheelMissing( UCHAR_INVALID_INDEX, vehicleComponent ) )
@@ -4647,7 +4810,7 @@ bool CClientVehicle::SetComponentVisible ( SString vehicleComponent, bool bVisib
     return false;
 }
 
-bool CClientVehicle::GetComponentVisible ( SString vehicleComponent, bool &bVisible )
+bool CClientVehicle::GetComponentVisible ( const SString& vehicleComponent, bool &bVisible )
 {
     if ( m_pVehicle )
     {
@@ -4666,7 +4829,7 @@ bool CClientVehicle::GetComponentVisible ( SString vehicleComponent, bool &bVisi
     return false;
 }
 
-bool CClientVehicle::DoesSupportUpgrade ( SString strFrameName )
+bool CClientVehicle::DoesSupportUpgrade ( const SString& strFrameName )
 {
     if ( m_pVehicle != NULL )
     {

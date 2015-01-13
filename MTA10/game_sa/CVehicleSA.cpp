@@ -40,6 +40,34 @@ namespace
         matOut.vPos = (CVector&)rwMatrix.pos;
     }
 
+    void RwMatrixGetRotation( const RwMatrix& rwMatrix, CVector& vecOutRotation )
+    {
+        CMatrix matTemp;
+        matTemp.vRight = (CVector&)rwMatrix.right;
+        matTemp.vFront = (CVector&)rwMatrix.up;
+        matTemp.vUp = (CVector&)rwMatrix.at;
+        vecOutRotation = matTemp.GetRotation();
+    }
+
+    void RwMatrixSetRotation( RwMatrix& rwInOutMatrix, const CVector& vecRotation )
+    {
+        CMatrix matTemp;
+        matTemp.SetRotation( vecRotation );
+        rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
+        rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
+        rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
+    }
+
+    void RwMatrixGetPosition( const RwMatrix& rwMatrix, CVector& vecOutPosition )
+    {
+        vecOutPosition = (CVector&)rwMatrix.pos;
+    }
+
+    void RwMatrixSetPosition( RwMatrix& rwInOutMatrix, const CVector& vecPosition )
+    {
+        rwInOutMatrix.pos = (RwV3d&)vecPosition;
+    }
+
     RpAtomic* ClumpDumpCB (RpAtomic* pAtomic, void * data)
     {
         CVehicleSA * pVehicleSA = (CVehicleSA *)data;
@@ -827,7 +855,7 @@ void CVehicleSA::RemoveVehicleUpgrade ( DWORD dwModelID )
     }
 }
 
-bool CVehicleSA::DoesSupportUpgrade ( SString strFrameName )
+bool CVehicleSA::DoesSupportUpgrade ( const SString& strFrameName )
 {
     SVehicleFrame* pComponent = GetVehicleComponent ( strFrameName );
     if ( pComponent && pComponent->pFrame != NULL )
@@ -2376,53 +2404,52 @@ SVehicleFrame* CVehicleSA::GetVehicleComponent ( const SString& vehicleComponent
     return MapFind( m_ExtraFrames, vehicleComponent );
 }
 
-bool CVehicleSA::SetComponentRotation ( SString vehicleComponent, CVector vecRotation )  
-{ 
-    CMatrix matResult;
-    if ( GetComponentMatrix( vehicleComponent, matResult ) )
-    {
-        matResult.SetRotation( vecRotation );
-        SetComponentMatrix( vehicleComponent, matResult );
-        return true;
-    }
-    return false;
-}
 
-bool CVehicleSA::GetComponentRotation ( SString vehicleComponent, CVector &vecRotation )
+bool CVehicleSA::SetComponentRotation ( const SString& vehicleComponent, const CVector& vecRotation )  
 {
-    CMatrix matResult;
-    if ( GetComponentMatrix( vehicleComponent, matResult ) )
+    SVehicleFrame* pComponent = GetVehicleComponent ( vehicleComponent );
+    if ( pComponent && pComponent->pFrame != NULL )
     {
-        vecRotation = matResult.GetRotation();
+        RwMatrixSetRotation( pComponent->pFrame->modelling, vecRotation );
         return true;
     }
     return false;
 }
 
-bool CVehicleSA::SetComponentPosition ( SString vehicleComponent, CVector vecPosition )  
+bool CVehicleSA::GetComponentRotation ( const SString& vehicleComponent, CVector &vecRotation )
+{
+    SVehicleFrame* pComponent = GetVehicleComponent ( vehicleComponent );
+    if ( pComponent && pComponent->pFrame != NULL )
+    {
+        RwMatrixGetRotation( pComponent->pFrame->modelling, vecRotation );
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::SetComponentPosition ( const SString& vehicleComponent, const CVector& vecPosition )  
+{
+    SVehicleFrame* pComponent = GetVehicleComponent ( vehicleComponent );
+    if ( pComponent && pComponent->pFrame != NULL )
+    {
+        RwMatrixSetPosition( pComponent->pFrame->modelling, vecPosition );
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::GetComponentPosition ( const SString& vehicleComponent, CVector &vecPositionModelling )  
 { 
-    CMatrix matResult;
-    if ( GetComponentMatrix( vehicleComponent, matResult ) )
-        {
-        matResult.SetPosition( vecPosition );
-        SetComponentMatrix( vehicleComponent, matResult );
+    SVehicleFrame* pComponent = GetVehicleComponent ( vehicleComponent );
+    if ( pComponent && pComponent->pFrame != NULL )
+    {
+        RwMatrixGetPosition( pComponent->pFrame->modelling, vecPositionModelling );
         return true;
     }
     return false;
 }
 
-bool CVehicleSA::GetComponentPosition ( SString vehicleComponent, CVector &vecPositionModelling )  
-{ 
-    CMatrix matResult;
-    if ( GetComponentMatrix( vehicleComponent, matResult ) )
-        {
-        vecPositionModelling = matResult.GetPosition();
-        return true;
-    }
-    return false;
-}
-
-bool CVehicleSA::IsComponentPresent ( SString vehicleComponent )
+bool CVehicleSA::IsComponentPresent ( const SString& vehicleComponent )
 {
     return GetVehicleComponent ( vehicleComponent ) != NULL;
 }
@@ -2433,23 +2460,7 @@ bool CVehicleSA::GetComponentMatrix ( const SString& vehicleComponent, CMatrix& 
     // Check validty
     if ( pComponent && pComponent->pFrame != NULL )
     {
-        // Calc root to parent transform
-        CMatrix matCombo;
-        for( uint i = 0 ; i < pComponent->frameList.size() ; i++ )
-        {
-            RwFrame* pFrame = pComponent->frameList[ i ];
-            if ( pFrame )
-            {
-                CMatrix matFrame;
-                RwMatrixToCMatrix( pFrame->modelling, matFrame );
-                matCombo = matFrame * matCombo;
-            }
-        }
-
-        // Append parent to component transform (to get root to component transform which MTA uses)
-        CMatrix matFrame;
-        RwMatrixToCMatrix( pComponent->pFrame->modelling, matFrame );
-        matOutOrientation = matFrame * matCombo;
+        RwMatrixToCMatrix( pComponent->pFrame->modelling, matOutOrientation );
         return true;
     }
     return false;
@@ -2462,6 +2473,20 @@ bool CVehicleSA::SetComponentMatrix ( const SString& vehicleComponent, const CMa
     // Check validty
     if ( pComponent && pComponent->pFrame != NULL )
     {
+        CMatrixToRwMatrix( matOrientation, pComponent->pFrame->modelling );
+        return true;
+    }
+    return false;
+}
+
+
+// Get transform from component parent to the model root
+bool CVehicleSA::GetComponentParentToRootMatrix ( const SString& vehicleComponent, CMatrix& matOutParentToRoot )
+{
+    SVehicleFrame* pComponent = GetVehicleComponent ( vehicleComponent );
+    // Check validty
+    if ( pComponent && pComponent->pFrame != NULL )
+    {
         // Calc root to parent transform
         CMatrix matCombo;
         for( uint i = 0 ; i < pComponent->frameList.size() ; i++ )
@@ -2474,16 +2499,12 @@ bool CVehicleSA::SetComponentMatrix ( const SString& vehicleComponent, const CMa
                 matCombo = matFrame * matCombo;
             }
         }
-
-        // Remove root to parent transform from input (to get parent to component transform which GTA uses)
-        CMatrix matResult = matOrientation * matCombo.Inverse();
-
-        // Set for GTA
-        CMatrixToRwMatrix( matResult, pComponent->pFrame->modelling );
+        matOutParentToRoot = matCombo;
         return true;
     }
     return false;
 }
+
 
 void CVehicleSA::AddComponent ( RwFrame * pFrame, bool bReadOnly )
 {
@@ -2544,7 +2565,7 @@ void CVehicleSA::FinalizeFramesList ( void )
 }
 
 
-bool CVehicleSA::SetComponentVisible ( SString vehicleComponent, bool bRequestVisible )  
+bool CVehicleSA::SetComponentVisible ( const SString& vehicleComponent, bool bRequestVisible )  
 { 
     SVehicleFrame* pComponent = GetVehicleComponent ( vehicleComponent );
     // Check validty
@@ -2588,7 +2609,7 @@ bool CVehicleSA::SetComponentVisible ( SString vehicleComponent, bool bRequestVi
     return false;
 }
 
-bool CVehicleSA::GetComponentVisible ( SString vehicleComponent, bool &bOutVisible )  
+bool CVehicleSA::GetComponentVisible ( const SString& vehicleComponent, bool &bOutVisible )  
 { 
     SVehicleFrame* pComponent = GetVehicleComponent ( vehicleComponent );
     // Check validty
