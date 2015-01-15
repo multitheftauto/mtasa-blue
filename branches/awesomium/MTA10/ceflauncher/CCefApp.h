@@ -33,7 +33,7 @@ public:
 
         // Bind V8 --> C++ functions
         V8Helpers::BindV8Function ( handler, mtaObject, "triggerEvent", Javascript_triggerEvent );
-        V8Helpers::BindV8Function ( handler, mtaObject, "triggerServerEvent", Javascript_triggerServerEvent );
+        // V8Helpers::BindV8Function ( handler, mtaObject, "triggerServerEvent", Javascript_triggerServerEvent ); // Disabled due to security issues
 
         // Assign mtaObject to global object
         globalObject->SetValue ( "mta", mtaObject, V8_PROPERTY_ATTRIBUTE_NONE );

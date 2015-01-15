@@ -13,11 +13,10 @@
 int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
 {
 //  texture createBrowser ( int width, int height, bool isLocal [, bool transparent = false] )
-    int width; int height; bool bIsLocal; bool bTransparent;
+    CVector2D vecSize; bool bIsLocal; bool bTransparent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D ( vecSize );
     argStream.ReadBool ( bIsLocal );
     argStream.ReadBool ( bTransparent, false );
     
@@ -34,7 +33,7 @@ int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
         {
             CResource* pParentResource = pLuaMain->GetResource ();
 
-            CClientWebBrowser* pBrowserTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, bIsLocal, bTransparent );
+            CClientWebBrowser* pBrowserTexture = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( (int)vecSize.fX, (int)vecSize.fY, bIsLocal, bTransparent );
             if ( pBrowserTexture )
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
@@ -136,16 +135,15 @@ int CLuaFunctionDefs::IsBrowserLoading ( lua_State* luaVM )
 int CLuaFunctionDefs::InjectBrowserMouseMove ( lua_State* luaVM )
 {
 //  bool injectBrowserMouseMove(browser webBrowser, int x, int y)
-    CClientWebBrowser* pWebBrowser; int posX; int posY;
+    CClientWebBrowser* pWebBrowser; CVector2D vecPosition;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadNumber ( posX );
-    argStream.ReadNumber ( posY );
+    argStream.ReadVector2D ( vecPosition );
 
     if ( !argStream.HasErrors () )
     {
-        pWebBrowser->InjectMouseMove ( posX, posY );
+        pWebBrowser->InjectMouseMove ( (int)vecPosition.fX, (int)vecPosition.fY );
         lua_pushboolean ( luaVM, true );
         return 1;
     }

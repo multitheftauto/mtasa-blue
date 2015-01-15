@@ -485,6 +485,23 @@ bool CWebView::OnTooltip ( CefRefPtr<CefBrowser> browser, CefString& title )
     return true;
 }
 
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefDisplayHandler::OnConsoleMessage            //
+// http://magpcss.org/ceforum/apidocs/projects/%28default%29/CefDisplayHandler.html#OnConsoleMessage%28CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,int%29 //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line )
+{
+    // Redirect console message to debug window (if development mode is enabled)
+    if ( g_pCore->GetWebCore ()->IsTestModeEnabled () )
+    {
+        g_pCore->DebugPrintfColor ( "[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8 ( message ).c_str (), UTF16ToMbUTF8 ( source ).c_str () );
+    }
+
+    return true;
+}
+
 
 void CWebView::ConvertURL ( const CefString& url, SString& convertedURL )
 {

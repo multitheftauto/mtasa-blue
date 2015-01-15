@@ -153,12 +153,12 @@ eURLState CWebCore::GetURLState ( const SString& strURL )
             return eURLState::WEBPAGE_ALLOWED;
         else
         {
-            if ( m_bTestmodeEnabled ) g_pCore->DebugPrintf ( "[BROWSER] Blocked page: %s", strURL.c_str() );
+            if ( m_bTestmodeEnabled ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
             return eURLState::WEBPAGE_DISALLOWED;
         }
     }
 
-    if ( m_bTestmodeEnabled ) g_pCore->DebugPrintf ( "[BROWSER] Blocked page: %s", strURL.c_str() );
+    if ( m_bTestmodeEnabled ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
     return eURLState::WEBPAGE_NOT_LISTED;
 }
 
