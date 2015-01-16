@@ -157,7 +157,13 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
     argStream.ReadVector2D ( vecTopLeft );
-    argStream.ReadVector2D ( vecBottomRight, vecTopLeft );
+    if ( argStream.NextIsUserDataOfType<CLuaVector2D>() )
+        argStream.ReadVector2D ( vecBottomRight );
+    else
+    {
+        argStream.ReadNumber ( vecBottomRight.fX, vecTopLeft.fX );
+        argStream.ReadNumber ( vecBottomRight.fY, vecTopLeft.fY );
+    }
     argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
     if ( argStream.NextIsUserDataOfType<CLuaVector2D>() ) {
         CVector2D vecScale;
