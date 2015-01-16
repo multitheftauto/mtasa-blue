@@ -745,6 +745,7 @@ void CCore::ShowNetErrorMessageBox( const SString& strTitle, SString strMessage,
     if ( bLinkRequiresErrorCode )
         strTroubleLink = "";        // No link if no error code
 
+    AddReportLog( 7100, SString( "Core - NetError (%s) (%s)", *strTitle, *strMessage ) );
     ShowErrorMessageBox( strTitle, strMessage, strTroubleLink );
 }
 
@@ -1457,6 +1458,7 @@ void CCore::Quit ( bool bInstantly )
 {
     if ( bInstantly )
     {
+        AddReportLog( 7101, "Core - Quit" );
         // Show that we are quiting (for the crash dump filename)
         SetApplicationSettingInt ( "last-server-ip", 1 );
 

@@ -596,8 +596,10 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
         }
 
         // Display the error
-         g_pCore->ShowMessageBox ( _("Disconnected")+strErrorCode, strReason, MB_BUTTON_OK | MB_ICON_INFO );
+        g_pCore->ShowMessageBox ( _("Disconnected")+strErrorCode, strReason, MB_BUTTON_OK | MB_ICON_INFO );
     }
+
+    AddReportLog( 7107, SString( "Game - Disconnected (%s) (%s)", *strErrorCode, *strReason.Replace( "\n", " " ) ) );
 
     // Terminate the mod (disconnect first in case there were more packets after this one)
     g_pClientGame->m_bGracefulDisconnect = true;

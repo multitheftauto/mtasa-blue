@@ -85,6 +85,7 @@ namespace SharedUtil
     void            AddReportLog                    ( uint uiId, const SString& strText, uint uiAmountLimit = UINT_MAX );
     void            SetReportLogContents            ( const SString& strText );
     SString         GetReportLogContents            ( void );
+    SString         GetReportLogProcessTag          ( void );
     void            WriteDebugEvent                 ( const SString& strText );
     void            WriteErrorEvent                 ( const SString& strText );
     void            BeginEventLog                   ( void );

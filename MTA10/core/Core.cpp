@@ -54,6 +54,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
         {
             RemoveUtf8FileHooks();
 
+            AddReportLog( 7102, "Core - PROCESS_DETACH" );
             // For now, TerminateProcess if any destruction is attempted (or we'll crash)
             TerminateProcess ( GetCurrentProcess (), 0 );
 
