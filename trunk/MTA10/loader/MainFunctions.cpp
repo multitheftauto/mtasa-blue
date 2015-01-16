@@ -920,7 +920,8 @@ int LaunchGame ( SString strCmdLine )
     SString strCoreDLL = PathJoin( strMTASAPath, "mta", MTA_DLL_NAME );
     RemoteLoadLibrary ( piLoadee.hProcess, FromUTF8( strCoreDLL ) );
     WriteDebugEvent( SString( "Loader - Core injected: %s", *strCoreDLL ) );
-    
+    AddReportLog( 7103, "Loader - Core injected" );
+
     // Clear previous on quit commands
     SetOnQuitCommand ( "" );
 
@@ -1003,6 +1004,7 @@ int LaunchGame ( SString strCmdLine )
         BsodDetectionOnGameEnd();
     }
 
+    AddReportLog( 7104, "Loader - Finishing" );
     WriteDebugEvent( "Loader - Finishing" );
 
     EndD3DStuff();

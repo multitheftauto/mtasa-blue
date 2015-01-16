@@ -152,6 +152,7 @@ void RaiseFatalError ( unsigned int uiCode )
     g_pCore->ShowErrorMessageBox ( _("Fatal error")+_E("CD62"), strBuffer, strTroubleLink );
 
     // Request the mod unload
+    AddReportLog( 7108, SString( "Game - RaiseFatalError %d", uiCode ) );
     g_pCore->GetModManager ()->RequestUnload ();
 }
 
@@ -169,6 +170,7 @@ void RaiseProtocolError ( unsigned int uiCode )
 
     // Request the mod unload
     g_pCore->GetModManager ()->RequestUnload ();
+    AddReportLog( 7109, SString( "Game - RaiseProtocolError %d", uiCode ) );
 }
 
 
