@@ -273,8 +273,27 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
 
     pD3DSurface->GetDesc ( &SurfaceDesc );
     pD3DSurface->LockRect ( &LockedRect, NULL, 0 );
-    
+
+    // Dirty rect implementation, don't use this as loops are significantly slower than memcpy
+    /*auto surfaceData = (int*)LockedRect.pBits;
+    auto sourceData = (const int*)buffer;
+    auto pitch = LockedRect.Pitch;
+
+    for (auto& rect : dirtyRects) 
+    {
+        for (int y = rect.y; y < rect.y+rect.height; ++y)
+        {
+            for (int x = rect.x; x < rect.x+rect.width; ++x)
+            {
+                int index = y * pitch / 4 + x;
+                surfaceData[index] = sourceData[index];
+            }
+        }
+    }*/
+
+    // Copy entire texture
     memcpy ( LockedRect.pBits, buffer, width * height * 4 );
+    
     pD3DSurface->UnlockRect ();
 }
 
