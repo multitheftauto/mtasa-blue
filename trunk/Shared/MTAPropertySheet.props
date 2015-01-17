@@ -5,7 +5,7 @@
     <DirectXIncludePath>$(DXSDK_DIR)\Include</DirectXIncludePath>
     <DirectXLibPath>$(DXSDK_DIR)\Lib\x86</DirectXLibPath>
     <SafeRootNamespace>$(RootNamespace)</SafeRootNamespace>
-    <MyTargetDir>C:\Program Files\MTA San Andreas 1.4</MyTargetDir>
+    <MyTargetDir>C:\Program Files\MTA San Andreas 1.5</MyTargetDir>
   </PropertyGroup>
   <PropertyGroup>
     <IncludePath>$(DirectXIncludePath);$(IncludePath)</IncludePath>
