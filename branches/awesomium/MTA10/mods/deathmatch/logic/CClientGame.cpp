@@ -1005,6 +1005,7 @@ void CClientGame::DoPulses ( void )
             else
             {
                 // Otherwise, disconnect here
+                AddReportLog( 7105, SString( "Core - Kicked (%s)", *strMessageCombo ) );
                 g_pCore->ShowMessageBox ( _("Error")+_E("CD05"), SString ( _("You were kicked from the game ( %s )"), *strMessageCombo ), MB_BUTTON_OK | MB_ICON_ERROR );
                 g_pCore->GetModManager ()->RequestUnload ();
                 return;
@@ -4088,6 +4089,8 @@ void CClientGame::DownloadInitialResourceFiles ( void )
             else
             {
                 // Throw the error and disconnect
+                AddReportLog( 7106, SString( "Game - HTTPError (%s)", szHTTPError ) );
+
                 g_pCore->GetModManager ()->RequestUnload ();
                 g_pCore->ShowMessageBox ( _("Error")+_E("CD20"), szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR ); // HTTP Error
             }

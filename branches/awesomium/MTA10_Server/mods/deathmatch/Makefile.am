@@ -193,7 +193,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionDefs.Blip.cpp \
 ./logic/lua/CLuaFunctionDefs.Clothing.cpp \
 ./logic/lua/CLuaFunctionDefs.ColShape.cpp \
-./logic/lua/CLuaFunctionDefs.cpp \
 ./logic/lua/CLuaFunctionDefs.Crypt.cpp \
 ./logic/lua/CLuaFunctionDefs.Database.cpp \
 ./logic/lua/CLuaFunctionDefs.Event.cpp \

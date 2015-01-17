@@ -2663,18 +2663,21 @@ int CLuaFunctionDefs::GetVehicleDoorOpenRatio ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetVehicleComponentPosition ( lua_State* luaVM )
 {
-    CScriptArgReader argStream ( luaVM );
-
+// bool setVehicleComponentPosition ( vehicle theVehicle, string theComponent, float posX, float posY, float posZ [, string base = "root"] )
     SString strComponent;
     CClientVehicle * pVehicle = NULL;
     CVector vecPosition;
+    EComponentBaseType inputBase;
+
+    CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
     argStream.ReadVector3D ( vecPosition );
+    argStream.ReadEnumString ( inputBase, EComponentBase::ROOT );
 
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle->SetComponentPosition ( strComponent, vecPosition ) )
+        if ( pVehicle->SetComponentPosition ( strComponent, vecPosition, inputBase ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -2690,16 +2693,20 @@ int CLuaFunctionDefs::SetVehicleComponentPosition ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetVehicleComponentPosition ( lua_State* luaVM )
 {
-    CScriptArgReader argStream ( luaVM );
+// float, float, float getVehicleComponentPosition ( vehicle theVehicle, string theComponent [, string base = "root"] )
     SString strComponent;
     CClientVehicle * pVehicle = NULL;
-    CVector vecPosition;
+    EComponentBaseType outputBase;
+
+    CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
-    
+    argStream.ReadEnumString ( outputBase, EComponentBase::ROOT );
+
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle->GetComponentPosition ( strComponent, vecPosition ) )
+        CVector vecPosition;
+        if ( pVehicle->GetComponentPosition ( strComponent, vecPosition, outputBase ) )
         {
             lua_pushnumber ( luaVM, vecPosition.fX );
             lua_pushnumber ( luaVM, vecPosition.fY );
@@ -2716,17 +2723,23 @@ int CLuaFunctionDefs::GetVehicleComponentPosition ( lua_State* luaVM )
 
 int CLuaFunctionDefs::SetVehicleComponentRotation ( lua_State* luaVM )
 {
-    CScriptArgReader argStream ( luaVM );
+//  bool setVehicleComponentRotation ( vehicle theVehicle, string theComponent, float rotX, float rotY, float rotZ [, string base = "parent"] )
     SString strComponent;
     CClientVehicle * pVehicle = NULL;
     CVector vecRotation;
+    EComponentBaseType inputBase;
+
+    CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
     argStream.ReadVector3D ( vecRotation );
+    argStream.ReadEnumString ( inputBase, EComponentBase::PARENT );
 
     if ( !argStream.HasErrors() )
     {
-        pVehicle->SetComponentRotation ( strComponent, vecRotation );
+        // Script uses degrees
+        ConvertDegreesToRadians( vecRotation );
+        pVehicle->SetComponentRotation ( strComponent, vecRotation, inputBase );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -2739,17 +2752,23 @@ int CLuaFunctionDefs::SetVehicleComponentRotation ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetVehicleComponentRotation ( lua_State* luaVM )
 {
-    CScriptArgReader argStream ( luaVM );
+// float, float, float getVehicleComponentRotation ( vehicle theVehicle, string theComponent [, string base = "parent"]  )
     SString strComponent;
     CClientVehicle * pVehicle = NULL;
-    CVector vecRotation;
+    EComponentBaseType outputBase;
+
+    CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
     argStream.ReadString ( strComponent );
-    
+    argStream.ReadEnumString ( outputBase, EComponentBase::PARENT );
+  
     if ( !argStream.HasErrors() )
     {
-        if ( pVehicle->GetComponentRotation ( strComponent, vecRotation ) )
+        CVector vecRotation;
+        if ( pVehicle->GetComponentRotation ( strComponent, vecRotation, outputBase ) )
         {
+            // Script uses degrees
+            ConvertRadiansToDegrees( vecRotation );
             lua_pushnumber ( luaVM, vecRotation.fX );
             lua_pushnumber ( luaVM, vecRotation.fY );
             lua_pushnumber ( luaVM, vecRotation.fZ );
