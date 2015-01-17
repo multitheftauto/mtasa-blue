@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 /*
-    IMPORTANT (Windows only)
+    IMPORTANT (Windows only) 
 
     If this project changes, a new release build should be copied into
     the launcher/output diectory.
