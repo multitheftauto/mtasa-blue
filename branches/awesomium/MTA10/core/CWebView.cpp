@@ -17,6 +17,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
 {
     m_bIsLocal = bIsLocal;
     m_pWebBrowserRenderItem = pWebBrowserRenderItem;
+    m_pEventsInterface = nullptr;
 
     // Initialise the web session (which holds the actual settings) in in-memory mode
     CefBrowserSettings browserSettings;
@@ -51,11 +52,11 @@ CWebView::~CWebView()
     if ( IsMainThread () )
     {
         if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
-            g_pCore->GetWebCore ()->SetFocusedWebView ( NULL );
+            g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
     }
 
     // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
-    m_pWebView = NULL;
+    m_pWebView = nullptr;
 }
 
 void CWebView::CloseBrowser ()
@@ -133,7 +134,8 @@ void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
 
 void CWebView::TriggerLuaEvent ( const SString& strEventName, const std::vector<std::string> arguments, bool bIsServer )
 {
-    m_pEventsInterface->Events_OnTriggerEvent ( strEventName, arguments, bIsServer );
+    if ( m_pEventsInterface )
+        m_pEventsInterface->Events_OnTriggerEvent ( strEventName, arguments, bIsServer );
 }
 
 void CWebView::InjectMouseMove ( int iPosX, int iPosY )
@@ -293,7 +295,7 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
 
     // Copy entire texture
     memcpy ( LockedRect.pBits, buffer, width * height * 4 );
-    
+
     pD3DSurface->UnlockRect ();
 }
 
@@ -307,7 +309,9 @@ void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle c
 {
     // Find the cursor index by the cursor handle
     unsigned char cursorIndex = static_cast < unsigned char > ( type );
-    m_pEventsInterface->Events_OnChangeCursor ( cursorIndex );
+
+    if ( m_pEventsInterface )
+        m_pEventsInterface->Events_OnChangeCursor ( cursorIndex );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -325,7 +329,8 @@ void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
         return;
 
     // Trigger navigate event
-    m_pEventsInterface->Events_OnNavigate ( strURL, frame->IsMain () );
+    if ( m_pEventsInterface )
+        m_pEventsInterface->Events_OnNavigate ( strURL, frame->IsMain () );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -340,7 +345,9 @@ void CWebView::OnLoadEnd ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
     {
 	    SString strURL;
 	    ConvertURL ( frame->GetURL (), strURL );
-	    m_pEventsInterface->Events_OnDocumentReady ( strURL );
+
+        if ( m_pEventsInterface )
+	        m_pEventsInterface->Events_OnDocumentReady ( strURL );
     }
 }
 
@@ -354,7 +361,9 @@ void CWebView::OnLoadError ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
 {
     SString strURL;
     ConvertURL ( failedURL, strURL );
-    m_pEventsInterface->Events_OnLoadingFailed ( strURL, errorCode, SString ( errorText ) );
+    
+    if ( m_pEventsInterface )
+        m_pEventsInterface->Events_OnLoadingFailed ( strURL, errorCode, SString ( errorText ) );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -425,10 +434,10 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
 {
-    m_pWebView = NULL;
+    m_pWebView = nullptr;
     
     if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
-        g_pCore->GetWebCore ()->SetFocusedWebView ( NULL );
+        g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -500,7 +509,9 @@ void CWebView::OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& t
 ////////////////////////////////////////////////////////////////////
 bool CWebView::OnTooltip ( CefRefPtr<CefBrowser> browser, CefString& title )
 {
-    m_pEventsInterface->Events_OnTooltip ( UTF16ToMbUTF8 ( title ) );
+    if ( m_pEventsInterface )
+        m_pEventsInterface->Events_OnTooltip ( UTF16ToMbUTF8 ( title ) );
+    
     return true;
 }
 
