@@ -391,8 +391,9 @@ if(OS_WINDOWS)
   # /wd"4244"             = Ignore "conversion possible loss of data" warning
   # /wd"4512"             = Ignore "assignment operator could not be generated" warning
   # /wd"4701"             = Ignore "potentially uninitialized local variable" warning
+  # /wd"4702"             = Ignore "unreachable code" warning
   # /wd"4996"             = Ignore "function or variable may be unsafe" warning
-  set(CEF_COMPILER_FLAGS          "/MP /Gy /GR- /Zi /W4 /WX /wd\"4100\" /wd\"4127\" /wd\"4244\" /wd\"4512\" /wd\"4701\" /wd\"4996\"")
+  set(CEF_COMPILER_FLAGS          "/MP /Gy /GR- /Zi /W4 /WX /wd\"4100\" /wd\"4127\" /wd\"4244\" /wd\"4512\" /wd\"4701\" /wd\"4702\" /wd\"4996\"")
   # /MTd                  = Multithreaded debug runtime
   # /Od                   = Disable optimizations
   # /RTC1                 = Enable basic run-time checks
@@ -411,12 +412,12 @@ if(OS_WINDOWS)
   # Standard definitions
   # -DWIN32 -D_WIN32 -D_WINDOWS           = Windows platform
   # -DUNICODE -D_UNICODE                  = Unicode build
-  # -DWINVER=0x0602 -D_WIN32_WINNT=0x602  = Targeting Windows 8
+  # -DWINVER=0x0603 -D_WIN32_WINNT=0x603  = Targeting Windows 8.1
   # -DNOMINMAX                            = Use the standard's templated min/max
   # -DWIN32_LEAN_AND_MEAN                 = Exclude less common API declarations
   # -D_HAS_EXCEPTIONS=0                   = Disable exceptions
-  add_definitions(-DWIN32 -D_WIN32 -D_WINDOWS -DUNICODE -D_UNICODE -DWINVER=0x0602
-                  -D_WIN32_WINNT=0x602 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_HAS_EXCEPTIONS=0)
+  add_definitions(-DWIN32 -D_WIN32 -D_WINDOWS -DUNICODE -D_UNICODE -DWINVER=0x0603
+                  -D_WIN32_WINNT=0x603 -DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_HAS_EXCEPTIONS=0)
 
   # Standard libraries.
   set(CEF_STANDARD_LIBS "comctl32.lib" "rpcrt4.lib" "shlwapi.lib")
@@ -434,7 +435,7 @@ if(OS_WINDOWS)
   # List of CEF binary files.
   set(CEF_BINARY_FILES
     d3dcompiler_43.dll
-    d3dcompiler_46.dll
+    d3dcompiler_47.dll
     ffmpegsumo.dll
     libcef.dll
     libEGL.dll

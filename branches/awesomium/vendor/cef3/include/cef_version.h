@@ -1,4 +1,4 @@
-// Copyright (c) 2014 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2015 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -36,13 +36,13 @@
 #define CEF_INCLUDE_CEF_VERSION_H_
 
 #define CEF_VERSION_MAJOR 3
-#define CEF_REVISION 1949
-#define COPYRIGHT_YEAR 2014
+#define CEF_REVISION 1972
+#define COPYRIGHT_YEAR 2015
 
 #define CHROME_VERSION_MAJOR 39
 #define CHROME_VERSION_MINOR 0
 #define CHROME_VERSION_BUILD 2171
-#define CHROME_VERSION_PATCH 65
+#define CHROME_VERSION_PATCH 95
 
 #define DO_MAKE_STRING(p) #p
 #define MAKE_STRING(p) DO_MAKE_STRING(p)
