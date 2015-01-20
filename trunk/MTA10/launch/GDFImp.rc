@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //  Resource File for : GDFImp
 #include "GDFImp.h"
-#include "vcexpress_rc_fix.h"
+//#include "vcexpress_rc_fix.h"
 
 // The following line is a workaround for a redefinition warning in sal.h
 // when using Visual Studio 2005 compilers and includes.  Comment out the
@@ -11,7 +11,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // This resource files requires the Platform SDK to be compiled.
-#include <gameux.h>
+//#include <gameux.h>     // FIXME Removed to work with vs120_xp
 
 
 #define APSTUDIO_READONLY_SYMBOLS
