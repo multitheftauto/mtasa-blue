@@ -89,7 +89,7 @@ bool CWebCore::Initialise ()
     settings.log_severity = cef_log_severity_t::LOGSEVERITY_WARNING;
 #endif
 
-    settings.multi_threaded_message_loop = false;
+    settings.multi_threaded_message_loop = true;
     settings.windowless_rendering_enabled = true;
 
     return CefInitialize ( mainArgs, settings, NULL, sandboxInfo );
@@ -109,6 +109,9 @@ void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
     CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*> ( pWebViewInterface );
     if ( pWebView )
     {
+        // Ensure that no threads are waiting for a paint
+        pWebView->NotifyPaint ();
+
         m_WebViews.remove ( pWebView );
         //pWebView->Release(); // Do not release since other references get corrupted then
         pWebView->CloseBrowser ();
@@ -118,11 +121,10 @@ void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
 void CWebCore::DoPulse ()
 {
     // Check for queued whitelist/blacklist downloads
-    g_pCore->GetNetwork()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->ProcessQueuedFiles ();
+    g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->ProcessQueuedFiles ();
 
-    // Perform a single CEF message loop iteration (only if minimized to prevent corrupted renderstates (?))
-    if ( !g_pCore->IsWindowMinimized () )
-        CefDoMessageLoopWork ();
+    // Execute queued events on the main thread (Lua calls must be executed on the main thread)
+    DoEventQueuePulse ();
 }
 
 CWebView* CWebCore::FindWebView ( CefRefPtr<CefBrowser> browser )
@@ -135,8 +137,36 @@ CWebView* CWebCore::FindWebView ( CefRefPtr<CefBrowser> browser )
     return NULL;
 }
 
+void CWebCore::AddEventToEventQueue(std::function<void(void)> event)
+{
+    std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
+    
+    m_EventQueue.push_back ( event );
+}
+
+void CWebCore::DoEventQueuePulse ()
+{
+    std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
+
+    for ( auto& event : m_EventQueue )
+    {
+        event ();
+    }
+
+    // Clear message queue
+    m_EventQueue.clear ();
+
+    // Invoke paint method if necessary on the main thread
+    for ( auto& view : m_WebViews )
+    {
+        view->NotifyPaint ();
+    }
+}
+
 eURLState CWebCore::GetURLState ( const SString& strURL )
 {
+    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
+    
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
     static SString wildcardWhitelist[] = { "*.googlevideo.com", "*.google.com", "*.youtube.com", "*.ytimg.com", "*.vimeocdn.com" };
 
@@ -164,6 +194,8 @@ eURLState CWebCore::GetURLState ( const SString& strURL )
 
 void CWebCore::ResetFilter ( bool bResetRequestsOnly )
 {
+    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
+
     // Clear old data
     m_PendingRequests.clear ();
 
@@ -219,11 +251,15 @@ void CWebCore::InitialiseWhiteAndBlacklist ( bool bAddHardcoded, bool bAddDynami
 
 void CWebCore::AddAllowedPage ( const SString& strURL, eWebFilterType filterType )
 {
+    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
+
     m_Whitelist[strURL] = std::pair<bool, eWebFilterType> ( true, filterType );
 }
 
 void CWebCore::AddBlockedPage ( const SString& strURL, eWebFilterType filterType )
 {
+    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
+
     m_Whitelist[strURL] = std::pair<bool, eWebFilterType> ( false, filterType );
 }
 
@@ -597,6 +633,8 @@ void CWebCore::WriteCustomList ( const SString& strListName, const std::vector<S
 
 void CWebCore::GetFilterEntriesByType ( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType, eWebFilterState state )
 {
+    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
+
     google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.begin ();
     for ( ; iter != m_Whitelist.end(); ++iter )
     {

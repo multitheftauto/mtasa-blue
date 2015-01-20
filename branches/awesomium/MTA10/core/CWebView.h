@@ -20,10 +20,10 @@
 #include <cef3/include/cef_client.h>
 #include <cef3/include/cef_render_handler.h>
 #include <cef3/include/cef_life_span_handler.h>
-#include <d3d9.h>
 #include <SString.h>
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
+#include <condition_variable>
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
@@ -44,10 +44,9 @@ public:
     void SetRenderingPaused     ( bool bPaused );
     void Focus                  ();
     void ClearTexture           ();
+    inline void NotifyPaint     () { m_PaintCV.notify_one (); }
 
     void ExecuteJavascript      ( const SString& strJavascriptCode );
-    void TriggerLuaEvent        ( const SString& strEventName, const std::vector<std::string> arguments, bool bIsServer = false );
-    void TriggerPopupEvent      ( const SString& strTargetURL, const SString& strOpenerURL ) { m_pEventsInterface->Events_OnPopup ( strTargetURL, strOpenerURL ); };
     
     void InjectMouseMove        ( int iPosX, int iPosY );
     void InjectMouseDown        ( eWebBrowserMouseButton mouseButton );
@@ -88,6 +87,7 @@ public:
     // CefLifeSpawnHandler methods
     virtual void OnBeforeClose  ( CefRefPtr<CefBrowser> browser ) override;
     virtual bool OnBeforePopup  ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access ) override;
+    virtual void OnAfterCreated ( CefRefPtr<CefBrowser> browser) override;
 
     // CefJSDialogHandler methods
     virtual bool OnJSDialog     ( CefRefPtr<CefBrowser> browser, const CefString& origin_url, const CefString& accept_lang, CefJSDialogHandler::JSDialogType dialog_type, const CefString& message_text, const CefString& default_prompt_text, CefRefPtr< CefJSDialogCallback > callback, bool& suppress_message ) override;
@@ -112,6 +112,8 @@ private:
     SString             m_strTempURL;
     POINT               m_vecMousePosition;
     SString             m_CurrentTitle;
+    std::mutex          m_PaintMutex;
+    std::condition_variable m_PaintCV;
 
     CWebBrowserEventsInterface* m_pEventsInterface;
 

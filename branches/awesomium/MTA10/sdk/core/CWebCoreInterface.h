@@ -49,6 +49,9 @@ class CWebCoreInterface
 public:
     virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent ) = 0;
     virtual void                DestroyWebView      ( CWebViewInterface* pWebView ) = 0;
+
+    virtual void                AddEventToEventQueue( std::function<void(void)> func ) = 0;
+    virtual void                DoEventQueuePulse   () = 0;
     
     virtual eURLState           GetURLState        ( const SString& strURL ) = 0;
     virtual void                ResetFilter        ( bool bResetRequestsOnly ) = 0;

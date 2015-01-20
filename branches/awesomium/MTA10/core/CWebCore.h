@@ -13,6 +13,8 @@
 
 #undef GetNextSibling
 #undef GetFirstChild
+#include <functional>
+#include <mutex>
 #include <core/CWebCoreInterface.h>
 #include <cef3/include/cef_app.h>
 #define MTA_BROWSERDATA_PATH "mta/browserdata.xml"
@@ -38,6 +40,9 @@ public:
     void                DestroyWebView      ( CWebViewInterface* pWebViewInterface );
     void                DoPulse             ();
     CWebView*           FindWebView         ( CefRefPtr<CefBrowser> browser );
+
+    void                AddEventToEventQueue ( std::function<void(void)> func );
+    void                DoEventQueuePulse   ();
     
     eURLState           GetURLState         ( const SString& strURL );
     void                ResetFilter         ( bool bResetRequestsOnly = true );
@@ -82,8 +87,12 @@ private:
     CWebView*                               m_pFocusedWebView;
     HCURSOR                                 m_aCursors[16];
 
+    std::list<std::function<void(void)>>    m_EventQueue;
+    std::mutex                              m_EventQueueMutex;
+
     CFastHashMap<SString, WebFilterPair>    m_Whitelist;
     std::vector<SString>                    m_PendingRequests;
+    std::recursive_mutex                    m_FilterMutex;
 
     IAudioSessionManager2*                  m_pAudioSessionManager;
 

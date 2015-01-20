@@ -18,6 +18,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     m_bIsLocal = bIsLocal;
     m_pWebBrowserRenderItem = pWebBrowserRenderItem;
     m_pEventsInterface = nullptr;
+    m_bBeingDestroyed = false;
 
     // Initialise the web session (which holds the actual settings) in in-memory mode
     CefBrowserSettings browserSettings;
@@ -41,13 +42,12 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     }
 
     CefWindowInfo windowInfo;
-    windowInfo.SetAsWindowless ( NULL, bTransparent );
+    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow (), bTransparent );
     
-    m_pWebView = CefBrowserHost::CreateBrowserSync ( windowInfo, this, "", browserSettings, NULL );
-    m_bBeingDestroyed = false;
+    CefBrowserHost::CreateBrowser ( windowInfo, this, "", browserSettings, nullptr );
 }
 
-CWebView::~CWebView()
+CWebView::~CWebView ()
 {
     if ( IsMainThread () )
     {
@@ -63,7 +63,9 @@ void CWebView::CloseBrowser ()
 {
     // CefBrowserHost::CloseBrowser calls the destructor after the browser has been destroyed
     m_bBeingDestroyed = true;
-    m_pWebView->GetHost ()->CloseBrowser ( true );
+
+    if ( m_pWebView )
+        m_pWebView->GetHost ()->CloseBrowser ( true );
 }
 
 bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled )
@@ -73,21 +75,29 @@ bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled )
         return false; // Invalid URL
 
     // Are we allowed to browse this website?
-    if ( bFilterEnabled && g_pCore->GetWebCore()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
+    if ( bFilterEnabled && g_pCore->GetWebCore ()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
         return false;
 
     // Load it!
-    m_pWebView->GetMainFrame ()->LoadURL ( strURL );
+    if ( m_pWebView )
+        m_pWebView->GetMainFrame ()->LoadURL ( strURL );
+    
     return true;
 }
 
 bool CWebView::IsLoading ()
 {
+    if ( !m_pWebView )
+        return false;
+
     return m_pWebView->IsLoading ();
 }
 
 void CWebView::GetURL ( SString& outURL )
 {
+    if ( !m_pWebView )
+        return;
+
     if ( !m_bIsLocal )
         outURL = static_cast < SString > ( m_pWebView->GetMainFrame ()->GetURL () );
     else
@@ -101,11 +111,15 @@ void CWebView::GetTitle ( SString& outTitle )
 
 void CWebView::SetRenderingPaused ( bool bPaused )
 {
-    m_pWebView->GetHost ()->WasHidden ( bPaused );
+    if ( m_pWebView )
+        m_pWebView->GetHost ()->WasHidden ( bPaused );
 }
 
 void CWebView::Focus ()
 {
+    if ( !m_pWebView )
+        return;
+
     m_pWebView->GetHost ()->SetFocus ( true );
     m_pWebView->GetHost ()->SendFocusEvent ( true );
     g_pCore->GetWebCore()->SetFocusedWebView ( this );
@@ -129,17 +143,15 @@ void CWebView::ClearTexture ()
 
 void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
 {
-    m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJavascriptCode, "", 0 );
-}
-
-void CWebView::TriggerLuaEvent ( const SString& strEventName, const std::vector<std::string> arguments, bool bIsServer )
-{
-    if ( m_pEventsInterface )
-        m_pEventsInterface->Events_OnTriggerEvent ( strEventName, arguments, bIsServer );
+    if ( m_pWebView )
+        m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJavascriptCode, "", 0 );
 }
 
 void CWebView::InjectMouseMove ( int iPosX, int iPosY )
 {
+    if ( !m_pWebView )
+        return;
+    
     CefMouseEvent mouseEvent;
     mouseEvent.x = iPosX;
     mouseEvent.y = iPosY;
@@ -150,6 +162,9 @@ void CWebView::InjectMouseMove ( int iPosX, int iPosY )
 
 void CWebView::InjectMouseDown ( eWebBrowserMouseButton mouseButton )
 {
+    if ( !m_pWebView )
+        return;
+    
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
@@ -159,6 +174,9 @@ void CWebView::InjectMouseDown ( eWebBrowserMouseButton mouseButton )
 
 void CWebView::InjectMouseUp ( eWebBrowserMouseButton mouseButton )
 {
+    if ( !m_pWebView )
+        return;
+
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
@@ -168,6 +186,9 @@ void CWebView::InjectMouseUp ( eWebBrowserMouseButton mouseButton )
 
 void CWebView::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
 {
+    if ( !m_pWebView )
+        return;
+
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
@@ -177,12 +198,13 @@ void CWebView::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
 
 void CWebView::InjectKeyboardEvent ( const CefKeyEvent& keyEvent )
 {
-    m_pWebView->GetHost ()->SendKeyEvent ( keyEvent );
+    if ( m_pWebView )
+        m_pWebView->GetHost ()->SendKeyEvent ( keyEvent );
 }
 
 bool CWebView::SetAudioVolume ( float fVolume )
 {
-    if ( fVolume < 0.0f || fVolume > 1.0f )
+    if ( !m_pWebView || fVolume < 0.0f || fVolume > 1.0f )
         return false;
 
     // Since the necessary interfaces of the core audio API were introduced in Win7, we've to fallback to HTML5 audio
@@ -219,8 +241,9 @@ bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProc
             args.push_back ( argList->GetString ( i ) );
         }
 
-        // Trigger Lua event now
-        TriggerLuaEvent ( SString ( eventName ), args, message->GetName () == "TriggerServerLuaEvent" );
+        // Queue event to run on the main thread
+        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString ( eventName ), args, message->GetName () == "TriggerServerLuaEvent" );
+        g_pCore->GetWebCore ()->AddEventToEventQueue ( func );
 
         // The message was handled
         return true;
@@ -270,33 +293,48 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
     if ( !pD3DSurface )
         return;
 
-    D3DLOCKED_RECT LockedRect;
-    D3DSURFACE_DESC SurfaceDesc;
+    /*
+        DirectX9 is not thread safe, so locking the texture from another thread causes D3DDevice::Present to block forever (-> client freeze)
+        The only way we can get rid of this problem is (imo) locking CEF until the texture has been written (unlocking/notifying is done in CWebCore::DoEventQueuePulse).
+        If someone knows a better solution than this weird construction, feel free to contact me (Jusonex).
+    */
 
-    pD3DSurface->GetDesc ( &SurfaceDesc );
-    pD3DSurface->LockRect ( &LockedRect, NULL, 0 );
+    auto f = [&]() {
+        if ( m_bBeingDestroyed )
+            return;
 
-    // Dirty rect implementation, don't use this as loops are significantly slower than memcpy
-    /*auto surfaceData = (int*)LockedRect.pBits;
-    auto sourceData = (const int*)buffer;
-    auto pitch = LockedRect.Pitch;
+        D3DLOCKED_RECT LockedRect;
+        D3DSURFACE_DESC SurfaceDesc;
 
-    for (auto& rect : dirtyRects) 
-    {
-        for (int y = rect.y; y < rect.y+rect.height; ++y)
+        pD3DSurface->GetDesc ( &SurfaceDesc );
+        pD3DSurface->LockRect ( &LockedRect, NULL, 0 );
+
+        // Dirty rect implementation, don't use this as loops are significantly slower than memcpy
+        /*auto surfaceData = (int*)LockedRect.pBits;
+        auto sourceData = (const int*)buffer;
+        auto pitch = LockedRect.Pitch;
+
+        for (auto& rect : dirtyRects) 
         {
-            for (int x = rect.x; x < rect.x+rect.width; ++x)
+            for (int y = rect.y; y < rect.y+rect.height; ++y)
             {
-                int index = y * pitch / 4 + x;
-                surfaceData[index] = sourceData[index];
+                for (int x = rect.x; x < rect.x+rect.width; ++x)
+                {
+                    int index = y * pitch / 4 + x;
+                    surfaceData[index] = sourceData[index];
+                }
             }
-        }
-    }*/
+        }*/
 
-    // Copy entire texture
-    memcpy ( LockedRect.pBits, buffer, width * height * 4 );
+        // Copy entire texture
+        memcpy ( LockedRect.pBits, buffer, width * height * 4 );
 
-    pD3DSurface->UnlockRect ();
+        pD3DSurface->UnlockRect ();
+    };
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( f );
+
+    std::unique_lock<std::mutex> lock ( m_PaintMutex );
+    m_PaintCV.wait ( lock );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -310,8 +348,9 @@ void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle c
     // Find the cursor index by the cursor handle
     unsigned char cursorIndex = static_cast < unsigned char > ( type );
 
-    if ( m_pEventsInterface )
-        m_pEventsInterface->Events_OnChangeCursor ( cursorIndex );
+    // Queue event to run on the main thread
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -328,9 +367,9 @@ void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
     if ( strURL == "blank" )
         return;
 
-    // Trigger navigate event
-    if ( m_pEventsInterface )
-        m_pEventsInterface->Events_OnNavigate ( strURL, frame->IsMain () );
+    // Queue event to run on the main thread
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, strURL, frame->IsMain () );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -346,8 +385,9 @@ void CWebView::OnLoadEnd ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 	    SString strURL;
 	    ConvertURL ( frame->GetURL (), strURL );
 
-        if ( m_pEventsInterface )
-	        m_pEventsInterface->Events_OnDocumentReady ( strURL );
+        // Queue event to run on the main thread
+        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnDocumentReady, m_pEventsInterface, strURL );
+        g_pCore->GetWebCore ()->AddEventToEventQueue ( func );
     }
 }
 
@@ -362,8 +402,9 @@ void CWebView::OnLoadError ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
     SString strURL;
     ConvertURL ( failedURL, strURL );
     
-    if ( m_pEventsInterface )
-        m_pEventsInterface->Events_OnLoadingFailed ( strURL, errorCode, SString ( errorText ) );
+    // Queue event to run on the main thread
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnLoadingFailed, m_pEventsInterface, strURL, errorCode, SString ( errorText ) );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -434,6 +475,8 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
 {
+    m_PaintCV.notify_one ();
+
     m_pWebView = nullptr;
     
     if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
@@ -455,12 +498,25 @@ bool CWebView::OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame
     ConvertURL ( target_url, strTagetURL );
     ConvertURL ( frame->GetURL (), strOpenerURL );
     
-    // Post event call task on the UI thread (will be called during the next CefDoMessageLoopWork call)
-    CefPostTask ( TID_UI, NewCefRunnableMethod ( this, &CWebView::TriggerPopupEvent, strTagetURL, strOpenerURL ) );
+    // Queue event to run on the main thread
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnPopup, m_pEventsInterface, strTagetURL, strOpenerURL );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func );
 
     // Block popups generally
     return true;
 }
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefLifeSpanHandler::OnAfterCreated             //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnAfterCreated(CefRefPtr<CefBrowser>) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnAfterCreated ( CefRefPtr<CefBrowser> browser )
+{
+    m_pWebView = browser;
+}
+
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -509,8 +565,9 @@ void CWebView::OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& t
 ////////////////////////////////////////////////////////////////////
 bool CWebView::OnTooltip ( CefRefPtr<CefBrowser> browser, CefString& title )
 {
-    if ( m_pEventsInterface )
-        m_pEventsInterface->Events_OnTooltip ( UTF16ToMbUTF8 ( title ) );
+    // Queue event to run on the main thread
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTooltip, m_pEventsInterface, UTF16ToMbUTF8 ( title ) );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func );
     
     return true;
 }

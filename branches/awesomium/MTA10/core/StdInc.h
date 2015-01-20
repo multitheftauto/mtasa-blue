@@ -32,6 +32,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <iomanip>
+#include <functional>
 
 
 // Localization
