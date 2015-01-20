@@ -134,12 +134,12 @@
     <TargetName>core</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>..\..\output\MTA San Andreas\server\</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\server\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>core</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
-    <OutDir>..\..\output\MTA San Andreas\server\$(PlatformTarget)\</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\server\$(PlatformTarget)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>core</TargetName>
   </PropertyGroup>
@@ -339,7 +339,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>../dependencies;../../vendor/detours/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

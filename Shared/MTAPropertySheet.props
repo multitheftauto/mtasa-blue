@@ -10,7 +10,8 @@
   <PropertyGroup>
     <IncludePath>$(DirectXIncludePath);$(IncludePath)</IncludePath>
     <LibraryPath>$(DirectXLibPath);$(LibraryPath)</LibraryPath>
-    <IntDir>$(SolutionDir)\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</IntDir>
+    <IntDir>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</IntDir>
+    <OutDir>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Bscmake>

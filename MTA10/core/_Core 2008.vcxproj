@@ -75,7 +75,7 @@
     <TargetName>core</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\mta\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>core</TargetName>
   </PropertyGroup>
@@ -159,7 +159,7 @@
       <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)/../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
       <MapFileName />
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -202,10 +202,10 @@
     <Link>
       <AdditionalDependencies>strmiids.lib;libv2.lib;zlib.lib;libpng.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;wsock32.lib;winmm.lib;Imagehlp.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread.lib;jpeg.lib;Psapi.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\vendor/libv2\lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\libpng;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;$(SolutionDir)..\vendor\detours\lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pthread;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\jpeg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

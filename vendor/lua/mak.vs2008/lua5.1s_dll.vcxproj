@@ -124,12 +124,12 @@
     <TargetName>lua5.1</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>..\..\..\output\MTA San Andreas\server\mods\deathmatch\</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\server\mods\deathmatch\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>lua5.1</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
-    <OutDir>..\..\..\output\MTA San Andreas\server\$(PlatformTarget)\</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\server\$(PlatformTarget)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>lua5.1</TargetName>
   </PropertyGroup>
@@ -300,7 +300,7 @@
     <Link>
       <ModuleDefinitionFile />
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

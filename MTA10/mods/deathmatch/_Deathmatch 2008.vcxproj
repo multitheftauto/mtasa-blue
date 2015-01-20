@@ -75,7 +75,7 @@
     <TargetName>client</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\mods\deathmatch\</OutDir>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>client</TargetName>
@@ -185,11 +185,11 @@
       <AdditionalOptions>/FIXED:NO %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>libv2.lib;libspeex2013.lib;bass.lib;bass_fx.lib;bassmix.lib;tags.lib;Psapi.lib;Winmm.lib;kernel32.lib;wsock32.lib;zlib.lib;json.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Client;../../../vendor/libv2/lib;../../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\vendor\libspeex;$(SolutionDir)..\vendor\bass\lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\lua5.1c_dll;$(SolutionDir)..\vendor\libv2\lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\json;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pcre;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
