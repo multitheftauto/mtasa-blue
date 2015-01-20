@@ -718,7 +718,6 @@ DontInstallRedistVC12:
 		SectionIn 1 RO
 		SetOutPath "$INSTDIR\mods\deathmatch"
 		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
-		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\lua5.1c.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\pcre3.dll"
 		SetOutPath "$INSTDIR\mods\deathmatch\resources"
 	SectionEnd
