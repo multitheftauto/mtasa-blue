@@ -136,13 +136,13 @@
     <TargetName>deathmatch_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>../../../output/MTA San Andreas/server/mods/deathmatch/</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\server\mods\deathmatch\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
     <TargetName>deathmatch</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
-    <OutDir>../../../output/MTA San Andreas/server/$(PlatformTarget)/</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\server\$(PlatformTarget)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
     <TargetName>deathmatch</TargetName>
@@ -370,15 +370,13 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0809</Culture>
     </ResourceCompile>
-    <ProjectReference>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-    </ProjectReference>
+    <ProjectReference />
     <Link>
       <AdditionalDependencies>wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\lua5.1s_dll;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\json;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\ehs;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pme;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pcre;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pthread;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -387,6 +385,9 @@
       <ImportLibrary>$(IntDir)$(TargetFileName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
     <Midl>
@@ -426,7 +427,7 @@
     <Link>
       <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\lua5.1s_dll;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\json;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\ehs;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pme;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pcre;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pthread;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(PlatformTarget)_$(SafeParentName).pdb</ProgramDatabaseFile>
       <MapFileName />

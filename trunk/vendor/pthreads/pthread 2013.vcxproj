@@ -131,11 +131,9 @@
     <TargetName>pthread</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>pthread</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>pthread</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -249,7 +247,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
     </Link>

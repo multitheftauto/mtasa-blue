@@ -67,7 +67,6 @@
     <TargetName>jpeg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>..\$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>jpeg</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

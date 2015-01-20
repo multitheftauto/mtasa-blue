@@ -70,7 +70,6 @@
     <TargetName>CEGUIBase</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>..\..\..\..\$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>CEGUIBase</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

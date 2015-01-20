@@ -76,7 +76,7 @@
     <TargetName>game_sa_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\mta\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>game_sa</TargetName>
   </PropertyGroup>
@@ -202,7 +202,7 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

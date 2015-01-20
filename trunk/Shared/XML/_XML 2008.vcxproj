@@ -134,12 +134,10 @@
     <TargetName>xmll</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>xmll</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>xmll</TargetName>
   </PropertyGroup>
@@ -361,7 +359,7 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

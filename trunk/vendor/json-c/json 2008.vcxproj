@@ -119,11 +119,9 @@
     <TargetName>json</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>json</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
     <TargetName>json</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

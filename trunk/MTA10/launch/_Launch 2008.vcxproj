@@ -75,7 +75,7 @@
     <TargetName>Multi Theft Auto</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>Multi Theft Auto</TargetName>
   </PropertyGroup>
@@ -205,7 +205,7 @@
       <AdditionalDependencies>shlwapi.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
