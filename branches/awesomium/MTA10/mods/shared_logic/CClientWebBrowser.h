@@ -46,6 +46,7 @@ public:
 
     
     // CWebBrowserEventsInterface implementation
+    void                        Events_OnCreated       () override;
     void                        Events_OnDocumentReady ( const SString& strURL ) override;
     void                        Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription ) override;
     void                        Events_OnNavigate      ( const SString& strURL, bool bMainFrame ) override;

@@ -14,6 +14,7 @@
 class CWebBrowserEventsInterface
 {
 public:
+    virtual void Events_OnCreated () = 0;
     virtual void Events_OnDocumentReady ( const SString& strURL ) = 0;
     virtual void Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription ) = 0;
     virtual void Events_OnNavigate ( const SString& strURL, bool bMainFrame ) = 0;

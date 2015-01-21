@@ -2891,6 +2891,7 @@ void CClientGame::AddBuiltInEvents ( void )
 
     // Web events
     m_Events.AddEvent ( "onClientBrowserRequestsChange", "newPages", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserCreated", "", NULL, false );
     m_Events.AddEvent ( "onClientBrowserDocumentReady", "url", NULL, false );
     m_Events.AddEvent ( "onClientBrowserLoadingFailed", "url, errorcode, errordescription", NULL, false );
     m_Events.AddEvent ( "onClientBrowserNavigate", "url, mainframe", NULL, false );

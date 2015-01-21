@@ -31,6 +31,8 @@ struct IAudioSessionManager2;
 
 class CWebCore : public CWebCoreInterface
 {
+    using EventEntry = std::pair<std::function<void(void)>, CWebView*>;
+
 public:
     CWebCore();
     ~CWebCore();
@@ -41,7 +43,8 @@ public:
     void                DoPulse             ();
     CWebView*           FindWebView         ( CefRefPtr<CefBrowser> browser );
 
-    void                AddEventToEventQueue ( std::function<void(void)> func );
+    void                AddEventToEventQueue( std::function<void(void)> func, CWebView* pWebView );
+    void                RemoveWebViewEvents ( CWebView* pWebView );
     void                DoEventQueuePulse   ();
     
     eURLState           GetURLState         ( const SString& strURL );
@@ -87,7 +90,7 @@ private:
     CWebView*                               m_pFocusedWebView;
     HCURSOR                                 m_aCursors[16];
 
-    std::list<std::function<void(void)>>    m_EventQueue;
+    std::list<EventEntry>                   m_EventQueue;
     std::mutex                              m_EventQueueMutex;
 
     CFastHashMap<SString, WebFilterPair>    m_Whitelist;

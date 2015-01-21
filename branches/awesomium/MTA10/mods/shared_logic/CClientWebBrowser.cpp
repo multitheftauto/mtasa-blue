@@ -110,6 +110,12 @@ bool CClientWebBrowser::SetAudioVolume ( float fVolume )
 //            CWebBrowserEventsInterface implementation                   //
 //                                                                        //
 ////////////////////////////////////////////////////////////////////////////
+void CClientWebBrowser::Events_OnCreated ()
+{
+    CLuaArguments Arguments;
+    CallEvent ( "onClientBrowserCreated", Arguments, false );
+}
+
 void CClientWebBrowser::Events_OnDocumentReady ( const SString& strURL )
 {
     CLuaArguments Arguments;

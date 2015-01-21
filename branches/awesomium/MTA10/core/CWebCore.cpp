@@ -109,7 +109,8 @@ void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
     CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*> ( pWebViewInterface );
     if ( pWebView )
     {
-        // Ensure that no threads are waiting for a paint
+        // Ensure that no attached events are in the queue
+        RemoveWebViewEvents ( pWebView );
         pWebView->NotifyPaint ();
 
         m_WebViews.remove ( pWebView );
@@ -129,19 +130,32 @@ void CWebCore::DoPulse ()
 
 CWebView* CWebCore::FindWebView ( CefRefPtr<CefBrowser> browser )
 {
-    for ( std::list<CefRefPtr<CWebView>>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
+    for ( auto pWebView : m_WebViews )
     {
-        if ( (*iter)->GetCefBrowser () == browser )
-            return iter->get();
+        if ( pWebView->GetCefBrowser () == browser )
+            return pWebView.get ();
     }
-    return NULL;
+    return nullptr;
 }
 
-void CWebCore::AddEventToEventQueue(std::function<void(void)> event)
+void CWebCore::AddEventToEventQueue ( std::function<void(void)> event, CWebView* pWebView )
 {
     std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
     
-    m_EventQueue.push_back ( event );
+    m_EventQueue.push_back ( EventEntry ( event, pWebView ) );
+}
+
+void CWebCore::RemoveWebViewEvents ( CWebView* pWebView )
+{
+    std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
+
+    for ( auto iter = m_EventQueue.begin (); iter != m_EventQueue.end (); )
+    {
+        // Increment iterator before we remove the element from the list (to guarantee iterator validity)
+        auto tempIterator = iter++;
+        if ( tempIterator->second == pWebView )
+            m_EventQueue.erase ( tempIterator );
+    }
 }
 
 void CWebCore::DoEventQueuePulse ()
@@ -150,7 +164,7 @@ void CWebCore::DoEventQueuePulse ()
 
     for ( auto& event : m_EventQueue )
     {
-        event ();
+        event.first ();
     }
 
     // Clear message queue
@@ -291,9 +305,9 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages )
 
 void CWebCore::AllowPendingPages ( bool bRemember )
 {
-    for ( std::vector<SString>::iterator iter = m_PendingRequests.begin(); iter != m_PendingRequests.end(); ++iter )
+    for ( const auto& request : m_PendingRequests )
     {
-        AddAllowedPage ( *iter, !bRemember ? eWebFilterType::WEBFILTER_REQUEST : eWebFilterType::WEBFILTER_USER );
+        AddAllowedPage ( request, !bRemember ? eWebFilterType::WEBFILTER_REQUEST : eWebFilterType::WEBFILTER_USER );
     }
 
     // Trigger an event now
@@ -333,9 +347,9 @@ void CWebCore::OnPreScreenshot ()
 void CWebCore::OnPostScreenshot ()
 {
     // Re-draw textures
-    for ( std::list<CefRefPtr<CWebView>>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
+    for ( auto& pWebView : m_WebViews )
     {
-        (*iter)->GetCefBrowser ()->GetHost ()->Invalidate ( CefBrowserHost::PaintElementType::PET_VIEW );
+        pWebView->GetCefBrowser ()->GetHost ()->Invalidate ( CefBrowserHost::PaintElementType::PET_VIEW );
     }
 }
 
@@ -362,9 +376,9 @@ void CWebCore::ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 void CWebCore::ClearTextures ()
 {
-    for ( std::list<CefRefPtr<CWebView>>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
+    for ( auto& pWebBrowser : m_WebViews )
     {
-        (*iter)->ClearTexture ();
+        pWebBrowser->ClearTexture ();
     }
 }
 
@@ -402,9 +416,9 @@ bool CWebCore::SetGlobalAudioVolume ( float fVolume )
 
     if ( GetApplicationSetting ( "os-version" ) < "6.2" || !m_pAudioSessionManager )
     {
-        for ( std::list<CefRefPtr<CWebView>>::iterator iter = m_WebViews.begin (); iter != m_WebViews.end (); ++iter )
+        for ( auto& pWebView : m_WebViews )
         {
-            (*iter)->SetAudioVolume ( fVolume );
+            pWebView->SetAudioVolume ( fVolume );
         }
     }
     else
