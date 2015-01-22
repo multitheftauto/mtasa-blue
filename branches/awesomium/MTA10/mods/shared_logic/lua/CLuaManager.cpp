@@ -1183,7 +1183,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Browser functions
     CLuaCFunctions::AddFunction ( "createBrowser", CLuaFunctionDefs::CreateBrowser );
-    CLuaCFunctions::AddFunction ( "requestBrowserPages", CLuaFunctionDefs::RequestBrowserPages );
+    CLuaCFunctions::AddFunction ( "requestBrowserDomains", CLuaFunctionDefs::RequestBrowserDomains );
     CLuaCFunctions::AddFunction ( "loadBrowserURL", CLuaFunctionDefs::LoadBrowserURL );
     CLuaCFunctions::AddFunction ( "isBrowserLoading", CLuaFunctionDefs::IsBrowserLoading );
     CLuaCFunctions::AddFunction ( "injectBrowserMouseMove", CLuaFunctionDefs::InjectBrowserMouseMove );
@@ -1195,7 +1195,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setBrowserRenderingPaused", CLuaFunctionDefs::SetBrowserRenderingPaused );
     CLuaCFunctions::AddFunction ( "executeBrowserJavascript", CLuaFunctionDefs::ExecuteBrowserJavascript );
     CLuaCFunctions::AddFunction ( "setBrowserVolume", CLuaFunctionDefs::SetBrowserVolume );
-    CLuaCFunctions::AddFunction ( "isBrowserURLBlocked", CLuaFunctionDefs::IsBrowserURLBlocked );
+    CLuaCFunctions::AddFunction ( "isBrowserDomainBlocked", CLuaFunctionDefs::IsBrowserDomainBlocked );
     CLuaCFunctions::AddFunction ( "focusBrowser", CLuaFunctionDefs::FocusBrowser );
     CLuaCFunctions::AddFunction ( "isBrowserFocused", CLuaFunctionDefs::IsBrowserFocused );
 

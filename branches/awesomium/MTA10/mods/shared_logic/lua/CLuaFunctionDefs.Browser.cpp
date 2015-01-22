@@ -50,9 +50,9 @@ int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::RequestBrowserPages ( lua_State* luaVM )
+int CLuaFunctionDefs::RequestBrowserDomains ( lua_State* luaVM )
 {
-//  bool requestBrowserPages ( table pages )
+//  bool requestBrowserDomains ( table domains )
     std::vector<SString> pages;
 
     CScriptArgReader argStream ( luaVM );
@@ -339,9 +339,9 @@ int CLuaFunctionDefs::SetBrowserVolume ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::IsBrowserURLBlocked ( lua_State* luaVM )
+int CLuaFunctionDefs::IsBrowserDomainBlocked ( lua_State* luaVM )
 {
-//  bool isBrowserURLBlocked ( string url )
+//  bool isBrowserDomainBlocked ( string url )
     SString strURL;
 
     CScriptArgReader argStream ( luaVM );

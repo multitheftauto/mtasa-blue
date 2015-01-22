@@ -1008,7 +1008,7 @@ public:
 
     // Webbrowser functions
     LUA_DECLARE ( CreateBrowser );
-    LUA_DECLARE ( RequestBrowserPages );
+    LUA_DECLARE ( RequestBrowserDomains );
     LUA_DECLARE ( LoadBrowserURL );
     LUA_DECLARE ( IsBrowserLoading );
     LUA_DECLARE ( InjectBrowserMouseMove );
@@ -1020,7 +1020,7 @@ public:
     LUA_DECLARE ( SetBrowserRenderingPaused );
     LUA_DECLARE ( ExecuteBrowserJavascript );
     LUA_DECLARE ( SetBrowserVolume );
-    LUA_DECLARE ( IsBrowserURLBlocked );
+    LUA_DECLARE ( IsBrowserDomainBlocked );
     LUA_DECLARE ( FocusBrowser );
     LUA_DECLARE ( IsBrowserFocused );
 

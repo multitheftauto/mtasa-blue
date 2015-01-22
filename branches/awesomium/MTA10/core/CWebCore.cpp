@@ -79,7 +79,7 @@ bool CWebCore::Initialise ()
 #else
     CefString ( &settings.browser_subprocess_path ).FromASCII( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher_d.exe" ) );
 #endif
-    CefString ( &settings.user_agent ).FromASCII ( "Multi Theft Auto: San Andreas Client; Chromium" );
+    //CefString ( &settings.user_agent ).FromASCII ( "Multi Theft Auto: San Andreas Client; Chromium" );
     CefString ( &settings.resources_dir_path ).FromASCII ( CalcMTASAPath( "MTA\\CEF") );
     CefString ( &settings.locales_dir_path ).FromASCII( CalcMTASAPath( "MTA\\CEF\\locales" ) );
     CefString ( &settings.log_file ).FromASCII ( CalcMTASAPath ( "MTA\\CEF\\cefdebug.txt" ) );
@@ -92,7 +92,7 @@ bool CWebCore::Initialise ()
     settings.multi_threaded_message_loop = true;
     settings.windowless_rendering_enabled = true;
 
-    return CefInitialize ( mainArgs, settings, NULL, sandboxInfo );
+    return CefInitialize ( mainArgs, settings, nullptr, sandboxInfo );
 }
 
 CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
