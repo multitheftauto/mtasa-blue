@@ -203,7 +203,6 @@ public:
 
     inline bool                                 IsDead                      ( void )                        { return m_bIsDead; };
     void                                        SetIsDead                   ( bool bDead );
-    inline unsigned long                        GetLastDieTime              ( void )                        { return m_ulLastDieTime; };
 
     inline bool                                 IsSpawned                   ( void )                        { return m_bSpawned; }
     inline void                                 SetSpawned                  ( bool bSpawned )               { m_bSpawned = bSpawned; }
@@ -230,7 +229,6 @@ public:
     inline CVehicle*                            GetOccupiedVehicle          ( void )                        { return m_pVehicle; };
     inline unsigned int                         GetOccupiedVehicleSeat      ( void )                        { return m_uiVehicleSeat; };
     CVehicle*                                   SetOccupiedVehicle          ( CVehicle* pVehicle, unsigned int uiSeat );
-    inline unsigned long                        GetVehicleActionStartTime   ( void )                        { return m_ulVehicleActionStartTime; };
 
     inline unsigned int                         GetVehicleAction            ( void )                        { return m_uiVehicleAction; };
     void                                        SetVehicleAction            ( unsigned int uiAction );
@@ -285,7 +283,6 @@ protected:
     CElement*                                   m_pContactElement;
     CVector                                     m_vecContactPosition;
     bool                                        m_bIsDead;
-    unsigned long                               m_ulLastDieTime;
     float                                       m_fRotation;
     bool                                        m_bSpawned;
     CElement*                                   m_pTargetedEntity;
@@ -301,7 +298,6 @@ protected:
     CVehicle*                                   m_pVehicle;
     unsigned int                                m_uiVehicleSeat;
     unsigned int                                m_uiVehicleAction;
-    unsigned long                               m_ulVehicleActionStartTime;
 
     bool                                        m_bSyncable;
     bool                                        m_bCollisionsEnabled;
