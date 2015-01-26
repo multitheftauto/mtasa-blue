@@ -790,11 +790,14 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
 {
     if ( m_bLoaded && !m_bActive )
     {
+        m_bStarting = true;
+
         CLuaArguments PreStartArguments;
         PreStartArguments.PushResource ( this );
         if ( !g_pGame->GetMapManager()->GetRootElement()->CallEvent ( "onResourcePreStart", PreStartArguments ) )
         {
             // Start cancelled by another resource
+            m_bStarting = false;
             return false;
         }
 
@@ -811,6 +814,7 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         {
             m_strFailureReason = SString ( "Not starting resource %s as %s\n", m_strResourceName.c_str (), *strStatus );
             CLogger::LogPrint ( m_strFailureReason );
+            m_bStarting = false;
             return false;
         }
         else
@@ -820,9 +824,6 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
             CLogger::LogPrint ( strReason );
             CLogger::LogPrintf ( "Use the 'upgrade' command to perform a basic upgrade of resources.\n" );
         }
-
-
-        m_bStarting = true;
 
         // Check the included resources are linked
         if ( !m_bLinked )
