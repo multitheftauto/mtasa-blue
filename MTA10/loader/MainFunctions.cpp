@@ -670,13 +670,6 @@ void CheckDataFiles( void )
         return ExitProcess( EXIT_ERROR );
     }
 
-    // Check for lua file
-    if ( !FileExists ( PathJoin( strMTASAPath, CHECK_DM_LUA_NAME ) ) )
-    {
-        DisplayErrorMessageBox ( SString(_("Load failed. Please ensure that %s is installed correctly."),CHECK_DM_LUA_NAME), _E("CL19"), "lua-missing" );
-        return ExitProcess( EXIT_ERROR );
-    }
-
     // Make sure the gta executable exists
     if ( !FileExists( PathJoin( strGTAPath, MTA_GTAEXE_NAME ) ) )
     {
@@ -791,7 +784,6 @@ void CheckLibVersions( void )
                                      ,"MTA\\xmll.dll"
                                      ,"MTA\\game_sa.dll"
                                      ,"mods\\deathmatch\\client.dll"
-                                     ,"mods\\deathmatch\\lua5.1c.dll"
                                      ,"mods\\deathmatch\\pcre3.dll"
                                     };
     SString strReqFileVersion;
