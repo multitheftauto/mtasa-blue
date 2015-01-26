@@ -706,11 +706,9 @@ void CMapManager::DoRespawning ( void )
 void CMapManager::DoPickupRespawning ( void )
 {
     // Grab the current time
-    unsigned long ulCurrentTime = GetTime ();
+    CTickCount currentTime = CTickCount::Now();
 
     // Loop through each pickup looking for respawnable ones
-    unsigned long ulLastUsedTime;
-    unsigned long ulCreationTime;
     CPickup* pPickup;
     list < CPickup* > ::const_iterator iterPickups = m_pPickupManager->IterBegin ();
     for ( ; iterPickups != m_pPickupManager->IterEnd (); iterPickups++ )
@@ -718,14 +716,13 @@ void CMapManager::DoPickupRespawning ( void )
         pPickup = *iterPickups;
 
         // Do we have to respawn this one and is it time to?
-        ulLastUsedTime = pPickup->GetLastUsedTime ();
-        ulCreationTime = pPickup->GetCreationTime ();
-        
+        const CTickCount lastUsedTime = pPickup->GetLastUsedTime ();
+        const CTickCount creationTime = pPickup->GetCreationTime ();
 
         if ( pPickup->IsEnabled () == false )
         {
             // Allow time for the element to be at least sent client side before allowing collisions otherwise it's possible to get a collision before the pickup is created. DO NOT WANT! - Caz
-            if ( ulCurrentTime >= ( ulCreationTime + 100 ) && pPickup->HasDoneDelayHack() == false )
+            if ( currentTime >= ( creationTime + CTickCount( 100LL ) ) && pPickup->HasDoneDelayHack() == false )
             {
                 // make sure we only happen once.
                 pPickup->SetDoneDelayHack ( true );
@@ -733,7 +730,7 @@ void CMapManager::DoPickupRespawning ( void )
             }
         }
 
-        if ( !pPickup->IsSpawned () && ulLastUsedTime != 0 && ulCurrentTime >= ( ulLastUsedTime + pPickup->GetRespawnIntervals () ) )
+        if ( !pPickup->IsSpawned () && lastUsedTime != CTickCount( 0LL ) && currentTime >= ( lastUsedTime + CTickCount( (long long)pPickup->GetRespawnIntervals() ) ) )
         {            
             // Set it as spawned
             pPickup->SetSpawned ( true );
