@@ -180,6 +180,7 @@
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)xmll_d.dll" "$(MyTargetDir)\mta\" &amp;&amp; xcopy /y "$(OutDir)xmll_d.dll" "$(MyTargetDir)\server\"</Command>
@@ -271,6 +272,7 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)xmll.dll" "$(MyTargetDir)\mta\" &amp;&amp; xcopy /y "$(OutDir)xmll.dll" "$(MyTargetDir)\server\"</Command>
@@ -367,6 +369,7 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)xmll.dll" "..\..\output\MTA San Andreas\mta\" &amp;&amp; xcopy /y "$(OutDir)xmll.dll" "..\..\output\MTA San Andreas\server\"</Command>
