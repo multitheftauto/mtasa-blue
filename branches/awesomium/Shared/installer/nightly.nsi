@@ -626,6 +626,7 @@ DontInstallRedistVC12:
         File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\busy_spinner.png"
         File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\rect_edge.png"
 		
+		SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libcef.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\icudtl.dat"
 		
