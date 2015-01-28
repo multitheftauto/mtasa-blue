@@ -1188,6 +1188,7 @@ bool CClientEntity::IsAttachable ( void )
         case CCLIENTSOUND:
         case CCLIENTCOLSHAPE:
         case CCLIENTWEAPON:
+        case CCLIENTPOINTLIGHTS:
         {
             return true;
             break;
@@ -1213,6 +1214,7 @@ bool CClientEntity::IsAttachToable ( void )
         case CCLIENTSOUND:
         case CCLIENTCOLSHAPE:
         case CCLIENTCAMERA:
+        case CCLIENTPOINTLIGHTS:
         {
             return true;
             break;
@@ -1262,6 +1264,8 @@ unsigned int CClientEntity::GetTypeID ( const char* szTypeName )
         return CCLIENTRADARAREA;
     else if ( strcmp ( szTypeName, "sound" ) == 0 )
         return CCLIENTSOUND;
+    else if ( strcmp ( szTypeName, "light" ) == 0 )
+        return CCLIENTPOINTLIGHTS;
     else
         return CCLIENTUNKNOWN;
 }

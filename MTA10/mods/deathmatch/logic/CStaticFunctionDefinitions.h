@@ -304,6 +304,16 @@ public:
 
     // Fire funcs
     static bool                         CreateFire                          ( CVector& vecPosition, float fSize );
+    
+    // Light funcs
+    static CClientPointLights*          CreateLight                         ( CResource& Resource, int iMode, const CVector& vecPosition, float fRadius, SColor color, CVector& vecDirection );
+    static bool                         GetLightType                        ( CClientPointLights* pLight, int& iMode );
+    static bool                         GetLightRadius                      ( CClientPointLights* pLight, float& fRadius );
+    static bool                         GetLightColor                       ( CClientPointLights* pLight, SColor& outColor );
+    static bool                         GetLightDirection                   ( CClientPointLights* pLight, CVector& vecDirection );
+    static bool                         SetLightRadius                      ( CClientPointLights* pLight, float fRadius );
+    static bool                         SetLightColor                       ( CClientPointLights* pLight, SColor color );
+    static bool                         SetLightDirection                   ( CClientPointLights* pLight, CVector vecDirection );
 
     // Audio funcs
     static bool                         PlaySoundFrontEnd                   ( unsigned char ucSound );

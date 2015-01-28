@@ -865,6 +865,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientPointLights.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientPointLightsManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientProjectile.cpp"
 					>
 				</File>
@@ -1149,6 +1157,10 @@
 					</File>
 					<File
 						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Player.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.PointLights.cpp"
 						>
 					</File>
 					<File
@@ -3364,6 +3376,14 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientPlayerVoice.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientPointLights.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientPointLightsManager.h"
 					>
 				</File>
 				<File

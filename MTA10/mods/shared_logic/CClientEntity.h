@@ -78,6 +78,7 @@ enum eClientEntityType
     CCLIENTSHADER,
     CCLIENTWEAPON,
     CCLIENTEFFECT,
+    CCLIENTPOINTLIGHTS,
     CCLIENTSCREENSOURCE,
     CCLIENTRENDERTARGET,
     CCLIENTUNKNOWN,
@@ -142,6 +143,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientScreenSource,
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
+    CLASS_CClientPointLights,
 };
 
 
