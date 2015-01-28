@@ -16,12 +16,14 @@
 enum ePointLightType
 {
     PLTYPE_POINTLIGHT=0,
+    PLTYPE_SPOTLIGHT=1,
+    PLTYPE_DARKLIGHT=2,
 };
 
 class CPointLights
 {
 public:
-    virtual void                        AddLight                ( unsigned char ucType, CVector vec_2, CVector vec_3, float f_4, float f_5, float f_6, float f_7, unsigned char uc_8, bool b_9, CEntity * pEntity ) = 0;
+    virtual void                        AddLight                ( int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SColor color, unsigned char uc_8, bool bCreatesShadow, CEntity * pAffected ) = 0;
 };
 
 #endif

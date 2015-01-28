@@ -54,6 +54,7 @@ CClientManager::CClientManager ( void )
     m_pWaterManager = new CClientWaterManager ( this );
     m_pWeaponManager = new CClientWeaponManager ( this );
     m_pEffectManager = new CClientEffectManager ( this );
+    m_pPointLightsManager = new CClientPointLightsManager ( this );
     m_pPacketRecorder = new CClientPacketRecorder ( this );
 
     m_bBeingDeleted = false;
@@ -170,6 +171,9 @@ CClientManager::~CClientManager ( void )
 
     delete m_pWeaponManager;
     m_pWeaponManager = NULL;
+
+    delete m_pPointLightsManager;
+    m_pPointLightsManager = NULL;
 }
 
 //

@@ -359,9 +359,12 @@
     </ClCompile>
     <ClCompile Include="..\shared_logic\CClientEffect.cpp" />
     <ClCompile Include="..\shared_logic\CClientEffectManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPointLights.cpp" />
+    <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector4Defs.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.PointLights.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector4.cpp" />
@@ -748,6 +751,8 @@
   <ItemGroup>
     <ClInclude Include="..\shared_logic\CClientEffect.h" />
     <ClInclude Include="..\shared_logic\CClientEffectManager.h" />
+    <ClInclude Include="..\shared_logic\CClientPointLights.h" />
+    <ClInclude Include="..\shared_logic\CClientPointLightsManager.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector4Defs.h" />

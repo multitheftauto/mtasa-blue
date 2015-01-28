@@ -920,6 +920,15 @@
     <ClCompile Include="..\..\..\vendor\lua\src\llex.c">
       <Filter>Source Files\utils\lualib</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared_logic\CClientPointLights.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.PointLights.cpp">
+      <Filter>Source Files\shared_logic\lua</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CClient.h">
@@ -1626,6 +1635,12 @@
     </ClInclude>
     <ClInclude Include="..\shared_logic\lua\CLuaVector2.h">
       <Filter>Header Files\shared_logic\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientPointLights.h">
+      <Filter>Header Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientPointLightsManager.h">
+      <Filter>Header Files\shared_logic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

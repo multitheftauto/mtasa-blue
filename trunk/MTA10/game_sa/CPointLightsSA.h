@@ -3,15 +3,15 @@
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        game_sa/CPointLightsSA.h
-*  PURPOSE:     Point lights class header
+*  PURPOSE:     Header file for PointLights entity class
 *  DEVELOPERS:  Jax <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
 
-#ifndef __CPointLightsSA_H
-#define __CPointLightsSA_H
+#ifndef __CGAMESA_POINTLIGHTS
+#define __CGAMESA_POINTLIGHTS
 
 #include <game/CPointLights.h>
 
@@ -20,7 +20,7 @@
 class CPointLightsSA : public CPointLights
 {
 public:
-    void                        AddLight                ( unsigned char ucType, CVector vec_2, CVector vec_3, float fRed, float fGreen, float fBlue, float f_7, unsigned char uc_8, bool bCreatesShadow, CEntity * pEntity );
+    void                        AddLight                ( int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SColor color, unsigned char uc_8, bool bCreatesShadow, CEntity * pAffected );
 };
 
 #endif

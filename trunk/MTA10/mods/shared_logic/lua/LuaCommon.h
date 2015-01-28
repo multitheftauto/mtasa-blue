@@ -44,6 +44,7 @@ class CClientVehicle;
 class CClientWater;
 class CClientWeapon;
 class CClientRadarArea;
+class CClientPointLights;
 class CLuaTimer;
 class CResource;
 class CXMLNode;

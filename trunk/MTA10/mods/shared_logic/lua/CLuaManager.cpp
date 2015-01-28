@@ -599,6 +599,16 @@ void CLuaManager::LoadCFunctions ( void )
     // Fire funcs
     CLuaCFunctions::AddFunction ( "createFire", CLuaFunctionDefs::CreateFire );
 
+    // PointLights funcs
+    CLuaCFunctions::AddFunction ( "createLight", CLuaFunctionDefs::CreateLight );
+    CLuaCFunctions::AddFunction ( "getLightType", CLuaFunctionDefs::GetLightType );
+    CLuaCFunctions::AddFunction ( "getLightRadius", CLuaFunctionDefs::GetLightRadius );
+    CLuaCFunctions::AddFunction ( "setLightRadius", CLuaFunctionDefs::SetLightRadius );
+    CLuaCFunctions::AddFunction ( "getLightColor", CLuaFunctionDefs::GetLightColor );
+    CLuaCFunctions::AddFunction ( "setLightColor", CLuaFunctionDefs::SetLightColor );
+    CLuaCFunctions::AddFunction ( "getLightDirection", CLuaFunctionDefs::GetLightDirection );
+    CLuaCFunctions::AddFunction ( "setLightDirection", CLuaFunctionDefs::SetLightDirection );
+
     // Engine funcs
     CLuaCFunctions::AddFunction ( "engineLoadTXD", CLuaFunctionDefs::EngineLoadTXD );
     CLuaCFunctions::AddFunction ( "engineLoadCOL", CLuaFunctionDefs::EngineLoadCOL );

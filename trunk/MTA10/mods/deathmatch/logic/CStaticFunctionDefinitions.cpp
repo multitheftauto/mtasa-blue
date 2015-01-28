@@ -1244,6 +1244,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, un
         case CCLIENTRADARMARKER:
         case CCLIENTPED:
         case CCLIENTPICKUP:
+        case CCLIENTPOINTLIGHTS:
         case CCLIENTRADARAREA:
         case CCLIENTWORLDMESH:
         case CCLIENTSOUND:
@@ -8623,4 +8624,100 @@ bool CStaticFunctionDefinitions::SetSoundPan ( CClientSound& pSound, float fPan 
 bool CStaticFunctionDefinitions::GetSoundPan ( CClientSound& pSound, float& fPan )
 {
     return pSound.GetPan ( fPan );
+}
+
+CClientPointLights* CStaticFunctionDefinitions::CreateLight ( CResource& Resource, int iMode, const CVector& vecPosition, float fRadius, SColor color, CVector& vecDirection )
+{
+    // Create it
+    CClientPointLights* pLight = new CClientPointLights ( m_pManager, INVALID_ELEMENT_ID );
+    if ( pLight )
+    {
+        pLight->SetParent ( Resource.GetResourceDynamicEntity () );
+        pLight->SetMode ( iMode );
+        pLight->SetPosition ( vecPosition );
+        pLight->SetRadius ( fRadius );
+        pLight->SetColor ( color );
+        pLight->SetDirection ( vecDirection );        
+
+        return pLight;
+    }
+
+    return NULL;
+}
+
+
+bool CStaticFunctionDefinitions::GetLightType ( CClientPointLights* pLight, int& iMode )
+{
+    if ( pLight )
+    {
+        iMode = pLight->GetMode ();
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetLightRadius ( CClientPointLights* pLight, float& fRadius )
+{
+    if ( pLight )
+    {
+        fRadius = pLight->GetRadius ();
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetLightColor ( CClientPointLights* pLight, SColor& outColor )
+{
+    if ( pLight )
+    {
+        outColor = pLight->GetColor ();
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::GetLightDirection ( CClientPointLights* pLight, CVector& vecDirection )
+{
+    if ( pLight )
+    {
+        vecDirection = pLight->GetDirection();
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetLightRadius ( CClientPointLights* pLight, float fRadius )
+{
+    if ( pLight )
+    {
+        pLight->SetRadius ( fRadius );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetLightColor ( CClientPointLights* pLight, SColor color )
+{
+    if ( pLight )
+    {
+        pLight->SetColor ( color );
+        return true;
+    }
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetLightDirection ( CClientPointLights* pLight, CVector vecDirection )
+{
+    if ( pLight )
+    {
+        pLight->SetDirection ( vecDirection );
+        return true;
+    }
+    return false;
 }

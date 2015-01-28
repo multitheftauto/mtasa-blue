@@ -2314,6 +2314,7 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
     m_pManager->GetVehicleStreamer ()->SetDimension ( usDimension );
     m_pManager->GetRadarMarkerManager ()->SetDimension ( usDimension );
     m_pManager->GetSoundManager ()->SetDimension ( usDimension );
+    m_pManager->GetPointLightsManager ()->SetDimension ( usDimension );
     m_pNametags->SetDimension ( usDimension );
 }
 
@@ -3896,6 +3897,7 @@ void CClientGame::PreWorldProcessHandler ( void )
 void CClientGame::PostWorldProcessHandler ( void )
 {
     m_pManager->GetMarkerManager ()->DoPulse ();
+    m_pManager->GetPointLightsManager ()->DoPulse ();
 
     // Update frame time slice
     uint uiCurrentTick = GetTickCount32 ();

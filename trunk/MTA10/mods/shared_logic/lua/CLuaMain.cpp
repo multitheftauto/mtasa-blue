@@ -903,6 +903,29 @@ void CLuaMain::AddWeaponClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Weapon", "Element" );
 }
 
+void CLuaMain::AddPointLightsClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "createLight" );
+
+    lua_classfunction ( luaVM, "getType", "getLightType" );
+    lua_classfunction ( luaVM, "getRadius", "getLightRadius" );
+    lua_classfunction ( luaVM, "getColor", "getLightColor" ); // color
+    lua_classfunction ( luaVM, "getDirection", "getLightDirection" );
+
+    lua_classfunction ( luaVM, "setRadius", "setLightRadius" );
+    lua_classfunction ( luaVM, "setColor", "setLightColor" ); // color
+    lua_classfunction ( luaVM, "setDirection", "setLightDirection" );
+
+    lua_classvariable ( luaVM, "type", NULL, "getLightType" );
+    lua_classvariable ( luaVM, "radius", "setLightRadius", "getLightRadius" );
+    //lua_classvariable ( luaVM, "color", "setLightColor", "getLightColor" );
+    lua_classvariable ( luaVM, "direction", "setLightDirection", "getLightDirection" );
+
+    lua_registerclass ( luaVM, "Light", "Element" );
+}
+
 
 void CLuaMain::AddEffectClass ( lua_State* luaVM )
 {
@@ -1795,6 +1818,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddSoundClass               ( luaVM );
     AddWeaponClass              ( luaVM );
     AddEffectClass              ( luaVM );
+    AddPointLightsClass         ( luaVM );
 
     AddGuiElementClass          ( luaVM );
     AddGuiWindowClass           ( luaVM );
