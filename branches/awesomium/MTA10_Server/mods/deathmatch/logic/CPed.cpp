@@ -56,7 +56,6 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_ucAlpha = 255;
     m_pContactElement = NULL;
     m_bIsDead = true;
-    m_ulLastDieTime = 0;
     m_bSpawned = false;
     m_fRotation = 0.0f;
     m_pTargetedEntity = NULL;
@@ -69,7 +68,6 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     m_pVehicle = NULL;
     m_uiVehicleSeat = INVALID_VEHICLE_SEAT;
     m_uiVehicleAction = CPed::VEHICLEACTION_NONE;
-    m_ulVehicleActionStartTime = 0;
 
     m_vecVelocity.fX = m_vecVelocity.fY = m_vecVelocity.fZ = 0.0f;
 
@@ -353,11 +351,6 @@ void CPed::SetContactElement ( CElement* pElement )
 
 void CPed::SetIsDead ( bool bDead )
 {
-    if ( !m_bIsDead && bDead )
-    {
-        m_ulLastDieTime = GetTime ();
-    }
-
     m_bIsDead = bDead;
 }
 
@@ -387,7 +380,6 @@ CVehicle* CPed::SetOccupiedVehicle ( CVehicle* pVehicle, unsigned int uiSeat )
 void CPed::SetVehicleAction ( unsigned int uiAction )
 {
     m_uiVehicleAction = uiAction;
-    m_ulVehicleActionStartTime = GetTime ();
 }
 
 

@@ -23,19 +23,19 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -73,7 +73,7 @@
     <TargetName>cgui</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
-    <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\output\MTA San Andreas\mta\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>cgui</TargetName>
   </PropertyGroup>
@@ -168,11 +168,11 @@
     <Link>
       <AdditionalDependencies>shlwapi.lib;d3dx9.lib;dxerr.lib;CEGUIBase.lib;DirectX9GUIRenderer.lib;CEGUIFalagardBase.lib;freetype2412ST.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../vendor/cegui-0.4.0-custom/lib;../../vendor/cegui-0.4.0-custom/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\vendor\cegui-0.4.0-custom\lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\CEGUI - Base;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\CEGUI - DirectX9GUIRenderer;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\CEGUI - FalagardBase;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug />
-      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

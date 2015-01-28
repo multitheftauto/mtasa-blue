@@ -338,6 +338,7 @@ const char* CLuaClassDefs::GetEntityClass ( CClientEntity* pEntity )
         case CCLIENTSHADER: return "DxShader";
         case CCLIENTWEAPON: return "Weapon";
         case CCLIENTEFFECT: return "Effect";
+        case CCLIENTPOINTLIGHTS: return "Light";
         case CCLIENTSCREENSOURCE: return "DxScreenSource";
         case CCLIENTRENDERTARGET: return "DxRenderTarget";
         case CCLIENTBROWSER: return "Browser";

@@ -16,6 +16,31 @@
 
 unsigned long GetTickCountInternal ( void );
 
+// Not multithread safe
+// Must be called from within a locked critical section
+uint GetTickCount32ST ( void )
+{
+    static uint uiCurrent = ( GetTickCountInternal () % 300000 + 200000 );
+    static uint uiWas      = GetTickCountInternal();
+    uint        uiNow      = GetTickCountInternal();
+    uint        uiDelta    = uiNow - uiWas;
+    uiWas = uiNow;
+
+    // Ensure delta is not negative
+    if ( uiDelta > 0x80000000 )
+        uiDelta = 0;
+
+    // Or greater than 600 seconds
+    if ( uiDelta > 600 * 1000 )
+        uiDelta = 600 * 1000;
+
+    // Add delta to accumulator
+    uiCurrent += uiDelta;
+
+    return uiCurrent;
+}
+
+
 //
 // Retrieves the number of milliseconds that have elapsed since the function was first called (plus a little bit to make it look good).
 // This keeps the counter as low as possible to delay any precision or wrap around issues.
@@ -23,9 +48,10 @@ unsigned long GetTickCountInternal ( void );
 //
 uint SharedUtil::GetTickCount32 ( void )
 {
-    static const uint ulInitial = GetTickCountInternal () - ( GetTickCountInternal () % 300000 + 200000 );
-    uint ulNow = GetTickCountInternal ();
-    return ulNow - ulInitial;
+    static CCriticalSection criticalSection;
+    uint uiResult = GetTickCount32ST();
+    criticalSection.Unlock ();
+    return uiResult;
 }
 
 
@@ -41,21 +67,18 @@ long long SharedUtil::GetTickCount64_ ( void )
     static CCriticalSection criticalSection;
     criticalSection.Lock ();
 
-    static long          lHightPart = 0;
-    static unsigned long ulWas      = GetTickCount32 ();
-    unsigned long        ulNow      = GetTickCount32 ();
-    unsigned long        ulDelta    = ulNow - ulWas;
+    static long long llCurrent = GetTickCount32ST();
+    static uint uiWas      = GetTickCount32ST ();
+    uint        uiNow      = GetTickCount32ST ();
+    uint        uiDelta    = uiNow - uiWas;
+    uiWas = uiNow;
 
-    // Detect wrap around
-    if( ulDelta > 0x80000000 )
-        lHightPart++;
+    // Add delta to accumulator
+    llCurrent += uiDelta;
 
-    ulWas = ulNow;
-
-    long long Result = ( ( ( ( long long ) lHightPart ) << 32 ) | ( ( long long ) ulNow ) );
-
+    long long llResult = llCurrent;
     criticalSection.Unlock ();
-    return Result;
+    return llResult;
 }
 
 

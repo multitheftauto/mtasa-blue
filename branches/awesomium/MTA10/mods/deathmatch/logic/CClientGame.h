@@ -124,6 +124,7 @@ public:
         SCRIPTFILE,
         WATER,
         WEAPON,
+        POINTLIGHTS,
         UNKNOWN,
     };
 
@@ -611,6 +612,7 @@ private:
     CClientPathManager*                 m_pPathManager;
     CClientTeamManager*                 m_pTeamManager;
     CClientPedManager*                  m_pPedManager;
+    CClientPointLightsManager*          m_pPointLightsManager;
     CClientProjectileManager*           m_pProjectileManager;
     CRPCFunctions*                      m_pRPCFunctions;
     CUnoccupiedVehicleSync*             m_pUnoccupiedVehicleSync;

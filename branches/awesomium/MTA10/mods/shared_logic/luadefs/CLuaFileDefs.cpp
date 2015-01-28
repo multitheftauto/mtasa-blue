@@ -372,8 +372,7 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
             {
                 // Allocate a buffer to read the stuff into and read some shit into it
                 char* pReadContent = new char [ulCount + 1];
-                long lBytesRead = pFile->Read ( static_cast < unsigned long > ( ulCount ),
-                                                            pReadContent );
+                long lBytesRead = pFile->Read ( ulCount, pReadContent );
 
                 if ( lBytesRead != -1 )
                 {
@@ -388,9 +387,15 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
                 }
 
                 // Delete our read content. Lua should've stored it
-                delete [] pReadContent;
+                delete[] pReadContent;
 
                 // We're returning the result string
+                return 1;
+            }
+            else
+            {
+                // Reading zero bytes from a file results in an empty string
+                lua_pushstring ( luaVM, "" );
                 return 1;
             }
         }

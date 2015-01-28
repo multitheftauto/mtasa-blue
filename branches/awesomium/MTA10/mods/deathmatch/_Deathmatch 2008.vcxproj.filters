@@ -75,6 +75,9 @@
     <Filter Include="Header Files\shared\animation">
       <UniqueIdentifier>{f747ba22-0747-4bf9-a21c-9e6afc47447d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\utils\lualib">
+      <UniqueIdentifier>{4ab2244d-178c-4ef0-856a-d8bc3800ebf7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CClient.cpp">
@@ -824,6 +827,108 @@
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp">
       <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lmathlib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lmem.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\loadlib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lobject.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lopcodes.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\loslib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lparser.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lstate.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lstring.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lstrlib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\ltable.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\ltablib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\ltm.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lundump.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lutf8lib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lvm.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lzio.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\print.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lapi.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lauxlib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lbaselib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lcode.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\ldblib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\ldebug.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\ldo.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\ldump.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lfunc.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\lgc.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\linit.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\liolib.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vendor\lua\src\llex.c">
+      <Filter>Source Files\utils\lualib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\CClientPointLights.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.PointLights.cpp">
+      <Filter>Source Files\shared_logic\lua</Filter>
+    </ClCompile>
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp">
       <Filter>Source Files\shared_logic</Filter>
     </ClCompile>
@@ -1536,6 +1641,12 @@
     </ClInclude>
     <ClInclude Include="..\shared_logic\lua\CLuaVector2.h">
       <Filter>Header Files\shared_logic\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientPointLights.h">
+      <Filter>Header Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientPointLightsManager.h">
+      <Filter>Header Files\shared_logic</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\CClientWebBrowser.h">
       <Filter>Header Files\shared_logic</Filter>

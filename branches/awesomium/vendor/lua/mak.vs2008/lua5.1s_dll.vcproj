@@ -46,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../../Shared/publicsdk/lua/include"
-				PreprocessorDefinitions="LUA_USE_APICHECK;LUA_BUILD_AS_DLL"
+				PreprocessorDefinitions="LUA_BUILD_AS_DLL"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

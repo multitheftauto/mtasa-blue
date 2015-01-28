@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic;../../../vendor/pcre"
-				PreprocessorDefinitions="WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;LUA_USE_APICHECK"
+				PreprocessorDefinitions="WIN32;LUA_USE_APICHECK;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;LUA_USE_APICHECK"
 				StringPooling="true"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -72,12 +72,12 @@
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="libv2.lib lua5.1c_d.lib libspeexd.lib bass.lib bass_fx.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlib_d.lib Iphlpapi.lib json_d.lib pcre3_d.lib"
+				AdditionalDependencies="libv2.lib libspeexd.lib bass.lib bass_fx.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib ws2_32.lib zlib_d.lib Iphlpapi.lib json_d.lib pcre3_d.lib"
 				ShowProgress="0"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\Client_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;&quot;../../../vendor/lua/x86/$(ConfigurationName)Client&quot;;../../../vendor/libv2/lib;&quot;../../../vendor/zlib/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/json-c/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/pcre/x86/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/libv2/lib;&quot;../../../vendor/zlib/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/json-c/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/pcre/x86/$(ConfigurationName)&quot;"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
@@ -141,7 +141,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic;../../../vendor/pcre"
-				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS;LUA_USE_APICHECK"
+				PreprocessorDefinitions="WIN32;LUA_USE_APICHECK;_CRT_SECURE_NO_WARNINGS;LUA_USE_APICHECK"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -165,11 +165,11 @@
 				IgnoreImportLibrary="false"
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
-				AdditionalDependencies="libv2.lib lua5.1c.lib libspeex.lib bass.lib bass_fx.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib.lib json.lib pcre3.lib"
+				AdditionalDependencies="libv2.lib libspeex.lib bass.lib bass_fx.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib.lib json.lib pcre3.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\mods\deathmatch\Client.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;&quot;../../../vendor/lua/x86/$(ConfigurationName)Client&quot;;../../../vendor/libv2/lib;&quot;../../../vendor/zlib/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/json-c/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/pcre/x86/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/libv2/lib;&quot;../../../vendor/zlib/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/json-c/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/pcre/x86/$(ConfigurationName)&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
@@ -237,7 +237,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="../../../vendor/libv2;../../../vendor/libspeex;../../../vendor/portaudio;../../../vendor/bass;../../../Shared/publicsdk/include;../../Voice;./;../shared_logic;../../../Shared/XML/interface;../../../vendor;../../../vendor/lua/src;../../../vendor/zlib;&quot;../../../vendor/json-c&quot;;../../sdk/;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../Shared/mods/deathmatch/logic;../../../vendor/pcre"
-				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_WARNINGS;LUA_USE_APICHECK"
+				PreprocessorDefinitions="WIN32;LUA_USE_APICHECK;_CRT_SECURE_NO_WARNINGS;LUA_USE_APICHECK"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -261,11 +261,11 @@
 				IgnoreImportLibrary="false"
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/FIXED:NO"
-				AdditionalDependencies="libv2.lib lua5.1c.lib libspeex.lib bass.lib bass_fx.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib.lib json.lib pcre3.lib"
+				AdditionalDependencies="libv2.lib libspeex.lib bass.lib bass_fx.lib bassmix.lib tags.lib Psapi.lib Winmm.lib kernel32.lib wsock32.lib zlib.lib json.lib pcre3.lib"
 				OutputFile="..\..\..\output\MTA San Andreas\mods\deathmatch\client.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;&quot;../../../vendor/lua/x86/$(ConfigurationName)Client&quot;;../../../vendor/libv2/lib;&quot;../../../vendor/zlib/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/json-c/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/pcre/x86/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="../../../vendor/libspeex;../../../vendor/bass/lib;../../../vendor/libv2/lib;&quot;../../../vendor/zlib/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/json-c/x86/$(ConfigurationName)&quot;;&quot;../../../vendor/pcre/x86/$(ConfigurationName)&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
@@ -865,6 +865,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\shared_logic\CClientPointLights.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientPointLightsManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\shared_logic\CClientProjectile.cpp"
 					>
 				</File>
@@ -1160,6 +1168,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.PointLights.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp"
 						>
 					</File>
@@ -1255,15 +1267,11 @@
 							>
 						</File>
 						<File
+							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp"
+							>
+						</File>
+						<File
 							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp"
 							>
 						</File>
 						<File
@@ -1271,11 +1279,15 @@
 							>
 						</File>
 						<File
-							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp"
+							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp"
 							>
 						</File>
 						<File
 							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp"
 							>
 						</File>
 					</Filter>
@@ -1789,6 +1801,878 @@
 					</File>
 					<File
 						RelativePath="..\..\..\vendor\portaudio\pa_x86_plain_converters.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+				</Filter>
+				<Filter
+					Name="lualib"
+					>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lapi.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lauxlib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lbaselib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lcode.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\ldblib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\ldebug.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\ldo.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\ldump.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lfunc.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lgc.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\linit.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\liolib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\llex.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lmathlib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lmem.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\loadlib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lobject.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lopcodes.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\loslib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lparser.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lstate.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lstring.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lstrlib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\ltable.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\ltablib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\ltm.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lundump.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lutf8lib.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lvm.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\lzio.c"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Nightly|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								UsePrecompiledHeader="0"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\..\..\vendor\lua\src\print.c"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -2500,6 +3384,14 @@
 				</File>
 				<File
 					RelativePath="..\shared_logic\CClientPlayerVoice.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientPointLights.h"
+					>
+				</File>
+				<File
+					RelativePath="..\shared_logic\CClientPointLightsManager.h"
 					>
 				</File>
 				<File

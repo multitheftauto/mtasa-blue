@@ -434,6 +434,16 @@ public:
     // Fire functions
     LUA_DECLARE ( CreateFire );
 
+    // PointLights functions
+    LUA_DECLARE ( CreateLight );
+    LUA_DECLARE ( GetLightType );
+    LUA_DECLARE ( GetLightRadius );
+    LUA_DECLARE ( GetLightColor );
+    LUA_DECLARE ( GetLightDirection );
+    LUA_DECLARE ( SetLightRadius );
+    LUA_DECLARE ( SetLightColor );
+    LUA_DECLARE ( SetLightDirection );
+
     // Audio funcs
     LUA_DECLARE ( PlaySoundFrontEnd );
     LUA_DECLARE ( SetAmbientSoundEnabled );
