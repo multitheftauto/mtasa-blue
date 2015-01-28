@@ -146,16 +146,9 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\ffmpegsumo.dll"
-	File "${FILES_ROOT}\MTA San Andreas\mta\libcef.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
-	File "${FILES_ROOT}\MTA San Andreas\mta\icudtl.dat"
 	File "${FILES_ROOT}\MTA San Andreas\mta\wow_helper.exe"
-	
-	SetOutPath "$INSTDIR\MTA\CEF"
-	File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef.pak"
-	File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_100_percent.pak"
-	File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_200_percent.pak"
 
 	SetOutPath "$INSTDIR\skins\Classic"
     File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
