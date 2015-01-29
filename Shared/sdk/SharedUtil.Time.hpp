@@ -49,6 +49,7 @@ uint GetTickCount32ST ( void )
 uint SharedUtil::GetTickCount32 ( void )
 {
     static CCriticalSection criticalSection;
+    criticalSection.Lock ();
     uint uiResult = GetTickCount32ST();
     criticalSection.Unlock ();
     return uiResult;
