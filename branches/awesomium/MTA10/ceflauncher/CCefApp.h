@@ -16,10 +16,43 @@ using V8Helpers::CV8Handler;
 class CCefApp : public CefApp, public CefRenderProcessHandler
 {
 public:
-    CCefApp()
-    {
-    }
+    CCefApp() {}
     virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler () override { return this; };
+
+    // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnFocusedNodeChanged(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefDOMNode%3E)
+    virtual void OnFocusedNodeChanged ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node ) override
+    {
+        if ( m_bHasInputFocus )
+        {
+            if ( node )
+                return;
+
+            // Tell MTA that we lost input focus
+            auto message = CefProcessMessage::Create ( "InputFocus" );
+            message->GetArgumentList ()->SetBool ( 0, false );
+            browser->SendProcessMessage ( PID_BROWSER, message );
+
+            // Set variable to ensure that the event does not trigger twice
+            m_bHasInputFocus = false;
+            return;
+        }
+        else
+        {
+            if ( !node )
+                return;
+
+            if ( node->GetType () == CefDOMNode::Type::DOM_NODE_TYPE_ELEMENT && !node->GetFormControlElementType ().empty () )
+            {
+                auto message = CefProcessMessage::Create ( "InputFocus" );
+                message->GetArgumentList ()->SetBool ( 0, true );
+                browser->SendProcessMessage ( PID_BROWSER, message );
+
+                // Set variable to ensure that the event does not trigger twice
+                m_bHasInputFocus = true;
+            }
+        }
+    }
+
 
     // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnContextCreated(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefV8Context%3E) //
     virtual void OnContextCreated ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context ) override
@@ -59,4 +92,7 @@ public:
 
 public:
     IMPLEMENT_REFCOUNTING(CCefApp);
+
+private:
+    bool m_bHasInputFocus = false;
 };

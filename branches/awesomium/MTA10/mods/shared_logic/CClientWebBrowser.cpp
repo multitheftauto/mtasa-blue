@@ -180,3 +180,10 @@ void CClientWebBrowser::Events_OnTooltip ( const SString& strTooltip )
     Arguments.PushString ( strTooltip );
     CallEvent ( "onClientBrowserTooltip", Arguments, false );
 }
+
+void CClientWebBrowser::Events_OnInputFocusChanged ( bool bGainedFocus )
+{
+    CLuaArguments Arguments;
+    Arguments.PushBoolean ( bGainedFocus );
+    CallEvent ( "onClientBrowserInputFocusChanged", Arguments, false );
+}

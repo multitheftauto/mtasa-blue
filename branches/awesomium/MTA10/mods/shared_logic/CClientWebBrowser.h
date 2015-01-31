@@ -54,6 +54,7 @@ public:
     void                        Events_OnChangeCursor  ( unsigned char ucCursor ) override;
     void                        Events_OnTriggerEvent  ( const SString& strEventName, const std::vector<std::string>& arguments, bool bIsServer = false ) override;
     void                        Events_OnTooltip       ( const SString& strTooltip ) override;
+    void                        Events_OnInputFocusChanged ( bool bGainedFocus ) override;
 
 private:
     CWebViewInterface* m_pWebView;
