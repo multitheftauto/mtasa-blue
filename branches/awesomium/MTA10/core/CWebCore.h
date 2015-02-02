@@ -17,9 +17,9 @@
 #include <mutex>
 #include <core/CWebCoreInterface.h>
 #include <cef3/include/cef_app.h>
-#define MTA_BROWSERDATA_PATH "mta/browserdata.xml"
+#define MTA_BROWSERDATA_PATH "mta/cef/browserdata.xml"
 #define BROWSER_LIST_UPDATE_INTERVAL (24*60*60)
-#define BROWSER_UPDATE_URL "http://jusonex.net/aw/getlist.php"
+#define BROWSER_UPDATE_URL "http://cef.multitheftauto.com/get.php"
 #define CEF_ENABLE_SANDBOX 0
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)

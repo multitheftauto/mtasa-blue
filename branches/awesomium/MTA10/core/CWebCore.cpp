@@ -502,9 +502,12 @@ bool CWebCore::MakeSureXMLNodesExist ()
     // Check xml file
     if ( !m_pXmlConfig )
     {
-        m_pXmlConfig = g_pCore->GetXML ()->CreateXML ( CalcMTASAPath ( MTA_BROWSERDATA_PATH ) );
+        SString browserDataPath = CalcMTASAPath ( MTA_BROWSERDATA_PATH );
+        bool exists = FileExists ( browserDataPath );
 
-        if ( !m_pXmlConfig || !m_pXmlConfig->Parse () )
+        m_pXmlConfig = g_pCore->GetXML ()->CreateXML ( browserDataPath );
+
+        if ( !m_pXmlConfig || ( exists && !m_pXmlConfig->Parse () ) )
             return false;
     }
 
