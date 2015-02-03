@@ -54,19 +54,23 @@ public:
     std::list < CKeyBind* > ::const_iterator IterBegin  ( void )    { return m_pList->begin (); }
     std::list < CKeyBind* > ::const_iterator IterEnd    ( void )    { return m_pList->end (); }
 
-
     // Command-bind funcs
-    bool                    AddCommand                  ( const char* szKey, const char* szCommand, const char* szArguments = NULL, bool bState = true, const char* szResource = NULL, bool bAltKey = false );
+    bool                    AddCommand                  ( const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL , bool bScriptCreated = false, const char* szOriginalScriptKey = NULL );
     bool                    AddCommand                  ( const SBindableKey* pKey, const char* szCommand, const char* szArguments = NULL, bool bState = true );
     bool                    RemoveCommand               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true );
     bool                    RemoveAllCommands           ( const char* szKey, bool bCheckState = false, bool bState = true );
     bool                    RemoveAllCommands           ( void );
-    bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL, const char* szResource = NULL );
+    bool                    CommandExists               ( const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL, const char* szResource = NULL, bool bCheckScriptCreated = false, bool bScriptCreated = false );
     bool                    SetCommandActive            ( const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive, bool checkHitState );
     void                    SetAllCommandsActive        ( const char* szResource, bool bActive, const char* szCommand = NULL, bool bState = true, const char* szArguments = NULL, bool checkHitState = false );
     CCommandBind*           GetBindFromCommand          ( const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true, const char* szKey = NULL, bool bCheckHitState = false, bool bState = NULL );
     bool                    GetBoundCommands            ( const char* szCommand, std::list < CCommandBind * > & commandsList );
-    
+    void                    UserChangeCommandBoundKey   ( CCommandBind* pBind, const SBindableKey* pNewBoundKey );
+    void                    UserRemoveCommandBoundKey   ( CCommandBind* pBind );
+    CCommandBind*           FindMatchingUpBind          ( CCommandBind* pBind );
+    CCommandBind*           FindCommandMatch            ( const char* szKey, const char* szCommand, const char* szArguments, const char* szResource, const char* szOriginalScriptKey, bool bCheckState, bool bState, bool bCheckScriptCreated, bool bScriptCreated );
+    void                    SortCommandBinds            ( void );
+
     // Control-bind funcs
     bool                    AddGTAControl               ( const char* szKey, const char* szControl );
     bool                    AddGTAControl               ( const SBindableKey* pKey, SBindableGTAControl* pControl );

@@ -2035,24 +2035,24 @@ void CSettings::ProcessKeyBinds ( void )
                     // If the primary key is different than the original one
                     if ( pPriKey != pBind->boundKey ) {
                         // Did we have any keys with the same "up" state?
-                        CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                        CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind( pBind );
                         if ( pUpBind )
                         {
-                            pUpBind->boundKey = pPriKey;
+                            pKeyBinds->UserChangeCommandBoundKey( pUpBind, pPriKey );
                         }
 
-                        pBind->boundKey = pPriKey;
+                        pKeyBinds->UserChangeCommandBoundKey( pBind, pPriKey );
                     }
                 }
                 // If the primary key field was empty, we can remove the keybind
                 else {
                     // Remove any matching "up" state binds we may have
-                    CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                    CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind( pBind );
                     if ( pUpBind )
                     {
-                        pKeyBinds->Remove ( pUpBind );
+                        pKeyBinds->UserRemoveCommandBoundKey( pUpBind );
                     }
-                    pKeyBinds->Remove ( pBind );
+                    pKeyBinds->UserRemoveCommandBoundKey( pBind );
                 }
             }
             // If there was no keybind for this command, create it
@@ -2077,24 +2077,24 @@ void CSettings::ProcessKeyBinds ( void )
                         if ( pSecKeys[k] != pBind->boundKey )
                         {
                             // Did we have any keys with the same "up" state?
-                            CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                            CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind ( pBind );
                             if ( pUpBind )
                             {
-                                pUpBind->boundKey = pSecKeys[k];
+                                pKeyBinds->UserChangeCommandBoundKey( pUpBind, pSecKeys[k] );
                             }
-                            pBind->boundKey = pSecKeys[k];
+                            pKeyBinds->UserChangeCommandBoundKey( pBind, pSecKeys[k] );
                         }
                     }
                     // If the secondary key field was empty, we should remove the keybind
                     else
                     {
                         // Remove any matching "up" state binds we may have
-                        CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                        CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind ( pBind );
                         if ( pUpBind )
                         {
-                             pKeyBinds->Remove ( pUpBind );
+                            pKeyBinds->UserRemoveCommandBoundKey( pUpBind );
                         }
-                        pKeyBinds->Remove ( pBind );
+                        pKeyBinds->UserRemoveCommandBoundKey( pBind );
                     }
                 }
                 // If this key bind didn't exist, create it
@@ -2103,13 +2103,13 @@ void CSettings::ProcessKeyBinds ( void )
                     if ( strResource.empty() )
                         pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
                     else
-                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, szArguments, true, strResource.c_str (), true );
+                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, szArguments, true, strResource.c_str () );
 
                     // Also add a matching "up" state if applicable
                     CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pPriKey->szKey, true, false );
                     if ( pUpBind )
                     {
-                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource, true );
+                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource );
                     }
                 }
             }
@@ -2236,6 +2236,8 @@ void CSettings::Initialize ( void )
         (*iters)->rowCount = 0;
     }
  
+    pKeyBinds->SortCommandBinds();
+
     // Loop through all the available controls
     int i;
     for ( i = 0 ; *g_bcControls [ i ].szControl != NULL ; i++ );
