@@ -177,7 +177,7 @@ CCredits::CCredits ( void )
                               "tinygettext (http://code.google.com/p/tinygettext/)\n"
                               "PortAudio (http://www.portaudio.com/)\n"
                               "speex (http://www.speex.org/)\n"
-                              "Awesomium (http://www.awesomium.com/)\n"
+                              "CEF (https://code.google.com/p/chromiumembedded/)\n"
                               ;
 
     // Create our window

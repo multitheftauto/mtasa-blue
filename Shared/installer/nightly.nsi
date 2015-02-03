@@ -43,7 +43,7 @@ Var ShowLastUsed
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
-	;!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
+	!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
 	!define FILES_ROOT "Install files builder/output"
 	!define SERVER_FILES_ROOT "Install files builder/output/server"
 	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
