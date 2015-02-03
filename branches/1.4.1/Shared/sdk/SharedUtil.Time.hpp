@@ -14,6 +14,7 @@
     #include "sys/time.h"
 #endif
 
+static CCriticalSection ms_criticalSection;
 unsigned long GetTickCountInternal ( void );
 
 // Not multithread safe
@@ -48,10 +49,9 @@ uint GetTickCount32ST ( void )
 //
 uint SharedUtil::GetTickCount32 ( void )
 {
-    static CCriticalSection criticalSection;
-    criticalSection.Lock ();
+    ms_criticalSection.Lock ();
     uint uiResult = GetTickCount32ST();
-    criticalSection.Unlock ();
+    ms_criticalSection.Unlock ();
     return uiResult;
 }
 
@@ -65,8 +65,7 @@ uint SharedUtil::GetTickCount32 ( void )
 //
 long long SharedUtil::GetTickCount64_ ( void )
 {
-    static CCriticalSection criticalSection;
-    criticalSection.Lock ();
+    ms_criticalSection.Lock ();
 
     static long long llCurrent = GetTickCount32ST();
     static uint uiWas      = GetTickCount32ST ();
@@ -78,7 +77,7 @@ long long SharedUtil::GetTickCount64_ ( void )
     llCurrent += uiDelta;
 
     long long llResult = llCurrent;
-    criticalSection.Unlock ();
+    ms_criticalSection.Unlock ();
     return llResult;
 }
 
