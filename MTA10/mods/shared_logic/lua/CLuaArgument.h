@@ -50,6 +50,7 @@ public:
     void                    ReadElement         ( CClientEntity* pElement );
     void                    ReadScriptID        ( uint uiScriptID );
     void                    ReadElementID       ( ElementID ID );
+    void                    ReadTable           ( class CLuaArguments * table );
 
     void                    Push                ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int > * pKnownTables = NULL ) const;
 

@@ -40,6 +40,7 @@ public:
     virtual void                QueueScreenShot                 ( uint uiSizeX, uint uiSizeY, uint uiQuality, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback );
     virtual void                ClearScreenShotQueue            ( void );
     virtual bool                GetBackBufferPixels             ( uint uiSizeX, uint uiSizeY, CBuffer& buffer, SString& strOutError );
+    virtual bool                IsQueueEmpty                    ( void );
 
     // CScreenGrabber
     void                        ProcessScreenShotQueue          ( void );
@@ -292,4 +293,17 @@ void CScreenGrabber::ClearScreenShotQueue ( void )
     if ( m_pCompressJobData )
         m_pCompressorJobQueue->PollCommand ( m_pCompressJobData, -1 );
     m_pCompressJobData = NULL;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CScreenGrabber::IsQueueEmpty
+//
+// Checks whether the queue is empty
+//
+////////////////////////////////////////////////////////////////
+bool CScreenGrabber::IsQueueEmpty ( void )
+{
+    return m_ScreenShotQueue.empty ();
 }

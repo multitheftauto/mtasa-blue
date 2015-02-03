@@ -43,7 +43,7 @@ Var ShowLastUsed
 
 ; ###########################################################################################################
 !ifndef FILES_ROOT
-	!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
+	;!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
 	!define FILES_ROOT "Install files builder/output"
 	!define SERVER_FILES_ROOT "Install files builder/output/server"
 	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
@@ -625,6 +625,16 @@ DontInstallRedistVC12:
         SetOutPath "$INSTDIR\MTA\cgui\images"
         File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\busy_spinner.png"
         File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\rect_edge.png"
+		
+		SetOutPath "$INSTDIR\MTA"
+		File "${FILES_ROOT}\MTA San Andreas\mta\libcef.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\icudtl.dat"
+		
+		SetOutPath "$INSTDIR\MTA\CEF"
+		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher.exe"
+		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef.pak"
+		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_100_percent.pak"
+		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_200_percent.pak"
 
 
 		${If} "$(LANGUAGE_CODE)" != ""
@@ -646,6 +656,13 @@ DontInstallRedistVC12:
 			File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 			File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
+
+			File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\ffmpegsumo.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\wow_helper.exe"
 
             SetOutPath "$INSTDIR\skins\Classic"
             File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"

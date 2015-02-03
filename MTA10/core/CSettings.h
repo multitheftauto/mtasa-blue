@@ -138,6 +138,7 @@ public:
 
     void                RequestNewNickname      ( void );
     void                ShowRestartQuestion     ( void );
+    void                ShowDisconnectQuestion  ( void );
 
     void                TabSkip                 ( bool bBackwards );
 
@@ -317,6 +318,22 @@ protected:
     CGUIEdit*           m_pChatLineLife;
     CGUIEdit*           m_pChatLineFadeout;
 
+    CGUILabel*          m_pLabelBrowserGeneral;
+    CGUICheckBox*       m_pCheckBoxRemoteBrowser;
+    CGUICheckBox*       m_pCheckBoxRemoteJavascript;
+    CGUICheckBox*       m_pCheckBoxBrowserPluginsEnabled;
+    CGUILabel*          m_pLabelBrowserCustomBlacklist;
+    CGUIEdit*           m_pEditBrowserBlacklistAdd;
+    CGUIButton*         m_pButtonBrowserBlacklistAdd;
+    CGUIGridList*       m_pGridBrowserBlacklist;
+    CGUIButton*         m_pButtonBrowserBlacklistRemove;
+    CGUILabel*          m_pLabelBrowserCustomWhitelist;
+    CGUIEdit*           m_pEditBrowserWhitelistAdd;
+    CGUIButton*         m_pButtonBrowserWhitelistAdd;
+    CGUIGridList*       m_pGridBrowserWhitelist;
+    CGUIButton*         m_pButtonBrowserWhitelistRemove;
+    bool                m_bBrowserListsChanged;
+
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );
     bool                OnAudioDefaultClick     ( CGUIElement* pElement );
@@ -343,6 +360,10 @@ protected:
     bool                OnUpdateButtonClick     ( CGUIElement* pElement );
     bool                OnMouseSensitivityChanged ( CGUIElement* pElement );
     bool                OnVerticalAimSensitivityChanged ( CGUIElement* pElement );
+    bool                OnBrowserBlacklistAdd   ( CGUIElement* pElement );
+    bool                OnBrowserBlacklistRemove( CGUIElement* pElement );
+    bool                OnBrowserWhitelistAdd   ( CGUIElement* pElement );
+    bool                OnBrowserWhitelistRemove( CGUIElement* pElement );
 
     bool                OnMouseDoubleClick      ( CGUIMouseEventArgs Args );
 

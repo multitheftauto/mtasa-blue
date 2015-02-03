@@ -2890,6 +2890,17 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientObjectDamage", "loss, attacker", NULL, false );
     m_Events.AddEvent ( "onClientObjectBreak", "attacker", NULL, false );
 
+    // Web events
+    m_Events.AddEvent ( "onClientBrowserRequestsChange", "newPages", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserCreated", "", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserDocumentReady", "url", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserLoadingFailed", "url, errorcode, errordescription", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserNavigate", "url, mainframe", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserPopup", "targeturl, openerurl, ispopup", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserCursorChange", "cursor", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserTooltip", "text", NULL, false );
+    m_Events.AddEvent ( "onClientBrowserInputFocusChanged", "gainedfocus", NULL, false );
+
     // Misc events
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
     
@@ -6323,6 +6334,8 @@ void CClientGame::SetDevelopmentMode ( bool bEnable )
         g_pGame->GetAudio ()->SetWorldSoundHandler ( CClientGame::StaticWorldSoundHandler );
     else
         g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
+
+    g_pCore->GetWebCore()->SetTestModeEnabled ( bEnable );
 }
 
 
@@ -6601,4 +6614,20 @@ void CClientGame::SetFileCacheRoot ( void )
         else
             AddReportLog( 7413, SString( "CClientGame::SetFileCacheRoot - Change shared from '%s' to '%s'", *strFileCachePath, *m_strFileCacheRoot ) );
     }
+}
+
+bool CClientGame::TriggerBrowserRequestResultEvent ( const std::vector<SString>& newPages )
+{
+    CLuaArguments Arguments;
+    CLuaArguments LuaTable;
+    int i = 0;
+
+    for ( std::vector<SString>::const_iterator iter = newPages.begin (); iter != newPages.end (); ++iter )
+    {
+        LuaTable.PushNumber ( ++i );
+        LuaTable.PushString ( *iter );
+    }
+    Arguments.PushTable ( &LuaTable );
+
+    return GetRootEntity ()->CallEvent ( "onClientBrowserRequestsChange", Arguments, false );
 }

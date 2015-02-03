@@ -1016,6 +1016,24 @@ public:
     LUA_DECLARE ( BitExtract );
     LUA_DECLARE ( BitReplace );
 
+    // Webbrowser functions
+    LUA_DECLARE ( CreateBrowser );
+    LUA_DECLARE ( RequestBrowserDomains );
+    LUA_DECLARE ( LoadBrowserURL );
+    LUA_DECLARE ( IsBrowserLoading );
+    LUA_DECLARE ( InjectBrowserMouseMove );
+    LUA_DECLARE ( InjectBrowserMouseDown );
+    LUA_DECLARE ( InjectBrowserMouseUp );
+    LUA_DECLARE ( InjectBrowserMouseWheel );
+    LUA_DECLARE ( GetBrowserTitle );
+    LUA_DECLARE ( GetBrowserURL );
+    LUA_DECLARE ( SetBrowserRenderingPaused );
+    LUA_DECLARE ( ExecuteBrowserJavascript );
+    LUA_DECLARE ( SetBrowserVolume );
+    LUA_DECLARE ( IsBrowserDomainBlocked );
+    LUA_DECLARE ( FocusBrowser );
+    LUA_DECLARE ( IsBrowserFocused );
+
 private:
     // Static references to objects
     static CLuaManager*                 m_pLuaManager;

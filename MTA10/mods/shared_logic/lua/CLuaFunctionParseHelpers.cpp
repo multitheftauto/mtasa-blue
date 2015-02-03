@@ -438,6 +438,12 @@ IMPLEMENT_ENUM_BEGIN( EComponentBase::EComponentBaseType )
     ADD_ENUM( EComponentBaseType::PARENT,   "parent" )
 IMPLEMENT_ENUM_END( "component-base" )
 
+IMPLEMENT_ENUM_BEGIN(eWebBrowserMouseButton)
+    ADD_ENUM(BROWSER_MOUSEBUTTON_LEFT, "left")
+    ADD_ENUM(BROWSER_MOUSEBUTTON_MIDDLE, "middle")
+    ADD_ENUM(BROWSER_MOUSEBUTTON_RIGHT, "right")
+IMPLEMENT_ENUM_END("webbrowser-mouse-button")
+
 //
 // Get best guess at name of userdata type
 //

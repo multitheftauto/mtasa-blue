@@ -136,6 +136,7 @@ public:
     void                            AddDxShaderClass        ( lua_State* luaVM );
     void                            AddDxScreenSourceClass  ( lua_State* luaVM );
     void                            AddDxRenderTargetClass  ( lua_State* luaVM );
+    void                            AddBrowserClass         ( lua_State* luaVM );
     
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );

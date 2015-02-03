@@ -434,6 +434,8 @@ public:
     void                                ChangeFloatPrecision            ( bool bHigh );
     bool                                IsHighFloatPrecision            ( void ) const;
 
+    bool                                TriggerBrowserRequestResultEvent( const std::vector<SString>& newPages );
+
 private:
 
     // CGUI Callbacks

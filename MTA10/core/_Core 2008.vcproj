@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib;../../vendor/tinygettext"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib;../../vendor/tinygettext;../../vendor/awesomium/include"
 				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				BasicRuntimeChecks="3"
@@ -77,12 +77,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib_d.lib libpng_d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthread_d.lib jpeg_d.lib Psapi.lib xinput.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib_d.lib libpng_d.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib winmm.lib Imagehlp.lib ws2_32.lib gdi32.lib Userenv.lib Imm32.lib pthread_d.lib jpeg_d.lib Psapi.lib xinput.lib awesomium.lib"
 				ShowProgress="0"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\mta\core_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;../../vendor/pthreads/x86/$(ConfigurationName);&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;&quot;../../vendor/pthreads/x86/$(ConfigurationName)&quot;;&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;;../../vendor/awesomium/build/lib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
@@ -149,7 +149,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib;../../vendor/tinygettext"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib;../../vendor/tinygettext;../../vendor/awesomium/include"
 				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -176,11 +176,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthread.lib jpeg.lib Psapi.lib xinput.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthread.lib jpeg.lib Psapi.lib xinput.lib awesomium.lib"
 				OutputFile="C:\Program Files\MTA San Andreas 1.4\MTA\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;../../vendor/pthreads/x86/$(ConfigurationName);&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;&quot;../../vendor/pthreads/x86/$(ConfigurationName)&quot;;&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;;../../vendor/awesomium/build/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
@@ -249,7 +249,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib;../../vendor/tinygettext"
+				AdditionalIncludeDirectories=".;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;&quot;../../vendor/jpeg/jpeg-8d&quot;;../../vendor/zlib;../../vendor/tinygettext;../../vendor/awesomium/include"
 				PreprocessorDefinitions="_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -276,11 +276,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthread.lib jpeg.lib Psapi.lib xinput.lib"
+				AdditionalDependencies="strmiids.lib libv2.lib zlib.lib libpng.lib odbc32.lib odbccp32.lib dinput8.lib dxguid.lib shlwapi.lib d3dx9.lib wsock32.lib winmm.lib Imagehlp.lib gdi32.lib Userenv.lib Imm32.lib pthread.lib jpeg.lib Psapi.lib xinput.lib awesomium.lib"
 				OutputFile="..\..\output\MTA San Andreas\mta\core.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;../../vendor/pthreads/x86/$(ConfigurationName);&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="../../Shared/XML;../../vendor/libv2/lib;&quot;../../vendor/libpng/x86/$(ConfigurationName)&quot;;&quot;../../vendor/zlib/x86/$(ConfigurationName)&quot;;../../vendor/detours/lib;&quot;../../vendor/pthreads/x86/$(ConfigurationName)&quot;;&quot;../../vendor/jpeg/x86/$(ConfigurationName)&quot;;../../vendor/awesomium/build/lib"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../symbols/$(ConfigurationName)_$(SafeParentName).pdb"
@@ -655,6 +655,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderItem.WebBrowser.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CRenderItemManager.cpp"
 				>
 			</File>
@@ -716,6 +720,18 @@
 			</File>
 			<File
 				RelativePath=".\CVideoModeManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CWebCore.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CWebsiteRequests.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CWebView.cpp"
 				>
 			</File>
 			<File
@@ -1344,11 +1360,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CWebCore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWebsiteRequests.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWebView.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CXfireQuery.h"
 				>
 			</File>
 			<File
 				RelativePath=".\StdInc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WebBrowserHelpers.h"
 				>
 			</File>
 			<File
@@ -1467,6 +1499,10 @@
 					</File>
 					<File
 						RelativePath="..\sdk\core\CSetCursorPosHookInterface.h"
+						>
+					</File>
+					<File
+						RelativePath="..\sdk\core\CWebBrowserEventsInterface.h"
 						>
 					</File>
 				</Filter>

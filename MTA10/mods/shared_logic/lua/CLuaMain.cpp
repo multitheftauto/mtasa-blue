@@ -1620,6 +1620,38 @@ void CLuaMain::AddDxRenderTargetClass ( lua_State* luaVM )
 }
 
 
+void CLuaMain::AddBrowserClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "createBrowser" );
+    lua_classfunction ( luaVM, "loadURL", "loadBrowserURL" );
+    lua_classfunction ( luaVM, "isLoading", "isBrowserLoading" );
+    lua_classfunction ( luaVM, "injectMouseMove", "injectBrowserMouseMove" );
+    lua_classfunction ( luaVM, "injectMouseDown", "injectBrowserMouseDown" );
+    lua_classfunction ( luaVM, "injectMouseUp", "injectBrowserMouseUp" );
+    lua_classfunction ( luaVM, "injectMouseWheel", "injectBrowserMouseWheel" );
+    lua_classfunction ( luaVM, "getTitle", "getBrowserTitle" );
+    lua_classfunction ( luaVM, "getURL", "getBrowserURL" );
+    lua_classfunction ( luaVM, "setRenderingPaused", "setBrowserRenderingPaused" );
+    lua_classfunction ( luaVM, "executeJavascript", "executeBrowserJavascript" );
+    lua_classfunction ( luaVM, "setVolume", "setBrowserVolume" );
+    lua_classfunction ( luaVM, "focus", "focusBrowser" );
+    lua_classfunction ( luaVM, "isFocused", "isBrowserFocused" );
+
+    lua_classfunction ( luaVM, "requestDomains", "requestBrowserDomains" );
+    lua_classfunction ( luaVM, "isDomainBlocked", "isBrowserDomainBlocked" );
+
+    lua_classvariable ( luaVM, "url", "loadBrowserURL", "getBrowserURL" );
+    lua_classvariable ( luaVM, "loading", NULL, "isBrowserLoading ");
+    lua_classvariable ( luaVM, "title", NULL, "getBrowserTitle" );
+    lua_classvariable ( luaVM, "renderingPaused", "setBrowserRenderingPaused", NULL );
+    lua_classvariable ( luaVM, "volume", "setBrowserVolume", NULL );
+    
+    lua_registerclass ( luaVM, "Browser", "DxTexture" );
+}
+
+
 void CLuaMain::AddVector4DClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1854,6 +1886,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddDxShaderClass            ( luaVM );
     AddDxScreenSourceClass      ( luaVM );
     AddDxRenderTargetClass      ( luaVM );
+    AddBrowserClass             ( luaVM );
     
     AddCameraClass              ( luaVM );
 }

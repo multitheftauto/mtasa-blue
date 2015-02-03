@@ -31,6 +31,7 @@ public:
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask );
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false );
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY );
+    virtual CWebBrowserItem*    CreateWebBrowser                    ( uint uiSizeX, uint uiSizeY );
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear );
     virtual void                EnableSetRenderTargetOldVer         ( bool bEnable );
     virtual bool                IsSetRenderTargetEnabledOldVer      ( void );

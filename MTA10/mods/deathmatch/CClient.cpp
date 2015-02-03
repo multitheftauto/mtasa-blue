@@ -262,6 +262,15 @@ void CClient::IdleHandler ( void )
 }
 
 
+bool CClient::WebsiteRequestResultHandler ( const std::vector<SString>& newPages )
+{
+    if ( g_pClientGame )
+        return g_pClientGame->TriggerBrowserRequestResultEvent ( newPages );
+
+    return false;
+}
+
+
 bool CClient::ProcessCommand ( const char* szCommandLine )
 {
     return false;

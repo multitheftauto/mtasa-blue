@@ -40,6 +40,7 @@ DECLARE_ENUM( eAudioLookupIndex );
 DECLARE_ENUM( eAspectRatio );
 DECLARE_ENUM( eRadioStreamIndex );
 DECLARE_ENUM( EComponentBase::EComponentBaseType );
+DECLARE_ENUM( eWebBrowserMouseButton );
 
 enum eDXHorizontalAlign
 {

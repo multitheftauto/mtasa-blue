@@ -929,6 +929,12 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.PointLights.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp">
+      <Filter>Source Files\shared_logic\lua</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CClient.h">
@@ -1640,6 +1646,9 @@
       <Filter>Header Files\shared_logic</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\CClientPointLightsManager.h">
+      <Filter>Header Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientWebBrowser.h">
       <Filter>Header Files\shared_logic</Filter>
     </ClInclude>
   </ItemGroup>

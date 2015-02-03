@@ -32,6 +32,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <iomanip>
+#include <functional>
 
 
 // Localization
@@ -70,3 +71,4 @@
 #include "CMemStats.h"
 #include "CGraphStats.h"
 #include "CNickGen.h"
+#include "CWebView.h"
