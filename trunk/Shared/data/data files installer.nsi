@@ -142,6 +142,13 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\vvo.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\vvof.dll"
+	
+	File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\ffmpegsumo.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\wow_helper.exe"
 
 	SetOutPath "$INSTDIR\skins\Classic"
     File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"

@@ -127,6 +127,7 @@ CCore::CCore ( void )
     m_pGraphics                 = new CGraphics ( m_pLocalGUI );
     g_pGraphics                 = m_pGraphics;
     m_pGUI                      = NULL;
+    m_pWebCore                  = NULL;
 
     // Create the mod manager
     m_pModManager               = new CModManager;
@@ -225,6 +226,9 @@ CCore::~CCore ( void )
     // Delete the GUI manager    
     delete m_pLocalGUI;
     delete m_pGraphics;
+
+    // Delete the web
+    delete m_pWebCore;
 
     // Delete lazy subsystems
     DestroyGUI ();
@@ -1133,6 +1137,17 @@ void CCore::DestroyNetwork ( )
 }
 
 
+void CCore::InitialiseWeb ()
+{
+    // Don't initialise webcore twice
+    if ( m_pWebCore )
+        return;
+
+    m_pWebCore = new CWebCore;
+    m_pWebCore->Initialise ();
+}
+
+
 void CCore::UpdateIsWindowMinimized ( void )
 {
     m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
@@ -1295,6 +1310,9 @@ void CCore::DoPostFramePulse ( )
     GetJoystickManager ()->DoPulse ();      // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse ();
 
+    if ( m_pWebCore )
+        m_pWebCore->DoPulse ();
+
     // Notify the mod manager and the connect manager
     TIMING_CHECKPOINT( "-CorePostFrame1" );
     m_pModManager->DoPulsePostFrame ();
@@ -1353,6 +1371,9 @@ void CCore::OnModUnload ( )
 
     // Reset client script frame rate limit
     m_uiClientScriptFrameRateLimit = 0;
+
+    // Clear web whitelist
+    m_pWebCore->ResetFilter ();
 }
 
 

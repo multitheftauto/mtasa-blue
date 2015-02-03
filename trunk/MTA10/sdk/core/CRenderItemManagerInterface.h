@@ -29,6 +29,7 @@ class CShaderItem;
 class CShaderInstance;
 class CRenderTargetItem;
 class CScreenSourceItem;
+class CWebBrowserItem;
 class CRenderItemManager;
 class CD3DDUMMY;
 class CEffectCloner;
@@ -37,6 +38,7 @@ class CClientEntityBase;
 struct SShaderItemLayers;
 typedef CShaderItem CSHADERDUMMY;
 enum eAspectRatio;
+class CWebViewInterface;
 
 #define RDEFAULT            ((uint) -1)
 
@@ -139,6 +141,7 @@ public:
     virtual CShaderItem*        CreateShader                        ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask ) = 0;
     virtual CRenderTargetItem*  CreateRenderTarget                  ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false ) = 0;
     virtual CScreenSourceItem*  CreateScreenSource                  ( uint uiSizeX, uint uiSizeY ) = 0;
+    virtual CWebBrowserItem*    CreateWebBrowser                    ( uint uiSizeX, uint uiSizeY ) = 0;
     virtual bool                SetRenderTarget                     ( CRenderTargetItem* pItem, bool bClear ) = 0;
     virtual void                EnableSetRenderTargetOldVer         ( bool bEnable ) = 0;
     virtual bool                IsSetRenderTargetEnabledOldVer      ( void ) = 0;
@@ -218,6 +221,7 @@ enum eRenderItemClassTypes
     CLASS_CFileTextureItem,
     CLASS_CRenderTargetItem,
     CLASS_CScreenSourceItem,
+    CLASS_CWebBrowserItem,
 };
 
 
@@ -503,4 +507,24 @@ class CScreenSourceItem : public CTextureItem
 
     IDirect3DSurface9*  m_pD3DRenderTargetSurface;
     uint                m_uiRevision;
+};
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// CWebBrowserItem - webbrowser texture
+//
+class CWebBrowserItem : public CTextureItem
+{
+    DECLARE_CLASS(CWebBrowserItem, CTextureItem)
+                    CWebBrowserItem         ( void ) : ClassInit ( this ) {}
+    virtual void    PostConstruct           ( CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY );
+    virtual void    PreDestruct             ( void );
+    virtual bool    IsValid                 ( void );
+    virtual void    OnLostDevice            ( void );
+    virtual void    OnResetDevice           ( void );
+    void            CreateUnderlyingData    ( void );
+    void            ReleaseUnderlyingData   ( void );
+
+    IDirect3DSurface9*    m_pD3DRenderTargetSurface;
 };

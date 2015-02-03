@@ -27,6 +27,7 @@ namespace EDownloadMode
         RESOURCE_INITIAL_FILES,
         RESOURCE_SINGULAR_FILES,
         CALL_REMOTE,
+        WEBBROWSER_LISTS,
     };
 }
 using EDownloadMode::EDownloadModeType;

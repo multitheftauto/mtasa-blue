@@ -31,6 +31,8 @@ public:
     void        PostFrameExecutionHandler       ( void );
     void        IdleHandler                     ( void );
 
+    bool        WebsiteRequestResultHandler     ( const std::vector<SString>& newPages );
+
     bool        ProcessCommand                  ( const char* szCommandLine );
     //bool        ProcessInput                    ( CInputMessage* pInputMessage );
 

@@ -204,6 +204,33 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::CreateWebBrowser
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CWebBrowserItem* CRenderItemManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY )
+{
+    if ( !CanCreateRenderItem ( CWebBrowserItem::GetClassId () ) )
+        return NULL;
+
+    CWebBrowserItem* pWebBrowserItem = new CWebBrowserItem;
+    pWebBrowserItem->PostConstruct ( this, uiSizeX, uiSizeY );
+
+    if ( !pWebBrowserItem->IsValid () )
+    {
+        SAFE_RELEASE ( pWebBrowserItem );
+        return NULL;
+    }
+
+    UpdateMemoryUsage ();
+
+    return pWebBrowserItem;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::CreateShader
 //
 // Create a D3DX effect from .fx file

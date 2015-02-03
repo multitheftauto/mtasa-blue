@@ -86,7 +86,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/cef3/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -110,10 +110,10 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib_d.lib;libpng_d.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;winmm.lib;Imagehlp.lib;ws2_32.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread_d.lib;jpeg_d.lib;Psapi.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib_d.lib;libpng_d.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;winmm.lib;Imagehlp.lib;ws2_32.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread_d.lib;jpeg_d.lib;Psapi.lib;xinput.lib;libcef.lib;..\..\vendor\cef3\out\Debug\lib\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);../../vendor/cef3/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <MapFileName />
@@ -135,7 +135,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/cef3/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -154,9 +154,9 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib.lib;libpng.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;wsock32.lib;winmm.lib;Imagehlp.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread.lib;jpeg.lib;Psapi.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib.lib;libpng.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;wsock32.lib;winmm.lib;Imagehlp.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread.lib;jpeg.lib;Psapi.lib;xinput.lib;libcef.lib;..\..\vendor\cef3\out\Release\lib\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);../../vendor/cef3/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(SolutionDir)/../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
@@ -181,7 +181,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/awesomium/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -301,6 +301,7 @@
     <ClCompile Include="CRenderItem.ScreenSource.cpp" />
     <ClCompile Include="CRenderItem.Shader.cpp" />
     <ClCompile Include="CRenderItem.ShaderInstance.cpp" />
+    <ClCompile Include="CRenderItem.WebBrowser.cpp" />
     <ClCompile Include="CRenderItemManager.cpp" />
     <ClCompile Include="CRenderItemManager.TextureReplace.cpp" />
     <ClCompile Include="CScreenGrabber.cpp" />
@@ -317,6 +318,9 @@
     <ClCompile Include="CVersionUpdater.cpp" />
     <ClCompile Include="CVertexStreamBoundingBoxManager.cpp" />
     <ClCompile Include="CVideoModeManager.cpp" />
+    <ClCompile Include="CWebCore.cpp" />
+    <ClCompile Include="CWebsiteRequests.cpp" />
+    <ClCompile Include="CWebView.cpp" />
     <ClCompile Include="CXfireQuery.cpp" />
     <ClCompile Include="StdInc.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -394,6 +398,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\sdk\core\CWebBrowserEventsInterface.h" />
+    <ClInclude Include="..\sdk\core\CWebCoreInterface.h" />
+    <ClInclude Include="..\sdk\core\CWebViewInterface.h" />
     <ClInclude Include="CAdditionalVertexStreamManager.h" />
     <ClInclude Include="CAspectRatioConverter.h" />
     <ClInclude Include="CChat.h" />
@@ -477,8 +484,12 @@
     <ClInclude Include="CVersionUpdater.Util.hpp" />
     <ClInclude Include="CVertexStreamBoundingBoxManager.h" />
     <ClInclude Include="CVideoModeManager.h" />
+    <ClInclude Include="CWebCore.h" />
+    <ClInclude Include="CWebsiteRequests.h" />
+    <ClInclude Include="CWebView.h" />
     <ClInclude Include="CXfireQuery.h" />
     <ClInclude Include="StdInc.h" />
+    <ClInclude Include="WebBrowserHelpers.h" />
     <ClInclude Include="xfire.h" />
     <ClInclude Include="tracking\CHTTPClient.h" />
     <ClInclude Include="tracking\CHTTPResponse.h" />

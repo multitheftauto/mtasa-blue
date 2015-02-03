@@ -301,6 +301,9 @@ CKeyBinds::~CKeyBinds ( void )
 
 bool CKeyBinds::ProcessMessage ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+    if ( g_pCore->GetWebCore () && !m_pCore->IsMenuVisible() && !m_pCore->GetConsole()->IsVisible() && !m_pCore->IsChatInputEnabled() )
+        g_pCore->GetWebCore ()->ProcessInputMessage ( uMsg, wParam, lParam );
+
     // Don't process Shift keys here, we have a hack for that
     if ( wParam == 0x10 &&
         ( uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP ) )

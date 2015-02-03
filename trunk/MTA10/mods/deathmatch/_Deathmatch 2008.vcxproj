@@ -371,6 +371,8 @@
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp" />
+    <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp" />
+    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp" />
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCommands.cpp" />
@@ -759,6 +761,7 @@
     <ClInclude Include="..\shared_logic\lua\CLuaVector2.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaVector3.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaVector4.h" />
+    <ClInclude Include="..\shared_logic\CClientWebBrowser.h" />
     <ClInclude Include="CClient.h" />
     <ClInclude Include="ClientCommands.h" />
     <ClInclude Include="CVoiceRecorder.h" />
