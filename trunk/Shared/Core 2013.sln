@@ -738,7 +738,6 @@ Global
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Nightly|Win32.ActiveCfg = Nightly|Win32
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Nightly|Win32.Build.0 = Nightly|Win32
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Nightly|x64.ActiveCfg = Release|x64
-		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Nightly|x64.Build.0 = Release|x64
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Release client only|Win32.ActiveCfg = Release|Win32
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Release client only|Win32.Build.0 = Release|Win32
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Release client only|x64.ActiveCfg = Release|x64
