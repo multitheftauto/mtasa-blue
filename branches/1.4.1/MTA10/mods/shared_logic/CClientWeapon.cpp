@@ -446,12 +446,7 @@ void CClientWeapon::FireInstantHit ( CVector vecOrigin, CVector vecTarget, bool 
         m_pMarker2->SetPosition ( vecTarget );
 #endif
         m_pWeapon->DoBulletImpact ( m_pObject, pEntity, &vecOrigin, &vecTarget, pColPoint, 0 );
-        if ( pColEntity && pColEntity->GetEntityType () == ENTITY_TYPE_PED )
-        {
-            ePedPieceTypes hitZone = ( ePedPieceTypes ) pColPoint->GetPieceTypeB ();
-            short sDamage = m_pWeaponInfo->GetDamagePerHit ();
-            m_pWeapon->GenerateDamageEvent ( dynamic_cast < CPed * > ( pColEntity ), m_pObject, m_Type, sDamage, hitZone, 0 );
-        }
+
         if ( !IsLocalEntity ( ) && m_pOwner )
         {
             CClientPed * pPed = m_pOwner;

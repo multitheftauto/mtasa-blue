@@ -214,6 +214,8 @@ protected:
     CGUIComboBox*       m_pBrowserSpeedCombo;
     CGUILabel*          m_pSingleDownloadLabel;
     CGUIComboBox*       m_pSingleDownloadCombo;
+    CGUILabel*          m_pPacketTagLabel;
+    CGUIComboBox*       m_pPacketTagCombo;
     CGUILabel*          m_pDebugSettingLabel;
     CGUIComboBox*       m_pDebugSettingCombo;
     CGUILabel*          m_pWin8Label;

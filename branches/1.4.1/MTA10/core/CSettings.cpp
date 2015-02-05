@@ -1100,18 +1100,21 @@ void CSettings::CreateGUI ( void )
      **/
     vecTemp = CVector2D ( 12.f, 12.f );
     float fComboWidth = 170.f;
+    float fHeaderHeight = 20;
+    float fLineHeight = 27;
 
     // Misc section label
     m_pAdvancedMiscLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Misc") ) );
     m_pAdvancedMiscLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pAdvancedMiscLabel->SetFont ( "default-bold-small" );
     m_pAdvancedMiscLabel->AutoSize ( );
-    vecTemp.fY += 20;
+    vecTemp.fY += fHeaderHeight;
 
     fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
         _("Fast CJ clothes loading:"),
         _("Browser speed:"),
         _("Single connection:"),
+        _("Packet tag:"),
         _("Fullscreen mode:"),
         _("Process priority:"),
         _("Debug setting:"),
@@ -1134,7 +1137,7 @@ void CSettings::CreateGUI ( void )
     m_pFastClothesCombo->AddItem ( _("On") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_ON );
     m_pFastClothesCombo->AddItem ( _("Auto") )->SetData ( (void*)CMultiplayer::FAST_CLOTHES_AUTO );
     m_pFastClothesCombo->SetReadOnly ( true );
-    vecTemp.fY += 29;
+    vecTemp.fY += fLineHeight;
 
     // Browser scan speed
     m_pBrowserSpeedLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Browser speed:") ) );
@@ -1161,7 +1164,20 @@ void CSettings::CreateGUI ( void )
     m_pSingleDownloadCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pSingleDownloadCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pSingleDownloadCombo->SetReadOnly ( true );
-    vecTemp.fY += 29;
+    vecTemp.fY += fLineHeight;
+
+    // Packet tag
+    m_pPacketTagLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Packet tag:") ) );
+    m_pPacketTagLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pPacketTagLabel->AutoSize ( );
+
+    m_pPacketTagCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pPacketTagCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+    m_pPacketTagCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
+    m_pPacketTagCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
+    m_pPacketTagCombo->AddItem ( _("On") )->SetData ( (void*)1 );
+    m_pPacketTagCombo->SetReadOnly ( true );
+    vecTemp.fY += fLineHeight;
 
     // Fullscreen mode
     m_pFullscreenStyleLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Fullscreen mode:") ) );
@@ -1175,7 +1191,7 @@ void CSettings::CreateGUI ( void )
     m_pFullscreenStyleCombo->AddItem ( _("Borderless window") )->SetData ( (void*)FULLSCREEN_BORDERLESS );
     m_pFullscreenStyleCombo->AddItem ( _("Borderless keep res") )->SetData ( (void*)FULLSCREEN_BORDERLESS_KEEP_RES );
     m_pFullscreenStyleCombo->SetReadOnly ( true );
-    vecTemp.fY += 29;
+    vecTemp.fY += fLineHeight;
 
     // Process priority
     m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Process priority:" ) );
@@ -1207,7 +1223,7 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->AddItem ( "#0000 Joystick" )->SetData ( (void*)EDiagnosticDebug::JOYSTICK_0000 );
     m_pDebugSettingCombo->AddItem ( "#0000 Lua trace" )->SetData ( (void*)EDiagnosticDebug::LUA_TRACE_0000 );
     m_pDebugSettingCombo->SetReadOnly ( true );
-    vecTemp.fY += 29;
+    vecTemp.fY += fLineHeight;
 
     m_pDebugSettingCombo->SetText ( _("Default") );
     SetApplicationSetting ( "diagnostics", "debug-setting", "none" );
@@ -1237,7 +1253,7 @@ void CSettings::CreateGUI ( void )
     m_pStreamingMemoryMaxLabel->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
     m_pStreamingMemoryMaxLabel->AutoSize ( );
     vecTemp.fX = 22.f;
-    vecTemp.fY += 29;
+    vecTemp.fY += fLineHeight;
 
     // Windows 8 compatibility
     m_pWin8Label = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Windows 8 compatibility:") ) );
@@ -1253,7 +1269,7 @@ void CSettings::CreateGUI ( void )
     m_pWin8MouseCheckBox = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabAdvanced, _("Mouse fix") ) );
     m_pWin8MouseCheckBox->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pWin8MouseCheckBox->AutoSize ( NULL, 20.0f );
-    vecTemp.fY += 29;
+    vecTemp.fY += fLineHeight;
     vecTemp.fX -= 110;
 
     if ( GetApplicationSetting ( "os-version" ) < "6.2" )
@@ -1262,7 +1278,7 @@ void CSettings::CreateGUI ( void )
         m_pWin8Label->SetVisible ( false );
         m_pWin8ColorCheckBox->SetVisible ( false );
         m_pWin8MouseCheckBox->SetVisible ( false );
-        vecTemp.fY -= 29;
+        vecTemp.fY -= fLineHeight;
 #endif
     }
 
@@ -1271,7 +1287,7 @@ void CSettings::CreateGUI ( void )
     m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX - 10.0f, vecTemp.fY ) );
     m_pAdvancedUpdaterLabel->SetFont ( "default-bold-small" );
     m_pAdvancedUpdaterLabel->AutoSize ( _("Auto updater") );
-    vecTemp.fY += 20;
+    vecTemp.fY += fHeaderHeight;
 
     // UpdateAutoInstall
     m_pUpdateAutoInstallLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Install important updates:") ) );
@@ -1284,7 +1300,7 @@ void CSettings::CreateGUI ( void )
     m_pUpdateAutoInstallCombo->AddItem ( _("Off") )->SetData ( (void*)0 );
     m_pUpdateAutoInstallCombo->AddItem ( _("Default") )->SetData ( (void*)1 );
     m_pUpdateAutoInstallCombo->SetReadOnly ( true );
-    vecTemp.fY += 29;
+    vecTemp.fY += fLineHeight;
 
     // Update build type
     m_pUpdateBuildTypeLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Update build type:") ) );
@@ -1306,11 +1322,11 @@ void CSettings::CreateGUI ( void )
     m_pButtonUpdate->AutoSize ( NULL, 20.0f, 8.0f );
     m_pButtonUpdate->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnUpdateButtonClick, this ) );
     m_pButtonUpdate->SetZOrderingEnabled ( false );
-    vecTemp.fY += 29;
+    vecTemp.fY += fLineHeight;
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY = 354;
+    vecTemp.fY = 354 + 10;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "" ) );
     m_pAdvancedSettingDescriptionLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pAdvancedSettingDescriptionLabel->SetFont ( "default-bold-small" );
@@ -1369,6 +1385,12 @@ void CSettings::CreateGUI ( void )
 
     m_pSingleDownloadCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
     m_pSingleDownloadCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pPacketTagLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pPacketTagLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pPacketTagCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pPacketTagCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
 
     m_pFullscreenStyleLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
     m_pFullscreenStyleLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
@@ -2035,24 +2057,24 @@ void CSettings::ProcessKeyBinds ( void )
                     // If the primary key is different than the original one
                     if ( pPriKey != pBind->boundKey ) {
                         // Did we have any keys with the same "up" state?
-                        CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                        CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind( pBind );
                         if ( pUpBind )
                         {
-                            pUpBind->boundKey = pPriKey;
+                            pKeyBinds->UserChangeCommandBoundKey( pUpBind, pPriKey );
                         }
 
-                        pBind->boundKey = pPriKey;
+                        pKeyBinds->UserChangeCommandBoundKey( pBind, pPriKey );
                     }
                 }
                 // If the primary key field was empty, we can remove the keybind
                 else {
                     // Remove any matching "up" state binds we may have
-                    CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                    CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind( pBind );
                     if ( pUpBind )
                     {
-                        pKeyBinds->Remove ( pUpBind );
+                        pKeyBinds->UserRemoveCommandBoundKey( pUpBind );
                     }
-                    pKeyBinds->Remove ( pBind );
+                    pKeyBinds->UserRemoveCommandBoundKey( pBind );
                 }
             }
             // If there was no keybind for this command, create it
@@ -2077,24 +2099,24 @@ void CSettings::ProcessKeyBinds ( void )
                         if ( pSecKeys[k] != pBind->boundKey )
                         {
                             // Did we have any keys with the same "up" state?
-                            CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                            CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind ( pBind );
                             if ( pUpBind )
                             {
-                                pUpBind->boundKey = pSecKeys[k];
+                                pKeyBinds->UserChangeCommandBoundKey( pUpBind, pSecKeys[k] );
                             }
-                            pBind->boundKey = pSecKeys[k];
+                            pKeyBinds->UserChangeCommandBoundKey( pBind, pSecKeys[k] );
                         }
                     }
                     // If the secondary key field was empty, we should remove the keybind
                     else
                     {
                         // Remove any matching "up" state binds we may have
-                        CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pBind->boundKey->szKey, true, false );
+                        CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind ( pBind );
                         if ( pUpBind )
                         {
-                             pKeyBinds->Remove ( pUpBind );
+                            pKeyBinds->UserRemoveCommandBoundKey( pUpBind );
                         }
-                        pKeyBinds->Remove ( pBind );
+                        pKeyBinds->UserRemoveCommandBoundKey( pBind );
                     }
                 }
                 // If this key bind didn't exist, create it
@@ -2103,13 +2125,13 @@ void CSettings::ProcessKeyBinds ( void )
                     if ( strResource.empty() )
                         pKeyBinds->AddCommand ( pSecKeys[k], szCommand, szArguments );
                     else
-                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, szArguments, true, strResource.c_str (), true );
+                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, szArguments, true, strResource.c_str () );
 
                     // Also add a matching "up" state if applicable
                     CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand ( szCommand, NULL, true, pPriKey->szKey, true, false );
                     if ( pUpBind )
                     {
-                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource, true );
+                        pKeyBinds->AddCommand ( pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource );
                     }
                 }
             }
@@ -2236,6 +2258,8 @@ void CSettings::Initialize ( void )
         (*iters)->rowCount = 0;
     }
  
+    pKeyBinds->SortCommandBinds();
+
     // Loop through all the available controls
     int i;
     for ( i = 0 ; *g_bcControls [ i ].szControl != NULL ; i++ );
@@ -2691,6 +2715,11 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pSingleDownloadCombo->SetText ( _("Default") );
     else if ( iVar == 1 ) m_pSingleDownloadCombo->SetText ( _("On") );
 
+    // Packet tag
+    CVARS_GET ( "packet_tag", iVar );
+    if ( iVar == 0 ) m_pPacketTagCombo->SetText ( _("Default") );
+    else if ( iVar == 1 ) m_pPacketTagCombo->SetText ( _("On") );
+
     // Windows 8 16-bit color
     iVar = GetApplicationSettingInt( "Win8Color16" );
     m_pWin8ColorCheckBox->SetSelected ( iVar != 0 );
@@ -2933,6 +2962,13 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "single_download", iSelected );
+    }
+
+    // Packet tag
+    if ( CGUIListItem* pSelected = m_pPacketTagCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "packet_tag", iSelected );
     }
 
     // Windows 8 16-bit color
@@ -3705,6 +3741,8 @@ bool CSettings::OnShowAdvancedSettingDescription ( CGUIElement* pElement )
         strText = std::string( _( "Browser speed:" ) ) + " " + std::string( _( "Older routers may require a slower scan speed." ) );
     else if ( pLabel && pLabel == m_pSingleDownloadLabel || pComboBox && pComboBox == m_pSingleDownloadCombo )
         strText = std::string( _( "Single connection:" ) ) + " " + std::string( _( "Switch on to use only one connection when downloading." ) );
+    else if ( pLabel && pLabel == m_pPacketTagLabel || pComboBox && pComboBox == m_pPacketTagCombo )
+        strText = std::string( _( "Packet tag:" ) ) + " " + std::string( _( "Tag network packets to help ISPs identify MTA traffic." ) );
     else if ( pLabel && pLabel == m_pFullscreenStyleLabel || pComboBox && pComboBox == m_pFullscreenStyleCombo )
         strText = std::string( _( "Fullscreen mode:" ) ) + " " + std::string( _( "Experimental feature." ) );
     else if ( pLabel && pLabel == m_pDebugSettingLabel || pComboBox && pComboBox == m_pDebugSettingCombo )
