@@ -936,6 +936,7 @@ void _declspec(naked) HOOK_CrashFix_Misc28 ()
         test    eax, eax
         jne     cont
 
+        CRASH_AVERTED( 28 )
         // Skip much code
         jmp     RETURN_CrashFix_Misc28B
 
@@ -979,8 +980,46 @@ void _declspec(naked) HOOK_CrashFix_Misc29 ()
         jmp     RETURN_CrashFix_Misc29
 
 cont:
+        CRASH_AVERTED( 29 )
         // Skip much code
         jmp     RETURN_CrashFix_Misc29B
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////
+// Handle CAnimBlendAssociation::SetFinishCallback with invalid ecx
+#define HOOKPOS_CrashFix_Misc30                             0x4CEBE8
+#define HOOKSIZE_CrashFix_Misc30                            7
+#define HOOKCHECK_CrashFix_Misc30                           0xC7
+DWORD RETURN_CrashFix_Misc30 =                              0x4CEBEF;
+DWORD RETURN_CrashFix_Misc30B =                             0x4CEBF5;
+void _declspec(naked) HOOK_CrashFix_Misc30 ()
+{
+#if TEST_CRASH_FIXES
+    SIMULATE_ERROR_BEGIN( 10 )
+        _asm
+        {
+            mov     ecx, 0
+        }
+    SIMULATE_ERROR_END
+#endif
+
+    _asm
+    {
+        // Check for incorrect pointer
+        cmp     ecx, 0
+        jz      cont
+
+        // Execute replaced code
+        mov     dword ptr [ecx+30h], 1
+        // Continue standard path
+        jmp     RETURN_CrashFix_Misc30
+
+cont:
+        CRASH_AVERTED( 30 )
+        // Skip much code
+        jmp     RETURN_CrashFix_Misc30B
     }
 }
 
@@ -1385,6 +1424,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CrashFix_Misc27 );
     EZHookInstall ( CrashFix_Misc28 );
     EZHookInstall ( CrashFix_Misc29 );
+    EZHookInstallChecked ( CrashFix_Misc30 );
     EZHookInstall ( CClumpModelInfo_GetFrameFromId );
     EZHookInstallChecked ( CEntity_GetBoundRect );
     EZHookInstallChecked ( CVehicle_AddUpgrade );

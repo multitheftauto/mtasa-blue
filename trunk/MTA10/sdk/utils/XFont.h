@@ -273,33 +273,33 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
 
 				if (szTempAnsi[0] != 0)
 				{
-					_ASSERTE(strlen(szTempAnsi) < sizeof(lpFontProps->csName));
+					//_ASSERTE(strlen(szTempAnsi) < sizeof(lpFontProps->csName));
 
 					switch (ttRecord.uNameID)
 					{
 						case 0:
 							if (lpFontProps->csCopyright[0] == 0)
-								strncpy(lpFontProps->csCopyright, szTempAnsi,
-									sizeof(lpFontProps->csCopyright)-1);
+								STRNCPY(lpFontProps->csCopyright, szTempAnsi,
+									sizeof(lpFontProps->csCopyright));
 							break;
 
 						case 1:
 							if (lpFontProps->csFamily[0] == 0)
-								strncpy(lpFontProps->csFamily, szTempAnsi,
-									sizeof(lpFontProps->csFamily)-1);
+								STRNCPY(lpFontProps->csFamily, szTempAnsi,
+									sizeof(lpFontProps->csFamily));
 							bRetVal = TRUE;
 							break;
 
 						case 4:
 							if (lpFontProps->csName[0] == 0)
-								strncpy(lpFontProps->csName, szTempAnsi,
-									sizeof(lpFontProps->csName)-1);
+								STRNCPY(lpFontProps->csName, szTempAnsi,
+									sizeof(lpFontProps->csName));
 							break;
 
 						case 7:
 							if (lpFontProps->csTrademark[0] == 0)
-								strncpy(lpFontProps->csTrademark, szTempAnsi,
-									sizeof(lpFontProps->csTrademark)-1);
+								STRNCPY(lpFontProps->csTrademark, szTempAnsi,
+									sizeof(lpFontProps->csTrademark));
 							break;
 
 						default:
@@ -316,7 +316,7 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
 	::CloseHandle(hFile);
 
 	if (lpFontProps->csName[0] == 0)
-		strcpy(lpFontProps->csName, lpFontProps->csFamily);
+		STRNCPY(lpFontProps->csName, lpFontProps->csFamily, sizeof( lpFontProps->csName ));
 
 	memset(lpFontPropsX, 0, sizeof(FONT_PROPERTIES));
 
@@ -331,10 +331,10 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
 		sizeof(lpFontPropsX->csFamily)/sizeof(TCHAR)-1);
     */
 
-    strcpy(lpFontPropsX->csName, lpFontProps->csName);
-	strcpy(lpFontPropsX->csCopyright, lpFontProps->csCopyright);
-	strcpy(lpFontPropsX->csTrademark, lpFontProps->csTrademark);
-	strcpy(lpFontPropsX->csFamily, lpFontProps->csFamily);
+    STRNCPY(lpFontPropsX->csName, lpFontProps->csName, sizeof( lpFontPropsX->csName ));
+	STRNCPY(lpFontPropsX->csCopyright, lpFontProps->csCopyright, sizeof( lpFontPropsX->csCopyright ));
+	STRNCPY(lpFontPropsX->csTrademark, lpFontProps->csTrademark, sizeof( lpFontPropsX->csTrademark ));
+	STRNCPY(lpFontPropsX->csFamily, lpFontProps->csFamily, sizeof( lpFontPropsX->csFamily ));
 
 	return bRetVal;
 }
