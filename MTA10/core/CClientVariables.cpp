@@ -295,6 +295,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "mapalpha",                   155 );                          // map alpha
     DEFAULT ( "browser_speed",              1 );                            // Browser speed
     DEFAULT ( "single_download",            0 );                            // Single connection for downloads
+    DEFAULT ( "packet_tag",                 0 );                            // Tag network packets
     DEFAULT ( "update_build_type",          0 );                            // 0-stable 1-test 2-nightly
     DEFAULT ( "update_auto_install",        1 );                            // 0-off 1-on
     DEFAULT ( "volumetric_shadows",         0 );                            // Enable volumetric shadows

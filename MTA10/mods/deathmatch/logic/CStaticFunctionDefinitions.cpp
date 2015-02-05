@@ -6437,11 +6437,11 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
         //Activate all keys for this command
         pKeyBinds->SetAllCommandsActive ( szResource, true, szCommandName, bHitState, szArguments, true );
         //Check if its binded already (dont rebind)
-        if ( pKeyBinds->CommandExists ( szKey, szCommandName, true, bHitState, szArguments, szResource ) )
+        if ( pKeyBinds->CommandExists ( szKey, szCommandName, true, bHitState, szArguments, szResource, true, true  ) )
             return true;
 
         if ( ( !stricmp ( szHitState, "down" ) || !stricmp ( szHitState, "both" ) ) &&
-             pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource ) )
+             pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource, true ) )
         {
             pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true );
             bSuccess = true;
@@ -6449,11 +6449,11 @@ bool CStaticFunctionDefinitions::BindKey ( const char* szKey, const char* szHitS
 
         bHitState = false;
         pKeyBinds->SetAllCommandsActive ( szResource, true, szCommandName, bHitState, szArguments, true );
-        if ( pKeyBinds->CommandExists ( szKey, szCommandName, true, bHitState, szArguments, szResource ) )
+        if ( pKeyBinds->CommandExists ( szKey, szCommandName, true, bHitState, szArguments, szResource, true, true  ) )
             return true;
 
         if ( ( !stricmp ( szHitState, "up" ) || !stricmp ( szHitState, "both" ) ) &&
-             pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource ) )
+             pKeyBinds->AddCommand ( szKey, szCommandName, szArguments, bHitState, szResource, true ) )
         {
             pKeyBinds->SetCommandActive ( szKey, szCommandName, bHitState, szArguments, szResource, true, true  );
             bSuccess = true;

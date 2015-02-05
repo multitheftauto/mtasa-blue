@@ -120,8 +120,8 @@ public:
     inline unsigned long            GetRespawnIntervals         ( void )                                { return m_ulRespawnIntervals; };
     inline void                     SetRespawnIntervals         ( unsigned long ulRespawnIntervals )    { m_ulRespawnIntervals = ulRespawnIntervals; };
 
-    inline unsigned long            GetLastUsedTime             ( void )                                { return m_ulLastUsedTime; }
-    inline unsigned long            GetCreationTime             ( void )                                { return m_ulCreationTime; }
+    CTickCount                      GetLastUsedTime             ( void )                                { return m_LastUsedTime; }
+    CTickCount                      GetCreationTime             ( void )                                { return m_CreationTime; }
 
     inline unsigned short           GetModel                    ( void )                                { return m_usModel; };
     inline void                     SetModel                    ( unsigned short usModel )              { m_usModel = usModel; };
@@ -157,8 +157,8 @@ private:
     unsigned short                  m_usAmmo;
     float                           m_fAmount;
     unsigned long                   m_ulRespawnIntervals;
-    unsigned long                   m_ulLastUsedTime;
-    unsigned long                   m_ulCreationTime;
+    CTickCount                      m_LastUsedTime;
+    CTickCount                      m_CreationTime;
     unsigned short                  m_usModel;
     bool                            m_bVisible;
 
