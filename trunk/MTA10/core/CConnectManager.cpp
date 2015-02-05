@@ -121,7 +121,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     // Try to start a network to connect
     SString strAddress = inet_ntoa ( m_Address );
-    if ( m_usPort && !pNet->StartNetwork ( strAddress, m_usPort ) )
+    if ( m_usPort && !pNet->StartNetwork ( strAddress, m_usPort, CVARS_GET_VALUE < bool > ( "packet_tag" ) ) )
     {
         SString strBuffer ( _("Connecting to %s at port %u failed!"), m_strHost.c_str (), m_usPort );
         CCore::GetSingleton ().ShowMessageBox ( _("Error")+_E("CC22"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR ); // Failed to connect
@@ -266,6 +266,9 @@ void CConnectManager::DoPulse ( void )
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
                         strError = _("Disconnected: unknown protocol error"); strErrorCode = _E("CC24");  // encryption key mismatch
+                        break;
+                    case RID_INCOMPATIBLE_PROTOCOL_VERSION:
+                        strError = _("Disconnected: unknown protocol error"); strErrorCode = _E("CC34");  // old raknet version
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
                         strError = _("Disconnected: disconnected remotely"); strErrorCode = _E("CC25");
