@@ -104,4 +104,15 @@ private:
     int                                     m_iBlacklistRevision;
 };
 
+class CCefApp : public CefApp, public CefSchemeHandlerFactory
+{
+public:
+    virtual void OnRegisterCustomSchemes ( CefRefPtr<CefSchemeRegistrar> registrar ) override;
+
+    // CefSchemeHandlerFactory methods
+    virtual CefRefPtr<CefResourceHandler> Create ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request ) override;
+
+    IMPLEMENT_REFCOUNTING(CCefApp);
+};
+
 #endif

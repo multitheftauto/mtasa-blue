@@ -16,6 +16,8 @@
 #include <cef3/include/cef_app.h>
 #include <cef3/include/cef_browser.h>
 #include <cef3/include/cef_sandbox_win.h>
+#include <cef3/include/cef_url.h>
+#include <cef3/include/wrapper/cef_stream_resource_handler.h>
 #include "WebBrowserHelpers.h"
 
 #ifdef CEF_ENABLE_SANDBOX
@@ -24,11 +26,11 @@
 
 CWebCore::CWebCore ()
 {
-    m_pRequestsGUI = NULL;
+    m_pRequestsGUI = nullptr;
     m_bTestmodeEnabled = false;
-    m_pAudioSessionManager = NULL;
-    m_pXmlConfig = NULL;
-    m_pFocusedWebView = NULL;
+    m_pAudioSessionManager = nullptr;
+    m_pXmlConfig = nullptr;
+    m_pFocusedWebView = nullptr;
 
     MakeSureXMLNodesExist ();
     InitialiseWhiteAndBlacklist ();
@@ -58,14 +60,15 @@ CWebCore::~CWebCore ()
 bool CWebCore::Initialise ()
 {
     CefMainArgs mainArgs;
-    void* sandboxInfo = NULL;
+    void* sandboxInfo = nullptr;
+    CefRefPtr<CCefApp> app = new CCefApp;
 
 #if CEF_ENABLE_SANDBOX
     CefScopedSandboxInfo scopedSandbox;
     sandboxInfo = scopedSandbox.sandbox_info();
 #endif
 
-    if ( CefExecuteProcess ( mainArgs, NULL, sandboxInfo ) >= 0 )
+    if ( CefExecuteProcess ( mainArgs, app, sandboxInfo ) >= 0 )
         return false;
 
     CefSettings settings;
@@ -92,7 +95,12 @@ bool CWebCore::Initialise ()
     settings.multi_threaded_message_loop = true;
     settings.windowless_rendering_enabled = true;
 
-    return CefInitialize ( mainArgs, settings, nullptr, sandboxInfo );
+    bool state = CefInitialize ( mainArgs, settings, app, sandboxInfo );
+    
+    // Register custom scheme handler factory
+    CefRegisterSchemeHandlerFactory ( "mtalocal", "", app );
+
+    return state;
 }
 
 CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
@@ -132,7 +140,8 @@ CWebView* CWebCore::FindWebView ( CefRefPtr<CefBrowser> browser )
 {
     for ( auto pWebView : m_WebViews )
     {
-        if ( pWebView->GetCefBrowser () == browser )
+        // CefBrowser objects are not unique
+        if ( pWebView->GetCefBrowser ()->GetIdentifier () == browser->GetIdentifier () )
             return pWebView.get ();
     }
     return nullptr;
@@ -786,4 +795,47 @@ bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownl
     OutputDebugLine ( "Updated browser blacklist!" );
 #endif
     return true;
+}
+
+//////////////////////////////////////////////////////////////
+//                CefApp implementation                     //
+//////////////////////////////////////////////////////////////
+void CCefApp::OnRegisterCustomSchemes ( CefRefPtr < CefSchemeRegistrar > registrar )
+{
+    // Register custom MTA scheme (has to be called in all proceseses)
+    registrar->AddCustomScheme ( "mtalocal", false, false, false );
+}
+
+CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request )
+{
+    if (scheme_name != "mtalocal")
+        return nullptr;
+
+    CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore ());
+    auto pWebView = pWebCore->FindWebView ( browser );
+    if ( !pWebView || !pWebView->IsLocal () )
+        return nullptr;
+
+    CefURLParts urlParts;
+    if ( !CefParseURL ( request->GetURL (), urlParts ) )
+        return nullptr;
+
+    // Get full path
+    SString path = UTF16ToMbUTF8 ( urlParts.path.str ).substr ( 2 );
+    if ( !pWebView->GetFullPathFromLocal ( path ) )
+        return nullptr;
+
+    // Get mime type from extension
+    CefString mimeType;
+    size_t pos = path.find_last_of('.');
+    if (pos != std::string::npos)
+        mimeType = CefGetMimeType ( path.substr ( pos + 1 ) );
+    else
+        mimeType = "text/plain";
+
+    auto stream = CefStreamReader::CreateForFile ( path );
+    if ( stream.get () )
+        return new CefStreamResourceHandler ( mimeType, stream );
+
+    return nullptr;
 }

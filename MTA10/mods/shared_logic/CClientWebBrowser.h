@@ -42,6 +42,9 @@ public:
     bool                        IsLocal             ();
     void                        SetTempURL          ( const SString& strTempURL );
 
+    inline CResource*           GetResource         () { return m_pResource; }
+    inline void                 SetResource         ( CResource* pResource ) { m_pResource = pResource; }
+
     bool                        SetAudioVolume      ( float fVolume );
 
     
@@ -55,9 +58,11 @@ public:
     void                        Events_OnTriggerEvent  ( const SString& strEventName, const std::vector<std::string>& arguments, bool bIsServer = false ) override;
     void                        Events_OnTooltip       ( const SString& strTooltip ) override;
     void                        Events_OnInputFocusChanged ( bool bGainedFocus ) override;
+    bool                        Events_OnResourcePathCheck ( SString& strURL ) override;
 
 private:
     CWebViewInterface* m_pWebView;
+    CResource*         m_pResource;
 };
 
 #endif

@@ -53,6 +53,12 @@ public:
         }
     }
 
+    virtual void OnRegisterCustomSchemes ( CefRefPtr < CefSchemeRegistrar > registrar ) override
+    {
+        // Register custom MTA scheme (has to be called in all proceseses)
+        registrar->AddCustomScheme ( "mtalocal", false, false, false );
+    }
+
 
     // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnContextCreated(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefV8Context%3E) //
     virtual void OnContextCreated ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context ) override

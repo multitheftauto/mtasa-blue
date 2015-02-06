@@ -15,6 +15,7 @@ CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, C
     : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem )
 {
     m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( pWebBrowserItem->m_uiSizeX, pWebBrowserItem->m_uiSizeY, bLocal, pWebBrowserItem, bTransparent );
+    m_pResource = nullptr;
 
     // Set events interface
     m_pWebView->SetWebBrowserEvents ( this );
@@ -24,7 +25,7 @@ CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, C
 CClientWebBrowser::~CClientWebBrowser ()
 {
     g_pCore->GetWebCore()->DestroyWebView ( m_pWebView );
-    m_pWebView = NULL;
+    m_pWebView = nullptr;
 
     // Unlink from tree
     Unlink ();
@@ -187,3 +188,19 @@ void CClientWebBrowser::Events_OnInputFocusChanged ( bool bGainedFocus )
     Arguments.PushBoolean ( bGainedFocus );
     CallEvent ( "onClientBrowserInputFocusChanged", Arguments, false );
 }
+
+bool CClientWebBrowser::Events_OnResourcePathCheck ( SString& strURL )
+{
+    // ATTENTION: This method is called within a secondary thread so be sure to use only thread safe functions
+
+    // If no resource is set, we are allowed to use the requested file
+    if ( !m_pResource )
+        return true;
+
+    CResource* pTempResource = m_pResource; // Make a copy to ignore a changed resource
+    if ( CResourceManager::ParseResourcePathInput ( strURL, pTempResource, strURL ) )
+        return true;
+
+    return false;
+}
+
