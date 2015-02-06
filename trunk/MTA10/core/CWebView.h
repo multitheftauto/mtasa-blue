@@ -59,6 +59,7 @@ public:
 
     bool SetAudioVolume         ( float fVolume );
 
+    bool GetFullPathFromLocal   ( SString& strPath );
 
     // CefClient methods
     virtual CefRefPtr<CefRenderHandler>     GetRenderHandler() override { return this; };

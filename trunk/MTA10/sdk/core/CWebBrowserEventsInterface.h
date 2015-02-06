@@ -23,6 +23,7 @@ public:
     virtual void Events_OnTriggerEvent ( const SString& strEventName, const std::vector<std::string>& arguments, bool bIsServer = false ) = 0;
     virtual void Events_OnTooltip ( const SString& strTooltip ) = 0;
     virtual void Events_OnInputFocusChanged ( bool bGainedFocus ) = 0;
+    virtual bool Events_OnResourcePathCheck ( SString& strURL ) = 0;
 };
 
 #endif

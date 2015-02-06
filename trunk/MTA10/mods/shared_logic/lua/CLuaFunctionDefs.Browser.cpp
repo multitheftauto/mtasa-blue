@@ -38,6 +38,9 @@ int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                 pBrowserTexture->SetParent ( pParentResource->GetResourceDynamicEntity () );
+
+                // Set our owner resource
+                pBrowserTexture->SetResource ( pParentResource );
             }
             lua_pushelement ( luaVM, pBrowserTexture );
             return 1;
@@ -84,7 +87,7 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Are we dealing with a remote website?
-        if ( strURL.SubStr ( 0, 7 ) == "http://" || strURL.SubStr ( 0, 8 ) == "https://" )
+        if ( strURL.substr ( 0, 7 ) == "http://" || strURL.substr ( 0, 8 ) == "https://" )
         {
             lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, true ) );
             return 1;
@@ -100,7 +103,7 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( strURL, pResource, strAbsPath ) && pWebBrowser->IsLocal () )
             {
                 pWebBrowser->SetTempURL ( strURL );
-                lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( strAbsPath, false ) );
+                lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( "mtalocal://" + strURL, false ) );
                 return 1;
             }
         }

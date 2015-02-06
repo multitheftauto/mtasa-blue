@@ -83,7 +83,7 @@ bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled )
 
     // Load it!
     m_pWebView->GetMainFrame ()->LoadURL ( strURL );
-    
+   
     return true;
 }
 
@@ -216,6 +216,11 @@ bool CWebView::SetAudioVolume ( float fVolume )
 
     m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJSCode, "", 0 );
     return true;
+}
+
+bool CWebView::GetFullPathFromLocal ( SString& strPath )
+{
+     return m_pEventsInterface->Events_OnResourcePathCheck ( strPath );
 }
 
 
@@ -445,10 +450,14 @@ bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFram
 
         if ( g_pCore->GetWebCore ()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
             return true;
+
+        return false;
     }
+    else if ( scheme == L"mtalocal" )
+        return false;
     
-    // Do not block local websites
-    return false;
+    // Block everything else
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -470,12 +479,20 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
         if ( IsLocal () )
             return true; // Block remote requests in local mode generally
 
-        if ( g_pCore->GetWebCore()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
-            return true;
+        if ( g_pCore->GetWebCore ()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
+            return true; // Block if explicitly forbidden
+
+        // Allow
+        return false;
+    }
+    else if ( scheme == L"mtalocal" )
+    {
+        // Allow :)
+        return false;
     }
 
-    // Do not block local websites
-    return false;
+    // Block everything else
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////
