@@ -1039,6 +1039,7 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, unsigned char uc
         m_ucVariation2 = ucVariant2;
 
         // Set the new vehicle id and type
+        eClientVehicleType eOldVehicleType = m_eVehicleType;
         m_usModel = usModel;
         m_eVehicleType = CClientVehicleManager::GetVehicleType ( usModel );
         m_bHasDamageModel = CClientVehicleManager::HasDamageModel ( m_eVehicleType );
@@ -1047,6 +1048,21 @@ void CClientVehicle::SetModelBlocking ( unsigned short usModel, unsigned char uc
         {
             GetInitialDoorStates ( m_ucDoorStates );
             memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
+        }
+
+        // If this is a train unlink if we're going to be a non-train
+        if ( eOldVehicleType == CLIENTVEHICLE_TRAIN && m_eVehicleType != CLIENTVEHICLE_TRAIN)
+        {
+            if ( m_pNextLink != NULL )
+            {
+                m_pNextLink->SetPreviousTrainCarriage ( NULL );
+                m_pNextLink = NULL;
+            }
+            if ( m_pPreviousLink != NULL )
+            {
+                m_pPreviousLink->SetNextTrainCarriage ( NULL );
+                m_pPreviousLink = NULL;
+            }
         }
 
         // Check if we have landing gears and adjustable properties
