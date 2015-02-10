@@ -610,7 +610,7 @@ void CLuaMain::AddMarkerClass( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "createMarker" );
     lua_classfunction ( luaVM, "getCount", "getMarkerCount" );
 
-    lua_classfunction ( luaVM, "getType", "getMarkerType" );
+    lua_classfunction ( luaVM, "getMarkerType", "getMarkerType" );
     lua_classfunction ( luaVM, "getIcon", "getMarkerIcon" );
     lua_classfunction ( luaVM, "getSize", "getMarkerSize" );
     lua_classfunction ( luaVM, "getTarget", CLuaOOPDefs::GetMarkerTarget );
@@ -622,7 +622,7 @@ void CLuaMain::AddMarkerClass( lua_State* luaVM )
     lua_classfunction ( luaVM, "setTarget", "setMarkerTarget" );
     lua_classfunction ( luaVM, "setColor", "setMarkerColor" );
 
-    lua_classvariable ( luaVM, "type", "setMarkerType", "getMarkerType" );
+    lua_classvariable ( luaVM, "markerType", "setMarkerType", "getMarkerType" );
     lua_classvariable ( luaVM, "icon", "setMarkerIcon", "getMarkerIcon" );
     lua_classvariable ( luaVM, "size", "setMarkerSize", "getMarkerSize" );
 
