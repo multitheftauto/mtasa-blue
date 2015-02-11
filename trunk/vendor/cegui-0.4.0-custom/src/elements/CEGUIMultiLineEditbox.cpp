@@ -712,6 +712,10 @@ void MultiLineEditbox::formatText(void)
 							{
 								// get point at which to break the token
 								lineLen = fnt->getCharAtPixel(paraText.substr(lineIndex, nextTokenSize), areaWidth);
+
+                                // If not enough room, pretend there is (to prevent infinite loop)
+							    if ( lineLen == 0 )
+							        lineLen = 1;
 							}
 
 							// text wraps, exit loop early with line info up until wrap point
