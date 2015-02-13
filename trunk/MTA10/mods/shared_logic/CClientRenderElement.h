@@ -17,7 +17,7 @@ public:
                             CClientRenderElement         ( CClientManager* pManager, ElementID ID );
                             ~CClientRenderElement        ( void );
 
-    void                    Unlink                  ( void );
+    virtual void            Unlink                  ( void );
     void                    GetPosition             ( CVector& vecPosition ) const      { vecPosition = CVector (); }
     void                    SetPosition             ( const CVector& vecPosition )      {}
 

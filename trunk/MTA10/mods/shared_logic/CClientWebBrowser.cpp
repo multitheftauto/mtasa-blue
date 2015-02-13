@@ -31,6 +31,15 @@ CClientWebBrowser::~CClientWebBrowser ()
     Unlink ();
 }
 
+void CClientWebBrowser::Unlink ()
+{
+    // Mark as being destroyed (DirectX surfaces won't be available anymore)
+    if ( m_pWebView )
+        m_pWebView->SetBeingDestroyed ( true );
+
+    CClientRenderElement::Unlink ();
+}
+
 bool CClientWebBrowser::IsLoading ()
 {
     return m_pWebView->IsLoading ();

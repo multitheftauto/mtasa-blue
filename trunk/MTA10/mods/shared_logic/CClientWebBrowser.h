@@ -21,6 +21,7 @@ public:
     CClientWebBrowser           ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, bool bLocal, bool bTransparent );
     ~CClientWebBrowser          ();
     eClientEntityType           GetType             ( ) const { return CCLIENTBROWSER; }
+    virtual void                Unlink () override;
 
     inline CWebBrowserItem*     GetWebBrowserItem   ()    { return (CWebBrowserItem*)m_pRenderItem; }
     inline CWebViewInterface*   GetWebView          ()    { return m_pWebView; }

@@ -35,6 +35,7 @@ public:
     void                        SetWebBrowserEvents ( CWebBrowserEventsInterface* pInterface ) { m_pEventsInterface = pInterface; };
     void                        CloseBrowser ();
     inline CefRefPtr<CefBrowser>GetCefBrowser() { return m_pWebView; };
+    void                        SetBeingDestroyed ( bool state ) { m_bBeingDestroyed = state; }
 
     // Exported methods
     bool LoadURL                ( const SString& strURL, bool bFilterEnabled = true );
