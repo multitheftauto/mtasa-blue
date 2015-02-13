@@ -34,6 +34,8 @@ static std::map < int, SCrashAvertedInfo >      ms_CrashAvertedMap;
 static uint                                     ms_uiTickCountBase = 0;
 static void*                                    ms_pReservedMemory = NULL;
 static uint                                     ms_uiInCrashZone = 0;
+static uint                                     ms_uiInvalidParameterCount = 0;
+static uint                                     ms_uiInvalidParameterCountLogged = 0;
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
                                     CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
@@ -94,6 +96,54 @@ void CCrashDumpWriter::LogEvent ( const char* szType, const char* szContext, con
 
     while ( ms_LogEventList.size () > LOG_EVENT_SIZE )
         ms_LogEventList.pop_back ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::SetHandlers
+//
+// Static function. Initialize handlers for crash situations
+//
+///////////////////////////////////////////////////////////////
+void CCrashDumpWriter::SetHandlers( void )
+{
+#ifndef MTA_DEBUG
+    _set_invalid_parameter_handler( CCrashDumpWriter::HandleInvalidParameter );
+    SetCrashHandlerFilter ( CCrashDumpWriter::HandleExceptionGlobal );
+    CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing( 500 );
+#endif
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::UpdateCounters
+//
+// Static function. Called every so often, you know
+//
+///////////////////////////////////////////////////////////////
+void CCrashDumpWriter::UpdateCounters( void )
+{
+    if ( ms_uiInvalidParameterCount > ms_uiInvalidParameterCountLogged && ms_uiInvalidParameterCountLogged < 10 )
+    {
+        AddReportLog( 9206, SString( "InvalidParameterCount changed from %d to %d", ms_uiInvalidParameterCountLogged, ms_uiInvalidParameterCount ) );
+        ms_uiInvalidParameterCountLogged = ms_uiInvalidParameterCount;
+    }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CCrashDumpWriter::HandleInvalidParameter
+//
+// Static function. Called when an invalid parameter is detected by functions such as printf.
+// Can be caused by problems with localized strings.
+//
+///////////////////////////////////////////////////////////////
+void CCrashDumpWriter::HandleInvalidParameter( const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved )
+{
+    ms_uiInvalidParameterCount++;
 }
 
 

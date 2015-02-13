@@ -53,4 +53,7 @@ public:
     static SString      GetCrashAvertedStatsSoFar ( void );
     static void         ReserveMemoryKBForCrashDumpProcessing ( uint uiMemoryKB );
     static void         FreeMemoryForCrashDumpProcessing ( void );
+    static void         SetHandlers             ( void );
+    static void         UpdateCounters          ( void );
+    static void         HandleInvalidParameter  ( const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved );
 };

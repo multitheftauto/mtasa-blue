@@ -39,6 +39,8 @@ SString& SString::vFormat ( const char* szFormat, va_list vl )
     {
         // Error or empty string
         clear ();
+        if ( iRequiredCapacity == -1 )
+            OnInvalidParameter( szFormat );
         return *this;
     }
 
@@ -64,6 +66,8 @@ SString& SString::vFormat ( const char* szFormat, va_list vl )
     {
         // Error
         clear ();
+        if ( iSize == -1 )
+            OnInvalidParameter( szFormat );
     }
     else
     {
@@ -144,6 +148,17 @@ void SString::OnFormatException ( const char* szFormat )
     dassert( 0 );
     // Replace format characters because it seems like a good idea
     *this = ( SStringX( "[Format exception] " ) + szFormat ).Replace( "%", "#" );
+}
+
+
+//
+// Handle format invalid parameter
+//
+void SString::OnInvalidParameter ( const char* szFormat )
+{
+    dassert( 0 );
+    // Replace format characters because it seems like a good idea
+    *this = ( SStringX( "[Invalid parameter] " ) + szFormat ).Replace( "%", "#" );
 }
 
 

@@ -31,12 +31,6 @@ CModManager::CModManager ( void )
 
     // Load the modlist from the folders in "mta/mods"
     InitializeModList ( CalcMTASAPath( "mods\\" ) );
-
-    // Set up our exception handler
-    #ifndef MTA_DEBUG
-    SetCrashHandlerFilter ( CCrashDumpWriter::HandleExceptionGlobal );
-    CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing( 500 );
-    #endif
 }
 
 CModManager::~CModManager ( void )
