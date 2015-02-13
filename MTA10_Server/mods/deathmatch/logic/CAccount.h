@@ -68,7 +68,15 @@ public:
     inline bool                 HasChanged              ( void )                    { return m_bChanged; }
     uint                        GetScriptID             ( void ) const              { return m_uiScriptID; }
 
-protected:
+    CLuaArgument*               GetData                 ( const std::string& strKey );
+    void                        SetData                 ( const std::string& strKey, const std::string& strValue, int iType );
+    void                        RemoveData              ( const std::string& strKey );
+    std::list < CAccountData >  ::iterator DataBegin    ( void )                    { return m_Data.begin (); }
+    std::list < CAccountData >  ::iterator DataEnd      ( void )                    { return m_Data.end (); }
+
+ protected:
+    CAccountData*               GetDataPointer ( const std::string& strKey );
+
     CAccountManager*            m_pManager;
 
     bool                        m_bRegistered;
@@ -84,6 +92,27 @@ protected:
 
     class CClient*              m_pClient;
     uint                        m_uiScriptID;
+
+    std::list < CAccountData >  m_Data;
+};
+
+
+class CAccountData
+{
+public:
+                            CAccountData ( const std::string& strKey, const std::string& strValue, int iType )
+                                                                         { m_strKey = strKey; m_strValue = strValue; m_iType = iType; }
+
+    const std::string&      GetKey       ( void )                        { return m_strKey; }
+    const std::string&      GetStrValue  ( void )                        { return m_strValue; }
+    int                     GetType      ( void )                        { return m_iType; }
+    void                    SetStrValue  ( const std::string& strValue ) { m_strValue = strValue; }
+    void                    SetType      ( int iType )                   { m_iType = iType; }
+
+private:
+    std::string              m_strKey;
+    std::string              m_strValue;
+    int                      m_iType;
 };
 
 #endif
