@@ -132,6 +132,8 @@ CCore::CCore ( void )
     // Create the mod manager
     m_pModManager               = new CModManager;
 
+    CCrashDumpWriter::SetHandlers();
+
     m_pfnMessageProcessor       = NULL;
     m_pMessageBox = NULL;
 
@@ -1184,6 +1186,9 @@ void CCore::DoPreFramePulse ( )
     m_pModManager->DoPulsePreFrame ();  
 
     m_pLocalGUI->DoPulse ();
+
+    CCrashDumpWriter::UpdateCounters();
+
     TIMING_CHECKPOINT( "-CorePreFrame" );
 }
 

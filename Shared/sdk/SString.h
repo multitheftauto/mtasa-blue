@@ -69,6 +69,7 @@ public:
 
     SString& vFormat ( const char* szFormat, va_list vl );
     void OnFormatException ( const char* szFormat );
+    void OnInvalidParameter ( const char* szFormat );
 
     // Access
     char& operator[]( int iOffset )
