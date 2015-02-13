@@ -119,11 +119,11 @@ void CWebView::SetRenderingPaused ( bool bPaused )
 
 void CWebView::Focus ()
 {
-    if ( !m_pWebView )
-        return;
-
-    m_pWebView->GetHost ()->SetFocus ( true );
-    m_pWebView->GetHost ()->SendFocusEvent ( true );
+    if ( m_pWebView )
+    {
+        m_pWebView->GetHost ()->SetFocus ( true );
+        m_pWebView->GetHost ()->SendFocusEvent ( true );
+    }
     g_pCore->GetWebCore()->SetFocusedWebView ( this );
 }
 

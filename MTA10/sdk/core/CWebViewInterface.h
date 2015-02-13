@@ -19,6 +19,7 @@ public:
     virtual void SetWebBrowserEvents( CWebBrowserEventsInterface* pInterface ) = 0;
     virtual bool LoadURL            ( const SString& strURL, bool bFilterEnabled = true ) = 0;
     virtual bool IsLoading          () = 0;
+    virtual void SetBeingDestroyed  ( bool state ) = 0;
     
     virtual void GetURL             ( SString& outURL ) = 0;
     virtual void GetTitle           ( SString& outTitle ) = 0;
