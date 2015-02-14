@@ -14,12 +14,17 @@
 CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, bool bLocal, bool bTransparent )
     : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem )
 {
-    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( pWebBrowserItem->m_uiSizeX, pWebBrowserItem->m_uiSizeY, bLocal, pWebBrowserItem, bTransparent );
     m_pResource = nullptr;
+    SetTypeName ( "webbrowser" );
+
+    // Create the web view
+    m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( pWebBrowserItem->m_uiSizeX, pWebBrowserItem->m_uiSizeY, bLocal, pWebBrowserItem, bTransparent );
 
     // Set events interface
     m_pWebView->SetWebBrowserEvents ( this );
-    SetTypeName ( "webbrowser" );
+
+    // Initialise the webview after setting the events interface
+    m_pWebView->Initialise ();
 }
 
 CClientWebBrowser::~CClientWebBrowser ()

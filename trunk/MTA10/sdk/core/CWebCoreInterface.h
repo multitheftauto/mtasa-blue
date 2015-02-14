@@ -50,7 +50,7 @@ public:
     virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent ) = 0;
     virtual void                DestroyWebView      ( CWebViewInterface* pWebView ) = 0;
 
-    virtual void                AddEventToEventQueue( std::function<void(void)> func, CWebView* pWebView ) = 0;
+    virtual void                AddEventToEventQueue( std::function<void(void)> func, CWebView* pWebView, const SString& name ) = 0;
     virtual void                RemoveWebViewEvents ( CWebView* pWebView ) = 0;
     virtual void                DoEventQueuePulse   () = 0;
     

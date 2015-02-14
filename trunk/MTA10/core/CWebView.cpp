@@ -16,10 +16,30 @@
 CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
 {
     m_bIsLocal = bIsLocal;
+    m_bIsTransparent = bTransparent;
     m_pWebBrowserRenderItem = pWebBrowserRenderItem;
     m_pEventsInterface = nullptr;
     m_bBeingDestroyed = false;
+}
 
+CWebView::~CWebView ()
+{
+    if ( IsMainThread () )
+    {
+        if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
+            g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
+    }
+
+    // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
+    m_pWebView = nullptr;
+
+#ifdef MTA_DEBUG
+    OutputDebugLine ( "CWebView::~CWebView" );
+#endif
+}
+
+void CWebView::Initialise ()
+{
     // Initialise the web session (which holds the actual settings) in in-memory mode
     CefBrowserSettings browserSettings;
     browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit ();
@@ -34,7 +54,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     bool bEnabledPlugins;
     CVARS_GET ( "browser_plugins", bEnabledPlugins );
     browserSettings.plugins = bEnabledPlugins ? cef_state_t::STATE_ENABLED : cef_state_t::STATE_DISABLED;
-    if ( !bIsLocal )
+    if ( !m_bIsLocal )
     {
         bool bEnabledJavascript;
         CVARS_GET ( "browser_remote_javascript", bEnabledJavascript );
@@ -42,21 +62,9 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     }
 
     CefWindowInfo windowInfo;
-    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow (), bTransparent );
+    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow (), m_bIsTransparent );
     
     CefBrowserHost::CreateBrowser ( windowInfo, this, "", browserSettings, nullptr );
-}
-
-CWebView::~CWebView ()
-{
-    if ( IsMainThread () )
-    {
-        if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
-            g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
-    }
-
-    // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
-    m_pWebView = nullptr;
 }
 
 void CWebView::CloseBrowser ()
@@ -250,7 +258,7 @@ bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProc
 
         // Queue event to run on the main thread
         auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString ( eventName ), args, message->GetName () == "TriggerServerLuaEvent" );
-        g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this );
+        g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnProcessMessageReceived1" );
 
         // The message was handled
         return true;
@@ -262,7 +270,7 @@ bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProc
 
         // Queue event to run on the main thread
         auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnInputFocusChanged, m_pEventsInterface, gainedFocus );
-        g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this );
+        g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnProcessMessageReceived2" );
     }
 
     // The message wasn't handled
@@ -347,7 +355,7 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
 
         pD3DSurface->UnlockRect ();
     };
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( f, this );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( f, this, "OnPaint" );
 
     std::unique_lock<std::mutex> lock ( m_PaintMutex );
     m_PaintCV.wait ( lock );
@@ -366,7 +374,7 @@ void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle c
 
     // Queue event to run on the main thread
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnCursorChange" );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -385,7 +393,7 @@ void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
 
     // Queue event to run on the main thread
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, strURL, frame->IsMain () );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadStart" );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -403,7 +411,7 @@ void CWebView::OnLoadEnd ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 
         // Queue event to run on the main thread
         auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnDocumentReady, m_pEventsInterface, strURL );
-        g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this );
+        g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadEnd" );
     }
 }
 
@@ -420,7 +428,7 @@ void CWebView::OnLoadError ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
     
     // Queue event to run on the main thread
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnLoadingFailed, m_pEventsInterface, strURL, errorCode, SString ( errorText ) );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadError" );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -531,7 +539,7 @@ bool CWebView::OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame
     
     // Queue event to run on the main thread
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnPopup, m_pEventsInterface, strTagetURL, strOpenerURL );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnBeforePopup" );
 
     // Block popups generally
     return true;
@@ -550,7 +558,7 @@ void CWebView::OnAfterCreated ( CefRefPtr<CefBrowser> browser )
 
     // Call created event callback
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnCreated, m_pEventsInterface );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnAfterCreated" );
 }
 
 
@@ -603,7 +611,7 @@ bool CWebView::OnTooltip ( CefRefPtr<CefBrowser> browser, CefString& title )
 {
     // Queue event to run on the main thread
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTooltip, m_pEventsInterface, UTF16ToMbUTF8 ( title ) );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnTooltip" );
     
     return true;
 }
