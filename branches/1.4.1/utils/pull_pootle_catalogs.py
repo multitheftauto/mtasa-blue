@@ -23,7 +23,7 @@ from optparse import OptionParser
 def myurlopen(url,urltimeout):
     content = ""
     try:
-        header = {"pragma-directive" : "no-cache"}
+        header = {"pragma-directive" : "no-cache","PRAGMA" : "NO-CACHE","CACHE-CONTROL" : "NO-CACHE"}
         req = urllib2.Request(url, headers=header)
         u = urllib2.urlopen(req, timeout = urltimeout)
         content = u.read()
@@ -86,7 +86,12 @@ parser.add_option("-a", "--attempts",type="int", dest="attempts", default=3,
 
 (options, args) = parser.parse_args()
 
-# e.g http://translate.multitheftauto.com/export/client/nl/client.po
+# e.g.:
+# http://translate.mtasa.com/export/installer/hr.po
+# http://translate.mtasa.com/download/hr/installer/hr.po
+#
+# http://translate.mtasa.com/export/client/nl/client.po
+# http://translate.mtasa.com/download/nl/client/client.po
 
 if options.rmdir:
     # Clear our output directory first
@@ -108,14 +113,19 @@ if options.langindex > -1:
 for lang in (langlist):
     # Let's create our full Pootle export URL depending on whether we're GNU or not
     url = ""
+    alturl = ""
     output = ""
     if options.gnu:
         url = urlparse.urljoin(options.url, "export/%s/%s.po"%(options.project,lang))
+        alturl = urlparse.urljoin(options.url, "download/%s/%s/%s.po"%(lang,options.project,lang))
         output = os.path.join(options.output,"%s.po"%(lang))
     else:
         url = urlparse.urljoin(options.url, "export/%s/%s/%s.po"%(options.project,lang,options.project))
+        alturl = urlparse.urljoin(options.url, "download/%s/%s/%s.po"%(lang,options.project,options.project))
         output = os.path.join(options.output,"%s/%s.po"%(lang,options.project))
 
+    # Read from alt url first (try to flush pootle cache)
+    content = myurlopenDeluxe(alturl,options.urltimeout,options.attempts)
     content = myurlopenDeluxe(url,options.urltimeout,options.attempts)
 
     path,tail = os.path.split(output)

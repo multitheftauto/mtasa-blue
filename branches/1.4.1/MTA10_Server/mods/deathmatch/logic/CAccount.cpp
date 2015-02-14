@@ -123,3 +123,77 @@ void CAccount::SetID ( int iUserID )
         m_iUserID = iUserID;
     }
 }
+
+CAccountData* CAccount::GetDataPointer ( const std::string& strKey )
+{
+    std::list < CAccountData > ::iterator iter = m_Data.begin ();
+    for ( ; iter != m_Data.end (); iter++ )
+    {
+        if ( iter->GetKey () == strKey )
+            return &(*iter);
+    }
+    return NULL;
+}
+
+CLuaArgument* CAccount::GetData ( const std::string& strKey )
+{
+    CAccountData* pData = GetDataPointer ( strKey );
+    CLuaArgument* pResult = new CLuaArgument ();
+
+    if ( pData )
+    {
+        if ( pData->GetType () == LUA_TBOOLEAN )
+        {
+            pResult->ReadBool ( pData->GetStrValue () == "true" );
+        }
+        else
+        if ( pData->GetType () == LUA_TNUMBER )
+        {
+            pResult->ReadNumber ( strtod ( pData->GetStrValue ().c_str(), NULL ) );
+        }
+        else
+        {
+            pResult->ReadString ( pData->GetStrValue () );
+        }
+    }
+    else
+    {
+        pResult->ReadBool ( false );
+    }
+    return pResult;
+}
+
+void CAccount::SetData ( const std::string& strKey, const std::string& strValue, int iType )
+{
+    if ( strValue == "false" && iType == LUA_TBOOLEAN )
+    {
+        RemoveData ( strKey );
+    }
+    else
+    {
+        CAccountData* pData = GetDataPointer ( strKey );
+        
+        if ( pData )
+        {
+            pData->SetStrValue ( strValue );
+            pData->SetType ( iType );
+        }
+        else
+        {
+            m_Data.push_back ( CAccountData ( strKey, strValue, iType ) );
+        }
+    }
+}
+
+void CAccount::RemoveData ( const std::string& strKey )
+{
+    std::list < CAccountData > ::iterator iter = m_Data.begin();
+    for (; iter != m_Data.end(); iter++)
+    {
+        if ( iter->GetKey() == strKey )
+        {
+            m_Data.erase( iter );
+            break;
+        }
+    }
+}

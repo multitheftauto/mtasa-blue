@@ -1923,6 +1923,9 @@ void BsodDetectionPreLaunch( void )
             {
                 SetApplicationSetting( "diagnostics", "user-confirmed-bsod-time", strMinidumpTime );
                 IncApplicationSettingInt( DIAG_MINIDUMP_CONFIRMED_COUNT );
+
+                // BSOD might be caused by progress animation, so flag for it to be disabled
+                SetApplicationSettingInt( GENERAL_PROGRESS_ANIMATION_DISABLE, 1 );
             }
         }
     }

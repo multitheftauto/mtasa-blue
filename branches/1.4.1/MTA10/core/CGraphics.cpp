@@ -1779,8 +1779,8 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
         return;
 
     // Check if disabled
-    static bool bDisabled = !GetApplicationSetting( "diagnostics", "user-confirmed-bsod-time" ).empty();
-    if ( bDisabled )
+    bool bEnabled = CVARS_GET_VALUE < bool > ( "progress_animation" );
+    if ( !bEnabled )
         return;
 
     //
