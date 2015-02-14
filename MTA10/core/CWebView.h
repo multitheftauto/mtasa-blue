@@ -32,9 +32,12 @@ class CWebView : public CWebViewInterface, private CefClient, private CefRenderH
 public:
     CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false );
     virtual ~CWebView           ();
+    void                        Initialise ();
     void                        SetWebBrowserEvents ( CWebBrowserEventsInterface* pInterface ) { m_pEventsInterface = pInterface; };
     void                        CloseBrowser ();
     inline CefRefPtr<CefBrowser>GetCefBrowser() { return m_pWebView; };
+
+    inline bool                 IsBeingDestroyed () { return m_bBeingDestroyed; }
     void                        SetBeingDestroyed ( bool state ) { m_bBeingDestroyed = state; }
 
     // Exported methods
@@ -111,6 +114,7 @@ private:
 
     bool                m_bBeingDestroyed;
     bool                m_bIsLocal;
+    bool                m_bIsTransparent;
     SString             m_strTempURL;
     POINT               m_vecMousePosition;
     SString             m_CurrentTitle;

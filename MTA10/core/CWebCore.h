@@ -31,7 +31,19 @@ struct IAudioSessionManager2;
 
 class CWebCore : public CWebCoreInterface
 {
-    using EventEntry = std::pair<std::function<void(void)>, CWebView*>;
+    struct EventEntry
+    {
+        std::function<void(void)> callback;
+        CWebView* pWebView;
+    #ifdef MTA_DEBUG
+        SString name;
+    #endif
+
+        EventEntry(const std::function<void(void)>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_) {}
+#ifdef MTA_DEBUG
+        EventEntry(const std::function<void(void)>& callback_, CWebView* pWebView_, const SString& name_) : callback(callback_), pWebView(pWebView_), name(name_) {}
+#endif
+    };
 
 public:
     CWebCore();
@@ -43,7 +55,7 @@ public:
     void                DoPulse             ();
     CWebView*           FindWebView         ( CefRefPtr<CefBrowser> browser );
 
-    void                AddEventToEventQueue( std::function<void(void)> func, CWebView* pWebView );
+    void                AddEventToEventQueue( std::function<void(void)> func, CWebView* pWebView, const SString& name );
     void                RemoveWebViewEvents ( CWebView* pWebView );
     void                DoEventQueuePulse   ();
     

@@ -147,11 +147,21 @@ CWebView* CWebCore::FindWebView ( CefRefPtr<CefBrowser> browser )
     return nullptr;
 }
 
-void CWebCore::AddEventToEventQueue ( std::function<void(void)> event, CWebView* pWebView )
+void CWebCore::AddEventToEventQueue ( std::function<void(void)> event, CWebView* pWebView, const SString& name )
 {
+#ifndef MTA_DEBUG
+    UNREFERENCED_PARAMETER(name);
+#endif
+    if ( pWebView->IsBeingDestroyed () )
+        return;
+
     std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
     
+#ifndef MTA_DEBUG
     m_EventQueue.push_back ( EventEntry ( event, pWebView ) );
+#else
+    m_EventQueue.push_back ( EventEntry ( event, pWebView, name ) );
+#endif
 }
 
 void CWebCore::RemoveWebViewEvents ( CWebView* pWebView )
@@ -162,7 +172,7 @@ void CWebCore::RemoveWebViewEvents ( CWebView* pWebView )
     {
         // Increment iterator before we remove the element from the list (to guarantee iterator validity)
         auto tempIterator = iter++;
-        if ( tempIterator->second == pWebView )
+        if ( tempIterator->pWebView == pWebView )
             m_EventQueue.erase ( tempIterator );
     }
 }
@@ -173,7 +183,7 @@ void CWebCore::DoEventQueuePulse ()
 
     for ( auto& event : m_EventQueue )
     {
-        event.first ();
+        event.callback ();
     }
 
     // Clear message queue

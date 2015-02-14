@@ -16,6 +16,7 @@ class CWebBrowserEventsInterface;
 class CWebViewInterface
 {
 public:
+    virtual void Initialise         () = 0;
     virtual void SetWebBrowserEvents( CWebBrowserEventsInterface* pInterface ) = 0;
     virtual bool LoadURL            ( const SString& strURL, bool bFilterEnabled = true ) = 0;
     virtual bool IsLoading          () = 0;
