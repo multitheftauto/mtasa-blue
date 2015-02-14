@@ -44,6 +44,13 @@ CSettings::CSettings ( void )
     m_pWindow = NULL;
     m_bBrowserListsChanged = false;
     CreateGUI ();
+
+    // Disable progress animation if required
+    if ( GetApplicationSettingInt( GENERAL_PROGRESS_ANIMATION_DISABLE ) )
+    {
+        SetApplicationSettingInt( GENERAL_PROGRESS_ANIMATION_DISABLE, 0 );
+        CVARS_SET ( "progress_animation", 0 );
+    }
 }
 
 
@@ -1195,6 +1202,7 @@ void CSettings::CreateGUI ( void )
         _("Browser speed:"),
         _("Single connection:"),
         _("Packet tag:"),
+        _("Progress animation:"),
         _("Fullscreen mode:"),
         _("Process priority:"),
         _("Debug setting:"),
@@ -1257,6 +1265,19 @@ void CSettings::CreateGUI ( void )
     m_pPacketTagCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
     m_pPacketTagCombo->AddItem ( _("On") )->SetData ( (void*)1 );
     m_pPacketTagCombo->SetReadOnly ( true );
+    vecTemp.fY += fLineHeight;
+
+    // Progress animation
+    m_pProgressAnimationLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Progress animation:") ) );
+    m_pProgressAnimationLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pProgressAnimationLabel->AutoSize ( );
+
+    m_pProgressAnimationCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
+    m_pProgressAnimationCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+    m_pProgressAnimationCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
+    m_pProgressAnimationCombo->AddItem ( _("Off") )->SetData ( (void*)0 );
+    m_pProgressAnimationCombo->AddItem ( _("Default") )->SetData ( (void*)1 );
+    m_pProgressAnimationCombo->SetReadOnly ( true );
     vecTemp.fY += fLineHeight;
 
     // Fullscreen mode
@@ -1382,6 +1403,14 @@ void CSettings::CreateGUI ( void )
     m_pUpdateAutoInstallCombo->SetReadOnly ( true );
     vecTemp.fY += fLineHeight;
 
+    if ( true )
+    {
+        // Always hide for now
+        m_pUpdateAutoInstallLabel->SetVisible ( false );
+        m_pUpdateAutoInstallCombo->SetVisible ( false );
+        vecTemp.fY -= fLineHeight;
+    }
+
     // Update build type
     m_pUpdateBuildTypeLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Update build type:") ) );
     m_pUpdateBuildTypeLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
@@ -1475,6 +1504,12 @@ void CSettings::CreateGUI ( void )
 
     m_pPacketTagCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
     m_pPacketTagCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pProgressAnimationLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pProgressAnimationLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
+
+    m_pProgressAnimationCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
+    m_pProgressAnimationCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
 
     m_pFullscreenStyleLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
     m_pFullscreenStyleLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
@@ -2830,6 +2865,11 @@ void CSettings::LoadData ( void )
     if ( iVar == 0 ) m_pPacketTagCombo->SetText ( _("Default") );
     else if ( iVar == 1 ) m_pPacketTagCombo->SetText ( _("On") );
 
+    // Progress animation
+    CVARS_GET ( "progress_animation", iVar );
+    if ( iVar == 0 ) m_pProgressAnimationCombo->SetText ( _("Off") );
+    else if ( iVar == 1 ) m_pProgressAnimationCombo->SetText ( _("Default") );
+
     // Windows 8 16-bit color
     iVar = GetApplicationSettingInt( "Win8Color16" );
     m_pWin8ColorCheckBox->SetSelected ( iVar != 0 );
@@ -3097,6 +3137,13 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "packet_tag", iSelected );
+    }
+
+    // Progress animation
+    if ( CGUIListItem* pSelected = m_pProgressAnimationCombo->GetSelectedItem () )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "progress_animation", iSelected );
     }
 
     // Windows 8 16-bit color
@@ -3979,6 +4026,8 @@ bool CSettings::OnShowAdvancedSettingDescription ( CGUIElement* pElement )
         strText = std::string( _( "Single connection:" ) ) + " " + std::string( _( "Switch on to use only one connection when downloading." ) );
     else if ( pLabel && pLabel == m_pPacketTagLabel || pComboBox && pComboBox == m_pPacketTagCombo )
         strText = std::string( _( "Packet tag:" ) ) + " " + std::string( _( "Tag network packets to help ISPs identify MTA traffic." ) );
+    else if ( pLabel && pLabel == m_pProgressAnimationLabel || pComboBox && pComboBox == m_pProgressAnimationCombo )
+        strText = std::string( _( "Progress animation:" ) ) + " " + std::string( _( "Spinning circle animation at the bottom of the screen" ) );
     else if ( pLabel && pLabel == m_pFullscreenStyleLabel || pComboBox && pComboBox == m_pFullscreenStyleCombo )
         strText = std::string( _( "Fullscreen mode:" ) ) + " " + std::string( _( "Experimental feature." ) );
     else if ( pLabel && pLabel == m_pDebugSettingLabel || pComboBox && pComboBox == m_pDebugSettingCombo )
