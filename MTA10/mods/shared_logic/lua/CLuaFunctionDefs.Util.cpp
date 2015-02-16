@@ -875,7 +875,7 @@ int CLuaFunctionDefs::GetNetworkStats ( lua_State* luaVM )
         lua_settable   ( luaVM, -3 );
 
         lua_pushstring ( luaVM, "encryptionStatus" );
-        lua_pushnumber ( luaVM, stats.encryptionStatus );
+        lua_pushnumber ( luaVM, 1 );
         lua_settable   ( luaVM, -3 );
 
         return 1;

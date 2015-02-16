@@ -102,7 +102,6 @@ public:
     int                             GetMinClientVersionAutoUpdate   ( void )                    { return m_iMinClientVersionAutoUpdate; }
     inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
-    bool                            GetNetworkEncryptionEnabled     ( void )                    { return m_bNetworkEncryptionEnabled; }
     bool                            GetThreadNetEnabled             ( void )                    { return m_bThreadNetEnabled; }
     const SString&                  GetGlobalDatabasesPath          ( void )                    { return m_strGlobalDatabasesPath; }
     const SString&                  GetSystemDatabasesPath          ( void )                    { return m_strSystemDatabasesPath; }
@@ -199,7 +198,6 @@ private:
     int                             m_iBackupAmount;
     int                             m_iCompactInternalDatabases;
     bool                            m_bDidBackup;
-    bool                            m_bNetworkEncryptionEnabled;
     SString                         m_strBandwidthReductionMode;
     int                             m_iPendingWorkToDoSleepTime;
     int                             m_iNoWorkToDoSleepTime;
