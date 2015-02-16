@@ -1154,6 +1154,13 @@ bool CStaticFunctionDefinitions::SetElementParent ( CElement* pElement, CElement
         pTemp = pTemp->GetParentEntity();
     }
 
+    // Issue #8766: Player's parent element can't be resetted
+    const char * szElementTypeName = pElement->GetTypeName().c_str();
+    const char * szParentTypeName = pParent->GetTypeName().c_str();
+
+    if ( !bValidParent && !strcmp(szElementTypeName, "player") && !strcmp(szParentTypeName, "root") )
+        bValidParent = true;
+
     // Make sure the new parent isn't the element and isn't a child of the entity
     if ( bValidParent && pElement != pParent && !pElement->IsMyChild ( pParent, true ) )
     {
