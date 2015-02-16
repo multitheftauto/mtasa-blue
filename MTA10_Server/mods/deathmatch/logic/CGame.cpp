@@ -796,11 +796,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket );
 
-    // Set encryption level
-    g_pNetServer->SetEncryptionEnabled ( m_pMainConfig->GetNetworkEncryptionEnabled () );
-    if ( !m_pMainConfig->GetNetworkEncryptionEnabled ()  )
-        CLogger::LogPrintf ( "Network encryption disabled\n" );
-
     // Try to start the network
     if ( !g_pNetServer->StartNetwork ( strServerIPList, usServerPort, uiMaxPlayers, m_pMainConfig->GetServerName ().c_str () ) )
     {
