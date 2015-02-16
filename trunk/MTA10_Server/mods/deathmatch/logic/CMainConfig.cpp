@@ -90,7 +90,6 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_ucVoiceQuality = 4;
     m_bVoiceEnabled = false;
     m_uiVoiceBitrate = 0;
-    m_bNetworkEncryptionEnabled = true;
     m_strBandwidthReductionMode = "medium";
     m_iPendingWorkToDoSleepTime = -1;
     m_iNoWorkToDoSleepTime = -1;
@@ -479,9 +478,6 @@ bool CMainConfig::Load ( void )
     m_iBackupAmount = Clamp ( 0, m_iBackupAmount, 100 );
 
     GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
-
-    // networkencryption - Encryption for Server <-> client communications
-    GetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
 
     // bandwidth_reduction
     GetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );
@@ -1121,7 +1117,8 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
     else
     if ( strName == "networkencryption" )
     {
-        strValue = SString ( "%d", m_bNetworkEncryptionEnabled ? 1 : 0 );
+        // Deprecated
+        strValue = "1";
         return true;
     }
     else
@@ -1241,13 +1238,7 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
     {
         if ( strValue == "0" || strValue == "1" )
         {
-            m_bNetworkEncryptionEnabled = atoi ( strValue ) ? true : false;
-            if ( bSave )
-            {
-                SetBoolean ( m_pRootNode, "networkencryption", m_bNetworkEncryptionEnabled );
-                Save ();
-            }
-            g_pNetServer->SetEncryptionEnabled ( m_bNetworkEncryptionEnabled );
+            // Deprecated
             return true;
         }
     }

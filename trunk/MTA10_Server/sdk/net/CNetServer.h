@@ -136,7 +136,6 @@ public:
     virtual void                            GetNetRoute                     ( SFixedString < 32 >* pstrRoute ) = 0;
 
     virtual bool                            InitServerId                    ( const char* szPath ) = 0;
-    virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled ) = 0;
     virtual void                            ResendModPackets                ( const NetServerPlayerID& playerID ) = 0;
 
     virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 64 >& strExtra, SFixedString < 32 >& strVersion ) = 0;

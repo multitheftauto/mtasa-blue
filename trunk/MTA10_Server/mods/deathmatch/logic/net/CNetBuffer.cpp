@@ -723,20 +723,6 @@ bool CNetServerBuffer::InitServerId ( const char* szPath )
 
 ///////////////////////////////////////////////////////////////////////////
 //
-// CNetServerBuffer::SetEncryptionEnabled
-//
-// Non-blocking. Called once at startup, and when config changes
-//
-///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::SetEncryptionEnabled ( bool bEncryptionEnabled )
-{
-    SSetEncryptionEnabledArgs* pArgs = new SSetEncryptionEnabledArgs ( bEncryptionEnabled );
-    AddCommandAndFree ( pArgs );
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-//
 // CNetServerBuffer::ResendModPackets
 //
 // Non-blocking.
@@ -1191,7 +1177,6 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET0R( unsigned int,        GetPendingPacketCount           )
         CALLREALNET1 (                      GetNetRoute                     , SFixedString < 32 >*, pstrRoute )
         CALLREALNET1R( bool,                InitServerId                    , const char*, szPath )
-        CALLREALNET1 (                      SetEncryptionEnabled            , bool, bEncryptionEnabled )
         CALLREALNET1 (                      ResendModPackets                , const NetServerPlayerID&, playerID )
         CALLREALNET4 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, SFixedString < 32 >&, strSerial, SFixedString < 64 >&, strExtra, SFixedString < 32 >&, strVersion )
         CALLREALNET1 (                      SetNetOptions                   , const SNetOptions&, options )

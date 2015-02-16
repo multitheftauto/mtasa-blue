@@ -100,7 +100,6 @@ public:
     virtual void                            GetNetRoute                     ( SFixedString < 32 >* pstrRoute );
 
     virtual bool                            InitServerId                    ( const char* szPath );
-    virtual void                            SetEncryptionEnabled            ( bool bEncryptionEnabled );
     virtual void                            ResendModPackets                ( const NetServerPlayerID& playerID );
 
     virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 64 >& strExtra, SFixedString < 32 >& strVersion );
@@ -151,7 +150,6 @@ public:
     DECLARE_FUNC_ARGS0R( unsigned int,          GetPendingPacketCount           );
     DECLARE_FUNC_ARGS1 (                        GetNetRoute                     , SFixedString < 32 >*, pstrRoute );
     DECLARE_FUNC_ARGS1R( bool,                  InitServerId                    , const char*, szPath );
-    DECLARE_FUNC_ARGS1 (                        SetEncryptionEnabled            , bool, bEncryptionEnabled );
     DECLARE_FUNC_ARGS1 (                        ResendModPackets                , const NetServerPlayerIDRef, playerID );
     DECLARE_FUNC_ARGS4 (                        GetClientSerialAndVersion       , const NetServerPlayerIDRef, playerID, SFixedString < 32 >&, strSerial, SFixedString < 64 >&, strExtra, SFixedString < 32 >&, strVersion );
     DECLARE_FUNC_ARGS1 (                        SetNetOptions                   , const SNetOptions, options );
