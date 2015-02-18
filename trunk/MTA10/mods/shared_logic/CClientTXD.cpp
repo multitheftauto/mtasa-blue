@@ -34,21 +34,38 @@ CClientTXD::~CClientTXD ( void )
 }
 
 
-bool CClientTXD::LoadTXD ( const char* szFile, bool bFilteringEnabled )
+bool CClientTXD::LoadTXD ( const SString& strFile, bool bFilteringEnabled, bool bIsRawData )
 {
     // Do load here to check for errors.
-    m_strFilename = szFile;
     m_bFilteringEnabled = bFilteringEnabled;
-    CBuffer buffer;
-    if ( !LoadFileData( buffer ) )
-        return false;
-    return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, buffer, m_bFilteringEnabled );
+    m_bIsRawData = bIsRawData;
+
+    if( !m_bIsRawData )
+    {
+        m_strFilename = strFile;
+        CBuffer buffer;
+        if ( !LoadFileData( buffer ) )
+            return false;
+        return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, buffer, m_bFilteringEnabled );
+    }
+    else
+    {
+        m_FileData = CBuffer( strFile, strFile.length() );
+        if ( !g_pCore->GetNetwork()->CheckFile( "txd", "", m_FileData ) )
+            return false;
+
+        return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, m_FileData, m_bFilteringEnabled );
+    }
 }
+
 
 bool CClientTXD::Import ( unsigned short usModelID )
 {
     if ( usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST )
     {
+        if ( m_FileData.IsEmpty() && m_bIsRawData )
+            return false;   // Raw data has been freed already because texture was first used as non-clothes
+
         // If using for clothes only, unload 'replacing model textures' stuff to save memory
         if ( !m_ReplacementTextures.textures.empty() && m_ReplacementTextures.usedInModelIds.empty() )
         {
@@ -61,6 +78,7 @@ bool CClientTXD::Import ( unsigned short usModelID )
             if ( !LoadFileData( m_FileData ) )
                 return false;
         }
+        m_bUsingFileDataForClothes = true;
         g_pGame->GetRenderWare ()->ClothesAddReplacementTxd( m_FileData.GetData(), usModelID - CLOTHES_MODEL_ID_FIRST );
         return true;
     }
@@ -69,12 +87,28 @@ bool CClientTXD::Import ( unsigned short usModelID )
         // Ensure loaded for replacing model textures
         if ( m_ReplacementTextures.textures.empty () )
         {
-            CBuffer buffer;
-            if ( !LoadFileData( buffer ) )
-                return false;
-            g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, buffer, m_bFilteringEnabled );
-            if ( m_ReplacementTextures.textures.empty() )
-                return false;
+            if( !m_bIsRawData )
+            {
+                CBuffer buffer;
+                if ( !LoadFileData( buffer ) )
+                    return false;
+                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, buffer, m_bFilteringEnabled );
+                if ( m_ReplacementTextures.textures.empty() )
+                    return false;
+            }
+            else
+            {
+                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, m_FileData, m_bFilteringEnabled );
+                if ( m_ReplacementTextures.textures.empty() )
+                    return false;
+            }
+        }
+
+        // If raw data and not used as clothes textures yet, then free raw data buffer to save RAM
+        if ( m_bIsRawData && !m_bUsingFileDataForClothes )
+        {
+            // This means the texture can't be used for clothes now
+            m_FileData.Clear();
         }
 
         // Have we got textures and haven't already imported into this model?
@@ -124,5 +158,11 @@ bool CClientTXD::LoadFileData( CBuffer& buffer )
 {
     buffer.LoadFromFile( m_strFilename );
     g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strFilename, buffer );
-    return g_pCore->GetNetwork()->CheckFile( "txd", m_strFilename );
+    return g_pCore->GetNetwork()->CheckFile( "txd", m_strFilename, buffer );
+}
+
+// Return true if data looks like TXD file contents
+bool CClientTXD::IsTXDData ( const SString& strData )
+{
+    return strData.length() > 32 && memcmp( strData, "\x16\x00\x00\x00", 4 ) == 0;
 }

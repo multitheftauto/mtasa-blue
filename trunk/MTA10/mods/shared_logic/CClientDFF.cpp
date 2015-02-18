@@ -53,30 +53,53 @@ RpClump* CClientDFF::GetLoadedClump ( ushort usModelId )
         m_pManager->GetModelRequestManager ()->RequestBlocking ( usModelId, "CClientDFF::LoadDFF" );
 
         // Attempt loading it
-        CBuffer buffer;
-        buffer.LoadFromFile( m_strDffFilename );
-        g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strDffFilename, buffer );
-        info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( buffer, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
+        if( !m_bIsRawData ) // We have file
+        {
+            CBuffer buffer;
+            buffer.LoadFromFile( m_strDffFilename );
+            g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strDffFilename, buffer );
+            if ( g_pCore->GetNetwork ()->CheckFile ( "dff", m_strDffFilename, buffer ) )
+            {
+                info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( buffer, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
+            }
+        }
+        else //We have raw data
+        {
+            info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( m_RawDataBuffer, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
+
+            // Remove raw data from memory (can only do one replace when using raw data)
+            m_RawDataBuffer.Clear ();
+        }
     }
 
     return info.pClump;
 }
 
 
-bool CClientDFF::LoadDFF ( const char* szFile )
+bool CClientDFF::LoadDFF ( const SString& strFile, bool bIsRawData )
 {
     // Should only be called once, directly after construction
-    assert ( m_strDffFilename.empty () );
+    m_bIsRawData = bIsRawData;
+    if( !m_bIsRawData ) // If we have actual file
+    {
+        assert ( m_strDffFilename.empty () );
 
-    m_strDffFilename = szFile;
-    if ( m_strDffFilename.empty () )
-        return false;
+        m_strDffFilename = strFile;
+        if ( m_strDffFilename.empty () )
+            return false;
 
-    if ( !FileExists ( m_strDffFilename ) )
-        return false;
+        if ( !FileExists ( m_strDffFilename ) )
+            return false;
 
-    if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", m_strDffFilename ) )
-        return false;
+        if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", m_strDffFilename ) )
+            return false;
+    }
+    else
+    {
+        m_RawDataBuffer = CBuffer( strFile, strFile.length() );
+        if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", "", m_RawDataBuffer ) )
+            return false;
+    }
 
     // Do actual load later (in ReplaceModel)
     return true;
@@ -331,4 +354,10 @@ bool CClientDFF::ReplaceVehicleModel ( RpClump* pClump, ushort usModel, bool bAl
 
     // Success
     return true;
+}
+
+// Return true if data looks like DFF file contents
+bool CClientDFF::IsDFFData ( const SString& strData )
+{
+    return strData.length() > 32 && memcmp( strData, "\x10\x00\x00\x00", 4 ) == 0;
 }
