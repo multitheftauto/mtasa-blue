@@ -36,7 +36,7 @@ public:
 
     eClientEntityType               GetType                 ( void ) const              { return CCLIENTDFF; }
 
-    bool                            LoadDFF                 ( const char* szFile );
+    bool                            LoadDFF                 ( const SString& strFile, bool bIsRawData );
 
     bool                            ReplaceModel            ( unsigned short usModel, bool bAlphaTransparency );
 
@@ -44,6 +44,8 @@ public:
 
     void                            RestoreModel            ( unsigned short usModel );
     void                            RestoreModels           ( void );
+
+    static bool                     IsDFFData               ( const SString& strData );
 
     // Sorta a hack that these are required by CClientEntity...
     void                            Unlink                  ( void ) {};
@@ -64,6 +66,8 @@ protected:
     class CClientDFFManager*        m_pDFFManager;
 
     SString                         m_strDffFilename;
+    CBuffer                         m_RawDataBuffer;
+    bool                            m_bIsRawData;
     std::map < ushort, SLoadedClumpInfo > m_LoadedClumpInfoMap;
 
     std::list < unsigned short >    m_Replaced;
