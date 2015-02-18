@@ -32,7 +32,7 @@ The hooks in this file modify the following WinAPI functions to work correctly w
     DeleteFile
     GetModuleHandle
 
-The following functions will also work correctly with utf8 strings as they eventually call the hooked WinAPI functions:
+The following will also work correctly with utf8 strings as they eventually call the hooked WinAPI functions:
 
     fopen
     mkdir
@@ -41,6 +41,7 @@ The following functions will also work correctly with utf8 strings as they event
     rename
     remove
     unlink
+    fstream
 
 BUT
     * Many other Win32 functions are not hooked and will need utf8 conversions when used, like these:
@@ -50,9 +51,28 @@ BUT
         GetCurrentDirectory
         GetDllDirectory
             and many more...
-ALSO BUT
-    * std::stream functions are not hooked, so each one use will require a ToUTF8() during the open call.
 */
+
+
+//
+// Determine file name of Microsoft Visual Studio C/C++ Runtime dll
+//
+#if _MSC_VER == 1500        // MSVC++ 9.0 (Visual Studio 2008)
+    #ifdef _DEBUG
+        #define MSVCR_DLL "msvcr90d.dll"
+    #else
+        #define MSVCR_DLL "msvcr90.dll"
+    #endif
+#elif _MSC_VER == 1800      // MSVC++ 12.0 (Visual Studio 2013)
+    #ifdef _DEBUG
+        #define MSVCR_DLL "msvcr120d.dll"
+    #else
+        #define MSVCR_DLL "msvcr120.dll"
+    #endif
+#else
+    #error "Insert VCR info"
+#endif
+
 
 namespace SharedUtil
 {
@@ -183,6 +203,17 @@ namespace SharedUtil
         __in_opt LPCSTR lpModuleName
         );
 
+    typedef
+    errno_t
+    (__cdecl
+    *FUNC__sopen_s)(
+        _Out_ int * _FileHandle,
+        _In_z_ const char * _Filename,
+        _In_ int _OpenFlag,
+        _In_ int _ShareFlag,
+        _In_ int _PermissionMode
+        );
+
 
     /////////////////////////////////////////////////////////////
     //
@@ -209,6 +240,7 @@ namespace SharedUtil
     HOOKVAR( MoveFileA )
     HOOKVAR( DeleteFileA )
     HOOKVAR( GetModuleHandleA )
+    HOOKVAR( _sopen_s )
 
 
 #ifdef MTA_CLIENT
@@ -427,6 +459,18 @@ namespace SharedUtil
         return GetModuleHandleW( FromUTF8( lpModuleName ) );
     }
 
+    errno_t
+    __cdecl
+    My_sopen_s(
+        _Out_ int * _FileHandle,
+        _In_z_ const char * _Filename,
+        _In_ int _OpenFlag,
+        _In_ int _ShareFlag,
+        _In_ int _PermissionMode
+    )
+    {
+        return _wsopen_s( _FileHandle, FromUTF8( _Filename ), _OpenFlag, _ShareFlag, _PermissionMode );
+    }
 
     /////////////////////////////////////////////////////////////
     //
@@ -456,6 +500,7 @@ namespace SharedUtil
         ADDHOOK( "Kernel32.dll", MoveFileA )
         ADDHOOK( "Kernel32.dll", DeleteFileA )
         ADDHOOK( "Kernel32.dll", GetModuleHandleA )
+        ADDHOOK( MSVCR_DLL, _sopen_s )
     }
 
 
@@ -491,5 +536,6 @@ namespace SharedUtil
         DELHOOK( MoveFileA )
         DELHOOK( DeleteFileA )
         DELHOOK( GetModuleHandleA )
+        DELHOOK( _sopen_s )
     }
 }
