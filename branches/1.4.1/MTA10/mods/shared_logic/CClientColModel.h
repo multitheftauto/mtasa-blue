@@ -24,7 +24,7 @@ public:
 
     eClientEntityType               GetType                 ( void ) const              { return CCLIENTCOL; }
 
-    bool                            LoadCol                 ( const char* szFile );
+    bool                            LoadCol                 ( const SString& strFile, bool bIsRawData );
     inline bool                     IsLoaded                ( void )                    { return m_pColModel != NULL; };
 
     bool                            Replace                 ( unsigned short usModel );
@@ -32,6 +32,7 @@ public:
     void                            RestoreAll              ( void );
 
     bool                            HasReplaced             ( unsigned short usModel );
+    static bool                     IsCOLData               ( const SString& strData );
 
 
     // Sorta a hack that these are required by CClientEntity...

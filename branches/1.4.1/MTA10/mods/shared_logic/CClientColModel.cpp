@@ -38,16 +38,25 @@ CClientColModel::~CClientColModel ( void )
 }
 
 
-bool CClientColModel::LoadCol ( const char* szFile )
+bool CClientColModel::LoadCol ( const SString& strFile, bool bIsRawData )
 {
     // Not already got a col model?
     if ( !m_pColModel )
     {
+        SString strFilename;
         CBuffer buffer;
-        buffer.LoadFromFile( szFile );
-        g_pClientGame->GetResourceManager()->ValidateResourceFile( szFile, buffer );
+        if ( !bIsRawData )
+        {
+            strFilename = strFile;
+            buffer.LoadFromFile( strFilename );
+            g_pClientGame->GetResourceManager()->ValidateResourceFile( strFilename, buffer );
+        }
+        else
+        {
+            buffer = CBuffer( strFile, strFile.length() );
+        }
 
-        if ( !g_pCore->GetNetwork ()->CheckFile ( "col", szFile ) )
+        if ( !g_pCore->GetNetwork()->CheckFile( "col", strFilename, buffer ) )
             return false;
 
         // Load the collision file
@@ -140,4 +149,11 @@ void CClientColModel::InternalRestore ( unsigned short usModel )
     // Grab the model info and restore it
     CModelInfo* pModel = g_pGame->GetModelInfo ( usModel );
     pModel->RestoreColModel ();
+}
+
+
+// Return true if data looks like COL file contents
+bool CClientColModel::IsCOLData ( const SString& strData )
+{
+    return strData.length() > 32 && memcmp( strData, "COL", 3 ) == 0 && strData[7] == 0;
 }
