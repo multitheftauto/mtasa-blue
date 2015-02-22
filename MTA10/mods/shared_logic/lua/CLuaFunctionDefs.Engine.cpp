@@ -23,7 +23,7 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
 {
     SString strFile = "";
     CScriptArgReader argStream ( luaVM );
-    // Grab the COL filename
+    // Grab the COL filename or data
     argStream.ReadString ( strFile );
 
     if ( !argStream.HasErrors ( ) )
@@ -36,10 +36,10 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                
+                bool bIsRawData = CClientColModel::IsCOLData( strFile );
                 SString strPath;
                 // Is this a legal filepath?
-                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
                 {
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceCOLModelRoot ();
@@ -48,7 +48,7 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
                     CClientColModel* pCol = new CClientColModel ( m_pManager, INVALID_ELEMENT_ID );
 
                     // Attempt loading the file
-                    if ( pCol->LoadCol ( strPath ) )
+                    if ( pCol->LoadCol ( bIsRawData ? strFile : strPath, bIsRawData ) )
                     {
                         // Success. Make it a child of the resource collision root
                         pCol->SetParent ( pRoot );
@@ -61,11 +61,11 @@ int CLuaFunctionDefs::EngineLoadCOL ( lua_State* luaVM )
                     {
                         // Delete it again. We failed
                         delete pCol;
-                        argStream.SetCustomError( strFile, "Error loading COL" );
+                        argStream.SetCustomError( bIsRawData ? "raw data" : strFile, "Error loading COL" );
                     }
                 }
                 else
-                    argStream.SetCustomError( strFile, "Bad file path" );
+                    argStream.SetCustomError( bIsRawData ? "raw data" : strFile, "Bad file path" );
             }
         }
     }
@@ -82,7 +82,7 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
 {
     SString strFile = "";
     CScriptArgReader argStream ( luaVM );
-    // Grab the DFF filename (model ID ignored after 1.3.1)
+    // Grab the DFF filename or data (model ID ignored after 1.3.1)
     argStream.ReadString ( strFile );
 
     if ( !argStream.HasErrors ( ) )
@@ -95,9 +95,10 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
+                bool bIsRawData = CClientDFF::IsDFFData( strFile );
                 SString strPath;
                 // Is this a legal filepath?
-                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
                 {
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
@@ -106,7 +107,7 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
                     CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
 
                     // Try to load the DFF file
-                    if ( pDFF->LoadDFF ( strPath ) )
+                    if ( pDFF->LoadDFF ( bIsRawData ? strFile : strPath, bIsRawData ) )
                     {
                         // Success loading the file. Set parent to DFF root
                         pDFF->SetParent ( pRoot );
@@ -119,11 +120,11 @@ int CLuaFunctionDefs::EngineLoadDFF ( lua_State* luaVM )
                     {
                         // Delete it again
                         delete pDFF;
-                        argStream.SetCustomError( strFile, "Error loading DFF" );
+                        argStream.SetCustomError( bIsRawData ? "raw data" : strFile, "Error loading DFF" );
                     }
                 }
                 else
-                    argStream.SetCustomError( strFile, "Bad file path" );
+                    argStream.SetCustomError( bIsRawData ? "raw data" : strFile, "Bad file path" );
             }
         }
     }
@@ -141,7 +142,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
     SString strFile = "";
     bool bFilteringEnabled = true;
     CScriptArgReader argStream ( luaVM );
-    // Grab the TXD filename
+    // Grab the TXD filename or data
     argStream.ReadString ( strFile );
     if ( argStream.NextIsBool() )   // Some scripts have a number here (in error)
         argStream.ReadBool ( bFilteringEnabled, true );
@@ -156,9 +157,10 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
+                bool bIsRawData = CClientTXD::IsTXDData( strFile );
                 SString strPath;
                 // Is this a legal filepath?
-                if ( CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
                 {
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
@@ -167,7 +169,7 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
                     CClientTXD* pTXD = new CClientTXD ( m_pManager, INVALID_ELEMENT_ID );
 
                     // Try to load the TXD file
-                    if ( pTXD->LoadTXD ( strPath, bFilteringEnabled ) )
+                    if ( pTXD->LoadTXD ( bIsRawData ? strFile : strPath, bFilteringEnabled, bIsRawData ) )
                     {
                         // Success loading the file. Set parent to TXD root
                         pTXD->SetParent ( pRoot );
@@ -180,15 +182,15 @@ int CLuaFunctionDefs::EngineLoadTXD ( lua_State* luaVM )
                     {
                         // Delete it again
                         delete pTXD;
-                        m_pScriptDebugging->LogCustom ( luaVM, SString ( "Load error @ '%s' [Unable to load '%s']", "engineLoadTXD", *strFile ) );
+                        argStream.SetCustomError( bIsRawData ? "raw data" : strFile, "Error loading TXD" );
                     }
                 }
                 else
-                    m_pScriptDebugging->LogBadPointer ( luaVM, "string", 1 );
+                    argStream.SetCustomError( bIsRawData ? "raw data" : strFile, "Bad file path" );
             }
         }
     }
-    else
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
