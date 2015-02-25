@@ -566,6 +566,7 @@ public:
     LUA_DECLARE ( SetUnbanTime );
     LUA_DECLARE ( SetBanReason );
     LUA_DECLARE ( SetBanAdmin );
+    LUA_DECLARE ( SetBanNick );
     LUA_DECLARE ( IsBan );
 
     // Cursor get funcs
