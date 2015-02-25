@@ -404,6 +404,30 @@ int CLuaFunctionDefs::SetBanAdmin ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::SetBanNick ( lua_State* luaVM )
+{
+    CBan* pBan;
+    SString strNick;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pBan );
+    argStream.ReadString ( strNick );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetBanNick ( pBan, strNick ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::IsBan ( lua_State* luaVM )
 {
     CBan* pBan;
