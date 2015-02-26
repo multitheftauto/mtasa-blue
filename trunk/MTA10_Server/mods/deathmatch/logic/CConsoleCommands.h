@@ -74,6 +74,7 @@ public:
 
     static bool         AclRequest      ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         DebugJoinFlood  ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
+    static bool         DebugUpTime     ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         FakeLag         ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 };
 

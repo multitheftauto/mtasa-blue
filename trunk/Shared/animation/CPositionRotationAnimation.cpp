@@ -62,12 +62,12 @@ void CPositionRotationAnimation::SetTargetValue ( const SPositionRotation& a_rVa
      a_rBitStream.WriteBit ( a_bResumeMode );
      if ( a_bResumeMode )
      {
-        unsigned long ulNow = _GetTime ();
-        unsigned long ulElaspedTime = ulNow - m_ulStartTime;
+        unsigned long long ullNow = _GetTime ();
+        unsigned long ulElaspedTime = static_cast < unsigned long > ( ullNow - m_ullStartTime );
         unsigned long ulTimeLeft = 0;
-        if ( m_ulEndTime > ulNow )
+        if ( m_ullEndTime > ullNow )
         {
-            ulTimeLeft = m_ulEndTime - ulNow;
+            ulTimeLeft = static_cast < unsigned long > ( m_ullEndTime - ullNow );
         }
         a_rBitStream.WriteCompressed ( ulElaspedTime );
         a_rBitStream.WriteCompressed ( ulTimeLeft );

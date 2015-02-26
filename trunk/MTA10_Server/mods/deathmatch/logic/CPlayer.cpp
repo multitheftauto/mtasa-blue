@@ -52,7 +52,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     
     m_uiScriptDebugLevel = 0;
 
-    m_ulTimeConnected = GetTime ();
+    m_ullTimeConnected = GetTickCount64_ ();
 
     m_tNickChange = 0;
 

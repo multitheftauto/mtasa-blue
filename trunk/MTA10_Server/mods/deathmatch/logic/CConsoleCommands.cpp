@@ -1979,3 +1979,28 @@ bool CConsoleCommands::DebugJoinFlood ( CConsole* pConsole, const char* szArgume
     pEchoClient->SendConsole ( strOutput );
     return true;
 }
+
+
+bool CConsoleCommands::DebugUpTime ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    {
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debuguptime", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole ( "debuguptime: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    int iDaysAdd = 0;
+    if ( szArguments )
+    {
+        iDaysAdd = atoi( szArguments );
+        iDaysAdd = Clamp( 0, iDaysAdd, 10 );
+    }
+
+    long long llTickCountAdd = iDaysAdd * 1000 * 60 * 60 * 24;
+    AddTickCount( llTickCountAdd );
+    pEchoClient->SendConsole ( SString( "TickCount advanced by %d days", iDaysAdd ) );
+    return true;
+}
