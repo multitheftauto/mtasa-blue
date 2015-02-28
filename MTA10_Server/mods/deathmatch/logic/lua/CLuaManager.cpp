@@ -687,6 +687,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setUnbanTime", CLuaFunctionDefs::SetUnbanTime );
     CLuaCFunctions::AddFunction ( "setBanReason", CLuaFunctionDefs::SetBanReason );
     CLuaCFunctions::AddFunction ( "setBanAdmin", CLuaFunctionDefs::SetBanAdmin );
+    CLuaCFunctions::AddFunction ( "setBanNick", CLuaFunctionDefs::SetBanNick );
     CLuaCFunctions::AddFunction ( "isBan", CLuaFunctionDefs::IsBan );
 
     /*

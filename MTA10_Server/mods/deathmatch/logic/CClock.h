@@ -26,7 +26,7 @@ public:
     unsigned long           GetMinuteDuration       ( void );
 
 private:
-    unsigned long           m_ulMidnightTime;
+    unsigned long long      m_ullMidnightTime;
     unsigned long           m_ulMinuteDuration;
 };
 

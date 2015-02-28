@@ -54,6 +54,8 @@ namespace SharedUtil
     long long   GetModuleTickCount64 ( void );
     void        UpdateModuleTickCount64 ( void );
 
+    // Debugging
+    void        AddTickCount    ( long long llTickCountAdd );
 
     //
     // Encapsulate a tick count value

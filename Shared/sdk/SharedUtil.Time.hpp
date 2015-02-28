@@ -15,30 +15,15 @@
 #endif
 
 static CCriticalSection ms_criticalSection;
+static long long ms_llTickCountAdd = 0;
 unsigned long GetTickCountInternal ( void );
 
-// Not multithread safe
-// Must be called from within a locked critical section
-uint GetTickCount32ST ( void )
+// Debugging
+void SharedUtil::AddTickCount( long long llTickCountAdd )
 {
-    static uint uiCurrent = ( GetTickCountInternal () % 300000 + 200000 );
-    static uint uiWas      = GetTickCountInternal();
-    uint        uiNow      = GetTickCountInternal();
-    uint        uiDelta    = uiNow - uiWas;
-    uiWas = uiNow;
-
-    // Ensure delta is not negative
-    if ( uiDelta > 0x80000000 )
-        uiDelta = 0;
-
-    // Or greater than 600 seconds
-    if ( uiDelta > 600 * 1000 )
-        uiDelta = 600 * 1000;
-
-    // Add delta to accumulator
-    uiCurrent += uiDelta;
-
-    return uiCurrent;
+    ms_criticalSection.Lock ();
+    ms_llTickCountAdd = llTickCountAdd;
+    ms_criticalSection.Unlock ();
 }
 
 
@@ -49,10 +34,7 @@ uint GetTickCount32ST ( void )
 //
 uint SharedUtil::GetTickCount32 ( void )
 {
-    ms_criticalSection.Lock ();
-    uint uiResult = GetTickCount32ST();
-    ms_criticalSection.Unlock ();
-    return uiResult;
+    return (uint)GetTickCount64_();
 }
 
 
@@ -67,14 +49,26 @@ long long SharedUtil::GetTickCount64_ ( void )
 {
     ms_criticalSection.Lock ();
 
-    static long long llCurrent = GetTickCount32ST();
-    static uint uiWas      = GetTickCount32ST ();
-    uint        uiNow      = GetTickCount32ST ();
+    static long long llCurrent = ( GetTickCountInternal () % 300000 + 200000 );
+    static uint uiWas      = GetTickCountInternal();
+    uint        uiNow      = GetTickCountInternal();
     uint        uiDelta    = uiNow - uiWas;
     uiWas = uiNow;
 
+    // Ensure delta is not negative
+    if ( uiDelta > 0x80000000 )
+        uiDelta = 0;
+
+    // Or greater than 600 seconds
+    if ( uiDelta > 600 * 1000 )
+        uiDelta = 600 * 1000;
+
     // Add delta to accumulator
     llCurrent += uiDelta;
+
+    // Add debug value
+    llCurrent += ms_llTickCountAdd;
+    ms_llTickCountAdd = 0;
 
     long long llResult = llCurrent;
     ms_criticalSection.Unlock ();

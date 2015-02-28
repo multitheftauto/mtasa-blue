@@ -17,8 +17,8 @@ class TInterpolation
 public:
     TInterpolation ( ) :
         m_easingCurve ( CEasingCurve::Linear ),
-        m_ulStartTime ( 0 ),
-        m_ulEndTime ( 0 ),
+        m_ullStartTime ( 0 ),
+        m_ullEndTime ( 0 ),
         m_ulDuration ( 0 )
       {
       }
@@ -45,24 +45,24 @@ public:
 
     void SetDuration ( unsigned long a_ulDuration )
     {
-        unsigned long ulNow = _GetTime ();
-        m_ulStartTime = ulNow;
-        m_ulEndTime = ulNow + a_ulDuration;
+        unsigned long long ullNow = _GetTime ();
+        m_ullStartTime = ullNow;
+        m_ullEndTime = ullNow + a_ulDuration;
         m_ulDuration = a_ulDuration;
     }
 
     void SetDuration ( unsigned long a_ulElapsedTime, unsigned long a_ulTimeLeft )
     {
-        unsigned long ulNow = _GetTime ();
-        m_ulStartTime = ulNow - a_ulElapsedTime;
-        m_ulEndTime = ulNow + a_ulTimeLeft;
+        unsigned long long ullNow = _GetTime ();
+        m_ullStartTime = ullNow - a_ulElapsedTime;
+        m_ullEndTime = ullNow + a_ulTimeLeft;
         m_ulDuration = a_ulElapsedTime + a_ulTimeLeft;
     }
 
     bool IsRunning () const
     {
-        unsigned long ulNow = _GetTime ();
-        return ( ulNow < m_ulEndTime ) && ( m_ulDuration > 0 );
+        unsigned long long ullNow = _GetTime ();
+        return ( ullNow < m_ullEndTime ) && ( m_ulDuration > 0 );
     }
 
     // Returns false if the animation reached the end and should not be used anymore
@@ -70,8 +70,8 @@ public:
     {
         if ( IsRunning () )
         {
-            unsigned long ulNow = _GetTime ();
-            float fElapsedTime = static_cast < float > ( ulNow - m_ulStartTime );
+            unsigned long long ullNow = _GetTime ();
+            float fElapsedTime = static_cast < float > ( ullNow - m_ullStartTime );
 
             float fAnimationTime = fElapsedTime / m_ulDuration; //Division by 0 is handled by IsRunning ()
             fAnimationTime = m_easingCurve.ValueForProgress ( fAnimationTime ); //Get the animation time to use (since it can be non linear)
@@ -124,9 +124,9 @@ public:
     }
        
 protected:
-    unsigned long _GetTime () const
+    unsigned long long _GetTime () const
     {
-        return GetTickCount32 ();
+        return GetTickCount64_ ();
     }
 
     void _GetValue ( T& a_rResult, float a_fAnimationTime ) const
@@ -142,9 +142,9 @@ protected:
   
     CEasingCurve    m_easingCurve;
 
-    unsigned long   m_ulStartTime;
-    unsigned long   m_ulEndTime;
-    unsigned long   m_ulDuration;
+    unsigned long long  m_ullStartTime;
+    unsigned long long  m_ullEndTime;
+    unsigned long       m_ulDuration;
 };
 
 #endif

@@ -90,6 +90,7 @@
       <right name="function.setUnbanTime" access="false"/>
       <right name="function.setBanAdmin" access="false"/>
       <right name="function.setBanReason" access="false"/>
+      <right name="function.setBanNick" access="false"/>
       <right name="function.removeBan" access="false"/>
       <right name="function.removeAccount" access="false"/>
       <right name="function.setAccountPassword" access="false"/>
@@ -193,6 +194,7 @@
       <right name="function.setUnbanTime" access="true"/>
       <right name="function.setBanAdmin" access="true"/>
       <right name="function.setBanReason" access="true"/>
+      <right name="function.setBanNick" access="true"/>
       <right name="function.removeBan" access="true"/>
       <right name="function.reloadBans" access="true"/>
       <right name="function.executeCommandHandler" access="true"/>

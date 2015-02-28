@@ -11646,6 +11646,16 @@ bool CStaticFunctionDefinitions::SetBanAdmin ( CBan* pBan, const SString& strAdm
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetBanNick ( CBan* pBan, const SString& strNick )
+{
+    if ( strNick.length () > MAX_PLAYER_NICK_LENGTH )
+        pBan->SetNick ( strNick.substr( 0, MAX_PLAYER_NICK_LENGTH - 3 ) + "..." );
+    else
+        pBan->SetNick ( strNick );
+
+    return true;
+}
+
 bool CStaticFunctionDefinitions::IsCursorShowing ( CPlayer* pPlayer, bool& bShowing )
 {
     assert ( pPlayer );
