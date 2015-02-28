@@ -283,12 +283,12 @@ void CClientCamera::SetOrbitTarget ( const CVector& vecPosition )
 {
     if ( m_pCamera )
     {
-        CVector vecPlayerPosition;
-        g_pClientGame->GetLocalPlayer ()->GetPosition ( vecPlayerPosition );
+        CVector vecCameraPosition;
+        GetPosition ( vecCameraPosition );
 
-        float fDistance = (vecPosition - vecPlayerPosition).Length ();
-        float fAngleHorz = -atan2 ( vecPosition.fX - vecPlayerPosition.fX, vecPosition.fY - vecPlayerPosition.fY ) - PI/2;
-        float fAngleVert = atan2 ( vecPosition.fZ - vecPlayerPosition.fZ, fDistance );
+        float fDistance = (vecPosition - vecCameraPosition).Length ();
+        float fAngleHorz = -atan2 ( vecPosition.fX - vecCameraPosition.fX, vecPosition.fY - vecCameraPosition.fY ) - PI/2;
+        float fAngleVert = atan2 ( vecPosition.fZ - vecCameraPosition.fZ, fDistance );
 
         CCam* pCam = m_pCamera->GetCam ( m_pCamera->GetActiveCam () );
         pCam->SetDirection ( fAngleHorz, fAngleVert );

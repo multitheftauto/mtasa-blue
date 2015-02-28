@@ -558,6 +558,7 @@ void CLuaMain::AddBanClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "time", NULL, "getBanTime" );
     lua_classvariable ( luaVM, "unbanTime", NULL, "getUnbanTime" );
     lua_classvariable ( luaVM, "reason", "setBanReason", "getBanReason" );
+    lua_classvariable ( luaVM, "nick", "setBanNick", "getBanNick" );
     
     lua_registerclass ( luaVM, "Ban" );
 }

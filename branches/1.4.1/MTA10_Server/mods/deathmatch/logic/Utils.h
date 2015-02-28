@@ -63,11 +63,6 @@ bool            XMLColorToInt               ( const char* szColor, unsigned long
 bool            XMLColorToInt               ( const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha );
 
 
-inline unsigned long GetTime ( void )
-{
-    return GetTickCount32 ();
-}
-
 inline float WrapAround ( float fValue, float fHigh )
 {
     return fValue - ( fHigh * floor ( static_cast < float > ( fValue / fHigh ) ) );
