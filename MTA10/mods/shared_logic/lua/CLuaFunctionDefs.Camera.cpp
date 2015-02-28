@@ -156,7 +156,7 @@ int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
 //  bool setCameraTarget ( element target = nil ) or setCameraTarget ( float x, float y, float z )
 
     CScriptArgReader argStream ( luaVM );
-    if ( argStream.NextIsUserData () )
+    if ( argStream.NextIsUserDataOfType<CClientEntity> () )
     {
         CClientEntity* pTarget;
         argStream.ReadUserData ( pTarget );
