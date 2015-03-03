@@ -175,7 +175,7 @@ void CScriptDebugging::LogBadLevel ( lua_State* luaVM, unsigned int uiRequiredLe
 
 
 // Handle filename/line number in string
-void CScriptDebugging::LogPCallError( lua_State* luaVM, const SString& strRes, const SString& strNiceFilename )
+void CScriptDebugging::LogPCallError( lua_State* luaVM, const SString& strRes, bool bInitialCall )
 {   
     std::vector < SString > vecSplit;
     strRes.Split( ":", vecSplit );
@@ -187,20 +187,18 @@ void CScriptDebugging::LogPCallError( lua_State* luaVM, const SString& strRes, c
         int     iLine   = atoi( vecSplit[ 1 ] );
         SString strMsg  = vecSplit[2].SubStr( 1 );
                     
-        LogError ( SLuaDebugInfo( strFile, iLine ), "%s", *strMsg );
+        if ( iLine == 0 && bInitialCall )
+        {
+            // Location hint for compiled scripts
+            LogError ( SLuaDebugInfo( strFile, iLine ), "(global scope) %s", *strMsg );
+        }
+        else
+            LogError ( SLuaDebugInfo( strFile, iLine ), "%s", *strMsg );
     }
     else
     {
         // File+line info not present
-        if ( !strNiceFilename.empty() && !strRes.ContainsI( ExtractFilename( strNiceFilename ) ) )
-        {
-            // Add filename to error message, if not already present
-            LogError( luaVM, "%s (global scope) - %s", *strNiceFilename, *strRes );
-        }
-        else
-        {
-            LogError( luaVM, "%s", strRes.c_str () );
-        }
+        LogError( luaVM, "%s", strRes.c_str () );
     }
 }
 
