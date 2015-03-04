@@ -1512,7 +1512,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
             if ( iret == LUA_ERRRUN || iret == LUA_ERRMEM )
             {
                 SString strRes = lua_tostring( m_luaVM, -1 );
-                g_pGame->GetScriptDebugging()->LogPCallError( m_luaVM, strRes, strNiceFilename );
+                g_pGame->GetScriptDebugging()->LogPCallError( m_luaVM, strRes, true );
             }
             // Cleanup any return values
             if ( lua_gettop ( m_luaVM ) > luaSavedTop )

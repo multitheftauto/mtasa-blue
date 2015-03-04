@@ -40,7 +40,7 @@ public:
     void                            LogCustom                       ( lua_State* luaVM, const char* szMessage );
     void                            LogWarning                      ( const SLuaDebugInfo& luaDebugInfo, const char* szFormat, ... );
     void                            LogError                        ( const SLuaDebugInfo& luaDebugInfo, const char* szFormat, ... );
-    void                            LogPCallError                   ( lua_State* luaVM, const SString& strRes, const SString& strNiceFilename = "" );
+    void                            LogPCallError                   ( lua_State* luaVM, const SString& strRes, bool bInitialCall = false );
 
     bool                            SetLogfile                      ( const char* szFilename, unsigned int uiLevel );
     inline void                     SetHTMLLogLevel                 ( unsigned int uiLevel ) { m_uiHtmlLogLevel = uiLevel; }
