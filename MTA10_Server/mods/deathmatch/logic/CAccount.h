@@ -61,18 +61,19 @@ public:
     inline int                  GetID                   ( void )                    { return m_iUserID; }
     void                        SetID                   ( int iUserID );
 
-    inline class CClient*       GetClient               ( void )                    { return m_pClient; }
-    inline void                 SetClient               ( class CClient* pClient )  { m_pClient = pClient; }
+    CClient*                    GetClient               ( void )                    { return m_pClient; }
+    void                        SetClient               ( CClient* pClient );
 
     inline void                 SetChanged              ( bool bChanged )           { m_bChanged = bChanged; }
     inline bool                 HasChanged              ( void )                    { return m_bChanged; }
     uint                        GetScriptID             ( void ) const              { return m_uiScriptID; }
 
     CLuaArgument*               GetData                 ( const std::string& strKey );
-    void                        SetData                 ( const std::string& strKey, const std::string& strValue, int iType );
+    bool                        SetData                 ( const std::string& strKey, const std::string& strValue, int iType );
+    bool                        HasData                 ( const std::string& strKey );
     void                        RemoveData              ( const std::string& strKey );
-    std::list < CAccountData >  ::iterator DataBegin    ( void )                    { return m_Data.begin (); }
-    std::list < CAccountData >  ::iterator DataEnd      ( void )                    { return m_Data.end (); }
+    std::map < SString, CAccountData >::iterator DataBegin  ( void )                { return m_Data.begin (); }
+    std::map < SString, CAccountData >::iterator DataEnd    ( void )                { return m_Data.end (); }
 
  protected:
     CAccountData*               GetDataPointer ( const std::string& strKey );
@@ -93,14 +94,14 @@ public:
     class CClient*              m_pClient;
     uint                        m_uiScriptID;
 
-    std::list < CAccountData >  m_Data;
+    std::map < SString, CAccountData >  m_Data;
 };
 
 
 class CAccountData
 {
 public:
-                            CAccountData ( const std::string& strKey, const std::string& strValue, int iType )
+                            CAccountData ( const std::string& strKey = "", const std::string& strValue = "", int iType = 0 )
                                                                          { m_strKey = strKey; m_strValue = strValue; m_iType = iType; }
 
     const std::string&      GetKey       ( void )                        { return m_strKey; }
