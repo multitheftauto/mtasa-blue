@@ -583,7 +583,7 @@ bool CAccountManager::IntegrityCheck ()
         {
             CLogger::ErrorPrintf ( "%s\n", *m_pDatabaseManager->GetLastErrorMessage () );
             CLogger::ErrorPrintf ( "Errors were encountered updating '%s' database\n", *ExtractFilename ( PathConform ( "internal.db" ) ) );
-            CLogger::ErrorPrintf ( "Database might be locked by another process, or damaged.\n" );
+            CLogger::ErrorPrintf ( "Database might have incorrect file permissions, or locked by another process, or damaged.\n" );
             CLogger::ErrorPrintf ( "See - http://wiki.multitheftauto.com/wiki/fixdb\n" );
             CLogger::ErrorPrintf ( "************************\n" );
             return false;
@@ -905,6 +905,12 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
         return pAccount->GetData ( szKey );
     }
 
+    // Check cache first
+    if ( pAccount->HasData ( szKey ) )
+    {
+        return pAccount->GetData ( szKey );
+    }
+
     //Get the user ID
     int iUserID = pAccount->GetID();
     //create a new registry result for the query return
@@ -921,18 +927,23 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
     {
         const CRegistryResultRow& row = result->Data.front();
 
+        const char* szValue = (const char *)row[0].pVal;
         int iType = static_cast < int > ( row[1].nVal );
+
+        // Cache value for next get
+        pAccount->SetData ( szKey, szValue, iType );
+
         //Account data is stored as text so we don't need to check what type it is just return it
         if ( iType == LUA_TBOOLEAN )
         {
-            SString strResult = (const char *)row[0].pVal;
+            SString strResult = szValue;
             pResult->ReadBool ( strResult == "true" );
         }
         else
         if ( iType == LUA_TNUMBER )
-            pResult->ReadNumber ( strtod ( (const char *)row[0].pVal, NULL ) );
+            pResult->ReadNumber ( strtod ( szValue, NULL ) );
         else
-            pResult->ReadString ( (const char *)row[0].pVal );
+            pResult->ReadString ( szValue );
     }
     else
     {
@@ -951,6 +962,13 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, const char* szKey, con
     if ( !pAccount->IsRegistered () )
     {
         pAccount->SetData ( szKey, strValue, iType );
+        return true;
+    }
+
+    // Set cache value for next get
+    if ( !pAccount->SetData ( szKey, strValue, iType ) )
+    {
+        // If no change, skip DB update
         return true;
     }
 
@@ -973,14 +991,14 @@ bool CAccountManager::SetAccountData( CAccount* pAccount, const char* szKey, con
 bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAccount )
 {
     // list to store pFromAccount data to
-    std::list < CAccountData > copiedData;
+    std::map < SString, CAccountData > copiedData;
 
     if ( !pFromAccount->IsRegistered () )   // is not registered account, retrieve data from memory
     {
-        std::list < CAccountData > ::iterator iter = pFromAccount->DataBegin ();
+        std::map < SString, CAccountData > ::iterator iter = pFromAccount->DataBegin ();
         for ( ; iter != pFromAccount->DataEnd (); iter++ )
         {
-            copiedData.push_back( CAccountData( iter->GetKey(), iter->GetStrValue(), iter->GetType() ) );
+            MapSet( copiedData, iter->second.GetKey(), CAccountData( iter->second.GetKey(), iter->second.GetStrValue(), iter->second.GetType() ) );
         }
     }
     else    // is registered account, retrieve from database
@@ -1007,31 +1025,31 @@ bool CAccountManager::CopyAccountData( CAccount* pFromAccount, CAccount* pToAcco
                 strValue = (const char *)row[1].pVal;
                 int iType = static_cast < int > ( row[2].nVal );
 
-                copiedData.push_back ( CAccountData ( strKey, strValue, iType ) );
-            }
+                MapSet( copiedData, strKey, CAccountData ( strKey, strValue, iType ) );
+           }
         }
     }
 
     if (copiedData.size () > 0) // got anything to copy?
     {
-        std::list < CAccountData > ::iterator iter = copiedData.begin ();
+        std::map < SString, CAccountData > ::iterator iter = copiedData.begin ();
 
         for (; iter != copiedData.end(); iter++)
         {
             if ( !pToAccount->IsRegistered () ) // store to memory
             {
-                pToAccount->SetData ( iter->GetKey (), iter->GetStrValue (), iter->GetType () );
+                pToAccount->SetData ( iter->second.GetKey (), iter->second.GetStrValue (), iter->second.GetType () );
             }
             else // store to database
             {
                 CRegistryResult subResult;
 
-                m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, iter->GetKey ().c_str() );
+                m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, iter->second.GetKey ().c_str() );
                 //If there is a key with this value update it otherwise insert it and store the return value in bRetVal
                 if ( subResult->nRows > 0 )
-                    m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT, iter->GetStrValue ().c_str(), SQLITE_INTEGER, iter->GetType (), SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, iter->GetKey ().c_str() );
+                    m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT, iter->second.GetStrValue ().c_str(), SQLITE_INTEGER, iter->second.GetType (), SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, iter->second.GetKey ().c_str() );
                 else
-                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, iter->GetKey ().c_str(), SQLITE_TEXT, iter->GetStrValue ().c_str(), SQLITE_INTEGER, iter->GetType () );
+                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER, pToAccount->GetID (), SQLITE_TEXT, iter->second.GetKey ().c_str(), SQLITE_TEXT, iter->second.GetStrValue ().c_str(), SQLITE_INTEGER, iter->second.GetType () );
             }
         }
         return true;
@@ -1045,31 +1063,31 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
 {
     if ( !pAccount->IsRegistered () )
     {
-        std::list < CAccountData > ::iterator iter = pAccount->DataBegin ();
+        std::map < SString, CAccountData > ::iterator iter = pAccount->DataBegin ();
         for ( ; iter != pAccount->DataEnd (); iter++ )
         {
-            if ( iter->GetType() == LUA_TNIL )
+            if ( iter->second.GetType() == LUA_TNIL )
             {
-                lua_pushstring ( pLua, iter->GetKey ().c_str() );
+                lua_pushstring ( pLua, iter->second.GetKey ().c_str() );
                 lua_pushnil ( pLua );
                 lua_settable ( pLua, -3 );
             }
-            if ( iter->GetType() == LUA_TBOOLEAN )
+            if ( iter->second.GetType() == LUA_TBOOLEAN )
             {
-                lua_pushstring ( pLua, iter->GetKey ().c_str() );
-                lua_pushboolean ( pLua, iter->GetStrValue () == "true" ? true : false );
+                lua_pushstring ( pLua, iter->second.GetKey ().c_str() );
+                lua_pushboolean ( pLua, iter->second.GetStrValue () == "true" ? true : false );
                 lua_settable ( pLua, -3 );
             }
-            if ( iter->GetType() == LUA_TNUMBER )
+            if ( iter->second.GetType() == LUA_TNUMBER )
             {
-                lua_pushstring ( pLua, iter->GetKey ().c_str() );
-                lua_pushnumber ( pLua, strtod ( iter->GetStrValue ().c_str(), NULL ) );
+                lua_pushstring ( pLua, iter->second.GetKey ().c_str() );
+                lua_pushnumber ( pLua, strtod ( iter->second.GetStrValue ().c_str(), NULL ) );
                 lua_settable ( pLua, -3 );
             }
             else
             {
-                lua_pushstring ( pLua, iter->GetKey ().c_str() );
-                lua_pushstring ( pLua, iter->GetStrValue ().c_str() );
+                lua_pushstring ( pLua, iter->second.GetKey ().c_str() );
+                lua_pushstring ( pLua, iter->second.GetStrValue ().c_str() );
                 lua_settable ( pLua, -3 );
             }
         }

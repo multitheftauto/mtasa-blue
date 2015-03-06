@@ -56,6 +56,7 @@ void CAccount::Register ( const char* szPassword )
 {
     SetPassword( szPassword );
     m_bRegistered = true;
+    m_Data.clear();
 
     m_pManager->MarkAsChanged ( this );
 }
@@ -74,6 +75,15 @@ void CAccount::SetName ( const std::string& strName )
 
         m_pManager->MarkAsChanged ( this );
     }
+}
+
+
+void CAccount::SetClient( CClient* pClient )
+{
+    m_pClient = pClient;
+    // Clear data cache if not linked to a client
+    if ( !m_pClient )
+        m_Data.clear();
 }
 
 
@@ -126,13 +136,7 @@ void CAccount::SetID ( int iUserID )
 
 CAccountData* CAccount::GetDataPointer ( const std::string& strKey )
 {
-    std::list < CAccountData > ::iterator iter = m_Data.begin ();
-    for ( ; iter != m_Data.end (); iter++ )
-    {
-        if ( iter->GetKey () == strKey )
-            return &(*iter);
-    }
-    return NULL;
+    return MapFind( m_Data, strKey );
 }
 
 CLuaArgument* CAccount::GetData ( const std::string& strKey )
@@ -163,11 +167,16 @@ CLuaArgument* CAccount::GetData ( const std::string& strKey )
     return pResult;
 }
 
-void CAccount::SetData ( const std::string& strKey, const std::string& strValue, int iType )
+// Return true if data was changed
+bool CAccount::SetData ( const std::string& strKey, const std::string& strValue, int iType )
 {
     if ( strValue == "false" && iType == LUA_TBOOLEAN )
     {
-        RemoveData ( strKey );
+        if ( HasData( strKey ) )
+        {
+            RemoveData ( strKey );
+            return true;
+        }
     }
     else
     {
@@ -175,25 +184,28 @@ void CAccount::SetData ( const std::string& strKey, const std::string& strValue,
         
         if ( pData )
         {
-            pData->SetStrValue ( strValue );
-            pData->SetType ( iType );
+            if ( pData->GetType() != iType || pData->GetStrValue() != strValue )
+            {
+                pData->SetStrValue ( strValue );
+                pData->SetType ( iType );
+                return true;
+            }
         }
         else
         {
-            m_Data.push_back ( CAccountData ( strKey, strValue, iType ) );
+            MapSet ( m_Data, strKey, CAccountData ( strKey, strValue, iType ) );
+            return true;
         }
     }
+    return false;
+}
+
+bool CAccount::HasData ( const std::string& strKey )
+{
+    return MapContains( m_Data, strKey );
 }
 
 void CAccount::RemoveData ( const std::string& strKey )
 {
-    std::list < CAccountData > ::iterator iter = m_Data.begin();
-    for (; iter != m_Data.end(); iter++)
-    {
-        if ( iter->GetKey() == strKey )
-        {
-            m_Data.erase( iter );
-            break;
-        }
-    }
+    MapRemove( m_Data, strKey );
 }
