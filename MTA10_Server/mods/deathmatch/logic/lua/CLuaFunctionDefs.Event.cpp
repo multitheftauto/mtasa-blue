@@ -100,11 +100,14 @@ int CLuaFunctionDefs::AddEventHandler ( lua_State* luaVM )
                 {
                     argStream.SetCustomError ( SString ( "'%s' with this function is already handled", *strName ) );
                 }
-                // Do it
-                if ( CStaticFunctionDefinitions::AddEventHandler ( pLuaMain, strName, pElement, iLuaFunction, bPropagated, eventPriority, fPriorityMod ) )
+                else
                 {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
+                    // Do it
+                    if ( CStaticFunctionDefinitions::AddEventHandler ( pLuaMain, strName, pElement, iLuaFunction, bPropagated, eventPriority, fPriorityMod ) )
+                    {
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
                 }
             }
         }
