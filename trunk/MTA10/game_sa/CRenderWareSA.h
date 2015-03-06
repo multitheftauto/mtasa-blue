@@ -61,10 +61,6 @@ public:
     // Replaces a CColModel for a specific object identified by the object id (usModelID)
     void                ReplaceCollisions           ( CColModel * pColModel, unsigned short usModelID );
 
-    // Positions the front seat by reading out the vector from the 'ped_frontseat' atomic in the clump (RpClump*)
-    // and changing the vector in the CModelInfo class identified by the model id (usModelID)
-    bool                PositionFrontSeat           ( RpClump * pClump, unsigned short usModelID );
-
     // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
     unsigned int        LoadAtomics                 ( RpClump * pClump, RpAtomicContainer * pAtomics );
 

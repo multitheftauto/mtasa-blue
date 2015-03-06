@@ -486,7 +486,6 @@ private:
     void                                QuitPlayer                      ( CClientPlayer* pPlayer, eQuitReason Reason );
 
     void                                Event_OnIngame                  ( void );
-    void                                Event_OnIngameAndReady          ( void );
     void                                Event_OnIngameAndConnected      ( void );
 
     static bool                         StaticDamageHandler             ( CPed* pDamagePed, CEventDamage * pEvent );

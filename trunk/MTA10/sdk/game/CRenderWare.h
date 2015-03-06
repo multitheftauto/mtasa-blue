@@ -75,7 +75,6 @@ class CRenderWare {
     virtual void                DestroyTXD                  ( RwTexDictionary * pTXD ) = 0;
     virtual void                DestroyTexture              ( RwTexture * pTex ) = 0;
     virtual void                ReplaceCollisions           ( CColModel * pColModel, unsigned short usModelID ) = 0;
-    virtual bool                PositionFrontSeat           ( RpClump *pClump, unsigned short usModelID ) = 0;
     virtual unsigned int        LoadAtomics                 ( RpClump * pClump, RpAtomicContainer * pAtomics ) = 0;
     virtual void                ReplaceAllAtomicsInModel    ( RpClump * pSrc, unsigned short usModelID ) = 0;
     virtual void                ReplaceAllAtomicsInClump    ( RpClump * pDst, RpAtomicContainer * pAtomics, unsigned int uiAtomics ) = 0;

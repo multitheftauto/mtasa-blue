@@ -88,20 +88,20 @@ int CLuaFunctionDefs::AddEventHandler ( lua_State* luaVM )
             // Check if the handle is in use
             if ( pEntity->GetEventManager()->HandleExists ( pLuaMain, strName, iLuaFunction ) )
             {
-                m_pScriptDebugging->LogCustom ( luaVM, 255, 0, 0, "%s: '%s' with this function is already handled", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strName );
-                lua_pushboolean ( luaVM, false );
-                return 1;
+                argStream.SetCustomError ( SString ( "'%s' with this function is already handled", *strName ) );
             }
-
-            // Do it
-            if ( CStaticFunctionDefinitions::AddEventHandler ( *pLuaMain, strName, *pEntity, iLuaFunction, bPropagated, eventPriority, fPriorityMod ) )
+            else
             {
-                lua_pushboolean ( luaVM, true );
-                return 1;
+                // Do it
+                if ( CStaticFunctionDefinitions::AddEventHandler ( *pLuaMain, strName, *pEntity, iLuaFunction, bPropagated, eventPriority, fPriorityMod ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
             }
         }
     }
-    else
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // Failed

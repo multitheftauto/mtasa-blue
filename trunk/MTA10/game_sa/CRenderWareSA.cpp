@@ -446,28 +446,6 @@ CColModel * CRenderWareSA::ReadCOL ( const CBuffer& fileData )
     return NULL;
 }
 
-// Positions the front seat by reading out the vector from the 'ped_frontseat' atomic in the clump (RpClump*)
-// and changing the vector in the CModelInfo class identified by the model id (usModelID)
-bool CRenderWareSA::PositionFrontSeat ( RpClump *pClump, unsigned short usModelID )
-{
-    // get the modelinfo array (+5Ch contains a pointer to vehicle specific dummy data)
-    DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;
-    DWORD *pVehicleDummies = ( DWORD* ) ( pPool[usModelID] + 0x5C );
-
-    // read out the 'ped_frontseat' frame
-    RwFrame * pPedFrontSeat = RwFrameFindFrame ( RpGetFrame ( pClump ), "ped_frontseat" );
-    if ( pPedFrontSeat == NULL )
-        return false;
-
-    // in the vehicle specific dummy data, +30h contains the front seat vector
-    CVector *vecFrontSeat = ( CVector* ) ( pVehicleDummies + 0x30 );
-    vecFrontSeat->fX = pPedFrontSeat->modelling.pos.x;
-    vecFrontSeat->fY = pPedFrontSeat->modelling.pos.y;
-    vecFrontSeat->fZ = pPedFrontSeat->modelling.pos.z;
-
-    return true;
-}
-
 // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
 unsigned int CRenderWareSA::LoadAtomics ( RpClump * pClump, RpAtomicContainer * pAtomics )
 {

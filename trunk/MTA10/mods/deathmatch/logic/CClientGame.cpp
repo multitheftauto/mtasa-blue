@@ -1256,20 +1256,6 @@ void CClientGame::DoPulses ( void )
         }
     }
 
-    // Fire the engine ready event 10 frames after we're ingame
-    static int iFrameCount = 0;
-
-    if ( iFrameCount <= 10 && m_Status == CClientGame::STATUS_JOINED )
-    {
-        ++iFrameCount;
-
-        // Give the game 5 frames to get ready
-        if ( iFrameCount == 10 )
-        {
-            Event_OnIngameAndReady ();
-        }
-    }
-
     // Check for radar input
     m_pRadarMap->DoPulse ();
     g_pCore->GetGraphics ()->SetAspectRatioAdjustmentSuspended( m_pRadarMap->IsRadarShowing() );
@@ -3610,17 +3596,8 @@ void CClientGame::Event_OnIngame ( void )
 }
 
 
-void CClientGame::Event_OnIngameAndReady ( void )
-{
-    // Fade in
-    //m_pCamera->FadeIn ( 1.0f );
-}
-
-
 void CClientGame::Event_OnIngameAndConnected ( void )
 {
-    // Create a messagebox saying that we're verifying the client
-    //g_pCore->ShowMessageBox ( "Connecting", _("Verifying client ..."), false );
     m_ulVerifyTimeStart = CClientTime::GetTime ();
     
     // Keep criminal records of how many times they've connected to servers
@@ -3628,14 +3605,7 @@ void CClientGame::Event_OnIngameAndConnected ( void )
     if ( m_ServerType == SERVER_TYPE_EDITOR )
         SetApplicationSettingInt ( "times-connected-editor", GetApplicationSettingInt ("times-connected-editor") + 1 );
 
-    /*
     // Notify the server telling we're ingame
-    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-    if ( pBitStream )
-    {
-        g_pNet->SendPacket ( PACKET_ID_PLAYER_INGAME_NOTICE, pBitStream );
-        g_pNet->DeallocateNetBitStream ( pBitStream );
-    }*/
     m_pNetAPI->RPC ( PLAYER_INGAME_NOTICE );
 }
 
