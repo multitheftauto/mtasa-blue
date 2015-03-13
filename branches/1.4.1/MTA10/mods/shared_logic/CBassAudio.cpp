@@ -606,7 +606,7 @@ void CBassAudio::SetPan ( float fPan )
         BASS_ChannelSetAttribute( m_pSound, BASS_ATTRIB_PAN, fPan );
 }
 
-void CBassAudio::SetVolume ( float fVolume, bool bStore )
+void CBassAudio::SetVolume ( float fVolume )
 {
     m_fVolume = fVolume;
 

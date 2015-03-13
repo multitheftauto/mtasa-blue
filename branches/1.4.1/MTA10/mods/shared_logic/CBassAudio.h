@@ -58,7 +58,7 @@ public:
     void                    SetPlayPosition         ( double dPosition );
     double                  GetPlayPosition         ( void );
     double                  GetLength               ( void );
-    void                    SetVolume               ( float fVolume, bool bStore = true );
+    void                    SetVolume               ( float fVolume );
     void                    SetPlaybackSpeed        ( float fSpeed );
     void                    SetPosition             ( const CVector& vecPosition );
     void                    SetVelocity             ( const CVector& vecVelocity );
