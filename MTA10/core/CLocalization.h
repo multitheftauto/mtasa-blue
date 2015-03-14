@@ -36,6 +36,8 @@ public:
     SString                     GetLanguageCode             ( void );
     SString                     GetLanguageName             ( void );
 
+    static void                 LogCallback                 ( const std::string& str );
+
 private:
     Dictionary                  m_CurrentDict; 
     DictionaryManager           m_DictManager;
