@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "../../vendor/tinygettext/log.hpp"
 #define MTA_LOCALE_DIR              "MTA/locale/"
 #define MTA_LOCALE_TEXTDOMAIN       "client"
 
@@ -23,6 +24,15 @@ CLocalization::CLocalization ( SString strLocale, SString strLocalePath )
         strLocale = "en_US";
     
     WriteDebugEvent( SString("CLocalization::CLocalization Localization set to '%s'",strLocale.c_str()) );
+
+    // Set log callbacks so we can record problems
+#ifdef MTA_DEBUG
+    Log::set_log_info_callback( LogCallback );
+#else
+    Log::set_log_info_callback( NULL );
+#endif
+    Log::set_log_warning_callback( LogCallback );
+    Log::set_log_error_callback( LogCallback );
 
     // Grab the nearest language based upon our setting, or revert to en_US
     Language Lang = Language::from_name(strLocale);
@@ -121,6 +131,10 @@ SString CLocalization::GetLanguageDirectory ( void )
     return strFullPath.substr( 0, strFullPath.find_last_of( '/' ) +1 );
 }
 
+void CLocalization::LogCallback( const std::string& str )
+{
+    WriteDebugEvent( ( SStringX( "Localization: " ) + str ).TrimEnd( "\n" ) );
+}
 
 ///////////////////////////////////////////////////////
 //
