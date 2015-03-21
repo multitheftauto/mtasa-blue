@@ -200,9 +200,9 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib.lib;libpng.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;wsock32.lib;winmm.lib;Imagehlp.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread.lib;jpeg.lib;Psapi.lib;xinput.lib;libcef.lib;..\..\vendor\cef3\out\Release\lib\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>strmiids.lib;libv2.lib;zlib.lib;libpng.lib;odbc32.lib;odbccp32.lib;dinput8.lib;dxguid.lib;shlwapi.lib;d3dx9.lib;wsock32.lib;winmm.lib;Imagehlp.lib;gdi32.lib;Userenv.lib;Imm32.lib;pthread.lib;jpeg.lib;Psapi.lib;xinput.lib;libcef.lib;libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\vendor/libv2\lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\libpng;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;$(SolutionDir)..\vendor\detours\lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pthread;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\jpeg;../../vendor/cef3/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\vendor/libv2\lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\libpng;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;$(SolutionDir)..\vendor\detours\lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pthread;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\jpeg;$(SolutionDir)..\vendor\cef3\Release\;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\libcef_dll_wrapper\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>

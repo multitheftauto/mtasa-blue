@@ -129,8 +129,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>..\..\vendor\cef3\Release\libcef.lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\libcef_dll_wrapper\lib\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcef.lib;libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\vendor\cef3\Release\;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\libcef_dll_wrapper\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
