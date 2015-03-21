@@ -1,7 +1,7 @@
 Multi Theft Auto: San Andreas
 -----------------------------
 
-[Multi Theft Auto](http://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
+[Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
 
 ### Introduction
 
@@ -23,12 +23,12 @@ Using a framework based on resources has a number of advantages. It allows conte
 
 ### Development
 
-Our project's code repository can be found on the [multitheftauto/multitheftauto](http://github.com/multitheftauto/multitheftauto/) git repository at [GitHub](http://github.com/). We are always looking for new developers, so if you're interested, here are some useful links:
+Our project's code repository can be found on the [multitheftauto/mtasa-blue](https://github.com/multitheftauto/mtasa-blue/) Git repository at [GitHub](https://github.com/). We are always looking for new developers, so if you're interested, here are some useful links:
 
-*   [Git Coding Guidelines](http://wiki.mtasa.com/index.php?title=Git_Coding_Guidelines)
-*   [Nightly Builds](http://nightly.mtasa.com/)
-*   [Bugtracker Roadmap](http://bugs.mtasa.com/roadmap_page.php)
-*   [Wiki Roadmap](http://wiki.mtasa.com/index.php?title=Roadmap)
+* [Coding guidelines](https://wiki.mtasa.com/index.php?title=Coding_guidelines)
+* [Nightly Builds](https://nightly.mtasa.com/)
+* [Bugtracker Roadmap](https://bugs.mtasa.com/roadmap_page.php)
+* [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
 ### Screenshots
 
@@ -36,11 +36,10 @@ Our project's code repository can be found on the [multitheftauto/multitheftauto
 ![screenshot 2](http://www.mtasa.com/images/c_bigpeds.png "Screenshot 2")
 ![screenshot 3](http://www.mtasa.com/images/c_yougofirst.png "Screenshot 3")
 
-For in-game videos, head over to [MTAQA on YouTube](http://www.youtube.com/user/MTAQA).
+For in-game videos, head over to [MTAQA on YouTube](https://www.youtube.com/user/MTAQA).
 
 ### License
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
 Grand Theft Auto and all related trademarks are © Rockstar North 1997-2009.
-
