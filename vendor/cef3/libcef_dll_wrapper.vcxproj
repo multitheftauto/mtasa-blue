@@ -54,8 +54,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <ExecutablePath>$(ExecutablePath);$(MSBuildProjectDirectory)\.\bin\;$(MSBuildProjectDirectory)\.\bin\</ExecutablePath>
-    <OutDir>out\$(Configuration)\</OutDir>
-    <IntDir>$(OutDir)obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\$(RootNamespace)\</OutDir>
+    <IntDir>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\$(RootNamespace)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
