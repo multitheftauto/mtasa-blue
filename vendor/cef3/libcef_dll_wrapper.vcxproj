@@ -57,6 +57,14 @@
     <TargetName>$(ProjectName)</TargetName>
     <TargetPath>$(OutDir)lib\$(ProjectName)$(TargetExt)</TargetPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\vendor\cef3\out\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\vendor\cef3\out\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\vendor\cef3\out\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\vendor\cef3\out\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(OutDir)obj\global_intermediate;..\..\..\third_party\wtl\include;.;C:\Program Files (x86)\Windows Kits\8.1\Include\shared;C:\Program Files (x86)\Windows Kits\8.1\Include\um;C:\Program Files (x86)\Windows Kits\8.1\Include\winrt;$(VSInstallDir)\VC\atlmfc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
