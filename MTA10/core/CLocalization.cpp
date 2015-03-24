@@ -26,11 +26,7 @@ CLocalization::CLocalization ( SString strLocale, SString strLocalePath )
     WriteDebugEvent( SString("CLocalization::CLocalization Localization set to '%s'",strLocale.c_str()) );
 
     // Set log callbacks so we can record problems
-#ifdef MTA_DEBUG
-    Log::set_log_info_callback( LogCallback );
-#else
     Log::set_log_info_callback( NULL );
-#endif
     Log::set_log_warning_callback( LogCallback );
     Log::set_log_error_callback( LogCallback );
 
