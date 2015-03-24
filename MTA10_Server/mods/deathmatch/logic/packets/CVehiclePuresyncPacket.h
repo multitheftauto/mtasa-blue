@@ -35,7 +35,7 @@ public:
     bool                        Write                       ( NetBitStreamInterface& BitStream ) const;
 
 private:
-    void                        ReadVehicleSpecific         ( class CVehicle* pVehicle, NetBitStreamInterface& BitStream );
+    void                        ReadVehicleSpecific         ( class CVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModel );
     void                        WriteVehicleSpecific        ( class CVehicle* pVehicle, NetBitStreamInterface& BitStream ) const;
 };
 
