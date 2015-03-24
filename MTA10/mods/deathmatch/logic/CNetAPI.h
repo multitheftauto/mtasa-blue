@@ -88,10 +88,10 @@ private:
     bool                    ReadFullKeysync                 ( CControllerState& ControllerState, NetBitStreamInterface& BitStream );
     void                    WriteFullKeysync                ( const CControllerState& ControllerState, NetBitStreamInterface& BitStream );
 
-    void                    ReadSmallVehicleSpecific        ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
+    void                    ReadSmallVehicleSpecific        ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModelID );
     void                    WriteSmallVehicleSpecific       ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
 
-    void                    ReadFullVehicleSpecific         ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
+    void                    ReadFullVehicleSpecific         ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModelID );
     void                    WriteFullVehicleSpecific        ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream );
 
     void                    ReadLightweightSync             ( CClientPlayer* pPlayer, NetBitStreamInterface& BitStream );

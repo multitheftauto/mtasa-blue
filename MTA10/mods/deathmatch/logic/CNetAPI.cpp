@@ -694,7 +694,11 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     if ( pVehicle && flags.data.bSyncingVehicle )
     {
         // Eventually read vehicle specific keysync data
-        ReadSmallVehicleSpecific ( pVehicle, BitStream );
+        int iRemoteModelID = pVehicle->GetModel ( );
+        if ( BitStream.Version ( ) >= 0x05F )
+            BitStream.Read ( iRemoteModelID );
+
+        ReadSmallVehicleSpecific ( pVehicle, BitStream, iRemoteModelID );
 
         if ( pVehicle->GetUpgrades ()->HasUpgrade ( 1087 ) ) // Hydraulics?
         {
@@ -1317,6 +1321,18 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     SPositionSync position ( false );
     SRotationDegreesSync rotation;
     SVelocitySync velocity;
+
+    // Read the remote model to prevent desyncs when the remote model
+    // differs from the local one (#8800)
+    int iModelID = pVehicle->GetModel ( );
+    int iRemoteModelID = iModelID;
+
+    if ( BitStream.Version ( ) >= 0x05F )
+        BitStream.Read ( iRemoteModelID );
+
+    eClientVehicleType remoteVehicleType = CClientVehicleManager::GetVehicleType ( iRemoteModelID );
+    eClientVehicleType vehicleType = pVehicle->GetVehicleType ( );
+
     if ( uiSeat == 0 )
     {
 #ifdef MTA_DEBUG
@@ -1331,7 +1347,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         // Read out vehicle position and rotation
         BitStream.Read ( &position );
 
-        if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
+        if ( remoteVehicleType == CLIENTVEHICLE_TRAIN )
         {
             // Train specific data
             float fPosition = 0.0f;
@@ -1343,21 +1359,24 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
             BitStream.Read ( ucTrack );
             BitStream.Read ( fSpeed );
 
-            if ( !pVehicle->IsStreamedIn () )
-                pVehicle->SetPosition ( position.data.vecPosition, true );
+            if ( vehicleType == CLIENTVEHICLE_TRAIN )
+            {
+                if ( !pVehicle->IsStreamedIn ( ) )
+                    pVehicle->SetPosition ( position.data.vecPosition, true );
 
-            pVehicle->SetTrainTrack ( ucTrack );
-            pVehicle->SetTrainPosition ( fPosition, false );
-            pVehicle->SetTrainDirection( bDirection );
-            pVehicle->SetTrainSpeed ( fSpeed );
+                pVehicle->SetTrainTrack ( ucTrack );
+                pVehicle->SetTrainPosition ( fPosition, false );
+                pVehicle->SetTrainDirection ( bDirection );
+                pVehicle->SetTrainSpeed ( fSpeed );
+            }
         }
 
         BitStream.Read ( &rotation );
 
-        // Read out the movespeed
+        // Read out the move speed
         BitStream.Read ( &velocity );
 
-        // Read out the turnspeed
+        // Read out the turn speed
         SVelocitySync turnSpeed;
         BitStream.Read ( &turnSpeed );
 
@@ -1367,7 +1386,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         pVehicle->SetHealth ( health.data.fValue );
 
         // Set the target position and rotation
-        if ( pVehicle->GetVehicleType() != CLIENTVEHICLE_TRAIN || pVehicle->IsDerailed () )
+        if ( vehicleType != CLIENTVEHICLE_TRAIN || pVehicle->IsDerailed ( ) )
         {
             // Vehicles use the position and rotation
             pVehicle->SetTargetPosition ( position.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ );
@@ -1381,37 +1400,35 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         // Apply the correct move and turnspeed
         pVehicle->SetMoveSpeed ( velocity.data.vecVelocity );
         pVehicle->SetTurnSpeed ( turnSpeed.data.vecVelocity );
-
-        if ( BitStream.Version () >= 0x42 )
+        
+        
+        while ( BitStream.ReadBit ( ) )
         {
-            while ( BitStream.ReadBit () )
+            ElementID TrailerID;
+            if ( BitStream.Read ( TrailerID ) )
             {
-                ElementID TrailerID;
-                if ( BitStream.Read ( TrailerID ) )
+                CClientVehicle* pTrailer = m_pVehicleManager->Get ( TrailerID );
+                if ( pTrailer )
                 {
-                    CClientVehicle* pTrailer = m_pVehicleManager->Get ( TrailerID );
-                    if ( pTrailer )
+                    SPositionSync trailerPosition ( false );
+                    BitStream.Read ( &trailerPosition );
+
+                    SRotationDegreesSync trailerRotation;
+                    BitStream.Read ( &trailerRotation );
+
+                    if ( pTrailer->GetVehicleType ( ) != CLIENTVEHICLE_TRAIN && !pTrailer->IsStreamedIn ( ) )
                     {
-                        SPositionSync trailerPosition ( false );
-                        BitStream.Read ( &trailerPosition );
+                        pTrailer->SetTargetPosition ( trailerPosition.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ );
+                        pTrailer->SetTargetRotation ( trailerRotation.data.vecRotation, TICK_RATE );
+                    }
+                    else if ( pTrailer->GetVehicleType ( ) == CLIENTVEHICLE_TRAIN )
+                    {
+                        // Set streaming position to fix streaming
+                        pTrailer->UpdatePedPositions ( trailerPosition.data.vecPosition );
 
-                        SRotationDegreesSync trailerRotation;
-                        BitStream.Read ( &trailerRotation );
-
-                        if ( pTrailer->GetVehicleType () != CLIENTVEHICLE_TRAIN && !pTrailer->IsStreamedIn () )
-                        {
-                            pTrailer->SetTargetPosition ( trailerPosition.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ );
-                            pTrailer->SetTargetRotation ( trailerRotation.data.vecRotation, TICK_RATE );
-                        }
-                        else if ( pTrailer->GetVehicleType () == CLIENTVEHICLE_TRAIN )
-                        {
-                            // Set streaming position to fix streaming
-                            pTrailer->UpdatePedPositions ( trailerPosition.data.vecPosition );
-
-                            // Use the synced train speed as long as the chain engine isn't streamed in
-                            if ( !pVehicle->IsStreamedIn () )
-                                pTrailer->SetTrainSpeed ( pVehicle->GetTrainSpeed () );
-                        }
+                        // Use the synced train speed as long as the chain engine isn't streamed in
+                        if ( !pVehicle->IsStreamedIn ( ) )
+                            pTrailer->SetTrainSpeed ( pVehicle->GetTrainSpeed ( ) );
                     }
                 }
             }
@@ -1437,8 +1454,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     // Set flag stuff
     pPlayer->SetWearingGoggles ( flags.data.bIsWearingGoggles );
 
-    // Sirene states
-    int iModelID = pVehicle->GetModel ();
+    // Siren states
     if ( uiSeat == 0 )
     {
         if ( CClientVehicleManager::HasSirens ( iModelID ) || pVehicle->DoesVehicleHaveSirens ( ) )
@@ -1491,7 +1507,6 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
 
         if ( flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo ( uiSlot ) )
         {
-
             unsigned char ucCurrentWeapon = 0;
             float fWeaponRange = 0.01f;
             if ( pWeapon )
@@ -1543,7 +1558,7 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
     // Read out vehicle specific data if he's the driver
     if ( uiSeat == 0 )
     {
-        ReadFullVehicleSpecific ( pVehicle, BitStream );
+        ReadFullVehicleSpecific ( pVehicle, BitStream, iRemoteModelID );
     }
 
     // Gang driveby
@@ -1588,6 +1603,10 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     CControllerState ControllerState;
     pPlayerModel->GetControllerState ( ControllerState );
     WriteFullKeysync ( ControllerState, BitStream );
+
+    // Write the clientside model
+    if ( BitStream.Version ( ) >= 0x05F )
+        BitStream.Write ( (int) pVehicle->GetModel() );
 
     // Grab the vehicle position
     CVector vecPosition;
@@ -1876,16 +1895,19 @@ void CNetAPI::WriteFullKeysync ( const CControllerState& ControllerState, NetBit
 }
 
 
-void CNetAPI::ReadSmallVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream )
+void CNetAPI::ReadSmallVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModelID )
 {
     // Turret states
-    int iModelID = pVehicle->GetModel ();
-    if ( CClientVehicleManager::HasTurret ( iModelID ) )
+    if ( CClientVehicleManager::HasTurret ( iRemoteModelID ) )
     {
         SVehicleTurretSync vehicle;
         BitStream.Read ( &vehicle );
 
-        pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
+        int iModelID = pVehicle->GetModel ( );
+        if ( CClientVehicleManager::HasTurret ( iModelID ) )
+        {
+            pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
+        }
     }
 }
 
@@ -1904,36 +1926,42 @@ void CNetAPI::WriteSmallVehicleSpecific ( CClientVehicle* pVehicle, NetBitStream
 }
 
 
-void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream )
+void CNetAPI::ReadFullVehicleSpecific ( CClientVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModelID )
 {
     // Turret states
     int iModelID = pVehicle->GetModel ();
-    if ( CClientVehicleManager::HasTurret ( iModelID ) )
+    if ( CClientVehicleManager::HasTurret ( iRemoteModelID ) )
     {
         SVehicleTurretSync vehicle;
         BitStream.Read ( &vehicle );
 
-        pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
+        if ( CClientVehicleManager::HasTurret ( iModelID ) )
+        {
+            pVehicle->SetTurretRotation ( vehicle.data.fTurretX, vehicle.data.fTurretY );
+        }
     }
 
     // Adjustable property
-    if ( CClientVehicleManager::HasAdjustableProperty ( iModelID ) )
+    if ( CClientVehicleManager::HasAdjustableProperty ( iRemoteModelID ) )
     {
         unsigned short usAdjustableProperty;
-        if ( BitStream.Read ( usAdjustableProperty ) )
+        if ( BitStream.Read ( usAdjustableProperty ) && CClientVehicleManager::HasAdjustableProperty ( iModelID ) )
         {
             pVehicle->SetAdjustablePropertyValue ( usAdjustableProperty );
         }
     }
 
     // Read door angles.
-    if ( CClientVehicleManager::HasDoors ( iModelID ) )
+    if ( CClientVehicleManager::HasDoors ( iRemoteModelID ) )
     {
         SDoorOpenRatioSync door;
         for ( unsigned char i = 2; i < 6; ++i )
         {
             BitStream.Read ( &door );
-            pVehicle->SetDoorOpenRatio ( i, door.data.fRatio, TICK_RATE );
+            if ( CClientVehicleManager::HasDoors ( iModelID ) )
+            {
+                pVehicle->SetDoorOpenRatio ( i, door.data.fRatio, TICK_RATE );
+            }
         }
     }
 }

@@ -48,13 +48,23 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( !ReadFullKeysync ( ControllerState, BitStream ) )
                 return false;
 
+            // Read out the remote model
+            int iModelID = pVehicle->GetModel ( );
+            int iRemoteModelID = iModelID;
+
+            if ( BitStream.Version ( ) >= 0x05F )
+                BitStream.Read ( iRemoteModelID );
+
+            eVehicleType vehicleType = pVehicle->GetVehicleType ( );
+            eVehicleType remoteVehicleType = CVehicleManager::GetVehicleType ( iRemoteModelID );
+
             // Read out its position
             SPositionSync position ( false );
             if ( !BitStream.Read ( &position ) )
                 return false;
             pSourcePlayer->SetPosition ( position.data.vecPosition );
 
-            if ( pVehicle->GetVehicleType() == VEHICLE_TRAIN )
+            if ( remoteVehicleType == VEHICLE_TRAIN )
             {
                 // Train specific data
                 float fPosition = 0.0f;
@@ -65,10 +75,14 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                 BitStream.ReadBit ( bDirection );
                 BitStream.Read ( ucTrack );
                 BitStream.Read ( fSpeed );
-                pVehicle->SetTrainPosition ( fPosition );
-                pVehicle->SetTrainDirection ( bDirection );
-                pVehicle->SetTrainTrack ( ucTrack );
-                pVehicle->SetTrainSpeed ( fSpeed );
+
+                if ( vehicleType == VEHICLE_TRAIN )
+                {
+                    pVehicle->SetTrainPosition ( fPosition );
+                    pVehicle->SetTrainDirection ( bDirection );
+                    pVehicle->SetTrainTrack ( ucTrack );
+                    pVehicle->SetTrainSpeed ( fSpeed );
+                }
             }
 
             // Read the camera orientation
@@ -138,7 +152,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
                     }
                 }
                 pVehicle->SetHealth ( fHealth );
-                // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a seperate stored float keeping track of ONLY what comes in via sync
+                // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a separate stored float keeping track of ONLY what comes in via sync
                 // - Caz
                 pVehicle->SetLastSyncedHealth( fHealth );
 
@@ -396,7 +410,7 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             // Vehicle specific data if he's the driver
             if ( uiSeat == 0 )
             {
-                ReadVehicleSpecific ( pVehicle, BitStream );
+                ReadVehicleSpecific ( pVehicle, BitStream, iRemoteModelID );
 
                 // Set vehicle specific stuff if he's the driver
                 pVehicle->SetSirenActive ( flags.data.bIsSirenOrAlarmActive );
@@ -455,6 +469,10 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             // Write the keysync data
             const CControllerState& ControllerState = pSourcePlayer->GetPad ()->GetCurrentControllerState ();
             WriteFullKeysync ( ControllerState, BitStream );
+
+            // Write the serverside model (#8800)
+            if ( BitStream.Version ( ) >= 0x05F )
+                BitStream.Write ( pVehicle->GetModel() );
 
             // Write the vehicle matrix only if he's the driver
             CVector vecTemp;
@@ -630,11 +648,11 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 }
 
 
-void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInterface& BitStream )
+void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModel )
 {
     // Turret data
     unsigned short usModel = pVehicle->GetModel ();
-    if ( CVehicleManager::HasTurret ( usModel ) ) 
+    if ( CVehicleManager::HasTurret ( iRemoteModel ) )
     {
         // Read out the turret position
         SVehicleTurretSync vehicle;
@@ -642,21 +660,22 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
             return;
 
         // Set the data
-        pVehicle->SetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
+        if ( CVehicleManager::HasTurret ( usModel ) )
+            pVehicle->SetTurretPosition ( vehicle.data.fTurretX, vehicle.data.fTurretY );
     }
 
     // Adjustable property value
-    if ( CVehicleManager::HasAdjustableProperty ( usModel ) )
+    if ( CVehicleManager::HasAdjustableProperty ( iRemoteModel ) )
     {
         unsigned short usAdjustableProperty;
-        if ( BitStream.Read ( usAdjustableProperty ) )
+        if ( BitStream.Read ( usAdjustableProperty ) && CVehicleManager::HasAdjustableProperty ( usModel ) )
         {
             pVehicle->SetAdjustableProperty ( usAdjustableProperty );
         }
     }
 
     // Door angles.
-    if ( CVehicleManager::HasDoors ( usModel ) )
+    if ( CVehicleManager::HasDoors ( iRemoteModel ) )
     {
         SDoorOpenRatioSync door;
 
@@ -664,7 +683,9 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific ( CVehicle* pVehicle, NetBitStr
         {
             if ( !BitStream.Read ( &door ) )
                 return;
-            pVehicle->SetDoorOpenRatio ( i, door.data.fRatio );
+
+            if ( CVehicleManager::HasDoors ( usModel ) )
+                pVehicle->SetDoorOpenRatio ( i, door.data.fRatio );
         }
     }
 }

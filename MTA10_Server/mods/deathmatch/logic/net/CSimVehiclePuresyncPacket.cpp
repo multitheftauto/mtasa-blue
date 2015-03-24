@@ -54,13 +54,17 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         // Only read this packet if it matches the current time context that
         // player is in.
         if ( !CanUpdateSync ( m_Cache.ucTimeContext ) )
-        {
             return false;
-        }
 
         // Read out the keysync data
         if ( !ReadFullKeysync ( m_sharedControllerState, BitStream ) )
             return false;
+
+        // Read out the remote model
+        if ( BitStream.Version ( ) >= 0x05F )
+            BitStream.Read ( m_Cache.iModelID );
+        else
+            m_Cache.iModelID = m_usVehicleGotModel;
 
         // Read out its position
         SPositionSync position ( false );
@@ -68,12 +72,7 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             return false;
         m_Cache.PlrPosition = position.data.vecPosition;
 
-        if ( m_usVehicleGotModel == 449 ||
-            m_usVehicleGotModel == 537 ||
-            m_usVehicleGotModel == 538 ||
-            m_usVehicleGotModel == 570 ||
-            m_usVehicleGotModel == 569 ||
-            m_usVehicleGotModel == 590 )
+        if ( CVehicleManager::GetVehicleType(m_Cache.iModelID) == VEHICLE_TRAIN )
         {
             // Train specific data
             float fRailPosition = 0.0f;
@@ -287,6 +286,10 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Write the keysync data
         WriteFullKeysync ( m_sharedControllerState, BitStream );
 
+        // Write the serverside model (#8800)
+        if ( BitStream.Version ( ) >= 0x05F )
+            BitStream.Write ( m_Cache.iModelID );
+
         // Write the vehicle matrix only if he's the driver
         CVector vecTemp;
         unsigned int uiSeat = m_ucPlayerGotOccupiedVehicleSeat;
@@ -437,9 +440,7 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
 void CSimVehiclePuresyncPacket::ReadVehicleSpecific ( NetBitStreamInterface& BitStream )
 {
-    // Turret data
-    unsigned short usModel = m_usVehicleGotModel;
-    if ( CVehicleManager::HasTurret ( usModel ) ) 
+    if ( CVehicleManager::HasTurret ( m_Cache.iModelID ) ) 
     {
         // Read out the turret position
         SVehicleTurretSync vehicle;
@@ -452,7 +453,7 @@ void CSimVehiclePuresyncPacket::ReadVehicleSpecific ( NetBitStreamInterface& Bit
     }
 
     // Adjustable property value
-    if ( CVehicleManager::HasAdjustableProperty ( usModel ) )
+    if ( CVehicleManager::HasAdjustableProperty ( m_Cache.iModelID ) )
     {
         unsigned short usAdjustableProperty;
         if ( BitStream.Read ( usAdjustableProperty ) )
@@ -462,7 +463,7 @@ void CSimVehiclePuresyncPacket::ReadVehicleSpecific ( NetBitStreamInterface& Bit
     }
 
     // Door angles.
-    if ( CVehicleManager::HasDoors ( usModel ) )
+    if ( CVehicleManager::HasDoors ( m_Cache.iModelID ) )
     {
         SDoorOpenRatioSync door;
 
@@ -479,8 +480,7 @@ void CSimVehiclePuresyncPacket::ReadVehicleSpecific ( NetBitStreamInterface& Bit
 void CSimVehiclePuresyncPacket::WriteVehicleSpecific ( NetBitStreamInterface& BitStream ) const
 {
     // Turret states
-    unsigned short usModel = m_usVehicleGotModel;
-    if ( CVehicleManager::HasTurret ( usModel ) )
+    if ( CVehicleManager::HasTurret ( m_Cache.iModelID ) )
     {
         SVehicleTurretSync vehicle;
         vehicle.data.fTurretX = m_Cache.fTurretX;
@@ -489,13 +489,13 @@ void CSimVehiclePuresyncPacket::WriteVehicleSpecific ( NetBitStreamInterface& Bi
     }
 
     // Adjustable property value
-    if ( CVehicleManager::HasAdjustableProperty ( usModel ) )
+    if ( CVehicleManager::HasAdjustableProperty ( m_Cache.iModelID ) )
     {
         BitStream.Write ( m_Cache.usAdjustableProperty );
     }
 
     // Door angles.
-    if ( CVehicleManager::HasDoors ( usModel ) )
+    if ( CVehicleManager::HasDoors ( m_Cache.iModelID ) )
     {
         SDoorOpenRatioSync door;
         for ( unsigned int i = 2; i < 6; ++i )

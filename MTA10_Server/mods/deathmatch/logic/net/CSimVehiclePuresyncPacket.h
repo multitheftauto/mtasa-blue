@@ -69,6 +69,8 @@ private:
     {
         uchar           ucTimeContext;
 
+        int             iModelID;
+
         CVector         PlrPosition;
         CVector         vecCamPosition;
         CVector         vecCamFwd;
