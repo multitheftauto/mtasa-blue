@@ -55,6 +55,15 @@
 #endif
 
 //
+// Location of server crash dumps
+//
+#ifdef WIN32
+    #define SERVER_DUMP_PATH    "dumps"
+#else
+    #define SERVER_DUMP_PATH    "mods/deathmatch/dumps"
+#endif
+
+//
 // vsnprintf with buffer full check
 //
 #define VSNPRINTF( buffer, count, format, argptr ) \
