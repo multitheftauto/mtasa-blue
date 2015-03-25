@@ -694,11 +694,7 @@ void CNetAPI::ReadKeysync ( CClientPlayer* pPlayer, NetBitStreamInterface& BitSt
     if ( pVehicle && flags.data.bSyncingVehicle )
     {
         // Eventually read vehicle specific keysync data
-        int iRemoteModelID = pVehicle->GetModel ( );
-        if ( BitStream.Version ( ) >= 0x05F )
-            BitStream.Read ( iRemoteModelID );
-
-        ReadSmallVehicleSpecific ( pVehicle, BitStream, iRemoteModelID );
+        ReadSmallVehicleSpecific ( pVehicle, BitStream, pVehicle->GetModel ( ) );
 
         if ( pVehicle->GetUpgrades ()->HasUpgrade ( 1087 ) ) // Hydraulics?
         {
