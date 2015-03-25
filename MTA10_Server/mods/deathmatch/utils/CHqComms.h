@@ -29,7 +29,7 @@ public:
     {
         m_iPollInterval = TICKS_FROM_MINUTES( 60 );
         m_strURL = HQCOMMS_URL;
-        m_strCrashInfoFilename = "dumps/server_pending_upload.log";
+        m_strCrashInfoFilename = g_pServerInterface->GetAbsolutePath( PathJoin( SERVER_DUMP_PATH, "server_pending_upload.log" ) );
     }
 
     //
@@ -56,7 +56,7 @@ public:
             strUrlParams += SString( "&aselisten=%d", g_pGame->GetConfig()->GetAseInternetListenEnabled() );
 
             SString strCrashInfo;
-            FileLoad( m_strCrashInfoFilename, strCrashInfo );
+            FileLoad( m_strCrashInfoFilename, strCrashInfo, 50000 );
             strUrlParams += SString( "&crashinfosize=%d", strCrashInfo.length() );
 
             // Send request

@@ -4262,7 +4262,7 @@ SString CGame::CalculateMinClientRequirement ( void )
 void CGame::HandleCrashDumpEncryption( void )
 {
 #ifdef WIN32
-    SString strDumpDirPath = g_pServerInterface->GetAbsolutePath( "dumps" );
+    SString strDumpDirPath = g_pServerInterface->GetAbsolutePath( SERVER_DUMP_PATH );
     SString strDumpDirPrivatePath = PathJoin( strDumpDirPath, "private" );
     SString strDumpDirPublicPath = PathJoin( strDumpDirPath, "public" );
     MakeSureDirExists( strDumpDirPrivatePath + "/" );
