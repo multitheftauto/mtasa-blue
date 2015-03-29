@@ -367,7 +367,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPR
 
         DWORD dwFlags = pShaderInstance->m_pEffectWrap->m_uiSaveStateFlags;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint uiNumPasses = 0;
-        pD3DEffect->Begin ( &uiNumPasses, dwFlags );
+        pShaderInstance->m_pEffectWrap->Begin ( &uiNumPasses, dwFlags );
 
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
@@ -380,7 +380,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader ( IDirect3DDevice9 *pDevice, D3DPR
             DrawPrimitiveGuarded ( pDevice, PrimitiveType, StartVertex, PrimitiveCount );
             pD3DEffect->EndPass ();
         }
-        pD3DEffect->End ();
+        pShaderInstance->m_pEffectWrap->End ();
 
         // If we didn't get the effect to save the shader state, clear some things here
         if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )
@@ -554,7 +554,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
 
         DWORD dwFlags = pShaderInstance->m_pEffectWrap->m_uiSaveStateFlags;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint uiNumPasses = 0;
-        pD3DEffect->Begin ( &uiNumPasses, dwFlags );
+        pShaderInstance->m_pEffectWrap->Begin ( &uiNumPasses, dwFlags );
 
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
@@ -576,7 +576,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader ( IDirect3DDevice9 *pDevice
 
             pD3DEffect->EndPass ();
         }
-        pD3DEffect->End ();
+        pShaderInstance->m_pEffectWrap->End ();
 
         // If we didn't get the effect to save the shader state, clear some things here
         if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )
@@ -612,7 +612,7 @@ void CDirect3DEvents9::CloseActiveShader( void )
 
     pD3DEffect->EndPass ();
 
-    pD3DEffect->End ();
+    g_pActiveShader->m_pShaderInstance->m_pEffectWrap->End ();
 
     // We didn't get the effect to save the shader state, clear some things here
     IDirect3DDevice9* pDevice = g_pGraphics->GetDevice();

@@ -453,11 +453,13 @@ public:
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
     virtual void    OnResetDevice           ( void );
-    void            CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
-    void            ReleaseUnderlyingData   ( void );
-    bool            ApplyCommonHandles      ( void );
-    bool            ApplyMappedHandles      ( void );
-    void            ReadParameterHandles    ( void );
+    virtual void    CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
+    virtual void    ReleaseUnderlyingData   ( void );
+    virtual bool    ApplyCommonHandles      ( void );
+    virtual bool    ApplyMappedHandles      ( void );
+    virtual void    ReadParameterHandles    ( void );
+    virtual HRESULT Begin                   ( UINT* pPasses, DWORD Flags );
+    virtual HRESULT End                     ( void );
 
     static void             InitMaps                        ( void );
     const SRegisterInfo*    GetRegisterInfo                 ( EStateGroup stateGroup, const SString& strName );
@@ -466,6 +468,8 @@ public:
     bool                    TryMappingParameterToRegister   ( D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc );
     bool                    AddStandardParameter            ( D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc );
     bool                    TryParseSpecialParameter        ( D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc );
+    SString                 GetAnnotationNameAndValue       ( D3DXHANDLE hParameter, uint uiIndex, SString& strOutValue );
+    bool                    IsSecondaryRenderTarget         ( D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc );
 
     static std::map < SString, SRegisterInfo > ms_RegisterInfoMap;
 
@@ -650,6 +654,60 @@ void CEffectWrapImpl::InitMaps ( void )
         SString strKey ( "%s.%s", info.szRegName, info.szGroupName );
         MapSet ( ms_RegisterInfoMap, strKey.ToUpper (), info );
     }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CEffectWrapImpl::Begin
+//
+// Wrap for ID3DEffect::Begin
+// Ensures secondary render targets are set if required
+//
+////////////////////////////////////////////////////////////////
+HRESULT CEffectWrapImpl::Begin( UINT* pPasses, DWORD Flags )
+{
+    for ( uint i = 0 ; i < m_SecondaryRenderTargetList.size() ; i++ )
+    {
+        D3DXHANDLE hTexture = m_SecondaryRenderTargetList[i];
+        IDirect3DBaseTexture9* pD3DTexture;
+        HRESULT hr = m_pD3DEffect->GetTexture( hTexture, &pD3DTexture );
+        if ( hr == D3D_OK && pD3DTexture->GetType() == D3DRTYPE_TEXTURE )
+        {
+            IDirect3DSurface9* pD3DSurface;
+            HRESULT hr = ((IDirect3DTexture9*)pD3DTexture)->GetSurfaceLevel ( 0, &pD3DSurface );
+            if ( hr == D3D_OK )
+            {
+                LPDIRECT3DDEVICE9 pDevice;
+                m_pD3DEffect->GetDevice ( &pDevice );
+                pDevice->SetRenderTarget( i + 1, pD3DSurface );
+                SAFE_RELEASE( pD3DSurface );
+            }
+            SAFE_RELEASE( pD3DTexture );
+        }
+    }
+    return m_pD3DEffect->Begin( pPasses, Flags );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CEffectWrapImpl::End
+//
+// Wrap for ID3DEffect::End
+// Ensures secondary render targets are unset
+//
+////////////////////////////////////////////////////////////////
+HRESULT CEffectWrapImpl::End( void )
+{
+    HRESULT hResult = m_pD3DEffect->End();
+    for ( uint i = 0 ; i < m_SecondaryRenderTargetList.size() ; i++ )
+    {
+        LPDIRECT3DDEVICE9 pDevice;
+        m_pD3DEffect->GetDevice ( &pDevice );
+        pDevice->SetRenderTarget( i + 1, NULL );
+    }
+    return hResult;
 }
 
 
@@ -1122,8 +1180,8 @@ void CEffectWrapImpl::ReadParameterHandles ( void )
             continue;
 
         // Check if parameter is used
-        if ( m_bSkipUnusedParameters && !MapContains ( m_ReferencedParameterMap, hParameter ) )
-                continue;
+        if ( m_bSkipUnusedParameters && !MapContains ( m_ReferencedParameterMap, hParameter ) && !IsSecondaryRenderTarget( hParameter, ParameterDesc ) )
+            continue;
 
         // See if this parameter wants to be mapped to a D3D register
         if ( TryMappingParameterToRegister ( hParameter, ParameterDesc ) )
@@ -1133,6 +1191,25 @@ void CEffectWrapImpl::ReadParameterHandles ( void )
         if ( AddStandardParameter ( hParameter, ParameterDesc ) )
             continue;
     }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
+// CEffectWrapImpl::GetAnnotationNameAndValue
+//
+// Get parameter annotation by index
+//
+////////////////////////////////////////////////////////////////
+SString CEffectWrapImpl::GetAnnotationNameAndValue( D3DXHANDLE hParameter, uint uiIndex, SString& strOutValue )
+{
+    D3DXHANDLE hAnnotation = m_pD3DEffect->GetAnnotation( hParameter, uiIndex );
+    D3DXPARAMETER_DESC AnnotDesc;
+    m_pD3DEffect->GetParameterDesc( hAnnotation, &AnnotDesc );
+    LPCSTR szAnnotValue;
+    m_pD3DEffect->GetString( hAnnotation, &szAnnotValue );
+    strOutValue = szAnnotValue;
+    return AnnotDesc.Name;
 }
 
 
@@ -1154,13 +1231,7 @@ bool CEffectWrapImpl::TryParseSpecialParameter ( D3DXHANDLE hParameter, const D3
         for ( uint i = 0 ; i < ParameterDesc.Annotations ; i++ )
         {
             // Get name and value
-            D3DXHANDLE hAnnotation = m_pD3DEffect->GetAnnotation( hParameter, i );
-            D3DXPARAMETER_DESC AnnotDesc;
-            m_pD3DEffect->GetParameterDesc ( hAnnotation, &AnnotDesc );
-            LPCSTR szAnnotValue;
-            m_pD3DEffect->GetString ( hAnnotation, &szAnnotValue );
-            const SString strAnnotName = AnnotDesc.Name;
-            const SString strAnnotValue = szAnnotValue;
+            SString strAnnotValue, strAnnotName = GetAnnotationNameAndValue( hParameter, i, strAnnotValue );
 
             if ( strAnnotName == "createNormals" )
             {
@@ -1196,6 +1267,30 @@ bool CEffectWrapImpl::TryParseSpecialParameter ( D3DXHANDLE hParameter, const D3
 
 ////////////////////////////////////////////////////////////////
 //
+// CEffectWrapImpl::IsSecondaryRenderTarget
+//
+// Return true if paramter is flagged for use as a secondary render target texture
+//
+////////////////////////////////////////////////////////////////
+bool CEffectWrapImpl::IsSecondaryRenderTarget( D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc )
+{
+    if ( ParameterDesc.Type == D3DXPT_TEXTURE )
+    {
+        for ( uint i = 0 ; i < ParameterDesc.Annotations ; i++ )
+        {
+            SString strAnnotValue, strAnnotName = GetAnnotationNameAndValue( hParameter, i, strAnnotValue );
+            if ( strAnnotName == "renderTarget" )
+            {
+                return strAnnotValue == "yes";
+            }
+        }
+    }
+    return false;
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CEffectWrapImpl::AddStandardParameter
 //
 // Global parameter not tied to a D3D register
@@ -1209,9 +1304,14 @@ bool CEffectWrapImpl::AddStandardParameter ( D3DXHANDLE hParameter, const D3DXPA
     // Add to correct lookup map
     if ( ParameterDesc.Type == D3DXPT_TEXTURE )
     {
-        // Keep handle to first texture to get size of shader
+        if ( IsSecondaryRenderTarget( hParameter, ParameterDesc ) )
+            m_SecondaryRenderTargetList.push_back( hParameter );
+        else
         if ( !m_hFirstTexture )
+        {
+            // Keep handle to first non render target texture to get size of shader
             m_hFirstTexture = hParameter;
+        }
         MapSet ( m_texureHandleMap, strName.ToUpper (), hParameter );
     }
     else
@@ -1234,12 +1334,7 @@ bool CEffectWrapImpl::TryMappingParameterToRegister ( D3DXHANDLE hParameter, con
     for ( uint i = 0 ; i < ParameterDesc.Annotations ; i++ )
     {
         // Get name and value
-        D3DXHANDLE hAnnotation = m_pD3DEffect->GetAnnotation( hParameter, i );
-        D3DXPARAMETER_DESC AnnotDesc;
-        m_pD3DEffect->GetParameterDesc ( hAnnotation, &AnnotDesc );
-        LPCSTR szAnnotValue;
-        m_pD3DEffect->GetString ( hAnnotation, &szAnnotValue );
-        const SString strAnnotName = AnnotDesc.Name;
+        SString strAnnotValue, strAnnotName = GetAnnotationNameAndValue( hParameter, i, strAnnotValue );
 
         // Find group match from name
         EStateGroup stateGroup;
@@ -1251,14 +1346,14 @@ bool CEffectWrapImpl::TryMappingParameterToRegister ( D3DXHANDLE hParameter, con
         }
 
         // Extract prepended stage number, if any
-        int iStage = atoi ( szAnnotValue );
-        SString strName = SStringX ( szAnnotValue ).SplitRight( ",", NULL, -1 );
+        int iStage = atoi ( strAnnotValue );
+        SString strName = strAnnotValue.SplitRight( ",", NULL, -1 );
 
         // Find D3D register line for this group+name
         const SRegisterInfo* pRegsiterInfo = GetRegisterInfo ( stateGroup, strName );
         if ( !pRegsiterInfo )
         {
-            m_strWarnings += SString ( "No match for annotation '%s' '%s' on parameter '%s'\n", *strAnnotName, szAnnotValue, ParameterDesc.Name );
+            m_strWarnings += SString ( "No match for annotation '%s' '%s' on parameter '%s'\n", *strAnnotName, *strAnnotValue, ParameterDesc.Name );
             continue;
         }
 
@@ -1267,7 +1362,7 @@ bool CEffectWrapImpl::TryMappingParameterToRegister ( D3DXHANDLE hParameter, con
 
         if ( !pTypeMapping )
         {
-            m_strWarnings += SString ( "Type mismatch for annotation '%s' '%s' on parameter '%s'\n", *strAnnotName, szAnnotValue, ParameterDesc.Name );
+            m_strWarnings += SString ( "Type mismatch for annotation '%s' '%s' on parameter '%s'\n", *strAnnotName, *strAnnotValue, ParameterDesc.Name );
             continue;
         }
 
