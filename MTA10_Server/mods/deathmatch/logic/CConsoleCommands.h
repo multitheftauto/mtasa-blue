@@ -35,9 +35,7 @@ public:
 
     static bool         Say             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         TeamSay         ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         ASay            ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         Msg             ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-    static bool         AMsg            ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         Me              ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
     static bool         Nick            ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
@@ -56,8 +54,6 @@ public:
     static bool         WhoWas          ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
     static bool         DebugScript     ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
-
-    static bool         Sudo            ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
     static bool         Help            ( class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient );
 
