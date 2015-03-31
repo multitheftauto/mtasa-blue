@@ -410,7 +410,7 @@ public:
     bool                                IsDownloadingBigPacket          ( ) const                       { return m_bReceivingBigPacket; }
     bool                                IsBeingDeleted                  ( void )                        { return m_bBeingDeleted; }
 
-    void                                SetDevelopmentMode              ( bool bEnable );
+    void                                SetDevelopmentMode              ( bool bEnable, bool bEnableWeb );
     bool                                GetDevelopmentMode              ( void )                        { return m_bDevelopmentMode; } 
     void                                SetShowCollision                ( bool bEnable )                { m_bShowCollision = bEnable; } 
     bool                                GetShowCollision                ( void )                        { return m_bShowCollision; } 

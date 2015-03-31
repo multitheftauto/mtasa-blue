@@ -20,6 +20,9 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     m_pWebBrowserRenderItem = pWebBrowserRenderItem;
     m_pEventsInterface = nullptr;
     m_bBeingDestroyed = false;
+
+    // Initialise properties
+    m_Properties["mobile"] = "0";
 }
 
 CWebView::~CWebView ()
@@ -155,6 +158,29 @@ void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
 {
     if ( m_pWebView )
         m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJavascriptCode, "", 0 );
+}
+
+bool CWebView::SetProperty ( const SString& strKey, const SString& strValue )
+{
+    if ( strKey == "mobile" && ( strValue == "0" || strValue == "1" ) )
+    {
+        
+    }
+    else
+        return false;
+
+    m_Properties[strKey] = strValue;
+    return true;
+}
+
+bool CWebView::GetProperty ( const SString& strKey, SString& outValue )
+{
+    auto iter = m_Properties.find ( strKey );
+    if ( iter == m_Properties.end () )
+        return false;
+
+    outValue = iter->second;
+    return true;
 }
 
 void CWebView::InjectMouseMove ( int iPosX, int iPosY )
@@ -480,6 +506,26 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
     CefURLParts urlParts;
     if ( !CefParseURL ( request->GetURL (), urlParts ) )
         return true; // Cancel if invalid URL (this line will normally not be executed)
+
+    // Add some information to the HTTP header
+    {
+        CefRequest::HeaderMap headerMap;
+        request->GetHeaderMap ( headerMap );
+        auto iter = headerMap.find ( "User-Agent" );
+
+        if ( iter != headerMap.end () )
+        {
+            // Add MTA:SA "watermark"
+            iter->second = iter->second.ToString () + "; Multi Theft Auto: San Andreas Client";
+
+            // Add 'Android' to get the mobile version
+            SString strPropertyValue;
+            if ( GetProperty ( "mobile", strPropertyValue ) && strPropertyValue == "1" )
+                iter->second = iter->second.ToString () + "; Mobile Android";
+
+            request->SetHeaderMap ( headerMap );
+        }
+    }
 
     WString scheme = urlParts.scheme.str;
     if ( scheme == L"http" || scheme == L"https" )

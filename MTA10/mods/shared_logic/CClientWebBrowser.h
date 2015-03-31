@@ -35,6 +35,9 @@ public:
 
     bool                        ExecuteJavascript   ( const SString& strJavascriptCode );
 
+    bool                        SetProperty         ( const SString& strKey, const SString& strValue );
+    bool                        GetProperty         ( const SString& strKey, SString& outValue );
+
     void                        InjectMouseMove     ( int iPosX, int iPosY );
     void                        InjectMouseDown     ( eWebBrowserMouseButton mouseButton );
     void                        InjectMouseUp       ( eWebBrowserMouseButton mouseButton );

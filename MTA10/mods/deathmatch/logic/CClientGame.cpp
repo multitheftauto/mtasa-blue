@@ -6296,7 +6296,7 @@ bool CClientGame::GetWeaponTypeUsesBulletSync ( eWeaponType weaponType )
 // Special mode which enables commands such as showcol and showsound
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::SetDevelopmentMode ( bool bEnable )
+void CClientGame::SetDevelopmentMode ( bool bEnable, bool bEnableWeb )
 {
     m_bDevelopmentMode = bEnable;
 
@@ -6305,7 +6305,7 @@ void CClientGame::SetDevelopmentMode ( bool bEnable )
     else
         g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
 
-    g_pCore->GetWebCore()->SetTestModeEnabled ( bEnable );
+    g_pCore->GetWebCore()->SetTestModeEnabled ( bEnableWeb );
 }
 
 

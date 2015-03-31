@@ -410,3 +410,53 @@ int CLuaFunctionDefs::IsBrowserFocused ( lua_State* luaVM )
     lua_pushnil ( luaVM );
     return 1;
 }
+
+int CLuaFunctionDefs::SetBrowserProperty ( lua_State* luaVM )
+{
+//  bool setBrowserProperty ( browser webBrowser, string key, string value )
+    CClientWebBrowser* pWebBrowser; SString strKey; SString strValue;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadString ( strKey );
+    argStream.ReadString ( strValue );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( pWebBrowser->SetProperty ( strKey, strValue ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetBrowserProperty ( lua_State* luaVM )
+{
+//  string getBrowserProperty ( browser webBrowser, string key )
+    CClientWebBrowser* pWebBrowser; SString strKey;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadString ( strKey );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strValue;
+        if ( pWebBrowser->GetProperty ( strKey, strValue ) )
+        {
+            lua_pushstring ( luaVM, strValue );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushnil ( luaVM );
+    return 1;
+}

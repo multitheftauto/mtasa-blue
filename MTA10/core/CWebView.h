@@ -51,6 +51,9 @@ public:
     inline void NotifyPaint     () { m_PaintCV.notify_one (); }
 
     void ExecuteJavascript      ( const SString& strJavascriptCode );
+
+    bool SetProperty            ( const SString& strKey, const SString& strValue );
+    bool GetProperty            ( const SString& strKey, SString& outProperty );
     
     void InjectMouseMove        ( int iPosX, int iPosY );
     void InjectMouseDown        ( eWebBrowserMouseButton mouseButton );
@@ -120,7 +123,8 @@ private:
     SString             m_CurrentTitle;
     std::mutex          m_PaintMutex;
     std::condition_variable m_PaintCV;
-
+    std::map<SString, SString> m_Properties;
+        
     CWebBrowserEventsInterface* m_pEventsInterface;
 
 public:

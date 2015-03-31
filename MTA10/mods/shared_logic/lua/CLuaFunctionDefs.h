@@ -1033,6 +1033,8 @@ public:
     LUA_DECLARE ( IsBrowserDomainBlocked );
     LUA_DECLARE ( FocusBrowser );
     LUA_DECLARE ( IsBrowserFocused );
+    LUA_DECLARE ( SetBrowserProperty );
+    LUA_DECLARE ( GetBrowserProperty );
 
 private:
     // Static references to objects

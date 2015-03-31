@@ -1149,7 +1149,7 @@ int CLuaFunctionDefs::SetDevelopmentMode ( lua_State* luaVM )
 {
 //  bool setDevelopmentMode ( bool enable )
 //  bool setDevelopmentMode ( string command )
-    bool bEnable; SString strCommand;
+    bool bEnable; bool bEnableWeb; SString strCommand;
 
     CScriptArgReader argStream ( luaVM );
     if ( argStream.NextIsString () )
@@ -1160,10 +1160,11 @@ int CLuaFunctionDefs::SetDevelopmentMode ( lua_State* luaVM )
         return 1;
     }
     argStream.ReadBool ( bEnable );
+    argStream.ReadBool ( bEnableWeb, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pClientGame->SetDevelopmentMode ( bEnable );
+        g_pClientGame->SetDevelopmentMode ( bEnable, bEnableWeb );
         lua_pushboolean ( luaVM, true );
         return 1;
     }

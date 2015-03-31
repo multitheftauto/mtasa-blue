@@ -85,6 +85,16 @@ bool CClientWebBrowser::ExecuteJavascript ( const SString& strJavascriptCode )
     return true;
 }
 
+bool CClientWebBrowser::SetProperty ( const SString& strKey, const SString& strValue )
+{
+    return m_pWebView->SetProperty ( strKey, strValue );
+}
+
+bool CClientWebBrowser::GetProperty ( const SString& strKey, SString& outValue )
+{
+    return m_pWebView->GetProperty ( strKey, outValue );
+}
+
 void CClientWebBrowser::InjectMouseMove ( int iPosX, int iPosY )
 {
     m_pWebView->InjectMouseMove ( iPosX, iPosY );

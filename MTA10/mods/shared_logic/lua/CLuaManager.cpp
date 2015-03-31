@@ -1208,6 +1208,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isBrowserDomainBlocked", CLuaFunctionDefs::IsBrowserDomainBlocked );
     CLuaCFunctions::AddFunction ( "focusBrowser", CLuaFunctionDefs::FocusBrowser );
     CLuaCFunctions::AddFunction ( "isBrowserFocused", CLuaFunctionDefs::IsBrowserFocused );
+    CLuaCFunctions::AddFunction ( "setBrowserProperty", CLuaFunctionDefs::SetBrowserProperty );
+    CLuaCFunctions::AddFunction ( "getBrowserProperty", CLuaFunctionDefs::GetBrowserProperty );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();
