@@ -12,7 +12,7 @@
 #include "detours/include/detours.h"
 
 /*
-The hooks in this file modify the following WinAPI functions to work correctly with utf8 strings:
+The hooks in this file modify the following functions to work correctly with utf8 strings:
 
     CreateFile
     LoadLibrary
@@ -31,25 +31,27 @@ The hooks in this file modify the following WinAPI functions to work correctly w
     MoveFile
     DeleteFile
     GetModuleHandle
+    sopen_s
+    _chdir
+    _mkdir
+    _rmdir
+    remove
+    rename
 
-The following will also work correctly with utf8 strings as they eventually call the hooked WinAPI functions:
+The following will also work correctly with utf8 strings as they eventually call the above hooked functions:
 
     fopen
-    mkdir
-    rmdir
-    delete
-    rename
-    remove
     unlink
     fstream
 
 BUT
-    * Many other Win32 functions are not hooked and will need utf8 conversions when used, like these:
+    * Many other functions are not hooked and will need utf8 conversions when used, like these:
         FindFirstFile
         GetModuleFileName
         GetModuleFileNameEx
         GetCurrentDirectory
         GetDllDirectory
+        getcwd
             and many more...
 */
 
@@ -214,6 +216,41 @@ namespace SharedUtil
         _In_ int _PermissionMode
         );
 
+    typedef
+    int
+    (__cdecl
+    *FUNC__chdir) (
+            const char *_Path
+            );
+
+    typedef
+    int
+    (__cdecl
+    *FUNC__mkdir) (
+            const char *_Path
+            );
+
+    typedef
+    int
+    (__cdecl
+    *FUNC__rmdir) (
+            const char *_Path
+            );
+
+    typedef
+    int
+    (__cdecl
+    *FUNC_remove) (
+            const char *_Filename
+            );
+
+    typedef
+    int
+    (__cdecl
+    *FUNC_rename) (
+            const char *_OldFilename,
+            const char *_NewFilename
+            );
 
     /////////////////////////////////////////////////////////////
     //
@@ -241,6 +278,11 @@ namespace SharedUtil
     HOOKVAR( DeleteFileA )
     HOOKVAR( GetModuleHandleA )
     HOOKVAR( _sopen_s )
+    HOOKVAR( _chdir )
+    HOOKVAR( _mkdir )
+    HOOKVAR( _rmdir )
+    HOOKVAR( remove )
+    HOOKVAR( rename )
 
 
 #ifdef MTA_CLIENT
@@ -472,6 +514,32 @@ namespace SharedUtil
         return _wsopen_s( _FileHandle, FromUTF8( _Filename ), _OpenFlag, _ShareFlag, _PermissionMode );
     }
 
+
+    int __cdecl My_chdir( const char *_Path )
+    {
+        return _wchdir( FromUTF8( _Path ) );
+    }
+
+    int __cdecl My_mkdir( const char *_Path )
+    {
+        return _wmkdir( FromUTF8( _Path ) );
+    }
+
+    int __cdecl My_rmdir( const char *_Path )
+    {
+        return _wrmdir( FromUTF8( _Path ) );
+    }
+
+    int __cdecl Myremove( const char * _Filename )
+    {
+        return _wremove( FromUTF8( _Filename ) );
+    }
+
+    int __cdecl Myrename( const char * _OldFilename, const char * _NewFilename )
+    {
+        return _wrename( FromUTF8( _OldFilename ), FromUTF8( _NewFilename ) );
+    }
+
     /////////////////////////////////////////////////////////////
     //
     // Hook adding
@@ -501,6 +569,11 @@ namespace SharedUtil
         ADDHOOK( "Kernel32.dll", DeleteFileA )
         ADDHOOK( "Kernel32.dll", GetModuleHandleA )
         ADDHOOK( MSVCR_DLL, _sopen_s )
+        ADDHOOK( MSVCR_DLL, _chdir )
+        ADDHOOK( MSVCR_DLL, _mkdir )
+        ADDHOOK( MSVCR_DLL, _rmdir )
+        ADDHOOK( MSVCR_DLL, remove )
+        ADDHOOK( MSVCR_DLL, rename )
     }
 
 
@@ -537,5 +610,10 @@ namespace SharedUtil
         DELHOOK( DeleteFileA )
         DELHOOK( GetModuleHandleA )
         DELHOOK( _sopen_s )
+        DELHOOK( _chdir )
+        DELHOOK( _mkdir )
+        DELHOOK( _rmdir )
+        DELHOOK( remove )
+        DELHOOK( rename )
     }
 }

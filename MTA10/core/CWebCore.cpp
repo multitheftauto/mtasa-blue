@@ -78,14 +78,14 @@ bool CWebCore::Initialise ()
 
     // Specifiy sub process executable path
 #ifndef MTA_DEBUG
-    CefString ( &settings.browser_subprocess_path ).FromASCII( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher.exe" ) );
+    CefString ( &settings.browser_subprocess_path ).FromWString( FromUTF8( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher.exe" ) ) );
 #else
-    CefString ( &settings.browser_subprocess_path ).FromASCII( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher_d.exe" ) );
+    CefString ( &settings.browser_subprocess_path ).FromWString( FromUTF8( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher_d.exe" ) ) );
 #endif
     //CefString ( &settings.user_agent ).FromASCII ( "Multi Theft Auto: San Andreas Client; Chromium" );
-    CefString ( &settings.resources_dir_path ).FromASCII ( CalcMTASAPath( "MTA\\CEF") );
-    CefString ( &settings.locales_dir_path ).FromASCII( CalcMTASAPath( "MTA\\CEF\\locales" ) );
-    CefString ( &settings.log_file ).FromASCII ( CalcMTASAPath ( "MTA\\CEF\\cefdebug.txt" ) );
+    CefString ( &settings.resources_dir_path ).FromWString ( FromUTF8( CalcMTASAPath( "MTA\\CEF") ) );
+    CefString ( &settings.locales_dir_path ).FromWString( FromUTF8( CalcMTASAPath( "MTA\\CEF\\locales" ) ) );
+    CefString ( &settings.log_file ).FromWString ( FromUTF8( CalcMTASAPath ( "MTA\\CEF\\cefdebug.txt" ) ) );
 #ifdef MTA_DEBUG
     settings.log_severity = cef_log_severity_t::LOGSEVERITY_INFO;
 #else
