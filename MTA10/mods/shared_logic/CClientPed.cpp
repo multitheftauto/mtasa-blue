@@ -1494,7 +1494,7 @@ void CClientPed::ResetToOutOfVehicleWeapon ( void )
 }
 
 
-CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
+CClientVehicle * CClientPed::RemoveFromVehicle ( bool bSkipWarpIfGettingOut )
 {
     SetDoingGangDriveby ( false );
 
@@ -1523,8 +1523,12 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bIgnoreIfGettingOut )
         CVehicle* pGameVehicle = pVehicle->m_pVehicle;
         if ( pGameVehicle )
         {
+            // If vehicle was deleted during exit, don't skip warp. Fixes player getting stuck and going invisible.
+            if ( pVehicle->IsBeingDeleted() )
+                bSkipWarpIfGettingOut = false;
+
             // Jax: this should be safe, doesn't remove the player if he's getting dragged out already (fix for getting stuck on back after being jacked)
-            if ( !bIgnoreIfGettingOut || ( !IsGettingOutOfVehicle () ) )
+            if ( !bSkipWarpIfGettingOut || ( !IsGettingOutOfVehicle () ) )
             {
                 // Warp the player out
                 InternalRemoveFromVehicle ( pGameVehicle );
