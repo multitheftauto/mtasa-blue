@@ -472,7 +472,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
             // Write the serverside model (#8800)
             if ( BitStream.Version ( ) >= 0x05F )
-                BitStream.Write ( pVehicle->GetModel() );
+                BitStream.Write ( (int) pVehicle->GetModel() );
 
             // Write the vehicle matrix only if he's the driver
             CVector vecTemp;
