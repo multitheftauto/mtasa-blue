@@ -22,6 +22,7 @@
 
 using namespace std;
 
+#define CORE_MTA_FILLER                 "cgui\\images\\mta_filler.png"
 #define CORE_SETTINGS_UPDATE_INTERVAL   30         // Settings update interval in frames
 #define CORE_SETTINGS_HEADERS           3
 #define CORE_SETTINGS_HEADER_SPACER     " "
@@ -77,25 +78,56 @@ void CSettings::CreateGUI ( void )
     CVector2D vecTemp;
     CVector2D vecSize;
 
-    // Create the window
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, _("SETTINGS") ) );
-    m_pWindow->SetCloseButtonEnabled ( true );
-    m_pWindow->SetMovable ( true );
-
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
-    float yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
-    m_pWindow->SetPosition ( CVector2D ( resolution.fX / 2 - 560.0f / 2, resolution.fY / 2 - 480.0f / 2 + yoff  ), false );
 
-    //m_pWindow->SetPosition ( CVector2D ( 0.15f, 0.20f ), true );
-    m_pWindow->SetSize ( CVector2D ( 560.0f, 480.0f ) );
-    m_pWindow->SetSizingEnabled ( false );
-    m_pWindow->SetAlwaysOnTop ( true );
-    m_pWindow->BringToFront ();
+#ifdef SETTINGS_PANEL_MAX_SIZE
+    // Use this for maxium settings panel size
+    // Will require content layout changes to make it look good
+    CVector2D contentSize( 640, 480 );
+#else
+    CVector2D contentSize( 560, 458 );
+#endif
+    float fBottomButtonAreaHeight = 38;
+    CVector2D tabPanelPosition;
+    CVector2D tabPanelSize = contentSize - CVector2D( 0, fBottomButtonAreaHeight );
+
+    // Window size is content size plus window frame edge dims
+    CVector2D windowSize = contentSize + CVector2D( 9 + 9, 20 + 2 );
+
+    if ( windowSize.fX <= resolution.fX && windowSize.fY  <= resolution.fY )
+    {
+        // Create window (with frame) if it will fit inside the screen resolution
+        CGUIWindow* pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, _("SETTINGS") ) );
+        pWindow->SetCloseButtonEnabled ( true );
+        pWindow->SetMovable ( true );
+        pWindow->SetPosition ( ( resolution - windowSize ) / 2 );
+        pWindow->SetSize ( windowSize );
+        pWindow->SetSizingEnabled ( false );
+        pWindow->SetAlwaysOnTop ( true );
+        pWindow->BringToFront ();
+        m_pWindow = pWindow;
+        tabPanelPosition = CVector2D( 0, 20 );
+    }
+    else
+    {
+		// Otherwise use black background image
+        CGUIStaticImage* pFiller = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+        pFiller->LoadFromFile ( CORE_MTA_FILLER );
+        pFiller->SetVisible ( false );
+        pFiller->SetZOrderingEnabled ( false );
+        pFiller->SetAlwaysOnTop ( true );
+        pFiller->MoveToBack ();
+        pFiller->SetPosition ( ( resolution - contentSize ) / 2 );
+        pFiller->SetSize ( contentSize );
+        m_pWindow = pFiller;
+        tabPanelPosition = CVector2D( 0, 0 );
+    }
 
     // Create the tab panel and necessary tabs
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
-    m_pTabs->SetPosition ( CVector2D ( 0, 20.0f ) );
-    m_pTabs->SetSize ( CVector2D ( 560.0f, 420.0f ) );
+    m_pTabs->SetPosition ( tabPanelPosition );
+    m_pTabs->SetSize ( tabPanelSize );
+
     pTabMultiplayer = m_pTabs->CreateTab ( _("Multiplayer") );
     pTabVideo = m_pTabs->CreateTab ( _("Video") );
     pTabAudio = m_pTabs->CreateTab ( _("Audio") );
@@ -109,12 +141,12 @@ void CSettings::CreateGUI ( void )
     // Create buttons
     //  OK button
     m_pButtonOK = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, _("OK") ) );
-    m_pButtonOK->SetPosition ( CVector2D ( 0.5f, 0.94f ), true );
+    m_pButtonOK->SetPosition ( CVector2D ( contentSize.fX * 0.5f, tabPanelSize.fY + tabPanelPosition.fY + 8 ) );
     m_pButtonOK->SetZOrderingEnabled ( false );
 
     //  Cancel button
     m_pButtonCancel = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, _("Cancel") ) );
-    m_pButtonCancel->SetPosition ( CVector2D ( 0.78f, 0.94f ), true );
+    m_pButtonCancel->SetPosition ( CVector2D ( contentSize.fX * 0.78f, tabPanelSize.fY + tabPanelPosition.fY + 8 ) );
     m_pButtonCancel->SetZOrderingEnabled ( false );
 
     /**

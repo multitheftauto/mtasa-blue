@@ -150,7 +150,7 @@ protected:
     const static int    SecKeyNum = 3;     // Number of secondary keys
 
     // Keep these protected so we can access them in the event handlers of CClientGame
-    CGUIWindow*         m_pWindow;
+    CGUIElement*        m_pWindow;
     CGUITabPanel*       m_pTabs;
     CGUIButton*         m_pButtonOK;
     CGUIButton*         m_pButtonCancel;
