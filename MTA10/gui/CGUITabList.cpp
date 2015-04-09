@@ -18,13 +18,16 @@ void CGUITabList::SelectNext ( CGUITabListItem* pBase )
     bool bFound = false;
     for ( CGUITabIterator iter = m_Items.begin (); iter != m_Items.end () ; ++ iter )
     {
-        if ( (*iter) == pBase )
+        CGUITabListItem* pItem = *iter;
+
+        if ( pItem == pBase )
         {
             bFound = true;
         }
-        else if ( bFound && (*iter)->ActivateOnTab () )
+        else if ( bFound && pItem->IsEnabled () )
         {
             // we found an element that wants to get selected
+            pItem->ActivateOnTab ();
             return;
         }
     }
@@ -32,15 +35,18 @@ void CGUITabList::SelectNext ( CGUITabListItem* pBase )
     // Contine to search an element from the beginning
     for ( CGUITabIterator iter = m_Items.begin (); iter != m_Items.end (); ++ iter )
     {
-        if ( (*iter) == pBase )
+        CGUITabListItem* pItem = *iter;
+
+        if ( pItem == pBase )
         {
             // just where we started, so we don't have to do anything
             return;
         }
-        else if ( (*iter)->ActivateOnTab () )
+        else if ( pItem->IsEnabled () )
         {
-                // finally found something different than the current element     
-                return;
+            // finally found something different than the current element     
+            pItem->ActivateOnTab ();
+            return;
         }
     }
 }
