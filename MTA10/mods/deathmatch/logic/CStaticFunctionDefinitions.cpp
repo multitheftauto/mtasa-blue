@@ -5125,6 +5125,30 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetItemText ( CClientEntity& Entity,
     return false;
 }
 
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strURL, bool bIsLocal, bool bRelative, CClientGUIElement* pParent )
+{
+    CGUIWebBrowser* pElement = m_pGUI->CreateWebBrowser ( pParent ? pParent->GetCGUIElement () : nullptr );
+    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
+    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+
+    // Register to the gui manager
+    CVector2D absoluteSize;
+    pElement->GetSize ( absoluteSize, false );
+    auto pGUIElement = new CClientGUIWebBrowser ( bIsLocal,  (uint)absoluteSize.fX, (uint)absoluteSize.fY, m_pManager, &LuaMain, pElement );
+    pGUIElement->SetParent ( pParent ? pParent : LuaMain.GetResource ()->GetResourceGUIEntity () );
+
+    // Load CEGUI element texture from webview
+    pElement->LoadFromWebView ( pGUIElement->GetBrowser ()->GetWebView () );
+
+    if ( pParent && !pParent->IsCallPropagationEnabled () )
+    {
+        pGUIElement->GetCGUIElement ()->SetInheritsAlpha ( false );
+    }
+
+    return pGUIElement;
+}
+
+
 void CStaticFunctionDefinitions::GUISetText ( CClientEntity& Entity, const char* szText )
 {
     // Are we a CGUI element?

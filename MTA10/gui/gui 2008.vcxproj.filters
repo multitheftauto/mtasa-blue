@@ -86,6 +86,9 @@
     <ClCompile Include="StdInc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CGUIWebBrowser_Impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGUI_Impl.h">
@@ -236,6 +239,12 @@
       <Filter>Header Files\interface</Filter>
     </ClInclude>
     <ClInclude Include="..\sdk\gui\CGUIWindow.h">
+      <Filter>Header Files\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="CGUIWebBrowser_Impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdk\gui\CGUIWebBrowser.h">
       <Filter>Header Files\interface</Filter>
     </ClInclude>
   </ItemGroup>

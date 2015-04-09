@@ -49,6 +49,7 @@ public:
     void GetTitle               ( SString& outTitle );
     void SetRenderingPaused     ( bool bPaused );
     void Focus                  ();
+    IDirect3DTexture9* GetTexture () { return static_cast<IDirect3DTexture9*>(m_pWebBrowserRenderItem->m_pD3DTexture); }
     void ClearTexture           ();
     inline void NotifyPaint     () { m_PaintCV.notify_one (); }
 

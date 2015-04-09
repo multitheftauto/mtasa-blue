@@ -56,10 +56,10 @@ private:
 	/*************************************************************************
 		Construction & Destruction (by Renderer object only)
 	*************************************************************************/
+public: // changed by MTA; BE CAREFUL!
 	DirectX9Texture(Renderer* owner);
 	virtual ~DirectX9Texture(void);
 
-public:
 	/*!
 	\brief
 		Returns the current pixel width of the texture
@@ -122,7 +122,7 @@ public:
 	\return
 		Pointer to the IDirect3DTexture9 interface currently being used by this Texture object
 	*/
-	LPDIRECT3DTEXTURE9	getD3DTexture(void) const		{return d_d3dtexture;}
+	virtual LPDIRECT3DTEXTURE9	getD3DTexture(void) const		{return d_d3dtexture;}
 
 
 	//

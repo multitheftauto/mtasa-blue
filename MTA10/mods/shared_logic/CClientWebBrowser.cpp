@@ -228,3 +228,10 @@ bool CClientWebBrowser::Events_OnResourcePathCheck ( SString& strURL )
     return false;
 }
 
+
+
+CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) 
+    : CClientGUIElement ( pManager, pLuaMain, pCGUIElement, ID )
+{
+    m_pBrowser = std::unique_ptr < CClientWebBrowser > ( g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, isLocal, false ) );
+}

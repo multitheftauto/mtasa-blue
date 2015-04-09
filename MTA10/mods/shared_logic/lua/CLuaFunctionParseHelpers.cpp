@@ -144,6 +144,7 @@ IMPLEMENT_ENUM_BEGIN( eCGUIType )
     ADD_ENUM ( CGUI_SCROLLPANE,     "gui-scrollpane" )
     ADD_ENUM ( CGUI_SCROLLBAR,      "gui-scrollbar" )
     ADD_ENUM ( CGUI_COMBOBOX,       "gui-combobox" )
+    ADD_ENUM ( CGUI_WEBBROWSER,     "gui-browser" )
 IMPLEMENT_ENUM_END( "gui-type" )
 
 IMPLEMENT_ENUM_BEGIN( eDxTestMode )

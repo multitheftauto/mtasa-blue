@@ -78,6 +78,7 @@ inline eCGUIType GetClassType ( CGUIWindow* )      { return CGUI_WINDOW; }
 inline eCGUIType GetClassType ( CGUIScrollPane* )  { return CGUI_SCROLLPANE; }
 inline eCGUIType GetClassType ( CGUIScrollBar* )   { return CGUI_SCROLLBAR; }
 inline eCGUIType GetClassType ( CGUIComboBox* )    { return CGUI_COMBOBOX; }
+inline eCGUIType GetClassType ( CGUIWebBrowser* )  { return CGUI_WEBBROWSER; }
 
 
 // class -> class name
@@ -126,6 +127,7 @@ inline SString GetClassTypeName ( CGUIWindow* )      { return "gui-window"; }
 inline SString GetClassTypeName ( CGUIScrollPane* )  { return "gui-scrollpane"; }
 inline SString GetClassTypeName ( CGUIScrollBar* )   { return "gui-scrollbar"; }
 inline SString GetClassTypeName ( CGUIComboBox* )    { return "gui-combobox"; }
+inline SString GetClassTypeName ( CGUIWebBrowser* )  { return "gui-browser"; }
 
 inline SString GetClassTypeName ( CResource* )              { return "resource-data"; }
 inline SString GetClassTypeName ( CXMLNode* )               { return "xml-node"; }

@@ -134,6 +134,9 @@ public:
     CGUIComboBox*                   CreateComboBox              ( CGUIElement* pParent = NULL, const char* szCaption = "" );
     CGUIComboBox*                   CreateComboBox              ( CGUIComboBox* pParent = NULL, const char* szCaption = "" );
 
+    CGUIWebBrowser*                 CreateWebBrowser            ( CGUIElement* pParent = nullptr );
+    CGUIWebBrowser*                 CreateWebBrowser            ( CGUITab* pParent = nullptr );
+
 	CGUIWindow*                     CreateWnd                   ( CGUIElement* pParent = NULL, const char* szCaption = "" );
     //
 
@@ -234,6 +237,7 @@ private:
     CGUIScrollPane*                 _CreateScrollPane           ( CGUIElement_Impl* pParent = NULL );
     CGUIScrollBar*                  _CreateScrollBar            ( bool bHorizontal, CGUIElement_Impl* pParent = NULL );
     CGUIComboBox*                   _CreateComboBox             ( CGUIElement_Impl* pParent = NULL, const char* szCaption = "" );
+    CGUIWebBrowser*                 _CreateWebBrowser           ( CGUIElement_Impl* pParent = nullptr );
 	
     void                            SubscribeToMouseEvents();
     CGUIFont*                       CreateFntFromWinFont        ( const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false );
