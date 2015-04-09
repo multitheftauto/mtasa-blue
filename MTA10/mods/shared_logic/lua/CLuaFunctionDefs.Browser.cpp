@@ -463,7 +463,7 @@ int CLuaFunctionDefs::GetBrowserProperty ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
 {
-//  element guiCreateBrowser ( float x, float y, float width, float height, string url, bool isLocal, bool relative, [element parent = nil] )
+//  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool relative, [element parent = nil] )
     float x; float y; float width; float height; SString url; bool bIsLocal; bool bIsRelative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
@@ -482,16 +482,9 @@ int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CResource* pResource = pLuaMain->GetResource();
-            SString strPath;
-            //if ( CResourceManager::ParseResourcePathInput( url, pResource, strPath ) )
-            {
-                CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, x, y, width, height, strPath, bIsLocal, bIsRelative, parent );
-                lua_pushelement ( luaVM, pGUIElement );
-                return 1;
-            }
-            /*else
-                argStream.SetCustomError( strPath, "Bad file path" );*/
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, x, y, width, height, bIsLocal, bIsRelative, parent );
+            lua_pushelement ( luaVM, pGUIElement );
+            return 1;
         }
     }
     else
@@ -501,7 +494,7 @@ int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::GUIGetBrowser ( lua_State* luaVM )
+int CLuaFunctionDefs::GUIGetBrowser ( lua_State* luaVM ) // Or rather guiGetBrowserBrowser?
 {
 //  webbrowser guiGetBrowser ( gui-webbrowser browser )
     CClientGUIElement* pGUIElement;
@@ -511,7 +504,7 @@ int CLuaFunctionDefs::GUIGetBrowser ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( IS_GUI(pGUIElement) && pGUIElement->GetCGUIType () == CGUI_WEBBROWSER )
+        if ( IS_GUI ( pGUIElement ) && pGUIElement->GetCGUIType () == CGUI_WEBBROWSER )
         {
             CClientGUIWebBrowser* pGUIBrowser = static_cast < CClientGUIWebBrowser* > ( pGUIElement );
             lua_pushelement ( luaVM, pGUIBrowser->GetBrowser () );

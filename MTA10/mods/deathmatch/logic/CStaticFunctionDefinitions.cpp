@@ -5125,7 +5125,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetItemText ( CClientEntity& Entity,
     return false;
 }
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strURL, bool bIsLocal, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bIsLocal, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIWebBrowser* pElement = m_pGUI->CreateWebBrowser ( pParent ? pParent->GetCGUIElement () : nullptr );
     pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );

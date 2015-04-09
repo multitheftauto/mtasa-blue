@@ -186,7 +186,7 @@ bool CGUIWebBrowser_Impl::Event_MouseWheel ( const CEGUI::EventArgs& e )
 {
     const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
     
-    m_pWebView->InjectMouseWheel ( args.wheelChange * 30, 0 );
+    m_pWebView->InjectMouseWheel ( args.wheelChange * 40, 0 );
     return true;
 }
 
