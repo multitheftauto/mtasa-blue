@@ -24,21 +24,28 @@ class CGUIWebBrowser_Impl : public CGUIWebBrowser, public CGUIElement_Impl
 {
 public:
                                 CGUIWebBrowser_Impl     ( CGUI_Impl* pGUI, CGUIElement* pParent = nullptr );
-                                ~CGUIWebBrowser_Impl    ( void );
+                                ~CGUIWebBrowser_Impl    ();
+    void                        Clear                   ();
 
     void                        LoadFromWebView         ( CWebViewInterface* pWebView );
     bool                        LoadFromTexture         ( IDirect3DTexture9* pD3DTexture );
-    bool                        GetNativeSize           ( CVector2D& vecSize );
-    void                        Clear                   ( void );
 
     void                        SetFrameEnabled         ( bool bFrameEnabled );
-    bool                        IsFrameEnabled          ( void );
+    bool                        IsFrameEnabled          ();
 
-    CEGUI::Image*               GetDirectImage          ( void );
+    CEGUI::Image*               GetDirectImage          ();
 
-    void                        Render                  ( void );
+    void                        Render                  ();
 
-    eCGUIType                   GetType                 ( void ) { return CGUI_WEBBROWSER; }
+    eCGUIType                   GetType                 () { return CGUI_WEBBROWSER; }
+
+protected:
+    bool                        Event_MouseButtonDown   ( const CEGUI::EventArgs& e );
+    bool                        Event_MouseButtonUp     ( const CEGUI::EventArgs& e );
+    bool                        Event_MouseWheel        ( const CEGUI::EventArgs& e );
+    bool                        Event_MouseMove         ( const CEGUI::EventArgs& e );
+    bool                        Event_Activated         ( const CEGUI::EventArgs& e );
+    bool                        Event_Deactivated       ( const CEGUI::EventArgs& e );
 
 private:
     CGUI_Impl*                  m_pGUI;
@@ -51,20 +58,23 @@ private:
     #include "CGUIElement_Inc.h"
 };
 
+
+// The purpose of this class is to provide an externally managed DirectX texture
 class CGUIWebBrowserTexture : public CEGUI::DirectX9Texture
 {
 public:
-    CGUIWebBrowserTexture(CEGUI::Renderer* pOwner, IDirect3DTexture9* pTexture);
+    CGUIWebBrowserTexture ( CEGUI::Renderer* pOwner, IDirect3DTexture9* pTexture );
 
-    virtual ushort getWidth() const override { return m_Width; };
-    virtual ushort getHeight() const override { return m_Height; };
+    virtual ushort getWidth () const override { return m_Width; };
+    virtual ushort getHeight () const override { return m_Height; };
 
-    virtual void loadFromFile(const CEGUI::String& filename, const CEGUI::String& resourceGroup) override {};
-    virtual void loadFromMemory(const void* buffPtr, uint buffWidth, uint buffHeight) override {};
+    // Override with empty function (--> eliminate the functinions from DirectX9Texture)
+    virtual void loadFromFile ( const CEGUI::String& filename, const CEGUI::String& resourceGroup ) override {};
+    virtual void loadFromMemory ( const void* buffPtr, uint buffWidth, uint buffHeight ) override {};
 
-    virtual LPDIRECT3DTEXTURE9 getD3DTexture() const override { return m_pTexture; };
-    virtual void preD3DReset() {};
-    virtual void postD3DReset() {};
+    virtual LPDIRECT3DTEXTURE9 getD3DTexture () const override { return m_pTexture; };
+    virtual void preD3DReset () {};
+    virtual void postD3DReset () {};
 
 private:
     IDirect3DTexture9* m_pTexture;

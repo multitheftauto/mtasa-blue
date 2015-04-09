@@ -21,9 +21,6 @@ public:
 
     virtual void                        LoadFromWebView         ( class CWebViewInterface* pWebView ) = 0;
 
-    virtual void                        Clear                   () = 0;
-    virtual bool                        GetNativeSize           ( CVector2D &vecSize ) = 0;
-
     virtual void                        SetFrameEnabled         ( bool bFrameEnabled ) = 0;
     virtual bool                        IsFrameEnabled          () = 0;
 

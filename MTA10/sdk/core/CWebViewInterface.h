@@ -27,7 +27,7 @@ public:
     virtual void GetURL             ( SString& outURL ) = 0;
     virtual void GetTitle           ( SString& outTitle ) = 0;
     virtual void SetRenderingPaused ( bool bPaused ) = 0;
-    virtual void Focus              () = 0;
+    virtual void Focus              ( bool state = true ) = 0;
     virtual IDirect3DTexture9* GetTexture () = 0;
 
     virtual void ExecuteJavascript  ( const SString& strJavascriptCode ) = 0;

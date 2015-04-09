@@ -39,6 +39,14 @@ CGUIWebBrowser_Impl::CGUIWebBrowser_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent
 
     AddEvents ();
 
+    // Apply browser events
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseButtonDown, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_MouseButtonDown, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseButtonUp, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_MouseButtonUp, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseMove, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_MouseMove, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventMouseWheel, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_MouseWheel, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventActivated, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_Activated, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Window::EventDeactivated, CEGUI::Event::Subscriber ( &CGUIWebBrowser_Impl::Event_Deactivated, this ) );
+
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
     if ( pParent )
     {
@@ -51,12 +59,26 @@ CGUIWebBrowser_Impl::CGUIWebBrowser_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent
     }
 }
 
-CGUIWebBrowser_Impl::~CGUIWebBrowser_Impl ( void )
+CGUIWebBrowser_Impl::~CGUIWebBrowser_Impl ()
 {
-    // Clear the image
-    Clear ();
+    Clear();
 
     DestroyElement ();
+}
+
+void CGUIWebBrowser_Impl::Clear ()
+{
+    // Stop the control from using it
+    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow )->setImage ( nullptr );
+
+    // Kill the images
+    if ( m_pImageset )
+    {
+        m_pImageset->undefineAllImages ();
+        m_pImagesetManager->destroyImageset ( m_pImageset );
+        m_pImage = nullptr;
+        m_pImageset = nullptr;
+    }
 }
 
 bool CGUIWebBrowser_Impl::LoadFromTexture ( IDirect3DTexture9* pTexture )
@@ -102,35 +124,6 @@ void CGUIWebBrowser_Impl::LoadFromWebView ( CWebViewInterface* pWebView )
     LoadFromTexture ( pWebView->GetTexture () );
 }
 
-void CGUIWebBrowser_Impl::Clear ( void )
-{
-    // Stop the control from using it
-    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow )->setImage ( nullptr );
-
-    // Kill the images
-    if ( m_pImageset )
-    {
-        m_pImageset->undefineAllImages ();
-        m_pImagesetManager->destroyImageset ( m_pImageset );
-        m_pImage = nullptr;
-        m_pImageset = nullptr;
-    }
-}
-
-bool CGUIWebBrowser_Impl::GetNativeSize ( CVector2D& vecSize )
-{
-    auto pTexture = m_pWebView->GetTexture ();
-    D3DSURFACE_DESC SurfaceDesc;
-    if ( pTexture->GetLevelDesc ( 0, &SurfaceDesc ) == ERROR_SUCCESS )
-    {
-        vecSize.fX = (float)SurfaceDesc.Width;
-        vecSize.fY = (float)SurfaceDesc.Height;
-        return true;
-    }
-    
-    return false;    
-}
-
 void CGUIWebBrowser_Impl::SetFrameEnabled ( bool bFrameEnabled )
 {
     reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> setFrameEnabled ( bFrameEnabled );
@@ -153,10 +146,64 @@ void CGUIWebBrowser_Impl::Render ( void )
     return reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> render ();
 }
 
+bool CGUIWebBrowser_Impl::Event_MouseButtonDown ( const CEGUI::EventArgs& e )
+{
+    const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
+
+    if ( args.button == CEGUI::MouseButton::LeftButton )
+        m_pWebView->InjectMouseDown ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_LEFT );
+    else if ( args.button == CEGUI::MouseButton::MiddleButton )
+        m_pWebView->InjectMouseDown ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_MIDDLE );
+    else if ( args.button == CEGUI::MouseButton::RightButton )
+        m_pWebView->InjectMouseDown ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_RIGHT );
+
+    return true;
+}
+
+bool CGUIWebBrowser_Impl::Event_MouseButtonUp ( const CEGUI::EventArgs& e )
+{
+    const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
+
+    if ( args.button == CEGUI::MouseButton::LeftButton )
+        m_pWebView->InjectMouseUp ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_LEFT );
+    else if ( args.button == CEGUI::MouseButton::MiddleButton )
+        m_pWebView->InjectMouseUp ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_MIDDLE );
+    else if ( args.button == CEGUI::MouseButton::RightButton )
+        m_pWebView->InjectMouseUp ( eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_RIGHT );
+
+    return true;
+}
+
+bool CGUIWebBrowser_Impl::Event_MouseMove ( const CEGUI::EventArgs& e )
+{
+    const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
+    
+    m_pWebView->InjectMouseMove ( (int)args.position.d_x - m_pWindow->windowToScreenX ( 0.0f ), (int)args.position.d_y - m_pWindow->windowToScreenY ( 0.0f ) );
+    return true;
+}
+
+bool CGUIWebBrowser_Impl::Event_MouseWheel ( const CEGUI::EventArgs& e )
+{
+    const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
+    
+    m_pWebView->InjectMouseWheel ( args.wheelChange * 30, 0 );
+    return true;
+}
+
+bool CGUIWebBrowser_Impl::Event_Activated ( const CEGUI::EventArgs& e )
+{
+    m_pWebView->Focus ( true );
+    return true;
+}
+
+bool CGUIWebBrowser_Impl::Event_Deactivated ( const CEGUI::EventArgs& e )
+{
+    m_pWebView->Focus ( false );
+    return true;
+}
 
 
-
-CGUIWebBrowserTexture::CGUIWebBrowserTexture ( CEGUI::Renderer* pOwner, IDirect3DTexture9* pTexture ) : CEGUI::DirectX9Texture(pOwner)
+CGUIWebBrowserTexture::CGUIWebBrowserTexture ( CEGUI::Renderer* pOwner, IDirect3DTexture9* pTexture ) : CEGUI::DirectX9Texture ( pOwner )
 {
     m_pTexture = pTexture;
 
