@@ -308,6 +308,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getUpgrades", "getVehicleUpgrades" );
     lua_classfunction ( luaVM, "getUpgradeSlotName", "getVehicleUpgradeSlotName" );
     lua_classfunction ( luaVM, "getCompatibleUpgrades", "getVehicleCompatibleUpgrades" );
+    lua_classfunction ( luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot" );
     
     lua_classfunction ( luaVM, "setComponentVisible", "setVehicleComponentVisible" );
     lua_classfunction ( luaVM, "setSirensOn", "setVehicleSirensOn" );
