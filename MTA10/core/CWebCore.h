@@ -81,7 +81,6 @@ public:
     void                OnPreScreenshot     ();
     void                OnPostScreenshot    ();
 
-    bool                InitialiseCoreAudio ();
     bool                SetGlobalAudioVolume( float fVolume );
 
     bool                UpdateListsFromMaster();

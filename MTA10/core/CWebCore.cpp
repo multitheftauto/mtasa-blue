@@ -12,7 +12,6 @@
 #include "CWebCore.h"
 #include "CWebView.h"
 #include "CWebsiteRequests.h"
-#include <Audiopolicy.h>
 #include <cef3/include/cef_app.h>
 #include <cef3/include/cef_browser.h>
 #include <cef3/include/cef_sandbox_win.h>
@@ -37,12 +36,6 @@ CWebCore::CWebCore ()
 
     // Update dynamic lists from QA server
     UpdateListsFromMaster ();
-
-    // Get AudioVolume COM interface if the Audio Core API is available
-    if ( GetApplicationSetting("os-version") >= "6.2" )
-    {
-        InitialiseCoreAudio ();
-    }
 }
 
 CWebCore::~CWebCore ()
@@ -401,71 +394,14 @@ void CWebCore::ClearTextures ()
     }
 }
 
-bool CWebCore::InitialiseCoreAudio()
-{
-    const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
-    const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
-    const IID IID_IAudioSessionManager2 = __uuidof(IAudioSessionManager2);
-
-    IMMDeviceEnumerator* pEnumerator;
-    CoCreateInstance ( CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, IID_IMMDeviceEnumerator, (void**)&pEnumerator );
-    if ( !pEnumerator )
-        return false;
-
-    IMMDevice* pMMDevice;
-    pEnumerator->GetDefaultAudioEndpoint ( EDataFlow::eRender, ERole::eMultimedia, &pMMDevice );
-    pEnumerator->Release ();
-    if ( !pMMDevice )
-        return false;
-
-    IAudioSessionManager2* pAudioSessionManager;
-    pMMDevice->Activate ( IID_IAudioSessionManager2, 0, NULL, (void**)&pAudioSessionManager );
-    pMMDevice->Release ();
-    if ( !pAudioSessionManager )
-        return false;
-
-    m_pAudioSessionManager = pAudioSessionManager;
-    return true;
-}
-
 bool CWebCore::SetGlobalAudioVolume ( float fVolume )
 {
     if ( fVolume < 0.0f || fVolume > 1.0f )
         return false;
 
-    if ( GetApplicationSetting ( "os-version" ) < "6.2" || !m_pAudioSessionManager )
+    for ( auto& pWebView : m_WebViews )
     {
-        for ( auto& pWebView : m_WebViews )
-        {
-            pWebView->SetAudioVolume ( fVolume );
-        }
-    }
-    else
-    {
-        IAudioSessionEnumerator* pSessionEnumerator;
-        m_pAudioSessionManager->GetSessionEnumerator ( &pSessionEnumerator );
-        if ( !pSessionEnumerator )
-            return false;
-
-        // Obtain the associated ISimpleAudioVolume interface
-        int sessionCount;
-        pSessionEnumerator->GetCount ( &sessionCount );
-        for ( int i = 0; i < sessionCount; ++i )
-        {
-            IAudioSessionControl2* pSessionControl;
-            pSessionEnumerator->GetSession ( i, (IAudioSessionControl**)&pSessionControl );
-            PWSTR szIdentifier;
-            pSessionControl->GetSessionIdentifier(&szIdentifier);
-
-            if ( std::wstring(szIdentifier).find(L"CEFLauncher") != std::string::npos )
-            {
-                ISimpleAudioVolume* pSimpleAudioVolume;
-                pSessionControl->QueryInterface ( &pSimpleAudioVolume );
-                pSimpleAudioVolume->SetMasterVolume ( fVolume, NULL );
-            }
-            pSessionControl->Release ();
-        }
-        pSessionEnumerator->Release ();
+        pWebView->SetAudioVolume ( fVolume );
     }
     return true;
 }

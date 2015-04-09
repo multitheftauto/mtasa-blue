@@ -516,7 +516,7 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
         if ( iter != headerMap.end () )
         {
             // Add MTA:SA "watermark"
-            iter->second = iter->second.ToString () + "; Multi Theft Auto: San Andreas Client";
+            iter->second = iter->second.ToString () + "; " MTA_CEF_USERAGENT;
 
             // Add 'Android' to get the mobile version
             SString strPropertyValue;
