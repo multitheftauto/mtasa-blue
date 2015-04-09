@@ -1035,6 +1035,8 @@ public:
     LUA_DECLARE ( IsBrowserFocused );
     LUA_DECLARE ( SetBrowserProperty );
     LUA_DECLARE ( GetBrowserProperty );
+    LUA_DECLARE ( GUICreateBrowser );
+    LUA_DECLARE ( GUIGetBrowser );
 
 private:
     // Static references to objects

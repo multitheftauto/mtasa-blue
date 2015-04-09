@@ -128,14 +128,18 @@ void CWebView::SetRenderingPaused ( bool bPaused )
         m_pWebView->GetHost ()->WasHidden ( bPaused );
 }
 
-void CWebView::Focus ()
+void CWebView::Focus ( bool state )
 {
     if ( m_pWebView )
     {
-        m_pWebView->GetHost ()->SetFocus ( true );
-        m_pWebView->GetHost ()->SendFocusEvent ( true );
+        m_pWebView->GetHost ()->SetFocus ( state );
+        m_pWebView->GetHost ()->SendFocusEvent ( state );
     }
-    g_pCore->GetWebCore()->SetFocusedWebView ( this );
+
+    if ( state )
+        g_pCore->GetWebCore ()->SetFocusedWebView ( this );
+    else if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
+        g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
 }
 
 void CWebView::ClearTexture ()

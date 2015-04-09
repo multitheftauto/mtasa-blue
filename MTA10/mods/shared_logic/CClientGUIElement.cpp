@@ -75,6 +75,9 @@ CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLua
         case CGUI_COMBOBOX:
             m_strCGUITypeName = "combobox";
             break;
+        case CGUI_WEBBROWSER:
+            m_strCGUITypeName = "browser";
+            break;
         default:
             m_strCGUITypeName = "unknown";
             break;

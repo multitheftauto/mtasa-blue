@@ -54,7 +54,7 @@ class CClientGUIElement : public CClientEntity
 
 public:
                                 CClientGUIElement           ( CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID = INVALID_ELEMENT_ID );
-                                ~CClientGUIElement          ( void );
+    virtual                     ~CClientGUIElement          ( void );
 
     void                        Unlink                      ( void );
 

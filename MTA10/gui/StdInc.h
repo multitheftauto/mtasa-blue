@@ -33,5 +33,6 @@
 #include "CGUIScrollPane_Impl.h"
 #include "CGUITabPanel_Impl.h"
 #include "CGUITexture_Impl.h"
+#include "CGUIWebBrowser_Impl.h"
 #include "CGUIWindow_Impl.h"
 #include "CGUIComboBox_Impl.h"

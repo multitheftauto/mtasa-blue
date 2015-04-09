@@ -320,6 +320,7 @@ const char* CLuaClassDefs::GetEntityClass ( CClientEntity* pEntity )
                     case CGUI_SCROLLPANE: return "GuiScrollPane";
                     case CGUI_SCROLLBAR: return "GuiScrollBar";
                     case CGUI_COMBOBOX: return "GuiComboBox";
+                    case CGUI_WEBBROWSER: return "GuiBrowser";
                 }
                 return "GuiElement";
             }

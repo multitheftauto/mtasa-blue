@@ -33,6 +33,7 @@ class CGUI;
 #include "CGUIScrollPane.h"
 #include "CGUITexture.h"
 #include "CGUIWindow.h"
+#include "CGUIWebBrowser.h"
 #include "CGUITabPanel.h"
 #include "CGUIComboBox.h"
 #include "CGUITypes.h"
@@ -143,6 +144,9 @@ public:
 
     virtual CGUIComboBox*       CreateComboBox          ( CGUIElement* pParent = NULL, const char* szCaption = "" ) = 0;
     virtual CGUIComboBox*       CreateComboBox          ( CGUIComboBox* pParent = NULL, const char* szCaption = "" ) = 0;
+
+    virtual CGUIWebBrowser*     CreateWebBrowser        ( CGUIElement* pParent = nullptr ) = 0;
+    virtual CGUIWebBrowser*     CreateWebBrowser        ( CGUITab* pParent = nullptr ) = 0;
 
     //
 

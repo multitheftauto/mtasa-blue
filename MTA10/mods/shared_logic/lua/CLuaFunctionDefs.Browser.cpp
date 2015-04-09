@@ -460,3 +460,60 @@ int CLuaFunctionDefs::GetBrowserProperty ( lua_State* luaVM )
     lua_pushnil ( luaVM );
     return 1;
 }
+
+int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
+{
+//  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool relative, [element parent = nil] )
+    float x; float y; float width; float height; SString url; bool bIsLocal; bool bIsRelative; CClientGUIElement* parent;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( x );
+    argStream.ReadNumber ( y );
+    argStream.ReadNumber ( width );
+    argStream.ReadNumber ( height );
+    argStream.ReadString ( url );
+    argStream.ReadBool ( bIsLocal );
+    argStream.ReadBool ( bIsRelative );
+    argStream.ReadUserData ( parent, nullptr );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
+        if ( pLuaMain )
+        {
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, x, y, width, height, bIsLocal, bIsRelative, parent );
+            lua_pushelement ( luaVM, pGUIElement );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GUIGetBrowser ( lua_State* luaVM ) // Or rather guiGetBrowserBrowser?
+{
+//  webbrowser guiGetBrowser ( gui-webbrowser browser )
+    CClientGUIElement* pGUIElement;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData < CGUIWebBrowser > ( pGUIElement );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( IS_GUI ( pGUIElement ) && pGUIElement->GetCGUIType () == CGUI_WEBBROWSER )
+        {
+            CClientGUIWebBrowser* pGUIBrowser = static_cast < CClientGUIWebBrowser* > ( pGUIElement );
+            lua_pushelement ( luaVM, pGUIBrowser->GetBrowser () );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

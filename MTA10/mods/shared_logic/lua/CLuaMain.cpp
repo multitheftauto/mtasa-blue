@@ -1652,6 +1652,13 @@ void CLuaMain::AddBrowserClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "volume", "setBrowserVolume", NULL );
     
     lua_registerclass ( luaVM, "Browser", "DxTexture" );
+
+    // Add GUI browser class
+    lua_newclass ( luaVM );
+    lua_classfunction ( luaVM, "create", "guiCreateBrowser" );
+    lua_classfunction ( luaVM, "getBrowser", "guiGetBrowser" );
+    lua_classvariable ( luaVM, "browser", NULL, "guiGetBrowser" );
+    lua_registerclass ( luaVM, "GuiBrowser", "GuiElement" );
 }
 
 

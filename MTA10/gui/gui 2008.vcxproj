@@ -184,6 +184,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CGUIWebBrowser_Impl.cpp" />
     <ClCompile Include="CGUI_Impl.cpp" />
     <ClCompile Include="CGUIButton_Impl.cpp" />
     <ClCompile Include="CGUICheckBox_Impl.cpp" />
@@ -214,6 +215,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\sdk\gui\CGUIWebBrowser.h" />
+    <ClInclude Include="CGUIWebBrowser_Impl.h" />
     <ClInclude Include="CGUI_Impl.h" />
     <ClInclude Include="CGUIButton_Impl.h" />
     <ClInclude Include="CGUICheckBox_Impl.h" />

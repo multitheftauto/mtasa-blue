@@ -482,6 +482,12 @@ CGUIComboBox* CGUI_Impl::_CreateComboBox ( CGUIElement_Impl* pParent, const char
 }
 
 
+CGUIWebBrowser* CGUI_Impl::_CreateWebBrowser ( CGUIElement_Impl* pParent )
+{
+    return new CGUIWebBrowser_Impl ( this, pParent );
+}
+
+
 CGUITexture* CGUI_Impl::CreateTexture ( void )
 {
     return new CGUITexture_Impl ( this );
@@ -1650,6 +1656,21 @@ CGUIComboBox* CGUI_Impl::CreateComboBox ( CGUIComboBox* pParent, const char* szC
     CGUIComboBox_Impl* wnd = reinterpret_cast < CGUIComboBox_Impl* > ( pParent );
     return _CreateComboBox ( wnd, szCaption );
 }
+
+
+CGUIWebBrowser* CGUI_Impl::CreateWebBrowser ( CGUIElement* pParent )
+{
+    CGUIWindow_Impl* wnd = reinterpret_cast < CGUIWindow_Impl* > ( pParent );
+    return _CreateWebBrowser ( wnd );
+}
+
+
+CGUIWebBrowser* CGUI_Impl::CreateWebBrowser ( CGUITab* pParent )
+{
+    CGUITab_Impl* wnd = reinterpret_cast < CGUITab_Impl* > ( pParent );
+    return _CreateWebBrowser ( wnd );
+}
+
 
 void CGUI_Impl::CleanDeadPool ()
 {
