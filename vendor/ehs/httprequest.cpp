@@ -1,9 +1,8 @@
 
 #include "httprequest.h"
+#include "stats.h"
 
 #include <assert.h>
-
-extern SAllocationStats ms_AllocationStats;
 
 void HttpRequest::GetFormDataFromString ( const std::string & irsString ///< string to parse for form data
 	)
@@ -543,8 +542,7 @@ HttpRequest::HttpRequest ( int inRequestId,
 	m_nRequestId ( inRequestId ),
 	m_poSourceEHSConnection ( ipoSourceEHSConnection )
 {
-    ms_AllocationStats.uiTotalNumRequests++;
-    ms_AllocationStats.uiActiveNumRequests++;
+    StatsNumRequestsInc();
 
 #ifdef EHS_MEMORY
 	fprintf ( stderr, "[EHS_MEMORY] Allocated: HttpRequest\n" );
@@ -562,7 +560,7 @@ HttpRequest::~HttpRequest ( )
 #ifdef EHS_MEMORY
 	fprintf ( stderr, "[EHS_MEMORY] Deallocated: HttpRequest\n" );
 #endif
-    ms_AllocationStats.uiActiveNumRequests--;
+    StatsNumRequestsDec();
 }
 
 

@@ -29,6 +29,7 @@ This can be found in the 'COPYING' file.
 
 long long ms_HttpTotalBytesSent = 0;
 SAllocationStats ms_AllocationStats = { 0 };
+CCriticalSection ms_StatsCS;
 
 // Returns true if lock succeeded
 static bool MUTEX_TRY_LOCK( MUTEX_TYPE& x )
@@ -1580,10 +1581,67 @@ SSL_CTX * SecureSocket::poCtx;
 
 long long EHS::StaticGetTotalBytesSent ( void )
 {
-    return ms_HttpTotalBytesSent;
+    ms_StatsCS.Lock();
+    long long llResult = ms_HttpTotalBytesSent;
+    ms_StatsCS.Unlock();
+    return llResult;
 }
 
 void EHS::StaticGetAllocationStats ( SAllocationStats& outAllocationStats )
 {
+    ms_StatsCS.Lock();
     outAllocationStats = ms_AllocationStats;
+    ms_StatsCS.Unlock();
+}
+
+void StatsAddTotalBytesSent( size_t inLength )
+{
+    ms_StatsCS.Lock();
+    ms_HttpTotalBytesSent += inLength;
+    ms_StatsCS.Unlock();
+}
+
+void StatsNumRequestsInc( void )
+{
+    ms_StatsCS.Lock();
+    ms_AllocationStats.uiTotalNumRequests++;
+    ms_AllocationStats.uiActiveNumRequests++;
+    ms_StatsCS.Unlock();
+}
+
+void StatsNumRequestsDec( void )
+{
+    ms_StatsCS.Lock();
+    ms_AllocationStats.uiActiveNumRequests--;
+    ms_StatsCS.Unlock();
+}
+
+void StatsNumResponsesInc( void )
+{
+    ms_StatsCS.Lock();
+    ms_AllocationStats.uiTotalNumResponses++;
+    ms_AllocationStats.uiActiveNumResponses++;
+    ms_StatsCS.Unlock();
+}
+
+void StatsNumResponsesDec( void )
+{
+    ms_StatsCS.Lock();
+    ms_AllocationStats.uiActiveNumResponses--;
+    ms_StatsCS.Unlock();
+}
+
+void StatsBytesAllocated( int nBodyLength )
+{
+    ms_StatsCS.Lock();
+    ms_AllocationStats.uiTotalKBAllocated += nBodyLength / 1024;
+    ms_AllocationStats.uiActiveKBAllocated += nBodyLength / 1024;
+    ms_StatsCS.Unlock();
+}
+
+void StatsBytesDeallocated( int nBodyLength )
+{
+    ms_StatsCS.Lock();
+    ms_AllocationStats.uiActiveKBAllocated -= nBodyLength / 1024;
+    ms_StatsCS.Unlock();
 }
