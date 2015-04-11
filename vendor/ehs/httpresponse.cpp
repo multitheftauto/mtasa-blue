@@ -2,8 +2,7 @@
 #include <stdio.h>
 #include "httpresponse.h"
 #include <assert.h>
-
-extern SAllocationStats ms_AllocationStats;
+#include "stats.h"
 
 
 const char * DaysOfWeek [] = { 
@@ -54,8 +53,7 @@ HttpResponse::HttpResponse ( int inResponseId,
 	m_poEHSConnection ( ipoEHSConnection )
 	
 {
-    ms_AllocationStats.uiTotalNumResponses++;
-    ms_AllocationStats.uiActiveNumResponses++;
+    StatsNumResponsesInc();
 
 #ifdef EHS_MEMORY
 	fprintf ( stderr, "[EHS_MEMORY] Allocated: HttpResponse\n" );
@@ -85,8 +83,8 @@ HttpResponse::~HttpResponse ( )
 #endif
 
 	delete [] psBody;
-    ms_AllocationStats.uiActiveNumResponses--;
-    ms_AllocationStats.uiActiveKBAllocated -= nBodyLength / 1024;
+    StatsNumResponsesDec();
+    StatsBytesDeallocated( nBodyLength );
 }
 
 
@@ -98,8 +96,7 @@ void HttpResponse::SetBody ( const char * ipsBody, ///< body to return to user
 							 
 {
     nBodyLength = inBodyLength;
-    ms_AllocationStats.uiTotalKBAllocated += nBodyLength / 1024;
-    ms_AllocationStats.uiActiveKBAllocated += nBodyLength / 1024;
+    StatsBytesAllocated( nBodyLength );
 
 	assert ( psBody == NULL );
 	
