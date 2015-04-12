@@ -117,6 +117,7 @@ struct SDxStatus
         int             iAntiAliasing;
         eAspectRatio    aspectRatio;
         bool            bHUDMatchAspectRatio;
+        float           fFieldOfView;
     } settings;
 };
 

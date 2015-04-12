@@ -640,6 +640,7 @@ void CSettings::CreateGUI ( void )
      **/
     fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
         _("Resolution:"),
+        _("FOV:"),
         _("Draw Distance:"),
         _("Brightness:"),
         _("FX Quality:"),
@@ -681,6 +682,22 @@ void CSettings::CreateGUI ( void )
 #endif
 
     vecTemp.fY -= 5;
+    m_pFieldOfViewLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("FOV:") ) );
+    m_pFieldOfViewLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+    m_pFieldOfViewLabel->GetPosition ( vecTemp, false );
+    m_pFieldOfViewLabel->AutoSize ( );
+
+    m_pFieldOfView = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTabVideo ) );
+    m_pFieldOfView->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY ) );
+    m_pFieldOfView->GetPosition ( vecTemp, false );
+    m_pFieldOfView->SetSize ( CVector2D ( 160.0f, 20.0f ) );
+    m_pFieldOfView->GetSize ( vecSize );
+
+    m_pFieldOfViewValueLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, "70") );
+    m_pFieldOfViewValueLabel->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY ) );
+    m_pFieldOfViewValueLabel->AutoSize ( "70 " );
+
+    vecTemp.fX = 11;
     m_pDrawDistanceLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Draw Distance:") ) );
     m_pDrawDistanceLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pDrawDistanceLabel->GetPosition ( vecTemp, false );
@@ -1487,6 +1504,7 @@ void CSettings::CreateGUI ( void )
     m_pAudioSFXVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnSFXVolumeChanged, this ) );
     m_pAudioMTAVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMTAVolumeChanged, this ) );
     m_pAudioVoiceVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnVoiceVolumeChanged, this ) );
+    m_pFieldOfView->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnFieldOfViewChanged, this ) );
     m_pDrawDistance->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnDrawDistanceChanged, this ) );
     m_pBrightness->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnBrightnessChanged, this ) );
     m_pAnisotropic->SetOnScrollHandler ( GUI_CALLBACK ( &CSettings::OnAnisotropicChanged, this ) );
@@ -1722,6 +1740,11 @@ void CSettings::UpdateVideoTab ( void )
     m_pCheckBoxDisableDriverOverrides->SetSelected ( GetApplicationSettingInt ( "driver-overrides-disabled" ) ? true : false );
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
+
+    // FieldOfView
+    int iFieldOfView;
+    CVARS_GET ( "fov", iFieldOfView );
+    m_pFieldOfView->SetScrollPosition ( ( iFieldOfView - 70 ) / 20.f );
 
     // Anisotropic filtering
     int iAnisotropic;
@@ -1992,11 +2015,13 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
 
 
     //gameSettings->SetMipMappingEnabled (); // Doesn't appear to even be enabled
+    gameSettings->SetFieldOfView( 70 );
     gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness ( 253 );
     gameSettings->SetFXQuality ( 2 );
     gameSettings->SetAntiAliasing ( 1, true );
     CVARS_SET ("aspect_ratio", ASPECT_RATIO_AUTO );
+    CVARS_SET ("fov", 70 );
     CVARS_SET ("anisotropic", 0 );
     CVARS_SET ("volumetric_shadows", false );
     CVARS_SET ( "grass", true );
@@ -3069,6 +3094,11 @@ void CSettings::SaveData ( void )
     SetApplicationSettingInt ( "aero-enabled", m_pCheckBoxDisableAero->GetSelected() ? 0 : 1 );
     SetApplicationSettingInt ( "driver-overrides-disabled", m_pCheckBoxDisableDriverOverrides->GetSelected() ? 1 : 0 );
 
+    // iFieldOfView
+    int iFieldOfView = Min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
+    CVARS_SET ( "fov", iFieldOfView );
+    gameSettings->SetFieldOfView ( iFieldOfView );
+
     // Anisotropic filtering
     int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
     CVARS_SET( "anisotropic", iAnisotropic );
@@ -3650,6 +3680,14 @@ bool CSettings::OnSkinChanged ( CGUIElement* pElement )
         return true;
     }
 
+    return true;
+}
+
+bool CSettings::OnFieldOfViewChanged ( CGUIElement* pElement )
+{
+    int iFieldOfView = Min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
+
+    m_pFieldOfViewValueLabel->SetText ( SString("%i", iFieldOfView).c_str() );
     return true;
 }
 

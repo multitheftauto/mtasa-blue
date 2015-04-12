@@ -181,6 +181,9 @@ protected:
 	CGUICheckBox*       m_pCheckBoxGrass;
 	CGUICheckBox*       m_pCheckBoxHeatHaze;
     CGUICheckBox*       m_pCheckBoxTyreSmokeParticles;
+    CGUILabel*          m_pFieldOfViewLabel;
+    CGUIScrollBar*      m_pFieldOfView;
+    CGUILabel*          m_pFieldOfViewValueLabel;
     CGUILabel*          m_pDrawDistanceLabel;
     CGUIScrollBar*      m_pDrawDistance;
     CGUILabel*          m_pDrawDistanceValueLabel;
@@ -349,6 +352,7 @@ protected:
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
     bool                OnLoginButtonClick      ( CGUIElement* pElement );
     bool                OnRegisterButtonClick   ( CGUIElement* pElement );
+    bool                OnFieldOfViewChanged    ( CGUIElement* pElement );
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );
     bool                OnAnisotropicChanged     ( CGUIElement* pElement );

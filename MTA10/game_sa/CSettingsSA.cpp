@@ -477,6 +477,43 @@ void CSettingsSA::SetRadarMode ( eRadarMode hudMode )
     MemPutFast < DWORD > ( VAR_RadarMode, hudMode );
 }
 
+
+////////////////////////////////////////////////
+//
+// Camera field of view. Player follow and car follow only
+//
+////////////////////////////////////////////////
+float ms_fFOV = 70;
+float ms_fFOVCar = 70;
+float ms_fFOVCarMax = 100;  // When car go fast
+
+float CSettingsSA::GetFieldOfView ( void )
+{
+    return ms_fFOV;
+}
+
+void CSettingsSA::SetFieldOfView ( float fAngle )
+{
+    fAngle = Clamp( 70.f, fAngle, 100.f );
+    ms_fFOV = fAngle;
+    ms_fFOVCar = fAngle;
+
+    // Player follow
+    MemPut < void* > ( 0x0522F3A, &ms_fFOV );
+    MemPut < void* > ( 0x0522F5D, &ms_fFOV );
+    MemPut < float > ( 0x0522F7A, ms_fFOV );
+
+    // Car follow
+    MemPut < void* > ( 0x0524B76, &ms_fFOVCar );
+    MemPut < void* > ( 0x0524B9A, &ms_fFOVCar );
+    MemPut < void* > ( 0x0524BA2, &ms_fFOVCar );
+    MemPut < void* > ( 0x0524BB4, &ms_fFOVCarMax );
+    MemPut < float > ( 0x0524BC5, ms_fFOVCarMax );
+    MemPut < void* > ( 0x0524BD3, &ms_fFOVCar );
+    MemPut < float > ( 0x0524BE4, ms_fFOVCar );
+}
+
+
 ////////////////////////////////////////////////
 //
 // CSettingsSA::HasUnsafeResolutions
