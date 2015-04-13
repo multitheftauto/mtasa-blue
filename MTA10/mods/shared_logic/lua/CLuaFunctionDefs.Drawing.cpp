@@ -1025,6 +1025,10 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         lua_pushboolean( luaVM, dxStatus.settings.bHUDMatchAspectRatio );
         lua_settable   ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "SettingFOV" );
+        lua_pushboolean( luaVM, dxStatus.settings.fFieldOfView );
+        lua_settable   ( luaVM, -3 );
+
         return 1;
     }
     else

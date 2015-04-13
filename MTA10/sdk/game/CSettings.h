@@ -147,6 +147,9 @@ public:
     virtual eRadarMode      GetRadarMode            ( void ) = 0;
     virtual void            SetRadarMode            ( eRadarMode hudMode ) = 0;
 
+    virtual void            SetFieldOfView          ( float fAngle ) = 0;
+    virtual float           GetFieldOfView          ( void ) = 0;
+
     virtual void            Save                    ( void ) = 0;
 };
 
