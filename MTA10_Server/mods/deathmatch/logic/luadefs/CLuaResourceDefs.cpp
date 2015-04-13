@@ -474,8 +474,9 @@ int CLuaResourceDefs::stopResource ( lua_State* luaVM )
         {
             if ( pResource->IsProtected() )
             {
-
-                if ( !m_pACLManager->CanObjectUseRight ( m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource()->GetName().c_str (),
+                CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource ( luaVM );
+                if ( !pThisResource || !m_pACLManager->CanObjectUseRight ( pThisResource->GetName().c_str (),
+    
                     CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
                     "stopResource.protected",
                     CAccessControlListRight::RIGHT_TYPE_FUNCTION,
@@ -714,10 +715,10 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        CResource* pThisResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
+        CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource ( luaVM );
         CResource* pResource = pThisResource;
 
-        if ( CResourceManager::ParseResourcePathInput ( strConfigName, pResource, NULL, &strMetaPath ) )
+        if ( pThisResource && CResourceManager::ParseResourcePathInput ( strConfigName, pResource, NULL, &strMetaPath ) )
         {
             // We have access to modify other resource?
             if (pResource == pThisResource ||
@@ -1197,7 +1198,7 @@ int CLuaResourceDefs::updateResourceACLRequest ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CResource* pThisResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource();
+        CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource ( luaVM );
         if ( strUserName.empty () && pThisResource )
             strUserName = pThisResource->GetName ();
 
