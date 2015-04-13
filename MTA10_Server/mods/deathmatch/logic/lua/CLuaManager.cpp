@@ -152,6 +152,14 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
     return NULL;
 }
 
+// Return resource associated with a lua state
+CResource* CLuaManager::GetVirtualMachineResource ( lua_State* luaVM )
+{
+    CLuaMain* pLuaMain = GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+        return pLuaMain->GetResource();
+    return NULL;
+}
 
 void CLuaManager::LoadCFunctions ( void )
 {

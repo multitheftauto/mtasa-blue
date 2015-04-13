@@ -272,7 +272,6 @@ int CLuaFunctionDefs::GetServerPort ( lua_State* luaVM )
 
 int CLuaFunctionDefs::Set ( lua_State* luaVM )
 {
-    CResource* pResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource ();
     SString strSetting;
     CLuaArguments Args;
 
@@ -282,14 +281,18 @@ int CLuaFunctionDefs::Set ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        std::string strResourceName = pResource->GetName ();
-        std::string strJSON;
-        Args.WriteToJSONString ( strJSON );
-
-        if ( g_pGame->GetSettings ()->Set ( strResourceName.c_str (), strSetting.c_str (), strJSON.c_str () ) )
+        CResource* pResource = m_pLuaManager->GetVirtualMachineResource ( luaVM );
+        if ( pResource )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            std::string strResourceName = pResource->GetName ();
+            std::string strJSON;
+            Args.WriteToJSONString ( strJSON );
+
+            if ( g_pGame->GetSettings ()->Set ( strResourceName.c_str (), strSetting.c_str (), strJSON.c_str () ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
     else
@@ -311,7 +314,6 @@ Args.PushString ( buf ); \
 
 int CLuaFunctionDefs::Get ( lua_State* luaVM )
 {
-    CResource* pResource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource ();
     SString strSetting;
     CLuaArguments Args;
 
@@ -320,76 +322,80 @@ int CLuaFunctionDefs::Get ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        unsigned int uiIndex = 0;
-        bool bDeleteNode;
-
-        // Extract attribute name if setting to be gotten has three parts i.e. resname.settingname.attributename
-        SString strAttribute = "value";
-        vector < SString > Result;
-        strSetting.Split ( ".", Result );
-        if ( Result.size () == 3 && Result[2].length () )
+        CResource* pResource = m_pLuaManager->GetVirtualMachineResource ( luaVM );
+        if ( pResource )
         {
-            strAttribute = Result[2];
-        }
+            unsigned int uiIndex = 0;
+            bool bDeleteNode;
 
-        // Get the setting
-        CXMLNode *pSubNode, *pNode = g_pGame->GetSettings ()->Get ( pResource->GetName ().c_str (), strSetting.c_str (), bDeleteNode );
-
-        // Only proceed if we have a valid node
-        if ( pNode ) {
-            // Argument count
-            unsigned int uiArgCount = 1;
-
-            // See if we need to return a table with single or multiple entries
-            if ( pNode->GetSubNodeCount () == 0 ) {
-                // See if required attribute exists
-                CXMLAttribute *pAttribute = pNode->GetAttributes ().Find ( strAttribute.c_str () );
-                if ( !pAttribute )
-                {
-                    if ( bDeleteNode )
-                        delete pNode;
-                    lua_pushboolean ( luaVM, false );
-                    return 1;
-                }
-                // We only have a single entry for a specific setting, so output a string
-                const std::string& strDataValue = pAttribute->GetValue ();
-                if ( !Args.ReadFromJSONString ( strDataValue.c_str () ) ) {
-                    // No valid JSON? Parse as plain text
-                    Args.PushString ( strDataValue );
-                }
-
-                Args.PushArguments ( luaVM );
-                uiArgCount = Args.Count ();
-
-                /* Don't output a table because although it is more consistent with the multiple values output below,
-                ** due to lua's implementation of associative arrays (assuming we use the "setting-name", "value" key-value pairs)
-                ** it would require the scripter to walk through an array that only has a single entry which is a Bad Thing, performance wise.
-                **
-                PUSH_SETTING ( pNode );
-                Args.PushAsTable ( luaVM );
-                **/
+            // Extract attribute name if setting to be gotten has three parts i.e. resname.settingname.attributename
+            SString strAttribute = "value";
+            vector < SString > Result;
+            strSetting.Split ( ".", Result );
+            if ( Result.size () == 3 && Result[2].length () )
+            {
+                strAttribute = Result[2];
             }
-            else {
-                // We need to return multiply entries, so push all subnodes
-                while ( ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) )
-                {
-                    CXMLAttributes& attributes = pSubNode->GetAttributes ();
-                    Args.PushString ( attributes.Find ( "name" )->GetValue () );
-                    const std::string& strDataValue = attributes.Find ( "value" )->GetValue ();
-                    if ( !Args.ReadFromJSONString ( strDataValue.c_str () ) )
+
+            // Get the setting
+            CXMLNode *pSubNode, *pNode = g_pGame->GetSettings ()->Get ( pResource->GetName ().c_str (), strSetting.c_str (), bDeleteNode );
+
+            // Only proceed if we have a valid node
+            if ( pNode ) {
+                // Argument count
+                unsigned int uiArgCount = 1;
+
+                // See if we need to return a table with single or multiple entries
+                if ( pNode->GetSubNodeCount () == 0 ) {
+                    // See if required attribute exists
+                    CXMLAttribute *pAttribute = pNode->GetAttributes ().Find ( strAttribute.c_str () );
+                    if ( !pAttribute )
                     {
+                        if ( bDeleteNode )
+                            delete pNode;
+                        lua_pushboolean ( luaVM, false );
+                        return 1;
+                    }
+                    // We only have a single entry for a specific setting, so output a string
+                    const std::string& strDataValue = pAttribute->GetValue ();
+                    if ( !Args.ReadFromJSONString ( strDataValue.c_str () ) ) {
+                        // No valid JSON? Parse as plain text
                         Args.PushString ( strDataValue );
                     }
+
+                    Args.PushArguments ( luaVM );
+                    uiArgCount = Args.Count ();
+
+                    /* Don't output a table because although it is more consistent with the multiple values output below,
+                    ** due to lua's implementation of associative arrays (assuming we use the "setting-name", "value" key-value pairs)
+                    ** it would require the scripter to walk through an array that only has a single entry which is a Bad Thing, performance wise.
+                    **
+                    PUSH_SETTING ( pNode );
+                    Args.PushAsTable ( luaVM );
+                    **/
                 }
-                // Push a table and return
-                Args.PushAsTable ( luaVM );
+                else {
+                    // We need to return multiply entries, so push all subnodes
+                    while ( ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) )
+                    {
+                        CXMLAttributes& attributes = pSubNode->GetAttributes ();
+                        Args.PushString ( attributes.Find ( "name" )->GetValue () );
+                        const std::string& strDataValue = attributes.Find ( "value" )->GetValue ();
+                        if ( !Args.ReadFromJSONString ( strDataValue.c_str () ) )
+                        {
+                            Args.PushString ( strDataValue );
+                        }
+                    }
+                    // Push a table and return
+                    Args.PushAsTable ( luaVM );
+                }
+
+                // Check if we have to delete the node
+                if ( bDeleteNode )
+                    delete pNode;
+
+                return uiArgCount;
             }
-
-            // Check if we have to delete the node
-            if ( bDeleteNode )
-                delete pNode;
-
-            return uiArgCount;
         }
     }
     else

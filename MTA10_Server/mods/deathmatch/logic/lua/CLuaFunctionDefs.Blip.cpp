@@ -103,7 +103,7 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CResource * resource = m_pLuaManager->GetVirtualMachine ( luaVM )->GetResource ();
+        CResource * resource = m_pLuaManager->GetVirtualMachineResource ( luaVM );
         if ( resource )
         {
             // Create the blip

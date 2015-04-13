@@ -50,6 +50,7 @@ public:
     CLuaMain*                       CreateVirtualMachine    ( CResource* pResourceOwner, bool bEnableOOP );
     bool                            RemoveVirtualMachine    ( CLuaMain* vm );
     CLuaMain*                       GetVirtualMachine       ( lua_State* luaVM );
+    CResource*                      GetVirtualMachineResource ( lua_State* luaVM );
     void                            OnLuaMainOpenVM         ( CLuaMain* pLuaMain, lua_State* luaVM );
     void                            OnLuaMainCloseVM        ( CLuaMain* pLuaMain, lua_State* luaVM );
 
