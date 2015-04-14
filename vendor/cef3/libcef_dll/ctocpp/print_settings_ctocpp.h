@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -31,7 +31,6 @@ class CefPrintSettingsCToCpp
   explicit CefPrintSettingsCToCpp(cef_print_settings_t* str)
       : CefCToCpp<CefPrintSettingsCToCpp, CefPrintSettings,
           cef_print_settings_t>(str) {}
-  virtual ~CefPrintSettingsCToCpp() {}
 
   // CefPrintSettings methods
   virtual bool IsValid() OVERRIDE;

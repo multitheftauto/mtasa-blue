@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -23,6 +23,26 @@ void CefDownloadItemCallbackCToCpp::Cancel() {
 
   // Execute
   struct_->cancel(struct_);
+}
+
+void CefDownloadItemCallbackCToCpp::Pause() {
+  if (CEF_MEMBER_MISSING(struct_, pause))
+    return;
+
+  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
+
+  // Execute
+  struct_->pause(struct_);
+}
+
+void CefDownloadItemCallbackCToCpp::Resume() {
+  if (CEF_MEMBER_MISSING(struct_, resume))
+    return;
+
+  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
+
+  // Execute
+  struct_->resume(struct_);
 }
 
 

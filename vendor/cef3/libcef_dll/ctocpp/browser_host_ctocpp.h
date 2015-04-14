@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -34,7 +34,6 @@ class CefBrowserHostCToCpp
   explicit CefBrowserHostCToCpp(cef_browser_host_t* str)
       : CefCToCpp<CefBrowserHostCToCpp, CefBrowserHost, cef_browser_host_t>(
           str) {}
-  virtual ~CefBrowserHostCToCpp() {}
 
   // CefBrowserHost methods
   virtual CefRefPtr<CefBrowser> GetBrowser() OVERRIDE;
@@ -48,8 +47,8 @@ class CefBrowserHostCToCpp
   virtual double GetZoomLevel() OVERRIDE;
   virtual void SetZoomLevel(double zoomLevel) OVERRIDE;
   virtual void RunFileDialog(FileDialogMode mode, const CefString& title,
-      const CefString& default_file_name,
-      const std::vector<CefString>& accept_types,
+      const CefString& default_file_path,
+      const std::vector<CefString>& accept_filters, int selected_accept_filter,
       CefRefPtr<CefRunFileDialogCallback> callback) OVERRIDE;
   virtual void StartDownload(const CefString& url) OVERRIDE;
   virtual void Print() OVERRIDE;

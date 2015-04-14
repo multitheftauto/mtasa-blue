@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -31,7 +31,6 @@ class CefNavigationEntryCToCpp
   explicit CefNavigationEntryCToCpp(cef_navigation_entry_t* str)
       : CefCToCpp<CefNavigationEntryCToCpp, CefNavigationEntry,
           cef_navigation_entry_t>(str) {}
-  virtual ~CefNavigationEntryCToCpp() {}
 
   // CefNavigationEntry methods
   virtual bool IsValid() OVERRIDE;

@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -32,7 +32,6 @@ class CefContextMenuParamsCToCpp
   explicit CefContextMenuParamsCToCpp(cef_context_menu_params_t* str)
       : CefCToCpp<CefContextMenuParamsCToCpp, CefContextMenuParams,
           cef_context_menu_params_t>(str) {}
-  virtual ~CefContextMenuParamsCToCpp() {}
 
   // CefContextMenuParams methods
   virtual int GetXCoord() OVERRIDE;

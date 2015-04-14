@@ -1721,10 +1721,35 @@ typedef enum {
   FILE_DIALOG_OPEN_MULTIPLE,
 
   ///
+  // Like Open, but selects a folder to open.
+  ///
+  FILE_DIALOG_OPEN_FOLDER,
+
+  ///
   // Allows picking a nonexistent file, and prompts to overwrite if the file
   // already exists.
   ///
   FILE_DIALOG_SAVE,
+
+  ///
+  // General mask defining the bits used for the type values.
+  ///
+  FILE_DIALOG_TYPE_MASK = 0xFF,
+
+  // Qualifiers.
+  // Any of the type values above can be augmented by one or more qualifiers.
+  // These qualifiers further define the dialog behavior.
+
+  ///
+  // Prompt to overwrite if the user selects an existing file with the Save
+  // dialog.
+  ///
+  FILE_DIALOG_OVERWRITEPROMPT_FLAG = 0x01000000,
+
+  ///
+  // Do not display read-only files.
+  ///
+  FILE_DIALOG_HIDEREADONLY_FLAG = 0x02000000,
 } cef_file_dialog_mode_t;
 
 ///
@@ -1779,7 +1804,7 @@ typedef struct _cef_geoposition_t {
   double speed;
 
   ///
-  // Time of position measurement in miliseconds since Epoch in UTC time. This
+  // Time of position measurement in milliseconds since Epoch in UTC time. This
   // is taken from the host computer's system clock.
   ///
   cef_time_t timestamp;
@@ -1901,6 +1926,57 @@ typedef struct _cef_cursor_info_t {
   void* buffer;
   cef_size_t size;
 } cef_cursor_info_t;
+
+///
+// URI unescape rules passed to CefURIDecode().
+///
+typedef enum {
+  ///
+  // Don't unescape anything at all.
+  ///
+  UU_NONE = 0,
+
+  ///
+  // Don't unescape anything special, but all normal unescaping will happen.
+  // This is a placeholder and can't be combined with other flags (since it's
+  // just the absence of them). All other unescape rules imply "normal" in
+  // addition to their special meaning. Things like escaped letters, digits,
+  // and most symbols will get unescaped with this mode.
+  ///
+  UU_NORMAL = 1,
+
+  ///
+  // Convert %20 to spaces. In some places where we're showing URLs, we may
+  // want this. In places where the URL may be copied and pasted out, then
+  // you wouldn't want this since it might not be interpreted in one piece
+  // by other applications.
+  ///
+  UU_SPACES = 2,
+
+  ///
+  // Unescapes various characters that will change the meaning of URLs,
+  // including '%', '+', '&', '/', '#'. If we unescaped these characters, the
+  // resulting URL won't be the same as the source one. This flag is used when
+  // generating final output like filenames for URLs where we won't be
+  // interpreting as a URL and want to do as much unescaping as possible.
+  ///
+  UU_URL_SPECIAL_CHARS = 4,
+
+  ///
+  // Unescapes control characters such as %01. This INCLUDES NULLs. This is
+  // used for rare cases such as data: URL decoding where the result is binary
+  // data. This flag also unescapes BiDi control characters.
+  //
+  // DO NOT use CONTROL_CHARS if the URL is going to be displayed in the UI
+  // for security reasons.
+  ///
+  UU_CONTROL_CHARS = 8,
+
+  ///
+  // URL queries use "+" for space. This flag controls that replacement.
+  ///
+  UU_REPLACE_PLUS_WITH_SPACE = 16,
+} cef_uri_unescape_rule_t;
 
 #ifdef __cplusplus
 }

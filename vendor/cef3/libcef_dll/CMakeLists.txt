@@ -18,7 +18,7 @@ macro(LIBCEF_APPEND_PLATFORM_SOURCES name_of_list)
 endmacro()
 
 set(LIBCEF_SRCS
-  transfer_util.cpp
+  transfer_util.cc
   transfer_util.h
   )
 source_group(libcef_dll FILES ${LIBCEF_SRCS})
@@ -66,6 +66,8 @@ set(LIBCEF_CPPTOC_SRCS
   cpptoc/drag_handler_cpptoc.h
   cpptoc/end_tracing_callback_cpptoc.cc
   cpptoc/end_tracing_callback_cpptoc.h
+  cpptoc/find_handler_cpptoc.cc
+  cpptoc/find_handler_cpptoc.h
   cpptoc/focus_handler_cpptoc.cc
   cpptoc/focus_handler_cpptoc.h
   cpptoc/geolocation_handler_cpptoc.cc
@@ -192,6 +194,10 @@ set(LIBCEF_CTOCPP_SRCS
   ctocpp/response_ctocpp.h
   ctocpp/scheme_registrar_ctocpp.cc
   ctocpp/scheme_registrar_ctocpp.h
+  ctocpp/sslcert_principal_ctocpp.cc
+  ctocpp/sslcert_principal_ctocpp.h
+  ctocpp/sslinfo_ctocpp.cc
+  ctocpp/sslinfo_ctocpp.h
   ctocpp/stream_reader_ctocpp.cc
   ctocpp/stream_reader_ctocpp.h
   ctocpp/stream_writer_ctocpp.cc
@@ -237,6 +243,7 @@ set(LIBCEF_INCLUDE_SRCS
   ../include/cef_download_item.h
   ../include/cef_drag_data.h
   ../include/cef_drag_handler.h
+  ../include/cef_find_handler.h
   ../include/cef_focus_handler.h
   ../include/cef_frame.h
   ../include/cef_geolocation.h
@@ -266,6 +273,7 @@ set(LIBCEF_INCLUDE_SRCS
   ../include/cef_response.h
   ../include/cef_runnable.h
   ../include/cef_scheme.h
+  ../include/cef_ssl_info.h
   ../include/cef_stream.h
   ../include/cef_string_visitor.h
   ../include/cef_task.h
@@ -357,6 +365,7 @@ set(LIBCEF_INCLUDE_CAPI_SRCS
   ../include/capi/cef_download_item_capi.h
   ../include/capi/cef_drag_data_capi.h
   ../include/capi/cef_drag_handler_capi.h
+  ../include/capi/cef_find_handler_capi.h
   ../include/capi/cef_focus_handler_capi.h
   ../include/capi/cef_frame_capi.h
   ../include/capi/cef_geolocation_capi.h
@@ -383,6 +392,7 @@ set(LIBCEF_INCLUDE_CAPI_SRCS
   ../include/capi/cef_resource_handler_capi.h
   ../include/capi/cef_response_capi.h
   ../include/capi/cef_scheme_capi.h
+  ../include/capi/cef_ssl_info_capi.h
   ../include/capi/cef_stream_capi.h
   ../include/capi/cef_string_visitor_capi.h
   ../include/capi/cef_task_capi.h

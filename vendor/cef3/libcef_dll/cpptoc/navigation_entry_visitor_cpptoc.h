@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -31,7 +31,6 @@ class CefNavigationEntryVisitorCppToC
         CefNavigationEntryVisitor, cef_navigation_entry_visitor_t> {
  public:
   explicit CefNavigationEntryVisitorCppToC(CefNavigationEntryVisitor* cls);
-  virtual ~CefNavigationEntryVisitorCppToC() {}
 };
 
 #endif  // USING_CEF_SHARED
