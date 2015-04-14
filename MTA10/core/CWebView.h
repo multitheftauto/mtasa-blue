@@ -104,7 +104,7 @@ public:
     virtual bool OnJSDialog     ( CefRefPtr<CefBrowser> browser, const CefString& origin_url, const CefString& accept_lang, CefJSDialogHandler::JSDialogType dialog_type, const CefString& message_text, const CefString& default_prompt_text, CefRefPtr< CefJSDialogCallback > callback, bool& suppress_message ) override;
 
     // CefDialogHandler methods
-    virtual bool OnFileDialog  ( CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name, const std::vector< CefString >& accept_types, CefRefPtr< CefFileDialogCallback > callback ) override;
+    virtual bool OnFileDialog  ( CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name, const std::vector< CefString >& accept_types, int selected_accept_filter, CefRefPtr< CefFileDialogCallback > callback ) override;
 
     // CefDisplayHandler methods
     virtual void OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& title ) override;

@@ -478,8 +478,13 @@ int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( !bIsLocal && !g_pCore->GetWebCore()->CanLoadRemotePages () )
+        {
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
 
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
             CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, x, y, width, height, bIsLocal, bIsRelative, parent );

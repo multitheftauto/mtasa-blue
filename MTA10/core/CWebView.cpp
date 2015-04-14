@@ -634,7 +634,7 @@ bool CWebView::OnJSDialog ( CefRefPtr<CefBrowser> browser, const CefString& orig
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDialogHandler.html#OnFileDialog(CefRefPtr%3CCefBrowser%3E,FileDialogMode,constCefString&,constCefString&,conststd::vector%3CCefString%3E&,CefRefPtr%3CCefFileDialogCallback%3E) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnFileDialog ( CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name, const std::vector< CefString >& accept_types, CefRefPtr< CefFileDialogCallback > callback )
+bool CWebView::OnFileDialog ( CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name, const std::vector< CefString >& accept_types, int selected_accept_filter, CefRefPtr< CefFileDialogCallback > callback )
 {
     // Don't show the dialog
     return true;
