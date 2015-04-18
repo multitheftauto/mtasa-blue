@@ -145,8 +145,11 @@ bool CMainConfig::Load ( void )
         return false;
     }
 
-    // Grab the script debuglog
-    GetString ( m_pRootNode, "serverip", m_strServerIP, 1 );
+    // Grab the forced server ip(s)
+    GetString ( m_pRootNode, "serverip", m_strServerIP );
+    m_strServerIP = SString( m_strServerIP ).Replace( " ", "" );
+    if ( m_strServerIP == "auto" || m_strServerIP == "any" )
+        m_strServerIP = "";
 
     // Grab the port
     int iTemp;
@@ -292,6 +295,7 @@ bool CMainConfig::Load ( void )
         {
             SString strDisableAC;
             GetString ( m_pRootNode, "disableac", strDisableAC );
+            strDisableAC = strDisableAC.Replace( " ", "" );
             std::vector < SString > tagACList;
             strDisableAC.Split ( ",", tagACList );
             for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
@@ -314,6 +318,7 @@ bool CMainConfig::Load ( void )
         {
             SString strEnableSD;
             GetString ( m_pRootNode, "enablesd", strEnableSD );
+            strEnableSD = strEnableSD.Replace( " ", "" );
             std::vector < SString > tagSDList;
             strEnableSD.Split ( ",", tagSDList );
             for ( std::vector < SString >::iterator it = tagSDList.begin () ; it != tagSDList.end () ; ++it )
@@ -348,6 +353,7 @@ bool CMainConfig::Load ( void )
     {
         SString strEnable;
         GetString ( m_pRootNode, "enablediagnostic", strEnable );
+        strEnable = strEnable.Replace( " ", "" );
         std::vector < SString > tagList;
         strEnable.Split ( ",", tagList );
         for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
@@ -1314,11 +1320,11 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         SString strCurSD;
         GetSetting( "enablesd", strCurSD );
         std::vector < SString > curSDList;
-        strCurSD.Split ( ",", curSDList );
+        strCurSD.Replace( " ", "" ).Split ( ",", curSDList );
 
         // Get new setting as as list of ids
         std::vector < SString > newSDList;
-        strValue.Split( ",", newSDList );
+        strValue.Replace( " ", "" ).Split( ",", newSDList );
 
         // Merge
         std::set < uint > comboSDMap;

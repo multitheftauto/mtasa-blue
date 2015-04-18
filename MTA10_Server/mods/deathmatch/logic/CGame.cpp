@@ -474,6 +474,8 @@ void CGame::DoPulse ( void )
 
     CLOCK_CALL1( m_pLatentTransferManager->DoPulse (); );
 
+    PrintLogOutputFromNetModule();
+
     // Unlock the critical section again
     Unlock();
 }
@@ -598,6 +600,20 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         }
     }
 
+    if ( m_pMainConfig->GetAseInternetListenEnabled() )
+    {
+        // Check if IP is one of the most common private IP addresses
+        in_addr serverIp;
+        serverIp.s_addr = inet_addr( strServerIP );
+        uchar a = serverIp.S_un.S_un_b.s_b1;
+        uchar b = serverIp.S_un.S_un_b.s_b2;
+        if ( a == 10 || a == 127 || ( a == 169 && b == 254 ) || ( a == 192 && b == 168 ) )
+        {
+            CLogger::ErrorPrintf ( "Can not specify private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
+            return false;
+        }
+    }
+
     m_pFunctionUseLogger = new CFunctionUseLogger( m_pMainConfig->GetLoadstringLogFilename() );
 
     // Setup server id
@@ -676,6 +692,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     if ( !bLogFile )
         CLogger::ErrorPrintf ( "Unable to save logfile to '%s'\n", m_pMainConfig->GetLogFile ().c_str () );
+
+    // Show startup messages from net module
+    PrintLogOutputFromNetModule();
 
     // Check accounts database and print message if there is a problem
     if ( !m_pAccountManager->IntegrityCheck () )
@@ -886,6 +905,17 @@ void CGame::Stop ( void )
     // Unregister our packethandler
     g_pNetServer->RegisterPacketHandler ( NULL );
 
+}
+
+
+// Handle logging output from the net module
+void CGame::PrintLogOutputFromNetModule( void )
+{
+    std::vector < SString > lineList;
+    SStringX( g_pRealNetServer->GetLogOutput() ).Split( "\n", lineList );
+    for( std::vector < SString >::iterator iter = lineList.begin() ; iter != lineList.end() ; ++iter )
+        if ( !iter->empty() )
+            CLogger::LogPrint ( *iter + "\n" );
 }
 
 
