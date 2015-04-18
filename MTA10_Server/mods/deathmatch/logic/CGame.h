@@ -377,6 +377,7 @@ public:
     inline int                  GetMoonSize                  ( void )        { return m_iMoonSize; }
     inline void                 SetMoonSize                  ( int iMoonSize ) { m_iMoonSize = iMoonSize; }
 
+    void                        PrintLogOutputFromNetModule ( void );
     void                        StartOpenPortsTest          ( void );
 
     bool                        IsServerFullyUp             ( void )        { return m_bServerFullyUp; }
