@@ -1116,16 +1116,19 @@ bool CStaticFunctionDefinitions::RemoveElementData ( CElement* pElement, const c
     assert ( szName );
     assert ( strlen ( szName ) <= MAX_CUSTOMDATA_NAME_LENGTH );
 
-    // Set its custom data
-    if ( pElement->DeleteCustomData ( szName, false ) )
+    // Check it exists
+    if ( pElement->GetCustomData ( szName, false ) )
     {
         // Tell our clients to update their data
         unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
         CBitStream BitStream;
         BitStream.pBitStream->WriteCompressed ( usNameLength );
         BitStream.pBitStream->Write ( szName, usNameLength );
-        BitStream.pBitStream->WriteBit ( false ); // Not recursive
+        BitStream.pBitStream->WriteBit ( false ); // Unused (was recursive flag)
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, REMOVE_ELEMENT_DATA, *BitStream.pBitStream ) );
+
+        // Delete here
+        pElement->DeleteCustomData ( szName );
         return true;
     }
 

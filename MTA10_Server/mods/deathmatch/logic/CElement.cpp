@@ -767,41 +767,24 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
 }
 
 
-bool CElement::DeleteCustomData ( const char* szName, bool bRecursive )
+void CElement::DeleteCustomData ( const char* szName )
 {
-    // Delete the custom data
-    bool bReturn = m_pCustomData->Delete ( szName );
-
-    // If recursive, delete our children's data
-    if ( bRecursive )
+    // Grab the old variable
+    SCustomData * pData = m_pCustomData->Get ( szName );
+    if ( pData )
     {
-        CChildListType ::const_iterator iter = m_Children.begin ();
-        for ( ; iter != m_Children.end (); iter++ )
-        {
-            // Delete it. If we deleted any, remember that we've done that so we can return true.
-            if ( (*iter)->DeleteCustomData ( szName, true ) )
-                bReturn = true;
-        }
-    }
+        CLuaArgument oldVariable;
+        oldVariable = pData->Variable;
 
-    // Return whether we deleted some
-    return bReturn;
-}
+        // Delete the custom data
+        m_pCustomData->Delete ( szName );
 
-
-void CElement::DeleteAllCustomData ( CLuaMain* pLuaMain, bool bRecursive )
-{
-    // Delete our data
-    m_pCustomData->DeleteAll ( pLuaMain );
-
-    // If recursive, delete our children's data
-    if ( bRecursive )
-    {
-        CChildListType ::const_iterator iter = m_Children.begin ();
-        for ( ; iter != m_Children.end (); iter++ )
-        {
-            (*iter)->DeleteAllCustomData ( pLuaMain, true );
-        }
+        // Trigger the onElementDataChange event on us
+        CLuaArguments Arguments;
+        Arguments.PushString ( szName );
+        Arguments.PushArgument ( oldVariable );
+        Arguments.PushArgument ( CLuaArgument() );  // Use nil as the new value to indicate the data has been removed
+        CallEvent ( "onElementDataChange", Arguments );
     }
 }
 

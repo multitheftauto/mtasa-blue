@@ -109,7 +109,7 @@ void CElementRPCs::RemoveElementData ( CClientEntity* pSource, NetBitStreamInter
 {
     // Read out the name length
     unsigned short usNameLength;
-    bool bRecursive;
+    bool bRecursive;    // Unused
     if ( bitStream.ReadCompressed ( usNameLength ) )
     {
         SString strName;
@@ -119,7 +119,7 @@ void CElementRPCs::RemoveElementData ( CClientEntity* pSource, NetBitStreamInter
              bitStream.ReadBit ( bRecursive ) )
         {
             // Remove that name
-            pSource->DeleteCustomData ( strName, bRecursive );
+            pSource->DeleteCustomData ( strName );
         }
     }
 }

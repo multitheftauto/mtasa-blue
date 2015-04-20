@@ -142,8 +142,7 @@ public:
     bool                                        GetCustomDataFloat          ( const char* szName, float& fOut, bool bInheritData );
     bool                                        GetCustomDataBool           ( const char* szName, bool& bOut, bool bInheritData );
     void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true, CPlayer* pClient = NULL, bool bTriggerEvent = true );
-    bool                                        DeleteCustomData            ( const char* szName, bool bRecursive );
-    void                                        DeleteAllCustomData         ( CLuaMain* pLuaMain, bool bRecursive );
+    void                                        DeleteCustomData            ( const char* szName );
     void                                        SendAllCustomData           ( CPlayer* pPlayer );
 
     CXMLNode*                                   OutputToXML                 ( CXMLNode* pNode );
