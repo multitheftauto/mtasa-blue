@@ -682,10 +682,10 @@ void CClientSound::Process3D ( const CVector& vecPlayerPosition, const CVector& 
             CLuaArguments Arguments;
             Arguments.PushBoolean ( eventInfo.bBool );
             Arguments.PushNumber ( eventInfo.dNumber );
-            if ( !eventInfo.strString.empty () )
-                Arguments.PushString ( eventInfo.strString );
+            Arguments.PushString( eventInfo.strString );
+            Arguments.PushString( eventInfo.strError );
             CallEvent ( "onClientSoundStream", Arguments, true );
-            OutputDebugLine ( SString ( "[ClientSound] onClientSoundStream %d %f %s", eventInfo.bBool, eventInfo.dNumber, *eventInfo.strString ) );
+            OutputDebugLine ( SString ( "[ClientSound] onClientSoundStream %d %f %s %s", eventInfo.bBool, eventInfo.dNumber, *eventInfo.strString, *eventInfo.strError ) );
         }
         else
         if ( eventInfo.type == SOUND_EVENT_BEAT )

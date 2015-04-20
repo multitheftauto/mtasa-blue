@@ -380,7 +380,8 @@ void CBassAudio::PlayStreamIntern ( void* arguments )
 //
 void CBassAudio::CompleteStreamConnect ( HSTREAM pSound )
 {
-    if ( pSound )
+    SString strError;
+    if (pSound)
     {
         m_pSound = pSound;
 
@@ -395,11 +396,11 @@ void CBassAudio::CompleteStreamConnect ( HSTREAM pSound )
 
         if ( BASS_FX_BPM_CallbackSet ( pSound, (BPMPROC*)&BPMCallback, 1, 0, 0, m_uiCallbackId ) == false )
         {
-            g_pCore->GetConsole()->Print ( "BASS ERROR in BASS_FX_BPM_CallbackSet" );
+            strError = "BASS ERROR in BASS_FX_BPM_CallbackSet";
         }
         if ( BASS_FX_BPM_BeatCallbackSet ( pSound, (BPMBEATPROC*)&BeatCallback, m_uiCallbackId ) == false )
         {
-            g_pCore->GetConsole()->Print ( "BASS ERROR in BASS_FX_BPM_BeatCallbackSet" );
+            strError = "BASS ERROR in BASS_FX_BPM_BeatCallbackSet";
         }
         // get the broadcast name
         const char* szIcy;
@@ -439,11 +440,11 @@ void CBassAudio::CompleteStreamConnect ( HSTREAM pSound )
         //g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_WMA_CHANGE", BASS_ErrorGetCode() );
     }
     else
-        g_pCore->GetConsole()->Printf ( "BASS ERROR %d in PlayStream  b3D = %s  path = %s", BASS_ErrorGetCode(), m_b3D ? "true" : "false", m_strPath.c_str() );
+        strError = SString( "BASS ERROR %d in PlayStream  b3D = %s  path = %s", BASS_ErrorGetCode(), m_b3D ? "true" : "false", m_strPath.c_str() );
 
     OutputDebugLine ( "[Bass]        stream connect complete" );
 
-    AddQueuedEvent ( SOUND_EVENT_STREAM_RESULT, m_strStreamName, GetLength (), pSound ? true : false );
+    AddQueuedEvent ( SOUND_EVENT_STREAM_RESULT, m_strStreamName, GetLength (), pSound ? true : false, strError );
 }
 
 
@@ -1025,13 +1026,14 @@ void CBassAudio::ParseShoutcastMeta ( const SString& strMeta )
 //
 // Add queued event from
 //
-void CBassAudio::AddQueuedEvent ( eSoundEventType type, const SString& strString, double dNumber, bool bBool )
+void CBassAudio::AddQueuedEvent ( eSoundEventType type, const SString& strString, double dNumber, bool bBool, const SString& strError )
 {
     SSoundEventInfo info;
     info.type = type;
     info.strString = strString;
     info.dNumber = dNumber;
     info.bBool = bBool;
+    info.strError = strError;
     m_EventQueue.push_back ( info );
 }
 
