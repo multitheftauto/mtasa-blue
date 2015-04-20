@@ -2864,7 +2864,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientProjectileCreation", "creator", NULL, false );
 
     // Sound events
-    m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName", NULL, false );
+    m_Events.AddEvent ( "onClientSoundStream", "success, length, streamName, error", NULL, false );
     m_Events.AddEvent ( "onClientSoundFinishedDownload", "length", NULL, false );
     m_Events.AddEvent ( "onClientSoundChangedMeta", "streamTitle", NULL, false );
     m_Events.AddEvent ( "onClientSoundStarted", "reason", NULL, false );

@@ -26,6 +26,7 @@ struct SSoundEventInfo
     SString         strString;
     double          dNumber;
     bool            bBool;
+    SString         strError;
 };
 
 struct SSoundThreadVariables
@@ -77,7 +78,7 @@ public:
     void                    SetPan                  ( float fPan );
 
     void                    DoPulse                 ( const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt );
-    void                    AddQueuedEvent          ( eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false );
+    void                    AddQueuedEvent          ( eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false, const SString& strError = "" );
     bool                    GetQueuedEvent          ( SSoundEventInfo& info );
     void                    ParseShoutcastMeta      ( const SString& strMeta );
     float*                  GetFFTData              ( int iLength );
