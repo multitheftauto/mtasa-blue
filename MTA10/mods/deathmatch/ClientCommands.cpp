@@ -767,7 +767,15 @@ void COMMAND_VoicePushToTalk ( const char* szCmdLine )
     if ( g_pClientGame->GetVoiceRecorder()->IsEnabled() )
         g_pClientGame->GetVoiceRecorder()-> UpdatePTTState ( atoi(szCmdLine) );
     else
-        g_pCore->GetConsole ()->Print ( "voiceptt: This server does not have voice enabled" );
+    {
+        // Show warning only once per server
+        static bool bDone = false;
+        if ( !bDone )
+        {
+            bDone = true;
+            g_pCore->GetConsole ()->Print ( "voiceptt: This server does not have voice enabled" );
+        }
+    }
 }
 
 void COMMAND_ServerInfo ( const char* szCmdLine )
