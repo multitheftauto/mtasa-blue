@@ -2084,6 +2084,12 @@ void CCore::CalculateStreamingMemoryRange ( void )
     float fMinAmount = EvalSamplePosition < float > ( minPoints, NUMELMS ( minPoints ), iSystemRamMB );
     float fMaxAmount = EvalSamplePosition < float > ( maxPoints, NUMELMS ( maxPoints ), iSystemRamMB );
 
+    // Scale max if gta3.img is over 1GB
+    SString strGta3imgFilename = PathJoin( GetLaunchPath(), "models", "gta3.img" );
+    uint uiFileSizeMB = FileSize( strGta3imgFilename ) / 0x100000LL;
+    float fSizeScale = UnlerpClamped( 1024, uiFileSizeMB, 2048 );
+    fMaxAmount += fMaxAmount * fSizeScale;
+
     // Apply cap dependant on video memory
     fMaxAmount = Min ( fMaxAmount, iVideoMemoryMB * 2.f );
     fMinAmount = Min ( fMinAmount, iVideoMemoryMB * 1.f );
