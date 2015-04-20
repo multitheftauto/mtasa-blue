@@ -213,8 +213,7 @@ public:
     bool                                        GetCustomDataInt        ( const char * szKey, int& iOut, bool bInheritData );
     bool                                        GetCustomDataBool       ( const char * szKey, bool& bOut, bool bInheritData );
     void                                        SetCustomData           ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain );
-    bool                                        DeleteCustomData        ( const char* szName, bool bRecursive );
-    void                                        DeleteAllCustomData     ( CLuaMain* pLuaMain, bool bRecursive );
+    void                                        DeleteCustomData        ( const char* szName );
 
     virtual bool                                GetMatrix               ( CMatrix& matrix ) const;
     virtual bool                                SetMatrix               ( const CMatrix & matrix );
