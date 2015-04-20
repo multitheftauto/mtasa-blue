@@ -567,7 +567,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
 {
     // If we can take input
     if ( !CLocalGUI::GetSingleton ().GetConsole ()->IsVisible () &&
-        m_bInputVisible )
+        IsInputVisible() )
     {
         // Check if it's a special key like enter and backspace, if not, add it as a character to the message
         switch ( KeyboardArgs.codepoint )
@@ -637,6 +637,9 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
 void CChat::SetVisible ( bool bVisible )
 {
     m_bVisible = bVisible;
+    // If hiding chat, also reset chat input line
+    if ( !m_bVisible )
+        SetInputVisible( false );
 }
 
 

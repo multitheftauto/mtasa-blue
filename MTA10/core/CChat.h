@@ -200,7 +200,7 @@ public:
 
     inline bool                 IsVisible               ( void )            { return m_bVisible; }
     void                        SetVisible              ( bool bVisible );
-    inline bool                 IsInputVisible          ( void )            { return m_bInputVisible; }
+    inline bool                 IsInputVisible          ( void )            { return m_bVisible && m_bInputVisible; }
     void                        SetInputVisible         ( bool bVisible );
 
     const char*                 GetInputPrefix          ( void );
