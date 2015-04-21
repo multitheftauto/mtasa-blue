@@ -50,6 +50,8 @@ public:
     SString                     GetDurationDesc         ( void );
     SString                     GetReasonText           ( void ) const;
     uint                        GetScriptID             ( void ) const                  { return m_uiScriptID; }
+    bool                        IsBeingDeleted          ( void ) const                  { return m_bBeingDeleted; }
+    void                        SetBeingDeleted         ( void )                        { m_bBeingDeleted = true; }
 
 private:
     std::string                 m_strIP;
@@ -61,6 +63,7 @@ private:
     time_t                      m_tTimeOfBan;
     time_t                      m_tTimeOfUnban;
     uint                        m_uiScriptID;
+    bool                        m_bBeingDeleted;
 };
 
 #endif

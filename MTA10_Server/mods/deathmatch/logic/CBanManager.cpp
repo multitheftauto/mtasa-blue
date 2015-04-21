@@ -33,8 +33,14 @@ CBanManager::~CBanManager ( void )
     {
         delete *iter;
     }
-
     m_BanManager.clear ();
+
+    // Cleanup queued deletions
+    for ( std::set < CBan* >::iterator iter = m_BansBeingDeleted.begin() ; iter != m_BansBeingDeleted.end() ; iter++ )
+    {
+        delete *iter;
+    }
+    m_BansBeingDeleted.clear();
 }
 
 
@@ -68,6 +74,13 @@ void CBanManager::DoPulse ( void )
 
     if ( ms_bSaveRequired )
         SaveBanList();
+
+    // Cleanup queued deletions
+    for ( std::set < CBan* >::iterator iter = m_BansBeingDeleted.begin() ; iter != m_BansBeingDeleted.end() ; iter++ )
+    {
+        delete *iter;
+    }
+    m_BansBeingDeleted.clear();
 }
 
 
@@ -252,10 +265,11 @@ CBan* CBanManager::GetBanFromAccount ( const char* szAccount )
 
 void CBanManager::RemoveBan ( CBan* pBan )
 {
-    if ( pBan )
+    if ( m_BanManager.Contains( pBan ) )
     {
         m_BanManager.remove ( pBan );
-        delete pBan;
+        MapInsert( m_BansBeingDeleted, pBan );
+        pBan->SetBeingDeleted();
     }
 }
 
@@ -434,7 +448,9 @@ bool CBanManager::ReloadBanList ( void )
     list < CBan* >::const_iterator iter = m_BanManager.begin ();
     for ( ; iter != m_BanManager.end (); iter++ )
     {
-        delete *iter;
+        CBan* pBan = *iter;
+        MapInsert( m_BansBeingDeleted, pBan );
+        pBan->SetBeingDeleted();
     }
     m_BanManager.clear ();
 

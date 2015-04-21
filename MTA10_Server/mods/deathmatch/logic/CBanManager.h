@@ -66,6 +66,7 @@ private:
     SString             m_strPath;
 
     CMappedList < CBan* >   m_BanManager;
+    std::set < CBan* >      m_BansBeingDeleted;
 
     time_t              m_tUpdate;
 

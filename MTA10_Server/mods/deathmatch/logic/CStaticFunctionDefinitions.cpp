@@ -11328,12 +11328,20 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
         // Save the ban list
         m_pBanManager->SaveBanList ();
 
+        // Check if script removed the ban
+        if ( pBan->IsBeingDeleted() )
+            return NULL;
+
         // Call the event
         CLuaArguments Arguments;
         Arguments.PushBan ( pBan );
         if ( pResponsible )
             Arguments.PushElement ( pResponsible );
         pPlayer->CallEvent ( "onPlayerBan", Arguments );
+
+        // Check if script removed the ban
+        if ( pBan->IsBeingDeleted() )
+            return NULL;
 
         // Tell the player that was banned why. QuitPlayer will delete the player.
         time_t Duration = pBan->GetBanTimeRemaining();
@@ -11342,7 +11350,6 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
         g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str() );
 
         // Tell everyone else that he was banned from the game including console
-        // m_pPlayerManager->BroadcastOnlyJoined ( CChatEchoPacket ( szInfoMessage, CHATCOLOR_INFO ) );
         CLogger::LogPrintf ( "BAN: %s\n", strInfoMessage.c_str() );
 
         return pBan;
@@ -11434,6 +11441,10 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
             m_pMapManager->GetRootElement()->CallEvent ( "onBan", Arguments );
         }
 
+        // Check if script removed the ban
+        if ( pBan->IsBeingDeleted() )
+            return NULL;
+
         // Log
         if ( bIPSpecified )
             CLogger::LogPrintf ( "BAN: %s was banned by %s%s\n", strIP.c_str(), strResponsible.c_str(), strDetails.c_str () );
@@ -11489,6 +11500,10 @@ CBan* CStaticFunctionDefinitions::AddBan ( SString strIP, SString strUsername, S
                     Arguments.PushElement ( pResponsible );
                 (*iter)->CallEvent ( "onPlayerBan", Arguments );
 
+                // Check if script removed the ban
+                if ( pBan->IsBeingDeleted() )
+                    return NULL;
+
                 // Tell the player that was banned why. QuitPlayer will delete the player.
                 time_t Duration = pBan->GetBanTimeRemaining();
                 CPlayerDisconnectedPacket Packet ( CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str ( ) );
@@ -11515,6 +11530,9 @@ bool CStaticFunctionDefinitions::RemoveBan ( CBan* pBan, CPlayer* pResponsible )
         Arguments.PushElement ( pResponsible );
     m_pMapManager->GetRootElement()->CallEvent ( "onUnban", Arguments );
 
+    // Check if script removed the ban
+    if ( pBan->IsBeingDeleted() )
+        return false;
 
     CLogger::LogPrintf ( "UNBAN: A ban was removed by %s\n", ( pResponsible ) ? pResponsible->GetNick () : "Console" );
 
