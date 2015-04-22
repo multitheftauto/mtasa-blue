@@ -53,6 +53,8 @@ public:
     void ClearTexture           ();
     inline void NotifyPaint     () { m_PaintCV.notify_one (); }
 
+    inline bool HasInputFocus   () { return m_bHasInputFocus; }
+
     void ExecuteJavascript      ( const SString& strJavascriptCode );
 
     bool SetProperty            ( const SString& strKey, const SString& strValue );
@@ -127,6 +129,7 @@ private:
     std::mutex          m_PaintMutex;
     std::condition_variable m_PaintCV;
     std::map<SString, SString> m_Properties;
+    bool                m_bHasInputFocus;
         
     CWebBrowserEventsInterface* m_pEventsInterface;
 

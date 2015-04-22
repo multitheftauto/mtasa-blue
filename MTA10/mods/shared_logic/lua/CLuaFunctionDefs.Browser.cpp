@@ -464,14 +464,13 @@ int CLuaFunctionDefs::GetBrowserProperty ( lua_State* luaVM )
 int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
 {
 //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; SString url; bool bIsLocal; bool bIsRelative; CClientGUIElement* parent;
+    float x; float y; float width; float height; bool bIsLocal; bool bIsRelative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( x );
     argStream.ReadNumber ( y );
     argStream.ReadNumber ( width );
     argStream.ReadNumber ( height );
-    argStream.ReadString ( url );
     argStream.ReadBool ( bIsLocal );
     argStream.ReadBool ( bIsRelative );
     argStream.ReadUserData ( parent, nullptr );

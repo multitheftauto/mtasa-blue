@@ -11,9 +11,6 @@
 #include "StdInc.h"
 #include <core/CWebViewInterface.h>
 
-// Use StaticImage here as we'd have to add the same definition twice to the Falagard definition file otherwise
-#define CGUIWEBBROWSER_NAME "CGUI/StaticImage"
-
 CGUIWebBrowser_Impl::CGUIWebBrowser_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
 {
     // Initialize
@@ -130,20 +127,25 @@ void CGUIWebBrowser_Impl::SetFrameEnabled ( bool bFrameEnabled )
 }
 
 
-bool CGUIWebBrowser_Impl::IsFrameEnabled ( void )
+bool CGUIWebBrowser_Impl::IsFrameEnabled ()
 {
     return reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> isFrameEnabled ();
 }
 
 
-CEGUI::Image* CGUIWebBrowser_Impl::GetDirectImage ( void )
+CEGUI::Image* CGUIWebBrowser_Impl::GetDirectImage ()
 {
     return const_cast < CEGUI::Image* > ( reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) ->getImage () );
 }
 
-void CGUIWebBrowser_Impl::Render ( void )
+void CGUIWebBrowser_Impl::Render ()
 {
     return reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow ) -> render ();
+}
+
+bool CGUIWebBrowser_Impl::HasInputFocus ()
+{
+    return m_pWebView->HasInputFocus ();
 }
 
 bool CGUIWebBrowser_Impl::Event_MouseButtonDown ( const CEGUI::EventArgs& e )
@@ -178,7 +180,7 @@ bool CGUIWebBrowser_Impl::Event_MouseMove ( const CEGUI::EventArgs& e )
 {
     const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
     
-    m_pWebView->InjectMouseMove ( (int)args.position.d_x - m_pWindow->windowToScreenX ( 0.0f ), (int)args.position.d_y - m_pWindow->windowToScreenY ( 0.0f ) );
+    m_pWebView->InjectMouseMove ( (int)(args.position.d_x - m_pWindow->windowToScreenX ( 0.0f )), (int)(args.position.d_y - m_pWindow->windowToScreenY ( 0.0f )) );
     return true;
 }
 
@@ -186,7 +188,7 @@ bool CGUIWebBrowser_Impl::Event_MouseWheel ( const CEGUI::EventArgs& e )
 {
     const CEGUI::MouseEventArgs& args = reinterpret_cast < const CEGUI::MouseEventArgs& > ( e );
     
-    m_pWebView->InjectMouseWheel ( args.wheelChange * 40, 0 );
+    m_pWebView->InjectMouseWheel ( (int)(args.wheelChange * 40), 0 );
     return true;
 }
 

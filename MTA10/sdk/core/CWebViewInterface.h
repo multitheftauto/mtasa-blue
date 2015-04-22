@@ -30,6 +30,8 @@ public:
     virtual void Focus              ( bool state = true ) = 0;
     virtual IDirect3DTexture9* GetTexture () = 0;
 
+    virtual bool HasInputFocus      () = 0;
+
     virtual void ExecuteJavascript  ( const SString& strJavascriptCode ) = 0;
 
     virtual bool SetProperty        ( const SString& strKey, const SString& strValue ) = 0;

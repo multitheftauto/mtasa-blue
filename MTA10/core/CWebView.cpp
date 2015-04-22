@@ -296,10 +296,10 @@ bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProc
     if ( message->GetName () == "InputFocus" )
     {
         // Retrieve arguments from process message
-        bool gainedFocus = argList->GetBool ( 0 );
+        m_bHasInputFocus = argList->GetBool ( 0 );
 
         // Queue event to run on the main thread
-        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnInputFocusChanged, m_pEventsInterface, gainedFocus );
+        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnInputFocusChanged, m_pEventsInterface, m_bHasInputFocus );
         g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnProcessMessageReceived2" );
     }
 

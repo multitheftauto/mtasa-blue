@@ -319,6 +319,15 @@ bool CGUI_Impl::GetGUIInputEnabled ( void )
                 CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
                 return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
             }
+            else if ( pActiveWindow->getType () == CGUIWEBBROWSER_NAME )
+            {
+                auto pElement = reinterpret_cast<CGUIElement_Impl*>(pActiveWindow->getUserData ());
+                if ( pElement->GetType () == CGUI_WEBBROWSER )
+                {
+                    auto pWebBrowser = reinterpret_cast<CGUIWebBrowser_Impl*>(pElement);
+                    return pWebBrowser->HasInputFocus ();
+                }
+            }
             return false;
         }
         break;

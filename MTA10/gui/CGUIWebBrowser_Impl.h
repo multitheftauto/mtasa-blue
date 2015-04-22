@@ -15,6 +15,9 @@
 #include "CGUITexture_Impl.h"
 #include <renderers/directx9GUIRenderer/d3d9texture.h>
 
+// Use StaticImage here as we'd have to add the same definition twice to the Falagard definition file otherwise
+#define CGUIWEBBROWSER_NAME "CGUI/StaticImage"
+
 class CGUITexture;
 class CGUITexture_Impl;
 class CGUI_Impl;
@@ -34,10 +37,11 @@ public:
     bool                        IsFrameEnabled          ();
 
     CEGUI::Image*               GetDirectImage          ();
-
     void                        Render                  ();
 
-    eCGUIType                   GetType                 () { return CGUI_WEBBROWSER; }
+    virtual eCGUIType           GetType                 () override { return CGUI_WEBBROWSER; }
+
+    bool                        HasInputFocus           ();
 
 protected:
     bool                        Event_MouseButtonDown   ( const CEGUI::EventArgs& e );
