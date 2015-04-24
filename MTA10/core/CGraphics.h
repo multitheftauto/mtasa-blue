@@ -108,6 +108,7 @@ public:
     bool                CreateStandardDXFontWithCustomScale ( eFontType fontType, float fScale, ID3DXFont** ppD3DXFont );
 
     bool                LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont );
+    bool                LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality, ID3DXFont** ppD3DXFont );
     bool                DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pD3DXFont );
 
     float               GetDXFontHeight         ( float fScale = 1.0f, ID3DXFont * pDXFont = NULL );

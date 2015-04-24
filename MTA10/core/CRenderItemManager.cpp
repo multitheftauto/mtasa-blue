@@ -236,13 +236,13 @@ CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
 // TODO: Make underlying data for fonts shared
 //
 ////////////////////////////////////////////////////////////////
-CDxFontItem* CRenderItemManager::CreateDxFont ( const SString& strFullFilePath, uint uiSize, bool bBold )
+CDxFontItem* CRenderItemManager::CreateDxFont ( const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality )
 {
     if ( !CanCreateRenderItem ( CDxFontItem::GetClassId () ) )
         return NULL;
 
     CDxFontItem* pDxFontItem = new CDxFontItem ();
-    pDxFontItem->PostConstruct ( this, strFullFilePath, uiSize, bBold );
+    pDxFontItem->PostConstruct ( this, strFullFilePath, uiSize, bBold, ulQuality );
 
     if ( !pDxFontItem->IsValid () )
     {

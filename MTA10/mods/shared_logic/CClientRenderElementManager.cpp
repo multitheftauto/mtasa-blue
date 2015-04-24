@@ -52,10 +52,10 @@ CClientRenderElementManager::~CClientRenderElementManager ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientDxFont* CClientRenderElementManager::CreateDxFont ( const SString& strFullFilePath, uint uiSize, bool bBold )
+CClientDxFont* CClientRenderElementManager::CreateDxFont ( const SString& strFullFilePath, uint uiSize, bool bBold, const DWORD ulQuality )
 {
     // Create the item
-    CDxFontItem* pDxFontItem = m_pRenderItemManager->CreateDxFont ( strFullFilePath, uiSize, bBold );
+    CDxFontItem* pDxFontItem = m_pRenderItemManager->CreateDxFont ( strFullFilePath, uiSize, bBold, ulQuality );
 
     // Check create worked
     if ( !pDxFontItem )

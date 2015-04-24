@@ -78,6 +78,7 @@ public:
     virtual float                   GetDXTextExtent     ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL, bool bColorCoded = false ) = 0;
 
     virtual bool                    LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont ) = 0;
+    virtual bool                    LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality, ID3DXFont** ppD3DXFont ) = 0;
     virtual bool                    DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pD3DXFont ) = 0;
 
     virtual ID3DXFont *             GetFont             ( eFontType fontType = FONT_DEFAULT, float* pfOutScaleUsed = NULL, float fRequestedScale = 1, const char* szCustomScaleUser = NULL ) = 0;

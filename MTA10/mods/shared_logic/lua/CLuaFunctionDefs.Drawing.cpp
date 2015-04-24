@@ -852,12 +852,13 @@ int CLuaFunctionDefs::dxUpdateScreenSource ( lua_State* luaVM )
 int CLuaFunctionDefs::dxCreateFont ( lua_State* luaVM )
 {
 //  element dxCreateFont( string filepath [, int size=9, bool bold=false ] )
-    SString strFilePath; int iSize; bool bBold;
+    SString strFilePath, strQuality; int iSize; bool bBold;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strFilePath );
     argStream.ReadNumber ( iSize, 9 );
     argStream.ReadBool ( bBold, false );
+    argStream.ReadString ( strQuality, "proof" );
 
     if ( !argStream.HasErrors () )
     {
@@ -871,15 +872,53 @@ int CLuaFunctionDefs::dxCreateFont ( lua_State* luaVM )
             {
                 if ( FileExists ( strPath ) )
                 {
-                    CClientDxFont* pDxFont = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateDxFont ( strPath, iSize, bBold );
-                    if ( pDxFont )
+                    DWORD ulQuality = 0xFF;
+
+                    strQuality = strQuality.ToLower();
+                    
+                    if( strQuality.compare( "default" ) == 0 )
                     {
-                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                        pDxFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
-                        lua_pushelement ( luaVM, pDxFont );
-                        return 1;
+                        ulQuality = DEFAULT_QUALITY;
                     }
-                    argStream.SetCustomError( strFilePath, "Error creating font" );
+                    else if( strQuality.compare( "draft" ) == 0 )
+                    {
+                        ulQuality = DRAFT_QUALITY;
+                    }
+                    else if( strQuality.compare( "proof" ) == 0 )
+                    {
+                        ulQuality = PROOF_QUALITY;
+                    }
+                    else if( strQuality.compare( "nonantialiased" ) == 0 )
+                    {
+                        ulQuality = NONANTIALIASED_QUALITY;
+                    }
+                    else if( strQuality.compare( "antialiased" ) == 0 )
+                    {
+                        ulQuality = ANTIALIASED_QUALITY;
+                    }
+                    else if( strQuality.compare( "cleartype" ) == 0 )
+                    {
+                        ulQuality = CLEARTYPE_QUALITY;
+                    }
+                    else if( strQuality.compare( "cleartype_natural" ) == 0 )
+                    {
+                        ulQuality = CLEARTYPE_NATURAL_QUALITY;
+                    }
+
+                    if( ulQuality != 0xFF )
+                    {
+                        CClientDxFont* pDxFont = g_pClientGame->GetManager()->GetRenderElementManager()->CreateDxFont( strPath, iSize, bBold, ulQuality );
+                        if( pDxFont )
+                        {
+                            // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+                            pDxFont->SetParent( pParentResource->GetResourceDynamicEntity() );
+                            lua_pushelement( luaVM, pDxFont );
+                            return 1;
+                        }
+                        argStream.SetCustomError( strFilePath, "Error creating font" );
+                    }
+                    else
+                        argStream.SetCustomError( strFilePath, "Invalid font quality" );
                 }
                 else
                     argStream.SetCustomError( strFilePath, "File not found" );
