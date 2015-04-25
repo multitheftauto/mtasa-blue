@@ -48,7 +48,8 @@ bool CRenderWareSA::RightSizeTxd( const CBuffer& inTxd, const SString& strOutTxd
     // read the txd
     RwTexDictionary* pTxd = RwTexDictionaryGtaStreamRead( pStream );
     RwStreamClose( pStream, NULL );
-
+    if ( !pTxd )
+        return false;
 
     //
     // Process each texture in the txd
