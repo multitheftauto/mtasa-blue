@@ -513,5 +513,6 @@ void CCommandFuncs::ShowFrameGraph ( const char* szParameters )
 
 void CCommandFuncs::JingleBells ( const char* szParameters )
 {
+    g_strJingleBells = szParameters;
     g_pCore->GetConsole ()->Print ( "Batman smells" );
 }

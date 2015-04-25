@@ -152,6 +152,9 @@ public:
     virtual void                            LeavingMTARenderZone        ( void ) = 0;
     virtual void                            MaybeEnteringMTARenderZone  ( void ) = 0;
     virtual void                            MaybeLeavingMTARenderZone   ( void ) = 0;
+
+    // Texture data manipulation
+    virtual bool        ResizeTextureData       ( const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight, CBuffer& outBuffer ) = 0;
 };
 
 #endif

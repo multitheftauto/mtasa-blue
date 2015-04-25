@@ -194,6 +194,11 @@ public:
     void                                    SaveGTARenderStates         ( void );
     void                                    RestoreGTARenderStates      ( void );
 
+    // Texture data manipulation
+    bool                ResizeTextureData       ( const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight, CBuffer& outBuffer );
+    bool                CopyDataToSurface       ( IDirect3DSurface9* pSurface, const uchar* pPixelsData, uint uiDataPitch );
+    bool                CopyDataFromSurface     ( IDirect3DSurface9* pSurface, CBuffer& outBuffer );
+
     // To draw queued up drawings
     void                DrawPreGUIQueue         ( void );
     void                DrawPostGUIQueue        ( void );

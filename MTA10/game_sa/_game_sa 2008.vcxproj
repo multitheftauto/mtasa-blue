@@ -304,6 +304,7 @@
     <ClCompile Include="CRenderWareSA.ShaderMatching.cpp" />
     <ClCompile Include="CRenderWareSA.ShaderSupport.cpp" />
     <ClCompile Include="CRenderWareSA.TextureReplacing.cpp" />
+    <ClCompile Include="CRenderWareSA.TxdRightSizing.cpp" />
     <ClCompile Include="CRestartSA.cpp" />
     <ClCompile Include="CRopesSA.cpp" />
     <ClCompile Include="CSettingsSA.cpp" />

@@ -684,6 +684,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CRenderWareSA.TxdRightSizing.cpp"
+				>
+			</File>
+			<File
 				RelativePath="CRestartSA.cpp"
 				>
 			</File>

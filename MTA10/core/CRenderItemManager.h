@@ -69,6 +69,7 @@ public:
     void                        NotifyShaderItemUsesDepthBuffer     ( CShaderItem* pShaderItem, bool bUsesDepthBuffer );
 
     static int                  GetBitsPerPixel                     ( D3DFORMAT Format );
+    static int                  GetPitchDivisor                     ( D3DFORMAT Format );
     static int                  CalcD3DResourceMemoryKBUsage        ( IDirect3DResource9* pD3DResource );
     static int                  CalcD3DSurfaceMemoryKBUsage         ( IDirect3DSurface9* pD3DSurface );
     static int                  CalcD3DTextureMemoryKBUsage         ( IDirect3DTexture9* pD3DTexture );

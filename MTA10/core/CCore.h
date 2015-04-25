@@ -80,6 +80,7 @@ extern class CCore* g_pCore;
 extern class CGraphics* g_pGraphics;
 extern class CLocalization* g_pLocalization;
 bool UsingAltD3DSetup();
+extern SString g_strJingleBells;
 
 class CCore : public CCoreInterface, public CSingleton < CCore >
 {
@@ -272,6 +273,7 @@ public:
     bool                    GetRequiredDisplayResolution    ( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions );
     void                    NotifyRenderingGrass            ( bool bIsRenderingGrass );
     bool                    IsRenderingGrass                ( void )                { return m_bIsRenderingGrass; }
+    bool                    GetRightSizeTxdEnabled          ( void );
 
 private:
     // Core devices.

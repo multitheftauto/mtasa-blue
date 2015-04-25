@@ -169,6 +169,7 @@ public:
     virtual bool                    GetDeviceSelectionEnabled       ( void ) = 0;
     virtual bool                    GetRequiredDisplayResolution    ( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions ) = 0;
     virtual void                    NotifyRenderingGrass            ( bool bIsRenderingGrass ) = 0;
+    virtual bool                    GetRightSizeTxdEnabled          ( void ) = 0;
 };
 
 class CClientTime

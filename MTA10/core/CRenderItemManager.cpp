@@ -848,6 +848,30 @@ int CRenderItemManager::GetBitsPerPixel ( D3DFORMAT Format )
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::GetPitchDivisor
+//
+// Returns block width for a given D3D format
+//
+////////////////////////////////////////////////////////////////
+int CRenderItemManager::GetPitchDivisor ( D3DFORMAT Format )
+{
+	switch ( Format )
+	{
+	    case D3DFMT_DXT1:
+	    case D3DFMT_DXT2:
+	    case D3DFMT_DXT3:
+	    case D3DFMT_DXT4:
+	    case D3DFMT_DXT5:
+		    return 4;
+
+	    default:
+		    return 1;
+	}
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::CalcD3DResourceMemoryKBUsage
 //
 // Calculate how much video memory a D3D resource will take

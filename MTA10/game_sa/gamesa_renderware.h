@@ -93,11 +93,14 @@ typedef int                 (__cdecl *RpClumpDestroy_t)                     (RpC
 typedef RpClump*                (__cdecl *RpClumpForAllAtomics_t)               (RpClump *clump, void* callback, void* pData);
 typedef RwTexDictionary*        (__cdecl *RwTexDictionaryStreamRead_t)          (RwStream *stream);
 typedef RwTexDictionary*        (__cdecl *RwTexDictionaryGtaStreamRead_t)       (RwStream *stream);
+typedef int                     (__cdecl *RwTexDictionaryStreamWrite_t)         (RwTexDictionary* txd, RwStream *stream);
+typedef int                     (__cdecl *rwD3D9NativeTextureRead_t)            (RwStream *stream, RwTexture** textureOut);
 typedef RwRaster*               (__cdecl *RwRasterUnlock_t)                     (RwRaster *raster);
 typedef RwRaster*               (__cdecl *RwRasterLock_t)                       (RwRaster *raster, unsigned char level, int lockmode);
 typedef RwRaster*               (__cdecl *RwRasterCreate_t)                     (int width, int height, int depth, int flags);
 typedef RwTexture*              (__cdecl *RwTextureCreate_t)                    (RwRaster *raster);
 typedef RpMaterial*             (__cdecl *RpMaterialSetTexture_t)               (RpMaterial * mat, RwTexture * tex);
+
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
 /*****************************************************************************/
@@ -129,6 +132,8 @@ RWFUNC ( RwTexDictionaryGetCurrent_t             RwTexDictionaryGetCurrent      
 RWFUNC ( RwTexDictionarySetCurrent_t             RwTexDictionarySetCurrent               , (RwTexDictionarySetCurrent_t)             0xDEAD )
 RWFUNC ( RwTexDictionaryForAllTextures_t         RwTexDictionaryForAllTextures           , (RwTexDictionaryForAllTextures_t)         0xDEAD )
 RWFUNC ( RwTexDictionaryAddTexture_t             RwTexDictionaryAddTexture               , (RwTexDictionaryAddTexture_t)             0xDEAD )
+RWFUNC ( RwTexDictionaryStreamWrite_t            RwTexDictionaryStreamWrite              , (RwTexDictionaryStreamWrite_t)            0xDEAD )
+RWFUNC ( rwD3D9NativeTextureRead_t               rwD3D9NativeTextureRead                 , (rwD3D9NativeTextureRead_t)               0xDEAD )
 RWFUNC ( RpPrtStdGlobalDataSetStreamEmbedded_t   RpPrtStdGlobalDataSetStreamEmbedded     , (RpPrtStdGlobalDataSetStreamEmbedded_t)   0xDEAD )
 RWFUNC ( RpClumpRemoveAtomic_t                   RpClumpRemoveAtomic                     , (RpClumpRemoveAtomic_t)                   0xDEAD )
 RWFUNC ( RpAtomicClone_t                         RpAtomicClone                           , (RpAtomicClone_t)                         0xDEAD )
