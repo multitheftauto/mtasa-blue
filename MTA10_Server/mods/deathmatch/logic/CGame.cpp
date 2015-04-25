@@ -605,8 +605,8 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         // Check if IP is one of the most common private IP addresses
         in_addr serverIp;
         serverIp.s_addr = inet_addr( strServerIP );
-        uchar a = serverIp.S_un.S_un_b.s_b1;
-        uchar b = serverIp.S_un.S_un_b.s_b2;
+        uchar a = ( (uchar*)&serverIp.s_addr )[0];
+        uchar b = ( (uchar*)&serverIp.s_addr )[1];
         if ( a == 10 || a == 127 || ( a == 169 && b == 254 ) || ( a == 192 && b == 168 ) )
         {
             CLogger::ErrorPrintf ( "Can not specify private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
