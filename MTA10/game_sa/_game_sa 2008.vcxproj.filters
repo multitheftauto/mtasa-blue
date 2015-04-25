@@ -401,6 +401,9 @@
     <ClCompile Include="CFxSystemSA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CRenderWareSA.TxdRightSizing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3DMarkerSA.h">

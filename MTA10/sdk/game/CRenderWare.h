@@ -96,6 +96,7 @@ class CRenderWare {
     virtual void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity ) = 0;
     virtual void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem ) = 0;
     virtual RwFrame *           GetFrameFromName            ( RpClump * pRoot, SString strName ) = 0;
+    virtual bool                RightSizeTxd                ( const CBuffer& inTxd, const SString& strOutTxdFilename, uint uiSizeLimit ) = 0;
 };
 
 

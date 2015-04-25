@@ -84,6 +84,8 @@ namespace SharedUtil
     void            GenerateSha256              ( const void* pData, uint uiLength, uchar output[32] );
     SString         GenerateSha256HexString     ( const void* pData, uint uiLength );
     SString         GenerateSha256HexString     ( const SString& strData );
+    SString         GenerateSha256HexStringFromFile ( const SString& strFilename );
     SString         GenerateHashHexString       ( EHashFunctionType hashFunction, const void* pData, uint uiLength );
     SString         GenerateHashHexString       ( EHashFunctionType hashFunction, const SString& strData );
+    SString         GenerateHashHexStringFromFile ( EHashFunctionType hashFunction, const SString& strFilename );
 }

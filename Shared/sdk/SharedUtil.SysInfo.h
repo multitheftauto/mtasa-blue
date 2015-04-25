@@ -32,6 +32,7 @@ namespace SharedUtil
     long long   GetWMITotalPhysicalMemory       ( void );
     void        GetWMIAntiVirusStatus           ( std::vector < SString >& outEnabledList, std::vector < SString >& outDisabledList );
     bool        GetLibVersionInfo               ( const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo );
+    bool        Is64BitOS                       ( void );
 }
 
 #endif

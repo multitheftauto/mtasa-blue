@@ -105,8 +105,10 @@ public:
     void                AppendSubtractiveMatch      ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch );
     void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity );
     void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem );
+    bool                RightSizeTxd                ( const CBuffer& inTxd, const SString& strOutTxdFilename, uint uiSizeLimit );
 
     // CRenderWareSA methods
+    RwTexture*          RightSizeTexture            ( RwTexture* pTexture, uint uiSizeLimit );
     void                ResetStats                  ( void );
     void                GetShaderReplacementStats   ( SShaderReplacementStats& outStats );
     CModelTexturesInfo* GetModelTexturesInfo        ( ushort usModelId );

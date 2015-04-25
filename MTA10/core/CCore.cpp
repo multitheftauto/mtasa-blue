@@ -33,6 +33,7 @@ static float fTest = 1;
 
 extern CCore* g_pCore;
 bool g_bBoundsChecker = false;
+SString g_strJingleBells;
 
 BOOL AC_RestrictAccess( VOID )
 {
@@ -2407,4 +2408,22 @@ void CCore::NotifyRenderingGrass( bool bIsRenderingGrass )
 {
     m_bIsRenderingGrass = bIsRenderingGrass;
     CDirect3DEvents9::CloseActiveShader();
+}
+
+bool CCore::GetRightSizeTxdEnabled( void )
+{
+    // 32 bit users get rightsized txds
+    if ( !Is64BitOS() )
+        return true;
+
+    // Low ram users get rightsized txds
+    int iSystemRamMB = static_cast < int > ( GetWMITotalPhysicalMemory () / 1024LL / 1024LL );
+    if ( iSystemRamMB <= 2048 )
+        return true;
+
+    // Debug users get rightsized txds
+    if ( g_strJingleBells == "rightsize" )
+        return true;
+
+    return false;
 }

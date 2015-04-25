@@ -154,11 +154,67 @@ void CClientTXD::Restream ( unsigned short usModelID )
 }
 
 // Load file contents into supplied buffer
-bool CClientTXD::LoadFileData( CBuffer& buffer )
+bool CClientTXD::LoadFileData( CBuffer& outBuffer )
 {
-    buffer.LoadFromFile( m_strFilename );
-    g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strFilename, buffer );
-    return g_pCore->GetNetwork()->CheckFile( "txd", m_strFilename, buffer );
+    outBuffer.LoadFromFile( m_strFilename );
+    g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strFilename, outBuffer );
+    if ( !g_pCore->GetNetwork()->CheckFile( "txd", m_strFilename, outBuffer ) )
+        return false;
+
+    // Should we try to reduce the size of this txd?
+    if ( g_pCore->GetRightSizeTxdEnabled() )
+    {
+        // See if previously shrunk result exists
+        SString strLargeSha256 = GenerateSha256HexString( outBuffer.GetData(), outBuffer.GetSize() );
+        SString strShrunkFilename = PathJoin( ExtractPath( m_strFilename ), SString( "_1_%s", *strLargeSha256.Left( 32 ) ) );
+        CBuffer shrunk;
+        shrunk.LoadFromFile( strShrunkFilename );
+        if ( shrunk.GetSize() >= 128 )
+        {
+            // Extract cksum from the end
+            uint uiNewSize = shrunk.GetSize() - 64;
+            SStringX strSmallSha256Check( shrunk.GetData() + uiNewSize, 64 );
+            shrunk.SetSize( uiNewSize );
+            SString strSmallSha256 = GenerateSha256HexString( shrunk.GetData(), shrunk.GetSize() );
+            if ( strSmallSha256Check == strSmallSha256 )
+            {
+                // Have valid previous shrunk result
+                if ( IsTXDData( SStringX( shrunk.GetData(), 64 ) ) )
+                {
+                    // Result is: use shrunk data
+                    outBuffer = shrunk;
+                }
+                else
+                {
+                    // Result is: keep original data
+                }
+                return true;
+            }
+        }
+
+        // See if txd should be shrunk
+        if ( g_pGame->GetRenderWare()->RightSizeTxd( outBuffer, strShrunkFilename, 256 ) )
+        {
+            // Yes
+            outBuffer.LoadFromFile( strShrunkFilename );
+            FileAppend( strShrunkFilename, GenerateSha256HexStringFromFile( strShrunkFilename ) );
+            AddReportLog( 9400, SString( "RightSized %s(%s) from %d to %d"
+                                            , *ExtractFilename( m_strFilename )
+                                            , *strLargeSha256.Left( 8 )
+                                            , (uint)FileSize( m_strFilename )
+                                            , outBuffer.GetSize()
+                                        ) );
+        }
+        else
+        {
+            // No
+            // Indicate for next time
+            FileSave( strShrunkFilename, strLargeSha256 );
+            FileAppend( strShrunkFilename, GenerateSha256HexStringFromFile( strShrunkFilename ) );
+        }
+    }
+
+    return true;
 }
 
 // Return true if data looks like TXD file contents

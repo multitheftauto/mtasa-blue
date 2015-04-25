@@ -523,6 +523,10 @@ namespace SharedUtil
         return GenerateHashHexString( EHashFunction::SHA256, strData );
     }
 
+    SString GenerateSha256HexStringFromFile( const SString& strFilename )
+    {
+        return GenerateHashHexStringFromFile( EHashFunction::SHA256, strFilename );
+    }
 
     SString GenerateHashHexString( EHashFunctionType hashFunction, const void* pData, uint uiLength )
     {
@@ -571,6 +575,13 @@ namespace SharedUtil
     SString GenerateHashHexString( EHashFunctionType hashFunction, const SString& strData )
     {
         return GenerateHashHexString( hashFunction, *strData, strData.length() );
+    }
+
+    SString GenerateHashHexStringFromFile( EHashFunctionType hashFunction, const SString& strFilename )
+    {
+        CBuffer buffer;
+        buffer.LoadFromFile( strFilename );
+        return GenerateHashHexString( hashFunction, buffer.GetData(), buffer.GetSize() );
     }
 
     void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k) {

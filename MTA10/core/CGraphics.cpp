@@ -1949,3 +1949,138 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
 
     m_ActiveBlendMode = savedBlendMode;
 }
+
+
+/////////////////////////////////////////////////////////////
+//
+// CGraphics::ResizeTextureData
+//
+// Resize supplied texture data into outBuffer
+// Returns true on success
+//
+/////////////////////////////////////////////////////////////
+bool CGraphics::ResizeTextureData( const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight, CBuffer& outBuffer )
+{
+    bool bResult = false;
+    IDirect3DSurface9* pCurrentSurface = NULL;
+    IDirect3DSurface9* pNewSurface = NULL;
+
+    do
+    {
+        // Create surfaces
+        if ( FAILED( g_pGraphics->GetDevice()->CreateOffscreenPlainSurface( uiWidth, uiHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SYSTEMMEM, &pCurrentSurface, NULL ) ) )
+            break;
+        if ( FAILED( g_pGraphics->GetDevice()->CreateOffscreenPlainSurface( uiNewWidth, uiNewHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SYSTEMMEM, &pNewSurface, NULL ) ) )
+            break;
+
+        // Data in
+        if ( !CopyDataToSurface( pCurrentSurface, (const BYTE*)pData, uiDataPitch ) )
+            break;
+
+        // Resize
+        if ( FAILED( D3DXLoadSurfaceFromSurface( pNewSurface, NULL, NULL, pCurrentSurface, NULL, NULL, D3DX_FILTER_TRIANGLE, 0 ) ) )
+            break;
+
+        // Data out
+        if ( !CopyDataFromSurface( pNewSurface, outBuffer ) )
+            break;
+
+        bResult = true;
+    }
+    while ( false );
+
+    // Clean up
+    SAFE_RELEASE( pCurrentSurface );
+    SAFE_RELEASE( pNewSurface );
+    return bResult;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CopyDataFromSurface
+//
+// Copy raw data into the supplied surface
+// Returns true on success
+//
+/////////////////////////////////////////////////////////////
+bool CGraphics::CopyDataToSurface( IDirect3DSurface9* pSurface, const uchar* pData, uint uiDataPitch )
+{
+    D3DSURFACE_DESC SurfDesc;
+    pSurface->GetDesc( &SurfDesc );
+
+    D3DLOCKED_RECT LockedRect;
+    if ( FAILED( pSurface->LockRect( &LockedRect, NULL, D3DLOCK_NOSYSLOCK ) ) )
+        return false;
+
+    uiDataPitch /= CRenderItemManager::GetPitchDivisor( SurfDesc.Format );
+    uint uiSurfPitch = LockedRect.Pitch / CRenderItemManager::GetPitchDivisor( SurfDesc.Format );
+    BYTE* pSurfBits = (BYTE*)LockedRect.pBits;
+
+    uint uiLineWidthBytes = SurfDesc.Width * CRenderItemManager::GetBitsPerPixel( SurfDesc.Format ) / 8;
+
+    if ( uiLineWidthBytes == uiSurfPitch && uiLineWidthBytes == uiDataPitch )
+    {
+        // Pitches match byte width
+        memcpy( pSurfBits, pData, uiLineWidthBytes * SurfDesc.Height );
+    }
+    else
+    {
+        // Copy lines into surface
+        for ( uint i = 0; i < SurfDesc.Height; i++ )
+        {
+            memcpy( pSurfBits + uiSurfPitch * i, pData + uiDataPitch * i, uiLineWidthBytes );
+        }
+    }
+
+    if ( FAILED( pSurface->UnlockRect() ) )
+        return false;
+
+    return true;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CopyDataFromSurface
+//
+// Copy raw data from the supplied surface into outBuffer
+// Returns true on success
+//
+/////////////////////////////////////////////////////////////
+bool CGraphics::CopyDataFromSurface( IDirect3DSurface9* pSurface, CBuffer& outBuffer )
+{
+    D3DSURFACE_DESC SurfDesc;
+    pSurface->GetDesc( &SurfDesc );
+
+    D3DLOCKED_RECT LockedRect;
+    if ( FAILED( pSurface->LockRect( &LockedRect, NULL, D3DLOCK_NOSYSLOCK ) ) )
+        return false;
+
+    uint uiSurfPitch = LockedRect.Pitch / CRenderItemManager::GetPitchDivisor( SurfDesc.Format );
+    BYTE* pSurfBits = (BYTE*)LockedRect.pBits;
+
+    uint uiLineWidthBytes = SurfDesc.Width * CRenderItemManager::GetBitsPerPixel( SurfDesc.Format ) / 8;
+
+    outBuffer.SetSize( uiLineWidthBytes * SurfDesc.Height );
+    char* pOutData = outBuffer.GetData();
+
+    if ( uiLineWidthBytes == uiSurfPitch )
+    {
+        // Pitch matches byte width
+        memcpy( pOutData, pSurfBits, uiLineWidthBytes * SurfDesc.Height );
+    }
+    else
+    {
+        // Copy lines from surface
+        for ( uint i = 0; i < SurfDesc.Height; i++ )
+        {
+            memcpy( pOutData + uiLineWidthBytes * i, pSurfBits + uiSurfPitch * i, uiLineWidthBytes );
+        }
+    }
+
+    if ( FAILED( pSurface->UnlockRect() ) )
+        return false;
+
+    return true;
+}
