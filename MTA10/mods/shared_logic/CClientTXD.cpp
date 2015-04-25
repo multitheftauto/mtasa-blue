@@ -198,11 +198,11 @@ bool CClientTXD::LoadFileData( CBuffer& outBuffer )
             // Yes
             outBuffer.LoadFromFile( strShrunkFilename );
             FileAppend( strShrunkFilename, GenerateSha256HexStringFromFile( strShrunkFilename ) );
-            AddReportLog( 9400, SString( "RightSized %s(%s) from %d to %d"
+            AddReportLog( 9400, SString( "RightSized %s(%s) from %d KB => %d KB"
                                             , *ExtractFilename( m_strFilename )
                                             , *strLargeSha256.Left( 8 )
-                                            , (uint)FileSize( m_strFilename )
-                                            , outBuffer.GetSize()
+                                            , (uint)FileSize( m_strFilename ) / 1024
+                                            , outBuffer.GetSize() / 1024
                                         ) );
         }
         else
