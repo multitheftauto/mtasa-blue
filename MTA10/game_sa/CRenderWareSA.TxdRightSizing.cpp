@@ -119,7 +119,7 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
     int iPitch = pD3DRaster->lockedRect.Pitch;
     bool bHasAlpha = pD3DRaster->alpha != 0;
     bool bIsCubeTexture = ( pD3DRaster->cubeTextureFlags & 0x01 ) != 0;
-    bool bHasMipMaps = ( pD3DRaster->textureFlags & 0x01 ) != 0;
+    bool bHasMipMaps = pRaster->depth != 1;
     bool bIsCompressed = ( pD3DRaster->textureFlags & 0x10 ) != 0;
 
     // Check we can do this
@@ -150,7 +150,7 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
     header.TextureFormat.vAddressing = ( pTexture->flags & 0xf000 ) >> 12;
     memcpy( header.TextureFormat.name, pTexture->name, 32 );
     memcpy( header.TextureFormat.maskName, pTexture->mask, 32 );
-    header.RasterFormat.rasterFormat = pRaster->format << 8;    // dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300
+    header.RasterFormat.rasterFormat = pRaster->format << 8;    // ( dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300 ) | 0x00008000 mipmaps?
     header.RasterFormat.d3dFormat = pD3DRaster->format;
     header.RasterFormat.width = uiReqWidth;
     header.RasterFormat.height = uiReqHeight;
