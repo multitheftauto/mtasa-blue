@@ -134,7 +134,7 @@ void CSettings::CreateGUI ( void )
     pTabBinds = m_pTabs->CreateTab ( _("Binds") );
     pTabControls = m_pTabs->CreateTab ( _("Controls") );
     pTabInterface = m_pTabs->CreateTab ( _("Interface") );
-    pTabBrowser = m_pTabs->CreateTab ( _("Browser") );
+    pTabBrowser = m_pTabs->CreateTab ( _("Web Browser") );
     pTabAdvanced = m_pTabs->CreateTab ( _("Advanced") );
     pTabCommunity = m_pTabs->CreateTab ( _("Community") );
 
@@ -1206,7 +1206,7 @@ void CSettings::CreateGUI ( void )
     m_pLabelBrowserCustomBlacklist->GetPosition ( vecTemp ); // Reset vecTemp
 
     m_pLabelBrowserCustomWhitelist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("Custom whitelist") ) );
-    m_pLabelBrowserCustomWhitelist->SetPosition ( CVector2D ( 276.0f , vecTemp.fY ) );
+    m_pLabelBrowserCustomWhitelist->SetPosition ( CVector2D ( 292.0f , vecTemp.fY ) );
     m_pLabelBrowserCustomWhitelist->GetPosition ( vecTemp );
     m_pLabelBrowserCustomWhitelist->AutoSize ( NULL, 5.0f );
     m_pLabelBrowserCustomWhitelist->SetFont ( "default-bold-small" );
