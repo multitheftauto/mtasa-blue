@@ -394,6 +394,20 @@ IMPLEMENT_ENUM_BEGIN( eFontType )
     ADD_ENUM( FONT_BECKETT,         "beckett" )
 IMPLEMENT_ENUM_END_DEFAULTS( "font-type", FONT_DEFAULT, "" )
 
+IMPLEMENT_ENUM_BEGIN( eFontQuality )
+    ADD_ENUM( FONT_QUALITY_DEFAULT,           "default" )
+    ADD_ENUM( FONT_QUALITY_DRAFT,             "draft" )
+    ADD_ENUM( FONT_QUALITY_PROOF,             "proof" )
+#if( WINVER >= 0x0400 )
+    ADD_ENUM( FONT_QUALITY_NONANTIALIASED,    "nonantialiased" )
+    ADD_ENUM( FONT_QUALITY_ANTIALIASED,       "antialiased" )
+#endif
+#if( _WIN32_WINNT >= _WIN32_WINNT_WINXP )
+    ADD_ENUM( FONT_QUALITY_CLEARTYPE,         "cleartype" )
+    ADD_ENUM( FONT_QUALITY_CLEARTYPE_NATURAL, "cleartype_natural" )
+#endif
+IMPLEMENT_ENUM_END_DEFAULTS( "font-quality", FONT_QUALITY_DEFAULT, "" )
+
 IMPLEMENT_ENUM_BEGIN ( eAudioLookupIndex )
     ADD_ENUM ( AUDIO_LOOKUP_FEET, "feet" )
     ADD_ENUM ( AUDIO_LOOKUP_GENRL, "genrl" )
