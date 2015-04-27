@@ -77,20 +77,21 @@ int CLuaFunctionDefs::RequestBrowserDomains ( lua_State* luaVM )
 
 int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
 {
-//  bool loadBrowserURL ( browser webBrowser, string url [, string postData = "" ] )
-    CClientWebBrowser* pWebBrowser; SString strURL; SString strPostData;
+//  bool loadBrowserURL ( browser webBrowser, string url [, string postData = "", bool postURLEncoded = true ] )
+    CClientWebBrowser* pWebBrowser; SString strURL; SString strPostData; bool bURLEncoded;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
     argStream.ReadString ( strURL );
     argStream.ReadString ( strPostData, "" );
+    argStream.ReadBool ( bURLEncoded, true );
 
     if ( !argStream.HasErrors () )
     {
         // Are we dealing with a remote website?
         if ( strURL.substr ( 0, 7 ) == "http://" || strURL.substr ( 0, 8 ) == "https://" )
         {
-            lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, true, strPostData ) );
+            lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, true, strPostData, bURLEncoded ) );
             return 1;
         }
 
@@ -104,7 +105,7 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( strURL, pResource, strAbsPath ) && pWebBrowser->IsLocal () )
             {
                 pWebBrowser->SetTempURL ( strURL );
-                lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( "mtalocal://" + strURL, false, strPostData ) );
+                lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( "mtalocal://" + strURL, false, strPostData, bURLEncoded ) );
                 return 1;
             }
         }

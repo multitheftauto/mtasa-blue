@@ -27,7 +27,7 @@ public:
     inline CWebViewInterface*   GetWebView          ()    { return m_pWebView; }
 
     bool                        IsLoading           ();
-    bool                        LoadURL             ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString() );
+    bool                        LoadURL             ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString(), bool bURLEncoded = true );
     void                        GetTitle            ( SString& outPageTitle );
     void                        GetURL              ( SString& outURL );
     void                        SetRenderingPaused  ( bool bPaused );
