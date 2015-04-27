@@ -195,13 +195,19 @@ CRenderWareSA::~CRenderWareSA ( void )
 
 
 // Reads and parses a TXD file specified by a path (szTXD)
-RwTexDictionary * CRenderWareSA::ReadTXD ( const CBuffer& fileData )
+RwTexDictionary * CRenderWareSA::ReadTXD ( const SString& strFilename, const CBuffer& fileData )
 {
     // open the stream
+    RwStream * streamTexture;
     RwBuffer buffer;
-    buffer.ptr = (void*)fileData.GetData();
-    buffer.size = fileData.GetSize();
-    RwStream * streamTexture = RwStreamOpen ( STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer );
+    if ( !fileData.IsEmpty() )
+    {
+        buffer.ptr = (void*)fileData.GetData();
+        buffer.size = fileData.GetSize();
+        streamTexture = RwStreamOpen ( STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer );
+    }
+    else
+        streamTexture = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename );
 
     // check for errors
     if ( streamTexture == NULL )
@@ -229,7 +235,7 @@ RwTexDictionary * CRenderWareSA::ReadTXD ( const CBuffer& fileData )
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
-RpClump * CRenderWareSA::ReadDFF ( const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions )
+RpClump * CRenderWareSA::ReadDFF ( const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions )
 {
     // Set correct TXD as materials are processed at the same time
     if ( usModelID != 0 )
@@ -239,10 +245,16 @@ RpClump * CRenderWareSA::ReadDFF ( const CBuffer& fileData, unsigned short usMod
     }
 
     // open the stream
+    RwStream * streamModel;
     RwBuffer buffer;
-    buffer.ptr = (void*)fileData.GetData();
-    buffer.size = fileData.GetSize();
-    RwStream * streamModel = RwStreamOpen ( STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer );
+    if ( !fileData.IsEmpty() )
+    {
+        buffer.ptr = (void*)fileData.GetData();
+        buffer.size = fileData.GetSize();
+        streamModel = RwStreamOpen ( STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer );
+    }
+    else
+        streamModel = RwStreamOpen ( STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strFilename );
 
     // get the modelinfo array
     DWORD *pPool = ( DWORD* ) ARRAY_ModelInfo;

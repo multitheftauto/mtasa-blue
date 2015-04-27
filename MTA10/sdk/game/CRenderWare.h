@@ -62,14 +62,14 @@ typedef void (*PFN_WATCH_CALLBACK) ( CSHADERDUMMY* pContext, CD3DDUMMY* pD3DData
 
 class CRenderWare {
     public:
-    virtual bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const CBuffer& fileData, bool bFilteringEnabled ) = 0;
+    virtual bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& strFilename, const CBuffer& fileData, bool bFilteringEnabled ) = 0;
     virtual bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId ) = 0;
     virtual void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures ) = 0;
     virtual void                ClothesAddReplacementTxd    ( char* pFileData, ushort usFileId ) = 0;
     virtual void                ClothesRemoveReplacementTxd ( char* pFileData ) = 0;
     virtual bool                HasClothesReplacementChanged( void ) = 0;
-    virtual RwTexDictionary *   ReadTXD                     ( const CBuffer& fileData ) = 0;
-    virtual RpClump *           ReadDFF                     ( const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions ) = 0;
+    virtual RwTexDictionary *   ReadTXD                     ( const SString& strFilename, const CBuffer& fileData ) = 0;
+    virtual RpClump *           ReadDFF                     ( const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions ) = 0;
     virtual CColModel *         ReadCOL                     ( const CBuffer& fileData ) = 0;
     virtual void                DestroyDFF                  ( RpClump * pClump ) = 0;
     virtual void                DestroyTXD                  ( RwTexDictionary * pTXD ) = 0;
@@ -96,7 +96,7 @@ class CRenderWare {
     virtual void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity ) = 0;
     virtual void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem ) = 0;
     virtual RwFrame *           GetFrameFromName            ( RpClump * pRoot, SString strName ) = 0;
-    virtual bool                RightSizeTxd                ( const CBuffer& inTxd, const SString& strOutTxdFilename, uint uiSizeLimit ) = 0;
+    virtual bool                RightSizeTxd                ( const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit ) = 0;
 };
 
 

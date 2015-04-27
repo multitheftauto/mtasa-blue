@@ -44,11 +44,12 @@ namespace SharedUtil
         static SString                  CalculateHexString ( const char* szFilename );
         static SString                  CalculateHexString ( const void* pBuffer, size_t sizeLength );
 
-    private:
         void                            Init ( void );
         void                            Update ( unsigned char* input, unsigned int input_length );
         void                            Finalize ( void );
+        const unsigned char*            GetResult ( void ) const;
 
+    private:
         void                            Transform ( unsigned char* pBuffer );
 
         static void                     Encode ( unsigned char *dest, unsigned int  *src, unsigned long length );
@@ -87,5 +88,5 @@ namespace SharedUtil
     SString         GenerateSha256HexStringFromFile ( const SString& strFilename );
     SString         GenerateHashHexString       ( EHashFunctionType hashFunction, const void* pData, uint uiLength );
     SString         GenerateHashHexString       ( EHashFunctionType hashFunction, const SString& strData );
-    SString         GenerateHashHexStringFromFile ( EHashFunctionType hashFunction, const SString& strFilename );
+    SString         GenerateHashHexStringFromFile ( EHashFunctionType hashFunction, const SString& strFilename, int iMaxSize = INT_MAX, int iOffset = 0 );
 }

@@ -216,7 +216,13 @@ namespace SharedUtil
       // Zeroize sensitive information
       memset ( m_buffer, 0, sizeof (m_buffer) );
     }
-    
+
+
+    const unsigned char* CMD5Hasher::GetResult ( void ) const
+    {
+        return m_digest;
+    }
+
     
     void CMD5Hasher::Transform ( unsigned char block [64] )
     {
@@ -577,11 +583,93 @@ namespace SharedUtil
         return GenerateHashHexString( hashFunction, *strData, strData.length() );
     }
 
-    SString GenerateHashHexStringFromFile( EHashFunctionType hashFunction, const SString& strFilename )
+    SString GenerateHashHexStringFromFile( EHashFunctionType hashFunction, FILE* fh, uint uiMaxSize, int iOffset )
     {
-        CBuffer buffer;
-        buffer.LoadFromFile( strFilename );
-        return GenerateHashHexString( hashFunction, buffer.GetData(), buffer.GetSize() );
+        unsigned char buf[ 32768 ];
+
+        // Set offset
+        fseek ( fh, iOffset, SEEK_SET );
+
+        switch( hashFunction )
+        {
+            case EHashFunction::MD5:
+            {
+                CMD5Hasher Hasher;
+                Hasher.Init();
+                for( size_t n ; ( n = fread( buf, 1, Min( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                    Hasher.Update( buf, n );
+                Hasher.Finalize();
+                return ConvertDataToHexString( Hasher.GetResult(), 16 );
+            }
+            case EHashFunction::SHA1:
+            {
+                sha1_context ctx;
+                sha1_init( &ctx );
+                sha1_starts( &ctx );
+                for( size_t n ; ( n = fread( buf, 1, Min( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                    sha1_update( &ctx, buf, n );
+                uchar output[20];
+                sha1_finish( &ctx, output );
+                sha1_free( &ctx );
+                return ConvertDataToHexString( output, sizeof( output ) );
+            }
+            case EHashFunction::SHA224:
+            {
+                sha224_ctx ctx;
+                sha224_init( &ctx );
+                for( size_t n ; ( n = fread( buf, 1, Min( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                    sha224_update( &ctx, buf, n );
+                uchar output[ SHA224_DIGEST_SIZE ];
+                sha224_final( &ctx, output );
+                return ConvertDataToHexString( output, sizeof( output ) );
+            }
+            case EHashFunction::SHA256:
+            {
+                sha256_ctx ctx;
+                sha256_init(&ctx);
+                for( size_t n ; ( n = fread( buf, 1, Min( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                    sha256_update( &ctx, buf, n );
+                uchar output[ SHA256_DIGEST_SIZE ];
+                sha256_final(&ctx, output);
+                return ConvertDataToHexString( output, sizeof( output ) );
+            }
+            case EHashFunction::SHA384:
+            {
+                sha384_ctx ctx;
+                sha384_init(&ctx);
+                for( size_t n ; ( n = fread( buf, 1, Min( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                    sha384_update( &ctx, buf, n );
+                uchar output[ SHA384_DIGEST_SIZE ];
+                sha384_final(&ctx, output);
+                return ConvertDataToHexString( output, sizeof( output ) );
+            }
+            case EHashFunction::SHA512:
+            {
+                sha512_ctx ctx;
+                sha512_init(&ctx);
+                for( size_t n ; ( n = fread( buf, 1, Min( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                    sha512_update( &ctx, buf, n );
+                uchar output[ SHA512_DIGEST_SIZE ];
+                sha512_final(&ctx, output);
+                return ConvertDataToHexString( output, sizeof( output ) );
+            }
+            default:
+                break;
+        };
+        return "";
+    }
+
+    SString GenerateHashHexStringFromFile( EHashFunctionType hashFunction, const SString& strFilename, int iMaxSize, int iOffset )
+    {
+        FILE* fh = fopen( strFilename, "rb" );
+        if ( fh )
+        {
+            SString strResult = GenerateHashHexStringFromFile( hashFunction, fh, iMaxSize, iOffset );
+            fclose( fh );
+            return strResult;
+        }
+        else
+            return GenerateHashHexString( hashFunction, NULL, 0 );
     }
 
     void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k) {

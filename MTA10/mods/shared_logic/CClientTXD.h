@@ -33,7 +33,7 @@ public:
 
 protected:
     void                            Restream                ( unsigned short usModel );
-    bool                            LoadFileData            ( CBuffer& buffer );
+    bool                            GetFilenameToUse        ( SString& strOutFilename );
 
     SString                         m_strFilename;
     bool                            m_bFilteringEnabled;

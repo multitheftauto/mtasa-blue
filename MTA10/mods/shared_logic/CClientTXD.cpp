@@ -43,10 +43,10 @@ bool CClientTXD::LoadTXD ( const SString& strFile, bool bFilteringEnabled, bool 
     if( !m_bIsRawData )
     {
         m_strFilename = strFile;
-        CBuffer buffer;
-        if ( !LoadFileData( buffer ) )
+        SString strUseFilename;
+        if ( !GetFilenameToUse( strUseFilename ) )
             return false;
-        return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, buffer, m_bFilteringEnabled );
+        return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, strUseFilename, CBuffer(), m_bFilteringEnabled );
     }
     else
     {
@@ -54,7 +54,7 @@ bool CClientTXD::LoadTXD ( const SString& strFile, bool bFilteringEnabled, bool 
         if ( !g_pCore->GetNetwork()->CheckFile( "txd", "", m_FileData ) )
             return false;
 
-        return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, m_FileData, m_bFilteringEnabled );
+        return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled );
     }
 }
 
@@ -75,10 +75,14 @@ bool CClientTXD::Import ( unsigned short usModelID )
         // Load txd file data if not already done
         if ( m_FileData.IsEmpty() )
         {
-            if ( !LoadFileData( m_FileData ) )
+            SString strUseFilename;
+            if ( !GetFilenameToUse( strUseFilename ) )
                 return false;
+            if ( !m_FileData.LoadFromFile( strUseFilename ) )
+                return false;  
         }
         m_bUsingFileDataForClothes = true;
+        // Note: ClothesAddReplacementTxd uses the pointer from m_FileData, so don't touch m_FileData until matching ClothesRemove call
         g_pGame->GetRenderWare ()->ClothesAddReplacementTxd( m_FileData.GetData(), usModelID - CLOTHES_MODEL_ID_FIRST );
         return true;
     }
@@ -89,16 +93,16 @@ bool CClientTXD::Import ( unsigned short usModelID )
         {
             if( !m_bIsRawData )
             {
-                CBuffer buffer;
-                if ( !LoadFileData( buffer ) )
+                SString strUseFilename;
+                if ( !GetFilenameToUse( strUseFilename ) )
                     return false;
-                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, buffer, m_bFilteringEnabled );
+                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, strUseFilename, CBuffer(), m_bFilteringEnabled );
                 if ( m_ReplacementTextures.textures.empty() )
                     return false;
             }
             else
             {
-                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, m_FileData, m_bFilteringEnabled );
+                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled );
                 if ( m_ReplacementTextures.textures.empty() )
                     return false;
             }
@@ -153,36 +157,40 @@ void CClientTXD::Restream ( unsigned short usModelID )
     }
 }
 
-// Load file contents into supplied buffer
-bool CClientTXD::LoadFileData( CBuffer& outBuffer )
+// Return filename to use, or false if not valid
+bool CClientTXD::GetFilenameToUse( SString& strOutFilename )
 {
-    outBuffer.LoadFromFile( m_strFilename );
-    g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strFilename, outBuffer );
-    if ( !g_pCore->GetNetwork()->CheckFile( "txd", m_strFilename, outBuffer ) )
+    g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strFilename, CBuffer() );
+    if ( !g_pCore->GetNetwork()->CheckFile( "txd", m_strFilename, CBuffer() ) )
         return false;
+
+    // Default: use original data
+    strOutFilename = m_strFilename;
 
     // Should we try to reduce the size of this txd?
     if ( g_pCore->GetRightSizeTxdEnabled() )
     {
         // See if previously shrunk result exists
-        SString strLargeSha256 = GenerateSha256HexString( outBuffer.GetData(), outBuffer.GetSize() );
-        SString strShrunkFilename = PathJoin( ExtractPath( m_strFilename ), SString( "_1_%s", *strLargeSha256.Left( 32 ) ) );
-        CBuffer shrunk;
-        shrunk.LoadFromFile( strShrunkFilename );
-        if ( shrunk.GetSize() >= 128 )
+        SString strLargeSha256 = GenerateSha256HexStringFromFile( m_strFilename );
+        SString strShrunkFilename = PathJoin( ExtractPath( m_strFilename ), SString( "_2_%s", *strLargeSha256.Left( 32 ) ) );
+        uint uiShrunkSize = (uint)FileSize( strShrunkFilename );
+        if ( uiShrunkSize >= 128 )
         {
-            // Extract cksum from the end
-            uint uiNewSize = shrunk.GetSize() - 64;
-            SStringX strSmallSha256Check( shrunk.GetData() + uiNewSize, 64 );
-            shrunk.SetSize( uiNewSize );
-            SString strSmallSha256 = GenerateSha256HexString( shrunk.GetData(), shrunk.GetSize() );
+            // Read cksum from the end
+            SString strSmallSha256Check;
+            FileLoad( strShrunkFilename, strSmallSha256Check, 64, uiShrunkSize - 64 );
+
+            // Check cksum
+            SString strSmallSha256 = GenerateHashHexStringFromFile( EHashFunction::SHA256, strShrunkFilename, uiShrunkSize - 64 );
             if ( strSmallSha256Check == strSmallSha256 )
             {
-                // Have valid previous shrunk result
-                if ( IsTXDData( SStringX( shrunk.GetData(), 64 ) ) )
+                // Have valid previous shrunk result?
+                SString headBytes;
+                FileLoad( strShrunkFilename, headBytes, 33 );
+                if ( IsTXDData( headBytes ) )
                 {
                     // Result is: use shrunk data
-                    outBuffer = shrunk;
+                    strOutFilename = strShrunkFilename;
                 }
                 else
                 {
@@ -193,16 +201,17 @@ bool CClientTXD::LoadFileData( CBuffer& outBuffer )
         }
 
         // See if txd should be shrunk
-        if ( g_pGame->GetRenderWare()->RightSizeTxd( outBuffer, strShrunkFilename, 256 ) )
+        if ( g_pGame->GetRenderWare()->RightSizeTxd( m_strFilename, strShrunkFilename, 256 ) )
         {
             // Yes
-            outBuffer.LoadFromFile( strShrunkFilename );
+            strOutFilename = strShrunkFilename;
+            FileAppend( strShrunkFilename, SStringX( "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 12 ) );
             FileAppend( strShrunkFilename, GenerateSha256HexStringFromFile( strShrunkFilename ) );
             AddReportLog( 9400, SString( "RightSized %s(%s) from %d KB => %d KB"
                                             , *ExtractFilename( m_strFilename )
                                             , *strLargeSha256.Left( 8 )
                                             , (uint)FileSize( m_strFilename ) / 1024
-                                            , outBuffer.GetSize() / 1024
+                                            , (uint)FileSize( strShrunkFilename ) / 1024
                                         ) );
         }
         else

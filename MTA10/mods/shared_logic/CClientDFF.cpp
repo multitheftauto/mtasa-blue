@@ -55,17 +55,15 @@ RpClump* CClientDFF::GetLoadedClump ( ushort usModelId )
         // Attempt loading it
         if( !m_bIsRawData ) // We have file
         {
-            CBuffer buffer;
-            buffer.LoadFromFile( m_strDffFilename );
-            g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strDffFilename, buffer );
-            if ( g_pCore->GetNetwork ()->CheckFile ( "dff", m_strDffFilename, buffer ) )
+            if ( g_pCore->GetNetwork ()->CheckFile ( "dff", m_strDffFilename ) )
             {
-                info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( buffer, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
+                g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strDffFilename, CBuffer() );
+                info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( m_strDffFilename, CBuffer(), usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
             }
         }
         else //We have raw data
         {
-            info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( m_RawDataBuffer, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
+            info.pClump = g_pGame->GetRenderWare ()->ReadDFF ( NULL, m_RawDataBuffer, usModelId, CClientVehicleManager::IsValidModel ( usModelId ) );
 
             // Remove raw data from memory (can only do one replace when using raw data)
             m_RawDataBuffer.Clear ();
