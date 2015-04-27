@@ -19,13 +19,13 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFullFilePath, uint uiSize, bool bBold )
+void CDxFontItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality )
 {
     Super::PostConstruct ( pManager );
     m_strFullFilePath = strFullFilePath;
 
     // Initial creation of d3d data
-    CreateUnderlyingData ( uiSize, bBold );
+    CreateUnderlyingData ( uiSize, bBold, ulQuality );
 }
 
 
@@ -89,7 +89,7 @@ void CDxFontItem::OnResetDevice ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::CreateUnderlyingData ( uint uiSize, bool bBold )
+void CDxFontItem::CreateUnderlyingData ( uint uiSize, bool bBold, DWORD ulQuality )
 {
     assert ( !m_pFntNormal );
 
@@ -98,7 +98,7 @@ void CDxFontItem::CreateUnderlyingData ( uint uiSize, bool bBold )
     // Create the D3DX fonts
     FONT_PROPERTIES sFontProps;
     if ( GetFontProperties ( LPCTSTR ( m_strFullFilePath.c_str () ), &sFontProps ) )
-        CCore::GetSingleton ().GetGraphics()->LoadAdditionalDXFont ( m_strFullFilePath, sFontProps.csName, static_cast < int > ( std::floor ( uiSize * 1.75f ) ), bBold, &m_pFntNormal );
+        CCore::GetSingleton ().GetGraphics()->LoadAdditionalDXFont ( m_strFullFilePath, sFontProps.csName, static_cast < int > ( std::floor ( uiSize * 1.75f ) ), bBold, ulQuality, &m_pFntNormal );
 
     if ( !m_pFntNormal )
         return;

@@ -852,12 +852,13 @@ int CLuaFunctionDefs::dxUpdateScreenSource ( lua_State* luaVM )
 int CLuaFunctionDefs::dxCreateFont ( lua_State* luaVM )
 {
 //  element dxCreateFont( string filepath [, int size=9, bool bold=false ] )
-    SString strFilePath; int iSize; bool bBold;
+    SString strFilePath; int iSize; bool bBold; eFontQuality ulFontQuality;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strFilePath );
     argStream.ReadNumber ( iSize, 9 );
     argStream.ReadBool ( bBold, false );
+    argStream.ReadEnumString ( ulFontQuality, FONT_QUALITY_PROOF );
 
     if ( !argStream.HasErrors () )
     {
@@ -871,14 +872,16 @@ int CLuaFunctionDefs::dxCreateFont ( lua_State* luaVM )
             {
                 if ( FileExists ( strPath ) )
                 {
-                    CClientDxFont* pDxFont = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateDxFont ( strPath, iSize, bBold );
-                    if ( pDxFont )
+                    CClientDxFont* pDxFont = g_pClientGame->GetManager()->GetRenderElementManager()->CreateDxFont( strPath, iSize, bBold, ulFontQuality );
+                    
+                    if( pDxFont )
                     {
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                        pDxFont->SetParent ( pParentResource->GetResourceDynamicEntity () );
-                        lua_pushelement ( luaVM, pDxFont );
+                        pDxFont->SetParent( pParentResource->GetResourceDynamicEntity() );
+                        lua_pushelement( luaVM, pDxFont );
                         return 1;
                     }
+                    
                     argStream.SetCustomError( strFilePath, "Error creating font" );
                 }
                 else

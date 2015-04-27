@@ -1140,8 +1140,7 @@ bool CGraphics::CreateStandardDXFontWithCustomScale ( eFontType fontType, float 
     return true;
 }
 
-
-bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont )
+bool CGraphics::LoadAdditionalDXFont( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality, ID3DXFont** ppD3DXFont )
 {
     int iLoaded = AddFontResourceEx ( strFontPath.c_str (), FR_PRIVATE, 0 );
 
@@ -1151,7 +1150,7 @@ bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strF
     bool bSuccess = true;
     // Normal size
     if( !SUCCEEDED ( D3DXCreateFont ( m_pDevice, uiHeight, 0, iWeight, 1,
-        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
+        FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ulQuality, DEFAULT_PITCH | FF_DONTCARE, strFontName.c_str(),
         ppD3DXFont ) ) )
     {
         WriteErrorEvent( SString( "Could not create Direct3D font '%s'", strFontName.c_str() ) );
@@ -1159,6 +1158,12 @@ bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strF
     }
 
     return bSuccess && ( iLoaded == 1 );
+}
+
+
+bool CGraphics::LoadAdditionalDXFont ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont )
+{
+    return this->LoadAdditionalDXFont( strFontPath, strFontName, uiHeight, bBold, PROOF_QUALITY, ppD3DXFont );
 }
 
 bool CGraphics::DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont *pD3DXFont )

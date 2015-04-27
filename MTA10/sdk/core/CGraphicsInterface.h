@@ -33,6 +33,25 @@ enum eFontType
     NUM_FONTS
 };
 
+enum eFontQuality
+{
+    FONT_QUALITY_DEFAULT = DEFAULT_QUALITY,
+    FONT_QUALITY_DRAFT = DRAFT_QUALITY,
+    FONT_QUALITY_PROOF = PROOF_QUALITY,
+
+#if( WINVER >= 0x0400 )
+    FONT_QUALITY_NONANTIALIASED = NONANTIALIASED_QUALITY,
+    FONT_QUALITY_ANTIALIASED = ANTIALIASED_QUALITY,
+#endif
+
+#if( _WIN32_WINNT >= _WIN32_WINNT_WINXP )
+    FONT_QUALITY_CLEARTYPE = CLEARTYPE_QUALITY,
+    FONT_QUALITY_CLEARTYPE_NATURAL = CLEARTYPE_NATURAL_QUALITY,
+#endif
+
+    NUM_QUALITIES
+};
+
 namespace EBlendMode
 {
     enum EBlendModeType
@@ -78,6 +97,7 @@ public:
     virtual float                   GetDXTextExtent     ( const char * szText, float fScale = 1.0f, ID3DXFont * pDXFont = NULL, bool bColorCoded = false ) = 0;
 
     virtual bool                    LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont ) = 0;
+    virtual bool                    LoadAdditionalDXFont    ( std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality, ID3DXFont** ppD3DXFont ) = 0;
     virtual bool                    DestroyAdditionalDXFont ( std::string strFontPath, ID3DXFont* pD3DXFont ) = 0;
 
     virtual ID3DXFont *             GetFont             ( eFontType fontType = FONT_DEFAULT, float* pfOutScaleUsed = NULL, float fRequestedScale = 1, const char* szCustomScaleUser = NULL ) = 0;
