@@ -26,15 +26,12 @@
 // Returns true if shrunk file was written
 //
 /////////////////////////////////////////////////////////////////////////////
-bool CRenderWareSA::RightSizeTxd( const CBuffer& inTxd, const SString& strOutTxdFilename, uint uiSizeLimit )
+bool CRenderWareSA::RightSizeTxd( const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit )
 {
     //
     // Read txd from memory
     //
-    RwBuffer buffer;
-    buffer.ptr = (void*)inTxd.GetData();
-    buffer.size = inTxd.GetSize();
-    RwStream* pStream = RwStreamOpen( STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer );
+    RwStream* pStream = RwStreamOpen( STREAM_TYPE_FILENAME, STREAM_MODE_READ, *strInTxdFilename );
     if ( pStream == NULL )
         return false;
 
@@ -68,6 +65,12 @@ bool CRenderWareSA::RightSizeTxd( const CBuffer& inTxd, const SString& strOutTxd
             RwTextureDestroy( pTexture );
             RwTexDictionaryAddTexture( pTxd, pNewRwTexture );
             bChanged = true;
+        }
+        else
+        {
+            // Keep texture (Reinsert to preserve order for easier debugging)
+            RwTexDictionaryRemoveTexture( pTxd, pTexture );
+            RwTexDictionaryAddTexture( pTxd, pTexture );
         }
     }
 
@@ -115,15 +118,13 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
     uint uiWidth = pRaster->width;
     uint uiHeight = pRaster->height;
     D3DFORMAT d3dFormat = pD3DRaster->format;
-    void* pBits = pD3DRaster->lockedRect.pBits;
-    int iPitch = pD3DRaster->lockedRect.Pitch;
     bool bHasAlpha = pD3DRaster->alpha != 0;
     bool bIsCubeTexture = ( pD3DRaster->cubeTextureFlags & 0x01 ) != 0;
-    bool bHasMipMaps = pRaster->depth != 1;
+    bool bHasMipMaps = ( pRaster->numLevels > 1 );
     bool bIsCompressed = ( pD3DRaster->textureFlags & 0x10 ) != 0;
 
     // Check we can do this
-    if ( bHasMipMaps || bIsCubeTexture || !bIsCompressed )
+    if ( bIsCubeTexture || !bIsCompressed )
         return NULL;
 
     // Only process DXT formats
@@ -136,9 +137,21 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
     if ( uiReqWidth == uiWidth && uiReqHeight == uiHeight )
         return NULL;
 
+    // Lock mip level 0 if required
+    D3DLOCKED_RECT lockedRect = pD3DRaster->lockedRect;
+    bool bNeedOwnLock = ( pD3DRaster->lockedLevel != 0 ) || !pD3DRaster->lockedSurface;
+    if ( bNeedOwnLock )
+        if ( FAILED( pD3DRaster->texture->LockRect( 0, &lockedRect, NULL, D3DLOCK_NO_DIRTY_UPDATE | D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY ) ) )
+            return NULL;
+
     // Try resize
     CBuffer newPixelBuffer;
-    if ( !g_pCore->GetGraphics()->ResizeTextureData( pBits, iPitch, uiWidth, uiHeight, d3dFormat, uiReqWidth, uiReqHeight, newPixelBuffer ) )
+    bool bDidResize = g_pCore->GetGraphics()->ResizeTextureData( lockedRect.pBits, lockedRect.Pitch, uiWidth, uiHeight, d3dFormat, uiReqWidth, uiReqHeight, newPixelBuffer );
+
+    if ( bNeedOwnLock )
+        pD3DRaster->texture->UnlockRect( 0 );
+
+    if ( !bDidResize )
         return NULL;
 
     // Make new RwTexture from pixels
@@ -150,7 +163,7 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
     header.TextureFormat.vAddressing = ( pTexture->flags & 0xf000 ) >> 12;
     memcpy( header.TextureFormat.name, pTexture->name, 32 );
     memcpy( header.TextureFormat.maskName, pTexture->mask, 32 );
-    header.RasterFormat.rasterFormat = pRaster->format << 8;    // ( dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300 ) | 0x00008000 mipmaps?
+    header.RasterFormat.rasterFormat = ( pRaster->format & 0x0f ) << 8;    // ( dxt1 = 0x00000100 or 0x00000200 / dxt3 = 0x00000300 ) | 0x00008000 mipmaps?
     header.RasterFormat.d3dFormat = pD3DRaster->format;
     header.RasterFormat.width = uiReqWidth;
     header.RasterFormat.height = uiReqHeight;

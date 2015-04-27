@@ -22,9 +22,8 @@ struct RwD3D9Raster
     unsigned char       *palette;
     unsigned char        alpha;
     unsigned char        cubeTextureFlags; /* 0x01 IS_CUBEMAP_TEX */
-    unsigned char        textureFlags;     /* 0x01 HAS_MIP_MAPS
-                                                0x10 IS_COMPRESSED */
-    unsigned char        lockFlags;
+    unsigned char        textureFlags;     /* 0x10 IS_COMPRESSED */
+    unsigned char        lockedLevel;
     IDirect3DSurface9   *lockedSurface;
     D3DLOCKED_RECT       lockedRect;
     D3DFORMAT            format;

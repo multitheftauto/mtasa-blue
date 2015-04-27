@@ -778,10 +778,19 @@ void SharedUtil_Hash_Tests ( void )
         TEST_END
     }
 
+    #define szTempFilename "hash_""\xD0""\x98""_test"
+
     // MD5
     {
         TEST_FUNCTION
             SString strResult = CMD5Hasher::CalculateHexString( a.c_str(), a.length() );
+            assert ( strResult == result );
+
+            strResult = GenerateHashHexString( EHashFunction::MD5, a );
+            assert ( strResult == result );
+
+            FileSave( szTempFilename, a );
+            strResult = GenerateHashHexStringFromFile( EHashFunction::MD5, szTempFilename );
             assert ( strResult == result );
         TEST_VARS
             const SString a;
@@ -798,6 +807,10 @@ void SharedUtil_Hash_Tests ( void )
         TEST_FUNCTION
             SString strResult = GenerateSha256HexString( a );
             assert ( strResult == result );
+
+            FileSave( szTempFilename, a );
+            strResult = GenerateHashHexStringFromFile( EHashFunction::SHA256, szTempFilename );
+            assert ( strResult == result );
         TEST_VARS
             const SString a;
             const char* result;
@@ -812,6 +825,10 @@ void SharedUtil_Hash_Tests ( void )
     {
         TEST_FUNCTION
             SString strResult = GenerateHashHexString( EHashFunction::SHA1, a );
+            assert ( strResult == result );
+
+            FileSave( szTempFilename, a );
+            strResult = GenerateHashHexStringFromFile( EHashFunction::SHA1, szTempFilename );
             assert ( strResult == result );
         TEST_VARS
             const SString a;
@@ -828,6 +845,10 @@ void SharedUtil_Hash_Tests ( void )
         TEST_FUNCTION
             SString strResult = GenerateHashHexString( EHashFunction::SHA224, a );
             assert ( strResult == result );
+
+            FileSave( szTempFilename, a );
+            strResult = GenerateHashHexStringFromFile( EHashFunction::SHA224, szTempFilename );
+            assert ( strResult == result );
         TEST_VARS
             const SString a;
             const char* result;
@@ -842,6 +863,10 @@ void SharedUtil_Hash_Tests ( void )
     {
         TEST_FUNCTION
             SString strResult = GenerateHashHexString( EHashFunction::SHA384, a );
+            assert ( strResult == result );
+
+            FileSave( szTempFilename, a );
+            strResult = GenerateHashHexStringFromFile( EHashFunction::SHA384, szTempFilename );
             assert ( strResult == result );
         TEST_VARS
             const SString a;
@@ -858,6 +883,10 @@ void SharedUtil_Hash_Tests ( void )
         TEST_FUNCTION
             SString strResult = GenerateHashHexString( EHashFunction::SHA512, a );
             assert ( strResult == result );
+
+            FileSave( szTempFilename, a );
+            strResult = GenerateHashHexStringFromFile( EHashFunction::SHA512, szTempFilename );
+            assert ( strResult == result );
         TEST_VARS
             const SString a;
             const char* result;
@@ -868,4 +897,5 @@ void SharedUtil_Hash_Tests ( void )
         TEST_END
     }
 
+    FileDelete( szTempFilename );
 }

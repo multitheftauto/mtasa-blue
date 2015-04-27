@@ -33,7 +33,7 @@ public:
                         CRenderWareSA               ( enum eGameVersion version );
                         ~CRenderWareSA              ( void );
     void                Initialize                  ( void );
-    bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const CBuffer& fileData, bool bFilteringEnabled );
+    bool                ModelInfoTXDLoadTextures    ( SReplacementTextures* pReplacementTextures, const SString& strFilename, const CBuffer& fileData, bool bFilteringEnabled );
     bool                ModelInfoTXDAddTextures     ( SReplacementTextures* pReplacementTextures, ushort usModelId );
     void                ModelInfoTXDRemoveTextures  ( SReplacementTextures* pReplacementTextures );
     void                ClothesAddReplacementTxd    ( char* pFileData, ushort usFileId );
@@ -41,10 +41,10 @@ public:
     bool                HasClothesReplacementChanged( void );
 
     // Reads and parses a TXD file specified by a path (szTXD)
-    RwTexDictionary *   ReadTXD                     ( const CBuffer& fileData );
+    RwTexDictionary *   ReadTXD                     ( const SString& strFilename, const CBuffer& fileData );
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    RpClump *           ReadDFF                     ( const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions );
+    RpClump *           ReadDFF                     ( const SString& strFilename, const CBuffer& fileData, unsigned short usModelID, bool bLoadEmbeddedCollisions );
 
     // Destroys a DFF instance
     void                DestroyDFF                  ( RpClump * pClump );
@@ -105,7 +105,7 @@ public:
     void                AppendSubtractiveMatch      ( CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch );
     void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity );
     void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem );
-    bool                RightSizeTxd                ( const CBuffer& inTxd, const SString& strOutTxdFilename, uint uiSizeLimit );
+    bool                RightSizeTxd                ( const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit );
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture            ( RwTexture* pTexture, uint uiSizeLimit );

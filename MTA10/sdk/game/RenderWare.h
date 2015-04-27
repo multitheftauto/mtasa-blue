@@ -208,7 +208,7 @@ struct RwRaster
     unsigned char   *pixels;               // 4
     unsigned char   *palette;              // 8
     int             width, height, depth;  // 12, 16 / 0x10, 20
-    int             stride;                // 24 / 0x18
+    int             numLevels;             // 24 / 0x18
     short           u, v;
     unsigned char   type;
     unsigned char   flags;
@@ -216,7 +216,7 @@ struct RwRaster
     unsigned char   format;
     unsigned char   *origPixels;
     int             origWidth, origHeight, origDepth;
-    void*           renderResource;
+    void*           renderResource;         // RwD3D9Raster continues from here
 };
 struct RwColorFloat
 {

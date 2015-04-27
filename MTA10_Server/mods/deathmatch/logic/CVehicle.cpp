@@ -137,7 +137,7 @@ CVehicle::~CVehicle ( void )
                     pPlayer->SetOccupiedVehicle ( NULL, 0 );
                     pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
 
-                    // Tell everyone he can has exited the vehicle
+                    // Tell everyone he has exited the vehicle
                     CVehicleInOutPacket Reply ( GetID ( ), ucOccupiedSeat, CGame::VEHICLE_NOTIFY_OUT_RETURN );
                     Reply.SetSourceElement ( pPlayer );
                     g_pGame->GetPlayerManager ( )->BroadcastOnlyJoined ( Reply );

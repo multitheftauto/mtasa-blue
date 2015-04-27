@@ -80,14 +80,14 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo ( ushort usModelId )
 // Load textures from a TXD file
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderWareSA::ModelInfoTXDLoadTextures ( SReplacementTextures* pReplacementTextures, const CBuffer& fileData, bool bFilteringEnabled )
+bool CRenderWareSA::ModelInfoTXDLoadTextures ( SReplacementTextures* pReplacementTextures, const SString& strFilename, const CBuffer& fileData, bool bFilteringEnabled )
 {
     // Are we already loaded?
     if ( !pReplacementTextures->textures.empty () )
         return false;
 
     // Try to load it
-    RwTexDictionary* pTxd = ReadTXD ( fileData );
+    RwTexDictionary* pTxd = ReadTXD ( strFilename, fileData );
     if ( pTxd )
     {
         // Get the list of textures into our own list

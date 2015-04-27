@@ -2012,6 +2012,7 @@ bool CGraphics::CopyDataToSurface( IDirect3DSurface9* pSurface, const uchar* pDa
     uint uiLineWidthBytes = SurfDesc.Width * CRenderItemManager::GetBitsPerPixel( SurfDesc.Format ) / 8;
 
     // Check pitch is not too small (i.e from a mipmap level)
+    uiDataPitch /= CRenderItemManager::GetPitchDivisor( SurfDesc.Format );
     if ( uiDataPitch < uiLineWidthBytes )
         return false;
 
@@ -2019,7 +2020,6 @@ bool CGraphics::CopyDataToSurface( IDirect3DSurface9* pSurface, const uchar* pDa
     if ( FAILED( pSurface->LockRect( &LockedRect, NULL, D3DLOCK_NOSYSLOCK ) ) )
         return false;
 
-    uiDataPitch /= CRenderItemManager::GetPitchDivisor( SurfDesc.Format );
     uint uiSurfPitch = LockedRect.Pitch / CRenderItemManager::GetPitchDivisor( SurfDesc.Format );
     BYTE* pSurfBits = (BYTE*)LockedRect.pBits;
 
@@ -2058,7 +2058,7 @@ bool CGraphics::CopyDataFromSurface( IDirect3DSurface9* pSurface, CBuffer& outBu
     pSurface->GetDesc( &SurfDesc );
 
     D3DLOCKED_RECT LockedRect;
-    if ( FAILED( pSurface->LockRect( &LockedRect, NULL, D3DLOCK_NOSYSLOCK ) ) )
+    if ( FAILED( pSurface->LockRect( &LockedRect, NULL, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY ) ) )
         return false;
 
     uint uiSurfPitch = LockedRect.Pitch / CRenderItemManager::GetPitchDivisor( SurfDesc.Format );
