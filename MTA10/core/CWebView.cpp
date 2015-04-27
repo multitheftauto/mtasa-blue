@@ -107,6 +107,7 @@ bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled, const SStri
         auto request = CefRequest::Create ();
         auto postData = CefPostData::Create ();
         auto postDataElement = CefPostDataElement::Create ();
+        postDataElement->SetToBytes ( strPostData.size (), strPostData.c_str () );
         postData->AddElement ( postDataElement );
 
         if ( bURLEncoded )
@@ -115,7 +116,6 @@ bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled, const SStri
             headerMap.insert ( std::make_pair ( "Content-Type", "application/x-www-form-urlencoded" ) );
             headerMap.insert ( std::make_pair ( "Content-Length", std::to_string ( strPostData.size () ) ) );
             //headerMap.insert ( std::make_pair ( "Connection", "close" ) );
-            postDataElement->SetToBytes ( strPostData.size (), strPostData.c_str () );
             request->SetHeaderMap ( headerMap );
         }
 
