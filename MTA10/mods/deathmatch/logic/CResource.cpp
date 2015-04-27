@@ -364,13 +364,8 @@ void CResource::Load ( CClientEntity *pRootEntity )
         else
         if ( pResourceFile->IsAutoDownload() )
         {
-            // Load the file
-            std::vector < char > buffer;
-            FileLoad ( pResourceFile->GetName (), buffer );
-            unsigned int iSize = buffer.size();
-
-            // Check the contents
-            if ( iSize > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), iSize ) == pResourceFile->GetServerChecksum () )
+            // Check the file contents
+            if ( CChecksum::GenerateChecksumFromFile ( pResourceFile->GetName () ) == pResourceFile->GetServerChecksum () )
             {
                 SString strError = "";
                 bool bIsBad = CheckFileForCorruption ( pResourceFile->GetName ( ), strError );
