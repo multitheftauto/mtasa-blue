@@ -27,7 +27,7 @@ public:
     inline CWebViewInterface*   GetWebView          ()    { return m_pWebView; }
 
     bool                        IsLoading           ();
-    bool                        LoadURL             ( const SString& strURL, bool bFilterEnabled = true );
+    bool                        LoadURL             ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString() );
     void                        GetTitle            ( SString& outPageTitle );
     void                        GetURL              ( SString& outURL );
     void                        SetRenderingPaused  ( bool bPaused );
@@ -72,7 +72,7 @@ private:
 class CClientGUIWebBrowser : public CClientGUIElement
 {
 public:
-    CClientGUIWebBrowser ( bool isLocal, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID = INVALID_ELEMENT_ID );
+    CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID = INVALID_ELEMENT_ID );
 
     inline CClientWebBrowser* GetBrowser () { return m_pBrowser.get (); }
 

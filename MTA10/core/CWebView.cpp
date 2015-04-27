@@ -79,7 +79,7 @@ void CWebView::CloseBrowser ()
         m_pWebView->GetHost ()->CloseBrowser ( true );
 }
 
-bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled )
+bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled, const SString& strPostData )
 {
     if ( !m_pWebView )
         return false;
@@ -93,7 +93,28 @@ bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled )
         return false;
 
     // Load it!
-    m_pWebView->GetMainFrame ()->LoadURL ( strURL );
+    auto pFrame = m_pWebView->GetMainFrame ();
+    if ( strPostData.empty () )
+    {
+        pFrame->LoadURL ( strURL );
+    }
+    else
+    {
+        // Load URL first, see https://bitbucket.org/chromiumembedded/cef/issue/579
+        pFrame->LoadURL ( "about:blank" );
+
+        // Perform HTTP POST
+        auto request = CefRequest::Create ();
+        auto postData = CefPostData::Create ();
+        auto postDataElement = CefPostDataElement::Create ();
+        postDataElement->SetToBytes ( strPostData.size (), strPostData.c_str () );
+        postData->AddElement ( postDataElement );
+
+        request->SetURL ( strURL );
+        request->SetMethod ( "post" );
+        request->SetPostData ( postData );
+        pFrame->LoadRequest ( request );
+    }
    
     return true;
 }

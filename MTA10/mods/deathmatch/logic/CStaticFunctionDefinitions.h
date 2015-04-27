@@ -396,7 +396,7 @@ public:
     static CClientGUIElement*           GUICreateRadioButton                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
     static CClientGUIElement*           GUICreateStaticImage                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strFile, bool bRelative, CClientGUIElement* pParent );
     static CClientGUIElement*           GUICreateComboBox                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateBrowser                    ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bIsLocal, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateBrowser                    ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bIsLocal, bool bIsTransparent, bool bRelative, CClientGUIElement* pParent );
 
     
     static bool                         GUIStaticImageLoadImage             ( CClientEntity& Element, const SString& strDir );

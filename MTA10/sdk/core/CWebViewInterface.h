@@ -20,7 +20,7 @@ class CWebViewInterface
 public:
     virtual void Initialise         () = 0;
     virtual void SetWebBrowserEvents( CWebBrowserEventsInterface* pInterface ) = 0;
-    virtual bool LoadURL            ( const SString& strURL, bool bFilterEnabled = true ) = 0;
+    virtual bool LoadURL            ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString() ) = 0;
     virtual bool IsLoading          () = 0;
     virtual void SetBeingDestroyed  ( bool state ) = 0;
     

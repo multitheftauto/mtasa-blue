@@ -50,9 +50,9 @@ bool CClientWebBrowser::IsLoading ()
     return m_pWebView->IsLoading ();
 }
 
-bool CClientWebBrowser::LoadURL ( const SString& strURL, bool bFilterEnabled )
+bool CClientWebBrowser::LoadURL ( const SString& strURL, bool bFilterEnabled, const SString& strPostData )
 {
-    return m_pWebView->LoadURL ( strURL, bFilterEnabled );
+    return m_pWebView->LoadURL ( strURL, bFilterEnabled, strPostData );
 }
 
 void CClientWebBrowser::GetTitle ( SString& outPageTitle )
@@ -230,8 +230,8 @@ bool CClientWebBrowser::Events_OnResourcePathCheck ( SString& strURL )
 
 
 
-CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) 
+CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) 
     : CClientGUIElement ( pManager, pLuaMain, pCGUIElement, ID )
 {
-    m_pBrowser = std::unique_ptr < CClientWebBrowser > ( g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, isLocal, false ) );
+    m_pBrowser = std::unique_ptr < CClientWebBrowser > ( g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, isLocal, isTransparent ) );
 }

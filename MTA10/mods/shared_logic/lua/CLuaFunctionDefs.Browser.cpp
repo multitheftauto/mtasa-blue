@@ -77,19 +77,20 @@ int CLuaFunctionDefs::RequestBrowserDomains ( lua_State* luaVM )
 
 int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
 {
-//  bool loadBrowserURL(browser webBrowser, string url)
-    CClientWebBrowser* pWebBrowser; SString strURL;
+//  bool loadBrowserURL ( browser webBrowser, string url [, string postData = "" ] )
+    CClientWebBrowser* pWebBrowser; SString strURL; SString strPostData;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
     argStream.ReadString ( strURL );
+    argStream.ReadString ( strPostData, "" );
 
     if ( !argStream.HasErrors () )
     {
         // Are we dealing with a remote website?
         if ( strURL.substr ( 0, 7 ) == "http://" || strURL.substr ( 0, 8 ) == "https://" )
         {
-            lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, true ) );
+            lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, true, strPostData ) );
             return 1;
         }
 
@@ -103,7 +104,7 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( strURL, pResource, strAbsPath ) && pWebBrowser->IsLocal () )
             {
                 pWebBrowser->SetTempURL ( strURL );
-                lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( "mtalocal://" + strURL, false ) );
+                lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( "mtalocal://" + strURL, false, strPostData ) );
                 return 1;
             }
         }
@@ -463,8 +464,8 @@ int CLuaFunctionDefs::GetBrowserProperty ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
 {
-//  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; bool bIsLocal; bool bIsRelative; CClientGUIElement* parent;
+//  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil] )
+    float x; float y; float width; float height; bool bIsLocal; bool bIsTransparent; bool bIsRelative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( x );
@@ -472,6 +473,7 @@ int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
     argStream.ReadNumber ( width );
     argStream.ReadNumber ( height );
     argStream.ReadBool ( bIsLocal );
+    argStream.ReadBool ( bIsTransparent );
     argStream.ReadBool ( bIsRelative );
     argStream.ReadUserData ( parent, nullptr );
 
@@ -486,7 +488,7 @@ int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, x, y, width, height, bIsLocal, bIsRelative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, x, y, width, height, bIsLocal, bIsTransparent, bIsRelative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
