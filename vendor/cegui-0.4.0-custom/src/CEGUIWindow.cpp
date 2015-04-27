@@ -3836,6 +3836,9 @@ void Window::onHidden(WindowEventArgs& e)
 {
 	requestRedraw();
 	fireEvent(EventHidden, e, EventNamespace);
+
+    // Fix by MTA: Deactivate to stop retrieving input
+    deactivate();
 }
 
 
