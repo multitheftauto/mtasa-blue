@@ -60,6 +60,7 @@ public:
     void                DoEventQueuePulse   ();
     
     eURLState           GetURLState         ( const SString& strURL );
+    SString             GetDomainFromURL   ( const SString& strURL );
     void                ResetFilter         ( bool bResetRequestsOnly = true );
     void                InitialiseWhiteAndBlacklist ( bool bAddHardcoded = true, bool bAddDynamic = true );
     void                AddAllowedPage      ( const SString& strURL, eWebFilterType filterType );

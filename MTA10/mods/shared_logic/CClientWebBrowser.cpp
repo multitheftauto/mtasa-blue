@@ -141,6 +141,14 @@ void CClientWebBrowser::Events_OnCreated ()
     CallEvent ( "onClientBrowserCreated", Arguments, false );
 }
 
+void CClientWebBrowser::Events_OnLoadingStart ( const SString& strURL, bool bMainFrame )
+{
+    CLuaArguments Arguments;
+    Arguments.PushString ( strURL );
+    Arguments.PushBoolean ( bMainFrame );
+    CallEvent ( "onClientBrowserLoadingStart", Arguments, false );
+}
+
 void CClientWebBrowser::Events_OnDocumentReady ( const SString& strURL )
 {
     CLuaArguments Arguments;
@@ -157,11 +165,11 @@ void CClientWebBrowser::Events_OnLoadingFailed ( const SString& strURL, int erro
     CallEvent ( "onClientBrowserLoadingFailed", Arguments, false );
 }
 
-void CClientWebBrowser::Events_OnNavigate ( const SString& strURL, bool bMainFrame )
+void CClientWebBrowser::Events_OnNavigate ( const SString& strURL, bool bIsBlocked )
 {
     CLuaArguments Arguments;
     Arguments.PushString ( strURL );
-    Arguments.PushBoolean ( bMainFrame );
+    Arguments.PushBoolean ( bIsBlocked );
     CallEvent ( "onClientBrowserNavigate", Arguments, false );
 }
 

@@ -218,6 +218,15 @@ eURLState CWebCore::GetURLState ( const SString& strURL )
     return eURLState::WEBPAGE_NOT_LISTED;
 }
 
+SString CWebCore::GetDomainFromURL ( const SString& strURL )
+{
+    CefURLParts urlParts;
+    if ( !CefParseURL ( strURL, urlParts ) )
+        return "";
+
+    return UTF16ToMbUTF8 ( urlParts.host.str );
+}
+
 void CWebCore::ResetFilter ( bool bResetRequestsOnly )
 {
     std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );

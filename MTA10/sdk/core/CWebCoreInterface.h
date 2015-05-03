@@ -55,6 +55,7 @@ public:
     virtual void                DoEventQueuePulse   () = 0;
     
     virtual eURLState           GetURLState        ( const SString& strURL ) = 0;
+    virtual SString             GetDomainFromURL   ( const SString& strURL ) = 0;
     virtual void                ResetFilter        ( bool bResetRequestsOnly ) = 0;
     //virtual void                AddAllowedPage     ( const SString& strURL ) = 0;
     virtual void                RequestPages       ( const std::vector<SString>& pages ) = 0;

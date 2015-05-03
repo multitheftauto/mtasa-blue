@@ -452,8 +452,8 @@ void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
         return;
 
     // Queue event to run on the main thread
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, strURL, frame->IsMain () );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadStart" );
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnLoadingStart, m_pEventsInterface, strURL, frame->IsMain () );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadingStart" );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -510,22 +510,26 @@ bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFram
     if ( !CefParseURL ( request->GetURL(), urlParts ) )
         return true; // Cancel if invalid URL (this line will normally not be executed)
     
+    bool bResult;
     WString scheme = urlParts.scheme.str;
     if ( scheme == L"http" || scheme == L"https" )
     {
-        if ( IsLocal () )
-            return true; // Block remote here requests generally
-
-        if ( g_pCore->GetWebCore ()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
-            return true;
-
-        return false;
+        if ( IsLocal () || g_pCore->GetWebCore ()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
+            bResult = true; // Block remote here
+        else
+            bResult = false; // Allow
     }
     else if ( scheme == L"mtalocal" )
-        return false;
+        bResult = false; // Allow mtalocal:// URLs
+    else
+        bResult = true; // Block other schemes
     
-    // Block everything else
-    return true;
+    // Queue event to run on the main thread
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, SString ( request->GetURL () ), bResult );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnNavigate" );
+
+    // Return execution to CEF
+    return bResult;
 }
 
 ////////////////////////////////////////////////////////////////////
