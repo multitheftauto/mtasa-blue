@@ -55,14 +55,24 @@ int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
 
 int CLuaFunctionDefs::RequestBrowserDomains ( lua_State* luaVM )
 {
-//  bool requestBrowserDomains ( table domains )
-    std::vector<SString> pages;
+//  bool requestBrowserDomains ( table domains, bool isURL )
+    std::vector<SString> pages; bool bIsURL;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadStringTable ( pages );
+    argStream.ReadBool ( bIsURL, false );
 
     if ( !argStream.HasErrors () )
     {
+        // Convert to domains if we got a list of URLs
+        if ( bIsURL )
+        {
+            for ( auto& strURL : pages )
+            {
+                strURL = g_pCore->GetWebCore ()->GetDomainFromURL ( strURL );
+            }
+        }
+
         g_pCore->GetWebCore ()->RequestPages ( pages );
         // Todo: Add a callback or event to check if the pagerequest dialog was successfully done
         lua_pushboolean ( luaVM, true );
