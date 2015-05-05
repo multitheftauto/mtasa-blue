@@ -258,7 +258,7 @@ CGame::~CGame ( void )
     // Disconnect all players
     std::list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
     for ( ; iter != m_pPlayerManager->IterEnd (); iter++ )
-        DisconnectPlayer ( this, **iter, CPlayerDisconnectedPacket::NO_REASON );
+        DisconnectPlayer ( this, **iter, CPlayerDisconnectedPacket::SHUTDOWN );
 
     // Stop networking
     Stop ();

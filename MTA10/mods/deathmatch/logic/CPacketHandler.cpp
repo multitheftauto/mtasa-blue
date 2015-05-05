@@ -559,6 +559,9 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             strReason = "%s"; strErrorCode = _E("CD48"); // Custom disconnect reason
             bExpectExtraString = true;
             break;
+        case ePlayerDisconnectType::SHUTDOWN:
+            strReason = _("Disconnected: Server shutdown or restarting"); strErrorCode = _E("CD49");
+            break;
         default: break;
     }
 

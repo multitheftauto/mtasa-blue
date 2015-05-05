@@ -46,7 +46,8 @@ class CPacketHandler
         CONNECTION_DESYNC,
         BAN,
         KICK,
-        CUSTOM
+        CUSTOM,
+        SHUTDOWN
     };
 
     struct SEntityDependantStuff

@@ -40,7 +40,8 @@ public:
         CONNECTION_DESYNC,
         BAN,
         KICK,
-        CUSTOM
+        CUSTOM,
+        SHUTDOWN
     };
 
                             CPlayerDisconnectedPacket   ( const char* szReason );
