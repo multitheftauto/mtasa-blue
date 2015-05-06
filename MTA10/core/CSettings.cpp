@@ -1151,6 +1151,11 @@ void CSettings::CreateGUI ( void )
         m_pChatCssBackground->SetPosition ( CVector2D ( 10.0f, 350.0f ) );
         m_pChatCssBackground->GetPosition ( vecTemp );
         m_pChatCssBackground->AutoSize ( NULL, 20.0f );
+
+        m_pChatAutocomplete = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabInterface, _( "Nickname autocomplete with TAB" ) ) );
+        m_pChatAutocomplete->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
+        m_pChatAutocomplete->GetPosition ( vecTemp );
+        m_pChatAutocomplete->AutoSize ( NULL, 20.0f );
     }
 
     /**
@@ -2976,6 +2981,7 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "chat_width", strVar ); m_pChatWidth->SetText ( strVar.c_str () );
     CVARS_GET ( "chat_css_style_text", bVar ); m_pChatCssText->SetSelected ( bVar );
     CVARS_GET ( "chat_css_style_background", bVar ); m_pChatCssBackground->SetSelected ( bVar );
+    CVARS_GET ( "chat_autocomplete", bVar ); m_pChatAutocomplete->SetSelected ( bVar );
 
     {
         int iVar;
@@ -3276,6 +3282,7 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "chat_width", m_pChatWidth->GetText () );
     CVARS_SET ( "chat_css_style_text", m_pChatCssText->GetSelected () );
     CVARS_SET ( "chat_css_style_background", m_pChatCssBackground->GetSelected () );
+    CVARS_SET ( "chat_autocomplete", m_pChatAutocomplete->GetSelected () );
     CVARS_SET ( "chat_line_life", GetMilliseconds ( m_pChatLineLife ) );
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
 

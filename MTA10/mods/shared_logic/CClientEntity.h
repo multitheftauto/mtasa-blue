@@ -187,7 +187,7 @@ public:
     };
     bool                                        CanUpdateSync           ( unsigned char ucRemote );
 
-    inline const char*                          GetName                 ( void )                    { return m_strName; }
+    inline SString                              GetName                 ( void )                    { return m_strName; }
     inline void                                 SetName                 ( const char* szName )      { m_strName.AssignLeft ( szName, MAX_ELEMENT_NAME_LENGTH ); }
 
     inline const char*                          GetTypeName             ( void )                    { return m_strTypeName; };

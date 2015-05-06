@@ -32,6 +32,7 @@ public:
     //virtual bool    ProcessInput                ( CInputMessage* pInputMessage ) = 0  *TODO*
 
     virtual bool    HandleException             ( CExceptionInformation* pExceptionInformation ) = 0;
+    virtual void    GetPlayerNames              ( std::vector<SString> &vPlayerNames ) = 0;
 };
 
 #endif
