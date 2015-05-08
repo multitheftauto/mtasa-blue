@@ -109,7 +109,7 @@ int CLuaFunctionDefs::GetAccountData ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CLuaArgument * pArgument = CStaticFunctionDefinitions::GetAccountData ( pAccount, strKey );
+        auto pArgument = CStaticFunctionDefinitions::GetAccountData ( pAccount, strKey );
         if ( pArgument )
         {
             pArgument->Push ( luaVM );

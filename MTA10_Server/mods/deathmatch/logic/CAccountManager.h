@@ -127,7 +127,7 @@ public:
     inline bool                 IsAutoLoginEnabled          ( void )                    { return m_bAutoLogin; }
     inline void                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; }
 
-    CLuaArgument*               GetAccountData              ( CAccount* pAccount, const char* szKey );
+    std::shared_ptr<CLuaArgument> GetAccountData              ( CAccount* pAccount, const char* szKey );
     bool                        SetAccountData              ( CAccount* pAccount, const char* szKey, const SString& strValue, int iType );
     bool                        CopyAccountData             ( CAccount* pFromAccount, CAccount* pToAccount );
     bool                        GetAllAccountData           ( CAccount* pAccount, lua_State* pLua );

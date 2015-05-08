@@ -11047,7 +11047,7 @@ bool CStaticFunctionDefinitions::IsGuestAccount ( CAccount* pAccount, bool& bGue
 }
 
 
-CLuaArgument* CStaticFunctionDefinitions::GetAccountData ( CAccount* pAccount, const char* szKey )
+std::shared_ptr<CLuaArgument> CStaticFunctionDefinitions::GetAccountData ( CAccount* pAccount, const char* szKey )
 {
     assert ( pAccount );
     assert ( szKey );

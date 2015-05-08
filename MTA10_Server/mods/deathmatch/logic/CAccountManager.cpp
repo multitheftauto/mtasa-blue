@@ -898,7 +898,7 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
 }
 
 
-CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* szKey )
+std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData( CAccount* pAccount, const char* szKey )
 {
     if ( !pAccount->IsRegistered () )
     {
@@ -920,7 +920,7 @@ CLuaArgument* CAccountManager::GetAccountData( CAccount* pAccount, const char* s
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT value,type from userdata where userid=? and key=? LIMIT 1", SQLITE_INTEGER, iUserID, SQLITE_TEXT, szKey );
 
     // Default result is nil
-    CLuaArgument* pResult = new CLuaArgument ();
+    auto pResult = std::make_shared<CLuaArgument> ();
 
     //Do we have any results?
     if ( result->nRows > 0 )

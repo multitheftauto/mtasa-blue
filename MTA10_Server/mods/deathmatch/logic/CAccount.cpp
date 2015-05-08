@@ -139,10 +139,10 @@ CAccountData* CAccount::GetDataPointer ( const std::string& strKey )
     return MapFind( m_Data, strKey );
 }
 
-CLuaArgument* CAccount::GetData ( const std::string& strKey )
+std::shared_ptr<CLuaArgument> CAccount::GetData ( const std::string& strKey )
 {
     CAccountData* pData = GetDataPointer ( strKey );
-    CLuaArgument* pResult = new CLuaArgument ();
+    auto pResult = std::make_shared<CLuaArgument>();
 
     if ( pData )
     {

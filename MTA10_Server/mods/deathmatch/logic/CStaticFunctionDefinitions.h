@@ -643,7 +643,7 @@ public:
     static bool                 GetAccounts                         ( CLuaMain* pLuaMain );
     static CClient*             GetAccountPlayer                    ( CAccount* pAccount );
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
-    static CLuaArgument*        GetAccountData                      ( CAccount* pAccount, const char* szKey );
+    static std::shared_ptr<CLuaArgument> GetAccountData             ( CAccount* pAccount, const char* szKey );
     static bool                 GetAllAccountData                   ( lua_State* pLua, CAccount* pAccount );
     static bool                 GetAccountSerial                    ( CAccount* pAccount, SString& strSerial );
     static bool                 GetAccountsBySerial                 ( const SString& strSerial, std::vector<CAccount*>& outAccounts );

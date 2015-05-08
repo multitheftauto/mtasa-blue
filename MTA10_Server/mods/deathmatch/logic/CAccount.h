@@ -68,7 +68,7 @@ public:
     inline bool                 HasChanged              ( void )                    { return m_bChanged; }
     uint                        GetScriptID             ( void ) const              { return m_uiScriptID; }
 
-    CLuaArgument*               GetData                 ( const std::string& strKey );
+    std::shared_ptr<CLuaArgument> GetData               ( const std::string& strKey );
     bool                        SetData                 ( const std::string& strKey, const std::string& strValue, int iType );
     bool                        HasData                 ( const std::string& strKey );
     void                        RemoveData              ( const std::string& strKey );
