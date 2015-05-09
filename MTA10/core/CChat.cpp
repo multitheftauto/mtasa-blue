@@ -124,7 +124,7 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_line_life",               (unsigned int &)m_ulChatLineLife );
     CVARS_GET ( "chat_line_fade_out",           (unsigned int &)m_ulChatLineFadeOut );
     CVARS_GET ( "chat_font",                    (unsigned int &)Font ); SetChatFont ( (eChatFont)Font );
-	CVARS_GET ( "chat_autocomplete",            m_bAutocomplete );
+    CVARS_GET ( "chat_autocomplete",            m_bAutocomplete );
 
     // Modify default chat box to be like 'Transparent' preset
     SString strFlags;
@@ -605,12 +605,14 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                     bool bSuccess = false;
 
                     SString strCurrentInput = GetInputText ();
-
-                    std::vector<SString> vChatParts;
-                    strCurrentInput.Split ( " ", vChatParts );
-                    SString strPlayerNamePart = vChatParts.back ();
-                    if ( strPlayerNamePart.size () == 0 )
-                        break;
+                    size_t iFound;
+                    iFound = strCurrentInput.find_last_of ( " " );
+                    if ( iFound == std::string::npos )
+                        iFound = 0;
+                    else
+                        ++iFound;
+                    
+                    SString strPlayerNamePart = strCurrentInput.substr ( iFound );
 
                     CModManager* pModManager = CModManager::GetSingletonPtr ();
                     if ( pModManager && pModManager->GetCurrentMod () )
@@ -650,20 +652,8 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                                 continue;
                             else
                             {
-                                //Remove last part
-                                vChatParts.pop_back ();
-
-                                //Turn back into string
-                                SString strTmp;
-                                for ( std::vector<SString>::iterator _iter = vChatParts.begin ();
-                                    _iter != vChatParts.end ();
-                                    _iter++ )
-                                {
-                                    strTmp += *_iter + " ";
-                                }
-
                                 //Check size if it's ok, then output
-                                SString strOutput = strTmp + strPlayerName;
+                                SString strOutput = strCurrentInput.replace ( iFound, std::string::npos, strPlayerName );
                                 if ( MbUTF8ToUTF16 ( strOutput ).size () < CHAT_MAX_CHAT_LENGTH )
                                 {
                                     bSuccess = true;
