@@ -435,18 +435,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CFileSystemHook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CFileSystemMemoryHandle.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CFileSystemMemoryHandleManager.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CGraphics.cpp"
 				>
 			</File>
@@ -1137,18 +1125,6 @@
 			</File>
 			<File
 				RelativePath=".\CFilePathTranslator.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CFileSystemHook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CFileSystemMemoryHandle.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CFileSystemMemoryHandleManager.h"
 				>
 			</File>
 			<File

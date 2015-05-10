@@ -24,7 +24,6 @@ class CCore;
 
 #include "CClientVariables.h"
 #include "CCommands.h"
-#include "CFileSystemHook.h"
 #include "CModuleLoader.h"
 #include "CSingleton.h"
 #include "CGUI.h"

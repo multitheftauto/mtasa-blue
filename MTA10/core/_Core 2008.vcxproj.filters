@@ -134,15 +134,6 @@
     <ClCompile Include="CFilePathTranslator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CFileSystemHook.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CFileSystemMemoryHandle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CFileSystemMemoryHandleManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CGraphics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -470,15 +461,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CFilePathTranslator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CFileSystemHook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CFileSystemMemoryHandle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CFileSystemMemoryHandleManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CGraphics.h">

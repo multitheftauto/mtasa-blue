@@ -245,9 +245,6 @@
     <ClCompile Include="CFileFormatJpeg.cpp" />
     <ClCompile Include="CFileFormatPng.cpp" />
     <ClCompile Include="CFilePathTranslator.cpp" />
-    <ClCompile Include="CFileSystemHook.cpp" />
-    <ClCompile Include="CFileSystemMemoryHandle.cpp" />
-    <ClCompile Include="CFileSystemMemoryHandleManager.cpp" />
     <ClCompile Include="CGraphics.cpp" />
     <ClCompile Include="CGraphStats.cpp" />
     <ClCompile Include="CGUI.cpp" />
@@ -429,9 +426,6 @@
     <ClInclude Include="CFavouritesAddByIP.h" />
     <ClInclude Include="CFileFormat.h" />
     <ClInclude Include="CFilePathTranslator.h" />
-    <ClInclude Include="CFileSystemHook.h" />
-    <ClInclude Include="CFileSystemMemoryHandle.h" />
-    <ClInclude Include="CFileSystemMemoryHandleManager.h" />
     <ClInclude Include="CGraphics.h" />
     <ClInclude Include="CGraphStats.h" />
     <ClInclude Include="CGUI.h" />
