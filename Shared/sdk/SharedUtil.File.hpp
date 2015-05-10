@@ -682,7 +682,7 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
                         SString strAbsPath = strSearchDirectory + DirEntry->d_name;
                         struct stat attrib;
                         stat( strAbsPath, &attrib );
-                        MapInsert( sortMap, (uint64)attrib.st_mtime, DirEntry->d_name );
+                        MapInsert( sortMap, (uint64)attrib.st_mtime, SStringX( DirEntry->d_name ) );
                     }
                     else
                         strResult.push_back ( DirEntry->d_name );
