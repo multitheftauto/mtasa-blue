@@ -68,10 +68,11 @@ namespace
 }
 
 
-CBassAudio::CBassAudio ( bool bStream, const SString& strPath, bool bLoop, bool b3D )
+CBassAudio::CBassAudio ( bool bStream, const SString& strPath, bool bLoop, bool bThrottle, bool b3D )
     : m_bStream ( bStream )
     , m_strPath ( strPath )
     , m_bLoop ( bLoop )
+    , m_bThrottle ( bThrottle )
     , m_b3D ( b3D )
 {
     m_fVolume = 1.0f;
@@ -85,7 +86,7 @@ CBassAudio::CBassAudio ( bool bStream, const SString& strPath, bool bLoop, bool 
 }
 
 
-CBassAudio::CBassAudio ( void* pBuffer, unsigned int uiBufferLength, bool bLoop, bool b3D ) : m_bStream ( false ), m_pBuffer ( pBuffer ), m_uiBufferLength ( uiBufferLength ), m_bLoop ( bLoop ), m_b3D ( b3D )
+CBassAudio::CBassAudio ( void* pBuffer, unsigned int uiBufferLength, bool bLoop, bool b3D ) : m_bStream ( false ), m_pBuffer ( pBuffer ), m_uiBufferLength ( uiBufferLength ), m_bLoop ( bLoop ), m_bThrottle( false), m_b3D ( b3D )
 {
     m_fVolume = 1.0f;
     m_fDefaultFrequency = 44100.0f;
@@ -149,6 +150,9 @@ bool CBassAudio::BeginLoadingMedia ( void )
 #endif
     if ( m_bLoop )
         lFlags |= BASS_SAMPLE_LOOP;
+
+    if ( m_bThrottle )
+        lFlags |= BASS_STREAM_RESTRATE;
 
     if ( m_bStream )
     {

@@ -632,8 +632,8 @@ public:
     static CClientEffect*               CreateEffect                        ( CResource& Resource, const SString& strFxName, const CVector& vecPosition );
 
     // Sound funcs
-    static CClientSound*                PlaySound                           ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop );
-    static CClientSound*                PlaySound3D                         ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop );
+    static CClientSound*                PlaySound                           ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle );
+    static CClientSound*                PlaySound3D                         ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop, bool bThrottle );
     static bool                         StopSound                           ( CClientSound& Sound );
     static bool                         SetSoundPosition                    ( CClientSound& Sound, double dPosition );
     static bool                         GetSoundPosition                    ( CClientSound& Sound, double& dPosition );

@@ -7282,17 +7282,17 @@ CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, con
 }
 
 
-CClientSound* CStaticFunctionDefinitions::PlaySound ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop )
+CClientSound* CStaticFunctionDefinitions::PlaySound ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle )
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound2D ( strSound, bIsURL, bLoop );
+    CClientSound* pSound = m_pSoundManager->PlaySound2D ( strSound, bIsURL, bLoop, bThrottle );
     if ( pSound ) pSound->SetParent ( pResource->GetResourceDynamicEntity() );
     return pSound;
 }
 
 
-CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop )
+CClientSound* CStaticFunctionDefinitions::PlaySound3D ( CResource* pResource, const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop, bool bThrottle )
 {
-    CClientSound* pSound = m_pSoundManager->PlaySound3D ( strSound, bIsURL, vecPosition, bLoop );
+    CClientSound* pSound = m_pSoundManager->PlaySound3D ( strSound, bIsURL, vecPosition, bLoop, bThrottle );
     if ( pSound ) pSound->SetParent ( pResource->GetResourceDynamicEntity() );
     return pSound;
 }

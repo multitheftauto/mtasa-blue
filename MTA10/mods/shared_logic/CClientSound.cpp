@@ -113,7 +113,7 @@ bool CClientSound::Create ( void )
 
     // Initial state
     if ( !m_pBuffer )
-        m_pAudio = new CBassAudio ( m_bStream, m_strPath, m_bLoop, m_b3D );
+        m_pAudio = new CBassAudio ( m_bStream, m_strPath, m_bLoop, m_bThrottle, m_b3D );
     else
         m_pAudio = new CBassAudio ( m_pBuffer, m_uiBufferLength, m_bLoop, m_b3D );
         
@@ -286,7 +286,7 @@ bool CClientSound::Play3D ( void* pMemory, unsigned int uiLength, bool bLoop )
 }
 
 
-void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool b3D )
+void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool bThrottle, bool b3D )
 {
     assert ( m_strPath.empty () );
 
@@ -294,6 +294,7 @@ void CClientSound::PlayStream ( const SString& strURL, bool bLoop, bool b3D )
     m_b3D = b3D;
     m_strPath = strURL;
     m_bLoop = bLoop;
+    m_bThrottle = bThrottle;
 
     // Instant distance-stream in if not 3D
     if ( !m_b3D )
