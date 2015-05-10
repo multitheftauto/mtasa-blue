@@ -121,13 +121,16 @@ int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
 
     if ( !argStream.NextIsNil ( ) )
     {
+        bool bCompact = false;
         // Read the argument
         CLuaArguments JSON;
         JSON.ReadArgument ( luaVM, 1 );
+        argStream.Skip ( 1 );
+        argStream.ReadBool ( bCompact, false );
 
         // Convert it to a JSON string
         std::string strJSON;
-        if ( JSON.WriteToJSONString ( strJSON ) )
+        if ( JSON.WriteToJSONString ( strJSON, false, bCompact ) )
         {
             // Return the JSON string
             lua_pushstring ( luaVM, strJSON.c_str () );

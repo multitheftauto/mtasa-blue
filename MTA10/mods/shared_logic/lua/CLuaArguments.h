@@ -75,7 +75,7 @@ public:
     bool                                                WriteToBitStream    ( NetBitStreamInterface& bitStream, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;
     void                                                ValidateTableKeys   ( void );
     bool                                                ReadFromJSONString  ( const char* szJSON );
-    bool                                                WriteToJSONString   ( std::string& strJSON, bool bSerialize = false );
+    bool                                                WriteToJSONString   ( std::string& strJSON, bool bSerialize = false, bool bCompact = false );
     json_object *                                       WriteTableToJSONObject ( bool bSerialize = false, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables = NULL );
     json_object *                                       WriteToJSONArray    ( bool bSerialize );
     bool                                                ReadFromJSONObject  ( json_object * object, std::vector < CLuaArguments* > * pKnownTables = NULL );

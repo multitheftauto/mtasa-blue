@@ -529,12 +529,12 @@ bool CLuaArguments::WriteToBitStream ( NetBitStreamInterface& bitStream, CFastHa
 }
 
 
-bool CLuaArguments::WriteToJSONString ( std::string& strJSON, bool bSerialize )
+bool CLuaArguments::WriteToJSONString ( std::string& strJSON, bool bSerialize, bool bCompact )
 {
     json_object * my_array = WriteToJSONArray ( bSerialize );
     if ( my_array )
     {
-        strJSON = json_object_get_string ( my_array );
+        strJSON = json_object_to_json_string_ext ( my_array, bCompact ? JSON_C_TO_STRING_PLAIN : JSON_C_TO_STRING_SPACED );
         json_object_put ( my_array ); // dereference - causes a crash, is actually commented out in the example too
         return true;
     }
