@@ -38,7 +38,7 @@ public:
     bool                    Play                    ( void* pMemory, unsigned int uiLength, bool bLoop );
     bool                    Play3D                  ( const SString& strPath, bool bLoop );
     bool                    Play3D                  ( void* pMemory, unsigned int uiLength, bool bLoop );
-    void                    PlayStream              ( const SString& strURL, bool bLoop, bool b3D = false );
+    void                    PlayStream              ( const SString& strURL, bool bLoop, bool bThrottle, bool b3D = false );
 
     void                    SetPaused               ( bool bPaused  );
     bool                    IsPaused                ( void );
@@ -111,6 +111,7 @@ private:
     bool        m_b3D;
     SString     m_strPath;
     bool        m_bLoop;
+    bool        m_bThrottle;
     void*       m_pBuffer;
     unsigned int m_uiBufferLength;
 

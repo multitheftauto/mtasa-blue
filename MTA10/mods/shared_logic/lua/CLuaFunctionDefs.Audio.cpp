@@ -23,9 +23,11 @@ int CLuaFunctionDefs::PlaySound ( lua_State* luaVM )
 {
     SString strSound = "";
     bool bLoop = false;
+    bool bThrottle = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strSound );
     argStream.ReadBool ( bLoop, false );
+    argStream.ReadBool ( bThrottle, true );
 
     if ( !argStream.HasErrors() )
     {
@@ -46,7 +48,7 @@ int CLuaFunctionDefs::PlaySound ( lua_State* luaVM )
                 // Fixes #6507 - Caz
                 if ( pResource )
                 {
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, strSound, bIsURL, bLoop );
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound ( pResource, strSound, bIsURL, bLoop, bThrottle );
                     if ( pSound )
                     {
                         // call onClientSoundStarted
@@ -74,10 +76,12 @@ int CLuaFunctionDefs::PlaySound3D ( lua_State* luaVM )
     SString strSound = "";
     CVector vecPosition;
     bool bLoop = false;
+    bool bThrottle = false;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strSound );
     argStream.ReadVector3D ( vecPosition );
     argStream.ReadBool ( bLoop, false );
+    argStream.ReadBool ( bThrottle, true );
 
     if ( !argStream.HasErrors() )
     {
@@ -98,7 +102,7 @@ int CLuaFunctionDefs::PlaySound3D ( lua_State* luaVM )
                 // Fixes #6507 - Caz
                 if ( pResource )
                 {
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, strSound, bIsURL, vecPosition, bLoop );
+                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D ( pResource, strSound, bIsURL, vecPosition, bLoop, bThrottle );
                     if ( pSound )
                     {
                         // call onClientSoundStarted

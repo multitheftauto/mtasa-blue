@@ -127,12 +127,12 @@ void CClientSoundManager::SetDimension ( unsigned short usDimension )
     m_usDimension = usDimension;
 }
 
-CClientSound* CClientSoundManager::PlaySound2D ( const SString& strSound, bool bIsURL, bool bLoop )
+CClientSound* CClientSoundManager::PlaySound2D ( const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle )
 {
     CClientSound* pSound = new CClientSound ( m_pClientManager, INVALID_ELEMENT_ID );
     if ( bIsURL )
     {
-        pSound->PlayStream ( strSound, bLoop );
+        pSound->PlayStream ( strSound, bLoop, bThrottle );
         return pSound;
     }
     else
@@ -154,13 +154,13 @@ CClientSound* CClientSoundManager::PlaySound2D ( void* pMemory, unsigned int uiL
     return NULL;
 }
 
-CClientSound* CClientSoundManager::PlaySound3D ( const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop )
+CClientSound* CClientSoundManager::PlaySound3D ( const SString& strSound, bool bIsURL, const CVector& vecPosition, bool bLoop, bool bThrottle )
 {
     CClientSound* pSound = new CClientSound ( m_pClientManager, INVALID_ELEMENT_ID );
 
     if ( bIsURL )
     {
-        pSound->PlayStream ( strSound, bLoop, true );
+        pSound->PlayStream ( strSound, bLoop, bThrottle, true );
         pSound->SetPosition ( vecPosition );
         return pSound;
     }
