@@ -16,6 +16,8 @@ struct SExePatchedStatus
     bool bNvightmare;
     bool bAltModules;
 
+    SExePatchedStatus( void ) : bTimestamp( false ), bLargeMem( false ), bDep( false ), bNvightmare( false ), bAltModules( false ) {}
+
     bool operator!= ( const SExePatchedStatus& other ) const    { return !operator==( other ); }
     bool operator== ( const SExePatchedStatus& other ) const
     {
@@ -45,12 +47,10 @@ enum EPatchResult
 SExePatchedStatus   GetExePatchedStatus             ( bool bUseExeCopy );
 SExePatchedStatus   GetExePatchRequirements         ( void );
 bool                SetExePatchedStatus             ( bool bUseExeCopy, const SExePatchedStatus& reqStatus );
-bool                ShouldUseExeCopy                ( void );
 SString             GetPatchExeAdminReason          ( bool bUseExeCopy, const SExePatchedStatus& reqStatus );
 uint64              GetExeFileSize                  ( bool bUseExeCopy );
 bool                CopyExe                         ( void );
 SString             GetExePathFilename              ( bool bUseExeCopy );
-SString             GetUsingExePathFilename         ( void );
 bool                GetPatchRequirementAltModules   ( void );
 EPatchResult        UpdatePatchStatusNvightmare     ( const SString& strGTAEXEPath, EPatchMode mode );
 EPatchResult        UpdatePatchStatusTimestamp      ( const SString& strGTAEXEPath, EPatchMode mode );

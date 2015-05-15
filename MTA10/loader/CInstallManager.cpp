@@ -743,28 +743,17 @@ bool CInstallManager::UpdateOptimusSymbolExport( void )
 
 //////////////////////////////////////////////////////////
 //
-// MaybeRenameExe
+// GetApplicationExeForCreateProcess
 //
-// Figure out whether to use a renamed exe, and return filename to use.
-// Also tries file copy if required.
+// Return filename to use for CreateProcess call
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::MaybeRenameExe( const SString& strGTAPath )
+SString CInstallManager::GetApplicationExeForCreateProcess( void )
 {
-    // Try patch/copy (may fail if not admin)
+    // Try patch/copy in case nvidia dialog indicated changes (may fail if not admin)
     _ProcessExePatchChecks();
 
-    SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
-    if ( ShouldUseExeCopy() )
-    {
-        // See if exe copy seems usable
-        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
-        uint64 uiStdFileSize = FileSize( strGTAEXEPath );
-        if ( uiStdFileSize && uiStdFileSize == FileSize( strHTAEXEPath ) )
-            strGTAEXEPath = strHTAEXEPath;
-    }
-
-    return strGTAEXEPath;
+    return GetExePathFilename( true );
 }
 
 
@@ -780,38 +769,29 @@ SString CInstallManager::_ProcessExePatchChecks ( void )
     if ( !HasGTAPath() )
         return "ok";
 
+    // Remove old patches from original exe
+    SetExePatchedStatus( false, SExePatchedStatus() );
+
+    // See what patches are required
     SExePatchedStatus reqStatus = GetExePatchRequirements();
 
-    if ( !ShouldUseExeCopy() )
+    // Check if we need to create/update the exe copy
+    if ( GetExePatchedStatus( true ) != reqStatus || GetExeFileSize( false ) != GetExeFileSize( true ) )
     {
-        // Simple patching if won't be using a exe copy
-        if ( !SetExePatchedStatus( false, reqStatus ) )
+        // Copy
+        if ( !CopyExe() )
         {
-            m_strAdminReason = GetPatchExeAdminReason( false, reqStatus );
+            m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
+            return "fail";
+        }
+        // Apply patches
+        if ( !SetExePatchedStatus( true, reqStatus ) )
+        {
+            m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
             return "fail";
         }
     }
-    else
-    {
-        // Bit more complercated if will be using a exe copy
 
-        // First check if we need to create/update the exe copy
-        if ( GetExePatchedStatus( true ) != reqStatus || GetExeFileSize( false ) != GetExeFileSize( true ) )
-        {
-            // Copy
-            if ( !CopyExe() )
-            {
-                m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
-                return "fail";
-            }
-            // Apply patches
-            if ( !SetExePatchedStatus( true, reqStatus ) )
-            {
-                m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
-                return "fail";
-            }
-        }
-    }
     return "ok";
 }
 
@@ -849,7 +829,7 @@ SString CInstallManager::_ProcessAppCompatChecks ( void )
     BOOL bIsWOW64 = false;  // 64bit OS
     IsWow64Process( GetCurrentProcess(), &bIsWOW64 );
     uint uiHKLMFlags = bIsWOW64 ? KEY_WOW64_64KEY : 0;
-    WString strGTAExePathFilename = FromUTF8( GetUsingExePathFilename() );
+    WString strGTAExePathFilename = FromUTF8( GetExePathFilename( true ) );
     WString strMTAExePathFilename = FromUTF8( GetLaunchPathFilename() );
     WString strCompatModeRegKey = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
     int bWin816BitColorOption = GetApplicationSettingInt( "Win8Color16" );

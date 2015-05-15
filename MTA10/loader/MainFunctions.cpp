@@ -849,8 +849,8 @@ int LaunchGame ( SString strCmdLine )
     BeginD3DStuff();
     LogSettings();
 
-    // Use renamed exe if required
-    SString strGTAEXEPath = GetInstallManager()->MaybeRenameExe( strGTAPath );
+    // Use renamed exe
+    SString strGTAEXEPath = GetInstallManager()->GetApplicationExeForCreateProcess();
     SetCurrentDirectory ( strGTAPath );
 
     //////////////////////////////////////////////////////////

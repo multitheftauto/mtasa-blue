@@ -77,28 +77,6 @@ bool SetExePatchedStatus( bool bUseExeCopy, const SExePatchedStatus& status )
 
 //////////////////////////////////////////////////////////
 //
-// ShouldUseExeCopy
-//
-// Returns true if patches should be applied to exe copy
-//
-//////////////////////////////////////////////////////////
-bool ShouldUseExeCopy( void )
-{
-    int iUseCopy;
-    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
-        iUseCopy = GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" );
-    else
-        iUseCopy = GetApplicationSettingInt( "driver-overrides-disabled" );
-
-    if ( GetPatchRequirementAltModules() )
-        iUseCopy = 1;
-
-    return iUseCopy != 0;
-}
-
-
-//////////////////////////////////////////////////////////
-//
 // GetPatchExeAdminReason
 //
 // Get reason for user message
@@ -159,7 +137,7 @@ bool CopyExe( void )
 //
 // GetExePathFilename
 //
-// Return full path and filename of main or copy exe
+// Return full path and filename of original or copy exe
 //
 //////////////////////////////////////////////////////////
 SString GetExePathFilename( bool bUseExeCopy )
@@ -172,19 +150,6 @@ SString GetExePathFilename( bool bUseExeCopy )
         return strGTAEXEPath;
     }
     return "unknown";
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// GetUsingExePathFilename
-//
-// Return full path and filename of exe we will probably be using
-//
-//////////////////////////////////////////////////////////
-SString GetUsingExePathFilename( void )
-{
-    return GetExePathFilename( ShouldUseExeCopy() );
 }
 
 
@@ -293,7 +258,6 @@ EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode
     if ( bCanChangeLargeMemSetting )
     {
         ushort usCharacteristicsRequired = ( mode == PATCH_SET_ON ) ? LARGEMEM_ENABLED : LARGEMEM_DISABLED;
-        dassert( usCharacteristicsRequired == LARGEMEM_ENABLED );
         if ( usCharacteristics != usCharacteristicsRequired )
         {
             // Change needed!
@@ -355,7 +319,6 @@ EPatchResult UpdatePatchStatusDep( const SString& strGTAEXEPath, EPatchMode mode
     if ( bCanChangeDepSetting )
     {
         ulong ulDllCharacteristicsRequired = ( mode == PATCH_SET_ON ) ? DEP_ENABLED : DEP_DISABLED;
-        dassert( ulDllCharacteristicsRequired == DEP_ENABLED );
         if ( ulDllCharacteristics != ulDllCharacteristicsRequired )
         {
             // Change needed!
