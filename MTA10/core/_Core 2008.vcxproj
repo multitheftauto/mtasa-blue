@@ -159,7 +159,7 @@
       <AdditionalLibraryDirectories>../../Shared/XML;../../vendor/libv2/lib;../../vendor/libpng/$(PlatformTarget)/$(Configuration);../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../vendor/detours/lib;../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../vendor/jpeg/$(PlatformTarget)/$(Configuration);../../vendor/cef3/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(SolutionDir)/../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <MapFileName />
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

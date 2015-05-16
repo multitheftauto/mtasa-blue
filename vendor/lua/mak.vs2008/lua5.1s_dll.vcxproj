@@ -235,6 +235,7 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(IntDir)lua5.1s.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <ProgramDatabaseFile>$(IntDir)lua5.1s.pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command />

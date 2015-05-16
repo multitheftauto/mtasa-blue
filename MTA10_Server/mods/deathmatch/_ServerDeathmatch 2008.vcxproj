@@ -196,6 +196,7 @@
       <ImportLibrary>$(IntDir)$(TargetFileName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <SubSystem>Console</SubSystem>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

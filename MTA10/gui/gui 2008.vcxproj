@@ -136,7 +136,7 @@
       <AdditionalLibraryDirectories>../../vendor/cegui-0.4.0-custom/lib;../../vendor/cegui-0.4.0-custom/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../symbols/$(Configuration)_$(SafeParentName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <MapFileName />
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

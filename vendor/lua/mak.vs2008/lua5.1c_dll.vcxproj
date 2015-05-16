@@ -129,7 +129,7 @@
     <Link>
       <ModuleDefinitionFile />
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(IntDir)lua5.1c.pdb</ProgramDatabaseFile>
       <MapFileName />
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
