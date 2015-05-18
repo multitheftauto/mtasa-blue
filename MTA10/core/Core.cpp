@@ -33,6 +33,10 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
             AddUtf8FileHooks();
 
+            // Set low frag heap for XP
+            ULONG heapInfo = 2 ;
+            HeapSetInformation( GetProcessHeap(), HeapCompatibilityInformation, &heapInfo, sizeof( heapInfo ) );
+
             FileTranslator.GetGTARootDirectory ( WorkingDirectory );
             SetCurrentDirectory ( WorkingDirectory.c_str ( ) );
 
