@@ -377,6 +377,7 @@ protected:
 
     bool                OnChatLoadPresetClick   ( CGUIElement* pElement );
 
+    bool                OnLanguageChanged ( CGUIElement* pElement );
     bool                OnSkinChanged ( CGUIElement* pElement );
 
     bool                OnFxQualityChanged      ( CGUIElement* pElement );

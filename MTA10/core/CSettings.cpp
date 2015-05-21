@@ -80,13 +80,7 @@ void CSettings::CreateGUI ( void )
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
 
-#ifdef SETTINGS_PANEL_MAX_SIZE
-    // Use this for maxium settings panel size
-    // Will require content layout changes to make it look good
     CVector2D contentSize( 640, 480 );
-#else
-    CVector2D contentSize( 560, 458 );
-#endif
     float fBottomButtonAreaHeight = 38;
     CVector2D tabPanelPosition;
     CVector2D tabPanelSize = contentSize - CVector2D( 0, fBottomButtonAreaHeight );
@@ -154,7 +148,7 @@ void CSettings::CreateGUI ( void )
      **/
     m_pBindsList = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( pTabBinds, false ) );
     m_pBindsList->SetPosition ( CVector2D ( 10, 15 ) );
-    m_pBindsList->SetSize ( CVector2D ( 520.0f, 335.0f ) );
+    m_pBindsList->SetSize ( CVector2D ( 620, 357 ) );
     m_pBindsList->SetSorting ( false );
     m_pBindsList->SetSelectionMode ( SelectionModes::CellSingle );
     m_pBindsList->SetDoubleClickHandler ( GUI_CALLBACK( &CSettings::OnBindsListClick, this ) );
@@ -164,7 +158,7 @@ void CSettings::CreateGUI ( void )
     m_pBindsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBindsDefaultClick, this ) );
     m_pBindsDefButton->AutoSize ( NULL, 20.0f, 8.0f );
     m_pBindsDefButton->GetSize ( vecSize );
-    m_pBindsDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
+    m_pBindsDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 387 ) );
     m_pBindsDefButton->SetZOrderingEnabled ( false );
 
     /**
@@ -363,7 +357,7 @@ void CSettings::CreateGUI ( void )
     pControlsDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnControlsDefaultClick, this ) );
     pControlsDefButton->AutoSize ( NULL, 20.0f, 8.0f );
     pControlsDefButton->GetSize ( vecSize );
-    pControlsDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
+    pControlsDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 387 ) );
     pControlsDefButton->SetZOrderingEnabled ( false );
 
     m_hBind = m_pBindsList->AddColumn ( _("DESCRIPTION"), 0.35f );
@@ -632,7 +626,7 @@ void CSettings::CreateGUI ( void )
     m_pAudioDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnAudioDefaultClick, this ) );
     m_pAudioDefButton->AutoSize ( NULL, 20.0f, 8.0f );
     m_pAudioDefButton->GetSize ( vecSize );
-    m_pAudioDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
+    m_pAudioDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 387 ) );
     m_pAudioDefButton->SetZOrderingEnabled ( false );
 
     /**
@@ -896,7 +890,7 @@ void CSettings::CreateGUI ( void )
     m_pVideoDefButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnVideoDefaultClick, this ) );
     m_pVideoDefButton->AutoSize ( NULL, 20.0f, 8.0f );
     m_pVideoDefButton->GetSize ( vecSize );
-    m_pVideoDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 365 ) );
+    m_pVideoDefButton->SetPosition ( CVector2D ( vecTemp.fX - vecSize.fX - 12.0f, 387 ) );
     m_pVideoDefButton->SetZOrderingEnabled ( false );
 
     /**
@@ -987,7 +981,7 @@ void CSettings::CreateGUI ( void )
 
     // Add 20 for each tab
     fColorTabsTextWidth += 20 * 4;
-    float fColorTabPanelWidth = Max( 320.f, fColorTabsTextWidth );
+    float fColorTabPanelWidth = Max( 400.f, fColorTabsTextWidth );
 
     CGUITabPanel* pColorTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( pTabInterface ) );
     pColorTabPanel->SetPosition ( CVector2D ( 10.0f, 150.0f ) );
@@ -1044,7 +1038,7 @@ void CSettings::CreateGUI ( void )
         float fLineGapY = 4;
 
         // Position
-        vecTemp.fX = 522 - fEditsWidth - fLabelsWidth;
+        vecTemp.fX = 602 - fEditsWidth - fLabelsWidth;
         vecTemp.fY = 199;
 
         // Background pane in case of overlap with the color panel
@@ -1102,7 +1096,7 @@ void CSettings::CreateGUI ( void )
         m_pChatWidth->SetAlwaysOnTop ( true );
 
 
-        vecTemp.fX = 360;
+        vecTemp.fX = 440;
         vecTemp.fY = 216;
         fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
             _("after"),
@@ -1498,6 +1492,7 @@ void CSettings::CreateGUI ( void )
     m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
     m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
     m_pChatLoadPreset->SetClickHandler ( GUI_CALLBACK( &CSettings::OnChatLoadPresetClick, this ) );
+    m_pInterfaceLanguageSelector->SetSelectionHandler ( GUI_CALLBACK(&CSettings::OnLanguageChanged, this) );
     m_pInterfaceSkinSelector->SetSelectionHandler ( GUI_CALLBACK(&CSettings::OnSkinChanged, this) );
     m_pMapAlpha->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnMapAlphaChanged, this ) );
     m_pAudioRadioVolume->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnRadioVolumeChanged, this ) );
@@ -3242,18 +3237,12 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "mapalpha", fMapAlpha );
 
     // Language
-    std::string strCurrentLocale;
-    CVARS_GET("locale", strCurrentLocale );
-    bool bIsLocaleChanged = false;
-
     CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetSelectedItem ();
     if ( pItem )
     {
         const char* szItemText = (const char*)pItem->GetData();
         CVARS_SET("locale", std::string(szItemText) );
         SetApplicationSetting ( "locale", szItemText );
-        if ( szItemText != strCurrentLocale )
-            bIsLocaleChanged = true;
     }
 
     // Chat
@@ -3333,7 +3322,7 @@ void CSettings::SaveData ( void )
     gameSettings->Save ();
 
     // Ask to restart?
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged || bIsCustomizedSAFilesChanged || bIsLocaleChanged )
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged || bIsCustomizedSAFilesChanged )
         ShowRestartQuestion();
     else if ( CModManager::GetSingleton ().IsLoaded () && bBrowserSettingChanged )
         ShowDisconnectQuestion();
@@ -3649,6 +3638,37 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
                 SetMilliseconds( m_pChatLineFadeout, iValue );
             }
         }
+    }
+
+    return true;
+}
+
+
+bool CSettings::OnLanguageChanged ( CGUIElement* pElement )
+{
+    CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetSelectedItem ();
+    if ( !pItem )
+        return true;
+
+    if ( m_bIsModLoaded )
+    {
+        // Reset our item
+        SString strLocale;
+        CVARS_GET("locale",strLocale);
+        unsigned int uiIndex = 0;
+        while ( uiIndex != m_pInterfaceLanguageSelector->GetItemCount() )
+        {
+            CGUIListItem* pItem =  m_pInterfaceLanguageSelector->GetItemByIndex(uiIndex);
+            if ( ((const char*)pItem->GetData()) == strLocale )
+                break;
+
+            uiIndex++;
+        }
+        m_pInterfaceLanguageSelector->SetSelectedItemByIndex(uiIndex);
+
+        g_pCore->ShowMessageBox ( _("Error")+_E("CC82"), _("Please disconnect before changing language"), MB_BUTTON_OK | MB_ICON_INFO );
+        m_pWindow->MoveToBack();
+        return true;
     }
 
     return true;

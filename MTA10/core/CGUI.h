@@ -47,6 +47,7 @@ public:
                         ~CLocalGUI                       ( void );
 
     void                SetSkin                     ( const char* szName );
+    void                ChangeLocale                ( const char* szName );
 
     void                CreateWindows               ( bool bGameIsAlreadyLoaded );
     void                DestroyWindows              ( void );
@@ -120,6 +121,8 @@ private:
 
     int                     m_LastSettingsRevision; // the revision number the last time we saw the skin change
     SString                 m_LastSkinName;
+    SString                 m_LastLocaleName;
+    uint                    m_LocaleChangeCounter;
 };
 
 #endif

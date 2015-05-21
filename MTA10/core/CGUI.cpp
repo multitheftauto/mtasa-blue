@@ -41,6 +41,7 @@ CLocalGUI::CLocalGUI ( void )
     m_pVersionUpdater = GetVersionUpdater ();
 
     m_LastSettingsRevision = -1;
+    m_LocaleChangeCounter = 0;
 }
 
 
@@ -96,6 +97,26 @@ void CLocalGUI::SetSkin( const char* szName )
         CCore::GetSingleton().GetConsole()->Echo(error.c_str());
 
 }
+
+
+void CLocalGUI::ChangeLocale( const char* szName )
+{
+    bool guiWasLoaded = m_pMainMenu != NULL;
+    assert(guiWasLoaded);
+    if(guiWasLoaded)
+        DestroyWindows();
+
+    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
+    m_LastSettingsRevision = cvars->GetRevision();
+
+    // Don't delete old Localization as it crashes
+    g_pLocalization = new CLocalization;
+    m_LastLocaleName = szName;
+
+    if(guiWasLoaded)
+        CreateWindows(guiWasLoaded);
+}
+
 
 void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
 {
@@ -191,6 +212,9 @@ void CLocalGUI::DoPulse ( void )
     {
         m_LastSettingsRevision = cvars->GetRevision();
 
+        //
+        // Check for skin change
+        //
         SString currentSkinName;
         cvars->Get("current_skin", currentSkinName);
 
@@ -202,6 +226,44 @@ void CLocalGUI::DoPulse ( void )
             {
                 CCore::GetSingleton ().GetConsole()->Printf ( "Please disconnect before changing skin" );
                 cvars->Set("current_skin", m_LastSkinName );
+            }
+        }
+
+        //
+        // Check for locale change
+        //
+        SString currentLocaleName;
+        cvars->Get( "locale", currentLocaleName );
+
+        if ( m_LastLocaleName.empty() )
+        {
+            m_LastLocaleName = currentLocaleName;
+        }
+        if ( currentLocaleName != m_LastLocaleName )
+        {
+            m_LocaleChangeCounter++;
+            if ( m_LocaleChangeCounter < 5 )
+            {
+                // Do GUI stuff for first 5 frames
+                // Force pulse next time
+                m_LastSettingsRevision = cvars->GetRevision() - 1;
+
+                if ( m_LocaleChangeCounter == 2 )
+                    CCore::GetSingleton ().ShowMessageBox ( _E("CC99"), ("PLEASE WAIT...................."), MB_ICON_INFO );
+            }
+            else
+            {
+                // Do actual local change
+                m_LocaleChangeCounter = 0;
+                CCore::GetSingleton ().RemoveMessageBox();
+    
+                if ( !CCore::GetSingleton ().GetModManager()->IsLoaded() )
+                    ChangeLocale( currentLocaleName );
+                else
+                {
+                    CCore::GetSingleton ().GetConsole()->Printf ( "Please disconnect before changing language" );
+                    cvars->Set("locale", m_LastLocaleName );
+                }
             }
         }
     }
