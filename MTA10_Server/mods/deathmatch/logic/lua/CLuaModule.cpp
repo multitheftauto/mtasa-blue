@@ -116,7 +116,11 @@ int CLuaModule::_LoadModule ( void )
     //if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
 #endif
     // Run initialisation function
-    pfnInitFunc( this, &m_FunctionInfo.szModuleName[0], &m_FunctionInfo.szAuthor[0], &m_FunctionInfo.fVersion );
+    if ( !pfnInitFunc( this, &m_FunctionInfo.szModuleName[0], &m_FunctionInfo.szAuthor[0], &m_FunctionInfo.fVersion ) )
+    {
+        CLogger::LogPrintf ( "MODULE: Unable to initialize modules/%s!\n", m_szShortFileName.c_str() );
+        return 2;
+    }
     m_bInitialised = true;
 
     CLogger::LogPrintf ("MODULE: Loaded \"%s\" (%.2f) by \"%s\"\n", m_FunctionInfo.szModuleName, m_FunctionInfo.fVersion, m_FunctionInfo.szAuthor);
