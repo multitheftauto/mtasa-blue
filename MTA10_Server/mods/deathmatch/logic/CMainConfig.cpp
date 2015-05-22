@@ -650,7 +650,7 @@ bool CMainConfig::LoadExtended ( void )
             if ( pAttribute )
             {
                 std::string strBuffer = pAttribute->GetValue ();
-                SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), strBuffer.c_str () );
+                SString strFilename = PathJoin ( g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", strBuffer );
 
                 if ( IsValidFilePath ( strBuffer.c_str () ) )
                 {

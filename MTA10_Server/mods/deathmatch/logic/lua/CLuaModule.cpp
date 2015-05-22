@@ -54,10 +54,18 @@ int CLuaModule::_LoadModule ( void )
     InitModuleFunc pfnInitFunc;
     // Load Module
 #ifdef WIN32
-    m_hModule = LoadLibrary ( m_szFileName );
+    #ifdef WIN_x64
+        // Search the x64 path for dependencies
+        SString strSavedCurrentDirectory = GetSystemCurrentDirectory();
+        SetCurrentDirectory( PathJoin( g_pServerInterface->GetModManager ()->GetServerPath (), SERVER_BIN_PATH ) );
+        m_hModule = LoadLibrary ( m_szFileName );
+        SetCurrentDirectory( strSavedCurrentDirectory );
+    #else
+        m_hModule = LoadLibrary ( m_szFileName );
+    #endif
     if ( m_hModule == NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s!\n", m_szShortFileName.c_str() );
+        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s! (%d)\n", m_szShortFileName.c_str(), GetLastError() );
         return 1;
     }
 #else

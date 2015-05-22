@@ -1393,7 +1393,7 @@ bool CConsoleCommands::LoadModule ( CConsole* pConsole, const char* szArguments,
             pEchoClient->SendConsole ( "loadmodule: Invalid module path" );
             return false;
         }
-        SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
+        SString strFilename = PathJoin ( g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments );
 
         // These modules are late loaded
         int iSuccess = g_pGame->GetLuaManager ()->GetLuaModuleManager ()->LoadModule ( szArguments, strFilename, true );
@@ -1484,7 +1484,7 @@ bool CConsoleCommands::ReloadModule ( CConsole* pConsole, const char* szArgument
         if ( pClient->GetNick () )
             CLogger::LogPrintf ( "reloadmodule: Requested by %s\n", pClient->GetNick () );
 
-        SString strFilename ( "%s/modules/%s", g_pServerInterface->GetModManager ()->GetModPath (), szArguments );
+        SString strFilename = PathJoin ( g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments );
 
         int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->ReloadModule ( szArguments, strFilename, true );
         switch ( iSuccess )
