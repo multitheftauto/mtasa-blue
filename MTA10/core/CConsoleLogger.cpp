@@ -34,40 +34,11 @@ struct {
 
 CConsoleLogger::CConsoleLogger ( )
 {
-    CleanLogDir();
-
-    // Ask windows for the system time.
-    SYSTEMTIME SystemTime;
-    GetLocalTime ( &SystemTime );
-    
-    // Convert date to a string
-    char szDate[9] = {'\0'};
-    if  ( SystemTime.wMonth < 10 )
-    {
-        if ( SystemTime.wDay < 10 )
-        {
-            sprintf ( szDate, "%i0%i0%i", SystemTime.wYear, SystemTime.wMonth, SystemTime.wDay );
-        }
-        else
-        {
-            sprintf ( szDate, "%i0%i%i", SystemTime.wYear, SystemTime.wMonth, SystemTime.wDay );
-        }
-    }
-    else if ( SystemTime.wDay < 10 )
-    {
-        sprintf ( szDate, "%i%i0%i", SystemTime.wYear, SystemTime.wMonth, SystemTime.wDay );
-    }
-    else
-    {
-        sprintf ( szDate, "%i%i%i", SystemTime.wYear, SystemTime.wMonth, SystemTime.wDay );
-    }
-
     // Create file name
-    m_strFilename = CalcMTASAPath ( PathJoin ( "MTA", "logs", "console_logfile-" ) );
-    m_strFilename.append ( szDate );
-    m_strFilename.append ( ".log" );
+    m_strFilename = CalcMTASAPath ( MTA_CONSOLE_LOG_PATH );
 
-    MakeSureDirExists ( m_strFilename );
+    // Cycle if over size (100KB, 5 backup files)
+    CycleFile( m_strFilename, 100, 5 );
 
     // get the file stream
     File.open ( m_strFilename.c_str(), ios::app );
@@ -116,48 +87,6 @@ void CConsoleLogger::LinePrintf ( const char* szFormat, ... )
     WriteLine ( szBuffer );
 }
 
-//
-// Copy from old naming scheme to new, and clean sensitive info as we go
-//
-void CConsoleLogger::CleanLogDir( void )
-{
-    SString strLogDir = CalcMTASAPath ( PathJoin ( "MTA", "logs" ) );
-    SString strSearch = PathJoin ( strLogDir, "consolelogfile-*" );
-    std::vector < SString > fileList = FindFiles( strSearch, true, false );
-    for ( uint i = 0 ; i < fileList.size() ; i++ )
-    {
-        SString strFilenameSource = fileList[i];
-        SString strFilenameDest = strFilenameSource.Replace( "consolelogfile", "console_logfile" );
-        SString strPathFilenameSource = PathJoin ( strLogDir, strFilenameSource );
-        SString strPathFilenameDest = PathJoin ( strLogDir, strFilenameDest );
-        CleanFile( strPathFilenameSource, strPathFilenameDest );
-    }
-}
-
-//
-// Copy a file, line by line and clean sensitive info
-//
-void CConsoleLogger::CleanFile( const SString& strPathFilenameSource, const SString& strPathFilenameDest )
-{
-    std::fstream fileSource;
-    std::fstream fileDest;
-    fileSource.open ( FromUTF8( strPathFilenameSource ), ios::in );
-    if ( !fileSource.good() )
-        return;
-    fileDest.open ( FromUTF8( strPathFilenameDest ), ios::out );
-    while ( fileSource.good() )
-    {
-        SString strLine;
-        std::getline( fileSource, strLine );
-        CleanLine( strLine );
-        strLine.Replace( " ***** *****", " " );
-        strLine.Replace( " *****", " " );
-        fileDest << strLine << endl;
-    }
-    fileSource.close();
-    fileDest.close();
-    FileDelete( strPathFilenameSource );
-}
 
 //
 // Clean line of sensitive info

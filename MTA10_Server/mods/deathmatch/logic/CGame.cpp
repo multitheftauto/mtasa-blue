@@ -4301,18 +4301,6 @@ void CGame::HandleCrashDumpEncryption( void )
     SString strMessage = "Dump files in this directory are encrypted and copied to 'dumps\\public' during server startup\n\n";
     FileSave( PathJoin( strDumpDirPrivatePath, "README.txt" ), strMessage );
 
-    // Move old dumps to the private folder
-    {
-        std::vector < SString > legacyList = FindFiles( PathJoin( strDumpDirPath, "*.dmp" ), true, false );
-        for ( uint i = 0 ; i < legacyList.size() ; i++ )
-        {
-            const SString& strFilename = legacyList[i];
-            SString strSrcPathFilename = PathJoin( strDumpDirPath, strFilename );
-            SString strDestPathFilename = PathJoin( strDumpDirPrivatePath, strFilename );
-            FileRename( strSrcPathFilename, strDestPathFilename );
-        }
-    }
-
     // Copy and encrypt private files to public if they don't already exist
     {
         std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false );

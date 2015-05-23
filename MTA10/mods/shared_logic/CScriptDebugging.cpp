@@ -213,6 +213,7 @@ void CALLBACK TimerProc( void* lpParametar, BOOLEAN TimerOrWaitFired )
     }
 }
 
+
 bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel )
 {
     assert ( szFilename );
@@ -234,17 +235,8 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
     // Apply log size limit
     uint uiMaxSizeKB = 0;
     g_pCore->GetCVars ()->Get ( "max_clientscript_log_kb", uiMaxSizeKB );
-    if ( uiMaxSizeKB > 0 )
-    {
-        uint64 uiCurrentSizeKB = FileSize ( szFilename ) / 1024;
-        if ( uiCurrentSizeKB > uiMaxSizeKB )
-        {
-            SString strFilenameBackup ( "%s.bak", szFilename );
-            FileDelete ( strFilenameBackup );
-            FileRename ( szFilename, strFilenameBackup );
-            FileDelete ( szFilename );
-        }
-    }
+    CycleFile( szFilename, uiMaxSizeKB );
+
 
     // Try to load the new file
     FILE* pFile = fopen ( szFilename, "a+" );

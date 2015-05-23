@@ -40,7 +40,8 @@ namespace SharedUtil
         #define DEBUG_DESTROY_COUNT(cls)
     #endif
 
+    // Cycle (log) files when they reach a certain size.
+    void CycleFile          ( const SString& strPathFilename, uint uiCycleThreshKB = 1, uint uiNumBackups = 1 );
 };
 
 using namespace SharedUtil;
-

@@ -543,6 +543,17 @@ void ShowLayoutError ( const SString& strExtraInfo )
     TerminateProcess ( GetCurrentProcess (), 9 );
 }
 
+// Move file to new location
+void MigrateFile( const SString& strFilenameOld, const SString& strFilenameNew )
+{
+    if ( FileExists( strFilenameOld ) )
+    {
+        if ( !FileExists( strFilenameNew ) )
+            FileRename( strFilenameOld, strFilenameNew );
+        FileDelete( strFilenameOld );
+    }
+}
+ 
 //////////////////////////////////////////////////////////
 //
 // CInstallManager::_ProcessLayoutChecks
@@ -635,6 +646,35 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
             else
                 SetApplicationSettingInt ( "aero-enabled", 1 );
         }
+    }
+
+    // New log/config file layout
+    {
+        SString strOldDir = CalcMTASAPath( "MTA" );
+        SString strNewConfigDir = CalcMTASAPath( PathJoin( "MTA", "config" ) );
+        SString strNewLogDir = CalcMTASAPath( PathJoin( "MTA", "logs" ) );
+
+        MakeSureDirExists( strNewConfigDir + "/" );
+        MakeSureDirExists( strNewLogDir + "/" );
+
+        // Move usable files if they exist
+        const char* migrateConfigs[] = { "coreconfig.xml", "chatboxpresets.xml", "servercache.xml" };
+        for ( uint i = 0 ; i < NUMELMS( migrateConfigs ) ; i++ )
+            MigrateFile( PathJoin( strOldDir, migrateConfigs[i] ), PathJoin( strNewConfigDir, migrateConfigs[i] ) );
+
+        const char* migrateLogs[] = { "CEGUI.log", "console-input.log", "clientscript.log" , "logfile.txt" };
+        for ( uint i = 0 ; i < NUMELMS( migrateLogs ) ; i++ )
+            MigrateFile( PathJoin( strOldDir, migrateLogs[i] ), PathJoin( strNewLogDir, migrateLogs[i] ) );
+
+        // Delete unusable files
+        const char* deleteLogs[] = { "clientscript.log.bak", "logfile_old.txt" };
+        for ( uint i = 0 ; i < NUMELMS( deleteLogs ) ; i++ )
+            FileDelete( PathJoin ( strOldDir, deleteLogs[i] ) );
+
+        // Delete old console log files
+        std::vector < SString > fileList = FindFiles( PathJoin( strOldDir, "logs", "console_logfile-*" ), true, false );
+        for ( uint i = 0 ; i < fileList.size() ; i++ )
+            FileDelete( PathJoin( strOldDir, "logs", fileList[i] ) );
     }
 
     //

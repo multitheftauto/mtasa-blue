@@ -667,7 +667,6 @@ DontInstallRedistVC12:
 			File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 			File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
 
 			File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
@@ -676,6 +675,9 @@ DontInstallRedistVC12:
 			File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\wow_helper.exe"
+
+            SetOutPath "$INSTDIR\MTA\config"
+            File "${FILES_ROOT}\MTA San Andreas\mta\config\chatboxpresets.xml"
 
             SetOutPath "$INSTDIR\skins\Classic"
             File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"

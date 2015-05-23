@@ -709,7 +709,7 @@ void WriteEvent( const char* szType, const SString& strText )
             WriteEvent( szType, lineList[i] );
         return;
     }
-    SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
+    SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logs", "logfile.txt" ) );
     SString strMessage( "%s - %s %s", *GetLocalTimeString(), szType, *strText );
     FileAppend( strPathFilename, strMessage + "\n" );
 #ifdef MTA_DEBUG
@@ -733,11 +733,7 @@ void SharedUtil::BeginEventLog( void )
     if ( GetApplicationSettingInt(  "no-cycle-event-log" ) == 0 )
     {
         SetApplicationSettingInt( "no-cycle-event-log", 1 );
-        SString strPathFilename = CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) );
-        SString strPathFilenamePrev = CalcMTASAPath( PathJoin( "mta", "logfile_old.txt" ) );
-        FileDelete( strPathFilenamePrev );
-        FileRename( strPathFilename, strPathFilenamePrev );
-        FileDelete( strPathFilename );
+        CycleFile( CalcMTASAPath( PathJoin( "mta", "logs", "logfile.txt" ) ), 1 );
     }
     WriteDebugEvent( "BeginEventLog" );
 }

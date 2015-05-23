@@ -135,7 +135,6 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassopus.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-	File "${FILES_ROOT}\MTA San Andreas\mta\chatboxpresets.xml"
 	File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
 	File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
@@ -149,6 +148,9 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\wow_helper.exe"
+
+	SetOutPath "$INSTDIR\MTA\config"
+	File "${FILES_ROOT}\MTA San Andreas\mta\config\chatboxpresets.xml"
 
 	SetOutPath "$INSTDIR\skins\Classic"
     File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"

@@ -144,3 +144,33 @@ void SharedUtil::OutputReleaseLine ( const char* szMessage )
     // Other platforms here
 #endif
 }
+
+
+//
+// Cycle (log) files when they reach a certain size.
+//
+// uiCycleThreshKB - 0 = never cycle   1 = always cycle   >1 cycle when main file reaches this size
+//
+void SharedUtil::CycleFile( const SString& strPathFilename, uint uiCycleThreshKB, uint uiNumBackups )
+{
+    if ( uiCycleThreshKB == 0 )
+        return;
+
+    if ( uiCycleThreshKB == 1 || FileSize( strPathFilename ) / 1024 > uiCycleThreshKB )
+    {
+        for( uint i = 0 ; i < uiNumBackups ; i++ )
+        {
+            // Rename older files .1 .2 etc
+            uint uiNew = uiNumBackups - 1 - i;
+            uint uiOld = uiNumBackups - i;
+            SString strFilenameNewer = strPathFilename + ( uiNew ? SString( ".%d", uiNew ) : "" );
+            SString strFilenameOlder = strPathFilename + ( uiOld ? SString( ".%d", uiOld ) : "" );
+    
+            FileDelete( strFilenameOlder );
+            FileRename( strFilenameNewer, strFilenameOlder );
+            FileDelete( strFilenameNewer );
+        }
+
+        FileDelete( strPathFilename );            
+    }
+}

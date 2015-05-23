@@ -27,8 +27,6 @@ class CConsoleLogger : public CSingleton < CConsoleLogger >
 
 	void            LinePrintf          ( const char* szFormat, ... );
     void            WriteLine           ( const std::string& strLine );
-    static void     CleanLogDir         ( void );
-    static void     CleanFile           ( const SString& strPathFilenameSource, const SString& strPathFilenameDest );
     static void     CleanLine           ( SString& strLine );
     static int      ReplaceNextWord     ( SString& strLine, int iPos, const char* szBlanker );
 

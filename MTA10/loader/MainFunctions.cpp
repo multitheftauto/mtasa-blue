@@ -645,8 +645,7 @@ void CheckDataFiles( void )
                                      ,"MTA\\tags.dll"
                                      ,"MTA\\sa.dat"
                                      ,"MTA\\XInput9_1_0_mta.dll"
-                                     ,"MTA\\vea.dll"
-                                     ,"server\\mods\\deathmatch\\libmysql.dll"};
+                                     ,"MTA\\vea.dll"};
 
     for ( uint i = 0 ; i < NUMELMS( dataFilesFiles ) ; i++ )
     {

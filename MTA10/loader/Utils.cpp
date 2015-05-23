@@ -1712,7 +1712,7 @@ void MaybeShowCopySettingsDialog ( void )
 {
     // Check if coreconfig.xml is present
     const SString strMTASAPath = GetMTASAPath ();
-    SString strCurrentConfig = PathJoin ( GetMTASAPath (), "mta", "coreconfig.xml" );
+    SString strCurrentConfig = PathJoin ( GetMTASAPath (), "mta", "config", "coreconfig.xml" );
     if ( FileExists ( strCurrentConfig ) )
         return;
 
@@ -1722,7 +1722,9 @@ void MaybeShowCopySettingsDialog ( void )
     SString strPreviousPath = GetVersionRegistryValue ( strPreviousVersion, "", "Last Run Location" );
     if ( strPreviousPath.empty () )
         return;
-    SString strPreviousConfig = PathJoin ( strPreviousPath, "mta", "coreconfig.xml" );
+    SString strPreviousConfig = PathJoin ( strPreviousPath, "mta", "config", "coreconfig.xml" );
+    if ( MTASA_VERSION_MAJOR == 1 && MTASA_VERSION_MINOR == 5 )
+        strPreviousConfig = PathJoin ( strPreviousPath, "mta", "coreconfig.xml" );
     if ( !FileExists ( strPreviousConfig ) )
         return;
 

@@ -2272,18 +2272,6 @@ void CCore::HandleCrashDumpEncryption( void )
     SString strMessage = "Dump files in this directory are encrypted and copied to 'dumps\\public' during startup\n\n";
     FileSave( PathJoin( strDumpDirPrivatePath, "README.txt" ), strMessage );
 
-    // Move old dumps to the private folder
-    {
-        std::vector < SString > legacyList = FindFiles( PathJoin( strDumpDirPath, "*.dmp" ), true, false );
-        for ( uint i = 0 ; i < legacyList.size() ; i++ )
-        {
-            const SString& strFilename = legacyList[i];
-            SString strSrcPathFilename = PathJoin( strDumpDirPath, strFilename );
-            SString strDestPathFilename = PathJoin( strDumpDirPrivatePath, strFilename );
-            FileRename( strSrcPathFilename, strDestPathFilename );
-        }
-    }
-
     // Limit number of files in the private folder
     {
         std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false, true );

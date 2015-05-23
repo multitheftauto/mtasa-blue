@@ -27,7 +27,7 @@ class CSettings;
 #include "CCore.h"
 
 #define SKINS_PATH                    "skins/*"
-#define CHAT_PRESETS_PATH             "mta/chatboxpresets.xml"
+#define CHAT_PRESETS_PATH             "mta/config/chatboxpresets.xml"
 #define CHAT_PRESETS_ROOT             "chatboxpresets"
 
 //#define SHOWALLSETTINGS

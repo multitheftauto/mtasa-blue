@@ -19,15 +19,7 @@ CConsoleHistory::CConsoleHistory ( unsigned int uiHistoryLength )
 
 void CConsoleHistory::LoadFromFile ( void )
 {
-    // Copy and clean console input history
-    SString strLogDir = CalcMTASAPath( "MTA" );
-    SString strPathFilenameSource = PathJoin( strLogDir, "console.log" );
-    SString strPathFilenameDest = PathJoin( strLogDir, "console-input.log" );
-    CConsoleLogger::CleanFile( strPathFilenameSource, strPathFilenameDest );
-    strPathFilenameSource = PathJoin( strLogDir, "console_input.log" );
-    CConsoleLogger::CleanFile( strPathFilenameSource, strPathFilenameDest );
-
-    m_strFilename = strPathFilenameDest;
+    m_strFilename = CalcMTASAPath( MTA_CONSOLE_INPUT_LOG_PATH );
 
     // Load the history lines
     char szBuffer [256];

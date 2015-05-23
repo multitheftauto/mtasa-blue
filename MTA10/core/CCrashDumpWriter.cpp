@@ -485,7 +485,7 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
                 // Try to logfile.txt to dump file
                 SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-logfile" );
                 CBuffer logfileContent;
-                logfileContent.LoadFromFile( CalcMTASAPath( PathJoin( "mta", "logfile.txt" ) ) );
+                logfileContent.LoadFromFile( CalcMTASAPath( PathJoin( "mta", "logs", "logfile.txt" ) ) );
                 AppendToDumpFile ( strPathFilename, logfileContent, 'LOGs', 'LOGe' );
                 SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-logfile" );
 
