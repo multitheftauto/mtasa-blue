@@ -281,7 +281,7 @@ bool CClient::HandleException ( CExceptionInformation* pExceptionInformation )
 {
     #ifndef MTA_DEBUG
     #ifndef MTA_ALLOW_DEBUG
-        // Let the clientgame write its dump, then make the core terminte our process
+        // Let the clientgame write its dump, then make the core terminate our process
         if ( g_pClientGame && pExceptionInformation )
         {
             g_pClientGame->HandleException ( pExceptionInformation );
@@ -311,4 +311,4 @@ void CClient::GetPlayerNames ( std::vector<SString> &vPlayerNames )
             vPlayerNames.push_back ( strPlayerName );
         }
     }
-};
+}

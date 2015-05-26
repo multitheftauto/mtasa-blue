@@ -124,7 +124,7 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_line_life",               (unsigned int &)m_ulChatLineLife );
     CVARS_GET ( "chat_line_fade_out",           (unsigned int &)m_ulChatLineFadeOut );
     CVARS_GET ( "chat_font",                    (unsigned int &)Font ); SetChatFont ( (eChatFont)Font );
-    CVARS_GET ( "chat_autocomplete",            m_bAutocomplete );
+    CVARS_GET ( "chat_nickcompletion",          m_bNickCompletion );
 
     // Modify default chat box to be like 'Transparent' preset
     SString strFlags;
@@ -600,7 +600,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
             case VK_TAB:
             {
 
-                if ( m_bAutocomplete && m_strInputText.size () > 0 )
+                if ( m_bNickCompletion && m_strInputText.size () > 0 )
                 {
                     bool bSuccess = false;
 

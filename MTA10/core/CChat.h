@@ -298,7 +298,7 @@ protected:
     int                         m_iReportCount;
     CTickCount                  m_lastRenderTargetCreationFail;
 
-    bool                        m_bAutocomplete;
+    bool                        m_bNickCompletion;
 };
 
 #endif
