@@ -1387,6 +1387,92 @@ inner:
     }
 }
 
+struct CStreamingInfo
+{
+    DWORD gta_hash;
+    WORD  chain_next;
+    uchar flg;
+    uchar archiveId;
+    DWORD offsetInBlocks;
+    DWORD sizeInBlocks;
+    DWORD reqload;
+};
+
+CStreamingInfo* GetStreamingInfoFromModelId ( uint id )
+{
+    CStreamingInfo* pItemInfo = (CStreamingInfo*)(0x8E4CC0);
+    return pItemInfo + id;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CAnimManager_CreateAnimAssocGroups
+//
+// A model (usually 7) has to be loaded for this to work
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
+{
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo( uiModelId );
+    bool bIsLoaded = ( pModelInfo->IsLoaded() != 0 );
+    bool bHasRwObject = ( pModelInfo->GetInterface()->pRwObject != NULL );
+    int iRefCount = pModelInfo->GetRefCount();
+    CStreamingInfo* pStreamingInfo = GetStreamingInfoFromModelId( uiModelId );
+
+    if ( !bIsLoaded || !bHasRwObject || pStreamingInfo->reqload != 1 )
+    {
+        AddReportLog( 7440, SString( "CAnimManager_CreateAnimAssocGroups: Unexpected id:%d bIsLoaded:%d bHasRwObject:%d iRefCount:%d"
+                                                  " gta_hash:%08x chain_next:%04x flg:%02x arch:%d offset:%d size:%d reqload:%d"
+                                                , uiModelId, bIsLoaded, bHasRwObject, iRefCount
+                                                , pStreamingInfo->gta_hash
+                                                , pStreamingInfo->chain_next
+                                                , pStreamingInfo->flg
+                                                , pStreamingInfo->archiveId
+                                                , pStreamingInfo->offsetInBlocks
+                                                , pStreamingInfo->sizeInBlocks
+                                                , pStreamingInfo->reqload
+                                    ) );
+
+        pModelInfo->Request( BLOCKING, "AnimAssocGroups" );
+
+        bIsLoaded = ( pModelInfo->IsLoaded() != 0 );
+        bHasRwObject = ( pModelInfo->GetInterface()->pRwObject != NULL );
+        AddReportLog( 7441, SString( "CAnimManager_CreateAnimAssocGroups: Load result id:%d bIsLoaded:%d bHasRwObject:%d iRefCount:%d"
+                                                  " gta_hash:%08x chain_next:%04x flg:%02x arch:%d offset:%d size:%d reqload:%d"
+                                                , uiModelId, bIsLoaded, bHasRwObject, iRefCount
+                                                , pStreamingInfo->gta_hash
+                                                , pStreamingInfo->chain_next
+                                                , pStreamingInfo->flg
+                                                , pStreamingInfo->archiveId
+                                                , pStreamingInfo->offsetInBlocks
+                                                , pStreamingInfo->sizeInBlocks
+                                                , pStreamingInfo->reqload
+                                    ) );
+    }
+}
+
+
+// Hook info
+#define HOOKPOS_CAnimManager_CreateAnimAssocGroups                 0x4D3D52
+#define HOOKSIZE_CAnimManager_CreateAnimAssocGroups                5
+#define HOOKCHECK_CAnimManager_CreateAnimAssocGroups               0x8B
+DWORD RETURN_CAnimManager_CreateAnimAssocGroups =                  0x4D3D59;
+void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
+{
+    _asm
+    {
+        pushad
+        push    eax
+        call    OnMY_CAnimManager_CreateAnimAssocGroups
+        add     esp, 4*1
+        popad
+
+        // Replaced code
+        mov     eax, 0x0A9B0C8[eax*4] 
+        jmp     RETURN_CAnimManager_CreateAnimAssocGroups
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1432,4 +1518,5 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( ResetFurnitureObjectCounter );
     EZHookInstallChecked ( CVolumetricShadowMgr_Render );
     EZHookInstallChecked ( CVolumetricShadowMgr_Update );
+    EZHookInstallChecked ( CAnimManager_CreateAnimAssocGroups );
 }
