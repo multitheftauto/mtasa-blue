@@ -124,6 +124,7 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_line_life",               (unsigned int &)m_ulChatLineLife );
     CVARS_GET ( "chat_line_fade_out",           (unsigned int &)m_ulChatLineFadeOut );
     CVARS_GET ( "chat_font",                    (unsigned int &)Font ); SetChatFont ( (eChatFont)Font );
+    CVARS_GET ( "chat_autocomplete",            m_bAutocomplete );
 
     // Modify default chat box to be like 'Transparent' preset
     SString strFlags;
@@ -596,9 +597,94 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 m_fSmoothScrollResetTime = GetSecondCount ();
                 break;
             }
+            case VK_TAB:
+            {
+
+                if ( m_bAutocomplete && m_strInputText.size () > 0 )
+                {
+                    bool bSuccess = false;
+
+                    SString strCurrentInput = GetInputText ();
+                    size_t iFound;
+                    iFound = strCurrentInput.find_last_of ( " " );
+                    if ( iFound == std::string::npos )
+                        iFound = 0;
+                    else
+                        ++iFound;
+                    
+                    SString strPlayerNamePart = strCurrentInput.substr ( iFound );
+
+                    CModManager* pModManager = CModManager::GetSingletonPtr ();
+                    if ( pModManager && pModManager->GetCurrentMod () )
+                    {
+                        //Create vector and get playernames from deathmatch module
+                        std::vector<SString> vPlayerNames;
+                        pModManager->GetCurrentMod ()->GetPlayerNames ( vPlayerNames );
+
+                        for ( std::vector<SString>::iterator iter = vPlayerNames.begin ();
+                            iter != vPlayerNames.end ();
+                            ++iter )
+                        {
+                            SString strPlayerName = *iter;
+
+                            // Check if there is another player after our last result
+                            if ( m_strLastPlayerName.size () != 0 )
+                            {
+                                if ( strPlayerName.CompareI ( m_strLastPlayerName ) ) {
+                                    m_strLastPlayerName.clear ();
+                                    if ( *iter == vPlayerNames.back () )
+                                    {
+                                        CharacterKeyHandler ( KeyboardArgs );
+                                        return true;
+                                    }
+                                }
+                                continue;
+                            }
+
+                            // Already a part?
+                            if ( m_strLastPlayerNamePart.size () != 0 )
+                            {
+                                strPlayerNamePart = m_strLastPlayerNamePart;
+                            }
+
+                            // Check namepart
+                            if ( !strPlayerName.BeginsWith ( strPlayerNamePart ) )
+                                continue;
+                            else
+                            {
+                                //Check size if it's ok, then output
+                                SString strOutput = strCurrentInput.replace ( iFound, std::string::npos, strPlayerName );
+                                if ( MbUTF8ToUTF16 ( strOutput ).size () < CHAT_MAX_CHAT_LENGTH )
+                                {
+                                    bSuccess = true;
+                                    m_strLastPlayerNamePart = strPlayerNamePart;
+                                    m_strLastPlayerName = strPlayerName;
+                                    SetInputText ( strOutput );
+                                }
+
+                                break;
+                            }
+                        }
+
+                        // No success? Try again!
+                        if ( !bSuccess )
+                            m_strLastPlayerName.clear ();
+                    }
+
+                }
+                break;
+            }
             
             default:
             {
+                // Clear last namepart when pressing letter
+                if (m_strLastPlayerNamePart.size() != 0)
+                    m_strLastPlayerNamePart.clear();
+
+                // Clear last name when pressing letter
+                if (m_strLastPlayerName.size() != 0)
+                    m_strLastPlayerName.clear();
+
                 // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
                 if ( MbUTF8ToUTF16(m_strInputText).size () < CHAT_MAX_CHAT_LENGTH )
                 {                    

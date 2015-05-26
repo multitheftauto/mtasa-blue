@@ -285,6 +285,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "chat_line_life",             12000 );                        // chatbox line life time
     DEFAULT ( "chat_line_fade_out",         3000 );                         // chatbox line fade out time
     DEFAULT ( "chat_use_cegui",             false );                        // chatbox uses cegui
+    DEFAULT ( "chat_autocomplete",          true );                         // Enable autocomplete for nicknames in chatbox?
     DEFAULT ( "text_scale",                 1.0f );                         // text scale
     DEFAULT ( "invert_mouse",               false );                        // mouse inverting
     DEFAULT ( "fly_with_mouse",             false );                        // flying with mouse controls

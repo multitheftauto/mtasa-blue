@@ -246,6 +246,8 @@ protected:
     float                       m_fSmoothScrollResetTime;
     float                       m_fSmoothRepeatTimer;
     CChatInputLine              m_InputLine;
+    SString                     m_strLastPlayerNamePart;
+    SString                     m_strLastPlayerName;
 
     CGUI*                       m_pManager;
     CGUIFont*                   m_pFont;
@@ -295,6 +297,8 @@ protected:
     CVector2D                   m_RenderTargetChatSize;
     int                         m_iReportCount;
     CTickCount                  m_lastRenderTargetCreationFail;
+
+    bool                        m_bAutocomplete;
 };
 
 #endif

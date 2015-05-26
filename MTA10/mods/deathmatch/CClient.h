@@ -37,6 +37,7 @@ public:
     //bool        ProcessInput                    ( CInputMessage* pInputMessage );
 
     bool        HandleException                 ( CExceptionInformation* pExceptionInformation );
+    void        GetPlayerNames                  ( std::vector<SString> &vPlayerNames );
 };
 
 #endif

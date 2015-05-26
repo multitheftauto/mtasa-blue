@@ -297,3 +297,18 @@ bool CClient::HandleException ( CExceptionInformation* pExceptionInformation )
         return true;
     #endif
 }
+
+void CClient::GetPlayerNames ( std::vector<SString> &vPlayerNames )
+{
+    if ( g_pClientGame ) {
+        vPlayerNames.clear ();
+        for ( std::vector<CClientPlayer*>::const_iterator iter = g_pClientGame->GetPlayerManager ()->IterBegin ();
+            iter != g_pClientGame->GetPlayerManager ()->IterEnd ();
+            ++iter )
+        {
+            CClientPlayer* pClient = *iter;
+            SString strPlayerName = pClient->GetNametagText ();
+            vPlayerNames.push_back ( strPlayerName );
+        }
+    }
+};
