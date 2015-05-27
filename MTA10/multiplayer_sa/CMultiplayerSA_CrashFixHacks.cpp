@@ -1414,16 +1414,20 @@ CStreamingInfo* GetStreamingInfoFromModelId ( uint id )
 void OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
 {
     CModelInfo* pModelInfo = pGameInterface->GetModelInfo( uiModelId );
+    CBaseModelInfoSAInterface* pModelInfoSAInterface = pModelInfo->GetInterface();
     bool bIsLoaded = ( pModelInfo->IsLoaded() != 0 );
     bool bHasRwObject = ( pModelInfo->GetInterface()->pRwObject != NULL );
     int iRefCount = pModelInfo->GetRefCount();
+    unsigned short usNumberOfRefs = pModelInfoSAInterface->usNumberOfRefs;
     CStreamingInfo* pStreamingInfo = GetStreamingInfoFromModelId( uiModelId );
 
     if ( !bIsLoaded || !bHasRwObject || pStreamingInfo->reqload != 1 )
     {
-        AddReportLog( 7440, SString( "CAnimManager_CreateAnimAssocGroups: Unexpected id:%d bIsLoaded:%d bHasRwObject:%d iRefCount:%d"
+        for( uint i = 0 ; i < 2 ; i++ )
+        {
+            AddReportLog( 7440, SString( "CAnimManager_CreateAnimAssocGroups: Unexpected id:%d bIsLoaded:%d bHasRwObject:%d iRefCount:%d usNumberOfRefs:%d"
                                                   " gta_hash:%08x chain_next:%04x flg:%02x arch:%d offset:%d size:%d reqload:%d"
-                                                , uiModelId, bIsLoaded, bHasRwObject, iRefCount
+                                                    , uiModelId, bIsLoaded, bHasRwObject, iRefCount, usNumberOfRefs
                                                 , pStreamingInfo->gta_hash
                                                 , pStreamingInfo->chain_next
                                                 , pStreamingInfo->flg
@@ -1435,11 +1439,22 @@ void OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
 
         pModelInfo->Request( BLOCKING, "AnimAssocGroups" );
 
+            uint uiTimeTaken = 0;
+            while( pStreamingInfo->reqload == 2 && uiTimeTaken < 3000 )
+            {
+                Sleep( 100 );
+                uiTimeTaken += 100;
+                pGameInterface->GetStreaming()->LoadAllRequestedModels ( true, "AnimAssocGroups" );
+                pGameInterface->GetStreaming()->LoadAllRequestedModels ( false, "AnimAssocGroups" );
+            }
+
         bIsLoaded = ( pModelInfo->IsLoaded() != 0 );
         bHasRwObject = ( pModelInfo->GetInterface()->pRwObject != NULL );
-        AddReportLog( 7441, SString( "CAnimManager_CreateAnimAssocGroups: Load result id:%d bIsLoaded:%d bHasRwObject:%d iRefCount:%d"
-                                                  " gta_hash:%08x chain_next:%04x flg:%02x arch:%d offset:%d size:%d reqload:%d"
-                                                , uiModelId, bIsLoaded, bHasRwObject, iRefCount
+            iRefCount = pModelInfo->GetRefCount();
+            usNumberOfRefs = pModelInfoSAInterface->usNumberOfRefs;
+            AddReportLog( 7441, SString( "CAnimManager_CreateAnimAssocGroups: Load result id:%d bIsLoaded:%d bHasRwObject:%d iRefCount:%d usNumberOfRefs:%d"
+                                                      " gta_hash:%08x chain_next:%04x flg:%02x arch:%d offset:%d size:%d reqload:%d uiTimeTaken:%d"
+                                                    , uiModelId, bIsLoaded, bHasRwObject, iRefCount, usNumberOfRefs
                                                 , pStreamingInfo->gta_hash
                                                 , pStreamingInfo->chain_next
                                                 , pStreamingInfo->flg
@@ -1447,7 +1462,19 @@ void OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
                                                 , pStreamingInfo->offsetInBlocks
                                                 , pStreamingInfo->sizeInBlocks
                                                 , pStreamingInfo->reqload
+                                                    , uiTimeTaken
                                     ) );
+
+            if( pStreamingInfo->reqload != 2 )
+                break;
+
+            if ( i == 0 )
+            {
+                // If still loading, remove and retry
+                pModelInfo->ModelAddRef( BLOCKING, "" );
+                pModelInfo->RemoveRef();            
+            }
+        }
     }
 }
 
