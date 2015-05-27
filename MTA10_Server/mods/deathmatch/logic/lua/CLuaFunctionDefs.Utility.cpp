@@ -374,6 +374,7 @@ int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
 {
     // Got a string argument?
     CScriptArgReader argStream ( luaVM );
+
     if ( !argStream.NextIsNil () )
     {
         bool bCompact = false;
@@ -383,15 +384,22 @@ int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
         argStream.Skip ( 1 );
         argStream.ReadBool ( bCompact, false );
 
-        // Convert it to a JSON string
-        std::string strJSON;
-        if ( JSON.WriteToJSONString ( strJSON, false, bCompact ) )
+        if ( !argStream.HasErrors () )
         {
-            // Return the JSON string
-            lua_pushstring ( luaVM, strJSON.c_str () );
-            return 1;
+            // Convert it to a JSON string
+            std::string strJSON;
+            if ( JSON.WriteToJSONString ( strJSON, false, bCompact ) )
+            {
+                // Return the JSON string
+                lua_pushstring ( luaVM, strJSON.c_str () );
+                return 1;
+            }
         }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
 
     // Failed
     lua_pushnil ( luaVM );
