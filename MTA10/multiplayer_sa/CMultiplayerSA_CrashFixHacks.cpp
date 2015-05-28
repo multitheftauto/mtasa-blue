@@ -1409,9 +1409,10 @@ CStreamingInfo* GetStreamingInfoFromModelId ( uint id )
 // CAnimManager_CreateAnimAssocGroups
 //
 // A model (usually 7) has to be loaded for this to work
+// Return model id to use
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
+uint OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
 {
     CModelInfo* pModelInfo = pGameInterface->GetModelInfo( uiModelId );
     CBaseModelInfoSAInterface* pModelInfoSAInterface = pModelInfo->GetInterface();
@@ -1436,6 +1437,17 @@ void OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
                                                 , pStreamingInfo->sizeInBlocks
                                                 , pStreamingInfo->reqload
                                     ) );
+
+            // Change to use model 9
+            uiModelId = 9;
+
+            pModelInfo = pGameInterface->GetModelInfo( uiModelId );
+            pModelInfoSAInterface = pModelInfo->GetInterface();
+            bIsLoaded = ( pModelInfo->IsLoaded() != 0 );
+            bHasRwObject = ( pModelInfo->GetInterface()->pRwObject != NULL );
+            iRefCount = pModelInfo->GetRefCount();
+            usNumberOfRefs = pModelInfoSAInterface->usNumberOfRefs;
+            pStreamingInfo = GetStreamingInfoFromModelId( uiModelId );
 
         pModelInfo->Request( BLOCKING, "AnimAssocGroups" );
 
@@ -1476,6 +1488,8 @@ void OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
             }
         }
     }
+
+    return uiModelId;
 }
 
 
@@ -1491,8 +1505,11 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
         pushad
         push    eax
         call    OnMY_CAnimManager_CreateAnimAssocGroups
+        mov     [esp+0], eax         // Put result temp
         add     esp, 4*1
         popad
+
+        mov     eax, [esp-32-4*1]    // Get result temp
 
         // Replaced code
         mov     eax, 0x0A9B0C8[eax*4] 
