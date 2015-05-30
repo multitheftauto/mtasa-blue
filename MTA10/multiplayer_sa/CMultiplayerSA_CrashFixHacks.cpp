@@ -1520,6 +1520,50 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CAnimManager_CreateAnimAssocGroups
+//
+// A model (usually 7) has to be loaded to avoid a crash
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
+{
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo( uiModelId );
+    if ( pModelInfo->GetInterface()->pRwObject == NULL )
+    {
+        // Crash will occur at offset 00349b7b
+        LogEvent( 816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString( "No RwObject for model:%d", uiModelId ), 5416 );
+        CArgMap argMap;
+        argMap.Set( "id", uiModelId );
+        argMap.Set( "reason", "createanim" );
+        SetApplicationSetting( "diagnostics", "gta-model-fail", argMap.ToString() );
+    }
+}
+
+
+// Hook info
+#define HOOKPOS_CAnimManager_CreateAnimAssocGroups                 0x4D3D52
+#define HOOKSIZE_CAnimManager_CreateAnimAssocGroups                5
+#define HOOKCHECK_CAnimManager_CreateAnimAssocGroups               0x8B
+DWORD RETURN_CAnimManager_CreateAnimAssocGroups =                  0x4D3D59;
+void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
+{
+    _asm
+    {
+        pushad
+        push    eax
+        call    OnMY_CAnimManager_CreateAnimAssocGroups
+        add     esp, 4*1
+        popad
+
+        // Replaced code
+        mov     eax, 0x0A9B0C8[eax*4] 
+        jmp     RETURN_CAnimManager_CreateAnimAssocGroups
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////

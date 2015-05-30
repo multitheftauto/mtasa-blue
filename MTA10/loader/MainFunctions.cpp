@@ -823,6 +823,14 @@ void CheckLibVersions( void )
     }
 
 #endif
+
+    if ( GetSystemMetrics( SM_CLEANBOOT ) != 0 )
+    {
+        DisplayErrorMessageBox ( SStringX(_( "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
+                                    "Please restart your PC.\n" )
+                                    ), _E("CL42"), "safe-mode" );
+        return ExitProcess( EXIT_ERROR );
+    }
 }
 
 
