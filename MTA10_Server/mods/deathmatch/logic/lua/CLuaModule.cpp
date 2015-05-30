@@ -57,7 +57,7 @@ int CLuaModule::_LoadModule ( void )
     #ifdef WIN_x64
         // Search the x64 path for dependencies
         SString strSavedCurrentDirectory = GetSystemCurrentDirectory();
-        SetCurrentDirectory( PathJoin( g_pServerInterface->GetModManager ()->GetServerPath (), SERVER_BIN_PATH ) );
+        SetCurrentDirectory( PathJoin( g_pServerInterface->GetModManager ()->GetServerPath (), SERVER_BIN_PATH_MOD ) );
         m_hModule = LoadLibrary ( m_szFileName );
         SetCurrentDirectory( strSavedCurrentDirectory );
     #else
@@ -65,7 +65,7 @@ int CLuaModule::_LoadModule ( void )
     #endif
     if ( m_hModule == NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s! (%d)\n", m_szShortFileName.c_str(), GetLastError() );
+        CLogger::LogPrintf ( "MODULE: Unable to load %s! (%d)\n", *PathJoin( SERVER_BIN_PATH_MOD, "modules", m_szShortFileName ), GetLastError() );
         return 1;
     }
 #else
@@ -73,7 +73,7 @@ int CLuaModule::_LoadModule ( void )
 
     if ( m_hModule == NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to load modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror() );
+        CLogger::LogPrintf ( "MODULE: Unable to load %s (%s)!\n", *PathJoin( SERVER_BIN_PATH_MOD, "modules", m_szShortFileName ), dlerror() );
         return 1;
     }
 #endif
@@ -83,14 +83,14 @@ int CLuaModule::_LoadModule ( void )
     pfnInitFunc = ( InitModuleFunc ) ( GetProcAddress ( m_hModule, "InitModule" ) );
     if ( pfnInitFunc == NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to initialize modules/%s!\n", m_szShortFileName.c_str() );
+        CLogger::LogPrintf ( "MODULE: Unable to initialize %s!\n", *PathJoin( SERVER_BIN_PATH_MOD, "modules", m_szShortFileName ) );
         return 2;
     }
 #else
     pfnInitFunc = ( InitModuleFunc ) ( dlsym ( m_hModule, "InitModule" ) );
     if ( dlerror () != NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to initialize modules/%s (%s)!\n", m_szShortFileName.c_str(), dlerror () );
+        CLogger::LogPrintf ( "MODULE: Unable to initialize %s (%s)!\n", *PathJoin( SERVER_BIN_PATH_MOD, "modules", m_szShortFileName ), dlerror () );
         return 2;
     }
 #endif
@@ -126,7 +126,7 @@ int CLuaModule::_LoadModule ( void )
     // Run initialisation function
     if ( !pfnInitFunc( this, &m_FunctionInfo.szModuleName[0], &m_FunctionInfo.szAuthor[0], &m_FunctionInfo.fVersion ) )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to initialize modules/%s!\n", m_szShortFileName.c_str() );
+        CLogger::LogPrintf ( "MODULE: Unable to initialize %s!\n", *PathJoin( SERVER_BIN_PATH_MOD, "modules", m_szShortFileName ) );
         return 2;
     }
     m_bInitialised = true;
