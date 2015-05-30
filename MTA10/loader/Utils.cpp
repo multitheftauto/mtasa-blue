@@ -1822,7 +1822,8 @@ void CheckAndShowModelProblems ( void )
     {
         SString strMsg;
         strMsg += _("GTA:SA had trouble loading a model.");
-        strMsg += SString( " (%d)", iModelId );
+        strMsg += SString( " (%d)\n\n", iModelId );
+        strMsg += _("If you recently modified gta3.img, then try reinstalling GTA:SA.");
         DisplayErrorMessageBox ( strMsg, _E("CL34"), SString( "gta-model-fail&id=%d&reason=%s", iModelId, *strReason ) );
     }
 }

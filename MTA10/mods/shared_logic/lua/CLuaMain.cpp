@@ -2294,7 +2294,16 @@ int CLuaMain::PCall ( lua_State *L, int nargs, int nresults, int errfunc )
 
     g_pClientGame->ChangeFloatPrecision( true );
     g_pClientGame->GetScriptDebugging()->PushLuaMain ( this );
-    int iret = lua_pcall ( L, nargs, nresults, errfunc );
+    int iret = 0;
+    try
+    {
+        iret = lua_pcall ( L, nargs, nresults, errfunc );
+    }
+    catch(...)
+    {
+        // Can this happen?
+        AddReportLog( 7554, "CLuaMain::PCall - Unexpected execption thrown" );
+    }
     g_pClientGame->GetScriptDebugging()->PopLuaMain ( this );
     g_pClientGame->ChangeFloatPrecision( false );
 

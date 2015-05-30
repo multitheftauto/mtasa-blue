@@ -448,8 +448,14 @@ uint SharedUtil::GetPathFreeSpaceMB( const SString& strPath )
 
 SString SharedUtil::GetDriveNameWithNotEnoughSpace( uint uiResourcesPathMinMB, uint uiDataPathMinMB )
 {
+    SString strFileCachePath = GetCommonRegistryValue( "", "File Cache Path" );
+    if ( !strFileCachePath.empty() && DirectoryExists( PathJoin( strFileCachePath, "resources" ) ) )
+        if ( GetPathFreeSpaceMB( strFileCachePath ) < uiResourcesPathMinMB )
+            return GetPathDriveName( strFileCachePath );
+
     if ( GetPathFreeSpaceMB( GetMTASABaseDir() ) < uiResourcesPathMinMB )
         return GetPathDriveName( GetMTASABaseDir() );
+
     if ( GetPathFreeSpaceMB( GetSystemCommonAppDataPath() ) < uiDataPathMinMB )
         return GetPathDriveName( GetSystemCommonAppDataPath() );
    return ""; 
