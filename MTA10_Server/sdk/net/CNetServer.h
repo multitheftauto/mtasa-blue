@@ -100,7 +100,6 @@ public:
     // szIP can be NULL if autochoosing is wanted.
     virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName ) = 0;
     virtual void                            StopNetwork                     ( void ) = 0;
-    virtual void                            ResetNetwork                    ( void ) = 0;
 
     virtual void                            DoPulse                         ( void ) = 0;
 
@@ -130,7 +129,7 @@ public:
     virtual void                            SetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID, unsigned short usBitStreamVersion ) = 0;
     virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID ) = 0;
 
-    virtual void                            SetChecks                       ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC ) = 0;
+    virtual void                            SetChecks                       ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC, const char* szImgMods ) = 0;
 
     virtual unsigned int                    GetPendingPacketCount           ( void ) = 0;
     virtual void                            GetNetRoute                     ( SFixedString < 32 >* pstrRoute ) = 0;

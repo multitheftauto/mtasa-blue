@@ -283,6 +283,9 @@ bool CMainConfig::Load ( void )
     }
     while ( pNode );
 
+    // allow_gta3_img_mods
+    SString strImgMods;
+    GetString ( m_pRootNode, "allow_gta3_img_mods", strImgMods );
 
     // hideac
     int iHideAC = 0;
@@ -347,7 +350,7 @@ bool CMainConfig::Load ( void )
             argMap.Set ( *it, "" );
         SString strEnableSDMap = argMap.ToString ();
 
-        g_pNetServer->SetChecks ( strDisableComboACMap, strDisableACMap, strEnableSDMap, m_iEnableClientChecks, iHideAC != 0 );
+        g_pNetServer->SetChecks ( strDisableComboACMap, strDisableACMap, strEnableSDMap, m_iEnableClientChecks, iHideAC != 0, strImgMods );
     }
 
     {
