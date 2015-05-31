@@ -220,20 +220,6 @@ void CNetServerBuffer::StopNetwork ( void )
 
 ///////////////////////////////////////////////////////////////////////////
 //
-// CNetServerBuffer::ResetNetwork
-//
-// BLOCKING
-//
-///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::ResetNetwork ( void )
-{
-    SResetNetworkArgs* pArgs = new SResetNetworkArgs ();
-    AddCommandAndWait ( pArgs );
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-//
 // CNetServerBuffer::DoPulse
 //
 //
@@ -638,9 +624,9 @@ void CNetServerBuffer::ClearClientBitStreamVersion ( const NetServerPlayerID &Pl
 // (To make non blocking, strings will have to be stored in SSetChecksArgs)
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::SetChecks ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC )
+void CNetServerBuffer::SetChecks ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC, const char* szImgMods )
 {
-    SSetChecksArgs* pArgs = new SSetChecksArgs ( szDisableComboACMap, szDisableACMap, szEnableSDMap, iEnableClientChecks, bHideAC );
+    SSetChecksArgs* pArgs = new SSetChecksArgs ( szDisableComboACMap, szDisableACMap, szEnableSDMap, iEnableClientChecks, bHideAC, szImgMods );
     AddCommandAndWait ( pArgs );
 }
 
@@ -1140,6 +1126,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
 #define CALLREALNET3(func,t1,n1,t2,n2,t3,n3)                              CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3 ); CALLPOST
 #define CALLREALNET4(func,t1,n1,t2,n2,t3,n3,t4,n4)                        CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4 ); CALLPOST
 #define CALLREALNET5(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5)                  CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4, a.n5 ); CALLPOST
+#define CALLREALNET6(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5,t6,n6)            CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4, a.n5, a.n6 ); CALLPOST
 
 #define CALLREALNET0R(ret,func)                                           CALLPRE(func) a.result = m_pRealNetServer->func (); CALLPOST
 #define CALLREALNET1R(ret,func,t1,n1)                                     CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1 ); CALLPOST
@@ -1157,7 +1144,6 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
     {
         CALLREALNET4R( bool,                StartNetwork                    , const char*, szIP, unsigned short, usServerPort, unsigned int, uiAllowedPlayers, const char*, szServerName )
         CALLREALNET0 (                      StopNetwork                     )
-        CALLREALNET0 (                      ResetNetwork                    )
         CALLREALNET0 (                      DoPulse                         )
         CALLREALNET1 (                      RegisterPacketHandler           , PPACKETHANDLER, pfnPacketHandler )
         CALLREALNET2R( bool,                GetNetworkStatistics            , NetStatistics*, pDest, NetServerPlayerID&, PlayerID )
@@ -1173,7 +1159,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1 (                      SetMaximumIncomingConnections   , unsigned short, numberAllowed )
         CALLREALNET2 (                      SetClientBitStreamVersion       , const NetServerPlayerID &,PlayerID, unsigned short, usBitStreamVersion )
         CALLREALNET1 (                      ClearClientBitStreamVersion     , const NetServerPlayerID &,PlayerID )
-        CALLREALNET5 (                      SetChecks                       , const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool, bHideAC );
+        CALLREALNET6 (                      SetChecks                       , const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool, bHideAC, const char*, szImgMods );
         CALLREALNET0R( unsigned int,        GetPendingPacketCount           )
         CALLREALNET1 (                      GetNetRoute                     , SFixedString < 32 >*, pstrRoute )
         CALLREALNET1R( bool,                InitServerId                    , const char*, szPath )

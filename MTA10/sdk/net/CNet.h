@@ -62,7 +62,6 @@ public:
         STATS_OUTGOING_TRAFFIC = 1
     };
 
-    virtual void                        ResetNetwork                ( void ) = 0;
     virtual bool                        StartNetwork                ( const char* szServerHost, unsigned short usServerPort, bool bPacketTag = false ) = 0;
     virtual void                        StopNetwork                 ( void ) = 0;
 

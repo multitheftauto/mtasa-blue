@@ -64,7 +64,6 @@ public:
     // CNetServer interface
     virtual bool                            StartNetwork                    ( const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName );
     virtual void                            StopNetwork                     ( void );
-    virtual void                            ResetNetwork                    ( void );
 
     virtual void                            DoPulse                         ( void );
 
@@ -94,7 +93,7 @@ public:
     virtual void                            SetClientBitStreamVersion       ( const NetServerPlayerID &PlayerID, unsigned short usBitStreamVersion );
     virtual void                            ClearClientBitStreamVersion     ( const NetServerPlayerID &PlayerID );
 
-    virtual void                            SetChecks                       ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC );
+    virtual void                            SetChecks                       ( const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC, const char* szImgMods );
 
     virtual unsigned int                    GetPendingPacketCount           ( void );
     virtual void                            GetNetRoute                     ( SFixedString < 32 >* pstrRoute );
@@ -112,12 +111,13 @@ public:
     #define DOTYPE(func) const static int TYPE_##func = __COUNTER__;
     #define SETTYPE(func) type=TYPE_##func;
 
-    #define DECLARE_FUNC_ARGS0(func)                                DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( ) {SETTYPE(func)} };
-    #define DECLARE_FUNC_ARGS1(func,t1,n1)                          DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1 ) : n1(n1) {SETTYPE(func)} t1 n1; };
-    #define DECLARE_FUNC_ARGS2(func,t1,n1,t2,n2)                    DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2 ) : n1(n1), n2(n2) {SETTYPE(func)} t1 n1; t2 n2; };
-    #define DECLARE_FUNC_ARGS3(func,t1,n1,t2,n2,t3,n3)              DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3 ) : n1(n1), n2(n2), n3(n3) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; };
-    #define DECLARE_FUNC_ARGS4(func,t1,n1,t2,n2,t3,n3,t4,n4)        DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4 ) : n1(n1), n2(n2), n3(n3), n4(n4) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; };
-    #define DECLARE_FUNC_ARGS5(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5)  DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4,t5 n5 ) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; t5 n5; };
+    #define DECLARE_FUNC_ARGS0(func)                                        DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( ) {SETTYPE(func)} };
+    #define DECLARE_FUNC_ARGS1(func,t1,n1)                                  DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1 ) : n1(n1) {SETTYPE(func)} t1 n1; };
+    #define DECLARE_FUNC_ARGS2(func,t1,n1,t2,n2)                            DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2 ) : n1(n1), n2(n2) {SETTYPE(func)} t1 n1; t2 n2; };
+    #define DECLARE_FUNC_ARGS3(func,t1,n1,t2,n2,t3,n3)                      DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3 ) : n1(n1), n2(n2), n3(n3) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; };
+    #define DECLARE_FUNC_ARGS4(func,t1,n1,t2,n2,t3,n3,t4,n4)                DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4 ) : n1(n1), n2(n2), n3(n3), n4(n4) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; };
+    #define DECLARE_FUNC_ARGS5(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5)          DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4,t5 n5 ) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; t5 n5; };
+    #define DECLARE_FUNC_ARGS6(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5,t6,n6)    DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1,t2 n2,t3 n3,t4 n4,t5 n5,t6 n6 ) : n1(n1), n2(n2), n3(n3), n4(n4), n5(n5), n6(n6) {SETTYPE(func)} t1 n1; t2 n2; t3 n3; t4 n4; t5 n5; t6 n6; };
 
     #define DECLARE_FUNC_ARGS0R(ret,func)                                           DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( ) {SETTYPE(func)} ret result; };
     #define DECLARE_FUNC_ARGS1R(ret,func,t1,n1)                                     DOTYPE(func) struct S##func##Args : SArgs { S##func##Args ( t1 n1 ) : n1(n1) {SETTYPE(func)} t1 n1; ret result; };
@@ -130,7 +130,6 @@ public:
 
     DECLARE_FUNC_ARGS4R( bool,                  StartNetwork                    , const char*, szIP, unsigned short, usServerPort, unsigned int, uiAllowedPlayers, const char*, szServerName );
     DECLARE_FUNC_ARGS0 (                        StopNetwork                     );
-    DECLARE_FUNC_ARGS0 (                        ResetNetwork                    );
     DECLARE_FUNC_ARGS0 (                        DoPulse                         );
     DECLARE_FUNC_ARGS1 (                        RegisterPacketHandler           , PPACKETHANDLER, pfnPacketHandler );
     DECLARE_FUNC_ARGS2R( bool,                  GetNetworkStatistics            , NetStatistics*, pDest, const NetServerPlayerIDRef, PlayerID );
@@ -146,7 +145,7 @@ public:
     DECLARE_FUNC_ARGS1 (                        SetMaximumIncomingConnections   , unsigned short, numberAllowed );
     DECLARE_FUNC_ARGS2 (                        SetClientBitStreamVersion       , const NetServerPlayerIDRef, PlayerID, unsigned short, usBitStreamVersion );
     DECLARE_FUNC_ARGS1 (                        ClearClientBitStreamVersion     , const NetServerPlayerIDRef, PlayerID );
-    DECLARE_FUNC_ARGS5 (                        SetChecks                       , const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool, bHideAC );
+    DECLARE_FUNC_ARGS6 (                        SetChecks                       , const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool, bHideAC, const char*, szImgMods );
     DECLARE_FUNC_ARGS0R( unsigned int,          GetPendingPacketCount           );
     DECLARE_FUNC_ARGS1 (                        GetNetRoute                     , SFixedString < 32 >*, pstrRoute );
     DECLARE_FUNC_ARGS1R( bool,                  InitServerId                    , const char*, szPath );
