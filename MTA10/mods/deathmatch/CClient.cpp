@@ -268,6 +268,15 @@ bool CClient::ProcessCommand ( const char* szCommandLine )
 }
 
 
+void CClient::RestreamModel ( unsigned short usModel )
+{
+    if ( g_pClientGame )
+    {
+        g_pClientGame->RestreamModel( usModel );
+    }
+}
+
+
 bool CClient::HandleException ( CExceptionInformation* pExceptionInformation )
 {
     #ifndef MTA_DEBUG

@@ -433,6 +433,8 @@ public:
     void                                ChangeFloatPrecision            ( bool bHigh );
     bool                                IsHighFloatPrecision            ( void ) const;
 
+    void                                RestreamModel                   ( unsigned short usModel );
+
 private:
 
     // CGUI Callbacks

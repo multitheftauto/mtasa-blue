@@ -30,6 +30,7 @@ public:
     void        PreHUDRenderExecutionHandler    ( bool bDidUnminimize, bool bDidRecreateRenderTargets );
     void        PostFrameExecutionHandler       ( void );
     void        IdleHandler                     ( void );
+    void        RestreamModel                   ( unsigned short usModel );
 
     bool        ProcessCommand                  ( const char* szCommandLine );
     //bool        ProcessInput                    ( CInputMessage* pInputMessage );

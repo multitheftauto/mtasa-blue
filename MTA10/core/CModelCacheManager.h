@@ -18,6 +18,7 @@ public:
     // CModelCacheManager interface
     virtual void                DoPulse                             ( void ) = 0;
     virtual void                GetStats                            ( SModelCacheStats& outStats ) = 0;
+    virtual bool                UnloadModel                         ( ushort usModelId ) = 0;
     virtual void                OnRestreamModel                     ( ushort usModelId ) = 0;
     virtual void                OnClientClose                       ( void ) = 0;
     virtual void                UpdatePedModelCaching               ( const std::map < ushort, float >& newNeedCacheList ) = 0;

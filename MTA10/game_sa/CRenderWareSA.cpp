@@ -638,6 +638,54 @@ bool CRenderWareSA::RwTexDictionaryContainsTexture ( RwTexDictionary* pTXD, RwTe
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::TxdForceUnload
+//
+// 1. Unload txd from memory
+// 2. Cross fingers
+//
+// Why do we do this?
+// Player model adds (seemingly) unnecessary refs
+// (Will crash if anything is actually using the txd)
+//
+// No idea what will happen if there is a custom txd replacement
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::TxdForceUnload( ushort usTxdId, bool bDestroyTextures )
+{
+    RwTexDictionary* pTxd = CTxdStore_GetTxd( usTxdId );
+    if ( !pTxd )
+        return;
+
+    // We can abandon the textures instead of destroy. It might be safer, but will cause a memory leak
+    if ( bDestroyTextures )
+    {
+        // Unref the textures
+        std::vector < RwTexture* > textureList;
+        pGame->GetRenderWareSA()->GetTxdTextures( textureList, pTxd );
+        for ( std::vector < RwTexture* > ::iterator iter = textureList.begin() ; iter != textureList.end() ; iter++ )
+        {
+            RwTexture* pTexture = *iter;
+            while( pTexture->refs > 1 )
+                RwTextureDestroy( pTexture );
+            RwTextureDestroy( pTexture );
+        }
+    }
+
+    // Need to have at least one ref for RemoveRef to work correctly
+    if ( CTxdStore_GetNumRefs( usTxdId ) == 0 )
+    {
+        CTxdStore_AddRef( usTxdId );
+    }
+
+    while( CTxdStore_GetNumRefs( usTxdId ) > 0 )
+    {
+        CTxdStore_RemoveRef( usTxdId );
+    }
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::GetTXDIDForModelID
 //
 // Get a TXD ID associated with the model ID

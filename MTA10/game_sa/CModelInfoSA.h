@@ -322,6 +322,7 @@ public:
     void                            ModelAddRef             ( EModelRequestType requestType, const char* szTag );
     int                             GetRefCount             ( void );
     void                            RemoveRef               ( bool bRemoveExtraGTARef = false );
+    bool                            ForceUnload             ( void );
 
     // CVehicleModelInfo specific
     short                           GetAvailableVehicleMod  ( unsigned short usSlot );

@@ -6570,3 +6570,47 @@ void CClientGame::SetFileCacheRoot ( void )
             AddReportLog( 7413, SString( "CClientGame::SetFileCacheRoot - Change shared from '%s' to '%s'", *strFileCachePath, *m_strFileCacheRoot ) );
     }
 }
+
+void CClientGame::RestreamModel ( unsigned short usModel )
+{
+    // Is this a vehicle ID?
+    if ( CClientVehicleManager::IsValidModel ( usModel ) )
+    {
+        // Stream the vehicles of that model out so we have no
+        // loaded when we do the restore. The streamer will
+        // eventually stream them back in with async loading.
+        m_pManager->GetVehicleManager ()->RestreamVehicles ( usModel );
+    }
+
+    // Is this an object ID?
+    else if ( CClientObjectManager::IsValidModel ( usModel ) )
+    {
+        if ( CClientPedManager::IsValidWeaponModel ( usModel ) )
+        {
+            // Stream the weapon of that model out so we have no
+            // loaded when we do the restore. The streamer will
+            // eventually stream them back in with async loading.
+            m_pManager->GetPedManager ()->RestreamWeapon ( usModel );
+            m_pManager->GetPickupManager ()->RestreamPickups ( usModel );
+        }
+        // Stream the objects of that model out so we have no
+        // loaded when we do the restore. The streamer will
+        // eventually stream them back in with async loading.
+        m_pManager->GetObjectManager ()->RestreamObjects ( usModel );
+        g_pGame->GetModelInfo ( usModel )->RestreamIPL ();
+    }
+    // Is this an ped ID?
+    else if ( CClientPlayerManager::IsValidModel ( usModel ) )
+    {
+        // Stream the ped of that model out so we have no
+        // loaded when we do the restore. The streamer will
+        // eventually stream them back in with async loading.
+        m_pManager->GetPedManager ()->RestreamPeds ( usModel );
+    }
+    else
+
+    // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
+    if ( CClientObjectManager::IsValidModel ( usModel ) && CVehicleUpgrades::IsUpgrade ( usModel ) )
+        m_pManager->GetVehicleManager ()->RestreamVehicleUpgrades ( usModel );
+
+}

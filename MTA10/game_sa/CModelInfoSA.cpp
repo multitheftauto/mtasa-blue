@@ -758,8 +758,6 @@ int CModelInfoSA::GetRefCount ()
 
 void CModelInfoSA::RemoveRef ( bool bRemoveExtraGTARef )
 {
-    assert ( m_dwReferences > 0 );
-
     // Decrement the references
     if ( m_dwReferences > 0 )
         m_dwReferences--;
@@ -1383,4 +1381,50 @@ void CModelInfoSA::ResetSupportedUpgrades ( void )
 eModelInfoType CModelInfoSA::GetModelType(void)
 {
     return ((eModelInfoType(*)(void))m_pInterface->VFTBL->GetModelType)();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CModelInfoSA::ForceUnload
+//
+// 1. Unload the dff from memory
+// 2. Unload the associated txd from memory
+// 3. Cross fingers
+//
+// Why do we do this?
+// Player model adds (seemingly) unnecessary refs
+// (Will crash if anything is actually using the model or txd)
+//
+// Won't work if there is a custom model replacement
+//
+// Returns true if model was unloaded
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool CModelInfoSA::ForceUnload( void )
+{
+    CBaseModelInfoSAInterface* pModelInfoSAInterface = GetInterface();
+
+    // Need to have at least one ref to delete pRwObject
+    if ( pModelInfoSAInterface->usNumberOfRefs == 0 && pModelInfoSAInterface->pRwObject != NULL  )
+    {
+        pModelInfoSAInterface->usNumberOfRefs++;
+    }
+
+    // Keep removing refs from the model until is it gone
+    uint uiLimit = 100;
+    while( pModelInfoSAInterface->usNumberOfRefs > 0 && uiLimit-- )
+    {
+        RemoveRef();
+    }
+
+    // Did it work?
+    if ( pModelInfoSAInterface->usNumberOfRefs > 0 || pModelInfoSAInterface->pRwObject != NULL )
+        return false;
+
+    // If success, then remove txd
+    ushort usTxdId = GetTextureDictionaryID();
+    if ( usTxdId )
+        pGame->GetRenderWare()->TxdForceUnload( usTxdId, true );
+
+    return true;
 }
