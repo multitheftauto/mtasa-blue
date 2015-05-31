@@ -135,6 +135,7 @@ public:
     virtual void            ModelAddRef             ( EModelRequestType requestType, const char* szTag/* = NULL*/ ) = 0;
     virtual void            RemoveRef               ( bool bRemoveExtraGTARef = false ) = 0;
     virtual int             GetRefCount             () = 0;
+    virtual bool            ForceUnload             ( void ) = 0;
 
     virtual float           GetDistanceFromCentreOfMassToBaseOfModel () = 0;
 

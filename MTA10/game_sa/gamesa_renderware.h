@@ -196,6 +196,7 @@ typedef bool                (__cdecl *CTxdStore_LoadTxd_t)              (unsigne
 typedef void                (__cdecl *CTxdStore_RemoveTxd_t)            (unsigned int id);
 typedef void                (__cdecl *CTxdStore_RemoveRef_t)            (unsigned int id);
 typedef void                (__cdecl *CTxdStore_AddRef_t)               (unsigned int id);
+typedef int                 (__cdecl *CTxdStore_GetNumRefs_t)           (unsigned int id);
 typedef RwTexDictionary*    (__cdecl *CTxdStore_GetTxd_t)               (unsigned int id);
 typedef RwTexture*          (__cdecl *CClothesBuilder_CopyTexture_t)    (RwTexture *texture);
 
@@ -210,6 +211,7 @@ RWFUNC ( CTxdStore_GetTxd_t              CTxdStore_GetTxd                , (CTxd
 RWFUNC ( CTxdStore_RemoveTxd_t           CTxdStore_RemoveTxd             , (CTxdStore_RemoveTxd_t)           0xDEAD )
 RWFUNC ( CTxdStore_RemoveRef_t           CTxdStore_RemoveRef             , (CTxdStore_RemoveRef_t)           0xDEAD )
 RWFUNC ( CTxdStore_AddRef_t              CTxdStore_AddRef                , (CTxdStore_AddRef_t)              0xDEAD )
+RWFUNC ( CTxdStore_GetNumRefs_t          CTxdStore_GetNumRefs            , (CTxdStore_GetNumRefs_t)          0xDEAD )
 RWFUNC ( CClothesBuilder_CopyTexture_t   CClothesBuilder_CopyTexture     , (CClothesBuilder_CopyTexture_t)   0xDEAD )
 
 /*****************************************************************************/

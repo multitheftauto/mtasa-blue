@@ -435,6 +435,7 @@ public:
     bool                                IsHighFloatPrecision            ( void ) const;
 
     bool                                TriggerBrowserRequestResultEvent( const std::vector<SString>& newPages );
+    void                                RestreamModel                   ( unsigned short usModel );
 
 private:
 

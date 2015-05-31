@@ -98,6 +98,7 @@ void InitRwFunctions( eGameVersion version )
             CTxdStore_RemoveTxd                 = (CTxdStore_RemoveTxd_t)                   0x00731E90;
             CTxdStore_RemoveRef                 = (CTxdStore_RemoveRef_t)                   0x00731A30;
             CTxdStore_AddRef                    = (CTxdStore_AddRef_t)                      0x00731A00; 
+            CTxdStore_GetNumRefs                = (CTxdStore_GetNumRefs_t)                  0x00731AA0; 
             CClothesBuilder_CopyTexture         = (CClothesBuilder_CopyTexture_t)           0x005A5730;
 
             break;
@@ -187,6 +188,7 @@ void InitRwFunctions( eGameVersion version )
             CTxdStore_RemoveTxd                 = (CTxdStore_RemoveTxd_t)                   0x00731E90;
             CTxdStore_RemoveRef                 = (CTxdStore_RemoveRef_t)                   0x00731A30;
             CTxdStore_AddRef                    = (CTxdStore_AddRef_t)                      0x00731A00;
+            CTxdStore_GetNumRefs                = (CTxdStore_GetNumRefs_t)                  0x00731AA0;
             CClothesBuilder_CopyTexture         = (CClothesBuilder_CopyTexture_t)           0x005A5730;
 
             break;

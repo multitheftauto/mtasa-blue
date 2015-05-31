@@ -39,6 +39,7 @@ public:
     // CModelCacheManager interface
     virtual void                DoPulse                             ( void );
     virtual void                GetStats                            ( SModelCacheStats& outStats );
+    virtual bool                UnloadModel                         ( ushort usModelId );
     virtual void                OnRestreamModel                     ( ushort usModelId );
     virtual void                OnClientClose                       ( void );
     virtual void                UpdatePedModelCaching               ( const std::map < ushort, float >& newNeedCacheList );
@@ -476,6 +477,32 @@ void CModelCacheManagerImpl::SubModelRefCount ( ushort usModelId )
     CModelInfo* pModelInfo = m_pGame->GetModelInfo ( usModelId );
     if ( pModelInfo )
         pModelInfo->RemoveRef ();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CModelCacheManagerImpl::UnloadModel
+//
+// Remove model and associated txd from memory
+//
+///////////////////////////////////////////////////////////////
+bool CModelCacheManagerImpl::UnloadModel ( ushort usModelId )
+{
+    // Stream out usages in the client module
+    CClientBase* pClientBase = CModManager::GetSingleton().GetCurrentMod();
+    if ( pClientBase )
+        pClientBase->RestreamModel( usModelId );
+
+    // Uncache usages here
+    OnRestreamModel( usModelId );
+
+    // Ensure model and txd are removed
+    CModelInfo* pModelInfo = m_pGame->GetModelInfo( usModelId );
+    if ( pModelInfo )
+        return pModelInfo->ForceUnload();
+
+    return false;
 }
 
 

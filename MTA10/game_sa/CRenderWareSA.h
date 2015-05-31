@@ -106,6 +106,7 @@ public:
     void                RemoveClientEntityRefs      ( CClientEntityBase* pClientEntity );
     void                RemoveShaderRefs            ( CSHADERDUMMY* pShaderItem );
     bool                RightSizeTxd                ( const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit );
+    void                TxdForceUnload              ( ushort usTxdId, bool bDestroyTextures );
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture            ( RwTexture* pTexture, uint uiSizeLimit );
