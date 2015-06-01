@@ -511,6 +511,10 @@ void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptio
         CCore::GetSingleton().SaveConfig();
         AddReportLog( 9205, "Disabled volumetric shadows" );
     }
+
+    CNet* pNet = CCore::GetSingleton().GetNetwork();
+    if ( pNet )
+        pNet->PostCrash();    
 }
 
 
