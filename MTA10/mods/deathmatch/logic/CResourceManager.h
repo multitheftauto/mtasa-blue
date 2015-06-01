@@ -56,6 +56,7 @@ public:
     void                        OnRemoveResourceFile        ( CDownloadableResource* pResourceFile );
     void                        OnDownloadedResourceFile    ( const SString& strFilename );
     bool                        IsResourceFile              ( const SString& strFilename );
+    void                        FileModifedByScript         ( const SString& strFilename );
     void                        ValidateResourceFile        ( const SString& strFilename, const CBuffer& fileData );
 
     static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath );
