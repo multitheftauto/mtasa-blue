@@ -1970,7 +1970,7 @@ void CClientPed::SetFrozenWaitingForGroundToLoad ( bool bFrozen )
 }
 
 
-CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
+CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo, bool bSetAsCurrent )
 {   
     // Multiply ammo with 10 if flamethrower to get the numbers correct.
     if ( weaponType == WEAPONTYPE_FLAMETHROWER ) uiAmmo *= 10;
@@ -2033,7 +2033,10 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
 
             pWeapon->SetAmmoTotal ( uiTotalAmmo );
             pWeapon->SetAmmoInClip ( uiPreviousAmmoInClip );
-        }            
+        }
+
+        if ( bSetAsCurrent )
+            pWeapon->SetAsCurrentWeapon ();
     }
 
     CWeaponInfo* pInfo = NULL;
@@ -2049,8 +2052,11 @@ CWeapon * CClientPed::GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo )
     }
     if ( pInfo )
     {
-        m_CurrentWeaponSlot = pInfo->GetSlot ();
-        m_WeaponTypes [ m_CurrentWeaponSlot ] = weaponType;
+        eWeaponSlot slot = pInfo->GetSlot ();
+        m_WeaponTypes [ slot ] = weaponType;
+
+        if ( bSetAsCurrent )
+            m_CurrentWeaponSlot = slot;
     }
 
     return pWeapon;

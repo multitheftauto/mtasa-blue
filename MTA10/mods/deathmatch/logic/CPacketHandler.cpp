@@ -3732,6 +3732,44 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
                     }
 
+                    // weapons
+                    if ( bitStream.Version () >= 0x61 )
+                    {
+                        unsigned char slot;
+                        bitStream.Read ( slot );
+
+                        while ( slot != 0xFF )
+                        {
+                            // Read info from bitstream
+                            unsigned char ucType;
+                            bitStream.Read ( ucType );
+
+                            unsigned short usTotalAmmo;
+                            bitStream.Read ( usTotalAmmo );
+
+                            // ammoInClip is not implemented generally
+                            //unsigned short usAmmoInClip;
+                            //bitStream.Read ( usAmmoInClip );
+
+                            // Apply read info
+                            CWeapon* pWeapon = pPed->GiveWeapon ( (eWeaponType)ucType, usTotalAmmo );
+                            pPed->m_usWeaponAmmo[slot] = usTotalAmmo;
+                            if ( pWeapon )
+                            {
+                                //pWeapon->SetAmmoInClip ( usAmmoInClip );
+                                pWeapon->SetAmmoTotal ( usTotalAmmo );
+                            }
+
+                            // Get next slot
+                            bitStream.Read ( slot );
+                        }
+
+                        // Read and set current slot
+                        unsigned char ucCurrentSlot;
+                        bitStream.Read ( ucCurrentSlot );
+                        pPed->SetCurrentWeaponSlot ( (eWeaponSlot)ucCurrentSlot );
+                    }
+
                     // Collisions
                     pPed->SetUsesCollision ( bCollisonsEnabled );
                     

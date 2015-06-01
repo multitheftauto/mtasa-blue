@@ -899,6 +899,33 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                             BitStream.Write ( ucType );
                         }
                     }
+
+                    // weapons
+                    if ( BitStream.Version () >= 0x61 )
+                    {
+                        // Get a list of weapons
+                        for ( unsigned char slot = 0; slot < WEAPONSLOT_MAX; ++slot )
+                        {
+                            CWeapon* pWeapon = pPed->GetWeapon ( slot );
+                            if ( pWeapon->ucType != 0 )
+                            {
+                                BitStream.Write ( slot );
+                                BitStream.Write ( pWeapon->ucType );
+                                BitStream.Write ( pWeapon->usAmmo );
+
+                                // ammoInClip is not implemented generally
+                                //BitStream.Write ( pWeapon->usAmmoInClip );
+                            }
+                        }
+
+                        // Write end marker (slot)
+                        BitStream.Write ( (unsigned char)0xFF );
+
+                        // Send the current weapon spot
+                        unsigned char currentWeaponSlot = pPed->GetWeaponSlot ();
+                        BitStream.Write ( currentWeaponSlot );
+                    }
+
                     break;
                 }
 
