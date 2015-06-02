@@ -148,9 +148,10 @@ public:
     static bool                         IsPedDoingGangDriveby               ( CClientPed& Ped, bool & bDoingGangDriveby );
     static bool                         GetPedAnimation                     ( CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName );
     static bool                         GetPedMoveAnim                      ( CClientPed& Ped, unsigned int& iMoveAnim );
-    static bool                         GetPedMoveState                     ( CClientPed & Ped, std::string& strMoveState );
+    static bool                         GetPedMoveState                     ( CClientPed& Ped, std::string& strMoveState );
     static bool                         IsPedHeadless                       ( CClientPed& Ped, bool & bHeadless );
     static bool                         IsPedFrozen                         ( CClientPed& Ped, bool & bFrozen );
+    static bool                         GetPedOccupiedVehicleSeat           ( CClientPed& Ped, uint& uiSeat );
     static bool                         IsPedFootBloodEnabled               ( CClientPed& Ped, bool & bHasFootBlood );
     static bool                         GetPedCameraRotation                ( CClientPed& Ped, float & fRotation );
     static bool                         GetPedWeaponMuzzlePosition          ( CClientPed& Ped, CVector& vecPosition );

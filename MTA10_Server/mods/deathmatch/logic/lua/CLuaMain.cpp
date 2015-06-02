@@ -768,7 +768,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "ammoInClipOfCurrentWeaponSlot", NULL, "getPedAmmoInClip" );
     lua_classvariable ( luaVM, "weaponInCurrentWeaponSlot", NULL, "getPedWeapon" );
     lua_classvariable ( luaVM, "target", NULL, "getPedTarget" );
-    lua_classvariable ( luaVM, "occupiedVehicleSeat", NULL, "getPedOccupiedVehicleSeat" );
+    lua_classvariable ( luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat" );
     lua_classvariable ( luaVM, "contactElement", NULL, "getPedContactElement" );
     lua_classvariable ( luaVM, "totalAmmoInWeaponOfCurrentWeaponSlot", NULL, "getPedTotalAmmo" );
     lua_classvariable ( luaVM, "vehicle", "warpPedIntoVehicle", "getPedOccupiedVehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle ); // what about removePedFromVehicle?

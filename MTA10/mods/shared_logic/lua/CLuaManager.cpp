@@ -414,6 +414,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPedAmmoInClip", CLuaFunctionDefs::GetPedAmmoInClip );
     CLuaCFunctions::AddFunction ( "getPedTotalAmmo", CLuaFunctionDefs::GetPedTotalAmmo );
     CLuaCFunctions::AddFunction ( "getPedOccupiedVehicle", CLuaFunctionDefs::GetPedOccupiedVehicle );
+    CLuaCFunctions::AddFunction ( "getPedOccupiedVehicleSeat", CLuaFunctionDefs::GetPedOccupiedVehicleSeat );
     CLuaCFunctions::AddFunction ( "getPedArmor", CLuaFunctionDefs::GetPedArmor );
     CLuaCFunctions::AddFunction ( "isPedChoking", CLuaFunctionDefs::IsPedChoking );
     CLuaCFunctions::AddFunction ( "isPedDucked", CLuaFunctionDefs::IsPedDucked );

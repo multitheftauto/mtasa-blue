@@ -1714,6 +1714,16 @@ bool CStaticFunctionDefinitions::IsPedInVehicle ( CClientPed & Ped, bool & bInVe
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat ( CClientPed& pPed, uint& uiSeat )
+{
+    if ( pPed.IsInVehicle() )
+    {
+        uiSeat = pPed.GetOccupiedVehicleSeat ();
+        return true;
+    }
+    return false;
+}
+
 const char* CStaticFunctionDefinitions::GetPedSimplestTask ( CClientPed& Ped )
 {
     CTaskManager* pTaskManager = Ped.GetTaskManager ();

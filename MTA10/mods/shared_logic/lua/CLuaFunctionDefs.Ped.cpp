@@ -318,6 +318,28 @@ int CLuaFunctionDefs::GetPedOccupiedVehicle ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetPedOccupiedVehicleSeat ( lua_State* luaVM )
+{
+    CClientPed* pPed = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+
+    if ( !argStream.HasErrors () )
+    {
+        unsigned int uiVehicleSeat;
+        if ( CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat ( *pPed, uiVehicleSeat ) )
+        {
+            lua_pushnumber ( luaVM, uiVehicleSeat );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::GetPedTask ( lua_State* luaVM )
 {

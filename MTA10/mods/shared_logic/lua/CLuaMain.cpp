@@ -434,6 +434,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getControlState", "getPedControlState" );
     lua_classfunction ( luaVM, "getMoveState", "getPedMoveState" );
     lua_classfunction ( luaVM, "getOccupiedVehicle", "getPedOccupiedVehicle" );
+    lua_classfunction ( luaVM, "getOccupiedVehicleSeat", "getPedOccupiedVehicleSeat" );
     lua_classfunction ( luaVM, "getOxygenLevel", "getPedOxygenLevel" );
     lua_classfunction ( luaVM, "getStat", "getPedStat" );
     lua_classfunction ( luaVM, "getTarget", "getPedTarget" );
@@ -483,6 +484,7 @@ void CLuaMain::AddPedClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "giveWeapon", "givePedWeapon" );
 
     lua_classvariable ( luaVM, "vehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle );
+    lua_classvariable ( luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat" );
     lua_classvariable ( luaVM, "canBeKnockedOffBike", "setPedCanBeKnockedOffBike", "canPedBeKnockedOffBike" );
     lua_classvariable ( luaVM, "hasJetPack", NULL, "doesPedHaveJetPack" );
     lua_classvariable ( luaVM, "armor", NULL, "getPedArmor" );
