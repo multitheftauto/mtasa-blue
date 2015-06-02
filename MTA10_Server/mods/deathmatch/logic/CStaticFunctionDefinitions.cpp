@@ -1778,7 +1778,7 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             CObject * pObject = static_cast < CObject* > ( pElement );
             if ( pObject->GetModel () == usModel ) return false;
             if ( !CObjectManager::IsValidModel ( usModel ) ) return false;
-			CLuaArguments Arguments;
+            CLuaArguments Arguments;
             Arguments.PushNumber ( pObject->GetModel () ); // Get the old model
             pObject->SetModel ( usModel ); // Set the new model
             Arguments.PushNumber ( usModel ); // Get the new model

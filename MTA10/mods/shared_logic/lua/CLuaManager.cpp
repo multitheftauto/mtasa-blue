@@ -797,7 +797,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiCreateFont", CLuaFunctionDefs::GUICreateFont );
 
     CLuaCFunctions::AddFunction ( "guiStaticImageLoadImage", CLuaFunctionDefs::GUIStaticImageLoadImage );
-	CLuaCFunctions::AddFunction ( "guiStaticImageGetNativeSize", CLuaFunctionDefs::GUIStaticImageGetNativeSize );
+    CLuaCFunctions::AddFunction ( "guiStaticImageGetNativeSize", CLuaFunctionDefs::GUIStaticImageGetNativeSize );
     CLuaCFunctions::AddFunction ( "guiGetSelectedTab", CLuaFunctionDefs::GUIGetSelectedTab );
     CLuaCFunctions::AddFunction ( "guiSetSelectedTab", CLuaFunctionDefs::GUISetSelectedTab );
     CLuaCFunctions::AddFunction ( "guiDeleteTab", CLuaFunctionDefs::GUIDeleteTab );
@@ -898,13 +898,13 @@ void CLuaManager::LoadCFunctions ( void )
 
     CLuaCFunctions::AddFunction ( "getChatboxLayout", CLuaFunctionDefs::GUIGetChatboxLayout );
 
-	CLuaCFunctions::AddFunction ( "guiComboBoxAddItem", CLuaFunctionDefs::GUIComboBoxAddItem );
-	CLuaCFunctions::AddFunction ( "guiComboBoxRemoveItem", CLuaFunctionDefs::GUIComboBoxRemoveItem );
-	CLuaCFunctions::AddFunction ( "guiComboBoxClear", CLuaFunctionDefs::GUIComboBoxClear );
-	CLuaCFunctions::AddFunction ( "guiComboBoxGetSelected", CLuaFunctionDefs::GUIComboBoxGetSelected );
-	CLuaCFunctions::AddFunction ( "guiComboBoxSetSelected", CLuaFunctionDefs::GUIComboBoxSetSelected );
-	CLuaCFunctions::AddFunction ( "guiComboBoxGetItemText", CLuaFunctionDefs::GUIComboBoxGetItemText );
-	CLuaCFunctions::AddFunction ( "guiComboBoxSetItemText", CLuaFunctionDefs::GUIComboBoxSetItemText );
+    CLuaCFunctions::AddFunction ( "guiComboBoxAddItem", CLuaFunctionDefs::GUIComboBoxAddItem );
+    CLuaCFunctions::AddFunction ( "guiComboBoxRemoveItem", CLuaFunctionDefs::GUIComboBoxRemoveItem );
+    CLuaCFunctions::AddFunction ( "guiComboBoxClear", CLuaFunctionDefs::GUIComboBoxClear );
+    CLuaCFunctions::AddFunction ( "guiComboBoxGetSelected", CLuaFunctionDefs::GUIComboBoxGetSelected );
+    CLuaCFunctions::AddFunction ( "guiComboBoxSetSelected", CLuaFunctionDefs::GUIComboBoxSetSelected );
+    CLuaCFunctions::AddFunction ( "guiComboBoxGetItemText", CLuaFunctionDefs::GUIComboBoxGetItemText );
+    CLuaCFunctions::AddFunction ( "guiComboBoxSetItemText", CLuaFunctionDefs::GUIComboBoxSetItemText );
 
 
     // Util functions
@@ -1070,8 +1070,8 @@ void CLuaManager::LoadCFunctions ( void )
     // Projectile funcs
     CLuaCFunctions::AddFunction ( "createProjectile", CLuaFunctionDefs::CreateProjectile );
     CLuaCFunctions::AddFunction ( "getProjectileType", CLuaFunctionDefs::GetProjectileType );
-	CLuaCFunctions::AddFunction ( "getProjectileTarget", CLuaFunctionDefs::GetProjectileTarget );
-	CLuaCFunctions::AddFunction ( "getProjectileCreator", CLuaFunctionDefs::GetProjectileCreator );
+    CLuaCFunctions::AddFunction ( "getProjectileTarget", CLuaFunctionDefs::GetProjectileTarget );
+    CLuaCFunctions::AddFunction ( "getProjectileCreator", CLuaFunctionDefs::GetProjectileCreator );
     CLuaCFunctions::AddFunction ( "getProjectileForce", CLuaFunctionDefs::GetProjectileForce );
     CLuaCFunctions::AddFunction ( "setProjectileCounter", CLuaFunctionDefs::SetProjectileCounter );
     CLuaCFunctions::AddFunction ( "getProjectileCounter", CLuaFunctionDefs::GetProjectileCounter );
