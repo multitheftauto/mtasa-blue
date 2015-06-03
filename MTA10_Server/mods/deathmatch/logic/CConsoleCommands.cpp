@@ -948,23 +948,31 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
             // Long enough strings?
             if ( CAccountManager::IsValidNewAccountName( szNick ) && CAccountManager::IsValidNewPassword( szPassword ) )
             {
-                // Try creating the account
-                if ( !g_pGame->GetAccountManager ()->Get ( szNick ) )
+                SString strCaseVariation = g_pGame->GetAccountManager ()->GetActiveCaseVariation( szNick );
+                if ( strCaseVariation.empty() )
                 {
-                    CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), true, szNick );
-                    pAccount->SetPassword ( szPassword );
-                    g_pGame->GetAccountManager ()->Register( pAccount );
+                    // Try creating the account
+                    if ( !g_pGame->GetAccountManager ()->Get ( szNick ) )
+                    {
+                        CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), true, szNick );
+                        pAccount->SetPassword ( szPassword );
+                        g_pGame->GetAccountManager ()->Register( pAccount );
 
-                    // Tell the user
-                    pClient->SendEcho ( SString ( "addaccount: Added account '%s' with password '%s'", szNick, szPassword ) );
+                        // Tell the user
+                        pClient->SendEcho ( SString ( "addaccount: Added account '%s' with password '%s'", szNick, szPassword ) );
 
-                    // Tell the console
-                    CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s' with password '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
-                    return true;
+                        // Tell the console
+                        CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s' with password '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
+                        return true;
+                    }
+                    else
+                    {
+                        pEchoClient->SendEcho ( "addaccount: Already an account with that name" );
+                    }
                 }
                 else
                 {
-                    pEchoClient->SendEcho ( "addaccount: Already an account with that name" );
+                    pEchoClient->SendEcho ( SString ( "addaccount: Already an account using a case variation of that name ('%s')", *strCaseVariation ) );
                 }
             }
             else

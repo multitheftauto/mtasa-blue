@@ -68,9 +68,23 @@ public:
     }
 
     // Account functions
-    void FindAccountMatches ( std::vector < CAccount* >* pOutResults, const SString& strName )
+    void FindAccountMatches ( std::vector < CAccount* >* pOutResults, const SString& strName, bool bCaseSensitive )
     {
         MultiFind ( m_NameAccountMap, strName, pOutResults );
+
+        // If case sensitive, then remove non-exact matches
+        if ( bCaseSensitive )
+        {
+            for ( uint i = 0 ; i < pOutResults->size() ; ++i )
+            {
+                CAccount* pAccount = pOutResults->at( i );
+                if ( pAccount->GetName() != strName )
+                {
+                    pOutResults->erase( pOutResults->begin () + i );
+                    i--;
+                }
+            }
+        }
     }
 
     void ChangingName ( CAccount* pAccount, const SString& strOldName, const SString& strNewName )
@@ -84,7 +98,15 @@ public:
     }
 
 protected:
-    std::multimap < SString, CAccount* > m_NameAccountMap;
+    struct CaseInsensitiveCompare
+    { 
+        bool operator() ( const SString& strLhs, const SString& strRhs ) const
+        {
+            return stricmp( strLhs, strRhs ) < 0;
+        }
+    };
+
+    std::multimap < SString, CAccount*, CaseInsensitiveCompare > m_NameAccountMap;
 };
 
 // Returns true if the item is in the itemList
@@ -119,6 +141,7 @@ public:
     CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
     CAccount*                   Get                         ( const char* szName, const char* szIP );
     CAccount*                   GetAccountFromScriptID      ( uint uiScriptID );
+    SString                     GetActiveCaseVariation      ( const SString& strName );
 
     bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword );
     bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount, bool bAutoLogin = false );

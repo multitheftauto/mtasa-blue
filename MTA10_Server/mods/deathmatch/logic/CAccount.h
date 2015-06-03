@@ -44,8 +44,8 @@ public:
     inline bool                 IsRegistered            ( void )                    { return m_bRegistered; }
     void                        Register                ( const char* szPassword );
 
-    inline unsigned int         GetNameHash             ( void )                    { return m_uiNameHash; }
-    inline const std::string&   GetName                 ( void )                    { return m_strName; }
+    unsigned int                GetNameHash             ( void )                    { return m_uiNameHash; }
+    const SString&              GetName                 ( void )                    { return m_strName; }
     void                        SetName                 ( const std::string& strName );
 
     void                        SetPassword             ( const SString& strPassword );
@@ -81,7 +81,7 @@ public:
     CAccountManager*            m_pManager;
 
     bool                        m_bRegistered;
-    std::string                 m_strName;
+    SString                     m_strName;
     CAccountPassword            m_Password;
     std::string                 m_strIP;
     std::string                 m_strSerial;

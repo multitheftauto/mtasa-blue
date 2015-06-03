@@ -629,7 +629,7 @@ CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
     if ( szName && szName [ 0 ] )
     {
         std::vector < CAccount* > results;
-        m_List.FindAccountMatches ( &results, szName );
+        m_List.FindAccountMatches ( &results, szName, true );
         for ( uint i = 0 ; i < results.size () ; i++ )
         {
             CAccount* pAccount = results[i];
@@ -648,7 +648,7 @@ CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
     if ( szName && szName [ 0 ] && szIP && szIP [ 0 ] )
     {
         std::vector < CAccount* > results;
-        m_List.FindAccountMatches ( &results, szName );
+        m_List.FindAccountMatches ( &results, szName, true );
         for ( uint i = 0 ; i < results.size () ; i++ )
         {
             CAccount* pAccount = results[i];
@@ -670,6 +670,28 @@ CAccount* CAccountManager::GetAccountFromScriptID ( uint uiScriptID )
     CAccount* pAccount = (CAccount*) CIdArray::FindEntry ( uiScriptID, EIdClass::ACCOUNT );
     dassert ( !pAccount || ListContains ( m_List, pAccount ) );
     return pAccount;
+}
+
+
+// Return the name of an account which already exists, and is using the same name with one or more letters in a different case
+SString CAccountManager::GetActiveCaseVariation ( const SString& strName )
+{
+    // Check for exact match already existing
+    if ( Get( strName ) )
+        return "";
+
+    std::vector < CAccount* > results;
+    // Case insensitive search to find all variations
+    m_List.FindAccountMatches ( &results, strName, false );
+    for ( uint i = 0 ; i < results.size () ; i++ )
+    {
+        CAccount* pAccount = results[i];
+        if ( pAccount->IsRegistered () && pAccount->GetName () != strName )
+        {
+            return pAccount->GetName ();
+        }
+    }
+    return "";
 }
 
 

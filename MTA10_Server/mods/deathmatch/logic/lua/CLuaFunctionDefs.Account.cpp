@@ -247,23 +247,36 @@ int CLuaFunctionDefs::GetAccountsBySerial ( lua_State* luaVM )
 
 int CLuaFunctionDefs::AddAccount ( lua_State* luaVM )
 {
-    //  account addAccount ( string name, string pass )
-    SString strName; SString strPassword;
+    //  account addAccount ( string name, string pass[, bool allowCaseVariations = false ] )
+    SString strName; SString strPassword; bool bAllowCaseVariations;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strName );
     argStream.ReadString ( strPassword );
+    argStream.ReadBool ( bAllowCaseVariations, false );
 
     if ( !argStream.HasErrors () )
     {
-        CAccount* pAccount;
-        if ( ( pAccount = CStaticFunctionDefinitions::AddAccount ( strName, strPassword ) ) )
+        if ( !bAllowCaseVariations )
         {
-            lua_pushaccount ( luaVM, pAccount );
-            return 1;
+            // Message for new behaviour
+            SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation( strName );
+            if ( !strCaseVariation.empty() )
+                argStream.SetCustomError ( SString( "Already an account using a case variation of that name ('%s')", *strCaseVariation ) );
+        }
+
+        if ( !argStream.HasErrors () )
+        {
+            CAccount* pAccount;
+            if ( ( pAccount = CStaticFunctionDefinitions::AddAccount ( strName, strPassword ) ) )
+            {
+                lua_pushaccount ( luaVM, pAccount );
+                return 1;
+            }
         }
     }
-    else
+
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
