@@ -47,6 +47,14 @@ CLuaManager::CLuaManager ( CObjectManager* pObjectManager,
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
     lua_registerUndumpHook ( CLuaMain::OnUndump );
+
+#ifdef MTA_DEBUG
+    // Check rounding in case json is updated
+    json_object* obj = json_object_new_double( 5.1 );
+    SString strResult = json_object_to_json_string_ext( obj, JSON_C_TO_STRING_PLAIN );
+    assert( strResult == "5.1" );
+    json_object_put( obj );
+#endif
 }
 
 CLuaManager::~CLuaManager ( void )

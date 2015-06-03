@@ -839,7 +839,7 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, CFastHashMap < 
             }
             else
             {
-                return json_object_new_double( static_cast < float > ( GetNumber() ) );
+                return json_object_new_double( GetNumber() );
             }
             break;
         }
@@ -929,7 +929,7 @@ char * CLuaArgument::WriteToString ( char * szBuffer, int length )
             }
             else
             {
-                snprintf ( szBuffer, length, "%f", static_cast < float > ( GetNumber() ) );
+                snprintf ( szBuffer, length, "%f", GetNumber() );
                 return szBuffer;
             }
             break;
