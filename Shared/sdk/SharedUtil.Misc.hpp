@@ -51,12 +51,14 @@ std::map < uint, uint > ms_ReportAmountMap;
 #ifdef _WINDOWS_ //Only for modules that use windows.h
     int SharedUtil::MessageBoxUTF8 ( HWND hWnd, SString lpText, SString lpCaption, UINT uType )
     {
+        // Default to warning icon
+        if ( ( uType & ICON_MASK_VALUE ) == 0 )
+            uType |= ICON_WARNING;
         WString strText = MbUTF8ToUTF16 ( lpText );
         WString strCaption = MbUTF8ToUTF16 ( lpCaption );
         return MessageBoxW ( hWnd, strText.c_str(), strCaption.c_str(), uType );
     }
 #endif
-
 
 //
 // Get startup directory as saved in the registry by the launcher
@@ -70,7 +72,7 @@ SString SharedUtil::GetMTASABaseDir ( void )
         strInstallRoot = GetRegistryValue ( "", "Last Run Location" );
         if ( strInstallRoot.empty () )
         {
-            MessageBoxUTF8 ( 0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error")+_E("U01"), MB_OK | MB_TOPMOST );
+            MessageBoxUTF8 ( 0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error")+_E("U01"), MB_OK | MB_ICONERROR | MB_TOPMOST );
             TerminateProcess ( GetCurrentProcess (), 9 );
         }
     }
@@ -566,13 +568,13 @@ bool SharedUtil::ProcessPendingBrowseToSolution ( void )
         if ( !strMessageBoxMessage.empty() )
             strMessageBoxMessage += "\n\n\n";
         strMessageBoxMessage += _("Do you want to see some on-line help about this problem ?");
-        if ( IDYES != MessageBoxUTF8( NULL, strMessageBoxMessage, strTitle, MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) )
+        if ( IDYES != MessageBoxUTF8( NULL, strMessageBoxMessage, strTitle, MB_YESNO | MB_TOPMOST | ( iFlags & ICON_MASK_VALUE ) ) )
             return false;
     }
     else
     {
         if ( !strMessageBoxMessage.empty() )
-            MessageBoxUTF8 ( NULL, strMessageBoxMessage, strTitle, MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST );
+            MessageBoxUTF8 ( NULL, strMessageBoxMessage, strTitle, MB_OK | MB_TOPMOST | ( iFlags & ICON_MASK_VALUE ) );
         if ( iFlags & SHOW_MESSAGE_ONLY )
             return true;
     }

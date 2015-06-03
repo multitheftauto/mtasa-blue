@@ -221,7 +221,7 @@ void HandleDuplicateLaunching( void )
                                     "If the problem persists, open Task Manager and\n"
                                     "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
                                     "Try to launch MTA:SA again?" );
-                if ( MessageBoxUTF8( 0, strMessage, _("Error")+_E("CL04"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES ) // Trouble restarting MTA:SA
+                if ( MessageBoxUTF8( 0, strMessage, _("Error")+_E("CL04"), MB_ICONWARNING | MB_YESNO | MB_TOPMOST  ) == IDYES ) // Trouble restarting MTA:SA
                 {
                     TerminateGTAIfRunning ();
                     TerminateOtherMTAIfRunning ();
@@ -237,7 +237,7 @@ void HandleDuplicateLaunching( void )
                 MessageBoxUTF8 ( 0, _("Another instance of MTA is already running.\n\nIf this problem persists, please restart your computer"), _("Error")+_E("CL05"), MB_ICONERROR | MB_TOPMOST  );
             }
             else
-            if ( MessageBoxUTF8( 0, _("Another instance of MTA is already running.\n\nDo you want to terminate it?"), _("Error")+_E("CL06"), MB_ICONERROR | MB_YESNO | MB_TOPMOST  ) == IDYES )
+            if ( MessageBoxUTF8( 0, _("Another instance of MTA is already running.\n\nDo you want to terminate it?"), _("Error")+_E("CL06"), MB_ICONQUESTION | MB_YESNO | MB_TOPMOST  ) == IDYES )
             {
                 TerminateGTAIfRunning ();
                 TerminateOtherMTAIfRunning ();
@@ -261,7 +261,7 @@ void HandleTrouble ( void )
     if ( CheckAndShowFileOpenFailureMessage () )
         return;
 
-    int iResponse = MessageBoxUTF8 ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?"), "MTA: San Andreas"+_E("CL07"), MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+    int iResponse = MessageBoxUTF8 ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?"), "MTA: San Andreas"+_E("CL07"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
     if ( iResponse == IDYES )
     {
         BrowseToSolution ( "crashing-before-gtagame", TERMINATE_PROCESS );
@@ -289,7 +289,7 @@ void HandleResetSettings ( void )
 
     if ( FileExists ( strSettingsFilename ) )
     {
-        int iResponse = MessageBoxUTF8 ( NULL, _("There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?"), "MTA: San Andreas"+_E("CL08"), MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+        int iResponse = MessageBoxUTF8 ( NULL, _("There seems to be a problem launching MTA:SA.\nResetting GTA settings can sometimes fix this problem.\n\nDo you want to reset GTA settings now?"), "MTA: San Andreas"+_E("CL08"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
         if ( iResponse == IDYES )
         {
             FileDelete ( strSettingsFilenameBak );
@@ -303,14 +303,14 @@ void HandleResetSettings ( void )
             else
             {
                 AddReportLog ( 5054, SString ( "Delete gta_sa.set failed with '%s'", *strSettingsFilename ) );
-                MessageBoxUTF8 ( NULL, SString ( _("File could not be deleted: '%s'"), *strSettingsFilename ), "Error"+_E("CL09"), MB_OK | MB_ICONERROR | MB_TOPMOST );
+                MessageBoxUTF8 ( NULL, SString ( _("File could not be deleted: '%s'"), *strSettingsFilename ), "Error"+_E("CL09"), MB_OK | MB_ICONWARNING | MB_TOPMOST );
             }
         }
     }
     else
     {
         // No settings to delete, or can't find them
-        int iResponse = MessageBoxUTF8 ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to see some online help?"), "MTA: San Andreas", MB_YESNO | MB_ICONERROR | MB_TOPMOST );
+        int iResponse = MessageBoxUTF8 ( NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to see some online help?"), "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
         if ( iResponse == IDYES )
         {
             BrowseToSolution ( "crashing-before-gtalaunch", TERMINATE_PROCESS );
@@ -460,7 +460,7 @@ void HandleIfGTAIsAlreadyRunning( void )
             TerminateGTAIfRunning ();
             if ( IsGTARunning () )
             {
-                MessageBoxUTF8 ( 0, _("Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."), _("Information")+_E("CL11"), MB_OK | MB_ICONQUESTION | MB_TOPMOST );
+                MessageBoxUTF8 ( 0, _("Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."), _("Information")+_E("CL11"), MB_OK | MB_ICONERROR | MB_TOPMOST );
                 return ExitProcess( EXIT_ERROR );
             }       
         }

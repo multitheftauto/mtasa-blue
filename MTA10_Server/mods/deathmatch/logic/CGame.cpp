@@ -682,7 +682,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
                                 " [64 bit]"
 #endif
                                 ,m_pMainConfig->GetServerName ().c_str (),
-                                strServerIPList.c_str (),
+                                strServerIPList.empty() ? "auto" : strServerIPList.c_str (),
                                 usServerPort,
                                 pszLogFileName,
                                 uiMaxPlayers,

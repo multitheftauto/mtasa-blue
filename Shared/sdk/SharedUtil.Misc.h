@@ -125,7 +125,12 @@ namespace SharedUtil
         TERMINATE_IF_NO         = 8,        //    ''
         TERMINATE_IF_YES_OR_NO  = TERMINATE_IF_YES | TERMINATE_IF_NO,
         TERMINATE_PROCESS       = TERMINATE_IF_YES_OR_NO,
-        SHOW_MESSAGE_ONLY       = 16,        // Just show message without going online
+        ICON_ERROR              = 0x10,     // MB_ICONERROR
+        ICON_QUESTION           = 0x20,     // MB_ICONQUESTION
+        ICON_WARNING            = 0x30,     // MB_ICONWARNING
+        ICON_INFO               = 0x40,     // MB_ICONINFORMATION
+        ICON_MASK_VALUE         = ICON_ERROR | ICON_QUESTION | ICON_WARNING | ICON_INFO,
+        SHOW_MESSAGE_ONLY       = 0x80,     // Just show message without going online
     };
     void            BrowseToSolution                ( const SString& strType, int uiFlags = 0, const SString& strMessageBoxMessage = "", const SString& strErrorCode = "" );
     bool            ProcessPendingBrowseToSolution  ( void );

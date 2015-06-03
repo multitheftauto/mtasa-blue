@@ -908,7 +908,7 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
     if ( m_Loader.IsOk () == false )
     {
         SString strMessage( "Error loading %s module! (%s)", *strName.ToLower (), *m_Loader.GetLastErrorMessage () );
-        BrowseToSolution ( strModuleName + "-not-loadable", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
+        BrowseToSolution ( "module-not-loadable&name=" + strModuleName, ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
     }
     // Restore current directory
     SetCurrentDirectory ( strSavedCwd );
@@ -937,7 +937,7 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 
     if ( pfnInit == NULL )
     {
-        MessageBoxUTF8 ( 0, SString(_("%s module is incorrect!"),*strName), "Error"+_E("CC40"), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  );
+        MessageBoxUTF8 ( 0, SString(_("%s module is incorrect!"),*strName), "Error"+_E("CC40"), MB_OK | MB_ICONERROR | MB_TOPMOST  );
         TerminateProcess ( GetCurrentProcess (), 1 );
     }
 
