@@ -608,11 +608,11 @@ void CDirect3DEvents9::CloseActiveShader( void )
         return;
 
     ID3DXEffect* pD3DEffect = g_pActiveShader->m_pShaderInstance->m_pEffectWrap->m_pD3DEffect;
-    g_pActiveShader = NULL;
 
     pD3DEffect->EndPass ();
 
     g_pActiveShader->m_pShaderInstance->m_pEffectWrap->End ();
+    g_pActiveShader = NULL;
 
     // We didn't get the effect to save the shader state, clear some things here
     IDirect3DDevice9* pDevice = g_pGraphics->GetDevice();
