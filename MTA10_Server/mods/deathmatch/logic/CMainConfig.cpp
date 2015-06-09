@@ -194,7 +194,7 @@ bool CMainConfig::Load ( void )
     }
     else if ( iResult == DOESNT_EXIST )
     {
-        m_bHTTPEnabled = false;
+        m_bHTTPEnabled = true;
     }
 
     // HTTPD port
