@@ -11,31 +11,28 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAPICKUPDEFS_H
-#define __CLUAPICKUPDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaPickupDefs: public CLuaDefs
 {
 public:
     static void     LoadFunctions                       ( void );
+    static void     AddClass ( lua_State* luaVM );
 
     // Create/destroy
-    static int      createPickup                        ( lua_State* luaVM );
+    LUA_DECLARE ( createPickup );
 
     // Get
-    static int      getPickupType                       ( lua_State* luaVM );
-    static int      getPickupWeapon                     ( lua_State* luaVM );
-    static int      getPickupAmount                     ( lua_State* luaVM );
-    static int      getPickupAmmo                       ( lua_State* luaVM );
-    static int      getPickupRespawnInterval            ( lua_State* luaVM );
-    static int      isPickupSpawned                     ( lua_State* luaVM );
+    LUA_DECLARE ( getPickupType );
+    LUA_DECLARE ( getPickupWeapon );
+    LUA_DECLARE ( getPickupAmount );
+    LUA_DECLARE ( getPickupAmmo );
+    LUA_DECLARE ( getPickupRespawnInterval );
+    LUA_DECLARE ( isPickupSpawned );
 
     // Set
-    static int      setPickupType                       ( lua_State* luaVM );
-    static int      setPickupRespawnInterval            ( lua_State* luaVM );
-    static int      usePickup                           ( lua_State* luaVM );
+    LUA_DECLARE ( setPickupType );
+    LUA_DECLARE ( setPickupRespawnInterval );
+    LUA_DECLARE ( usePickup );
 };
-
-#endif

@@ -12,94 +12,91 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAELEMENTDEFS_H
-#define __CLUAELEMENTDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaElementDefs: public CLuaDefs
 {
 public:
     static void     LoadFunctions                       ( void );
-
-    // Create/destroy
-    static int      createElement                       ( lua_State* luaVM );
-    static int      destroyElement                      ( lua_State* luaVM );
-    static int      cloneElement                        ( lua_State* luaVM );
-
-    // Is/get
-    static int      isElement                           ( lua_State* luaVM );
-    static int      isElementWithinColShape             ( lua_State* luaVM );
-    static int      isElementWithinMarker               ( lua_State* luaVM );
-
-    static int      getElementChildren                  ( lua_State* luaVM );
-    static int      getElementChild                     ( lua_State* luaVM );
-    static int      getElementChildrenCount             ( lua_State* luaVM );
-    static int      getElementID                        ( lua_State* luaVM );
-    static int      getElementByID                      ( lua_State* luaVM );
-    static int      getElementByIndex                   ( lua_State* luaVM );
-    static int      getAllElementData                   ( lua_State* luaVM );
-    static int      getElementParent                    ( lua_State* luaVM );
-    static int      getElementMatrix                    ( lua_State* luaVM );
-    static int      getElementPosition                  ( lua_State* luaVM );
-    static int      getElementRotation                  ( lua_State* luaVM );
-    static int      getElementVelocity                  ( lua_State* luaVM );
-    static int      getElementType                      ( lua_State* luaVM );
-    static int      getElementsByType                   ( lua_State* luaVM );
-    static int      getElementInterior                  ( lua_State* luaVM );
-    static int      getElementsWithinColShape           ( lua_State* luaVM );
-    static int      getElementDimension                 ( lua_State* luaVM );
-    static int      getElementZoneName                  ( lua_State* luaVM );
-    static int      getElementColShape                  ( lua_State* luaVM );
-    static int      getElementAlpha                     ( lua_State* luaVM );
-    static int      isElementDoubleSided                ( lua_State* luaVM );
-    static int      getElementHealth                    ( lua_State* luaVM );
-    static int      getElementModel                     ( lua_State* luaVM );
-    static int      isElementInWater                    ( lua_State* luaVM );
-    static int      getElementSyncer                    ( lua_State* luaVM );
-    static int      getElementCollisionsEnabled         ( lua_State* luaVM );
-    static int      isElementFrozen                     ( lua_State* luaVM );
-    static int      getLowLODElement                    ( lua_State* luaVM );
-    static int      isElementLowLOD                     ( lua_State* luaVM );
-    static int      isElementCallPropagationEnabled     ( lua_State* luaVM );
-
-    // Visible to
-    static int      clearElementVisibleTo               ( lua_State* luaVM );
-    static int      isElementVisibleTo                  ( lua_State* luaVM );
-    static int      setElementVisibleTo                 ( lua_State* luaVM );
-
-    // Element data
-    static int      getElementData                      ( lua_State* luaVM );
-    static int      setElementData                      ( lua_State* luaVM );
-    static int      removeElementData                   ( lua_State* luaVM );
-
-    // Attachement
-    static int      attachElements                      ( lua_State* luaVM );
-    static int      detachElements                      ( lua_State* luaVM );
-    static int      isElementAttached                   ( lua_State* luaVM );
-    static int      getAttachedElements                 ( lua_State* luaVM );
-    static int      getElementAttachedTo                ( lua_State* luaVM );
-    static int      setElementAttachedOffsets           ( lua_State* luaVM );
-    static int      getElementAttachedOffsets           ( lua_State* luaVM );
-
-    // Set
-    static int      setElementID                        ( lua_State* luaVM );
-    static int      setElementParent                    ( lua_State* luaVM );
-    static int      setElementMatrix                    ( lua_State* luaVM );
-    static int      setElementPosition                  ( lua_State* luaVM );
-    static int      setElementRotation                  ( lua_State* luaVM );
-    static int      setElementVelocity                  ( lua_State* luaVM );
-    static int      setElementInterior                  ( lua_State* luaVM );
-    static int      setElementDimension                 ( lua_State* luaVM );
-    static int      setElementAlpha                     ( lua_State* luaVM );
-    static int      setElementDoubleSided               ( lua_State* luaVM );
-    static int      setElementHealth                    ( lua_State* luaVM );
-    static int      setElementModel                     ( lua_State* luaVM );
-    static int      setElementSyncer                    ( lua_State* luaVM );
-    static int      setElementCollisionsEnabled         ( lua_State* luaVM );
-    static int      setElementFrozen                    ( lua_State* luaVM );
-    static int      setLowLODElement                    ( lua_State* luaVM );
-    static int      setElementCallPropagationEnabled    ( lua_State* luaVM );
+    static void AddClass ( lua_State* luaVM );
+  
+    // Create/destroy  
+    LUA_DECLARE ( createElement );
+    LUA_DECLARE ( destroyElement );
+    LUA_DECLARE ( cloneElement  );
+                                          
+    // Is/get                             
+    LUA_DECLARE ( isElement );
+    LUA_DECLARE ( isElementWithinColShape );
+    LUA_DECLARE ( isElementWithinMarker );
+                                          
+    LUA_DECLARE ( getElementChildren );
+    LUA_DECLARE ( getElementChild );
+    LUA_DECLARE ( getElementChildrenCount );
+    LUA_DECLARE ( getElementID );
+    LUA_DECLARE ( getElementByID );
+    LUA_DECLARE ( getElementByIndex );
+    LUA_DECLARE ( getAllElementData );
+    LUA_DECLARE ( getElementParent );
+    LUA_DECLARE_OOP ( getElementMatrix );
+    LUA_DECLARE_OOP ( getElementPosition );
+    LUA_DECLARE_OOP ( getElementRotation );
+    LUA_DECLARE_OOP ( getElementVelocity );
+    LUA_DECLARE ( getElementType );
+    LUA_DECLARE ( getElementsByType  );
+    LUA_DECLARE ( getElementInterior );
+    LUA_DECLARE ( getElementsWithinColShape );
+    LUA_DECLARE ( getElementDimension );
+    LUA_DECLARE ( getElementZoneName );
+    LUA_DECLARE ( getElementColShape );
+    LUA_DECLARE ( getElementAlpha );
+    LUA_DECLARE ( isElementDoubleSided );
+    LUA_DECLARE ( getElementHealth );
+    LUA_DECLARE ( getElementModel );
+    LUA_DECLARE ( isElementInWater );
+    LUA_DECLARE ( getElementSyncer );
+    LUA_DECLARE ( getElementCollisionsEnabled );
+    LUA_DECLARE ( isElementFrozen );
+    LUA_DECLARE ( getLowLODElement );
+    LUA_DECLARE ( isElementLowLOD );
+    LUA_DECLARE ( isElementCallPropagationEnabled );
+                                                   
+    // Visible to                                  
+    LUA_DECLARE ( clearElementVisibleTo );
+    LUA_DECLARE ( isElementVisibleTo );
+    LUA_DECLARE ( setElementVisibleTo );
+                                        
+    // Element data                     
+    LUA_DECLARE ( getElementData );
+    LUA_DECLARE ( setElementData );
+    LUA_DECLARE ( removeElementData);
+                                                   
+    // Attachement                                 
+    LUA_DECLARE ( attachElements );
+    LUA_DECLARE ( detachElements );
+    LUA_DECLARE ( isElementAttached );
+    LUA_DECLARE ( getAttachedElements );
+    LUA_DECLARE ( getElementAttachedTo );
+    LUA_DECLARE ( setElementAttachedOffsets );
+    LUA_DECLARE ( getElementAttachedOffsets );
+                                                   
+    // Set                                         
+    LUA_DECLARE ( setElementID );
+    LUA_DECLARE ( setElementParent );
+    LUA_DECLARE ( setElementMatrix );
+    LUA_DECLARE ( setElementPosition );
+    LUA_DECLARE_OOP ( setElementRotation );
+    LUA_DECLARE ( setElementVelocity );
+    LUA_DECLARE ( setElementInterior );
+    LUA_DECLARE ( setElementDimension );
+    LUA_DECLARE ( setElementAlpha );
+    LUA_DECLARE ( setElementDoubleSided );
+    LUA_DECLARE ( setElementHealth );
+    LUA_DECLARE ( setElementModel );
+    LUA_DECLARE ( setElementSyncer );
+    LUA_DECLARE ( setElementCollisionsEnabled );
+    LUA_DECLARE ( setElementFrozen );
+    LUA_DECLARE ( setLowLODElement );
+    LUA_DECLARE ( setElementCallPropagationEnabled );
 };
-
-#endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto v1.x
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/deathmatch/logic/luadefs/CLuaACLDefs.cpp
 *  PURPOSE:     Lua ACL function definitions class
@@ -20,41 +20,99 @@ static const char* GetResourceName ( lua_State* luaVM )
     return luaMain ? luaMain->GetScriptName () : "";
 }
 
-
 void CLuaACLDefs::LoadFunctions ( void )
 {
-    CLuaCFunctions::AddFunction ( "aclReload", CLuaACLDefs::aclReload );
-    CLuaCFunctions::AddFunction ( "aclSave", CLuaACLDefs::aclSave );
+    CLuaCFunctions::AddFunction ( "aclReload", aclReload );
+    CLuaCFunctions::AddFunction ( "aclSave", aclSave );
 
-    CLuaCFunctions::AddFunction ( "aclCreate", CLuaACLDefs::aclCreate );
-    CLuaCFunctions::AddFunction ( "aclDestroy", CLuaACLDefs::aclDestroy );
+    CLuaCFunctions::AddFunction ( "aclCreate", aclCreate );
+    CLuaCFunctions::AddFunction ( "aclDestroy", aclDestroy );
 
-    CLuaCFunctions::AddFunction ( "aclGet", CLuaACLDefs::aclGet );
+    CLuaCFunctions::AddFunction ( "aclGet", aclGet );
 
-    CLuaCFunctions::AddFunction ( "aclList", CLuaACLDefs::aclList );
-    CLuaCFunctions::AddFunction ( "aclGetName", CLuaACLDefs::aclGetName );
+    CLuaCFunctions::AddFunction ( "aclList", aclList );
+    CLuaCFunctions::AddFunction ( "aclGetName", aclGetName );
 
-    CLuaCFunctions::AddFunction ( "aclGetRight", CLuaACLDefs::aclGetRight );
-    CLuaCFunctions::AddFunction ( "aclSetRight", CLuaACLDefs::aclSetRight );
-    CLuaCFunctions::AddFunction ( "aclListRights", CLuaACLDefs::aclListRights );
-    CLuaCFunctions::AddFunction ( "aclRemoveRight", CLuaACLDefs::aclRemoveRight );
+    CLuaCFunctions::AddFunction ( "aclGetRight", aclGetRight );
+    CLuaCFunctions::AddFunction ( "aclSetRight", aclSetRight );
+    CLuaCFunctions::AddFunction ( "aclListRights", aclListRights );
+    CLuaCFunctions::AddFunction ( "aclRemoveRight", aclRemoveRight );
 
-    CLuaCFunctions::AddFunction ( "aclCreateGroup", CLuaACLDefs::aclCreateGroup );
-    CLuaCFunctions::AddFunction ( "aclDestroyGroup", CLuaACLDefs::aclDestroyGroup );
+    CLuaCFunctions::AddFunction ( "aclCreateGroup", aclCreateGroup );
+    CLuaCFunctions::AddFunction ( "aclDestroyGroup", aclDestroyGroup );
 
-    CLuaCFunctions::AddFunction ( "aclGetGroup", CLuaACLDefs::aclGetGroup );
-    CLuaCFunctions::AddFunction ( "aclGroupList", CLuaACLDefs::aclGroupList );
+    CLuaCFunctions::AddFunction ( "aclGetGroup", aclGetGroup );
+    CLuaCFunctions::AddFunction ( "aclGroupList", aclGroupList );
 
-    CLuaCFunctions::AddFunction ( "aclGroupGetName", CLuaACLDefs::aclGroupGetName );
-    CLuaCFunctions::AddFunction ( "aclGroupAddACL", CLuaACLDefs::aclGroupAddACL );
-    CLuaCFunctions::AddFunction ( "aclGroupListACL", CLuaACLDefs::aclGroupListACL );
-    CLuaCFunctions::AddFunction ( "aclGroupRemoveACL", CLuaACLDefs::aclGroupRemoveACL );
-    CLuaCFunctions::AddFunction ( "aclGroupAddObject", CLuaACLDefs::aclGroupAddObject );
-    CLuaCFunctions::AddFunction ( "aclGroupListObjects", CLuaACLDefs::aclGroupListObjects );
-    CLuaCFunctions::AddFunction ( "aclGroupRemoveObject", CLuaACLDefs::aclGroupRemoveObject );
+    CLuaCFunctions::AddFunction ( "aclGroupGetName", aclGroupGetName );
+    CLuaCFunctions::AddFunction ( "aclGroupAddACL", aclGroupAddACL );
+    CLuaCFunctions::AddFunction ( "aclGroupListACL", aclGroupListACL );
+    CLuaCFunctions::AddFunction ( "aclGroupRemoveACL", aclGroupRemoveACL );
+    CLuaCFunctions::AddFunction ( "aclGroupAddObject", aclGroupAddObject );
+    CLuaCFunctions::AddFunction ( "aclGroupListObjects", aclGroupListObjects );
+    CLuaCFunctions::AddFunction ( "aclGroupRemoveObject", aclGroupRemoveObject );
 
-    CLuaCFunctions::AddFunction ( "isObjectInACLGroup", CLuaACLDefs::isObjectInACLGroup );
-    CLuaCFunctions::AddFunction ( "hasObjectPermissionTo", CLuaACLDefs::hasObjectPermissionTo );
+    CLuaCFunctions::AddFunction ( "isObjectInACLGroup", isObjectInACLGroup );
+    CLuaCFunctions::AddFunction ( "hasObjectPermissionTo", hasObjectPermissionTo );
+}
+
+
+void CLuaACLDefs::AddClass ( lua_State* luaVM )
+{
+    //////////////////////////
+    //  ACL class
+    //////////////////////////
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "save", "aclSave" );
+    lua_classfunction ( luaVM, "get", "aclGet" );
+    lua_classfunction ( luaVM, "reload", "aclReload" );
+    lua_classfunction ( luaVM, "list", "aclList" );
+    lua_classfunction ( luaVM, "hasObjectPermissionTo", "hasObjectPermissionTo" );
+
+    lua_classfunction ( luaVM, "create", "aclCreate" );
+    lua_classfunction ( luaVM, "destroy", "aclDestroy" );
+    lua_classfunction ( luaVM, "listRights", "aclListRights" );
+    lua_classfunction ( luaVM, "removeRight", "aclRemoveRight" );
+
+    lua_classfunction ( luaVM, "getName", "aclGetName" );
+    lua_classfunction ( luaVM, "getRight", "aclGetRight" );
+
+    lua_classfunction ( luaVM, "setRight", "aclSetRight" );
+
+    lua_classvariable ( luaVM, "name", NULL, "aclGetName" );
+    //lua_classvariable ( luaVM, "rights", "", "aclListRights", NULL, CLuaOOPDefs::AclListRights ); // .rights[allowedType] = {..}
+    //lua_classvariable ( luaVM, "right", "aclSetRight", "aclGetRight", CLuaOOPDefs::AclSetRight, CLuaOOPDefs::AclGetRight ); // .right["e.y.e"] = "illuminati"; if value == nil then aclRemoveRight(self, key)
+
+    lua_registerclass ( luaVM, "ACL" );
+    //////////////////////////
+
+
+
+    //////////////////////////
+    //  ACLGroup class
+    //////////////////////////
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "get", "aclGetGroup" );
+    lua_classfunction ( luaVM, "list", "aclGroupList" );
+
+    lua_classfunction ( luaVM, "create", "aclCreateGroup" );
+    lua_classfunction ( luaVM, "destroy", "aclDestroyGroup" );
+    lua_classfunction ( luaVM, "doesContainObject", "isObjectInACLGroup", OOP_isObjectInACLGroup );
+    lua_classfunction ( luaVM, "addACL", "aclGroupAddACL" );
+    lua_classfunction ( luaVM, "addObject", "aclGroupAddObject" );
+    lua_classfunction ( luaVM, "removeACL", "aclGroupRemoveACL" );
+    lua_classfunction ( luaVM, "removeObject", "aclGroupRemoveObject" );
+    lua_classfunction ( luaVM, "listACL", "aclGroupListACL" );
+    lua_classfunction ( luaVM, "listObjects", "aclGroupListObjects" );
+    lua_classfunction ( luaVM, "getName", "aclGroupGetName" );
+
+    lua_classvariable ( luaVM, "name", NULL, "aclGroupGetName" );
+    lua_classvariable ( luaVM, "aclList", NULL, "aclGroupListACL" ); // value nil = remove acl
+    lua_classvariable ( luaVM, "objects", NULL, "aclGroupListObjects" ); // value nil = remove object
+
+    lua_registerclass ( luaVM, "ACLGroup" );
 }
 
 
@@ -916,6 +974,48 @@ int CLuaACLDefs::isObjectInACLGroup ( lua_State* luaVM )
     argStream.ReadString ( strObject );
     argStream.ReadUserData ( pGroup );
     
+    if ( !argStream.HasErrors () )
+    {
+        // Figure out what type of object this is
+        const char* szObjectAfterDot = strObject;
+        if ( StringBeginsWith ( strObject, "resource." ) ) {
+            szObjectAfterDot += 9;
+            GroupObjectType = CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE;
+        }
+        else if ( StringBeginsWith ( strObject, "user." ) )
+        {
+            szObjectAfterDot += 5;
+            GroupObjectType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
+        }
+        else
+        {
+            // Invalid group type
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+        if ( pGroup->FindObjectMatch ( szObjectAfterDot, GroupObjectType ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaACLDefs::OOP_isObjectInACLGroup ( lua_State* luaVM )
+{
+    //  bool DoesACLGroupContainObject ( aclgroup theGroup, string theObject )
+    SString strObject; CAccessControlListGroup* pGroup; CAccessControlListGroupObject::EObjectType GroupObjectType;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pGroup );
+    argStream.ReadString ( strObject );
+
     if ( !argStream.HasErrors () )
     {
         // Figure out what type of object this is

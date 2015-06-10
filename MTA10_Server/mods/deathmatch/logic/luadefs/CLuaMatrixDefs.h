@@ -10,9 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAMATRIXDEFS_H
-#define __CLUAMATRIXDEFS_H
-
+#pragma once
 extern "C"
 {
     #include "lua.h"
@@ -23,31 +21,30 @@ extern "C"
 class CLuaMatrixDefs: public CLuaDefs
 {
 public:
-    static int      Create                          ( lua_State* luaVM );
-    static int      Destroy                         ( lua_State* luaVM );
+    static void     AddClass                        ( lua_State* luaVM );
+    LUA_DECLARE ( Create );
+    LUA_DECLARE ( Destroy );
 
-    static int      ToString                        ( lua_State* luaVM );
+    LUA_DECLARE ( ToString );
 
-    static int      TransformDirection              ( lua_State* luaVM );
-    static int      TransformPosition               ( lua_State* luaVM );
-    static int      Inverse                         ( lua_State* luaVM );
+    LUA_DECLARE ( TransformDirection );
+    LUA_DECLARE ( TransformPosition );
+    LUA_DECLARE ( Inverse );
 
-    static int      GetPosition                     ( lua_State* luaVM );
-    static int      GetRotation                     ( lua_State* luaVM );
-    static int      GetForward                      ( lua_State* luaVM );
-    static int      GetRight                        ( lua_State* luaVM );
-    static int      GetUp                           ( lua_State* luaVM );
+    LUA_DECLARE ( GetPosition );
+    LUA_DECLARE ( GetRotation );
+    LUA_DECLARE ( GetForward );
+    LUA_DECLARE ( GetRight );
+    LUA_DECLARE ( GetUp );
 
-    static int      SetPosition                     ( lua_State* luaVM );
-    static int      SetRotation                     ( lua_State* luaVM );
-    static int      SetForward                      ( lua_State* luaVM );
-    static int      SetRight                        ( lua_State* luaVM );
-    static int      SetUp                           ( lua_State* luaVM );
+    LUA_DECLARE ( SetPosition );
+    LUA_DECLARE ( SetRotation );
+    LUA_DECLARE ( SetForward );
+    LUA_DECLARE ( SetRight );
+    LUA_DECLARE ( SetUp );
 
-    static int      Add                             ( lua_State* luaVM );
-    static int      Sub                             ( lua_State* luaVM );
-    static int      Mul                             ( lua_State* luaVM );
-    static int      Div                             ( lua_State* luaVM );
+    LUA_DECLARE ( Add );
+    LUA_DECLARE ( Sub );
+    LUA_DECLARE ( Mul );
+    LUA_DECLARE ( Div );
 };
-
-#endif

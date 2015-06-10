@@ -13,9 +13,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAWORLDDEFS_H
-#define __CLUAWORLDDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaWorldDefs: public CLuaDefs
@@ -24,80 +22,78 @@ public:
     static void     LoadFunctions                       ( void );
 
     // Get
-    static int      getTime                             ( lua_State* luaVM );
-    static int      getWeather                          ( lua_State* luaVM );
-    static int      getZoneName                         ( lua_State* luaVM );
-    static int      getGravity                          ( lua_State* luaVM );
-    static int      getGameSpeed                        ( lua_State* luaVM );
-    static int      getWaveHeight                       ( lua_State* luaVM );
-    static int      getFPSLimit                         ( lua_State* luaVM );
-    static int      getMinuteDuration                   ( lua_State* luaVM );
-    static int      isGarageOpen                        ( lua_State* luaVM );
-    static int      isGlitchEnabled                     ( lua_State* luaVM );
-    static int      setJetpackWeaponEnabled             ( lua_State* luaVM );
-    static int      getJetpackWeaponEnabled             ( lua_State* luaVM );
-    static int      getCloudsEnabled                    ( lua_State* luaVM );
-    static int      getTrafficLightState                ( lua_State* luaVM );
-    static int      areTrafficLightsLocked              ( lua_State* luaVM );
-    static int      getJetpackMaxHeight                 ( lua_State* luaVM );
-    static int      getHeatHaze                         ( lua_State* luaVM );
-    static int      getSkyGradient                      ( lua_State* luaVM );
-    static int      getInteriorSoundsEnabled            ( lua_State* luaVM );
-    static int      getRainLevel                        ( lua_State* luaVM );
-    static int      getSunSize                          ( lua_State* luaVM );
-    static int      getSunColor                         ( lua_State* luaVM );
-    static int      getWindVelocity                     ( lua_State* luaVM );
-    static int      getFarClipDistance                  ( lua_State* luaVM );
-    static int      getFogDistance                      ( lua_State* luaVM );
-    static int      getAircraftMaxHeight                ( lua_State* luaVM );
-    static int      getAircraftMaxVelocity              ( lua_State* luaVM );
-    static int      setOcclusionsEnabled                ( lua_State* luaVM );
-    static int      getOcclusionsEnabled                ( lua_State* luaVM );
-    static int      getMoonSize                         ( lua_State* luaVM );
+    LUA_DECLARE ( getTime );
+    LUA_DECLARE ( getWeather );
+    LUA_DECLARE ( getZoneName );
+    LUA_DECLARE ( getGravity );
+    LUA_DECLARE ( getGameSpeed );
+    LUA_DECLARE ( getWaveHeight );
+    LUA_DECLARE ( getFPSLimit );
+    LUA_DECLARE ( getMinuteDuration );
+    LUA_DECLARE ( isGarageOpen );
+    LUA_DECLARE ( isGlitchEnabled );
+    LUA_DECLARE ( setJetpackWeaponEnabled );
+    LUA_DECLARE ( getJetpackWeaponEnabled );
+    LUA_DECLARE ( getCloudsEnabled );
+    LUA_DECLARE ( getTrafficLightState );
+    LUA_DECLARE ( areTrafficLightsLocked );
+    LUA_DECLARE ( getJetpackMaxHeight );
+    LUA_DECLARE ( getHeatHaze );
+    LUA_DECLARE ( getSkyGradient );
+    LUA_DECLARE ( getInteriorSoundsEnabled );
+    LUA_DECLARE ( getRainLevel );
+    LUA_DECLARE ( getSunSize );
+    LUA_DECLARE ( getSunColor );
+    LUA_DECLARE ( getWindVelocity );
+    LUA_DECLARE ( getFarClipDistance );
+    LUA_DECLARE ( getFogDistance );
+    LUA_DECLARE ( getAircraftMaxHeight );
+    LUA_DECLARE ( getAircraftMaxVelocity );
+    LUA_DECLARE ( setOcclusionsEnabled );
+    LUA_DECLARE ( getOcclusionsEnabled );
+    LUA_DECLARE ( getMoonSize );
 
     // Set
-    static int      setTime                             ( lua_State* luaVM );
-    static int      setWeather                          ( lua_State* luaVM );
-    static int      setWeatherBlended                   ( lua_State* luaVM );
-    static int      setGravity                          ( lua_State* luaVM );
-    static int      setGameSpeed                        ( lua_State* luaVM );
-    static int      setWaveHeight                       ( lua_State* luaVM );
-    static int      setSkyGradient                      ( lua_State* luaVM );
-    static int      setHeatHaze                         ( lua_State* luaVM );
-    static int      setFPSLimit                         ( lua_State* luaVM );
-    static int      setMinuteDuration                   ( lua_State* luaVM );
-    static int      setGarageOpen                       ( lua_State* luaVM );
-    static int      setGlitchEnabled                    ( lua_State* luaVM );
-    static int      setCloudsEnabled                    ( lua_State* luaVM );
-    static int      setTrafficLightState                ( lua_State* luaVM );
-    static int      setTrafficLightsLocked              ( lua_State* luaVM );
-    static int      setJetpackMaxHeight                 ( lua_State* luaVM );
-    static int      setInteriorSoundsEnabled            ( lua_State* luaVM );
-    static int      setRainLevel                        ( lua_State* luaVM );
-    static int      setSunSize                          ( lua_State* luaVM );
-    static int      setSunColor                         ( lua_State* luaVM );
-    static int      setWindVelocity                     ( lua_State* luaVM );
-    static int      setFarClipDistance                  ( lua_State* luaVM );
-    static int      setFogDistance                      ( lua_State* luaVM );
-    static int      setAircraftMaxHeight                ( lua_State* luaVM );
-    static int      setAircraftMaxVelocity              ( lua_State* luaVM );
-    static int      setPedTargetingMarkerEnabled        ( lua_State* luaVM );
-    static int      isPedTargetingMarkerEnabled         ( lua_State* luaVM );
-    static int      setMoonSize                         ( lua_State* luaVM );
+    LUA_DECLARE ( setTime );
+    LUA_DECLARE ( setWeather );
+    LUA_DECLARE ( setWeatherBlended );
+    LUA_DECLARE ( setGravity );
+    LUA_DECLARE ( setGameSpeed );
+    LUA_DECLARE ( setWaveHeight );
+    LUA_DECLARE ( setSkyGradient );
+    LUA_DECLARE ( setHeatHaze );
+    LUA_DECLARE ( setFPSLimit );
+    LUA_DECLARE ( setMinuteDuration );
+    LUA_DECLARE ( setGarageOpen );
+    LUA_DECLARE ( setGlitchEnabled );
+    LUA_DECLARE ( setCloudsEnabled );
+    LUA_DECLARE ( setTrafficLightState );
+    LUA_DECLARE ( setTrafficLightsLocked );
+    LUA_DECLARE ( setJetpackMaxHeight );
+    LUA_DECLARE ( setInteriorSoundsEnabled );
+    LUA_DECLARE ( setRainLevel );
+    LUA_DECLARE ( setSunSize );
+    LUA_DECLARE ( setSunColor );
+    LUA_DECLARE ( setWindVelocity );
+    LUA_DECLARE ( setFarClipDistance );
+    LUA_DECLARE ( setFogDistance );
+    LUA_DECLARE ( setAircraftMaxHeight );
+    LUA_DECLARE ( setAircraftMaxVelocity );
+    LUA_DECLARE ( setPedTargetingMarkerEnabled );
+    LUA_DECLARE ( isPedTargetingMarkerEnabled );
+    LUA_DECLARE ( setMoonSize );
 
     // Reset
-    static int      resetSkyGradient                    ( lua_State* luaVM );
-    static int      resetHeatHaze                       ( lua_State* luaVM );
-    static int      resetRainLevel                      ( lua_State* luaVM );
-    static int      resetSunSize                        ( lua_State* luaVM );
-    static int      resetSunColor                       ( lua_State* luaVM );
-    static int      resetWindVelocity                   ( lua_State* luaVM );
-    static int      resetFarClipDistance                ( lua_State* luaVM );
-    static int      resetFogDistance                    ( lua_State* luaVM );
-    static int      RemoveWorldModel                    ( lua_State* luaVM );
-    static int      RestoreWorldModel                   ( lua_State* luaVM );
-    static int      RestoreAllWorldModels               ( lua_State* luaVM );
-    static int      resetMoonSize                       ( lua_State* luaVM );
+    LUA_DECLARE ( resetSkyGradient );
+    LUA_DECLARE ( resetHeatHaze );
+    LUA_DECLARE ( resetRainLevel );
+    LUA_DECLARE ( resetSunSize );
+    LUA_DECLARE ( resetSunColor );
+    LUA_DECLARE ( resetWindVelocity );
+    LUA_DECLARE ( resetFarClipDistance );
+    LUA_DECLARE ( resetFogDistance );
+    LUA_DECLARE ( RemoveWorldModel );
+    LUA_DECLARE ( RestoreWorldModel );
+    LUA_DECLARE ( RestoreAllWorldModels );
+    LUA_DECLARE ( resetMoonSize );
 };
-
-#endif

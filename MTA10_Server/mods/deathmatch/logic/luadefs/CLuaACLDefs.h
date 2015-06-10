@@ -11,47 +11,43 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAACLDEFS_H
-#define __CLUAACLDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaACLDefs: public CLuaDefs
 {
 public:
-    static void     LoadFunctions                       ( void );
+    static void     LoadFunctions ( void );
+    static void     AddClass      ( lua_State* luaVM );
 
-    static int      aclReload                           ( lua_State* luaVM );
-    static int      aclSave                             ( lua_State* luaVM );
+    LUA_DECLARE ( aclReload );
+    LUA_DECLARE ( aclSave );
 
-    static int      aclCreate                           ( lua_State* luaVM );
-    static int      aclDestroy                          ( lua_State* luaVM );
+    LUA_DECLARE ( aclCreate );
+    LUA_DECLARE ( aclDestroy );
 
-    static int      aclGet                              ( lua_State* luaVM );
-    static int      aclList                             ( lua_State* luaVM );
+    LUA_DECLARE ( aclGet );
+    LUA_DECLARE ( aclList );
 
-    static int      aclGetName                          ( lua_State* luaVM );
-    static int      aclGetRight                         ( lua_State* luaVM );
-    static int      aclSetRight                         ( lua_State* luaVM );
-    static int      aclListRights                       ( lua_State* luaVM );
-    static int      aclRemoveRight                      ( lua_State* luaVM );
+    LUA_DECLARE ( aclGetName );
+    LUA_DECLARE ( aclGetRight );
+    LUA_DECLARE ( aclSetRight );
+    LUA_DECLARE ( aclListRights );
+    LUA_DECLARE ( aclRemoveRight );
 
-    static int      aclCreateGroup                      ( lua_State* luaVM );
-    static int      aclDestroyGroup                     ( lua_State* luaVM );
+    LUA_DECLARE ( aclCreateGroup );
+    LUA_DECLARE ( aclDestroyGroup );
 
-    static int      aclGetGroup                         ( lua_State* luaVM );
-    static int      aclGroupList                        ( lua_State* luaVM );
+    LUA_DECLARE ( aclGetGroup );
+    LUA_DECLARE ( aclGroupList );
 
-    static int      aclGroupGetName                     ( lua_State* luaVM );
-    static int      aclGroupAddACL                      ( lua_State* luaVM );
-    static int      aclGroupListACL                     ( lua_State* luaVM );
-    static int      aclGroupRemoveACL                   ( lua_State* luaVM );
-    static int      aclGroupAddObject                   ( lua_State* luaVM );
-    static int      aclGroupListObjects                 ( lua_State* luaVM );
-    static int      aclGroupRemoveObject                ( lua_State* luaVM );
-
-    static int      isObjectInACLGroup                  ( lua_State* luaVM );
-    static int      hasObjectPermissionTo               ( lua_State* luaVM );
+    LUA_DECLARE ( aclGroupGetName );
+    LUA_DECLARE ( aclGroupAddACL );
+    LUA_DECLARE ( aclGroupListACL );
+    LUA_DECLARE ( aclGroupRemoveACL );
+    LUA_DECLARE ( aclGroupAddObject );
+    LUA_DECLARE ( aclGroupListObjects );
+    LUA_DECLARE ( aclGroupRemoveObject );
+    LUA_DECLARE_OOP ( isObjectInACLGroup );
+    LUA_DECLARE ( hasObjectPermissionTo );
 };
-
-#endif

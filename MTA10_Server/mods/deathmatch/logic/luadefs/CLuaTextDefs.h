@@ -11,38 +11,35 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUATEXTDEFS_H
-#define __CLUATEXTDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaTextDefs: public CLuaDefs
 {
 public:
-    static void     LoadFunctions                       ( void );
+    static void     LoadFunctions ( void );
+    static void     AddClass      ( lua_State* luaVM );
 
-    static int      textCreateDisplay                   ( lua_State* luaVM );
-    static int      textDestroyDisplay                  ( lua_State* luaVM );
-    static int      textCreateTextItem                  ( lua_State* luaVM );
-    static int      textDestroyTextItem                 ( lua_State* luaVM );
+    LUA_DECLARE ( textCreateDisplay );
+    LUA_DECLARE ( textDestroyDisplay );
+    LUA_DECLARE ( textCreateTextItem );
+    LUA_DECLARE ( textDestroyTextItem );
 
-    static int      textDisplayAddText                  ( lua_State* luaVM );
-    static int      textDisplayRemoveText               ( lua_State* luaVM );
-    static int      textDisplayAddObserver              ( lua_State* luaVM );
-    static int      textDisplayRemoveObserver           ( lua_State* luaVM );
-    static int      textDisplayIsObserver               ( lua_State* luaVM );
-    static int      textDisplayGetObservers             ( lua_State* luaVM );
+    LUA_DECLARE ( textDisplayAddText );
+    LUA_DECLARE ( textDisplayRemoveText );
+    LUA_DECLARE ( textDisplayAddObserver );
+    LUA_DECLARE ( textDisplayRemoveObserver );
+    LUA_DECLARE ( textDisplayIsObserver );
+    LUA_DECLARE ( textDisplayGetObservers );
 
-    static int      textItemSetText                     ( lua_State* luaVM );
-    static int      textItemGetText                     ( lua_State* luaVM );
-    static int      textItemSetScale                    ( lua_State* luaVM );
-    static int      textItemGetScale                    ( lua_State* luaVM );
-    static int      textItemSetPosition                 ( lua_State* luaVM );
-    static int      textItemGetPosition                 ( lua_State* luaVM );
-    static int      textItemSetColor                    ( lua_State* luaVM );
-    static int      textItemGetColor                    ( lua_State* luaVM );
-    static int      textItemSetPriority                 ( lua_State* luaVM );
-    static int      textItemGetPriority                 ( lua_State* luaVM );
+    LUA_DECLARE ( textItemSetText );
+    LUA_DECLARE ( textItemGetText );
+    LUA_DECLARE ( textItemSetScale );
+    LUA_DECLARE ( textItemGetScale );
+    LUA_DECLARE ( textItemSetPosition );
+    LUA_DECLARE ( textItemGetPosition );
+    LUA_DECLARE ( textItemSetColor );
+    LUA_DECLARE ( textItemGetColor );
+    LUA_DECLARE ( textItemSetPriority );
+    LUA_DECLARE ( textItemGetPriority );
 };
-
-#endif

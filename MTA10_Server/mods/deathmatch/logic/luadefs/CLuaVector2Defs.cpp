@@ -12,6 +12,47 @@
 
 #include "StdInc.h"
 
+
+void CLuaVector2Defs::AddClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classmetamethod ( luaVM, "__tostring", ToString );
+    lua_classmetamethod ( luaVM, "__gc", Destroy );
+
+    lua_classmetamethod ( luaVM, "__add", Add );
+    lua_classmetamethod ( luaVM, "__sub", Sub );
+    lua_classmetamethod ( luaVM, "__mul", Mul );
+    lua_classmetamethod ( luaVM, "__div", Div );
+    lua_classmetamethod ( luaVM, "__pow", Pow );
+    lua_classmetamethod ( luaVM, "__unm", Unm );
+    lua_classmetamethod ( luaVM, "__eq", Eq );
+    lua_classmetamethod ( luaVM, "__len", GetLength );
+
+    lua_classfunction ( luaVM, "create", "", Create );
+    lua_classfunction ( luaVM, "normalize", "", Normalize );
+    lua_classfunction ( luaVM, "dot", "", Dot );
+
+    lua_classfunction ( luaVM, "getLength", "", GetLength );
+    lua_classfunction ( luaVM, "getSquaredLength", "", GetLengthSquared );
+    lua_classfunction ( luaVM, "getNormalized", "", GetNormalized );
+    lua_classfunction ( luaVM, "getX", "", GetX );
+    lua_classfunction ( luaVM, "getY", "", GetY );
+
+    lua_classfunction ( luaVM, "setX", "", SetX );
+    lua_classfunction ( luaVM, "setY", "", SetY );
+
+    lua_classvariable ( luaVM, "x", "", "", SetX, GetX );
+    lua_classvariable ( luaVM, "y", "", "", SetY, GetY );
+
+    lua_classvariable ( luaVM, "length", "", "", NULL, GetLength );
+    lua_classvariable ( luaVM, "squaredLength", "", "", NULL, GetLengthSquared );
+    lua_classvariable ( luaVM, "normalized", "", "", NULL, GetNormalized );
+
+    lua_registerclass ( luaVM, "Vector2" );
+}
+
+
 int CLuaVector2Defs::Create ( lua_State* luaVM )
 {
     CVector2D vector;

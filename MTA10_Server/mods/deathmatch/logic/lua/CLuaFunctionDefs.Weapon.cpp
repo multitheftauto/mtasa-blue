@@ -24,6 +24,62 @@
 #define MIN_SERVER_REQ_WEAPON_PROPERTY_FLAG                 "1.3.5-9.06139"
 
 
+int CLuaFunctionDefs::SetWeaponAmmo ( lua_State* luaVM )
+{
+    // bool setWeaponAmmo ( player thePlayer, int weapon, int totalAmmo, [int ammoInClip = 0] )
+    CElement* pElement;
+    eWeaponType weaponType;
+    ushort usAmmo;
+    ushort usAmmoInClip;
+    CCustomWeapon * pWeapon = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( pElement->GetType () != CElement::WEAPON )
+        {
+            argStream.ReadEnumStringOrNumber ( weaponType );
+            argStream.ReadNumber ( usAmmo );
+            argStream.ReadNumber ( usAmmoInClip, 0 );
+
+            if ( !argStream.HasErrors () )
+            {
+                if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pElement, weaponType, usAmmo, usAmmoInClip ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        }
+        else
+        {
+            pWeapon = static_cast <CCustomWeapon *> ( pElement );
+            argStream.ReadNumber ( usAmmo );
+
+            if ( !argStream.HasErrors () )
+            {
+                if ( CStaticFunctionDefinitions::SetWeaponAmmo ( pWeapon, usAmmo ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetWeaponNameFromID ( lua_State* luaVM )
 {
     unsigned char ucID;

@@ -11,18 +11,14 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAVOICEDEFS_H
-#define __CLUAVOICEDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaVoiceDefs: public CLuaDefs
 {
 public:
     static void     LoadFunctions                       ( void );
-    static int      IsVoiceEnabled                      ( lua_State* luaVM );
-    static int      SetPlayerVoiceBroadcastTo           ( lua_State* luaVM );
-    static int      setPlayerVoiceIgnoreFrom            ( lua_State* luaVM );
+    LUA_DECLARE ( IsVoiceEnabled );
+    LUA_DECLARE ( SetPlayerVoiceBroadcastTo );
+    LUA_DECLARE ( setPlayerVoiceIgnoreFrom );
 };
-
-#endif
