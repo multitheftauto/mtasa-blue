@@ -121,14 +121,15 @@ bool DoInstallFiles ( void )
     // Copy current(old) files into backup location
     for ( unsigned int i = 0 ; i < itemList.size () ; i++ )
     {
-        if ( !FileCopy ( itemList[i].strDestPathFilename, itemList[i].strBackupPathFilename ) )
+        const SFileItem& item = itemList[i];
+        if ( !FileCopy ( item.strDestPathFilename, item.strBackupPathFilename ) )
         {
-            if ( FileExists ( itemList[i].strDestPathFilename ) )
+            if ( FileExists ( item.strDestPathFilename ) )
             {
-                AddReportLog ( 5021, SString ( "InstallFiles: Couldn't backup '%s' to '%s'", itemList[i].strDestPathFilename.c_str (), itemList[i].strBackupPathFilename.c_str () ) );
+                AddReportLog ( 5021, SString ( "InstallFiles: Couldn't backup '%s' to '%s'", *item.strDestPathFilename, *item.strBackupPathFilename ) );
                 return false;
             }
-            AddReportLog ( 4023, SString ( "InstallFiles: Couldn't backup '%s' as it does not exist", itemList[i].strDestPathFilename.c_str () ) );
+            AddReportLog ( 4023, SString ( "InstallFiles: Couldn't backup '%s' as it does not exist", *item.strDestPathFilename ) );
         }
     }
 
@@ -137,30 +138,40 @@ bool DoInstallFiles ( void )
     std::vector < SFileItem > fileListSuccess;
     for (  unsigned int i = 0 ; i < itemList.size () ; i++ )
     {
-        if ( !FileCopy ( itemList[i].strSrcPathFilename, itemList[i].strDestPathFilename ) )
+        const SFileItem& item = itemList[i];
+        if ( !FileCopy ( item.strSrcPathFilename, item.strDestPathFilename ) )
         {
-            AddReportLog ( 5022, SString ( "InstallFiles: Couldn't copy '%s' to '%s'", itemList[i].strSrcPathFilename.c_str (), itemList[i].strDestPathFilename.c_str () ) );
-            bOk = false;
-            break;
+            // If copy failed, check if we really need to copy the file
+            if ( GenerateSha256HexStringFromFile( item.strSrcPathFilename ) != GenerateSha256HexStringFromFile( item.strDestPathFilename ) )
+            {
+                AddReportLog ( 5022, SString ( "InstallFiles: Couldn't copy '%s' to '%s'", *item.strSrcPathFilename, *item.strDestPathFilename ) );
+                bOk = false;
+                break;
+            }
         }
-        fileListSuccess.push_back ( itemList[i] );
+        fileListSuccess.push_back ( item );
     }
 
     // If fail, copy back old files
     if ( !bOk )
     {
         bool bPossibleDisaster = false;
-        for (  unsigned int i = 0 ; i < fileListSuccess.size () ; i++ )
+        for ( unsigned int i = 0 ; i < fileListSuccess.size () ; i++ )
         {
+            const SFileItem& item = fileListSuccess[i];
             int iRetryCount = 3;
             while ( true )
             {
-                if ( FileCopy ( fileListSuccess[i].strBackupPathFilename, fileListSuccess[i].strDestPathFilename ) )
+                if ( FileCopy ( item.strBackupPathFilename, item.strDestPathFilename ) )
+                    break;
+
+                // If copy failed, check if we really need to copy the file
+                if ( GenerateSha256HexStringFromFile( item.strBackupPathFilename ) != GenerateSha256HexStringFromFile( item.strDestPathFilename ) )
                     break;
 
                 if ( !--iRetryCount )
                 {
-                    AddReportLog ( 5023, SString ( "InstallFiles: Possible disaster restoring '%s' to '%s'", itemList[i].strBackupPathFilename.c_str (), itemList[i].strDestPathFilename.c_str () ) );
+                    AddReportLog ( 5023, SString ( "InstallFiles: Possible disaster restoring '%s' to '%s'", *item.strBackupPathFilename, *item.strDestPathFilename ) );
                     bPossibleDisaster = true;
                     break;
                 }

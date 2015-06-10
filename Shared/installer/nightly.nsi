@@ -508,10 +508,24 @@ DontInstallRedistVC12:
             DetailPrint "$(INFO_UPDATE_PERMISSIONS)"
 
             # Fix permissions for MTA install directory
+
+            # Check if install path begins with "..Program Files (x86)\M" or "..Program Files\M"
+            StrCpy $3 "0"
             StrCpy $0 "$PROGRAMFILES\M"
             StrLen $2 $0
             StrCpy $1 "$INSTDIR" $2
             ${If} $0 == $1
+                StrCpy $3 "1"
+            ${EndIf}
+
+            StrCpy $0 "$PROGRAMFILES64\M"
+            StrLen $2 $0
+            StrCpy $1 "$INSTDIR" $2
+            ${If} $0 == $1
+                StrCpy $3 "1"
+            ${EndIf}
+
+            ${If} $3 == "1"
                 FastPerms::FullAccessPlox "$INSTDIR"
             ${Else}
                 # More conservative permissions blat if install directory it too different from default
@@ -714,7 +728,10 @@ DontInstallRedistVC12:
 		!ifndef LIGHTBUILD
             File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe.dat"
 		!endif
-		
+
+        # Ensure exe file can be updated without admin
+		AccessControl::GrantOnFile "$INSTDIR\Multi Theft Auto.exe" "(BU)" "FullAccess"
+
         ${If} $AddToGameExplorer == 1
             ${GameExplorer_UpdateGame} ${GUID}
             ${If} ${Errors}
