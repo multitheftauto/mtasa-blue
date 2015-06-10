@@ -23,6 +23,7 @@ extern "C"
 class CLuaVector2Defs : public CLuaDefs
 {
 public:
+    static void    AddClass                             ( lua_State * luaVM );
     static int     Create                               ( lua_State * luaVM );
     static int     Destroy                              ( lua_State * luaVM );
 

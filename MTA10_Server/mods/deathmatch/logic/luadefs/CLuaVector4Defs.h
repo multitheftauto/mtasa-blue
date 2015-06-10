@@ -23,34 +23,35 @@ extern "C"
 class CLuaVector4Defs: public CLuaDefs
 {
 public:
-    static int     Create                               ( lua_State * luaVM );
-    static int     Destroy                              ( lua_State * luaVM );
+    static void    AddClass                             ( lua_State* luaVM );
+    static int     Create                               ( lua_State* luaVM );
+    static int     Destroy                              ( lua_State* luaVM );
 
-    static int     GetLength                            ( lua_State * luaVM );
-    static int     GetLengthSquared                     ( lua_State * luaVM );
-    static int     GetNormalized                        ( lua_State * luaVM );
-    static int     Normalize                            ( lua_State * luaVM );
-    static int     Dot                                  ( lua_State * luaVM );
+    static int     GetLength                            ( lua_State* luaVM );
+    static int     GetLengthSquared                     ( lua_State* luaVM );
+    static int     GetNormalized                        ( lua_State* luaVM );
+    static int     Normalize                            ( lua_State* luaVM );
+    static int     Dot                                  ( lua_State* luaVM );
 
-    static int     ToString                             ( lua_State * luaVM );
+    static int     ToString                             ( lua_State* luaVM );
 
-    static int     SetX                                 ( lua_State * luaVM );
-    static int     SetY                                 ( lua_State * luaVM );
-    static int     SetZ                                 ( lua_State * luaVM );
-    static int     SetW                                 ( lua_State * luaVM );
+    static int     SetX                                 ( lua_State* luaVM );
+    static int     SetY                                 ( lua_State* luaVM );
+    static int     SetZ                                 ( lua_State* luaVM );
+    static int     SetW                                 ( lua_State* luaVM );
 
-    static int     GetX                                 ( lua_State * luaVM );
-    static int     GetY                                 ( lua_State * luaVM );
-    static int     GetZ                                 ( lua_State * luaVM );
-    static int     GetW                                 ( lua_State * luaVM );
+    static int     GetX                                 ( lua_State* luaVM );
+    static int     GetY                                 ( lua_State* luaVM );
+    static int     GetZ                                 ( lua_State* luaVM );
+    static int     GetW                                 ( lua_State* luaVM );
 
-    static int     Add                                  ( lua_State * luaVM );
-    static int     Sub                                  ( lua_State * luaVM );
-    static int     Mul                                  ( lua_State * luaVM );
-    static int     Div                                  ( lua_State * luaVM );
-    static int     Pow                                  ( lua_State * luaVM );
-    static int     Unm                                  ( lua_State * luaVM );
-    static int     Eq                                   ( lua_State * luaVM );
+    static int     Add                                  ( lua_State* luaVM );
+    static int     Sub                                  ( lua_State* luaVM );
+    static int     Mul                                  ( lua_State* luaVM );
+    static int     Div                                  ( lua_State* luaVM );
+    static int     Pow                                  ( lua_State* luaVM );
+    static int     Unm                                  ( lua_State* luaVM );
+    static int     Eq                                   ( lua_State* luaVM );
 };
 
 #endif

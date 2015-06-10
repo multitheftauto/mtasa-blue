@@ -12,6 +12,45 @@
 
 #include "StdInc.h"
 
+void CLuaMatrixDefs::AddClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classmetamethod ( luaVM, "__tostring", ToString );
+    lua_classmetamethod ( luaVM, "__gc", Destroy );
+
+    lua_classmetamethod ( luaVM, "__add", Add );
+    lua_classmetamethod ( luaVM, "__sub", Sub );
+    lua_classmetamethod ( luaVM, "__mul", Mul );
+    lua_classmetamethod ( luaVM, "__div", Div );
+
+    lua_classfunction ( luaVM, "create", "", Create );
+    lua_classfunction ( luaVM, "transformPosition", "", TransformPosition );
+    lua_classfunction ( luaVM, "transformDirection", "", TransformDirection );
+    lua_classfunction ( luaVM, "inverse", "", Inverse );
+
+    lua_classfunction ( luaVM, "getPosition", "", GetPosition );
+    lua_classfunction ( luaVM, "getRotation", "", GetRotation );
+    lua_classfunction ( luaVM, "getForward", "", GetForward );
+    lua_classfunction ( luaVM, "getRight", "", GetRight );
+    lua_classfunction ( luaVM, "getUp", "", GetUp );
+
+    lua_classfunction ( luaVM, "setPosition", "", SetPosition );
+    lua_classfunction ( luaVM, "setRotation", "", SetRotation );
+    lua_classfunction ( luaVM, "setForward", "", SetForward );
+    lua_classfunction ( luaVM, "setRight", "", SetRight );
+    lua_classfunction ( luaVM, "setUp", "", SetUp );
+
+    lua_classvariable ( luaVM, "position", "", "", SetPosition, GetPosition );
+    lua_classvariable ( luaVM, "rotation", "", "", SetRotation, GetRotation );
+    lua_classvariable ( luaVM, "forward", "", "", SetForward, GetForward );
+    lua_classvariable ( luaVM, "right", "", "", SetRight, GetRight );
+    lua_classvariable ( luaVM, "up", "", "", SetUp, GetUp );
+
+    lua_registerclass ( luaVM, "Matrix" );
+}
+
+
 int CLuaMatrixDefs::Create ( lua_State* luaVM )
 {
     CMatrix matrix;

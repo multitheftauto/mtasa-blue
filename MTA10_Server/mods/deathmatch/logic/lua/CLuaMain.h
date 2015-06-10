@@ -129,12 +129,6 @@ private:
     void                            InitClasses             ( lua_State* luaVM );
 
 public:
-
-    void                            AddVector4DClass        ( lua_State* luaVM );
-    void                            AddVector3DClass        ( lua_State* luaVM );
-    void                            AddVector2DClass        ( lua_State* luaVM );
-    void                            AddMatrixClass          ( lua_State* luaVM );
-
     void                            AddElementClass         ( lua_State* luaVM );
     void                            AddACLClass             ( lua_State* luaVM );
     void                            AddACLGroupClass        ( lua_State* luaVM );
@@ -142,7 +136,6 @@ public:
     void                            AddBanClass             ( lua_State* luaVM );
     void                            AddBlipClass            ( lua_State* luaVM );
     void                            AddColShapeClass        ( lua_State* luaVM );
-    void                            AddFileClass            ( lua_State* luaVM );
     void                            AddMarkerClass          ( lua_State* luaVM );
     void                            AddObjectClass          ( lua_State* luaVM );
     void                            AddPedClass             ( lua_State* luaVM );

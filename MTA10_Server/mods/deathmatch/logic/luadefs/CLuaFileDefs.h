@@ -13,14 +13,13 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAFILEDEFS_H
-#define __CLUAFILEDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaFileDefs: public CLuaDefs
 {
 public:
+    static void     AddClass                            ( lua_State* luaVM );
     static void     LoadFunctions                       ( void );
 
     static int      fileCreate                          ( lua_State* luaVM );
@@ -39,5 +38,3 @@ public:
     static int      fileCopy                            ( lua_State* luaVM );
     static int      fileGetPath                         ( lua_State* luaVM );
 };
-
-#endif
