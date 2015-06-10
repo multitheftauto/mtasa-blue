@@ -58,11 +58,22 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     }
     else
     {
+        iReturnCode = 1;
         SString strError = GetSystemErrorMessage ( GetLastError () );
         SString strMessage ( "Failed to load: '%s'\n\n%s", *strLoaderDllPathFilename, *strError );
         AddReportLog ( 5711, strMessage );
-        BrowseToSolution ( "loader-dll-missing", ASK_GO_ONLINE, strMessage );
-        iReturnCode = 1;
+
+        // Check if runtime is loadable
+        HMODULE hModule = LoadLibrary ( MSVCR_DLL );
+        if ( hModule )
+        {
+            BrowseToSolution ( "loader-dll-missing", ASK_GO_ONLINE, strMessage );
+            FreeLibrary ( hModule );
+        }
+        else
+        {
+            BrowseToSolution ( "launch-" MSVCR_DLL "-missing", ASK_GO_ONLINE, "Redistributable Packages for Visual Studio are not installed" );     
+        }
     }
 
     return iReturnCode;
