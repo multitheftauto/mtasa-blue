@@ -150,6 +150,36 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
     return 1;
 }
 
+// Only when onfoot/invehicle
+int CLuaFunctionDefs::SetCameraFieldOfView ( lua_State* luaVM )
+{
+    float fFOV;
+    CScriptArgReader argStream ( luaVM );
+
+    argStream.ReadNumber ( fFOV, 70.0f );
+
+    if ( fFOV < 0 || fFOV > 179 )
+        argStream.SetCustomError ( "Outside boundaries (0 to 179 inclusive)" );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pGame->GetSettings ()->SetFieldOfView ( fFOV, true );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+// Only when onfoot/invehicle
+int CLuaFunctionDefs::GetCameraFieldOfView ( lua_State* luaVM )
+{
+    lua_pushnumber ( luaVM, g_pGame->GetSettings ()->GetFieldOfView () );
+    return 1;
+}
 
 int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
 {

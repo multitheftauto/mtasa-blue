@@ -5391,6 +5391,10 @@ void CClientGame::ResetMapInfo ( void )
     g_pGame->GetWorld ()->SetCurrentArea ( 0 );
     m_pCamera->SetFocusToLocalPlayer ();
 
+    float fFOV;
+    g_pCore->GetCVars ()->Get ( "fov", fFOV );    
+    g_pGame->GetSettings ()->SetFieldOfView ( fFOV, false );
+
     // Dimension
     SetAllDimensions ( 0 );
 
