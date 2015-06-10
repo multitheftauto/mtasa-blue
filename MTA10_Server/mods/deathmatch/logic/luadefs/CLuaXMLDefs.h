@@ -22,6 +22,7 @@
 class CLuaXMLDefs: public CLuaDefs
 {
 public:
+    static void     AddClass                            ( lua_State* luaVM );
     static void     LoadFunctions                       ( void );
 
     static int      xmlCreateFile                       ( lua_State* luaVM );

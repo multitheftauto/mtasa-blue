@@ -17,90 +17,197 @@
 void CLuaElementDefs::LoadFunctions ( void )
 {
     // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
-    CLuaCFunctions::AddFunction ( "attachElementToElement", CLuaElementDefs::attachElements );
-    CLuaCFunctions::AddFunction ( "detachElementFromElement", CLuaElementDefs::detachElements );
+    CLuaCFunctions::AddFunction ( "attachElementToElement", attachElements );
+    CLuaCFunctions::AddFunction ( "detachElementFromElement", detachElements );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
 
 
     // Create/destroy
-    CLuaCFunctions::AddFunction ( "createElement", CLuaElementDefs::createElement );
-    CLuaCFunctions::AddFunction ( "destroyElement", CLuaElementDefs::destroyElement );
-    CLuaCFunctions::AddFunction ( "cloneElement", CLuaElementDefs::cloneElement );
+    CLuaCFunctions::AddFunction ( "createElement", createElement );
+    CLuaCFunctions::AddFunction ( "destroyElement", destroyElement );
+    CLuaCFunctions::AddFunction ( "cloneElement", cloneElement );
 
     // Get
-    CLuaCFunctions::AddFunction ( "isElement", CLuaElementDefs::isElement );
-    CLuaCFunctions::AddFunction ( "isElementWithinColShape", CLuaElementDefs::isElementWithinColShape );
-    CLuaCFunctions::AddFunction ( "isElementWithinMarker", CLuaElementDefs::isElementWithinMarker );
-    CLuaCFunctions::AddFunction ( "isElementInWater", CLuaElementDefs::isElementInWater );
-    CLuaCFunctions::AddFunction ( "isElementFrozen", CLuaElementDefs::isElementFrozen );
-    CLuaCFunctions::AddFunction ( "isElementLowLOD", CLuaElementDefs::isElementLowLOD );
-    CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", CLuaElementDefs::setElementCallPropagationEnabled );
-    CLuaCFunctions::AddFunction ( "isElementCallPropagationEnabled", CLuaElementDefs::isElementCallPropagationEnabled );
+    CLuaCFunctions::AddFunction ( "isElement", isElement );
+    CLuaCFunctions::AddFunction ( "isElementWithinColShape", isElementWithinColShape );
+    CLuaCFunctions::AddFunction ( "isElementWithinMarker", isElementWithinMarker );
+    CLuaCFunctions::AddFunction ( "isElementInWater", isElementInWater );
+    CLuaCFunctions::AddFunction ( "isElementFrozen", isElementFrozen );
+    CLuaCFunctions::AddFunction ( "isElementLowLOD", isElementLowLOD );
+    CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", setElementCallPropagationEnabled );
+    CLuaCFunctions::AddFunction ( "isElementCallPropagationEnabled", isElementCallPropagationEnabled );
 
-    CLuaCFunctions::AddFunction ( "getElementByID", CLuaElementDefs::getElementByID );
-    CLuaCFunctions::AddFunction ( "getElementByIndex", CLuaElementDefs::getElementByIndex );
-    CLuaCFunctions::AddFunction ( "getElementChildren", CLuaElementDefs::getElementChildren );
-    CLuaCFunctions::AddFunction ( "getElementChild", CLuaElementDefs::getElementChild );
-    CLuaCFunctions::AddFunction ( "getElementChildrenCount", CLuaElementDefs::getElementChildrenCount );
-    CLuaCFunctions::AddFunction ( "getAllElementData", CLuaElementDefs::getAllElementData );
-    CLuaCFunctions::AddFunction ( "getElementID", CLuaElementDefs::getElementID );
-    CLuaCFunctions::AddFunction ( "getElementParent", CLuaElementDefs::getElementParent );
-    CLuaCFunctions::AddFunction ( "getElementMatrix", CLuaElementDefs::getElementMatrix );
-    CLuaCFunctions::AddFunction ( "getElementPosition", CLuaElementDefs::getElementPosition );
-    CLuaCFunctions::AddFunction ( "getElementRotation", CLuaElementDefs::getElementRotation );
-    CLuaCFunctions::AddFunction ( "getElementVelocity", CLuaElementDefs::getElementVelocity );
-    CLuaCFunctions::AddFunction ( "getElementsByType", CLuaElementDefs::getElementsByType );
-    CLuaCFunctions::AddFunction ( "getElementType", CLuaElementDefs::getElementType );
-    CLuaCFunctions::AddFunction ( "getElementInterior", CLuaElementDefs::getElementInterior );
-    CLuaCFunctions::AddFunction ( "getElementsWithinColShape", CLuaElementDefs::getElementsWithinColShape );
-    CLuaCFunctions::AddFunction ( "getElementDimension", CLuaElementDefs::getElementDimension );
-    CLuaCFunctions::AddFunction ( "getElementZoneName", CLuaElementDefs::getElementZoneName );
-    CLuaCFunctions::AddFunction ( "getElementColShape", CLuaElementDefs::getElementColShape );
-    CLuaCFunctions::AddFunction ( "getElementAlpha", CLuaElementDefs::getElementAlpha );
-    CLuaCFunctions::AddFunction ( "isElementDoubleSided", CLuaElementDefs::isElementDoubleSided );
-    CLuaCFunctions::AddFunction ( "getElementHealth", CLuaElementDefs::getElementHealth );
-    CLuaCFunctions::AddFunction ( "getElementModel", CLuaElementDefs::getElementModel );
-    CLuaCFunctions::AddFunction ( "getElementSyncer", CLuaElementDefs::getElementSyncer );
-    CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", CLuaElementDefs::getElementCollisionsEnabled );
-    CLuaCFunctions::AddFunction ( "getLowLODElement", CLuaElementDefs::getLowLODElement );
+    CLuaCFunctions::AddFunction ( "getElementByID", getElementByID );
+    CLuaCFunctions::AddFunction ( "getElementByIndex", getElementByIndex );
+    CLuaCFunctions::AddFunction ( "getElementChildren", getElementChildren );
+    CLuaCFunctions::AddFunction ( "getElementChild", getElementChild );
+    CLuaCFunctions::AddFunction ( "getElementChildrenCount", getElementChildrenCount );
+    CLuaCFunctions::AddFunction ( "getAllElementData", getAllElementData );
+    CLuaCFunctions::AddFunction ( "getElementID", getElementID );
+    CLuaCFunctions::AddFunction ( "getElementParent", getElementParent );
+    CLuaCFunctions::AddFunction ( "getElementMatrix", getElementMatrix );
+    CLuaCFunctions::AddFunction ( "getElementPosition", getElementPosition );
+    CLuaCFunctions::AddFunction ( "getElementRotation", getElementRotation );
+    CLuaCFunctions::AddFunction ( "getElementVelocity", getElementVelocity );
+    CLuaCFunctions::AddFunction ( "getElementsByType", getElementsByType );
+    CLuaCFunctions::AddFunction ( "getElementType", getElementType );
+    CLuaCFunctions::AddFunction ( "getElementInterior", getElementInterior );
+    CLuaCFunctions::AddFunction ( "getElementsWithinColShape", getElementsWithinColShape );
+    CLuaCFunctions::AddFunction ( "getElementDimension", getElementDimension );
+    CLuaCFunctions::AddFunction ( "getElementZoneName", getElementZoneName );
+    CLuaCFunctions::AddFunction ( "getElementColShape", getElementColShape );
+    CLuaCFunctions::AddFunction ( "getElementAlpha", getElementAlpha );
+    CLuaCFunctions::AddFunction ( "isElementDoubleSided", isElementDoubleSided );
+    CLuaCFunctions::AddFunction ( "getElementHealth", getElementHealth );
+    CLuaCFunctions::AddFunction ( "getElementModel", getElementModel );
+    CLuaCFunctions::AddFunction ( "getElementSyncer", getElementSyncer );
+    CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", getElementCollisionsEnabled );
+    CLuaCFunctions::AddFunction ( "getLowLODElement", getLowLODElement );
 
     // Attachement
-    CLuaCFunctions::AddFunction ( "attachElements", CLuaElementDefs::attachElements );
-    CLuaCFunctions::AddFunction ( "detachElements", CLuaElementDefs::detachElements );
-    CLuaCFunctions::AddFunction ( "isElementAttached", CLuaElementDefs::isElementAttached );
-    CLuaCFunctions::AddFunction ( "getAttachedElements", CLuaElementDefs::getAttachedElements );
-    CLuaCFunctions::AddFunction ( "getElementAttachedTo", CLuaElementDefs::getElementAttachedTo );
-    CLuaCFunctions::AddFunction ( "setElementAttachedOffsets", CLuaElementDefs::setElementAttachedOffsets );
-    CLuaCFunctions::AddFunction ( "getElementAttachedOffsets", CLuaElementDefs::getElementAttachedOffsets );
+    CLuaCFunctions::AddFunction ( "attachElements", attachElements );
+    CLuaCFunctions::AddFunction ( "detachElements", detachElements );
+    CLuaCFunctions::AddFunction ( "isElementAttached", isElementAttached );
+    CLuaCFunctions::AddFunction ( "getAttachedElements", getAttachedElements );
+    CLuaCFunctions::AddFunction ( "getElementAttachedTo", getElementAttachedTo );
+    CLuaCFunctions::AddFunction ( "setElementAttachedOffsets", setElementAttachedOffsets );
+    CLuaCFunctions::AddFunction ( "getElementAttachedOffsets", getElementAttachedOffsets );
 
     // Element data
-    CLuaCFunctions::AddFunction ( "getElementData", CLuaElementDefs::getElementData );
-    CLuaCFunctions::AddFunction ( "setElementData", CLuaElementDefs::setElementData );
-    CLuaCFunctions::AddFunction ( "removeElementData", CLuaElementDefs::removeElementData );
+    CLuaCFunctions::AddFunction ( "getElementData", getElementData );
+    CLuaCFunctions::AddFunction ( "setElementData", setElementData );
+    CLuaCFunctions::AddFunction ( "removeElementData", removeElementData );
 
     // Set
-    CLuaCFunctions::AddFunction ( "setElementID", CLuaElementDefs::setElementID );
-    CLuaCFunctions::AddFunction ( "setElementParent", CLuaElementDefs::setElementParent );
-    CLuaCFunctions::AddFunction ( "setElementMatrix", CLuaElementDefs::setElementMatrix );
-    CLuaCFunctions::AddFunction ( "setElementPosition", CLuaElementDefs::setElementPosition );
-    CLuaCFunctions::AddFunction ( "setElementRotation", CLuaElementDefs::setElementRotation );
-    CLuaCFunctions::AddFunction ( "setElementVelocity", CLuaElementDefs::setElementVelocity );
-    CLuaCFunctions::AddFunction ( "setElementVisibleTo", CLuaElementDefs::setElementVisibleTo );
-    CLuaCFunctions::AddFunction ( "clearElementVisibleTo", CLuaElementDefs::clearElementVisibleTo );
-    CLuaCFunctions::AddFunction ( "isElementVisibleTo", CLuaElementDefs::isElementVisibleTo );
-    CLuaCFunctions::AddFunction ( "setElementInterior", CLuaElementDefs::setElementInterior );
-    CLuaCFunctions::AddFunction ( "setElementDimension", CLuaElementDefs::setElementDimension );
-    CLuaCFunctions::AddFunction ( "setElementAlpha", CLuaElementDefs::setElementAlpha );
-    CLuaCFunctions::AddFunction ( "setElementDoubleSided", CLuaElementDefs::setElementDoubleSided );
-    CLuaCFunctions::AddFunction ( "setElementHealth", CLuaElementDefs::setElementHealth );
-    CLuaCFunctions::AddFunction ( "setElementModel", CLuaElementDefs::setElementModel );
-    CLuaCFunctions::AddFunction ( "setElementSyncer", CLuaElementDefs::setElementSyncer );
-    CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", CLuaElementDefs::setElementCollisionsEnabled );
-    CLuaCFunctions::AddFunction ( "setElementFrozen", CLuaElementDefs::setElementFrozen );
-    CLuaCFunctions::AddFunction ( "setLowLODElement", CLuaElementDefs::setLowLODElement );
+    CLuaCFunctions::AddFunction ( "setElementID", setElementID );
+    CLuaCFunctions::AddFunction ( "setElementParent", setElementParent );
+    CLuaCFunctions::AddFunction ( "setElementMatrix", setElementMatrix );
+    CLuaCFunctions::AddFunction ( "setElementPosition", setElementPosition );
+    CLuaCFunctions::AddFunction ( "setElementRotation", setElementRotation );
+    CLuaCFunctions::AddFunction ( "setElementVelocity", setElementVelocity );
+    CLuaCFunctions::AddFunction ( "setElementVisibleTo", setElementVisibleTo );
+    CLuaCFunctions::AddFunction ( "clearElementVisibleTo", clearElementVisibleTo );
+    CLuaCFunctions::AddFunction ( "isElementVisibleTo", isElementVisibleTo );
+    CLuaCFunctions::AddFunction ( "setElementInterior", setElementInterior );
+    CLuaCFunctions::AddFunction ( "setElementDimension", setElementDimension );
+    CLuaCFunctions::AddFunction ( "setElementAlpha", setElementAlpha );
+    CLuaCFunctions::AddFunction ( "setElementDoubleSided", setElementDoubleSided );
+    CLuaCFunctions::AddFunction ( "setElementHealth", setElementHealth );
+    CLuaCFunctions::AddFunction ( "setElementModel", setElementModel );
+    CLuaCFunctions::AddFunction ( "setElementSyncer", setElementSyncer );
+    CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", setElementCollisionsEnabled );
+    CLuaCFunctions::AddFunction ( "setElementFrozen", setElementFrozen );
+    CLuaCFunctions::AddFunction ( "setLowLODElement", setLowLODElement );
 }
 
+// TODO: specials
+void CLuaElementDefs::AddClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "getByID", "getElementByID" );
+    lua_classfunction ( luaVM, "getAllByType", "getElementsByType" );
+    lua_classfunction ( luaVM, "getByIndex", "getElementByIndex" );
+
+    lua_classfunction ( luaVM, "create", "createElement" );
+    lua_classfunction ( luaVM, "clone", "cloneElement" );
+    lua_classfunction ( luaVM, "destroy", "destroyElement" );
+    lua_classfunction ( luaVM, "clearVisibility", "clearElementVisibleTo" );
+    lua_classfunction ( luaVM, "attach", "attachElements" );
+    lua_classfunction ( luaVM, "detach", "detachElements" );
+    lua_classfunction ( luaVM, "removeData", "removeElementData" );
+
+    lua_classfunction ( luaVM, "setParent", "setElementParent" );
+    lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
+    lua_classfunction ( luaVM, "setFrozen", "setElementFrozen" );
+    lua_classfunction ( luaVM, "setHealth", "setElementHealth" );
+    lua_classfunction ( luaVM, "setModel", "setElementModel" );
+    lua_classfunction ( luaVM, "setSyncer", "setElementSyncer" );
+    lua_classfunction ( luaVM, "setAlpha", "setElementAlpha" );
+    lua_classfunction ( luaVM, "setDoubleSided", "setElementDoubleSided" );
+    lua_classfunction ( luaVM, "setCollisionsEnabled", "setElementCollisionsEnabled" );
+    lua_classfunction ( luaVM, "setData", "setElementData" );
+    lua_classfunction ( luaVM, "setPosition", "setElementPosition" );
+    lua_classfunction ( luaVM, "setRotation", "setElementRotation" );
+    lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
+    lua_classfunction ( luaVM, "setMatrix", "setElementMatrix" );
+    lua_classfunction ( luaVM, "setID", "setElementID" );
+    lua_classfunction ( luaVM, "setInterior", "setElementInterior" );
+    lua_classfunction ( luaVM, "setDimension", "setElementDimension" );
+    lua_classfunction ( luaVM, "setLowLOD", "setLowLODElement" );
+    lua_classfunction ( luaVM, "setAttachedOffsets", "setElementAttachedOffsets" );
+    lua_classfunction ( luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled" );
+
+    lua_classfunction ( luaVM, "getAttachedOffsets", "getElementAttachedOffsets" );
+    lua_classfunction ( luaVM, "getChild", "getElementChild" );
+    lua_classfunction ( luaVM, "getChildren", "getElementChildren" );
+    lua_classfunction ( luaVM, "getParent", "getElementParent" );
+    lua_classfunction ( luaVM, "getAttachedElements", "getAttachedElements" );
+    lua_classfunction ( luaVM, "getAttachedTo", "getElementAttachedTo" );
+    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity", CLuaOOPDefs::GetElementVelocity );
+    lua_classfunction ( luaVM, "getID", "getElementID" );
+    lua_classfunction ( luaVM, "getZoneName", "getElementZoneName" );
+    lua_classfunction ( luaVM, "getAlpha", "getElementAlpha" );
+    lua_classfunction ( luaVM, "getHealth", "getElementHealth" );
+    lua_classfunction ( luaVM, "getModel", "getElementModel" );
+    lua_classfunction ( luaVM, "getChildrenCount", "getElementChildrenCount" );
+    lua_classfunction ( luaVM, "getSyncer", "getElementSyncer" );
+    lua_classfunction ( luaVM, "getAllData", "getAllElementData" );
+    lua_classfunction ( luaVM, "getColShape", "getElementColShape" );
+    lua_classfunction ( luaVM, "getData", "getElementData" );
+    lua_classfunction ( luaVM, "getPosition", "getElementPosition", CLuaOOPDefs::GetElementPosition );
+    lua_classfunction ( luaVM, "getRotation", "getElementRotation", CLuaOOPDefs::GetElementRotation );
+    lua_classfunction ( luaVM, "getMatrix", "getElementMatrix", CLuaOOPDefs::GetElementMatrix );
+    lua_classfunction ( luaVM, "getType", "getElementType" );
+    lua_classfunction ( luaVM, "getInterior", "getElementInterior" );
+    lua_classfunction ( luaVM, "getDimension", "getElementDimension" );
+    lua_classfunction ( luaVM, "getLowLOD", "getLowLODElement" );
+
+    lua_classfunction ( luaVM, "areCollisionsEnabled", "areElementCollisionsEnabled" );
+    lua_classfunction ( luaVM, "isCallPropagationEnabled", "isElementCallPropagationEnabled" );
+    lua_classfunction ( luaVM, "isWaitingForGroundToLoad", "isElementWaitingForGroundToLoad" );
+    lua_classfunction ( luaVM, "isWithinMarker", "isElementWithinMarker" );
+    lua_classfunction ( luaVM, "isWithinColShape", "isElementWithinColShape" );
+    lua_classfunction ( luaVM, "isFrozen", "isElementFrozen" );
+    lua_classfunction ( luaVM, "isInWater", "isElementInWater" );
+    lua_classfunction ( luaVM, "isDoubleSided", "isElementDoubleSided" );
+    lua_classfunction ( luaVM, "isVisibleTo", "isElementVisibleTo" );
+    lua_classfunction ( luaVM, "isLowLOD", "isElementLowLOD" );
+    lua_classfunction ( luaVM, "isAttached", "isElementAttached" );
+
+    lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
+    lua_classvariable ( luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled" );
+    lua_classvariable ( luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad" );
+    lua_classvariable ( luaVM, "parent", "setElementParent", "getElementParent" );
+    lua_classvariable ( luaVM, "zoneName", NULL, "getElementZoneName" );
+    lua_classvariable ( luaVM, "attachedTo", "attachElements", "getElementAttachedTo" );
+    lua_classvariable ( luaVM, "children", NULL, "getElementChildren" );
+    lua_classvariable ( luaVM, "frozen", "setElementFrozen", "isElementFrozen" );
+    lua_classvariable ( luaVM, "attachedElements", NULL, "getAttachedElements" );
+    lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
+    lua_classvariable ( luaVM, "health", "setElementHealth", "getElementHealth" );
+    lua_classvariable ( luaVM, "alpha", "setElementAlpha", "getElementAlpha" );
+    lua_classvariable ( luaVM, "type", NULL, "getElementType" );
+    lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
+    lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
+    lua_classvariable ( luaVM, "model", "setElementModel", "getElementModel" );
+    lua_classvariable ( luaVM, "lowLOD", "setLowLODElement", "getLowLODElement" );
+    lua_classvariable ( luaVM, "syncer", NULL, "isElementSyncer" );
+    lua_classvariable ( luaVM, "childrenCount", NULL, "getElementChildrenCount" );
+    lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
+    lua_classvariable ( luaVM, "colShape", NULL, "getElementColShape" );
+    lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
+    lua_classvariable ( luaVM, "position", "setElementPosition", "getElementPosition", setElementPosition, CLuaOOPDefs::GetElementPosition );
+    lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
+    lua_classvariable ( luaVM, "matrix", "setElementMatrix", "getElementMatrix", setElementMatrix, CLuaOOPDefs::GetElementMatrix );
+    lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity", setElementVelocity, CLuaOOPDefs::GetElementVelocity );
+    lua_classvariable ( luaVM, "isElement", NULL, "isElement" );
+    //lua_classvariable ( luaVM, "data", "setElementData", "getElementData", CLuaOOPDefs::SetElementData, CLuaOOPDefs::GetElementData );
+    //lua_classvariable ( luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", CLuaOOPDefs::SetElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo ); // .visibility[john]=false
+
+    lua_registerclass ( luaVM, "Element" );
+}
 
 int CLuaElementDefs::createElement ( lua_State* luaVM )
 {

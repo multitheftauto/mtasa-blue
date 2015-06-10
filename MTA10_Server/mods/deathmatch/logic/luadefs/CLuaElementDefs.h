@@ -21,6 +21,7 @@ class CLuaElementDefs: public CLuaDefs
 {
 public:
     static void     LoadFunctions                       ( void );
+    static void     AddClass                            ( lua_State* luaVM );
 
     // Create/destroy
     static int      createElement                       ( lua_State* luaVM );

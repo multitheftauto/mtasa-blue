@@ -129,7 +129,6 @@ private:
     void                            InitClasses             ( lua_State* luaVM );
 
 public:
-    void                            AddElementClass         ( lua_State* luaVM );
     void                            AddACLClass             ( lua_State* luaVM );
     void                            AddACLGroupClass        ( lua_State* luaVM );
     void                            AddAccountClass         ( lua_State* luaVM );
@@ -139,18 +138,14 @@ public:
     void                            AddMarkerClass          ( lua_State* luaVM );
     void                            AddObjectClass          ( lua_State* luaVM );
     void                            AddPedClass             ( lua_State* luaVM );
-    void                            AddPickupClass          ( lua_State* luaVM );
     void                            AddPlayerClass          ( lua_State* luaVM );
     void                            AddRadarAreaClass       ( lua_State* luaVM );
     void                            AddResourceClass        ( lua_State* luaVM );
     void                            AddConnectionClass      ( lua_State* luaVM );
     void                            AddQueryHandleClass     ( lua_State* luaVM );
     void                            AddTeamClass            ( lua_State* luaVM );
-    void                            AddTextDisplayClass     ( lua_State* luaVM );
-    void                            AddTextItemClass        ( lua_State* luaVM );
     void                            AddVehicleClass         ( lua_State* luaVM );
     void                            AddWaterClass           ( lua_State* luaVM );
-    void                            AddXMLClass             ( lua_State* luaVM );
     void                            AddTimerClass           ( lua_State* luaVM );
     
     bool                            IsOOPEnabled            ( void )                        { return m_bEnableOOP; }

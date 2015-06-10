@@ -20,6 +20,7 @@ class CLuaTextDefs: public CLuaDefs
 {
 public:
     static void     LoadFunctions                       ( void );
+    static void     AddClasses                          ( lua_State* luaVM );
 
     static int      textCreateDisplay                   ( lua_State* luaVM );
     static int      textDestroyDisplay                  ( lua_State* luaVM );

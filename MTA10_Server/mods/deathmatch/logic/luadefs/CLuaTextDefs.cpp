@@ -39,6 +39,59 @@ void CLuaTextDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "textItemGetPriority", CLuaTextDefs::textItemGetPriority );
 }
 
+void CLuaTextDefs::AddClasses ( lua_State* luaVM )
+{
+    //////////////////////////
+    //  TextDisplay class
+    //////////////////////////
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "textCreateDisplay" );
+    lua_classfunction ( luaVM, "destroy", "textDestroyDisplay" );
+    lua_classfunction ( luaVM, "addObserver", "textDisplayAddObserver" );
+    lua_classfunction ( luaVM, "removeObserver", "textDisplayRemoveObserver" );
+    lua_classfunction ( luaVM, "addText", "textDisplayAddText" );
+    lua_classfunction ( luaVM, "removeText", "textDisplayRemoveText" );
+
+    lua_classfunction ( luaVM, "isObserver", "textDisplayIsObserver" );
+    lua_classfunction ( luaVM, "getObservers", "textDisplayGetObservers" );
+
+    lua_classvariable ( luaVM, "observers", NULL, "textDisplayGetObservers" );
+
+    lua_registerclass ( luaVM, "TextDisplay" );
+    //////////////////////////
+
+
+
+    //////////////////////////
+    //  TextItem class
+    //////////////////////////
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "textCreateTextItem" );
+    lua_classfunction ( luaVM, "destroy", "textDestroyTextItem" );
+
+    lua_classfunction ( luaVM, "getColor", "textItemGetColor" );
+    lua_classfunction ( luaVM, "getPosition", "textItemGetPosition" );
+    lua_classfunction ( luaVM, "getPriority", "textItemGetPriority" );
+    lua_classfunction ( luaVM, "getScale", "textItemGetScale" );
+    lua_classfunction ( luaVM, "getText", "textItemGetText" );
+
+    lua_classfunction ( luaVM, "setColor", "textItemSetColor" );
+    lua_classfunction ( luaVM, "setPosition", "textItemSetPosition" );
+    lua_classfunction ( luaVM, "setPriority", "textItemSetPriority" );
+    lua_classfunction ( luaVM, "setScale", "textItemSetScale" );
+    lua_classfunction ( luaVM, "setText", "textItemSetText" );
+
+    lua_classvariable ( luaVM, "priority", "textItemSetPriority", "textItemGetPriority" );
+    lua_classvariable ( luaVM, "scale", "textItemSetScale", "textItemGetScale" );
+    lua_classvariable ( luaVM, "text", "textItemSetText", "textItemGetText" );
+    //lua_classvariable ( luaVM, "color", "textItemSetColor", "textItemGetColor", CLuaOOPDefs::TextItemSetColor, CLuaOOPDefs::TextItemGetColor ); // color
+    lua_classvariable ( luaVM, "position", "textItemSetPosition", "textItemGetPosition" );
+
+    lua_registerclass ( luaVM, "TextItem" );
+    //////////////////////////
+}
 
 int CLuaTextDefs::textCreateDisplay ( lua_State* luaVM )
 {

@@ -19,21 +19,21 @@
 
 void CLuaFileDefs::LoadFunctions ( void )
 {
-    CLuaCFunctions::AddFunction ( "fileCreate", CLuaFileDefs::fileCreate );
-    CLuaCFunctions::AddFunction ( "fileExists", CLuaFileDefs::fileExists );
-    CLuaCFunctions::AddFunction ( "fileOpen", CLuaFileDefs::fileOpen );
-    CLuaCFunctions::AddFunction ( "fileIsEOF", CLuaFileDefs::fileIsEOF );
-    CLuaCFunctions::AddFunction ( "fileGetPos", CLuaFileDefs::fileGetPos );
-    CLuaCFunctions::AddFunction ( "fileSetPos", CLuaFileDefs::fileSetPos );
-    CLuaCFunctions::AddFunction ( "fileGetSize", CLuaFileDefs::fileGetSize );
-    CLuaCFunctions::AddFunction ( "fileRead", CLuaFileDefs::fileRead );
-    CLuaCFunctions::AddFunction ( "fileWrite", CLuaFileDefs::fileWrite );
-    CLuaCFunctions::AddFunction ( "fileFlush", CLuaFileDefs::fileFlush );
-    CLuaCFunctions::AddFunction ( "fileClose", CLuaFileDefs::fileClose );
-    CLuaCFunctions::AddFunction ( "fileDelete", CLuaFileDefs::fileDelete );
-    CLuaCFunctions::AddFunction ( "fileRename", CLuaFileDefs::fileRename );
-    CLuaCFunctions::AddFunction ( "fileCopy", CLuaFileDefs::fileCopy );
-    CLuaCFunctions::AddFunction ( "fileGetPath", CLuaFileDefs::fileGetPath );
+    CLuaCFunctions::AddFunction ( "fileCreate", fileCreate );
+    CLuaCFunctions::AddFunction ( "fileExists", fileExists );
+    CLuaCFunctions::AddFunction ( "fileOpen", fileOpen );
+    CLuaCFunctions::AddFunction ( "fileIsEOF", fileIsEOF );
+    CLuaCFunctions::AddFunction ( "fileGetPos", fileGetPos );
+    CLuaCFunctions::AddFunction ( "fileSetPos", fileSetPos );
+    CLuaCFunctions::AddFunction ( "fileGetSize", fileGetSize );
+    CLuaCFunctions::AddFunction ( "fileRead", fileRead );
+    CLuaCFunctions::AddFunction ( "fileWrite", fileWrite );
+    CLuaCFunctions::AddFunction ( "fileFlush", fileFlush );
+    CLuaCFunctions::AddFunction ( "fileClose", fileClose );
+    CLuaCFunctions::AddFunction ( "fileDelete", fileDelete );
+    CLuaCFunctions::AddFunction ( "fileRename", fileRename );
+    CLuaCFunctions::AddFunction ( "fileCopy", fileCopy );
+    CLuaCFunctions::AddFunction ( "fileGetPath", fileGetPath );
 }
 
 

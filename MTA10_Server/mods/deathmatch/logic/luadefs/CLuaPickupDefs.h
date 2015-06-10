@@ -19,6 +19,7 @@
 class CLuaPickupDefs: public CLuaDefs
 {
 public:
+    static void     AddClass                            ( lua_State* luaVM );
     static void     LoadFunctions                       ( void );
 
     // Create/destroy
