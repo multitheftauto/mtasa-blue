@@ -123,6 +123,7 @@ struct SAclRequest;
 #include "luadefs/CLuaResourceDefs.h"
 #include "luadefs/CLuaTextDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
+#include "luadefs/CLuaVehicleDefs.h"
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaXMLDefs.h"
 #include "luadefs/CLuaClassDefs.h"

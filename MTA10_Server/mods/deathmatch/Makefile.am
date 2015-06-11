@@ -208,7 +208,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionDefs.Timer.cpp \
 ./logic/lua/CLuaFunctionDefs.UTF.cpp \
 ./logic/lua/CLuaFunctionDefs.Utility.cpp \
-./logic/lua/CLuaFunctionDefs.Vehicle.cpp \
 ./logic/lua/CLuaFunctionDefs.Water.cpp \
 ./logic/lua/CLuaFunctionDefs.Weapon.cpp \
 ./logic/lua/CLuaFunctionParseHelpers.cpp \
@@ -249,6 +248,7 @@ LOGIC = \
 ./logic/luadefs/CLuaVector2Defs.cpp \
 ./logic/luadefs/CLuaVector3Defs.cpp \
 ./logic/luadefs/CLuaVector4Defs.cpp \
+./logic/luadefs/CLuaVehicleDefs.cpp \
 ./logic/luadefs/CLuaVoiceDefs.cpp \
 ./logic/luadefs/CLuaWorldDefs.cpp \
 ./logic/luadefs/CLuaXMLDefs.cpp \

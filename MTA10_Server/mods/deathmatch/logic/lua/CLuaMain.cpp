@@ -655,158 +655,6 @@ void CLuaMain::AddTeamClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddVehicleClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "getModelFromName", "getVehicleModelFromName" );
-    lua_classfunction ( luaVM, "getNameFromModel", "getVehicleNameFromModel" );
-    lua_classfunction ( luaVM, "getAllOfType", "getVehiclesOfType" );
-    lua_classfunction ( luaVM, "getModelHandling", "getModelHandling" );
-    lua_classfunction ( luaVM, "setModelHandling", "setModelHandling" );
-    lua_classfunction ( luaVM, "getOriginalHandling", "getOriginalHandling" );
-    lua_classfunction ( luaVM, "getUpgradeSlotName", "getVehicleUpgradeSlotName" );
-
-    lua_classfunction ( luaVM, "create", "createVehicle" );
-    lua_classfunction ( luaVM, "blow", "blowVehicle" );
-    lua_classfunction ( luaVM, "fix", "fixVehicle" );
-    lua_classfunction ( luaVM, "detachTrailer", "detachTrailerFromVehicle" );
-    lua_classfunction ( luaVM, "addUpgrade", "addVehicleUpgrade" );
-    lua_classfunction ( luaVM, "attachTrailer", "attachTrailerToVehicle" );
-    lua_classfunction ( luaVM, "removeUpgrade", "removeVehicleUpgrade" );
-    lua_classfunction ( luaVM, "resetIdleTime", "resetVehicleIdleTime" );
-    lua_classfunction ( luaVM, "resetExplosionTime", "resetVehicleExplosionTime" );
-    lua_classfunction ( luaVM, "respawn", "respawnVehicle" );
-    lua_classfunction ( luaVM, "spawn", "spawnVehicle" );
-    lua_classfunction ( luaVM, "toggleRespawn", "toggleVehicleRespawn" );
-    lua_classfunction ( luaVM, "removeSirens", "removeVehicleSirens" );
-    lua_classfunction ( luaVM, "addSirens", "addVehicleSirens" );
-
-    lua_classfunction ( luaVM, "isDamageProof", "isVehicleDamageProof" );
-    lua_classfunction ( luaVM, "isFuelTankExplodable", "isVehicleFuelTankExplodable" );
-    lua_classfunction ( luaVM, "isLocked", "isVehicleLocked" );
-    lua_classfunction ( luaVM, "isOnGround", "isVehicleOnGround" );
-    lua_classfunction ( luaVM, "isDerailable", "isTrainDerailable" );
-    lua_classfunction ( luaVM, "isDerailed", "isTrainDerailed" );
-    lua_classfunction ( luaVM, "isBlown", "isVehicleBlown" );
-    lua_classfunction ( luaVM, "isTaxiLightOn", "isVehicleTaxiLightOn" );
-    lua_classfunction ( luaVM, "getSirenParams", "getVehicleSirenParams" );
-    lua_classfunction ( luaVM, "getVariant", "getVehicleVariant" );
-    lua_classfunction ( luaVM, "getSirens", "getVehicleSirens" );
-    lua_classfunction ( luaVM, "getDirection", "getTrainDirection" );
-    lua_classfunction ( luaVM, "getTrainSpeed", "getTrainSpeed" );
-    lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
-    lua_classfunction ( luaVM, "getTrainPosition", "getTrainPosition" );
-    lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
-    lua_classfunction ( luaVM, "getColor", "getVehicleColor" );
-    lua_classfunction ( luaVM, "getCompatibleUpgrades", "getVehicleCompatibleUpgrades" );
-    lua_classfunction ( luaVM, "getController", "getVehicleController" );
-    lua_classfunction ( luaVM, "getDoorState", "getVehicleDoorState" );
-    lua_classfunction ( luaVM, "getEngineState", "getVehicleEngineState" );
-    lua_classfunction ( luaVM, "getLandingGearDown", "getVehicleLandingGearDown" );
-    lua_classfunction ( luaVM, "getLightState", "getVehicleLightState" );
-    lua_classfunction ( luaVM, "getMaxPassenger", "getVehicleMaxPassengers" );
-    lua_classfunction ( luaVM, "getName", "getVehicleName" );
-    lua_classfunction ( luaVM, "getOccupant", "getVehicleOccupant" );
-    lua_classfunction ( luaVM, "getOccupants", "getVehicleOccupants" );
-    lua_classfunction ( luaVM, "getOverrideLights", "getVehicleOverrideLights" );
-    lua_classfunction ( luaVM, "getPlateText", "getVehiclePlateText" );
-    lua_classfunction ( luaVM, "getPaintjob", "getVehiclePaintjob" );
-    lua_classfunction ( luaVM, "getPanelState", "getVehiclePanelState" );
-    lua_classfunction ( luaVM, "areSirensOn", "getVehicleSirensOn" );
-    lua_classfunction ( luaVM, "getTowedByVehicle", "getVehicleTowedByVehicle" );
-    lua_classfunction ( luaVM, "getTowingVehicle", "getVehicleTowingVehicle" );
-    lua_classfunction ( luaVM, "getTurnVelocity", "getVehicleTurnVelocity" );
-    lua_classfunction ( luaVM, "getTurretPosition", "getVehicleTurretPosition" );
-    lua_classfunction ( luaVM, "getVehicleType", "getVehicleType" ); // This isn't "getType" because it would overwrite Element.getType
-    lua_classfunction ( luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot" );
-    lua_classfunction ( luaVM, "getUpgrades", "getVehicleUpgrades" );
-    lua_classfunction ( luaVM, "getWheelStates", "getVehicleWheelStates" );
-    lua_classfunction ( luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio" );
-    lua_classfunction ( luaVM, "getHandling", "getVehicleHandling" );
-
-    lua_classfunction ( luaVM, "setColor", "setVehicleColor" );
-    lua_classfunction ( luaVM, "setDamageProof", "setVehicleDamageProof" );
-    lua_classfunction ( luaVM, "setDoorState", "setVehicleDoorState" );
-    lua_classfunction ( luaVM, "setDoorsUndamageable", "setVehicleDoorsUndamageable" );
-    lua_classfunction ( luaVM, "setEngineState", "setVehicleEngineState" );
-    lua_classfunction ( luaVM, "setFuelTankExplodable", "setVehicleFuelTankExplodable" );
-    lua_classfunction ( luaVM, "setIdleRespawnDelay", "setVehicleIdleRespawnDelay" );
-    lua_classfunction ( luaVM, "setLandingGearDown", "setVehicleLandingGearDown" );
-    lua_classfunction ( luaVM, "setLightState", "setVehicleLightState" );
-    lua_classfunction ( luaVM, "setLocked", "setVehicleLocked" );
-    lua_classfunction ( luaVM, "setOverrideLights", "setVehicleOverrideLights" );
-    lua_classfunction ( luaVM, "setPaintjob", "setVehiclePaintjob" );
-    lua_classfunction ( luaVM, "setPanelState", "setVehiclePanelState" );
-    lua_classfunction ( luaVM, "setRespawnDelay", "setVehicleRespawnDelay" );
-    lua_classfunction ( luaVM, "setRespawnPosition", "setVehicleRespawnPosition" );
-    lua_classfunction ( luaVM, "setSirensOn", "setVehicleSirensOn" );
-    lua_classfunction ( luaVM, "setTurretPosition", "setVehicleTurretPosition" );
-    lua_classfunction ( luaVM, "setDoorOpenRatio", "setVehicleDoorOpenRatio" );
-    lua_classfunction ( luaVM, "setHandling", "setVehicleHandling" );
-    lua_classfunction ( luaVM, "setTurnVelocity", "setVehicleTurnVelocity" );
-    lua_classfunction ( luaVM, "setWheelStates", "setVehicleWheelStates" );
-    lua_classfunction ( luaVM, "setHeadLightColor", "setVehicleHeadLightColor" );
-    lua_classfunction ( luaVM, "setTaxiLightOn", "setVehicleTaxiLightOn" );
-    lua_classfunction ( luaVM, "setVariant", "setVehicleVariant" );
-    lua_classfunction ( luaVM, "setSirens", "setVehicleSirens" );
-    lua_classfunction ( luaVM, "setPlateText", "setVehiclePlateText" );
-    lua_classfunction ( luaVM, "setDerailable", "setTrainDerailable" );
-    lua_classfunction ( luaVM, "setDerailed", "setTrainDerailed" );
-    lua_classfunction ( luaVM, "setDirection", "setTrainDirection" );
-    lua_classfunction ( luaVM, "setTrack", "setTrainTrack" );
-    lua_classfunction ( luaVM, "setTrainPosition", "setTrainPosition" );
-    lua_classfunction ( luaVM, "setTrainSpeed", "setTrainSpeed" ); // Reduce confusion
-    
-    lua_classvariable ( luaVM, "damageProof", "setVehicleDamageProof", "isVehicleDamageProof" );
-    lua_classvariable ( luaVM, "locked", "setVehicleLocked", "isVehicleLocked" );
-    lua_classvariable ( luaVM, "derailable", "setTrainDerailable", "isTrainDerailable" );
-    lua_classvariable ( luaVM, "derailed", "setTrainDerailed", "isTrainDerailed" );
-    lua_classvariable ( luaVM, "blown", "blowVehicle", "isVehicleBlown" );
-    lua_classvariable ( luaVM, "direction", "setTrainDirection", "getTrainDirection" );
-    lua_classvariable ( luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed" );
-    lua_classvariable ( luaVM, "track", "setTrainTrack", "getTrainTrack" );
-    lua_classvariable ( luaVM, "trainPosition", "getTrainPosition", "getTrainPosition" );
-    lua_classvariable ( luaVM, "taxiLightOn", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn" );
-    lua_classvariable ( luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable" );
-    lua_classvariable ( luaVM, "plateText", "setVehiclePlateText", "getVehiclePlateText" );
-    lua_classvariable ( luaVM, "sirensOn", "setVehicleSirensOn", "getVehicleSirensOn" );
-    lua_classvariable ( luaVM, "sirenParams", NULL, "getVehicleSirenParams" );
-    lua_classvariable ( luaVM, "controller", NULL, "getVehicleController" );
-    lua_classvariable ( luaVM, "engineState", "setVehicleEngineState", "getVehicleEngineState" );
-    lua_classvariable ( luaVM, "paintjob", "setVehiclePaintjob", "getVehiclePaintjob" );
-    lua_classvariable ( luaVM, "occupants", NULL, "getVehicleOccupants" );
-    lua_classvariable ( luaVM, "compatibleUpgrades", NULL, "getVehicleCompatibleUpgrades" );
-    lua_classvariable ( luaVM, "doorsUndamageable", "setVehicleDoorsUndamageable", NULL );
-    lua_classvariable ( luaVM, "towingVehicle", NULL, "getVehicleTowingVehicle" );
-    lua_classvariable ( luaVM, "towedByVehicle", NULL, "getVehicleTowedByVehicle" );
-    lua_classvariable ( luaVM, "landingGearDown", "setVehicleLandingGearDown", "getVehicleLandingGearDown" );
-    lua_classvariable ( luaVM, "maxPassengers", NULL, "getVehicleMaxPassengers" );
-    lua_classvariable ( luaVM, "upgrades", NULL, "getVehicleUpgrades" );
-    lua_classvariable ( luaVM, "turretPosition", "setVehicleTurretPosition", "getVehicleTurretPosition" );
-    lua_classvariable ( luaVM, "turnVelocity", "setVehicleTurnVelocity", "getVehicleTurnVelocity" );
-    lua_classvariable ( luaVM, "overrideLights", "setVehicleOverrideLights", "getVehicleOverrideLights" );
-    lua_classvariable ( luaVM, "idleRespawnDelay", "setVehicleIdleRespawnDelay", NULL );
-    lua_classvariable ( luaVM, "respawnDelay", "setVehicleRespawnDelay", NULL );
-    lua_classvariable ( luaVM, "respawnPosition", "setVehicleRespawnPosition", NULL );
-    lua_classvariable ( luaVM, "onGround", NULL, "isVehicleOnGround" );
-    lua_classvariable ( luaVM, "name", NULL, "getVehicleName" );
-    lua_classvariable ( luaVM, "vehicleType", NULL, "getVehicleType" );
-    //lua_classvariable ( luaVM, "upgradeOnSlot", NULL, "getVehicleUpgradeOnSlot", NULL, CLuaOOPDefs::GetVehicleUpgradeOnSlot ); // .upgradeOnSlot[slot]=int
-    //lua_classvariable ( luaVM, "doorOpenRatio", "setVehicleDoorOpenRatio", "getVehicleDoorOpenRatio", CLuaOOPDefs::SetVehicleDoorOpenRation, CLuaOOPDefs::GetVehicleDoorOpenRatio ); // .doorOpenRatio[door]=ratio
-    //lua_classvariable ( luaVM, "doorState", "setVehicleDoorState", "getVehicleDoorState", CLuaOOPDefs::SetVehicleDoorState, CLuaOOPDefs::GetVehicleDoorState ); // .doorState[id]=state
-    //lua_classvariable ( luaVM, "lightState", "setVehicleLightState", "getVehicleLightState", CLuaOOPDefs::SetVehicleLightState, CLuaOOPDefs::GetVehicleLightState ); // .lightState[id]=state
-    //lua_classvariable ( luaVM, "panelState", "setVehiclePanelState", "getVehiclePanelState", CLuaOOPDefs::SetVehiclePanelState, CLuaOOPDefs::GetVehiclePanelState ); // .panelState[panel]=state
-    //lua_classvariable ( luaVM, "headLightColor", "setVehicleHeadLightColor", "getVehicleHeadLightColor" );
-    //lua_classvariable ( luaVM, "color", "setVehicleColor", "getVehicleColor" );
-    lua_classvariable ( luaVM, "sirens", NULL, "geVehicleSirens" ); // TODO: support .sirens[point] = {...}
-    lua_classvariable ( luaVM, "handling", NULL, "setVehicleHandling" ); // .handling[property]=value
-    lua_classvariable ( luaVM, "occupant", NULL, "getVehicleOccupant" ); // Currrently returns driver, support .occupant[seat]=ped
-    
-    lua_registerclass ( luaVM, "Vehicle", "Element" );
-}
-
-
 void CLuaMain::AddWaterClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -876,6 +724,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaPickupDefs      ::AddClass   ( luaVM );
     CLuaTextDefs        ::AddClasses ( luaVM );
     CLuaACLDefs         ::AddClasses ( luaVM );
+    CLuaVehicleDefs     ::AddClass   ( luaVM );
     AddAccountClass             ( luaVM );
     AddBanClass                 ( luaVM );
     AddBlipClass                ( luaVM );
@@ -889,7 +738,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddConnectionClass          ( luaVM );
     AddQueryHandleClass         ( luaVM );
     AddTeamClass                ( luaVM );
-    AddVehicleClass             ( luaVM );
     AddWaterClass               ( luaVM );
     AddTimerClass               ( luaVM );
 }

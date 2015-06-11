@@ -19,8 +19,8 @@
 class CLuaFileDefs: public CLuaDefs
 {
 public:
-    static void     AddClass                            ( lua_State* luaVM );
     static void     LoadFunctions                       ( void );
+    static void     AddClass                            ( lua_State* luaVM );
 
     static int      fileCreate                          ( lua_State* luaVM );
     static int      fileExists                          ( lua_State* luaVM );
