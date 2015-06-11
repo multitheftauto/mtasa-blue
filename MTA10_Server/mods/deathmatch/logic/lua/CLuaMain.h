@@ -129,8 +129,6 @@ private:
     void                            InitClasses             ( lua_State* luaVM );
 
 public:
-    void                            AddACLClass             ( lua_State* luaVM );
-    void                            AddACLGroupClass        ( lua_State* luaVM );
     void                            AddAccountClass         ( lua_State* luaVM );
     void                            AddBanClass             ( lua_State* luaVM );
     void                            AddBlipClass            ( lua_State* luaVM );
