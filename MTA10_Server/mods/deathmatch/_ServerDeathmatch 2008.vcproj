@@ -1436,6 +1436,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\logic\packets\CPlayerNetworkStatusPacket.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\logic\packets\CPlayerPuresyncPacket.cpp"
 						>
 					</File>
@@ -1560,10 +1564,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\logic\lua\CLuaFunctionDefs.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\logic\lua\CLuaFunctionDefs.Account.cpp"
 						>
 					</File>
@@ -1581,6 +1581,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\lua\CLuaFunctionDefs.ColShape.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\lua\CLuaFunctionDefs.cpp"
 						>
 					</File>
 					<File
@@ -1727,7 +1731,15 @@
 							>
 						</File>
 						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp"
+							>
+						</File>
+						<File
 							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp"
 							>
 						</File>
 						<File
@@ -1736,14 +1748,6 @@
 						</File>
 						<File
 							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp"
-							>
-						</File>
-						<File
-							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp"
-							>
-						</File>
-						<File
-							RelativePath=".\logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp"
 							>
 						</File>
 						<File
@@ -3094,6 +3098,10 @@
 					</File>
 					<File
 						RelativePath=".\logic\packets\CPlayerModInfoPacket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\logic\packets\CPlayerNetworkStatusPacket.h"
 						>
 					</File>
 					<File

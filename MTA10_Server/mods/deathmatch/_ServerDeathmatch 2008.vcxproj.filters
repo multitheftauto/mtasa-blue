@@ -1005,6 +1005,9 @@
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp">
       <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>
+    <ClCompile Include="logic\packets\CPlayerNetworkStatusPacket.cpp">
+      <Filter>Source Files\logic\packets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logic\CLightsyncManager.h">
@@ -1864,6 +1867,9 @@
     </ClInclude>
     <ClInclude Include="logic\lua\CLuaFunctionDefs.h">
       <Filter>Header Files\logic\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\packets\CPlayerNetworkStatusPacket.h">
+      <Filter>Header Files\logic\packets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
