@@ -108,6 +108,10 @@ bool CPacketHandler::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInter
             Packet_PartialPacketInfo ( bitStream );
             return true;
 
+        case PACKET_ID_PLAYER_NETWORK_STATUS:
+            Packet_PlayerNetworkStatus( bitStream );
+            return true;
+
         // Adds a new entity of any type to the world streamer.
         case PACKET_ID_ENTITY_ADD:
             Packet_EntityAdd ( bitStream );
@@ -2527,6 +2531,24 @@ void CPacketHandler::Packet_PartialPacketInfo ( NetBitStreamInterface& bitStream
                     g_pClientGame->NotifyBigPacketProgress ( 0, 0 );
             }
         }
+    }
+}
+
+
+void CPacketHandler::Packet_PlayerNetworkStatus ( NetBitStreamInterface& bitStream )
+{
+    uchar ucType;
+    uint uiTicks;
+
+    if ( bitStream.Read ( ucType ) &&
+         bitStream.Read ( uiTicks ) )
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber ( ucType );    // 0-interruption began  1-interruption end
+        Arguments.PushNumber ( uiTicks );   // Ticks since interruption start
+        CClientPlayer* pLocalPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
+        if ( pLocalPlayer )
+            pLocalPlayer->CallEvent ( "onClientPlayerNetworkStatus", Arguments, false );
     }
 }
 

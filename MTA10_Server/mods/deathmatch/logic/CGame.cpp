@@ -1136,6 +1136,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_NETWORK_STATUS:
+        {
+            Packet_PlayerNetworkStatus ( static_cast < CPlayerNetworkStatusPacket& > ( Packet ) );
+            return true;
+        }
+
         default:
             break;
     }
@@ -1449,6 +1455,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerUnmute", "", NULL, false );
     m_Events.AddEvent ( "onPlayerCommand", "command", NULL, false );
     m_Events.AddEvent ( "onPlayerModInfo", "type, ids, names", NULL, false );
+    m_Events.AddEvent ( "onPlayerNetworkStatus", "type, ticks", NULL, false );
     m_Events.AddEvent ( "onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false );
 
     // Ped events
@@ -3709,6 +3716,19 @@ void CGame::Packet_PlayerNoSocket ( CPlayerNoSocketPacket & Packet )
             pPlayer->Send ( CPlayerDisconnectedPacket ( CPlayerDisconnectedPacket::KICK, "Worrying message" ) );
             g_pGame->QuitPlayer ( *pPlayer, CClient::QUIT_TIMEOUT );
         }
+    }
+}
+
+
+void CGame::Packet_PlayerNetworkStatus ( CPlayerNetworkStatusPacket & Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer ();
+    if ( pPlayer )
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber ( Packet.m_ucType );   // 0-interruption began  1-interruption end
+        Arguments.PushNumber ( Packet.m_uiTicks );  // Ticks since interruption start
+        pPlayer->CallEvent ( "onPlayerNetworkStatus", Arguments, NULL );
     }
 }
 

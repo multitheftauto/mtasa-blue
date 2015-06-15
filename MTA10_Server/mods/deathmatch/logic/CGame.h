@@ -438,6 +438,7 @@ private:
     void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
     void                        Packet_PlayerScreenShot     ( class CPlayerScreenShotPacket & Packet );
     void                        Packet_PlayerNoSocket       ( class CPlayerNoSocketPacket & Packet );
+    void                        Packet_PlayerNetworkStatus  ( class CPlayerNetworkStatusPacket & Packet );
 
     static void                 PlayerCompleteConnect       ( CPlayer* pPlayer, bool bSuccess, const char* szError );
 
