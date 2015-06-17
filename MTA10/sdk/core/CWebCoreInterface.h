@@ -15,14 +15,14 @@ class CWebBrowserItem;
 class CWebViewInterface;
 class CWebView;
 
-enum eURLState
+enum class eURLState
 {
     WEBPAGE_NOT_LISTED,
     WEBPAGE_ALLOWED,
     WEBPAGE_DISALLOWED
 };
 
-enum eWebFilterType
+enum class eWebFilterType
 {
     WEBFILTER_HARDCODED,
     WEBFILTER_DYNAMIC,
@@ -30,7 +30,7 @@ enum eWebFilterType
     WEBFILTER_REQUEST
 };
 
-enum eWebFilterState
+enum class eWebFilterState
 {
     WEBFILTER_ALL,
     WEBFILTER_ALLOWED,

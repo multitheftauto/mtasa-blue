@@ -572,10 +572,12 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
         if ( IsLocal () )
             return true; // Block remote requests in local mode generally
 
-        if ( g_pCore->GetWebCore ()->GetURLState ( domain ) != eURLState::WEBPAGE_ALLOWED )
+        eURLState urlState = g_pCore->GetWebCore ()->GetURLState ( domain );
+        if ( urlState != eURLState::WEBPAGE_ALLOWED )
         {
             // Trigger onClientBrowserResourceBlocked event
-            auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString ( request->GetURL () ), domain, 0 ); // reason 0 := blocked url
+            auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface,
+                SString ( request->GetURL () ), domain, urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1 );
             g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
 
             return true; // Block if explicitly forbidden
@@ -591,7 +593,7 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
     }
 
      // Trigger onClientBrowserResourceBlocked event
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString ( request->GetURL () ), domain, 1 ); // reason 1 := blocked protocol scheme
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString ( request->GetURL () ), domain, 2 ); // reason 1 := blocked protocol scheme
     g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
 
     // Block everything else
