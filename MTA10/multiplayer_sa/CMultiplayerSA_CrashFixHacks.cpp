@@ -1281,22 +1281,32 @@ inner:
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CObject_Destructor_TrainCrossing_Check 0x59F7A8
-#define HOOKSIZE_CObject_Destructor_TrainCrossing_Check 5
-DWORD RETURN_CObject_Destructor_TrainCross_Check = 0x59F7AD;
-DWORD RETURN_CObject_Destructor_TrainCross_INVALID = 0x59F811;
-void _declspec(naked) HOOK_CObject_Destructor_TrainCrossing_Check ()
+#define HOOKPOS_CObject_ProcessTrainCrossingBehavior1 0x5A0C34
+#define HOOKPOS_CObject_ProcessTrainCrossingBehavior2 0x5A0C54
+#define RETURN_CObject_Destructor_TrainCrossing_Check 0x59F7AD
+#define RETURN_CObject_Destructor_TrainCrossing_Invalid 0x59F811
+#define RETURN_CObject_ProcessTrainCrossingBehavior1_Check 0x5A0C39
+#define RETURN_CObject_ProcessTrainCrossingBehavior2_Check 0x5A0C59
+#define RETURN_CObject_ProcessTrainCrossingBehavior_Invalid 0x5A0CBD
+
+DWORD TrainCrossingFix_ReturnAddress, TrainCrossingFix_InvalidReturnAddress;
+template <DWORD ReturnAddress, DWORD InvalidReturnAddress>
+void _declspec(naked) HOOK_TrainCrossingBarrierCrashFix ()
 {
+    // We cannot use template parameters directly in inline assembly; the following instructions don't modify registers
+    TrainCrossingFix_ReturnAddress = ReturnAddress;
+    TrainCrossingFix_InvalidReturnAddress = InvalidReturnAddress;
+
     _asm
     {
         test eax, eax // Check if pLinkedBarrierPost exists
         jz jmp_invalid // Skip the barrier stuff
-
         mov ecx, [eax+14h] // Execute replaced code
         test ecx, ecx
-        jmp RETURN_CObject_Destructor_TrainCross_Check
+        jmp TrainCrossingFix_ReturnAddress
 
-    jmp_invalid:
-        jmp RETURN_CObject_Destructor_TrainCross_INVALID
+jmp_invalid:
+        jmp TrainCrossingFix_InvalidReturnAddress
     }
 }
 
@@ -1501,9 +1511,16 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstall ( CClumpModelInfo_GetFrameFromId );
     EZHookInstallChecked ( CEntity_GetBoundRect );
     EZHookInstallChecked ( CVehicle_AddUpgrade );
-    EZHookInstall ( CObject_Destructor_TrainCrossing_Check );
     EZHookInstall ( ResetFurnitureObjectCounter );
     EZHookInstallChecked ( CVolumetricShadowMgr_Render );
     EZHookInstallChecked ( CVolumetricShadowMgr_Update );
     EZHookInstallChecked ( CAnimManager_CreateAnimAssocGroups );
+
+    // Install train crossing crashfix (the temporary variable is required for the template logic)
+    void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
+    HookInstall ( HOOKPOS_CObject_Destructor_TrainCrossing_Check, (DWORD)temp, 5 );
+    temp = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_ProcessTrainCrossingBehavior1_Check, RETURN_CObject_ProcessTrainCrossingBehavior_Invalid>;
+    HookInstall ( HOOKPOS_CObject_ProcessTrainCrossingBehavior1, (DWORD)temp, 5 );
+    temp = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_ProcessTrainCrossingBehavior2_Check, RETURN_CObject_ProcessTrainCrossingBehavior_Invalid>;
+    HookInstall ( HOOKPOS_CObject_ProcessTrainCrossingBehavior2, (DWORD)temp, 5 );
 }
