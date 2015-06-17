@@ -272,6 +272,45 @@ void _declspec(naked) HOOK_CProjectileDestructor()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
+void _cdecl OnCPhysicalDestructor ( DWORD calledFrom, CPhysicalSAInterface* pEntity )
+{
+    // This should be null
+    if ( pEntity->m_pMovingList )
+    {
+        AddReportLog( 8640, SString( "Removing CPhysical type %d from moving list", pEntity->nType ) );
+        DWORD dwFunc = FUNC_CPhysical_RemoveFromMovingList;
+        _asm
+        {
+            mov     ecx, pEntity
+            call    dwFunc
+        }
+    }
+}
+
+
+// Hook info
+#define HOOKPOS_CPhysicalDestructor        0x0542457
+#define HOOKSIZE_CPhysicalDestructor       6
+DWORD RETURN_CPhysicalDestructor =         0x054245D;
+void _declspec(naked) HOOK_CPhysicalDestructor()
+{
+    _asm
+    {
+        pushad
+        push    ecx
+        push    [esp+32+4*1+8]
+        call    OnCPhysicalDestructor
+        add     esp, 4*2
+        popad
+
+        mov     eax,dword ptr fs:[00000000h]
+        jmp     RETURN_CPhysicalDestructor
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
 void _cdecl OnCEntityDestructor ( DWORD calledFrom, CEntitySAInterface* pEntity )
 {
     RemoveEntityFromStreamSectors( pEntity, true );
@@ -512,6 +551,7 @@ void CMultiplayerSA::InitHooks_HookDestructors ( void )
    EZHookInstall ( CVehicleDestructor );
    EZHookInstall ( CProjectileDestructor );
    EZHookInstall ( CPlayerPedDestructor );
+   EZHookInstall ( CPhysicalDestructor );
    EZHookInstall ( CEntityDestructor );
    EZHookInstall ( CStreamingRemoveModel );
    EZHookInstall ( CEntityAddMid1 );
