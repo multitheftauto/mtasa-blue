@@ -236,6 +236,15 @@ bool CClientWebBrowser::Events_OnResourcePathCheck ( SString& strURL )
     return false;
 }
 
+void CClientWebBrowser::Events_OnResourceBlocked ( const SString& strURL, const SString& strDomain, unsigned char reason )
+{
+    CLuaArguments Arguments;
+    Arguments.PushString ( strURL );
+    Arguments.PushString ( strDomain );
+    Arguments.PushNumber ( reason );
+    CallEvent ( "onClientBrowserResourceBlocked", Arguments, false );
+}
+
 
 
 CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) 

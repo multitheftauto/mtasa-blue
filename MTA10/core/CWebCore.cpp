@@ -75,7 +75,6 @@ bool CWebCore::Initialise ()
 #else
     CefString ( &settings.browser_subprocess_path ).FromWString( FromUTF8( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher_d.exe" ) ) );
 #endif
-    //CefString ( &settings.user_agent ).FromASCII ( "Multi Theft Auto: San Andreas Client; Chromium" );
     CefString ( &settings.resources_dir_path ).FromWString ( FromUTF8( CalcMTASAPath( "MTA\\CEF") ) );
     CefString ( &settings.locales_dir_path ).FromWString( FromUTF8( CalcMTASAPath( "MTA\\CEF\\locales" ) ) );
     CefString ( &settings.log_file ).FromWString ( FromUTF8( CalcMTASAPath ( "MTA\\CEF\\cefdebug.txt" ) ) );

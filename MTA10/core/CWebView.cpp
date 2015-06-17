@@ -453,7 +453,7 @@ void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
 
     // Queue event to run on the main thread
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnLoadingStart, m_pEventsInterface, strURL, frame->IsMain () );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadingStart" );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadStart" );
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -566,13 +566,20 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
     }
 
     WString scheme = urlParts.scheme.str;
+    SString domain = UTF16ToMbUTF8 ( urlParts.host.str );
     if ( scheme == L"http" || scheme == L"https" )
     {
         if ( IsLocal () )
             return true; // Block remote requests in local mode generally
 
-        if ( g_pCore->GetWebCore ()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ) ) != eURLState::WEBPAGE_ALLOWED )
+        if ( g_pCore->GetWebCore ()->GetURLState ( domain ) != eURLState::WEBPAGE_ALLOWED )
+        {
+            // Trigger onClientBrowserResourceBlocked event
+            auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString ( request->GetURL () ), domain, 0 ); // reason 0 := blocked url
+            g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
+
             return true; // Block if explicitly forbidden
+        }
 
         // Allow
         return false;
@@ -582,6 +589,10 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
         // Allow :)
         return false;
     }
+
+     // Trigger onClientBrowserResourceBlocked event
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString ( request->GetURL () ), domain, 1 ); // reason 1 := blocked protocol scheme
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
 
     // Block everything else
     return true;

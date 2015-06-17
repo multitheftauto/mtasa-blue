@@ -25,6 +25,7 @@ public:
     virtual void Events_OnTooltip ( const SString& strTooltip ) = 0;
     virtual void Events_OnInputFocusChanged ( bool bGainedFocus ) = 0;
     virtual bool Events_OnResourcePathCheck ( SString& strURL ) = 0;
+    virtual void Events_OnResourceBlocked ( const SString& strURL, const SString& strDomain, unsigned char reason ) = 0;
 };
 
 #endif

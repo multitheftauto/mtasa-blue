@@ -64,6 +64,7 @@ public:
     void                        Events_OnTooltip       ( const SString& strTooltip ) override;
     void                        Events_OnInputFocusChanged ( bool bGainedFocus ) override;
     bool                        Events_OnResourcePathCheck ( SString& strURL ) override;
+    void                        Events_OnResourceBlocked   ( const SString& strURL, const SString& strDomain, unsigned char reason ) override;
 
 private:
     CWebViewInterface* m_pWebView;
