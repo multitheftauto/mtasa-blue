@@ -16,6 +16,9 @@ CBulletsyncPacket::CBulletsyncPacket ( CPlayer * pPlayer )
     m_pSourceElement = pPlayer;
     m_WeaponType = WEAPONTYPE_UNARMED;
     m_ucOrderCounter = 0;
+    m_fDamage = 0;
+    m_ucHitZone = 0;
+    m_DamagedPlayerID = INVALID_ELEMENT_ID;
 }
 
 bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
@@ -34,6 +37,12 @@ bool CBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
         if ( !BitStream.Read ( m_ucOrderCounter ) )
             return false;
 
+        if ( BitStream.ReadBit() )
+        {
+            BitStream.Read ( m_fDamage );
+            BitStream.Read ( m_ucHitZone );
+            BitStream.Read ( m_DamagedPlayerID );
+        }
         return true;
     }
 
@@ -60,6 +69,19 @@ bool CBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
         // Duplicate packet protection
         BitStream.Write ( m_ucOrderCounter );
+
+        if ( m_fDamage > 0 && m_DamagedPlayerID != INVALID_ELEMENT_ID )
+        {
+            BitStream.WriteBit ( true );
+            BitStream.Write ( m_fDamage );
+            BitStream.Write ( m_ucHitZone );
+            BitStream.Write ( m_DamagedPlayerID );
+        }
+        else
+        {
+            BitStream.WriteBit ( false );
+        }
+
         return true;
     }
 

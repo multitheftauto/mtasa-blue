@@ -2548,7 +2548,10 @@ void CPacketHandler::Packet_PlayerNetworkStatus ( NetBitStreamInterface& bitStre
         Arguments.PushNumber ( uiTicks );   // Ticks since interruption start
         CClientPlayer* pLocalPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer ();
         if ( pLocalPlayer )
+        {
+            pLocalPlayer->SetIsInNetworkInterruption( ucType == 0 );
             pLocalPlayer->CallEvent ( "onClientPlayerNetworkStatus", Arguments, false );
+        }
     }
 }
 

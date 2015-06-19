@@ -59,7 +59,7 @@ public:
 
     void                    AddInterpolation                ( const CVector& vecPosition );
     bool                    GetInterpolation                ( CVector& vecPosition, unsigned short usLatency );
-    void                    SendBulletSyncFire              ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
+    void                    SendBulletSyncFire              ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fDamage, uchar ucHitZone, CClientPlayer* pRemoteDamagedPlayer );
     void                    SendBulletSyncCustomWeaponFire  ( CClientWeapon * pWeapon, const CVector& vecStart, const CVector& vecEnd );
     bool                    IsNetworkTrouble                ( void )            { return m_bIsNetworkTrouble; }
 
