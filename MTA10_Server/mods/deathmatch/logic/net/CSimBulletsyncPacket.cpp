@@ -15,6 +15,9 @@ CSimBulletsyncPacket::CSimBulletsyncPacket ( ElementID PlayerID )
     : m_PlayerID ( PlayerID )
 {
     m_Cache.ucOrderCounter = 0;
+    m_Cache.fDamage = 0;
+    m_Cache.ucHitZone = 0;
+    m_Cache.DamagedPlayerID = INVALID_ELEMENT_ID;
 }
 
 
@@ -33,6 +36,13 @@ bool CSimBulletsyncPacket::Read ( NetBitStreamInterface& BitStream )
     // Duplicate packet protection
     if ( !BitStream.Read ( m_Cache.ucOrderCounter ) )
         return false;
+
+    if ( BitStream.ReadBit() )
+    {
+        BitStream.Read ( m_Cache.fDamage );
+        BitStream.Read ( m_Cache.ucHitZone );
+        BitStream.Read ( m_Cache.DamagedPlayerID );
+    }
 
     return true;
 }
@@ -53,6 +63,18 @@ bool CSimBulletsyncPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     // Duplicate packet protection
     BitStream.Write ( m_Cache.ucOrderCounter );
+
+    if ( m_Cache.fDamage > 0 && m_Cache.DamagedPlayerID != INVALID_ELEMENT_ID )
+    {
+        BitStream.WriteBit ( true );
+        BitStream.Write ( m_Cache.fDamage );
+        BitStream.Write ( m_Cache.ucHitZone );
+        BitStream.Write ( m_Cache.DamagedPlayerID );
+    }
+    else
+    {
+        BitStream.WriteBit ( false );
+    }
 
     return true;
 }

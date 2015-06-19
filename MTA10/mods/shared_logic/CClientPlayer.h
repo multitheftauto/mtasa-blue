@@ -109,11 +109,13 @@ public:
     
     inline CClientManager*          GetManager              ( void )                                { return m_pManager; }
 
-    void                            DischargeWeapon         ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd );
+    void                            DischargeWeapon         ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fBackupDamage, uchar ucBackupHitZone, CClientPlayer* pBackupDamagedPlayer );
 
     void                            SetRemoteVersionInfo        ( ushort usBitstreamVersion, uint uiBuildNumber );
     ushort                          GetRemoteBitstreamVersion   ( void );
     uint                            GetRemoteBuildNumber        ( void );
+    bool                            GetWasRecentlyInNetworkInterruption  ( uint uiMaxTicksAgo );
+    void                            SetIsInNetworkInterruption  ( bool bInNetworkInterruption );
 
     CVector                         m_vecPrevBulletSyncStart;
     CVector                         m_vecPrevBulletSyncEnd;
@@ -168,6 +170,8 @@ private:
     CVector                         m_vecLightsyncCalcedVelocity;
     ushort                          m_usRemoteBitstreamVersion;
     uint                            m_uiRemoteBuildNumber;
+    bool                            m_bInNetworkInterruption;
+    CElapsedTime                    m_TimeSinceNetworkInterruptionEnded;
 
 #ifdef MTA_DEBUG
 private:

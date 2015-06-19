@@ -2292,6 +2292,18 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
     uchar ucOrderCounter = 0;
     BitStream.Read ( ucOrderCounter );
 
+    float fDamage = 0;
+    uchar ucHitZone = 0;
+    CClientPlayer* pDamagedPlayer = NULL;
+    if ( BitStream.ReadBit() )
+    {
+        ElementID DamagedPlayerID = INVALID_ELEMENT_ID;
+        BitStream.Read( fDamage );
+        BitStream.Read( ucHitZone );
+        BitStream.Read( DamagedPlayerID );
+        pDamagedPlayer = DynamicCast < CClientPlayer > ( CElementIDs::GetElement( DamagedPlayerID ) );
+    }
+
     // Duplicate bullet check
     {
        bool bIsDuplicate = false;
@@ -2315,7 +2327,7 @@ void CNetAPI::ReadBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterface& Bi
             return;
     }
 
-    pPlayer->DischargeWeapon ( weaponType, vecStart, vecEnd );
+    pPlayer->DischargeWeapon ( weaponType, vecStart, vecEnd, fDamage, ucHitZone, pDamagedPlayer );
 }
 
 
@@ -2344,7 +2356,7 @@ void CNetAPI::ReadWeaponBulletsync ( CClientPlayer* pPlayer, NetBitStreamInterfa
 //
 // Send bulletsync fire button press packet to remote players
 //
-void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd )
+void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fDamage, uchar ucHitZone, CClientPlayer* pRemoteDamagedPlayer )
 {
     // Send a bulletsync packet
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
@@ -2356,6 +2368,18 @@ void CNetAPI::SendBulletSyncFire ( eWeaponType weaponType, const CVector& vecSta
     pBitStream->Write ( (const char*)&vecEnd, sizeof ( CVector ) );
 
     pBitStream->Write ( m_ucBulletSyncOrderCounter++ );
+
+    if ( fDamage > 0 && pRemoteDamagedPlayer )
+    {
+        pBitStream->WriteBit ( true );
+        pBitStream->Write ( fDamage );
+        pBitStream->Write ( ucHitZone );
+        pBitStream->Write ( pRemoteDamagedPlayer->GetID() );
+    }
+    else
+    {
+        pBitStream->WriteBit ( false );
+    }
 
     // Send the packet
     g_pNet->SendPacket ( PACKET_ID_PLAYER_BULLETSYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE );

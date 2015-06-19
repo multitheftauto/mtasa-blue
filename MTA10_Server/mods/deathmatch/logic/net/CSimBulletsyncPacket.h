@@ -35,6 +35,9 @@ public:
         CVector     vecStart;
         CVector     vecEnd;
         uchar       ucOrderCounter;
+        float       fDamage;
+        uchar       ucHitZone;
+        ElementID   DamagedPlayerID;
     } m_Cache;
 
 };

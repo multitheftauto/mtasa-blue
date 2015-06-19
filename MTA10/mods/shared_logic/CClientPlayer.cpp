@@ -17,6 +17,8 @@
 
 #include <StdInc.h>
 int g_iDamageEventLimit = -1;
+extern float g_fApplyDamageLastAmount;
+extern CClientPed* g_pApplyDamageLastDamagedPed;
 
 CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsLocalPlayer ) : ClassInit ( this ), CClientPed ( pManager, 0, ID, bIsLocalPlayer )
 {
@@ -259,10 +261,13 @@ void CClientPlayer::SetNametagText ( const char * szText )
 }
 
 
-void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd )
+void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fBackupDamage, uchar ucBackupHitZone, CClientPlayer* pBackupDamagedPlayer )
 {
     if ( m_pPlayerPed )
     {
+        g_pApplyDamageLastDamagedPed = NULL;
+        g_fApplyDamageLastAmount = 0;
+
         // Check weapon matches and is enabled for bullet sync
         if ( weaponType == GetCurrentWeaponType () &&
              g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
@@ -279,6 +284,40 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
             g_iDamageEventLimit = -1;
 
             m_shotSyncData->m_bRemoteBulletSyncVectorsValid = false;
+        }
+
+        // Apply extra damage if player has bad network
+        if ( pBackupDamagedPlayer && pBackupDamagedPlayer->GetGamePlayer() && pBackupDamagedPlayer->GetWasRecentlyInNetworkInterruption( 1000 ) )
+        {
+            // Subtract any damage that did get applied during FireBullet
+            if ( pBackupDamagedPlayer == g_pApplyDamageLastDamagedPed )
+                fBackupDamage -= g_fApplyDamageLastAmount;
+
+            if ( fBackupDamage > 0 )
+            {
+                // Apply left over damage like what the game would:
+                //      CClientPlayer has pre damage health/armor
+                //      CPlayerPed has post damage health/armor
+
+                float fPreviousHealth = pBackupDamagedPlayer->m_fHealth;
+                float fPreviousArmor = pBackupDamagedPlayer->m_fArmor;
+
+                // Calculate how much damage should be applied to health/armor
+                float fArmorDamage = Min( fBackupDamage, pBackupDamagedPlayer->m_fArmor ); 
+                float fHealthDamage = Min( fBackupDamage - fArmorDamage, pBackupDamagedPlayer->m_fHealth );
+
+                float fNewArmor = pBackupDamagedPlayer->m_fArmor - fArmorDamage;
+                float fNewHealth = pBackupDamagedPlayer->m_fHealth - fHealthDamage;
+
+                // Ensure CPlayerPed has post damage health/armor
+                pBackupDamagedPlayer->GetGamePlayer()->SetHealth( fNewHealth );
+                pBackupDamagedPlayer->GetGamePlayer()->SetArmor( fNewArmor );
+
+                g_pClientGame->ApplyPedDamageFromGame( weaponType, fBackupDamage, ucBackupHitZone, pBackupDamagedPlayer, this, NULL );
+
+                SString strMessage( "Applied %0.2f damage to %s (from %s) due to network interruption", fBackupDamage, pBackupDamagedPlayer->GetNick(), GetNick() );
+                g_pClientGame->TellServerSomethingImportant( 1010, strMessage, false );
+            }
         }
     }
 }
@@ -298,4 +337,18 @@ ushort CClientPlayer::GetRemoteBitstreamVersion ( void )
 uint CClientPlayer::GetRemoteBuildNumber ( void )
 {
     return m_uiRemoteBuildNumber;
+}
+
+bool CClientPlayer::GetWasRecentlyInNetworkInterruption ( uint uiMaxTicksAgo )
+{
+    if ( m_bInNetworkInterruption )
+        return true;
+    return m_TimeSinceNetworkInterruptionEnded.Get() < uiMaxTicksAgo;
+}
+
+void CClientPlayer::SetIsInNetworkInterruption ( bool bBegan )
+{
+    m_bInNetworkInterruption = bBegan;
+    if ( !bBegan )
+        m_TimeSinceNetworkInterruptionEnded.Reset();
 }

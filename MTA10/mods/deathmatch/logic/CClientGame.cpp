@@ -43,6 +43,12 @@ using std::vector;
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
 extern int g_iDamageEventLimit;
+float g_fApplyDamageLastAmount;
+uchar g_ucApplyDamageLastHitZone;
+CClientPed* g_pApplyDamageLastDamagedPed;
+bool g_bBulletFireVectorsValid;
+CVector g_vecBulletFireStartPosition;
+CVector g_vecBulletFireEndPosition;
 
 #define DEFAULT_GRAVITY              0.008f
 #define DEFAULT_GAME_SPEED           1.0f
@@ -4089,6 +4095,24 @@ void CClientGame::DownloadSingularResourceFiles ( void )
 }
 
 
+// Get relevant death anim for animation purposes during death situation
+void GetDeathAnim( CClientPed* pDamagedPed, CEventDamage* pEvent, AssocGroupId& outAnimGroup, AnimationId& outAnimID )
+{
+    if ( pEvent )
+    {
+        pEvent->ComputeDeathAnim ( pDamagedPed->GetGamePlayer(), true );
+        outAnimGroup = pEvent->GetAnimGroup ();
+        outAnimID = pEvent->GetAnimId ();
+    }
+    else
+    {
+        // Using same numbers as CClientGame::DoWastedCheck defaults
+        outAnimGroup = 0;
+        outAnimID = 15;
+    }
+}
+
+
 //
 // DamageHandler seems to be called 3 times for each bit of damage:
 //
@@ -4148,11 +4172,6 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     // Do we have a damaged ped?
     if ( pDamagedPed )
     {
-        float fPreviousHealth = pDamagedPed->m_fHealth;
-        float fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
-        float fPreviousArmor = pDamagedPed->m_fArmor;
-        float fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
-
         ///////////////////////////////////////////////////////////////////////////
         //
         // Pass 1 stuff
@@ -4244,153 +4263,7 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
         // Pass 1 end
         ///////////////////////////////////////////////////////////////////////////
 
-
-        // Have we taken any damage here?
-        if ( ( fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor ) && fDamage != 0.0f )
-        {
-            ///////////////////////////////////////////////////////////////////////////
-            ///
-            // Pass 2 stuff - (GTA has applied the damage)
-            //
-            // return false to stop damage anim (incl. death task) 
-            //
-            ///////////////////////////////////////////////////////////////////////////
-
-            CLuaArguments Arguments;
-            if ( pInflictingEntity ) Arguments.PushElement ( pInflictingEntity );
-            else Arguments.PushBoolean ( false );
-            Arguments.PushNumber ( static_cast < unsigned char > ( weaponUsed ) );
-            Arguments.PushNumber ( static_cast < unsigned char > ( hitZone ) );
-            Arguments.PushNumber ( fDamage );
-
-            // Call our event
-            if ( ( IS_PLAYER ( pDamagedPed ) && !pDamagedPed->CallEvent ( "onClientPlayerDamage", Arguments, true ) ) || ( !IS_PLAYER ( pDamagedPed ) && !pDamagedPed->CallEvent ( "onClientPedDamage", Arguments, true ) ) )
-            {
-                // Stop here if they cancelEvent it
-                if ( pDamagedPed->IsLocalPlayer () )
-                {
-                    // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
-                    fPreviousHealth = pDamagedPed->m_fHealth;
-                    fPreviousArmor = pDamagedPed->m_fArmor;
-                }
-                pDamagedPed->GetGamePlayer ()->SetHealth ( fPreviousHealth );
-                pDamagedPed->GetGamePlayer ()->SetArmor ( fPreviousArmor );
-                return false;
-            }
-
-            if ( pDamagedPed->IsLocalPlayer () )
-            {
-                // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
-                fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
-                fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
-            }
-
-            bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
-            bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
-            
-            // Is this is a remote player?
-            if (!pDamagedPed->IsLocalPlayer())
-            {
-               // Don't allow GTA to start the choking task
-               if (weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER)
-                    return false;
-            }
-
-            // Check if their health or armor is locked, and if so prevent applying the damage locally
-            if ( pDamagedPed->IsHealthLocked () || pDamagedPed->IsArmorLocked () )
-            {
-                // Restore health+armor
-                pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
-                pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
-
-                if ( bOldBehaviour )
-                {
-                    // Don't play the animation if it's going to be a death one, or if it's going to interrupt aiming
-                    if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming )
-                        return false;
-
-                    // Allow animation for remote players
-                    return true;
-                }
-
-                // No hit animation for remote players
-                return false;
-            }
-
-            // Update our stored health/armor
-            pDamagedPed->m_fHealth = fCurrentHealth;
-            pDamagedPed->m_fArmor = fCurrentArmor;
-
-            ElementID damagerID = INVALID_ELEMENT_ID;
-            if ( pInflictingEntity && !pInflictingEntity->IsLocalEntity ( ) )
-                damagerID = pInflictingEntity->GetID ( );
-
-            // Is it the local player?
-            if ( pDamagedPed->IsLocalPlayer () )
-            {  
-                // Update our stored damage stuff
-                m_ucDamageWeapon = static_cast < unsigned char > ( weaponUsed );
-                m_ucDamageBodyPiece = static_cast < unsigned char > ( hitZone );
-                m_pDamageEntity = pInflictingEntity;
-                m_ulDamageTime = CClientTime::GetTime ();
-                m_DamagerID = damagerID;
-                m_bDamageSent = false;
-            }
-            // Does this damage kill the player?
-            if ( fCurrentHealth == 0.0f )
-            {                
-                if ( pDamagedPed->GetType () == CCLIENTPLAYER )
-                {                
-                    // Is the local player dying?
-                    if ( pDamagedPed->IsLocalPlayer () && fPreviousHealth > 0.0f )
-                    {
-                        // Grab our death animation
-                        pEvent->ComputeDeathAnim ( pDamagePed, true );
-                        AssocGroupId animGroup = pEvent->GetAnimGroup ();
-                        AnimationId animID = pEvent->GetAnimId ();
-
-                        // Check if we're dead
-                        DoWastedCheck ( damagerID, weaponUsed, hitZone, animGroup, animID );                
-                    }
-
-                    // Allow GTA to kill us if we've fell to our death
-                    if ( pDamagedPed->IsLocalPlayer () && weaponUsed == WEAPONTYPE_FALL ) return true;
-                    
-                    // Don't let GTA start the death task
-                    return false;            
-                }
-                else
-                {
-                    if ( pDamagedPed->IsLocalEntity () && fPreviousHealth > 0.0f )
-                    {
-                        // Client-side ped
-                        pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
-                        pEvent->ComputeDeathAnim ( pDamagePed, true );
-                        AssocGroupId animGroup = pEvent->GetAnimGroup ();
-                        AnimationId animID = pEvent->GetAnimId ();
-                        pDamagedPed->Kill ( weaponUsed, hitZone, false, false, animGroup, animID );
-                        return true;
-                    }
-                    if ( fPreviousHealth > 0.0f )
-                    {
-                        // Grab our death animation
-                        pEvent->ComputeDeathAnim ( pDamagePed, true );
-                        AssocGroupId animGroup = pEvent->GetAnimGroup ();
-                        AnimationId animID = pEvent->GetAnimId ();
-
-                        SendPedWastedPacket ( pDamagedPed, damagerID, weaponUsed, hitZone, animGroup, animID );
-                    }
-                }
-            }
-
-            // Inhibit hit-by-gun animation for local player if required
-            if ( bOldBehaviour )
-                if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
-
-            ///////////////////////////////////////////////////////////////////////////
-            // Pass 2 end
-            ///////////////////////////////////////////////////////////////////////////
-        }
+        return ApplyPedDamageFromGame ( weaponUsed, fDamage, hitZone, pDamagedPed, pInflictingEntity, pEvent );
     }
 
     // No damage anim for fire
@@ -4399,6 +4272,176 @@ bool CClientGame::DamageHandler ( CPed* pDamagePed, CEventDamage * pEvent )
     // Allow the damage processing to continue
     return true;
 }
+
+
+//
+// Check GTA stored health with our stored health and do stuff
+//
+bool CClientGame::ApplyPedDamageFromGame ( eWeaponType weaponUsed, float fDamage, uchar hitZone, CClientPed* pDamagedPed, CClientEntity* pInflictingEntity, CEventDamage* pEvent )
+{
+    float fPreviousHealth = pDamagedPed->m_fHealth;
+    float fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
+    float fPreviousArmor = pDamagedPed->m_fArmor;
+    float fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
+
+    // Have we taken any damage here?
+    if ( ( fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor ) && fDamage != 0.0f )
+    {
+        ///////////////////////////////////////////////////////////////////////////
+        ///
+        // Pass 2 stuff - (GTA has applied the damage)
+        //
+        // return false to stop damage anim (incl. death task) 
+        //
+        ///////////////////////////////////////////////////////////////////////////
+
+        g_fApplyDamageLastAmount = fDamage;
+        g_ucApplyDamageLastHitZone = hitZone;
+        g_pApplyDamageLastDamagedPed = pDamagedPed;
+
+        CLuaArguments Arguments;
+        if ( pInflictingEntity ) Arguments.PushElement ( pInflictingEntity );
+        else Arguments.PushBoolean ( false );
+        Arguments.PushNumber ( static_cast < unsigned char > ( weaponUsed ) );
+        Arguments.PushNumber ( static_cast < unsigned char > ( hitZone ) );
+        Arguments.PushNumber ( fDamage );
+
+        // Call our event
+        if ( ( IS_PLAYER ( pDamagedPed ) && !pDamagedPed->CallEvent ( "onClientPlayerDamage", Arguments, true ) ) || ( !IS_PLAYER ( pDamagedPed ) && !pDamagedPed->CallEvent ( "onClientPedDamage", Arguments, true ) ) )
+        {
+            // Stop here if they cancelEvent it
+            if ( pDamagedPed->IsLocalPlayer () )
+            {
+                // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
+                fPreviousHealth = pDamagedPed->m_fHealth;
+                fPreviousArmor = pDamagedPed->m_fArmor;
+            }
+            pDamagedPed->GetGamePlayer ()->SetHealth ( fPreviousHealth );
+            pDamagedPed->GetGamePlayer ()->SetArmor ( fPreviousArmor );
+            return false;
+        }
+
+        if ( pDamagedPed->IsLocalPlayer () )
+        {
+            // Reget values in case they have been changed during onClientPlayerDamage event (Avoid AC#1 kick)
+            fCurrentHealth = pDamagedPed->GetGamePlayer ()->GetHealth ();
+            fCurrentArmor = pDamagedPed->GetGamePlayer ()->GetArmor ();
+        }
+
+        bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
+        bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
+            
+        // Is this is a remote player?
+        if (!pDamagedPed->IsLocalPlayer())
+        {
+            // Don't allow GTA to start the choking task
+            if (weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER)
+                return false;
+        }
+
+        // Check if their health or armor is locked, and if so prevent applying the damage locally
+        if ( pDamagedPed->IsHealthLocked () || pDamagedPed->IsArmorLocked () )
+        {
+            // Restore health+armor
+            pDamagedPed->GetGamePlayer ()->SetHealth ( pDamagedPed->GetHealth () );
+            pDamagedPed->GetGamePlayer ()->SetArmor ( pDamagedPed->GetArmor () );
+
+            if ( bOldBehaviour )
+            {
+                // Don't play the animation if it's going to be a death one, or if it's going to interrupt aiming
+                if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming )
+                    return false;
+
+                // Allow animation for remote players
+                return true;
+            }
+
+            // No hit animation for remote players
+            return false;
+        }
+
+        // Update our stored health/armor
+        pDamagedPed->m_fHealth = fCurrentHealth;
+        pDamagedPed->m_fArmor = fCurrentArmor;
+
+        ElementID damagerID = INVALID_ELEMENT_ID;
+        if ( pInflictingEntity && !pInflictingEntity->IsLocalEntity ( ) )
+            damagerID = pInflictingEntity->GetID ( );
+
+        // Is it the local player?
+        if ( pDamagedPed->IsLocalPlayer () )
+        {  
+            // Update our stored damage stuff
+            m_ucDamageWeapon = static_cast < unsigned char > ( weaponUsed );
+            m_ucDamageBodyPiece = static_cast < unsigned char > ( hitZone );
+            m_pDamageEntity = pInflictingEntity;
+            m_ulDamageTime = CClientTime::GetTime ();
+            m_DamagerID = damagerID;
+            m_bDamageSent = false;
+        }
+        // Does this damage kill the player?
+        if ( fCurrentHealth == 0.0f )
+        {                
+            if ( pDamagedPed->GetType () == CCLIENTPLAYER )
+            {                
+                // Is the local player dying?
+                if ( pDamagedPed->IsLocalPlayer () && fPreviousHealth > 0.0f )
+                {
+                    // Grab our death animation
+                    AssocGroupId animGroup;
+                    AnimationId animID;
+                    GetDeathAnim( pDamagedPed, pEvent, animGroup, animID );
+
+                    // Check if we're dead
+                    DoWastedCheck ( damagerID, weaponUsed, hitZone, animGroup, animID );                
+                }
+
+                // Allow GTA to kill us if we've fell to our death
+                if ( pDamagedPed->IsLocalPlayer () && weaponUsed == WEAPONTYPE_FALL ) return true;
+                    
+                // Don't let GTA start the death task
+                return false;            
+            }
+            else
+            {
+                if ( pDamagedPed->IsLocalEntity () && fPreviousHealth > 0.0f )
+                {
+                    // Client-side ped
+                    pDamagedPed->CallEvent ( "onClientPedWasted", Arguments, true );
+                    AssocGroupId animGroup;
+                    AnimationId animID;
+                    GetDeathAnim( pDamagedPed, pEvent, animGroup, animID );
+                    pDamagedPed->Kill ( weaponUsed, hitZone, false, false, animGroup, animID );
+                    return true;
+                }
+                if ( fPreviousHealth > 0.0f )
+                {
+                    // Grab our death animation
+                    AssocGroupId animGroup;
+                    AnimationId animID;
+                    GetDeathAnim( pDamagedPed, pEvent, animGroup, animID );
+
+                    SendPedWastedPacket ( pDamagedPed, damagerID, weaponUsed, hitZone, animGroup, animID );
+                }
+            }
+        }
+
+        // Inhibit hit-by-gun animation for local player if required
+        if ( bOldBehaviour )
+            if ( pDamagedPed->IsLocalPlayer () && bIsBeingShotWhilstAiming ) return false;
+
+        ///////////////////////////////////////////////////////////////////////////
+        // Pass 2 end
+        ///////////////////////////////////////////////////////////////////////////
+    }
+
+    // No damage anim for fire
+    if ( weaponUsed == WEAPONTYPE_FLAMETHROWER ) return false;
+    
+    // Allow the damage processing to continue
+    return true;
+}
+
 
 void CClientGame::DeathHandler ( CPed* pKilledPedSA, unsigned char ucDeathReason, unsigned char ucBodyPart)
 {
@@ -5047,6 +5090,22 @@ bool CClientGame::PreWeaponFire ( CPlayerPed* pPlayerPed, bool bStopIfUsingBulle
 
 void CClientGame::PostWeaponFire ( void )
 {
+    // Send bullet sync with local damage info
+    if ( g_bBulletFireVectorsValid )
+    {
+        g_bBulletFireVectorsValid = false;
+        CClientPlayer* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
+        if ( pLocalPlayer )
+        {
+            eWeaponType weaponType = pLocalPlayer->GetCurrentWeaponType ();
+            if ( g_pClientGame->GetWeaponTypeUsesBulletSync( weaponType ) )
+            {
+                g_pClientGame->GetNetAPI()->SendBulletSyncFire( weaponType, g_vecBulletFireStartPosition, g_vecBulletFireEndPosition,
+                    g_fApplyDamageLastAmount, g_ucApplyDamageLastHitZone, DynamicCast < CClientPlayer > ( g_pApplyDamageLastDamagedPed ) );
+            }
+        }
+    }
+
     // Got a local player model?
     CClientPed* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
     if ( pLocalPlayer && pWeaponFirePed )
@@ -5192,14 +5251,18 @@ void CClientGame::BulletImpact ( CPed* pInitiator, CEntity* pVictim, const CVect
 
 void CClientGame::BulletFire ( CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition )
 {
+    g_bBulletFireVectorsValid = false;
+    g_fApplyDamageLastAmount = 0;
+    g_ucApplyDamageLastHitZone = 0;
+    g_pApplyDamageLastDamagedPed = NULL;
+
     // Got a local player model?
     CClientPlayer* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
     if ( pLocalPlayer && pLocalPlayer->GetGamePlayer () == pInitiator )
     {
-        // Maybe send bulletsync packet for the firing of this bullet
-        eWeaponType weaponType = pLocalPlayer->GetCurrentWeaponType ();
-        if ( g_pClientGame->GetWeaponTypeUsesBulletSync ( weaponType ) )
-            g_pClientGame->m_pNetAPI->SendBulletSyncFire ( weaponType, *pStartPosition, *pEndPosition );
+        g_bBulletFireVectorsValid = true;
+        g_vecBulletFireStartPosition = *pStartPosition;
+        g_vecBulletFireEndPosition = *pEndPosition;
     }
 }
 

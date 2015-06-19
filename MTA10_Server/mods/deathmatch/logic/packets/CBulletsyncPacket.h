@@ -26,5 +26,8 @@ public:
     CVector                 m_vecStart;
     CVector                 m_vecEnd;
     uchar                   m_ucOrderCounter;
+    float                   m_fDamage;
+    uchar                   m_ucHitZone;
+    ElementID               m_DamagedPlayerID;
 };
 

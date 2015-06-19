@@ -355,7 +355,7 @@ bool CMainConfig::Load ( void )
 
     {
         SString strEnable;
-        GetString ( m_pRootNode, "enablediagnostic", strEnable );
+        GetString ( m_pRootNode, "enable_diagnostic", strEnable );
         strEnable = strEnable.Replace( " ", "" );
         std::vector < SString > tagList;
         strEnable.Split ( ",", tagList );
@@ -1167,6 +1167,14 @@ bool CMainConfig::GetSetting ( const SString& strName, SString& strValue )
         return false;
     }
     else
+    if ( strName == "enable_diagnostic" )
+    {
+        for ( std::set < SString >::iterator iter = m_EnableDiagnosticMap.begin() ; iter != m_EnableDiagnosticMap.end() ; ++iter )
+            strValue += *iter + ",";
+        strValue = strValue.TrimEnd( "," );
+        return true;
+    }
+    else
     {
         // Check settings in this list here
         const std::vector < SIntSetting >& settingList = GetIntSettingList ();
@@ -1358,6 +1366,27 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         Save ();
         return true;
     }
+    else
+    if ( strName == "enable_diagnostic" )
+    {
+        if ( true )
+        {
+            m_EnableDiagnosticMap.clear();
+            SString strEnableDiagnostic = strValue.Replace( " ", "" );
+            std::vector < SString > tagList;
+            strEnableDiagnostic.Split ( ",", tagList );
+            for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
+            if ( (*it).length () )
+                MapInsert ( m_EnableDiagnosticMap, *it );
+
+            if ( bSave )
+            {
+                SetString ( m_pRootNode, "enable_diagnostic", strEnableDiagnostic );
+                Save ();
+            }
+            return true;
+        }
+    }
 
     // Check settings in this list here
     const std::vector < SIntSetting >& settingList = GetIntSettingList ();
@@ -1423,6 +1452,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { false, false, 0,      1,      2,      "compact_internal_databases",           &m_iCompactInternalDatabases,               NULL },
             { true, true,   0,      1,      2,      "minclientversion_auto_update",         &m_iMinClientVersionAutoUpdate,             NULL },
             { true, true,   0,      0,      100,    "server_logic_fps_limit",               &m_iServerLogicFpsLimit,                    NULL },
+            { true, true,   0,      0,      1,      "bad_net_bullet_fix",                   &m_bBadNetBulletFixEnabled,                 NULL },
         };
 
     static std::vector < SIntSetting > settingsList;

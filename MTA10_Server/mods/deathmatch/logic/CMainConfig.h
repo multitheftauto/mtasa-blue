@@ -124,6 +124,7 @@ public:
     bool                            GetUseAltPulseOrder             ( void ) const              { return m_bUseAltPulseOrder != 0; }
     const SString&                  GetLoadstringLogFilename        ( void ) const              { return m_strLoadstringLogFilename; }
     bool                            GetLoadstringLogEnabled         ( void ) const              { return !m_strLoadstringLogFilename.empty(); }
+    bool                            GetBadNetBulletFixEnabled       ( void ) const              { return m_bBadNetBulletFixEnabled != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -213,6 +214,7 @@ private:
     SString                         m_strLoadstringLogFilename;
     int                             m_iMinClientVersionAutoUpdate;
     int                             m_iServerLogicFpsLimit;
+    int                             m_bBadNetBulletFixEnabled;
 };
 
 #endif
