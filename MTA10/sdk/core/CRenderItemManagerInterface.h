@@ -90,6 +90,7 @@ struct SDxStatus
         SString         strPSVersion;
         int             iMaxAnisotropy;
         ERenderFormat   depthBufferFormat;
+        int             iNumSimultaneousRTs;
     } videoCard;
 
     struct

@@ -956,6 +956,10 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         lua_pushnumber ( luaVM, dxStatus.videoCard.iMaxAnisotropy );
         lua_settable   ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "VideoCardNumRenderTargets" );
+        lua_pushnumber ( luaVM, dxStatus.videoCard.iNumSimultaneousRTs );
+        lua_settable   ( luaVM, -3 );
+
         lua_pushstring ( luaVM, "VideoMemoryFreeForMTA" );
         lua_pushnumber ( luaVM, dxStatus.videoMemoryKB.iFreeForMTA / 1024 );
         lua_settable   ( luaVM, -3 );
