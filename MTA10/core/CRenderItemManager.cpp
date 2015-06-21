@@ -752,6 +752,7 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.videoCard.strPSVersion = m_strVideoCardPSVersion;
     outStatus.videoCard.depthBufferFormat = m_depthBufferFormat;
     outStatus.videoCard.iMaxAnisotropy = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
+    outStatus.videoCard.iNumSimultaneousRTs = g_pDeviceState->DeviceCaps.NumSimultaneousRTs;
 
     // Memory usage
     outStatus.videoMemoryKB.iFreeForMTA = m_iMemoryKBFreeForMTA;

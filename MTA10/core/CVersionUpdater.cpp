@@ -2955,6 +2955,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
 
     SString strSystemStats2 ( "2_%d_%d_%d"
                              "_%d_%d_%d"
+                             "_%d_%d_%d_%d_%d_%x"
                              , g_pGraphics->GetViewportWidth()
                              , g_pGraphics->GetViewportHeight()
                              , dxStatus.settings.b32BitColor
@@ -2962,6 +2963,13 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
                              , GetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE )
                              , GetApplicationSettingInt( DIAG_MINIDUMP_DETECTED_COUNT )
                              , GetApplicationSettingInt( DIAG_MINIDUMP_CONFIRMED_COUNT )
+
+                             , atoi( dxStatus.videoCard.strPSVersion )
+                             , dxStatus.videoCard.iNumSimultaneousRTs
+                             , dxStatus.settings.iAntiAliasing
+                             , dxStatus.settings.iAnisotropicFiltering
+                             , (int)dxStatus.settings.fFieldOfView
+                             , dxStatus.videoCard.depthBufferFormat
                            );
 
     SString strSystemStats3 ( "3_%d"
