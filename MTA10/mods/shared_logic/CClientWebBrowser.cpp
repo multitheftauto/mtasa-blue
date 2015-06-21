@@ -15,6 +15,7 @@ CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, C
     : ClassInit ( this ), CClientTexture ( pManager, ID, pWebBrowserItem )
 {
     m_pResource = nullptr;
+    m_pManager = pManager;
     SetTypeName ( "webbrowser" );
 
     // Create the web view
@@ -181,7 +182,7 @@ void CClientWebBrowser::Events_OnPopup ( const SString& strTargetURL, const SStr
     CallEvent ( "onClientBrowserPopup", Arguments, false );
 }
 
-void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
+void CClientWebBrowser::Events_OnChangeCursor ( unsigned char ucCursor )
 {
     CLuaArguments Arguments;
     Arguments.PushNumber ( ucCursor );
@@ -250,7 +251,9 @@ void CClientWebBrowser::Events_OnResourceBlocked ( const SString& strURL, const 
 CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) 
     : CClientGUIElement ( pManager, pLuaMain, pCGUIElement, ID )
 {
-    m_pBrowser = std::unique_ptr < CClientWebBrowser > ( g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, isLocal, isTransparent ) );
+    m_pManager = pManager;
+    m_pBrowser = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, isLocal, isTransparent );
+    m_pBrowser->SetParent ( this ); // m_pBrowser gets deleted automatically by the element tree logic
     
     // Set our owner resource
     m_pBrowser->SetResource ( pLuaMain->GetResource () );

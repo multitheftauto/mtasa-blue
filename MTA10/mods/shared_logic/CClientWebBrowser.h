@@ -75,11 +75,11 @@ class CClientGUIWebBrowser : public CClientGUIElement
 {
 public:
     CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID = INVALID_ELEMENT_ID );
-
-    inline CClientWebBrowser* GetBrowser () { return m_pBrowser.get (); }
+    
+    inline CClientWebBrowser* GetBrowser () { return m_pBrowser; }
 
 private:
-    std::unique_ptr < CClientWebBrowser > m_pBrowser;
+    CClientWebBrowser* m_pBrowser;
 };
 
 #endif
