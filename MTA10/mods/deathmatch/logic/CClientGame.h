@@ -58,6 +58,8 @@
 #include "CObjectRespawner.h"
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
+#define INVALID_DOWNLOAD_PRIORITY_GROUP (INT_MIN)
+
 class CGameEntityXRefManager;
 class CClientModelCacheManager;
 class CDebugHookManager;
@@ -573,10 +575,11 @@ public:
     void                                SetServerVersionSortable        ( const SString& strVersion )   { m_strServerVersionSortable = strVersion; }
     const SString&                      GetServerVersionSortable        ( void )                        { return m_strServerVersionSortable; }
 
-    void                                SetTransferringInitialFiles     ( bool bTransfer );
+    void                                SetTransferringInitialFiles     ( bool bTransfer, int iDownloadPriorityGroup = INVALID_DOWNLOAD_PRIORITY_GROUP );
     bool                                IsTransferringInitialFiles      ( void )            { return m_bTransferringInitialFiles; }
     void                                SetTransferringSingularFiles    ( bool bTransfer )  { m_bTransferringSingularFiles = bTransfer; }
     bool                                IsTransferringSingularFiles     ( void )            { return m_bTransferringSingularFiles; }
+    int                                 GetActiveDownloadPriorityGroup  ( void );
 
     void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
@@ -708,6 +711,7 @@ private:
 
     bool                                m_bTransferringInitialFiles;
     bool                                m_bTransferringSingularFiles;
+    int                                 m_iActiveDownloadPriorityGroup;
 
     float                               m_fGameSpeed;
     long                                m_lMoney;

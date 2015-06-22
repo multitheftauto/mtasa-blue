@@ -4018,13 +4018,21 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
 
 
 // Set flag and transfer box visibility
-void CClientGame::SetTransferringInitialFiles ( bool bTransfer )
+void CClientGame::SetTransferringInitialFiles ( bool bTransfer, int iDownloadPriorityGroup )
 {
     m_bTransferringInitialFiles = bTransfer;
+    m_iActiveDownloadPriorityGroup = bTransfer ? iDownloadPriorityGroup : INVALID_DOWNLOAD_PRIORITY_GROUP;
     if ( bTransfer )
         m_pTransferBox->Show ();
     else
         m_pTransferBox->Hide ();
+}
+
+
+// Get Download Priority Group of resources that are DOWNLOADING RIGHT NOW!
+int CClientGame::GetActiveDownloadPriorityGroup ( void )
+{
+    return m_bTransferringInitialFiles ? m_iActiveDownloadPriorityGroup : INVALID_DOWNLOAD_PRIORITY_GROUP;
 }
 
 
@@ -4048,6 +4056,7 @@ void CClientGame::DownloadInitialResourceFiles ( void )
     }
     else
     {
+        // This will also hide the transfer box
         SetTransferringInitialFiles ( false );
 
         // Get the last error to occur in the HTTP Manager
@@ -4057,8 +4066,7 @@ void CClientGame::DownloadInitialResourceFiles ( void )
         if ( strlen (szHTTPError) == 0 )
         {
             // Load our ("unavailable"-flagged) resources, and make them available
-            m_pResourceManager->LoadUnavailableResources ( m_pRootEntity );
-            m_pTransferBox->Hide ();
+            m_pResourceManager->OnDownloadGroupFinished ();
         }
         else
         {

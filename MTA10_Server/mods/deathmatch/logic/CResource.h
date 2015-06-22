@@ -211,6 +211,7 @@ private:
 
     bool                    m_bProtected;
     bool                    m_bStartedManually;
+    int                     m_iDownloadPriorityGroup;
 
     bool                    m_bOOPEnabledInMetaXml;
     uint                    m_uiFunctionRightCacheRevision;
@@ -379,6 +380,7 @@ public:
     bool                CheckFunctionRightCache         ( lua_CFunction f, bool* pbOutAllowed );
     void                UpdateFunctionRightCache        ( lua_CFunction f, bool bAllowed );
     bool                IsFilenameUsed                  ( const SString& strFilename, bool bClient );
+    int                 GetDownloadPriorityGroup        ( void )                                { return m_iDownloadPriorityGroup; }
 
 protected:
     SString             GetAutoGroupName                ( void );

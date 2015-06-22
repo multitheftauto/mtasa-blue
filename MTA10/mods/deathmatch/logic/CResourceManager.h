@@ -50,7 +50,8 @@ public:
     bool                        Exists                      ( CResource* pResource );
     void                        StopAll                     ( void );
 
-    void                        LoadUnavailableResources    ( CClientEntity* pRootEntity );
+    void                        OnDownloadGroupFinished     ( void );
+    void                        UpdatePendingDownloads      ( void );
 
     void                        OnAddResourceFile           ( CDownloadableResource* pResourceFile );
     void                        OnRemoveResourceFile        ( CDownloadableResource* pResourceFile );

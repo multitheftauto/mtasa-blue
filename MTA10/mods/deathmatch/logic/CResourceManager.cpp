@@ -103,13 +103,71 @@ CResource* CResourceManager::GetResource ( const char* szResourceName )
 }
 
 
-void CResourceManager::LoadUnavailableResources ( CClientEntity *pRootEntity )
+void CResourceManager::OnDownloadGroupFinished( void )
 {
-    list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); ++iter )
+    // Clear downloading flags
+    for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
     {
-        if ( !( ( *iter )->GetActive () ) )
-            ( *iter )->Load ( pRootEntity );
+        CResource* pResource = *iter;
+        if ( pResource->IsDownloading() )
+            pResource->SetIsDownloading( false );
+    }
+
+    // Start next download group
+    UpdatePendingDownloads();
+
+    // Try to load newly ready resources
+    for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
+    {
+        CResource* pResource = *iter;
+        if ( !pResource->IsActive() )
+        {
+            // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
+            if ( pResource->HasPendingFileDownloads() || pResource->IsDownloading() )
+                break;
+            pResource->Load();
+        }
+    }
+}
+
+
+void CResourceManager::UpdatePendingDownloads( void )
+{
+    // Check currently active group
+    int iGroup = g_pClientGame->GetActiveDownloadPriorityGroup();
+    if ( iGroup == INVALID_DOWNLOAD_PRIORITY_GROUP )
+    {
+        // If no group is active, then find highest priority to make active
+        for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
+        {
+            CResource* pResource = *iter;
+            if ( pResource->HasPendingFileDownloads() )
+            {
+                iGroup = Max( iGroup, pResource->GetDownloadPriorityGroup() );
+            }
+        }
+
+        // Anything to do?
+        if ( iGroup == INVALID_DOWNLOAD_PRIORITY_GROUP )
+        {
+            return;
+        }
+
+        // Make new group active
+        g_pClientGame->SetTransferringInitialFiles( true, iGroup );
+    }
+
+    // Do start matching groups
+    for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
+    {
+        CResource* pResource = *iter;
+        if ( pResource->HasPendingFileDownloads() )
+        {
+            if ( pResource->GetDownloadPriorityGroup() == iGroup )
+            {
+                pResource->StartPendingFileDownloads();
+            }
+        }
     }
 }
 

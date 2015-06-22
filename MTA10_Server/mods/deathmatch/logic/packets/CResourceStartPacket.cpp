@@ -70,6 +70,11 @@ bool CResourceStartPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.WriteBit ( m_pResource->IsOOPEnabledInMetaXml ( ) );
         }
 
+        if ( BitStream.Version() >= 0x62 )
+        {
+            BitStream.Write( m_pResource->GetDownloadPriorityGroup() );
+        }
+
         // Send the resource files info
         list < CResourceFile* > ::iterator iter = m_pResource->IterBegin();
         for ( ; iter != m_pResource->IterEnd (); iter++ )

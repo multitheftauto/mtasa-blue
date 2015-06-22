@@ -74,6 +74,7 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     m_bResourceIsZip = bIsZipped;
     m_bProtected = false;
     m_bStartedManually = false;
+    m_iDownloadPriorityGroup = 0;
 
     m_uiVersionMajor = 0;
     m_uiVersionMinor = 0;
@@ -254,6 +255,13 @@ bool CResource::Load ( void )
                 if ( pNodeClientOOP )
                 {
                     m_bOOPEnabledInMetaXml = StringToBool ( pNodeClientOOP->GetTagContent ().c_str () );
+                }
+
+                m_iDownloadPriorityGroup = 0;
+                CXMLNode * pNodeDownloadPriorityGroup = root->FindSubNode ( "download_priority_group", 0 );
+                if ( pNodeDownloadPriorityGroup )
+                {
+                    m_iDownloadPriorityGroup = atoi ( pNodeDownloadPriorityGroup->GetTagContent ().c_str () );
                 }
 
                 // disabled for now
@@ -1027,9 +1035,8 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         // Add us to the running resources list
         m_StartedResources.push_back ( this );
 
-
-      //  if  ( stricmp ( this->GetName(), "updtest" ) == 0 )
-        //    printf ( "0x%X\n", m_ulCRC );
+        // Sort by priority, for start grouping on the client
+        sort_list_inline ( m_StartedResources, ( CResource* a, CResource* b ) { return a->m_iDownloadPriorityGroup > b->m_iDownloadPriorityGroup; } );
     }
     return m_bActive;
 }

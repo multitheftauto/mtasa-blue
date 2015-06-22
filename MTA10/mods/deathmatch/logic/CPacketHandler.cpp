@@ -4819,6 +4819,12 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
         bitStream.ReadBit ( bEnableOOP );
     }
 
+    int iDownloadPriorityGroup = 0;
+    if ( bitStream.Version() >= 0x62 )
+    {
+        bitStream.Read( iDownloadPriorityGroup );
+    }
+
     // Get the resource entity
     CClientEntity* pResourceEntity = CElementIDs::GetElement ( ResourceEntityID );
 
@@ -4829,6 +4835,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     if ( pResource )
     {
         pResource->SetRemainingNoClientCacheScripts ( usNoClientCacheScriptCount );
+        pResource->SetDownloadPriorityGroup( iDownloadPriorityGroup );
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
         unsigned char ucChunkType;
@@ -4932,14 +4939,8 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 // Combine the HTTP Download URL, the Resource Name and the Resource File
                                 SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
 
-
                                 // Queue the file to be downloaded
-                                bool bAddedFile = pHTTP->QueueFile ( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame (), 10, 10000, true );
-
-                                // If the file was successfully queued, increment the resources to be downloaded
-                                g_pClientGame->SetTransferringInitialFiles ( true );
-                                if ( bAddedFile )
-                                    g_pClientGame->m_pTransferBox->AddToTotalSize ( dChunkDataSize );
+                                pResource->AddPendingFileDownload( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize );
                             }                       
                         }
                     }
@@ -4957,12 +4958,14 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
             }
         }
 
+        g_pClientGame->GetResourceManager()->UpdatePendingDownloads();
+
         // Are there any resources to being downloaded?
         if ( !g_pClientGame->IsTransferringInitialFiles () )
         {
             // Load the resource now
-            if ( !pResource->GetActive() )
-                pResource->Load ( g_pClientGame->m_pRootEntity );
+            if ( pResource->CanBeLoaded() )
+                pResource->Load();
         }
     }
 

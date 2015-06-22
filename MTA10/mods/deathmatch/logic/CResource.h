@@ -46,6 +46,12 @@ struct SNoClientCacheScript
     SString strFilename;
 };
 
+struct SPendingFileDownload
+{
+    SString strUrl;
+    SString strFilename;
+    double dDownloadSize;
+};
 
 class CResource
 {  
@@ -54,13 +60,14 @@ public:
                             CResource       ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP );
                             ~CResource      ( void );
 
-    inline unsigned short   GetNetID        ( void )                { return m_usNetID; };
+    unsigned short          GetNetID        ( void )                { return m_usNetID; };
     uint                    GetScriptID     ( void ) const          { return m_uiScriptID; };
     const char*             GetName         ( void )                { return m_strResourceName; };
-    inline CLuaMain*        GetVM           ( void )                { return m_pLuaVM; };
-    inline bool             GetActive       ( void )                { return m_bActive; };
+    CLuaMain*               GetVM           ( void )                { return m_pLuaVM; };
+    bool                    IsActive        ( void )                { return m_bActive; };
+    bool                    CanBeLoaded     ( void );
 
-    void                    Load            ( CClientEntity *pRootEntity );
+    void                    Load            ( void );
     void                    Stop            ( void );
     SString                 GetState        ( void );
 
@@ -109,6 +116,13 @@ public:
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
     bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
     void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch, const SString &strAppendix = "" );
+    void                    AddPendingFileDownload          ( const SString& strUrl, const SString& strFilename, double dDownloadSize );
+    void                    StartPendingFileDownloads       ( void );
+    bool                    HasPendingFileDownloads         ( void )                        { return !m_PendingFileDownloadList.empty(); }
+    int                     GetDownloadPriorityGroup        ( void )                        { return m_iDownloadPriorityGroup; }
+    void                    SetDownloadPriorityGroup        ( int iDownloadPriorityGroup )  { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
+    bool                    IsDownloading                   ( void )                        { return m_bIsDownloading; }
+    void                    SetIsDownloading                ( bool bIsDownloading )         { m_bIsDownloading = bIsDownloading; }
 
 private:
     unsigned short          m_usNetID;
@@ -132,6 +146,9 @@ private:
     SString                 m_strMinServerReq;
     SString                 m_strMinClientReq;
     bool                    m_bOOPEnabled;
+    std::vector < SPendingFileDownload > m_PendingFileDownloadList;
+    int                     m_iDownloadPriorityGroup;
+    bool                    m_bIsDownloading;
 
     // To control cursor show/hide
     static int              m_iShowingCursor;

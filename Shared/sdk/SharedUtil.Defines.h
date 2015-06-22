@@ -173,6 +173,15 @@
             std::sort ( a, b, LOCAL_FUNCTION::SortPredicate ); \
         }
 
+// Inline callback definition for std::list::sort
+#define sort_list_inline(a,c) \
+        { \
+            LOCAL_FUNCTION_START \
+                static bool SortPredicate c \
+            LOCAL_FUNCTION_END \
+            a.sort ( LOCAL_FUNCTION::SortPredicate ); \
+        }
+
 // printf/wprintf helpers
 //
 // http://www.firstobject.com/wchar_t-string-on-linux-osx-windows.htm

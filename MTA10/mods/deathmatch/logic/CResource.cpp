@@ -77,6 +77,8 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
 
     // Move this after the CreateVirtualMachine line and heads will roll
     m_bOOPEnabled = bEnableOOP;
+    m_iDownloadPriorityGroup = 0;
+    m_bIsDownloading = false;
 
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this, bEnableOOP );
     if ( m_pLuaVM )
@@ -287,9 +289,45 @@ static bool CheckFileForCorruption( const SString &strPath, SString &strAppendix
 }
 
 
-void CResource::Load ( CClientEntity *pRootEntity )
+void CResource::AddPendingFileDownload( const SString& strUrl, const SString& strFilename, double dDownloadSize )
 {
-    m_pRootEntity = pRootEntity;
+    SPendingFileDownload item;
+    item.strUrl = strUrl;
+    item.strFilename = strFilename;
+    item.dDownloadSize = dDownloadSize;
+    m_PendingFileDownloadList.push_back( item );
+}
+
+
+void CResource::StartPendingFileDownloads( void )
+{
+    for( uint i = 0 ; i < m_PendingFileDownloadList.size() ; ++i )
+    {
+        const SPendingFileDownload& item = m_PendingFileDownloadList[i];
+    
+        // Queue the file to be downloaded
+        CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::RESOURCE_INITIAL_FILES );
+        bool bAddedFile = pHTTP->QueueFile( item.strUrl, item.strFilename, item.dDownloadSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame(), 10, 10000, true );
+    
+        // If the file was successfully queued, increment the resources to be downloaded (The file won't be added if it's already in the queue)
+        if ( bAddedFile )
+            g_pClientGame->GetTransferBox()->AddToTotalSize( item.dDownloadSize );
+        m_bIsDownloading = true;
+    }
+    m_PendingFileDownloadList.clear();
+}
+
+
+bool CResource::CanBeLoaded( void )
+{
+    return !IsActive() && !HasPendingFileDownloads() && !IsDownloading();
+}
+
+
+void CResource::Load ( void )
+{
+    dassert( CanBeLoaded() );
+    m_pRootEntity = g_pClientGame->GetRootEntity();
 
     if ( m_usRemainingNoClientCacheScripts > 0 )
     {
@@ -505,7 +543,7 @@ void CResource::LoadNoClientCacheScript ( const char* chunk, unsigned int len, c
         if ( m_usRemainingNoClientCacheScripts == 0 && m_bLoadAfterReceivingNoClientCacheScripts )
         {
             m_bLoadAfterReceivingNoClientCacheScripts = false;
-            Load ( m_pRootEntity );
+            Load ();
         }
     }
 }
