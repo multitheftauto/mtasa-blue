@@ -412,7 +412,7 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
             if ( ucPacketID != PACKET_ID_SERVER_JOIN && ucPacketID != PACKET_ID_SERVER_JOIN_DATA )
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton ().ShowNetErrorMessageBox ( _("Error")+_E("CC33"), _("Bad server response (1)") );
+                CCore::GetSingleton ().ShowNetErrorMessageBox ( _("Error")+_E("CC33"), _("Bad server response (1)") + SString( " [%d]", ucPacketID ) );
                 g_pConnectManager->Abort ();
             }
         }
