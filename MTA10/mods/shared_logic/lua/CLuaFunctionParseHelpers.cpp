@@ -663,6 +663,7 @@ void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions )
         pOptions.set_multiline ( ( uiFlags & 2 ) != 0 );
         pOptions.set_dotall ( ( uiFlags & 4 ) != 0 );
         pOptions.set_extended ( ( uiFlags & 8 ) != 0 );
+        pOptions.set_utf8 ( ( uiFlags & 16 ) != 0 );
     }
     else
     if ( argStream.NextIsString() )
@@ -684,6 +685,9 @@ void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions )
                     break;
                 case 'e':
                     pOptions.set_extended ( true );
+                    break;
+                case 'u':
+                    pOptions.set_utf8 ( true );
                     break;
                 default:
                     argStream.SetCustomError( "Flags all wrong" );
