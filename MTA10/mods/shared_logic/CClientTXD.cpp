@@ -172,7 +172,7 @@ bool CClientTXD::GetFilenameToUse( SString& strOutFilename )
     {
         // See if previously shrunk result exists
         SString strLargeSha256 = GenerateSha256HexStringFromFile( m_strFilename );
-        SString strShrunkFilename = PathJoin( ExtractPath( m_strFilename ), SString( "_2_%s", *strLargeSha256.Left( 32 ) ) );
+        SString strShrunkFilename = PathJoin( ExtractPath( m_strFilename ), SString( "_3_%s", *strLargeSha256.Left( 32 ) ) );
         uint uiShrunkSize = (uint)FileSize( strShrunkFilename );
         if ( uiShrunkSize >= 128 )
         {

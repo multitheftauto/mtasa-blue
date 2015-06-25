@@ -1973,9 +1973,9 @@ bool CGraphics::ResizeTextureData( const void* pData, uint uiDataPitch, uint uiW
     do
     {
         // Create surfaces
-        if ( FAILED( g_pGraphics->GetDevice()->CreateOffscreenPlainSurface( uiWidth, uiHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SYSTEMMEM, &pCurrentSurface, NULL ) ) )
+        if ( FAILED( g_pGraphics->GetDevice()->CreateOffscreenPlainSurface( uiWidth, uiHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SCRATCH, &pCurrentSurface, NULL ) ) )
             break;
-        if ( FAILED( g_pGraphics->GetDevice()->CreateOffscreenPlainSurface( uiNewWidth, uiNewHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SYSTEMMEM, &pNewSurface, NULL ) ) )
+        if ( FAILED( g_pGraphics->GetDevice()->CreateOffscreenPlainSurface( uiNewWidth, uiNewHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SCRATCH, &pNewSurface, NULL ) ) )
             break;
 
         // Data in

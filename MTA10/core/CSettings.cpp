@@ -1371,6 +1371,8 @@ void CSettings::CreateGUI ( void )
     m_pDebugSettingCombo->AddItem ( "#0000 Log timing" )->SetData ( (void*)EDiagnosticDebug::LOG_TIMING_0000 );
     m_pDebugSettingCombo->AddItem ( "#0000 Joystick" )->SetData ( (void*)EDiagnosticDebug::JOYSTICK_0000 );
     m_pDebugSettingCombo->AddItem ( "#0000 Lua trace" )->SetData ( (void*)EDiagnosticDebug::LUA_TRACE_0000 );
+    m_pDebugSettingCombo->AddItem ( "#0000 Resize always" )->SetData ( (void*)EDiagnosticDebug::RESIZE_ALWAYS_0000 );
+    m_pDebugSettingCombo->AddItem ( "#0000 Resize never" )->SetData ( (void*)EDiagnosticDebug::RESIZE_NEVER_0000 );
     m_pDebugSettingCombo->SetReadOnly ( true );
     vecTemp.fY += fLineHeight;
 
