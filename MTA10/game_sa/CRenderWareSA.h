@@ -109,7 +109,7 @@ public:
     void                TxdForceUnload              ( ushort usTxdId, bool bDestroyTextures );
 
     // CRenderWareSA methods
-    RwTexture*          RightSizeTexture            ( RwTexture* pTexture, uint uiSizeLimit );
+    RwTexture*          RightSizeTexture            ( RwTexture* pTexture, uint uiSizeLimit, SString& strError );
     void                ResetStats                  ( void );
     void                GetShaderReplacementStats   ( SShaderReplacementStats& outStats );
     CModelTexturesInfo* GetModelTexturesInfo        ( ushort usModelId );

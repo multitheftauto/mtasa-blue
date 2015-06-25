@@ -54,11 +54,16 @@ bool CRenderWareSA::RightSizeTxd( const SString& strInTxdFilename, const SString
     std::vector < RwTexture* > textureList;
     pGame->GetRenderWareSA()->GetTxdTextures( textureList, pTxd );
 
+    // Double size limit if only one texture in txd
+    if ( textureList.size() == 1 )
+        uiSizeLimit *= 2;
+
+    SString strError;
     bool bChanged = false;
     for ( std::vector < RwTexture* > ::iterator iter = textureList.begin() ; iter != textureList.end() ; iter++ )
     {
         RwTexture* pTexture = *iter;
-        RwTexture* pNewRwTexture = RightSizeTexture( pTexture, uiSizeLimit );
+        RwTexture* pNewRwTexture = RightSizeTexture( pTexture, uiSizeLimit, strError );
         if ( pNewRwTexture && pNewRwTexture != pTexture )
         {
             // Replace texture in txd if changed
@@ -74,6 +79,11 @@ bool CRenderWareSA::RightSizeTxd( const SString& strInTxdFilename, const SString
         }
     }
 
+    // Log last error
+    if ( !strError.empty() )
+    {
+        AddReportLog( 8430, SString( "RightSizeTxd problem %s with '%s'", *strError, *strInTxdFilename ), 10 );
+    }
 
     //
     // Save shrunked txd if changed
@@ -103,16 +113,32 @@ bool CRenderWareSA::RightSizeTxd( const SString& strInTxdFilename, const SString
 // Returns new texture if did shrink
 //
 /////////////////////////////////////////////////////////////////////////////
-RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimit )
+RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimit, SString& strError )
 {
     // Validate
     RwRaster* pRaster = pTexture->raster;
     if ( !pRaster )
+    {
+        strError = "pRaster == NULL";
         return NULL;
+    }
 
     RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)( &pRaster->renderResource );
-    if ( !pD3DRaster->texture || !pD3DRaster->lockedSurface || !pD3DRaster->lockedRect.pBits )
+    if ( !pD3DRaster->texture )
+    {
+        strError = "pD3DRaster->texture == NULL";
         return NULL;
+    }
+    if ( !pD3DRaster->lockedSurface )
+    {
+        strError = "pD3DRaster->lockedSurface == NULL";
+        return NULL;
+    }
+    if ( !pD3DRaster->lockedRect.pBits )
+    {
+        strError = "pD3DRaster->lockedRect.pBits == NULL";
+        return NULL;
+    }
 
     // Get texture info
     uint uiWidth = pRaster->width;
@@ -131,6 +157,10 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
     if ( d3dFormat != D3DFMT_DXT1 && d3dFormat != D3DFMT_DXT3 && d3dFormat != D3DFMT_DXT5 )
         return NULL;
 
+    // Double size limit if DXT1
+    if ( d3dFormat == D3DFMT_DXT1 )
+        uiSizeLimit *= 2;
+
     // Change size
     uint uiReqWidth = Min( uiSizeLimit, uiWidth );
     uint uiReqHeight = Min( uiSizeLimit, uiHeight );
@@ -142,7 +172,10 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
     bool bNeedOwnLock = ( pD3DRaster->lockedLevel != 0 ) || !pD3DRaster->lockedSurface;
     if ( bNeedOwnLock )
         if ( FAILED( pD3DRaster->texture->LockRect( 0, &lockedRect, NULL, D3DLOCK_NO_DIRTY_UPDATE | D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY ) ) )
+        {
+            strError = "pD3DRaster->texture->LockRect failed";
             return NULL;
+        }
 
     // Try resize
     CBuffer newPixelBuffer;
@@ -152,7 +185,10 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
         pD3DRaster->texture->UnlockRect( 0 );
 
     if ( !bDidResize )
+    {
+        strError = "ResizeTextureData failed";
         return NULL;
+    }
 
     // Make new RwTexture from pixels
     NativeTexturePC_Header header;
@@ -190,12 +226,21 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
     buffer.size = nativeData.GetSize();
     RwStream * rwStream = RwStreamOpen( STREAM_TYPE_BUFFER, STREAM_MODE_READ, &buffer );
     if ( !rwStream )
+    {
+        strError = "RwStreamOpen failed";
         return NULL;
+    }
 
     // Read new texture
     RwTexture* pNewRwTexture = NULL;
     rwD3D9NativeTextureRead( rwStream, &pNewRwTexture );
     RwStreamClose( rwStream, NULL );
+
+    if ( !pNewRwTexture )
+    {
+        strError = "rwD3D9NativeTextureRead failed";
+        return NULL;
+    }
 
     return pNewRwTexture;
 }

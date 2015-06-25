@@ -2391,6 +2391,11 @@ void CCore::NotifyRenderingGrass( bool bIsRenderingGrass )
 
 bool CCore::GetRightSizeTxdEnabled( void )
 {
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::RESIZE_NEVER_0000 )
+        return false;
+    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::RESIZE_ALWAYS_0000 )
+        return true;
+
     // 32 bit users get rightsized txds
     if ( !Is64BitOS() )
         return true;
@@ -2398,10 +2403,6 @@ bool CCore::GetRightSizeTxdEnabled( void )
     // Low ram users get rightsized txds
     int iSystemRamMB = static_cast < int > ( GetWMITotalPhysicalMemory () / 1024LL / 1024LL );
     if ( iSystemRamMB <= 2048 )
-        return true;
-
-    // Debug users get rightsized txds
-    if ( g_strJingleBells == "rightsize" )
         return true;
 
     return false;
