@@ -13,17 +13,16 @@ autoreconf -fiv
 
 # then look at the configure options:
 #   ./configure --help
-
-# on a 64bit system, while there's no 64bit net.so
-# and probably some unknown issues you should compile and link
-# 32bit objects like so:
-#export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
-#./configure LDFLAGS="-m32" CPPFLAGS="-m32" CFLAGS="-m32" CXXFLAGS="-m32" --enable-silent-rules $@
-
 if [ $1 = "-g" ]; then
-    ./configure CFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' CPPFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' --with-pic --disable-system-pcre
+    ./configure --with-pic --disable-system-pcre --enable-utf8 \
+                  CFLAGS='-g -O2 -fPIC -DPIC' \
+                CXXFLAGS='-g -O2 -fPIC -DPIC -std=gnu++0x' \
+                CPPFLAGS='-g -O2 -fPIC -DPIC'
 else
-    ./configure CFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' CXXFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' CPPFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' --with-pic --disable-system-pcre
+    ./configure --with-pic --disable-system-pcre --enable-utf8 \
+                  CFLAGS='-O2 -fPIC -DPIC' \
+                CXXFLAGS='-O2 -fPIC -DPIC -std=gnu++0x' \
+                CPPFLAGS='-O2 -fPIC -DPIC'
 fi
 
 # Remove previous build files #2
@@ -43,8 +42,14 @@ cd ../..
 # then you have makefiles and the source can be compiled :)
 # building in parallel mode (use -j<JOBS>)
 if [ $1 = "-g" ]; then
-    make CFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' CPPFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
+    make \
+                  CFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' \
+                CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized -std=gnu++0x' \
+                CPPFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
 else
-    make CFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' CXXFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' CPPFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
+    make \
+                  CFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' \
+                CXXFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized -std=gnu++0x' \
+                CPPFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
 fi
 

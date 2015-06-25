@@ -530,6 +530,15 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         return false;
     }
 
+    // Check pcre has been built correctly
+    int iPcreConfigUtf8 = 0;
+    pcre_config( PCRE_CONFIG_UTF8, &iPcreConfigUtf8 );
+    if ( iPcreConfigUtf8 == 0 )
+    {
+        CLogger::ErrorPrintf( "PCRE built without UTF8 support\n" );
+        return false;
+    }
+
     // Grab the path to the main config
     SString strBuffer;
     const char* szMainConfig;
