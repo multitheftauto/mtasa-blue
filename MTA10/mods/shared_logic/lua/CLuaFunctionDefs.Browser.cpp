@@ -22,7 +22,7 @@ int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
     
     if ( !argStream.HasErrors () )
     {
-        if ( !bIsLocal && !g_pCore->GetWebCore()->CanLoadRemotePages () )
+        if ( !bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled () )
         {
             lua_pushboolean ( luaVM, false );
             return 1;
@@ -480,6 +480,26 @@ int CLuaFunctionDefs::GetBrowserProperty ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetBrowserSettings ( lua_State* luaVM )
+{
+//  table getBrowserSettings ()
+    lua_createtable ( luaVM, 0, 3 );
+
+    lua_pushstring ( luaVM, "RemoteEnabled" );
+    lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetRemotePagesEnabled () );
+    lua_settable ( luaVM, -3 );
+
+    lua_pushstring ( luaVM, "RemoteJavascript" );
+    lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetRemoteJavascriptEnabled () );
+    lua_settable ( luaVM, -3 );
+
+    lua_pushstring ( luaVM, "PluginsEnabled" );
+    lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetPluginsEnabled () );
+    lua_settable ( luaVM, -3 );
+
+    return 1;
+}
+
 int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
 {
 //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil] )
@@ -497,7 +517,7 @@ int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( !bIsLocal && !g_pCore->GetWebCore()->CanLoadRemotePages () )
+        if ( !bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled () )
         {
             lua_pushboolean ( luaVM, false );
             return 1;

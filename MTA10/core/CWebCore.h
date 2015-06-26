@@ -77,7 +77,9 @@ public:
     void                ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam );
     void                ClearTextures       ();
 
-    bool                CanLoadRemotePages  ();
+    bool                GetRemotePagesEnabled ();
+    bool                GetRemoteJavascriptEnabled ();
+    bool                GetPluginsEnabled   ();
 
     void                OnPreScreenshot     ();
     void                OnPostScreenshot    ();

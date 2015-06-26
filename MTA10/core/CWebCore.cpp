@@ -351,11 +351,25 @@ void CWebCore::DenyPendingPages ()
     m_PendingRequests.clear ();
 }
 
-bool CWebCore::CanLoadRemotePages ()
+bool CWebCore::GetRemotePagesEnabled ()
 {
     bool bCanLoadRemotePages;
     CVARS_GET ( "browser_remote_websites", bCanLoadRemotePages );
     return bCanLoadRemotePages;
+}
+
+bool CWebCore::GetRemoteJavascriptEnabled ()
+{
+    bool bIsRemoteJavascriptEnabled;
+    CVARS_GET ( "browser_remote_javascript", bIsRemoteJavascriptEnabled );
+    return bIsRemoteJavascriptEnabled;
+}
+
+bool CWebCore::GetPluginsEnabled ()
+{
+    bool bArePluginsEnabled;
+    CVARS_GET ( "browser_plugins", bArePluginsEnabled );
+    return bArePluginsEnabled;
 }
 
 void CWebCore::OnPreScreenshot ()

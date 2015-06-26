@@ -1038,6 +1038,7 @@ public:
     LUA_DECLARE ( IsBrowserFocused );
     LUA_DECLARE ( SetBrowserProperty );
     LUA_DECLARE ( GetBrowserProperty );
+    LUA_DECLARE ( GetBrowserSettings );
     LUA_DECLARE ( GUICreateBrowser );
     LUA_DECLARE ( GUIGetBrowser );
 
