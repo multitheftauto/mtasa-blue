@@ -566,9 +566,9 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
     }
 
     WString scheme = urlParts.scheme.str;
-    SString domain = UTF16ToMbUTF8 ( urlParts.host.str );
     if ( scheme == L"http" || scheme == L"https" )
     {
+        SString domain = UTF16ToMbUTF8 ( urlParts.host.str );
         if ( IsLocal () )
             return true; // Block remote requests in local mode generally
 
@@ -593,7 +593,7 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
     }
 
      // Trigger onClientBrowserResourceBlocked event
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString ( request->GetURL () ), domain, 2 ); // reason 1 := blocked protocol scheme
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString ( request->GetURL () ), "", 2 ); // reason 1 := blocked protocol scheme
     g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
 
     // Block everything else
