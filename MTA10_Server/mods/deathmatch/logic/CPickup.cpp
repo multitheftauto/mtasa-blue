@@ -249,6 +249,10 @@ bool CPickup::ReadSpecialData ( void )
     if ( GetCustomDataInt ( "dimension", iTemp, true ) )
         m_usDimension = static_cast < unsigned short > ( iTemp );
 
+
+	if (GetCustomDataInt("interior", iTemp, true))
+		m_ucInterior = static_cast <unsigned char> ( iTemp );
+
     // Success
     return true;
 }
