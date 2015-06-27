@@ -63,10 +63,10 @@ int CLuaFunctionDefs::GetElementID ( lua_State* luaVM )
         if ( pEntity )
         {
             // Get its ID and return it
-            const char* szName = pEntity->GetName ();
-            if ( szName )
+            const SString& strName = pEntity->GetName ();
+            if ( strName.length() > 0 )
             {
-                lua_pushstring ( luaVM, szName );
+                lua_pushstring ( luaVM, strName );
                 return 1;
             }
         }
