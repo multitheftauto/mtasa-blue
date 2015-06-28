@@ -568,6 +568,12 @@ float CGraphics::GetDXCharacterWidth ( char c, float fScale, LPD3DXFONT pDXFont 
 
 float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT pDXFont, bool bColorCoded )
 {
+	// We're calling this a lot on empty strings
+	// Also prevents undefined behavior when using 
+	// strText.back() below
+	if (*szText == '\0')
+		return 0.0f;
+
     if ( !pDXFont )
         pDXFont = GetFont ();
 
@@ -575,17 +581,21 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
 
     if ( pDXFont )
     {
-        HDC dc = pDXFont->GetDC ();
-        SIZE size;
+		RECT rect;
+		WString strText = MbUTF8ToUTF16(szText);
 
-        WString strText = MbUTF8ToUTF16(szText);
+		if (bColorCoded)
+			RemoveColorCodesInPlaceW(strText);
 
-        if ( bColorCoded )
-            RemoveColorCodesInPlaceW( strText );
+		// DT_CALCRECT does not take space characters at the end of a line 
+		// into consideration for the rect size. Thus replace it with an underscore
+		if (strText.back() = ' ')
+			strText.back() = '_';
+		
+		
+		pDXFont->DrawTextW(NULL, strText.c_str(), strText.length(), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
 
-        GetTextExtentPoint32W ( dc, strText.c_str(), strText.length(), &size );
-
-        return ( ( float ) size.cx * fScale );
+        return ( ( float ) (rect.right - rect.left)* fScale );
     }
     return 0.0f;
 }
