@@ -7797,8 +7797,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip ( CResource* pResource, const CVec
     // Valid icon and size?
     if ( CBlipManager::IsValidIcon ( ucIcon ) && ucSize <= 25 )
     {
-        // Create the blip as a child of the root item
-        //CBlip* pBlip = m_pBlipManager->Create ( m_pMapManager->GetRootElement () );
+        // Create the blip as a child of the resource's dynamic element root item
         CBlip* pBlip = m_pBlipManager->Create ( pResource->GetDynamicElementRoot() );
         if ( pBlip )
         {
@@ -7834,7 +7833,8 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo ( CResource* pResource, 
     // Valid icon and size?
     if ( CBlipManager::IsValidIcon ( ucIcon ) && ucSize <= 25 )
     {
-        CBlip* pBlip = m_pBlipManager->Create ( m_pMapManager->GetRootElement () );
+        // Create the blip as a child of the resource's dynamic element root item
+        CBlip* pBlip = m_pBlipManager->Create ( pResource->GetDynamicElementRoot () );
         if ( pBlip )
         {
             // Set the properties

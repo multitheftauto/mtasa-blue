@@ -110,7 +110,6 @@ int CLuaFunctionDefs::CreateBlipAttachedTo ( lua_State* luaVM )
             CBlip* pBlip = CStaticFunctionDefinitions::CreateBlipAttachedTo ( resource, pElement, ucIcon, ucSize, color, sOrdering, usVisibleDistance, pVisibleTo );
             if ( pBlip )
             {
-                pBlip->SetParentObject ( resource->GetDynamicElementRoot () );
                 CElementGroup * group = resource->GetElementGroup ();
                 if ( group )
                 {
