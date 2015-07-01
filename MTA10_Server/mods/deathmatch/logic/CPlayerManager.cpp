@@ -18,6 +18,7 @@ CPlayerManager::CPlayerManager ( void )
 {
     // Init
     m_pScriptDebugging = NULL;
+    m_ZombieCheckTimer.SetUseModuleTickCount( true );
 }
 
 
@@ -29,26 +30,49 @@ CPlayerManager::~CPlayerManager ( void )
 
 void CPlayerManager::DoPulse ( void )
 {
-    // TODO: Low Priorityy: No need to do this every frame. Could be done every minute or so.
-    // Remove any players that have been connected for very long (90 sec) but hasn't reached the verifying step
-    unsigned long long ullTimeNow = GetTickCount64_ ();
-    for ( list < CPlayer* > ::const_iterator iter = m_Players.begin () ; iter != m_Players.end (); iter++ )
-    {
-        if ( (*iter)->GetStatus () == STATUS_CONNECTED && ullTimeNow > (*iter)->GetTimeConnected () + 90000 )
-        {
-            // Tell the console he timed out due during connect
-            CLogger::LogPrintf ( "INFO: %s (%s) timed out during connect\n", (*iter)->GetNick (), (*iter)->GetSourceIP () );
-
-            // Remove him
-            delete *iter;
-            break;
-        }
-    }
+    PulseZombieCheck();
 
     list < CPlayer* > ::const_iterator iter = m_Players.begin ();
     for ( ; iter != m_Players.end (); iter++ )
     {
         (*iter)->DoPulse ();
+    }
+}
+
+
+void CPlayerManager::PulseZombieCheck( void )
+{
+    // Only check once a second
+    if ( m_ZombieCheckTimer.Get() < 1000 )
+        return;
+    m_ZombieCheckTimer.Reset();
+
+    for ( std::list < CPlayer* > ::const_iterator iter = m_Players.begin() ; iter != m_Players.end(); iter++ )
+    {
+        CPlayer* pPlayer = *iter;
+
+        if ( pPlayer->GetStatus() == STATUS_CONNECTED )
+        {
+            // Remove any players that have been connected for very long (90 sec) but haven't reached the verifying step
+            if ( pPlayer->GetTimeSinceConnected() > 90000 )
+            {
+                CLogger::LogPrintf( "INFO: %s (%s) timed out during connect\n", pPlayer->GetNick(), pPlayer->GetSourceIP() );
+                g_pGame->QuitPlayer( *pPlayer, CClient::QUIT_QUIT, false );
+            }
+        }
+        else
+        {
+            // Remove any players that are joined, but not sending sync and have incorrect connection info
+            if ( pPlayer->GetTimeSinceReceivedSync() > 20000 )
+            {
+                if ( !g_pRealNetServer->IsValidSocket( pPlayer->GetSocket() ) )
+                {
+                    CLogger::LogPrintf( "INFO: %s (%s) connection gone away\n", pPlayer->GetNick(), pPlayer->GetSourceIP() );
+                    pPlayer->Send( CPlayerDisconnectedPacket( CPlayerDisconnectedPacket::KICK, "hacky code" ) );
+                    g_pGame->QuitPlayer( *pPlayer, CClient::QUIT_TIMEOUT );
+                }
+            }
+        }
     }
 }
 

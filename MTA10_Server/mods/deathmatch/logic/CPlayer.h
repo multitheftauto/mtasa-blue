@@ -101,7 +101,7 @@ public:
     inline void                                 SetDoNotSendEntities        ( bool bDont )      { m_bDoNotSendEntities = bDont; };
 
     inline int                                  GetClientType               ( void )                                { return CClient::CLIENT_PLAYER; };
-    inline unsigned long long                   GetTimeConnected            ( void ) const                          { return m_ullTimeConnected; };
+    unsigned long long                          GetTimeSinceConnected       ( void )                                { return m_ConnectedTimer.Get(); }
 
     inline const char*                          GetNick                     ( void )                                { return m_strNick; };
     void                                        SetNick                     ( const char* szNick );
@@ -380,7 +380,7 @@ private:
     
     bool                                        m_bAkimboArmUp;
 
-    unsigned long long                          m_ullTimeConnected;
+    CElapsedTime                                m_ConnectedTimer;
 
     NetServerPlayerID                           m_PlayerSocket;
     uint                                        m_uiPing;
