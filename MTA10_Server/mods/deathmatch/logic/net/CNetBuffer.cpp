@@ -22,6 +22,7 @@ namespace
     bool                    ms_bNetStatisticsLastSavedValid = false;
     NetStatistics           ms_NetStatisticsLastSaved;
     NetServerPlayerID       ms_NetStatisticsLastFor;
+    bool                    ms_bNetStatisticsLastResult;
     bool                    ms_bBandwidthStatisticsLastSavedValid = false;
     SBandwidthStatistics    ms_BandwidthStatisticsLastSaved;
     bool                    ms_bPingStatusLastSavedValid = false;
@@ -310,8 +311,9 @@ bool CNetServerBuffer::GetNetworkStatistics ( NetStatistics* pDest, const NetSer
         // Save results
         ms_NetStatisticsLastSaved = *pDest;
         ms_NetStatisticsLastFor = PlayerID;
+        ms_bNetStatisticsLastResult = pArgs->result;
         ms_bNetStatisticsLastSavedValid = true;
-        return pArgs->result;
+        return ms_bNetStatisticsLastResult;
     }
 
     // Start a new async read,
@@ -321,7 +323,7 @@ bool CNetServerBuffer::GetNetworkStatistics ( NetStatistics* pDest, const NetSer
 
     // but use results from previous
     *pDest = ms_NetStatisticsLastSaved;
-    return true;
+    return ms_bNetStatisticsLastResult;
 }
 
 

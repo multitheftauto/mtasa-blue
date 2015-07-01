@@ -30,6 +30,7 @@ public:
                                                 ~CPlayerManager                 ( void );
 
     void                                        DoPulse                         ( void );
+    void                                        PulseZombieCheck                ( void );
 
     inline void                                 SetScriptDebugging              ( class CScriptDebugging* pScriptDebugging )        { m_pScriptDebugging = pScriptDebugging; };
 
@@ -70,6 +71,7 @@ private:
     CMappedList < CPlayer* >                    m_Players;
     std::map < NetServerPlayerID, CPlayer* >    m_SocketPlayerMap;
     SString                                     m_strLowestConnectedPlayerVersion;
+    CElapsedTime                                m_ZombieCheckTimer;
 };
 
 #endif

@@ -52,8 +52,6 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     
     m_uiScriptDebugLevel = 0;
 
-    m_ullTimeConnected = GetTickCount64_ ();
-
     m_tNickChange = 0;
 
     m_pPlayerTextManager = new CPlayerTextManager ( this ); 
@@ -106,7 +104,8 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_pPlayerStatsPacket = new CPlayerStatsPacket ( );
 
     m_UpdateNearListTimer.SetMaxIncrement ( 500, true );
-    m_LastReceivedSyncTimer.SetMaxIncrement( 2000, true );
+    m_LastReceivedSyncTimer.SetUseModuleTickCount( true );
+    m_ConnectedTimer.SetUseModuleTickCount( true );
 }
 
 

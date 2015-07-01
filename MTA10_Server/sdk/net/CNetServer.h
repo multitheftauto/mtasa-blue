@@ -145,7 +145,8 @@ public:
     virtual bool                            GetScriptInfo                   ( const char* cpInBuffer, uint uiInSize, SScriptInfo* pOutInfo ) { return false; }
     virtual bool                            DecryptScript                   ( const char* cpInBuffer, uint uiInSize, const char** pcpOutBuffer, uint* puiOutSize, const char* szScriptName ) { return false; }
     virtual bool                            GetPlayerPacketUsageStats       ( uchar* packetIdList, uint uiNumPacketIds, SPlayerPacketUsage* pOutStats, uint uiTopCount ) { return false; }
-    virtual const char*                     GetLogOutput                    ( void )                   { return NULL; }
+    virtual const char*                     GetLogOutput                    ( void )                                    { return NULL; }
+    virtual bool                            IsValidSocket                   ( const NetServerPlayerID& playerID )       { assert( 0 ); return false; }
 };
 
 #endif
