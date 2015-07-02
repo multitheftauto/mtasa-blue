@@ -485,19 +485,16 @@ void CSettingsSA::SetRadarMode ( eRadarMode hudMode )
 ////////////////////////////////////////////////
 float ms_fFOV = 70;
 float ms_fFOVCar = 70;
-float ms_fFOVCarMax = 100;  // When car go fast   <-- ha!
+float ms_fFOVCarMax = 100;  // When car go fast
 
 float CSettingsSA::GetFieldOfView ( void )
 {
     return ms_fFOV;
 }
 
-void CSettingsSA::SetFieldOfView ( float fAngle, bool bBreakLimits )
+void CSettingsSA::SetFieldOfView ( float fAngle )
 {
-    if (!bBreakLimits)
-    {
-        fAngle = Clamp ( 70.f, fAngle, 100.f );
-    }
+    fAngle = Clamp( 70.f, fAngle, 100.f );
     ms_fFOV = fAngle;
     ms_fFOVCar = fAngle;
 

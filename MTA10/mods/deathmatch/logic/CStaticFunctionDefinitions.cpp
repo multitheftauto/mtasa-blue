@@ -4443,6 +4443,7 @@ bool CStaticFunctionDefinitions::SetCameraMatrix ( const CVector& vecPosition, C
     return true;
 }
 
+
 bool CStaticFunctionDefinitions::SetCameraTarget ( CClientEntity * pEntity )
 {
     assert ( pEntity );

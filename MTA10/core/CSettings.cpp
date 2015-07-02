@@ -2017,7 +2017,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
 
 
     //gameSettings->SetMipMappingEnabled (); // Doesn't appear to even be enabled
-    gameSettings->SetFieldOfView( 70, false );
+    gameSettings->SetFieldOfView( 70 );
     gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness ( 253 );
     gameSettings->SetFXQuality ( 2 );
@@ -3100,6 +3100,7 @@ void CSettings::SaveData ( void )
     // iFieldOfView
     int iFieldOfView = Min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
     CVARS_SET ( "fov", iFieldOfView );
+    gameSettings->SetFieldOfView ( iFieldOfView );
 
     // Anisotropic filtering
     int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );

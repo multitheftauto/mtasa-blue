@@ -145,7 +145,7 @@ public:
     eRadarMode              GetRadarMode                ( void );
     void                    SetRadarMode                ( eRadarMode hudMode );
 
-    void                    SetFieldOfView              ( float fAngle, bool bBreakLimits );
+    void                    SetFieldOfView              ( float fAngle );
     float                   GetFieldOfView              ( void );
 
     void                    Save                        ( void );
