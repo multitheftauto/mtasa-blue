@@ -744,14 +744,6 @@ namespace
 
         struct {
             CDataInfoSet    serverInfoMap;
-        } gtadatafiles;
-
-        struct {
-            CDataInfoSet    serverInfoMap;
-        } gtadatafiles2;
-
-        struct {
-            CDataInfoSet    serverInfoMap;
         } trouble;
 
         struct {
@@ -783,7 +775,6 @@ namespace
                     && version.serverInfoMap.size ()
                     && report.serverInfoMap.size ()
                     && crashdump.serverInfoMap.size ()
-                    && gtadatafiles.serverInfoMap.size ()
                     && trouble.serverInfoMap.size ()
                     && ase.serverInfoMap.size ()
                     && !news.strOldestPost.empty ()
@@ -935,94 +926,25 @@ namespace
         }
     };
 
-
-
-
     typedef void (CVersionUpdater::*PFNVOIDVOID) ( void );
 
-    ///////////////////////////////////////////////////////////////
-    //
-    // CInstruction
-    //
-    // One update instruction
-    //
-    ///////////////////////////////////////////////////////////////
-    struct CInstruction
+    enum class EUpdaterProgramType
     {
-        SString     strLabel;
-        SString     strCondition;
-        SString     strGoto;
-        PFNVOIDVOID pfnCmdFunc;
-
-        CInstruction ( PFNVOIDVOID pfnCmdFunc )
-        {
-            this->pfnCmdFunc = pfnCmdFunc;
-        }
-        CInstruction ( const SString& strText )
-        {
-            this->pfnCmdFunc = NULL;
-            std::vector < SString > parts;
-            strText.Split ( " ", parts );
-            if ( parts.size () == 1 )
-                strLabel = parts[0].TrimEnd ( ":" );    // Label
-            else
-            if ( parts.size () == 4 )
-            {
-                strCondition = parts[1];                // Conditional goto
-                strGoto = parts[3];
-            }
-        }
-        bool IsLabel() const            { return strLabel.length () != 0; }
-        bool IsConditionalGoto() const  { return strCondition.length () != 0; }
-        bool IsFunction() const         { return pfnCmdFunc != NULL; }
+        None,
+        VersionCheck,
+        ManualCheck,
+        ManualCheckSim,
+        ServerSaysUpdate,
+        ServerSaysRecommend,
+        ServerSaysDataFilesWrong,
+        MasterFetch,
+        SendCrashDump,
+        SendReportLog,
+        SidegradeLaunch,
+        NewsUpdate,
     };
 
-
-    ///////////////////////////////////////////////////////////////
-    //
-    // CProgram
-    //
-    //  Many update instructions
-    //
-    ///////////////////////////////////////////////////////////////
-    struct CProgram
+    class ExceptionQuitProgram : public std::exception
     {
-        unsigned int pc;
-        std::vector < CInstruction >    instructions;
-
-        CProgram() : pc ( 0 ) {}
-        bool IsValid () const
-        {
-            return ( pc >= 0 && pc < instructions.size () );
-        }
-        const CInstruction* GetNextInstruction()
-        {
-            if ( IsValid () )
-                return &instructions[ pc++ ];
-            return NULL;
-        }
-        void GotoLabel ( const SString& strLabel )
-        {
-            pc = FindLabel ( strLabel );
-        }
-        int FindLabel( const SString& strLabel ) const
-        {
-            for ( unsigned int i = 0 ; i < instructions.size () ; i++ )
-                if ( instructions[i].IsLabel () && instructions[i].strLabel == strLabel )
-                    return i;
-            return -1;
-        }
     };
-
-
-    #define Push(F) \
-        m_Stack.push_back ( &CVersionUpdater::F )
-
-    #define ADDINST( expr ) \
-        program.instructions.push_back ( CInstruction ( &CVersionUpdater::expr ) );
-    #define ADDCOND( condition ) \
-        program.instructions.push_back ( CInstruction ( condition ) );
-    #define ADDLABL( label ) \
-        program.instructions.push_back ( CInstruction ( label ) );
-
 }

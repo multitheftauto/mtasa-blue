@@ -13,6 +13,7 @@
 #include "StdInc.h"
 #include "CVersionUpdater.Util.hpp"
 #include "CNewsBrowser.h"
+#include "SharedUtil.Thread.h"
 
 
 ///////////////////////////////////////////////////////////////
@@ -48,9 +49,19 @@ public:
     bool                EnsureLoadedConfigFromXML           ( void );
 
     // Command lists
-    void                InitPrograms                        ( void );
-    void                CheckPrograms                       ( void );
-    void                RunProgram                          ( const SString& strProgramName );
+    void                RunProgram                          ( EUpdaterProgramType strProgramName );
+
+    void                Program_VersionCheck                ( void );
+    void                Program_ManualCheck                 ( void );
+    void                Program_ManualCheckSim              ( void );
+    void                Program_ServerSaysUpdate            ( void );
+    void                Program_ServerSaysRecommend         ( void );
+    void                Program_ServerSaysDataFilesWrong    ( void );
+    void                Program_MasterFetch                 ( void );
+    void                Program_SendCrashDump               ( void );
+    void                Program_SendReportLog               ( void );
+    void                Program_SidegradeLaunch             ( void );
+    void                Program_NewsUpdate                  ( void );
 
     // Util
     CXMLNode*           GetXMLConfigNode                    ( bool bCreateIfRequired );
@@ -65,7 +76,6 @@ public:
     void                _UseMasterFetchURLs                 ( void );
     void                _UseVersionQueryURLs                ( void );
     void                _UseProvidedURLs                    ( void );
-    void                _UseDataFiles2URLs                   ( void );
     void                _UseReportLogURLs                   ( void );
     void                _UseCrashDumpQueryURLs              ( void );
     void                _UseCrashDumpURLs                   ( void );
@@ -77,7 +87,6 @@ public:
     void                _ResetLastCrashDump                 ( void );
     void                _ActionReconnect                    ( void );
     void                _DialogHide                         ( void );
-    void                _End                                ( void );
     void                _ExitGame                           ( void );
     void                _ResetVersionCheckTimer             ( void );
     void                _ResetNewsCheckTimer                ( void );
@@ -97,12 +106,11 @@ public:
     void                _QUpdateResult                      ( void );
     void                _QUpdateNewsResult                  ( void );
     void                _DialogDataFilesQuestion            ( void );
-    void                _DialogDataFilesQueryError          ( void );
-    void                _DialogDataFilesResult              ( void );
+    void                _DialogExeFilesResult               ( void );
     void                _StartDownload                      ( void );
-    void                _PollDownload                       ( void );
+    int                 _PollDownload                       ( void );
     void                _StartSendPost                      ( void );
-    void                _PollSendPost                       ( void );
+    int                 _PollSendPost                       ( void );
     void                _CheckSidegradeRequirements         ( void );
     void                _DoSidegradeLaunch                  ( void );
     void                _DialogSidegradeDownloadQuestion    ( void );
@@ -113,6 +121,7 @@ public:
     void                _ProcessMasterFetch                 ( void );
     void                _ProcessPatchFileQuery              ( void );
     void                _ProcessPatchFileDownload           ( void );
+    void                _QuitCurrentProgram                 ( void );
 
     // Doers
     int                 DoSendDownloadRequestToNextServer   ( void );
@@ -120,9 +129,13 @@ public:
     int                 DoSendPostToNextServer              ( void );
     int                 DoPollPost                          ( void );
 
-    std::vector < PFNVOIDVOID >         m_Stack;
-    std::map < SString, CProgram >      m_ProgramMap;
-    CProgram                            m_CurrentProgram;
+    static void*        StaticThreadProc                    ( void* pContext );
+    void*               ThreadProc                          ( void );
+    void                StopThread                          ( void );
+    void                ProcessCommand                      ( EUpdaterProgramType eProgramType );
+    void                MainStep                            ( void );
+    void                UpdaterYield                        ( void );
+
     SJobInfo                            m_JobInfo;
     CHTTPClient                         m_HTTP;
     long long                           m_llTimeStart;
@@ -157,6 +170,19 @@ public:
 
     SUpdaterMasterConfig                m_MasterConfig;
     SUpdaterVarConfig                   m_VarConfig;
+
+    CThreadHandle*                      m_pProgramThreadHandle;
+
+    // Shared variables
+    struct
+    {
+        bool                                m_bTerminateThread;
+        bool                                m_bThreadTerminated;
+        EUpdaterProgramType                 m_CurrentProgram;
+        CComboMutex                         m_Mutex;
+        bool                                m_bQuitCurrentProgram;
+        bool                                m_bExitGame;
+    } shared;
 };
 
 
@@ -186,8 +212,11 @@ CVersionUpdaterInterface* GetVersionUpdater ()
 ///////////////////////////////////////////////////////////////
 CVersionUpdater::CVersionUpdater ( void )
 {
-    InitPrograms ();
-    CheckPrograms ();
+    IsDebugTagHidden( "" );
+    SetDebugTagHidden ( "Updater", false );
+
+    shared.m_Mutex.Lock ();
+    m_pProgramThreadHandle = new CThreadHandle( CVersionUpdater::StaticThreadProc, this );
 }
 
 
@@ -200,7 +229,34 @@ CVersionUpdater::CVersionUpdater ( void )
 ///////////////////////////////////////////////////////////////
 CVersionUpdater::~CVersionUpdater ( void )
 {
+    StopThread();
+    SAFE_DELETE ( m_pProgramThreadHandle );
     SAFE_DELETE ( m_pReportWrap );
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::StopThread
+//
+// Stop the updater processing thread
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::StopThread( void )
+{
+    shared.m_bTerminateThread = true;
+    shared.m_Mutex.Signal();
+    shared.m_Mutex.Unlock();
+
+    for ( uint i = 0 ; i < 5000 ; i += 15 )
+    {
+        if ( shared.m_bThreadTerminated )
+            return;
+
+        Sleep ( 15 );
+    }
+
+    // If thread not stopped, (async) cancel it
+    m_pProgramThreadHandle->Cancel();
 }
 
 
@@ -285,8 +341,6 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
         XMLAccess.GetSubNodeValue ( "crashdump.serverlist",         m_MasterConfig.crashdump.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
-        XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
-        XMLAccess.GetSubNodeValue ( "gtadatafiles2.serverlist",     m_MasterConfig.gtadatafiles2.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
@@ -353,8 +407,6 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         XMLAccess.SetSubNodeValue ( "crashdump.serverlist",         m_MasterConfig.crashdump.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "crashdump.duplicates",         m_MasterConfig.crashdump.iDuplicates );
         XMLAccess.SetSubNodeValue ( "crashdump.maxhistorylength",   m_MasterConfig.crashdump.iMaxHistoryLength );
-        XMLAccess.SetSubNodeValue ( "gtadatafiles.serverlist",      m_MasterConfig.gtadatafiles.serverInfoMap );
-        XMLAccess.SetSubNodeValue ( "gtadatafiles2.serverlist",     m_MasterConfig.gtadatafiles2.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "trouble.serverlist",           m_MasterConfig.trouble.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "ase.serverlist",               m_MasterConfig.ase.serverInfoMap );
         XMLAccess.SetSubNodeValue ( "sidegrade.serverlist",         m_MasterConfig.sidegrade.serverInfoMap );
@@ -437,7 +489,7 @@ void CVersionUpdater::DoPulse ( void )
         // Only check once a week
         if ( secondsSinceCheck > m_MasterConfig.master.interval.ToSeconds () || secondsSinceCheck < 0 )
         {
-            RunProgram ( "MasterFetch" );
+            RunProgram ( EUpdaterProgramType::MasterFetch );
         }
     }
 
@@ -458,7 +510,7 @@ void CVersionUpdater::DoPulse ( void )
         // Only check once a day
         if ( secondsSinceCheck > m_MasterConfig.version.interval.ToSeconds () || secondsSinceCheck < 0 )
         {
-            RunProgram ( "VersionCheck" );
+            RunProgram ( EUpdaterProgramType::VersionCheck );
         }
     }
 
@@ -475,7 +527,7 @@ void CVersionUpdater::DoPulse ( void )
         // Only check once an interval
         if ( secondsSinceCheck > m_MasterConfig.news.interval.ToSeconds () || secondsSinceCheck < 0 )
         {
-            RunProgram ( "NewsUpdate" );
+            RunProgram ( EUpdaterProgramType::NewsUpdate );
         }
     }
 
@@ -485,7 +537,7 @@ void CVersionUpdater::DoPulse ( void )
     if ( !m_bSentCrashDump && !IsBusy () )
     {
         m_bSentCrashDump = true;
-        RunProgram ( "SendCrashDump" );
+        RunProgram ( EUpdaterProgramType::SendCrashDump );
     }
 
     //
@@ -494,31 +546,15 @@ void CVersionUpdater::DoPulse ( void )
     if ( !m_bSentReportLog && !IsBusy () )
     {
         m_bSentReportLog = true;
-        RunProgram ( "SendReportLog" );
+        RunProgram ( EUpdaterProgramType::SendReportLog );
     }
 
     //
-    // Step through update sequence
+    // Give updater thread some time if it is doing something
     //
-    if ( m_Stack.size () )
+    if ( IsBusy() )
     {
-        // Call top function on stack
-        PFNVOIDVOID pfnCmdFunc = m_Stack.back ();
-        m_Stack.pop_back ();
-        ( this->*pfnCmdFunc ) ();
-    }
-    else
-    {
-        // If no top function on stack, process next instruction
-        if ( const CInstruction* pInstruction = m_CurrentProgram.GetNextInstruction () )
-        {
-            if ( pInstruction->IsFunction () )
-                m_Stack.push_back ( pInstruction->pfnCmdFunc );
-            else
-            if ( pInstruction->IsConditionalGoto () )
-                if ( m_ConditionMap.IsConditionTrue ( pInstruction->strCondition ) )
-                    m_CurrentProgram.GotoLabel ( pInstruction->strGoto );
-        }
+        MainStep();
     }
 
     TIMING_CHECKPOINT( "-VersionUpdaterPulse" );
@@ -537,14 +573,14 @@ void CVersionUpdater::InitiateUpdate ( const SString& strType, const SString& st
     if ( strType == "Mandatory" )
     {
         CCore::GetSingleton ().RemoveMessageBox ();
-        RunProgram ( "ServerSaysUpdate" );
+        RunProgram ( EUpdaterProgramType::ServerSaysUpdate );
     }
     else
     if ( strType == "Optional" || strType == "Recommended" )
     {
         CCore::GetSingleton ().RemoveMessageBox ();
         MapSet ( m_DoneOptionalMap, strHost, 1 );
-        RunProgram ( "ServerSaysRecommend" );
+        RunProgram ( EUpdaterProgramType::ServerSaysRecommend );
     }
 
     m_strServerSaysType = strType;
@@ -576,7 +612,7 @@ bool CVersionUpdater::IsOptionalUpdateInfoRequired ( const SString& strHost )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::InitiateDataFilesFix ( void )
 {
-    RunProgram ( "ServerSaysDataFilesWrong" );
+    RunProgram ( EUpdaterProgramType::ServerSaysDataFilesWrong );
 }
 
 
@@ -607,12 +643,12 @@ void CVersionUpdater::InitiateManualCheck ( void )
 
     if ( GetTickCount64_ () - m_llTimeLastManualCheck > 10000 || strUpdateBuildType != m_strLastManualCheckBuildType )
     {
-        RunProgram ( "ManualCheck" );
+        RunProgram ( EUpdaterProgramType::ManualCheck );
     }
     else
     {
         // Pretend to do a check if less than a minute since last check
-        RunProgram ( "ManualCheckSim" );
+        RunProgram ( EUpdaterProgramType::ManualCheckSim );
     }
 }
 
@@ -633,7 +669,7 @@ void CVersionUpdater::InitiateSidegradeLaunch ( const SString& strVersion, const
     m_strSidegradePassword = strPassword;
 
     m_strServerSaysHost = SString ( "%s:%d", *strHost, usPort );
-    RunProgram ( "SidegradeLaunch" );
+    RunProgram ( EUpdaterProgramType::SidegradeLaunch );
 }
 
 
@@ -745,9 +781,7 @@ const SString& CVersionUpdater::GetDebugFilterString ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::ResetEverything ()
 {
-    m_Stack.clear ();
     m_JobInfo = SJobInfo();
-    m_CurrentProgram = CProgram();
     m_HTTP.Get ("");
     m_llTimeStart = 0;
     m_ConditionMap.clear ();
@@ -755,6 +789,7 @@ void CVersionUpdater::ResetEverything ()
     m_strServerSaysData = "";
     m_strServerSaysHost = "";
     GetQuestionBox ().Reset ();
+    shared.m_bQuitCurrentProgram = false;
 }
 
 
@@ -767,7 +802,7 @@ void CVersionUpdater::ResetEverything ()
 ///////////////////////////////////////////////////////////////
 bool CVersionUpdater::IsBusy ( void )
 {
-    if ( m_Stack.size () || ( m_CurrentProgram.IsValid () ) )
+    if ( shared.m_CurrentProgram != EUpdaterProgramType::None )
         return true;
     if ( GetQuestionBox ().IsVisible () )
         return true;
@@ -886,393 +921,6 @@ void CVersionUpdater::OnPossibleConfigProblem ( void )
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//
-//
-//
-// Run'
-//
-//
-//
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////
-//
-// CVersionUpdater::InitPrograms
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void CVersionUpdater::InitPrograms ()
-{
-    //
-    // VersionCheck
-    //
-    {
-        SString strProgramName = "VersionCheck";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _UseVersionQueryURLs );                     // Use VERSION_CHECKER_URL*
-        ADDINST (   _StartDownload );                        // Fetch update info from update server
-        ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.update goto dload");        // If update server says 'update' then goto dload:
-        ADDCOND ( "if ProcessResponse.files goto dload");         // If update server says 'files' then goto dload:
-        ADDCOND ( "if ProcessResponse.silent goto silentdload");  // If update server says 'silent' then goto silentdload:
-        ADDCOND ( "if ProcessResponse.noupdate goto noupdate");   // If update server says 'noupdate' then goto noupdate:
-        ADDINST (   _End );
-
-        ADDLABL ( "dload:" );
-        ADDINST (   _DialogUpdateQuestion );                    // Show "Update available" dialog
-        ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
-        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
-        ADDINST (   _UseProvidedURLs );
-        ADDINST (   _StartDownload );                        // Fetch update binary from update mirror
-        ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _DialogUpdateResult );                      // Show "Update ok/failed" message
-        ADDINST (   _End );
-
-        ADDLABL ( "silentdload:" );
-        ADDINST (   _UseProvidedURLs );
-        ADDINST (   _StartDownload );                        // Fetch update binary from update mirror
-        ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _QUpdateResult );                           // Maybe set OnRestartCommand
-        ADDINST (   _End );
-
-        ADDLABL ( "noupdate:" );
-        ADDINST (   _ResetVersionCheckTimer );                 // Wait 24hrs before checking again
-        ADDINST (   _End );
-
-        ADDLABL ( "end:" );
-        ADDINST (   _End );
-    }
-
-
-    //
-    // Manual update check
-    //
-    {
-        SString strProgramName = "ManualCheck";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _UseVersionQueryURLs );                     // Use VERSION_CHECKER_URL*
-        ADDINST (   _DialogChecking );                          // Show "Checking..." message
-        ADDINST (   _StartDownload );                          // Fetch update info from update server
-        ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.update goto dload");        // If update server says 'update' then goto dload:
-        ADDCOND ( "if ProcessResponse.files goto dload");         // If update server says 'files' then goto dload:
-        ADDCOND ( "if ProcessResponse.silent goto dload");        // If update server says 'silent' then goto dload:
-        ADDCOND ( "if ProcessResponse.noupdate goto noupdate");   // If update server says 'noupdate' then goto noupdate:
-        ADDCOND ( "if ProcessResponse.cancel goto end");
-        ADDINST (   _DialogUpdateQueryError );
-        ADDINST (   _End );
-
-        ADDLABL ( "dload:" );
-        ADDINST (   _DialogUpdateQuestion );                    // Show "Update available" dialog
-        ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
-        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
-        ADDINST (   _UseProvidedURLs );
-        ADDINST (   _StartDownload );                       // Fetch update binary from update mirror
-        ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _DialogUpdateResult );                      // Show "Update ok/failed" message
-        ADDINST (   _End );
-
-        ADDLABL ( "noupdate:" );
-        ADDINST (   _ResetManualCheckTimer );                   // Wait 1min before checking again
-        ADDINST (   _DialogNoUpdate );                          // Show "No update available" dialog
-        ADDINST (   _End );
-
-        ADDLABL ( "end:" );
-        ADDINST (   _End );
-    }
-
-
-    //
-    // Manual update simulation
-    //
-    {
-        SString strProgramName = "ManualCheckSim";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _DialogNoUpdate );                          // Show "No update available" dialog
-        ADDINST (   _End );
-    }
-
-
-    //
-    // ServerSaysUpdate
-    //
-    {
-        SString strProgramName = "ServerSaysUpdate";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _UseVersionQueryURLs );                     // Use VERSION_CHECKER_URL*
-        ADDINST (   _DialogServerSaysUpdateQuestion );          // Show "Server says update" dialog
-        ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
-        ADDINST (   _DialogChecking );                          // Show "Checking..." message
-        ADDINST (   _StartDownload );                          // Fetch update info from update server
-        ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.update goto dload");        // If update server says 'update' then goto dload:
-        ADDCOND ( "if ProcessResponse.files goto dload");         // If update server says 'files' then goto dload:
-        ADDCOND ( "if ProcessResponse.silent goto dload");        // If update server says 'silent' then goto dload:
-        ADDINST (   _DialogUpdateQueryError );
-        ADDINST (   _End );
-
-        ADDLABL ( "dload:" );
-        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
-        ADDINST (   _UseProvidedURLs );
-        ADDINST (   _StartDownload );                       // Fetch update binary from update mirror
-        ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _DialogUpdateResult );                      // Show "Update ok/failed" message
-        ADDINST (   _End );
-
-        ADDLABL ( "end:" );
-        ADDINST (   _End );
-    }
-
-    //
-    // ServerSaysRecommend
-    //
-    {
-        SString strProgramName = "ServerSaysRecommend";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _UseVersionQueryURLs );                     // Use VERSION_CHECKER_URL*
-        ADDINST (   _DialogConnectingWait );                    // Show "Please wait..." message
-        ADDINST (   _StartDownload );                          // Fetch update info from update server
-        ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.update goto dload");        // If update server says 'update' then goto dload:
-        ADDCOND ( "if ProcessResponse.files goto dload");         // If update server says 'files' then goto dload:
-        ADDCOND ( "if ProcessResponse.silent goto silentdload");  // If update server says 'silent' then goto silentdload:
-        ADDINST (   _ActionReconnect );
-        ADDINST (   _End );
-
-        ADDLABL ( "dload:" );
-        ADDINST (   _DialogServerSaysRecommendQuestion );       // Show "Server says update" dialog
-        ADDCOND ( "if QuestionResponse.!Yes goto reconnect" );  // If user says 'No', then goto reconnect:
-        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
-        ADDINST (   _UseProvidedURLs );
-        ADDINST (   _StartDownload );                       // Fetch update binary from update mirror
-        ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _DialogUpdateResult );                      // Show "Update ok/failed" message
-        ADDINST (   _End );
-
-        ADDLABL ( "silentdload:" );
-        ADDINST (   _DialogHide );                              // Don't show downloading progress
-        ADDINST (   _ActionReconnect );                         // Reconnect to game
-        ADDINST (   _UseProvidedURLs );
-        ADDINST (   _StartDownload );                       // Fetch update binary from update mirror
-        ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _QUpdateResult );                           // Maybe set OnRestartCommand
-        ADDINST (   _End );
-
-        ADDLABL ( "reconnect:" );
-        ADDINST (   _ActionReconnect );
-        ADDINST (   _End );
-
-        ADDLABL ( "end:" );
-        ADDINST (   _End );
-    }
-
-
-    //
-    // ServerSaysDataFilesWrong
-    //
-    {
-        SString strProgramName = "ServerSaysDataFilesWrong";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _UseDataFiles2URLs );                        // Use DATA_FILES_URL*
-        ADDINST (   _DialogDataFilesQuestion );                 // Show "Data files wrong" dialog
-        ADDCOND ( "if QuestionResponse.!Yes goto end" );        // If user says 'No', then goto end:
-        ADDINST (   _DialogChecking );                          // Show "Checking..." message
-        ADDINST (   _StartDownload );                          // Fetch file info from server
-        ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.!files goto error1" );  // If server says 'No files' then goto error1:
-        ADDINST (   _DialogDownloading );                       // Show "Downloading..." message
-        ADDINST (   _UseProvidedURLs );
-        ADDINST (   _StartDownload );                       // Fetch file binary from mirror
-        ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _DialogUpdateResult );                   // Show "Update ok/failed" message
-        ADDINST (   _End );
-
-        ADDLABL ( "error1:" );
-        ADDINST (   _DialogUpdateQueryError );
-        ADDINST (   _End );
-
-        ADDLABL ( "end:" );
-        ADDINST (     _End );
-    }
-
-
-    //
-    // MasterFetch
-    //
-    {
-        SString strProgramName = "MasterFetch";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _UseMasterFetchURLs );                     // Use VERSION_CHECKER_URL*
-        ADDINST (   _StartDownload );                          // Fetch file info from server
-        ADDINST (   _ProcessMasterFetch );
-        ADDCOND ( "if ProcessResponse.!ok goto error1" );
-        ADDINST (   _ResetMasterCheckTimer );
-        ADDINST (   _End );
-
-        ADDLABL ( "error1:" );
-        ADDINST (   _End );
-
-        ADDLABL ( "end:" );
-        ADDINST (   _End );
-    }
-
-    //
-    // SendCrashDump
-    //
-    {
-        SString strProgramName = "SendCrashDump";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _ShouldSendCrashDump );                     // Have we already sent a matching dump?
-        ADDCOND ( "if ProcessResponse.!ok goto end" );
-        ADDINST (   _UseCrashDumpQueryURLs );
-        ADDINST (   _StartDownload );
-        ADDINST (   _ProcessCrashDumpQuery );                   // Does the server want this dump?
-        ADDCOND ( "if ProcessResponse.!ok goto end" );
-        ADDINST (   _UseCrashDumpURLs );                        // Use CRASH_DUMP_URL*
-        ADDINST (   _UseCrashDumpPostContent );                 // Use crash dump source
-        ADDINST (   _StartSendPost );                           // Send data
-        ADDLABL ( "end:" );
-        ADDINST (   _ResetLastCrashDump );
-        ADDINST (     _End );
-    }
-
-
-    //
-    // SendReportLog
-    //
-    {
-        SString strProgramName = "SendReportLog";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _UseReportLogURLs );                        // Use REPORT_LOG_URL*
-        ADDINST (   _UseReportLogPostContent );                 // Use report log source
-        ADDINST (   _StartSendPost );                           // Send data
-        ADDLABL ( "end:" );
-        ADDINST (     _End );
-    }
-
-
-    //
-    // SidegradeLaunch
-    //
-    {
-        SString strProgramName = "SidegradeLaunch";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _CheckSidegradeRequirements );                      // Check if other version already installed
-        ADDCOND ( "if ProcessResponse.!installed goto NOTINSTALLED" );  // Other version present and valid?
-            ADDINST (   _DialogSidegradeLaunchQuestion );                   // Does user want to launch and connect using the other version?
-            ADDCOND ( "if QuestionResponse.!Yes goto NOLAUNCH" );
-                ADDINST (   _DoSidegradeLaunch );                                   // If user says 'Yes', then launch
-            ADDLABL ( "NOLAUNCH:" );
-            ADDINST (   _End );
-       
-        ADDLABL ( "NOTINSTALLED:" );                                    // If not installed, check if it is downloadable
-        ADDINST (   _UseSidegradeURLs );                                // Use sidegrade URLs
-        ADDINST (   _StartDownload );                                   // Fetch file info from server
-        ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.update goto HASFILE" );           // Does server have the required file?
-            ADDINST (   _DialogSidegradeQueryError );                       // If no download available, show message
-            ADDINST (   _End );
-
-        ADDLABL ( "HASFILE:" );
-        ADDINST (   _DialogSidegradeDownloadQuestion );                 // If it is downloadable, ask user what to do
-        ADDCOND ( "if QuestionResponse.Yes goto YESDOWNLOAD" );
-            ADDINST (     _End );                                           // If user says 'No', then finish
-
-        ADDLABL ( "YESDOWNLOAD:" );                                     // If user says yes, download and run installer
-        ADDINST (   _DialogDownloading );                               // Show "Downloading..." message
-        ADDINST (   _UseProvidedURLs );
-        ADDINST (   _StartDownload );                                   // Fetch file binary from mirror
-        ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _DialogDataFilesResult );                           // Show "ok/failed" message
-        ADDINST (   _End );
-    }
-
-
-    //
-    // NewsUpdate
-    //
-    {
-        SString strProgramName = "NewsUpdate";
-        MapSet ( m_ProgramMap, strProgramName, CProgram () );
-        CProgram& program = *MapFind ( m_ProgramMap, strProgramName );
-
-        ADDINST (   _UseNewsUpdateURLs );                       // Use news serverlist
-        ADDINST (   _StartDownload );                           // Fetch update info from update server
-        ADDINST (   _ProcessPatchFileQuery );
-        ADDCOND ( "if ProcessResponse.silent goto silentdload");  // If update server says 'silent' then goto silentdload:
-        ADDCOND ( "if ProcessResponse.noupdate goto noupdate");   // If update server says 'noupdate' then goto noupdate:
-        ADDINST (   _End );
-
-        ADDLABL ( "silentdload:" );
-        ADDINST (   _UseProvidedURLs );
-        ADDINST (   _StartDownload );                           // Fetch update binary from update mirror
-        ADDINST (   _ProcessPatchFileDownload );
-        ADDINST (   _QUpdateNewsResult );                       // Maybe update news install queue
-        ADDINST (   _End );
-
-        ADDLABL ( "noupdate:" );
-        ADDINST (   _ResetNewsCheckTimer );                 // Wait interval before checking again
-        ADDINST (   _End );
-
-        ADDLABL ( "end:" );
-        ADDINST (   _End );
-    }
-
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CVersionUpdater::CheckPrograms
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void CVersionUpdater::CheckPrograms ()
-{
-    // Check each program
-    for ( std::map < SString, CProgram >::iterator it = m_ProgramMap.begin (); it != m_ProgramMap.end (); ++it )
-    {
-        CProgram program = it->second;
-
-        // Check each instruction
-        while ( const CInstruction* pInstruction = program.GetNextInstruction () )
-        {
-            assert ( pInstruction->IsFunction () || pInstruction->IsConditionalGoto () || pInstruction->IsLabel () );
-
-            if ( pInstruction->IsConditionalGoto () )
-                assert ( program.FindLabel ( pInstruction->strGoto ) != -1 );
-        }
-    }
-}
-
-
 ///////////////////////////////////////////////////////////////
 //
 // CVersionUpdater::RunProgram
@@ -1280,15 +928,489 @@ void CVersionUpdater::CheckPrograms ()
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::RunProgram ( const SString& strProgramName )
+void CVersionUpdater::RunProgram ( EUpdaterProgramType strProgramName )
 {
-    OutputDebugLine ( SString ( "[Updater] RunProgram %s", strProgramName.c_str () ) );
-    ResetEverything ();
-    CProgram* pProgram = MapFind ( m_ProgramMap, strProgramName );
-    if ( pProgram )
+    assert( IsMainThread() );
+    OutputDebugLine ( SString ( "[Updater] RunProgram %d", strProgramName ) );
+
+    // Stop any running program
+    while( shared.m_CurrentProgram != EUpdaterProgramType::None )
     {
-        m_CurrentProgram = *pProgram;
+        shared.m_bQuitCurrentProgram = true;
+        MainStep();
     }
+
+    shared.m_CurrentProgram = strProgramName;
+}
+
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::MainStep
+//
+// Let the updater thread have some time
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::MainStep( void )
+{
+    assert( IsMainThread() );
+    shared.m_Mutex.Signal();
+    shared.m_Mutex.Wait( -1 );
+
+    if ( shared.m_bExitGame )
+        CCore::GetSingleton().Quit();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::UpdaterYield
+//
+// Let the main thread continue
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::UpdaterYield( void )
+{
+    assert( !IsMainThread() );
+    shared.m_Mutex.Signal();
+    shared.m_Mutex.Wait( -1 );
+
+    if ( shared.m_bQuitCurrentProgram )
+        _QuitCurrentProgram();
+}
+
+
+//
+//
+//
+// Job servicing thread
+//
+//
+//
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::StaticThreadProc
+//
+// static function
+// Thread entry point
+//
+///////////////////////////////////////////////////////////////
+void* CVersionUpdater::StaticThreadProc ( void* pContext )
+{
+    CThreadHandle::AllowASyncCancel();
+    return ((CVersionUpdater*)pContext)->ThreadProc();
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::ThreadProc
+//
+// Job service loop
+//
+///////////////////////////////////////////////////////////////
+void* CVersionUpdater::ThreadProc( void )
+{
+    shared.m_Mutex.Lock();
+    while ( !shared.m_bTerminateThread )
+    {
+        if ( shared.m_CurrentProgram != EUpdaterProgramType::None )
+        {
+            ResetEverything();
+            try
+            {
+                ProcessCommand( shared.m_CurrentProgram );
+            }
+            catch ( ExceptionQuitProgram )
+            {
+                OutputDebugLine( SString ( "[Updater] Program terminated %d", shared.m_CurrentProgram ) );
+            }
+            ResetEverything();
+
+            shared.m_CurrentProgram = EUpdaterProgramType::None;
+        }
+        shared.m_Mutex.Signal();
+        shared.m_Mutex.Wait( -1 );
+    }
+
+    shared.m_bThreadTerminated = true;
+    shared.m_Mutex.Unlock();
+
+    return NULL;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::ProcessCommand
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::ProcessCommand( EUpdaterProgramType eProgramType )
+{
+    struct {
+        EUpdaterProgramType eProgramType;
+        PFNVOIDVOID pFunction;
+    } programList[] = {
+                        { EUpdaterProgramType::VersionCheck, &CVersionUpdater::Program_VersionCheck },
+                        { EUpdaterProgramType::ManualCheck, &CVersionUpdater::Program_ManualCheck },
+                        { EUpdaterProgramType::ManualCheckSim, &CVersionUpdater::Program_ManualCheckSim },
+                        { EUpdaterProgramType::ServerSaysUpdate, &CVersionUpdater::Program_ServerSaysUpdate },
+                        { EUpdaterProgramType::ServerSaysRecommend, &CVersionUpdater::Program_ServerSaysRecommend },
+                        { EUpdaterProgramType::ServerSaysDataFilesWrong, &CVersionUpdater::Program_ServerSaysDataFilesWrong },
+                        { EUpdaterProgramType::MasterFetch, &CVersionUpdater::Program_MasterFetch },
+                        { EUpdaterProgramType::SendCrashDump, &CVersionUpdater::Program_SendCrashDump },
+                        { EUpdaterProgramType::SendReportLog, &CVersionUpdater::Program_SendReportLog },
+                        { EUpdaterProgramType::SidegradeLaunch, &CVersionUpdater::Program_SidegradeLaunch },
+                        { EUpdaterProgramType::NewsUpdate, &CVersionUpdater::Program_NewsUpdate },
+                    };
+    for( uint i = 0 ; i < NUMELMS( programList ) ; i++ )
+    {
+        if ( programList[i].eProgramType == eProgramType )
+        {
+            OutputDebugLine( SString ( "[Updater] ProcessCommand %d", eProgramType ) );
+            ( this->*( programList[i].pFunction ) )();
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+//
+// 'Program_'
+//
+//
+//
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_VersionCheck
+//
+// VersionCheck
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_VersionCheck()
+{
+    _UseVersionQueryURLs();                                                                 // Use VERSION_CHECKER_URL*
+    _StartDownload();                                                                       // Fetch update info from update server
+    _ProcessPatchFileQuery();
+
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.update" ) )  goto dload;         // If update server says 'update' then goto dload
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.files" ) )  goto dload;          // If update server says 'files' then goto dload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.silent" ) )  goto silentdload;   // If update server says 'silent' then goto silentdload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.noupdate" ) )  goto noupdate;    // If update server says 'noupdate' then goto noupdate:
+    return;
+
+dload:
+    _DialogUpdateQuestion();                                                                // Show "Update available" dialog
+    if ( m_ConditionMap.IsConditionTrue ( "QuestionResponse.!Yes" ) )  goto end;            // If user says 'No', then goto end:
+    _DialogDownloading();                                                                   // Show "Downloading..." message
+    _UseProvidedURLs();
+    _StartDownload();                                                                       // Fetch update binary from update mirror
+    _ProcessPatchFileDownload();
+    _DialogUpdateResult();                                                                  // Show "Update ok/failed" message
+    return;
+
+silentdload:
+    _UseProvidedURLs();
+    _StartDownload();                                                                       // Fetch update binary from update mirror
+    _ProcessPatchFileDownload();
+    _QUpdateResult();                                                                       // Maybe set OnRestartCommand
+    return;
+
+noupdate:
+    _ResetVersionCheckTimer();                                                              // Wait 24hrs before checking again
+    return;
+
+end:
+    _ResetVersionCheckTimer();
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_ManualCheck
+//
+// Manual update check
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_ManualCheck()
+{
+    _UseVersionQueryURLs();                                                                 // Use VERSION_CHECKER_URL*
+    _DialogChecking();                                                                      // Show "Checking..." message
+    _StartDownload();                                                                       // Fetch update info from update server
+    _ProcessPatchFileQuery();
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.update" ) )  goto dload;         // If update server says 'update' then goto dload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.files" ) )  goto dload;          // If update server says 'files' then goto dload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.silent" ) )  goto dload;         // If update server says 'silent' then goto dload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.noupdate" ) )  goto noupdate;    // If update server says 'noupdate' then goto noupdate:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.cancel" ) )  goto end;
+    _DialogUpdateQueryError();
+    return;
+
+dload:
+    _DialogUpdateQuestion();                                                                // Show "Update available" dialog
+    if ( m_ConditionMap.IsConditionTrue ( "QuestionResponse.!Yes" ) )   goto end;           // If user says 'No', then goto end:
+    _DialogDownloading();                                                                   // Show "Downloading..." message
+    _UseProvidedURLs();
+    _StartDownload();                                                                       // Fetch update binary from update mirror
+    _ProcessPatchFileDownload();
+    _DialogUpdateResult();                                                                  // Show "Update ok/failed" message
+    return;
+
+noupdate:
+    _ResetManualCheckTimer();                                                               // Wait 1min before checking again
+    _DialogNoUpdate();                                                                      // Show "No update available" dialog
+    return;
+
+end:
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_ManualCheckSim
+//
+// Manual update simulation
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_ManualCheckSim()
+{
+    _DialogNoUpdate();                  // Show "No update available" dialog
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_ServerSaysUpdate
+//
+// ServerSaysUpdate
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_ServerSaysUpdate()
+{
+    _UseVersionQueryURLs();                                                             // Use VERSION_CHECKER_URL*
+    _DialogServerSaysUpdateQuestion();                                                  // Show "Server says update" dialog
+    if ( m_ConditionMap.IsConditionTrue ( "QuestionResponse.!Yes" ) )   goto end;       // If user says 'No', then goto end:
+    _DialogChecking();                                                                  // Show "Checking..." message
+    _StartDownload();                                                                   // Fetch update info from update server
+    _ProcessPatchFileQuery();
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.update" ) )   goto dload;    // If update server says 'update' then goto dload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.files" ) )   goto dload;     // If update server says 'files' then goto dload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.silent" ) )   goto dload;    // If update server says 'silent' then goto dload:
+    _DialogUpdateQueryError();
+    return;
+
+dload:
+    _DialogDownloading();                   // Show "Downloading..." message
+    _UseProvidedURLs();
+    _StartDownload();                       // Fetch update binary from update mirror
+    _ProcessPatchFileDownload();
+    _DialogUpdateResult();                  // Show "Update ok/failed" message
+    return;
+
+end:
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_ServerSaysRecommend
+//
+// ServerSaysRecommend
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_ServerSaysRecommend()
+{
+    _UseVersionQueryURLs();                                                                 // Use VERSION_CHECKER_URL*
+    _DialogConnectingWait();                                                                // Show "Please wait..." message
+    _StartDownload();                                                                       // Fetch update info from update server
+    _ProcessPatchFileQuery();
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.update" ) )   goto dload;        // If update server says 'update' then goto dload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.files" ) )   goto dload;         // If update server says 'files' then goto dload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.silent" ) )   goto silentdload;  // If update server says 'silent' then goto silentdload:
+    _ActionReconnect();
+    return;
+
+dload:
+    _DialogServerSaysRecommendQuestion();                                                   // Show "Server says update" dialog
+    if ( m_ConditionMap.IsConditionTrue ( "QuestionResponse.!Yes" ) )   goto reconnect;     // If user says 'No', then goto reconnect:
+    _DialogDownloading();                                                                   // Show "Downloading..." message
+    _UseProvidedURLs();
+    _StartDownload();                                                                       // Fetch update binary from update mirror
+    _ProcessPatchFileDownload();
+    _DialogUpdateResult();                                                                  // Show "Update ok/failed" message
+    return;
+
+silentdload:
+    _DialogHide();                                                                          // Don't show downloading progress
+    _ActionReconnect();                                                                     // Reconnect to game
+    _UseProvidedURLs();
+    _StartDownload();                                                                       // Fetch update binary from update mirror
+    _ProcessPatchFileDownload();
+    _QUpdateResult();                                                                       // Maybe set OnRestartCommand
+    return;
+
+reconnect:
+    _ActionReconnect();
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_ServerSaysDataFilesWrong
+//
+// ServerSaysDataFilesWrong
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_ServerSaysDataFilesWrong()
+{
+    _DialogDataFilesQuestion();
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_MasterFetch
+//
+// MasterFetch
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_MasterFetch()
+{
+    _UseMasterFetchURLs();                                                          // Use VERSION_CHECKER_URL*
+    _StartDownload();                                                               // Fetch file info from server
+    _ProcessMasterFetch();
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.!ok" ) )   goto error1;
+    _ResetMasterCheckTimer();
+    return;
+
+error1:
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_SendCrashDump
+//
+// SendCrashDump
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_SendCrashDump()
+{
+    _ShouldSendCrashDump();                                                         // Have we already sent a matching dump?
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.!ok" ) )   goto end;
+    _UseCrashDumpQueryURLs();
+    _StartDownload();
+    _ProcessCrashDumpQuery();                                                       // Does the server want this dump?
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.!ok" ) )   goto end;
+    _UseCrashDumpURLs();                                                            // Use CRASH_DUMP_URL*
+    _UseCrashDumpPostContent();                                                     // Use crash dump source
+    _StartSendPost();                                                               // Send data
+end:
+    _ResetLastCrashDump();
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_SendReportLog
+//
+// SendReportLog
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_SendReportLog()
+{
+    _UseReportLogURLs();                    // Use REPORT_LOG_URL*
+    _UseReportLogPostContent();             // Use report log source
+    _StartSendPost();                       // Send data
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_SidegradeLaunch
+//
+// SidegradeLaunch
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_SidegradeLaunch()
+{
+    _CheckSidegradeRequirements();                                                                  // Check if other version already installed
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.!installed" ) )   goto notinstalled;     // Other version present and valid?
+    _DialogSidegradeLaunchQuestion();                                                               // Does user want to launch and connect using the other version?
+    if ( m_ConditionMap.IsConditionTrue ( "QuestionResponse.!Yes" ) )   goto nolaunch;
+    _DoSidegradeLaunch();                                                                           // If user says 'Yes', then launch
+nolaunch:
+    return;
+       
+notinstalled:
+    _UseSidegradeURLs();                                                                            // Use sidegrade URLs
+    _StartDownload();                                                                               // Fetch file info from server
+    _ProcessPatchFileQuery();
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.update" ) )   goto hasfile;              // Does server have the required file?
+    _DialogSidegradeQueryError();                                                                   // If no download available, show message
+    return;
+
+hasfile:
+    _DialogSidegradeDownloadQuestion();                                                             // If it is downloadable, ask user what to do
+    if ( m_ConditionMap.IsConditionTrue ( "QuestionResponse.Yes" ) )   goto yesdownload;
+    return;                                                                                         // If user says 'No', then finish
+
+yesdownload:
+    _DialogDownloading();                                                                           // Show "Downloading..." message
+    _UseProvidedURLs();
+    _StartDownload();                                                                               // Fetch file binary from mirror
+    _ProcessPatchFileDownload();
+    _DialogExeFilesResult();                                                                        // Show "ok/failed" message
+    return;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::Program_NewsUpdate
+//
+// NewsUpdate
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::Program_NewsUpdate()
+{
+    _UseNewsUpdateURLs();                                                                   // Use news serverlist
+    _StartDownload();                                                                       // Fetch update info from update server
+    _ProcessPatchFileQuery();
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.silent" ) )   goto silentdload;  // If update server says 'silent' then goto silentdload:
+    if ( m_ConditionMap.IsConditionTrue ( "ProcessResponse.noupdate" ) )   goto noupdate;   // If update server says 'noupdate' then goto noupdate:
+    return;
+
+silentdload:
+    _UseProvidedURLs();
+    _StartDownload();                                                                       // Fetch update binary from update mirror
+    _ProcessPatchFileDownload();
+    _QUpdateNewsResult();                                                                   // Maybe update news install queue
+    return;
+
+noupdate:
+    _ResetNewsCheckTimer();                                                                 // Wait interval before checking again
+    return;
 }
 
 
@@ -1378,7 +1500,7 @@ void CVersionUpdater::_DoSidegradeLaunch ( void )
 {
     SString strURL ( "mtasa://%s:%s@%s:%d", *m_strSidegradeName, *m_strSidegradePassword, *m_strSidegradeHost, m_usSidegradePort );
     SetOnQuitCommand ( "open", m_strSidegradePath, strURL );
-    Push ( _ExitGame );
+    _ExitGame();
 }
 
 
@@ -1398,7 +1520,7 @@ void CVersionUpdater::_DialogSidegradeDownloadQuestion ( void )
     GetQuestionBox ().SetButton ( 0, _("No") );
     GetQuestionBox ().SetButton ( 1, _("Yes") );
     GetQuestionBox ().Show ();
-    Push ( _PollQuestionNoYes );
+    _PollQuestionNoYes();
 }
 
 
@@ -1417,7 +1539,7 @@ void CVersionUpdater::_DialogSidegradeLaunchQuestion ( void )
     GetQuestionBox ().SetButton ( 0, _("No") );
     GetQuestionBox ().SetButton ( 1, _("Yes") );
     GetQuestionBox ().Show ();
-    Push ( _PollQuestionNoYes );
+    _PollQuestionNoYes();
 }
 
 
@@ -1435,7 +1557,7 @@ void CVersionUpdater::_DialogSidegradeQueryError ( void )
     GetQuestionBox ().SetMessage ( _("It is not possible to connect at this time.\n\nPlease try later.") );
     GetQuestionBox ().SetButton ( 0, _("OK") );
     GetQuestionBox ().Show ();
-    Push ( _PollAnyButton );
+    _PollAnyButton();
 }
 
 
@@ -1467,14 +1589,14 @@ void CVersionUpdater::_DialogHide()
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::_End
+// CVersionUpdater::_QuitCurrentProgram
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_End ( void )
+void CVersionUpdater::_QuitCurrentProgram( void )
 {
-    ResetEverything ();
+    throw ExceptionQuitProgram();
 }
 
 
@@ -1487,8 +1609,8 @@ void CVersionUpdater::_End ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_ExitGame ( void )
 {
-    // Exit game
-    CCore::GetSingleton ().Quit ();
+    shared.m_bExitGame = true;
+    _QuitCurrentProgram();
 }
 
 
@@ -1558,11 +1680,16 @@ void CVersionUpdater::_ResetManualCheckTimer ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_PollAnyButton ( void )
 {
-    // Wait for button press before continuing
-    if ( GetQuestionBox ().PollButtons () == -1 )
-        Push ( _PollAnyButton );
-    else
-        GetQuestionBox ().Reset ();
+    while( true )
+    {
+        UpdaterYield();
+        // Wait for button press before continuing
+        if ( GetQuestionBox ().PollButtons () != -1 )
+        {
+            GetQuestionBox ().Reset ();
+            return;
+        }
+    }
 }
 
 
@@ -1575,24 +1702,27 @@ void CVersionUpdater::_PollAnyButton ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_PollQuestionNoYes ( void )
 {
-    switch ( GetQuestionBox ().PollButtons () )
+    while( true )
     {
-        case BUTTON_NONE:
-            Push ( _PollQuestionNoYes );
-            break;
+        UpdaterYield();
+        switch ( GetQuestionBox ().PollButtons () )
+        {
+            case BUTTON_NONE:
+                break;
 
-        case BUTTON_0:
-            m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
-            GetQuestionBox ().Reset ();
-            break;
+            case BUTTON_0:
+                m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
+                GetQuestionBox ().Reset ();
+                return;
 
-        case BUTTON_1:
-            m_ConditionMap.SetCondition ( "QuestionResponse", "Yes" );
-            GetQuestionBox ().Reset ();
-            break;
+            case BUTTON_1:
+                m_ConditionMap.SetCondition ( "QuestionResponse", "Yes" );
+                GetQuestionBox ().Reset ();
+                return;
 
-        default:
-            assert ( 0 );
+            default:
+                assert ( 0 );
+        }
     }
 }
 
@@ -1646,7 +1776,7 @@ void CVersionUpdater::_DialogNoUpdate ( void )
     GetQuestionBox ().SetMessage ( _("No update needed") );
     GetQuestionBox ().SetButton ( 0, _("OK") );
     GetQuestionBox ().Show ();
-    Push ( _PollAnyButton );
+    _PollAnyButton();
 }
 
 
@@ -1684,7 +1814,7 @@ void CVersionUpdater::_DialogServerSaysUpdateQuestion ( void )
     GetQuestionBox ().SetButton ( 0, _("No") );
     GetQuestionBox ().SetButton ( 1, _("Yes") );
     GetQuestionBox ().Show ();
-    Push ( _PollQuestionNoYes );
+    _PollQuestionNoYes();
 }
 
 
@@ -1704,7 +1834,7 @@ void CVersionUpdater::_DialogServerSaysRecommendQuestion ( void )
     GetQuestionBox ().SetButton ( 0, _("No") );
     GetQuestionBox ().SetButton ( 1, _("Yes") );
     GetQuestionBox ().Show ();
-    Push ( _PollQuestionNoYes );
+    _PollQuestionNoYes();
 }
 
 
@@ -1725,7 +1855,7 @@ void CVersionUpdater::_DialogUpdateQuestion ( void )
     GetQuestionBox ().SetButton ( 1, m_JobInfo.strYes );
     GetQuestionBox ().Show ();
     GetQuestionBox ().SetAutoCloseOnConnect ( true );
-    Push ( _PollQuestionNoYes );
+    _PollQuestionNoYes();
 }
 
 
@@ -1744,7 +1874,7 @@ void CVersionUpdater::_DialogUpdateQueryError ( void )
     GetQuestionBox ().SetMessage ( _("Update not currently avalable.\n\nPlease check www.mtasa.com") );
     GetQuestionBox ().SetButton ( 0, _("OK") );
     GetQuestionBox ().Show ();
-    Push ( _PollAnyButton );
+    _PollAnyButton();
 }
 
 
@@ -1767,7 +1897,7 @@ void CVersionUpdater::_DialogUpdateResult(void)
             GetQuestionBox ().SetMessage ( _("Unable to create the file.") );
             GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
-            Push ( _PollAnyButton );
+            _PollAnyButton();
         }
         else
         if ( m_ConditionMap.IsConditionTrue ( "Download.Fail.Checksum" ) )
@@ -1777,7 +1907,7 @@ void CVersionUpdater::_DialogUpdateResult(void)
             GetQuestionBox ().SetMessage ( _("The downloaded file appears to be incorrect.") );
             GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
-            Push ( _PollAnyButton );
+            _PollAnyButton();
         }
         else
         {
@@ -1786,7 +1916,7 @@ void CVersionUpdater::_DialogUpdateResult(void)
             GetQuestionBox ().SetMessage ( _("For some reason.") );
             GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
-            Push ( _PollAnyButton );
+            _PollAnyButton();
         }
     }
     else
@@ -1805,7 +1935,8 @@ void CVersionUpdater::_DialogUpdateResult(void)
             // 'update' - Stand alone installer
             SetOnQuitCommand ( "open", m_JobInfo.strSaveLocation );
             SetOnRestartCommand ( "" );
-            Push ( _ExitGame );
+            _PollAnyButton();
+            _ExitGame();
         }
         else
         if ( m_JobInfo.strStatus == "files" || m_JobInfo.strStatus == "silent" )
@@ -1813,13 +1944,14 @@ void CVersionUpdater::_DialogUpdateResult(void)
             // 'files'/'silent' - Self extracting archive 
             SetOnQuitCommand ( "restart" );
             SetOnRestartCommand ( "files", m_JobInfo.strSaveLocation );
-            Push ( _ExitGame );
+            _PollAnyButton();
+            _ExitGame();
         }
         else
         {
             GetQuestionBox ().SetMessage ( m_JobInfo.strStatus + _(" - Unknown problem in _DialogUpdateResult") );
+            _PollAnyButton();
         }
-        Push ( _PollAnyButton );
     }
 }
 
@@ -1903,7 +2035,7 @@ void CVersionUpdater::_QUpdateNewsResult ( void )
 //
 // CVersionUpdater::_DialogDataFilesQuestion
 //
-//
+// Just displays information these days
 //
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_DialogDataFilesQuestion ( void )
@@ -1921,8 +2053,7 @@ void CVersionUpdater::_DialogDataFilesQuestion ( void )
         GetQuestionBox ().SetMessage ( _(strMessage) );
         GetQuestionBox ().SetButton ( 0, _("Ok") );
         GetQuestionBox ().Show ();
-        Push ( _PollAnyButton );
-        m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
+        _PollAnyButton();
         return;
     }
 
@@ -1932,38 +2063,18 @@ void CVersionUpdater::_DialogDataFilesQuestion ( void )
     GetQuestionBox ().SetMessage ( _("Some MTA:SA data files are missing.\n\n\nPlease reinstall MTA:SA") );
     GetQuestionBox ().SetButton ( 0, _("Ok") );
     GetQuestionBox ().Show ();
-    Push ( _PollAnyButton );
-    m_ConditionMap.SetCondition ( "QuestionResponse", "No" );
+    _PollAnyButton();
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CVersionUpdater::_DialogDataFilesQueryError
+// CVersionUpdater::_DialogExeFilesResult
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogDataFilesQueryError ( void )
-{
-    // Display message
-    GetQuestionBox ().Reset ();
-    GetQuestionBox ().SetTitle ( _("DATA FILES") );
-    GetQuestionBox ().SetMessage ( _("Data files not currently avalable.\n\nPlease check www.mtasa.com") );
-    GetQuestionBox ().SetButton ( 0, _("OK") );
-    GetQuestionBox ().Show ();
-    Push ( _PollAnyButton );
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CVersionUpdater::_DialogDataFilesResult
-//
-//
-//
-///////////////////////////////////////////////////////////////
-void CVersionUpdater::_DialogDataFilesResult ( void )
+void CVersionUpdater::_DialogExeFilesResult ( void )
 {
     // Handle failure
     if ( m_ConditionMap.IsConditionTrue ( "Download.Fail" ) )
@@ -1975,7 +2086,7 @@ void CVersionUpdater::_DialogDataFilesResult ( void )
             GetQuestionBox ().SetMessage ( _("Unable to create the file.") );
             GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
-            Push ( _PollAnyButton );
+            _PollAnyButton();
         }
         else
         if ( m_ConditionMap.IsConditionTrue ( "Download.Fail.Checksum" ) )
@@ -1985,7 +2096,7 @@ void CVersionUpdater::_DialogDataFilesResult ( void )
             GetQuestionBox ().SetMessage ( _("The downloaded file appears to be incorrect.") );
             GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
-            Push ( _PollAnyButton );
+            _PollAnyButton();
         }
         else
         {
@@ -1994,7 +2105,7 @@ void CVersionUpdater::_DialogDataFilesResult ( void )
             GetQuestionBox ().SetMessage ( _("For some reason.") );
             GetQuestionBox ().SetButton ( 0, _("OK") );
             GetQuestionBox ().Show ();
-            Push ( _PollAnyButton );
+            _PollAnyButton();
         }
     }
     else
@@ -2009,8 +2120,8 @@ void CVersionUpdater::_DialogDataFilesResult ( void )
         GetQuestionBox ().SetMessage ( m_JobInfo.strMsg2 );
         GetQuestionBox ().SetButton ( 0, _("OK") );
         GetQuestionBox ().Show ();
-        Push ( _ExitGame );
-        Push ( _PollAnyButton );
+        _PollAnyButton();
+        _ExitGame();
     }
 }
 
@@ -2204,8 +2315,6 @@ void CVersionUpdater::_ProcessMasterFetch ( void )
     XMLAccess.GetSubNodeValue ( "crashdump.serverlist",         newMasterConfig.crashdump.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "crashdump.duplicates",         newMasterConfig.crashdump.iDuplicates );
     XMLAccess.GetSubNodeValue ( "crashdump.maxhistorylength",   newMasterConfig.crashdump.iMaxHistoryLength );
-    XMLAccess.GetSubNodeValue ( "gtadatafiles.serverlist",      newMasterConfig.gtadatafiles.serverInfoMap );
-    XMLAccess.GetSubNodeValue ( "gtadatafiles2.serverlist",     newMasterConfig.gtadatafiles2.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "trouble.serverlist",           newMasterConfig.trouble.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "ase.serverlist",               newMasterConfig.ase.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "sidegrade.serverlist",         newMasterConfig.sidegrade.serverInfoMap );
@@ -2311,22 +2420,6 @@ void CVersionUpdater::_UseProvidedURLs ( void )
 {
     CDataInfoSet serverInfoMap = m_JobInfo.serverInfoMap;
     m_JobInfo.serverList = MakeServerList ( serverInfoMap );
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CVersionUpdater::_UseDataFiles2URLs
-//
-// Called before starting the file download
-//
-///////////////////////////////////////////////////////////////
-void CVersionUpdater::_UseDataFiles2URLs ( void )
-{
-    m_JobInfo = SJobInfo ();
-    m_JobInfo.serverList = MakeServerList ( m_MasterConfig.gtadatafiles2.serverInfoMap );
-    if ( m_JobInfo.serverList.empty () )
-        m_JobInfo.serverList.push_back ( "http://updatesa.mtasa.com/sa/gtadatafiles2/?v=%VERSION%&amp;id=%ID%" );
 }
 
 
@@ -2492,23 +2585,34 @@ void CVersionUpdater::_StartDownload ( void )
         }
     }
 
-    switch ( DoSendDownloadRequestToNextServer () )
+    while ( true )
     {
-        case RES_FAIL:
-            // Can't find any(more) servers to send a query to
-            // Drop back to previous stack level
+        UpdaterYield();
+        switch ( DoSendDownloadRequestToNextServer () )
+        {
+            case RES_FAIL:
+                // Can't find any(more) servers to send a query to
+                // Drop back to previous stack level
 
-            // Refresh master config as well
-            OnPossibleConfigProblem ();
-            break;
+                // Refresh master config as well
+                OnPossibleConfigProblem ();
+                return;
 
-        case RES_OK:
-            // Query sent ok, now wait for response
-            Push ( _PollDownload );
-            break;
+            case RES_OK:
+            {
+                // Query sent ok, now wait for response
+                if ( _PollDownload () == RES_OK )
+                {
+                    // Got a valid response or cancelled by user
+                    return;                  
+                }
+                // Connection to current server failed, try next server
+                break;
+            }
 
-        default:
-            assert ( 0 );
+            default:
+                assert ( 0 );
+        }
     }
 }
 
@@ -2520,48 +2624,48 @@ void CVersionUpdater::_StartDownload ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_PollDownload ( void )
+int CVersionUpdater::_PollDownload ( void )
 {
-    switch ( DoPollDownload () )
+    while ( true )
     {
-        case RES_FAIL:
-            // Connection to current server failed, try next server
-            Push ( _StartDownload );
-            // Refresh master config as well
-            OnPossibleConfigProblem ();
-            break;
+        UpdaterYield();
+        switch ( DoPollDownload () )
+        {
+            case RES_FAIL:
+                // Connection to current server failed, try next server
+                OnPossibleConfigProblem ();
+                return RES_FAIL;
 
-        case RES_OK:
-            // Got a valid response
-            // Drop back to previous stack level for processing
-            break;
+            case RES_OK:
+                // Got a valid response
+                return RES_OK;
 
-        case RES_POLL:
-            // Waiting...
+            case RES_POLL:
+                // Waiting...
 
-            if ( GetQuestionBox ().IsVisible () )
-            {
-                // Handle progress/cancel if visible
-                if ( GetQuestionBox ().PollButtons () == 0 )
+                if ( GetQuestionBox ().IsVisible () )
                 {
-                    m_HTTP.Get ("");
-                    GetQuestionBox ().Reset ();
-                    m_ConditionMap.SetCondition ( "ProcessResponse", "cancel" );
-                    return;
+                    // Handle progress/cancel if visible
+                    if ( GetQuestionBox ().PollButtons () == 0 )
+                    {
+                        m_HTTP.Get ("");
+                        GetQuestionBox ().Reset ();
+                        m_ConditionMap.SetCondition ( "ProcessResponse", "cancel" );
+                        return RES_OK;
+                    }
+                    if ( m_JobInfo.bShowDownloadPercent )
+                        GetQuestionBox ().SetMessage ( SString ( _("%3d %% completed"), m_JobInfo.uiBytesDownloaded * 100 / Max < unsigned int > ( 1, m_JobInfo.iFilesize ) ) );
+                    if ( m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500 )
+                        GetQuestionBox ().AppendMessage ( SString ( _("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000 ) );
+                    else
+                        GetQuestionBox ().AppendMessage ( "" );
                 }
-                if ( m_JobInfo.bShowDownloadPercent )
-                    GetQuestionBox ().SetMessage ( SString ( _("%3d %% completed"), m_JobInfo.uiBytesDownloaded * 100 / Max < unsigned int > ( 1, m_JobInfo.iFilesize ) ) );
-                if ( m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500 )
-                    GetQuestionBox ().AppendMessage ( SString ( _("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000 ) );
-                else
-                    GetQuestionBox ().AppendMessage ( "" );
-            }
 
-            Push ( _PollDownload );
-            break;
+                break;
 
-        default:
-            assert ( 0 );
+            default:
+                assert ( 0 );
+        }
     }
 }
 
@@ -2796,20 +2900,32 @@ void CVersionUpdater::_StartSendPost ( void )
     if ( !m_JobInfo.postContent.size () )
         return;
 
-    switch ( DoSendPostToNextServer () )
+    while ( true )
     {
-        case RES_FAIL:
-            // Can't find any(more) servers to send a query to
-            // Drop back to previous stack level
+        UpdaterYield();
+        switch ( DoSendPostToNextServer () )
+        {
+            case RES_FAIL:
+                // Can't find any(more) servers to send a query to
+                // Drop back to previous stack level
+                return;                  
+    
+            case RES_OK:
+            {
+                // Query sent ok, now wait for response
+                if ( _PollSendPost () == RES_OK )
+                {
+                    // Got a valid response
+                    return;                  
+                }
+                // Connection to current server failed, try next server
+                break;
             break;
-
-        case RES_OK:
-            // Query sent ok, now wait for response
-            Push ( _PollSendPost );
-            break;
-
-        default:
-            assert ( 0 );
+            }
+    
+            default:
+                assert ( 0 );
+        }
     }
 }
 
@@ -2821,28 +2937,29 @@ void CVersionUpdater::_StartSendPost ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::_PollSendPost ( void )
+int CVersionUpdater::_PollSendPost ( void )
 {
-    switch ( DoPollPost () )
+    while ( true )
     {
-        case RES_FAIL:
-            // Connection to current server failed, try next server
-            Push ( _StartSendPost );
-            break;
+        UpdaterYield();
+        switch ( DoPollPost () )
+        {
+            case RES_FAIL:
+                // Connection to current server failed, try next server
+                return RES_FAIL;
 
-        case RES_OK:
-            // Got a valid response
-            // Drop back to previous stack level for processing
-            break;
+            case RES_OK:
+                // Got a valid response
+                return RES_OK;
 
-        case RES_POLL:
+            case RES_POLL:
 
-            // Waiting...
-            Push ( _PollSendPost );
-            break;
+                // Waiting...
+                break;
 
-        default:
-            assert ( 0 );
+            default:
+                assert ( 0 );
+        }
     }
 }
 
