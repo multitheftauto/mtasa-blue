@@ -102,7 +102,6 @@ private:
     std::list<CefRefPtr<CWebView>>          m_WebViews;
     bool                                    m_bTestmodeEnabled;
     CWebView*                               m_pFocusedWebView;
-    HCURSOR                                 m_aCursors[16];
 
     std::list<EventEntry>                   m_EventQueue;
     std::mutex                              m_EventQueueMutex;
@@ -110,8 +109,6 @@ private:
     CFastHashMap<SString, WebFilterPair>    m_Whitelist;
     std::vector<SString>                    m_PendingRequests;
     std::recursive_mutex                    m_FilterMutex;
-
-    IAudioSessionManager2*                  m_pAudioSessionManager;
 
     CXMLFile*                               m_pXmlConfig;
     int                                     m_iWhitelistRevision;

@@ -60,6 +60,13 @@ CWebsiteRequests::CWebsiteRequests()
 
 CWebsiteRequests::~CWebsiteRequests ()
 {
+    delete m_pLabel1;
+    delete m_pLabel2;
+    delete m_pAddressMemo;
+    delete m_pCheckRemember;
+    delete m_pButtonAllow;
+    delete m_pButtonDeny;
+    delete m_pWindow;
 }
 
 void CWebsiteRequests::Show ()

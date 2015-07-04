@@ -27,7 +27,6 @@ CWebCore::CWebCore ()
 {
     m_pRequestsGUI = nullptr;
     m_bTestmodeEnabled = false;
-    m_pAudioSessionManager = nullptr;
     m_pXmlConfig = nullptr;
     m_pFocusedWebView = nullptr;
 
@@ -42,9 +41,6 @@ CWebCore::~CWebCore ()
 {
     // Shutdown CEF
     CefShutdown();
-
-    if ( m_pAudioSessionManager )
-        m_pAudioSessionManager->Release ();
 
     delete m_pRequestsGUI;
     delete m_pXmlConfig;
@@ -242,6 +238,13 @@ void CWebCore::ResetFilter ( bool bResetRequestsOnly )
     }
     else
     {
+        // Close requests GUI
+        if ( m_pRequestsGUI )
+        {
+            delete m_pRequestsGUI;
+            m_pRequestsGUI = nullptr;
+        }
+
         // Erase all WEBFILTER_REQUEST entries
         google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.begin ();
         for ( ; iter != m_Whitelist.end (); )
@@ -301,13 +304,13 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages )
 {
     // Add to pending pages queue
     bool bNewItem = false;
-    for ( std::vector<SString>::const_iterator iter = pages.begin(); iter != pages.end(); ++iter )
+    for ( const auto& page : pages )
     {
-        eURLState status = GetURLState ( *iter );
+        eURLState status = GetURLState ( page );
         if ( status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED )
             continue;
 
-        m_PendingRequests.push_back ( *iter );
+        m_PendingRequests.push_back ( page );
         bNewItem = true;
     }
 
@@ -331,7 +334,11 @@ void CWebCore::AllowPendingPages ( bool bRemember )
     }
 
     // Trigger an event now
-    CModManager::GetSingleton ().GetCurrentMod ()->WebsiteRequestResultHandler ( m_PendingRequests );
+    auto pCurrentMod = CModManager::GetSingleton ().GetCurrentMod ();
+    if ( !pCurrentMod )
+        return;
+
+    pCurrentMod->WebsiteRequestResultHandler ( m_PendingRequests );
     m_PendingRequests.clear ();
 
     if ( bRemember )
