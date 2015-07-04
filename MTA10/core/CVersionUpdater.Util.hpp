@@ -811,6 +811,7 @@ namespace
                                 {
                                     exe.iFilesize = 0;
                                     rar.iFilesize = 0;
+                                    slim.iFilesize = 0;
                                 }
         // Input
         int                     iMaxServersToTry;
@@ -860,6 +861,15 @@ namespace
             CDataInfoSet            serverInfoMap;
             SString                 strMD5;
         } rar;
+
+        struct
+        {
+            SString                 strFilename;
+            CValueInt               iFilesize;
+            CDataInfoSet            serverInfoMap;
+            SString                 strMD5;
+            CDataInfoSet            dependencyInfoMap;
+        } slim;
 
     };
 

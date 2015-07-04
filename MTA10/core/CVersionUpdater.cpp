@@ -212,9 +212,6 @@ CVersionUpdaterInterface* GetVersionUpdater ()
 ///////////////////////////////////////////////////////////////
 CVersionUpdater::CVersionUpdater ( void )
 {
-    IsDebugTagHidden( "" );
-    SetDebugTagHidden ( "Updater", false );
-
     shared.m_Mutex.Lock ();
     m_pProgramThreadHandle = new CThreadHandle( CVersionUpdater::StaticThreadProc, this );
 }
@@ -955,8 +952,8 @@ void CVersionUpdater::RunProgram ( EUpdaterProgramType strProgramName )
 void CVersionUpdater::MainStep( void )
 {
     assert( IsMainThread() );
-    shared.m_Mutex.Signal();
-    shared.m_Mutex.Wait( -1 );
+        shared.m_Mutex.Signal();
+        shared.m_Mutex.Wait( -1 );
 
     if ( shared.m_bExitGame )
         CCore::GetSingleton().Quit();
@@ -2196,6 +2193,11 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     XMLAccess.GetSubNodeValue ( "file_rar.size",                m_JobInfo.rar.iFilesize );
     XMLAccess.GetSubNodeValue ( "file_rar.md5",                 m_JobInfo.rar.strMD5 );
     XMLAccess.GetSubNodeValue ( "serverlist_rar",               m_JobInfo.rar.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "file_slim.name",               m_JobInfo.slim.strFilename );
+    XMLAccess.GetSubNodeValue ( "file_slim.size",               m_JobInfo.slim.iFilesize );
+    XMLAccess.GetSubNodeValue ( "file_slim.md5",                m_JobInfo.slim.strMD5 );
+    XMLAccess.GetSubNodeValue ( "serverlist_slim",              m_JobInfo.slim.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "dependencies_slim",            m_JobInfo.slim.dependencyInfoMap );
     XMLAccess.GetSubNodeValue ( "reportsettings.filter2",       strReportSettingsFilter );
     XMLAccess.GetSubNodeValue ( "reportsettings.minsize",       strReportSettingsMin );
     XMLAccess.GetSubNodeValue ( "reportsettings.maxsize",       strReportSettingsMax );
@@ -2418,6 +2420,41 @@ void CVersionUpdater::_UseNewsUpdateURLs ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_UseProvidedURLs ( void )
 {
+    if ( m_JobInfo.slim.iFilesize > 0 )
+    {
+        // Check if files not included in the smaller archive are already installed
+        bool bUseSlim = true;
+        for ( uint i = 0 ; i < m_JobInfo.slim.dependencyInfoMap.size() ; i++ )
+        {
+            const SDataInfoItem& dependencyItem = m_JobInfo.slim.dependencyInfoMap[i];
+            if ( dependencyItem.strName == "dependency" )
+            {
+                SString strRequiredMd5 = dependencyItem.GetAttribute( "md5" );
+                SString strFilename = dependencyItem.strValue;
+                if ( strRequiredMd5.length() == 32 )
+                {
+                    SString strPathFilename = CalcMTASAPath( strFilename );
+                    SString strActualMd5 = GenerateHashHexStringFromFile( EHashFunctionType::MD5, strPathFilename );
+                    if ( strRequiredMd5.CompareI( strActualMd5 ) == false )
+                    {
+                        bUseSlim = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ( bUseSlim )
+        {
+            // We can use the smaller archive
+            m_JobInfo.strFilename   = m_JobInfo.slim.strFilename;
+            m_JobInfo.iFilesize     = m_JobInfo.slim.iFilesize;
+            m_JobInfo.strMD5        = m_JobInfo.slim.strMD5;
+            m_JobInfo.serverInfoMap = m_JobInfo.slim.serverInfoMap;
+        }
+        m_JobInfo.slim.iFilesize = 0;
+    }
+
     CDataInfoSet serverInfoMap = m_JobInfo.serverInfoMap;
     m_JobInfo.serverList = MakeServerList ( serverInfoMap );
 }
