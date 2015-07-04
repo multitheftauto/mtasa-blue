@@ -1470,7 +1470,6 @@ void CSettings::CreateGUI ( void )
     m_pUpdateBuildTypeCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pUpdateBuildTypeCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
     m_pUpdateBuildTypeCombo->AddItem ( _("Default") )->SetData ( (void*)0 );
-    m_pUpdateBuildTypeCombo->AddItem ( "Beta" )->SetData ( (void*)1 );
     m_pUpdateBuildTypeCombo->AddItem ( "Nightly" )->SetData ( (void*)2 );
     m_pUpdateBuildTypeCombo->SetReadOnly ( true );
     vecTemp.fX += fComboWidth + 15;
@@ -2939,8 +2938,7 @@ void CSettings::LoadData ( void )
 
     // Update build type
     CVARS_GET ( "update_build_type", iVar );
-    if ( iVar == 0 ) m_pUpdateBuildTypeCombo->SetText ( _("Default") );
-    else if ( iVar == 1 ) m_pUpdateBuildTypeCombo->SetText ( "Beta" );
+    if ( iVar == 0 || iVar == 1 ) m_pUpdateBuildTypeCombo->SetText ( _("Default") );
     else if ( iVar == 2 ) m_pUpdateBuildTypeCombo->SetText ( "Nightly" );
 
     // Update auto install

@@ -670,13 +670,13 @@ HRESULT CEffectWrapImpl::Begin( UINT* pPasses, DWORD Flags )
     for ( uint i = 0 ; i < m_SecondaryRenderTargetList.size() ; i++ )
     {
         D3DXHANDLE hTexture = m_SecondaryRenderTargetList[i];
-        IDirect3DBaseTexture9* pD3DTexture;
+        IDirect3DBaseTexture9* pD3DTexture = NULL;
         HRESULT hr = m_pD3DEffect->GetTexture( hTexture, &pD3DTexture );
-        if ( hr == D3D_OK && pD3DTexture->GetType() == D3DRTYPE_TEXTURE )
+        if ( hr == D3D_OK && pD3DTexture && pD3DTexture->GetType() == D3DRTYPE_TEXTURE )
         {
-            IDirect3DSurface9* pD3DSurface;
+            IDirect3DSurface9* pD3DSurface = NULL;
             HRESULT hr = ((IDirect3DTexture9*)pD3DTexture)->GetSurfaceLevel ( 0, &pD3DSurface );
-            if ( hr == D3D_OK )
+            if ( hr == D3D_OK && pD3DSurface )
             {
                 LPDIRECT3DDEVICE9 pDevice;
                 m_pD3DEffect->GetDevice ( &pDevice );

@@ -61,7 +61,7 @@ public:
     inline bool                     IsNametagColorOverridden( void )                                { return m_bNametagColorOverridden; }
 
     inline const char*              GetNametagText          ( void )                                { return m_strNametag.c_str (); }
-    inline void                     SetNametagText          ( const char* szText );
+    void                            SetNametagText          ( const char* szText );
     inline bool                     IsNametagShowing        ( void )                                { return m_bNametagShowing; }
     inline void                     SetNametagShowing       ( bool bShowing )                       { m_bNametagShowing = bShowing; }
     inline unsigned long            GetLastNametagShow      ( void )                                { return m_ulLastNametagShow; }

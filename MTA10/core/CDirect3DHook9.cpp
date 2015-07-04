@@ -82,6 +82,28 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
         CCore::GetSingleton ( ).CreateGUI ( );
     }
 
+    // D3DX_SDK_VERSION checks
+    // August 2009 SDK required for shaders to work properly
+    #if D3DX_SDK_VERSION != 42
+        WriteDebugEvent( "D3DX_SDK_VERSION incorrect " QUOTE_DEFINE( D3DX_SDK_VERSION ) );
+        #pragma message( "WARNING: Microsoft DirectX SDK (August 2009) includes missing" )
+        #ifndef MTA_DEBUG
+            #error "Microsoft DirectX SDK (August 2009) includes missing"
+        #endif
+    #endif
+    if ( !D3DXCheckVersion( D3D_SDK_VERSION, D3DX_SDK_VERSION ) )
+    {
+        SString strMessage( "D3DXCheckVersion FAILED (D3D_SDK_VERSION: %d  D3DX_SDK_VERSION: %d  SDKVersion: %d)", D3D_SDK_VERSION, D3DX_SDK_VERSION, SDKVersion );
+        WriteDebugEvent( strMessage );
+        AddReportLog( 9640, strMessage );
+    }
+    else
+    {
+        SString strMessage( "D3DXCheckVersion success (D3D_SDK_VERSION: %d  D3DX_SDK_VERSION: %d  SDKVersion: %d)", D3D_SDK_VERSION, D3DX_SDK_VERSION, SDKVersion );
+        WriteDebugEvent( strMessage );
+    }
+
+
     // Create our interface.
     WriteDebugEvent ( "Calling Direct3DCreate9" );
     IDirect3D9* pDirect3D9 = pThis->m_pfnDirect3DCreate9 ( SDKVersion );
@@ -93,7 +115,7 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
         MessageBoxUTF8 ( NULL, _("Could not initialize Direct3D9.\n\n"
                            "Please ensure the DirectX End-User Runtime and\n"
                            "latest Windows Service Packs are installed correctly.")
-                           , _("Error")+_E("CC50"), MB_OK | MB_ICONEXCLAMATION | MB_TOPMOST  ); // Could not initialize Direct3D9.  Please ensure the DirectX End-User Runtime and latest Windows Service Packs are installed correctly.
+                           , _("Error")+_E("CC50"), MB_OK | MB_ICONERROR | MB_TOPMOST  ); // Could not initialize Direct3D9.  Please ensure the DirectX End-User Runtime and latest Windows Service Packs are installed correctly.
         return NULL;
     }
 
