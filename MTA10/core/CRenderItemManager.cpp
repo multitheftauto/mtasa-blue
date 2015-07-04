@@ -1040,6 +1040,22 @@ void CRenderItemManager::NotifyShaderItemUsesDepthBuffer ( CShaderItem* pShaderI
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::NotifyShaderItemUsesMultipleRenderTargets
+//
+//
+//
+////////////////////////////////////////////////////////////////
+void CRenderItemManager::NotifyShaderItemUsesMultipleRenderTargets ( CShaderItem* pShaderItem, bool bUsesMultipleRenderTargets )
+{
+    if ( bUsesMultipleRenderTargets )
+        MapInsert ( m_ShadersUsingMultipleRenderTargets, pShaderItem );
+    else
+        MapRemove ( m_ShadersUsingMultipleRenderTargets, pShaderItem );
+}
+
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::PreDrawWorld
 //
 //
@@ -1051,74 +1067,87 @@ void CRenderItemManager::PreDrawWorld ( void )
     g_pDeviceState->MainSceneState.TransformState = g_pDeviceState->TransformState;
     IDirect3DTexture9*& pReadableDepthBuffer = g_pDeviceState->MainSceneState.DepthBuffer;
 
-    // Create/destroy readable depth buffer depending on what is needed
-    bool bRequireDepthBuffer = !m_ShadersUsingDepthBuffer.empty ();
+    // Determine what is needed
+    bool bRequireDepthBuffer = false;
+    if ( !m_ShadersUsingDepthBuffer.empty () && m_depthBufferFormat != RFORMAT_UNKNOWN )
+        bRequireDepthBuffer = true;
+
+    bool bRequireNonAADisplay = false;
+    if ( g_pDeviceState->CreationState.PresentationParameters.MultiSampleType != D3DMULTISAMPLE_NONE )
+        bRequireNonAADisplay = bRequireDepthBuffer || !m_ShadersUsingMultipleRenderTargets.empty();
 
     // Readable depth buffer is not compatible with volumetric shadows
     CCore::GetSingleton ().GetGame ()->GetSettings ()->SetVolumetricShadowsSuspended( bRequireDepthBuffer );
 
+    // Destroy old stuff that we don't need anymore
     if ( !bRequireDepthBuffer )
     {
         SAFE_RELEASE( pReadableDepthBuffer );
+    }
+    if ( !bRequireNonAADisplay )
+    {
         SAFE_RELEASE( m_pNonAARenderTargetTexture );
         SAFE_RELEASE( m_pNonAARenderTarget );
         SAFE_RELEASE( m_pNonAADepthSurface2 );
     }
 
-    if ( bRequireDepthBuffer && !pReadableDepthBuffer && m_depthBufferFormat != RFORMAT_UNKNOWN )
+    // Create new stuff that we need now
+    if ( bRequireDepthBuffer && !pReadableDepthBuffer )
     {
         // Create readable depth buffer
         m_pDevice->CreateTexture ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_DEPTHSTENCIL, (D3DFORMAT)m_depthBufferFormat, D3DPOOL_DEFAULT, &pReadableDepthBuffer, NULL );
+    }
+    if ( bRequireNonAADisplay && !m_pNonAARenderTarget )
+    {
+        // Create a non-AA render target and depth buffer
+        assert( !m_pNonAARenderTargetTexture );
+        assert( !m_pNonAADepthSurface2 );
 
-        if ( pReadableDepthBuffer )
+        const D3DPRESENT_PARAMETERS& pp = g_pDeviceState->CreationState.PresentationParameters;
+        if ( !m_bIsSwiftShader )
+            m_pDevice->CreateRenderTarget( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false, &m_pNonAARenderTarget, NULL );
+        else
         {
-            assert( !m_pNonAARenderTargetTexture );
-            assert( !m_pNonAARenderTarget );
-            assert( !m_pNonAADepthSurface2 );
-
-            const D3DPRESENT_PARAMETERS& pp = g_pDeviceState->CreationState.PresentationParameters;
-            if ( pp.MultiSampleType != D3DMULTISAMPLE_NONE )
-            {
-                // If device is using an AA swapchain, then:
-                //      1. Create a non-AA render target to pair with our readable depth buffer
-                //      2. Create second depth buffer for pairing with non-AA render target when readable depth buffer needs to be preserved
-                if ( !m_bIsSwiftShader )
-                    m_pDevice->CreateRenderTarget( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false, &m_pNonAARenderTarget, NULL );
-                else
-                {
-                    // Render target texture is needed when emulating StretchRect
-                    m_pDevice->CreateTexture ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_RENDERTARGET, pp.BackBufferFormat, D3DPOOL_DEFAULT, &m_pNonAARenderTargetTexture, NULL );
-                    if ( m_pNonAARenderTargetTexture )
-                        m_pNonAARenderTargetTexture->GetSurfaceLevel ( 0, &m_pNonAARenderTarget );
-                }
-
-                m_pDevice->CreateDepthStencilSurface( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.AutoDepthStencilFormat, D3DMULTISAMPLE_NONE, 0, true, &m_pNonAADepthSurface2, NULL );
-            }
+            // Render target texture is needed when emulating StretchRect
+            m_pDevice->CreateTexture ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_RENDERTARGET, pp.BackBufferFormat, D3DPOOL_DEFAULT, &m_pNonAARenderTargetTexture, NULL );
+            if ( m_pNonAARenderTargetTexture )
+                m_pNonAARenderTargetTexture->GetSurfaceLevel ( 0, &m_pNonAARenderTarget );
         }
+
+        m_pDevice->CreateDepthStencilSurface( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.AutoDepthStencilFormat, D3DMULTISAMPLE_NONE, 0, true, &m_pNonAADepthSurface2, NULL );
     }
 
-    // Set readable depth buffer if needed
-    if ( pReadableDepthBuffer != NULL && m_pSavedSceneDepthSurface == NULL )
+    // Set depth buffer and maybe render target
+    if ( ( pReadableDepthBuffer || m_pNonAADepthSurface2 ) && m_pSavedSceneDepthSurface == NULL )
     {
         if ( m_pDevice->GetDepthStencilSurface ( &m_pSavedSceneDepthSurface ) == D3D_OK )
         {
-            IDirect3DSurface9* pSurf = NULL;
-            if ( pReadableDepthBuffer->GetSurfaceLevel ( 0, &pSurf ) == D3D_OK )
+            if ( pReadableDepthBuffer )
             {
-                m_pDevice->SetDepthStencilSurface ( pSurf );
-                m_bUsingReadableDepthBuffer = true;
-                pSurf->Release ();
-
-                // Also switch to non-AA render target if created
-                if ( m_pNonAARenderTarget )
+                // Set readable depth buffer
+                IDirect3DSurface9* pSurf = NULL;
+                if ( pReadableDepthBuffer->GetSurfaceLevel ( 0, &pSurf ) == D3D_OK )
                 {
-                    if ( m_pDevice->GetRenderTarget( 0, &m_pSavedSceneRenderTargetAA ) == D3D_OK )
-                    {
-                        m_pDevice->SetRenderTarget( 0, m_pNonAARenderTarget );
-                    }
+                    m_pDevice->SetDepthStencilSurface ( pSurf );
+                    m_bUsingReadableDepthBuffer = true;
+                    pSurf->Release ();
                 }
-                m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
             }
+            else
+            {
+                // Set non-AA depth buffer
+                m_pDevice->SetDepthStencilSurface ( m_pNonAADepthSurface2 );
+            }
+
+            // Also switch to non-AA render target if created
+            if ( m_pNonAARenderTarget )
+            {
+                if ( m_pDevice->GetRenderTarget( 0, &m_pSavedSceneRenderTargetAA ) == D3D_OK )
+                {
+                    m_pDevice->SetRenderTarget( 0, m_pNonAARenderTarget );
+                }
+            }
+            m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
         }
     }
 }

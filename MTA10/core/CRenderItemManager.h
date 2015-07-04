@@ -68,6 +68,7 @@ public:
     void                        UpdateMemoryUsage                   ( void );
     bool                        CanCreateRenderItem                 ( ClassId classId );
     void                        NotifyShaderItemUsesDepthBuffer     ( CShaderItem* pShaderItem, bool bUsesDepthBuffer );
+    void                        NotifyShaderItemUsesMultipleRenderTargets ( CShaderItem* pShaderItem, bool bUsesMultipleRenderTargets );
 
     static int                  GetBitsPerPixel                     ( D3DFORMAT Format );
     static int                  GetPitchDivisor                     ( D3DFORMAT Format );
@@ -104,6 +105,7 @@ protected:
     bool                                        m_bUsingReadableDepthBuffer;
     ERenderFormat                               m_depthBufferFormat;
     std::set < CShaderItem* >                   m_ShadersUsingDepthBuffer;
+    std::set < CShaderItem* >                   m_ShadersUsingMultipleRenderTargets;
     IDirect3DSurface9*                          m_pSavedSceneDepthSurface;
     IDirect3DSurface9*                          m_pSavedSceneRenderTargetAA;
     IDirect3DSurface9*                          m_pNonAADepthSurface2;

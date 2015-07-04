@@ -143,6 +143,9 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Restore in case script forgets
     CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();
 
+    // Must do this before GUI draw to prevent NVidia performance problems
+    CGraphics::GetSingleton ().GetRenderItemManager ()->FlushNonAARenderTarget();
+
     bool bTookScreenShot = false;
     if ( !CGraphics::GetSingleton ().GetScreenGrabber ()->IsQueueEmpty () )
     {
@@ -187,8 +190,6 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     CheckForScreenShot ();
 
     TIMING_CHECKPOINT( "-OnPresent2" );
-
-    CGraphics::GetSingleton ().GetRenderItemManager ()->FlushNonAARenderTarget();
 }
 
 

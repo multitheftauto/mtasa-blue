@@ -156,6 +156,7 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
     }
 
     m_pManager->NotifyShaderItemUsesDepthBuffer ( this, m_pEffectWrap->m_bUsesDepthBuffer );
+    m_pManager->NotifyShaderItemUsesMultipleRenderTargets ( this, !m_pEffectWrap->m_SecondaryRenderTargetList.empty() );
        
     // Create instance to store param values
     RenewShaderInstance ();
@@ -172,6 +173,7 @@ void CShaderItem::CreateUnderlyingData ( const SString& strFilename, const SStri
 void CShaderItem::ReleaseUnderlyingData ( void )
 {
     m_pManager->NotifyShaderItemUsesDepthBuffer ( this, false );
+    m_pManager->NotifyShaderItemUsesMultipleRenderTargets ( this, false );
     SAFE_RELEASE( m_pEffectWrap )
     SAFE_RELEASE( m_pShaderInstance );
 }
