@@ -164,6 +164,73 @@ int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
     return 1;
 }
 
+// Only when onfoot/invehicle
+int CLuaFunctionDefs::SetCameraFieldOfView ( lua_State* luaVM )
+{
+    float fFOV; eFieldOfViewMode eMode;
+    CScriptArgReader argStream ( luaVM );
+
+    argStream.ReadEnumString ( eMode );
+    argStream.ReadNumber ( fFOV );
+
+    if ( fFOV < 0 || fFOV > 179 )
+        argStream.SetCustomError ( "Outside 0-179 boundaries" );
+
+    if ( !argStream.HasErrors () )
+    {
+        if (eMode == FOV_MODE_PLAYER)
+            g_pGame->GetSettings ()->SetFieldOfViewPlayer ( fFOV );
+        else if ( eMode == FOV_MODE_VEHICLE )
+            g_pGame->GetSettings ()->SetFieldOfViewVehicle ( fFOV );
+        else if ( eMode == FOV_MODE_VEHICLE_MAX )
+            g_pGame->GetSettings ()->SetFieldOfViewVehicleMax ( fFOV );
+        else {
+            argStream.m_iIndex = 1;
+            m_pScriptDebugging->LogCustom ( luaVM, SString("Enum not yet implemented: " + EnumToString ( eMode )) );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+// Only when onfoot/invehicle
+int CLuaFunctionDefs::GetCameraFieldOfView ( lua_State* luaVM )
+{
+    eFieldOfViewMode eMode;
+    CScriptArgReader argStream ( luaVM );
+
+    argStream.ReadEnumString ( eMode );
+
+    if ( !argStream.HasErrors() )
+    {
+        float fFOV;
+        if ( eMode == FOV_MODE_PLAYER )
+            fFOV = g_pGame->GetSettings ()->GetFieldOfViewPlayer ();
+        else if ( eMode == FOV_MODE_VEHICLE )
+            fFOV = g_pGame->GetSettings ()->GetFieldOfViewVehicle ();
+        else if ( eMode == FOV_MODE_VEHICLE_MAX )
+            fFOV = g_pGame->GetSettings ()->GetFieldOfViewVehicleMax ();
+        else {
+            argStream.m_iIndex = 1;
+            m_pScriptDebugging->LogCustom ( luaVM, SString ( "Enum not yet implemented: " + EnumToString ( eMode ) ) );
+            lua_pushboolean ( luaVM, false );
+            return 1;
+        }
+
+        lua_pushnumber ( luaVM, fFOV );
+        return 1;
+    }
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::SetCameraTarget ( lua_State* luaVM )
 {

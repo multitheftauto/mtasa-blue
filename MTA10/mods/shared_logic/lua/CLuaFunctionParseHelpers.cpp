@@ -459,6 +459,13 @@ IMPLEMENT_ENUM_BEGIN(eWebBrowserMouseButton)
     ADD_ENUM(BROWSER_MOUSEBUTTON_RIGHT, "right")
 IMPLEMENT_ENUM_END("webbrowser-mouse-button")
 
+IMPLEMENT_ENUM_BEGIN(eFieldOfViewMode)
+    ADD_ENUM(FOV_MODE_PLAYER, "player")
+    ADD_ENUM(FOV_MODE_VEHICLE, "vehicle")
+    ADD_ENUM(FOV_MODE_VEHICLE_MAX, "vehicle_max")
+    ADD_ENUM(FOV_MODE_AIMING, "aiming")
+IMPLEMENT_ENUM_END("fieldofview-mode")
+
 //
 // Get best guess at name of userdata type
 //

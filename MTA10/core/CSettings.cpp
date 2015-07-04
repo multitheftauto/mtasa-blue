@@ -104,7 +104,7 @@ void CSettings::CreateGUI ( void )
     }
     else
     {
-		// Otherwise use black background image
+        // Otherwise use black background image
         CGUIStaticImage* pFiller = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
         pFiller->LoadFromFile ( CORE_MTA_FILLER );
         pFiller->SetVisible ( false );
@@ -1771,7 +1771,7 @@ void CSettings::UpdateVideoTab ( void )
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected ( GetApplicationSettingInt ( "customized-sa-files-request" ) != 0 );
-	m_pCheckBoxCustomizedSAFiles->SetVisible ( GetApplicationSettingInt ( "customized-sa-files-show" ) != 0 );
+    m_pCheckBoxCustomizedSAFiles->SetVisible ( GetApplicationSettingInt ( "customized-sa-files-show" ) != 0 );
 
     // Grass
     bool bGrassEnabled;
@@ -3057,13 +3057,12 @@ void CSettings::SaveData ( void )
     gameSettings->SetDrawDistance ( ( m_pDrawDistance->GetScrollPosition () * 0.875f ) + 0.925f );
     gameSettings->SetBrightness ( m_pBrightness->GetScrollPosition () * 384 );
     gameSettings->SetMouseSensitivity ( m_pMouseSensitivity->GetScrollPosition () );
-	gameSettings->SetMipMappingEnabled ( m_pCheckBoxMipMapping->GetSelected () );
+    gameSettings->SetMipMappingEnabled ( m_pCheckBoxMipMapping->GetSelected () );
     SetApplicationSettingInt ( "customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0 );
 
     // iFieldOfView
     int iFieldOfView = Min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
     CVARS_SET ( "fov", iFieldOfView );
-    gameSettings->SetFieldOfView ( iFieldOfView );
 
     // Anisotropic filtering
     int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
@@ -3090,7 +3089,7 @@ void CSettings::SaveData ( void )
     // Volumetric shadows
     bool bVolumetricShadowsEnabled = m_pCheckBoxVolumetricShadows->GetSelected ();
     CVARS_SET ( "volumetric_shadows", bVolumetricShadowsEnabled );
-	gameSettings->SetVolumetricShadowsEnabled ( bVolumetricShadowsEnabled );
+    gameSettings->SetVolumetricShadowsEnabled ( bVolumetricShadowsEnabled );
 
     // Device selection dialog
     bool bDeviceSelectionDialogEnabled = m_pCheckBoxDeviceSelectionDialog->GetSelected ();
