@@ -85,6 +85,7 @@ public:
 
     // CefRenderHandler methods
     virtual bool GetViewRect    ( CefRefPtr<CefBrowser> browser, CefRect& rect ) override;
+    virtual void OnPopupSize    ( CefRefPtr<CefBrowser> browser, const CefRect& rect ) override;
     virtual void OnPaint        ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height ) override;
     virtual void OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo ) override;
 
@@ -128,6 +129,7 @@ private:
     SString             m_CurrentTitle;
     std::mutex          m_PaintMutex;
     std::condition_variable m_PaintCV;
+    int                 m_RenderPopupOffsetX, m_RenderPopupOffsetY;
     std::map<SString, SString> m_Properties;
     bool                m_bHasInputFocus;
         

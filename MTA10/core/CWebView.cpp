@@ -362,6 +362,18 @@ bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
+// Implementation: CefRenderHandler::OnPopupSize                  //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPopupSize(CefRefPtr<CefBrowser>,constCefRect&) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnPopupSize ( CefRefPtr<CefBrowser> browser, const CefRect& rect )
+{
+    m_RenderPopupOffsetX = rect.x;
+    m_RenderPopupOffsetY = rect.y;
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
 // Implementation: CefRenderHandler::OnPaint                      //
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPaint(CefRefPtr%3CCefBrowser%3E,PaintElementType,constRectList&,constvoid*,int,int) //
 //                                                                //
@@ -409,7 +421,27 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
         }*/
 
         // Copy entire texture
-        memcpy ( LockedRect.pBits, buffer, width * height * 4 );
+        int theoreticalPitch = width * 4;
+        if ( LockedRect.Pitch == theoreticalPitch )
+            memcpy ( LockedRect.pBits, buffer, theoreticalPitch * height );
+        else
+        {
+            // We've to skip a few rows if this is a popup draw
+            // The pitch will never equal the theoretical pitch (see above) by definition
+            int skipRows = 0;
+            int skipPixels = 0;
+            if ( paintType == PaintElementType::PET_POPUP )
+            {
+                skipRows = m_RenderPopupOffsetY;
+                skipPixels = m_RenderPopupOffsetX;
+            }
+
+            uint32 destAddress = (uint32)LockedRect.pBits + skipPixels * 4;
+            for ( int i = 0; i < height; ++i )
+            {
+                memcpy ( (void*)(destAddress + LockedRect.Pitch * (i + skipRows)), (void*)((uint32)buffer + theoreticalPitch * i), theoreticalPitch );
+            }
+        }
 
         pD3DSurface->UnlockRect ();
     };
