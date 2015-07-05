@@ -9,7 +9,7 @@
 *****************************************************************************/
 #include "StdInc.h"
 #include "CWebView.h"
-#include <cef3/include/cef_url.h>
+#include <cef3/include/cef_parser.h>
 #include <cef3/include/cef_task.h>
 #include <cef3/include/cef_runnable.h>
 
@@ -568,12 +568,12 @@ bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFram
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeResourceLoad(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request )
+CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefRequestCallback> callback )
 {
     // Mostly the same as CWebView::OnBeforeBrowse
     CefURLParts urlParts;
     if ( !CefParseURL ( request->GetURL (), urlParts ) )
-        return true; // Cancel if invalid URL (this line will normally not be executed)
+        return RV_CANCEL; // Cancel if invalid URL (this line will normally not be executed)
 
     // Add some information to the HTTP header
     {
@@ -600,7 +600,7 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
     {
         SString domain = UTF16ToMbUTF8 ( urlParts.host.str );
         if ( IsLocal () )
-            return true; // Block remote requests in local mode generally
+            return RV_CANCEL; // Block remote requests in local mode generally
 
         eURLState urlState = g_pCore->GetWebCore ()->GetURLState ( domain );
         if ( urlState != eURLState::WEBPAGE_ALLOWED )
@@ -610,16 +610,16 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
                 SString ( request->GetURL () ), domain, urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1 );
             g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
 
-            return true; // Block if explicitly forbidden
+            return RV_CANCEL; // Block if explicitly forbidden
         }
 
         // Allow
-        return false;
+        return RV_CONTINUE;
     }
     else if ( scheme == L"mtalocal" )
     {
         // Allow :)
-        return false;
+        return RV_CONTINUE;
     }
 
      // Trigger onClientBrowserResourceBlocked event
@@ -627,7 +627,7 @@ bool CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<C
     g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
 
     // Block everything else
-    return true;
+    return RV_CANCEL;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -655,7 +655,7 @@ void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforePopup(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,constCefString&,constCefString&,constCefPopupFeatures&,CefWindowInfo&,CefRefPtr%3CCefClient%3E&,CefBrowserSettings&,bool*) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access )
+bool CWebView::OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access )
 {
     // ATTENTION: This method is called on the IO thread
     
@@ -754,7 +754,10 @@ bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString
     // Redirect console message to debug window (if development mode is enabled)
     if ( g_pCore->GetWebCore ()->IsTestModeEnabled () )
     {
-        g_pCore->DebugPrintfColor ( "[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8 ( message ).c_str (), UTF16ToMbUTF8 ( source ).c_str () );
+        g_pCore->GetWebCore ()->AddEventToEventQueue ( [message, source]() { 
+            g_pCore->DebugPrintfColor ( "[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8 ( message ).c_str (), UTF16ToMbUTF8 ( source ).c_str () ); 
+        }, this, "OnConsoleMessage" );
+        
     }
 
     return true;

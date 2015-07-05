@@ -15,7 +15,7 @@
 #include <cef3/include/cef_app.h>
 #include <cef3/include/cef_browser.h>
 #include <cef3/include/cef_sandbox_win.h>
-#include <cef3/include/cef_url.h>
+#include <cef3/include/cef_parser.h>
 #include <cef3/include/wrapper/cef_stream_resource_handler.h>
 #include "WebBrowserHelpers.h"
 
