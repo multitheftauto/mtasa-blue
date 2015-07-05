@@ -16,7 +16,6 @@
 
 #include <ctime>
 #include <gui/CGUI.h>
-#include <xfire.h>
 #include "CServerInfo.h"
 
 class CConnectManager

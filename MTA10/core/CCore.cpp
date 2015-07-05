@@ -173,10 +173,6 @@ CCore::CCore ( void )
     // Reset the screenshot flag
     bScreenShot = false;
 
-    //Create our current server and set the update time to zero
-    m_pCurrentServer = new CXfireServerInfo();
-    m_tXfireUpdate = 0;
-
     // No initial fps limit
     m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
@@ -245,9 +241,6 @@ CCore::~CCore ( void )
 
     // Delete the logger
     delete m_pConsoleLogger;
-
-    //Delete the Current Server
-    delete m_pCurrentServer;
 
     // Delete last so calls to GetHookedWindowHandle do not crash
     delete m_pMessageLoopHook;
@@ -1330,36 +1323,6 @@ void CCore::DoPostFramePulse ( )
 
     m_Community.DoPulse ();
 
-    //XFire polling
-    if ( IsConnected() )
-    {
-        time_t ttime;
-        ttime = time ( NULL );
-        if ( ttime >= m_tXfireUpdate + XFIRE_UPDATE_RATE )
-        {
-            if ( m_pCurrentServer->IsSocketClosed() )
-            {
-                //Init our socket
-                m_pCurrentServer->Init();
-            }
-            //Get our xfire query reply
-            SString strReply = UpdateXfire( );
-            //If we Parsed or if the reply failed wait another XFIRE_UPDATE_RATE until trying again
-            if ( strReply == "ParsedQuery" || strReply == "NoReply" ) 
-            {
-                m_tXfireUpdate = time ( NULL );
-                //Close the socket
-                m_pCurrentServer->SocketClose();
-            }
-        }
-    }
-    //Set our update time to zero to ensure that the first xfire update happens instantly when joining
-    else
-    {
-        XfireSetCustomGameData ( 0, NULL, NULL );
-        if ( m_tXfireUpdate != 0 )
-            m_tXfireUpdate = 0;
-    }
     TIMING_CHECKPOINT( "-CorePostFrame2" );
 }
 
@@ -1783,68 +1746,6 @@ void CCore::UpdateRecentlyPlayed()
     //Save our configuration file
     CCore::GetSingleton ().SaveConfig ();
 }
-
-void CCore::SetCurrentServer( in_addr Addr, unsigned short usGamePort )
-{
-    //Set the current server info so we can query it with ASE for xfire
-    m_pCurrentServer->ChangeAddress( Addr, usGamePort );
-}
-
-SString CCore::UpdateXfire( void )
-{
-    //Check if a current server exists
-    if ( m_pCurrentServer ) 
-    {
-        //Get the result from the Pulse method
-        std::string strResult = m_pCurrentServer->Pulse();
-        //Have we parsed the query this function call?
-        if ( strResult == "ParsedQuery" )
-        {
-            //Get our Nick from CVARS
-            std::string strNick;
-            CVARS_GET ( "nick", strNick );
-            //Format a player count
-            SString strPlayerCount("%i / %i", m_pCurrentServer->nPlayers, m_pCurrentServer->nMaxPlayers);
-            // Set as our custom date
-            SetXfireData( m_pCurrentServer->strName, m_pCurrentServer->strVersion, m_pCurrentServer->bPassworded, m_pCurrentServer->strGameMode, m_pCurrentServer->strMap, strNick, strPlayerCount );
-        }
-        //Return the result
-        return strResult;
-    }
-    return "";
-}
-
-void CCore::SetXfireData ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount )
-{
-    if ( XfireIsLoaded () )
-    {
-        //Set our "custom data"
-        const char *szKey[7], *szValue[7];
-        szKey[0] = "Server Name";
-        szValue[0] = strServerName.c_str();
-
-        szKey[1] = "Server Version";
-        szValue[1] = strVersion.c_str();
-
-        szKey[2] = "Passworded";
-        szValue[2] = bPassworded ? "Yes" : "No";
-
-        szKey[3] = "Gamemode";
-        szValue[3] = strGamemode.c_str();
-
-        szKey[4] = "Map";
-        szValue[4] = strMap.c_str();
-
-        szKey[5] = "Player Name";
-        szValue[5] = strPlayerName.c_str();
-
-        szKey[6] = "Player Count";
-        szValue[6] = strPlayerCount.c_str();
-        
-        XfireSetCustomGameData ( 7, szKey, szValue );
-    }
-}
-
 
 //
 // Recalculate FPS limit to use

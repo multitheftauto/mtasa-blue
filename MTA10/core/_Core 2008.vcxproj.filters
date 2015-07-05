@@ -320,13 +320,7 @@
     <ClCompile Include="CVideoModeManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CXfireQuery.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StdInc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="xfire.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tracking\CHTTPClient.cpp">
@@ -619,13 +613,7 @@
     <ClInclude Include="CVideoModeManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CXfireQuery.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StdInc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="xfire.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tracking\CHTTPClient.h">

@@ -47,7 +47,6 @@ class CCore;
 #include "CCommunity.h"
 #include <xml/CXML.h>
 #include <ijsify.h>
-#include "CXfireQuery.h"
 #include "CWebCore.h"
 
 #define DIRECTINPUT_VERSION 0x0800
@@ -246,11 +245,6 @@ public:
     bool                    WasLaunchedWithConnectURI       ( void );
     void                    HandleCrashDumpEncryption       ( void );
 
-    //XFire
-    SString                 UpdateXfire                     ( void );
-    void                    SetCurrentServer                ( in_addr Addr, unsigned short usGamePort );
-    void                    SetXfireData                    ( std::string strServerName, std::string strVersion, bool bPassworded, std::string strGamemode, std::string strMap, std::string strPlayerName, std::string strPlayerCount );
-
     void                    OnPreFxRender                   ( void );
     void                    OnPreHUDRender                  ( void );
     void                    OnDeviceRestore                 ( void );
@@ -343,10 +337,6 @@ private:
 
     // screen res
     DEVMODE                     m_Current;
-
-    //Xfire Update
-    CXfireServerInfo*           m_pCurrentServer;
-    time_t                      m_tXfireUpdate;
 
     SString                     m_strModInstallRoot;
 

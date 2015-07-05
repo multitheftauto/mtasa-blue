@@ -740,9 +740,6 @@ DontInstallRedistVC12:
 
 		SetOutPath "$INSTDIR"
         File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe"
-		!ifndef LIGHTBUILD
-            File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe.dat"
-		!endif
 
         # Ensure exe file can be updated without admin
 		AccessControl::GrantOnFile "$INSTDIR\Multi Theft Auto.exe" "(BU)" "FullAccess"
