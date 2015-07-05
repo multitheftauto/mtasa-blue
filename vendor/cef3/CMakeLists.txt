@@ -280,7 +280,6 @@ if(OS_LINUX)
     chrome-sandbox
     libffmpegsumo.so
     libcef.so
-    libpdf.so
     natives_blob.bin
     snapshot_blob.bin
     )
@@ -442,7 +441,8 @@ if(OS_WINDOWS)
     libcef.dll
     libEGL.dll
     libGLESv2.dll
-    pdf.dll
+    natives_blob.bin
+    snapshot_blob.bin
     )
   if(PROJECT_ARCH STREQUAL "x86")
     # Only used on 32-bit platforms.

@@ -13,6 +13,7 @@
 #include "libcef_dll/ctocpp/binary_value_ctocpp.h"
 #include "libcef_dll/ctocpp/dictionary_value_ctocpp.h"
 #include "libcef_dll/ctocpp/list_value_ctocpp.h"
+#include "libcef_dll/ctocpp/value_ctocpp.h"
 
 
 // STATIC METHODS - Body may be edited by hand.
@@ -64,6 +65,44 @@ bool CefListValueCToCpp::IsReadOnly() {
 
   // Execute
   int _retval = struct_->is_read_only(struct_);
+
+  // Return type: bool
+  return _retval?true:false;
+}
+
+bool CefListValueCToCpp::IsSame(CefRefPtr<CefListValue> that) {
+  if (CEF_MEMBER_MISSING(struct_, is_same))
+    return false;
+
+  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
+
+  // Verify param: that; type: refptr_same
+  DCHECK(that.get());
+  if (!that.get())
+    return false;
+
+  // Execute
+  int _retval = struct_->is_same(struct_,
+      CefListValueCToCpp::Unwrap(that));
+
+  // Return type: bool
+  return _retval?true:false;
+}
+
+bool CefListValueCToCpp::IsEqual(CefRefPtr<CefListValue> that) {
+  if (CEF_MEMBER_MISSING(struct_, is_equal))
+    return false;
+
+  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
+
+  // Verify param: that; type: refptr_same
+  DCHECK(that.get());
+  if (!that.get())
+    return false;
+
+  // Execute
+  int _retval = struct_->is_equal(struct_,
+      CefListValueCToCpp::Unwrap(that));
 
   // Return type: bool
   return _retval?true:false;
@@ -158,6 +197,25 @@ CefValueType CefListValueCToCpp::GetType(int index) {
 
   // Return type: simple
   return _retval;
+}
+
+CefRefPtr<CefValue> CefListValueCToCpp::GetValue(int index) {
+  if (CEF_MEMBER_MISSING(struct_, get_value))
+    return NULL;
+
+  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
+
+  // Verify param: index; type: simple_byval
+  DCHECK_GE(index, 0);
+  if (index < 0)
+    return NULL;
+
+  // Execute
+  cef_value_t* _retval = struct_->get_value(struct_,
+      index);
+
+  // Return type: refptr_same
+  return CefValueCToCpp::Wrap(_retval);
 }
 
 bool CefListValueCToCpp::GetBool(int index) {
@@ -293,6 +351,30 @@ CefRefPtr<CefListValue> CefListValueCToCpp::GetList(int index) {
 
   // Return type: refptr_same
   return CefListValueCToCpp::Wrap(_retval);
+}
+
+bool CefListValueCToCpp::SetValue(int index, CefRefPtr<CefValue> value) {
+  if (CEF_MEMBER_MISSING(struct_, set_value))
+    return false;
+
+  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
+
+  // Verify param: index; type: simple_byval
+  DCHECK_GE(index, 0);
+  if (index < 0)
+    return false;
+  // Verify param: value; type: refptr_same
+  DCHECK(value.get());
+  if (!value.get())
+    return false;
+
+  // Execute
+  int _retval = struct_->set_value(struct_,
+      index,
+      CefValueCToCpp::Unwrap(value));
+
+  // Return type: bool
+  return _retval?true:false;
 }
 
 bool CefListValueCToCpp::SetNull(int index) {

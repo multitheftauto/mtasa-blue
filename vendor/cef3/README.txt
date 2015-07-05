@@ -1,15 +1,15 @@
 Chromium Embedded Framework (CEF) Standard Binary Distribution for Windows
 -------------------------------------------------------------------------------
 
-Date:             April 10, 2015
+Date:             June 05, 2015
 
-CEF Version:      3.2272.2077
-CEF URL:          https://chromiumembedded@bitbucket.org/chromiumembedded/branches-2272-cef3.git
-                  @2077
+CEF Version:      3.2357.1280.geba024d
+CEF URL:          https://bitbucket.org/chromiumembedded/cef.git
+                  @eba024daac2e2b873185d259508278aa973a3229
 
-Chromium Verison: 41.0.2272.76
+Chromium Verison: 43.0.2357.81
 Chromium URL:     https://chromium.googlesource.com/chromium/src.git
-                  @ff3293b421463d090f04f4d942d64af8cfd3b234
+                  @4d096306deb9e86953c81f08454dd6db07b406b5
 
 This distribution contains all components necessary to build and distribute an
 application using CEF on the Windows platform. Please see the LICENSING
@@ -57,7 +57,7 @@ Building using CMake:
 
 Please visit the CEF Website for additional usage information.
 
-http://code.google.com/p/chromiumembedded
+https://bitbucket.org/chromiumembedded/cef/
 
 
 REDISTRIBUTION
@@ -99,10 +99,6 @@ Optional components:
 * FFmpeg audio and video support
     ffmpegsumo.dll
   Note: Without this component HTML5 audio and video will not function.
-
-* PDF support
-    pdf.dll
-  Note: Without this component printing will not function.
 
 * Angle and Direct3D support
     d3dcompiler_43.dll (required for Windows XP)
