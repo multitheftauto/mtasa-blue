@@ -82,7 +82,8 @@ void InitLocalization( bool bNoFail )
     }
 
     // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
-    HMODULE hCoreModule = LoadLibrary( strCoreDLL );
+    // Use LOAD_WITH_ALTERED_SEARCH_PATH so the strCoreDLL path is searched first for dependent dlls
+    HMODULE hCoreModule = LoadLibraryEx( strCoreDLL, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
     if ( hCoreModule == NULL )
     {
         if ( !bNoFail )
