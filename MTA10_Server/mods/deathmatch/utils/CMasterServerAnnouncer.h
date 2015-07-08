@@ -234,7 +234,7 @@ public:
         SString strExtra( "%d_%d_%d_%s_%d", uiPlayerCount, uiMaxPlayerCount, bPassworded, *strAseMode, bAseLanListen );
 
         SMasterServerDefinition masterServerDefinitionList[] = {
-                                         { false, false, true,  "Querying game-monitor.com master server...", SString( QUERY_URL_GAME_MONITOR, usServerPort + 123 ) },
+                           // Gone away  { false, false, true,  "Querying game-monitor.com master server...", SString( QUERY_URL_GAME_MONITOR, usServerPort + 123 ) },
                                          { true,  true,  false, "Querying MTA master server...", SString( QUERY_URL_MTA_MASTER_SERVER, usServerPort, usServerPort + 123, usHTTPPort, *strVersion, *strExtra, *strServerIP ) },
                                        };
 

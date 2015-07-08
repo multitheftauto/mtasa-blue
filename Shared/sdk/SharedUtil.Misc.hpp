@@ -633,9 +633,12 @@ static SString GetReportLogHeaderText ( void )
 
 void SharedUtil::AddReportLog ( uint uiId, const SString& strText, uint uiAmountLimit )
 {
-    uint& uiAmount = MapGet( ms_ReportAmountMap, uiId );
-    if ( uiAmount++ >= uiAmountLimit )
-        return;
+    if ( uiAmountLimit )
+    {
+        uint& uiAmount = MapGet( ms_ReportAmountMap, uiId );
+        if ( uiAmount++ >= uiAmountLimit )
+            return;
+    }
 
     SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
     MakeSureDirExists ( strPathFilename );
