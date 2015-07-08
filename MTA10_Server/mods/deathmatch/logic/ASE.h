@@ -28,6 +28,7 @@ class ASE;
     #include <netinet/in.h>
     #include <arpa/inet.h>
     #define sockclose close
+    typedef int SOCKET;
 #endif
 
 #include <string.h>
@@ -51,7 +52,7 @@ class ASE
 {
 public:
     ZERO_ON_NEW
-                            ASE                      ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP = NULL );
+                            ASE                      ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList );
                             ~ASE                     ( void );
 
     void                    DoPulse                  ( void );
@@ -97,7 +98,7 @@ private:
 
     std::string             m_strGameType;
     std::string             m_strMapName;
-    std::string             m_strIP;
+    SString                 m_strIPList;
     std::string             m_strPort;
 
     static ASE*             _instance;
@@ -105,8 +106,7 @@ private:
 
     list < CASERule* >      m_Rules;
 
-    unsigned int            m_Socket;
-    sockaddr_in             m_SockAddr;
+    std::vector < SOCKET >  m_SocketList;
 
     unsigned short          m_usPortBase;
     unsigned short          m_usPort;

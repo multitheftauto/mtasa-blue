@@ -602,9 +602,11 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Enable it if required
     if ( m_pMainConfig->IsHTTPEnabled () )
     {
-        if ( !m_pHTTPD->StartHTTPD ( strServerIP, m_pMainConfig->GetHTTPPort () ) )
+        // Slight hack for internal HTTPD: Listen on all IPs if multiple IPs declared
+        SString strUseIP = ( strServerIP == strServerIPList ) ? strServerIP : "";
+        if ( !m_pHTTPD->StartHTTPD ( strUseIP, m_pMainConfig->GetHTTPPort () ) )
         {
-            CLogger::ErrorPrintf ( "Could not start HTTP server on interface '%s' and port '%u'!\n", strServerIP.c_str (), m_pMainConfig->GetHTTPPort () );
+            CLogger::ErrorPrintf ( "Could not start HTTP server on interface '%s' and port '%u'!\n", strUseIP.c_str (), m_pMainConfig->GetHTTPPort () );
             return false;
         }
     }
@@ -851,7 +853,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     }
 
     // If ASE is enabled
-    m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), strServerIP );
+    m_pASE = new ASE ( m_pMainConfig, m_pPlayerManager, static_cast < int > ( usServerPort ), strServerIPList );
     if ( m_pMainConfig->GetSerialVerificationEnabled () )
         m_pASE->SetRuleValue ( "SerialVerification", "yes" );
     ApplyAseSetting ();

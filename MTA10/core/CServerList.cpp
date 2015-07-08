@@ -462,7 +462,7 @@ void CServerListItem::Query ( void )
         ioctlsocket ( m_Socket, FIONBIO, &flag );
     }
 
-    sendto ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
+    g_pCore->GetNetwork()->SendTo ( m_Socket, "r", 1, 0, (sockaddr *) &addr, sizeof(addr) );
     m_ElapsedTime.Reset ();
 }
 
@@ -518,8 +518,9 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     // Port
     if ( !ReadString ( strTemp, szBuffer, i, nLength ) )
         return false;
-    if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PORT ) == false )
-        ChangeAddress( Address, atoi ( strTemp.c_str () ) );
+    // Don't update port here. We must already have the correct value.
+    //if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PORT ) == false )
+    //    ChangeAddress( Address, atoi ( strTemp.c_str () ) );
 
     // Server name
     if ( !ReadString ( strTemp, szBuffer, i, nLength ) )

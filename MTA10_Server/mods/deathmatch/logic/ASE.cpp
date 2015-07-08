@@ -23,7 +23,7 @@ extern "C"
 
 ASE* ASE::_instance = NULL;
 
-ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const char* szServerIP/*, bool bLan*/ )
+ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList/*, bool bLan*/ )
     : m_QueryDosProtect( 5, 6000, 7000 )        // Max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
@@ -53,12 +53,10 @@ ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned sh
 
     m_strGameType = "MTA:SA";
     m_strMapName = "None";
-    if ( szServerIP )
-        m_strIP = szServerIP;
+    m_strIPList = strServerIPList;
     std::stringstream ss;
     ss << usPort;
     m_strPort = ss.str();
-    m_Socket = INVALID_SOCKET;
 
     m_strMtaAseVersion = MTA_DM_ASE_VERSION;
 }
@@ -79,55 +77,64 @@ bool ASE::SetPortEnabled ( bool bInternetEnabled, bool bLanEnabled )
     ushort usPortReq = m_usPortBase + SERVER_LIST_QUERY_PORT_OFFSET;
 
     // Any change?
-    if ( ( m_Socket != INVALID_SOCKET ) == bPortEnableReq && m_usPort == usPortReq )
+    if ( ( !m_SocketList.empty() ) == bPortEnableReq && m_usPort == usPortReq )
         return true;
 
     m_usPort = usPortReq;
 
     // Remove current thingmy
-    if ( m_Socket != INVALID_SOCKET )
+    for ( uint s = 0 ; s < m_SocketList.size() ; s++ )
     {
-        closesocket( m_Socket );
-        m_Socket = INVALID_SOCKET;
+        closesocket( m_SocketList[s] );
     }
+    m_SocketList.clear();
 
     if ( !bPortEnableReq )
         return true;
 
     // Start new thingmy
-    m_SockAddr.sin_family = AF_INET;         
-    m_SockAddr.sin_port = htons ( m_usPort );
     // If a local IP has been specified, ensure it is used for sending
-    if ( m_strIP.length () )
-        m_SockAddr.sin_addr.s_addr = inet_addr( m_strIP.c_str () );
-    else
-        m_SockAddr.sin_addr.s_addr = INADDR_ANY;
-
-    // Initialize socket
-    m_Socket = socket ( AF_INET, SOCK_DGRAM, 0 );
-
-    // If we are in lan only mode, reuse addr to avoid possible conflicts
-    if ( bLanOnly )
+    std::vector < SString > ipList;
+    m_strIPList.Split( ",", ipList );
+    for ( uint i = 0 ; i < ipList.size() ; i++ )
     {
-        const int Flags = 1;
-        setsockopt ( m_Socket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
-    }
+        const SString& strIP = ipList[i];
+        sockaddr_in sockAddr;
+        sockAddr.sin_family = AF_INET;         
+        sockAddr.sin_port = htons ( m_usPort );
+        if ( !strIP.empty() )
+            sockAddr.sin_addr.s_addr = inet_addr( strIP );
+        else
+            sockAddr.sin_addr.s_addr = INADDR_ANY;
 
-    // Bind the socket
-    if ( ::bind ( m_Socket, ( sockaddr* ) &m_SockAddr, sizeof ( m_SockAddr ) ) != 0 )
-    {
-        sockclose ( m_Socket );
-        m_Socket = INVALID_SOCKET;
-        return false;
-    }
+        // Initialize socket
+        SOCKET newSocket = socket ( AF_INET, SOCK_DGRAM, 0 );
 
-    // Set it to non blocking, so we dont have to wait for a packet
-    #ifdef WIN32
-    unsigned long ulNonBlock = 1;
-    ioctlsocket ( m_Socket, FIONBIO, &ulNonBlock );
-    #else
-    fcntl ( m_Socket, F_SETFL, fcntl( m_Socket, F_GETFL ) | O_NONBLOCK ); 
-    #endif
+        // If we are in lan only mode, reuse addr to avoid possible conflicts
+        if ( bLanOnly )
+        {
+            const int Flags = 1;
+            setsockopt ( newSocket, SOL_SOCKET, SO_REUSEADDR, (const char *)&Flags, sizeof ( Flags ) );
+        }
+
+        // Bind the socket
+        if ( ::bind ( newSocket, ( sockaddr* ) &sockAddr, sizeof ( sockAddr ) ) != 0 )
+        {
+            sockclose ( newSocket );
+            newSocket = INVALID_SOCKET;
+            return false;
+        }
+
+        // Set it to non blocking, so we dont have to wait for a packet
+        #ifdef WIN32
+            unsigned long ulNonBlock = 1;
+            ioctlsocket ( newSocket, FIONBIO, &ulNonBlock );
+        #else
+            fcntl ( newSocket, F_SETFL, fcntl( newSocket, F_GETFL ) | O_NONBLOCK ); 
+        #endif
+
+        m_SocketList.push_back( newSocket );
+    }
 
     return true;
 }
@@ -135,7 +142,7 @@ bool ASE::SetPortEnabled ( bool bInternetEnabled, bool bLanEnabled )
 
 void ASE::DoPulse ( void )
 {
-    if ( m_Socket == INVALID_SOCKET )
+    if ( m_SocketList.empty() )
         return;
 
     sockaddr_in SockAddr;
@@ -150,60 +157,65 @@ void ASE::DoPulse ( void )
 
     char szBuffer[100];     // Extra bytes for future use
 
-    for ( uint i = 0 ; i < 100 ; i++ )
+    for ( uint s = 0 ; s < m_SocketList.size() ; s++ )
     {
-        // We set the socket to non-blocking so we can just keep reading
-        int iBuffer = recvfrom ( m_Socket, szBuffer, sizeof( szBuffer ), 0, (sockaddr*)&SockAddr, &nLen );
-        if ( iBuffer < 1 )
-            break;
+        SOCKET aseSocket = m_SocketList[s];
 
-        m_uiNumQueriesTotal++;
-
-        if ( m_QueryDosProtect.GetTotalFloodingCount () < 100 )
-            if ( m_QueryDosProtect.AddConnect ( inet_ntoa ( SockAddr.sin_addr ) ) )
-                continue;
-
-        const std::string* strReply = NULL;
-
-        switch ( szBuffer[0] )
+        for ( uint i = 0 ; i < 100 ; i++ )
         {
-            case 's':
-            { // ASE protocol query
-                m_ulMasterServerQueryCount++;
-                strReply = QueryFullCached ();
+            // We set the socket to non-blocking so we can just keep reading
+            int iBuffer = recvfrom ( aseSocket, szBuffer, sizeof( szBuffer ), 0, (sockaddr*)&SockAddr, &nLen );
+            if ( iBuffer < 1 )
                 break;
-            }
-            case 'b':
-            { // Our own lighter query for ingame browser
-                strReply = QueryLightCached ();
-                break;
-            }
-            case 'r':
-            { // Our own lighter query for ingame browser - Release version only
-                strReply = QueryLightCached ();
-                break;
-            }
-            case 'x':
-            { // Our own lighter query for xfire updates
-                strReply = QueryXfireLightCached ();
-                break;
-            }
-            case 'v':
-            { // MTA Version (For further possibilities to quick ping, in case we do multiply master servers)
-                strReply = &m_strMtaAseVersion;
-                break;
-            }
-        }
 
-        // If our reply buffer isn't empty, send it
-        if ( strReply && !strReply->empty() )
-        {
-            /*int sent =*/ sendto ( m_Socket,
-                                strReply->c_str(),
-                                strReply->length(),
-                                0,
-                                (sockaddr*)&SockAddr,
-                                nLen );
+            m_uiNumQueriesTotal++;
+
+            if ( m_QueryDosProtect.GetTotalFloodingCount () < 100 )
+                if ( m_QueryDosProtect.AddConnect ( inet_ntoa ( SockAddr.sin_addr ) ) )
+                    continue;
+
+            const std::string* strReply = NULL;
+
+            switch ( szBuffer[0] )
+            {
+                case 's':
+                { // ASE protocol query
+                    m_ulMasterServerQueryCount++;
+                    strReply = QueryFullCached ();
+                    break;
+                }
+                case 'b':
+                { // Our own lighter query for ingame browser
+                    strReply = QueryLightCached ();
+                    break;
+                }
+                case 'r':
+                { // Our own lighter query for ingame browser - Release version only
+                    strReply = QueryLightCached ();
+                    break;
+                }
+                case 'x':
+                { // Our own lighter query for xfire updates
+                    strReply = QueryXfireLightCached ();
+                    break;
+                }
+                case 'v':
+                { // MTA Version (For further possibilities to quick ping, in case we do multiply master servers)
+                    strReply = &m_strMtaAseVersion;
+                    break;
+                }
+            }
+
+            // If our reply buffer isn't empty, send it
+            if ( strReply && !strReply->empty() )
+            {
+                /*int sent =*/ sendto ( aseSocket,
+                                    strReply->c_str(),
+                                    strReply->length(),
+                                    0,
+                                    (sockaddr*)&SockAddr,
+                                    nLen );
+            }
         }
     }
 
