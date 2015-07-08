@@ -644,6 +644,11 @@ DontInstallRedistVC12:
 		SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libcef.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\icudtl.dat"
+		File "${FILES_ROOT}\MTA San Andreas\mta\ffmpegsumo.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
+		File "${FILES_ROOT}\MTA San Andreas\mta\natives_blob.bin"
+		File "${FILES_ROOT}\MTA San Andreas\mta\snapshot_blob.bin"
 		
 		SetOutPath "$INSTDIR\MTA\CEF"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher.exe"
@@ -681,9 +686,6 @@ DontInstallRedistVC12:
 
 			File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\ffmpegsumo.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
-			File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\wow_helper.exe"
 
             SetOutPath "$INSTDIR\MTA\config"
