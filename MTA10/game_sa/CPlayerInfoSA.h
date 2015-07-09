@@ -90,23 +90,23 @@ public:
     DWORD   m_bRequireHandleBreath : 1; // 
     
     // The player runs a group. Player is the leader. Player can go up to gang-members and make them join his group.  // 50
-    DWORD   m_GroupStuffDisabled : 1;   // 49 // if this is true the player can't recrout or give his group commands.
+    DWORD   m_GroupStuffDisabled : 1;   // 52 // if this is true the player can't recrout or give his group commands.
     DWORD   m_GroupAlwaysFollow : 1;    // The group is told to always follow the player (used for girlfriend missions)
     DWORD   m_GroupNeverFollow : 1; // The group is told to always follow the player (used for girlfriend missions)
     DWORD   m_bInVehicleDontAllowWeaponChange : 1; // stop weapon change once driveby weapon has been given
     DWORD   m_bRenderWeapon : 1;    //  set to false during cutscenes so that knuckledusters are not rendered
 
-    DWORD   m_pad2;                 // 52
+    DWORD   m_pad2;                 // 56
 
-    long    m_PlayerGroup;          // 56
+    long    m_PlayerGroup;          // 60
 
-    DWORD   m_AdrenalineEndTime;    // 60
-    BYTE    m_nDrunkenness;         // 64
-    bool    m_bFadeDrunkenness;     // 65
-    BYTE    m_nDrugLevel;           // 66
-    BYTE    m_nScriptLimitToGangSize; // 67
+    DWORD   m_AdrenalineEndTime;    // 64
+    BYTE    m_nDrunkenness;         // 68
+    bool    m_bFadeDrunkenness;     // 69
+    BYTE    m_nDrugLevel;           // 70
+    BYTE    m_nScriptLimitToGangSize; // 71
     
-    FLOAT   m_fBreath;  // for holding breath (ie underwater) // 68
+    FLOAT   m_fBreath;  // for holding breath (ie underwater) // 72
 
     // once a set of melee weapon anims have been loaded and referenced for the player
     // we need to remember what we've referenced
@@ -298,6 +298,9 @@ public:
 
     DWORD           GetLastTimeBigGunFired ( void );
     void            SetLastTimeBigGunFired ( DWORD dwTime );
+
+    byte            GetCamDrunkLevel ();
+    void            SetCamDrunkLevel ( byte level );
     
     inline DWORD    GetCarTwoWheelCounter       ( void )            { return internalInterface->nCarTwoWheelCounter; }
     inline float    GetCarTwoWheelDist          ( void )            { return internalInterface->fCarTwoWheelDist; }

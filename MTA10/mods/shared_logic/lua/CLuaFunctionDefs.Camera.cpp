@@ -111,6 +111,20 @@ int CLuaFunctionDefs::GetCameraGoggleEffect ( lua_State *luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetCameraShakeLevel ( lua_State* luaVM )
+{
+//  int getCameraShakeLevel ()
+    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo ();
+    if ( pPlayerInfo )
+    {
+        lua_pushnumber ( luaVM, pPlayerInfo->GetCamDrunkLevel () );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::SetCameraMatrix ( lua_State* luaVM )
 {
@@ -330,6 +344,36 @@ int CLuaFunctionDefs::SetCameraGoggleEffect ( lua_State *luaVM )
         }
     }
     else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetCameraShakeLevel ( lua_State* luaVM )
+{
+//  bool setCameraShakeLevel ( int level )
+    int drunkLevel;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( drunkLevel );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( drunkLevel >= 0 && drunkLevel <= 255 )
+        {
+            CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo ();
+            if ( pPlayerInfo )
+            {
+                pPlayerInfo->SetCamDrunkLevel ( static_cast<byte> ( drunkLevel ) );
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            argStream.SetCustomError ( "Invalid range (0-255)");
+    }
+    
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );

@@ -375,8 +375,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefs::GetPlayerFromName );
     CLuaCFunctions::AddFunction ( "getPlayerFromName", CLuaFunctionDefs::GetPlayerFromName );
     CLuaCFunctions::AddFunction ( "isPlayerHudComponentVisible", CLuaFunctionDefs::IsPlayerHudComponentVisible );
-    CLuaCFunctions::AddFunction ( "getPlayerMoney", CLuaFunctionDefs::GetPlayerMoney );   
-    CLuaCFunctions::AddFunction ( "getPlayerWantedLevel", CLuaFunctionDefs::GetPlayerWantedLevel ); 
+    CLuaCFunctions::AddFunction ( "getPlayerMoney", CLuaFunctionDefs::GetPlayerMoney );
+    CLuaCFunctions::AddFunction ( "getPlayerWantedLevel", CLuaFunctionDefs::GetPlayerWantedLevel );
 
     // Player set funcs
     CLuaCFunctions::AddFunction ( "showPlayerHudComponent", CLuaFunctionDefs::ShowPlayerHudComponent );
@@ -747,6 +747,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaFunctionDefs::GetCameraTarget );
     CLuaCFunctions::AddFunction ( "getCameraInterior", CLuaFunctionDefs::GetCameraInterior );
     CLuaCFunctions::AddFunction ( "getCameraGoggleEffect", CLuaFunctionDefs::GetCameraGoggleEffect );
+    CLuaCFunctions::AddFunction ( "getCameraShakeLevel", CLuaFunctionDefs::GetCameraShakeLevel );
 
     // Cam set funcs
     CLuaCFunctions::AddFunction ( "setCameraMatrix", CLuaFunctionDefs::SetCameraMatrix );
@@ -757,6 +758,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getCameraClip", CLuaFunctionDefs::GetCameraClip );
     CLuaCFunctions::AddFunction ( "setCameraViewMode", CLuaFunctionDefs::SetCameraViewMode );
     CLuaCFunctions::AddFunction ( "setCameraGoggleEffect", CLuaFunctionDefs::SetCameraGoggleEffect );
+    CLuaCFunctions::AddFunction ( "setCameraShakeLevel", CLuaFunctionDefs::SetCameraShakeLevel );
 
     // Cursor funcs
     CLuaCFunctions::AddFunction ( "getCursorPosition", CLuaFunctionDefs::GetCursorPosition );

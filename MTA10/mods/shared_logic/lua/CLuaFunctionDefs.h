@@ -519,6 +519,7 @@ public:
     LUA_DECLARE ( GetCameraTarget );
     LUA_DECLARE ( GetCameraInterior );
     LUA_DECLARE ( GetCameraGoggleEffect );
+    LUA_DECLARE ( GetCameraShakeLevel );
 
     // Cam set funcs
     LUA_DECLARE ( SetCameraMatrix );
@@ -529,6 +530,7 @@ public:
     LUA_DECLARE ( GetCameraClip );
     LUA_DECLARE ( SetCameraViewMode );
     LUA_DECLARE ( SetCameraGoggleEffect );
+    LUA_DECLARE ( SetCameraShakeLevel );
 
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );

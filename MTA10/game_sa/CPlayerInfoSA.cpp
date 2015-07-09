@@ -251,3 +251,16 @@ void CPlayerInfoSA::SetLastTimeBigGunFired ( DWORD dwTime )
 {
     internalInterface->LastTimeBigGunFired = dwTime;
 }
+
+byte CPlayerInfoSA::GetCamDrunkLevel ()
+{
+    return internalInterface->PlayerPedData.m_nDrunkenness;
+}
+
+void CPlayerInfoSA::SetCamDrunkLevel ( byte level )
+{
+    internalInterface->PlayerPedData.m_nDrunkenness = level;
+    internalInterface->PlayerPedData.m_bFadeDrunkenness = level == 0;
+
+    // SCM opcode handler for 0x52C sets 0xB7CD64 which is the game speed additionally to 0
+}

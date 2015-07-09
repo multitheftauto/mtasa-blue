@@ -28,11 +28,11 @@
 class CPadSAInterface
 {
 public:
-    CControllerState    NewState;
-    CControllerState    OldState;
+    CControllerState    NewState; // 0
+    CControllerState    OldState; // 48
     
-    signed short        SteeringLeftRightBuffer[STEERINGBUFFERLENGTH];
-    signed long         DrunkDrivingBufferUsed;
+    signed short        SteeringLeftRightBuffer[STEERINGBUFFERLENGTH]; // 96
+    signed long         DrunkDrivingBufferUsed; // 116
 
     //120
     CControllerState    PCTempKeyState;
@@ -87,6 +87,9 @@ public:
     VOID                SetHornHistoryValue( bool value );
     long                GetAverageWeapon ( void );
     void                SetLastTimeTouched ( DWORD dwTime );
+
+    uint                GetDrunkInputDelay () { return internalInterface->DrunkDrivingBufferUsed; };
+    void                SetDrunkInputDelay ( uint inputDelay ) { internalInterface->DrunkDrivingBufferUsed = inputDelay; }; // Does not work yet, guess it's caused by MTA's control logic
 };
 
 #endif

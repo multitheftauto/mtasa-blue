@@ -69,6 +69,8 @@ public:
     virtual VOID                SetHornHistoryValue( bool value )=0;
     virtual long                GetAverageWeapon ( void )=0;
     virtual void                SetLastTimeTouched ( DWORD dwTime )=0;
+    virtual uint                GetDrunkInputDelay () = 0;
+    virtual void                SetDrunkInputDelay ( uint inputDelay ) = 0;
 };
 
 #endif

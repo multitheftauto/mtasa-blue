@@ -41,6 +41,9 @@ public:
     virtual DWORD           GetLastTimeBigGunFired ( void ) = 0;
     virtual void            SetLastTimeBigGunFired ( DWORD dwTime ) = 0;
 
+    virtual byte            GetCamDrunkLevel () = 0;
+    virtual void            SetCamDrunkLevel ( byte level ) = 0;
+
     virtual DWORD           GetCarTwoWheelCounter       ( void ) = 0;
     virtual float           GetCarTwoWheelDist          ( void ) = 0;
     virtual DWORD           GetCarLess3WheelCounter     ( void ) = 0;
