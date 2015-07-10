@@ -7,42 +7,43 @@
 
 Archive::Archive(RAROptions *InitCmd)
 {
-  Cmd=InitCmd==NULL ? &DummyCmd:InitCmd;
+  Cmd=NULL; // Just in case we'll have an exception in 'new' below.
+
+  DummyCmd=(InitCmd==NULL);
+  Cmd=DummyCmd ? (new RAROptions):InitCmd;
+
   OpenShared=Cmd->OpenShared;
-  OldFormat=false;
+  Format=RARFMT15;
   Solid=false;
   Volume=false;
   MainComment=false;
   Locked=false;
   Signed=false;
-  NotFirstVolume=false;
+  FirstVolume=false;
+  NewNumbering=false;
   SFXSize=0;
   LatestTime.Reset();
   Protected=false;
   Encrypted=false;
   FailedHeaderDecryption=false;
-  BrokenFileHeader=false;
+  BrokenHeader=false;
   LastReadBlock=0;
 
   CurBlockPos=0;
   NextBlockPos=0;
 
-  RecoveryPos=SIZEOF_MARKHEAD;
-  RecoverySectors=-1;
+  RecoverySize=-1;
+  RecoveryPercent=-1;
 
-  memset(&NewMhd,0,sizeof(NewMhd));
-  NewMhd.HeadType=MAIN_HEAD;
-  NewMhd.HeadSize=SIZEOF_NEWMHD;
-  HeaderCRC=0;
+  memset(&MainHead,0,sizeof(MainHead));
+  memset(&CryptHead,0,sizeof(CryptHead));
+  memset(&EndArcHead,0,sizeof(EndArcHead));
+
+  VolNumber=0;
   VolWrite=0;
   AddingFilesSize=0;
   AddingHeadersSize=0;
-#if !defined(SHELL_EXT) && !defined(RAR_NOCRYPT)
-  *HeadersSalt=0;
-  *SubDataSalt=0;
-#endif
   *FirstVolumeName=0;
-  *FirstVolumeNameW=0;
 
   Splitting=false;
   NewArchive=false;
@@ -52,13 +53,22 @@ Archive::Archive(RAROptions *InitCmd)
 }
 
 
+Archive::~Archive()
+{
+  if (DummyCmd)
+    delete Cmd;
+}
+
 
 #ifndef SHELL_EXT
 void Archive::CheckArc(bool EnableBroken)
 {
   if (!IsArchive(EnableBroken))
   {
-    Log(FileName,St(MBadArc),FileName);
+    // If FailedHeaderDecryption is set, we already reported that archive
+    // password is incorrect.
+    if (!FailedHeaderDecryption)
+      uiMsg(UIERROR_BADARCHIVE,FileName);
     ErrHandler.Exit(RARX_FATAL);
   }
 }
@@ -66,37 +76,35 @@ void Archive::CheckArc(bool EnableBroken)
 
 
 #if !defined(SHELL_EXT) && !defined(SFX_MODULE)
-void Archive::CheckOpen(const char *Name,const wchar *NameW)
+void Archive::CheckOpen(const wchar *Name)
 {
-  TOpen(Name,NameW);
+  TOpen(Name);
   CheckArc(false);
 }
 #endif
 
 
-bool Archive::WCheckOpen(const char *Name,const wchar *NameW)
+bool Archive::WCheckOpen(const wchar *Name)
 {
-  if (!WOpen(Name,NameW))
-    return(false);
+  if (!WOpen(Name))
+    return false;
   if (!IsArchive(false))
   {
-#ifndef SHELL_EXT
-    Log(FileName,St(MNotRAR),FileName);
-#endif
+    uiMsg(UIERROR_BADARCHIVE,FileName);
     Close();
-    return(false);
+    return false;
   }
-  return(true);
+  return true;
 }
 
 
-ARCSIGN_TYPE Archive::IsSignature(const byte *D,size_t Size)
+RARFORMAT Archive::IsSignature(const byte *D,size_t Size)
 {
-  ARCSIGN_TYPE Type=ARCSIGN_NONE;
+  RARFORMAT Type=RARFMT_NONE;
   if (Size>=1 && D[0]==0x52)
 #ifndef SFX_MODULE
     if (Size>=4 && D[1]==0x45 && D[2]==0x7e && D[3]==0x5e)
-      Type=ARCSIGN_OLD;
+      Type=RARFMT14;
     else
 #endif
       if (Size>=7 && D[1]==0x61 && D[2]==0x72 && D[3]==0x21 && D[4]==0x1a && D[5]==0x07)
@@ -104,7 +112,14 @@ ARCSIGN_TYPE Archive::IsSignature(const byte *D,size_t Size)
         // We check for non-zero last signature byte, so we can return
         // a sensible warning in case we'll want to change the archive
         // format sometimes in the future.
-        Type=D[6]==0 ? ARCSIGN_CURRENT:ARCSIGN_FUTURE;
+        if (D[6]==0)
+          Type=RARFMT15;
+        else
+          if (D[6]==1)
+            Type=RARFMT50;
+          else
+            if (D[6]==2)
+              Type=RARFMT_FUTURE;
       }
   return Type;
 }
@@ -113,25 +128,25 @@ ARCSIGN_TYPE Archive::IsSignature(const byte *D,size_t Size)
 bool Archive::IsArchive(bool EnableBroken)
 {
   Encrypted=false;
+  BrokenHeader=false; // Might be left from previous volume.
+  
 #ifndef SFX_MODULE
   if (IsDevice())
   {
-#ifndef SHELL_EXT
-    Log(FileName,St(MInvalidName),FileName);
-#endif
-    return(false);
+    uiMsg(UIERROR_INVALIDNAME,FileName,FileName);
+    return false;
   }
 #endif
-  if (Read(MarkHead.Mark,SIZEOF_MARKHEAD)!=SIZEOF_MARKHEAD)
-    return(false);
+  if (Read(MarkHead.Mark,SIZEOF_MARKHEAD3)!=SIZEOF_MARKHEAD3)
+    return false;
   SFXSize=0;
   
-  ARCSIGN_TYPE Type;
-  if ((Type=IsSignature(MarkHead.Mark,sizeof(MarkHead.Mark)))!=ARCSIGN_NONE)
+  RARFORMAT Type;
+  if ((Type=IsSignature(MarkHead.Mark,SIZEOF_MARKHEAD3))!=RARFMT_NONE)
   {
-    OldFormat=(Type==ARCSIGN_OLD);
-    if (OldFormat)
-      Seek(0,SEEK_SET);
+    Format=Type;
+    if (Format==RARFMT14)
+      Seek(Tell()-SIZEOF_MARKHEAD3,SEEK_SET);
   }
   else
   {
@@ -139,10 +154,10 @@ bool Archive::IsArchive(bool EnableBroken)
     long CurPos=(long)Tell();
     int ReadSize=Read(&Buffer[0],Buffer.Size()-16);
     for (int I=0;I<ReadSize;I++)
-      if (Buffer[I]==0x52 && (Type=IsSignature((byte *)&Buffer[I],ReadSize-I))!=ARCSIGN_NONE)
+      if (Buffer[I]==0x52 && (Type=IsSignature((byte *)&Buffer[I],ReadSize-I))!=RARFMT_NONE)
       {
-        OldFormat=(Type==ARCSIGN_OLD);
-        if (OldFormat && I>0 && CurPos<28 && ReadSize>31)
+        Format=Type;
+        if (Format==RARFMT14 && I>0 && CurPos<28 && ReadSize>31)
         {
           char *D=&Buffer[28-CurPos];
           if (D[0]!=0x52 || D[1]!=0x53 || D[2]!=0x46 || D[3]!=0x58)
@@ -150,62 +165,28 @@ bool Archive::IsArchive(bool EnableBroken)
         }
         SFXSize=CurPos+I;
         Seek(SFXSize,SEEK_SET);
-        if (!OldFormat)
-          Read(MarkHead.Mark,SIZEOF_MARKHEAD);
+        if (Format==RARFMT15 || Format==RARFMT50)
+          Read(MarkHead.Mark,SIZEOF_MARKHEAD3);
         break;
       }
     if (SFXSize==0)
       return false;
   }
-  if (Type==ARCSIGN_FUTURE)
+  if (Format==RARFMT_FUTURE)
   {
-#if !defined(SHELL_EXT) && !defined(SFX_MODULE)
-    Log(FileName,St(MNewRarFormat));
-#endif
+    uiMsg(UIERROR_NEWRARFORMAT,FileName);
     return false;
   }
-  ReadHeader();
-  SeekToNext();
-#ifndef SFX_MODULE
-  if (OldFormat)
+  if (Format==RARFMT50) // RAR 5.0 signature is by one byte longer.
   {
-    NewMhd.Flags=OldMhd.Flags & 0x3f;
-    NewMhd.HeadSize=OldMhd.HeadSize;
+    Read(MarkHead.Mark+SIZEOF_MARKHEAD3,1);
+    if (MarkHead.Mark[SIZEOF_MARKHEAD3]!=0)
+      return false;
+    MarkHead.HeadSize=SIZEOF_MARKHEAD5;
   }
   else
-#endif
-  {
-    if (HeaderCRC!=NewMhd.HeadCRC)
-    {
-#ifndef SHELL_EXT
-      Log(FileName,St(MLogMainHead));
-#endif
-      Alarm();
-      if (!EnableBroken)
-        return(false);
-    }
-  }
-  Volume=(NewMhd.Flags & MHD_VOLUME);
-  Solid=(NewMhd.Flags & MHD_SOLID)!=0;
-  MainComment=(NewMhd.Flags & MHD_COMMENT)!=0;
-  Locked=(NewMhd.Flags & MHD_LOCK)!=0;
-  Signed=(NewMhd.PosAV!=0);
-  Protected=(NewMhd.Flags & MHD_PROTECT)!=0;
-  Encrypted=(NewMhd.Flags & MHD_PASSWORD)!=0;
+    MarkHead.HeadSize=SIZEOF_MARKHEAD3;
 
-  if (NewMhd.EncryptVer>UNP_VER)
-  {
-#ifdef RARDLL
-    Cmd->DllError=ERAR_UNKNOWN_FORMAT;
-#else
-    ErrHandler.SetErrorCode(RARX_WARNING);
-  #if !defined(SILENT) && !defined(SFX_MODULE)
-      Log(FileName,St(MUnknownMeth),FileName);
-      Log(FileName,St(MVerRequired),NewMhd.EncryptVer/10,NewMhd.EncryptVer%10);
-  #endif
-#endif
-    return(false);
-  }
 #ifdef RARDLL
   // If callback function is not set, we cannot get the password,
   // so we skip the initial header processing for encrypted header archive.
@@ -215,45 +196,67 @@ bool Archive::IsArchive(bool EnableBroken)
     SilentOpen=true;
 #endif
 
-  // If not encrypted, we'll check it below.
-  NotFirstVolume=Encrypted && (NewMhd.Flags & MHD_FIRSTVOLUME)==0;
+  // Skip the archive encryption header if any and read the main header.
+  while (ReadHeader()!=0)
+  {
+    HEADER_TYPE Type=GetHeaderType();
+    // In RAR 5.0 we need to quit after reading HEAD_CRYPT if we wish to
+    // avoid the password prompt.
+    if (Type==HEAD_MAIN || SilentOpen && Type==HEAD_CRYPT)
+      break;
+    SeekToNext();
+  }
 
+  // This check allows to make RS based recovery even if password is incorrect.
+  // But we should not do it for EnableBroken or we'll get 'not RAR archive'
+  // messages when extracting encrypted archives with wrong password.
+  if (FailedHeaderDecryption && !EnableBroken)
+    return false;
+
+  SeekToNext();
+  if (BrokenHeader) // Main archive header is corrupt.
+  {
+    uiMsg(UIERROR_MHEADERBROKEN,FileName);
+    if (!EnableBroken)
+      return false;
+  }
+
+  MainComment=MainHead.CommentInHeader;
+
+  // If we process non-encrypted archive or can request a password,
+  // we set 'first volume' flag based on file attributes below.
+  // It is necessary for RAR 2.x archives, which did not have 'first volume'
+  // flag in main header. Also for all RAR formats we need to scan until
+  // first file header to set "comment" flag when reading service header.
+  // Unless we are in silent mode, we need to know about presence of comment
+  // immediately after IsArchive call.
   if (!SilentOpen || !Encrypted)
   {
     SaveFilePos SavePos(*this);
     int64 SaveCurBlockPos=CurBlockPos,SaveNextBlockPos=NextBlockPos;
+    HEADER_TYPE SaveCurHeaderType=CurHeaderType;
 
-    NotFirstVolume=false;
     while (ReadHeader()!=0)
     {
-      int HeaderType=GetHeaderType();
-      if (HeaderType==NEWSUB_HEAD)
-      {
-        if (SubHead.CmpName(SUBHEAD_TYPE_CMT))
-          MainComment=true;
-        if ((SubHead.Flags & LHD_SPLIT_BEFORE) ||
-            Volume && (NewMhd.Flags & MHD_FIRSTVOLUME)==0)
-          NotFirstVolume=true;
-      }
+      HEADER_TYPE HeaderType=GetHeaderType();
+      if (HeaderType==HEAD_SERVICE)
+        FirstVolume=Volume && !SubHead.SplitBefore;
       else
-      {
-        if (HeaderType==FILE_HEAD && ((NewLhd.Flags & LHD_SPLIT_BEFORE)!=0 ||
-            Volume && NewLhd.UnpVer>=29 && (NewMhd.Flags & MHD_FIRSTVOLUME)==0))
-          NotFirstVolume=true;
-        break;
-      }
+        if (HeaderType==HEAD_FILE)
+        {
+          FirstVolume=Volume && !FileHead.SplitBefore;
+          break;
+        }
       SeekToNext();
     }
     CurBlockPos=SaveCurBlockPos;
     NextBlockPos=SaveNextBlockPos;
+    CurHeaderType=SaveCurHeaderType;
   }
-  if (!Volume || !NotFirstVolume)
-  {
-    strcpy(FirstVolumeName,FileName);
-    wcscpy(FirstVolumeNameW,FileNameW);
-  }
+  if (!Volume || FirstVolume)
+    wcscpy(FirstVolumeName,FileName);
 
-  return(true);
+  return true;
 }
 
 
@@ -265,20 +268,60 @@ void Archive::SeekToNext()
 }
 
 
-#ifndef SFX_MODULE
-int Archive::GetRecoverySize(bool Required)
+
+
+
+
+// Calculate the block size including encryption fields and padding if any.
+uint Archive::FullHeaderSize(size_t Size)
 {
-  if (!Protected)
-    return(0);
-  if (RecoverySectors!=-1 || !Required)
-    return(RecoverySectors);
-  SaveFilePos SavePos(*this);
-  Seek(SFXSize,SEEK_SET);
-  SearchSubBlock(SUBHEAD_TYPE_RR);
-  return(RecoverySectors);
+  if (Encrypted)
+  {
+    Size = ALIGN_VALUE(Size, CRYPT_BLOCK_SIZE); // Align to encryption block size.
+    if (Format == RARFMT50)
+      Size += SIZE_INITV;
+    else
+      Size += SIZE_SALT30;
+  }
+  return uint(Size);
+}
+
+
+
+
+#ifdef USE_QOPEN
+bool Archive::Open(const wchar *Name,uint Mode)
+{
+  // Important if we reuse Archive object and it has virtual QOpen
+  // file position not matching real. For example, for 'l -v volname'.
+  QOpen.Unload();
+
+  return File::Open(Name,Mode);
+}
+
+
+int Archive::Read(void *Data,size_t Size)
+{
+  size_t Result;
+  if (QOpen.Read(Data,Size,Result))
+    return (int)Result;
+  return File::Read(Data,Size);
+}
+
+
+void Archive::Seek(int64 Offset,int Method)
+{
+  if (!QOpen.Seek(Offset,Method))
+    File::Seek(Offset,Method);
+}
+
+
+int64 Archive::Tell()
+{
+  int64 QPos;
+  if (QOpen.Tell(&QPos))
+    return QPos;
+  return File::Tell();
 }
 #endif
-
-
-
 

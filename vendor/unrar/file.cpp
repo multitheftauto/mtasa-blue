@@ -1,13 +1,9 @@
 #include "rar.hpp"
 
-static File *CreatedFiles[256];
-static int RemoveCreatedActive=0;
-
 File::File()
 {
-  hFile=BAD_HANDLE;
+  hFile=FILE_BAD_HANDLE;
   *FileName=0;
-  *FileNameW=0;
   NewFile=false;
   LastWrite=false;
   HandleType=FILE_HANDLENORMAL;
@@ -16,7 +12,6 @@ File::File()
   ErrorType=FILE_SUCCESS;
   OpenShared=false;
   AllowDelete=true;
-  CloseCount=0;
   AllowExceptions=true;
 #ifdef _WIN_ALL
   NoSequentialRead=false;
@@ -27,7 +22,7 @@ File::File()
 
 File::~File()
 {
-  if (hFile!=BAD_HANDLE && !SkipClose)
+  if (hFile!=FILE_BAD_HANDLE && !SkipClose)
     if (NewFile)
       Delete();
     else
@@ -38,15 +33,15 @@ File::~File()
 void File::operator = (File &SrcFile)
 {
   hFile=SrcFile.hFile;
-  strcpy(FileName,SrcFile.FileName);
   NewFile=SrcFile.NewFile;
   LastWrite=SrcFile.LastWrite;
   HandleType=SrcFile.HandleType;
+  wcsncpyz(FileName,SrcFile.FileName,ASIZE(FileName));
   SrcFile.SkipClose=true;
 }
 
 
-bool File::Open(const char *Name,const wchar *NameW,uint Mode)
+bool File::Open(const wchar *Name,uint Mode)
 {
   ErrorType=FILE_SUCCESS;
   FileHandle hNewFile;
@@ -57,16 +52,40 @@ bool File::Open(const char *Name,const wchar *NameW,uint Mode)
   uint Access=WriteMode ? GENERIC_WRITE:GENERIC_READ;
   if (UpdateMode)
     Access|=GENERIC_WRITE;
-  uint ShareMode=FILE_SHARE_READ;
+  uint ShareMode=(Mode & FMF_OPENEXCLUSIVE) ? 0 : FILE_SHARE_READ;
   if (OpenShared)
     ShareMode|=FILE_SHARE_WRITE;
   uint Flags=NoSequentialRead ? 0:FILE_FLAG_SEQUENTIAL_SCAN;
-  if (WinNT() && NameW!=NULL && *NameW!=0)
-    hNewFile=CreateFileW(NameW,Access,ShareMode,NULL,OPEN_EXISTING,Flags,NULL);
-  else
-    hNewFile=CreateFileA(Name,Access,ShareMode,NULL,OPEN_EXISTING,Flags,NULL);
+  hNewFile=CreateFile(Name,Access,ShareMode,NULL,OPEN_EXISTING,Flags,NULL);
 
-  if (hNewFile==BAD_HANDLE && GetLastError()==ERROR_FILE_NOT_FOUND)
+  DWORD LastError;
+  if (hNewFile==FILE_BAD_HANDLE)
+  {
+    LastError=GetLastError();
+
+    wchar LongName[NM];
+    if (GetWinLongPath(Name,LongName,ASIZE(LongName)))
+    {
+      hNewFile=CreateFile(LongName,Access,ShareMode,NULL,OPEN_EXISTING,Flags,NULL);
+
+      // For archive names longer than 260 characters first CreateFile
+      // (without \\?\) fails and sets LastError to 3 (access denied).
+      // We need the correct "file not found" error code to decide
+      // if we create a new archive or quit with "cannot create" error.
+      // So we need to check the error code after \\?\ CreateFile again,
+      // otherwise we'll fail to create new archives with long names.
+      // But we cannot simply assign the new code to LastError,
+      // because it would break "..\arcname.rar" relative names processing.
+      // First CreateFile returns the correct "file not found" code for such
+      // names, but "\\?\" CreateFile returns ERROR_INVALID_NAME treating
+      // dots as a directory name. So we check only for "file not found"
+      // error here and for other errors use the first CreateFile result.
+      if (GetLastError()==ERROR_FILE_NOT_FOUND)
+        LastError=ERROR_FILE_NOT_FOUND;
+    }
+  }
+
+  if (hNewFile==FILE_BAD_HANDLE && LastError==ERROR_FILE_NOT_FOUND)
     ErrorType=FILE_NOTFOUND;
 #else
   int flags=UpdateMode ? O_RDWR:(WriteMode ? O_WRONLY:O_RDONLY);
@@ -76,11 +95,10 @@ bool File::Open(const char *Name,const wchar *NameW,uint Mode)
   flags|=O_LARGEFILE;
 #endif
 #endif
-#if defined(_EMX) && !defined(_DJGPP)
-  int sflags=OpenShared ? SH_DENYNO:SH_DENYWR;
-  int handle=sopen(Name,flags,sflags);
-#else
-  int handle=open(Name,flags);
+  char NameA[NM];
+  WideToChar(Name,NameA,ASIZE(NameA));
+
+  int handle=open(NameA,flags);
 #ifdef LOCK_EX
 
 #ifdef _OSF_SOURCE
@@ -90,59 +108,54 @@ bool File::Open(const char *Name,const wchar *NameW,uint Mode)
   if (!OpenShared && UpdateMode && handle>=0 && flock(handle,LOCK_EX|LOCK_NB)==-1)
   {
     close(handle);
-    return(false);
+    return false;
   }
 #endif
+  if (handle==-1)
+    hNewFile=FILE_BAD_HANDLE;
+  else
+  {
+#ifdef FILE_USE_OPEN
+    hNewFile=handle;
+#else
+    hNewFile=fdopen(handle,UpdateMode ? UPDATEBINARY:READBINARY);
 #endif
-  hNewFile=handle==-1 ? BAD_HANDLE:fdopen(handle,UpdateMode ? UPDATEBINARY:READBINARY);
-  if (hNewFile==BAD_HANDLE && errno==ENOENT)
+  }
+  if (hNewFile==FILE_BAD_HANDLE && errno==ENOENT)
     ErrorType=FILE_NOTFOUND;
 #endif
   NewFile=false;
   HandleType=FILE_HANDLENORMAL;
   SkipClose=false;
-  bool Success=hNewFile!=BAD_HANDLE;
+  bool Success=hNewFile!=FILE_BAD_HANDLE;
   if (Success)
   {
     hFile=hNewFile;
-
-    // We use memove instead of strcpy and wcscpy to avoid problems
-    // with overlapped buffers. While we do not call this function with
-    // really overlapped buffers yet, we do call it with Name equal to
-    // FileName like Arc.Open(Arc.FileName,Arc.FileNameW,...).
-    if (NameW!=NULL)
-      memmove(FileNameW,NameW,(wcslen(NameW)+1)*sizeof(*NameW));
-    else
-      *FileNameW=0;
-    if (Name!=NULL)
-      memmove(FileName,Name,strlen(Name)+1);
-    else
-      WideToChar(NameW,FileName);
-    AddFileToList(hFile);
+    wcsncpyz(FileName,Name,ASIZE(FileName));
   }
-  return(Success);
+  return Success;
 }
 
 
 #if !defined(SHELL_EXT) && !defined(SFX_MODULE)
-void File::TOpen(const char *Name,const wchar *NameW)
+void File::TOpen(const wchar *Name)
 {
-  if (!WOpen(Name,NameW))
+  if (!WOpen(Name))
     ErrHandler.Exit(RARX_OPEN);
 }
 #endif
 
 
-bool File::WOpen(const char *Name,const wchar *NameW)
+bool File::WOpen(const wchar *Name)
 {
-  if (Open(Name,NameW))
-    return(true);
-  ErrHandler.OpenErrorMsg(Name,NameW);
-  return(false);
+  if (Open(Name))
+    return true;
+  ErrHandler.OpenErrorMsg(Name);
+  return false;
 }
 
 
-bool File::Create(const char *Name,const wchar *NameW,uint Mode)
+bool File::Create(const wchar *Name,uint Mode)
 {
   // OpenIndiana based NAS and CIFS shares fail to set the file time if file
   // was created in read+write mode and some data was written and not flushed
@@ -154,161 +167,144 @@ bool File::Create(const char *Name,const wchar *NameW,uint Mode)
   CreateMode=Mode;
   uint Access=WriteMode ? GENERIC_WRITE:GENERIC_READ|GENERIC_WRITE;
   DWORD ShareMode=ShareRead ? FILE_SHARE_READ:0;
-  if (WinNT() && NameW!=NULL && *NameW!=0)
-    hFile=CreateFileW(NameW,Access,ShareMode,NULL,CREATE_ALWAYS,0,NULL);
+
+  // Windows automatically removes dots and spaces in the end of file name,
+  // So we detect such names and process them with \\?\ prefix.
+  wchar *LastChar=PointToLastChar(Name);
+  bool Special=*LastChar=='.' || *LastChar==' ';
+  
+  if (Special)
+    hFile=FILE_BAD_HANDLE;
   else
-    hFile=CreateFileA(Name,Access,ShareMode,NULL,CREATE_ALWAYS,0,NULL);
+    hFile=CreateFile(Name,Access,ShareMode,NULL,CREATE_ALWAYS,0,NULL);
+
+  if (hFile==FILE_BAD_HANDLE)
+  {
+    wchar LongName[NM];
+    if (GetWinLongPath(Name,LongName,ASIZE(LongName)))
+      hFile=CreateFile(LongName,Access,ShareMode,NULL,CREATE_ALWAYS,0,NULL);
+  }
+
 #else
-  hFile=fopen(Name,WriteMode ? WRITEBINARY:CREATEBINARY);
+  char NameA[NM];
+  WideToChar(Name,NameA,ASIZE(NameA));
+#ifdef FILE_USE_OPEN
+  hFile=open(NameA,(O_CREAT|O_TRUNC) | (WriteMode ? O_WRONLY : O_RDWR));
+#ifdef _ANDROID
+  if (hFile==FILE_BAD_HANDLE)
+    hFile=JniCreateFile(Name); // If external card is read-only for usual file API.
+#endif
+#else
+  hFile=fopen(NameA,WriteMode ? WRITEBINARY:CREATEBINARY);
+#endif
 #endif
   NewFile=true;
   HandleType=FILE_HANDLENORMAL;
   SkipClose=false;
-  if (NameW!=NULL)
-    wcscpy(FileNameW,NameW);
-  else
-    *FileNameW=0;
-  if (Name!=NULL)
-    strcpy(FileName,Name);
-  else
-    WideToChar(NameW,FileName);
-  AddFileToList(hFile);
-  return(hFile!=BAD_HANDLE);
-}
-
-
-void File::AddFileToList(FileHandle hFile)
-{
-  if (hFile!=BAD_HANDLE)
-    for (int I=0;I<sizeof(CreatedFiles)/sizeof(CreatedFiles[0]);I++)
-      if (CreatedFiles[I]==NULL)
-      {
-        CreatedFiles[I]=this;
-        break;
-      }
+  wcsncpyz(FileName,Name,ASIZE(FileName));
+  return hFile!=FILE_BAD_HANDLE;
 }
 
 
 #if !defined(SHELL_EXT) && !defined(SFX_MODULE)
-void File::TCreate(const char *Name,const wchar *NameW,uint Mode)
+void File::TCreate(const wchar *Name,uint Mode)
 {
-  if (!WCreate(Name,NameW,Mode))
+  if (!WCreate(Name,Mode))
     ErrHandler.Exit(RARX_FATAL);
 }
 #endif
 
 
-bool File::WCreate(const char *Name,const wchar *NameW,uint Mode)
+bool File::WCreate(const wchar *Name,uint Mode)
 {
-  if (Create(Name,NameW,Mode))
-    return(true);
-  ErrHandler.SetErrorCode(RARX_CREATE);
-  ErrHandler.CreateErrorMsg(Name,NameW);
-  return(false);
+  if (Create(Name,Mode))
+    return true;
+  ErrHandler.CreateErrorMsg(Name);
+  return false;
 }
 
 
 bool File::Close()
 {
   bool Success=true;
-  if (HandleType!=FILE_HANDLENORMAL)
-    HandleType=FILE_HANDLENORMAL;
-  else
-    if (hFile!=BAD_HANDLE)
+
+  if (hFile!=FILE_BAD_HANDLE)
+  {
+    if (!SkipClose)
     {
-      if (!SkipClose)
-      {
 #ifdef _WIN_ALL
+      // We use the standard system handle for stdout in Windows
+      // and it must not  be closed here.
+      if (HandleType==FILE_HANDLENORMAL)
         Success=CloseHandle(hFile)==TRUE;
 #else
-        Success=fclose(hFile)!=EOF;
-#endif
-        if (Success || !RemoveCreatedActive)
-          for (int I=0;I<sizeof(CreatedFiles)/sizeof(CreatedFiles[0]);I++)
-            if (CreatedFiles[I]==this)
-            {
-              CreatedFiles[I]=NULL;
-              break;
-            }
-      }
-      hFile=BAD_HANDLE;
-      if (!Success && AllowExceptions)
-        ErrHandler.CloseError(FileName,FileNameW);
-    }
-  CloseCount++;
-  return(Success);
-}
-
-
-void File::Flush()
-{
-#ifdef _WIN_ALL
-  FlushFileBuffers(hFile);
+#ifdef FILE_USE_OPEN
+      Success=close(hFile)!=-1;
 #else
-  fflush(hFile);
+      Success=fclose(hFile)!=EOF;
 #endif
+#endif
+    }
+    hFile=FILE_BAD_HANDLE;
+  }
+  HandleType=FILE_HANDLENORMAL;
+  if (!Success && AllowExceptions)
+    ErrHandler.CloseError(FileName);
+  return Success;
 }
 
 
 bool File::Delete()
 {
   if (HandleType!=FILE_HANDLENORMAL)
-    return(false);
-  if (hFile!=BAD_HANDLE)
+    return false;
+  if (hFile!=FILE_BAD_HANDLE)
     Close();
   if (!AllowDelete)
-    return(false);
-  return(DelFile(FileName,FileNameW));
+    return false;
+  return DelFile(FileName);
 }
 
 
-bool File::Rename(const char *NewName,const wchar *NewNameW)
+bool File::Rename(const wchar *NewName)
 {
-  // we do not need to rename if names are already same
-  bool Success=strcmp(FileName,NewName)==0;
-  if (Success && *FileNameW!=0 && *NullToEmpty(NewNameW)!=0)
-    Success=wcscmp(FileNameW,NewNameW)==0;
+  // No need to rename if names are already same.
+  bool Success=wcscmp(FileName,NewName)==0;
 
   if (!Success)
-    Success=RenameFile(FileName,FileNameW,NewName,NewNameW);
+    Success=RenameFile(FileName,NewName);
 
   if (Success)
-  {
-    // renamed successfully, storing the new name
-    strcpy(FileName,NewName);
-    wcscpy(FileNameW,NullToEmpty(NewNameW));
-  }
-  return(Success);
+    wcscpy(FileName,NewName);
+
+  return Success;
 }
 
 
-void File::Write(const void *Data,size_t Size)
+bool File::Write(const void *Data,size_t Size)
 {
   if (Size==0)
-    return;
-#ifndef _WIN_CE
-  if (HandleType!=FILE_HANDLENORMAL)
-    switch(HandleType)
+    return true;
+  if (HandleType==FILE_HANDLESTD)
+  {
+#ifdef _WIN_ALL
+    hFile=GetStdHandle(STD_OUTPUT_HANDLE);
+#else
+    // Cannot use the standard stdout here, because it already has wide orientation.
+    if (hFile==FILE_BAD_HANDLE)
     {
-      case FILE_HANDLESTD:
-#ifdef _WIN_ALL
-        hFile=GetStdHandle(STD_OUTPUT_HANDLE);
+#ifdef FILE_USE_OPEN
+      hFile=dup(STDOUT_FILENO); // Open new stdout stream.
 #else
-        hFile=stdout;
+      hFile=fdopen(dup(STDOUT_FILENO),"w"); // Open new stdout stream.
 #endif
-        break;
-      case FILE_HANDLEERR:
-#ifdef _WIN_ALL
-        hFile=GetStdHandle(STD_ERROR_HANDLE);
-#else
-        hFile=stderr;
-#endif
-        break;
     }
 #endif
+  }
+  bool Success;
   while (1)
   {
-    bool Success=false;
+    Success=false;
 #ifdef _WIN_ALL
     DWORD Written=0;
     if (HandleType!=FILE_HANDLENORMAL)
@@ -325,8 +321,13 @@ void File::Write(const void *Data,size_t Size)
     else
       Success=WriteFile(hFile,Data,(DWORD)Size,&Written,NULL)==TRUE;
 #else
+#ifdef FILE_USE_OPEN
+    ssize_t Written=write(hFile,Data,Size);
+    Success=Written==Size;
+#else
     int Written=fwrite(Data,1,Size,hFile);
     Success=Written==Size && !ferror(hFile);
+#endif
 #endif
     if (!Success && AllowExceptions && HandleType==FILE_HANDLENORMAL)
     {
@@ -336,22 +337,23 @@ void File::Write(const void *Data,size_t Size)
       uint64 FreeSize=GetFreeDisk(FileName);
       SetLastError(ErrCode);
       if (FreeSize>Size && FilePos-Size<=0xffffffff && FilePos+Size>0xffffffff)
-        ErrHandler.WriteErrorFAT(FileName,FileNameW);
+        ErrHandler.WriteErrorFAT(FileName);
 #endif
-      if (ErrHandler.AskRepeatWrite(FileName,FileNameW,false))
+      if (ErrHandler.AskRepeatWrite(FileName,false))
       {
-#ifndef _WIN_ALL
+#if !defined(_WIN_ALL) && !defined(FILE_USE_OPEN)
         clearerr(hFile);
 #endif
         if (Written<Size && Written>0)
           Seek(Tell()-Written,SEEK_SET);
         continue;
       }
-      ErrHandler.WriteError(NULL,NULL,FileName,FileNameW);
+      ErrHandler.WriteError(NULL,FileName);
     }
     break;
   }
   LastWrite=true;
+  return Success; // It can return false only if AllowExceptions is disabled.
 }
 
 
@@ -382,14 +384,14 @@ int File::Read(void *Data,size_t Size)
         }
         else
         {
-          if (HandleType==FILE_HANDLENORMAL && ErrHandler.AskRepeatRead(FileName,FileNameW))
+          if (HandleType==FILE_HANDLENORMAL && ErrHandler.AskRepeatRead(FileName))
             continue;
-          ErrHandler.ReadError(FileName,FileNameW);
+          ErrHandler.ReadError(FileName);
         }
     }
     break;
   }
-  return(ReadSize);
+  return ReadSize;
 }
 
 
@@ -398,30 +400,52 @@ int File::DirectRead(void *Data,size_t Size)
 {
 #ifdef _WIN_ALL
   const size_t MaxDeviceRead=20000;
+  const size_t MaxLockedRead=32768;
 #endif
-#ifndef _WIN_CE
   if (HandleType==FILE_HANDLESTD)
   {
 #ifdef _WIN_ALL
-    if (Size>MaxDeviceRead)
-      Size=MaxDeviceRead;
+//    if (Size>MaxDeviceRead)
+//      Size=MaxDeviceRead;
     hFile=GetStdHandle(STD_INPUT_HANDLE);
+#else
+#ifdef FILE_USE_OPEN
+    hFile=STDIN_FILENO;
 #else
     hFile=stdin;
 #endif
-  }
 #endif
+  }
 #ifdef _WIN_ALL
+  // For pipes like 'type file.txt | rar -si arcname' ReadFile may return
+  // data in small ~4KB blocks. It may slightly reduce the compression ratio.
   DWORD Read;
   if (!ReadFile(hFile,Data,(DWORD)Size,&Read,NULL))
   {
     if (IsDevice() && Size>MaxDeviceRead)
-      return(DirectRead(Data,MaxDeviceRead));
+      return DirectRead(Data,MaxDeviceRead);
     if (HandleType==FILE_HANDLESTD && GetLastError()==ERROR_BROKEN_PIPE)
-      return(0);
-    return(-1);
+      return 0;
+
+    // We had a bug report about failure to archive 1C database lock file
+    // 1Cv8tmp.1CL, which is a zero length file with a region above 200 KB
+    // permanently locked. If our first read request uses too large buffer
+    // and if we are in -dh mode, so we were able to open the file,
+    // we'll fail with "Read error". So now we use try a smaller buffer size
+    // in case of lock error.
+    if (HandleType==FILE_HANDLENORMAL && Size>MaxLockedRead &&
+        GetLastError()==ERROR_LOCK_VIOLATION)
+      return DirectRead(Data,MaxLockedRead);
+
+    return -1;
   }
-  return(Read);
+  return Read;
+#else
+#ifdef FILE_USE_OPEN
+  ssize_t ReadSize=read(hFile,Data,Size);
+  if (ReadSize==-1)
+    return -1;
+  return (int)ReadSize;
 #else
   if (LastWrite)
   {
@@ -431,8 +455,9 @@ int File::DirectRead(void *Data,size_t Size)
   clearerr(hFile);
   size_t ReadSize=fread(Data,1,Size,hFile);
   if (ferror(hFile))
-    return(-1);
-  return((int)ReadSize);
+    return -1;
+  return (int)ReadSize;
+#endif
 #endif
 }
 
@@ -440,14 +465,14 @@ int File::DirectRead(void *Data,size_t Size)
 void File::Seek(int64 Offset,int Method)
 {
   if (!RawSeek(Offset,Method) && AllowExceptions)
-    ErrHandler.SeekError(FileName,FileNameW);
+    ErrHandler.SeekError(FileName);
 }
 
 
 bool File::RawSeek(int64 Offset,int Method)
 {
-  if (hFile==BAD_HANDLE)
-    return(true);
+  if (hFile==FILE_BAD_HANDLE)
+    return true;
   if (Offset<0 && Method!=SEEK_SET)
   {
     Offset=(Method==SEEK_CUR ? Tell():FileLength())+Offset;
@@ -457,41 +482,47 @@ bool File::RawSeek(int64 Offset,int Method)
   LONG HighDist=(LONG)(Offset>>32);
   if (SetFilePointer(hFile,(LONG)Offset,&HighDist,Method)==0xffffffff &&
       GetLastError()!=NO_ERROR)
-    return(false);
+    return false;
 #else
   LastWrite=false;
-#if defined(_LARGEFILE_SOURCE) && !defined(_OSF_SOURCE) && !defined(__VMS)
+#ifdef FILE_USE_OPEN
+  if (lseek64(hFile,Offset,Method)==-1)
+    return false;
+#elif defined(_LARGEFILE_SOURCE) && !defined(_OSF_SOURCE) && !defined(__VMS)
   if (fseeko(hFile,Offset,Method)!=0)
+    return false;
 #else
   if (fseek(hFile,(long)Offset,Method)!=0)
+    return false;
 #endif
-    return(false);
 #endif
-  return(true);
+  return true;
 }
 
 
 int64 File::Tell()
 {
-  if (hFile==BAD_HANDLE)
+  if (hFile==FILE_BAD_HANDLE)
     if (AllowExceptions)
-      ErrHandler.SeekError(FileName,FileNameW);
+      ErrHandler.SeekError(FileName);
     else
-      return(-1);
+      return -1;
 #ifdef _WIN_ALL
   LONG HighDist=0;
   uint LowDist=SetFilePointer(hFile,0,&HighDist,FILE_CURRENT);
   if (LowDist==0xffffffff && GetLastError()!=NO_ERROR)
     if (AllowExceptions)
-      ErrHandler.SeekError(FileName,FileNameW);
+      ErrHandler.SeekError(FileName);
     else
-      return(-1);
-  return(INT32TO64(HighDist,LowDist));
+      return -1;
+  return INT32TO64(HighDist,LowDist);
 #else
-#if defined(_LARGEFILE_SOURCE) && !defined(_OSF_SOURCE)
-  return(ftello(hFile));
+#ifdef FILE_USE_OPEN
+  return lseek64(hFile,0,SEEK_CUR);
+#elif defined(_LARGEFILE_SOURCE) && !defined(_OSF_SOURCE)
+  return ftello(hFile);
 #else
-  return(ftell(hFile));
+  return ftell(hFile);
 #endif
 #endif
 }
@@ -510,7 +541,7 @@ void File::Prealloc(int64 Size)
 #if defined(_UNIX) && defined(USE_FALLOCATE)
   // fallocate is rather new call. Only latest kernels support it.
   // So we are not using it by default yet.
-  int fd = fileno(hFile);
+  int fd = GetFD(hFile);
   if (fd >= 0)
     fallocate(fd, 0, 0, Size);
 #endif
@@ -521,7 +552,7 @@ byte File::GetByte()
 {
   byte Byte=0;
   Read(&Byte,1);
-  return(Byte);
+  return Byte;
 }
 
 
@@ -534,9 +565,9 @@ void File::PutByte(byte Byte)
 bool File::Truncate()
 {
 #ifdef _WIN_ALL
-  return(SetEndOfFile(hFile)==TRUE);
+  return SetEndOfFile(hFile)==TRUE;
 #else
-  return(false);
+  return false;
 #endif
 }
 
@@ -567,15 +598,15 @@ void File::SetOpenFileTime(RarTime *ftm,RarTime *ftc,RarTime *fta)
 
 void File::SetCloseFileTime(RarTime *ftm,RarTime *fta)
 {
-#if defined(_UNIX) || defined(_EMX)
+#ifdef _UNIX
   SetCloseFileTimeByName(FileName,ftm,fta);
 #endif
 }
 
 
-void File::SetCloseFileTimeByName(const char *Name,RarTime *ftm,RarTime *fta)
+void File::SetCloseFileTimeByName(const wchar *Name,RarTime *ftm,RarTime *fta)
 {
-#if defined(_UNIX) || defined(_EMX)
+#ifdef _UNIX
   bool setm=ftm!=NULL && ftm->IsSet();
   bool seta=fta!=NULL && fta->IsSet();
   if (setm || seta)
@@ -589,7 +620,9 @@ void File::SetCloseFileTimeByName(const char *Name,RarTime *ftm,RarTime *fta)
       ut.actime=fta->GetUnix();
     else
       ut.actime=ut.modtime;
-    utime(Name,&ut);
+    char NameA[NM];
+    WideToChar(Name,NameA,ASIZE(NameA));
+    utime(NameA,&ut);
   }
 #endif
 }
@@ -604,7 +637,7 @@ void File::GetOpenFileTime(RarTime *ft)
 #endif
 #if defined(_UNIX) || defined(_EMX)
   struct stat st;
-  fstat(fileno(hFile),&st);
+  fstat(GetFD(),&st);
   *ft=st.st_mtime;
 #endif
 }
@@ -614,82 +647,27 @@ int64 File::FileLength()
 {
   SaveFilePos SavePos(*this);
   Seek(0,SEEK_END);
-  return(Tell());
-}
-
-
-void File::SetHandleType(FILE_HANDLETYPE Type)
-{
-  HandleType=Type;
+  return Tell();
 }
 
 
 bool File::IsDevice()
 {
-  if (hFile==BAD_HANDLE)
-    return(false);
+  if (hFile==FILE_BAD_HANDLE)
+    return false;
 #ifdef _WIN_ALL
   uint Type=GetFileType(hFile);
-  return(Type==FILE_TYPE_CHAR || Type==FILE_TYPE_PIPE);
+  return Type==FILE_TYPE_CHAR || Type==FILE_TYPE_PIPE;
 #else
-  return(isatty(fileno(hFile)));
+  return isatty(GetFD());
 #endif
-}
-
-
-#ifndef SFX_MODULE
-void File::fprintf(const char *fmt,...)
-{
-  va_list argptr;
-  va_start(argptr,fmt);
-  safebuf char Msg[2*NM+1024],OutMsg[2*NM+1024];
-  vsprintf(Msg,fmt,argptr);
-#ifdef _WIN_ALL
-  for (int Src=0,Dest=0;;Src++)
-  {
-    char CurChar=Msg[Src];
-    if (CurChar=='\n')
-      OutMsg[Dest++]='\r';
-    OutMsg[Dest++]=CurChar;
-    if (CurChar==0)
-      break;
-  }
-#else
-  strcpy(OutMsg,Msg);
-#endif
-  Write(OutMsg,strlen(OutMsg));
-  va_end(argptr);
-}
-#endif
-
-
-bool File::RemoveCreated()
-{
-  RemoveCreatedActive++;
-  bool RetCode=true;
-  for (int I=0;I<sizeof(CreatedFiles)/sizeof(CreatedFiles[0]);I++)
-    if (CreatedFiles[I]!=NULL)
-    {
-      CreatedFiles[I]->SetExceptions(false);
-      bool Success;
-      if (CreatedFiles[I]->NewFile)
-        Success=CreatedFiles[I]->Delete();
-      else
-        Success=CreatedFiles[I]->Close();
-      if (Success)
-        CreatedFiles[I]=NULL;
-      else
-        RetCode=false;
-    }
-  RemoveCreatedActive--;
-  return(RetCode);
 }
 
 
 #ifndef SFX_MODULE
 int64 File::Copy(File &Dest,int64 Length)
 {
-  Array<char> Buffer(0x10000);
+  Array<char> Buffer(0x40000);
   int64 CopySize=0;
   bool CopyAll=(Length==INT64NDF);
 
@@ -697,14 +675,30 @@ int64 File::Copy(File &Dest,int64 Length)
   {
     Wait();
     size_t SizeToRead=(!CopyAll && Length<(int64)Buffer.Size()) ? (size_t)Length:Buffer.Size();
-    int ReadSize=Read(&Buffer[0],SizeToRead);
+    char *Buf=&Buffer[0];
+    int ReadSize=Read(Buf,SizeToRead);
     if (ReadSize==0)
       break;
-    Dest.Write(&Buffer[0],ReadSize);
+    size_t WriteSize=ReadSize;
+#ifdef _WIN_ALL
+    // For FAT32 USB flash drives in Windows if first write is 4 KB or more,
+    // write caching is disabled and "write through" is enabled, resulting
+    // in bad performance, especially for many small files. It happens when
+    // we create SFX archive on USB drive, because SFX module is written first.
+    // So we split the first write to small 1 KB followed by rest of data.
+    if (CopySize==0 && WriteSize>=4096)
+    {
+      const size_t FirstWrite=1024;
+      Dest.Write(Buf,FirstWrite);
+      Buf+=FirstWrite;
+      WriteSize-=FirstWrite;
+    }
+#endif
+    Dest.Write(Buf,WriteSize);
     CopySize+=ReadSize;
     if (!CopyAll)
       Length-=ReadSize;
   }
-  return(CopySize);
+  return CopySize;
 }
 #endif

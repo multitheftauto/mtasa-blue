@@ -19,19 +19,9 @@
   #endif
 #endif
 
-#ifdef _WIN32_WCE
-  #define _WIN_ALL
-  #define _WIN_CE
-  #ifdef WM_FILECHANGEINFO
-    #define PC2002
-  #else
-    #undef PC2002
-  #endif
-#endif
-
-#ifdef __BEOS__
+#ifdef ANDROID
   #define _UNIX
-  #define _BEOS
+  #define _ANDROID
 #endif
 
 #ifdef __APPLE__

@@ -4,6 +4,9 @@
 #define  Min(x,y) (((x)<(y)) ? (x):(y))
 #define  Max(x,y) (((x)>(y)) ? (x):(y))
 
+// Universal replacement of abs function for non-int arguments.
+#define  Abs(x) (((x)<0) ? -(x):(x))
+
 #define  ASIZE(x) (sizeof(x)/sizeof(x[0]))
 
 // MAXPASSWORD is expected to be multiple of CRYPTPROTECTMEMORY_BLOCK_SIZE (16)
@@ -12,17 +15,19 @@
 
 #define  MAXSFXSIZE        0x100000
 
-#define  DefSFXName        "default.sfx"
-#define  DefSortListName   "rarfiles.lst"
+#define  DefSFXName        L"default.sfx"
+#define  DefSortListName   L"rarfiles.lst"
 
-#ifndef FA_RDONLY
-  #define FA_RDONLY   0x01
-  #define FA_HIDDEN   0x02
-  #define FA_SYSTEM   0x04
-  #define FA_LABEL    0x08
-  #define FA_DIREC    0x10
-  #define FA_ARCH     0x20
+
+#ifndef SFX_MODULE
+#define USE_QOPEN
 #endif
 
+// Suppress GCC warn_unused_result warning in -O2 mode
+// for those function calls where we do not need it.
+#define ignore_result(x) if (x)
+
+// Produce the value, which is equal or larger than 'v' and aligned to 'a'.
+#define ALIGN_VALUE(v,a) (size_t(v) + ( (~size_t(v) + 1) & (a - 1) ) )
 
 #endif

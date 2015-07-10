@@ -1,16 +1,14 @@
 #include "rar.hpp"
 
-#ifndef _WIN_CE
 static int SleepTime=0;
 
 void InitSystemOptions(int SleepTime)
 {
   ::SleepTime=SleepTime;
 }
-#endif
 
 
-#if !defined(SFX_MODULE) && !defined(_WIN_CE) && !defined(SETUP)
+#if !defined(SFX_MODULE) && !defined(SETUP)
 void SetPriority(int Priority)
 {
 #ifdef _WIN_ALL
@@ -72,7 +70,9 @@ void SetPriority(int Priority)
 #ifndef SETUP
 void Wait()
 {
-#if defined(_WIN_ALL) && !defined(_WIN_CE) && !defined(SFX_MODULE)
+  if (ErrHandler.UserBreak)
+    ErrHandler.Exit(RARX_USERBREAK);
+#if defined(_WIN_ALL) && !defined(SFX_MODULE)
   if (SleepTime!=0)
     Sleep(SleepTime);
 #endif
@@ -82,7 +82,7 @@ void Wait()
 
 
 
-#if defined(_WIN_ALL) && !defined(_WIN_CE) && !defined(SFX_MODULE) && !defined(SHELL_EXT) && !defined(SETUP)
+#if defined(_WIN_ALL) && !defined(SFX_MODULE) && !defined(SHELL_EXT) && !defined(SETUP)
 void Shutdown()
 {
   HANDLE hToken;
@@ -100,3 +100,22 @@ void Shutdown()
 #endif
 
 
+
+#ifdef USE_SSE
+SSE_VERSION _SSE_Version=GetSSEVersion();
+
+SSE_VERSION GetSSEVersion()
+{
+  int CPUInfo[4];
+  __cpuid(CPUInfo, 1);
+  if ((CPUInfo[2] & 0x80000)!=0)
+    return SSE_SSE41;
+  if ((CPUInfo[2] & 0x200)!=0)
+    return SSE_SSSE3;
+  if ((CPUInfo[3] & 0x4000000)!=0)
+    return SSE_SSE2;
+  if ((CPUInfo[3] & 0x2000000)!=0)
+    return SSE_SSE;
+  return SSE_NONE;
+}
+#endif
