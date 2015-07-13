@@ -202,6 +202,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     funBugs.data2.bHitAnim    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_HITANIM );
     funBugs.data3.bFastSprint = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTSPRINT );
     funBugs.data4.bBadDrivebyHitboxes = g_pGame->IsGlitchEnabled( CGame::GLITCH_BADDRIVEBYHITBOX );
+    funBugs.data5.bQuickStand = g_pGame->IsGlitchEnabled( CGame::GLITCH_QUICKSTAND );
     BitStream.Write ( &funBugs );
 
     BitStream.Write ( m_fJetpackMaxHeight );

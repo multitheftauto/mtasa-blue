@@ -129,6 +129,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_Glitches [ GLITCH_HITANIM ] = false;
     m_Glitches [ GLITCH_FASTSPRINT ] = false;
     m_Glitches [ GLITCH_BADDRIVEBYHITBOX ] = false;
+    m_Glitches [ GLITCH_QUICKSTAND ] = false;
     g_pMultiplayer->DisableBadDrivebyHitboxes( true );
 
     // Remove Night & Thermal vision view (if enabled).

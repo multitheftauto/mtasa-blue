@@ -2240,6 +2240,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_HITANIM, funBugs.data2.bHitAnim );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_FASTSPRINT, funBugs.data3.bFastSprint );
     g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_BADDRIVEBYHITBOX, funBugs.data4.bBadDrivebyHitboxes );
+    g_pClientGame->SetGlitchEnabled ( CClientGame::GLITCH_QUICKSTAND, funBugs.data5.bQuickStand );
 
     float fJetpackMaxHeight = 100;
     if ( !bitStream.Read ( fJetpackMaxHeight ) )
