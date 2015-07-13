@@ -116,9 +116,6 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     if ( !CCore::GetSingleton ().CheckDiskSpace () )
         return false;
 
-    // Test: Fix some timeouts by trying a tcp connection
-    pNet->GetHTTPDownloadManager ( EDownloadMode::CORE_UPDATER )->QueueFile ( m_strHost.c_str(), NULL, 0, "", 0, true, NULL, NULL, false, 1, 2000 );
-
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket );
 
@@ -133,6 +130,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     m_bIsConnecting = true;
     m_tConnectStarted = time ( NULL );
+    m_bHasSentTcpRequest = false;
 
     // Load server password
     if ( m_strPassword.empty () )
@@ -247,6 +245,17 @@ void CConnectManager::DoPulse ( void )
                     Abort ();
                     return;
                 }
+            }
+        }
+
+        if ( !m_bHasSentTcpRequest )
+        {
+            if ( time ( NULL ) >= m_tConnectStarted + 2 )
+            {
+                // Handle possible IP rejection by proving we exist with a TCP connection
+                g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CORE_UPDATER )->QueueFile( m_strHost.c_str(), NULL, 0, "", 0, true, NULL, NULL, false, 1, 2000 );
+                m_bHasSentTcpRequest = true;
+                AddReportLog( 9401, SString( "ConnectManager sent TCP connection request to %s", m_strHost.c_str() ) );
             }
         }
 
