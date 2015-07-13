@@ -54,6 +54,7 @@ private:
     bool            m_bSave;
     bool            m_bForceInternalHTTPServer;
     time_t          m_tConnectStarted;
+    bool            m_bHasSentTcpRequest;
 
     GUI_CALLBACK*   m_pOnCancelClick;
 
