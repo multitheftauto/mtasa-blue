@@ -179,6 +179,7 @@ CGame::CGame ( void )
     m_Glitches [ GLITCH_HITANIM ] = false;
     m_Glitches [ GLITCH_FASTSPRINT ] = false;
     m_Glitches [ GLITCH_BADDRIVEBYHITBOX ] = false;
+    m_Glitches [ GLITCH_QUICKSTAND ] = false;
     for ( int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++ )
         m_JetpackWeapons [ i ] = false;
 
@@ -194,6 +195,7 @@ CGame::CGame ( void )
     m_GlitchNames["hitanim"] = GLITCH_HITANIM;
     m_GlitchNames["fastsprint"] = GLITCH_FASTSPRINT;
     m_GlitchNames["baddrivebyhitbox"] = GLITCH_BADDRIVEBYHITBOX;
+    m_GlitchNames["quickstand"] = GLITCH_QUICKSTAND;
 
     m_bCloudsEnabled = true;
 

@@ -3101,9 +3101,12 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
             if ( ( ulNow - m_ulLastTimePressedLeftOrRight < 500.f * fSpeedRatio ) && 
                  ( ulNow - m_ulLastTimeUseGunCrouched < 500.f * fSpeedRatio ) )
             {
-                Current.ShockButtonL = 0; 
-                Current.ButtonCross = 0;
-                Current.ButtonSquare = 0;
+                if ( !g_pClientGame->IsGlitchEnabled( CClientGame::GLITCH_QUICKSTAND ) )
+                {
+                    Current.ShockButtonL = 0;
+                    Current.ButtonCross = 0;
+                    Current.ButtonSquare = 0;
+                }
             }
 
         }

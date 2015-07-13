@@ -197,6 +197,7 @@ public:
         GLITCH_HITANIM,
         GLITCH_FASTSPRINT,
         GLITCH_BADDRIVEBYHITBOX,
+        GLITCH_QUICKSTAND,
         NUM_GLITCHES
     };
 public:

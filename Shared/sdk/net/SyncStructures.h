@@ -1918,6 +1918,7 @@ struct SFunBugsStateSync : public ISyncStructure
     enum { BITCOUNT2 = 1 };
     enum { BITCOUNT3 = 1 };
     enum { BITCOUNT4 = 1 };
+    enum { BITCOUNT5 = 1 };
 
     bool Read ( NetBitStreamInterface& bitStream )
     {
@@ -1934,6 +1935,10 @@ struct SFunBugsStateSync : public ISyncStructure
             bOk &= bitStream.ReadBits(reinterpret_cast < char* > (&data4), BITCOUNT4);
         else
             data4.bBadDrivebyHitboxes = 0;
+        if ( bitStream.Version() >= 0x063 )
+            bOk &= bitStream.ReadBits( reinterpret_cast < char* > ( &data5 ), BITCOUNT5 );
+        else
+            data5.bQuickStand = 0;
 
         //// Example for adding item:
         // if ( bitStream.Version() >= 0x999 )
@@ -1952,6 +1957,8 @@ struct SFunBugsStateSync : public ISyncStructure
             bitStream.WriteBits ( reinterpret_cast < const char* > ( &data3 ), BITCOUNT3 );
         if (bitStream.Version() >= 0x059)
             bitStream.WriteBits(reinterpret_cast < const char* > (&data4), BITCOUNT4);
+        if ( bitStream.Version() >= 0x063 )
+            bitStream.WriteBits( reinterpret_cast < const char* > ( &data5 ), BITCOUNT5 );
 
         //// Example for adding item:
         // if ( bitStream.Version() >= 0x999 )
@@ -1985,6 +1992,12 @@ struct SFunBugsStateSync : public ISyncStructure
     {
         bool bBadDrivebyHitboxes : 1;
     } data4;
+
+    // Add new ones in separate structs
+    struct
+    {
+        bool bQuickStand : 1;
+    } data5;
 };
 
 
