@@ -116,6 +116,9 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     if ( !CCore::GetSingleton ().CheckDiskSpace () )
         return false;
 
+    // Test: Fix some timeouts by trying a tcp connection
+    pNet->GetHTTPDownloadManager ( EDownloadMode::CORE_UPDATER )->QueueFile ( m_strHost.c_str(), NULL, 0, "", 0, true, NULL, NULL, false, 1, 2000 );
+
     // Set our packet handler
     pNet->RegisterPacketHandler ( CConnectManager::StaticProcessPacket );
 
