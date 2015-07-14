@@ -324,7 +324,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "fov",                        70 );                           // Camera field of view
     DEFAULT ( "browser_remote_websites",    true );                         // Load remote websites?
     DEFAULT ( "browser_remote_javascript",  true );                         // Execute javascript on remote websites?
-    DEFAULT ( "browser_plugins",            true );                         // Enable browser plugins?
+    DEFAULT ( "browser_plugins",            false );                         // Enable browser plugins?
 
     if(!Exists("locale")) 
     {
