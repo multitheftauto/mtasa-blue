@@ -6441,7 +6441,7 @@ void CClientGame::OutputServerInfo( void )
 
     {
         SString strEnabledGlitches;
-        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint", "Bad driveby hitboxes" };
+        const char* szGlitchNames[] = { "Quick reload", "Fast fire", "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint", "Bad driveby hitboxes", "Quick stand" };
         for( uint i = 0 ; i < NUM_GLITCHES ; i++ )
         {
             if ( IsGlitchEnabled( i ) )
