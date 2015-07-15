@@ -658,11 +658,11 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         switch (m_pMainConfig->GetVoiceSampleRate())
         {
             case 0:
-                strVoice = SString("Quality [%i];  Sample Rate: [8000kHz]",m_pMainConfig->GetVoiceQuality() ); break;
+                strVoice = SString("Quality [%i];  Sample Rate: [8000Hz]",m_pMainConfig->GetVoiceQuality() ); break;
             case 1:
-                strVoice = SString("Quality [%i];  Sample Rate: [16000kHz]",m_pMainConfig->GetVoiceQuality() ); break;
+                strVoice = SString("Quality [%i];  Sample Rate: [16000Hz]",m_pMainConfig->GetVoiceQuality() ); break;
             case 2:
-                strVoice = SString("Quality [%i];  Sample Rate: [32000kHz]",m_pMainConfig->GetVoiceQuality() ); break;
+                strVoice = SString("Quality [%i];  Sample Rate: [32000Hz]",m_pMainConfig->GetVoiceQuality() ); break;
             default:
                 break;
         }
