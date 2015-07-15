@@ -589,7 +589,7 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
 
         // DT_CALCRECT does not take space characters at the end of a line 
         // into consideration for the rect size. Thus replace it with an underscore
-        if (strText.back() = ' ')
+        if (strText.back() == ' ')
             strText.back() = '_';
         
         
