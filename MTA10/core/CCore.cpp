@@ -2279,7 +2279,7 @@ void CCore::UpdateDummyProgress( int iValue, const char* szType )
 void CCore::CallSetCursorPos( int X, int Y )
 {
     if ( CCore::GetSingleton ( ).IsFocused ( ) && !CLocalGUI::GetSingleton ( ).IsMainMenuVisible ( ) )
-        m_pLocalGUI->SetCursorPos ( X, Y );
+        m_pLocalGUI->SetCursorPos ( X, Y, true );
 }
 
 bool CCore::GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions )

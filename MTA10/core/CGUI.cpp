@@ -866,12 +866,16 @@ DWORD CLocalGUI::TranslateScanCodeToGUIKey ( DWORD dwCharacter )
     }
 }
 
-void CLocalGUI::SetCursorPos ( int iX, int iY )
+void CLocalGUI::SetCursorPos ( int iX, int iY, bool bForce )
 {
-	// Update the stored position
+    // Update the stored position
     m_StoredMousePosition.x = iX;
     m_StoredMousePosition.y = iY;
 
-	// Apply the position
-    ::SetCursorPos ( iX, iY );
+    // Apply the position
+    if ( bForce )
+        CSetCursorPosHook::GetSingleton ().CallSetCursorPos ( iX, iY );
+    else
+        ::SetCursorPos ( iX, iY );
+
 }
