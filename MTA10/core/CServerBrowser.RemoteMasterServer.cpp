@@ -388,6 +388,8 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
     bool bHasRestrictionFlags = ( uiFlags & ASE_FLAG_RESTRICTIONS ) != 0;
     bool bHasSearchIgnoreSections = ( uiFlags & ASE_FLAG_SEARCH_IGNORE_SECTIONS ) != 0;
     bool bHasKeepFlag       = ( uiFlags & ASE_FLAG_KEEP ) != 0;
+    bool bHasHttpPort       = ( uiFlags & ASE_FLAG_HTTP_PORT ) != 0;
+    bool bHasSpecialFlags   = ( uiFlags & ASE_FLAG_SPECIAL_FLAGS ) != 0;
 
     // Rate quality of data supplied here
     uint uiDataQuality = SERVER_INFO_ASE_2;
@@ -494,6 +496,16 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
                 uchar ucKeepFlag = 0;
                 stream.Read ( ucKeepFlag );
                 pItem->bKeepFlag = ucKeepFlag ? true : false;
+            }
+
+            if ( bHasHttpPort )
+            {
+                stream.Read ( pItem->m_usHttpPort );
+            }
+
+            if ( bHasSpecialFlags )
+            {
+                stream.Read ( pItem->m_ucSpecialFlags );
             }
 
             pItem->PostChange ();

@@ -28,6 +28,7 @@ namespace EDownloadMode
         RESOURCE_SINGULAR_FILES,
         CALL_REMOTE,
         WEBBROWSER_LISTS,
+        CONNECT_TCP_SEND,
     };
 }
 using EDownloadMode::EDownloadModeType;

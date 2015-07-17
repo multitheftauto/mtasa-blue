@@ -424,6 +424,11 @@ std::string ASE::QueryLight ( void )
     SString strPingStatus = (const char*)strPingStatusFixed;
     SString strNetRoute = (const char*)strNetRouteFixed;
     SString strUpTime( "%d", (uint)( time( NULL ) - m_tStartTime ) );
+    SString strHttpPort( "%d", m_pMainConfig->GetHTTPPort() );
+
+    uint uiExtraDataLength = ( strPlayerCount.length () + 1 + strBuildType.length () + 1 + strBuildNumber.length () + 1 + strPingStatus.length () + 1 + strNetRoute.length () + 1 + strUpTime.length() + 1 + strHttpPort.length() + 1 );
+    uint uiMaxMapNameLength = 250 - uiExtraDataLength;
+    m_strMapName = m_strMapName.Left( uiMaxMapNameLength );
 
     reply << "EYE2";
     // game
@@ -439,7 +444,7 @@ std::string ASE::QueryLight ( void )
     reply << ( unsigned char ) ( m_strGameType.length() + 1 );
     reply << m_strGameType;
     // map name with backwardly compatible large player count, build type and build number
-    reply << ( unsigned char ) ( m_strMapName.length() + 1 + strPlayerCount.length () + 1 + strBuildType.length () + 1 + strBuildNumber.length () + 1 + strPingStatus.length () + 1 + strNetRoute.length () + 1 + strUpTime.length() + 1 );
+    reply << ( unsigned char ) ( m_strMapName.length() + 1 + uiExtraDataLength );
     reply << m_strMapName;
     reply << ( unsigned char ) 0;
     reply << strPlayerCount;
@@ -453,6 +458,8 @@ std::string ASE::QueryLight ( void )
     reply << strNetRoute;
     reply << ( unsigned char ) 0;
     reply << strUpTime;
+    reply << ( unsigned char ) 0;
+    reply << strHttpPort;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
     reply << ( unsigned char ) ( temp.length() + 1 );

@@ -390,7 +390,34 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery, bool bRemoveNonRespondi
             }
         }
 
-        if ( m_ElapsedTime.Get () > SERVER_LIST_ITEM_TIMEOUT )
+        /////////////////////////////////////////////////////////////////////////////////////////
+        // TCP send to servers that the master server can see, but this client can't
+        uint uiQueryAge = (uint)m_ElapsedTime.Get();
+        if ( uiQueryAge > 2000 )
+        {
+            if ( !m_bDoneTcpSend && GetMaxRetries() > 0 )
+            {
+                m_bDoneTcpSend = true;
+                if ( ( m_ucSpecialFlags & ASE_SPECIAL_FLAG_DENY_TCP_SEND ) == 0 )
+                {
+                    CConnectManager::OpenServerFirewall( Address, m_usHttpPort, false );
+                    m_bDoPostTcpQuery = 1;
+                }
+            }
+        }
+        if ( uiQueryAge > 4000 )
+        {
+            if ( m_bDoPostTcpQuery )
+            {
+                // Do another query if we just tried to open this server's firewall
+                m_bDoPostTcpQuery = false;
+                Query ();
+                return "ResentQuery";
+            }
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////
+
+        if ( uiQueryAge > SERVER_LIST_ITEM_TIMEOUT )
         {
             if ( bKeepFlag )
                 bRemoveNonResponding = false;
@@ -401,9 +428,8 @@ std::string CServerListItem::Pulse ( bool bCanSendQuery, bool bRemoveNonRespondi
                 nPlayers = 0;               // We don't have player names, so zero this now
             }
             uiRevision++;               // To flag browser gui update
-            uint uiMaxRetries = GetDataQuality () <= SERVER_INFO_ASE_0 || MaybeWontRespond () ? 0 : 1;
 
-            if ( uiQueryRetryCount < uiMaxRetries )
+            if ( uiQueryRetryCount < GetMaxRetries() )
             {
                 // Try again
                 uiQueryRetryCount++;
@@ -600,6 +626,13 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
     const SString strPingStatus = strBuildNumber.Right ( strBuildNumber.length () - strlen ( strBuildNumber ) - 1 );
     CCore::GetSingleton ().GetNetwork ()->UpdatePingStatus ( *strPingStatus, nPlayers );
 
+    // Recover server http port if present
+    const SString strNetRoute = strPingStatus.Right ( strPingStatus.length () - strlen ( strPingStatus ) - 1 );
+    const SString strUpTime = strNetRoute.Right ( strNetRoute.length () - strlen ( strNetRoute ) - 1 );
+    const SString strHttpPort = strUpTime.Right ( strUpTime.length () - strlen ( strUpTime ) - 1 );
+    if ( !strHttpPort.empty () )
+        m_usHttpPort = atoi ( strHttpPort );
+
     // Get player nicks
     vecPlayers.clear ();
     while ( i < nLength )
@@ -770,6 +803,10 @@ CServerListItem::CServerListItem ( in_addr _Address, unsigned short _usGamePort,
     Address = _Address;
     usGamePort = _usGamePort;
     m_pItemList = pItemList;
+    m_bDoneTcpSend = false;
+    m_bDoPostTcpQuery = false;
+    m_usHttpPort = 0;
+    m_ucSpecialFlags = 0;
     Init ();
     if ( m_pItemList )
     {
