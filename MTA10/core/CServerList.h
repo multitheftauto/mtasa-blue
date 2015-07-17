@@ -63,6 +63,15 @@ enum
     ASE_FLAG_RESTRICTIONS       =   0x2000,
     ASE_FLAG_SEARCH_IGNORE_SECTIONS =   0x4000,
     ASE_FLAG_KEEP                   =   0x8000,
+    ASE_FLAG_HTTP_PORT              = 0x080000,
+    ASE_FLAG_SPECIAL_FLAGS          = 0x100000,
+};
+
+enum
+{
+    ASE_SPECIAL_FLAG_VALID              = 0x01,
+    ASE_SPECIAL_FLAG_DENY_TCP_SEND      = 0x02,
+    ASE_SPECIAL_FLAG_FORCE_KEEP         = 0x04,
 };
 
 enum
@@ -86,6 +95,10 @@ public:
         Address.S_un.S_addr = 0;
         usGamePort = 0;
         m_pItemList = NULL;
+        m_bDoneTcpSend = false;
+        m_bDoPostTcpQuery = false;
+        m_usHttpPort = 0;
+        m_ucSpecialFlags = 0;
         Init ();
     }
     CServerListItem     ( in_addr _Address, unsigned short _usGamePort, CServerListItemList* pItemList = NULL, bool bAtFront = false );
@@ -204,6 +217,8 @@ public:
 
     int                 m_iBuildType;     // 9=release
     int                 m_iBuildNumber;   // 00000 and up
+    ushort              m_usHttpPort;
+    uchar               m_ucSpecialFlags;
 
     SString             strNameSortKey;         // Server name as a sortable string
     SString             strVersionSortKey;      // Game version as a sortable string
@@ -300,11 +315,18 @@ public:
         return m_iDataQuality;
     }
 
+    uint GetMaxRetries ( void ) const
+    {
+        return GetDataQuality () <= SERVER_INFO_ASE_0 || MaybeWontRespond () ? 0 : 1;
+    }
+
     static bool StaticIsValid ( CServerListItem* pServer )
     {
         return MapContains ( ms_ValidServerListItemMap, pServer );
     }
 
+    bool                m_bDoneTcpSend;
+    bool                m_bDoPostTcpQuery;
     int                 m_iTimeoutLength;
     CServerListItemList* m_pItemList;
 protected:

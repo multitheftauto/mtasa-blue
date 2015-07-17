@@ -130,7 +130,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     m_bIsConnecting = true;
     m_tConnectStarted = time ( NULL );
-    m_bHasSentTcpRequest = false;
+    m_bHasTriedSecondConnect = false;
 
     // Load server password
     if ( m_strPassword.empty () )
@@ -141,6 +141,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_pServerItem = new CServerListItem ( m_Address, m_usPort );
     m_pServerItem->m_iTimeoutLength = 2000;
     m_bIsDetectingVersion = true;
+    OpenServerFirewall( m_Address );
 
     // Display the status box
     SString strBuffer ( _("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort );
@@ -248,19 +249,18 @@ void CConnectManager::DoPulse ( void )
             }
         }
 
-        if ( !m_bHasSentTcpRequest )
+        int iConnectTimeDelta = time ( NULL ) - m_tConnectStarted;
+
+        // Try connect again if no response after 4 seconds
+        if ( iConnectTimeDelta >= 4 && !m_bHasTriedSecondConnect && g_pCore->GetNetwork()->GetExtendedErrorCode() == 0 )
         {
-            if ( time ( NULL ) >= m_tConnectStarted + 2 )
-            {
-                // Handle possible IP rejection by proving we exist with a TCP connection
-                g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CORE_UPDATER )->QueueFile( m_strHost.c_str(), NULL, 0, "", 0, true, NULL, NULL, false, 1, 2000 );
-                m_bHasSentTcpRequest = true;
-                AddReportLog( 9401, SString( "ConnectManager sent TCP connection request to %s", m_strHost.c_str() ) );
-            }
+            m_bHasTriedSecondConnect = true;
+            SString strAddress = inet_ntoa ( m_Address );
+            g_pCore->GetNetwork()->StartNetwork ( strAddress, m_usPort, CVARS_GET_VALUE < bool > ( "packet_tag" ) );
         }
 
         // Time to timeout the connection?
-        if ( time ( NULL ) >= m_tConnectStarted + 8 )
+        if ( iConnectTimeDelta >= 8 )
         {
             // Show a message that the connection timed out and abort
             g_pCore->ShowNetErrorMessageBox ( _("Error")+_E("CC23"), _("Connection timed out"), "connect-timed-out", true );
@@ -457,4 +457,28 @@ void CConnectManager::OnServerExists ( void )
         m_bNotifyServerBrowser = false;
         CServerBrowser::GetSingletonPtr()->NotifyServerExists ( m_Address, m_usPort );
     }
+}
+
+//
+// Some server firewalls block UDP packets unless a TCP connection has previously been established 
+//
+void CConnectManager::OpenServerFirewall( in_addr Address, ushort usHttpPort, bool bHighPriority )
+{
+    if ( usHttpPort == 0 )
+        usHttpPort = 80;
+
+    uint uiTimeOut;
+    if ( bHighPriority )
+    {
+        // Clear previously queued requests if this is high priority
+        g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CONNECT_TCP_SEND )->Reset();
+        uiTimeOut = 2000;
+    }
+    else
+    {
+        uiTimeOut = 1000;
+    }
+
+    SString strDummyUrl( "http://%s:%d/.dummy/", inet_ntoa( Address ), usHttpPort );
+    g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CONNECT_TCP_SEND )->QueueFile( strDummyUrl, NULL, 0, "", 0, true, NULL, NULL, false, 1, uiTimeOut );
 }

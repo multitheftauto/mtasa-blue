@@ -35,6 +35,7 @@ public:
     void            OnServerExists      ( void );
 
     bool            ShouldUseInternalHTTPServer ( void )    { return m_bForceInternalHTTPServer; }
+    static void     OpenServerFirewall ( in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false );
 
     static bool     StaticProcessPacket ( unsigned char ucPacketID, class NetBitStreamInterface& bitStream );
 
@@ -55,7 +56,7 @@ private:
     bool            m_bSave;
     bool            m_bForceInternalHTTPServer;
     time_t          m_tConnectStarted;
-    bool            m_bHasSentTcpRequest;
+    bool            m_bHasTriedSecondConnect;
 
     GUI_CALLBACK*   m_pOnCancelClick;
 

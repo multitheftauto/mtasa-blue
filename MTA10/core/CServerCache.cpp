@@ -37,6 +37,8 @@ namespace
         CValueInt       bPassworded;    // Password protected
         CValueInt       bKeepFlag;
         CValueInt       uiCacheNoReplyCount;
+        CValueInt       usHttpPort;
+        CValueInt       ucSpecialFlags;
         SString         strName;        // Server name
         SString         strGameMode;    // Game mode
         SString         strMap;         // Map name
@@ -168,6 +170,8 @@ bool CServerCache::LoadServerCache ( void )
         if ( const SString* pString = MapFind ( item.attributeMap, "bPassworded" ) )    info.bPassworded.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "bKeepFlag" ) )      info.bKeepFlag.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "uiNoReplyCount" ) ) info.uiCacheNoReplyCount.SetFromString ( *pString );
+        if ( const SString* pString = MapFind ( item.attributeMap, "httpPort" ) )       info.usHttpPort.SetFromString ( *pString );
+        if ( const SString* pString = MapFind ( item.attributeMap, "flags" ) )          info.ucSpecialFlags.SetFromString ( *pString );
         if ( const SString* pString = MapFind ( item.attributeMap, "strName" ) )        info.strName    = *pString;
         if ( const SString* pString = MapFind ( item.attributeMap, "strGameMode" ) )    info.strGameMode = *pString;
         if ( const SString* pString = MapFind ( item.attributeMap, "strMap" ) )         info.strMap     = *pString;
@@ -281,6 +285,8 @@ void CServerCache::StaticSaveServerCache ( void )
         MapSet ( item.attributeMap, "bPassworded",      info.bPassworded.ToString () );
         MapSet ( item.attributeMap, "bKeepFlag",        info.bKeepFlag.ToString () );
         MapSet ( item.attributeMap, "uiNoReplyCount",   info.uiCacheNoReplyCount.ToString () );
+        MapSet ( item.attributeMap, "httpPort",         info.usHttpPort.ToString () );
+        MapSet ( item.attributeMap, "flags",            info.ucSpecialFlags.ToString () );
         MapSet ( item.attributeMap, "strName",          info.strName );
         MapSet ( item.attributeMap, "strGameMode",      info.strGameMode );
         MapSet ( item.attributeMap, "strMap",           info.strMap );
@@ -324,7 +330,8 @@ void CServerCache::GetServerCachedInfo ( CServerListItem* pItem )
             pItem->strMap           = pInfo->strMap;
             pItem->strVersion       = pInfo->strVersion;
             pItem->uiCacheNoReplyCount = pInfo->uiCacheNoReplyCount;
-
+            pItem->m_usHttpPort     = pInfo->usHttpPort;
+            pItem->m_ucSpecialFlags = pInfo->ucSpecialFlags;
             pItem->PostChange ();
         }
         else
@@ -335,6 +342,8 @@ void CServerCache::GetServerCachedInfo ( CServerListItem* pItem )
             if ( pItem->strMap.empty () )           pItem->strMap       = pInfo->strMap;
             if ( pItem->strVersion.empty () )       pItem->strVersion   = pInfo->strVersion;
             if ( pItem->nPing == 9999 )             pItem->nPing        = pInfo->nPing;
+            if ( pItem->m_usHttpPort == 0 )         pItem->m_usHttpPort = pInfo->usHttpPort;
+            if ( pItem->m_ucSpecialFlags == 0 )     pItem->m_ucSpecialFlags = pInfo->ucSpecialFlags;
         }
     }
 }
@@ -370,7 +379,9 @@ void CServerCache::SetServerCachedInfo ( const CServerListItem* pItem )
          && pInfo->strGameMode          == pItem->strGameMode
          //&& pInfo->strMap               == pItem->strMap
          && pInfo->strVersion           == pItem->strVersion
-         && pInfo->uiCacheNoReplyCount  == pItem->uiCacheNoReplyCount )
+         && pInfo->uiCacheNoReplyCount  == pItem->uiCacheNoReplyCount
+         && pInfo->usHttpPort           == pItem->m_usHttpPort
+         && pInfo->ucSpecialFlags       == pItem->m_ucSpecialFlags )
     {
         return;
     }
@@ -386,6 +397,8 @@ void CServerCache::SetServerCachedInfo ( const CServerListItem* pItem )
     pInfo->strMap           = pItem->strMap;
     pInfo->strVersion       = pItem->strVersion;
     pInfo->uiCacheNoReplyCount   = pItem->uiCacheNoReplyCount;
+    pInfo->usHttpPort       = pItem->m_usHttpPort;
+    pInfo->ucSpecialFlags   = pItem->m_ucSpecialFlags;
 }
 
 

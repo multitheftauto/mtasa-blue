@@ -34,6 +34,8 @@ public:
 
     // Limit number of concurrent http client connections
     virtual void            SetMaxConnections   ( int iMaxConnections ) = 0;
+
+    virtual void            Reset               ( void ) = 0;
 };
 
 #endif

@@ -96,7 +96,7 @@ private:
     CPlayerManager*         m_pPlayerManager;
 
     std::string             m_strGameType;
-    std::string             m_strMapName;
+    SString                 m_strMapName;
     std::string             m_strIP;
     std::string             m_strPort;
 
