@@ -649,7 +649,7 @@ public:
     static bool                 GetAccountsBySerial                 ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
 
     // Account set funcs
-    static CAccount*            AddAccount                          ( const char* szName, const char* szPassword );
+    static CAccount*            AddAccount                          ( const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError );
     static bool                 RemoveAccount                       ( CAccount* pAccount );
     static bool                 SetAccountPassword                  ( CAccount* pAccount, const char* szPassword );
     static bool                 SetAccountData                      ( CAccount* pAccount, const char* szKey, CLuaArgument * pArgument );

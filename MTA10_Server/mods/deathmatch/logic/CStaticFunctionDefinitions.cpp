@@ -11082,16 +11082,37 @@ bool CStaticFunctionDefinitions::GetAccountsBySerial ( const SString& strSerial,
 }
 
 
-CAccount* CStaticFunctionDefinitions::AddAccount ( const char* szName, const char* szPassword )
+CAccount* CStaticFunctionDefinitions::AddAccount ( const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError )
 {
-    assert ( szName );
-    assert ( szPassword );
-
-    CAccount* pCurrentAccount = m_pAccountManager->Get ( szName );
-    if ( pCurrentAccount == NULL && CAccountManager::IsValidNewAccountName( szName ) && CAccountManager::IsValidNewPassword( szPassword ) )
+    // Check for case variations if not allowed
+    if ( !bAllowCaseVariations )
     {
-        CAccount* pAccount = new CAccount ( m_pAccountManager, true, szName );
-        pAccount->SetPassword ( szPassword );
+        SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation( strName );
+        if ( !strCaseVariation.empty() )
+        {
+            strOutError = SString( "Already an account using a case variation of that name ('%s')", *strCaseVariation );
+            return NULL;
+        }
+    }
+
+    if ( m_pAccountManager->Get( strName ) != NULL )
+    {
+        strOutError = "Account already exists";
+    }
+    else
+    if ( !CAccountManager::IsValidNewAccountName( strName ) )
+    {
+        strOutError = "Name invalid";
+    }
+    else
+    if ( !CAccountManager::IsValidNewPassword( strPassword ) )
+    {
+        strOutError = "Password invalid";
+    }
+    else
+    {
+        CAccount* pAccount = new CAccount ( m_pAccountManager, true, strName );
+        pAccount->SetPassword ( strPassword );
         g_pGame->GetAccountManager ()->Register( pAccount );
         return pAccount;
     }
