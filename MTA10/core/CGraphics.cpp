@@ -1095,7 +1095,7 @@ bool CGraphics::LoadStandardDXFonts ( void )
     for ( uint i = 0 ; i < m_FontResourceNames.size () ; i++ )
     {
         SString strPathFilename = CalcMTASAPath ( "MTA\\cgui\\" + m_FontResourceNames[i] );
-        if ( AddFontResourceEx ( strPathFilename, FR_PRIVATE, 0 ) )
+        if ( !AddFontResourceEx ( strPathFilename, FR_PRIVATE, 0 ) )
         {
             SString strFileMd5 = GenerateHashHexStringFromFile ( EHashFunctionType::MD5, strPathFilename );
             uint uiFileSize = (uint)FileSize( strPathFilename );
