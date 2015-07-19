@@ -22,7 +22,6 @@ SExePatchedStatus GetExePatchedStatus( bool bUseExeCopy )
     SString strGTAEXEPath = GetExePathFilename( bUseExeCopy );
 
     SExePatchedStatus status;
-    status.bTimestamp   = UpdatePatchStatusTimestamp ( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
     status.bLargeMem    = UpdatePatchStatusLargeMem  ( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
     status.bDep         = UpdatePatchStatusDep       ( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
     status.bNvightmare  = UpdatePatchStatusNvightmare( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
@@ -42,7 +41,6 @@ SExePatchedStatus GetExePatchedStatus( bool bUseExeCopy )
 SExePatchedStatus GetExePatchRequirements( void )
 {
     SExePatchedStatus status;
-    status.bTimestamp   = GetApplicationSettingInt ( "aero-enabled" ) ? true : false;
     status.bLargeMem    = true;
     status.bDep         = true;
     status.bNvightmare  = GetApplicationSettingInt( "nvhacks", "optimus-export-enablement" ) ? true : false;
@@ -65,7 +63,6 @@ bool SetExePatchedStatus( bool bUseExeCopy, const SExePatchedStatus& status )
     SString strGTAEXEPath = GetExePathFilename( bUseExeCopy );
 
     bool bReqAdmin = false;
-    bReqAdmin |= UpdatePatchStatusTimestamp ( strGTAEXEPath, status.bTimestamp  ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusLargeMem  ( strGTAEXEPath, status.bLargeMem   ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusDep       ( strGTAEXEPath, status.bDep        ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusNvightmare( strGTAEXEPath, status.bNvightmare ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
@@ -88,8 +85,6 @@ SString GetPatchExeAdminReason( bool bUseExeCopy, const SExePatchedStatus& reqSt
     SExePatchedStatus status = GetExePatchedStatus( bUseExeCopy );
 
     // See what needs doing
-    if ( status.bTimestamp != reqStatus.bTimestamp )
-        return _("Update Aero setting");
     if ( status.bLargeMem != reqStatus.bLargeMem )
         return _("Update Large Memory setting");
     if ( status.bDep != reqStatus.bDep )
@@ -150,70 +145,6 @@ SString GetExePathFilename( bool bUseExeCopy )
         return strGTAEXEPath;
     }
     return "unknown";
-}
-
-
-//////////////////////////////////////////////////////////
-//
-// UpdatePatchStatusTimestamp
-//
-// Change the link timestamp in gta_sa.exe to trick windows 7 into using aero
-//
-//////////////////////////////////////////////////////////
-EPatchResult UpdatePatchStatusTimestamp( const SString& strGTAEXEPath, EPatchMode mode )
-{
-    // Get the top byte of the file link timestamp
-    uchar ucTimeStamp = 0;
-    FILE* fh = fopen ( strGTAEXEPath, "rb" );
-    if ( fh )
-    {
-        if ( !fseek ( fh, 0x8B, SEEK_SET ) )
-        {
-            if ( fread ( &ucTimeStamp, sizeof ( ucTimeStamp ), 1, fh ) != 1 )
-            {
-                ucTimeStamp = 0;
-            }
-        }
-        fclose ( fh );
-    }
-
-    const uchar AERO_DISABLED = 0x42;
-    const uchar AERO_ENABLED  = 0x43;
-
-    // Return status if just checking
-    if ( mode == PATCH_CHECK )
-    {
-        if ( ucTimeStamp == AERO_ENABLED )
-            return PATCH_CHECK_RESULT_ON;
-        return PATCH_CHECK_RESULT_OFF;
-    }
-
-    // Check it's a value we're expecting
-    bool bCanChangeAeroSetting = ( ucTimeStamp == AERO_DISABLED || ucTimeStamp == AERO_ENABLED );
-    SetApplicationSettingInt ( "aero-changeable", bCanChangeAeroSetting );
-
-    if ( bCanChangeAeroSetting )
-    {
-        // Get option to set
-        bool bAeroEnabled = ( mode == PATCH_SET_ON );
-        uchar ucTimeStampRequired = bAeroEnabled ? AERO_ENABLED : AERO_DISABLED;
-        if ( ucTimeStamp != ucTimeStampRequired )
-        {
-            // Change needed!
-            SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen ( strGTAEXEPath, "r+b" );
-            if ( !fh )
-            {
-                return PATCH_SET_RESULT_REQ_ADMIN;
-            }
-            if ( !fseek ( fh, 0x8B, SEEK_SET ) )
-            {
-                fwrite ( &ucTimeStampRequired, sizeof ( ucTimeStampRequired ), 1, fh );
-            }
-            fclose ( fh );
-        }
-    }
-    return PATCH_SET_RESULT_OK;
 }
 
 

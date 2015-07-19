@@ -835,32 +835,8 @@ void CSettings::CreateGUI ( void )
     }
 #endif
 
-    m_pCheckBoxDisableAero = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Disable Aero Desktop"), true ) );
-    m_pCheckBoxDisableAero->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 50.0f ) );
-    m_pCheckBoxDisableAero->AutoSize ( NULL, 20.0f );
-
-#ifndef SHOWALLSETTINGS
-    if ( GetApplicationSetting ( "os-version" ) < "6.1" || GetApplicationSettingInt ( "aero-changeable" ) == 0 )
-    {
-        m_pCheckBoxDisableAero->SetVisible ( false );
-        fPosY -= 20.0f;
-    }
-#endif
-
-    m_pCheckBoxDisableDriverOverrides = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Disable Driver Overrides"), true ) );
-    m_pCheckBoxDisableDriverOverrides->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 70.0f ) );
-    m_pCheckBoxDisableDriverOverrides->AutoSize ( NULL, 20.0f );
-
-#ifndef SHOWALLSETTINGS
-    if ( GetApplicationSettingInt ( "nvhacks", "optimus" ) )
-    {
-        m_pCheckBoxDisableDriverOverrides->SetVisible ( false );
-        fPosY -= 20.0f;
-    }
-#endif
-
     m_pCheckBoxDeviceSelectionDialog = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Enable Device Selection Dialog"), true ) );
-    m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 90.0f ) );
+    m_pCheckBoxDeviceSelectionDialog->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 50.0f ) );
     m_pCheckBoxDeviceSelectionDialog->AutoSize ( NULL, 20.0f );
 
 #ifndef SHOWALLSETTINGS
@@ -872,7 +848,7 @@ void CSettings::CreateGUI ( void )
 #endif
 
     m_pCheckBoxShowUnsafeResolutions = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Show unsafe resolutions"), true ) );
-    m_pCheckBoxShowUnsafeResolutions->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 110.0f ) );
+    m_pCheckBoxShowUnsafeResolutions->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 70.0f ) );
     m_pCheckBoxShowUnsafeResolutions->AutoSize ( NULL, 20.0f );
 
 #ifndef SHOWALLSETTINGS
@@ -1737,8 +1713,6 @@ void CSettings::UpdateVideoTab ( void )
     m_pCheckBoxMipMapping->SetSelected ( gameSettings->IsMipMappingEnabled () );
     m_pCheckBoxWindowed->SetSelected ( bNextWindowed );
     m_pCheckBoxMinimize->SetSelected ( bNextFSMinimize );
-    m_pCheckBoxDisableAero->SetSelected ( GetApplicationSettingInt ( "aero-enabled" ) ? false : true );
-    m_pCheckBoxDisableDriverOverrides->SetSelected ( GetApplicationSettingInt ( "driver-overrides-disabled" ) ? true : false );
     m_pDrawDistance->SetScrollPosition ( ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f );
     m_pBrightness->SetScrollPosition ( ( float )gameSettings->GetBrightness () / 384 );
 
@@ -2038,9 +2012,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
 
     // Display restart required message if required
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != m_pComboAntiAliasing->GetSelectedItemIndex ();
-    bool bIsAeroChanged = ( GetApplicationSettingInt ( "aero-enabled"  ) ? false : true ) != m_pCheckBoxDisableAero->GetSelected ();
-    bool bIsDriverOverridesChanged = ( GetApplicationSettingInt ( "driver-overrides-disabled"  ) ? true : false ) != m_pCheckBoxDisableDriverOverrides->GetSelected ();
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged )
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged )
         ShowRestartQuestion();
 
     // Update the GUI
@@ -3064,8 +3036,6 @@ void CSettings::SaveData ( void )
         iNextFullscreenStyle = ( int ) pSelected->GetData();
     if ( CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem () )
         iAntiAliasing = ( int ) pSelected->GetData();
-    int iAeroEnabled = m_pCheckBoxDisableAero->GetSelected() ? 0 : 1;
-    int iDriverOverridesDisabled = m_pCheckBoxDisableDriverOverrides->GetSelected() ? 1 : 0;
     bool bCustomizedSAFilesEnabled = m_pCheckBoxCustomizedSAFiles->GetSelected();
     bool bCustomizedSAFilesWasEnabled = GetApplicationSettingInt ( "customized-sa-files-request" ) != 0;
 
@@ -3080,8 +3050,6 @@ void CSettings::SaveData ( void )
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle );
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != iAntiAliasing;
-    bool bIsAeroChanged = GetApplicationSettingInt ( "aero-enabled"  ) != iAeroEnabled;
-    bool bIsDriverOverridesChanged = GetApplicationSettingInt ( "driver-overrides-disabled"  ) != iDriverOverridesDisabled;
     bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
 
     gameSettings->SetAntiAliasing ( iAntiAliasing, true );
@@ -3090,10 +3058,6 @@ void CSettings::SaveData ( void )
     gameSettings->SetMouseSensitivity ( m_pMouseSensitivity->GetScrollPosition () );
 	gameSettings->SetMipMappingEnabled ( m_pCheckBoxMipMapping->GetSelected () );
     SetApplicationSettingInt ( "customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0 );
-
-    // Update Aero override setting. This need to be a registry setting as it's done in the launcher
-    SetApplicationSettingInt ( "aero-enabled", m_pCheckBoxDisableAero->GetSelected() ? 0 : 1 );
-    SetApplicationSettingInt ( "driver-overrides-disabled", m_pCheckBoxDisableDriverOverrides->GetSelected() ? 1 : 0 );
 
     // iFieldOfView
     int iFieldOfView = Min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
@@ -3329,7 +3293,7 @@ void CSettings::SaveData ( void )
     gameSettings->Save ();
 
     // Ask to restart?
-    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsAeroChanged || bIsDriverOverridesChanged || bIsCustomizedSAFilesChanged )
+    if ( bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged )
         ShowRestartQuestion();
     else if ( CModManager::GetSingleton ().IsLoaded () && bBrowserSettingChanged )
         ShowDisconnectQuestion();

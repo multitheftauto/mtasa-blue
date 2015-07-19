@@ -10,19 +10,17 @@
 
 struct SExePatchedStatus
 {
-    bool bTimestamp;
     bool bLargeMem;
     bool bDep;
     bool bNvightmare;
     bool bAltModules;
 
-    SExePatchedStatus( void ) : bTimestamp( false ), bLargeMem( false ), bDep( false ), bNvightmare( false ), bAltModules( false ) {}
+    SExePatchedStatus( void ) : bLargeMem( false ), bDep( false ), bNvightmare( false ), bAltModules( false ) {}
 
     bool operator!= ( const SExePatchedStatus& other ) const    { return !operator==( other ); }
     bool operator== ( const SExePatchedStatus& other ) const
     {
-        return bTimestamp == other.bTimestamp
-               && bLargeMem == other.bLargeMem
+        return bLargeMem == other.bLargeMem
                && bDep == other.bDep
                && bNvightmare == other.bNvightmare
                && bAltModules == other.bAltModules;
@@ -53,7 +51,6 @@ bool                CopyExe                         ( void );
 SString             GetExePathFilename              ( bool bUseExeCopy );
 bool                GetPatchRequirementAltModules   ( void );
 EPatchResult        UpdatePatchStatusNvightmare     ( const SString& strGTAEXEPath, EPatchMode mode );
-EPatchResult        UpdatePatchStatusTimestamp      ( const SString& strGTAEXEPath, EPatchMode mode );
 EPatchResult        UpdatePatchStatusLargeMem       ( const SString& strGTAEXEPath, EPatchMode mode );
 EPatchResult        UpdatePatchStatusDep            ( const SString& strGTAEXEPath, EPatchMode mode );
 bool                GetPatchRequirementAltModules   ( void );
