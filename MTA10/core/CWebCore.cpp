@@ -805,8 +805,11 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
     size_t pos = path.find_last_of('.');
     if (pos != std::string::npos)
         mimeType = CefGetMimeType ( path.substr ( pos + 1 ) );
-    else
-        mimeType = "text/plain";
+    
+    // Make sure we provide a mime type, even 
+    // when we cannot deduct it from the file extension
+    if ( mimeType.empty( ) )
+        mimeType = "application/octet-stream";
 
     auto stream = CefStreamReader::CreateForFile ( path );
     if ( stream.get () )
