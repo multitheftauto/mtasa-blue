@@ -35,7 +35,9 @@ MTAEXPORT int Run ( int iArgumentCount, char* szArguments [] )
         }
     }
 
-    SharedUtil_Tests ();
+    #if defined(_DEBUG) 
+        SharedUtil_Tests ();
+    #endif
 
     #ifdef WIN32
         // Disable critical error message boxes
