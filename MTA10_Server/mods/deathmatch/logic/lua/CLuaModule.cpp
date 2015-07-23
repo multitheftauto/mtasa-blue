@@ -49,34 +49,69 @@ CLuaModule::~CLuaModule ( void )
 }
 
 
+#ifdef WIN32
+bool IsModule32Bit( const SString& strExpectedPathFilename )
+{
+    FILE* fh = fopen( strExpectedPathFilename, "rb" );
+    fseek( fh, 60, SEEK_SET );
+    int offset = 0;
+    fread( &offset, sizeof( offset ), 1, fh );
+    fseek( fh, offset + 24, SEEK_SET );
+    ushort type = 0;
+    fread( &type, sizeof( type ), 1, fh );
+    fclose( fh );
+    return type == 0x010b;
+}
+#endif
+
+
 int CLuaModule::_LoadModule ( void )
 {
     InitModuleFunc pfnInitFunc;
     // Load Module
+    SString strError;
 #ifdef WIN32
-    #ifdef WIN_x64
-        // Search the x64 path for dependencies
-        SString strSavedCurrentDirectory = GetSystemCurrentDirectory();
-        SetCurrentDirectory( PathJoin( g_pServerInterface->GetModManager ()->GetServerPath (), SERVER_BIN_PATH_MOD ) );
-        m_hModule = LoadLibrary ( m_szFileName );
-        SetCurrentDirectory( strSavedCurrentDirectory );
-    #else
-        m_hModule = LoadLibrary ( m_szFileName );
-    #endif
+    // Search the mod path for dependencies
+    SString strSavedCurrentDirectory = GetSystemCurrentDirectory();
+    SetCurrentDirectory( PathJoin( g_pServerInterface->GetModManager ()->GetServerPath (), SERVER_BIN_PATH_MOD ) );
+    m_hModule = LoadLibrary ( m_szFileName );
     if ( m_hModule == NULL )
-    {
-        CLogger::LogPrintf ( "MODULE: Unable to load %s! (%d)\n", *PathJoin( SERVER_BIN_PATH_MOD, "modules", m_szShortFileName ), GetLastError() );
-        return 1;
-    }
+        strError = SString( "%d", GetLastError() );
+    SetCurrentDirectory( strSavedCurrentDirectory );
 #else
     m_hModule = dlopen ( m_szFileName, RTLD_NOW );
+    if ( m_hModule == NULL )
+        strError = dlerror();
+#endif
 
     if ( m_hModule == NULL )
     {
-        CLogger::LogPrintf ( "MODULE: Unable to load %s (%s)!\n", *PathJoin( SERVER_BIN_PATH_MOD, "modules", m_szShortFileName ), dlerror() );
+        // Module failed to load
+        SString strExpectedPathFilename = PathJoin( SERVER_BIN_PATH_MOD, "modules", m_szShortFileName );
+        if ( !FileExists( strExpectedPathFilename ) )
+        {
+            CLogger::LogPrintf ( "MODULE: File not found - %s\n", *strExpectedPathFilename );
+        }
+        else
+    #ifdef WIN_x64
+        if ( IsModule32Bit( strExpectedPathFilename ) )
+        {
+            CLogger::LogPrintf ( "MODULE: File not 64 bit - %s\n", *strExpectedPathFilename );
+        }
+    #endif
+    #ifdef WIN_x86
+        if ( !IsModule32Bit( strExpectedPathFilename ) )
+        {
+            CLogger::LogPrintf ( "MODULE: File not 32 bit - %s\n", *strExpectedPathFilename );
+        }
+    #endif
+        else
+        {
+            CLogger::LogPrintf ( "MODULE: Unable to load %s (%s)\n", *strExpectedPathFilename, *strError );
+        }
         return 1;
     }
-#endif
+
 
     // Find the initialisation function
 #ifdef WIN32
