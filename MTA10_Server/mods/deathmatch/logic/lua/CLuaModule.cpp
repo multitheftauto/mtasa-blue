@@ -98,14 +98,15 @@ int CLuaModule::_LoadModule ( void )
         {
             CLogger::LogPrintf ( "MODULE: File not 64 bit - %s\n", *strExpectedPathFilename );
         }
+        else
     #endif
     #ifdef WIN_x86
         if ( !IsModule32Bit( strExpectedPathFilename ) )
         {
             CLogger::LogPrintf ( "MODULE: File not 32 bit - %s\n", *strExpectedPathFilename );
         }
-    #endif
         else
+    #endif
         {
             CLogger::LogPrintf ( "MODULE: Unable to load %s (%s)\n", *strExpectedPathFilename, *strError );
         }

@@ -32,6 +32,12 @@
 ///////////////////////////////////////////////////////////////
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+    if ( !IsWindowsXPSP3OrGreater() )
+    {
+        BrowseToSolution ( "launch-xpsp3-check", ASK_GO_ONLINE, "This version of MTA requires Windows XP SP3 or later" );     
+        return 1;
+    }
+
     // Load the loader.dll and continue the load
 #ifdef MTA_DEBUG
     SString strLoaderDllFilename = "loader_d.dll";

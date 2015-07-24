@@ -21,24 +21,14 @@
     (set flag.new_server_exe on the build server to generate a new 'MTA Server.exe')
 */
 
-
 #include "CDynamicLibrary.h"
-#include "../../Shared/sdk/SharedUtil.Defines.h"
-#include <cstdio>
 #include <iostream>
+#include "MTAPlatform.h"
+#define SHARED_UTIL_WITH_SYS_INFO
+#include "SharedUtil.h"
+#include "SharedUtil.hpp"
 
 using namespace std;
-
-#ifdef WIN32
-    #include <windows.h>
-    #include <direct.h>
-    #include "Shlwapi.h"
-    #pragma comment(lib, "Shlwapi.lib")
-#else
-    #include <string.h>
-    #include <alloca.h>
-    #include <unistd.h>
-#endif
 
 #ifdef WIN32
     #ifdef MTA_DEBUG
@@ -99,6 +89,18 @@ int main ( int argc, char* argv [] )
             return 1;
         }
     }
+
+#ifdef WIN32
+    if ( !IsWindowsXPSP3OrGreater() )
+    {
+        printf ( "This version of MTA requires Windows XP SP3 or later\n" );
+
+        // Wait for a key then exit
+        printf ( "Press enter to continue...\n" );
+        cin.get ();
+        return 1;
+    }
+#endif
 
     // If we are unable to access the core module, try changing to the directory of the launched file
     FILE* fh = fopen ( LIB_CORE, "r" );

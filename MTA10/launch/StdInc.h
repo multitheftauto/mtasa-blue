@@ -3,6 +3,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #define MTA_CLIENT
+#define SHARED_UTIL_WITH_SYS_INFO
 #include "SharedUtil.h"
 
 #include "resource.h"
