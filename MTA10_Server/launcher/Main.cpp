@@ -24,7 +24,6 @@
 #include "CDynamicLibrary.h"
 #include <iostream>
 #include "MTAPlatform.h"
-#define SHARED_UTIL_WITH_SYS_INFO
 #include "SharedUtil.h"
 #include "SharedUtil.hpp"
 
@@ -140,7 +139,7 @@ int main ( int argc, char* argv [] )
         printf ( "ERROR: Could not load %s\n", LIB_CORE );
         printf ( "* Check installed data files.\n" );
 #ifdef WIN32
-        printf ( "* Check installed Microsoft Visual C++ 2008 SP1 Redistributable Package (x86).\n" );
+        printf ( "* Check installed Microsoft Visual C++ 2013 Redistributable Package (x86).\n" );
 #endif
     }
 

@@ -113,6 +113,7 @@ public:
     bool            Contains            ( const SString& strOther ) const;
     bool            ContainsI           ( const SString& strOther ) const;
     bool            CompareI            ( const SString& strOther ) const;
+    bool            EqualsI             ( const SString& strOther ) const                       { return CompareI( strOther ); }
     SString         SubStr              ( int iPos, int iCount = 0x3fffffff ) const;
     SString         Left                ( int iCount ) const;
     SString         Right               ( int iCount ) const;

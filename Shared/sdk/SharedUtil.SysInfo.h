@@ -33,8 +33,6 @@ namespace SharedUtil
     void        GetWMIAntiVirusStatus           ( std::vector < SString >& outEnabledList, std::vector < SString >& outDisabledList );
     bool        GetLibVersionInfo               ( const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo );
     bool        Is64BitOS                       ( void );
-    bool        IsWindowsVersionOrGreater       ( WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor );
-    bool        IsWindowsXPSP3OrGreater         ( void );
 }
 
 #endif

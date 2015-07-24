@@ -35,7 +35,6 @@ CCriticalSection CRefCountable::ms_CS;
 std::map < uint, uint > ms_ReportAmountMap;
 
 #ifdef MTA_CLIENT
-#ifdef WIN32
 
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
@@ -781,7 +780,6 @@ SString SharedUtil::GetSystemErrorMessage ( uint uiError, bool bRemoveNewlines, 
 }
 
 
-#endif
 
 
 #ifdef ExpandEnvironmentStringsForUser
@@ -877,9 +875,40 @@ bool SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SStri
     return MyShellExecute ( false, strAction, strFile, strParameters, strDirectory );
 }
 
-
 #endif  // MTA_CLIENT
 
+#ifdef WIN32
+///////////////////////////////////////////////////////////////////////////
+//
+// SharedUtil::IsWindowsVersionOrGreater
+//
+// From Windows Kits\8.1 VersionHelpers.h
+// (Ignores compatibility mode)
+//
+///////////////////////////////////////////////////////////////////////////
+bool SharedUtil::IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
+{
+    OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
+    DWORDLONG        const dwlConditionMask = VerSetConditionMask(
+        VerSetConditionMask(
+        VerSetConditionMask(
+            0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+               VER_MINORVERSION, VER_GREATER_EQUAL),
+               VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+
+    osvi.dwMajorVersion = wMajorVersion;
+    osvi.dwMinorVersion = wMinorVersion;
+    osvi.wServicePackMajor = wServicePackMajor;
+
+    return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | 
+      VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE;
+}
+
+bool SharedUtil::IsWindowsXPSP3OrGreater()
+{
+    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP), LOBYTE(_WIN32_WINNT_WINXP), 3);
+}
+#endif  // WIN32
 
 static uchar ToHexChar ( uchar c )
 {

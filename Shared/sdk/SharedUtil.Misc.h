@@ -139,6 +139,10 @@ namespace SharedUtil
     SString         GetSystemErrorMessage           ( uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true );
     void            SetClipboardText                ( const SString& strText );
 
+    // Version checks
+    bool            IsWindowsVersionOrGreater       ( WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor );
+    bool            IsWindowsXPSP3OrGreater         ( void );
+
 #endif
 
     // Ensure rand() seed gets set to a new unique value

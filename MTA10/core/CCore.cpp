@@ -1140,6 +1140,15 @@ void CCore::InitialiseWeb ()
     if ( m_pWebCore )
         return;
 
+    // Ensure DllDirectory has not been changed
+    SString strDllDirectory = GetSystemDllDirectory();
+    SString strRequiredDllDirectory = CalcMTASAPath( "mta" );
+    if ( strRequiredDllDirectory.EqualsI( strDllDirectory ) == false )
+    {
+        AddReportLog( 3118, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *strRequiredDllDirectory ) );
+        SetDllDirectory( strRequiredDllDirectory );
+    }
+
     m_pWebCore = new CWebCore;
     m_pWebCore->Initialise ();
 }

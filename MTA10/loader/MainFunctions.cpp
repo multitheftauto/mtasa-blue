@@ -89,7 +89,7 @@ void InitLocalization( bool bNoFail )
         if ( !bNoFail )
             return;
         DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
+                            "Microsoft Visual C++ 2013 Redistributable Package (x86) \n"
                             "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
         return ExitProcess( EXIT_ERROR );
     }
@@ -112,7 +112,7 @@ void InitLocalization( bool bNoFail )
             return;
 
         DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) \n"
+                            "Microsoft Visual C++ 2013 Redistributable Package (x86) \n"
                             "and the latest DirectX is correctly installed."), _E("CL26"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
         FreeLibrary ( hCoreModule );
         return ExitProcess( EXIT_ERROR );
