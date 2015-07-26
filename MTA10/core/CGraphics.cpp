@@ -581,21 +581,39 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
 
     if ( pDXFont )
     {
-        RECT rect;
+        RECT rect = { 0, 0, 0, 0 };
         WString strText = MbUTF8ToUTF16(szText);
 
         if (bColorCoded)
             RemoveColorCodesInPlaceW(strText);
 
         // DT_CALCRECT does not take space characters at the end of a line 
-        // into consideration for the rect size. Thus replace it with an underscore
-        if (strText.back() == ' ')
-            strText.back() = '_';
+        // into consideration for the rect size.
+        // Count the amount of space characters at the end
+        int iSpaceCount = 0;
+        for ( auto c = strText.rbegin( ); c != strText.rend( ); ++c )
+        {
+            if ( *c == ' ' )
+                ++iSpaceCount;
+            else
+                break;
+        }
         
+        // Compute the size of a single space and use that
+        // to get the width of the ignored space characters
+        int iAdditionalPixels = 0;
+        if ( iSpaceCount > 0 )
+        {
+            HDC dc = pDXFont->GetDC( );
+            SIZE size;
+            GetTextExtentPoint32W( dc, L" ", 1, &size );
+            iAdditionalPixels = iSpaceCount * size.cx;
+        }
         
+        // Compute the size of the text itself 
         pDXFont->DrawTextW(NULL, strText.c_str(), strText.length(), &rect, DT_CALCRECT | DT_SINGLELINE, D3DCOLOR_XRGB(0, 0, 0));
 
-        return ( ( float ) (rect.right - rect.left)* fScale );
+        return ( ( float ) ( rect.right - rect.left + iAdditionalPixels ) * fScale );
     }
     return 0.0f;
 }
