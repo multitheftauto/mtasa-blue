@@ -175,16 +175,7 @@ public:
     // ignored. Note that if this value is 0, all sync packets should be accepted. This is
     // so we don't need this byte when the element is created first.
     inline unsigned char                        GetSyncTimeContext      ( void )                    { return m_ucSyncTimeContext; };
-    inline void                                 SetSyncTimeContext      ( unsigned char ucContext ) 
-    {
-        #ifdef MTA_DEBUG
-        if ( GetType ( ) == eClientEntityType::CCLIENTPLAYER )
-        {
-            g_pCore->GetConsole ( )->Printf ( "Player Sync Context Updated from %i to %i.", m_ucSyncTimeContext, ucContext );
-        }
-        #endif
-        m_ucSyncTimeContext = ucContext;
-    };
+    inline void                                 SetSyncTimeContext      ( unsigned char ucContext ) { m_ucSyncTimeContext = ucContext; }
     bool                                        CanUpdateSync           ( unsigned char ucRemote );
 
     inline const SString&                       GetName                 ( void ) const              { return m_strName; }
