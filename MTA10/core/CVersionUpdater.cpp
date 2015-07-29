@@ -665,8 +665,8 @@ void CVersionUpdater::InitiateSidegradeLaunch ( const SString& strVersion, const
     m_strSidegradeName = strName;
     m_strSidegradePassword = strPassword;
 
-    m_strServerSaysHost = SString ( "%s:%d", *strHost, usPort );
     RunProgram ( EUpdaterProgramType::SidegradeLaunch );
+    m_strServerSaysHost = SString ( "%s:%d", *strHost, usPort );
 }
 
 
@@ -937,6 +937,7 @@ void CVersionUpdater::RunProgram ( EUpdaterProgramType strProgramName )
         MainStep();
     }
 
+    ResetEverything();
     shared.m_CurrentProgram = strProgramName;
 }
 
@@ -952,8 +953,8 @@ void CVersionUpdater::RunProgram ( EUpdaterProgramType strProgramName )
 void CVersionUpdater::MainStep( void )
 {
     assert( IsMainThread() );
-        shared.m_Mutex.Signal();
-        shared.m_Mutex.Wait( -1 );
+    shared.m_Mutex.Signal();
+    shared.m_Mutex.Wait( -1 );
 
     if ( shared.m_bExitGame )
         CCore::GetSingleton().Quit();
@@ -1015,7 +1016,6 @@ void* CVersionUpdater::ThreadProc( void )
     {
         if ( shared.m_CurrentProgram != EUpdaterProgramType::None )
         {
-            ResetEverything();
             try
             {
                 ProcessCommand( shared.m_CurrentProgram );
