@@ -2189,6 +2189,10 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
     XMLAccess.GetSubNodeValue ( "file.size",                    m_JobInfo.exe.iFilesize );
     XMLAccess.GetSubNodeValue ( "file.md5",                     m_JobInfo.exe.strMD5 );
     XMLAccess.GetSubNodeValue ( "serverlist",                   m_JobInfo.exe.serverInfoMap );
+    XMLAccess.GetSubNodeValue ( "file_sig.name",                m_JobInfo.sig.strFilename );
+    XMLAccess.GetSubNodeValue ( "file_sig.size",                m_JobInfo.sig.iFilesize );
+    XMLAccess.GetSubNodeValue ( "file_sig.md5",                 m_JobInfo.sig.strMD5 );
+    XMLAccess.GetSubNodeValue ( "serverlist_sig",               m_JobInfo.sig.serverInfoMap );
     XMLAccess.GetSubNodeValue ( "file_rar.name",                m_JobInfo.rar.strFilename );
     XMLAccess.GetSubNodeValue ( "file_rar.size",                m_JobInfo.rar.iFilesize );
     XMLAccess.GetSubNodeValue ( "file_rar.md5",                 m_JobInfo.rar.strMD5 );
@@ -2212,8 +2216,17 @@ void CVersionUpdater::_ProcessPatchFileQuery ( void )
         m_JobInfo.serverInfoMap = m_JobInfo.rar.serverInfoMap;
     }
     else
+    if ( !m_JobInfo.sig.strFilename.empty () )
     {
-        // Otherwise, exe info
+        // Otherwise Authenticode signed exe
+        m_JobInfo.strFilename   = m_JobInfo.sig.strFilename;
+        m_JobInfo.iFilesize     = m_JobInfo.sig.iFilesize;
+        m_JobInfo.strMD5        = m_JobInfo.sig.strMD5;
+        m_JobInfo.serverInfoMap = m_JobInfo.sig.serverInfoMap;
+    }
+    else
+    {
+        // Finally, unsigned exe
         m_JobInfo.strFilename   = m_JobInfo.exe.strFilename;
         m_JobInfo.iFilesize     = m_JobInfo.exe.iFilesize;
         m_JobInfo.strMD5        = m_JobInfo.exe.strMD5;
