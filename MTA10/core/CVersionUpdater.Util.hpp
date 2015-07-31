@@ -810,6 +810,7 @@ namespace
                                     , iFilesize ( 0 )
                                 {
                                     exe.iFilesize = 0;
+                                    sig.iFilesize = 0;
                                     rar.iFilesize = 0;
                                     slim.iFilesize = 0;
                                 }
@@ -853,6 +854,14 @@ namespace
             CDataInfoSet            serverInfoMap;
             SString                 strMD5;
         } exe;
+
+        struct
+        {
+            SString                 strFilename;
+            CValueInt               iFilesize;
+            CDataInfoSet            serverInfoMap;
+            SString                 strMD5;
+        } sig;
 
         struct
         {
