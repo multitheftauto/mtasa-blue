@@ -111,7 +111,7 @@ public:
     CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
     CWebCoreInterface*      GetWebCore                      ( void )                { return m_pWebCore; };
 
-    void                    SaveConfig                      ( void );
+    void                    SaveConfig                      ( bool bWaitUntilFinished = false );
 
     // Debug
     void                    DebugEcho                       ( const char* szText );

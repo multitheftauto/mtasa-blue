@@ -322,7 +322,7 @@ CLocalGUI* CCore::GetLocalGUI ( void )
 }
 
 
-void CCore::SaveConfig ( void )
+void CCore::SaveConfig ( bool bWaitUntilFinished )
 {
     if ( m_pConfigFile )
     {
@@ -331,8 +331,8 @@ void CCore::SaveConfig ( void )
             pBindsNode = GetConfig ()->CreateSubNode ( CONFIG_NODE_KEYBINDS );
         m_pKeyBinds->SaveToXML ( pBindsNode );
         GetVersionUpdater ()->SaveConfigToXML ();
-        GetServerCache ()->SaveServerCache ();
         m_pConfigFile->Write ();
+        GetServerCache ()->SaveServerCache ( bWaitUntilFinished );
     }
 }
 
@@ -1107,7 +1107,7 @@ void CCore::DestroyXML ( )
 
     // Save and unload configuration
     if ( m_pConfigFile ) {
-        SaveConfig ();
+        SaveConfig ( true );
         delete m_pConfigFile;
     }
 

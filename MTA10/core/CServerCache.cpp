@@ -62,7 +62,7 @@ class CServerCache : public CServerCacheInterface
 {
 public:
     ZERO_ON_NEW
-    virtual void        SaveServerCache             ( void );
+    virtual void        SaveServerCache             ( bool bWaitUntilFinished );
     virtual void        GetServerCachedInfo         ( CServerListItem* pItem );
     virtual void        SetServerCachedInfo         ( const CServerListItem* pItem );
     virtual void        GetServerListCachedInfo     ( CServerList *pList );
@@ -193,32 +193,34 @@ bool CServerCache::LoadServerCache ( void )
 // Save cache data to config
 //
 ///////////////////////////////////////////////////////////////
-void CServerCache::SaveServerCache ( void )
+void CServerCache::SaveServerCache ( bool bWaitUntilFinished )
 {
-    // Check if need to save
-    if ( !m_bListChanged )
-        return;
-
-    // Check if can save
-    if ( ms_bIsSaving )
-        return;
-
-    m_bListChanged = false;
-
-    // Copy vars for save thread
-    ms_ServerCachedMap = m_ServerCachedMap;
-
-    // Start save thread
-    HANDLE hThread = CreateThread ( NULL, 0, (LPTHREAD_START_ROUTINE)CServerCache::StaticThreadProc, NULL, CREATE_SUSPENDED, NULL );
-    if ( !hThread )
+    // Check if we need to save
+    if ( m_bListChanged && !ms_bIsSaving )
     {
-        CCore::GetSingleton ().GetConsole ()->Printf ( "Could not create server cache thread." );
+        m_bListChanged = false;
+
+        // Copy vars for save thread
+        ms_ServerCachedMap = m_ServerCachedMap;
+
+        // Start save thread
+        HANDLE hThread = CreateThread ( NULL, 0, (LPTHREAD_START_ROUTINE)CServerCache::StaticThreadProc, NULL, CREATE_SUSPENDED, NULL );
+        if ( !hThread )
+        {
+            CCore::GetSingleton ().GetConsole ()->Printf ( "Could not create server cache thread." );
+        }
+        else
+        {
+            ms_bIsSaving = true;
+            SetThreadPriority ( hThread, THREAD_PRIORITY_LOWEST );
+            ResumeThread ( hThread );
+        }
     }
-    else
+
+    // If required, wait until save thread is done
+    while ( bWaitUntilFinished && ms_bIsSaving )
     {
-        ms_bIsSaving = true;
-        SetThreadPriority ( hThread, THREAD_PRIORITY_LOWEST );
-        ResumeThread ( hThread );
+        Sleep( 1 );
     }
 }
 

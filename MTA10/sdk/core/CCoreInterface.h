@@ -131,7 +131,7 @@ public:
     virtual bool                    IsFocused                       ( void ) = 0;
     virtual bool                    IsWindowMinimized               ( void ) = 0;
 
-    virtual void                    SaveConfig                      ( void ) = 0;
+    virtual void                    SaveConfig                      ( bool bWaitUntilFinished = false ) = 0;
     virtual void                    UpdateRecentlyPlayed            ( void ) = 0;
 
     virtual void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput ) = 0;
