@@ -261,6 +261,11 @@ IMPLEMENT_ENUM_BEGIN( CElement::EElementType )
     ADD_ENUM( CElement::UNKNOWN,                "unknown" )
 IMPLEMENT_ENUM_END_DEFAULTS( "element-type", CElement::UNKNOWN, "unknown" )
 
+IMPLEMENT_ENUM_BEGIN ( CAccountPassword::EAccountPasswordType )
+    ADD_ENUM ( CAccountPassword::PLAINTEXT, "plaintext" )
+    ADD_ENUM ( CAccountPassword::SHA256, "sha256" )
+    ADD_ENUM ( CAccountPassword::MD5, "md5" )
+IMPLEMENT_ENUM_END ( "account-password-type" )
 
 
 //

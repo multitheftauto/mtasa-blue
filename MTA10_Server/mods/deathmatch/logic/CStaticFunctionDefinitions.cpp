@@ -11178,16 +11178,20 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
 }
 
 
-bool CStaticFunctionDefinitions::SetAccountPassword ( CAccount* pAccount, const char* szPassword )
+bool CStaticFunctionDefinitions::SetAccountPassword ( CAccount* pAccount, SString strPassword, CAccountPassword::EAccountPasswordType ePasswordType )
 {
     assert ( pAccount );
-    assert ( szPassword );
+    assert ( strPassword );
 
     if ( pAccount->IsRegistered () )
     {
-        if ( CAccountManager::IsValidNewPassword( szPassword ) )
+        if (
+            ( ePasswordType == CAccountPassword::PLAINTEXT && CAccountManager::IsValidNewPassword( strPassword ) ) ||
+            ( ePasswordType == CAccountPassword::MD5 && strPassword.length () == 32 ) ||
+            ( ePasswordType == CAccountPassword::SHA256 && strPassword.length () == 64 + 32 + 1 )
+           )
         {
-            pAccount->SetPassword ( szPassword );
+            pAccount->SetPassword ( strPassword );
             return true;
         }
     }

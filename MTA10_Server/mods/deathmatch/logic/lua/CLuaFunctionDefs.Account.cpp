@@ -306,15 +306,16 @@ int CLuaFunctionDefs::RemoveAccount ( lua_State* luaVM )
 int CLuaFunctionDefs::SetAccountPassword ( lua_State* luaVM )
 {
     //  bool setAccountPassword ( account theAccount, string password )
-    CAccount* pAccount; SString strPassword;
+    CAccount* pAccount; SString strPassword; CAccountPassword::EAccountPasswordType ePasswordType;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pAccount );
     argStream.ReadString ( strPassword );
+    argStream.ReadEnumString ( ePasswordType, CAccountPassword::PLAINTEXT );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetAccountPassword ( pAccount, strPassword ) )
+        if ( CStaticFunctionDefinitions::SetAccountPassword ( pAccount, strPassword, ePasswordType ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

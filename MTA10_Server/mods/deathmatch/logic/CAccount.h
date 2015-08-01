@@ -26,16 +26,20 @@ public:
     bool        IsPassword          ( const SString& strPassword );
     bool        CanChangePasswordTo ( const SString& strPassword );
     SString     GetPasswordHash     ( void );
+
+    enum EAccountPasswordType {
+        NONE, // "" (empty string) possibly means 'not a password'
+        PLAINTEXT,
+        MD5, // pass stored as sha256(md5)+salt+type, stored as "1"
+        SHA256 // pass stored as sha256(plaintext)+salt+type, stored as "0"
+    };
 protected:
     SString     GenerateSalt        ( void );
 
     SString     m_strSha256;
     SString     m_strSalt;
 
-    // "0" means stored as sha256+salt+type
-    // "1" means stored as sha256(md5)+salt+type
-    // "" (empty string) possibly means 'not a password'
-    SString     m_strType;
+    SString     m_strType; // can be "1", "0" or "" as shown in EAccountPasswordType
 };
 
 class CAccountData;
