@@ -31,6 +31,10 @@ protected:
 
     SString     m_strSha256;
     SString     m_strSalt;
+
+    // "0" means stored as sha256+salt+type
+    // "1" means stored as sha256(md5)+salt+type
+    // "" (empty string) possibly means 'not a password'
     SString     m_strType;
 };
 
