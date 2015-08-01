@@ -2966,6 +2966,7 @@ void CSettings::LoadData ( void )
 
     m_pGridBrowserBlacklist->Clear ();
     m_pGridBrowserWhitelist->Clear ();
+    m_bBrowserListsChanged = false;
 
     std::vector<std::pair<SString, bool>> customBlacklist;
     CCore::GetSingleton ().GetWebCore ()->GetFilterEntriesByType ( customBlacklist, eWebFilterType::WEBFILTER_USER );

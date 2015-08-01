@@ -40,7 +40,7 @@ CWebsiteRequests::CWebsiteRequests()
     m_pAddressMemo->SetFont ( "default-bold" );
     m_pAddressMemo->SetReadOnly ( true );
 
-    m_pCheckRemember = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pWindow, "Remember decision" ) );
+    m_pCheckRemember = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pWindow, _("Remember decision") ) );
     m_pCheckRemember->SetPosition ( CVector2D ( 10, 229 ) );
     m_pCheckRemember->SetSize ( CVector2D ( 456, 30 ) );
     m_pCheckRemember->SetFont ( "default-bold" );
