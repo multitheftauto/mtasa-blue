@@ -1638,11 +1638,13 @@ void CLuaMain::AddBrowserClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getURL", "getBrowserURL" );
     lua_classfunction ( luaVM, "setRenderingPaused", "setBrowserRenderingPaused" );
     lua_classfunction ( luaVM, "executeJavascript", "executeBrowserJavascript" );
+    lua_classfunction ( luaVM, "getVolume", "getBrowserVolume" );
     lua_classfunction ( luaVM, "setVolume", "setBrowserVolume" );
     lua_classfunction ( luaVM, "focus", "focusBrowser" );
     lua_classfunction ( luaVM, "isFocused", "isBrowserFocused" );
     lua_classfunction ( luaVM, "setProperty", "setBrowserProperty" );
     lua_classfunction ( luaVM, "getProperty", "getBrowserProperty" );
+    lua_classfunction ( luaVM, "getSource", "getBrowserSource" );
 
     lua_classfunction ( luaVM, "requestDomains", "requestBrowserDomains" );
     lua_classfunction ( luaVM, "isDomainBlocked", "isBrowserDomainBlocked" );
@@ -1651,7 +1653,7 @@ void CLuaMain::AddBrowserClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "loading", NULL, "isBrowserLoading");
     lua_classvariable ( luaVM, "title", NULL, "getBrowserTitle" );
     lua_classvariable ( luaVM, "renderingPaused", "setBrowserRenderingPaused", NULL );
-    lua_classvariable ( luaVM, "volume", "setBrowserVolume", NULL );
+    lua_classvariable ( luaVM, "volume", "setBrowserVolume", "getBrowserVolume" );
     
     lua_registerclass ( luaVM, "Browser", "DxTexture" );
 
