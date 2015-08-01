@@ -188,7 +188,7 @@ int CLuaFunctionDefs::InterpolateBetween ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetTickCount_ ( lua_State* luaVM )
 {
-    double dTime = GetSecondCount () * 1000.0;
+    double dTime = static_cast < double > ( GetTickCount64_() );
     lua_pushnumber ( luaVM, dTime );
     return 1;
 }

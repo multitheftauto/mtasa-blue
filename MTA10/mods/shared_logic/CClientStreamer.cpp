@@ -685,6 +685,10 @@ void CClientStreamer::OnElementEnterSector ( CClientStreamElement * pElement, CC
     CClientStreamSector * pPreviousSector = pElement->GetStreamSector ();
     if ( pPreviousSector )
     {
+        // Skip if disconnecting
+        if ( g_pClientGame->IsBeingDeleted () )
+            return;
+
         // Remove the element from its old sector
         pPreviousSector->Remove ( pElement );
     }

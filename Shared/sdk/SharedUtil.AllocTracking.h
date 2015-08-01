@@ -71,6 +71,7 @@
     #include <deque>
     #include <algorithm>
     #include <limits>
+    #include <memory>
 
     namespace std
     {
