@@ -15,6 +15,7 @@
 #include "UTF8.h"
 #include "UTF8Detect.cpp"
 #ifdef WIN32
+    #include <ctime>
     #include <direct.h>
     #include <shellapi.h>
     #include <TlHelp32.h>
@@ -314,6 +315,41 @@ bool SharedUtil::GetOnRestartCommand ( SString& strOperation, SString& strFile, 
     }
     return false;
 }
+
+
+//
+// What server to connect to after update
+//
+void SharedUtil::SetPostUpdateConnect( const SString& strHost )
+{
+    CArgMap argMap;
+    argMap.Set( "host", strHost );
+    argMap.Set( "time", SString( PRId64, (int64)time( NULL ) ) );
+    SetRegistryValue( "", "PostUpdateConnect", argMap.ToString() );
+}
+
+
+//
+// What server to connect to after update
+//
+SString SharedUtil::GetPostUpdateConnect( void )
+{
+    SString strPostUpdateConnect = GetRegistryValue( "", "PostUpdateConnect" );
+    SetPostUpdateConnect( "" );
+
+    CArgMap argMap;
+    argMap.SetFromString( strPostUpdateConnect );
+    SString strHost = argMap.Get( "host" );
+    time_t timeThen = (time_t)atoi64( argMap.Get( "time" ) );
+
+    // Expire after 5 mins
+    double seconds = difftime( time( NULL ), timeThen );
+    if ( seconds < 0 || seconds > 60 * 5 )
+        strHost == "";
+
+    return strHost;
+}
+
 #endif
 
 

@@ -878,6 +878,12 @@ int LaunchGame ( SString strCmdLine )
     // Extract 'done-admin' flag from command line
     bool bDoneAdmin = strCmdLine.Contains ( "/done-admin" );
     strCmdLine = strCmdLine.Replace ( " /done-admin", "" );
+
+    // Add server connection after update to command line
+    SString strPostUpdateConnect = GetPostUpdateConnect();
+    if ( !strPostUpdateConnect.empty() && strCmdLine.empty() )
+        strCmdLine = SString( "mtasa://%s", *strPostUpdateConnect );
+
     WString wstrCmdLine = FromUTF8( strCmdLine );
 
     // Start GTA

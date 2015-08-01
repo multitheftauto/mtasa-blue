@@ -26,7 +26,7 @@ public:
     virtual void            InitiateDataFilesFix            ( void ) = 0;
     virtual void            InitiateManualCheck             ( void ) = 0;
     virtual void            GetAseServerList                ( std::vector < SString >& outResult ) = 0;
-    virtual void            InitiateSidegradeLaunch         ( const SString& strVersion, const SString& strHost, ushort usPort, const SString& strName, const SString& strPassword ) = 0;
+    virtual void            InitiateSidegradeLaunch         ( const SString& strVersion, const SString& strIp, ushort usPort, const SString& strName, const SString& strPassword ) = 0;
     virtual void            GetBrowseVersionMaps            ( std::map < SString, int >& outBlockedVersionMap, std::map < SString, int >& outAllowedVersionMap ) = 0;
     virtual void            GetNewsSettings                 ( SString& strOutOldestPost, uint& uiOutMaxHistoryLength ) = 0;
     virtual const SString&  GetDebugFilterString            ( void ) = 0;

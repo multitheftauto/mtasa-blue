@@ -80,6 +80,12 @@ namespace SharedUtil
     bool GetOnRestartCommand ( SString& strOperation, SString& strFile, SString& strParameters, SString& strDirectory, SString& strShowCmd );
 
     //
+    // What server to connect to after update
+    //
+    void            SetPostUpdateConnect            ( const SString& strHost );
+    SString         GetPostUpdateConnect            ( void );
+
+    //
     // For tracking results of new features
     //
     void            AddReportLog                    ( uint uiId, const SString& strText, uint uiAmountLimit = 0 );

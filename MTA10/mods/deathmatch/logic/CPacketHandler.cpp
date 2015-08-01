@@ -5107,7 +5107,7 @@ void CPacketHandler::Packet_UpdateInfo ( NetBitStreamInterface& bitStream )
     if ( BitStreamReadUsString( bitStream, strType ) &&
          BitStreamReadUsString( bitStream, strData ) )
     {
-        g_pCore->InitiateUpdate ( strType, strData, g_pNet->GetConnectedServer () );
+        g_pCore->InitiateUpdate ( strType, strData, g_pNet->GetConnectedServer ( true ) );
     }
 }
 

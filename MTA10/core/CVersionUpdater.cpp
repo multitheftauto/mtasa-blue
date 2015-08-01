@@ -146,7 +146,6 @@ public:
 
     SString                             m_strSidegradeVersion;
     SString                             m_strSidegradeHost;
-    ushort                              m_usSidegradePort;
     SString                             m_strSidegradeName;
     SString                             m_strSidegradePassword;
     SString                             m_strSidegradePath;
@@ -657,16 +656,14 @@ void CVersionUpdater::InitiateManualCheck ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::InitiateSidegradeLaunch ( const SString& strVersion, const SString& strHost, ushort usPort, const SString& strName, const SString& strPassword )
+void CVersionUpdater::InitiateSidegradeLaunch ( const SString& strVersion, const SString& strIp, ushort usPort, const SString& strName, const SString& strPassword )
 {
+    RunProgram ( EUpdaterProgramType::SidegradeLaunch );
+
     m_strSidegradeVersion = strVersion;
-    m_strSidegradeHost = strHost;
-    m_usSidegradePort = usPort;
+    m_strSidegradeHost = SString ( "%s:%d", *strIp, usPort );
     m_strSidegradeName = strName;
     m_strSidegradePassword = strPassword;
-
-    RunProgram ( EUpdaterProgramType::SidegradeLaunch );
-    m_strServerSaysHost = SString ( "%s:%d", *strHost, usPort );
 }
 
 
@@ -785,6 +782,11 @@ void CVersionUpdater::ResetEverything ()
     m_strServerSaysType = "";
     m_strServerSaysData = "";
     m_strServerSaysHost = "";
+    m_strSidegradeVersion = "";
+    m_strSidegradeHost = "";
+    m_strSidegradeName = "";
+    m_strSidegradePassword = "";
+
     GetQuestionBox ().Reset ();
     shared.m_bQuitCurrentProgram = false;
 }
@@ -1495,7 +1497,7 @@ void CVersionUpdater::_CheckSidegradeRequirements ( void )
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_DoSidegradeLaunch ( void )
 {
-    SString strURL ( "mtasa://%s:%s@%s:%d", *m_strSidegradeName, *m_strSidegradePassword, *m_strSidegradeHost, m_usSidegradePort );
+    SString strURL ( "mtasa://%s:%s@%s", *m_strSidegradeName, *m_strSidegradePassword, *m_strSidegradeHost );
     SetOnQuitCommand ( "open", m_strSidegradePath, strURL );
     _ExitGame();
 }
@@ -1942,6 +1944,7 @@ void CVersionUpdater::_DialogUpdateResult(void)
             SetOnQuitCommand ( "restart" );
             SetOnRestartCommand ( "files", m_JobInfo.strSaveLocation );
             _PollAnyButton();
+            SetPostUpdateConnect( m_strServerSaysHost );
             _ExitGame();
         }
         else
@@ -3160,6 +3163,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "_TYPE_", m_strServerSaysType );
     strQueryURL = strQueryURL.Replace ( "_DATA_", m_strServerSaysData );
     strQueryURL = strQueryURL.Replace ( "_REFER_", m_strServerSaysHost );
+    strQueryURL = strQueryURL.Replace ( "_REFERSG_", m_strSidegradeHost );
     strQueryURL = strQueryURL.Replace ( "_WANTVER_", m_strSidegradeVersion );
     strQueryURL = strQueryURL.Replace ( "_LASTNEWS_", m_VarConfig.news_lastNewsDate );
     strQueryURL = strQueryURL.Replace ( "_FILE_", m_JobInfo.strPostFilename );
