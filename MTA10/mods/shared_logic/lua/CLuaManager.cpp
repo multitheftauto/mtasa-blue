@@ -1207,6 +1207,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBrowserURL", CLuaFunctionDefs::GetBrowserURL );
     CLuaCFunctions::AddFunction ( "setBrowserRenderingPaused", CLuaFunctionDefs::SetBrowserRenderingPaused );
     CLuaCFunctions::AddFunction ( "executeBrowserJavascript", CLuaFunctionDefs::ExecuteBrowserJavascript );
+    CLuaCFunctions::AddFunction ( "getBrowserVolume", CLuaFunctionDefs::GetBrowserVolume );
     CLuaCFunctions::AddFunction ( "setBrowserVolume", CLuaFunctionDefs::SetBrowserVolume );
     CLuaCFunctions::AddFunction ( "isBrowserDomainBlocked", CLuaFunctionDefs::IsBrowserDomainBlocked );
     CLuaCFunctions::AddFunction ( "focusBrowser", CLuaFunctionDefs::FocusBrowser );

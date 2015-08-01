@@ -49,6 +49,7 @@ public:
     inline CResource*           GetResource         () { return m_pResource; }
     inline void                 SetResource         ( CResource* pResource ) { m_pResource = pResource; }
 
+    float                       GetAudioVolume      ();
     bool                        SetAudioVolume      ( float fVolume );
 
     

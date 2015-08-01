@@ -69,6 +69,7 @@ public:
     bool IsLocal                ()                                                  { return m_bIsLocal; };
     void SetTempURL             ( const SString& strTempURL )                       { m_strTempURL = strTempURL; };
 
+    inline float GetAudioVolume ()                                                  { return m_fVolume; };
     bool SetAudioVolume         ( float fVolume );
 
     bool GetFullPathFromLocal   ( SString& strPath );
@@ -127,6 +128,7 @@ private:
     SString             m_strTempURL;
     POINT               m_vecMousePosition;
     SString             m_CurrentTitle;
+    float               m_fVolume;
     std::mutex          m_PaintMutex;
     std::condition_variable m_PaintCV;
     int                 m_RenderPopupOffsetX, m_RenderPopupOffsetY;

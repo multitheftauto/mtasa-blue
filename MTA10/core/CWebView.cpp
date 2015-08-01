@@ -20,6 +20,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     m_pWebBrowserRenderItem = pWebBrowserRenderItem;
     m_pEventsInterface = nullptr;
     m_bBeingDestroyed = false;
+    m_fVolume = 1.0f;
 
     // Initialise properties
     m_Properties["mobile"] = "0";
@@ -272,6 +273,7 @@ void CWebView::InjectKeyboardEvent ( const CefKeyEvent& keyEvent )
 
 bool CWebView::SetAudioVolume ( float fVolume )
 {
+    // NOTE: Keep this function thread-safe
     if ( !m_pWebView || fVolume < 0.0f || fVolume > 1.0f )
         return false;
 
@@ -281,6 +283,7 @@ bool CWebView::SetAudioVolume ( float fVolume )
         fVolume, fVolume );
 
     m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJSCode, "", 0 );
+    m_fVolume = fVolume;
     return true;
 }
 
@@ -494,6 +497,9 @@ void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnLoadEnd ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode )
 {
+    // Set browser volume once again
+    SetAudioVolume ( m_fVolume );
+
     if ( frame->IsMain () )
     {
 	    SString strURL;
