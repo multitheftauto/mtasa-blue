@@ -520,6 +520,47 @@ int CLuaFunctionDefs::GetBrowserSettings ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetBrowserSource ( lua_State* luaVM )
+{
+//  bool getBrowserSource ( function callback )
+    CClientWebBrowser* pWebBrowser; CLuaFunctionRef callbackFunction;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadFunction ( callbackFunction );
+    argStream.ReadFunctionComplete ();
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain && VERIFY_FUNCTION ( callbackFunction ) )
+        {
+            pWebBrowser->GetSourceCode ( [callbackFunction, pLuaMain]( const std::string& code ) {
+                /*
+                    This function should not be called when the resource is about to stop as
+                    stopping the resource destroys the browser element and thus cancels the 
+                    CefStringVisitor callback class (see CWebView::GetSourceCode::MyStringVisitor)
+                */
+                if ( VERIFY_FUNCTION ( callbackFunction ) )
+                {
+                    CLuaArguments arguments;
+                    // TODO: Use SCharStringRef/direct string access instead of copying strings around
+                    arguments.PushString ( code );
+                    arguments.Call ( pLuaMain, callbackFunction );
+                }
+            });
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
 {
 //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil] )

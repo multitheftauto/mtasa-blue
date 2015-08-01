@@ -72,6 +72,8 @@ public:
     inline float GetAudioVolume ()                                                  { return m_fVolume; };
     bool SetAudioVolume         ( float fVolume );
 
+    void GetSourceCode          ( const std::function<void( const std::string& code )>& callback );
+
     bool GetFullPathFromLocal   ( SString& strPath );
 
     // CefClient methods

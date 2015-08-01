@@ -1215,6 +1215,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setBrowserProperty", CLuaFunctionDefs::SetBrowserProperty );
     CLuaCFunctions::AddFunction ( "getBrowserProperty", CLuaFunctionDefs::GetBrowserProperty );
     CLuaCFunctions::AddFunction ( "getBrowserSettings", CLuaFunctionDefs::GetBrowserSettings );
+    CLuaCFunctions::AddFunction ( "getBrowserSource", CLuaFunctionDefs::GetBrowserSource );
     CLuaCFunctions::AddFunction ( "guiCreateBrowser", CLuaFunctionDefs::GUICreateBrowser );
     CLuaCFunctions::AddFunction ( "guiGetBrowser", CLuaFunctionDefs::GUIGetBrowser );
 

@@ -287,6 +287,34 @@ bool CWebView::SetAudioVolume ( float fVolume )
     return true;
 }
 
+void CWebView::GetSourceCode ( const std::function<void( const std::string& code )>& callback )
+{
+    class MyStringVisitor : public CefStringVisitor
+    {
+    private:
+        CWebView* webView;
+        std::function<void( const std::string& )> callback;
+
+    public:
+        MyStringVisitor ( CWebView* webView_, const std::function<void( const std::string& )>& callback_ ) : webView(webView_), callback(callback_) {}
+
+        virtual void Visit ( const CefString& code ) override
+        {
+            // Limit to 2MiB for now to prevent freezes (TODO: Optimize that and increase later)
+            if ( code.size () <= 2097152 )
+            {
+                // Call callback on main thread
+                g_pCore->GetWebCore ()->AddEventToEventQueue ( std::bind ( callback, code ), webView, "GetSourceCode_Visit" );
+            }
+        }
+
+        IMPLEMENT_REFCOUNTING(MyStringVisitor);
+    };
+
+    CefRefPtr<CefStringVisitor> visitor { new MyStringVisitor ( this, callback ) };
+    m_pWebView->GetMainFrame ()->GetSource ( visitor );
+}
+
 bool CWebView::GetFullPathFromLocal ( SString& strPath )
 {
      return m_pEventsInterface->Events_OnResourcePathCheck ( strPath );

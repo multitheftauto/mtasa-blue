@@ -47,6 +47,8 @@ public:
 
     virtual float GetAudioVolume    () = 0;
     virtual bool SetAudioVolume     ( float fVolume ) = 0;
+
+    virtual void GetSourceCode      ( const std::function<void( const std::string& code )>& callback ) = 0;
 };
 
 #endif

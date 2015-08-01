@@ -136,6 +136,11 @@ bool CClientWebBrowser::SetAudioVolume ( float fVolume )
     return m_pWebView->SetAudioVolume ( fVolume );
 }
 
+void CClientWebBrowser::GetSourceCode ( const std::function<void( const std::string& code )>& callback )
+{
+    return m_pWebView->GetSourceCode ( callback );
+}
+
 ////////////////////////////////////////////////////////////////////////////
 //                                                                        //
 //            CWebBrowserEventsInterface implementation                   //
