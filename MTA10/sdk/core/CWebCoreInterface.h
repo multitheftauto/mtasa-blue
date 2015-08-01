@@ -54,7 +54,7 @@ public:
     virtual void                RemoveWebViewEvents ( CWebView* pWebView ) = 0;
     virtual void                DoEventQueuePulse   () = 0;
     
-    virtual eURLState           GetURLState        ( const SString& strURL ) = 0;
+    virtual eURLState           GetURLState        ( const SString& strURL, bool bOutputDebug = false ) = 0;
     virtual SString             GetDomainFromURL   ( const SString& strURL ) = 0;
     virtual void                ResetFilter        ( bool bResetRequestsOnly ) = 0;
     //virtual void                AddAllowedPage     ( const SString& strURL ) = 0;

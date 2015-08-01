@@ -184,7 +184,7 @@ void CWebCore::DoEventQueuePulse ()
     }
 }
 
-eURLState CWebCore::GetURLState ( const SString& strURL )
+eURLState CWebCore::GetURLState ( const SString& strURL, bool bOutputDebug )
 {
     std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
     
@@ -204,19 +204,19 @@ eURLState CWebCore::GetURLState ( const SString& strURL )
             return eURLState::WEBPAGE_ALLOWED;
         else
         {
-            if ( m_bTestmodeEnabled ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
+            if ( m_bTestmodeEnabled && bOutputDebug ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
             return eURLState::WEBPAGE_DISALLOWED;
         }
     }
 
-    if ( m_bTestmodeEnabled ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
+    if ( m_bTestmodeEnabled && bOutputDebug ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
     return eURLState::WEBPAGE_NOT_LISTED;
 }
 
 SString CWebCore::GetDomainFromURL ( const SString& strURL )
 {
     CefURLParts urlParts;
-    if ( !CefParseURL ( strURL, urlParts ) )
+    if ( !CefParseURL ( strURL, urlParts ) || !urlParts.host.str )
         return "";
 
     return UTF16ToMbUTF8 ( urlParts.host.str );

@@ -27,7 +27,6 @@
 class CWebBrowserItem;
 class CWebsiteRequests;
 class CWebView;
-struct IAudioSessionManager2;
 
 class CWebCore : public CWebCoreInterface
 {
@@ -59,8 +58,8 @@ public:
     void                RemoveWebViewEvents ( CWebView* pWebView );
     void                DoEventQueuePulse   ();
     
-    eURLState           GetURLState         ( const SString& strURL );
-    SString             GetDomainFromURL   ( const SString& strURL );
+    eURLState           GetURLState         ( const SString& strURL, bool bOutputDebug = false );
+    SString             GetDomainFromURL    ( const SString& strURL );
     void                ResetFilter         ( bool bResetRequestsOnly = true );
     void                InitialiseWhiteAndBlacklist ( bool bAddHardcoded = true, bool bAddDynamic = true );
     void                AddAllowedPage      ( const SString& strURL, eWebFilterType filterType );
