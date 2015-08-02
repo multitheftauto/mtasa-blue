@@ -345,7 +345,7 @@ SString SharedUtil::GetPostUpdateConnect( void )
     // Expire after 5 mins
     double seconds = difftime( time( NULL ), timeThen );
     if ( seconds < 0 || seconds > 60 * 5 )
-        strHost == "";
+        strHost = "";
 
     return strHost;
 }
