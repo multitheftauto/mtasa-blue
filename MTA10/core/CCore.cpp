@@ -675,8 +675,7 @@ void CCore::SetMessageProcessor ( pfnProcessMessage pfnMessageProcessor )
 
 void CCore::ShowMessageBox ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler )
 {
-    if ( m_pMessageBox )
-        delete m_pMessageBox;
+    RemoveMessageBox ();
 
     // Create the message box
     m_pMessageBox = m_pGUI->CreateMessageBox ( szTitle, szText, uiFlags );
