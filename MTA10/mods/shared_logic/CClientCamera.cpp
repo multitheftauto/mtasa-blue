@@ -378,7 +378,7 @@ void CClientCamera::SetFocus ( CClientPlayer* pPlayer, eCamMode eMode, bool bSmo
     // Should we attach to a player, or set the camera to free?
     if ( pPlayer )
     {
-        // Attach the camera to the player vehicle if in a vehicle. To the player model otherwize
+        // Attach the camera to the player vehicle if in a vehicle. To the player model otherwise
         CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
         if ( pVehicle )
         {

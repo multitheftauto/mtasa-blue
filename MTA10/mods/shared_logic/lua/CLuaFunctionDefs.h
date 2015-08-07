@@ -520,11 +520,13 @@ public:
     LUA_DECLARE ( GetCameraInterior );
     LUA_DECLARE ( GetCameraGoggleEffect );
     LUA_DECLARE ( GetCameraShakeLevel );
+    LUA_DECLARE ( GetCameraFieldOfView );
 
     // Cam set funcs
     LUA_DECLARE ( SetCameraMatrix );
     LUA_DECLARE ( SetCameraTarget );
     LUA_DECLARE ( SetCameraInterior );
+    LUA_DECLARE ( SetCameraFieldOfView );
     LUA_DECLARE ( FadeCamera );
     LUA_DECLARE ( SetCameraClip );
     LUA_DECLARE ( GetCameraClip );

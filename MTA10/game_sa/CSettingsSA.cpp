@@ -485,32 +485,53 @@ void CSettingsSA::SetRadarMode ( eRadarMode hudMode )
 ////////////////////////////////////////////////
 float ms_fFOV = 70;
 float ms_fFOVCar = 70;
-float ms_fFOVCarMax = 100;  // When car go fast
+float ms_fFOVCarMax = 100;  // at high vehicle velocity
 
-float CSettingsSA::GetFieldOfView ( void )
+// consider moving this to the camera class - qaisjp
+float CSettingsSA::GetFieldOfViewPlayer ( void )
 {
     return ms_fFOV;
 }
 
+float CSettingsSA::GetFieldOfViewVehicle ( void )
+{
+    return ms_fFOVCar;
+}
+
+float CSettingsSA::GetFieldOfViewVehicleMax ( void )
+{
+    return ms_fFOVCarMax;
+}
+
 void CSettingsSA::SetFieldOfView ( float fAngle )
 {
-    fAngle = Clamp( 70.f, fAngle, 100.f );
+    SetFieldOfViewPlayer ( fAngle );
+    SetFieldOfViewVehicle ( fAngle );
+}
+    
+void CSettingsSA::SetFieldOfViewPlayer ( float fAngle )
+{
     ms_fFOV = fAngle;
-    ms_fFOVCar = fAngle;
-
-    // Player follow
     MemPut < void* > ( 0x0522F3A, &ms_fFOV );
     MemPut < void* > ( 0x0522F5D, &ms_fFOV );
     MemPut < float > ( 0x0522F7A, ms_fFOV );
+}
 
-    // Car follow
+void CSettingsSA::SetFieldOfViewVehicle ( float fAngle )
+{
+    ms_fFOVCar = fAngle;
     MemPut < void* > ( 0x0524B76, &ms_fFOVCar );
     MemPut < void* > ( 0x0524B9A, &ms_fFOVCar );
     MemPut < void* > ( 0x0524BA2, &ms_fFOVCar );
-    MemPut < void* > ( 0x0524BB4, &ms_fFOVCarMax );
-    MemPut < float > ( 0x0524BC5, ms_fFOVCarMax );
     MemPut < void* > ( 0x0524BD3, &ms_fFOVCar );
     MemPut < float > ( 0x0524BE4, ms_fFOVCar );
+}
+
+void CSettingsSA::SetFieldOfViewVehicleMax ( float fAngle )
+{
+    ms_fFOVCarMax = fAngle;
+    MemPut < void* > ( 0x0524BB4, &ms_fFOVCarMax );
+    MemPut < float > ( 0x0524BC5, ms_fFOVCarMax );
 }
 
 
