@@ -279,13 +279,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatRPCPacketUsageImpl* g_pPerfStatRPCPacketUsageImp = NULL;
+static std::unique_ptr<CPerfStatRPCPacketUsageImpl> g_pPerfStatRPCPacketUsageImp;
 
 CPerfStatRPCPacketUsage* CPerfStatRPCPacketUsage::GetSingleton ()
 {
     if ( !g_pPerfStatRPCPacketUsageImp )
-        g_pPerfStatRPCPacketUsageImp = new CPerfStatRPCPacketUsageImpl ();
-    return g_pPerfStatRPCPacketUsageImp;
+        g_pPerfStatRPCPacketUsageImp.reset(new CPerfStatRPCPacketUsageImpl ());
+    return g_pPerfStatRPCPacketUsageImp.get();
 }
 
 

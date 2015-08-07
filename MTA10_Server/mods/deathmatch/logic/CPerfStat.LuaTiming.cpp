@@ -146,13 +146,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatLuaTimingImpl* g_pPerfStatLuaTimingImp = NULL;
+static std::unique_ptr<CPerfStatLuaTimingImpl> g_pPerfStatLuaTimingImp;
 
 CPerfStatLuaTiming* CPerfStatLuaTiming::GetSingleton ()
 {
     if ( !g_pPerfStatLuaTimingImp )
-        g_pPerfStatLuaTimingImp = new CPerfStatLuaTimingImpl ();
-    return g_pPerfStatLuaTimingImp;
+        g_pPerfStatLuaTimingImp.reset(new CPerfStatLuaTimingImpl ());
+    return g_pPerfStatLuaTimingImp.get();
 }
 
 

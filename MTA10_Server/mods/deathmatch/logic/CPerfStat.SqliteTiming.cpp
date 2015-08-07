@@ -70,13 +70,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatSqliteTimingImpl* g_pPerfStatSqliteTimingImp = NULL;
+static std::unique_ptr<CPerfStatSqliteTimingImpl> g_pPerfStatSqliteTimingImp;
 
 CPerfStatSqliteTiming* CPerfStatSqliteTiming::GetSingleton ()
 {
     if ( !g_pPerfStatSqliteTimingImp )
-        g_pPerfStatSqliteTimingImp = new CPerfStatSqliteTimingImpl ();
-    return g_pPerfStatSqliteTimingImp;
+        g_pPerfStatSqliteTimingImp.reset(new CPerfStatSqliteTimingImpl ());
+    return g_pPerfStatSqliteTimingImp.get();
 }
 
 

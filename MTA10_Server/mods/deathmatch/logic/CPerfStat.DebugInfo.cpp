@@ -64,13 +64,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatDebugInfoImpl* g_pPerfStatDebugInfoImp = NULL;
+static std::unique_ptr<CPerfStatDebugInfoImpl> g_pPerfStatDebugInfoImp;
 
 CPerfStatDebugInfo* CPerfStatDebugInfo::GetSingleton ()
 {
     if ( !g_pPerfStatDebugInfoImp )
-        g_pPerfStatDebugInfoImp = new CPerfStatDebugInfoImpl ();
-    return g_pPerfStatDebugInfoImp;
+        g_pPerfStatDebugInfoImp.reset(new CPerfStatDebugInfoImpl ());
+    return g_pPerfStatDebugInfoImp.get();
 }
 
 

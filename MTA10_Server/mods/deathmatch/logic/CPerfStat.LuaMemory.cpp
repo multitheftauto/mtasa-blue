@@ -86,13 +86,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatLuaMemoryImpl* g_pPerfStatLuaMemoryImp = NULL;
+static std::unique_ptr<CPerfStatLuaMemoryImpl> g_pPerfStatLuaMemoryImp;
 
 CPerfStatLuaMemory* CPerfStatLuaMemory::GetSingleton ()
 {
     if ( !g_pPerfStatLuaMemoryImp )
-        g_pPerfStatLuaMemoryImp = new CPerfStatLuaMemoryImpl ();
-    return g_pPerfStatLuaMemoryImp;
+        g_pPerfStatLuaMemoryImp.reset(new CPerfStatLuaMemoryImpl ());
+    return g_pPerfStatLuaMemoryImp.get();
 }
 
 

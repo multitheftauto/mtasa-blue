@@ -106,13 +106,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatServerInfoImpl* g_pPerfStatServerInfoImp = NULL;
+static std::unique_ptr<CPerfStatServerInfoImpl> g_pPerfStatServerInfoImp;
 
 CPerfStatServerInfo* CPerfStatServerInfo::GetSingleton ()
 {
     if ( !g_pPerfStatServerInfoImp )
-        g_pPerfStatServerInfoImp = new CPerfStatServerInfoImpl ();
-    return g_pPerfStatServerInfoImp;
+        g_pPerfStatServerInfoImp.reset(new CPerfStatServerInfoImpl ());
+    return g_pPerfStatServerInfoImp.get();
 }
 
 

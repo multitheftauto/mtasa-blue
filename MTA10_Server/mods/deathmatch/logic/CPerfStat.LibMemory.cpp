@@ -88,13 +88,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatLibMemoryImpl* g_pPerfStatLibMemoryImp = NULL;
+static std::unique_ptr<CPerfStatLibMemoryImpl> g_pPerfStatLibMemoryImp;
 
 CPerfStatLibMemory* CPerfStatLibMemory::GetSingleton ()
 {
     if ( !g_pPerfStatLibMemoryImp )
-        g_pPerfStatLibMemoryImp = new CPerfStatLibMemoryImpl ();
-    return g_pPerfStatLibMemoryImp;
+        g_pPerfStatLibMemoryImp.reset(new CPerfStatLibMemoryImpl ());
+    return g_pPerfStatLibMemoryImp.get();
 }
 
 

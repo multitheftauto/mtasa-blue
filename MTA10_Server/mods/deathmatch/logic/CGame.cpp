@@ -254,6 +254,9 @@ CGame::~CGame ( void )
 {
     m_bBeingDeleted = true;
 
+    // Stop the performance stats modules
+    CPerfStatManager::GetSingleton ()->Stop ();
+
     // Stop and flush sim packet handling
     CSimControl::EnableSimSystem ( false );
 
@@ -301,6 +304,7 @@ CGame::~CGame ( void )
     if ( m_pRegistryManager )
         m_pRegistryManager->CloseRegistry ( m_pRegistry );
     m_pRegistry = NULL;
+    SAFE_DELETE ( m_pConsoleClient );
     SAFE_DELETE ( m_pAccountManager );
     SAFE_DELETE ( m_pRegistryManager );
     SAFE_DELETE ( m_pDatabaseManager );
@@ -323,6 +327,7 @@ CGame::~CGame ( void )
     SAFE_DELETE ( m_pFunctionUseLogger );
     SAFE_DELETE ( m_pOpenPortsTester );
     SAFE_DELETE ( m_pMasterServerAnnouncer );
+    SAFE_DELETE ( m_pASE );
     SAFE_RELEASE ( m_pHqComms );
     CSimControl::Shutdown ();
 

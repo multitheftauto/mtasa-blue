@@ -51,13 +51,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatServerTimingImpl* g_pPerfStatServerTimingImp = NULL;
+static std::unique_ptr<CPerfStatServerTimingImpl> g_pPerfStatServerTimingImp;
 
 CPerfStatServerTiming* CPerfStatServerTiming::GetSingleton ()
 {
     if ( !g_pPerfStatServerTimingImp )
-        g_pPerfStatServerTimingImp = new CPerfStatServerTimingImpl ();
-    return g_pPerfStatServerTimingImp;
+        g_pPerfStatServerTimingImp.reset(new CPerfStatServerTimingImpl ());
+    return g_pPerfStatServerTimingImp.get();
 }
 
 

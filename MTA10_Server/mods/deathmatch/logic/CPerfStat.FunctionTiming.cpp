@@ -130,13 +130,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatFunctionTimingImpl* g_pPerfStatFunctionTimingImp = NULL;
+static std::unique_ptr<CPerfStatFunctionTimingImpl> g_pPerfStatFunctionTimingImp;
 
 CPerfStatFunctionTiming* CPerfStatFunctionTiming::GetSingleton ()
 {
     if ( !g_pPerfStatFunctionTimingImp )
-        g_pPerfStatFunctionTimingImp = new CPerfStatFunctionTimingImpl ();
-    return g_pPerfStatFunctionTimingImp;
+        g_pPerfStatFunctionTimingImp.reset(new CPerfStatFunctionTimingImpl ());
+    return g_pPerfStatFunctionTimingImp.get();
 }
 
 

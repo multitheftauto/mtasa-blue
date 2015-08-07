@@ -53,13 +53,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatBandwidthReductionImpl* g_pPerfStatBandwidthReductionImp = NULL;
+static std::unique_ptr<CPerfStatBandwidthReductionImpl> g_pPerfStatBandwidthReductionImp;
 
 CPerfStatBandwidthReduction* CPerfStatBandwidthReduction::GetSingleton ()
 {
     if ( !g_pPerfStatBandwidthReductionImp )
-        g_pPerfStatBandwidthReductionImp = new CPerfStatBandwidthReductionImpl ();
-    return g_pPerfStatBandwidthReductionImp;
+        g_pPerfStatBandwidthReductionImp.reset(new CPerfStatBandwidthReductionImpl ());
+    return g_pPerfStatBandwidthReductionImp.get();
 }
 
 

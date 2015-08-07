@@ -167,6 +167,7 @@ CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacket
 
         case PACKET_ID_PLAYER_NO_SOCKET:
             pTemp = new CPlayerNoSocketPacket;
+            break;
  
         case PACKET_ID_PLAYER_NETWORK_STATUS:
             pTemp = new CPlayerNetworkStatusPacket;

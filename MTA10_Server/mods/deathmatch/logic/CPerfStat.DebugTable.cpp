@@ -59,13 +59,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatDebugTableImpl* g_pPerfStatDebugTableImp = NULL;
+static std::unique_ptr<CPerfStatDebugTableImpl> g_pPerfStatDebugTableImp;
 
 CPerfStatDebugTable* CPerfStatDebugTable::GetSingleton ()
 {
     if ( !g_pPerfStatDebugTableImp )
-        g_pPerfStatDebugTableImp = new CPerfStatDebugTableImpl ();
-    return g_pPerfStatDebugTableImp;
+        g_pPerfStatDebugTableImp.reset(new CPerfStatDebugTableImpl ());
+    return g_pPerfStatDebugTableImp.get();
 }
 
 

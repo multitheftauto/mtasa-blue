@@ -53,14 +53,15 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatPacketUsageImpl* g_pPerfStatPacketUsageImp = NULL;
+static std::unique_ptr<CPerfStatPacketUsageImpl> g_pPerfStatPacketUsageImp;
 
 CPerfStatPacketUsage* CPerfStatPacketUsage::GetSingleton ()
 {
     if ( !g_pPerfStatPacketUsageImp )
-        g_pPerfStatPacketUsageImp = new CPerfStatPacketUsageImpl ();
-    return g_pPerfStatPacketUsageImp;
+        g_pPerfStatPacketUsageImp.reset(new CPerfStatPacketUsageImpl ());
+    return g_pPerfStatPacketUsageImp.get();
 }
+
 
 
 ///////////////////////////////////////////////////////////////

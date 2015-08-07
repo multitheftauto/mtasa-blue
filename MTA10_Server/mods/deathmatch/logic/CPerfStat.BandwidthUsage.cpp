@@ -112,6 +112,7 @@ public:
     virtual const SString&      GetCategoryName         ( void );
     virtual void                DoPulse                 ( void );
     virtual void                GetStats                ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter );
+    virtual void                Stop                    ( void );
 
     // CPerfStatBandwidthUsageImpl
     void                        RecordStats             ( void );
@@ -136,13 +137,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatBandwidthUsageImpl* g_pPerfStatBandwidthUsageImp = NULL;
+static std::unique_ptr<CPerfStatBandwidthUsageImpl> g_pPerfStatBandwidthUsageImp;
 
 CPerfStatBandwidthUsage* CPerfStatBandwidthUsage::GetSingleton ()
 {
     if ( !g_pPerfStatBandwidthUsageImp )
-        g_pPerfStatBandwidthUsageImp = new CPerfStatBandwidthUsageImpl ();
-    return g_pPerfStatBandwidthUsageImp;
+        g_pPerfStatBandwidthUsageImp.reset(new CPerfStatBandwidthUsageImpl ());
+    return g_pPerfStatBandwidthUsageImp.get();
 }
 
 
@@ -170,6 +171,18 @@ CPerfStatBandwidthUsageImpl::CPerfStatBandwidthUsageImpl ( void )
 //
 ///////////////////////////////////////////////////////////////
 CPerfStatBandwidthUsageImpl::~CPerfStatBandwidthUsageImpl ( void )
+{
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatBandwidthUsageImpl::Stop
+//
+// Save stats and clean up the database connection
+//
+///////////////////////////////////////////////////////////////
+void CPerfStatBandwidthUsageImpl::Stop( void )
 {
     SaveStats ();
     g_pGame->GetDatabaseManager ()->Disconnect ( m_DatabaseConnection );

@@ -129,13 +129,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatPlayerPacketUsageImpl* g_pPerfStatPlayerPacketUsageImp = NULL;
+static std::unique_ptr<CPerfStatPlayerPacketUsageImpl> g_pPerfStatPlayerPacketUsageImp;
 
 CPerfStatPlayerPacketUsage* CPerfStatPlayerPacketUsage::GetSingleton ()
 {
     if ( !g_pPerfStatPlayerPacketUsageImp )
-        g_pPerfStatPlayerPacketUsageImp = new CPerfStatPlayerPacketUsageImpl ();
-    return g_pPerfStatPlayerPacketUsageImp;
+        g_pPerfStatPlayerPacketUsageImp.reset(new CPerfStatPlayerPacketUsageImpl ());
+    return g_pPerfStatPlayerPacketUsageImp.get();
 }
 
 

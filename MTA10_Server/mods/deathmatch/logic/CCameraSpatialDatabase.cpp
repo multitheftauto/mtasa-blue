@@ -58,13 +58,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CCameraSpatialDatabaseImpl* g_pCameraSpatialDatabaseImp = NULL;
+static std::unique_ptr<CCameraSpatialDatabaseImpl> g_pCameraSpatialDatabaseImp;
 
 CCameraSpatialDatabase* GetCameraSpatialDatabase ()
 {
     if ( !g_pCameraSpatialDatabaseImp )
-        g_pCameraSpatialDatabaseImp = new CCameraSpatialDatabaseImpl ();
-    return g_pCameraSpatialDatabaseImp;
+        g_pCameraSpatialDatabaseImp.reset(new CCameraSpatialDatabaseImpl ());
+    return g_pCameraSpatialDatabaseImp.get();
 }
 
 

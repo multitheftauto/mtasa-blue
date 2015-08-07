@@ -68,6 +68,8 @@ CMapManager::~CMapManager ( void )
 {
     // Delete the weather manager
     delete m_pBlendedWeather;
+    // Delete the root element
+    delete m_pRootElement;
 }
 
 

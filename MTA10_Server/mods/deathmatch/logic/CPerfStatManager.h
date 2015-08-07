@@ -22,6 +22,7 @@ public:
 
     virtual void        DoPulse             ( void ) = 0;
     virtual void        GetStats            ( CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter ) = 0;
+    virtual void        Stop                ( void ) = 0;
 
     // Utility
     static SString      GetScaledByteString ( long long Amount );

@@ -36,7 +36,7 @@ struct SStatData
     int iDbConnectionCount;
 };
 
-extern SStatData* g_pStats;
+extern std::unique_ptr<SStatData> g_pStats;
 
 
 //
@@ -120,6 +120,7 @@ public:
     virtual const SString&      GetCategoryName     ( void ) = 0;
     virtual void                DoPulse             ( void ) = 0;
     virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+    virtual void                Stop                ( void ) {};
 };
 
 
@@ -260,6 +261,7 @@ public:
     virtual const SString&      GetCategoryName     ( void ) = 0;
     virtual void                DoPulse             ( void ) = 0;
     virtual void                GetStats            ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter ) = 0;
+    virtual void                Stop                ( void ) = 0;
 
     // CPerfStatBandwidthUsage
 

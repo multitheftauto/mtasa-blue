@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-SStatData* g_pStats = new SStatData ();
+std::unique_ptr<SStatData> g_pStats(new SStatData ());
 
 ///////////////////////////////////////////////////////////////
 //
@@ -29,6 +29,7 @@ public:
     // CPerfStatManager
     virtual void                DoPulse                     ( void );
     virtual void                GetStats                    ( CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter );
+    virtual void                Stop                        ( void );
 
     // CPerfStatManagerImpl
     void                        AddModule                   ( CPerfStatModule* pModule );
@@ -48,13 +49,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatManagerImpl* g_pPerfStatManagerImp = NULL;
+static std::unique_ptr<CPerfStatManagerImpl> g_pPerfStatManagerImp;
 
 CPerfStatManager* CPerfStatManager::GetSingleton ( void )
 {
     if ( !g_pPerfStatManagerImp )
-        g_pPerfStatManagerImp = new CPerfStatManagerImpl ();
-    return g_pPerfStatManagerImp;
+        g_pPerfStatManagerImp.reset(new CPerfStatManagerImpl ());
+    return g_pPerfStatManagerImp.get();
 }
 
 
@@ -94,6 +95,20 @@ CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
 ///////////////////////////////////////////////////////////////
 CPerfStatManagerImpl::~CPerfStatManagerImpl ( void )
 {
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatManagerImpl::Stop
+//
+// Stops all modules by invoking Stop() on all modules
+//
+///////////////////////////////////////////////////////////////
+void CPerfStatManagerImpl::Stop ( void )
+{
+    for ( auto const& module : m_ModuleList )
+        module->Stop ();
 }
 
 

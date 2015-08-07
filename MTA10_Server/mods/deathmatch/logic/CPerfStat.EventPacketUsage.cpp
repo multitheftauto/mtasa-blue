@@ -66,13 +66,13 @@ public:
 //
 //
 ///////////////////////////////////////////////////////////////
-static CPerfStatEventPacketUsageImpl* g_pPerfStatEventPacketUsageImp = NULL;
+static std::unique_ptr<CPerfStatEventPacketUsageImpl> g_pPerfStatEventPacketUsageImp;
 
 CPerfStatEventPacketUsage* CPerfStatEventPacketUsage::GetSingleton ()
 {
     if ( !g_pPerfStatEventPacketUsageImp )
-        g_pPerfStatEventPacketUsageImp = new CPerfStatEventPacketUsageImpl ();
-    return g_pPerfStatEventPacketUsageImp;
+        g_pPerfStatEventPacketUsageImp.reset(new CPerfStatEventPacketUsageImpl ());
+    return g_pPerfStatEventPacketUsageImp.get();
 }
 
 
