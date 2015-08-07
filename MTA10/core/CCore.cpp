@@ -607,7 +607,7 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "classic_controls", bval ); pController->SetClassicControls ( bval );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal, CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) );
-    CVARS_GET ( "fov",              iVal ); m_pGame->GetSettings ()->SetFieldOfView ( iVal );
+    CVARS_GET ( "fov",              iVal ); iVal = Clamp ( 70, iVal, 100 ); m_pGame->GetSettings ()->SetFieldOfView ( iVal );
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
     CVARS_GET ( "heat_haze",        bval ); m_pMultiplayer->SetHeatHazeEnabled ( bval );
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
@@ -675,8 +675,7 @@ void CCore::SetMessageProcessor ( pfnProcessMessage pfnMessageProcessor )
 
 void CCore::ShowMessageBox ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler )
 {
-    if ( m_pMessageBox )
-        delete m_pMessageBox;
+    RemoveMessageBox ();
 
     // Create the message box
     m_pMessageBox = m_pGUI->CreateMessageBox ( szTitle, szText, uiFlags );

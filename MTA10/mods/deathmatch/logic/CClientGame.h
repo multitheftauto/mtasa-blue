@@ -234,7 +234,6 @@ public:
     void                                SetupLocalGame                  ( eServerType Type );
     //bool                                StartGame                       ( void );
     inline bool                         IsLocalGame                     ( void ) const { return m_bLocalPlay; }
-    inline bool                         IsWaitingForLocalConnect        ( void ) const { return m_bWaitingForLocalConnect; }
     bool                                OnCancelLocalGameClick          ( CGUIElement* pElement );
 
     void                                DoPulsePreFrame                 ( void );

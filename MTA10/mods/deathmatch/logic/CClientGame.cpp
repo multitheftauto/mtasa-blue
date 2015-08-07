@@ -2781,9 +2781,9 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPlayerStealthKill", "target", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHitByWaterCannon", "vehicle", NULL, false );
     m_Events.AddEvent ( "onClientPlayerHeliKilled", "heli", NULL, false );
-	m_Events.AddEvent ( "onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false );
-	m_Events.AddEvent ( "onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false );
-	m_Events.AddEvent ( "onClientPlayerNetworkStatus", "type, ticks", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false );
+    m_Events.AddEvent ( "onClientPlayerNetworkStatus", "type, ticks", NULL, false );
 
     // Ped events
     m_Events.AddEvent ( "onClientPedDamage", "attacker, weapon, bodypart", NULL, false );
@@ -5465,6 +5465,11 @@ void CClientGame::ResetMapInfo ( void )
     g_pGame->GetWorld ()->SetCurrentArea ( 0 );
     m_pCamera->SetFocusToLocalPlayer ();
 
+    float fFOV;
+    g_pCore->GetCVars ()->Get ( "fov", fFOV );
+    g_pGame->GetSettings ()->SetFieldOfView ( Clamp ( 70.f, fFOV, 100.f ) );
+    g_pGame->GetSettings ()->SetFieldOfViewVehicleMax ( 100 );
+
     // Dimension
     SetAllDimensions ( 0 );
 
@@ -5526,7 +5531,7 @@ void CClientGame::ResetMapInfo ( void )
     // Water-colour
     g_pMultiplayer->ResetWater ( );
 
-	// Water
+    // Water
     GetManager ()->GetWaterManager ()->ResetWorldWaterLevel ();
 
     // Re-enable interior sounds and furniture

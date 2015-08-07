@@ -62,6 +62,14 @@ DECLARE_ENUM( eDXVerticalAlign );
 DECLARE_ENUM( eHudComponent );
 
 
+enum eFieldOfViewMode
+{
+    FOV_MODE_PLAYER,
+    FOV_MODE_VEHICLE,
+    FOV_MODE_VEHICLE_MAX,
+    FOV_MODE_AIMING
+};
+DECLARE_ENUM ( eFieldOfViewMode );
 
 // class -> class type
 inline eCGUIType GetClassType ( CGUIButton* )      { return CGUI_BUTTON; }
