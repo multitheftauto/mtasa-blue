@@ -4947,14 +4947,12 @@ bool CClientVehicle::SetWindowOpen ( uchar ucWindow, bool bOpen )
 {
     if ( ucWindow < MAX_WINDOWS )
     {
+        m_bWindowOpen [ ucWindow ] = bOpen;
         if ( m_pVehicle )
         {
-            if ( m_pVehicle->SetWindowOpenFlagState ( ucWindow, bOpen ) )
-            {
-                m_bWindowOpen [ ucWindow ] = bOpen;
-                return true;
-            }
+            return m_pVehicle->SetWindowOpenFlagState ( ucWindow, bOpen );
         }
+        return true;
     }
     return false;
 }
