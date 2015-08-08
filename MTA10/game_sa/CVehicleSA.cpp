@@ -2743,3 +2743,32 @@ bool CVehicleSA::SetPlateText( const SString& strText )
     }
     return bReturn;
 }
+
+bool CVehicleSA::SetWindowOpenFlagState ( unsigned char ucWindow, bool bState )
+{
+    if ( ucWindow > 7 )
+        return false;
+    unsigned char ucWindows [ 7 ] = { 0, 1, 8, 9, 10, 11, 18 };
+    ucWindow = ucWindows [ ucWindow ];
+
+    DWORD dwThis = ( DWORD ) GetVehicleInterface ( );
+    DWORD dwFunc;
+    if ( bState )
+    {
+        dwFunc = FUNC_CVehicle_SetWindowOpenFlag;
+    }
+    else
+    {
+        dwFunc = FUNC_CVehicle_ClearWindowOpenFlag;
+    }
+    bool bReturn = false;
+
+    _asm
+    {
+        mov     ecx, dwThis
+        push    ucWindow
+        call    dwFunc
+        mov     bReturn, al
+    }
+    return bReturn;
+}

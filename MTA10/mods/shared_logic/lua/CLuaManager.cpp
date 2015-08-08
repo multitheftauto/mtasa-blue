@@ -521,6 +521,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehicleNitroCount", CLuaFunctionDefs::GetVehicleNitroCount );
     CLuaCFunctions::AddFunction ( "getVehicleNitroLevel", CLuaFunctionDefs::GetVehicleNitroLevel );
     CLuaCFunctions::AddFunction ( "getHeliBladeCollisionsEnabled", CLuaFunctionDefs::GetHeliBladeCollisionsEnabled );
+    CLuaCFunctions::AddFunction ( "isVehicleWindowOpen", CLuaFunctionDefs::IsVehicleWindowOpen );
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );
@@ -573,6 +574,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleNitroLevel", CLuaFunctionDefs::SetVehicleNitroLevel );
     CLuaCFunctions::AddFunction ( "setVehiclePlateText", CLuaFunctionDefs::SetVehiclePlateText );
     CLuaCFunctions::AddFunction ( "setHeliBladeCollisionsEnabled", CLuaFunctionDefs::SetHeliBladeCollisionsEnabled );
+    CLuaCFunctions::AddFunction ( "setVehicleWindowOpen", CLuaFunctionDefs::SetVehicleWindowOpen );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );

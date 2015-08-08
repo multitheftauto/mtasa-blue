@@ -63,6 +63,18 @@ enum eDelayedSyncVehicleData
     DELAYEDSYNC_VEHICLE_TURNSPEED,
 };
 
+enum eWindow
+{
+    WINDOW_BIKESHIELD = 0,
+    WINDOW_REAR,
+    WINDOW_RIGHT_FRONT,
+    WINDOW_RIGHT_BACK,
+    WINDOW_LEFT_FRONT,
+    WINDOW_LEFT_BACK,
+    WINDOW_WINDSHIELD,
+    MAX_WINDOWS
+};
+
 namespace EComponentBase
 {
     enum EComponentBaseType
@@ -369,6 +381,9 @@ public:
     void                        SetNitroCount           ( char cCount );
     void                        SetNitroLevel           ( float fLevel );
 
+    bool                        IsWindowOpen            ( uchar ucWindow );
+    bool                        SetWindowOpen           ( uchar ucWindow, bool bOpen );
+
     bool                        IsNitroInstalled        ( void );
 
     float                       GetDistanceFromGround   ( void );
@@ -655,6 +670,7 @@ protected:
     bool                        m_bEnableHeliBladeCollisions;
     CMatrix                     m_matCreate;
     unsigned char               m_ucFellThroughMapCount;
+    SFixedArray < bool, MAX_WINDOWS >    m_bWindowOpen;
 
 public:
 #ifdef MTA_DEBUG

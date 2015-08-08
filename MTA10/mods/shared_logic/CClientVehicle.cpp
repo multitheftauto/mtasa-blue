@@ -145,6 +145,11 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_fNitroLevel = 1.0f;
     m_cNitroCount = 0;
 
+    for ( unsigned int i = 0; i < MAX_WINDOWS; ++i )
+    {
+        m_bWindowOpen [ i ] = false;
+    }
+
 #ifdef MTA_DEBUG
     m_pLastSyncer = NULL;
     m_ulLastSyncTime = 0;
@@ -2829,6 +2834,9 @@ void CClientVehicle::Create ( void )
         for ( unsigned char i = 0; i < 6; ++i )
             SetDoorOpenRatio ( i, m_fDoorOpenRatio [ i ], 0, true );
 
+        for ( unsigned char i = 0; i < MAX_WINDOWS; ++i )
+            SetWindowOpen ( i, m_bWindowOpen [ i ] );
+
 
         // Re-apply handling entry
         if ( m_pHandlingEntry )
@@ -4935,3 +4943,27 @@ char CClientVehicle::GetNitroCount ( )
     return m_cNitroCount;
 }
 
+bool CClientVehicle::SetWindowOpen ( uchar ucWindow, bool bOpen )
+{
+    if ( ucWindow < MAX_WINDOWS )
+    {
+        if ( m_pVehicle )
+        {
+            if ( m_pVehicle->SetWindowOpenFlagState ( ucWindow, bOpen ) )
+            {
+                m_bWindowOpen [ ucWindow ] = bOpen;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool CClientVehicle::IsWindowOpen ( uchar ucWindow )
+{
+    if ( ucWindow < MAX_WINDOWS )
+    {
+        return m_bWindowOpen [ ucWindow ];
+    }
+    return false;
+}

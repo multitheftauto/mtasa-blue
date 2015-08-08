@@ -3152,3 +3152,53 @@ int CLuaFunctionDefs::GetHeliBladeCollisionsEnabled ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::SetVehicleWindowOpen ( lua_State* luaVM )
+{
+//  bool setVehicleWindowOpen ( vehicle theVehicle, int iWindow, bool bOpen )
+    CClientVehicle* pVehicle; uchar ucWindow; bool bOpen;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( ucWindow );
+    argStream.ReadBool ( bOpen );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::SetVehicleWindowOpen ( *pVehicle, ucWindow, bOpen ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::IsVehicleWindowOpen ( lua_State* luaVM )
+{
+//  bool isVehicleWindowOpen ( vehicle theVehicle, int iWindow )
+    CClientVehicle* pVehicle; uchar ucWindow;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( ucWindow );
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( CStaticFunctionDefinitions::IsVehicleWindowOpen ( *pVehicle, ucWindow ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

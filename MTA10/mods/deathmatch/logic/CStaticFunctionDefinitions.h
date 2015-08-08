@@ -221,6 +221,7 @@ public:
     static bool                         GetVehicleNitroCount                ( CClientVehicle& Vehicle, char& cCount );
     static bool                         GetVehicleNitroLevel                ( CClientVehicle& Vehicle, float& fLevel );
     static bool                         GetHeliBladeCollisionsEnabled       ( CClientVehicle& Vehicle );
+    static bool                         IsVehicleWindowOpen                 ( CClientVehicle& Vehicle, uchar ucWindow );
 
     // Vehicle set functions
     static bool                         FixVehicle                          ( CClientEntity& Entity );
@@ -262,6 +263,7 @@ public:
     static bool                         SetVehicleNitroLevel                ( CClientEntity& Entity, float fLevel );
     static bool                         SetVehiclePlateText                 ( CClientEntity& Entity, const SString& strText );
     static bool                         SetHeliBladeCollisionsEnabled       ( CClientVehicle& Vehicle, bool bEnabled );
+    static bool                         SetVehicleWindowOpen                ( CClientVehicle& Vehicle, uchar ucWindow, bool bOpen );
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );

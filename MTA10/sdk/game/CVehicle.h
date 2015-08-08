@@ -315,6 +315,7 @@ public:
     virtual std::map < SString, SVehicleFrame > & GetComponentMap       ( void ) = 0;
     virtual void                 UpdateLandingGearPosition              ( void ) = 0;
     virtual bool                 SetPlateText                           ( const SString& strText ) = 0;
+    virtual bool                 SetWindowOpenFlagState                 ( unsigned char ucWindow, bool bState ) = 0;
 };
 
 #endif
