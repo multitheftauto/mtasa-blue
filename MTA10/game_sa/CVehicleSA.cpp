@@ -2746,7 +2746,7 @@ bool CVehicleSA::SetPlateText( const SString& strText )
 
 bool CVehicleSA::SetWindowOpenFlagState ( unsigned char ucWindow, bool bState )
 {
-    if ( ucWindow > 7 )
+    if ( ucWindow > 6 )
         return false;
     unsigned char ucWindows [ 7 ] = { 0, 1, 8, 9, 10, 11, 18 };
     ucWindow = ucWindows [ ucWindow ];
