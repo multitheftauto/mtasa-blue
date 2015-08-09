@@ -123,6 +123,9 @@ class CVehicleSA;
 #define FUNC_CVehicle__SetRemap                                 0x6D0C00
 #define FUNC_CVehicle_CustomCarPlate_TextureCreate              0x6D10E0
 
+#define FUNC_CVehicle_SetWindowOpenFlag                         0x6D3080
+#define FUNC_CVehicle_ClearWindowOpenFlag                       0x6D30B0
+
 // from CBike
 #define FUNC_Bike_PlaceOnRoadProperly           0x6BEEB0
 #define FUNC_Automobile_PlaceOnRoadProperly     0x6AF420
@@ -783,6 +786,7 @@ public:
     bool                        GetComponentVisible             ( const SString& vehicleComponent, bool &bVisible );
     std::map < SString, SVehicleFrame > & GetComponentMap       ( void )                                                            { return m_ExtraFrames; }
     bool                        SetPlateText                    ( const SString& strText );
+    bool                        SetWindowOpenFlagState          ( unsigned char ucWindow, bool bState );
 
     void                        UpdateLandingGearPosition       ( );
 

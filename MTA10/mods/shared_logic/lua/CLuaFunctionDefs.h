@@ -353,6 +353,7 @@ public:
     LUA_DECLARE ( GetVehicleNitroCount );
     LUA_DECLARE ( GetVehicleNitroLevel );
     LUA_DECLARE ( GetHeliBladeCollisionsEnabled );
+    LUA_DECLARE ( IsVehicleWindowOpen );
 
     // Vehicle set functions
     LUA_DECLARE ( FixVehicle );
@@ -407,6 +408,7 @@ public:
     LUA_DECLARE ( SetVehicleNitroLevel );
     LUA_DECLARE ( SetVehiclePlateText );
     LUA_DECLARE ( SetHeliBladeCollisionsEnabled );
+    LUA_DECLARE ( SetVehicleWindowOpen );
 
     // Object create funcs
     LUA_DECLARE ( CreateObject );

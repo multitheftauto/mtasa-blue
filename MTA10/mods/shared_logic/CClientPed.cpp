@@ -5576,11 +5576,36 @@ void CClientPed::SetDoingGangDriveby ( bool bDriveby )
         }
         else if ( bDriveby )
         {
-            bool bRight = ( GetOccupiedVehicleSeat ( ) % 2 == 0 ) ? false : true;
+            char cSeat = GetOccupiedVehicleSeat ( );
+            bool bRight = ( cSeat % 2 != 0 );
             CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleGangDriveBy ( NULL, NULL, 0.0f, 0, 0, bRight );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
+            }
+
+            char cWindow = -1;
+            switch ( cSeat )
+            {
+            case 0:
+                cWindow = WINDOW_LEFT_FRONT;
+                break;
+
+            case 1:
+                cWindow = WINDOW_RIGHT_FRONT;
+                break;
+
+            case 2:
+                cWindow = WINDOW_LEFT_BACK;
+                break;
+
+            case 3:
+                cWindow = WINDOW_RIGHT_BACK;
+                break;
+            }
+            if ( cWindow != -1 )
+            {
+                GetOccupiedVehicle ( )->SetWindowOpen ( cWindow, true );
             }
         }
     }

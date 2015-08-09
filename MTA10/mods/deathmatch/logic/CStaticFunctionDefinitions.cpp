@@ -3365,6 +3365,16 @@ bool CStaticFunctionDefinitions::GetHeliBladeCollisionsEnabled ( CClientVehicle&
     return Vehicle.AreHeliBladeCollisionsEnabled ( );
 }
 
+bool CStaticFunctionDefinitions::SetVehicleWindowOpen ( CClientVehicle& Vehicle, uchar ucWindow, bool bOpen )
+{
+    return Vehicle.SetWindowOpen ( ucWindow, bOpen );
+}
+
+bool CStaticFunctionDefinitions::IsVehicleWindowOpen ( CClientVehicle& Vehicle, uchar ucWindow )
+{
+    return Vehicle.IsWindowOpen ( ucWindow );
+}
+
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled ( CClientEntity& Entity, bool bEnabled )
 {
     switch ( Entity.GetType () )
