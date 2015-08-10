@@ -26,6 +26,10 @@
     #undef realloc
     #undef calloc
     #undef free
+    #define thread_id uint
+#else
+    #define GetCurrentThreadId pthread_self
+    #define thread_id pthread_t
 #endif
 
 using namespace std;
@@ -123,7 +127,7 @@ public:
     uint                            tagIdCounter;
     maptype < uint, STagInfo >      tagInfoMap;
     CCriticalSection                cs;
-    DWORD                           dwThreadUsing;
+    thread_id                       dwThreadUsing;
 
     #define SIZE_SORTED_TAG_THRESH 10000
     maptype < uint64, uint >      sizeSortedTagMap;
@@ -311,7 +315,7 @@ public:
     // Return false if should not use alloc tracking
     bool Lock( void )
     {
-        DWORD dwThreadWanting = GetCurrentThreadId();
+        thread_id dwThreadWanting = GetCurrentThreadId();
         if ( dwThreadWanting == dwThreadUsing )
             return false;   // No tracking when tracker is allocating 
         cs.Lock();
