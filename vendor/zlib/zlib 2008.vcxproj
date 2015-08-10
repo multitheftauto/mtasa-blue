@@ -101,9 +101,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
     <TargetName>zlib</TargetName>
+    <OutDir>..\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</OutDir>
+    <IntDir>..\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
     <TargetName>zlib</TargetName>
+    <OutDir>..\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</OutDir>
+    <IntDir>..\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(PlatformTarget)\$(Configuration)\</OutDir>

@@ -108,10 +108,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>libcurl</TargetName>
+    <OutDir>..\..\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</OutDir>
+    <IntDir>..\..\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>libcurl</TargetName>
+    <OutDir>..\..\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</OutDir>
+    <IntDir>..\..\..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\$(PlatformTarget)\$(Configuration)\</OutDir>
@@ -166,9 +170,9 @@
     <Link>
       <AdditionalDependencies>ws2_32.lib;wldap32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\obj\$(PlatformTarget)\$(Configuration)\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>..\..\..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
@@ -211,9 +215,9 @@
     <Link>
       <AdditionalDependencies>ws2_32.lib;wldap32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\obj\$(PlatformTarget)\$(Configuration)\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>..\..\..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
