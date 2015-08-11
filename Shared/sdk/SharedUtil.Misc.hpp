@@ -1072,13 +1072,51 @@ void SharedUtil::RandomizeRandomSeed ( void )
 
 //
 // Return true if currently executing the main thread.
-// Main thread being defined as the thread the function is first called from.
+// (Linux: Main thread being defined as the thread the function is first called from.)
 //
 bool SharedUtil::IsMainThread ( void )
 {
 #ifdef WIN32
-    static DWORD dwMainThread = GetCurrentThreadId ();
-    return GetCurrentThreadId () == dwMainThread;
+    static DWORD dwMainThreadID = 0;
+    if ( dwMainThreadID == 0 )
+    {
+        // Find oldest thread in the current process ( http://www.codeproject.com/Questions/78801/How-to-get-the-main-thread-ID-of-a-process-known-b )
+        HANDLE hThreadSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD, 0 );
+        if ( hThreadSnap != INVALID_HANDLE_VALUE )
+        {
+            ULONGLONG ullMinCreateTime = ULLONG_MAX;
+            THREADENTRY32 th32;
+            th32.dwSize = sizeof(THREADENTRY32);
+            for ( BOOL bOK = Thread32First( hThreadSnap, &th32 ); bOK; bOK = Thread32Next( hThreadSnap, &th32 ) )
+            {
+                if ( th32.th32OwnerProcessID == GetCurrentProcessId() )
+                {
+                    HANDLE hThread = OpenThread( THREAD_QUERY_INFORMATION,TRUE, th32.th32ThreadID );
+                    if ( hThread )
+                    {
+                        FILETIME afTimes[4] = { 0 };
+                        if ( GetThreadTimes( hThread, &afTimes[0], &afTimes[1], &afTimes[2], &afTimes[3] ) )
+                        {
+                            ULONGLONG ullTest = ( ULONGLONG(afTimes[0].dwHighDateTime) << 32 ) + afTimes[0].dwLowDateTime;
+                            if ( ullTest && ullTest < ullMinCreateTime )
+                            {
+                                ullMinCreateTime = ullTest;
+                                dwMainThreadID = th32.th32ThreadID;
+                            }
+                        }
+                        CloseHandle( hThread );
+                    }
+                }
+            }
+            CloseHandle( hThreadSnap );
+        }
+
+        // Fallback
+        if ( dwMainThreadID == 0 )
+            dwMainThreadID = GetCurrentThreadId();
+    }
+
+    return dwMainThreadID == GetCurrentThreadId();
 #else
     static pthread_t dwMainThread = pthread_self ();
     return pthread_equal ( pthread_self (), dwMainThread ) != 0;
