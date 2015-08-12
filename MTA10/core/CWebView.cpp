@@ -9,6 +9,7 @@
 *****************************************************************************/
 #include "StdInc.h"
 #include "CWebView.h"
+#include "CAjaxResourceHandler.h"
 #include <cef3/include/cef_parser.h>
 #include <cef3/include/cef_task.h>
 #include <cef3/include/cef_runnable.h>
@@ -318,6 +319,30 @@ void CWebView::GetSourceCode ( const std::function<void( const std::string& code
 bool CWebView::GetFullPathFromLocal ( SString& strPath )
 {
      return m_pEventsInterface->Events_OnResourcePathCheck ( strPath );
+}
+
+bool CWebView::RegisterAjaxHandler ( const SString& strURL )
+{
+    auto result = m_AjaxHandlers.insert ( strURL );
+    return result.second;
+}
+
+bool CWebView::UnregisterAjaxHandler ( const SString& strURL )
+{
+    return m_AjaxHandlers.erase ( strURL ) == 1;
+}
+
+
+bool CWebView::HasAjaxHandler ( const SString& strURL )
+{
+    auto iterCB = m_AjaxHandlers.find ( strURL );
+    return iterCB != m_AjaxHandlers.end ();
+}
+
+void CWebView::HandleAjaxRequest ( const SString& strURL, CAjaxResourceHandler * pHandler )
+{
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL );
+    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "AjaxResourceRequest" );
 }
 
 
@@ -824,3 +849,4 @@ void CWebView::ConvertURL ( const CefString& url, SString& convertedURL )
             convertedURL = "";
     }
 }
+

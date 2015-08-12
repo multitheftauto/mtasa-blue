@@ -256,6 +256,39 @@ void CClientWebBrowser::Events_OnResourceBlocked ( const SString& strURL, const 
     CallEvent ( "onClientBrowserResourceBlocked", Arguments, false );
 }
 
+void CClientWebBrowser::Events_OnAjaxRequest ( CAjaxResourceHandlerInterface* pHandler, const SString& strURL )
+{
+    auto callbackMapEntry = m_mapAjaxCallback.find ( strURL );
+
+    if ( callbackMapEntry == m_mapAjaxCallback.end () )
+    {
+        pHandler->SetResponse ( "" );
+        return;
+    }
+
+    auto callback = callbackMapEntry->second;
+    SString result = callback ( pHandler->GetGetData (), pHandler->GetPostData () );
+    pHandler->SetResponse ( result );
+}
+
+
+bool CClientWebBrowser::AddAjaxHandler ( const SString& strURL, ajax_callback_t& handler )
+{
+    if ( !m_pWebView->RegisterAjaxHandler ( strURL ) )
+        return false;
+    
+    m_mapAjaxCallback.insert ( std::make_pair ( strURL, handler ) );
+    return true;
+}
+
+
+bool CClientWebBrowser::RemoveAjaxHandler ( const SString& strURL )
+{
+    if ( !m_pWebView->UnregisterAjaxHandler ( strURL ) )
+        return false;
+
+    return m_mapAjaxCallback.erase ( strURL ) == 1;
+}
 
 
 CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) 
@@ -268,3 +301,5 @@ CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, bool isTransparent, u
     // Set our owner resource
     m_pBrowser->SetResource ( pLuaMain->GetResource () );
 }
+
+

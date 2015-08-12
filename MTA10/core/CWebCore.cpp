@@ -12,6 +12,7 @@
 #include "CWebCore.h"
 #include "CWebView.h"
 #include "CWebsiteRequests.h"
+#include "CAjaxResourceHandler.h"
 #include <cef3/include/cef_app.h>
 #include <cef3/include/cef_browser.h>
 #include <cef3/include/cef_sandbox_win.h>
@@ -797,23 +798,62 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
 
     // Get full path
     SString path = UTF16ToMbUTF8 ( urlParts.path.str ).substr ( 2 );
-    if ( !pWebView->GetFullPathFromLocal ( path ) )
-        return nullptr;
 
     // Get mime type from extension
     CefString mimeType;
-    size_t pos = path.find_last_of('.');
-    if (pos != std::string::npos)
+    size_t pos = path.find_last_of ( '.' );
+    if ( pos != std::string::npos )
         mimeType = CefGetMimeType ( path.substr ( pos + 1 ) );
-    
+
     // Make sure we provide a mime type, even 
     // when we cannot deduct it from the file extension
-    if ( mimeType.empty( ) )
+    if ( mimeType.empty () )
         mimeType = "application/octet-stream";
 
-    auto stream = CefStreamReader::CreateForFile ( path );
-    if ( stream.get () )
-        return new CefStreamResourceHandler ( mimeType, stream );
+
+    if( pWebView->HasAjaxHandler ( path ) )
+    {
+        std::vector<SString> vecGet;
+        std::vector<SString> vecPost;
+
+        SString strGet = UTF16ToMbUTF8(urlParts.query.str);
+        std::vector<SString> vecTmp;
+        strGet.Split ( "&", vecTmp, 0, 0 );
+
+        SString key; SString value;
+        for ( auto&& param : vecTmp )
+        {
+            param.Split ( "=", &key, &value );
+            vecGet.push_back ( key );
+            vecGet.push_back ( value );
+        }
+
+        // ToDo: POST Information is Empty for non-standard URI schemes
+        // Getting POST parameters into Lua will require changing
+        // mtalocal:// to a standard scheme first
+        /*
+        CefPostData::ElementVector vecPostElements;
+        request->GetPostData ().get ()->GetElements ( vecPostElements );
+
+        for ( auto&& post : vecPostElements )
+        {
+            // ToDo: Parse POST data into our vector
+        }
+        */
+
+        auto handler = new CAjaxResourceHandler ( vecGet, vecPost, mimeType );
+        pWebView->HandleAjaxRequest ( path, handler );
+        return handler;
+    }
+    else
+    {
+        if ( !pWebView->GetFullPathFromLocal ( path ) )
+            return nullptr;
+        
+        auto stream = CefStreamReader::CreateForFile ( path );
+        if ( stream.get () )
+            return new CefStreamResourceHandler ( mimeType, stream );
+    }
 
     return nullptr;
 }

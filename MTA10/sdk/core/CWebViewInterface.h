@@ -49,6 +49,12 @@ public:
     virtual bool SetAudioVolume     ( float fVolume ) = 0;
 
     virtual void GetSourceCode      ( const std::function<void( const std::string& code )>& callback ) = 0;
+
+    // Ajax Handlers
+    using ajax_callback_t = const std::function<const SString ( std::vector<SString>& vecGet, std::vector<SString>& vecPost )>;
+    
+    virtual bool RegisterAjaxHandler ( const SString& strURL ) = 0;
+    virtual bool UnregisterAjaxHandler ( const SString& strURL ) = 0;
 };
 
 #endif

@@ -1647,6 +1647,7 @@ void CLuaMain::AddBrowserClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setProperty", "setBrowserProperty" );
     lua_classfunction ( luaVM, "getProperty", "getBrowserProperty" );
     lua_classfunction ( luaVM, "getSource", "getBrowserSource" );
+    lua_classfunction ( luaVM, "setAjaxHandler", "setBrowserAjaxHandler" );
 
     lua_classfunction ( luaVM, "requestDomains", "requestBrowserDomains" );
     lua_classfunction ( luaVM, "isDomainBlocked", "isBrowserDomainBlocked" );

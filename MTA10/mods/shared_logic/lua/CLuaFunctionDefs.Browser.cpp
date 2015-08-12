@@ -622,3 +622,91 @@ int CLuaFunctionDefs::GUIGetBrowser ( lua_State* luaVM ) // Or rather guiGetBrow
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::SetBrowserAjaxHandler ( lua_State* luaVM )
+{
+    //  bool setBrowserAjaxHandler ( browser browser, string URL[, function callback] )
+    CClientWebBrowser* pWebBrowser; SString strURL; CLuaFunctionRef callbackFunction;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadString ( strURL );
+
+    if ( argStream.NextIsNil () || argStream.NextIsNone () )
+    {
+        if ( !argStream.HasErrors () )
+        {
+            lua_pushboolean ( luaVM, pWebBrowser->RemoveAjaxHandler ( strURL ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    }
+    else
+    {
+        argStream.ReadFunction ( callbackFunction );
+        argStream.ReadFunctionComplete ();
+        if ( !argStream.HasErrors () )
+        {
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( pLuaMain && VERIFY_FUNCTION ( callbackFunction ) )
+            {
+                CResource* pResource = pLuaMain->GetResource ();
+                CResourceManager * pResourceManager = m_pResourceManager;
+                auto netId = pResource->GetNetID ();
+
+                bool bResult = pWebBrowser->AddAjaxHandler ( strURL, 
+                [=] ( std::vector<SString>& vecGet, std::vector<SString>& vecPost ) -> const SString
+                {
+                    // Make sure the resource is still running
+                    if ( !pResourceManager->Exists ( pResource ) || pResource->GetNetID() != netId )
+                    {
+                        return "";
+                    }
+
+                    // Make sure the function is valid
+                    if ( VERIFY_FUNCTION ( callbackFunction ) )
+                    {
+                        CLuaArguments arguments;
+                        CLuaArguments getArguments;
+                        CLuaArguments postArguments;
+
+                        for ( auto&& param : vecGet )
+                            getArguments.PushString ( param );
+
+                        for ( auto&& param : vecPost )
+                            postArguments.PushString ( param );
+
+                        arguments.PushTable ( &getArguments );
+                        arguments.PushTable ( &postArguments );
+
+                        CLuaArguments result;
+                        
+                        arguments.Call ( pLuaMain, callbackFunction, &result );
+
+                        if ( result.Count () == 0 )
+                            return "";
+
+
+                        CLuaArgument* returnedValue = *result.IterBegin ();
+                        if ( returnedValue->GetType () == LUA_TSTRING )                       
+                            return returnedValue->GetString ();
+                        else
+                            return "";
+                    }
+                    else
+                        return "";
+
+                } );
+
+                lua_pushboolean ( luaVM, bResult );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
