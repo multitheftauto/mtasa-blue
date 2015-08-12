@@ -75,6 +75,11 @@ public:
     void GetSourceCode          ( const std::function<void( const std::string& code )>& callback );
 
     bool GetFullPathFromLocal   ( SString& strPath );
+    
+    virtual bool RegisterAjaxHandler ( const SString& strURL ) override;
+    virtual bool UnregisterAjaxHandler ( const SString& strURL ) override;
+    virtual bool HasAjaxHandler ( const SString& strURL );
+    virtual void HandleAjaxRequest ( const SString& strURL, class CAjaxResourceHandler * pHandler );
 
     // CefClient methods
     virtual CefRefPtr<CefRenderHandler>     GetRenderHandler() override { return this; };
@@ -136,7 +141,8 @@ private:
     int                 m_RenderPopupOffsetX, m_RenderPopupOffsetY;
     std::map<SString, SString> m_Properties;
     bool                m_bHasInputFocus;
-        
+    std::set<std::string> m_AjaxHandlers;
+
     CWebBrowserEventsInterface* m_pEventsInterface;
 
 public:

@@ -218,6 +218,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CAdditionalVertexStreamManager.cpp" />
+    <ClCompile Include="CAjaxResourceHandler.cpp" />
     <ClCompile Include="CChat.cpp" />
     <ClCompile Include="CClientVariables.cpp" />
     <ClCompile Include="CCommandFuncs.cpp" />
@@ -396,6 +397,7 @@
     <ClInclude Include="..\sdk\core\CWebBrowserEventsInterface.h" />
     <ClInclude Include="..\sdk\core\CWebCoreInterface.h" />
     <ClInclude Include="..\sdk\core\CWebViewInterface.h" />
+    <ClInclude Include="CAjaxResourceHandler.h" />
     <ClInclude Include="CAdditionalVertexStreamManager.h" />
     <ClInclude Include="CAspectRatioConverter.h" />
     <ClInclude Include="CChat.h" />

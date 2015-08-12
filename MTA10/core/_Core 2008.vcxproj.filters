@@ -371,6 +371,9 @@
     <ClCompile Include="CWebView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CAjaxResourceHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CAdditionalVertexStreamManager.h">
@@ -1287,6 +1290,9 @@
     </ClInclude>
     <ClInclude Include="..\sdk\core\CWebCoreInterface.h">
       <Filter>Header Files\sdk\core</Filter>
+    </ClInclude>
+    <ClInclude Include="CAjaxResourceHandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

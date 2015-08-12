@@ -12,6 +12,7 @@
 #define __CCLIENTWEBBROWSER_H
 
 #include <core/CWebViewInterface.h>
+#include <core/CAjaxResourceHandlerInterface.h>
 #include <core/CWebBrowserEventsInterface.h>
 
 class CClientWebBrowser : public CClientTexture, public CWebBrowserEventsInterface
@@ -54,6 +55,10 @@ public:
 
     void                        GetSourceCode       ( const std::function<void( const std::string& code )>& callback );
 
+    using ajax_callback_t = const std::function<const SString ( std::vector<SString>& vecGet, std::vector<SString>& vecPost )>;
+    
+    bool                        AddAjaxHandler      ( const SString& strURL, ajax_callback_t& handler );
+    bool                        RemoveAjaxHandler   ( const SString& strURL );
     
     // CWebBrowserEventsInterface implementation
     void                        Events_OnCreated       () override;
@@ -68,10 +73,12 @@ public:
     void                        Events_OnInputFocusChanged ( bool bGainedFocus ) override;
     bool                        Events_OnResourcePathCheck ( SString& strURL ) override;
     void                        Events_OnResourceBlocked   ( const SString& strURL, const SString& strDomain, unsigned char reason ) override;
+    void                        Events_OnAjaxRequest ( CAjaxResourceHandlerInterface* pHandler, const SString& strURL ) override;
 
 private:
     CWebViewInterface* m_pWebView;
     CResource*         m_pResource;
+    std::map<SString, ajax_callback_t> m_mapAjaxCallback;
 };
 
 class CClientGUIWebBrowser : public CClientGUIElement
