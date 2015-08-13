@@ -291,6 +291,10 @@ void CMarker::SetIcon ( unsigned char ucIcon )
 
 void CMarker::Callback_OnCollision ( CColShape& Shape, CElement& Element )
 {
+    // Do not call on ourselves #7359
+    if ( this == &Element )
+        return;
+
     // Matching interior?
     if ( GetInterior () == Element.GetInterior () )
     {
