@@ -191,6 +191,10 @@ void CDeathmatchObject::UpdateContacting ( const CVector& vecCenterOfRotation, c
     {
         CClientPed* pPed = *iter;
 
+        // Do not move the ped if it is frozen
+        if ( pPed->IsFrozen () )
+            continue;
+
         // Get ped start position
         CVector vecPlayerPosition;
         pPed->GetPosition ( vecPlayerPosition );
