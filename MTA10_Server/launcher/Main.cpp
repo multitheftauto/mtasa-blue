@@ -25,7 +25,10 @@
 #include <iostream>
 #include "MTAPlatform.h"
 #include "SharedUtil.h"
-#include "SharedUtil.hpp"
+#ifdef WIN32
+    // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
+    #include "SharedUtil.hpp"
+#endif
 
 using namespace std;
 
