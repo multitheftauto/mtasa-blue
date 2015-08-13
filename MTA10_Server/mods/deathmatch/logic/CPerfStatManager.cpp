@@ -55,7 +55,7 @@ CPerfStatManager* CPerfStatManager::GetSingleton ( void )
 {
     // If we're stopping the server, do not create a PerfStatManager just to destroy it
     if ( g_pGame->IsBeingDeleted () )
-        return nullptr;
+        return NULL;
 
     if ( !g_pPerfStatManagerImp )
         g_pPerfStatManagerImp.reset(new CPerfStatManagerImpl ());
