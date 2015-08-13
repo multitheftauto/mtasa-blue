@@ -255,7 +255,7 @@ CGame::~CGame ( void )
     m_bBeingDeleted = true;
 
     // Stop the performance stats modules
-    if ( CPerfStatManager::GetSingleton () != nullptr )
+    if ( CPerfStatManager::GetSingleton () != NULL )
         CPerfStatManager::GetSingleton ()->Stop ();
 
     // Stop and flush sim packet handling
