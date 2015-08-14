@@ -1876,7 +1876,7 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
                 RECT clientRect;
                 GetClientRect( hwnd, &clientRect );
                 MapWindowPoints(hwnd, NULL, (LPPOINT)(&clientRect), (sizeof(clientRect)/sizeof(POINT)) );
-                hr = m_pDevice->CreateOffscreenPlainSurface( BackBufferDesc.Width, BackBufferDesc.Height, BackBufferDesc.Format, D3DPOOL_SYSTEMMEM, &m_pSavedFrontBufferData, NULL );
+                hr = m_pDevice->CreateOffscreenPlainSurface( BackBufferDesc.Width, BackBufferDesc.Height, BackBufferDesc.Format, D3DPOOL_DEFAULT, &m_pSavedFrontBufferData, NULL );
                 if ( FAILED( hr ) )
                     break;
                 hr = D3DXLoadSurfaceFromSurface( m_pSavedFrontBufferData, NULL, NULL, pTempFrontBufferData, NULL, &clientRect, D3DX_FILTER_NONE, 0 );
