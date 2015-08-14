@@ -334,7 +334,7 @@ void CRPCFunctions::RequestStealthKill ( NetBitStreamInterface & bitStream )
                     {
                         CLuaArguments Arguments;
                         Arguments.PushElement ( pTarget );
-                        if ( m_pSourcePlayer->CallEvent ( "onPlayerStealthKill", Arguments, false ) ) 
+                        if ( m_pSourcePlayer->CallEvent ( "onPlayerStealthKill", Arguments ) ) 
                         {
                             // Start the stealth kill
                             CStaticFunctionDefinitions::KillPed ( pTarget, m_pSourcePlayer, 4 /*WEAPONTYPE_KNIFE*/, 9/*BODYPART_HEAD*/, true );

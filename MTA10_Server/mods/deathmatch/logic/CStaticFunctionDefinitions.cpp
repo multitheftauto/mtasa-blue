@@ -1741,7 +1741,7 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             Arguments.PushNumber ( pPed->GetModel() ); // Get the old model
             pPed->SetModel ( usModel ); // Set the new model
             Arguments.PushNumber ( usModel ); // Get the new model
-            pPed->CallEvent ( "onElementModelChange", Arguments, false );
+            pPed->CallEvent ( "onElementModelChange", Arguments );
             break;
         }
         case CElement::VEHICLE:
@@ -1753,7 +1753,7 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             Arguments.PushNumber ( pVehicle->GetModel () ); // Get the old model
             pVehicle->SetModel ( usModel ); // Set the new model
             Arguments.PushNumber ( usModel ); // Get the new model
-            pVehicle->CallEvent ( "onElementModelChange", Arguments, false );
+            pVehicle->CallEvent ( "onElementModelChange", Arguments );
 
             // Check for any passengers above the max seat list
             unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers ();
@@ -1782,7 +1782,7 @@ bool CStaticFunctionDefinitions::SetElementModel ( CElement* pElement, unsigned 
             Arguments.PushNumber ( pObject->GetModel () ); // Get the old model
             pObject->SetModel ( usModel ); // Set the new model
             Arguments.PushNumber ( usModel ); // Get the new model
-            pObject->CallEvent ( "onElementModelChange", Arguments, false );
+            pObject->CallEvent ( "onElementModelChange", Arguments );
             break;
         }
         default: return false;

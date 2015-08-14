@@ -2567,9 +2567,6 @@ void Unescape ( std::string& str )
 
 ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse, CAccount* account )
 {
-    static int bAlreadyCalling = false; // a mini-mutex flag, seems to work :)
-    // This code runs multithreaded, we need to make sure multiple server requests don't overlap each other... (slows the server down quite a bit)
-
     // Check for http general and if we have access to this resource
     // if we're trying to return a http file. Otherwize it's the MTA
     // client trying to download files.
@@ -2602,7 +2599,6 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     // If denied with both 'new way' and 'old way' then stop here
     if ( !bResourceBlahHttp && ( !bResourceBlah || !bGeneralHttp ) )
     {
-        bAlreadyCalling = false;
         return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
     }
 
@@ -2620,7 +2616,6 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     {
         const char* szError = "error: invalid function name";
         ipoHttpResponse->SetBody ( szError, strlen(szError) );
-        bAlreadyCalling = false;
         return HTTPRESPONSECODE_200_OK;
     }
 
@@ -2842,18 +2837,15 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
                     g_pGame->GetScriptDebugging()->SaveLuaDebugInfo( SLuaDebugInfo() );
 
                     ipoHttpResponse->SetBody ( strJSON.c_str (), strJSON.length () );
-                    bAlreadyCalling = false;
                     return HTTPRESPONSECODE_200_OK;
                 }
                 else
                 {
-                    bAlreadyCalling = false;
                     return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
                 }
             }
             else
             {
-                bAlreadyCalling = false;
                 return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
             }
         }
@@ -2861,7 +2853,6 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
 
     const char* szError = "error: not found";
     ipoHttpResponse->SetBody ( szError, strlen(szError) );
-    bAlreadyCalling = false;
     return HTTPRESPONSECODE_200_OK;
 }
 

@@ -50,9 +50,11 @@ public:
         , uiNextFrontIndex ( UINT_MAX / 2 - 1 )
         , uiNextBackIndex ( UINT_MAX / 2 )
     {
-        // T must be a pointer
-        void* ptr = (T)NULL;
-        ptr = NULL;
+        #ifdef MTA_DEBUG
+            // T must be a pointer
+            void* ptr = (T)NULL;
+            ptr = NULL;
+        #endif
     }
 
     const T& front( void ) const
