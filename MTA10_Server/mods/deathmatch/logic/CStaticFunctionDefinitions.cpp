@@ -11181,7 +11181,7 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
 bool CStaticFunctionDefinitions::SetAccountPassword ( CAccount* pAccount, SString strPassword, CAccountPassword::EAccountPasswordType ePasswordType )
 {
     assert ( pAccount );
-    assert ( strPassword );
+    assert ( !strPassword.empty() );
 
     if ( pAccount->IsRegistered () )
     {
