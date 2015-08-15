@@ -885,9 +885,6 @@
     <ClCompile Include="logic\lua\CLuaMatrix.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp">
       <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>

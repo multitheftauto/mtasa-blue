@@ -16,15 +16,15 @@
 void CLuaCameraDefs::LoadFunctions ( void )
 {
     // Get functions
-    CLuaCFunctions::AddFunction ( "getCameraMatrix", CLuaCameraDefs::getCameraMatrix );
-    CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaCameraDefs::getCameraTarget );
-    CLuaCFunctions::AddFunction ( "getCameraInterior", CLuaCameraDefs::getCameraInterior );
+    CLuaCFunctions::AddFunction ( "getCameraMatrix", getCameraMatrix );
+    CLuaCFunctions::AddFunction ( "getCameraTarget", getCameraTarget );
+    CLuaCFunctions::AddFunction ( "getCameraInterior", getCameraInterior );
 
     // Set functions
-    CLuaCFunctions::AddFunction ( "setCameraMatrix", CLuaCameraDefs::setCameraMatrix );
-    CLuaCFunctions::AddFunction ( "setCameraTarget", CLuaCameraDefs::setCameraTarget );
-    CLuaCFunctions::AddFunction ( "setCameraInterior", CLuaCameraDefs::setCameraInterior );
-    CLuaCFunctions::AddFunction ( "fadeCamera", CLuaCameraDefs::fadeCamera );
+    CLuaCFunctions::AddFunction ( "setCameraMatrix", setCameraMatrix );
+    CLuaCFunctions::AddFunction ( "setCameraTarget", setCameraTarget );
+    CLuaCFunctions::AddFunction ( "setCameraInterior", setCameraInterior );
+    CLuaCFunctions::AddFunction ( "fadeCamera", fadeCamera );
 }
 
 
@@ -52,6 +52,30 @@ int CLuaCameraDefs::getCameraMatrix ( lua_State* luaVM )
             lua_pushnumber ( luaVM, fFOV );
             return 8;
         }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaCameraDefs::OOP_getCameraMatrix ( lua_State* luaVM )
+{
+    // Needs further attention before adding
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream ( luaVM );
+
+    argStream.ReadUserData ( pPlayer );
+
+    if ( !argStream.HasErrors () )
+    {
+        CMatrix matrix;
+        //pPlayer->GetCamera ()->GetMatrix ( matrix );
+
+        lua_pushmatrix ( luaVM, matrix );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
