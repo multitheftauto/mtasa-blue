@@ -21,9 +21,9 @@ class CAjaxResourceHandler : public CefResourceHandler, public CAjaxResourceHand
 public:
     CAjaxResourceHandler ( std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& mimeType);
 
-    virtual std::vector<SString>& GetGetData ();
-    virtual std::vector<SString>& GetPostData ();
-    virtual void SetResponse ( const SString& data );
+    virtual std::vector<SString>& GetGetData () override;
+    virtual std::vector<SString>& GetPostData( ) override;;
+    virtual void SetResponse( const SString& data ) override;;
 
     // CefResourceHandler
     virtual void Cancel () override;
@@ -37,12 +37,11 @@ public:
     DISALLOW_COPY_AND_ASSIGN ( CAjaxResourceHandler );
 
 private:
-    // 
     CefRefPtr< CefCallback > m_callback;
     std::vector<SString> m_vecGetData;
     std::vector<SString> m_vecPostData;
     SString m_strResponse;
     CefString m_strMime;
     bool m_bHasData = false;
-    bool m_bHasRead = false;
+    int m_DataOffset = 0; 
 };
