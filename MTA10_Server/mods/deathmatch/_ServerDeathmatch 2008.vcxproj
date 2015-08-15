@@ -483,7 +483,6 @@
     <ClCompile Include="logic\lua\CLuaVector4.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.ACL.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp" />
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp" />

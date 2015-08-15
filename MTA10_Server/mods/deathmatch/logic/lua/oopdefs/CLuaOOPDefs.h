@@ -19,8 +19,6 @@ class CLuaFunctionDefs;
 
 class CRegisteredCommands;
 
-#define LUA_DECLARE(x) static int x ( lua_State * luaVM );
-
 class CLuaOOPDefs : public CLuaDefs
 {
 public:
@@ -29,13 +27,6 @@ public:
 
     // Player
     LUA_DECLARE ( OutputChat );
-
-    // Element
-    LUA_DECLARE ( GetElementMatrix );
-    LUA_DECLARE ( GetElementPosition );
-    LUA_DECLARE ( GetElementRotation );
-    LUA_DECLARE ( SetElementRotation );
-    LUA_DECLARE ( GetElementVelocity );
 
     // Camera
     LUA_DECLARE ( GetCameraMatrix );

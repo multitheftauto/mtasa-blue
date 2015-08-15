@@ -145,7 +145,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getParent", "getElementParent" );
     lua_classfunction ( luaVM, "getAttachedElements", "getAttachedElements" );
     lua_classfunction ( luaVM, "getAttachedTo", "getElementAttachedTo" );
-    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity", CLuaOOPDefs::GetElementVelocity );
+    lua_classfunction ( luaVM, "getVelocity", "getElementVelocity", OOP_getElementVelocity );
     lua_classfunction ( luaVM, "getID", "getElementID" );
     lua_classfunction ( luaVM, "getZoneName", "getElementZoneName" );
     lua_classfunction ( luaVM, "getAlpha", "getElementAlpha" );
@@ -156,9 +156,9 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getAllData", "getAllElementData" );
     lua_classfunction ( luaVM, "getColShape", "getElementColShape" );
     lua_classfunction ( luaVM, "getData", "getElementData" );
-    lua_classfunction ( luaVM, "getPosition", "getElementPosition", CLuaOOPDefs::GetElementPosition );
-    lua_classfunction ( luaVM, "getRotation", "getElementRotation", CLuaOOPDefs::GetElementRotation );
-    lua_classfunction ( luaVM, "getMatrix", "getElementMatrix", CLuaOOPDefs::GetElementMatrix );
+    lua_classfunction ( luaVM, "getPosition", "getElementPosition", OOP_getElementPosition );
+    lua_classfunction ( luaVM, "getRotation", "getElementRotation", OOP_getElementRotation );
+    lua_classfunction ( luaVM, "getMatrix", "getElementMatrix", OOP_getElementMatrix );
     lua_classfunction ( luaVM, "getType", "getElementType" );
     lua_classfunction ( luaVM, "getInterior", "getElementInterior" );
     lua_classfunction ( luaVM, "getDimension", "getElementDimension" );
@@ -198,13 +198,13 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
     lua_classvariable ( luaVM, "colShape", NULL, "getElementColShape" );
     lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
-    lua_classvariable ( luaVM, "position", "setElementPosition", "getElementPosition", setElementPosition, CLuaOOPDefs::GetElementPosition );
-    lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
-    lua_classvariable ( luaVM, "matrix", "setElementMatrix", "getElementMatrix", setElementMatrix, CLuaOOPDefs::GetElementMatrix );
-    lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity", setElementVelocity, CLuaOOPDefs::GetElementVelocity );
+    lua_classvariable ( luaVM, "position", "setElementPosition", "getElementPosition", setElementPosition, OOP_getElementPosition );
+    lua_classvariable ( luaVM, "rotation", "setElementRotation", "getElementRotation", OOP_setElementRotation, OOP_getElementRotation );
+    lua_classvariable ( luaVM, "matrix", "setElementMatrix", "getElementMatrix", setElementMatrix, OOP_getElementMatrix );
+    lua_classvariable ( luaVM, "velocity", "setElementVelocity", "getElementVelocity", setElementVelocity, OOP_getElementVelocity );
     lua_classvariable ( luaVM, "isElement", NULL, "isElement" );
-    //lua_classvariable ( luaVM, "data", "setElementData", "getElementData", CLuaOOPDefs::SetElementData, CLuaOOPDefs::GetElementData );
-    //lua_classvariable ( luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", CLuaOOPDefs::SetElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo ); // .visibility[john]=false
+    //lua_classvariable ( luaVM, "data", "setElementData", "getElementData", OOP_setElementData, OOP_getElementData );
+    //lua_classvariable ( luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", OOP_setElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo ); // .visibility[john]=false
 
     lua_registerclass ( luaVM, "Element" );
 }
@@ -605,6 +605,26 @@ int CLuaElementDefs::getElementPosition ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaElementDefs::OOP_getElementPosition ( lua_State* luaVM )
+{
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+
+    if ( !argStream.HasErrors () )
+    {
+        CVector vector = pElement->GetPosition ();
+
+        lua_pushvector ( luaVM, vector );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaElementDefs::getElementMatrix ( lua_State* luaVM )
 {
@@ -687,6 +707,28 @@ int CLuaElementDefs::getElementMatrix ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaElementDefs::OOP_getElementMatrix ( lua_State* luaVM )
+{
+    CElement* pEntity = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        CMatrix matrix;
+        pEntity->GetMatrix ( matrix );
+
+        lua_pushmatrix ( luaVM, matrix );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaElementDefs::getElementRotation ( lua_State* luaVM )
 {
@@ -717,6 +759,31 @@ int CLuaElementDefs::getElementRotation ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaElementDefs::OOP_getElementRotation ( lua_State* luaVM )
+{
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+
+    if ( !argStream.HasErrors () )
+    {
+        CMatrix matrix;
+        CVector vecRotation;
+        pElement->GetMatrix ( matrix );
+
+        vecRotation = matrix.GetRotation ();
+        ConvertRadiansToDegrees ( vecRotation );
+
+        lua_pushvector ( luaVM, vecRotation );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaElementDefs::getElementVelocity ( lua_State* luaVM )
 {
@@ -746,6 +813,27 @@ int CLuaElementDefs::getElementVelocity ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaElementDefs::OOP_getElementVelocity ( lua_State* luaVM )
+{
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+
+    if ( !argStream.HasErrors () )
+    {
+        CVector vecVelocity;
+        CStaticFunctionDefinitions::GetElementVelocity ( pElement, vecVelocity );
+
+        lua_pushvector ( luaVM, vecVelocity );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaElementDefs::getElementType ( lua_State* luaVM )
 {
@@ -1609,6 +1697,54 @@ int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaElementDefs::OOP_setElementRotation ( lua_State* luaVM )
+{
+    // element.rotation = Vector3
+    CElement* pElement = NULL;
+    CVector vecRotation;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadVector3D ( vecRotation );
+
+    if ( !argStream.HasErrors () )
+    {
+        CMatrix matrix;
+
+        // fill in our matrix
+        pElement->GetMatrix ( matrix );
+
+        // degrees to radians
+        ConvertDegreesToRadiansNoWrap ( vecRotation );
+
+        // set the matrix rotation (takes radians)
+        matrix.SetRotation ( vecRotation );
+
+        // set the element matrix using the element specific SetMatrix function
+        pElement->SetMatrix ( matrix );
+
+        // get the rotation (outputs radians)
+        pElement->GetRotation ( vecRotation );
+
+        // convert radians to degrees
+        ConvertRadiansToDegrees ( vecRotation );
+
+        eEulerRotationOrder rotationOrder = EULER_DEFAULT;
+        if ( pElement->GetType () == CElement::OBJECT )
+            rotationOrder = EULER_ZYX;
+
+        if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, true ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaElementDefs::setElementVelocity ( lua_State* luaVM )
 {
