@@ -41,9 +41,6 @@ public:
     // Connection
     LUA_DECLARE ( DbQuery );
 
-    // ACL
-    LUA_DECLARE ( DoesACLGroupContainObject );
-
     // RadarArea
     LUA_DECLARE ( GetRadarAreaSize );
 };

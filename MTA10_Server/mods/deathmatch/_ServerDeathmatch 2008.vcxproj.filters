@@ -924,9 +924,6 @@
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp">
       <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.ACL.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>

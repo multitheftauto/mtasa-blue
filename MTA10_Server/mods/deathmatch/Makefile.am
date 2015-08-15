@@ -224,7 +224,6 @@ LOGIC = \
 ./logic/lua/CLuaVector4.cpp \
 ./logic/lua/LuaCommon.cpp \
 ./logic/lua/LuaUtils.cpp \
-./logic/lua/oopdefs/CLuaOOPFunctionDefs.ACL.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Camera.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Connection.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Marker.cpp \
