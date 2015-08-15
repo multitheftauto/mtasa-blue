@@ -119,6 +119,7 @@ struct SAclRequest;
 #include "luadefs/CLuaFileDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"
 #include "luadefs/CLuaHandlingDefs.h"
+#include "luadefs/CLuaMarkerDefs.h"
 #include "luadefs/CLuaPickupDefs.h"
 #include "luadefs/CLuaResourceDefs.h"
 #include "luadefs/CLuaTextDefs.h"

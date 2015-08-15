@@ -196,7 +196,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionDefs.Crypt.cpp \
 ./logic/lua/CLuaFunctionDefs.Database.cpp \
 ./logic/lua/CLuaFunctionDefs.Event.cpp \
-./logic/lua/CLuaFunctionDefs.Marker.cpp \
 ./logic/lua/CLuaFunctionDefs.Misc.cpp \
 ./logic/lua/CLuaFunctionDefs.Object.cpp \
 ./logic/lua/CLuaFunctionDefs.Ped.cpp \
@@ -225,7 +224,6 @@ LOGIC = \
 ./logic/lua/LuaCommon.cpp \
 ./logic/lua/LuaUtils.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Connection.cpp \
-./logic/lua/oopdefs/CLuaOOPFunctionDefs.Marker.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Ped.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Player.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.RadarArea.cpp \
@@ -239,6 +237,7 @@ LOGIC = \
 ./logic/luadefs/CLuaHandlingDefs.cpp \
 ./logic/luadefs/CLuaHTTPDefs.cpp \
 ./logic/luadefs/CLuaMatrixDefs.cpp \
+./logic/luadefs/CLuaMarkerDefs.cpp \
 ./logic/luadefs/CLuaPickupDefs.cpp \
 ./logic/luadefs/CLuaResourceDefs.cpp \
 ./logic/luadefs/CLuaTextDefs.cpp \

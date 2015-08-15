@@ -179,24 +179,6 @@ public:
     LUA_DECLARE ( SetWeaponAmmo );
     LUA_DECLARE ( GetSlotFromWeapon );
 
-    // Marker create/destroy functions
-    LUA_DECLARE ( CreateMarker );
-
-    // Marker get functions
-    LUA_DECLARE ( GetMarkerCount );
-    LUA_DECLARE ( GetMarkerType );
-    LUA_DECLARE ( GetMarkerSize );
-    LUA_DECLARE ( GetMarkerColor );
-    LUA_DECLARE ( GetMarkerTarget );
-    LUA_DECLARE ( GetMarkerIcon );
-
-    // Marker set functions
-    LUA_DECLARE ( SetMarkerType );
-    LUA_DECLARE ( SetMarkerSize );
-    LUA_DECLARE ( SetMarkerColor );
-    LUA_DECLARE ( SetMarkerTarget );
-    LUA_DECLARE ( SetMarkerIcon );
-
     // Blip create/destroy functions
     LUA_DECLARE ( CreateBlip );
     LUA_DECLARE ( CreateBlipAttachedTo );

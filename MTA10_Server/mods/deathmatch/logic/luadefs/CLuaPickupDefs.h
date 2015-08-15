@@ -11,9 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAPICKUPDEFS_H
-#define __CLUAPICKUPDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaPickupDefs: public CLuaDefs
@@ -38,5 +36,3 @@ public:
     static int      setPickupRespawnInterval            ( lua_State* luaVM );
     static int      usePickup                           ( lua_State* luaVM );
 };
-
-#endif

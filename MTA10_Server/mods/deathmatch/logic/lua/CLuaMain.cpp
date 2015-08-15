@@ -279,36 +279,6 @@ void CLuaMain::AddColShapeClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddMarkerClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "createMarker" );
-    lua_classfunction ( luaVM, "getCount", "getMarkerCount" );
-    
-    lua_classfunction ( luaVM, "getMarkerType", "getMarkerType" );
-    lua_classfunction ( luaVM, "getIcon", "getMarkerIcon" );
-    lua_classfunction ( luaVM, "getSize", "getMarkerSize" );
-    lua_classfunction ( luaVM, "getTarget", "getMarkerTarget", CLuaOOPDefs::GetMarkerTarget );
-    lua_classfunction ( luaVM, "getColor", "getMarkerColor" ); // color
-    
-    lua_classfunction ( luaVM, "setType", "setMarkerType" );
-    lua_classfunction ( luaVM, "setIcon", "setMarkerIcon" );
-    lua_classfunction ( luaVM, "setSize", "setMarkerSize" );
-    lua_classfunction ( luaVM, "setTarget", "setMarkerTarget" );
-    lua_classfunction ( luaVM, "setColor", "setMarkerColor" ); // color
-    
-    lua_classvariable ( luaVM, "markerType", "setMarkerType", "getMarkerType" );
-    lua_classvariable ( luaVM, "icon", "setMarkerIcon", "getMarkerIcon" );
-    lua_classvariable ( luaVM, "size", "setMarkerSize", "getMarkerSize" );
-    
-    lua_classvariable ( luaVM, "target", "setMarkerTarget", "getMarkerTarget", CLuaFunctionDefs::SetMarkerTarget, CLuaOOPDefs::GetMarkerTarget );
-    //lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor ); color
-
-    lua_registerclass ( luaVM, "Marker", "Element" );
-}
-
-
 void CLuaMain::AddObjectClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -724,11 +694,12 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaTextDefs        ::AddClasses ( luaVM );
     CLuaACLDefs         ::AddClasses ( luaVM );
     CLuaVehicleDefs     ::AddClass   ( luaVM );
+    CLuaMarkerDefs      ::AddClass   ( luaVM );
     AddAccountClass             ( luaVM );
     AddBanClass                 ( luaVM );
     AddBlipClass                ( luaVM );
     AddColShapeClass            ( luaVM );
-    AddMarkerClass              ( luaVM );
+    
     AddObjectClass              ( luaVM );
     AddPedClass                 ( luaVM );
     AddPlayerClass              ( luaVM );

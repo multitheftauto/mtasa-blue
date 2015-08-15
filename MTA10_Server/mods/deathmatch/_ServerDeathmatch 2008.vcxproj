@@ -450,6 +450,7 @@
     <ClCompile Include="CServer.cpp" />
     <ClCompile Include="..\..\sdk\MTAPlatform.cpp" />
     <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaMarkerDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVector3Defs.cpp" />
@@ -463,7 +464,6 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Crypt.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Database.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Event.cpp" />
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Marker.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Misc.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Object.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Ped.cpp" />
@@ -481,7 +481,6 @@
     <ClCompile Include="logic\lua\CLuaVector2.cpp" />
     <ClCompile Include="logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="logic\lua\CLuaVector4.cpp" />
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp" />
@@ -882,6 +881,7 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="..\..\..\vendor\zip\crypt.h" />
     <ClInclude Include="CServer.h" />
+    <ClInclude Include="logic\luadefs\CLuaMarkerDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaMatrixDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="logic\luadefs\CLuaVector3Defs.h" />

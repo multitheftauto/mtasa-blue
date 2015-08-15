@@ -304,24 +304,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefs::SetWeaponAmmo );
     CLuaCFunctions::AddFunction ( "getSlotFromWeapon", CLuaFunctionDefs::GetSlotFromWeapon );
 
-    // Marker functions
-    CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefs::CreateMarker );
-
-    // Marker get functions
-    CLuaCFunctions::AddFunction ( "getMarkerCount", CLuaFunctionDefs::GetMarkerCount );
-    CLuaCFunctions::AddFunction ( "getMarkerType", CLuaFunctionDefs::GetMarkerType );
-    CLuaCFunctions::AddFunction ( "getMarkerSize", CLuaFunctionDefs::GetMarkerSize );
-    CLuaCFunctions::AddFunction ( "getMarkerColor", CLuaFunctionDefs::GetMarkerColor );
-    CLuaCFunctions::AddFunction ( "getMarkerTarget", CLuaFunctionDefs::GetMarkerTarget );
-    CLuaCFunctions::AddFunction ( "getMarkerIcon", CLuaFunctionDefs::GetMarkerIcon );
-
-    // Marker set functions
-    CLuaCFunctions::AddFunction ( "setMarkerType", CLuaFunctionDefs::SetMarkerType );
-    CLuaCFunctions::AddFunction ( "setMarkerSize", CLuaFunctionDefs::SetMarkerSize );
-    CLuaCFunctions::AddFunction ( "setMarkerColor", CLuaFunctionDefs::SetMarkerColor );
-    CLuaCFunctions::AddFunction ( "setMarkerTarget", CLuaFunctionDefs::SetMarkerTarget );
-    CLuaCFunctions::AddFunction ( "setMarkerIcon", CLuaFunctionDefs::SetMarkerIcon );
-
     // Blip create/destroy funcs
     CLuaCFunctions::AddFunction ( "createBlip", CLuaFunctionDefs::CreateBlip );
     CLuaCFunctions::AddFunction ( "createBlipAttachedTo", CLuaFunctionDefs::CreateBlipAttachedTo );
@@ -534,6 +516,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaWorldDefs::LoadFunctions ();
     CLuaVoiceDefs::LoadFunctions ();
     CLuaXMLDefs::LoadFunctions ();
+    CLuaMarkerDefs::LoadFunctions ();
 
     // All-Seeing Eye Functions
     CLuaCFunctions::AddFunction ( "getGameType", CLuaFunctionDefs::GetGameType );

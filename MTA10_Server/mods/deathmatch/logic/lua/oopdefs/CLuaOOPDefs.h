@@ -28,9 +28,6 @@ public:
     // Player
     LUA_DECLARE ( OutputChat );
 
-    // Marker
-    LUA_DECLARE ( GetMarkerTarget );
-
     // Connection
     LUA_DECLARE ( DbQuery );
 
