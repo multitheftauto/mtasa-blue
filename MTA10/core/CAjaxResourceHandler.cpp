@@ -11,6 +11,7 @@
 #include "CWebCore.h"
 #include "CWebView.h"
 #include "CAjaxResourceHandler.h"
+#undef min
 
 CAjaxResourceHandler::CAjaxResourceHandler ( std::vector<SString>& vecGet, std::vector<SString>& vecPost, const CefString& strMime) 
     : m_vecGetData(vecGet), m_vecPostData(vecPost), m_strMime(strMime)
@@ -32,7 +33,9 @@ void CAjaxResourceHandler::SetResponse ( const SString& data )
 {
     m_strResponse = data;
     m_bHasData = true;
-    m_callback->Continue ();
+
+    if ( m_callback )
+        m_callback->Continue( );
 }
 
 // CefResourceHandler implementation
@@ -68,9 +71,7 @@ bool CAjaxResourceHandler::ProcessRequest ( CefRefPtr< CefRequest > request, Cef
 
 bool CAjaxResourceHandler::ReadResponse ( void* data_out, int bytes_to_read, int& bytes_read, CefRefPtr< CefCallback > callback )
 {
-    if ( m_bHasRead )
-        return false;
-
+    // If we have no data yet, wait
     if ( !m_bHasData )
     {   
         bytes_read = 0;
@@ -79,12 +80,17 @@ bool CAjaxResourceHandler::ReadResponse ( void* data_out, int bytes_to_read, int
         return true;
     }
 
+    // Are we done?
+    if ( m_strResponse.length( ) - m_DataOffset <= 0 )
+        return false;
+
     // +1 due to terminating \0
-    int copyBytes = min ( (uint)bytes_to_read, m_strResponse.length () +1 );
-    memcpy ( data_out, m_strResponse.c_str (), copyBytes );
-    ((char*)data_out) [copyBytes] = '\0';
+    int copyBytes = std::min ( (uint)bytes_to_read, m_strResponse.length () +1 );
+
+    memcpy ( data_out, m_strResponse.c_str () + m_DataOffset, copyBytes );
     bytes_read = copyBytes;
-    m_bHasRead = true;
+
+    m_DataOffset += copyBytes -1;
 
     return true;
 }
