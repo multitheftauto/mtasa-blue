@@ -1744,6 +1744,10 @@ void MaybeShowCopySettingsDialog ( void )
     // Copy settings from previous version
     FileCopy ( strPreviousConfig, strCurrentConfig );
 
+    // Copy registry setting for aero-enabled
+    SString strAeroEnabled = GetVersionRegistryValue ( strPreviousVersion, PathJoin ( "Settings", "general" ) , "aero-enabled" );
+    SetApplicationSetting ( "aero-enabled", strAeroEnabled );
+
     // Copy some directories if empty
     SString strCurrentNewsDir = PathJoin ( GetMTADataPath (), "news" );
 
@@ -2045,6 +2049,9 @@ bool VerifyEmbeddedSignature( const SString& strFilename )
 void LogSettings( void )
 {
     const char* szSettings[] = {
+                                "general", "aero-enabled",
+                                "general", "aero-changeable",
+                                "general", "driver-overrides-disabled",
                                 "general", "device-selection-disabled",
                                 "general", "customized-sa-files-using",
                                 "general", "times-connected",

@@ -29,7 +29,7 @@ public:
     SString         GetSequencerSnapshot            ( void );
     SString         GetLauncherPathFilename         ( void );
     bool            UpdateOptimusSymbolExport       ( void );
-    SString         GetApplicationExeForCreateProcess ( void );
+    SString         MaybeRenameExe                  ( const SString& strGTAPath );
 
 protected:
     SString         _ShowCrashFailDialog            ( void );

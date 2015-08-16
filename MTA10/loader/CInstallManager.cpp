@@ -636,6 +636,18 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
         }
     }
 
+    // If aero option reg entry doesn't exist in new, but does in old place, move it
+    {
+        if ( GetApplicationSetting ( "aero-enabled" ).empty () )
+        {
+            SString strLegacyValue = GetVersionRegistryValueLegacy ( GetMajorVersionString (), PathJoin ( "Settings", "general" ), "aero-enabled" );
+            if ( !strLegacyValue.empty () )
+                SetApplicationSettingInt ( "aero-enabled", atoi ( strLegacyValue ) );
+            else
+                SetApplicationSettingInt ( "aero-enabled", 1 );
+        }
+    }
+
     // New log/config file layout
     {
         SString strOldDir = CalcMTASAPath( "MTA" );
@@ -771,17 +783,28 @@ bool CInstallManager::UpdateOptimusSymbolExport( void )
 
 //////////////////////////////////////////////////////////
 //
-// GetApplicationExeForCreateProcess
+// MaybeRenameExe
 //
-// Return filename to use for CreateProcess call
+// Figure out whether to use a renamed exe, and return filename to use.
+// Also tries file copy if required.
 //
 //////////////////////////////////////////////////////////
-SString CInstallManager::GetApplicationExeForCreateProcess( void )
+SString CInstallManager::MaybeRenameExe( const SString& strGTAPath )
 {
-    // Try patch/copy in case nvidia dialog indicated changes (may fail if not admin)
+    // Try patch/copy (may fail if not admin)
     _ProcessExePatchChecks();
 
-    return GetExePathFilename( true );
+    SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
+    if ( ShouldUseExeCopy() )
+    {
+        // See if exe copy seems usable
+        SString strHTAEXEPath = PathJoin( strGTAPath, MTA_HTAEXE_NAME );
+        uint64 uiStdFileSize = FileSize( strGTAEXEPath );
+        if ( uiStdFileSize && uiStdFileSize == FileSize( strHTAEXEPath ) )
+            strGTAEXEPath = strHTAEXEPath;
+    }
+
+    return strGTAEXEPath;
 }
 
 
@@ -797,29 +820,38 @@ SString CInstallManager::_ProcessExePatchChecks ( void )
     if ( !HasGTAPath() )
         return "ok";
 
-    // Remove old patches from original exe
-    SetExePatchedStatus( false, SExePatchedStatus() );
-
-    // See what patches are required
     SExePatchedStatus reqStatus = GetExePatchRequirements();
 
-    // Check if we need to create/update the exe copy
-    if ( GetExePatchedStatus( true ) != reqStatus || GetExeFileSize( false ) != GetExeFileSize( true ) )
+    if ( !ShouldUseExeCopy() )
     {
-        // Copy
-        if ( !CopyExe() )
+        // Simple patching if won't be using a exe copy
+        if ( !SetExePatchedStatus( false, reqStatus ) )
         {
-            m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
-            return "fail";
-        }
-        // Apply patches
-        if ( !SetExePatchedStatus( true, reqStatus ) )
-        {
-            m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
+            m_strAdminReason = GetPatchExeAdminReason( false, reqStatus );
             return "fail";
         }
     }
+    else
+    {
+        // Bit more complercated if will be using a exe copy
 
+        // First check if we need to create/update the exe copy
+        if ( GetExePatchedStatus( true ) != reqStatus || GetExeFileSize( false ) != GetExeFileSize( true ) )
+        {
+            // Copy
+            if ( !CopyExe() )
+            {
+                m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
+                return "fail";
+            }
+            // Apply patches
+            if ( !SetExePatchedStatus( true, reqStatus ) )
+            {
+                m_strAdminReason = GetPatchExeAdminReason( true, reqStatus );
+                return "fail";
+            }
+        }
+    }
     return "ok";
 }
 
@@ -857,7 +889,7 @@ SString CInstallManager::_ProcessAppCompatChecks ( void )
     BOOL bIsWOW64 = false;  // 64bit OS
     IsWow64Process( GetCurrentProcess(), &bIsWOW64 );
     uint uiHKLMFlags = bIsWOW64 ? KEY_WOW64_64KEY : 0;
-    WString strGTAExePathFilename = FromUTF8( GetExePathFilename( true ) );
+    WString strGTAExePathFilename = FromUTF8( GetUsingExePathFilename() );
     WString strMTAExePathFilename = FromUTF8( GetLaunchPathFilename() );
     WString strCompatModeRegKey = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
     int bWin816BitColorOption = GetApplicationSettingInt( "Win8Color16" );
