@@ -103,7 +103,7 @@ bool SharedUtil::IsGTAProcess ( void )
 //
 // Write a registry string value
 //
-static void WriteRegistryStringValue ( HKEY hkRoot, const char* szSubKey, const char* szValue, const SString& strBuffer )
+static void WriteRegistryStringValue ( HKEY hkRoot, const char* szSubKey, const char* szValue, const SString& strBuffer, bool bFlush = false )
 {
     HKEY hkTemp;
     WString wstrSubKey = FromUTF8( szSubKey );
@@ -113,6 +113,11 @@ static void WriteRegistryStringValue ( HKEY hkRoot, const char* szSubKey, const 
     if ( hkTemp )
     {
         RegSetValueExW ( hkTemp, wstrValue, NULL, REG_SZ, (LPBYTE)wstrBuffer.c_str (), ( wstrBuffer.length () + 1 ) * sizeof( wchar_t ) );
+        if ( bFlush )
+        {
+            // Very slow. Only needed if there is a risk of BSOD soon afterwards.
+            RegFlushKey ( hkTemp );
+        }
         RegCloseKey ( hkTemp );
     }
 }
@@ -224,9 +229,9 @@ static SString MakeVersionRegistryPath ( const SString& strVersion, const SStrin
 // Registry values
 // 
 // Get/set registry values for the current version
-void SharedUtil::SetRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue )
+void SharedUtil::SetRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue, bool bFlush )
 {
-    WriteRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( GetMajorVersionString (), strPath ), strName, strValue );
+    WriteRegistryStringValue ( HKEY_LOCAL_MACHINE, MakeVersionRegistryPath ( GetMajorVersionString (), strPath ), strName, strValue, bFlush );
 }
 
 SString SharedUtil::GetRegistryValue ( const SString& strPath, const SString& strName )

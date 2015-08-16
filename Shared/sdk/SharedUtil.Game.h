@@ -118,6 +118,7 @@ namespace SharedUtil
     #define DIAG_CRASH_EXTRA_MSG                "diagnostics", "last-crash-reason"
     #define DIAG_MINIDUMP_DETECTED_COUNT        "diagnostics", "num-minidump-detected"
     #define DIAG_MINIDUMP_CONFIRMED_COUNT       "diagnostics", "num-minidump-confirmed"
+    #define DIAG_BSOD_DETECT_SKIP               "diagnostics", "bsod-detect-skip"
     #define GENERAL_PROGRESS_ANIMATION_DISABLE  "progress-animation-disable"
 
 }

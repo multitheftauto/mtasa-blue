@@ -25,7 +25,7 @@ namespace SharedUtil
     SString GetSystemRegistryValue ( uint hKey, const SString& strPath, const SString& strName );
 
     // Get/set registry values for the current version
-    void SetRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue );
+    void SetRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue, bool bFlush = false );
     SString GetRegistryValue ( const SString& strPath, const SString& strName );
     bool RemoveRegistryKey ( const SString& strPath );
 

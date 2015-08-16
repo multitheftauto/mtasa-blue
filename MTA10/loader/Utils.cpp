@@ -1882,6 +1882,10 @@ void* LoadFunction( const char* szLibName, const char* c, const char* a, const c
 //////////////////////////////////////////////////////////
 void BsodDetectionPreLaunch( void )
 {
+    // BSOD detection being handled elsewhere ?
+    int iBsodDetectSkip = GetApplicationSettingInt( DIAG_BSOD_DETECT_SKIP );
+    SetApplicationSettingInt( DIAG_BSOD_DETECT_SKIP, 0 );
+
     // Find latest system minidump file
     SString strMatch = PathJoin( GetSystemWindowsPath(), "MiniDump", "*" );
     SString strMinidumpTime;
@@ -1914,7 +1918,7 @@ void BsodDetectionPreLaunch( void )
 
         // Was it created during the game?
         SString strGameBeginTime = GetApplicationSetting( "diagnostics", "game-begin-time" );
-        if ( strMinidumpTime > strGameBeginTime && !strGameBeginTime.empty() )
+        if ( strMinidumpTime > strGameBeginTime && !strGameBeginTime.empty() && iBsodDetectSkip == 0 )
         {
             // Ask user to confirm
             int iResponse = MessageBoxUTF8 ( NULL, _("Did your computer restart when playing MTA:SA?"), "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
@@ -1922,8 +1926,8 @@ void BsodDetectionPreLaunch( void )
             {
                 SetApplicationSetting( "diagnostics", "user-confirmed-bsod-time", strMinidumpTime );
                 IncApplicationSettingInt( DIAG_MINIDUMP_CONFIRMED_COUNT );
-
-                // BSOD might be caused by progress animation, so flag for it to be disabled
+ 
+               // BSOD might be caused by progress animation, so flag for it to be disabled
                 SetApplicationSettingInt( GENERAL_PROGRESS_ANIMATION_DISABLE, 1 );
             }
         }
@@ -1997,6 +2001,7 @@ void ForbodenProgramsMessage ( void )
         strMessage += "\n\n";
         strMessage += strResult;
         DisplayErrorMessageBox ( strMessage, _E("CL39"), "forboden-programs" );
+        WriteDebugEventAndReport( 6550, SString( "Showed forboden programs list (%s)", *strResult.Replace( "\n", "" ) ) );
     }
 }
 
