@@ -51,7 +51,7 @@ bool CWebCore::Initialise ()
 {
     CefMainArgs mainArgs;
     void* sandboxInfo = nullptr;
-    CefRefPtr<CCefApp> app = new CCefApp;
+    CefRefPtr<CCefApp> app { new CCefApp };
 
 #if CEF_ENABLE_SANDBOX
     CefScopedSandboxInfo scopedSandbox;
@@ -88,6 +88,7 @@ bool CWebCore::Initialise ()
     
     // Register custom scheme handler factory
     CefRegisterSchemeHandlerFactory ( "mtalocal", "", app );
+    CefRegisterSchemeHandlerFactory ( "http", "mta", app );
 
     return state;
 }
@@ -784,10 +785,7 @@ void CCefApp::OnRegisterCustomSchemes ( CefRefPtr < CefSchemeRegistrar > registr
 
 CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request )
 {
-    if (scheme_name != "mtalocal")
-        return nullptr;
-
-    CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore ());
+    CWebCore* pWebCore = static_cast<CWebCore*> ( g_pCore->GetWebCore () );
     auto pWebView = pWebCore->FindWebView ( browser );
     if ( !pWebView || !pWebView->IsLocal () )
         return nullptr;
@@ -796,64 +794,137 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
     if ( !CefParseURL ( request->GetURL (), urlParts ) )
         return nullptr;
 
-    // Get full path
-    SString path = UTF16ToMbUTF8 ( urlParts.path.str ).substr ( 2 );
-
-    // Get mime type from extension
-    CefString mimeType;
-    size_t pos = path.find_last_of ( '.' );
-    if ( pos != std::string::npos )
-        mimeType = CefGetMimeType ( path.substr ( pos + 1 ) );
-
-    // Make sure we provide a mime type, even 
-    // when we cannot deduct it from the file extension
-    if ( mimeType.empty () )
-        mimeType = "application/octet-stream";
-
-
-    if( pWebView->HasAjaxHandler ( path ) )
+    if ( scheme_name == "mtalocal" ) // Backward compatibility
     {
-        std::vector<SString> vecGet;
-        std::vector<SString> vecPost;
+        // Get full path
+        SString path = UTF16ToMbUTF8 ( urlParts.path.str ).substr ( 2 );
 
-        SString strGet = UTF16ToMbUTF8(urlParts.query.str);
-        std::vector<SString> vecTmp;
-        strGet.Split ( "&", vecTmp, 0, 0 );
-
-        SString key; SString value;
-        for ( auto&& param : vecTmp )
+        // Check if we're dealing with an external resource
+        if ( path[0] == ':' )
         {
-            param.Split ( "=", &key, &value );
-            vecGet.push_back ( key );
-            vecGet.push_back ( value );
-        }
+            size_t end = path.find_first_of ( '/' );
+            if ( end != std::string::npos )
+            {
+                SString resourceName = path.substr ( 1, end-1 );
+                SString resourcePath = path.substr ( end );
 
-        // ToDo: POST Information is Empty for non-standard URI schemes
-        // Getting POST parameters into Lua will require changing
-        // mtalocal:// to a standard scheme first
-        /*
-        CefPostData::ElementVector vecPostElements;
-        request->GetPostData ().get ()->GetElements ( vecPostElements );
-
-        for ( auto&& post : vecPostElements )
-        {
-            // ToDo: Parse POST data into our vector
-        }
-        */
-
-        auto handler = new CAjaxResourceHandler ( vecGet, vecPost, mimeType );
-        pWebView->HandleAjaxRequest ( path, handler );
-        return handler;
-    }
-    else
-    {
-        if ( !pWebView->GetFullPathFromLocal ( path ) )
+				// Call this function recursively and use the mta scheme instead
+                request->SetURL ( "http://mta/local/" + resourceName + resourcePath );
+				return Create ( browser, frame, "http", request );
+            }
             return nullptr;
+        }
         
-        auto stream = CefStreamReader::CreateForFile ( path );
-        if ( stream.get () )
-            return new CefStreamResourceHandler ( mimeType, stream );
+        // Redirect mtalocal://* to http://mta/local/*, call recursively
+        request->SetURL ( "http://mta/local/" + path );
+		return Create ( browser, frame, "http", request );
+    }
+    
+    SString host = UTF16ToMbUTF8 ( urlParts.host.str );
+    if ( scheme_name == "http" && host == "mta" )
+    {
+        // Scheme format: http://mta/resourceName/file.html or http://mta/local/file.html for the current resource
+
+        // Get resource name and path
+        SString path = UTF16ToMbUTF8 ( urlParts.path.str ).substr ( 1 ); // Remove slash at the front
+        size_t slashPos = path.find ( '/' );
+        if ( slashPos == std::string::npos )
+            return nullptr;
+
+        SString resourceName = path.substr ( 0, slashPos );
+        SString resourcePath = path.substr ( slashPos + 1 );
+
+        if ( resourcePath.empty () )
+            return nullptr;
+
+        // Get mime type from extension
+        CefString mimeType;
+        size_t pos = resourcePath.find_last_of ( '.' );
+        if ( pos != std::string::npos )
+            mimeType = CefGetMimeType ( resourcePath.substr ( pos + 1 ) );
+
+        // Make sure we provide a mime type, even 
+        // when we cannot deduct it from the file extension
+        if ( mimeType.empty () )
+            mimeType = "application/octet-stream";
+
+        if ( pWebView->HasAjaxHandler ( resourcePath ) )
+        {
+            std::vector<SString> vecGet;
+            std::vector<SString> vecPost;
+
+            if ( urlParts.query.str != nullptr )
+            {
+                SString strGet = UTF16ToMbUTF8 ( urlParts.query.str );
+                std::vector<SString> vecTmp;
+                strGet.Split ( "&", vecTmp );
+
+                SString key; SString value;
+                for ( auto&& param : vecTmp )
+                {
+                    param.Split ( "=", &key, &value );
+                    vecGet.push_back ( key );
+                    vecGet.push_back ( value );
+                }
+            }
+
+            CefPostData::ElementVector vecPostElements;
+            auto postData = request->GetPostData ();
+            if ( postData.get () )
+            {
+                request->GetPostData ()->GetElements ( vecPostElements );
+
+                SString key; SString value;
+                for ( auto&& post : vecPostElements )
+                {
+                    // Limit to 5MiB and allow byte data only
+                    size_t bytesCount = post->GetBytesCount ();
+                    if ( bytesCount > 5*1024*1024 || post->GetType () != CefPostDataElement::Type::PDE_TYPE_BYTES )
+                        continue;
+
+                    // Make string from buffer
+                    std::unique_ptr<char[]> buffer { new char[bytesCount] };
+                    post->GetBytes ( bytesCount, buffer.get () );
+                    SStringX param ( buffer.get (), bytesCount );
+
+                    // Parse POST data into vector
+                    std::vector<SString> vecTmp;
+                    param.Split ( "&", vecTmp );
+                    
+                    for ( auto&& param : vecTmp )
+                    {
+                        param.Split ( "=", &key, &value );
+                        vecPost.push_back ( key );
+                        vecPost.push_back ( value );
+                    }
+                }
+            }
+
+            auto handler = new CAjaxResourceHandler ( vecGet, vecPost, mimeType );
+            pWebView->HandleAjaxRequest ( resourcePath, handler );
+            return handler;
+        }
+        else
+        {
+            // Calculate MTA resource path
+            if ( resourceName != "local" )
+                path = ":" + resourceName + "/" + resourcePath;
+            else
+                path = resourcePath;
+
+            // Calculate absolute path
+            if ( !pWebView->GetFullPathFromLocal ( path ) )
+                return nullptr;
+        
+            // Finally, load the file stream
+            auto stream = CefStreamReader::CreateForFile ( path );
+            if ( stream.get () )
+                return new CefStreamResourceHandler ( mimeType, stream );
+        }
+
+        return nullptr;
     }
 
+    // Return null if there is no matching scheme
     return nullptr;
 }

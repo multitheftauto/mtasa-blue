@@ -603,10 +603,16 @@ bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFram
     WString scheme = urlParts.scheme.str;
     if ( scheme == L"http" || scheme == L"https" )
     {
-        if ( IsLocal () || g_pCore->GetWebCore ()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ), true ) != eURLState::WEBPAGE_ALLOWED )
-            bResult = true; // Block remote here
+        SString host = UTF16ToMbUTF8 ( urlParts.host.str );
+        if ( host != "mta" )
+        {
+            if ( IsLocal () || g_pCore->GetWebCore ()->GetURLState ( host, true ) != eURLState::WEBPAGE_ALLOWED )
+                bResult = true; // Block remote here
+            else
+                bResult = false; // Allow
+        }
         else
-            bResult = false; // Allow
+            bResult = false;
     }
     else if ( scheme == L"mtalocal" )
         bResult = false; // Allow mtalocal:// URLs
@@ -658,22 +664,27 @@ CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBro
     if ( scheme == L"http" || scheme == L"https" )
     {
         SString domain = UTF16ToMbUTF8 ( urlParts.host.str );
-        if ( IsLocal () )
-            return RV_CANCEL; // Block remote requests in local mode generally
-
-        eURLState urlState = g_pCore->GetWebCore ()->GetURLState ( domain, true );
-        if ( urlState != eURLState::WEBPAGE_ALLOWED )
+        if ( domain != "mta" )
         {
-            // Trigger onClientBrowserResourceBlocked event
-            auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface,
-                SString ( request->GetURL () ), domain, urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1 );
-            g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
+            if ( IsLocal () )
+                return RV_CANCEL; // Block remote requests in local mode generally
 
-            return RV_CANCEL; // Block if explicitly forbidden
+            eURLState urlState = g_pCore->GetWebCore ()->GetURLState ( domain, true );
+            if ( urlState != eURLState::WEBPAGE_ALLOWED )
+            {
+                // Trigger onClientBrowserResourceBlocked event
+                auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface,
+                    SString ( request->GetURL () ), domain, urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1 );
+                g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
+
+                return RV_CANCEL; // Block if explicitly forbidden
+            }
+
+            // Allow
+            return RV_CONTINUE;
         }
-
-        // Allow
-        return RV_CONTINUE;
+        else
+            return RV_CONTINUE;
     }
     else if ( scheme == L"mtalocal" )
     {

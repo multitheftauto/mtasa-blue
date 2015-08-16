@@ -101,7 +101,14 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
         // Are we dealing with a remote website?
         if ( strURL.substr ( 0, 7 ) == "http://" || strURL.substr ( 0, 8 ) == "https://" )
         {
-            lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, true, strPostData, bURLEncoded ) );
+            bool isLocalURL = strURL.substr ( 0, 11 ) == "http://mta/";
+            if ( pWebBrowser->IsLocal () != isLocalURL )
+            {
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+
+            lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, !isLocalURL, strPostData, bURLEncoded ) );
             return 1;
         }
 
@@ -114,6 +121,9 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( CResourceManager::ParseResourcePathInput ( strURL, pResource, strAbsPath ) && pWebBrowser->IsLocal () )
             {
+                // Output deprecated warning, TODO: Remove this at a later point
+                m_pScriptDebugging->LogWarning ( luaVM, "This URL scheme is deprecated and may not work in future versions. Please consider using http://mta/* instead. See https://wiki.mtasa.com/wiki/LoadBrowserURL for details" );
+
                 pWebBrowser->SetTempURL ( strURL );
                 lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( "mtalocal://" + strURL, false, strPostData, bURLEncoded ) );
                 return 1;
