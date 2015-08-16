@@ -10,17 +10,17 @@
 
 struct SExePatchedStatus
 {
+    bool bTimestamp;
     bool bLargeMem;
     bool bDep;
     bool bNvightmare;
     bool bAltModules;
 
-    SExePatchedStatus( void ) : bLargeMem( false ), bDep( false ), bNvightmare( false ), bAltModules( false ) {}
-
     bool operator!= ( const SExePatchedStatus& other ) const    { return !operator==( other ); }
     bool operator== ( const SExePatchedStatus& other ) const
     {
-        return bLargeMem == other.bLargeMem
+        return bTimestamp == other.bTimestamp
+               && bLargeMem == other.bLargeMem
                && bDep == other.bDep
                && bNvightmare == other.bNvightmare
                && bAltModules == other.bAltModules;
@@ -45,12 +45,15 @@ enum EPatchResult
 SExePatchedStatus   GetExePatchedStatus             ( bool bUseExeCopy );
 SExePatchedStatus   GetExePatchRequirements         ( void );
 bool                SetExePatchedStatus             ( bool bUseExeCopy, const SExePatchedStatus& reqStatus );
+bool                ShouldUseExeCopy                ( void );
 SString             GetPatchExeAdminReason          ( bool bUseExeCopy, const SExePatchedStatus& reqStatus );
 uint64              GetExeFileSize                  ( bool bUseExeCopy );
 bool                CopyExe                         ( void );
 SString             GetExePathFilename              ( bool bUseExeCopy );
+SString             GetUsingExePathFilename         ( void );
 bool                GetPatchRequirementAltModules   ( void );
 EPatchResult        UpdatePatchStatusNvightmare     ( const SString& strGTAEXEPath, EPatchMode mode );
+EPatchResult        UpdatePatchStatusTimestamp      ( const SString& strGTAEXEPath, EPatchMode mode );
 EPatchResult        UpdatePatchStatusLargeMem       ( const SString& strGTAEXEPath, EPatchMode mode );
 EPatchResult        UpdatePatchStatusDep            ( const SString& strGTAEXEPath, EPatchMode mode );
 bool                GetPatchRequirementAltModules   ( void );

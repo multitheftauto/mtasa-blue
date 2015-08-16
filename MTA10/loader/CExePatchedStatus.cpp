@@ -22,6 +22,7 @@ SExePatchedStatus GetExePatchedStatus( bool bUseExeCopy )
     SString strGTAEXEPath = GetExePathFilename( bUseExeCopy );
 
     SExePatchedStatus status;
+    status.bTimestamp   = UpdatePatchStatusTimestamp ( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
     status.bLargeMem    = UpdatePatchStatusLargeMem  ( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
     status.bDep         = UpdatePatchStatusDep       ( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
     status.bNvightmare  = UpdatePatchStatusNvightmare( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
@@ -41,6 +42,7 @@ SExePatchedStatus GetExePatchedStatus( bool bUseExeCopy )
 SExePatchedStatus GetExePatchRequirements( void )
 {
     SExePatchedStatus status;
+    status.bTimestamp   = GetApplicationSettingInt ( "aero-enabled" ) ? true : false;
     status.bLargeMem    = true;
     status.bDep         = true;
     status.bNvightmare  = GetApplicationSettingInt( "nvhacks", "optimus-export-enablement" ) ? true : false;
@@ -63,12 +65,35 @@ bool SetExePatchedStatus( bool bUseExeCopy, const SExePatchedStatus& status )
     SString strGTAEXEPath = GetExePathFilename( bUseExeCopy );
 
     bool bReqAdmin = false;
+    bReqAdmin |= UpdatePatchStatusTimestamp ( strGTAEXEPath, status.bTimestamp  ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusLargeMem  ( strGTAEXEPath, status.bLargeMem   ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusDep       ( strGTAEXEPath, status.bDep        ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusNvightmare( strGTAEXEPath, status.bNvightmare ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusAltModules( strGTAEXEPath, status.bAltModules ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
 
     return !bReqAdmin;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// ShouldUseExeCopy
+//
+// Returns true if patches should be applied to exe copy
+//
+//////////////////////////////////////////////////////////
+bool ShouldUseExeCopy( void )
+{
+    int iUseCopy;
+    if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
+        iUseCopy = GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" );
+    else
+        iUseCopy = GetApplicationSettingInt( "driver-overrides-disabled" );
+
+    if ( GetPatchRequirementAltModules() )
+        iUseCopy = 1;
+
+    return iUseCopy != 0;
 }
 
 
@@ -85,6 +110,8 @@ SString GetPatchExeAdminReason( bool bUseExeCopy, const SExePatchedStatus& reqSt
     SExePatchedStatus status = GetExePatchedStatus( bUseExeCopy );
 
     // See what needs doing
+    if ( status.bTimestamp != reqStatus.bTimestamp )
+        return _("Update Aero setting");
     if ( status.bLargeMem != reqStatus.bLargeMem )
         return _("Update Large Memory setting");
     if ( status.bDep != reqStatus.bDep )
@@ -132,7 +159,7 @@ bool CopyExe( void )
 //
 // GetExePathFilename
 //
-// Return full path and filename of original or copy exe
+// Return full path and filename of main or copy exe
 //
 //////////////////////////////////////////////////////////
 SString GetExePathFilename( bool bUseExeCopy )
@@ -145,6 +172,83 @@ SString GetExePathFilename( bool bUseExeCopy )
         return strGTAEXEPath;
     }
     return "unknown";
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// GetUsingExePathFilename
+//
+// Return full path and filename of exe we will probably be using
+//
+//////////////////////////////////////////////////////////
+SString GetUsingExePathFilename( void )
+{
+    return GetExePathFilename( ShouldUseExeCopy() );
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// UpdatePatchStatusTimestamp
+//
+// Change the link timestamp in gta_sa.exe to trick windows 7 into using aero
+//
+//////////////////////////////////////////////////////////
+EPatchResult UpdatePatchStatusTimestamp( const SString& strGTAEXEPath, EPatchMode mode )
+{
+    // Get the top byte of the file link timestamp
+    uchar ucTimeStamp = 0;
+    FILE* fh = fopen ( strGTAEXEPath, "rb" );
+    if ( fh )
+    {
+        if ( !fseek ( fh, 0x8B, SEEK_SET ) )
+        {
+            if ( fread ( &ucTimeStamp, sizeof ( ucTimeStamp ), 1, fh ) != 1 )
+            {
+                ucTimeStamp = 0;
+            }
+        }
+        fclose ( fh );
+    }
+
+    const uchar AERO_DISABLED = 0x42;
+    const uchar AERO_ENABLED  = 0x43;
+
+    // Return status if just checking
+    if ( mode == PATCH_CHECK )
+    {
+        if ( ucTimeStamp == AERO_ENABLED )
+            return PATCH_CHECK_RESULT_ON;
+        return PATCH_CHECK_RESULT_OFF;
+    }
+
+    // Check it's a value we're expecting
+    bool bCanChangeAeroSetting = ( ucTimeStamp == AERO_DISABLED || ucTimeStamp == AERO_ENABLED );
+    SetApplicationSettingInt ( "aero-changeable", bCanChangeAeroSetting );
+
+    if ( bCanChangeAeroSetting )
+    {
+        // Get option to set
+        bool bAeroEnabled = ( mode == PATCH_SET_ON );
+        uchar ucTimeStampRequired = bAeroEnabled ? AERO_ENABLED : AERO_DISABLED;
+        if ( ucTimeStamp != ucTimeStampRequired )
+        {
+            // Change needed!
+            SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
+            FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+            if ( !fh )
+            {
+                return PATCH_SET_RESULT_REQ_ADMIN;
+            }
+            if ( !fseek ( fh, 0x8B, SEEK_SET ) )
+            {
+                fwrite ( &ucTimeStampRequired, sizeof ( ucTimeStampRequired ), 1, fh );
+            }
+            fclose ( fh );
+        }
+    }
+    return PATCH_SET_RESULT_OK;
 }
 
 
@@ -189,6 +293,7 @@ EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode
     if ( bCanChangeLargeMemSetting )
     {
         ushort usCharacteristicsRequired = ( mode == PATCH_SET_ON ) ? LARGEMEM_ENABLED : LARGEMEM_DISABLED;
+        dassert( usCharacteristicsRequired == LARGEMEM_ENABLED );
         if ( usCharacteristics != usCharacteristicsRequired )
         {
             // Change needed!
@@ -250,6 +355,7 @@ EPatchResult UpdatePatchStatusDep( const SString& strGTAEXEPath, EPatchMode mode
     if ( bCanChangeDepSetting )
     {
         ulong ulDllCharacteristicsRequired = ( mode == PATCH_SET_ON ) ? DEP_ENABLED : DEP_DISABLED;
+        dassert( ulDllCharacteristicsRequired == DEP_ENABLED );
         if ( ulDllCharacteristics != ulDllCharacteristicsRequired )
         {
             // Change needed!
