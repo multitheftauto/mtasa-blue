@@ -135,7 +135,6 @@ public:
     void                            AddColShapeClass        ( lua_State* luaVM );
     void                            AddObjectClass          ( lua_State* luaVM );
     void                            AddPedClass             ( lua_State* luaVM );
-    void                            AddPlayerClass          ( lua_State* luaVM );
     void                            AddRadarAreaClass       ( lua_State* luaVM );
     void                            AddResourceClass        ( lua_State* luaVM );
     void                            AddConnectionClass      ( lua_State* luaVM );

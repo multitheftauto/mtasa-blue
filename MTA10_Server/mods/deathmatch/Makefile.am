@@ -199,7 +199,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionDefs.Misc.cpp \
 ./logic/lua/CLuaFunctionDefs.Object.cpp \
 ./logic/lua/CLuaFunctionDefs.Ped.cpp \
-./logic/lua/CLuaFunctionDefs.Player.cpp \
 ./logic/lua/CLuaFunctionDefs.PREG.cpp \
 ./logic/lua/CLuaFunctionDefs.RadarArea.cpp \
 ./logic/lua/CLuaFunctionDefs.Server.cpp \
@@ -239,6 +238,7 @@ LOGIC = \
 ./logic/luadefs/CLuaMatrixDefs.cpp \
 ./logic/luadefs/CLuaMarkerDefs.cpp \
 ./logic/luadefs/CLuaPickupDefs.cpp \
+./logic/luadefs/CLuaPlayerDefs.cpp \
 ./logic/luadefs/CLuaResourceDefs.cpp \
 ./logic/luadefs/CLuaTextDefs.cpp \
 ./logic/luadefs/CLuaVector2Defs.cpp \

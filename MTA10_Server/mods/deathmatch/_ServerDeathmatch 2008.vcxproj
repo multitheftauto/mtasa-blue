@@ -452,6 +452,7 @@
     <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp" />
     <ClCompile Include="logic\luadefs\CLuaMarkerDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaPlayerDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVector3Defs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVector4Defs.cpp" />
@@ -467,7 +468,6 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Misc.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Object.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Ped.cpp" />
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Player.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.PREG.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.RadarArea.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Server.cpp" />
@@ -883,6 +883,7 @@
     <ClInclude Include="CServer.h" />
     <ClInclude Include="logic\luadefs\CLuaMarkerDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaMatrixDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaPlayerDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="logic\luadefs\CLuaVector3Defs.h" />
     <ClInclude Include="logic\luadefs\CLuaVector4Defs.h" />

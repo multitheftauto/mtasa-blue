@@ -190,58 +190,6 @@ void CLuaManager::LoadCFunctions ( void )
     // Ped funcs
     CLuaCFunctions::AddFunction ( "createPed", CLuaFunctionDefs::CreatePed );
 
-    // Player get funcs
-    CLuaCFunctions::AddFunction ( "getPlayerCount", CLuaFunctionDefs::GetPlayerCount );
-    CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefs::GetPlayerFromName );
-    CLuaCFunctions::AddFunction ( "getPlayerFromName", CLuaFunctionDefs::GetPlayerFromName );
-    CLuaCFunctions::AddFunction ( "getPlayerMoney", CLuaFunctionDefs::GetPlayerMoney );
-    CLuaCFunctions::AddFunction ( "getPlayerPing", CLuaFunctionDefs::GetPlayerPing );
-    CLuaCFunctions::AddFunction ( "getRandomPlayer", CLuaFunctionDefs::GetRandomPlayer );
-    CLuaCFunctions::AddFunction ( "isPlayerMuted", CLuaFunctionDefs::IsPlayerMuted );
-    CLuaCFunctions::AddFunction ( "getPlayerTeam", CLuaFunctionDefs::GetPlayerTeam );
-    CLuaCFunctions::AddFunction ( "getPlayerWantedLevel", CLuaFunctionDefs::GetPlayerWantedLevel );
-    CLuaCFunctions::AddFunction ( "getAlivePlayers", CLuaFunctionDefs::GetAlivePlayers );
-    CLuaCFunctions::AddFunction ( "getDeadPlayers", CLuaFunctionDefs::GetDeadPlayers );
-    CLuaCFunctions::AddFunction ( "getPlayerIdleTime", CLuaFunctionDefs::GetPlayerIdleTime );
-    CLuaCFunctions::AddFunction ( "isPlayerScoreboardForced", CLuaFunctionDefs::IsPlayerScoreboardForced );
-    CLuaCFunctions::AddFunction ( "isPlayerMapForced", CLuaFunctionDefs::IsPlayerMapForced );
-    CLuaCFunctions::AddFunction ( "getPlayerNametagText", CLuaFunctionDefs::GetPlayerNametagText );
-    CLuaCFunctions::AddFunction ( "getPlayerNametagColor", CLuaFunctionDefs::GetPlayerNametagColor );
-    CLuaCFunctions::AddFunction ( "isPlayerNametagShowing", CLuaFunctionDefs::IsPlayerNametagShowing );
-    CLuaCFunctions::AddFunction ( "getPlayerSerial", CLuaFunctionDefs::GetPlayerSerial );
-    CLuaCFunctions::AddFunction ( "getPlayerUserName", CLuaFunctionDefs::GetPlayerUserName );
-    CLuaCFunctions::AddFunction ( "getPlayerCommunityID", CLuaFunctionDefs::GetPlayerCommunityID );
-    CLuaCFunctions::AddFunction ( "getPlayerBlurLevel", CLuaFunctionDefs::GetPlayerBlurLevel );
-    CLuaCFunctions::AddFunction ( "getPlayerName", CLuaFunctionDefs::GetPlayerName );
-    CLuaCFunctions::AddFunction ( "getPlayerIP", CLuaFunctionDefs::GetPlayerIP );
-    CLuaCFunctions::AddFunction ( "getPlayerAccount", CLuaFunctionDefs::GetPlayerAccount );
-    CLuaCFunctions::AddFunction ( "getPlayerVersion", CLuaFunctionDefs::GetPlayerVersion );
-    CLuaCFunctions::AddFunction ( "getPlayerACInfo", CLuaFunctionDefs::GetPlayerACInfo );
-    CLuaCFunctions::AddFunction ( "getWeaponProperty", CLuaFunctionDefs::GetWeaponProperty );
-    CLuaCFunctions::AddFunction ( "getOriginalWeaponProperty", CLuaFunctionDefs::GetOriginalWeaponProperty );
-    CLuaCFunctions::AddFunction ( "resendPlayerModInfo", CLuaFunctionDefs::ResendPlayerModInfo );
-
-    // Player set funcs
-    CLuaCFunctions::AddFunction ( "setPlayerMoney", CLuaFunctionDefs::SetPlayerMoney );
-    CLuaCFunctions::AddFunction ( "setPlayerAmmo", CLuaFunctionDefs::SetPlayerAmmo );
-    CLuaCFunctions::AddFunction ( "givePlayerMoney", CLuaFunctionDefs::GivePlayerMoney );
-    CLuaCFunctions::AddFunction ( "takePlayerMoney", CLuaFunctionDefs::TakePlayerMoney );
-    CLuaCFunctions::AddFunction ( "spawnPlayer", CLuaFunctionDefs::SpawnPlayer );
-    CLuaCFunctions::AddFunction ( "showPlayerHudComponent", CLuaFunctionDefs::ShowPlayerHudComponent );
-    CLuaCFunctions::AddFunction ( "setPlayerHudComponentVisible", CLuaFunctionDefs::ShowPlayerHudComponent );
-    CLuaCFunctions::AddFunction ( "setPlayerWantedLevel", CLuaFunctionDefs::SetPlayerWantedLevel );
-    CLuaCFunctions::AddFunction ( "forcePlayerMap", CLuaFunctionDefs::ForcePlayerMap );
-    CLuaCFunctions::AddFunction ( "setPlayerNametagText", CLuaFunctionDefs::SetPlayerNametagText );
-    CLuaCFunctions::AddFunction ( "setPlayerNametagColor", CLuaFunctionDefs::SetPlayerNametagColor );
-    CLuaCFunctions::AddFunction ( "setPlayerNametagShowing", CLuaFunctionDefs::SetPlayerNametagShowing );
-    CLuaCFunctions::AddFunction ( "setPlayerMuted", CLuaFunctionDefs::SetPlayerMuted );
-    CLuaCFunctions::AddFunction ( "setPlayerBlurLevel", CLuaFunctionDefs::SetPlayerBlurLevel );
-    CLuaCFunctions::AddFunction ( "redirectPlayer", CLuaFunctionDefs::RedirectPlayer );
-    CLuaCFunctions::AddFunction ( "setPlayerName", CLuaFunctionDefs::SetPlayerName );
-    CLuaCFunctions::AddFunction ( "detonateSatchels", CLuaFunctionDefs::DetonateSatchels );
-    CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefs::SetWeaponProperty );
-    CLuaCFunctions::AddFunction ( "takePlayerScreenShot", CLuaFunctionDefs::TakePlayerScreenShot );
-
     // Ped get functions
     CLuaCFunctions::AddFunction ( "getPedWeaponSlot", CLuaFunctionDefs::GetPedWeaponSlot );
     CLuaCFunctions::AddFunction ( "getPedArmor", CLuaFunctionDefs::GetPedArmor );
@@ -303,6 +251,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "takeWeaponAmmo", CLuaFunctionDefs::TakeWeapon );
     CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefs::SetWeaponAmmo );
     CLuaCFunctions::AddFunction ( "getSlotFromWeapon", CLuaFunctionDefs::GetSlotFromWeapon );
+    CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefs::SetWeaponProperty );
 
     // Blip create/destroy funcs
     CLuaCFunctions::AddFunction ( "createBlip", CLuaFunctionDefs::CreateBlip );
@@ -355,11 +304,6 @@ void CLuaManager::LoadCFunctions ( void )
     // Fire create funcs
     //CLuaCFunctions::AddFunction ( "createFire", CLuaFunctionDefinitions::CreateFire );
 
-    // Audio funcs
-    //CLuaCFunctions::AddFunction ( "playMissionAudio", CLuaFunctionDefinitions::PlayMissionAudio );
-    //CLuaCFunctions::AddFunction ( "preloadMissionAudio", CLuaFunctionDefinitions::PreloadMissionAudio );
-    CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );
-
     // Path(node) funcs
     //CLuaCFunctions::AddFunction ( "createNode", CLuaFunctionDefinitions::CreateNode );
 
@@ -368,19 +312,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex );
     CLuaCFunctions::AddFunction ( "getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes );
     CLuaCFunctions::AddFunction ( "getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName );
-
-    // Input funcs
-    CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );
-    CLuaCFunctions::AddFunction ( "unbindKey", CLuaFunctionDefs::UnbindKey );
-    CLuaCFunctions::AddFunction ( "isKeyBound", CLuaFunctionDefs::IsKeyBound );
-    CLuaCFunctions::AddFunction ( "getFunctionsBoundToKey", CLuaFunctionDefs::GetFunctionsBoundToKey );
-    CLuaCFunctions::AddFunction ( "getKeyBoundToFunction", CLuaFunctionDefs::GetKeyBoundToFunction );
-    CLuaCFunctions::AddFunction ( "getControlState", CLuaFunctionDefs::GetControlState );
-    CLuaCFunctions::AddFunction ( "isControlEnabled", CLuaFunctionDefs::IsControlEnabled );
-    
-    CLuaCFunctions::AddFunction ( "setControlState", CLuaFunctionDefs::SetControlState );
-    CLuaCFunctions::AddFunction ( "toggleControl", CLuaFunctionDefs::ToggleControl );
-    CLuaCFunctions::AddFunction ( "toggleAllControls", CLuaFunctionDefs::ToggleAllControls );
     
     // Team get funcs
     CLuaCFunctions::AddFunction ( "createTeam", CLuaFunctionDefs::CreateTeam );
@@ -418,6 +349,8 @@ void CLuaManager::LoadCFunctions ( void )
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefs::GetWeaponNameFromID );
     CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefs::GetWeaponIDFromName );
+    CLuaCFunctions::AddFunction ( "getWeaponProperty", CLuaFunctionDefs::GetWeaponProperty );
+    CLuaCFunctions::AddFunction ( "getOriginalWeaponProperty", CLuaFunctionDefs::GetOriginalWeaponProperty );
 #if MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE
     CLuaCFunctions::AddFunction ( "createWeapon", CLuaFunctionDefs::CreateWeapon );
     CLuaCFunctions::AddFunction ( "fireWeapon", CLuaFunctionDefs::FireWeapon );
@@ -437,6 +370,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefs::SetWeaponAmmo );
     CLuaCFunctions::AddFunction ( "setWeaponClipAmmo", CLuaFunctionDefs::SetWeaponClipAmmo );
 #endif
+
 
     // Console funcs
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefs::AddCommandHandler );
@@ -517,6 +451,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaVoiceDefs::LoadFunctions ();
     CLuaXMLDefs::LoadFunctions ();
     CLuaMarkerDefs::LoadFunctions ();
+    CLuaPlayerDefs::LoadFunctions ();
 
     // All-Seeing Eye Functions
     CLuaCFunctions::AddFunction ( "getGameType", CLuaFunctionDefs::GetGameType );
@@ -526,8 +461,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getRuleValue", CLuaFunctionDefs::GetRuleValue );
     CLuaCFunctions::AddFunction ( "setRuleValue", CLuaFunctionDefs::SetRuleValue );
     CLuaCFunctions::AddFunction ( "removeRuleValue", CLuaFunctionDefs::RemoveRuleValue );
-    CLuaCFunctions::AddFunction ( "getPlayerAnnounceValue", CLuaFunctionDefs::GetPlayerAnnounceValue );
-    CLuaCFunctions::AddFunction ( "setPlayerAnnounceValue", CLuaFunctionDefs::SetPlayerAnnounceValue );
 
     // Database funcs
     CLuaCFunctions::AddFunction ( "dbConnect", CLuaFunctionDefs::DbConnect );
@@ -568,10 +501,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "logIn", CLuaFunctionDefs::LogIn );
     CLuaCFunctions::AddFunction ( "logOut", CLuaFunctionDefs::LogOut );
 
-    // Admin functions (TODO)
-    CLuaCFunctions::AddFunction ( "kickPlayer", CLuaFunctionDefs::KickPlayer );
-    CLuaCFunctions::AddFunction ( "banPlayer", CLuaFunctionDefs::BanPlayer );
-
+    // Admin functions
     CLuaCFunctions::AddFunction ( "addBan", CLuaFunctionDefs::AddBan );
     CLuaCFunctions::AddFunction ( "removeBan", CLuaFunctionDefs::RemoveBan );
 
@@ -609,15 +539,6 @@ void CLuaManager::LoadCFunctions ( void )
 
     CLuaCFunctions::AddFunction ( "callRemote", CLuaFunctionDefs::CallRemote );
     CLuaCFunctions::AddFunction ( "fetchRemote", CLuaFunctionDefs::FetchRemote );
-
-    // Cursor get funcs
-    CLuaCFunctions::AddFunction ( "isCursorShowing", CLuaFunctionDefs::IsCursorShowing );
-    
-    // Cursor set funcs
-    CLuaCFunctions::AddFunction ( "showCursor", CLuaFunctionDefs::ShowCursor );
-
-    // Chat funcs
-    CLuaCFunctions::AddFunction ( "showChat", CLuaFunctionDefs::ShowChat );
 
     // Misc funcs
     CLuaCFunctions::AddFunction ( "resetMapInfo", CLuaFunctionDefs::ResetMapInfo );
@@ -687,10 +608,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicle", CLuaFunctionDefs::GetPedOccupiedVehicle );
     CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicleSeat", CLuaFunctionDefs::GetPedOccupiedVehicleSeat );
     CLuaCFunctions::AddFunction ( "isPlayerInVehicle", CLuaFunctionDefs::IsPedInVehicle );
-    CLuaCFunctions::AddFunction ( "getClientName", CLuaFunctionDefs::GetPlayerName );
-    CLuaCFunctions::AddFunction ( "getClientIP", CLuaFunctionDefs::GetPlayerIP );
-    CLuaCFunctions::AddFunction ( "getClientAccount", CLuaFunctionDefs::GetPlayerAccount );
-    CLuaCFunctions::AddFunction ( "setClientName", CLuaFunctionDefs::SetPlayerName );
+    CLuaCFunctions::AddFunction ( "getClientName", CLuaPlayerDefs::GetPlayerName );
+    CLuaCFunctions::AddFunction ( "getClientIP", CLuaPlayerDefs::GetPlayerIP );
+    CLuaCFunctions::AddFunction ( "getClientAccount", CLuaPlayerDefs::GetPlayerAccount );
+    CLuaCFunctions::AddFunction ( "setClientName", CLuaPlayerDefs::SetPlayerName );
     CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefs::GetPedWeapon );
     CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaFunctionDefs::GetPedTotalAmmo );
     CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaFunctionDefs::GetPedAmmoInClip );

@@ -70,55 +70,6 @@ public:
     LUA_DECLARE ( AddDebugHook );
     LUA_DECLARE ( RemoveDebugHook );
 
-    // Player get functions
-    LUA_DECLARE ( GetPlayerCount );
-    LUA_DECLARE ( GetPedAmmoInClip );
-    LUA_DECLARE ( GetPedTotalAmmo );
-    LUA_DECLARE ( SetPlayerAmmo );
-    LUA_DECLARE ( GetPlayerFromName );
-    LUA_DECLARE ( GetPlayerMoney );
-    LUA_DECLARE ( GetPlayerPing );
-    LUA_DECLARE ( GetRandomPlayer );
-    LUA_DECLARE ( IsPlayerMuted );
-    LUA_DECLARE ( GetPlayerTeam );
-    LUA_DECLARE ( CanPlayerUseFunction );
-    LUA_DECLARE ( GetPlayerWantedLevel );
-    LUA_DECLARE ( GetAlivePlayers );
-    LUA_DECLARE ( GetDeadPlayers );
-    LUA_DECLARE ( GetPlayerIdleTime );
-    LUA_DECLARE ( IsPlayerScoreboardForced );
-    LUA_DECLARE ( IsPlayerMapForced );
-    LUA_DECLARE ( GetPlayerNametagText );
-    LUA_DECLARE ( GetPlayerNametagColor );
-    LUA_DECLARE ( IsPlayerNametagShowing );
-    LUA_DECLARE ( GetPlayerSerial );
-    LUA_DECLARE ( GetPlayerCommunityID ); // deprecate me
-    LUA_DECLARE ( GetPlayerUserName ); // deprecate me
-    LUA_DECLARE ( GetPlayerBlurLevel );
-    LUA_DECLARE ( GetPlayerName );
-    LUA_DECLARE ( GetPlayerIP );
-    LUA_DECLARE ( GetPlayerAccount );
-    LUA_DECLARE ( GetPlayerVersion );
-    LUA_DECLARE ( GetPlayerACInfo );
-
-    // Player set functions
-    LUA_DECLARE ( SetPlayerMoney );
-    LUA_DECLARE ( GivePlayerMoney );
-    LUA_DECLARE ( TakePlayerMoney );
-    LUA_DECLARE ( SpawnPlayer );
-    LUA_DECLARE ( ShowPlayerHudComponent );
-    LUA_DECLARE ( SetPlayerWantedLevel );
-    LUA_DECLARE ( ForcePlayerMap );
-    LUA_DECLARE ( SetPlayerNametagText );
-    LUA_DECLARE ( SetPlayerNametagColor );
-    LUA_DECLARE ( SetPlayerNametagShowing );
-    LUA_DECLARE ( SetPlayerMuted );
-    LUA_DECLARE ( SetPlayerBlurLevel );
-    LUA_DECLARE ( RedirectPlayer );
-    LUA_DECLARE ( SetPlayerName );
-    LUA_DECLARE ( DetonateSatchels );
-    LUA_DECLARE ( TakePlayerScreenShot );
-
     // Ped get functions
     LUA_DECLARE ( CreatePed );
     LUA_DECLARE ( GetPedArmor );
@@ -146,8 +97,10 @@ public:
     LUA_DECLARE ( IsPedInVehicle );
     LUA_DECLARE ( GetWeaponProperty );
     LUA_DECLARE ( GetOriginalWeaponProperty );
+    LUA_DECLARE ( GetPedAmmoInClip );
+    LUA_DECLARE ( GetPedTotalAmmo );
 
-    // Player set functions
+    // Ped set functions
     LUA_DECLARE ( SetPedArmor );
     LUA_DECLARE ( KillPed );
     LUA_DECLARE ( SetPedRotation );
@@ -232,29 +185,11 @@ public:
     // Fire funcs
     LUA_DECLARE ( CreateFire );
 
-    // Audio funcs
-    LUA_DECLARE ( PlaySoundFrontEnd );
-    LUA_DECLARE ( PlayMissionAudio );
-    LUA_DECLARE ( PreloadMissionAudio );
-
     // Ped body funcs?
     LUA_DECLARE ( GetBodyPartName );
     LUA_DECLARE ( GetClothesByTypeIndex );
     LUA_DECLARE ( GetTypeIndexFromClothes );
     LUA_DECLARE ( GetClothesTypeName );
-
-    // Key bind funcs
-    LUA_DECLARE ( BindKey );
-    LUA_DECLARE ( UnbindKey );
-    LUA_DECLARE ( IsKeyBound );
-    LUA_DECLARE ( GetFunctionsBoundToKey );
-    LUA_DECLARE ( GetKeyBoundToFunction );
-    LUA_DECLARE ( GetControlState );
-    LUA_DECLARE ( IsControlEnabled );
-
-    LUA_DECLARE ( SetControlState );
-    LUA_DECLARE ( ToggleControl );
-    LUA_DECLARE ( ToggleAllControls );
 
     // Shape create funcs
     LUA_DECLARE ( CreateColCircle );
@@ -384,9 +319,6 @@ public:
     LUA_DECLARE ( GetRuleValue );
     LUA_DECLARE ( SetRuleValue );
     LUA_DECLARE ( RemoveRuleValue );
-    LUA_DECLARE ( GetPlayerAnnounceValue );
-    LUA_DECLARE ( SetPlayerAnnounceValue );
-    LUA_DECLARE ( ResendPlayerModInfo );
 
     // Database funcs
     static void     DbQueryCallback ( CDbJobData* pJobData, void* pContext );
@@ -429,9 +361,6 @@ public:
     LUA_DECLARE ( LogOut );
 
     // Admin funcs
-    LUA_DECLARE ( KickPlayer );
-    LUA_DECLARE ( BanPlayer );
-
     LUA_DECLARE ( AddBan );
     LUA_DECLARE ( RemoveBan );
 
@@ -452,15 +381,6 @@ public:
     LUA_DECLARE ( SetBanAdmin );
     LUA_DECLARE ( SetBanNick );
     LUA_DECLARE ( IsBan );
-
-    // Cursor get funcs
-    LUA_DECLARE ( IsCursorShowing );
-
-    // Cursor set funcs
-    LUA_DECLARE ( ShowCursor );
-
-    // Chat funcs
-    LUA_DECLARE ( ShowChat );
 
     // Misc funcs
     LUA_DECLARE ( ResetMapInfo );

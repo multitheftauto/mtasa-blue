@@ -240,6 +240,45 @@ int CLuaFunctionDefs::RemoveCommandHandler ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::ExecuteCommandHandler ( lua_State* luaVM )
+{
+    //  bool executeCommandHandler ( string commandName, player thePlayer, [ string args ] )
+    SString strKey; CElement* pElement; SString strArgs;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strKey );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strArgs, "" );
+
+    if ( !argStream.HasErrors () )
+    {
+
+        // Grab our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CClient* pClient = NULL;
+            if ( pElement->GetType () == CElement::PLAYER )
+                pClient = static_cast <CClient*> ( static_cast <CPlayer*> ( pElement ) );
+
+            if ( pClient )
+            {
+
+                // Call it
+                if ( m_pRegisteredCommands->ProcessCommand ( strKey, strArgs, pClient ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::OutputServerLog ( lua_State* luaVM )
 {

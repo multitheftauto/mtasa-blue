@@ -23,6 +23,30 @@
 #include "StdInc.h"
 
 
+int CLuaFunctionDefs::SetPlayerTeam ( lua_State* luaVM )
+{
+    CPlayer* pPlayer;
+    CTeam* pTeam;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer );
+    argStream.ReadUserData ( pTeam, NULL );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetPlayerTeam ( pPlayer, pTeam ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::CreateTeam ( lua_State* luaVM )
 {
     SString strName;
