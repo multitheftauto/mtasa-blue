@@ -83,6 +83,7 @@
       <right name="command.aexec" access="false"/>
       <right name="command.whois" access="false"/>
       <right name="command.whowas" access="false"/>
+      <right name="command.aclrequest" access="false" />
       <right name="function.executeCommandHandler" access="false"/>
       <right name="function.setPlayerMuted" access="false"/>
       <right name="function.addAccount" access="false"/>
@@ -132,7 +133,7 @@
       <right name="function.refreshResources" access="false"/>
       <right name="function.setServerConfigSetting" access="false" />
       <right name="function.updateResourceACLRequest" access="false" />
-      <right name="command.aclrequest" access="false" />
+      <right name="function.shutdown" access="false" />
    </acl>
    <acl name="Moderator">
       <right name="general.ModifyOtherObjects" access="false"/>
@@ -190,6 +191,7 @@
       <right name="command.crun" access="true"/>
       <right name="command.srun" access="true"/>
       <right name="command.run" access="true"/>
+      <right name="command.aclrequest" access="true" />
       <right name="function.addBan" access="true"/>
       <right name="function.setUnbanTime" access="true"/>
       <right name="function.setBanAdmin" access="true"/>
@@ -222,7 +224,7 @@
       <right name="function.refreshResources" access="true"/>
       <right name="function.setServerConfigSetting" access="true" />
       <right name="function.updateResourceACLRequest" access="true" />
-      <right name="command.aclrequest" access="true" />
+      <right name="function.shutdown" access="true" />
    </acl>
    <acl name="RPC">
       <right name="function.callRemote" access="true"/>
