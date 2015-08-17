@@ -16,13 +16,6 @@
 
 void CLuaElementDefs::LoadFunctions ( void )
 {
-    // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
-    CLuaCFunctions::AddFunction ( "attachElementToElement", attachElements );
-    CLuaCFunctions::AddFunction ( "detachElementFromElement", detachElements );
-    // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
-
-
-
     // Create/destroy
     CLuaCFunctions::AddFunction ( "createElement", createElement );
     CLuaCFunctions::AddFunction ( "destroyElement", destroyElement );

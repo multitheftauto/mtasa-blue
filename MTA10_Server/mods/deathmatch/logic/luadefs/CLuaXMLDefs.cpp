@@ -18,12 +18,6 @@
 
 void CLuaXMLDefs::LoadFunctions ( void )
 {
-    // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
-    CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", xmlNodeGetChildren );
-    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", xmlCreateChild );
-    CLuaCFunctions::AddFunction ( "xmlFindSubNode", xmlNodeFindChild );
-    // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
-
     CLuaCFunctions::AddFunction ( "xmlCreateFile", xmlCreateFile );
     CLuaCFunctions::AddFunction ( "xmlLoadFile", xmlLoadFile );
     CLuaCFunctions::AddFunction ( "xmlCopyFile", xmlCopyFile );
@@ -71,7 +65,7 @@ void CLuaXMLDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getChildren", "xmlNodeGetChildren" );
     lua_classfunction ( luaVM, "getName", "xmlNodeGetName" );
     lua_classfunction ( luaVM, "getParent", "xmlNodeGetParent" );
-    lua_classfunction ( luaVM, "getAttribute", "xmlNodeGetAttribute" ); // table classvar?
+    lua_classfunction ( luaVM, "getAttribute", "xmlNodeGetAttribute" );
 
     lua_classvariable ( luaVM, "value", "xmlNodeSetValue", "xmlNodeGetValue" );
     lua_classvariable ( luaVM, "name", "xmlNodeSetName", "xmlNodeGetName" );

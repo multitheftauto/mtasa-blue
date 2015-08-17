@@ -15,28 +15,28 @@
 
 void CLuaTextDefs::LoadFunctions ( void )
 {
-    CLuaCFunctions::AddFunction ( "textCreateDisplay", CLuaTextDefs::textCreateDisplay );
-    CLuaCFunctions::AddFunction ( "textDestroyDisplay", CLuaTextDefs::textDestroyDisplay );
-    CLuaCFunctions::AddFunction ( "textCreateTextItem", CLuaTextDefs::textCreateTextItem );
-    CLuaCFunctions::AddFunction ( "textDestroyTextItem", CLuaTextDefs::textDestroyTextItem );
+    CLuaCFunctions::AddFunction ( "textCreateDisplay", textCreateDisplay );
+    CLuaCFunctions::AddFunction ( "textDestroyDisplay", textDestroyDisplay );
+    CLuaCFunctions::AddFunction ( "textCreateTextItem", textCreateTextItem );
+    CLuaCFunctions::AddFunction ( "textDestroyTextItem", textDestroyTextItem );
 
-    CLuaCFunctions::AddFunction ( "textDisplayAddText", CLuaTextDefs::textDisplayAddText );
-    CLuaCFunctions::AddFunction ( "textDisplayRemoveText", CLuaTextDefs::textDisplayRemoveText );
-    CLuaCFunctions::AddFunction ( "textDisplayAddObserver", CLuaTextDefs::textDisplayAddObserver );
-    CLuaCFunctions::AddFunction ( "textDisplayRemoveObserver", CLuaTextDefs::textDisplayRemoveObserver );
-    CLuaCFunctions::AddFunction ( "textDisplayIsObserver", CLuaTextDefs::textDisplayIsObserver );
-    CLuaCFunctions::AddFunction ( "textDisplayGetObservers", CLuaTextDefs::textDisplayGetObservers );
+    CLuaCFunctions::AddFunction ( "textDisplayAddText", textDisplayAddText );
+    CLuaCFunctions::AddFunction ( "textDisplayRemoveText", textDisplayRemoveText );
+    CLuaCFunctions::AddFunction ( "textDisplayAddObserver", textDisplayAddObserver );
+    CLuaCFunctions::AddFunction ( "textDisplayRemoveObserver", textDisplayRemoveObserver );
+    CLuaCFunctions::AddFunction ( "textDisplayIsObserver", textDisplayIsObserver );
+    CLuaCFunctions::AddFunction ( "textDisplayGetObservers", textDisplayGetObservers );
 
-    CLuaCFunctions::AddFunction ( "textItemSetText", CLuaTextDefs::textItemSetText );
-    CLuaCFunctions::AddFunction ( "textItemGetText", CLuaTextDefs::textItemGetText );
-    CLuaCFunctions::AddFunction ( "textItemSetScale", CLuaTextDefs::textItemSetScale );
-    CLuaCFunctions::AddFunction ( "textItemGetScale", CLuaTextDefs::textItemGetScale );
-    CLuaCFunctions::AddFunction ( "textItemSetPosition", CLuaTextDefs::textItemSetPosition );
-    CLuaCFunctions::AddFunction ( "textItemGetPosition", CLuaTextDefs::textItemGetPosition );
-    CLuaCFunctions::AddFunction ( "textItemSetColor", CLuaTextDefs::textItemSetColor );
-    CLuaCFunctions::AddFunction ( "textItemGetColor", CLuaTextDefs::textItemGetColor );
-    CLuaCFunctions::AddFunction ( "textItemSetPriority", CLuaTextDefs::textItemSetPriority );
-    CLuaCFunctions::AddFunction ( "textItemGetPriority", CLuaTextDefs::textItemGetPriority );
+    CLuaCFunctions::AddFunction ( "textItemSetText", textItemSetText );
+    CLuaCFunctions::AddFunction ( "textItemGetText", textItemGetText );
+    CLuaCFunctions::AddFunction ( "textItemSetScale", textItemSetScale );
+    CLuaCFunctions::AddFunction ( "textItemGetScale", textItemGetScale );
+    CLuaCFunctions::AddFunction ( "textItemSetPosition", textItemSetPosition );
+    CLuaCFunctions::AddFunction ( "textItemGetPosition", textItemGetPosition );
+    CLuaCFunctions::AddFunction ( "textItemSetColor", textItemSetColor );
+    CLuaCFunctions::AddFunction ( "textItemGetColor", textItemGetColor );
+    CLuaCFunctions::AddFunction ( "textItemSetPriority", textItemSetPriority );
+    CLuaCFunctions::AddFunction ( "textItemGetPriority", textItemGetPriority );
 }
 
 void CLuaTextDefs::AddClasses ( lua_State* luaVM )
