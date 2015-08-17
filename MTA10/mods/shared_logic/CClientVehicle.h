@@ -615,6 +615,7 @@ protected:
     float                       m_fTrainSpeed;
     float                       m_fTrainPosition;
     uchar                       m_ucTrackID;
+    bool                        m_bJustStreamedIn;
 
     // Time dependent error compensation interpolation
     struct
