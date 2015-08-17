@@ -3,7 +3,7 @@
 *  PROJECT:     Multi Theft Auto v1.x
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/deathmatch/logic/luadefs/CLuaPlayerDefs.cpp
-*  PURPOSE:     Lua file handling definitions class
+*  PURPOSE:     Lua player definitions class
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
