@@ -808,16 +808,16 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
                 SString resourceName = path.substr ( 1, end-1 );
                 SString resourcePath = path.substr ( end );
 
-				// Call this function recursively and use the mta scheme instead
+                // Call this function recursively and use the mta scheme instead
                 request->SetURL ( "http://mta/local/" + resourceName + resourcePath );
-				return Create ( browser, frame, "http", request );
+                return Create ( browser, frame, "http", request );
             }
             return nullptr;
         }
         
         // Redirect mtalocal://* to http://mta/local/*, call recursively
         request->SetURL ( "http://mta/local/" + path );
-		return Create ( browser, frame, "http", request );
+        return Create ( browser, frame, "http", request );
     }
     
     SString host = UTF16ToMbUTF8 ( urlParts.host.str );

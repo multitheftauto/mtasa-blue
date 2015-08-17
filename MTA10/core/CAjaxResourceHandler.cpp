@@ -28,7 +28,6 @@ std::vector<SString>& CAjaxResourceHandler::GetPostData ()
     return m_vecPostData;
 }
 
-
 void CAjaxResourceHandler::SetResponse ( const SString& data )
 {
     m_strResponse = data;
@@ -67,7 +66,6 @@ bool CAjaxResourceHandler::ProcessRequest ( CefRefPtr< CefRequest > request, Cef
     callback->Continue ();
     return true;
 }
-
 
 bool CAjaxResourceHandler::ReadResponse ( void* data_out, int bytes_to_read, int& bytes_read, CefRefPtr< CefCallback > callback )
 {
