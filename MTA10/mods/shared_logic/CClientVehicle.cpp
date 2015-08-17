@@ -171,6 +171,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // reset our fall through map count
     m_ucFellThroughMapCount = 1;
+
+    // We've not yet been streamed in 
+    m_bJustStreamedIn = false;
 }
 
 
@@ -2259,6 +2262,28 @@ void CClientVehicle::StreamedInPulse ( void )
     // Make sure the vehicle doesn't go too far down
     if ( m_pVehicle )
     {
+        if ( m_bJustStreamedIn )
+        {
+            // Apply door & panel states. This cannot be done in Create()
+            // due to issues upon setting the visibility of new RwFrames
+            
+            // Does this car have a damage model?
+            if ( HasDamageModel( ) )
+            {
+                // Set the damage model doors
+                CDamageManager* pDamageManager = m_pVehicle->GetDamageManager( );
+
+                for ( int i = 0; i < MAX_DOORS; i++ )
+                    pDamageManager->SetDoorStatus( static_cast < eDoors > ( i ), m_ucDoorStates[i] );
+                for ( int i = 0; i < MAX_PANELS; i++ )
+                    pDamageManager->SetPanelStatus( static_cast < ePanels > ( i ), m_ucPanelStates[i] );
+                for ( int i = 0; i < MAX_LIGHTS; i++ )
+                    pDamageManager->SetLightStatus( static_cast < eLights > ( i ), m_ucLightStates[i] );
+            }
+
+            m_bJustStreamedIn = false;
+        }
+
         if ( m_bBlowNextFrame )
         {
             Blow ( false );
@@ -2752,19 +2777,6 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetTurretRotation ( m_fTurretHorizontal, m_fTurretVertical );
         }
 
-        // Does this car have a damage model?
-        if ( HasDamageModel () )
-        {
-            // Set the damage model doors
-            CDamageManager* pDamageManager = m_pVehicle->GetDamageManager ();
-
-            for ( int i = 0; i < MAX_DOORS; i++ )
-                pDamageManager->SetDoorStatus ( static_cast < eDoors > ( i ), m_ucDoorStates [i] );            
-            for ( int i = 0; i < MAX_PANELS; i++ )
-                pDamageManager->SetPanelStatus ( static_cast < ePanels > ( i ), m_ucPanelStates [i] );
-            for ( int i = 0; i < MAX_LIGHTS; i++ )
-                pDamageManager->SetLightStatus ( static_cast < eLights > ( i ), m_ucLightStates [i] );
-        }
         for ( int i = 0; i < MAX_WHEELS; i++ )
             SetWheelStatus ( i, m_ucWheelStates [i], true );
 
@@ -2923,6 +2935,9 @@ void CClientVehicle::Create ( void )
         }
         // store our spawn position in case we fall through the map
         m_matCreate = m_Matrix;
+
+        // We've just been streamed in
+        m_bJustStreamedIn = true;
 
         // Tell the streamer we've created this object
         NotifyCreate ();
