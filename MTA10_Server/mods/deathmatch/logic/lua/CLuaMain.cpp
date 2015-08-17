@@ -318,67 +318,6 @@ void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddResourceClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    // These have been separated for their abnormal argument scheme
-    // Their first arg take a path from which a resource is determined
-    // For now, they are static-classes, and if the scheme is fixed
-    // Then they will also be able to serve use when in an instance
-    lua_classfunction ( luaVM, "addConfig", "addResourceConfig" );
-    lua_classfunction ( luaVM, "addMap", "addResourceMap" );
-    lua_classfunction ( luaVM, "getConfig", "getResourceConfig" );
-    
-    lua_classfunction ( luaVM, "getFromName", "getResourceFromName" );
-    lua_classfunction ( luaVM, "getAll", "getResources" );
-    lua_classfunction ( luaVM, "getThis", "getThisResource" );
-    lua_classfunction ( luaVM, "refresh", "refreshResources" ); // Can't use "all" here because that's an argument
-    
-    lua_classfunction ( luaVM, "create", "createResource" );
-    lua_classfunction ( luaVM, "start", "startResource" );
-    lua_classfunction ( luaVM, "stop", "stopResource" );
-    lua_classfunction ( luaVM, "copy", "copyResource" );
-    lua_classfunction ( luaVM, "rename", "renameResource" );
-    lua_classfunction ( luaVM, "delete", "deleteResource" );
-    lua_classfunction ( luaVM, "call", "call" );
-    lua_classfunction ( luaVM, "removeDefaultSetting", "removeResourceDefaultSetting" );
-    lua_classfunction ( luaVM, "removeFile", "removeResourceFile" );
-    lua_classfunction ( luaVM, "restart", "restartResource" );
-    lua_classfunction ( luaVM, "hasPermissionTo", "hasObjectPermissionTo" );
-    lua_classfunction ( luaVM, "updateACLRequest", "updateResourceACLRequest" );
-    
-    lua_classfunction ( luaVM, "setInfo", "setResourceInfo" );
-    lua_classfunction ( luaVM, "setDefaultSetting", "setResourceDefaultSetting" );
-
-    lua_classfunction ( luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot" );
-    lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
-    lua_classfunction ( luaVM, "getExportedFunctions", "getResourceExportedFunctions" );
-    lua_classfunction ( luaVM, "getLastStartTime", "getResourceLastStartTime" );
-    lua_classfunction ( luaVM, "getLoadTime", "getResourceLoadTime" );
-    lua_classfunction ( luaVM, "getInfo", "getResourceInfo" );
-    lua_classfunction ( luaVM, "getLoadFailureReason", "getResourceLoadFailureReason" );
-    lua_classfunction ( luaVM, "getMapRootElement", "getResourceMapRootElement" );
-    lua_classfunction ( luaVM, "getName", "getResourceName" );
-    lua_classfunction ( luaVM, "getState", "getResourceState" );
-    lua_classfunction ( luaVM, "getACLRequests", "getResourceACLRequests" );
-    
-    lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
-    lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
-    lua_classvariable ( luaVM, "lastStartTime", NULL, "getResourceLastStartTime" );
-    lua_classvariable ( luaVM, "aclRequests", NULL, "getResourceACLRequests" );
-    lua_classvariable ( luaVM, "loadTime", NULL, "getResourceLoadTime" );
-    lua_classvariable ( luaVM, "name", "renameResource", "getResourceName" );
-    lua_classvariable ( luaVM, "rootElement", NULL, "getResourceRootElement" );
-    lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
-    lua_classvariable ( luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason" );
-    //lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
-    //lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
-
-    lua_registerclass ( luaVM, "Resource" );
-}
-
-
 void CLuaMain::AddConnectionClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -501,14 +440,14 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaVehicleDefs     ::AddClass   ( luaVM );
     CLuaMarkerDefs      ::AddClass   ( luaVM );
     CLuaPedDefs         ::AddClass   ( luaVM );
-    CLuaPlayerDefs      ::AddClass   ( luaVM ); // inherits ped
+    CLuaPlayerDefs      ::AddClass   ( luaVM );
+    CLuaResourceDefs    ::AddClass   ( luaVM );
     AddAccountClass             ( luaVM );
     AddBanClass                 ( luaVM );
     AddBlipClass                ( luaVM );
     AddColShapeClass            ( luaVM );
     AddObjectClass              ( luaVM );
     AddRadarAreaClass           ( luaVM );
-    AddResourceClass            ( luaVM );
     AddConnectionClass          ( luaVM );
     AddQueryHandleClass         ( luaVM );
     AddTeamClass                ( luaVM );
