@@ -643,7 +643,7 @@ void CServerImpl::ShowInfoTag ( char* szTag )
                     // No more tag data, so fill it up with spaces and break the loop
                     for ( int j = ScrnBufferCount ; j < ScrnBufferInfo.dwSize.X ; j++ )
                     {
-                        m_ScrnBuffer[j].Char.AsciiChar = ' ';
+                        m_ScrnBuffer[j].Char.UnicodeChar = L' ';
                         m_ScrnBuffer[j].Attributes = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE;
                     }
                     break;
@@ -666,14 +666,14 @@ void CServerImpl::ShowInfoTag ( char* szTag )
                         // If this is a color code, skip to the next character, so we can color that one
                         i++;
                     }
-                    m_ScrnBuffer[ScrnBufferCount].Char.AsciiChar = szTag[i];
+                    m_ScrnBuffer[ScrnBufferCount].Char.UnicodeChar = szTag[i];
 
                     // Enable a grey background
                     m_ScrnBuffer[ScrnBufferCount++].Attributes |= ( BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE );
                 }
             }
         }
-        WriteConsoleOutput ( m_hConsole, m_ScrnBuffer, BufferSize, TopLeft, &Region);
+        WriteConsoleOutputW ( m_hConsole, m_ScrnBuffer, BufferSize, TopLeft, &Region);
 #else
     // Linux curses variant, so much easier :)
     int iAttr = COLOR_PAIR ( 1 );
