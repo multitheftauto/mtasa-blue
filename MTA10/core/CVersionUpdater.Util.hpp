@@ -108,6 +108,13 @@ DO YOU WANT TO DOWNLOAD AND INSTALL THE LATEST VERSION ?
 
 namespace
 {
+    enum class EDownloadStatus
+    {
+        None,
+        Running,
+        Success,
+        Failure,
+    };
 
     enum
     {
@@ -807,6 +814,8 @@ namespace
                                     , iIdleTime ( 0 )
                                     , iIdleTimeLeft ( 0 )
                                     , uiBytesDownloaded ( 0 )
+                                    , downloadStatus ( EDownloadStatus::None )
+                                    , iDownloadResultCode ( 0 )
                                     , iFilesize ( 0 )
                                 {
                                     exe.iFilesize = 0;
@@ -830,6 +839,9 @@ namespace
         int                     iIdleTime;
         int                     iIdleTimeLeft;
         unsigned int            uiBytesDownloaded;
+        EDownloadStatus         downloadStatus;
+        int                     iDownloadResultCode;
+        SString                 strResumableSaveLocation;
 
         // Result
         std::vector < char >    downloadBuffer;

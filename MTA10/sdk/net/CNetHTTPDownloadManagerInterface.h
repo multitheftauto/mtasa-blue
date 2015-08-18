@@ -14,7 +14,11 @@
 
 #include <windows.h>
 
-typedef bool (*PDOWNLOADPROGRESSCALLBACK) ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
+// Despite its name, PDOWNLOADPROGRESSCALLBACK is only called once at the end of the download.
+// If bSuccess is true, then pCompletedData/Length will be set or the output file will be ready.
+// If bSuccess is false, then iErrorCode and CNetHTTPDownloadManagerInterface->GetError() will reveal the problem.
+// (dDownloadNow and dDownloadTotal are deprecated and will be removed next Tuesday)
+typedef bool (*PDOWNLOADPROGRESSCALLBACK) ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
 
 class CNetHTTPDownloadManagerInterface
 {
@@ -30,7 +34,7 @@ public:
     virtual bool            ProcessQueuedFiles  ( void ) = 0;
 
     // Queue a file to download
-    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, double dSize = 0, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false, void * objectPtr = NULL, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL, bool bIsLocal = false, uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false ) = 0;
+    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, double dSize = 0, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false, void * objectPtr = NULL, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL, bool bIsLocal = false, uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false ) = 0;
 
     // Limit number of concurrent http client connections
     virtual void            SetMaxConnections   ( int iMaxConnections ) = 0;
