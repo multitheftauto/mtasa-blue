@@ -4888,62 +4888,58 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                     if ( uiTotalSizeProcessed / 1024 / 1024 > 50 )
                         g_pCore->UpdateDummyProgress( uiTotalSizeProcessed / 1024 / 1024, " MB" );
 
-                    // Don't bother with empty files
-                    if ( dChunkDataSize > 0 )
+                    // Create the resource downloadable
+                    CDownloadableResource* pDownloadableResource = NULL;
+                    switch ( ucChunkSubType )
                     {
-                        // Create the resource downloadable
-                        CDownloadableResource* pDownloadableResource = NULL;
-                        switch ( ucChunkSubType )
+                        case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
+                            {
+                                bool bDownload = bitStream.ReadBit ();
+                                pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, chunkChecksum, bDownload );
+
+                                break;
+                            }
+                        case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                            pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, chunkChecksum );
+
+                            break;
+                        case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                            pDownloadableResource = pResource->AddConfigFile ( szChunkData, chunkChecksum );
+
+                            break;
+                        default:
+
+                            break;
+                    }
+
+                    // Does the Client and Server checksum differ?
+                    if ( pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch () )
+                    {
+                        // Delete the file that already exists
+                        FileDelete ( pDownloadableResource->GetName () );
+                        if ( FileExists( pDownloadableResource->GetName () ) )
                         {
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                                {
-                                    bool bDownload = bitStream.ReadBit ();
-                                    pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, chunkChecksum, bDownload );
-
-                                    break;
-                                }
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                                pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, chunkChecksum );
-
-                                break;
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                                pDownloadableResource = pResource->AddConfigFile ( szChunkData, chunkChecksum );
-
-                                break;
-                            default:
-
-                                break;
+                            SString strMessage( "Unable to delete old file %s", *ConformResourcePath( pDownloadableResource->GetName () ) );
+                            g_pClientGame->TellServerSomethingImportant( 1009, strMessage, false );
                         }
 
-                        // Does the Client and Server checksum differ?
-                        if ( pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch () )
+                        // Is it downloadable now?
+                        if ( pDownloadableResource->IsAutoDownload() )
                         {
-                            // Delete the file that already exists
-                            FileDelete ( pDownloadableResource->GetName () );
-                            if ( FileExists( pDownloadableResource->GetName () ) )
+                            // Make sure the directory exists
+                            const char* szTempName = pDownloadableResource->GetName ();
+                            if ( szTempName )
                             {
-                                SString strMessage( "Unable to delete old file %s", *ConformResourcePath( pDownloadableResource->GetName () ) );
-                                g_pClientGame->TellServerSomethingImportant( 1009, strMessage, false );
+                                // Make sure its directory exists
+                                MakeSureDirExists ( szTempName );
                             }
 
-                            // Is it downloadable now?
-                            if ( pDownloadableResource->IsAutoDownload() )
-                            {
-                                // Make sure the directory exists
-                                const char* szTempName = pDownloadableResource->GetName ();
-                                if ( szTempName )
-                                {
-                                    // Make sure its directory exists
-                                    MakeSureDirExists ( szTempName );
-                                }
+                            // Combine the HTTP Download URL, the Resource Name and the Resource File
+                            SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
 
-                                // Combine the HTTP Download URL, the Resource Name and the Resource File
-                                SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
-
-                                // Queue the file to be downloaded
-                                pResource->AddPendingFileDownload( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize );
-                            }                       
-                        }
+                            // Queue the file to be downloaded
+                            pResource->AddPendingFileDownload( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize );
+                        }                       
                     }
                 }
 
