@@ -71,6 +71,11 @@ public:
     static std::vector < SString > MakeServerList           ( const CDataInfoSet& infoMap );
     void                PostChangeMasterConfig              ( void );
     void                OnPossibleConfigProblem             ( void );
+    CNetHTTPDownloadManagerInterface* GetHTTP               ( void );
+    void                GetSaveLocationList                 ( std::list < SString >& outSaveLocationList, const SString& strFilename );
+    SString             GetResumableSaveLocation            ( const SString& strFilename, const SString& strMD5, uint iFilesize );
+    static bool         StaticDownloadFinished              ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    bool                DownloadFinished                    ( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode );
 
     // Commands
     void                _UseMasterFetchURLs                 ( void );
@@ -137,7 +142,6 @@ public:
     void                UpdaterYield                        ( void );
 
     SJobInfo                            m_JobInfo;
-    CHTTPClient                         m_HTTP;
     long long                           m_llTimeStart;
     CConditionMap                       m_ConditionMap;
     SString                             m_strServerSaysType;
@@ -768,6 +772,80 @@ const SString& CVersionUpdater::GetDebugFilterString ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CVersionUpdater::GetHTTP
+//
+// Get the HTTP download manager used for all version updater stuff
+//
+///////////////////////////////////////////////////////////////
+CNetHTTPDownloadManagerInterface* CVersionUpdater::GetHTTP( void )
+{
+    return g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CORE_UPDATER );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::GetSaveLocationList
+//
+// Get list of places to try to save a file to
+//
+///////////////////////////////////////////////////////////////
+void CVersionUpdater::GetSaveLocationList( std::list < SString >& outSaveLocationList, const SString& strFilename )
+{
+    outSaveLocationList.push_back( PathJoin( GetMTADataPath(), "upcache", strFilename ) );
+    outSaveLocationList.push_back( PathJoin( GetMTATempPath(), "upcache", strFilename ) );
+    outSaveLocationList.push_back( GetMTATempPath() + strFilename );
+    outSaveLocationList.push_back( PathJoin( "\\temp", strFilename ) );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::GetResumableSaveLocation
+//
+// Get path and filename to use for a resumable file download
+//
+///////////////////////////////////////////////////////////////
+SString CVersionUpdater::GetResumableSaveLocation( const SString& strFilename, const SString& strMD5, uint iFilesize )
+{
+    if ( strMD5.empty() || strFilename.empty() )
+        return "";
+
+    // Get a list of possible save places
+    std::list < SString > saveLocationList;
+    GetSaveLocationList( saveLocationList, SString( "%s-%s.tmp", *strFilename, *strMD5 ) );
+
+    // First, find to find existing file to resume
+    for ( std::list < SString > ::iterator iter = saveLocationList.begin() ; iter != saveLocationList.end() ; ++iter )
+    {
+        // Check exists and can be appended to, and is smaller than what we want
+        const SString strSaveLocation = *iter;
+        if ( FileExists( strSaveLocation ) && FileAppend( strSaveLocation, "" ) && FileSize( strSaveLocation ) < iFilesize )
+        {
+            AddReportLog( 5008, SString( "GetResumableSaveLocation: Will resume download at %d/%d for %s", (int)FileSize( strSaveLocation ), iFilesize, *strSaveLocation ) );
+            return strSaveLocation;
+        }
+    }
+
+    // Otherwise, find writable place to save new file
+    for ( std::list < SString > ::iterator iter = saveLocationList.begin() ; iter != saveLocationList.end() ; ++iter )
+    {
+        const SString strSaveLocation = *iter;
+        MakeSureDirExists( strSaveLocation );
+        // Check this is writable
+        if ( FileSave( strSaveLocation, "" ) )
+        {
+            FileDelete( strSaveLocation );
+            AddReportLog( 5009, SString( "GetResumableSaveLocation: New download of %d for %s", iFilesize, *strSaveLocation ) );
+            return strSaveLocation;
+        }
+    }
+    return "";
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CVersionUpdater::ResetEverything
 //
 //
@@ -776,7 +854,7 @@ const SString& CVersionUpdater::GetDebugFilterString ( void )
 void CVersionUpdater::ResetEverything ()
 {
     m_JobInfo = SJobInfo();
-    m_HTTP.Get ("");
+    GetHTTP()->Reset();
     m_llTimeStart = 0;
     m_ConditionMap.clear ();
     m_strServerSaysType = "";
@@ -2528,14 +2606,11 @@ void CVersionUpdater::_ProcessPatchFileDownload ( void )
     
     ////////////////////////
     // Save file somewhere
-    // Make a list of possible places to save the file
     SString strPathFilename;
     {
+        // Get a list of possible places to save the file
         std::list < SString > saveLocationList;
-        saveLocationList.push_back ( PathJoin ( GetMTADataPath (), "upcache", m_JobInfo.strFilename ) );
-        saveLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache", m_JobInfo.strFilename ) );
-        saveLocationList.push_back ( GetMTATempPath () + m_JobInfo.strFilename );
-        saveLocationList.push_back ( PathJoin ( "\\temp", m_JobInfo.strFilename ) );
+        GetSaveLocationList( saveLocationList, m_JobInfo.strFilename );
 
         // Try each place
         for ( std::list < SString > ::iterator iter = saveLocationList.begin () ; iter != saveLocationList.end () ; ++iter )
@@ -2581,10 +2656,7 @@ void CVersionUpdater::_StartDownload ( void )
     {
         // See if file already exists in upcache
         std::list < SString > saveLocationList;
-        saveLocationList.push_back ( PathJoin ( GetMTADataPath (), "upcache", m_JobInfo.strFilename ) );
-        saveLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache", m_JobInfo.strFilename ) );
-        saveLocationList.push_back ( GetMTATempPath () + m_JobInfo.strFilename );
-        saveLocationList.push_back ( PathJoin ( "\\temp", m_JobInfo.strFilename ) );
+        GetSaveLocationList( saveLocationList, m_JobInfo.strFilename );
 
         // Try each place
         for ( std::list < SString > ::iterator iter = saveLocationList.begin () ; iter != saveLocationList.end () ; ++iter )
@@ -2701,7 +2773,7 @@ int CVersionUpdater::_PollDownload ( void )
                     // Handle progress/cancel if visible
                     if ( GetQuestionBox ().PollButtons () == 0 )
                     {
-                        m_HTTP.Get ("");
+                        GetHTTP()->Reset();
                         GetQuestionBox ().Reset ();
                         m_ConditionMap.SetCondition ( "ProcessResponse", "cancel" );
                         return RES_OK;
@@ -3175,11 +3247,56 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     strQueryURL = strQueryURL.Replace ( "_SCUT_", strSoundCut );
     strQueryURL = strQueryURL.Replace ( "_OPTIMUS_", strOptimusInfo );
 
+    // See if this download qualifies for using a resumable file
+    if ( !m_JobInfo.strFilename.empty() && strQueryURL.EndsWith( m_JobInfo.strFilename ) )
+    {
+        m_JobInfo.strResumableSaveLocation = GetResumableSaveLocation( m_JobInfo.strFilename, m_JobInfo.strMD5, m_JobInfo.iFilesize );
+    }
+    else
+    {
+        m_JobInfo.strResumableSaveLocation = "";
+    }
+
     // Perform the HTTP request
-    m_HTTP.Get ( strQueryURL );
+    m_JobInfo.downloadStatus = EDownloadStatus::Running;
+    m_JobInfo.iDownloadResultCode = 0;
+    GetHTTP()->Reset();
+    GetHTTP()->QueueFile( strQueryURL, m_JobInfo.strResumableSaveLocation, 0, NULL, 0, false, this, StaticDownloadFinished, false, 10, 10000, false, true );
     m_strLastQueryURL = strQueryURL;
     OutputDebugLine( SString ( "[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
     return RES_OK;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CVersionUpdater::StaticDownloadFinished
+//
+// Handle when download finishes
+//
+///////////////////////////////////////////////////////////////
+bool CVersionUpdater::StaticDownloadFinished ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+{
+    return ((CVersionUpdater*)pObj)->DownloadFinished( pCompletedData, completedLength, bSuccess, iErrorCode );
+}
+
+bool CVersionUpdater::DownloadFinished( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode )
+{
+    if ( bSuccess )
+    {
+        m_JobInfo.downloadStatus = EDownloadStatus::Success;
+        m_JobInfo.iDownloadResultCode = iErrorCode;
+        // Save data if a file wasn't used
+        m_JobInfo.downloadBuffer.resize( completedLength );
+        if ( completedLength > 0 )
+            memcpy ( &m_JobInfo.downloadBuffer[0], pCompletedData, completedLength );
+    }
+    else
+    {
+        m_JobInfo.downloadStatus = EDownloadStatus::Failure;
+        m_JobInfo.iDownloadResultCode = iErrorCode;
+    }
+    return true;
 }
 
 
@@ -3195,27 +3312,28 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
 int CVersionUpdater::DoPollDownload ( void )
 {
     m_ConditionMap.SetCondition ( "Download", "" );
+    GetHTTP()->ProcessQueuedFiles();
 
     // Update progress
-    unsigned int uiBytesDownloaded = m_HTTP.PeekNextDataSize ();
+    unsigned int uiBytesDownloaded = GetHTTP()->GetDownloadSizeNow();
     if ( m_JobInfo.uiBytesDownloaded != uiBytesDownloaded )
     {
         m_llTimeStart = GetTickCount64_ ();
         m_JobInfo.uiBytesDownloaded = uiBytesDownloaded;
+        OutputDebugLine( SString( "uiBytesDownloaded:%d", uiBytesDownloaded ) );
     }
 
     // Are we done yet?
-    CHTTPBuffer buffer;
-    if ( !m_HTTP.GetData ( buffer ) )
+    if ( m_JobInfo.downloadStatus != EDownloadStatus::Success )
     {
-        unsigned int status = m_HTTP.GetStatus ();
         m_JobInfo.iIdleTime = GetTickCount64_ () - m_llTimeStart;
         int iUseTimeOut = m_JobInfo.uiBytesDownloaded ? m_JobInfo.iTimeoutTransfer : m_JobInfo.iTimeoutConnect;
         m_JobInfo.iIdleTimeLeft = iUseTimeOut - m_JobInfo.iIdleTime;
         // Give up if error or timeout
-        if ( ( status !=0 && status != 200 ) || m_JobInfo.iIdleTimeLeft < 0 )
+        if ( ( m_JobInfo.downloadStatus == EDownloadStatus::Failure ) || m_JobInfo.iIdleTimeLeft < 0 )
         {
-            AddReportLog ( 4002, SString ( "DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_strLastQueryURL.c_str (), status, m_JobInfo.iIdleTime ) );
+            GetHTTP()->Reset();
+            AddReportLog ( 4002, SString ( "DoPollDownload: Regular fail for %s (status:%u  time:%u)", m_strLastQueryURL.c_str (), m_JobInfo.iDownloadResultCode, m_JobInfo.iIdleTime ) );
 
             m_ConditionMap.SetCondition ( "Download", "Fail" );
             return RES_FAIL;
@@ -3223,16 +3341,18 @@ int CVersionUpdater::DoPollDownload ( void )
         return RES_POLL;
     }
 
-    // Got something
-    if ( buffer.GetSize () > 0 )
+    // If was using file to store resumable data, load it up
+    if ( m_JobInfo.downloadBuffer.empty() && !m_JobInfo.strResumableSaveLocation.empty() )
     {
-        char* pData = buffer.GetData ();
-        unsigned int uiSize = buffer.GetSize ();
-        m_JobInfo.downloadBuffer.resize ( buffer.GetSize () );
-        memcpy ( &m_JobInfo.downloadBuffer[0], pData, uiSize );
+        FileLoad( m_JobInfo.strResumableSaveLocation, m_JobInfo.downloadBuffer );
+        FileDelete( m_JobInfo.strResumableSaveLocation );
+    }
 
+    // Got something
+    if ( !m_JobInfo.downloadBuffer.empty() )
+    {
         m_ConditionMap.SetCondition ( "Download", "Ok" );
-        AddReportLog ( 2005, SString ( "DoPollDownload: Downloaded %d bytes from %s", uiSize, m_strLastQueryURL.c_str() ) );
+        AddReportLog ( 2005, SString ( "DoPollDownload: Downloaded %d bytes from %s", m_JobInfo.downloadBuffer.size(), m_strLastQueryURL.c_str() ) );
         return RES_OK;
     }
 
@@ -3294,8 +3414,8 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
     //
     // Send data. Doesn't check if it was received.
     //
-    CNetHTTPDownloadManagerInterface * downloadManager = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::CORE_UPDATER );
-    downloadManager->QueueFile ( strQueryURL, NULL, 0, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
+    GetHTTP()->Reset();
+    GetHTTP()->QueueFile( strQueryURL, NULL, 0, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
 
     return RES_OK;
 }
@@ -3312,8 +3432,7 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
 ///////////////////////////////////////////////////////////////
 int CVersionUpdater::DoPollPost ( void )
 {
-    CNetHTTPDownloadManagerInterface* pHTTP = CCore::GetSingleton ().GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::CORE_UPDATER );
-    if ( !pHTTP->ProcessQueuedFiles () )
+    if ( !GetHTTP()->ProcessQueuedFiles() )
     {
         return RES_POLL;
     }
