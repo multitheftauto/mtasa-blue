@@ -38,6 +38,10 @@ public:
     bool                    Load                    ( CResource* pResourceForFilePath, eMode Mode );
     void                    Unload                  ( void );
     bool                    IsLoaded                ( void )    { return m_pFile != NULL; };
+    const SString&          GetFilePath             ( void )    { return m_strFilename; };
+
+    // Get the owning resource
+    CResource*              GetResource             ( void );
 
     // Only call functions belw this if you're sure that the file is loaded.
     // Or you will crash.
@@ -53,9 +57,10 @@ public:
     long                    Write                   ( unsigned long ulSize, const char* pData );
 
 private:
+    CResource*              m_pResource;
     FILE*                   m_pFile;
     uint                    m_uiScriptId;
-    std::string             m_strFilename;
+    SString                 m_strFilename;
     unsigned long           m_ulMaxSize;
 };
 

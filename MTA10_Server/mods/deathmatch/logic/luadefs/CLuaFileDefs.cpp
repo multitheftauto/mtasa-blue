@@ -33,6 +33,7 @@ void CLuaFileDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fileDelete", fileDelete );
     CLuaCFunctions::AddFunction ( "fileRename", fileRename );
     CLuaCFunctions::AddFunction ( "fileCopy", fileCopy );
+    CLuaCFunctions::AddFunction ( "fileGetPath", CLuaFileDefs::fileGetPath );
 }
 
 
@@ -773,5 +774,46 @@ int CLuaFileDefs::fileCopy ( lua_State* luaVM )
 
     // Failed
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFileDefs::fileGetPath( lua_State* luaVM )
+{
+    //  string fileGetPath ( file theFile )
+    CScriptFile* pFile;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadUserData( pFile );
+
+    if ( !argStream.HasErrors( ) )
+    {
+        // Grab our lua VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine( luaVM );
+        if ( pLuaMain )
+        {
+            // We have a resource argument?
+            CResource* pThisResource = pLuaMain->GetResource( );
+            CResource* pFileResource = pFile->GetResource( );
+
+            const SString& strFilePath = pFile->GetFilePath( );
+            SString outPath = strFilePath;
+            
+            // If the calling resource is not the resource the file resides in 
+            // we need to prepend :resourceName to the path
+            if ( pThisResource != pFileResource )
+            {
+                outPath = ":" + pFileResource->GetName() + "/" + outPath;
+            }
+            
+            lua_pushlstring( luaVM, outPath.c_str( ), outPath.length( ) );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage( ) );
+
+    // Failed
+    lua_pushboolean( luaVM, false );
     return 1;
 }
