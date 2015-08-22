@@ -29,7 +29,7 @@ public:
         MODE_CREATE,
     };
 
-                            CScriptFile             ( const char* szFilename, unsigned long ulMaxSize );
+                            CScriptFile             ( uint uiScriptId, const char* szFilename, unsigned long ulMaxSize, eAccessType accessType );
                             ~CScriptFile            ( void );
 
     // Functions required for linking
@@ -42,9 +42,13 @@ public:
     bool                    ReadSpecialData         ( void )    { return true; };
 
     // Load and unload routines
-    bool                    Load                    ( eMode Mode );
+    bool                    Load                    (  CResource* pResourceForFilePath, eMode Mode );
     void                    Unload                  ( void );
     bool                    IsLoaded                ( void )    { return m_pFile != NULL; };
+    const SString&          GetFilePath             ( void )    { return m_strFilename; };
+
+    // Get the owning resource
+    CResource*              GetResource             ( void );
 
     // Only call functions belw this if you're sure that the file is loaded.
     // Or you will crash.
@@ -62,9 +66,12 @@ private:
     void                    DoResourceFileCheck     ( void );
 
     CBinaryFileInterface*   m_pFile;
-    std::string             m_strFilename;
+    SString                 m_strFilename;
     unsigned long           m_ulMaxSize;
     bool                    m_bDoneResourceFileCheck;
+    unsigned int            m_uiScriptId;
+    CResource*              m_pResource;
+    eAccessType             m_accessType;
 };
 
 #endif

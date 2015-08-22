@@ -21,6 +21,7 @@ CScriptFile::CScriptFile ( uint uiScriptId, const char* szFilename, unsigned lon
     m_pFile = NULL;
     m_strFilename = szFilename ? szFilename : "";
     m_ulMaxSize = ulMaxSize;
+    m_pResource = nullptr;
 }
 
 
@@ -67,6 +68,8 @@ bool CScriptFile::Load ( CResource* pResourceForFilePath, eMode Mode )
             CResource* pResource = g_pGame->GetResourceManager ()->GetResourceFromScriptID( m_uiScriptId );
             if ( pResource && pResource->GetVirtualMachine() )
                 pResource->GetVirtualMachine()->OnOpenFile( m_strFilename );
+
+            m_pResource = pResourceForFilePath;
         }
         return m_pFile != NULL;
     }
@@ -195,4 +198,9 @@ long CScriptFile::Write ( unsigned long ulSize, const char* pData )
 
     // Write the data into the given block. Return number of bytes we wrote.
     return fwrite ( pData, 1, ulSize, m_pFile );
+}
+
+CResource* CScriptFile::GetResource( void )
+{
+    return m_pResource;
 }

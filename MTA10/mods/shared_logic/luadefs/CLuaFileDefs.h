@@ -33,6 +33,7 @@ public:
     static int      fileDelete                          ( lua_State* luaVM );
     static int      fileRename                          ( lua_State* luaVM );
     static int      fileCopy                            ( lua_State* luaVM );
+    static int      fileGetPath                         ( lua_State* luaVM );
 };
 
 #endif

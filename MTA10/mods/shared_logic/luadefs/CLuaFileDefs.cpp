@@ -33,6 +33,7 @@ void CLuaFileDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "fileDelete", CLuaFileDefs::fileDelete );
     CLuaCFunctions::AddFunction ( "fileRename", CLuaFileDefs::fileRename );
     CLuaCFunctions::AddFunction ( "fileCopy", CLuaFileDefs::fileCopy );
+    CLuaCFunctions::AddFunction ( "fileGetPath", CLuaFileDefs::fileGetPath );
 }
 
 
@@ -56,9 +57,11 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
         else
         if ( pLuaMain )
         {
-            std::string strAbsPath;
-            CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath ) )
+            SString strAbsPath;
+            SString strMetaPath;
+            CResource* pThisResource = pLuaMain->GetResource ();
+            CResource* pResource = pThisResource;
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, strMetaPath ) )
             {
                 // Inform file verifier
                 g_pClientGame->GetResourceManager()->FileModifedByScript( strAbsPath );
@@ -67,25 +70,21 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
                 MakeSureDirExists ( strAbsPath.c_str () );
 
                 // Create the file to create
-                CScriptFile* pFile = new CScriptFile ( strAbsPath.c_str (), DEFAULT_MAX_FILESIZE );
+                eAccessType accessType = filePath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
+                CScriptFile* pFile = new CScriptFile( pThisResource->GetScriptID( ), strMetaPath.c_str(), DEFAULT_MAX_FILESIZE, accessType);
                 assert ( pFile );
 
                 // Try to load it
-                if ( pFile->Load ( CScriptFile::MODE_CREATE ) )
+                if ( pFile->Load ( pResource, CScriptFile::MODE_CREATE ) )
                 {
                     // Make it a child of the resource's file root
                     pFile->SetParent ( pResource->GetResourceDynamicEntity () );
 
-                    // Grab its owner resource
-                    CResource* pParentResource = pLuaMain->GetResource ();
-                    if ( pParentResource )
+                    // Add it to the scrpt resource element group
+                    CElementGroup* pGroup = pThisResource->GetElementGroup ();
+                    if ( pGroup )
                     {
-                        // Add it to the scrpt resource element group
-                        CElementGroup* pGroup = pParentResource->GetElementGroup ();
-                        if ( pGroup )
-                        {
-                            pGroup->Add ( pFile );
-                        }
+                        pGroup->Add ( pFile );
                     }
 
                     // Success. Return the file.
@@ -162,20 +161,23 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            std::string strAbsPath;
-            CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath ) )
+            SString strAbsPath;
+            SString strMetaPath;
+            CResource* pThisResource = pLuaMain->GetResource ();
+            CResource* pResource = pThisResource;
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, strMetaPath ) )
             {
                 // Inform file verifier
                 if ( !readOnly )
                     g_pClientGame->GetResourceManager()->FileModifedByScript( strAbsPath );
 
                 // Create the file to create
-                CScriptFile* pFile = new CScriptFile ( strAbsPath.c_str (), DEFAULT_MAX_FILESIZE );
+                eAccessType accessType = filePath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
+                CScriptFile* pFile = new CScriptFile( pThisResource->GetScriptID( ), strMetaPath.c_str( ), DEFAULT_MAX_FILESIZE, accessType );
                 assert ( pFile );
 
                 // Try to load it
-                if ( pFile->Load ( readOnly ? CScriptFile::MODE_READ : CScriptFile::MODE_READWRITE ) )
+                if ( pFile->Load ( pResource, readOnly ? CScriptFile::MODE_READ : CScriptFile::MODE_READWRITE ) )
                 {
                     // Make it a child of the resource's file root
                     pFile->SetParent ( pResource->GetResourceDynamicEntity () );
@@ -724,6 +726,48 @@ int CLuaFileDefs::fileCopy ( lua_State* luaVM )
     }
 
     if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+
+int CLuaFileDefs::fileGetPath ( lua_State* luaVM )
+{
+    //  string fileGetPath ( file theFile )
+    CScriptFile* pFile;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab our lua VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            // We have a resource argument?
+            CResource* pThisResource = pLuaMain->GetResource ();
+            CResource* pFileResource = pFile->GetResource ();
+
+            SString strFilePath = pFile->GetFilePath ();
+
+            // If the calling resource is not the resource the file resides in 
+            // we need to prepend :resourceName to the path
+            if ( pThisResource != pFileResource )
+            {
+                SString strResourceName = pFileResource->GetName ();
+                strFilePath = ":" + strResourceName + "/" + strFilePath;
+            }
+
+            lua_pushlstring ( luaVM, strFilePath.c_str (), strFilePath.length () );
+            return 1;
+        }
+    }
+    else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     // Failed

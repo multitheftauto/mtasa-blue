@@ -13,13 +13,16 @@
 
 #include <StdInc.h>
 
-CScriptFile::CScriptFile ( const char* szFilename, unsigned long ulMaxSize ) : ClassInit ( this ), CClientEntity ( INVALID_ELEMENT_ID )
+CScriptFile::CScriptFile( uint uiScriptId, const char* szFilename, unsigned long ulMaxSize, eAccessType accessType ) : ClassInit( this ), CClientEntity( INVALID_ELEMENT_ID )
 {
     // Init
     SetTypeName ( "file" );
     m_pFile = NULL;
     m_strFilename = szFilename ? szFilename : "";
     m_ulMaxSize = ulMaxSize;
+    m_uiScriptId = uiScriptId;
+    m_accessType = accessType;
+
 }
 
 
@@ -30,7 +33,7 @@ CScriptFile::~CScriptFile ( void )
 }
 
 
-bool CScriptFile::Load ( eMode Mode )
+bool CScriptFile::Load( CResource* pResourceForFilePath, eMode Mode )
 {
     // If we haven't already got a file
     if ( !m_pFile )
@@ -38,22 +41,23 @@ bool CScriptFile::Load ( eMode Mode )
         m_bDoneResourceFileCheck = false;
         m_pFile = g_pNet->AllocateBinaryFile ();
         bool bOk = false;
+        SString strAbsPath = pResourceForFilePath->GetResourceDirectoryPath( m_accessType, m_strFilename );
         switch ( Mode )
         {
             // Open file in read only binary mode
             case MODE_READ:
-                bOk = m_pFile->FOpen ( m_strFilename.c_str (), "rb", true );
+                bOk = m_pFile->FOpen( strAbsPath.c_str( ), "rb", true );
                 break;
 
             // Open file in read write binary mode.
             case MODE_READWRITE:
                 // Try to load the file in rw mode. Use existing content.
-                bOk = m_pFile->FOpen ( m_strFilename.c_str (), "rb+", true );
+                bOk = m_pFile->FOpen( strAbsPath.c_str( ), "rb+", true );
                 break;
 
             // Open file in read write binary mode. Truncate size to 0.
             case MODE_CREATE:
-                bOk = m_pFile->FOpen ( m_strFilename.c_str (), "wb+", true );
+                bOk = m_pFile->FOpen( strAbsPath.c_str( ), "wb+", true );
                 break;
         }
 
@@ -61,6 +65,8 @@ bool CScriptFile::Load ( eMode Mode )
         {
             SAFE_DELETE( m_pFile );
         }
+
+        m_pResource = pResourceForFilePath;
 
         // Return whether we successfully opened it or not
         return m_pFile != NULL;
@@ -206,4 +212,9 @@ void CScriptFile::DoResourceFileCheck ( void )
         // Check file content
         g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strFilename, buffer );
     }
+}
+
+CResource* CScriptFile::GetResource( void )
+{
+    return m_pResource;
 }
