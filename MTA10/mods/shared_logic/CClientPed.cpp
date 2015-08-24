@@ -790,13 +790,18 @@ void CClientPed::GetMoveSpeed ( CVector& vecMoveSpeed ) const
 }
 
 
-void CClientPed::SetMoveSpeed ( const CVector& vecMoveSpeed )
+bool CClientPed::SetMoveSpeed ( const CVector& vecMoveSpeed )
 {
-    if ( m_pPlayerPed )
+    if ( !m_bFrozen )
     {
-        m_pPlayerPed->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
+        if ( m_pPlayerPed )
+        {
+            m_pPlayerPed->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
+        }
+        m_vecMoveSpeed = vecMoveSpeed;
+        return true;
     }
-    m_vecMoveSpeed = vecMoveSpeed;
+    return false;
 }
 
 
@@ -813,13 +818,18 @@ void CClientPed::GetTurnSpeed ( CVector& vecTurnSpeed ) const
 }
 
 
-void CClientPed::SetTurnSpeed ( const CVector& vecTurnSpeed )
+bool CClientPed::SetTurnSpeed ( const CVector& vecTurnSpeed )
 {
-    if ( m_pPlayerPed )
+    if ( !m_bFrozen )
     {
-        m_pPlayerPed->SetTurnSpeed ( const_cast < CVector* > ( &vecTurnSpeed ) );
+        if ( m_pPlayerPed )
+        {
+            m_pPlayerPed->SetTurnSpeed ( const_cast < CVector* > ( &vecTurnSpeed ) );
+        }
+        m_vecTurnSpeed = vecTurnSpeed;
+        return true;
     }
-    m_vecTurnSpeed = vecTurnSpeed;
+    return false;
 }
 
 

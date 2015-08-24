@@ -342,7 +342,11 @@ void CClientObject::Render ( void )
 void CClientObject::SetStatic ( bool bStatic )
 {
     m_bIsStatic = bStatic;
-    StreamOutForABit ( );
+    if ( m_pObject )
+    {
+        m_pObject->SetMovementDisabled ( bStatic );
+    }
+    m_vecMoveSpeed = CVector();
 }
 
 
@@ -502,10 +506,8 @@ void CClientObject::Create ( void )
                 // Add XRef
                 g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pObject );
 
-                // If set to true,this has the effect of forcing the object to be static at all times
-                m_pObject->SetStaticWaitingForCollision ( m_bIsStatic );
-
                 // Apply our data to the object
+                m_pObject->SetMovementDisabled ( m_bIsStatic );
                 m_pObject->Teleport ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
                 m_pObject->SetOrientation ( m_vecRotation.fX, m_vecRotation.fY, m_vecRotation.fZ );
                 #ifndef MTA_BUILDINGS
@@ -644,13 +646,18 @@ void CClientObject::GetMoveSpeed ( CVector& vecMoveSpeed ) const
 }
 
 
-void CClientObject::SetMoveSpeed ( const CVector& vecMoveSpeed )
+bool CClientObject::SetMoveSpeed ( const CVector& vecMoveSpeed )
 {
-    if ( m_pObject )
+    if ( !m_bIsStatic )
     {
-        m_pObject->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
+        if ( m_pObject )
+        {
+            m_pObject->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
+        }
+        m_vecMoveSpeed = vecMoveSpeed;
+        return true;
     }
-    m_vecMoveSpeed = vecMoveSpeed;
+    return false;
 }
 
 

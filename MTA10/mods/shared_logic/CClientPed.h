@@ -186,10 +186,10 @@ public:
     void                        SetCameraRotation           ( float fRotation );
 
     void                        GetMoveSpeed                ( CVector& vecMoveSpeed ) const;
-    void                        SetMoveSpeed                ( const CVector& vecMoveSpeed );
+    bool                        SetMoveSpeed                ( const CVector& vecMoveSpeed );
 
     void                        GetTurnSpeed                ( CVector& vecTurnSpeed ) const;
-    void                        SetTurnSpeed                ( const CVector& vecTurnSpeed );
+    bool                        SetTurnSpeed                ( const CVector& vecTurnSpeed );
 
     void                        GetControllerState          ( CControllerState& ControllerState );
     void                        GetLastControllerState      ( CControllerState& ControllerState );

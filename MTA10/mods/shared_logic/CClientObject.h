@@ -54,7 +54,7 @@ public:
     virtual void                    SetRotationRadians      ( const CVector& vecRotation );
 
     void                            GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
-    void                            SetMoveSpeed            ( const CVector& vecMoveSpeed );
+    bool                            SetMoveSpeed            ( const CVector& vecMoveSpeed );
 
     void                            GetOrientation          ( CVector& vecPosition, CVector& vecRotationRadians );
     virtual void                    SetOrientation          ( const CVector& vecPosition, const CVector& vecRotationRadians );
