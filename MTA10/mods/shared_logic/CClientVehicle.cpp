@@ -557,7 +557,7 @@ void CClientVehicle::GetMoveSpeedMeters ( CVector& vecMoveSpeed ) const
 }
 
 
-void CClientVehicle::SetMoveSpeed ( const CVector& vecMoveSpeed )
+bool CClientVehicle::SetMoveSpeed ( const CVector& vecMoveSpeed )
 {
     if ( !m_bIsFrozen )
     {
@@ -569,7 +569,9 @@ void CClientVehicle::SetMoveSpeed ( const CVector& vecMoveSpeed )
 
         if ( IsFrozenWaitingForGroundToLoad() )
             m_vecWaitingForGroundSavedMoveSpeed = vecMoveSpeed;
+        return true;
     }
+    return false;
 }
 
 
@@ -590,7 +592,7 @@ void CClientVehicle::GetTurnSpeed ( CVector& vecTurnSpeed ) const
 }
 
 
-void CClientVehicle::SetTurnSpeed ( const CVector& vecTurnSpeed )
+bool CClientVehicle::SetTurnSpeed ( const CVector& vecTurnSpeed )
 {
     if ( !m_bIsFrozen )
     {
@@ -602,7 +604,9 @@ void CClientVehicle::SetTurnSpeed ( const CVector& vecTurnSpeed )
 
         if ( IsFrozenWaitingForGroundToLoad() )
             m_vecWaitingForGroundSavedTurnSpeed = vecTurnSpeed;
+        return true;
     }
+    return false;
 }
 
 

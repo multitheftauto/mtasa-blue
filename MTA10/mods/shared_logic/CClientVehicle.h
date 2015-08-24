@@ -176,9 +176,9 @@ public:
 
     void                        GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
     void                        GetMoveSpeedMeters      ( CVector& vecMoveSpeed ) const;
-    void                        SetMoveSpeed            ( const CVector& vecMoveSpeed );
+    bool                        SetMoveSpeed            ( const CVector& vecMoveSpeed );
     void                        GetTurnSpeed            ( CVector& vecTurnSpeed ) const;
-    void                        SetTurnSpeed            ( const CVector& vecTurnSpeed );
+    bool                        SetTurnSpeed            ( const CVector& vecTurnSpeed );
 
     bool                        IsVisible               ( void );
     void                        SetVisible              ( bool bVisible );

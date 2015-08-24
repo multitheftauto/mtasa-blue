@@ -370,3 +370,22 @@ void CPhysicalSA::SetLighting ( float fLighting )
     CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
     pInterface->m_fLighting = fLighting;
 }
+
+void CPhysicalSA::SetMovementDisabled ( bool bDisabled )
+{
+    CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *) this->GetInterface();
+    // Ignore non gravity entities
+    if ( pInterface->bApplyGravity )
+    {
+        // Make entity (not) movable
+        pInterface->bDisableMovement = bDisabled;
+        // Make entity (not) rotatable
+        pInterface->bDisableFriction = bDisabled;
+    }
+    else
+    {
+        // Reset move speed manually only for non gravity entities 
+        SetMoveSpeed ( &CVector() );
+    }
+    SetTurnSpeed ( &CVector() );
+}

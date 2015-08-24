@@ -1119,21 +1119,18 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CClientEntity& Entity, con
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-            Ped.SetMoveSpeed ( vecVelocity );
-            break;
+            return Ped.SetMoveSpeed ( vecVelocity );
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.SetMoveSpeed ( vecVelocity );
-            break;
+            return Vehicle.SetMoveSpeed ( vecVelocity );
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            Object.SetMoveSpeed ( vecVelocity );
-            break;
+            return Object.SetMoveSpeed ( vecVelocity );
         }
         case CCLIENTPROJECTILE:
         {
