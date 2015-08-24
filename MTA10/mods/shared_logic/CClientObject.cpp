@@ -342,7 +342,10 @@ void CClientObject::Render ( void )
 void CClientObject::SetStatic ( bool bStatic )
 {
     m_bIsStatic = bStatic;
-    m_pObject->SetMovementDisabled ( bStatic );
+    if ( m_pObject )
+    {
+        m_pObject->SetMovementDisabled ( bStatic );
+    }
     m_vecMoveSpeed = CVector();
 }
 
