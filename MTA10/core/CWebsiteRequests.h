@@ -26,6 +26,7 @@ public:
 
     void Show ();
     void Hide ();
+    bool IsVisible ();
 
     void SetPendingRequests ( const std::vector<SString>& pendingRequests );
     void Clear ();

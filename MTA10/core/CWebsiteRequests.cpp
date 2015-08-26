@@ -80,6 +80,11 @@ void CWebsiteRequests::Hide ()
     m_pWindow->SetVisible ( false );
 }
 
+bool CWebsiteRequests::IsVisible ()
+{
+    return m_pWindow->IsVisible ();
+}
+
 void CWebsiteRequests::SetPendingRequests ( const std::vector<SString>& pendingRequests )
 {
     SString content = "";

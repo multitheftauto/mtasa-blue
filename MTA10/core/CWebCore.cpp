@@ -360,6 +360,11 @@ void CWebCore::DenyPendingPages ()
     m_PendingRequests.clear ();
 }
 
+bool CWebCore::IsRequestsGUIVisible ()
+{
+    return m_pRequestsGUI && m_pRequestsGUI->IsVisible ();
+}
+
 bool CWebCore::GetRemotePagesEnabled ()
 {
     bool bCanLoadRemotePages;
