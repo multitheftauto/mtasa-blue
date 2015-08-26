@@ -67,6 +67,7 @@ public:
     void                RequestPages        ( const std::vector<SString>& pages );
     void                AllowPendingPages   ( bool bRemember );
     void                DenyPendingPages    ();
+    bool                IsRequestsGUIVisible();
 
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
     inline void         SetTestModeEnabled  ( bool bEnabled ) { m_bTestmodeEnabled = bEnabled; };
