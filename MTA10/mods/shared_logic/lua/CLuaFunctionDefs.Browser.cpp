@@ -55,12 +55,14 @@ int CLuaFunctionDefs::CreateBrowser ( lua_State* luaVM )
 
 int CLuaFunctionDefs::RequestBrowserDomains ( lua_State* luaVM )
 {
-//  bool requestBrowserDomains ( table domains, bool isURL )
-    std::vector<SString> pages; bool bIsURL;
+//  bool requestBrowserDomains ( table domains, bool isURL [, function callback ] )
+    std::vector<SString> pages; bool bIsURL; CLuaFunctionRef callbackFunction;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadStringTable ( pages );
     argStream.ReadBool ( bIsURL, false );
+    argStream.ReadFunction ( callbackFunction, LUA_REFNIL );
+    argStream.ReadFunctionComplete ();
 
     if ( !argStream.HasErrors () )
     {
@@ -73,8 +75,30 @@ int CLuaFunctionDefs::RequestBrowserDomains ( lua_State* luaVM )
             }
         }
 
-        g_pCore->GetWebCore ()->RequestPages ( pages );
-        // Todo: Add a callback or event to check if the pagerequest dialog was successfully done
+        WebRequestCallback callback = [=]( bool bAllow, const std::vector<SString>& domains ) {
+            // Test if luaVM is still available
+            if ( m_pLuaManager->IsLuaVMValid ( luaVM ) && VERIFY_FUNCTION ( callbackFunction ) )
+            {
+                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+                if ( !pLuaMain )
+                    return;
+
+                CLuaArguments arguments;
+                arguments.PushBoolean ( bAllow );
+                
+                CLuaArguments LuaTable;
+                int i = 0;
+                for ( const auto& domain : domains )
+                {
+                    LuaTable.PushNumber ( ++i );
+                    LuaTable.PushString ( domain );
+                }
+                arguments.PushTable ( &LuaTable );
+                arguments.Call ( pLuaMain, callbackFunction );
+            }
+        };
+
+        g_pCore->GetWebCore ()->RequestPages ( pages, VERIFY_FUNCTION ( callbackFunction ) ? &callback : nullptr );
         lua_pushboolean ( luaVM, true );
         return 1;
     }

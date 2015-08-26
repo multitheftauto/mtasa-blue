@@ -44,6 +44,8 @@ enum eWebBrowserMouseButton
     BROWSER_MOUSEBUTTON_RIGHT = 2
 };
 
+using WebRequestCallback = std::function<void(bool, const std::vector<SString>&)>;
+
 class CWebCoreInterface
 {
 public:
@@ -58,16 +60,17 @@ public:
     virtual SString             GetDomainFromURL   ( const SString& strURL ) = 0;
     virtual void                ResetFilter        ( bool bResetRequestsOnly ) = 0;
     //virtual void                AddAllowedPage     ( const SString& strURL ) = 0;
-    virtual void                RequestPages       ( const std::vector<SString>& pages ) = 0;
+    virtual void                RequestPages       ( const std::vector<SString>& pages, WebRequestCallback* pCallback = nullptr ) = 0;
     virtual void                AllowPendingPages  ( bool bRemember ) = 0;
     virtual void                DenyPendingPages   () = 0;
+    virtual std::vector<SString>& GetPendingRequests () = 0;
     virtual bool                IsRequestsGUIVisible() = 0;
 
     virtual bool                IsTestModeEnabled  () = 0;
     virtual void                SetTestModeEnabled ( bool bEnabled ) = 0;
 
     virtual CWebViewInterface*  GetFocusedWebView  () = 0;
-    virtual void                SetFocusedWebView  (CWebView* pWebView) = 0;
+    virtual void                SetFocusedWebView  ( CWebView* pWebView ) = 0;
     virtual void                ProcessInputMessage( UINT uMsg, WPARAM wParam, LPARAM lParam ) = 0;
     virtual void                ClearTextures      () = 0;
 
