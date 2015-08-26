@@ -64,9 +64,10 @@ public:
     void                InitialiseWhiteAndBlacklist ( bool bAddHardcoded = true, bool bAddDynamic = true );
     void                AddAllowedPage      ( const SString& strURL, eWebFilterType filterType );
     void                AddBlockedPage      ( const SString& strURL, eWebFilterType filterType );
-    void                RequestPages        ( const std::vector<SString>& pages );
+    void                RequestPages        ( const std::vector<SString>& pages, WebRequestCallback* pCallback = nullptr );
     void                AllowPendingPages   ( bool bRemember );
     void                DenyPendingPages    ();
+    std::vector<SString>& GetPendingRequests () { return m_PendingRequests; };
     bool                IsRequestsGUIVisible();
 
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };

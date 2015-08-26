@@ -49,6 +49,8 @@ public:
     void                            AddToPendingDeleteList   ( lua_State* m_luaVM )     { m_PendingDeleteList.push_back ( m_luaVM ); }
     void                            ProcessPendingDeleteList ( void );
 
+    bool                            IsLuaVMValid            ( lua_State* luaVM )        { return MapFindRef ( m_VirtualMachineMap, luaVM ) != nullptr; };
+
     CClientGUIManager*              m_pGUIManager;
 
 private:

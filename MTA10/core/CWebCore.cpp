@@ -302,7 +302,7 @@ void CWebCore::AddBlockedPage ( const SString& strURL, eWebFilterType filterType
     m_Whitelist[strURL] = std::pair<bool, eWebFilterType> ( false, filterType );
 }
 
-void CWebCore::RequestPages ( const std::vector<SString>& pages )
+void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallback* pCallback )
 {
     // Add to pending pages queue
     bool bNewItem = false;
@@ -323,8 +323,14 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages )
             m_pRequestsGUI = new CWebsiteRequests;
 
         // Set pending requests memo content and show the window
-        m_pRequestsGUI->SetPendingRequests ( m_PendingRequests );
+        m_pRequestsGUI->SetPendingRequests ( m_PendingRequests, pCallback );
         m_pRequestsGUI->Show ();
+    }
+    else
+    {
+        // Call callback immediately if nothing has changed (all entries are most likely already on the whitelist)
+        // There is still the possibility that all websites are blacklisted; this is not the usual case tho, so ignore for now (TODO)
+        (*pCallback)( true, pages );
     }
 }
 
