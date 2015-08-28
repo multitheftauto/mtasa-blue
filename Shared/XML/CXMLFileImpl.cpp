@@ -106,8 +106,12 @@ bool CXMLFileImpl::Parse ( std::vector < char >* pOutFileContents )
             }
         }
 
-        // Bad XML file
-        SetLastError ( CXMLErrorCodes::OtherError, "Invalid file" );
+        SString strErrorDesc;
+        if ( m_pDocument->Error() )
+            strErrorDesc = SString( "Line %d: %s", m_pDocument->ErrorRow(), m_pDocument->ErrorDesc() );
+        else
+            strErrorDesc = "Invalid file";
+        SetLastError ( CXMLErrorCodes::OtherError, strErrorDesc );
         return false;
     }
 

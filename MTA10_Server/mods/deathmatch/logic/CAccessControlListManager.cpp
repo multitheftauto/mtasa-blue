@@ -63,7 +63,9 @@ bool CAccessControlListManager::Load ( void )
     // Parse it
     if ( !m_pXML->Parse () )
     {
-        CLogger::ErrorPrintf ( "Error parsing Access Control List file\n" );
+        SString strParseErrorDesc;
+        m_pXML->GetLastError( strParseErrorDesc );
+        CLogger::ErrorPrintf ( "Error parsing %s - %s\n", *ExtractFilename( GetFileName() ), *strParseErrorDesc );
         return false;
     }
 
