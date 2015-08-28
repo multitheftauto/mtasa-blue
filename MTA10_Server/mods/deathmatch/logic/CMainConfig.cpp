@@ -120,7 +120,9 @@ bool CMainConfig::Load ( void )
     // Parse it
     if ( !m_pFile->Parse () )
     {
-        CLogger::ErrorPrintf ( "Error parsing config file\n" );
+        SString strParseErrorDesc;
+        m_pFile->GetLastError( strParseErrorDesc );
+        CLogger::ErrorPrintf ( "Error parsing %s - %s\n", *ExtractFilename( GetFileName() ), *strParseErrorDesc );
         return false;
     }
 
