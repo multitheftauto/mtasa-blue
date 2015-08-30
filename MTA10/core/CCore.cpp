@@ -1129,7 +1129,8 @@ void CCore::DestroyNetwork ( )
         m_pNet = NULL;
     }
 
-    m_NetModule.UnloadModule();
+    // Skip unload as it can cause exit crashes due to threading issues
+    //m_NetModule.UnloadModule();
 }
 
 
