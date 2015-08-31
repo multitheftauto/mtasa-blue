@@ -54,7 +54,7 @@
 namespace google_breakpad {
 
 class CallStack;
-class MinidumpContext;
+class DumpContext;
 class StackFrameSymbolizer;
 
 using std::set;
@@ -86,7 +86,7 @@ class Stackwalker {
   // argument.  If no suitable concrete subclass exists, returns NULL.
   static Stackwalker* StackwalkerForCPU(
      const SystemInfo* system_info,
-     MinidumpContext* context,
+     DumpContext* context,
      MemoryRegion* memory,
      const CodeModules* modules,
      StackFrameSymbolizer* resolver_helper);

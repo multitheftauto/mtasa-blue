@@ -192,6 +192,11 @@ SetupOptions(int argc, const char *argv[], Options *options) {
 
   while ((ch = getopt(argc, (char * const *)argv, "u:v:x:h?")) != -1) {
     switch (ch) {
+      case 'h':
+      case '?':
+        Usage(argc, argv);
+        exit(0);
+        break;
       case 'u':
         options->proxy_user_pwd = optarg;
         break;

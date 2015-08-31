@@ -155,6 +155,18 @@ NSString* GetPlatform() {
   });
 }
 
+// This method must be called from the breakpad queue.
+- (void)threadUnsafeSendReportWithConfiguration:(NSDictionary*)configuration
+                                withBreakpadRef:(BreakpadRef)ref {
+  NSAssert(started_, @"The controller must be started before "
+                     "threadUnsafeSendReportWithConfiguration is called");
+  if (breakpadRef_) {
+    BreakpadUploadReportWithParametersAndConfiguration(breakpadRef_,
+                                                       uploadTimeParameters_,
+                                                       configuration);
+  }
+}
+
 - (void)setUploadingEnabled:(BOOL)enabled {
   NSAssert(started_,
       @"The controller must be started before setUploadingEnabled is called");
@@ -257,6 +269,25 @@ NSString* GetPlatform() {
                      "getCrashReportCount is called");
   dispatch_async(queue_, ^{
       callback(breakpadRef_ ? BreakpadGetCrashReportCount(breakpadRef_) : 0);
+  });
+}
+
+- (void)getNextReportConfigurationOrSendDelay:
+    (void(^)(NSDictionary*, int))callback {
+  NSAssert(started_, @"The controller must be started before "
+                     "getNextReportConfigurationOrSendDelay is called");
+  dispatch_async(queue_, ^{
+      if (!breakpadRef_) {
+        callback(nil, -1);
+        return;
+      }
+      int delay = [self sendDelay];
+      if (delay != 0) {
+        callback(nil, delay);
+        return;
+      }
+      [self reportWillBeSent];
+      callback(BreakpadGetNextReportConfiguration(breakpadRef_), 0);
   });
 }
 

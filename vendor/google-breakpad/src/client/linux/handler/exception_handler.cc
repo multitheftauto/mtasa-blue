@@ -68,6 +68,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/limits.h>
+#include <pthread.h>
 #include <sched.h>
 #include <signal.h>
 #include <stdio.h>
@@ -90,6 +91,7 @@
 #include "common/linux/linux_libc_support.h"
 #include "common/memory.h"
 #include "client/linux/log/log.h"
+#include "client/linux/microdump_writer/microdump_writer.h"
 #include "client/linux/minidump_writer/linux_dumper.h"
 #include "client/linux/minidump_writer/minidump_writer.h"
 #include "common/linux/eintr_wrapper.h"
@@ -148,7 +150,7 @@ void InstallAlternateStackLocked() {
   // one is too small.
   if (sys_sigaltstack(NULL, &old_stack) == -1 || !old_stack.ss_sp ||
       old_stack.ss_size < kSigStackSize) {
-    new_stack.ss_sp = malloc(kSigStackSize);
+    new_stack.ss_sp = calloc(1, kSigStackSize);
     new_stack.ss_size = kSigStackSize;
 
     if (sys_sigaltstack(&new_stack, NULL) == -1) {
@@ -186,13 +188,31 @@ void RestoreAlternateStackLocked() {
   stack_installed = false;
 }
 
-}  // namespace
+void InstallDefaultHandler(int sig) {
+#if defined(__ANDROID__)
+  // Android L+ expose signal and sigaction symbols that override the system
+  // ones. There is a bug in these functions where a request to set the handler
+  // to SIG_DFL is ignored. In that case, an infinite loop is entered as the
+  // signal is repeatedly sent to breakpad's signal handler.
+  // To work around this, directly call the system's sigaction.
+  struct kernel_sigaction sa;
+  memset(&sa, 0, sizeof(sa));
+  sys_sigemptyset(&sa.sa_mask);
+  sa.sa_handler_ = SIG_DFL;
+  sa.sa_flags = SA_RESTART;
+  sys_rt_sigaction(sig, &sa, NULL, sizeof(kernel_sigset_t));
+#else
+  signal(sig, SIG_DFL);
+#endif
+}
 
-// We can stack multiple exception handlers. In that case, this is the global
-// which holds the stack.
-std::vector<ExceptionHandler*>* ExceptionHandler::handler_stack_ = NULL;
-pthread_mutex_t ExceptionHandler::handler_stack_mutex_ =
-    PTHREAD_MUTEX_INITIALIZER;
+// The global exception handler stack. This is needed because there may exist
+// multiple ExceptionHandler instances in a process. Each will have itself
+// registered in this stack.
+std::vector<ExceptionHandler*>* g_handler_stack_ = NULL;
+pthread_mutex_t g_handler_stack_mutex_ = PTHREAD_MUTEX_INITIALIZER;
+
+}  // namespace
 
 // Runs before crashing: normal context.
 ExceptionHandler::ExceptionHandler(const MinidumpDescriptor& descriptor,
@@ -209,33 +229,39 @@ ExceptionHandler::ExceptionHandler(const MinidumpDescriptor& descriptor,
   if (server_fd >= 0)
     crash_generation_client_.reset(CrashGenerationClient::TryCreate(server_fd));
 
-  if (!IsOutOfProcess() && !minidump_descriptor_.IsFD())
+  if (!IsOutOfProcess() && !minidump_descriptor_.IsFD() &&
+      !minidump_descriptor_.IsMicrodumpOnConsole())
     minidump_descriptor_.UpdatePath();
 
-  pthread_mutex_lock(&handler_stack_mutex_);
-  if (!handler_stack_)
-    handler_stack_ = new std::vector<ExceptionHandler*>;
+#if defined(__ANDROID__)
+  if (minidump_descriptor_.IsMicrodumpOnConsole())
+    logger::initializeCrashLogWriter();
+#endif
+
+  pthread_mutex_lock(&g_handler_stack_mutex_);
+  if (!g_handler_stack_)
+    g_handler_stack_ = new std::vector<ExceptionHandler*>;
   if (install_handler) {
     InstallAlternateStackLocked();
     InstallHandlersLocked();
   }
-  handler_stack_->push_back(this);
-  pthread_mutex_unlock(&handler_stack_mutex_);
+  g_handler_stack_->push_back(this);
+  pthread_mutex_unlock(&g_handler_stack_mutex_);
 }
 
 // Runs before crashing: normal context.
 ExceptionHandler::~ExceptionHandler() {
-  pthread_mutex_lock(&handler_stack_mutex_);
+  pthread_mutex_lock(&g_handler_stack_mutex_);
   std::vector<ExceptionHandler*>::iterator handler =
-      std::find(handler_stack_->begin(), handler_stack_->end(), this);
-  handler_stack_->erase(handler);
-  if (handler_stack_->empty()) {
-    delete handler_stack_;
-    handler_stack_ = NULL;
+      std::find(g_handler_stack_->begin(), g_handler_stack_->end(), this);
+  g_handler_stack_->erase(handler);
+  if (g_handler_stack_->empty()) {
+    delete g_handler_stack_;
+    g_handler_stack_ = NULL;
     RestoreAlternateStackLocked();
     RestoreHandlersLocked();
   }
-  pthread_mutex_unlock(&handler_stack_mutex_);
+  pthread_mutex_unlock(&g_handler_stack_mutex_);
 }
 
 // Runs before crashing: normal context.
@@ -280,7 +306,7 @@ void ExceptionHandler::RestoreHandlersLocked() {
 
   for (int i = 0; i < kNumHandledSignals; ++i) {
     if (sigaction(kExceptionSignals[i], &old_handlers[i], NULL) == -1) {
-      signal(kExceptionSignals[i], SIG_DFL);
+      InstallDefaultHandler(kExceptionSignals[i]);
     }
   }
   handlers_installed = false;
@@ -295,7 +321,7 @@ void ExceptionHandler::RestoreHandlersLocked() {
 // static
 void ExceptionHandler::SignalHandler(int sig, siginfo_t* info, void* uc) {
   // All the exception signals are blocked at this point.
-  pthread_mutex_lock(&handler_stack_mutex_);
+  pthread_mutex_lock(&g_handler_stack_mutex_);
 
   // Sometimes, Breakpad runs inside a process where some other buggy code
   // saves and restores signal handlers temporarily with 'signal'
@@ -320,15 +346,15 @@ void ExceptionHandler::SignalHandler(int sig, siginfo_t* info, void* uc) {
     if (sigaction(sig, &cur_handler, NULL) == -1) {
       // When resetting the handler fails, try to reset the
       // default one to avoid an infinite loop here.
-      signal(sig, SIG_DFL);
+      InstallDefaultHandler(sig);
     }
-    pthread_mutex_unlock(&handler_stack_mutex_);
+    pthread_mutex_unlock(&g_handler_stack_mutex_);
     return;
   }
 
   bool handled = false;
-  for (int i = handler_stack_->size() - 1; !handled && i >= 0; --i) {
-    handled = (*handler_stack_)[i]->HandleSignal(sig, info, uc);
+  for (int i = g_handler_stack_->size() - 1; !handled && i >= 0; --i) {
+    handled = (*g_handler_stack_)[i]->HandleSignal(sig, info, uc);
   }
 
   // Upon returning from this signal handler, sig will become unmasked and then
@@ -337,14 +363,15 @@ void ExceptionHandler::SignalHandler(int sig, siginfo_t* info, void* uc) {
   // previously installed handler. Then, when the signal is retriggered, it will
   // be delivered to the appropriate handler.
   if (handled) {
-    signal(sig, SIG_DFL);
+    InstallDefaultHandler(sig);
   } else {
     RestoreHandlersLocked();
   }
 
-  pthread_mutex_unlock(&handler_stack_mutex_);
+  pthread_mutex_unlock(&g_handler_stack_mutex_);
 
-  if (info->si_pid || sig == SIGABRT) {
+  // info->si_code <= 0 iff SI_FROMUSER (SI_FROMKERNEL otherwise).
+  if (info->si_code <= 0 || sig == SIGABRT) {
     // This signal was triggered by somebody sending us the signal with kill().
     // In order to retrigger it, we have to queue a new signal by calling
     // kill() ourselves.  The special case (si_pid == 0 && sig == SIGABRT) is
@@ -398,6 +425,8 @@ bool ExceptionHandler::HandleSignal(int sig, siginfo_t* info, void* uc) {
     sys_prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
   }
   CrashContext context;
+  // Fill in all the holes in the struct to make Valgrind happy.
+  memset(&context, 0, sizeof(context));
   memcpy(&context.siginfo, info, sizeof(siginfo_t));
   memcpy(&context.context, uc, sizeof(struct ucontext));
 #if defined(__aarch64__)
@@ -449,7 +478,7 @@ bool ExceptionHandler::GenerateDump(CrashContext *context) {
   // of caution than smash it into random locations.
   static const unsigned kChildStackSize = 16000;
   PageAllocator allocator;
-  uint8_t* stack = (uint8_t*) allocator.Alloc(kChildStackSize);
+  uint8_t* stack = reinterpret_cast<uint8_t*>(allocator.Alloc(kChildStackSize));
   if (!stack)
     return false;
   // clone() needs the top-most address. (scrub just to be safe)
@@ -545,6 +574,15 @@ void ExceptionHandler::WaitForContinueSignal() {
 // Runs on the cloned process.
 bool ExceptionHandler::DoDump(pid_t crashing_process, const void* context,
                               size_t context_size) {
+  if (minidump_descriptor_.IsMicrodumpOnConsole()) {
+    return google_breakpad::WriteMicrodump(
+        crashing_process,
+        context,
+        context_size,
+        mapping_list_,
+        minidump_descriptor_.microdump_build_fingerprint(),
+        minidump_descriptor_.microdump_product_info());
+  }
   if (minidump_descriptor_.IsFD()) {
     return google_breakpad::WriteMinidump(minidump_descriptor_.fd(),
                                           minidump_descriptor_.size_limit(),
@@ -580,7 +618,8 @@ bool ExceptionHandler::WriteMinidump(const string& dump_path,
 __attribute__((optimize("no-omit-frame-pointer")))
 #endif
 bool ExceptionHandler::WriteMinidump() {
-  if (!IsOutOfProcess() && !minidump_descriptor_.IsFD()) {
+  if (!IsOutOfProcess() && !minidump_descriptor_.IsFD() &&
+      !minidump_descriptor_.IsMicrodumpOnConsole()) {
     // Update the path of the minidump so that this can be called multiple times
     // and new files are created for each minidump.  This is done before the
     // generation happens, as clients may want to access the MinidumpDescriptor

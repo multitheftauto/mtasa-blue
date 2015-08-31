@@ -45,14 +45,6 @@ namespace google_breakpad {
 
 class ExceptionHandler;
 
-struct MappingEntry {
-  MappingInfo first;
-  uint8_t second[sizeof(MDGUID)];
-};
-
-// A list of <MappingInfo, GUID>
-typedef std::list<MappingEntry> MappingList;
-
 #if defined(__aarch64__)
 typedef struct fpsimd_context fpstate_t;
 #elif !defined(__ARM_EABI__) && !defined(__mips__)

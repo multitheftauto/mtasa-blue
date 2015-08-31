@@ -183,14 +183,15 @@ const char* CompilationUnit::SkipAttribute(const char* start,
     case DW_FORM_addr:
       return start + reader_->AddressSize();
     case DW_FORM_ref_addr:
-      // DWARF2 and 3 differ on whether ref_addr is address size or
+      // DWARF2 and 3/4 differ on whether ref_addr is address size or
       // offset size.
-      assert(header_.version == 2 || header_.version == 3);
+      assert(header_.version >= 2);
       if (header_.version == 2) {
         return start + reader_->AddressSize();
-      } else if (header_.version == 3) {
+      } else if (header_.version >= 3) {
         return start + reader_->OffsetSize();
       }
+      break;
 
     case DW_FORM_block1:
       return start + 1 + reader_->ReadOneByte(start);
@@ -390,14 +391,14 @@ const char* CompilationUnit::ProcessAttribute(
                                           + offset_from_section_start_);
       return start + len;
     case DW_FORM_ref_addr:
-      // DWARF2 and 3 differ on whether ref_addr is address size or
+      // DWARF2 and 3/4 differ on whether ref_addr is address size or
       // offset size.
-      assert(header_.version == 2 || header_.version == 3);
+      assert(header_.version >= 2);
       if (header_.version == 2) {
         handler_->ProcessAttributeReference(dieoffset, attr, form,
                                             reader_->ReadAddress(start));
         return start + reader_->AddressSize();
-      } else if (header_.version == 3) {
+      } else if (header_.version >= 3) {
         handler_->ProcessAttributeReference(dieoffset, attr, form,
                                             reader_->ReadOffset(start));
         return start + reader_->OffsetSize();

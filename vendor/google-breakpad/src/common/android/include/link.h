@@ -36,7 +36,8 @@
 
 // TODO(rmcilroy): Remove this file once the ndk is updated for other
 // architectures - crbug.com/358831
-#if !defined(__aarch64__) && !defined(__x86_64__)
+#if !defined(__aarch64__) && !defined(__x86_64__) && \
+    !(defined(__mips__) && _MIPS_SIM == _ABI64)
 
 #ifdef __cplusplus
 extern "C" {

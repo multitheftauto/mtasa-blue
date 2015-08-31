@@ -150,5 +150,10 @@ AC_ARG_ENABLE(selftest,
               [selftest=false])
 AM_CONDITIONAL(SELFTEST, test x$selftest = xtrue)
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES(m4_flatten([
+  breakpad.pc
+  breakpad-client.pc
+  Makefile
+]))
+
 AC_OUTPUT

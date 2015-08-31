@@ -491,7 +491,7 @@ TEST_F(GetCallerFrame, CallerPushedRBP) {
   EXPECT_EQ(0x40000000c0000100ULL, frame0->function_base);
 
   StackFrameAMD64 *frame1 = static_cast<StackFrameAMD64 *>(frames->at(1));
-  EXPECT_EQ(StackFrame::FRAME_TRUST_SCAN, frame1->trust);
+  EXPECT_EQ(StackFrame::FRAME_TRUST_FP, frame1->trust);
   ASSERT_EQ((StackFrameAMD64::CONTEXT_VALID_RIP |
              StackFrameAMD64::CONTEXT_VALID_RSP |
              StackFrameAMD64::CONTEXT_VALID_RBP),

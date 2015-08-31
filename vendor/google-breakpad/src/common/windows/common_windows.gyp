@@ -37,14 +37,32 @@
       'all_dependent_settings': {
         'include_dirs': [
           '<(DEPTH)',
-          '$(VSInstallDir)\DIA SDK\include',
+          '$(VSInstallDir)/DIA SDK/include',
         ],
         'msvs_settings': {
           'VCLinkerTool': {
             'AdditionalDependencies': [
-              '$(VSInstallDir)\DIA SDK\lib\diaguids.lib',
+              'diaguids.lib',
               'imagehlp.lib',
             ],
+          },
+        },
+        'configurations': {
+          'x86_Base': {
+            'msvs_settings': {
+              'VCLinkerTool': {
+                'AdditionalLibraryDirectories':
+                  ['$(VSInstallDir)/DIA SDK/lib'],
+              },
+            },
+          },
+          'x64_Base': {
+            'msvs_settings': {
+              'VCLinkerTool': {
+                'AdditionalLibraryDirectories':
+                  ['$(VSInstallDir)/DIA SDK/lib/amd64'],
+              },
+            },
           },
         },
       },

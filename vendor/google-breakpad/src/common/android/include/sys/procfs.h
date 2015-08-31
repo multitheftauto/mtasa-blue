@@ -38,6 +38,9 @@
 
 #include <asm/ptrace.h>
 #include <sys/cdefs.h>
+#if defined (__mips__)
+#include <sys/types.h>
+#endif
 #include <sys/user.h>
 #include <unistd.h>
 

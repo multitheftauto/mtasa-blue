@@ -95,6 +95,15 @@ using google_breakpad::scoped_ptr;
 #define EM_AARCH64      183
 #endif
 
+// Define SHT_ANDROID_REL and SHT_ANDROID_RELA if not defined by the host.
+// Sections with this type contain Android packed relocations.
+#ifndef SHT_ANDROID_REL
+#define SHT_ANDROID_REL  (SHT_LOOS + 1)
+#endif
+#ifndef SHT_ANDROID_RELA
+#define SHT_ANDROID_RELA (SHT_LOOS + 2)
+#endif
+
 //
 // FDWrapper
 //
@@ -413,6 +422,15 @@ bool ElfEndianness(const typename ElfClass::Ehdr* elf_header,
   return false;
 }
 
+// Given |left_abspath|, find the absolute path for |right_path| and see if the
+// two absolute paths are the same.
+bool IsSameFile(const char* left_abspath, const string& right_path) {
+  char right_abspath[PATH_MAX];
+  if (!realpath(right_path.c_str(), right_abspath))
+    return false;
+  return strcmp(left_abspath, right_abspath) == 0;
+}
+
 // Read the .gnu_debuglink and get the debug file name. If anything goes
 // wrong, return an empty string.
 string ReadDebugLink(const char* debuglink,
@@ -430,14 +448,27 @@ string ReadDebugLink(const char* debuglink,
     return string();
   }
 
-  bool found = false;
-  int debuglink_fd = -1;
+  char obj_file_abspath[PATH_MAX];
+  if (!realpath(obj_file.c_str(), obj_file_abspath)) {
+    fprintf(stderr, "Cannot resolve absolute path for %s\n", obj_file.c_str());
+    return string();
+  }
+
+  std::vector<string> searched_paths;
   string debuglink_path;
   std::vector<string>::const_iterator it;
   for (it = debug_dirs.begin(); it < debug_dirs.end(); ++it) {
     const string& debug_dir = *it;
     debuglink_path = debug_dir + "/" + debuglink;
-    debuglink_fd = open(debuglink_path.c_str(), O_RDONLY);
+
+    // There is the annoying case of /path/to/foo.so having foo.so as the
+    // debug link file name. Thus this may end up opening /path/to/foo.so again,
+    // and there is a small chance of the two files having the same CRC.
+    if (IsSameFile(obj_file_abspath, debuglink_path))
+      continue;
+
+    searched_paths.push_back(debug_dir);
+    int debuglink_fd = open(debuglink_path.c_str(), O_RDONLY);
     if (debuglink_fd < 0)
       continue;
 
@@ -469,21 +500,19 @@ string ReadDebugLink(const char* debuglink,
               debuglink_path.c_str());
       continue;
     }
-    found = true;
-    break;
+
+    // Found debug file.
+    return debuglink_path;
   }
 
-  if (!found) {
-    fprintf(stderr, "Failed to find debug ELF file for '%s' after trying:\n",
-            obj_file.c_str());
-    for (it = debug_dirs.begin(); it < debug_dirs.end(); ++it) {
-      const string debug_dir = *it;
-      fprintf(stderr, "  %s/%s\n", debug_dir.c_str(), debuglink);
-    }
-    return string();
+  // Not found case.
+  fprintf(stderr, "Failed to find debug ELF file for '%s' after trying:\n",
+          obj_file.c_str());
+  for (it = searched_paths.begin(); it < searched_paths.end(); ++it) {
+    const string& debug_dir = *it;
+    fprintf(stderr, "  %s/%s\n", debug_dir.c_str(), debuglink);
   }
-
-  return debuglink_path;
+  return string();
 }
 
 //
@@ -591,6 +620,28 @@ bool LoadSymbols(const string& obj_file,
   bool found_debug_info_section = false;
   bool found_usable_info = false;
 
+  // Reject files that contain Android packed relocations. The pre-packed
+  // version of the file should be symbolized; the packed version is only
+  // intended for use on the target system.
+  if (FindElfSectionByName<ElfClass>(".rel.dyn", SHT_ANDROID_REL,
+                                     sections, names,
+                                     names_end, elf_header->e_shnum)) {
+    fprintf(stderr, "%s: file contains a \".rel.dyn\" section "
+                    "with type SHT_ANDROID_REL\n", obj_file.c_str());
+    fprintf(stderr, "Files containing Android packed relocations "
+                    "may not be symbolized.\n");
+    return false;
+  }
+  if (FindElfSectionByName<ElfClass>(".rela.dyn", SHT_ANDROID_RELA,
+                                     sections, names,
+                                     names_end, elf_header->e_shnum)) {
+    fprintf(stderr, "%s: file contains a \".rela.dyn\" section "
+                    "with type SHT_ANDROID_RELA\n", obj_file.c_str());
+    fprintf(stderr, "Files containing Android packed relocations "
+                    "may not be symbolized.\n");
+    return false;
+  }
+
   if (options.symbol_data != ONLY_CFI) {
 #ifndef NO_STABS_SUPPORT
     // Look for STABS debugging information, and load it if present.
@@ -627,6 +678,35 @@ bool LoadSymbols(const string& obj_file,
         fprintf(stderr, "%s: \".debug_info\" section found, but failed to load "
                 "DWARF debugging information\n", obj_file.c_str());
       }
+    }
+
+    // See if there are export symbols available.
+    const Shdr* dynsym_section =
+      FindElfSectionByName<ElfClass>(".dynsym", SHT_DYNSYM,
+                                     sections, names, names_end,
+                                     elf_header->e_shnum);
+    const Shdr* dynstr_section =
+      FindElfSectionByName<ElfClass>(".dynstr", SHT_STRTAB,
+                                     sections, names, names_end,
+                                     elf_header->e_shnum);
+    if (dynsym_section && dynstr_section) {
+      info->LoadedSection(".dynsym");
+
+      const uint8_t* dynsyms =
+          GetOffset<ElfClass, uint8_t>(elf_header,
+                                       dynsym_section->sh_offset);
+      const uint8_t* dynstrs =
+          GetOffset<ElfClass, uint8_t>(elf_header,
+                                       dynstr_section->sh_offset);
+      bool result =
+          ELFSymbolsToModule(dynsyms,
+                             dynsym_section->sh_size,
+                             dynstrs,
+                             dynstr_section->sh_size,
+                             big_endian,
+                             ElfClass::kAddrSize,
+                             module);
+      found_usable_info = found_usable_info || result;
     }
   }
 
@@ -708,40 +788,8 @@ bool LoadSymbols(const string& obj_file,
                 obj_file.c_str());
       }
     } else {
-      if (options.symbol_data != ONLY_CFI) {
-        // The caller doesn't want to consult .gnu_debuglink.
-        // See if there are export symbols available.
-        const Shdr* dynsym_section =
-          FindElfSectionByName<ElfClass>(".dynsym", SHT_DYNSYM,
-                                         sections, names, names_end,
-                                         elf_header->e_shnum);
-        const Shdr* dynstr_section =
-          FindElfSectionByName<ElfClass>(".dynstr", SHT_STRTAB,
-                                         sections, names, names_end,
-                                         elf_header->e_shnum);
-        if (dynsym_section && dynstr_section) {
-          info->LoadedSection(".dynsym");
-
-          const uint8_t* dynsyms =
-              GetOffset<ElfClass, uint8_t>(elf_header,
-                                           dynsym_section->sh_offset);
-          const uint8_t* dynstrs =
-              GetOffset<ElfClass, uint8_t>(elf_header,
-                                           dynstr_section->sh_offset);
-          bool result =
-              ELFSymbolsToModule(dynsyms,
-                                 dynsym_section->sh_size,
-                                 dynstrs,
-                                 dynstr_section->sh_size,
-                                 big_endian,
-                                 ElfClass::kAddrSize,
-                                 module);
-          found_usable_info = found_usable_info || result;
-        }
-      }
-
-      // Return true if some usable information was found, since
-      // the caller doesn't want to use .gnu_debuglink.
+      // Return true if some usable information was found, since the caller
+      // doesn't want to use .gnu_debuglink.
       return found_usable_info;
     }
 
@@ -804,11 +852,42 @@ string BaseFileName(const string &filename) {
 }
 
 template<typename ElfClass>
+bool SanitizeDebugFile(const typename ElfClass::Ehdr* debug_elf_header,
+                       const string& debuglink_file,
+                       const string& obj_filename,
+                       const char* obj_file_architecture,
+                       const bool obj_file_is_big_endian) {
+  const char* debug_architecture =
+      ElfArchitecture<ElfClass>(debug_elf_header);
+  if (!debug_architecture) {
+    fprintf(stderr, "%s: unrecognized ELF machine architecture: %d\n",
+            debuglink_file.c_str(), debug_elf_header->e_machine);
+    return false;
+  }
+  if (strcmp(obj_file_architecture, debug_architecture)) {
+    fprintf(stderr, "%s with ELF machine architecture %s does not match "
+            "%s with ELF architecture %s\n",
+            debuglink_file.c_str(), debug_architecture,
+            obj_filename.c_str(), obj_file_architecture);
+    return false;
+  }
+  bool debug_big_endian;
+  if (!ElfEndianness<ElfClass>(debug_elf_header, &debug_big_endian))
+    return false;
+  if (debug_big_endian != obj_file_is_big_endian) {
+    fprintf(stderr, "%s and %s does not match in endianness\n",
+            obj_filename.c_str(), debuglink_file.c_str());
+    return false;
+  }
+  return true;
+}
+
+template<typename ElfClass>
 bool ReadSymbolDataElfClass(const typename ElfClass::Ehdr* elf_header,
-                             const string& obj_filename,
-                             const std::vector<string>& debug_dirs,
-                             const DumpOptions& options,
-                             Module** out_module) {
+                            const string& obj_filename,
+                            const std::vector<string>& debug_dirs,
+                            const DumpOptions& options,
+                            Module** out_module) {
   typedef typename ElfClass::Ehdr Ehdr;
   typedef typename ElfClass::Shdr Shdr;
 
@@ -852,34 +931,13 @@ bool ReadSymbolDataElfClass(const typename ElfClass::Ehdr* elf_header,
     MmapWrapper debug_map_wrapper;
     Ehdr* debug_elf_header = NULL;
     if (!LoadELF(debuglink_file, &debug_map_wrapper,
-                 reinterpret_cast<void**>(&debug_elf_header)))
-      return false;
-    // Sanity checks to make sure everything matches up.
-    const char *debug_architecture =
-        ElfArchitecture<ElfClass>(debug_elf_header);
-    if (!debug_architecture) {
-      fprintf(stderr, "%s: unrecognized ELF machine architecture: %d\n",
-              debuglink_file.c_str(), debug_elf_header->e_machine);
-      return false;
-    }
-    if (strcmp(architecture, debug_architecture)) {
-      fprintf(stderr, "%s with ELF machine architecture %s does not match "
-              "%s with ELF architecture %s\n",
-              debuglink_file.c_str(), debug_architecture,
-              obj_filename.c_str(), architecture);
+                 reinterpret_cast<void**>(&debug_elf_header)) ||
+        !SanitizeDebugFile<ElfClass>(debug_elf_header, debuglink_file,
+                                     obj_filename, architecture, big_endian)) {
       return false;
     }
 
-    bool debug_big_endian;
-    if (!ElfEndianness<ElfClass>(debug_elf_header, &debug_big_endian))
-      return false;
-    if (debug_big_endian != big_endian) {
-      fprintf(stderr, "%s and %s does not match in endianness\n",
-              obj_filename.c_str(), debuglink_file.c_str());
-      return false;
-    }
-
-    if (!LoadSymbols<ElfClass>(debuglink_file, debug_big_endian,
+    if (!LoadSymbols<ElfClass>(debuglink_file, big_endian,
                                debug_elf_header, false, &info,
                                options, module.get())) {
       return false;

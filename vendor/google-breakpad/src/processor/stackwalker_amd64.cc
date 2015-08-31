@@ -147,6 +147,52 @@ StackFrameAMD64* StackwalkerAMD64::GetCallerByCFIFrameInfo(
   return frame.release();
 }
 
+StackFrameAMD64* StackwalkerAMD64::GetCallerByFramePointerRecovery(
+    const vector<StackFrame*>& frames) {
+  StackFrameAMD64* last_frame = static_cast<StackFrameAMD64*>(frames.back());
+  uint64_t last_rsp = last_frame->context.rsp;
+  uint64_t last_rbp = last_frame->context.rbp;
+
+  // Assume the presence of a frame pointer. This is not mandated by the
+  // AMD64 ABI, c.f. section 3.2.2 footnote 7, though it is typical for
+  // compilers to still preserve the frame pointer and not treat %rbp as a
+  // general purpose register.
+  //
+  // With this assumption, the CALL instruction pushes the return address
+  // onto the stack and sets %rip to the procedure to enter. The procedure
+  // then establishes the stack frame with a prologue that PUSHes the current
+  // %rbp onto the stack, MOVes the current %rsp to %rbp, and then allocates
+  // space for any local variables. Using this procedure linking information,
+  // it is possible to locate frame information for the callee:
+  //
+  // %caller_rsp = *(%callee_rbp + 16)
+  // %caller_rip = *(%callee_rbp + 8)
+  // %caller_rbp = *(%callee_rbp)
+
+  uint64_t caller_rip, caller_rbp;
+  if (memory_->GetMemoryAtAddress(last_rbp + 8, &caller_rip) &&
+      memory_->GetMemoryAtAddress(last_rbp, &caller_rbp)) {
+    uint64_t caller_rsp = last_rbp + 16;
+
+    // Simple sanity check that the stack is growing downwards as expected.
+    if (caller_rbp < last_rbp || caller_rsp < last_rsp)
+      return NULL;
+
+    StackFrameAMD64* frame = new StackFrameAMD64();
+    frame->trust = StackFrame::FRAME_TRUST_FP;
+    frame->context = last_frame->context;
+    frame->context.rip = caller_rip;
+    frame->context.rsp = caller_rsp;
+    frame->context.rbp = caller_rbp;
+    frame->context_validity = StackFrameAMD64::CONTEXT_VALID_RIP |
+                              StackFrameAMD64::CONTEXT_VALID_RSP |
+                              StackFrameAMD64::CONTEXT_VALID_RBP;
+    return frame;
+  }
+
+  return NULL;
+}
+
 StackFrameAMD64* StackwalkerAMD64::GetCallerByStackScan(
     const vector<StackFrame*> &frames) {
   StackFrameAMD64* last_frame = static_cast<StackFrameAMD64*>(frames.back());
@@ -214,8 +260,12 @@ StackFrame* StackwalkerAMD64::GetCallerFrame(const CallStack* stack,
   if (cfi_frame_info.get())
     new_frame.reset(GetCallerByCFIFrameInfo(frames, cfi_frame_info.get()));
 
-  // If CFI failed, or there wasn't CFI available, fall back
-  // to stack scanning.
+  // If CFI was not available or failed, try using frame pointer recovery.
+  if (!new_frame.get()) {
+    new_frame.reset(GetCallerByFramePointerRecovery(frames));
+  }
+
+  // If all else fails, fall back to stack scanning.
   if (stack_scan_allowed && !new_frame.get()) {
     new_frame.reset(GetCallerByStackScan(frames));
   }

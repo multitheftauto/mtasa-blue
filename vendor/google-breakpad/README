@@ -28,7 +28,7 @@ To request change review:
 3. Download http://codereview.appspot.com/static/upload.py
 
 4. Run upload.py from the 'src' directory:
-   upload.py --server=breakpad.appspot.com
+   upload.py --server=codereview.chromium.org
 
    You will be prompted for credential and a description.
 

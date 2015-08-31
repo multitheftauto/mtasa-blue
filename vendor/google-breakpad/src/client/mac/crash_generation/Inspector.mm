@@ -43,6 +43,7 @@
 
 #import "common/mac/MachIPC.h"
 #include "common/mac/bootstrap_compat.h"
+#include "common/mac/launch_reporter.h"
 
 #import "GTMDefines.h"
 
@@ -76,7 +77,9 @@ void Inspector::Inspect(const char *receive_port_name) {
       if (wrote_minidump) {
         // Ask the user if he wants to upload the crash report to a server,
         // and do so if he agrees.
-        LaunchReporter(config_file_.GetFilePath());
+        LaunchReporter(
+            config_params_.GetValueForKey(BREAKPAD_REPORTER_EXE_LOCATION),
+            config_file_.GetFilePath());
       } else {
         fprintf(stderr, "Inspection of crashed process failed\n");
       }
@@ -353,52 +356,6 @@ kern_return_t Inspector::SendAcknowledgement() {
   }
 
   return KERN_INVALID_NAME;
-}
-
-//=============================================================================
-void Inspector::LaunchReporter(const char *inConfigFilePath) {
-  // Extract the path to the reporter executable.
-  const char *reporterExecutablePath =
-          config_params_.GetValueForKey(BREAKPAD_REPORTER_EXE_LOCATION);
-
-  // Setup and launch the crash dump sender.
-  const char *argv[3];
-  argv[0] = reporterExecutablePath;
-  argv[1] = inConfigFilePath;
-  argv[2] = NULL;
-
-  // Launch the reporter
-  pid_t pid = fork();
-
-  // If we're in the child, load in our new executable and run.
-  // The parent will not wait for the child to complete.
-  if (pid == 0) {
-    execv(argv[0], (char * const *)argv);
-    config_file_.Unlink();  // launch failed - get rid of config file
-    _exit(1);
-  }
-
-  // Wait until the Reporter child process exits.
-  //
-
-  // We'll use a timeout of one minute.
-  int timeoutCount = 60;   // 60 seconds
-
-  while (timeoutCount-- > 0) {
-    int status;
-    pid_t result = waitpid(pid, &status, WNOHANG);
-
-    if (result == 0) {
-      // The child has not yet finished.
-      sleep(1);
-    } else if (result == -1) {
-      // error occurred.
-      break;
-    } else {
-      // child has finished
-      break;
-    }
-  }
 }
 
 } // namespace google_breakpad

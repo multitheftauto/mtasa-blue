@@ -45,6 +45,7 @@ ProcessState::~ProcessState() {
 
 void ProcessState::Clear() {
   time_date_stamp_ = 0;
+  process_create_time_ = 0;
   crashed_ = false;
   crash_reason_.clear();
   crash_address_ = 0;

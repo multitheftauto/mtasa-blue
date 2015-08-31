@@ -37,6 +37,7 @@
 //
 // Author: Siyang Xie (lambxsy@google.com)
 
+#include <assert.h>
 #include <stdio.h>
 
 #include <sstream>
@@ -112,6 +113,9 @@ class MockMemoryRegion: public MemoryRegion {
   bool GetMemoryAtAddress(uint64_t address, uint64_t *value) const {
     *value = address;
     return true;
+  }
+  void Print() const {
+    assert(false);
   }
 };
 

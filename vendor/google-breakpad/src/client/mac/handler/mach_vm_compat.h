@@ -39,11 +39,7 @@
 #define mach_vm_address_t vm_address_t
 #define mach_vm_deallocate vm_deallocate
 #define mach_vm_read vm_read
-#if defined(__LP64__)
 #define mach_vm_region_recurse vm_region_recurse_64
-#else
-#define mach_vm_region_recurse vm_region_recurse
-#endif
 #define mach_vm_size_t vm_size_t
 #else
 #include <mach/mach_vm.h>

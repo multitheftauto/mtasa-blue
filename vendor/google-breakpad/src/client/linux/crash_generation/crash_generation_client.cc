@@ -50,7 +50,7 @@ class CrashGenerationClientImpl : public CrashGenerationClient {
 
   virtual bool RequestDump(const void* blob, size_t blob_size) {
     int fds[2];
-    if (sys_socketpair(AF_UNIX, SOCK_STREAM, 0, fds) < 0)
+    if (sys_pipe(fds) < 0)
       return false;
     static const unsigned kControlMsgSize = CMSG_SPACE(sizeof(int));
 

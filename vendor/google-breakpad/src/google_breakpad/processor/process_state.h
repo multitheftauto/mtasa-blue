@@ -97,13 +97,14 @@ class ProcessState {
 
   // Accessors.  See the data declarations below.
   uint32_t time_date_stamp() const { return time_date_stamp_; }
+  uint32_t process_create_time() const { return process_create_time_; }
   bool crashed() const { return crashed_; }
   string crash_reason() const { return crash_reason_; }
   uint64_t crash_address() const { return crash_address_; }
   string assertion() const { return assertion_; }
   int requesting_thread() const { return requesting_thread_; }
   const vector<CallStack*>* threads() const { return &threads_; }
-  const vector<MinidumpMemoryRegion*>* thread_memory_regions() const {
+  const vector<MemoryRegion*>* thread_memory_regions() const {
     return &thread_memory_regions_;
   }
   const SystemInfo* system_info() const { return &system_info_; }
@@ -117,11 +118,16 @@ class ProcessState {
   ExploitabilityRating exploitability() const { return exploitability_; }
 
  private:
-  // MinidumpProcessor is responsible for building ProcessState objects.
+  // MinidumpProcessor and MicrodumpProcessor are responsible for building
+  // ProcessState objects.
   friend class MinidumpProcessor;
+  friend class MicrodumpProcessor;
 
   // The time-date stamp of the minidump (time_t format)
   uint32_t time_date_stamp_;
+
+  // The time-date stamp when the process was created (time_t format)
+  uint32_t process_create_time_;
 
   // True if the process crashed, false if the dump was produced outside
   // of an exception handler.
@@ -157,7 +163,7 @@ class ProcessState {
   // Stacks for each thread (except possibly the exception handler
   // thread) at the time of the crash.
   vector<CallStack*> threads_;
-  vector<MinidumpMemoryRegion*> thread_memory_regions_;
+  vector<MemoryRegion*> thread_memory_regions_;
 
   // OS and CPU information.
   SystemInfo system_info_;
@@ -174,7 +180,7 @@ class ProcessState {
 
   // The exploitability rating as determined by the exploitability
   // engine. When the exploitability engine is not enabled this
-  // defaults to EXPLOITABILITY_NONE.
+  // defaults to EXPLOITABILITY_NOT_ANALYZED.
   ExploitabilityRating exploitability_;
 };
 

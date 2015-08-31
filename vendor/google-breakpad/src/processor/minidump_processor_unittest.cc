@@ -66,6 +66,7 @@ class MockMinidump : public Minidump {
   MOCK_CONST_METHOD0(header, const MDRawHeader*());
   MOCK_METHOD0(GetThreadList, MinidumpThreadList*());
   MOCK_METHOD0(GetSystemInfo, MinidumpSystemInfo*());
+  MOCK_METHOD0(GetMiscInfo, MinidumpMiscInfo*());
   MOCK_METHOD0(GetBreakpadInfo, MinidumpBreakpadInfo*());
   MOCK_METHOD0(GetException, MinidumpException*());
   MOCK_METHOD0(GetAssertion, MinidumpAssertion*());
@@ -126,6 +127,17 @@ class MockMinidumpMemoryRegion : public MinidumpMemoryRegion {
   MockMemoryRegion region_;
 };
 
+// A test miscelaneous info stream, just returns values from the
+// MDRawMiscInfo fed to it.
+class TestMinidumpMiscInfo : public MinidumpMiscInfo {
+ public:
+  explicit TestMinidumpMiscInfo(const MDRawMiscInfo& misc_info) :
+      MinidumpMiscInfo(NULL) {
+    valid_ = true;
+    misc_info_ = misc_info;
+  }
+};
+
 }  // namespace google_breakpad
 
 namespace {
@@ -135,6 +147,7 @@ using google_breakpad::CallStack;
 using google_breakpad::CodeModule;
 using google_breakpad::MinidumpContext;
 using google_breakpad::MinidumpMemoryRegion;
+using google_breakpad::MinidumpMiscInfo;
 using google_breakpad::MinidumpProcessor;
 using google_breakpad::MinidumpSystemInfo;
 using google_breakpad::MinidumpThreadList;
@@ -299,8 +312,8 @@ class TestMinidumpContext : public MinidumpContext {
   explicit TestMinidumpContext(const MDRawContextX86& context) :
       MinidumpContext(NULL) {
     valid_ = true;
-    context_.x86 = new MDRawContextX86(context);
-    context_flags_ = MD_CONTEXT_X86;
+    SetContextX86(new MDRawContextX86(context));
+    SetContextFlags(MD_CONTEXT_X86);
   }
 };
 
@@ -402,6 +415,8 @@ TEST_F(MinidumpProcessorTest, TestBasicProcessing) {
   ASSERT_EQ(state.crash_address(), 0x45U);
   ASSERT_EQ(state.threads()->size(), size_t(1));
   ASSERT_EQ(state.requesting_thread(), 0);
+  EXPECT_EQ(1171480435U, state.time_date_stamp());
+  EXPECT_EQ(1171480435U, state.process_create_time());
 
   CallStack *stack = state.threads()->at(0);
   ASSERT_TRUE(stack);
@@ -527,6 +542,40 @@ TEST_F(MinidumpProcessorTest, TestThreadMissingMemory) {
   ASSERT_EQ(1U, state.threads()->size());
   ASSERT_EQ(1U, state.threads()->at(0)->frames()->size());
   ASSERT_EQ(kExpectedEIP, state.threads()->at(0)->frames()->at(0)->instruction);
+}
+
+TEST_F(MinidumpProcessorTest, GetProcessCreateTime) {
+  const uint32_t kProcessCreateTime = 2000;
+  const uint32_t kTimeDateStamp = 5000;
+  MockMinidump dump;
+  EXPECT_CALL(dump, path()).WillRepeatedly(Return("mock minidump"));
+  EXPECT_CALL(dump, Read()).WillRepeatedly(Return(true));
+
+  // Set time of crash.
+  MDRawHeader fake_header;
+  fake_header.time_date_stamp = kTimeDateStamp;
+  EXPECT_CALL(dump, header()).WillRepeatedly(Return(&fake_header));
+
+  // Set process create time.
+  MDRawMiscInfo raw_misc_info;
+  memset(&raw_misc_info, 0, sizeof(raw_misc_info));
+  raw_misc_info.process_create_time = kProcessCreateTime;
+  raw_misc_info.flags1 |= MD_MISCINFO_FLAGS1_PROCESS_TIMES;
+  google_breakpad::TestMinidumpMiscInfo dump_misc_info(raw_misc_info);
+  EXPECT_CALL(dump, GetMiscInfo()).WillRepeatedly(Return(&dump_misc_info));
+
+  // No threads
+  MockMinidumpThreadList thread_list;
+  EXPECT_CALL(dump, GetThreadList()).WillOnce(Return(&thread_list));
+  EXPECT_CALL(thread_list, thread_count()).WillRepeatedly(Return(0));
+
+  MinidumpProcessor processor(reinterpret_cast<SymbolSupplier*>(NULL), NULL);
+  ProcessState state;
+  EXPECT_EQ(google_breakpad::PROCESS_OK, processor.Process(&dump, &state));
+
+  // Verify the time stamps.
+  ASSERT_EQ(kTimeDateStamp, state.time_date_stamp());
+  ASSERT_EQ(kProcessCreateTime, state.process_create_time());
 }
 
 TEST_F(MinidumpProcessorTest, TestThreadMissingContext) {
