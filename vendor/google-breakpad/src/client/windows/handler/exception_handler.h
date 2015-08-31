@@ -57,8 +57,8 @@
 #define CLIENT_WINDOWS_HANDLER_EXCEPTION_HANDLER_H__
 
 #include <stdlib.h>
-#include <Windows.h>
-#include <DbgHelp.h>
+#include <windows.h>
+#include <dbghelp.h>
 #include <rpc.h>
 
 #pragma warning(push)
@@ -261,6 +261,15 @@ class ExceptionHandler {
   bool get_handle_debug_exceptions() const { return handle_debug_exceptions_; }
   void set_handle_debug_exceptions(bool handle_debug_exceptions) {
     handle_debug_exceptions_ = handle_debug_exceptions;
+  }
+
+  // Controls behavior of EXCEPTION_INVALID_HANDLE.
+  bool get_consume_invalid_handle_exceptions() const {
+    return consume_invalid_handle_exceptions_;
+  }
+  void set_consume_invalid_handle_exceptions(
+      bool consume_invalid_handle_exceptions) {
+    consume_invalid_handle_exceptions_ = consume_invalid_handle_exceptions;
   }
 
   // Returns whether out-of-process dump generation is used or not.
@@ -471,6 +480,10 @@ class ExceptionHandler {
   // EXCEPTION_SINGLE_STEP exceptions.  Leave this false (the default)
   // to not interfere with debuggers.
   bool handle_debug_exceptions_;
+
+  // If true, the handler will consume any EXCEPTION_INVALID_HANDLE exceptions.
+  // Leave this false (the default) to handle these exceptions as normal.
+  bool consume_invalid_handle_exceptions_;
 
   // Callers can request additional memory regions to be included in
   // the dump.

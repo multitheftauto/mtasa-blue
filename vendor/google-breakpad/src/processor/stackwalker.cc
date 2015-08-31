@@ -41,7 +41,7 @@
 #include "google_breakpad/processor/call_stack.h"
 #include "google_breakpad/processor/code_module.h"
 #include "google_breakpad/processor/code_modules.h"
-#include "google_breakpad/processor/minidump.h"
+#include "google_breakpad/processor/dump_context.h"
 #include "google_breakpad/processor/stack_frame.h"
 #include "google_breakpad/processor/stack_frame_symbolizer.h"
 #include "google_breakpad/processor/system_info.h"
@@ -190,7 +190,7 @@ bool Stackwalker::Walk(
 // static
 Stackwalker* Stackwalker::StackwalkerForCPU(
     const SystemInfo* system_info,
-    MinidumpContext* context,
+    DumpContext* context,
     MemoryRegion* memory,
     const CodeModules* modules,
     StackFrameSymbolizer* frame_symbolizer) {

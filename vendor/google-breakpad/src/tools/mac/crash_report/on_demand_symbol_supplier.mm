@@ -40,7 +40,7 @@
 #include "processor/pathname_stripper.h"
 
 #include "on_demand_symbol_supplier.h"
-#include "dump_syms.h"
+#include "common/mac/dump_syms.h"
 
 using std::map;
 using std::string;

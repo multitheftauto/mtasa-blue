@@ -46,6 +46,7 @@
 
 #include "common/byte_cursor.h"
 #include "common/mac/macho_reader.h"
+#include "common/mac/super_fat_arch.h"
 #include "common/module.h"
 #include "common/symbol_data.h"
 
@@ -59,6 +60,7 @@ class DumpSymbols {
         input_pathname_(),
         object_filename_(),
         contents_(),
+        object_files_(),
         selected_object_file_(),
         selected_object_name_() { }
   ~DumpSymbols() {
@@ -98,14 +100,14 @@ class DumpSymbols {
   // architecture matches that of this dumper program.
   bool SetArchitecture(const std::string &arch_name);
 
-  // Return a pointer to an array of 'struct fat_arch' structures,
-  // describing the object files contained in this dumper's file. Set
-  // *|count| to the number of elements in the array. The returned array is
-  // owned by this DumpSymbols instance.
+  // Return a pointer to an array of SuperFatArch structures describing the
+  // object files contained in this dumper's file. Set *|count| to the number
+  // of elements in the array. The returned array is owned by this DumpSymbols
+  // instance.
   //
   // If there are no available architectures, this function
   // may return NULL.
-  const struct fat_arch *AvailableArchitectures(size_t *count) {
+  const SuperFatArch* AvailableArchitectures(size_t *count) {
     *count = object_files_.size();
     if (object_files_.size() > 0)
       return &object_files_[0];
@@ -126,6 +128,11 @@ class DumpSymbols {
   // Used internally.
   class DumperLineToModule;
   class LoadCommandDumper;
+
+  // This method behaves similarly to NXFindBestFatArch, but it supports
+  // SuperFatArch.
+  SuperFatArch* FindBestMatchForArchitecture(
+      cpu_type_t cpu_type, cpu_subtype_t cpu_subtype);
 
   // Return an identifier string for the file this DumpSymbols is dumping.
   std::string Identifier();
@@ -167,15 +174,15 @@ class DumpSymbols {
   // The complete contents of object_filename_, mapped into memory.
   NSData *contents_;
 
-  // A vector of fat_arch structures describing the object files
+  // A vector of SuperFatArch structures describing the object files
   // object_filename_ contains. If object_filename_ refers to a fat binary,
   // this may have more than one element; if it refers to a Mach-O file, this
   // has exactly one element.
-  vector<struct fat_arch> object_files_;
+  vector<SuperFatArch> object_files_;
 
   // The object file in object_files_ selected to dump, or NULL if
   // SetArchitecture hasn't been called yet.
-  const struct fat_arch *selected_object_file_;
+  const SuperFatArch *selected_object_file_;
 
   // A string that identifies the selected object file, for use in error
   // messages.  This is usually object_filename_, but if that refers to a

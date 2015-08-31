@@ -441,7 +441,7 @@ TEST(LinuxPtraceDumperTest, VerifyStackReadWithMultipleThreads) {
     pid_t* process_tid_location = (pid_t*)(one_thread.regs.rcx);
 #elif defined(__mips__)
     pid_t* process_tid_location =
-        reinterpret_cast<pid_t*>(one_thread.regs.regs[1]);
+        reinterpret_cast<pid_t*>(one_thread.mcontext.gregs[1]);
 #else
 #error This test has not been ported to this platform.
 #endif

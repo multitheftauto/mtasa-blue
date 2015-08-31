@@ -66,24 +66,6 @@
 #ifndef GOOGLE_BREAKPAD_COMMON_MINIDUMP_CPU_MIPS_H__
 #define GOOGLE_BREAKPAD_COMMON_MINIDUMP_CPU_MIPS_H__
 
-#if defined(__mips__) && !defined(__ANDROID__)
-typedef struct {
-  uint64_t regs[32];
-  uint64_t lo;
-  uint64_t hi;
-  uint64_t epc;
-  uint64_t badvaddr;
-  uint64_t status;
-  uint64_t cause;
-} user_regs_struct;
-
-typedef struct {
-  uint64_t regs[32];
-  uint32_t fpcsr;
-  uint32_t fir;
-} user_fpregs_struct;
-#endif
-
 #define MD_CONTEXT_MIPS_GPR_COUNT 32
 #define MD_FLOATINGSAVEAREA_MIPS_FPR_COUNT 32
 #define MD_CONTEXT_MIPS_DSP_COUNT 3
@@ -112,8 +94,8 @@ typedef struct {
 
   /* 32 64-bit integer registers, r0..r31.
    * Note the following fixed uses:
-   *   r30 is the stack pointer.
-   *   r31 is the return address (link register).
+   *   r29 is the stack pointer.
+   *   r31 is the return address.
    */
   uint64_t iregs[MD_CONTEXT_MIPS_GPR_COUNT];
 

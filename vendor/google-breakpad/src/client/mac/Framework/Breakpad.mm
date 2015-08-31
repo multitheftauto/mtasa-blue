@@ -44,10 +44,11 @@
 #import "client/mac/Framework/Breakpad.h"
 #import "client/mac/Framework/OnDemandServer.h"
 #import "client/mac/handler/protected_memory_allocator.h"
+#include "common/mac/launch_reporter.h"
 #import "common/mac/MachIPC.h"
 #import "common/simple_string_dictionary.h"
 
-#ifndef __EXCEPTIONS
+#if !defined(__EXCEPTIONS) || (__clang__ && !__has_feature(cxx_exceptions))
 // This file uses C++ try/catch (but shouldn't). Duplicate the macros from
 // <c++/4.2.1/exception_defines.h> allowing this file to work properly with
 // exceptions disabled even when other C++ libraries are used. #undef the try
@@ -173,6 +174,8 @@ class Breakpad {
   }
 
   bool Initialize(NSDictionary *parameters);
+  bool InitializeInProcess(NSDictionary *parameters);
+  bool InitializeOutOfProcess(NSDictionary *parameters);
 
   bool ExtractParameters(NSDictionary *parameters);
 
@@ -187,6 +190,17 @@ class Breakpad {
                        int exception_code,
                        int exception_subcode,
                        mach_port_t crashing_thread);
+
+  // Dispatches to HandleMinidump().
+  // This gets called instead of ExceptionHandlerDirectCallback when running
+  // with the BREAKPAD_IN_PROCESS option.
+  static bool HandleMinidumpCallback(const char *dump_dir,
+                                     const char *minidump_id,
+                                     void *context,
+                                     bool succeeded);
+
+  // This is only used when BREAKPAD_IN_PROCESS is YES.
+  bool HandleMinidump(const char *dump_dir, const char *minidump_id);
 
   // Since ExceptionHandler (w/o namespace) is defined as typedef in OSX's
   // MachineExceptions.h, we have to explicitly name the handler.
@@ -266,6 +280,21 @@ bool Breakpad::ExceptionHandlerDirectCallback(void *context,
 }
 
 //=============================================================================
+bool Breakpad::HandleMinidumpCallback(const char *dump_dir,
+                                      const char *minidump_id,
+                                      void *context,
+                                      bool succeeded) {
+  Breakpad *breakpad = (Breakpad *)context;
+
+  // If our context is damaged or something, just return false to indicate that
+  // the handler should continue without us.
+  if (!breakpad || !succeeded)
+    return false;
+
+  return breakpad->HandleMinidump(dump_dir, minidump_id);
+}
+
+//=============================================================================
 #pragma mark -
 
 #include <dlfcn.h>
@@ -326,6 +355,25 @@ bool Breakpad::Initialize(NSDictionary *parameters) {
     return false;
   }
 
+  if ([[parameters objectForKey:@BREAKPAD_IN_PROCESS] boolValue])
+    return InitializeInProcess(parameters);
+  else
+    return InitializeOutOfProcess(parameters);
+}
+
+//=============================================================================
+bool Breakpad::InitializeInProcess(NSDictionary* parameters) {
+  handler_ =
+      new (gBreakpadAllocator->Allocate(
+          sizeof(google_breakpad::ExceptionHandler)))
+          google_breakpad::ExceptionHandler(
+              config_params_->GetValueForKey(BREAKPAD_DUMP_DIRECTORY),
+              0, &HandleMinidumpCallback, this, true, 0);
+  return true;    
+}
+
+//=============================================================================
+bool Breakpad::InitializeOutOfProcess(NSDictionary* parameters) {
   // Get path to Inspector executable.
   NSString *inspectorPathString = KeyValue(@BREAKPAD_INSPECTOR_LOCATION);
 
@@ -708,6 +756,16 @@ bool Breakpad::HandleException(int exception_type,
   if (send_and_exit_) return true;
 
   return false;
+}
+
+//=============================================================================
+bool Breakpad::HandleMinidump(const char *dump_dir, const char *minidump_id) {
+  google_breakpad::ConfigFile config_file;
+  config_file.WriteFile(dump_dir, config_params_, dump_dir, minidump_id);
+  google_breakpad::LaunchReporter(
+      config_params_->GetValueForKey(BREAKPAD_REPORTER_EXE_LOCATION),
+      config_file.GetFilePath());
+  return true;
 }
 
 //=============================================================================

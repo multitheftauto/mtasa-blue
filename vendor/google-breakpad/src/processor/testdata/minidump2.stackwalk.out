@@ -6,6 +6,7 @@ CPU: x86
 
 Crash reason:  EXCEPTION_ACCESS_VIOLATION_WRITE
 Crash address: 0x45
+Process uptime: 0 seconds
 
 Thread 0 (crashed)
  0  test_app.exe!`anonymous namespace'::CrashFunction [test_app.cc : 58 + 0x3]

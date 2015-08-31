@@ -65,7 +65,7 @@
 #ifndef TOOLS_WINDOWS_MS_SYMBOL_SERVER_CONVERTER_H_
 #define TOOLS_WINDOWS_MS_SYMBOL_SERVER_CONVERTER_H_
 
-#include <Windows.h>
+#include <windows.h>
 
 #include <string>
 #include <vector>

@@ -122,6 +122,20 @@
 // Get the number of crash reports waiting to upload.
 - (void)getCrashReportCount:(void(^)(int))callback;
 
+// Get the next report to upload.
+// - If upload is disabled, callback will be called with (nil, -1).
+// - If a delay is to be waited before sending, callback will be called with
+//   (nil, n), with n (> 0) being the number of seconds to wait.
+// - if no delay is needed, callback will be called with (0, configuration),
+//   configuration being next report to upload, or nil if none is pending.
+- (void)getNextReportConfigurationOrSendDelay:
+    (void(^)(NSDictionary*, int))callback;
+
+// Sends synchronously the report specified by |configuration|. This method is
+// NOT thread safe and must be called from the breakpad thread.
+- (void)threadUnsafeSendReportWithConfiguration:(NSDictionary*)configuration
+                                withBreakpadRef:(BreakpadRef)ref;
+
 @end
 
 #endif  // CLIENT_IOS_HANDLER_IOS_BREAKPAD_CONTROLLER_H_

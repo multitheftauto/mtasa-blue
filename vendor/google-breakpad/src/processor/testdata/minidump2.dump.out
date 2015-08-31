@@ -9,67 +9,67 @@ MDRawHeader
 
 mDirectory[0]
 MDRawDirectory
-  stream_type        = 3
+  stream_type        = 0x3 (MD_THREAD_LIST_STREAM)
   location.data_size = 100
   location.rva       = 0x184
 
 mDirectory[1]
 MDRawDirectory
-  stream_type        = 4
+  stream_type        = 0x4 (MD_MODULE_LIST_STREAM)
   location.data_size = 1408
   location.rva       = 0x1e8
 
 mDirectory[2]
 MDRawDirectory
-  stream_type        = 5
+  stream_type        = 0x5 (MD_MEMORY_LIST_STREAM)
   location.data_size = 52
   location.rva       = 0x1505
 
 mDirectory[3]
 MDRawDirectory
-  stream_type        = 6
+  stream_type        = 0x6 (MD_EXCEPTION_STREAM)
   location.data_size = 168
   location.rva       = 0xdc
 
 mDirectory[4]
 MDRawDirectory
-  stream_type        = 7
+  stream_type        = 0x7 (MD_SYSTEM_INFO_STREAM)
   location.data_size = 56
   location.rva       = 0x8c
 
 mDirectory[5]
 MDRawDirectory
-  stream_type        = 15
+  stream_type        = 0xf (MD_MISC_INFO_STREAM)
   location.data_size = 24
   location.rva       = 0xc4
 
 mDirectory[6]
 MDRawDirectory
-  stream_type        = 1197932545
+  stream_type        = 0x47670001 (MD_BREAKPAD_INFO_STREAM)
   location.data_size = 12
   location.rva       = 0x14f9
 
 mDirectory[7]
 MDRawDirectory
-  stream_type        = 0
+  stream_type        = 0x0 (MD_UNUSED_STREAM)
   location.data_size = 0
   location.rva       = 0x0
 
 mDirectory[8]
 MDRawDirectory
-  stream_type        = 0
+  stream_type        = 0x0 (MD_UNUSED_STREAM)
   location.data_size = 0
   location.rva       = 0x0
 
 Streams:
-  stream type 0x0 at index 8
-  stream type 0x3 at index 0
-  stream type 0x4 at index 1
-  stream type 0x5 at index 2
-  stream type 0x6 at index 3
-  stream type 0x7 at index 4
-  stream type 0xf at index 5
-  stream type 0x47670001 at index 6
+  stream type 0x0 (MD_UNUSED_STREAM) at index 8
+  stream type 0x3 (MD_THREAD_LIST_STREAM) at index 0
+  stream type 0x4 (MD_MODULE_LIST_STREAM) at index 1
+  stream type 0x5 (MD_MEMORY_LIST_STREAM) at index 2
+  stream type 0x6 (MD_EXCEPTION_STREAM) at index 3
+  stream type 0x7 (MD_SYSTEM_INFO_STREAM) at index 4
+  stream type 0xf (MD_MISC_INFO_STREAM) at index 5
+  stream type 0x47670001 (MD_BREAKPAD_INFO_STREAM) at index 6
 
 MinidumpThreadList
   thread_count = 2

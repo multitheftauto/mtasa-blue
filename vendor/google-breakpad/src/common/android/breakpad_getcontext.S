@@ -229,14 +229,27 @@ breakpad_getcontext:
 
 #elif defined(__mips__)
 
-#if _MIPS_SIM != _ABIO32
-#error "Unsupported mips ISA. Only mips o32 is supported."
-#endif
-
 // This implementation is inspired by implementation of getcontext in glibc.
+#if _MIPS_SIM == _ABIO32
 #include <asm/asm.h>
 #include <asm/regdef.h>
 #include <asm/fpregdef.h>
+#else
+#include <machine/asm.h>
+#include <machine/regdef.h>
+#endif
+
+// from asm/asm.h
+#if _MIPS_SIM == _ABIO32
+#define ALSZ 7
+#define ALMASK ~7
+#define SZREG 4
+#else // _MIPS_SIM != _ABIO32
+#define ALSZ 15
+#define ALMASK ~15
+#define SZREG 8
+#endif
+
 #include <asm/unistd.h> // for __NR_rt_sigprocmask
 
 #define _NSIG8 128 / 8
@@ -244,11 +257,13 @@ breakpad_getcontext:
 
 
   .text
-LOCALS_NUM = 2	// save gp and ra on stack
+LOCALS_NUM = 1 // save gp on stack
 FRAME_SIZE = ((LOCALS_NUM * SZREG) + ALSZ) & ALMASK
-RA_FRAME_OFFSET = FRAME_SIZE - (1 * SZREG)
-GP_FRAME_OFFSET = FRAME_SIZE - (2 * SZREG)
+
+GP_FRAME_OFFSET = FRAME_SIZE - (1 * SZREG)
 MCONTEXT_REG_SIZE = 8
+
+#if _MIPS_SIM == _ABIO32
 
 NESTED (breakpad_getcontext, FRAME_SIZE, ra)
   .mask	0x00000000, 0
@@ -262,8 +277,7 @@ NESTED (breakpad_getcontext, FRAME_SIZE, ra)
 #define _SP a2
 
   addiu sp, -FRAME_SIZE
-  sw ra, RA_FRAME_OFFSET(sp)
-  sw gp, GP_FRAME_OFFSET(sp)
+  .cprestore GP_FRAME_OFFSET
 
   sw s0, (16 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
   sw s1, (17 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
@@ -298,12 +312,95 @@ NESTED (breakpad_getcontext, FRAME_SIZE, ra)
   li v0, __NR_rt_sigprocmask
   syscall
 
-  lw ra, RA_FRAME_OFFSET(sp)
-  lw gp, GP_FRAME_OFFSET(sp)
   addiu sp, FRAME_SIZE
   jr ra
 
 END (breakpad_getcontext)
+#else
+
+#ifndef NESTED
+/*
+ * NESTED - declare nested routine entry point
+ */
+#define NESTED(symbol, framesize, rpc)  \
+    .globl  symbol;                     \
+    .align  2;                          \
+    .type symbol,@function;             \
+    .ent  symbol,0;                     \
+symbol:   .frame  sp, framesize, rpc;
+#endif
+
+/*
+ * END - mark end of function
+ */
+#ifndef END
+# define END(function)                  \
+    .end  function;                     \
+    .size function,.-function
+#endif
+
+/* int getcontext (ucontext_t *ucp) */
+
+NESTED (breakpad_getcontext, FRAME_SIZE, ra)
+  .mask   0x10000000, 0
+  .fmask  0x00000000, 0
+
+  move  a2, sp
+#define _SP a2
+  move  a3, gp
+#define _GP a3
+
+  daddiu sp, -FRAME_SIZE
+  .cpsetup $25, GP_FRAME_OFFSET, breakpad_getcontext
+
+  /* Store a magic flag.  */
+  li  v1, 1
+  sd v1, (0 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)  /* zero */
+
+  sd s0, (16 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd s1, (17 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd s2, (18 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd s3, (19 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd s4, (20 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd s5, (21 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd s6, (22 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd s7, (23 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd _GP, (28 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd _SP, (29 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd s8, (30 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd ra, (31 * MCONTEXT_REG_SIZE + MCONTEXT_GREGS_OFFSET)(a0)
+  sd ra, MCONTEXT_PC_OFFSET(a0)
+
+#ifdef __mips_hard_float
+  s.d $f24, (24 * MCONTEXT_REG_SIZE + MCONTEXT_FPREGS_OFFSET)(a0)
+  s.d $f25, (25 * MCONTEXT_REG_SIZE + MCONTEXT_FPREGS_OFFSET)(a0)
+  s.d $f26, (26 * MCONTEXT_REG_SIZE + MCONTEXT_FPREGS_OFFSET)(a0)
+  s.d $f27, (27 * MCONTEXT_REG_SIZE + MCONTEXT_FPREGS_OFFSET)(a0)
+  s.d $f28, (28 * MCONTEXT_REG_SIZE + MCONTEXT_FPREGS_OFFSET)(a0)
+  s.d $f29, (29 * MCONTEXT_REG_SIZE + MCONTEXT_FPREGS_OFFSET)(a0)
+  s.d $f30, (30 * MCONTEXT_REG_SIZE + MCONTEXT_FPREGS_OFFSET)(a0)
+  s.d $f31, (31 * MCONTEXT_REG_SIZE + MCONTEXT_FPREGS_OFFSET)(a0)
+
+  cfc1  v1, $31
+  sw  v1, MCONTEXT_FPC_CSR(a0)
+#endif /* __mips_hard_float */
+
+/* rt_sigprocmask (SIG_BLOCK, NULL, &ucp->uc_sigmask, _NSIG8) */
+  li  a3, _NSIG8
+  daddu a2, a0, UCONTEXT_SIGMASK_OFFSET
+  move  a1, zero
+  li  a0, SIG_BLOCK
+
+  li  v0, __NR_rt_sigprocmask
+  syscall
+
+  .cpreturn
+  daddiu sp, FRAME_SIZE
+  move  v0, zero
+  jr  ra
+
+END (breakpad_getcontext)
+#endif // _MIPS_SIM == _ABIO32
 
 #elif defined(__x86_64__)
 /* The x64 implementation of breakpad_getcontext was derived in part

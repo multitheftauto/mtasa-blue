@@ -121,12 +121,12 @@ CrashGenerationServer::CrashGenerationServer(
       upload_request_callback_(upload_request_callback),
       upload_context_(upload_context),
       generate_dumps_(generate_dumps),
+      pre_fetch_custom_info_(true),
       dump_path_(dump_path ? *dump_path : L""),
       server_state_(IPC_SERVER_STATE_UNINITIALIZED),
       shutting_down_(false),
       overlapped_(),
-      client_info_(NULL),
-      pre_fetch_custom_info_(true) {
+      client_info_(NULL) {
   InitializeCriticalSection(&sync_);
 }
 

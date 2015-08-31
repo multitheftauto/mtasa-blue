@@ -70,7 +70,7 @@ TEST(ElfCoreDumpTest, TestElfHeader) {
   ElfCoreDump core;
 
   ASSERT_TRUE(WriteFile(core_file, &header, sizeof(header) - 1));
-  ASSERT_TRUE(mapped_core_file.Map(core_file));
+  ASSERT_TRUE(mapped_core_file.Map(core_file, 0));
   core.SetContent(mapped_core_file.content());
   EXPECT_FALSE(core.IsValid());
   EXPECT_EQ(NULL, core.GetHeader());
@@ -80,49 +80,49 @@ TEST(ElfCoreDumpTest, TestElfHeader) {
   EXPECT_FALSE(core.GetFirstNote().IsValid());
 
   ASSERT_TRUE(WriteFile(core_file, &header, sizeof(header)));
-  ASSERT_TRUE(mapped_core_file.Map(core_file));
+  ASSERT_TRUE(mapped_core_file.Map(core_file, 0));
   core.SetContent(mapped_core_file.content());
   EXPECT_FALSE(core.IsValid());
 
   header.e_ident[0] = ELFMAG0;
   ASSERT_TRUE(WriteFile(core_file, &header, sizeof(header)));
-  ASSERT_TRUE(mapped_core_file.Map(core_file));
+  ASSERT_TRUE(mapped_core_file.Map(core_file, 0));
   core.SetContent(mapped_core_file.content());
   EXPECT_FALSE(core.IsValid());
 
   header.e_ident[1] = ELFMAG1;
   ASSERT_TRUE(WriteFile(core_file, &header, sizeof(header)));
-  ASSERT_TRUE(mapped_core_file.Map(core_file));
+  ASSERT_TRUE(mapped_core_file.Map(core_file, 0));
   core.SetContent(mapped_core_file.content());
   EXPECT_FALSE(core.IsValid());
 
   header.e_ident[2] = ELFMAG2;
   ASSERT_TRUE(WriteFile(core_file, &header, sizeof(header)));
-  ASSERT_TRUE(mapped_core_file.Map(core_file));
+  ASSERT_TRUE(mapped_core_file.Map(core_file, 0));
   core.SetContent(mapped_core_file.content());
   EXPECT_FALSE(core.IsValid());
 
   header.e_ident[3] = ELFMAG3;
   ASSERT_TRUE(WriteFile(core_file, &header, sizeof(header)));
-  ASSERT_TRUE(mapped_core_file.Map(core_file));
+  ASSERT_TRUE(mapped_core_file.Map(core_file, 0));
   core.SetContent(mapped_core_file.content());
   EXPECT_FALSE(core.IsValid());
 
   header.e_ident[4] = ElfCoreDump::kClass;
   ASSERT_TRUE(WriteFile(core_file, &header, sizeof(header)));
-  ASSERT_TRUE(mapped_core_file.Map(core_file));
+  ASSERT_TRUE(mapped_core_file.Map(core_file, 0));
   core.SetContent(mapped_core_file.content());
   EXPECT_FALSE(core.IsValid());
 
   header.e_version = EV_CURRENT;
   ASSERT_TRUE(WriteFile(core_file, &header, sizeof(header)));
-  ASSERT_TRUE(mapped_core_file.Map(core_file));
+  ASSERT_TRUE(mapped_core_file.Map(core_file, 0));
   core.SetContent(mapped_core_file.content());
   EXPECT_FALSE(core.IsValid());
 
   header.e_type = ET_CORE;
   ASSERT_TRUE(WriteFile(core_file, &header, sizeof(header)));
-  ASSERT_TRUE(mapped_core_file.Map(core_file));
+  ASSERT_TRUE(mapped_core_file.Map(core_file, 0));
   core.SetContent(mapped_core_file.content());
   EXPECT_TRUE(core.IsValid());
 }
@@ -156,7 +156,8 @@ TEST(ElfCoreDumpTest, ValidCoreFile) {
 #endif
 
   MemoryMappedFile mapped_core_file;
-  ASSERT_TRUE(mapped_core_file.Map(crash_generator.GetCoreFilePath().c_str()));
+  ASSERT_TRUE(
+      mapped_core_file.Map(crash_generator.GetCoreFilePath().c_str(), 0));
 
   ElfCoreDump core;
   core.SetContent(mapped_core_file.content());

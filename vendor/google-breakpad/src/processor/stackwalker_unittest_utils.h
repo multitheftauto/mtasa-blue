@@ -36,6 +36,7 @@
 #ifndef PROCESSOR_STACKWALKER_UNITTEST_UTILS_H_
 #define PROCESSOR_STACKWALKER_UNITTEST_UTILS_H_
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string>
 #include <vector>
@@ -74,6 +75,9 @@ class MockMemoryRegion: public google_breakpad::MemoryRegion {
   }
   bool GetMemoryAtAddress(uint64_t address, uint64_t *value) const {
     return GetMemoryLittleEndian(address, value);
+  }
+  void Print() const {
+    assert(false);
   }
 
  private:

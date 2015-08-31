@@ -112,6 +112,11 @@ typedef struct {
   MDVectorSaveAreaPPC   vector_save;
 } MDRawContextPPC64;  /* Based on ppc_thread_state */
 
+/* Indices into gpr for registers with a dedicated or conventional purpose. */
+enum MDPPC64RegisterNumbers {
+  MD_CONTEXT_PPC64_REG_SP = 1
+};
+
 /* For (MDRawContextPPC).context_flags.  These values indicate the type of
  * context stored in the structure.  MD_CONTEXT_PPC is Breakpad-defined.  Its
  * value was chosen to avoid likely conflicts with MD_CONTEXT_* for other

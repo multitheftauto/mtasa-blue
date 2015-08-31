@@ -27,6 +27,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <assert.h>
 #include <stdio.h>
 
 #include <string>
@@ -101,6 +102,9 @@ class MockMemoryRegion: public MemoryRegion {
   bool GetMemoryAtAddress(uint64_t address, uint64_t *value) const {
     *value = address;
     return true;
+  }
+  void Print() const {
+    assert(false);
   }
 };
 

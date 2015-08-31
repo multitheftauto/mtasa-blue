@@ -146,6 +146,9 @@
 		D2F9A53F121383A1002747C1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		D2F9A541121383A1002747C1 /* libgtest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F9A41512131EF0002747C1 /* libgtest.a */; };
 		D2F9A553121383DC002747C1 /* crash_generation_server_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = D2F9A4CE121336F7002747C1 /* crash_generation_server_test.cc */; };
+		F4DAB1DD19F1027100A5A838 /* launch_reporter.cc in Sources */ = {isa = PBXBuildFile; fileRef = F4DAB1DB19F1027100A5A838 /* launch_reporter.cc */; };
+		F4DAB1DE19F1027100A5A838 /* launch_reporter.h in Headers */ = {isa = PBXBuildFile; fileRef = F4DAB1DC19F1027100A5A838 /* launch_reporter.h */; };
+		F4F916B619F10FFC00B83BE4 /* launch_reporter.cc in Sources */ = {isa = PBXBuildFile; fileRef = F4DAB1DB19F1027100A5A838 /* launch_reporter.cc */; };
 		F91AF6210FD60784009D8BE2 /* Breakpad.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Breakpad.framework */; };
 		F9286B3A0F7EB25800A4DCC8 /* InspectorMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = F9286B390F7EB25800A4DCC8 /* InspectorMain.mm */; };
 		F92C53B80ECCE7B3009BE4BA /* Inspector.mm in Sources */ = {isa = PBXBuildFile; fileRef = F92C53B70ECCE7B3009BE4BA /* Inspector.mm */; };
@@ -627,6 +630,8 @@
 		DE43468E11C72971004F095F /* sl */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = sl; path = sender/sl.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DE43468F11C72973004F095F /* sv */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = sv; path = sender/sv.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DE43469011C72976004F095F /* tr */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = tr; path = sender/tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F4DAB1DB19F1027100A5A838 /* launch_reporter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = launch_reporter.cc; path = ../../common/mac/launch_reporter.cc; sourceTree = SOURCE_ROOT; };
+		F4DAB1DC19F1027100A5A838 /* launch_reporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = launch_reporter.h; path = ../../common/mac/launch_reporter.h; sourceTree = SOURCE_ROOT; };
 		F91AF5CF0FD60393009D8BE2 /* BreakpadFramework_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BreakpadFramework_Test.mm; path = tests/BreakpadFramework_Test.mm; sourceTree = "<group>"; };
 		F9286B380F7EB25800A4DCC8 /* Inspector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Inspector.h; path = crash_generation/Inspector.h; sourceTree = "<group>"; };
 		F9286B390F7EB25800A4DCC8 /* InspectorMain.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = InspectorMain.mm; path = crash_generation/InspectorMain.mm; sourceTree = "<group>"; };
@@ -959,6 +964,8 @@
 				F92C53750ECCE635009BE4BA /* file_id.h */,
 				F92C53760ECCE635009BE4BA /* HTTPMultipartUpload.h */,
 				F92C53770ECCE635009BE4BA /* HTTPMultipartUpload.m */,
+				F4DAB1DB19F1027100A5A838 /* launch_reporter.cc */,
+				F4DAB1DC19F1027100A5A838 /* launch_reporter.h */,
 				F92C53780ECCE635009BE4BA /* MachIPC.h */,
 				F92C53790ECCE635009BE4BA /* MachIPC.mm */,
 				4D61A25D14F43CFC002D5862 /* bootstrap_compat.cc */,
@@ -1150,6 +1157,7 @@
 				163201D61443019E00C4DBF5 /* ConfigFile.h in Headers */,
 				16C7C918147D45AE00776EAD /* BreakpadDefines.h in Headers */,
 				162F64F3161C577500CD68D5 /* arch_utilities.h in Headers */,
+				F4DAB1DE19F1027100A5A838 /* launch_reporter.h in Headers */,
 				1EEEB6241720829E00F7E689 /* simple_string_dictionary.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1671,6 +1679,7 @@
 				F92C565F0ECD116B009BE4BA /* protected_memory_allocator.cc in Sources */,
 				F92C56630ECD1179009BE4BA /* exception_handler.cc in Sources */,
 				F92C55D10ECD0064009BE4BA /* Breakpad.mm in Sources */,
+				F4DAB1DD19F1027100A5A838 /* launch_reporter.cc in Sources */,
 				F92C56340ECD0DF1009BE4BA /* OnDemandServer.mm in Sources */,
 				D2F9A4CB121336C7002747C1 /* crash_generation_client.cc in Sources */,
 				D2F9A4CD121336C7002747C1 /* crash_generation_server.cc in Sources */,
@@ -1758,6 +1767,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4F916B619F10FFC00B83BE4 /* launch_reporter.cc in Sources */,
 				162F64F4161C579B00CD68D5 /* arch_utilities.cc in Sources */,
 				162F64F5161C579B00CD68D5 /* arch_utilities.h in Sources */,
 				D2A5DD301188633800081F03 /* breakpad_nlist_64.cc in Sources */,

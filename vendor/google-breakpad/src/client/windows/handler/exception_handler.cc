@@ -27,7 +27,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <ObjBase.h>
+#include <objbase.h>
 
 #include <algorithm>
 #include <cassert>
@@ -174,6 +174,7 @@ void ExceptionHandler::Initialize(
   assertion_ = NULL;
   handler_return_value_ = false;
   handle_debug_exceptions_ = false;
+  consume_invalid_handle_exceptions_ = false;
 
   // Attempt to use out-of-process if user has specified a pipe or a
   // crash generation client.
@@ -480,6 +481,11 @@ LONG ExceptionHandler::HandleException(EXCEPTION_POINTERS* exinfo) {
   LONG action;
   bool is_debug_exception = (code == EXCEPTION_BREAKPOINT) ||
                             (code == EXCEPTION_SINGLE_STEP);
+
+  if (code == EXCEPTION_INVALID_HANDLE &&
+      current_handler->consume_invalid_handle_exceptions_) {
+    return EXCEPTION_CONTINUE_EXECUTION;
+  }
 
   bool success = false;
 

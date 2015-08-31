@@ -28,19 +28,33 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <mach-o/fat.h>
+#include <mach-o/arch.h>
 #include <mach-o/loader.h>
+#include <mach/machine.h>
 
 // Go/Cgo does not support #define constants, so turn them into symbols
 // that are reachable from Go.
 
-const cpu_type_t kCPUType_i386 = CPU_TYPE_I386;
-const cpu_type_t kCPUType_x86_64 = CPU_TYPE_X86_64;
+#ifndef CPU_TYPE_ARM64
+#define CPU_TYPE_ARM64 (CPU_TYPE_ARM | CPU_ARCH_ABI64)
+#endif
 
-const uint32_t kMachHeaderMagic32 = MH_MAGIC;
-const uint32_t kMachHeaderMagic64 = MH_MAGIC_64;
-const uint32_t kMachHeaderMagicFat = FAT_MAGIC;
-const uint32_t kMachHeaderCigamFat = FAT_CIGAM;
+#ifndef CPU_SUBTYPE_ARM64_ALL
+#define CPU_SUBTYPE_ARM64_ALL 0
+#endif
+
+const cpu_type_t kCPU_TYPE_ARM = CPU_TYPE_ARM;
+const cpu_type_t kCPU_TYPE_ARM64 = CPU_TYPE_ARM64;
+
+const cpu_subtype_t kCPU_SUBTYPE_ARM64_ALL = CPU_SUBTYPE_ARM64_ALL;
+const cpu_subtype_t kCPU_SUBTYPE_ARM_V7S = CPU_SUBTYPE_ARM_V7S;
+
+const char* GetNXArchInfoName(cpu_type_t cpu_type, cpu_subtype_t cpu_subtype) {
+  const NXArchInfo* arch_info = NXGetArchInfoFromCpuType(cpu_type, cpu_subtype);
+  if (!arch_info)
+    return 0;
+  return arch_info->name;
+}
 
 const uint32_t kMachHeaderFtypeDylib = MH_DYLIB;
 const uint32_t kMachHeaderFtypeBundle = MH_BUNDLE;

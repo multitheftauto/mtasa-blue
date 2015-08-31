@@ -186,7 +186,7 @@
     'linux_use_seccomp_sandbox%': 0,
 
     # Set to select the Title Case versions of strings in GRD files.
-    'use_titlecase_in_grd_files%': 0,
+    'use_titlecase_in_grd%': 0,
 
     # Used to disable Native Client at compile time, for platforms where it
     # isn't supported
@@ -203,21 +203,6 @@
     'enable_new_npdevice_api%': 0,
 
     'conditions': [
-      ['OS=="linux" or OS=="freebsd" or OS=="openbsd"', {
-        # This will set gcc_version to XY if you are running gcc X.Y.*.
-        # This is used to tweak build flags for gcc 4.4.
-        'gcc_version%': '<!(python <(DEPTH)/build/compiler_version.py)',
-        # Figure out the python architecture to decide if we build pyauto.
-        'python_arch%': '<!(<(DEPTH)/build/linux/python_arch.sh <(sysroot)/usr/lib/libpython<(python_ver).so.1.0)',
-        'linux_breakpad%': 1,
-        'linux_dump_symbols%': 1,
-      }],  # OS=="linux" or OS=="freebsd" or OS=="openbsd"
-      ['OS=="mac"', {
-        # Mac wants Title Case strings
-        'use_titlecase_in_grd_files%': 1,
-        'mac_breakpad%': 0,
-        'mac_keystone%': 0,
-      }],  # OS=="mac"
       # Whether to use multiple cores to compile with visual studio. This is
       # optional because it sometimes causes corruption on VS 2005.
       # It is on by default on VS 2008 and off on VS 2005.
@@ -241,24 +226,6 @@
           'NACL_WIN64',
         ],
       }],
-      # Compute based on OS and target architecture whether the GPU
-      # plugin / process is supported.
-      [ 'OS=="win" or (OS=="linux" and target_arch!="arm") or OS=="mac"', {
-        # Enable a variable used elsewhere throughout the GYP files to determine
-        # whether to compile in the sources for the GPU plugin / process.
-        'enable_gpu%': 1,
-      }, {  # GPU plugin not supported
-        'enable_gpu%': 0,
-      }],
-      # Compute based on OS, target architecture and device whether GLES
-      # is supported
-      [ 'OS=="linux" and target_arch=="arm"', {
-        # Enable a variable used elsewhere throughout the GYP files to determine
-        # whether to compile in the sources for the GLES support.
-        'enable_gles%': 1,
-      }, {  # GLES not supported
-        'enable_gles%': 0,
-      }],
     ],
 
     # NOTE: When these end up in the Mac bundle, we need to replace '-' for '_'
@@ -273,6 +240,9 @@
     ],
   },
   'target_defaults': {
+    'includes': [
+      'filename_rules.gypi',
+    ],
     'variables': {
       # See http://gcc.gnu.org/onlinedocs/gcc-4.4.2/gcc/Optimize-Options.html
       'mac_release_optimization%': '3', # Use -O3 unless overridden
@@ -297,16 +267,6 @@
           ['OS=="win"', {
             'defines': ['NO_TCMALLOC'],
           }],
-        ],
-      }],
-      ['enable_gpu==1', {
-        'defines': [
-          'ENABLE_GPU=1',
-        ],
-      }],
-      ['enable_gles==1', {
-        'defines': [
-          'ENABLE_GLES=1',
         ],
       }],
       ['coverage!=0', {
@@ -610,7 +570,7 @@
           '-fvisibility=hidden',
         ],
         'cflags_cc': [
-          '-fno-rtti',
+          '-frtti',
           '-fno-threadsafe-statics',
           # Make inline functions have hidden visiblity by default.
           # Surprisingly, not covered by -fvisibility=hidden.
@@ -658,12 +618,6 @@
                            '$_LIBDIRFLAGS', '$LDMODULEFLAGS', '$SOURCES',
                            '-Wl,--start-group', '$_LIBFLAGS', '-Wl,--end-group']],
           'IMPLICIT_COMMAND_DEPENDENCIES': 0,
-          # -rpath is only used when building with shared libraries.
-          'conditions': [
-            [ 'component=="shared_library"', {
-              'RPATH': '$LIB_DIR',
-            }],
-          ],
         },
         'scons_import_variables': [
           'AS',
@@ -847,21 +801,6 @@
               '-fno-strict-aliasing',
             ],
           }],
-          ['linux_breakpad==1', {
-            'cflags': [ '-gstabs' ],
-            'defines': ['USE_LINUX_BREAKPAD'],
-          }],
-          ['library=="shared_library"', {
-            # When building with shared libraries, remove the visiblity-hiding
-            # flag.
-            'cflags!': [ '-fvisibility=hidden' ],
-            'conditions': [
-              ['target_arch=="x64" or target_arch=="arm"', {
-                # Shared libraries need -fPIC on x86-64 and arm
-                'cflags': ['-fPIC']
-              }]
-            ],
-          }],
           ['linux_use_heapchecker==1', {
             'variables': {'linux_use_tcmalloc%': 1},
           }],
@@ -903,7 +842,7 @@
           'GCC_DYNAMIC_NO_PIC': 'NO',               # No -mdynamic-no-pic
                                                     # (Equivalent to -fPIC)
           'GCC_ENABLE_CPP_EXCEPTIONS': 'NO',        # -fno-exceptions
-          'GCC_ENABLE_CPP_RTTI': 'NO',              # -fno-rtti
+          'GCC_ENABLE_CPP_RTTI': 'YES',             # -frtti
           'GCC_ENABLE_PASCAL_STRINGS': 'NO',        # No -mpascal-strings
           # GCC_INLINES_ARE_PRIVATE_EXTERN maps to -fvisibility-inlines-hidden
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
@@ -931,51 +870,6 @@
           ['_mac_bundle', {
             'xcode_settings': {'OTHER_LDFLAGS': ['-Wl,-ObjC']},
           }],
-          ['_type=="executable" or _type=="shared_library"', {
-            'target_conditions': [
-              ['mac_real_dsym == 1', {
-                # To get a real .dSYM bundle produced by dsymutil, set the
-                # debug information format to dwarf-with-dsym.  Since
-                # strip_from_xcode will not be used, set Xcode to do the
-                # stripping as well.
-                'configurations': {
-                  'Release_Base': {
-                    'xcode_settings': {
-                      'DEBUG_INFORMATION_FORMAT': 'dwarf-with-dsym',
-                      'DEPLOYMENT_POSTPROCESSING': 'YES',
-                      'STRIP_INSTALLED_PRODUCT': 'YES',
-                      'target_conditions': [
-                        ['_type=="shared_library"', {
-                          # The Xcode default is to strip debugging symbols
-                          # only (-S).  Local symbols should be stripped as
-                          # well, which will be handled by -x.  Xcode will
-                          # continue to insert -S when stripping even when
-                          # additional flags are added with STRIPFLAGS.
-                          'STRIPFLAGS': '-x',
-                        }],  # _type=="shared_library"
-                      ],  # target_conditions
-                    },  # xcode_settings
-                  },  # configuration "Release"
-                },  # configurations
-              }, {  # mac_real_dsym != 1
-                # To get a fast fake .dSYM bundle, use a post-build step to
-                # produce the .dSYM and strip the executable.  strip_from_xcode
-                # only operates in the Release configuration.
-                'postbuilds': [
-                  {
-                    'variables': {
-                      # Define strip_from_xcode in a variable ending in _path
-                      # so that gyp understands it's a path and performs proper
-                      # relativization during dict merging.
-                      'strip_from_xcode_path': 'mac/strip_from_xcode',
-                    },
-                    'postbuild_name': 'Strip If Needed',
-                    'action': ['<(strip_from_xcode_path)'],
-                  },
-                ],  # postbuilds
-              }],  # mac_real_dsym
-            ],  # target_conditions
-          }],  # _type=="executable" or _type=="shared_library"
         ],  # target_conditions
       },  # target_defaults
     }],  # OS=="mac"

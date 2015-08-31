@@ -60,6 +60,7 @@ class MockMemoryRegion: public MemoryRegion {
   MOCK_CONST_METHOD2(GetMemoryAtAddress, bool(uint64_t, uint16_t *));
   MOCK_CONST_METHOD2(GetMemoryAtAddress, bool(uint64_t, uint32_t *));
   MOCK_CONST_METHOD2(GetMemoryAtAddress, bool(uint64_t, uint64_t *));
+  MOCK_CONST_METHOD0(Print, void());
 };
 
 // Handy definitions for all tests.

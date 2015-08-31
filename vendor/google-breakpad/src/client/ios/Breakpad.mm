@@ -45,7 +45,7 @@
 #import "client/mac/handler/protected_memory_allocator.h"
 #import "common/simple_string_dictionary.h"
 
-#ifndef __EXCEPTIONS
+#if !defined(__EXCEPTIONS) || (__clang__ && !__has_feature(cxx_exceptions))
 // This file uses C++ try/catch (but shouldn't). Duplicate the macros from
 // <c++/4.2.1/exception_defines.h> allowing this file to work properly with
 // exceptions disabled even when other C++ libraries are used. #undef the try
@@ -152,9 +152,15 @@ class Breakpad {
   void RemoveKeyValue(NSString *key);
   NSArray *CrashReportsToUpload();
   NSString *NextCrashReportToUpload();
+  NSDictionary *NextCrashReportConfiguration();
   void UploadNextReport(NSDictionary *server_parameters);
+  void UploadReportWithConfiguration(NSDictionary *configuration,
+                                     NSDictionary *server_parameters);
   void UploadData(NSData *data, NSString *name,
                   NSDictionary *server_parameters);
+  void HandleNetworkResponse(NSDictionary *configuration,
+                             NSData *data,
+                             NSError *error);
   NSDictionary *GenerateReport(NSDictionary *server_parameters);
 
  private:
@@ -258,6 +264,7 @@ void Breakpad::UncaughtExceptionHandler(NSException *exception) {
   if (current_breakpad_) {
     current_breakpad_->HandleUncaughtException(exception);
   }
+  BreakpadRelease(current_breakpad_);
 }
 
 //=============================================================================
@@ -334,7 +341,7 @@ bool Breakpad::ExtractParameters(NSDictionary *parameters) {
     }
   }
 
-  if (!version)
+  if (!version.length)  // Default nil or empty string to CFBundleVersion
     version = [parameters objectForKey:@"CFBundleVersion"];
 
   if (!vendor) {
@@ -448,18 +455,38 @@ NSString *Breakpad::NextCrashReportToUpload() {
 }
 
 //=============================================================================
+NSDictionary *Breakpad::NextCrashReportConfiguration() {
+  return [Uploader readConfigurationDataFromFile:NextCrashReportToUpload()];
+}
+
+//=============================================================================
+void Breakpad::HandleNetworkResponse(NSDictionary *configuration,
+                                     NSData *data,
+                                     NSError *error) {
+  Uploader *uploader = [[[Uploader alloc]
+      initWithConfig:configuration] autorelease];
+  [uploader handleNetworkResponse:data withError:error];
+}
+
+//=============================================================================
+void Breakpad::UploadReportWithConfiguration(NSDictionary *configuration,
+                                             NSDictionary *server_parameters) {
+  Uploader *uploader = [[[Uploader alloc]
+      initWithConfig:configuration] autorelease];
+  if (!uploader)
+    return;
+  for (NSString *key in server_parameters) {
+    [uploader addServerParameter:[server_parameters objectForKey:key]
+                          forKey:key];
+  }
+  [uploader report];
+}
+
+//=============================================================================
 void Breakpad::UploadNextReport(NSDictionary *server_parameters) {
-  NSString *configFile = NextCrashReportToUpload();
-  if (configFile) {
-    Uploader *uploader = [[[Uploader alloc]
-        initWithConfigFile:[configFile UTF8String]] autorelease];
-    if (uploader) {
-      for (NSString *key in server_parameters) {
-        [uploader addServerParameter:[server_parameters objectForKey:key]
-                              forKey:key];
-      }
-      [uploader report];
-    }
+  NSDictionary *configuration = NextCrashReportConfiguration();
+  if (configuration) {
+    return UploadReportWithConfiguration(configuration, server_parameters);
   }
 }
 
@@ -794,17 +821,64 @@ void BreakpadUploadNextReport(BreakpadRef ref) {
 }
 
 //=============================================================================
+NSDictionary *BreakpadGetNextReportConfiguration(BreakpadRef ref) {
+  try {
+    Breakpad *breakpad = (Breakpad *)ref;
+    if (breakpad)
+      return breakpad->NextCrashReportConfiguration();
+  } catch(...) {    // don't let exceptions leave this C API
+    fprintf(stderr, "BreakpadGetNextReportConfiguration() : error\n");
+  }
+  return nil;
+}
+
+//=============================================================================
+void BreakpadUploadReportWithParametersAndConfiguration(
+    BreakpadRef ref,
+    NSDictionary *server_parameters,
+    NSDictionary *configuration) {
+  try {
+    Breakpad *breakpad = (Breakpad *)ref;
+    if (!breakpad || !configuration)
+      return;
+    breakpad->UploadReportWithConfiguration(configuration, server_parameters);
+  } catch(...) {    // don't let exceptions leave this C API
+    fprintf(stderr,
+        "BreakpadUploadReportWithParametersAndConfiguration() : error\n");
+  }
+
+}
+
+//=============================================================================
 void BreakpadUploadNextReportWithParameters(BreakpadRef ref,
                                             NSDictionary *server_parameters) {
   try {
+    Breakpad *breakpad = (Breakpad *)ref;
+    if (!breakpad)
+      return;
+    NSDictionary *configuration = breakpad->NextCrashReportConfiguration();
+    if (!configuration)
+      return;
+    return BreakpadUploadReportWithParametersAndConfiguration(ref,
+                                                              server_parameters,
+                                                              configuration);
+  } catch(...) {    // don't let exceptions leave this C API
+    fprintf(stderr, "BreakpadUploadNextReportWithParameters() : error\n");
+  }
+}
+
+void BreakpadHandleNetworkResponse(BreakpadRef ref,
+                                   NSDictionary *configuration,
+                                   NSData *data,
+                                   NSError *error) {
+  try {
     // Not called at exception time
     Breakpad *breakpad = (Breakpad *)ref;
+    if (breakpad && configuration)
+      breakpad->HandleNetworkResponse(configuration,data, error);
 
-    if (breakpad) {
-       breakpad->UploadNextReport(server_parameters);
-    }
   } catch(...) {    // don't let exceptions leave this C API
-    fprintf(stderr, "BreakpadUploadNextReport() : error\n");
+    fprintf(stderr, "BreakpadHandleNetworkResponse() : error\n");
   }
 }
 

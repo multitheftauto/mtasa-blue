@@ -37,41 +37,68 @@
 
 #include "common/using_std_string.h"
 
-// The MinidumpDescriptor describes how to access a minidump: it can contain
-// either a file descriptor or a path.
-// Note that when using files, it is created with the path to a directory.
-// The actual path where the minidump is generated is created by this class.
+// This class describes how a crash dump should be generated, either:
+// - Writing a full minidump to a file in a given directory (the actual path,
+//   inside the directory, is determined by this class).
+// - Writing a full minidump to a given fd.
+// - Writing a reduced microdump to the console (logcat on Android).
 namespace google_breakpad {
 
 class MinidumpDescriptor {
  public:
-  MinidumpDescriptor() : fd_(-1), size_limit_(-1) {}
+  struct MicrodumpOnConsole {};
+  static const MicrodumpOnConsole kMicrodumpOnConsole;
+
+  MinidumpDescriptor() : mode_(kUninitialized),
+                         fd_(-1),
+                         size_limit_(-1),
+                         microdump_build_fingerprint_(NULL),
+                         microdump_product_info_(NULL) {}
 
   explicit MinidumpDescriptor(const string& directory)
-      : fd_(-1),
+      : mode_(kWriteMinidumpToFile),
+        fd_(-1),
         directory_(directory),
         c_path_(NULL),
-        size_limit_(-1) {
+        size_limit_(-1),
+        microdump_build_fingerprint_(NULL),
+        microdump_product_info_(NULL) {
     assert(!directory.empty());
   }
 
   explicit MinidumpDescriptor(int fd)
-      : fd_(fd),
+      : mode_(kWriteMinidumpToFd),
+        fd_(fd),
         c_path_(NULL),
-        size_limit_(-1) {
+        size_limit_(-1),
+        microdump_build_fingerprint_(NULL),
+        microdump_product_info_(NULL) {
     assert(fd != -1);
   }
+
+  explicit MinidumpDescriptor(const MicrodumpOnConsole&)
+      : mode_(kWriteMicrodumpToConsole),
+        fd_(-1),
+        size_limit_(-1),
+        microdump_build_fingerprint_(NULL),
+        microdump_product_info_(NULL) {}
 
   explicit MinidumpDescriptor(const MinidumpDescriptor& descriptor);
   MinidumpDescriptor& operator=(const MinidumpDescriptor& descriptor);
 
-  bool IsFD() const { return fd_ != -1; }
+  static MinidumpDescriptor getMicrodumpDescriptor();
+
+  bool IsFD() const { return mode_ == kWriteMinidumpToFd; }
 
   int fd() const { return fd_; }
 
   string directory() const { return directory_; }
 
   const char* path() const { return c_path_; }
+
+  bool IsMicrodumpOnConsole() const {
+    return mode_ == kWriteMicrodumpToConsole;
+  }
 
   // Updates the path so it is unique.
   // Should be called from a normal context: this methods uses the heap.
@@ -80,19 +107,53 @@ class MinidumpDescriptor {
   off_t size_limit() const { return size_limit_; }
   void set_size_limit(off_t limit) { size_limit_ = limit; }
 
+  // TODO(primiano): make this and product info (below) just part of the
+  // microdump ctor once it is rolled stably into Chrome. ETA: June 2015.
+  void SetMicrodumpBuildFingerprint(const char* build_fingerprint);
+  const char* microdump_build_fingerprint() const {
+    return microdump_build_fingerprint_;
+  }
+
+  void SetMicrodumpProductInfo(const char* product_info);
+  const char* microdump_product_info() const {
+    return microdump_product_info_;
+  }
+
  private:
+  enum DumpMode {
+    kUninitialized = 0,
+    kWriteMinidumpToFile,
+    kWriteMinidumpToFd,
+    kWriteMicrodumpToConsole
+  };
+
+  // Specifies the dump mode (see DumpMode).
+  DumpMode mode_;
+
   // The file descriptor where the minidump is generated.
   int fd_;
 
   // The directory where the minidump should be generated.
   string directory_;
+
   // The full path to the generated minidump.
   string path_;
+
   // The C string of |path_|. Precomputed so it can be access from a compromised
   // context.
   const char* c_path_;
 
   off_t size_limit_;
+
+  // The product name/version and build fingerprint that should be appended to
+  // the dump (microdump only). Microdumps don't have the ability of appending
+  // extra metadata after the dump is generated (as opposite to minidumps
+  // MIME fields), therefore the product details must be provided upfront.
+  // The string pointers are supposed to be valid through all the lifetime of
+  // the process (read: the caller has to guarantee that they are stored in
+  // global static storage).
+  const char* microdump_build_fingerprint_;
+  const char* microdump_product_info_;
 };
 
 }  // namespace google_breakpad

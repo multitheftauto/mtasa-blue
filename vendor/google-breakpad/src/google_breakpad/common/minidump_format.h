@@ -342,7 +342,7 @@ typedef enum {
   MD_LINUX_ENVIRON               = 0x47670007,  /* /proc/$x/environ   */
   MD_LINUX_AUXV                  = 0x47670008,  /* /proc/$x/auxv      */
   MD_LINUX_MAPS                  = 0x47670009,  /* /proc/$x/maps      */
-  MD_LINUX_DSO_DEBUG             = 0x4767000A   /* MDRawDebug         */
+  MD_LINUX_DSO_DEBUG             = 0x4767000A   /* MDRawDebug{32,64}  */
 } MDStreamType;  /* MINIDUMP_STREAM_TYPE */
 
 
@@ -930,21 +930,39 @@ typedef enum {
 } MDAssertionInfoData;
 
 /* These structs are used to store the DSO debug data in Linux minidumps,
- * which is necessary for converting minidumps to usable coredumps. */
+ * which is necessary for converting minidumps to usable coredumps.
+ * Because of a historical accident, several fields are variably encoded
+ * according to client word size, so tools potentially need to support both. */
+
 typedef struct {
-  void*     addr;
+  uint32_t  addr;
   MDRVA     name;
-  void*     ld;
-} MDRawLinkMap;
+  uint32_t  ld;
+} MDRawLinkMap32;
 
 typedef struct {
   uint32_t  version;
-  MDRVA     map;
+  MDRVA     map;  /* array of MDRawLinkMap32 */
   uint32_t  dso_count;
-  void*     brk;
-  void*     ldbase;
-  void*     dynamic;
-} MDRawDebug;
+  uint32_t  brk;
+  uint32_t  ldbase;
+  uint32_t  dynamic;
+} MDRawDebug32;
+
+typedef struct {
+  uint64_t  addr;
+  MDRVA     name;
+  uint64_t  ld;
+} MDRawLinkMap64;
+
+typedef struct {
+  uint32_t  version;
+  MDRVA     map;  /* array of MDRawLinkMap64 */
+  uint32_t  dso_count;
+  uint64_t  brk;
+  uint64_t  ldbase;
+  uint64_t  dynamic;
+} MDRawDebug64;
 
 #if defined(_MSC_VER)
 #pragma warning(pop)

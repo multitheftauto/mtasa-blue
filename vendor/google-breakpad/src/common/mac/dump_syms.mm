@@ -35,6 +35,7 @@
 
 #include "common/mac/dump_syms.h"
 
+#include <assert.h>
 #include <Foundation/Foundation.h>
 #include <mach-o/arch.h>
 #include <mach-o/fat.h>
@@ -170,7 +171,7 @@ bool DumpSymbols::Read(NSString *filename) {
 
   // Get our own copy of fat_reader's object file list.
   size_t object_files_count;
-  const struct fat_arch *object_files =
+  const SuperFatArch *object_files =
     fat_reader.object_files(&object_files_count);
   if (object_files_count == 0) {
     fprintf(stderr, "Fat binary file contains *no* architectures: %s\n",
@@ -179,7 +180,7 @@ bool DumpSymbols::Read(NSString *filename) {
   }
   object_files_.resize(object_files_count);
   memcpy(&object_files_[0], object_files,
-         sizeof(struct fat_arch) * object_files_count);
+         sizeof(SuperFatArch) * object_files_count);
 
   return true;
 }
@@ -187,9 +188,8 @@ bool DumpSymbols::Read(NSString *filename) {
 bool DumpSymbols::SetArchitecture(cpu_type_t cpu_type,
                                   cpu_subtype_t cpu_subtype) {
   // Find the best match for the architecture the user requested.
-  const struct fat_arch *best_match
-    = NXFindBestFatArch(cpu_type, cpu_subtype, &object_files_[0],
-                        static_cast<uint32_t>(object_files_.size()));
+  const SuperFatArch *best_match = FindBestMatchForArchitecture(
+      cpu_type, cpu_subtype);
   if (!best_match) return false;
 
   // Record the selected object file.
@@ -205,6 +205,56 @@ bool DumpSymbols::SetArchitecture(const std::string &arch_name) {
     arch_set = SetArchitecture(arch_info->cputype, arch_info->cpusubtype);
   }
   return arch_set;
+}
+
+SuperFatArch* DumpSymbols::FindBestMatchForArchitecture(
+    cpu_type_t cpu_type, cpu_subtype_t cpu_subtype) {
+  // Check if all the object files can be converted to struct fat_arch.
+  bool can_convert_to_fat_arch = true;
+  vector<struct fat_arch> fat_arch_vector;
+  for (vector<SuperFatArch>::const_iterator it = object_files_.begin();
+       it != object_files_.end();
+       ++it) {
+    struct fat_arch arch;
+    bool success = it->ConvertToFatArch(&arch);
+    if (!success) {
+      can_convert_to_fat_arch = false;
+      break;
+    }
+    fat_arch_vector.push_back(arch);
+  }
+
+  // If all the object files can be converted to struct fat_arch, use
+  // NXFindBestFatArch.
+  if (can_convert_to_fat_arch) {
+    const struct fat_arch *best_match
+      = NXFindBestFatArch(cpu_type, cpu_subtype, &fat_arch_vector[0],
+                          static_cast<uint32_t>(fat_arch_vector.size()));
+
+    for (size_t i = 0; i < fat_arch_vector.size(); ++i) {
+      if (best_match == &fat_arch_vector[i])
+        return &object_files_[i];
+    }
+    assert(best_match == NULL);
+    return NULL;
+  }
+
+  // Check for an exact match with cpu_type and cpu_subtype.
+  for (vector<SuperFatArch>::iterator it = object_files_.begin();
+       it != object_files_.end();
+       ++it) {
+    if (it->cputype == cpu_type && it->cpusubtype == cpu_subtype)
+      return &*it;
+  }
+
+  // No exact match found.
+  // TODO(erikchen): If it becomes necessary, we can copy the implementation of
+  // NXFindBestFatArch, located at
+  // http://web.mit.edu/darwin/src/modules/cctools/libmacho/arch.c.
+  fprintf(stderr, "Failed to find an exact match for an object file with cpu "
+      "type: %d and cpu subtype: %d. Furthermore, at least one object file is "
+      "larger than 2**32.\n", cpu_type, cpu_subtype);
+  return NULL;
 }
 
 string DumpSymbols::Identifier() {
