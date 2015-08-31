@@ -818,6 +818,14 @@ void CCore::ApplyHooks ( )
 
     // Redirect basic files.
     //m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
+
+    // Remove useless DirectPlay dependency (dpnhpast.dll)
+    // We have to patch here as multiplayer_sa and game_sa are loaded too late
+    DWORD oldProt;
+    VirtualProtect ( (void*)0x745701, 12, PAGE_EXECUTE_READWRITE, &oldProt );
+    memset ( (void*)0x745701, 0x90, 5+2+2+2 );
+    memset ( (void*)0x74570C, 0xEB, 1 ); // 0xEB := jmp + rel8
+    VirtualProtect ( (void*)0x745701, 12, oldProt, nullptr );
 }
 
 bool UsingAltD3DSetup()
