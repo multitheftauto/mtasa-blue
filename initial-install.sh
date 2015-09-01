@@ -16,12 +16,12 @@ autoreconf -fiv
 if [ $1 = "-g" ]; then
     ./configure --with-pic --disable-system-pcre --enable-utf8 \
                   CFLAGS='-g -O2 -fPIC -DPIC' \
-                CXXFLAGS='-g -O2 -fPIC -DPIC -std=gnu++0x' \
+                CXXFLAGS='-g -O2 -fPIC -DPIC -std=c++0x' \
                 CPPFLAGS='-g -O2 -fPIC -DPIC'
 else
     ./configure --with-pic --disable-system-pcre --enable-utf8 \
                   CFLAGS='-O2 -fPIC -DPIC' \
-                CXXFLAGS='-O2 -fPIC -DPIC -std=gnu++0x' \
+                CXXFLAGS='-O2 -fPIC -DPIC -std=c++0x' \
                 CPPFLAGS='-O2 -fPIC -DPIC'
 fi
 
@@ -36,7 +36,7 @@ rm ./MTA10_Server/net/net.la
 # Build breakpad
 cd ./vendor/google-breakpad
 ./configure
-make
+make CXXFLAGS='-Wno-sign-compare'
 cd ../..
 
 # then you have makefiles and the source can be compiled :)
@@ -44,12 +44,12 @@ cd ../..
 if [ $1 = "-g" ]; then
     make \
                   CFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' \
-                CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized -std=gnu++0x' \
+                CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized -std=c++0x' \
                 CPPFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
 else
     make \
                   CFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' \
-                CXXFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized -std=gnu++0x' \
+                CXXFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized -std=c++0x' \
                 CPPFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
 fi
 
