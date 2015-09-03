@@ -330,7 +330,8 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallb
     {
         // Call callback immediately if nothing has changed (all entries are most likely already on the whitelist)
         // There is still the possibility that all websites are blacklisted; this is not the usual case tho, so ignore for now (TODO)
-        (*pCallback)( true, pages );
+        if ( pCallback )
+            (*pCallback)( true, pages );
     }
 }
 
