@@ -322,10 +322,6 @@ void CLocalGUI::Draw ( void )
         {
             pGUI->Draw ( );
         }
-        else
-        {
-            WriteDebugEvent ( "WARNING: CLocalGUI::Draw() called, but CLocalGUI::CreateObjects() isn't!" );
-        }
 
         // If the system state was 8, make sure we don't do another delayed frame
         if ( SystemState == 8 )
@@ -345,10 +341,6 @@ void CLocalGUI::Invalidate ( void )
     {
         pGUI->Invalidate ( );
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::Invalidate() called, but CLocalGUI::CreateObjects() isn't!" );
-    }
 }
 
 
@@ -360,10 +352,6 @@ void CLocalGUI::Restore ( void )
     {
         // Restore the GUI
         pGUI->Restore ();
-    }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::Restore() called, but CLocalGUI::CreateObjects() isn't!" );
     }
 }
 
@@ -398,10 +386,6 @@ void CLocalGUI::SetConsoleVisible ( bool bVisible )
         else
 	        pGUI->SetCursorAlpha ( pGUI->GetCurrentServerCursorAlpha () );
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::HideConsole() called, but CLocalGUI::CreateObjects() isn't!" );
-    }
 }
 
 
@@ -411,11 +395,7 @@ bool CLocalGUI::IsConsoleVisible ( void )
     {
         return m_pConsole->IsVisible ();
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::IsConsoleVisible() called, but CLocalGUI::CreateObjects() isn't!" );
-        return false;
-    }
+    return false;
 }
 
 
@@ -424,10 +404,6 @@ void CLocalGUI::EchoConsole ( const char* szText )
     if ( m_pConsole )
     {
         m_pConsole->Echo ( szText );
-    }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::EchoConsole() called, but CLocalGUI::CreateObjects() isn't" );
     }
 }
 
@@ -463,10 +439,6 @@ void CLocalGUI::SetMainMenuVisible ( bool bVisible )
         else
             pGUI->SetCursorAlpha ( pGUI->GetCurrentServerCursorAlpha () );
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::SetMainMenuVisible() called, but CLocalGUI::CreateObjects() isn't" );
-    }
 }
 
 
@@ -476,11 +448,7 @@ bool CLocalGUI::IsMainMenuVisible ( void )
     {
         return m_pMainMenu->IsVisible ();
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::IsMainMenuVisible() called, but CLocalGUI::CreateObjects() isn't" );
-        return false;
-    }
+    return false;
 }
 
 CChat* CLocalGUI::GetChat ( void )
@@ -502,10 +470,6 @@ void CLocalGUI::SetChatBoxVisible ( bool bVisible )
             m_pChat->SetVisible ( bVisible );
         m_bChatboxVisible = bVisible;
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::SetChatBoxVisible() called, but CLocalGUI::CreateObjects() isn't" );
-    }
 }
 
 void CLocalGUI::SetDebugViewVisible ( bool bVisible )
@@ -516,10 +480,6 @@ void CLocalGUI::SetDebugViewVisible ( bool bVisible )
             m_pDebugView->SetVisible ( bVisible );
         m_pDebugViewVisible = bVisible;
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::SetDebugViewVisible() called, but CLocalGUI::CreateObjects() isn't" );
-    }
 }
 
 bool CLocalGUI::IsChatBoxVisible ( void )
@@ -528,11 +488,7 @@ bool CLocalGUI::IsChatBoxVisible ( void )
     {
         return m_bChatboxVisible;
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::IsChatBoxVisible() called, but CLocalGUI::CreateObjects() isn't" );
-        return false;
-    }
+    return false;
 }
 
 bool CLocalGUI::IsDebugViewVisible ( void )
@@ -541,11 +497,7 @@ bool CLocalGUI::IsDebugViewVisible ( void )
     {
         return m_pDebugViewVisible;
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::IsDebugViewVisible() called, but CLocalGUI::CreateObjects() isn't" );
-        return false;
-    }
+    return false;
 }
 
 
@@ -554,10 +506,6 @@ void CLocalGUI::SetChatBoxInputEnabled ( bool bInputEnabled )
     if ( m_pChat )
     {
         m_pChat->SetInputVisible ( bInputEnabled );
-    }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::SetChatBoxInputEnabled() called, but CLocalGUI::CreateObjects() isn't" );
     }
 }
 
@@ -568,11 +516,7 @@ bool CLocalGUI::IsChatBoxInputEnabled ( void )
     {
         return m_pChat->IsInputVisible () && m_bChatboxVisible;
     }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::IsChatBoxInputEnabled() called, but CLocalGUI::CreateObjects() isn't" );
-        return false;
-    }
+    return false;
 }
 
 
@@ -582,10 +526,16 @@ void CLocalGUI::EchoChat ( const char* szText, bool bColorCoded )
     {
         m_pChat->Output ( szText, bColorCoded );
     }
-    else
+}
+
+bool CLocalGUI::IsWebRequestGUIVisible ()
+{
+    auto pWebCore = g_pCore->GetWebCore ();
+    if ( pWebCore )
     {
-        WriteDebugEvent ( "WARNING: CLocalGUI::EchoChat() called, but CLocalGUI::CreateObjects() isn't" );
+        return pWebCore->IsRequestsGUIVisible ();
     }
+    return false;
 }
 
 void CLocalGUI::EchoDebug ( const char* szText )
@@ -593,10 +543,6 @@ void CLocalGUI::EchoDebug ( const char* szText )
     if ( m_pDebugView )
     {
         m_pDebugView->Output ( szText, false );
-    }
-    else
-    {
-        WriteDebugEvent ( "WARNING: CLocalGUI::EchoDebug() called, but CLocalGUI::CreateObjects() isn't" );
     }
 }
 
@@ -767,7 +713,7 @@ bool CLocalGUI::InputGoesToGUI ( void )
 
     // Here we're supposed to check if things like menues are up, console is up or the chatbox is expecting input
     // If the console is visible OR the chat is expecting input OR the mainmenu is visible
-    return ( IsConsoleVisible () || IsMainMenuVisible () || IsChatBoxInputEnabled () || m_bForceCursorVisible || pGUI->GetGUIInputEnabled () || !CCore::GetSingleton ().IsFocused () || g_pCore->GetWebCore ()->IsRequestsGUIVisible () );
+    return ( IsConsoleVisible () || IsMainMenuVisible () || IsChatBoxInputEnabled () || m_bForceCursorVisible || pGUI->GetGUIInputEnabled () || !CCore::GetSingleton ().IsFocused () || IsWebRequestGUIVisible () );
 }
 
 
