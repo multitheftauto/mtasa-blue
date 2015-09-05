@@ -80,6 +80,8 @@ public:
     bool                IsChatBoxInputEnabled       ( void );
     void                EchoChat                    ( const char* szText, bool bColorCoded );
 
+    bool                IsWebRequestGUIVisible      ( void );
+
     CDebugView*         GetDebugView                ( void );
     void                SetDebugViewVisible         ( bool bVisible );
     bool                IsDebugViewVisible          ( void );
