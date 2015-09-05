@@ -71,6 +71,7 @@ namespace
     }
 
     bool bDetectedOptimus = false;
+    bool bDetectedNVidia = false;
     IDirect3D9* pD3D9 = NULL;
     IDirect3DDevice9* pD3DDevice9 = NULL;
     IDirect3DVertexDeclaration9* pD3DVertexDeclarations[ 20 ] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
@@ -132,6 +133,10 @@ void BeginD3DStuff( void )
             bDetectedOptimus = true;
             WriteDebugEvent( SString( "D3DStuff %d - Detected nvd3d9wrap", i ) );
         }
+        if ( SStringX( Identifier.Driver ).BeginsWithI( "nv" ) )
+        {
+            bDetectedNVidia = true;
+        }
 
         WriteDebugEvent( SString( "D3DStuff %d Identifier - %s", i, *ToString( Identifier ) ) );
         WriteDebugEvent( SString( "D3DStuff %d DisplayMode - %s", i, *ToString( DisplayMode ) ) );
@@ -143,6 +148,7 @@ void BeginD3DStuff( void )
         bDetectedOptimus = true;
 
     SetApplicationSettingInt( "nvhacks", "optimus", bDetectedOptimus );
+    SetApplicationSettingInt( "nvhacks", "nvidia", bDetectedNVidia );
 
     if ( bDetectedOptimus )
     {

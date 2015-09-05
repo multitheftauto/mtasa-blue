@@ -1205,6 +1205,10 @@ bool IsWin8OrHigher ( void )
     return GetRealOSVersion () >= "6.2";
 }
 
+bool IsWin10OrHigher ( void )
+{
+    return GetRealOSVersion () >= "10.0";
+}
 
 
 static SString HashBuffer ( char* pData, uint uiLength )

@@ -329,7 +329,7 @@ void SharedUtil::SetPostUpdateConnect( const SString& strHost )
 {
     CArgMap argMap;
     argMap.Set( "host", strHost );
-    argMap.Set( "time", SString( PRId64, (int64)time( NULL ) ) );
+    argMap.Set( "time", SString( "%" PRId64, (int64)time( NULL ) ) );
     SetRegistryValue( "", "PostUpdateConnect", argMap.ToString() );
 }
 
@@ -349,7 +349,7 @@ SString SharedUtil::GetPostUpdateConnect( void )
 
     // Expire after 5 mins
     double seconds = difftime( time( NULL ), timeThen );
-    if ( seconds < 0 || seconds > 60 * 5 )
+    if ( ( seconds < 0 || seconds > 60 * 5 ) && timeThen != 0 )
         strHost = "";
 
     return strHost;

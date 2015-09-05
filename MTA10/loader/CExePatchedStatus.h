@@ -46,6 +46,7 @@ SExePatchedStatus   GetExePatchedStatus             ( bool bUseExeCopy );
 SExePatchedStatus   GetExePatchRequirements         ( void );
 bool                SetExePatchedStatus             ( bool bUseExeCopy, const SExePatchedStatus& reqStatus );
 bool                ShouldUseExeCopy                ( void );
+bool                RequiresAltTabFix               ( void );
 SString             GetPatchExeAdminReason          ( bool bUseExeCopy, const SExePatchedStatus& reqStatus );
 uint64              GetExeFileSize                  ( bool bUseExeCopy );
 bool                CopyExe                         ( void );
