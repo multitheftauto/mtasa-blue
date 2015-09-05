@@ -448,15 +448,6 @@ bool CVideoModeManager::SetVideoMode ( int iNextVideoMode, bool bNextWindowed, b
 ///////////////////////////////////////////////////////////////
 void CVideoModeManager::LoadCVars ( void )
 {
-    // Upgrade display_alttab_handler
-    bool bAltTabHandlerWasEnabled = CVARS_GET_VALUE < bool > ( "display_alttab_handler" );
-    int iFullscreenStyle = CVARS_GET_VALUE < int > ( "display_fullscreen_style" );
-    if ( bAltTabHandlerWasEnabled && iFullscreenStyle == 0 )
-    {
-        CVARS_SET ( "display_alttab_handler", false );
-        CVARS_SET ( "display_fullscreen_style", FULLSCREEN_BORDERLESS );
-    }
-
     // Apply override
     if ( GetApplicationSettingInt( "nvhacks", "optimus-force-windowed" ) )
     {
