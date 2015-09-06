@@ -552,7 +552,7 @@ void CVehicleRPCs::SetTrainPosition ( CClientEntity* pSource, NetBitStreamInterf
         CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
         if ( pVehicle )
         {
-            pVehicle->SetTrainPosition ( fPosition );
+            pVehicle->SetTrainPosition ( fPosition, false );
         }
     }
 }
