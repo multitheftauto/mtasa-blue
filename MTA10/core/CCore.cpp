@@ -25,6 +25,7 @@
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
+#include "detours/include/detours.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -819,13 +820,27 @@ void CCore::ApplyHooks ( )
     // Redirect basic files.
     //m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
 
-    // Remove useless DirectPlay dependency (dpnhpast.dll)
+    // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
-    DWORD oldProt;
-    VirtualProtect ( (void*)0x745701, 12, PAGE_EXECUTE_READWRITE, &oldProt );
-    memset ( (void*)0x745701, 0x90, 5+2+2+2 );
-    memset ( (void*)0x74570C, 0xEB, 1 ); // 0xEB := jmp + rel8
-    VirtualProtect ( (void*)0x745701, 12, oldProt, nullptr );
+    using LoadLibraryA_t = HMODULE (__stdcall *)(LPCTSTR fileName);
+    static LoadLibraryA_t oldLoadLibraryA = (LoadLibraryA_t)DetourFunction ( DetourFindFunction ( "KERNEL32.DLL", "LoadLibraryA" ),
+        (PBYTE)(LoadLibraryA_t)[](LPCSTR fileName) -> HMODULE
+    {
+        // Don't load dpnhpast.dll
+        if ( StrCmpA ( "dpnhpast.dll", fileName ) == 0 )
+        {
+            // Unfortunately, Microsoft's detours library doesn't support something like 'detour chains' properly,
+            // so that we cannot remove the hook flawlessly
+            // See http://read.pudn.com/downloads71/ebook/256925/%E5%BE%AE%E8%BD%AF%E6%8F%90%E4%BE%9B%E7%9A%84%E6%88%AA%E5%8F%96Win32%20API%E5%87%BD%E6%95%B0%E7%9A%84%E5%BC%80%E5%8F%91%E5%8C%85%E5%92%8C%E4%BE%8B%E5%AD%90detours-src-1.2/src/detours.cpp__.htm
+
+            // Do something hacky: GTA requires a valid module handle, so pass a module handle of a DLL that is already loaded
+            // as FreeLibrary is later called
+            return oldLoadLibraryA ( "D3D8.DLL" );
+        }
+
+        // Call old LoadLibraryA (this in our case SharedUtil::MyLoadLibraryA though)
+        return oldLoadLibraryA ( fileName );
+    });
 }
 
 bool UsingAltD3DSetup()
