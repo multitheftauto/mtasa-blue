@@ -14,7 +14,7 @@
 #include "../../vendor/unrar/dll.hpp"
 
 
-bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
+bool TerminateProcessFromPathFilename ( const SString& strPathFilename, bool bTestOnly = false )
 {
     DWORD dwProcessIDs[250];
     DWORD pBytesReturned = 0;
@@ -43,7 +43,8 @@ bool TerminateProcessFromPathFilename ( const SString& strPathFilename )
                         SString strModuleName = ToUTF8( szModuleName );
                         if ( stricmp ( strModuleName, strPathFilename ) == 0 )
                         {
-                            TerminateProcess ( hProcess, 0 );
+                            if ( !bTestOnly )
+                                TerminateProcess ( hProcess, 0 );
                             CloseHandle ( hProcess );
                             return true;
                         } 
@@ -115,7 +116,20 @@ bool DoInstallFiles ( void )
     {
         SString strFile = itemList[i].strDestPathFilename;
         if ( strFile.EndsWithI( ".exe" ) )
+        {
+            if ( ExtractFilename( strFile ).BeginsWithI( "MTA Server" ) )
+            {
+                if ( TerminateProcessFromPathFilename( strFile, true ) )
+                {
+                    int iResponse = MessageBoxUTF8( NULL, _("Do you want to terminate the MTA Server and continue updating?"), "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
+                    if ( iResponse != IDYES )
+                    {
+                        return false;
+                    }
+                }
+            }
             TerminateProcessFromPathFilename ( strFile );
+        }
     }
 
     // Copy current(old) files into backup location
