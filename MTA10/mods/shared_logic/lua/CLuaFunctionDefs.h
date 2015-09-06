@@ -341,6 +341,7 @@ public:
     LUA_DECLARE ( GetTrainDirection );
     LUA_DECLARE ( GetTrainSpeed );
     LUA_DECLARE ( GetTrainTrack );
+    LUA_DECLARE ( GetTrainPosition );
     LUA_DECLARE ( IsTrainChainEngine );
     LUA_DECLARE ( GetVehicleGravity );
     LUA_DECLARE ( IsVehicleBlown );
@@ -398,6 +399,7 @@ public:
     LUA_DECLARE ( SetTrainDirection );
     LUA_DECLARE ( SetTrainSpeed );
     LUA_DECLARE ( SetTrainTrack );
+    LUA_DECLARE ( SetTrainPosition );
     LUA_DECLARE ( SetVehicleGravity );
     LUA_DECLARE ( SetVehicleHeadLightColor );
     LUA_DECLARE ( SetVehicleTurretPosition );

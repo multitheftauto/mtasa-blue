@@ -1392,6 +1392,31 @@ int CLuaFunctionDefs::IsTrainDerailable ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::GetTrainPosition ( lua_State* luaVM )
+{
+    CVehicle* pVehicle;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors () )
+    {
+        float fPosition;
+        if ( CStaticFunctionDefinitions::GetTrainPosition ( pVehicle, fPosition ) )
+        {
+            lua_pushnumber ( luaVM, fPosition );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetTrainTrack ( lua_State* luaVM )
 {
     CVehicle* pVehicle;
@@ -1414,7 +1439,6 @@ int CLuaFunctionDefs::GetTrainTrack ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
 
 
 int CLuaFunctionDefs::GetTrainDirection ( lua_State* luaVM )
@@ -2449,6 +2473,7 @@ int CLuaFunctionDefs::SetTrainSpeed ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaFunctionDefs::SetTrainTrack ( lua_State* luaVM )
 {
     CVehicle* pVehicle;
@@ -2460,14 +2485,39 @@ int CLuaFunctionDefs::SetTrainTrack ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( (ucTrack >= 0) && (ucTrack <= 3) ) {
+        if ( ( ucTrack >= 0 ) && ( ucTrack <= 3 ) ) {
             if ( CStaticFunctionDefinitions::SetTrainTrack ( pVehicle, ucTrack ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
-            }            
+            }
         }
         m_pScriptDebugging->LogCustom ( luaVM, "track number should be between 0 and 3 inclusive" );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetTrainPosition ( lua_State* luaVM )
+{
+    CVehicle* pVehicle;
+    float fPosition;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( fPosition );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetTrainPosition ( pVehicle, fPosition ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
