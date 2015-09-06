@@ -48,6 +48,7 @@ public:
     DECLARE_ELEMENT_RPC ( SetTrainDerailable );
     DECLARE_ELEMENT_RPC ( SetTrainDirection );
     DECLARE_ELEMENT_RPC ( SetTrainSpeed );
+    DECLARE_ELEMENT_RPC ( SetTrainTrack );
     DECLARE_ELEMENT_RPC ( SetVehicleTaxiLightOn );
     DECLARE_ELEMENT_RPC ( SetVehicleHeadLightColor );
     DECLARE_ELEMENT_RPC ( SetVehicleTurretPosition );

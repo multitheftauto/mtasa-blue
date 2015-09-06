@@ -505,6 +505,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isTrainDerailable", CLuaFunctionDefs::IsTrainDerailable );
     CLuaCFunctions::AddFunction ( "getTrainDirection", CLuaFunctionDefs::GetTrainDirection );
     CLuaCFunctions::AddFunction ( "getTrainSpeed", CLuaFunctionDefs::GetTrainSpeed );
+    CLuaCFunctions::AddFunction ( "getTrainTrack", CLuaFunctionDefs::GetTrainTrack );
     CLuaCFunctions::AddFunction ( "isTrainChainEngine", CLuaFunctionDefs::IsTrainChainEngine );
     CLuaCFunctions::AddFunction ( "getVehicleGravity", CLuaFunctionDefs::GetVehicleGravity );
     CLuaCFunctions::AddFunction ( "isVehicleBlown", CLuaFunctionDefs::IsVehicleBlown );
@@ -554,6 +555,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setTrainDerailable", CLuaFunctionDefs::SetTrainDerailable );
     CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefs::SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefs::SetTrainSpeed );
+    CLuaCFunctions::AddFunction ( "setTrainTrack", CLuaFunctionDefs::SetTrainTrack );
     CLuaCFunctions::AddFunction ( "setVehicleTaxiLightOn", CLuaFunctionDefs::SetVehicleTaxiLightOn );
     CLuaCFunctions::AddFunction ( "setVehicleGravity", CLuaFunctionDefs::SetVehicleGravity );
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", CLuaFunctionDefs::SetVehicleHeadLightColor );

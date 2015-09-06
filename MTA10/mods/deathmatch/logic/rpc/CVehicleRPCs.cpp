@@ -42,6 +42,7 @@ void CVehicleRPCs::LoadFunctions ( void )
     AddHandler ( SET_TRAIN_DERAILABLE, SetTrainDerailable, "SetTrainDerailable" );
     AddHandler ( SET_TRAIN_DIRECTION, SetTrainDirection, "SetTrainDirection" );
     AddHandler ( SET_TRAIN_SPEED, SetTrainSpeed, "SetTrainSpeed" );
+    AddHandler ( SET_TRAIN_TRACK, SetTrainTrack, "SetTrainTrack" );
     AddHandler ( SET_TAXI_LIGHT_ON, SetVehicleTaxiLightOn, "SetVehicleTaxiLightOn" );
     AddHandler ( SET_VEHICLE_HEADLIGHT_COLOR, SetVehicleHeadLightColor, "SetVehicleHeadLightColor" );
     AddHandler ( SET_VEHICLE_TURRET_POSITION, SetVehicleTurretPosition, "SetVehicleTurretPosition" );
@@ -524,6 +525,20 @@ void CVehicleRPCs::SetTrainSpeed ( CClientEntity* pSource, NetBitStreamInterface
         if ( pVehicle )
         {
             pVehicle->SetTrainSpeed ( fSpeed );
+        }
+    }
+}
+
+
+void CVehicleRPCs::SetTrainTrack ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    uchar ucTrack;
+    if ( bitStream.Read ( ucTrack ) )
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
+        if ( pVehicle )
+        {
+            pVehicle->SetTrainTrack ( ucTrack );
         }
     }
 }

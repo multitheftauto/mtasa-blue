@@ -1129,7 +1129,8 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getVariant", "getVehicleVariant" );
     lua_classfunction ( luaVM, "getSirens", "getVehicleSirens" );
     lua_classfunction ( luaVM, "getDirection", "getTrainDirection" );
-    lua_classfunction ( luaVM, "getSpeed", "getTrainSpeed" );
+    lua_classfunction ( luaVM, "getTrainSpeed", "getTrainSpeed" );
+    lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
     lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
     lua_classfunction ( luaVM, "getColor", "getVehicleColor" );
     lua_classfunction ( luaVM, "getCompatibleUpgrades", "getVehicleCompatibleUpgrades" );
@@ -1187,7 +1188,8 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setDerailable", "setTrainDerailable" );
     lua_classfunction ( luaVM, "setDerailed", "setTrainDerailed" );
     lua_classfunction ( luaVM, "setDirection", "setTrainDirection" );
-    lua_classfunction ( luaVM, "setSpeed", "setTrainSpeed" );
+    lua_classfunction ( luaVM, "setTrack", "setTrainTrack" );
+    lua_classfunction ( luaVM, "setTrainSpeed", "setTrainSpeed" ); // Reduce confusion
     
     lua_classvariable ( luaVM, "damageProof", "setVehicleDamageProof", "isVehicleDamageProof" );
     lua_classvariable ( luaVM, "locked", "setVehicleLocked", "isVehicleLocked" );
@@ -1195,7 +1197,8 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "derailed", "setTrainDerailed", "isTrainDerailed" );
     lua_classvariable ( luaVM, "blown", "blowVehicle", "isVehicleBlown" );
     lua_classvariable ( luaVM, "direction", "setTrainDirection", "getTrainDirection" );
-    lua_classvariable ( luaVM, "speed", "setTrainSpeed", "getTrainSpeed" );
+    lua_classvariable ( luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed" );
+    lua_classvariable ( luaVM, "track", "setTrainTrack", "getTrainTrack" );
     lua_classvariable ( luaVM, "taxiLightOn", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn" );
     lua_classvariable ( luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable" );
     lua_classvariable ( luaVM, "plateText", "setVehiclePlateText", "getVehiclePlateText" );

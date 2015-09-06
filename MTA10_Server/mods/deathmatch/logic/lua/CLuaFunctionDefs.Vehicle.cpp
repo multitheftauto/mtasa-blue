@@ -1392,6 +1392,30 @@ int CLuaFunctionDefs::IsTrainDerailable ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetTrainTrack ( lua_State* luaVM )
+{
+    CVehicle* pVehicle;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+
+    if ( !argStream.HasErrors () )
+    {
+        uchar ucTrack;
+        if ( CStaticFunctionDefinitions::GetTrainTrack ( pVehicle, ucTrack ) )
+        {
+            lua_pushnumber ( luaVM, ucTrack );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 
 int CLuaFunctionDefs::GetTrainDirection ( lua_State* luaVM )
 {
@@ -2424,6 +2448,34 @@ int CLuaFunctionDefs::SetTrainSpeed ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::SetTrainTrack ( lua_State* luaVM )
+{
+    CVehicle* pVehicle;
+    uchar ucTrack;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadNumber ( ucTrack );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( (ucTrack >= 0) && (ucTrack <= 3) ) {
+            if ( CStaticFunctionDefinitions::SetTrainTrack ( pVehicle, ucTrack ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }            
+        }
+        m_pScriptDebugging->LogCustom ( luaVM, "track number should be between 0 and 3 inclusive" );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::SetVehicleHeadLightColor ( lua_State* luaVM )
 {

@@ -2492,6 +2492,16 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CClientVehicle& Vehicle, float&
 }
 
 
+bool CStaticFunctionDefinitions::GetTrainTrack ( CClientVehicle& Vehicle, uchar& ucTrack )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+    ucTrack = Vehicle.GetTrainTrack ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::IsTrainChainEngine ( CClientVehicle& Vehicle, bool& bChainEngine )
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
@@ -3154,6 +3164,16 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float 
         return false;
 
     Vehicle.SetTrainSpeed ( fSpeed );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainTrack ( CClientVehicle& Vehicle, uchar ucTrack )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+    Vehicle.SetTrainTrack ( ucTrack );
     return true;
 }
 

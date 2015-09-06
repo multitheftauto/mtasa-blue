@@ -5301,6 +5301,13 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CVehicle* pVehicle, float& fSpe
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetTrainTrack ( CVehicle* pVehicle, uchar& ucTrack )
+{
+    assert ( pVehicle );
+    ucTrack = pVehicle->GetTrainTrack ();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::FixVehicle ( CElement* pElement )
 {
     assert ( pElement );
@@ -7194,6 +7201,21 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CVehicle* pVehicle, float fSpee
     BitStream.pBitStream->Write ( fSpeed );
 
     m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_TRAIN_SPEED, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainTrack ( CVehicle* pVehicle, uchar ucTrack )
+{
+    assert ( pVehicle );
+
+    pVehicle->SetTrainTrack ( ucTrack );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( ucTrack );
+
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream ) );
 
     return true;
 }
