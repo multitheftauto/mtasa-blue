@@ -546,14 +546,12 @@ void CVehicleRPCs::SetTrainTrack ( CClientEntity* pSource, NetBitStreamInterface
 
 void CVehicleRPCs::SetTrainPosition ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    g_pCore->DebugEcho ( "SetTrainPositiona" );
     float fPosition;
     if ( bitStream.Read ( fPosition ) )
     {
         CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
         if ( pVehicle )
         {
-            g_pCore->DebugEcho ( "SetTrainPositionaa" );
             pVehicle->SetTrainPosition ( fPosition );
         }
     }
