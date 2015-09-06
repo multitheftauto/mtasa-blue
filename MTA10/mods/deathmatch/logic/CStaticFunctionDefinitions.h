@@ -212,6 +212,7 @@ public:
     static bool                         GetTrainDirection                   ( CClientVehicle& Vehicle, bool& bDirection );
     static bool                         GetTrainSpeed                       ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         GetTrainTrack                       ( CClientVehicle& Vehicle, uchar& ucTrack );
+    static bool                         GetTrainPosition                    ( CClientVehicle& Vehicle, float& fPosition );
     static bool                         IsTrainChainEngine                  ( CClientVehicle& Vehicle, bool& bChainEngine );
     static bool                         IsVehicleBlown                      ( CClientVehicle& Vehicle, bool& bBlown );
     static bool                         GetVehicleHeadLightColor            ( CClientVehicle& Vehicle, SColor& outColor );
@@ -257,6 +258,7 @@ public:
     static bool                         SetTrainDirection                   ( CClientVehicle& Vehicle, bool bDirection );
     static bool                         SetTrainSpeed                       ( CClientVehicle& Vehicle, float fSpeed );
     static bool                         SetTrainTrack                       ( CClientVehicle& Vehicle, uchar ucTrack );
+    static bool                         SetTrainPosition                    ( CClientVehicle& Vehicle, float fPosition );
     static bool                         SetVehicleHeadLightColor            ( CClientEntity& Vehicle, const SColor color );
     static bool                         SetVehicleDoorOpenRatio             ( CClientEntity& Vehicle, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0 );
     static bool                         SetVehicleSirens                    ( CClientVehicle& pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo );

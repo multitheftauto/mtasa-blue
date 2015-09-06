@@ -2502,6 +2502,16 @@ bool CStaticFunctionDefinitions::GetTrainTrack ( CClientVehicle& Vehicle, uchar&
 }
 
 
+bool CStaticFunctionDefinitions::GetTrainPosition ( CClientVehicle& Vehicle, float& fPosition )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+    fPosition = Vehicle.GetTrainPosition ();
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::IsTrainChainEngine ( CClientVehicle& Vehicle, bool& bChainEngine )
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
@@ -3167,7 +3177,6 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float 
     return true;
 }
 
-
 bool CStaticFunctionDefinitions::SetTrainTrack ( CClientVehicle& Vehicle, uchar ucTrack )
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
@@ -3176,6 +3185,18 @@ bool CStaticFunctionDefinitions::SetTrainTrack ( CClientVehicle& Vehicle, uchar 
     Vehicle.SetTrainTrack ( ucTrack );
     return true;
 }
+
+
+
+bool CStaticFunctionDefinitions::SetTrainPosition ( CClientVehicle& Vehicle, float fPosition )
+{
+    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+
+    Vehicle.SetTrainPosition ( fPosition );
+    return true;
+}
+
 
 
 bool CStaticFunctionDefinitions::SetVehicleHeadLightColor ( CClientEntity& Entity, const SColor color )

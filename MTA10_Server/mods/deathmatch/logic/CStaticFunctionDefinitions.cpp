@@ -5301,10 +5301,19 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CVehicle* pVehicle, float& fSpe
     return true;
 }
 
+
 bool CStaticFunctionDefinitions::GetTrainTrack ( CVehicle* pVehicle, uchar& ucTrack )
 {
     assert ( pVehicle );
     ucTrack = pVehicle->GetTrainTrack ();
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetTrainPosition ( CVehicle* pVehicle, float& fPosition )
+{
+    assert ( pVehicle );
+    fPosition = pVehicle->GetTrainPosition ();
     return true;
 }
 
@@ -7216,6 +7225,21 @@ bool CStaticFunctionDefinitions::SetTrainTrack ( CVehicle* pVehicle, uchar ucTra
     BitStream.pBitStream->Write ( ucTrack );
 
     m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream ) );
+
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::SetTrainPosition ( CVehicle* pVehicle, float fPosition )
+{
+    assert ( pVehicle );
+
+    pVehicle->SetTrainPosition ( fPosition );
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write ( fPosition );
+
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_TRAIN_POSITION, *BitStream.pBitStream ) );
 
     return true;
 }

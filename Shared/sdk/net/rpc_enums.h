@@ -251,6 +251,7 @@ enum eElementRPCFunctions
     SET_PROPAGATE_CALLS_ENABLED,
 
     SET_TRAIN_TRACK,
+    SET_TRAIN_POSITION,
 
     NUM_RPC_FUNCS
 };
