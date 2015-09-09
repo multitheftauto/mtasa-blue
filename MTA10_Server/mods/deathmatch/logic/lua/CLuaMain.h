@@ -130,7 +130,6 @@ public:
     void                            AddAccountClass         ( lua_State* luaVM );
     void                            AddBanClass             ( lua_State* luaVM );
     void                            AddColShapeClass        ( lua_State* luaVM );
-    void                            AddObjectClass          ( lua_State* luaVM );
     void                            AddRadarAreaClass       ( lua_State* luaVM );
     void                            AddConnectionClass      ( lua_State* luaVM );
     void                            AddQueryHandleClass     ( lua_State* luaVM );

@@ -70,21 +70,6 @@ public:
     LUA_DECLARE ( AddDebugHook );
     LUA_DECLARE ( RemoveDebugHook );
 
-    // Object create/destroy functions
-    LUA_DECLARE ( CreateObject );
-
-    // Object get functions
-    LUA_DECLARE ( GetObjectName );
-    LUA_DECLARE ( GetObjectRotation );
-    LUA_DECLARE ( GetObjectScale );
-
-    // Object set functions
-    LUA_DECLARE ( SetObjectName );
-    LUA_DECLARE ( SetObjectRotation );
-    LUA_DECLARE ( SetObjectScale );
-    LUA_DECLARE ( MoveObject );
-    LUA_DECLARE ( StopObject );
-
     // Radar area create/destroy funcs
     LUA_DECLARE ( CreateRadarArea );
 

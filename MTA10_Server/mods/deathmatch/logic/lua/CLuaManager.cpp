@@ -186,19 +186,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "cancelLatentEvent", CLuaFunctionDefs::CancelLatentEvent );
     CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefs::AddDebugHook );
     CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefs::RemoveDebugHook );
-    
-    // Object create/destroy funcs
-    CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
-
-    // Object get funcs
-    CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaFunctionDefs::GetObjectRotation );
-    CLuaCFunctions::AddFunction ( "getObjectScale", CLuaFunctionDefs::GetObjectScale );
-
-    // Object set funcs
-    CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaFunctionDefs::SetObjectRotation );
-    CLuaCFunctions::AddFunction ( "setObjectScale", CLuaFunctionDefs::SetObjectScale );
-    CLuaCFunctions::AddFunction ( "moveObject", CLuaFunctionDefs::MoveObject );
-    CLuaCFunctions::AddFunction ( "stopObject", CLuaFunctionDefs::StopObject );
 
     // Radar area create/destroy funcs
     CLuaCFunctions::AddFunction ( "createRadarArea", CLuaFunctionDefs::CreateRadarArea );
@@ -336,6 +323,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaVoiceDefs::LoadFunctions ();
     CLuaXMLDefs::LoadFunctions ();
     CLuaMarkerDefs::LoadFunctions ();
+    CLuaObjectDefs::LoadFunctions ();
     CLuaPedDefs::LoadFunctions ();
     CLuaPlayerDefs::LoadFunctions ();
     CLuaBlipDefs::LoadFunctions ();

@@ -249,22 +249,6 @@ void CLuaMain::AddColShapeClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddObjectClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "createObject" );
-    lua_classfunction ( luaVM, "move", "moveObject" );
-    lua_classfunction ( luaVM, "stop", "stopObject" );
-    
-    lua_classfunction ( luaVM, "getScale", "getObjectScale" );
-    lua_classfunction ( luaVM, "setScale", "setObjectScale" );
-    
-    lua_classvariable ( luaVM, "scale", "setObjectScale", "getObjectScale" );
-
-    lua_registerclass ( luaVM, "Object", "Element" );
-}
-
 void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -339,6 +323,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaACLDefs         ::AddClasses ( luaVM );
     CLuaVehicleDefs     ::AddClass   ( luaVM );
     CLuaMarkerDefs      ::AddClass   ( luaVM );
+    CLuaObjectDefs      ::AddClass   ( luaVM );
     CLuaPedDefs         ::AddClass   ( luaVM );
     CLuaPlayerDefs      ::AddClass   ( luaVM );
     CLuaResourceDefs    ::AddClass   ( luaVM );
@@ -349,7 +334,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddAccountClass             ( luaVM );
     AddBanClass                 ( luaVM );
     AddColShapeClass            ( luaVM );
-    AddObjectClass              ( luaVM );
     AddRadarAreaClass           ( luaVM );
     AddConnectionClass          ( luaVM );
     AddQueryHandleClass         ( luaVM );
