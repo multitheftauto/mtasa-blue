@@ -43,7 +43,7 @@ public:
     void                        SetBeingDestroyed ( bool state ) { m_bBeingDestroyed = state; }
 
     // Exported methods
-    bool LoadURL                ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString(), bool bURLEncoded = true );
+    bool LoadURL                ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString(), bool bURLEncoded = true, bool bIgnoreCache = false );
     bool IsLoading              ();
     void GetURL                 ( SString& outURL );
     void GetTitle               ( SString& outTitle );
