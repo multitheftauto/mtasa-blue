@@ -119,16 +119,6 @@ public:
     LUA_DECLARE ( CreateColPolygon );
     LUA_DECLARE ( CreateColTube );
 
-    // Water funcs
-    LUA_DECLARE ( CreateWater );
-    LUA_DECLARE ( SetWaterLevel );
-    LUA_DECLARE ( ResetWaterLevel );
-    LUA_DECLARE ( GetWaterVertexPosition );
-    LUA_DECLARE ( SetWaterVertexPosition );
-    LUA_DECLARE ( GetWaterColor );
-    LUA_DECLARE ( SetWaterColor );
-    LUA_DECLARE ( ResetWaterColor );
-
     // Weapon funcs
     LUA_DECLARE ( GetWeaponProperty );
     LUA_DECLARE ( GetOriginalWeaponProperty );

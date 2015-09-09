@@ -134,7 +134,6 @@ public:
     void                            AddRadarAreaClass       ( lua_State* luaVM );
     void                            AddConnectionClass      ( lua_State* luaVM );
     void                            AddQueryHandleClass     ( lua_State* luaVM );
-    void                            AddWaterClass           ( lua_State* luaVM );
     void                            AddTimerClass           ( lua_State* luaVM );
     
     bool                            IsOOPEnabled            ( void )                        { return m_bEnableOOP; }

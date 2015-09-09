@@ -460,6 +460,7 @@
     <ClCompile Include="logic\luadefs\CLuaVector3Defs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVector4Defs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVehicleDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaWaterDefs.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Account.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Ban.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Clothing.cpp" />
@@ -475,7 +476,6 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Timer.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.UTF.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Utility.cpp" />
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Water.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Weapon.cpp" />
     <ClCompile Include="logic\lua\CLuaMatrix.cpp" />
     <ClCompile Include="logic\lua\CLuaVector2.cpp" />
@@ -890,6 +890,7 @@
     <ClInclude Include="logic\luadefs\CLuaVector3Defs.h" />
     <ClInclude Include="logic\luadefs\CLuaVector4Defs.h" />
     <ClInclude Include="logic\luadefs\CLuaVehicleDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaWaterDefs.h" />
     <ClInclude Include="logic\lua\CLuaVector2.h" />
     <ClInclude Include="logic\lua\CLuaVector3.h" />
     <ClInclude Include="logic\lua\CLuaVector4.h" />
