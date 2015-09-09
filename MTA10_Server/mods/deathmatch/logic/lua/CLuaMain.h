@@ -129,7 +129,6 @@ private:
 public:
     void                            AddAccountClass         ( lua_State* luaVM );
     void                            AddBanClass             ( lua_State* luaVM );
-    void                            AddBlipClass            ( lua_State* luaVM );
     void                            AddColShapeClass        ( lua_State* luaVM );
     void                            AddObjectClass          ( lua_State* luaVM );
     void                            AddRadarAreaClass       ( lua_State* luaVM );

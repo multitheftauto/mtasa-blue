@@ -70,24 +70,6 @@ public:
     LUA_DECLARE ( AddDebugHook );
     LUA_DECLARE ( RemoveDebugHook );
 
-    // Blip create/destroy functions
-    LUA_DECLARE ( CreateBlip );
-    LUA_DECLARE ( CreateBlipAttachedTo );
-
-    // Blip get functions
-    LUA_DECLARE ( GetBlipIcon );
-    LUA_DECLARE ( GetBlipSize );
-    LUA_DECLARE ( GetBlipColor );
-    LUA_DECLARE ( GetBlipOrdering );
-    LUA_DECLARE ( GetBlipVisibleDistance );
-
-    // Blip set functions
-    LUA_DECLARE ( SetBlipIcon );
-    LUA_DECLARE ( SetBlipSize );
-    LUA_DECLARE ( SetBlipColor );
-    LUA_DECLARE ( SetBlipOrdering );
-    LUA_DECLARE ( SetBlipVisibleDistance );
-
     // Object create/destroy functions
     LUA_DECLARE ( CreateObject );
 

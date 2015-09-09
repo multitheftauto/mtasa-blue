@@ -233,36 +233,6 @@ void CLuaMain::AddBanClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddBlipClass( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "createBlip" );
-    lua_classfunction ( luaVM, "createAttachedTo", "createBlipAttachedTo" );
-    
-    lua_classfunction ( luaVM, "getColor", "getBlipColor" );
-    lua_classfunction ( luaVM, "getVisibleDistance", "getBlipVisibleDistance" );
-    lua_classfunction ( luaVM, "getOrdering", "getBlipOrdering" );
-    lua_classfunction ( luaVM, "getSize", "getBlipSize" );
-    lua_classfunction ( luaVM, "getIcon", "getBlipIcon" );
-    
-    lua_classfunction ( luaVM, "setColor", "setBlipColor" );
-    lua_classfunction ( luaVM, "setVisibleDistance", "setBlipVisibleDistance" );
-    lua_classfunction ( luaVM, "setOrdering", "setBlipOrdering" );
-    lua_classfunction ( luaVM, "setSize", "setBlipSize" );
-    lua_classfunction ( luaVM, "setIcon", "setBlipIcon" );
-    
-    lua_classvariable ( luaVM, "icon", "setBlipIcon", "getBlipIcon" );
-    lua_classvariable ( luaVM, "size", "setBlipSize", "getBlipSize" );
-    lua_classvariable ( luaVM, "ordering", "setBlipOrdering", "getBlipOrdering" );
-    lua_classvariable ( luaVM, "visibleDistance", "setBlipVisibleDistance", "getBlipVisibleDistance" );
-    //lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor", "" ); color
-    
-    lua_registerclass ( luaVM, "Blip", "Element" );
-    
-}
-
-
 void CLuaMain::AddColShapeClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -442,9 +412,9 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaPedDefs         ::AddClass   ( luaVM );
     CLuaPlayerDefs      ::AddClass   ( luaVM );
     CLuaResourceDefs    ::AddClass   ( luaVM );
+    CLuaBlipDefs        ::AddClass   ( luaVM );
     AddAccountClass             ( luaVM );
     AddBanClass                 ( luaVM );
-    AddBlipClass                ( luaVM );
     AddColShapeClass            ( luaVM );
     AddObjectClass              ( luaVM );
     AddRadarAreaClass           ( luaVM );

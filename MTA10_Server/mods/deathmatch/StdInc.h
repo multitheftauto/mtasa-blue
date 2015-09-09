@@ -111,11 +111,12 @@ struct SAclRequest;
 #include "packets/CVoiceEndPacket.h"
 
 // Lua function definition includes
+#include "luadefs/CLuaElementDefs.h"
 #include "luadefs/CLuaACLDefs.h"
 #include "luadefs/CLuaBitDefs.h"
+#include "luadefs/CLuaBlipDefs.h"
 #include "luadefs/CLuaCameraDefs.h"
 #include "luadefs/CLuaDefs.h"
-#include "luadefs/CLuaElementDefs.h"
 #include "luadefs/CLuaFileDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"
 #include "luadefs/CLuaHandlingDefs.h"
