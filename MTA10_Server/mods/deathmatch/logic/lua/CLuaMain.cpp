@@ -311,23 +311,6 @@ void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddTimerClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "setTimer" );
-    lua_classfunction ( luaVM, "destroy", "killTimer" );
-    lua_classfunction ( luaVM, "reset", "resetTimer" );
-    lua_classfunction ( luaVM, "isValid", "isTimer" );
-    
-    lua_classfunction ( luaVM, "getDetails", "getTimerDetails" );
-    
-    lua_classvariable ( luaVM, "valid", NULL, "isTimer" );
-    
-    lua_registerclass ( luaVM, "Timer" );
-}
-
-
 void CLuaMain::InitClasses ( lua_State* luaVM )
 {
     lua_initclasses             ( luaVM );
@@ -362,6 +345,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaBlipDefs        ::AddClass   ( luaVM );
     CLuaTeamDefs        ::AddClass   ( luaVM );
     CLuaWaterDefs       ::AddClass   ( luaVM );
+    CLuaTimerDefs       ::AddClass   ( luaVM );
     AddAccountClass             ( luaVM );
     AddBanClass                 ( luaVM );
     AddColShapeClass            ( luaVM );
@@ -369,7 +353,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddRadarAreaClass           ( luaVM );
     AddConnectionClass          ( luaVM );
     AddQueryHandleClass         ( luaVM );
-    AddTimerClass               ( luaVM );
 }
 
 

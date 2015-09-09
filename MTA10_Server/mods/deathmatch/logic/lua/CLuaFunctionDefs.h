@@ -183,12 +183,6 @@ public:
     LUA_DECLARE ( GetCTime );
     LUA_DECLARE ( Split );
     LUA_DECLARE ( GetTok );
-    LUA_DECLARE ( SetTimer );
-    LUA_DECLARE ( KillTimer );
-    LUA_DECLARE ( ResetTimer );
-    LUA_DECLARE ( GetTimers );
-    LUA_DECLARE ( IsTimer );
-    LUA_DECLARE ( GetTimerDetails );
     LUA_DECLARE ( GetColorFromString );
     LUA_DECLARE ( Reference );
     LUA_DECLARE ( Dereference );

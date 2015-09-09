@@ -200,7 +200,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionDefs.PREG.cpp \
 ./logic/lua/CLuaFunctionDefs.RadarArea.cpp \
 ./logic/lua/CLuaFunctionDefs.Server.cpp \
-./logic/lua/CLuaFunctionDefs.Timer.cpp \
 ./logic/lua/CLuaFunctionDefs.UTF.cpp \
 ./logic/lua/CLuaFunctionDefs.Utility.cpp \
 ./logic/lua/CLuaFunctionDefs.Weapon.cpp \
@@ -239,6 +238,7 @@ LOGIC = \
 ./logic/luadefs/CLuaResourceDefs.cpp \
 ./logic/luadefs/CLuaTeamDefs.cpp \
 ./logic/luadefs/CLuaTextDefs.cpp \
+./logic/luadefs/CLuaTimerDefs.cpp \
 ./logic/luadefs/CLuaVector2Defs.cpp \
 ./logic/luadefs/CLuaVector3Defs.cpp \
 ./logic/luadefs/CLuaVector4Defs.cpp \
