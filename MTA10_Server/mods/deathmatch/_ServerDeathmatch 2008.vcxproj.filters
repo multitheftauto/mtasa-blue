@@ -927,9 +927,6 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Event.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Team.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Server.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
@@ -991,6 +988,9 @@
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="logic\luadefs\CLuaBlipDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaTeamDefs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1869,6 +1869,9 @@
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="logic\luadefs\CLuaBlipDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaTeamDefs.h">
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>

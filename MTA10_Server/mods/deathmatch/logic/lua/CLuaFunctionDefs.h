@@ -119,21 +119,6 @@ public:
     LUA_DECLARE ( CreateColPolygon );
     LUA_DECLARE ( CreateColTube );
 
-    // Team get funcs
-    LUA_DECLARE ( CreateTeam );
-    LUA_DECLARE ( GetTeamFromName );
-    LUA_DECLARE ( GetTeamName );
-    LUA_DECLARE ( GetTeamColor );
-    LUA_DECLARE ( GetTeamFriendlyFire );
-    LUA_DECLARE ( GetPlayersInTeam );
-    LUA_DECLARE ( CountPlayersInTeam );
-
-    // Team set funcs
-    LUA_DECLARE ( SetPlayerTeam );
-    LUA_DECLARE ( SetTeamName );
-    LUA_DECLARE ( SetTeamColor );
-    LUA_DECLARE ( SetTeamFriendlyFire );
-
     // Water funcs
     LUA_DECLARE ( CreateWater );
     LUA_DECLARE ( SetWaterLevel );

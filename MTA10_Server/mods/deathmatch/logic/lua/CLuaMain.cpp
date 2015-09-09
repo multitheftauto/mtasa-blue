@@ -311,33 +311,6 @@ void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddTeamClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "createTeam" );
-    lua_classfunction ( luaVM, "getFromName", "getTeamFromName" );
-    lua_classfunction ( luaVM, "countPlayers", "countPlayersInTeam" );
-    lua_classfunction ( luaVM, "getPlayers", "getPlayersInTeam" );
-    
-    lua_classfunction ( luaVM, "getFriendlyFire", "getTeamFriendlyFire" );
-    lua_classfunction ( luaVM, "getName", "getTeamName" );
-    lua_classfunction ( luaVM, "getColor", "getTeamColor" );
-    
-    lua_classfunction ( luaVM, "setName", "setTeamName" );
-    lua_classfunction ( luaVM, "setColor", "setTeamColor" );
-    lua_classfunction ( luaVM, "setFriendlyFire", "setTeamFriendlyFire" );
-    
-    lua_classvariable ( luaVM, "playerCount", NULL, "countPlayersInTeam" );
-    lua_classvariable ( luaVM, "friendlyFire", "setTeamFriendlyFire", "getTeamFriendlyFire" );
-    lua_classvariable ( luaVM, "players", NULL, "getPlayersInTeam" ); // todo: perhaps table.insert/nilvaluing?
-    lua_classvariable ( luaVM, "name", "setTeamName", "getTeamName" );
-    //lua_classvariable ( luaVM, "color", "setTeamColor", "getTeamColor" );
-
-    lua_registerclass ( luaVM, "Team", "Element" );
-}
-
-
 void CLuaMain::AddWaterClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -413,6 +386,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaPlayerDefs      ::AddClass   ( luaVM );
     CLuaResourceDefs    ::AddClass   ( luaVM );
     CLuaBlipDefs        ::AddClass   ( luaVM );
+    CLuaTeamDefs        ::AddClass   ( luaVM );
     AddAccountClass             ( luaVM );
     AddBanClass                 ( luaVM );
     AddColShapeClass            ( luaVM );
@@ -420,7 +394,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddRadarAreaClass           ( luaVM );
     AddConnectionClass          ( luaVM );
     AddQueryHandleClass         ( luaVM );
-    AddTeamClass                ( luaVM );
     AddWaterClass               ( luaVM );
     AddTimerClass               ( luaVM );
 }

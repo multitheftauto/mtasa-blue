@@ -228,21 +228,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex );
     CLuaCFunctions::AddFunction ( "getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes );
     CLuaCFunctions::AddFunction ( "getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName );
-    
-    // Team get funcs
-    CLuaCFunctions::AddFunction ( "createTeam", CLuaFunctionDefs::CreateTeam );
-    CLuaCFunctions::AddFunction ( "getTeamFromName", CLuaFunctionDefs::GetTeamFromName );
-    CLuaCFunctions::AddFunction ( "getTeamName", CLuaFunctionDefs::GetTeamName );
-    CLuaCFunctions::AddFunction ( "getTeamColor", CLuaFunctionDefs::GetTeamColor );
-    CLuaCFunctions::AddFunction ( "getTeamFriendlyFire", CLuaFunctionDefs::GetTeamFriendlyFire );
-    CLuaCFunctions::AddFunction ( "getPlayersInTeam", CLuaFunctionDefs::GetPlayersInTeam );
-    CLuaCFunctions::AddFunction ( "countPlayersInTeam", CLuaFunctionDefs::CountPlayersInTeam );
-
-    // Team set funcs
-    CLuaCFunctions::AddFunction ( "setPlayerTeam", CLuaFunctionDefs::SetPlayerTeam );
-    CLuaCFunctions::AddFunction ( "setTeamName", CLuaFunctionDefs::SetTeamName );
-    CLuaCFunctions::AddFunction ( "setTeamColor", CLuaFunctionDefs::SetTeamColor );
-    CLuaCFunctions::AddFunction ( "setTeamFriendlyFire", CLuaFunctionDefs::SetTeamFriendlyFire );
 
     // Shape create funcs
     CLuaCFunctions::AddFunction ( "createColCircle", CLuaFunctionDefs::CreateColCircle );
@@ -370,6 +355,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaPedDefs::LoadFunctions ();
     CLuaPlayerDefs::LoadFunctions ();
     CLuaBlipDefs::LoadFunctions ();
+    CLuaTeamDefs::LoadFunctions ();
 
     // All-Seeing Eye Functions
     CLuaCFunctions::AddFunction ( "getGameType", CLuaFunctionDefs::GetGameType );
