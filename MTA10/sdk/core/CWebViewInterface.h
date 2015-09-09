@@ -24,8 +24,8 @@ public:
     virtual bool IsLoading          () = 0;
     virtual void SetBeingDestroyed  ( bool state ) = 0;
     
-    virtual void GetURL             ( SString& outURL ) = 0;
-    virtual void GetTitle           ( SString& outTitle ) = 0;
+    virtual SString GetURL          () = 0;
+    virtual const SString& GetTitle () = 0;
     virtual void SetRenderingPaused ( bool bPaused ) = 0;
     virtual void Focus              ( bool state = true ) = 0;
     virtual IDirect3DTexture9* GetTexture () = 0;
@@ -43,7 +43,6 @@ public:
     virtual void InjectMouseWheel   ( int iScrollVert, int iScrollHorz ) = 0;
 
     virtual bool IsLocal            () = 0;
-    virtual void SetTempURL         ( const SString& strTempURL ) = 0;
 
     virtual float GetAudioVolume    () = 0;
     virtual bool SetAudioVolume     ( float fVolume ) = 0;

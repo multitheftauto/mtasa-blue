@@ -56,14 +56,14 @@ bool CClientWebBrowser::LoadURL ( const SString& strURL, bool bFilterEnabled, co
     return m_pWebView->LoadURL ( strURL, bFilterEnabled, strPostData, bURLEncoded, bIgnoreCache );
 }
 
-void CClientWebBrowser::GetTitle ( SString& outPageTitle )
+const SString& CClientWebBrowser::GetTitle ()
 {
-    m_pWebView->GetTitle ( outPageTitle );
+    return m_pWebView->GetTitle ();
 }
 
-void CClientWebBrowser::GetURL ( SString& outURL )
+SString CClientWebBrowser::GetURL ()
 {
-    m_pWebView->GetURL ( outURL );
+    return m_pWebView->GetURL ();
 }
 
 void CClientWebBrowser::SetRenderingPaused ( bool bPaused )
@@ -119,11 +119,6 @@ void CClientWebBrowser::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
 bool CClientWebBrowser::IsLocal ()
 {
     return m_pWebView->IsLocal ();
-}
-
-void CClientWebBrowser::SetTempURL ( const SString& strTempURL )
-{
-    m_pWebView->SetTempURL ( strTempURL );
 }
 
 float CClientWebBrowser::GetAudioVolume ()
