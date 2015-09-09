@@ -29,8 +29,8 @@ public:
 
     bool                        IsLoading           ();
     bool                        LoadURL             ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString(), bool bURLEncoded = true, bool bIgnoreCache = false );
-    void                        GetTitle            ( SString& outPageTitle );
-    void                        GetURL              ( SString& outURL );
+    const SString&              GetTitle            ();
+    SString                     GetURL              ();
     void                        SetRenderingPaused  ( bool bPaused );
     void                        Focus               ();
 
@@ -45,7 +45,6 @@ public:
     void                        InjectMouseWheel    ( int iScrollVert, int iScrollHorz );
 
     bool                        IsLocal             ();
-    void                        SetTempURL          ( const SString& strTempURL );
 
     inline CResource*           GetResource         () { return m_pResource; }
     inline void                 SetResource         ( CResource* pResource ) { m_pResource = pResource; }

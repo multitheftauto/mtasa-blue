@@ -45,8 +45,8 @@ public:
     // Exported methods
     bool LoadURL                ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString(), bool bURLEncoded = true, bool bIgnoreCache = false );
     bool IsLoading              ();
-    void GetURL                 ( SString& outURL );
-    void GetTitle               ( SString& outTitle );
+    SString GetURL              ();
+    const SString& GetTitle     ();
     void SetRenderingPaused     ( bool bPaused );
     void Focus                  ( bool state = true );
     IDirect3DTexture9* GetTexture () { return static_cast<IDirect3DTexture9*>(m_pWebBrowserRenderItem->m_pD3DTexture); }
@@ -67,7 +67,6 @@ public:
     void InjectKeyboardEvent    ( const CefKeyEvent& keyEvent );
 
     bool IsLocal                ()                                                  { return m_bIsLocal; };
-    void SetTempURL             ( const SString& strTempURL )                       { m_strTempURL = strTempURL; };
 
     inline float GetAudioVolume ()                                                  { return m_fVolume; };
     bool SetAudioVolume         ( float fVolume );
@@ -121,9 +120,6 @@ public:
     virtual void OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& title ) override;
     virtual bool OnTooltip     ( CefRefPtr<CefBrowser> browser, CefString& text ) override;
     virtual bool OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line ) override;
-
-protected:
-    void ConvertURL ( const CefString& url, SString& convertedURL );
     
 private:
     CefRefPtr<CefBrowser> m_pWebView;
@@ -132,7 +128,6 @@ private:
     bool                m_bBeingDestroyed;
     bool                m_bIsLocal;
     bool                m_bIsTransparent;
-    SString             m_strTempURL;
     POINT               m_vecMousePosition;
     SString             m_CurrentTitle;
     float               m_fVolume;
