@@ -197,7 +197,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionDefs.Event.cpp \
 ./logic/lua/CLuaFunctionDefs.Misc.cpp \
 ./logic/lua/CLuaFunctionDefs.PREG.cpp \
-./logic/lua/CLuaFunctionDefs.RadarArea.cpp \
 ./logic/lua/CLuaFunctionDefs.Server.cpp \
 ./logic/lua/CLuaFunctionDefs.UTF.cpp \
 ./logic/lua/CLuaFunctionDefs.Utility.cpp \
@@ -218,7 +217,6 @@ LOGIC = \
 ./logic/lua/LuaUtils.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Connection.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Player.cpp \
-./logic/lua/oopdefs/CLuaOOPFunctionDefs.RadarArea.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaBitDefs.cpp \
 ./logic/luadefs/CLuaBlipDefs.cpp \
@@ -235,6 +233,7 @@ LOGIC = \
 ./logic/luadefs/CLuaPedDefs.cpp \
 ./logic/luadefs/CLuaPickupDefs.cpp \
 ./logic/luadefs/CLuaPlayerDefs.cpp \
+./logic/luadefs/CLuaRadarAreaDefs.cpp \
 ./logic/luadefs/CLuaResourceDefs.cpp \
 ./logic/luadefs/CLuaTeamDefs.cpp \
 ./logic/luadefs/CLuaTextDefs.cpp \

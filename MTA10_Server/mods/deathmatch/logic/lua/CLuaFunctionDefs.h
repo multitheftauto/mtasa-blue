@@ -70,20 +70,6 @@ public:
     LUA_DECLARE ( AddDebugHook );
     LUA_DECLARE ( RemoveDebugHook );
 
-    // Radar area create/destroy funcs
-    LUA_DECLARE ( CreateRadarArea );
-
-    // Radar area get funcs
-    LUA_DECLARE ( GetRadarAreaSize );
-    LUA_DECLARE ( GetRadarAreaColor );
-    LUA_DECLARE ( IsRadarAreaFlashing );
-    LUA_DECLARE ( IsInsideRadarArea );
-
-    // Radar area set funcs
-    LUA_DECLARE ( SetRadarAreaSize );
-    LUA_DECLARE ( SetRadarAreaColor );
-    LUA_DECLARE ( SetRadarAreaFlashing );
-
     // Explosion funcs
     LUA_DECLARE ( CreateExplosion );
 

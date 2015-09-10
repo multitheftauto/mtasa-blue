@@ -456,6 +456,7 @@
     <ClCompile Include="logic\luadefs\CLuaObjectDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaPedDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaPlayerDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaRadarAreaDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaTeamDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaTimerDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaVector2Defs.cpp" />
@@ -472,7 +473,6 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Event.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Misc.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.PREG.cpp" />
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.RadarArea.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Server.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.UTF.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Utility.cpp" />
@@ -483,7 +483,6 @@
     <ClCompile Include="logic\lua\CLuaVector4.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp" />
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp" />
     <ClCompile Include="logic\packets\CPlayerNetworkStatusPacket.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="StdInc.cpp">
@@ -886,6 +885,7 @@
     <ClInclude Include="logic\luadefs\CLuaObjectDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaPedDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaPlayerDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaRadarAreaDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaTeamDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaTimerDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaVector2Defs.h" />

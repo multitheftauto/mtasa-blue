@@ -187,20 +187,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefs::AddDebugHook );
     CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefs::RemoveDebugHook );
 
-    // Radar area create/destroy funcs
-    CLuaCFunctions::AddFunction ( "createRadarArea", CLuaFunctionDefs::CreateRadarArea );
-
-    // Radar area get funcs
-    CLuaCFunctions::AddFunction ( "getRadarAreaSize", CLuaFunctionDefs::GetRadarAreaSize );
-    CLuaCFunctions::AddFunction ( "getRadarAreaColor", CLuaFunctionDefs::GetRadarAreaColor );
-    CLuaCFunctions::AddFunction ( "isRadarAreaFlashing", CLuaFunctionDefs::IsRadarAreaFlashing );
-    CLuaCFunctions::AddFunction ( "isInsideRadarArea", CLuaFunctionDefs::IsInsideRadarArea );
-
-    // Radar area set funcs
-    CLuaCFunctions::AddFunction ( "setRadarAreaSize", CLuaFunctionDefs::SetRadarAreaSize );
-    CLuaCFunctions::AddFunction ( "setRadarAreaColor", CLuaFunctionDefs::SetRadarAreaColor );
-    CLuaCFunctions::AddFunction ( "setRadarAreaFlashing", CLuaFunctionDefs::SetRadarAreaFlashing );
-
     // Explosion create funcs
     CLuaCFunctions::AddFunction ( "createExplosion", CLuaFunctionDefs::CreateExplosion );
 
@@ -330,6 +316,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaTeamDefs::LoadFunctions ();
     CLuaWaterDefs::LoadFunctions ();
     CLuaTimerDefs::LoadFunctions ();
+    CLuaRadarAreaDefs::LoadFunctions ();
 
     // All-Seeing Eye Functions
     CLuaCFunctions::AddFunction ( "getGameType", CLuaFunctionDefs::GetGameType );

@@ -30,9 +30,6 @@ public:
 
     // Connection
     LUA_DECLARE ( DbQuery );
-
-    // RadarArea
-    LUA_DECLARE ( GetRadarAreaSize );
 };
 
 #endif

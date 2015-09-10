@@ -933,9 +933,6 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Weapon.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.RadarArea.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.ColShape.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
@@ -959,9 +956,6 @@
     </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Misc.cpp">
       <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>
     <ClCompile Include="logic\packets\CPlayerNetworkStatusPacket.cpp">
       <Filter>Source Files\logic\packets</Filter>
@@ -991,6 +985,9 @@
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="logic\luadefs\CLuaObjectDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaRadarAreaDefs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1881,6 +1878,9 @@
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="logic\luadefs\CLuaObjectDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaRadarAreaDefs.h">
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>
