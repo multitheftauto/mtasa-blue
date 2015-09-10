@@ -101,7 +101,7 @@ bool CZipMaker::InsertDirectoryTree ( const SString& strInSrc, const SString& st
     SString strSrc = PathConform ( strInSrc );
     SString strDest = PathConform ( strInDest );
 
-    std::vector < SString > fileList = FindFiles ( PathJoin ( strSrc, "*" ), true, true );
+    std::vector < SString > fileList = FindFiles ( PathJoin ( strSrc, "" ), true, true );
     for ( unsigned int i = 0 ; i < fileList.size () ; i++ )
     {
         SString strSrcNext = PathConform ( PathJoin ( strSrc, fileList[i] ) );
