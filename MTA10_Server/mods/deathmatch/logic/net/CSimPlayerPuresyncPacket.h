@@ -12,7 +12,7 @@ class CSimPacket
 {
 public:
                                         CSimPacket          ( void )                        { DEBUG_CREATE_COUNT( "CSimPacket" ); }
-                                        ~CSimPacket         ( void )                        { DEBUG_DESTROY_COUNT( "CSimPacket" ); }
+    virtual                             ~CSimPacket         ( void )                        { DEBUG_DESTROY_COUNT( "CSimPacket" ); }
 
     virtual ePacketID                   GetPacketID         ( void ) const = 0;
     virtual ePacketOrdering             GetPacketOrdering   ( void ) const { return PACKET_ORDERING_DEFAULT; }

@@ -21,7 +21,7 @@ class CXMLConfig
 {
 public:
                                 CXMLConfig          ( const char* szFileName );
-                                ~CXMLConfig         ( void );
+    virtual                     ~CXMLConfig         ( void );
 
     inline std::string&         GetFileName         ( void )                    { return m_strFileName; }
     void                        SetFileName         ( const char* szFileName );

@@ -290,19 +290,18 @@ bool CAccountManager::LoadXML ( CXMLNode* pParent )
                             }
                             else
                             {
-                                CAccount* pAccount = NULL;
                                 pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
                                 if ( pAttribute )
                                 {
                                     //Insert the entry into the accounts database
                                     m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password, serial) VALUES(?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strPassword.c_str(), SQLITE_TEXT, pAttribute->GetValue().c_str() );
-                                    pAccount = new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, pAttribute->GetValue () );
+                                    new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, pAttribute->GetValue () );
                                 }
                                 else
                                 {
                                     //Insert the entry into the accounts database
                                     m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strPassword.c_str() );
-                                    pAccount = new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, "" );
+                                    new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, "" );
                                 }
                             }
                         }

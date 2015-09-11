@@ -32,7 +32,8 @@ public: //All public since it's only an internal class
         m_fPeriod ( period ),
         m_fOvershoot ( overshoot)
     { }
-    
+    virtual ~CComplexEasingFunction( void ) {}
+
     virtual double valueForProgress ( double a_fProgress ) const = 0;
     
     eType   m_eType;
