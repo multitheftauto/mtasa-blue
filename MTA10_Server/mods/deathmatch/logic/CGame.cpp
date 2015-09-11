@@ -989,7 +989,7 @@ bool CGame::ProcessPacket ( CPacket& Packet )
 {
     // Can we handle it?
     ePacketID PacketID = Packet.GetPacketID ();
-    switch ( PacketID )
+    switch ( (int)PacketID )
     {
         case PACKET_ID_PLAYER_JOINDATA:
         {

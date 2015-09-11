@@ -31,7 +31,7 @@ CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacket
 {
     // Create the packet class
     CPacket* pTemp = NULL;
-    switch ( PacketID )
+    switch ( (int)PacketID )
     {
         case PACKET_ID_PLAYER_JOIN:
             pTemp = new CPlayerJoinPacket;

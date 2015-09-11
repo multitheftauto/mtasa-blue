@@ -29,7 +29,7 @@
     #include <unistd.h>
 
     // This is probably safer than changing MTAPlatform.h against compatibility issues
-    #undef Printf
+    #undef Print
     #define Print printf
 #endif
 

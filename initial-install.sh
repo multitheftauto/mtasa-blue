@@ -43,13 +43,13 @@ cd ../..
 # building in parallel mode (use -j<JOBS>)
 if [ $1 = "-g" ]; then
     make \
-                  CFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' \
-                CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized -std=c++0x' \
-                CPPFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
+                  CFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized -Wno-narrowing' \
+                CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized -Wno-narrowing -std=c++0x' \
+                CPPFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized -Wno-narrowing' >_make.log
 else
     make \
-                  CFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' \
-                CXXFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized -std=c++0x' \
-                CPPFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized' >_make.log
+                  CFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized -Wno-narrowing' \
+                CXXFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized -Wno-narrowing -std=c++0x' \
+                CPPFLAGS='-O2 -fPIC -DPIC -Wno-uninitialized -Wno-narrowing' >_make.log
 fi
 

@@ -77,7 +77,7 @@ void CCrashHandler::Init ( const SString& strInServerPath )
 #ifndef WIN32
 
 // Save basic backtrace info into a file. Forced inline to avoid backtrace pollution
-__attribute__((always_inline))
+inline __attribute__((always_inline))
 static void SaveBacktraceSummary()
 {
     // Collect backtrace information
