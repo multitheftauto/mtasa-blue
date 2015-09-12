@@ -82,14 +82,6 @@ public:
     LUA_DECLARE ( GetTypeIndexFromClothes );
     LUA_DECLARE ( GetClothesTypeName );
 
-    // Shape create funcs
-    LUA_DECLARE ( CreateColCircle );
-    LUA_DECLARE ( CreateColCuboid );
-    LUA_DECLARE ( CreateColSphere );
-    LUA_DECLARE ( CreateColRectangle );
-    LUA_DECLARE ( CreateColPolygon );
-    LUA_DECLARE ( CreateColTube );
-
     // Weapon funcs
     LUA_DECLARE ( GetWeaponProperty );
     LUA_DECLARE ( GetOriginalWeaponProperty );

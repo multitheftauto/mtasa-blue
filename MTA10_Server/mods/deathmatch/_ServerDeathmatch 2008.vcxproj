@@ -451,6 +451,7 @@
     <ClCompile Include="..\..\sdk\MTAPlatform.cpp" />
     <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp" />
     <ClCompile Include="logic\luadefs\CLuaBlipDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaColShapeDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaMarkerDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaObjectDefs.cpp" />
@@ -467,7 +468,6 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Account.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Ban.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Clothing.cpp" />
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.ColShape.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Crypt.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Database.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Event.cpp" />
@@ -880,6 +880,7 @@
     <ClInclude Include="..\..\..\vendor\zip\crypt.h" />
     <ClInclude Include="CServer.h" />
     <ClInclude Include="logic\luadefs\CLuaBlipDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaColShapeDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaMarkerDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaMatrixDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaObjectDefs.h" />

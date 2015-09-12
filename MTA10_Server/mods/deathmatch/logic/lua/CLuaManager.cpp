@@ -202,14 +202,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes );
     CLuaCFunctions::AddFunction ( "getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName );
 
-    // Shape create funcs
-    CLuaCFunctions::AddFunction ( "createColCircle", CLuaFunctionDefs::CreateColCircle );
-    CLuaCFunctions::AddFunction ( "createColCuboid", CLuaFunctionDefs::CreateColCuboid );
-    CLuaCFunctions::AddFunction ( "createColSphere", CLuaFunctionDefs::CreateColSphere );
-    CLuaCFunctions::AddFunction ( "createColRectangle", CLuaFunctionDefs::CreateColRectangle );
-    CLuaCFunctions::AddFunction ( "createColPolygon", CLuaFunctionDefs::CreateColPolygon );
-    CLuaCFunctions::AddFunction ( "createColTube", CLuaFunctionDefs::CreateColTube );
-
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefs::GetWeaponNameFromID );
     CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefs::GetWeaponIDFromName );
@@ -317,6 +309,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaWaterDefs::LoadFunctions ();
     CLuaTimerDefs::LoadFunctions ();
     CLuaRadarAreaDefs::LoadFunctions ();
+    CLuaColShapeDefs::LoadFunctions ();
 
     // All-Seeing Eye Functions
     CLuaCFunctions::AddFunction ( "getGameType", CLuaFunctionDefs::GetGameType );

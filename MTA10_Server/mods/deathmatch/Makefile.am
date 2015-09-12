@@ -191,7 +191,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionDefs.Account.cpp \
 ./logic/lua/CLuaFunctionDefs.Ban.cpp \
 ./logic/lua/CLuaFunctionDefs.Clothing.cpp \
-./logic/lua/CLuaFunctionDefs.ColShape.cpp \
 ./logic/lua/CLuaFunctionDefs.Crypt.cpp \
 ./logic/lua/CLuaFunctionDefs.Database.cpp \
 ./logic/lua/CLuaFunctionDefs.Event.cpp \
@@ -222,6 +221,7 @@ LOGIC = \
 ./logic/luadefs/CLuaBlipDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \
 ./logic/luadefs/CLuaClassDefs.cpp \
+./logic/luadefs/CLuaColShapeDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \
 ./logic/luadefs/CLuaElementDefs.cpp \
 ./logic/luadefs/CLuaFileDefs.cpp \

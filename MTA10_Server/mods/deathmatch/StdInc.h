@@ -116,6 +116,7 @@ struct SAclRequest;
 #include "luadefs/CLuaBitDefs.h"
 #include "luadefs/CLuaBlipDefs.h"
 #include "luadefs/CLuaCameraDefs.h"
+#include "luadefs/CLuaColShapeDefs.h"
 #include "luadefs/CLuaDefs.h"
 #include "luadefs/CLuaFileDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"

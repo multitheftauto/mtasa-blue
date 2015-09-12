@@ -233,22 +233,6 @@ void CLuaMain::AddBanClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddColShapeClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "Circle", "createColCircle" );
-    lua_classfunction ( luaVM, "Cuboid", "createColCuboid" );
-    lua_classfunction ( luaVM, "Rectangle", "createColRectangle" );
-    lua_classfunction ( luaVM, "Sphere", "createColSphere" );
-    lua_classfunction ( luaVM, "Tube", "createColTube" );
-    lua_classfunction ( luaVM, "Polygon", "createColPolygon" );
-
-    lua_classfunction ( luaVM, "getElementsWithin", "getElementsWithinColShape" );
-    lua_registerclass ( luaVM, "ColShape", "Element" );
-}
-
-
 void CLuaMain::AddConnectionClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -293,6 +277,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     // Putting CLuaElementDefs::AddClass near
     // the bottom will cause a crash.
     CLuaElementDefs     ::AddClass   ( luaVM );
+    CLuaColShapeDefs    ::AddClass   ( luaVM );
     CLuaFileDefs        ::AddClass   ( luaVM );
     CLuaXMLDefs         ::AddClass   ( luaVM );
     CLuaPickupDefs      ::AddClass   ( luaVM );
@@ -311,7 +296,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaRadarAreaDefs   ::AddClass   ( luaVM );
     AddAccountClass             ( luaVM );
     AddBanClass                 ( luaVM );
-    AddColShapeClass            ( luaVM );
     AddConnectionClass          ( luaVM );
     AddQueryHandleClass         ( luaVM );
 }
