@@ -22,18 +22,27 @@ void CElementDeleter::Delete ( class CElement* pElement, bool bUnlink, bool bUpd
     {
         if ( !IsBeingDeleted ( pElement ) )
         {
+            // Flag it as being deleted
+            pElement->SetIsBeingDeleted ( true );
+
+            // We have to call RemoveAllPlayers here so it's not too late for it
+            // to trigger onPlayerTeamChange with a valid element as previous team
+            if ( pElement->GetType ( ) == CElement::TEAM )
+            {
+                ( ( CTeam* ) pElement )->RemoveAllPlayers ( );
+            }
+
             // Before we do anything, fire the on-destroy event
             CLuaArguments Arguments;
             pElement->CallEvent ( "onElementDestroy", Arguments );
 
             // Add it to our list
-            if ( !pElement->IsBeingDeleted () )
+            if ( !IsBeingDeleted ( pElement ) )
             {
                 m_List.push_back ( pElement );
             }
 
-            // Flag it as being deleted and unlink it from the tree/managers
-            pElement->SetIsBeingDeleted ( true );
+            // unlink it from the tree/managers
             pElement->ClearChildren ();
             pElement->SetParentObject ( NULL, bUpdatePerPlayerEntities );
 

@@ -490,12 +490,22 @@ void CPlayer::SetTeam ( CTeam* pTeam, bool bChangeTeam )
 {
     if ( pTeam == m_pTeam ) return;
 
+    // Setting parameters for the onPlayerTeamChange event
+    CLuaArguments Arguments;
+    Arguments.PushElement( m_pTeam );
+    Arguments.PushElement( pTeam );
+
+    // Trigger onPlayerTeamChange and cancel the execution if canceled (but you can't cancel it if it's because of the player's team being deleted)
+    if ( !CallEvent ( "onPlayerTeamChange", Arguments ) && m_pTeam && !m_pTeam->IsBeingDeleted ( ) )
+        return;
+
     if ( m_pTeam && bChangeTeam )
         m_pTeam->RemovePlayer ( this, false );
 
+    if ( pTeam && bChangeTeam )
+        pTeam->AddPlayer ( this, false );
+
     m_pTeam = pTeam;
-    if ( m_pTeam && bChangeTeam )
-        m_pTeam->AddPlayer ( this, false );
 }
 
 
