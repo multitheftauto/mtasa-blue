@@ -10,9 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUABITDEFS_H
-#define __CLUABITDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaBitDefs: public CLuaDefs
@@ -38,5 +36,3 @@ public:
     LUA_DECLARE ( bitReplace );
 
 };
-
-#endif

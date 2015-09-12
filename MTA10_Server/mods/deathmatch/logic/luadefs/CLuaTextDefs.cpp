@@ -39,7 +39,7 @@ void CLuaTextDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "textItemGetPriority", textItemGetPriority );
 }
 
-void CLuaTextDefs::AddClasses ( lua_State* luaVM )
+void CLuaTextDefs::AddClass ( lua_State* luaVM )
 {
     //////////////////////////
     //  TextDisplay class

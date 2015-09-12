@@ -10,9 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAMATRIXDEFS_H
-#define __CLUAMATRIXDEFS_H
-
+#pragma once
 extern "C"
 {
     #include "lua.h"
@@ -50,5 +48,3 @@ public:
     LUA_DECLARE ( Mul );
     LUA_DECLARE ( Div );
 };
-
-#endif

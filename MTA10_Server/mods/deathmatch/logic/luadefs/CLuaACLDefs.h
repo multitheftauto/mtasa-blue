@@ -18,7 +18,7 @@ class CLuaACLDefs: public CLuaDefs
 {
 public:
     static void     LoadFunctions ( void );
-    static void     AddClasses ( lua_State* luaVM );
+    static void     AddClass      ( lua_State* luaVM );
 
     LUA_DECLARE ( aclReload );
     LUA_DECLARE ( aclSave );

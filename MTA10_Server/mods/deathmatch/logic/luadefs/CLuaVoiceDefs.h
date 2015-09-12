@@ -11,9 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAVOICEDEFS_H
-#define __CLUAVOICEDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaVoiceDefs: public CLuaDefs
@@ -24,5 +22,3 @@ public:
     LUA_DECLARE ( SetPlayerVoiceBroadcastTo );
     LUA_DECLARE ( setPlayerVoiceIgnoreFrom );
 };
-
-#endif

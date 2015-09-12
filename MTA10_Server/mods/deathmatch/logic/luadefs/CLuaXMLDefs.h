@@ -14,9 +14,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAXMLDEFS_H
-#define __CLUAXMLDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaXMLDefs: public CLuaDefs
@@ -47,5 +45,3 @@ public:
     LUA_DECLARE ( xmlNodeGetName );
     LUA_DECLARE ( xmlNodeSetName );
 };
-
-#endif

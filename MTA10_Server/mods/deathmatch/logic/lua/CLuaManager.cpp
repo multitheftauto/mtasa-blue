@@ -289,27 +289,27 @@ void CLuaManager::LoadCFunctions ( void )
     // Load the functions from our classes
     CLuaACLDefs::LoadFunctions ();
     CLuaBitDefs::LoadFunctions ();
+    CLuaBlipDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();
+    CLuaColShapeDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
-    CLuaVehicleDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
     CLuaHandlingDefs::LoadFunctions ();
-    CLuaPickupDefs::LoadFunctions ();
-    CLuaResourceDefs::LoadFunctions ();
-    CLuaTextDefs::LoadFunctions ();
-    CLuaWorldDefs::LoadFunctions ();
-    CLuaVoiceDefs::LoadFunctions ();
-    CLuaXMLDefs::LoadFunctions ();
     CLuaMarkerDefs::LoadFunctions ();
     CLuaObjectDefs::LoadFunctions ();
     CLuaPedDefs::LoadFunctions ();
+    CLuaPickupDefs::LoadFunctions ();
     CLuaPlayerDefs::LoadFunctions ();
-    CLuaBlipDefs::LoadFunctions ();
-    CLuaTeamDefs::LoadFunctions ();
-    CLuaWaterDefs::LoadFunctions ();
-    CLuaTimerDefs::LoadFunctions ();
     CLuaRadarAreaDefs::LoadFunctions ();
-    CLuaColShapeDefs::LoadFunctions ();
+    CLuaResourceDefs::LoadFunctions ();
+    CLuaTeamDefs::LoadFunctions ();
+    CLuaTextDefs::LoadFunctions ();
+    CLuaTimerDefs::LoadFunctions ();
+    CLuaVehicleDefs::LoadFunctions ();
+    CLuaVoiceDefs::LoadFunctions ();
+    CLuaWaterDefs::LoadFunctions ();
+    CLuaWorldDefs::LoadFunctions ();
+    CLuaXMLDefs::LoadFunctions ();
 
     // All-Seeing Eye Functions
     CLuaCFunctions::AddFunction ( "getGameType", CLuaFunctionDefs::GetGameType );

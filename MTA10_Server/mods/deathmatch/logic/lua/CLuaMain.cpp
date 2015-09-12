@@ -271,33 +271,27 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     if ( !m_bEnableOOP )
         return;
     
-    // Ordering of classes matters here -
-    // just make sure that inherited classes
-    // stay near the top.
-    // Putting CLuaElementDefs::AddClass near
-    // the bottom will cause a crash.
-    CLuaElementDefs     ::AddClass   ( luaVM );
+    CLuaElementDefs     ::AddClass   ( luaVM ); // keep this at the top because inheritance
+    AddAccountClass ( luaVM );
+    AddBanClass ( luaVM );
+    CLuaBlipDefs        ::AddClass   ( luaVM );
     CLuaColShapeDefs    ::AddClass   ( luaVM );
+    AddConnectionClass ( luaVM );
     CLuaFileDefs        ::AddClass   ( luaVM );
-    CLuaXMLDefs         ::AddClass   ( luaVM );
-    CLuaPickupDefs      ::AddClass   ( luaVM );
-    CLuaTextDefs        ::AddClasses ( luaVM );
-    CLuaACLDefs         ::AddClasses ( luaVM );
-    CLuaVehicleDefs     ::AddClass   ( luaVM );
     CLuaMarkerDefs      ::AddClass   ( luaVM );
     CLuaObjectDefs      ::AddClass   ( luaVM );
     CLuaPedDefs         ::AddClass   ( luaVM );
+    CLuaPickupDefs      ::AddClass   ( luaVM );
     CLuaPlayerDefs      ::AddClass   ( luaVM );
-    CLuaResourceDefs    ::AddClass   ( luaVM );
-    CLuaBlipDefs        ::AddClass   ( luaVM );
-    CLuaTeamDefs        ::AddClass   ( luaVM );
-    CLuaWaterDefs       ::AddClass   ( luaVM );
-    CLuaTimerDefs       ::AddClass   ( luaVM );
+    AddQueryHandleClass ( luaVM );
     CLuaRadarAreaDefs   ::AddClass   ( luaVM );
-    AddAccountClass             ( luaVM );
-    AddBanClass                 ( luaVM );
-    AddConnectionClass          ( luaVM );
-    AddQueryHandleClass         ( luaVM );
+    CLuaResourceDefs    ::AddClass   ( luaVM );
+    CLuaTeamDefs        ::AddClass   ( luaVM );
+    CLuaTextDefs        ::AddClass   ( luaVM );
+    CLuaTimerDefs       ::AddClass   ( luaVM );
+    CLuaVehicleDefs     ::AddClass   ( luaVM );
+    CLuaWaterDefs       ::AddClass   ( luaVM );
+    CLuaXMLDefs         ::AddClass   ( luaVM );
 }
 
 

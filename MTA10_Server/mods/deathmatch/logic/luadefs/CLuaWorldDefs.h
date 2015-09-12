@@ -13,9 +13,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAWORLDDEFS_H
-#define __CLUAWORLDDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaWorldDefs: public CLuaDefs
@@ -99,5 +97,3 @@ public:
     LUA_DECLARE ( RestoreAllWorldModels );
     LUA_DECLARE ( resetMoonSize );
 };
-
-#endif

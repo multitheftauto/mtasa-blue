@@ -447,6 +447,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CLuaAccountDefs.cpp" />
     <ClCompile Include="CServer.cpp" />
     <ClCompile Include="..\..\sdk\MTAPlatform.cpp" />
     <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp" />
@@ -875,6 +876,7 @@
     <ClCompile Include="..\..\..\Shared\animation\CPositionRotationAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CLuaAccountDefs.h" />
     <ClInclude Include="logic\CLightsyncManager.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="..\..\..\vendor\zip\crypt.h" />

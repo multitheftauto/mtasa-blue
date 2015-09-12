@@ -57,7 +57,7 @@ void CLuaACLDefs::LoadFunctions ( void )
 }
 
 
-void CLuaACLDefs::AddClasses ( lua_State* luaVM )
+void CLuaACLDefs::AddClass ( lua_State* luaVM )
 {
     //////////////////////////
     //  ACL class

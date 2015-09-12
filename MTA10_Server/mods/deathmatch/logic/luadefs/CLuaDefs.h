@@ -11,9 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUADEFS_H
-#define __CLUADEFS_H
-
+#pragma once
 #include "../CAccessControlListManager.h"
 #include "../CAccountManager.h"
 #include "../CBlipManager.h"
@@ -89,5 +87,3 @@ protected:
     static CAccessControlListManager*   m_pACLManager;
     static CMainConfig*                 m_pMainConfig;
 };
-
-#endif

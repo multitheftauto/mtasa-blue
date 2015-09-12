@@ -11,8 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __LUACOMMON_H
-#define __LUACOMMON_H
+#pragma once
 
 extern "C"
 {
@@ -94,5 +93,3 @@ struct SLuaDebugInfo
     int         iLine;
     int         infoType;
 };
-
-#endif

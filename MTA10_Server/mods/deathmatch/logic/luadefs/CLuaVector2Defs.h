@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __LUAVECTORDEFS_H
-#define __LUAVECTORDEFS_H
+#pragma once
 
 extern "C"
 {
@@ -51,5 +50,3 @@ public:
     LUA_DECLARE ( Unm );
     LUA_DECLARE ( Eq );
 };
-
-#endif

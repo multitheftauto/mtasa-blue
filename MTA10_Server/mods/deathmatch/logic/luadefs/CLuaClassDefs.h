@@ -10,9 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __LUACLASSES_H
-#define __LUACLASSES_H
-
+#pragma once
 extern "C"
 {
     #include "lua.h"
@@ -46,5 +44,3 @@ public:
     static const char*	GetQueryClass       ( CDbJobData* pJobData );
     static const char*	GetElementClass		( CElement* pElement );
 };
-
-#endif

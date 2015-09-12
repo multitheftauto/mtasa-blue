@@ -11,16 +11,14 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUATEXTDEFS_H
-#define __CLUATEXTDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaTextDefs: public CLuaDefs
 {
 public:
-    static void     LoadFunctions                       ( void );
-    static void     AddClasses                          ( lua_State* luaVM );
+    static void     LoadFunctions ( void );
+    static void     AddClass      ( lua_State* luaVM );
 
     LUA_DECLARE ( textCreateDisplay );
     LUA_DECLARE ( textDestroyDisplay );
@@ -45,5 +43,3 @@ public:
     LUA_DECLARE ( textItemSetPriority );
     LUA_DECLARE ( textItemGetPriority );
 };
-
-#endif

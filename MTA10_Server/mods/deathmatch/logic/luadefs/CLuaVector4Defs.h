@@ -10,9 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __LUAVECTOR4DEFS_H
-#define __LUAVECTOR4DEFS_H
-
+#pragma once
 extern "C"
 {
     #include "lua.h"
@@ -53,5 +51,3 @@ public:
     LUA_DECLARE ( Unm );
     LUA_DECLARE ( Eq );
 };
-
-#endif

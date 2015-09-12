@@ -10,9 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAHTTPDEFS_H
-#define __CLUAHTTPDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 // This class is for functions are only available to HTTPD scripts.
@@ -29,5 +27,3 @@ public:
     LUA_DECLARE ( httpClear );
     LUA_DECLARE ( httpRequestLogin );
 };
-
-#endif
