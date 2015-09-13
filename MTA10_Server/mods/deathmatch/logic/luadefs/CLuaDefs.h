@@ -53,7 +53,7 @@
 #define SCRIPT_VERIFY_COLSHAPE(colshape) (m_pColManager->Exists(colshape))
 #define SCRIPT_VERIFY_RESOURCE(resource) (m_pResourceManager->Exists(resource))
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM ); 
-#define LUA_DECLARE_OOP(x) static int x ( lua_State * luaVM ); static int OOP_##x ( lua_State * luaVM ); 
+#define LUA_DECLARE_OOP(x) LUA_DECLARE(x) LUA_DECLARE(OOP_##x)
 
 class CLuaDefs
 {
