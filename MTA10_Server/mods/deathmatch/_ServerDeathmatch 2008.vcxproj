@@ -447,10 +447,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CLuaAccountDefs.cpp" />
     <ClCompile Include="CServer.cpp" />
     <ClCompile Include="..\..\sdk\MTAPlatform.cpp" />
     <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaAccountDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaBlipDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaColShapeDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaMarkerDefs.cpp" />
@@ -876,11 +876,11 @@
     <ClCompile Include="..\..\..\Shared\animation\CPositionRotationAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CLuaAccountDefs.h" />
     <ClInclude Include="logic\CLightsyncManager.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="..\..\..\vendor\zip\crypt.h" />
     <ClInclude Include="CServer.h" />
+    <ClInclude Include="logic\luadefs\CLuaAccountDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaBlipDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaColShapeDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaMarkerDefs.h" />

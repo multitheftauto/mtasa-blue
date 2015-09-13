@@ -987,10 +987,10 @@
     <ClCompile Include="logic\luadefs\CLuaRadarAreaDefs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
-    <ClCompile Include="CLuaAccountDefs.cpp">
+    <ClCompile Include="logic\luadefs\CLuaColShapeDefs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
-    <ClCompile Include="logic\luadefs\CLuaColShapeDefs.cpp">
+    <ClCompile Include="logic\luadefs\CLuaAccountDefs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1889,7 +1889,7 @@
     <ClInclude Include="logic\luadefs\CLuaColShapeDefs.h">
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
-    <ClInclude Include="CLuaAccountDefs.h">
+    <ClInclude Include="logic\luadefs\CLuaAccountDefs.h">
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>

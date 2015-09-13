@@ -288,6 +288,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Load the functions from our classes
     CLuaACLDefs::LoadFunctions ();
+    CLuaAccountDefs::LoadFunctions ();
     CLuaBitDefs::LoadFunctions ();
     CLuaBlipDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();
@@ -336,28 +337,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "executeSQLInsert", CLuaFunctionDefs::ExecuteSQLInsert );
     CLuaCFunctions::AddFunction ( "executeSQLQuery", CLuaFunctionDefs::ExecuteSQLQuery );
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
-
-    // Account get functions
-    CLuaCFunctions::AddFunction ( "getAccountName", CLuaFunctionDefs::GetAccountName );
-    CLuaCFunctions::AddFunction ( "getAccountPlayer", CLuaFunctionDefs::GetAccountPlayer );
-    CLuaCFunctions::AddFunction ( "isGuestAccount", CLuaFunctionDefs::IsGuestAccount );
-    CLuaCFunctions::AddFunction ( "getAccountData", CLuaFunctionDefs::GetAccountData );
-    CLuaCFunctions::AddFunction ( "getAllAccountData", CLuaFunctionDefs::GetAllAccountData );
-    CLuaCFunctions::AddFunction ( "getAccount", CLuaFunctionDefs::GetAccount );
-    CLuaCFunctions::AddFunction ( "getAccounts", CLuaFunctionDefs::GetAccounts );
-    CLuaCFunctions::AddFunction ( "getAccountSerial", CLuaFunctionDefs::GetAccountSerial );
-    CLuaCFunctions::AddFunction ( "getAccountsBySerial", CLuaFunctionDefs::GetAccountsBySerial );
-
-    // Account set functions
-    CLuaCFunctions::AddFunction ( "addAccount", CLuaFunctionDefs::AddAccount );
-    CLuaCFunctions::AddFunction ( "removeAccount", CLuaFunctionDefs::RemoveAccount );
-    CLuaCFunctions::AddFunction ( "setAccountPassword", CLuaFunctionDefs::SetAccountPassword );
-    CLuaCFunctions::AddFunction ( "setAccountData", CLuaFunctionDefs::SetAccountData );
-    CLuaCFunctions::AddFunction ( "copyAccountData", CLuaFunctionDefs::CopyAccountData );
-
-    // Log in/out funcs
-    CLuaCFunctions::AddFunction ( "logIn", CLuaFunctionDefs::LogIn );
-    CLuaCFunctions::AddFunction ( "logOut", CLuaFunctionDefs::LogOut );
 
     // Admin functions
     CLuaCFunctions::AddFunction ( "addBan", CLuaFunctionDefs::AddBan );

@@ -112,6 +112,7 @@ struct SAclRequest;
 
 // Lua function definition includes
 #include "luadefs/CLuaElementDefs.h"
+#include "luadefs/CLuaAccountDefs.h"
 #include "luadefs/CLuaACLDefs.h"
 #include "luadefs/CLuaBitDefs.h"
 #include "luadefs/CLuaBlipDefs.h"

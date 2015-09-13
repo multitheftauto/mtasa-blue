@@ -127,7 +127,6 @@ private:
     void                            InitClasses             ( lua_State* luaVM );
 
 public:
-    void                            AddAccountClass         ( lua_State* luaVM );
     void                            AddBanClass             ( lua_State* luaVM );
     void                            AddConnectionClass      ( lua_State* luaVM );
     void                            AddQueryHandleClass     ( lua_State* luaVM );

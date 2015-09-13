@@ -165,43 +165,6 @@ void CLuaMain::InitSecurity ( void )
 }
 
 
-// TODO: special
-void CLuaMain::AddAccountClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "getAll", "getAccounts" );
-    lua_classfunction ( luaVM, "getAllBySerial", "getAccountsBySerial" );
-    lua_classfunction ( luaVM, "getFromPlayer", "getPlayerAccount" );
-    lua_classfunction ( luaVM, "logPlayerOut", "logOut" );
-
-    lua_classfunction ( luaVM, "create", "getAccount" );
-    lua_classfunction ( luaVM, "add", "addAccount" );
-    lua_classfunction ( luaVM, "copyDataFrom", "copyAccountData" );
-    lua_classfunction ( luaVM, "remove", "removeAccount" );
-
-    lua_classfunction ( luaVM, "setData", "setAccountData" );
-    lua_classfunction ( luaVM, "setPassword", "setAccountPassword" );
-
-    lua_classfunction ( luaVM, "getSerial", "getAccountSerial" );
-    lua_classfunction ( luaVM, "getData", "getAccountData" );
-    lua_classfunction ( luaVM, "getAllData", "getAllAccountData" );
-    lua_classfunction ( luaVM, "getName", "getAccountName" );
-    lua_classfunction ( luaVM, "getPlayer", "getAccountPlayer" );
-    lua_classfunction ( luaVM, "isGuest", "isGuestAccount" );
-
-    lua_classvariable ( luaVM, "serial", NULL, "getAccountSerial" );
-    lua_classvariable ( luaVM, "name", NULL, "getAccountName" );
-    lua_classvariable ( luaVM, "player", NULL, "getAccountPlayer" );
-    lua_classvariable ( luaVM, "guest", NULL, "isGuestAccount" );
-    lua_classvariable ( luaVM, "password", "setAccountPassword", NULL );
-    lua_classvariable ( luaVM, "data", NULL, "getAllAccountData" ); // allow setting
-    
-    lua_registerclass ( luaVM, "Account" );
-    
-}
-
-
 // TODO: The "set" attribute of .admin, .reason and .unbanTime needs to be checked for syntax
 void CLuaMain::AddBanClass ( lua_State* luaVM )
 {
@@ -272,7 +235,8 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
         return;
     
     CLuaElementDefs     ::AddClass   ( luaVM ); // keep this at the top because inheritance
-    AddAccountClass ( luaVM );
+    CLuaAccountDefs     ::AddClass   ( luaVM );
+    CLuaACLDefs         ::AddClass   ( luaVM );
     AddBanClass ( luaVM );
     CLuaBlipDefs        ::AddClass   ( luaVM );
     CLuaColShapeDefs    ::AddClass   ( luaVM );
