@@ -144,7 +144,6 @@ struct SAclRequest;
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
 #include "luadefs/CLuaXMLDefs.h"
-#include "lua/oopdefs/CLuaOOPDefs.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"

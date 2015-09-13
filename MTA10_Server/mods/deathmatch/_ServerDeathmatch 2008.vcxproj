@@ -481,7 +481,6 @@
     <ClCompile Include="logic\lua\CLuaVector2.cpp" />
     <ClCompile Include="logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="logic\lua\CLuaVector4.cpp" />
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp" />
     <ClCompile Include="logic\packets\CPlayerNetworkStatusPacket.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="StdInc.cpp">
@@ -899,7 +898,6 @@
     <ClInclude Include="logic\lua\CLuaVector2.h" />
     <ClInclude Include="logic\lua\CLuaVector3.h" />
     <ClInclude Include="logic\lua\CLuaVector4.h" />
-    <ClInclude Include="logic\lua\oopdefs\CLuaOOPDefs.h" />
     <ClInclude Include="logic\packets\CPlayerNetworkStatusPacket.h" />
     <ClInclude Include="utils\CZipMaker.h" />
     <ClInclude Include="..\EXECryptor\EXECryptor.h" />

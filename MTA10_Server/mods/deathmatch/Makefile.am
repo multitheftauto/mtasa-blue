@@ -211,7 +211,6 @@ LOGIC = \
 ./logic/lua/CLuaVector4.cpp \
 ./logic/lua/LuaCommon.cpp \
 ./logic/lua/LuaUtils.cpp \
-./logic/lua/oopdefs/CLuaOOPFunctionDefs.Player.cpp \
 ./logic/luadefs/CLuaAccountDefs.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
 ./logic/luadefs/CLuaBanDefs.cpp \

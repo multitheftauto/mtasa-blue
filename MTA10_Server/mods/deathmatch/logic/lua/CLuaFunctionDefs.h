@@ -29,15 +29,13 @@ class CAccountManager;
 class CColManager;
 class CAccessControlListManager;
 
-#ifndef __CLUAFUNCTIONDEFINITIONS_H
-#define __CLUAFUNCTIONDEFINITIONS_H
-
+#pragma once
 #include "LuaCommon.h"
 #include "CLuaMain.h"
 #include "CLuaTimerManager.h"
 
 #define LUA_ERROR() lua_pushboolean ( luaVM, false ); return 0;
-#define LUA_DECLARE(x) static int x ( lua_State * luaVM );
+#define LUA_DECLARE(x) static int x ( lua_State * luaVM ); 
 
 extern CTimeUsMarker < 20 > markerLatentEvent;  // For timing triggerLatentClientEvent
 
@@ -117,7 +115,7 @@ public:
     // Standard server functions
     LUA_DECLARE ( GetMaxPlayers );
     LUA_DECLARE ( SetMaxPlayers );
-    LUA_DECLARE ( OutputChatBox );
+    LUA_DECLARE ( OutputChatBox ); LUA_DECLARE ( OOP_OutputChatBox );
     LUA_DECLARE ( OutputConsole );
     LUA_DECLARE ( OutputDebugString );
     LUA_DECLARE ( OutputServerLog );
@@ -220,5 +218,3 @@ private:
     static CAccessControlListManager*                   m_pACLManager;
     static CLuaModuleManager*                           m_pLuaModuleManager;
 };
-
-#endif
