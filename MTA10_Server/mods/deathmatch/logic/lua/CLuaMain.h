@@ -70,8 +70,6 @@ public:
     inline const char*              GetScriptName           ( void ) const                  { return m_strScriptName; }
     void                            SetScriptName           ( const char* szName )          { m_strScriptName.AssignLeft ( szName, MAX_SCRIPTNAME_LENGTH ); }
 
-    void                            RegisterFunction        ( const char* szFunction, lua_CFunction function );
-
     inline lua_State*               GetVM                   ( void )                        { return m_luaVM; };
     inline CLuaTimerManager*        GetTimerManager         ( void ) const                  { return m_pLuaTimerManager; };
 
