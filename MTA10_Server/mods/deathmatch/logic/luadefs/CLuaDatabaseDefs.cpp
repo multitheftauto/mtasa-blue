@@ -53,7 +53,7 @@ void CLuaDatabaseDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "poll", "dbPoll" );
     lua_classfunction ( luaVM, "free", "dbFree" );
 
-    lua_registerclass ( luaVM, "QueryHandle" );
+    lua_registerclass ( luaVM, "QueryHandle", NULL, false );
     //////////////////////////
 }
 
