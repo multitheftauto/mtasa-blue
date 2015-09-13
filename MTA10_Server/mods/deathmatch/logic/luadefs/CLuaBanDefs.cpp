@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.x
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/luadefs/CLuaAccountDefs.cpp
+*  FILE:        mods/deathmatch/logic/luadefs/CLuaBanDefs.cpp
 *  PURPOSE:     Lua function definitions class
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/

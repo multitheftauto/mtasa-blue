@@ -454,6 +454,7 @@
     <ClCompile Include="logic\luadefs\CLuaBanDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaBlipDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaColShapeDefs.cpp" />
+    <ClCompile Include="logic\luadefs\CLuaDatabaseDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaMarkerDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp" />
     <ClCompile Include="logic\luadefs\CLuaObjectDefs.cpp" />
@@ -469,7 +470,6 @@
     <ClCompile Include="logic\luadefs\CLuaWaterDefs.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Clothing.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Crypt.cpp" />
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Database.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Event.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Misc.cpp" />
     <ClCompile Include="logic\lua\CLuaFunctionDefs.PREG.cpp" />
@@ -482,7 +482,6 @@
     <ClCompile Include="logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="logic\lua\CLuaVector4.cpp" />
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp" />
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp" />
     <ClCompile Include="logic\packets\CPlayerNetworkStatusPacket.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="StdInc.cpp">
@@ -883,6 +882,7 @@
     <ClInclude Include="logic\luadefs\CLuaBanDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaBlipDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaColShapeDefs.h" />
+    <ClInclude Include="logic\luadefs\CLuaDatabaseDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaMarkerDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaMatrixDefs.h" />
     <ClInclude Include="logic\luadefs\CLuaObjectDefs.h" />

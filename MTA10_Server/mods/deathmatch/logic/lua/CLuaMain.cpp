@@ -165,29 +165,6 @@ void CLuaMain::InitSecurity ( void )
 }
 
 
-void CLuaMain::AddConnectionClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "dbConnect" );
-    lua_classfunction ( luaVM, "exec", "dbExec" );
-    lua_classfunction ( luaVM, "query", "dbQuery", CLuaOOPDefs::DbQuery );
-
-    lua_registerclass ( luaVM, "Connection", "Element" );
-}
-
-
-void CLuaMain::AddQueryHandleClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "poll", "dbPoll" );
-    lua_classfunction ( luaVM, "free", "dbFree" );
-
-    lua_registerclass ( luaVM, "QueryHandle" );
-}
-
-
 void CLuaMain::InitClasses ( lua_State* luaVM )
 {
     lua_initclasses             ( luaVM );
@@ -203,28 +180,27 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     if ( !m_bEnableOOP )
         return;
     
-    CLuaElementDefs     ::AddClass ( luaVM ); // keep this at the top because inheritance
-    CLuaAccountDefs     ::AddClass ( luaVM );
-    CLuaACLDefs         ::AddClass ( luaVM );
-    CLuaBanDefs         ::AddClass ( luaVM );
-    CLuaBlipDefs        ::AddClass ( luaVM );
-    CLuaColShapeDefs    ::AddClass ( luaVM );
-    AddConnectionClass ( luaVM );
-    CLuaFileDefs        ::AddClass ( luaVM );
-    CLuaMarkerDefs      ::AddClass ( luaVM );
-    CLuaObjectDefs      ::AddClass ( luaVM );
-    CLuaPedDefs         ::AddClass ( luaVM );
-    CLuaPickupDefs      ::AddClass ( luaVM );
-    CLuaPlayerDefs      ::AddClass ( luaVM );
-    AddQueryHandleClass ( luaVM );
-    CLuaRadarAreaDefs   ::AddClass ( luaVM );
-    CLuaResourceDefs    ::AddClass ( luaVM );
-    CLuaTeamDefs        ::AddClass ( luaVM );
-    CLuaTextDefs        ::AddClass ( luaVM );
-    CLuaTimerDefs       ::AddClass ( luaVM );
-    CLuaVehicleDefs     ::AddClass ( luaVM );
-    CLuaWaterDefs       ::AddClass ( luaVM );
-    CLuaXMLDefs         ::AddClass ( luaVM );
+    CLuaElementDefs   ::AddClass ( luaVM ); // keep this at the top because inheritance
+    CLuaAccountDefs   ::AddClass ( luaVM );
+    CLuaACLDefs       ::AddClass ( luaVM );
+    CLuaBanDefs       ::AddClass ( luaVM );
+    CLuaBlipDefs      ::AddClass ( luaVM );
+    CLuaColShapeDefs  ::AddClass ( luaVM );
+    CLuaDatabaseDefs  ::AddClass ( luaVM );
+    CLuaFileDefs      ::AddClass ( luaVM );
+    CLuaMarkerDefs    ::AddClass ( luaVM );
+    CLuaObjectDefs    ::AddClass ( luaVM );
+    CLuaPedDefs       ::AddClass ( luaVM );
+    CLuaPickupDefs    ::AddClass ( luaVM );
+    CLuaPlayerDefs    ::AddClass ( luaVM );
+    CLuaRadarAreaDefs ::AddClass ( luaVM );
+    CLuaResourceDefs  ::AddClass ( luaVM );
+    CLuaTeamDefs      ::AddClass ( luaVM );
+    CLuaTextDefs      ::AddClass ( luaVM );
+    CLuaTimerDefs     ::AddClass ( luaVM );
+    CLuaVehicleDefs   ::AddClass ( luaVM );
+    CLuaWaterDefs     ::AddClass ( luaVM );
+    CLuaXMLDefs       ::AddClass ( luaVM );
 }
 
 

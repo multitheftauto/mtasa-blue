@@ -190,7 +190,6 @@ LOGIC = \
 ./logic/lua/CLuaFunctionDefs.cpp \
 ./logic/lua/CLuaFunctionDefs.Clothing.cpp \
 ./logic/lua/CLuaFunctionDefs.Crypt.cpp \
-./logic/lua/CLuaFunctionDefs.Database.cpp \
 ./logic/lua/CLuaFunctionDefs.Event.cpp \
 ./logic/lua/CLuaFunctionDefs.Misc.cpp \
 ./logic/lua/CLuaFunctionDefs.PREG.cpp \
@@ -212,7 +211,6 @@ LOGIC = \
 ./logic/lua/CLuaVector4.cpp \
 ./logic/lua/LuaCommon.cpp \
 ./logic/lua/LuaUtils.cpp \
-./logic/lua/oopdefs/CLuaOOPFunctionDefs.Connection.cpp \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Player.cpp \
 ./logic/luadefs/CLuaAccountDefs.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
@@ -222,6 +220,7 @@ LOGIC = \
 ./logic/luadefs/CLuaCameraDefs.cpp \
 ./logic/luadefs/CLuaClassDefs.cpp \
 ./logic/luadefs/CLuaColShapeDefs.cpp \
+./logic/luadefs/CLuaDatabaseDefs.cpp \
 ./logic/luadefs/CLuaDefs.cpp \
 ./logic/luadefs/CLuaElementDefs.cpp \
 ./logic/luadefs/CLuaFileDefs.cpp \

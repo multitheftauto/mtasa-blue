@@ -46,9 +46,6 @@ class CLuaFunctionDefs
 public:
     static void     Initialize ( class CLuaManager* pLuaManager, class CGame* pClientGame );
 
-    static void DbFreeCallback ( CDbJobData* pJobData, void* pContext );
-    static void DbExecCallback ( CDbJobData* pJobData, void* pContext );
-
     LUA_DECLARE ( DisabledFunction );
     LUA_DECLARE ( CallRemote );
     LUA_DECLARE ( FetchRemote );
@@ -177,22 +174,7 @@ public:
     LUA_DECLARE ( SetRuleValue );
     LUA_DECLARE ( RemoveRuleValue );
 
-    // Database funcs
-    static void     DbQueryCallback ( CDbJobData* pJobData, void* pContext );
-    LUA_DECLARE ( DbConnect );
-    LUA_DECLARE ( DbExec );
-    LUA_DECLARE ( DbQuery );
-    LUA_DECLARE ( DbFree );
-    LUA_DECLARE ( DbPoll );
-
     // Registry funcs
-    LUA_DECLARE ( ExecuteSQLCreateTable );
-    LUA_DECLARE ( ExecuteSQLDropTable );
-    LUA_DECLARE ( ExecuteSQLDelete );
-    LUA_DECLARE ( ExecuteSQLInsert );
-    LUA_DECLARE ( ExecuteSQLSelect );
-    LUA_DECLARE ( ExecuteSQLUpdate );
-    LUA_DECLARE ( ExecuteSQLQuery );
     LUA_DECLARE ( GetPerformanceStats );
 
     // Misc funcs

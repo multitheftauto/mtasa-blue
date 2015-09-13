@@ -120,6 +120,7 @@ struct SAclRequest;
 #include "luadefs/CLuaCameraDefs.h"
 #include "luadefs/CLuaClassDefs.h"
 #include "luadefs/CLuaColShapeDefs.h"
+#include "luadefs/CLuaDatabaseDefs.h"
 #include "luadefs/CLuaDefs.h"
 #include "luadefs/CLuaFileDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"

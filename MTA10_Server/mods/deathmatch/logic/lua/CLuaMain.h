@@ -127,10 +127,8 @@ private:
     void                            InitClasses             ( lua_State* luaVM );
 
 public:
-    void                            AddConnectionClass      ( lua_State* luaVM );
-    void                            AddQueryHandleClass     ( lua_State* luaVM );
-    
     bool                            IsOOPEnabled            ( void )                        { return m_bEnableOOP; }
+
 private:
 
     static void                     InstructionCountHook    ( lua_State* luaVM, lua_Debug* pDebug );

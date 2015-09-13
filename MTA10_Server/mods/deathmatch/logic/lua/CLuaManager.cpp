@@ -294,6 +294,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaBlipDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();
     CLuaColShapeDefs::LoadFunctions ();
+    CLuaDatabaseDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
     CLuaHandlingDefs::LoadFunctions ();
@@ -322,21 +323,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setRuleValue", CLuaFunctionDefs::SetRuleValue );
     CLuaCFunctions::AddFunction ( "removeRuleValue", CLuaFunctionDefs::RemoveRuleValue );
 
-    // Database funcs
-    CLuaCFunctions::AddFunction ( "dbConnect", CLuaFunctionDefs::DbConnect );
-    CLuaCFunctions::AddFunction ( "dbExec", CLuaFunctionDefs::DbExec );
-    CLuaCFunctions::AddFunction ( "dbQuery", CLuaFunctionDefs::DbQuery );
-    CLuaCFunctions::AddFunction ( "dbFree", CLuaFunctionDefs::DbFree );
-    CLuaCFunctions::AddFunction ( "dbPoll", CLuaFunctionDefs::DbPoll );
-
     // Registry functions
-    CLuaCFunctions::AddFunction ( "executeSQLCreateTable", CLuaFunctionDefs::ExecuteSQLCreateTable );
-    CLuaCFunctions::AddFunction ( "executeSQLDropTable", CLuaFunctionDefs::ExecuteSQLDropTable );
-    CLuaCFunctions::AddFunction ( "executeSQLDelete", CLuaFunctionDefs::ExecuteSQLDelete );
-    CLuaCFunctions::AddFunction ( "executeSQLSelect", CLuaFunctionDefs::ExecuteSQLSelect );
-    CLuaCFunctions::AddFunction ( "executeSQLUpdate", CLuaFunctionDefs::ExecuteSQLUpdate );
-    CLuaCFunctions::AddFunction ( "executeSQLInsert", CLuaFunctionDefs::ExecuteSQLInsert );
-    CLuaCFunctions::AddFunction ( "executeSQLQuery", CLuaFunctionDefs::ExecuteSQLQuery );
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
 
     // Admin functions

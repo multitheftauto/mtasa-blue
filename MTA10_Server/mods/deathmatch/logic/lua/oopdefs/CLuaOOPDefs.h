@@ -27,9 +27,6 @@ public:
 
     // Player
     LUA_DECLARE ( OutputChat );
-
-    // Connection
-    LUA_DECLARE ( DbQuery );
 };
 
 #endif

@@ -912,13 +912,7 @@
     <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp">
       <Filter>Source Files\logic\oopdefs</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Database.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Event.cpp">
@@ -988,6 +982,9 @@
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="logic\luadefs\CLuaBanDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaDatabaseDefs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1890,6 +1887,9 @@
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="logic\luadefs\CLuaBanDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaDatabaseDefs.h">
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>
