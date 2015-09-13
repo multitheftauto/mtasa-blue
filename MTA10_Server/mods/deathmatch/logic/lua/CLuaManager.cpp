@@ -289,6 +289,7 @@ void CLuaManager::LoadCFunctions ( void )
     // Load the functions from our classes
     CLuaACLDefs::LoadFunctions ();
     CLuaAccountDefs::LoadFunctions ();
+    CLuaBanDefs::LoadFunctions ();
     CLuaBitDefs::LoadFunctions ();
     CLuaBlipDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();
@@ -339,27 +340,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
 
     // Admin functions
-    CLuaCFunctions::AddFunction ( "addBan", CLuaFunctionDefs::AddBan );
-    CLuaCFunctions::AddFunction ( "removeBan", CLuaFunctionDefs::RemoveBan );
-
-    CLuaCFunctions::AddFunction ( "getBans", CLuaFunctionDefs::GetBans );
-    CLuaCFunctions::AddFunction ( "reloadBans", CLuaFunctionDefs::ReloadBanList );
-
-    CLuaCFunctions::AddFunction ( "getBanIP", CLuaFunctionDefs::GetBanIP );
-    CLuaCFunctions::AddFunction ( "getBanSerial", CLuaFunctionDefs::GetBanSerial );
-    CLuaCFunctions::AddFunction ( "getBanUsername", CLuaFunctionDefs::GetBanUsername );
-    CLuaCFunctions::AddFunction ( "getBanNick", CLuaFunctionDefs::GetBanNick );
-    CLuaCFunctions::AddFunction ( "getBanTime", CLuaFunctionDefs::GetBanTime );
-    CLuaCFunctions::AddFunction ( "getUnbanTime", CLuaFunctionDefs::GetUnbanTime );
-    CLuaCFunctions::AddFunction ( "getBanReason", CLuaFunctionDefs::GetBanReason );
-    CLuaCFunctions::AddFunction ( "getBanAdmin", CLuaFunctionDefs::GetBanAdmin );
-
-    CLuaCFunctions::AddFunction ( "setUnbanTime", CLuaFunctionDefs::SetUnbanTime );
-    CLuaCFunctions::AddFunction ( "setBanReason", CLuaFunctionDefs::SetBanReason );
-    CLuaCFunctions::AddFunction ( "setBanAdmin", CLuaFunctionDefs::SetBanAdmin );
-    CLuaCFunctions::AddFunction ( "setBanNick", CLuaFunctionDefs::SetBanNick );
-    CLuaCFunctions::AddFunction ( "isBan", CLuaFunctionDefs::IsBan );
-
     /*
     CLuaCFunctions::AddFunction ( "aexec", CLuaFunctionDefinitions::Aexec );
     CLuaCFunctions::AddFunction ( "kickPlayer", CLuaFunctionDefinitions::KickPlayer );

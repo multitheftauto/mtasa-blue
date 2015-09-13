@@ -165,37 +165,6 @@ void CLuaMain::InitSecurity ( void )
 }
 
 
-// TODO: The "set" attribute of .admin, .reason and .unbanTime needs to be checked for syntax
-void CLuaMain::AddBanClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "addBan" );
-    lua_classfunction ( luaVM, "remove", "removeBan" );
-    lua_classfunction ( luaVM, "getList", "getBans" );
-    lua_classvariable ( luaVM, "list", NULL, "getBans" );
-    
-    lua_classfunction ( luaVM, "getAdmin", "getBanAdmin" );
-    lua_classfunction ( luaVM, "getIP", "getBanIP" );
-    lua_classfunction ( luaVM, "getNick", "getBanNick" );
-    lua_classfunction ( luaVM, "getReason", "getBanReason" );
-    lua_classfunction ( luaVM, "getSerial", "getBanSerial" );
-    lua_classfunction ( luaVM, "getTime", "getBanTime" );
-    lua_classfunction ( luaVM, "getUnbanTime", "getUnbanTime" );
-    
-    lua_classvariable ( luaVM, "admin", "setBanAdmin", "getBanAdmin" );
-    lua_classvariable ( luaVM, "IP", NULL, "getBanIP" );
-    lua_classvariable ( luaVM, "nick", NULL, "getBanNick" );
-    lua_classvariable ( luaVM, "serial", NULL, "getBanSerial" );
-    lua_classvariable ( luaVM, "time", NULL, "getBanTime" );
-    lua_classvariable ( luaVM, "unbanTime", NULL, "getUnbanTime" );
-    lua_classvariable ( luaVM, "reason", "setBanReason", "getBanReason" );
-    lua_classvariable ( luaVM, "nick", "setBanNick", "getBanNick" );
-    
-    lua_registerclass ( luaVM, "Ban" );
-}
-
-
 void CLuaMain::AddConnectionClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -234,28 +203,28 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     if ( !m_bEnableOOP )
         return;
     
-    CLuaElementDefs     ::AddClass   ( luaVM ); // keep this at the top because inheritance
-    CLuaAccountDefs     ::AddClass   ( luaVM );
-    CLuaACLDefs         ::AddClass   ( luaVM );
-    AddBanClass ( luaVM );
-    CLuaBlipDefs        ::AddClass   ( luaVM );
-    CLuaColShapeDefs    ::AddClass   ( luaVM );
+    CLuaElementDefs     ::AddClass ( luaVM ); // keep this at the top because inheritance
+    CLuaAccountDefs     ::AddClass ( luaVM );
+    CLuaACLDefs         ::AddClass ( luaVM );
+    CLuaBanDefs         ::AddClass ( luaVM );
+    CLuaBlipDefs        ::AddClass ( luaVM );
+    CLuaColShapeDefs    ::AddClass ( luaVM );
     AddConnectionClass ( luaVM );
-    CLuaFileDefs        ::AddClass   ( luaVM );
-    CLuaMarkerDefs      ::AddClass   ( luaVM );
-    CLuaObjectDefs      ::AddClass   ( luaVM );
-    CLuaPedDefs         ::AddClass   ( luaVM );
-    CLuaPickupDefs      ::AddClass   ( luaVM );
-    CLuaPlayerDefs      ::AddClass   ( luaVM );
+    CLuaFileDefs        ::AddClass ( luaVM );
+    CLuaMarkerDefs      ::AddClass ( luaVM );
+    CLuaObjectDefs      ::AddClass ( luaVM );
+    CLuaPedDefs         ::AddClass ( luaVM );
+    CLuaPickupDefs      ::AddClass ( luaVM );
+    CLuaPlayerDefs      ::AddClass ( luaVM );
     AddQueryHandleClass ( luaVM );
-    CLuaRadarAreaDefs   ::AddClass   ( luaVM );
-    CLuaResourceDefs    ::AddClass   ( luaVM );
-    CLuaTeamDefs        ::AddClass   ( luaVM );
-    CLuaTextDefs        ::AddClass   ( luaVM );
-    CLuaTimerDefs       ::AddClass   ( luaVM );
-    CLuaVehicleDefs     ::AddClass   ( luaVM );
-    CLuaWaterDefs       ::AddClass   ( luaVM );
-    CLuaXMLDefs         ::AddClass   ( luaVM );
+    CLuaRadarAreaDefs   ::AddClass ( luaVM );
+    CLuaResourceDefs    ::AddClass ( luaVM );
+    CLuaTeamDefs        ::AddClass ( luaVM );
+    CLuaTextDefs        ::AddClass ( luaVM );
+    CLuaTimerDefs       ::AddClass ( luaVM );
+    CLuaVehicleDefs     ::AddClass ( luaVM );
+    CLuaWaterDefs       ::AddClass ( luaVM );
+    CLuaXMLDefs         ::AddClass ( luaVM );
 }
 
 

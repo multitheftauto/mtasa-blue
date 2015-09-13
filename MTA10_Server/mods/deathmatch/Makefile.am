@@ -188,7 +188,6 @@ LOGIC = \
 ./logic/lua/CLuaArguments.cpp \
 ./logic/lua/CLuaCFunctions.cpp \
 ./logic/lua/CLuaFunctionDefs.cpp \
-./logic/lua/CLuaFunctionDefs.Ban.cpp \
 ./logic/lua/CLuaFunctionDefs.Clothing.cpp \
 ./logic/lua/CLuaFunctionDefs.Crypt.cpp \
 ./logic/lua/CLuaFunctionDefs.Database.cpp \
@@ -217,6 +216,7 @@ LOGIC = \
 ./logic/lua/oopdefs/CLuaOOPFunctionDefs.Player.cpp \
 ./logic/luadefs/CLuaAccountDefs.cpp \
 ./logic/luadefs/CLuaACLDefs.cpp \
+./logic/luadefs/CLuaBanDefs.cpp \
 ./logic/luadefs/CLuaBitDefs.cpp \
 ./logic/luadefs/CLuaBlipDefs.cpp \
 ./logic/luadefs/CLuaCameraDefs.cpp \

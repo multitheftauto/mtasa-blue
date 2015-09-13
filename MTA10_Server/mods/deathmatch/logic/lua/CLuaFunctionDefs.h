@@ -195,28 +195,6 @@ public:
     LUA_DECLARE ( ExecuteSQLQuery );
     LUA_DECLARE ( GetPerformanceStats );
 
-    // Admin funcs
-    LUA_DECLARE ( AddBan );
-    LUA_DECLARE ( RemoveBan );
-
-    LUA_DECLARE ( GetBans );
-    LUA_DECLARE ( ReloadBanList );
-
-    LUA_DECLARE ( GetBanIP );
-    LUA_DECLARE ( GetBanSerial );
-    LUA_DECLARE ( GetBanUsername );
-    LUA_DECLARE ( GetBanNick );
-    LUA_DECLARE ( GetBanTime );
-    LUA_DECLARE ( GetUnbanTime );
-    LUA_DECLARE ( GetBanReason );
-    LUA_DECLARE ( GetBanAdmin );
-
-    LUA_DECLARE ( SetUnbanTime );
-    LUA_DECLARE ( SetBanReason );
-    LUA_DECLARE ( SetBanAdmin );
-    LUA_DECLARE ( SetBanNick );
-    LUA_DECLARE ( IsBan );
-
     // Misc funcs
     LUA_DECLARE ( ResetMapInfo );
     LUA_DECLARE ( GetServerPort );
