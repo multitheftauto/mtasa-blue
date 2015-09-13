@@ -744,8 +744,8 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         }
 
         // Player flags
-        bool bIsDead = bitStream.ReadBit ();
-        bool bIsSpawned = bitStream.ReadBit ();
+        bool bIsDead = bitStream.ReadBit ();        // Unused.
+        bool bIsSpawned = bitStream.ReadBit ();     // Indicates extra info in packet. Always true for newer server builds.
         bool bInVehicle = bitStream.ReadBit ();
         bool bHasJetPack = bitStream.ReadBit ();
         bool bNametagShowing = bitStream.ReadBit ();
@@ -786,11 +786,6 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         if ( bitStream.Version() > 0x4B )
             bitStream.Read ( ucMoveAnim );
 
-        // **************************************************************************************************************
-        // Note: The code below skips various attributes if the player is not spawned.
-        // This means joining clients will not receive the current value of these attributes, which could lead to desync.
-        // **************************************************************************************************************
-
         // Read out the spawndata if he has spawned
         unsigned short usPlayerModelID;
         ElementID TeamID = INVALID_ELEMENT_ID;
@@ -802,7 +797,7 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         unsigned char ucFightingStyle = 0;
         SEntityAlphaSync alpha;
         unsigned char ucInterior = 0;
-        if ( bIsSpawned )
+        if ( bIsSpawned )       // Always true for newer server builds.
         {
             // Read out the player model id
             bitStream.ReadCompressed ( usPlayerModelID );
@@ -896,7 +891,7 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
                 pPlayer->SetTeam ( pTeam, true );
 
             // If the player has spawned
-            if ( bIsSpawned )
+            if ( bIsSpawned )       // Always true for newer server builds.
             {
                 // Give him the correct skin
                 pPlayer->SetModel ( usPlayerModelID );
