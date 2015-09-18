@@ -279,6 +279,12 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
 
             // Fire
             g_iDamageEventLimit = 1;
+
+#if MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE 
+            #pragma message( "Testing #9038: bugged shotgun with bullet sync" )
+            g_iDamageEventLimit = 2;
+#endif
+
             CWeapon* pWeapon = m_pPlayerPed->GetWeapon ( m_pPlayerPed->GetCurrentWeaponSlot () );
             pWeapon->FireBullet ( m_pPlayerPed, vecStart, vecEnd );
             g_iDamageEventLimit = -1;
