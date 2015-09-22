@@ -128,6 +128,14 @@ bool CClientDFF::ReplaceModel ( unsigned short usModel, bool bAlphaTransparency 
     // We have a DFF?
     if ( pClump )
     {
+        g_pCore->LogEvent( 6450, "ReplaceModel", "", SString( "%d", usModel ) );
+
+        //////////////////////////////////////////
+        #pragma message( "Temp crash fix test - Remove one day" )
+        if ( usModel == 1168 )
+            return true;
+        //////////////////////////////////////////
+
         // Have someone already replaced that model?
         CClientDFF* pReplaced = m_pDFFManager->GetElementThatReplaced ( usModel );
         if ( pReplaced )
