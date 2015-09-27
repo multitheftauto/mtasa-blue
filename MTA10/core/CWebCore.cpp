@@ -796,6 +796,14 @@ bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownl
 //////////////////////////////////////////////////////////////
 //                CefApp implementation                     //
 //////////////////////////////////////////////////////////////
+CefRefPtr<CefResourceHandler> CCefApp::HandleError ( const SString& strError, unsigned int uiError )
+{
+    auto stream = CefStreamReader::CreateForData ( (void*)strError.c_str(), strError.length());
+    return new CefStreamResourceHandler ( 
+            uiError, strError, "text/plain", CefResponse::HeaderMap(), stream);
+}
+
+
 void CCefApp::OnRegisterCustomSchemes ( CefRefPtr < CefSchemeRegistrar > registrar )
 {
     // Register custom MTA scheme (has to be called in all proceseses)
@@ -837,7 +845,7 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
                 request->SetURL ( "http://mta/local/" + resourceName + resourcePath );
                 return Create ( browser, frame, "http", request );
             }
-            return nullptr;
+            return HandleError ("404 - Not found", 404);
         }
         
         // Redirect mtalocal://* to http://mta/local/*, call recursively
@@ -854,13 +862,13 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
         SString path = UTF16ToMbUTF8 ( urlParts.path.str ).substr ( 1 ); // Remove slash at the front
         size_t slashPos = path.find ( '/' );
         if ( slashPos == std::string::npos )
-            return nullptr;
+            return HandleError ( "404 - Not found", 404 );
 
         SString resourceName = path.substr ( 0, slashPos );
         SString resourcePath = path.substr ( slashPos + 1 );
 
         if ( resourcePath.empty () )
-            return nullptr;
+            return HandleError ( "404 - Not found", 404 );
 
         // Get mime type from extension
         CefString mimeType;
@@ -939,17 +947,21 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
 
             // Calculate absolute path
             if ( !pWebView->GetFullPathFromLocal ( path ) )
-                return nullptr;
+                return HandleError ( "404 - Not found", 404 );
+
+            // Verify local files
+            if ( !pWebView->VerifyFile ( path ) )
+                return HandleError ( "403 - Access Denied", 403 );
         
             // Finally, load the file stream
             auto stream = CefStreamReader::CreateForFile ( path );
             if ( stream.get () )
                 return new CefStreamResourceHandler ( mimeType, stream );
+            return HandleError ( "404 - Not found", 404 );
         }
-
-        return nullptr;
     }
 
     // Return null if there is no matching scheme
+    // This falls back to letting CEF handle the request
     return nullptr;
 }

@@ -368,6 +368,10 @@ bool CWebView::ToggleDevTools ( bool visible )
     return CWebDevTools::Close ( this );
 }
 
+bool CWebView::VerifyFile ( const SString& strPath )
+{
+    return m_pEventsInterface->Events_OnResourceFileCheck ( strPath );
+}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
