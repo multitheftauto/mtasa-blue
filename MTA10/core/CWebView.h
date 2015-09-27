@@ -74,6 +74,7 @@ public:
     void GetSourceCode          ( const std::function<void( const std::string& code )>& callback );
 
     bool GetFullPathFromLocal   ( SString& strPath );
+    bool VerifyFile             ( const SString& strPath );
     
     virtual bool RegisterAjaxHandler ( const SString& strURL ) override;
     virtual bool UnregisterAjaxHandler ( const SString& strURL ) override;

@@ -342,6 +342,11 @@ void CWebView::HandleAjaxRequest ( const SString& strURL, CAjaxResourceHandler *
     g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "AjaxResourceRequest" );
 }
 
+bool CWebView::VerifyFile ( const SString& strPath )
+{
+    return m_pEventsInterface->Events_OnResourceFileCheck ( strPath );
+}
+
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //

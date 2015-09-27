@@ -119,6 +119,9 @@ private:
 class CCefApp : public CefApp, public CefSchemeHandlerFactory
 {
 public:
+    // Error Handler
+    static CefRefPtr<CefResourceHandler> CCefApp::HandleError ( const SString& strError, unsigned int uiError );
+
     virtual void OnRegisterCustomSchemes ( CefRefPtr<CefSchemeRegistrar> registrar ) override;
 
     // CefSchemeHandlerFactory methods
