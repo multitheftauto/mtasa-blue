@@ -385,13 +385,13 @@ void CResource::Load ( void )
             // Load the file
             std::vector < char > buffer;
             FileLoad ( pResourceFile->GetName (), buffer );
-            unsigned int iSize = buffer.size();
+            const char* pBufferData = buffer.empty() ? nullptr : &buffer.at( 0 );
 
             DECLARE_PROFILER_SECTION( OnPreLoadScript )
             // Check the contents
-            if ( iSize > 0 && CChecksum::GenerateChecksumFromBuffer ( &buffer.at ( 0 ), iSize ) == pResourceFile->GetServerChecksum () )
+            if ( CChecksum::GenerateChecksumFromBuffer ( pBufferData, buffer.size() ) == pResourceFile->GetServerChecksum () )
             {
-                m_pLuaVM->LoadScriptFromBuffer ( &buffer.at ( 0 ), iSize, pResourceFile->GetName () );
+                m_pLuaVM->LoadScriptFromBuffer ( pBufferData, buffer.size(), pResourceFile->GetName () );
             }
             else
             {
