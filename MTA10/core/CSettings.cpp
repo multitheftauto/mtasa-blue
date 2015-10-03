@@ -1399,7 +1399,8 @@ void CSettings::CreateGUI ( void )
     vecTemp.fY += fLineHeight;
     vecTemp.fX -= 110;
 
-    if ( GetApplicationSetting ( "os-version" ) < "6.2" )
+    // Hide if < Win8 or >= Win10
+    if ( IsWindows8OrGreater() == false || IsWindows10OrGreater() == true )
     {
 #ifndef MTA_DEBUG   // Don't hide when debugging
         m_pWin8Label->SetVisible ( false );
