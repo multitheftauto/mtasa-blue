@@ -523,6 +523,14 @@ void SharedUtil::WatchDogSetLastRunCrash( bool bOn )
     bWatchDogWasLastRunCrashValue = bOn;
 }
 
+//
+// Special things
+//
+void SharedUtil::WatchDogUserDidInteractWithMenu( void )
+{
+    WatchDogCompletedSection( WD_SECTION_NOT_USED_MAIN_MENU );
+    WatchDogCompletedSection( WD_SECTION_POST_INSTALL );
+}
 
 
 void SharedUtil::SetClipboardText ( const SString& strText )

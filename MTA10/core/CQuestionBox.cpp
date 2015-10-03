@@ -211,6 +211,9 @@ bool CQuestionBox::IsVisible ( void )
 
 bool CQuestionBox::OnButtonClick ( CGUIElement* pElement )
 {
+    // For detecting startup problems
+    WatchDogUserDidInteractWithMenu();
+
     m_uiLastButton = reinterpret_cast < unsigned int > ( pElement->GetUserData () );
     if ( m_Callback)
         m_Callback ( m_CallbackParameter, m_uiLastButton );

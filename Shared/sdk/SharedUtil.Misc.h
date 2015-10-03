@@ -121,6 +121,7 @@ namespace SharedUtil
     void            WatchDogSetUncleanStop          ( bool bOn );
     bool            WatchDogWasLastRunCrash         ( void );
     void            WatchDogSetLastRunCrash         ( bool bOn );
+    void            WatchDogUserDidInteractWithMenu ( void );
 
     // BrowseToSolution flags
     enum
