@@ -60,6 +60,9 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     m_bNotifyServerBrowser = bNotifyServerBrowser;
 
+    // For detecting startup problems
+    WatchDogUserDidInteractWithMenu();
+
     // Hide certain questions
     CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->OnConnect ();
 

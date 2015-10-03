@@ -769,6 +769,9 @@ bool CMainMenu::OnMenuClick ( CGUIElement* pElement )
     // Handle all our clicks to the menu from here
     if ( m_pHoveredItem )
     {
+        // For detecting startup problems
+        WatchDogUserDidInteractWithMenu();
+
         // Possible disconnect question for user
         if ( g_pCore->IsConnected() )
         {
