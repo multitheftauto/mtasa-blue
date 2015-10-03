@@ -191,11 +191,11 @@ void HandleDuplicateLaunching( void )
                 LPWSTR szCommandLine = GetCommandLineW ();
                 int numArgs;
                 LPWSTR* aCommandLineArgs = CommandLineToArgvW ( szCommandLine, &numArgs );
-                for ( int i = 0; i < numArgs; ++i )
+                for ( int i = 1; i < numArgs; ++i )
                 {
-                    if ( StrCmpW ( aCommandLineArgs[i], L"-c" ) == 0 && numArgs > i )
+                    if ( WStringX( aCommandLineArgs[i] ).BeginsWith( L"mtasa://" ) )
                     {
-                        WString wideConnectInfo = aCommandLineArgs[i + 1];
+                        WString wideConnectInfo = aCommandLineArgs[i];
                         SString strConnectInfo = ToUTF8 ( wideConnectInfo );
 
                         COPYDATASTRUCT cdStruct;
