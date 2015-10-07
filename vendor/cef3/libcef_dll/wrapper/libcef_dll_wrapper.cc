@@ -54,6 +54,7 @@
 #include "libcef_dll/cpptoc/life_span_handler_cpptoc.h"
 #include "libcef_dll/cpptoc/load_handler_cpptoc.h"
 #include "libcef_dll/cpptoc/navigation_entry_visitor_cpptoc.h"
+#include "libcef_dll/cpptoc/pdf_print_callback_cpptoc.h"
 #include "libcef_dll/cpptoc/print_handler_cpptoc.h"
 #include "libcef_dll/cpptoc/read_handler_cpptoc.h"
 #include "libcef_dll/cpptoc/render_handler_cpptoc.h"
@@ -98,6 +99,7 @@
 #include "libcef_dll/ctocpp/print_settings_ctocpp.h"
 #include "libcef_dll/ctocpp/process_message_ctocpp.h"
 #include "libcef_dll/ctocpp/request_callback_ctocpp.h"
+#include "libcef_dll/ctocpp/run_context_menu_callback_ctocpp.h"
 #include "libcef_dll/ctocpp/sslcert_principal_ctocpp.h"
 #include "libcef_dll/ctocpp/sslinfo_ctocpp.h"
 #include "libcef_dll/ctocpp/scheme_registrar_ctocpp.h"
@@ -224,6 +226,7 @@ CEF_GLOBAL void CefShutdown() {
   DCHECK(base::AtomicRefCountIsZero(&CefNavigationEntryCToCpp::DebugObjCt));
   DCHECK(base::AtomicRefCountIsZero(
       &CefNavigationEntryVisitorCppToC::DebugObjCt));
+  DCHECK(base::AtomicRefCountIsZero(&CefPdfPrintCallbackCppToC::DebugObjCt));
   DCHECK(base::AtomicRefCountIsZero(&CefPrintDialogCallbackCToCpp::DebugObjCt));
   DCHECK(base::AtomicRefCountIsZero(&CefPrintHandlerCppToC::DebugObjCt));
   DCHECK(base::AtomicRefCountIsZero(&CefPrintJobCallbackCToCpp::DebugObjCt));
@@ -238,6 +241,8 @@ CEF_GLOBAL void CefShutdown() {
   DCHECK(base::AtomicRefCountIsZero(
       &CefResourceBundleHandlerCppToC::DebugObjCt));
   DCHECK(base::AtomicRefCountIsZero(&CefResourceHandlerCppToC::DebugObjCt));
+  DCHECK(base::AtomicRefCountIsZero(
+      &CefRunContextMenuCallbackCToCpp::DebugObjCt));
   DCHECK(base::AtomicRefCountIsZero(
       &CefRunFileDialogCallbackCppToC::DebugObjCt));
   DCHECK(base::AtomicRefCountIsZero(&CefSSLCertPrincipalCToCpp::DebugObjCt));
@@ -299,6 +304,13 @@ CEF_GLOBAL void CefSetOSModalLoop(bool osModalLoop) {
   // Execute
   cef_set_osmodal_loop(
       osModalLoop);
+}
+
+CEF_GLOBAL void CefEnableHighDPISupport() {
+  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
+
+  // Execute
+  cef_enable_highdpi_support();
 }
 
 CEF_GLOBAL bool CefGetGeolocation(

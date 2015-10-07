@@ -2511,9 +2511,6 @@
     <ClInclude Include="libcef_dll\cpptoc\cpptoc.h">
       <Filter>libcef_dll\cpptoc</Filter>
     </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\base_ctocpp.h">
-      <Filter>libcef_dll\ctocpp</Filter>
-    </ClInclude>
     <ClInclude Include="libcef_dll\ctocpp\ctocpp.h">
       <Filter>libcef_dll\ctocpp</Filter>
     </ClInclude>
@@ -3082,6 +3079,24 @@
     <ClInclude Include="libcef_dll\ctocpp\value_ctocpp.h">
       <Filter>libcef_dll\ctocpp</Filter>
     </ClInclude>
+    <ClInclude Include="include\capi\cef_resource_bundle_capi.h">
+      <Filter>include\capi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cef_resource_bundle.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="libcef_dll\cpptoc\pdf_print_callback_cpptoc.h">
+      <Filter>libcef_dll\cpptoc</Filter>
+    </ClInclude>
+    <ClInclude Include="libcef_dll\ctocpp\resource_bundle_ctocpp.h">
+      <Filter>libcef_dll\ctocpp</Filter>
+    </ClInclude>
+    <ClInclude Include="libcef_dll\ctocpp\run_context_menu_callback_ctocpp.h">
+      <Filter>libcef_dll\ctocpp</Filter>
+    </ClInclude>
+    <ClInclude Include="libcef_dll\wrapper_types.h">
+      <Filter>libcef_dll</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libcef_dll\cpptoc\find_handler_cpptoc.cc">
@@ -3109,6 +3124,18 @@
       <Filter>libcef_dll\ctocpp</Filter>
     </ClCompile>
     <ClCompile Include="libcef_dll\ctocpp\value_ctocpp.cc">
+      <Filter>libcef_dll\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcef_dll\cpptoc\pdf_print_callback_cpptoc.cc">
+      <Filter>libcef_dll\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="libcef_dll\cpptoc\base_cpptoc.cc">
+      <Filter>libcef_dll\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="libcef_dll\ctocpp\run_context_menu_callback_ctocpp.cc">
+      <Filter>libcef_dll\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcef_dll\ctocpp\resource_bundle_ctocpp.cc">
       <Filter>libcef_dll\ctocpp</Filter>
     </ClCompile>
   </ItemGroup>

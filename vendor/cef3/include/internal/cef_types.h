@@ -32,7 +32,7 @@
 #define CEF_INCLUDE_INTERNAL_CEF_TYPES_H_
 #pragma once
 
-#include "include/base/cef_build.h"
+#include "include/base/cef_basictypes.h"
 #include "include/internal/cef_string.h"
 #include "include/internal/cef_string_list.h"
 #include "include/internal/cef_time.h"
@@ -44,45 +44,6 @@
 #include "include/internal/cef_types_mac.h"
 #elif defined(OS_LINUX)
 #include "include/internal/cef_types_linux.h"
-#endif
-
-#include <limits.h>         // For UINT_MAX
-#include <stddef.h>         // For size_t
-
-// The NSPR system headers define 64-bit as |long| when possible, except on
-// Mac OS X.  In order to not have typedef mismatches, we do the same on LP64.
-//
-// On Mac OS X, |long long| is used for 64-bit types for compatibility with
-// <inttypes.h> format macros even in the LP64 model.
-#if defined(__LP64__) && !defined(OS_MACOSX) && !defined(OS_OPENBSD)
-typedef long                int64;  // NOLINT(runtime/int)
-typedef unsigned long       uint64;  // NOLINT(runtime/int)
-#else
-typedef long long           int64;  // NOLINT(runtime/int)
-typedef unsigned long long  uint64;  // NOLINT(runtime/int)
-#endif
-
-// TODO: Remove these type guards.  These are to avoid conflicts with
-// obsolete/protypes.h in the Gecko SDK.
-#ifndef _INT32
-#define _INT32
-typedef int                 int32;
-#endif
-
-// TODO: Remove these type guards.  These are to avoid conflicts with
-// obsolete/protypes.h in the Gecko SDK.
-#ifndef _UINT32
-#define _UINT32
-typedef unsigned int       uint32;
-#endif
-
-// UTF-16 character type
-#ifndef char16
-#if defined(WIN32)
-typedef wchar_t             char16;
-#else
-typedef unsigned short      char16;
-#endif
 #endif
 
 // 32-bit ARGB color value, not premultiplied. The color components are always
@@ -214,7 +175,8 @@ typedef struct _cef_settings_t {
   ///
   // Set to true (1) to have the browser process message loop run in a separate
   // thread. If false (0) than the CefDoMessageLoopWork() function must be
-  // called from your application message loop.
+  // called from your application message loop. This option is only supported on
+  // Windows.
   ///
   int multi_threaded_message_loop;
 
@@ -476,7 +438,8 @@ typedef struct _cef_browser_settings_t {
   // The maximum rate in frames per second (fps) that CefRenderHandler::OnPaint
   // will be called for a windowless browser. The actual fps may be lower if
   // the browser cannot generate frames at the requested rate. The minimum
-  // value is 1 and the maximum value is 60 (default 30).
+  // value is 1 and the maximum value is 60 (default 30). This value can also be
+  // changed dynamically via CefBrowserHost::SetWindowlessFrameRate.
   ///
   int windowless_frame_rate;
 
@@ -1460,6 +1423,11 @@ typedef enum {
   MENU_ID_NO_SPELLING_SUGGESTIONS        = 205,
   MENU_ID_ADD_TO_DICTIONARY              = 206,
 
+  // Custom menu items originating from the renderer process. For example,
+  // plugin placeholder menu items or Flash menu items.
+  MENU_ID_CUSTOM_FIRST        = 220,
+  MENU_ID_CUSTOM_LAST         = 250,
+
   // All user-defined menu IDs should come between MENU_ID_USER_FIRST and
   // MENU_ID_USER_LAST to avoid overlapping the Chromium and CEF ID ranges
   // defined in the tools/gritsettings/resource_ids file.
@@ -2191,6 +2159,136 @@ typedef enum {
   ///
   JSON_WRITER_PRETTY_PRINT = 1 << 2,
 } cef_json_writer_options_t;
+
+///
+// Margin type for PDF printing.
+///
+typedef enum {
+  ///
+  // Default margins.
+  ///
+  PDF_PRINT_MARGIN_DEFAULT,
+
+  ///
+  // No margins.
+  ///
+  PDF_PRINT_MARGIN_NONE,
+
+  ///
+  // Minimum margins.
+  ///
+  PDF_PRINT_MARGIN_MINIMUM,
+
+  ///
+  // Custom margins using the |margin_*| values from cef_pdf_print_settings_t.
+  ///
+  PDF_PRINT_MARGIN_CUSTOM,
+} cef_pdf_print_margin_type_t;
+
+///
+// Structure representing PDF print settings.
+///
+typedef struct _cef_pdf_print_settings_t {
+  ///
+  // Page title to display in the header. Only used if |header_footer_enabled|
+  // is set to true (1).
+  ///
+  cef_string_t header_footer_title;
+
+  ///
+  // URL to display in the footer. Only used if |header_footer_enabled| is set
+  // to true (1).
+  ///
+  cef_string_t header_footer_url;
+
+  ///
+  // Output page size in microns. If either of these values is less than or
+  // equal to zero then the default paper size (A4) will be used.
+  ///
+  int page_width;
+  int page_height;
+
+  ///
+  // Margins in millimeters. Only used if |margin_type| is set to
+  // PDF_PRINT_MARGIN_CUSTOM.
+  ///
+  double margin_top;
+  double margin_right;
+  double margin_bottom;
+  double margin_left;
+
+  ///
+  // Margin type.
+  ///
+  cef_pdf_print_margin_type_t margin_type;
+
+  ///
+  // Set to true (1) to print headers and footers or false (0) to not print
+  // headers and footers.
+  ///
+  int header_footer_enabled;
+
+  ///
+  // Set to true (1) to print the selection only or false (0) to print all.
+  ///
+  int selection_only;
+
+  ///
+  // Set to true (1) for landscape mode or false (0) for portrait mode.
+  ///
+  int landscape;
+
+  ///
+  // Set to true (1) to print background graphics or false (0) to not print
+  // background graphics.
+  ///
+  int backgrounds_enabled;
+
+} cef_pdf_print_settings_t;
+
+///
+// Supported UI scale factors for the platform. SCALE_FACTOR_NONE is used for
+// density independent resources such as string, html/js files or an image that
+// can be used for any scale factors (such as wallpapers).
+///
+typedef enum {
+  SCALE_FACTOR_NONE = 0,
+  SCALE_FACTOR_100P,
+  SCALE_FACTOR_125P,
+  SCALE_FACTOR_133P,
+  SCALE_FACTOR_140P,
+  SCALE_FACTOR_150P,
+  SCALE_FACTOR_180P,
+  SCALE_FACTOR_200P,
+  SCALE_FACTOR_250P,
+  SCALE_FACTOR_300P,
+} cef_scale_factor_t;
+
+///
+// Plugin policies supported by CefRequestContextHandler::OnBeforePluginLoad.
+///
+typedef enum {
+  ///
+  // Allow the content.
+  ///
+  PLUGIN_POLICY_ALLOW,
+
+  ///
+  // Allow important content and block unimportant content based on heuristics.
+  // The user can manually load blocked content.
+  ///
+  PLUGIN_POLICY_DETECT_IMPORTANT,
+
+  ///
+  // Block the content. The user can manually load blocked content.
+  ///
+  PLUGIN_POLICY_BLOCK,
+
+  ///
+  // Disable the content. The user cannot load disabled content.
+  ///
+  PLUGIN_POLICY_DISABLE,
+} cef_plugin_policy_t;
 
 #ifdef __cplusplus
 }
