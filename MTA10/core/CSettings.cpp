@@ -651,12 +651,12 @@ void CSettings::CreateGUI ( void )
     m_pVideoGeneralLabel->SetFont ( "default-bold-small" );
 
     m_pVideoResolutionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Resolution:") ) );
-    m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
+    m_pVideoResolutionLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 26.0f ) );
     m_pVideoResolutionLabel->GetPosition ( vecTemp, false );
     m_pVideoResolutionLabel->AutoSize ( );
 
     m_pComboResolution = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
-    m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 5.0f ) );
+    m_pComboResolution->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 3.0f ) );
     m_pComboResolution->GetPosition ( vecTemp, false );
     m_pComboResolution->SetSize ( CVector2D ( 200.0f, 160.0f ) );
     m_pComboResolution->GetSize ( vecSize );
@@ -667,6 +667,21 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxWindowed->AutoSize ( NULL, 20.0f );
 
     m_pVideoResolutionLabel->GetPosition ( vecTemp, false ); // Restore our label position
+
+    // Fullscreen mode
+    vecTemp.fY += 26;
+    m_pFullscreenStyleLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabVideo, _("Fullscreen mode:") ) );
+    m_pFullscreenStyleLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pFullscreenStyleLabel->AutoSize ( );
+
+    m_pFullscreenStyleCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabVideo, "" ) );
+    m_pFullscreenStyleCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 5.0f, vecTemp.fY - 1.0f ) );
+    m_pFullscreenStyleCombo->SetSize ( CVector2D ( 200, 95.0f ) );
+    m_pFullscreenStyleCombo->AddItem ( _("Standard") )->SetData ( (void*)FULLSCREEN_STANDARD );
+    m_pFullscreenStyleCombo->AddItem ( _("Borderless window") )->SetData ( (void*)FULLSCREEN_BORDERLESS );
+    m_pFullscreenStyleCombo->AddItem ( _("Borderless keep res") )->SetData ( (void*)FULLSCREEN_BORDERLESS_KEEP_RES );
+    m_pFullscreenStyleCombo->SetReadOnly ( true );
+    vecTemp.fY += 4;
 
     m_pCheckBoxMipMapping = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Mip Mapping"), true ) );
 #ifndef MIP_MAPPING_SETTING_APPEARS_TO_DO_SOMETHING
@@ -1304,20 +1319,6 @@ void CSettings::CreateGUI ( void )
     m_pProgressAnimationCombo->SetReadOnly ( true );
     vecTemp.fY += fLineHeight;
 
-    // Fullscreen mode
-    m_pFullscreenStyleLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Fullscreen mode:") ) );
-    m_pFullscreenStyleLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
-    m_pFullscreenStyleLabel->AutoSize ( );
-
-    m_pFullscreenStyleCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
-    m_pFullscreenStyleCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-    m_pFullscreenStyleCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
-    m_pFullscreenStyleCombo->AddItem ( _("Standard") )->SetData ( (void*)FULLSCREEN_STANDARD );
-    m_pFullscreenStyleCombo->AddItem ( _("Borderless window") )->SetData ( (void*)FULLSCREEN_BORDERLESS );
-    m_pFullscreenStyleCombo->AddItem ( _("Borderless keep res") )->SetData ( (void*)FULLSCREEN_BORDERLESS_KEEP_RES );
-    m_pFullscreenStyleCombo->SetReadOnly ( true );
-    vecTemp.fY += fLineHeight;
-
     // Process priority
     m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Process priority:" ) );
     m_pPriorityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
@@ -1492,6 +1493,7 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxVolumetricShadows->SetClickHandler ( GUI_CALLBACK( &CSettings::OnVolumetricShadowsClick, this ) );
     m_pCheckBoxAllowScreenUpload->SetClickHandler ( GUI_CALLBACK( &CSettings::OnAllowScreenUploadClick, this ) );
     m_pCheckBoxCustomizedSAFiles->SetClickHandler ( GUI_CALLBACK( &CSettings::OnCustomizedSAFilesClick, this ) );
+    m_pCheckBoxWindowed->SetClickHandler ( GUI_CALLBACK( &CSettings::OnWindowedClick, this ) );
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler ( GUI_CALLBACK( &CSettings::ShowUnsafeResolutionsClick, this ) );
     m_pButtonBrowserBlacklistAdd->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserBlacklistAdd, this ) );
     m_pButtonBrowserBlacklistRemove->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserBlacklistRemove, this ) );
@@ -1538,13 +1540,7 @@ void CSettings::CreateGUI ( void )
 
     m_pProgressAnimationCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
     m_pProgressAnimationCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
-
-    m_pFullscreenStyleLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
-    m_pFullscreenStyleLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
-
-    m_pFullscreenStyleCombo->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
-    m_pFullscreenStyleCombo->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
-    
+ 
     m_pDebugSettingLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
     m_pDebugSettingLabel->SetMouseLeaveHandler ( GUI_CALLBACK ( &CSettings::OnHideAdvancedSettingDescription, this ) );
     
@@ -1797,6 +1793,8 @@ void CSettings::UpdateVideoTab ( void )
     else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS ) m_pFullscreenStyleCombo->SetText ( _("Borderless window") );
     else if ( iNextFullscreenStyle == FULLSCREEN_BORDERLESS_KEEP_RES ) m_pFullscreenStyleCombo->SetText ( _("Borderless keep res") );
 
+    UpdateFullScreenComboBoxEnabled();
+
     // Streaming memory
     unsigned int uiStreamingMemory = 0;
     CVARS_GET ( "streaming_memory", uiStreamingMemory );
@@ -1868,7 +1866,26 @@ void CSettings::PopulateResolutionComboBox( void )
 
         if ( currentInfo.width == vidModemInfo.width && currentInfo.height == vidModemInfo.height && currentInfo.depth == vidModemInfo.depth )
             m_pComboResolution->SetText ( strMode );
-    }    
+    }
+}
+
+//
+// Disable/enable the full screen mode options
+//
+void CSettings::UpdateFullScreenComboBoxEnabled( void )
+{
+    if ( m_pCheckBoxWindowed->GetSelected() )
+    {
+        m_pFullscreenStyleLabel->SetAlpha( 0.42f );
+        m_pFullscreenStyleCombo->SetAlpha( 0.42f );
+        m_pFullscreenStyleCombo->SetEnabled( false );
+    }
+    else
+    {
+        m_pFullscreenStyleLabel->SetAlpha( 1 );
+        m_pFullscreenStyleCombo->SetAlpha( 1 );
+        m_pFullscreenStyleCombo->SetEnabled( true );
+    }
 }
 
 //
@@ -3964,6 +3981,15 @@ bool CSettings::ShowUnsafeResolutionsClick ( CGUIElement* pElement )
     return true;
 }
 
+//
+// OnWindowedClick
+//
+bool CSettings::OnWindowedClick ( CGUIElement* pElement )
+{
+    UpdateFullScreenComboBoxEnabled();
+    return true;
+}
+
 bool CSettings::OnBrowserBlacklistAdd ( CGUIElement* pElement )
 {
     SString strDomain = m_pEditBrowserBlacklistAdd->GetText ();
@@ -4090,8 +4116,6 @@ bool CSettings::OnShowAdvancedSettingDescription ( CGUIElement* pElement )
         strText = std::string( _( "Packet tag:" ) ) + " " + std::string( _( "Tag network packets to help ISPs identify MTA traffic." ) );
     else if ( pLabel && pLabel == m_pProgressAnimationLabel || pComboBox && pComboBox == m_pProgressAnimationCombo )
         strText = std::string( _( "Progress animation:" ) ) + " " + std::string( _( "Spinning circle animation at the bottom of the screen" ) );
-    else if ( pLabel && pLabel == m_pFullscreenStyleLabel || pComboBox && pComboBox == m_pFullscreenStyleCombo )
-        strText = std::string( _( "Fullscreen mode:" ) ) + " " + std::string( _( "Experimental feature." ) );
     else if ( pLabel && pLabel == m_pDebugSettingLabel || pComboBox && pComboBox == m_pDebugSettingCombo )
         strText = std::string( _( "Debug setting:" ) ) + " " + std::string( _( "Select default always. (This setting is not saved)" ) );
     else if ( pLabel && pLabel == m_pStreamingMemoryLabel || pScrollBar && pScrollBar == m_pStreamingMemory )
