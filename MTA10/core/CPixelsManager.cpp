@@ -567,7 +567,7 @@ bool CPixelsManager::GetPixelsSize ( const CPixels& pixels, uint& uiOutWidth, ui
 //
 // CPixelsManager::GetPixelsFormat
 //
-// Auto detect PNG, JPEG or PLAIN
+// Auto detect PNG, JPEG, DDS or PLAIN
 //
 ////////////////////////////////////////////////////////////////
 EPixelsFormatType CPixelsManager::GetPixelsFormat ( const CPixels& pixels )
@@ -582,6 +582,11 @@ EPixelsFormatType CPixelsManager::GetPixelsFormat ( const CPixels& pixels )
     // Check if jpeg
     if ( IsJpeg ( pData, uiDataSize ) )
         return EPixelsFormat::JPEG;
+
+    // Check if dds
+    static byte ddsHeader[] = { 0x44, 0x44, 0x53, 0x20 };
+    if ( uiDataSize >= sizeof ( ddsHeader ) && memcmp ( pData, ddsHeader, sizeof ( ddsHeader ) ) == 0 )
+        return EPixelsFormat::DDS;
 
     // Check if plain
     if ( uiDataSize >= 8 )
