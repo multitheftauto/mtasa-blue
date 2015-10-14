@@ -14,8 +14,6 @@
 #include "libcef_dll/ctocpp/web_plugin_info_ctocpp.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 int CEF_CALLBACK web_plugin_info_visitor_visit(
@@ -41,20 +39,14 @@ int CEF_CALLBACK web_plugin_info_visitor_visit(
   return _retval;
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefWebPluginInfoVisitorCppToC::CefWebPluginInfoVisitorCppToC() {
-  GetStruct()->visit = web_plugin_info_visitor_visit;
-}
-
-template<> CefRefPtr<CefWebPluginInfoVisitor> CefCppToC<CefWebPluginInfoVisitorCppToC,
-    CefWebPluginInfoVisitor, cef_web_plugin_info_visitor_t>::UnwrapDerived(
-    CefWrapperType type, cef_web_plugin_info_visitor_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
+CefWebPluginInfoVisitorCppToC::CefWebPluginInfoVisitorCppToC(
+    CefWebPluginInfoVisitor* cls)
+    : CefCppToC<CefWebPluginInfoVisitorCppToC, CefWebPluginInfoVisitor,
+        cef_web_plugin_info_visitor_t>(cls) {
+  struct_.struct_.visit = web_plugin_info_visitor_visit;
 }
 
 #ifndef NDEBUG
@@ -62,6 +54,3 @@ template<> base::AtomicRefCount CefCppToC<CefWebPluginInfoVisitorCppToC,
     CefWebPluginInfoVisitor, cef_web_plugin_info_visitor_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefWebPluginInfoVisitorCppToC,
-    CefWebPluginInfoVisitor, cef_web_plugin_info_visitor_t>::kWrapperType =
-    WT_WEB_PLUGIN_INFO_VISITOR;

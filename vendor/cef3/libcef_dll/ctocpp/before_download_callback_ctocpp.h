@@ -28,11 +28,15 @@ class CefBeforeDownloadCallbackCToCpp
     : public CefCToCpp<CefBeforeDownloadCallbackCToCpp,
         CefBeforeDownloadCallback, cef_before_download_callback_t> {
  public:
-  CefBeforeDownloadCallbackCToCpp();
+  explicit CefBeforeDownloadCallbackCToCpp(cef_before_download_callback_t* str)
+      : CefCToCpp<CefBeforeDownloadCallbackCToCpp, CefBeforeDownloadCallback,
+          cef_before_download_callback_t>(str) {}
 
-  // CefBeforeDownloadCallback methods.
-  void Continue(const CefString& download_path, bool show_dialog) OVERRIDE;
+  // CefBeforeDownloadCallback methods
+  virtual void Continue(const CefString& download_path,
+      bool show_dialog) OVERRIDE;
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CTOCPP_BEFORE_DOWNLOAD_CALLBACK_CTOCPP_H_
+

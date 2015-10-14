@@ -28,8 +28,9 @@ class CefDownloadHandlerCppToC
     : public CefCppToC<CefDownloadHandlerCppToC, CefDownloadHandler,
         cef_download_handler_t> {
  public:
-  CefDownloadHandlerCppToC();
+  explicit CefDownloadHandlerCppToC(CefDownloadHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_DOWNLOAD_HANDLER_CPPTOC_H_
+

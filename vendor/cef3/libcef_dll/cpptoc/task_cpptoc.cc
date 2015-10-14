@@ -13,8 +13,6 @@
 #include "libcef_dll/cpptoc/task_cpptoc.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 void CEF_CALLBACK task_execute(struct _cef_task_t* self) {
@@ -28,19 +26,12 @@ void CEF_CALLBACK task_execute(struct _cef_task_t* self) {
   CefTaskCppToC::Get(self)->Execute();
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefTaskCppToC::CefTaskCppToC() {
-  GetStruct()->execute = task_execute;
-}
-
-template<> CefRefPtr<CefTask> CefCppToC<CefTaskCppToC, CefTask,
-    cef_task_t>::UnwrapDerived(CefWrapperType type, cef_task_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
+CefTaskCppToC::CefTaskCppToC(CefTask* cls)
+    : CefCppToC<CefTaskCppToC, CefTask, cef_task_t>(cls) {
+  struct_.struct_.execute = task_execute;
 }
 
 #ifndef NDEBUG
@@ -48,5 +39,3 @@ template<> base::AtomicRefCount CefCppToC<CefTaskCppToC, CefTask,
     cef_task_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefTaskCppToC, CefTask,
-    cef_task_t>::kWrapperType = WT_TASK;

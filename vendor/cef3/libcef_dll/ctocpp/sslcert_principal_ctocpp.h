@@ -29,19 +29,22 @@ class CefSSLCertPrincipalCToCpp
     : public CefCToCpp<CefSSLCertPrincipalCToCpp, CefSSLCertPrincipal,
         cef_sslcert_principal_t> {
  public:
-  CefSSLCertPrincipalCToCpp();
+  explicit CefSSLCertPrincipalCToCpp(cef_sslcert_principal_t* str)
+      : CefCToCpp<CefSSLCertPrincipalCToCpp, CefSSLCertPrincipal,
+          cef_sslcert_principal_t>(str) {}
 
-  // CefSSLCertPrincipal methods.
-  CefString GetDisplayName() OVERRIDE;
-  CefString GetCommonName() OVERRIDE;
-  CefString GetLocalityName() OVERRIDE;
-  CefString GetStateOrProvinceName() OVERRIDE;
-  CefString GetCountryName() OVERRIDE;
-  void GetStreetAddresses(std::vector<CefString>& addresses) OVERRIDE;
-  void GetOrganizationNames(std::vector<CefString>& names) OVERRIDE;
-  void GetOrganizationUnitNames(std::vector<CefString>& names) OVERRIDE;
-  void GetDomainComponents(std::vector<CefString>& components) OVERRIDE;
+  // CefSSLCertPrincipal methods
+  virtual CefString GetDisplayName() OVERRIDE;
+  virtual CefString GetCommonName() OVERRIDE;
+  virtual CefString GetLocalityName() OVERRIDE;
+  virtual CefString GetStateOrProvinceName() OVERRIDE;
+  virtual CefString GetCountryName() OVERRIDE;
+  virtual void GetStreetAddresses(std::vector<CefString>& addresses) OVERRIDE;
+  virtual void GetOrganizationNames(std::vector<CefString>& names) OVERRIDE;
+  virtual void GetOrganizationUnitNames(std::vector<CefString>& names) OVERRIDE;
+  virtual void GetDomainComponents(std::vector<CefString>& components) OVERRIDE;
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CTOCPP_SSLCERT_PRINCIPAL_CTOCPP_H_
+

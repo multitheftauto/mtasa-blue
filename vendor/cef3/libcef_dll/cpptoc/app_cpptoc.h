@@ -27,8 +27,9 @@
 class CefAppCppToC
     : public CefCppToC<CefAppCppToC, CefApp, cef_app_t> {
  public:
-  CefAppCppToC();
+  explicit CefAppCppToC(CefApp* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_APP_CPPTOC_H_
+

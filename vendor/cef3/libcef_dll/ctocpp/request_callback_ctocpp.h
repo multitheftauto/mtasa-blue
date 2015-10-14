@@ -28,12 +28,15 @@ class CefRequestCallbackCToCpp
     : public CefCToCpp<CefRequestCallbackCToCpp, CefRequestCallback,
         cef_request_callback_t> {
  public:
-  CefRequestCallbackCToCpp();
+  explicit CefRequestCallbackCToCpp(cef_request_callback_t* str)
+      : CefCToCpp<CefRequestCallbackCToCpp, CefRequestCallback,
+          cef_request_callback_t>(str) {}
 
-  // CefRequestCallback methods.
-  void Continue(bool allow) OVERRIDE;
-  void Cancel() OVERRIDE;
+  // CefRequestCallback methods
+  virtual void Continue(bool allow) OVERRIDE;
+  virtual void Cancel() OVERRIDE;
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CTOCPP_REQUEST_CALLBACK_CTOCPP_H_
+

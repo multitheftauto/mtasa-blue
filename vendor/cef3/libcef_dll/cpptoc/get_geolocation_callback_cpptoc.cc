@@ -13,8 +13,6 @@
 #include "libcef_dll/cpptoc/get_geolocation_callback_cpptoc.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 void CEF_CALLBACK get_geolocation_callback_on_location_update(
@@ -40,20 +38,15 @@ void CEF_CALLBACK get_geolocation_callback_on_location_update(
       positionObj);
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefGetGeolocationCallbackCppToC::CefGetGeolocationCallbackCppToC() {
-  GetStruct()->on_location_update = get_geolocation_callback_on_location_update;
-}
-
-template<> CefRefPtr<CefGetGeolocationCallback> CefCppToC<CefGetGeolocationCallbackCppToC,
-    CefGetGeolocationCallback, cef_get_geolocation_callback_t>::UnwrapDerived(
-    CefWrapperType type, cef_get_geolocation_callback_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
+CefGetGeolocationCallbackCppToC::CefGetGeolocationCallbackCppToC(
+    CefGetGeolocationCallback* cls)
+    : CefCppToC<CefGetGeolocationCallbackCppToC, CefGetGeolocationCallback,
+        cef_get_geolocation_callback_t>(cls) {
+  struct_.struct_.on_location_update =
+      get_geolocation_callback_on_location_update;
 }
 
 #ifndef NDEBUG
@@ -62,6 +55,3 @@ template<> base::AtomicRefCount CefCppToC<CefGetGeolocationCallbackCppToC,
     0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefGetGeolocationCallbackCppToC,
-    CefGetGeolocationCallback, cef_get_geolocation_callback_t>::kWrapperType =
-    WT_GET_GEOLOCATION_CALLBACK;

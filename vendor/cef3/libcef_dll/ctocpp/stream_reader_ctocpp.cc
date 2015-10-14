@@ -72,8 +72,7 @@ CefRefPtr<CefStreamReader> CefStreamReader::CreateForHandler(
 // VIRTUAL METHODS - Body may be edited by hand.
 
 size_t CefStreamReaderCToCpp::Read(void* ptr, size_t size, size_t n) {
-  cef_stream_reader_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, read))
+  if (CEF_MEMBER_MISSING(struct_, read))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -84,7 +83,7 @@ size_t CefStreamReaderCToCpp::Read(void* ptr, size_t size, size_t n) {
     return 0;
 
   // Execute
-  size_t _retval = _struct->read(_struct,
+  size_t _retval = struct_->read(struct_,
       ptr,
       size,
       n);
@@ -94,14 +93,13 @@ size_t CefStreamReaderCToCpp::Read(void* ptr, size_t size, size_t n) {
 }
 
 int CefStreamReaderCToCpp::Seek(int64 offset, int whence) {
-  cef_stream_reader_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, seek))
+  if (CEF_MEMBER_MISSING(struct_, seek))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->seek(_struct,
+  int _retval = struct_->seek(struct_,
       offset,
       whence);
 
@@ -110,64 +108,47 @@ int CefStreamReaderCToCpp::Seek(int64 offset, int whence) {
 }
 
 int64 CefStreamReaderCToCpp::Tell() {
-  cef_stream_reader_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, tell))
+  if (CEF_MEMBER_MISSING(struct_, tell))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int64 _retval = _struct->tell(_struct);
+  int64 _retval = struct_->tell(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 int CefStreamReaderCToCpp::Eof() {
-  cef_stream_reader_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, eof))
+  if (CEF_MEMBER_MISSING(struct_, eof))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->eof(_struct);
+  int _retval = struct_->eof(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 bool CefStreamReaderCToCpp::MayBlock() {
-  cef_stream_reader_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, may_block))
+  if (CEF_MEMBER_MISSING(struct_, may_block))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->may_block(_struct);
+  int _retval = struct_->may_block(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 
-// CONSTRUCTOR - Do not edit by hand.
-
-CefStreamReaderCToCpp::CefStreamReaderCToCpp() {
-}
-
-template<> cef_stream_reader_t* CefCToCpp<CefStreamReaderCToCpp,
-    CefStreamReader, cef_stream_reader_t>::UnwrapDerived(CefWrapperType type,
-    CefStreamReader* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
-
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefStreamReaderCToCpp,
     CefStreamReader, cef_stream_reader_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefStreamReaderCToCpp, CefStreamReader,
-    cef_stream_reader_t>::kWrapperType = WT_STREAM_READER;

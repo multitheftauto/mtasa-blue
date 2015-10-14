@@ -28,8 +28,9 @@ class CefKeyboardHandlerCppToC
     : public CefCppToC<CefKeyboardHandlerCppToC, CefKeyboardHandler,
         cef_keyboard_handler_t> {
  public:
-  CefKeyboardHandlerCppToC();
+  explicit CefKeyboardHandlerCppToC(CefKeyboardHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_KEYBOARD_HANDLER_CPPTOC_H_
+

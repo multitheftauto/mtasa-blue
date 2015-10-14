@@ -13,8 +13,6 @@
 #include "libcef_dll/cpptoc/cookie_visitor_cpptoc.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 int CEF_CALLBACK cookie_visitor_visit(struct _cef_cookie_visitor_t* self,
@@ -56,20 +54,13 @@ int CEF_CALLBACK cookie_visitor_visit(struct _cef_cookie_visitor_t* self,
   return _retval;
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefCookieVisitorCppToC::CefCookieVisitorCppToC() {
-  GetStruct()->visit = cookie_visitor_visit;
-}
-
-template<> CefRefPtr<CefCookieVisitor> CefCppToC<CefCookieVisitorCppToC,
-    CefCookieVisitor, cef_cookie_visitor_t>::UnwrapDerived(CefWrapperType type,
-    cef_cookie_visitor_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
+CefCookieVisitorCppToC::CefCookieVisitorCppToC(CefCookieVisitor* cls)
+    : CefCppToC<CefCookieVisitorCppToC, CefCookieVisitor, cef_cookie_visitor_t>(
+        cls) {
+  struct_.struct_.visit = cookie_visitor_visit;
 }
 
 #ifndef NDEBUG
@@ -77,5 +68,3 @@ template<> base::AtomicRefCount CefCppToC<CefCookieVisitorCppToC,
     CefCookieVisitor, cef_cookie_visitor_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefCookieVisitorCppToC, CefCookieVisitor,
-    cef_cookie_visitor_t>::kWrapperType = WT_COOKIE_VISITOR;

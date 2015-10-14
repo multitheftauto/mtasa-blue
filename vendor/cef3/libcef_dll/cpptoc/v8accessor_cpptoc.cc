@@ -14,8 +14,6 @@
 #include "libcef_dll/ctocpp/v8value_ctocpp.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 int CEF_CALLBACK v8accessor_get(struct _cef_v8accessor_t* self,
@@ -112,21 +110,13 @@ int CEF_CALLBACK v8accessor_set(struct _cef_v8accessor_t* self,
   return _retval;
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefV8AccessorCppToC::CefV8AccessorCppToC() {
-  GetStruct()->get = v8accessor_get;
-  GetStruct()->set = v8accessor_set;
-}
-
-template<> CefRefPtr<CefV8Accessor> CefCppToC<CefV8AccessorCppToC,
-    CefV8Accessor, cef_v8accessor_t>::UnwrapDerived(CefWrapperType type,
-    cef_v8accessor_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
+CefV8AccessorCppToC::CefV8AccessorCppToC(CefV8Accessor* cls)
+    : CefCppToC<CefV8AccessorCppToC, CefV8Accessor, cef_v8accessor_t>(cls) {
+  struct_.struct_.get = v8accessor_get;
+  struct_.struct_.set = v8accessor_set;
 }
 
 #ifndef NDEBUG
@@ -134,5 +124,3 @@ template<> base::AtomicRefCount CefCppToC<CefV8AccessorCppToC, CefV8Accessor,
     cef_v8accessor_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefV8AccessorCppToC, CefV8Accessor,
-    cef_v8accessor_t>::kWrapperType = WT_V8ACCESSOR;

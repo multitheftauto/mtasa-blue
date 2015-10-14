@@ -14,8 +14,6 @@
 #include "libcef_dll/transfer_util.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 void CEF_CALLBACK run_file_dialog_callback_on_file_dialog_dismissed(
@@ -42,21 +40,15 @@ void CEF_CALLBACK run_file_dialog_callback_on_file_dialog_dismissed(
       file_pathsList);
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefRunFileDialogCallbackCppToC::CefRunFileDialogCallbackCppToC() {
-  GetStruct()->on_file_dialog_dismissed =
+CefRunFileDialogCallbackCppToC::CefRunFileDialogCallbackCppToC(
+    CefRunFileDialogCallback* cls)
+    : CefCppToC<CefRunFileDialogCallbackCppToC, CefRunFileDialogCallback,
+        cef_run_file_dialog_callback_t>(cls) {
+  struct_.struct_.on_file_dialog_dismissed =
       run_file_dialog_callback_on_file_dialog_dismissed;
-}
-
-template<> CefRefPtr<CefRunFileDialogCallback> CefCppToC<CefRunFileDialogCallbackCppToC,
-    CefRunFileDialogCallback, cef_run_file_dialog_callback_t>::UnwrapDerived(
-    CefWrapperType type, cef_run_file_dialog_callback_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
 }
 
 #ifndef NDEBUG
@@ -64,6 +56,3 @@ template<> base::AtomicRefCount CefCppToC<CefRunFileDialogCallbackCppToC,
     CefRunFileDialogCallback, cef_run_file_dialog_callback_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefRunFileDialogCallbackCppToC,
-    CefRunFileDialogCallback, cef_run_file_dialog_callback_t>::kWrapperType =
-    WT_RUN_FILE_DIALOG_CALLBACK;

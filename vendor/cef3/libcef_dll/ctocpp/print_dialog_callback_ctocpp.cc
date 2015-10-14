@@ -18,8 +18,7 @@
 
 void CefPrintDialogCallbackCToCpp::Continue(
     CefRefPtr<CefPrintSettings> settings) {
-  cef_print_dialog_callback_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, cont))
+  if (CEF_MEMBER_MISSING(struct_, cont))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -30,39 +29,23 @@ void CefPrintDialogCallbackCToCpp::Continue(
     return;
 
   // Execute
-  _struct->cont(_struct,
+  struct_->cont(struct_,
       CefPrintSettingsCToCpp::Unwrap(settings));
 }
 
 void CefPrintDialogCallbackCToCpp::Cancel() {
-  cef_print_dialog_callback_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, cancel))
+  if (CEF_MEMBER_MISSING(struct_, cancel))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->cancel(_struct);
+  struct_->cancel(struct_);
 }
 
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefPrintDialogCallbackCToCpp::CefPrintDialogCallbackCToCpp() {
-}
-
-template<> cef_print_dialog_callback_t* CefCToCpp<CefPrintDialogCallbackCToCpp,
-    CefPrintDialogCallback, cef_print_dialog_callback_t>::UnwrapDerived(
-    CefWrapperType type, CefPrintDialogCallback* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefPrintDialogCallbackCToCpp,
     CefPrintDialogCallback, cef_print_dialog_callback_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefPrintDialogCallbackCToCpp,
-    CefPrintDialogCallback, cef_print_dialog_callback_t>::kWrapperType =
-    WT_PRINT_DIALOG_CALLBACK;

@@ -30,8 +30,9 @@ class CefLifeSpanHandlerCppToC
     : public CefCppToC<CefLifeSpanHandlerCppToC, CefLifeSpanHandler,
         cef_life_span_handler_t> {
  public:
-  CefLifeSpanHandlerCppToC();
+  explicit CefLifeSpanHandlerCppToC(CefLifeSpanHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_LIFE_SPAN_HANDLER_CPPTOC_H_
+

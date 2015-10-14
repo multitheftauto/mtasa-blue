@@ -101,8 +101,7 @@ typedef struct _cef_zip_reader_t {
   ///
   // Returns the last modified timestamp for the file.
   ///
-  cef_time_t (CEF_CALLBACK *get_file_last_modified)(
-      struct _cef_zip_reader_t* self);
+  time_t (CEF_CALLBACK *get_file_last_modified)(struct _cef_zip_reader_t* self);
 
   ///
   // Opens the file for reading of uncompressed data. A read password may

@@ -28,15 +28,18 @@ class CefProcessMessageCToCpp
     : public CefCToCpp<CefProcessMessageCToCpp, CefProcessMessage,
         cef_process_message_t> {
  public:
-  CefProcessMessageCToCpp();
+  explicit CefProcessMessageCToCpp(cef_process_message_t* str)
+      : CefCToCpp<CefProcessMessageCToCpp, CefProcessMessage,
+          cef_process_message_t>(str) {}
 
-  // CefProcessMessage methods.
-  bool IsValid() OVERRIDE;
-  bool IsReadOnly() OVERRIDE;
-  CefRefPtr<CefProcessMessage> Copy() OVERRIDE;
-  CefString GetName() OVERRIDE;
-  CefRefPtr<CefListValue> GetArgumentList() OVERRIDE;
+  // CefProcessMessage methods
+  virtual bool IsValid() OVERRIDE;
+  virtual bool IsReadOnly() OVERRIDE;
+  virtual CefRefPtr<CefProcessMessage> Copy() OVERRIDE;
+  virtual CefString GetName() OVERRIDE;
+  virtual CefRefPtr<CefListValue> GetArgumentList() OVERRIDE;
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CTOCPP_PROCESS_MESSAGE_CTOCPP_H_
+

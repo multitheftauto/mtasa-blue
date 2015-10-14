@@ -27,8 +27,9 @@
 class CefDOMVisitorCppToC
     : public CefCppToC<CefDOMVisitorCppToC, CefDOMVisitor, cef_domvisitor_t> {
  public:
-  CefDOMVisitorCppToC();
+  explicit CefDOMVisitorCppToC(CefDOMVisitor* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_DOMVISITOR_CPPTOC_H_
+

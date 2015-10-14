@@ -28,8 +28,9 @@ class CefDragHandlerCppToC
     : public CefCppToC<CefDragHandlerCppToC, CefDragHandler,
         cef_drag_handler_t> {
  public:
-  CefDragHandlerCppToC();
+  explicit CefDragHandlerCppToC(CefDragHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_DRAG_HANDLER_CPPTOC_H_
+

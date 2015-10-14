@@ -16,8 +16,6 @@
 #include "libcef_dll/transfer_util.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 int CEF_CALLBACK dialog_handler_on_file_dialog(
@@ -62,20 +60,13 @@ int CEF_CALLBACK dialog_handler_on_file_dialog(
   return _retval;
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefDialogHandlerCppToC::CefDialogHandlerCppToC() {
-  GetStruct()->on_file_dialog = dialog_handler_on_file_dialog;
-}
-
-template<> CefRefPtr<CefDialogHandler> CefCppToC<CefDialogHandlerCppToC,
-    CefDialogHandler, cef_dialog_handler_t>::UnwrapDerived(CefWrapperType type,
-    cef_dialog_handler_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
+CefDialogHandlerCppToC::CefDialogHandlerCppToC(CefDialogHandler* cls)
+    : CefCppToC<CefDialogHandlerCppToC, CefDialogHandler, cef_dialog_handler_t>(
+        cls) {
+  struct_.struct_.on_file_dialog = dialog_handler_on_file_dialog;
 }
 
 #ifndef NDEBUG
@@ -83,5 +74,3 @@ template<> base::AtomicRefCount CefCppToC<CefDialogHandlerCppToC,
     CefDialogHandler, cef_dialog_handler_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefDialogHandlerCppToC, CefDialogHandler,
-    cef_dialog_handler_t>::kWrapperType = WT_DIALOG_HANDLER;

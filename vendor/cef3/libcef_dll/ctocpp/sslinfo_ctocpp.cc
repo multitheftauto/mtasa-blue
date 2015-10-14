@@ -18,119 +18,99 @@
 // VIRTUAL METHODS - Body may be edited by hand.
 
 CefRefPtr<CefSSLCertPrincipal> CefSSLInfoCToCpp::GetSubject() {
-  cef_sslinfo_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_subject))
+  if (CEF_MEMBER_MISSING(struct_, get_subject))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_sslcert_principal_t* _retval = _struct->get_subject(_struct);
+  cef_sslcert_principal_t* _retval = struct_->get_subject(struct_);
 
   // Return type: refptr_same
   return CefSSLCertPrincipalCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefSSLCertPrincipal> CefSSLInfoCToCpp::GetIssuer() {
-  cef_sslinfo_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_issuer))
+  if (CEF_MEMBER_MISSING(struct_, get_issuer))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_sslcert_principal_t* _retval = _struct->get_issuer(_struct);
+  cef_sslcert_principal_t* _retval = struct_->get_issuer(struct_);
 
   // Return type: refptr_same
   return CefSSLCertPrincipalCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefBinaryValue> CefSSLInfoCToCpp::GetSerialNumber() {
-  cef_sslinfo_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_serial_number))
+  if (CEF_MEMBER_MISSING(struct_, get_serial_number))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_binary_value_t* _retval = _struct->get_serial_number(_struct);
+  cef_binary_value_t* _retval = struct_->get_serial_number(struct_);
 
   // Return type: refptr_same
   return CefBinaryValueCToCpp::Wrap(_retval);
 }
 
 CefTime CefSSLInfoCToCpp::GetValidStart() {
-  cef_sslinfo_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_valid_start))
+  if (CEF_MEMBER_MISSING(struct_, get_valid_start))
     return CefTime();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_time_t _retval = _struct->get_valid_start(_struct);
+  cef_time_t _retval = struct_->get_valid_start(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 CefTime CefSSLInfoCToCpp::GetValidExpiry() {
-  cef_sslinfo_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_valid_expiry))
+  if (CEF_MEMBER_MISSING(struct_, get_valid_expiry))
     return CefTime();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_time_t _retval = _struct->get_valid_expiry(_struct);
+  cef_time_t _retval = struct_->get_valid_expiry(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 CefRefPtr<CefBinaryValue> CefSSLInfoCToCpp::GetDEREncoded() {
-  cef_sslinfo_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_derencoded))
+  if (CEF_MEMBER_MISSING(struct_, get_derencoded))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_binary_value_t* _retval = _struct->get_derencoded(_struct);
+  cef_binary_value_t* _retval = struct_->get_derencoded(struct_);
 
   // Return type: refptr_same
   return CefBinaryValueCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefBinaryValue> CefSSLInfoCToCpp::GetPEMEncoded() {
-  cef_sslinfo_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_pemencoded))
+  if (CEF_MEMBER_MISSING(struct_, get_pemencoded))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_binary_value_t* _retval = _struct->get_pemencoded(_struct);
+  cef_binary_value_t* _retval = struct_->get_pemencoded(struct_);
 
   // Return type: refptr_same
   return CefBinaryValueCToCpp::Wrap(_retval);
 }
 
 
-// CONSTRUCTOR - Do not edit by hand.
-
-CefSSLInfoCToCpp::CefSSLInfoCToCpp() {
-}
-
-template<> cef_sslinfo_t* CefCToCpp<CefSSLInfoCToCpp, CefSSLInfo,
-    cef_sslinfo_t>::UnwrapDerived(CefWrapperType type, CefSSLInfo* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
-
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefSSLInfoCToCpp, CefSSLInfo,
     cef_sslinfo_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefSSLInfoCToCpp, CefSSLInfo,
-    cef_sslinfo_t>::kWrapperType = WT_SSLINFO;

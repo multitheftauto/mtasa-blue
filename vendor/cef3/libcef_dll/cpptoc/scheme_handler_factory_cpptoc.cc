@@ -17,8 +17,6 @@
 #include "libcef_dll/ctocpp/request_ctocpp.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 cef_resource_handler_t* CEF_CALLBACK scheme_handler_factory_create(
@@ -52,20 +50,14 @@ cef_resource_handler_t* CEF_CALLBACK scheme_handler_factory_create(
   return CefResourceHandlerCppToC::Wrap(_retval);
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefSchemeHandlerFactoryCppToC::CefSchemeHandlerFactoryCppToC() {
-  GetStruct()->create = scheme_handler_factory_create;
-}
-
-template<> CefRefPtr<CefSchemeHandlerFactory> CefCppToC<CefSchemeHandlerFactoryCppToC,
-    CefSchemeHandlerFactory, cef_scheme_handler_factory_t>::UnwrapDerived(
-    CefWrapperType type, cef_scheme_handler_factory_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
+CefSchemeHandlerFactoryCppToC::CefSchemeHandlerFactoryCppToC(
+    CefSchemeHandlerFactory* cls)
+    : CefCppToC<CefSchemeHandlerFactoryCppToC, CefSchemeHandlerFactory,
+        cef_scheme_handler_factory_t>(cls) {
+  struct_.struct_.create = scheme_handler_factory_create;
 }
 
 #ifndef NDEBUG
@@ -73,6 +65,3 @@ template<> base::AtomicRefCount CefCppToC<CefSchemeHandlerFactoryCppToC,
     CefSchemeHandlerFactory, cef_scheme_handler_factory_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefSchemeHandlerFactoryCppToC,
-    CefSchemeHandlerFactory, cef_scheme_handler_factory_t>::kWrapperType =
-    WT_SCHEME_HANDLER_FACTORY;

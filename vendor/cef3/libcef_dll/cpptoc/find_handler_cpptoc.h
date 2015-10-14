@@ -28,8 +28,9 @@ class CefFindHandlerCppToC
     : public CefCppToC<CefFindHandlerCppToC, CefFindHandler,
         cef_find_handler_t> {
  public:
-  CefFindHandlerCppToC();
+  explicit CefFindHandlerCppToC(CefFindHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_FIND_HANDLER_CPPTOC_H_
+

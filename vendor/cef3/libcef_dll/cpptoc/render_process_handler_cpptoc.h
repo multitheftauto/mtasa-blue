@@ -28,8 +28,9 @@ class CefRenderProcessHandlerCppToC
     : public CefCppToC<CefRenderProcessHandlerCppToC, CefRenderProcessHandler,
         cef_render_process_handler_t> {
  public:
-  CefRenderProcessHandlerCppToC();
+  explicit CefRenderProcessHandlerCppToC(CefRenderProcessHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_RENDER_PROCESS_HANDLER_CPPTOC_H_
+

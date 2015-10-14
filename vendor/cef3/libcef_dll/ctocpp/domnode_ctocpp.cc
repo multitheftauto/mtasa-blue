@@ -18,85 +18,79 @@
 // VIRTUAL METHODS - Body may be edited by hand.
 
 CefDOMNode::Type CefDOMNodeCToCpp::GetType() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_type))
+  if (CEF_MEMBER_MISSING(struct_, get_type))
     return DOM_NODE_TYPE_UNSUPPORTED;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_dom_node_type_t _retval = _struct->get_type(_struct);
+  cef_dom_node_type_t _retval = struct_->get_type(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 bool CefDOMNodeCToCpp::IsText() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_text))
+  if (CEF_MEMBER_MISSING(struct_, is_text))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_text(_struct);
+  int _retval = struct_->is_text(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefDOMNodeCToCpp::IsElement() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_element))
+  if (CEF_MEMBER_MISSING(struct_, is_element))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_element(_struct);
+  int _retval = struct_->is_element(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefDOMNodeCToCpp::IsEditable() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_editable))
+  if (CEF_MEMBER_MISSING(struct_, is_editable))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_editable(_struct);
+  int _retval = struct_->is_editable(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefDOMNodeCToCpp::IsFormControlElement() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_form_control_element))
+  if (CEF_MEMBER_MISSING(struct_, is_form_control_element))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_form_control_element(_struct);
+  int _retval = struct_->is_form_control_element(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 CefString CefDOMNodeCToCpp::GetFormControlElementType() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_form_control_element_type))
+  if (CEF_MEMBER_MISSING(struct_, get_form_control_element_type))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_form_control_element_type(
-      _struct);
+  cef_string_userfree_t _retval = struct_->get_form_control_element_type(
+      struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -105,8 +99,7 @@ CefString CefDOMNodeCToCpp::GetFormControlElementType() {
 }
 
 bool CefDOMNodeCToCpp::IsSame(CefRefPtr<CefDOMNode> that) {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_same))
+  if (CEF_MEMBER_MISSING(struct_, is_same))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -117,7 +110,7 @@ bool CefDOMNodeCToCpp::IsSame(CefRefPtr<CefDOMNode> that) {
     return false;
 
   // Execute
-  int _retval = _struct->is_same(_struct,
+  int _retval = struct_->is_same(struct_,
       CefDOMNodeCToCpp::Unwrap(that));
 
   // Return type: bool
@@ -125,14 +118,13 @@ bool CefDOMNodeCToCpp::IsSame(CefRefPtr<CefDOMNode> that) {
 }
 
 CefString CefDOMNodeCToCpp::GetName() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_name))
+  if (CEF_MEMBER_MISSING(struct_, get_name))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_name(_struct);
+  cef_string_userfree_t _retval = struct_->get_name(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -141,14 +133,13 @@ CefString CefDOMNodeCToCpp::GetName() {
 }
 
 CefString CefDOMNodeCToCpp::GetValue() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_value))
+  if (CEF_MEMBER_MISSING(struct_, get_value))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_value(_struct);
+  cef_string_userfree_t _retval = struct_->get_value(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -157,8 +148,7 @@ CefString CefDOMNodeCToCpp::GetValue() {
 }
 
 bool CefDOMNodeCToCpp::SetValue(const CefString& value) {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_value))
+  if (CEF_MEMBER_MISSING(struct_, set_value))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -169,7 +159,7 @@ bool CefDOMNodeCToCpp::SetValue(const CefString& value) {
     return false;
 
   // Execute
-  int _retval = _struct->set_value(_struct,
+  int _retval = struct_->set_value(struct_,
       value.GetStruct());
 
   // Return type: bool
@@ -177,14 +167,13 @@ bool CefDOMNodeCToCpp::SetValue(const CefString& value) {
 }
 
 CefString CefDOMNodeCToCpp::GetAsMarkup() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_as_markup))
+  if (CEF_MEMBER_MISSING(struct_, get_as_markup))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_as_markup(_struct);
+  cef_string_userfree_t _retval = struct_->get_as_markup(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -193,112 +182,104 @@ CefString CefDOMNodeCToCpp::GetAsMarkup() {
 }
 
 CefRefPtr<CefDOMDocument> CefDOMNodeCToCpp::GetDocument() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_document))
+  if (CEF_MEMBER_MISSING(struct_, get_document))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_domdocument_t* _retval = _struct->get_document(_struct);
+  cef_domdocument_t* _retval = struct_->get_document(struct_);
 
   // Return type: refptr_same
   return CefDOMDocumentCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefDOMNode> CefDOMNodeCToCpp::GetParent() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_parent))
+  if (CEF_MEMBER_MISSING(struct_, get_parent))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_domnode_t* _retval = _struct->get_parent(_struct);
+  cef_domnode_t* _retval = struct_->get_parent(struct_);
 
   // Return type: refptr_same
   return CefDOMNodeCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefDOMNode> CefDOMNodeCToCpp::GetPreviousSibling() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_previous_sibling))
+  if (CEF_MEMBER_MISSING(struct_, get_previous_sibling))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_domnode_t* _retval = _struct->get_previous_sibling(_struct);
+  cef_domnode_t* _retval = struct_->get_previous_sibling(struct_);
 
   // Return type: refptr_same
   return CefDOMNodeCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefDOMNode> CefDOMNodeCToCpp::GetNextSibling() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_next_sibling))
+  if (CEF_MEMBER_MISSING(struct_, get_next_sibling))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_domnode_t* _retval = _struct->get_next_sibling(_struct);
+  cef_domnode_t* _retval = struct_->get_next_sibling(struct_);
 
   // Return type: refptr_same
   return CefDOMNodeCToCpp::Wrap(_retval);
 }
 
 bool CefDOMNodeCToCpp::HasChildren() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, has_children))
+  if (CEF_MEMBER_MISSING(struct_, has_children))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->has_children(_struct);
+  int _retval = struct_->has_children(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 CefRefPtr<CefDOMNode> CefDOMNodeCToCpp::GetFirstChild() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_first_child))
+  if (CEF_MEMBER_MISSING(struct_, get_first_child))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_domnode_t* _retval = _struct->get_first_child(_struct);
+  cef_domnode_t* _retval = struct_->get_first_child(struct_);
 
   // Return type: refptr_same
   return CefDOMNodeCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefDOMNode> CefDOMNodeCToCpp::GetLastChild() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_last_child))
+  if (CEF_MEMBER_MISSING(struct_, get_last_child))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_domnode_t* _retval = _struct->get_last_child(_struct);
+  cef_domnode_t* _retval = struct_->get_last_child(struct_);
 
   // Return type: refptr_same
   return CefDOMNodeCToCpp::Wrap(_retval);
 }
 
 CefString CefDOMNodeCToCpp::GetElementTagName() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_element_tag_name))
+  if (CEF_MEMBER_MISSING(struct_, get_element_tag_name))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_element_tag_name(_struct);
+  cef_string_userfree_t _retval = struct_->get_element_tag_name(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -307,22 +288,20 @@ CefString CefDOMNodeCToCpp::GetElementTagName() {
 }
 
 bool CefDOMNodeCToCpp::HasElementAttributes() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, has_element_attributes))
+  if (CEF_MEMBER_MISSING(struct_, has_element_attributes))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->has_element_attributes(_struct);
+  int _retval = struct_->has_element_attributes(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefDOMNodeCToCpp::HasElementAttribute(const CefString& attrName) {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, has_element_attribute))
+  if (CEF_MEMBER_MISSING(struct_, has_element_attribute))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -333,7 +312,7 @@ bool CefDOMNodeCToCpp::HasElementAttribute(const CefString& attrName) {
     return false;
 
   // Execute
-  int _retval = _struct->has_element_attribute(_struct,
+  int _retval = struct_->has_element_attribute(struct_,
       attrName.GetStruct());
 
   // Return type: bool
@@ -341,8 +320,7 @@ bool CefDOMNodeCToCpp::HasElementAttribute(const CefString& attrName) {
 }
 
 CefString CefDOMNodeCToCpp::GetElementAttribute(const CefString& attrName) {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_element_attribute))
+  if (CEF_MEMBER_MISSING(struct_, get_element_attribute))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -353,7 +331,7 @@ CefString CefDOMNodeCToCpp::GetElementAttribute(const CefString& attrName) {
     return CefString();
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_element_attribute(_struct,
+  cef_string_userfree_t _retval = struct_->get_element_attribute(struct_,
       attrName.GetStruct());
 
   // Return type: string
@@ -363,8 +341,7 @@ CefString CefDOMNodeCToCpp::GetElementAttribute(const CefString& attrName) {
 }
 
 void CefDOMNodeCToCpp::GetElementAttributes(AttributeMap& attrMap) {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_element_attributes))
+  if (CEF_MEMBER_MISSING(struct_, get_element_attributes))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -376,7 +353,7 @@ void CefDOMNodeCToCpp::GetElementAttributes(AttributeMap& attrMap) {
     transfer_string_map_contents(attrMap, attrMapMap);
 
   // Execute
-  _struct->get_element_attributes(_struct,
+  struct_->get_element_attributes(struct_,
       attrMapMap);
 
   // Restore param:attrMap; type: string_map_single_byref
@@ -389,8 +366,7 @@ void CefDOMNodeCToCpp::GetElementAttributes(AttributeMap& attrMap) {
 
 bool CefDOMNodeCToCpp::SetElementAttribute(const CefString& attrName,
     const CefString& value) {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_element_attribute))
+  if (CEF_MEMBER_MISSING(struct_, set_element_attribute))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -405,7 +381,7 @@ bool CefDOMNodeCToCpp::SetElementAttribute(const CefString& attrName,
     return false;
 
   // Execute
-  int _retval = _struct->set_element_attribute(_struct,
+  int _retval = struct_->set_element_attribute(struct_,
       attrName.GetStruct(),
       value.GetStruct());
 
@@ -414,14 +390,13 @@ bool CefDOMNodeCToCpp::SetElementAttribute(const CefString& attrName,
 }
 
 CefString CefDOMNodeCToCpp::GetElementInnerText() {
-  cef_domnode_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_element_inner_text))
+  if (CEF_MEMBER_MISSING(struct_, get_element_inner_text))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_element_inner_text(_struct);
+  cef_string_userfree_t _retval = struct_->get_element_inner_text(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -430,21 +405,8 @@ CefString CefDOMNodeCToCpp::GetElementInnerText() {
 }
 
 
-// CONSTRUCTOR - Do not edit by hand.
-
-CefDOMNodeCToCpp::CefDOMNodeCToCpp() {
-}
-
-template<> cef_domnode_t* CefCToCpp<CefDOMNodeCToCpp, CefDOMNode,
-    cef_domnode_t>::UnwrapDerived(CefWrapperType type, CefDOMNode* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
-
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefDOMNodeCToCpp, CefDOMNode,
     cef_domnode_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefDOMNodeCToCpp, CefDOMNode,
-    cef_domnode_t>::kWrapperType = WT_DOMNODE;

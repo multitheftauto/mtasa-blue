@@ -27,8 +27,9 @@
 class CefTaskCppToC
     : public CefCppToC<CefTaskCppToC, CefTask, cef_task_t> {
  public:
-  CefTaskCppToC();
+  explicit CefTaskCppToC(CefTask* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_TASK_CPPTOC_H_
+

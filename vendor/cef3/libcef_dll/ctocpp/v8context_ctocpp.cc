@@ -54,106 +54,98 @@ bool CefV8Context::InContext() {
 // VIRTUAL METHODS - Body may be edited by hand.
 
 CefRefPtr<CefTaskRunner> CefV8ContextCToCpp::GetTaskRunner() {
-  cef_v8context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_task_runner))
+  if (CEF_MEMBER_MISSING(struct_, get_task_runner))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_task_runner_t* _retval = _struct->get_task_runner(_struct);
+  cef_task_runner_t* _retval = struct_->get_task_runner(struct_);
 
   // Return type: refptr_same
   return CefTaskRunnerCToCpp::Wrap(_retval);
 }
 
 bool CefV8ContextCToCpp::IsValid() {
-  cef_v8context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_valid))
+  if (CEF_MEMBER_MISSING(struct_, is_valid))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_valid(_struct);
+  int _retval = struct_->is_valid(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 CefRefPtr<CefBrowser> CefV8ContextCToCpp::GetBrowser() {
-  cef_v8context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_browser))
+  if (CEF_MEMBER_MISSING(struct_, get_browser))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_browser_t* _retval = _struct->get_browser(_struct);
+  cef_browser_t* _retval = struct_->get_browser(struct_);
 
   // Return type: refptr_same
   return CefBrowserCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefFrame> CefV8ContextCToCpp::GetFrame() {
-  cef_v8context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_frame))
+  if (CEF_MEMBER_MISSING(struct_, get_frame))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_frame_t* _retval = _struct->get_frame(_struct);
+  cef_frame_t* _retval = struct_->get_frame(struct_);
 
   // Return type: refptr_same
   return CefFrameCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefV8Value> CefV8ContextCToCpp::GetGlobal() {
-  cef_v8context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_global))
+  if (CEF_MEMBER_MISSING(struct_, get_global))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_v8value_t* _retval = _struct->get_global(_struct);
+  cef_v8value_t* _retval = struct_->get_global(struct_);
 
   // Return type: refptr_same
   return CefV8ValueCToCpp::Wrap(_retval);
 }
 
 bool CefV8ContextCToCpp::Enter() {
-  cef_v8context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, enter))
+  if (CEF_MEMBER_MISSING(struct_, enter))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->enter(_struct);
+  int _retval = struct_->enter(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefV8ContextCToCpp::Exit() {
-  cef_v8context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, exit))
+  if (CEF_MEMBER_MISSING(struct_, exit))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->exit(_struct);
+  int _retval = struct_->exit(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefV8ContextCToCpp::IsSame(CefRefPtr<CefV8Context> that) {
-  cef_v8context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_same))
+  if (CEF_MEMBER_MISSING(struct_, is_same))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -164,7 +156,7 @@ bool CefV8ContextCToCpp::IsSame(CefRefPtr<CefV8Context> that) {
     return false;
 
   // Execute
-  int _retval = _struct->is_same(_struct,
+  int _retval = struct_->is_same(struct_,
       CefV8ContextCToCpp::Unwrap(that));
 
   // Return type: bool
@@ -173,8 +165,7 @@ bool CefV8ContextCToCpp::IsSame(CefRefPtr<CefV8Context> that) {
 
 bool CefV8ContextCToCpp::Eval(const CefString& code,
     CefRefPtr<CefV8Value>& retval, CefRefPtr<CefV8Exception>& exception) {
-  cef_v8context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, eval))
+  if (CEF_MEMBER_MISSING(struct_, eval))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -196,7 +187,7 @@ bool CefV8ContextCToCpp::Eval(const CefString& code,
   cef_v8exception_t* exceptionOrig = exceptionStruct;
 
   // Execute
-  int _retval = _struct->eval(_struct,
+  int _retval = struct_->eval(struct_,
       code.GetStruct(),
       &retvalStruct,
       &exceptionStruct);
@@ -223,21 +214,8 @@ bool CefV8ContextCToCpp::Eval(const CefString& code,
 }
 
 
-// CONSTRUCTOR - Do not edit by hand.
-
-CefV8ContextCToCpp::CefV8ContextCToCpp() {
-}
-
-template<> cef_v8context_t* CefCToCpp<CefV8ContextCToCpp, CefV8Context,
-    cef_v8context_t>::UnwrapDerived(CefWrapperType type, CefV8Context* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
-
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefV8ContextCToCpp, CefV8Context,
     cef_v8context_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefV8ContextCToCpp, CefV8Context,
-    cef_v8context_t>::kWrapperType = WT_V8CONTEXT;

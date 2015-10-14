@@ -28,8 +28,9 @@ class CefDeleteCookiesCallbackCppToC
     : public CefCppToC<CefDeleteCookiesCallbackCppToC, CefDeleteCookiesCallback,
         cef_delete_cookies_callback_t> {
  public:
-  CefDeleteCookiesCallbackCppToC();
+  explicit CefDeleteCookiesCallbackCppToC(CefDeleteCookiesCallback* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_DELETE_COOKIES_CALLBACK_CPPTOC_H_
+

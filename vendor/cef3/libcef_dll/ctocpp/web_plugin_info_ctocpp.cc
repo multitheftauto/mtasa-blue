@@ -16,14 +16,13 @@
 // VIRTUAL METHODS - Body may be edited by hand.
 
 CefString CefWebPluginInfoCToCpp::GetName() {
-  cef_web_plugin_info_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_name))
+  if (CEF_MEMBER_MISSING(struct_, get_name))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_name(_struct);
+  cef_string_userfree_t _retval = struct_->get_name(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -32,14 +31,13 @@ CefString CefWebPluginInfoCToCpp::GetName() {
 }
 
 CefString CefWebPluginInfoCToCpp::GetPath() {
-  cef_web_plugin_info_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_path))
+  if (CEF_MEMBER_MISSING(struct_, get_path))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_path(_struct);
+  cef_string_userfree_t _retval = struct_->get_path(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -48,14 +46,13 @@ CefString CefWebPluginInfoCToCpp::GetPath() {
 }
 
 CefString CefWebPluginInfoCToCpp::GetVersion() {
-  cef_web_plugin_info_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_version))
+  if (CEF_MEMBER_MISSING(struct_, get_version))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_version(_struct);
+  cef_string_userfree_t _retval = struct_->get_version(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -64,14 +61,13 @@ CefString CefWebPluginInfoCToCpp::GetVersion() {
 }
 
 CefString CefWebPluginInfoCToCpp::GetDescription() {
-  cef_web_plugin_info_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_description))
+  if (CEF_MEMBER_MISSING(struct_, get_description))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_description(_struct);
+  cef_string_userfree_t _retval = struct_->get_description(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -80,22 +76,8 @@ CefString CefWebPluginInfoCToCpp::GetDescription() {
 }
 
 
-// CONSTRUCTOR - Do not edit by hand.
-
-CefWebPluginInfoCToCpp::CefWebPluginInfoCToCpp() {
-}
-
-template<> cef_web_plugin_info_t* CefCToCpp<CefWebPluginInfoCToCpp,
-    CefWebPluginInfo, cef_web_plugin_info_t>::UnwrapDerived(
-    CefWrapperType type, CefWebPluginInfo* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
-
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefWebPluginInfoCToCpp,
     CefWebPluginInfo, cef_web_plugin_info_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefWebPluginInfoCToCpp, CefWebPluginInfo,
-    cef_web_plugin_info_t>::kWrapperType = WT_WEB_PLUGIN_INFO;

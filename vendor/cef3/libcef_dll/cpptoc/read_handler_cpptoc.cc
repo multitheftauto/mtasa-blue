@@ -13,8 +13,6 @@
 #include "libcef_dll/cpptoc/read_handler_cpptoc.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 size_t CEF_CALLBACK read_handler_read(struct _cef_read_handler_t* self,
@@ -98,24 +96,16 @@ int CEF_CALLBACK read_handler_may_block(struct _cef_read_handler_t* self) {
   return _retval;
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefReadHandlerCppToC::CefReadHandlerCppToC() {
-  GetStruct()->read = read_handler_read;
-  GetStruct()->seek = read_handler_seek;
-  GetStruct()->tell = read_handler_tell;
-  GetStruct()->eof = read_handler_eof;
-  GetStruct()->may_block = read_handler_may_block;
-}
-
-template<> CefRefPtr<CefReadHandler> CefCppToC<CefReadHandlerCppToC,
-    CefReadHandler, cef_read_handler_t>::UnwrapDerived(CefWrapperType type,
-    cef_read_handler_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
+CefReadHandlerCppToC::CefReadHandlerCppToC(CefReadHandler* cls)
+    : CefCppToC<CefReadHandlerCppToC, CefReadHandler, cef_read_handler_t>(cls) {
+  struct_.struct_.read = read_handler_read;
+  struct_.struct_.seek = read_handler_seek;
+  struct_.struct_.tell = read_handler_tell;
+  struct_.struct_.eof = read_handler_eof;
+  struct_.struct_.may_block = read_handler_may_block;
 }
 
 #ifndef NDEBUG
@@ -123,5 +113,3 @@ template<> base::AtomicRefCount CefCppToC<CefReadHandlerCppToC, CefReadHandler,
     cef_read_handler_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefReadHandlerCppToC, CefReadHandler,
-    cef_read_handler_t>::kWrapperType = WT_READ_HANDLER;
