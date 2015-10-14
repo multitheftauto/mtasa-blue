@@ -644,7 +644,6 @@ DontInstallRedistVC12:
 		SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libcef.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\icudtl.dat"
-		File "${FILES_ROOT}\MTA San Andreas\mta\ffmpegsumo.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\natives_blob.bin"
