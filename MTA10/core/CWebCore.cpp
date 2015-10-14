@@ -797,6 +797,12 @@ void CCefApp::OnRegisterCustomSchemes ( CefRefPtr < CefSchemeRegistrar > registr
 
 CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request )
 {
+    // browser or frame are NULL if the request does not orginate from a browser window
+    // This is for exmaple true for the application cache or CEFURLRequests
+    // (http://www.html5rocks.com/en/tutorials/appcache/beginner/)
+    if ( !browser || !frame )
+        return nullptr;
+
     CWebCore* pWebCore = static_cast<CWebCore*> ( g_pCore->GetWebCore () );
     auto pWebView = pWebCore->FindWebView ( browser );
     if ( !pWebView || !pWebView->IsLocal () )
