@@ -150,7 +150,6 @@ namespace SharedUtil
     bool            IsWindowsVersionOrGreater       ( WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor );
     bool            IsWindowsXPSP3OrGreater         ( void );
     bool            IsWindows8OrGreater             ( void );
-    bool            IsWindows10OrGreater            ( void );
 
 #endif
 

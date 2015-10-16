@@ -55,6 +55,7 @@ void            FindFilesRecursive                  ( const SString& strPathMatc
 SString         GetOSVersion                        ( void );
 SString         GetRealOSVersion                    ( void );
 SString         GetRealOSBuildNumber                ( void );
+bool            IsWindows10OrGreater                ( void );
 bool            IsVS2013RuntimeInstalled            ( void );
 BOOL            IsUserAdmin                         ( void );
 
