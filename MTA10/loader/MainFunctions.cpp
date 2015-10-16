@@ -356,7 +356,11 @@ void HandleNotUsedMainMenu ( void )
                     FileSave( strCoreConfigFilename, strCoreConfig );
                     AddReportLog( 9311, "Loader - HandleNotUsedMainMenu - User change to Borderless window" );
                 }
-            }   
+                else
+                    AddReportLog( 9313, "Loader - HandleNotUsedMainMenu - User said no" );
+            }
+            else
+                AddReportLog( 9314, "Loader - HandleNotUsedMainMenu - Mode not fullscreen standard" );
         }
         else
         {
@@ -466,12 +470,20 @@ void PreLaunchWatchDogs ( void )
         HandleResetSettings ();
     }
 
-    // Check for possible fullscreen problems after install
-    if ( WatchDogIsSectionOpen( WD_SECTION_NOT_USED_MAIN_MENU ) && WatchDogIsSectionOpen( WD_SECTION_POST_INSTALL ) )
+    // Check for possible fullscreen problems
+    if ( WatchDogIsSectionOpen( WD_SECTION_NOT_USED_MAIN_MENU ) )
     {
         WatchDogCompletedSection( WD_SECTION_NOT_USED_MAIN_MENU );
-        HandleNotUsedMainMenu();
+        WatchDogIncCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU );
+        int iChainLimit = GetApplicationSettingInt( "times-connected" ) ? 4 : 1;
+        if ( WatchDogGetCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU ) >= iChainLimit )
+        {
+            WatchDogClearCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU );
+            HandleNotUsedMainMenu();
+        }
     }
+    else
+        WatchDogClearCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU );
 
     // Clear down freeze on quit detection
     WatchDogCompletedSection( "Q0" );
