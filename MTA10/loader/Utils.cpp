@@ -1133,6 +1133,19 @@ SString GetRealOSBuildNumber( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// IsWindows10OrGreater
+//
+// Works around limit for applications not manifested for Windows 10
+//
+///////////////////////////////////////////////////////////////
+bool IsWindows10OrGreater( void )
+{
+    return atoi( GetRealOSVersion() ) >= 10;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // IsVS2013RuntimeInstalled
 //
 // Only checks registry settings, so install could still be invalid

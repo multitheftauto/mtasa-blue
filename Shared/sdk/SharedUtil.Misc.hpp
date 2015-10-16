@@ -928,7 +928,6 @@ bool SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SStri
 
 #ifdef WIN32
 #define _WIN32_WINNT_WIN8                   0x0602
-#define _WIN32_WINNT_WIN10                  0x0A00
 ///////////////////////////////////////////////////////////////////////////
 //
 // SharedUtil::IsWindowsVersionOrGreater
@@ -963,11 +962,6 @@ bool SharedUtil::IsWindowsXPSP3OrGreater()
 bool SharedUtil::IsWindows8OrGreater()
 {
     return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
-}
-
-bool SharedUtil::IsWindows10OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 0);
 }
 #endif  // WIN32
 

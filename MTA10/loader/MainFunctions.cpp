@@ -473,9 +473,16 @@ void PreLaunchWatchDogs ( void )
     // Check for possible fullscreen problems
     if ( WatchDogIsSectionOpen( WD_SECTION_NOT_USED_MAIN_MENU ) )
     {
+        int iChainLimit;
+        if ( WatchDogIsSectionOpen( WD_SECTION_POST_INSTALL ) )
+            iChainLimit = 1;
+        else
+        if ( GetApplicationSettingInt( "times-connected" ) == 0 )
+            iChainLimit = 2;
+        else
+            iChainLimit = 3;
         WatchDogCompletedSection( WD_SECTION_NOT_USED_MAIN_MENU );
         WatchDogIncCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU );
-        int iChainLimit = GetApplicationSettingInt( "times-connected" ) ? 4 : 1;
         if ( WatchDogGetCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU ) >= iChainLimit )
         {
             WatchDogClearCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU );
