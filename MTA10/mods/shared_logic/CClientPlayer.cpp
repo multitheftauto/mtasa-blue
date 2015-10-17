@@ -277,13 +277,14 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
             m_shotSyncData->m_vecRemoteBulletSyncEnd = vecEnd;
             m_shotSyncData->m_bRemoteBulletSyncVectorsValid = true;
 
-#if MTA_DM_VERSION >= 0x151 
+            g_iDamageEventLimit = 1;
+
             // Fixed #9038: bugged shotgun with bullet sync
             if ( weaponType == WEAPONTYPE_SHOTGUN || weaponType == WEAPONTYPE_SAWNOFF_SHOTGUN || weaponType == WEAPONTYPE_SPAS12_SHOTGUN )
-                g_iDamageEventLimit = 2;
-            else
-#endif
-                g_iDamageEventLimit = 1;
+            {
+                if ( g_pClientGame->GetMiscGameSettings().bAllowShotgunDamageFix )
+                    g_iDamageEventLimit = 2;
+            }
 
             // Fire
             CWeapon* pWeapon = m_pPlayerPed->GetWeapon ( m_pPlayerPed->GetCurrentWeaponSlot () );

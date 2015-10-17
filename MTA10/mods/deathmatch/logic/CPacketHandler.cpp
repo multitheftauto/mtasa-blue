@@ -5158,10 +5158,15 @@ void CPacketHandler::Packet_SyncSettings ( NetBitStreamInterface& bitStream )
     if ( bitStream.Version() >= 0x59 )
         bitStream.Read ( ucAllowBadDrivebyHitboxesFix );
 
+    uchar ucAllowShotgunDamageFix = 0;
+    if ( bitStream.Version() >= 0x64 )
+        bitStream.Read ( ucAllowShotgunDamageFix );
+
     SMiscGameSettings miscGameSettings;
     miscGameSettings.bUseAltPulseOrder = ( ucUseAltPulseOrder != 0 );
     miscGameSettings.bAllowFastSprintFix = ( ucAllowFastSprintFix != 0 );
     miscGameSettings.bAllowBadDrivebyHitboxFix = (ucAllowBadDrivebyHitboxesFix != 0);
+    miscGameSettings.bAllowShotgunDamageFix = ( ucAllowShotgunDamageFix != 0 );
     g_pClientGame->SetMiscGameSettings( miscGameSettings );
 }
 
