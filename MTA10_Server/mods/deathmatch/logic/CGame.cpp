@@ -39,6 +39,7 @@
 #define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.5-9.06054"
 #define SPRINT_FIX_MIN_CLIENT_VERSION           "1.3.5-9.06277"
 #define DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION   "1.4.0-5.06399"
+#define SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION   "1.5.1"
 
 CGame* g_pGame = NULL;
 
@@ -4172,6 +4173,7 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
     uchar ucUseAltPulseOrder = m_pMainConfig->GetUseAltPulseOrder () != 0;
     uchar ucAllowFastSprintFix = false;
     uchar ucAllowDrivebyAnimFix = false;
+    uchar ucAllowShotgunDamageFix = false;
 
     // Add sprint fix if all clients can handle it
     if ( ExtractVersionStringBuildNumber( m_pPlayerManager->GetLowestConnectedPlayerVersion() ) >= ExtractVersionStringBuildNumber( SPRINT_FIX_MIN_CLIENT_VERSION ) )
@@ -4181,7 +4183,11 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
     if (ExtractVersionStringBuildNumber(m_pPlayerManager->GetLowestConnectedPlayerVersion()) >= ExtractVersionStringBuildNumber( DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION ))
         ucAllowDrivebyAnimFix = true;
 
-    CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs, ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix);
+    // Add shotgun bullet sync damage fix if all clients can handle it
+    if ( m_pPlayerManager->GetLowestConnectedPlayerVersion() >= SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION )
+        ucAllowShotgunDamageFix = true;
+
+    CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs, ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix );
     if ( pPlayer )
         pPlayer->Send ( packet );
     else
