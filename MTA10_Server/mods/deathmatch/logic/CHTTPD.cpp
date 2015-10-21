@@ -117,6 +117,25 @@ HttpResponse * CHTTPD::RouteRequest ( HttpRequest * ipoHttpRequest )
 ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
                                          HttpResponse * ipoHttpResponse )
 {
+    // Check if server verification was requested
+    auto keySecret = ipoHttpRequest->oRequestHeaders["key_secret"];
+    if ( ipoHttpRequest->sUri == "/get_verification_key_code" && keySecret != "" )
+    {
+        // Read keyfile
+        auto path = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "verify.key" );
+        SString content;
+        SharedUtil::FileLoad ( path, content, 100 );
+
+        // Verify key_secret client header to prevent unauthorized people to steal the key
+        if ( keySecret == content.substr ( 0, 10 ) )
+        {
+            ipoHttpResponse->SetBody ( content, content.size () );
+            return HTTPRESPONSECODE_200_OK;
+        }
+        ipoHttpResponse->SetBody ( "", 0 );
+        return HTTPRESPONSECODE_401_UNAUTHORIZED;
+    }
+
     CAccount * account = CheckAuthentication ( ipoHttpRequest );
 
     if ( account )
