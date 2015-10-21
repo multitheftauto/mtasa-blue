@@ -49,6 +49,10 @@ public:
 
 protected:
     void                    CreateWindows       ( void );
+    static bool             StaticDownloadFinished ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    void                    DownloadSuccess     ( char* pCompletedData, size_t completedLength );
+    void                    DownloadFailed      ( int iErrorCode );
+    CNetHTTPDownloadManagerInterface* GetHTTP   ( void );
 
 private:
 
@@ -74,9 +78,6 @@ private:
 
     CGUIButton*             m_pButtonRegister;
     CGUIButton*             m_pButtonCancel;
-
-    // Community stuff
-    CHTTPClient                 m_HTTP;
 
     std::string                 m_strCommunityHash;
 

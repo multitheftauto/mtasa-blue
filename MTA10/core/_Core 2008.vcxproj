@@ -324,10 +324,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="tracking\CHTTPClient.cpp" />
-    <ClCompile Include="tracking\CHTTPResponse.cpp" />
-    <ClCompile Include="tracking\CTCPClientSocketImpl.cpp" />
-    <ClCompile Include="tracking\CTCPManager.cpp" />
     <ClCompile Include="..\..\vendor\tinygettext\dictionary.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -483,14 +479,6 @@
     <ClInclude Include="CWebView.h" />
     <ClInclude Include="StdInc.h" />
     <ClInclude Include="WebBrowserHelpers.h" />
-    <ClInclude Include="tracking\CHTTPClient.h" />
-    <ClInclude Include="tracking\CHTTPResponse.h" />
-    <ClInclude Include="tracking\CTCPClientSocket.h" />
-    <ClInclude Include="tracking\CTCPClientSocketImpl.h" />
-    <ClInclude Include="tracking\CTCPManager.h" />
-    <ClInclude Include="tracking\CTCPServerSocket.h" />
-    <ClInclude Include="tracking\CTCPServerSocketImpl.h" />
-    <ClInclude Include="tracking\CTCPSocket.h" />
     <ClInclude Include="CExceptionInformation_Impl.h" />
     <ClInclude Include="..\sdk\core\CClientBase.h" />
     <ClInclude Include="..\sdk\core\CClientEntityBase.h" />

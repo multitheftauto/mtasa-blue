@@ -24,7 +24,6 @@ class CMasterServerManagerInterface;
 #include <sstream>
 #include <vector>
 #include "CSingleton.h"
-#include "tracking/CHTTPClient.h"
 
 // Master server list URL
 #define SERVER_LIST_MASTER_URL              "http://master.multitheftauto.com/ase/mta/"
