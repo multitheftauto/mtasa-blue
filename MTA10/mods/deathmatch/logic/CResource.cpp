@@ -222,73 +222,6 @@ bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArgument
 }
 
 
-//
-// Quick integrity check of png, dff and txd files
-//
-static bool CheckFileForCorruption( const SString &strPath, SString &strAppendix )
-{
-    const char* szExt   = strPath.c_str () + max<long>( 0, strPath.length () - 4 );
-    bool bIsBad         = false;
-
-    if ( stricmp ( szExt, ".PNG" ) == 0 )
-    {
-        // Open the file
-        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
-        {
-            // This is what the png header should look like
-            unsigned char pGoodHeader [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-
-             // Load the header
-            unsigned char pBuffer [8] = { 0,0,0,0,0,0,0,0 };
-            fread ( pBuffer, 1, 8, pFile );
-
-            // Check header integrity
-            if ( memcmp ( pBuffer, pGoodHeader, 8 ) )
-                bIsBad = true;
-
-            // Close the file
-            fclose ( pFile );
-        }
-    }
-    else
-    if ( stricmp ( szExt, ".TXD" ) == 0 || stricmp ( szExt, ".DFF" ) == 0 )
-    {
-        // Open the file
-        if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
-        {
-            struct {
-                long id;
-                long size;
-                long ver;
-            } header = {0,0,0};
-
-            // Load the first header
-            fread ( &header, 1, sizeof(header), pFile );
-            long pos = sizeof(header);
-            long validSize = header.size + pos;
-
-            // Step through the sections
-            while ( pos < validSize )
-            {
-                if ( fread ( &header, 1, sizeof(header), pFile ) != sizeof(header) )
-                    break;
-                fseek ( pFile, header.size, SEEK_CUR );
-                pos += header.size + sizeof(header);
-            }
-
-            // Check integrity
-            if ( pos != validSize )
-                bIsBad = true;
-               
-            // Close the file
-            fclose ( pFile );
-        }
-    }
-
-    return bIsBad;
-}
-
-
 void CResource::AddPendingFileDownload( const SString& strUrl, const SString& strFilename, double dDownloadSize )
 {
     SPendingFileDownload item;
@@ -395,7 +328,7 @@ void CResource::Load ( void )
             }
             else
             {
-                HandleDownloadedFileTrouble( pResourceFile, true );
+                HandleDownloadedFileTrouble( pResourceFile );
             }
             DECLARE_PROFILER_SECTION( OnPostLoadScript )
         }
@@ -405,16 +338,10 @@ void CResource::Load ( void )
             // Check the file contents
             if ( CChecksum::GenerateChecksumFromFile ( pResourceFile->GetName () ) == pResourceFile->GetServerChecksum () )
             {
-                SString strError = "";
-                bool bIsBad = CheckFileForCorruption ( pResourceFile->GetName ( ), strError );
-                if ( bIsBad )
-                {
-                    HandleDownloadedFileTrouble( pResourceFile, false, strError );
-                }
             }
             else
             {
-                HandleDownloadedFileTrouble( pResourceFile, true, "" );
+                HandleDownloadedFileTrouble( pResourceFile );
             }
         }
     }
@@ -564,28 +491,15 @@ void CResource::AddToElementGroup ( CClientEntity* pElement )
 //
 // Handle when things go wrong 
 //
-void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile, bool bCRCMismatch, const SString &strAppendix )
+void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile )
 {
     // Compose message
     SString strMessage;
-    if ( bCRCMismatch )
-    {
-        if ( g_pClientGame->IsUsingExternalHTTPServer() )
-            strMessage += "External ";
-        strMessage += "HTTP server file mismatch";
-    }
-    else
-        strMessage += "Invalid file";
-    SString strFilename = ExtractFilename( PathConform( pResourceFile->GetShortName() ) );
-    strMessage += SString( " (%s) %s %s", GetName(), *strFilename, *strAppendix );
+    if ( g_pClientGame->IsUsingExternalHTTPServer() )
+        strMessage += "External ";
 
-    if ( !bCRCMismatch )
-    {
-        // For corrupt files, log to the client console
-        g_pClientGame->TellServerSomethingImportant( 1000, strMessage, true );
-        g_pCore->GetConsole()->Printf( "Download error: %s", *strMessage );
-        return;
-    }
+    SString strFilename = ExtractFilename( PathConform( pResourceFile->GetShortName() ) );
+    strMessage += SString( "HTTP server file mismatch (%s) %s", GetName(), *strFilename);
 
     // If using external HTTP server, reconnect and use internal one
     if ( g_pClientGame->IsUsingExternalHTTPServer() && !g_pCore->ShouldUseInternalHTTPServer() )
