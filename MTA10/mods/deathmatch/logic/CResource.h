@@ -115,7 +115,7 @@ public:
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
     bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
-    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bCRCMismatch, const SString &strAppendix = "" );
+    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile );
     void                    AddPendingFileDownload          ( const SString& strUrl, const SString& strFilename, double dDownloadSize );
     void                    StartPendingFileDownloads       ( void );
     bool                    HasPendingFileDownloads         ( void )                        { return !m_PendingFileDownloadList.empty(); }
