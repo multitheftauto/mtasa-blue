@@ -341,6 +341,11 @@ void HandleNotUsedMainMenu ( void )
         FileLoad( strCoreConfigFilename, strCoreConfig );
         SString strWindowed        = strCoreConfig.SplitRight( "<display_windowed>" ).Left( 1 );
         SString strFullscreenStyle = strCoreConfig.SplitRight( "<display_fullscreen_style>" ).Left( 1 );
+        if ( strFullscreenStyle == "1" )
+        {
+            AddReportLog( 9315, "Loader - HandleNotUsedMainMenu - Already Borderless window" );
+            return;
+        }
         if ( !strWindowed.empty() && !strFullscreenStyle.empty())
         {
             if ( strWindowed == "0" && strFullscreenStyle == "0" )   // 0=FULLSCREEN_STANDARD
@@ -348,6 +353,7 @@ void HandleNotUsedMainMenu ( void )
                 // Inform user
                 SString strMessage = _("Are you having problems running MTA:SA?.\n\nDo you want to change the following setting?");
                 strMessage += "\n" + _("Fullscreen mode:") + " -> " + _("Borderless window");
+                HideSplash();
                 int iResponse = MessageBoxUTF8 ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
                 if ( iResponse == IDYES )
                 {

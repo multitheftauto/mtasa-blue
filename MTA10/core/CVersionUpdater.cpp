@@ -686,7 +686,7 @@ void CVersionUpdater::GetAseServerList ( std::vector < SString >& outResult )
 
     // Backup plan if list is empty
     if ( outResult.empty () )
-        outResult.push_back ( "http://1mgg.com/affil/mta" );
+        outResult.push_back ( SERVER_LIST_MASTER_URL );
 }
 
 
