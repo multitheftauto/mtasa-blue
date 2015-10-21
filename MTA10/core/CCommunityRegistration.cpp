@@ -121,10 +121,11 @@ void CCommunityRegistration::Open ( void )
     if ( m_ulStartTime == 0 )
     {
         // Create the URL
-        std::string strURL = std::string ( REGISTRATION_URL ) + "?action=request";
+        SString strURL = std::string ( REGISTRATION_URL ) + "?action=request";
 
         // Perform the HTTP request
-        m_HTTP.Get ( strURL );
+        GetHTTP()->Reset();
+        GetHTTP()->QueueFile( strURL, NULL, 0, NULL, 0, false, this, StaticDownloadFinished, false, 1/*uiConnectionAttempts*/ );
 
         // Store the start time
         m_ulStartTime = CClientTime::GetTime ();
@@ -154,81 +155,101 @@ void CCommunityRegistration::DoPulse ( void )
 {
     if ( m_ulStartTime > 0 )
     {
-        CHTTPBuffer buffer;
-        if ( m_HTTP.GetData ( buffer ) )
-        {
-            char* szBuffer = buffer.GetData ();
-            unsigned int uiBufferLength = buffer.GetSize ();
-
-            // Succeed, deal with the response
-            m_ulStartTime = 0;
-
-            // ID
-            eRegistrationResult Result = (eRegistrationResult)(szBuffer[0] - 48);
-
-            if ( Result == REGISTRATION_ERROR_REQUEST )
-            {
-                CGUI *pManager = g_pCore->GetGUI ();
-
-                // Sure we have it all right?
-                if ( uiBufferLength > 32 )
-                {
-                    // Get the hash
-                    m_strCommunityHash = std::string ( &szBuffer[1], 32 );
-
-                    // TODO: Load it without a temp file
-
-                    // Create a temp file for the png
-                    FILE * fp = fopen ( CalcMTASAPath( REGISTRATION_TEMP_FILE ), "wb" );
-                    if ( fp )
-                    {
-                        fwrite ( &szBuffer[33], uiBufferLength, 1, fp );
-                        fclose ( fp );
-
-                        m_pImageCode->LoadFromFile ( "temp.png" );
-                        m_pImageCode->SetSize ( CVector2D ( 65.0f, 20.0f ), false );
-                        m_pWindow->SetVisible ( true );
-                        m_pWindow->BringToFront ();
-
-                        // Delete the temp file
-                        remove ( CalcMTASAPath( REGISTRATION_TEMP_FILE ) );
-                        return;
-                    }
-                }
-                g_pCore->ShowMessageBox ( _("Error")+_E("CC04"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
-            }
-            else if ( Result == REGISTRATION_ERROR_SUCCESS )
-            {
-                g_pCore->ShowMessageBox ( _("Success")+_E("CC05"), _("Successfully registered!"), MB_BUTTON_OK | MB_ICON_INFO );
-
-                m_pWindow->SetVisible ( false );
-                SetFrozen ( false );
-                m_strCommunityHash.clear ();
-                m_pImageCode->Clear ();
-            }
-            else if ( Result == REGISTRATION_ERROR_ERROR )
-            {
-                if ( strlen ( &szBuffer[1] ) > 0 )
-                    g_pCore->ShowMessageBox ( _("Error")+_E("CC06"), &szBuffer[1], MB_BUTTON_OK | MB_ICON_ERROR );
-                else
-                    g_pCore->ShowMessageBox ( _("Error")+_E("CC07"), "Unexpected error", MB_BUTTON_OK | MB_ICON_ERROR );
-
-                SetFrozen ( false );
-            }
-            else
-            {
-                g_pCore->ShowMessageBox ( _("Error")+_E("CC08"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
-                SetFrozen ( false );
-            }
-        }
-        else if ( ( CClientTime::GetTime () - m_ulStartTime ) > REGISTRATION_DELAY )
-        {
-            g_pCore->ShowMessageBox ( _("Error")+_E("CC10"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
-            SetFrozen ( false );
-            // Timed out
-            m_ulStartTime = 0;
-        }
+        GetHTTP()->ProcessQueuedFiles();
     }
+}
+
+
+// Get the HTTP download manager used for community stuff
+CNetHTTPDownloadManagerInterface* CCommunityRegistration::GetHTTP( void )
+{
+    return g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CORE_UPDATER );
+}
+
+
+// Handle server response
+bool CCommunityRegistration::StaticDownloadFinished ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+{
+    if ( bSuccess )
+        ((CCommunityRegistration*)pObj)->DownloadSuccess( pCompletedData, completedLength );
+    else
+        ((CCommunityRegistration*)pObj)->DownloadFailed( iErrorCode );
+    return true;
+}
+
+void CCommunityRegistration::DownloadSuccess( char* szBuffer, size_t uiBufferLength )
+{
+    // Succeed, deal with the response
+    m_ulStartTime = 0;
+
+    // ID
+    eRegistrationResult Result = REGISTRATION_ERROR_UNEXPECTED;
+    if ( uiBufferLength > 0 )
+        (eRegistrationResult)(szBuffer[0] - 48);
+
+    if ( Result == REGISTRATION_ERROR_REQUEST )
+    {
+        CGUI *pManager = g_pCore->GetGUI ();
+
+        // Sure we have it all right?
+        if ( uiBufferLength > 32 )
+        {
+            // Get the hash
+            m_strCommunityHash = std::string ( &szBuffer[1], 32 );
+
+            // TODO: Load it without a temp file
+
+            // Create a temp file for the png
+            FILE * fp = fopen ( CalcMTASAPath( REGISTRATION_TEMP_FILE ), "wb" );
+            if ( fp )
+            {
+                fwrite ( &szBuffer[33], uiBufferLength, 1, fp );
+                fclose ( fp );
+
+                m_pImageCode->LoadFromFile ( "temp.png" );
+                m_pImageCode->SetSize ( CVector2D ( 65.0f, 20.0f ), false );
+                m_pWindow->SetVisible ( true );
+                m_pWindow->BringToFront ();
+
+                // Delete the temp file
+                remove ( CalcMTASAPath( REGISTRATION_TEMP_FILE ) );
+                return;
+            }
+        }
+        g_pCore->ShowMessageBox ( _("Error")+_E("CC04"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
+    }
+    else if ( Result == REGISTRATION_ERROR_SUCCESS )
+    {
+        g_pCore->ShowMessageBox ( _("Success")+_E("CC05"), _("Successfully registered!"), MB_BUTTON_OK | MB_ICON_INFO );
+
+        m_pWindow->SetVisible ( false );
+        SetFrozen ( false );
+        m_strCommunityHash.clear ();
+        m_pImageCode->Clear ();
+    }
+    else if ( Result == REGISTRATION_ERROR_ERROR )
+    {
+        if ( strlen ( &szBuffer[1] ) > 0 )
+            g_pCore->ShowMessageBox ( _("Error")+_E("CC06"), &szBuffer[1], MB_BUTTON_OK | MB_ICON_ERROR );
+        else
+            g_pCore->ShowMessageBox ( _("Error")+_E("CC07"), "Unexpected error", MB_BUTTON_OK | MB_ICON_ERROR );
+
+        SetFrozen ( false );
+    }
+    else
+    {
+        g_pCore->ShowMessageBox ( _("Error")+_E("CC08"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
+        SetFrozen ( false );
+    }
+}
+
+
+void CCommunityRegistration::DownloadFailed( int iErrorCode )
+{
+    g_pCore->ShowMessageBox ( _("Error")+_E("CC10"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
+    SetFrozen ( false );
+    // Timed out
+    m_ulStartTime = 0;
 }
 
 
@@ -269,7 +290,7 @@ bool CCommunityRegistration::OnButtonRegisterClick ( CGUIElement* pElement )
             Md5HashString ( m_pEditPassword->GetText().c_str(), strPassword );
 
             // Create the URL
-            std::string strURL =
+            SString strURL =
                 std::string ( REGISTRATION_URL ) +
                 "?action=register" +
                 "&username=" + m_pEditUsername->GetText() + 
@@ -279,7 +300,8 @@ bool CCommunityRegistration::OnButtonRegisterClick ( CGUIElement* pElement )
                 "&hash=" + m_strCommunityHash;
 
             // Perform the HTTP request
-            m_HTTP.Get ( strURL );
+            GetHTTP()->Reset();
+            GetHTTP()->QueueFile( strURL, NULL, 0, NULL, 0, false, this, StaticDownloadFinished, false, 1/*uiConnectionAttempts*/ );
 
             // Store the start time
             m_ulStartTime = CClientTime::GetTime ();
