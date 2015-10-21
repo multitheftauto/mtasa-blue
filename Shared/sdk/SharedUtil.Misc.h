@@ -193,7 +193,6 @@ namespace SharedUtil
     // Version string things
     bool        IsValidVersionString                ( const SString& strVersion );
     SString     ExtractVersionStringBuildNumber     ( const SString& strVersion );
-    SString     ConformVersionStringToBaseVersion   ( const SString& strVersion, const SString& strBaseVersion );
 
     //
     // Try to make a path relative to the 'resources/' directory

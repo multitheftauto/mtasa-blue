@@ -119,6 +119,21 @@ void CClientDFF::UnloadDFF ( void )
 
 bool CClientDFF::ReplaceModel ( unsigned short usModel, bool bAlphaTransparency )
 {
+    // Record attempt in case it all goes wrong
+    CArgMap argMap;
+    argMap.Set( "id", usModel );
+    argMap.Set( "reason", "ReplaceModel" );
+    SetApplicationSetting( "diagnostics", "gta-model-fail", argMap.ToString() );
+
+    bool bResult = DoReplaceModel( usModel, bAlphaTransparency );
+
+    SetApplicationSetting( "diagnostics", "gta-model-fail", "" );
+    return bResult;
+}
+
+
+bool CClientDFF::DoReplaceModel ( unsigned short usModel, bool bAlphaTransparency )
+{
     if ( !CClientDFFManager::IsReplacableModel( usModel ) )
         return false;
 
