@@ -14,9 +14,6 @@
 #include "CServerImpl.h"
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
-#if defined(_DEBUG) 
-    #include "SharedUtil.Tests.hpp"
-#endif
 #ifdef WIN_x86
     // TODO - 64 bit file hooks
     #include "SharedUtil.Win32Utf8FileHooks.hpp"
@@ -36,10 +33,6 @@ MTAEXPORT int Run ( int iArgumentCount, char* szArguments [] )
             return 1;
         }
     }
-
-    #if defined(_DEBUG) 
-        SharedUtil_Tests ();
-    #endif
 
     #ifdef WIN32
         // Disable critical error message boxes
