@@ -22,6 +22,7 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     m_pEventsInterface = nullptr;
     m_bBeingDestroyed = false;
     m_fVolume = 1.0f;
+    memset ( m_mouseButtonStates, 0, sizeof(m_mouseButtonStates) );
 
     // Initialise properties
     m_Properties["mobile"] = "0";
@@ -222,7 +223,17 @@ void CWebView::InjectMouseMove ( int iPosX, int iPosY )
     CefMouseEvent mouseEvent;
     mouseEvent.x = iPosX;
     mouseEvent.y = iPosY;
+
+    // Set modifiers from mouse states (yeah, using enum values as indices isn't best practise, but it's the easiest solution here)
+    if ( m_mouseButtonStates[BROWSER_MOUSEBUTTON_LEFT] )
+        mouseEvent.modifiers |= EVENTFLAG_LEFT_MOUSE_BUTTON;
+    if ( m_mouseButtonStates[BROWSER_MOUSEBUTTON_MIDDLE] )
+        mouseEvent.modifiers |= EVENTFLAG_MIDDLE_MOUSE_BUTTON;
+    if ( m_mouseButtonStates[BROWSER_MOUSEBUTTON_RIGHT] )
+        mouseEvent.modifiers |= EVENTFLAG_RIGHT_MOUSE_BUTTON;
+
     m_pWebView->GetHost ()->SendMouseMoveEvent ( mouseEvent, false );
+
     m_vecMousePosition.x = iPosX;
     m_vecMousePosition.y = iPosY;
 }
@@ -236,6 +247,9 @@ void CWebView::InjectMouseDown ( eWebBrowserMouseButton mouseButton )
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
 
+    // Save mouse button states
+    m_mouseButtonStates[static_cast<int>(mouseButton)] = true;
+
     m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, static_cast < CefBrowserHost::MouseButtonType > ( mouseButton ), false, 1 );
 }
 
@@ -247,6 +261,9 @@ void CWebView::InjectMouseUp ( eWebBrowserMouseButton mouseButton )
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
+
+    // Save mouse button states
+    m_mouseButtonStates[static_cast<int>(mouseButton)] = false;
 
     m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, static_cast < CefBrowserHost::MouseButtonType > ( mouseButton ), true, 1 );
 }

@@ -130,6 +130,7 @@ private:
     bool                m_bIsLocal;
     bool                m_bIsTransparent;
     POINT               m_vecMousePosition;
+    bool                m_mouseButtonStates[3];
     SString             m_CurrentTitle;
     float               m_fVolume;
     std::mutex          m_PaintMutex;
