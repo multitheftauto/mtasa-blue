@@ -72,7 +72,6 @@ public:
 
         // Bind V8 --> C++ functions
         V8Helpers::BindV8Function ( handler, mtaObject, "triggerEvent", Javascript_triggerEvent );
-        // V8Helpers::BindV8Function ( handler, mtaObject, "triggerServerEvent", Javascript_triggerServerEvent ); // Disabled due to security issues
 
         // Assign mtaObject to global object
         globalObject->SetValue ( "mta", mtaObject, V8_PROPERTY_ATTRIBUTE_NONE );
@@ -84,15 +83,6 @@ public:
             return;
 
         CefRefPtr<CefProcessMessage> message = V8Helpers::SerialiseV8Arguments ( "TriggerLuaEvent", arguments );
-        frame->GetBrowser ()->SendProcessMessage ( PID_BROWSER, message );
-    }
-
-    static void Javascript_triggerServerEvent ( CefRefPtr<CefFrame> frame, const CefV8ValueList& arguments )
-    {
-        if ( arguments.size () == 0 )
-            return;
-
-        CefRefPtr<CefProcessMessage> message = V8Helpers::SerialiseV8Arguments ( "TriggerServerLuaEvent", arguments );
         frame->GetBrowser ()->SendProcessMessage ( PID_BROWSER, message );
     }
 

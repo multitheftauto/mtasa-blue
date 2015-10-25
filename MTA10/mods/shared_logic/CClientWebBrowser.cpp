@@ -194,7 +194,7 @@ void CClientWebBrowser::Events_OnChangeCursor ( unsigned char ucCursor )
     CallEvent ( "onClientBrowserCursorChange", Arguments, false );
 }
 
-void CClientWebBrowser::Events_OnTriggerEvent ( const SString& strEventName, const std::vector<std::string>& arguments, bool bIsServer )
+void CClientWebBrowser::Events_OnTriggerEvent ( const SString& strEventName, const std::vector<std::string>& arguments )
 {
     CLuaArguments Arguments;
     for ( std::vector<std::string>::const_iterator iter = arguments.begin (); iter != arguments.end (); ++iter )
@@ -202,15 +202,8 @@ void CClientWebBrowser::Events_OnTriggerEvent ( const SString& strEventName, con
         Arguments.PushString ( *iter );
     }
 
-    if ( bIsServer )
-    {
-        CStaticFunctionDefinitions::TriggerServerEvent ( strEventName, *g_pClientGame->GetRootEntity (), Arguments );
-    }
-    else
-    {
-        bool bWasCancelled;
-        CStaticFunctionDefinitions::TriggerEvent ( strEventName, *this, Arguments, bWasCancelled );
-    }
+    bool bWasCancelled;
+    CStaticFunctionDefinitions::TriggerEvent ( strEventName, *this, Arguments, bWasCancelled );
 }
 
 void CClientWebBrowser::Events_OnTooltip ( const SString& strTooltip )
