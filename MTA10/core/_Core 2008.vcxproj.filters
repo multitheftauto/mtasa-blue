@@ -356,6 +356,9 @@
     <ClCompile Include="CAjaxResourceHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CWebDevTools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CAdditionalVertexStreamManager.h">
@@ -1250,6 +1253,9 @@
       <Filter>Header Files\sdk\core</Filter>
     </ClInclude>
     <ClInclude Include="CAjaxResourceHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWebDevTools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

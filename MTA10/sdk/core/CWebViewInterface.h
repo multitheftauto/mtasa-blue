@@ -54,6 +54,8 @@ public:
     
     virtual bool RegisterAjaxHandler ( const SString& strURL ) = 0;
     virtual bool UnregisterAjaxHandler ( const SString& strURL ) = 0;
+
+    virtual bool ToggleDevTools     ( bool visible ) = 0;
 };
 
 #endif

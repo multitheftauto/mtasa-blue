@@ -13,6 +13,7 @@
 #include <cef3/include/cef_parser.h>
 #include <cef3/include/cef_task.h>
 #include <cef3/include/cef_runnable.h>
+#include "CWebDevTools.h"
 
 CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
 {
@@ -361,6 +362,14 @@ void CWebView::HandleAjaxRequest ( const SString& strURL, CAjaxResourceHandler *
 {
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL );
     g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "AjaxResourceRequest" );
+}
+
+bool CWebView::ToggleDevTools ( bool visible )
+{
+    if ( visible )
+        return CWebDevTools::Show ( this );
+
+    return CWebDevTools::Close ( this );
 }
 
 

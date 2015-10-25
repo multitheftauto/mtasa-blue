@@ -80,6 +80,8 @@ public:
     virtual bool HasAjaxHandler ( const SString& strURL );
     virtual void HandleAjaxRequest ( const SString& strURL, class CAjaxResourceHandler * pHandler );
 
+    virtual bool ToggleDevTools ( bool visible ) override;
+
     // CefClient methods
     virtual CefRefPtr<CefRenderHandler>     GetRenderHandler() override { return this; };
     virtual CefRefPtr<CefLoadHandler>       GetLoadHandler() override { return this; };

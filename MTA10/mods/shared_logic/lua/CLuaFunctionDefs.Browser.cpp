@@ -589,6 +589,33 @@ int CLuaFunctionDefs::GetBrowserSource ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::ToggleBrowserDevTools ( lua_State* luaVM )
+{
+//  bool toggleBrowserDevTools ( browser webBrowser, bool visible )
+    CClientWebBrowser* pWebBrowser; bool visible;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadBool ( visible );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( g_pCore->GetWebCore ()->IsTestModeEnabled () )
+        {
+            lua_pushboolean ( luaVM, pWebBrowser->ToggleDevTools ( visible ) );
+            return 1;
+        }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, "toggleBrowserDevtools can only be used in development mode" );
+        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GUICreateBrowser ( lua_State* luaVM )
 {
 //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil] )

@@ -654,6 +654,8 @@ DontInstallRedistVC12:
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef.pak"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_100_percent.pak"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_200_percent.pak"
+		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\devtools_resources.pak"
+		#File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_extensions.pak"
 
 
 		${If} "$(LANGUAGE_CODE)" != ""
