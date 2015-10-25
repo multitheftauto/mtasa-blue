@@ -51,9 +51,9 @@ bool CClientWebBrowser::IsLoading ()
     return m_pWebView->IsLoading ();
 }
 
-bool CClientWebBrowser::LoadURL ( const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded, bool bIgnoreCache )
+bool CClientWebBrowser::LoadURL ( const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded )
 {
-    return m_pWebView->LoadURL ( strURL, bFilterEnabled, strPostData, bURLEncoded, bIgnoreCache );
+    return m_pWebView->LoadURL ( strURL, bFilterEnabled, strPostData, bURLEncoded );
 }
 
 const SString& CClientWebBrowser::GetTitle ()
