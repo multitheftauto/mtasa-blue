@@ -79,7 +79,7 @@ void CWebView::CloseBrowser ()
         m_pWebView->GetHost ()->CloseBrowser ( true );
 }
 
-bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded, bool bIgnoreCache )
+bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded )
 {
     if ( !m_pWebView )
         return false;
@@ -97,10 +97,6 @@ bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled, const SStri
     if ( strPostData.empty () )
     {
         pFrame->LoadURL ( strURL );
-
-        // Reload immediately and flush the cache if either requested or test mode is enabled
-        if ( bIgnoreCache || g_pCore->GetWebCore ()->IsTestModeEnabled () )
-            m_pWebView->ReloadIgnoreCache ();
     }
     else
     {

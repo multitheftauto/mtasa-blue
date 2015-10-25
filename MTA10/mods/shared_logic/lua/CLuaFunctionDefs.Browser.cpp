@@ -111,15 +111,14 @@ int CLuaFunctionDefs::RequestBrowserDomains ( lua_State* luaVM )
 
 int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
 {
-//  bool loadBrowserURL ( browser webBrowser, string url [, string postData = "", bool postURLEncoded = true, bool ignoreCache = false ] )
-    CClientWebBrowser* pWebBrowser; SString strURL; SString strPostData; bool bURLEncoded; bool bIgnoreCache;
+//  bool loadBrowserURL ( browser webBrowser, string url [, string postData = "", bool postURLEncoded = true ] )
+    CClientWebBrowser* pWebBrowser; SString strURL; SString strPostData; bool bURLEncoded;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
     argStream.ReadString ( strURL );
     argStream.ReadString ( strPostData, "" );
     argStream.ReadBool ( bURLEncoded, true );
-    argStream.ReadBool ( bIgnoreCache, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -133,7 +132,7 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
                 return 1;
             }
 
-            lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, !isLocalURL, strPostData, bURLEncoded, bIgnoreCache ) );
+            lua_pushboolean ( luaVM, pWebBrowser->LoadURL ( strURL, !isLocalURL, strPostData, bURLEncoded ) );
             return 1;
         }
 
@@ -149,7 +148,7 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
                 // Output deprecated warning, TODO: Remove this at a later point
                 m_pScriptDebugging->LogWarning ( luaVM, "This URL scheme is deprecated and may not work in future versions. Please consider using http://mta/* instead. See https://wiki.mtasa.com/wiki/LoadBrowserURL for details" );
 
-                lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( "mtalocal://" + strURL, false, strPostData, bURLEncoded, bIgnoreCache ) );
+                lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( "mtalocal://" + strURL, false, strPostData, bURLEncoded ) );
                 return 1;
             }
         }
