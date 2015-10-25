@@ -142,7 +142,7 @@ void CWebCore::AddEventToEventQueue ( std::function<void(void)> event, CWebView*
 #ifndef MTA_DEBUG
     UNREFERENCED_PARAMETER(name);
 #endif
-    if ( pWebView->IsBeingDestroyed () )
+    if ( pWebView && pWebView->IsBeingDestroyed () )
         return;
 
     std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
@@ -206,12 +206,12 @@ eURLState CWebCore::GetURLState ( const SString& strURL, bool bOutputDebug )
             return eURLState::WEBPAGE_ALLOWED;
         else
         {
-            if ( m_bTestmodeEnabled && bOutputDebug ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
+            if ( m_bTestmodeEnabled && bOutputDebug ) DebugOutputThreadsafe ( SString ( "[BROWSER] Blocked page: %s", strURL.c_str () ), 255, 0, 0 );
             return eURLState::WEBPAGE_DISALLOWED;
         }
     }
 
-    if ( m_bTestmodeEnabled && bOutputDebug ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
+    if ( m_bTestmodeEnabled && bOutputDebug ) DebugOutputThreadsafe ( SString ( "[BROWSER] Blocked page: %s", strURL.c_str () ), 255, 0, 0 );
     return eURLState::WEBPAGE_NOT_LISTED;
 }
 
@@ -370,6 +370,13 @@ void CWebCore::DenyPendingPages ()
 bool CWebCore::IsRequestsGUIVisible ()
 {
     return m_pRequestsGUI && m_pRequestsGUI->IsVisible ();
+}
+
+void CWebCore::DebugOutputThreadsafe ( const SString& message, unsigned char R, unsigned char G, unsigned char B )
+{
+    AddEventToEventQueue( [message, R, G, B]() {
+        g_pCore->DebugEchoColor ( message, R, G, B );
+    }, nullptr, "DebugOutputThreadsafe" );
 }
 
 bool CWebCore::GetRemotePagesEnabled ()
