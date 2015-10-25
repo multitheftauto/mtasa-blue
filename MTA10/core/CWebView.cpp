@@ -382,8 +382,11 @@ bool CWebView::VerifyFile ( const SString& strPath )
 bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message )
 {
     CefRefPtr<CefListValue> argList = message->GetArgumentList ();
-    if ( message->GetName () == "TriggerLuaEvent" || message->GetName () == "TriggerServerLuaEvent" )
+    if ( message->GetName () == "TriggerLuaEvent" )
     {
+        if ( !m_bIsLocal )
+            return true;
+
         // Get event name
         CefString eventName = argList->GetString ( 0 );
 
@@ -398,7 +401,7 @@ bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProc
         }
 
         // Queue event to run on the main thread
-        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString ( eventName ), args, message->GetName () == "TriggerServerLuaEvent" );
+        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString ( eventName ), args );
         g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnProcessMessageReceived1" );
 
         // The message was handled
