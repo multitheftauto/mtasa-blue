@@ -58,6 +58,8 @@ public:
     
     bool                        AddAjaxHandler      ( const SString& strURL, ajax_callback_t& handler );
     bool                        RemoveAjaxHandler   ( const SString& strURL );
+
+    bool                        ToggleDevTools      ( bool visible );
     
     // CWebBrowserEventsInterface implementation
     void                        Events_OnCreated       () override;

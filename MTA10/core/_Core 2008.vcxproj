@@ -317,6 +317,7 @@
     <ClCompile Include="CVertexStreamBoundingBoxManager.cpp" />
     <ClCompile Include="CVideoModeManager.cpp" />
     <ClCompile Include="CWebCore.cpp" />
+    <ClCompile Include="CWebDevTools.cpp" />
     <ClCompile Include="CWebsiteRequests.cpp" />
     <ClCompile Include="CWebView.cpp" />
     <ClCompile Include="StdInc.cpp">
@@ -475,6 +476,7 @@
     <ClInclude Include="CVertexStreamBoundingBoxManager.h" />
     <ClInclude Include="CVideoModeManager.h" />
     <ClInclude Include="CWebCore.h" />
+    <ClInclude Include="CWebDevTools.h" />
     <ClInclude Include="CWebsiteRequests.h" />
     <ClInclude Include="CWebView.h" />
     <ClInclude Include="StdInc.h" />

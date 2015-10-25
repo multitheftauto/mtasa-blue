@@ -294,6 +294,11 @@ bool CClientWebBrowser::RemoveAjaxHandler ( const SString& strURL )
     return m_mapAjaxCallback.erase ( strURL ) == 1;
 }
 
+bool CClientWebBrowser::ToggleDevTools ( bool visible )
+{
+    return m_pWebView->ToggleDevTools ( visible );
+}
+
 
 CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) 
     : CClientGUIElement ( pManager, pLuaMain, pCGUIElement, ID )
