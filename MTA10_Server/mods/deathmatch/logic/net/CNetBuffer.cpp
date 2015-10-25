@@ -482,9 +482,9 @@ void CNetServerBuffer::GetPingStatus ( SFixedString < 32 >* pstrStatus )
 // Thread safe
 //
 ///////////////////////////////////////////////////////////////////////////
-NetBitStreamInterface* CNetServerBuffer::AllocateNetServerBitStream ( unsigned short usBitStreamVersion )
+NetBitStreamInterface* CNetServerBuffer::AllocateNetServerBitStream ( unsigned short usBitStreamVersion, const void* pData, uint uiDataSize, bool bCopyData )
 {
-    return m_pRealNetServer->AllocateNetServerBitStream ( usBitStreamVersion );
+    return m_pRealNetServer->AllocateNetServerBitStream ( usBitStreamVersion, pData, uiDataSize, bCopyData );
 }
 
 
