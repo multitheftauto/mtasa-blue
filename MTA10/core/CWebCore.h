@@ -72,6 +72,7 @@ public:
 
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
     inline void         SetTestModeEnabled  ( bool bEnabled ) { m_bTestmodeEnabled = bEnabled; };
+    void                DebugOutputThreadsafe ( const SString& message, unsigned char R, unsigned char G, unsigned char B );
 
     inline CWebViewInterface* GetFocusedWebView () { return (CWebViewInterface*) m_pFocusedWebView; };
     inline void         SetFocusedWebView   ( CWebView* pWebView ) { m_pFocusedWebView = pWebView; };
