@@ -264,6 +264,7 @@ public:
     inline CBuildingRemovalManager* GetBuildingRemovalManager   ( void )        { return m_pBuildingRemovalManager; }
     inline CCustomWeaponManager*    GetCustomWeaponManager      ( void )        { return m_pCustomWeaponManager; }
     inline CFunctionUseLogger*      GetFunctionUseLogger        ( void )        { return m_pFunctionUseLogger; }
+    inline CMasterServerAnnouncer*  GetMasterServerAnnouncer    ( void )        { return m_pMasterServerAnnouncer; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );

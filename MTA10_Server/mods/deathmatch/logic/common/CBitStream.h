@@ -18,8 +18,9 @@
 class CBitStream
 {
 public:
-    inline                          CBitStream  ( void )    { pBitStream = g_pNetServer->AllocateNetServerBitStream ( 0 ); };
+    inline                          CBitStream  ( const void* pData = nullptr, uint uiDataSize = 0, bool bCopyData = false )    { pBitStream = g_pNetServer->AllocateNetServerBitStream ( 0, pData, uiDataSize, bCopyData ); }
     inline                          ~CBitStream ( void )    { g_pNetServer->DeallocateNetServerBitStream ( (NetBitStreamInterface*)pBitStream ); };
+    NetBitStreamInterfaceNoVersion* operator->  ( void )    { return pBitStream; }
 
     NetBitStreamInterfaceNoVersion* pBitStream;
 };
@@ -30,6 +31,7 @@ class CPlayerBitStream
 public:
                                     CPlayerBitStream  ( class CPlayer* pPlayer );//  { pBitStream = g_pNetServer->AllocateNetServerBitStream ( pPlayer->GetBitStreamVersion() ); };
     inline                          ~CPlayerBitStream ( void )              { g_pNetServer->DeallocateNetServerBitStream ( (NetBitStreamInterface*)pBitStream ); };
+    NetBitStreamInterface*          operator->        ( void )              { return pBitStream; }
 
     NetBitStreamInterface* pBitStream;
 };

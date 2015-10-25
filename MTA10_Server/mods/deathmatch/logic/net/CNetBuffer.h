@@ -76,7 +76,7 @@ public:
     virtual void                            GetPingStatus                   ( SFixedString < 32 >* pstrStatus );
     virtual bool                            GetSyncThreadStatistics         ( SSyncThreadStatistics* pDest, bool bResetCounters );
 
-    virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion );
+    virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion, const void* pData = nullptr, uint uiDataSize = 0, bool bCopyData = false );
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream );
     virtual bool                            SendPacket                      ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 
