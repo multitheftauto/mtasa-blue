@@ -1336,7 +1336,7 @@ void CLuaMain::AddResourceClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
     
     lua_classfunction ( luaVM, "create", "getResourceFromName" );
-    lua_classfunction ( luaVM, "getfromName", "getResourceFromName" );
+    lua_classfunction ( luaVM, "getFromName", "getResourceFromName" );
     
     lua_classfunction ( luaVM, "getGuiElement", "getResourceGUIElement" );
     lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
@@ -1664,7 +1664,7 @@ void CLuaMain::AddBrowserClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "title", nullptr, "getBrowserTitle" );
     lua_classvariable ( luaVM, "renderingPaused", "setBrowserRenderingPaused", nullptr );
     lua_classvariable ( luaVM, "volume", "setBrowserVolume", "getBrowserVolume" );
-    lua_classvariable ( luaVM, "devtools", "toggleBrowserDevTools", nullptr );
+    lua_classvariable ( luaVM, "devTools", "toggleBrowserDevTools", nullptr );
     
     lua_registerclass ( luaVM, "Browser", "DxTexture" );
 
