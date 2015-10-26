@@ -260,7 +260,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     //lua_classvariable ( luaVM, "panelState", "setVehiclePanelState", "getVehiclePanelState", CLuaOOPDefs::SetVehiclePanelState, CLuaOOPDefs::GetVehiclePanelState ); // .panelState[panel]=state
     //lua_classvariable ( luaVM, "headLightColor", "setVehicleHeadLightColor", "getVehicleHeadLightColor" );
     //lua_classvariable ( luaVM, "color", "setVehicleColor", "getVehicleColor" );
-    lua_classvariable ( luaVM, "sirens", NULL, "geVehicleSirens" ); // TODO: support .sirens[point] = {...}
+    lua_classvariable ( luaVM, "sirens", NULL, "getVehicleSirens" ); // TODO: support .sirens[point] = {...}
     lua_classvariable ( luaVM, "handling", NULL, "setVehicleHandling" ); // .handling[property]=value
     lua_classvariable ( luaVM, "occupant", NULL, "getVehicleOccupant" ); // Currrently returns driver, support .occupant[seat]=ped
 

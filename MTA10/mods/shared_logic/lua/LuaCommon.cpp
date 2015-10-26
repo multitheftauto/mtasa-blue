@@ -347,6 +347,8 @@ void lua_classfunction ( lua_State* luaVM, const char* szFunction, const char* f
     {
         lua_classfunction ( luaVM, szFunction, pFunction->GetFunctionAddress () );
     }
+    else
+        dassert ( false );
 }
 
 void lua_classvariable ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get )
@@ -397,12 +399,22 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* s
     lua_CFunction fnGet = NULL;
 
     if ( set )
+    {
         if ( CLuaCFunction* pSet = CLuaCFunctions::GetFunction ( set ) )
             fnSet = pSet->GetFunctionAddress ();
+        else
+            dassert ( false );
+    }
+        
 
     if ( get )
+    {
         if ( CLuaCFunction* pGet = CLuaCFunctions::GetFunction ( get ) )
             fnGet = pGet->GetFunctionAddress ();
+        else
+            dassert ( false );
+    }
+        
 
     if ( fnSet || fnGet )
         lua_classvariable ( luaVM, szVariable, fnSet, fnGet );

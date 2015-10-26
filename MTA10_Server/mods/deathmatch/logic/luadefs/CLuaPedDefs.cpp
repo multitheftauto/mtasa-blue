@@ -111,7 +111,6 @@ void CLuaPedDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isHeadless", "isPedHeadless" );
 
     lua_classfunction ( luaVM, "getArmor", "getPedArmor" );
-    lua_classfunction ( luaVM, "getAnalogControlState", "getPedAnalogControlState" );
     lua_classfunction ( luaVM, "getFightingStyle", "getPedFightingStyle" );
     lua_classfunction ( luaVM, "getGravity", "getPedGravity" );
     lua_classfunction ( luaVM, "getStat", "getPedStat" );
@@ -133,7 +132,6 @@ void CLuaPedDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setFrozen", "setPedFrozen" );
     lua_classfunction ( luaVM, "setHeadless", "setPedHeadless" );
     lua_classfunction ( luaVM, "setArmor", "setPedArmor" );
-    lua_classfunction ( luaVM, "setAnalogControlState", "setPedAnalogControlState" );
     lua_classfunction ( luaVM, "setFightingStyle", "setPedFightingStyle" );
     lua_classfunction ( luaVM, "setGravity", "setPedGravity" );
     lua_classfunction ( luaVM, "setStat", "setPedStat" );

@@ -157,9 +157,8 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getDimension", "getElementDimension" );
     lua_classfunction ( luaVM, "getLowLOD", "getLowLODElement" );
 
-    lua_classfunction ( luaVM, "areCollisionsEnabled", "areElementCollisionsEnabled" );
+    lua_classfunction ( luaVM, "getCollisionsEnabled", "getElementCollisionsEnabled" );
     lua_classfunction ( luaVM, "isCallPropagationEnabled", "isElementCallPropagationEnabled" );
-    lua_classfunction ( luaVM, "isWaitingForGroundToLoad", "isElementWaitingForGroundToLoad" );
     lua_classfunction ( luaVM, "isWithinMarker", "isElementWithinMarker" );
     lua_classfunction ( luaVM, "isWithinColShape", "isElementWithinColShape" );
     lua_classfunction ( luaVM, "isFrozen", "isElementFrozen" );
@@ -171,7 +170,6 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
     lua_classvariable ( luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled" );
-    lua_classvariable ( luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad" );
     lua_classvariable ( luaVM, "parent", "setElementParent", "getElementParent" );
     lua_classvariable ( luaVM, "zoneName", NULL, "getElementZoneName" );
     lua_classvariable ( luaVM, "attachedTo", "attachElements", "getElementAttachedTo" );
@@ -186,7 +184,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
     lua_classvariable ( luaVM, "model", "setElementModel", "getElementModel" );
     lua_classvariable ( luaVM, "lowLOD", "setLowLODElement", "getLowLODElement" );
-    lua_classvariable ( luaVM, "syncer", NULL, "isElementSyncer" );
+    lua_classvariable ( luaVM, "syncer", NULL, "getElementSyncer" );
     lua_classvariable ( luaVM, "childrenCount", NULL, "getElementChildrenCount" );
     lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
     lua_classvariable ( luaVM, "colShape", NULL, "getElementColShape" );
