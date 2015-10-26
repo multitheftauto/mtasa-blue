@@ -57,10 +57,12 @@ void CLuaFileDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setPos", "fileSetPos" );
     lua_classfunction ( luaVM, "write", "fileWrite" );
     lua_classfunction ( luaVM, "copy", "fileCopy" );
+    lua_classfunction ( luaVM, "getPath", "fileGetPath" );
 
     lua_classvariable ( luaVM, "pos", "fileSetPos", "fileGetPos" );
     lua_classvariable ( luaVM, "size", NULL, "fileGetSize" );
     lua_classvariable ( luaVM, "isEOF", NULL, "fileIsEOF" );
+    lua_classvariable ( luaVM, "path", NULL, "fileGetPath" );
 
     lua_registerclass ( luaVM, "File" );
 }
