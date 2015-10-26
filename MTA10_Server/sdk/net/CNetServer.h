@@ -151,33 +151,33 @@ public:
     //
     // RSA structures:
     //
-    // private key (64 bytes):
-    //  32 bytes p (prime1)
-    //  32 bytes q (prime2)
+    // private key (bits/8 bytes):
+    //  bits/16 bytes p (prime1)
+    //  bits/16 bytes q (prime2)
     //
-    // public key (68 bytes):
+    // public key (4+bits/8 bytes):
     //  4 bytes e (public exponent)
-    //  64 bytes n (modulus)
+    //  bits/8 bytes n (modulus)
     // 
     // encrypted data:
-    //  4 bytes original size
     //  64+ bytes data
+    //  4 bytes original size
     //
 
     // RSAGenerateKeys
-    //  PrivateKeySize must be set to 64, PublicKeySize must be set to 68.
+    //  PrivateKeySize must be set to bits/8, PublicKeySize must be set to 4+bits/8.
     //  Returns false on failure.
-    virtual bool                            RSAGenerateKeys                 ( char* pOutPrivateKey, uint uiPrivateKeySize, char* pOutPublicKey, uint uiPublicKeySize ) { assert( 0 ); return false; }
+    virtual bool                            RSAGenerateKeys                 ( char* pOutPrivateKey, uint uiPrivateKeySize, char* pOutPublicKey, uint uiPublicKeySize, uint uiNumBits = 1024 ) { assert( 0 ); return false; }
 
     // RSAEncryptData
     //  MaxOutputDataSize should be slightly larger than the input size.
     //  Returns actual size of encrypted data, or zero on failure.
-    virtual uint                            RSAEncryptData                  ( const char* pInputData, uint uiInputDataSize, const char* pKey, uint uiKeySize, char* pOutputData, uint uiMaxOutputDataSize ) { assert( 0 ); return 0; }
+    virtual uint                            RSAEncryptData                  ( const char* pInputData, uint uiInputDataSize, const char* pKey, uint uiKeySize, char* pOutputData, uint uiMaxOutputDataSize, uint uiNumBits = 1024 ) { assert( 0 ); return 0; }
 
     // RSADecryptData
     //  MaxOutputDataSize can be the same size as the input size.
     //  Returns actual size of decrypted data, or zero on failure.
-    virtual uint                            RSADecryptData                  ( const char* pInputData, uint uiInputDataSize, const char* pKey, uint uiKeySize, char* pOutputData, uint uiMaxOutputDataSize ) { assert( 0 ); return 0; }
+    virtual uint                            RSADecryptData                  ( const char* pInputData, uint uiInputDataSize, const char* pKey, uint uiKeySize, char* pOutputData, uint uiMaxOutputDataSize, uint uiNumBits = 1024 ) { assert( 0 ); return 0; }
 };
 
 #endif
