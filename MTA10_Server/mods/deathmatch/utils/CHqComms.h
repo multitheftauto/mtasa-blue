@@ -29,7 +29,8 @@ public:
     {
         m_iPollInterval = TICKS_FROM_MINUTES( 60 );
         m_strURL = HQCOMMS_URL;
-        m_strCrashInfoFilename = g_pServerInterface->GetAbsolutePath( PathJoin( SERVER_DUMP_PATH, "server_pending_upload.log" ) );
+        m_strCrashLogFilename = g_pServerInterface->GetAbsolutePath( PathJoin( SERVER_DUMP_PATH, "server_pending_upload.log" ) );
+        m_strCrashDumpMeta = g_pServerInterface->GetAbsolutePath( PathJoin( SERVER_DUMP_PATH, "server_pending_upload_filename" ) );
     }
 
     //
@@ -44,7 +45,7 @@ public:
             m_Stage = HQCOMMS_STAGE_QUERY;
 
             CBitStream bitStream;
-            bitStream->Write( (char)1 );
+            bitStream->Write( (char)2 );    // Data version
             bitStream->WriteStr( g_pGame->GetConfig()->GetServerIP() );
             bitStream->Write( g_pGame->GetConfig()->GetServerPort() );
             bitStream->WriteStr( CStaticFunctionDefinitions::GetVersionSortable() );
@@ -56,13 +57,32 @@ public:
             bitStream->Write( g_pGame->GetConfig()->GetAseInternetPushEnabled() ? 1 : 0 );
             bitStream->Write( g_pGame->GetConfig()->GetAseInternetListenEnabled() ? 1 : 0 );
 
-            SString strCrashInfo;
-            FileLoad( m_strCrashInfoFilename, strCrashInfo, 50000 );
-            bitStream->WriteStr( strCrashInfo );
+            SString strCrashLog;
+            FileLoad( m_strCrashLogFilename, strCrashLog, 50000 );
+            bitStream->WriteStr( strCrashLog );
+
+            // Latest crash dump
+            SString strCrashDumpFilename, strCrashDumpContent;
+            if ( FileExists( m_strCrashDumpMeta ) )
+            {
+                if ( g_pGame->GetConfig()->GetCrashDumpUploadEnabled() )
+                {
+                    FileLoad( m_strCrashDumpMeta, strCrashDumpFilename );
+                    FileLoad( strCrashDumpFilename, strCrashDumpContent );
+                }
+                // Only attempt to send crashdump once
+                FileDelete( m_strCrashDumpMeta );
+                m_strCrashDumpMeta = "";
+            }
+            bitStream->WriteStr( ExtractFilename( strCrashDumpFilename ) );
+            bitStream->WriteStr( strCrashDumpContent );
+
+            bitStream->WriteStr( MTA_OS_STRING );
+            bitStream->WriteStr( g_pGame->GetConfig()->GetServerIPList() );
 
             // Send request
             this->AddRef();     // Keep object alive
-            GetDownloadManager()->QueueFile( m_strURL, NULL, 0, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this, StaticProgressCallback, false, 1 );
+            GetDownloadManager()->QueueFile( m_strURL, NULL, 0, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this, StaticProgressCallback, false, 2 );
         }
     }
 
@@ -180,7 +200,7 @@ public:
         bitStream->Read( iGotCrashInfo );
         if ( iGotCrashInfo )
         {
-            FileDelete( m_strCrashInfoFilename );
+            FileDelete( m_strCrashLogFilename );
         }
     }
 
@@ -223,5 +243,6 @@ protected:
     CElapsedTime    m_CheckTimer;
     SString         m_strURL;
     SString         m_strPrevMessage;
-    SString         m_strCrashInfoFilename;
+    SString         m_strCrashLogFilename;
+    SString         m_strCrashDumpMeta;     // Filename of file which contains the latest crash dump filename
 };
