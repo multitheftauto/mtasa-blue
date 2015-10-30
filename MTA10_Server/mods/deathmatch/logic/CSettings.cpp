@@ -184,7 +184,8 @@ CXMLNode* CSettings::Get ( const char *szLocalResource, const char *szSetting, b
     bDeleteNode = false;
 
     // Get the temporary storage node associated with this resource
-    CXMLNode *pStorage = m_pResourceManager->GetResource ( szLocalResource )->GetStorageNode ();
+    CResource* pLocalResource = m_pResourceManager->GetResource ( szLocalResource );
+    CXMLNode* pStorage = pLocalResource ? pLocalResource->GetStorageNode () : nullptr;
 
     // Get the actual resource name from the specified setting, and get the resource class
     if ( !GetResourceName ( szSetting, szQueryResource, MAX_RESOURCE_LENGTH - 1 ) ) {
