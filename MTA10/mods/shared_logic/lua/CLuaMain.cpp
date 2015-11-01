@@ -62,8 +62,20 @@ const char szPreloadedScript [] = ""\
     "                return setmetatable({}, rescallMT)\n" \
     "        end\n" \
     "end\n" \
-    "exports = setmetatable({}, exportsMT)\n";
+    "exports = setmetatable({}, exportsMT)\n"
 
+    //
+    // Output errors that occur inside coroutines
+    //
+    "local _coroutine_resume = coroutine.resume\n"
+    "function coroutine.resume(...)\n"
+    "    local state,result = _coroutine_resume(...)\n"
+    "    if not state then\n"
+    "        outputDebugString( tostring(result), 1 )\n"
+    "    end\n"
+    "    return state,result\n"
+    "end\n"
+    ;
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP )
 {
