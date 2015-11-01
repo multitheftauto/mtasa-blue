@@ -45,7 +45,7 @@ public:
             m_Stage = HQCOMMS_STAGE_QUERY;
 
             CBitStream bitStream;
-            bitStream->Write( (char)2 );    // Data version
+            bitStream->Write( (char)3 );    // Data version
             bitStream->WriteStr( g_pGame->GetConfig()->GetServerIP() );
             bitStream->Write( g_pGame->GetConfig()->GetServerPort() );
             bitStream->WriteStr( CStaticFunctionDefinitions::GetVersionSortable() );
@@ -211,17 +211,18 @@ public:
         bitStream->Read( uiNumServers );
         for( uint i = 0 ; i < uiNumServers ; i++ )
         {
-            char bAcceptsPush, bDoReminders, bHideProblems;
+            char bAcceptsPush, bDoReminders, bHideProblems, bHideSuccess;
             uint uiReminderIntervalMins;
             SString strDesc, strUrl;
             bitStream->Read( bAcceptsPush );
             bitStream->Read( bDoReminders );
             bitStream->Read( bHideProblems );
+            bitStream->Read( bHideSuccess );
             bitStream->Read( uiReminderIntervalMins );
             bitStream->ReadStr( strDesc );
             if ( !bitStream->ReadStr( strUrl ) )
                 break;
-            g_pGame->GetMasterServerAnnouncer()->AddServer( bAcceptsPush != 0, bDoReminders != 0, bHideProblems != 0, Max( 5U, uiReminderIntervalMins ), strDesc, strUrl );
+            g_pGame->GetMasterServerAnnouncer()->AddServer( bAcceptsPush != 0, bDoReminders != 0, bHideProblems != 0, bHideSuccess != 0, Max( 5U, uiReminderIntervalMins ), strDesc, strUrl );
         }
     }
 

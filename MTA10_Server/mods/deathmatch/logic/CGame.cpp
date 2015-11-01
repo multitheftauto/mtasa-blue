@@ -255,6 +255,10 @@ CGame::~CGame ( void )
 {
     m_bBeingDeleted = true;
 
+    // Stop the web server first to avoid threading issues
+    if ( m_pHTTPD )
+        m_pHTTPD->StopHTTPD ();
+
     // Stop the performance stats modules
     if ( CPerfStatManager::GetSingleton () != NULL )
         CPerfStatManager::GetSingleton ()->Stop ();
@@ -269,10 +273,6 @@ CGame::~CGame ( void )
 
     // Stop networking
     Stop ();
-
-    // Stop the web server
-    if ( m_pHTTPD )
-        m_pHTTPD->StopHTTPD ();
 
      // Destroy our stuff
     SAFE_DELETE( m_pResourceManager );

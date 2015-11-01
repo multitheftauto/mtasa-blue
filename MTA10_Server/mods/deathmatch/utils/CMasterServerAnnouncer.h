@@ -13,6 +13,7 @@ struct SMasterServerDefinition
     bool bAcceptsPush;
     bool bDoReminders;
     bool bHideProblems;
+    bool bHideSuccess;
     uint uiReminderIntervalMins;
     SString strDesc;
     SString strURL;
@@ -125,7 +126,7 @@ public:
             if ( m_Stage < ANNOUNCE_STAGE_REMINDER )
             {
                 m_Stage = ANNOUNCE_STAGE_REMINDER;
-                if ( !m_Definition.bHideProblems || iError == 200 )
+                if ( !m_Definition.bHideSuccess )
                 {
                     CArgMap argMap;
                     argMap.SetFromString( data );
@@ -223,10 +224,10 @@ public:
     void InitServerList( void )
     {
         assert( m_MasterServerList.empty() );
-        AddServer( true, true, false, 60 * 24, "Querying MTA master server...", QUERY_URL_MTA_MASTER_SERVER );
+        AddServer( true, true, false, false, 60 * 24, "Querying MTA master server...", QUERY_URL_MTA_MASTER_SERVER );
     }
 
-    void AddServer( bool bAcceptsPush, bool bDoReminders, bool bHideProblems, uint uiReminderIntervalMins, const SString& strDesc, const SString& strInUrl )
+    void AddServer( bool bAcceptsPush, bool bDoReminders, bool bHideProblems, bool bHideSuccess, uint uiReminderIntervalMins, const SString& strDesc, const SString& strInUrl )
     {
         // Check if server is already present
         for( auto pMasterServer : m_MasterServerList )
@@ -255,7 +256,7 @@ public:
         strUrl = strUrl.Replace( "%EXTRA%", strExtra );
         strUrl = strUrl.Replace( "%IP%", strServerIP );
 
-        SMasterServerDefinition masterServerDefinition = { bAcceptsPush, bDoReminders, bHideProblems, uiReminderIntervalMins, strDesc, strUrl };
+        SMasterServerDefinition masterServerDefinition = { bAcceptsPush, bDoReminders, bHideProblems, bHideSuccess, uiReminderIntervalMins, strDesc, strUrl };
         m_MasterServerList.push_back( new CMasterServer( masterServerDefinition ) );
     }
 
