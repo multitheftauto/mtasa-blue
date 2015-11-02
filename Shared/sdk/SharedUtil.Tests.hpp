@@ -21,9 +21,6 @@ void 	SharedUtil_WildcardMatch_Tests  ( void );
 void    SharedUtil_Collection_Tests     ( void );
 void    SharedUtil_String_Tests         ( void );
 void    SharedUtil_Hash_Tests           ( void );
-void    SharedUtil_RSA_Tests            ( void );
-void    RSATestCrypt                    ( const SString& input, const SString& keyEncrypt, const SString& keyDecrypt );
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -41,9 +38,6 @@ void SharedUtil_Tests ( void )
     SharedUtil_Collection_Tests ();
     SharedUtil_String_Tests ();
     SharedUtil_Hash_Tests ();
-#ifndef MTA_CLIENT
-    SharedUtil_RSA_Tests ();
-#endif
 }
 
 
@@ -905,51 +899,3 @@ void SharedUtil_Hash_Tests ( void )
 
     FileDelete( szTempFilename );
 }
-
-
-#ifndef MTA_CLIENT
-///////////////////////////////////////////////////////////////
-//
-// SharedUtil_RSA_Tests
-//
-// Test behaviour of Raknet RSA code
-//
-///////////////////////////////////////////////////////////////
-void SharedUtil_RSA_Tests( void )
-{
-    // Generate keys
-    char privateKeyTemp[64];
-    char publicKeyTemp[68];
-    g_pRealNetServer->RSAGenerateKeys( privateKeyTemp, sizeof( privateKeyTemp ), publicKeyTemp, sizeof( publicKeyTemp ) );
-    SStringX privateKey( privateKeyTemp, sizeof( privateKeyTemp ) );
-    SStringX publicKey( publicKeyTemp, sizeof( publicKeyTemp ) );
-
-    // Short data length
-    SString input = "hello";
-    RSATestCrypt( input, publicKey, privateKey );
-    RSATestCrypt( input, privateKey, publicKey );
-
-    // Long data length
-    while( input.size() < 3000 )
-        input += input + "goodbye";
-    RSATestCrypt( input, publicKey, privateKey );
-    RSATestCrypt( input, privateKey, publicKey );
-}
-
-void RSATestCrypt( const SString& input, const SString& keyEncrypt, const SString& keyDecrypt )
-{
-    // Encrypt
-    std::vector < char > encryptedBuffer;
-    encryptedBuffer.resize( input.size() + 100 );
-    uint uiEncryptedSize = g_pRealNetServer->RSAEncryptData( &input[0], input.size(), &keyEncrypt[0], keyEncrypt.size(), &encryptedBuffer[0], encryptedBuffer.size() );
-
-    // Decrypt
-    std::vector < char > decryptedBuffer;
-    decryptedBuffer.resize( uiEncryptedSize );
-    uint uiDecryptedSize = g_pRealNetServer->RSADecryptData( &encryptedBuffer[0], uiEncryptedSize, &keyDecrypt[0], keyDecrypt.size(), &decryptedBuffer[0], decryptedBuffer.size() );
-
-    // Check decrypted is the same as original
-    assert( input.size() == uiDecryptedSize );
-    assert( memcmp( &input[0], &decryptedBuffer[0], uiDecryptedSize ) == 0 );
-}
-#endif
