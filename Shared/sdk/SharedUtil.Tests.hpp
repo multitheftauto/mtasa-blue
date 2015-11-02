@@ -21,9 +21,6 @@ void 	SharedUtil_WildcardMatch_Tests  ( void );
 void    SharedUtil_Collection_Tests     ( void );
 void    SharedUtil_String_Tests         ( void );
 void    SharedUtil_Hash_Tests           ( void );
-void    SharedUtil_RSA_Tests            ( void );
-void    RSATestCrypt                    ( const SString& input, const std::vector < char >& keyEncrypt, const std::vector < char >& keyDecrypt, uint uiNumBits );
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -41,9 +38,6 @@ void SharedUtil_Tests ( void )
     SharedUtil_Collection_Tests ();
     SharedUtil_String_Tests ();
     SharedUtil_Hash_Tests ();
-#ifndef MTA_CLIENT
-    SharedUtil_RSA_Tests ();
-#endif
 }
 
 
@@ -905,57 +899,3 @@ void SharedUtil_Hash_Tests ( void )
 
     FileDelete( szTempFilename );
 }
-
-
-#ifndef MTA_CLIENT
-///////////////////////////////////////////////////////////////
-//
-// SharedUtil_RSA_Tests
-//
-// Test behaviour of Raknet RSA code
-//
-///////////////////////////////////////////////////////////////
-void SharedUtil_RSA_Tests( void )
-{
-    uint bitsToTest[] = { 512, 1024, 1280 };
-    for( uint i = 0 ; i < NUMELMS( bitsToTest ) ; i++ )
-    {
-        uint uiNumBits = bitsToTest[i];
-
-        // Generate keys
-        std::vector < char > privateKey;
-        std::vector < char > publicKey;
-        privateKey.resize( uiNumBits / 8 );
-        publicKey.resize( uiNumBits / 8 + 4 );
-        g_pRealNetServer->RSAGenerateKeys( &privateKey[0], privateKey.size(), &publicKey[0], publicKey.size(), uiNumBits );
-
-        // Short data length
-        SString input = "hello";
-        RSATestCrypt( input, publicKey, privateKey, uiNumBits );
-        RSATestCrypt( input, privateKey, publicKey, uiNumBits );
-
-        // Long data length
-        while( input.size() < 3000 )
-            input += input + "goodbye";
-        RSATestCrypt( input, publicKey, privateKey, uiNumBits );
-        RSATestCrypt( input, privateKey, publicKey, uiNumBits );
-    }
-}
-
-void RSATestCrypt( const SString& input, const std::vector < char >& keyEncrypt, const std::vector < char >& keyDecrypt, uint uiNumBits )
-{
-    // Encrypt
-    std::vector < char > encryptedBuffer;
-    encryptedBuffer.resize( input.size() + uiNumBits / 8 + 20 );
-    uint uiEncryptedSize = g_pRealNetServer->RSAEncryptData( &input[0], input.size(), &keyEncrypt[0], keyEncrypt.size(), &encryptedBuffer[0], encryptedBuffer.size(), uiNumBits );
-
-    // Decrypt
-    std::vector < char > decryptedBuffer;
-    decryptedBuffer.resize( uiEncryptedSize );
-    uint uiDecryptedSize = g_pRealNetServer->RSADecryptData( &encryptedBuffer[0], uiEncryptedSize, &keyDecrypt[0], keyDecrypt.size(), &decryptedBuffer[0], decryptedBuffer.size(), uiNumBits );
-
-    // Check decrypted is the same as original
-    assert( input.size() == uiDecryptedSize );
-    assert( memcmp( &input[0], &decryptedBuffer[0], uiDecryptedSize ) == 0 );
-}
-#endif
