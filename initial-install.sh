@@ -13,7 +13,7 @@ autoreconf -fiv
 
 # then look at the configure options:
 #   ./configure --help
-if [ $1 = "-g" ]; then
+if [ "$1" = "-g" ]; then
     ./configure --with-pic --disable-system-pcre --enable-utf8 \
                   CFLAGS='-g -O2 -fPIC -DPIC' \
                 CXXFLAGS='-g -O2 -fPIC -DPIC -std=c++0x' \
@@ -39,9 +39,18 @@ cd ./vendor/google-breakpad
 make CXXFLAGS='-Wno-sign-compare'
 cd ../..
 
+# Build Crypto++
+cd ./vendor/cryptopp
+if [ "$1" = "-g" ]; then
+	make static WITH_SYMBOLS=1
+else
+	make static
+fi
+cd ../..
+
 # then you have makefiles and the source can be compiled :)
 # building in parallel mode (use -j<JOBS>)
-if [ $1 = "-g" ]; then
+if [ "$1" = "-g" ]; then
     make \
                   CFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized -Wno-narrowing' \
                 CXXFLAGS='-g -O2 -fPIC -DPIC -Wno-uninitialized -Wno-narrowing -std=c++0x' \
