@@ -133,7 +133,9 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
         {
             // Load public RSA key from disk
             RSA::PublicKey publicKey;
-            StringSource stringSource ( Base64::decode ( encodedPublicKey, SString () ), true );
+            std::string base64Data;
+            Base64::decode ( encodedPublicKey, base64Data );
+            StringSource stringSource ( base64Data, true );
             publicKey.Load ( stringSource );
 
             // Launch encryptor and encrypt

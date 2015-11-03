@@ -39,6 +39,15 @@ cd ./vendor/google-breakpad
 make CXXFLAGS='-Wno-sign-compare'
 cd ../..
 
+# Build Crypto++
+cd ./vendor/cryptopp
+if [ "$1" = "-g" ]; then
+	make static WITH_SYMBOLS=1
+else
+	make static
+fi
+cd ../..
+
 # then you have makefiles and the source can be compiled :)
 # building in parallel mode (use -j<JOBS>)
 if [ "$1" = "-g" ]; then
