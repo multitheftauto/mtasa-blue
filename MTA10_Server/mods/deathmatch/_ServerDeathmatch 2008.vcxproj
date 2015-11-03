@@ -162,7 +162,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;../../../vendor/cryptopp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -184,9 +184,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;cryptopp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../../vendor/cryptopp/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <MapFileName />
       <OptimizeReferences>true</OptimizeReferences>
@@ -235,9 +235,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;cryptopp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../../vendor/cryptopp/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>../../../symbols/$(Configuration)_$(PlatformTarget)_$(SafeParentName).pdb</ProgramDatabaseFile>
       <MapFileName />
@@ -260,7 +260,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;../../../vendor/cryptopp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -283,9 +283,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthread_d.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthread_d.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;cryptopp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>logic/lib;../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../../vendor/cryptopp/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -331,9 +331,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthread_d.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s_d.lib;wsock32.lib;zlib_d.lib;ehs_d.lib;pthread_d.lib;pme_d.lib;pcre3_d.lib;json_d.lib;psapi.lib;cryptopp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../vendor/lua/$(PlatformTarget)/$(Configuration)Server;../../../vendor/json-c/$(PlatformTarget)/$(Configuration);../../../vendor/ehs/$(PlatformTarget)/$(Configuration);../../../vendor/pme/$(PlatformTarget)/$(Configuration);../../../vendor/pcre/$(PlatformTarget)/$(Configuration);../../../vendor/pthreads/$(PlatformTarget)/$(Configuration);../../../vendor/zlib/$(PlatformTarget)/$(Configuration);../../../vendor/cryptopp/$(PlatformTarget)/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -354,7 +354,7 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;./logic;../../../vendor;../../../vendor/sqlite;../../../vendor/zlib/;../../../vendor/pcre;../../../vendor/pme;../../../vendor/pthreads/include;../../../Shared/publicsdk/include;logic/common;../../../vendor/zlib;../../../vendor/json-c;../../sdk;../../../Shared/sdk;../../../vendor/sparsehash/current/src;../../../vendor/sparsehash/current/src/windows;../../../Shared/animation;../../../vendor/bochs;../../../vendor/bob_withers;../../../vendor/zip;../../../vendor/lua/src;../../../vendor/pcre/shipped_for_mta;../../../vendor/json-c/shipped_for_mta;../../../Shared/mods/deathmatch/logic;../../../vendor/cryptopp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -377,9 +377,9 @@
     </ResourceCompile>
     <ProjectReference />
     <Link>
-      <AdditionalDependencies>wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;json.lib;psapi.lib;cryptopp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\lua5.1s_dll;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\json;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\ehs;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pme;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pcre;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pthread;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\lua5.1s_dll;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\json;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\ehs;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pme;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pcre;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pthread;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\cryptopp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
@@ -432,9 +432,9 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua5.1s.lib;wsock32.lib;zlib.lib;ehs.lib;pthread.lib;pme.lib;pcre3.lib;json.lib;psapi.lib;cryptopp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\lua5.1s_dll;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\json;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\ehs;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pme;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pcre;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pthread;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\lua5.1s_dll;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\json;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\ehs;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pme;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pcre;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\pthread;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\zlib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\cryptopp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
@@ -1187,6 +1187,9 @@
     <None Include="..\..\output\README" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\vendor\cryptopp\cryptopp.vcxproj">
+      <Project>{abf5e061-cceb-407e-a726-7185de5e49b5}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\vendor\ehs\vs2008\ehs 2008.vcxproj">
       <Project>{ecc4ba90-6aa5-4630-aea9-f923fb633c7d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

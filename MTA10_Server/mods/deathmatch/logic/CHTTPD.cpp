@@ -13,6 +13,8 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <cryptopp/rsa.h>
+#include <cryptopp/osrng.h>
 
 extern CGame * g_pGame;
 
@@ -118,20 +120,41 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
                                          HttpResponse * ipoHttpResponse )
 {
     // Check if server verification was requested
-    auto keySecret = ipoHttpRequest->oRequestHeaders["key_secret"];
-    if ( ipoHttpRequest->sUri == "/get_verification_key_code" && keySecret != "" )
+    auto challenge = ipoHttpRequest->oRequestHeaders["crypto_challenge"];
+    if ( ipoHttpRequest->sUri == "/get_verification_key_code" && challenge != "" )
     {
-        // Read keyfile
         auto path = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "verify.key" );
-        SString content;
-        SharedUtil::FileLoad ( path, content, 100 );
+        SString encodedPublicKey;
+        SharedUtil::FileLoad ( path, encodedPublicKey, 392 );
 
-        // Verify key_secret client header to prevent unauthorized people to steal the key
-        if ( keySecret == content.substr ( 0, 10 ) )
+        using namespace CryptoPP;
+
+        try
         {
-            ipoHttpResponse->SetBody ( content, content.size () );
-            return HTTPRESPONSECODE_200_OK;
+            // Load public RSA key from disk
+            RSA::PublicKey publicKey;
+            StringSource stringSource ( Base64::decode ( encodedPublicKey, SString () ), true );
+            publicKey.Load ( stringSource );
+
+            // Launch encryptor and encrypt
+            RSAES_OAEP_SHA_Encryptor encryptor ( publicKey );
+            SecByteBlock cipherText ( encryptor.CiphertextLength ( challenge.size () ) );
+            AutoSeededRandomPool rng;
+            encryptor.Encrypt ( rng, (const byte*) challenge.data (), challenge.size (), cipherText.begin () );
+
+            if ( !cipherText.empty () )
+            {
+                ipoHttpResponse->SetBody ( (const char*)cipherText.BytePtr (), cipherText.SizeInBytes () );
+                return HTTPRESPONSECODE_200_OK;
+            }
+            else
+                CLogger::LogPrintf ( LOGLEVEL_MEDIUM, "ERROR: Empty crypto challenge was passed during verification\n" );
         }
+        catch ( const std::exception& ex )
+        {
+            CLogger::LogPrintf ( LOGLEVEL_MEDIUM, "ERROR: Invalid verify.key keyfile\n" );
+        }
+
         ipoHttpResponse->SetBody ( "", 0 );
         return HTTPRESPONSECODE_401_UNAUTHORIZED;
     }
