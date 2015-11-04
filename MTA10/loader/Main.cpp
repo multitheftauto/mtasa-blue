@@ -39,6 +39,13 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     SharedUtil_Tests ();
 #endif
 
+    // Run 'Microsoft IDN Mitigation APIs' installer if required file is missing
+    if ( !IsWindowsVistaOrGreater() && !FileExists( PathJoin( GetSystemSystemPath(), "normaliz.dll" ) ) )
+    {
+        SString strIDNMInstaller = PathJoin( GetMTASAPath(), "redist", "idndl.x86.exe" );
+        ShellExecuteBlocking ( "open", strIDNMInstaller, "" );
+    }
+
     //
     // Init
     //
