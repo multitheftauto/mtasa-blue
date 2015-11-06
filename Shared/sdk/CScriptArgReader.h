@@ -31,7 +31,6 @@ public:
         m_pPendingFunctionOutValue = NULL;
         m_pPendingFunctionIndex = -1;
         m_bResolvedErrorGotArgumentTypeAndValue = false;
-        m_iErrorGotArgumentType = 0;
         m_bHasCustomMessage = false;
     }
 
@@ -629,7 +628,7 @@ public:
                 // Error
                 SetTypeError ( GetEnumTypeName ( outValue ) );
                 m_bResolvedErrorGotArgumentTypeAndValue = true;
-                m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
+                m_strErrorGotArgumentType = EnumToString ( (eLuaType)lua_type ( m_luaVM, m_iErrorIndex ) );
                 m_strErrorGotArgumentValue = inValueList[i];
 
                 if ( iArgument == LUA_TSTRING )
@@ -1130,31 +1129,17 @@ public:
             return m_strCustomMessage;
 
         ResolveErrorGotArgumentTypeAndValue ();
-        SString strGotArgumentType  = EnumToString ( (eLuaType)m_iErrorGotArgumentType );
-        SString strGotArgumentValue = m_strErrorGotArgumentValue;
 
         // Compose error message
         SString strMessage ( "Expected %s at argument %d", *m_strErrorExpectedType, m_iErrorIndex );
 
-        if ( m_iErrorGotArgumentType == LUA_TLIGHTUSERDATA )
+        if ( !m_strErrorGotArgumentType.empty () )
         {
-	        // Get name of userdata type
-            strGotArgumentType = GetUserDataClassName ( lua_touserdata ( m_luaVM, m_iErrorIndex ), m_luaVM );
-            strGotArgumentValue = "";
-        }
-        else if ( m_iErrorGotArgumentType == LUA_TUSERDATA )
-        {
-            strGotArgumentType = GetUserDataClassName ( * ( ( void** ) lua_touserdata ( m_luaVM, m_iErrorIndex ) ), m_luaVM );
-            strGotArgumentValue = "";
-        }
-
-        if ( !strGotArgumentType.empty () )
-        {
-            strMessage += SString ( ", got %s", *strGotArgumentType );
+            strMessage += SString ( ", got %s", *m_strErrorGotArgumentType );
 
             // Append value if available
-            if ( !strGotArgumentValue.empty () )
-                strMessage += SString ( " '%s'", *strGotArgumentValue );
+            if ( !m_strErrorGotArgumentValue.empty () )
+                strMessage += SString ( " '%s'", *m_strErrorGotArgumentValue );
         }
 
         return strMessage;
@@ -1172,8 +1157,20 @@ public:
 
         if ( !m_bHasCustomMessage )
         {
-            m_iErrorGotArgumentType = lua_type ( m_luaVM, m_iErrorIndex );
+            int iArgument = lua_type ( m_luaVM, m_iErrorIndex );
+            m_strErrorGotArgumentType = EnumToString ( (eLuaType)iArgument );
             m_strErrorGotArgumentValue = lua_tostring ( m_luaVM, m_iErrorIndex );
+
+            if ( iArgument == LUA_TLIGHTUSERDATA )
+            {
+                m_strErrorGotArgumentType = GetUserDataClassName ( lua_touserdata ( m_luaVM, m_iErrorIndex ), m_luaVM );
+                m_strErrorGotArgumentValue = "";
+            }
+            else if ( iArgument == LUA_TUSERDATA )
+            {
+                m_strErrorGotArgumentType = GetUserDataClassName ( * ( ( void** ) lua_touserdata ( m_luaVM, m_iErrorIndex ) ), m_luaVM );
+                m_strErrorGotArgumentValue = "";
+            }
         }
     }
 
@@ -1223,7 +1220,7 @@ public:
     CLuaFunctionRef*        m_pPendingFunctionOutValue;
     int                     m_pPendingFunctionIndex;
     bool                    m_bResolvedErrorGotArgumentTypeAndValue;
-    int                     m_iErrorGotArgumentType;
+    SString                 m_strErrorGotArgumentType;
     SString                 m_strErrorGotArgumentValue;
     SString                 m_strErrorCategory;
     bool                    m_bHasCustomMessage;
