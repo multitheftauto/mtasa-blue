@@ -345,7 +345,7 @@ SString SharedUtil::GetPostUpdateConnect( void )
     CArgMap argMap;
     argMap.SetFromString( strPostUpdateConnect );
     SString strHost = argMap.Get( "host" );
-    time_t timeThen = (time_t)atoi64( argMap.Get( "time" ) );
+    time_t timeThen = (time_t)std::atoll( argMap.Get( "time" ) );
 
     // Expire after 5 mins
     double seconds = difftime( time( NULL ), timeThen );

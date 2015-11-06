@@ -98,21 +98,11 @@
 #endif
 
 #ifdef _MSC_VER
-    #define atoi64 _atoi64
     #define PRId64  "I64d"
     #define PRIx64  "I64x"
 #else
-    #define atoi64 std::atoll
     #define PRId64  "lld"
     #define PRIx64  "llx"
-#endif
-
-#if defined(WIN32)
-    #if _MSC_VER <= 1500
-        // VS08 does not have isnan, but _isnan
-        #include <float.h>
-        #define isnan _isnan
-    #endif
 #endif
 
 //

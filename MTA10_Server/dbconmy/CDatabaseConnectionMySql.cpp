@@ -340,7 +340,7 @@ bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistr
                     case SQLITE_NULL:
                         break;
                     case SQLITE_INTEGER:
-                        cell.nVal = atoi64 ( inData );
+                        cell.nVal = std::atoll ( inData );
                         break;
                     case SQLITE_FLOAT:
                         cell.fVal = (float)atof ( inData );

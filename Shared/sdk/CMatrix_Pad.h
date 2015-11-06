@@ -16,7 +16,7 @@
 #include "CMatrix.h"
 
 /**
- * CVector Structure used internally by GTA.
+ * CMatrix Structure used internally by GTA.
  */
 class CMatrix_Padded
 {
