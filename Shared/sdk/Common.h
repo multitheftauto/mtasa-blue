@@ -30,9 +30,9 @@
 #define MAX_SERVER_ELEMENTS 131072
 #define MAX_CLIENT_ELEMENTS 131072
 
-#if (MAX_SERVER_ELEMENTS&(MAX_SERVER_ELEMENTS-1)) != 0
-    #error MAX_SERVER_ELEMENTS "Macro must be power of 2"
-#endif
+// Make sure MAX_SERVER_ELEMENTS are a power of two
+static_assert( ( MAX_SERVER_ELEMENTS&( MAX_SERVER_ELEMENTS - 1 ) ) == 0, "MAX_SERVER_ELEMENTS must be a power of 2" );
+
 
 // ElementID structure
 struct ElementID
