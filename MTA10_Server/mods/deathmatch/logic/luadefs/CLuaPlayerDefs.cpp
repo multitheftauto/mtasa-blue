@@ -500,27 +500,21 @@ int CLuaPlayerDefs::GetPlayerWantedLevel ( lua_State* luaVM )
 
 int CLuaPlayerDefs::GetAlivePlayers ( lua_State* luaVM )
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        // Create a new table
-        lua_newtable ( luaVM );
+    // Create a new table
+    lua_newtable ( luaVM );
 
-        // Add all alive players
-        unsigned int uiIndex = 0;
-        list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
+    // Add all alive players
+    unsigned int uiIndex = 0;
+    list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
+    for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
+    {
+        if ( ( *iter )->IsSpawned () && !( *iter )->IsBeingDeleted () )
         {
-            if ( ( *iter )->IsSpawned () && !( *iter )->IsBeingDeleted () )
-            {
-                lua_pushnumber ( luaVM, ++uiIndex );
-                lua_pushelement ( luaVM, *iter );
-                lua_settable ( luaVM, -3 );
-            }
+            lua_pushnumber ( luaVM, ++uiIndex );
+            lua_pushelement ( luaVM, *iter );
+            lua_settable ( luaVM, -3 );
         }
-        return 1;
     }
-    lua_pushboolean ( luaVM, false );
     return 1;
 }
 

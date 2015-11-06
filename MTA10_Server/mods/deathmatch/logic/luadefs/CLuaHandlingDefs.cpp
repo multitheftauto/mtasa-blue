@@ -16,13 +16,13 @@
 void CLuaHandlingDefs::LoadFunctions ( void )
 {
     // Set
-    CLuaCFunctions::AddFunction ( "setVehicleHandling", CLuaHandlingDefs::SetVehicleHandling );
-    CLuaCFunctions::AddFunction ( "setModelHandling", CLuaHandlingDefs::SetModelHandling );
+    CLuaCFunctions::AddFunction ( "setVehicleHandling", SetVehicleHandling );
+    CLuaCFunctions::AddFunction ( "setModelHandling", SetModelHandling );
 
     // Get
-    CLuaCFunctions::AddFunction ( "getVehicleHandling", CLuaHandlingDefs::GetVehicleHandling );
-    CLuaCFunctions::AddFunction ( "getModelHandling", CLuaHandlingDefs::GetModelHandling );
-    CLuaCFunctions::AddFunction ( "getOriginalHandling", CLuaHandlingDefs::GetOriginalHandling );
+    CLuaCFunctions::AddFunction ( "getVehicleHandling", GetVehicleHandling );
+    CLuaCFunctions::AddFunction ( "getModelHandling", GetModelHandling );
+    CLuaCFunctions::AddFunction ( "getOriginalHandling", GetOriginalHandling );
 }
 
 int CLuaHandlingDefs::SetVehicleHandling ( lua_State* luaVM )
