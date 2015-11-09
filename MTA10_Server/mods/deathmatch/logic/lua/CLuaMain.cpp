@@ -68,6 +68,7 @@ const char szPreloadedScript [] = ""\
     //
     // Output errors that occur inside coroutines
     //
+    "coroutine._resume = coroutine.resume\n"    // For access to the original function
     "local _coroutine_resume = coroutine.resume\n"
     "function coroutine.resume(...)\n"
     "    local state,result = _coroutine_resume(...)\n"
