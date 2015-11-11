@@ -238,7 +238,7 @@ void CTileBatcher::Flush ( void )
             // Do shader passes
             DWORD dwFlags = pShaderInstance->m_pEffectWrap->m_uiSaveStateFlags;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
             uint uiNumPasses = 0;
-            pD3DEffect->Begin ( &uiNumPasses, dwFlags );
+            pShaderInstance->m_pEffectWrap->Begin ( &uiNumPasses, dwFlags, false );
 
             for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
             {
@@ -246,7 +246,7 @@ void CTileBatcher::Flush ( void )
                 m_pDevice->DrawIndexedPrimitiveUP( D3DPT_TRIANGLELIST, 0, NumVertices, PrimitiveCount, pIndexData, D3DFMT_INDEX16, pVertexStreamZeroData, VertexStreamZeroStride );
                 pD3DEffect->EndPass ();
             }
-            pD3DEffect->End ();
+            pShaderInstance->m_pEffectWrap->End ();
 
             // If we didn't get the effect to save the shader state, clear some things here
             if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )

@@ -1978,9 +1978,6 @@ void CCore::OnPreHUDRender ( void )
 {
     IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
 
-    // Handle saving depth buffer
-    CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
-
     CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
@@ -1994,6 +1991,9 @@ void CCore::OnPreHUDRender ( void )
     }
     else
         m_pModManager->DoPulsePreHUDRender ( false, false );
+
+    // Handle saving depth buffer
+    CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
 
     // Restore in case script forgets
     CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();
