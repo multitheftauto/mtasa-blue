@@ -458,7 +458,7 @@ public:
     virtual bool    ApplyCommonHandles      ( void );
     virtual bool    ApplyMappedHandles      ( void );
     virtual void    ReadParameterHandles    ( void );
-    virtual HRESULT Begin                   ( UINT* pPasses, DWORD Flags );
+    virtual HRESULT Begin                   ( UINT* pPasses, DWORD Flags, bool bWorldRender );
     virtual HRESULT End                     ( void );
 
     static void             InitMaps                        ( void );
@@ -665,8 +665,14 @@ void CEffectWrapImpl::InitMaps ( void )
 // Ensures secondary render targets are set if required
 //
 ////////////////////////////////////////////////////////////////
-HRESULT CEffectWrapImpl::Begin( UINT* pPasses, DWORD Flags )
+HRESULT CEffectWrapImpl::Begin( UINT* pPasses, DWORD Flags, bool bWorldRender )
 {
+    if ( m_bUsesDepthBuffer && !bWorldRender )
+    {
+        // Ensure readable depth buffer is ready to be read
+        CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
+    }
+
     for ( uint i = 0 ; i < m_SecondaryRenderTargetList.size() ; i++ )
     {
         D3DXHANDLE hTexture = m_SecondaryRenderTargetList[i];

@@ -97,6 +97,11 @@ struct SDxStatus
 
     struct
     {
+        int             iNumShadersUsingReadableDepthBuffer;
+    } state;
+
+    struct
+    {
         int             iFreeForMTA;
         int             iUsedByFonts;
         int             iUsedByTextures;
@@ -311,7 +316,7 @@ class CEffectWrap : public CRenderItem
     virtual bool    ApplyCommonHandles      ( void ) = 0;
     virtual bool    ApplyMappedHandles      ( void ) = 0;
     virtual void    ReadParameterHandles    ( void ) = 0;
-    virtual HRESULT Begin                   ( UINT* pPasses, DWORD Flags ) = 0;
+    virtual HRESULT Begin                   ( UINT* pPasses, DWORD Flags, bool bWorldRender = true ) = 0;
     virtual HRESULT End                     ( void ) = 0;
 
     ID3DXEffect*    m_pD3DEffect;
