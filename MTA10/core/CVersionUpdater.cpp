@@ -3217,9 +3217,11 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     SString strSystemStats3 ( "3_%d"
                              "_%s"
                              "_%s"
+                             "_%d"
                              , GetApplicationSettingInt( "vs2013-runtime-installed" )
                              , *GetApplicationSetting ( "real-os-build" )
                              , *GetApplicationSetting ( "locale" ).Replace( "_", "-" )
+                             , (uint)FileSize( PathJoin( GetSystemSystemPath(), "normaliz.dll" ) )
                            );
 
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );

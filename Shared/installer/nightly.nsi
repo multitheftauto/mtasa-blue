@@ -626,15 +626,15 @@ DontInstallRedistVC12:
 
 		#############################################################
         # Fix missing or incorrect VS2013 redist files
-        SetOutPath $WINDIR\SysWOW64
-        Push $WINDIR\SysWOW64\msvcp120.dll
+        SetOutPath $SYSDIR
+        Push $SYSDIR\msvcp120.dll
         Call IsDll32Bit
         Pop $0
         ${If} $0 != 1
             File "${FILES_ROOT}\MTA San Andreas\redist\msvcp120.dll"
 		${EndIf}
 
-        Push $WINDIR\SysWOW64\msvcr120.dll
+        Push $SYSDIR\msvcr120.dll
         Call IsDll32Bit
         Pop $0
         ${If} $0 != 1
