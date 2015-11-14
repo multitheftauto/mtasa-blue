@@ -31,6 +31,7 @@ public:
     bool            IsLoaded                ( void );
 
     FuncPtr_t       GetProcedureAddress     ( const char* szProcName );
+    bool            CheckMtaVersion         ( const char* szLibName );
 
 private:
     #ifdef WIN32
