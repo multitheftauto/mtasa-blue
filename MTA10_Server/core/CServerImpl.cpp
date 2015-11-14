@@ -27,10 +27,6 @@
 #else
     #include <termios.h>
     #include <unistd.h>
-
-    // This is probably safer than changing MTAPlatform.h against compatibility issues
-    #undef Print
-    #define Print printf
 #endif
 
 // Define libraries
@@ -47,6 +43,7 @@ bool g_bNoCrashHandler = false;
     bool g_bDaemonized = false;
     WINDOW* m_wndMenu = NULL;
     WINDOW* m_wndInput = NULL;
+    bool IsCursesActive( void )     { return m_wndInput != NULL; }
 #endif
 
 #ifdef WIN32
@@ -120,7 +117,7 @@ void CServerImpl::Printf ( const char* szFormat, ... )
 #ifdef WIN32
         vprintf ( szFormat, ap );
 #else
-        if(!g_bNoCurses)
+        if( IsCursesActive() )
             vwprintw ( stdscr, szFormat, ap );
         else
             vprintf ( szFormat, ap );
@@ -308,7 +305,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 
     // Welcome text
     if ( !g_bSilent )
-        Print ( "MTA:BLUE Server for MTA:SA\r\n\r\n" );
+        Print ( "MTA:BLUE Server for MTA:SA\n\n" );
 
     // Load the network DLL
     if ( m_NetworkLibrary.Load ( PathJoin ( m_strServerPath, SERVER_BIN_PATH, szNetworkLibName ) ) )
@@ -322,10 +319,10 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             ulong ulNetModuleVersion = 0;
             if ( pfnCheckCompatibility )
                 pfnCheckCompatibility ( 1, &ulNetModuleVersion );
-            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, (uint)ulNetModuleVersion );
-            Print ( "Press Q to shut down the server!\n\r" );
-            Print ( "\n\r\n\r\n\r(If this is a custom build,\n\r" );
-            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n\r" );
+            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n", MTA_DM_SERVER_NET_MODULE_VERSION, (uint)ulNetModuleVersion );
+            Print ( "Press Q to shut down the server!\n" );
+            Print ( "\n\n\n(If this is a custom build,\n" );
+            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n" );
             WaitForKey ( 'q' );
             DestroyWindow ( );
             return ERROR_NETWORK_LIBRARY_FAILED;
@@ -991,7 +988,7 @@ void CServerImpl::DestroyWindow ( void )
 
 void WaitForKey ( int iKey )
 {
-    if ( !g_bSilent )
+    if ( !g_bSilent && !g_bNoCurses )
     {
         for ( ;; )
         {
@@ -1005,4 +1002,25 @@ void WaitForKey ( int iKey )
             Sleep ( 10 );
         }
     }
+}
+
+// Always print these messages
+void Print ( const char* szFormat, ... )
+{
+    va_list ap;
+    va_start ( ap, szFormat );
+
+    SString str;
+    str.vFormat ( szFormat, ap );
+
+#ifdef WIN32
+    printf ( "%s", *str );
+#else
+    if( IsCursesActive() )
+        printw ( "%s", *str );
+    else
+        printf ( "%s", *str );
+#endif
+
+    va_end ( ap );
 }
