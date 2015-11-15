@@ -642,6 +642,17 @@ DontInstallRedistVC12:
 		${EndIf}
 		#############################################################
 
+		#############################################################
+        # For XP, install Microsoft Internationalized Domain Names (IDN) Mitigation APIs
+        SetOutPath "$TEMP"
+        ${If} ${AtMostWinXP}
+            ${IfNot} ${FileExists} $SYSDIR\normaliz.dll
+                File "${FILES_ROOT}\MTA San Andreas\redist\idndl.x86.exe"
+                ExecWait '"$TEMP\idndl.x86.exe" /passive'
+            ${EndIf}
+        ${EndIf}
+		#############################################################
+
 		SetOutPath "$INSTDIR\MTA"
 		SetOverwrite on
 
