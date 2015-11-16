@@ -1178,7 +1178,10 @@ int CLuaResourceDefs::refreshResources ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        m_pResourceManager->Refresh ( bRefreshAll );
+        if ( bRefreshAll )
+            m_pResourceManager->QueueResource( NULL, CResourceManager::QUEUE_REFRESHALL, NULL );
+        else
+            m_pResourceManager->QueueResource( NULL, CResourceManager::QUEUE_REFRESH, NULL );
 
         lua_pushboolean ( luaVM, true );
         return 1;

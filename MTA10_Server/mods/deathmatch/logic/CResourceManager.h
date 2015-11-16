@@ -38,6 +38,8 @@ public:
         QUEUE_STOPALL,
         QUEUE_RESTART,
         QUEUE_RESTART2,
+        QUEUE_REFRESH,
+        QUEUE_REFRESHALL,
     };
 
     struct sResourceStartFlags
