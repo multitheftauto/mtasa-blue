@@ -868,6 +868,14 @@ void CResourceManager::ProcessQueue ( void )
             else
                 CLogger::LogPrintf ( "%s restarted successfully\n", sItem.pResource->GetName ().c_str () );
         }
+        else if ( sItem.eQueue == QUEUE_REFRESH )
+        {
+            Refresh();
+        }
+        else if ( sItem.eQueue == QUEUE_REFRESHALL )
+        {
+            Refresh( true );
+        }
     }
 
 }
