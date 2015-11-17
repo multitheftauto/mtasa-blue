@@ -196,6 +196,12 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         std::setlocale(LC_ALL,"C");
         assert ( strcoll( "a", "B" ) > 0 );
 
+        // Disable QuickEdit mode to prevent text selection causing server freeze
+        HANDLE hConIn = GetStdHandle( STD_INPUT_HANDLE );
+        DWORD dwConInMode;
+        GetConsoleMode( hConIn, &dwConInMode );
+        SetConsoleMode( hConIn, dwConInMode & ~ENABLE_QUICK_EDIT_MODE );
+
         // Get the console handle
         m_hConsole = GetStdHandle ( STD_OUTPUT_HANDLE );
 
