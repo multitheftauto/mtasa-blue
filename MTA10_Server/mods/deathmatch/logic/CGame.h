@@ -62,6 +62,7 @@ class CGame;
 #include "packets/CPlayerTransgressionPacket.h"
 #include "packets/CPlayerDiagnosticPacket.h"
 #include "packets/CPlayerModInfoPacket.h"
+#include "packets/CPlayerACInfoPacket.h"
 #include "packets/CPlayerScreenShotPacket.h"
 
 #include "CRPCFunctions.h"
@@ -438,6 +439,7 @@ private:
     void                        Packet_PlayerTransgression  ( class CPlayerTransgressionPacket& Packet );
     void                        Packet_PlayerDiagnostic     ( class CPlayerDiagnosticPacket& Packet );
     void                        Packet_PlayerModInfo        ( class CPlayerModInfoPacket & Packet );
+    void                        Packet_PlayerACInfo         ( class CPlayerACInfoPacket & Packet );
     void                        Packet_PlayerScreenShot     ( class CPlayerScreenShotPacket & Packet );
     void                        Packet_PlayerNoSocket       ( class CPlayerNoSocketPacket & Packet );
     void                        Packet_PlayerNetworkStatus  ( class CPlayerNetworkStatusPacket & Packet );

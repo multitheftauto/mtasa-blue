@@ -725,6 +725,20 @@ void CNetServerBuffer::ResendModPackets ( const NetServerPlayerID& playerID )
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// CNetServerBuffer::ResendACPackets
+//
+// Non-blocking.
+//
+///////////////////////////////////////////////////////////////////////////
+void CNetServerBuffer::ResendACPackets ( const NetServerPlayerID& playerID )
+{
+    SResendACPacketsArgs* pArgs = new SResendACPacketsArgs ( playerID );
+    AddCommandAndFree ( pArgs );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // CNetServerBuffer::GetClientSerialAndVersion
 //
 // BLOCKING. Called once per player
@@ -1166,6 +1180,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1 (                      GetNetRoute                     , SFixedString < 32 >*, pstrRoute )
         CALLREALNET1R( bool,                InitServerId                    , const char*, szPath )
         CALLREALNET1 (                      ResendModPackets                , const NetServerPlayerID&, playerID )
+        CALLREALNET1 (                      ResendACPackets                 , const NetServerPlayerID&, playerID )
         CALLREALNET4 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, SFixedString < 32 >&, strSerial, SFixedString < 64 >&, strExtra, SFixedString < 32 >&, strVersion )
         CALLREALNET1 (                      SetNetOptions                   , const SNetOptions&, options )
         CALLREALNET2 (                      GenerateRandomData              , void*, pOutData, uint, uiLength )
