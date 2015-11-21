@@ -30,16 +30,8 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 * [Bugtracker Roadmap](https://bugs.mtasa.com/roadmap_page.php)
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
-### Screenshots
-
-![screenshot 1](http://www.mtasa.com/images/c_wipeout.png "Screenshot 1")
-![screenshot 2](http://www.mtasa.com/images/c_bigpeds.png "Screenshot 2")
-![screenshot 3](http://www.mtasa.com/images/c_yougofirst.png "Screenshot 3")
-
-For in-game videos, head over to [MTAQA on YouTube](https://www.youtube.com/user/MTAQA).
-
 ### License
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997-2009.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997-2015.
