@@ -503,6 +503,7 @@ public:
     LUA_DECLARE ( GetPlayerAnnounceValue );
     LUA_DECLARE ( SetPlayerAnnounceValue );
     LUA_DECLARE ( ResendPlayerModInfo );
+    LUA_DECLARE ( ResendPlayerACInfo );
 
     // Database funcs
     static void     DbQueryCallback ( CDbJobData* pJobData, void* pContext );

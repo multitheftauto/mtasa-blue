@@ -339,7 +339,7 @@ int CLuaFunctionDefs::SetPlayerAnnounceValue ( lua_State* luaVM )
 
 int CLuaFunctionDefs::ResendPlayerModInfo ( lua_State* luaVM )
 {
-    // bool getPlayerModInfo ( player thePlayer )
+    // bool resendPlayerModInfo ( player thePlayer )
     CPlayer* pPlayer;
 
     CScriptArgReader argStream ( luaVM );
@@ -357,6 +357,29 @@ int CLuaFunctionDefs::ResendPlayerModInfo ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::ResendPlayerACInfo ( lua_State* luaVM )
+{
+    // bool resendPlayerACInfo ( player thePlayer )
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pNetServer->ResendACPackets ( pPlayer->GetSocket () );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::PlaySoundFrontEnd ( lua_State* luaVM )
 {

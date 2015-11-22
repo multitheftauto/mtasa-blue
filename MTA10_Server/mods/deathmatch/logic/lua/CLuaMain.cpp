@@ -840,6 +840,7 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "kick", "kickPlayer" );
     lua_classfunction ( luaVM, "redirect", "redirectPlayer" );
     lua_classfunction ( luaVM, "resendModInfo", "resendPlayerModInfo" );
+    lua_classfunction ( luaVM, "resendACInfo", "resendPlayerACInfo" );
     lua_classfunction ( luaVM, "spawn", "spawnPlayer" );
     lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
     lua_classfunction ( luaVM, "takeScreenShot", "takePlayerScreenShot" );

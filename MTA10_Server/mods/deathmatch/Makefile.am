@@ -292,6 +292,7 @@ LOGIC = \
 ./logic/packets/CPlayerJoinPacket.cpp \
 ./logic/packets/CPlayerListPacket.cpp \
 ./logic/packets/CPlayerPuresyncPacket.cpp \
+./logic/packets/CPlayerACInfoPacket.cpp \
 ./logic/packets/CPlayerModInfoPacket.cpp \
 ./logic/packets/CPlayerNetworkStatusPacket.cpp \
 ./logic/packets/CPlayerScreenShotPacket.cpp \

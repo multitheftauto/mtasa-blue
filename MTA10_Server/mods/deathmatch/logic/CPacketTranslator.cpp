@@ -157,6 +157,10 @@ CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacket
             pTemp = new CPlayerModInfoPacket;
             break;
 
+        case PACKET_ID_PLAYER_ACINFO:
+            pTemp = new CPlayerACInfoPacket;
+            break;
+
         case PACKET_ID_PLAYER_SCREENSHOT:
             pTemp = new CPlayerScreenShotPacket;
             break;

@@ -1144,6 +1144,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
             return true;
         }
 
+        case PACKET_ID_PLAYER_ACINFO:
+        {
+            Packet_PlayerACInfo ( static_cast < CPlayerACInfoPacket& > ( Packet ) );
+            return true;
+        }
+
         case PACKET_ID_PLAYER_SCREENSHOT:
         {
             Packet_PlayerScreenShot ( static_cast < CPlayerScreenShotPacket& > ( Packet ) );
@@ -1474,7 +1480,8 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerMute", "", NULL, false );
     m_Events.AddEvent ( "onPlayerUnmute", "", NULL, false );
     m_Events.AddEvent ( "onPlayerCommand", "command", NULL, false );
-    m_Events.AddEvent ( "onPlayerModInfo", "type, ids, names", NULL, false );
+    m_Events.AddEvent ( "onPlayerModInfo", "filename, itemlist", NULL, false );
+    m_Events.AddEvent ( "onPlayerACInfo", "aclist, size, md5, sha256", NULL, false );
     m_Events.AddEvent ( "onPlayerNetworkStatus", "type, ticks", NULL, false );
     m_Events.AddEvent ( "onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false );
 
@@ -3761,7 +3768,7 @@ void CGame::Packet_PlayerNetworkStatus ( CPlayerNetworkStatusPacket & Packet )
 void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    if ( pPlayer && pPlayer->IsJoined () )
+    if ( pPlayer )
     {
         // Make itemList table
         CLuaArguments resultItemList;
@@ -3831,6 +3838,28 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
         Arguments.PushString ( Packet.m_strInfoType );
         Arguments.PushTable ( &resultItemList );
         pPlayer->CallEvent ( "onPlayerModInfo", Arguments );
+    }
+}
+
+
+void CGame::Packet_PlayerACInfo( CPlayerACInfoPacket& Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if ( pPlayer )
+    {
+        CLuaArguments acList;
+        for ( uint i = 0 ; i < Packet.m_IdList.size() ; i++ )
+        {
+            acList.PushNumber( i + 1 );
+            acList.PushNumber( Packet.m_IdList[ i ] );
+        }
+
+        CLuaArguments Arguments;
+        Arguments.PushTable( &acList );
+        Arguments.PushNumber( Packet.m_uiD3d9Size );
+        Arguments.PushString( Packet.m_strD3d9MD5 );
+        Arguments.PushString( Packet.m_strD3d9SHA256 );
+        pPlayer->CallEvent( "onPlayerACInfo", Arguments );
     }
 }
 
