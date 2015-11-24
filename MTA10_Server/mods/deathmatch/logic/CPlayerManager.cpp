@@ -331,23 +331,21 @@ void CPlayerManager::Broadcast ( const CPacket& Packet, const std::multimap < us
 
 bool CPlayerManager::IsValidPlayerModel ( unsigned short usPlayerModel )
 {
-    return ( usPlayerModel == 0 ||
-             usPlayerModel == 1 ||
-             usPlayerModel == 2 ||
-             usPlayerModel == 7 ||
-             (usPlayerModel >= 9 &&
-             usPlayerModel != 208 &&
-             usPlayerModel != 149 &&
-             usPlayerModel != 119 &&
-             usPlayerModel != 86 &&
-             usPlayerModel != 74 &&
-             usPlayerModel != 65 &&
-             usPlayerModel != 42 &&
-             usPlayerModel <= 272) ||
-             (usPlayerModel >= 274 &&
-             usPlayerModel <= 288) ||
-             (usPlayerModel >= 290 &&
-             usPlayerModel <= 312 ) );
+    return ( ( usPlayerModel >= 0 && usPlayerModel <= 312 ) || usPlayerModel == 329 || usPlayerModel == 340 || usPlayerModel == 382 ||
+         usPlayerModel == 383 || usPlayerModel == 398 || usPlayerModel == 399 || ( usPlayerModel >= 612 &&  usPlayerModel <= 614 ) ||
+         usPlayerModel == 662 || usPlayerModel == 663 || ( usPlayerModel >= 665 && usPlayerModel <= 699 ) ||
+         ( usPlayerModel >= 793 && usPlayerModel <= 799 ) || ( usPlayerModel >= 907 && usPlayerModel <= 909 ) || 
+         usPlayerModel == 965 || usPlayerModel == 999 || ( usPlayerModel >= 1194 && usPlayerModel <= 1206 ) ||
+         usPlayerModel == 1326 || usPlayerModel == 1573 || usPlayerModel == 1699 || usPlayerModel == 2883 || usPlayerModel == 2884 ||
+         ( usPlayerModel >= 3176 && usPlayerModel <= 3197 ) || ( usPlayerModel >= 3215 && usPlayerModel <= 3220 ) ||
+         usPlayerModel == 3245 || usPlayerModel == 3247 || usPlayerModel == 3248 || usPlayerModel == 3251 || usPlayerModel == 3254 ||
+         usPlayerModel == 3266 || usPlayerModel == 3348 || usPlayerModel == 3349 || usPlayerModel == 3416 || usPlayerModel == 3429 ||
+         usPlayerModel == 3610 || usPlayerModel == 3611 || usPlayerModel == 3784 || usPlayerModel == 3870 || usPlayerModel == 3871 ||
+         usPlayerModel == 3883 || usPlayerModel == 3889 || usPlayerModel == 3974 || ( usPlayerModel >= 4542 && usPlayerModel <= 4549 ) ||
+         usPlayerModel == 5090 || usPlayerModel == 5104 || ( usPlayerModel >= 3136 && usPlayerModel <= 3166 ) ||
+         ( usPlayerModel >= 3194 && usPlayerModel <= 3213 ) || ( usPlayerModel >= 3222 && usPlayerModel <= 3240 ) ||
+         ( usPlayerModel >= 4763 && usPlayerModel <= 4805 ) || ( usPlayerModel >= 5376 && usPlayerModel <= 5389 )
+        );
 }
 
 

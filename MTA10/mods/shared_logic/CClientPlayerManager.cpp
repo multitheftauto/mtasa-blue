@@ -188,23 +188,21 @@ bool CClientPlayerManager::IsPlayerLimitReached ( void )
 
 bool CClientPlayerManager::IsValidModel ( unsigned long ulModel )
 {
-    return ( ulModel == 0 ||
-             ulModel == 1 ||
-             ulModel == 2 ||
-             ulModel == 7 ||
-             ulModel >= 9 &&
-             ulModel != 208 &&
-             ulModel != 149 &&
-             ulModel != 119 &&
-             ulModel != 86 &&
-             ulModel != 74 &&
-             ulModel != 65 &&
-             ulModel != 42 &&
-             ulModel <= 272 ||
-             ulModel >= 274 &&
-             ulModel <= 288 ||
-             ulModel >= 290 &&
-             ulModel <= 312 );
+    return ( ( ulModel >= 0 && ulModel <= 312 ) || ulModel == 329 || ulModel == 340 || ulModel == 382 ||
+         ulModel == 383 || ulModel == 398 || ulModel == 399 || ( ulModel >= 612 &&  ulModel <= 614 ) ||
+         ulModel == 662 || ulModel == 663 || ( ulModel >= 665 && ulModel <= 699 ) ||
+         ( ulModel >= 793 && ulModel <= 799 ) || ( ulModel >= 907 && ulModel <= 909 ) || 
+         ulModel == 965 || ulModel == 999 || ( ulModel >= 1194 && ulModel <= 1206 ) ||
+         ulModel == 1326 || ulModel == 1573 || ulModel == 1699 || ulModel == 2883 || ulModel == 2884 ||
+         ( ulModel >= 3176 && ulModel <= 3197 ) || ( ulModel >= 3215 && ulModel <= 3220 ) ||
+         ulModel == 3245 || ulModel == 3247 || ulModel == 3248 || ulModel == 3251 || ulModel == 3254 ||
+         ulModel == 3266 || ulModel == 3348 || ulModel == 3349 || ulModel == 3416 || ulModel == 3429 ||
+         ulModel == 3610 || ulModel == 3611 || ulModel == 3784 || ulModel == 3870 || ulModel == 3871 ||
+         ulModel == 3883 || ulModel == 3889 || ulModel == 3974 || ( ulModel >= 4542 && ulModel <= 4549 ) ||
+         ulModel == 5090 || ulModel == 5104 || ( ulModel >= 3136 && ulModel <= 3166 ) ||
+         ( ulModel >= 3194 && ulModel <= 3213 ) || ( ulModel >= 3222 && ulModel <= 3240 ) ||
+         ( ulModel >= 4763 && ulModel <= 4805 ) || ( ulModel >= 5376 && ulModel <= 5389 )
+        );
 }
 
 void CClientPlayerManager::ResetAll ( void )
