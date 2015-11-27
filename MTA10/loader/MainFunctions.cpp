@@ -327,13 +327,12 @@ void HandleResetSettings ( void )
 // HandleNotUsedMainMenu
 //
 // Called when a problem occured before the main menu was used by user
-// If Win10 and fullscreen, then maybe change fullscreen mode
+// If fullscreen, then maybe change fullscreen mode
 //
 //////////////////////////////////////////////////////////
 void HandleNotUsedMainMenu ( void )
 {
     AddReportLog( 9310, "Loader - HandleNotUsedMainMenu" );
-    if ( IsWindows10OrGreater() )
     {
         // Slighty hacky way of checking in-game settings
         SString strCoreConfigFilename = CalcMTASAPath( PathJoin( "mta", "config", "coreconfig.xml" ) );
