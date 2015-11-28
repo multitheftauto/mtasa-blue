@@ -1,4 +1,4 @@
-Multi Theft Auto: San Andreas  
+Multi Theft Auto: San Andreas
 -----------------------------
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
