@@ -630,7 +630,7 @@ void CCore::SetConnected ( bool bConnected )
 
 bool CCore::IsConnected ( void )
 {
-    return m_pLocalGUI->GetMainMenu ( )->GetIsIngame ();
+    return m_pLocalGUI->GetMainMenu() && m_pLocalGUI->GetMainMenu ( )->GetIsIngame ();
 }
 
 
