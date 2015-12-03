@@ -40,7 +40,7 @@
 #
 # The below requirements must be met to build this CEF binary distribution.
 #
-# - CMake version 2.8.12.2 or newer.
+# - CMake version 2.8.12.1 or newer.
 #
 # - Linux requirements:
 #   Currently supported distributions include Debian Wheezy, Ubuntu Precise, and
@@ -121,7 +121,7 @@
 # Shared configuration.
 #
 
-cmake_minimum_required(VERSION 2.8.12.2)
+cmake_minimum_required(VERSION 2.8.12.1)
 
 # Only generate Debug and Release configuration types.
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
@@ -278,7 +278,6 @@ if(OS_LINUX)
   # List of CEF binary files.
   set(CEF_BINARY_FILES
     chrome-sandbox
-    libffmpegsumo.so
     libcef.so
     natives_blob.bin
     snapshot_blob.bin
@@ -289,6 +288,7 @@ if(OS_LINUX)
     cef.pak
     cef_100_percent.pak
     cef_200_percent.pak
+    cef_extensions.pak
     devtools_resources.pak
     icudtl.dat
     locales
@@ -437,7 +437,6 @@ if(OS_WINDOWS)
   set(CEF_BINARY_FILES
     d3dcompiler_43.dll
     d3dcompiler_47.dll
-    ffmpegsumo.dll
     libcef.dll
     libEGL.dll
     libGLESv2.dll
@@ -457,6 +456,7 @@ if(OS_WINDOWS)
     cef.pak
     cef_100_percent.pak
     cef_200_percent.pak
+    cef_extensions.pak
     devtools_resources.pak
     icudtl.dat
     locales
