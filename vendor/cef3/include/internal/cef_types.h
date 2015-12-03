@@ -218,14 +218,24 @@ typedef struct _cef_settings_t {
   ///
   // To persist session cookies (cookies without an expiry date or validity
   // interval) by default when using the global cookie manager set this value to
-  // true. Session cookies are generally intended to be transient and most Web
-  // browsers do not persist them. A |cache_path| value must also be specified
-  // to enable this feature. Also configurable using the
+  // true (1). Session cookies are generally intended to be transient and most
+  // Web browsers do not persist them. A |cache_path| value must also be
+  // specified to enable this feature. Also configurable using the
   // "persist-session-cookies" command-line switch. Can be overridden for
   // individual CefRequestContext instances via the
   // CefRequestContextSettings.persist_session_cookies value.
   ///
   int persist_session_cookies;
+
+  ///
+  // To persist user preferences as a JSON file in the cache path directory set
+  // this value to true (1). A |cache_path| value must also be specified
+  // to enable this feature. Also configurable using the
+  // "persist-user-preferences" command-line switch. Can be overridden for
+  // individual CefRequestContext instances via the
+  // CefRequestContextSettings.persist_user_preferences value.
+  ///
+  int persist_user_preferences;
 
   ///
   // Value that will be returned as the User-Agent HTTP header. If empty the
@@ -252,10 +262,12 @@ typedef struct _cef_settings_t {
   cef_string_t locale;
 
   ///
-  // The directory and file name to use for the debug log. If empty, the
-  // default name of "debug.log" will be used and the file will be written
-  // to the application directory. Also configurable using the "log-file"
-  // command-line switch.
+  // The directory and file name to use for the debug log. If empty a default
+  // log file name and location will be used. On Windows and Linux a "debug.log"
+  // file will be written in the main executable directory. On Mac OS X a
+  // "~/Library/Logs/<app name>_debug.log" file will be written where <app name>
+  // is the name of the main app executable. Also configurable using the
+  // "log-file" command-line switch.
   ///
   cef_string_t log_file;
 
@@ -394,12 +406,20 @@ typedef struct _cef_request_context_settings_t {
   ///
   // To persist session cookies (cookies without an expiry date or validity
   // interval) by default when using the global cookie manager set this value to
-  // true. Session cookies are generally intended to be transient and most Web
-  // browsers do not persist them. Can be set globally using the
+  // true (1). Session cookies are generally intended to be transient and most
+  // Web browsers do not persist them. Can be set globally using the
   // CefSettings.persist_session_cookies value. This value will be ignored if
   // |cache_path| is empty or if it matches the CefSettings.cache_path value.
   ///
   int persist_session_cookies;
+
+  ///
+  // To persist user preferences as a JSON file in the cache path directory set
+  // this value to true (1). Can be set globally using the
+  // CefSettings.persist_user_preferences value. This value will be ignored if
+  // |cache_path| is empty or if it matches the CefSettings.cache_path value.
+  ///
+  int persist_user_preferences;
 
   ///
   // Set to true (1) to ignore errors related to invalid SSL certificates.
@@ -512,12 +532,6 @@ typedef struct _cef_browser_settings_t {
   // the "enable-caret-browsing" command-line switch.
   ///
   cef_state_t caret_browsing;
-
-  ///
-  // Controls whether the Java plugin will be loaded. Also configurable using
-  // the "disable-java" command-line switch.
-  ///
-  cef_state_t java;
 
   ///
   // Controls whether any plugins will be loaded. Also configurable using the
@@ -1150,11 +1164,6 @@ typedef enum {
   // If set upload progress events will be generated when a request has a body.
   ///
   UR_FLAG_REPORT_UPLOAD_PROGRESS    = 1 << 3,
-
-  ///
-  // If set the headers sent and received for the request will be recorded.
-  ///
-  UR_FLAG_REPORT_RAW_HEADERS        = 1 << 5,
 
   ///
   // If set the CefURLRequestClient::OnDownloadData method will not be called.
