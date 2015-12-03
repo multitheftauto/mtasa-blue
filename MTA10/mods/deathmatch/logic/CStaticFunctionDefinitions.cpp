@@ -328,6 +328,28 @@ bool CStaticFunctionDefinitions::ShowChat ( bool bShow )
 }
 
 
+bool CStaticFunctionDefinitions::SetWindowFlashing ( bool flash, uint count )
+{
+    // Don't flash if the window is active
+    if ( g_pCore->IsFocused () || !g_pCore->GetCVars ()->GetValue < bool > ( "server-can-flash-window", true ) )
+        return false;
+
+    // 0 is infinite flashing
+    if ( count == 0 )
+        return false;
+
+    FLASHWINFO flashInfo;
+    flashInfo.cbSize = sizeof(FLASHWINFO);
+    flashInfo.hwnd = g_pCore->GetHookedWindow ();
+    flashInfo.dwTimeout = 0;
+    flashInfo.uCount = count;
+    flashInfo.dwFlags = flash ? (FLASHW_ALL | FLASHW_TIMERNOFG) : FLASHW_STOP;
+    ::FlashWindowEx ( &flashInfo );
+
+    return true;
+}
+
+
 CClientEntity* CStaticFunctionDefinitions::GetRootElement ( void )
 {
     return m_pRootEntity;
