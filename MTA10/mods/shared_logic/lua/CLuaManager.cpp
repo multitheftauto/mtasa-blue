@@ -252,6 +252,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefs::OutputClientDebugString );
     CLuaCFunctions::AddFunction ( "setClipboard", CLuaFunctionDefs::SetClipboard );
     //CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
+    CLuaCFunctions::AddFunction ( "setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing );
 
     // Element get funcs
     CLuaCFunctions::AddFunction ( "getRootElement", CLuaFunctionDefs::GetRootElement );

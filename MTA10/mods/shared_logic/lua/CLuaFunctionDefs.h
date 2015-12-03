@@ -111,6 +111,7 @@ public:
     LUA_DECLARE ( OutputClientDebugString );
     LUA_DECLARE ( SetClipboard );
     LUA_DECLARE ( GetClipboard );
+    LUA_DECLARE ( SetWindowFlashing );
 
     // Element get functions
     LUA_DECLARE ( GetRootElement );
