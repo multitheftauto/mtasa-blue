@@ -1142,7 +1142,7 @@ void CSettings::CreateGUI ( void )
         m_pChatNickCompletion->GetPosition ( vecTemp );
         m_pChatNickCompletion->AutoSize ( NULL, 20.0f );
 
-        m_pFlashWindow = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabInterface, _("Server can flash the window") ) );
+        m_pFlashWindow = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabInterface, _("Allow server to flash the window") ) );
         m_pFlashWindow->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
         m_pFlashWindow->GetPosition ( vecTemp );
         m_pFlashWindow->AutoSize ( NULL, 20.0f );
@@ -2981,7 +2981,7 @@ void CSettings::LoadData ( void )
         CVARS_GET ( "chat_line_fade_out", iVar ); 
         SetMilliseconds ( m_pChatLineFadeout, iVar );
     }
-    CVARS_GET ( "server-can-flash-window", bVar ); m_pFlashWindow->SetSelected ( bVar );
+    CVARS_GET ( "server_can_flash_window", bVar ); m_pFlashWindow->SetSelected ( bVar );
 
     // Browser
     CVARS_GET ( "browser_remote_websites", bVar ); m_pCheckBoxRemoteBrowser->SetSelected ( bVar );
@@ -3262,7 +3262,7 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "chat_nickcompletion", m_pChatNickCompletion->GetSelected () );
     CVARS_SET ( "chat_line_life", GetMilliseconds ( m_pChatLineLife ) );
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
-    CVARS_SET ( "server-can-flash-window", m_pFlashWindow->GetSelected () );
+    CVARS_SET ( "server_can_flash_window", m_pFlashWindow->GetSelected () );
 
     // Set our new skin last, as it'll destroy all our GUI
     pItem = m_pInterfaceSkinSelector->GetSelectedItem ();
