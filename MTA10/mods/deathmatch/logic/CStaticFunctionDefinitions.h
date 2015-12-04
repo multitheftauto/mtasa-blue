@@ -55,7 +55,7 @@ public:
     static bool                         ShowChat                            ( bool bShow );
     static bool                         SetClipboard                        ( SString& strText );
     static bool                         GetClipboard                        ( SString& strText );
-    static bool                         SetWindowFlashing                   ( bool flash, uint count = 10 );
+    static bool                         SetWindowFlashing                   ( bool flash, uint count );
 
     // Element get funcs
     static CClientEntity*               GetRootElement                      ( void );
