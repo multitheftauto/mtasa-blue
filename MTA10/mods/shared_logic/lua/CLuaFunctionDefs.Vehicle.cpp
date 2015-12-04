@@ -2063,11 +2063,10 @@ int CLuaFunctionDefs::SetTrainTrack ( lua_State* luaVM )
                 return 1;
             }
         }
-        m_pScriptDebugging->LogCustom ( luaVM, "track number should be between 0 and 3 inclusive" );
+        argStream.SetCustomError ( "track number should be between 0 and 3 inclusive" );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
+    
+    m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
