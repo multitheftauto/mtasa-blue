@@ -2777,7 +2777,7 @@ int CLuaVehicleDefs::SetTrainTrack ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( ( ucTrack >= 0 ) && ( ucTrack <= 3 ) ) {
+        if ( ( ucTrack <= 3 ) ) {
             if ( CStaticFunctionDefinitions::SetTrainTrack ( pVehicle, ucTrack ) )
             {
                 lua_pushboolean ( luaVM, true );
