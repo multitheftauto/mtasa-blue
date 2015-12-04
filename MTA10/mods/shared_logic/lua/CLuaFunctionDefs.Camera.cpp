@@ -172,30 +172,33 @@ int CLuaFunctionDefs::SetCameraFieldOfView ( lua_State* luaVM )
 
     argStream.ReadEnumString ( eMode );
     argStream.ReadNumber ( fFOV );
-
-    if ( fFOV < 0 || fFOV > 179 )
-        argStream.SetCustomError ( "Outside 0-179 boundaries" );
-
+    
     if ( !argStream.HasErrors () )
     {
-        if (eMode == FOV_MODE_PLAYER)
-            g_pGame->GetSettings ()->SetFieldOfViewPlayer ( fFOV );
-        else if ( eMode == FOV_MODE_VEHICLE )
-            g_pGame->GetSettings ()->SetFieldOfViewVehicle ( fFOV );
-        else if ( eMode == FOV_MODE_VEHICLE_MAX )
-            g_pGame->GetSettings ()->SetFieldOfViewVehicleMax ( fFOV );
-        else {
-            argStream.m_iIndex = 1;
-            m_pScriptDebugging->LogCustom ( luaVM, SString("Enum not yet implemented: " + EnumToString ( eMode )) );
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        while (true) {
+            if ( fFOV < 0 || fFOV > 179 ) {
+                argStream.SetCustomError ( "FOV is outside the 0-179 boundary" );
+                break;
+            }
 
+            if (eMode == FOV_MODE_PLAYER)
+                g_pGame->GetSettings ()->SetFieldOfViewPlayer ( fFOV );
+            else if ( eMode == FOV_MODE_VEHICLE )
+                g_pGame->GetSettings ()->SetFieldOfViewVehicle ( fFOV );
+            else if ( eMode == FOV_MODE_VEHICLE_MAX )
+                g_pGame->GetSettings ()->SetFieldOfViewVehicleMax ( fFOV );
+            else {
+                argStream.m_iIndex = 1;
+                argStream.SetCustomError( SString( "Enum not yet implemented: " + EnumToString ( eMode ) ) );
+                break;
+            }
+
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }        
+    }
+
+    m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
