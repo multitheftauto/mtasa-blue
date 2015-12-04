@@ -334,10 +334,6 @@ bool CStaticFunctionDefinitions::SetWindowFlashing ( bool flash, uint count )
     if ( g_pCore->IsFocused () || !g_pCore->GetCVars ()->GetValue < bool > ( "server-can-flash-window", true ) )
         return false;
 
-    // 0 is infinite flashing
-    if ( count == 0 )
-        return false;
-
     FLASHWINFO flashInfo;
     flashInfo.cbSize = sizeof(FLASHWINFO);
     flashInfo.hwnd = g_pCore->GetHookedWindow ();
