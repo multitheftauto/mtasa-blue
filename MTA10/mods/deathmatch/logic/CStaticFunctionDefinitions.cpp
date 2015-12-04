@@ -3211,7 +3211,7 @@ bool CStaticFunctionDefinitions::SetTrainPosition ( CClientVehicle& Vehicle, flo
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
 
-    Vehicle.SetTrainPosition ( fPosition );
+    Vehicle.SetTrainPosition ( fPosition, false );
     return true;
 }
 
