@@ -177,7 +177,7 @@ int CLuaFunctionDefs::SetCameraFieldOfView ( lua_State* luaVM )
     {
         while (true) {
             if ( fFOV < 0 || fFOV > 179 ) {
-                argStream.SetCustomError ( "FOV is outside the 0-179 boundary" );
+                argStream.SetCustomError ( "Invalid FOV range (0-179)" );
                 break;
             }
 
@@ -231,6 +231,7 @@ int CLuaFunctionDefs::GetCameraFieldOfView ( lua_State* luaVM )
         return 1;
     }
     
+    m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
