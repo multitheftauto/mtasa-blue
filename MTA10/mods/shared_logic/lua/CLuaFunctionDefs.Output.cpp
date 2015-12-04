@@ -200,7 +200,7 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
 int CLuaFunctionDefs::SetWindowFlashing ( lua_State* luaVM )
 {
 //  bool setWindowFlashing ( bool flash [, int count = 10 ] )
-    bool flash; int count;
+    bool flash; uint count;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadBool ( flash );
@@ -208,14 +208,12 @@ int CLuaFunctionDefs::SetWindowFlashing ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if (count > 0) {
-            lua_pushboolean ( luaVM, CStaticFunctionDefinitions::SetWindowFlashing ( flash, count ) );
-            return 1;
-        } else
-            argStream.SetCustomError ( "'count' should be greater than 0" );
+        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::SetWindowFlashing ( flash, count ) );
+        return 1;
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
-    m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     lua_pushboolean ( luaVM, false );
     return 1;
 }
