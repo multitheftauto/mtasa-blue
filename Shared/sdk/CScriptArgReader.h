@@ -42,21 +42,27 @@ public:
     //
     // Read next number
     //
-    template < class T >
+    template < typename T >
     void ReadNumber ( T& outValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
         {
-            lua_Number number = lua_tonumber(m_luaVM, m_iIndex++);
+            lua_Number number = lua_tonumber ( m_luaVM, m_iIndex++ );
 
-            if (std::isnan(number))
+            if ( std::isnan( number ) )
             {
-                SetCustomError("Expected number, got NaN", "Bad argument");
+                SetCustomError ( "Expected number, got NaN", "Bad argument" );
                 return;
             }
 
-            outValue = static_cast < T > (number);
+            if ( std::is_unsigned < T > () && number < 0.0 )
+            {
+                SetCustomError ( "Expected positive value, got negative", "Bad argument" );
+                return;
+            }
+
+            outValue = static_cast < T > ( number );
             return;
         }
 
@@ -68,17 +74,23 @@ public:
     //
     // Read next number, using default if needed
     //
-    template < class T, class U >
+    template < typename T, typename U >
     void ReadNumber ( T& outValue, const U& defaultValue )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
         {
-            lua_Number number = lua_tonumber(m_luaVM, m_iIndex++);
+            lua_Number number = lua_tonumber ( m_luaVM, m_iIndex++ );
 
-            if (std::isnan(number))
+            if ( std::isnan ( number ) )
             {
-                SetCustomError("Expected number, got NaN", "Bad argument");
+                SetCustomError ( "Expected number, got NaN", "Bad argument" );
+                return;
+            }
+
+            if ( std::is_unsigned < T > () && number < 0.0 )
+            {
+                SetCustomError ( "Expected positive value, got negative", "Bad argument" );
                 return;
             }
 
