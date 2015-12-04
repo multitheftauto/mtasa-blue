@@ -331,7 +331,7 @@ bool CStaticFunctionDefinitions::ShowChat ( bool bShow )
 bool CStaticFunctionDefinitions::SetWindowFlashing ( bool flash, uint count )
 {
     // Don't flash if the window is active
-    if ( g_pCore->IsFocused () || !g_pCore->GetCVars ()->GetValue < bool > ( "server-can-flash-window", true ) )
+    if ( g_pCore->IsFocused () || !g_pCore->GetCVars ()->GetValue < bool > ( "server_can_flash_window", true ) )
         return false;
 
     FLASHWINFO flashInfo;
