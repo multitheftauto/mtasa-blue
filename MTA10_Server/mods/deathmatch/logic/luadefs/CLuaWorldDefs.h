@@ -52,6 +52,7 @@ public:
     LUA_DECLARE ( setOcclusionsEnabled );
     LUA_DECLARE ( getOcclusionsEnabled );
     LUA_DECLARE ( getMoonSize );
+    LUA_DECLARE ( getNonHighwayLimiterEnabled );
 
     // Set
     LUA_DECLARE ( setTime );
@@ -82,6 +83,7 @@ public:
     LUA_DECLARE ( setPedTargetingMarkerEnabled );
     LUA_DECLARE ( isPedTargetingMarkerEnabled );
     LUA_DECLARE ( setMoonSize );
+    LUA_DECLARE ( setNonHighwayLimiterEnabled );
 
     // Reset
     LUA_DECLARE ( resetSkyGradient );

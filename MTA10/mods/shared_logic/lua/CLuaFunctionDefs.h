@@ -867,6 +867,8 @@ public:
     LUA_DECLARE ( SetFPSLimit );
     LUA_DECLARE ( GetFPSLimit );
     LUA_DECLARE ( FetchRemote );
+    LUA_DECLARE ( SetNonHighwayLimiterEnabled );
+    LUA_DECLARE ( GetNonHighwayLimiterEnabled );
 
     // Input functions
     LUA_DECLARE ( BindKey );
