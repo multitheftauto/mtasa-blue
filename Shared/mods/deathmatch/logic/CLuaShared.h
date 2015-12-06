@@ -6,5 +6,10 @@
 *  FILE:        mods/shared_logic/CLuaShared.h
 *
 *****************************************************************************/
-
-void        EmbedChunkName          ( SString strChunkName, const char** pcpOutBuffer, uint* puiOutSize );
+#pragma once
+static class CLuaShared
+{
+public:
+    static void        EmbedChunkName          ( SString strChunkName, const char** pcpOutBuffer, uint* puiOutSize );
+    static bool        CheckUTF8BOMAndUpdate ( const char** pcpOutBuffer, uint* puiOutSize );
+};

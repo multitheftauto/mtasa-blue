@@ -10,7 +10,7 @@
 #include "StdInc.h"
 
 // If compiled script, make sure correct chunkname is embedded
-void EmbedChunkName( SString strChunkName, const char** pcpOutBuffer, uint* puiOutSize )
+void CLuaShared::EmbedChunkName( SString strChunkName, const char** pcpOutBuffer, uint* puiOutSize )
 {
     const char*& cpBuffer = *pcpOutBuffer;
     uint& uiSize = *puiOutSize;
@@ -47,4 +47,27 @@ void EmbedChunkName( SString strChunkName, const char** pcpOutBuffer, uint* puiO
 
     cpBuffer = store.GetData();
     uiSize = store.GetSize();
+}
+
+bool CLuaShared::CheckUTF8BOMAndUpdate ( const char ** pcpOutBuffer, uint * puiOutSize )
+{
+    const char*& cpBuffer = *pcpOutBuffer;
+    uint& uiSize = *puiOutSize;
+    bool bUTF8;
+
+    // UTF-8 BOM?  Compare by checking the standard UTF-8 BOM
+    if ( IsUTF8BOM ( cpBuffer, uiSize ) )
+    {
+        // If there's a BOM, load ignoring the first 3 bytes
+        bUTF8 = true;
+        cpBuffer += 3;
+        uiSize -= 3;
+    }
+    else
+    {
+        // Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
+        bUTF8 = ( GetUTF8Confidence ( (const unsigned char*) cpBuffer, uiSize ) >= 80 );
+    }
+
+    return bUTF8;
 }
