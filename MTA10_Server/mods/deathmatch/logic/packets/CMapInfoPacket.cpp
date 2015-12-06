@@ -219,7 +219,7 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
     }
 
     // Non-Highway Speed Limiter
-    if ( BitStream.Version () >= 0x045 )
+    if ( BitStream.Version () >= 0x065 )
         BitStream.WriteBit ( m_bNonHighwayLimiterEnabled );
 
     // Interior sounds

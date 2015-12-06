@@ -2269,7 +2269,7 @@ void CPacketHandler::Packet_MapInfo ( NetBitStreamInterface& bitStream )
 
     // Non-Highway Speed Limiter Enabled
     bool bNonHighwayLimiterEnabled = true;
-    if ( bitStream.Version () >= 0x045 )
+    if ( bitStream.Version () >= 0x065 )
     {
         if ( !bitStream.ReadBit ( bNonHighwayLimiterEnabled ) )
             return;
