@@ -441,6 +441,7 @@ int CLuaFunctionDefs::LoadString( lua_State* luaVM )
 
         if ( !argStream.HasErrors() )
         {
+            CLuaShared::CheckUTF8BOMAndUpdate ( &cpBuffer, &uiSize );
             if ( !CLuaMain::LuaLoadBuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
             {
                 // Ok
@@ -513,6 +514,7 @@ int CLuaFunctionDefs::Load( lua_State* luaVM )
 
         if ( !argStream.HasErrors() )
         {
+            CLuaShared::CheckUTF8BOMAndUpdate ( &cpBuffer, &uiSize );
             if ( !CLuaMain::LuaLoadBuffer( luaVM, cpBuffer, uiSize, szChunkname ) )
             {
                 // Ok
