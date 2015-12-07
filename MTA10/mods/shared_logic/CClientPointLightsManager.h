@@ -42,6 +42,8 @@ public:
     void                                                    DoPulse                             ( void );
     void                                                    RenderHeliLightHandler              ( void );
 
+    static bool                                             IsLightsLimitReached                ();
+
 private:
 
     inline void                                             AddToList                           ( CClientPointLights* pLight )          { m_List.push_back ( pLight ); };
