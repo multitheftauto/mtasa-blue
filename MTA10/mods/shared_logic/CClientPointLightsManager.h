@@ -20,6 +20,7 @@ class CClientPointLightsManager
 {
     friend class CClientManager;
     friend class CClientPointLights;
+    friend class CClientSearchLight;
 
 public:
                                                             CClientPointLightsManager           ( CClientManager* pManager );
@@ -39,16 +40,21 @@ public:
     void                                                    SetDimension                        ( unsigned short usDimension );
 
     void                                                    DoPulse                             ( void );
+    void                                                    RenderHeliLightHandler              ( void );
 
 private:
 
     inline void                                             AddToList                           ( CClientPointLights* pLight )          { m_List.push_back ( pLight ); };
     void                                                    RemoveFromList                      ( CClientPointLights* pLight );
 
+    inline void                                             AddToSearchLightList                ( CClientSearchLight* pLight )          { m_SearchLightList.push_back ( pLight ); }
+    void                                                    RemoveSearchLightFromList           ( CClientSearchLight* pLight );
+
 private:
     CClientManager*                                         m_pManager;
 
     std::list < CClientPointLights* >                       m_List;
+    std::list < CClientSearchLight* >                       m_SearchLightList;
     bool                                                    m_bDontRemoveFromList;
     unsigned short                                          m_usDimension;
 

@@ -24,6 +24,7 @@ class CPointLights
 {
 public:
     virtual void                        AddLight                ( int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SColor color, unsigned char uc_8, bool bCreatesShadow, CEntity * pAffected ) = 0;
+    virtual void                        RenderHeliLight         ( const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot ) = 0;
 };
 
 #endif

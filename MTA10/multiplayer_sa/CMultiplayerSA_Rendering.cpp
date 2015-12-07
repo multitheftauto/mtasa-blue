@@ -10,8 +10,9 @@
 
 #include "StdInc.h"
 extern CCoreInterface* g_pCore;
-GameEntityRenderHandler* pGameEntityRenderHandler = NULL;
-PreRenderSkyHandler* pPreRenderSkyHandlerHandler = NULL;
+GameEntityRenderHandler* pGameEntityRenderHandler = nullptr;
+PreRenderSkyHandler* pPreRenderSkyHandlerHandler = nullptr;
+RenderHeliLightHandler* pRenderHeliLightHandler = nullptr;
 
 #define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
 #define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
@@ -487,6 +488,34 @@ void _declspec(naked) HOOK_RwCameraSetNearClipPlane ()
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Rendering heli search lights (in RenderEffects at 0x53E170)
+//
+// Render our own heli search lights (we have to do that here as 
+// it requires some render states
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// Hook info
+#define HOOKPOS_RenderEffects_HeliLight                           0x53E1B9
+#define HOOKSIZE_RenderEffects_HeliLight                          5
+DWORD RETURN_RenderEffects_HeliLight =                            0x53E1BE;
+void _declspec(naked) HOOK_RenderEffects_HeliLight ()
+{
+    _asm pushad
+
+    // Call render handler
+    if ( pRenderHeliLightHandler )
+        pRenderHeliLightHandler ();
+
+    _asm
+    {
+        popad
+        mov     eax, ds:[0xC1C96C]
+        jmp     RETURN_RenderEffects_HeliLight
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -509,6 +538,18 @@ void CMultiplayerSA::SetGameEntityRenderHandler ( GameEntityRenderHandler * pHan
 void CMultiplayerSA::SetPreRenderSkyHandler ( PreRenderSkyHandler * pHandler )
 {
     pPreRenderSkyHandlerHandler = pHandler;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::SetRenderHeliLightHandler
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetRenderHeliLightHandler ( RenderHeliLightHandler* pHandler )
+{
+    pRenderHeliLightHandler = pHandler;
 }
 
 
@@ -578,4 +619,5 @@ void CMultiplayerSA::InitHooks_Rendering ( void )
     EZHookInstall ( psGrabScreen );
     EZHookInstallChecked ( CClouds_RenderSkyPolys );
     EZHookInstallChecked ( RwCameraSetNearClipPlane );
+    EZHookInstall ( RenderEffects_HeliLight );
 }

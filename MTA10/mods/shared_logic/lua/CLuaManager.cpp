@@ -611,6 +611,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getLightDirection", CLuaFunctionDefs::GetLightDirection );
     CLuaCFunctions::AddFunction ( "setLightDirection", CLuaFunctionDefs::SetLightDirection );
 
+    // SearchLight funcs
+    CLuaCFunctions::AddFunction ( "createSearchLight", CLuaFunctionDefs::CreateSearchLight );
+
     // Engine funcs
     CLuaCFunctions::AddFunction ( "engineLoadTXD", CLuaFunctionDefs::EngineLoadTXD );
     CLuaCFunctions::AddFunction ( "engineLoadCOL", CLuaFunctionDefs::EngineLoadCOL );

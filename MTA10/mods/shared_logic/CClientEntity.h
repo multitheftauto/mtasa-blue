@@ -82,6 +82,7 @@ enum eClientEntityType
     CCLIENTSCREENSOURCE,
     CCLIENTRENDERTARGET,
     CCLIENTBROWSER,
+    CCLIENTSEARCHLIGHT,
     CCLIENTUNKNOWN,
 };
 
@@ -146,6 +147,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
     CLASS_CClientPointLights,
+    CLASS_CClientSearchLight
 };
 
 
