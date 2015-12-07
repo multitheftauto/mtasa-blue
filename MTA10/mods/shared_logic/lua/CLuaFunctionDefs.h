@@ -452,6 +452,9 @@ public:
     LUA_DECLARE ( SetLightColor );
     LUA_DECLARE ( SetLightDirection );
 
+    // SearchLight functions
+    LUA_DECLARE ( CreateSearchLight );
+
     // Audio funcs
     LUA_DECLARE ( PlaySoundFrontEnd );
     LUA_DECLARE ( SetAmbientSoundEnabled );

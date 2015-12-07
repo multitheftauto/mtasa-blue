@@ -323,6 +323,9 @@ public:
     static bool                         SetLightColor                       ( CClientPointLights* pLight, SColor color );
     static bool                         SetLightDirection                   ( CClientPointLights* pLight, CVector vecDirection );
 
+    // Search light funcs
+    static CClientSearchLight*          CreateSearchLight                   ( CResource& Resource, const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot );
+    
     // Audio funcs
     static bool                         PlaySoundFrontEnd                   ( unsigned char ucSound );
     static bool                         SetAmbientSoundEnabled              ( eAmbientSoundType eType, bool bMute );

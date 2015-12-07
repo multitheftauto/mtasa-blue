@@ -190,6 +190,7 @@ public:
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
     void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler );
+    void                        SetRenderHeliLightHandler   ( RenderHeliLightHandler* pHandler );
 
     void                        Reset                       ();
 

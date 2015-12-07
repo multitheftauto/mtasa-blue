@@ -56,6 +56,7 @@ typedef bool ( ProcessCamHandler ) ( class CCam* pCam );
 typedef void ( DrawRadarAreasHandler ) ( void );
 typedef void ( Render3DStuffHandler ) ( void );
 typedef void ( PreRenderSkyHandler ) ( void );
+typedef void ( RenderHeliLightHandler ) ( void );
 typedef bool ( ChokingHandler ) ( unsigned char ucWeaponType );
 typedef void ( PreWorldProcessHandler ) ( void );
 typedef void ( PostWorldProcessHandler ) ( void );
@@ -257,6 +258,7 @@ public:
     virtual void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler ) = 0;
     virtual void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler ) = 0;
     virtual void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler ) = 0;
+    virtual void                        SetRenderHeliLightHandler  ( RenderHeliLightHandler* pHandler ) = 0;
 
     virtual void                        Reset                       () = 0;
 

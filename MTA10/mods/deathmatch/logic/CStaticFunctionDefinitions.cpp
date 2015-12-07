@@ -8822,3 +8822,21 @@ bool CStaticFunctionDefinitions::SetLightDirection ( CClientPointLights* pLight,
     }
     return false;
 }
+
+
+CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight ( CResource& Resource, const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot )
+{
+    auto pLight = new CClientSearchLight ( m_pManager, INVALID_ELEMENT_ID );
+    if ( pLight )
+    {
+        pLight->SetParent ( Resource.GetResourceDynamicEntity () );
+        pLight->SetStartPosition ( vecStart );
+        pLight->SetEndPosition ( vecEnd );
+        pLight->SetStartRadius ( startRadius );
+        pLight->SetEndRadius ( endRadius );
+        pLight->SetRenderSpot ( renderSpot );
+        return pLight;
+    }
+
+    return nullptr;
+}

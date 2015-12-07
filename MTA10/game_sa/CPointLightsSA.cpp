@@ -40,3 +40,23 @@ void CPointLightsSA::AddLight ( int iMode, const CVector vecPosition, CVector ve
         add     esp, 56
     }
 }
+
+void CPointLightsSA::RenderHeliLight ( const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot )
+{
+    using CHeli_SearchLightCone_t = void(__cdecl *)(int handleId, CVector startPos, CVector endPos, float radius1, float unknownConstant,
+        int unkown1, bool renderSpot, CVector* unkown3, CVector* unkown4, CVector* unknown5, int unknown6, float radius2);
+    using CHeli_PreSearchLightCone_t = int(__cdecl *)();
+    using CHeli_PostSearchLightCone_t = int(__cdecl *)();
+
+    auto CHeli_SearchLightCone = (CHeli_SearchLightCone_t)FUNC_CHeli_SearchLightCone;
+    auto CHeli_PreSearchLightCone = (CHeli_PreSearchLightCone_t)FUNC_CHeli_Pre_SearchLightCone;
+    auto CHeli_PostSearchLightCone = (CHeli_PostSearchLightCone_t)FUNC_CHeli_Post_SearchLightCone;
+
+    // 3x3 translation matrix (initialised by the game)
+    CVector mat[] = { CVector(), CVector(), CVector() };
+
+    // Set render states and render
+    CHeli_PreSearchLightCone ();
+    CHeli_SearchLightCone ( 0, vecStart, vecEnd, endRadius, 1.0f, 0, renderSpot, &mat[0], &mat[1], &mat[2], 1, startRadius );
+    CHeli_PostSearchLightCone ();
+}

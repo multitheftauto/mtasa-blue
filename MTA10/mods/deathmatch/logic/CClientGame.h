@@ -499,6 +499,7 @@ private:
     static void                         StaticDrawRadarAreasHandler     ( void );
     static void                         StaticRender3DStuffHandler      ( void );
     static void                         StaticPreRenderSkyHandler       ( void );
+    static void                         StaticRenderHeliLightHandler    ( void );
     static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
     static void                         StaticPreWorldProcessHandler    ( void );
     static void                         StaticPostWorldProcessHandler   ( void );

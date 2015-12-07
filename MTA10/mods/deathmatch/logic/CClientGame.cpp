@@ -261,6 +261,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetProjectileHandler ( CClientProjectileManager::Hook_StaticProjectileCreation );
     g_pMultiplayer->SetRender3DStuffHandler ( CClientGame::StaticRender3DStuffHandler );
     g_pMultiplayer->SetPreRenderSkyHandler ( CClientGame::StaticPreRenderSkyHandler );
+    g_pMultiplayer->SetRenderHeliLightHandler ( CClientGame::StaticRenderHeliLightHandler );
     g_pMultiplayer->SetChokingHandler ( CClientGame::StaticChokingHandler );
     g_pMultiplayer->SetPreWorldProcessHandler ( CClientGame::StaticPreWorldProcessHandler );
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
@@ -416,6 +417,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetProjectileHandler ( NULL );
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetPreRenderSkyHandler ( NULL );
+    g_pMultiplayer->SetRenderHeliLightHandler ( nullptr );
     g_pMultiplayer->SetChokingHandler ( NULL );
     g_pMultiplayer->SetPreWorldProcessHandler (  NULL );
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
@@ -3652,6 +3654,11 @@ void CClientGame::StaticRender3DStuffHandler ( void )
 void CClientGame::StaticPreRenderSkyHandler ( void )
 {
     g_pClientGame->PreRenderSkyHandler ();
+}
+
+void CClientGame::StaticRenderHeliLightHandler ()
+{
+    g_pClientGame->GetManager ()->GetPointLightsManager ()->RenderHeliLightHandler ();
 }
 
 bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )

@@ -87,6 +87,7 @@ public:
     inline CClientDisplayManager*       GetDisplayManager           ( void )        { return m_pDisplayManager; }
     inline CClientVehicleManager*       GetVehicleManager           ( void )        { return m_pVehicleManager; }
     inline CClientStreamer*             GetVehicleStreamer          ( void )        { return m_pVehicleStreamer; }
+    inline CClientStreamer*             GetLightStreamer            ( void )        { return m_pLightStreamer; }
     inline CClientPedManager*           GetPedManager               ( void )        { return m_pPedManager; }
     inline CResourceManager*            GetResourceManager          ( void )        { return m_pResourceManager; }
     inline CClientColManager*           GetColManager               ( void )        { return m_pColManager; }
@@ -139,6 +140,7 @@ private:
     CClientDisplayManager*              m_pDisplayManager;
     CClientVehicleManager*              m_pVehicleManager;
     CClientStreamer*                    m_pVehicleStreamer;
+    CClientStreamer*                    m_pLightStreamer;
     CClientPedManager*                  m_pPedManager;
     CClientWaterManager*                m_pWaterManager;
     CResourceManager*                   m_pResourceManager;
