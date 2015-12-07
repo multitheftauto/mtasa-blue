@@ -20,8 +20,7 @@
 
 class CLuaFunctionDefinitions;
 
-#ifndef __CLUAFUNCTIONDEFINITIONS_H
-#define __CLUAFUNCTIONDEFINITIONS_H
+#pragma once
 
 #include "LuaCommon.h"
 #include "CLuaMain.h"
@@ -445,9 +444,6 @@ public:
     LUA_DECLARE ( SetLightRadius );
     LUA_DECLARE ( SetLightColor );
     LUA_DECLARE ( SetLightDirection );
-
-    // SearchLight functions
-    LUA_DECLARE ( CreateSearchLight );
 
     // Audio funcs
     LUA_DECLARE ( PlaySoundFrontEnd );
@@ -1075,5 +1071,3 @@ private:
     static CClientColModelManager*      m_pColModelManager;
     static CRegisteredCommands*         m_pRegisteredCommands;
 };
-
-#endif
