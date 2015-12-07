@@ -1192,10 +1192,6 @@ void CKeyBinds::CallGTAControlBind ( CGTAControlBind* pBind, bool bState )
 {
     if ( pBind )
     {
-        // HACK: temp fix for binds using mouse_wheel for zooming (the game seems to still do this itself)
-        if ( m_bMouseWheel && ( pBind->control->action == ZOOM_IN || pBind->control->action == ZOOM_OUT ) )
-            return;
-
         // Don't allow custom track skips. Crashes for some reason.
         if ( pBind->control->action == RADIO_USER_TRACK_SKIP )
             return;
