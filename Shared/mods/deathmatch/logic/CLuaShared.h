@@ -7,7 +7,7 @@
 *
 *****************************************************************************/
 #pragma once
-static class CLuaShared
+class CLuaShared
 {
 public:
     static void        EmbedChunkName          ( SString strChunkName, const char** pcpOutBuffer, uint* puiOutSize );
