@@ -1919,6 +1919,8 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddBrowserClass             ( luaVM );
     
     AddCameraClass              ( luaVM );
+
+    CLuaSearchLightDefs::AddClass ( luaVM );
 }
 
 void CLuaMain::InitVM ( void )

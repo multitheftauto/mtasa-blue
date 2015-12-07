@@ -935,11 +935,11 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.SearchLight.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\CClientSearchLight.cpp">
       <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1659,6 +1659,9 @@
     </ClInclude>
     <ClInclude Include="..\shared_logic\CClientSearchLight.h">
       <Filter>Header Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
