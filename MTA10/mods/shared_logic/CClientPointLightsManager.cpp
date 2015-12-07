@@ -104,10 +104,24 @@ void CClientPointLightsManager::DoPulse ( void )
 
 void CClientPointLightsManager::RenderHeliLightHandler ()
 {
+    // Set render states
+    auto pLights = g_pGame->GetPointLights ();
+    pLights->PreRenderHeliLights ();
+
+    // Render our lights
     for ( auto pLight : m_SearchLightList )
     {
         pLight->Render ();
     }
+
+    // Reset render states
+    pLights->PostRenderHeliLights ();
+}
+
+bool CClientPointLightsManager::IsLightsLimitReached ()
+{
+    auto pThis = g_pClientGame->GetManager ()->GetPointLightsManager ();
+    return pThis->m_SearchLightList.size () >= 1000;
 }
 
 void CClientPointLightsManager::RemoveFromList ( CClientPointLights* pLight )

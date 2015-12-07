@@ -26,7 +26,7 @@ CClientManager::CClientManager ( void )
     m_pPickupStreamer = new CClientStreamer ( CClientPickupManager::IsPickupLimitReached, 100.0f, 300, 300 );
     m_pPlayerStreamer = new CClientStreamer ( CClientPlayerManager::IsPlayerLimitReached, 250.0f, 300, 300 );
     m_pVehicleStreamer = new CClientStreamer ( CClientVehicleManager::IsVehicleLimitReached, 250.0f, 300, 300 );
-    m_pLightStreamer = new CClientStreamer ( []() -> bool { return false; }, 600.0f, 300, 300 );
+    m_pLightStreamer = new CClientStreamer ( CClientPointLightsManager::IsLightsLimitReached, 600.0f, 300, 300 );
     m_pModelRequestManager = new CClientModelRequestManager;
 
     m_pGUIManager = new CClientGUIManager;
