@@ -98,6 +98,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DisableSpecificWarnings>4290;4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>/Zm110 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <RegisterOutput>false</RegisterOutput>
@@ -136,6 +137,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>/Zm110 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -177,6 +179,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>/Zm110 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
