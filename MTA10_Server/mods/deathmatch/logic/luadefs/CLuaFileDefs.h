@@ -36,5 +36,4 @@ public:
     LUA_DECLARE ( fileDelete );
     LUA_DECLARE ( fileRename );
     LUA_DECLARE ( fileCopy );
-    LUA_DECLARE ( fileGetPath );
 };

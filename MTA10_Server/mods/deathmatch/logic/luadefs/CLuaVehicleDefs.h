@@ -61,8 +61,6 @@ public:
     LUA_DECLARE ( IsTrainDerailable );
     LUA_DECLARE ( GetTrainDirection );
     LUA_DECLARE ( GetTrainSpeed );
-    LUA_DECLARE ( GetTrainTrack );
-    LUA_DECLARE ( GetTrainPosition );
     LUA_DECLARE ( IsVehicleBlown );
     LUA_DECLARE ( GetVehicleHeadLightColor );
     LUA_DECLARE ( GetVehicleDoorOpenRatio );
@@ -107,8 +105,6 @@ public:
     LUA_DECLARE ( SetTrainDerailable );
     LUA_DECLARE ( SetTrainDirection );
     LUA_DECLARE ( SetTrainSpeed );
-    LUA_DECLARE ( SetTrainTrack );
-    LUA_DECLARE ( SetTrainPosition );
     LUA_DECLARE ( SetVehicleHeadLightColor );
     LUA_DECLARE ( SetVehicleTurretPosition );
     LUA_DECLARE ( SetVehicleDoorOpenRatio );

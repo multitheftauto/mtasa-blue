@@ -56,8 +56,6 @@ void CLuaVehicleDefs::LoadFunctions()
     CLuaCFunctions::AddFunction ( "isTrainDerailable", IsTrainDerailable );
     CLuaCFunctions::AddFunction ( "getTrainDirection", GetTrainDirection );
     CLuaCFunctions::AddFunction ( "getTrainSpeed", GetTrainSpeed );
-    CLuaCFunctions::AddFunction ( "getTrainTrack", GetTrainTrack );
-    CLuaCFunctions::AddFunction ( "getTrainPosition", GetTrainPosition );
     CLuaCFunctions::AddFunction ( "isVehicleBlown", IsVehicleBlown );
     CLuaCFunctions::AddFunction ( "getVehicleHeadLightColor", GetVehicleHeadLightColor );
     CLuaCFunctions::AddFunction ( "getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio );
@@ -101,8 +99,6 @@ void CLuaVehicleDefs::LoadFunctions()
     CLuaCFunctions::AddFunction ( "setTrainDerailable", SetTrainDerailable );
     CLuaCFunctions::AddFunction ( "setTrainDirection", SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", SetTrainSpeed );
-    CLuaCFunctions::AddFunction ( "setTrainTrack", SetTrainTrack );
-    CLuaCFunctions::AddFunction ( "setTrainPosition", SetTrainPosition );
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", SetVehicleHeadLightColor );
     CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", SetVehicleTurretPosition );
     CLuaCFunctions::AddFunction ( "setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio );
@@ -156,8 +152,6 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getSirens", "getVehicleSirens" );
     lua_classfunction ( luaVM, "getDirection", "getTrainDirection" );
     lua_classfunction ( luaVM, "getTrainSpeed", "getTrainSpeed" );
-    lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
-    lua_classfunction ( luaVM, "getTrainPosition", "getTrainPosition" );
     lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
     lua_classfunction ( luaVM, "getColor", "getVehicleColor" );
     lua_classfunction ( luaVM, "getCompatibleUpgrades", "getVehicleCompatibleUpgrades" );
@@ -215,8 +209,6 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setDerailable", "setTrainDerailable" );
     lua_classfunction ( luaVM, "setDerailed", "setTrainDerailed" );
     lua_classfunction ( luaVM, "setDirection", "setTrainDirection" );
-    lua_classfunction ( luaVM, "setTrack", "setTrainTrack" );
-    lua_classfunction ( luaVM, "setTrainPosition", "setTrainPosition" );
     lua_classfunction ( luaVM, "setTrainSpeed", "setTrainSpeed" ); // Reduce confusion
 
     lua_classvariable ( luaVM, "damageProof", "setVehicleDamageProof", "isVehicleDamageProof" );
@@ -226,8 +218,6 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "blown", "blowVehicle", "isVehicleBlown" );
     lua_classvariable ( luaVM, "direction", "setTrainDirection", "getTrainDirection" );
     lua_classvariable ( luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed" );
-    lua_classvariable ( luaVM, "track", "setTrainTrack", "getTrainTrack" );
-    lua_classvariable ( luaVM, "trainPosition", "getTrainPosition", "getTrainPosition" );
     lua_classvariable ( luaVM, "taxiLightOn", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn" );
     lua_classvariable ( luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable" );
     lua_classvariable ( luaVM, "plateText", "setVehiclePlateText", "getVehiclePlateText" );
@@ -1715,54 +1705,6 @@ int CLuaVehicleDefs::GetTrainSpeed ( lua_State* luaVM )
 }
 
 
-int CLuaVehicleDefs::GetTrainPosition ( lua_State* luaVM )
-{
-    CVehicle* pVehicle;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVehicle );
-
-    if ( !argStream.HasErrors () )
-    {
-        float fPosition;
-        if ( CStaticFunctionDefinitions::GetTrainPosition ( pVehicle, fPosition ) )
-        {
-            lua_pushnumber ( luaVM, fPosition );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaVehicleDefs::GetTrainTrack ( lua_State* luaVM )
-{
-    CVehicle* pVehicle;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVehicle );
-
-    if ( !argStream.HasErrors () )
-    {
-        uchar ucTrack;
-        if ( CStaticFunctionDefinitions::GetTrainTrack ( pVehicle, ucTrack ) )
-        {
-            lua_pushnumber ( luaVM, ucTrack );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaVehicleDefs::FixVehicle ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -2753,59 +2695,6 @@ int CLuaVehicleDefs::SetTrainSpeed ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         if ( CStaticFunctionDefinitions::SetTrainSpeed ( pVehicle, fSpeed ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaVehicleDefs::SetTrainTrack ( lua_State* luaVM )
-{
-    CVehicle* pVehicle;
-    uchar ucTrack;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVehicle );
-    argStream.ReadNumber ( ucTrack );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( ( ucTrack >= 0 ) && ( ucTrack <= 3 ) ) {
-            if ( CStaticFunctionDefinitions::SetTrainTrack ( pVehicle, ucTrack ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        m_pScriptDebugging->LogCustom ( luaVM, "track number should be between 0 and 3 inclusive" );
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
-int CLuaVehicleDefs::SetTrainPosition ( lua_State* luaVM )
-{
-    CVehicle* pVehicle;
-    float fPosition;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVehicle );
-    argStream.ReadNumber ( fPosition );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::SetTrainPosition ( pVehicle, fPosition ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
