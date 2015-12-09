@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CLuaSearchLightDefs.cpp
+*  FILE:        mods/shared_logic/luadefs/CLuaSearchLightDefs.cpp
 *  PURPOSE:     Lua searchlight class functions
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
