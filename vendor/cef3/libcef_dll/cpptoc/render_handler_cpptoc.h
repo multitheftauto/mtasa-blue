@@ -28,8 +28,9 @@ class CefRenderHandlerCppToC
     : public CefCppToC<CefRenderHandlerCppToC, CefRenderHandler,
         cef_render_handler_t> {
  public:
-  CefRenderHandlerCppToC();
+  explicit CefRenderHandlerCppToC(CefRenderHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_RENDER_HANDLER_CPPTOC_H_
+

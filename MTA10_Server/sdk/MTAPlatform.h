@@ -58,6 +58,9 @@ extern "C" bool g_bNoTopBar;
     #include <direct.h>
     #include <windows.h>
 
+    // Define functions
+    #define Print printf
+
     // Define types
     typedef int socklen_t;
 
@@ -91,6 +94,7 @@ extern "C" bool g_bNoTopBar;
     #endif
 
     #define MAX_PATH 255
+    #define Print printw
 
     #ifndef stricmp
     #define stricmp strcasecmp

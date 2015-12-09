@@ -27,8 +27,9 @@
 class CefV8HandlerCppToC
     : public CefCppToC<CefV8HandlerCppToC, CefV8Handler, cef_v8handler_t> {
  public:
-  CefV8HandlerCppToC();
+  explicit CefV8HandlerCppToC(CefV8Handler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_V8HANDLER_CPPTOC_H_
+

@@ -24,4 +24,3 @@
 #endif
 
 void WaitForKey ( int iKey );
-void Print ( const char* szFormat, ... );

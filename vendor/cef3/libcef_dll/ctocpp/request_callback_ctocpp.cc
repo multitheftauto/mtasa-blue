@@ -16,46 +16,29 @@
 // VIRTUAL METHODS - Body may be edited by hand.
 
 void CefRequestCallbackCToCpp::Continue(bool allow) {
-  cef_request_callback_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, cont))
+  if (CEF_MEMBER_MISSING(struct_, cont))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->cont(_struct,
+  struct_->cont(struct_,
       allow);
 }
 
 void CefRequestCallbackCToCpp::Cancel() {
-  cef_request_callback_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, cancel))
+  if (CEF_MEMBER_MISSING(struct_, cancel))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->cancel(_struct);
+  struct_->cancel(struct_);
 }
 
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefRequestCallbackCToCpp::CefRequestCallbackCToCpp() {
-}
-
-template<> cef_request_callback_t* CefCToCpp<CefRequestCallbackCToCpp,
-    CefRequestCallback, cef_request_callback_t>::UnwrapDerived(
-    CefWrapperType type, CefRequestCallback* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefRequestCallbackCToCpp,
     CefRequestCallback, cef_request_callback_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefRequestCallbackCToCpp,
-    CefRequestCallback, cef_request_callback_t>::kWrapperType =
-    WT_REQUEST_CALLBACK;

@@ -31,36 +31,33 @@ CefRefPtr<CefPostData> CefPostData::Create() {
 // VIRTUAL METHODS - Body may be edited by hand.
 
 bool CefPostDataCToCpp::IsReadOnly() {
-  cef_post_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_read_only))
+  if (CEF_MEMBER_MISSING(struct_, is_read_only))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_read_only(_struct);
+  int _retval = struct_->is_read_only(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 size_t CefPostDataCToCpp::GetElementCount() {
-  cef_post_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_element_count))
+  if (CEF_MEMBER_MISSING(struct_, get_element_count))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  size_t _retval = _struct->get_element_count(_struct);
+  size_t _retval = struct_->get_element_count(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 void CefPostDataCToCpp::GetElements(ElementVector& elements) {
-  cef_post_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_elements))
+  if (CEF_MEMBER_MISSING(struct_, get_elements))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -83,7 +80,7 @@ void CefPostDataCToCpp::GetElements(ElementVector& elements) {
   }
 
   // Execute
-  _struct->get_elements(_struct,
+  struct_->get_elements(struct_,
       &elementsCount,
       elementsList);
 
@@ -98,8 +95,7 @@ void CefPostDataCToCpp::GetElements(ElementVector& elements) {
 }
 
 bool CefPostDataCToCpp::RemoveElement(CefRefPtr<CefPostDataElement> element) {
-  cef_post_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, remove_element))
+  if (CEF_MEMBER_MISSING(struct_, remove_element))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -110,7 +106,7 @@ bool CefPostDataCToCpp::RemoveElement(CefRefPtr<CefPostDataElement> element) {
     return false;
 
   // Execute
-  int _retval = _struct->remove_element(_struct,
+  int _retval = struct_->remove_element(struct_,
       CefPostDataElementCToCpp::Unwrap(element));
 
   // Return type: bool
@@ -118,8 +114,7 @@ bool CefPostDataCToCpp::RemoveElement(CefRefPtr<CefPostDataElement> element) {
 }
 
 bool CefPostDataCToCpp::AddElement(CefRefPtr<CefPostDataElement> element) {
-  cef_post_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, add_element))
+  if (CEF_MEMBER_MISSING(struct_, add_element))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -130,7 +125,7 @@ bool CefPostDataCToCpp::AddElement(CefRefPtr<CefPostDataElement> element) {
     return false;
 
   // Execute
-  int _retval = _struct->add_element(_struct,
+  int _retval = struct_->add_element(struct_,
       CefPostDataElementCToCpp::Unwrap(element));
 
   // Return type: bool
@@ -138,32 +133,18 @@ bool CefPostDataCToCpp::AddElement(CefRefPtr<CefPostDataElement> element) {
 }
 
 void CefPostDataCToCpp::RemoveElements() {
-  cef_post_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, remove_elements))
+  if (CEF_MEMBER_MISSING(struct_, remove_elements))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->remove_elements(_struct);
+  struct_->remove_elements(struct_);
 }
 
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefPostDataCToCpp::CefPostDataCToCpp() {
-}
-
-template<> cef_post_data_t* CefCToCpp<CefPostDataCToCpp, CefPostData,
-    cef_post_data_t>::UnwrapDerived(CefWrapperType type, CefPostData* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefPostDataCToCpp, CefPostData,
     cef_post_data_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefPostDataCToCpp, CefPostData,
-    cef_post_data_t>::kWrapperType = WT_POST_DATA;

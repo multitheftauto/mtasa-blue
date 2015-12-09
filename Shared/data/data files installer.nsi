@@ -144,6 +144,7 @@ Section "Data files" SEC01
 	
 	File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\ffmpegsumo.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\wow_helper.exe"

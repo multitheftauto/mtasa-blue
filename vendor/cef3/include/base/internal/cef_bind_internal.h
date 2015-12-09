@@ -2554,27 +2554,22 @@ template <typename Runnable, typename RunType, typename BoundArgsType>
 struct BindState;
 
 template <typename Runnable, typename RunType>
-struct BindState<Runnable, RunType, void()> final : public BindStateBase {
+struct BindState<Runnable, RunType, void()> : public BindStateBase {
   typedef Runnable RunnableType;
   typedef false_type IsWeakCall;
   typedef Invoker<0, BindState, RunType> InvokerType;
   typedef typename InvokerType::UnboundRunType UnboundRunType;
   explicit BindState(const Runnable& runnable)
-      : BindStateBase(&Destroy),
-        runnable_(runnable) {
+      : runnable_(runnable) {
   }
 
-  ~BindState() {  }
-
-  static void Destroy(BindStateBase* self) {
-    delete static_cast<BindState*>(self);
-  }
+  virtual ~BindState() {  }
 
   RunnableType runnable_;
 };
 
 template <typename Runnable, typename RunType, typename P1>
-struct BindState<Runnable, RunType, void(P1)> final : public BindStateBase {
+struct BindState<Runnable, RunType, void(P1)> : public BindStateBase {
   typedef Runnable RunnableType;
   typedef IsWeakMethod<HasIsMethodTag<Runnable>::value, P1> IsWeakCall;
   typedef Invoker<1, BindState, RunType> InvokerType;
@@ -2584,25 +2579,20 @@ struct BindState<Runnable, RunType, void(P1)> final : public BindStateBase {
   typedef UnwrapTraits<P1> Bound1UnwrapTraits;
 
   BindState(const Runnable& runnable, const P1& p1)
-      : BindStateBase(&Destroy),
-        runnable_(runnable),
+      : runnable_(runnable),
         p1_(p1) {
     MaybeRefcount<HasIsMethodTag<Runnable>::value, P1>::AddRef(p1_);
   }
 
-  ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
+  virtual ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
       P1>::Release(p1_);  }
-
-  static void Destroy(BindStateBase* self) {
-    delete static_cast<BindState*>(self);
-  }
 
   RunnableType runnable_;
   P1 p1_;
 };
 
 template <typename Runnable, typename RunType, typename P1, typename P2>
-struct BindState<Runnable, RunType, void(P1, P2)> final : public BindStateBase {
+struct BindState<Runnable, RunType, void(P1, P2)> : public BindStateBase {
   typedef Runnable RunnableType;
   typedef IsWeakMethod<HasIsMethodTag<Runnable>::value, P1> IsWeakCall;
   typedef Invoker<2, BindState, RunType> InvokerType;
@@ -2613,19 +2603,14 @@ struct BindState<Runnable, RunType, void(P1, P2)> final : public BindStateBase {
   typedef UnwrapTraits<P2> Bound2UnwrapTraits;
 
   BindState(const Runnable& runnable, const P1& p1, const P2& p2)
-      : BindStateBase(&Destroy),
-        runnable_(runnable),
+      : runnable_(runnable),
         p1_(p1),
         p2_(p2) {
     MaybeRefcount<HasIsMethodTag<Runnable>::value, P1>::AddRef(p1_);
   }
 
-  ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
+  virtual ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
       P1>::Release(p1_);  }
-
-  static void Destroy(BindStateBase* self) {
-    delete static_cast<BindState*>(self);
-  }
 
   RunnableType runnable_;
   P1 p1_;
@@ -2634,8 +2619,7 @@ struct BindState<Runnable, RunType, void(P1, P2)> final : public BindStateBase {
 
 template <typename Runnable, typename RunType, typename P1, typename P2,
     typename P3>
-struct BindState<Runnable, RunType, void(P1, P2, P3)> final
-    : public BindStateBase {
+struct BindState<Runnable, RunType, void(P1, P2, P3)> : public BindStateBase {
   typedef Runnable RunnableType;
   typedef IsWeakMethod<HasIsMethodTag<Runnable>::value, P1> IsWeakCall;
   typedef Invoker<3, BindState, RunType> InvokerType;
@@ -2647,20 +2631,15 @@ struct BindState<Runnable, RunType, void(P1, P2, P3)> final
   typedef UnwrapTraits<P3> Bound3UnwrapTraits;
 
   BindState(const Runnable& runnable, const P1& p1, const P2& p2, const P3& p3)
-      : BindStateBase(&Destroy),
-        runnable_(runnable),
+      : runnable_(runnable),
         p1_(p1),
         p2_(p2),
         p3_(p3) {
     MaybeRefcount<HasIsMethodTag<Runnable>::value, P1>::AddRef(p1_);
   }
 
-  ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
+  virtual ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
       P1>::Release(p1_);  }
-
-  static void Destroy(BindStateBase* self) {
-    delete static_cast<BindState*>(self);
-  }
 
   RunnableType runnable_;
   P1 p1_;
@@ -2670,8 +2649,8 @@ struct BindState<Runnable, RunType, void(P1, P2, P3)> final
 
 template <typename Runnable, typename RunType, typename P1, typename P2,
     typename P3, typename P4>
-struct BindState<Runnable, RunType, void(P1, P2, P3, P4)> final
-    : public BindStateBase {
+struct BindState<Runnable, RunType, void(P1, P2, P3,
+    P4)> : public BindStateBase {
   typedef Runnable RunnableType;
   typedef IsWeakMethod<HasIsMethodTag<Runnable>::value, P1> IsWeakCall;
   typedef Invoker<4, BindState, RunType> InvokerType;
@@ -2685,8 +2664,7 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4)> final
 
   BindState(const Runnable& runnable, const P1& p1, const P2& p2, const P3& p3,
       const P4& p4)
-      : BindStateBase(&Destroy),
-        runnable_(runnable),
+      : runnable_(runnable),
         p1_(p1),
         p2_(p2),
         p3_(p3),
@@ -2694,12 +2672,8 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4)> final
     MaybeRefcount<HasIsMethodTag<Runnable>::value, P1>::AddRef(p1_);
   }
 
-  ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
+  virtual ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
       P1>::Release(p1_);  }
-
-  static void Destroy(BindStateBase* self) {
-    delete static_cast<BindState*>(self);
-  }
 
   RunnableType runnable_;
   P1 p1_;
@@ -2710,8 +2684,8 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4)> final
 
 template <typename Runnable, typename RunType, typename P1, typename P2,
     typename P3, typename P4, typename P5>
-struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5)> final
-    : public BindStateBase {
+struct BindState<Runnable, RunType, void(P1, P2, P3, P4,
+    P5)> : public BindStateBase {
   typedef Runnable RunnableType;
   typedef IsWeakMethod<HasIsMethodTag<Runnable>::value, P1> IsWeakCall;
   typedef Invoker<5, BindState, RunType> InvokerType;
@@ -2726,8 +2700,7 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5)> final
 
   BindState(const Runnable& runnable, const P1& p1, const P2& p2, const P3& p3,
       const P4& p4, const P5& p5)
-      : BindStateBase(&Destroy),
-        runnable_(runnable),
+      : runnable_(runnable),
         p1_(p1),
         p2_(p2),
         p3_(p3),
@@ -2736,12 +2709,8 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5)> final
     MaybeRefcount<HasIsMethodTag<Runnable>::value, P1>::AddRef(p1_);
   }
 
-  ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
+  virtual ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
       P1>::Release(p1_);  }
-
-  static void Destroy(BindStateBase* self) {
-    delete static_cast<BindState*>(self);
-  }
 
   RunnableType runnable_;
   P1 p1_;
@@ -2753,8 +2722,8 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5)> final
 
 template <typename Runnable, typename RunType, typename P1, typename P2,
     typename P3, typename P4, typename P5, typename P6>
-struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5, P6)> final
-    : public BindStateBase {
+struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5,
+    P6)> : public BindStateBase {
   typedef Runnable RunnableType;
   typedef IsWeakMethod<HasIsMethodTag<Runnable>::value, P1> IsWeakCall;
   typedef Invoker<6, BindState, RunType> InvokerType;
@@ -2770,8 +2739,7 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5, P6)> final
 
   BindState(const Runnable& runnable, const P1& p1, const P2& p2, const P3& p3,
       const P4& p4, const P5& p5, const P6& p6)
-      : BindStateBase(&Destroy),
-        runnable_(runnable),
+      : runnable_(runnable),
         p1_(p1),
         p2_(p2),
         p3_(p3),
@@ -2781,12 +2749,8 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5, P6)> final
     MaybeRefcount<HasIsMethodTag<Runnable>::value, P1>::AddRef(p1_);
   }
 
-  ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
+  virtual ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
       P1>::Release(p1_);  }
-
-  static void Destroy(BindStateBase* self) {
-    delete static_cast<BindState*>(self);
-  }
 
   RunnableType runnable_;
   P1 p1_;
@@ -2799,8 +2763,8 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5, P6)> final
 
 template <typename Runnable, typename RunType, typename P1, typename P2,
     typename P3, typename P4, typename P5, typename P6, typename P7>
-struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5, P6, P7)> final
-    : public BindStateBase {
+struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5, P6,
+    P7)> : public BindStateBase {
   typedef Runnable RunnableType;
   typedef IsWeakMethod<HasIsMethodTag<Runnable>::value, P1> IsWeakCall;
   typedef Invoker<7, BindState, RunType> InvokerType;
@@ -2817,8 +2781,7 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5, P6, P7)> final
 
   BindState(const Runnable& runnable, const P1& p1, const P2& p2, const P3& p3,
       const P4& p4, const P5& p5, const P6& p6, const P7& p7)
-      : BindStateBase(&Destroy),
-        runnable_(runnable),
+      : runnable_(runnable),
         p1_(p1),
         p2_(p2),
         p3_(p3),
@@ -2829,12 +2792,8 @@ struct BindState<Runnable, RunType, void(P1, P2, P3, P4, P5, P6, P7)> final
     MaybeRefcount<HasIsMethodTag<Runnable>::value, P1>::AddRef(p1_);
   }
 
-  ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
+  virtual ~BindState() {    MaybeRefcount<HasIsMethodTag<Runnable>::value,
       P1>::Release(p1_);  }
-
-  static void Destroy(BindStateBase* self) {
-    delete static_cast<BindState*>(self);
-  }
 
   RunnableType runnable_;
   P1 p1_;

@@ -72,16 +72,15 @@ typedef int                 int32;
 typedef unsigned int       uint32;
 #endif
 
-#endif  // !BUILDING_CEF_SHARED
-
-// UTF-16 character type.
-// This should be kept synchronized with base/strings/string16.h
+// UTF-16 character type
 #ifndef char16
-#if defined(WCHAR_T_IS_UTF16)
+#if defined(WIN32)
 typedef wchar_t             char16;
-#elif defined(WCHAR_T_IS_UTF32)
+#else
 typedef unsigned short      char16;
 #endif
 #endif
+
+#endif  // !BUILDING_CEF_SHARED
 
 #endif  // CEF_INCLUDE_BASE_CEF_BASICTYPES_H_

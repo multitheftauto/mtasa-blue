@@ -95,15 +95,9 @@ bool CDynamicLibrary::Load ( const char* szFilename )
             if ( szError )
                 Print ( "%s\n", szError );
             else
-                Print ( "Loading %s failed\n", szFilename );
+                printf ( "Loading %s failed\n", szFilename );
         }
     #endif
-
-    // Check for version mismatch
-    if ( !CheckMtaVersion( ExtractFilename( szFilename ) ) )
-    {
-        return false;
-    }
 
     // Return whether we succeeded or not
     return m_hModule != 0;
@@ -155,35 +149,4 @@ FuncPtr_t CDynamicLibrary::GetProcedureAddress ( const char* szProcName )
     }
 
     return NULL;
-}
-
-
-bool CDynamicLibrary::CheckMtaVersion( const char* szLibName )
-{
-#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNSTABLE
-// define MTASA_SKIP_VERSION_CHECKS in "build_overrides_s.h" to skip version checks
-#ifndef MTASA_SKIP_VERSION_CHECKS
-
-    if ( m_hModule == 0 )
-        return false;
-
-    char buffer[256];
-    buffer[0] = 0;
-    GetLibMtaVersion( buffer, sizeof( buffer ) );
-    SString strVersionCore = buffer;
-
-    buffer[0] = 0;
-    FUNC_GetMtaVersion* pfnGetMtaVersion = (FUNC_GetMtaVersion*) ( GetProcedureAddress ( "GetLibMtaVersion" ) );
-    if ( pfnGetMtaVersion )
-        pfnGetMtaVersion( buffer, sizeof( buffer ) );
-    if ( strVersionCore != buffer )
-    {
-        Print( "ERROR: '%s' library version is '%s' (Expected '%s')\n", szLibName, buffer, *strVersionCore );
-        Print( "\n** REINSTALL MTA **\n" );
-        return false;
-    }
-
-#endif
-#endif
-    return true;
 }

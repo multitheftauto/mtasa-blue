@@ -77,7 +77,6 @@ struct SMiscGameSettings
     bool bUseAltPulseOrder;
     bool bAllowFastSprintFix;
     bool bAllowBadDrivebyHitboxFix;
-    bool bAllowShotgunDamageFix;
 };
 
 class CClientGame

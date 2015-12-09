@@ -13,8 +13,6 @@
 #include "libcef_dll/cpptoc/end_tracing_callback_cpptoc.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 void CEF_CALLBACK end_tracing_callback_on_end_tracing_complete(
@@ -35,21 +33,15 @@ void CEF_CALLBACK end_tracing_callback_on_end_tracing_complete(
       CefString(tracing_file));
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefEndTracingCallbackCppToC::CefEndTracingCallbackCppToC() {
-  GetStruct()->on_end_tracing_complete =
+CefEndTracingCallbackCppToC::CefEndTracingCallbackCppToC(
+    CefEndTracingCallback* cls)
+    : CefCppToC<CefEndTracingCallbackCppToC, CefEndTracingCallback,
+        cef_end_tracing_callback_t>(cls) {
+  struct_.struct_.on_end_tracing_complete =
       end_tracing_callback_on_end_tracing_complete;
-}
-
-template<> CefRefPtr<CefEndTracingCallback> CefCppToC<CefEndTracingCallbackCppToC,
-    CefEndTracingCallback, cef_end_tracing_callback_t>::UnwrapDerived(
-    CefWrapperType type, cef_end_tracing_callback_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
 }
 
 #ifndef NDEBUG
@@ -57,6 +49,3 @@ template<> base::AtomicRefCount CefCppToC<CefEndTracingCallbackCppToC,
     CefEndTracingCallback, cef_end_tracing_callback_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefEndTracingCallbackCppToC,
-    CefEndTracingCallback, cef_end_tracing_callback_t>::kWrapperType =
-    WT_END_TRACING_CALLBACK;

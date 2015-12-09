@@ -220,7 +220,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getWeaponProperty", CLuaFunctionDefs::GetWeaponProperty );
     CLuaCFunctions::AddFunction ( "getOriginalWeaponProperty", CLuaFunctionDefs::GetOriginalWeaponProperty );
     CLuaCFunctions::AddFunction ( "resendPlayerModInfo", CLuaFunctionDefs::ResendPlayerModInfo );
-    CLuaCFunctions::AddFunction ( "resendPlayerACInfo", CLuaFunctionDefs::ResendPlayerACInfo );
 
     // Player set funcs
     CLuaCFunctions::AddFunction ( "setPlayerMoney", CLuaFunctionDefs::SetPlayerMoney );

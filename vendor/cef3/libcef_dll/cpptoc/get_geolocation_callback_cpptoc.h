@@ -28,8 +28,9 @@ class CefGetGeolocationCallbackCppToC
     : public CefCppToC<CefGetGeolocationCallbackCppToC,
         CefGetGeolocationCallback, cef_get_geolocation_callback_t> {
  public:
-  CefGetGeolocationCallbackCppToC();
+  explicit CefGetGeolocationCallbackCppToC(CefGetGeolocationCallback* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_GET_GEOLOCATION_CALLBACK_CPPTOC_H_
+

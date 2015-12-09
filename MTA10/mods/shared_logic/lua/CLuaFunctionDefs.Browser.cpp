@@ -148,6 +148,7 @@ int CLuaFunctionDefs::LoadBrowserURL ( lua_State* luaVM )
                 // Output deprecated warning, TODO: Remove this at a later point
                 m_pScriptDebugging->LogWarning ( luaVM, "This URL scheme is deprecated and may not work in future versions. Please consider using http://mta/* instead. See https://wiki.mtasa.com/wiki/LoadBrowserURL for details" );
 
+                pWebBrowser->SetTempURL ( strURL );
                 lua_pushboolean ( luaVM,  pWebBrowser->LoadURL ( "mtalocal://" + strURL, false, strPostData, bURLEncoded ) );
                 return 1;
             }
@@ -279,7 +280,10 @@ int CLuaFunctionDefs::GetBrowserTitle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushstring ( luaVM, pWebBrowser->GetTitle () );
+        SString strPageTitle;
+        pWebBrowser->GetTitle ( strPageTitle );
+
+        lua_pushstring ( luaVM, strPageTitle );
         return 1;
     }
     else
@@ -299,7 +303,10 @@ int CLuaFunctionDefs::GetBrowserURL ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushstring ( luaVM, pWebBrowser->GetURL () );
+        SString strURL;
+        pWebBrowser->GetURL ( strURL );
+
+        lua_pushstring ( luaVM, strURL );
         return 1;
     }
     else
@@ -580,33 +587,6 @@ int CLuaFunctionDefs::GetBrowserSource ( lua_State* luaVM )
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaFunctionDefs::ToggleBrowserDevTools ( lua_State* luaVM )
-{
-//  bool toggleBrowserDevTools ( browser webBrowser, bool visible )
-    CClientWebBrowser* pWebBrowser; bool visible;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pWebBrowser );
-    argStream.ReadBool ( visible );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( g_pCore->GetWebCore ()->IsTestModeEnabled () )
-        {
-            lua_pushboolean ( luaVM, pWebBrowser->ToggleDevTools ( visible ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, "toggleBrowserDevtools can only be used in development mode" );
-        
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

@@ -55,8 +55,10 @@ void            FindFilesRecursive                  ( const SString& strPathMatc
 SString         GetOSVersion                        ( void );
 SString         GetRealOSVersion                    ( void );
 SString         GetRealOSBuildNumber                ( void );
-bool            IsWindows10OrGreater                ( void );
 bool            IsVS2013RuntimeInstalled            ( void );
+bool            IsVistaOrHigher                     ( void );
+bool            IsWin8OrHigher                      ( void );
+bool            IsWin10OrHigher                     ( void );
 BOOL            IsUserAdmin                         ( void );
 
 void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );

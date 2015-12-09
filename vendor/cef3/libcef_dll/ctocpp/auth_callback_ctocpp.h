@@ -28,12 +28,16 @@ class CefAuthCallbackCToCpp
     : public CefCToCpp<CefAuthCallbackCToCpp, CefAuthCallback,
         cef_auth_callback_t> {
  public:
-  CefAuthCallbackCToCpp();
+  explicit CefAuthCallbackCToCpp(cef_auth_callback_t* str)
+      : CefCToCpp<CefAuthCallbackCToCpp, CefAuthCallback, cef_auth_callback_t>(
+          str) {}
 
-  // CefAuthCallback methods.
-  void Continue(const CefString& username, const CefString& password) OVERRIDE;
-  void Cancel() OVERRIDE;
+  // CefAuthCallback methods
+  virtual void Continue(const CefString& username,
+      const CefString& password) OVERRIDE;
+  virtual void Cancel() OVERRIDE;
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CTOCPP_AUTH_CALLBACK_CTOCPP_H_
+

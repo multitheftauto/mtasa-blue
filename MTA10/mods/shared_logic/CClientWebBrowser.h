@@ -29,8 +29,8 @@ public:
 
     bool                        IsLoading           ();
     bool                        LoadURL             ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString(), bool bURLEncoded = true );
-    const SString&              GetTitle            ();
-    SString                     GetURL              ();
+    void                        GetTitle            ( SString& outPageTitle );
+    void                        GetURL              ( SString& outURL );
     void                        SetRenderingPaused  ( bool bPaused );
     void                        Focus               ();
 
@@ -45,6 +45,7 @@ public:
     void                        InjectMouseWheel    ( int iScrollVert, int iScrollHorz );
 
     bool                        IsLocal             ();
+    void                        SetTempURL          ( const SString& strTempURL );
 
     inline CResource*           GetResource         () { return m_pResource; }
     inline void                 SetResource         ( CResource* pResource ) { m_pResource = pResource; }
@@ -58,8 +59,6 @@ public:
     
     bool                        AddAjaxHandler      ( const SString& strURL, ajax_callback_t& handler );
     bool                        RemoveAjaxHandler   ( const SString& strURL );
-
-    bool                        ToggleDevTools      ( bool visible );
     
     // CWebBrowserEventsInterface implementation
     void                        Events_OnCreated       () override;
@@ -69,11 +68,10 @@ public:
     void                        Events_OnNavigate      ( const SString& strURL, bool bIsBlocked ) override;
     void                        Events_OnPopup         ( const SString& strTargetURL, const SString& strOpenerURL ) override;
     void                        Events_OnChangeCursor  ( unsigned char ucCursor ) override;
-    void                        Events_OnTriggerEvent  ( const SString& strEventName, const std::vector<std::string>& arguments ) override;
+    void                        Events_OnTriggerEvent  ( const SString& strEventName, const std::vector<std::string>& arguments, bool bIsServer = false ) override;
     void                        Events_OnTooltip       ( const SString& strTooltip ) override;
     void                        Events_OnInputFocusChanged ( bool bGainedFocus ) override;
     bool                        Events_OnResourcePathCheck ( SString& strURL ) override;
-    bool                        Events_OnResourceFileCheck ( const SString& strURL ) override;
     void                        Events_OnResourceBlocked   ( const SString& strURL, const SString& strDomain, unsigned char reason ) override;
     void                        Events_OnAjaxRequest ( CAjaxResourceHandlerInterface* pHandler, const SString& strURL ) override;
 

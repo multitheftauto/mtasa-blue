@@ -69,8 +69,7 @@ CefRefPtr<CefRequestContext> CefRequestContext::CreateContext(
 // VIRTUAL METHODS - Body may be edited by hand.
 
 bool CefRequestContextCToCpp::IsSame(CefRefPtr<CefRequestContext> other) {
-  cef_request_context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_same))
+  if (CEF_MEMBER_MISSING(struct_, is_same))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -81,7 +80,7 @@ bool CefRequestContextCToCpp::IsSame(CefRefPtr<CefRequestContext> other) {
     return false;
 
   // Execute
-  int _retval = _struct->is_same(_struct,
+  int _retval = struct_->is_same(struct_,
       CefRequestContextCToCpp::Unwrap(other));
 
   // Return type: bool
@@ -90,8 +89,7 @@ bool CefRequestContextCToCpp::IsSame(CefRefPtr<CefRequestContext> other) {
 
 bool CefRequestContextCToCpp::IsSharingWith(
     CefRefPtr<CefRequestContext> other) {
-  cef_request_context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_sharing_with))
+  if (CEF_MEMBER_MISSING(struct_, is_sharing_with))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -102,7 +100,7 @@ bool CefRequestContextCToCpp::IsSharingWith(
     return false;
 
   // Execute
-  int _retval = _struct->is_sharing_with(_struct,
+  int _retval = struct_->is_sharing_with(struct_,
       CefRequestContextCToCpp::Unwrap(other));
 
   // Return type: bool
@@ -110,42 +108,39 @@ bool CefRequestContextCToCpp::IsSharingWith(
 }
 
 bool CefRequestContextCToCpp::IsGlobal() {
-  cef_request_context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_global))
+  if (CEF_MEMBER_MISSING(struct_, is_global))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_global(_struct);
+  int _retval = struct_->is_global(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 CefRefPtr<CefRequestContextHandler> CefRequestContextCToCpp::GetHandler() {
-  cef_request_context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_handler))
+  if (CEF_MEMBER_MISSING(struct_, get_handler))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_request_context_handler_t* _retval = _struct->get_handler(_struct);
+  cef_request_context_handler_t* _retval = struct_->get_handler(struct_);
 
   // Return type: refptr_diff
   return CefRequestContextHandlerCppToC::Unwrap(_retval);
 }
 
 CefString CefRequestContextCToCpp::GetCachePath() {
-  cef_request_context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_cache_path))
+  if (CEF_MEMBER_MISSING(struct_, get_cache_path))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_cache_path(_struct);
+  cef_string_userfree_t _retval = struct_->get_cache_path(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -155,8 +150,7 @@ CefString CefRequestContextCToCpp::GetCachePath() {
 
 CefRefPtr<CefCookieManager> CefRequestContextCToCpp::GetDefaultCookieManager(
     CefRefPtr<CefCompletionCallback> callback) {
-  cef_request_context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_default_cookie_manager))
+  if (CEF_MEMBER_MISSING(struct_, get_default_cookie_manager))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -164,7 +158,7 @@ CefRefPtr<CefCookieManager> CefRequestContextCToCpp::GetDefaultCookieManager(
   // Unverified params: callback
 
   // Execute
-  cef_cookie_manager_t* _retval = _struct->get_default_cookie_manager(_struct,
+  cef_cookie_manager_t* _retval = struct_->get_default_cookie_manager(struct_,
       CefCompletionCallbackCppToC::Wrap(callback));
 
   // Return type: refptr_same
@@ -174,8 +168,7 @@ CefRefPtr<CefCookieManager> CefRequestContextCToCpp::GetDefaultCookieManager(
 bool CefRequestContextCToCpp::RegisterSchemeHandlerFactory(
     const CefString& scheme_name, const CefString& domain_name,
     CefRefPtr<CefSchemeHandlerFactory> factory) {
-  cef_request_context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, register_scheme_handler_factory))
+  if (CEF_MEMBER_MISSING(struct_, register_scheme_handler_factory))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -187,7 +180,7 @@ bool CefRequestContextCToCpp::RegisterSchemeHandlerFactory(
   // Unverified params: domain_name, factory
 
   // Execute
-  int _retval = _struct->register_scheme_handler_factory(_struct,
+  int _retval = struct_->register_scheme_handler_factory(struct_,
       scheme_name.GetStruct(),
       domain_name.GetStruct(),
       CefSchemeHandlerFactoryCppToC::Wrap(factory));
@@ -197,48 +190,21 @@ bool CefRequestContextCToCpp::RegisterSchemeHandlerFactory(
 }
 
 bool CefRequestContextCToCpp::ClearSchemeHandlerFactories() {
-  cef_request_context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, clear_scheme_handler_factories))
+  if (CEF_MEMBER_MISSING(struct_, clear_scheme_handler_factories))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->clear_scheme_handler_factories(_struct);
+  int _retval = struct_->clear_scheme_handler_factories(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
-void CefRequestContextCToCpp::PurgePluginListCache(bool reload_pages) {
-  cef_request_context_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, purge_plugin_list_cache))
-    return;
-
-  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
-
-  // Execute
-  _struct->purge_plugin_list_cache(_struct,
-      reload_pages);
-}
-
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefRequestContextCToCpp::CefRequestContextCToCpp() {
-}
-
-template<> cef_request_context_t* CefCToCpp<CefRequestContextCToCpp,
-    CefRequestContext, cef_request_context_t>::UnwrapDerived(
-    CefWrapperType type, CefRequestContext* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefRequestContextCToCpp,
     CefRequestContext, cef_request_context_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefRequestContextCToCpp, CefRequestContext,
-    cef_request_context_t>::kWrapperType = WT_REQUEST_CONTEXT;

@@ -21,110 +21,100 @@
 // VIRTUAL METHODS - Body may be edited by hand.
 
 bool CefFrameCToCpp::IsValid() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_valid))
+  if (CEF_MEMBER_MISSING(struct_, is_valid))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_valid(_struct);
+  int _retval = struct_->is_valid(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 void CefFrameCToCpp::Undo() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, undo))
+  if (CEF_MEMBER_MISSING(struct_, undo))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->undo(_struct);
+  struct_->undo(struct_);
 }
 
 void CefFrameCToCpp::Redo() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, redo))
+  if (CEF_MEMBER_MISSING(struct_, redo))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->redo(_struct);
+  struct_->redo(struct_);
 }
 
 void CefFrameCToCpp::Cut() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, cut))
+  if (CEF_MEMBER_MISSING(struct_, cut))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->cut(_struct);
+  struct_->cut(struct_);
 }
 
 void CefFrameCToCpp::Copy() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, copy))
+  if (CEF_MEMBER_MISSING(struct_, copy))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->copy(_struct);
+  struct_->copy(struct_);
 }
 
 void CefFrameCToCpp::Paste() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, paste))
+  if (CEF_MEMBER_MISSING(struct_, paste))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->paste(_struct);
+  struct_->paste(struct_);
 }
 
 void CefFrameCToCpp::Delete() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, del))
+  if (CEF_MEMBER_MISSING(struct_, del))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->del(_struct);
+  struct_->del(struct_);
 }
 
 void CefFrameCToCpp::SelectAll() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, select_all))
+  if (CEF_MEMBER_MISSING(struct_, select_all))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->select_all(_struct);
+  struct_->select_all(struct_);
 }
 
 void CefFrameCToCpp::ViewSource() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, view_source))
+  if (CEF_MEMBER_MISSING(struct_, view_source))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->view_source(_struct);
+  struct_->view_source(struct_);
 }
 
 void CefFrameCToCpp::GetSource(CefRefPtr<CefStringVisitor> visitor) {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_source))
+  if (CEF_MEMBER_MISSING(struct_, get_source))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -135,13 +125,12 @@ void CefFrameCToCpp::GetSource(CefRefPtr<CefStringVisitor> visitor) {
     return;
 
   // Execute
-  _struct->get_source(_struct,
+  struct_->get_source(struct_,
       CefStringVisitorCppToC::Wrap(visitor));
 }
 
 void CefFrameCToCpp::GetText(CefRefPtr<CefStringVisitor> visitor) {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_text))
+  if (CEF_MEMBER_MISSING(struct_, get_text))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -152,13 +141,12 @@ void CefFrameCToCpp::GetText(CefRefPtr<CefStringVisitor> visitor) {
     return;
 
   // Execute
-  _struct->get_text(_struct,
+  struct_->get_text(struct_,
       CefStringVisitorCppToC::Wrap(visitor));
 }
 
 void CefFrameCToCpp::LoadRequest(CefRefPtr<CefRequest> request) {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, load_request))
+  if (CEF_MEMBER_MISSING(struct_, load_request))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -169,13 +157,12 @@ void CefFrameCToCpp::LoadRequest(CefRefPtr<CefRequest> request) {
     return;
 
   // Execute
-  _struct->load_request(_struct,
+  struct_->load_request(struct_,
       CefRequestCToCpp::Unwrap(request));
 }
 
 void CefFrameCToCpp::LoadURL(const CefString& url) {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, load_url))
+  if (CEF_MEMBER_MISSING(struct_, load_url))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -186,14 +173,13 @@ void CefFrameCToCpp::LoadURL(const CefString& url) {
     return;
 
   // Execute
-  _struct->load_url(_struct,
+  struct_->load_url(struct_,
       url.GetStruct());
 }
 
 void CefFrameCToCpp::LoadString(const CefString& string_val,
     const CefString& url) {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, load_string))
+  if (CEF_MEMBER_MISSING(struct_, load_string))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -208,15 +194,14 @@ void CefFrameCToCpp::LoadString(const CefString& string_val,
     return;
 
   // Execute
-  _struct->load_string(_struct,
+  struct_->load_string(struct_,
       string_val.GetStruct(),
       url.GetStruct());
 }
 
 void CefFrameCToCpp::ExecuteJavaScript(const CefString& code,
     const CefString& script_url, int start_line) {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, execute_java_script))
+  if (CEF_MEMBER_MISSING(struct_, execute_java_script))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -228,49 +213,46 @@ void CefFrameCToCpp::ExecuteJavaScript(const CefString& code,
   // Unverified params: script_url
 
   // Execute
-  _struct->execute_java_script(_struct,
+  struct_->execute_java_script(struct_,
       code.GetStruct(),
       script_url.GetStruct(),
       start_line);
 }
 
 bool CefFrameCToCpp::IsMain() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_main))
+  if (CEF_MEMBER_MISSING(struct_, is_main))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_main(_struct);
+  int _retval = struct_->is_main(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefFrameCToCpp::IsFocused() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_focused))
+  if (CEF_MEMBER_MISSING(struct_, is_focused))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_focused(_struct);
+  int _retval = struct_->is_focused(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 CefString CefFrameCToCpp::GetName() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_name))
+  if (CEF_MEMBER_MISSING(struct_, get_name))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_name(_struct);
+  cef_string_userfree_t _retval = struct_->get_name(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -279,42 +261,39 @@ CefString CefFrameCToCpp::GetName() {
 }
 
 int64 CefFrameCToCpp::GetIdentifier() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_identifier))
+  if (CEF_MEMBER_MISSING(struct_, get_identifier))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int64 _retval = _struct->get_identifier(_struct);
+  int64 _retval = struct_->get_identifier(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 CefRefPtr<CefFrame> CefFrameCToCpp::GetParent() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_parent))
+  if (CEF_MEMBER_MISSING(struct_, get_parent))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_frame_t* _retval = _struct->get_parent(_struct);
+  cef_frame_t* _retval = struct_->get_parent(struct_);
 
   // Return type: refptr_same
   return CefFrameCToCpp::Wrap(_retval);
 }
 
 CefString CefFrameCToCpp::GetURL() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_url))
+  if (CEF_MEMBER_MISSING(struct_, get_url))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_url(_struct);
+  cef_string_userfree_t _retval = struct_->get_url(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -323,36 +302,33 @@ CefString CefFrameCToCpp::GetURL() {
 }
 
 CefRefPtr<CefBrowser> CefFrameCToCpp::GetBrowser() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_browser))
+  if (CEF_MEMBER_MISSING(struct_, get_browser))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_browser_t* _retval = _struct->get_browser(_struct);
+  cef_browser_t* _retval = struct_->get_browser(struct_);
 
   // Return type: refptr_same
   return CefBrowserCToCpp::Wrap(_retval);
 }
 
 CefRefPtr<CefV8Context> CefFrameCToCpp::GetV8Context() {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_v8context))
+  if (CEF_MEMBER_MISSING(struct_, get_v8context))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_v8context_t* _retval = _struct->get_v8context(_struct);
+  cef_v8context_t* _retval = struct_->get_v8context(struct_);
 
   // Return type: refptr_same
   return CefV8ContextCToCpp::Wrap(_retval);
 }
 
 void CefFrameCToCpp::VisitDOM(CefRefPtr<CefDOMVisitor> visitor) {
-  cef_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, visit_dom))
+  if (CEF_MEMBER_MISSING(struct_, visit_dom))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -363,26 +339,13 @@ void CefFrameCToCpp::VisitDOM(CefRefPtr<CefDOMVisitor> visitor) {
     return;
 
   // Execute
-  _struct->visit_dom(_struct,
+  struct_->visit_dom(struct_,
       CefDOMVisitorCppToC::Wrap(visitor));
 }
 
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefFrameCToCpp::CefFrameCToCpp() {
-}
-
-template<> cef_frame_t* CefCToCpp<CefFrameCToCpp, CefFrame,
-    cef_frame_t>::UnwrapDerived(CefWrapperType type, CefFrame* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefFrameCToCpp, CefFrame,
     cef_frame_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefFrameCToCpp, CefFrame,
-    cef_frame_t>::kWrapperType = WT_FRAME;

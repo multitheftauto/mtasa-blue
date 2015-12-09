@@ -29,7 +29,7 @@ class CModManagerImpl : public CModManager
 {
 public:
                         CModManagerImpl         ( CServerImpl* pServer );
-    virtual             ~CModManagerImpl        ( void );
+                        ~CModManagerImpl        ( void );
 
     inline void         SetServerPath           ( const char* szServerPath )    { m_strServerPath = szServerPath; };
 

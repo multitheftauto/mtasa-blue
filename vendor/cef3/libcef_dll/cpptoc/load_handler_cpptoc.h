@@ -28,8 +28,9 @@ class CefLoadHandlerCppToC
     : public CefCppToC<CefLoadHandlerCppToC, CefLoadHandler,
         cef_load_handler_t> {
  public:
-  CefLoadHandlerCppToC();
+  explicit CefLoadHandlerCppToC(CefLoadHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_LOAD_HANDLER_CPPTOC_H_
+

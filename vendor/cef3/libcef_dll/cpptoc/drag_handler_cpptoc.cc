@@ -15,8 +15,6 @@
 #include "libcef_dll/ctocpp/drag_data_ctocpp.h"
 
 
-namespace {
-
 // MEMBER FUNCTIONS - Body may be edited by hand.
 
 int CEF_CALLBACK drag_handler_on_drag_enter(struct _cef_drag_handler_t* self,
@@ -67,8 +65,7 @@ void CEF_CALLBACK drag_handler_on_draggable_regions_changed(
   std::vector<CefDraggableRegion > regionsList;
   if (regionsCount > 0) {
     for (size_t i = 0; i < regionsCount; ++i) {
-      CefDraggableRegion regionsVal = regions[i];
-      regionsList.push_back(regionsVal);
+      regionsList.push_back(regions[i]);
     }
   }
 
@@ -78,22 +75,14 @@ void CEF_CALLBACK drag_handler_on_draggable_regions_changed(
       regionsList);
 }
 
-}  // namespace
-
 
 // CONSTRUCTOR - Do not edit by hand.
 
-CefDragHandlerCppToC::CefDragHandlerCppToC() {
-  GetStruct()->on_drag_enter = drag_handler_on_drag_enter;
-  GetStruct()->on_draggable_regions_changed =
+CefDragHandlerCppToC::CefDragHandlerCppToC(CefDragHandler* cls)
+    : CefCppToC<CefDragHandlerCppToC, CefDragHandler, cef_drag_handler_t>(cls) {
+  struct_.struct_.on_drag_enter = drag_handler_on_drag_enter;
+  struct_.struct_.on_draggable_regions_changed =
       drag_handler_on_draggable_regions_changed;
-}
-
-template<> CefRefPtr<CefDragHandler> CefCppToC<CefDragHandlerCppToC,
-    CefDragHandler, cef_drag_handler_t>::UnwrapDerived(CefWrapperType type,
-    cef_drag_handler_t* s) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
 }
 
 #ifndef NDEBUG
@@ -101,5 +90,3 @@ template<> base::AtomicRefCount CefCppToC<CefDragHandlerCppToC, CefDragHandler,
     cef_drag_handler_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCppToC<CefDragHandlerCppToC, CefDragHandler,
-    cef_drag_handler_t>::kWrapperType = WT_DRAG_HANDLER;

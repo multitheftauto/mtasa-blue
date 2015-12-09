@@ -63,21 +63,7 @@ const char szPreloadedScript [] = ""\
     "                return setmetatable({}, rescallMT)\n" \
     "        end\n" \
     "end\n" \
-    "exports = setmetatable({}, exportsMT)\n"
-
-    //
-    // Output errors that occur inside coroutines
-    //
-    "coroutine._resume = coroutine.resume\n"    // For access to the original function
-    "local _coroutine_resume = coroutine.resume\n"
-    "function coroutine.resume(...)\n"
-    "    local state,result = _coroutine_resume(...)\n"
-    "    if not state then\n"
-    "        outputDebugString( tostring(result), 1 )\n"
-    "    end\n"
-    "    return state,result\n"
-    "end\n"
-    ;
+    "exports = setmetatable({}, exportsMT)\n";
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
                      CObjectManager* pObjectManager,
@@ -840,7 +826,6 @@ void CLuaMain::AddPlayerClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "kick", "kickPlayer" );
     lua_classfunction ( luaVM, "redirect", "redirectPlayer" );
     lua_classfunction ( luaVM, "resendModInfo", "resendPlayerModInfo" );
-    lua_classfunction ( luaVM, "resendACInfo", "resendPlayerACInfo" );
     lua_classfunction ( luaVM, "spawn", "spawnPlayer" );
     lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
     lua_classfunction ( luaVM, "takeScreenShot", "takePlayerScreenShot" );

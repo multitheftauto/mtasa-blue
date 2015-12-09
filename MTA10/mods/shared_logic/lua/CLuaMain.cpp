@@ -62,21 +62,8 @@ const char szPreloadedScript [] = ""\
     "                return setmetatable({}, rescallMT)\n" \
     "        end\n" \
     "end\n" \
-    "exports = setmetatable({}, exportsMT)\n"
+    "exports = setmetatable({}, exportsMT)\n";
 
-    //
-    // Output errors that occur inside coroutines
-    //
-    "coroutine._resume = coroutine.resume\n"    // For access to the original function
-    "local _coroutine_resume = coroutine.resume\n"
-    "function coroutine.resume(...)\n"
-    "    local state,result = _coroutine_resume(...)\n"
-    "    if not state then\n"
-    "        outputDebugString( tostring(result), 1 )\n"
-    "    end\n"
-    "    return state,result\n"
-    "end\n"
-    ;
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP )
 {
@@ -1343,7 +1330,7 @@ void CLuaMain::AddResourceClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
     
     lua_classfunction ( luaVM, "create", "getResourceFromName" );
-    lua_classfunction ( luaVM, "getFromName", "getResourceFromName" );
+    lua_classfunction ( luaVM, "getfromName", "getResourceFromName" );
     
     lua_classfunction ( luaVM, "getGuiElement", "getResourceGUIElement" );
     lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
@@ -1661,17 +1648,15 @@ void CLuaMain::AddBrowserClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getProperty", "getBrowserProperty" );
     lua_classfunction ( luaVM, "getSource", "getBrowserSource" );
     lua_classfunction ( luaVM, "setAjaxHandler", "setBrowserAjaxHandler" );
-    lua_classfunction ( luaVM, "toggleDevTools", "toggleBrowserDevTools" );
 
     lua_classfunction ( luaVM, "requestDomains", "requestBrowserDomains" );
     lua_classfunction ( luaVM, "isDomainBlocked", "isBrowserDomainBlocked" );
 
     lua_classvariable ( luaVM, "url", "loadBrowserURL", "getBrowserURL" );
-    lua_classvariable ( luaVM, "loading", nullptr, "isBrowserLoading");
-    lua_classvariable ( luaVM, "title", nullptr, "getBrowserTitle" );
-    lua_classvariable ( luaVM, "renderingPaused", "setBrowserRenderingPaused", nullptr );
+    lua_classvariable ( luaVM, "loading", NULL, "isBrowserLoading");
+    lua_classvariable ( luaVM, "title", NULL, "getBrowserTitle" );
+    lua_classvariable ( luaVM, "renderingPaused", "setBrowserRenderingPaused", NULL );
     lua_classvariable ( luaVM, "volume", "setBrowserVolume", "getBrowserVolume" );
-    lua_classvariable ( luaVM, "devTools", "toggleBrowserDevTools", nullptr );
     
     lua_registerclass ( luaVM, "Browser", "DxTexture" );
 

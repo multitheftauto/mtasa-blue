@@ -16,34 +16,18 @@
 // VIRTUAL METHODS - Body may be edited by hand.
 
 void CefPrintJobCallbackCToCpp::Continue() {
-  cef_print_job_callback_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, cont))
+  if (CEF_MEMBER_MISSING(struct_, cont))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->cont(_struct);
+  struct_->cont(struct_);
 }
 
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefPrintJobCallbackCToCpp::CefPrintJobCallbackCToCpp() {
-}
-
-template<> cef_print_job_callback_t* CefCToCpp<CefPrintJobCallbackCToCpp,
-    CefPrintJobCallback, cef_print_job_callback_t>::UnwrapDerived(
-    CefWrapperType type, CefPrintJobCallback* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefPrintJobCallbackCToCpp,
     CefPrintJobCallback, cef_print_job_callback_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefPrintJobCallbackCToCpp,
-    CefPrintJobCallback, cef_print_job_callback_t>::kWrapperType =
-    WT_PRINT_JOB_CALLBACK;

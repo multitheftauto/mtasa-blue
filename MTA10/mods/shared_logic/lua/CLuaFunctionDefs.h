@@ -1044,7 +1044,6 @@ public:
     LUA_DECLARE ( GetBrowserSettings );
     LUA_DECLARE ( GetBrowserSource );
     LUA_DECLARE ( SetBrowserAjaxHandler );
-    LUA_DECLARE ( ToggleBrowserDevTools );
     LUA_DECLARE ( GUICreateBrowser );
     LUA_DECLARE ( GUIGetBrowser );
 

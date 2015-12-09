@@ -28,8 +28,9 @@ class CefDisplayHandlerCppToC
     : public CefCppToC<CefDisplayHandlerCppToC, CefDisplayHandler,
         cef_display_handler_t> {
  public:
-  CefDisplayHandlerCppToC();
+  explicit CefDisplayHandlerCppToC(CefDisplayHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_DISPLAY_HANDLER_CPPTOC_H_
+

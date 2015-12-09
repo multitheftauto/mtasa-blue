@@ -142,7 +142,7 @@ void CWebCore::AddEventToEventQueue ( std::function<void(void)> event, CWebView*
 #ifndef MTA_DEBUG
     UNREFERENCED_PARAMETER(name);
 #endif
-    if ( pWebView && pWebView->IsBeingDestroyed () )
+    if ( pWebView->IsBeingDestroyed () )
         return;
 
     std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
@@ -206,12 +206,12 @@ eURLState CWebCore::GetURLState ( const SString& strURL, bool bOutputDebug )
             return eURLState::WEBPAGE_ALLOWED;
         else
         {
-            if ( m_bTestmodeEnabled && bOutputDebug ) DebugOutputThreadsafe ( SString ( "[BROWSER] Blocked page: %s", strURL.c_str () ), 255, 0, 0 );
+            if ( m_bTestmodeEnabled && bOutputDebug ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
             return eURLState::WEBPAGE_DISALLOWED;
         }
     }
 
-    if ( m_bTestmodeEnabled && bOutputDebug ) DebugOutputThreadsafe ( SString ( "[BROWSER] Blocked page: %s", strURL.c_str () ), 255, 0, 0 );
+    if ( m_bTestmodeEnabled && bOutputDebug ) g_pCore->DebugPrintfColor ( "[BROWSER] Blocked page: %s", 255, 0, 0, strURL.c_str() );
     return eURLState::WEBPAGE_NOT_LISTED;
 }
 
@@ -370,13 +370,6 @@ void CWebCore::DenyPendingPages ()
 bool CWebCore::IsRequestsGUIVisible ()
 {
     return m_pRequestsGUI && m_pRequestsGUI->IsVisible ();
-}
-
-void CWebCore::DebugOutputThreadsafe ( const SString& message, unsigned char R, unsigned char G, unsigned char B )
-{
-    AddEventToEventQueue( [message, R, G, B]() {
-        g_pCore->DebugEchoColor ( message, R, G, B );
-    }, nullptr, "DebugOutputThreadsafe" );
 }
 
 bool CWebCore::GetRemotePagesEnabled ()
@@ -796,14 +789,6 @@ bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownl
 //////////////////////////////////////////////////////////////
 //                CefApp implementation                     //
 //////////////////////////////////////////////////////////////
-CefRefPtr<CefResourceHandler> CCefApp::HandleError ( const SString& strError, unsigned int uiError )
-{
-    auto stream = CefStreamReader::CreateForData ( (void*)strError.c_str(), strError.length());
-    return new CefStreamResourceHandler ( 
-            uiError, strError, "text/plain", CefResponse::HeaderMap(), stream);
-}
-
-
 void CCefApp::OnRegisterCustomSchemes ( CefRefPtr < CefSchemeRegistrar > registrar )
 {
     // Register custom MTA scheme (has to be called in all proceseses)
@@ -812,12 +797,6 @@ void CCefApp::OnRegisterCustomSchemes ( CefRefPtr < CefSchemeRegistrar > registr
 
 CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request )
 {
-    // browser or frame are NULL if the request does not orginate from a browser window
-    // This is for exmaple true for the application cache or CEFURLRequests
-    // (http://www.html5rocks.com/en/tutorials/appcache/beginner/)
-    if ( !browser || !frame )
-        return nullptr;
-
     CWebCore* pWebCore = static_cast<CWebCore*> ( g_pCore->GetWebCore () );
     auto pWebView = pWebCore->FindWebView ( browser );
     if ( !pWebView || !pWebView->IsLocal () )
@@ -845,7 +824,7 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
                 request->SetURL ( "http://mta/local/" + resourceName + resourcePath );
                 return Create ( browser, frame, "http", request );
             }
-            return HandleError ("404 - Not found", 404);
+            return nullptr;
         }
         
         // Redirect mtalocal://* to http://mta/local/*, call recursively
@@ -862,13 +841,13 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
         SString path = UTF16ToMbUTF8 ( urlParts.path.str ).substr ( 1 ); // Remove slash at the front
         size_t slashPos = path.find ( '/' );
         if ( slashPos == std::string::npos )
-            return HandleError ( "404 - Not found", 404 );
+            return nullptr;
 
         SString resourceName = path.substr ( 0, slashPos );
         SString resourcePath = path.substr ( slashPos + 1 );
 
         if ( resourcePath.empty () )
-            return HandleError ( "404 - Not found", 404 );
+            return nullptr;
 
         // Get mime type from extension
         CefString mimeType;
@@ -947,21 +926,17 @@ CefRefPtr<CefResourceHandler> CCefApp::Create ( CefRefPtr<CefBrowser> browser, C
 
             // Calculate absolute path
             if ( !pWebView->GetFullPathFromLocal ( path ) )
-                return HandleError ( "404 - Not found", 404 );
-
-            // Verify local files
-            if ( !pWebView->VerifyFile ( path ) )
-                return HandleError ( "403 - Access Denied", 403 );
+                return nullptr;
         
             // Finally, load the file stream
             auto stream = CefStreamReader::CreateForFile ( path );
             if ( stream.get () )
                 return new CefStreamResourceHandler ( mimeType, stream );
-            return HandleError ( "404 - Not found", 404 );
         }
+
+        return nullptr;
     }
 
     // Return null if there is no matching scheme
-    // This falls back to letting CEF handle the request
     return nullptr;
 }

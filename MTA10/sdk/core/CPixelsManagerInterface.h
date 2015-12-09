@@ -16,7 +16,6 @@ namespace EPixelsFormat
         PLAIN,
         JPEG,
         PNG,
-        DDS
     };
 }
 using EPixelsFormat::EPixelsFormatType;

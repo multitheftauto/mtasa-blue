@@ -72,7 +72,6 @@ public:
 
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
     inline void         SetTestModeEnabled  ( bool bEnabled ) { m_bTestmodeEnabled = bEnabled; };
-    void                DebugOutputThreadsafe ( const SString& message, unsigned char R, unsigned char G, unsigned char B );
 
     inline CWebViewInterface* GetFocusedWebView () { return (CWebViewInterface*) m_pFocusedWebView; };
     inline void         SetFocusedWebView   ( CWebView* pWebView ) { m_pFocusedWebView = pWebView; };
@@ -120,9 +119,6 @@ private:
 class CCefApp : public CefApp, public CefSchemeHandlerFactory
 {
 public:
-    // Error Handler
-    static CefRefPtr<CefResourceHandler> CCefApp::HandleError ( const SString& strError, unsigned int uiError );
-
     virtual void OnRegisterCustomSchemes ( CefRefPtr<CefSchemeRegistrar> registrar ) override;
 
     // CefSchemeHandlerFactory methods

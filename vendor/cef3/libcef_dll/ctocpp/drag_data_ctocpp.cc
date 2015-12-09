@@ -31,84 +31,78 @@ CefRefPtr<CefDragData> CefDragData::Create() {
 // VIRTUAL METHODS - Body may be edited by hand.
 
 CefRefPtr<CefDragData> CefDragDataCToCpp::Clone() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, clone))
+  if (CEF_MEMBER_MISSING(struct_, clone))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_drag_data_t* _retval = _struct->clone(_struct);
+  cef_drag_data_t* _retval = struct_->clone(struct_);
 
   // Return type: refptr_same
   return CefDragDataCToCpp::Wrap(_retval);
 }
 
 bool CefDragDataCToCpp::IsReadOnly() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_read_only))
+  if (CEF_MEMBER_MISSING(struct_, is_read_only))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_read_only(_struct);
+  int _retval = struct_->is_read_only(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefDragDataCToCpp::IsLink() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_link))
+  if (CEF_MEMBER_MISSING(struct_, is_link))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_link(_struct);
+  int _retval = struct_->is_link(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefDragDataCToCpp::IsFragment() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_fragment))
+  if (CEF_MEMBER_MISSING(struct_, is_fragment))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_fragment(_struct);
+  int _retval = struct_->is_fragment(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefDragDataCToCpp::IsFile() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_file))
+  if (CEF_MEMBER_MISSING(struct_, is_file))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_file(_struct);
+  int _retval = struct_->is_file(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 CefString CefDragDataCToCpp::GetLinkURL() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_link_url))
+  if (CEF_MEMBER_MISSING(struct_, get_link_url))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_link_url(_struct);
+  cef_string_userfree_t _retval = struct_->get_link_url(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -117,14 +111,13 @@ CefString CefDragDataCToCpp::GetLinkURL() {
 }
 
 CefString CefDragDataCToCpp::GetLinkTitle() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_link_title))
+  if (CEF_MEMBER_MISSING(struct_, get_link_title))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_link_title(_struct);
+  cef_string_userfree_t _retval = struct_->get_link_title(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -133,14 +126,13 @@ CefString CefDragDataCToCpp::GetLinkTitle() {
 }
 
 CefString CefDragDataCToCpp::GetLinkMetadata() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_link_metadata))
+  if (CEF_MEMBER_MISSING(struct_, get_link_metadata))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_link_metadata(_struct);
+  cef_string_userfree_t _retval = struct_->get_link_metadata(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -149,14 +141,13 @@ CefString CefDragDataCToCpp::GetLinkMetadata() {
 }
 
 CefString CefDragDataCToCpp::GetFragmentText() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_fragment_text))
+  if (CEF_MEMBER_MISSING(struct_, get_fragment_text))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_fragment_text(_struct);
+  cef_string_userfree_t _retval = struct_->get_fragment_text(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -165,14 +156,13 @@ CefString CefDragDataCToCpp::GetFragmentText() {
 }
 
 CefString CefDragDataCToCpp::GetFragmentHtml() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_fragment_html))
+  if (CEF_MEMBER_MISSING(struct_, get_fragment_html))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_fragment_html(_struct);
+  cef_string_userfree_t _retval = struct_->get_fragment_html(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -181,14 +171,13 @@ CefString CefDragDataCToCpp::GetFragmentHtml() {
 }
 
 CefString CefDragDataCToCpp::GetFragmentBaseURL() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_fragment_base_url))
+  if (CEF_MEMBER_MISSING(struct_, get_fragment_base_url))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_fragment_base_url(_struct);
+  cef_string_userfree_t _retval = struct_->get_fragment_base_url(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -197,14 +186,13 @@ CefString CefDragDataCToCpp::GetFragmentBaseURL() {
 }
 
 CefString CefDragDataCToCpp::GetFileName() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_file_name))
+  if (CEF_MEMBER_MISSING(struct_, get_file_name))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_file_name(_struct);
+  cef_string_userfree_t _retval = struct_->get_file_name(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -213,8 +201,7 @@ CefString CefDragDataCToCpp::GetFileName() {
 }
 
 size_t CefDragDataCToCpp::GetFileContents(CefRefPtr<CefStreamWriter> writer) {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_file_contents))
+  if (CEF_MEMBER_MISSING(struct_, get_file_contents))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -222,7 +209,7 @@ size_t CefDragDataCToCpp::GetFileContents(CefRefPtr<CefStreamWriter> writer) {
   // Unverified params: writer
 
   // Execute
-  size_t _retval = _struct->get_file_contents(_struct,
+  size_t _retval = struct_->get_file_contents(struct_,
       CefStreamWriterCToCpp::Unwrap(writer));
 
   // Return type: simple
@@ -230,8 +217,7 @@ size_t CefDragDataCToCpp::GetFileContents(CefRefPtr<CefStreamWriter> writer) {
 }
 
 bool CefDragDataCToCpp::GetFileNames(std::vector<CefString>& names) {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_file_names))
+  if (CEF_MEMBER_MISSING(struct_, get_file_names))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -243,7 +229,7 @@ bool CefDragDataCToCpp::GetFileNames(std::vector<CefString>& names) {
     transfer_string_list_contents(names, namesList);
 
   // Execute
-  int _retval = _struct->get_file_names(_struct,
+  int _retval = struct_->get_file_names(struct_,
       namesList);
 
   // Restore param:names; type: string_vec_byref
@@ -258,8 +244,7 @@ bool CefDragDataCToCpp::GetFileNames(std::vector<CefString>& names) {
 }
 
 void CefDragDataCToCpp::SetLinkURL(const CefString& url) {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_link_url))
+  if (CEF_MEMBER_MISSING(struct_, set_link_url))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -267,13 +252,12 @@ void CefDragDataCToCpp::SetLinkURL(const CefString& url) {
   // Unverified params: url
 
   // Execute
-  _struct->set_link_url(_struct,
+  struct_->set_link_url(struct_,
       url.GetStruct());
 }
 
 void CefDragDataCToCpp::SetLinkTitle(const CefString& title) {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_link_title))
+  if (CEF_MEMBER_MISSING(struct_, set_link_title))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -281,13 +265,12 @@ void CefDragDataCToCpp::SetLinkTitle(const CefString& title) {
   // Unverified params: title
 
   // Execute
-  _struct->set_link_title(_struct,
+  struct_->set_link_title(struct_,
       title.GetStruct());
 }
 
 void CefDragDataCToCpp::SetLinkMetadata(const CefString& data) {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_link_metadata))
+  if (CEF_MEMBER_MISSING(struct_, set_link_metadata))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -295,13 +278,12 @@ void CefDragDataCToCpp::SetLinkMetadata(const CefString& data) {
   // Unverified params: data
 
   // Execute
-  _struct->set_link_metadata(_struct,
+  struct_->set_link_metadata(struct_,
       data.GetStruct());
 }
 
 void CefDragDataCToCpp::SetFragmentText(const CefString& text) {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_fragment_text))
+  if (CEF_MEMBER_MISSING(struct_, set_fragment_text))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -309,13 +291,12 @@ void CefDragDataCToCpp::SetFragmentText(const CefString& text) {
   // Unverified params: text
 
   // Execute
-  _struct->set_fragment_text(_struct,
+  struct_->set_fragment_text(struct_,
       text.GetStruct());
 }
 
 void CefDragDataCToCpp::SetFragmentHtml(const CefString& html) {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_fragment_html))
+  if (CEF_MEMBER_MISSING(struct_, set_fragment_html))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -323,13 +304,12 @@ void CefDragDataCToCpp::SetFragmentHtml(const CefString& html) {
   // Unverified params: html
 
   // Execute
-  _struct->set_fragment_html(_struct,
+  struct_->set_fragment_html(struct_,
       html.GetStruct());
 }
 
 void CefDragDataCToCpp::SetFragmentBaseURL(const CefString& base_url) {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_fragment_base_url))
+  if (CEF_MEMBER_MISSING(struct_, set_fragment_base_url))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -337,25 +317,23 @@ void CefDragDataCToCpp::SetFragmentBaseURL(const CefString& base_url) {
   // Unverified params: base_url
 
   // Execute
-  _struct->set_fragment_base_url(_struct,
+  struct_->set_fragment_base_url(struct_,
       base_url.GetStruct());
 }
 
 void CefDragDataCToCpp::ResetFileContents() {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, reset_file_contents))
+  if (CEF_MEMBER_MISSING(struct_, reset_file_contents))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->reset_file_contents(_struct);
+  struct_->reset_file_contents(struct_);
 }
 
 void CefDragDataCToCpp::AddFile(const CefString& path,
     const CefString& display_name) {
-  cef_drag_data_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, add_file))
+  if (CEF_MEMBER_MISSING(struct_, add_file))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -367,27 +345,14 @@ void CefDragDataCToCpp::AddFile(const CefString& path,
   // Unverified params: display_name
 
   // Execute
-  _struct->add_file(_struct,
+  struct_->add_file(struct_,
       path.GetStruct(),
       display_name.GetStruct());
 }
 
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefDragDataCToCpp::CefDragDataCToCpp() {
-}
-
-template<> cef_drag_data_t* CefCToCpp<CefDragDataCToCpp, CefDragData,
-    cef_drag_data_t>::UnwrapDerived(CefWrapperType type, CefDragData* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefDragDataCToCpp, CefDragData,
     cef_drag_data_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefDragDataCToCpp, CefDragData,
-    cef_drag_data_t>::kWrapperType = WT_DRAG_DATA;

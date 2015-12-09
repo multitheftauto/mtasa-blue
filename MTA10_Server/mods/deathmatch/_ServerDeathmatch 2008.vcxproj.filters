@@ -1008,9 +1008,6 @@
     <ClCompile Include="logic\packets\CPlayerNetworkStatusPacket.cpp">
       <Filter>Source Files\logic\packets</Filter>
     </ClCompile>
-    <ClCompile Include="logic\packets\CPlayerACInfoPacket.cpp">
-      <Filter>Source Files\logic\packets</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logic\CLightsyncManager.h">
@@ -1872,9 +1869,6 @@
       <Filter>Header Files\logic\lua</Filter>
     </ClInclude>
     <ClInclude Include="logic\packets\CPlayerNetworkStatusPacket.h">
-      <Filter>Header Files\logic\packets</Filter>
-    </ClInclude>
-    <ClInclude Include="logic\packets\CPlayerACInfoPacket.h">
       <Filter>Header Files\logic\packets</Filter>
     </ClInclude>
   </ItemGroup>

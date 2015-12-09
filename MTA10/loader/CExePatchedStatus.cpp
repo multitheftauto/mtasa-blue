@@ -114,7 +114,7 @@ bool RequiresAltTabFix( void )
         return false;
 
     // Check for problem combo of: Windows 10 + NVidia card + full screen
-    if ( IsWindows10OrGreater() && GetApplicationSettingInt( "nvhacks", "nvidia" ) )
+    if ( IsWin10OrHigher() && GetApplicationSettingInt( "nvhacks", "nvidia" ) )
     {
         // Slighty hacky way of checking in-game settings
         SString strCoreConfig;

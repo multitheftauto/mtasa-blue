@@ -12,7 +12,6 @@
 
 #include "libcef_dll/cpptoc/client_cpptoc.h"
 #include "libcef_dll/cpptoc/navigation_entry_visitor_cpptoc.h"
-#include "libcef_dll/cpptoc/pdf_print_callback_cpptoc.h"
 #include "libcef_dll/cpptoc/run_file_dialog_callback_cpptoc.h"
 #include "libcef_dll/ctocpp/browser_ctocpp.h"
 #include "libcef_dll/ctocpp/browser_host_ctocpp.h"
@@ -67,134 +66,124 @@ CefRefPtr<CefBrowser> CefBrowserHost::CreateBrowserSync(
 // VIRTUAL METHODS - Body may be edited by hand.
 
 CefRefPtr<CefBrowser> CefBrowserHostCToCpp::GetBrowser() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_browser))
+  if (CEF_MEMBER_MISSING(struct_, get_browser))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_browser_t* _retval = _struct->get_browser(_struct);
+  cef_browser_t* _retval = struct_->get_browser(struct_);
 
   // Return type: refptr_same
   return CefBrowserCToCpp::Wrap(_retval);
 }
 
 void CefBrowserHostCToCpp::CloseBrowser(bool force_close) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, close_browser))
+  if (CEF_MEMBER_MISSING(struct_, close_browser))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->close_browser(_struct,
+  struct_->close_browser(struct_,
       force_close);
 }
 
 void CefBrowserHostCToCpp::SetFocus(bool focus) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_focus))
+  if (CEF_MEMBER_MISSING(struct_, set_focus))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->set_focus(_struct,
+  struct_->set_focus(struct_,
       focus);
 }
 
 void CefBrowserHostCToCpp::SetWindowVisibility(bool visible) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_window_visibility))
+  if (CEF_MEMBER_MISSING(struct_, set_window_visibility))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->set_window_visibility(_struct,
+  struct_->set_window_visibility(struct_,
       visible);
 }
 
 CefWindowHandle CefBrowserHostCToCpp::GetWindowHandle() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_window_handle))
+  if (CEF_MEMBER_MISSING(struct_, get_window_handle))
     return kNullWindowHandle;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_window_handle_t _retval = _struct->get_window_handle(_struct);
+  cef_window_handle_t _retval = struct_->get_window_handle(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 CefWindowHandle CefBrowserHostCToCpp::GetOpenerWindowHandle() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_opener_window_handle))
+  if (CEF_MEMBER_MISSING(struct_, get_opener_window_handle))
     return kNullWindowHandle;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_window_handle_t _retval = _struct->get_opener_window_handle(_struct);
+  cef_window_handle_t _retval = struct_->get_opener_window_handle(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 CefRefPtr<CefClient> CefBrowserHostCToCpp::GetClient() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_client))
+  if (CEF_MEMBER_MISSING(struct_, get_client))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_client_t* _retval = _struct->get_client(_struct);
+  cef_client_t* _retval = struct_->get_client(struct_);
 
   // Return type: refptr_diff
   return CefClientCppToC::Unwrap(_retval);
 }
 
 CefRefPtr<CefRequestContext> CefBrowserHostCToCpp::GetRequestContext() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_request_context))
+  if (CEF_MEMBER_MISSING(struct_, get_request_context))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_request_context_t* _retval = _struct->get_request_context(_struct);
+  cef_request_context_t* _retval = struct_->get_request_context(struct_);
 
   // Return type: refptr_same
   return CefRequestContextCToCpp::Wrap(_retval);
 }
 
 double CefBrowserHostCToCpp::GetZoomLevel() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_zoom_level))
+  if (CEF_MEMBER_MISSING(struct_, get_zoom_level))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  double _retval = _struct->get_zoom_level(_struct);
+  double _retval = struct_->get_zoom_level(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 void CefBrowserHostCToCpp::SetZoomLevel(double zoomLevel) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_zoom_level))
+  if (CEF_MEMBER_MISSING(struct_, set_zoom_level))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->set_zoom_level(_struct,
+  struct_->set_zoom_level(struct_,
       zoomLevel);
 }
 
@@ -202,8 +191,7 @@ void CefBrowserHostCToCpp::RunFileDialog(FileDialogMode mode,
     const CefString& title, const CefString& default_file_path,
     const std::vector<CefString>& accept_filters, int selected_accept_filter,
     CefRefPtr<CefRunFileDialogCallback> callback) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, run_file_dialog))
+  if (CEF_MEMBER_MISSING(struct_, run_file_dialog))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -225,7 +213,7 @@ void CefBrowserHostCToCpp::RunFileDialog(FileDialogMode mode,
     transfer_string_list_contents(accept_filters, accept_filtersList);
 
   // Execute
-  _struct->run_file_dialog(_struct,
+  struct_->run_file_dialog(struct_,
       mode,
       title.GetStruct(),
       default_file_path.GetStruct(),
@@ -239,8 +227,7 @@ void CefBrowserHostCToCpp::RunFileDialog(FileDialogMode mode,
 }
 
 void CefBrowserHostCToCpp::StartDownload(const CefString& url) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, start_download))
+  if (CEF_MEMBER_MISSING(struct_, start_download))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -251,47 +238,23 @@ void CefBrowserHostCToCpp::StartDownload(const CefString& url) {
     return;
 
   // Execute
-  _struct->start_download(_struct,
+  struct_->start_download(struct_,
       url.GetStruct());
 }
 
 void CefBrowserHostCToCpp::Print() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, print))
+  if (CEF_MEMBER_MISSING(struct_, print))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->print(_struct);
-}
-
-void CefBrowserHostCToCpp::PrintToPDF(const CefString& path,
-    const CefPdfPrintSettings& settings,
-    CefRefPtr<CefPdfPrintCallback> callback) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, print_to_pdf))
-    return;
-
-  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
-
-  // Verify param: path; type: string_byref_const
-  DCHECK(!path.empty());
-  if (path.empty())
-    return;
-  // Unverified params: callback
-
-  // Execute
-  _struct->print_to_pdf(_struct,
-      path.GetStruct(),
-      &settings,
-      CefPdfPrintCallbackCppToC::Wrap(callback));
+  struct_->print(struct_);
 }
 
 void CefBrowserHostCToCpp::Find(int identifier, const CefString& searchText,
     bool forward, bool matchCase, bool findNext) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, find))
+  if (CEF_MEMBER_MISSING(struct_, find))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -302,7 +265,7 @@ void CefBrowserHostCToCpp::Find(int identifier, const CefString& searchText,
     return;
 
   // Execute
-  _struct->find(_struct,
+  struct_->find(struct_,
       identifier,
       searchText.GetStruct(),
       forward,
@@ -311,22 +274,20 @@ void CefBrowserHostCToCpp::Find(int identifier, const CefString& searchText,
 }
 
 void CefBrowserHostCToCpp::StopFinding(bool clearSelection) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, stop_finding))
+  if (CEF_MEMBER_MISSING(struct_, stop_finding))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->stop_finding(_struct,
+  struct_->stop_finding(struct_,
       clearSelection);
 }
 
 void CefBrowserHostCToCpp::ShowDevTools(const CefWindowInfo& windowInfo,
     CefRefPtr<CefClient> client, const CefBrowserSettings& settings,
     const CefPoint& inspect_element_at) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, show_dev_tools))
+  if (CEF_MEMBER_MISSING(struct_, show_dev_tools))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -338,7 +299,7 @@ void CefBrowserHostCToCpp::ShowDevTools(const CefWindowInfo& windowInfo,
   // Unverified params: inspect_element_at
 
   // Execute
-  _struct->show_dev_tools(_struct,
+  struct_->show_dev_tools(struct_,
       &windowInfo,
       CefClientCppToC::Wrap(client),
       &settings,
@@ -346,20 +307,18 @@ void CefBrowserHostCToCpp::ShowDevTools(const CefWindowInfo& windowInfo,
 }
 
 void CefBrowserHostCToCpp::CloseDevTools() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, close_dev_tools))
+  if (CEF_MEMBER_MISSING(struct_, close_dev_tools))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->close_dev_tools(_struct);
+  struct_->close_dev_tools(struct_);
 }
 
 void CefBrowserHostCToCpp::GetNavigationEntries(
     CefRefPtr<CefNavigationEntryVisitor> visitor, bool current_only) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_navigation_entries))
+  if (CEF_MEMBER_MISSING(struct_, get_navigation_entries))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -370,40 +329,37 @@ void CefBrowserHostCToCpp::GetNavigationEntries(
     return;
 
   // Execute
-  _struct->get_navigation_entries(_struct,
+  struct_->get_navigation_entries(struct_,
       CefNavigationEntryVisitorCppToC::Wrap(visitor),
       current_only);
 }
 
 void CefBrowserHostCToCpp::SetMouseCursorChangeDisabled(bool disabled) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_mouse_cursor_change_disabled))
+  if (CEF_MEMBER_MISSING(struct_, set_mouse_cursor_change_disabled))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->set_mouse_cursor_change_disabled(_struct,
+  struct_->set_mouse_cursor_change_disabled(struct_,
       disabled);
 }
 
 bool CefBrowserHostCToCpp::IsMouseCursorChangeDisabled() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_mouse_cursor_change_disabled))
+  if (CEF_MEMBER_MISSING(struct_, is_mouse_cursor_change_disabled))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_mouse_cursor_change_disabled(_struct);
+  int _retval = struct_->is_mouse_cursor_change_disabled(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 void CefBrowserHostCToCpp::ReplaceMisspelling(const CefString& word) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, replace_misspelling))
+  if (CEF_MEMBER_MISSING(struct_, replace_misspelling))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -414,13 +370,12 @@ void CefBrowserHostCToCpp::ReplaceMisspelling(const CefString& word) {
     return;
 
   // Execute
-  _struct->replace_misspelling(_struct,
+  struct_->replace_misspelling(struct_,
       word.GetStruct());
 }
 
 void CefBrowserHostCToCpp::AddWordToDictionary(const CefString& word) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, add_word_to_dictionary))
+  if (CEF_MEMBER_MISSING(struct_, add_word_to_dictionary))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -431,92 +386,85 @@ void CefBrowserHostCToCpp::AddWordToDictionary(const CefString& word) {
     return;
 
   // Execute
-  _struct->add_word_to_dictionary(_struct,
+  struct_->add_word_to_dictionary(struct_,
       word.GetStruct());
 }
 
 bool CefBrowserHostCToCpp::IsWindowRenderingDisabled() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_window_rendering_disabled))
+  if (CEF_MEMBER_MISSING(struct_, is_window_rendering_disabled))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_window_rendering_disabled(_struct);
+  int _retval = struct_->is_window_rendering_disabled(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 void CefBrowserHostCToCpp::WasResized() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, was_resized))
+  if (CEF_MEMBER_MISSING(struct_, was_resized))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->was_resized(_struct);
+  struct_->was_resized(struct_);
 }
 
 void CefBrowserHostCToCpp::WasHidden(bool hidden) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, was_hidden))
+  if (CEF_MEMBER_MISSING(struct_, was_hidden))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->was_hidden(_struct,
+  struct_->was_hidden(struct_,
       hidden);
 }
 
 void CefBrowserHostCToCpp::NotifyScreenInfoChanged() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, notify_screen_info_changed))
+  if (CEF_MEMBER_MISSING(struct_, notify_screen_info_changed))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->notify_screen_info_changed(_struct);
+  struct_->notify_screen_info_changed(struct_);
 }
 
 void CefBrowserHostCToCpp::Invalidate(PaintElementType type) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, invalidate))
+  if (CEF_MEMBER_MISSING(struct_, invalidate))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->invalidate(_struct,
+  struct_->invalidate(struct_,
       type);
 }
 
 void CefBrowserHostCToCpp::SendKeyEvent(const CefKeyEvent& event) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, send_key_event))
+  if (CEF_MEMBER_MISSING(struct_, send_key_event))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->send_key_event(_struct,
+  struct_->send_key_event(struct_,
       &event);
 }
 
 void CefBrowserHostCToCpp::SendMouseClickEvent(const CefMouseEvent& event,
     MouseButtonType type, bool mouseUp, int clickCount) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, send_mouse_click_event))
+  if (CEF_MEMBER_MISSING(struct_, send_mouse_click_event))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->send_mouse_click_event(_struct,
+  struct_->send_mouse_click_event(struct_,
       &event,
       type,
       mouseUp,
@@ -525,102 +473,70 @@ void CefBrowserHostCToCpp::SendMouseClickEvent(const CefMouseEvent& event,
 
 void CefBrowserHostCToCpp::SendMouseMoveEvent(const CefMouseEvent& event,
     bool mouseLeave) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, send_mouse_move_event))
+  if (CEF_MEMBER_MISSING(struct_, send_mouse_move_event))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->send_mouse_move_event(_struct,
+  struct_->send_mouse_move_event(struct_,
       &event,
       mouseLeave);
 }
 
 void CefBrowserHostCToCpp::SendMouseWheelEvent(const CefMouseEvent& event,
     int deltaX, int deltaY) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, send_mouse_wheel_event))
+  if (CEF_MEMBER_MISSING(struct_, send_mouse_wheel_event))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->send_mouse_wheel_event(_struct,
+  struct_->send_mouse_wheel_event(struct_,
       &event,
       deltaX,
       deltaY);
 }
 
 void CefBrowserHostCToCpp::SendFocusEvent(bool setFocus) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, send_focus_event))
+  if (CEF_MEMBER_MISSING(struct_, send_focus_event))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->send_focus_event(_struct,
+  struct_->send_focus_event(struct_,
       setFocus);
 }
 
 void CefBrowserHostCToCpp::SendCaptureLostEvent() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, send_capture_lost_event))
+  if (CEF_MEMBER_MISSING(struct_, send_capture_lost_event))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->send_capture_lost_event(_struct);
+  struct_->send_capture_lost_event(struct_);
 }
 
 void CefBrowserHostCToCpp::NotifyMoveOrResizeStarted() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, notify_move_or_resize_started))
+  if (CEF_MEMBER_MISSING(struct_, notify_move_or_resize_started))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->notify_move_or_resize_started(_struct);
-}
-
-int CefBrowserHostCToCpp::GetWindowlessFrameRate() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_windowless_frame_rate))
-    return 0;
-
-  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
-
-  // Execute
-  int _retval = _struct->get_windowless_frame_rate(_struct);
-
-  // Return type: simple
-  return _retval;
-}
-
-void CefBrowserHostCToCpp::SetWindowlessFrameRate(int frame_rate) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_windowless_frame_rate))
-    return;
-
-  // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
-
-  // Execute
-  _struct->set_windowless_frame_rate(_struct,
-      frame_rate);
+  struct_->notify_move_or_resize_started(struct_);
 }
 
 CefTextInputContext CefBrowserHostCToCpp::GetNSTextInputContext() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_nstext_input_context))
+  if (CEF_MEMBER_MISSING(struct_, get_nstext_input_context))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_text_input_context_t _retval = _struct->get_nstext_input_context(_struct);
+  cef_text_input_context_t _retval = struct_->get_nstext_input_context(struct_);
 
   // Return type: simple
   return _retval;
@@ -628,34 +544,31 @@ CefTextInputContext CefBrowserHostCToCpp::GetNSTextInputContext() {
 
 void CefBrowserHostCToCpp::HandleKeyEventBeforeTextInputClient(
     CefEventHandle keyEvent) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, handle_key_event_before_text_input_client))
+  if (CEF_MEMBER_MISSING(struct_, handle_key_event_before_text_input_client))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->handle_key_event_before_text_input_client(_struct,
+  struct_->handle_key_event_before_text_input_client(struct_,
       keyEvent);
 }
 
 void CefBrowserHostCToCpp::HandleKeyEventAfterTextInputClient(
     CefEventHandle keyEvent) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, handle_key_event_after_text_input_client))
+  if (CEF_MEMBER_MISSING(struct_, handle_key_event_after_text_input_client))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->handle_key_event_after_text_input_client(_struct,
+  struct_->handle_key_event_after_text_input_client(struct_,
       keyEvent);
 }
 
 void CefBrowserHostCToCpp::DragTargetDragEnter(CefRefPtr<CefDragData> drag_data,
     const CefMouseEvent& event, DragOperationsMask allowed_ops) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, drag_target_drag_enter))
+  if (CEF_MEMBER_MISSING(struct_, drag_target_drag_enter))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -666,7 +579,7 @@ void CefBrowserHostCToCpp::DragTargetDragEnter(CefRefPtr<CefDragData> drag_data,
     return;
 
   // Execute
-  _struct->drag_target_drag_enter(_struct,
+  struct_->drag_target_drag_enter(struct_,
       CefDragDataCToCpp::Unwrap(drag_data),
       &event,
       allowed_ops);
@@ -674,84 +587,65 @@ void CefBrowserHostCToCpp::DragTargetDragEnter(CefRefPtr<CefDragData> drag_data,
 
 void CefBrowserHostCToCpp::DragTargetDragOver(const CefMouseEvent& event,
     DragOperationsMask allowed_ops) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, drag_target_drag_over))
+  if (CEF_MEMBER_MISSING(struct_, drag_target_drag_over))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->drag_target_drag_over(_struct,
+  struct_->drag_target_drag_over(struct_,
       &event,
       allowed_ops);
 }
 
 void CefBrowserHostCToCpp::DragTargetDragLeave() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, drag_target_drag_leave))
+  if (CEF_MEMBER_MISSING(struct_, drag_target_drag_leave))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->drag_target_drag_leave(_struct);
+  struct_->drag_target_drag_leave(struct_);
 }
 
 void CefBrowserHostCToCpp::DragTargetDrop(const CefMouseEvent& event) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, drag_target_drop))
+  if (CEF_MEMBER_MISSING(struct_, drag_target_drop))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->drag_target_drop(_struct,
+  struct_->drag_target_drop(struct_,
       &event);
 }
 
 void CefBrowserHostCToCpp::DragSourceEndedAt(int x, int y,
     DragOperationsMask op) {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, drag_source_ended_at))
+  if (CEF_MEMBER_MISSING(struct_, drag_source_ended_at))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->drag_source_ended_at(_struct,
+  struct_->drag_source_ended_at(struct_,
       x,
       y,
       op);
 }
 
 void CefBrowserHostCToCpp::DragSourceSystemDragEnded() {
-  cef_browser_host_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, drag_source_system_drag_ended))
+  if (CEF_MEMBER_MISSING(struct_, drag_source_system_drag_ended))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->drag_source_system_drag_ended(_struct);
+  struct_->drag_source_system_drag_ended(struct_);
 }
 
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefBrowserHostCToCpp::CefBrowserHostCToCpp() {
-}
-
-template<> cef_browser_host_t* CefCToCpp<CefBrowserHostCToCpp, CefBrowserHost,
-    cef_browser_host_t>::UnwrapDerived(CefWrapperType type,
-    CefBrowserHost* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefBrowserHostCToCpp, CefBrowserHost,
     cef_browser_host_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefBrowserHostCToCpp, CefBrowserHost,
-    cef_browser_host_t>::kWrapperType = WT_BROWSER_HOST;

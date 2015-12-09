@@ -37,36 +37,33 @@ CefRefPtr<CefBinaryValue> CefBinaryValue::Create(const void* data,
 // VIRTUAL METHODS - Body may be edited by hand.
 
 bool CefBinaryValueCToCpp::IsValid() {
-  cef_binary_value_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_valid))
+  if (CEF_MEMBER_MISSING(struct_, is_valid))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_valid(_struct);
+  int _retval = struct_->is_valid(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefBinaryValueCToCpp::IsOwned() {
-  cef_binary_value_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_owned))
+  if (CEF_MEMBER_MISSING(struct_, is_owned))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_owned(_struct);
+  int _retval = struct_->is_owned(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefBinaryValueCToCpp::IsSame(CefRefPtr<CefBinaryValue> that) {
-  cef_binary_value_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_same))
+  if (CEF_MEMBER_MISSING(struct_, is_same))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -77,7 +74,7 @@ bool CefBinaryValueCToCpp::IsSame(CefRefPtr<CefBinaryValue> that) {
     return false;
 
   // Execute
-  int _retval = _struct->is_same(_struct,
+  int _retval = struct_->is_same(struct_,
       CefBinaryValueCToCpp::Unwrap(that));
 
   // Return type: bool
@@ -85,8 +82,7 @@ bool CefBinaryValueCToCpp::IsSame(CefRefPtr<CefBinaryValue> that) {
 }
 
 bool CefBinaryValueCToCpp::IsEqual(CefRefPtr<CefBinaryValue> that) {
-  cef_binary_value_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_equal))
+  if (CEF_MEMBER_MISSING(struct_, is_equal))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -97,7 +93,7 @@ bool CefBinaryValueCToCpp::IsEqual(CefRefPtr<CefBinaryValue> that) {
     return false;
 
   // Execute
-  int _retval = _struct->is_equal(_struct,
+  int _retval = struct_->is_equal(struct_,
       CefBinaryValueCToCpp::Unwrap(that));
 
   // Return type: bool
@@ -105,28 +101,26 @@ bool CefBinaryValueCToCpp::IsEqual(CefRefPtr<CefBinaryValue> that) {
 }
 
 CefRefPtr<CefBinaryValue> CefBinaryValueCToCpp::Copy() {
-  cef_binary_value_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, copy))
+  if (CEF_MEMBER_MISSING(struct_, copy))
     return NULL;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_binary_value_t* _retval = _struct->copy(_struct);
+  cef_binary_value_t* _retval = struct_->copy(struct_);
 
   // Return type: refptr_same
   return CefBinaryValueCToCpp::Wrap(_retval);
 }
 
 size_t CefBinaryValueCToCpp::GetSize() {
-  cef_binary_value_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_size))
+  if (CEF_MEMBER_MISSING(struct_, get_size))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  size_t _retval = _struct->get_size(_struct);
+  size_t _retval = struct_->get_size(struct_);
 
   // Return type: simple
   return _retval;
@@ -134,8 +128,7 @@ size_t CefBinaryValueCToCpp::GetSize() {
 
 size_t CefBinaryValueCToCpp::GetData(void* buffer, size_t buffer_size,
     size_t data_offset) {
-  cef_binary_value_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_data))
+  if (CEF_MEMBER_MISSING(struct_, get_data))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -146,7 +139,7 @@ size_t CefBinaryValueCToCpp::GetData(void* buffer, size_t buffer_size,
     return 0;
 
   // Execute
-  size_t _retval = _struct->get_data(_struct,
+  size_t _retval = struct_->get_data(struct_,
       buffer,
       buffer_size,
       data_offset);
@@ -156,22 +149,8 @@ size_t CefBinaryValueCToCpp::GetData(void* buffer, size_t buffer_size,
 }
 
 
-// CONSTRUCTOR - Do not edit by hand.
-
-CefBinaryValueCToCpp::CefBinaryValueCToCpp() {
-}
-
-template<> cef_binary_value_t* CefCToCpp<CefBinaryValueCToCpp, CefBinaryValue,
-    cef_binary_value_t>::UnwrapDerived(CefWrapperType type,
-    CefBinaryValue* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
-
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefBinaryValueCToCpp, CefBinaryValue,
     cef_binary_value_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefBinaryValueCToCpp, CefBinaryValue,
-    cef_binary_value_t>::kWrapperType = WT_BINARY_VALUE;

@@ -29,33 +29,30 @@ CefRefPtr<CefPostDataElement> CefPostDataElement::Create() {
 // VIRTUAL METHODS - Body may be edited by hand.
 
 bool CefPostDataElementCToCpp::IsReadOnly() {
-  cef_post_data_element_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_read_only))
+  if (CEF_MEMBER_MISSING(struct_, is_read_only))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_read_only(_struct);
+  int _retval = struct_->is_read_only(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 void CefPostDataElementCToCpp::SetToEmpty() {
-  cef_post_data_element_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_to_empty))
+  if (CEF_MEMBER_MISSING(struct_, set_to_empty))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->set_to_empty(_struct);
+  struct_->set_to_empty(struct_);
 }
 
 void CefPostDataElementCToCpp::SetToFile(const CefString& fileName) {
-  cef_post_data_element_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_to_file))
+  if (CEF_MEMBER_MISSING(struct_, set_to_file))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -66,13 +63,12 @@ void CefPostDataElementCToCpp::SetToFile(const CefString& fileName) {
     return;
 
   // Execute
-  _struct->set_to_file(_struct,
+  struct_->set_to_file(struct_,
       fileName.GetStruct());
 }
 
 void CefPostDataElementCToCpp::SetToBytes(size_t size, const void* bytes) {
-  cef_post_data_element_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, set_to_bytes))
+  if (CEF_MEMBER_MISSING(struct_, set_to_bytes))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -83,34 +79,32 @@ void CefPostDataElementCToCpp::SetToBytes(size_t size, const void* bytes) {
     return;
 
   // Execute
-  _struct->set_to_bytes(_struct,
+  struct_->set_to_bytes(struct_,
       size,
       bytes);
 }
 
 CefPostDataElement::Type CefPostDataElementCToCpp::GetType() {
-  cef_post_data_element_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_type))
+  if (CEF_MEMBER_MISSING(struct_, get_type))
     return PDE_TYPE_EMPTY;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_postdataelement_type_t _retval = _struct->get_type(_struct);
+  cef_postdataelement_type_t _retval = struct_->get_type(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 CefString CefPostDataElementCToCpp::GetFile() {
-  cef_post_data_element_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_file))
+  if (CEF_MEMBER_MISSING(struct_, get_file))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_file(_struct);
+  cef_string_userfree_t _retval = struct_->get_file(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -119,22 +113,20 @@ CefString CefPostDataElementCToCpp::GetFile() {
 }
 
 size_t CefPostDataElementCToCpp::GetBytesCount() {
-  cef_post_data_element_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_bytes_count))
+  if (CEF_MEMBER_MISSING(struct_, get_bytes_count))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  size_t _retval = _struct->get_bytes_count(_struct);
+  size_t _retval = struct_->get_bytes_count(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 size_t CefPostDataElementCToCpp::GetBytes(size_t size, void* bytes) {
-  cef_post_data_element_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_bytes))
+  if (CEF_MEMBER_MISSING(struct_, get_bytes))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -145,7 +137,7 @@ size_t CefPostDataElementCToCpp::GetBytes(size_t size, void* bytes) {
     return 0;
 
   // Execute
-  size_t _retval = _struct->get_bytes(_struct,
+  size_t _retval = struct_->get_bytes(struct_,
       size,
       bytes);
 
@@ -154,23 +146,8 @@ size_t CefPostDataElementCToCpp::GetBytes(size_t size, void* bytes) {
 }
 
 
-// CONSTRUCTOR - Do not edit by hand.
-
-CefPostDataElementCToCpp::CefPostDataElementCToCpp() {
-}
-
-template<> cef_post_data_element_t* CefCToCpp<CefPostDataElementCToCpp,
-    CefPostDataElement, cef_post_data_element_t>::UnwrapDerived(
-    CefWrapperType type, CefPostDataElement* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
-
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefPostDataElementCToCpp,
     CefPostDataElement, cef_post_data_element_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefPostDataElementCToCpp,
-    CefPostDataElement, cef_post_data_element_t>::kWrapperType =
-    WT_POST_DATA_ELEMENT;

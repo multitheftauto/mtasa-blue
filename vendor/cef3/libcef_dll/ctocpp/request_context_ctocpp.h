@@ -30,22 +30,24 @@ class CefRequestContextCToCpp
     : public CefCToCpp<CefRequestContextCToCpp, CefRequestContext,
         cef_request_context_t> {
  public:
-  CefRequestContextCToCpp();
+  explicit CefRequestContextCToCpp(cef_request_context_t* str)
+      : CefCToCpp<CefRequestContextCToCpp, CefRequestContext,
+          cef_request_context_t>(str) {}
 
-  // CefRequestContext methods.
-  bool IsSame(CefRefPtr<CefRequestContext> other) OVERRIDE;
-  bool IsSharingWith(CefRefPtr<CefRequestContext> other) OVERRIDE;
-  bool IsGlobal() OVERRIDE;
-  CefRefPtr<CefRequestContextHandler> GetHandler() OVERRIDE;
-  CefString GetCachePath() OVERRIDE;
-  CefRefPtr<CefCookieManager> GetDefaultCookieManager(
+  // CefRequestContext methods
+  virtual bool IsSame(CefRefPtr<CefRequestContext> other) OVERRIDE;
+  virtual bool IsSharingWith(CefRefPtr<CefRequestContext> other) OVERRIDE;
+  virtual bool IsGlobal() OVERRIDE;
+  virtual CefRefPtr<CefRequestContextHandler> GetHandler() OVERRIDE;
+  virtual CefString GetCachePath() OVERRIDE;
+  virtual CefRefPtr<CefCookieManager> GetDefaultCookieManager(
       CefRefPtr<CefCompletionCallback> callback) OVERRIDE;
-  bool RegisterSchemeHandlerFactory(const CefString& scheme_name,
+  virtual bool RegisterSchemeHandlerFactory(const CefString& scheme_name,
       const CefString& domain_name,
       CefRefPtr<CefSchemeHandlerFactory> factory) OVERRIDE;
-  bool ClearSchemeHandlerFactories() OVERRIDE;
-  void PurgePluginListCache(bool reload_pages) OVERRIDE;
+  virtual bool ClearSchemeHandlerFactories() OVERRIDE;
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CTOCPP_REQUEST_CONTEXT_CTOCPP_H_
+

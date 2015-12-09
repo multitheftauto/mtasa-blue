@@ -374,12 +374,13 @@ bool IsValidOrganizationPath ( const char *szDir )
     if ( uiLen > 0 && szDir [ uiLen - 1 ] == '/' ) // will return false if ending with an invalid character, mainly used for linux (#6871)
         return false;
 
-    unsigned char c;
+    unsigned char c, c_d;
     bool bInsideBraces = false;
     
     // iterate through the char array
     for ( unsigned int i = 0; i < uiLen; i++ ) {
         c = szDir[i];                                       // current character
+        c_d = ( i < ( uiLen - 1 ) ) ? szDir[i+1] : 0;       // one character ahead, if any
 
         // Enforce braces around visible letters
         if ( !bInsideBraces && IsVisibleCharacter ( c ) && c != '[' && c != ']' && c != '/' && c != '\\' )

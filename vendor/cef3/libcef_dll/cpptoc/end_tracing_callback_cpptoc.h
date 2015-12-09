@@ -28,8 +28,9 @@ class CefEndTracingCallbackCppToC
     : public CefCppToC<CefEndTracingCallbackCppToC, CefEndTracingCallback,
         cef_end_tracing_callback_t> {
  public:
-  CefEndTracingCallbackCppToC();
+  explicit CefEndTracingCallbackCppToC(CefEndTracingCallback* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_END_TRACING_CALLBACK_CPPTOC_H_
+

@@ -39,6 +39,7 @@ class CCore;
 #include <core/CClientEntityBase.h>
 #include <core/CCoreInterface.h>
 #include "CDirect3DData.h"
+#include "tracking/CTCPManager.h"
 #include "CClientVariables.h"
 #include "CKeyBinds.h"
 #include "CMouseControl.h"
@@ -296,6 +297,7 @@ private:
     CDirect3DHookManager *      m_pDirect3DHookManager;
     //CFileSystemHook *           m_pFileSystemHook;
     CSetCursorPosHook *         m_pSetCursorPosHook;
+    CTCPManager *               m_pTCPManager;
 
     bool                        m_bLastFocused;
     int                         m_iUnminimizeFrameCounter;

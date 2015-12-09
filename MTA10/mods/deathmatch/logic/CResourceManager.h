@@ -36,34 +36,32 @@ class CResourceManager
 {  
 
 public:
-                                  CResourceManager            ( void );
-                                  ~CResourceManager           ( void );
+                                CResourceManager            ( void );
+                                ~CResourceManager           ( void );
 
-    CResource*                    Add                         ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP );
-    CResource*                    GetResource                 ( const char* szResourceName );
-    CResource*                    GetResourceFromNetID        ( unsigned short usNetID );
-    CResource*                    GetResourceFromScriptID     ( uint uiScriptID );
-    CResource*                    GetResourceFromLuaState     ( struct lua_State* luaVM );
-    SString                       GetResourceName             ( struct lua_State* luaVM );
-    
-    bool                          RemoveResource              ( unsigned short usID );
-    void                          Remove                      ( CResource* pResource );
-    bool                          Exists                      ( CResource* pResource );
-    void                          StopAll                     ( void );
+    CResource*                  Add                         ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP );
+    CResource*                  GetResource                 ( const char* szResourceName );
+    CResource*                  GetResourceFromNetID        ( unsigned short usNetID );
+    CResource*                  GetResourceFromScriptID     ( uint uiScriptID );
+    CResource*                  GetResourceFromLuaState     ( struct lua_State* luaVM );
+    SString                     GetResourceName             ( struct lua_State* luaVM );
+    bool                        RemoveResource              ( unsigned short usID );
+    void                        Remove                      ( CResource* pResource );
+    bool                        Exists                      ( CResource* pResource );
+    void                        StopAll                     ( void );
 
-    void                          OnDownloadGroupFinished     ( void );
-    void                          UpdatePendingDownloads      ( void );
+    void                        OnDownloadGroupFinished     ( void );
+    void                        UpdatePendingDownloads      ( void );
 
-    void                          OnAddResourceFile           ( CDownloadableResource* pResourceFile );
-    void                          OnRemoveResourceFile        ( CDownloadableResource* pResourceFile );
-    void                          OnDownloadedResourceFile    ( const SString& strFilename );
-    bool                          IsResourceFile              ( const SString& strFilename );
-    void                          FileModifedByScript         ( const SString& strFilename );
-    void                          ValidateResourceFile        ( const SString& strFilename, const CBuffer& fileData );
-    inline CDownloadableResource* GetDownloadableResourceFile ( const SString& strFilename ) { return MapFindRef ( m_ResourceFileMap, strFilename ); }
+    void                        OnAddResourceFile           ( CDownloadableResource* pResourceFile );
+    void                        OnRemoveResourceFile        ( CDownloadableResource* pResourceFile );
+    void                        OnDownloadedResourceFile    ( const SString& strFilename );
+    bool                        IsResourceFile              ( const SString& strFilename );
+    void                        FileModifedByScript         ( const SString& strFilename );
+    void                        ValidateResourceFile        ( const SString& strFilename, const CBuffer& fileData );
 
-    static bool                   ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath );
-    static bool                   ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath );
+    static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath );
+    static bool                 ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath );
 
 private:
 

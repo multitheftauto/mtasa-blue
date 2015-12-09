@@ -76,8 +76,6 @@ bool CClientColModel::Replace ( unsigned short usModel )
     // We have a model loaded?
     if ( m_pColModel )
     {
-        g_pCore->LogEvent( 6451, "ReplaceCol", "", SString( "%d", usModel ) );
-
         // Check if anyone has replaced that model already. If so make it forget that
         // it replaced it. We're the new replacer.
         CClientColModel* pAlready = m_pColModelManager->GetElementThatReplaced ( usModel );

@@ -17,8 +17,7 @@
 
 void CefAuthCallbackCToCpp::Continue(const CefString& username,
     const CefString& password) {
-  cef_auth_callback_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, cont))
+  if (CEF_MEMBER_MISSING(struct_, cont))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
@@ -33,39 +32,24 @@ void CefAuthCallbackCToCpp::Continue(const CefString& username,
     return;
 
   // Execute
-  _struct->cont(_struct,
+  struct_->cont(struct_,
       username.GetStruct(),
       password.GetStruct());
 }
 
 void CefAuthCallbackCToCpp::Cancel() {
-  cef_auth_callback_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, cancel))
+  if (CEF_MEMBER_MISSING(struct_, cancel))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->cancel(_struct);
+  struct_->cancel(struct_);
 }
 
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefAuthCallbackCToCpp::CefAuthCallbackCToCpp() {
-}
-
-template<> cef_auth_callback_t* CefCToCpp<CefAuthCallbackCToCpp,
-    CefAuthCallback, cef_auth_callback_t>::UnwrapDerived(CefWrapperType type,
-    CefAuthCallback* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefAuthCallbackCToCpp,
     CefAuthCallback, cef_auth_callback_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefAuthCallbackCToCpp, CefAuthCallback,
-    cef_auth_callback_t>::kWrapperType = WT_AUTH_CALLBACK;

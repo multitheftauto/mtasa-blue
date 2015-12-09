@@ -28,8 +28,9 @@ class CefSetCookieCallbackCppToC
     : public CefCppToC<CefSetCookieCallbackCppToC, CefSetCookieCallback,
         cef_set_cookie_callback_t> {
  public:
-  CefSetCookieCallbackCppToC();
+  explicit CefSetCookieCallbackCppToC(CefSetCookieCallback* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_SET_COOKIE_CALLBACK_CPPTOC_H_
+

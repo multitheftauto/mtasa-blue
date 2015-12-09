@@ -1,13 +1,11 @@
 ZIPDIR=$(srcdir)/../../../vendor/zip/
 LUADIR=$(srcdir)/../../../vendor/lua
 LUABDIR=$(builddir)/../../../vendor/lua
-CRYPTOPP=$(srcdir)/../../../vendor/cryptopp/
 
 INCLUDES += -I$(srcdir)/logic/
 INCLUDES += -I$(srcdir)/../../sdk/
 INCLUDES += -I$(srcdir)/../../../Shared/sdk/
 INCLUDES += -I$(srcdir)/../../../Shared/publicsdk/include/
-INCLUDES += -I$(srcdir)/../../../vendor/
 INCLUDES += -I$(srcdir)/../../../vendor/ehs/
 INCLUDES += -I$(srcdir)/../../../vendor/pme/
 INCLUDES += -I$(srcdir)/../../../vendor/json-c/
@@ -294,7 +292,6 @@ LOGIC = \
 ./logic/packets/CPlayerJoinPacket.cpp \
 ./logic/packets/CPlayerListPacket.cpp \
 ./logic/packets/CPlayerPuresyncPacket.cpp \
-./logic/packets/CPlayerACInfoPacket.cpp \
 ./logic/packets/CPlayerModInfoPacket.cpp \
 ./logic/packets/CPlayerNetworkStatusPacket.cpp \
 ./logic/packets/CPlayerScreenShotPacket.cpp \
@@ -369,5 +366,4 @@ deathmatch_la_LIBADD = \
 	$(SPARSEHASH_LIBS)
 
 deathmatch_la_LDFLAGS = \
-	-module -avoid-version -lz \
-	-L$(CRYPTOPP) -lcryptopp
+	-module -avoid-version -lz

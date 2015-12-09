@@ -29,13 +29,16 @@ class CefFileDialogCallbackCToCpp
     : public CefCToCpp<CefFileDialogCallbackCToCpp, CefFileDialogCallback,
         cef_file_dialog_callback_t> {
  public:
-  CefFileDialogCallbackCToCpp();
+  explicit CefFileDialogCallbackCToCpp(cef_file_dialog_callback_t* str)
+      : CefCToCpp<CefFileDialogCallbackCToCpp, CefFileDialogCallback,
+          cef_file_dialog_callback_t>(str) {}
 
-  // CefFileDialogCallback methods.
-  void Continue(int selected_accept_filter,
+  // CefFileDialogCallback methods
+  virtual void Continue(int selected_accept_filter,
       const std::vector<CefString>& file_paths) OVERRIDE;
-  void Cancel() OVERRIDE;
+  virtual void Cancel() OVERRIDE;
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CTOCPP_FILE_DIALOG_CALLBACK_CTOCPP_H_
+

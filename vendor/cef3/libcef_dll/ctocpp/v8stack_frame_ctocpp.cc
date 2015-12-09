@@ -16,28 +16,26 @@
 // VIRTUAL METHODS - Body may be edited by hand.
 
 bool CefV8StackFrameCToCpp::IsValid() {
-  cef_v8stack_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_valid))
+  if (CEF_MEMBER_MISSING(struct_, is_valid))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_valid(_struct);
+  int _retval = struct_->is_valid(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 CefString CefV8StackFrameCToCpp::GetScriptName() {
-  cef_v8stack_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_script_name))
+  if (CEF_MEMBER_MISSING(struct_, get_script_name))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_script_name(_struct);
+  cef_string_userfree_t _retval = struct_->get_script_name(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -46,15 +44,14 @@ CefString CefV8StackFrameCToCpp::GetScriptName() {
 }
 
 CefString CefV8StackFrameCToCpp::GetScriptNameOrSourceURL() {
-  cef_v8stack_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_script_name_or_source_url))
+  if (CEF_MEMBER_MISSING(struct_, get_script_name_or_source_url))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_script_name_or_source_url(
-      _struct);
+  cef_string_userfree_t _retval = struct_->get_script_name_or_source_url(
+      struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -63,14 +60,13 @@ CefString CefV8StackFrameCToCpp::GetScriptNameOrSourceURL() {
 }
 
 CefString CefV8StackFrameCToCpp::GetFunctionName() {
-  cef_v8stack_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_function_name))
+  if (CEF_MEMBER_MISSING(struct_, get_function_name))
     return CefString();
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  cef_string_userfree_t _retval = _struct->get_function_name(_struct);
+  cef_string_userfree_t _retval = struct_->get_function_name(struct_);
 
   // Return type: string
   CefString _retvalStr;
@@ -79,78 +75,60 @@ CefString CefV8StackFrameCToCpp::GetFunctionName() {
 }
 
 int CefV8StackFrameCToCpp::GetLineNumber() {
-  cef_v8stack_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_line_number))
+  if (CEF_MEMBER_MISSING(struct_, get_line_number))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->get_line_number(_struct);
+  int _retval = struct_->get_line_number(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 int CefV8StackFrameCToCpp::GetColumn() {
-  cef_v8stack_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, get_column))
+  if (CEF_MEMBER_MISSING(struct_, get_column))
     return 0;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->get_column(_struct);
+  int _retval = struct_->get_column(struct_);
 
   // Return type: simple
   return _retval;
 }
 
 bool CefV8StackFrameCToCpp::IsEval() {
-  cef_v8stack_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_eval))
+  if (CEF_MEMBER_MISSING(struct_, is_eval))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_eval(_struct);
+  int _retval = struct_->is_eval(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 bool CefV8StackFrameCToCpp::IsConstructor() {
-  cef_v8stack_frame_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, is_constructor))
+  if (CEF_MEMBER_MISSING(struct_, is_constructor))
     return false;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  int _retval = _struct->is_constructor(_struct);
+  int _retval = struct_->is_constructor(struct_);
 
   // Return type: bool
   return _retval?true:false;
 }
 
 
-// CONSTRUCTOR - Do not edit by hand.
-
-CefV8StackFrameCToCpp::CefV8StackFrameCToCpp() {
-}
-
-template<> cef_v8stack_frame_t* CefCToCpp<CefV8StackFrameCToCpp,
-    CefV8StackFrame, cef_v8stack_frame_t>::UnwrapDerived(CefWrapperType type,
-    CefV8StackFrame* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
-
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefV8StackFrameCToCpp,
     CefV8StackFrame, cef_v8stack_frame_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefV8StackFrameCToCpp, CefV8StackFrame,
-    cef_v8stack_frame_t>::kWrapperType = WT_V8STACK_FRAME;

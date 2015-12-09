@@ -128,7 +128,6 @@ public:
 
     void                UpdateVideoTab          ( void );
     void                PopulateResolutionComboBox( void );
-    void                UpdateFullScreenComboBoxEnabled( void );
 
     void                AddKeyBindSection       ( char * szSectionName );
     void                RemoveKeyBindSection    ( char * szSectionName );
@@ -385,7 +384,6 @@ protected:
     bool                OnAllowScreenUploadClick ( CGUIElement* pElement );
     bool                OnCustomizedSAFilesClick ( CGUIElement* pElement );
     bool                ShowUnsafeResolutionsClick ( CGUIElement* pElement );
-    bool                OnWindowedClick         ( CGUIElement* pElement );
     bool                OnShowAdvancedSettingDescription ( CGUIElement* pElement );
     bool                OnHideAdvancedSettingDescription ( CGUIElement* pElement );
 

@@ -57,7 +57,7 @@
 
 namespace base {
 
-namespace cef_subtle {
+namespace subtle {
 
 class RefCountedBase {
  public:
@@ -141,7 +141,7 @@ class RefCountedThreadSafeBase {
   DISALLOW_COPY_AND_ASSIGN(RefCountedThreadSafeBase);
 };
 
-}  // namespace cef_subtle
+}  // namespace subtle
 
 //
 // A base class for reference counted classes.  Otherwise, known as a cheap
@@ -158,16 +158,16 @@ class RefCountedThreadSafeBase {
 // You should always make your destructor private, to avoid any code deleting
 // the object accidently while there are references to it.
 template <class T>
-class RefCounted : public cef_subtle::RefCountedBase {
+class RefCounted : public subtle::RefCountedBase {
  public:
   RefCounted() {}
 
   void AddRef() const {
-    cef_subtle::RefCountedBase::AddRef();
+    subtle::RefCountedBase::AddRef();
   }
 
   void Release() const {
-    if (cef_subtle::RefCountedBase::Release()) {
+    if (subtle::RefCountedBase::Release()) {
       delete static_cast<const T*>(this);
     }
   }
@@ -208,16 +208,16 @@ struct DefaultRefCountedThreadSafeTraits {
 //     friend class base::RefCountedThreadSafe<MyFoo>;
 //     ~MyFoo();
 template <class T, typename Traits = DefaultRefCountedThreadSafeTraits<T> >
-class RefCountedThreadSafe : public cef_subtle::RefCountedThreadSafeBase {
+class RefCountedThreadSafe : public subtle::RefCountedThreadSafeBase {
  public:
   RefCountedThreadSafe() {}
 
   void AddRef() const {
-    cef_subtle::RefCountedThreadSafeBase::AddRef();
+    subtle::RefCountedThreadSafeBase::AddRef();
   }
 
   void Release() const {
-    if (cef_subtle::RefCountedThreadSafeBase::Release()) {
+    if (subtle::RefCountedThreadSafeBase::Release()) {
       Traits::Destruct(static_cast<const T*>(this));
     }
   }

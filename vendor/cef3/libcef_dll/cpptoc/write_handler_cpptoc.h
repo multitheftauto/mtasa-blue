@@ -28,8 +28,9 @@ class CefWriteHandlerCppToC
     : public CefCppToC<CefWriteHandlerCppToC, CefWriteHandler,
         cef_write_handler_t> {
  public:
-  CefWriteHandlerCppToC();
+  explicit CefWriteHandlerCppToC(CefWriteHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_WRITE_HANDLER_CPPTOC_H_
+

@@ -28,8 +28,9 @@ class CefJSDialogHandlerCppToC
     : public CefCppToC<CefJSDialogHandlerCppToC, CefJSDialogHandler,
         cef_jsdialog_handler_t> {
  public:
-  CefJSDialogHandlerCppToC();
+  explicit CefJSDialogHandlerCppToC(CefJSDialogHandler* cls);
 };
 
 #endif  // USING_CEF_SHARED
 #endif  // CEF_LIBCEF_DLL_CPPTOC_JSDIALOG_HANDLER_CPPTOC_H_
+

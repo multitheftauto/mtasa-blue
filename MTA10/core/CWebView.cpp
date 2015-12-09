@@ -13,7 +13,6 @@
 #include <cef3/include/cef_parser.h>
 #include <cef3/include/cef_task.h>
 #include <cef3/include/cef_runnable.h>
-#include "CWebDevTools.h"
 
 CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
 {
@@ -23,7 +22,6 @@ CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal,
     m_pEventsInterface = nullptr;
     m_bBeingDestroyed = false;
     m_fVolume = 1.0f;
-    memset ( m_mouseButtonStates, 0, sizeof(m_mouseButtonStates) );
 
     // Initialise properties
     m_Properties["mobile"] = "0";
@@ -138,17 +136,20 @@ bool CWebView::IsLoading ()
     return m_pWebView->IsLoading ();
 }
 
-SString CWebView::GetURL ()
+void CWebView::GetURL ( SString& outURL )
 {
     if ( !m_pWebView )
-        return "";
+        return;
 
-    return UTF16ToMbUTF8 ( m_pWebView->GetMainFrame ()->GetURL () );
+    if ( !m_bIsLocal )
+        outURL = static_cast < SString > ( m_pWebView->GetMainFrame ()->GetURL () );
+    else
+        outURL = m_strTempURL;
 }
 
-const SString& CWebView::GetTitle ()
+void CWebView::GetTitle ( SString& outTitle )
 {
-    return m_CurrentTitle;
+    outTitle = m_CurrentTitle;
 }
 
 void CWebView::SetRenderingPaused ( bool bPaused )
@@ -224,17 +225,7 @@ void CWebView::InjectMouseMove ( int iPosX, int iPosY )
     CefMouseEvent mouseEvent;
     mouseEvent.x = iPosX;
     mouseEvent.y = iPosY;
-
-    // Set modifiers from mouse states (yeah, using enum values as indices isn't best practise, but it's the easiest solution here)
-    if ( m_mouseButtonStates[BROWSER_MOUSEBUTTON_LEFT] )
-        mouseEvent.modifiers |= EVENTFLAG_LEFT_MOUSE_BUTTON;
-    if ( m_mouseButtonStates[BROWSER_MOUSEBUTTON_MIDDLE] )
-        mouseEvent.modifiers |= EVENTFLAG_MIDDLE_MOUSE_BUTTON;
-    if ( m_mouseButtonStates[BROWSER_MOUSEBUTTON_RIGHT] )
-        mouseEvent.modifiers |= EVENTFLAG_RIGHT_MOUSE_BUTTON;
-
     m_pWebView->GetHost ()->SendMouseMoveEvent ( mouseEvent, false );
-
     m_vecMousePosition.x = iPosX;
     m_vecMousePosition.y = iPosY;
 }
@@ -248,9 +239,6 @@ void CWebView::InjectMouseDown ( eWebBrowserMouseButton mouseButton )
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
 
-    // Save mouse button states
-    m_mouseButtonStates[static_cast<int>(mouseButton)] = true;
-
     m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, static_cast < CefBrowserHost::MouseButtonType > ( mouseButton ), false, 1 );
 }
 
@@ -262,9 +250,6 @@ void CWebView::InjectMouseUp ( eWebBrowserMouseButton mouseButton )
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
-
-    // Save mouse button states
-    m_mouseButtonStates[static_cast<int>(mouseButton)] = false;
 
     m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, static_cast < CefBrowserHost::MouseButtonType > ( mouseButton ), true, 1 );
 }
@@ -360,19 +345,6 @@ void CWebView::HandleAjaxRequest ( const SString& strURL, CAjaxResourceHandler *
     g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "AjaxResourceRequest" );
 }
 
-bool CWebView::ToggleDevTools ( bool visible )
-{
-    if ( visible )
-        return CWebDevTools::Show ( this );
-
-    return CWebDevTools::Close ( this );
-}
-
-bool CWebView::VerifyFile ( const SString& strPath )
-{
-    return m_pEventsInterface->Events_OnResourceFileCheck ( strPath );
-}
-
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -383,11 +355,8 @@ bool CWebView::VerifyFile ( const SString& strPath )
 bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message )
 {
     CefRefPtr<CefListValue> argList = message->GetArgumentList ();
-    if ( message->GetName () == "TriggerLuaEvent" )
+    if ( message->GetName () == "TriggerLuaEvent" || message->GetName () == "TriggerServerLuaEvent" )
     {
-        if ( !m_bIsLocal )
-            return true;
-
         // Get event name
         CefString eventName = argList->GetString ( 0 );
 
@@ -402,7 +371,7 @@ bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProc
         }
 
         // Queue event to run on the main thread
-        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString ( eventName ), args );
+        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString ( eventName ), args, message->GetName () == "TriggerServerLuaEvent" );
         g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnProcessMessageReceived1" );
 
         // The message was handled
@@ -562,7 +531,9 @@ void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle c
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame )
 {
-    SString strURL = UTF16ToMbUTF8 ( frame->GetURL () );
+    SString strURL;
+    ConvertURL ( frame->GetURL (), strURL );
+
     if ( strURL == "blank" )
         return;
 
@@ -584,7 +555,8 @@ void CWebView::OnLoadEnd ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 
     if ( frame->IsMain () )
     {
-	    SString strURL = UTF16ToMbUTF8 ( frame->GetURL () );
+	    SString strURL;
+	    ConvertURL ( frame->GetURL (), strURL );
 
         // Queue event to run on the main thread
         auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnDocumentReady, m_pEventsInterface, strURL );
@@ -600,7 +572,8 @@ void CWebView::OnLoadEnd ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnLoadError ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedURL )
 {
-    SString strURL = UTF16ToMbUTF8 ( frame->GetURL () );
+    SString strURL;
+    ConvertURL ( failedURL, strURL );
     
     // Queue event to run on the main thread
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnLoadingFailed, m_pEventsInterface, strURL, errorCode, SString ( errorText ) );
@@ -757,8 +730,9 @@ bool CWebView::OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame
     // ATTENTION: This method is called on the IO thread
     
     // Trigger the popup/new tab event
-    SString strTagetURL = UTF16ToMbUTF8 ( target_url );
-    SString strOpenerURL = UTF16ToMbUTF8 ( frame->GetURL () );
+    SString strTagetURL, strOpenerURL;
+    ConvertURL ( target_url, strTagetURL );
+    ConvertURL ( frame->GetURL (), strOpenerURL );
     
     // Queue event to run on the main thread
     auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnPopup, m_pEventsInterface, strTagetURL, strOpenerURL );
@@ -858,3 +832,32 @@ bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString
 
     return true;
 }
+
+
+void CWebView::ConvertURL ( const CefString& url, SString& convertedURL )
+{
+    CefURLParts urlParts;
+    if ( !CefParseURL ( url, urlParts ) )
+    {
+        convertedURL = "";
+        return;
+    }
+    WString scheme = urlParts.scheme.str;
+    
+    if ( scheme == L"http" || scheme == L"https" )
+    {
+        convertedURL = UTF16ToMbUTF8 ( urlParts.spec.str );
+    }
+    else
+    {
+        // Get the file name (charsequence after last /)
+        WString tempStr = urlParts.path.str;
+        size_t pos = tempStr.find_last_of ( L"/" );
+
+        if ( pos != std::wstring::npos && pos < tempStr.size () )
+            convertedURL = UTF16ToMbUTF8 ( tempStr.SubStr ( pos + 1 ) );
+        else
+            convertedURL = "";
+    }
+}
+

@@ -16,35 +16,19 @@
 // VIRTUAL METHODS - Body may be edited by hand.
 
 void CefGeolocationCallbackCToCpp::Continue(bool allow) {
-  cef_geolocation_callback_t* _struct = GetStruct();
-  if (CEF_MEMBER_MISSING(_struct, cont))
+  if (CEF_MEMBER_MISSING(struct_, cont))
     return;
 
   // AUTO-GENERATED CONTENT - DELETE THIS COMMENT BEFORE MODIFYING
 
   // Execute
-  _struct->cont(_struct,
+  struct_->cont(struct_,
       allow);
 }
 
-
-// CONSTRUCTOR - Do not edit by hand.
-
-CefGeolocationCallbackCToCpp::CefGeolocationCallbackCToCpp() {
-}
-
-template<> cef_geolocation_callback_t* CefCToCpp<CefGeolocationCallbackCToCpp,
-    CefGeolocationCallback, cef_geolocation_callback_t>::UnwrapDerived(
-    CefWrapperType type, CefGeolocationCallback* c) {
-  NOTREACHED() << "Unexpected class type: " << type;
-  return NULL;
-}
 
 #ifndef NDEBUG
 template<> base::AtomicRefCount CefCToCpp<CefGeolocationCallbackCToCpp,
     CefGeolocationCallback, cef_geolocation_callback_t>::DebugObjCt = 0;
 #endif
 
-template<> CefWrapperType CefCToCpp<CefGeolocationCallbackCToCpp,
-    CefGeolocationCallback, cef_geolocation_callback_t>::kWrapperType =
-    WT_GEOLOCATION_CALLBACK;

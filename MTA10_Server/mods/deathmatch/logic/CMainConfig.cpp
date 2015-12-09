@@ -1451,7 +1451,6 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      1,      2,      "minclientversion_auto_update",         &m_iMinClientVersionAutoUpdate,             NULL },
             { true, true,   0,      0,      100,    "server_logic_fps_limit",               &m_iServerLogicFpsLimit,                    NULL },
             { true, true,   0,      1,      1,      "bad_net_bullet_fix",                   &m_bBadNetBulletFixEnabled,                 NULL },
-            { true, true,   0,      1,      1,      "crash_dump_upload",                    &m_bCrashDumpUploadEnabled,                 NULL },
         };
 
     static std::vector < SIntSetting > settingsList;
