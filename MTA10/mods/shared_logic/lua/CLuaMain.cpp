@@ -281,6 +281,8 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
     lua_classfunction ( luaVM, "getTrainPosition", "getTrainPosition" );
     lua_classfunction ( luaVM, "getName", "getVehicleName" );
+    lua_classfunction ( luaVM, "getModelFromName", "getVehicleModelFromName" );
+    lua_classfunction ( luaVM, "getNameFromModel", "getVehicleNameFromModel" );
     lua_classfunction ( luaVM, "getVehicleType", "getVehicleType" );
     lua_classfunction ( luaVM, "getMaxPassengers", "getVehicleMaxPassengers" );
     lua_classfunction ( luaVM, "getGear", "getVehicleCurrentGear" );
