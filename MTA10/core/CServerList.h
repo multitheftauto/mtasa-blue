@@ -24,10 +24,9 @@ class CMasterServerManagerInterface;
 #include <sstream>
 #include <vector>
 #include "CSingleton.h"
-#include "tracking/CHTTPClient.h"
 
 // Master server list URL
-#define SERVER_LIST_MASTER_URL              "http://1mgg.com/affil/mta-1.0"
+#define SERVER_LIST_MASTER_URL              "http://master.multitheftauto.com/ase/mta/"
 
 // Query response data buffer
 #define SERVER_LIST_QUERY_BUFFER            4096

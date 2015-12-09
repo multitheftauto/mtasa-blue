@@ -76,7 +76,7 @@ public:
     virtual void                            GetPingStatus                   ( SFixedString < 32 >* pstrStatus );
     virtual bool                            GetSyncThreadStatistics         ( SSyncThreadStatistics* pDest, bool bResetCounters );
 
-    virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion );
+    virtual NetBitStreamInterface*          AllocateNetServerBitStream      ( unsigned short usBitStreamVersion, const void* pData = nullptr, uint uiDataSize = 0, bool bCopyData = false );
     virtual void                            DeallocateNetServerBitStream    ( NetBitStreamInterface* bitStream );
     virtual bool                            SendPacket                      ( unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast, NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT );
 
@@ -100,6 +100,7 @@ public:
 
     virtual bool                            InitServerId                    ( const char* szPath );
     virtual void                            ResendModPackets                ( const NetServerPlayerID& playerID );
+    virtual void                            ResendACPackets                 ( const NetServerPlayerID& playerID );
 
     virtual void                            GetClientSerialAndVersion       ( const NetServerPlayerID& playerID, SFixedString < 32 >& strSerial, SFixedString < 64 >& strExtra, SFixedString < 32 >& strVersion );
     virtual void                            SetNetOptions                   ( const SNetOptions& options );
@@ -150,6 +151,7 @@ public:
     DECLARE_FUNC_ARGS1 (                        GetNetRoute                     , SFixedString < 32 >*, pstrRoute );
     DECLARE_FUNC_ARGS1R( bool,                  InitServerId                    , const char*, szPath );
     DECLARE_FUNC_ARGS1 (                        ResendModPackets                , const NetServerPlayerIDRef, playerID );
+    DECLARE_FUNC_ARGS1 (                        ResendACPackets                 , const NetServerPlayerIDRef, playerID );
     DECLARE_FUNC_ARGS4 (                        GetClientSerialAndVersion       , const NetServerPlayerIDRef, playerID, SFixedString < 32 >&, strSerial, SFixedString < 64 >&, strExtra, SFixedString < 32 >&, strVersion );
     DECLARE_FUNC_ARGS1 (                        SetNetOptions                   , const SNetOptions, options );
     DECLARE_FUNC_ARGS2 (                        GenerateRandomData              , void*, pOutData, uint, uiLength );

@@ -90,7 +90,8 @@ void CCommunity::Login ( VERIFICATIONCALLBACK pCallBack, void* pObject )
                      szSerial );
 
     // Perform the HTTP request
-    m_HTTP.Get ( strURL );
+    GetHTTP()->Reset();
+    GetHTTP()->QueueFile( strURL, NULL, 0, NULL, 0, false, this, StaticDownloadFinished, false, 1/*uiConnectionAttempts*/ );
 
     // Store the start time
     m_ulStartTime = CClientTime::GetTime ();
@@ -101,34 +102,56 @@ void CCommunity::DoPulse ( void )
 {
     if ( m_ulStartTime )
     {
-        eVerificationResult Status;
-
-        // Poll the HTTP client
-        CHTTPBuffer buffer;
-        if ( m_HTTP.GetData ( buffer ) ) {
-
-            char *szBuffer = buffer.GetData ();
-            
-            // Get the returned status
-            Status = (eVerificationResult)(szBuffer[0] - 48);
-            m_bLoggedIn = Status == VERIFY_ERROR_SUCCESS;
-            m_ulStartTime = 0;
-
-            // Change GUI
-            CLocalGUI::GetSingleton ().GetMainMenu()->ChangeCommunityState ( m_bLoggedIn, m_strUsername );
-            CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( m_bLoggedIn );
-
-            // Perform callback
-            if ( m_pCallback ) {
-                m_pCallback ( m_bLoggedIn, szVerificationMessages[Status], m_pVerificationObject );
-                m_pCallback = NULL;
-                m_pVerificationObject = NULL;
-            }
-        }
-        // Check for timeout
-        else if ( ( CClientTime::GetTime () - m_ulStartTime ) > VERIFICATION_DELAY ) {
-            g_pCore->ShowMessageBox ( _("Error")+_E("CC01"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
-            Logout ();
-        }
+        GetHTTP()->ProcessQueuedFiles();
     }
+}
+
+
+// Get the HTTP download manager used for community stuff
+CNetHTTPDownloadManagerInterface* CCommunity::GetHTTP( void )
+{
+    return g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CORE_UPDATER );
+}
+
+
+// Handle server response
+bool CCommunity::StaticDownloadFinished ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+{
+    if ( bSuccess )
+        ((CCommunity*)pObj)->DownloadSuccess( pCompletedData, completedLength );
+    else
+        ((CCommunity*)pObj)->DownloadFailed( iErrorCode );
+    return true;
+}
+
+void CCommunity::DownloadSuccess( char* pCompletedData, size_t completedLength )
+{
+    // Get the returned status
+    eVerificationResult Status = VERIFY_ERROR_UNEXPECTED;
+    if ( completedLength > 0 )
+    {
+        Status = (eVerificationResult)(pCompletedData[0] - 48);
+    }
+            
+    m_bLoggedIn = Status == VERIFY_ERROR_SUCCESS;
+    m_ulStartTime = 0;
+
+    // Change GUI
+    CLocalGUI::GetSingleton ().GetMainMenu()->ChangeCommunityState ( m_bLoggedIn, m_strUsername );
+    CLocalGUI::GetSingleton ().GetMainMenu()->GetSettingsWindow()->OnLoginStateChange ( m_bLoggedIn );
+
+    // Perform callback
+    if ( m_pCallback )
+    {
+        m_pCallback ( m_bLoggedIn, szVerificationMessages[Status], m_pVerificationObject );
+        m_pCallback = NULL;
+        m_pVerificationObject = NULL;
+    }
+}
+
+void CCommunity::DownloadFailed( int iErrorCode )
+{
+    m_ulStartTime = 0;
+    g_pCore->ShowMessageBox ( _("Error")+_E("CC01"), _("Services currently unavailable"), MB_BUTTON_OK | MB_ICON_ERROR );
+    Logout ();
 }

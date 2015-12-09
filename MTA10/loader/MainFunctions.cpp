@@ -141,6 +141,8 @@ void HandleSpecialLaunchOptions( void )
     if ( CommandLineContains( "/kdinstall" ) )
     {
         UpdateMTAVersionApplicationSetting( true );
+        WatchDogReset();
+        WatchDogBeginSection( WD_SECTION_POST_INSTALL );
         if ( CheckService( CHECK_SERVICE_POST_INSTALL ) )
             return ExitProcess( EXIT_OK );
         return ExitProcess( EXIT_ERROR );
@@ -189,11 +191,11 @@ void HandleDuplicateLaunching( void )
                 LPWSTR szCommandLine = GetCommandLineW ();
                 int numArgs;
                 LPWSTR* aCommandLineArgs = CommandLineToArgvW ( szCommandLine, &numArgs );
-                for ( int i = 0; i < numArgs; ++i )
+                for ( int i = 1; i < numArgs; ++i )
                 {
-                    if ( StrCmpW ( aCommandLineArgs[i], L"-c" ) == 0 && numArgs > i )
+                    if ( WStringX( aCommandLineArgs[i] ).BeginsWith( L"mtasa://" ) )
                     {
-                        WString wideConnectInfo = aCommandLineArgs[i + 1];
+                        WString wideConnectInfo = aCommandLineArgs[i];
                         SString strConnectInfo = ToUTF8 ( wideConnectInfo );
 
                         COPYDATASTRUCT cdStruct;
@@ -322,6 +324,62 @@ void HandleResetSettings ( void )
 
 //////////////////////////////////////////////////////////
 //
+// HandleNotUsedMainMenu
+//
+// Called when a problem occured before the main menu was used by user
+// If fullscreen, then maybe change fullscreen mode
+//
+//////////////////////////////////////////////////////////
+void HandleNotUsedMainMenu ( void )
+{
+    AddReportLog( 9310, "Loader - HandleNotUsedMainMenu" );
+    {
+        // Slighty hacky way of checking in-game settings
+        SString strCoreConfigFilename = CalcMTASAPath( PathJoin( "mta", "config", "coreconfig.xml" ) );
+        SString strCoreConfig;
+        FileLoad( strCoreConfigFilename, strCoreConfig );
+        SString strWindowed        = strCoreConfig.SplitRight( "<display_windowed>" ).Left( 1 );
+        SString strFullscreenStyle = strCoreConfig.SplitRight( "<display_fullscreen_style>" ).Left( 1 );
+        if ( strFullscreenStyle == "1" )
+        {
+            AddReportLog( 9315, "Loader - HandleNotUsedMainMenu - Already Borderless window" );
+            return;
+        }
+        if ( !strWindowed.empty() && !strFullscreenStyle.empty())
+        {
+            if ( strWindowed == "0" && strFullscreenStyle == "0" )   // 0=FULLSCREEN_STANDARD
+            {
+                // Inform user
+                SString strMessage = _("Are you having problems running MTA:SA?.\n\nDo you want to change the following setting?");
+                strMessage += "\n" + _("Fullscreen mode:") + " -> " + _("Borderless window");
+                HideSplash();
+                int iResponse = MessageBoxUTF8 ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
+                if ( iResponse == IDYES )
+                {
+                    // Very hacky way of changing in-game settings
+                    strCoreConfig = strCoreConfig.Replace( "<display_fullscreen_style>0", "<display_fullscreen_style>1" );
+                    FileSave( strCoreConfigFilename, strCoreConfig );
+                    AddReportLog( 9311, "Loader - HandleNotUsedMainMenu - User change to Borderless window" );
+                }
+                else
+                    AddReportLog( 9313, "Loader - HandleNotUsedMainMenu - User said no" );
+            }
+            else
+                AddReportLog( 9314, "Loader - HandleNotUsedMainMenu - Mode not fullscreen standard" );
+        }
+        else
+        {
+            // If no valid settings file yet, do the change without asking
+            strCoreConfig = "<mainconfig><settings><display_fullscreen_style>1</display_fullscreen_style></settings></mainconfig>";
+            FileSave( strCoreConfigFilename, strCoreConfig );
+            AddReportLog( 9312, "Loader - HandleNotUsedMainMenu - Set Borderless window" );
+        }
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // HandleCustomStartMessage
 //
 //
@@ -416,6 +474,28 @@ void PreLaunchWatchDogs ( void )
         WatchDogClearCounter ( "CR2" );
         HandleResetSettings ();
     }
+
+    // Check for possible fullscreen problems
+    if ( WatchDogIsSectionOpen( WD_SECTION_NOT_USED_MAIN_MENU ) )
+    {
+        int iChainLimit;
+        if ( WatchDogIsSectionOpen( WD_SECTION_POST_INSTALL ) )
+            iChainLimit = 1;
+        else
+        if ( GetApplicationSettingInt( "times-connected" ) == 0 )
+            iChainLimit = 2;
+        else
+            iChainLimit = 3;
+        WatchDogCompletedSection( WD_SECTION_NOT_USED_MAIN_MENU );
+        WatchDogIncCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU );
+        if ( WatchDogGetCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU ) >= iChainLimit )
+        {
+            WatchDogClearCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU );
+            HandleNotUsedMainMenu();
+        }
+    }
+    else
+        WatchDogClearCounter( WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU );
 
     // Clear down freeze on quit detection
     WatchDogCompletedSection( "Q0" );
@@ -874,6 +954,7 @@ int LaunchGame ( SString strCmdLine )
 
     WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
     WatchDogBeginSection ( "L3" );      // Gets closed when loading screen is shown, or a startup problem is handled elsewhere
+    WatchDogBeginSection ( WD_SECTION_NOT_USED_MAIN_MENU );      // Gets closed when the main menu is used
 
     // Extract 'done-admin' flag from command line
     bool bDoneAdmin = strCmdLine.Contains ( "/done-admin" );

@@ -6592,8 +6592,7 @@ bool CStaticFunctionDefinitions::GetKeyState ( const char* szKey, bool& bState )
     const SBindableKey* pKey = pKeyBinds->GetBindableFromKey ( szKey );
     if ( pKey )
     {
-        HWND hActiveWindow = GetActiveWindow ();
-        if ( hActiveWindow == g_pCore->GetHookedWindow () )
+        if ( g_pCore->IsFocused () )
         {
             bState = ( ::GetKeyState ( pKey->ulCode ) & 0x8000  ) ? true:false;
             

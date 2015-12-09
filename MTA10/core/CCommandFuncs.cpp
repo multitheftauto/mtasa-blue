@@ -24,10 +24,6 @@ extern bool g_bBoundsChecker;
 
 #define MTA_HELP_SPACING    32
 
-/* ACHTUNG */
-#include "tracking/CTCPManager.h"
-#include "tracking/CHTTPClient.h"
-
 void CCommandFuncs::Help ( const char* szParameters )
 {
     CConsoleInterface* pConsole = g_pCore->GetConsole ();

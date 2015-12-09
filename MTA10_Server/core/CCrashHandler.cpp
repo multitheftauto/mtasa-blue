@@ -24,9 +24,9 @@
     extern "C" bool g_bNoCurses;
     #include <client/linux/handler/exception_handler.h>
     bool DumpCallback( const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded );
-    static SString ms_strDumpPath;
     static SString ms_strDumpPathFilename;
 #endif
+static SString ms_strDumpPath;
 
 #ifdef WIN32
 #include <ctime>
@@ -43,15 +43,16 @@ typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hF
 
 void CCrashHandler::Init ( const SString& strInServerPath )
 {
+    SString strServerPath = strInServerPath;
+    if ( strServerPath == "" )
+        strServerPath = GetSystemCurrentDirectory();
+    ms_strDumpPath = PathJoin( strServerPath, SERVER_DUMP_PATH );
+
     // Set a global filter
     #ifdef WIN32
         SetCrashHandlerFilter ( HandleExceptionGlobal );
     #else
         // Prepare initial dumpfile name
-        SString strServerPath = strInServerPath;
-        if ( strServerPath == "" )
-            strServerPath = GetSystemCurrentDirectory();
-        ms_strDumpPath = PathJoin( strServerPath, SERVER_DUMP_PATH );
         time_t pTime = time( NULL );
         struct tm* tm = localtime( &pTime );
         SString strFilename( "server_%s_%04d%02d%02d_%02d%02d.dmp",
@@ -77,7 +78,7 @@ void CCrashHandler::Init ( const SString& strInServerPath )
 #ifndef WIN32
 
 // Save basic backtrace info into a file. Forced inline to avoid backtrace pollution
-__attribute__((always_inline))
+inline __attribute__((always_inline))
 static void SaveBacktraceSummary()
 {
     // Collect backtrace information
@@ -151,6 +152,7 @@ bool DumpCallback( const google_breakpad::MinidumpDescriptor& descriptor, void* 
     rename( ms_strDumpPathFilename, strFinalDumpPathFilename );
 
     SaveBacktraceSummary();
+    FileSave( PathJoin( ms_strDumpPath, "server_pending_upload_filename" ), strFinalDumpPathFilename );
 
     // Return false to indicate exception has not been handled (and allow core dump?)
     return false;
@@ -212,15 +214,15 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionIn
             GetLocalTime ( &SystemTime );
 
             // Create the dump directory
-            CreateDirectory ( SERVER_DUMP_PATH, 0 );
-            CreateDirectory ( SERVER_DUMP_PATH "/private", 0 );
+            CreateDirectory ( ms_strDumpPath, 0 );
+            CreateDirectory ( PathJoin( ms_strDumpPath, "private" ), 0 );
 
             SString strModuleName = pExceptionInformation->GetModuleBaseName ();
             strModuleName = strModuleName.ReplaceI ( ".dll", "" ).Replace ( ".exe", "" ).Replace ( "_", "" ).Replace ( ".", "" ).Replace ( "-", "" );
             if ( strModuleName.length () == 0 )
                 strModuleName = "unknown";
 
-            SString strFilename ( SERVER_DUMP_PATH "/private/server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp",
+            SString strFilename ( "server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp",
                                          MTA_DM_BUILDTAG_LONG,
                                          strModuleName.c_str (),
                                          pExceptionInformation->GetAddressModuleOffset (),
@@ -232,8 +234,10 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionIn
                                          SystemTime.wMinute
                                        );
 
+            SString strFinalDumpPathFilename = PathJoin( ms_strDumpPath, "private", strFilename );
+
             // Create the file
-            HANDLE hFile = CreateFile ( strFilename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+            HANDLE hFile = CreateFile ( strFinalDumpPathFilename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
             if ( hFile != INVALID_HANDLE_VALUE )
             {
                 // Create an exception information struct
@@ -247,10 +251,12 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionIn
 
                 // Close the dumpfile
                 CloseHandle ( hFile );
+
+                FileSave( PathJoin( ms_strDumpPath, "server_pending_upload_filename" ), strFinalDumpPathFilename );
             }
 
             // Write a log with the generic exception information
-            FILE* pFile = fopen ( SERVER_DUMP_PATH "/server_pending_upload.log", "a+" );
+            FILE* pFile = fopen ( PathJoin( ms_strDumpPath, "server_pending_upload.log" ), "a+" );
             if ( pFile )
             {
                // Header

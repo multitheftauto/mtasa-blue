@@ -110,7 +110,6 @@ namespace SharedUtil
 
 
     // Common strings for SetApplicationSetting
-    #define WD_SECTION_PRELOAD_UPGRADES         "preload-upgrades"
     #define DIAG_PRELOAD_UPGRADES_SLOW          "diagnostics", "preloading-upgrades-slow"
     #define DIAG_PRELOAD_UPGRADE_ATTEMPT_ID     "diagnostics", "preloading-upgrade-attempt-id"
     #define DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE "diagnostics", "preloading-upgrades-lowest-unsafe"
@@ -121,4 +120,16 @@ namespace SharedUtil
     #define DIAG_BSOD_DETECT_SKIP               "diagnostics", "bsod-detect-skip"
     #define GENERAL_PROGRESS_ANIMATION_DISABLE  "progress-animation-disable"
 
+    // Common strings for watchdog detections
+    #define WD_SECTION_PRELOAD_UPGRADES                     "preload-upgrades"
+    #define WD_SECTION_NOT_CLEAN_GTA_EXIT                   "L0"                // Opened in loader, closed if GTA exits with no error
+    #define WD_SECTION_NOT_STARTED_ONLINE_GAME              "L1"                // Opened in loader, closed when online game has started
+    #define WD_SECTION_NOT_SHOWN_LOADING_SCREEN             "L2"                // Opened in loader, closed when loading screen is shown
+    #define WD_SECTION_STARTUP_FREEZE                       "L3"                // Opened in loader, closed when loading screen is shown, or a startup problem is handled elsewhere
+    #define WD_SECTION_NOT_USED_MAIN_MENU                   "L4"                // Opened in loader, closed when main menu is used
+    #define WD_SECTION_POST_INSTALL                         "L5"                // Opened in when installer runs, closed when main menu is used
+    #define WD_SECTION_IS_QUITTING                          "Q0"                // Open during quit 
+    #define WD_COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME       "CR1"               // Counts consecutive crashes before the online game starts
+    #define WD_COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN    "CR2"               // Counts consecutive crashes before the loading screen is shown
+    #define WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU    "CR3"               // Counts consecutive crashes before the main menu is used
 }

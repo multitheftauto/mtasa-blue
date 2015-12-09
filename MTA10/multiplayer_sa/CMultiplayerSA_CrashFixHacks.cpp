@@ -1473,6 +1473,42 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// Something called from CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask
+//
+// Accessing a temporally not existing vehicle
+// (seems to happen when the driver is slower being thrown out than the jacker enters the vehicle)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask   0x6485AC
+#define HOOKSIZE_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask  6
+DWORD RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask =    0x6485B2;
+DWORD RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask_Invalid = 0x6485E1;
+void OnMY_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
+{
+    LogEvent( 817, "CTaskComplexCarSlowBeDraggedOut", "", "CTaskComplexCarSlowBeDraggedOut race condition" );
+}
+
+void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
+{
+    _asm
+    {
+        test eax, eax
+        jz invalid_vehicle
+
+        mov ecx, [eax+460h]
+        jmp RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask
+
+    invalid_vehicle:
+        pushad
+        call OnMY_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask
+        popad
+        jmp RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask_Invalid
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1515,6 +1551,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstallChecked ( CVolumetricShadowMgr_Render );
     EZHookInstallChecked ( CVolumetricShadowMgr_Update );
     EZHookInstallChecked ( CAnimManager_CreateAnimAssocGroups );
+    EZHookInstall ( CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask );
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

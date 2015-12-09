@@ -1004,6 +1004,10 @@ int CLuaFunctionDefs::dxGetStatus ( lua_State* luaVM )
         lua_pushstring ( luaVM, EnumToString ( dxStatus.videoCard.depthBufferFormat ) );
         lua_settable   ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "UsingDepthBuffer" );
+        lua_pushboolean ( luaVM, dxStatus.state.iNumShadersUsingReadableDepthBuffer > 0 );
+        lua_settable   ( luaVM, -3 );
+
         lua_pushstring ( luaVM, "Setting32BitColor" );
         lua_pushboolean( luaVM, dxStatus.settings.b32BitColor );
         lua_settable   ( luaVM, -3 );

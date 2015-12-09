@@ -15,7 +15,6 @@
 #define __CCOMMUNITY_H
 
 #include <core/CCommunityInterface.h>
-#include "tracking/CHTTPClient.h"
 
 typedef void (*VERIFICATIONCALLBACK) ( bool, char*, void* obj );
 
@@ -61,9 +60,12 @@ protected:
     void                        Login               ( VERIFICATIONCALLBACK pCallBack = NULL, void* pObject = NULL );
     void                        Logout              ( void );
 
-private:
-    CHTTPClient                 m_HTTP;
+    CNetHTTPDownloadManagerInterface* GetHTTP       ( void );
+    static bool                 StaticDownloadFinished ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    void                        DownloadFailed      ( int iErrorCode );
+    void                        DownloadSuccess     ( char* pCompletedData, size_t completedLength );
 
+private:
     std::string                 m_strUsername;
     std::string                 m_strPassword;
 

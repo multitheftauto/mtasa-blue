@@ -18,7 +18,8 @@ CSyncSettingsPacket::CSyncSettingsPacket ( const std::set < eWeaponType >& weapo
                                             short sVehExtrapolateMaxMs,
                                             uchar ucUseAltPulseOrder,
                                             uchar ucAllowFastSprintFix,
-                                            uchar ucAllowDrivebyAnimationFix)
+                                            uchar ucAllowDrivebyAnimationFix,
+                                            uchar ucAllowShotgunDamageFix )
 {
     m_weaponTypesUsingBulletSync = weaponTypesUsingBulletSync;
     m_ucVehExtrapolateEnabled = ucVehExtrapolateEnabled;
@@ -28,6 +29,7 @@ CSyncSettingsPacket::CSyncSettingsPacket ( const std::set < eWeaponType >& weapo
     m_ucUseAltPulseOrder = ucUseAltPulseOrder;
     m_ucAllowFastSprintFix = ucAllowFastSprintFix;
     m_ucAllowDrivebyAnimationFix = ucAllowDrivebyAnimationFix;
+    m_ucAllowShotgunDamageFix = ucAllowShotgunDamageFix;
 }
 
 
@@ -68,6 +70,11 @@ bool CSyncSettingsPacket::Write ( NetBitStreamInterface& BitStream ) const
     if (BitStream.Version() >= 0x59)
     {
         BitStream.Write(m_ucAllowDrivebyAnimationFix);
+    }
+
+    if ( BitStream.Version() >= 0x64 )
+    {
+        BitStream.Write( m_ucAllowShotgunDamageFix );
     }
 
     return true;

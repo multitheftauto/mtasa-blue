@@ -56,14 +56,14 @@ bool CClientWebBrowser::LoadURL ( const SString& strURL, bool bFilterEnabled, co
     return m_pWebView->LoadURL ( strURL, bFilterEnabled, strPostData, bURLEncoded );
 }
 
-void CClientWebBrowser::GetTitle ( SString& outPageTitle )
+const SString& CClientWebBrowser::GetTitle ()
 {
-    m_pWebView->GetTitle ( outPageTitle );
+    return m_pWebView->GetTitle ();
 }
 
-void CClientWebBrowser::GetURL ( SString& outURL )
+SString CClientWebBrowser::GetURL ()
 {
-    m_pWebView->GetURL ( outURL );
+    return m_pWebView->GetURL ();
 }
 
 void CClientWebBrowser::SetRenderingPaused ( bool bPaused )
@@ -119,11 +119,6 @@ void CClientWebBrowser::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
 bool CClientWebBrowser::IsLocal ()
 {
     return m_pWebView->IsLocal ();
-}
-
-void CClientWebBrowser::SetTempURL ( const SString& strTempURL )
-{
-    m_pWebView->SetTempURL ( strTempURL );
 }
 
 float CClientWebBrowser::GetAudioVolume ()
@@ -199,7 +194,7 @@ void CClientWebBrowser::Events_OnChangeCursor ( unsigned char ucCursor )
     CallEvent ( "onClientBrowserCursorChange", Arguments, false );
 }
 
-void CClientWebBrowser::Events_OnTriggerEvent ( const SString& strEventName, const std::vector<std::string>& arguments, bool bIsServer )
+void CClientWebBrowser::Events_OnTriggerEvent ( const SString& strEventName, const std::vector<std::string>& arguments )
 {
     CLuaArguments Arguments;
     for ( std::vector<std::string>::const_iterator iter = arguments.begin (); iter != arguments.end (); ++iter )
@@ -207,15 +202,8 @@ void CClientWebBrowser::Events_OnTriggerEvent ( const SString& strEventName, con
         Arguments.PushString ( *iter );
     }
 
-    if ( bIsServer )
-    {
-        CStaticFunctionDefinitions::TriggerServerEvent ( strEventName, *g_pClientGame->GetRootEntity (), Arguments );
-    }
-    else
-    {
-        bool bWasCancelled;
-        CStaticFunctionDefinitions::TriggerEvent ( strEventName, *this, Arguments, bWasCancelled );
-    }
+    bool bWasCancelled;
+    CStaticFunctionDefinitions::TriggerEvent ( strEventName, *this, Arguments, bWasCancelled );
 }
 
 void CClientWebBrowser::Events_OnTooltip ( const SString& strTooltip )
@@ -245,6 +233,22 @@ bool CClientWebBrowser::Events_OnResourcePathCheck ( SString& strURL )
         return true;
 
     return false;
+}
+
+bool CClientWebBrowser::Events_OnResourceFileCheck ( const SString& strPath )
+{
+    // If no resource is set, we do not require to verify the file
+    if ( !m_pResource )
+        return true;
+    
+    auto pFile = g_pClientGame->GetResourceManager ()->GetDownloadableResourceFile ( strPath.ToLower() );
+
+    // If we did not download this file, it has been script or user generated, nothing to verify for us
+    if ( pFile == nullptr )
+        return true;
+
+    pFile->GenerateClientChecksum ();
+    return pFile->DoesClientAndServerChecksumMatch ();
 }
 
 void CClientWebBrowser::Events_OnResourceBlocked ( const SString& strURL, const SString& strDomain, unsigned char reason )
@@ -288,6 +292,11 @@ bool CClientWebBrowser::RemoveAjaxHandler ( const SString& strURL )
         return false;
 
     return m_mapAjaxCallback.erase ( strURL ) == 1;
+}
+
+bool CClientWebBrowser::ToggleDevTools ( bool visible )
+{
+    return m_pWebView->ToggleDevTools ( visible );
 }
 
 

@@ -74,10 +74,9 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
         }
 
         // Flags
-        bool bIsSpawned = pPlayer->IsSpawned ();
-        bool bInVehicle = ( bIsSpawned && ( pPlayer->GetOccupiedVehicle () != NULL ) );
-        BitStream.WriteBit ( pPlayer->IsDead () );
-        BitStream.WriteBit ( bIsSpawned );
+        bool bInVehicle = ( pPlayer->GetOccupiedVehicle () != NULL );
+        BitStream.WriteBit ( pPlayer->IsDead () );  // Currently unused by the client
+        BitStream.WriteBit ( true );                // (Was IsSpawned) Used by the client to determine if extra info was sent (in this packet)
         BitStream.WriteBit ( bInVehicle );
         BitStream.WriteBit ( pPlayer->HasJetPack () );
         BitStream.WriteBit ( pPlayer->IsNametagShowing () );
@@ -112,13 +111,8 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
             BitStream.Write ( ucMoveAnim );
         }
 
-        // **************************************************************************************************************
-        // Note: The code below skips various attributes if the player is not spawned.
-        // This means joining clients will not receive the current value of these attributes, which could lead to desync.
-        // **************************************************************************************************************
-
-        // Write spawn info if he's spawned
-        if ( bIsSpawned )
+        // Always send extra info (Was: "Write spawn info if he's spawned")
+        if ( true )
         {
             // Player model ID
             BitStream.WriteCompressed ( pPlayer->GetModel () );

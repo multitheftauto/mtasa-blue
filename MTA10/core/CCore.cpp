@@ -163,7 +163,6 @@ CCore::CCore ( void )
     m_pDirectInputHookManager   = new CDirectInputHookManager ( );
     m_pMessageLoopHook          = new CMessageLoopHook ( );
     m_pSetCursorPosHook         = new CSetCursorPosHook ( );
-    m_pTCPManager               = new CTCPManager ( );
 
     // Register internal commands.
     RegisterCommands ( );
@@ -221,7 +220,6 @@ CCore::~CCore ( void )
     //delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
-    delete m_pTCPManager;
 
     // Delete the GUI manager    
     delete m_pLocalGUI;
@@ -632,7 +630,7 @@ void CCore::SetConnected ( bool bConnected )
 
 bool CCore::IsConnected ( void )
 {
-    return m_pLocalGUI->GetMainMenu ( )->GetIsIngame ();
+    return m_pLocalGUI->GetMainMenu() && m_pLocalGUI->GetMainMenu ( )->GetIsIngame ();
 }
 
 
@@ -1980,9 +1978,6 @@ void CCore::OnPreHUDRender ( void )
 {
     IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
 
-    // Handle saving depth buffer
-    CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
-
     CGraphics::GetSingleton ().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
@@ -1996,6 +1991,9 @@ void CCore::OnPreHUDRender ( void )
     }
     else
         m_pModManager->DoPulsePreHUDRender ( false, false );
+
+    // Handle saving depth buffer
+    CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
 
     // Restore in case script forgets
     CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();

@@ -45,8 +45,8 @@ public:
     // Exported methods
     bool LoadURL                ( const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString(), bool bURLEncoded = true );
     bool IsLoading              ();
-    void GetURL                 ( SString& outURL );
-    void GetTitle               ( SString& outTitle );
+    SString GetURL              ();
+    const SString& GetTitle     ();
     void SetRenderingPaused     ( bool bPaused );
     void Focus                  ( bool state = true );
     IDirect3DTexture9* GetTexture () { return static_cast<IDirect3DTexture9*>(m_pWebBrowserRenderItem->m_pD3DTexture); }
@@ -67,7 +67,6 @@ public:
     void InjectKeyboardEvent    ( const CefKeyEvent& keyEvent );
 
     bool IsLocal                ()                                                  { return m_bIsLocal; };
-    void SetTempURL             ( const SString& strTempURL )                       { m_strTempURL = strTempURL; };
 
     inline float GetAudioVolume ()                                                  { return m_fVolume; };
     bool SetAudioVolume         ( float fVolume );
@@ -75,11 +74,14 @@ public:
     void GetSourceCode          ( const std::function<void( const std::string& code )>& callback );
 
     bool GetFullPathFromLocal   ( SString& strPath );
+    bool VerifyFile             ( const SString& strPath );
     
     virtual bool RegisterAjaxHandler ( const SString& strURL ) override;
     virtual bool UnregisterAjaxHandler ( const SString& strURL ) override;
     virtual bool HasAjaxHandler ( const SString& strURL );
     virtual void HandleAjaxRequest ( const SString& strURL, class CAjaxResourceHandler * pHandler );
+
+    virtual bool ToggleDevTools ( bool visible ) override;
 
     // CefClient methods
     virtual CefRefPtr<CefRenderHandler>     GetRenderHandler() override { return this; };
@@ -121,9 +123,6 @@ public:
     virtual void OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& title ) override;
     virtual bool OnTooltip     ( CefRefPtr<CefBrowser> browser, CefString& text ) override;
     virtual bool OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line ) override;
-
-protected:
-    void ConvertURL ( const CefString& url, SString& convertedURL );
     
 private:
     CefRefPtr<CefBrowser> m_pWebView;
@@ -132,8 +131,8 @@ private:
     bool                m_bBeingDestroyed;
     bool                m_bIsLocal;
     bool                m_bIsTransparent;
-    SString             m_strTempURL;
     POINT               m_vecMousePosition;
+    bool                m_mouseButtonStates[3];
     SString             m_CurrentTitle;
     float               m_fVolume;
     std::mutex          m_PaintMutex;

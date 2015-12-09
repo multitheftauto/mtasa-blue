@@ -41,6 +41,7 @@ void CLuaPlayerDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerVersion", GetPlayerVersion );
     CLuaCFunctions::AddFunction ( "getPlayerACInfo", GetPlayerACInfo );
     CLuaCFunctions::AddFunction ( "resendPlayerModInfo", ResendPlayerModInfo );
+    CLuaCFunctions::AddFunction ( "resendPlayerACInfo", ResendPlayerACInfo );
 
     // Player set funcs
     CLuaCFunctions::AddFunction ( "setPlayerMoney", SetPlayerMoney );
@@ -113,6 +114,7 @@ void CLuaPlayerDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "kick", "kickPlayer" );
     lua_classfunction ( luaVM, "redirect", "redirectPlayer" );
     lua_classfunction ( luaVM, "resendModInfo", "resendPlayerModInfo" );
+    lua_classfunction ( luaVM, "resendACInfo", "resendPlayerACInfo" );
     lua_classfunction ( luaVM, "spawn", "spawnPlayer" );
     lua_classfunction ( luaVM, "takeMoney", "takePlayerMoney" );
     lua_classfunction ( luaVM, "takeScreenShot", "takePlayerScreenShot" );
@@ -1364,6 +1366,28 @@ int CLuaPlayerDefs::ResendPlayerModInfo ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         g_pNetServer->ResendModPackets ( pPlayer->GetSocket () );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaPlayerDefs::ResendPlayerACInfo ( lua_State* luaVM )
+{
+    // bool resendPlayerACInfo ( player thePlayer )
+    CPlayer* pPlayer;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPlayer );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pNetServer->ResendACPackets ( pPlayer->GetSocket () );
         lua_pushboolean ( luaVM, true );
         return 1;
     }

@@ -45,8 +45,8 @@ Var ShowLastUsed
 !ifndef FILES_ROOT
 	!define LIGHTBUILD    ; enable LIGHTBUILD for nightly
 	!define FILES_ROOT "Install files builder/output"
-	!define SERVER_FILES_ROOT "Install files builder/output/server"
-	!define FILES_MODULE_SDK "Install files builder/output/development/publicsdk"
+	!define SERVER_FILES_ROOT "Install files builder/output/MTA San Andreas/server"
+	!define FILES_MODULE_SDK "Install files builder/output/MTA San Andreas/development/publicsdk"
 	!define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
 	!define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
 	!define REVISION "0"
@@ -602,9 +602,9 @@ DontInstallRedistVC12:
                 !insertmacro GetMD5 $GTA_DIR\$1 $ExeMD5
                 DetailPrint "$1 successfully detected ($ExeMD5)"
                 ${Switch} $ExeMD5
-                    ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam
-                    ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update)
-                    ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update)
+                    ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam                   2007-12-04 11:50:50     5697536
+                    ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update) 2014-10-14 21:58:05     5971456
+                    ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update) 2014-12-01 20:43:21     5971456
                         #Copy gta-sa.exe to gta_sa.exe and commence patching process
                         CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
                         Call InstallPatch
@@ -623,6 +623,35 @@ DontInstallRedistVC12:
 		NoExeFound:
 			MessageBox MB_ICONSTOP "$(MSGBOX_INVALID_GTASA)"
 		CompletePatchProc:
+
+		#############################################################
+        # Fix missing or incorrect VS2013 redist files
+        SetOutPath $SYSDIR
+        Push $SYSDIR\msvcp120.dll
+        Call IsDll32Bit
+        Pop $0
+        ${If} $0 != 1
+            File "${FILES_ROOT}\MTA San Andreas\redist\msvcp120.dll"
+		${EndIf}
+
+        Push $SYSDIR\msvcr120.dll
+        Call IsDll32Bit
+        Pop $0
+        ${If} $0 != 1
+            File "${FILES_ROOT}\MTA San Andreas\redist\msvcr120.dll"
+		${EndIf}
+		#############################################################
+
+		#############################################################
+        # For XP, install Microsoft Internationalized Domain Names (IDN) Mitigation APIs
+        SetOutPath "$TEMP"
+        ${If} ${AtMostWinXP}
+            ${IfNot} ${FileExists} $SYSDIR\normaliz.dll
+                File "${FILES_ROOT}\MTA San Andreas\redist\idndl.x86.exe"
+                ExecWait '"$TEMP\idndl.x86.exe" /passive'
+            ${EndIf}
+        ${EndIf}
+		#############################################################
 
 		SetOutPath "$INSTDIR\MTA"
 		SetOverwrite on
@@ -644,7 +673,6 @@ DontInstallRedistVC12:
 		SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libcef.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\icudtl.dat"
-		File "${FILES_ROOT}\MTA San Andreas\mta\ffmpegsumo.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\natives_blob.bin"
@@ -655,6 +683,8 @@ DontInstallRedistVC12:
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef.pak"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_100_percent.pak"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_200_percent.pak"
+		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\devtools_resources.pak"
+		#File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_extensions.pak"
 
 
 		${If} "$(LANGUAGE_CODE)" != ""
@@ -1723,6 +1753,32 @@ Function RemoveVirtualStore
         CopyFiles $3\*.* $4
         RmDir /r "$3"
     NoVirtualStore:
+FunctionEnd
+
+
+;****************************************************************
+;
+; Returns 1 if file exists and is 32 bit.
+;
+;****************************************************************
+Function IsDll32Bit
+    Pop $3
+    StrCpy $2 ""
+    ClearErrors
+    FileOpen $0 $3 r
+    IfErrors done
+    FileSeek $0 60    ;   IMAGE_DOS_HEADER->e_lfanew
+    FileReadWord $0 $1
+    FileSeek $0 $1    ;   IMAGE_NT_HEADERS
+    FileSeek $0 4 CUR ;   IMAGE_FILE_HEADER->Machine
+    FileReadWord $0 $2  ; $2 = Machine
+    FileClose $0
+done:
+    StrCpy $1 "0"
+    ${If} $2 == 332     ; 0x014c IMAGE_FILE_MACHINE_I386
+        StrCpy $1 "1"
+    ${EndIf}
+    Push $1
 FunctionEnd
 
 

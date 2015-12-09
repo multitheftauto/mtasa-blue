@@ -523,6 +523,14 @@ void SharedUtil::WatchDogSetLastRunCrash( bool bOn )
     bWatchDogWasLastRunCrashValue = bOn;
 }
 
+//
+// Special things
+//
+void SharedUtil::WatchDogUserDidInteractWithMenu( void )
+{
+    WatchDogCompletedSection( WD_SECTION_NOT_USED_MAIN_MENU );
+    WatchDogCompletedSection( WD_SECTION_POST_INSTALL );
+}
 
 
 void SharedUtil::SetClipboardText ( const SString& strText )
@@ -919,6 +927,7 @@ bool SharedUtil::ShellExecuteNonBlocking ( const SString& strAction, const SStri
 #endif  // MTA_CLIENT
 
 #ifdef WIN32
+#define _WIN32_WINNT_WIN8                   0x0602
 ///////////////////////////////////////////////////////////////////////////
 //
 // SharedUtil::IsWindowsVersionOrGreater
@@ -948,6 +957,11 @@ bool SharedUtil::IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersio
 bool SharedUtil::IsWindowsXPSP3OrGreater()
 {
     return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP), LOBYTE(_WIN32_WINNT_WINXP), 3);
+}
+
+bool SharedUtil::IsWindows8OrGreater()
+{
+    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
 }
 #endif  // WIN32
 
@@ -1351,17 +1365,6 @@ bool SharedUtil::IsValidVersionString ( const SString& strVersion )
 SString SharedUtil::ExtractVersionStringBuildNumber( const SString& strVersion )
 {
     return strVersion.SubStr( 8, 5 );
-}
-
-
-// Replace major/minor/type to match current configuration
-SString SharedUtil::ConformVersionStringToBaseVersion( const SString& strVersion, const SString& strBaseVersion )
-{
-    SString strResult = strVersion;
-    strResult[0] = strBaseVersion[0];  // Major
-    strResult[2] = strBaseVersion[2];  // Minor
-    strResult[6] = strBaseVersion[6];  // Type
-    return strResult;
 }
 
 

@@ -47,7 +47,7 @@ class CLuaModule : public ILuaModuleManager10
 public:
 
                             CLuaModule          ( CLuaModuleManager* pLuaModuleManager, CScriptDebugging* pScriptDebugging, const char* szFileName, const char* szShortFileName );
-                            ~CLuaModule         ( void );
+    virtual                 ~CLuaModule         ( void );
 
     // functions for external modules until DP2.3
     void                    Printf                  ( const char * szFormat, ... );

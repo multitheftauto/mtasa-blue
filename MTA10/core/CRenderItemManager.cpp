@@ -754,6 +754,9 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.videoCard.iMaxAnisotropy = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
     outStatus.videoCard.iNumSimultaneousRTs = g_pDeviceState->DeviceCaps.NumSimultaneousRTs;
 
+    // State
+    outStatus.state.iNumShadersUsingReadableDepthBuffer = m_ShadersUsingDepthBuffer.size();
+
     // Memory usage
     outStatus.videoMemoryKB.iFreeForMTA = m_iMemoryKBFreeForMTA;
     outStatus.videoMemoryKB.iUsedByFonts = m_iFontMemoryKBUsed;
@@ -1170,6 +1173,7 @@ void CRenderItemManager::SaveReadableDepthBuffer( void )
         {
             // If using AA hacks, change to the other depth buffer we created
             m_pDevice->SetDepthStencilSurface ( m_pNonAADepthSurface2 );
+            m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
         }
         else
         {
@@ -1282,8 +1286,6 @@ void CRenderItemManager::FlushNonAARenderTarget( void )
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::HandleStretchRect( IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestSurface,CONST RECT* pDestRect,int Filter )
 {
-    SaveReadableDepthBuffer();
-
     if ( pSourceSurface == m_pSavedSceneRenderTargetAA )
     {
         // If trying to copy from the saved render target, use the active render target instead

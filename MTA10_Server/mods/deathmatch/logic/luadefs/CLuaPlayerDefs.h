@@ -69,6 +69,7 @@ public:
     LUA_DECLARE ( GetPlayerAnnounceValue );
     LUA_DECLARE ( SetPlayerAnnounceValue );
     LUA_DECLARE ( ResendPlayerModInfo );
+    LUA_DECLARE ( ResendPlayerACInfo );
 
     // Key bind funcs
     LUA_DECLARE ( BindKey );

@@ -27,10 +27,6 @@
 #else
     #include <termios.h>
     #include <unistd.h>
-
-    // This is probably safer than changing MTAPlatform.h against compatibility issues
-    #undef Printf
-    #define Print printf
 #endif
 
 // Define libraries
@@ -47,6 +43,7 @@ bool g_bNoCrashHandler = false;
     bool g_bDaemonized = false;
     WINDOW* m_wndMenu = NULL;
     WINDOW* m_wndInput = NULL;
+    bool IsCursesActive( void )     { return m_wndInput != NULL; }
 #endif
 
 #ifdef WIN32
@@ -120,7 +117,7 @@ void CServerImpl::Printf ( const char* szFormat, ... )
 #ifdef WIN32
         vprintf ( szFormat, ap );
 #else
-        if(!g_bNoCurses)
+        if( IsCursesActive() )
             vwprintw ( stdscr, szFormat, ap );
         else
             vprintf ( szFormat, ap );
@@ -165,38 +162,6 @@ void CServerImpl::Daemonize () const
 }
 #endif
 
-bool CServerImpl::CheckLibVersions( void )
-{
-#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
-// define MTASA_SKIP_VERSION_CHECKS in "build_overrides_s.h" to skip version checks
-#ifndef MTASA_SKIP_VERSION_CHECKS
-
-    char buffer[256];
-    buffer[0] = 0;
-    GetLibMtaVersion( buffer, sizeof( buffer ) );
-    SString strVersionCore = buffer;
-
-    CDynamicLibrary* dynLibList[] = { &m_NetworkLibrary, &m_XMLLibrary, &m_pModManager->GetDynamicLibrary() };
-    const char* dynLibNameList[] = { "net", "xml", "deathmatch" };
-
-    for( uint i = 0 ; i < NUMELMS( dynLibList ) ; i++ )
-    {
-        buffer[0] = 0;
-        FUNC_GetMtaVersion* pfnGetMtaVersion = (FUNC_GetMtaVersion*) ( dynLibList[i]->GetProcedureAddress ( "GetLibMtaVersion" ) );
-        if ( pfnGetMtaVersion )
-            pfnGetMtaVersion( buffer, sizeof( buffer ) );
-        if ( strVersionCore != buffer )
-        {
-            Print( "ERROR: '%s' library version is '%s' (Expected '%s')\n", dynLibNameList[i], buffer, *strVersionCore );
-            Print( "Try reinstalling\n" );
-            return false;
-        }
-    }
-
-#endif
-#endif
-    return true;
-}
 
 int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 {
@@ -230,6 +195,12 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         // Set our locale to the C locale, as Unicode output only functions in this locale
         std::setlocale(LC_ALL,"C");
         assert ( strcoll( "a", "B" ) > 0 );
+
+        // Disable QuickEdit mode to prevent text selection causing server freeze
+        HANDLE hConIn = GetStdHandle( STD_INPUT_HANDLE );
+        DWORD dwConInMode;
+        GetConsoleMode( hConIn, &dwConInMode );
+        SetConsoleMode( hConIn, dwConInMode & ~ENABLE_QUICK_EDIT_MODE );
 
         // Get the console handle
         m_hConsole = GetStdHandle ( STD_OUTPUT_HANDLE );
@@ -340,7 +311,7 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
 
     // Welcome text
     if ( !g_bSilent )
-        Print ( "MTA:BLUE Server for MTA:SA\r\n\r\n" );
+        Print ( "MTA:BLUE Server for MTA:SA\n\n" );
 
     // Load the network DLL
     if ( m_NetworkLibrary.Load ( PathJoin ( m_strServerPath, SERVER_BIN_PATH, szNetworkLibName ) ) )
@@ -354,10 +325,10 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             ulong ulNetModuleVersion = 0;
             if ( pfnCheckCompatibility )
                 pfnCheckCompatibility ( 1, &ulNetModuleVersion );
-            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n\r", MTA_DM_SERVER_NET_MODULE_VERSION, (uint)ulNetModuleVersion );
-            Print ( "Press Q to shut down the server!\n\r" );
-            Print ( "\n\r\n\r\n\r(If this is a custom build,\n\r" );
-            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n\r" );
+            Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n", MTA_DM_SERVER_NET_MODULE_VERSION, (uint)ulNetModuleVersion );
+            Print ( "Press Q to shut down the server!\n" );
+            Print ( "\n\n\n(If this is a custom build,\n" );
+            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n" );
             WaitForKey ( 'q' );
             DestroyWindow ( );
             return ERROR_NETWORK_LIBRARY_FAILED;
@@ -378,19 +349,8 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
                     // Make the modmanager load our mod
                     if ( m_pModManager->Load ( "deathmatch", iArgumentCount, szArguments ) )   // Hardcoded for now
                     {
-                        if ( CheckLibVersions() )
-                        {
-                            // Enter our mainloop
-                            MainLoop ();
-                        }
-                        else
-                        {
-                            // Version mismatch
-                            Print ( "Press Q to shut down the server!\n" );
-                            WaitForKey ( 'q' );
-                            DestroyWindow ( );
-                            return ERROR_LOADING_MOD;
-                        }
+                        // Enter our mainloop
+                        MainLoop ();
                     }
                     else
                     {
@@ -1034,7 +994,7 @@ void CServerImpl::DestroyWindow ( void )
 
 void WaitForKey ( int iKey )
 {
-    if ( !g_bSilent )
+    if ( !g_bSilent && !g_bNoCurses )
     {
         for ( ;; )
         {
@@ -1048,4 +1008,25 @@ void WaitForKey ( int iKey )
             Sleep ( 10 );
         }
     }
+}
+
+// Always print these messages
+void Print ( const char* szFormat, ... )
+{
+    va_list ap;
+    va_start ( ap, szFormat );
+
+    SString str;
+    str.vFormat ( szFormat, ap );
+
+#ifdef WIN32
+    printf ( "%s", *str );
+#else
+    if( IsCursesActive() )
+        printw ( "%s", *str );
+    else
+        printf ( "%s", *str );
+#endif
+
+    va_end ( ap );
 }

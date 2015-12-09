@@ -482,9 +482,9 @@ void CNetServerBuffer::GetPingStatus ( SFixedString < 32 >* pstrStatus )
 // Thread safe
 //
 ///////////////////////////////////////////////////////////////////////////
-NetBitStreamInterface* CNetServerBuffer::AllocateNetServerBitStream ( unsigned short usBitStreamVersion )
+NetBitStreamInterface* CNetServerBuffer::AllocateNetServerBitStream ( unsigned short usBitStreamVersion, const void* pData, uint uiDataSize, bool bCopyData )
 {
-    return m_pRealNetServer->AllocateNetServerBitStream ( usBitStreamVersion );
+    return m_pRealNetServer->AllocateNetServerBitStream ( usBitStreamVersion, pData, uiDataSize, bCopyData );
 }
 
 
@@ -719,6 +719,20 @@ bool CNetServerBuffer::InitServerId ( const char* szPath )
 void CNetServerBuffer::ResendModPackets ( const NetServerPlayerID& playerID )
 {
     SResendModPacketsArgs* pArgs = new SResendModPacketsArgs ( playerID );
+    AddCommandAndFree ( pArgs );
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// CNetServerBuffer::ResendACPackets
+//
+// Non-blocking.
+//
+///////////////////////////////////////////////////////////////////////////
+void CNetServerBuffer::ResendACPackets ( const NetServerPlayerID& playerID )
+{
+    SResendACPacketsArgs* pArgs = new SResendACPacketsArgs ( playerID );
     AddCommandAndFree ( pArgs );
 }
 
@@ -1166,6 +1180,7 @@ void CNetServerBuffer::ProcessCommand ( CNetJobData* pJobData )
         CALLREALNET1 (                      GetNetRoute                     , SFixedString < 32 >*, pstrRoute )
         CALLREALNET1R( bool,                InitServerId                    , const char*, szPath )
         CALLREALNET1 (                      ResendModPackets                , const NetServerPlayerID&, playerID )
+        CALLREALNET1 (                      ResendACPackets                 , const NetServerPlayerID&, playerID )
         CALLREALNET4 (                      GetClientSerialAndVersion       , const NetServerPlayerID&, playerID, SFixedString < 32 >&, strSerial, SFixedString < 64 >&, strExtra, SFixedString < 32 >&, strVersion )
         CALLREALNET1 (                      SetNetOptions                   , const SNetOptions&, options )
         CALLREALNET2 (                      GenerateRandomData              , void*, pOutData, uint, uiLength )

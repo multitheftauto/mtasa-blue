@@ -60,6 +60,9 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 
     m_bNotifyServerBrowser = bNotifyServerBrowser;
 
+    // For detecting startup problems
+    WatchDogUserDidInteractWithMenu();
+
     // Hide certain questions
     CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->OnConnect ();
 
@@ -476,6 +479,6 @@ void CConnectManager::OpenServerFirewall( in_addr Address, ushort usHttpPort, bo
         uiTimeOut = 1000;
     }
 
-    SString strDummyUrl( "http://%s:%d/.dummy/", inet_ntoa( Address ), usHttpPort );
+    SString strDummyUrl( "http://%s:%d/mta_client_firewall_probe/", inet_ntoa( Address ), usHttpPort );
     g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CONNECT_TCP_SEND )->QueueFile( strDummyUrl, NULL, 0, "", 0, true, NULL, NULL, false, 1, uiTimeOut );
 }

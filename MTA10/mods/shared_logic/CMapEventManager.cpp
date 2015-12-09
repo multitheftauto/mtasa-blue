@@ -26,10 +26,10 @@ CMapEventManager::CMapEventManager ( void )
 CMapEventManager::~CMapEventManager ( void )
 {
     // If this happens while we're iterating the list, we're screwed
-    assert ( !m_bIteratingList );
+    dassert ( !m_bIteratingList );
 
     // This should always be empty when m_bIteratingList is false
-    assert ( m_TrashCan.empty () );
+    dassert ( m_TrashCan.empty () );
 
     // Delete all eventhandlers
     DeleteAll ();

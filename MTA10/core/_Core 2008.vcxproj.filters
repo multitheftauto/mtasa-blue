@@ -5,9 +5,6 @@
       <UniqueIdentifier>{a2040412-0851-4f3a-9172-ab5573d0e959}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
-    <Filter Include="Source Files\tracking">
-      <UniqueIdentifier>{099812ab-61ba-47e8-9b1a-6fd6b5d7cbe9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{78cb4a43-ba21-4eca-816b-35c2a9a8437b}</UniqueIdentifier>
     </Filter>
@@ -17,9 +14,6 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{79d06019-c056-4188-9958-68bcecd5556a}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
-    </Filter>
-    <Filter Include="Header Files\tracking">
-      <UniqueIdentifier>{bf53bd58-5eb3-4ef9-a8be-f7954ed44fae}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\client">
       <UniqueIdentifier>{a25be505-f902-46d3-8ec3-1d732f81e16d}</UniqueIdentifier>
@@ -323,18 +317,6 @@
     <ClCompile Include="StdInc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tracking\CHTTPClient.cpp">
-      <Filter>Source Files\tracking</Filter>
-    </ClCompile>
-    <ClCompile Include="tracking\CHTTPResponse.cpp">
-      <Filter>Source Files\tracking</Filter>
-    </ClCompile>
-    <ClCompile Include="tracking\CTCPClientSocketImpl.cpp">
-      <Filter>Source Files\tracking</Filter>
-    </ClCompile>
-    <ClCompile Include="tracking\CTCPManager.cpp">
-      <Filter>Source Files\tracking</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\vendor\tinygettext\dictionary.cpp">
       <Filter>Source Files\utils\tinygettext</Filter>
     </ClCompile>
@@ -372,6 +354,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CAjaxResourceHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CWebDevTools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -618,30 +603,6 @@
     </ClInclude>
     <ClInclude Include="StdInc.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tracking\CHTTPClient.h">
-      <Filter>Header Files\tracking</Filter>
-    </ClInclude>
-    <ClInclude Include="tracking\CHTTPResponse.h">
-      <Filter>Header Files\tracking</Filter>
-    </ClInclude>
-    <ClInclude Include="tracking\CTCPClientSocket.h">
-      <Filter>Header Files\tracking</Filter>
-    </ClInclude>
-    <ClInclude Include="tracking\CTCPClientSocketImpl.h">
-      <Filter>Header Files\tracking</Filter>
-    </ClInclude>
-    <ClInclude Include="tracking\CTCPManager.h">
-      <Filter>Header Files\tracking</Filter>
-    </ClInclude>
-    <ClInclude Include="tracking\CTCPServerSocket.h">
-      <Filter>Header Files\tracking</Filter>
-    </ClInclude>
-    <ClInclude Include="tracking\CTCPServerSocketImpl.h">
-      <Filter>Header Files\tracking</Filter>
-    </ClInclude>
-    <ClInclude Include="tracking\CTCPSocket.h">
-      <Filter>Header Files\tracking</Filter>
     </ClInclude>
     <ClInclude Include="CExceptionInformation_Impl.h">
       <Filter>Header Files\client</Filter>
@@ -1292,6 +1253,9 @@
       <Filter>Header Files\sdk\core</Filter>
     </ClInclude>
     <ClInclude Include="CAjaxResourceHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CWebDevTools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

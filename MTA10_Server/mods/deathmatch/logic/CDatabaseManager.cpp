@@ -444,7 +444,7 @@ void CDatabaseManagerImpl::SetLogLevel ( EJobLogLevelType logLevel, const SStrin
     CDbOptionsMap argMap;
     argMap.Set ( "name", strLogFilename );
     argMap.Set ( "level", logLevel );
-    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::SETLOGLEVEL, NULL, argMap.ToString () );
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::SETLOGLEVEL, 0, argMap.ToString () );
     m_JobQueue->FreeCommand ( pJobData );
 }
 

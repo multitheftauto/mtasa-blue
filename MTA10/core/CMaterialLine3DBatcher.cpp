@@ -287,7 +287,7 @@ void CMaterialLine3DBatcher::DrawBatch ( const CVector& vecCameraPos, uint* pBat
         // Do shader passes
         DWORD dwFlags = pShaderInstance->m_pEffectWrap->m_uiSaveStateFlags;      // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint uiNumPasses = 0;
-        pD3DEffect->Begin ( &uiNumPasses, dwFlags );
+        pShaderInstance->m_pEffectWrap->Begin ( &uiNumPasses, dwFlags );
 
         for ( uint uiPass = 0 ; uiPass < uiNumPasses ; uiPass++ )
         {
@@ -295,7 +295,7 @@ void CMaterialLine3DBatcher::DrawBatch ( const CVector& vecCameraPos, uint* pBat
             m_pDevice->DrawPrimitiveUP ( D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride );
             pD3DEffect->EndPass ();
         }
-        pD3DEffect->End ();
+        pShaderInstance->m_pEffectWrap->End ();
 
         // If we didn't get the effect to save the shader state, clear some things here
         if ( dwFlags & D3DXFX_DONOTSAVESHADERSTATE )

@@ -105,7 +105,6 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
             if ( bIsDir && ( strName.BeginsWith( "#" ) || ( strName.BeginsWith( "[" ) && strName.EndsWith( "]" ) ) ) )
             {
                 resourcesPathList.push_back ( PathJoin ( strResourcesRelPath, strName ) );
-                continue;
             }
 
             // Extract file extension
@@ -120,12 +119,12 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
             // Ignore items that have dot or space in the name
             if ( strName.Contains ( "." ) || strName.Contains ( " " ) )
             {
-                if ( strJustThisResource.empty () )
+                if ( !bIsDir && strJustThisResource.empty () )
                     CLogger::LogPrintf ( "WARNING: Not loading resource '%s' as it contains illegal characters\n", *strName );
                 continue;
             }
 
-            // Ignore dir items with no meta.xml (assume it's the result of saved files from a zipped resource)
+            // Ignore dir items with no meta.xml
             if ( bIsDir && !FileExists ( PathJoin ( strResourcesAbsPath, strName, "meta.xml" ) ) )
                 continue;
 
@@ -868,6 +867,14 @@ void CResourceManager::ProcessQueue ( void )
             }
             else
                 CLogger::LogPrintf ( "%s restarted successfully\n", sItem.pResource->GetName ().c_str () );
+        }
+        else if ( sItem.eQueue == QUEUE_REFRESH )
+        {
+            Refresh();
+        }
+        else if ( sItem.eQueue == QUEUE_REFRESHALL )
+        {
+            Refresh( true );
         }
     }
 

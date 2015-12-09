@@ -53,6 +53,7 @@ public:
     void                            SetPosition             ( const CVector& vecPosition ) {};
 
 protected:
+    bool                            DoReplaceModel          ( unsigned short usModel, bool bAlphaTransparency );
     void                            UnloadDFF               ( void );
     void                            InternalRestoreModel    ( unsigned short usModel );
 

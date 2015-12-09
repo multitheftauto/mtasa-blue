@@ -1133,6 +1133,19 @@ SString GetRealOSBuildNumber( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// IsWindows10OrGreater
+//
+// Works around limit for applications not manifested for Windows 10
+//
+///////////////////////////////////////////////////////////////
+bool IsWindows10OrGreater( void )
+{
+    return atoi( GetRealOSVersion() ) >= 10;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // IsVS2013RuntimeInstalled
 //
 // Only checks registry settings, so install could still be invalid
@@ -1184,30 +1197,6 @@ Return Value:
     }
 
     return(b);
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// IsVistaOrHigher
-//
-//
-//
-///////////////////////////////////////////////////////////////
-bool IsVistaOrHigher ( void )
-{
-    int iMajor = atoi ( GetRealOSVersion () );
-    return iMajor >= 6;
-}
-
-bool IsWin8OrHigher ( void )
-{
-    return GetRealOSVersion () >= "6.2";
-}
-
-bool IsWin10OrHigher ( void )
-{
-    return GetRealOSVersion () >= "10.0";
 }
 
 
@@ -2052,41 +2041,68 @@ bool VerifyEmbeddedSignature( const SString& strFilename )
 //////////////////////////////////////////////////////////
 void LogSettings( void )
 {
-    const char* szSettings[] = {
-                                "general", "aero-enabled",
-                                "general", "aero-changeable",
-                                "general", "driver-overrides-disabled",
-                                "general", "device-selection-disabled",
-                                "general", "customized-sa-files-using",
-                                "general", "times-connected",
-                                "general", "times-connected-editor",
-                                "nvhacks", "optimus-force-detection",
-                                "nvhacks", "optimus-export-enablement",
-                                "nvhacks", "optimus",
-                                "nvhacks", "optimus-rename-exe",
-                                "nvhacks", "optimus-alt-startup",
-                                "nvhacks", "optimus-force-windowed",
-                                "nvhacks", "optimus-dialog-skip",
-                                "nvhacks", "optimus-startup-option",
-                                "diagnostics", "send-dumps",
-                                "diagnostics", "last-minidump-time",
-                                "diagnostics", "user-confirmed-bsod-time",
-                                DIAG_MINIDUMP_DETECTED_COUNT,
-                                DIAG_MINIDUMP_CONFIRMED_COUNT,
-                                DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE,
-                                "general", "noav-user-says-skip",
-                                "general", "noav-last-asked-time",
-                            };
+    struct {
+        int bSkipIfZero;
+        const char* szPath;
+        const char* szName;
+        const char* szDesc;
+    } const settings[] = {
+                            { false, "general", GENERAL_PROGRESS_ANIMATION_DISABLE, "", },
+                            { false, "general", "aero-enabled", "", },
+                            { false, "general", "aero-changeable", "", },
+                            { false, "general", "driver-overrides-disabled", "", },
+                            { false, "general", "device-selection-disabled", "", },
+                            { false, "general", "customized-sa-files-using", "", },
+                            { false, "general", "times-connected", "", },
+                            { false, "general", "times-connected-editor", "", },
+                            { false, "nvhacks", "nvidia", "", },
+                            { false, "nvhacks", "optimus-force-detection", "", },
+                            { false, "nvhacks", "optimus-export-enablement", "", },
+                            { false, "nvhacks", "optimus", "", },
+                            { false, "nvhacks", "optimus-rename-exe", "", },
+                            { false, "nvhacks", "optimus-alt-startup", "", },
+                            { false, "nvhacks", "optimus-force-windowed", "", },
+                            { false, "nvhacks", "optimus-dialog-skip", "", },
+                            { false, "nvhacks", "optimus-startup-option", "", },
+                            { true,  "watchdog", "CR1", "COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME", },
+                            { true,  "watchdog", "CR2", "COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN", },
+                            { true,  "watchdog", "CR3", "COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU", },
+                            { true,  "watchdog", "L0", "SECTION_NOT_CLEAN_GTA_EXIT", },
+                            { true,  "watchdog", "L1", "SECTION_NOT_STARTED_ONLINE_GAME", },
+                            { true,  "watchdog", "L2", "SECTION_NOT_SHOWN_LOADING_SCREEN", },
+                            { true,  "watchdog", "L3", "SECTION_STARTUP_FREEZE", },
+                            { true,  "watchdog", "L4", "SECTION_NOT_USED_MAIN_MENU", },
+                            { true,  "watchdog", "L5", "SECTION_POST_INSTALL", },
+                            { true,  "watchdog", "lastruncrash", "", },
+                            { true,  "watchdog", "preload-upgrades", "", },
+                            { true,  "watchdog", "Q0", "SECTION_IS_QUITTING", },
+                            { true,  "watchdog", "uncleanstop", "", },
+                            { false, "diagnostics", "send-dumps", "", },
+                            { true,  "diagnostics", "last-minidump-time", "", },
+                            { true,  "diagnostics", "user-confirmed-bsod-time", "", },
+                            { true,  DIAG_MINIDUMP_DETECTED_COUNT, "", },
+                            { true,  DIAG_MINIDUMP_CONFIRMED_COUNT, "", },
+                            { true,  DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, "", },
+                            { false, "general", "noav-user-says-skip", "", },
+                            { false, "general", "noav-last-asked-time", "", },
+                        };
 
-    for ( uint i = 0 ; i < NUMELMS( szSettings ) ; i += 2 )
+    for ( uint i = 0 ; i < NUMELMS( settings ) ; i++ )
     {
-        WriteDebugEvent( SString( "%s: %s", szSettings[i+1], *GetApplicationSetting( szSettings[i], szSettings[i+1] ) ) );
+        SString strValue = GetApplicationSetting( settings[i].szPath, settings[i].szName );
+        if ( !settings[i].bSkipIfZero || atoi( strValue ) != 0 )
+        {
+            WriteDebugEvent( SString( "%s.%s: %s %s", settings[i].szPath, settings[i].szName, *strValue, settings[i].szDesc ) );
+        }
     }
 
     uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
-    uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
-    uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
-    WriteDebugEvent( SString( "noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked ) );
+    if ( uiTimeLastAsked )
+    {
+        uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
+        uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
+        WriteDebugEvent( SString( "noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked ) );
+    }
 }
 
 

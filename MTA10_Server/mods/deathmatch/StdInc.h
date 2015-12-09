@@ -310,3 +310,6 @@ struct SAclRequest;
 #include "Config.h"
 #define SHOW_SELF_COMPILE_WARNING
 #include "../../version.h"
+
+extern CNetServer* g_pRealNetServer;
+extern CGame* g_pGame;

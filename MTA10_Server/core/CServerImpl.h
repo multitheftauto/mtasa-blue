@@ -73,7 +73,6 @@ public:
 
 private:
     void                MainLoop            ( void );
-    bool                CheckLibVersions    ( void );
 
     bool                ParseArguments      ( int iArgumentCount, char* szArguments [] );
 

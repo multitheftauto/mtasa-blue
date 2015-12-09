@@ -39,6 +39,7 @@
 #define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.5-9.06054"
 #define SPRINT_FIX_MIN_CLIENT_VERSION           "1.3.5-9.06277"
 #define DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION   "1.4.0-5.06399"
+#define SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION   "1.5.1"
 
 CGame* g_pGame = NULL;
 
@@ -254,6 +255,10 @@ CGame::~CGame ( void )
 {
     m_bBeingDeleted = true;
 
+    // Stop the web server first to avoid threading issues
+    if ( m_pHTTPD )
+        m_pHTTPD->StopHTTPD ();
+
     // Stop the performance stats modules
     if ( CPerfStatManager::GetSingleton () != NULL )
         CPerfStatManager::GetSingleton ()->Stop ();
@@ -268,10 +273,6 @@ CGame::~CGame ( void )
 
     // Stop networking
     Stop ();
-
-    // Stop the web server
-    if ( m_pHTTPD )
-        m_pHTTPD->StopHTTPD ();
 
      // Destroy our stuff
     SAFE_DELETE( m_pResourceManager );
@@ -989,7 +990,7 @@ bool CGame::ProcessPacket ( CPacket& Packet )
 {
     // Can we handle it?
     ePacketID PacketID = Packet.GetPacketID ();
-    switch ( PacketID )
+    switch ( (int)PacketID )
     {
         case PACKET_ID_PLAYER_JOINDATA:
         {
@@ -1140,6 +1141,12 @@ bool CGame::ProcessPacket ( CPacket& Packet )
         case PACKET_ID_PLAYER_MODINFO:
         {
             Packet_PlayerModInfo ( static_cast < CPlayerModInfoPacket& > ( Packet ) );
+            return true;
+        }
+
+        case PACKET_ID_PLAYER_ACINFO:
+        {
+            Packet_PlayerACInfo ( static_cast < CPlayerACInfoPacket& > ( Packet ) );
             return true;
         }
 
@@ -1473,7 +1480,8 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerMute", "", NULL, false );
     m_Events.AddEvent ( "onPlayerUnmute", "", NULL, false );
     m_Events.AddEvent ( "onPlayerCommand", "command", NULL, false );
-    m_Events.AddEvent ( "onPlayerModInfo", "type, ids, names", NULL, false );
+    m_Events.AddEvent ( "onPlayerModInfo", "filename, itemlist", NULL, false );
+    m_Events.AddEvent ( "onPlayerACInfo", "aclist, size, md5, sha256", NULL, false );
     m_Events.AddEvent ( "onPlayerNetworkStatus", "type, ticks", NULL, false );
     m_Events.AddEvent ( "onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false );
 
@@ -3760,7 +3768,7 @@ void CGame::Packet_PlayerNetworkStatus ( CPlayerNetworkStatusPacket & Packet )
 void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
-    if ( pPlayer && pPlayer->IsJoined () )
+    if ( pPlayer )
     {
         // Make itemList table
         CLuaArguments resultItemList;
@@ -3830,6 +3838,28 @@ void CGame::Packet_PlayerModInfo ( CPlayerModInfoPacket & Packet )
         Arguments.PushString ( Packet.m_strInfoType );
         Arguments.PushTable ( &resultItemList );
         pPlayer->CallEvent ( "onPlayerModInfo", Arguments );
+    }
+}
+
+
+void CGame::Packet_PlayerACInfo( CPlayerACInfoPacket& Packet )
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if ( pPlayer )
+    {
+        CLuaArguments acList;
+        for ( uint i = 0 ; i < Packet.m_IdList.size() ; i++ )
+        {
+            acList.PushNumber( i + 1 );
+            acList.PushNumber( Packet.m_IdList[ i ] );
+        }
+
+        CLuaArguments Arguments;
+        Arguments.PushTable( &acList );
+        Arguments.PushNumber( Packet.m_uiD3d9Size );
+        Arguments.PushString( Packet.m_strD3d9MD5 );
+        Arguments.PushString( Packet.m_strD3d9SHA256 );
+        pPlayer->CallEvent( "onPlayerACInfo", Arguments );
     }
 }
 
@@ -4172,6 +4202,7 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
     uchar ucUseAltPulseOrder = m_pMainConfig->GetUseAltPulseOrder () != 0;
     uchar ucAllowFastSprintFix = false;
     uchar ucAllowDrivebyAnimFix = false;
+    uchar ucAllowShotgunDamageFix = false;
 
     // Add sprint fix if all clients can handle it
     if ( ExtractVersionStringBuildNumber( m_pPlayerManager->GetLowestConnectedPlayerVersion() ) >= ExtractVersionStringBuildNumber( SPRINT_FIX_MIN_CLIENT_VERSION ) )
@@ -4181,7 +4212,11 @@ void CGame::SendSyncSettings ( CPlayer* pPlayer )
     if (ExtractVersionStringBuildNumber(m_pPlayerManager->GetLowestConnectedPlayerVersion()) >= ExtractVersionStringBuildNumber( DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION ))
         ucAllowDrivebyAnimFix = true;
 
-    CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs, ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix);
+    // Add shotgun bullet sync damage fix if all clients can handle it
+    if ( m_pPlayerManager->GetLowestConnectedPlayerVersion() >= SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION )
+        ucAllowShotgunDamageFix = true;
+
+    CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs, ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix );
     if ( pPlayer )
         pPlayer->Send ( packet );
     else
