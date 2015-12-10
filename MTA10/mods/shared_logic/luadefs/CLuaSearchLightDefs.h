@@ -19,4 +19,18 @@ public:
     static void     AddClass ( lua_State* luaVM );
 
     LUA_DECLARE ( CreateSearchLight );
+
+    LUA_DECLARE ( GetSearchLightStartPosition );
+    LUA_DECLARE ( GetSearchLightEndPosition );
+    LUA_DECLARE ( GetSearchLightStartRadius );
+    LUA_DECLARE ( GetSearchLightEndRadius );
+
+    LUA_DECLARE ( SetSearchLightStartPosition );
+    LUA_DECLARE ( SetSearchLightEndPosition );
+    LUA_DECLARE ( SetSearchLightStartRadius );
+    LUA_DECLARE ( SetSearchLightEndRadius );
+
+    LUA_DECLARE ( OOP_GetSearchLightStartPosition );
+    LUA_DECLARE ( OOP_GetSearchLightEndPosition );
+
 };
