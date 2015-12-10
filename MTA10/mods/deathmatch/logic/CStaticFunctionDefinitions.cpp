@@ -4739,7 +4739,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& 
 
     if ( pParent && !pParent->IsCallPropagationEnabled () )
     {
-        pGUIElement->GetCGUIElement ()->SetInheritsAlpha ( false );
+        pElement->SetInheritsAlpha ( false );
     }
 
     return pGUIElement;
