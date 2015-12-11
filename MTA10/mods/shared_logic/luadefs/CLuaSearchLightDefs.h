@@ -20,8 +20,8 @@ public:
 
     LUA_DECLARE ( CreateSearchLight );
 
-    LUA_DECLARE ( GetSearchLightStartPosition );
-    LUA_DECLARE ( GetSearchLightEndPosition );
+    LUA_DECLARE_OOP ( GetSearchLightStartPosition );
+    LUA_DECLARE_OOP ( GetSearchLightEndPosition );
     LUA_DECLARE ( GetSearchLightStartRadius );
     LUA_DECLARE ( GetSearchLightEndRadius );
 
@@ -29,8 +29,5 @@ public:
     LUA_DECLARE ( SetSearchLightEndPosition );
     LUA_DECLARE ( SetSearchLightStartRadius );
     LUA_DECLARE ( SetSearchLightEndRadius );
-
-    LUA_DECLARE ( OOP_GetSearchLightStartPosition );
-    LUA_DECLARE ( OOP_GetSearchLightEndPosition );
 
 };

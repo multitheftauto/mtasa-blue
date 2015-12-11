@@ -40,10 +40,10 @@ void CLuaSearchLightDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setStartRadius", "setSearchLightStartRadius" );
     lua_classfunction ( luaVM, "setEndRadius", "setSearchLightEndRadius" );
 
-    lua_classvariable ( luaVM, "startposition", "setSearchLightStartPosition", "getSearchLightStartPosition" );
-    lua_classvariable ( luaVM, "endposition", "setSearchLightEndPosition", "getSearchLightEndPosition" );
-    lua_classvariable ( luaVM, "startradius", "setSearchLightStartRadius", "getSearchLightStartRadius" );
-    lua_classvariable ( luaVM, "endradius", "setSearchLightEndRadius", "getSearchLightEndRadius" );
+    lua_classvariable ( luaVM, "startPosition", SetSearchLightStartPosition, OOP_GetSearchLightStartPosition );
+    lua_classvariable ( luaVM, "endPosition", SetSearchLightEndPosition, OOP_GetSearchLightEndPosition );
+    lua_classvariable ( luaVM, "startRadius", "setSearchLightStartRadius", "getSearchLightStartRadius" );
+    lua_classvariable ( luaVM, "endRadius", "setSearchLightEndRadius", "getSearchLightEndRadius" );
 
     lua_registerclass ( luaVM, "SearchLight", "Element" );
 }
