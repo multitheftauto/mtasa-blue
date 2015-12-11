@@ -11,26 +11,22 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUACAMERADEFS_H
-#define __CLUACAMERADEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaCameraDefs: public CLuaDefs
 {
 public:
-    static void     LoadFunctions                       ( void );
+    static void LoadFunctions ( void              );
 
     // Get functions
-    static int      getCameraMatrix                     ( lua_State* luaVM );
-    static int      getCameraTarget                     ( lua_State* luaVM );
-    static int      getCameraInterior                   ( lua_State* luaVM );
-
-    // Set functions
-    static int      setCameraMatrix                     ( lua_State* luaVM );
-    static int      setCameraTarget                     ( lua_State* luaVM );
-    static int      setCameraInterior                   ( lua_State* luaVM );
-    static int      fadeCamera                          ( lua_State* luaVM );  
+    LUA_DECLARE_OOP           ( getCameraMatrix   );
+    LUA_DECLARE               ( getCameraTarget   );
+    LUA_DECLARE               ( getCameraInterior );
+                                    
+    // Set functions                
+    LUA_DECLARE               ( setCameraMatrix   );
+    LUA_DECLARE               ( setCameraTarget   );
+    LUA_DECLARE               ( setCameraInterior );
+    LUA_DECLARE               ( fadeCamera        ); 
 };
-
-#endif

@@ -11,8 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __LUACOMMON_H
-#define __LUACOMMON_H
+#pragma once
 
 extern "C"
 {
@@ -57,7 +56,7 @@ void                    lua_initclasses         ( lua_State* luaVM );
 
 void                    lua_newclass            ( lua_State* luaVM );
 void                    lua_getclass            ( lua_State* luaVM, const char* szName );
-void                    lua_registerclass       ( lua_State* luaVM, const char* szName, const char* szParent = NULL );
+void                    lua_registerclass       ( lua_State* luaVM, const char* szName, const char* szParent = NULL, bool bRegisterWithEnvironment = true);
 void                    lua_registerstaticclass ( lua_State* luaVM, const char* szName );
 void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* szACLName, lua_CFunction fn );
 void                    lua_classfunction       ( lua_State* luaVM, const char* szFunction, const char* fn );
@@ -94,5 +93,3 @@ struct SLuaDebugInfo
     int         iLine;
     int         infoType;
 };
-
-#endif

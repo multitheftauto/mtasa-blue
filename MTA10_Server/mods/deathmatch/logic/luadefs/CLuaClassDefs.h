@@ -10,9 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __LUACLASSES_H
-#define __LUACLASSES_H
-
+#pragma once
 extern "C"
 {
     #include "lua.h"
@@ -23,15 +21,15 @@ extern "C"
 class CLuaClassDefs: public CLuaDefs
 {
 public:
-    static int			Index               ( lua_State* luaVM );
-    static int			NewIndex            ( lua_State* luaVM );
-    static int			StaticNewIndex      ( lua_State* luaVM );
-    static int			Call                ( lua_State* luaVM );
+    LUA_DECLARE ( Index );
+    LUA_DECLARE ( NewIndex );
+    LUA_DECLARE ( StaticNewIndex );
+    LUA_DECLARE ( Call );
 
-    static int			ReadOnly            ( lua_State* luaVM );
-    static int			WriteOnly           ( lua_State* luaVM );
+    LUA_DECLARE ( ReadOnly );
+    LUA_DECLARE ( WriteOnly );
 
-    static int			ToString            ( lua_State* luaVM );
+    LUA_DECLARE ( ToString );
 
     static const char*	GetObjectClass	    ( void* pObject );
     static const char*	GetResourceClass	( CResource* pResource );
@@ -46,5 +44,3 @@ public:
     static const char*	GetQueryClass       ( CDbJobData* pJobData );
     static const char*	GetElementClass		( CElement* pElement );
 };
-
-#endif

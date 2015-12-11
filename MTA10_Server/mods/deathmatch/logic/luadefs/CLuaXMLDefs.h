@@ -14,36 +14,34 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAXMLDEFS_H
-#define __CLUAXMLDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaXMLDefs: public CLuaDefs
 {
 public:
     static void     LoadFunctions                       ( void );
+    static void     AddClass                            ( lua_State* luaVM );
 
-    static int      xmlCreateFile                       ( lua_State* luaVM );
-    static int      xmlLoadFile                         ( lua_State* luaVM );
-    static int      xmlCopyFile                         ( lua_State* luaVM );
-    static int      xmlSaveFile                         ( lua_State* luaVM );
-    static int      xmlUnloadFile                       ( lua_State* luaVM );
 
-    static int      xmlCreateChild                      ( lua_State* luaVM );
-    static int      xmlDestroyNode                      ( lua_State* luaVM );
-    static int      xmlNodeFindChild                    ( lua_State* luaVM );
-    static int      xmlNodeGetChildren                  ( lua_State* luaVM );
-    static int      xmlNodeGetParent                    ( lua_State* luaVM );
+    LUA_DECLARE ( xmlCreateFile );
+    LUA_DECLARE ( xmlLoadFile );
+    LUA_DECLARE ( xmlCopyFile );
+    LUA_DECLARE ( xmlSaveFile );
+    LUA_DECLARE ( xmlUnloadFile );
 
-    static int      xmlNodeGetValue                     ( lua_State* luaVM );
-    static int      xmlNodeSetValue                     ( lua_State* luaVM );
-    static int      xmlNodeGetAttributes                ( lua_State* luaVM );
-    static int      xmlNodeGetAttribute                 ( lua_State* luaVM );
-    static int      xmlNodeSetAttribute                 ( lua_State* luaVM );
+    LUA_DECLARE ( xmlCreateChild );
+    LUA_DECLARE ( xmlDestroyNode );
+    LUA_DECLARE ( xmlNodeFindChild );
+    LUA_DECLARE ( xmlNodeGetChildren );
+    LUA_DECLARE ( xmlNodeGetParent );
 
-    static int      xmlNodeGetName                      ( lua_State* luaVM );
-    static int      xmlNodeSetName                      ( lua_State* luaVM );
+    LUA_DECLARE ( xmlNodeGetValue );
+    LUA_DECLARE ( xmlNodeSetValue );
+    LUA_DECLARE ( xmlNodeGetAttributes );
+    LUA_DECLARE ( xmlNodeGetAttribute );
+    LUA_DECLARE ( xmlNodeSetAttribute );
+
+    LUA_DECLARE ( xmlNodeGetName );
+    LUA_DECLARE ( xmlNodeSetName );
 };
-
-#endif

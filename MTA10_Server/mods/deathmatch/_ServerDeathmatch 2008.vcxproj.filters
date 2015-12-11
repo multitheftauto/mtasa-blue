@@ -73,12 +73,6 @@
     <Filter Include="Resource Files\output">
       <UniqueIdentifier>{4a26eed3-0f7c-400a-b106-efff6f2b1bb6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\logic\oopdefs">
-      <UniqueIdentifier>{3769e3ec-6cde-45c2-9bf0-b30dd16010ec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\logic\oopdefs">
-      <UniqueIdentifier>{802fad09-80e2-4684-80cf-b3145bd3809c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CServer.cpp">
@@ -885,15 +879,6 @@
     <ClCompile Include="logic\lua\CLuaMatrix.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="logic\luadefs\CLuaMatrixDefs.cpp">
       <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
@@ -918,37 +903,10 @@
     <ClCompile Include="logic\CPerfStat.PlayerPacketUsage.cpp">
       <Filter>Source Files\logic</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Player.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.Connection.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.ACL.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Marker.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Database.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Account.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Event.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Player.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Team.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Server.cpp">
@@ -957,34 +915,10 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Weapon.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Ped.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Vehicle.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Blip.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Object.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.RadarArea.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Water.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.ColShape.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.UTF.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Utility.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Ban.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Crypt.cpp">
@@ -993,20 +927,56 @@
     <ClCompile Include="logic\lua\CLuaFunctionDefs.PREG.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\CLuaFunctionDefs.Timer.cpp">
-      <Filter>Source Files\logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Clothing.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="logic\lua\CLuaFunctionDefs.Misc.cpp">
       <Filter>Source Files\logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp">
-      <Filter>Source Files\logic\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="logic\packets\CPlayerNetworkStatusPacket.cpp">
       <Filter>Source Files\logic\packets</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaVehicleDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaMarkerDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaPlayerDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaPedDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaBlipDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaTeamDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaWaterDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaTimerDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaObjectDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaRadarAreaDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaColShapeDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaAccountDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaBanDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\luadefs\CLuaDatabaseDefs.cpp">
+      <Filter>Source Files\logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="logic\packets\CPlayerACInfoPacket.cpp">
       <Filter>Source Files\logic\packets</Filter>
@@ -1844,9 +1814,6 @@
     <ClInclude Include="..\..\..\Shared\animation\TInterpolation.h">
       <Filter>Header Files\shared\animation</Filter>
     </ClInclude>
-    <ClInclude Include="logic\lua\oopdefs\CLuaOOPDefs.h">
-      <Filter>Header Files\logic\oopdefs</Filter>
-    </ClInclude>
     <ClInclude Include="logic\luadefs\CLuaMatrixDefs.h">
       <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
@@ -1873,6 +1840,48 @@
     </ClInclude>
     <ClInclude Include="logic\packets\CPlayerNetworkStatusPacket.h">
       <Filter>Header Files\logic\packets</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaVehicleDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaMarkerDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaPlayerDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaPedDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaBlipDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaTeamDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaWaterDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaTimerDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaObjectDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaRadarAreaDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaColShapeDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaAccountDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaBanDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\luadefs\CLuaDatabaseDefs.h">
+      <Filter>Header Files\logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="logic\packets\CPlayerACInfoPacket.h">
       <Filter>Header Files\logic\packets</Filter>

@@ -10,9 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUABITDEFS_H
-#define __CLUABITDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaBitDefs: public CLuaDefs
@@ -21,22 +19,20 @@ public:
     static void     LoadFunctions                       ( void );
 
     // bitwise operators
-    static int      bitAnd                              ( lua_State* luaVM );
-    static int      bitNot                              ( lua_State* luaVM );
-    static int      bitOr                               ( lua_State* luaVM );
-    static int      bitTest                             ( lua_State* luaVM );
-    static int      bitXor                              ( lua_State* luaVM );
+    LUA_DECLARE ( bitAnd );
+    LUA_DECLARE ( bitNot );
+    LUA_DECLARE ( bitOr );
+    LUA_DECLARE ( bitTest );
+    LUA_DECLARE ( bitXor );
 
-    static int      bitLRotate                          ( lua_State* luaVM );
-    static int      bitRRotate                          ( lua_State* luaVM );
-    static int      bitLShift                           ( lua_State* luaVM );
-    static int      bitRShift                           ( lua_State* luaVM );
-    static int      bitArShift                          ( lua_State* luaVM );
+    LUA_DECLARE ( bitLRotate );
+    LUA_DECLARE ( bitRRotate );
+    LUA_DECLARE ( bitLShift );
+    LUA_DECLARE ( bitRShift );
+    LUA_DECLARE ( bitArShift );
 
     // utilities
-    static int      bitExtract                          ( lua_State* luaVM );
-    static int      bitReplace                          ( lua_State* luaVM );
+    LUA_DECLARE ( bitExtract );
+    LUA_DECLARE ( bitReplace );
 
 };
-
-#endif

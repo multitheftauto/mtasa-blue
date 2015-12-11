@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __LUAVECTORDEFS_H
-#define __LUAVECTORDEFS_H
+#pragma once
 
 extern "C"
 {
@@ -23,32 +22,31 @@ extern "C"
 class CLuaVector2Defs : public CLuaDefs
 {
 public:
-    static int     Create                               ( lua_State * luaVM );
-    static int     Destroy                              ( lua_State * luaVM );
+    static void    AddClass                             ( lua_State * luaVM );
+    LUA_DECLARE ( Create );
+    LUA_DECLARE ( Destroy );
 
-    static int     GetLength                            ( lua_State * luaVM );
-    static int     GetLengthSquared                     ( lua_State * luaVM );
-    static int     GetNormalized                        ( lua_State * luaVM );
-    static int     Normalize                            ( lua_State * luaVM );
-    static int     Dot                                  ( lua_State * luaVM );
+    LUA_DECLARE ( GetLength );
+    LUA_DECLARE ( GetLengthSquared );
+    LUA_DECLARE ( GetNormalized );
+    LUA_DECLARE ( Normalize );
+    LUA_DECLARE ( Dot );
 
-    static int     ToString                             ( lua_State * luaVM );
+    LUA_DECLARE ( ToString );
 
-    static int     SetX                                 ( lua_State * luaVM );
-    static int     SetY                                 ( lua_State * luaVM );
-    static int     SetZ                                 ( lua_State * luaVM );
+    LUA_DECLARE ( SetX );
+    LUA_DECLARE ( SetY );
+    LUA_DECLARE ( SetZ );
 
-    static int     GetX                                 ( lua_State * luaVM );
-    static int     GetY                                 ( lua_State * luaVM );
-    static int     GetZ                                 ( lua_State * luaVM );
+    LUA_DECLARE ( GetX );
+    LUA_DECLARE ( GetY );
+    LUA_DECLARE ( GetZ );
 
-    static int     Add                                  ( lua_State * luaVM );
-    static int     Sub                                  ( lua_State * luaVM );
-    static int     Mul                                  ( lua_State * luaVM );
-    static int     Div                                  ( lua_State * luaVM );
-    static int     Pow                                  ( lua_State * luaVM );
-    static int     Unm                                  ( lua_State * luaVM );
-    static int     Eq                                   ( lua_State * luaVM );
+    LUA_DECLARE ( Add );
+    LUA_DECLARE ( Sub );
+    LUA_DECLARE ( Mul );
+    LUA_DECLARE ( Div );
+    LUA_DECLARE ( Pow );
+    LUA_DECLARE ( Unm );
+    LUA_DECLARE ( Eq );
 };
-
-#endif

@@ -94,6 +94,45 @@ int CLuaFunctionDefs::OutputChatBox ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaFunctionDefs::OOP_OutputChatBox ( lua_State * luaVM )
+{
+    // bool Player:outputChat ( string text [, int r=231, int g=217, int b=176, bool colorCoded=false ] )
+    CElement* pElement; SString strText; uchar ucRed = 231; uchar ucGreen = 217; uchar ucBlue = 176; bool bColorCoded;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strText );
+
+    if ( argStream.NextIsNumber ( 0 ) && argStream.NextIsNumber ( 1 ) && argStream.NextIsNumber ( 2 ) )
+    {
+        argStream.ReadNumber ( ucRed );
+        argStream.ReadNumber ( ucGreen );
+        argStream.ReadNumber ( ucBlue );
+    }
+    else
+        argStream.Skip ( 3 );
+
+    argStream.ReadBool ( bColorCoded, false );
+
+    if ( !argStream.HasErrors () )
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CStaticFunctionDefinitions::OutputChatBox ( strText, pElement, ucRed, ucGreen, ucBlue, bColorCoded, pLuaMain );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::OutputConsole ( lua_State* luaVM )
 {
     SString strMessage;
@@ -240,6 +279,45 @@ int CLuaFunctionDefs::RemoveCommandHandler ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::ExecuteCommandHandler ( lua_State* luaVM )
+{
+    //  bool executeCommandHandler ( string commandName, player thePlayer, [ string args ] )
+    SString strKey; CElement* pElement; SString strArgs;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strKey );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strArgs, "" );
+
+    if ( !argStream.HasErrors () )
+    {
+
+        // Grab our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
+        {
+            CClient* pClient = NULL;
+            if ( pElement->GetType () == CElement::PLAYER )
+                pClient = static_cast <CClient*> ( static_cast <CPlayer*> ( pElement ) );
+
+            if ( pClient )
+            {
+
+                // Call it
+                if ( m_pRegisteredCommands->ProcessCommand ( strKey, strArgs, pClient ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaFunctionDefs::OutputServerLog ( lua_State* luaVM )
 {

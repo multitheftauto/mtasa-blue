@@ -14,63 +14,60 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUARESOURCEDEFS_H
-#define __CLUARESOURCEDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaResourceDefs: public CLuaDefs
 {
 public:
-    static void     LoadFunctions                       ( void );
+    static void  LoadFunctions                       ( void );
+    static void  AddClass ( lua_State* luaVM );
 
     // Create/edit functions
-    static int      createResource                      ( lua_State* luaVM );
-    static int      copyResource                        ( lua_State* luaVM );
-    static int      renameResource                      ( lua_State* luaVM );
-    static int      deleteResource                      ( lua_State* luaVM );
+    LUA_DECLARE ( createResource );
+    LUA_DECLARE ( copyResource );
+    LUA_DECLARE ( renameResource );
+    LUA_DECLARE ( deleteResource );
 
-    static int      addResourceMap                      ( lua_State* luaVM );
-    static int      addResourceConfig                   ( lua_State* luaVM );
-    static int      removeResourceFile                  ( lua_State* luaVM );
+    LUA_DECLARE ( addResourceMap );
+    LUA_DECLARE ( addResourceConfig );
+    LUA_DECLARE ( removeResourceFile );
 
-    static int      setResourceDefaultSetting           ( lua_State* luaVM );
-    static int      removeResourceDefaultSetting        ( lua_State* luaVM );
+    LUA_DECLARE ( setResourceDefaultSetting );
+    LUA_DECLARE ( removeResourceDefaultSetting );
 
     // Start/stop management
-    static int      startResource                       ( lua_State* luaVM );
-    static int      stopResource                        ( lua_State* luaVM );
-    static int      restartResource                     ( lua_State* luaVM );
+    LUA_DECLARE ( startResource );
+    LUA_DECLARE ( stopResource );
+    LUA_DECLARE ( restartResource );
 
     // Get stuff
-    static int      getThisResource                     ( lua_State* luaVM );
-    static int      getResourceFromName                 ( lua_State* luaVM );
-    static int      getResources                        ( lua_State* luaVM );
+    LUA_DECLARE ( getThisResource );
+    LUA_DECLARE ( getResourceFromName );
+    LUA_DECLARE ( getResources );
 
-    static int      getResourceState                    ( lua_State* luaVM );
-    static int      getResourceInfo                     ( lua_State* luaVM );
-    static int      getResourceConfig                   ( lua_State* luaVM );
-    static int      getResourceLoadFailureReason        ( lua_State* luaVM );
-    static int      getResourceLastStartTime            ( lua_State* luaVM );
-    static int      getResourceLoadTime                 ( lua_State* luaVM );
-    static int      getResourceName                     ( lua_State* luaVM );
-    static int      getResourceRootElement              ( lua_State* luaVM );
-    static int      getResourceDynamicElementRoot       ( lua_State* luaVM );
-    static int      getResourceMapRootElement           ( lua_State* luaVM );
-    static int      getResourceExportedFunctions        ( lua_State* luaVM );
+    LUA_DECLARE ( getResourceState );
+    LUA_DECLARE ( getResourceInfo );
+    LUA_DECLARE ( getResourceConfig );
+    LUA_DECLARE ( getResourceLoadFailureReason );
+    LUA_DECLARE ( getResourceLastStartTime );
+    LUA_DECLARE ( getResourceLoadTime );
+    LUA_DECLARE ( getResourceName );
+    LUA_DECLARE ( getResourceRootElement );
+    LUA_DECLARE ( getResourceDynamicElementRoot );
+    LUA_DECLARE ( getResourceMapRootElement );
+    LUA_DECLARE ( getResourceExportedFunctions );
 
     // Set stuff
-    static int      setResourceInfo                     ( lua_State* luaVM );
+    LUA_DECLARE ( setResourceInfo );
 
     // Misc
-    static int      call                                ( lua_State* luaVM );
-    static int      refreshResources                    ( lua_State* luaVM );
+    LUA_DECLARE ( call );
+    LUA_DECLARE ( refreshResources );
 
-    static int      getResourceACLRequests              ( lua_State* luaVM );
-    static int      updateResourceACLRequest            ( lua_State* luaVM );
+    LUA_DECLARE ( getResourceACLRequests );
+    LUA_DECLARE ( updateResourceACLRequest );
 
-    static int      LoadString                          ( lua_State* luaVM );
-    static int      Load                                ( lua_State* luaVM );
+    LUA_DECLARE ( LoadString );
+    LUA_DECLARE ( Load );
 };
-
-#endif

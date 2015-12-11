@@ -22,51 +22,112 @@ extern CNetServer* g_pRealNetServer;
 void CLuaResourceDefs::LoadFunctions ( void )
 {
     // Create/edit functions
-    CLuaCFunctions::AddFunction ( "createResource", CLuaResourceDefs::createResource );
-    CLuaCFunctions::AddFunction ( "copyResource", CLuaResourceDefs::copyResource );
-    CLuaCFunctions::AddFunction ( "renameResource", CLuaResourceDefs::renameResource );
-    CLuaCFunctions::AddFunction ( "deleteResource", CLuaResourceDefs::deleteResource );
+    CLuaCFunctions::AddFunction ( "createResource", createResource );
+    CLuaCFunctions::AddFunction ( "copyResource", copyResource );
+    CLuaCFunctions::AddFunction ( "renameResource", renameResource );
+    CLuaCFunctions::AddFunction ( "deleteResource", deleteResource );
 
-    CLuaCFunctions::AddFunction ( "addResourceMap", CLuaResourceDefs::addResourceMap );
-    CLuaCFunctions::AddFunction ( "addResourceConfig", CLuaResourceDefs::addResourceConfig );
-    CLuaCFunctions::AddFunction ( "removeResourceFile", CLuaResourceDefs::removeResourceFile );
+    CLuaCFunctions::AddFunction ( "addResourceMap", addResourceMap );
+    CLuaCFunctions::AddFunction ( "addResourceConfig", addResourceConfig );
+    CLuaCFunctions::AddFunction ( "removeResourceFile", removeResourceFile );
 
-    CLuaCFunctions::AddFunction ( "setResourceDefaultSetting", CLuaResourceDefs::setResourceDefaultSetting );
-    CLuaCFunctions::AddFunction ( "removeResourceDefaultSetting", CLuaResourceDefs::removeResourceDefaultSetting );
+    CLuaCFunctions::AddFunction ( "setResourceDefaultSetting", setResourceDefaultSetting );
+    CLuaCFunctions::AddFunction ( "removeResourceDefaultSetting", removeResourceDefaultSetting );
 
     // Start/stop management
-    CLuaCFunctions::AddFunction ( "startResource", CLuaResourceDefs::startResource );
-    CLuaCFunctions::AddFunction ( "stopResource", CLuaResourceDefs::stopResource );
-    CLuaCFunctions::AddFunction ( "restartResource", CLuaResourceDefs::restartResource );
+    CLuaCFunctions::AddFunction ( "startResource", startResource );
+    CLuaCFunctions::AddFunction ( "stopResource", stopResource );
+    CLuaCFunctions::AddFunction ( "restartResource", restartResource );
 
     // Get stuff
-    CLuaCFunctions::AddFunction ( "getThisResource", CLuaResourceDefs::getThisResource );
-    CLuaCFunctions::AddFunction ( "getResourceFromName", CLuaResourceDefs::getResourceFromName );
-    CLuaCFunctions::AddFunction ( "getResources", CLuaResourceDefs::getResources );
+    CLuaCFunctions::AddFunction ( "getThisResource", getThisResource );
+    CLuaCFunctions::AddFunction ( "getResourceFromName", getResourceFromName );
+    CLuaCFunctions::AddFunction ( "getResources", getResources );
 
-    CLuaCFunctions::AddFunction ( "getResourceState", CLuaResourceDefs::getResourceState );
-    CLuaCFunctions::AddFunction ( "getResourceInfo", CLuaResourceDefs::getResourceInfo );
-    CLuaCFunctions::AddFunction ( "getResourceConfig", CLuaResourceDefs::getResourceConfig );
-    CLuaCFunctions::AddFunction ( "getResourceLoadFailureReason", CLuaResourceDefs::getResourceLoadFailureReason );
-    CLuaCFunctions::AddFunction ( "getResourceLastStartTime", CLuaResourceDefs::getResourceLastStartTime );
-    CLuaCFunctions::AddFunction ( "getResourceLoadTime", CLuaResourceDefs::getResourceLoadTime );
-    CLuaCFunctions::AddFunction ( "getResourceName", CLuaResourceDefs::getResourceName );
-    CLuaCFunctions::AddFunction ( "getResourceRootElement", CLuaResourceDefs::getResourceRootElement );
-    CLuaCFunctions::AddFunction ( "getResourceDynamicElementRoot", CLuaResourceDefs::getResourceDynamicElementRoot );
-    CLuaCFunctions::AddFunction ( "getResourceMapRootElement", CLuaResourceDefs::getResourceMapRootElement );
-    CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", CLuaResourceDefs::getResourceExportedFunctions );
+    CLuaCFunctions::AddFunction ( "getResourceState", getResourceState );
+    CLuaCFunctions::AddFunction ( "getResourceInfo", getResourceInfo );
+    CLuaCFunctions::AddFunction ( "getResourceConfig", getResourceConfig );
+    CLuaCFunctions::AddFunction ( "getResourceLoadFailureReason", getResourceLoadFailureReason );
+    CLuaCFunctions::AddFunction ( "getResourceLastStartTime", getResourceLastStartTime );
+    CLuaCFunctions::AddFunction ( "getResourceLoadTime", getResourceLoadTime );
+    CLuaCFunctions::AddFunction ( "getResourceName", getResourceName );
+    CLuaCFunctions::AddFunction ( "getResourceRootElement", getResourceRootElement );
+    CLuaCFunctions::AddFunction ( "getResourceDynamicElementRoot", getResourceDynamicElementRoot );
+    CLuaCFunctions::AddFunction ( "getResourceMapRootElement", getResourceMapRootElement );
+    CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", getResourceExportedFunctions );
 
     // Set stuff
-    CLuaCFunctions::AddFunction ( "setResourceInfo", CLuaResourceDefs::setResourceInfo );
+    CLuaCFunctions::AddFunction ( "setResourceInfo", setResourceInfo );
 
     // Misc
-    CLuaCFunctions::AddFunction ( "call", CLuaResourceDefs::call );
-    CLuaCFunctions::AddFunction ( "refreshResources", CLuaResourceDefs::refreshResources );
+    CLuaCFunctions::AddFunction ( "call", call );
+    CLuaCFunctions::AddFunction ( "refreshResources", refreshResources );
 
-    CLuaCFunctions::AddFunction ( "getResourceACLRequests", CLuaResourceDefs::getResourceACLRequests );
-    CLuaCFunctions::AddFunction ( "updateResourceACLRequest", CLuaResourceDefs::updateResourceACLRequest, true );
-    CLuaCFunctions::AddFunction ( "loadstring", CLuaResourceDefs::LoadString );
-    CLuaCFunctions::AddFunction ( "load", CLuaResourceDefs::Load );
+    CLuaCFunctions::AddFunction ( "getResourceACLRequests", getResourceACLRequests );
+    CLuaCFunctions::AddFunction ( "updateResourceACLRequest", updateResourceACLRequest, true );
+    CLuaCFunctions::AddFunction ( "loadstring", LoadString );
+    CLuaCFunctions::AddFunction ( "load", Load );
+}
+
+
+void CLuaResourceDefs::AddClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    // These have been separated for their abnormal argument scheme
+    // Their first arg take a path from which a resource is determined
+    // For now, they are static-classes, and if the scheme is fixed
+    // Then they will also be able to serve use when in an instance
+    lua_classfunction ( luaVM, "addConfig", "addResourceConfig" );
+    lua_classfunction ( luaVM, "addMap", "addResourceMap" );
+    lua_classfunction ( luaVM, "getConfig", "getResourceConfig" );
+
+    lua_classfunction ( luaVM, "getFromName", "getResourceFromName" );
+    lua_classfunction ( luaVM, "getAll", "getResources" );
+    lua_classfunction ( luaVM, "getThis", "getThisResource" );
+    lua_classfunction ( luaVM, "refresh", "refreshResources" ); // Can't use "all" here because that's an argument
+
+    lua_classfunction ( luaVM, "create", "createResource" );
+    lua_classfunction ( luaVM, "start", "startResource" );
+    lua_classfunction ( luaVM, "stop", "stopResource" );
+    lua_classfunction ( luaVM, "copy", "copyResource" );
+    lua_classfunction ( luaVM, "rename", "renameResource" );
+    lua_classfunction ( luaVM, "delete", "deleteResource" );
+    lua_classfunction ( luaVM, "call", "call" );
+    lua_classfunction ( luaVM, "removeDefaultSetting", "removeResourceDefaultSetting" );
+    lua_classfunction ( luaVM, "removeFile", "removeResourceFile" );
+    lua_classfunction ( luaVM, "restart", "restartResource" );
+    lua_classfunction ( luaVM, "hasPermissionTo", "hasObjectPermissionTo" );
+    lua_classfunction ( luaVM, "updateACLRequest", "updateResourceACLRequest" );
+
+    lua_classfunction ( luaVM, "setInfo", "setResourceInfo" );
+    lua_classfunction ( luaVM, "setDefaultSetting", "setResourceDefaultSetting" );
+
+    lua_classfunction ( luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot" );
+    lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
+    lua_classfunction ( luaVM, "getExportedFunctions", "getResourceExportedFunctions" );
+    lua_classfunction ( luaVM, "getLastStartTime", "getResourceLastStartTime" );
+    lua_classfunction ( luaVM, "getLoadTime", "getResourceLoadTime" );
+    lua_classfunction ( luaVM, "getInfo", "getResourceInfo" );
+    lua_classfunction ( luaVM, "getLoadFailureReason", "getResourceLoadFailureReason" );
+    lua_classfunction ( luaVM, "getMapRootElement", "getResourceMapRootElement" );
+    lua_classfunction ( luaVM, "getName", "getResourceName" );
+    lua_classfunction ( luaVM, "getState", "getResourceState" );
+    lua_classfunction ( luaVM, "getACLRequests", "getResourceACLRequests" );
+
+    lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
+    lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
+    lua_classvariable ( luaVM, "lastStartTime", NULL, "getResourceLastStartTime" );
+    lua_classvariable ( luaVM, "aclRequests", NULL, "getResourceACLRequests" );
+    lua_classvariable ( luaVM, "loadTime", NULL, "getResourceLoadTime" );
+    lua_classvariable ( luaVM, "name", "renameResource", "getResourceName" );
+    lua_classvariable ( luaVM, "rootElement", NULL, "getResourceRootElement" );
+    lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
+    lua_classvariable ( luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason" );
+    //lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
+    //lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
+
+    lua_registerclass ( luaVM, "Resource" );
 }
 
 

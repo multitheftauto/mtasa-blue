@@ -11,9 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAHANDLINGDEFS_H
-#define __CLUAHANDLINGDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaHandlingDefs: public CLuaDefs
@@ -22,104 +20,102 @@ public:
     static void     LoadFunctions                           ( void );
 
     // Set
-    static int      SetVehicleHandling                      ( lua_State* luaVM );
-    static int      SetModelHandling                        ( lua_State* luaVM );
+    LUA_DECLARE ( SetVehicleHandling );
+    LUA_DECLARE ( SetModelHandling );
 
     // Get
-    static int      GetVehicleHandling                      ( lua_State* luaVM );
-    static int      GetModelHandling                        ( lua_State* luaVM );
-    static int      GetOriginalHandling                     ( lua_State* luaVM );
+    LUA_DECLARE ( GetVehicleHandling );
+    LUA_DECLARE ( GetModelHandling );
+    LUA_DECLARE ( GetOriginalHandling );
 
 /*
     // Create/action
-    static int      createHandling                          ( lua_State* luaVM );
-    static int      addDefaultHandling                      ( lua_State* luaVM );
+    LUA_DECLARE ( createHandling );
+    LUA_DECLARE ( addDefaultHandling );
 
     // Get
-    static int      handlingGetMass                         ( lua_State* luaVM );
-    static int      handlingGetTurnMass                     ( lua_State* luaVM );
-    static int      handlingGetDragCoefficiency             ( lua_State* luaVM );
-    static int      handlingGetCenterOfMass                 ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetMass );
+    LUA_DECLARE ( handlingGetTurnMass );
+    LUA_DECLARE ( handlingGetDragCoefficiency );
+    LUA_DECLARE ( handlingGetCenterOfMass );
 
-    static int      handlingGetPercentSubmerged             ( lua_State* luaVM );
-    static int      handlingGetTractionMultiplier           ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetPercentSubmerged );
+    LUA_DECLARE ( handlingGetTractionMultiplier );
 
-    static int      handlingGetDriveType                    ( lua_State* luaVM );
-    static int      handlingGetEngineType                   ( lua_State* luaVM );
-    static int      handlingGetNumberOfGears                ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetDriveType );
+    LUA_DECLARE ( handlingGetEngineType );
+    LUA_DECLARE ( handlingGetNumberOfGears );
 
-    static int      handlingGetEngineAcceleration          ( lua_State* luaVM );
-    static int      handlingGetEngineInertia                ( lua_State* luaVM );
-    static int      handlingGetMaxVelocity                  ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetEngineAcceleration );
+    LUA_DECLARE ( handlingGetEngineInertia );
+    LUA_DECLARE ( handlingGetMaxVelocity );
 
-    static int      handlingGetBrakeDeceleration           ( lua_State* luaVM );
-    static int      handlingGetBrakeBias                    ( lua_State* luaVM );
-    static int      handlingGetABS                          ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetBrakeDeceleration );
+    LUA_DECLARE ( handlingGetBrakeBias );
+    LUA_DECLARE ( handlingGetABS );
 
-    static int      handlingGetSteeringLock                 ( lua_State* luaVM );
-    static int      handlingGetTractionLoss                 ( lua_State* luaVM );
-    static int      handlingGetTractionBias                 ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetSteeringLock );
+    LUA_DECLARE ( handlingGetTractionLoss );
+    LUA_DECLARE ( handlingGetTractionBias );
 
-    static int      handlingGetSuspensionForceLevel         ( lua_State* luaVM );
-    static int      handlingGetSuspensionDamping            ( lua_State* luaVM );
-    static int      handlingGetSuspensionHighSpeedDamping   ( lua_State* luaVM );
-    static int      handlingGetSuspensionUpperLimit         ( lua_State* luaVM );
-    static int      handlingGetSuspensionLowerLimit         ( lua_State* luaVM );
-    static int      handlingGetSuspensionFrontRearBias      ( lua_State* luaVM );
-    static int      handlingGetSuspensionAntiDiveMultiplier ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetSuspensionForceLevel );
+    LUA_DECLARE ( handlingGetSuspensionDamping );
+    LUA_DECLARE ( handlingGetSuspensionHighSpeedDamping );
+    LUA_DECLARE ( handlingGetSuspensionUpperLimit );
+    LUA_DECLARE ( handlingGetSuspensionLowerLimit );
+    LUA_DECLARE ( handlingGetSuspensionFrontRearBias );
+    LUA_DECLARE ( handlingGetSuspensionAntiDiveMultiplier );
 
-    static int      handlingGetCollisionDamageMultiplier    ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetCollisionDamageMultiplier );
 
-    static int      handlingGetFlags                        ( lua_State* luaVM );
-    static int      handlingGetModelFlags                   ( lua_State* luaVM );
-    static int      handlingGetSeatOffsetDistance           ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetFlags );
+    LUA_DECLARE ( handlingGetModelFlags );
+    LUA_DECLARE ( handlingGetSeatOffsetDistance );
 
-    static int      handlingGetHeadLightType                ( lua_State* luaVM );
-    static int      handlingGetTailLightType                ( lua_State* luaVM );
-    static int      handlingGetAnimGroup                    ( lua_State* luaVM );
+    LUA_DECLARE ( handlingGetHeadLightType );
+    LUA_DECLARE ( handlingGetTailLightType );
+    LUA_DECLARE ( handlingGetAnimGroup );
 
     // Set
-    static int      handlingSetMass                         ( lua_State* luaVM );
-    static int      handlingSetTurnMass                     ( lua_State* luaVM );
-    static int      handlingSetDragCoefficiency             ( lua_State* luaVM );
-    static int      handlingSetCenterOfMass                 ( lua_State* luaVM );
+    LUA_DECLARE ( handlingSetMass );
+    LUA_DECLARE ( handlingSetTurnMass );
+    LUA_DECLARE ( handlingSetDragCoefficiency );
+    LUA_DECLARE ( handlingSetCenterOfMass );
 
-    static int      handlingSetPercentSubmerged             ( lua_State* luaVM );
-    static int      handlingSetTractionMultiplier           ( lua_State* luaVM );
+    LUA_DECLARE ( handlingSetPercentSubmerged );
+    LUA_DECLARE ( handlingSetTractionMultiplier );
 
-    static int      handlingSetDriveType                    ( lua_State* luaVM );
-    static int      handlingSetEngineType                   ( lua_State* luaVM );
-    static int      handlingSetNumberOfGears                ( lua_State* luaVM );
+    LUA_DECLARE ( handlingSetDriveType );
+    LUA_DECLARE ( handlingSetEngineType );
+    LUA_DECLARE ( handlingSetNumberOfGears );
 
-    static int      handlingSetEngineAcceleration          ( lua_State* luaVM );
-    static int      handlingSetEngineInertia                ( lua_State* luaVM );
-    static int      handlingSetMaxVelocity                  ( lua_State* luaVM );
+    LUA_DECLARE ( handlingSetEngineAcceleration );
+    LUA_DECLARE ( handlingSetEngineInertia );
+    LUA_DECLARE ( handlingSetMaxVelocity );
 
-    static int      handlingSetBrakeDeceleration           ( lua_State* luaVM );
-    static int      handlingSetBrakeBias                    ( lua_State* luaVM );
-    static int      handlingSetABS                          ( lua_State* luaVM );
+    LUA_DECLARE ( handlingSetBrakeDeceleration );
+    LUA_DECLARE ( handlingSetBrakeBias );
+    LUA_DECLARE ( handlingSetABS );
 
-    static int      handlingSetSteeringLock                 ( lua_State* luaVM );
-    static int      handlingSetTractionLoss                 ( lua_State* luaVM );
-    static int      handlingSetTractionBias                 ( lua_State* luaVM );
+    LUA_DECLARE ( handlingSetSteeringLock );
+    LUA_DECLARE ( handlingSetTractionLoss );
+    LUA_DECLARE ( handlingSetTractionBias );
 
-    static int      handlingSetSuspensionForceLevel         ( lua_State* luaVM );
-    static int      handlingSetSuspensionDamping            ( lua_State* luaVM );
-    static int      handlingSetSuspensionHighSpeedDamping   ( lua_State* luaVM );
-    static int      handlingSetSuspensionUpperLimit         ( lua_State* luaVM );
-    static int      handlingSetSuspensionLowerLimit         ( lua_State* luaVM );
-    static int      handlingSetSuspensionFrontRearBias      ( lua_State* luaVM );
-    static int      handlingSetSuspensionAntiDiveMultiplier ( lua_State* luaVM );
+    LUA_DECLARE ( handlingSetSuspensionForceLevel );
+    LUA_DECLARE ( handlingSetSuspensionDamping );
+    LUA_DECLARE ( handlingSetSuspensionHighSpeedDamping );
+    LUA_DECLARE ( handlingSetSuspensionUpperLimit );
+    LUA_DECLARE ( handlingSetSuspensionLowerLimit );
+    LUA_DECLARE ( handlingSetSuspensionFrontRearBias );
+    LUA_DECLARE ( handlingSetSuspensionAntiDiveMultiplier );
 
-    static int      handlingSetCollisionDamageMultiplier    ( lua_State* luaVM );
+    LUA_DECLARE ( handlingSetCollisionDamageMultiplier );
 
-    static int      handlingSetFlags                        ( lua_State* luaVM );
-    static int      handlingSetModelFlags                   ( lua_State* luaVM );
-    static int      handlingSetSeatOffsetDistance           ( lua_State* luaVM );
+    LUA_DECLARE ( handlingSetFlags );
+    LUA_DECLARE ( handlingSetModelFlags );
+    LUA_DECLARE ( handlingSetSeatOffsetDistance );
 
-    static int      handlingSetHeadLightType                ( lua_State* luaVM );
-    static int      handlingSetTailLightType                ( lua_State* luaVM );
-    static int      handlingSetAnimGroup                    ( lua_State* luaVM );*/
+    LUA_DECLARE ( handlingSetHeadLightType );
+    LUA_DECLARE ( handlingSetTailLightType );
+    LUA_DECLARE ( handlingSetAnimGroup );*/
 };
-
-#endif

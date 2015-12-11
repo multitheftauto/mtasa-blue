@@ -357,7 +357,7 @@ void lua_getclass ( lua_State* luaVM, const char* szName )
 }
 
 
-void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szParent )
+void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szParent, bool bRegisterWithEnvironment )
 {
     if ( szParent != NULL )
     {
@@ -381,9 +381,10 @@ void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szPar
 
     lua_pop ( luaVM, 1 );
 
-    // register with environment
-    lua_getfield ( luaVM, -1, "__class" );
-    lua_setglobal ( luaVM, szName );
+    if ( bRegisterWithEnvironment ) {
+        lua_getfield ( luaVM, -1, "__class" );
+        lua_setglobal ( luaVM, szName );
+    }
 
     lua_pop ( luaVM, 1 );
 }

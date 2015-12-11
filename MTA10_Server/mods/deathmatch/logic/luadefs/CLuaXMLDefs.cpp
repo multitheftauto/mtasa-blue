@@ -18,32 +18,62 @@
 
 void CLuaXMLDefs::LoadFunctions ( void )
 {
-    // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
-    CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaXMLDefs::xmlNodeGetChildren );
-    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaXMLDefs::xmlCreateChild );
-    CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild );
-    // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
+    CLuaCFunctions::AddFunction ( "xmlCreateFile", xmlCreateFile );
+    CLuaCFunctions::AddFunction ( "xmlLoadFile", xmlLoadFile );
+    CLuaCFunctions::AddFunction ( "xmlCopyFile", xmlCopyFile );
+    CLuaCFunctions::AddFunction ( "xmlSaveFile", xmlSaveFile );
+    CLuaCFunctions::AddFunction ( "xmlUnloadFile", xmlUnloadFile );
 
-    CLuaCFunctions::AddFunction ( "xmlCreateFile", CLuaXMLDefs::xmlCreateFile );
-    CLuaCFunctions::AddFunction ( "xmlLoadFile", CLuaXMLDefs::xmlLoadFile );
-    CLuaCFunctions::AddFunction ( "xmlCopyFile", CLuaXMLDefs::xmlCopyFile );
-    CLuaCFunctions::AddFunction ( "xmlSaveFile", CLuaXMLDefs::xmlSaveFile );
-    CLuaCFunctions::AddFunction ( "xmlUnloadFile", CLuaXMLDefs::xmlUnloadFile );
+    CLuaCFunctions::AddFunction ( "xmlCreateChild", xmlCreateChild );
+    CLuaCFunctions::AddFunction ( "xmlDestroyNode", xmlDestroyNode );
+    CLuaCFunctions::AddFunction ( "xmlFindChild", xmlNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlNodeGetChildren", xmlNodeGetChildren );
+    CLuaCFunctions::AddFunction ( "xmlNodeGetParent", xmlNodeGetParent );
 
-    CLuaCFunctions::AddFunction ( "xmlCreateChild", CLuaXMLDefs::xmlCreateChild );
-    CLuaCFunctions::AddFunction ( "xmlDestroyNode", CLuaXMLDefs::xmlDestroyNode );
-    CLuaCFunctions::AddFunction ( "xmlFindChild", CLuaXMLDefs::xmlNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetChildren", CLuaXMLDefs::xmlNodeGetChildren );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetParent", CLuaXMLDefs::xmlNodeGetParent );
+    CLuaCFunctions::AddFunction ( "xmlNodeGetValue", xmlNodeGetValue );
+    CLuaCFunctions::AddFunction ( "xmlNodeSetValue", xmlNodeSetValue );
+    CLuaCFunctions::AddFunction ( "xmlNodeGetAttributes", xmlNodeGetAttributes );
+    CLuaCFunctions::AddFunction ( "xmlNodeGetAttribute", xmlNodeGetAttribute );
+    CLuaCFunctions::AddFunction ( "xmlNodeSetAttribute", xmlNodeSetAttribute );
 
-    CLuaCFunctions::AddFunction ( "xmlNodeGetValue", CLuaXMLDefs::xmlNodeGetValue );
-    CLuaCFunctions::AddFunction ( "xmlNodeSetValue", CLuaXMLDefs::xmlNodeSetValue );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetAttributes", CLuaXMLDefs::xmlNodeGetAttributes );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetAttribute", CLuaXMLDefs::xmlNodeGetAttribute );
-    CLuaCFunctions::AddFunction ( "xmlNodeSetAttribute", CLuaXMLDefs::xmlNodeSetAttribute );
+    CLuaCFunctions::AddFunction ( "xmlNodeGetName", xmlNodeGetName );
+    CLuaCFunctions::AddFunction ( "xmlNodeSetName", xmlNodeSetName );
+}
 
-    CLuaCFunctions::AddFunction ( "xmlNodeGetName", CLuaXMLDefs::xmlNodeGetName );
-    CLuaCFunctions::AddFunction ( "xmlNodeSetName", CLuaXMLDefs::xmlNodeSetName );
+
+void CLuaXMLDefs::AddClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "load", "xmlLoadFile" );
+    lua_classfunction ( luaVM, "unload", "xmlUnloadFile" );
+    lua_classfunction ( luaVM, "copy", "xmlCopyFile" );
+    lua_classfunction ( luaVM, "create", "xmlCreateFile" );
+    lua_classfunction ( luaVM, "destroy", "xmlDestroyNode" );
+    lua_classfunction ( luaVM, "loadMapData", "loadMapData" );
+    lua_classfunction ( luaVM, "saveMapData", "saveMapData" );
+
+    lua_classfunction ( luaVM, "getValue", "xmlNodeGetValue" );
+    lua_classfunction ( luaVM, "setAttribute", "xmlNodeSetAttribute" );
+    lua_classfunction ( luaVM, "setValue", "xmlNodeSetValue" );
+    lua_classfunction ( luaVM, "saveFile", "xmlSaveFile" );
+    lua_classfunction ( luaVM, "createChild", "xmlCreateChild" );
+    lua_classfunction ( luaVM, "findChild", "xmlFindChild" );
+    lua_classfunction ( luaVM, "setName", "xmlNodeSetName" );
+
+    lua_classfunction ( luaVM, "getAttributes", "xmlNodeGetAttributes" );
+    lua_classfunction ( luaVM, "getChildren", "xmlNodeGetChildren" );
+    lua_classfunction ( luaVM, "getName", "xmlNodeGetName" );
+    lua_classfunction ( luaVM, "getParent", "xmlNodeGetParent" );
+    lua_classfunction ( luaVM, "getAttribute", "xmlNodeGetAttribute" );
+
+    lua_classvariable ( luaVM, "value", "xmlNodeSetValue", "xmlNodeGetValue" );
+    lua_classvariable ( luaVM, "name", "xmlNodeSetName", "xmlNodeGetName" );
+    lua_classvariable ( luaVM, "attributes", NULL, "xmlNodeGetAttributes" );
+    lua_classvariable ( luaVM, "children", NULL, "xmlNodeGetChildren" );
+    lua_classvariable ( luaVM, "parent", NULL, "xmlNodeGetParent" );
+
+    lua_registerclass ( luaVM, "XML" );
 }
 
 

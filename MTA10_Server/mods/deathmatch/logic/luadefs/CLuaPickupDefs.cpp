@@ -16,21 +16,48 @@
 void CLuaPickupDefs::LoadFunctions ( void )
 {
      // Create/destroy
-    CLuaCFunctions::AddFunction ( "createPickup", CLuaPickupDefs::createPickup );
+    CLuaCFunctions::AddFunction ( "createPickup", createPickup );
 
     // Get
-    CLuaCFunctions::AddFunction ( "getPickupType", CLuaPickupDefs::getPickupType );
-    CLuaCFunctions::AddFunction ( "getPickupWeapon", CLuaPickupDefs::getPickupWeapon );
-    CLuaCFunctions::AddFunction ( "getPickupAmount", CLuaPickupDefs::getPickupAmount );
-    CLuaCFunctions::AddFunction ( "getPickupAmmo", CLuaPickupDefs::getPickupAmmo );
-    CLuaCFunctions::AddFunction ( "getPickupRespawnInterval", CLuaPickupDefs::getPickupRespawnInterval );
-    CLuaCFunctions::AddFunction ( "isPickupSpawned", CLuaPickupDefs::isPickupSpawned );
+    CLuaCFunctions::AddFunction ( "getPickupType", getPickupType );
+    CLuaCFunctions::AddFunction ( "getPickupWeapon", getPickupWeapon );
+    CLuaCFunctions::AddFunction ( "getPickupAmount", getPickupAmount );
+    CLuaCFunctions::AddFunction ( "getPickupAmmo", getPickupAmmo );
+    CLuaCFunctions::AddFunction ( "getPickupRespawnInterval", getPickupRespawnInterval );
+    CLuaCFunctions::AddFunction ( "isPickupSpawned", isPickupSpawned );
 
     // Set
-    CLuaCFunctions::AddFunction ( "setPickupType", CLuaPickupDefs::setPickupType );
-    CLuaCFunctions::AddFunction ( "setPickupRespawnInterval", CLuaPickupDefs::setPickupRespawnInterval );
-    CLuaCFunctions::AddFunction ( "usePickup", CLuaPickupDefs::usePickup );
+    CLuaCFunctions::AddFunction ( "setPickupType", setPickupType );
+    CLuaCFunctions::AddFunction ( "setPickupRespawnInterval", setPickupRespawnInterval );
+    CLuaCFunctions::AddFunction ( "usePickup", usePickup );
 }
+
+
+void CLuaPickupDefs::AddClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "createPickup" );
+    lua_classfunction ( luaVM, "use", "usePickup" );
+
+    lua_classfunction ( luaVM, "getAmmo", "getPickupAmmo" );
+    lua_classfunction ( luaVM, "getAmount", "getPickupAmount" );
+    lua_classfunction ( luaVM, "getWeapon", "getPickupWeapon" );
+    lua_classfunction ( luaVM, "getRespawnInterval", "getPickupRespawnInterval" );
+    lua_classfunction ( luaVM, "getType", "getPickupType" );
+    lua_classfunction ( luaVM, "setType", "setPickupType" );
+    lua_classfunction ( luaVM, "setRespawnInterval", "setPickupRespawnInterval" );
+
+    lua_classvariable ( luaVM, "ammo", NULL, "getPickupAmmo" );
+    lua_classvariable ( luaVM, "amount", NULL, "getPickupAmount" );
+    lua_classvariable ( luaVM, "spawned", NULL, "isPickupSpawned" );
+    lua_classvariable ( luaVM, "weapon", NULL, "getPickupWeapon" );
+    lua_classvariable ( luaVM, "type", "setPickupType", "getPickupType" );
+    lua_classvariable ( luaVM, "respawnInterval", "setPickupRespawnInterval", "getPickupRespawnInterval" );
+
+    lua_registerclass ( luaVM, "Pickup", "Element" );
+}
+
 
 
 int CLuaPickupDefs::createPickup ( lua_State* luaVM )
