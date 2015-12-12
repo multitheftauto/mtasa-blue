@@ -78,7 +78,7 @@ public:
                 // Send request
                 this->AddRef();     // Keep object alive
                 m_bStatusBusy = true;
-                GetDownloadManager()->QueueFile( m_Definition.strURL, NULL, 0, "", 0, false, this, StaticProgressCallback, false, 1 );
+                GetDownloadManager()->QueueFile( m_Definition.strURL, NULL, 0, "", 0, false, this, StaticProgressCallback, false, 2 );
             }
         }
         else
@@ -153,7 +153,7 @@ public:
                     if ( !m_Definition.bHideProblems )
                     {
                         // Log initial failure
-                        CLogger::LogPrintf( "%s problem (%u). Retrying...\n", *m_Definition.strDesc, iError );
+                        CLogger::LogPrintf( "%s no response. Retrying...\n", *m_Definition.strDesc );
                     }
                 }
             }
