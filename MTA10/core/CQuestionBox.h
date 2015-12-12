@@ -38,6 +38,7 @@ public:
     CGUIEdit*           SetEditbox                  ( unsigned int uiEditbox, const SString& strText );
     void                SetCallback                 ( pfnQuestionCallback callback, void* ptr = NULL );
     void                SetCallbackEdit             ( pfnQuestionEditCallback callback, void* ptr = NULL );
+    void                SetOnLineHelpOption         ( const SString& strTroubleType );
     unsigned int        PollButtons                 ( void );
     bool                IsVisible                   ( void );
     void                SetAutoCloseOnConnect       ( bool bEnable );
