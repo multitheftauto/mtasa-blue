@@ -348,7 +348,7 @@ int CLuaFunctionDefs::ExecuteBrowserJavascript ( lua_State* luaVM )
             return 1;
         }
         else
-            argStream.SetCustomError ( "This function does not work with local browsers" );
+            argStream.SetCustomError ( "This function does not work with remote browsers" );
     }
     
     if ( argStream.HasErrors () )
