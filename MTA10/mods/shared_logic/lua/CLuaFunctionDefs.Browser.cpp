@@ -342,10 +342,16 @@ int CLuaFunctionDefs::ExecuteBrowserJavascript ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        lua_pushboolean ( luaVM, pWebBrowser->ExecuteJavascript ( strJavascriptCode ) );
-        return 1;
+        if ( pWebBrowser->ExecuteJavascript ( strJavascriptCode ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+        else
+            argStream.SetCustomError ( "This function does not work with local browsers" );
     }
-    else
+    
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
