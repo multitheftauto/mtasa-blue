@@ -74,7 +74,7 @@ bool CConsole::HandleInput ( const char* szCommand, CClient* pClient, CClient* p
             }
 
             // Not enough access, tell the console
-            CLogger::LogPrintf ( "DENIED: Denied '%s' access to command '%s'\n", pClient->GetNick (), szKey );
+            CLogger::LogPrintf ( "ACL: Denied '%s' access to command '%s'\n", pClient->GetNick (), szKey );
 
             // Tell the client
             char szBuffer [128];
