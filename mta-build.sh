@@ -2,7 +2,7 @@
 
 #
 # To compile with symbols:
-#   ./initial-install.sh -g
+#   ./mta-build.sh -g
 #
 
 # Remove previous build files
