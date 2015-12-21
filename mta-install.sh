@@ -1,9 +1,9 @@
 #! /bin/sh
 #
-# Must be called after initial-install.sh the first time, can be called anytime after that
+# Must be called after mta-build.sh the first time, can be called anytime after that
 #
 if [ ! -f "Makefile" ]; then
-  echo "Error: Please run ./initial-install.sh first"
+  echo "Error: Please run ./mta-build.sh first"
   exit
 fi
 
