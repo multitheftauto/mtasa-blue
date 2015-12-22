@@ -168,13 +168,12 @@ CNetHTTPDownloadManagerInterface* CCommunityRegistration::GetHTTP( void )
 
 
 // Handle server response
-bool CCommunityRegistration::StaticDownloadFinished ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CCommunityRegistration::StaticDownloadFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
 {
     if ( bSuccess )
         ((CCommunityRegistration*)pObj)->DownloadSuccess( pCompletedData, completedLength );
     else
         ((CCommunityRegistration*)pObj)->DownloadFailed( iErrorCode );
-    return true;
 }
 
 void CCommunityRegistration::DownloadSuccess( char* szBuffer, size_t uiBufferLength )

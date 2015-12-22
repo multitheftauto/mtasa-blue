@@ -45,7 +45,7 @@ namespace
         SString         strVersion;     // Version
     };
 
-    // Variables used for saving the screen shot file on a separate thread
+    // Variables used for saving the server cache file on a separate thread
     static bool ms_bIsSaving = false;
     static std::map < CCachedKey, CCachedInfo > ms_ServerCachedMap;
 }

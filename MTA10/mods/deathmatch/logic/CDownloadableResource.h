@@ -39,7 +39,7 @@ public:
     };
 
 public:
-    CDownloadableResource           ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum checksum = CChecksum (), bool bGenerateClientChecksum = false, bool bAutoDownload = true );
+    CDownloadableResource           ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum serverChecksum = CChecksum (), bool bGenerateClientChecksum = false, bool bAutoDownload = true );
     virtual ~CDownloadableResource  ( void );
 
     bool DoesClientAndServerChecksumMatch ( void );
@@ -48,13 +48,8 @@ public:
     const char* GetName             ( void ) { return m_strName; };
     const char* GetShortName        ( void ) { return m_strNameShort; };
 
-    // CRC-based methods
     CChecksum GenerateClientChecksum ( void );
-
-    CChecksum GetLastClientChecksum  ( void );
-
     CChecksum GetServerChecksum      ( void );
-    void SetServerChecksum           ( CChecksum serverChecksum );
 
     bool     IsAutoDownload         ( void )    { return m_bAutoDownload; };
     void     SetDownloaded          ( void )    { m_bDownloaded = true; };

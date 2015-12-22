@@ -78,7 +78,7 @@ public:
                 // Send request
                 this->AddRef();     // Keep object alive
                 m_bStatusBusy = true;
-                GetDownloadManager()->QueueFile( m_Definition.strURL, NULL, 0, "", 0, false, this, StaticProgressCallback, false, 2 );
+                GetDownloadManager()->QueueFile( m_Definition.strURL, NULL, 0, "", 0, false, this, StaticDownloadFinishedCallback, false, 2 );
             }
         }
         else
@@ -102,26 +102,21 @@ public:
     //
     // Process response from master server
     //
-    static bool StaticProgressCallback( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool bComplete, int iError )
+    static void StaticDownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )
     {
         CMasterServer* pMasterServer = (CMasterServer*)obj;
-        pMasterServer->ProgressCallback( sizeJustDownloaded, totalDownloaded, data, dataLength, bComplete, iError );
-        if ( bComplete || iError )
-            pMasterServer->Release();   // No need to keep object alive now
-        return true;
+        pMasterServer->DownloadFinishedCallback( data, dataLength, bSuccess, iErrorCode );
+        pMasterServer->Release();   // No need to keep object alive now
     }
 
     //
     // Process response from master server
     //
-    void ProgressCallback( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, bool bComplete, int iError )
+    void DownloadFinishedCallback( char * data, size_t dataLength, bool bSuccess, int iErrorCode )
     {
-        if ( bComplete || iError )
-        {
-            m_bStatusBusy = false;
-        }
+        m_bStatusBusy = false;
 
-        if ( bComplete )
+        if ( bSuccess )
         {
             if ( m_Stage < ANNOUNCE_STAGE_REMINDER )
             {
@@ -133,17 +128,16 @@ public:
                     SString strOkMessage = argMap.Get( "ok_message" );
 
                     // Log successful initial announcement
-                    if ( iError == 200 )
+                    if ( iErrorCode == 200 )
                         CLogger::LogPrintf( "%s success! %s\n", *m_Definition.strDesc, *strOkMessage );
                     else
-                        CLogger::LogPrintf( "%s successish! (%u %s)\n", *m_Definition.strDesc, iError, GetDownloadManager()->GetError() );
+                        CLogger::LogPrintf( "%s successish! (%u %s)\n", *m_Definition.strDesc, iErrorCode, GetDownloadManager()->GetError() );
                 }
             }
         }
         else
-        if ( iError )
         {
-            bool bCanRetry = ( iError == 28 ); // We can retry if 'Timeout was reached'
+            bool bCanRetry = ( iErrorCode == 28 ); // We can retry if 'Timeout was reached'
 
             if ( m_Stage == ANNOUNCE_STAGE_INITIAL )
             {
@@ -167,7 +161,7 @@ public:
                     if ( !m_Definition.bHideProblems )
                     {
                         // Log final failure
-                        CLogger::LogPrintf( "%s failed! (%u %s)\n", *m_Definition.strDesc, iError, GetDownloadManager()->GetError() );
+                        CLogger::LogPrintf( "%s failed! (%u %s)\n", *m_Definition.strDesc, iErrorCode, GetDownloadManager()->GetError() );
                     }
                 }
             }

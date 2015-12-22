@@ -61,7 +61,7 @@ protected:
     void                        Logout              ( void );
 
     CNetHTTPDownloadManagerInterface* GetHTTP       ( void );
-    static bool                 StaticDownloadFinished ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    static void                 StaticDownloadFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
     void                        DownloadFailed      ( int iErrorCode );
     void                        DownloadSuccess     ( char* pCompletedData, size_t completedLength );
 

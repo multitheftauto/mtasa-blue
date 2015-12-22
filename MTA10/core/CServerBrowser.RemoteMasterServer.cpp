@@ -35,8 +35,8 @@ protected:
     bool                    ParseListVer2               ( CServerListItemList& itemList );
     CServerListItem*        GetServerListItem           ( CServerListItemList& itemList, in_addr Address, ushort usGamePort );
     CNetHTTPDownloadManagerInterface* GetHTTP           ( void );
-    static bool             StaticDownloadProgress      ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
-    void                    DownloadProgress            ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, bool bComplete, int iError );
+    static void             StaticDownloadFinished     ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    void                    DownloadFinished           ( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode );
 
     long long               m_llLastRefreshTime;
     SString                 m_strStage;
@@ -128,37 +128,35 @@ void CRemoteMasterServer::Refresh ( void )
     m_strStage = "waitingreply";
     m_llLastRefreshTime = GetTickCount64_ ();
     AddRef();   // Keep alive
-    GetHTTP()->QueueFile( m_strURL, NULL, 0, NULL, 0, false, this, &CRemoteMasterServer::StaticDownloadProgress, false, 1 );
+    GetHTTP()->QueueFile( m_strURL, NULL, 0, NULL, 0, false, this, &CRemoteMasterServer::StaticDownloadFinished, false, 1 );
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CRemoteMasterServer::StaticDownloadProgress
+// CRemoteMasterServer::StaticDownloadFinished
 //
 // Callback during ProcessQueuedFiles
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::StaticDownloadProgress( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError )
+void CRemoteMasterServer::StaticDownloadFinished( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
 {
     CRemoteMasterServer* pRemoteMasterServer = (CRemoteMasterServer*)pObj;
-    pRemoteMasterServer->DownloadProgress( dDownloadNow, dDownloadTotal, pCompletedData, completedLength, bComplete, iError );
-    if ( bComplete || iError )
-        pRemoteMasterServer->Release(); // Unkeep alive
-    return true;
+    pRemoteMasterServer->DownloadFinished( pCompletedData, completedLength, bSuccess, iErrorCode );
+    pRemoteMasterServer->Release(); // Unkeep alive
 }
 
 
 ///////////////////////////////////////////////////////////////
 //
-// CRemoteMasterServer::DownloadProgress
+// CRemoteMasterServer::DownloadFinished
 //
 // Callback during ProcessQueuedFiles
 //
 ///////////////////////////////////////////////////////////////
-void CRemoteMasterServer::DownloadProgress( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, bool bComplete, int iError )
+void CRemoteMasterServer::DownloadFinished( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode )
 {
-    if ( bComplete )
+    if ( bSuccess )
     {
         if ( m_strStage == "waitingreply" )
         {

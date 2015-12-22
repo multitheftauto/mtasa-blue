@@ -15,7 +15,10 @@
 #include <string.h>
 #include <stdio.h>
 
-typedef bool (*PDOWNLOADPROGRESSCALLBACK) ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
+// PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.
+// If bSuccess is true, then pCompletedData/Length will be set or the output file will be ready.
+// If bSuccess is false, then iErrorCode and CNetHTTPDownloadManagerInterface->GetError() will reveal the problem.
+typedef void (*PFN_DOWNLOAD_FINISHED_CALLBACK) ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
 
 class CNetHTTPDownloadManagerInterface
 {
@@ -32,7 +35,7 @@ public:
 
     // Queue a file to download
     // szPostHeaders is a new line separated list of HTTP headers. Examples at https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
-    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, double dSize = 0, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false, void * objectPtr = NULL, PDOWNLOADPROGRESSCALLBACK pfnDownloadProgressCallback = NULL, bool bIsLocal = false, uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false, const char* szPostHeaders = NULL ) = 0;
+    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, double dSize = 0, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false, void * objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false, uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false, const char* szPostHeaders = NULL ) = 0;
 
     // Limit number of concurrent http client connections
     virtual void            SetMaxConnections   ( int iMaxConnections ) = 0;

@@ -59,17 +59,7 @@ CChecksum CDownloadableResource::GenerateClientChecksum ( void )
     return m_LastClientChecksum;
 }
 
-CChecksum CDownloadableResource::GetLastClientChecksum ( void )
-{
-    return m_LastClientChecksum;
-}
-
 CChecksum CDownloadableResource::GetServerChecksum ( void )
 {
     return m_ServerChecksum;
-}
-
-void CDownloadableResource::SetServerChecksum ( CChecksum serverChecksum )
-{
-    m_ServerChecksum = serverChecksum;
 }

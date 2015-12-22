@@ -28,10 +28,10 @@ class CSingularFileDownload
 {
     
 public:
-                        CSingularFileDownload           ( CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum checksum );
+                        CSingularFileDownload           ( CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum serverChecksum );
                         ~CSingularFileDownload          ( void );
 
-        static bool     ProgressCallBack                ( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error );
+        static void     DownloadFinishedCallBack       ( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode );
 
         bool            DoesClientAndServerChecksumMatch ( void );
 
@@ -46,13 +46,7 @@ public:
         void                    CallFinished                    ( bool bSuccess );
         void                    Cancel                          ( void );
 
-        // CRC-based methods
         CChecksum               GenerateClientChecksum          ( void );
-
-        CChecksum               GetLastClientChecksum           ( void );
-    
-        CChecksum               GetProvidedChecksum             ( void );
-        void                    SetProvidedChecksum             ( CChecksum providedChecksum );
 
 protected:
 
@@ -65,7 +59,7 @@ protected:
     bool                m_bBeingDeleted;
 
     CChecksum           m_LastClientChecksum;
-    CChecksum           m_ProvidedChecksum;
+    CChecksum           m_ServerChecksum;
 
 };
 

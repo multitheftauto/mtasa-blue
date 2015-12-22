@@ -492,7 +492,7 @@ bool CWebCore::UpdateListsFromMaster ()
             OutputDebugLine ( "Updating white- and blacklist..." );
         #endif
             g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=getrev", BROWSER_UPDATE_URL),
-                NULL, 0, NULL, 0, false, this, &CWebCore::StaticFetchRevisionProgress, false, 3 );
+                NULL, 0, NULL, 0, false, this, &CWebCore::StaticFetchRevisionFinished, false, 3 );
 
             pLastUpdateNode->SetTagContent ( SString ( "%d", (long long)currentTime ) );
             m_pXmlConfig->Write ();
@@ -672,10 +672,10 @@ void CWebCore::GetFilterEntriesByType ( std::vector<std::pair<SString, bool>>& o
     }
 }
 
-bool CWebCore::StaticFetchRevisionProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError )
+void CWebCore::StaticFetchRevisionFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
 {
     CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
-    if ( bComplete )
+    if ( bSuccess )
     {
         SString strData = pCompletedData;
         SString strWhiteRevision, strBlackRevision;
@@ -687,7 +687,7 @@ bool CWebCore::StaticFetchRevisionProgress ( double dDownloadNow, double dDownlo
             if ( iWhiteListRevision > pWebCore->m_iWhitelistRevision )
             {
                 g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=fetchwhite", BROWSER_UPDATE_URL ),
-                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchWhitelistProgress, false, 3 );
+                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchWhitelistFinished, false, 3 );
 
                 pWebCore->m_iWhitelistRevision = iWhiteListRevision;
             }
@@ -695,27 +695,25 @@ bool CWebCore::StaticFetchRevisionProgress ( double dDownloadNow, double dDownlo
             if ( iBlackListRevision > pWebCore->m_iBlacklistRevision )
             {
                 g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=fetchblack", BROWSER_UPDATE_URL),
-                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchBlacklistProgress, false, 3 );
+                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchBlacklistFinished, false, 3 );
 
                 pWebCore->m_iBlacklistRevision = iBlackListRevision;
             }
         }
     }
-
-    return true;
 }
 
-bool CWebCore::StaticFetchWhitelistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError )
+void CWebCore::StaticFetchWhitelistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
 {
-    if ( !bComplete )
-        return false;
+    if ( !bSuccess )
+        return;
 
     CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
     if ( !pWebCore->m_pXmlConfig )
-        return false;
+        return;
 
     if ( !pWebCore->MakeSureXMLNodesExist () )
-        return false;
+        return;
 
     CXMLNode* pRootNode = pWebCore->m_pXmlConfig->GetRootNode ();
     std::vector<SString> whitelist;
@@ -723,7 +721,7 @@ bool CWebCore::StaticFetchWhitelistProgress ( double dDownloadNow, double dDownl
     strData.Split ( ";", whitelist );
     CXMLNode* pListNode = pRootNode->FindSubNode ( "globalwhitelist" );
     if ( !pListNode )
-        return false;
+        return;
     pListNode->DeleteAllSubNodes ();
 
     for ( std::vector<SString>::const_iterator iter = whitelist.begin (); iter != whitelist.end (); ++iter )
@@ -735,7 +733,7 @@ bool CWebCore::StaticFetchWhitelistProgress ( double dDownloadNow, double dDownl
     // Set whitelist revision
     CXMLNode* pNode = pRootNode->FindSubNode ( "whitelistrev" );
     if ( !pNode )
-        return false;
+        return;
     pNode->SetTagContent ( pWebCore->m_iWhitelistRevision );
 
     // Write changes to the XML file
@@ -746,20 +744,19 @@ bool CWebCore::StaticFetchWhitelistProgress ( double dDownloadNow, double dDownl
 #ifdef MTA_DEBUG
     OutputDebugLine ( "Updated whitelist!" );
 #endif
-    return true;
 }
 
-bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError )
+void CWebCore::StaticFetchBlacklistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
 {
-    if ( !bComplete )
-        return false;
+    if ( !bSuccess )
+        return;
 
     CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
     if ( !pWebCore->m_pXmlConfig )
-        return false;
+        return;
 
     if ( !pWebCore->MakeSureXMLNodesExist () )
-        return false;
+        return;
 
     CXMLNode* pRootNode = pWebCore->m_pXmlConfig->GetRootNode ();
     std::vector<SString> blacklist;
@@ -767,7 +764,7 @@ bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownl
     strData.Split ( ";", blacklist );
     CXMLNode* pListNode = pRootNode->FindSubNode ( "globalblacklist" );
     if ( !pListNode )
-        return false;
+        return;
     pListNode->DeleteAllSubNodes ();
 
     for ( std::vector<SString>::const_iterator iter = blacklist.begin (); iter != blacklist.end (); ++iter )
@@ -779,7 +776,7 @@ bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownl
     // Set blacklist revision
     CXMLNode* pNode = pRootNode->FindSubNode ( "blacklistrev" );
     if ( !pNode )
-        return false;
+        return;
     pNode->SetTagContent ( pWebCore->m_iBlacklistRevision );
 
     // Write changes to the XML file
@@ -790,7 +787,6 @@ bool CWebCore::StaticFetchBlacklistProgress ( double dDownloadNow, double dDownl
 #ifdef MTA_DEBUG
     OutputDebugLine ( "Updated browser blacklist!" );
 #endif
-    return true;
 }
 
 //////////////////////////////////////////////////////////////
