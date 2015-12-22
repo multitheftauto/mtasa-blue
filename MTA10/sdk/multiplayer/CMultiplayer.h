@@ -81,6 +81,7 @@ typedef void ( GameModelRemoveHandler ) ( ushort usModelId );
 typedef void ( GameEntityRenderHandler ) ( CEntitySAInterface* pEntity );
 typedef void ( FxSystemDestructionHandler ) ( void* pFxSA );
 typedef AnimationId(DrivebyAnimationHandler) (AnimationId animGroup, AssocGroupId animId);
+typedef void ( AudioZoneRadioSwitchHandler ) ( DWORD dwStationID );
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -194,6 +195,7 @@ public:
     virtual void                        SetGameEntityRenderHandler      ( GameEntityRenderHandler * pHandler ) = 0;
     virtual void                        SetFxSystemDestructionHandler   ( FxSystemDestructionHandler * pHandler ) = 0;
     virtual void                        SetDrivebyAnimationHandler      (DrivebyAnimationHandler * pHandler) = 0;
+    virtual void                        SetAudioZoneRadioSwitchHandler  ( AudioZoneRadioSwitchHandler * pHandler ) = 0;
 
     virtual void                        AllowMouseMovement          ( bool bAllow ) = 0;
     virtual void                        DoSoundHacksOnLostFocus     ( bool bLostFocus ) = 0;
