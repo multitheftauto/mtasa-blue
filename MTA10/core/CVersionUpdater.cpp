@@ -74,8 +74,8 @@ public:
     CNetHTTPDownloadManagerInterface* GetHTTP               ( void );
     void                GetSaveLocationList                 ( std::list < SString >& outSaveLocationList, const SString& strFilename );
     SString             GetResumableSaveLocation            ( const SString& strFilename, const SString& strMD5, uint iFilesize );
-    static bool         StaticDownloadFinished              ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
-    bool                DownloadFinished                    ( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode );
+    static void         StaticDownloadFinished              ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    void                DownloadFinished                    ( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode );
 
     // Commands
     void                _UseMasterFetchURLs                 ( void );
@@ -3287,12 +3287,12 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
 // Handle when download finishes
 //
 ///////////////////////////////////////////////////////////////
-bool CVersionUpdater::StaticDownloadFinished ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CVersionUpdater::StaticDownloadFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
 {
-    return ((CVersionUpdater*)pObj)->DownloadFinished( pCompletedData, completedLength, bSuccess, iErrorCode );
+    ((CVersionUpdater*)pObj)->DownloadFinished( pCompletedData, completedLength, bSuccess, iErrorCode );
 }
 
-bool CVersionUpdater::DownloadFinished( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode )
+void CVersionUpdater::DownloadFinished( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode )
 {
     if ( bSuccess )
     {
@@ -3308,7 +3308,6 @@ bool CVersionUpdater::DownloadFinished( char* pCompletedData, size_t completedLe
         m_JobInfo.downloadStatus = EDownloadStatus::Failure;
         m_JobInfo.iDownloadResultCode = iErrorCode;
     }
-    return true;
 }
 
 

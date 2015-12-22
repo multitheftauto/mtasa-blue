@@ -93,9 +93,9 @@ public:
     void                LoadListsFromXML     ( bool bWhitelist, bool bBlacklist, bool bCustomLists );
     void                WriteCustomList     ( const SString& strListName, const std::vector<SString>& customList, bool bReset = true );
     void                GetFilterEntriesByType( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType, eWebFilterState state = eWebFilterState::WEBFILTER_ALL );
-    static bool         StaticFetchRevisionProgress  ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
-    static bool         StaticFetchWhitelistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
-    static bool         StaticFetchBlacklistProgress ( double dDownloadNow, double dDownloadTotal, char* pCompletedData, size_t completedLength, void *pObj, bool bComplete, int iError );
+    static void         StaticFetchRevisionFinished  ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    static void         StaticFetchWhitelistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    static void         StaticFetchBlacklistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
     
 private:
     typedef std::pair<bool, eWebFilterType> WebFilterPair;

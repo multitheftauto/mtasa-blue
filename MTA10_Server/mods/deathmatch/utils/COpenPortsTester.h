@@ -47,7 +47,7 @@ public:
         }
 
         // Send request
-        GetDownloadManager()->QueueFile ( strURL, NULL, 0, "", 0, true, this, ProgressCallback, false, 1, 15000 );
+        GetDownloadManager()->QueueFile ( strURL, NULL, 0, "", 0, true, this, DownloadFinishedCallback, false, 1, 15000 );
 
         CLogger::LogPrintfNoStamp ( "Testing ports...\n" );
 
@@ -58,15 +58,15 @@ public:
     //
     // Process response from remote
     //
-    static bool ProgressCallback( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool bComplete, int iError )
+    static void DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )
     {
         COpenPortsTester* pOpenPortsTester = (COpenPortsTester*)obj;
-        if ( bComplete )
+        if ( bSuccess )
         {
             pOpenPortsTester->m_iPortTestStage = 0;
-            if ( iError != 200 )
+            if ( iErrorCode != 200 )
             {
-                CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u: %s)\n", iError, GetDownloadManager()->GetError() );
+                CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u: %s)\n", iErrorCode, GetDownloadManager()->GetError() );
             }
             else
             {
@@ -121,13 +121,10 @@ public:
             }
         }
         else
-        if ( iError )
         {
             pOpenPortsTester->m_iPortTestStage = 0;
-            CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u %s)\n", iError, GetDownloadManager()->GetError() );
+            CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u %s)\n", iErrorCode, GetDownloadManager()->GetError() );
         }
-
-        return true;
     }
 
     //

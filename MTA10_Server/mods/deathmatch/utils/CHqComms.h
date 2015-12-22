@@ -82,28 +82,26 @@ public:
 
             // Send request
             this->AddRef();     // Keep object alive
-            GetDownloadManager()->QueueFile( m_strURL, NULL, 0, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this, StaticProgressCallback, false, 2 );
+            GetDownloadManager()->QueueFile( m_strURL, NULL, 0, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this, StaticDownloadFinishedCallback, false, 2 );
         }
     }
 
     //
     // Process response from hq
     //
-    static bool StaticProgressCallback( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool bComplete, int iError )
+    static void StaticDownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )
     {
         CHqComms* pHqComms = (CHqComms*)obj;
-        pHqComms->ProgressCallback( sizeJustDownloaded, totalDownloaded, data, dataLength, bComplete, iError );
-        if ( bComplete || iError )
-            pHqComms->Release();   // No need to keep object alive now
-        return true;
+        pHqComms->DownloadFinishedCallback( data, dataLength, bSuccess, iErrorCode );
+        pHqComms->Release();   // No need to keep object alive now
     }
 
     //
     // Process response from hq
     //
-    void ProgressCallback( double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, bool bComplete, int iError )
+    void DownloadFinishedCallback( char * data, size_t dataLength, bool bSuccess, int iErrorCode )
     {
-        if ( bComplete )
+        if ( bSuccess )
         {
             m_Stage = HQCOMMS_STAGE_TIMER;
             CBitStream bitStream( data, dataLength );
@@ -117,7 +115,6 @@ public:
             ProcessAseServers( bitStream );
         }
         else
-        if ( iError )
         {
             m_Stage = HQCOMMS_STAGE_TIMER;
         }

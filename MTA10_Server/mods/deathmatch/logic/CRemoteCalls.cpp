@@ -141,13 +141,13 @@ CRemoteCall::~CRemoteCall ()
 void CRemoteCall::MakeCall()
 {
     CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE );
-    downloadManager->QueueFile ( m_strURL, NULL, 0, m_strData.c_str (), m_strData.length (), m_bPostBinary, this, ProgressCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs );
+    downloadManager->QueueFile ( m_strURL, NULL, 0, m_strData.c_str (), m_strData.length (), m_bPostBinary, this, DownloadFinishedCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs );
 }
 
-bool CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownloaded, char * data, size_t dataLength, void * obj, bool complete, int error)
+void CRemoteCall::DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )
 {
     //printf("Progress: %s\n", data);
-    if ( complete )
+    if ( bSuccess )
     {
         CRemoteCall * call = (CRemoteCall*)obj;
         if ( g_pGame->GetRemoteCalls()->CallExists(call) )
@@ -167,17 +167,16 @@ bool CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownlo
             arguments.Call ( call->m_VM, call->m_iFunction);   
 
             g_pGame->GetRemoteCalls()->Remove(call); // delete ourselves
-            return true;
         }
     }
-    else if ( error )
+    else
     {
         CRemoteCall * call = (CRemoteCall*)obj;
         if ( g_pGame->GetRemoteCalls()->CallExists(call) )
         {
             CLuaArguments arguments;
             arguments.PushString("ERROR");
-            arguments.PushNumber(error);
+            arguments.PushNumber( iErrorCode );
             if ( call->IsFetch () )
                 for ( uint i = 0 ; i < call->GetFetchArguments ().Count () ; i++ )
                     arguments.PushArgument ( *( call->GetFetchArguments ()[i] ) );
@@ -185,9 +184,6 @@ bool CRemoteCall::ProgressCallback(double sizeJustDownloaded, double totalDownlo
             arguments.Call ( call->m_VM, call->m_iFunction);   
 
             g_pGame->GetRemoteCalls()->Remove(call); // delete ourselves
-            return true;
         }
     }
-
-    return false;   // Possible problem
 }

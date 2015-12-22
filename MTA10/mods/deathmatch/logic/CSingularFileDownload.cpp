@@ -12,7 +12,7 @@
 
 #include <StdInc.h>
 
-CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char *szName, const char *szNameShort, SString strHTTPURL, CChecksum checksum )
+CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char *szName, const char *szNameShort, SString strHTTPURL, CChecksum serverChecksum )
 {
     // Store the name
     m_strName = szName;
@@ -23,8 +23,8 @@ CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char 
     // store the resource
     m_pResource = pResource;
 
-    // Store the provided checksum
-    m_ProvidedChecksum = checksum;
+    // Store the server checksum
+    m_ServerChecksum = serverChecksum;
 
     m_bBeingDeleted = false;
 
@@ -33,7 +33,7 @@ CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char 
     if ( !DoesClientAndServerChecksumMatch () )
     {
         CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_SINGULAR_FILES );
-        pHTTP->QueueFile ( strHTTPURL.c_str(), szName, 0, NULL, 0, false, this, ProgressCallBack, false, 10, 10000, true );
+        pHTTP->QueueFile ( strHTTPURL.c_str(), szName, 0, NULL, 0, false, this, DownloadFinishedCallBack, false, 10, 10000, true );
         m_bComplete = false;
         g_pClientGame->SetTransferringSingularFiles ( true );
     }
@@ -50,19 +50,18 @@ CSingularFileDownload::~CSingularFileDownload ( void )
 }
 
 
-bool CSingularFileDownload::ProgressCallBack ( double sizeJustDownloaded, double totalDownloaded, char *data, size_t dataLength, void *obj, bool complete, int error )
+void CSingularFileDownload::DownloadFinishedCallBack ( char *data, size_t dataLength, void *obj, bool bSuccess, int iErrorCode )
 {
-    if ( complete )
+    if ( bSuccess )
     {
         CSingularFileDownload * pFile = (CSingularFileDownload*)obj;
         pFile->CallFinished ( true );
     }
-    else if ( error )
+    else
     {
         CSingularFileDownload * pFile = (CSingularFileDownload*)obj;
         pFile->CallFinished ( false );
     }
-    return true;
 }
 
 
@@ -93,26 +92,11 @@ void CSingularFileDownload::Cancel ( void )
 
 bool CSingularFileDownload::DoesClientAndServerChecksumMatch ( void )
 {
-    return ( m_LastClientChecksum == m_ProvidedChecksum );
+    return ( m_LastClientChecksum == m_ServerChecksum );
 }
 
 CChecksum CSingularFileDownload::GenerateClientChecksum ( void )
 {
     m_LastClientChecksum = CChecksum::GenerateChecksumFromFile ( m_strName );
     return m_LastClientChecksum;
-}
-
-CChecksum CSingularFileDownload::GetLastClientChecksum ( void )
-{
-    return m_LastClientChecksum;
-}
-
-CChecksum CSingularFileDownload::GetProvidedChecksum ( void )
-{
-    return m_ProvidedChecksum;
-}
-
-void CSingularFileDownload::SetProvidedChecksum ( CChecksum providedChecksum )
-{
-    m_ProvidedChecksum = providedChecksum;
 }
