@@ -343,8 +343,8 @@ void HandleNotUsedMainMenu ( void )
         if ( strFullscreenStyle == "1" )
         {
             AddReportLog( 9315, "Loader - HandleNotUsedMainMenu - Already Borderless window" );
-            return;
         }
+        else
         if ( !strWindowed.empty() && !strFullscreenStyle.empty())
         {
             if ( strWindowed == "0" && strFullscreenStyle == "0" )   // 0=FULLSCREEN_STANDARD
@@ -373,6 +373,19 @@ void HandleNotUsedMainMenu ( void )
             strCoreConfig = "<mainconfig><settings><display_fullscreen_style>1</display_fullscreen_style></settings></mainconfig>";
             FileSave( strCoreConfigFilename, strCoreConfig );
             AddReportLog( 9312, "Loader - HandleNotUsedMainMenu - Set Borderless window" );
+        }
+    }
+
+    // Check if Evolve is active
+    for ( auto processId : MyEnumProcesses( true ) )
+    {
+        SString strFilename = ExtractFilename( GetProcessPathFilename( processId ) );
+        if ( strFilename.BeginsWithI( "Evolve" ) )
+        {
+            SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
+            strMessage += "\n\nEvolve";
+            DisplayErrorMessageBox ( strMessage, _E("CL43"), "not-used-menu-evolve" );
+            break;
         }
     }
 }
