@@ -14,49 +14,20 @@
 #include "../../vendor/unrar/dll.hpp"
 
 
+// Will not terminate a 64 bit process, or the current process
 bool TerminateProcessFromPathFilename ( const SString& strPathFilename, bool bTestOnly = false )
 {
-    DWORD dwProcessIDs[250];
-    DWORD pBytesReturned = 0;
-    if ( EnumProcesses ( dwProcessIDs, 250 * sizeof(DWORD), &pBytesReturned ) )
+    for ( auto processId : MyEnumProcesses() )
     {
-        DWORD id1 = GetCurrentProcessId();
-        for ( unsigned int i = 0; i < pBytesReturned / sizeof ( DWORD ); i++ )
+        if ( GetProcessPathFilename( processId ).EqualsI( strPathFilename ) )
         {
-            DWORD id2 = dwProcessIDs[i];
-            if ( id2 == id1 )
-                continue;
-            // Skip 64 bit processes to avoid errors
-            if ( !Is32bitProcess ( dwProcessIDs[i] ) )
-                continue;
-            // Open the process
-            HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);
-            if ( hProcess )
+            if ( !bTestOnly )
             {
-                HMODULE pModule;
-                DWORD cbNeeded;
-                if ( EnumProcessModules ( hProcess, &pModule, sizeof ( HMODULE ), &cbNeeded ) )
-                {
-                    WCHAR szModuleName[MAX_PATH*2] = L"";
-                    if ( GetModuleFileNameExW( hProcess, pModule, szModuleName, NUMELMS(szModuleName) ) )
-                    {
-                        SString strModuleName = ToUTF8( szModuleName );
-                        if ( stricmp ( strModuleName, strPathFilename ) == 0 )
-                        {
-                            if ( !bTestOnly )
-                                TerminateProcess ( hProcess, 0 );
-                            CloseHandle ( hProcess );
-                            return true;
-                        } 
-                    }
-                }
-
-                // Close the process
-                CloseHandle ( hProcess );
+                TerminateProcess( processId );
             }
+            return true;
         }
     }
-
     return false;
 }
 
