@@ -51,6 +51,7 @@ void CWebView::Initialise ()
     CefBrowserSettings browserSettings;
     browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit ();
     browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
+    browserSettings.java = cef_state_t::STATE_DISABLED;
     browserSettings.caret_browsing = cef_state_t::STATE_ENABLED;
     browserSettings.universal_access_from_file_urls = cef_state_t::STATE_DISABLED; // Also filtered by resource interceptor, but set this nevertheless
     browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
