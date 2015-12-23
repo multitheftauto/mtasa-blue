@@ -182,8 +182,7 @@ class CefFrame : public virtual CefBase {
   virtual CefString GetName() =0;
 
   ///
-  // Returns the globally unique identifier for this frame or < 0 if the
-  // underlying frame does not yet exist.
+  // Returns the globally unique identifier for this frame.
   ///
   /*--cef()--*/
   virtual int64 GetIdentifier() =0;

@@ -176,8 +176,7 @@ typedef struct _cef_frame_t {
   cef_string_userfree_t (CEF_CALLBACK *get_name)(struct _cef_frame_t* self);
 
   ///
-  // Returns the globally unique identifier for this frame or < 0 if the
-  // underlying frame does not yet exist.
+  // Returns the globally unique identifier for this frame.
   ///
   int64 (CEF_CALLBACK *get_identifier)(struct _cef_frame_t* self);
 

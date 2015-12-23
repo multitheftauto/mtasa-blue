@@ -45,23 +45,24 @@
 // If the Chromium implementation diverges the below implementation should be
 // updated to match.
 
-#include "include/base/cef_logging.h"
-#include "include/base/internal/cef_thread_checker_impl.h"
-
 // Apart from debug builds, we also enable the thread checker in
 // builds with DCHECK_ALWAYS_ON so that trybots and waterfall bots
 // with this define will get the same level of thread checking as
 // debug bots.
-#if DCHECK_IS_ON()
+//
+// Note that this does not perfectly match situations where DCHECK is
+// enabled.  For example a non-official release build may have
+// DCHECK_ALWAYS_ON undefined (and therefore ThreadChecker would be
+// disabled) but have DCHECKs enabled at runtime.
+#if (!defined(NDEBUG) || defined(DCHECK_ALWAYS_ON))
 #define ENABLE_THREAD_CHECKER 1
 #else
 #define ENABLE_THREAD_CHECKER 0
 #endif
 
+#include "include/base/internal/cef_thread_checker_impl.h"
 
 namespace base {
-
-namespace cef_internal {
 
 // Do nothing implementation, for use in release mode.
 //
@@ -75,8 +76,6 @@ class ThreadCheckerDoNothing {
 
   void DetachFromThread() {}
 };
-
-}  // namespace cef_internal
 
 // ThreadChecker is a helper class used to help verify that some methods of a
 // class are called from the same thread. It provides identical functionality to
@@ -110,10 +109,10 @@ class ThreadCheckerDoNothing {
 //
 // In Release mode, CalledOnValidThread will always return true.
 #if ENABLE_THREAD_CHECKER
-class ThreadChecker : public cef_internal::ThreadCheckerImpl {
+class ThreadChecker : public ThreadCheckerImpl {
 };
 #else
-class ThreadChecker : public cef_internal::ThreadCheckerDoNothing {
+class ThreadChecker : public ThreadCheckerDoNothing {
 };
 #endif  // ENABLE_THREAD_CHECKER
 

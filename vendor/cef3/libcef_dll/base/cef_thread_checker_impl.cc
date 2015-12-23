@@ -5,7 +5,6 @@
 #include "include/base/internal/cef_thread_checker_impl.h"
 
 namespace base {
-namespace cef_internal {
 
 ThreadCheckerImpl::ThreadCheckerImpl()
     : valid_thread_id_() {
@@ -32,5 +31,4 @@ void ThreadCheckerImpl::EnsureThreadIdAssigned() const {
   }
 }
 
-}  // namespace cef_internal
 }  // namespace base

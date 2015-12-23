@@ -201,6 +201,22 @@
                 '${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}'
               ],
             },
+            {
+              # This postbuid step is responsible for creating the following
+              # helpers:
+              #
+              # cefclient Helper EH.app and cefclient Helper NP.app are created
+              # from cefclient Helper.app.
+              #
+              # The EH helper is marked for an executable heap. The NP helper
+              # is marked for no PIE (ASLR).
+              'postbuild_name': 'Make More Helpers',
+              'action': [
+                'tools/make_more_helpers.sh',
+                'Frameworks',
+                'cefclient',
+              ],
+            },
           ],
           'link_settings': {
             'libraries': [
@@ -228,12 +244,12 @@
                 'Resources/cef.pak',
                 'Resources/cef_100_percent.pak',
                 'Resources/cef_200_percent.pak',
-                'Resources/cef_extensions.pak',
                 'Resources/devtools_resources.pak',
                 'Resources/icudtl.dat',
                 'Resources/locales/',
                 '$(BUILDTYPE)/chrome-sandbox',
                 '$(BUILDTYPE)/libcef.so',
+                '$(BUILDTYPE)/libffmpegsumo.so',
                 '$(BUILDTYPE)/natives_blob.bin',
                 '$(BUILDTYPE)/snapshot_blob.bin',
               ],
@@ -435,6 +451,22 @@
                 '${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}'
               ],
             },
+            {
+              # This postbuid step is responsible for creating the following
+              # helpers:
+              #
+              # cefsimple Helper EH.app and cefsimple Helper NP.app are created
+              # from cefsimple Helper.app.
+              #
+              # The EH helper is marked for an executable heap. The NP helper
+              # is marked for no PIE (ASLR).
+              'postbuild_name': 'Make More Helpers',
+              'action': [
+                'tools/make_more_helpers.sh',
+                'Frameworks',
+                'cefsimple',
+              ],
+            },
           ],
           'link_settings': {
             'libraries': [
@@ -455,12 +487,12 @@
                 'Resources/cef.pak',
                 'Resources/cef_100_percent.pak',
                 'Resources/cef_200_percent.pak',
-                'Resources/cef_extensions.pak',
                 'Resources/devtools_resources.pak',
                 'Resources/icudtl.dat',
                 'Resources/locales/',
                 '$(BUILDTYPE)/chrome-sandbox',
                 '$(BUILDTYPE)/libcef.so',
+                '$(BUILDTYPE)/libffmpegsumo.so',
                 '$(BUILDTYPE)/natives_blob.bin',
                 '$(BUILDTYPE)/snapshot_blob.bin',
               ],
