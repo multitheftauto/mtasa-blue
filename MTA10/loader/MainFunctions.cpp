@@ -665,18 +665,11 @@ void CheckAntiVirusStatus( void )
 
             if ( bEnableScaremongering )
             {
-                std::vector < DWORD > processIdList = MyEnumProcesses();
-                for ( uint i = 0; i < processIdList.size (); i++ )
+                for ( auto processId : MyEnumProcesses( true ) )
                 {
-                    DWORD processId = processIdList[i];
-                    // Skip 64 bit processes to avoid errors
-                    if ( !Is32bitProcess ( processId ) )
-                        continue;
-
-                    std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
-                    for ( uint i = 0; i < filenameList.size (); i++ )
+                    SString strProcessPathFileName = GetProcessPathFilename ( processId );
+                    if ( !strProcessPathFileName.empty() )
                     {
-                        const SString& strProcessPathFileName = filenameList[i];
                         SLibVersionInfo libVersionInfo;
                         if ( GetLibVersionInfo ( strProcessPathFileName, &libVersionInfo ) )
                         {
@@ -693,7 +686,7 @@ void CheckAntiVirusStatus( void )
                     }
                 }
                 if ( bEnableScaremongering )
-                    WriteDebugEvent( SString( "AV Searched %d processes, but could not find av helper", processIdList.size() ) );
+                    WriteDebugEvent( "AV Searched %d processes, but could not find av helper" );
             }
         }
 

@@ -352,18 +352,15 @@ typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hP
 
 ///////////////////////////////////////////////////////////////////////////
 //
-// GetPossibleProcessPathFilenames
+// GetProcessPathFilename
 //
-// Get all image names for a processID
+//
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
+SString GetProcessPathFilename ( DWORD processID )
 {
     static LPFN_QueryFullProcessImageNameW fnQueryFullProcessImageNameW = NULL;
     static bool bDoneGetProcAddress = false;
-
-    std::vector < SString > result;
-
     if ( !bDoneGetProcAddress )
     {
         // Find 'QueryFullProcessImageNameA'
@@ -377,50 +374,64 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
         for ( int i = 0 ; i < 2 ; i++ )
         {
             HANDLE hProcess = OpenProcess ( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
-
             if ( hProcess )
             {
                 WCHAR szProcessName[MAX_PATH] = L"";
                 DWORD dwSize = NUMELMS(szProcessName);
                 DWORD bOk = fnQueryFullProcessImageNameW ( hProcess, 0, szProcessName, &dwSize );
                 CloseHandle( hProcess );
-
-                if ( bOk && wcslen ( szProcessName ) > 0 )
-                    ListAddUnique ( result, ToUTF8 ( szProcessName ) );
+                if ( bOk )
+                {
+                    wchar_t szBuffer[MAX_PATH * 2] = L"";
+                    if ( GetLongPathNameW( szProcessName, szBuffer, NUMELMS(szBuffer) - 1 ) )
+                    {
+                        return ToUTF8( szBuffer );
+                    }
+                }
             }
         }
     }
 
     {
-        HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
-
-        if ( hProcess )
         {
-            WCHAR szProcessName[MAX_PATH] = L"";
-            DWORD bOk = GetModuleFileNameExW ( hProcess, NULL, szProcessName, NUMELMS(szProcessName) );
-            CloseHandle ( hProcess );
+            HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
+            if ( hProcess )
+            {
+                WCHAR szProcessName[MAX_PATH] = L"";
+                DWORD bOk = GetModuleFileNameExW( hProcess, NULL, szProcessName, NUMELMS(szProcessName) );
+                CloseHandle( hProcess );
+                if ( bOk )
+                {
+                    wchar_t szBuffer[MAX_PATH * 2] = L"";
+                    if ( GetLongPathNameW( szProcessName, szBuffer, NUMELMS(szBuffer) - 1 ) )
+                    {
+                        return ToUTF8( szBuffer );
+                    }
+                }
+            }
+        }
 
-            if ( bOk && wcslen ( szProcessName ) > 0 )
-                ListAddUnique ( result, ToUTF8 ( szProcessName ) );
+        for ( int i = 0 ; i < 2 ; i++ )
+        {
+            HANDLE hProcess = OpenProcess( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
+            if ( hProcess )
+            {
+                WCHAR szProcessName[MAX_PATH] = L"";
+                DWORD bOk = GetProcessImageFileNameW( hProcess, szProcessName, NUMELMS(szProcessName) );
+                CloseHandle( hProcess );
+                if ( bOk )
+                {
+                    wchar_t szBuffer[MAX_PATH * 2] = L"";
+                    if ( GetLongPathNameW( devicePathToWin32Path( szProcessName ), szBuffer, NUMELMS(szBuffer) - 1 ) )
+                    {
+                        return ToUTF8( szBuffer );
+                    }
+                }
+            }
         }
     }
 
-    for ( int i = 0 ; i < 2 ; i++ )
-    {
-        HANDLE hProcess = OpenProcess ( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
-
-        if ( hProcess )
-        {
-            WCHAR szProcessName[MAX_PATH] = L"";
-            DWORD bOk = GetProcessImageFileNameW ( hProcess, szProcessName, NUMELMS(szProcessName) );
-            CloseHandle( hProcess );
-
-            if ( bOk && wcslen ( szProcessName ) > 0 )
-                ListAddUnique ( result, ToUTF8 ( devicePathToWin32Path ( szProcessName ) ) );
-        }
-    }
-
-    return result;
+    return "";
 }
 
 
@@ -431,7 +442,7 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector < DWORD > MyEnumProcesses ( void )
+std::vector < DWORD > MyEnumProcesses ( bool bInclude64bit, bool bIncludeCurrent )
 {
     uint uiSize = 200;
     std::vector < DWORD > processIdList;
@@ -455,7 +466,18 @@ std::vector < DWORD > MyEnumProcesses ( void )
         uiSize *= 2;
     }
 
-    return processIdList;
+    // Filter list
+    std::vector < DWORD > filteredList;
+    for( auto processId : processIdList )
+    {
+        if ( !bInclude64bit && !Is32bitProcess ( processId ) )
+            continue;
+        if ( !bIncludeCurrent && processId == GetCurrentProcessId() )
+            continue;
+        filteredList.push_back( processId );
+    }
+
+    return filteredList;
 }
 
 
@@ -502,18 +524,11 @@ std::vector < DWORD > GetGTAProcessList ( void )
 {
     std::vector < DWORD > result;
 
-    std::vector < DWORD > processIdList = MyEnumProcesses ();
-    for ( uint i = 0; i < processIdList.size (); i++ )
+    for ( auto processId : MyEnumProcesses() )
     {
-        DWORD processId = processIdList[i];
-        // Skip 64 bit processes to avoid errors
-        if ( !Is32bitProcess ( processId ) )
-            continue;
-
-        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
-        for ( uint i = 0; i < filenameList.size (); i++ )
-            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) || filenameList[i].EndsWith ( MTA_HTAEXE_NAME ) )
-                ListAddUnique ( result, processId );
+        SString strPathFilename = GetProcessPathFilename ( processId );
+        if ( strPathFilename.EndsWith ( MTA_GTAEXE_NAME ) || strPathFilename.EndsWith ( MTA_HTAEXE_NAME ) )
+            ListAddUnique ( result, processId );
     }
 
     if ( DWORD processId = FindProcessId ( MTA_GTAEXE_NAME ) )
@@ -550,23 +565,15 @@ void TerminateGTAIfRunning ( void )
 {
     std::vector < DWORD > processIdList = GetGTAProcessList ();
 
-    if ( processIdList.size () )
+    // Try to stop all GTA process id's
+    for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
     {
-        // Try to stop all GTA process id's
-        for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
+        for ( auto processId : processIdList )
         {
-            for ( std::vector < DWORD > ::iterator iter = processIdList.begin () ; iter != processIdList.end (); ++iter )
-            {
-                HANDLE hProcess = OpenProcess ( PROCESS_TERMINATE, 0, *iter );
-                if ( hProcess )
-                {
-                    TerminateProcess ( hProcess, 0 );
-                    CloseHandle ( hProcess );
-                }
-            }
-            Sleep ( 1000 );
-            processIdList = GetGTAProcessList ();
+            TerminateProcess( processId );
         }
+        Sleep ( 1000 );
+        processIdList = GetGTAProcessList ();
     }
 }
 
@@ -582,18 +589,11 @@ std::vector < DWORD > GetOtherMTAProcessList ( void )
 {
     std::vector < DWORD > result;
 
-    std::vector < DWORD > processIdList = MyEnumProcesses ();
-    for ( uint i = 0; i < processIdList.size (); i++ )
+    for ( auto processId : MyEnumProcesses() )
     {
-        DWORD processId = processIdList[i];
-        // Skip 64 bit processes to avoid errors
-        if ( !Is32bitProcess ( processId ) )
-            continue;
-
-        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
-        for ( uint i = 0; i < filenameList.size (); i++ )
-            if ( filenameList[i].EndsWith ( MTA_EXE_NAME ) )
-                ListAddUnique ( result, processId );
+        SString strPathFilename = GetProcessPathFilename ( processId );
+        if ( strPathFilename.EndsWith ( MTA_EXE_NAME ) )
+            ListAddUnique ( result, processId );
     }
 
     if ( DWORD processId = FindProcessId ( MTA_EXE_NAME ) )
@@ -635,14 +635,9 @@ void TerminateOtherMTAIfRunning ( void )
         // Try to stop all other MTA process id's
         for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
         {
-            for ( std::vector < DWORD > ::iterator iter = processIdList.begin () ; iter != processIdList.end (); ++iter )
+            for ( auto processId : processIdList )
             {
-                HANDLE hProcess = OpenProcess ( PROCESS_TERMINATE, 0, *iter );
-                if ( hProcess )
-                {
-                    TerminateProcess ( hProcess, 0 );
-                    CloseHandle ( hProcess );
-                }
+                TerminateProcess( processId );
             }
             Sleep ( 1000 );
             processIdList = GetOtherMTAProcessList ();
@@ -735,17 +730,13 @@ SString GetMTASAPath ( void )
 ///////////////////////////////////////////////////////////////
 bool LookForGtaProcess ( SString& strOutPathFilename )
 {
-    std::vector < DWORD > processIdList = GetGTAProcessList ();
-    for ( uint i = 0 ; i < processIdList.size () ; i++ )
+    for ( auto processId : GetGTAProcessList() )
     {
-        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
-        for ( uint i = 0 ; i < filenameList.size () ; i++ )
+        SString strPathFilename = GetProcessPathFilename ( processId );
+        if ( FileExists ( strPathFilename ) )
         {
-            if ( FileExists ( filenameList[i] ) )
-            {
-                strOutPathFilename = filenameList[i];
-                return true;
-            }
+            strOutPathFilename = strPathFilename;
+            return true;
         }
     }
     return false;
@@ -1402,6 +1393,24 @@ bool Is32bitProcess ( DWORD processID )
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// TerminateProcess
+//
+// Terminate process from pid
+//
+///////////////////////////////////////////////////////////////////////////
+void TerminateProcess( DWORD dwProcessID, uint uiExitCode )
+{
+    HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, dwProcessID );
+    if ( hProcess )
+    {
+        TerminateProcess( hProcess, uiExitCode );
+        CloseHandle( hProcess );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // CreateSingleInstanceMutex
 //
 //
@@ -1977,18 +1986,14 @@ void ForbodenProgramsMessage ( void )
     forbodenList.push_back( "CheatEngine" );
 
     SString strResult;
-    std::vector < DWORD > processIdList = MyEnumProcesses ();
-    for ( uint i = 0; i < processIdList.size (); i++ )
+    for ( auto processId : MyEnumProcesses( true ) )
     {
-        std::vector < SString > pathFilenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
-        for ( uint p = 0; p < pathFilenameList.size (); p++ )
+        SString strPathFilename = GetProcessPathFilename ( processId );
+        SString strFilename = ExtractFilename( strPathFilename );
+        for ( auto forbodenName : forbodenList )
         {
-            SString strFilename = ExtractFilename( pathFilenameList[p] );
-            for ( uint f = 0; f < forbodenList.size (); f++ )
-            {
-                if ( strFilename.Replace( " ", "" ).BeginsWithI( forbodenList[f] ) )
-                    strResult += strFilename + "\n";
-            }
+            if ( strFilename.Replace( " ", "" ).BeginsWithI( forbodenName ) )
+                strResult += strFilename + "\n";
         }
     }
 
