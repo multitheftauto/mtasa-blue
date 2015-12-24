@@ -124,7 +124,7 @@ void CLuaPlayerDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "logOut", "logOut" );
     lua_classfunction ( luaVM, "toggleControl", "toggleControl" );
     lua_classfunction ( luaVM, "triggerEvent", "triggerClientEvent" );
-    lua_classfunction ( luaVM, "outputChat", "outputChatBox", CLuaFunctionDefs::OutputChatBox );
+    lua_classfunction ( luaVM, "outputChat", "outputChatBox", CLuaFunctionDefs::OOP_OutputChatBox);
 
     lua_classfunction ( luaVM, "forceMap", "forcePlayerMap" );
     lua_classfunction ( luaVM, "fadeCamera", "fadeCamera" );
