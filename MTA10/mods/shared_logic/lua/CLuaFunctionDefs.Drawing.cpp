@@ -1067,7 +1067,7 @@ int CLuaFunctionDefs::dxGetTexturePixels ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CVector2D vecEndPosition = vecEndPosition + vecSize;
+        CVector2D vecEndPosition = vecPosition + vecSize;
         RECT rc = { (int) vecPosition.fX, (int) vecPosition.fY, (int) vecEndPosition.fX, (int) vecEndPosition.fY };
         CPixels pixels;
 
