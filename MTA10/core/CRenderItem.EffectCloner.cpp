@@ -35,6 +35,8 @@ public:
     std::map < ID3DXEffect*, CEffectTemplate* > m_CloneMap;
     std::map < SString, CEffectTemplate* >      m_ValidMap;        // Active and files not changed since first created   
     std::vector < CEffectTemplate* >            m_OldList;         // Active but files changed since first created
+    uint                                        m_uiCloneFailTotalCount;
+    uint                                        m_uiCloneSuccessTotalCount;
 };
 
 
@@ -86,6 +88,7 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
 {
     // Do we have a match with the initial path
     CEffectTemplate* pEffectTemplate = MapFindRef ( m_ValidMap, ConformPathForSorting ( strFilename ) );
+    CEffectTemplate* pEffectTemplatePrevDebug = NULL;
     if ( pEffectTemplate )
     {
         // Have files changed since create?
@@ -94,6 +97,7 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
             // EffectTemplate is no good for cloning now, so move it to the old list 
             MapRemove ( m_ValidMap, ConformPathForSorting ( strFilename ) );
             m_OldList.push_back ( pEffectTemplate );
+            pEffectTemplatePrevDebug = pEffectTemplate;
             pEffectTemplate = NULL;
         }
     }
@@ -104,6 +108,7 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
         pEffectTemplate = NewEffectTemplate ( m_pManager, strFilename, strRootPath, strOutStatus, bDebug );
         if ( !pEffectTemplate->IsValid () )
         {
+            AddReportLog( 7544, SString( "NewEffectTemplate failed (%s) %s", *strOutStatus, *strFilename ) );
             SAFE_RELEASE( pEffectTemplate );
             return NULL;
         }
@@ -119,14 +124,42 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
     //
 
     // Clone D3DXEffect
-    ID3DXEffect* pNewD3DEffect = pEffectTemplate->CloneD3DEffect ( strOutStatus, bOutUsesVertexShader, bOutUsesDepthBuffer );
+    ID3DXEffect* pNewD3DEffect = pEffectTemplate->CloneD3DEffect ( strOutStatus, bOutUsesVertexShader, bOutUsesDepthBuffer);
 
     if( !pNewD3DEffect )
     {
         if ( strOutStatus.empty () )
             strOutStatus = "Error: Clone failed";
+
+        // Debug #9085 - CloneEffect failure
+        m_uiCloneFailTotalCount++;
+        {
+            CEffectTemplate::SDebugInfo debugInfo = pEffectTemplate->GetDebugInfo();
+            SString strMessage( "CloneEffect failed %08x age:%d [fail:%d success:%d] [totfail:%d totsuccess:%d] '%s'"
+                                    ,debugInfo.cloneResult
+                                    ,( CTickCount::Now() - debugInfo.createTime ).ToInt()
+                                    ,debugInfo.uiCloneFailCount
+                                    ,debugInfo.uiCloneSuccessCount
+                                    ,m_uiCloneFailTotalCount
+                                    ,m_uiCloneSuccessTotalCount
+                                    ,*strFilename
+                                );
+            AddReportLog( 7545, strMessage, 20 );
+        }
+        if ( pEffectTemplatePrevDebug )
+        {
+            CEffectTemplate::SDebugInfo debugInfo = pEffectTemplatePrevDebug->GetDebugInfo();
+            SString strMessage( "CloneEffect PrevInfo: %08x age:%d [fail:%d success:%d]"
+                                    ,debugInfo.cloneResult
+                                    ,( CTickCount::Now() - debugInfo.createTime ).ToInt()
+                                    ,debugInfo.uiCloneFailCount
+                                    ,debugInfo.uiCloneSuccessCount
+                                );
+            AddReportLog( 7546, strMessage, 20 );
+        }
         return NULL;
     }
+    m_uiCloneSuccessTotalCount++;
 
     // Cross ref clone with original
     MapSet ( m_CloneMap, pNewD3DEffect, pEffectTemplate );
