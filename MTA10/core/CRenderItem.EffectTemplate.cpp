@@ -32,6 +32,7 @@ public:
     virtual int             GetTicksSinceLastUsed   ( void );
     virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer );
     virtual void            UnCloneD3DEffect        ( ID3DXEffect* pD3DEffect );
+    virtual const SDebugInfo& GetDebugInfo          ( void )            { return m_DebugInfo; }
 
     // CEffectTemplateImpl
     void                    CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
@@ -44,6 +45,7 @@ public:
     std::map < SString, SString >       m_FileMD5Map;
     CTickCount                          m_TickCountLastUsed;
     std::set < ID3DXEffect* >           m_CloneList;
+    SDebugInfo                          m_DebugInfo;
 };
 
 
@@ -240,6 +242,7 @@ void CEffectTemplateImpl::OnResetDevice ( void )
 void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
 {
     assert ( !m_pD3DEffect );
+    m_DebugInfo.createTime = CTickCount::Now();
 
     // Make defines
     bool bUsesRAWZ = CGraphics::GetSingleton ().GetRenderItemManager ()->GetDepthBufferFormat () == RFORMAT_RAWZ;
@@ -436,10 +439,14 @@ ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& 
     ID3DXEffect* pNewD3DEffect = NULL;
     LPDIRECT3DDEVICE9 pDevice = NULL;
     m_pD3DEffect->GetDevice ( &pDevice );
-    m_pD3DEffect->CloneEffect ( pDevice, &pNewD3DEffect );
+    m_DebugInfo.cloneResult = m_pD3DEffect->CloneEffect ( pDevice, &pNewD3DEffect );
 
     if ( !pNewD3DEffect )
+    {
+        m_DebugInfo.uiCloneFailCount++;
         return NULL;
+    }
+    m_DebugInfo.uiCloneSuccessCount++;
 
     // Set the same technique
     {
