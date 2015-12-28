@@ -30,7 +30,7 @@ public:
     // CEffectTemplate
     virtual bool            HaveFilesChanged        ( void );
     virtual int             GetTicksSinceLastUsed   ( void );
-    virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer );
+    virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, HRESULT& outHResult );
     virtual void            UnCloneD3DEffect        ( ID3DXEffect* pD3DEffect );
     virtual const SDebugInfo& GetDebugInfo          ( void )            { return m_DebugInfo; }
 
@@ -46,6 +46,7 @@ public:
     CTickCount                          m_TickCountLastUsed;
     std::set < ID3DXEffect* >           m_CloneList;
     SDebugInfo                          m_DebugInfo;
+    HRESULT                             m_CreateHResult;
 };
 
 
@@ -54,11 +55,18 @@ public:
 // CEffectTemplate instantiation
 //
 ///////////////////////////////////////////////////////////////
-CEffectTemplate* NewEffectTemplate ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
+CEffectTemplate* NewEffectTemplate ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug, HRESULT& outHResult )
 {
-    CEffectTemplateImpl* m_pEffectTemplate = new CEffectTemplateImpl ();
-    m_pEffectTemplate->PostConstruct ( pManager, strFilename, strRootPath, strOutStatus, bDebug );
-    return m_pEffectTemplate;
+    CEffectTemplateImpl* pEffectTemplate = new CEffectTemplateImpl ();
+    pEffectTemplate->PostConstruct ( pManager, strFilename, strRootPath, strOutStatus, bDebug );
+
+    outHResult = pEffectTemplate->m_CreateHResult;
+    if ( !pEffectTemplate->IsValid () )
+    {
+        SAFE_RELEASE ( pEffectTemplate );
+    }
+
+    return pEffectTemplate;
 }
 
 
@@ -189,7 +197,7 @@ int CEffectTemplateImpl::GetTicksSinceLastUsed ( void )
         return 0;   // Used right now
 
     CTickCount delta = CTickCount::Now ( true ) - m_TickCountLastUsed;
-    return static_cast < int > ( delta.ToLongLong () );
+    return static_cast < int > ( delta.ToLongLong () ) + 1;
 }
 
 
@@ -265,7 +273,7 @@ void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, con
     SString strMetaPath = strFilename.Right ( strFilename.length () - strRootPath.length () );
     CIncludeManager IncludeManager ( strRootPath, ExtractPath ( strMetaPath ) );
     LPD3DXBUFFER pBufferErrors = NULL;
-    HRESULT hr = D3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
+    m_CreateHResult = D3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
 
     // Handle compile errors
     strOutStatus = "";
@@ -283,7 +291,7 @@ void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, con
     if( !m_pD3DEffect )
     {
         if ( strOutStatus.empty () )
-            strOutStatus = SString ( "[D3DXCreateEffectFromFile failed (%08x)%s]", hr, *IncludeManager.m_strReport );
+            strOutStatus = SString ( "[D3DXCreateEffectFromFile failed (%08x)%s]", m_CreateHResult, *IncludeManager.m_strReport );
         return;
     }
 
@@ -433,14 +441,15 @@ void CEffectTemplateImpl::ReleaseUnderlyingData ( void )
 // Clone the d3d effect
 //
 ////////////////////////////////////////////////////////////////
-ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer )
+ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, HRESULT& outHResult )
 {
     // Clone D3DXEffect
     ID3DXEffect* pNewD3DEffect = NULL;
     LPDIRECT3DDEVICE9 pDevice = NULL;
     m_pD3DEffect->GetDevice ( &pDevice );
-    m_DebugInfo.cloneResult = m_pD3DEffect->CloneEffect ( pDevice, &pNewD3DEffect );
+    outHResult = m_pD3DEffect->CloneEffect ( pDevice, &pNewD3DEffect );
 
+    m_DebugInfo.cloneResult = outHResult;
     if ( !pNewD3DEffect )
     {
         m_DebugInfo.uiCloneFailCount++;
