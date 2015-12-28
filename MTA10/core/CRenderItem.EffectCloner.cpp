@@ -28,7 +28,7 @@ public:
     virtual void            ReleaseD3DEffect        ( ID3DXEffect* pD3DEffect );
 
     // CEffectClonerImpl
-    void                    MaybeTidyUp             ( void );
+    void                    MaybeTidyUp             ( bool bForceDrasticMeasures = false );
 
     CElapsedTime                                m_TidyupTimer;
     CRenderItemManager*                         m_pManager;
@@ -105,12 +105,19 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
     // Need to create new EffectTemplate?
     if ( !pEffectTemplate )
     {
-        pEffectTemplate = NewEffectTemplate ( m_pManager, strFilename, strRootPath, strOutStatus, bDebug );
-        if ( !pEffectTemplate->IsValid () )
+        for( uint i = 0 ; i < 2 ; i++ )
+        {
+            HRESULT hr;
+            pEffectTemplate = NewEffectTemplate ( m_pManager, strFilename, strRootPath, strOutStatus, bDebug, hr );
+            if ( pEffectTemplate || hr != E_OUTOFMEMORY || i > 0 )
+                break;
+            // Remove unused effects from memory any try again
+            AddReportLog( 7542, SString( "NewEffectTemplate E_OUTOFMEMORY - Attempting to free unused resources (%s) %s", *strOutStatus, *strFilename ) );
+            MaybeTidyUp( true );
+        }
+        if ( !pEffectTemplate )
         {
             AddReportLog( 7544, SString( "NewEffectTemplate failed (%s) %s", *strOutStatus, *strFilename ) );
-            SAFE_RELEASE( pEffectTemplate );
-            return NULL;
         }
 
         OutputDebugLine ( SString ( "[Shader] CEffectClonerImpl::CreateD3DEffect - New EffectTemplate for %s", *strFilename ) );
@@ -124,7 +131,17 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
     //
 
     // Clone D3DXEffect
-    ID3DXEffect* pNewD3DEffect = pEffectTemplate->CloneD3DEffect ( strOutStatus, bOutUsesVertexShader, bOutUsesDepthBuffer);
+    ID3DXEffect* pNewD3DEffect;
+    for( uint i = 0 ; i < 2 ; i++ )
+    {
+        HRESULT hr;
+        pNewD3DEffect = pEffectTemplate->CloneD3DEffect ( strOutStatus, bOutUsesVertexShader, bOutUsesDepthBuffer, hr );
+        if ( !pNewD3DEffect || hr != E_OUTOFMEMORY || i > 0 )
+            break;
+        // Remove unused effects from memory any try again
+        AddReportLog( 7543, SString( "CloneD3DEffect E_OUTOFMEMORY - Attempting to free unused resources (%s) %s", *strOutStatus, *strFilename ) );
+        MaybeTidyUp( true );
+    }
 
     if( !pNewD3DEffect )
     {
@@ -210,9 +227,9 @@ void CEffectClonerImpl::DoPulse ( void )
 // Tidy up if been a little while since last time
 //
 ////////////////////////////////////////////////////////////////
-void CEffectClonerImpl::MaybeTidyUp ( void )
+void CEffectClonerImpl::MaybeTidyUp ( bool bForceDrasticMeasures )
 {
-    if ( m_TidyupTimer.Get () < 1000 )
+    if ( !bForceDrasticMeasures && m_TidyupTimer.Get () < 1000 )
         return;
 
     m_TidyupTimer.Reset ();
@@ -221,9 +238,9 @@ void CEffectClonerImpl::MaybeTidyUp ( void )
     for ( uint i = 0 ; i < m_OldList.size () ; i++ )
     {
         CEffectTemplate* pEffectTemplate = m_OldList[i];
-        if ( pEffectTemplate->GetTicksSinceLastUsed () > 0 )
+        if ( pEffectTemplate->GetTicksSinceLastUsed () > ( bForceDrasticMeasures ? 0 : 1 ) )
         {
-            OutputDebugLine ( "[Shader] CEffectClonerImpl::MaybeTidyUp: Releasing old EffectTemplate" );
+            OutputDebugLine ( "[Shader] CEffectClonerImpl::MaybeTidyUp: Releasing old EffectTemplate" );                
             SAFE_RELEASE( pEffectTemplate );
             ListRemoveIndex ( m_OldList, i-- );
         }
@@ -242,7 +259,7 @@ void CEffectClonerImpl::MaybeTidyUp ( void )
     for ( std::map < SString, CEffectTemplate* >::iterator iter = m_ValidMap.begin () ; iter != m_ValidMap.end () ; )
     {
         CEffectTemplate* pEffectTemplate = iter->second;
-        if ( pEffectTemplate->GetTicksSinceLastUsed () > iTicks )
+        if ( pEffectTemplate->GetTicksSinceLastUsed () > ( bForceDrasticMeasures ? 0 : iTicks ) )
         {
             OutputDebugLine ( "[Shader] CEffectClonerImpl::MaybeTidyUp: Releasing valid EffectTemplate" );
             SAFE_RELEASE( pEffectTemplate );
@@ -250,5 +267,10 @@ void CEffectClonerImpl::MaybeTidyUp ( void )
         }
         else
             ++iter;
+    }
+
+    if ( bForceDrasticMeasures )
+    {
+        CGraphics::GetSingleton().GetDevice()->EvictManagedResources();
     }
 }

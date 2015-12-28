@@ -42,7 +42,7 @@ class CEffectTemplate : public CRenderItem
 
     virtual bool            HaveFilesChanged        ( void ) = 0;
     virtual int             GetTicksSinceLastUsed   ( void ) = 0;
-    virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer ) = 0;
+    virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, HRESULT& outHResult ) = 0;
     virtual void            UnCloneD3DEffect        ( ID3DXEffect* pD3DEffect ) = 0;
 
     // Debugging #9085 - CloneEffect fail
@@ -56,4 +56,4 @@ class CEffectTemplate : public CRenderItem
     virtual const SDebugInfo& GetDebugInfo          ( void ) = 0;
 };
 
-CEffectTemplate* NewEffectTemplate ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
+CEffectTemplate* NewEffectTemplate ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug, HRESULT& outHResult );
