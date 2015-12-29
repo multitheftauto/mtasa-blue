@@ -118,6 +118,7 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
         if ( !pEffectTemplate )
         {
             AddReportLog( 7544, SString( "NewEffectTemplate failed (%s) %s", *strOutStatus, *strFilename ) );
+            return NULL;
         }
 
         OutputDebugLine ( SString ( "[Shader] CEffectClonerImpl::CreateD3DEffect - New EffectTemplate for %s", *strFilename ) );
@@ -240,7 +241,7 @@ void CEffectClonerImpl::MaybeTidyUp ( bool bForceDrasticMeasures )
         CEffectTemplate* pEffectTemplate = m_OldList[i];
         if ( pEffectTemplate->GetTicksSinceLastUsed () > ( bForceDrasticMeasures ? 0 : 1 ) )
         {
-            OutputDebugLine ( "[Shader] CEffectClonerImpl::MaybeTidyUp: Releasing old EffectTemplate" );                
+            OutputDebugLine ( "[Shader] CEffectClonerImpl::MaybeTidyUp: Releasing old EffectTemplate" );
             SAFE_RELEASE( pEffectTemplate );
             ListRemoveIndex ( m_OldList, i-- );
         }
