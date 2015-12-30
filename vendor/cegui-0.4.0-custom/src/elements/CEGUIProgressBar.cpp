@@ -71,6 +71,9 @@ ProgressBar::~ProgressBar(void)
 *************************************************************************/
 void ProgressBar::setProgress(float progress)
 {
+    if ( std::isnan( progress ) )
+        progress = 0;
+
 	// legal progress rangeis : 0.0f <= progress <= 1.0f
 	progress = (progress < 0.0f) ? 0.0f : (progress > 1.0f) ? 1.0f : progress;
 
