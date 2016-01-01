@@ -462,6 +462,7 @@ public:
         SResourceMemory DynamicIndexBuffer;
         SResourceMemory StaticTexture;
         SResourceMemory DynamicTexture;
+        SResourceMemory Effect;
     };
 
     struct SStreamSourceState

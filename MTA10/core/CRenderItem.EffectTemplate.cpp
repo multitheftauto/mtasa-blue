@@ -9,7 +9,7 @@
 
 #include "StdInc.h"
 #include "CRenderItem.EffectCloner.h"
-
+#include "CProxyDirect3DEffect.h"
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -273,7 +273,7 @@ void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, con
     SString strMetaPath = strFilename.Right ( strFilename.length () - strRootPath.length () );
     CIncludeManager IncludeManager ( strRootPath, ExtractPath ( strMetaPath ) );
     LPD3DXBUFFER pBufferErrors = NULL;
-    m_CreateHResult = D3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
+    m_CreateHResult = MyD3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
 
     // Handle compile errors
     strOutStatus = "";

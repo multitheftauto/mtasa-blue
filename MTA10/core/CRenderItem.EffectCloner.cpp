@@ -110,7 +110,11 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
             HRESULT hr;
             pEffectTemplate = NewEffectTemplate ( m_pManager, strFilename, strRootPath, strOutStatus, bDebug, hr );
             if ( pEffectTemplate || hr != E_OUTOFMEMORY || i > 0 )
+            {
+                if ( i > 0 )
+                    AddReportLog( 7547, SString( "NewEffectTemplate - Free unused resources success! %s", *strFilename ) );
                 break;
+            }
             // Remove unused effects from memory any try again
             AddReportLog( 7542, SString( "NewEffectTemplate E_OUTOFMEMORY - Attempting to free unused resources (%s) %s", *strOutStatus, *strFilename ) );
             MaybeTidyUp( true );
@@ -137,8 +141,12 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
     {
         HRESULT hr;
         pNewD3DEffect = pEffectTemplate->CloneD3DEffect ( strOutStatus, bOutUsesVertexShader, bOutUsesDepthBuffer, hr );
-        if ( !pNewD3DEffect || hr != E_OUTOFMEMORY || i > 0 )
+        if ( pNewD3DEffect || hr != E_OUTOFMEMORY || i > 0 )
+        {
+            if ( i > 0 )
+                AddReportLog( 7548, SString( "CloneD3DEffect - Free unused resources success! %s", *strFilename ) );
             break;
+        }
         // Remove unused effects from memory any try again
         AddReportLog( 7543, SString( "CloneD3DEffect E_OUTOFMEMORY - Attempting to free unused resources (%s) %s", *strOutStatus, *strFilename ) );
         MaybeTidyUp( true );
@@ -153,13 +161,16 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
         m_uiCloneFailTotalCount++;
         {
             CEffectTemplate::SDebugInfo debugInfo = pEffectTemplate->GetDebugInfo();
-            SString strMessage( "CloneEffect failed %08x age:%d [fail:%d success:%d] [totfail:%d totsuccess:%d] '%s'"
+            SString strMessage( "CloneEffect failed %08x age:%d [clnfail:%d clnsuccess:%d] [totfail:%d totsuccess:%d] [effects cur:%d created:%d dest:%d] '%s'"
                                     ,debugInfo.cloneResult
                                     ,( CTickCount::Now() - debugInfo.createTime ).ToInt()
                                     ,debugInfo.uiCloneFailCount
                                     ,debugInfo.uiCloneSuccessCount
                                     ,m_uiCloneFailTotalCount
                                     ,m_uiCloneSuccessTotalCount
+                                    ,g_pDeviceState->MemoryState.Effect.iCurrentCount
+                                    ,g_pDeviceState->MemoryState.Effect.iCreatedCount
+                                    ,g_pDeviceState->MemoryState.Effect.iDestroyedCount
                                     ,*strFilename
                                 );
             AddReportLog( 7545, strMessage, 20 );
@@ -167,7 +178,7 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
         if ( pEffectTemplatePrevDebug )
         {
             CEffectTemplate::SDebugInfo debugInfo = pEffectTemplatePrevDebug->GetDebugInfo();
-            SString strMessage( "CloneEffect PrevInfo: %08x age:%d [fail:%d success:%d]"
+            SString strMessage( "CloneEffect PrevInfo: %08x age:%d [clnfail:%d clnsuccess:%d]"
                                     ,debugInfo.cloneResult
                                     ,( CTickCount::Now() - debugInfo.createTime ).ToInt()
                                     ,debugInfo.uiCloneFailCount
