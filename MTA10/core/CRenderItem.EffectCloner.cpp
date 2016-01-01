@@ -28,7 +28,7 @@ public:
     virtual void            ReleaseD3DEffect        ( ID3DXEffect* pD3DEffect );
 
     // CEffectClonerImpl
-    void                    MaybeTidyUp             ( bool bForceDrasticMeasures = false );
+    void                    MaybeTidyUp             ( bool bForceDrasticMeasures = false, CEffectTemplate* pKeepThis = NULL );
 
     CElapsedTime                                m_TidyupTimer;
     CRenderItemManager*                         m_pManager;
@@ -102,32 +102,41 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
         }
     }
 
+    static uint uiCallCount = 0;
+    uiCallCount++;
+
     // Need to create new EffectTemplate?
     if ( !pEffectTemplate )
     {
+        SString strReport;
+        HRESULT hr;
         for( uint i = 0 ; i < 2 ; i++ )
         {
-            HRESULT hr;
             pEffectTemplate = NewEffectTemplate ( m_pManager, strFilename, strRootPath, strOutStatus, bDebug, hr );
             if ( pEffectTemplate || hr != E_OUTOFMEMORY || i > 0 )
             {
-                if ( i > 0 )
-                    AddReportLog( 7547, SString( "NewEffectTemplate - Free unused resources success! %s", *strFilename ) );
+                if ( pEffectTemplate && i > 0 )
+                    strReport += "[Free unused resources success]";
                 break;
             }
             // Remove unused effects from memory any try again
-            AddReportLog( 7542, SString( "NewEffectTemplate E_OUTOFMEMORY - Attempting to free unused resources (%s) %s", *strOutStatus, *strFilename ) );
+            strReport += "[E_OUTOFMEMORY]";
             MaybeTidyUp( true );
         }
         if ( !pEffectTemplate )
         {
-            AddReportLog( 7544, SString( "NewEffectTemplate failed (%s) %s", *strOutStatus, *strFilename ) );
-            return NULL;
+            strReport += SString( "[failed %08x %s]", hr, *strOutStatus );
+        }
+        else
+        {
+            // Add to active map
+            MapSet ( m_ValidMap, ConformPathForSorting ( strFilename ), pEffectTemplate );
         }
 
-        OutputDebugLine ( SString ( "[Shader] CEffectClonerImpl::CreateD3DEffect - New EffectTemplate for %s", *strFilename ) );
-        // Add to active map
-        MapSet ( m_ValidMap, ConformPathForSorting ( strFilename ), pEffectTemplate );
+        if ( !strReport.empty() )
+            AddReportLog( 7544, SString( "NewEffectTemplate (call:%d) %s %s", uiCallCount, *strReport, *strFilename ) );
+        if ( !pEffectTemplate )
+            return NULL;
     }
 
 
@@ -137,20 +146,27 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
 
     // Clone D3DXEffect
     ID3DXEffect* pNewD3DEffect;
+    SString strReport;
+    HRESULT hr;
     for( uint i = 0 ; i < 2 ; i++ )
     {
-        HRESULT hr;
         pNewD3DEffect = pEffectTemplate->CloneD3DEffect ( strOutStatus, bOutUsesVertexShader, bOutUsesDepthBuffer, hr );
         if ( pNewD3DEffect || hr != E_OUTOFMEMORY || i > 0 )
         {
-            if ( i > 0 )
-                AddReportLog( 7548, SString( "CloneD3DEffect - Free unused resources success! %s", *strFilename ) );
+            if ( pNewD3DEffect && i > 0 )
+                strReport += "[Free unused resources success]";
             break;
         }
         // Remove unused effects from memory any try again
-        AddReportLog( 7543, SString( "CloneD3DEffect E_OUTOFMEMORY - Attempting to free unused resources (%s) %s", *strOutStatus, *strFilename ) );
-        MaybeTidyUp( true );
+        strReport += "[E_OUTOFMEMORY]";
+        MaybeTidyUp( true, pEffectTemplate );
     }
+
+    if( !pNewD3DEffect )
+        strReport += SString( "[failed %08x %s]", hr, *strOutStatus );
+
+    if ( !strReport.empty() )
+        AddReportLog( 7544, SString( "CloneD3DEffect (call:%d) %s %s", uiCallCount, *strReport, *strFilename ) );
 
     if( !pNewD3DEffect )
     {
@@ -239,7 +255,7 @@ void CEffectClonerImpl::DoPulse ( void )
 // Tidy up if been a little while since last time
 //
 ////////////////////////////////////////////////////////////////
-void CEffectClonerImpl::MaybeTidyUp ( bool bForceDrasticMeasures )
+void CEffectClonerImpl::MaybeTidyUp ( bool bForceDrasticMeasures, CEffectTemplate* pKeepThis )
 {
     if ( !bForceDrasticMeasures && m_TidyupTimer.Get () < 1000 )
         return;
@@ -250,7 +266,7 @@ void CEffectClonerImpl::MaybeTidyUp ( bool bForceDrasticMeasures )
     for ( uint i = 0 ; i < m_OldList.size () ; i++ )
     {
         CEffectTemplate* pEffectTemplate = m_OldList[i];
-        if ( pEffectTemplate->GetTicksSinceLastUsed () > ( bForceDrasticMeasures ? 0 : 1 ) )
+        if ( pEffectTemplate != pKeepThis && pEffectTemplate->GetTicksSinceLastUsed () > ( bForceDrasticMeasures ? 0 : 1 ) )
         {
             OutputDebugLine ( "[Shader] CEffectClonerImpl::MaybeTidyUp: Releasing old EffectTemplate" );
             SAFE_RELEASE( pEffectTemplate );
@@ -271,7 +287,7 @@ void CEffectClonerImpl::MaybeTidyUp ( bool bForceDrasticMeasures )
     for ( std::map < SString, CEffectTemplate* >::iterator iter = m_ValidMap.begin () ; iter != m_ValidMap.end () ; )
     {
         CEffectTemplate* pEffectTemplate = iter->second;
-        if ( pEffectTemplate->GetTicksSinceLastUsed () > ( bForceDrasticMeasures ? 0 : iTicks ) )
+        if ( pEffectTemplate != pKeepThis && pEffectTemplate->GetTicksSinceLastUsed () > ( bForceDrasticMeasures ? 0 : iTicks ) )
         {
             OutputDebugLine ( "[Shader] CEffectClonerImpl::MaybeTidyUp: Releasing valid EffectTemplate" );
             SAFE_RELEASE( pEffectTemplate );
