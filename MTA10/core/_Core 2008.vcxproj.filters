@@ -359,6 +359,9 @@
     <ClCompile Include="CWebDevTools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CProxyDirect3DEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CAdditionalVertexStreamManager.h">
@@ -1256,6 +1259,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CWebDevTools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CProxyDirect3DEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

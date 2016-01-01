@@ -282,6 +282,7 @@
     </ClCompile>
     <ClCompile Include="CProxyDirect3D9.cpp" />
     <ClCompile Include="CProxyDirect3DDevice9.cpp" />
+    <ClCompile Include="CProxyDirect3DEffect.cpp" />
     <ClCompile Include="CProxyDirect3DIndexBuffer.cpp" />
     <ClCompile Include="CProxyDirect3DTexture.cpp" />
     <ClCompile Include="CProxyDirect3DVertexBuffer.cpp" />
@@ -453,6 +454,7 @@
     <ClInclude Include="CProxyDirect3D9.h" />
     <ClInclude Include="CProxyDirect3DDevice8.h" />
     <ClInclude Include="CProxyDirect3DDevice9.h" />
+    <ClInclude Include="CProxyDirect3DEffect.h" />
     <ClInclude Include="CProxyDirect3DIndexBuffer.h" />
     <ClInclude Include="CProxyDirect3DTexture.h" />
     <ClInclude Include="CProxyDirect3DVertexBuffer.h" />

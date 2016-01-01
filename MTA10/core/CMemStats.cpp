@@ -432,15 +432,18 @@ void CMemStats::UpdateFrameStats ( void )
 
     static CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &m_MemStatsNow.d3dMemory.StaticVertexBuffer, &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
                                                                                 &m_MemStatsNow.d3dMemory.StaticIndexBuffer, &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture };
+                                                                                &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture,
+                                                                                &m_MemStatsNow.d3dMemory.Effect };
 
     static CProxyDirect3DDevice9::SResourceMemory* const maxList[] = {    &m_MemStatsMax.d3dMemory.StaticVertexBuffer, &m_MemStatsMax.d3dMemory.DynamicVertexBuffer,
                                                                                 &m_MemStatsMax.d3dMemory.StaticIndexBuffer, &m_MemStatsMax.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsMax.d3dMemory.StaticTexture, &m_MemStatsMax.d3dMemory.DynamicTexture };
+                                                                                &m_MemStatsMax.d3dMemory.StaticTexture, &m_MemStatsMax.d3dMemory.DynamicTexture,
+                                                                                &m_MemStatsMax.d3dMemory.Effect };
 
     CProxyDirect3DDevice9::SResourceMemory* const prevList[] = {   &m_MemStatsPrev.d3dMemory.StaticVertexBuffer, &m_MemStatsPrev.d3dMemory.DynamicVertexBuffer,
                                                                                 &m_MemStatsPrev.d3dMemory.StaticIndexBuffer, &m_MemStatsPrev.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsPrev.d3dMemory.StaticTexture, &m_MemStatsPrev.d3dMemory.DynamicTexture };
+                                                                                &m_MemStatsPrev.d3dMemory.StaticTexture, &m_MemStatsPrev.d3dMemory.DynamicTexture,
+                                                                                &m_MemStatsPrev.d3dMemory.Effect };
 
     for ( uint i = 0 ; i < NUMELMS( nowList ) ; i++ )
     {
@@ -554,19 +557,23 @@ void CMemStats::UpdateIntervalStats ( void )
 
     static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &m_MemStatsNow.d3dMemory.StaticVertexBuffer, &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
                                                                                 &m_MemStatsNow.d3dMemory.StaticIndexBuffer, &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture };
+                                                                                &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture,
+                                                                                &m_MemStatsNow.d3dMemory.Effect };
 
     static const CProxyDirect3DDevice9::SResourceMemory* const prevList[] = {   &m_MemStatsPrev.d3dMemory.StaticVertexBuffer, &m_MemStatsPrev.d3dMemory.DynamicVertexBuffer,
                                                                                 &m_MemStatsPrev.d3dMemory.StaticIndexBuffer, &m_MemStatsPrev.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsPrev.d3dMemory.StaticTexture, &m_MemStatsPrev.d3dMemory.DynamicTexture };
+                                                                                &m_MemStatsPrev.d3dMemory.StaticTexture, &m_MemStatsPrev.d3dMemory.DynamicTexture,
+                                                                                &m_MemStatsPrev.d3dMemory.Effect };
 
     static CProxyDirect3DDevice9::SResourceMemory* const deltaList[] = {        &m_MemStatsDelta.d3dMemory.StaticVertexBuffer, &m_MemStatsDelta.d3dMemory.DynamicVertexBuffer,
                                                                                 &m_MemStatsDelta.d3dMemory.StaticIndexBuffer, &m_MemStatsDelta.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsDelta.d3dMemory.StaticTexture, &m_MemStatsDelta.d3dMemory.DynamicTexture };
+                                                                                &m_MemStatsDelta.d3dMemory.StaticTexture, &m_MemStatsDelta.d3dMemory.DynamicTexture,
+                                                                                &m_MemStatsDelta.d3dMemory.Effect };
 
     static const CProxyDirect3DDevice9::SResourceMemory* const maxList[] = {    &m_MemStatsMax.d3dMemory.StaticVertexBuffer, &m_MemStatsMax.d3dMemory.DynamicVertexBuffer,
                                                                                 &m_MemStatsMax.d3dMemory.StaticIndexBuffer, &m_MemStatsMax.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsMax.d3dMemory.StaticTexture, &m_MemStatsMax.d3dMemory.DynamicTexture };
+                                                                                &m_MemStatsMax.d3dMemory.StaticTexture, &m_MemStatsMax.d3dMemory.DynamicTexture,
+                                                                                &m_MemStatsMax.d3dMemory.Effect };
 
     for ( uint i = 0 ; i < NUMELMS( nowList ) ; i++ )
     {
@@ -721,16 +728,19 @@ void CMemStats::CreateTables ( void )
     DynamicIndexBuffer      1     1      1      10     1000
     StaticTexture           1     1      1      10     1000
     DynamicTexture          1     1      1      10     1000
+    Effect                  1     1      1      10     1000
 */
-        static const char* const nameList[] = {  "Vertices", "Vertices dynamic", "Indices", "Indices dynamic", "Textures", "Textures dynamic" };
+        static const char* const nameList[] = {  "Vertices", "Vertices dynamic", "Indices", "Indices dynamic", "Textures", "Textures dynamic", "Effects" };
 
         static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &m_MemStatsNow.d3dMemory.StaticVertexBuffer, &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
                                                                                     &m_MemStatsNow.d3dMemory.StaticIndexBuffer, &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
-                                                                                    &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture };
+                                                                                    &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture,
+                                                                                    &m_MemStatsNow.d3dMemory.Effect };
 
         static const CProxyDirect3DDevice9::SResourceMemory* const deltaList[] = {  &m_MemStatsDelta.d3dMemory.StaticVertexBuffer, &m_MemStatsDelta.d3dMemory.DynamicVertexBuffer,
                                                                                     &m_MemStatsDelta.d3dMemory.StaticIndexBuffer, &m_MemStatsDelta.d3dMemory.DynamicIndexBuffer,
-                                                                                    &m_MemStatsDelta.d3dMemory.StaticTexture, &m_MemStatsDelta.d3dMemory.DynamicTexture };
+                                                                                    &m_MemStatsDelta.d3dMemory.StaticTexture, &m_MemStatsDelta.d3dMemory.DynamicTexture,
+                                                                                    &m_MemStatsDelta.d3dMemory.Effect };
 
         m_TableList.push_back ( CDxTable ( "|" ) );
         CDxTable& table = m_TableList.back ();
