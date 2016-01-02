@@ -1757,15 +1757,18 @@ const char* CStaticFunctionDefinitions::GetPedSimplestTask ( CClientPed& Ped )
                     break;
             }
         }
-        CTask* pTempTask = pTask->GetSubTask ();
-        while ( pTempTask )
-        {
-            pTask = pTempTask;
-            pTempTask = pTempTask->GetSubTask ();
-        }
         if ( pTask )
         {
-            return pTask->GetTaskName ();
+            CTask* pTempTask = pTask->GetSubTask ();
+            while ( pTempTask )
+            {
+                pTask = pTempTask;
+                pTempTask = pTempTask->GetSubTask ();
+            }
+            if ( pTask )
+            {
+                return pTask->GetTaskName ();
+            }
         }
     }
 
