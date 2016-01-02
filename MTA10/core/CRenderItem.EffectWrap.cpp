@@ -593,7 +593,8 @@ void CEffectWrapImpl::CreateUnderlyingData ( const SString& strFilename, const S
     m_uiSaveStateFlags = D3DXFX_DONOTSAVESHADERSTATE;     // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
 
     // Fetch compiled D3DEffect
-    m_pD3DEffect = m_pManager->GetEffectCloner ()->CreateD3DEffect ( strFilename, strRootPath, strOutStatus, m_bUsesVertexShader, m_bUsesDepthBuffer, bDebug );
+    m_ppD3DEffect = m_pManager->GetEffectCloner ()->CreateD3DEffect ( strFilename, strRootPath, strOutStatus, m_bUsesVertexShader, m_bUsesDepthBuffer, bDebug );
+    m_pD3DEffect = m_ppD3DEffect ? *m_ppD3DEffect : NULL;
 
     if ( !m_pD3DEffect )
         return;
@@ -628,7 +629,8 @@ void CEffectWrapImpl::ReleaseUnderlyingData ( void )
 {
     if ( m_pD3DEffect )
     {
-        m_pManager->GetEffectCloner ()->ReleaseD3DEffect ( m_pD3DEffect );
+        m_pManager->GetEffectCloner ()->ReleaseD3DEffect ( m_ppD3DEffect );
+        m_ppD3DEffect = NULL;
         m_pD3DEffect = NULL;
     }
 }

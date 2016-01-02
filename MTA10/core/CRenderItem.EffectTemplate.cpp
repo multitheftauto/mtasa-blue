@@ -44,7 +44,7 @@ public:
     bool                                m_bHaveFilesChanged;
     std::map < SString, SString >       m_FileMD5Map;
     CTickCount                          m_TickCountLastUsed;
-    std::set < ID3DXEffect* >           m_CloneList;
+    uint                                m_uiCloneCount;
     SDebugInfo                          m_DebugInfo;
     HRESULT                             m_CreateHResult;
 };
@@ -193,7 +193,7 @@ void CEffectTemplateImpl::PreDestruct ( void )
 ////////////////////////////////////////////////////////////////
 int CEffectTemplateImpl::GetTicksSinceLastUsed ( void )
 {
-    if ( !m_CloneList.empty () )
+    if ( m_uiCloneCount != 0 )
         return 0;   // Used right now
 
     CTickCount delta = CTickCount::Now ( true ) - m_TickCountLastUsed;
@@ -445,9 +445,9 @@ ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& 
 {
     // Clone D3DXEffect
     ID3DXEffect* pNewD3DEffect = NULL;
-    LPDIRECT3DDEVICE9 pDevice = NULL;
-    m_pD3DEffect->GetDevice ( &pDevice );
-    outHResult = m_pD3DEffect->CloneEffect ( pDevice, &pNewD3DEffect );
+    outHResult = D3D_OK;
+    pNewD3DEffect = m_pD3DEffect;
+    pNewD3DEffect->AddRef();
 
     m_DebugInfo.cloneResult = outHResult;
     if ( !pNewD3DEffect )
@@ -489,8 +489,7 @@ ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& 
     bOutUsesDepthBuffer = m_bUsesDepthBuffer;
 
     // Add to list of clones
-    assert ( !MapContains ( m_CloneList, pNewD3DEffect ) );
-    MapInsert ( m_CloneList, pNewD3DEffect );
+    m_uiCloneCount++;
     return pNewD3DEffect;
 }
 
@@ -504,10 +503,10 @@ ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& 
 ////////////////////////////////////////////////////////////////
 void CEffectTemplateImpl::UnCloneD3DEffect ( ID3DXEffect* pOldD3DEffect )
 {
-    assert ( MapContains ( m_CloneList, pOldD3DEffect ) );
-    MapRemove ( m_CloneList, pOldD3DEffect );
+    assert( m_uiCloneCount > 0 );
+    m_uiCloneCount--;
 
-    if ( m_CloneList.empty () )
+    if ( m_uiCloneCount == 0 )
         m_TickCountLastUsed = CTickCount::Now ( true );
 
     SAFE_RELEASE( pOldD3DEffect );

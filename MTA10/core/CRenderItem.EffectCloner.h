@@ -20,8 +20,8 @@ class CEffectCloner
 public:
     virtual                 ~CEffectCloner      ( void ) {}
     virtual void            DoPulse             ( void ) = 0;
-    virtual ID3DXEffect*    CreateD3DEffect     ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, bool bDebug ) = 0;
-    virtual void            ReleaseD3DEffect    ( ID3DXEffect* pD3DEffect ) = 0;
+    virtual ID3DXEffect**   CreateD3DEffect     ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, bool bDebug ) = 0;
+    virtual void            ReleaseD3DEffect    ( ID3DXEffect** pD3DEffect ) = 0;
 };
 
 CEffectCloner* NewEffectCloner ( CRenderItemManager* pManager );
