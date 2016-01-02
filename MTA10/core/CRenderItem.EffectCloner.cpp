@@ -24,15 +24,15 @@ public:
                             CEffectClonerImpl       ( CRenderItemManager* pManager );
     virtual                 ~CEffectClonerImpl      ( void );
     virtual void            DoPulse                 ( void );
-    virtual ID3DXEffect*    CreateD3DEffect         ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, bool bDebug );
-    virtual void            ReleaseD3DEffect        ( ID3DXEffect* pD3DEffect );
+    virtual ID3DXEffect**   CreateD3DEffect         ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, bool bDebug );
+    virtual void            ReleaseD3DEffect        ( ID3DXEffect** pD3DEffect );
 
     // CEffectClonerImpl
     void                    MaybeTidyUp             ( bool bForceDrasticMeasures = false, CEffectTemplate* pKeepThis = NULL );
 
     CElapsedTime                                m_TidyupTimer;
     CRenderItemManager*                         m_pManager;
-    std::map < ID3DXEffect*, CEffectTemplate* > m_CloneMap;
+    std::map < ID3DXEffect**, CEffectTemplate* > m_CloneMap;
     std::map < SString, CEffectTemplate* >      m_ValidMap;        // Active and files not changed since first created   
     std::vector < CEffectTemplate* >            m_OldList;         // Active but files changed since first created
     uint                                        m_uiCloneFailTotalCount;
@@ -84,7 +84,7 @@ CEffectClonerImpl::~CEffectClonerImpl ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, bool bDebug )
+ID3DXEffect** CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, bool bDebug )
 {
     // Do we have a match with the initial path
     CEffectTemplate* pEffectTemplate = MapFindRef ( m_ValidMap, ConformPathForSorting ( strFilename ) );
@@ -134,7 +134,10 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
         }
 
         if ( !strReport.empty() )
+        {
+            strReport += SString( "[effects cur:%d created:%d dest:%d]", g_pDeviceState->MemoryState.Effect.iCurrentCount, g_pDeviceState->MemoryState.Effect.iCreatedCount, g_pDeviceState->MemoryState.Effect.iDestroyedCount );
             AddReportLog( 7544, SString( "NewEffectTemplate (call:%d) %s %s", uiCallCount, *strReport, *strFilename ) );
+        }
         if ( !pEffectTemplate )
             return NULL;
     }
@@ -206,11 +209,14 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
     }
     m_uiCloneSuccessTotalCount++;
 
+    ID3DXEffect** ppNewD3DEffect = new ID3DXEffect*;
+    *ppNewD3DEffect = pNewD3DEffect;
+
     // Cross ref clone with original
-    MapSet ( m_CloneMap, pNewD3DEffect, pEffectTemplate );
+    MapSet ( m_CloneMap, ppNewD3DEffect, pEffectTemplate );
 
     // Return result
-    return pNewD3DEffect;
+    return ppNewD3DEffect;
 }
 
 
@@ -221,15 +227,17 @@ ID3DXEffect* CEffectClonerImpl::CreateD3DEffect ( const SString& strFilename, co
 // Remove all refs to the d3d effect
 //
 ////////////////////////////////////////////////////////////////
-void CEffectClonerImpl::ReleaseD3DEffect ( ID3DXEffect* pD3DEffect )
+void CEffectClonerImpl::ReleaseD3DEffect ( ID3DXEffect** ppD3DEffect )
 {
     // Find pEffectTemplate from which this d3d effect was cloned from
-    CEffectTemplate* pEffectTemplate = MapFindRef ( m_CloneMap, pD3DEffect );
+    CEffectTemplate* pEffectTemplate = MapFindRef ( m_CloneMap, ppD3DEffect );
     assert ( pEffectTemplate );
 
     // Remove from clone map
-    MapRemove ( m_CloneMap, pD3DEffect );
+    MapRemove ( m_CloneMap, ppD3DEffect );
 
+    ID3DXEffect* pD3DEffect = *ppD3DEffect;
+    delete ppD3DEffect;
     // Remove from pEffectTemplate. This will alse release the d3d effect.
     pEffectTemplate->UnCloneD3DEffect ( pD3DEffect );
 }
