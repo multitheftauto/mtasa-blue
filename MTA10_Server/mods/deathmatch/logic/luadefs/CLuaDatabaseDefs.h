@@ -27,6 +27,7 @@ public:
     LUA_DECLARE_OOP ( DbQuery );
     LUA_DECLARE ( DbFree );
     LUA_DECLARE ( DbPoll );
+    LUA_DECLARE ( DbPrepareString );
 
     LUA_DECLARE ( ExecuteSQLCreateTable );
     LUA_DECLARE ( ExecuteSQLDropTable );
