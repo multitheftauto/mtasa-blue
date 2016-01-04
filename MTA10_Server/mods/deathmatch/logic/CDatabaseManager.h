@@ -148,6 +148,7 @@ public:
     virtual void                    DoPulse                 ( void ) = 0;
     virtual SConnectionHandle       Connect                 ( const SString& strType, const SString& strHost, const SString& strUsername = "", const SString& strPassword = "", const SString& strOptions = "" ) = 0;
     virtual bool                    Disconnect              ( SConnectionHandle hConnection ) = 0;
+    virtual SString                 PrepareString           ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
     virtual CDbJobData*             Exec                    ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
     virtual CDbJobData*             Execf                   ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
     virtual CDbJobData*             QueryStart              ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;

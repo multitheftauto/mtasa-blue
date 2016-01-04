@@ -34,6 +34,7 @@ public:
     virtual void                    DoPulse                     ( void );
     virtual SConnectionHandle       Connect                     ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
     virtual bool                    Disconnect                  ( SConnectionHandle hConnection );
+    virtual SString                 PrepareString               ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
     virtual CDbJobData*             Exec                        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
     virtual CDbJobData*             Execf                       ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
@@ -180,6 +181,29 @@ bool CDatabaseManagerImpl::Disconnect ( uint hConnection )
     MapRemove ( m_ConnectionTypeMap, hConnection );
     m_JobQueue->IgnoreConnectionResults ( hConnection );
     return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::PrepareString
+//
+// Safely insert supplied arguments into string
+//
+///////////////////////////////////////////////////////////////
+SString CDatabaseManagerImpl::PrepareString ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs )
+{
+    ClearLastErrorMessage ();
+
+    // Check connection
+    if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
+    {
+        SetLastErrorMessage ( "Invalid connection" );
+        return NULL;
+    }
+
+    // Insert arguments with correct escapement
+    return InsertQueryArguments ( hConnection, strQuery, pArgs );
 }
 
 

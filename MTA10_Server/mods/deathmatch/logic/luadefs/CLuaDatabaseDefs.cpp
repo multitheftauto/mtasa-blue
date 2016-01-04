@@ -18,6 +18,7 @@ void CLuaDatabaseDefs::LoadFunctions ()
     CLuaCFunctions::AddFunction ( "dbQuery", DbQuery );
     CLuaCFunctions::AddFunction ( "dbFree", DbFree );
     CLuaCFunctions::AddFunction ( "dbPoll", DbPoll );
+    CLuaCFunctions::AddFunction ( "dbPrepareString", DbPrepareString );
 
     CLuaCFunctions::AddFunction ( "executeSQLCreateTable", ExecuteSQLCreateTable );
     CLuaCFunctions::AddFunction ( "executeSQLDropTable", ExecuteSQLDropTable );
@@ -583,6 +584,36 @@ int CLuaDatabaseDefs::DbPoll ( lua_State* luaVM )
         return 3;
     }
     else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaDatabaseDefs::DbPrepareString ( lua_State* luaVM )
+{
+    //  string dbPrepareString ( element connection, string query, ... )
+    CDatabaseConnectionElement* pElement; SString strQuery; CLuaArguments Args;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pElement );
+    argStream.ReadString ( strQuery );
+    argStream.ReadLuaArguments ( Args );
+
+    if ( !argStream.HasErrors () )
+    {
+        SString strResult = g_pGame->GetDatabaseManager ()->PrepareString ( pElement->GetConnectionHandle (), strQuery, &Args );
+        SString strError = g_pGame->GetDatabaseManager ()->GetLastErrorMessage ();
+        if ( !strResult.empty () || strError.empty () )
+        {
+            lua_pushstring ( luaVM, strResult );
+            return 1;
+        }
+        if ( !g_pGame->GetDatabaseManager ()->IsLastErrorSuppressed () )
+            argStream.SetCustomError ( strError );
+    }
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
