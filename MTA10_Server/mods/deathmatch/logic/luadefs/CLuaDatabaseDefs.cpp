@@ -39,6 +39,7 @@ void CLuaDatabaseDefs::AddClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "create", "dbConnect" );
     lua_classfunction ( luaVM, "exec", "dbExec" );
+    lua_classfunction ( luaVM, "prepareString", "dbPrepareString" );
     lua_classfunction ( luaVM, "query", "dbQuery", OOP_DbQuery );
 
     lua_registerclass ( luaVM, "Connection", "Element" );
