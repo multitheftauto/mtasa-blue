@@ -112,8 +112,7 @@ public:
     virtual void                    ApplyHooks3                     ( bool bEnable ) = 0;
 
     virtual bool                    IsConnected                     ( void ) = 0;
-    virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true, bool bForceInternalHTTPServer = false ) = 0;
-    virtual bool                    ShouldUseInternalHTTPServer     ( void ) = 0;
+    virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true ) = 0;
 
     virtual const char *            GetModInstallRoot               ( const char * szModName )=0;
     virtual bool                    CheckDiskSpace                  ( uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10 )=0;

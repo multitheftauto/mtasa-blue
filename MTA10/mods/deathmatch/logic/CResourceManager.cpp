@@ -102,20 +102,8 @@ CResource* CResourceManager::GetResource ( const char* szResourceName )
     return NULL;
 }
 
-
 void CResourceManager::OnDownloadGroupFinished( void )
 {
-    // Clear downloading flags
-    for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
-    {
-        CResource* pResource = *iter;
-        if ( pResource->IsDownloading() )
-            pResource->SetIsDownloading( false );
-    }
-
-    // Start next download group
-    UpdatePendingDownloads();
-
     // Try to load newly ready resources
     for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
     {
@@ -123,54 +111,12 @@ void CResourceManager::OnDownloadGroupFinished( void )
         if ( !pResource->IsActive() )
         {
             // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
-            if ( pResource->HasPendingFileDownloads() || pResource->IsDownloading() )
+            if ( pResource->IsWaitingForInitialDownloads() )
                 break;
             pResource->Load();
         }
     }
 }
-
-
-void CResourceManager::UpdatePendingDownloads( void )
-{
-    // Check currently active group
-    int iGroup = g_pClientGame->GetActiveDownloadPriorityGroup();
-    if ( iGroup == INVALID_DOWNLOAD_PRIORITY_GROUP )
-    {
-        // If no group is active, then find highest priority to make active
-        for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
-        {
-            CResource* pResource = *iter;
-            if ( pResource->HasPendingFileDownloads() )
-            {
-                iGroup = Max( iGroup, pResource->GetDownloadPriorityGroup() );
-            }
-        }
-
-        // Anything to do?
-        if ( iGroup == INVALID_DOWNLOAD_PRIORITY_GROUP )
-        {
-            return;
-        }
-
-        // Make new group active
-        g_pClientGame->SetTransferringInitialFiles( true, iGroup );
-    }
-
-    // Do start matching groups
-    for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
-    {
-        CResource* pResource = *iter;
-        if ( pResource->HasPendingFileDownloads() )
-        {
-            if ( pResource->GetDownloadPriorityGroup() == iGroup )
-            {
-                pResource->StartPendingFileDownloads();
-            }
-        }
-    }
-}
-
 
 bool CResourceManager::RemoveResource ( unsigned short usNetID )
 {
@@ -310,7 +256,7 @@ void CResourceManager::ValidateResourceFile( const SString& strInFilename, const
     CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
     if ( pResourceFile )
     {
-        if ( pResourceFile->IsAutoDownload() && !pResourceFile->IsDownloaded() )
+        if ( !pResourceFile->IsAutoDownload() && !pResourceFile->IsDownloaded() )
         {
             // Scripting error
             g_pClientGame->GetScriptDebugging()->LogError( NULL, "Attempt to load '%s' before onClientFileDownloadComplete event", *ConformResourcePath( strInFilename ) );
@@ -336,7 +282,7 @@ void CResourceManager::ValidateResourceFile( const SString& strInFilename, const
                     AddReportLog( 7057, strMessage + g_pNet->GetConnectedServer( true ), 10 );
                 }
                 else
-                if ( !pResourceFile->IsAutoDownload() )
+                if ( pResourceFile->IsAutoDownload() )
                 {
                     char szMd5[33];
                     CMD5Hasher::ConvertToHex( checksum.md5, szMd5 );

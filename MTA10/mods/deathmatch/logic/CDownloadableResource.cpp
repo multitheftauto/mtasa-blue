@@ -13,38 +13,26 @@
 
 #include <StdInc.h>
 
-CDownloadableResource::CDownloadableResource ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum serverChecksum, bool bGenerateClientChecksum, bool bAutoDownload )
+CDownloadableResource::CDownloadableResource ( CResource* pResource, eResourceType resourceType, const char* szName, const char* szNameShort, uint uiDownloadSize, CChecksum serverChecksum, bool bAutoDownload )
 {
-    // Store the resource type
+    m_pResource = pResource;
     m_resourceType = resourceType;
-
-    // Store the name
     m_strName = szName;
-
-    // Store the  name (short)
     m_strNameShort = szNameShort;
-
-    // Store the server checksum
     m_ServerChecksum = serverChecksum;
-
-    // Check to see if the client checksum should be generated now
-    if ( bGenerateClientChecksum )
-    {
-        GenerateClientChecksum ();
-    }
-    else
-    {
-        // Default the last client checksum
-        m_LastClientChecksum = CChecksum ();
-    }
-
     m_bAutoDownload = bAutoDownload;
+    m_bInDownloadQueue = false;
     m_bDownloaded = false;
+    m_uiDownloadSize = uiDownloadSize;
+    m_uiHttpServerIndex = 0;
+
+    GenerateClientChecksum ();
     g_pClientGame->GetResourceManager()->OnAddResourceFile( this );
 }
 
 CDownloadableResource::~CDownloadableResource ( void )
 {
+    g_pClientGame->GetResourceFileDownloadManager()->OnRemoveResourceFile( this );
     g_pClientGame->GetResourceManager()->OnRemoveResourceFile( this );
 }
 
@@ -62,4 +50,9 @@ CChecksum CDownloadableResource::GenerateClientChecksum ( void )
 CChecksum CDownloadableResource::GetServerChecksum ( void )
 {
     return m_ServerChecksum;
+}
+
+int CDownloadableResource::GetDownloadPriorityGroup ( void )
+{
+    return m_pResource->GetDownloadPriorityGroup();
 }

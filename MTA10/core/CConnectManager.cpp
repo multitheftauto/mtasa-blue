@@ -29,7 +29,6 @@ CConnectManager::CConnectManager ( void )
     m_bIsDetectingVersion = false;
     m_bIsConnecting = false;
     m_bSave = true;
-    m_bForceInternalHTTPServer = false;
     m_tConnectStarted = 0;
 
     m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
@@ -52,7 +51,7 @@ CConnectManager::~CConnectManager ( void )
 }
 
 
-bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser, bool bForceInternalHTTPServer )
+bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser )
 {
     assert ( szHost );
     assert ( szNick );
@@ -100,7 +99,6 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_strPassword = szPassword;
     m_Address.s_addr = 0;
     m_usPort = usPort;
-    m_bForceInternalHTTPServer = bForceInternalHTTPServer;
     m_bSave = true;
 
     m_strLastHost = m_strHost;
@@ -144,7 +142,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_pServerItem = new CServerListItem ( m_Address, m_usPort );
     m_pServerItem->m_iTimeoutLength = 2000;
     m_bIsDetectingVersion = true;
-    OpenServerFirewall( m_Address );
+    OpenServerFirewall( m_Address, 80, true );
 
     // Display the status box
     SString strBuffer ( _("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort );
@@ -154,7 +152,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
 }
 
 
-bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave, bool bForceInternalHTTPServer )
+bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave )
 {
     // Use previous connection datum when function arguments are not set
     unsigned int uiPort = 0;
@@ -185,7 +183,6 @@ bool CConnectManager::Reconnect ( const char* szHost, unsigned short usPort, con
     m_bSave = bSave;
 
     m_bReconnect = true;
-    m_bForceInternalHTTPServer = bForceInternalHTTPServer;
 
     return true;
 }
@@ -336,7 +333,7 @@ void CConnectManager::DoPulse ( void )
     {
         std::string strNick;
         CVARS_GET ( "nick", strNick );
-        Connect ( m_strHost.c_str(), m_usPort, strNick.c_str(), m_strPassword.c_str(), false, m_bForceInternalHTTPServer );
+        Connect ( m_strHost.c_str(), m_usPort, strNick.c_str(), m_strPassword.c_str(), false );
         m_bReconnect = false;
     }
 }

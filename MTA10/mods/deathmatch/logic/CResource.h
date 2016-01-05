@@ -71,12 +71,8 @@ public:
     void                    Stop            ( void );
     SString                 GetState        ( void );
 
-    bool                    InDownloadQueue     ( void )            { return m_bInDownloadQueue; };
-    bool                    SetInDownloadQueue  ( bool bIn )        { m_bInDownloadQueue = bIn; };
-
-    CDownloadableResource*  QueueFile       ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload = true );
-
-    CDownloadableResource*  AddConfigFile   ( const char *szFileName, CChecksum serverChecksum );
+    CDownloadableResource*  AddResourceFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, uint uiDownloadSize, CChecksum serverChecksum, bool bAutoDownload );
+    CDownloadableResource*  AddConfigFile   ( const char *szFileName, uint uiDownloadSize, CChecksum serverChecksum );
 
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterBegin     ( void )        { return m_ConfigFiles.begin(); }
     inline std::list < class CResourceConfigItem* >::iterator    ConfigIterEnd       ( void )        { return m_ConfigFiles.end(); }
@@ -116,13 +112,9 @@ public:
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
     bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
     void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile );
-    void                    AddPendingFileDownload          ( const SString& strUrl, const SString& strFilename, double dDownloadSize );
-    void                    StartPendingFileDownloads       ( void );
-    bool                    HasPendingFileDownloads         ( void )                        { return !m_PendingFileDownloadList.empty(); }
+    bool                    IsWaitingForInitialDownloads    ( void );
     int                     GetDownloadPriorityGroup        ( void )                        { return m_iDownloadPriorityGroup; }
     void                    SetDownloadPriorityGroup        ( int iDownloadPriorityGroup )  { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
-    bool                    IsDownloading                   ( void )                        { return m_bIsDownloading; }
-    void                    SetIsDownloading                ( bool bIsDownloading )         { m_bIsDownloading = bIsDownloading; }
 
 private:
     unsigned short          m_usNetID;
@@ -140,15 +132,12 @@ private:
     class CClientEntity*    m_pResourceDFFEntity;
     class CClientEntity*    m_pResourceGUIEntity;
     class CClientEntity*    m_pResourceTXDRoot;
-    bool                    m_bInDownloadQueue;
     unsigned short          m_usRemainingNoClientCacheScripts;
     bool                    m_bLoadAfterReceivingNoClientCacheScripts;
     SString                 m_strMinServerReq;
     SString                 m_strMinClientReq;
     bool                    m_bOOPEnabled;
-    std::vector < SPendingFileDownload > m_PendingFileDownloadList;
     int                     m_iDownloadPriorityGroup;
-    bool                    m_bIsDownloading;
 
     // To control cursor show/hide
     static int              m_iShowingCursor;

@@ -428,6 +428,7 @@
     <ClCompile Include="..\shared_logic\CRemoteCalls.cpp" />
     <ClCompile Include="logic\CResource.cpp" />
     <ClCompile Include="logic\CResourceConfigItem.cpp" />
+    <ClCompile Include="logic\CResourceFileDownloadManager.cpp" />
     <ClCompile Include="logic\CResourceManager.cpp" />
     <ClCompile Include="logic\CScriptKeyBinds.cpp" />
     <ClCompile Include="logic\CServer.cpp" />
@@ -805,6 +806,7 @@
     <ClInclude Include="logic\CResource.h" />
     <ClInclude Include="logic\CResourceConfigItem.h" />
     <ClInclude Include="logic\CResourceFile.h" />
+    <ClInclude Include="logic\CResourceFileDownloadManager.h" />
     <ClInclude Include="logic\CResourceManager.h" />
     <ClInclude Include="logic\CScriptKeyBinds.h" />
     <ClInclude Include="logic\CServer.h" />

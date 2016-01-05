@@ -397,54 +397,35 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
     unsigned char ucHTTPDownloadType;
     bitStream.Read ( ucHTTPDownloadType );
 
-    g_pClientGame->m_usHTTPDownloadPort = 0;
-    g_pClientGame->m_ucHTTPDownloadType = static_cast < eHTTPDownloadType > ( ucHTTPDownloadType );
-    // Depending on the HTTP Download Type, read more data
-    switch ( g_pClientGame->m_ucHTTPDownloadType )
+    ushort usHTTPDownloadPort;
+    bitStream.Read ( usHTTPDownloadPort );
+
+    SString strExternalHTTPDownloadURL;
+    if ( ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL )
     {
-        case HTTP_DOWNLOAD_DISABLED:
-        {
-            RaiseFatalError ( 3 );
-            break;
-        }
-        case HTTP_DOWNLOAD_ENABLED_PORT:
-        {
-            bitStream.Read ( g_pClientGame->m_usHTTPDownloadPort );
-            // TODO: Set m_szHTTPDownloadURL to the appropriate path based off of server ip / port
-            unsigned long ulHTTPDownloadPort = g_pClientGame->m_usHTTPDownloadPort;
-            g_pClientGame->m_strHTTPDownloadURL = SString ( "http://%s:%d", g_pNet->GetConnectedServer(), ulHTTPDownloadPort );
-
-            // We are downloading from the internal HTTP Server, therefore disable multiple downloads
-            iHTTPMaxConnectionsPerClient = 1;
-            break;
-        }
-        case HTTP_DOWNLOAD_ENABLED_URL:
-        {
-            // Internal http server port in case we need it
-            bitStream.Read( g_pClientGame->m_usHTTPDownloadPort );
-
-            // External http server URL
-            bitStream.ReadString( g_pClientGame->m_strHTTPDownloadURL );
-
-            // See if we should switch to the internal http server
-            if ( g_pCore->ShouldUseInternalHTTPServer() )
-            {
-                g_pClientGame->m_strHTTPDownloadURL = SString ( "http://%s:%d", g_pNet->GetConnectedServer(), g_pClientGame->m_usHTTPDownloadPort );
-                g_pClientGame->m_ucHTTPDownloadType = HTTP_DOWNLOAD_ENABLED_PORT;
-                iHTTPMaxConnectionsPerClient = 1;
-            }
-            break;
-        }
-    default:
-        break;
+        bitStream.ReadString( strExternalHTTPDownloadURL );
     }
 
+    //
+    // Add servers to use
+    //
+
     // Allow forcing of SingleDownloadOption with core config option <single_download>1</single_download>
-    int iSingleDownload;
-    if ( g_pCore->GetCVars ()->Get ( "single_download", iSingleDownload ) && iSingleDownload == 1 )
+    if ( g_pCore->GetCVars ()->GetValue ( "single_download", 0 ) == 1 )
         iHTTPMaxConnectionsPerClient = 1;
 
-    g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES )->SetMaxConnections( iHTTPMaxConnectionsPerClient );
+    // First HTTP server is external if present
+    if ( !strExternalHTTPDownloadURL.empty() )
+    {
+        g_pClientGame->GetResourceFileDownloadManager()->AddServer( strExternalHTTPDownloadURL, iHTTPMaxConnectionsPerClient, EDownloadMode::RESOURCE_INITIAL_FILES_EXTERNAL, 3, 6000 );
+    }
+
+    // Last (or only) HTTP server is internal
+    SString strInternalHTTPDownloadURL = SString ( "http://%s:%d", g_pNet->GetConnectedServer(), usHTTPDownloadPort );
+    g_pClientGame->GetResourceFileDownloadManager()->AddServer( strInternalHTTPDownloadURL, 1, EDownloadMode::RESOURCE_INITIAL_FILES_INTERNAL, 10, 10000 );
+
+    // Set appropriate server for stupid SingularFileDownloadManager
+    g_pClientGame->m_strHTTPDownloadURL = !strExternalHTTPDownloadURL.empty() ? strExternalHTTPDownloadURL : strInternalHTTPDownloadURL;
 
     // Make the camera black until we spawn
     // Anyone want to document wtf these values are?  Why are we putting seemingly "random"
@@ -4766,8 +4747,6 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
     * * unsigned char (x)    - function name
     */
 
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
-
     // Number of 'no client cache' scripts
     unsigned short usNoClientCacheScriptCount = 0;
 
@@ -4879,7 +4858,8 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                     bitStream.Read ( (char*)chunkChecksum.md5.data, sizeof ( chunkChecksum.md5.data ) );
                     bitStream.Read ( dChunkDataSize );
 
-                    uiTotalSizeProcessed += (uint)dChunkDataSize;
+                    uint uiDownloadSize = (uint)dChunkDataSize;
+                    uiTotalSizeProcessed += uiDownloadSize;
                     if ( uiTotalSizeProcessed / 1024 / 1024 > 50 )
                         g_pCore->UpdateDummyProgress( uiTotalSizeProcessed / 1024 / 1024, " MB" );
 
@@ -4890,16 +4870,16 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                         case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
                             {
                                 bool bDownload = bitStream.ReadBit ();
-                                pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, chunkChecksum, bDownload );
+                                pDownloadableResource = pResource->AddResourceFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData, uiDownloadSize, chunkChecksum, bDownload );
 
                                 break;
                             }
                         case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                            pDownloadableResource = pResource->QueueFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, chunkChecksum );
+                            pDownloadableResource = pResource->AddResourceFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, uiDownloadSize, chunkChecksum, false );
 
                             break;
                         case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                            pDownloadableResource = pResource->AddConfigFile ( szChunkData, chunkChecksum );
+                            pDownloadableResource = pResource->AddConfigFile ( szChunkData, uiDownloadSize, chunkChecksum );
 
                             break;
                         default:
@@ -4922,19 +4902,11 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                         if ( pDownloadableResource->IsAutoDownload() )
                         {
                             // Make sure the directory exists
-                            const char* szTempName = pDownloadableResource->GetName ();
-                            if ( szTempName )
-                            {
-                                // Make sure its directory exists
-                                MakeSureDirExists ( szTempName );
-                            }
-
-                            // Combine the HTTP Download URL, the Resource Name and the Resource File
-                            SString strHTTPDownloadURLFull ( "%s/%s/%s", g_pClientGame->m_strHTTPDownloadURL.c_str (), pResource->GetName (), pDownloadableResource->GetShortName () );
+                            MakeSureDirExists ( pDownloadableResource->GetName () );
 
                             // Queue the file to be downloaded
-                            pResource->AddPendingFileDownload( strHTTPDownloadURLFull, pDownloadableResource->GetName (), dChunkDataSize );
-                        }                       
+                            g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload( pDownloadableResource );
+                        }
                     }
                 }
 
@@ -4950,10 +4922,10 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
             }
         }
 
-        g_pClientGame->GetResourceManager()->UpdatePendingDownloads();
+        g_pClientGame->GetResourceFileDownloadManager()->UpdatePendingDownloads();
 
         // Are there any resources to being downloaded?
-        if ( !g_pClientGame->IsTransferringInitialFiles () )
+        if ( !g_pClientGame->GetResourceFileDownloadManager()->IsTransferringInitialFiles() )
         {
             // Load the resource now
             if ( pResource->CanBeLoaded() )

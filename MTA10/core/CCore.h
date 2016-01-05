@@ -154,8 +154,7 @@ public:
     // Net
     void                    SetConnected                    ( bool bConnected );
     bool                    IsConnected                     ( void );
-    bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true, bool bForceInternalHTTPServer = false );
-    bool                    ShouldUseInternalHTTPServer     ( void );
+    bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true );
 
     // Mod
     void                    SetOfflineMod                   ( bool bOffline );
