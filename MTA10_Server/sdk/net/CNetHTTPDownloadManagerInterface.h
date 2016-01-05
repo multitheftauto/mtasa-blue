@@ -24,7 +24,8 @@ class CNetHTTPDownloadManagerInterface
 {
 public:
     // Get some stats regarding the current download size now & total
-    virtual double          GetDownloadSizeNow  ( void ) = 0;
+    virtual uint            GetDownloadSizeNow  ( void ) = 0;
+    virtual void            ResetDownloadSize   ( void ) = 0;
 
     // Get an error if one has been set
     virtual const char*     GetError            ( void ) = 0;

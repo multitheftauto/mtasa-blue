@@ -203,6 +203,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_pZoneNames = new CZoneNames;
     m_pScriptKeyBinds = new CScriptKeyBinds;
     m_pRemoteCalls = new CRemoteCalls();
+    m_pResourceFileDownloadManager = new CResourceFileDownloadManager();
 
     // Create our net API
     m_pNetAPI = new CNetAPI ( m_pManager );
@@ -475,6 +476,7 @@ CClientGame::~CClientGame ( void )
     SAFE_DELETE( m_pRemoteCalls );
     SAFE_DELETE( m_pLuaManager );
     SAFE_DELETE( m_pLatentTransferManager );
+    SAFE_DELETE( m_pResourceFileDownloadManager );
 
     SAFE_DELETE( m_pRootEntity );
 
@@ -1181,7 +1183,7 @@ void CClientGame::DoPulses ( void )
     else if ( m_Status == CClientGame::STATUS_JOINED )
     {
         // Pulse DownloadFiles if we're transferring stuff
-        DownloadInitialResourceFiles ();
+        GetResourceFileDownloadManager()->DoPulse();
         DownloadSingularResourceFiles ();
         g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
     }
@@ -4025,79 +4027,6 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
 }
 
 
-// Set flag and transfer box visibility
-void CClientGame::SetTransferringInitialFiles ( bool bTransfer, int iDownloadPriorityGroup )
-{
-    m_bTransferringInitialFiles = bTransfer;
-    m_iActiveDownloadPriorityGroup = bTransfer ? iDownloadPriorityGroup : INVALID_DOWNLOAD_PRIORITY_GROUP;
-    if ( bTransfer )
-        m_pTransferBox->Show ();
-    else
-        m_pTransferBox->Hide ();
-}
-
-
-// Get Download Priority Group of resources that are DOWNLOADING RIGHT NOW!
-int CClientGame::GetActiveDownloadPriorityGroup ( void )
-{
-    return m_bTransferringInitialFiles ? m_iActiveDownloadPriorityGroup : INVALID_DOWNLOAD_PRIORITY_GROUP;
-}
-
-
-//
-// Downloading initial resource files
-//
-void CClientGame::DownloadInitialResourceFiles ( void )
-{
-    if ( !IsTransferringInitialFiles () )
-        return;
-
-    if ( !g_pNet->IsConnected() )
-        return;
-
-    CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager ( EDownloadMode::RESOURCE_INITIAL_FILES );
-    if ( !pHTTP->ProcessQueuedFiles () )
-    {
-        // Downloading
-        m_pTransferBox->SetInfo ( pHTTP->GetDownloadSizeNow () );
-        m_pTransferBox->DoPulse ();
-    }
-    else
-    {
-        // This will also hide the transfer box
-        SetTransferringInitialFiles ( false );
-
-        // Get the last error to occur in the HTTP Manager
-        const char* szHTTPError = pHTTP->GetError ();
-
-        // Was an error found?
-        if ( strlen (szHTTPError) == 0 )
-        {
-            // Load our ("unavailable"-flagged) resources, and make them available
-            m_pResourceManager->OnDownloadGroupFinished ();
-        }
-        else
-        {
-            g_pCore->GetConsole ()->Printf ( _("Download error: %s"), szHTTPError );
-            if ( g_pClientGame->IsUsingExternalHTTPServer() && !g_pCore->ShouldUseInternalHTTPServer() )
-            {
-                SString strMessage( "External HTTP file download error:%s (Reconnecting with internal HTTP)", szHTTPError );
-                g_pClientGame->TellServerSomethingImportant( 1006, strMessage, true );
-                g_pCore->Reconnect( "", 0, NULL, false, true );
-            }
-            else
-            {
-                // Throw the error and disconnect
-                AddReportLog( 7106, SString( "Game - HTTPError (%s)", szHTTPError ) );
-
-                g_pCore->GetModManager ()->RequestUnload ();
-                g_pCore->ShowMessageBox ( _("Error")+_E("CD20"), szHTTPError, MB_BUTTON_OK | MB_ICON_ERROR ); // HTTP Error
-            }
-        }
-    }
-}
-
-
 //
 // On demand files
 //
@@ -6457,8 +6386,6 @@ void CClientGame::OutputServerInfo( void )
 {
     SString strTotalOutput;
     strTotalOutput += SString( "Server info for %s", g_pNet->GetConnectedServer( true ) );
-    if ( IsUsingExternalHTTPServer() )
-        strTotalOutput += "  (External HTTP)";
     strTotalOutput += "\n";
     strTotalOutput += SString( "Ver: %s\n", *GetServerVersionSortable () );
     strTotalOutput += SString( "AC: %s\n", *m_strACInfo );

@@ -27,7 +27,7 @@ class CResourceConfigItem :
     public CDownloadableResource
 {
 public:
-                                        CResourceConfigItem       ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CChecksum serverChecksum );
+                                        CResourceConfigItem       ( class CResource * resource, const char * szShortName, const char * szResourceFileName, uint uiDownloadSize, CChecksum serverChecksum );
                                         ~CResourceConfigItem      ( void );
 
     bool                                Start                           ( void );
@@ -38,7 +38,6 @@ public:
 private:
     class CXMLFile*                     m_pXMLFile;
     CXMLNode*                           m_pXMLRootNode;
-    CResource*                          m_pResource;
 };
 
 #endif

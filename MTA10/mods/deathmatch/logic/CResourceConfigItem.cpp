@@ -19,12 +19,11 @@
 
 #include <StdInc.h>
 
-CResourceConfigItem::CResourceConfigItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, CChecksum serverChecksum ) :
-    CDownloadableResource ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG, szResourceFileName, szShortName, serverChecksum, true )
+CResourceConfigItem::CResourceConfigItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, uint uiDownloadSize, CChecksum serverChecksum ) :
+    CDownloadableResource ( resource, CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG, szResourceFileName, szShortName, uiDownloadSize, serverChecksum, true )
 {
     m_pXMLFile = NULL;
     m_pXMLRootNode = NULL;
-    m_pResource = resource;
 }
 
 CResourceConfigItem::~CResourceConfigItem ( void )

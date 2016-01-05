@@ -39,7 +39,7 @@ public:
     };
 
 public:
-    CDownloadableResource           ( eResourceType resourceType, const char* szName, const char* szNameShort, CChecksum serverChecksum = CChecksum (), bool bGenerateClientChecksum = false, bool bAutoDownload = true );
+    CDownloadableResource           ( CResource* pResource, eResourceType resourceType, const char* szName, const char* szNameShort, uint uiDownloadSize, CChecksum serverChecksum, bool bAutoDownload );
     virtual ~CDownloadableResource  ( void );
 
     bool DoesClientAndServerChecksumMatch ( void );
@@ -47,6 +47,11 @@ public:
     eResourceType GetResourceType   ( void ) { return m_resourceType; };
     const char* GetName             ( void ) { return m_strName; };
     const char* GetShortName        ( void ) { return m_strNameShort; };
+    CResource*  GetResource         ( void ) { return m_pResource; }
+    int         GetDownloadPriorityGroup ( void );
+    uint        GetDownloadSize     ( void )                     { return m_uiDownloadSize; }
+    uint        GetHttpServerIndex  ( void )                     { return m_uiHttpServerIndex; }
+    void        SetHttpServerIndex  ( uint uiHttpServerIndex )   { m_uiHttpServerIndex = uiHttpServerIndex; }
 
     CChecksum GenerateClientChecksum ( void );
     CChecksum GetServerChecksum      ( void );
@@ -54,8 +59,11 @@ public:
     bool     IsAutoDownload         ( void )    { return m_bAutoDownload; };
     void     SetDownloaded          ( void )    { m_bDownloaded = true; };
     bool     IsDownloaded           ( void )    { return m_bDownloaded; };
+    void     SetIsWaitingForDownload( bool bInDownloadQueue )   { m_bInDownloadQueue = bInDownloadQueue; };
+    bool     IsWaitingForDownload   ( void )                    { return m_bInDownloadQueue; };
 
 protected:
+    CResource*          m_pResource;
     eResourceType       m_resourceType;
 
     SString             m_strName;
@@ -65,7 +73,10 @@ protected:
     CChecksum           m_ServerChecksum;
 
     bool                m_bAutoDownload;
+    bool                m_bInDownloadQueue;   // File in auto download queue
     bool                m_bDownloaded;        // File has been downloaded and is ready to use
+    uint                m_uiDownloadSize;
+    uint                m_uiHttpServerIndex;
 };
 
 #endif

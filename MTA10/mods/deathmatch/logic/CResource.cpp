@@ -32,7 +32,6 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     m_bActive = false;
     m_bStarting = true;
     m_bStopping = false;
-    m_bInDownloadQueue = false;
     m_bShowingCursor = false;
     m_usRemainingNoClientCacheScripts = 0;
     m_bLoadAfterReceivingNoClientCacheScripts = false;
@@ -78,7 +77,6 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     // Move this after the CreateVirtualMachine line and heads will roll
     m_bOOPEnabled = bEnableOOP;
     m_iDownloadPriorityGroup = 0;
-    m_bIsDownloading = false;
 
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine ( this, bEnableOOP );
     if ( m_pLuaVM )
@@ -157,7 +155,7 @@ CResource::~CResource ( void )
     m_exportedFunctions.clear();
 }
 
-CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, CChecksum serverChecksum, bool bAutoDownload )
+CDownloadableResource* CResource::AddResourceFile ( CDownloadableResource::eResourceType resourceType, const char *szFileName, uint uiDownloadSize, CChecksum serverChecksum, bool bAutoDownload )
 {
     // Create the resource file and add it to the list
     SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName, szFileName );
@@ -169,7 +167,7 @@ CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceTy
         return NULL;
     }
 
-    CResourceFile* pResourceFile = new CResourceFile ( resourceType, szFileName, strBuffer, serverChecksum, bAutoDownload );
+    CResourceFile* pResourceFile = new CResourceFile ( this, resourceType, szFileName, strBuffer, uiDownloadSize, serverChecksum, bAutoDownload );
     if ( pResourceFile )
     {
         m_ResourceFiles.push_back ( pResourceFile );
@@ -179,7 +177,7 @@ CDownloadableResource* CResource::QueueFile ( CDownloadableResource::eResourceTy
 }
 
 
-CDownloadableResource* CResource::AddConfigFile ( const char *szFileName, CChecksum serverChecksum )
+CDownloadableResource* CResource::AddConfigFile ( const char *szFileName, uint uiDownloadSize, CChecksum serverChecksum )
 {
     // Create the config file and add it to the list
     SString strBuffer ( "%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName, szFileName );
@@ -191,7 +189,7 @@ CDownloadableResource* CResource::AddConfigFile ( const char *szFileName, CCheck
         return NULL;
     }
 
-    CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, strBuffer, serverChecksum );
+    CResourceConfigItem* pConfig = new CResourceConfigItem ( this, szFileName, strBuffer, uiDownloadSize, serverChecksum );
     if ( pConfig )
     {
         m_ConfigFiles.push_back ( pConfig );
@@ -221,39 +219,22 @@ bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArgument
     return false;
 }
 
-
-void CResource::AddPendingFileDownload( const SString& strUrl, const SString& strFilename, double dDownloadSize )
-{
-    SPendingFileDownload item;
-    item.strUrl = strUrl;
-    item.strFilename = strFilename;
-    item.dDownloadSize = dDownloadSize;
-    m_PendingFileDownloadList.push_back( item );
-}
-
-
-void CResource::StartPendingFileDownloads( void )
-{
-    for( uint i = 0 ; i < m_PendingFileDownloadList.size() ; ++i )
-    {
-        const SPendingFileDownload& item = m_PendingFileDownloadList[i];
-    
-        // Queue the file to be downloaded
-        CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::RESOURCE_INITIAL_FILES );
-        bool bAddedFile = pHTTP->QueueFile( item.strUrl, item.strFilename, item.dDownloadSize, NULL, 0, false, NULL, NULL, g_pClientGame->IsLocalGame(), 10, 10000, true );
-    
-        // If the file was successfully queued, increment the resources to be downloaded (The file won't be added if it's already in the queue)
-        if ( bAddedFile )
-            g_pClientGame->GetTransferBox()->AddToTotalSize( item.dDownloadSize );
-        m_bIsDownloading = true;
-    }
-    m_PendingFileDownloadList.clear();
-}
-
-
 bool CResource::CanBeLoaded( void )
 {
-    return !IsActive() && !HasPendingFileDownloads() && !IsDownloading();
+    return !IsActive() && !IsWaitingForInitialDownloads();
+}
+
+bool CResource::IsWaitingForInitialDownloads( void )
+{
+    for ( std::list < CResourceConfigItem* >::iterator iter = m_ConfigFiles.begin ( ); iter != m_ConfigFiles.end () ; ++iter )
+        if ( (*iter)->IsWaitingForDownload() )
+            return true;
+
+    for ( std::list < CResourceFile* >::iterator iter = m_ResourceFiles.begin ( ); iter != m_ResourceFiles.end () ; ++iter )
+        if ( (*iter)->IsAutoDownload() )
+            if ( (*iter)->IsWaitingForDownload() )
+                return true;
+    return false;
 }
 
 
@@ -494,23 +475,10 @@ void CResource::AddToElementGroup ( CClientEntity* pElement )
 void CResource::HandleDownloadedFileTrouble( CResourceFile* pResourceFile )
 {
     // Compose message
-    SString strMessage;
-    if ( g_pClientGame->IsUsingExternalHTTPServer() )
-        strMessage += "External ";
-
     SString strFilename = ExtractFilename( PathConform( pResourceFile->GetShortName() ) );
-    strMessage += SString( "HTTP server file mismatch (%s) %s", GetName(), *strFilename);
+    SString strMessage = SString( "HTTP server file mismatch (%s) %s", GetName(), *strFilename );
 
-    // If using external HTTP server, reconnect and use internal one
-    if ( g_pClientGame->IsUsingExternalHTTPServer() && !g_pCore->ShouldUseInternalHTTPServer() )
-    {
-        g_pClientGame->TellServerSomethingImportant( 1001, strMessage, true );
-        g_pCore->Reconnect( "", 0, NULL, false, true );
-    }
-    else
-    {
-        // Otherwise, log to the client console
-        g_pClientGame->TellServerSomethingImportant( 1002, strMessage, true );
-        g_pCore->GetConsole ()->Printf ( "Download error: %s", *strMessage );
-    }
+    // Log to the server & client console
+    g_pClientGame->TellServerSomethingImportant( 1002, strMessage, true );
+    g_pCore->GetConsole ()->Printf ( "Download error: %s", *strMessage );
 }

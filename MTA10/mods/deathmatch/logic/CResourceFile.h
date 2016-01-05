@@ -20,11 +20,10 @@ class CResourceFile :
 {
 public:
 
-    CResourceFile ( eResourceType resourceType, const char * szShortName, const char * szResourceFileName, CChecksum serverChecksum, bool bAutoDownload = true )
-        : CDownloadableResource ( resourceType, szResourceFileName, szShortName, serverChecksum, true, bAutoDownload )
+    CResourceFile ( CResource* pResource, eResourceType resourceType, const char * szShortName, const char * szResourceFileName, uint uiDownloadSize, CChecksum serverChecksum, bool bAutoDownload )
+        : CDownloadableResource ( pResource, resourceType, szResourceFileName, szShortName, uiDownloadSize, serverChecksum, bAutoDownload )
     {
-        m_bAutoDownload = bAutoDownload;
-    };
+    }
 };
 
 #endif

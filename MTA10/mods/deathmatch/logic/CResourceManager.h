@@ -52,7 +52,6 @@ public:
     void                          StopAll                     ( void );
 
     void                          OnDownloadGroupFinished     ( void );
-    void                          UpdatePendingDownloads      ( void );
 
     void                          OnAddResourceFile           ( CDownloadableResource* pResourceFile );
     void                          OnRemoveResourceFile        ( CDownloadableResource* pResourceFile );
