@@ -169,6 +169,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isCallPropagationEnabled", "isElementCallPropagationEnabled" );
     lua_classfunction ( luaVM, "isWaitingForGroundToLoad", "isElementWaitingForGroundToLoad" );
     lua_classfunction ( luaVM, "isOnScreen", "isElementOnScreen" );
+    lua_classfunction ( luaVM, "isStreamedIn", "isElementStreamedIn" );
     lua_classfunction ( luaVM, "isStreamable", "isElementStreamable" );
     lua_classfunction ( luaVM, "isLocal", "isElementLocal" );
     lua_classfunction ( luaVM, "isSyncer", "isElementSyncer" );
@@ -226,6 +227,7 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled" );
     lua_classvariable ( luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad" );
     lua_classvariable ( luaVM, "onScreen", NULL, "isElementOnScreen" );
+    lua_classvariable ( luaVM, "streamedIn", NULL, "isElementStreamedIn" );
     lua_classvariable ( luaVM, "streamable", "setElementStreamable", "isElementStreamable" );
     lua_classvariable ( luaVM, "localElement", NULL, "isElementLocal" );
     lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
