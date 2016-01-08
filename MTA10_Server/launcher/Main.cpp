@@ -234,7 +234,8 @@ void HandleLinuxLibs( const SString& strLaunchDirectory, int argc, char* argv []
             if ( !strLdLibraryPath.empty() )
                 strLdLibraryPath += ";";
             strLdLibraryPath += strLinuxLibsPath;
-            putenv( (char*)*( SStringX( "LD_LIBRARY_PATH=" ) + strLdLibraryPath ) );
+            SString strEnvString = SStringX( "LD_LIBRARY_PATH=" ) + strLdLibraryPath;
+            putenv( (char*)*strEnvString );
 
             // Add -q to ensure linux-libs don't get added again
             char** pArgArray = new char*[argc + 2];
