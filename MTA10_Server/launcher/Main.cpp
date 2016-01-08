@@ -28,6 +28,18 @@
 #ifdef WIN32
     // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
     #include "SharedUtil.hpp"
+#else
+    bool SString::Contains ( const SString& strOther ) const
+    {
+        return find ( strOther ) != std::string::npos;
+    }
+    SString SharedUtil::GetSystemCurrentDirectory ( void )
+    {
+        char szBuffer[ MAX_PATH ];
+        getcwd ( szBuffer, MAX_PATH - 1 );
+        return szBuffer;
+    }
+    void HandleLinuxLibs( const SString& strLaunchDirectory, int argc, char* argv [] );
 #endif
 
 using namespace std;
@@ -35,14 +47,23 @@ using namespace std;
 #ifdef WIN32
     #ifdef MTA_DEBUG
         #define LIB_CORE SERVER_BIN_PATH "core_d.dll"
+        #define LIB_NET SERVER_BIN_PATH "net_d.dll"
     #else
         #define LIB_CORE SERVER_BIN_PATH "core.dll"
+        #define LIB_NET SERVER_BIN_PATH "net.dll"
     #endif
 #else
     #ifdef MTA_DEBUG
         #define LIB_CORE "./" SERVER_BIN_PATH "core_d.so"
+        #define LIB_NET "./" SERVER_BIN_PATH "net_d.so"
     #else
         #define LIB_CORE "./" SERVER_BIN_PATH "core.so"
+        #define LIB_NET "./" SERVER_BIN_PATH "net.so"
+    #endif
+    #ifdef ANY_x86
+        #define LINUX_LIBS_PATH     "x86/linux-libs"
+    #else
+        #define LINUX_LIBS_PATH     "x64/linux-libs"
     #endif
 #endif
 
@@ -51,7 +72,6 @@ int main ( int argc, char* argv [] )
     // Work out the launched directory and filename
     int iLength = strlen ( argv[0] );
     char *szLaunchDirectory = static_cast < char* > ( alloca ( iLength + 1 ) );
-    char *szLaunchFile = NULL;
 
     strncpy ( szLaunchDirectory, argv[0], iLength + 1 );
 
@@ -59,17 +79,24 @@ int main ( int argc, char* argv [] )
         if ( szLaunchDirectory[i] == '\\' )
             szLaunchDirectory[i] = '/';
 
+    SString strLaunchFile, strLaunchDirectory;
     if ( char* cpPos = strrchr ( szLaunchDirectory, '/' ) )
     {
         *cpPos = 0;
-        szLaunchFile = cpPos + 1;
+        strLaunchFile = cpPos + 1;
+        strLaunchDirectory = szLaunchDirectory;
+    }
+    else
+    {
+        strLaunchFile = szLaunchDirectory;
+        strLaunchDirectory = "";
     }
 
     if ( argc > 1 )
     {
         if ( strcmp ( argv[1], "/?" ) == 0 || strcmp ( argv[1], "--help" ) == 0 || strcmp ( argv[1], "-h" ) == 0 )
         {
-            printf ( "Usage: %s [OPTION]\n\n", szLaunchFile ? szLaunchFile : "mtaserver" );
+            printf ( "Usage: %s [OPTION]\n\n", *strLaunchFile );
             printf ( "  -v                   Shows the program version\n" );
             printf ( "  -s                   Run server in silent mode\n" );
 #ifndef WIN32
@@ -80,6 +107,8 @@ int main ( int argc, char* argv [] )
             printf ( "  -n                   Disable the usage of ncurses (For screenlog)\n" );
 #ifndef WIN32
             printf ( "  -x                   Disable simplified crash reports (To allow core dumps)\n" );
+            printf ( "  -p                   Always add linux-libs directory to library search path\n" );
+            printf ( "  -q                   Never add linux-libs directory to library search path\n" );
 #endif
             printf ( "  -D [PATH]            Use as base directory\n" );
             printf ( "  --config [FILE]      Alternate mtaserver.conf file\n" );
@@ -102,6 +131,8 @@ int main ( int argc, char* argv [] )
         cin.get ();
         return 1;
     }
+#else
+    HandleLinuxLibs( strLaunchDirectory, argc, argv );
 #endif
 
     // If we are unable to access the core module, try changing to the directory of the launched file
@@ -114,7 +145,7 @@ int main ( int argc, char* argv [] )
             PathRemoveFileSpecW ( szBuffer );
             SetCurrentDirectoryW( szBuffer );
         #else
-            chdir ( szLaunchDirectory );
+            chdir ( strLaunchDirectory );
         #endif
     }
     else
@@ -151,3 +182,73 @@ int main ( int argc, char* argv [] )
     cin.get ();
     return 1;
 }
+
+
+#ifndef WIN32
+//
+// Add linux-libs to library search path if either:
+//  1. Options don't forbid it (-q)
+//  2. Options force it (-p)
+//  3. net.so is not loadable
+//
+void HandleLinuxLibs( const SString& strLaunchDirectory, int argc, char* argv [] )
+{
+    // Check linux-libs options
+    bool bUseLinuxLibs = false;
+    bool bForbidLinuxLibs = false;
+    for ( int i = 1 ; i < argc ; i++ )
+    {
+        bUseLinuxLibs |= ( strcmp( argv[i], "-p" ) == 0 );
+        bForbidLinuxLibs |= ( strcmp( argv[i], "-q" ) == 0 );
+    }
+
+    // Is linux-libs forbidden by options?
+    if ( bForbidLinuxLibs )
+        return;
+
+    // Calculate absolute path to MTA directory
+    SString strSavedDir = GetSystemCurrentDirectory();
+    chdir( strLaunchDirectory );
+    SString strAbsLaunchDirectory = GetSystemCurrentDirectory();
+    chdir( strSavedDir );
+
+    if ( !bUseLinuxLibs )
+    {
+        // linux-libs not forced by options - Check if net module might need it
+        void* hModule = dlopen( strAbsLaunchDirectory + "/" LIB_NET, RTLD_NOW );
+        if ( hModule )
+            dlclose( hModule );
+        else
+            bUseLinuxLibs = true;
+    }
+
+    if ( bUseLinuxLibs )
+    {
+        SString strLdLibraryPath = getenv( "LD_LIBRARY_PATH" );
+        SString strLinuxLibsPath = strAbsLaunchDirectory + "/" LINUX_LIBS_PATH;
+
+        // Check that linux-libs is not already in library path
+        if ( !strLdLibraryPath.Contains( strLinuxLibsPath ) )
+        {
+            // Add linux-libs to search path
+            if ( !strLdLibraryPath.empty() )
+                strLdLibraryPath += ";";
+            strLdLibraryPath += strLinuxLibsPath;
+            putenv( (char*)*( SStringX( "LD_LIBRARY_PATH=" ) + strLdLibraryPath ) );
+
+            // Add -q to ensure linux-libs don't get added again
+            char** pArgArray = new char*[argc + 2];
+            for ( int i = 0 ; i <= argc ; i++ )
+            {
+                pArgArray[i] = argv[i];
+            }
+            char newArg[] = "-q";
+            pArgArray[argc] = newArg;
+            pArgArray[argc + 1] = nullptr;
+
+            // Go for launch #2
+            execv( argv[0], pArgArray );
+        }
+    }
+}
+#endif
