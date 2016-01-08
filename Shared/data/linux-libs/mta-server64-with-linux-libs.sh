@@ -10,7 +10,7 @@
 if [[ "$0" != *"64"* ]]; then
     # 32 bit
     LAUNCHER="mta-server"
-    LINUXLIBS="linux-libs"
+    LINUXLIBS="x86/linux-libs"
 else
     # 64 bit
     LAUNCHER="mta-server64"
