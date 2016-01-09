@@ -185,8 +185,11 @@ void CScriptDebugging::LogPCallError( lua_State* luaVM, const SString& strRes, b
         // File+line info present
         SString strFile = vecSplit[ 0 ];
         int     iLine   = atoi( vecSplit[ 1 ] );
-        SString strMsg  = vecSplit[2].SubStr( 1 );
-                    
+        
+        // Get the message string (we cannot use vecSplit here as the message itself could contain ':')
+        auto pos = strRes.find ( ':', vecSplit[0].length () + vecSplit[1].length () ) ;
+        SString strMsg = strRes.SubStr ( pos+2 );
+        
         if ( iLine == 0 && bInitialCall )
         {
             // Location hint for compiled scripts
