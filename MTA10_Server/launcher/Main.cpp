@@ -107,8 +107,7 @@ int main ( int argc, char* argv [] )
             printf ( "  -n                   Disable the usage of ncurses (For screenlog)\n" );
 #ifndef WIN32
             printf ( "  -x                   Disable simplified crash reports (To allow core dumps)\n" );
-            printf ( "  -p                   Always add linux-libs directory to library search path\n" );
-            printf ( "  -q                   Never add linux-libs directory to library search path\n" );
+            printf ( "  -q                   Do not add " LINUX_LIBS_PATH " directory to library search path\n" );
 #endif
             printf ( "  -D [PATH]            Use as base directory\n" );
             printf ( "  --config [FILE]      Alternate mtaserver.conf file\n" );
@@ -186,25 +185,18 @@ int main ( int argc, char* argv [] )
 
 #ifndef WIN32
 //
-// Add linux-libs to library search path if either:
+// Add linux-libs to library search path if:
 //  1. Options don't forbid it (-q)
-//  2. Options force it (-p)
-//  3. net.so is not loadable
+//  2. linux-libs is not already in the library search path
 //
 void HandleLinuxLibs( const SString& strLaunchDirectory, int argc, char* argv [] )
 {
-    // Check linux-libs options
-    bool bUseLinuxLibs = false;
-    bool bForbidLinuxLibs = false;
+    // Check for linux-libs forbidden option
     for ( int i = 1 ; i < argc ; i++ )
     {
-        bUseLinuxLibs |= ( strcmp( argv[i], "-p" ) == 0 );
-        bForbidLinuxLibs |= ( strcmp( argv[i], "-q" ) == 0 );
+        if ( strcmp( argv[i], "-q" ) == 0 )
+            return;
     }
-
-    // Is linux-libs forbidden by options?
-    if ( bForbidLinuxLibs )
-        return;
 
     // Calculate absolute path to MTA directory
     SString strSavedDir = GetSystemCurrentDirectory();
@@ -212,44 +204,31 @@ void HandleLinuxLibs( const SString& strLaunchDirectory, int argc, char* argv []
     SString strAbsLaunchDirectory = GetSystemCurrentDirectory();
     chdir( strSavedDir );
 
-    if ( !bUseLinuxLibs )
-    {
-        // linux-libs not forced by options - Check if net module might need it
-        void* hModule = dlopen( strAbsLaunchDirectory + "/" LIB_NET, RTLD_NOW );
-        if ( hModule )
-            dlclose( hModule );
-        else
-            bUseLinuxLibs = true;
-    }
+    SString strLdLibraryPath = getenv( "LD_LIBRARY_PATH" );
+    SString strLinuxLibsPath = strAbsLaunchDirectory + "/" LINUX_LIBS_PATH;
 
-    if ( bUseLinuxLibs )
+    // Check that linux-libs is not already in library path
+    if ( !strLdLibraryPath.Contains( strLinuxLibsPath ) )
     {
-        SString strLdLibraryPath = getenv( "LD_LIBRARY_PATH" );
-        SString strLinuxLibsPath = strAbsLaunchDirectory + "/" LINUX_LIBS_PATH;
+        // Add linux-libs to search path
+        if ( !strLdLibraryPath.empty() )
+            strLdLibraryPath += ";";
+        strLdLibraryPath += strLinuxLibsPath;
+        SString strEnvString = SStringX( "LD_LIBRARY_PATH=" ) + strLdLibraryPath;
+        putenv( (char*)*strEnvString );
 
-        // Check that linux-libs is not already in library path
-        if ( !strLdLibraryPath.Contains( strLinuxLibsPath ) )
+        // Add -q to ensure linux-libs don't get added again
+        char** pArgArray = new char*[argc + 2];
+        for ( int i = 0 ; i <= argc ; i++ )
         {
-            // Add linux-libs to search path
-            if ( !strLdLibraryPath.empty() )
-                strLdLibraryPath += ";";
-            strLdLibraryPath += strLinuxLibsPath;
-            SString strEnvString = SStringX( "LD_LIBRARY_PATH=" ) + strLdLibraryPath;
-            putenv( (char*)*strEnvString );
-
-            // Add -q to ensure linux-libs don't get added again
-            char** pArgArray = new char*[argc + 2];
-            for ( int i = 0 ; i <= argc ; i++ )
-            {
-                pArgArray[i] = argv[i];
-            }
-            char newArg[] = "-q";
-            pArgArray[argc] = newArg;
-            pArgArray[argc + 1] = nullptr;
-
-            // Go for launch #2
-            execv( argv[0], pArgArray );
+            pArgArray[i] = argv[i];
         }
+        char newArg[] = "-q";
+        pArgArray[argc] = newArg;
+        pArgArray[argc + 1] = nullptr;
+
+        // Go for launch #2
+        execv( argv[0], pArgArray );
     }
 }
 #endif
