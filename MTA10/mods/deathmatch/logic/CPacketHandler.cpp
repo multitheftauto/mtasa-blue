@@ -4875,7 +4875,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                                 break;
                             }
                         case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                            pDownloadableResource = pResource->AddResourceFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, uiDownloadSize, chunkChecksum, false );
+                            pDownloadableResource = pResource->AddResourceFile ( CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData, uiDownloadSize, chunkChecksum, true );
 
                             break;
                         case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
