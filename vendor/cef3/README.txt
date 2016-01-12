@@ -1,15 +1,15 @@
 Chromium Embedded Framework (CEF) Standard Binary Distribution for Windows
 -------------------------------------------------------------------------------
 
-Date:             June 05, 2015
+Date:             January 10, 2016
 
-CEF Version:      3.2357.1280.geba024d
+CEF Version:      3.2526.1366.g8617e7c
 CEF URL:          https://bitbucket.org/chromiumembedded/cef.git
-                  @eba024daac2e2b873185d259508278aa973a3229
+                  @8617e7c22c1215e26aff2a594bb1165b8972b9b1
 
-Chromium Verison: 43.0.2357.81
+Chromium Verison: 47.0.2526.80
 Chromium URL:     https://chromium.googlesource.com/chromium/src.git
-                  @4d096306deb9e86953c81f08454dd6db07b406b5
+                  @037a6fde9231f53aa6c5762eb6c5e649ea5068e5
 
 This distribution contains all components necessary to build and distribute an
 application using CEF on the Windows platform. Please see the LICENSING
@@ -63,55 +63,72 @@ https://bitbucket.org/chromiumembedded/cef/
 REDISTRIBUTION
 --------------
 
-This binary distribution contains the below components. Components listed under
-the "required" section must be redistributed with all applications using CEF.
-Components listed under the "optional" section may be excluded if the related
-features will not be used.
+This binary distribution contains the below components.
 
 Required components:
 
-* CEF core library
-    libcef.dll
+The following components are required. CEF will not function without them.
 
-* Unicode support
-    icudtl.dat
+* CEF core library.
+  * libcef.dll
+
+* Unicode support data.
+  * icudtl.dat
+
+* V8 snapshot data.
+  * natives_blob.bin
+  * snapshot_blob.bin
 
 Optional components:
 
-* Localized resources
-    locales/
-  Note: Contains localized strings for WebKit UI controls. A .pak file is loaded
-  from this folder based on the CefSettings.locale value. Only configured
-  locales need to be distributed. If no locale is configured the default locale
-  of "en-US" will be used. Locale file loading can be disabled completely using
-  CefSettings.pack_loading_disabled. The locales folder path can be customized
-  using CefSettings.locales_dir_path.
+The following components are optional. If they are missing CEF will continue to
+run but any related functionality may become broken or disabled.
 
-* Other resources
-    cef.pak
-    cef_100_percent.pak
-    cef_200_percent.pak
-    devtools_resources.pak
-  Note: Contains WebKit image and inspector resources. Pack file loading can be
-  disabled completely using CefSettings.pack_loading_disabled. The resources
-  directory path can be customized using CefSettings.resources_dir_path.
+* Localized resources.
+  Locale file loading can be disabled completely using
+  CefSettings.pack_loading_disabled. The locales directory path can be
+  customized using CefSettings.locales_dir_path. 
+ 
+  * locales/
+    Directory containing localized resources used by CEF, Chromium and Blink. A
+    .pak file is loaded from this directory based on the CefSettings.locale
+    value. Only configured locales need to be distributed. If no locale is
+    configured the default locale of "en-US" will be used. Without these files
+    arbitrary Web components may display incorrectly.
 
-* FFmpeg audio and video support
-    ffmpegsumo.dll
-  Note: Without this component HTML5 audio and video will not function.
+* Other resources.
+  Pack file loading can be disabled completely using
+  CefSettings.pack_loading_disabled. The resources directory path can be
+  customized using CefSettings.resources_dir_path.
 
-* Angle and Direct3D support
-    d3dcompiler_43.dll (required for Windows XP)
-    d3dcompiler_47.dll (required for Windows Vista and newer)
-    libEGL.dll
-    libGLESv2.dll
-  Note: Without these components HTML5 accelerated content like 2D canvas, 3D
-  CSS and WebGL will not function.
+  * cef.pak
+  * cef_100_percent.pak
+  * cef_200_percent.pak
+    These files contain non-localized resources used by CEF, Chromium and Blink.
+    Without these files arbitrary Web components may display incorrectly.
+
+  * cef_extensions.pak
+    This file contains non-localized resources required for extension loading.
+    Pass the `--disable-extensions` command-line flag to disable use of this
+    file. Without this file components that depend on the extension system,
+    such as the PDF viewer, will not function.
+
+  * devtools_resources.pak
+    This file contains non-localized resources required for Chrome Developer
+    Tools. Without this file Chrome Developer Tools will not function.
+
+* Angle and Direct3D support.
+  * d3dcompiler_43.dll (required for Windows XP)
+  * d3dcompiler_47.dll (required for Windows Vista and newer)
+  * libEGL.dll
+  * libGLESv2.dll
+  Without these files HTML5 accelerated content like 2D canvas, 3D CSS and WebGL
+  will not function.
 
 * Windows Vista 64-bit sandbox support (32-bit distributions only)
-    wow_helper.exe
-  Note: Without this component the 32-bit build of CEF will not run on 64-bit
-  Vista machines with the sandbox enabled.
+  * wow_helper.exe
+  Without this file the 32-bit build of CEF will not run on 64-bit Vista
+  machines with the sandbox enabled.
 
 
 LICENSING

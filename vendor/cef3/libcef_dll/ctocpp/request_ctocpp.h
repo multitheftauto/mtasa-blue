@@ -1,4 +1,4 @@
-// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2016 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -35,6 +35,10 @@ class CefRequestCToCpp
   void SetURL(const CefString& url) OVERRIDE;
   CefString GetMethod() OVERRIDE;
   void SetMethod(const CefString& method) OVERRIDE;
+  void SetReferrer(const CefString& referrer_url,
+      ReferrerPolicy policy) OVERRIDE;
+  CefString GetReferrerURL() OVERRIDE;
+  ReferrerPolicy GetReferrerPolicy() OVERRIDE;
   CefRefPtr<CefPostData> GetPostData() OVERRIDE;
   void SetPostData(CefRefPtr<CefPostData> postData) OVERRIDE;
   void GetHeaderMap(HeaderMap& headerMap) OVERRIDE;
