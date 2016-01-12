@@ -1357,7 +1357,7 @@ int CLuaPlayerDefs::SetPlayerAnnounceValue ( lua_State* luaVM )
 
 int CLuaPlayerDefs::ResendPlayerModInfo ( lua_State* luaVM )
 {
-    // bool getPlayerModInfo ( player thePlayer )
+    // bool resendPlayerModInfo ( player thePlayer )
     CPlayer* pPlayer;
 
     CScriptArgReader argStream ( luaVM );
@@ -1954,8 +1954,8 @@ int CLuaPlayerDefs::ShowCursor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( CStaticFunctionDefinitions::ShowCursor ( pPlayer, luaMain, bShow, bToggleControls ) )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain && CStaticFunctionDefinitions::ShowCursor ( pPlayer, pLuaMain, bShow, bToggleControls ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
