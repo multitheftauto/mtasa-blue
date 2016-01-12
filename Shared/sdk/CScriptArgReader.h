@@ -9,7 +9,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
+#include <limits>
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -56,7 +56,7 @@ public:
                 return;
             }
 
-            if ( std::is_unsigned < T > () && number < 0.0 )
+            if ( std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
                 SetCustomError ( "Expected positive value, got negative", "Bad argument" );
                 return;
@@ -88,7 +88,7 @@ public:
                 return;
             }
 
-            if ( std::is_unsigned < T > () && number < 0.0 )
+            if ( std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
                 SetCustomError ( "Expected positive value, got negative", "Bad argument" );
                 return;
