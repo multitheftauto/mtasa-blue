@@ -2331,7 +2331,9 @@ bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bI
         bool bIgnore = false;
         if ( bState )
         {
-            if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey ) )
+            auto pFocusedBrowser = g_pCore->GetWebCore ()->GetFocusedWebView ();
+
+            if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey ) || ( pFocusedBrowser && !pFocusedBrowser->IsLocal () ) )
                 bIgnore = true;                         // Ignore this keydown and the matching keyup
             else
                 MapInsert( m_AllowKeyUpMap, strKey );   // Use this keydown and the matching keyup
@@ -2387,6 +2389,11 @@ bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
     // Do we have a root yet?
     if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsInputActive() == false )
     {
+        // Cancel event if remote browser is focused
+        auto pFocusedBrowser = g_pCore->GetWebCore ()->GetFocusedWebView ();
+        if ( pFocusedBrowser && !pFocusedBrowser->IsLocal () )
+            return false;
+
         // Safe character?
         if ( wChar >= 32 )
         {
