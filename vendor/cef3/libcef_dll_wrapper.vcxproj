@@ -275,6 +275,7 @@
     <ClInclude Include="include\capi\cef_find_handler_capi.h" />
     <ClInclude Include="include\capi\cef_parser_capi.h" />
     <ClInclude Include="include\capi\cef_resource_bundle_capi.h" />
+    <ClInclude Include="include\capi\cef_response_filter_capi.h" />
     <ClInclude Include="include\capi\cef_ssl_info_capi.h" />
     <ClInclude Include="include\cef_base.h" />
     <ClInclude Include="include\cef_find_handler.h" />
@@ -282,6 +283,7 @@
     <ClInclude Include="include\cef_pack_strings.h" />
     <ClInclude Include="include\cef_parser.h" />
     <ClInclude Include="include\cef_resource_bundle.h" />
+    <ClInclude Include="include\cef_response_filter.h" />
     <ClInclude Include="include\cef_runnable.h" />
     <ClInclude Include="include\cef_ssl_info.h" />
     <ClInclude Include="include\cef_version.h" />
@@ -417,6 +419,7 @@
     <ClInclude Include="libcef_dll\cpptoc\delete_cookies_callback_cpptoc.h" />
     <ClInclude Include="libcef_dll\cpptoc\find_handler_cpptoc.h" />
     <ClInclude Include="libcef_dll\cpptoc\pdf_print_callback_cpptoc.h" />
+    <ClInclude Include="libcef_dll\cpptoc\response_filter_cpptoc.h" />
     <ClInclude Include="libcef_dll\cpptoc\set_cookie_callback_cpptoc.h" />
     <ClInclude Include="libcef_dll\ctocpp\ctocpp.h" />
     <ClInclude Include="libcef_dll\ctocpp\request_callback_ctocpp.h" />
@@ -528,6 +531,7 @@
     <ClCompile Include="libcef_dll\cpptoc\delete_cookies_callback_cpptoc.cc" />
     <ClCompile Include="libcef_dll\cpptoc\find_handler_cpptoc.cc" />
     <ClCompile Include="libcef_dll\cpptoc\pdf_print_callback_cpptoc.cc" />
+    <ClCompile Include="libcef_dll\cpptoc\response_filter_cpptoc.cc" />
     <ClCompile Include="libcef_dll\cpptoc\set_cookie_callback_cpptoc.cc" />
     <ClCompile Include="libcef_dll\ctocpp\request_callback_ctocpp.cc" />
     <ClCompile Include="libcef_dll\ctocpp\resource_bundle_ctocpp.cc" />

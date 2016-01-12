@@ -1,4 +1,4 @@
-// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2016 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -80,6 +80,7 @@ enum CefWrapperType {
   WT_RESOURCE_BUNDLE_HANDLER,
   WT_RESOURCE_HANDLER,
   WT_RESPONSE,
+  WT_RESPONSE_FILTER,
   WT_RUN_CONTEXT_MENU_CALLBACK,
   WT_RUN_FILE_DIALOG_CALLBACK,
   WT_SSLCERT_PRINCIPAL,

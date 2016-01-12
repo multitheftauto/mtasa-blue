@@ -3097,6 +3097,15 @@
     <ClInclude Include="libcef_dll\wrapper_types.h">
       <Filter>libcef_dll</Filter>
     </ClInclude>
+    <ClInclude Include="include\capi\cef_response_filter_capi.h">
+      <Filter>include\capi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cef_response_filter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="libcef_dll\cpptoc\response_filter_cpptoc.h">
+      <Filter>libcef_dll\cpptoc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libcef_dll\cpptoc\find_handler_cpptoc.cc">
@@ -3137,6 +3146,9 @@
     </ClCompile>
     <ClCompile Include="libcef_dll\ctocpp\run_context_menu_callback_ctocpp.cc">
       <Filter>libcef_dll\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcef_dll\cpptoc\response_filter_cpptoc.cc">
+      <Filter>libcef_dll\cpptoc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

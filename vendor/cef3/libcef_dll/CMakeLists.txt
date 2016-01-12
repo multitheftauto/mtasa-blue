@@ -106,6 +106,8 @@ set(LIBCEF_CPPTOC_SRCS
   cpptoc/resource_bundle_handler_cpptoc.h
   cpptoc/resource_handler_cpptoc.cc
   cpptoc/resource_handler_cpptoc.h
+  cpptoc/response_filter_cpptoc.cc
+  cpptoc/response_filter_cpptoc.h
   cpptoc/run_file_dialog_callback_cpptoc.cc
   cpptoc/run_file_dialog_callback_cpptoc.h
   cpptoc/scheme_handler_factory_cpptoc.cc
@@ -284,6 +286,7 @@ set(LIBCEF_INCLUDE_SRCS
   ../include/cef_resource_bundle_handler.h
   ../include/cef_resource_handler.h
   ../include/cef_response.h
+  ../include/cef_response_filter.h
   ../include/cef_runnable.h
   ../include/cef_scheme.h
   ../include/cef_ssl_info.h
@@ -405,6 +408,7 @@ set(LIBCEF_INCLUDE_CAPI_SRCS
   ../include/capi/cef_resource_bundle_handler_capi.h
   ../include/capi/cef_resource_handler_capi.h
   ../include/capi/cef_response_capi.h
+  ../include/capi/cef_response_filter_capi.h
   ../include/capi/cef_scheme_capi.h
   ../include/capi/cef_ssl_info_capi.h
   ../include/capi/cef_stream_capi.h
