@@ -1,4 +1,4 @@
-// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2016 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -30,6 +30,9 @@ class CefSSLInfoCToCpp
   CefSSLInfoCToCpp();
 
   // CefSSLInfo methods.
+  cef_cert_status_t GetCertStatus() OVERRIDE;
+  bool IsCertStatusError() OVERRIDE;
+  bool IsCertStatusMinorError() OVERRIDE;
   CefRefPtr<CefSSLCertPrincipal> GetSubject() OVERRIDE;
   CefRefPtr<CefSSLCertPrincipal> GetIssuer() OVERRIDE;
   CefRefPtr<CefBinaryValue> GetSerialNumber() OVERRIDE;
@@ -37,6 +40,9 @@ class CefSSLInfoCToCpp
   CefTime GetValidExpiry() OVERRIDE;
   CefRefPtr<CefBinaryValue> GetDEREncoded() OVERRIDE;
   CefRefPtr<CefBinaryValue> GetPEMEncoded() OVERRIDE;
+  size_t GetIssuerChainSize() OVERRIDE;
+  void GetDEREncodedIssuerChain(IssuerChainBinaryList& chain) OVERRIDE;
+  void GetPEMEncodedIssuerChain(IssuerChainBinaryList& chain) OVERRIDE;
 };
 
 #endif  // USING_CEF_SHARED
