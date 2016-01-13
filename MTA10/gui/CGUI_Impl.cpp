@@ -1128,6 +1128,16 @@ bool CGUI_Impl::Event_MouseButtonDown ( const CEGUI::EventArgs& Args )
     // Call global and object handlers
     if ( pElement )
         pElement->Event_OnMouseButtonDown();
+    else
+    {
+        // If there's no element, we're probably dealing with the root element
+        CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
+        if ( m_pTop == wnd && pActiveWindow )
+        {
+            // Deactivate active window to trigger onClientGUIBlur
+            pActiveWindow->deactivate();
+        }
+    }
 
     if ( m_MouseButtonDownHandlers[ m_Channel ] )
     {
