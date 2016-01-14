@@ -309,7 +309,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getAdjustableProperty", "getVehicleAdjustableProperty" );
     lua_classfunction ( luaVM, "getOverrideLights", "getVehicleOverrideLights" );
     lua_classfunction ( luaVM, "getPanelState", "getVehiclePanelState" );
-    lua_classfunction ( luaVM, "getTurnVelocity", "getVehicleTurnVelocity" );
+    lua_classfunction ( luaVM, "getTurnVelocity", CLuaOOPDefs::GetVehicleTurnVelocity );
     lua_classfunction ( luaVM, "isTaxiLightOn", "isVehicleTaxiLightOn" );
     lua_classfunction ( luaVM, "getComponents", "getVehicleComponents" );
     lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
@@ -411,6 +411,7 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "nitroActivated", "setVehicleNitroActivated", "isVehicleNitroActivated" );
     lua_classvariable ( luaVM, "nitroRecharging", NULL, "isVehicleNitroRecharging" );
     lua_classvariable ( luaVM, "gravity", CLuaFunctionDefs::SetVehicleGravity, CLuaOOPDefs::GetVehicleGravity );
+    lua_classvariable ( luaVM, "turnVelocity", CLuaFunctionDefs::SetVehicleTurnVelocity, CLuaOOPDefs::GetVehicleTurnVelocity );
 
     //lua_classvariable ( luaVM, "color", CLuaFunctionDefs::SetVehicleColor, CLuaOOPDefs::GetVehicleColor );
     //lua_classvariable ( luaVM, "headlightColor", CLuaFunctionDefs::SetHeadLightColor, CLuaOOPDefs::GetHeadLightColor );

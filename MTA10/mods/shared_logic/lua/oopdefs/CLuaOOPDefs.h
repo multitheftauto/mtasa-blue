@@ -43,6 +43,7 @@ public:
 
     // Vehicle
     LUA_DECLARE ( GetVehicleGravity );
+    LUA_DECLARE ( GetVehicleTurnVelocity );
 
     // Marker
     LUA_DECLARE ( GetMarkerTarget );
