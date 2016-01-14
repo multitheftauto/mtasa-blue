@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "include/base/cef_macros.h"
 #include "include/base/cef_weak_ptr.h"
 #include "include/cef_parser.h"
 #include "include/wrapper/cef_stream_resource_handler.h"
@@ -22,13 +23,10 @@ namespace {
   
 // Returns |url| without the query or fragment components, if any.
 std::string GetUrlWithoutQueryOrFragment(const std::string& url) {
-  size_t query_pos = url.find('?');
-  if (query_pos != std::string::npos)
-    return url.substr(0, query_pos);
-
-  size_t fragment_pos = url.find('#');
-  if (fragment_pos != std::string::npos)
-    return url.substr(0, fragment_pos);
+  // Find the first instance of '?' or '#'.
+  const size_t pos = std::min(url.find('?'), url.find('#'));
+  if (pos != std::string::npos)
+    return url.substr(0, pos);
 
   return url;
 }
@@ -185,7 +183,7 @@ class ArchiveProvider : public CefResourceManager::Provider {
       password_(password),
       archive_load_started_(false),
       archive_load_ended_(false),
-      weak_ptr_factory_(this) {
+      ALLOW_THIS_IN_INITIALIZER_LIST(weak_ptr_factory_(this)) {
     DCHECK(!url_path_.empty());
     DCHECK(!archive_path_.empty());
 
@@ -438,8 +436,7 @@ void CefResourceManager::Request::StopOnIOThread(
 
 CefResourceManager::CefResourceManager()
     : url_filter_(base::Bind(GetFilteredUrl)),
-      mime_type_resolver_(base::Bind(GetMimeType)),
-      weak_ptr_factory_(this) {
+      mime_type_resolver_(base::Bind(GetMimeType)) {
 }
 
 CefResourceManager::~CefResourceManager() {
@@ -592,7 +589,15 @@ cef_return_value_t CefResourceManager::OnBeforeResourceLoad(
 
   scoped_ptr<RequestState> state(new RequestState);
 
-  state->manager_ = weak_ptr_factory_.GetWeakPtr();
+  if (!weak_ptr_factory_.get()) {
+    // WeakPtrFactory instances need to be created and destroyed on the same
+    // thread. This object performs most of its work on the IO thread and will
+    // be destroyed on the IO thread so, now that we're on the IO thread,
+    // properly initialize the WeakPtrFactory.
+    weak_ptr_factory_.reset(new base::WeakPtrFactory<CefResourceManager>(this));
+  }
+
+  state->manager_ = weak_ptr_factory_->GetWeakPtr();
   state->callback_ = callback;
 
   state->params_.url_ =
@@ -687,7 +692,7 @@ void CefResourceManager::StopRequest(scoped_ptr<RequestState> state) {
 // Move state to the next provider if any and return true if there are more
 // providers.
 bool CefResourceManager::IncrementProvider(RequestState* state) {
-   // Identify the next provider.
+  // Identify the next provider.
   ProviderEntryList::iterator next_entry_pos = state->current_entry_pos_;
   GetNextValidProvider(++next_entry_pos);
 
