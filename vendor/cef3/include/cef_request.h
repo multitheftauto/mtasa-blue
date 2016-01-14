@@ -53,7 +53,6 @@ class CefPostDataElement;
 class CefRequest : public virtual CefBase {
  public:
   typedef std::multimap<CefString, CefString> HeaderMap;
-  typedef cef_referrer_policy_t ReferrerPolicy;
   typedef cef_resource_type_t ResourceType;
   typedef cef_transition_type_t TransitionType;
 
@@ -95,27 +94,6 @@ class CefRequest : public virtual CefBase {
   virtual void SetMethod(const CefString& method) =0;
 
   ///
-  // Set the referrer URL and policy. If non-empty the referrer URL must be
-  // fully qualified with an HTTP or HTTPS scheme component. Any username,
-  // password or ref component will be removed.
-  ///
-  /*--cef()--*/
-  virtual void SetReferrer(const CefString& referrer_url,
-                           ReferrerPolicy policy) =0;
-
-  ///
-  // Get the referrer URL.
-  ///
-  /*--cef()--*/
-  virtual CefString GetReferrerURL() =0;
-
-  ///
-  // Get the referrer policy.
-  ///
-  /*--cef(default_retval=REFERRER_POLICY_DEFAULT)--*/
-  virtual ReferrerPolicy GetReferrerPolicy() =0;
-
-  ///
   // Get the post data.
   ///
   /*--cef()--*/
@@ -128,14 +106,13 @@ class CefRequest : public virtual CefBase {
   virtual void SetPostData(CefRefPtr<CefPostData> postData) =0;
 
   ///
-  // Get the header values. Will not include the Referer value if any.
+  // Get the header values.
   ///
   /*--cef()--*/
   virtual void GetHeaderMap(HeaderMap& headerMap) =0;
 
   ///
-  // Set the header values. If a Referer value exists in the header map it will
-  // be removed and ignored.
+  // Set the header values.
   ///
   /*--cef()--*/
   virtual void SetHeaderMap(const HeaderMap& headerMap) =0;
@@ -222,15 +199,6 @@ class CefPostData : public virtual CefBase {
   ///
   /*--cef()--*/
   virtual bool IsReadOnly() =0;
-
-  ///
-  // Returns true if the underlying POST data includes elements that are not
-  // represented by this CefPostData object (for example, multi-part file upload
-  // data). Modifying CefPostData objects with excluded elements may result in
-  // the request failing.
-  ///
-  /*--cef()--*/
-  virtual bool HasExcludedElements() = 0;
 
   ///
   // Returns the number of existing post data elements.

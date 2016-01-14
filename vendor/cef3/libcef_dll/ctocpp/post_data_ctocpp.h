@@ -1,4 +1,4 @@
-// Copyright (c) 2016 The Chromium Embedded Framework Authors. All rights
+// Copyright (c) 2015 The Chromium Embedded Framework Authors. All rights
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 //
@@ -31,7 +31,6 @@ class CefPostDataCToCpp
 
   // CefPostData methods.
   bool IsReadOnly() OVERRIDE;
-  bool HasExcludedElements() OVERRIDE;
   size_t GetElementCount() OVERRIDE;
   void GetElements(ElementVector& elements) OVERRIDE;
   bool RemoveElement(CefRefPtr<CefPostDataElement> element) OVERRIDE;
