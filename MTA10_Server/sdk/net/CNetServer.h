@@ -144,7 +144,7 @@ public:
     virtual bool                            EncryptDumpfile                 ( const char* szClearPathFilename, const char* szEncryptedPathFilename ) { return false; }
     virtual bool                            ValidateHttpCacheFileName       ( const char* szFilename ) { return false; }
     virtual bool                            GetScriptInfo                   ( const char* cpInBuffer, uint uiInSize, SScriptInfo* pOutInfo ) { return false; }
-    virtual bool                            DecryptScript                   ( const char* cpInBuffer, uint uiInSize, const char** pcpOutBuffer, uint* puiOutSize, const char* szScriptName ) { return false; }
+    virtual bool                            DeobfuscateScript               ( const char* cpInBuffer, uint uiInSize, const char** pcpOutBuffer, uint* puiOutSize, const char* szScriptName ) { return false; }
     virtual bool                            GetPlayerPacketUsageStats       ( uchar* packetIdList, uint uiNumPacketIds, SPlayerPacketUsage* pOutStats, uint uiTopCount ) { return false; }
     virtual const char*                     GetLogOutput                    ( void )                                    { return NULL; }
     virtual bool                            IsValidSocket                   ( const NetServerPlayerID& playerID )       { assert( 0 ); return false; }

@@ -216,7 +216,7 @@ namespace SharedUtil
 
     // Buffer identification
     bool IsLuaCompiledScript( const void* pData, uint uiLength );
-    bool IsLuaEncryptedScript( const void* pData, uint uiLength );
+    bool IsLuaObfuscatedScript( const void* pData, uint uiLength );
 
     //
     // Some templates

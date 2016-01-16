@@ -58,7 +58,7 @@ protected:
     void                CheckMetaFileForIssues          ( const string& strPath, const string& strFileName, const string& strResourceName );
     void                CheckMetaSourceForIssues        ( CXMLNode* pRootNode, const string& strFileName, const string& strResourceName, ECheckerModeType checkerMode, bool* pbOutHasChanged = NULL );
     void                CheckLuaFileForIssues           ( const string& strPath, const string& strFileName, const string& strResourceName, bool bClientScript );
-    bool                CheckLuaDecryptRequirements     ( const string& strFileContents, const string& strFileName, const string& strResourceName, bool bClientScript );
+    bool                CheckLuaDeobfuscateRequirements ( const string& strFileContents, const string& strFileName, const string& strResourceName, bool bClientScript );
     void                CheckLuaSourceForIssues         ( string strLuaSource, const string& strFileName, const string& strResourceName, bool bClientScript, bool bCompiledScript, ECheckerModeType checkerMode, string* pstrOutResult = NULL );
     long                FindLuaIdentifier               ( const char* szLuaSource, long* plOutLength, long* plLineNumber );
     bool                UpgradeLuaFunctionName          ( const string& strFunctionName, bool bClientScript, string& strOutUpgraded );

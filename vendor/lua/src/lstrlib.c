@@ -144,6 +144,7 @@ static int writer (lua_State *L, const void* b, size_t size, void* B) {
 }
 
 
+#ifdef WITH_STRING_DUMP
 static int str_dump (lua_State *L) {
   luaL_Buffer b;
   luaL_checktype(L, 1, LUA_TFUNCTION);
@@ -154,7 +155,7 @@ static int str_dump (lua_State *L) {
   luaL_pushresult(&b);
   return 1;
 }
-
+#endif
 
 
 /*
@@ -827,7 +828,9 @@ static int str_format (lua_State *L) {
 static const luaL_Reg strlib[] = {
   {"byte", str_byte},
   {"char", str_char},
+#ifdef WITH_STRING_DUMP
   {"dump", str_dump},
+#endif
   {"find", str_find},
   {"format", str_format},
   {"gfind", gfind_nodef},
