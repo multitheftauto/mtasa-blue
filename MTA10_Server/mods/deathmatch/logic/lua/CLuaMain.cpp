@@ -297,10 +297,10 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
 {
     SString strNiceFilename = ConformResourcePath( szFileName );
 
-    // Decrypt if required
+    // Deobfuscate if required
     const char* cpBuffer;
     uint uiSize;
-    if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename ) )
+    if ( !g_pRealNetServer->DeobfuscateScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename ) )
     {
         SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
         g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );

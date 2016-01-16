@@ -400,8 +400,8 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     if ( strFileContents.length () == 0 )
         return;
 
-    // Update decrypt version requirements, and do no more checking if encrypted
-    if ( CheckLuaDecryptRequirements( strFileContents, strFileName, strResourceName, bClientScript ) )
+    // Update deobfuscate version requirements, and do no more checking if obfuscated
+    if ( CheckLuaDeobfuscateRequirements( strFileContents, strFileName, strResourceName, bClientScript ) )
         return;
 
     // Check if a compiled script
@@ -446,12 +446,12 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
 
 ///////////////////////////////////////////////////////////////
 //
-// CResourceChecker::CheckLuaDecryptRequirements
+// CResourceChecker::CheckLuaDeobfuscateRequirements
 //
-// Updates version requirements and returns true if encrypted
+// Updates version requirements and returns true if obfuscated
 //
 ///////////////////////////////////////////////////////////////
-bool CResourceChecker::CheckLuaDecryptRequirements ( const string& strFileContents, const string& strFileName, const string& strResourceName, bool bClientScript )
+bool CResourceChecker::CheckLuaDeobfuscateRequirements ( const string& strFileContents, const string& strFileName, const string& strResourceName, bool bClientScript )
 {
     // Get embedded version requirements
     SScriptInfo scriptInfo;
@@ -495,7 +495,7 @@ bool CResourceChecker::CheckLuaDecryptRequirements ( const string& strFileConten
         m_strReqServerReason = strFileName;
     }
 
-    return IsLuaEncryptedScript( strFileContents.c_str(), strFileContents.length() );
+    return IsLuaObfuscatedScript( strFileContents.c_str(), strFileContents.length() );
 }
 
 

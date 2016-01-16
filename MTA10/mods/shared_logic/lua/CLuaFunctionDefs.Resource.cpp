@@ -427,10 +427,10 @@ int CLuaFunctionDefs::LoadString( lua_State* luaVM )
         const char* cpInBuffer = strInput;
         uint uiInSize = strInput.length();
 
-        // Decrypt if required
+        // Deobfuscate if required
         const char* cpBuffer;
         uint uiSize;
-        if ( !g_pNet->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/loadstring" ) )
+        if ( !g_pNet->DeobfuscateScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/loadstring" ) )
         {
             SString strMessage( "argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
             argStream.SetCustomError( strMessage );
@@ -500,10 +500,10 @@ int CLuaFunctionDefs::Load( lua_State* luaVM )
         const char* cpInBuffer = strInput;
         uint uiInSize = strInput.length();
 
-        // Decrypt if required
+        // Deobfuscate if required
         const char* cpBuffer;
         uint uiSize;
-        if ( !g_pNet->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/load" ) )
+        if ( !g_pNet->DeobfuscateScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, m_pResourceManager->GetResourceName( luaVM ) + "/load" ) )
         {
             SString strMessage( "argument 2 is invalid. Please re-compile at http://luac.mtasa.com/", 0 ); 
             argStream.SetCustomError( strMessage );
