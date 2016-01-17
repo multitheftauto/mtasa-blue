@@ -233,7 +233,7 @@ int CLuaFunctionDefs::GetPedTotalAmmo ( lua_State* luaVM )
                 lua_pushnumber ( luaVM, usAmmo );
                 return 1;
             }
-            else if ( pPed->m_usWeaponAmmo [ ucSlot ] )
+            else if ( ucSlot < WEAPONSLOT_MAX && pPed->m_usWeaponAmmo [ ucSlot ] )
             {
                 // The ped musn't be streamed in, so we can get the stored value instead
                 ushort usAmmo = 1;
