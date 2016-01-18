@@ -506,11 +506,11 @@ int CLuaDatabaseDefs::DbFree ( lua_State* luaVM )
 int CLuaDatabaseDefs::DbPoll ( lua_State* luaVM )
 {
     //  table dbPoll ( handle query, int timeout )
-    CDbJobData* pJobData; uint uiTimeout;
+    CDbJobData* pJobData; int iTimeout;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pJobData );
-    argStream.ReadNumber ( uiTimeout );
+    argStream.ReadNumber ( iTimeout );
 
     if ( !argStream.HasErrors () )
     {
@@ -523,7 +523,7 @@ int CLuaDatabaseDefs::DbPoll ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( !g_pGame->GetDatabaseManager ()->QueryPoll ( pJobData, uiTimeout ) )
+        if ( !g_pGame->GetDatabaseManager ()->QueryPoll ( pJobData, iTimeout ) )
         {
             // Not ready yet
             lua_pushnil ( luaVM );
