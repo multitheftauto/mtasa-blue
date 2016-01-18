@@ -10,10 +10,10 @@ xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\cef\cef_100_percent.pak" "%
 xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\cef\cef_200_percent.pak" "%OUTPATH%\cef\"
 rem xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\cef\cef_extensions.pak" "%OUTPATH%\cef\"
 xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\cef\devtools_resources.pak" "%OUTPATH%\cef\"
+xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\cef\locales\en-US.pak" "%OUTPATH%\cef\locales\"
 
 xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\d3dcompiler_43.dll" "%OUTPATH%\"
 xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\d3dcompiler_47.dll" "%OUTPATH%\"
-xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\ffmpegsumo.dll" "%OUTPATH%\"
 xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\icudtl.dat" "%OUTPATH%\"
 xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\libcef.dll" "%OUTPATH%\"
 xcopy /Y /D "%SOLUTIONPATH%\data\MTA San Andreas\MTA\libEGL.dll" "%OUTPATH%\"
