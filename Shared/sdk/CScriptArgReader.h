@@ -9,7 +9,12 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+#pragma once
 #include <limits>
+
+#ifdef MTA_CLIENT
+    #include "CScriptDebugging.h"
+#endif
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -58,7 +63,7 @@ public:
 
             if ( std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
-                SetCustomError ( "Expected positive value, got negative", "Bad argument" );
+                SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
                 return;
             }
 
@@ -90,7 +95,7 @@ public:
 
             if ( std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
-                SetCustomError ( "Expected positive value, got negative", "Bad argument" );
+                SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
                 return;
             }
 
@@ -1121,11 +1126,24 @@ public:
     //
     // HasErrors - Optional check if there are any unread arguments
     //
-    bool HasErrors ( bool bCheckUnusedArgs = false ) const
+    bool HasErrors ( bool bCheckUnusedArgs = false )
     {
         assert ( !IsReadFunctionPending () );
         if ( bCheckUnusedArgs && lua_type ( m_luaVM, m_iIndex ) != LUA_TNONE )
             return true;
+
+        // Output warning here (there's no better way to integrate it without huge code changes
+        if ( !m_bError && !m_strCustomWarning.empty () )
+        {
+            #ifdef MTA_CLIENT
+                CLuaFunctionDefs::m_pScriptDebugging->LogWarning ( m_luaVM, m_strCustomWarning );
+            #else
+                g_pGame->GetScriptDebugging ()->LogWarning ( m_luaVM, m_strCustomWarning );
+            #endif
+            
+            m_strCustomWarning.clear ();
+        }
+
         return m_bError;
     }
 
@@ -1217,6 +1235,14 @@ public:
     }
 
     //
+    // Set custom warning message
+    //
+    void SetCustomWarning ( const SString& message )
+    {
+        m_strCustomWarning = message;
+    }
+
+    //
     // Skip n arguments
     //
     void Skip ( int n )
@@ -1237,5 +1263,6 @@ public:
     SString                 m_strErrorCategory;
     bool                    m_bHasCustomMessage;
     SString                 m_strCustomMessage;
+    SString                 m_strCustomWarning;
 
 };

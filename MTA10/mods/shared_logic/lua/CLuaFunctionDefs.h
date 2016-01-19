@@ -32,6 +32,8 @@ class CRegisteredCommands;
 
 class CLuaFunctionDefs
 {
+    friend class CScriptArgReader;
+
 public:
     static void Initialize ( class CLuaManager* pLuaManager,
                               class CScriptDebugging* pScriptDebugging,
