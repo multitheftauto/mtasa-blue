@@ -462,6 +462,30 @@ public:
     }
 
     //
+    // Read next color
+    //
+    void ReadColor ( SColor& outValue )
+    {
+        lua_Number color;
+        ReadNumber ( color );
+
+        if ( !m_bError )
+            outValue = static_cast<unsigned int> ( color );
+    }
+
+    //
+    // Read next color
+    //
+    void ReadColor ( SColor& outValue, const SColor& defaultValue )
+    {
+        lua_Number color;
+        ReadNumber ( color, static_cast<lua_Number> ( defaultValue ) );
+
+        if ( !m_bError )
+            outValue = static_cast<unsigned int> ( color );
+    }
+
+    //
     // Read next bool
     //
     void ReadBool ( bool& bOutValue )
