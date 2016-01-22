@@ -1,0 +1,18 @@
+ vendor/cryptopp/GNUmakefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/vendor/cryptopp/GNUmakefile b/vendor/cryptopp/GNUmakefile
+index 087690d..79941b0 100644
+--- a/vendor/cryptopp/GNUmakefile
++++ b/vendor/cryptopp/GNUmakefile
+@@ -41,8 +41,8 @@ GAS219_OR_LATER = $(shell $(CXX) -xc -c /dev/null -Wa,-v -o/dev/null 2>&1 | $(EG
+ ifneq ($(GCC42_OR_LATER),0)
+ ifeq ($(UNAME),Darwin)
+ CXXFLAGS += -arch x86_64 -arch i386
+-else
+-CXXFLAGS += -march=native
++# else
++# CXXFLAGS += -march=native
+ endif
+ endif
+ 

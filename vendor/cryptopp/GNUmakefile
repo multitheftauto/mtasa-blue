@@ -41,8 +41,8 @@ GAS219_OR_LATER = $(shell $(CXX) -xc -c /dev/null -Wa,-v -o/dev/null 2>&1 | $(EG
 ifneq ($(GCC42_OR_LATER),0)
 ifeq ($(UNAME),Darwin)
 CXXFLAGS += -arch x86_64 -arch i386
-else
-CXXFLAGS += -march=native
+# else
+# CXXFLAGS += -march=native
 endif
 endif
 
