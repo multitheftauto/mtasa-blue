@@ -1053,6 +1053,7 @@ void CClientGame::DoPulses ( void )
 #endif
     m_pLatentTransferManager->DoPulse ();
     m_pLuaManager->DoPulse ();
+    m_pScriptDebugging->UpdateLogOutput();
 
     GetModelCacheManager ()->DoPulse ();
 

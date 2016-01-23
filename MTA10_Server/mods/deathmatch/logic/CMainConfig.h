@@ -126,6 +126,7 @@ public:
     bool                            GetLoadstringLogEnabled         ( void ) const              { return !m_strLoadstringLogFilename.empty(); }
     bool                            GetBadNetBulletFixEnabled       ( void ) const              { return m_bBadNetBulletFixEnabled != 0; }
     bool                            GetCrashDumpUploadEnabled       ( void ) const              { return m_bCrashDumpUploadEnabled != 0; }
+    bool                            GetFilterDuplicateLogLinesEnabled ( void ) const            { return m_bFilterDuplicateLogLinesEnabled != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -217,6 +218,7 @@ private:
     int                             m_iServerLogicFpsLimit;
     int                             m_bBadNetBulletFixEnabled;
     int                             m_bCrashDumpUploadEnabled;
+    int                             m_bFilterDuplicateLogLinesEnabled;
 };
 
 #endif
