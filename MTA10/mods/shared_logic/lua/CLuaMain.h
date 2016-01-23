@@ -124,11 +124,6 @@ public:
     
     void                            AddCameraClass          ( lua_State* luaVM );
 
-    void                            AddVector4DClass        ( lua_State* luaVM );
-    void                            AddVector3DClass        ( lua_State* luaVM );
-    void                            AddVector2DClass        ( lua_State* luaVM );
-    void                            AddMatrixClass          ( lua_State* luaVM );
-
     void                            AddDxMaterialClass      ( lua_State* luaVM );
     void                            AddDxTextureClass       ( lua_State* luaVM );
     void                            AddDxFontClass          ( lua_State* luaVM );

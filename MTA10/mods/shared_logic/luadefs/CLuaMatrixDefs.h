@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAMATRIXDEFS_H
-#define __CLUAMATRIXDEFS_H
+#pragma once
 
 extern "C"
 {
@@ -23,6 +22,7 @@ extern "C"
 class CLuaMatrixDefs: public CLuaDefs
 {
 public:
+    static void AddClass ( lua_State* luaVM );
     LUA_DECLARE ( Create );
     LUA_DECLARE ( Destroy );
 
@@ -49,5 +49,3 @@ public:
     LUA_DECLARE ( Mul );
     LUA_DECLARE ( Div );
 };
-
-#endif

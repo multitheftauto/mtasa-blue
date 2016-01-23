@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __LUAVECTOR3DEFS_H
-#define __LUAVECTOR3DEFS_H
+#pragma once
 
 extern "C"
 {
@@ -23,6 +22,7 @@ extern "C"
 class CLuaVector3Defs: public CLuaDefs
 {
 public:
+    static void AddClass ( lua_State* luaVM );
     LUA_DECLARE ( Create );
     LUA_DECLARE ( Destroy );
 
@@ -51,5 +51,3 @@ public:
     LUA_DECLARE ( Unm );
     LUA_DECLARE ( Eq );
 };
-
-#endif
