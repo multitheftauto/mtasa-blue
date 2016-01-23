@@ -19,20 +19,49 @@
 
 void CLuaFileDefs::LoadFunctions ( void )
 {
-    CLuaCFunctions::AddFunction ( "fileCreate", CLuaFileDefs::fileCreate );
-    CLuaCFunctions::AddFunction ( "fileExists", CLuaFileDefs::fileExists );
-    CLuaCFunctions::AddFunction ( "fileOpen", CLuaFileDefs::fileOpen );
-    CLuaCFunctions::AddFunction ( "fileIsEOF", CLuaFileDefs::fileIsEOF );
-    CLuaCFunctions::AddFunction ( "fileGetPos", CLuaFileDefs::fileGetPos );
-    CLuaCFunctions::AddFunction ( "fileSetPos", CLuaFileDefs::fileSetPos );
-    CLuaCFunctions::AddFunction ( "fileGetSize", CLuaFileDefs::fileGetSize );
-    CLuaCFunctions::AddFunction ( "fileRead", CLuaFileDefs::fileRead );
-    CLuaCFunctions::AddFunction ( "fileWrite", CLuaFileDefs::fileWrite );
-    CLuaCFunctions::AddFunction ( "fileFlush", CLuaFileDefs::fileFlush );
-    CLuaCFunctions::AddFunction ( "fileClose", CLuaFileDefs::fileClose );
-    CLuaCFunctions::AddFunction ( "fileDelete", CLuaFileDefs::fileDelete );
-    CLuaCFunctions::AddFunction ( "fileRename", CLuaFileDefs::fileRename );
-    CLuaCFunctions::AddFunction ( "fileCopy", CLuaFileDefs::fileCopy );
+    CLuaCFunctions::AddFunction ( "fileCreate", fileCreate );
+    CLuaCFunctions::AddFunction ( "fileExists", fileExists );
+    CLuaCFunctions::AddFunction ( "fileOpen", fileOpen );
+    CLuaCFunctions::AddFunction ( "fileIsEOF", fileIsEOF );
+    CLuaCFunctions::AddFunction ( "fileGetPos", fileGetPos );
+    CLuaCFunctions::AddFunction ( "fileSetPos", fileSetPos );
+    CLuaCFunctions::AddFunction ( "fileGetSize", fileGetSize );
+    CLuaCFunctions::AddFunction ( "fileRead", fileRead );
+    CLuaCFunctions::AddFunction ( "fileWrite", fileWrite );
+    CLuaCFunctions::AddFunction ( "fileFlush", fileFlush );
+    CLuaCFunctions::AddFunction ( "fileClose", fileClose );
+    CLuaCFunctions::AddFunction ( "fileDelete", fileDelete );
+    CLuaCFunctions::AddFunction ( "fileRename", fileRename );
+    CLuaCFunctions::AddFunction ( "fileCopy", fileCopy );
+}
+
+
+void CLuaFileDefs::AddClass ( lua_State* luaVM )
+{
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "fileOpen" );
+    lua_classfunction ( luaVM, "destroy", "fileClose" );
+    lua_classfunction ( luaVM, "close", "fileClose" );
+    lua_classfunction ( luaVM, "new", "fileCreate" );
+
+    lua_classfunction ( luaVM, "delete", "fileDelete" );
+    lua_classfunction ( luaVM, "exists", "fileExists" );
+    lua_classfunction ( luaVM, "flush", "fileFlush" );
+    lua_classfunction ( luaVM, "getPos", "fileGetPos" );
+    lua_classfunction ( luaVM, "getSize", "fileGetSize" );
+    lua_classfunction ( luaVM, "isEOF", "fileIsEOF" );
+    lua_classfunction ( luaVM, "read", "fileRead" );
+    lua_classfunction ( luaVM, "rename", "fileRename" );
+    lua_classfunction ( luaVM, "setPos", "fileSetPos" );
+    lua_classfunction ( luaVM, "write", "fileWrite" );
+    lua_classfunction ( luaVM, "copy", "fileCopy" );
+
+    lua_classvariable ( luaVM, "pos", "fileSetPos", "fileGetPos" );
+    lua_classvariable ( luaVM, "size", NULL, "fileGetSize" );
+    lua_classvariable ( luaVM, "isEOF", NULL, "fileIsEOF" );
+
+    lua_registerclass ( luaVM, "File" );
 }
 
 

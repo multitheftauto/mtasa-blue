@@ -1387,35 +1387,6 @@ void CLuaMain::AddTimerClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddFileClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "fileOpen" );
-    lua_classfunction ( luaVM, "destroy", "fileClose" );
-    lua_classfunction ( luaVM, "close", "fileClose" );
-    lua_classfunction ( luaVM, "new", "fileCreate" );
-    
-    lua_classfunction ( luaVM, "delete", "fileDelete" );
-    lua_classfunction ( luaVM, "exists", "fileExists" );
-    lua_classfunction ( luaVM, "flush", "fileFlush" );
-    lua_classfunction ( luaVM, "getPos", "fileGetPos" );
-    lua_classfunction ( luaVM, "getSize", "fileGetSize" );
-    lua_classfunction ( luaVM, "isEOF", "fileIsEOF" );
-    lua_classfunction ( luaVM, "read", "fileRead" );
-    lua_classfunction ( luaVM, "rename", "fileRename" );
-    lua_classfunction ( luaVM, "setPos", "fileSetPos" );
-    lua_classfunction ( luaVM, "write", "fileWrite" );
-    lua_classfunction ( luaVM, "copy", "fileCopy" );
-
-    lua_classvariable ( luaVM, "pos", "fileSetPos", "fileGetPos" );
-    lua_classvariable ( luaVM, "size", NULL, "fileGetSize" );
-    lua_classvariable ( luaVM, "isEOF", NULL, "fileIsEOF" );
-    
-    lua_registerclass ( luaVM, "File" );
-}
-
-
 void CLuaMain::AddXMLClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1907,7 +1878,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
 
     AddResourceClass            ( luaVM );
     AddTimerClass               ( luaVM );
-    AddFileClass                ( luaVM );
     AddXMLClass                 ( luaVM );
 
     AddEngineClass              ( luaVM );
@@ -1925,6 +1895,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     
     AddCameraClass              ( luaVM );
 
+    CLuaFileDefs::AddClass ( luaVM );
     CLuaSearchLightDefs::AddClass ( luaVM );
 }
 

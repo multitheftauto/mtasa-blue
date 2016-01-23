@@ -115,7 +115,6 @@ public:
 
     void                            AddResourceClass        ( lua_State* luaVM );
     void                            AddTimerClass           ( lua_State* luaVM );
-    void                            AddFileClass            ( lua_State* luaVM );
     void                            AddXMLClass             ( lua_State* luaVM );
 
     void                            AddEngineClass          ( lua_State* luaVM );
