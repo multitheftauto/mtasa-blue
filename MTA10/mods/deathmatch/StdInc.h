@@ -106,6 +106,7 @@
 #include <CScriptArgReader.h>
 #include <luadefs/CLuaDefs.h>
 #include <luadefs/CLuaClassDefs.h>
+#include <luadefs/CLuaPedDefs.h>
 #include <luadefs/CLuaVector2Defs.h>
 #include <luadefs/CLuaVector3Defs.h>
 #include <luadefs/CLuaVector4Defs.h>

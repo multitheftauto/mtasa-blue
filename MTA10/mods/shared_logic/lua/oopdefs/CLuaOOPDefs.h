@@ -24,9 +24,6 @@ class CRegisteredCommands;
 class CLuaOOPDefs : public CLuaDefs
 {
 public:
-    // Ped
-    LUA_DECLARE ( SetPedOccupiedVehicle );
-
     // Element
     LUA_DECLARE ( GetElementMatrix );
     LUA_DECLARE ( GetElementPosition );

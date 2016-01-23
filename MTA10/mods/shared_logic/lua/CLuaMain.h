@@ -15,8 +15,7 @@
 
 class CLuaMain;
 
-#ifndef __CLUAMAIN_H
-#define __CLUAMAIN_H
+#pragma once
 
 #include "CLuaTimerManager.h"
 #include "CLuaVector2.h"
@@ -79,7 +78,6 @@ public:
 
     void                            AddElementClass         ( lua_State* luaVM );
     void                            AddVehicleClass         ( lua_State* luaVM );
-    void                            AddPedClass             ( lua_State* luaVM );
     void                            AddPlayerClass          ( lua_State* luaVM );
     void                            AddObjectClass          ( lua_State* luaVM );
     void                            AddMarkerClass          ( lua_State* luaVM );
@@ -164,5 +162,3 @@ public:
     CFastHashMap < const void*, CRefInfo >  m_CallbackTable;
     std::map < int, SString >               m_FunctionTagMap;
 };
-
-#endif
