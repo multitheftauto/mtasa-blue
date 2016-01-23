@@ -31,6 +31,10 @@ CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
 
 CScriptDebugging::~CScriptDebugging ( void )
 {
+    // Flush any pending duplicate loggings
+    m_DuplicateLineFilter.Flush();
+    UpdateLogOutput();
+
     // Close the previously loaded file
     if ( m_pLogFile )
     {
@@ -403,11 +407,6 @@ void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& l
         m_bTriggeringOnClientDebugMessage = false;
     }
 
-    // Log it to the file if enough level
-    if ( m_uiLogFileLevel >= uiMinimumDebugLevel )
-    {
-        PrintLog ( strText );
-    }
     switch ( uiMinimumDebugLevel )
     {
         case 1:
@@ -420,10 +419,30 @@ void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& l
             ucRed = 0, ucGreen = 255, ucBlue = 0;
             break;
     }
-#ifdef MTA_DEBUG
-    if ( !g_pCore->IsDebugVisible () ) return;
-#endif
-    g_pCore->DebugEchoColor ( strText, ucRed, ucGreen, ucBlue );
+
+    m_DuplicateLineFilter.AddLine( strText, { uiMinimumDebugLevel, ucRed, ucGreen, ucBlue } );
+    if ( g_pCore->GetCVars ()->GetValue < bool > ( "filter_duplicate_log_lines" ) == false )
+        m_DuplicateLineFilter.Flush();
+    UpdateLogOutput();
+}
+
+
+void CScriptDebugging::UpdateLogOutput( void )
+{
+    SString strText;
+    SLogData data;
+    while( m_DuplicateLineFilter.PopOutputLine( strText, data ) )
+    {
+        // Log it to the file if enough level
+        if ( m_uiLogFileLevel >= data.uiMinimumDebugLevel )
+        {
+            PrintLog ( strText );
+        }
+    #ifdef MTA_DEBUG
+        if ( !g_pCore->IsDebugVisible () ) return;
+    #endif
+        g_pCore->DebugEchoColor ( strText, data.ucRed, data.ucGreen, data.ucBlue );
+    }
 }
 
 

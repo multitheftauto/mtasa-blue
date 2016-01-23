@@ -19,12 +19,22 @@
 #include "packets/CPacket.h"
 #include <cstdio>
 #include <list>
+#include "CDuplicateLineFilter.h"
+
+struct SLogData
+{
+    unsigned int uiMinimumDebugLevel;
+    unsigned char ucRed;
+    unsigned char ucGreen;
+    unsigned char ucBlue;
+    bool operator ==( const SLogData& other ) const { return uiMinimumDebugLevel == other.uiMinimumDebugLevel && ucRed == other.ucRed; }
+};
 
 class CScriptDebugging
 {
 public:
                                     CScriptDebugging                ( CLuaManager* pLuaManager );
-    inline                          ~CScriptDebugging               ( void )                            { ClearPlayers (); };
+                                    ~CScriptDebugging               ( void );
 
     bool                            AddPlayer                       ( class CPlayer& Player, unsigned int uiLevel );
     bool                            RemovePlayer                    ( class CPlayer& Player );
@@ -52,6 +62,7 @@ public:
     void                            PopLuaMain                      ( CLuaMain* pLuaMain );
     void                            OnLuaMainDestroy                ( CLuaMain* pLuaMain );
     CLuaMain*                       GetTopLuaMain                   ( void );
+    void                            UpdateLogOutput                 ( void );
 
 private:
     SString                         ComposeErrorMessage             ( const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage );
@@ -68,6 +79,7 @@ private:
     bool                            m_bTriggeringOnDebugMessage;
     SLuaDebugInfo                   m_SavedLuaDebugInfo;
     std::list < CLuaMain* >         m_LuaMainStack;
+    CDuplicateLineFilter < SLogData > m_DuplicateLineFilter;
 };
 
 #endif
