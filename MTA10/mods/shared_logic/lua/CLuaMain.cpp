@@ -420,123 +420,6 @@ void CLuaMain::AddVehicleClass ( lua_State* luaVM )
 }
 
 
-// TODO: special tables
-void CLuaMain::AddPedClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "createPed" );
-
-    lua_classfunction ( luaVM, "getBodyPartName", "getBodyPartName" );
-    lua_classfunction ( luaVM, "getClothesTypeName", "getClothesTypeName" );
-    lua_classfunction ( luaVM, "getValidModels", "getValidPedModels" );
-    lua_classfunction ( luaVM, "getTypeIndexFromClothes", "getTypeIndexFromClothes" );
-    lua_classfunction ( luaVM, "getClothesByTypeIndex", "getClothesByTypeIndex" );
-    lua_classvariable ( luaVM, "validModels", NULL, "getValidPedModels" );
-    //lua_classvariable ( luaVM, "clothesTypeName", NULL, "getClothesTypeName" ); table
-    //lua_classvariable ( luaVM, "bodyPartName", NULL, "getBodyPartName" ); table
-    
-    lua_classfunction ( luaVM, "canBeKnockedOffBike", "canPedBeKnockedOffBike" );
-    lua_classfunction ( luaVM, "doesHaveJetPack", "doesPedHaveJetPack" );
-    lua_classfunction ( luaVM, "getAmmoInClip", "getPedAmmoInClip" );
-    lua_classfunction ( luaVM, "getAnalogControlState", "getPedAnalogControlState");
-    lua_classfunction ( luaVM, "getAnimation", "getPedAnimation" );
-    lua_classfunction ( luaVM, "getAnimationData", "getPedAnimationData" );
-    lua_classfunction ( luaVM, "getArmor", "getPedArmor" );
-    lua_classfunction ( luaVM, "getClothes", "getPedClothes" );
-    lua_classfunction ( luaVM, "addClothes", "addPedClothes" );
-    lua_classfunction ( luaVM, "removeClothes", "removePedClothes" );
-    lua_classfunction ( luaVM, "getContactElement", "getPedContactElement" );
-    lua_classfunction ( luaVM, "getControlState", "getPedControlState" );
-    lua_classfunction ( luaVM, "getMoveState", "getPedMoveState" );
-    lua_classfunction ( luaVM, "getOccupiedVehicle", "getPedOccupiedVehicle" );
-    lua_classfunction ( luaVM, "getOccupiedVehicleSeat", "getPedOccupiedVehicleSeat" );
-    lua_classfunction ( luaVM, "getOxygenLevel", "getPedOxygenLevel" );
-    lua_classfunction ( luaVM, "getStat", "getPedStat" );
-    lua_classfunction ( luaVM, "getTarget", "getPedTarget" );
-    lua_classfunction ( luaVM, "getTargetCollision", "getPedTargetCollision" );
-    lua_classfunction ( luaVM, "getSimplestTask", "getPedSimplestTask" );
-    lua_classfunction ( luaVM, "getTask", "getPedTask" );
-    lua_classfunction ( luaVM, "getTotalAmmo", "getPedTotalAmmo" );
-    lua_classfunction ( luaVM, "getVoice", "getPedVoice" );
-    lua_classfunction ( luaVM, "getWeapon", "getPedWeapon" );
-    lua_classfunction ( luaVM, "isChocking", "isPedChoking" );
-    lua_classfunction ( luaVM, "isDoingGangDriveby", "isPedDoingGangDriveby" );
-    lua_classfunction ( luaVM, "isDoingTask", "isPedDoingTask" );
-    lua_classfunction ( luaVM, "isDucked", "isPedDucked" );
-    lua_classfunction ( luaVM, "isHeadless", "isPedHeadless" );
-    lua_classfunction ( luaVM, "isInVehicle", "isPedInVehicle" );
-    lua_classfunction ( luaVM, "isOnFire", "isPedOnFire" );
-    lua_classfunction ( luaVM, "isOnGround", "isPedOnGround" );
-    lua_classfunction ( luaVM, "isTargetingMarkerEnabled", "isPedTargetingMarkerEnabled" );
-    lua_classfunction ( luaVM, "isDead", "isPedDead" );
-    lua_classfunction ( luaVM, "setFootBloodEnabled", "setPedFootBloodEnabled" );
-    lua_classfunction ( luaVM, "getTargetEnd", "getPedTargetEnd" );
-    lua_classfunction ( luaVM, "getTargetStart", "getPedTargetStart" );
-    lua_classfunction ( luaVM, "getWeaponMuzzlePosition", "getPedWeaponMuzzlePosition" );
-    lua_classfunction ( luaVM, "getBonePosition", "getPedBonePosition" );
-    lua_classfunction ( luaVM, "getCameraRotation", "getPedCameraRotation" );
-    lua_classfunction ( luaVM, "getWeaponSlot", "getPedWeaponSlot" );
-    lua_classfunction ( luaVM, "getWalkingStyle", "getPedWalkingStyle" );
-
-    lua_classfunction ( luaVM, "setCanBeKnockedOffBike", "setPedCanBeKnockedOffBike" );
-    lua_classfunction ( luaVM, "setAnalogControlState", "setPedAnalogControlState" );
-    lua_classfunction ( luaVM, "setAnimation", "setPedAnimation" );
-    lua_classfunction ( luaVM, "setAnimationProgress", "setPedAnimationProgress" );
-    lua_classfunction ( luaVM, "setCameraRotation", "setPedCameraRotation" );
-    lua_classfunction ( luaVM, "setControlState", "setPedControlState" );
-    lua_classfunction ( luaVM, "warpIntoVehicle", "warpPedIntoVehicle" );
-    lua_classfunction ( luaVM, "setOxygenLevel", "setPedOxygenLevel" );
-    lua_classfunction ( luaVM, "setWeaponSlot", "setPedWeaponSlot" );
-    lua_classfunction ( luaVM, "setDoingGangDriveby", "setPedDoingGangDriveby" );
-    lua_classfunction ( luaVM, "setHeadless", "setPedHeadless" );
-    lua_classfunction ( luaVM, "setOnFire", "setPedOnFire" );
-    lua_classfunction ( luaVM, "setTargetingMarkerEnabled", "setPedTargetingMarkerEnabled" );
-    lua_classfunction ( luaVM, "setVoice", "setPedVoice" );
-    lua_classfunction ( luaVM, "removeFromVehicle", "removePedFromVehicle" );
-    lua_classfunction ( luaVM, "setAimTarget", "setPedAimTarget" );
-    lua_classfunction ( luaVM, "setLookAt", "setPedLookAt" );
-    lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
-    lua_classfunction ( luaVM, "giveWeapon", "givePedWeapon" );
-
-    lua_classvariable ( luaVM, "vehicle", CLuaOOPDefs::SetPedOccupiedVehicle, CLuaFunctionDefs::GetPedOccupiedVehicle );
-    lua_classvariable ( luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat" );
-    lua_classvariable ( luaVM, "canBeKnockedOffBike", "setPedCanBeKnockedOffBike", "canPedBeKnockedOffBike" );
-    lua_classvariable ( luaVM, "hasJetPack", NULL, "doesPedHaveJetPack" );
-    lua_classvariable ( luaVM, "armor", NULL, "getPedArmor" );
-    lua_classvariable ( luaVM, "cameraRotation", "setPedCameraRotation", "getPedCameraRotation" );
-    lua_classvariable ( luaVM, "contactElement", NULL, "getPedContactElement" );
-    lua_classvariable ( luaVM, "moveState", NULL, "getPedMoveState" );
-    lua_classvariable ( luaVM, "oxygenLevel", "setPedOxygenLevel", "getPedOxygenLevel" );
-    lua_classvariable ( luaVM, "target", NULL, "getPedTarget" );
-    lua_classvariable ( luaVM, "simplestTask", NULL, "getPedSimplestTask" );
-    lua_classvariable ( luaVM, "choking", NULL, "isPedChoking" );
-    lua_classvariable ( luaVM, "doingGangDriveby", "setPedDoingGangDriveby", "isPedDoingGangDriveby" );
-    lua_classvariable ( luaVM, "ducked", NULL, "isPedDucked" );
-    lua_classvariable ( luaVM, "headless", "setPedHeadless", "isPedHeadless" );
-    lua_classvariable ( luaVM, "inVehicle", NULL, "isPedInVehicle" );
-    lua_classvariable ( luaVM, "onFire", "setPedOnFire", "isPedOnFire" );
-    lua_classvariable ( luaVM, "onGround", NULL, "isPedOnGround" );
-    lua_classvariable ( luaVM, "dead", NULL, "isPedDead" );
-    lua_classvariable ( luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled" );
-    lua_classvariable ( luaVM, "footBlood", "setPedFootBloodEnabled", NULL );
-    lua_classvariable ( luaVM, "targetCollision", NULL, "getPedTargetCollision" );
-    lua_classvariable ( luaVM, "targetEnd", NULL, "getPedTargetEnd" );
-    lua_classvariable ( luaVM, "targetStart", NULL, "getPedTargetStart" );
-    lua_classvariable ( luaVM, "muzzlePosition", NULL, "getPedMuzzlePosition" );
-    lua_classvariable ( luaVM, "weaponSlot", "setPedWeaponSlot", "getPedWeaponSlot" );
-    lua_classvariable ( luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle" );
-
-    //lua_classvariable ( luaVM, "ammoInClip", NULL, CLuaOOPDefs::GetPedAmmoInClip ); // .ammoInClip["slot"] (readonly)
-    //lua_classvariable ( luaVM, "analogControlState", CLuaOOPDefs::SetPedAnalogControlState, CLuaOOPDefs::GetPedAnalogControlState ); //TODO: .analogControlState["control"] = value
-    //lua_classvariable ( luaVM, "controlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState ); // TODO: .controlState["control"] = value
-    //lua_classvariable ( luaVM, "stats", NULL, CLuaOOPDefs::GetPedStat ); // table (readonly)
-    //lua_classvariable ( luaVM, "doingTask", NULL, CLuaOOPDefs::IsPedDoingTask ); // table (readonly)
-    //lua_classvariable ( luaVM, "totalAmmo", NULL, CLuaDefs::GetPedTotalAmmo ); // table readonly    
-    lua_registerclass ( luaVM, "Ped", "Element" );
-}
-
-
 // TODO: integrate colour class
 void CLuaMain::AddPlayerClass ( lua_State* luaVM )
 {
@@ -1672,7 +1555,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
 
     AddElementClass             ( luaVM );
     AddVehicleClass             ( luaVM );
-    AddPedClass                 ( luaVM );
+    CLuaPedDefs::AddClass       ( luaVM );
     AddPlayerClass              ( luaVM );
     AddObjectClass              ( luaVM );
     AddMarkerClass              ( luaVM );

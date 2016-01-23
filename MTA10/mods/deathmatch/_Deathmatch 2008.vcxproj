@@ -365,6 +365,7 @@
     <ClCompile Include="..\shared_logic\CClientSearchLight.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLights.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaPedDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp" />
@@ -575,7 +576,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Marker.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Object.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Ped.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Player.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp" />
@@ -599,7 +599,6 @@
     <ClCompile Include="..\shared_logic\lua\LuaCommon.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp" />
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp" />
     <ClCompile Include="..\..\..\vendor\bochs\bochs_internal\crc32.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaClassDefs.cpp" />
@@ -762,6 +761,7 @@
     <ClInclude Include="..\shared_logic\CClientSearchLight.h" />
     <ClInclude Include="..\shared_logic\CClientPointLights.h" />
     <ClInclude Include="..\shared_logic\CClientPointLightsManager.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaPedDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h" />
