@@ -1150,12 +1150,12 @@ int CLuaPedDefs::GivePedWeapon ( lua_State* luaVM )
 {
     // Verify the argument
     CClientEntity* pEntity = NULL;
-    uchar ucWeaponType = 0;
+    eWeaponType weaponType;
     ushort usAmmo = 0;
     bool bSetAsCurrent = false;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( ucWeaponType );
+    argStream.ReadEnumStringOrNumber ( weaponType );
     argStream.ReadNumber ( usAmmo, 30 );
     argStream.ReadBool ( bSetAsCurrent, false );
 
@@ -1163,7 +1163,7 @@ int CLuaPedDefs::GivePedWeapon ( lua_State* luaVM )
     {
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::GivePedWeapon ( *pEntity, ucWeaponType, usAmmo, bSetAsCurrent ) )
+            if ( CStaticFunctionDefinitions::GivePedWeapon ( *pEntity, weaponType, usAmmo, bSetAsCurrent ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
