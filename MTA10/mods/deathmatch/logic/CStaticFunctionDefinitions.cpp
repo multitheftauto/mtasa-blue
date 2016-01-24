@@ -2008,11 +2008,21 @@ bool CStaticFunctionDefinitions::KillPed ( CClientEntity& Entity, CClientEntity*
     // Remove him from any occupied vehicle
     pPed.SetVehicleInOutState ( VEHICLE_INOUT_NONE );
     pPed.RemoveFromVehicle ();
-            
-    // Update the ped
-    pPed.SetIsDead ( true );
-    pPed.SetHealth ( 0.0f );
-    pPed.SetArmor ( 0.0f );
+
+    // Is this a stealth kill? and do we have a killer ped?
+    // TODO: Make things dry. Refer to CPacketHandler::Packet_PlayerWasted
+    if ( bStealth && pKiller && IS_PED ( pKiller ) )
+    {
+        // Make our killer ped do the stealth kill animation
+        CClientPed* pKillerPed = static_cast < CClientPed * > ( pKiller );
+        pKillerPed->StealthKill ( &pPed );
+    }
+
+    // Kill the ped
+    pPed.Kill ( (eWeaponType) ucKillerWeapon,
+        ucBodyPart,
+        bStealth, false, 0, 15 );
+    // magic numbers 0, 15 found from CPlayerWastedPacket
 
     // Tell our scripts the ped has died
     CLuaArguments Arguments;
