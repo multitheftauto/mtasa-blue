@@ -20,8 +20,8 @@ int CLuaFunctionDefs::BitAnd ( lua_State* luaVM )
     uint uiVar1; uint uiVar2;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar1 );
-    argStream.ReadNumber ( uiVar2 );
+    argStream.ReadNumber ( uiVar1, false );
+    argStream.ReadNumber ( uiVar2, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -29,7 +29,7 @@ int CLuaFunctionDefs::BitAnd ( lua_State* luaVM )
         while ( argStream.NextIsNumber () )
         {
             uint uiVar;
-            argStream.ReadNumber ( uiVar );
+            argStream.ReadNumber ( uiVar, false );
 
             uiResult &= uiVar;
         }
@@ -51,7 +51,7 @@ int CLuaFunctionDefs::BitNot ( lua_State* luaVM )
     uint uiVar;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar );
+    argStream.ReadNumber ( uiVar, false );
     
     if ( !argStream.HasErrors () )
     {
@@ -72,8 +72,8 @@ int CLuaFunctionDefs::BitOr ( lua_State* luaVM )
     uint uiVar1; uint uiVar2;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar1 );
-    argStream.ReadNumber ( uiVar2 );
+    argStream.ReadNumber ( uiVar1, false );
+    argStream.ReadNumber ( uiVar2, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -81,7 +81,7 @@ int CLuaFunctionDefs::BitOr ( lua_State* luaVM )
         while ( argStream.NextIsNumber () )
         {
             uint uiVar;
-            argStream.ReadNumber ( uiVar );
+            argStream.ReadNumber ( uiVar, false );
 
             uiResult |= uiVar;
         }
@@ -103,8 +103,8 @@ int CLuaFunctionDefs::BitTest ( lua_State* luaVM )
     uint uiVar1; uint uiVar2;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar1 );
-    argStream.ReadNumber ( uiVar2 );
+    argStream.ReadNumber ( uiVar1, false );
+    argStream.ReadNumber ( uiVar2, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -112,7 +112,7 @@ int CLuaFunctionDefs::BitTest ( lua_State* luaVM )
         while ( argStream.NextIsNumber () )
         {
             uint uiVar;
-            argStream.ReadNumber ( uiVar );
+            argStream.ReadNumber ( uiVar, false );
 
             uiResult &= uiVar;
         }
@@ -135,8 +135,8 @@ int CLuaFunctionDefs::BitXor ( lua_State* luaVM )
     uint uiVar1; uint uiVar2;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar1 );
-    argStream.ReadNumber ( uiVar2 );
+    argStream.ReadNumber ( uiVar1, false );
+    argStream.ReadNumber ( uiVar2, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -144,7 +144,7 @@ int CLuaFunctionDefs::BitXor ( lua_State* luaVM )
         while ( argStream.NextIsNumber () )
         {
             uint uiVar;
-            argStream.ReadNumber ( uiVar );
+            argStream.ReadNumber ( uiVar, false );
 
             uiResult ^= uiVar;
         }
@@ -166,7 +166,7 @@ int CLuaFunctionDefs::BitLRotate ( lua_State* luaVM )
     uint uiVar; int iDisp;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar );
+    argStream.ReadNumber ( uiVar, false );
     argStream.ReadNumber ( iDisp );
 
     if ( !argStream.HasErrors () )
@@ -191,7 +191,7 @@ int CLuaFunctionDefs::BitRRotate ( lua_State* luaVM )
     uint uiVar; int iDisp;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar );
+    argStream.ReadNumber ( uiVar, false );
     argStream.ReadNumber ( iDisp );
 
     if ( !argStream.HasErrors () )
@@ -216,7 +216,7 @@ int CLuaFunctionDefs::BitLShift ( lua_State* luaVM )
     uint uiVar; int iDisp;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar );
+    argStream.ReadNumber ( uiVar, false );
     argStream.ReadNumber ( iDisp );
 
     if ( !argStream.HasErrors () )
@@ -245,7 +245,7 @@ int CLuaFunctionDefs::BitRShift ( lua_State* luaVM )
     uint uiVar; int iDisp;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar );
+    argStream.ReadNumber ( uiVar, false );
     argStream.ReadNumber ( iDisp );
 
     if ( !argStream.HasErrors () )
@@ -274,7 +274,7 @@ int CLuaFunctionDefs::BitArShift ( lua_State* luaVM )
     uint uiVar; int iDisp;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar );
+    argStream.ReadNumber ( uiVar, false );
     argStream.ReadNumber ( iDisp );
 
     if ( !argStream.HasErrors () )
@@ -319,7 +319,7 @@ int CLuaFunctionDefs::BitExtract ( lua_State* luaVM )
     uint uiVar; int iField; int iWidth;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar );
+    argStream.ReadNumber ( uiVar, false );
     argStream.ReadNumber ( iField );
     argStream.ReadNumber ( iWidth, 1 );
 
@@ -355,8 +355,8 @@ int CLuaFunctionDefs::BitReplace ( lua_State* luaVM )
     uint uiVar; uint uiReplaceValue; int iField; int iWidth;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiVar );
-    argStream.ReadNumber ( uiReplaceValue );
+    argStream.ReadNumber ( uiVar, false );
+    argStream.ReadNumber ( uiReplaceValue, false );
     argStream.ReadNumber ( iField );
     argStream.ReadNumber ( iWidth, 1 );
 
