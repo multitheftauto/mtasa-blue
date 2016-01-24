@@ -48,7 +48,7 @@ public:
     // Read next number
     //
     template < typename T >
-    void ReadNumber ( T& outValue )
+    void ReadNumber ( T& outValue, bool checkSign = true )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
@@ -61,7 +61,7 @@ public:
                 return;
             }
 
-            if ( std::is_unsigned < T > () && number < -FLT_EPSILON )
+            if ( checkSign && std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
                 SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
                 return;
@@ -80,7 +80,7 @@ public:
     // Read next number, using default if needed
     //
     template < typename T, typename U >
-    void ReadNumber ( T& outValue, const U& defaultValue )
+    void ReadNumber ( T& outValue, const U& defaultValue, bool checkSign = true )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
@@ -93,7 +93,7 @@ public:
                 return;
             }
 
-            if ( std::is_unsigned < T > () && number < -FLT_EPSILON )
+            if ( checkSign && std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
                 SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
                 return;
