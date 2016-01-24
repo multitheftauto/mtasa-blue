@@ -1988,6 +1988,48 @@ bool CStaticFunctionDefinitions::SetPlayerNametagShowing ( CClientEntity& Entity
     return false;
 }
 
+bool CStaticFunctionDefinitions::KillPed ( CClientEntity& Entity, CClientEntity* pKiller = NULL, unsigned char ucKillerWeapon = 0xFF, unsigned char ucBodyPart = 0xFF, bool bStealth = false )
+{
+    RUN_CHILDREN ( KillPed ( **iter, pKiller, ucKillerWeapon, ucBodyPart ) )
+
+    if ( !IS_PED ( &Entity ) )
+    {
+        return false;
+    }
+
+    CClientPed& pPed = static_cast < CClientPed& > ( Entity );
+
+    // Is the ped alive and a local entity?
+    if ( pPed.IsDead () || !pPed.IsLocalEntity() )
+    {
+        return false;
+    }
+
+    // Remove him from any occupied vehicle
+    pPed.SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+    pPed.RemoveFromVehicle ();
+            
+    // Update the ped
+    pPed.SetIsDead ( true );
+    pPed.SetHealth ( 0.0f );
+    pPed.SetArmor ( 0.0f );
+
+    // Tell our scripts the ped has died
+    CLuaArguments Arguments;
+    if ( pKiller ) Arguments.PushElement ( pKiller );
+    else Arguments.PushBoolean ( false );
+    if ( ucKillerWeapon != 0xFF ) Arguments.PushNumber ( ucKillerWeapon );
+    else Arguments.PushBoolean ( false );
+    if ( ucBodyPart != 0xFF ) Arguments.PushNumber ( ucBodyPart );
+    else Arguments.PushBoolean ( false );
+    Arguments.PushBoolean ( bStealth );
+            
+    pPed.CallEvent ( "onClientPedWasted", Arguments, false );
+    pPed.RemoveAllWeapons ();
+
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetPedRotation ( CClientEntity& Entity, float fRotation, bool bNewWay )
 {
