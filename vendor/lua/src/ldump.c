@@ -14,7 +14,6 @@
 #include "lobject.h"
 #include "lstate.h"
 #include "lundump.h"
-#ifdef WITH_STRING_DUMP
 
 typedef struct {
  lua_State* L;
@@ -163,5 +162,3 @@ int luaU_dump (lua_State* L, const Proto* f, lua_Writer w, void* data, int strip
  DumpFunction(f,NULL,&D);
  return D.status;
 }
-
-#endif  //  WITH_STRING_DUMP
