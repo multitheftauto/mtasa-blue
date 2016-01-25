@@ -386,7 +386,7 @@ CLuaArgument* CLuaArguments::PushTable ( CLuaArguments * table )
     return pArgument;
 }
 
-
+// Gets rid of all the arguments in the list
 void CLuaArguments::DeleteArguments ( void )
 {
     // Delete each item
@@ -400,6 +400,16 @@ void CLuaArguments::DeleteArguments ( void )
     m_Arguments.clear ();
 }
 
+// Gets rid of the last argument in the list
+void CLuaArguments::Pop ( void )
+{
+    // Delete the last element
+    CLuaArgument* item = m_Arguments.back ();
+    delete item;
+
+    // Pop it out of the vector
+    m_Arguments.pop_back ();
+}
 
 void CLuaArguments::ValidateTableKeys ( void )
 {
