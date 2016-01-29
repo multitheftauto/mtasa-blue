@@ -46,8 +46,6 @@ public:
     virtual bool            IsValid                 ( void ) = 0;
     virtual const SString&  GetLastErrorMessage     ( void ) = 0;
     virtual uint            GetLastErrorCode        ( void ) = 0;
-    virtual uint            GetNumAffectedRows      ( void ) = 0;
-    virtual uint64          GetLastInsertId         ( void ) = 0;
     virtual void            AddRef                  ( void ) = 0;
     virtual void            Release                 ( void ) = 0;
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult ) = 0;
