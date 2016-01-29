@@ -503,14 +503,55 @@ int CLuaDatabaseDefs::DbFree ( lua_State* luaVM )
 }
 
 
+// Plop single set of registry results into a lua table
+void PushRegistryResultTable( lua_State* luaVM, const CRegistryResultData* Result )
+{
+    lua_newtable ( luaVM );
+    int i = 0;
+    for ( CRegistryResultIterator iter = Result->begin (); iter != Result->end (); ++iter, ++i )
+    {
+        const CRegistryResultRow& row = *iter;
+        lua_pushnumber ( luaVM, i + 1 );
+        lua_newtable ( luaVM );
+        for ( int j = 0; j < Result->nColumns; j++ )
+        {
+            const CRegistryResultCell& cell = row[j];
+
+            // Push the column name
+            lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
+            switch ( cell.nType )                           // push the value with the right type
+            {
+            case SQLITE_INTEGER:
+                lua_pushnumber ( luaVM, static_cast <double> ( cell.nVal ) );
+                break;
+            case SQLITE_FLOAT:
+                lua_pushnumber ( luaVM, cell.fVal );
+                break;
+            case SQLITE_BLOB:
+                lua_pushlstring ( luaVM, (const char *) cell.pVal, cell.nLength );
+                break;
+            case SQLITE_TEXT:
+                lua_pushlstring ( luaVM, (const char *) cell.pVal, cell.nLength - 1 );
+                break;
+            default:
+                lua_pushboolean ( luaVM, false );
+            }
+            lua_settable ( luaVM, -3 );
+        }
+        lua_settable ( luaVM, -3 );
+    }
+}
+
+
 int CLuaDatabaseDefs::DbPoll ( lua_State* luaVM )
 {
     //  table dbPoll ( handle query, int timeout )
-    CDbJobData* pJobData; int iTimeout;
+    CDbJobData* pJobData; int iTimeout; bool bMultipleResults;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pJobData );
     argStream.ReadNumber ( iTimeout );
+    argStream.ReadBool ( bMultipleResults, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -540,49 +581,41 @@ int CLuaDatabaseDefs::DbPoll ( lua_State* luaVM )
             return 3;
         }
 
-        const CRegistryResult& Result = pJobData->result.registryResult;
+        const CRegistryResultData* Result = pJobData->result.registryResult->GetThis();
 
-        // Make table!
-        lua_newtable ( luaVM );
-        //for ( int i = 0; i < Result->nRows; i++ ) {
-        int i = 0;
-        for ( CRegistryResultIterator iter = Result->begin (); iter != Result->end (); ++iter, ++i )
+        if ( !bMultipleResults )
         {
-            const CRegistryResultRow& row = *iter;
-            lua_newtable ( luaVM );                             // new table
-            lua_pushnumber ( luaVM, i + 1 );                      // row index number (starting at 1, not 0)
-            lua_pushvalue ( luaVM, -2 );                        // value
-            lua_settable ( luaVM, -4 );                         // refer to the top level table
-            for ( int j = 0; j < Result->nColumns; j++ )
+            // Single result (from first statement)
+            PushRegistryResultTable( luaVM, Result );
+            lua_pushnumber ( luaVM, Result->uiNumAffectedRows );
+            lua_pushnumber ( luaVM, static_cast <double> ( Result->ullLastInsertId ) );
+            return 3;
+        }
+        else
+        {
+            // One or more results (from multiple statements)
+            lua_newtable ( luaVM );
+            for ( int i = 0 ; Result ; Result = Result->pNextResult, i++ )
             {
-                const CRegistryResultCell& cell = row[j];
-
-                // Push the column name
-                lua_pushlstring ( luaVM, Result->ColNames[j].c_str (), Result->ColNames[j].size () );
-                switch ( cell.nType )                           // push the value with the right type
+                lua_pushnumber ( luaVM, i + 1 );
+                lua_newtable ( luaVM );
                 {
-                case SQLITE_INTEGER:
-                    lua_pushnumber ( luaVM, static_cast <double> ( cell.nVal ) );
-                    break;
-                case SQLITE_FLOAT:
-                    lua_pushnumber ( luaVM, cell.fVal );
-                    break;
-                case SQLITE_BLOB:
-                    lua_pushlstring ( luaVM, (const char *) cell.pVal, cell.nLength );
-                    break;
-                case SQLITE_TEXT:
-                    lua_pushlstring ( luaVM, (const char *) cell.pVal, cell.nLength - 1 );
-                    break;
-                default:
-                    lua_pushboolean ( luaVM, false );
+                    lua_pushnumber ( luaVM, 1 );        // [1] - table of result rows
+                    PushRegistryResultTable( luaVM, Result );
+                    lua_settable ( luaVM, -3 );
+
+                    lua_pushnumber ( luaVM, 2 );        // [2] - NumAffectedRows
+                    lua_pushnumber ( luaVM, Result->uiNumAffectedRows );
+                    lua_settable ( luaVM, -3 );
+
+                    lua_pushnumber ( luaVM, 3 );        // [3] - LastInsertId
+                    lua_pushnumber ( luaVM, static_cast <double> ( Result->ullLastInsertId ) );
+                    lua_settable ( luaVM, -3 );
                 }
                 lua_settable ( luaVM, -3 );
             }
-            lua_pop ( luaVM, 1 );                               // pop the inner table
+            return 1;
         }
-        lua_pushnumber ( luaVM, pJobData->result.uiNumAffectedRows );
-        lua_pushnumber ( luaVM, static_cast <double> ( pJobData->result.ullLastInsertId ) );
-        return 3;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

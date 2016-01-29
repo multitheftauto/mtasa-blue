@@ -32,8 +32,6 @@ public:
     virtual bool            IsValid                 ( void );
     virtual const SString&  GetLastErrorMessage     ( void );
     virtual uint            GetLastErrorCode        ( void );
-    virtual uint            GetNumAffectedRows      ( void );
-    virtual uint64          GetLastInsertId         ( void );
     virtual void            AddRef                  ( void );
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
@@ -53,12 +51,11 @@ public:
     bool                    m_bOpened;
     SString                 m_strLastErrorMessage;
     uint                    m_uiLastErrorCode;
-    uint                    m_uiNumAffectedRows;
-    uint64                  m_ullLastInsertId;
     int                     m_bAutomaticReconnect;
     int                     m_bAutomaticTransactionsEnabled;
     bool                    m_bInAutomaticTransaction;
     CTickCount              m_AutomaticTransactionStartTime;
+    int                     m_bMultipleStatements;
 };
 
 
@@ -87,6 +84,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql ( CDatabaseType* pManager, co
     optionsMap.SetFromString ( strOptions );
     optionsMap.Get ( "autoreconnect", m_bAutomaticReconnect, 1 );
     optionsMap.Get ( "batch", m_bAutomaticTransactionsEnabled, 1 );
+    optionsMap.Get ( "multi_statements", m_bMultipleStatements, 0 );
 
     SString strHostname;
     SString strDatabaseName;
@@ -111,6 +109,8 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql ( CDatabaseType* pManager, co
         mysql_options ( m_handle, MYSQL_OPT_RECONNECT, &reconnect );
         if ( !strCharset.empty() )
             mysql_options( m_handle, MYSQL_SET_CHARSET_NAME, strCharset );
+        if ( m_bMultipleStatements )
+            ulClientFlags |= CLIENT_MULTI_STATEMENTS;
 
         if ( mysql_real_connect ( m_handle, strHostname, strUsername, strPassword, strDatabaseName, iPort, strUnixSocket, ulClientFlags ) )
             m_bOpened = true;
@@ -232,32 +232,6 @@ void CDatabaseConnectionMySql::SetLastError ( uint uiCode, const SString& strMes
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseConnectionMySql::GetNumAffectedRows
-//
-// Only valid when Query() returns true
-//
-///////////////////////////////////////////////////////////////
-uint CDatabaseConnectionMySql::GetNumAffectedRows ( void )
-{
-    return m_uiNumAffectedRows;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CDatabaseConnectionMySql::GetLastInsertId
-//
-// Only valid when Query() returns true
-//
-///////////////////////////////////////////////////////////////
-uint64 CDatabaseConnectionMySql::GetLastInsertId ( void )
-{
-    return m_ullLastInsertId;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // CDatabaseConnectionMySql::Query
 //
 //
@@ -280,7 +254,7 @@ bool CDatabaseConnectionMySql::Query ( const SString& strQuery, CRegistryResult&
 ///////////////////////////////////////////////////////////////
 bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistryResult& registryResult )
 {
-    CRegistryResult& pResult = registryResult;
+    CRegistryResultData* pResult = registryResult->GetThis();
 
     int status = mysql_real_query ( m_handle, strQuery, static_cast < unsigned long > ( strQuery.length () ) );
     if ( status )
@@ -289,91 +263,96 @@ bool CDatabaseConnectionMySql::QueryInternal ( const SString& strQuery, CRegistr
         return false;
     }
 
-
-    MYSQL_RES* res = mysql_store_result ( m_handle );
-
-    m_uiNumAffectedRows = static_cast < uint > ( mysql_affected_rows ( m_handle ) );
-    m_ullLastInsertId = mysql_insert_id( m_handle );
-
-    if ( !res )
+    while ( true )
     {
-        // No result data
-        registryResult = CRegistryResult ();
-    }
-    else
-    {
-        // Get column names
-        pResult->nColumns = mysql_num_fields ( res );
-        pResult->ColNames.clear ();
-        for ( int i = 0; i < pResult->nColumns; i++ )
-        {
-            mysql_field_seek ( res, i );
-            MYSQL_FIELD* field = mysql_fetch_field ( res );
-            pResult->ColNames.push_back ( field->name );
-        }
+        MYSQL_RES* res = mysql_store_result ( m_handle );
 
-        // Fetch the rows
-        pResult->nRows = 0;
-        pResult->Data.clear ();
-        MYSQL_ROW inRow;
-        while ( ( inRow = mysql_fetch_row ( res ) ) )
-        {
-            ulong* inLengths = mysql_fetch_lengths ( res );
+        pResult->uiNumAffectedRows = static_cast < uint > ( mysql_affected_rows ( m_handle ) );
+        pResult->ullLastInsertId = mysql_insert_id( m_handle );
 
-            pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
-            vector < CRegistryResultCell > & outRow = pResult->Data.back();
+        if ( res )
+        {
+            // Get column names
+            pResult->nColumns = mysql_num_fields ( res );
+            pResult->ColNames.clear ();
             for ( int i = 0; i < pResult->nColumns; i++ )
             {
-                CRegistryResultCell& cell = outRow[i];
                 mysql_field_seek ( res, i );
                 MYSQL_FIELD* field = mysql_fetch_field ( res );
-                cell.nType = ConvertToSqliteType ( field->type );
+                pResult->ColNames.push_back ( field->name );
+            }
 
-                char* inData = inRow[i];
-                ulong inLength = inLengths[i];
+            // Fetch the rows
+            pResult->nRows = 0;
+            pResult->Data.clear ();
+            MYSQL_ROW inRow;
+            while ( ( inRow = mysql_fetch_row ( res ) ) )
+            {
+                ulong* inLengths = mysql_fetch_lengths ( res );
 
-                if ( !inData )
-                    cell.nType = SQLITE_NULL;
-
-                switch ( cell.nType )
+                pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
+                vector < CRegistryResultCell > & outRow = pResult->Data.back();
+                for ( int i = 0; i < pResult->nColumns; i++ )
                 {
-                    case SQLITE_NULL:
-                        break;
-                    case SQLITE_INTEGER:
-                        cell.nVal = std::atoll ( inData );
-                        break;
-                    case SQLITE_FLOAT:
-                        cell.fVal = (float)atof ( inData );
-                        break;
-                    case SQLITE_BLOB:
-                        cell.nLength = inLength;
-                        if ( cell.nLength == 0 )
-                        {
-                            cell.pVal = NULL;
-                        }
-                        else
-                        {
+                    CRegistryResultCell& cell = outRow[i];
+                    mysql_field_seek ( res, i );
+                    MYSQL_FIELD* field = mysql_fetch_field ( res );
+                    cell.nType = ConvertToSqliteType ( field->type );
+
+                    char* inData = inRow[i];
+                    ulong inLength = inLengths[i];
+
+                    if ( !inData )
+                        cell.nType = SQLITE_NULL;
+
+                    switch ( cell.nType )
+                    {
+                        case SQLITE_NULL:
+                            break;
+                        case SQLITE_INTEGER:
+                            cell.nVal = std::atoll ( inData );
+                            break;
+                        case SQLITE_FLOAT:
+                            cell.fVal = (float)atof ( inData );
+                            break;
+                        case SQLITE_BLOB:
+                            cell.nLength = inLength;
+                            if ( cell.nLength == 0 )
+                            {
+                                cell.pVal = NULL;
+                            }
+                            else
+                            {
+                                cell.pVal = new unsigned char [ cell.nLength ];
+                                memcpy ( cell.pVal, inData, cell.nLength );
+                            }
+                            break;
+                        default:
+                            cell.nLength = inLength + 1;
                             cell.pVal = new unsigned char [ cell.nLength ];
                             memcpy ( cell.pVal, inData, cell.nLength );
-                        }
-                        break;
-                    default:
-                        cell.nLength = inLength + 1;
-                        cell.pVal = new unsigned char [ cell.nLength ];
-                        memcpy ( cell.pVal, inData, cell.nLength );
-                        break;
+                            break;
+                    }
                 }
+                pResult->nRows++;
             }
-            pResult->nRows++;
+
+            mysql_free_result ( res );
         }
 
-        mysql_free_result ( res );
-    }
+        // Any more results?
+        int status = mysql_next_result ( m_handle );
+        if ( status == -1 )
+            break;
+        if ( status != 0 )
+        {
+            SetLastError ( mysql_errno( m_handle ), mysql_error ( m_handle ) );
+            return false;
+        }
 
-    // Discard extra results from a called procedure
-    while ( mysql_next_result ( m_handle ) == 0 )
-        if ( MYSQL_RES* result = mysql_store_result ( m_handle ) )
-            mysql_free_result ( result );
+        pResult->pNextResult = new CRegistryResultData();
+        pResult = pResult->pNextResult;
+    }
 
     return true;
 }

@@ -131,12 +131,26 @@ struct CRegistryResultData
                                              {
                                                 nRows = 0;
                                                 nColumns = 0;
+                                                uiNumAffectedRows = 0;
+                                                ullLastInsertId = 0;
+                                                pNextResult = nullptr;
+                                             }
+                                             ~CRegistryResultData ( void )
+                                             {
+                                                SAFE_DELETE( pNextResult );
                                              }
     std::vector < SString >                  ColNames;
     std::list < CRegistryResultRow >         Data;
     int                                      nRows;
     int                                      nColumns;
+    uint                                     uiNumAffectedRows;
+    uint64                                   ullLastInsertId;
+    CRegistryResultData*                     pNextResult;
 
+    CRegistryResultData* GetThis()
+    {
+        return this;
+    }
     CRegistryResultIterator begin( void ) const
     {
         return Data.begin();

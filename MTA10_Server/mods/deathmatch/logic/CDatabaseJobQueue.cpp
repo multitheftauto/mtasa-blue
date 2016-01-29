@@ -711,8 +711,6 @@ void CDatabaseJobQueueImpl::ProcessQuery ( CDbJobData* pJobData )
     else
     {
         pJobData->result.status = EJobResult::SUCCESS;
-        pJobData->result.uiNumAffectedRows = pConnection->GetNumAffectedRows ();
-        pJobData->result.ullLastInsertId = pConnection->GetLastInsertId ();
     }
 
     // And log if required
@@ -856,7 +854,7 @@ void CDatabaseJobQueueImpl::LogResult ( CDbJobData* pJobData )
             SString strLine ( "%s: [%s] SUCCESS: Affected rows:%d [Query:%s]\n"
                                     , *GetLocalTimeString ( true, true )
                                     , *pConnection->m_strLogTag
-                                    , pJobData->result.uiNumAffectedRows
+                                    , pJobData->result.registryResult->uiNumAffectedRows
                                     , *pJobData->command.strData
                                 );
             LogString ( strLine );

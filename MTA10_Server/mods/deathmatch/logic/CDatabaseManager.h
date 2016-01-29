@@ -111,8 +111,6 @@ public:
         SString             strReason;
         bool                bErrorSuppressed;
         SConnectionHandle   connectionHandle;
-        uint                uiNumAffectedRows;
-        uint64              ullLastInsertId;
         CRegistryResult     registryResult;
         CTickCount          timeReady;
         bool                bLoggedWarning;
