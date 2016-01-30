@@ -55,7 +55,7 @@ public:
     long                    SetPointer              ( unsigned long ulPosition );
 
     void                    Flush                   ( void );
-    long                    Read                    ( unsigned long ulSize, char* pData );
+    long                    Read                    ( unsigned long ulSize, CBuffer& outBuffer );
     long                    Write                   ( unsigned long ulSize, const char* pData );
 
 private:

@@ -156,15 +156,25 @@ void CScriptFile::Flush ( void )
 }
 
 
-long CScriptFile::Read ( unsigned long ulSize, char* pData )
+long CScriptFile::Read ( unsigned long ulSize, CBuffer& outBuffer )
 {
     if ( !m_pFile )
         return -1;
 
     DoResourceFileCheck();
 
-    // Try to read data into the given block. Return number of bytes we read.
-    return m_pFile->FRead ( pData, ulSize );
+    // If read size is large, limit it to how many bytes can be read (avoid memory problems with over allocation)
+    if ( ulSize > 10000 )
+    {
+        long lCurrentPos = m_pFile->FTell ();
+        m_pFile->FSeek ( 0, SEEK_END );
+        long lFileSize = m_pFile->FTell ();
+        m_pFile->FSeek ( lCurrentPos, SEEK_SET );
+        ulSize = Min < unsigned long > ( lFileSize - lCurrentPos, ulSize );
+    }
+
+    outBuffer.SetSize( ulSize );
+    return m_pFile->FRead ( outBuffer.GetData(), ulSize );
 }
 
 
