@@ -405,24 +405,20 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
     {
         if ( ulCount > 0 )
         {
-            // Allocate a buffer to read the stuff into and read some shit into it
-            char* pReadContent = new char [ulCount + 1];
-            long lBytesRead = pFile->Read ( ulCount, pReadContent );
+            CBuffer buffer;
+            long lBytesRead = pFile->Read ( ulCount, buffer );
 
             if ( lBytesRead != -1 )
             {
                 // Push the string onto the lua stack. Use pushlstring so we are binary
                 // compatible. Normal push string takes zero terminated strings.
-                lua_pushlstring ( luaVM, pReadContent, lBytesRead );
+                lua_pushlstring ( luaVM, buffer.GetData(), lBytesRead );
             }
             else
             {
                 m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
                 lua_pushnil ( luaVM );
             }
-
-            // Delete our read content. Lua should've stored it
-            delete [] pReadContent;
 
             // We're returning the result string
             return 1;
