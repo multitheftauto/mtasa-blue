@@ -64,7 +64,6 @@ public:
             if ( checkSign && std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
                 SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
-                return;
             }
 
             outValue = static_cast < T > ( number );
@@ -96,7 +95,6 @@ public:
             if ( checkSign && std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
                 SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
-                return;
             }
 
             outValue = static_cast < T > ( number );
