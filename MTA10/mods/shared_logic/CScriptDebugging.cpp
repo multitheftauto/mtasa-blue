@@ -39,14 +39,14 @@ CScriptDebugging::~CScriptDebugging ( void )
     if ( m_pLogFile )
     {
         fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
-        fclose ( m_pLogFile );
 
         // if we have a flush timer
         if ( m_flushTimerHandle != NULL )
         {
             // delete our flush timer
-            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, NULL );
+            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE );   // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
+        fclose ( m_pLogFile );
         m_pLogFile = NULL;
     }
 }
@@ -229,13 +229,13 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
     if ( m_pLogFile )
     {
         fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
-        fclose ( m_pLogFile );
         // if we have a flush timer
         if ( m_flushTimerHandle != NULL )
         {
             // delete our flush timer
-            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, NULL );
+            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE );   // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
+        fclose ( m_pLogFile );
         m_pLogFile = NULL;
     }
 
