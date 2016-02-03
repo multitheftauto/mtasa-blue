@@ -17,6 +17,7 @@
 void CLuaPedDefs::LoadFunctions ( void ) {
     CLuaCFunctions::AddFunction ( "createPed", CreatePed );
     CLuaCFunctions::AddFunction ( "detonateSatchels", DetonateSatchels );
+    CLuaCFunctions::AddFunction ( "killPed", KillPed );
 
     CLuaCFunctions::AddFunction ( "getPedVoice", GetPedVoice );
     CLuaCFunctions::AddFunction ( "setPedVoice", SetPedVoice );
@@ -90,6 +91,7 @@ void CLuaPedDefs::AddClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "createPed" );
+    lua_classfunction ( luaVM, "kill", "killPed" );
 
     lua_classfunction ( luaVM, "getBodyPartName", "getBodyPartName" );
     lua_classfunction ( luaVM, "getClothesTypeName", "getClothesTypeName" );
@@ -2069,6 +2071,41 @@ int CLuaPedDefs::SetPedAimTarget ( lua_State* luaVM )
         }
         else
             m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaPedDefs::KillPed ( lua_State* luaVM )
+{
+    CClientEntity* pEntity = NULL;
+    CClientEntity *pKiller = NULL;
+    unsigned char ucKillerWeapon;
+    unsigned char ucBodyPart;
+    bool bStealth;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadUserData ( pKiller, NULL );
+    argStream.ReadNumber ( ucKillerWeapon, 0xFF );
+    argStream.ReadNumber ( ucBodyPart, 0xFF );
+    argStream.ReadBool ( bStealth, false );
+
+    if ( !argStream.HasErrors () )
+        if ( !pEntity->IsLocalEntity () )
+            argStream.SetCustomError ( "This client side function will only work with client created peds" );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::KillPed ( *pEntity, pKiller, ucKillerWeapon, ucBodyPart, bStealth ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

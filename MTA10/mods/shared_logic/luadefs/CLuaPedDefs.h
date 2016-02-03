@@ -18,7 +18,7 @@ public:
     static void AddClass ( lua_State* luaVM );
 
     LUA_DECLARE ( CreatePed );
-
+    LUA_DECLARE ( KillPed );
     LUA_DECLARE ( DetonateSatchels );
 
     LUA_DECLARE ( GetPedVoice );

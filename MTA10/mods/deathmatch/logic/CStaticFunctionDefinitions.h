@@ -136,6 +136,7 @@ public:
 
     // Ped funcs
     static CClientPed*                  CreatePed                           ( CResource& Resource, unsigned long ulModel, const CVector& vecPosition, float fRotation );
+    static bool                         KillPed                             ( CClientEntity& Entity, CClientEntity* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth );
 
     static CClientEntity*               GetPedTarget                        ( CClientPed& Ped );
     static bool                         GetPedTargetCollision               ( CClientPed& Ped, CVector& vecOrigin );

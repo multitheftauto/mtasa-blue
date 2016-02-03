@@ -2127,6 +2127,11 @@ void CClientGame::UpdateFireKey ( void )
                                 Arguments.PushElement ( pTargetPed );
                                 if ( m_pLocalPlayer->CallEvent ( "onClientPlayerStealthKill", Arguments, false ) ) 
                                 {
+                                    if ( pTargetPed->IsLocalEntity () ) {
+                                        CStaticFunctionDefinitions::KillPed ( *pTargetPed, m_pLocalPlayer, 4 /*WEAPONTYPE_KNIFE*/, 9/*BODYPART_HEAD*/, true );
+                                        return;
+                                    }
+
                                     // Lets request a stealth kill
                                     CBitStream bitStream;
                                     bitStream.pBitStream->Write ( pTargetPed->GetID () );
