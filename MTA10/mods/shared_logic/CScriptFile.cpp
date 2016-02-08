@@ -170,7 +170,8 @@ long CScriptFile::Read ( unsigned long ulSize, CBuffer& outBuffer )
         m_pFile->FSeek ( 0, SEEK_END );
         long lFileSize = m_pFile->FTell ();
         m_pFile->FSeek ( lCurrentPos, SEEK_SET );
-        ulSize = Min < unsigned long > ( lFileSize - lCurrentPos, ulSize );
+        ulSize = Min < unsigned long > ( 1 + lFileSize - lCurrentPos, ulSize );
+        // Note: Read extra byte at end so EOF indicator gets set
     }
 
     outBuffer.SetSize( ulSize );
