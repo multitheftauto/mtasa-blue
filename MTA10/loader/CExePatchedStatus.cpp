@@ -84,19 +84,26 @@ bool SetExePatchedStatus( bool bUseExeCopy, const SExePatchedStatus& status )
 //////////////////////////////////////////////////////////
 bool ShouldUseExeCopy( void )
 {
-    int iUseCopy;
+    SString strUseCopyReason;
     if ( GetApplicationSettingInt( "nvhacks", "optimus" ) )
-        iUseCopy = GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" );
+        strUseCopyReason = GetApplicationSettingInt( "nvhacks", "optimus-rename-exe" ) == 0 ? "" : "optimus-rename-exe";
     else
-        iUseCopy = GetApplicationSettingInt( "driver-overrides-disabled" );
+        strUseCopyReason = GetApplicationSettingInt( "driver-overrides-disabled" ) == 0 ? "" : "driver-overrides-disabled";
 
     if ( GetPatchRequirementAltModules() )
-        iUseCopy = 1;
+        strUseCopyReason += " AltModules";
 
     if ( RequiresAltTabFix() )
-        iUseCopy = 1;
+        strUseCopyReason += " AltTabFix";
 
-    return iUseCopy != 0;
+    // Log reason for using proxy_sa
+    static SString strUseCopyReasonPrevious;
+    if ( strUseCopyReasonPrevious != strUseCopyReason )
+    {
+        WriteDebugEventAndReport( 3500, SString( "Using proxy_sa because: %s", *strUseCopyReason ) );
+        strUseCopyReasonPrevious = strUseCopyReason;
+    }
+    return !strUseCopyReason.empty();
 }
 
 

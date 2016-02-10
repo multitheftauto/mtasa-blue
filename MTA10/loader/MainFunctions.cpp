@@ -699,7 +699,7 @@ void CheckAntiVirusStatus( void )
                     }
                 }
                 if ( bEnableScaremongering )
-                    WriteDebugEvent( "AV Searched %d processes, but could not find av helper" );
+                    WriteDebugEvent( "AV Searched processes, but could not find av helper" );
             }
         }
 
