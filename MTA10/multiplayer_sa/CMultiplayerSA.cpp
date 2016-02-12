@@ -1441,6 +1441,10 @@ void CMultiplayerSA::InitHooks()
     // Increase intensity of vehicle tail light corona
     MemPut < BYTE > ( 0x6E1A22, 0xF0 );
 
+    // Skip vehicle type check in CVehicle::SetupRender & CVehicle::ResetAfterRender (fix for #8158)
+    MemSet ( (void*)0x6D6517, 0x90, 2 );
+    MemSet ( (void*)0x6D0E43, 0x90, 2 );
+
 
     InitHooks_CrashFixHacks ();
 
