@@ -5270,6 +5270,9 @@ bool CStaticFunctionDefinitions::IsTrainDerailed ( CVehicle* pVehicle, bool& bDe
 {
     assert ( pVehicle );
 
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
+
     bDerailed = pVehicle->IsDerailed ();
     return true;
 }
@@ -5277,6 +5280,9 @@ bool CStaticFunctionDefinitions::IsTrainDerailed ( CVehicle* pVehicle, bool& bDe
 bool CStaticFunctionDefinitions::IsTrainDerailable ( CVehicle* pVehicle, bool& bDerailable )
 {
     assert ( pVehicle );
+
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
 
     bDerailable = pVehicle->IsDerailable ();
     return true;
