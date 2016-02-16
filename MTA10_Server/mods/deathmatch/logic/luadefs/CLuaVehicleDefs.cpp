@@ -2799,7 +2799,7 @@ int CLuaVehicleDefs::SetTrainTrack ( lua_State* luaVM )
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucTrack );
 
-    if ( ucTrack > 4 )
+    if ( ucTrack > 3 )
         argStream.SetCustomError ( "Invalid track number range (0-3)" );
 
     if ( !argStream.HasErrors () )
