@@ -582,9 +582,10 @@ int CLuaFunctionDefs::dxCreateRenderTarget ( lua_State* luaVM )
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                 pRenderTarget->SetParent ( pParentResource->GetResourceDynamicEntity () );
+
+                lua_pushelement ( luaVM, pRenderTarget );
+                return 1;
             }
-            lua_pushelement ( luaVM, pRenderTarget );
-            return 1;
         }
     }
     else
