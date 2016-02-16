@@ -5305,6 +5305,10 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CVehicle* pVehicle, float& fSpe
 bool CStaticFunctionDefinitions::GetTrainTrack ( CVehicle* pVehicle, uchar& ucTrack )
 {
     assert ( pVehicle );
+    
+    if ( pVehicle->IsDerailed () )
+        return false;
+
     ucTrack = pVehicle->GetTrainTrack ();
     return true;
 }
@@ -5313,6 +5317,10 @@ bool CStaticFunctionDefinitions::GetTrainTrack ( CVehicle* pVehicle, uchar& ucTr
 bool CStaticFunctionDefinitions::GetTrainPosition ( CVehicle* pVehicle, float& fPosition )
 {
     assert ( pVehicle );
+
+    if ( pVehicle->IsDerailed () )
+        return false;
+
     fPosition = pVehicle->GetTrainPosition ();
     return true;
 }
@@ -7219,6 +7227,9 @@ bool CStaticFunctionDefinitions::SetTrainTrack ( CVehicle* pVehicle, uchar ucTra
 {
     assert ( pVehicle );
 
+    if ( pVehicle->IsDerailed () )
+        return false;
+
     pVehicle->SetTrainTrack ( ucTrack );
 
     CBitStream BitStream;
@@ -7233,6 +7244,9 @@ bool CStaticFunctionDefinitions::SetTrainTrack ( CVehicle* pVehicle, uchar ucTra
 bool CStaticFunctionDefinitions::SetTrainPosition ( CVehicle* pVehicle, float fPosition )
 {
     assert ( pVehicle );
+
+    if ( pVehicle->IsDerailed () )
+        return false;
 
     pVehicle->SetTrainPosition ( fPosition );
 

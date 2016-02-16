@@ -2053,20 +2053,21 @@ int CLuaFunctionDefs::SetTrainTrack ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( ucTrack );
+    
+    if ( ucTrack > 3 )
+        argStream.SetCustomError ( "Invalid track number range (0-3)" );
 
     if ( !argStream.HasErrors () )
     {
-        if ( ( ucTrack <= 3 ) ) {
-            if ( CStaticFunctionDefinitions::SetTrainTrack ( *pVehicle, ucTrack ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        argStream.SetCustomError ( "Invalid track number range (0-3)" );
+        if ( CStaticFunctionDefinitions::SetTrainTrack ( *pVehicle, ucTrack ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }    
     }
-    
-    m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
