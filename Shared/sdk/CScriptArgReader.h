@@ -50,8 +50,7 @@ public:
     template < typename T >
     void ReadNumber ( T& outValue, bool checkSign = true )
     {
-        int iArgument = lua_type ( m_luaVM, m_iIndex );
-        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
+        if ( lua_isnumber( m_luaVM, m_iIndex ) == 1 )
         {
             lua_Number number = lua_tonumber ( m_luaVM, m_iIndex++ );
 
