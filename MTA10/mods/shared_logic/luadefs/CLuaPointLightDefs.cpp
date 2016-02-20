@@ -55,16 +55,12 @@ int CLuaPointLightDefs::CreateLight ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( iMode );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadVector3D ( vecPosition );
     argStream.ReadNumber ( fRadius, 3.0f );
     argStream.ReadNumber ( color.R, 255 );
     argStream.ReadNumber ( color.G, 0 );
     argStream.ReadNumber ( color.B, 0 );
-    argStream.ReadNumber ( vecDirection.fX, 0 );
-    argStream.ReadNumber ( vecDirection.fY, 0 );
-    argStream.ReadNumber ( vecDirection.fZ, 0 );
+    argStream.ReadVector3D ( vecDirection, vecDirection );
     argStream.ReadBool ( bCreatesShadow, false );
 
     if ( !argStream.HasErrors () )
@@ -261,10 +257,8 @@ int CLuaPointLightDefs::SetLightDirection ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pLight );
-    argStream.ReadNumber ( vecDirection.fX );
-    argStream.ReadNumber ( vecDirection.fY );
-    argStream.ReadNumber ( vecDirection.fZ );
-
+    argStream.ReadVector3D ( vecDirection );
+    
     if ( !argStream.HasErrors () )
     {
         if ( CStaticFunctionDefinitions::SetLightDirection ( pLight, vecDirection ) )
