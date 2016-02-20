@@ -365,6 +365,7 @@
     <ClCompile Include="..\shared_logic\CClientSearchLight.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLights.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaBrowserDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPedDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
@@ -378,7 +379,6 @@
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp" />
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp" />
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCommands.cpp" />
@@ -761,6 +761,7 @@
     <ClInclude Include="..\shared_logic\CClientSearchLight.h" />
     <ClInclude Include="..\shared_logic\CClientPointLights.h" />
     <ClInclude Include="..\shared_logic\CClientPointLightsManager.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaBrowserDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPedDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
