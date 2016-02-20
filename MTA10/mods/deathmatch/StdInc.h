@@ -105,6 +105,7 @@
 #include <lua/CLuaFunctionParseHelpers.h>
 #include <CScriptArgReader.h>
 #include <luadefs/CLuaDefs.h>
+#include <luadefs/CLuaBrowserDefs.h>
 #include <luadefs/CLuaClassDefs.h>
 #include <luadefs/CLuaPedDefs.h>
 #include <luadefs/CLuaVector2Defs.h>

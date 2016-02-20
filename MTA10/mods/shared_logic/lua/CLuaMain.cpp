@@ -1495,52 +1495,6 @@ void CLuaMain::AddDxRenderTargetClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddBrowserClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "createBrowser" );
-    lua_classfunction ( luaVM, "loadURL", "loadBrowserURL" );
-    lua_classfunction ( luaVM, "isLoading", "isBrowserLoading" );
-    lua_classfunction ( luaVM, "injectMouseMove", "injectBrowserMouseMove" );
-    lua_classfunction ( luaVM, "injectMouseDown", "injectBrowserMouseDown" );
-    lua_classfunction ( luaVM, "injectMouseUp", "injectBrowserMouseUp" );
-    lua_classfunction ( luaVM, "injectMouseWheel", "injectBrowserMouseWheel" );
-    lua_classfunction ( luaVM, "getTitle", "getBrowserTitle" );
-    lua_classfunction ( luaVM, "getURL", "getBrowserURL" );
-    lua_classfunction ( luaVM, "setRenderingPaused", "setBrowserRenderingPaused" );
-    lua_classfunction ( luaVM, "executeJavascript", "executeBrowserJavascript" );
-    lua_classfunction ( luaVM, "getVolume", "getBrowserVolume" );
-    lua_classfunction ( luaVM, "setVolume", "setBrowserVolume" );
-    lua_classfunction ( luaVM, "focus", "focusBrowser" );
-    lua_classfunction ( luaVM, "isFocused", "isBrowserFocused" );
-    lua_classfunction ( luaVM, "setProperty", "setBrowserProperty" );
-    lua_classfunction ( luaVM, "getProperty", "getBrowserProperty" );
-    lua_classfunction ( luaVM, "getSource", "getBrowserSource" );
-    lua_classfunction ( luaVM, "setAjaxHandler", "setBrowserAjaxHandler" );
-    lua_classfunction ( luaVM, "toggleDevTools", "toggleBrowserDevTools" );
-
-    lua_classfunction ( luaVM, "requestDomains", "requestBrowserDomains" );
-    lua_classfunction ( luaVM, "isDomainBlocked", "isBrowserDomainBlocked" );
-
-    lua_classvariable ( luaVM, "url", "loadBrowserURL", "getBrowserURL" );
-    lua_classvariable ( luaVM, "loading", nullptr, "isBrowserLoading");
-    lua_classvariable ( luaVM, "title", nullptr, "getBrowserTitle" );
-    lua_classvariable ( luaVM, "renderingPaused", "setBrowserRenderingPaused", nullptr );
-    lua_classvariable ( luaVM, "volume", "setBrowserVolume", "getBrowserVolume" );
-    lua_classvariable ( luaVM, "devTools", "toggleBrowserDevTools", nullptr );
-    
-    lua_registerclass ( luaVM, "Browser", "DxTexture" );
-
-    // Add GUI browser class
-    lua_newclass ( luaVM );
-    lua_classfunction ( luaVM, "create", "guiCreateBrowser" );
-    lua_classfunction ( luaVM, "getBrowser", "guiGetBrowser" );
-    lua_classvariable ( luaVM, "browser", NULL, "guiGetBrowser" );
-    lua_registerclass ( luaVM, "GuiBrowser", "GuiElement" );
-}
-
-
 void CLuaMain::InitClasses ( lua_State* luaVM )
 {
     lua_initclasses             ( luaVM );
@@ -1548,7 +1502,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaVector4Defs::AddClass ( luaVM );
     CLuaVector3Defs::AddClass ( luaVM );
     CLuaVector2Defs::AddClass ( luaVM );
-    CLuaMatrixDefs::AddClass ( luaVM );
+    CLuaMatrixDefs ::AddClass ( luaVM );
 
     if ( !m_bEnableOOP )
         return;
@@ -1604,7 +1558,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddDxShaderClass            ( luaVM );
     AddDxScreenSourceClass      ( luaVM );
     AddDxRenderTargetClass      ( luaVM );
-    AddBrowserClass             ( luaVM );
+    CLuaBrowserDefs::AddClass   ( luaVM );
     
     AddCameraClass              ( luaVM );
 

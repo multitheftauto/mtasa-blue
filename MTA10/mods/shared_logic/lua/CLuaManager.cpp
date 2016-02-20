@@ -1126,37 +1126,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "bitExtract", CLuaFunctionDefs::BitExtract );
     CLuaCFunctions::AddFunction ( "bitReplace", CLuaFunctionDefs::BitReplace );
 
-    // Browser functions
-    CLuaCFunctions::AddFunction ( "createBrowser", CLuaFunctionDefs::CreateBrowser );
-    CLuaCFunctions::AddFunction ( "requestBrowserDomains", CLuaFunctionDefs::RequestBrowserDomains );
-    CLuaCFunctions::AddFunction ( "loadBrowserURL", CLuaFunctionDefs::LoadBrowserURL );
-    CLuaCFunctions::AddFunction ( "isBrowserLoading", CLuaFunctionDefs::IsBrowserLoading );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseMove", CLuaFunctionDefs::InjectBrowserMouseMove );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseDown", CLuaFunctionDefs::InjectBrowserMouseDown );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseUp", CLuaFunctionDefs::InjectBrowserMouseUp );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseWheel", CLuaFunctionDefs::InjectBrowserMouseWheel );
-    CLuaCFunctions::AddFunction ( "getBrowserTitle", CLuaFunctionDefs::GetBrowserTitle );
-    CLuaCFunctions::AddFunction ( "getBrowserURL", CLuaFunctionDefs::GetBrowserURL );
-    CLuaCFunctions::AddFunction ( "setBrowserRenderingPaused", CLuaFunctionDefs::SetBrowserRenderingPaused );
-    CLuaCFunctions::AddFunction ( "executeBrowserJavascript", CLuaFunctionDefs::ExecuteBrowserJavascript );
-    CLuaCFunctions::AddFunction ( "getBrowserVolume", CLuaFunctionDefs::GetBrowserVolume );
-    CLuaCFunctions::AddFunction ( "setBrowserVolume", CLuaFunctionDefs::SetBrowserVolume );
-    CLuaCFunctions::AddFunction ( "isBrowserDomainBlocked", CLuaFunctionDefs::IsBrowserDomainBlocked );
-    CLuaCFunctions::AddFunction ( "focusBrowser", CLuaFunctionDefs::FocusBrowser );
-    CLuaCFunctions::AddFunction ( "isBrowserFocused", CLuaFunctionDefs::IsBrowserFocused );
-    CLuaCFunctions::AddFunction ( "setBrowserProperty", CLuaFunctionDefs::SetBrowserProperty );
-    CLuaCFunctions::AddFunction ( "getBrowserProperty", CLuaFunctionDefs::GetBrowserProperty );
-    CLuaCFunctions::AddFunction ( "getBrowserSettings", CLuaFunctionDefs::GetBrowserSettings );
-    CLuaCFunctions::AddFunction ( "getBrowserSource", CLuaFunctionDefs::GetBrowserSource );
-    CLuaCFunctions::AddFunction ( "setBrowserAjaxHandler", CLuaFunctionDefs::SetBrowserAjaxHandler );
-    CLuaCFunctions::AddFunction ( "toggleBrowserDevTools", CLuaFunctionDefs::ToggleBrowserDevTools );
-    CLuaCFunctions::AddFunction ( "guiCreateBrowser", CLuaFunctionDefs::GUICreateBrowser );
-    CLuaCFunctions::AddFunction ( "guiGetBrowser", CLuaFunctionDefs::GUIGetBrowser );
-
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();
     CLuaPedDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
+    CLuaBrowserDefs::LoadFunctions ();
 }
