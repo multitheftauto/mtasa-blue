@@ -1491,7 +1491,7 @@ struct {
     6318, "Roads12_LAw2", 6319, "Roads17_LAw2", 6320, "Roads15_LAw2", 6321, "Roads18_LAw2", 6322, "Roads20_LAw2", 6323, "Roads21_LAw2",
     6324, "Roads22_LAw2", 6325, "Roads01_LAw2", 6326, "Roads34_LAw2", 6327, "Roads35_LAw2", 6329, "Roads27_LAw2", 6330, "Roads06_LAw2",
     6331, "Roads05_LAw2", 6333, "Roads25_LAw2", 6341, "century02_LAw2", 6345, "Roads04_LAw2", 6427, "Roads03_LAw2", 6428, "Roads32_LAw2",
-    6448, "Pier01_LAw2", 6449, "Pier02_LAw2", 6450, "Pier03_LAw2", 6507, "Roads09_LAw2", 6508, "Roads10_LAw2", 6509, "Roads36_LAw2",
+    6448, "Pier01_LAw2", 6449, "Pier02_LAw2", 6450, "Pier03_LAw2", 6458, "Pier03Tr_LAw2", 6507, "Roads09_LAw2", 6508, "Roads10_LAw2", 6509, "Roads36_LAw2",
     6876, "VegasNedge12", 6877, "VegasNedge02", 6878, "VegasNroad055", 6879, "VegasNroad070", 6880, "VegasNroad071", 6881, "VegasNroad072",
     6886, "VegasNedge04", 6887, "VegasNedge05", 6888, "VegasNedge06", 6897, "VegasNroad622", 6898, "VegasNroad623", 6899, "VegasNroad624",
     6900, "VegasNroad625", 6945, "VegasNroad0711", 6948, "VegasNedge08", 6949, "VegasNedge09", 6950, "vegasNroad096", 6951, "VegasNroad032",
