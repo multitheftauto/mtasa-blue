@@ -41,6 +41,8 @@ void CLuaFileDefs::AddClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
+    lua_classmetamethod ( luaVM, "__gc", fileCloseGC );
+
     lua_classfunction ( luaVM, "create", "fileOpen" );
     lua_classfunction ( luaVM, "destroy", "fileClose" );
     lua_classfunction ( luaVM, "close", "fileClose" );
@@ -515,32 +517,6 @@ int CLuaFileDefs::fileFlush ( lua_State* luaVM )
 }
 
 
-int CLuaFileDefs::fileClose ( lua_State* luaVM )
-{
-//  bool fileClose ( file theFile )
-    CScriptFile* pFile;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pFile );
-
-    if ( !argStream.HasErrors () )
-    {
-        // Close the file and delete it
-        pFile->Unload ();
-        m_pElementDeleter->Delete ( pFile );
-
-        // Success. Return true
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    // Error
-    lua_pushnil ( luaVM );
-    return 1;
-}
-
 int CLuaFileDefs::fileDelete ( lua_State* luaVM )
 {
 //  bool fileDelete ( string filePath )
@@ -817,5 +793,54 @@ int CLuaFileDefs::fileGetPath( lua_State* luaVM )
 
     // Failed
     lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFileDefs::fileClose ( lua_State* luaVM )
+{
+//  bool fileClose ( file theFile )
+    CScriptFile* pFile;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Close the file and delete it
+        pFile->Unload ();
+        m_pElementDeleter->Delete ( pFile );
+
+        // Success. Return true
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Error
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+
+int CLuaFileDefs::fileCloseGC ( lua_State* luaVM )
+{
+    CScriptFile* pFile;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Close the file and delete it
+        pFile->Unload ();
+        m_pElementDeleter->Delete ( pFile );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushnil ( luaVM );
     return 1;
 }

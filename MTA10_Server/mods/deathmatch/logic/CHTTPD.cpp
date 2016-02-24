@@ -152,7 +152,7 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
             else
                 CLogger::LogPrintf ( LOGLEVEL_MEDIUM, "ERROR: Empty crypto challenge was passed during verification\n" );
         }
-        catch ( const std::exception& ex )
+        catch ( const std::exception& )
         {
             CLogger::LogPrintf ( LOGLEVEL_MEDIUM, "ERROR: Invalid verify.key keyfile\n" );
         }
