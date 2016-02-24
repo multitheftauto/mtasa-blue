@@ -33,4 +33,7 @@ public:
     LUA_DECLARE ( fileRename )
     LUA_DECLARE ( fileCopy )
     LUA_DECLARE(fileGetPath)
+    
+    LUA_DECLARE ( fileClose );
+    LUA_DECLARE ( fileCloseGC );
 };
