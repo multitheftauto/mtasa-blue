@@ -1,7 +1,7 @@
-project "Core"
+project "Dbconmy"
 	language "C++"
 	kind "SharedLib"
-	targetname "core"
+	targetname "dbconmy"
 	
 	includedirs { "../sdk", "../../vendor/google-breakpad/src" }
 	pchheader "StdInc.h"
@@ -21,3 +21,11 @@ project "Core"
 		"*.cpp"
 	}
 	
+	configuration "not windows"
+		includedirs { "/usr/include/mysql" }
+		links { "mysqlclient" }
+	
+	configuration "windows"
+		includedirs { "../../vendor/mysql/include" }
+		links { "../../vendor/opt/libmysql.lib" }
+		

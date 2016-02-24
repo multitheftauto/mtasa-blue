@@ -1,4 +1,4 @@
-solution "Freedomity"
+solution "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 	
 	location "Build"
@@ -19,6 +19,7 @@ solution "Freedomity"
 		
 		group "Server"
 		include "Server/core"
+		include "Server/dbconmy"
 		-- TODO
 		
 		group "Client"
