@@ -732,8 +732,7 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
     {
         // Close the file and delete it
         pFile->Unload ();
-        //m_pElementDeleter->Delete ( pFile );
-        g_pClientGame->GetElementDeleter()->Delete ( pFile );
+        m_pElementDeleter->Delete ( pFile );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -745,18 +744,25 @@ int CLuaFileDefs::fileClose ( lua_State* luaVM )
     return 1;
 }
 
+// Called by Lua when file userdatas are garbage collected
 int CLuaFileDefs::fileCloseGC ( lua_State* luaVM )
 {
     CScriptFile* pFile;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pFile );
 
-    if ( !argStream.HasErrors ( ) )
+    if ( !argStream.HasErrors () )
     {
         // Close the file and delete it
         pFile->Unload ();
-        //m_pElementDeleter->Delete ( pFile );
-        g_pClientGame->GetElementDeleter()->Delete ( pFile );
+        m_pElementDeleter->Delete ( pFile );
+
+        // This file wasn't closed, so we should warn 
+        // the scripter that they forgot to close it.
+        m_pScriptDebugging->LogWarning ( luaVM, "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.", pFile->GetFilePath ().c_str () );
+        // TODO: The debug info reported when Lua automatically garbage collects will
+        //       actually be the exact point Lua pauses for collection. Find a way to
+        //       remove the line number & script file completely.
 
         lua_pushboolean ( luaVM, true );
         return 1;

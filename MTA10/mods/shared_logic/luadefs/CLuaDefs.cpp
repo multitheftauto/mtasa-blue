@@ -13,6 +13,7 @@
 
 CLuaManager* CLuaDefs::m_pLuaManager = NULL;
 CScriptDebugging* CLuaDefs::m_pScriptDebugging = NULL;
+CElementDeleter* CLuaDefs::m_pElementDeleter = NULL;
 CClientGame* CLuaDefs::m_pClientGame = NULL;
 CClientManager* CLuaDefs::m_pManager = NULL;
 CClientEntity* CLuaDefs::m_pRootEntity = NULL;
@@ -38,6 +39,7 @@ void CLuaDefs::Initialize ( CClientGame* pClientGame,
 {
     m_pLuaManager = pLuaManager;
     m_pScriptDebugging = pScriptDebugging;
+    m_pElementDeleter = pClientGame->GetElementDeleter ();
     m_pClientGame = pClientGame;
     m_pManager = pClientGame->GetManager ();
     m_pRootEntity = pClientGame->GetRootEntity ();
