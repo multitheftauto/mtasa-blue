@@ -680,6 +680,7 @@ DontInstallRedistVC12:
 		
 		SetOutPath "$INSTDIR\MTA\CEF"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher.exe"
+		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher_DLL.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef.pak"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_100_percent.pak"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_200_percent.pak"
