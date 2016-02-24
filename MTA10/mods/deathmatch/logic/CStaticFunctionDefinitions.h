@@ -560,6 +560,8 @@ public:
     static bool                         SetMoonSize                         ( int iSize );
     static bool                         SetFPSLimit                         ( int iLimit );
     static bool                         GetFPSLimit                         ( int& iLimit );
+    static bool                         SetNonHighwayLimiterEnabled         ( bool bEnabled );
+    static bool                         GetNonHighwayLimiterEnabled         ( void );
 
     // Input functions
     static bool                         BindKey                             ( const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments );

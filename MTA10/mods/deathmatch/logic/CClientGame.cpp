@@ -140,6 +140,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     m_bBirdsEnabled = true;
 
+    m_bNonHighwayLimiterEnabled = true;
+
     m_bWasMinimized = false;
 
     // Grab the mod path
@@ -5521,6 +5523,10 @@ void CClientGame::ResetMapInfo ( void )
     // Moon size
     g_pMultiplayer->ResetMoonSize ();
 
+    // Non highway limiter
+    g_pMultiplayer->DisableNonHighwayLimiter ( false );
+    g_pClientGame->SetNonHighwayLimiterEnabled ( true );
+
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic ( true );
 
@@ -6012,8 +6018,8 @@ bool CClientGame::IsGlitchEnabled ( unsigned char ucGlitch )
 
 bool CClientGame::SetCloudsEnabled ( bool bEnabled )
 {
-   m_bCloudsEnabled = bEnabled;
-   return true;
+    m_bCloudsEnabled = bEnabled;
+    return true;
 }
 bool CClientGame::GetCloudsEnabled ( void )
 {
@@ -6028,6 +6034,17 @@ bool CClientGame::SetBirdsEnabled ( bool bEnabled )
 bool CClientGame::GetBirdsEnabled ( void )
 {
     return m_bBirdsEnabled;
+}
+
+bool CClientGame::SetNonHighwayLimiterEnabled ( bool bEnabled )
+{
+    m_bNonHighwayLimiterEnabled = bEnabled;
+    return true;
+}
+
+bool CClientGame::GetNonHighwayLimiterEnabled ( void )
+{
+    return m_bNonHighwayLimiterEnabled;
 }
 
 #pragma code_seg(".text")

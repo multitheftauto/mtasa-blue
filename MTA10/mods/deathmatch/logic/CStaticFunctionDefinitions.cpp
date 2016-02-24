@@ -6523,7 +6523,19 @@ bool CStaticFunctionDefinitions::SetMoonSize ( int iSize )
         return true;
     }
     return false;
-}  
+}
+
+bool CStaticFunctionDefinitions::SetNonHighwayLimiterEnabled ( bool bEnabled )
+{
+    g_pMultiplayer->DisableNonHighwayLimiter( !bEnabled );
+    g_pClientGame->SetNonHighwayLimiterEnabled ( bEnabled );
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetNonHighwayLimiterEnabled ( void )
+{
+    return g_pClientGame->GetNonHighwayLimiterEnabled();
+}
 
 bool CStaticFunctionDefinitions::SetFPSLimit( int iLimit )
 {
