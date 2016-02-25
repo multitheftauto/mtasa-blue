@@ -5,8 +5,19 @@ solution "MTASA"
 	
 	flags { "C++14", "Symbols" }
 	characterset "MBCS"
-	includedirs { "Shared/sdk" }
-	defines { "_CRT_SECURE_NO_WARNINGS" }
+	
+	includedirs { 
+		"Shared/sdk", 
+		"vendor",
+		"vendor/sparsehash/current/src/",
+		"vendor/sparsehash/current/src/windows"
+	}
+
+	defines { 
+		"_CRT_SECURE_NO_WARNINGS",
+		"_SCL_SECURE_NO_WARNINGS",
+		"_CRT_NONSTDC_NO_DEPRECATE"
+	}
 	
 	configuration "Debug"
 		defines { "MTA_DEBUG" }
@@ -29,7 +40,17 @@ solution "MTASA"
 		-- TODO
 		
 		group "Client"
+		include "Client/ceflauncher"
+		include "Client/ceflauncher_DLL"
+		include "Client/core"
+		include "Client/game_sa"
+		include "Client/gui"
+		include "Client/launch"
+		include "Client/loader"
+		include "Client/multiplayer_sa"
 		-- TODO
+		--include "Client/mods/deathmatch"
+		
 		
 		group "Vendor"
 		
