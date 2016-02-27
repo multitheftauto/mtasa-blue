@@ -127,9 +127,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
  
     if (FAILED(hres))
     {
-#if MTA_DEBUG
-        OutputDebugLine ( SString ( "[Error] QueryWMI - Failed to create IWbemLocator object. Error code = %x", hres ) );
-#endif
+        AddReportLog( 9130, SString ( "QueryWMI - Failed to create IWbemLocator object. Error code = %x (%s)", hres, *strQuery ) );
         return false;
     }
 
@@ -156,7 +154,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     if (FAILED(hres))
     {
         pLoc->Release();     
-        OutputDebugLine ( SString ( "[Error] QueryWMI - Could not connect. Error code = %x", hres ) );
+        AddReportLog( 9135, SString ( "QueryWMI - Could not connect. Error code = %x (%s)", hres, *strQuery ) );
         return false;
     }
 
@@ -178,7 +176,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     {
         pSvc->Release();
         pLoc->Release();     
-        OutputDebugLine ( SString ( "[Error] QueryWMI - Could not set proxy blanket. Error code = %x", hres ) );
+        AddReportLog( 9136, SString ( "QueryWMI - Could not set proxy blanket. Error code = %x (%s)", hres, *strQuery ) );
         return false;
     }
 
@@ -196,7 +194,7 @@ bool SharedUtil::QueryWMI ( SQueryWMIResult& outResult, const SString& strQuery,
     {
         pSvc->Release();
         pLoc->Release();
-        OutputDebugLine ( SString ( "[Error] QueryWMI - Query failed. Error code = %x", hres ) );
+        AddReportLog( 9137, SString ( "QueryWMI - Query failed. Error code = %x (%s)", hres, *strQuery ) );
         return false;
     }
 
