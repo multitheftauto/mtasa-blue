@@ -36,6 +36,11 @@ void CLuaBrowserDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getBrowserSettings", GetBrowserSettings );
     CLuaCFunctions::AddFunction ( "getBrowserSource", GetBrowserSource );
     CLuaCFunctions::AddFunction ( "setBrowserAjaxHandler", SetBrowserAjaxHandler );
+    CLuaCFunctions::AddFunction ( "canBrowserNavigateBack", CanBrowserNavigateBack );
+    CLuaCFunctions::AddFunction ( "canBrowserNavigateForward", CanBrowserNavigateForward );
+    CLuaCFunctions::AddFunction ( "navigateBrowserBack", NavigateBrowserBack );
+    CLuaCFunctions::AddFunction ( "navigateBrowserForward", NavigateBrowserForward );
+    CLuaCFunctions::AddFunction ( "reloadBrowserPage", ReloadBrowserPage );
     CLuaCFunctions::AddFunction ( "toggleBrowserDevTools", ToggleBrowserDevTools );
     CLuaCFunctions::AddFunction ( "guiCreateBrowser", GUICreateBrowser );
     CLuaCFunctions::AddFunction ( "guiGetBrowser", GUIGetBrowser );
@@ -65,6 +70,11 @@ void CLuaBrowserDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getProperty", "getBrowserProperty" );
     lua_classfunction ( luaVM, "getSource", "getBrowserSource" );
     lua_classfunction ( luaVM, "setAjaxHandler", "setBrowserAjaxHandler" );
+    lua_classfunction ( luaVM, "canNavigateBack", "canBrowserNavigateBack" );
+    lua_classfunction ( luaVM, "canNavigateForward", "canBrowserNavigateForward" );
+    lua_classfunction ( luaVM, "navigateBack", "navigateBrowserBack" );
+    lua_classfunction ( luaVM, "navigateForward", "navigateBrowserForward" );
+    lua_classfunction ( luaVM, "reloadPage", "reloadBrowserPage" );
     lua_classfunction ( luaVM, "toggleDevTools", "toggleBrowserDevTools" );
 
     lua_classfunction ( luaVM, "requestDomains", "requestBrowserDomains" );
@@ -696,6 +706,107 @@ int CLuaBrowserDefs::ToggleBrowserDevTools ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaBrowserDefs::CanBrowserNavigateBack ( lua_State* luaVM )
+{
+    //  bool canBrowserNavigateBack( browser webBrowser )
+    CClientWebBrowser* pWebBrowser;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushboolean ( luaVM, pWebBrowser->CanGoBack () );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+int CLuaBrowserDefs::CanBrowserNavigateForward ( lua_State* luaVM )
+{
+    //  bool canBrowserNavigateForward( browser webBrowser )
+    CClientWebBrowser* pWebBrowser;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushboolean ( luaVM, pWebBrowser->CanGoForward () );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+int CLuaBrowserDefs::NavigateBrowserBack ( lua_State* luaVM )
+{
+    //  bool navigateBrowserBack( browser webBrowser )
+    CClientWebBrowser* pWebBrowser;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushboolean ( luaVM, pWebBrowser->GoBack () );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+int CLuaBrowserDefs::NavigateBrowserForward ( lua_State* luaVM )
+{
+    //  bool navigateBrowserForward( browser webBrowser )
+    CClientWebBrowser* pWebBrowser;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushboolean ( luaVM, pWebBrowser->GoForward () );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+int CLuaBrowserDefs::ReloadBrowserPage( lua_State* luaVM )
+{
+    //  bool reloadBrowserPage( browser webBrowser )
+    CClientWebBrowser* pWebBrowser;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pWebBrowser );
+
+    if ( !argStream.HasErrors () )
+    {
+        pWebBrowser->Refresh ();
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushnil ( luaVM );
     return 1;
 }
 
