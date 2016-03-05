@@ -61,7 +61,7 @@ public:
     virtual bool CanGoForward       () = 0;
     virtual bool GoBack             () = 0;
     virtual bool GoForward          () = 0;
-    virtual void Refresh            () = 0;
+    virtual void Refresh            ( bool bIgnoreCache ) = 0;
 };
 
 #endif

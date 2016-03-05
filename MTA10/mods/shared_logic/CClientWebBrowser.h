@@ -65,7 +65,7 @@ public:
     bool                        CanGoForward        ();
     bool                        GoBack              ();
     bool                        GoForward           ();
-    void                        Refresh             ();
+    void                        Refresh             ( bool bIgnoreCache );
 
     // CWebBrowserEventsInterface implementation
     void                        Events_OnCreated       () override;

@@ -156,9 +156,9 @@ bool CClientWebBrowser::GoForward ()
     return m_pWebView->GoForward ();
 }
 
-void CClientWebBrowser::Refresh ()
+void CClientWebBrowser::Refresh ( bool bIgnoreCache )
 {
-    m_pWebView->Refresh ();
+    m_pWebView->Refresh ( bIgnoreCache );
 }
 
 ////////////////////////////////////////////////////////////////////////////

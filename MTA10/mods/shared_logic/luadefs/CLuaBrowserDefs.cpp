@@ -793,13 +793,15 @@ int CLuaBrowserDefs::ReloadBrowserPage( lua_State* luaVM )
 {
     //  bool reloadBrowserPage( browser webBrowser )
     CClientWebBrowser* pWebBrowser;
+    bool bIgnoreCache;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pWebBrowser );
+    argStream.ReadIfNextIsBool ( bIgnoreCache, false );
 
     if ( !argStream.HasErrors () )
     {
-        pWebBrowser->Refresh ();
+        pWebBrowser->Refresh ( bIgnoreCache );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
