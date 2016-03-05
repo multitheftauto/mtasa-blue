@@ -413,12 +413,19 @@ bool CWebView::GoForward ()
     return true;
 }
 
-void CWebView::Refresh ()
+void CWebView::Refresh ( bool bIgnoreCache )
 {
     if ( !m_pWebView )
         return;
 
-    m_pWebView->Reload ();
+    if ( bIgnoreCache )
+    {
+        m_pWebView->ReloadIgnoreCache ();
+    }
+    else
+    {
+        m_pWebView->Reload ();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////

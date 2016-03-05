@@ -87,7 +87,7 @@ public:
     bool CanGoForward           ();
     bool GoBack                 ();
     bool GoForward              ();
-    void Refresh                ();
+    void Refresh                ( bool ignoreCache );
 
     // CefClient methods
     virtual CefRefPtr<CefRenderHandler>     GetRenderHandler() override { return this; };
