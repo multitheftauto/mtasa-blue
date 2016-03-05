@@ -692,9 +692,12 @@ bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFram
         bResult = false; // Allow mtalocal:// URLs
     else
         bResult = true; // Block other schemes
-    
+
+    // Check if we're in the browser's main frame or only a frame element of the current page
+    bool bIsMainFrame = frame->IsMain ();
+
     // Queue event to run on the main thread
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, SString ( request->GetURL () ), bResult );
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, SString ( request->GetURL () ), bResult, bIsMainFrame );
     g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnNavigate" );
 
     // Return execution to CEF
