@@ -60,7 +60,13 @@ public:
     bool                        RemoveAjaxHandler   ( const SString& strURL );
 
     bool                        ToggleDevTools      ( bool visible );
-    
+
+    bool                        CanGoBack           ();
+    bool                        CanGoForward        ();
+    bool                        GoBack              ();
+    bool                        GoForward           ();
+    void                        Refresh             ();
+
     // CWebBrowserEventsInterface implementation
     void                        Events_OnCreated       () override;
     void                        Events_OnLoadingStart  ( const SString& strURL, bool bMainFrame ) override;
