@@ -1118,6 +1118,7 @@ void CPacketHandler::Packet_PlayerWasted ( NetBitStreamInterface& bitStream )
             // Caz: Issue 8148 - Desync when calling spawnPlayer from an event handler remotely triggered from within onClientPlayerWasted
 
             // Is this a stealth kill? and do we have a killer ped?
+            // TODO: Make things dry. Refer to CStaticFunctionDefinitions:KillPed
             if ( bStealth && pKiller && IS_PED ( pKiller ) )
             {
                 // Make our killer ped do the stealth kill animation

@@ -41,6 +41,8 @@ void CLuaFileDefs::AddClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
+    lua_classmetamethod ( luaVM, "__gc", fileCloseGC );
+
     lua_classfunction ( luaVM, "create", "fileOpen" );
     lua_classfunction ( luaVM, "destroy", "fileClose" );
     lua_classfunction ( luaVM, "close", "fileClose" );
@@ -405,24 +407,20 @@ int CLuaFileDefs::fileRead ( lua_State* luaVM )
     {
         if ( ulCount > 0 )
         {
-            // Allocate a buffer to read the stuff into and read some shit into it
-            char* pReadContent = new char [ulCount + 1];
-            long lBytesRead = pFile->Read ( ulCount, pReadContent );
+            CBuffer buffer;
+            long lBytesRead = pFile->Read ( ulCount, buffer );
 
             if ( lBytesRead != -1 )
             {
                 // Push the string onto the lua stack. Use pushlstring so we are binary
                 // compatible. Normal push string takes zero terminated strings.
-                lua_pushlstring ( luaVM, pReadContent, lBytesRead );
+                lua_pushlstring ( luaVM, buffer.GetData(), lBytesRead );
             }
             else
             {
                 m_pScriptDebugging->LogBadPointer ( luaVM, "file", 1 );
                 lua_pushnil ( luaVM );
             }
-
-            // Delete our read content. Lua should've stored it
-            delete [] pReadContent;
 
             // We're returning the result string
             return 1;
@@ -518,32 +516,6 @@ int CLuaFileDefs::fileFlush ( lua_State* luaVM )
     return 1;
 }
 
-
-int CLuaFileDefs::fileClose ( lua_State* luaVM )
-{
-//  bool fileClose ( file theFile )
-    CScriptFile* pFile;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pFile );
-
-    if ( !argStream.HasErrors () )
-    {
-        // Close the file and delete it
-        pFile->Unload ();
-        m_pElementDeleter->Delete ( pFile );
-
-        // Success. Return true
-        lua_pushboolean ( luaVM, true );
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    // Error
-    lua_pushnil ( luaVM );
-    return 1;
-}
 
 int CLuaFileDefs::fileDelete ( lua_State* luaVM )
 {
@@ -821,5 +793,60 @@ int CLuaFileDefs::fileGetPath( lua_State* luaVM )
 
     // Failed
     lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+
+int CLuaFileDefs::fileClose ( lua_State* luaVM )
+{
+//  bool fileClose ( file theFile )
+    CScriptFile* pFile;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Close the file and delete it
+        pFile->Unload ();
+        m_pElementDeleter->Delete ( pFile );
+
+        // Success. Return true
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Error
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+// Called by Lua when file userdatas are garbage collected
+int CLuaFileDefs::fileCloseGC ( lua_State* luaVM )
+{
+    CScriptFile* pFile;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pFile );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Close the file and delete it
+        pFile->Unload ();
+        m_pElementDeleter->Delete ( pFile );
+
+        // This file wasn't closed, so we should warn 
+        // the scripter that they forgot to close it.
+        m_pScriptDebugging->LogWarning ( luaVM, "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.", pFile->GetFilePath ().c_str () );
+        // TODO: The debug info reported when Lua automatically garbage collects will
+        //       actually be the exact point Lua pauses for collection. Find a way to
+        //       remove the line number & script file completely.
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushnil ( luaVM );
     return 1;
 }

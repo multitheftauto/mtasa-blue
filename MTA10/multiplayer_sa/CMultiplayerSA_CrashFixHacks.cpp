@@ -1507,6 +1507,61 @@ void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 }
 
 
+////////////////////////////////////////////////////////////////////////
+//
+// OnMY_printf
+//
+// GTA outputs stuff via printf which we can use to help diagnose problems
+//
+////////////////////////////////////////////////////////////////////////
+void _cdecl OnMY_printf ( const char* szMessage )
+{
+    SString strMessage = SStringX( szMessage ).Replace( "\n", "" );
+
+    // Ignore unimportant messages
+    if ( strMessage == "Initialised SoundManager" )
+    {
+        return;
+    }
+
+    LogEvent ( 6311, "printf", "GTALOG", strMessage, 6311 );
+
+    // Check for known issues
+    if ( strMessage == "Error subrastering" )
+    {
+        // Couldn't create render target for CPostEffects
+        BrowseToSolution ( "error-subrastering", EXIT_GAME_FIRST | ASK_GO_ONLINE, _( "Problem with graphics driver" ) );
+    }
+}
+
+// hook info
+#define HOOKPOS_printf_US                         0x821982
+#define HOOKSIZE_printf_US                        7
+#define HOOKCHECK_printf_US                       0x6A
+#define HOOKPOS_printf_EU                         0x8219C2
+#define HOOKSIZE_printf_EU                        7
+#define HOOKCHECK_printf_EU                       0x6A
+DWORD RETURN_printf_US =                          0x821989;
+DWORD RETURN_printf_EU =                          0x8219C9;
+DWORD RETURN_printf_BOTH =                        0;
+void _declspec(naked) HOOK_printf ()
+{
+    _asm
+    {
+        pushad
+        push    [esp+32+4*1]
+        call    OnMY_printf
+        add     esp, 4*1
+        popad
+
+        // Replaced code
+        push    10h
+        push    887DC0h
+        jmp     RETURN_printf_BOTH
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -1552,6 +1607,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstallChecked ( CVolumetricShadowMgr_Update );
     EZHookInstallChecked ( CAnimManager_CreateAnimAssocGroups );
     EZHookInstall ( CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask );
+    EZHookInstallChecked ( printf );
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

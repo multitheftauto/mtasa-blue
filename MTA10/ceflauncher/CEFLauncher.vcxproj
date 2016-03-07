@@ -73,7 +73,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\vendor\cef3\include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)..\output\MTA San Andreas\mta\cef\</OutDir>
-    <IntDir>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\</IntDir>
+    <IntDir>$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -89,8 +89,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\..\vendor\cef3\Debug\libcef.lib;..\..\vendor\cef3\out\Debug\lib\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>libcef.dll</DelayLoadDLLs>
+      <AdditionalDependencies>..\..\vendor\cef3\Debug\libcef.lib;..\..\vendor\cef3\out\Debug\lib\libcef_dll_wrapper.lib;..\ceflauncher_DLL\$(PlatformTarget)\$(Configuration)\ceflauncher_DLL_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,8 +109,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>..\..\vendor\cef3\Release\libcef.lib;..\..\vendor\cef3\out\Release\lib\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>libcef.dll</DelayLoadDLLs>
+      <AdditionalDependencies>..\..\vendor\cef3\Release\libcef.lib;..\..\vendor\cef3\out\Release\lib\libcef_dll_wrapper.lib;..\ceflauncher_DLL\$(PlatformTarget)\$(Configuration)\ceflauncher_DLL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|Win32'">
@@ -131,18 +129,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libcef.lib;libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcef.lib;libcef_dll_wrapper.lib;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\$(SafeRootNamespace)\ceflauncher_DLL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\vendor\cef3\Release\;$(SolutionDir)..\obj\$(PlatformTarget)\$(Configuration)\libcef_dll_wrapper\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <DelayLoadDLLs>libcef.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CCefApp.h" />
-    <ClInclude Include="V8Helpers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

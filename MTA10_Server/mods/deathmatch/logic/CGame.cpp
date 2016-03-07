@@ -484,6 +484,7 @@ void CGame::DoPulse ( void )
     CLOCK_CALL1( m_pLatentTransferManager->DoPulse (); );
 
     PrintLogOutputFromNetModule();
+    m_pScriptDebugging->UpdateLogOutput();
 
     // Unlock the critical section again
     Unlock();

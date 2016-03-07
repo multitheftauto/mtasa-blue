@@ -27,6 +27,7 @@ class CClientPlayerManager;
 class CClientRadarMarkerManager;
 class CClientTeamManager;
 class CClientVehicleManager;
+class CElementDeleter;
 class CLuaManager;
 class CRegisteredCommands;
 class CRenderWare;
@@ -43,9 +44,10 @@ public:
     static int                          CanUseFunction ( lua_CFunction f, lua_State* luaVM );
     static void                         DidUseFunction ( lua_CFunction f, lua_State* luaVM );
 
-// This is just for the LUA funcs. Please don't public this and use it other
+// This is just for the Lua funcs. Please don't public this and use it other
 // places in the client.
 public:
+    static CElementDeleter*             m_pElementDeleter;
     static CLuaManager*                 m_pLuaManager;
     static CScriptDebugging*            m_pScriptDebugging;
     static class CClientGame*           m_pClientGame;

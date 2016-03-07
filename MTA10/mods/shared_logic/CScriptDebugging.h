@@ -22,8 +22,18 @@
 #include <stdio.h>
 
 #include "lua/LuaCommon.h"
+#include "CDuplicateLineFilter.h"
 
 class CLuaManager;
+
+struct SLogData
+{
+    unsigned int uiMinimumDebugLevel;
+    unsigned char ucRed;
+    unsigned char ucGreen;
+    unsigned char ucBlue;
+    bool operator ==( const SLogData& other ) const { return uiMinimumDebugLevel == other.uiMinimumDebugLevel && ucRed == other.ucRed; }
+};
 
 class CScriptDebugging
 {
@@ -52,6 +62,7 @@ public:
     void                            PopLuaMain                      ( CLuaMain* pLuaMain );
     void                            OnLuaMainDestroy                ( CLuaMain* pLuaMain );
     CLuaMain*                       GetTopLuaMain                   ( void );
+    void                            UpdateLogOutput                 ( void );
 
 private:
     SString                         ComposeErrorMessage             ( const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage );
@@ -68,6 +79,7 @@ private:
     SLuaDebugInfo                   m_SavedLuaDebugInfo;
     std::list < CLuaMain* >         m_LuaMainStack;
     HANDLE                          m_flushTimerHandle;
+    CDuplicateLineFilter < SLogData > m_DuplicateLineFilter;
 };
 
 #endif

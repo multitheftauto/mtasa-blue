@@ -680,6 +680,7 @@ DontInstallRedistVC12:
 		
 		SetOutPath "$INSTDIR\MTA\CEF"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher.exe"
+		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher_DLL.dll"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef.pak"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_100_percent.pak"
 		File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_200_percent.pak"
@@ -717,6 +718,7 @@ DontInstallRedistVC12:
 
 			File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
+			File "${FILES_ROOT}\MTA San Andreas\mta\dbghelp.dll"
 			File "${FILES_ROOT}\MTA San Andreas\mta\wow_helper.exe"
 
             SetOutPath "$INSTDIR\MTA\config"

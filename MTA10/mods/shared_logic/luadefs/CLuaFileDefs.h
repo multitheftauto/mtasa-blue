@@ -9,31 +9,30 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUAFILEDEFS_H
-#define __CLUAFILEDEFS_H
-
+#pragma once
 #include "CLuaDefs.h"
 
 class CLuaFileDefs: public CLuaDefs
 {
 public:
-    static void     LoadFunctions                       ( void );
+    static void LoadFunctions ( void );
+    static void AddClass ( lua_State* luaVM );
 
-    static int      fileCreate                          ( lua_State* luaVM );
-    static int      fileExists                          ( lua_State* luaVM );
-    static int      fileOpen                            ( lua_State* luaVM );
-    static int      fileIsEOF                           ( lua_State* luaVM );
-    static int      fileGetPos                          ( lua_State* luaVM );
-    static int      fileSetPos                          ( lua_State* luaVM );
-    static int      fileGetSize                         ( lua_State* luaVM );
-    static int      fileRead                            ( lua_State* luaVM );
-    static int      fileWrite                           ( lua_State* luaVM );
-    static int      fileFlush                           ( lua_State* luaVM );
-    static int      fileClose                           ( lua_State* luaVM );
-    static int      fileDelete                          ( lua_State* luaVM );
-    static int      fileRename                          ( lua_State* luaVM );
-    static int      fileCopy                            ( lua_State* luaVM );
-    static int      fileGetPath                         ( lua_State* luaVM );
+    LUA_DECLARE(fileCreate)
+    LUA_DECLARE(fileExists)
+    LUA_DECLARE(fileOpen)
+    LUA_DECLARE(fileIsEOF)
+    LUA_DECLARE(fileGetPos)
+    LUA_DECLARE(fileSetPos)
+    LUA_DECLARE(fileGetSize)
+    LUA_DECLARE(fileRead)
+    LUA_DECLARE(fileWrite)
+    LUA_DECLARE(fileFlush)
+    LUA_DECLARE(fileDelete)
+    LUA_DECLARE(fileRename)
+    LUA_DECLARE(fileCopy)
+    LUA_DECLARE(fileGetPath)
+    
+    LUA_DECLARE ( fileClose );
+    LUA_DECLARE ( fileCloseGC );
 };
-
-#endif

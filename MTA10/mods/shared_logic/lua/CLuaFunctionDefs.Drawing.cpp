@@ -24,18 +24,18 @@ extern bool g_bAllowAspectRatioAdjustment;
 int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 {
 //  bool dxDrawLine ( int startX, int startY, int endX, int endY, int color, [float width=1, bool postGUI=false] )
-    CVector2D vecStart; CVector2D vecEnd; uint ulColor; float fWidth; bool bPostGUI;
+    CVector2D vecStart; CVector2D vecEnd; SColor color; float fWidth; bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadVector2D ( vecStart );
     argStream.ReadVector2D ( vecEnd );
-    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadColor ( color, 0xFFFFFFFF );
     argStream.ReadNumber ( fWidth, 1 );
     argStream.ReadBool ( bPostGUI, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->DrawLineQueued ( vecStart.fX, vecStart.fY, vecEnd.fX, vecEnd.fY, fWidth, ulColor, bPostGUI );
+        g_pCore->GetGraphics ()->DrawLineQueued ( vecStart.fX, vecStart.fY, vecEnd.fX, vecEnd.fY, fWidth, color, bPostGUI );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -51,18 +51,18 @@ int CLuaFunctionDefs::dxDrawLine ( lua_State* luaVM )
 int CLuaFunctionDefs::dxDrawLine3D ( lua_State* luaVM )
 {
 //  bool dxDrawLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, int color[, int width, bool postGUI ] )
-    CVector vecBegin; CVector vecEnd; uint ulColor; float fWidth; bool bPostGUI;
+    CVector vecBegin; CVector vecEnd; SColor color; float fWidth; bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadVector3D ( vecBegin );
     argStream.ReadVector3D ( vecEnd );
-    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadColor ( color, 0xFFFFFFFF );
     argStream.ReadNumber ( fWidth, 1 );
     argStream.ReadBool ( bPostGUI, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->DrawLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, bPostGUI );
+        g_pCore->GetGraphics ()->DrawLine3DQueued ( vecBegin, vecEnd, fWidth, color, bPostGUI );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -79,7 +79,7 @@ int CLuaFunctionDefs::dxDrawMaterialLine3D ( lua_State* luaVM )
 {
 //  bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, element material, int width [, int color = white,
 //                          float faceX, float faceY, float faceZ ] )
-    CVector vecBegin; CVector vecEnd; CClientMaterial* pMaterial; float fWidth; uint ulColor;
+    CVector vecBegin; CVector vecEnd; CClientMaterial* pMaterial; float fWidth; SColor color;
     CVector vecFaceToward; bool bUseFaceToward = false;
 
     CScriptArgReader argStream ( luaVM );
@@ -87,7 +87,7 @@ int CLuaFunctionDefs::dxDrawMaterialLine3D ( lua_State* luaVM )
     argStream.ReadVector3D ( vecEnd );
     argStream.ReadUserData ( pMaterial );
     argStream.ReadNumber ( fWidth );
-    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadColor ( color, 0xFFFFFFFF );
     if ( argStream.NextIsVector3D ( ) )
     {
         argStream.ReadVector3D ( vecFaceToward );
@@ -96,7 +96,7 @@ int CLuaFunctionDefs::dxDrawMaterialLine3D ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->DrawMaterialLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, pMaterial->GetMaterialItem (), 0, 0, 1, 1, true, bUseFaceToward, vecFaceToward );
+        g_pCore->GetGraphics ()->DrawMaterialLine3DQueued ( vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem (), 0, 0, 1, 1, true, bUseFaceToward, vecFaceToward );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -114,7 +114,7 @@ int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
 //  bool dxDrawMaterialSectionLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float vsize,
 //                                  element material, int width, [ int color = white, float faceX, float faceY, float faceZ ] )
     CVector vecBegin; CVector vecEnd; CVector2D vecSectionPos; CVector2D vecSectionSize;
-    CClientMaterial* pMaterial; float fWidth; uint ulColor; CVector vecFaceToward; bool bUseFaceToward = false;
+    CClientMaterial* pMaterial; float fWidth; SColor color; CVector vecFaceToward; bool bUseFaceToward = false;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadVector3D ( vecBegin );
@@ -123,7 +123,7 @@ int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
     argStream.ReadVector2D ( vecSectionSize );
     argStream.ReadUserData ( pMaterial );
     argStream.ReadNumber ( fWidth );
-    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadColor ( color, 0xFFFFFFFF );
     if ( argStream.NextIsVector3D ( ) )
     {
         argStream.ReadVector3D ( vecFaceToward );
@@ -132,7 +132,7 @@ int CLuaFunctionDefs::dxDrawMaterialSectionLine3D ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->DrawMaterialLine3DQueued ( vecBegin, vecEnd, fWidth, ulColor, pMaterial->GetMaterialItem (), vecSectionPos.fX, vecSectionPos.fY, vecSectionSize.fX, vecSectionSize.fY, false, bUseFaceToward, vecFaceToward );
+        g_pCore->GetGraphics ()->DrawMaterialLine3DQueued ( vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem (), vecSectionPos.fX, vecSectionPos.fY, vecSectionSize.fX, vecSectionSize.fY, false, bUseFaceToward, vecFaceToward );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -150,7 +150,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 //  bool dxDrawText ( string text, float left, float top [, float right=left, float bottom=top, int color=white, float scale=1, mixed font="default", 
 //      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI=false, bool colorCoded=false, bool subPixelPositioning=false,
 //      float rotation=0, float rotationCenterX=(left+right)/2, float rotationCenterY=(top+bottom)/2] )
-    SString strText; CVector2D vecTopLeft; CVector2D vecBottomRight; ulong ulColor; float fScaleX; float fScaleY; eFontType fontType; CClientDxFont* pDxFontElement;
+    SString strText; CVector2D vecTopLeft; CVector2D vecBottomRight; SColor color; float fScaleX; float fScaleY; eFontType fontType; CClientDxFont* pDxFontElement;
     eDXHorizontalAlign alignX; eDXVerticalAlign alignY; bool bClip; bool bWordBreak; bool bPostGUI; bool bColorCoded; bool bSubPixelPositioning;
     float fRotation; CVector2D vecRotationOrigin;
 
@@ -164,7 +164,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         argStream.ReadNumber ( vecBottomRight.fX, vecTopLeft.fX );
         argStream.ReadNumber ( vecBottomRight.fY, vecTopLeft.fY );
     }
-    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadColor ( color, 0xFFFFFFFF );
     if ( argStream.NextIsUserDataOfType<CLuaVector2D>() ) {
         CVector2D vecScale;
         argStream.ReadVector2D ( vecScale );
@@ -201,7 +201,7 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
         if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
         if ( !bClip )               ulFormat |= DT_NOCLIP;
 
-        CStaticFunctionDefinitions::DrawText ( vecTopLeft.fX, vecTopLeft.fY, vecBottomRight.fX, vecBottomRight.fY, ulColor, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, vecRotationOrigin.fX, vecRotationOrigin.fY );
+        CStaticFunctionDefinitions::DrawText ( vecTopLeft.fX, vecTopLeft.fY, vecBottomRight.fX, vecBottomRight.fY, color, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, vecRotationOrigin.fX, vecRotationOrigin.fY );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -218,18 +218,18 @@ int CLuaFunctionDefs::dxDrawText ( lua_State* luaVM )
 int CLuaFunctionDefs::dxDrawRectangle ( lua_State* luaVM )
 {
 //  bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false] )
-    CVector2D vecPosition; CVector2D vecSize; uint ulColor; bool bPostGUI; bool bSubPixelPositioning;
+    CVector2D vecPosition; CVector2D vecSize; SColor color; bool bPostGUI; bool bSubPixelPositioning;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadVector2D ( vecPosition );
     argStream.ReadVector2D ( vecSize );
-    argStream.ReadNumber ( ulColor, 0xFFFFFFFF );
+    argStream.ReadColor ( color, 0xFFFFFFFF );
     argStream.ReadBool ( bPostGUI, false );
     argStream.ReadBool ( bSubPixelPositioning, false );
 
     if ( !argStream.HasErrors () )
     {
-        g_pCore->GetGraphics ()->DrawRectQueued ( vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, ulColor, bPostGUI, bSubPixelPositioning );
+        g_pCore->GetGraphics ()->DrawRectQueued ( vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, color, bPostGUI, bSubPixelPositioning );
         lua_pushboolean ( luaVM, true );
         return 1;
     }
@@ -252,7 +252,7 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
     CClientMaterial* pMaterialElement; 
     float fRotation;
     CVector2D vecRotationCenter;
-    uint ulColor; 
+    SColor color; 
     bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
@@ -261,14 +261,14 @@ int CLuaFunctionDefs::dxDrawImage ( lua_State* luaVM )
     MixedReadMaterialString ( argStream, pMaterialElement );
     argStream.ReadNumber ( fRotation, 0 );
     argStream.ReadVector2D ( vecRotationCenter, CVector2D ( ) );
-    argStream.ReadNumber ( ulColor, 0xffffffff );
+    argStream.ReadColor ( color, 0xffffffff );
     argStream.ReadBool ( bPostGUI, false );
 
     if ( !argStream.HasErrors () )
     {
         if ( pMaterialElement )
         {
-            g_pCore->GetGraphics ()->DrawTextureQueued ( vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, 0, 0, 1, 1, true, pMaterialElement->GetMaterialItem (), fRotation, vecRotationCenter.fX, vecRotationCenter.fY, ulColor, bPostGUI );
+            g_pCore->GetGraphics ()->DrawTextureQueued ( vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, 0, 0, 1, 1, true, pMaterialElement->GetMaterialItem (), fRotation, vecRotationCenter.fX, vecRotationCenter.fY, color, bPostGUI );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
@@ -293,7 +293,7 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
     CClientMaterial* pMaterialElement;
     float fRotation; 
     CVector2D vecRotationCenter;
-    uint ulColor;
+    SColor color;
     bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
@@ -304,14 +304,14 @@ int CLuaFunctionDefs::dxDrawImageSection ( lua_State* luaVM )
     MixedReadMaterialString ( argStream, pMaterialElement );
     argStream.ReadNumber ( fRotation, 0 );
     argStream.ReadVector2D ( vecRotationCenter, CVector2D ( ) );
-    argStream.ReadNumber ( ulColor, 0xffffffff );
+    argStream.ReadColor ( color, 0xffffffff );
     argStream.ReadBool ( bPostGUI, false );
 
     if ( !argStream.HasErrors () )
     {
         if ( pMaterialElement )
         {
-            g_pCore->GetGraphics ()->DrawTextureQueued ( vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, vecSectionPosition.fX, vecSectionPosition.fY, vecSectionSize.fX, vecSectionSize.fY, false, pMaterialElement->GetMaterialItem (), fRotation, vecRotationCenter.fX, vecRotationCenter.fY, ulColor, bPostGUI );
+            g_pCore->GetGraphics ()->DrawTextureQueued ( vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, vecSectionPosition.fX, vecSectionPosition.fY, vecSectionSize.fX, vecSectionSize.fY, false, pMaterialElement->GetMaterialItem (), fRotation, vecRotationCenter.fX, vecRotationCenter.fY, color, bPostGUI );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
@@ -582,9 +582,10 @@ int CLuaFunctionDefs::dxCreateRenderTarget ( lua_State* luaVM )
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
                 pRenderTarget->SetParent ( pParentResource->GetResourceDynamicEntity () );
+
+                lua_pushelement ( luaVM, pRenderTarget );
+                return 1;
             }
-            lua_pushelement ( luaVM, pRenderTarget );
-            return 1;
         }
     }
     else
@@ -1335,17 +1336,17 @@ int CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled ( lua_State* luaVM )
 int CLuaFunctionDefs::dxSetTextureEdge ( lua_State* luaVM )
 {
 //  bool dxSetTextureEdge ( texture theTexture, string textureEdge [, int border-color )
-    CClientTexture* pTexture; ETextureAddress textureAddress; unsigned int uiBorderColor;
+    CClientTexture* pTexture; ETextureAddress textureAddress; SColor borderColor;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pTexture );
     argStream.ReadEnumString ( textureAddress );
-    argStream.ReadNumber ( uiBorderColor, 0 );
+    argStream.ReadColor ( borderColor, 0 );
 
     if ( !argStream.HasErrors () )
     {
         pTexture->GetMaterialItem ()->m_TextureAddress = textureAddress;
-        pTexture->GetMaterialItem ()->m_uiBorderColor = uiBorderColor;
+        pTexture->GetMaterialItem ()->m_uiBorderColor = borderColor;
         lua_pushboolean ( luaVM, true );
         return 1;
     }

@@ -1988,6 +1988,58 @@ bool CStaticFunctionDefinitions::SetPlayerNametagShowing ( CClientEntity& Entity
     return false;
 }
 
+bool CStaticFunctionDefinitions::KillPed ( CClientEntity& Entity, CClientEntity* pKiller = NULL, unsigned char ucKillerWeapon = 0xFF, unsigned char ucBodyPart = 0xFF, bool bStealth = false )
+{
+    RUN_CHILDREN ( KillPed ( **iter, pKiller, ucKillerWeapon, ucBodyPart ) )
+
+    if ( !IS_PED ( &Entity ) )
+    {
+        return false;
+    }
+
+    CClientPed& pPed = static_cast < CClientPed& > ( Entity );
+
+    // Is the ped alive and a local entity?
+    if ( pPed.IsDead () || !pPed.IsLocalEntity() )
+    {
+        return false;
+    }
+
+    // Remove him from any occupied vehicle
+    pPed.SetVehicleInOutState ( VEHICLE_INOUT_NONE );
+    pPed.RemoveFromVehicle ();
+
+    // Is this a stealth kill? and do we have a killer ped?
+    // TODO: Make things dry. Refer to CPacketHandler::Packet_PlayerWasted
+    if ( bStealth && pKiller && IS_PED ( pKiller ) )
+    {
+        // Make our killer ped do the stealth kill animation
+        CClientPed* pKillerPed = static_cast < CClientPed * > ( pKiller );
+        pKillerPed->StealthKill ( &pPed );
+    }
+
+    // Kill the ped
+    pPed.Kill ( (eWeaponType) ucKillerWeapon,
+        ucBodyPart,
+        bStealth, false, 0, 15 );
+    // magic numbers 0, 15 found from CPlayerWastedPacket
+
+    // Tell our scripts the ped has died
+    CLuaArguments Arguments;
+    if ( pKiller ) Arguments.PushElement ( pKiller );
+    else Arguments.PushBoolean ( false );
+    if ( ucKillerWeapon != 0xFF ) Arguments.PushNumber ( ucKillerWeapon );
+    else Arguments.PushBoolean ( false );
+    if ( ucBodyPart != 0xFF ) Arguments.PushNumber ( ucBodyPart );
+    else Arguments.PushBoolean ( false );
+    Arguments.PushBoolean ( bStealth );
+            
+    pPed.CallEvent ( "onClientPedWasted", Arguments, false );
+    pPed.RemoveAllWeapons ();
+
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::SetPedRotation ( CClientEntity& Entity, float fRotation, bool bNewWay )
 {
@@ -2517,6 +2569,8 @@ bool CStaticFunctionDefinitions::GetTrainTrack ( CClientVehicle& Vehicle, uchar&
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
+    else if ( Vehicle.IsDerailed () )
+        return false;
 
     ucTrack = Vehicle.GetTrainTrack ();
     return true;
@@ -2527,6 +2581,9 @@ bool CStaticFunctionDefinitions::GetTrainPosition ( CClientVehicle& Vehicle, flo
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
+    else if ( Vehicle.IsDerailed () )
+        return false;
+
 
     fPosition = Vehicle.GetTrainPosition ();
     return true;
@@ -3202,6 +3259,8 @@ bool CStaticFunctionDefinitions::SetTrainTrack ( CClientVehicle& Vehicle, uchar 
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
+    else if ( Vehicle.IsDerailed () )
+        return false;
 
     Vehicle.SetTrainTrack ( ucTrack );
     return true;
@@ -3212,6 +3271,8 @@ bool CStaticFunctionDefinitions::SetTrainTrack ( CClientVehicle& Vehicle, uchar 
 bool CStaticFunctionDefinitions::SetTrainPosition ( CClientVehicle& Vehicle, float fPosition )
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+        return false;
+    else if ( Vehicle.IsDerailed () )
         return false;
 
     Vehicle.SetTrainPosition ( fPosition, false );

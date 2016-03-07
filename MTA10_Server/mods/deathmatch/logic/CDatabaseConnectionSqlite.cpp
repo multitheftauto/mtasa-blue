@@ -30,8 +30,6 @@ public:
     virtual bool            IsValid                 ( void );
     virtual const SString&  GetLastErrorMessage     ( void );
     virtual uint            GetLastErrorCode        ( void );
-    virtual uint            GetNumAffectedRows      ( void );
-    virtual uint64          GetLastInsertId         ( void );
     virtual void            AddRef                  ( void );
     virtual void            Release                 ( void );
     virtual bool            Query                   ( const SString& strQuery, CRegistryResult& registryResult );
@@ -50,11 +48,10 @@ public:
     bool                    m_bOpened;
     SString                 m_strLastErrorMessage;
     uint                    m_uiLastErrorCode;
-    uint                    m_uiNumAffectedRows;
-    uint64                  m_ullLastInsertId;
     bool                    m_bAutomaticTransactionsEnabled;
     bool                    m_bInAutomaticTransaction;
     CTickCount              m_AutomaticTransactionStartTime;
+    bool                    m_bMultipleStatements;
 };
 
 
@@ -82,6 +79,7 @@ CDatabaseConnectionSqlite::CDatabaseConnectionSqlite ( CDatabaseType* pManager, 
 
     // Parse options string
     GetOption < CDbOptionsMap > ( strOptions, "batch", m_bAutomaticTransactionsEnabled, 1 );
+    GetOption < CDbOptionsMap > ( strOptions, "multi_statements", m_bMultipleStatements, 0 );
 
     MakeSureDirExists ( strPath );
     if ( sqlite3_open ( strPath, &m_handle ) )
@@ -202,32 +200,6 @@ void CDatabaseConnectionSqlite::SetLastError ( uint uiCode, const SString& strMe
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseConnectionSqlite::GetNumAffectedRows
-//
-// Only valid when Query() returns true
-//
-///////////////////////////////////////////////////////////////
-uint CDatabaseConnectionSqlite::GetNumAffectedRows ( void )
-{
-    return m_uiNumAffectedRows;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CDatabaseConnectionSqlite::GetLastInsertId
-//
-// Only valid when Query() returns true
-//
-///////////////////////////////////////////////////////////////
-uint64 CDatabaseConnectionSqlite::GetLastInsertId ( void )
-{
-    return m_ullLastInsertId;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // CDatabaseConnectionSqlite::Query
 //
 //
@@ -255,84 +227,94 @@ bool CDatabaseConnectionSqlite::Query ( const SString& strQuery, CRegistryResult
 bool CDatabaseConnectionSqlite::QueryInternal ( const SString& strQuery, CRegistryResult& registryResult )
 {
     const char* szQuery = strQuery;
-    CRegistryResult& pResult = registryResult;
+    CRegistryResultData* pResult = registryResult->GetThis();
 
-    // Prepare the query
-    sqlite3_stmt* pStmt;
-    if ( sqlite3_prepare ( m_handle, szQuery, strlen ( szQuery ) + 1, &pStmt, NULL ) != SQLITE_OK )
+    while( true )
     {
-        SetLastError ( sqlite3_errcode ( m_handle ), sqlite3_errmsg ( m_handle ) );
-        return false;
-    }
+        // Prepare the query
+        sqlite3_stmt* pStmt;
+        if ( sqlite3_prepare ( m_handle, szQuery, strlen ( szQuery ) + 1, &pStmt, &szQuery ) != SQLITE_OK )
+        {
+            SetLastError ( sqlite3_errcode ( m_handle ), sqlite3_errmsg ( m_handle ) );
+            return false;
+        }
 
-    // Get column names
-    pResult->nColumns = sqlite3_column_count ( pStmt );
-    pResult->ColNames.clear ();
-    for ( int i = 0; i < pResult->nColumns; i++ )
-    {
-        pResult->ColNames.push_back ( sqlite3_column_name ( pStmt, i ) );
-    }
-
-    // Fetch the rows
-    pResult->nRows = 0;
-    pResult->Data.clear ();
-    int status;
-    while ( (status = sqlite3_step(pStmt)) == SQLITE_ROW )
-    {
-        pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
-        vector < CRegistryResultCell > & row = pResult->Data.back();
+        // Get column names
+        pResult->nColumns = sqlite3_column_count ( pStmt );
+        pResult->ColNames.clear ();
         for ( int i = 0; i < pResult->nColumns; i++ )
         {
-            CRegistryResultCell& cell = row[i];
-            cell.nType = sqlite3_column_type ( pStmt, i );
-            switch ( cell.nType )
-            {
-                case SQLITE_NULL:
-                    break;
-                case SQLITE_INTEGER:
-                    cell.nVal = sqlite3_column_int ( pStmt, i );
-                    break;
-                case SQLITE_FLOAT:
-                    cell.fVal = (float)sqlite3_column_double ( pStmt, i );
-                    break;
-                case SQLITE_BLOB:
-                    cell.nLength = sqlite3_column_bytes ( pStmt, i );
-                    if ( cell.nLength == 0 )
-                    {
-                        cell.pVal = NULL;
-                    }
-                    else
-                    {
-                        cell.pVal = new unsigned char [ cell.nLength ];
-                        memcpy ( cell.pVal, sqlite3_column_blob ( pStmt, i ), cell.nLength );
-                    }
-                    break;
-                default:
-                    cell.nLength = sqlite3_column_bytes ( pStmt, i ) + 1;
-                    cell.pVal = new unsigned char [ cell.nLength ];
-                    memcpy ( cell.pVal, sqlite3_column_text ( pStmt, i ), cell.nLength );
-                    break;
-            }
+            pResult->ColNames.push_back ( sqlite3_column_name ( pStmt, i ) );
         }
-        pResult->nRows++;
-    }
 
-    // Did we leave the fetching loop because of an error?
-    if ( status != SQLITE_DONE )
-    {
-        SetLastError ( sqlite3_errcode ( m_handle ), sqlite3_errmsg ( m_handle ) );
+        // Fetch the rows
+        pResult->nRows = 0;
+        pResult->Data.clear ();
+        int status;
+        while ( (status = sqlite3_step(pStmt)) == SQLITE_ROW )
+        {
+            pResult->Data.push_back ( vector < CRegistryResultCell > ( pResult->nColumns ) );
+            vector < CRegistryResultCell > & row = pResult->Data.back();
+            for ( int i = 0; i < pResult->nColumns; i++ )
+            {
+                CRegistryResultCell& cell = row[i];
+                cell.nType = sqlite3_column_type ( pStmt, i );
+                switch ( cell.nType )
+                {
+                    case SQLITE_NULL:
+                        break;
+                    case SQLITE_INTEGER:
+                        cell.nVal = sqlite3_column_int ( pStmt, i );
+                        break;
+                    case SQLITE_FLOAT:
+                        cell.fVal = (float)sqlite3_column_double ( pStmt, i );
+                        break;
+                    case SQLITE_BLOB:
+                        cell.nLength = sqlite3_column_bytes ( pStmt, i );
+                        if ( cell.nLength == 0 )
+                        {
+                            cell.pVal = NULL;
+                        }
+                        else
+                        {
+                            cell.pVal = new unsigned char [ cell.nLength ];
+                            memcpy ( cell.pVal, sqlite3_column_blob ( pStmt, i ), cell.nLength );
+                        }
+                        break;
+                    default:
+                        cell.nLength = sqlite3_column_bytes ( pStmt, i ) + 1;
+                        cell.pVal = new unsigned char [ cell.nLength ];
+                        memcpy ( cell.pVal, sqlite3_column_text ( pStmt, i ), cell.nLength );
+                        break;
+                }
+            }
+            pResult->nRows++;
+        }
+
+        // Did we leave the fetching loop because of an error?
+        if ( status != SQLITE_DONE )
+        {
+            SetLastError ( sqlite3_errcode ( m_handle ), sqlite3_errmsg ( m_handle ) );
+            sqlite3_finalize ( pStmt );
+            return false;
+        }
+
+        // All done
         sqlite3_finalize ( pStmt );
-        return false;
+
+        // Number of affects rows/num of rows like MySql
+        pResult->uiNumAffectedRows = pResult->nRows ? pResult->nRows : sqlite3_changes ( m_handle );
+
+        // Last insert id
+        pResult->ullLastInsertId = sqlite3_last_insert_rowid( m_handle );
+
+        // See if should process next statement
+        if ( !m_bMultipleStatements || !szQuery || strlen( szQuery ) < 2 )
+            break;
+
+        pResult->pNextResult = new CRegistryResultData();
+        pResult = pResult->pNextResult;
     }
-
-    // All done
-    sqlite3_finalize ( pStmt );
-
-    // Number of affects rows/num of rows like MySql
-    m_uiNumAffectedRows = pResult->nRows ? pResult->nRows : sqlite3_changes ( m_handle );
-
-    // Last insert id
-    m_ullLastInsertId = sqlite3_last_insert_rowid( m_handle );
 
     return true;
 }

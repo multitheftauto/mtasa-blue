@@ -160,39 +160,39 @@ CLuaMain* CLuaManager::GetVirtualMachine ( lua_State* luaVM )
 void CLuaManager::LoadCFunctions ( void )
 {
     // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
-    CLuaCFunctions::AddFunction ( "getPlayerRotation", CLuaFunctionDefs::GetPedRotation );
-    CLuaCFunctions::AddFunction ( "canPlayerBeKnockedOffBike", CLuaFunctionDefs::CanPedBeKnockedOffBike );
-    CLuaCFunctions::AddFunction ( "getPlayerContactElement", CLuaFunctionDefs::GetPedContactElement );
-    CLuaCFunctions::AddFunction ( "isPlayerInVehicle", CLuaFunctionDefs::IsPedInVehicle );
-    CLuaCFunctions::AddFunction ( "doesPlayerHaveJetPack", CLuaFunctionDefs::DoesPedHaveJetPack );
+    CLuaCFunctions::AddFunction ( "getPlayerRotation", CLuaPedDefs::GetPedRotation );
+    CLuaCFunctions::AddFunction ( "canPlayerBeKnockedOffBike", CLuaPedDefs::CanPedBeKnockedOffBike );
+    CLuaCFunctions::AddFunction ( "getPlayerContactElement", CLuaPedDefs::GetPedContactElement );
+    CLuaCFunctions::AddFunction ( "isPlayerInVehicle", CLuaPedDefs::IsPedInVehicle );
+    CLuaCFunctions::AddFunction ( "doesPlayerHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack );
     CLuaCFunctions::AddFunction ( "isPlayerInWater", CLuaFunctionDefs::IsElementInWater );
     CLuaCFunctions::AddFunction ( "isPedInWater", CLuaFunctionDefs::IsElementInWater );
-    CLuaCFunctions::AddFunction ( "isPedOnFire", CLuaFunctionDefs::IsPedOnFire );
-    CLuaCFunctions::AddFunction ( "setPedOnFire", CLuaFunctionDefs::SetPedOnFire );
-    CLuaCFunctions::AddFunction ( "isPlayerOnGround", CLuaFunctionDefs::IsPedOnGround );
-    CLuaCFunctions::AddFunction ( "getPlayerTask", CLuaFunctionDefs::GetPedTask );
-    CLuaCFunctions::AddFunction ( "getPlayerSimplestTask", CLuaFunctionDefs::GetPedSimplestTask );
-    CLuaCFunctions::AddFunction ( "isPlayerDoingTask", CLuaFunctionDefs::IsPedDoingTask );
-    CLuaCFunctions::AddFunction ( "getPlayerTarget", CLuaFunctionDefs::GetPedTarget );
-    CLuaCFunctions::AddFunction ( "getPlayerTargetStart", CLuaFunctionDefs::GetPedTargetStart );
-    CLuaCFunctions::AddFunction ( "getPlayerTargetEnd", CLuaFunctionDefs::GetPedTargetEnd );
-    CLuaCFunctions::AddFunction ( "getPlayerTargetRange", CLuaFunctionDefs::GetPedTargetRange );
-    CLuaCFunctions::AddFunction ( "getPlayerTargetCollision", CLuaFunctionDefs::GetPedTargetCollision );
-    CLuaCFunctions::AddFunction ( "getPlayerWeaponSlot", CLuaFunctionDefs::GetPedWeaponSlot );
-    CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaFunctionDefs::GetPedWeapon );
-    CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaFunctionDefs::GetPedAmmoInClip );
-    CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaFunctionDefs::GetPedTotalAmmo );
-    CLuaCFunctions::AddFunction ( "getPedWeaponMuzzlePosition", CLuaFunctionDefs::GetPedWeaponMuzzlePosition );
-    CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicle", CLuaFunctionDefs::GetPedOccupiedVehicle );
-    CLuaCFunctions::AddFunction ( "getPlayerArmor", CLuaFunctionDefs::GetPedArmor );
+    CLuaCFunctions::AddFunction ( "isPedOnFire", CLuaPedDefs::IsPedOnFire );
+    CLuaCFunctions::AddFunction ( "setPedOnFire", CLuaPedDefs::SetPedOnFire );
+    CLuaCFunctions::AddFunction ( "isPlayerOnGround", CLuaPedDefs::IsPedOnGround );
+    CLuaCFunctions::AddFunction ( "getPlayerTask", CLuaPedDefs::GetPedTask );
+    CLuaCFunctions::AddFunction ( "getPlayerSimplestTask", CLuaPedDefs::GetPedSimplestTask );
+    CLuaCFunctions::AddFunction ( "isPlayerDoingTask", CLuaPedDefs::IsPedDoingTask );
+    CLuaCFunctions::AddFunction ( "getPlayerTarget", CLuaPedDefs::GetPedTarget );
+    CLuaCFunctions::AddFunction ( "getPlayerTargetStart", CLuaPedDefs::GetPedTargetStart );
+    CLuaCFunctions::AddFunction ( "getPlayerTargetEnd", CLuaPedDefs::GetPedTargetEnd );
+    CLuaCFunctions::AddFunction ( "getPlayerTargetRange", CLuaPedDefs::GetPedTargetRange );
+    CLuaCFunctions::AddFunction ( "getPlayerTargetCollision", CLuaPedDefs::GetPedTargetCollision );
+    CLuaCFunctions::AddFunction ( "getPlayerWeaponSlot", CLuaPedDefs::GetPedWeaponSlot );
+    CLuaCFunctions::AddFunction ( "getPlayerWeapon", CLuaPedDefs::GetPedWeapon );
+    CLuaCFunctions::AddFunction ( "getPlayerAmmoInClip", CLuaPedDefs::GetPedAmmoInClip );
+    CLuaCFunctions::AddFunction ( "getPlayerTotalAmmo", CLuaPedDefs::GetPedTotalAmmo );
+    CLuaCFunctions::AddFunction ( "getPedWeaponMuzzlePosition", CLuaPedDefs::GetPedWeaponMuzzlePosition );
+    CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicle", CLuaPedDefs::GetPedOccupiedVehicle );
+    CLuaCFunctions::AddFunction ( "getPlayerArmor", CLuaPedDefs::GetPedArmor );
     CLuaCFunctions::AddFunction ( "getPlayerSkin", CLuaFunctionDefs::GetElementModel );
-    CLuaCFunctions::AddFunction ( "isPlayerChoking", CLuaFunctionDefs::IsPedChoking );
-    CLuaCFunctions::AddFunction ( "isPlayerDucked", CLuaFunctionDefs::IsPedDucked );
-    CLuaCFunctions::AddFunction ( "getPlayerStat", CLuaFunctionDefs::GetPedStat );
-    CLuaCFunctions::AddFunction ( "setPlayerWeaponSlot", CLuaFunctionDefs::SetPedWeaponSlot );
+    CLuaCFunctions::AddFunction ( "isPlayerChoking", CLuaPedDefs::IsPedChoking );
+    CLuaCFunctions::AddFunction ( "isPlayerDucked", CLuaPedDefs::IsPedDucked );
+    CLuaCFunctions::AddFunction ( "getPlayerStat", CLuaPedDefs::GetPedStat );
+    CLuaCFunctions::AddFunction ( "setPlayerWeaponSlot", CLuaPedDefs::SetPedWeaponSlot );
     CLuaCFunctions::AddFunction ( "setPlayerSkin", CLuaFunctionDefs::SetElementModel );
-    CLuaCFunctions::AddFunction ( "setPlayerRotation", CLuaFunctionDefs::SetPedRotation );
-    CLuaCFunctions::AddFunction ( "setPlayerCanBeKnockedOffBike", CLuaFunctionDefs::SetPedCanBeKnockedOffBike );
+    CLuaCFunctions::AddFunction ( "setPlayerRotation", CLuaPedDefs::SetPedRotation );
+    CLuaCFunctions::AddFunction ( "setPlayerCanBeKnockedOffBike", CLuaPedDefs::SetPedCanBeKnockedOffBike );
     CLuaCFunctions::AddFunction ( "setVehicleModel", CLuaFunctionDefs::SetElementModel );
     CLuaCFunctions::AddFunction ( "getVehicleModel", CLuaFunctionDefs::GetElementModel );
     CLuaCFunctions::AddFunction ( "getPedSkin", CLuaFunctionDefs::GetElementModel );
@@ -211,7 +211,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaFunctionDefs::XMLNodeFindChild );
     CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaFunctionDefs::XMLCreateChild );
     CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaFunctionDefs::XMLNodeFindChild );
-    CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaFunctionDefs::IsPedDead );
+    CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaPedDefs::IsPedDead );
     CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaFunctionDefs::GUIEditSetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaFunctionDefs::GUIMemoSetCaretIndex );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
@@ -388,77 +388,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPlayerNametagText", CLuaFunctionDefs::SetPlayerNametagText );
     CLuaCFunctions::AddFunction ( "setPlayerNametagColor", CLuaFunctionDefs::SetPlayerNametagColor );
     CLuaCFunctions::AddFunction ( "setPlayerNametagShowing", CLuaFunctionDefs::SetPlayerNametagShowing );
-    
-
-    // Ped funcs
-    CLuaCFunctions::AddFunction ( "createPed", CLuaFunctionDefs::CreatePed );
-    CLuaCFunctions::AddFunction ( "detonateSatchels", CLuaFunctionDefs::DetonateSatchels );
-
-    CLuaCFunctions::AddFunction ( "getPedVoice", CLuaFunctionDefs::GetPedVoice );
-    CLuaCFunctions::AddFunction ( "setPedVoice", CLuaFunctionDefs::SetPedVoice );
-    CLuaCFunctions::AddFunction ( "getPedRotation", CLuaFunctionDefs::GetPedRotation );
-    CLuaCFunctions::AddFunction ( "canPedBeKnockedOffBike", CLuaFunctionDefs::CanPedBeKnockedOffBike );
-    CLuaCFunctions::AddFunction ( "getPedContactElement", CLuaFunctionDefs::GetPedContactElement );
-    CLuaCFunctions::AddFunction ( "isPedInVehicle", CLuaFunctionDefs::IsPedInVehicle );
-    CLuaCFunctions::AddFunction ( "doesPedHaveJetPack", CLuaFunctionDefs::DoesPedHaveJetPack );
-    CLuaCFunctions::AddFunction ( "isPedOnGround", CLuaFunctionDefs::IsPedOnGround );
-    CLuaCFunctions::AddFunction ( "getPedTask", CLuaFunctionDefs::GetPedTask );
-    CLuaCFunctions::AddFunction ( "getPedSimplestTask", CLuaFunctionDefs::GetPedSimplestTask );
-    CLuaCFunctions::AddFunction ( "isPedDoingTask", CLuaFunctionDefs::IsPedDoingTask );
-    CLuaCFunctions::AddFunction ( "getPedTarget", CLuaFunctionDefs::GetPedTarget );
-    CLuaCFunctions::AddFunction ( "getPedTargetStart", CLuaFunctionDefs::GetPedTargetStart );
-    CLuaCFunctions::AddFunction ( "getPedTargetEnd", CLuaFunctionDefs::GetPedTargetEnd );
-    CLuaCFunctions::AddFunction ( "getPedTargetRange", CLuaFunctionDefs::GetPedTargetRange );
-    CLuaCFunctions::AddFunction ( "getPedTargetCollision", CLuaFunctionDefs::GetPedTargetCollision );
-    CLuaCFunctions::AddFunction ( "getPedWeaponSlot", CLuaFunctionDefs::GetPedWeaponSlot );
-    CLuaCFunctions::AddFunction ( "getPedWeapon", CLuaFunctionDefs::GetPedWeapon );
-    CLuaCFunctions::AddFunction ( "getPedAmmoInClip", CLuaFunctionDefs::GetPedAmmoInClip );
-    CLuaCFunctions::AddFunction ( "getPedTotalAmmo", CLuaFunctionDefs::GetPedTotalAmmo );
-    CLuaCFunctions::AddFunction ( "getPedOccupiedVehicle", CLuaFunctionDefs::GetPedOccupiedVehicle );
-    CLuaCFunctions::AddFunction ( "getPedOccupiedVehicleSeat", CLuaFunctionDefs::GetPedOccupiedVehicleSeat );
-    CLuaCFunctions::AddFunction ( "getPedArmor", CLuaFunctionDefs::GetPedArmor );
-    CLuaCFunctions::AddFunction ( "isPedChoking", CLuaFunctionDefs::IsPedChoking );
-    CLuaCFunctions::AddFunction ( "isPedDucked", CLuaFunctionDefs::IsPedDucked );
-    CLuaCFunctions::AddFunction ( "getPedStat", CLuaFunctionDefs::GetPedStat );
-    CLuaCFunctions::AddFunction ( "getPedBonePosition", CLuaFunctionDefs::GetPedBonePosition );
-    CLuaCFunctions::AddFunction ( "getPedClothes", CLuaFunctionDefs::GetPedClothes );
-    CLuaCFunctions::AddFunction ( "getPedControlState", CLuaFunctionDefs::GetPedControlState );
-    CLuaCFunctions::AddFunction ( "getPedAnalogControlState", CLuaFunctionDefs::GetPedAnalogControlState );
-    CLuaCFunctions::AddFunction ( "isPedDead", CLuaFunctionDefs::IsPedDead );
-
-    CLuaCFunctions::AddFunction ( "isPedDoingGangDriveby", CLuaFunctionDefs::IsPedDoingGangDriveby );
-    CLuaCFunctions::AddFunction ( "getPedAnimation", CLuaFunctionDefs::GetPedAnimation );
-    CLuaCFunctions::AddFunction ( "getPedMoveState", CLuaFunctionDefs::GetPedMoveState );
-    CLuaCFunctions::AddFunction ( "getPedWalkingStyle", CLuaFunctionDefs::GetPedMoveAnim );
-    CLuaCFunctions::AddFunction ( "isPedHeadless", CLuaFunctionDefs::IsPedHeadless );
-    CLuaCFunctions::AddFunction ( "isPedFrozen", CLuaFunctionDefs::IsPedFrozen );
-    CLuaCFunctions::AddFunction ( "isPedFootBloodEnabled", CLuaFunctionDefs::IsPedFootBloodEnabled );
-    CLuaCFunctions::AddFunction ( "getPedCameraRotation", CLuaFunctionDefs::GetPedCameraRotation );
-    CLuaCFunctions::AddFunction ( "getPedOxygenLevel", CLuaFunctionDefs::GetPedOxygenLevel );
-
-    CLuaCFunctions::AddFunction ( "setPedWeaponSlot", CLuaFunctionDefs::SetPedWeaponSlot );
-    CLuaCFunctions::AddFunction ( "setPedRotation", CLuaFunctionDefs::SetPedRotation );
-    CLuaCFunctions::AddFunction ( "setPedCanBeKnockedOffBike", CLuaFunctionDefs::SetPedCanBeKnockedOffBike );
-    CLuaCFunctions::AddFunction ( "setPedAnimation", CLuaFunctionDefs::SetPedAnimation );
-    CLuaCFunctions::AddFunction ( "setPedAnimationProgress", CLuaFunctionDefs::SetPedAnimationProgress );
-    CLuaCFunctions::AddFunction ( "setPedWalkingStyle", CLuaFunctionDefs::SetPedMoveAnim );
-    CLuaCFunctions::AddFunction ( "addPedClothes", CLuaFunctionDefs::AddPedClothes );
-    CLuaCFunctions::AddFunction ( "removePedClothes", CLuaFunctionDefs::RemovePedClothes );
-    CLuaCFunctions::AddFunction ( "setPedControlState", CLuaFunctionDefs::SetPedControlState );
-    CLuaCFunctions::AddFunction ( "setPedAnalogControlState", CLuaFunctionDefs::SetPedAnalogControlState );
-    CLuaCFunctions::AddFunction ( "setPedDoingGangDriveby", CLuaFunctionDefs::SetPedDoingGangDriveby );
-    CLuaCFunctions::AddFunction ( "setPedLookAt", CLuaFunctionDefs::SetPedLookAt );
-    CLuaCFunctions::AddFunction ( "setPedHeadless", CLuaFunctionDefs::SetPedHeadless );
-    CLuaCFunctions::AddFunction ( "setPedFrozen", CLuaFunctionDefs::SetPedFrozen );
-    CLuaCFunctions::AddFunction ( "setPedFootBloodEnabled", CLuaFunctionDefs::SetPedFootBloodEnabled );
-    CLuaCFunctions::AddFunction ( "setPedCameraRotation", CLuaFunctionDefs::SetPedCameraRotation );
-    CLuaCFunctions::AddFunction ( "setPedAimTarget", CLuaFunctionDefs::SetPedAimTarget );
-    CLuaCFunctions::AddFunction ( "getWeaponProperty", CLuaFunctionDefs::GetWeaponProperty );
-    CLuaCFunctions::AddFunction ( "getOriginalWeaponProperty", CLuaFunctionDefs::GetOriginalWeaponProperty );
-    CLuaCFunctions::AddFunction ( "warpPedIntoVehicle", CLuaFunctionDefs::WarpPedIntoVehicle );
-    CLuaCFunctions::AddFunction ( "removePedFromVehicle", CLuaFunctionDefs::RemovePedFromVehicle );
-    CLuaCFunctions::AddFunction ( "setPedOxygenLevel", CLuaFunctionDefs::SetPedOxygenLevel );
-    CLuaCFunctions::AddFunction ( "givePedWeapon", CLuaFunctionDefs::GivePedWeapon );
 
     // Clothes and body functions
     CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefs::GetBodyPartName );
@@ -606,16 +535,6 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Fire funcs
     CLuaCFunctions::AddFunction ( "createFire", CLuaFunctionDefs::CreateFire );
-
-    // PointLights funcs
-    CLuaCFunctions::AddFunction ( "createLight", CLuaFunctionDefs::CreateLight );
-    CLuaCFunctions::AddFunction ( "getLightType", CLuaFunctionDefs::GetLightType );
-    CLuaCFunctions::AddFunction ( "getLightRadius", CLuaFunctionDefs::GetLightRadius );
-    CLuaCFunctions::AddFunction ( "setLightRadius", CLuaFunctionDefs::SetLightRadius );
-    CLuaCFunctions::AddFunction ( "getLightColor", CLuaFunctionDefs::GetLightColor );
-    CLuaCFunctions::AddFunction ( "setLightColor", CLuaFunctionDefs::SetLightColor );
-    CLuaCFunctions::AddFunction ( "getLightDirection", CLuaFunctionDefs::GetLightDirection );
-    CLuaCFunctions::AddFunction ( "setLightDirection", CLuaFunctionDefs::SetLightDirection );
 
     // Engine funcs
     CLuaCFunctions::AddFunction ( "engineLoadTXD", CLuaFunctionDefs::EngineLoadTXD );
@@ -1203,36 +1122,12 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "bitExtract", CLuaFunctionDefs::BitExtract );
     CLuaCFunctions::AddFunction ( "bitReplace", CLuaFunctionDefs::BitReplace );
 
-    // Browser functions
-    CLuaCFunctions::AddFunction ( "createBrowser", CLuaFunctionDefs::CreateBrowser );
-    CLuaCFunctions::AddFunction ( "requestBrowserDomains", CLuaFunctionDefs::RequestBrowserDomains );
-    CLuaCFunctions::AddFunction ( "loadBrowserURL", CLuaFunctionDefs::LoadBrowserURL );
-    CLuaCFunctions::AddFunction ( "isBrowserLoading", CLuaFunctionDefs::IsBrowserLoading );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseMove", CLuaFunctionDefs::InjectBrowserMouseMove );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseDown", CLuaFunctionDefs::InjectBrowserMouseDown );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseUp", CLuaFunctionDefs::InjectBrowserMouseUp );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseWheel", CLuaFunctionDefs::InjectBrowserMouseWheel );
-    CLuaCFunctions::AddFunction ( "getBrowserTitle", CLuaFunctionDefs::GetBrowserTitle );
-    CLuaCFunctions::AddFunction ( "getBrowserURL", CLuaFunctionDefs::GetBrowserURL );
-    CLuaCFunctions::AddFunction ( "setBrowserRenderingPaused", CLuaFunctionDefs::SetBrowserRenderingPaused );
-    CLuaCFunctions::AddFunction ( "executeBrowserJavascript", CLuaFunctionDefs::ExecuteBrowserJavascript );
-    CLuaCFunctions::AddFunction ( "getBrowserVolume", CLuaFunctionDefs::GetBrowserVolume );
-    CLuaCFunctions::AddFunction ( "setBrowserVolume", CLuaFunctionDefs::SetBrowserVolume );
-    CLuaCFunctions::AddFunction ( "isBrowserDomainBlocked", CLuaFunctionDefs::IsBrowserDomainBlocked );
-    CLuaCFunctions::AddFunction ( "focusBrowser", CLuaFunctionDefs::FocusBrowser );
-    CLuaCFunctions::AddFunction ( "isBrowserFocused", CLuaFunctionDefs::IsBrowserFocused );
-    CLuaCFunctions::AddFunction ( "setBrowserProperty", CLuaFunctionDefs::SetBrowserProperty );
-    CLuaCFunctions::AddFunction ( "getBrowserProperty", CLuaFunctionDefs::GetBrowserProperty );
-    CLuaCFunctions::AddFunction ( "getBrowserSettings", CLuaFunctionDefs::GetBrowserSettings );
-    CLuaCFunctions::AddFunction ( "getBrowserSource", CLuaFunctionDefs::GetBrowserSource );
-    CLuaCFunctions::AddFunction ( "setBrowserAjaxHandler", CLuaFunctionDefs::SetBrowserAjaxHandler );
-    CLuaCFunctions::AddFunction ( "toggleBrowserDevTools", CLuaFunctionDefs::ToggleBrowserDevTools );
-    CLuaCFunctions::AddFunction ( "guiCreateBrowser", CLuaFunctionDefs::GUICreateBrowser );
-    CLuaCFunctions::AddFunction ( "guiGetBrowser", CLuaFunctionDefs::GUIGetBrowser );
-
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();
+    CLuaPedDefs::LoadFunctions ();
+    CLuaPointLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
+    CLuaBrowserDefs::LoadFunctions ();
 }

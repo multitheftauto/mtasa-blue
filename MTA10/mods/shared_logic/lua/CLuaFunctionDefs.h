@@ -217,81 +217,6 @@ public:
     LUA_DECLARE ( SetPlayerNametagColor );
     LUA_DECLARE ( SetPlayerNametagShowing );
 
-    // Ped funcs
-    LUA_DECLARE ( CreatePed );
-
-    LUA_DECLARE ( DetonateSatchels );
-
-    LUA_DECLARE ( GetPedVoice );
-    LUA_DECLARE ( SetPedVoice );
-    LUA_DECLARE ( GetPedTarget );
-    LUA_DECLARE ( GetPedTargetStart );
-    LUA_DECLARE ( GetPedTargetEnd );
-    LUA_DECLARE ( GetPedTargetRange );
-    LUA_DECLARE ( GetPedTargetCollision );
-    LUA_DECLARE ( GetPedWeaponSlot );
-    LUA_DECLARE ( GetPedWeapon );
-    LUA_DECLARE ( GetPedAmmoInClip );
-    LUA_DECLARE ( GetPedTotalAmmo );
-    LUA_DECLARE ( GetPedWeaponMuzzlePosition );
-    LUA_DECLARE ( GetPedStat );
-    LUA_DECLARE ( GetPedOccupiedVehicle );
-    LUA_DECLARE ( GetPedOccupiedVehicleSeat );
-    LUA_DECLARE ( GetPedArmor );
-    LUA_DECLARE ( IsPedChoking );
-    LUA_DECLARE ( IsPedDucked );
-    LUA_DECLARE ( IsPedInVehicle );
-    LUA_DECLARE ( DoesPedHaveJetPack );
-    LUA_DECLARE ( IsPedOnGround );
-    LUA_DECLARE ( GetPedTask );
-    LUA_DECLARE ( GetPedSimplestTask );
-    LUA_DECLARE ( IsPedDoingTask );
-    LUA_DECLARE ( GetPedContactElement );
-    LUA_DECLARE ( GetPedRotation );
-    LUA_DECLARE ( CanPedBeKnockedOffBike );
-    LUA_DECLARE ( GetPedBonePosition );
-    LUA_DECLARE ( GetPedClothes );
-    LUA_DECLARE ( GetPedControlState );
-    LUA_DECLARE ( GetPedAnalogControlState );
-    LUA_DECLARE ( IsPedSunbathing );
-    LUA_DECLARE ( IsPedDoingGangDriveby );
-    LUA_DECLARE ( GetPedAnimation );
-    LUA_DECLARE ( GetPedMoveState );
-    LUA_DECLARE ( GetPedMoveAnim );
-    LUA_DECLARE ( IsPedHeadless );
-    LUA_DECLARE ( IsPedFrozen );
-    LUA_DECLARE ( IsPedFootBloodEnabled );
-    LUA_DECLARE ( GetPedCameraRotation );
-    LUA_DECLARE ( IsPedOnFire );
-    LUA_DECLARE ( GetWeaponProperty );
-    LUA_DECLARE ( GetOriginalWeaponProperty );
-    LUA_DECLARE ( GetPedOxygenLevel );
-    LUA_DECLARE ( IsPedDead );
-
-    LUA_DECLARE ( SetPedRotation );
-    LUA_DECLARE ( SetPedCanBeKnockedOffBike );
-    LUA_DECLARE ( SetPedAnimation );
-    LUA_DECLARE ( SetPedAnimationProgress );
-    LUA_DECLARE ( SetPedMoveAnim );
-    LUA_DECLARE ( SetPedWeaponSlot );
-    LUA_DECLARE ( GivePedWeapon );
-    LUA_DECLARE ( AddPedClothes );
-    LUA_DECLARE ( RemovePedClothes );
-    LUA_DECLARE ( SetPedControlState );
-    LUA_DECLARE ( SetPedAnalogControlState );
-    LUA_DECLARE ( SetPedSunbathing );
-    LUA_DECLARE ( SetPedDoingGangDriveby );
-    LUA_DECLARE ( SetPedLookAt );
-    LUA_DECLARE ( SetPedHeadless );
-    LUA_DECLARE ( SetPedFrozen );
-    LUA_DECLARE ( SetPedFootBloodEnabled );
-    LUA_DECLARE ( SetPedCameraRotation );
-    LUA_DECLARE ( SetPedAimTarget );
-    LUA_DECLARE ( SetPedOnFire );
-    LUA_DECLARE ( WarpPedIntoVehicle );
-    LUA_DECLARE ( RemovePedFromVehicle );
-    LUA_DECLARE ( SetPedOxygenLevel );
-
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );
     LUA_DECLARE ( GetClothesByTypeIndex );
@@ -442,16 +367,6 @@ public:
 
     // Fire functions
     LUA_DECLARE ( CreateFire );
-
-    // PointLights functions
-    LUA_DECLARE ( CreateLight );
-    LUA_DECLARE ( GetLightType );
-    LUA_DECLARE ( GetLightRadius );
-    LUA_DECLARE ( GetLightColor );
-    LUA_DECLARE ( GetLightDirection );
-    LUA_DECLARE ( SetLightRadius );
-    LUA_DECLARE ( SetLightColor );
-    LUA_DECLARE ( SetLightDirection );
 
     // Audio funcs
     LUA_DECLARE ( PlaySoundFrontEnd );
@@ -1028,33 +943,6 @@ public:
     LUA_DECLARE ( BitArShift );
     LUA_DECLARE ( BitExtract );
     LUA_DECLARE ( BitReplace );
-
-    // Webbrowser functions
-    LUA_DECLARE ( CreateBrowser );
-    LUA_DECLARE ( RequestBrowserDomains );
-    LUA_DECLARE ( LoadBrowserURL );
-    LUA_DECLARE ( IsBrowserLoading );
-    LUA_DECLARE ( InjectBrowserMouseMove );
-    LUA_DECLARE ( InjectBrowserMouseDown );
-    LUA_DECLARE ( InjectBrowserMouseUp );
-    LUA_DECLARE ( InjectBrowserMouseWheel );
-    LUA_DECLARE ( GetBrowserTitle );
-    LUA_DECLARE ( GetBrowserURL );
-    LUA_DECLARE ( SetBrowserRenderingPaused );
-    LUA_DECLARE ( ExecuteBrowserJavascript );
-    LUA_DECLARE ( GetBrowserVolume );
-    LUA_DECLARE ( SetBrowserVolume );
-    LUA_DECLARE ( IsBrowserDomainBlocked );
-    LUA_DECLARE ( FocusBrowser );
-    LUA_DECLARE ( IsBrowserFocused );
-    LUA_DECLARE ( SetBrowserProperty );
-    LUA_DECLARE ( GetBrowserProperty );
-    LUA_DECLARE ( GetBrowserSettings );
-    LUA_DECLARE ( GetBrowserSource );
-    LUA_DECLARE ( SetBrowserAjaxHandler );
-    LUA_DECLARE ( ToggleBrowserDevTools );
-    LUA_DECLARE ( GUICreateBrowser );
-    LUA_DECLARE ( GUIGetBrowser );
 
 private:
     // Static references to objects

@@ -545,6 +545,7 @@ CMultiplayerSA::CMultiplayerSA()
 
     m_bHeatHazeEnabled = true;
     m_bHeatHazeCustomized = false;
+    m_fMaddDoggPoolLevel = 1082.73f;
 }
 
 void CMultiplayerSA::InitHooks()
@@ -1441,9 +1442,21 @@ void CMultiplayerSA::InitHooks()
     // Increase intensity of vehicle tail light corona
     MemPut < BYTE > ( 0x6E1A22, 0xF0 );
 
+    // Do not change visibility flag for water areas above level 950 (fix for #9159)
+    // do it only for Madd Dogg's mansion pool instead
+    MemPut ( 0x6E5869, &m_fMaddDoggPoolLevel );
+    MemPut ( 0x6E58BD, &m_fMaddDoggPoolLevel );
+    MemPut ( 0x6E594B, &m_fMaddDoggPoolLevel );
+    MemPut ( 0x6E5995, &m_fMaddDoggPoolLevel );
+
+    MemCpy ( (void*) 0x6E5871, "\x40\x74", 2 );
+    MemCpy ( (void*) 0x6E58C5, "\x40\x74", 2 );
+    MemCpy ( (void*) 0x6E5951, "\x40\x74", 2 );
+    MemCpy ( (void*) 0x6E599D, "\x40\x74", 2 );
+
     // Skip vehicle type check in CVehicle::SetupRender & CVehicle::ResetAfterRender (fix for #8158)
-    MemSet ( (void*)0x6D6517, 0x90, 2 );
-    MemSet ( (void*)0x6D0E43, 0x90, 2 );
+    MemSet ( (void*) 0x6D6517, 0x90, 2 );
+    MemSet ( (void*) 0x6D0E43, 0x90, 2 );
 
 
     InitHooks_CrashFixHacks ();

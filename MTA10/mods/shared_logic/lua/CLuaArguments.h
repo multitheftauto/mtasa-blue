@@ -70,6 +70,7 @@ public:
     CLuaArgument*                                       PushTable           ( CLuaArguments * table );
 
     void                                                DeleteArguments     ( void );
+    void                                                Pop                 ( void );
 
     bool                                                ReadFromBitStream   ( NetBitStreamInterface& bitStream, std::vector < CLuaArguments* > * pKnownTables = NULL );
     bool                                                WriteToBitStream    ( NetBitStreamInterface& bitStream, CFastHashMap < CLuaArguments*, unsigned long > * pKnownTables = NULL ) const;

@@ -5270,6 +5270,9 @@ bool CStaticFunctionDefinitions::IsTrainDerailed ( CVehicle* pVehicle, bool& bDe
 {
     assert ( pVehicle );
 
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
+
     bDerailed = pVehicle->IsDerailed ();
     return true;
 }
@@ -5277,6 +5280,9 @@ bool CStaticFunctionDefinitions::IsTrainDerailed ( CVehicle* pVehicle, bool& bDe
 bool CStaticFunctionDefinitions::IsTrainDerailable ( CVehicle* pVehicle, bool& bDerailable )
 {
     assert ( pVehicle );
+
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
 
     bDerailable = pVehicle->IsDerailable ();
     return true;
@@ -5287,6 +5293,9 @@ bool CStaticFunctionDefinitions::GetTrainDirection ( CVehicle* pVehicle, bool& b
 {
     assert ( pVehicle );
 
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
+
     bDirection = pVehicle->GetTrainDirection ();
     return true;
 }
@@ -5295,6 +5304,9 @@ bool CStaticFunctionDefinitions::GetTrainDirection ( CVehicle* pVehicle, bool& b
 bool CStaticFunctionDefinitions::GetTrainSpeed ( CVehicle* pVehicle, float& fSpeed )
 {
     assert ( pVehicle );
+
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
 
     const CVector& vecVelocity = pVehicle->GetVelocity ();
     fSpeed = vecVelocity.Length ();
@@ -5305,6 +5317,12 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CVehicle* pVehicle, float& fSpe
 bool CStaticFunctionDefinitions::GetTrainTrack ( CVehicle* pVehicle, uchar& ucTrack )
 {
     assert ( pVehicle );
+    
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
+    else if ( pVehicle->IsDerailed () )
+        return false;
+
     ucTrack = pVehicle->GetTrainTrack ();
     return true;
 }
@@ -5313,6 +5331,12 @@ bool CStaticFunctionDefinitions::GetTrainTrack ( CVehicle* pVehicle, uchar& ucTr
 bool CStaticFunctionDefinitions::GetTrainPosition ( CVehicle* pVehicle, float& fPosition )
 {
     assert ( pVehicle );
+
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
+    else if ( pVehicle->IsDerailed () )
+        return false;
+
     fPosition = pVehicle->GetTrainPosition ();
     return true;
 }
@@ -7156,6 +7180,9 @@ bool CStaticFunctionDefinitions::SetTrainDerailed ( CVehicle* pVehicle, bool bDe
 {
     assert ( pVehicle );
 
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
+
     pVehicle->SetDerailed ( bDerailed );
 
     CBitStream BitStream;
@@ -7170,6 +7197,9 @@ bool CStaticFunctionDefinitions::SetTrainDerailed ( CVehicle* pVehicle, bool bDe
 bool CStaticFunctionDefinitions::SetTrainDerailable ( CVehicle* pVehicle, bool bDerailable )
 {
     assert ( pVehicle );
+
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
 
     pVehicle->SetDerailable ( bDerailable );
 
@@ -7186,6 +7216,9 @@ bool CStaticFunctionDefinitions::SetTrainDirection ( CVehicle* pVehicle, bool bD
 {
     assert ( pVehicle );
 
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
+
     pVehicle->SetTrainDirection ( bDirection );
 
     CBitStream BitStream;
@@ -7200,6 +7233,9 @@ bool CStaticFunctionDefinitions::SetTrainDirection ( CVehicle* pVehicle, bool bD
 bool CStaticFunctionDefinitions::SetTrainSpeed ( CVehicle* pVehicle, float fSpeed )
 {
     assert ( pVehicle );
+
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
 
     CVector vecVelocity = pVehicle->GetVelocity ();
     vecVelocity.Normalize ();
@@ -7219,6 +7255,11 @@ bool CStaticFunctionDefinitions::SetTrainTrack ( CVehicle* pVehicle, uchar ucTra
 {
     assert ( pVehicle );
 
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
+    else if ( pVehicle->IsDerailed () )
+        return false;
+
     pVehicle->SetTrainTrack ( ucTrack );
 
     CBitStream BitStream;
@@ -7233,6 +7274,11 @@ bool CStaticFunctionDefinitions::SetTrainTrack ( CVehicle* pVehicle, uchar ucTra
 bool CStaticFunctionDefinitions::SetTrainPosition ( CVehicle* pVehicle, float fPosition )
 {
     assert ( pVehicle );
+
+    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+        return false;
+    else if ( pVehicle->IsDerailed () )
+        return false;
 
     pVehicle->SetTrainPosition ( fPosition );
 

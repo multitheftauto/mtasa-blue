@@ -171,11 +171,12 @@ void CClientWebBrowser::Events_OnLoadingFailed ( const SString& strURL, int erro
     CallEvent ( "onClientBrowserLoadingFailed", Arguments, false );
 }
 
-void CClientWebBrowser::Events_OnNavigate ( const SString& strURL, bool bIsBlocked )
+void CClientWebBrowser::Events_OnNavigate ( const SString& strURL, bool bIsBlocked, bool bIsMainFrame )
 {
     CLuaArguments Arguments;
     Arguments.PushString ( strURL );
     Arguments.PushBoolean ( bIsBlocked );
+    Arguments.PushBoolean ( bIsMainFrame );
     CallEvent ( "onClientBrowserNavigate", Arguments, false );
 }
 

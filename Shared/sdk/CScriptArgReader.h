@@ -48,10 +48,9 @@ public:
     // Read next number
     //
     template < typename T >
-    void ReadNumber ( T& outValue )
+    void ReadNumber ( T& outValue, bool checkSign = true )
     {
-        int iArgument = lua_type ( m_luaVM, m_iIndex );
-        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
+        if ( lua_isnumber( m_luaVM, m_iIndex ) == 1 )
         {
             lua_Number number = lua_tonumber ( m_luaVM, m_iIndex++ );
 
@@ -61,10 +60,9 @@ public:
                 return;
             }
 
-            if ( std::is_unsigned < T > () && number < -FLT_EPSILON )
+            if ( checkSign && std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
                 SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
-                return;
             }
 
             outValue = static_cast < T > ( number );
@@ -80,7 +78,7 @@ public:
     // Read next number, using default if needed
     //
     template < typename T, typename U >
-    void ReadNumber ( T& outValue, const U& defaultValue )
+    void ReadNumber ( T& outValue, const U& defaultValue, bool checkSign = true )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
@@ -93,10 +91,9 @@ public:
                 return;
             }
 
-            if ( std::is_unsigned < T > () && number < -FLT_EPSILON )
+            if ( checkSign && std::is_unsigned < T > () && number < -FLT_EPSILON )
             {
                 SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
-                return;
             }
 
             outValue = static_cast < T > ( number );
@@ -459,6 +456,30 @@ public:
         outValue = CMatrix();
         SetTypeError ( "matrix" );
         m_iIndex++;
+    }
+
+    //
+    // Read next color
+    //
+    void ReadColor ( SColor& outValue )
+    {
+        lua_Number color;
+        ReadNumber ( color );
+
+        if ( !m_bError )
+            outValue = static_cast<unsigned int> ( color );
+    }
+
+    //
+    // Read next color
+    //
+    void ReadColor ( SColor& outValue, const SColor& defaultValue )
+    {
+        lua_Number color;
+        ReadNumber ( color, static_cast<lua_Number> ( defaultValue ) );
+
+        if ( !m_bError )
+            outValue = static_cast<unsigned int> ( color );
     }
 
     //

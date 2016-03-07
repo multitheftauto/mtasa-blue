@@ -15,8 +15,7 @@
 
 class CLuaMain;
 
-#ifndef __CLUAMAIN_H
-#define __CLUAMAIN_H
+#pragma once
 
 #include "CLuaTimerManager.h"
 #include "CLuaVector2.h"
@@ -79,7 +78,6 @@ public:
 
     void                            AddElementClass         ( lua_State* luaVM );
     void                            AddVehicleClass         ( lua_State* luaVM );
-    void                            AddPedClass             ( lua_State* luaVM );
     void                            AddPlayerClass          ( lua_State* luaVM );
     void                            AddObjectClass          ( lua_State* luaVM );
     void                            AddMarkerClass          ( lua_State* luaVM );
@@ -93,7 +91,6 @@ public:
     void                            AddSoundClass           ( lua_State* luaVM );
     void                            AddWeaponClass          ( lua_State* luaVM );
     void                            AddEffectClass          ( lua_State* luaVM );
-    void                            AddPointLightsClass     ( lua_State* luaVM );
 
     void                            AddGuiElementClass      ( lua_State* luaVM );
     void                            AddGuiFontClass         ( lua_State* luaVM );
@@ -115,7 +112,6 @@ public:
 
     void                            AddResourceClass        ( lua_State* luaVM );
     void                            AddTimerClass           ( lua_State* luaVM );
-    void                            AddFileClass            ( lua_State* luaVM );
     void                            AddXMLClass             ( lua_State* luaVM );
 
     void                            AddEngineClass          ( lua_State* luaVM );
@@ -125,18 +121,12 @@ public:
     
     void                            AddCameraClass          ( lua_State* luaVM );
 
-    void                            AddVector4DClass        ( lua_State* luaVM );
-    void                            AddVector3DClass        ( lua_State* luaVM );
-    void                            AddVector2DClass        ( lua_State* luaVM );
-    void                            AddMatrixClass          ( lua_State* luaVM );
-
     void                            AddDxMaterialClass      ( lua_State* luaVM );
     void                            AddDxTextureClass       ( lua_State* luaVM );
     void                            AddDxFontClass          ( lua_State* luaVM );
     void                            AddDxShaderClass        ( lua_State* luaVM );
     void                            AddDxScreenSourceClass  ( lua_State* luaVM );
     void                            AddDxRenderTargetClass  ( lua_State* luaVM );
-    void                            AddBrowserClass         ( lua_State* luaVM );
     
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );
@@ -170,5 +160,3 @@ public:
     CFastHashMap < const void*, CRefInfo >  m_CallbackTable;
     std::map < int, SString >               m_FunctionTagMap;
 };
-
-#endif
