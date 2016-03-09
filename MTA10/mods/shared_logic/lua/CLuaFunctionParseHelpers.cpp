@@ -10,7 +10,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#define MIN_SERVER_REQ_CANSUPPLY_MINCLIENTREQ    "1.3.0-9.04431"
 
 //
 // enum values <-> script strings
@@ -644,14 +643,9 @@ void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, 
         {
             if ( pResource->GetMinClientReq () < szVersionReq )
             {
-                if ( MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE )
-                {
-                    // Check server is able to give us a MinClientReq
-                    if ( pResource->GetMinServerReq () < MIN_SERVER_REQ_CANSUPPLY_MINCLIENTREQ )
-                        argStream.SetVersionError ( MIN_SERVER_REQ_CANSUPPLY_MINCLIENTREQ, "server", "of technical reasons" );
-                    else
-                        argStream.SetVersionError ( szVersionReq, "client", szReason );
-                }
+                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+                    argStream.SetVersionWarning ( szVersionReq, "client", szReason );
+                #endif
             }
         }
     }
