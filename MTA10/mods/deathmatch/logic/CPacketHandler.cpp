@@ -4896,7 +4896,7 @@ void CPacketHandler::Packet_ResourceStart ( NetBitStreamInterface& bitStream )
                         if ( FileExists( pDownloadableResource->GetName () ) )
                         {
                             SString strMessage( "Unable to delete old file %s", *ConformResourcePath( pDownloadableResource->GetName () ) );
-                            g_pClientGame->TellServerSomethingImportant( 1009, strMessage, false );
+                            g_pClientGame->TellServerSomethingImportant( 1009, strMessage );
                         }
 
                         // Is it downloadable now?

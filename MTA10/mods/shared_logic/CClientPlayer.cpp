@@ -324,7 +324,7 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
                 g_pClientGame->ApplyPedDamageFromGame( weaponType, fBackupDamage, ucBackupHitZone, pBackupDamagedPlayer, this, NULL );
 
                 SString strMessage( "Applied %0.2f damage to %s (from %s) due to network interruption", fBackupDamage, pBackupDamagedPlayer->GetNick(), GetNick() );
-                g_pClientGame->TellServerSomethingImportant( 1010, strMessage, false );
+                g_pClientGame->TellServerSomethingImportant( 1010, strMessage );
             }
         }
     }
