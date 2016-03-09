@@ -111,7 +111,7 @@ public:
     const SString&          GetMinServerReq                 ( void ) const                  { return m_strMinServerReq; }
     const SString&          GetMinClientReq                 ( void ) const                  { return m_strMinClientReq; }
     bool                    IsOOPEnabled                    ( void )                        { return m_bOOPEnabled; }
-    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile );
+    void                    HandleDownloadedFileTrouble     ( CResourceFile* pResourceFile, bool bScript );
     bool                    IsWaitingForInitialDownloads    ( void );
     int                     GetDownloadPriorityGroup        ( void )                        { return m_iDownloadPriorityGroup; }
     void                    SetDownloadPriorityGroup        ( int iDownloadPriorityGroup )  { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }

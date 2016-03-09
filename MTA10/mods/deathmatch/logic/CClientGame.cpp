@@ -6490,11 +6490,14 @@ void CClientGame::OutputServerInfo( void )
 // Report misc important warnings/errors to the current server
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId )
+void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMessage, uint uiSendLimitForThisId )
 {
-    if ( bOnlyOnceForThisId && MapContains( m_SentMessageIds, uiId ) )
-        return;
-    MapInsert( m_SentMessageIds, uiId );
+    if ( uiSendLimitForThisId )
+    {
+        uint& uiCount = MapGet( m_SentMessageIds, uiId );
+        if ( uiCount++ >= uiSendLimitForThisId )
+            return;
+    }
 
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
     pBitStream->WriteString( SString( "%d,%s", uiId, *strMessage ) );

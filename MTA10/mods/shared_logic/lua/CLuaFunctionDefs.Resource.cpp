@@ -436,7 +436,7 @@ int CLuaFunctionDefs::LoadString( lua_State* luaVM )
             argStream.SetCustomError( strMessage );
             cpBuffer = NULL;
             g_pCore->GetConsole()->Print( argStream.GetFullErrorMessage() );
-            g_pClientGame->TellServerSomethingImportant( 1004, argStream.GetFullErrorMessage(), true );
+            g_pClientGame->TellServerSomethingImportant( 1004, argStream.GetFullErrorMessage(), 3 );
         }
 
         if ( !argStream.HasErrors() )
@@ -509,7 +509,7 @@ int CLuaFunctionDefs::Load( lua_State* luaVM )
             argStream.SetCustomError( strMessage );
             cpBuffer = NULL;
             g_pCore->GetConsole()->Print( argStream.GetFullErrorMessage() );
-            g_pClientGame->TellServerSomethingImportant( 1005, argStream.GetFullErrorMessage(), true );
+            g_pClientGame->TellServerSomethingImportant( 1005, argStream.GetFullErrorMessage(), 3 );
         }
 
         if ( !argStream.HasErrors() )
