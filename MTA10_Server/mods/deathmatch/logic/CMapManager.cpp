@@ -827,7 +827,8 @@ void CMapManager::DoVehicleRespawning ( void )
     CVehicleSpawnPacket VehicleSpawnPacket;
 
     // Loop through all vehicles with respawn enabled
-    list < CVehicle* >& respawnEnabledList = m_pVehicleManager->GetRespawnEnabledVehicles ( );
+    // Use a copy of the list in case toggleVehicleRespawn is called during 'onVehicleRespawn'
+    const list < CVehicle* > respawnEnabledList = m_pVehicleManager->GetRespawnEnabledVehicles ( );
 
     list < CVehicle* > ::const_iterator iter = respawnEnabledList.begin ( );
     for ( ; iter != respawnEnabledList.end ( ); ++iter )
