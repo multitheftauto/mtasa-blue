@@ -57,7 +57,7 @@ public:
     void                          OnRemoveResourceFile        ( CDownloadableResource* pResourceFile );
     void                          OnDownloadedResourceFile    ( const SString& strFilename );
     bool                          IsResourceFile              ( const SString& strFilename );
-    void                          FileModifedByScript         ( const SString& strFilename );
+    void                          OnFileModifedByScript       ( const SString& strFilename );
     void                          ValidateResourceFile        ( const SString& strFilename, const CBuffer& fileData );
     inline CDownloadableResource* GetDownloadableResourceFile ( const SString& strFilename ) { return MapFindRef ( m_ResourceFileMap, strFilename ); }
 

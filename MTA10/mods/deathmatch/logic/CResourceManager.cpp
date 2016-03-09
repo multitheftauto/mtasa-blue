@@ -237,15 +237,15 @@ bool CResourceManager::IsResourceFile( const SString& strInFilename )
 }
 
 // Remove this file from the checks as it has been changed by script actions
-void CResourceManager::FileModifedByScript( const SString& strInFilename )
+void CResourceManager::OnFileModifedByScript( const SString& strInFilename )
 {
     SString strFilename = PathConform( strInFilename ).ToLower();
     CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
-    if ( pResourceFile )
+    if ( pResourceFile && !pResourceFile->IsModifedByScript() )
     {
+        pResourceFile->SetModifedByScript( true );
         SString strMessage( "Resource file modifed by script: %s ", *ConformResourcePath( strInFilename ) );
         AddReportLog( 7059, strMessage + g_pNet->GetConnectedServer( true ), 10 );
-        MapRemove( m_ResourceFileMap, strFilename );
     }
 }
 
@@ -254,12 +254,12 @@ void CResourceManager::ValidateResourceFile( const SString& strInFilename, const
 {
     SString strFilename = PathConform( strInFilename ).ToLower();
     CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
-    if ( pResourceFile )
+    if ( pResourceFile && !pResourceFile->IsModifedByScript() )
     {
         if ( !pResourceFile->IsAutoDownload() && !pResourceFile->IsDownloaded() )
         {
             // Scripting error
-            g_pClientGame->GetScriptDebugging()->LogError( NULL, "Attempt to load '%s' before onClientFileDownloadComplete event", *ConformResourcePath( strInFilename ) );
+            g_pClientGame->GetScriptDebugging()->LogWarning( NULL, "Attempt to load '%s' before onClientFileDownloadComplete event", *ConformResourcePath( strInFilename ) );
         }
         else
         {
