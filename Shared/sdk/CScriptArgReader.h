@@ -1227,11 +1227,11 @@ public:
     }
 
     //
-    // Set version error message
+    // Set version warning message
     //
-    void SetVersionError ( const char* szMinReq, const char* szSide, const char* szReason )
+    void SetVersionWarning ( const char* szMinReq, const char* szSide, const char* szReason )
     {
-        SetCustomError ( SString ( "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", szSide, szMinReq, szReason ) );
+        SetCustomWarning ( SString ( "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", szSide, szMinReq, szReason ) );
     }
 
     //
