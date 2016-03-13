@@ -341,6 +341,8 @@ public:
     int                                         GetApproxPuresyncPacketSize ( void );
     const CVector&                              GetCamPosition              ( void )            { return m_vecCamPosition; };
     const CVector&                              GetCamFwd                   ( void )            { return m_vecCamFwd; };
+    const SString&                              GetQuitReasonForLog         ( void )                     { return m_strQuitReasonForLog; }
+    void                                        SetQuitReasonForLog         ( const SString& strReason ) { m_strQuitReasonForLog = strReason; }
 
     CFastHashSet < CPlayer* >                   m_PureSyncSimSendList;
     bool                                        m_bPureSyncSimSendListDirty;
@@ -467,6 +469,7 @@ private:
     uint                                        m_uiWeaponRangeLastStatsRevision;
 
     ushort                                      m_usPrevDimension;
+    SString                                     m_strQuitReasonForLog;
 };
 
 #endif
