@@ -30,6 +30,9 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 * [Bugtracker Roadmap](https://bugs.mtasa.com/roadmap_page.php)
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
+#### IDE Setup
+Download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) to automatically set up your IDE for the correct formatting.
+
 ### License
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
