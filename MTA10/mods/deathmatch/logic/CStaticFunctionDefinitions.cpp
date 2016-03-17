@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include <shellapi.h>
 
 using std::list;
 
@@ -341,6 +342,69 @@ bool CStaticFunctionDefinitions::SetWindowFlashing ( bool flash, uint count )
     flashInfo.uCount = count;
     flashInfo.dwFlags = flash ? (FLASHW_ALL | FLASHW_TIMERNOFG) : FLASHW_STOP;
     ::FlashWindowEx ( &flashInfo );
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::CreateTrayNotification ( SString strTitle, SString strBody, SString strType, bool useSound )
+{
+    // Create tray icon
+    if ( !g_pCore->DoesTrayIconExist ( ) )
+        if ( !g_pCore->CreateTrayIcon ( ) )
+            return false;
+
+    // Lazy method to transform SString into wchar_t
+    auto CopySString = [] ( wchar_t* dest, size_t length, SString strInput ) {
+        // Clone SString into std::wstring
+        auto wideStrInput = std::wstring ( strInput.begin ( ), strInput.end ( ) );
+
+        // Cut wstring (to avoid overflow)
+        auto cutWideStrInput = wideStrInput.substr ( 0, length );
+
+        // Copy wstring to destination
+        std::copy ( cutWideStrInput.begin( ), cutWideStrInput.end ( ), dest ); // [Possible Memory Leak] See: http://stackoverflow.com/questions/347949/how-to-convert-a-stdstring-to-const-char-or-char
+        dest [ cutWideStrInput.size ( ) ] = '\0';
+    };
+
+    NOTIFYICONDATAW nid = { };
+
+    // The size of the structure, in bytes.
+    nid.cbSize = sizeof ( nid );
+
+    // A handle to the window that receives notifications associated with an icon in the notification area.
+    nid.hWnd = g_pCore->GetHookedWindow ( );
+    
+    // The application-defined identifier of the taskbar icon.
+    nid.uID = 0;
+
+    // Flags that either indicate which of the other members of the structure contain valid data or provide additional information
+    nid.uFlags = NIF_REALTIME | NIF_INFO;
+    nid.uTimeout = static_cast < UINT > ( 15e3 );
+    
+    // Title
+    CopySString ( nid.szInfoTitle, ARRAYSIZE ( nid.szInfoTitle ) - 1, strTitle );
+
+    // Body
+    CopySString ( nid.szInfo, ARRAYSIZE ( nid.szInfo ) - 1, strBody );
+
+    // Info flags
+    // nid.dwInfoFlags = NIIF_RESPECT_QUIET_TIME;
+    nid.dwInfoFlags = NIIF_LARGE_ICON;
+
+    // Type flag
+    if ( strType == "info" )
+        nid.dwInfoFlags = NIIF_INFO;
+    else if ( strType == "warning" )
+        nid.dwInfoFlags = NIIF_WARNING;
+    else if ( strType == "error" )
+        nid.dwInfoFlags = NIIF_ERROR;
+    
+    // Sound flag
+    if ( !useSound )
+        nid.dwInfoFlags |= NIIF_NOSOUND;
+
+    // Show notification
+    ::Shell_NotifyIconW ( NIM_MODIFY, &nid );
 
     return true;
 }

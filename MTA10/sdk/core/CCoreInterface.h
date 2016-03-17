@@ -171,6 +171,10 @@ public:
     virtual bool                    GetRequiredDisplayResolution    ( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions ) = 0;
     virtual void                    NotifyRenderingGrass            ( bool bIsRenderingGrass ) = 0;
     virtual bool                    GetRightSizeTxdEnabled          ( void ) = 0;
+
+    virtual bool                    DoesTrayIconExist               ( void ) = 0;
+    virtual bool                    CreateTrayIcon                  ( void ) = 0;
+    virtual bool                    DestroyTrayIcon                 ( void ) = 0;
 };
 
 class CClientTime

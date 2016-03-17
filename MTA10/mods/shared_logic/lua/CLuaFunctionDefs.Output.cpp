@@ -217,3 +217,34 @@ int CLuaFunctionDefs::SetWindowFlashing ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::CreateTrayNotification ( lua_State* luaVM )
+{
+//  bool createTrayNotification ( string title, string body [, string type = "noicon", bool sound = true ] )
+
+    SString strTitle = "";
+    SString strBody = "";
+    SString strType = "";
+    bool useSound = true;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strTitle );
+    argStream.ReadString ( strBody );
+    argStream.ReadString ( strType, "noicon" );
+    argStream.ReadBool ( useSound, true );
+
+    if (strType.compare("noicon") != 0 && strType.compare("info") != 0 && strType.compare("warning") != 0 && strType.compare("error") != 0)
+    {
+        strType = "noicon";
+    }
+
+    if ( !argStream.HasErrors () )
+    {
+        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateTrayNotification( strTitle, strBody, strType, useSound ) );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
