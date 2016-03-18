@@ -227,7 +227,7 @@ int CLuaFunctionDefs::CreateTrayNotification ( lua_State* luaVM )
     bool useSound = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
-    argStream.ReadString ( strType, "noicon" );
+    argStream.ReadString ( strType, "default" );
     argStream.ReadBool ( useSound, true );
 
     if (strType.compare("default") != 0 && strType.compare("info") != 0 && strType.compare("warning") != 0 && strType.compare("error") != 0)
@@ -237,7 +237,7 @@ int CLuaFunctionDefs::CreateTrayNotification ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateTrayNotification( strText, strType, useSound ) );
+        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateTrayNotification ( strText, strType, useSound ) );
         return 1;
     }
     else

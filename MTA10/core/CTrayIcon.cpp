@@ -39,9 +39,9 @@ bool CTrayIcon::CreateTrayIcon ( void )
         return true;
     
     m_pNID->hWnd    = g_pCore->GetHookedWindow ( );
+    m_pNID->uFlags  = NIF_ICON | NIF_TIP;
     m_pNID->hIcon   = LoadIcon ( NULL, IDI_APPLICATION );
     // m_pNID->hIcon   = LoadIcon ( GetModuleHandle ( NULL ), MAKEINTRESOURCE ( IDI_ICON1 ) );
-    m_pNID->uFlags  = NIF_ICON | NIF_TIP;
     
     m_bTrayIconExists = Shell_NotifyIconW ( NIM_ADD, m_pNID ) == S_OK;
 
@@ -66,8 +66,8 @@ bool CTrayIcon::CreateTrayBallon ( SString strText, CTrayIconType trayIconType, 
             return false;
 
     m_pNID->dwInfoFlags = 0;
-    m_pNID->uFlags = NIF_ICON | NIF_TIP | NIF_INFO;
-    StringCchCopyW ( m_pNID->szInfo, ARRAYSIZE ( m_pNID->szInfo ), SharedUtil::MbUTF8ToUTF16 ( strText ).c_str( ) );
+    m_pNID->uFlags      = NIF_ICON | NIF_TIP | NIF_INFO;
+    StringCchCopyW ( m_pNID->szInfo, ARRAYSIZE ( m_pNID->szInfo ), SharedUtil::MbUTF8ToUTF16 ( strText ).c_str ( ) );
 
     switch ( trayIconType ) {
     case CTrayIconType::Info:
