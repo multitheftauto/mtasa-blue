@@ -86,7 +86,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/cef3/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/cef3/;../launch/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -313,6 +313,7 @@
     <ClCompile Include="CSetCursorPosHook.cpp" />
     <ClCompile Include="CSettings.cpp" />
     <ClCompile Include="CTileBatcher.cpp" />
+    <ClCompile Include="CTrayIcon.cpp" />
     <ClCompile Include="CVersionUpdater.cpp" />
     <ClCompile Include="CVertexStreamBoundingBoxManager.cpp" />
     <ClCompile Include="CVideoModeManager.cpp" />
@@ -391,6 +392,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\sdk\core\CTrayIconInterface.h" />
     <ClInclude Include="..\sdk\core\CWebBrowserEventsInterface.h" />
     <ClInclude Include="..\sdk\core\CWebCoreInterface.h" />
     <ClInclude Include="..\sdk\core\CWebViewInterface.h" />
@@ -471,6 +473,7 @@
     <ClInclude Include="CSettings.h" />
     <ClInclude Include="CTileBatcher.h" />
     <ClInclude Include="CTimingCheckpoints.hpp" />
+    <ClInclude Include="CTrayIcon.h" />
     <ClInclude Include="CVersionUpdater.h" />
     <ClInclude Include="CVersionUpdater.Util.hpp" />
     <ClInclude Include="CVertexStreamBoundingBoxManager.h" />

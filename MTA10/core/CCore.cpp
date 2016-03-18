@@ -186,7 +186,7 @@ CCore::CCore ( void )
     m_bWindowsTimerEnabled = false;
 
     // Tray icon
-    m_bTrayIconExists = false;
+    m_pTrayIcon = new CTrayIcon ( );
 }
 
 CCore::~CCore ( void )
@@ -194,7 +194,7 @@ CCore::~CCore ( void )
     WriteDebugEvent ( "CCore::~CCore" );
 
     // Destroy tray icon
-    DestroyTrayIcon ( );
+    delete m_pTrayIcon;
 
     // Delete the mod manager
     delete m_pModManager;
@@ -2346,61 +2346,4 @@ bool CCore::GetRightSizeTxdEnabled( void )
         return true;
 
     return false;
-}
-
-//
-// Tray icon
-//
-bool CCore::DoesTrayIconExist ( void )
-{
-    return m_bTrayIconExists;
-}
-
-bool CCore::CreateTrayIcon ( void )
-{
-    if ( m_bTrayIconExists )
-        return true;
-
-    NOTIFYICONDATAW nid = { };
-
-    // The size of the structure, in bytes.
-    nid.cbSize = sizeof ( nid );
-
-    // A handle to the window that receives notifications associated with an icon in the notification area.
-    nid.hWnd = GetHookedWindow ( );
-
-    // The application-defined identifier of the taskbar icon.
-    nid.uID = 0;
-
-    // Flags that either indicate which of the other members of the structure contain valid data or provide additional information.
-    nid.uFlags = NIF_INFO;
-    nid.szInfo[0] = '\0';
-    nid.szInfoTitle[0] = '\0';
-    nid.dwInfoFlags = NIIF_NOSOUND;
-    nid.uTimeout = static_cast<UINT>(15e3);
-
-    // Create tray icon
-    m_bTrayIconExists = ::Shell_NotifyIconW(NIM_ADD, &nid) == S_OK ? true : false;
-    
-    return m_bTrayIconExists;
-}
-
-bool CCore::DestroyTrayIcon ( void )
-{
-    if ( !m_bTrayIconExists )
-        return true;
-
-    NOTIFYICONDATAW nid = { };
-
-    // A handle to the window that receives notifications associated with an icon in the notification area.
-    nid.hWnd = GetHookedWindow ( );
-
-    // The application-defined identifier of the taskbar icon.
-    nid.uID = 0;
-
-    // Destroy tray icon
-    ::Shell_NotifyIconW ( NIM_DELETE, &nid );
-    m_bTrayIconExists = false;
-
-    return true;
 }

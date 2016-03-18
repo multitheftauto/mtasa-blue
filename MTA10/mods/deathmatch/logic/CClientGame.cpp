@@ -353,7 +353,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
         g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 
     // Create tray icon
-    g_pCore->CreateTrayIcon ( );
+    g_pCore->GetTrayIcon( )->CreateTrayIcon ( );
 }
 
 
@@ -505,7 +505,7 @@ CClientGame::~CClientGame ( void )
     delete CClientPerfStatManager::GetSingleton ();
 
     // Destroy tray icon
-    g_pCore->DestroyTrayIcon ( );
+    g_pCore->GetTrayIcon( )->DestroyTrayIcon ( );
 
     // NULL the global CClientGame var
     g_pClientGame = NULL;

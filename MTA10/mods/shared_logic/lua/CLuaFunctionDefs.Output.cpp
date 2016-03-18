@@ -220,30 +220,28 @@ int CLuaFunctionDefs::SetWindowFlashing ( lua_State* luaVM )
 
 int CLuaFunctionDefs::CreateTrayNotification ( lua_State* luaVM )
 {
-//  bool createTrayNotification ( string title, string body [, string type = "noicon", bool sound = true ] )
+//  bool createTrayNotification ( string text [, string type = "default", bool sound = true ] )
 
-    SString strTitle = "";
-    SString strBody = "";
+    SString strText = "";
     SString strType = "";
     bool useSound = true;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strTitle );
-    argStream.ReadString ( strBody );
+    argStream.ReadString ( strText );
     argStream.ReadString ( strType, "noicon" );
     argStream.ReadBool ( useSound, true );
 
-    if (strType.compare("noicon") != 0 && strType.compare("info") != 0 && strType.compare("warning") != 0 && strType.compare("error") != 0)
+    if (strType.compare("default") != 0 && strType.compare("info") != 0 && strType.compare("warning") != 0 && strType.compare("error") != 0)
     {
-        strType = "noicon";
+        strType = "default";
     }
 
-    if ( !argStream.HasErrors () )
+    if ( !argStream.HasErrors ( ) )
     {
-        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateTrayNotification( strTitle, strBody, strType, useSound ) );
+        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateTrayNotification( strText, strType, useSound ) );
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;

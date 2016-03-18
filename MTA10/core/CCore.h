@@ -47,6 +47,7 @@ class CCore;
 #include <xml/CXML.h>
 #include <ijsify.h>
 #include "CWebCore.h"
+#include "CTrayIcon.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -109,6 +110,7 @@ public:
     CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
     CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
     CWebCoreInterface*      GetWebCore                      ( void )                { return m_pWebCore; };
+    CTrayIconInterface*     GetTrayIcon                     ( void )                { return m_pTrayIcon; };
 
     void                    SaveConfig                      ( bool bWaitUntilFinished = false );
 
@@ -273,11 +275,6 @@ public:
     bool                    IsRenderingGrass                ( void )                { return m_bIsRenderingGrass; }
     bool                    GetRightSizeTxdEnabled          ( void );
 
-    // Tray icon
-    bool                    DoesTrayIconExist               ( void );
-    bool                    CreateTrayIcon                  ( void );
-    bool                    DestroyTrayIcon                 ( void );
-
 private:
     // Core devices.
     CXML*                       m_pXML;
@@ -293,6 +290,7 @@ private:
     CClientVariables            m_ClientVariables;
     CCommunity                  m_Community;
     CWebCore*                   m_pWebCore;
+    CTrayIcon*                  m_pTrayIcon;
 
     // Hook interfaces.
     CMessageLoopHook *          m_pMessageLoopHook;
@@ -364,9 +362,6 @@ private:
     SString                     m_strDummyProgressType;
     bool                        m_bDummyProgressUpdateAlways;
     bool                        m_bIsRenderingGrass;
-
-    // Tray icon
-    bool                        m_bTrayIconExists;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );
