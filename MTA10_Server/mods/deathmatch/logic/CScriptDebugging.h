@@ -19,15 +19,26 @@
 #include "packets/CPacket.h"
 #include <cstdio>
 #include <list>
-#include "CDuplicateLineFilter.h"
 
-struct SLogData
+struct SLogLine
 {
+    SString strText;
     unsigned int uiMinimumDebugLevel;
     unsigned char ucRed;
     unsigned char ucGreen;
     unsigned char ucBlue;
-    bool operator ==( const SLogData& other ) const { return uiMinimumDebugLevel == other.uiMinimumDebugLevel && ucRed == other.ucRed; }
+    operator SString& ( void )
+    {
+        return strText;
+    }
+    bool operator ==( const SLogLine& other ) const
+    {
+        return strText == other.strText
+            && uiMinimumDebugLevel == other.uiMinimumDebugLevel
+            && ucRed == other.ucRed
+            && ucGreen == other.ucGreen
+            && ucBlue == other.ucBlue;
+    }
 };
 
 class CScriptDebugging
@@ -79,7 +90,7 @@ private:
     bool                            m_bTriggeringOnDebugMessage;
     SLuaDebugInfo                   m_SavedLuaDebugInfo;
     std::list < CLuaMain* >         m_LuaMainStack;
-    CDuplicateLineFilter < SLogData > m_DuplicateLineFilter;
+    CDuplicateLineFilter < SLogLine > m_DuplicateLineFilter;
 };
 
 #endif

@@ -35,6 +35,15 @@
 CCriticalSection CRefCountable::ms_CS;
 std::map < uint, uint > ms_ReportAmountMap;
 
+struct SReportLine
+{
+    SString strText;
+    uint    uiId;
+    operator SString&   ( void )                            { return strText; }
+    bool operator ==    ( const SReportLine& other ) const  { return strText == other.strText && uiId == other.uiId; }
+};
+CDuplicateLineFilter < SReportLine > ms_ReportLineFilter;
+
 #ifdef MTA_CLIENT
 
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
@@ -688,12 +697,21 @@ void SharedUtil::AddReportLog ( uint uiId, const SString& strText, uint uiAmount
             return;
     }
 
-    SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
-    MakeSureDirExists ( strPathFilename );
+    ms_ReportLineFilter.AddLine( { strText, uiId } );
 
-    SString strMessage ( "%u: %s %s [%s] - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), GetReportLogProcessTag().c_str (), strText.c_str () );
-    FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
-    OutputDebugLine ( SStringX ( "[ReportLog] " ) + strMessage );
+    SReportLine line;
+    while ( ms_ReportLineFilter.PopOutputLine( line ) )
+    {
+        const SString& strText = line.strText;
+        uint uiId = line.uiId;
+    
+        SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
+        MakeSureDirExists ( strPathFilename );
+    
+        SString strMessage ( "%u: %s %s [%s] - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), GetReportLogProcessTag().c_str (), strText.c_str () );
+        FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
+        OutputDebugLine ( SStringX ( "[ReportLog] " ) + strMessage );
+    }
 }
 
 void SharedUtil::SetReportLogContents ( const SString& strText )
