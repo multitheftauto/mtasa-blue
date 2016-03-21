@@ -420,7 +420,7 @@ void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& l
             break;
     }
 
-    m_DuplicateLineFilter.AddLine( strText, { uiMinimumDebugLevel, ucRed, ucGreen, ucBlue } );
+    m_DuplicateLineFilter.AddLine( { strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue } );
     if ( g_pCore->GetCVars ()->GetValue < bool > ( "filter_duplicate_log_lines" ) == false )
         m_DuplicateLineFilter.Flush();
     UpdateLogOutput();
@@ -429,19 +429,18 @@ void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& l
 
 void CScriptDebugging::UpdateLogOutput( void )
 {
-    SString strText;
-    SLogData data;
-    while( m_DuplicateLineFilter.PopOutputLine( strText, data ) )
+    SLogLine line;
+    while( m_DuplicateLineFilter.PopOutputLine( line ) )
     {
         // Log it to the file if enough level
-        if ( m_uiLogFileLevel >= data.uiMinimumDebugLevel )
+        if ( m_uiLogFileLevel >= line.uiMinimumDebugLevel )
         {
-            PrintLog ( strText );
+            PrintLog ( line.strText );
         }
     #ifdef MTA_DEBUG
         if ( !g_pCore->IsDebugVisible () ) return;
     #endif
-        g_pCore->DebugEchoColor ( strText, data.ucRed, data.ucGreen, data.ucBlue );
+        g_pCore->DebugEchoColor ( line.strText, line.ucRed, line.ucGreen, line.ucBlue );
     }
 }
 

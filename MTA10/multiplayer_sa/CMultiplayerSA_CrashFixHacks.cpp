@@ -1514,7 +1514,7 @@ void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 // GTA outputs stuff via printf which we can use to help diagnose problems
 //
 ////////////////////////////////////////////////////////////////////////
-void _cdecl OnMY_printf ( const char* szMessage )
+void _cdecl OnMY_printf ( DWORD dwCalledFrom, const char* szMessage )
 {
     SString strMessage = SStringX( szMessage ).Replace( "\n", "" );
 
@@ -1524,7 +1524,8 @@ void _cdecl OnMY_printf ( const char* szMessage )
         return;
     }
 
-    LogEvent ( 6311, "printf", "GTALOG", strMessage, 6311 );
+    SString strContext( "GTALOG Called from 0x%08x", dwCalledFrom );
+    LogEvent ( 6311, "printf", strContext, strMessage, 6311 );
 
     // Check for known issues
     if ( strMessage == "Error subrastering" )
@@ -1550,8 +1551,9 @@ void _declspec(naked) HOOK_printf ()
     {
         pushad
         push    [esp+32+4*1]
+        push    [esp+32+4*1]
         call    OnMY_printf
-        add     esp, 4*1
+        add     esp, 4*2
         popad
 
         // Replaced code
