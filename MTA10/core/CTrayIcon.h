@@ -25,4 +25,5 @@ public:
 private:
     NOTIFYICONDATAW*    m_pNID;
     bool                m_bTrayIconExists;
+    long long           m_llLastBalloonTime;
 };

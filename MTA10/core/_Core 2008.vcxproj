@@ -86,7 +86,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/cef3/;../launch/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../vendor;../sdk;../../Shared/sdk;../../vendor/sparsehash/current/src;../../vendor/sparsehash/current/src/windows;../../vendor/pthreads/include;../../vendor/jpeg/jpeg-8d;../../vendor/zlib;../../vendor/tinygettext;../../vendor/cef3/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x502;WIN32;MTA_DEBUG;_CRT_SECURE_NO_WARNINGS;INITGUID;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -482,6 +482,7 @@
     <ClInclude Include="CWebDevTools.h" />
     <ClInclude Include="CWebsiteRequests.h" />
     <ClInclude Include="CWebView.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="StdInc.h" />
     <ClInclude Include="WebBrowserHelpers.h" />
     <ClInclude Include="CExceptionInformation_Impl.h" />
@@ -707,6 +708,12 @@
       <Project>{ccabbc2e-172d-46fd-bc43-5a9fcd295112}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="core.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\launch\resource\mtaicon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

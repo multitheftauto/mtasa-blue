@@ -1173,6 +1173,11 @@ void CSettings::CreateGUI ( void )
         m_pFlashWindow->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineHeight ) );
         m_pFlashWindow->GetPosition ( vecTemp );
         m_pFlashWindow->AutoSize ( NULL, 20.0f );
+
+        m_pTrayBalloon = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabInterface, _("Allow tray balloon notifications") ) );
+        m_pTrayBalloon->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineHeight ) );
+        m_pTrayBalloon->GetPosition ( vecTemp );
+        m_pTrayBalloon->AutoSize ( NULL, 20.0f );
     }
 
     /**
@@ -3011,6 +3016,7 @@ void CSettings::LoadData ( void )
     
     // Interface
     CVARS_GET ( "server_can_flash_window", bVar ); m_pFlashWindow->SetSelected ( bVar );
+    CVARS_GET ( "allow_tray_notifications", bVar ); m_pTrayBalloon->SetSelected ( bVar );
 
     // Browser
     CVARS_GET ( "browser_remote_websites", bVar ); m_pCheckBoxRemoteBrowser->SetSelected ( bVar );
@@ -3294,6 +3300,7 @@ void CSettings::SaveData ( void )
 
     // Interface
     CVARS_SET ( "server_can_flash_window", m_pFlashWindow->GetSelected ( ) );
+    CVARS_SET ( "allow_tray_notifications", m_pTrayBalloon->GetSelected ( ) );
 
     // Set our new skin last, as it'll destroy all our GUI
     pItem = m_pInterfaceSkinSelector->GetSelectedItem ();

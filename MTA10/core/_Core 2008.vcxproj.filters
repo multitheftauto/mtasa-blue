@@ -42,6 +42,10 @@
     <Filter Include="Header Files\utils\tinygettext">
       <UniqueIdentifier>{2a2950bb-79ea-4629-8468-e87740ddf32a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{6f136ac2-7551-410a-a56e-b29c046e5e82}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;rc</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CAdditionalVertexStreamManager.cpp">
@@ -1267,5 +1271,18 @@
     <ClInclude Include="..\sdk\core\CTrayIconInterface.h">
       <Filter>Header Files\sdk\core</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="core.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\launch\resource\mtaicon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -221,7 +221,6 @@ int CLuaFunctionDefs::SetWindowFlashing ( lua_State* luaVM )
 int CLuaFunctionDefs::CreateTrayNotification ( lua_State* luaVM )
 {
 //  bool createTrayNotification ( string text [, string type = "default", bool sound = true ] )
-
     SString strText = "";
     SString strType = "";
     bool useSound = true;

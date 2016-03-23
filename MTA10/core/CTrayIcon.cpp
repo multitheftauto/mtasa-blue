@@ -13,13 +13,16 @@
 #include <strsafe.h>
 #include "resource.h"
 
-#define TRAY_MTA_TITLE L"Multi Theft Auto: San Andreas"
+#define TRAY_MTA_TITLE          L"Multi Theft Auto: San Andreas"
+#define TRAY_BALLOON_INTERVAL   750L // ms
 
 extern CCore* g_pCore;
+extern HINSTANCE g_hModule;
 
 CTrayIcon::CTrayIcon ( void )
-    : m_bTrayIconExists { false },
-    m_pNID { new NOTIFYICONDATAW { 0 } }
+    : m_bTrayIconExists { false }
+    , m_pNID { new NOTIFYICONDATAW { 0 } }
+    , m_llLastBalloonTime { 0L }
 {
     m_pNID->cbSize  = sizeof ( NOTIFYICONDATAW );
     m_pNID->uID     = 0;
@@ -37,12 +40,15 @@ bool CTrayIcon::CreateTrayIcon ( void )
 {
     if ( m_bTrayIconExists )
         return true;
-    
-    m_pNID->hWnd    = g_pCore->GetHookedWindow ( );
-    m_pNID->uFlags  = NIF_ICON | NIF_TIP;
-    m_pNID->hIcon   = LoadIcon ( NULL, IDI_APPLICATION );
-    // m_pNID->hIcon   = LoadIcon ( GetModuleHandle ( NULL ), MAKEINTRESOURCE ( IDI_ICON1 ) );
-    
+
+    // The handle to the core.dll is neccessary here,
+    // because Windows will search for the ICON in the executable and not in the DLL
+    // Note: Changing the size will not show a higher quality icon in the balloon
+    auto hIcon        = LoadImage ( g_hModule, MAKEINTRESOURCE ( IDI_ICON1 ), IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_SHARED | LR_LOADTRANSPARENT );
+
+    m_pNID->hWnd      = g_pCore->GetHookedWindow ( );
+    m_pNID->uFlags    = NIF_ICON | NIF_TIP;
+    m_pNID->hIcon     = ( hIcon != NULL ) ? ( ( HICON ) hIcon ) : LoadIcon ( NULL, IDI_APPLICATION );
     m_bTrayIconExists = Shell_NotifyIconW ( NIM_ADD, m_pNID ) == S_OK;
 
     return m_bTrayIconExists;
@@ -64,6 +70,13 @@ bool CTrayIcon::CreateTrayBallon ( SString strText, CTrayIconType trayIconType, 
     if ( !m_bTrayIconExists )
         if ( !CreateTrayIcon ( ) )
             return false;
+
+    auto currentTime = GetTickCount64_ ( );
+
+    if ( ( currentTime - m_llLastBalloonTime ) < TRAY_BALLOON_INTERVAL )
+        return false;
+    else
+        m_llLastBalloonTime = currentTime;
 
     m_pNID->dwInfoFlags = 0;
     m_pNID->uFlags      = NIF_ICON | NIF_TIP | NIF_INFO;
@@ -87,5 +100,6 @@ bool CTrayIcon::CreateTrayBallon ( SString strText, CTrayIconType trayIconType, 
     if ( !useSound )
         m_pNID->dwInfoFlags |= NIIF_NOSOUND;
 
-    return Shell_NotifyIconW ( NIM_MODIFY, m_pNID ) == S_OK;
+    Shell_NotifyIconW ( NIM_MODIFY, m_pNID );
+    return true;
 }
