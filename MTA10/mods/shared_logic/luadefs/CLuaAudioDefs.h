@@ -60,4 +60,9 @@ public:
     LUA_DECLARE ( GetSoundEffects );
     LUA_DECLARE ( SetSoundPan );
     LUA_DECLARE ( GetSoundPan );
+
+    // Radio functions
+    LUA_DECLARE ( SetRadioChannel );
+    LUA_DECLARE ( GetRadioChannel );
+    LUA_DECLARE ( GetRadioChannelName );
 };
