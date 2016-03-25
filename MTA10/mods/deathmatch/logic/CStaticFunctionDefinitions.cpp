@@ -346,29 +346,14 @@ bool CStaticFunctionDefinitions::SetWindowFlashing ( bool flash, uint count )
 }
 
 
-bool CStaticFunctionDefinitions::CreateTrayNotification ( SString strText, SString strType, bool useSound )
+bool CStaticFunctionDefinitions::CreateTrayNotification ( SString strText, eTrayIconType eType, bool useSound )
 {
     // Don't create notifications if window is active
     if ( g_pCore->IsFocused ( ) || !g_pCore->GetCVars ( )->GetValue < bool > ( "allow_tray_notifications", true ) )
         return false;
 
-    // Get tray icon interface
-    CTrayIconInterface* pTrayIcon = g_pCore->GetTrayIcon ( );
-
-    // Translate the string type
-    CTrayIconType trayIconType;
-
-    if ( strType == "info" )
-        trayIconType = CTrayIconType::Info;
-    else if ( strType == "warning" )
-        trayIconType = CTrayIconType::Warning;
-    else if ( strType == "error" )
-        trayIconType = CTrayIconType::Error;
-    else
-        trayIconType = CTrayIconType::Default;
-
     // Create tray notification
-    return pTrayIcon->CreateTrayBallon ( strText, trayIconType, useSound );
+    return g_pCore->GetTrayIcon ( )->CreateTrayBallon ( strText, eType, useSound );
 }
 
 

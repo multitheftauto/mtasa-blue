@@ -65,7 +65,7 @@ bool CTrayIcon::DestroyTrayIcon ( void )
     return true;
 }
 
-bool CTrayIcon::CreateTrayBallon ( SString strText, CTrayIconType trayIconType, bool useSound )
+bool CTrayIcon::CreateTrayBallon ( SString strText, eTrayIconType trayIconType, bool useSound )
 {
     if ( !m_bTrayIconExists )
         if ( !CreateTrayIcon ( ) )
@@ -83,16 +83,16 @@ bool CTrayIcon::CreateTrayBallon ( SString strText, CTrayIconType trayIconType, 
     StringCchCopyW ( m_pNID->szInfo, ARRAYSIZE ( m_pNID->szInfo ), SharedUtil::MbUTF8ToUTF16 ( strText ).c_str ( ) );
 
     switch ( trayIconType ) {
-    case CTrayIconType::Info:
+    case ICON_TYPE_INFO:
         m_pNID->dwInfoFlags |= NIIF_INFO;
         break;
-    case CTrayIconType::Warning:
+    case ICON_TYPE_WARNING:
         m_pNID->dwInfoFlags |= NIIF_WARNING;
         break;
-    case CTrayIconType::Error:
+    case ICON_TYPE_ERROR:
         m_pNID->dwInfoFlags |= NIIF_ERROR;
         break;
-    case CTrayIconType::Default:
+    case ICON_TYPE_DEFAULT:
     default:
         break;
     }

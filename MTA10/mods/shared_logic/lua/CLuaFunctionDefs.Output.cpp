@@ -222,21 +222,16 @@ int CLuaFunctionDefs::CreateTrayNotification ( lua_State* luaVM )
 {
 //  bool createTrayNotification ( string text [, string type = "default", bool sound = true ] )
     SString strText = "";
-    SString strType = "";
+    eTrayIconType eType;
     bool useSound = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strText );
-    argStream.ReadString ( strType, "default" );
+    argStream.ReadEnumString ( eType, ICON_TYPE_DEFAULT );
     argStream.ReadBool ( useSound, true );
-
-    if (strType.compare("default") != 0 && strType.compare("info") != 0 && strType.compare("warning") != 0 && strType.compare("error") != 0)
-    {
-        strType = "default";
-    }
 
     if ( !argStream.HasErrors ( ) )
     {
-        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateTrayNotification ( strText, strType, useSound ) );
+        lua_pushboolean ( luaVM, CStaticFunctionDefinitions::CreateTrayNotification ( strText, eType, useSound ) );
         return 1;
     }
     else

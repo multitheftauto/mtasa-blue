@@ -9,12 +9,12 @@
 *****************************************************************************/
 #pragma once
 
-enum class CTrayIconType
+enum eTrayIconType
 {
-    Default,
-    Info,
-    Warning,
-    Error
+    ICON_TYPE_DEFAULT,
+    ICON_TYPE_INFO,
+    ICON_TYPE_WARNING,
+    ICON_TYPE_ERROR
 };
 
 class CTrayIconInterface
@@ -23,5 +23,5 @@ public:
     virtual bool        DoesTrayIconExist       ( void ) = 0;
     virtual bool        CreateTrayIcon          ( void ) = 0;
     virtual bool        DestroyTrayIcon         ( void ) = 0;
-    virtual bool        CreateTrayBallon        ( SString strText, CTrayIconType trayIconType, bool useSound ) = 0;
+    virtual bool        CreateTrayBallon        ( SString strText, eTrayIconType trayIconType, bool useSound ) = 0;
 };

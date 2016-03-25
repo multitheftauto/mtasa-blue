@@ -56,7 +56,7 @@ public:
     static bool                         SetClipboard                        ( SString& strText );
     static bool                         GetClipboard                        ( SString& strText );
     static bool                         SetWindowFlashing                   ( bool flash, uint count );
-    static bool                         CreateTrayNotification              ( SString strText, SString strType, bool useSound );
+    static bool                         CreateTrayNotification              ( SString strText, eTrayIconType eType, bool useSound );
 
     // Element get funcs
     static CClientEntity*               GetRootElement                      ( void );

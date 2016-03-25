@@ -21,7 +21,7 @@ public:
     bool                DoesTrayIconExist       ( void ) { return m_bTrayIconExists; };
     bool                CreateTrayIcon          ( void );
     bool                DestroyTrayIcon         ( void );
-    bool                CreateTrayBallon        ( SString strText, CTrayIconType trayIconType, bool useSound );
+    bool                CreateTrayBallon        ( SString strText, eTrayIconType trayIconType, bool useSound );
 private:
     NOTIFYICONDATAW*    m_pNID;
     bool                m_bTrayIconExists;
