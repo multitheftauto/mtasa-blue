@@ -367,6 +367,7 @@
     <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaAudioDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaBrowserDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaMarkerDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPointLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPedDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp" />
@@ -377,7 +378,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector4.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp" />
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp" />
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp" />
     <ClCompile Include="CClient.cpp" />
@@ -573,7 +573,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Event.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.GUI.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Input.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Marker.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Object.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp" />
@@ -763,6 +762,7 @@
     <ClInclude Include="..\shared_logic\CClientPointLightsManager.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaAudioDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaBrowserDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaMarkerDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPointLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPedDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h" />
