@@ -10,7 +10,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#define DEFAULT_MAX_FILESIZE 52428800
 
 void CLuaAudioDefs::LoadFunctions ( void )
 {

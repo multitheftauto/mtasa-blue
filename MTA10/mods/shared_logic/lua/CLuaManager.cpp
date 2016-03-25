@@ -583,24 +583,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setBlipOrdering", CLuaFunctionDefs::SetBlipOrdering );
     CLuaCFunctions::AddFunction ( "setBlipVisibleDistance", CLuaFunctionDefs::SetBlipVisibleDistance );
 
-    // Marker create/destroy funcs
-    CLuaCFunctions::AddFunction ( "createMarker", CLuaFunctionDefs::CreateMarker );
-
-    // Marker get functions
-    CLuaCFunctions::AddFunction ( "getMarkerCount", CLuaFunctionDefs::GetMarkerCount );
-    CLuaCFunctions::AddFunction ( "getMarkerType", CLuaFunctionDefs::GetMarkerType );
-    CLuaCFunctions::AddFunction ( "getMarkerSize", CLuaFunctionDefs::GetMarkerSize );
-    CLuaCFunctions::AddFunction ( "getMarkerColor", CLuaFunctionDefs::GetMarkerColor );
-    CLuaCFunctions::AddFunction ( "getMarkerTarget", CLuaFunctionDefs::GetMarkerTarget );
-    CLuaCFunctions::AddFunction ( "getMarkerIcon", CLuaFunctionDefs::GetMarkerIcon );
-
-    // Marker set functions
-    CLuaCFunctions::AddFunction ( "setMarkerType", CLuaFunctionDefs::SetMarkerType );
-    CLuaCFunctions::AddFunction ( "setMarkerSize", CLuaFunctionDefs::SetMarkerSize );
-    CLuaCFunctions::AddFunction ( "setMarkerColor", CLuaFunctionDefs::SetMarkerColor );
-    CLuaCFunctions::AddFunction ( "setMarkerTarget", CLuaFunctionDefs::SetMarkerTarget );
-    CLuaCFunctions::AddFunction ( "setMarkerIcon", CLuaFunctionDefs::SetMarkerIcon );
-
     // Radar-area funcs
     CLuaCFunctions::AddFunction ( "createRadarArea", CLuaFunctionDefs::CreateRadarArea );
     CLuaCFunctions::AddFunction ( "getRadarAreaColor", CLuaFunctionDefs::GetRadarAreaColor  );
@@ -1084,6 +1066,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaBrowserDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();
+    CLuaMarkerDefs::LoadFunctions ();
     CLuaPedDefs::LoadFunctions ();
     CLuaPointLightDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();

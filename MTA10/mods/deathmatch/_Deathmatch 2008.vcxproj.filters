@@ -602,9 +602,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Input.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Marker.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Object.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
@@ -812,9 +809,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp">
-      <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp">
       <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
     </ClCompile>
@@ -939,6 +933,9 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaAudioDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaMarkerDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1676,6 +1673,9 @@
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaAudioDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaMarkerDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>

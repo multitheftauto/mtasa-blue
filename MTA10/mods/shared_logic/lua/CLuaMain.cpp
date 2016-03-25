@@ -502,37 +502,6 @@ void CLuaMain::AddObjectClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Object", "Element" );
 }
 
-
-// TODO: Specials
-void CLuaMain::AddMarkerClass( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "createMarker" );
-    lua_classfunction ( luaVM, "getCount", "getMarkerCount" );
-
-    lua_classfunction ( luaVM, "getMarkerType", "getMarkerType" );
-    lua_classfunction ( luaVM, "getIcon", "getMarkerIcon" );
-    lua_classfunction ( luaVM, "getSize", "getMarkerSize" );
-    lua_classfunction ( luaVM, "getTarget", CLuaOOPDefs::GetMarkerTarget );
-    lua_classfunction ( luaVM, "getColor", "getMarkerColor" );
-
-    lua_classfunction ( luaVM, "setType", "setMarkerType" );
-    lua_classfunction ( luaVM, "setIcon", "setMarkerIcon" );
-    lua_classfunction ( luaVM, "setSize", "setMarkerSize" );
-    lua_classfunction ( luaVM, "setTarget", "setMarkerTarget" );
-    lua_classfunction ( luaVM, "setColor", "setMarkerColor" );
-
-    lua_classvariable ( luaVM, "markerType", "setMarkerType", "getMarkerType" );
-    lua_classvariable ( luaVM, "icon", "setMarkerIcon", "getMarkerIcon" );
-    lua_classvariable ( luaVM, "size", "setMarkerSize", "getMarkerSize" );
-
-    lua_classvariable ( luaVM, "target", CLuaFunctionDefs::SetMarkerTarget, CLuaOOPDefs::GetMarkerTarget );
-    //lua_classvariable ( luaVM, "color", CLuaOOPDefs::SetMarkerColor, CLuaOOPDefs::GetMarkerColor );
-
-    lua_registerclass ( luaVM, "Marker", "Element" );
-}
-
 // TODO: colour class
 void CLuaMain::AddBlipClass( lua_State* luaVM )
 {
@@ -1424,7 +1393,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaPedDefs::AddClass       ( luaVM );
     AddPlayerClass              ( luaVM );
     AddObjectClass              ( luaVM );
-    AddMarkerClass              ( luaVM );
     AddBlipClass                ( luaVM );
     AddPickupClass              ( luaVM );
     AddColShapeClass            ( luaVM );
@@ -1474,6 +1442,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddCameraClass              ( luaVM );
 
     CLuaFileDefs::AddClass ( luaVM );
+    CLuaMarkerDefs::AddClass ( luaVM );
     CLuaPointLightDefs::AddClass ( luaVM );
     CLuaSearchLightDefs::AddClass ( luaVM );
 }
