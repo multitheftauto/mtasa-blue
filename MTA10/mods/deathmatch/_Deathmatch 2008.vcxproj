@@ -366,6 +366,7 @@
     <ClCompile Include="..\shared_logic\CClientPointLights.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaAudioDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaBlipDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaBrowserDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaMarkerDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPointLightDefs.cpp" />
@@ -562,7 +563,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaArguments.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaCFunctions.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Bit.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Blip.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.BodyClothes.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Camera.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Commands.cpp" />
@@ -761,6 +761,7 @@
     <ClInclude Include="..\shared_logic\CClientPointLights.h" />
     <ClInclude Include="..\shared_logic\CClientPointLightsManager.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaAudioDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaBlipDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaBrowserDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaMarkerDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPointLightDefs.h" />

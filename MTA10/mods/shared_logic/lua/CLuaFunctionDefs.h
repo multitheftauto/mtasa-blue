@@ -331,21 +331,6 @@ public:
     // Fire functions
     LUA_DECLARE ( CreateFire );
 
-    // Blip funcs
-    LUA_DECLARE ( CreateBlip );
-    LUA_DECLARE ( CreateBlipAttachedTo );
-    LUA_DECLARE ( GetBlipIcon );
-    LUA_DECLARE ( GetBlipSize );
-    LUA_DECLARE ( GetBlipColor );
-    LUA_DECLARE ( GetBlipOrdering );
-    LUA_DECLARE ( GetBlipVisibleDistance );
-
-    LUA_DECLARE ( SetBlipIcon );
-    LUA_DECLARE ( SetBlipSize );
-    LUA_DECLARE ( SetBlipColor );
-    LUA_DECLARE ( SetBlipOrdering );
-    LUA_DECLARE ( SetBlipVisibleDistance );
-
     // Radar-area funcs
     LUA_DECLARE ( CreateRadarArea );
     LUA_DECLARE ( GetRadarAreaColor );

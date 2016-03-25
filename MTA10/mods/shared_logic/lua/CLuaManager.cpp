@@ -562,21 +562,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxIsAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled );
     CLuaCFunctions::AddFunction ( "dxSetTextureEdge", CLuaFunctionDefs::dxSetTextureEdge );
 
-    // Blip funcs
-    CLuaCFunctions::AddFunction ( "createBlip", CLuaFunctionDefs::CreateBlip );
-    CLuaCFunctions::AddFunction ( "createBlipAttachedTo", CLuaFunctionDefs::CreateBlipAttachedTo );
-    CLuaCFunctions::AddFunction ( "getBlipIcon", CLuaFunctionDefs::GetBlipIcon );
-    CLuaCFunctions::AddFunction ( "getBlipSize", CLuaFunctionDefs::GetBlipSize );
-    CLuaCFunctions::AddFunction ( "getBlipColor", CLuaFunctionDefs::GetBlipColor );
-    CLuaCFunctions::AddFunction ( "getBlipOrdering", CLuaFunctionDefs::GetBlipOrdering );
-    CLuaCFunctions::AddFunction ( "getBlipVisibleDistance", CLuaFunctionDefs::GetBlipVisibleDistance );
-
-    CLuaCFunctions::AddFunction ( "setBlipIcon", CLuaFunctionDefs::SetBlipIcon );
-    CLuaCFunctions::AddFunction ( "setBlipSize", CLuaFunctionDefs::SetBlipSize );
-    CLuaCFunctions::AddFunction ( "setBlipColor", CLuaFunctionDefs::SetBlipColor );
-    CLuaCFunctions::AddFunction ( "setBlipOrdering", CLuaFunctionDefs::SetBlipOrdering );
-    CLuaCFunctions::AddFunction ( "setBlipVisibleDistance", CLuaFunctionDefs::SetBlipVisibleDistance );
-
     // Radar-area funcs
     CLuaCFunctions::AddFunction ( "createRadarArea", CLuaFunctionDefs::CreateRadarArea );
     CLuaCFunctions::AddFunction ( "getRadarAreaColor", CLuaFunctionDefs::GetRadarAreaColor  );
@@ -1057,6 +1042,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Luadef definitions
     CLuaAudioDefs::LoadFunctions ();
+    CLuaBlipDefs::LoadFunctions ();
     CLuaBrowserDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();
