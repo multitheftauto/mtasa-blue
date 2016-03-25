@@ -88,7 +88,6 @@ public:
     void                            AddRadarAreaClass       ( lua_State* luaVM );
     void                            AddTeamClass            ( lua_State* luaVM );
     void                            AddWaterClass           ( lua_State* luaVM );
-    void                            AddSoundClass           ( lua_State* luaVM );
     void                            AddWeaponClass          ( lua_State* luaVM );
     void                            AddEffectClass          ( lua_State* luaVM );
 
