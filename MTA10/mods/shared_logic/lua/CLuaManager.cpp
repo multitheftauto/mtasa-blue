@@ -329,37 +329,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setLowLODElement", CLuaFunctionDefs::SetLowLodElement );
     CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", CLuaFunctionDefs::SetElementCallPropagationEnabled );
 
-    // Sound effects and synth funcs
-    CLuaCFunctions::AddFunction ( "playSound", CLuaFunctionDefs::PlaySound );
-    CLuaCFunctions::AddFunction ( "playSound3D", CLuaFunctionDefs::PlaySound3D );
-    CLuaCFunctions::AddFunction ( "stopSound", CLuaFunctionDefs::StopSound );
-    CLuaCFunctions::AddFunction ( "setSoundPosition", CLuaFunctionDefs::SetSoundPosition );
-    CLuaCFunctions::AddFunction ( "getSoundPosition", CLuaFunctionDefs::GetSoundPosition );
-    CLuaCFunctions::AddFunction ( "getSoundLength", CLuaFunctionDefs::GetSoundLength );
-    CLuaCFunctions::AddFunction ( "setSoundPaused", CLuaFunctionDefs::SetSoundPaused );
-    CLuaCFunctions::AddFunction ( "isSoundPaused", CLuaFunctionDefs::IsSoundPaused );
-    CLuaCFunctions::AddFunction ( "setSoundVolume", CLuaFunctionDefs::SetSoundVolume );
-    CLuaCFunctions::AddFunction ( "getSoundVolume", CLuaFunctionDefs::GetSoundVolume );
-    CLuaCFunctions::AddFunction ( "setSoundSpeed", CLuaFunctionDefs::SetSoundSpeed );
-    CLuaCFunctions::AddFunction ( "getSoundSpeed", CLuaFunctionDefs::GetSoundSpeed );
-    CLuaCFunctions::AddFunction ( "setSoundProperties", CLuaFunctionDefs::SetSoundProperties );
-    CLuaCFunctions::AddFunction ( "getSoundProperties", CLuaFunctionDefs::GetSoundProperties );
-    CLuaCFunctions::AddFunction ( "getSoundFFTData", CLuaFunctionDefs::GetSoundFFTData );
-    CLuaCFunctions::AddFunction ( "getSoundWaveData", CLuaFunctionDefs::GetSoundWaveData );
-    CLuaCFunctions::AddFunction ( "getSoundLevelData", CLuaFunctionDefs::GetSoundLevelData );
-    CLuaCFunctions::AddFunction ( "getSoundBPM", CLuaFunctionDefs::GetSoundBPM );
-    CLuaCFunctions::AddFunction ( "setSoundPanningEnabled", CLuaFunctionDefs::SetSoundPanEnabled );
-    CLuaCFunctions::AddFunction ( "isSoundPanningEnabled", CLuaFunctionDefs::IsSoundPanEnabled );
-    CLuaCFunctions::AddFunction ( "setSoundMinDistance", CLuaFunctionDefs::SetSoundMinDistance );
-    CLuaCFunctions::AddFunction ( "getSoundMinDistance", CLuaFunctionDefs::GetSoundMinDistance );
-    CLuaCFunctions::AddFunction ( "setSoundMaxDistance", CLuaFunctionDefs::SetSoundMaxDistance );
-    CLuaCFunctions::AddFunction ( "getSoundMaxDistance", CLuaFunctionDefs::GetSoundMaxDistance );
-    CLuaCFunctions::AddFunction ( "getSoundMetaTags", CLuaFunctionDefs::GetSoundMetaTags );
-    CLuaCFunctions::AddFunction ( "setSoundEffectEnabled", CLuaFunctionDefs::SetSoundEffectEnabled );
-    CLuaCFunctions::AddFunction ( "getSoundEffects", CLuaFunctionDefs::GetSoundEffects );
-    CLuaCFunctions::AddFunction ( "setSoundPan", CLuaFunctionDefs::SetSoundPan );
-    CLuaCFunctions::AddFunction ( "getSoundPan", CLuaFunctionDefs::GetSoundPan );
-
     // Radio funcs
     CLuaCFunctions::AddFunction ( "setRadioChannel", CLuaFunctionDefs::SetRadioChannel );
     CLuaCFunctions::AddFunction ( "getRadioChannel", CLuaFunctionDefs::GetRadioChannel );
@@ -592,18 +561,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxSetAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxSetAspectRatioAdjustmentEnabled );
     CLuaCFunctions::AddFunction ( "dxIsAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled );
     CLuaCFunctions::AddFunction ( "dxSetTextureEdge", CLuaFunctionDefs::dxSetTextureEdge );
-
-    // Audio funcs
-    CLuaCFunctions::AddFunction ( "playSoundFrontEnd", CLuaFunctionDefs::PlaySoundFrontEnd );
-    CLuaCFunctions::AddFunction ( "setAmbientSoundEnabled", CLuaFunctionDefs::SetAmbientSoundEnabled );
-    CLuaCFunctions::AddFunction ( "isAmbientSoundEnabled", CLuaFunctionDefs::IsAmbientSoundEnabled );
-    CLuaCFunctions::AddFunction ( "resetAmbientSounds", CLuaFunctionDefs::ResetAmbientSounds );
-    CLuaCFunctions::AddFunction ( "setWorldSoundEnabled", CLuaFunctionDefs::SetWorldSoundEnabled );
-    CLuaCFunctions::AddFunction ( "isWorldSoundEnabled", CLuaFunctionDefs::IsWorldSoundEnabled );
-    CLuaCFunctions::AddFunction ( "resetWorldSounds", CLuaFunctionDefs::ResetWorldSounds );
-    CLuaCFunctions::AddFunction ( "playSFX", CLuaFunctionDefs::PlaySFX );
-    CLuaCFunctions::AddFunction ( "playSFX3D", CLuaFunctionDefs::PlaySFX3D );
-    CLuaCFunctions::AddFunction ( "getSFXStatus", CLuaFunctionDefs::GetSFXStatus );
 
     // Blip funcs
     CLuaCFunctions::AddFunction ( "createBlip", CLuaFunctionDefs::CreateBlip );
@@ -1117,11 +1074,12 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "bitReplace", CLuaFunctionDefs::BitReplace );
 
     // Luadef definitions
+    CLuaAudioDefs::LoadFunctions ();
+    CLuaBrowserDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();
     CLuaPedDefs::LoadFunctions ();
     CLuaPointLightDefs::LoadFunctions ();
-    CLuaTaskDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
-    CLuaBrowserDefs::LoadFunctions ();
+    CLuaTaskDefs::LoadFunctions ();
 }
