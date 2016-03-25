@@ -199,10 +199,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedSkin", CLuaFunctionDefs::SetElementModel );
     CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaFunctionDefs::GetElementRotation );
     CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaFunctionDefs::SetElementRotation );
-    CLuaCFunctions::AddFunction ( "getVehicleIDFromName", CLuaFunctionDefs::GetVehicleModelFromName );    
+    CLuaCFunctions::AddFunction ( "getVehicleIDFromName", CLuaVehicleDefs::GetVehicleModelFromName );    
     CLuaCFunctions::AddFunction ( "getVehicleID", CLuaFunctionDefs::GetElementModel );    
     CLuaCFunctions::AddFunction ( "getVehicleRotation", CLuaFunctionDefs::GetElementRotation );
-    CLuaCFunctions::AddFunction ( "getVehicleNameFromID", CLuaFunctionDefs::GetVehicleNameFromModel );
+    CLuaCFunctions::AddFunction ( "getVehicleNameFromID", CLuaVehicleDefs::GetVehicleNameFromModel );
     CLuaCFunctions::AddFunction ( "setVehicleRotation", CLuaFunctionDefs::SetElementRotation );
     CLuaCFunctions::AddFunction ( "attachElementToElement", CLuaFunctionDefs::AttachElements );
     CLuaCFunctions::AddFunction ( "detachElementFromElement", CLuaFunctionDefs::DetachElements );
@@ -329,11 +329,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setLowLODElement", CLuaFunctionDefs::SetLowLodElement );
     CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", CLuaFunctionDefs::SetElementCallPropagationEnabled );
 
-    // Radio funcs
-    CLuaCFunctions::AddFunction ( "setRadioChannel", CLuaFunctionDefs::SetRadioChannel );
-    CLuaCFunctions::AddFunction ( "getRadioChannel", CLuaFunctionDefs::GetRadioChannel );
-    CLuaCFunctions::AddFunction ( "getRadioChannelName", CLuaFunctionDefs::GetRadioChannelName );
-
     // Player get funcs
     CLuaCFunctions::AddFunction ( "getLocalPlayer", CLuaFunctionDefs::GetLocalPlayer );
     CLuaCFunctions::AddFunction ( "getPlayerName", CLuaFunctionDefs::GetPlayerName );
@@ -363,115 +358,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex );
     CLuaCFunctions::AddFunction ( "getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes );
     CLuaCFunctions::AddFunction ( "getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName );
-
-    // Vehicle get funcs
-    CLuaCFunctions::AddFunction ( "getVehicleType", CLuaFunctionDefs::GetVehicleType );
-    CLuaCFunctions::AddFunction ( "getVehicleModelFromName", CLuaFunctionDefs::GetVehicleModelFromName );
-    CLuaCFunctions::AddFunction ( "getVehicleVariant", CLuaFunctionDefs::GetVehicleVariant );
-    CLuaCFunctions::AddFunction ( "getVehicleColor", CLuaFunctionDefs::GetVehicleColor );
-    CLuaCFunctions::AddFunction ( "getVehicleLandingGearDown", CLuaFunctionDefs::GetVehicleLandingGearDown );
-    CLuaCFunctions::AddFunction ( "getVehicleMaxPassengers", CLuaFunctionDefs::GetVehicleMaxPassengers );
-    CLuaCFunctions::AddFunction ( "getVehicleOccupant", CLuaFunctionDefs::GetVehicleOccupant );
-    CLuaCFunctions::AddFunction ( "getVehicleOccupants", CLuaFunctionDefs::GetVehicleOccupants );
-    CLuaCFunctions::AddFunction ( "getVehicleController", CLuaFunctionDefs::GetVehicleController );
-    CLuaCFunctions::AddFunction ( "getVehicleSirensOn", CLuaFunctionDefs::GetVehicleSirensOn );
-    CLuaCFunctions::AddFunction ( "getVehicleTurnVelocity", CLuaFunctionDefs::GetVehicleTurnVelocity );
-    CLuaCFunctions::AddFunction ( "getVehicleTurretPosition", CLuaFunctionDefs::GetVehicleTurretPosition );
-    CLuaCFunctions::AddFunction ( "isVehicleLocked", CLuaFunctionDefs::IsVehicleLocked );
-    CLuaCFunctions::AddFunction ( "getVehicleUpgradeOnSlot", CLuaFunctionDefs::GetVehicleUpgradeOnSlot );
-    CLuaCFunctions::AddFunction ( "getVehicleUpgrades", CLuaFunctionDefs::GetVehicleUpgrades );
-    CLuaCFunctions::AddFunction ( "getVehicleUpgradeSlotName", CLuaFunctionDefs::GetVehicleUpgradeSlotName );
-    CLuaCFunctions::AddFunction ( "getVehicleCompatibleUpgrades", CLuaFunctionDefs::GetVehicleCompatibleUpgrades );
-    CLuaCFunctions::AddFunction ( "getVehicleDoorState", CLuaFunctionDefs::GetVehicleDoorState );
-    CLuaCFunctions::AddFunction ( "getVehicleLightState", CLuaFunctionDefs::GetVehicleLightState );
-    CLuaCFunctions::AddFunction ( "getVehiclePanelState", CLuaFunctionDefs::GetVehiclePanelState );
-    CLuaCFunctions::AddFunction ( "getVehicleOverrideLights", CLuaFunctionDefs::GetVehicleOverrideLights );
-    CLuaCFunctions::AddFunction ( "getVehicleTowedByVehicle", CLuaFunctionDefs::GetVehicleTowedByVehicle );
-    CLuaCFunctions::AddFunction ( "getVehicleTowingVehicle", CLuaFunctionDefs::GetVehicleTowingVehicle );
-    CLuaCFunctions::AddFunction ( "getVehiclePaintjob", CLuaFunctionDefs::GetVehiclePaintjob );
-    CLuaCFunctions::AddFunction ( "getVehiclePlateText", CLuaFunctionDefs::GetVehiclePlateText );
-    CLuaCFunctions::AddFunction ( "getVehicleWheelStates", CLuaFunctionDefs::GetVehicleWheelStates );
-    CLuaCFunctions::AddFunction ( "isVehicleDamageProof", CLuaFunctionDefs::IsVehicleDamageProof );
-    CLuaCFunctions::AddFunction ( "isVehicleFuelTankExplodable", CLuaFunctionDefs::IsVehicleFuelTankExplodable );
-    CLuaCFunctions::AddFunction ( "isVehicleFrozen", CLuaFunctionDefs::IsVehicleFrozen );
-    CLuaCFunctions::AddFunction ( "isVehicleOnGround", CLuaFunctionDefs::IsVehicleOnGround );
-    CLuaCFunctions::AddFunction ( "getVehicleName", CLuaFunctionDefs::GetVehicleName );
-    CLuaCFunctions::AddFunction ( "getVehicleNameFromModel", CLuaFunctionDefs::GetVehicleNameFromModel );
-    CLuaCFunctions::AddFunction ( "getVehicleAdjustableProperty", CLuaFunctionDefs::GetVehicleAdjustableProperty );
-    CLuaCFunctions::AddFunction ( "getHelicopterRotorSpeed", CLuaFunctionDefs::GetHelicopterRotorSpeed );
-    CLuaCFunctions::AddFunction ( "getVehicleEngineState", CLuaFunctionDefs::GetVehicleEngineState );
-    CLuaCFunctions::AddFunction ( "isTrainDerailed", CLuaFunctionDefs::IsTrainDerailed );
-    CLuaCFunctions::AddFunction ( "isTrainDerailable", CLuaFunctionDefs::IsTrainDerailable );
-    CLuaCFunctions::AddFunction ( "getTrainDirection", CLuaFunctionDefs::GetTrainDirection );
-    CLuaCFunctions::AddFunction ( "getTrainSpeed", CLuaFunctionDefs::GetTrainSpeed );
-    CLuaCFunctions::AddFunction ( "isTrainChainEngine", CLuaFunctionDefs::IsTrainChainEngine );
-    CLuaCFunctions::AddFunction ( "getVehicleGravity", CLuaFunctionDefs::GetVehicleGravity );
-    CLuaCFunctions::AddFunction ( "isVehicleBlown", CLuaFunctionDefs::IsVehicleBlown );
-    CLuaCFunctions::AddFunction ( "isVehicleTaxiLightOn", CLuaFunctionDefs::IsVehicleTaxiLightOn );
-    CLuaCFunctions::AddFunction ( "getVehicleHeadLightColor", CLuaFunctionDefs::GetVehicleHeadLightColor );
-    CLuaCFunctions::AddFunction ( "getVehicleCurrentGear", CLuaFunctionDefs::GetVehicleCurrentGear );
-    CLuaCFunctions::AddFunction ( "getVehicleHandling", CLuaFunctionDefs::GetVehicleHandling );
-    CLuaCFunctions::AddFunction ( "getOriginalHandling", CLuaFunctionDefs::GetOriginalHandling );
-    CLuaCFunctions::AddFunction ( "getVehicleDoorOpenRatio", CLuaFunctionDefs::GetVehicleDoorOpenRatio );
-    CLuaCFunctions::AddFunction ( "getVehicleSirens", CLuaFunctionDefs::GetVehicleSirens );
-    CLuaCFunctions::AddFunction ( "getVehicleSirenParams", CLuaFunctionDefs::GetVehicleSirenParams );
-    CLuaCFunctions::AddFunction ( "isVehicleNitroRecharging", CLuaFunctionDefs::IsVehicleNitroRecharging );
-    CLuaCFunctions::AddFunction ( "isVehicleNitroActivated", CLuaFunctionDefs::IsVehicleNitroActivated );
-    CLuaCFunctions::AddFunction ( "getVehicleNitroCount", CLuaFunctionDefs::GetVehicleNitroCount );
-    CLuaCFunctions::AddFunction ( "getVehicleNitroLevel", CLuaFunctionDefs::GetVehicleNitroLevel );
-    CLuaCFunctions::AddFunction ( "getHeliBladeCollisionsEnabled", CLuaFunctionDefs::GetHeliBladeCollisionsEnabled );
-
-    // Vehicle set funcs
-    CLuaCFunctions::AddFunction ( "createVehicle", CLuaFunctionDefs::CreateVehicle );
-    CLuaCFunctions::AddFunction ( "fixVehicle", CLuaFunctionDefs::FixVehicle );
-    CLuaCFunctions::AddFunction ( "blowVehicle", CLuaFunctionDefs::BlowVehicle );
-    CLuaCFunctions::AddFunction ( "setVehicleTurnVelocity", CLuaFunctionDefs::SetVehicleTurnVelocity );
-    CLuaCFunctions::AddFunction ( "setVehicleColor", CLuaFunctionDefs::SetVehicleColor );
-    CLuaCFunctions::AddFunction ( "setVehicleLandingGearDown", CLuaFunctionDefs::SetVehicleLandingGearDown );
-    CLuaCFunctions::AddFunction ( "setVehicleLocked", CLuaFunctionDefs::SetVehicleLocked );
-    CLuaCFunctions::AddFunction ( "setVehicleDoorsUndamageable", CLuaFunctionDefs::SetVehicleDoorsUndamageable );
-    CLuaCFunctions::AddFunction ( "setVehicleSirensOn", CLuaFunctionDefs::SetVehicleSirensOn );
-    CLuaCFunctions::AddFunction ( "addVehicleUpgrade", CLuaFunctionDefs::AddVehicleUpgrade );
-    CLuaCFunctions::AddFunction ( "removeVehicleUpgrade", CLuaFunctionDefs::RemoveVehicleUpgrade );
-    CLuaCFunctions::AddFunction ( "setVehicleDoorState", CLuaFunctionDefs::SetVehicleDoorState );
-    CLuaCFunctions::AddFunction ( "setVehicleWheelStates", CLuaFunctionDefs::SetVehicleWheelStates );
-    CLuaCFunctions::AddFunction ( "setVehicleLightState", CLuaFunctionDefs::SetVehicleLightState );
-    CLuaCFunctions::AddFunction ( "setVehiclePanelState", CLuaFunctionDefs::SetVehiclePanelState );
-    CLuaCFunctions::AddFunction ( "setVehicleOverrideLights", CLuaFunctionDefs::SetVehicleOverrideLights );
-    CLuaCFunctions::AddFunction ( "attachTrailerToVehicle", CLuaFunctionDefs::AttachTrailerToVehicle );
-    CLuaCFunctions::AddFunction ( "detachTrailerFromVehicle", CLuaFunctionDefs::DetachTrailerFromVehicle );
-    CLuaCFunctions::AddFunction ( "setVehicleEngineState", CLuaFunctionDefs::SetVehicleEngineState );
-    CLuaCFunctions::AddFunction ( "setVehicleDirtLevel", CLuaFunctionDefs::SetVehicleDirtLevel );
-    CLuaCFunctions::AddFunction ( "setVehicleDamageProof", CLuaFunctionDefs::SetVehicleDamageProof );
-    CLuaCFunctions::AddFunction ( "setVehiclePaintjob", CLuaFunctionDefs::SetVehiclePaintjob );
-    CLuaCFunctions::AddFunction ( "setVehicleFuelTankExplodable", CLuaFunctionDefs::SetVehicleFuelTankExplodable );
-    CLuaCFunctions::AddFunction ( "setVehicleFrozen", CLuaFunctionDefs::SetVehicleFrozen );
-    CLuaCFunctions::AddFunction ( "setVehicleAdjustableProperty", CLuaFunctionDefs::SetVehicleAdjustableProperty );
-    CLuaCFunctions::AddFunction ( "setHelicopterRotorSpeed", CLuaFunctionDefs::SetHelicopterRotorSpeed );
-    CLuaCFunctions::AddFunction ( "setTrainDerailed", CLuaFunctionDefs::SetTrainDerailed );
-    CLuaCFunctions::AddFunction ( "setTrainDerailable", CLuaFunctionDefs::SetTrainDerailable );
-    CLuaCFunctions::AddFunction ( "setTrainDirection", CLuaFunctionDefs::SetTrainDirection );
-    CLuaCFunctions::AddFunction ( "setTrainSpeed", CLuaFunctionDefs::SetTrainSpeed );
-    CLuaCFunctions::AddFunction ( "setVehicleTaxiLightOn", CLuaFunctionDefs::SetVehicleTaxiLightOn );
-    CLuaCFunctions::AddFunction ( "setVehicleGravity", CLuaFunctionDefs::SetVehicleGravity );
-    CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", CLuaFunctionDefs::SetVehicleHeadLightColor );
-    CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", CLuaFunctionDefs::SetVehicleTurretPosition );
-    CLuaCFunctions::AddFunction ( "setVehicleDoorOpenRatio", CLuaFunctionDefs::SetVehicleDoorOpenRatio );
-    CLuaCFunctions::AddFunction ( "setVehicleSirens", CLuaFunctionDefs::SetVehicleSirens );
-    CLuaCFunctions::AddFunction ( "setVehicleComponentPosition", CLuaFunctionDefs::SetVehicleComponentPosition );
-    CLuaCFunctions::AddFunction ( "getVehicleComponentPosition", CLuaFunctionDefs::GetVehicleComponentPosition );
-    CLuaCFunctions::AddFunction ( "setVehicleComponentRotation", CLuaFunctionDefs::SetVehicleComponentRotation );
-    CLuaCFunctions::AddFunction ( "getVehicleComponentRotation", CLuaFunctionDefs::GetVehicleComponentRotation );
-    CLuaCFunctions::AddFunction ( "resetVehicleComponentPosition", CLuaFunctionDefs::ResetVehicleComponentPosition );
-    CLuaCFunctions::AddFunction ( "resetVehicleComponentRotation", CLuaFunctionDefs::ResetVehicleComponentRotation );
-    CLuaCFunctions::AddFunction ( "setVehicleComponentVisible", CLuaFunctionDefs::SetVehicleComponentVisible );
-    CLuaCFunctions::AddFunction ( "getVehicleComponentVisible", CLuaFunctionDefs::GetVehicleComponentVisible );
-    CLuaCFunctions::AddFunction ( "getVehicleComponents", CLuaFunctionDefs::GetVehicleComponents );
-    CLuaCFunctions::AddFunction ( "setVehicleNitroActivated", CLuaFunctionDefs::SetVehicleNitroActivated );
-    CLuaCFunctions::AddFunction ( "setVehicleNitroCount", CLuaFunctionDefs::SetVehicleNitroCount );
-    CLuaCFunctions::AddFunction ( "setVehicleNitroLevel", CLuaFunctionDefs::SetVehicleNitroLevel );
-    CLuaCFunctions::AddFunction ( "setVehiclePlateText", CLuaFunctionDefs::SetVehiclePlateText );
-    CLuaCFunctions::AddFunction ( "setHeliBladeCollisionsEnabled", CLuaFunctionDefs::SetHeliBladeCollisionsEnabled );
 
     // Object create/destroy funcs
     CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
@@ -1051,4 +937,5 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaPointLightDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
+    CLuaVehicleDefs::LoadFunctions ();
 }

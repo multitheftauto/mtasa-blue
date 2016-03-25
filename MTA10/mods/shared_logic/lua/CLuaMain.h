@@ -77,7 +77,6 @@ public:
     unsigned long                   GetElementCount         ( void ) const;
 
     void                            AddElementClass         ( lua_State* luaVM );
-    void                            AddVehicleClass         ( lua_State* luaVM );
     void                            AddPlayerClass          ( lua_State* luaVM );
     void                            AddObjectClass          ( lua_State* luaVM );
     void                            AddPickupClass          ( lua_State* luaVM );

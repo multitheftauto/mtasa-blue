@@ -55,6 +55,11 @@ void CLuaAudioDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSoundEffects", GetSoundEffects );
     CLuaCFunctions::AddFunction ( "setSoundPan", SetSoundPan );
     CLuaCFunctions::AddFunction ( "getSoundPan", GetSoundPan );
+
+    // Radio funcs
+    CLuaCFunctions::AddFunction ( "setRadioChannel", SetRadioChannel );
+    CLuaCFunctions::AddFunction ( "getRadioChannel", GetRadioChannel );
+    CLuaCFunctions::AddFunction ( "getRadioChannelName", GetRadioChannelName );
 }
 
 
@@ -1678,6 +1683,69 @@ int CLuaAudioDefs::GetSoundPan ( lua_State* luaVM )
         else if ( pPlayer && CStaticFunctionDefinitions::GetSoundPan ( *pPlayer, fPan ) )
         {
             lua_pushnumber ( luaVM, fPan );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+// Radio
+int CLuaAudioDefs::SetRadioChannel ( lua_State* luaVM )
+{
+    unsigned char ucChannel = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( ucChannel );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetRadioChannel ( ucChannel ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaAudioDefs::GetRadioChannel ( lua_State* luaVM )
+{
+    unsigned char ucChannel = 0;
+    if ( CStaticFunctionDefinitions::GetRadioChannel ( ucChannel ) )
+    {
+        lua_pushnumber ( luaVM, ucChannel );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaAudioDefs::GetRadioChannelName ( lua_State* luaVM )
+{
+    static const SFixedArray < const char*, 13 > szRadioStations = { {
+            "Radio off", "Playback FM", "K-Rose", "K-DST",
+            "Bounce FM", "SF-UR", "Radio Los Santos", "Radio X", "CSR 103.9", "K-Jah West",
+        "Master Sounds 98.3", "WCTR", "User Track Player" } };
+
+    int iChannel = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( iChannel );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( iChannel >= 0 && iChannel < NUMELMS ( szRadioStations ) )
+        {
+            lua_pushstring ( luaVM, szRadioStations[iChannel] );
             return 1;
         }
     }

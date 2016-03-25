@@ -115,6 +115,7 @@
 #include <luadefs/CLuaVector2Defs.h>
 #include <luadefs/CLuaVector3Defs.h>
 #include <luadefs/CLuaVector4Defs.h>
+#include <luadefs/CLuaVehicleDefs.h>
 #include <luadefs/CLuaMatrixDefs.h>
 #include <luadefs/CLuaSearchLightDefs.h>
 #include <luadefs/CLuaTaskDefs.h>
