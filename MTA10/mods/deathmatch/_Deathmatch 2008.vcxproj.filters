@@ -608,9 +608,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Player.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
@@ -933,6 +930,9 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaVehicleDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaPlayerDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1679,6 +1679,9 @@
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaVehicleDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaPlayerDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>

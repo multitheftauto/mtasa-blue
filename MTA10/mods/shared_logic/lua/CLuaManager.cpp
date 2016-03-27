@@ -329,30 +329,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setLowLODElement", CLuaFunctionDefs::SetLowLodElement );
     CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", CLuaFunctionDefs::SetElementCallPropagationEnabled );
 
-    // Player get funcs
-    CLuaCFunctions::AddFunction ( "getLocalPlayer", CLuaFunctionDefs::GetLocalPlayer );
-    CLuaCFunctions::AddFunction ( "getPlayerName", CLuaFunctionDefs::GetPlayerName );
-    CLuaCFunctions::AddFunction ( "getPlayerNametagText", CLuaFunctionDefs::GetPlayerNametagText );
-    CLuaCFunctions::AddFunction ( "getPlayerNametagColor", CLuaFunctionDefs::GetPlayerNametagColor );
-    CLuaCFunctions::AddFunction ( "isPlayerNametagShowing", CLuaFunctionDefs::IsPlayerNametagShowing );
-    CLuaCFunctions::AddFunction ( "getPlayerPing", CLuaFunctionDefs::GetPlayerPing );
-    CLuaCFunctions::AddFunction ( "getPlayerTeam", CLuaFunctionDefs::GetPlayerTeam );
-    CLuaCFunctions::AddFunction ( "getPlayerFromNick", CLuaFunctionDefs::GetPlayerFromName );
-    CLuaCFunctions::AddFunction ( "getPlayerFromName", CLuaFunctionDefs::GetPlayerFromName );
-    CLuaCFunctions::AddFunction ( "isPlayerHudComponentVisible", CLuaFunctionDefs::IsPlayerHudComponentVisible );
-    CLuaCFunctions::AddFunction ( "getPlayerMoney", CLuaFunctionDefs::GetPlayerMoney );
-    CLuaCFunctions::AddFunction ( "getPlayerWantedLevel", CLuaFunctionDefs::GetPlayerWantedLevel );
-
-    // Player set funcs
-    CLuaCFunctions::AddFunction ( "showPlayerHudComponent", CLuaFunctionDefs::ShowPlayerHudComponent );
-    CLuaCFunctions::AddFunction ( "setPlayerHudComponentVisible", CLuaFunctionDefs::ShowPlayerHudComponent );
-    CLuaCFunctions::AddFunction ( "setPlayerMoney", CLuaFunctionDefs::SetPlayerMoney );
-    CLuaCFunctions::AddFunction ( "givePlayerMoney", CLuaFunctionDefs::GivePlayerMoney );
-    CLuaCFunctions::AddFunction ( "takePlayerMoney", CLuaFunctionDefs::TakePlayerMoney );
-    CLuaCFunctions::AddFunction ( "setPlayerNametagText", CLuaFunctionDefs::SetPlayerNametagText );
-    CLuaCFunctions::AddFunction ( "setPlayerNametagColor", CLuaFunctionDefs::SetPlayerNametagColor );
-    CLuaCFunctions::AddFunction ( "setPlayerNametagShowing", CLuaFunctionDefs::SetPlayerNametagShowing );
-
     // Clothes and body functions
     CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefs::GetBodyPartName );
     CLuaCFunctions::AddFunction ( "getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex );
@@ -854,21 +830,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler );
     CLuaCFunctions::AddFunction ( "executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler );
 
-    // Community funcs
-    CLuaCFunctions::AddFunction ( "getPlayerUserName", CLuaFunctionDefs::GetPlayerUserName );
-    CLuaCFunctions::AddFunction ( "getPlayerSerial", CLuaFunctionDefs::GetPlayerSerial );
-
     // Utility vector math functions
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints2D", CLuaFunctionDefs::GetDistanceBetweenPoints2D );
     CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints3D", CLuaFunctionDefs::GetDistanceBetweenPoints3D );
     CLuaCFunctions::AddFunction ( "getEasingValue", CLuaFunctionDefs::GetEasingValue );
     CLuaCFunctions::AddFunction ( "interpolateBetween", CLuaFunctionDefs::InterpolateBetween );
-
-    // Map funcs
-    CLuaCFunctions::AddFunction ( "forcePlayerMap", CLuaFunctionDefs::ForcePlayerMap );
-    CLuaCFunctions::AddFunction ( "isPlayerMapForced", CLuaFunctionDefs::IsPlayerMapForced );
-    CLuaCFunctions::AddFunction ( "isPlayerMapVisible", CLuaFunctionDefs::IsPlayerMapVisible );
-    CLuaCFunctions::AddFunction ( "getPlayerMapBoundingBox", CLuaFunctionDefs::GetPlayerMapBoundingBox );
 
     // Utility
     CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefs::Md5 );
@@ -934,6 +900,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaFxDefs::LoadFunctions ();
     CLuaMarkerDefs::LoadFunctions ();
     CLuaPedDefs::LoadFunctions ();
+    CLuaPlayerDefs::LoadFunctions ();
     CLuaPointLightDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();

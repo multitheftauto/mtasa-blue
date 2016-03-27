@@ -159,28 +159,6 @@ public:
     LUA_DECLARE ( SetLowLodElement );
     LUA_DECLARE ( SetElementCallPropagationEnabled );
 
-    // Player get functions
-    LUA_DECLARE ( GetLocalPlayer );
-    LUA_DECLARE ( GetPlayerName );
-    LUA_DECLARE ( GetPlayerFromName );
-    LUA_DECLARE ( GetPlayerNametagText );
-    LUA_DECLARE ( GetPlayerNametagColor );
-    LUA_DECLARE ( IsPlayerNametagShowing );
-    LUA_DECLARE ( GetPlayerPing );
-    LUA_DECLARE ( GetPlayerTeam );
-    LUA_DECLARE ( GetPlayerMoney );
-    LUA_DECLARE ( GetPlayerWantedLevel );
-    
-    // Player set funcs
-    LUA_DECLARE ( ShowPlayerHudComponent );
-    LUA_DECLARE ( IsPlayerHudComponentVisible );
-    LUA_DECLARE ( SetPlayerMoney );
-    LUA_DECLARE ( GivePlayerMoney );
-    LUA_DECLARE ( TakePlayerMoney );
-    LUA_DECLARE ( SetPlayerNametagText );
-    LUA_DECLARE ( SetPlayerNametagColor );
-    LUA_DECLARE ( SetPlayerNametagShowing );
-
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );
     LUA_DECLARE ( GetClothesByTypeIndex );
@@ -666,21 +644,11 @@ public:
     LUA_DECLARE ( RemoveCommandHandler );
     LUA_DECLARE ( ExecuteCommandHandler );
 
-    // Community funcs
-    LUA_DECLARE ( GetPlayerUserName );
-    LUA_DECLARE ( GetPlayerSerial );
-
     // Utility vector math functions
     LUA_DECLARE ( GetDistanceBetweenPoints2D );
     LUA_DECLARE ( GetDistanceBetweenPoints3D );
     LUA_DECLARE ( GetEasingValue );
     LUA_DECLARE ( InterpolateBetween );
-
-    // Map funcs
-    LUA_DECLARE ( ForcePlayerMap );
-    LUA_DECLARE ( IsPlayerMapForced );
-    LUA_DECLARE ( IsPlayerMapVisible );
-    LUA_DECLARE ( GetPlayerMapBoundingBox );
 
     // Utility
     LUA_DECLARE ( Md5 );
