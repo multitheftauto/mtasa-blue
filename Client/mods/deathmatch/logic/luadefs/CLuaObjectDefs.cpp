@@ -123,7 +123,7 @@ int CLuaObjectDefs::IsObjectStatic ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         bool bStatic;
-        if ( CStaticFunctionDefinitions::IsObjectStatic ( *pObject, bStatic ) )
+        if ( CStaticFunctionDefinitions::IsElementFrozen ( *pObject, bStatic ) )
         {
             lua_pushboolean ( luaVM, bStatic );
             return 1;

@@ -38,7 +38,7 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
 
     m_usModel = usModel;
     m_bIsVisible = true;
-    m_bIsStatic = false;
+    m_bIsFrozen = false;
     m_bUsesCollision = true;
     m_ucAlpha = 255;
     m_vecScale = CVector ( 1.0f, 1.0f, 1.0f );
@@ -339,10 +339,18 @@ void CClientObject::Render ( void )
 }
 
 
-void CClientObject::SetStatic ( bool bStatic )
+void CClientObject::SetFrozen ( bool bFrozen )
 {
-    m_bIsStatic = bStatic;
-    StreamOutForABit ( );
+    m_bIsFrozen = bFrozen;
+    if ( m_pObject )
+        m_pObject->SetFrozen ( bFrozen );
+
+    if ( bFrozen )
+    {
+        CVector vecZero;
+        SetMoveSpeed ( vecZero );
+        SetTurnSpeed ( vecZero );
+    }
 }
 
 
@@ -502,9 +510,6 @@ void CClientObject::Create ( void )
                 // Add XRef
                 g_pClientGame->GetGameEntityXRefManager ()->AddEntityXRef ( this, m_pObject );
 
-                // If set to true,this has the effect of forcing the object to be static at all times
-                m_pObject->SetStaticWaitingForCollision ( m_bIsStatic );
-
                 // Apply our data to the object
                 m_pObject->Teleport ( m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ );
                 m_pObject->SetOrientation ( m_vecRotation.fX, m_vecRotation.fY, m_vecRotation.fZ );
@@ -512,6 +517,7 @@ void CClientObject::Create ( void )
                 m_pObject->ProcessCollision ();
                 #endif
                 m_pObject->SetupLighting ();
+                m_pObject->SetFrozen ( m_bIsFrozen );
 
                 UpdateVisibility ();
                 if ( !m_bUsesCollision ) SetCollisionEnabled ( false );
@@ -612,9 +618,8 @@ void CClientObject::StreamedInPulse ( void )
         UpdateVisibility ();
     }
 
-
-    // Are we not a static object (allowed to move by physics)
-    if ( !m_bIsStatic )
+    // Are we not frozen
+    if ( !m_bIsFrozen )
     {
         // Grab our actual position (as GTA moves it too)
         CVector vecPosition = *m_pObject->GetPosition ();
@@ -651,6 +656,28 @@ void CClientObject::SetMoveSpeed ( const CVector& vecMoveSpeed )
         m_pObject->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
     }
     m_vecMoveSpeed = vecMoveSpeed;
+}
+
+
+void CClientObject::GetTurnSpeed ( CVector& vecTurnSpeed ) const
+{
+    if ( m_pObject )
+    {
+        m_pObject->GetTurnSpeed ( &vecTurnSpeed );
+    }
+    else
+    {
+        vecTurnSpeed = m_vecTurnSpeed;
+    }
+}
+
+void CClientObject::SetTurnSpeed ( const CVector& vecTurnSpeed )
+{
+    if ( m_pObject )
+    {
+        m_pObject->SetTurnSpeed ( const_cast < CVector* > ( &vecTurnSpeed ) );
+    }
+    m_vecTurnSpeed = vecTurnSpeed;
 }
 
 

@@ -370,3 +370,10 @@ void CPhysicalSA::SetLighting ( float fLighting )
     CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
     pInterface->m_fLighting = fLighting;
 }
+
+void CPhysicalSA::SetFrozen ( bool bFrozen )
+{
+    CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
+    pInterface->bDisableMovement = bFrozen;
+    pInterface->bDisableFriction = bFrozen;
+}
