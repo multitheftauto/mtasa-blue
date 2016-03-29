@@ -370,6 +370,7 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaBlipDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaBrowserDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaMarkerDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaObjectDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPlayerDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPointLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPedDefs.cpp" />
@@ -575,7 +576,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Event.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.GUI.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Input.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Object.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp" />
@@ -764,6 +764,7 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaBlipDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaBrowserDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaMarkerDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaObjectDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPlayerDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPointLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPedDefs.h" />

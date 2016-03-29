@@ -261,33 +261,6 @@ void CLuaMain::AddElementClass ( lua_State* luaVM )
 }
 
 
-void CLuaMain::AddObjectClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "createObject" );
-    lua_classfunction ( luaVM, "move", "moveObject" );
-    lua_classfunction ( luaVM, "stop", "stopObject" );
-    lua_classfunction ( luaVM, "break", "breakObject" );
-    lua_classfunction ( luaVM, "respawn", "respawnObject" );
-    lua_classfunction ( luaVM, "toggleObjectRespawn", "toggleObjectRespawn" );
-    
-    lua_classfunction ( luaVM, "getScale", "getObjectScale" );
-    lua_classfunction ( luaVM, "isBreakable", "isObjectBreakable" );
-    lua_classfunction ( luaVM, "getMass", "getObjectMass" );
-
-    lua_classfunction ( luaVM, "setScale", "setObjectScale" );
-    lua_classfunction ( luaVM, "setBreakable", "setObjectBreakable" );
-    lua_classfunction ( luaVM, "setMass", "setObjectMass" );
-    
-    lua_classvariable ( luaVM, "scale", "setObjectScale", "getObjectScale" );
-    lua_classvariable ( luaVM, "breakable", "setObjectBreakable", "isObjectBreakable" );
-    lua_classvariable ( luaVM, "mass", "setObjectMass", "getObjectMass" );
-
-    lua_registerclass ( luaVM, "Object", "Element" );
-}
-
-
 void CLuaMain::AddPickupClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1147,7 +1120,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
         return;
 
     AddElementClass             ( luaVM );
-    AddObjectClass              ( luaVM );
     AddPickupClass              ( luaVM );
     AddColShapeClass            ( luaVM );
     AddProjectileClass          ( luaVM );
@@ -1196,6 +1168,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddCameraClass              ( luaVM );
     CLuaFileDefs::AddClass ( luaVM );
     CLuaMarkerDefs::AddClass ( luaVM );
+    CLuaObjectDefs::AddClass ( luaVM );
     CLuaPedDefs::AddClass ( luaVM );
     CLuaPlayerDefs::AddClass ( luaVM );
     CLuaPointLightDefs::AddClass ( luaVM );

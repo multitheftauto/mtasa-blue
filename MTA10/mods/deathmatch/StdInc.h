@@ -111,6 +111,7 @@
 #include <luadefs/CLuaBrowserDefs.h>
 #include <luadefs/CLuaClassDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
+#include <luadefs/CLuaObjectDefs.h>
 #include <luadefs/CLuaPointLightDefs.h>
 #include <luadefs/CLuaPedDefs.h>
 #include <luadefs/CLuaPlayerDefs.h>
