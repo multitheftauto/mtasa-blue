@@ -351,9 +351,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Give a default value for the streaming memory
     if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
         g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
-
-    // Create tray icon
-    g_pCore->GetTrayIcon( )->CreateTrayIcon ( );
 }
 
 
@@ -503,9 +500,6 @@ CClientGame::~CClientGame ( void )
 
     // Delete PerfStatManager
     delete CClientPerfStatManager::GetSingleton ();
-
-    // Destroy tray icon
-    g_pCore->GetTrayIcon( )->DestroyTrayIcon ( );
 
     // NULL the global CClientGame var
     g_pClientGame = NULL;

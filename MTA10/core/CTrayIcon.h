@@ -20,7 +20,7 @@ public:
                         ~CTrayIcon              ( void );
     bool                DoesTrayIconExist       ( void ) { return m_bTrayIconExists; };
     bool                CreateTrayIcon          ( void );
-    bool                DestroyTrayIcon         ( void );
+    void                DestroyTrayIcon         ( void );
     bool                CreateTrayBallon        ( SString strText, eTrayIconType trayIconType, bool useSound );
 private:
     NOTIFYICONDATAW*    m_pNID;

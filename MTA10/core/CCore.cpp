@@ -1374,6 +1374,9 @@ void CCore::OnModUnload ( )
 
     // Clear web whitelist
     m_pWebCore->ResetFilter ();
+
+    // Destroy tray icon
+    m_pTrayIcon->DestroyTrayIcon ( );
 }
 
 
