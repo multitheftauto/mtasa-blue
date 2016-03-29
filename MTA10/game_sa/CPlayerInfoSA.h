@@ -20,7 +20,6 @@
 #include "Common.h"
 #include "CPlayerPedSA.h"
 
-#define FUNC_MakePlayerSafe                         0x56e870
 #define FUNC_CancelPlayerEnteringCars               0x56e860
 #define FUNC_ArrestPlayer                           0x56e5d0
 #define FUNC_KillPlayer                             0x56e580
@@ -282,7 +281,6 @@ public:
     short           GetLastTimeEaten ( void );
     void            SetLastTimeEaten ( short sTime );
 
-    VOID            MakePlayerSafe ( BOOL boolSafe );
     VOID            CancelPlayerEnteringCars ( CVehicle * vehicle );
     VOID            ArrestPlayer (  );
     VOID            KillPlayer (  );
