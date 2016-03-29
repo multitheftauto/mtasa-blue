@@ -106,6 +106,7 @@
 #include <CScriptArgReader.h>
 #include <luadefs/CLuaDefs.h>
 #include <luadefs/CLuaAudioDefs.h>
+#include <luadefs/CLuaBitDefs.h>
 #include <luadefs/CLuaBlipDefs.h>
 #include <luadefs/CLuaBrowserDefs.h>
 #include <luadefs/CLuaClassDefs.h>
