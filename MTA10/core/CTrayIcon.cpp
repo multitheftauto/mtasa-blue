@@ -33,7 +33,7 @@ CTrayIcon::CTrayIcon ( void )
 
 CTrayIcon::~CTrayIcon ( void )
 {
-    if (m_bTrayIconExists)
+    if ( m_bTrayIconExists )
         DestroyTrayIcon ( );
 
     delete m_pNID;
@@ -103,6 +103,5 @@ bool CTrayIcon::CreateTrayBallon ( SString strText, eTrayIconType trayIconType, 
     if ( !useSound )
         m_pNID->dwInfoFlags |= NIIF_NOSOUND;
 
-    Shell_NotifyIconW ( NIM_MODIFY, m_pNID );
-    return true;
+    return Shell_NotifyIconW ( NIM_MODIFY, m_pNID ) == TRUE;
 }
