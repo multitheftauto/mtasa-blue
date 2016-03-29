@@ -165,27 +165,6 @@ public:
     LUA_DECLARE ( GetTypeIndexFromClothes );
     LUA_DECLARE ( GetClothesTypeName );
 
-    // Object create funcs
-    LUA_DECLARE ( CreateObject );
-    
-    // Object get funcs
-    LUA_DECLARE ( IsObjectStatic );
-    LUA_DECLARE ( GetObjectScale );
-    LUA_DECLARE ( IsObjectBreakable );
-    LUA_DECLARE ( GetObjectMass );
-
-    // Object set funcs
-    LUA_DECLARE ( SetObjectRotation );
-    LUA_DECLARE ( MoveObject );
-    LUA_DECLARE ( StopObject );
-    LUA_DECLARE ( SetObjectScale );
-    LUA_DECLARE ( SetObjectStatic );
-    LUA_DECLARE ( SetObjectBreakable );
-    LUA_DECLARE ( BreakObject );
-    LUA_DECLARE ( RespawnObject );
-    LUA_DECLARE ( ToggleObjectRespawn );
-    LUA_DECLARE ( SetObjectMass );
-
     // Explosion functions
     LUA_DECLARE ( CreateExplosion );
 

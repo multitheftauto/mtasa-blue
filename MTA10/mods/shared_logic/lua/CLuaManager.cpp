@@ -197,8 +197,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehicleModel", CLuaFunctionDefs::GetElementModel );
     CLuaCFunctions::AddFunction ( "getPedSkin", CLuaFunctionDefs::GetElementModel );
     CLuaCFunctions::AddFunction ( "setPedSkin", CLuaFunctionDefs::SetElementModel );
-    CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaFunctionDefs::GetElementRotation );
-    CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaFunctionDefs::SetElementRotation );
+    CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaObjectDefs::GetElementRotation );
+    CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaObjectDefs::SetElementRotation );
     CLuaCFunctions::AddFunction ( "getVehicleIDFromName", CLuaVehicleDefs::GetVehicleModelFromName );    
     CLuaCFunctions::AddFunction ( "getVehicleID", CLuaFunctionDefs::GetElementModel );    
     CLuaCFunctions::AddFunction ( "getVehicleRotation", CLuaFunctionDefs::GetElementRotation );
@@ -334,26 +334,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex );
     CLuaCFunctions::AddFunction ( "getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes );
     CLuaCFunctions::AddFunction ( "getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName );
-
-    // Object create/destroy funcs
-    CLuaCFunctions::AddFunction ( "createObject", CLuaFunctionDefs::CreateObject );
-
-    // Object get funcs
-    CLuaCFunctions::AddFunction ( "isObjectStatic", CLuaFunctionDefs::IsObjectStatic );
-    CLuaCFunctions::AddFunction ( "getObjectScale", CLuaFunctionDefs::GetObjectScale );
-    CLuaCFunctions::AddFunction ( "isObjectBreakable", CLuaFunctionDefs::IsObjectBreakable );
-    CLuaCFunctions::AddFunction ( "getObjectMass", CLuaFunctionDefs::GetObjectMass );
-
-    // Object set funcs
-    CLuaCFunctions::AddFunction ( "moveObject", CLuaFunctionDefs::MoveObject );
-    CLuaCFunctions::AddFunction ( "stopObject", CLuaFunctionDefs::StopObject );
-    CLuaCFunctions::AddFunction ( "setObjectScale", CLuaFunctionDefs::SetObjectScale );
-    CLuaCFunctions::AddFunction ( "setObjectStatic", CLuaFunctionDefs::SetObjectStatic );
-    CLuaCFunctions::AddFunction ( "setObjectBreakable", CLuaFunctionDefs::SetObjectBreakable );
-    CLuaCFunctions::AddFunction ( "breakObject", CLuaFunctionDefs::BreakObject );
-    CLuaCFunctions::AddFunction ( "respawnObject", CLuaFunctionDefs::RespawnObject );
-    CLuaCFunctions::AddFunction ( "toggleObjectRespawn", CLuaFunctionDefs::ToggleObjectRespawn );
-    CLuaCFunctions::AddFunction ( "setObjectMass", CLuaFunctionDefs::SetObjectMass );
 
     // Explosion funcs
     CLuaCFunctions::AddFunction ( "createExplosion", CLuaFunctionDefs::CreateExplosion );
@@ -886,6 +866,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();
     CLuaMarkerDefs::LoadFunctions ();
+    CLuaObjectDefs::LoadFunctions ();
     CLuaPedDefs::LoadFunctions ();
     CLuaPlayerDefs::LoadFunctions ();
     CLuaPointLightDefs::LoadFunctions ();
