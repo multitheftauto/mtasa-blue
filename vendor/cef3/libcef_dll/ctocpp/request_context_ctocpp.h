@@ -18,6 +18,7 @@
 #pragma message("Warning: "__FILE__" may be accessed wrapper-side only")
 #else  // USING_CEF_SHARED
 
+#include <vector>
 #include "include/cef_request_context.h"
 #include "include/capi/cef_request_context_capi.h"
 #include "include/cef_scheme.h"
@@ -52,6 +53,13 @@ class CefRequestContextCToCpp
   bool CanSetPreference(const CefString& name) OVERRIDE;
   bool SetPreference(const CefString& name, CefRefPtr<CefValue> value,
       CefString& error) OVERRIDE;
+  void ClearCertificateExceptions(
+      CefRefPtr<CefCompletionCallback> callback) OVERRIDE;
+  void CloseAllConnections(CefRefPtr<CefCompletionCallback> callback) OVERRIDE;
+  void ResolveHost(const CefString& origin,
+      CefRefPtr<CefResolveCallback> callback) OVERRIDE;
+  cef_errorcode_t ResolveHostCached(const CefString& origin,
+      std::vector<CefString>& resolved_ips) OVERRIDE;
 };
 
 #endif  // USING_CEF_SHARED
