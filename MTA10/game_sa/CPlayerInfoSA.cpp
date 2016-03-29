@@ -93,22 +93,6 @@ VOID CPlayerInfoSA::StreamParachuteWeapon ( bool bAllowParachute )
 }
 
 /**
- * Not really sure what this does?
- * \todo Find out what this function actually does.
- * @param boolSafe TRUE if the player is to be made safe, FALSE to make them unsafe
- */
-VOID CPlayerInfoSA::MakePlayerSafe ( BOOL boolSafe )
-{
-    DEBUG_TRACE("VOID CPlayerInfoSA::MakePlayerSafe ( BOOL boolSafe )");
-    DWORD dwFunction = FUNC_MakePlayerSafe;
-    _asm
-    {
-        push    boolSafe
-        call    dwFunction
-    }
-}
-
-/**
  * Stop the player entering a specific car
  * @param vehicle The vehicle you want to stop them entering
  * \todo Find out what this really does...
