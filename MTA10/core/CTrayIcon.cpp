@@ -33,6 +33,9 @@ CTrayIcon::CTrayIcon ( void )
 
 CTrayIcon::~CTrayIcon ( void )
 {
+    if (m_bTrayIconExists)
+        DestroyTrayIcon ( );
+
     delete m_pNID;
 }
 
@@ -49,20 +52,20 @@ bool CTrayIcon::CreateTrayIcon ( void )
     m_pNID->hWnd      = g_pCore->GetHookedWindow ( );
     m_pNID->uFlags    = NIF_ICON | NIF_TIP;
     m_pNID->hIcon     = ( hIcon != NULL ) ? ( ( HICON ) hIcon ) : LoadIcon ( NULL, IDI_APPLICATION );
-    m_bTrayIconExists = Shell_NotifyIconW ( NIM_ADD, m_pNID ) == S_OK;
-
+    m_bTrayIconExists = Shell_NotifyIconW ( NIM_ADD, m_pNID ) == TRUE;
+   
     return m_bTrayIconExists;
 }
 
-bool CTrayIcon::DestroyTrayIcon ( void )
+void CTrayIcon::DestroyTrayIcon ( void )
 {
     if ( !m_bTrayIconExists )
-        return true;
+        return;
 
+    m_pNID->uFlags      = 0;
+    m_pNID->dwInfoFlags = 0;
     Shell_NotifyIconW ( NIM_DELETE, m_pNID );
-    m_bTrayIconExists = false;
-
-    return true;
+    m_bTrayIconExists   = false;
 }
 
 bool CTrayIcon::CreateTrayBallon ( SString strText, eTrayIconType trayIconType, bool useSound )
