@@ -13,7 +13,8 @@
 #include <strsafe.h>
 #include "resource.h"
 
-#define TRAY_MTA_TITLE          L"Multi Theft Auto: San Andreas"
+#define TRAY_BALLOON_TITLE      L"Notification from MTA:SA server"
+#define TRAY_ICON_TOOLTIP_TEXT  L"Multi Theft Auto: San Andreas"
 #define TRAY_BALLOON_INTERVAL   750L // ms
 
 extern CCore* g_pCore;
@@ -27,8 +28,8 @@ CTrayIcon::CTrayIcon ( void )
     m_pNID->cbSize  = sizeof ( NOTIFYICONDATAW );
     m_pNID->uID     = 0;
     
-    StringCchCopyW ( m_pNID->szTip, ARRAYSIZE ( m_pNID->szTip ), TRAY_MTA_TITLE );
-    StringCchCopyW ( m_pNID->szInfoTitle, ARRAYSIZE ( m_pNID->szInfoTitle ), TRAY_MTA_TITLE );
+    StringCchCopyW ( m_pNID->szTip, ARRAYSIZE ( m_pNID->szTip ), TRAY_ICON_TOOLTIP_TEXT );
+    StringCchCopyW ( m_pNID->szInfoTitle, ARRAYSIZE ( m_pNID->szInfoTitle ), TRAY_BALLOON_TITLE );
 }
 
 CTrayIcon::~CTrayIcon ( void )
