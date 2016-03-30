@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-int CLuaOOPDefs::GetVehicleGravity ( lua_State* luaVM )
+int CLuaVehicleDefs::OOP_GetVehicleGravity ( lua_State* luaVM )
 {
     CClientVehicle* pVehicle = NULL;
 
@@ -33,7 +33,7 @@ int CLuaOOPDefs::GetVehicleGravity ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaOOPDefs::GetVehicleTurnVelocity ( lua_State* luaVM )
+int CLuaVehicleDefs::OOP_GetVehicleTurnVelocity ( lua_State* luaVM )
 {
     CClientVehicle* pVehicle;
 

@@ -12,16 +12,9 @@ template < class T >
 class CDuplicateLineFilter
 {
 public:
-    struct SLine
+    struct SOutputLine : public T
     {
-        SString strText;
-        T       extraData;
-        bool    operator == ( const SLine& other ) const        { return strText == other.strText && extraData == other.extraData; }
-    };
-
-    struct SOutputLine : SLine
-    {
-                SOutputLine ( const SLine& line, uint uiCount ) : SLine( line ), uiDupCount( uiCount ) {}
+                SOutputLine ( const T& line, uint uiCount ) : T( line ), uiDupCount( uiCount ) {}
         uint    uiDupCount;
     };
 
@@ -37,10 +30,8 @@ public:
     // AddLine
     //
     //////////////////////////////////////////////////////////
-    void AddLine( const SString& strText, const T& extraData )
+    void AddLine( const T& line )
     {
-        SLine line = { strText, extraData };
-
         if ( m_bIsMatching == false )
         {
             // Not currently matching
@@ -129,7 +120,7 @@ public:
     // AddLineToOutputBuffer
     //
     //////////////////////////////////////////////////////////
-    void AddLineToOutputBuffer( const SLine& line, uint uiDupCount = 0 )
+    void AddLineToOutputBuffer( const T& line, uint uiDupCount = 0 )
     {
         m_PendingOutput.push_back( SOutputLine( line, uiDupCount ) );
     }
@@ -142,7 +133,7 @@ public:
     // Returns true if has populated values
     //
     //////////////////////////////////////////////////////////
-    bool PopOutputLine( SString& strOutLine, T& outExtraData )
+    bool PopOutputLine( T& outLine )
     {
         if ( m_PendingOutput.empty() )
         {
@@ -154,16 +145,15 @@ public:
         m_tLastOutputTime = time( NULL );
 
         const SOutputLine& line = m_PendingOutput.front();
-        strOutLine = line.strText;
-        outExtraData = line.extraData;
+        outLine = line;
         if ( line.uiDupCount > 1 )
-            strOutLine += SString( "  [DUP x%u]", line.uiDupCount );
+            static_cast < SString& > ( outLine ) += SString( "  [DUP x%u]", line.uiDupCount );
         m_PendingOutput.pop_front();
         return true;
     }
 
 protected:
-    std::deque < SLine >        m_History;
+    std::deque < T >            m_History;
     std::list < SOutputLine >   m_PendingOutput;
     bool                        m_bIsMatching;              // true if matching a duplicate set
     uint                        m_uiMatchSize;              // Number of lines in active match

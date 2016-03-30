@@ -77,18 +77,12 @@ public:
     unsigned long                   GetElementCount         ( void ) const;
 
     void                            AddElementClass         ( lua_State* luaVM );
-    void                            AddVehicleClass         ( lua_State* luaVM );
-    void                            AddPlayerClass          ( lua_State* luaVM );
-    void                            AddObjectClass          ( lua_State* luaVM );
-    void                            AddMarkerClass          ( lua_State* luaVM );
-    void                            AddBlipClass            ( lua_State* luaVM );
     void                            AddPickupClass          ( lua_State* luaVM );
     void                            AddColShapeClass        ( lua_State* luaVM );
     void                            AddProjectileClass      ( lua_State* luaVM );
     void                            AddRadarAreaClass       ( lua_State* luaVM );
     void                            AddTeamClass            ( lua_State* luaVM );
     void                            AddWaterClass           ( lua_State* luaVM );
-    void                            AddSoundClass           ( lua_State* luaVM );
     void                            AddWeaponClass          ( lua_State* luaVM );
     void                            AddEffectClass          ( lua_State* luaVM );
 

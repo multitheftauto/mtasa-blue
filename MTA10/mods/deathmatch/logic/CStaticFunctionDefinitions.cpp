@@ -6879,13 +6879,17 @@ CClientProjectile * CStaticFunctionDefinitions::CreateProjectile ( CResource& Re
                 case WEAPONTYPE_FREEFALL_BOMB:
                 case WEAPONTYPE_REMOTE_SATCHEL_CHARGE:
                 {
-                    CClientProjectile * pProjectile = m_pProjectileManager->Create ( &Creator, weaponType, vecOrigin, fForce, NULL, pTarget );
-                    if ( pProjectile )
+                    // Valid model ID? (0 means projectile will use default model)
+                    if ( usModel == 0 || CClientObjectManager::IsValidModel ( usModel ) )
                     {
-                        // Set our intiation data, which will be used on the next frame
-                        pProjectile->Initiate ( vecOrigin, vecRotation, vecVelocity, usModel );
-                        pProjectile->SetParent ( Resource.GetResourceDynamicEntity() );
-                        return pProjectile;
+                        CClientProjectile * pProjectile = m_pProjectileManager->Create ( &Creator, weaponType, vecOrigin, fForce, NULL, pTarget );
+                        if ( pProjectile )
+                        {
+                            // Set our intiation data, which will be used on the next frame
+                            pProjectile->Initiate ( vecOrigin, vecRotation, vecVelocity, usModel );
+                            pProjectile->SetParent ( Resource.GetResourceDynamicEntity() );
+                            return pProjectile;
+                        }
                     }
                     break;
                 }

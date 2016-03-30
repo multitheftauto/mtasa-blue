@@ -73,37 +73,6 @@ public:
     // Misc functions
     LUA_DECLARE ( DownloadFile );
 
-    // Sound effects and synth functions
-    LUA_DECLARE ( PlaySound );
-    LUA_DECLARE ( PlaySound3D );
-    LUA_DECLARE ( StopSound );
-    LUA_DECLARE ( SetSoundPosition );
-    LUA_DECLARE ( GetSoundPosition );
-    LUA_DECLARE ( GetSoundLength );
-    LUA_DECLARE ( SetSoundPaused );
-    LUA_DECLARE ( IsSoundPaused );
-    LUA_DECLARE ( SetSoundVolume );
-    LUA_DECLARE ( GetSoundVolume );
-    LUA_DECLARE ( SetSoundSpeed );
-    LUA_DECLARE ( GetSoundSpeed );
-    LUA_DECLARE ( SetSoundProperties );
-    LUA_DECLARE ( GetSoundProperties );
-    LUA_DECLARE ( GetSoundFFTData );
-    LUA_DECLARE ( GetSoundWaveData );
-    LUA_DECLARE ( SetSoundPanEnabled );
-    LUA_DECLARE ( IsSoundPanEnabled );
-    LUA_DECLARE ( GetSoundLevelData );
-    LUA_DECLARE ( GetSoundBPM );
-    LUA_DECLARE ( SetSoundMinDistance );
-    LUA_DECLARE ( GetSoundMinDistance );
-    LUA_DECLARE ( SetSoundMaxDistance );
-    LUA_DECLARE ( GetSoundMaxDistance );
-    LUA_DECLARE ( GetSoundMetaTags );
-    LUA_DECLARE ( SetSoundEffectEnabled );
-    LUA_DECLARE ( GetSoundEffects );
-    LUA_DECLARE ( SetSoundPan );
-    LUA_DECLARE ( GetSoundPan );
-
     // Output functions
     LUA_DECLARE ( OutputConsole );
     LUA_DECLARE ( OutputChatBox );
@@ -190,228 +159,17 @@ public:
     LUA_DECLARE ( SetLowLodElement );
     LUA_DECLARE ( SetElementCallPropagationEnabled );
 
-    // Radio functions
-    LUA_DECLARE ( SetRadioChannel );
-    LUA_DECLARE ( GetRadioChannel );
-    LUA_DECLARE ( GetRadioChannelName );
-
-    // Player get functions
-    LUA_DECLARE ( GetLocalPlayer );
-    LUA_DECLARE ( GetPlayerName );
-    LUA_DECLARE ( GetPlayerFromName );
-    LUA_DECLARE ( GetPlayerNametagText );
-    LUA_DECLARE ( GetPlayerNametagColor );
-    LUA_DECLARE ( IsPlayerNametagShowing );
-    LUA_DECLARE ( GetPlayerPing );
-    LUA_DECLARE ( GetPlayerTeam );
-    LUA_DECLARE ( GetPlayerMoney );
-    LUA_DECLARE ( GetPlayerWantedLevel );
-    
-    // Player set funcs
-    LUA_DECLARE ( ShowPlayerHudComponent );
-    LUA_DECLARE ( IsPlayerHudComponentVisible );
-    LUA_DECLARE ( SetPlayerMoney );
-    LUA_DECLARE ( GivePlayerMoney );
-    LUA_DECLARE ( TakePlayerMoney );
-    LUA_DECLARE ( SetPlayerNametagText );
-    LUA_DECLARE ( SetPlayerNametagColor );
-    LUA_DECLARE ( SetPlayerNametagShowing );
-
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );
     LUA_DECLARE ( GetClothesByTypeIndex );
     LUA_DECLARE ( GetTypeIndexFromClothes );
     LUA_DECLARE ( GetClothesTypeName );
 
-    // Vehicle get functions
-    LUA_DECLARE ( CreateVehicle );
-
-    LUA_DECLARE ( GetVehicleType );
-    LUA_DECLARE ( GetVehicleVariant );
-    LUA_DECLARE ( GetVehicleColor );
-    LUA_DECLARE ( GetModel );
-    LUA_DECLARE ( GetVehicleModelFromName );
-    LUA_DECLARE ( GetVehicleLandingGearDown );
-    LUA_DECLARE ( GetVehicleMaxPassengers );
-    LUA_DECLARE ( GetVehicleOccupant );
-    LUA_DECLARE ( GetVehicleOccupants );
-    LUA_DECLARE ( GetVehicleController );
-    LUA_DECLARE ( GetVehicleRotation );
-    LUA_DECLARE ( GetVehicleSirensOn );
-    LUA_DECLARE ( GetVehicleTurnVelocity );
-    LUA_DECLARE ( GetVehicleTurretPosition );
-    LUA_DECLARE ( IsVehicleLocked );
-    LUA_DECLARE ( GetVehicleUpgradeOnSlot );
-    LUA_DECLARE ( GetVehicleUpgrades );
-    LUA_DECLARE ( GetVehicleUpgradeSlotName );
-    LUA_DECLARE ( GetVehicleCompatibleUpgrades );
-    LUA_DECLARE ( GetVehicleWheelStates );
-    LUA_DECLARE ( GetVehicleDoorState );
-    LUA_DECLARE ( GetVehicleLightState );
-    LUA_DECLARE ( GetVehiclePanelState );
-    LUA_DECLARE ( GetVehicleOverrideLights );
-    LUA_DECLARE ( GetVehicleTowedByVehicle );
-    LUA_DECLARE ( GetVehicleTowingVehicle );
-    LUA_DECLARE ( GetVehiclePaintjob );
-    LUA_DECLARE ( GetVehiclePlateText );
-    LUA_DECLARE ( IsVehicleDamageProof );
-    LUA_DECLARE ( IsVehicleFuelTankExplodable );
-    LUA_DECLARE ( IsVehicleFrozen );
-    LUA_DECLARE ( IsVehicleOnGround );
-    LUA_DECLARE ( GetVehicleName );
-    LUA_DECLARE ( GetVehicleNameFromModel );
-    LUA_DECLARE ( GetVehicleAdjustableProperty );
-    LUA_DECLARE ( GetHelicopterRotorSpeed );
-    LUA_DECLARE ( GetVehicleEngineState );
-    LUA_DECLARE ( IsTrainDerailed );
-    LUA_DECLARE ( IsTrainDerailable );
-    LUA_DECLARE ( GetTrainDirection );
-    LUA_DECLARE ( GetTrainSpeed );
-    LUA_DECLARE ( GetTrainTrack );
-    LUA_DECLARE ( GetTrainPosition );
-    LUA_DECLARE ( IsTrainChainEngine );
-    LUA_DECLARE ( GetVehicleGravity );
-    LUA_DECLARE ( IsVehicleBlown );
-    LUA_DECLARE ( GetVehicleHeadLightColor );
-    LUA_DECLARE ( GetVehicleCurrentGear );
-    LUA_DECLARE ( GetVehicleHandling );
-    LUA_DECLARE ( GetOriginalHandling )
-    LUA_DECLARE ( GetVehicleDoorOpenRatio );
-    LUA_DECLARE ( IsVehicleNitroRecharging );
-    LUA_DECLARE ( IsVehicleNitroActivated );
-    LUA_DECLARE ( GetVehicleNitroCount );
-    LUA_DECLARE ( GetVehicleNitroLevel );
-    LUA_DECLARE ( GetHeliBladeCollisionsEnabled );
-    LUA_DECLARE ( IsVehicleWindowOpen );
-
-    // Vehicle set functions
-    LUA_DECLARE ( FixVehicle );
-    LUA_DECLARE ( BlowVehicle );
-    LUA_DECLARE ( SetVehicleRotation );
-    LUA_DECLARE ( SetVehicleTurnVelocity );
-    LUA_DECLARE ( SetVehicleColor );
-    LUA_DECLARE ( SetVehicleLandingGearDown );
-    LUA_DECLARE ( SetVehicleLocked );
-    LUA_DECLARE ( SetVehicleModel );
-    LUA_DECLARE ( SetVehicleDoorsUndamageable );
-    LUA_DECLARE ( SetVehicleSirensOn );
-    LUA_DECLARE ( AddVehicleUpgrade );
-    LUA_DECLARE ( RemoveVehicleUpgrade );
-    LUA_DECLARE ( SetVehicleDoorState );
-    LUA_DECLARE ( SetVehicleWheelStates );
-    LUA_DECLARE ( SetVehicleLightState );
-    LUA_DECLARE ( SetVehiclePanelState );
-    LUA_DECLARE ( ToggleVehicleRespawn );
-    LUA_DECLARE ( SetVehicleRespawnDelay );
-    LUA_DECLARE ( SetVehicleIdleRespawnDelay );
-    LUA_DECLARE ( SetVehicleRespawnPosition );
-    LUA_DECLARE ( ResetVehicleExplosionTime );
-    LUA_DECLARE ( ResetVehicleIdleTime );
-    LUA_DECLARE ( RespawnVehicle );
-    LUA_DECLARE ( SetVehicleOverrideLights );
-    LUA_DECLARE ( SetVehicleTaxiLightOn );
-    LUA_DECLARE ( IsVehicleTaxiLightOn );
-    LUA_DECLARE ( AttachTrailerToVehicle );
-    LUA_DECLARE ( DetachTrailerFromVehicle );
-    LUA_DECLARE ( SetVehicleEngineState );
-    LUA_DECLARE ( SetVehicleDirtLevel );
-    LUA_DECLARE ( SetVehicleDamageProof );
-    LUA_DECLARE ( SetVehiclePaintjob );
-    LUA_DECLARE ( SetVehicleFuelTankExplodable );
-    LUA_DECLARE ( SetVehicleFrozen );
-    LUA_DECLARE ( SetVehicleAdjustableProperty );
-    LUA_DECLARE ( SetHelicopterRotorSpeed );
-    LUA_DECLARE ( SetTrainDerailed );
-    LUA_DECLARE ( SetTrainDerailable );
-    LUA_DECLARE ( SetTrainDirection );
-    LUA_DECLARE ( SetTrainSpeed );
-    LUA_DECLARE ( SetTrainTrack );
-    LUA_DECLARE ( SetTrainPosition );
-    LUA_DECLARE ( SetVehicleGravity );
-    LUA_DECLARE ( SetVehicleHeadLightColor );
-    LUA_DECLARE ( SetVehicleTurretPosition );
-    LUA_DECLARE ( SetVehicleDoorOpenRatio );
-    LUA_DECLARE ( SetVehicleSirens );
-    LUA_DECLARE ( GetVehicleSirens );
-    LUA_DECLARE ( GetVehicleSirenParams );
-    LUA_DECLARE ( SetVehicleNitroActivated );
-    LUA_DECLARE ( SetVehicleNitroCount );
-    LUA_DECLARE ( SetVehicleNitroLevel );
-    LUA_DECLARE ( SetVehiclePlateText );
-    LUA_DECLARE ( SetHeliBladeCollisionsEnabled );
-    LUA_DECLARE ( SetVehicleWindowOpen );
-
-    // Object create funcs
-    LUA_DECLARE ( CreateObject );
-    
-    // Object get funcs
-    LUA_DECLARE ( IsObjectStatic );
-    LUA_DECLARE ( GetObjectScale );
-    LUA_DECLARE ( IsObjectBreakable );
-    LUA_DECLARE ( GetObjectMass );
-
-    // Object set funcs
-    LUA_DECLARE ( SetObjectRotation );
-    LUA_DECLARE ( MoveObject );
-    LUA_DECLARE ( StopObject );
-    LUA_DECLARE ( SetObjectScale );
-    LUA_DECLARE ( SetObjectStatic );
-    LUA_DECLARE ( SetObjectBreakable );
-    LUA_DECLARE ( BreakObject );
-    LUA_DECLARE ( RespawnObject );
-    LUA_DECLARE ( ToggleObjectRespawn );
-    LUA_DECLARE ( SetObjectMass );
-
     // Explosion functions
     LUA_DECLARE ( CreateExplosion );
 
     // Fire functions
     LUA_DECLARE ( CreateFire );
-
-    // Audio funcs
-    LUA_DECLARE ( PlaySoundFrontEnd );
-    LUA_DECLARE ( SetAmbientSoundEnabled );
-    LUA_DECLARE ( IsAmbientSoundEnabled );
-    LUA_DECLARE ( ResetAmbientSounds );
-    LUA_DECLARE ( SetWorldSoundEnabled );
-    LUA_DECLARE ( IsWorldSoundEnabled );
-    LUA_DECLARE ( ResetWorldSounds );
-    LUA_DECLARE ( PlaySFX );
-    LUA_DECLARE ( PlaySFX3D );
-    LUA_DECLARE ( GetSFXStatus );
-
-    // Blip funcs
-    LUA_DECLARE ( CreateBlip );
-    LUA_DECLARE ( CreateBlipAttachedTo );
-    LUA_DECLARE ( GetBlipIcon );
-    LUA_DECLARE ( GetBlipSize );
-    LUA_DECLARE ( GetBlipColor );
-    LUA_DECLARE ( GetBlipOrdering );
-    LUA_DECLARE ( GetBlipVisibleDistance );
-
-    LUA_DECLARE ( SetBlipIcon );
-    LUA_DECLARE ( SetBlipSize );
-    LUA_DECLARE ( SetBlipColor );
-    LUA_DECLARE ( SetBlipOrdering );
-    LUA_DECLARE ( SetBlipVisibleDistance );
-
-    // Marker funcs
-    LUA_DECLARE ( CreateMarker );
-
-    // Marker get functions
-    LUA_DECLARE ( GetMarkerCount );
-    LUA_DECLARE ( GetMarkerType );
-    LUA_DECLARE ( GetMarkerSize );
-    LUA_DECLARE ( GetMarkerColor );
-    LUA_DECLARE ( GetMarkerTarget );
-    LUA_DECLARE ( GetMarkerIcon );
-
-    // Marker set functions
-    LUA_DECLARE ( SetMarkerType );
-    LUA_DECLARE ( SetMarkerSize );
-    LUA_DECLARE ( SetMarkerColor );
-    LUA_DECLARE ( SetMarkerTarget );
-    LUA_DECLARE ( SetMarkerIcon );
 
     // Radar-area funcs
     LUA_DECLARE ( CreateRadarArea );
@@ -490,15 +248,6 @@ public:
     LUA_DECLARE ( EngineGetModelIDFromName );
     LUA_DECLARE ( EngineGetModelTextureNames );
     LUA_DECLARE ( EngineGetVisibleTextureNames );
-    LUA_DECLARE ( SetVehicleComponentPosition );
-    LUA_DECLARE ( GetVehicleComponentPosition );
-    LUA_DECLARE ( SetVehicleComponentRotation );
-    LUA_DECLARE ( GetVehicleComponentRotation );
-    LUA_DECLARE ( ResetVehicleComponentPosition );
-    LUA_DECLARE ( ResetVehicleComponentRotation );
-    LUA_DECLARE ( SetVehicleComponentVisible );
-    LUA_DECLARE ( GetVehicleComponentVisible );
-    LUA_DECLARE ( GetVehicleComponents );
 
     // Drawing funcs (low-level)
     LUA_DECLARE ( dxDrawLine );
@@ -874,21 +623,11 @@ public:
     LUA_DECLARE ( RemoveCommandHandler );
     LUA_DECLARE ( ExecuteCommandHandler );
 
-    // Community funcs
-    LUA_DECLARE ( GetPlayerUserName );
-    LUA_DECLARE ( GetPlayerSerial );
-
     // Utility vector math functions
     LUA_DECLARE ( GetDistanceBetweenPoints2D );
     LUA_DECLARE ( GetDistanceBetweenPoints3D );
     LUA_DECLARE ( GetEasingValue );
     LUA_DECLARE ( InterpolateBetween );
-
-    // Map funcs
-    LUA_DECLARE ( ForcePlayerMap );
-    LUA_DECLARE ( IsPlayerMapForced );
-    LUA_DECLARE ( IsPlayerMapVisible );
-    LUA_DECLARE ( GetPlayerMapBoundingBox );
 
     // Utility
     LUA_DECLARE ( Md5 );
@@ -929,20 +668,6 @@ public:
 
     // Voice functions
     LUA_DECLARE ( IsVoiceEnabled );
-
-    // Bitwise operator functions
-    LUA_DECLARE ( BitAnd );
-    LUA_DECLARE ( BitNot );
-    LUA_DECLARE ( BitOr );
-    LUA_DECLARE ( BitTest );
-    LUA_DECLARE ( BitXor );
-    LUA_DECLARE ( BitLRotate );
-    LUA_DECLARE ( BitRRotate );
-    LUA_DECLARE ( BitLShift );
-    LUA_DECLARE ( BitRShift );
-    LUA_DECLARE ( BitArShift );
-    LUA_DECLARE ( BitExtract );
-    LUA_DECLARE ( BitReplace );
 
 private:
     // Static references to objects

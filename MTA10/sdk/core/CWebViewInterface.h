@@ -56,6 +56,12 @@ public:
     virtual bool UnregisterAjaxHandler ( const SString& strURL ) = 0;
 
     virtual bool ToggleDevTools     ( bool visible ) = 0;
+
+    virtual bool CanGoBack          () = 0;
+    virtual bool CanGoForward       () = 0;
+    virtual bool GoBack             () = 0;
+    virtual bool GoForward          () = 0;
+    virtual void Refresh            ( bool bIgnoreCache ) = 0;
 };
 
 #endif

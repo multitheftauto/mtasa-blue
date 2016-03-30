@@ -1,0 +1,10 @@
+root = false
+
+[*]
+end_of_line =
+insert_final_newline =
+
+[*.{h,hpp,c,cpp,cc}]
+indent_style =
+indent_size =
+trim_trailing_whitespace =

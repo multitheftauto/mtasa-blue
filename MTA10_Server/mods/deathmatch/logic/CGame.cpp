@@ -630,8 +630,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         uchar b = ( (uchar*)&serverIp.s_addr )[1];
         if ( a == 10 || a == 127 || ( a == 169 && b == 254 ) || ( a == 192 && b == 168 ) )
         {
-            CLogger::ErrorPrintf ( "Can not specify private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
-            return false;
+            CLogger::LogPrintf ( "WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
         }
     }
 
