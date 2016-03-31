@@ -1404,8 +1404,9 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const 
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            pVehicle->SetVelocity ( vecVelocity );
-
+            if ( IsVehicleBlown( pVehicle ) == false ) {
+                pVehicle->SetVelocity ( vecVelocity );
+            }
             break;
         }
         case CElement::OBJECT:
