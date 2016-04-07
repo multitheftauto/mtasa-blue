@@ -751,14 +751,14 @@ enum eWeaponFlags
 };
 
 #include "json.h"
-// Custom toJSON modes (see mantis #9210)
-enum eJSONMarshalType
+// Prettify toJSON (see mantis #9210)
+enum eJSONPrettyType
 {
-    TYPE_PLAIN = JSON_C_TO_STRING_PLAIN,
-    TYPE_SPACED = JSON_C_TO_STRING_SPACED,
-    TYPE_PRETTY = JSON_C_TO_STRING_PRETTY
+    JSONPRETTY_SPACES = JSON_C_TO_STRING_PRETTY,
+    JSONPRETTY_NONE   = -1,
+    //JSONPRETTY_TAB = JSON_C_TO_STRING_PRETTY_TAB
 };
-DECLARE_ENUM ( eJSONMarshalType );
+DECLARE_ENUM ( eJSONPrettyType );
 
 //////////////////////////////////////////////
 // flags used to define weapon characteristics

@@ -377,25 +377,26 @@ int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
 
     if ( !argStream.NextIsNil () )
     {
-        eJSONMarshalType marshalType;
+        int jsonFlags;
         // Read the argument
         CLuaArguments JSON;
         JSON.ReadArgument ( luaVM, 1 );
         argStream.Skip ( 1 );
 
-        if ( argStream.NextIsBool () ) {
-            bool bCompact;
-            argStream.ReadBool ( bCompact );
-            marshalType = bCompact ? TYPE_SPACED : TYPE_PLAIN;
-        }
-        else
-            argStream.ReadEnumString ( marshalType, TYPE_PLAIN );
+        bool bSpaced;
+        argStream.ReadBool ( bSpaced, false );
+        jsonFlags |= bSpaced ? JSON_C_TO_STRING_SPACED : JSON_C_TO_STRING_PLAIN;
+        
+        eJSONPrettyType jsonPrettyType;
+        argStream.ReadEnumString ( jsonPrettyType, JSONPRETTY_NONE );
+        if ( jsonPrettyType != JSONPRETTY_NONE )
+            jsonFlags |= jsonPrettyType;
 
         if ( !argStream.HasErrors () )
         {
             // Convert it to a JSON string
             std::string strJSON;
-            if ( JSON.WriteToJSONString ( strJSON, false, marshalType ) )
+            if ( JSON.WriteToJSONString ( strJSON, false, jsonFlags ) )
             {
                 // Return the JSON string
                 lua_pushstring ( luaVM, strJSON.c_str () );
