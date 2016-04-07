@@ -377,7 +377,7 @@ int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
 
     if ( !argStream.NextIsNil () )
     {
-        eJSONMarshalType marshalType = TYPE_PLAIN;
+        eJSONMarshalType marshalType;
         // Read the argument
         CLuaArguments JSON;
         JSON.ReadArgument ( luaVM, 1 );
