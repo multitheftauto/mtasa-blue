@@ -377,7 +377,7 @@ int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
 
     if ( !argStream.NextIsNil () )
     {
-        int jsonFlags;
+        int jsonFlags = 0;
         // Read the argument
         CLuaArguments JSON;
         JSON.ReadArgument ( luaVM, 1 );

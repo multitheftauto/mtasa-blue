@@ -80,7 +80,7 @@ IMPLEMENT_ENUM_END( "hud-component" )
 IMPLEMENT_ENUM_BEGIN ( eJSONPrettyType )
     ADD_ENUM ( JSONPRETTY_SPACES, "spaces" )
     ADD_ENUM ( JSONPRETTY_NONE, "none" )
-    //ADD_ENUM ( JSONPRETTY_TAB, "tabs" )
+    ADD_ENUM ( JSONPRETTY_TABS, "tabs" )
 IMPLEMENT_ENUM_END ( "json-pretty-type" )
 
 IMPLEMENT_ENUM_BEGIN( eWeaponType )
