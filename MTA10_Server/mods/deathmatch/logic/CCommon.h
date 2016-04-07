@@ -9,8 +9,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CCOMMON_H
-#define __CCOMMON_H
+#pragma once
 
 #include <cmath>
 #include <cstdlib>
@@ -751,6 +750,16 @@ enum eWeaponFlags
     WEAPONFLAGS_INSTANT_RELOAD,
 };
 
+#include "json.h"
+// Custom toJSON modes (see mantis #9210)
+enum eJSONMarshalType
+{
+    TYPE_PLAIN = JSON_C_TO_STRING_PLAIN,
+    TYPE_SPACED = JSON_C_TO_STRING_SPACED,
+    TYPE_PRETTY = JSON_C_TO_STRING_PRETTY
+};
+DECLARE_ENUM ( eJSONMarshalType );
+
 //////////////////////////////////////////////
 // flags used to define weapon characteristics
 
@@ -781,5 +790,3 @@ enum eWeaponFlags
 #define WEAPONTYPE_RANDOM_SPEED     (0x020000)  // 
 #define WEAPONTYPE_FORCE_FINISH_ANIM (0x040000)  // force the anim to finish player after aim/fire rather than blending out
 #define WEAPONTYPE_EXPANDS          (0x080000)  // 
-
-#endif
