@@ -383,9 +383,9 @@ int CLuaFunctionDefs::toJSON ( lua_State* luaVM )
         JSON.ReadArgument ( luaVM, 1 );
         argStream.Skip ( 1 );
 
-        bool bSpaced;
-        argStream.ReadBool ( bSpaced, false );
-        jsonFlags |= bSpaced ? JSON_C_TO_STRING_SPACED : JSON_C_TO_STRING_PLAIN;
+        bool bCompact;
+        argStream.ReadBool ( bCompact, false );
+        jsonFlags |= bCompact ? JSON_C_TO_STRING_PLAIN : JSON_C_TO_STRING_SPACED;
         
         eJSONPrettyType jsonPrettyType;
         argStream.ReadEnumString ( jsonPrettyType, JSONPRETTY_NONE );
