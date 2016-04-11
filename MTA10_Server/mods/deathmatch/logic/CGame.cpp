@@ -630,8 +630,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         uchar b = ( (uchar*)&serverIp.s_addr )[1];
         if ( a == 10 || a == 127 || ( a == 169 && b == 254 ) || ( a == 192 && b == 168 ) )
         {
-            CLogger::ErrorPrintf ( "Can not specify private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
-            return false;
+            CLogger::LogPrintf ( "WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
         }
     }
 
@@ -1373,7 +1372,7 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
     const char* szNick = Player.GetNick ();
     if ( bSayInConsole && szNick && szNick [0] && !m_bBeingDeleted )
     {
-        CLogger::LogPrintf ( "QUIT: %s left the game [%s]\n", szNick, szReason );
+        CLogger::LogPrintf ( "QUIT: %s left the game [%s]%s\n", szNick, szReason, *Player.GetQuitReasonForLog() );
     }
 
     // If he had joined

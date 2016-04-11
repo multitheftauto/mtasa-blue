@@ -434,7 +434,7 @@ public:
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                IdleHandler                     ( void );
     void                                OutputServerInfo                ( void );
-    void                                TellServerSomethingImportant    ( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId );
+    void                                TellServerSomethingImportant    ( uint uiId, const SString& strMessage, uint uiSendLimitForThisId = 0 );
     void                                ChangeFloatPrecision            ( bool bHigh );
     bool                                IsHighFloatPrecision            ( void ) const;
 
@@ -792,7 +792,7 @@ private:
     SMiscGameSettings                   m_MiscGameSettings;
     uint                                m_uiAltPulseOrderCounter;
     SString                             m_strACInfo;
-    std::set < uint >                   m_SentMessageIds;
+    std::map < uint, uint >             m_SentMessageIds;
 
     bool                                m_bLastKeyWasEscapeCancelled;
     std::set < SString >                m_AllowKeyUpMap;

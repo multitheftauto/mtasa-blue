@@ -83,6 +83,12 @@ public:
 
     virtual bool ToggleDevTools ( bool visible ) override;
 
+    bool CanGoBack              ();
+    bool CanGoForward           ();
+    bool GoBack                 ();
+    bool GoForward              ();
+    void Refresh                ( bool ignoreCache );
+
     // CefClient methods
     virtual CefRefPtr<CefRenderHandler>     GetRenderHandler() override { return this; };
     virtual CefRefPtr<CefLoadHandler>       GetLoadHandler() override { return this; };

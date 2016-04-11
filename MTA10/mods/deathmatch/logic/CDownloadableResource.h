@@ -61,6 +61,8 @@ public:
     bool     IsDownloaded           ( void )    { return m_bDownloaded; };
     void     SetIsWaitingForDownload( bool bInDownloadQueue )   { m_bInDownloadQueue = bInDownloadQueue; };
     bool     IsWaitingForDownload   ( void )                    { return m_bInDownloadQueue; };
+    void     SetModifedByScript     ( bool bModifedByScript )   { m_bModifedByScript = bModifedByScript; };
+    bool     IsModifedByScript      ( void )                    { return m_bModifedByScript; };
 
 protected:
     CResource*          m_pResource;
@@ -77,6 +79,7 @@ protected:
     bool                m_bDownloaded;        // File has been downloaded and is ready to use
     uint                m_uiDownloadSize;
     uint                m_uiHttpServerIndex;
+    bool                m_bModifedByScript;
 };
 
 #endif

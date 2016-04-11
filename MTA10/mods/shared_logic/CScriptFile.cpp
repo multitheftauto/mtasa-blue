@@ -41,23 +41,23 @@ bool CScriptFile::Load( CResource* pResourceForFilePath, eMode Mode )
         m_bDoneResourceFileCheck = false;
         m_pFile = g_pNet->AllocateBinaryFile ();
         bool bOk = false;
-        SString strAbsPath = pResourceForFilePath->GetResourceDirectoryPath( m_accessType, m_strFilename );
+        m_strAbsPath = pResourceForFilePath->GetResourceDirectoryPath( m_accessType, m_strFilename );
         switch ( Mode )
         {
             // Open file in read only binary mode
             case MODE_READ:
-                bOk = m_pFile->FOpen( strAbsPath.c_str( ), "rb", true );
+                bOk = m_pFile->FOpen( m_strAbsPath, "rb", true );
                 break;
 
             // Open file in read write binary mode.
             case MODE_READWRITE:
                 // Try to load the file in rw mode. Use existing content.
-                bOk = m_pFile->FOpen( strAbsPath.c_str( ), "rb+", true );
+                bOk = m_pFile->FOpen( m_strAbsPath, "rb+", true );
                 break;
 
             // Open file in read write binary mode. Truncate size to 0.
             case MODE_CREATE:
-                bOk = m_pFile->FOpen( strAbsPath.c_str( ), "wb+", true );
+                bOk = m_pFile->FOpen( m_strAbsPath, "wb+", true );
                 break;
         }
 

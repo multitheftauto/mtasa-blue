@@ -23,6 +23,15 @@ struct SLogEventInfo
     SString strBody;
 };
 
+struct SLogEventLine
+{
+    SString strBody;
+    SString strType;
+    SString strContext;
+    operator SString&   ( void )                              { return strBody; }
+    bool operator ==    ( const SLogEventLine& other ) const  { return strBody == other.strBody && strType == other.strType && strContext == other.strContext; }
+};
+
 struct SCrashAvertedInfo
 {
     uint uiTickCount;
@@ -30,6 +39,7 @@ struct SCrashAvertedInfo
 };
 
 static std::list < SLogEventInfo >              ms_LogEventList;
+static CDuplicateLineFilter < SLogEventLine >   ms_LogEventFilter;
 static std::map < int, SCrashAvertedInfo >      ms_CrashAvertedMap;
 static uint                                     ms_uiTickCountBase = 0;
 static void*                                    ms_pReservedMemory = NULL;
@@ -87,15 +97,21 @@ void CCrashDumpWriter::OnEnterCrashZone( uint uiId )
 ///////////////////////////////////////////////////////////////
 void CCrashDumpWriter::LogEvent ( const char* szType, const char* szContext, const char* szBody )
 {
-    SLogEventInfo info;
-    info.uiTickCount = GetTickCount32 ();
-    info.strType = szType;
-    info.strContext = szContext;
-    info.strBody = szBody;
-    ms_LogEventList.push_front ( info );
+    ms_LogEventFilter.AddLine( { szBody, szType, szContext } );
 
-    while ( ms_LogEventList.size () > LOG_EVENT_SIZE )
-        ms_LogEventList.pop_back ();
+    SLogEventLine line;
+    while ( ms_LogEventFilter.PopOutputLine( line ) )
+    {
+        SLogEventInfo info;
+        info.uiTickCount = GetTickCount32 ();
+        info.strType = line.strType;
+        info.strContext = line.strContext;
+        info.strBody = line.strBody;
+        ms_LogEventList.push_front ( info );
+    
+        while ( ms_LogEventList.size () > LOG_EVENT_SIZE )
+            ms_LogEventList.pop_back ();
+    }
 }
 
 

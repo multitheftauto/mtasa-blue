@@ -40,7 +40,12 @@ public:
     LUA_DECLARE ( GetBrowserSettings );
     LUA_DECLARE ( GetBrowserSource );
     LUA_DECLARE ( SetBrowserAjaxHandler );
-    LUA_DECLARE ( ToggleBrowserDevTools );
+    LUA_DECLARE ( CanBrowserNavigateBack );
+    LUA_DECLARE ( CanBrowserNavigateForward );
+    LUA_DECLARE ( NavigateBrowserForward );
+    LUA_DECLARE ( NavigateBrowserBack );
+    LUA_DECLARE ( ReloadBrowserPage );
+    LUA_DECLARE ( ToggleBrowserDevTools )
     LUA_DECLARE ( GUICreateBrowser );
     LUA_DECLARE ( GUIGetBrowser );
 };

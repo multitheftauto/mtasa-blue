@@ -96,9 +96,6 @@ public:
     virtual unsigned char               GetConnectionError          ( void ) = 0;
     virtual void                        SetConnectionError          ( unsigned char ucConnectionError ) = 0;
 
-    virtual unsigned char               GetImmediateError           ( void ) = 0;
-    virtual void                        SetImmediateError           ( unsigned char ucImmediateError ) = 0;
-
     virtual void                        Reset                       ( void ) = 0;
 
     virtual CNetHTTPDownloadManagerInterface*   GetHTTPDownloadManager          ( EDownloadModeType iMode ) = 0;

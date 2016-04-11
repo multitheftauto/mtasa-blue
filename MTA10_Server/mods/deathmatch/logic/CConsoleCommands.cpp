@@ -1313,7 +1313,7 @@ bool CConsoleCommands::DebugScript ( CConsole* pConsole, const char* szArguments
 
                     // Tell the player and the console
                     pEchoClient->SendEcho ( SString ( "debugscript: Your debug mode was set to %i", iLevel ) );
-                    CLogger::LogPrintf ( "SCRIPT: %s set his script debug mode to %i\n", GetAdminNameForLog ( pClient ).c_str (), iLevel );
+                    CLogger::LogPrintf ( "SCRIPT: %s set their script debug mode to %i\n", GetAdminNameForLog ( pClient ).c_str (), iLevel );
 
                     // Enable/Disable their debugger
                     if ( iLevel == 0 )

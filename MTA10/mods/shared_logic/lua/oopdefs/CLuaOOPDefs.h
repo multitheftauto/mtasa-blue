@@ -38,13 +38,6 @@ public:
     LUA_DECLARE ( GetCameraRotation );
     LUA_DECLARE ( SetCameraRotation );
 
-    // Vehicle
-    LUA_DECLARE ( GetVehicleGravity );
-    LUA_DECLARE ( GetVehicleTurnVelocity );
-
-    // Marker
-    LUA_DECLARE ( GetMarkerTarget );
-
     // Drawing
     LUA_DECLARE ( DxGetFontHeight );
     LUA_DECLARE ( DxGetTextWidth );

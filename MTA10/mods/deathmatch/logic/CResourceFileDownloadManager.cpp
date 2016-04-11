@@ -279,7 +279,7 @@ void CResourceFileDownloadManager::DownloadFinished( char* pCompletedData, size_
                 // Was re-added - Add size again to total.
                 AddDownloadSize( pResourceFile->GetDownloadSize() );
                 SString strMessage( "External HTTP file mismatch (Retrying this file with internal HTTP) [%s]", *ConformResourcePath( pResourceFile->GetName() ) );
-                g_pClientGame->TellServerSomethingImportant( 1011, strMessage, true );
+                g_pClientGame->TellServerSomethingImportant( 1011, strMessage, 3 );
                 return;
             }
         }
@@ -298,7 +298,7 @@ void CResourceFileDownloadManager::DownloadFinished( char* pCompletedData, size_
                 // Was re-added - Add size again to total.
                 AddDownloadSize( pResourceFile->GetDownloadSize() );
                 SString strMessage( "External HTTP file download error:[%d] %s (Disabling External HTTP) [%s]", iErrorCode, *strHTTPError, *ConformResourcePath( pResourceFile->GetName() ) );
-                g_pClientGame->TellServerSomethingImportant( 1012, strMessage, true );
+                g_pClientGame->TellServerSomethingImportant( 1012, strMessage, 3 );
                 return;
             }
         }

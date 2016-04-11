@@ -136,6 +136,31 @@ void CClientWebBrowser::GetSourceCode ( const std::function<void( const std::str
     return m_pWebView->GetSourceCode ( callback );
 }
 
+bool CClientWebBrowser::CanGoBack ()
+{
+    return m_pWebView->CanGoBack ();
+}
+
+bool CClientWebBrowser::CanGoForward ()
+{
+    return m_pWebView->CanGoForward ();
+}
+
+bool CClientWebBrowser::GoBack ()
+{
+    return m_pWebView->GoBack ();
+}
+
+bool CClientWebBrowser::GoForward ()
+{
+    return m_pWebView->GoForward ();
+}
+
+void CClientWebBrowser::Refresh ( bool bIgnoreCache )
+{
+    m_pWebView->Refresh ( bIgnoreCache );
+}
+
 ////////////////////////////////////////////////////////////////////////////
 //                                                                        //
 //            CWebBrowserEventsInterface implementation                   //
@@ -299,7 +324,6 @@ bool CClientWebBrowser::ToggleDevTools ( bool visible )
 {
     return m_pWebView->ToggleDevTools ( visible );
 }
-
 
 CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) 
     : CClientGUIElement ( pManager, pLuaMain, pCGUIElement, ID )

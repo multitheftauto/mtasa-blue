@@ -5,7 +5,6 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        MTA10_Server/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
 *  PURPOSE:
-*  DEVELOPERS:  Nobody knows
 *
 *****************************************************************************/
 
@@ -77,6 +76,12 @@ IMPLEMENT_ENUM_BEGIN( eHudComponent )
     ADD_ENUM ( HUD_CROSSHAIR,       "crosshair" )
     ADD_ENUM ( HUD_ALL,             "all" )
 IMPLEMENT_ENUM_END( "hud-component" )
+
+IMPLEMENT_ENUM_BEGIN ( eJSONPrettyType )
+    ADD_ENUM ( JSONPRETTY_SPACES, "spaces" )
+    ADD_ENUM ( JSONPRETTY_NONE, "none" )
+    ADD_ENUM ( JSONPRETTY_TABS, "tabs" )
+IMPLEMENT_ENUM_END ( "json-pretty-type" )
 
 IMPLEMENT_ENUM_BEGIN( eWeaponType )
     // Compatible with getWeaponNameFromID                          From setWeaponProperty before r4523
@@ -364,9 +369,9 @@ void MinServerReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, 
         {
             if ( pResource->GetMinServerReqFromMetaXml () < szVersionReq )
             {
-#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
-                argStream.SetVersionError ( szVersionReq, "server", szReason );
-#endif
+                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+                    argStream.SetVersionWarning ( szVersionReq, "server", szReason );
+                #endif
             }
         }
     }

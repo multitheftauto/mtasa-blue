@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include "d3d9.h"
+#include "nvapi/nvapi.h"
 
 namespace
 {
@@ -70,11 +71,64 @@ namespace
                     );
     }
 
-    bool bDetectedOptimus = false;
-    bool bDetectedNVidia = false;
     IDirect3D9* pD3D9 = NULL;
     IDirect3DDevice9* pD3DDevice9 = NULL;
     IDirect3DVertexDeclaration9* pD3DVertexDeclarations[ 20 ] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// NvOptimusDetect
+//
+// Try detecting optimus via NvAPI
+//
+//////////////////////////////////////////////////////////
+bool NvOptimusDetect( void )
+{
+    if( NvAPI_Initialize() != NVAPI_OK )
+    {
+		return false;
+    }
+
+    // Get and log driver info
+	NvAPI_ShortString szDesc = "-";
+    NvU32 uiDriverVersion = -1;
+	NvAPI_ShortString szBuildBranchString = "-";
+
+    NvAPI_GetInterfaceVersionString( szDesc );
+    NvAPI_SYS_GetDriverAndBranchVersion( &uiDriverVersion, szBuildBranchString );
+    WriteDebugEventAndReport( 7460, SString( "NvAPI - InterfaceVersion:'%s' DriverVersion:%d.%d Branch:'%s'", szDesc, uiDriverVersion / 100, uiDriverVersion % 100, szBuildBranchString ) );
+    
+    // Get all the Physical GPU Handles
+    NvPhysicalGpuHandle nvGPUHandle[NVAPI_MAX_PHYSICAL_GPUS] = {0};
+    NvU32 uiGpuCount = 0;
+    if( NvAPI_EnumPhysicalGPUs( nvGPUHandle, &uiGpuCount ) != NVAPI_OK )
+    {
+        return false;
+    }
+
+    bool bFoundOptimus = false;
+    for( NvU32 i = 0; i < uiGpuCount; i++ )
+    {
+        NV_SYSTEM_TYPE SystemType = (NV_SYSTEM_TYPE)-1;     // 1-Laptop 2-Desktop
+        NV_GPU_TYPE GpuType = (NV_GPU_TYPE)-1;              // 1-Integrated 2-Discrete
+        NvAPI_ShortString szName = "-";
+
+        NvAPI_GPU_GetSystemType( nvGPUHandle[i], &SystemType );
+        NvAPI_GPU_GetGPUType( nvGPUHandle[i], &GpuType );
+        NvAPI_GPU_GetFullName( nvGPUHandle[i], szName );
+        SString strStatus( "NvAPI - GPU %d/%d - SystemType:%d GpuType:%d (%s)", i, uiGpuCount, SystemType, GpuType, szName );
+
+        if ( SystemType == NV_SYSTEM_TYPE_LAPTOP && GpuType == NV_SYSTEM_TYPE_DGPU )
+        {
+            bFoundOptimus = true;
+            strStatus += " FoundOptimus";
+        }
+        WriteDebugEventAndReport( 7461, strStatus );
+    }
+
+    return bFoundOptimus;
 }
 
 
@@ -98,6 +152,8 @@ void BeginD3DStuff( void )
     WriteDebugEvent( "D3DStuff -------------------------" );
     WriteDebugEvent( SString( "D3DStuff - Direct3DCreate9: 0x%08x", pD3D9 ) );
 
+    bool bDetectedOptimus = false;
+    bool bDetectedNVidia = false;
     // Get info about each connected adapter
     uint uiNumAdapters = pD3D9->GetAdapterCount();
     WriteDebugEvent( SString( "D3DStuff - %d Adapters", uiNumAdapters ) );
@@ -145,6 +201,9 @@ void BeginD3DStuff( void )
     }
 
     if ( GetApplicationSettingInt( "nvhacks", "optimus-force-detection" ) )
+        bDetectedOptimus = true;
+
+    if ( NvOptimusDetect() )
         bDetectedOptimus = true;
 
     SetApplicationSettingInt( "nvhacks", "optimus", bDetectedOptimus );

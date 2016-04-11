@@ -95,7 +95,7 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, strMetaPath ) )
             {
                 // Inform file verifier
-                g_pClientGame->GetResourceManager()->FileModifedByScript( strAbsPath );
+                g_pClientGame->GetResourceManager()->OnFileModifedByScript( strAbsPath );
 
                 // Make sure the destination folder exist so we can create the file
                 MakeSureDirExists ( strAbsPath.c_str () );
@@ -198,10 +198,6 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
             CResource* pResource = pThisResource;
             if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, strMetaPath ) )
             {
-                // Inform file verifier
-                if ( !readOnly )
-                    g_pClientGame->GetResourceManager()->FileModifedByScript( strAbsPath );
-
                 // Create the file to create
                 eAccessType accessType = filePath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
                 CScriptFile* pFile = new CScriptFile( pThisResource->GetScriptID( ), strMetaPath.c_str( ), DEFAULT_MAX_FILESIZE, accessType );
@@ -448,6 +444,10 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
         }
         while ( true );
 
+        // Inform file verifier
+        if ( lBytesWritten > 0 )
+            g_pClientGame->GetResourceManager()->OnFileModifedByScript( pFile->GetAbsPath() );
+
         // Return the number of bytes we wrote
         lua_pushnumber ( luaVM, lBytesWritten );
         return 1;
@@ -504,7 +504,7 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strPath ) )
             {
                 // Inform file verifier
-                g_pClientGame->GetResourceManager()->FileModifedByScript( strPath );
+                g_pClientGame->GetResourceManager()->OnFileModifedByScript( strPath );
 
                 if ( FileDelete ( strPath.c_str () ) )
                 {
@@ -569,7 +569,7 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                     else
                     {
                         // Inform file verifier
-                        g_pClientGame->GetResourceManager()->FileModifedByScript( strCurAbsPath );
+                        g_pClientGame->GetResourceManager()->OnFileModifedByScript( strCurAbsPath );
 
                         // Make sure the destination folder exist so we can move the file
                         MakeSureDirExists ( strNewAbsPath.c_str () );
@@ -646,7 +646,7 @@ int CLuaFileDefs::fileCopy ( lua_State* luaVM )
                     else
                     {
                         // Inform file verifier
-                        g_pClientGame->GetResourceManager()->FileModifedByScript( strNewAbsPath );
+                        g_pClientGame->GetResourceManager()->OnFileModifedByScript( strNewAbsPath );
 
                         // Make sure the destination folder exists so we can copy the file
                         MakeSureDirExists ( strNewAbsPath );

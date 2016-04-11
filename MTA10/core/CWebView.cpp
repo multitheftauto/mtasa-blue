@@ -372,6 +372,61 @@ bool CWebView::VerifyFile ( const SString& strPath )
     return m_pEventsInterface->Events_OnResourceFileCheck ( strPath );
 }
 
+bool CWebView::CanGoBack ()
+{
+    if ( !m_pWebView )
+        return false;
+
+    return m_pWebView->CanGoBack ();
+}
+
+bool CWebView::CanGoForward ()
+{
+    if ( !m_pWebView )
+        return false;
+
+    return m_pWebView->CanGoForward ();
+}
+
+bool CWebView::GoBack ()
+{
+    if ( !m_pWebView )
+        return false;
+
+    if ( !m_pWebView->CanGoBack () )
+        return false;
+
+    m_pWebView->GoBack ();
+    return true;
+}
+
+bool CWebView::GoForward ()
+{
+    if ( !m_pWebView )
+        return false;
+
+    if ( !m_pWebView->CanGoForward () )
+        return false;
+
+    m_pWebView->GoForward ();
+    return true;
+}
+
+void CWebView::Refresh ( bool bIgnoreCache )
+{
+    if ( !m_pWebView )
+        return;
+
+    if ( bIgnoreCache )
+    {
+        m_pWebView->ReloadIgnoreCache ();
+    }
+    else
+    {
+        m_pWebView->Reload ();
+    }
+}
+
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefClient::OnProcessMessageReceived            //
