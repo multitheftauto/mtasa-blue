@@ -42,7 +42,11 @@ public:
     bool                                    Exists                      ( CClientObject* pObject );
     bool                                    ObjectsAroundPointLoaded    ( const CVector& vecPosition, float fRadius, unsigned short usDimension, SString* pstrStatus = NULL );
 
-    static bool                             IsObjectLimitReached        ( void );
+    static bool                             StaticIsObjectLimitReached          ( void );
+    static bool                             StaticIsLowLodObjectLimitReached    ( void );
+    bool                                    IsObjectLimitReached                ( void );
+    bool                                    IsLowLodObjectLimitReached          ( void );
+    bool                                    IsHardObjectLimitReached            ( void );
 
     void                                    RestreamObjects             ( unsigned short usModel );
 
@@ -56,9 +60,13 @@ protected:
 
     void                                    UpdateLimitInfo             ( void );
 
-    static int                              m_iEntryInfoNodeEntries;
-    static int                              m_iPointerNodeSingleLinkEntries;
-    static int                              m_iPointerNodeDoubleLinkEntries;
+    int                                     m_iEntryInfoNodeEntries;
+    int                                     m_iPointerNodeSingleLinkEntries;
+    int                                     m_iPointerNodeDoubleLinkEntries;
+    uint                                    m_uiMaxStreamedInCount;
+    uint                                    m_uiMaxLowLodStreamedInCount;
+    uint                                    m_uiStreamedInCount;
+    uint                                    m_uiLowLodStreamedInCount;
 
     CClientManager*                         m_pManager;
     bool                                    m_bCanRemoveFromList;

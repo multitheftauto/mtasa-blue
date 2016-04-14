@@ -14,10 +14,22 @@
 
 #include <windows.h>
 
-#define MAX_VEHICLES                        110
-#define MAX_PEDS                            140
-#define MAX_OBJECTS                         700
+// Limits for MTA
+#define MAX_VEHICLES_MTA                    64      // Real limit is 100
+#define MAX_PEDS_MTA                        110     // Real limit is 140
+#define MAX_OBJECTS_MTA                     1000    // Real limit is 1200
+#define MAX_ENTRY_INFO_NODES_MTA            3500    // Real limit is 4096
+#define MAX_POINTER_SINGLE_LINKS_MTA        65000   // Real limit is 70000
+#define MAX_POINTER_DOUBLE_LINKS_MTA        7200    // Real limit is 8000
+
+// Real limits for GTA
+#define MAX_VEHICLES                        ( MAX_VEHICLES_MTA + 46 )               // 100
+#define MAX_PEDS                            ( MAX_PEDS_MTA + 30 )                   // 140
+#define MAX_OBJECTS                         ( MAX_OBJECTS_MTA + 200 )               // 1200
 #define MAX_BUILDINGS                       13000
+#define MAX_ENTRY_INFO_NODES                ( MAX_ENTRY_INFO_NODES_MTA + 596 )      // 4096
+#define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 70000
+#define MAX_POINTER_DOUBLE_LINKS            ( MAX_POINTER_DOUBLE_LINKS_MTA + 800 )  // 8000
 
 /**
  * Flags used to define weapon characteristics

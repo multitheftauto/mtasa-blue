@@ -171,17 +171,23 @@ CGameSA::CGameSA()
 
     // Change pool sizes here
     m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );                  // Default is 500
-    m_pPools->SetPoolCapacity ( OBJECT_POOL, 700 );                 // Default is 350
+    m_pPools->SetPoolCapacity ( OBJECT_POOL, MAX_OBJECTS );         // Default is 350
     m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );                 // Default is 200
     m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 12000 );            // Default is 10150
     m_pPools->SetPoolCapacity ( ENV_MAP_MATERIAL_POOL, 16000 );     // Default is 4096
     m_pPools->SetPoolCapacity ( ENV_MAP_ATOMIC_POOL, 4000 );        // Default is 1024
     m_pPools->SetPoolCapacity ( SPEC_MAP_MATERIAL_POOL, 16000 );    // Default is 4096
+    m_pPools->SetPoolCapacity ( ENTRY_INFO_NODE_POOL, MAX_ENTRY_INFO_NODES );           // Default is 500
+    m_pPools->SetPoolCapacity ( POINTER_DOUBLE_LINK_POOL, MAX_POINTER_DOUBLE_LINKS );   // Default is 3200
+    dassert( m_pPools->GetPoolCapacity ( POINTER_SINGLE_LINK_POOL ) == MAX_POINTER_SINGLE_LINKS );
 
     // Increase streaming object instances list size
     MemPut < WORD > ( 0x05B8E55, 30000 );         // Default is 12000
     MemPut < WORD > ( 0x05B8EB0, 30000 );         // Default is 12000
 
+    // Increase matrix array size
+    MemPut < int > ( 0x054F3A1, MAX_OBJECTS * 3 );   // Default is 900
+    
     CModelInfoSA::StaticSetHooks ();
     CPlayerPedSA::StaticSetHooks ();
     CRenderWareSA::StaticSetHooks ();
