@@ -723,10 +723,6 @@ void CMultiplayerSA::InitHooks()
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
 
-    // Increase double link limit from 3200 ro 8000
-    MemPut < int > ( 0x00550F82, 8000 );
-
-
     // Disable GTA being able to call CAudio::StopRadio ()
     // Well this isn't really CAudio::StopRadio, it's some global class
     // func that StopRadio just jumps to.
@@ -1126,16 +1122,6 @@ void CMultiplayerSA::InitHooks()
     // DISABLE weapon pickups
     MemPut < BYTE > ( 0x5B47B0, 0xC3 );
 
-    // INCREASE CEntyInfoNode pool size
-    //00550FB9   68 F4010000      PUSH 1F4
-    /*
-    MemPut < BYTE > ( 0x550FBA, 0xE8 );
-    MemPut < BYTE > ( 0x550FBB, 0x03 );
-    */
-    MemPut < BYTE > ( 0x550FBA, 0x00 );
-    MemPut < BYTE > ( 0x550FBB, 0x10 );
-
-    
     /*
     MemPut < BYTE > ( 0x469F00, 0xC3 );
     */
@@ -1412,9 +1398,6 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x4322B0, 0xC3 );
     // Disable CStreaming::StreamVehiclesAndPeds_Always
     MemPut < BYTE > ( 0x40B650, 0xC3 );
-
-    // Double the size of CPlaceable matrix array to fix a crash after CMatrixLinkList::AddToList1
-    MemPut < int > ( 0x54F3A1, 1800 );
 
     SetSuspensionEnabled ( true );
 

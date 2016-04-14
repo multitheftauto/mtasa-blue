@@ -93,15 +93,13 @@ static unsigned short g_usBreakableModelList[] = {
 };
 
 
-int CClientObjectManager::m_iEntryInfoNodeEntries = 0;
-int CClientObjectManager::m_iPointerNodeSingleLinkEntries = 0;
-int CClientObjectManager::m_iPointerNodeDoubleLinkEntries = 0;
-
 CClientObjectManager::CClientObjectManager ( CClientManager* pManager )
 {
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
+    m_uiMaxStreamedInCount = MAX_OBJECTS_MTA / 2;
+    m_uiMaxLowLodStreamedInCount = MAX_OBJECTS_MTA - m_uiMaxStreamedInCount;
 }
 
 
@@ -125,6 +123,7 @@ void CClientObjectManager::DoPulse ( void )
         assert ( pObject->GetGameObject () );
         pObject->StreamedInPulse ();
     }
+    assert( m_uiLowLodStreamedInCount + m_uiStreamedInCount == m_StreamedIn.size () );
 }
 
 
@@ -289,14 +288,28 @@ bool CClientObjectManager::ObjectsAroundPointLoaded ( const CVector& vecPosition
 
 void CClientObjectManager::OnCreation ( CClientObject * pObject )
 {
-    m_StreamedIn.push_back ( pObject );
+    if ( ListContains( m_StreamedIn, pObject )  == false )
+    {
+        if ( pObject->IsLowLod() )
+            m_uiLowLodStreamedInCount++;
+        else
+            m_uiStreamedInCount++;
+        m_StreamedIn.push_back ( pObject );
+    }
     UpdateLimitInfo ();
 }
 
 
 void CClientObjectManager::OnDestruction ( CClientObject * pObject )
 {
-    ListRemove ( m_StreamedIn, pObject );
+    if ( ListContains( m_StreamedIn, pObject ) )
+    {
+        if ( pObject->IsLowLod() )
+            m_uiLowLodStreamedInCount--;
+        else
+            m_uiStreamedInCount--;
+        ListRemove ( m_StreamedIn, pObject );
+    }
     UpdateLimitInfo ();
 }
 
@@ -309,26 +322,46 @@ void CClientObjectManager::UpdateLimitInfo ( void )
     m_iPointerNodeDoubleLinkEntries = pPools->GetPointerNodeDoubleLinkPool ()->GetNumberOfUsedSpaces ();
 }
 
+bool CClientObjectManager::StaticIsObjectLimitReached ( void )
+{
+    return g_pClientGame->GetObjectManager()->IsObjectLimitReached();
+}
+
+bool CClientObjectManager::StaticIsLowLodObjectLimitReached ( void )
+{
+    return g_pClientGame->GetObjectManager()->IsLowLodObjectLimitReached();
+}
+
 
 bool CClientObjectManager::IsObjectLimitReached ( void )
 {
-    // Make sure we haven't run out of entry node info's, single link nodes or double link nodes
-    #define MAX_ENTRYINFONODES          3500    // Real limit is 4096
-    #define MAX_POINTERNODESINGLELINK   65000   // Real limit is 70000
-    #define MAX_POINTERNODESDOUBLELINK  3600    // Real limit is 4000
+    if ( IsHardObjectLimitReached() || m_uiStreamedInCount >= m_uiMaxStreamedInCount )
+        return true;
+    return false;
+}
+
+bool CClientObjectManager::IsLowLodObjectLimitReached ( void )
+{
+    if ( IsHardObjectLimitReached() || m_uiLowLodStreamedInCount >= m_uiMaxLowLodStreamedInCount )
+        return true;
+    return false;
+}
+
+
+bool CClientObjectManager::IsHardObjectLimitReached ( void )
+{
+    if ( m_uiStreamedInCount + m_uiLowLodStreamedInCount >= MAX_OBJECTS_MTA )
+        return true;
 
     // If we've run out of either of these limit, don't allow more objects
-    if ( m_iEntryInfoNodeEntries >= MAX_ENTRYINFONODES ||
-         m_iPointerNodeSingleLinkEntries >= MAX_POINTERNODESINGLELINK ||
-         m_iPointerNodeDoubleLinkEntries >= MAX_POINTERNODESDOUBLELINK )
+    if ( m_iEntryInfoNodeEntries >= MAX_ENTRY_INFO_NODES_MTA ||
+         m_iPointerNodeSingleLinkEntries >= MAX_POINTER_SINGLE_LINKS_MTA ||
+         m_iPointerNodeDoubleLinkEntries >= MAX_POINTER_DOUBLE_LINKS_MTA )
     {
-        // Limit reached
         return true;
     }
 
-    // Allow max 250 objects at once for now.
-    // TODO: The real limit is up to 350 but we're limited by other limits.
-    return g_pGame->GetPools ()->GetObjectCount () >= 500;
+    return g_pGame->GetPools ()->GetObjectCount () >= MAX_OBJECTS_MTA;
 }
 
 
@@ -355,7 +388,14 @@ void CClientObjectManager::RemoveFromLists ( CClientObject* pObject )
     {
         ListRemove ( m_Objects, pObject );
     }
-    ListRemove ( m_StreamedIn, pObject );
+    if ( ListContains( m_StreamedIn, pObject ) )
+    {
+        if ( pObject->IsLowLod() )
+            m_uiLowLodStreamedInCount--;
+        else
+            m_uiStreamedInCount--;
+        ListRemove ( m_StreamedIn, pObject );
+    }
 }
 
 

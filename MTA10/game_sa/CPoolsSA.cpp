@@ -1067,11 +1067,11 @@ int CPoolsSA::GetPoolDefaultCapacity ( ePools pool )
         case TASK_ALLOCATOR_POOL:       return 16;
         case PED_INTELLIGENCE_POOL:     return 140;
         case PED_ATTRACTOR_POOL:        return 64;
-        case ENTRY_INFO_NODE_POOL:      return 500;          // Modded to 4096   @ CMultiplayerSA.cpp
+        case ENTRY_INFO_NODE_POOL:      return 500;          // Modded to 4096   @ CGameSA.cpp
         case NODE_ROUTE_POOL:           return 64;
         case PATROL_ROUTE_POOL:         return 32;
         case POINT_ROUTE_POOL:          return 64;
-        case POINTER_DOUBLE_LINK_POOL:  return 3200;         // Modded to 8000   @ CMultiplayerSA.cpp
+        case POINTER_DOUBLE_LINK_POOL:  return 3200;         // Modded to 8000   @ CGameSA.cpp
         case POINTER_SINGLE_LINK_POOL:  return 70000;
         case ENV_MAP_MATERIAL_POOL:     return 4096;         // Modded to 16000   @ CGameSA.cpp
         case ENV_MAP_ATOMIC_POOL:       return 1024;         // Modded to 8000    @ CGameSA.cpp

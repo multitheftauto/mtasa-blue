@@ -480,7 +480,7 @@ void CClientObject::Create ( void )
     {
         // Check again that the limit isn't reached. We are required to do so because
         // we load async. The streamer isn't always aware of our limits.
-        if ( !CClientObjectManager::IsObjectLimitReached () )
+        if ( IsLowLod() ? !CClientObjectManager::StaticIsLowLodObjectLimitReached () : !CClientObjectManager::StaticIsObjectLimitReached ())
         {
             // Add a reference to the object
             m_pModelInfo->ModelAddRef ( BLOCKING, "CClientObject::Create" );
