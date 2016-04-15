@@ -43,7 +43,7 @@ CClientColShape::~CClientColShape ( void )
     else if ( m_pOwningPickup && m_pOwningPickup->m_pCollision == this )
         m_pOwningPickup->m_pCollision = NULL;
 
-    RemoveAllColliders ( true );
+    RemoveAllColliders ();
     Unlink ();
     CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pOwningMarker, &m_pOwningPickup, NULL );
 }
@@ -111,15 +111,12 @@ bool CClientColShape::ColliderExists ( CClientEntity* pEntity )
 }
 
 
-void CClientColShape::RemoveAllColliders ( bool bNotify )
+void CClientColShape::RemoveAllColliders ( void )
 {
-    if ( bNotify )
+    CFastList < CClientEntity* > ::iterator iter = m_Colliders.begin ();
+    for ( ; iter != m_Colliders.end () ; iter++ )
     {
-        CFastList < CClientEntity* > ::iterator iter = m_Colliders.begin ();
-        for ( ; iter != m_Colliders.end () ; iter++ )
-        {
-            (*iter)->RemoveCollision ( this );
-        }
+        (*iter)->RemoveCollision ( this );
     }
     m_Colliders.clear ();
 }

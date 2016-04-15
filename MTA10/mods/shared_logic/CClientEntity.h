@@ -158,7 +158,6 @@ public:
                                                 CClientEntity           ( ElementID ID );
     virtual                                     ~CClientEntity          ( void );
 
-    virtual bool                                CanBeDeleted            ( void )                    { return true; };
 
     virtual eClientEntityType                   GetType                 ( void ) const = 0;
     inline bool                                 IsLocalEntity           ( void )                    { return m_ID >= MAX_SERVER_ELEMENTS; };
@@ -273,7 +272,7 @@ public:
     void                                        AddCollision                ( CClientColShape* pShape )     { m_Collisions.push_back ( pShape ); }
     void                                        RemoveCollision             ( CClientColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
     bool                                        CollisionExists             ( CClientColShape* pShape );
-    void                                        RemoveAllCollisions         ( bool bNotify = false );
+    void                                        RemoveAllCollisions         ( void );
     std::list < CClientColShape* > ::iterator   CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
     std::list < CClientColShape* > ::iterator   CollisionsEnd               ( void )                        { return m_Collisions.end (); }
 

@@ -1557,7 +1557,7 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bSkipWarpIfGettingOut )
     CClientVehicle::UnpairPedAndVehicle( this );
     assert ( m_pOccupiedVehicle == NULL );
     assert ( m_pOccupyingVehicle == NULL );
-    assert ( m_uiOccupiedVehicleSeat = 0xFF );
+    m_uiOccupiedVehicleSeat = 0xFF;
 
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;

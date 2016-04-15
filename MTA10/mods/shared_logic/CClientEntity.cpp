@@ -109,7 +109,7 @@ CClientEntity::~CClientEntity ( void )
     m_bDisallowAttaching = true;
     assert( !m_pAttachedToEntity && m_AttachedEntities.empty() );
 
-    RemoveAllCollisions ( true );
+    RemoveAllCollisions ();
 
     if ( m_pEventManager )
     {
@@ -1110,21 +1110,15 @@ bool CClientEntity::CollisionExists ( CClientColShape* pShape )
 }
 
 
-void CClientEntity::RemoveAllCollisions ( bool bNotify )
+void CClientEntity::RemoveAllCollisions ( void )
 {
-    if ( !m_Collisions.empty () )
+    list < CClientColShape* > ::iterator iter = m_Collisions.begin ();
+    for ( ; iter != m_Collisions.end () ; iter++ )
     {
-        if ( bNotify )
-        {
-            list < CClientColShape* > ::iterator iter = m_Collisions.begin ();
-            for ( ; iter != m_Collisions.end () ; iter++ )
-            {
-                (*iter)->RemoveCollider ( this );
-            }
-        }
-
-        m_Collisions.clear ();
+        (*iter)->RemoveCollider ( this );
     }
+
+    m_Collisions.clear ();
 }
 
 

@@ -89,17 +89,9 @@ void CElementDeleter::DoDeleteAll ( void )
     {
         CClientEntity* pEntity = *iter;
 
-        // Only destroy it if it allows that yet
-        if ( pEntity->CanBeDeleted () )
-        {
-            // Delete the entity and put the next element in the list in the iterator
-            delete pEntity;
-            iter = m_List.erase ( iter );
-        }
-        else
-        {
-            ++iter;
-        }
+        // Delete the entity and put the next element in the list in the iterator
+        delete pEntity;
+        iter = m_List.erase ( iter );
     }
 
     // We can now allow unrefernecs again
@@ -128,27 +120,4 @@ void CElementDeleter::CleanUpForVM ( CLuaMain* pLuaMain )
     list < CClientEntity* > ::const_iterator iter = m_List.begin ();
     for ( ; iter != m_List.end () ; ++iter )
         (*iter)->DeleteEvents ( pLuaMain, false );
-}
-
-
-bool CElementDeleter::CanBeDestroyed ( void )
-{
-    // Delete list empty? We can be destroyed
-    if ( m_List.empty () )
-        return true;
-
-    // Check if there are any elements that can't be destroyed ye
-    list < CClientEntity* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); ++iter )
-    {
-        // Can this element be destroyed yet?
-        if ( !(*iter)->CanBeDeleted () )
-        {
-            // We can't be destroyed yet
-            return false;
-        }
-    }
-
-    // We can be destroyed
-    return true;
 }

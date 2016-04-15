@@ -73,9 +73,6 @@ private:
     uint                        m_uiScriptID;
 
     std::list <CTextDisplay *>  m_Observers;
-    int                         m_iUsageCount;  // the number of CLIENTS that can see this. 
-                                                // Used when deleting to make sure it isn't destroyed until
-                                                // all clients have been informed
 
     void                    AddObserver             ( CTextDisplay* pObserver );
     inline void             RemoveObserver          ( CTextDisplay* pObserver )   { m_Observers.remove ( pObserver ); };

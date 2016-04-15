@@ -95,7 +95,7 @@ CElement::~CElement ( void )
         (*iter)->m_ElementReferences.remove ( this );
     }
 
-    RemoveAllCollisions ( true );
+    RemoveAllCollisions ();
 
     // Null all camera elements referencing us
     std::list < CPlayerCamera* > cloneFollowingCameras = m_FollowingCameras;
@@ -1099,15 +1099,12 @@ bool CElement::CollisionExists ( CColShape* pShape )
 }
 
 
-void CElement::RemoveAllCollisions ( bool bNotify )
+void CElement::RemoveAllCollisions ( void )
 {
-    if ( bNotify )
+    list < CColShape* > ::iterator iter = m_Collisions.begin ();
+    for ( ; iter != m_Collisions.end () ; iter++ )
     {
-        list < CColShape* > ::iterator iter = m_Collisions.begin ();
-        for ( ; iter != m_Collisions.end () ; iter++ )
-        {
-            (*iter)->RemoveCollider ( this );
-        }
+        (*iter)->RemoveCollider ( this );
     }
     m_Collisions.clear ();
 }

@@ -72,7 +72,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_bLocalPlay = bLocalPlay;
     m_bErrorStartingLocal = false;
     m_iLocalConnectAttempts = 0;
-    m_fMarkerBounce = 0.0f;
     m_Status = CClientGame::STATUS_CONNECTING;
     m_ulVerifyTimeStart = 0;
     m_ulLastClickTick = 0;

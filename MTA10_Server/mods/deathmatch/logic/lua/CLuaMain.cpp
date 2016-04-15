@@ -574,7 +574,6 @@ void CLuaMain::DestroyTextItem ( CTextItem * pTextItem )
 CTextDisplay* CLuaMain::GetTextDisplayFromScriptID ( uint uiScriptID )
 {
     CTextDisplay* pTextDisplay = (CTextDisplay*) CIdArray::FindEntry ( uiScriptID, EIdClass::TEXT_DISPLAY );
-    dassert ( !pTextDisplay || ListContains ( m_Displays, pTextDisplay ) );
     return pTextDisplay;
 }
 
@@ -582,7 +581,6 @@ CTextDisplay* CLuaMain::GetTextDisplayFromScriptID ( uint uiScriptID )
 CTextItem* CLuaMain::GetTextItemFromScriptID ( uint uiScriptID )
 {
     CTextItem* pTextItem = (CTextItem*) CIdArray::FindEntry ( uiScriptID, EIdClass::TEXT_ITEM );
-    dassert ( !pTextItem || ListContains ( m_TextItems, pTextItem ) );
     return pTextItem;
 }
 
