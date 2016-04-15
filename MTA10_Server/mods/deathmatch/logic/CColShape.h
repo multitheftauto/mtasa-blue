@@ -54,7 +54,7 @@ public:
     void                        AddCollider         ( CElement* pElement )              { m_Colliders.push_back ( pElement ); }
     void                        RemoveCollider      ( CElement* pElement )              { m_Colliders.remove ( pElement ); }
     bool                        ColliderExists      ( CElement* pElement );
-    void                        RemoveAllColliders  ( bool bNotify );
+    void                        RemoveAllColliders  ( void );
     list < CElement* > ::iterator  CollidersBegin   ( void )                            { return m_Colliders.begin (); }
     list < CElement* > ::iterator  CollidersEnd     ( void )                            { return m_Colliders.end (); }
 

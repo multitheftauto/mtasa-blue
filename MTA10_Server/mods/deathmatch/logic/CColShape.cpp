@@ -35,7 +35,7 @@ CColShape::~CColShape ( void )
     if ( m_pCallback )
         m_pCallback->Callback_OnCollisionDestroy ( this );
 
-    RemoveAllColliders ( true );
+    RemoveAllColliders ();
     // Unlink us from our manager
     Unlink ();
 }
@@ -97,15 +97,12 @@ bool CColShape::ColliderExists ( CElement* pElement )
 }
 
 
-void CColShape::RemoveAllColliders ( bool bNotify )
+void CColShape::RemoveAllColliders ( void )
 {
-    if ( bNotify )
+    list < CElement* > ::iterator iter = m_Colliders.begin ();
+    for ( ; iter != m_Colliders.end () ; iter++ )
     {
-        list < CElement* > ::iterator iter = m_Colliders.begin ();
-        for ( ; iter != m_Colliders.end () ; iter++ )
-        {
-            (*iter)->RemoveCollision ( this );
-        }
+        (*iter)->RemoveCollision ( this );
     }
     m_Colliders.clear ();
 }

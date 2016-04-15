@@ -177,7 +177,7 @@ public:
     void                                        AddCollision                ( class CColShape* pShape )     { m_Collisions.push_back ( pShape ); }
     void                                        RemoveCollision             ( class CColShape* pShape )     { m_Collisions.remove ( pShape ); }
     bool                                        CollisionExists             ( class CColShape* pShape );
-    void                                        RemoveAllCollisions         ( bool bNotify = false );
+    void                                        RemoveAllCollisions         ( void );
     std::list < class CColShape* > ::iterator   CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
     std::list < class CColShape* > ::iterator   CollisionsEnd               ( void )                        { return m_Collisions.end (); }
 

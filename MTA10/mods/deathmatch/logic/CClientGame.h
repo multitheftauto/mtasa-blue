@@ -388,9 +388,6 @@ public:
     void                                DoWastedCheck                   ( ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animId = 15 );
     void                                SendPedWastedPacket                       ( CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0, AnimationId animID = 15 );
 
-    void                                SetMarkerBounce                 ( float fMarkerBounce ) { m_fMarkerBounce = fMarkerBounce; }
-    float                               GetMarkerBounce                 ( void ) { return m_fMarkerBounce; }
-
     inline CClientGUIElement*           GetClickedGUIElement            ( void )                        { return m_pClickedGUIElement; }
     inline void                         SetClickedGUIElement            ( CClientGUIElement* pElement ) { m_pClickedGUIElement = NULL; }
 
@@ -458,7 +455,6 @@ private:
     bool                                OnFocusGain                     ( CGUIFocusEventArgs Args );
     bool                                OnFocusLoss                     ( CGUIFocusEventArgs Args );
 
-    float                               m_fMarkerBounce;
     // Network update functions
     void                                DoVehicleInKeyCheck             ( void );
     void                                UpdateVehicleInOut              ( void );

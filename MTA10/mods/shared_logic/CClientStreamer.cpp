@@ -28,7 +28,8 @@ CClientStreamer::CClientStreamer ( StreamerLimitReachedFunction* pLimitReachedFu
     m_usDimension = 0;
 
     // We need the limit reached func
-    assert ( m_pLimitReachedFunc = pLimitReachedFunc );
+    assert ( pLimitReachedFunc );
+    m_pLimitReachedFunc = pLimitReachedFunc;
 
     // Create our main world sectors covering the mainland
     CreateSectors ( &m_WorldRows,
