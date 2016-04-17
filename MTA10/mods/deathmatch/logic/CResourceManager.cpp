@@ -237,14 +237,14 @@ bool CResourceManager::IsResourceFile( const SString& strInFilename )
 }
 
 // Remove this file from the checks as it has been changed by script actions
-void CResourceManager::OnFileModifedByScript( const SString& strInFilename )
+void CResourceManager::OnFileModifedByScript( const SString& strInFilename, const SString& strReason  )
 {
     SString strFilename = PathConform( strInFilename ).ToLower();
     CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
     if ( pResourceFile && !pResourceFile->IsModifedByScript() )
     {
         pResourceFile->SetModifedByScript( true );
-        SString strMessage( "Resource file modifed by script: %s ", *ConformResourcePath( strInFilename ) );
+        SString strMessage( "Resource file modifed by script (%s): %s ", *strReason, *ConformResourcePath( strInFilename ) );
         AddReportLog( 7059, strMessage + g_pNet->GetConnectedServer( true ), 10 );
     }
 }

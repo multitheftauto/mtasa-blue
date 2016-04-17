@@ -1519,7 +1519,7 @@ void _cdecl OnMY_printf ( DWORD dwCalledFrom, const char* szMessage )
     SString strMessage = SStringX( szMessage ).Replace( "\n", "" );
 
     // Ignore unimportant messages
-    if ( strMessage == "Initialised SoundManager" )
+    if ( strMessage == "Initialised SoundManager" || strMessage == "%f" )
     {
         return;
     }
@@ -1532,6 +1532,11 @@ void _cdecl OnMY_printf ( DWORD dwCalledFrom, const char* szMessage )
     {
         // Couldn't create render target for CPostEffects
         BrowseToSolution ( "error-subrastering", EXIT_GAME_FIRST | ASK_GO_ONLINE, _( "Problem with graphics driver" ) );
+    }
+    else
+    if ( strMessage == "Too many objects without modelinfo structures" )
+    {
+        // Corrupted gta3.img - TODO: Inform user one day
     }
 }
 
