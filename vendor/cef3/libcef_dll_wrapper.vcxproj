@@ -419,7 +419,6 @@
     <ClInclude Include="libcef_dll\cpptoc\delete_cookies_callback_cpptoc.h" />
     <ClInclude Include="libcef_dll\cpptoc\find_handler_cpptoc.h" />
     <ClInclude Include="libcef_dll\cpptoc\pdf_print_callback_cpptoc.h" />
-    <ClInclude Include="libcef_dll\cpptoc\resolve_callback_cpptoc.h" />
     <ClInclude Include="libcef_dll\cpptoc\response_filter_cpptoc.h" />
     <ClInclude Include="libcef_dll\cpptoc\set_cookie_callback_cpptoc.h" />
     <ClInclude Include="libcef_dll\ctocpp\ctocpp.h" />
@@ -532,7 +531,6 @@
     <ClCompile Include="libcef_dll\cpptoc\delete_cookies_callback_cpptoc.cc" />
     <ClCompile Include="libcef_dll\cpptoc\find_handler_cpptoc.cc" />
     <ClCompile Include="libcef_dll\cpptoc\pdf_print_callback_cpptoc.cc" />
-    <ClCompile Include="libcef_dll\cpptoc\resolve_callback_cpptoc.cc" />
     <ClCompile Include="libcef_dll\cpptoc\response_filter_cpptoc.cc" />
     <ClCompile Include="libcef_dll\cpptoc\set_cookie_callback_cpptoc.cc" />
     <ClCompile Include="libcef_dll\ctocpp\request_callback_ctocpp.cc" />

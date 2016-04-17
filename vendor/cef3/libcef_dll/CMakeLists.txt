@@ -102,8 +102,6 @@ set(LIBCEF_CPPTOC_SRCS
   cpptoc/request_context_handler_cpptoc.h
   cpptoc/request_handler_cpptoc.cc
   cpptoc/request_handler_cpptoc.h
-  cpptoc/resolve_callback_cpptoc.cc
-  cpptoc/resolve_callback_cpptoc.h
   cpptoc/resource_bundle_handler_cpptoc.cc
   cpptoc/resource_bundle_handler_cpptoc.h
   cpptoc/resource_handler_cpptoc.cc

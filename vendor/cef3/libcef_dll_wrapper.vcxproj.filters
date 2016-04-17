@@ -3106,9 +3106,6 @@
     <ClInclude Include="libcef_dll\cpptoc\response_filter_cpptoc.h">
       <Filter>libcef_dll\cpptoc</Filter>
     </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\resolve_callback_cpptoc.h">
-      <Filter>libcef_dll\cpptoc</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libcef_dll\cpptoc\find_handler_cpptoc.cc">
@@ -3151,9 +3148,6 @@
       <Filter>libcef_dll\ctocpp</Filter>
     </ClCompile>
     <ClCompile Include="libcef_dll\cpptoc\response_filter_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\resolve_callback_cpptoc.cc">
       <Filter>libcef_dll\cpptoc</Filter>
     </ClCompile>
   </ItemGroup>
