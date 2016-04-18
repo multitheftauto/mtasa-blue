@@ -68,7 +68,8 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
 
     g_pCore->UpdateDummyProgress();
 
-    g_pClientGame->GetDebugHookManager()->OnPreFunction( f, luaVM, true );
+    if ( !g_pClientGame->GetDebugHookManager()->OnPreFunction( f, luaVM, true ) )
+        return false;
 
     // Check if post function hook is required
     if ( g_pClientGame->GetDebugHookManager()->HasPostFunctionHooks() )

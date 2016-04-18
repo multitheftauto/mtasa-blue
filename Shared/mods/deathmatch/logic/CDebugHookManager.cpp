@@ -177,29 +177,26 @@ void GetDebugInfo( lua_State* luaVM, lua_Debug& debugInfo, const char*& szFilena
 // CDebugHookManager::OnPreFunction
 //
 // Called before a MTA function is called
+// Returns false if function call should be skipped
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool bAllowed )
+bool CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool bAllowed )
 {
     DECLARE_PROFILER_SECTION( OnPreFunction )
 
     if ( m_PreFunctionHookList.empty() )
-        return;
+        return true;
 
     CLuaCFunction* pFunction = CLuaCFunctions::GetFunction( f );
-    dassert( pFunction );
     if ( !pFunction )
-        return;
+        return true;
 
     const SString& strName = pFunction->GetName();
+    bool bNameMustBeExplicitlyAllowed = MustNameBeExplicitlyAllowed( strName );
 
     // Check if name is not used
-    if ( !IsNameAllowed( strName, m_PreFunctionHookList ) )
-        return;
-
-    // Don't trace add/removeDebugHook
-    if ( strName.EndsWith( "DebugHook" ) )
-        return;
+    if ( !IsNameAllowed( strName, m_PreFunctionHookList, bNameMustBeExplicitlyAllowed ) )
+        return true;
 
     // Get file/line number
     const char* szFilename = "";
@@ -224,7 +221,7 @@ void CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool b
     FunctionArguments.ReadArguments( luaVM );
     NewArguments.PushArguments( FunctionArguments );
 
-    CallHook( strName, m_PreFunctionHookList, NewArguments );
+    return CallHook( strName, m_PreFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed );
 }
 
 
@@ -243,18 +240,14 @@ void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
         return;
 
     CLuaCFunction* pFunction = CLuaCFunctions::GetFunction( f );
-    dassert( pFunction );
     if ( !pFunction )
         return;
 
     const SString& strName = pFunction->GetName();
+    bool bNameMustBeExplicitlyAllowed = MustNameBeExplicitlyAllowed( strName );
 
     // Check if name is not used
-    if ( !IsNameAllowed( strName, m_PostFunctionHookList ) )
-        return;
-
-    // Don't trace add/removeDebugHook
-    if ( strName.EndsWith( "DebugHook" ) )
+    if ( !IsNameAllowed( strName, m_PostFunctionHookList, bNameMustBeExplicitlyAllowed ) )
         return;
 
     // Get file/line number
@@ -280,7 +273,7 @@ void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
     FunctionArguments.ReadArguments( luaVM );
     NewArguments.PushArguments( FunctionArguments );
 
-    CallHook( strName, m_PostFunctionHookList, NewArguments );
+    CallHook( strName, m_PostFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed );
 }
 
 
@@ -289,16 +282,17 @@ void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
 // CDebugHookManager::OnPreEvent
 //
 // Called before a MTA event is triggered
+// Returns false if event should be skipped
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnPreEvent( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller )
+bool CDebugHookManager::OnPreEvent( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller )
 {
     if ( m_PreEventHookList.empty() )
-        return;
+        return true;
 
     // Check if name is not used
     if ( !IsNameAllowed( szName, m_PreEventHookList ) )
-        return;
+        return true;
 
     CLuaMain* pSourceLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
     CResource* pSourceResource = pSourceLuaMain ? pSourceLuaMain->GetResource() : NULL;
@@ -323,7 +317,7 @@ void CDebugHookManager::OnPreEvent( const char* szName, const CLuaArguments& Arg
     NewArguments.PushNumber( iLineNumber );
     NewArguments.PushArguments( Arguments );
 
-    CallHook( szName, m_PreEventHookList, NewArguments );
+    return CallHook( szName, m_PreEventHookList, NewArguments );
 }
 
 
@@ -377,13 +371,13 @@ void CDebugHookManager::OnPostEvent( const char* szName, const CLuaArguments& Ar
 // Returns true if there is a debughook which handles the name
 //
 ///////////////////////////////////////////////////////////////
-bool CDebugHookManager::IsNameAllowed( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList )
+bool CDebugHookManager::IsNameAllowed( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, bool bNameMustBeExplicitlyAllowed )
 {
     for( uint i = 0 ; i < eventHookList.size() ; i++ )
     {
         const SDebugHookCallInfo& info = eventHookList[i];
 
-        if ( info.allowedNameMap.empty() )
+        if ( info.allowedNameMap.empty() && !bNameMustBeExplicitlyAllowed )
             return true;    // All names allowed
 
         if ( MapContains( info.allowedNameMap, szName ) )
@@ -395,23 +389,37 @@ bool CDebugHookManager::IsNameAllowed( const char* szName, const std::vector < S
 
 ///////////////////////////////////////////////////////////////
 //
-// CDebugHookManager::CallHook
+// CDebugHookManager::MustNameBeExplicitlyAllowed
 //
-//
+// Don't trace add/removeDebugHook unless requested
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::CallHook( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments )
+bool CDebugHookManager::MustNameBeExplicitlyAllowed( const SString& strName )
+{
+    return strName == "addDebugHook" || strName == "removeDebugHook";
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::CallHook
+//
+// Return false if function/event should be skipped
+//
+///////////////////////////////////////////////////////////////
+bool CDebugHookManager::CallHook( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments, bool bNameMustBeExplicitlyAllowed )
 {
     static bool bRecurse = false;
     if ( bRecurse )
-        return;
+        return true;
     bRecurse = true;
+    bool bSkip = false;
 
     for( uint i = 0 ; i < eventHookList.size() ; i++ )
     {
         const SDebugHookCallInfo& info = eventHookList[i];
 
-        if ( !info.allowedNameMap.empty() )
+        if ( !info.allowedNameMap.empty() || bNameMustBeExplicitlyAllowed )
         {
             if ( !MapContains( info.allowedNameMap, szName ) )
                 continue;
@@ -444,8 +452,20 @@ void CDebugHookManager::CallHook( const char* szName, const std::vector < SDebug
         CLuaArgument OldClient ( pState, -1 );
         lua_pop( pState, 1 );
 
-        Arguments.Call ( info.pLuaMain, info.functionRef );
+        CLuaArguments returnValues;
+        Arguments.Call ( info.pLuaMain, info.functionRef, &returnValues );
         // Note: info could be invalid now
+
+        // Check for skip option
+        if ( returnValues.Count() )
+        {
+            CLuaArgument* returnedValue = *returnValues.IterBegin();
+            if ( returnedValue->GetType() == LUA_TSTRING )
+            {
+                if ( returnedValue->GetString() == "skip" )
+                    bSkip = true;
+            }
+        }
 
         // Reset the globals on that VM
         OldSource.Push ( pState );
@@ -468,4 +488,5 @@ void CDebugHookManager::CallHook( const char* szName, const std::vector < SDebug
     }
 
     bRecurse = false;
+    return !bSkip;
 }

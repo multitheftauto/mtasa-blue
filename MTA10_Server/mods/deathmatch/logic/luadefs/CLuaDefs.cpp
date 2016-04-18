@@ -179,7 +179,8 @@ int CLuaDefs::CanUseFunction ( lua_CFunction f, lua_State* luaVM )
         pResource->UpdateFunctionRightCache( f, bAllowed );
     }
 
-    g_pGame->GetDebugHookManager()->OnPreFunction( f, luaVM, bAllowed );
+    if ( !g_pGame->GetDebugHookManager()->OnPreFunction( f, luaVM, bAllowed ) )
+        return false;
 
     // If not allowed, do no more
     if ( !bAllowed )
