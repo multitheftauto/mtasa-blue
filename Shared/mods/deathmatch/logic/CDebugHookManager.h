@@ -37,17 +37,18 @@ public:
     bool                RemoveDebugHook             ( EDebugHookType hookType, const CLuaFunctionRef& functionRef );
     void                OnLuaMainDestroy            ( CLuaMain* pLuaMain );
 
-    void                OnPreFunction               ( lua_CFunction f, lua_State* luaVM, bool bAllowed );
+    bool                OnPreFunction               ( lua_CFunction f, lua_State* luaVM, bool bAllowed );
     void                OnPostFunction              ( lua_CFunction f, lua_State* luaVM );
-    void                OnPreEvent                  ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
+    bool                OnPreEvent                  ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
     void                OnPostEvent                 ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
 
     bool                HasPostFunctionHooks        ( void ) const      { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
 
 protected:
     std::vector < SDebugHookCallInfo >& GetHookInfoListForType ( EDebugHookType hookType );
-    void                CallHook                    ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments );
-    bool                IsNameAllowed               ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList );
+    bool                CallHook                    ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments, bool bNameMustBeExplicitlyAllowed = false );
+    bool                IsNameAllowed               ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, bool bNameMustBeExplicitlyAllowed = false );
+    bool                MustNameBeExplicitlyAllowed ( const SString& strName );
 
     uint                                m_uiPostFunctionOverride;
     std::vector < SDebugHookCallInfo >  m_PreEventHookList;
