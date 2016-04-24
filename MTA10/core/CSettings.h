@@ -233,7 +233,9 @@ protected:
     CGUIButton*         m_pButtonUpdate;
     CGUILabel*          m_pAdvancedMiscLabel;
     CGUILabel*          m_pAdvancedUpdaterLabel;
-
+    CGUILabel*          m_pCachePathLabel;
+    CGUILabel*          m_pCachePathValue;
+    CGUIButton*         m_pCachePathShowButton;
     CGUILabel*          m_pLabelRadioVolume;
     CGUILabel*          m_pLabelSFXVolume;
     CGUILabel*          m_pLabelMTAVolume;
@@ -367,6 +369,7 @@ protected:
     bool                OnChatBlueChanged       ( CGUIElement* pElement );
     bool                OnChatAlphaChanged      ( CGUIElement* pElement );
     bool                OnUpdateButtonClick     ( CGUIElement* pElement );
+    bool                OnCachePathShowButtonClick ( CGUIElement* pElement );
     bool                OnMouseSensitivityChanged ( CGUIElement* pElement );
     bool                OnVerticalAimSensitivityChanged ( CGUIElement* pElement );
     bool                OnBrowserBlacklistAdd   ( CGUIElement* pElement );
