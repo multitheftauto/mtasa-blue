@@ -1416,6 +1416,25 @@ void CSettings::CreateGUI ( void )
 #endif
     }
 
+    // Cache path info
+    m_pCachePathLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Client resource files:") ) );
+    m_pCachePathLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
+    m_pCachePathLabel->AutoSize ( );
+
+    m_pCachePathShowButton = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabAdvanced, _("Show in Explorer") ) );
+    m_pCachePathShowButton->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 1, vecTemp.fY - 1 ) );
+    m_pCachePathShowButton->AutoSize ( NULL, 20.0f, 8.0f );
+    m_pCachePathShowButton->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCachePathShowButtonClick, this ) );
+    m_pCachePathShowButton->SetZOrderingEnabled ( false );
+    m_pCachePathShowButton->GetSize ( vecSize );
+
+    SString strFileCachePath = GetCommonRegistryValue( "", "File Cache Path" );
+    m_pCachePathValue = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, strFileCachePath ) );
+    m_pCachePathValue->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + vecSize.fX + 10, vecTemp.fY + 3 ) );
+    m_pCachePathValue->SetFont ( "default-small" );
+    m_pCachePathValue->AutoSize ( );
+    vecTemp.fY += fLineHeight;
+
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Auto updater") ) );
     m_pAdvancedUpdaterLabel->SetPosition ( CVector2D ( vecTemp.fX - 10.0f, vecTemp.fY ) );
@@ -1467,11 +1486,11 @@ void CSettings::CreateGUI ( void )
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY = 354 + 10;
+    vecTemp.fY = 354 + 35;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "" ) );
-    m_pAdvancedSettingDescriptionLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
+    m_pAdvancedSettingDescriptionLabel->SetPosition ( CVector2D ( 0, vecTemp.fY ) );
     m_pAdvancedSettingDescriptionLabel->SetFont ( "default-bold-small" );
-    m_pAdvancedSettingDescriptionLabel->SetSize ( CVector2D ( 500.0f, 95.0f ) );
+    m_pAdvancedSettingDescriptionLabel->SetSize ( CVector2D ( tabPanelSize.fX, 95.0f ) );
     m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP );
 
     // Set up the events
@@ -3882,6 +3901,16 @@ bool CSettings::OnUpdateButtonClick ( CGUIElement* pElement )
     GetVersionUpdater ()->InitiateManualCheck ();
     return true;
 }
+
+
+bool CSettings::OnCachePathShowButtonClick ( CGUIElement* pElement )
+{
+    SString strFileCachePath = GetCommonRegistryValue( "", "File Cache Path" );
+    if ( DirectoryExists( strFileCachePath ) )
+        ShellExecuteNonBlocking( "open", strFileCachePath );
+    return true;
+}
+
 
 bool CSettings::OnFxQualityChanged ( CGUIElement* pElement )
 {
