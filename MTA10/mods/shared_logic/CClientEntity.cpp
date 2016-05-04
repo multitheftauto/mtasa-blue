@@ -718,6 +718,14 @@ void CClientEntity::InternalAttachTo ( CClientEntity* pEntity )
                     }
                     break;
                 }
+                case CCLIENTCOLSHAPE:
+                {
+                    CVector vecPosition;
+                    static_cast <CClientColShape*> (pEntity)->GetPosition(vecPosition);
+                    vecPosition += m_vecAttachedPosition;
+                    static_cast <CClientColShape*> (pEntity)->SetPosition(vecPosition);
+                    break;
+                }
             }
         }
         else
