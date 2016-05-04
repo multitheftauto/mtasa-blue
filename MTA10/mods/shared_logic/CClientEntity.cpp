@@ -755,7 +755,8 @@ bool CClientEntity::AddEvent ( CLuaMain* pLuaMain, const char* szName, const CLu
 
 bool CClientEntity::CallEvent ( const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren )
 {
-    g_pClientGame->GetDebugHookManager()->OnPreEvent( szName, Arguments, this, NULL );
+    if ( !g_pClientGame->GetDebugHookManager()->OnPreEvent( szName, Arguments, this, NULL ) )
+        return false;
 
     TIMEUS startTime = GetTimeUs ();
 
