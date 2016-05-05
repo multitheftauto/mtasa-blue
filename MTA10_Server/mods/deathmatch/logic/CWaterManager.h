@@ -24,7 +24,7 @@ public:
                                     ~CWaterManager              ();
 
     CWater*                         Create                      ( CWater::EWaterType waterType, CElement* pParent, CXMLNode* Node = NULL );
-    CWater*                         CreateFromXML               ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
+    CWater*                         CreateFromXML               ( CElement* pParent, CXMLNode& Node, CEvents* pEvents );
     void                            DeleteAll                   ();
 
     inline unsigned int             Count                       ()          { return static_cast < unsigned int > ( m_List.size () ); };

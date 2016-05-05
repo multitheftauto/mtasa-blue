@@ -13,15 +13,16 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define DECLARE_PROFILER_SECTION_CCustomData
+#include "profiler/SharedUtil.Profiler.h"
 
-using std::map;
 
 void CCustomData::Copy ( CCustomData* pCustomData )
 {
-    map < std::string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();
+    std::map < std::string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();
     for ( ; iter != pCustomData->IterEnd (); iter++ )
     {
-        Set ( iter->first.c_str (), iter->second.Variable, iter->second.pLuaMain );
+        Set ( iter->first.c_str (), iter->second.Variable );
     }
 }
 
@@ -29,19 +30,15 @@ SCustomData* CCustomData::Get ( const char* szName )
 {
     assert ( szName );
 
-    std::map < std::string, SCustomData > :: const_iterator it = m_Data.find ( szName );
+    std::map < std::string, SCustomData > :: iterator it = m_Data.find ( szName );
     if ( it != m_Data.end () )
-        return (SCustomData *)&it->second;
+        return &it->second;
 
     return NULL;
 }
 
-// User-defined warnings
-#define __STR2__(x) #x
-#define __STR1__(x) __STR2__(x)
-#define __LOC__ __FILE__ "("__STR1__(__LINE__)") : warning C0000 *MTA Developers*: "
 
-void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain )
+void CCustomData::Set ( const char* szName, const CLuaArgument& Variable )
 {
     assert ( szName );
 
@@ -49,16 +46,14 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class 
     SCustomData* pData = Get ( szName );
     if ( pData )
     {
-        // Set the variable and eventually its new owner
+        // Update existing
         pData->Variable = Variable;
-        pData->pLuaMain = pLuaMain;
     }
     else
     {
-        // Set the stuff and add it
+        // Add new
         SCustomData newData;
         newData.Variable = Variable;
-        newData.pLuaMain = pLuaMain;
         m_Data [ szName ] = newData;
     }
 }
@@ -76,26 +71,4 @@ bool CCustomData::Delete ( const char* szName )
 
     // Didn't exist
     return false;
-}
-
-
-void CCustomData::DeleteAll ( class CLuaMain* pLuaMain )
-{
-    // Delete any items with matching VM's
-    std::map < std::string, SCustomData > :: iterator iter = m_Data.begin ();
-    while ( iter != m_Data.end () )
-    {
-        // Delete it if they match
-        if ( iter->second.pLuaMain == pLuaMain )
-            m_Data.erase ( iter );
-        else
-            iter++;
-    }
-}
-
-
-void CCustomData::DeleteAll ( void )
-{
-    // Delete all the items
-    m_Data.clear ();
 }

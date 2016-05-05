@@ -37,14 +37,14 @@ CMarker* CMarkerManager::Create ( CElement* pParent, CXMLNode* pNode )
 }
 
 
-CMarker* CMarkerManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CMarker* CMarkerManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
 {
     // Create the marker
     CMarker* pMarker = new CMarker ( this, m_pColManager, pParent, &Node );
 
     // Load the data from XML
     if ( pMarker->GetID () == INVALID_ELEMENT_ID ||
-         !pMarker->LoadFromCustomData ( pLuaMain, pEvents ) )
+         !pMarker->LoadFromCustomData ( pEvents ) )
     {
         delete pMarker;
         return NULL;

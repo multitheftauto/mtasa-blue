@@ -73,14 +73,14 @@ CTeam* CTeamManager::Create ( CElement* pParent, CXMLNode* pNode, char* szName, 
 }
 
 
-CTeam* CTeamManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CTeam* CTeamManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
 {
     // Create the Team
     CTeam* pTeam = new CTeam ( this, pParent, &Node );
 
     // Verify the Team id and load the data from xml
     if ( pTeam->GetID () == INVALID_ELEMENT_ID ||
-         !pTeam->LoadFromCustomData ( pLuaMain, pEvents ) )
+         !pTeam->LoadFromCustomData ( pEvents ) )
     {
         delete pTeam;
         return NULL;

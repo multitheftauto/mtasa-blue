@@ -30,7 +30,7 @@ public:
                                 ~CObjectManager                 ( void );
 
     CObject*                    Create                          ( CElement* pParent, CXMLNode* pNode, bool bIsLowLod );
-    CObject*                    CreateFromXML                   ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents, bool bIsLowLod );
+    CObject*                    CreateFromXML                   ( CElement* pParent, CXMLNode& Node, CEvents* pEvents, bool bIsLowLod );
     void                        DeleteAll                       ( void );
 
     inline unsigned int         Count                           ( void )                            { return static_cast < unsigned int > ( m_List.size () ); };

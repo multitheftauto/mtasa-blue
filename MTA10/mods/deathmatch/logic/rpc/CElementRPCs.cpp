@@ -99,7 +99,7 @@ void CElementRPCs::SetElementData ( CClientEntity* pSource, NetBitStreamInterfac
         CLuaArgument Argument;
         if ( bitStream.ReadStringCharacters ( strName, usNameLength ) && Argument.ReadFromBitStream ( bitStream ) )
         {
-            pSource->SetCustomData ( strName, Argument, NULL );
+            pSource->SetCustomData ( strName, Argument );
         }
     }
 }

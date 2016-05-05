@@ -2719,7 +2719,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         CLuaArgument Argument;
                         Argument.ReadFromBitStream ( bitStream );
 
-                        pCustomData->Set ( strName, Argument, NULL );
+                        pCustomData->Set ( strName, Argument );
                     }
                     else
                     {

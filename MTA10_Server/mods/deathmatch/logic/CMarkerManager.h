@@ -29,7 +29,7 @@ public:
     inline                                              ~CMarkerManager                   ( void )        { DeleteAll (); };
 
     CMarker*                                            Create                      ( CElement* pParent, CXMLNode* pNode = NULL );
-    CMarker*                                            CreateFromXML               ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
+    CMarker*                                            CreateFromXML               ( CElement* pParent, CXMLNode& Node, CEvents* pEvents );
     void                                                DeleteAll                   ( void );
 
     inline unsigned int                                 Count                       ( void )            { return static_cast < unsigned int > ( m_Markers.size () ); };

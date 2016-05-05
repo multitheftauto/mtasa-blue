@@ -24,7 +24,7 @@ public:
                                     ~CRadarAreaManager                      ( void );
 
     CRadarArea*                     Create                                  ( CElement* pParent, CXMLNode* pNode );
-    CRadarArea*                     CreateFromXML                           ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
+    CRadarArea*                     CreateFromXML                           ( CElement* pParent, CXMLNode& Node, CEvents* pEvents );
     void                            DeleteAll                               ( void );
 
     unsigned int                    Count                                   ( void )                        { return static_cast < unsigned int > ( m_List.size () ); };

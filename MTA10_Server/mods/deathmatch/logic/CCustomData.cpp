@@ -20,7 +20,7 @@ void CCustomData::Copy ( CCustomData* pCustomData )
     map < std::string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();
     for ( ; iter != pCustomData->IterEnd (); iter++ )
     {
-        Set ( iter->first.c_str (), iter->second.Variable, iter->second.pLuaMain );
+        Set ( iter->first.c_str (), iter->second.Variable );
     }
 }
 
@@ -61,7 +61,7 @@ bool CCustomData::DeleteSynced ( const char* szName )
     return false;
 }
 
-void CCustomData::UpdateSynced ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized )
+void CCustomData::UpdateSynced ( const char* szName, const CLuaArgument& Variable, bool bSynchronized )
 {
     if ( bSynchronized )
     {
@@ -69,14 +69,12 @@ void CCustomData::UpdateSynced ( const char* szName, const CLuaArgument& Variabl
         if ( pDataSynced )
         {
             pDataSynced->Variable = Variable;
-            pDataSynced->pLuaMain = pLuaMain;
             pDataSynced->bSynchronized = bSynchronized;
         }
         else
         {
             SCustomData newData;
             newData.Variable = Variable;
-            newData.pLuaMain = pLuaMain;
             newData.bSynchronized = bSynchronized;
             m_SyncedData [ szName ] = newData;
         }
@@ -86,12 +84,9 @@ void CCustomData::UpdateSynced ( const char* szName, const CLuaArgument& Variabl
         DeleteSynced ( szName );
     }
 }
-// User-defined warnings
-#define __STR2__(x) #x
-#define __STR1__(x) __STR2__(x)
-#define __LOC__ __FILE__ "("__STR1__(__LINE__)") : warning C0000 *MTA Developers*: "
 
-void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized )
+
+void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, bool bSynchronized )
 {
     assert ( szName );
 
@@ -99,21 +94,19 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, class 
     SCustomData* pData = Get ( szName );
     if ( pData )
     {
-        // Set the variable and eventually its new owner
+        // Update existing
         pData->Variable = Variable;
-        pData->pLuaMain = pLuaMain;
         pData->bSynchronized = bSynchronized;
-        UpdateSynced ( szName, Variable, pLuaMain, bSynchronized );
+        UpdateSynced ( szName, Variable, bSynchronized );
     }
     else
     {
-        // Set the stuff and add it
+        // Add new
         SCustomData newData;
         newData.Variable = Variable;
-        newData.pLuaMain = pLuaMain;
         newData.bSynchronized = bSynchronized;
         m_Data [ szName ] = newData;
-        UpdateSynced ( szName, Variable, pLuaMain, bSynchronized );
+        UpdateSynced ( szName, Variable, bSynchronized );
     }
 }
 
@@ -131,37 +124,6 @@ bool CCustomData::Delete ( const char* szName )
 
     // Didn't exist
     return false;
-}
-
-void CCustomData::DeleteAll ( class CLuaMain* pLuaMain )
-{
-    // Delete any items with matching VM's
-    std::map < std::string, SCustomData > :: iterator iter = m_Data.begin ();
-    while ( iter != m_Data.end () )
-    {
-        // Delete it if they match
-        if ( iter->second.pLuaMain == pLuaMain )
-            m_Data.erase ( iter++ );
-        else
-            iter++;
-    }
-    iter = m_SyncedData.begin ();
-    while ( iter != m_SyncedData.end () )
-    {
-        // Delete it if they match
-        if ( iter->second.pLuaMain == pLuaMain )
-            m_SyncedData.erase ( iter++ );
-        else
-            iter++;
-    }
-}
-
-
-void CCustomData::DeleteAll ( void )
-{
-    // Delete all the items
-    m_Data.clear ( );
-    m_SyncedData.clear ( );
 }
 
 CXMLNode * CCustomData::OutputToXML ( CXMLNode * pNode )

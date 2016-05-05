@@ -121,14 +121,14 @@ CObject* CObjectManager::Create ( CElement* pParent, CXMLNode* pNode, bool bIsLo
 }
 
 
-CObject* CObjectManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents, bool bIsLowLod )
+CObject* CObjectManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents, bool bIsLowLod )
 {
     // Create the object
     CObject* pObject = new CObject ( pParent, &Node, this, bIsLowLod );
 
     // Valid object id and load it from xml
     if ( pObject->GetID () == INVALID_ELEMENT_ID ||
-         !pObject->LoadFromCustomData ( pLuaMain, pEvents ) )
+         !pObject->LoadFromCustomData ( pEvents ) )
     {
         delete pObject;
         return NULL;

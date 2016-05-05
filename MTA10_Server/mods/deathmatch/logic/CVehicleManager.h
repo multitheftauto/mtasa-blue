@@ -34,7 +34,7 @@ public:
                                         ~CVehicleManager            ( void );
 
     CVehicle*                           Create                      ( unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, CElement* pParent, CXMLNode* pNode = NULL );
-    CVehicle*                           CreateFromXML               ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
+    CVehicle*                           CreateFromXML               ( CElement* pParent, CXMLNode& Node, CEvents* pEvents );
     void                                DeleteAll                   ( void );
 
     inline unsigned int                 Count                       ( void )                            { return static_cast < unsigned int > ( m_List.size () ); };

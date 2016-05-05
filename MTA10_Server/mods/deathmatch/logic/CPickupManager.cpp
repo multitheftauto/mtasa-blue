@@ -44,14 +44,14 @@ CPickup* CPickupManager::Create ( CElement* pParent )
 }
 
 
-CPickup* CPickupManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CPickup* CPickupManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
 {
     // Create the pickup
     CPickup* pPickup = new CPickup ( pParent, &Node, this, m_pColManager );
 
     // Delete it if it's invalid
     if ( pPickup->GetID () == INVALID_ELEMENT_ID ||
-         !pPickup->LoadFromCustomData ( pLuaMain, pEvents ) )
+         !pPickup->LoadFromCustomData ( pEvents ) )
     {
         delete pPickup;
         return NULL;

@@ -31,7 +31,7 @@ public:
     CTeam*                  GetTeam             ( const char* szName );
     bool                    Exists              ( CTeam* pTeam );
     CTeam*                  Create              ( CElement* pParent, CXMLNode* pNode, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
-    CTeam*                  CreateFromXML       ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
+    CTeam*                  CreateFromXML       ( CElement* pParent, CXMLNode& Node, CEvents* pEvents );
 
     std::list < CTeam* > ::const_iterator IterBegin  ( void )            { return m_List.begin (); }
     std::list < CTeam* > ::const_iterator IterEnd    ( void )            { return m_List.end (); }

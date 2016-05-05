@@ -20,11 +20,11 @@ CDummy* CGroups::Create ( CElement* pParent )
 }
 
 
-CDummy* CGroups::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CDummy* CGroups::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
 {
     // Create the item and load its custom data and events
     CDummy* pTemp = new CDummy ( this, pParent, &Node );
-    pTemp->LoadFromCustomData ( pLuaMain, pEvents );
+    pTemp->LoadFromCustomData ( pEvents );
 
     // Return it
     return pTemp;

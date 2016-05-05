@@ -976,7 +976,7 @@ bool CStaticFunctionDefinitions::SetElementID ( CClientEntity& Entity, const cha
 }
 
 
-bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const char* szName, CLuaArgument& Variable, CLuaMain& LuaMain, bool bSynchronize )
+bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const char* szName, CLuaArgument& Variable, bool bSynchronize )
 {
     assert ( szName );
     assert ( strlen ( szName ) <= MAX_CUSTOMDATA_NAME_LENGTH );
@@ -1002,7 +1002,7 @@ bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const c
                 g_pNet->DeallocateNetBitStream ( pBitStream );
 
                 // Set its custom data
-                Entity.SetCustomData ( szName, Variable, &LuaMain );
+                Entity.SetCustomData ( szName, Variable );
 
                 return true;
             }
@@ -1010,7 +1010,7 @@ bool CStaticFunctionDefinitions::SetElementData ( CClientEntity& Entity, const c
         else
         {
             // Set its custom data
-            Entity.SetCustomData ( szName, Variable, &LuaMain );
+            Entity.SetCustomData ( szName, Variable );
 
             return true;
         }

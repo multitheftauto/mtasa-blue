@@ -34,14 +34,14 @@ CBlip* CBlipManager::Create ( CElement* pParent, CXMLNode* pNode )
 }
 
 
-CBlip* CBlipManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CBlip* CBlipManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
 {
     // Create the blip
     CBlip* pBlip = new CBlip ( pParent, &Node, this );
 
     // Is the id valid?
     if ( pBlip->GetID () == INVALID_ELEMENT_ID ||
-         !pBlip->LoadFromCustomData ( pLuaMain, pEvents ) )
+         !pBlip->LoadFromCustomData ( pEvents ) )
     {
         delete pBlip;
         return NULL;
