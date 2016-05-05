@@ -27,7 +27,7 @@ public:
     inline                  ~CBlipManager               ( void )                        { DeleteAll (); };
 
     CBlip*                  Create                      ( CElement* pParent, CXMLNode* pNode = NULL );
-    CBlip*                  CreateFromXML               ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents );
+    CBlip*                  CreateFromXML               ( CElement* pParent, CXMLNode& Node, CEvents* pEvents );
     void                    DeleteAll                   ( void );
 
     inline unsigned int     Count                       ( void )                        { return static_cast < unsigned int > ( m_List.size () ); };

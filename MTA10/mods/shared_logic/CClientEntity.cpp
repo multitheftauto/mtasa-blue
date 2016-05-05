@@ -484,7 +484,7 @@ bool CClientEntity::GetCustomDataBool ( const char* szName, bool& bOut, bool bIn
     return false;
 }
 
-void CClientEntity::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain )
+void CClientEntity::SetCustomData ( const char* szName, const CLuaArgument& Variable )
 {
     assert ( szName );
     if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
@@ -503,7 +503,7 @@ void CClientEntity::SetCustomData ( const char* szName, const CLuaArgument& Vari
     }
 
     // Set the new data
-    m_pCustomData->Set ( szName, Variable, pLuaMain );
+    m_pCustomData->Set ( szName, Variable );
 
     // Trigger the onClientElementDataChange event on us
     CLuaArguments Arguments;

@@ -41,14 +41,14 @@ CRadarArea* CRadarAreaManager::Create ( CElement* pParent, CXMLNode* pNode )
 }
 
 
-CRadarArea* CRadarAreaManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CRadarArea* CRadarAreaManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
 {
     // Create the radar area
     CRadarArea* pArea = new CRadarArea ( this, pParent, &Node );
 
     // If the id was invalid, delete it and return NULL
     if ( pArea->GetID () == INVALID_ELEMENT_ID ||
-         !pArea->LoadFromCustomData ( pLuaMain, pEvents ) )
+         !pArea->LoadFromCustomData ( pEvents ) )
     {
         delete pArea;
         return NULL;

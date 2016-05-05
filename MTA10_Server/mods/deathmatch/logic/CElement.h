@@ -133,7 +133,7 @@ public:
     void                                        DeleteEvents                ( CLuaMain* pLuaMain, bool bRecursive );
     void                                        DeleteAllEvents             ( void );
 
-    void                                        ReadCustomData              ( CLuaMain* pLuaMain, CEvents* pEvents );
+    void                                        ReadCustomData              ( CEvents* pEvents );
     inline CCustomData*                         GetCustomDataPointer        ( void )                    { return m_pCustomData; }
     CLuaArgument*                               GetCustomData               ( const char* szName, bool bInheritData, bool* pbIsSynced = NULL );
     CLuaArguments*                              GetAllCustomData            ( CLuaArguments * table );
@@ -141,7 +141,7 @@ public:
     bool                                        GetCustomDataInt            ( const char* szName, int& iOut, bool bInheritData );
     bool                                        GetCustomDataFloat          ( const char* szName, float& fOut, bool bInheritData );
     bool                                        GetCustomDataBool           ( const char* szName, bool& bOut, bool bInheritData );
-    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized = true, CPlayer* pClient = NULL, bool bTriggerEvent = true );
+    void                                        SetCustomData               ( const char* szName, const CLuaArgument& Variable, bool bSynchronized = true, CPlayer* pClient = NULL, bool bTriggerEvent = true );
     void                                        DeleteCustomData            ( const char* szName );
     void                                        SendAllCustomData           ( CPlayer* pPlayer );
 
@@ -166,7 +166,7 @@ public:
     inline const std::string&                   GetName                     ( void )                        { return m_strName; };
     inline void                                 SetName                     ( const std::string& strName )  { m_strName = strName; };
 
-    bool                                        LoadFromCustomData          ( CLuaMain* pLuaMain, CEvents* pEvents );
+    bool                                        LoadFromCustomData          ( CEvents* pEvents );
 
     void                                        OnSubtreeAdd                ( CElement* pElement );
     void                                        OnSubtreeRemove             ( CElement* pElement );

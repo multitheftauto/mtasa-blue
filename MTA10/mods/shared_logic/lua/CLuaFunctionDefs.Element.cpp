@@ -1558,7 +1558,7 @@ int CLuaFunctionDefs::SetElementData ( lua_State* luaVM )
                 strKey = strKey.Left ( MAX_CUSTOMDATA_NAME_LENGTH );
             }
 
-            if ( CStaticFunctionDefinitions::SetElementData ( *pEntity, strKey, value, *pLuaMain, bSynchronize ) )
+            if ( CStaticFunctionDefinitions::SetElementData ( *pEntity, strKey, value, bSynchronize ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

@@ -25,7 +25,6 @@
 struct SCustomData
 {
     CLuaArgument        Variable;
-    class CLuaMain*     pLuaMain;
     bool                bSynchronized;
 };
 
@@ -37,13 +36,10 @@ public:
 
     SCustomData*            Get                     ( const char* szName );
     SCustomData*            GetSynced               ( const char* szName );
-    void                    Set                     ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized = true );
+    void                    Set                     ( const char* szName, const CLuaArgument& Variable, bool bSynchronized = true );
 
     bool                    Delete                  ( const char* szName );
-    void                    DeleteAll               ( class CLuaMain* pLuaMain );
-    void                    DeleteAll               ( void );
 
-    inline unsigned int     Count                   ( void )                           { return static_cast < unsigned int > ( m_Data.size () ); }
     unsigned short          CountOnlySynchronized   ( void );
 
     CXMLNode *              OutputToXML             ( CXMLNode * pNode );
@@ -56,7 +52,7 @@ public:
 
 private:
     bool                    DeleteSynced            ( const char* szName );
-    void                    UpdateSynced            ( const char* szName, const CLuaArgument& Variable, class CLuaMain* pLuaMain, bool bSynchronized );
+    void                    UpdateSynced            ( const char* szName, const CLuaArgument& Variable, bool bSynchronized );
 
 
     std::map < std::string, SCustomData >       m_Data;

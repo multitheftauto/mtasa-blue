@@ -505,9 +505,8 @@ void CElement::DeleteAllEvents ( void )
 }
 
 
-void CElement::ReadCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
+void CElement::ReadCustomData ( CEvents* pEvents )
 {
-    assert ( pLuaMain );
     assert ( pEvents );
 
     // Got an XML node?
@@ -527,7 +526,7 @@ void CElement::ReadCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
                 args.PushString ( pAttribute->GetValue ().c_str () );
 
             // Don't trigger onElementDataChanged event
-            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], pLuaMain, g_pGame->GetConfig ()->GetSyncMapElementData (), NULL, false );
+            SetCustomData ( pAttribute->GetName ().c_str (), *args[0], g_pGame->GetConfig ()->GetSyncMapElementData (), NULL, false );
         }
     }
 }
@@ -735,7 +734,7 @@ bool CElement::GetCustomDataBool ( const char* szName, bool& bOut, bool bInherit
 }
 
 
-void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent )
+void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable, bool bSynchronized, CPlayer* pClient, bool bTriggerEvent )
 {
     assert ( szName );
     if ( strlen ( szName ) > MAX_CUSTOMDATA_NAME_LENGTH )
@@ -754,7 +753,7 @@ void CElement::SetCustomData ( const char* szName, const CLuaArgument& Variable,
     }
 
     // Set the new data
-    m_pCustomData->Set ( szName, Variable, pLuaMain, bSynchronized );
+    m_pCustomData->Set ( szName, Variable, bSynchronized );
 
     if ( bTriggerEvent )
     {
@@ -847,13 +846,12 @@ void CElement::CleanUpForVM ( CLuaMain* pLuaMain, bool bRecursive )
 }
 
 
-bool CElement::LoadFromCustomData ( CLuaMain* pLuaMain, CEvents* pEvents )
+bool CElement::LoadFromCustomData ( CEvents* pEvents )
 {
-    assert ( pLuaMain );
     assert ( pEvents );
 
     // Read out all the attributes into our custom data records
-    ReadCustomData ( pLuaMain, pEvents );
+    ReadCustomData ( pEvents );
 
     // Grab the "id" custom data into our m_strName member
     char szBuf[MAX_ELEMENT_NAME_LENGTH + 1] = {0};

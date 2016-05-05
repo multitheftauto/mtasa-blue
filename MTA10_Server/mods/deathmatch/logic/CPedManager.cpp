@@ -40,14 +40,14 @@ CPed* CPedManager::Create ( unsigned short usModel, CElement* pParent, CXMLNode*
 }
 
 
-CPed* CPedManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CPed* CPedManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
 {
     // Create the Ped
     CPed* pPed = new CPed ( this, pParent, &Node, 400 );
 
     // Verify the Ped id and load the data from xml
     if ( pPed->GetID () == INVALID_ELEMENT_ID ||
-         !pPed->LoadFromCustomData ( pLuaMain, pEvents ) )
+         !pPed->LoadFromCustomData ( pEvents ) )
     {
         delete pPed;
         return NULL;

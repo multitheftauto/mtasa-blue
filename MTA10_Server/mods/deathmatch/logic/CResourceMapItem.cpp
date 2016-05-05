@@ -189,16 +189,16 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     CElement* pNode = NULL;
     if ( elementType == CElement::VEHICLE )
     {
-        pNode = m_pVehicleManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        pNode = m_pVehicleManager->CreateFromXML ( pParent, Node, m_pEvents );
     }
     else if ( elementType == CElement::OBJECT )
     {
         bool bIsLowLod = false;
-        pNode = m_pObjectManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents, bIsLowLod );
+        pNode = m_pObjectManager->CreateFromXML ( pParent, Node, m_pEvents, bIsLowLod );
     }
     else if ( elementType == CElement::BLIP )
     {
-        CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, m_pEvents );
         pNode = pBlip;
         /*
         if ( pBlip )
@@ -209,11 +209,11 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     }
     else if ( elementType == CElement::PICKUP )
     {
-        pNode = m_pPickupManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        pNode = m_pPickupManager->CreateFromXML ( pParent, Node, m_pEvents );
     }
     else if ( elementType == CElement::MARKER )
     {
-        CMarker* pMarker = m_pMarkerManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        CMarker* pMarker = m_pMarkerManager->CreateFromXML ( pParent, Node, m_pEvents );
         pNode = pMarker;
         /*
         if ( pMarker )
@@ -224,7 +224,7 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     }
     else if ( elementType == CElement::RADAR_AREA )
     {
-        CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML ( pParent, Node, m_pEvents );
         pNode = pRadarArea;
         /*
         if ( pRadarArea )
@@ -235,15 +235,15 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     }
     else if ( elementType == CElement::TEAM )
     {
-        pNode = m_pTeamManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        pNode = m_pTeamManager->CreateFromXML ( pParent, Node, m_pEvents );
     }
     else if ( elementType == CElement::PED )
     {
-        pNode = m_pPedManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        pNode = m_pPedManager->CreateFromXML ( pParent, Node, m_pEvents );
     }
     else if ( elementType == CElement::WATER )
     {
-        pNode = m_pWaterManager->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        pNode = m_pWaterManager->CreateFromXML ( pParent, Node, m_pEvents );
     }
     else if ( strBuffer.empty () )
     {
@@ -252,7 +252,7 @@ bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < 
     }
     else
     {
-        pNode = m_pGroups->CreateFromXML ( pParent, Node, m_pVM, m_pEvents );
+        pNode = m_pGroups->CreateFromXML ( pParent, Node, m_pEvents );
     }
 
     // Set the node we created in the pointer we were given

@@ -1079,7 +1079,7 @@ bool CStaticFunctionDefinitions::SetElementID ( CElement* pElement, const char* 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, const char* szName, const CLuaArgument& Variable, CLuaMain* pLuaMain, bool bSynchronize )
+bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, const char* szName, const CLuaArgument& Variable, bool bSynchronize )
 {
     assert ( pElement );
     assert ( szName );
@@ -1103,7 +1103,7 @@ bool CStaticFunctionDefinitions::SetElementData ( CElement* pElement, const char
         }
 
         // Set its custom data
-        pElement->SetCustomData ( szName, Variable, pLuaMain, bSynchronize );
+        pElement->SetCustomData ( szName, Variable, bSynchronize );
         return true;
     }
     return false;

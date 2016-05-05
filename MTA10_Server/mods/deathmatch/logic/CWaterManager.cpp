@@ -36,10 +36,10 @@ CWater* CWaterManager::Create ( CWater::EWaterType waterType, CElement* pParent,
     return pWater;
 }
 
-CWater* CWaterManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CLuaMain* pLuaMain, CEvents* pEvents )
+CWater* CWaterManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
 {
     CWater* pWater = new CWater ( this, pParent, &Node );
-    if ( pWater->GetID () == INVALID_ELEMENT_ID || !pWater->LoadFromCustomData ( pLuaMain, pEvents ) )
+    if ( pWater->GetID () == INVALID_ELEMENT_ID || !pWater->LoadFromCustomData ( pEvents ) )
     {
         delete pWater;
         pWater = NULL;

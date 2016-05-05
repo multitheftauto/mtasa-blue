@@ -2445,7 +2445,7 @@ void CGame::Packet_CustomData ( CCustomDataPacket& Packet )
 
             CPerfStatEventPacketUsage::GetSingleton ()->UpdateElementDataUsageRelayed ( szName, m_pPlayerManager->Count(), BitStream.pBitStream->GetNumberOfBytesUsed() );
 
-            pElement->SetCustomData ( szName, Value, NULL, true, pSourcePlayer );
+            pElement->SetCustomData ( szName, Value, true, pSourcePlayer );
         }
     }
 }
