@@ -12,6 +12,30 @@
 
 namespace SharedUtil
 {
+    //
+    // Heap memory which is auto-deleted on scope exit
+    // Designed as a replacement for alloca(), so allocated size is in bytes
+    //
+    template < class T >
+    class CScopeAlloc
+    {
+        std::vector < char > buffer;
+    public:
+        CScopeAlloc( size_t sizeInBytes )
+        {
+            buffer.resize( sizeInBytes );
+        }
+
+        void resize( size_t newSizeInBytes )
+        {
+            buffer.resize( newSizeInBytes );
+        }
+
+        operator T*( void )
+        {
+            return buffer.empty() ? nullptr : reinterpret_cast < T* >( &buffer.at( 0 ) );
+        }
+    };
 
     // Assuming compiled on little endian machine
     #define CBUFFER_LITTLE_ENDIAN
@@ -269,7 +293,7 @@ namespace SharedUtil
                 if ( !CanReadNumberOfBytes( usLength ) )
                     return false;
                 // Read the data
-                char* buffer = static_cast < char* > ( alloca ( usLength ) );
+                CScopeAlloc < char > buffer( usLength );
                 if ( !ReadBytes ( buffer, usLength, false ) )
                     return false;
 

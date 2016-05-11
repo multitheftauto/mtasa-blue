@@ -148,11 +148,11 @@ static SString ReadRegistryStringValue ( HKEY hkRoot, const char* szSubKey, cons
         DWORD dwBufferSize;
         if ( RegQueryValueExW ( hkTemp, wstrValue, NULL, NULL, NULL, &dwBufferSize ) == ERROR_SUCCESS )
         {
-            wchar_t* szBuffer = static_cast < wchar_t* > ( alloca ( dwBufferSize + sizeof( wchar_t ) ) );
-            if ( RegQueryValueExW ( hkTemp, wstrValue, NULL, NULL, (LPBYTE)szBuffer, &dwBufferSize ) == ERROR_SUCCESS )
+            CScopeAlloc < wchar_t > szBuffer( dwBufferSize + sizeof( wchar_t ) );
+            if ( RegQueryValueExW ( hkTemp, wstrValue, NULL, NULL, (LPBYTE)(wchar_t*)szBuffer, &dwBufferSize ) == ERROR_SUCCESS )
             {
                 szBuffer[ dwBufferSize / sizeof( wchar_t ) ] = 0;
-                strOutResult = ToUTF8( szBuffer );
+                strOutResult = ToUTF8( (wchar_t*)szBuffer );
                 bResult = true;
             }
         }
