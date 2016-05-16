@@ -13,6 +13,30 @@
 #include <game/CGame.h>
 #include "CModelCacheManager.h"
 
+DECLARE_ENUM( ePools );
+IMPLEMENT_ENUM_BEGIN( ePools )
+    ADD_ENUM1( BUILDING_POOL )
+    ADD_ENUM1( PED_POOL )
+    ADD_ENUM1( OBJECT_POOL )
+    ADD_ENUM1( DUMMY_POOL )
+    ADD_ENUM1( VEHICLE_POOL )
+    ADD_ENUM1( COL_MODEL_POOL )
+    ADD_ENUM1( TASK_POOL )
+    ADD_ENUM1( EVENT_POOL )
+    ADD_ENUM1( TASK_ALLOCATOR_POOL )
+    ADD_ENUM1( PED_INTELLIGENCE_POOL )
+    ADD_ENUM1( PED_ATTRACTOR_POOL )
+    ADD_ENUM1( ENTRY_INFO_NODE_POOL )
+    ADD_ENUM1( NODE_ROUTE_POOL )
+    ADD_ENUM1( PATROL_ROUTE_POOL )
+    ADD_ENUM1( POINT_ROUTE_POOL )
+    ADD_ENUM1( POINTER_DOUBLE_LINK_POOL )
+    ADD_ENUM1( POINTER_SINGLE_LINK_POOL )
+    ADD_ENUM1( ENV_MAP_MATERIAL_POOL )
+    ADD_ENUM1( ENV_MAP_ATOMIC_POOL )
+    ADD_ENUM1( SPEC_MAP_MATERIAL_POOL )
+IMPLEMENT_ENUM_END( "ePools" )
+
 namespace
 {
     //
@@ -928,6 +952,27 @@ void CMemStats::CreateTables ( void )
                                         ,pChannelStatsDelta->uiNumShaderAndEntities
                                         ,channelStatsNow.uiNumShaderAndEntities
                                   ) );
+        }
+    }
+
+    {
+/*
+    Pool sizes       Capacity   Used
+    NAME                100       10   10%
+*/
+        m_TableList.push_back ( CDxTable ( "|" ) );
+        CDxTable& table = m_TableList.back ();
+        table.SetColumnWidths( "170,50:R,50:R,40:R" );
+        table.SetNumberColors ( "^1", strNumberColorsModels );
+        table.AddRow ( HEADER1( "Pool sizes" ) "|" HEADER1( "Capacity" ) "|" HEADER1( "Used" ) "|" HEADER1( "" ) );
+        for ( int i = 0; i < MAX_POOLS ; i++ )
+        {
+            SString strName = EnumToString( (ePools)i );
+            int iDefCapacity = g_pCore->GetGame()->GetPools()->GetPoolDefaultCapacity ( (ePools)i );
+            int iCapacity = g_pCore->GetGame()->GetPools()->GetPoolCapacity ( (ePools)i );
+            int iUsedSpaces = g_pCore->GetGame()->GetPools()->GetNumberOfUsedSpaces ( (ePools)i );
+            int iUsedPercent = iUsedSpaces * 100 / iCapacity;
+            table.AddRow ( SString ( "%s|%d|%d|%d%%", *strName, iCapacity, iUsedSpaces, iUsedPercent ) );
         }
     }
 }
