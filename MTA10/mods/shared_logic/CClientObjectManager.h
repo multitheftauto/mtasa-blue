@@ -67,6 +67,7 @@ protected:
     uint                                    m_uiMaxLowLodStreamedInCount;
     uint                                    m_uiStreamedInCount;
     uint                                    m_uiLowLodStreamedInCount;
+    bool                                    m_bDoneLimitWarning;
 
     CClientManager*                         m_pManager;
     bool                                    m_bCanRemoveFromList;
