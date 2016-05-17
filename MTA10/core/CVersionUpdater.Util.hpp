@@ -316,7 +316,7 @@ namespace
         SString ToString ( void ) const
         {
             time_t t = ToSeconds ();
-            tm* tmp = gmtime ( &t );
+            tm* tmp = localtime ( &t );
             assert ( tmp );
 
             char outstr[200] = { 0 };
