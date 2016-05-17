@@ -273,8 +273,8 @@ public:
     void                                        RemoveCollision             ( CClientColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
     bool                                        CollisionExists             ( CClientColShape* pShape );
     void                                        RemoveAllCollisions         ( void );
-    std::list < CClientColShape* > ::iterator   CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
-    std::list < CClientColShape* > ::iterator   CollisionsEnd               ( void )                        { return m_Collisions.end (); }
+    CFastList < CClientColShape* > ::iterator   CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
+    CFastList < CClientColShape* > ::iterator   CollisionsEnd               ( void )                        { return m_Collisions.end (); }
 
     inline CElementGroup*                       GetElementGroup             ( void )                        { return m_pElementGroup; }
     inline void                                 SetElementGroup             ( CElementGroup * elementGroup ){ m_pElementGroup = elementGroup; }
@@ -358,7 +358,7 @@ protected:
     bool                                        m_bSystemEntity;
     CMapEventManager*                           m_pEventManager;
     CModelInfo*                                 m_pModelInfo;
-    std::list < class CClientColShape* >        m_Collisions;
+    CFastList < class CClientColShape* >        m_Collisions;
     CElementGroup*                              m_pElementGroup;
     std::list < CClientPed * >                  m_OriginSourceUsers;
     std::list < CClientPed * >                  m_Contacts;

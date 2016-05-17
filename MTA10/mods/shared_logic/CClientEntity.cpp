@@ -1099,7 +1099,7 @@ void CClientEntity::GetChildrenByType ( const char* szType, lua_State* luaVM )
 
 bool CClientEntity::CollisionExists ( CClientColShape* pShape )
 {
-    list < CClientColShape* > ::iterator iter = m_Collisions.begin ();
+    CFastList < CClientColShape* > ::iterator iter = m_Collisions.begin ();
     for ( ; iter != m_Collisions.end () ; iter++ )
     {
         if ( *iter == pShape )
@@ -1113,7 +1113,7 @@ bool CClientEntity::CollisionExists ( CClientColShape* pShape )
 
 void CClientEntity::RemoveAllCollisions ( void )
 {
-    list < CClientColShape* > ::iterator iter = m_Collisions.begin ();
+    CFastList < CClientColShape* > ::iterator iter = m_Collisions.begin ();
     for ( ; iter != m_Collisions.end () ; iter++ )
     {
         (*iter)->RemoveCollider ( this );
