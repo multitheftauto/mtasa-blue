@@ -119,7 +119,7 @@ void CClientColManager::DoHitDetectionForEntity ( const CVector& vecNowPosition,
             shortList[ (CClientColShape*)*it ] = 1;
 
     // Add existing collisions, so they can be disconnected if required
-    for ( list < CClientColShape* > ::const_iterator it = pEntity->CollisionsBegin () ; it != pEntity->CollisionsEnd (); ++it )
+    for ( CFastList < CClientColShape* > ::const_iterator it = pEntity->CollisionsBegin () ; it != pEntity->CollisionsEnd (); ++it )
         shortList[ *it ] = 1;
 
     // Test each colshape against the entity
