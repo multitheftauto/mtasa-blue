@@ -981,13 +981,11 @@ SectionGroupEnd
 LangString INST_SEC_DEVELOPER ${LANG_ENGLISH}   "Development"
 !ifdef INCLUDE_DEVELOPMENT
     SectionGroup /e "$(INST_SEC_DEVELOPER)" SECGDEV
-        ${LogText} "SectionGroup begin - DEVELOPER"
         Section /o "Module SDK" SEC09
             SetOutPath "$INSTDIR\development\module SDK"
             SetOverwrite ifnewer
             File /r "${FILES_MODULE_SDK}\"
         SectionEnd
-        ${LogText} "SectionGroup end - DEVELOPER"
     SectionGroupEnd
 !endif
 
