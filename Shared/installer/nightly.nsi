@@ -13,6 +13,7 @@ XPStyle on
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
 
+!include textlog.nsh
 Var GTA_DIR
 Var Install_Dir
 Var CreateSMShortcuts
@@ -214,6 +215,7 @@ Function LaunchLink
 FunctionEnd
 
 Function .onInstFailed
+    ${LogText} "Function begin - .onInstFailed"
 FunctionEnd
 
 Function .onInit
@@ -242,14 +244,20 @@ Function .onInit
 
     SetShellVarContext all
 
+    ${LogSetFileName} "$APPDATA\MTA San Andreas All\Common\Installer" "nsis.log"
+    ${LogText} "${PRODUCT_VERSION}"
+    ${LogText} "Function begin - .onInit"
+
     ; Check if we must install the Microsoft Visual Studio 2013 redistributable
     ClearErrors
     ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum" "Install"
     StrCmp "$0" "1" DontInstallVC12Redist
     StrCpy $RedistVC12Installed "0"
+    ${LogText} " VS2013 runtime not installed"
     Goto PostVC12Check
 DontInstallVC12Redist:
     StrCpy $RedistVC12Installed "1"
+    ${LogText} " VS2013 runtime already installed"
 PostVC12Check:
 
     
@@ -266,6 +274,7 @@ PostVC12Check:
         strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas ${0.0}"
     ${EndIf}
     strcpy $INSTDIR $Install_Dir
+    ${LogText} " Using install directory:'$INSTDIR'"
 
     ; Setup for install dir dialog
     strcpy $DEFAULT_INSTDIR "$PROGRAMFILES\MTA San Andreas ${0.0}"
@@ -332,11 +341,15 @@ PostVC12Check:
         strcpy $GTA_DIR "$PROGRAMFILES\Rockstar Games\GTA San Andreas\"
     ${EndIf}
 
+    ${LogText} " Default GTA install directory:'$GTA_DIR'"
+
     InitPluginsDir
     ;File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
+    ${LogText} "Function end - .onInit"
 FunctionEnd
 
 Function .onInstSuccess
+    ${LogText} "Function begin - .onInstSuccess"
     SetShellVarContext all
 
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
@@ -390,6 +403,7 @@ Function .onInstSuccess
     ${EndIf}
 
     ;UAC::Unload ;Must call unload!
+    ${LogText} "Function end - .onInstSuccess"
 FunctionEnd
 
 LangString INST_CLIENTSERVER ${LANG_ENGLISH}    "Client and Server"
@@ -449,6 +463,7 @@ LangString INST_SEC_EDITOR ${LANG_ENGLISH}  "Editor"
 SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
     Section "$(INST_SEC_CORE)" SEC01
         SectionIn 1 RO ; section is required
+        ${LogText} "Section begin - CLIENT CORE"
 
         StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
         Call InstallVC12Redistributable
@@ -508,6 +523,7 @@ DontInstallRedistVC12:
                 StrCpy $3 "1"
             ${EndIf}
 
+            ${LogText} " FullAccess $INSTDIR"
             ${If} $3 == "1"
                 FastPerms::FullAccessPlox "$INSTDIR"
             ${Else}
@@ -522,6 +538,7 @@ DontInstallRedistVC12:
                 FastPerms::FullAccessPlox "$INSTDIR\server"
                 FastPerms::FullAccessPlox "$INSTDIR\skins"
             ${EndIf}
+            ${LogText} " FullAccess $APPDATA\MTA San Andreas All"
             FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
 
             # Remove MTA virtual store
@@ -553,6 +570,7 @@ DontInstallRedistVC12:
             StrCmp "$0" "0" TrySteamExe
             !insertmacro GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5
             DetailPrint "gta_sa.exe successfully detected ($ExeMD5)"
+            ${LogText} " GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
             ${Switch} $ExeMD5
                 ${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
                 ${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
@@ -584,6 +602,7 @@ DontInstallRedistVC12:
                 IfFileExists $GTA_DIR\$1 0 TrySteamNext
                 !insertmacro GetMD5 $GTA_DIR\$1 $ExeMD5
                 DetailPrint "$1 successfully detected ($ExeMD5)"
+                ${LogText} " GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
                 ${Switch} $ExeMD5
                     ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam                   2007-12-04 11:50:50     5697536
                     ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update) 2014-10-14 21:58:05     5971456
@@ -630,6 +649,7 @@ DontInstallRedistVC12:
         SetOutPath "$TEMP"
         ${If} ${AtMostWinXP}
             ${IfNot} ${FileExists} $SYSDIR\normaliz.dll
+                ${LogText} " Did not find $SYSDIR\normaliz.dll"
                 File "${FILES_ROOT}\MTA San Andreas\redist\idndl.x86.exe"
                 ExecWait '"$TEMP\idndl.x86.exe" /passive'
             ${EndIf}
@@ -772,19 +792,23 @@ DontInstallRedistVC12:
         ${EndIf}
 
         Call DoServiceInstall
+        ${LogText} "Section end - CLIENT CORE"
     SectionEnd
 
     Section "$(INST_SEC_GAME)" SEC02
+        ${LogText} "Section begin - CLIENT GAME"
         SectionIn 1 RO
         SetOutPath "$INSTDIR\mods\deathmatch"
         File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
         File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\pcre3.dll"
         SetOutPath "$INSTDIR\mods\deathmatch\resources"
+        ${LogText} "Section end - CLIENT GAME"
     SectionEnd
 SectionGroupEnd
 
 SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
     Section "$(INST_SEC_CORE)" SEC04
+        ${LogText} "Section begin - SERVER CORE"
         SectionIn 1 2 RO ; section is required
         
         StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
@@ -801,9 +825,11 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${SERVER_FILES_ROOT}\net.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
         File "${FILES_ROOT}\MTA San Andreas\mta\pthread.dll"
+        ${LogText} "Section end - SERVER CORE"
     SectionEnd
 
     Section "$(INST_SEC_GAME)" SEC05
+        ${LogText} "Section begin - SERVER GAME"
         SectionIn 1 2 RO ; section is required
         SetOutPath "$INSTDIR\server\mods\deathmatch"
         
@@ -836,10 +862,12 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
             SetOutPath "$INSTDIR\server\mods\deathmatch\resource-cache"
             SetOutPath "$INSTDIR\server\mods\deathmatch\logs"
         !endif
+        ${LogText} "Section end - SERVER GAME"
     SectionEnd
 
     !ifndef LIGHTBUILD
         Section "$(INST_SEC_CORE_RESOURCES)" SEC06
+            ${LogText} "Section begin - SERVER CORE_RESOURCES"
             SectionIn 1 2 ; RO section is now optional
             SetOutPath "$INSTDIR\server\mods\deathmatch\resources\"
             File "${SERVER_FILES_ROOT}\mods\deathmatch\resources\Directory layout readme.txt"
@@ -858,6 +886,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
             File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[managers]\*.zip"
             SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[web]"
             File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[web]\*.zip"
+            ${LogText} "Section end - SERVER CORE_RESOURCES"
         SectionEnd
     !endif
 
@@ -952,11 +981,13 @@ SectionGroupEnd
 LangString INST_SEC_DEVELOPER ${LANG_ENGLISH}   "Development"
 !ifdef INCLUDE_DEVELOPMENT
     SectionGroup /e "$(INST_SEC_DEVELOPER)" SECGDEV
+        ${LogText} "SectionGroup begin - DEVELOPER"
         Section /o "Module SDK" SEC09
             SetOutPath "$INSTDIR\development\module SDK"
             SetOverwrite ifnewer
             File /r "${FILES_MODULE_SDK}\"
         SectionEnd
+        ${LogText} "SectionGroup end - DEVELOPER"
     SectionGroupEnd
 !endif
 
@@ -983,6 +1014,7 @@ LangString INST_SEC_DEVELOPER ${LANG_ENGLISH}   "Development"
 
 
 Section -Post
+    ${LogText} "Section begin - -Post"
     WriteUninstaller "$INSTDIR\Uninstall.exe"
     ;WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Multi Theft Auto.exe"
 
@@ -992,6 +1024,7 @@ Section -Post
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+    ${LogText} "Section end - -Post"
 SectionEnd
 
 LangString UNINST_SUCCESS ${LANG_ENGLISH}   "$(^Name) was successfully removed from your computer."
@@ -1125,6 +1158,7 @@ LangString MSGBOX_VC12RED_ERROR3 ${LANG_ENGLISH}    "Unable to download Microsof
 $\r$\nHowever installation will continue.\
 $\r$\nPlease reinstall if there are problems later."
 Function InstallVC12Redistributable
+    ${LogText} "Function begin - InstallVC12Redistributable"
     DetailPrint "Installing Microsoft Visual Studio 2013 redistributable ..."
     StrCpy $REDISTVC12 "$TEMP\vcredist12_x86.exe"
     NSISdl::download "http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe" $REDISTVC12
@@ -1163,6 +1197,7 @@ InstallEnd:
     StrCpy $RedistVC12Installed "1"
 
 InstallEnd2:
+    ${LogText} "Function end - InstallVC12Redistributable"
 FunctionEnd
 
 ;====================================================================================
@@ -1173,6 +1208,7 @@ Var PATCHFILE
 LangString MSGBOX_PATCH_FAIL1 ${LANG_ENGLISH}   "Unable to download the patch file for your version of Grand Theft Auto: San Andreas"
 LangString MSGBOX_PATCH_FAIL2 ${LANG_ENGLISH}   "Unable to install the patch file for your version of Grand Theft Auto: San Andreas"
 Function InstallPatch
+    ${LogText} "Function begin - InstallPatch"
     DetailPrint "Incompatible version of San Andreas detected.  Patching executable..."
     StrCpy $PATCHFILE "$TEMP\$ExeMD5.GTASAPatch"
     NSISdl::download "http://mirror.multitheftauto.com/gdata/$ExeMD5.GTASAPatch" $PATCHFILE
@@ -1207,6 +1243,7 @@ PatchDownloadSuccessful:
     StrCpy $PatchInstalled "0"
     
     FinishPatch:
+    ${LogText} "Function end - InstallPatch"
 FunctionEnd
 
 ;====================================================================================
@@ -1241,7 +1278,9 @@ LangString UAC_RIGHTS4 ${LANG_ENGLISH}  "Unable to elevate"
 !macroend
 
 Function DoRightsElevation
+    ${LogText} "Function begin - RightsElevation"
     !insertmacro RightsElevation "$(UAC_RIGHTS1)"
+    ${LogText} "Function end - RightsElevation"
 FunctionEnd
 
 Function un.DoRightsElevation
@@ -1614,26 +1653,33 @@ FunctionEnd
 Var COMPONENTS_EXPAND_STATUS
 
 Function "WelcomePreProc"
+    ${LogText} "Function begin - WelcomePreProc"
     !insertmacro UAC_IsInnerInstance
     ${If} ${UAC_IsInnerInstance} 
         ; If switched to admin, don't show welcome window again
         Abort
     ${EndIf}
+    ${LogText} "Function end - WelcomePreProc"
 FunctionEnd
 
 Function "WelcomeShowProc"
+    ${LogText} "Function begin - WelcomeShowProc"
     BringToFront
+    ${LogText} "Function end - WelcomeShowProc"
 FunctionEnd
 
 Function "WelcomeLeaveProc"
+    ${LogText} "Function begin - WelcomeLeaveProc"
     HideWindow
     ; Maybe switch to admin after welcome window
     Call DoRightsElevation
     ShowWindow $HWNDPARENT ${SW_SHOW}
+    ${LogText} "Function end - WelcomeLeaveProc"
 FunctionEnd
 
 
 Function "LicenseShowProc"
+    ${LogText} "Function begin - LicenseShowProc"
     ${If} $COMPONENTS_EXPAND_STATUS == 1
         StrCpy $COMPONENTS_EXPAND_STATUS 0
         IntOp $RESIZE_X 0 - ${EXPAND_DIALOG_X}
@@ -1643,10 +1689,12 @@ Function "LicenseShowProc"
     ${Endif}
     Call HideBackButton
     BringToFront
+    ${LogText} "Function end - LicenseShowProc"
 FunctionEnd
 
 
 Function "ComponentsShowProc"
+    ${LogText} "Function begin - ComponentsShowProc"
     ${If} $COMPONENTS_EXPAND_STATUS != 1
         StrCpy $COMPONENTS_EXPAND_STATUS 1
         IntOp $RESIZE_X 0 + ${EXPAND_DIALOG_X}
@@ -1655,10 +1703,12 @@ Function "ComponentsShowProc"
         Call ResizeSharedDialogContents
         Call ResizeMainWindow
     ${Endif}
+    ${LogText} "Function end - ComponentsShowProc"
 FunctionEnd
 
 
 Function "DirectoryShowProc"
+    ${LogText} "Function begin - DirectoryShowProc"
     ${If} $COMPONENTS_EXPAND_STATUS == 1
         StrCpy $COMPONENTS_EXPAND_STATUS 0
         IntOp $RESIZE_X 0 - ${EXPAND_DIALOG_X}
@@ -1666,6 +1716,7 @@ Function "DirectoryShowProc"
         Call ResizeSharedDialogContents
         Call ResizeMainWindow
     ${Endif}
+    ${LogText} "Function end - DirectoryShowProc"
 FunctionEnd
 
 
@@ -1680,9 +1731,13 @@ Function RemoveVirtualStore
     StrCpy $3 "$LOCALAPPDATA\VirtualStore\$2"
     StrCpy $4 "$0\FromVirtualStore"
     IfFileExists $3 0 NoVirtualStore
+        ${LogText} " Moving VirtualStore files from $3 to $4"
         CopyFiles $3\*.* $4
         RmDir /r "$3"
+        Goto done
     NoVirtualStore:
+        ${LogText} " NoVirtualStore detected at $3"
+    done:
 FunctionEnd
 
 
@@ -1708,6 +1763,7 @@ done:
     ${If} $2 == 332     ; 0x014c IMAGE_FILE_MACHINE_I386
         StrCpy $1 "1"
     ${EndIf}
+    ${LogText} " IsDll32Bit($3) result:$1"
     Push $1
 FunctionEnd
 
@@ -1725,6 +1781,7 @@ FunctionEnd
 ;     <stack> = "Maj.Min"
 Function GetInstallType
     Pop $0
+    Push $0
     Call GetVersionAtLocation
     StrCpy $1 $0 3  # First 3 chars
 
@@ -1735,6 +1792,8 @@ Function GetInstallType
     ${Else}
         StrCpy $2 "overwrite"
     ${EndIf}
+    Pop $0
+    ${LogText} " GetInstallType($0) result:$1,$2"
     Push $1
     Push $2
 FunctionEnd
@@ -2339,6 +2398,7 @@ LangString NETTEST_STATUS1  ${LANG_ENGLISH} "Checking for installer update infor
 LangString NETTEST_STATUS2  ${LANG_ENGLISH} "Please ensure your firewall is not blocking"
 
 Function CustomNetMessagePage
+    ${LogText} "Function begin - CustomNetMessagePage"
     # Initial try with blank page
     Call TryToSendInfo
     ${If} $NetDone == 1
@@ -2381,12 +2441,15 @@ Function CustomNetMessagePage
     ${NSD_CreateTimer} NetFuncTimer 1000
     nsDialogs::Show
     ${NSD_FreeImage} $NetImageHandle
+    ${LogText} "Function end - CustomNetMessagePage"
 FunctionEnd
 
 Function CustomNetMessagePageLeave
+    ${LogText} "Function begin - CustomNetMessagePageLeave"
     ${NSD_KillTimer} NetFuncTimer
     Call TryToSendInfo
     Call DirectoryShowProc
+    ${LogText} "Function end - CustomNetMessagePageLeave"
 FunctionEnd
 
 Function NetFuncTimer
@@ -2421,6 +2484,8 @@ Function TryToSendInfo
         Return
     ${EndIf}
 
+    ${LogText} "Function begin - TryToSendInfo"
+
     # Do attempt
     Call NetComposeURL
     StrCpy $0 $NetMsgURL
@@ -2443,6 +2508,7 @@ Function TryToSendInfo
             ${EndIf}
         ${EndIf}
     ${EndIf}
+    ${LogText} "Function end - TryToSendInfo"
 FunctionEnd
 
 ;--------------------------
@@ -2450,8 +2516,10 @@ FunctionEnd
 ; In $1 = Timeout
 ; Out $0 = result   (1 = success)
 Function DoSendInfo
+    ${LogText} "Function begin - DoSendInfo($0,$1)"
     NSISdl::download_quiet /TIMEOUT=$1 "$0" "$TEMP\prev_install"
     Pop $R0
+    ${LogText} " NSISdl::download_quiet result:$R0"
 
     # Allow for server errors #1
     StrCpy $0 $R0 14
@@ -2470,6 +2538,7 @@ Function DoSendInfo
     ${If} $R0 == "success"
         StrCpy $0 1
     ${EndIf}
+    ${LogText} "Function end - DoSendInfo result:$0"
 FunctionEnd
 
 ;--------------------------
@@ -2501,7 +2570,7 @@ Function NetComposeURL
     StrCpy $NetMsgURL "$NetMsgURL$NetPrevInfo"
     StrCpy $NetMsgURL "$NetMsgURL&try=$NetTryCount"
     StrCpy $NetMsgURL "$NetMsgURL&other=$NetOtherSuccessCount"
-    #MessageBox MB_OK $NetMsgURL
+    ${LogText} " NetComposeURL result:$NetMsgURL"
 FunctionEnd
 
 Function NoteMTAWasPresent
