@@ -342,14 +342,30 @@ void CClientObject::Render ( void )
 void CClientObject::SetFrozen ( bool bFrozen )
 {
     m_bIsFrozen = bFrozen;
-    if ( m_pObject )
-        m_pObject->SetFrozen ( bFrozen );
 
+    if ( m_pObject )
+    {
+        m_pObject->SetFrozen ( bFrozen );
+    }
+
+    // Reset speed if we frozing object
     if ( bFrozen )
     {
+        // Reset speed only if object is actually moving
         CVector vecZero;
-        SetMoveSpeed ( vecZero );
-        SetTurnSpeed ( vecZero );
+        CVector vecSpeed;
+
+        GetMoveSpeed ( vecSpeed );
+        if ( vecZero != vecSpeed )
+        {
+            SetMoveSpeed ( vecZero );
+        }
+
+        GetTurnSpeed ( vecSpeed );
+        if ( vecZero != vecSpeed )
+        {
+            SetTurnSpeed ( vecZero );
+        }
     }
 }
 
