@@ -4302,13 +4302,14 @@ bool CClientGame::ApplyPedDamageFromGame ( eWeaponType weaponUsed, float fDamage
 
         bool bIsBeingShotWhilstAiming = ( weaponUsed >= WEAPONTYPE_PISTOL && weaponUsed <= WEAPONTYPE_MINIGUN && pDamagedPed->IsUsingGun () );
         bool bOldBehaviour = !IsGlitchEnabled( GLITCH_HITANIM );
-            
+
+        bool bAllowChoke = true;
         // Is this is a remote player?
-        if (!pDamagedPed->IsLocalPlayer())
+        if ( !pDamagedPed->IsLocalPlayer () )
         {
             // Don't allow GTA to start the choking task
-            if (weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER)
-                return false;
+            if ( weaponUsed == WEAPONTYPE_TEARGAS || weaponUsed == WEAPONTYPE_SPRAYCAN || weaponUsed == WEAPONTYPE_EXTINGUISHER )
+                bAllowChoke = false;
         }
 
         // Check if their health or armor is locked, and if so prevent applying the damage locally
@@ -4324,8 +4325,8 @@ bool CClientGame::ApplyPedDamageFromGame ( eWeaponType weaponUsed, float fDamage
                 if ( fCurrentHealth == 0.0f || bIsBeingShotWhilstAiming )
                     return false;
 
-                // Allow animation for remote players
-                return true;
+                // Allow animation for remote players (if currently we don't need block choke)
+                return bAllowChoke;
             }
 
             // No hit animation for remote players
@@ -4397,6 +4398,10 @@ bool CClientGame::ApplyPedDamageFromGame ( eWeaponType weaponUsed, float fDamage
                 }
             }
         }
+
+        // Disallow choke task if it's necessary
+        if ( !bAllowChoke )
+            return false;
 
         // Inhibit hit-by-gun animation for local player if required
         if ( bOldBehaviour )
