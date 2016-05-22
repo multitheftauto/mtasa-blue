@@ -110,16 +110,8 @@ VOID CPhysicalSA::SetMoveSpeed(CVector * vecMoveSpeed)
 VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)");
-    DWORD dwFunc = FUNC_GetTurnSpeed;
-    DWORD dwThis = (DWORD)((CPhysicalSAInterface *)this->GetInterface());
-    DWORD dwReturn = 0;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
-    MemCpyFast ((void *)dwReturn, vecTurnSpeed, sizeof(CVector));
+    ((CPhysicalSAInterface *)this->GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
+    ((CPhysicalSAInterface *)this->GetInterface())->m_vecCollisionAngularVelocity = *vecTurnSpeed;
 }
 
 float CPhysicalSA::GetMass ( void )
@@ -374,6 +366,8 @@ void CPhysicalSA::SetLighting ( float fLighting )
 void CPhysicalSA::SetFrozen ( bool bFrozen )
 {
     CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
+    // Set movement ability
     pInterface->bDisableMovement = bFrozen;
+    // Set rotation movement ability
     pInterface->bDisableFriction = bFrozen;
 }
