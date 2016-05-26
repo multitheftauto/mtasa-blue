@@ -414,14 +414,11 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     if ( strFileContents.length () > 1000000 )
         CLogger::LogPrintf ( "Please wait...\n" );
 
-    // Ouput warnings...
-    if ( m_bUpgradeScripts == false )
+    if ( m_bUpgradeScripts == false ) // Output warnings...
     {
         CheckLuaSourceForIssues ( strFileContents, strFileName, strResourceName, bClientScript, bCompiledScript, ECheckerMode::WARNINGS );
     }
-    else
-    // ..or do an upgrade (if not compiled)
-    if ( m_bUpgradeScripts == true && !bCompiledScript )
+    else if ( !bCompiledScript ) // ..or do an upgrade (if not compiled)
     {
         string strNewFileContents;
         CheckLuaSourceForIssues ( strFileContents, strFileName, strResourceName, bClientScript, bCompiledScript, ECheckerMode::UPGRADE, &strNewFileContents );
