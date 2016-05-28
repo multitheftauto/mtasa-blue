@@ -349,6 +349,8 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
 bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
 {
     bool bFound = false;
+    uint uiTotalWaitTime = 0;
+    uint uiWaitTimeWarnThresh = TICKS_FROM_SECONDS( 60 );
 
     shared.m_Mutex.Lock ();
     while ( true )
@@ -384,11 +386,26 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
             break;
         }
 
-        shared.m_Mutex.Wait ( uiTimeout );
+        CElapsedTime timer;
+        shared.m_Mutex.Wait ( Min( uiTimeout, 1000U ) );
+        uint uiDelta = (uint)timer.Get() + 1;
+        uiTotalWaitTime += uiDelta;
 
-        // If not infinite, break after next check
+        // If not infinite, subtract time actually waited
         if ( uiTimeout != (uint)-1 )
-            uiTimeout = 0;
+        {
+            if ( uiDelta < uiTimeout )
+                uiTimeout -= uiDelta;
+            else
+                uiTimeout = 0;
+        }
+
+        // Issue warning if it's taking a long time
+        if ( uiTotalWaitTime > uiWaitTimeWarnThresh )
+        {
+            g_pGame->GetScriptDebugging()->LogWarning( pJobData->m_LuaDebugInfo, "dbPoll is waiting a long time (%d seconds so far). [Query: %s]", uiTotalWaitTime / 1000, *pJobData->command.strData );
+            uiWaitTimeWarnThresh += TICKS_FROM_SECONDS( 60 );
+        }
     }
 
     // Make sure if wait was infinite, we have a result
