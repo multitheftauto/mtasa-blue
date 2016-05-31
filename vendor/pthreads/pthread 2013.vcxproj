@@ -157,6 +157,7 @@
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)pthread_d.dll" "$(MyTargetDir)\server\" &amp;&amp; xcopy /y "$(OutDir)pthread_d.dll" "$(MyTargetDir)\MTA\" </Command>
@@ -205,6 +206,7 @@
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <MapFileName />
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)pthread.dll" "$(MyTargetDir)\" &amp;&amp; xcopy /y "$(OutDir)pthread.dll" "$(MyTargetDir)\MTA\"</Command>
@@ -254,6 +256,7 @@
       <ProgramDatabaseFile>..\..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)pthread.dll" "..\..\output\MTA San Andreas\server\" &amp;&amp; xcopy /y "$(OutDir)pthread.dll" "..\..\output\MTA San Andreas\MTA\"</Command>

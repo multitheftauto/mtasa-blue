@@ -23,9 +23,6 @@
     <ClCompile Include="deflate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="example.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gzio.c">
       <Filter>Source Files</Filter>
     </ClCompile>
