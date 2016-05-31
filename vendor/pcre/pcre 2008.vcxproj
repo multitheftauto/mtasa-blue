@@ -141,6 +141,7 @@
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)pcre3_d.dll" "$(MyTargetDir)\server\mods\deathmatch\" &amp;&amp; xcopy /y "$(OutDir)pcre3_d.dll" "$(MyTargetDir)\mods\deathmatch\" </Command>
@@ -189,6 +190,7 @@
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <MapFileName />
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)pcre3.dll" "$(MyTargetDir)\server\mods\deathmatch\" &amp;&amp; xcopy /y "$(OutDir)pcre3.dll" "$(MyTargetDir)\mods\deathmatch\"</Command>
@@ -238,6 +240,7 @@
       <ProgramDatabaseFile>$(SolutionDir)..\symbols\$(Configuration)_$(SafeRootNamespace).pdb</ProgramDatabaseFile>
       <MapFileName />
       <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(OutDir)pcre3.dll" "..\..\output\MTA San Andreas\server\mods\deathmatch\" &amp;&amp; xcopy /y "$(OutDir)pcre3.dll" "..\..\output\MTA San Andreas\mods\deathmatch\"</Command>
