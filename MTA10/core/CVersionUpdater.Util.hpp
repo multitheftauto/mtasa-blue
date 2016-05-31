@@ -305,6 +305,8 @@ namespace
             timeinfo.tm_sec     = numbers[i++];
 
             m_Seconds = mktime ( &timeinfo );
+            if ( m_Seconds == -1 )
+                m_Seconds = 0;
             return true;
         }
 
@@ -317,6 +319,11 @@ namespace
         {
             time_t t = ToSeconds ();
             tm* tmp = localtime ( &t );
+            if ( tmp == nullptr )
+            {
+                t = 0;
+                tmp = localtime ( &t );
+            }
             assert ( tmp );
 
             char outstr[200] = { 0 };
