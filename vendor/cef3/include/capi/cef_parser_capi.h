@@ -65,14 +65,14 @@ CEF_EXPORT int cef_create_url(const struct _cef_urlparts_t* parts,
 // friendly way to help users make security-related decisions (or in other
 // circumstances when people need to distinguish sites, origins, or otherwise-
 // simplified URLs from each other). Internationalized domain names (IDN) may be
-// presented in Unicode if |languages| accepts the Unicode representation. The
-// returned value will (a) omit the path for standard schemes, excepting file
-// and filesystem, and (b) omit the port if it is the default for the scheme. Do
-// not use this for URLs which will be parsed or sent to other applications.
+// presented in Unicode if the conversion is considered safe. The returned value
+// will (a) omit the path for standard schemes, excepting file and filesystem,
+// and (b) omit the port if it is the default for the scheme. Do not use this
+// for URLs which will be parsed or sent to other applications.
 ///
 // The resulting string must be freed by calling cef_string_userfree_free().
 CEF_EXPORT cef_string_userfree_t cef_format_url_for_security_display(
-    const cef_string_t* origin_url, const cef_string_t* languages);
+    const cef_string_t* origin_url);
 
 ///
 // Returns the mime type for the specified file extension or an NULL string if
@@ -128,15 +128,6 @@ CEF_EXPORT cef_string_userfree_t cef_uriencode(const cef_string_t* text,
 // The resulting string must be freed by calling cef_string_userfree_free().
 CEF_EXPORT cef_string_userfree_t cef_uridecode(const cef_string_t* text,
     int convert_to_utf8, cef_uri_unescape_rule_t unescape_rule);
-
-///
-// Parses |string| which represents a CSS color value. If |strict| is true (1)
-// strict parsing rules will be applied. Returns true (1) on success or false
-// (0) on error. If parsing succeeds |color| will be set to the color value
-// otherwise |color| will remain unchanged.
-///
-CEF_EXPORT int cef_parse_csscolor(const cef_string_t* string, int strict,
-    cef_color_t* color);
 
 ///
 // Parses the specified |json_string| and returns a dictionary or list
