@@ -66,6 +66,8 @@ set(LIBCEF_CPPTOC_SRCS
   cpptoc/domvisitor_cpptoc.h
   cpptoc/download_handler_cpptoc.cc
   cpptoc/download_handler_cpptoc.h
+  cpptoc/download_image_callback_cpptoc.cc
+  cpptoc/download_image_callback_cpptoc.h
   cpptoc/drag_handler_cpptoc.cc
   cpptoc/drag_handler_cpptoc.h
   cpptoc/end_tracing_callback_cpptoc.cc
@@ -86,6 +88,8 @@ set(LIBCEF_CPPTOC_SRCS
   cpptoc/life_span_handler_cpptoc.h
   cpptoc/load_handler_cpptoc.cc
   cpptoc/load_handler_cpptoc.h
+  cpptoc/menu_model_delegate_cpptoc.cc
+  cpptoc/menu_model_delegate_cpptoc.h
   cpptoc/navigation_entry_visitor_cpptoc.cc
   cpptoc/navigation_entry_visitor_cpptoc.h
   cpptoc/pdf_print_callback_cpptoc.cc
@@ -135,6 +139,24 @@ set(LIBCEF_CPPTOC_SRCS
   )
 source_group(libcef_dll\\\\cpptoc FILES ${LIBCEF_CPPTOC_SRCS})
 
+set(LIBCEF_CPPTOC_VIEWS_SRCS
+  cpptoc/views/browser_view_delegate_cpptoc.cc
+  cpptoc/views/browser_view_delegate_cpptoc.h
+  cpptoc/views/button_delegate_cpptoc.cc
+  cpptoc/views/button_delegate_cpptoc.h
+  cpptoc/views/menu_button_delegate_cpptoc.cc
+  cpptoc/views/menu_button_delegate_cpptoc.h
+  cpptoc/views/panel_delegate_cpptoc.cc
+  cpptoc/views/panel_delegate_cpptoc.h
+  cpptoc/views/textfield_delegate_cpptoc.cc
+  cpptoc/views/textfield_delegate_cpptoc.h
+  cpptoc/views/view_delegate_cpptoc.cc
+  cpptoc/views/view_delegate_cpptoc.h
+  cpptoc/views/window_delegate_cpptoc.cc
+  cpptoc/views/window_delegate_cpptoc.h
+  )
+source_group(libcef_dll\\\\cpptoc\\\\views FILES ${LIBCEF_CPPTOC_VIEWS_SRCS})
+
 set(LIBCEF_CTOCPP_SRCS
   ctocpp/auth_callback_ctocpp.cc
   ctocpp/auth_callback_ctocpp.h
@@ -173,6 +195,8 @@ set(LIBCEF_CTOCPP_SRCS
   ctocpp/frame_ctocpp.h
   ctocpp/geolocation_callback_ctocpp.cc
   ctocpp/geolocation_callback_ctocpp.h
+  ctocpp/image_ctocpp.cc
+  ctocpp/image_ctocpp.h
   ctocpp/jsdialog_callback_ctocpp.cc
   ctocpp/jsdialog_callback_ctocpp.h
   ctocpp/list_value_ctocpp.cc
@@ -240,6 +264,36 @@ set(LIBCEF_CTOCPP_SRCS
   )
 source_group(libcef_dll\\\\ctocpp FILES ${LIBCEF_CTOCPP_SRCS})
 
+set(LIBCEF_CTOCPP_VIEWS_SRCS
+  ctocpp/views/box_layout_ctocpp.cc
+  ctocpp/views/box_layout_ctocpp.h
+  ctocpp/views/browser_view_ctocpp.cc
+  ctocpp/views/browser_view_ctocpp.h
+  ctocpp/views/button_ctocpp.cc
+  ctocpp/views/button_ctocpp.h
+  ctocpp/views/display_ctocpp.cc
+  ctocpp/views/display_ctocpp.h
+  ctocpp/views/fill_layout_ctocpp.cc
+  ctocpp/views/fill_layout_ctocpp.h
+  ctocpp/views/label_button_ctocpp.cc
+  ctocpp/views/label_button_ctocpp.h
+  ctocpp/views/layout_ctocpp.cc
+  ctocpp/views/layout_ctocpp.h
+  ctocpp/views/menu_button_ctocpp.cc
+  ctocpp/views/menu_button_ctocpp.h
+  ctocpp/views/panel_ctocpp.cc
+  ctocpp/views/panel_ctocpp.h
+  ctocpp/views/scroll_view_ctocpp.cc
+  ctocpp/views/scroll_view_ctocpp.h
+  ctocpp/views/textfield_ctocpp.cc
+  ctocpp/views/textfield_ctocpp.h
+  ctocpp/views/view_ctocpp.cc
+  ctocpp/views/view_ctocpp.h
+  ctocpp/views/window_ctocpp.cc
+  ctocpp/views/window_ctocpp.h
+  )
+source_group(libcef_dll\\\\ctocpp\\\\views FILES ${LIBCEF_CTOCPP_VIEWS_SRCS})
+
 set(LIBCEF_INCLUDE_SRCS
   ../include/cef_app.h
   ../include/cef_auth_callback.h
@@ -263,11 +317,13 @@ set(LIBCEF_INCLUDE_SRCS
   ../include/cef_frame.h
   ../include/cef_geolocation.h
   ../include/cef_geolocation_handler.h
+  ../include/cef_image.h
   ../include/cef_jsdialog_handler.h
   ../include/cef_keyboard_handler.h
   ../include/cef_life_span_handler.h
   ../include/cef_load_handler.h
   ../include/cef_menu_model.h
+  ../include/cef_menu_model_delegate.h
   ../include/cef_navigation_entry.h
   ../include/cef_origin_whitelist.h
   ../include/cef_pack_resources.h
@@ -289,7 +345,6 @@ set(LIBCEF_INCLUDE_SRCS
   ../include/cef_resource_handler.h
   ../include/cef_response.h
   ../include/cef_response_filter.h
-  ../include/cef_runnable.h
   ../include/cef_scheme.h
   ../include/cef_ssl_info.h
   ../include/cef_stream.h
@@ -387,11 +442,13 @@ set(LIBCEF_INCLUDE_CAPI_SRCS
   ../include/capi/cef_frame_capi.h
   ../include/capi/cef_geolocation_capi.h
   ../include/capi/cef_geolocation_handler_capi.h
+  ../include/capi/cef_image_capi.h
   ../include/capi/cef_jsdialog_handler_capi.h
   ../include/capi/cef_keyboard_handler_capi.h
   ../include/capi/cef_life_span_handler_capi.h
   ../include/capi/cef_load_handler_capi.h
   ../include/capi/cef_menu_model_capi.h
+  ../include/capi/cef_menu_model_delegate_capi.h
   ../include/capi/cef_navigation_entry_capi.h
   ../include/capi/cef_origin_whitelist_capi.h
   ../include/capi/cef_parser_capi.h
@@ -426,6 +483,30 @@ set(LIBCEF_INCLUDE_CAPI_SRCS
   )
 source_group(include\\\\capi FILES ${LIBCEF_INCLUDE_CAPI_SRCS})
 
+set(LIBCEF_INCLUDE_CAPI_VIEWS_SRCS
+  ../include/capi/views/cef_box_layout_capi.h
+  ../include/capi/views/cef_browser_view_capi.h
+  ../include/capi/views/cef_browser_view_delegate_capi.h
+  ../include/capi/views/cef_button_capi.h
+  ../include/capi/views/cef_button_delegate_capi.h
+  ../include/capi/views/cef_display_capi.h
+  ../include/capi/views/cef_fill_layout_capi.h
+  ../include/capi/views/cef_label_button_capi.h
+  ../include/capi/views/cef_layout_capi.h
+  ../include/capi/views/cef_menu_button_capi.h
+  ../include/capi/views/cef_menu_button_delegate_capi.h
+  ../include/capi/views/cef_panel_capi.h
+  ../include/capi/views/cef_panel_delegate_capi.h
+  ../include/capi/views/cef_scroll_view_capi.h
+  ../include/capi/views/cef_textfield_capi.h
+  ../include/capi/views/cef_textfield_delegate_capi.h
+  ../include/capi/views/cef_view_capi.h
+  ../include/capi/views/cef_view_delegate_capi.h
+  ../include/capi/views/cef_window_capi.h
+  ../include/capi/views/cef_window_delegate_capi.h
+  )
+source_group(include\\\\capi\\\\views FILES ${LIBCEF_INCLUDE_CAPI_VIEWS_SRCS})
+
 set(LIBCEF_INCLUDE_INTERNAL_SRCS
   ../include/internal/cef_export.h
   ../include/internal/cef_logging_internal.h
@@ -457,6 +538,30 @@ set(LIBCEF_INCLUDE_INTERNAL_SRCS_WINDOWS
 LIBCEF_APPEND_PLATFORM_SOURCES(LIBCEF_INCLUDE_INTERNAL_SRCS)
 source_group(include\\\\internal FILES ${LIBCEF_INCLUDE_INTERNAL_SRCS})
 
+set(LIBCEF_INCLUDE_VIEWS_SRCS
+  ../include/views/cef_box_layout.h
+  ../include/views/cef_browser_view.h
+  ../include/views/cef_browser_view_delegate.h
+  ../include/views/cef_button.h
+  ../include/views/cef_button_delegate.h
+  ../include/views/cef_display.h
+  ../include/views/cef_fill_layout.h
+  ../include/views/cef_label_button.h
+  ../include/views/cef_layout.h
+  ../include/views/cef_menu_button.h
+  ../include/views/cef_menu_button_delegate.h
+  ../include/views/cef_panel.h
+  ../include/views/cef_panel_delegate.h
+  ../include/views/cef_scroll_view.h
+  ../include/views/cef_textfield.h
+  ../include/views/cef_textfield_delegate.h
+  ../include/views/cef_view.h
+  ../include/views/cef_view_delegate.h
+  ../include/views/cef_window.h
+  ../include/views/cef_window_delegate.h
+  )
+source_group(include\\\\views FILES ${LIBCEF_INCLUDE_VIEWS_SRCS})
+
 set(LIBCEF_INCLUDE_WRAPPER_SRCS
   ../include/wrapper/cef_byte_read_handler.h
   ../include/wrapper/cef_closure_task.h
@@ -487,15 +592,20 @@ add_library(libcef_dll_wrapper
   ${LIBCEF_SRCS}
   ${LIBCEF_BASE_SRCS}
   ${LIBCEF_CPPTOC_SRCS}
+  ${LIBCEF_CPPTOC_VIEWS_SRCS}
   ${LIBCEF_CTOCPP_SRCS}
+  ${LIBCEF_CTOCPP_VIEWS_SRCS}
   ${LIBCEF_INCLUDE_SRCS}
   ${LIBCEF_INCLUDE_BASE_SRCS}
   ${LIBCEF_INCLUDE_BASE_INTERNAL_SRCS}
   ${LIBCEF_INCLUDE_CAPI_SRCS}
+  ${LIBCEF_INCLUDE_CAPI_VIEWS_SRCS}
   ${LIBCEF_INCLUDE_INTERNAL_SRCS}
+  ${LIBCEF_INCLUDE_VIEWS_SRCS}
   ${LIBCEF_INCLUDE_WRAPPER_SRCS}
   ${LIBCEF_WRAPPER_SRCS}
   )
+SET_LIBRARY_TARGET_PROPERTIES(libcef_dll_wrapper)
 
 # Remove the default "lib" prefix from the resulting library.
 set_target_properties(libcef_dll_wrapper PROPERTIES PREFIX "")
