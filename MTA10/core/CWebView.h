@@ -59,7 +59,7 @@ public:
 
     bool SetProperty            ( const SString& strKey, const SString& strValue );
     bool GetProperty            ( const SString& strKey, SString& outProperty );
-    
+
     void InjectMouseMove        ( int iPosX, int iPosY );
     void InjectMouseDown        ( eWebBrowserMouseButton mouseButton );
     void InjectMouseUp          ( eWebBrowserMouseButton mouseButton );
@@ -75,7 +75,7 @@ public:
 
     bool GetFullPathFromLocal   ( SString& strPath );
     bool VerifyFile             ( const SString& strPath );
-    
+
     virtual bool RegisterAjaxHandler ( const SString& strURL ) override;
     virtual bool UnregisterAjaxHandler ( const SString& strURL ) override;
     virtual bool HasAjaxHandler ( const SString& strURL );
@@ -109,7 +109,7 @@ public:
     virtual void OnLoadStart    ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame ) override;
     virtual void OnLoadEnd      ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode ) override;
     virtual void OnLoadError    ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedURL ) override;
-    
+
     // CefRequestHandler methods
     virtual bool OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect ) override;
     virtual CefRequestHandler::ReturnValue OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefRequestCallback> callback ) override;
@@ -120,7 +120,7 @@ public:
     virtual void OnAfterCreated ( CefRefPtr<CefBrowser> browser) override;
 
     // CefJSDialogHandler methods
-    virtual bool OnJSDialog     ( CefRefPtr<CefBrowser> browser, const CefString& origin_url, const CefString& accept_lang, CefJSDialogHandler::JSDialogType dialog_type, const CefString& message_text, const CefString& default_prompt_text, CefRefPtr< CefJSDialogCallback > callback, bool& suppress_message ) override;
+    virtual bool OnJSDialog     ( CefRefPtr<CefBrowser> browser, const CefString& origin_url, CefJSDialogHandler::JSDialogType dialog_type, const CefString& message_text, const CefString& default_prompt_text, CefRefPtr<CefJSDialogCallback> callback, bool& suppress_message ) override;
 
     // CefDialogHandler methods
     virtual bool OnFileDialog  ( CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name, const std::vector< CefString >& accept_types, int selected_accept_filter, CefRefPtr< CefFileDialogCallback > callback ) override;
@@ -129,7 +129,7 @@ public:
     virtual void OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& title ) override;
     virtual bool OnTooltip     ( CefRefPtr<CefBrowser> browser, CefString& text ) override;
     virtual bool OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line ) override;
-    
+
 private:
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*    m_pWebBrowserRenderItem;
