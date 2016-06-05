@@ -293,9 +293,10 @@ bool CWebView::SetAudioVolume ( float fVolume )
         return false;
 
     // Since the necessary interfaces of the core audio API were introduced in Win7, we've to fallback to HTML5 audio
-    SString strJSCode ( "var tags = document.getElementsByTagName('audio'); for (var i=0; i<tags.length; ++i) { tags[i].volume = %f;} " \
-        "tags = document.getElementsByTagName('video'); for (var i=0; i<tags.length; ++i) { tags[i].volume = %f;}",
-        fVolume, fVolume );
+    SString strJSCode("function mta_adjustAudioVol(elem, vol) { elem.volume = vol; elem.onvolumechange = function() { if (Math.abs(elem.volume - vol) >= 0.001) elem.volume = vol; } }" \
+               "var tags = document.getElementsByTagName('audio'); for (var i = 0; i<tags.length; ++i) { mta_adjustAudioVol(tags[i], %f); }" \
+               "tags = document.getElementsByTagName('video'); for (var i = 0; i<tags.length; ++i) { mta_adjustAudioVol(tags[i], %f); }",
+            fVolume, fVolume );
 
     m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJSCode, "", 0 );
     m_fVolume = fVolume;
