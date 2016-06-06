@@ -82,6 +82,7 @@ public:
     LUA_DECLARE ( SetClipboard );
     LUA_DECLARE ( GetClipboard );
     LUA_DECLARE ( SetWindowFlashing );
+    LUA_DECLARE ( CreateTrayNotification );
 
     // Element get functions
     LUA_DECLARE ( GetRootElement );

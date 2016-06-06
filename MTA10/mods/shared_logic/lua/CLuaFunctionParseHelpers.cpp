@@ -465,6 +465,13 @@ IMPLEMENT_ENUM_BEGIN(eFieldOfViewMode)
     ADD_ENUM(FOV_MODE_AIMING, "aiming")
 IMPLEMENT_ENUM_END("fieldofview-mode")
 
+IMPLEMENT_ENUM_BEGIN(eTrayIconType)
+    ADD_ENUM(ICON_TYPE_DEFAULT, "default")
+    ADD_ENUM(ICON_TYPE_INFO, "info")
+    ADD_ENUM(ICON_TYPE_WARNING, "warning")
+    ADD_ENUM(ICON_TYPE_ERROR, "error")
+IMPLEMENT_ENUM_END("tray-icon-type")
+
 //
 // Get best guess at name of userdata type
 //

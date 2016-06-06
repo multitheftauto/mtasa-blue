@@ -184,11 +184,17 @@ CCore::CCore ( void )
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+
+    // Tray icon
+    m_pTrayIcon = new CTrayIcon ( );
 }
 
 CCore::~CCore ( void )
 {
     WriteDebugEvent ( "CCore::~CCore" );
+
+    // Destroy tray icon
+    delete m_pTrayIcon;
 
     // Delete the mod manager
     delete m_pModManager;
@@ -1368,6 +1374,9 @@ void CCore::OnModUnload ( )
 
     // Clear web whitelist
     m_pWebCore->ResetFilter ();
+
+    // Destroy tray icon
+    m_pTrayIcon->DestroyTrayIcon ( );
 }
 
 

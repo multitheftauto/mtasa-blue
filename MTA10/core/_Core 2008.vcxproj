@@ -316,6 +316,7 @@
     <ClCompile Include="CSetCursorPosHook.cpp" />
     <ClCompile Include="CSettings.cpp" />
     <ClCompile Include="CTileBatcher.cpp" />
+    <ClCompile Include="CTrayIcon.cpp" />
     <ClCompile Include="CVersionUpdater.cpp" />
     <ClCompile Include="CVertexStreamBoundingBoxManager.cpp" />
     <ClCompile Include="CVideoModeManager.cpp" />
@@ -394,6 +395,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\sdk\core\CTrayIconInterface.h" />
     <ClInclude Include="..\sdk\core\CWebBrowserEventsInterface.h" />
     <ClInclude Include="..\sdk\core\CWebCoreInterface.h" />
     <ClInclude Include="..\sdk\core\CWebViewInterface.h" />
@@ -474,6 +476,7 @@
     <ClInclude Include="CSettings.h" />
     <ClInclude Include="CTileBatcher.h" />
     <ClInclude Include="CTimingCheckpoints.hpp" />
+    <ClInclude Include="CTrayIcon.h" />
     <ClInclude Include="CVersionUpdater.h" />
     <ClInclude Include="CVersionUpdater.Util.hpp" />
     <ClInclude Include="CVertexStreamBoundingBoxManager.h" />
@@ -482,6 +485,7 @@
     <ClInclude Include="CWebDevTools.h" />
     <ClInclude Include="CWebsiteRequests.h" />
     <ClInclude Include="CWebView.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="StdInc.h" />
     <ClInclude Include="WebBrowserHelpers.h" />
     <ClInclude Include="CExceptionInformation_Impl.h" />
@@ -707,6 +711,12 @@
       <Project>{ccabbc2e-172d-46fd-bc43-5a9fcd295112}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="core.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\launch\resource\mtaicon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

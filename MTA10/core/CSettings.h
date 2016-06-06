@@ -327,6 +327,7 @@ protected:
     CGUIEdit*           m_pChatLineLife;
     CGUIEdit*           m_pChatLineFadeout;
     CGUICheckBox*       m_pFlashWindow;
+    CGUICheckBox*       m_pTrayBalloon;
 
     CGUILabel*          m_pLabelBrowserGeneral;
     CGUICheckBox*       m_pCheckBoxRemoteBrowser;
