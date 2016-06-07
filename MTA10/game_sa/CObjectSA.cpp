@@ -297,9 +297,17 @@ float CObjectSA::GetHealth ( void )
 
 void CObjectSA::SetModelIndex ( unsigned long ulModel )
 {
-    // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
-    DWORD dwFunc = this->GetInterface()->vtbl->SetModelIndex;
+    // Delete any existing RwObject first
+    DWORD dwFunc = this->GetInterface()->vtbl->DeleteRwObject;
     DWORD dwThis = (DWORD)this->GetInterface();
+    _asm    
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+
+    // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
+    dwFunc = this->GetInterface()->vtbl->SetModelIndex;
     _asm    
     {
         mov     ecx, dwThis
