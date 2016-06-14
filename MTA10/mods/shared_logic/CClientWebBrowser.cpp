@@ -19,6 +19,7 @@ CClientWebBrowser::CClientWebBrowser ( CClientManager* pManager, ElementID ID, C
     SetTypeName ( "webbrowser" );
 
     // Create the web view
+    assert( g_pCore->GetWebCore() );
     m_pWebView = g_pCore->GetWebCore ()->CreateWebView ( pWebBrowserItem->m_uiSizeX, pWebBrowserItem->m_uiSizeY, bLocal, pWebBrowserItem, bTransparent );
 
     // Set events interface
