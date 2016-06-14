@@ -14,6 +14,8 @@
 void CLuaBrowserDefs::LoadFunctions ( void )
 {
     // Define browser functions
+    CLuaCFunctions::AddFunction( "isBrowserSupported", IsBrowserSupported );
+
     std::map<const char*, lua_CFunction> functions
         {
             { "createBrowser", CreateBrowser },
@@ -49,7 +51,7 @@ void CLuaBrowserDefs::LoadFunctions ( void )
         };
 
     // Add browser functions
-    if ( IsBrowserSupported () )
+    if ( g_pCore->GetWebCore () )
     {
         for ( const auto& pair : functions )
         {
@@ -87,6 +89,7 @@ void CLuaBrowserDefs::AddClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "createBrowser" );
+    lua_classfunction ( luaVM, "isSupported", "isBrowserSupported" );
     lua_classfunction ( luaVM, "loadURL", "loadBrowserURL" );
     lua_classfunction ( luaVM, "isLoading", "isBrowserLoading" );
     lua_classfunction ( luaVM, "injectMouseMove", "injectBrowserMouseMove" );
@@ -133,12 +136,6 @@ void CLuaBrowserDefs::AddClass ( lua_State* luaVM )
 }
 
 
-bool CLuaBrowserDefs::IsBrowserSupported ()
-{
-    return g_pCore->GetWebCore() != nullptr;
-}
-
-
 int CLuaBrowserDefs::CreateBrowser ( lua_State* luaVM )
 {
     //  texture createBrowser ( int width, int height, bool isLocal [, bool transparent = false] )
@@ -179,6 +176,12 @@ int CLuaBrowserDefs::CreateBrowser ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaBrowserDefs::IsBrowserSupported ( lua_State* luaVM )
+{
+    lua_pushboolean ( luaVM, g_pCore->GetWebCore() != nullptr );
     return 1;
 }
 
