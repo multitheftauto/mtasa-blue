@@ -147,9 +147,12 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     CGraphics::GetSingleton ().GetRenderItemManager ()->FlushNonAARenderTarget();
 
     bool bTookScreenShot = false;
+    auto pWebCore = g_pCore->GetWebCore ();
     if ( !CGraphics::GetSingleton ().GetScreenGrabber ()->IsQueueEmpty () )
     {
-        g_pCore->GetWebCore ()->OnPreScreenshot ();
+        if ( pWebCore )
+            pWebCore->OnPreScreenshot ();
+        
         bTookScreenShot = true;
     }
 
@@ -159,8 +162,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Maybe grab screen for upload
     CGraphics::GetSingleton ().GetScreenGrabber ()->DoPulse ();
 
-    if ( bTookScreenShot )
-        g_pCore->GetWebCore ()->OnPostScreenshot ();
+    if ( bTookScreenShot && pWebCore )
+        pWebCore->OnPostScreenshot ();
 
     // Draw the GUI
     CLocalGUI::GetSingleton().Draw ();

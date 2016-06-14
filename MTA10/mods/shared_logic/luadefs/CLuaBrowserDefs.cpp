@@ -13,37 +13,61 @@
 
 void CLuaBrowserDefs::LoadFunctions ( void )
 {
-    // Browser functions
-    CLuaCFunctions::AddFunction ( "createBrowser", CreateBrowser );
-    CLuaCFunctions::AddFunction ( "requestBrowserDomains", RequestBrowserDomains );
-    CLuaCFunctions::AddFunction ( "loadBrowserURL", LoadBrowserURL );
-    CLuaCFunctions::AddFunction ( "isBrowserLoading", IsBrowserLoading );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseMove", InjectBrowserMouseMove );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseDown", InjectBrowserMouseDown );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseUp", InjectBrowserMouseUp );
-    CLuaCFunctions::AddFunction ( "injectBrowserMouseWheel", InjectBrowserMouseWheel );
-    CLuaCFunctions::AddFunction ( "getBrowserTitle", GetBrowserTitle );
-    CLuaCFunctions::AddFunction ( "getBrowserURL", GetBrowserURL );
-    CLuaCFunctions::AddFunction ( "setBrowserRenderingPaused", SetBrowserRenderingPaused );
-    CLuaCFunctions::AddFunction ( "executeBrowserJavascript", ExecuteBrowserJavascript );
-    CLuaCFunctions::AddFunction ( "getBrowserVolume", GetBrowserVolume );
-    CLuaCFunctions::AddFunction ( "setBrowserVolume", SetBrowserVolume );
-    CLuaCFunctions::AddFunction ( "isBrowserDomainBlocked", IsBrowserDomainBlocked );
-    CLuaCFunctions::AddFunction ( "focusBrowser", FocusBrowser );
-    CLuaCFunctions::AddFunction ( "isBrowserFocused", IsBrowserFocused );
-    CLuaCFunctions::AddFunction ( "setBrowserProperty", SetBrowserProperty );
-    CLuaCFunctions::AddFunction ( "getBrowserProperty", GetBrowserProperty );
-    CLuaCFunctions::AddFunction ( "getBrowserSettings", GetBrowserSettings );
-    CLuaCFunctions::AddFunction ( "getBrowserSource", GetBrowserSource );
-    CLuaCFunctions::AddFunction ( "setBrowserAjaxHandler", SetBrowserAjaxHandler );
-    CLuaCFunctions::AddFunction ( "canBrowserNavigateBack", CanBrowserNavigateBack );
-    CLuaCFunctions::AddFunction ( "canBrowserNavigateForward", CanBrowserNavigateForward );
-    CLuaCFunctions::AddFunction ( "navigateBrowserBack", NavigateBrowserBack );
-    CLuaCFunctions::AddFunction ( "navigateBrowserForward", NavigateBrowserForward );
-    CLuaCFunctions::AddFunction ( "reloadBrowserPage", ReloadBrowserPage );
-    CLuaCFunctions::AddFunction ( "toggleBrowserDevTools", ToggleBrowserDevTools );
-    CLuaCFunctions::AddFunction ( "guiCreateBrowser", GUICreateBrowser );
-    CLuaCFunctions::AddFunction ( "guiGetBrowser", GUIGetBrowser );
+    // Define browser functions
+    std::map<const char*, lua_CFunction> functions
+        {
+            { "createBrowser", CreateBrowser },
+            { "requestBrowserDomains", RequestBrowserDomains },
+            { "loadBrowserURL", LoadBrowserURL },
+            { "isBrowserLoading", IsBrowserLoading },
+            { "injectBrowserMouseMove", InjectBrowserMouseMove },
+            { "injectBrowserMouseDown", InjectBrowserMouseDown },
+            { "injectBrowserMouseUp", InjectBrowserMouseUp },
+            { "injectBrowserMouseWheel", InjectBrowserMouseWheel },
+            { "getBrowserTitle", GetBrowserTitle },
+            { "getBrowserURL", GetBrowserURL },
+            { "setBrowserRenderingPaused", SetBrowserRenderingPaused },
+            { "executeBrowserJavascript", ExecuteBrowserJavascript },
+            { "getBrowserVolume", GetBrowserVolume },
+            { "setBrowserVolume", SetBrowserVolume },
+            { "isBrowserDomainBlocked", IsBrowserDomainBlocked },
+            { "focusBrowser", FocusBrowser },
+            { "isBrowserFocused", IsBrowserFocused },
+            { "setBrowserProperty", SetBrowserProperty },
+            { "getBrowserProperty", GetBrowserProperty },
+            { "getBrowserSettings", GetBrowserSettings },
+            { "getBrowserSource", GetBrowserSource },
+            { "setBrowserAjaxHandler", SetBrowserAjaxHandler },
+            { "canBrowserNavigateBack", CanBrowserNavigateBack },
+            { "canBrowserNavigateForward", CanBrowserNavigateForward },
+            { "navigateBrowserBack", NavigateBrowserBack },
+            { "navigateBrowserForward", NavigateBrowserForward },
+            { "reloadBrowserPage", ReloadBrowserPage },
+            { "toggleBrowserDevTools", ToggleBrowserDevTools },
+            { "guiCreateBrowser", GUICreateBrowser },
+            { "guiGetBrowser", GUIGetBrowser },
+        };
+
+    // Add browser functions
+    if ( IsBrowserSupported () )
+    {
+        for ( const auto& pair : functions )
+        {
+            CLuaCFunctions::AddFunction ( pair.first, pair.second );
+        }
+    }
+    else
+    {
+        for ( const auto& pair : functions )
+        {
+            CLuaCFunctions::AddFunction( pair.first, [](lua_State* luaVM) -> int {
+                g_pCore->DebugPrintfColor ( "Called browser function on unsupported, vulnerable operating system. Please upgrade your OS as soon as possible", 255, 0, 0 );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            } );
+        }
+    }
+    
 }
 
 
@@ -95,6 +119,12 @@ void CLuaBrowserDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getBrowser", "guiGetBrowser" );
     lua_classvariable ( luaVM, "browser", nullptr, "guiGetBrowser" );
     lua_registerclass ( luaVM, "GuiBrowser", "GuiElement" );
+}
+
+
+bool CLuaBrowserDefs::IsBrowserSupported ()
+{
+    return g_pCore->GetWebCore() != nullptr;
 }
 
 

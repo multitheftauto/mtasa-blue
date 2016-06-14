@@ -2331,7 +2331,8 @@ bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bI
         bool bIgnore = false;
         if ( bState )
         {
-            auto pFocusedBrowser = g_pCore->GetWebCore ()->GetFocusedWebView ();
+            auto pWebCore = g_pCore->GetWebCore();
+            auto pFocusedBrowser = pWebCore ? pWebCore->GetFocusedWebView () : nullptr;
 
             if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey ) || ( pFocusedBrowser && !pFocusedBrowser->IsLocal () ) )
                 bIgnore = true;                         // Ignore this keydown and the matching keyup
@@ -2390,7 +2391,8 @@ bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
     if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsInputActive() == false )
     {
         // Cancel event if remote browser is focused
-        auto pFocusedBrowser = g_pCore->GetWebCore ()->GetFocusedWebView ();
+        auto pWebCore = g_pCore->GetWebCore();
+        auto pFocusedBrowser = pWebCore ? pWebCore->GetFocusedWebView () : nullptr;
         if ( pFocusedBrowser && !pFocusedBrowser->IsLocal () )
             return false;
 
@@ -6328,7 +6330,8 @@ void CClientGame::SetDevelopmentMode ( bool bEnable, bool bEnableWeb )
     else
         g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
 
-    g_pCore->GetWebCore()->SetTestModeEnabled ( bEnableWeb );
+    if ( g_pCore->GetWebCore() )
+        g_pCore->GetWebCore()->SetTestModeEnabled ( bEnableWeb );
 }
 
 
