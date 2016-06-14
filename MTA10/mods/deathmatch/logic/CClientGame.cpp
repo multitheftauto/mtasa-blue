@@ -611,7 +611,7 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServe
                                         );
             pBitStream->WriteString ( strPlayerVersion );
 
-            pBitStream->WriteBit ( g_pCore->IsOptionalUpdateInfoRequired ( g_pNet->GetConnectedServer() ) );
+            pBitStream->WriteBit ( g_pCore->IsOptionalUpdateInfoRequired ( g_pNet->GetConnectedServer( true ) ) );
 
             pBitStream->Write ( static_cast < unsigned char > ( g_pGame->GetGameVersion () ) );
             
