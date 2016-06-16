@@ -28,7 +28,6 @@ public:
     LUA_DECLARE ( fileRead )
     LUA_DECLARE ( fileWrite )
     LUA_DECLARE ( fileFlush )
-    LUA_DECLARE ( fileClose )
     LUA_DECLARE ( fileDelete )
     LUA_DECLARE ( fileRename )
     LUA_DECLARE ( fileCopy )
