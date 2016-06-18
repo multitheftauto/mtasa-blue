@@ -61,7 +61,6 @@ DECLARE_ENUM( eDXVerticalAlign );
 
 DECLARE_ENUM( eHudComponent );
 
-
 enum eFieldOfViewMode
 {
     FOV_MODE_PLAYER,
@@ -70,6 +69,16 @@ enum eFieldOfViewMode
     FOV_MODE_AIMING
 };
 DECLARE_ENUM ( eFieldOfViewMode );
+
+#include "json.h"
+// Prettify toJSON (see mantis #9210)
+enum eJSONPrettyType
+{
+    JSONPRETTY_SPACES = JSON_C_TO_STRING_PRETTY,
+    JSONPRETTY_NONE = -1,
+    JSONPRETTY_TABS = JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_TAB
+};
+DECLARE_ENUM ( eJSONPrettyType );
 
 // class -> class type
 inline eCGUIType GetClassType ( CGUIButton* )      { return CGUI_BUTTON; }

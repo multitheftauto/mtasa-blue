@@ -465,6 +465,12 @@ IMPLEMENT_ENUM_BEGIN(eFieldOfViewMode)
     ADD_ENUM(FOV_MODE_AIMING, "aiming")
 IMPLEMENT_ENUM_END("fieldofview-mode")
 
+IMPLEMENT_ENUM_BEGIN ( eJSONPrettyType )
+    ADD_ENUM ( JSONPRETTY_SPACES, "spaces" )
+    ADD_ENUM ( JSONPRETTY_NONE, "none" )
+    ADD_ENUM ( JSONPRETTY_TABS, "tabs" )
+IMPLEMENT_ENUM_END ( "json-pretty-type" )
+
 //
 // Get best guess at name of userdata type
 //
