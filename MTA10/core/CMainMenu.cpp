@@ -165,7 +165,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pVersion = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
     m_pVersion->LoadFromFile ( CORE_MTA_VERSION );
     m_pVersion->SetParent ( m_pCanvas );
-    m_pVersion->SetPosition ( CVector2D(0.845f,0.528f), true);
+    m_pVersion->SetPosition ( CVector2D ( 0.845f, 0.544f ), true );
     m_pVersion->SetSize ( CVector2D((32/NATIVE_RES_X)*m_iMenuSizeX,(32/NATIVE_RES_Y)*m_iMenuSizeY), false);
     m_pVersion->SetProperty("InheritsAlpha", "False" );
 
