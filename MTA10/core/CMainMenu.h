@@ -91,7 +91,7 @@ private:
     bool                OnQuickConnectButtonClick       ( CGUIElement* pElement );
     bool                OnResumeButtonClick             ( CGUIElement* pElement );
     bool                OnBrowseServersButtonClick      ( CGUIElement* pElement );
-    bool				OnPlayButtonClick				( void );
+    bool                OnPlayButtonClick               ( void );
     bool                OnHostGameButtonClick           ( void );
     bool                OnDisconnectButtonClick         ( CGUIElement* pElement );
     bool                OnEditorButtonClick             ( void );
