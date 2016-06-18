@@ -159,16 +159,16 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
             char* szPass = strtok ( NULL, " " );
 
             // Are we supposed to launch the server and play locally?
-			if (stricmp(szArguments, "play") == 0)
-			{
-				// Create clientgame
-				g_pClientGame = new CClientGame(true);
+            if ( stricmp ( szArguments, "play" ) == 0 )
+            {
+                // Create clientgame
+                g_pClientGame = new CClientGame( true );
 
-				g_pClientGame->SetupLocalGame(CClientGame::SERVER_TYPE_LOCAL);
+                g_pClientGame->SetupLocalGame ( CClientGame::SERVER_TYPE_LOCAL );
 
-				// Connect
-				g_pClientGame->StartLocalGame(CClientGame::SERVER_TYPE_LOCAL);
-			}
+                // Connect
+                g_pClientGame->StartLocalGame ( CClientGame::SERVER_TYPE_LOCAL );
+            }
             else if ( stricmp ( szArguments, "local" ) == 0 )
             {
                 // Create clientgame
