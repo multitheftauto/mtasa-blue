@@ -92,7 +92,7 @@ private:
     bool                OnResumeButtonClick             ( CGUIElement* pElement );
     bool                OnBrowseServersButtonClick      ( CGUIElement* pElement );
     bool				OnPlayButtonClick				( void );
-	bool                OnHostGameButtonClick           ( void );
+    bool                OnHostGameButtonClick           ( void );
     bool                OnDisconnectButtonClick         ( CGUIElement* pElement );
     bool                OnEditorButtonClick             ( void );
     bool                OnSettingsButtonClick           ( CGUIElement* pElement );
