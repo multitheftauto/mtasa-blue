@@ -165,7 +165,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pVersion = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
     m_pVersion->LoadFromFile ( CORE_MTA_VERSION );
     m_pVersion->SetParent ( m_pCanvas );
-    m_pVersion->SetPosition ( CVector2D(0.845f,0.528f), true);
+    m_pVersion->SetPosition ( CVector2D ( 0.845f, 0.544f ), true );
     m_pVersion->SetSize ( CVector2D((32/NATIVE_RES_X)*m_iMenuSizeX,(32/NATIVE_RES_Y)*m_iMenuSizeY), false);
     m_pVersion->SetProperty("InheritsAlpha", "False" );
 
@@ -181,22 +181,23 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     if ( CCore::GetSingleton().GetCommunity()->IsLoggedIn() && !strUsername.empty() )
         ChangeCommunityState ( true, strUsername );
 
-    float fBase = 0.613f;
-    float fGap = 0.043f;
+    float fBase = 0.595f;
+    float fGap = 0.025f;
     // Our disconnect item is shown/hidden dynamically, so we store it seperately
-    m_pDisconnect = CreateItem ( MENU_ITEM_DISCONNECT, "menu_disconnect.png",    CVector2D ( 0.168f, fBase + fGap * 0 ) );
+    m_pDisconnect = CreateItem ( MENU_ITEM_DISCONNECT,            "menu_disconnect.png",          CVector2D ( 0.168f, fBase + (fGap * 0) ) );
     m_pDisconnect->image->SetVisible(false);
 
     // Create the menu items
     //Filepath, Relative position, absolute native size
     // And the font for the graphics is ?
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "menu_quick_connect.png",    CVector2D ( 0.168f, fBase + fGap * 0 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png",   CVector2D ( 0.168f, fBase + fGap * 1 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "menu_host_game.png",        CVector2D ( 0.168f, fBase + fGap * 2 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "menu_map_editor.png",       CVector2D ( 0.168f, fBase + fGap * 3 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "menu_settings.png",         CVector2D ( 0.168f, fBase + fGap * 4 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "menu_about.png",            CVector2D ( 0.168f, fBase + fGap * 5 ) ) );
-    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "menu_quit.png",             CVector2D ( 0.168f, fBase + fGap * 6 ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_PLAY,           "menu_play.png",                CVector2D ( 0.168f, fBase + (fGap * 0) ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUICK_CONNECT,  "menu_quick_connect.png",       CVector2D ( 0.168f, fBase + (fGap * 1) ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png",      CVector2D ( 0.168f, fBase + (fGap * 2) ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_HOST_GAME,      "menu_host_game.png",           CVector2D ( 0.168f, fBase + (fGap * 3) ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_MAP_EDITOR,     "menu_map_editor.png",          CVector2D ( 0.168f, fBase + (fGap * 4) ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_SETTINGS,       "menu_settings.png",            CVector2D ( 0.168f, fBase + (fGap * 5) ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_ABOUT,          "menu_about.png",               CVector2D ( 0.168f, fBase + (fGap * 6) ) ) );
+    m_menuItems.push_back ( CreateItem ( MENU_ITEM_QUIT,           "menu_quit.png",                CVector2D ( 0.168f, fBase + (fGap * 7) ) ) );
 
     // We store the position of the top item, and the second item.  These will be useful later
     float fFirstItemSize = m_menuItems.front()->image->GetSize(false).fY;
@@ -777,6 +778,7 @@ bool CMainMenu::OnMenuClick ( CGUIElement* pElement )
         {
             switch (m_pHoveredItem->menuType)
             {
+                case MENU_ITEM_PLAY:
                 case MENU_ITEM_HOST_GAME:
                 case MENU_ITEM_MAP_EDITOR:
                     AskUserIfHeWantsToDisconnect( m_pHoveredItem->menuType );
@@ -787,6 +789,7 @@ bool CMainMenu::OnMenuClick ( CGUIElement* pElement )
 
         switch (m_pHoveredItem->menuType)
         {
+            case MENU_ITEM_PLAY:            OnPlayButtonClick         ();            break;
             case MENU_ITEM_DISCONNECT:      OnDisconnectButtonClick   (pElement);    break;
             case MENU_ITEM_QUICK_CONNECT:   OnQuickConnectButtonClick (pElement);    break;
             case MENU_ITEM_BROWSE_SERVERS:  OnBrowseServersButtonClick(pElement);    break;
@@ -860,6 +863,14 @@ bool CMainMenu::OnDisconnectButtonClick ( CGUIElement* pElement )
     return true;
 }
 
+bool CMainMenu::OnPlayButtonClick(void)
+{
+    // Return if we haven't faded in yet
+    if (m_ucFade != FADE_VISIBLE) return false;
+
+    CModManager::GetSingleton().RequestLoad ( "deathmatch", "play" );
+    return true;
+}
 
 bool CMainMenu::OnHostGameButtonClick ( void )
 {
@@ -1135,6 +1146,7 @@ void CMainMenu::WantsToDisconnectCallBack( void* pData, uint uiButton )
         uchar menuType = (uchar)pData;
         switch( menuType )
         {
+            case MENU_ITEM_PLAY:            OnPlayButtonClick     ();    break;
             case MENU_ITEM_HOST_GAME:       OnHostGameButtonClick ();    break;
             case MENU_ITEM_MAP_EDITOR:      OnEditorButtonClick   ();    break;
             default: break;

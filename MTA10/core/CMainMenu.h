@@ -91,6 +91,7 @@ private:
     bool                OnQuickConnectButtonClick       ( CGUIElement* pElement );
     bool                OnResumeButtonClick             ( CGUIElement* pElement );
     bool                OnBrowseServersButtonClick      ( CGUIElement* pElement );
+    bool                OnPlayButtonClick               ( void );
     bool                OnHostGameButtonClick           ( void );
     bool                OnDisconnectButtonClick         ( CGUIElement* pElement );
     bool                OnEditorButtonClick             ( void );
@@ -181,6 +182,7 @@ private:
 
     // Main menu items
     enum eMenuItems {
+        MENU_ITEM_PLAY,
         MENU_ITEM_DISCONNECT,
         MENU_ITEM_QUICK_CONNECT,
         MENU_ITEM_BROWSE_SERVERS,
