@@ -37,4 +37,4 @@ Download and install the [EditorConfig](https://visualstudiogallery.msdn.microso
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997-2015.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2016.
