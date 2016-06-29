@@ -17,7 +17,6 @@ typedef CAutoRefedPointer < struct CRegistryResultData > CRegistryResult;
 #define __CREGISTRY_H
 
 #include "CLogger.h"
-#include "lua/CLuaArguments.h"
 #include <list>
 #include <vector>
 #include <string>
@@ -42,7 +41,7 @@ public:
     bool                        Select                  ( const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult );
     bool                        Update                  ( const std::string& strTable, const std::string& strSet, const std::string& strWhere );
 
-    bool                        Query                   ( const std::string& strQuery, CLuaArguments *pArgs, CRegistryResult* pResult );
+    bool                        Query                   ( const std::string& strQuery, class CLuaArguments *pArgs, CRegistryResult* pResult );
     bool                        Query                   ( const char* szQuery, ... );
     bool                        Query                   ( CRegistryResult* pResult, const char* szQuery, ... );
 

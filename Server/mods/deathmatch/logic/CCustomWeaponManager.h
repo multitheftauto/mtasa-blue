@@ -13,7 +13,7 @@
 #define __CCUSTOMWEAPONMANAGER_H
 
 #include <list>
-#include <logic/CCommon.h>
+#include "CCommon.h"
 #include "CCustomWeapon.h"
 
 using std::list;

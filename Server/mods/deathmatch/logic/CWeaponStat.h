@@ -11,7 +11,7 @@
 
 #ifndef __CWEAPONSTAT_H
 #define __CWEAPONSTAT_H
-#include <logic/CCommon.h>
+#include "CCommon.h"
 struct sWeaponStats
 {
     eFireType   m_eFireType;        // type - instant hit (e.g. pistol), projectile (e.g. rocket launcher), area effect (e.g. flame thrower)

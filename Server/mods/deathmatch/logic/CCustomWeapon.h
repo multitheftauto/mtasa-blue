@@ -11,7 +11,7 @@
 
 #ifndef __CCUSTOMWEAPON_H
 #define __CCUSTOMWEAPON_H
-#include <logic/CCommon.h>
+#include "CCommon.h"
 #include "CCustomWeaponManager.h"
 #include "CWeaponStat.h"
 

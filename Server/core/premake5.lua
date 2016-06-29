@@ -21,3 +21,7 @@ project "Core"
 		"*.cpp"
 	}
 	
+	configuration "windows"
+		includedirs { "../../vendor/detours/include" }
+		links { "../../vendor/detours/lib/detours.lib", "Imagehlp.lib" }
+	

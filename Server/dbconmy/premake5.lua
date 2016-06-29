@@ -27,5 +27,5 @@ project "Dbconmy"
 	
 	configuration "windows"
 		includedirs { "../../vendor/mysql/include" }
-		links { "../../vendor/opt/libmysql.lib" }
+		links { "../../vendor/mysql/lib/x86/libmysql.lib" }
 		

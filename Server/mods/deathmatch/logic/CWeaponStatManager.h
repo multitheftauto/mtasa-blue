@@ -13,7 +13,7 @@
 #define __CWEAPONSTATMANAGER_H
 
 #include <list>
-#include <logic/CCommon.h>
+#include "CCommon.h"
 // Straight out of CGameSA.h
 #define     CLASSSIZE_WeaponInfo            112         // ##SA##
 #define     NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE

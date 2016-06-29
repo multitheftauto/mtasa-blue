@@ -37,6 +37,7 @@ solution "MTASA"
 		include "Server/core"
 		include "Server/dbconmy"
 		include "Server/launcher"
+		include "Server/mods/deathmatch"
 		-- TODO
 		
 		group "Client"
