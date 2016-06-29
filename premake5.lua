@@ -55,16 +55,14 @@ solution "MTASA"
 		
 		group "Vendor"
 		
-		-- TODO
 		include "vendor/ehs"
-		-- TODO
 		include "vendor/json-c"
 		include "vendor/libpng"
-		-- TODO
+		include "vendor/lua"
+		include "vendor/pthreads"
 		include "vendor/pcre"
 		include "vendor/pme"
 		include "vendor/portaudio"
-		-- TODO
 		include "vendor/sqlite"
 		include "vendor/tinygettext"
 		include "vendor/tinyxml"

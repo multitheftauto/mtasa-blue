@@ -22,6 +22,10 @@ project "Deathmatch"
 		""
 	}
 	
+	links {
+		"Lua", "pthread", "ws2_32"
+	}
+	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
