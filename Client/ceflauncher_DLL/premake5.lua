@@ -15,6 +15,10 @@ project "CEFLauncher DLL"
 		["*"] = "premake5.lua"
 	}
 	
+	links {
+		"../../vendor/cef3/Debug/libcef"
+	}
+
 	files {
 		"premake5.lua",
 		"*.h",

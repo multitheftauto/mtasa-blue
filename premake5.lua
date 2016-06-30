@@ -3,6 +3,8 @@ solution "MTASA"
 	
 	location "Build"
 	
+	targetdir "Output"
+	
 	flags { "C++14", "Symbols" }
 	characterset "MBCS"
 	
@@ -29,12 +31,14 @@ solution "MTASA"
 		
 	configuration "*"
 		group "Server"
+		targetdir "Output/Server"
 		include "Server/core"
 		include "Server/dbconmy"
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
 		
 		group "Client"
+		targetdir "Output/Client"
 		include "Client/ceflauncher"
 		include "Client/ceflauncher_DLL"
 		include "Client/core"
@@ -46,12 +50,14 @@ solution "MTASA"
 		include "Client/mods/deathmatch"
 		
 		group "Client/CEGUI"
+		targetdir "Output/Client"
 		include "vendor/cegui-0.4.0-custom/src/renderers/directx9GUIRenderer"
 		include "vendor/cegui-0.4.0-custom/WidgetSets/Falagard"
 		include "vendor/cegui-0.4.0-custom"
 		
 		
 		group "Vendor"
+		targetdir "Output/Shared"
 		include "vendor/cryptopp"
 		include "vendor/ehs"
 		include "vendor/json-c"

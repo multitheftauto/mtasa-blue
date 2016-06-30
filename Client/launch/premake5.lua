@@ -7,6 +7,8 @@ project "Client Launcher"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
+	flags { "WinMain" }
+	
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources"] = "*.c",

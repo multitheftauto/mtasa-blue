@@ -6,6 +6,7 @@ project "CEFLauncher"
 	includedirs { "../sdk" }
 	
 	links { "CEFLauncher DLL"}
+	flags { "WinMain" }
 
 	vpaths { 
 		["Headers/*"] = "**.h",

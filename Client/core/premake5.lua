@@ -17,7 +17,10 @@ project "Client Core"
 	libdirs {
 		"../../vendor/detours/lib"
 	}
-
+	
+	links {
+		"../../vendor/cef3/Debug/cef_sandbox"
+	}
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
