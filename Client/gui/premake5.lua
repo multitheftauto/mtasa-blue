@@ -5,7 +5,9 @@ project "GUI"
 	
 	includedirs { 
 		"../sdk",
-		"../../vendor/cegui-0.4.0-custom/include"
+		"../../vendor/cegui-0.4.0-custom/include",
+		"../../vendor/sparsehash/current/src/",
+		"../../vendor/sparsehash/current/src/windows"
 	 }
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"

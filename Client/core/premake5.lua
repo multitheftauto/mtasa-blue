@@ -9,7 +9,9 @@ project "Client Core"
 		"../../vendor/tinygettext",
 		"../../vendor/zlib",
 		"../../vendor/jpeg/jpeg-8d",
-		"../../vendor/pthreads/include" 
+		"../../vendor/pthreads/include",
+		"../../vendor/sparsehash/current/src/",
+		"../../vendor/sparsehash/current/src/windows"
 	}
 
 	libdirs {

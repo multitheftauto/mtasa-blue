@@ -3,7 +3,13 @@ project "Core"
 	kind "SharedLib"
 	targetname "core"
 	
-	includedirs { "../sdk", "../../vendor/google-breakpad/src" }
+	includedirs { 
+		"../sdk", 
+		"../../vendor/google-breakpad/src",
+		"../../vendor/sparsehash/current/src/",
+		"../../vendor/sparsehash/current/src/windows"
+	}
+	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	

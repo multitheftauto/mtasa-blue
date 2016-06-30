@@ -1,7 +1,7 @@
 project "pcre"
 	language "C++"
 	kind "SharedLib"
-	targetname "pcre3"
+	targetname "pcre"
 	
 	defines { "HAVE_CONFIG_H" }
 	includedirs { ".", "shipped_for_mta_win32" }
@@ -15,19 +15,39 @@ project "pcre"
 	
 	files {
 		"premake5.lua",
-		
-		"*.h",
-		"*.cc",
-		"*.c"
-	}
-	
-	excludes {
-		"pcredemo.c",
-		"pcretest.c",
-		"dftables.c",
-		"pcre_scanner_unittest.cc",
-		"pcre_stringpiece.unittest.cc",
-		"pcrecpp_unittest.cc",
-		"pcregrep.c"
+		"pcre_chartables.c",
+		"pcre_compile.c",
+		"pcre_config.c",
+		"pcre_dfa_exec.c",
+		"pcre_exec.c",
+		"pcre_fullinfo.c",
+		"pcre_get.c",
+		"pcre_globals.c",
+		"pcre_info.c",
+		"pcre_maketables.c",
+		"pcre_newline.c",
+		"pcre_ord2utf8.c",
+		"pcre_refcount.c",
+		"pcre_scanner.cc",
+		"pcre_stringpiece.cc",
+		"pcre_study.c",
+		"pcre_tables.c",
+		"pcre_try_flipped.c",
+		"pcre_ucd.c",
+		"pcre_valid_utf8.c",
+		"pcre_version.c",
+		"pcre_xclass.c",
+		"pcrecpp.cc",
+		"pcreposix.c",
+		"shipped_for_mta_win32/config.h",
+		"pcre.h",
+		"pcre_internal.h",
+		"pcre_scanner.h",
+		"pcre_stringpiece.h",
+		"pcrecpp.h",
+		"pcrecpp_internal.h",
+		"pcrecpparg.h",
+		"pcreposix.h",
+		"ucp.h"
 	}
 	

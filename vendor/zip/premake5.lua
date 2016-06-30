@@ -1,5 +1,5 @@
 project "zip"
-	language "C++"
+	language "C"
 	kind "StaticLib"
 	targetname "zip"
 	

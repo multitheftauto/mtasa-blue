@@ -8,9 +8,7 @@ solution "MTASA"
 	
 	includedirs { 
 		"Shared/sdk", 
-		"vendor",
-		"vendor/sparsehash/current/src/",
-		"vendor/sparsehash/current/src/windows"
+		"vendor"
 	}
 
 	defines { 
@@ -55,6 +53,7 @@ solution "MTASA"
 		
 		group "Vendor"
 		
+		include "vendor/cryptopp"
 		include "vendor/ehs"
 		include "vendor/json-c"
 		include "vendor/libpng"

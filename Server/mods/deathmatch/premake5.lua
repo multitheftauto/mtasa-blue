@@ -2,7 +2,10 @@ project "Deathmatch"
 	language "C++"
 	kind "SharedLib"
 	targetname "deathmatch"
-	
+
+	pchheader "StdInc.h"
+	pchsource "StdInc.cpp"
+
 	includedirs { 
 		"../../sdk", 
 		"../../../vendor/pthreads/include", 
@@ -17,21 +20,23 @@ project "Deathmatch"
 		"../../../Shared/mods/deathmatch/logic", 
 		"../../../Shared/animation", 
 		"../../../Shared/publicsdk/include", 
+		"../../../vendor/sparsehash/current/src/",
+		"../../../vendor/sparsehash/current/src/windows",
 		"logic", 
 		"utils",
-		""
+		"."
 	}
 	
 	links {
-		"Lua", "pthread", "ws2_32"
+		"Lua", "pthread", "ws2_32", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"
 	}
 	
-	pchheader "StdInc.h"
-	pchsource "StdInc.cpp"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources/*"] = "**.c",
+		["Sources/*"] = "**.cpp",
+		["Headers/*"] = "../../../**.h",
+		["Sources/*"] = "../../../**.cpp",
 		["*"] = "premake5.lua"
 	}
 	
@@ -41,7 +46,15 @@ project "Deathmatch"
 		"**.cpp",
 		"../../../Shared/mods/deathmatch/logic/**.cpp",
 		"../../../Shared/mods/deathmatch/logic/**.h",
+		"../../../Shared/animation/CEasingCurve.cpp", 
+		"../../../Shared/animation/CPositionRotationAnimation.cpp",
+		"../../../Server/sdk/MTAPlatform.cpp",
+		"../../../Server/sdk/MTAPlatform.h",
+		-- Todo: Replace these two by using the CryptoPP functions instead
+		"../../../vendor/bob_withers/base64.cpp",
+		"../../../vendor/bochs/bochs_internal/crc32.cpp",
 	}
+	
 	
 	configuration "windows"
 		buildoptions { "-Zm130" }

@@ -1,6 +1,6 @@
 project "pthread"
 	language "C++"
-	kind "StaticLib"
+	kind "SharedLib"
 	targetname "pthread"
 	
 		
