@@ -8,6 +8,7 @@
 !include WinVer.nsh
 !include nsArray.nsh
 !include Utils.nsh
+!include WordFunc.nsh
 
 XPStyle on
 RequestExecutionLevel user
@@ -1129,6 +1130,10 @@ Function UpdateVCRedistributables
     ${If} $0 != "1"
         Call InstallVC12Redistributable
     ${EndIf}
+    Call IsVC14RedistributableInstalled
+    ${If} $0 != "1"
+        Call InstallVC14Redistributable
+    ${EndIf}
 FunctionEnd
 
 
@@ -1180,6 +1185,67 @@ Function IsVC12RedistributableInstalled
     ${EndIf}
 FunctionEnd
 
+
+;====================================================================================
+; Download and install Microsoft Visual Studio 2015 redistributable
+;====================================================================================
+!define VC14_REDIST_VER    "14.0.23918"     ; Version number of update 2
+Var REDISTVC14
+
+LangString MSGBOX_VC14RED_ERROR1 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2015 redistributable"
+LangString MSGBOX_VC14RED_ERROR2 ${LANG_ENGLISH}    "Unable to install Microsoft Visual Studio 2015 redistributable"
+LangString MSGBOX_VC14RED_ERROR3 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2015 redistributable.\
+$\r$\nHowever installation will continue.\
+$\r$\nPlease reinstall if there are problems later."
+Function InstallVC14Redistributable
+    ${LogText} "Function begin - InstallVC14Redistributable"
+    DetailPrint "Installing Microsoft Visual Studio 2015 redistributable ..."
+    StrCpy $REDISTVC14 "$TEMP\vcredist14_x86.exe"
+    NSISdl::download "http://download.microsoft.com/download/0/5/0/0504B211-6090-48B1-8DEE-3FF879C29968/vc_redist.x86.exe" $REDISTVC14
+    Pop $0
+
+    ${If} $0 != "success"
+        DetailPrint "* Download of Microsoft Visual Studio 2015 redistributable failed:"
+        DetailPrint "* $0"
+        DetailPrint "* Installation continuing anyway"
+        MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR3)"
+    ${Else}
+        ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
+        ; /quiet = 'This option will suppress all UI and perform an install.'
+        ExecWait '"$REDISTVC14" /quiet'
+        Call IsVC14RedistributableInstalled
+        ${If} $0 != "1"
+            DetailPrint "* Some error occured installing Microsoft Visual Studio 2015 redistributable"
+            DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
+            DetailPrint "* Installation continuing anyway"
+            MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR2)"
+            MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR3)"
+        ${EndIf}
+    ${EndIf}
+
+    ${LogText} "Function end - InstallVC14Redistributable"
+FunctionEnd
+
+;----------------------------------------
+; Out $0 = result   ("1" = yes, "0" = no)
+Function IsVC14RedistributableInstalled
+    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Install"
+    ${If} $0 == "1" 
+        ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Version"
+
+        ; ${VersionCompare} "[Version1]" "[Version2]" $result
+        ;   0 = Versions are equal
+        ;   1 = Version1 is newer
+        ;   2 = Version2 is newer
+        ${VersionCompare} $0 ${VC14_REDIST_VER} $1
+        ${If} $1 != "2"     ; Version2 is not newer
+            StrCpy $0 "1"
+            Return
+        ${EndIf}
+
+    ${EndIf}
+    StrCpy $0 "0"
+FunctionEnd
 
 ;====================================================================================
 ; Patcher related functions
