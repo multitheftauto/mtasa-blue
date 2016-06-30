@@ -28,15 +28,11 @@ solution "MTASA"
 		defines { "WIN32" }
 		
 	configuration "*"
-		group "Shared"
-		-- TODO
-		
 		group "Server"
 		include "Server/core"
 		include "Server/dbconmy"
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
-		-- TODO
 		
 		group "Client"
 		include "Client/ceflauncher"
@@ -47,12 +43,15 @@ solution "MTASA"
 		include "Client/launch"
 		include "Client/loader"
 		include "Client/multiplayer_sa"
-		-- TODO
-		--include "Client/mods/deathmatch"
+		include "Client/mods/deathmatch"
+		
+		group "Client/CEGUI"
+		include "vendor/cegui-0.4.0-custom/src/renderers/directx9GUIRenderer"
+		include "vendor/cegui-0.4.0-custom/WidgetSets/Falagard"
+		include "vendor/cegui-0.4.0-custom"
 		
 		
 		group "Vendor"
-		
 		include "vendor/cryptopp"
 		include "vendor/ehs"
 		include "vendor/json-c"

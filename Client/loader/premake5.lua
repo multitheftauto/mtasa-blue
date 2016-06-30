@@ -13,7 +13,8 @@ project "Loader"
 	}
 
 	links {
-		"unrar", "d3d9"
+		"unrar", "d3d9",
+		"../../vendor/nvapi/x86/nvapi.lib"
 	}
 
 	pchheader "StdInc.h"

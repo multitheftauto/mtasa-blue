@@ -13,7 +13,9 @@ project "Game SA"
 	}
 	
 	includedirs {
-		"../sdk"
+		"../sdk",
+		"../../vendor/sparsehash/current/src/",
+		"../../vendor/sparsehash/current/src/windows"
 	}
 	
 	files {

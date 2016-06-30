@@ -14,6 +14,11 @@ project "Lua"
 		"src/**.c",
 		"src/**.h",
 	}
+	
+	-- Todo: Client only
+	defines {
+		"LUA_USE_APICHECK"
+	}
 
 	configuration "windows"
 		defines { "LUA_BUILD_AS_DLL" }

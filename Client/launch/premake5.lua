@@ -1,7 +1,7 @@
 project "Client Launcher"
 	language "C++"
 	kind "WindowedApp"
-	targetname "gui"
+	targetname "Multi Theft Auto"
 	
 	includedirs { "../sdk" }
 	pchheader "StdInc.h"
