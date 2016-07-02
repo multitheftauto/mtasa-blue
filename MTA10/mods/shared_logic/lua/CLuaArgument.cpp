@@ -39,6 +39,7 @@ using namespace std;
 CLuaArgument::CLuaArgument ( void )
 {
     m_iType = LUA_TNIL;
+    m_iIndex = -1;
     m_pTableData = NULL;
     m_pUserData = NULL;
 }
@@ -63,6 +64,7 @@ CLuaArgument::CLuaArgument ( lua_State* luaVM, int iArgument, CFastHashMap < con
 {
     // Read the argument out of the lua VM
     m_pTableData = NULL;
+    m_iIndex = iArgument;
     Read ( luaVM, iArgument, pKnownTables );
 }
 
