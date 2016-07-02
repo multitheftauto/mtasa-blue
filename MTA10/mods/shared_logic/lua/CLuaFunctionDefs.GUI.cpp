@@ -1696,18 +1696,56 @@ int CLuaFunctionDefs::GUIGridListGetColumnTitle ( lua_State* luaVM )
 int CLuaFunctionDefs::GUIGridListAddRow ( lua_State* luaVM )
 {
 //  int guiGridListAddRow ( element gridList )
+//  int guiGridListAddRow ( element gridList, int/string itemText1, int/string itemText2 ... )
     CClientGUIElement* guiGridlist;
+    CLuaArguments Arguments;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData < CGUIGridList > ( guiGridlist );
+    argStream.ReadLuaArguments(Arguments);
 
     if ( !argStream.HasErrors () )
     {
-        int iRet = CStaticFunctionDefinitions::GUIGridListAddRow ( *guiGridlist, true );
-        if ( iRet >= 0 )
+        int iRet = 0;
+        if (Arguments.Count() == 0)
+            iRet = CStaticFunctionDefinitions::GUIGridListAddRow(*guiGridlist, true);
+        else
         {
-            m_pGUIManager->QueueGridListUpdate ( guiGridlist );
-            lua_pushnumber ( luaVM, iRet );
+            // Vector containing our string arguments.  We add a bool to store whether it was originally a number.
+            std::vector < pair<SString,bool> > m_items;
+            std::vector < CLuaArgument* > ::const_iterator it = Arguments.IterBegin();
+            for (it; it != Arguments.IterEnd(); it++)
+            {
+                CLuaArgument* pArgument = *it;
+                SString strItemText;
+                bool bNumber = false;
+
+                // Check the type of the argument and convert it to a string we can process
+                uint type = pArgument->GetType();
+                if (type == LUA_TNUMBER)
+                {
+                    // Grab the lua string and its size
+                    const char* szLuaString = lua_tostring(luaVM, pArgument->GetIndex());
+                    size_t sizeLuaString = lua_strlen(luaVM, pArgument->GetIndex());
+
+                    // Set our string
+                    strItemText.assign(szLuaString, sizeLuaString);
+                    bNumber = true;
+                }
+                else if ( type == LUA_TSTRING )
+                    strItemText = pArgument->GetString();
+                else
+                    continue;
+
+                m_items.push_back(std::make_pair(strItemText,bNumber));
+            }
+            iRet = CStaticFunctionDefinitions::GUIGridListAddRow(*guiGridlist, true, &m_items);
+        }
+
+        if (iRet >= 0)
+        {
+            m_pGUIManager->QueueGridListUpdate(guiGridlist);
+            lua_pushnumber(luaVM, iRet);
             return 1;
         }
     }
@@ -1723,15 +1761,54 @@ int CLuaFunctionDefs::GUIGridListAddRow ( lua_State* luaVM )
 int CLuaFunctionDefs::GUIGridListInsertRowAfter ( lua_State* luaVM )
 {
 //  int guiGridListInsertRowAfter ( element gridList, int rowIndex )
+//  int guiGridListInsertRowAfter ( element gridList, int rowIndex, int/string itemText1, int/string itemText2 ... )
     CClientGUIElement* guiGridlist; int rowIndex;
+    CLuaArguments Arguments;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData < CGUIGridList > ( guiGridlist );
     argStream.ReadNumber ( rowIndex );
+    argStream.ReadLuaArguments(Arguments);
 
     if ( !argStream.HasErrors () )
     {
-        int iRet = CStaticFunctionDefinitions::GUIGridListInsertRowAfter ( *guiGridlist, rowIndex );
+        int iRet = 0;
+        if (Arguments.Count() == 0)
+            iRet = CStaticFunctionDefinitions::GUIGridListInsertRowAfter ( *guiGridlist, rowIndex );
+        else
+        {
+            // Vector containing our string arguments.  We add a bool to store whether it was originally a number.
+            std::vector < pair<SString, bool> > m_items;
+            std::vector < CLuaArgument* > ::const_iterator it = Arguments.IterBegin();
+            for (it; it != Arguments.IterEnd(); it++)
+            {
+                CLuaArgument* pArgument = *it;
+                SString strItemText;
+                bool bNumber = false;
+
+                // Check the type of the argument and convert it to a string we can process
+                uint type = pArgument->GetType();
+                if (type == LUA_TNUMBER)
+                {
+                    // Grab the lua string and its size
+                    const char* szLuaString = lua_tostring(luaVM, pArgument->GetIndex());
+                    size_t sizeLuaString = lua_strlen(luaVM, pArgument->GetIndex());
+
+                    // Set our string
+                    strItemText.assign(szLuaString, sizeLuaString);
+                    bNumber = true;
+                }
+                else if (type == LUA_TSTRING)
+                    strItemText = pArgument->GetString();
+                else
+                    continue;
+
+                m_items.push_back(std::make_pair(strItemText, bNumber));
+            }
+            iRet = CStaticFunctionDefinitions::GUIGridListInsertRowAfter(*guiGridlist, rowIndex, &m_items);
+        }
+
+
         if ( iRet >= 0 ) 
         {
             lua_pushnumber ( luaVM, iRet );

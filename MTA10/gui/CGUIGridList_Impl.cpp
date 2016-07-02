@@ -182,15 +182,40 @@ void CGUIGridList_Impl::ForceUpdate ( void )
     reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> forceUpdate();
 }
 
-int CGUIGridList_Impl::AddRow ( bool fast )
+
+int CGUIGridList_Impl::AddRow(bool fast, std::vector < pair<SString, bool> > *m_items)
 {
     try
     {
-        return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addRow ( m_iIndex++, fast );
+        int iRow = reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> addRow ( m_iIndex++, fast );
+        if (m_items)
+            return SetRowItemsText(iRow, m_items);
+        else
+            return iRow;
     }
     catch ( CEGUI::Exception ) {
         return -1;
     }
+}
+
+int CGUIGridList_Impl::SetRowItemsText(int iRow, std::vector < pair<SString, bool> > *m_items)
+{
+    int iSortColumn = reinterpret_cast < CEGUI::MultiColumnList* > (m_pWindow)->getSortColumn() + 1; // MTA columns start at 1, CEGUI at 0
+
+    std::vector < pair<SString, bool> >::iterator it = m_items->begin();
+    int col = 1;
+    for (it; it != m_items->end(); it++)
+    {
+        // Loop through every item.  We add each one unless it's the sorted by column, which we do last
+        if (col != iSortColumn)
+            SetItemText(iRow, col, it->first.c_str(), it->second, false, true);
+        col++;
+    }
+    // Add our sort column text, if it was provided
+    if ((uint)iSortColumn <= m_items->size())
+        iRow = SetItemText(iRow, iSortColumn, m_items->at(iSortColumn - 1).first.c_str(), m_items->at(iSortColumn - 1).second, false, true);
+
+    return iRow;
 }
 
 
@@ -204,17 +229,20 @@ void CGUIGridList_Impl::RemoveRow ( int iRow )
 }
 
 
-int CGUIGridList_Impl::InsertRowAfter ( int iRow )
+int CGUIGridList_Impl::InsertRowAfter(int iRow, std::vector < pair<SString, bool> > *m_items)
 {
     try
     {
-        return reinterpret_cast < CEGUI::MultiColumnList* > ( m_pWindow ) -> insertRow ( iRow+1, m_iIndex++ );
+        int iNewRow = reinterpret_cast < CEGUI::MultiColumnList* > (m_pWindow)->insertRow(iRow + 1, m_iIndex++);
+        if (m_items)
+            return SetRowItemsText(iNewRow, m_items);
+        else
+            return iNewRow;
     }
     catch ( CEGUI::Exception ) {
         return -1;
     }
 }
-
 
 void CGUIGridList_Impl::AutoSizeColumn ( unsigned int hColumn )
 {

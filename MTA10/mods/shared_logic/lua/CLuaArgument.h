@@ -55,6 +55,7 @@ public:
     void                    Push                ( lua_State* luaVM, CFastHashMap < CLuaArguments*, int > * pKnownTables = NULL ) const;
 
     inline int              GetType             ( void ) const      { return m_iType; };
+    inline int              GetIndex(void) const      { return m_iIndex; };
 
     inline bool             GetBoolean          ( void ) const      { return m_bBoolean; };
     inline lua_Number       GetNumber           ( void ) const      { return m_Number; };
@@ -72,6 +73,7 @@ private:
     void                    LogUnableToPacketize    ( const char* szMessage ) const;
 
     int                     m_iType;
+    int                     m_iIndex;
     bool                    m_bBoolean;
     lua_Number              m_Number;
     SString                 m_strString;
