@@ -344,6 +344,10 @@ void CPlayer::RemoveAllSyncingVehicles ( void )
     for ( ; iter != m_SyncingVehicles.end (); iter++ )
     {
         (*iter)->m_pSyncer = NULL;
+
+        CLuaArguments Arguments;
+        Arguments.PushElement(this);
+        (*iter)->CallEvent("onElementStopSync", Arguments);
     }
 }
 
@@ -389,6 +393,10 @@ void CPlayer::RemoveAllSyncingPeds ( void )
     for ( ; iter != m_SyncingPeds.end (); iter++ )
     {
         (*iter)->m_pSyncer = NULL;
+
+        CLuaArguments Arguments;
+        Arguments.PushElement(this);
+        (*iter)->CallEvent("onElementStopSync", Arguments);
     }
 }
 
@@ -434,6 +442,10 @@ void CPlayer::RemoveAllSyncingObjects ( void )
     for ( ; iter != m_SyncingObjects.end (); iter++ )
     {
         (*iter)->m_pSyncer = NULL;
+
+        CLuaArguments Arguments;
+        Arguments.PushElement(this);
+        (*iter)->CallEvent("onElementStopSync", Arguments);
     }
 }
 
