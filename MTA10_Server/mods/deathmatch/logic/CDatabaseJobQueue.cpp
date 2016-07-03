@@ -327,7 +327,9 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
             CTickCount age = timeNow - pJobData->result.timeReady;
             if ( age.ToLongLong () > 1000 * 60 * 5 )
             {
+                shared.m_Mutex.Unlock ();
                 g_pGame->GetScriptDebugging()->LogWarning( pJobData->m_LuaDebugInfo, "Database result uncollected after 5 minutes. [Query: %s]", *pJobData->command.strData );
+                shared.m_Mutex.Lock ();
                 pJobData->result.bLoggedWarning = true;
                 break;
             }
@@ -403,7 +405,9 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
         // Issue warning if it's taking a long time
         if ( uiTotalWaitTime > uiWaitTimeWarnThresh )
         {
+            shared.m_Mutex.Unlock ();
             g_pGame->GetScriptDebugging()->LogWarning( pJobData->m_LuaDebugInfo, "dbPoll is waiting a long time (%d seconds so far). [Query: %s]", uiTotalWaitTime / 1000, *pJobData->command.strData );
+            shared.m_Mutex.Lock ();
             uiWaitTimeWarnThresh += TICKS_FROM_SECONDS( 60 );
         }
     }
