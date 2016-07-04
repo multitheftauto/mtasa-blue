@@ -4955,32 +4955,43 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
                                             // If the vehicle's a boat, make sure we're standing on it (we need a dif task to enter boats properly)
                                             if ( pVehicle->GetVehicleType () != CLIENTVEHICLE_BOAT || m_pLocalPlayer->GetContactEntity () == pVehicle )
                                             {
-                                                // Send an in request
-                                                NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
-                                                if ( pBitStream )
+                                                // Call the onClientVehicleStartEnter event for remote players 
+                                                // Local player triggered before sending packet in CClientGame
+                                                CLuaArguments Arguments;
+                                                Arguments.PushElement(m_pLocalPlayer);      // player
+                                                Arguments.PushNumber(uiSeat);        // seat
+                                                Arguments.PushNumber(uiDoor);        // Door
+                                                
+                                                if ( pVehicle->CallEvent("onClientVehicleStartEnter", Arguments, true) )
                                                 {
-                                                    // Write the vehicle id to it and that we're requesting to get into it
-                                                    pBitStream->Write ( pVehicle->GetID () );
-                                                    unsigned char ucAction = static_cast < unsigned char > ( VEHICLE_REQUEST_IN );
-                                                    unsigned char ucSeat = static_cast < unsigned char > ( uiSeat );
-                                                    bool bIsOnWater = pVehicle->IsOnWater ();
-                                                    unsigned char ucDoor = static_cast < unsigned char > ( uiDoor );
-                                                    pBitStream->WriteBits ( &ucAction, 4 );
-                                                    pBitStream->WriteBits ( &ucSeat, 4 );
-                                                    pBitStream->WriteBit ( bIsOnWater );
-                                                    pBitStream->WriteBits ( &ucDoor, 3 );
 
-                                                    // Send and destroy it
-                                                    g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
-                                                    g_pNet->DeallocateNetBitStream ( pBitStream );
+                                                    // Send an in request
+                                                    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
+                                                    if ( pBitStream )
+                                                    {
+                                                        // Write the vehicle id to it and that we're requesting to get into it
+                                                        pBitStream->Write ( pVehicle->GetID () );
+                                                        unsigned char ucAction = static_cast < unsigned char > ( VEHICLE_REQUEST_IN );
+                                                        unsigned char ucSeat = static_cast < unsigned char > ( uiSeat );
+                                                        bool bIsOnWater = pVehicle->IsOnWater ();
+                                                        unsigned char ucDoor = static_cast < unsigned char > ( uiDoor );
+                                                        pBitStream->WriteBits ( &ucAction, 4 );
+                                                        pBitStream->WriteBits ( &ucSeat, 4 );
+                                                        pBitStream->WriteBit ( bIsOnWater );
+                                                        pBitStream->WriteBits ( &ucDoor, 3 );
 
-                                                    // We're now entering a vehicle
-                                                    m_bIsGettingIntoVehicle = true;
-                                                    m_ulLastVehicleInOutTime = CClientTime::GetTime ();
+                                                        // Send and destroy it
+                                                        g_pNet->SendPacket ( PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED );
+                                                        g_pNet->DeallocateNetBitStream ( pBitStream );
 
-#ifdef MTA_DEBUG
-                                                    g_pCore->GetConsole ()->Printf ( "* Sent_InOut: vehicle_request_in" );
-#endif
+                                                        // We're now entering a vehicle
+                                                        m_bIsGettingIntoVehicle = true;
+                                                        m_ulLastVehicleInOutTime = CClientTime::GetTime ();
+
+    #ifdef MTA_DEBUG
+                                                        g_pCore->GetConsole ()->Printf ( "* Sent_InOut: vehicle_request_in" );
+    #endif
+                                                    }
                                                 }
                                             }
                                         }
