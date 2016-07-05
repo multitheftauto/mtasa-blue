@@ -6,6 +6,7 @@
 *  PURPOSE:     Client/server shared enum definitions
 *
 *****************************************************************************/
+#pragma once
 
 namespace EEventPriority
 {
