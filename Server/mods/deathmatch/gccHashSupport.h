@@ -1,3 +1,4 @@
+#pragma once
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
 
