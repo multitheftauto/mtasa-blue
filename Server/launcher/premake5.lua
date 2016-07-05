@@ -17,4 +17,7 @@ project "Launcher"
 		"*.h",
 		"*.cpp"
 	}
-	
+
+	filter "system:linux" {
+		links { "dl" }
+	}
