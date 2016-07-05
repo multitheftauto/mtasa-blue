@@ -2,6 +2,7 @@ project "Deathmatch"
 	language "C++"
 	kind "SharedLib"
 	targetname "deathmatch"
+	targetdir(buildpath("Server"))
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
@@ -48,8 +49,9 @@ project "Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp", 
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
-		"../../../Server/sdk/MTAPlatform.cpp",
-		"../../../Server/sdk/MTAPlatform.h",
+		"../../sdk/MTAPlatform.cpp",
+		"../../sdk/MTAPlatform.h",
+		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bob_withers/base64.cpp",
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",

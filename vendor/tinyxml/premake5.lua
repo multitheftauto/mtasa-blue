@@ -7,7 +7,7 @@ project "tinyxml"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources"] = "*.cpp",
+		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
 	

@@ -2,6 +2,7 @@ project "Multiplayer SA"
 	language "C++"
 	kind "SharedLib"
 	targetname "multiplayer_sa"
+	targetdir(buildpath("Client"))
 	
 	includedirs { 
 		"../sdk",

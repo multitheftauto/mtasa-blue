@@ -5,7 +5,7 @@ project "sqlite"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources"] = "*.c",
+		["Sources/*"] = "*.c",
 		["*"] = "premake5.lua"
 	}
 	

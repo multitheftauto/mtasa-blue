@@ -2,13 +2,15 @@ project "Game SA"
 	language "C++"
 	kind "SharedLib"
 	targetname "game_sa"
+	targetdir(buildpath("Client"))
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources"] = "*.c",
+		["Headers/*"] = "**.hpp",
+		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
 	
@@ -21,6 +23,7 @@ project "Game SA"
 	files {
 		"premake5.lua",
 		"*.h",
+		"*.hpp",
 		"*.cpp"
 	}
 	

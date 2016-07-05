@@ -2,6 +2,7 @@ project "Client Deathmatch"
 	language "C++"
 	kind "SharedLib"
 	targetname "deathmatch"
+	targetdir(buildpath("Client"))
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"

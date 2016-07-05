@@ -2,6 +2,7 @@ project "Client Launcher"
 	language "C++"
 	kind "WindowedApp"
 	targetname "Multi Theft Auto"
+	targetdir(buildpath("Client"))
 	
 	includedirs { "../sdk" }
 	pchheader "StdInc.h"
@@ -11,7 +12,7 @@ project "Client Launcher"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources"] = "*.c",
+		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
 	

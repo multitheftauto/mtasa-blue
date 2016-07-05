@@ -26,8 +26,11 @@ project "Core"
 		"*.h",
 		"*.cpp"
 	}
-	
-	configuration "windows"
+
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 
+      
+	filter "configurations: windows"
 		includedirs { "../../vendor/detours/include" }
-		links { "../../vendor/detours/lib/detours.lib", "Imagehlp.lib" }
+		links { "../../vendor/detours/lib/detours.lib", "Imagehlp" }
 	

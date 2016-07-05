@@ -5,7 +5,7 @@ project "zlib"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources"] = "*.c",
+		["Sources/*"] = "*.cpp",
 		["*"] = "premake5.lua"
 	}
 	

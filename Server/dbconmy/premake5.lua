@@ -2,6 +2,7 @@ project "Dbconmy"
 	language "C++"
 	kind "SharedLib"
 	targetname "dbconmy"
+	targetdir(buildpath("Server"))
 	
 	includedirs { 
 		"../sdk", 

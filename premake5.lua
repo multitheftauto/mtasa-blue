@@ -1,9 +1,8 @@
-solution "MTASA"
+workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
+	platforms { "x86", "x64"}
 	
 	location "Build"
-	
-	targetdir "Output"
 	
 	flags { "C++14", "Symbols" }
 	characterset "MBCS"
@@ -18,27 +17,29 @@ solution "MTASA"
 		"_SCL_SECURE_NO_WARNINGS",
 		"_CRT_NONSTDC_NO_DEPRECATE"
 	}
+		
+	-- Helper function for output path 
+	buildpath = function(p) return "%{wks.location}../Bin/"..p.."/" end
 	
-	configuration "Debug"
+	filter "platforms:x86"
+		architecture "x86"
+	filter "platforms:x64"
+		architecture "x86_64"
+	
+	filter "configurations:Debug"
 		defines { "MTA_DEBUG" }
 		targetsuffix "_d"
 		
-	configuration "Release"
+	filter "configurations:Release or configurations:Nightly"
 		flags { "Optimize" }
 		
-	configuration "windows"
+	filter "system:windows"
 		defines { "WIN32" }
-		
-	configuration "*"
-		group "Server"
-		targetdir "Output/Server"
-		include "Server/core"
-		include "Server/dbconmy"
-		include "Server/launcher"
-		include "Server/mods/deathmatch"
-		
+
+	
+	-- Only build the client on Windows
+	filter "system:windows"	
 		group "Client"
-		targetdir "Output/Client"
 		include "Client/ceflauncher"
 		include "Client/ceflauncher_DLL"
 		include "Client/core"
@@ -50,26 +51,41 @@ solution "MTASA"
 		include "Client/mods/deathmatch"
 		
 		group "Client/CEGUI"
-		targetdir "Output/Client"
 		include "vendor/cegui-0.4.0-custom/src/renderers/directx9GUIRenderer"
 		include "vendor/cegui-0.4.0-custom/WidgetSets/Falagard"
 		include "vendor/cegui-0.4.0-custom"
 		
+		group "Vendor"
+		include "vendor/portaudio"
+		include "vendor/cef3"
+		include "vendor/jpeg-8d"
+		include "vendor/libpng"
+		include "vendor/tinygettext"
+		
+	filter {}
+		group "Server"
+		include "Server/core"
+		include "Server/dbconmy"
+		include "Server/launcher"
+		include "Server/mods/deathmatch"
 		
 		group "Vendor"
-		targetdir "Output/Shared"
 		include "vendor/cryptopp"
 		include "vendor/ehs"
 		include "vendor/json-c"
-		include "vendor/libpng"
 		include "vendor/lua"
 		include "vendor/pthreads"
 		include "vendor/pcre"
 		include "vendor/pme"
-		include "vendor/portaudio"
 		include "vendor/sqlite"
-		include "vendor/tinygettext"
 		include "vendor/tinyxml"
 		include "vendor/unrar"
 		include "vendor/zip"
 		include "vendor/zlib"
+		
+		
+	filter "platforms:x86"
+		architecture "x86"
+
+	filter "platforms:x64"
+		architecture "x86_64"

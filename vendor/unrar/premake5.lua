@@ -7,7 +7,7 @@ project "unrar"
 	
 	vpaths { 
 		["Headers/*"] = "**.hpp",
-		["Sources"] = "*.cpp",
+		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
 	

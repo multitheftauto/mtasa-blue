@@ -2,6 +2,7 @@ project "Loader"
 	language "C++"
 	kind "SharedLib"
 	targetname "loader"
+	targetdir(buildpath("Client"))
 	
 	includedirs { 
 		"../sdk",

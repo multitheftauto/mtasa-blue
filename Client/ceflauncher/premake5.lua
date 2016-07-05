@@ -2,6 +2,7 @@ project "CEFLauncher"
 	language "C++"
 	kind "WindowedApp"
 	targetname "ceflauncher"
+	targetdir(buildpath("Client"))
 	
 	includedirs { "../sdk" }
 	
@@ -10,7 +11,7 @@ project "CEFLauncher"
 
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources"] = "*.c",
+		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
 	
@@ -19,4 +20,3 @@ project "CEFLauncher"
 		"*.h",
 		"*.cpp"
 	}
-	
