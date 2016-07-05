@@ -10,7 +10,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-//#pragma once      Don't do this
+#pragma once      Don't do this
 
 /*************************************************************************
 	Simplification of some 'unsigned' types
