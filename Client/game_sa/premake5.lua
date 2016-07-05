@@ -2,7 +2,7 @@ project "Game SA"
 	language "C++"
 	kind "SharedLib"
 	targetname "game_sa"
-	targetdir(buildpath("Client"))
+	targetdir(buildpath("mta"))
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"

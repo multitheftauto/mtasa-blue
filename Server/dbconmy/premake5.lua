@@ -2,7 +2,7 @@ project "Dbconmy"
 	language "C++"
 	kind "SharedLib"
 	targetname "dbconmy"
-	targetdir(buildpath("Server"))
+	targetdir(buildpath("server/mods/deathmatch"))
 	
 	includedirs { 
 		"../sdk", 

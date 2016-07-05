@@ -23,3 +23,4 @@ project "Lua"
 	configuration "windows"
 		defines { "LUA_BUILD_AS_DLL" }
 
+	

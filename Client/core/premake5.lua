@@ -2,7 +2,7 @@ project "Client Core"
 	language "C++"
 	kind "SharedLib"
 	targetname "core"
-	targetdir(buildpath("Client"))
+	targetdir(buildpath("mta"))
 	
 	includedirs { 
 		"../sdk",

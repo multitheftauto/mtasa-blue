@@ -20,6 +20,7 @@ workspace "MTASA"
 		
 	-- Helper function for output path 
 	buildpath = function(p) return "%{wks.location}../Bin/"..p.."/" end
+	copy = function(p) return "{COPY} %{cfg.linktarget.abspath} %{wks.location}../Bin/"..p end 
 	
 	filter "platforms:x86"
 		architecture "x86"
@@ -69,7 +70,11 @@ workspace "MTASA"
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
 		
+		group "Shared"
+		include "Shared/XML"
+		
 		group "Vendor"
+		include "vendor/curl/lib"
 		include "vendor/cryptopp"
 		include "vendor/ehs"
 		include "vendor/json-c"

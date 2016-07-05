@@ -2,7 +2,7 @@ project "GUI"
 	language "C++"
 	kind "SharedLib"
 	targetname "gui"
-	targetdir(buildpath("Client"))
+	targetdir(buildpath("mta"))
 	
 	includedirs { 
 		"../sdk",

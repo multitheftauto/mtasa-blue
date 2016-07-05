@@ -2,7 +2,7 @@ project "pthread"
 	language "C++"
 	kind "SharedLib"
 	targetname "pthread"
-	
+	targetdir(buildpath("server"))
 		
 	includedirs { 
 		"include"
@@ -30,3 +30,9 @@ project "pthread"
 		"HAVE_PTW32_CONFIG_H",
 		"PTW32_BUILD_INLINED"
 	}
+	
+	filter "system:windows"
+		postbuildcommands {
+			copy "mta"
+		}
+	

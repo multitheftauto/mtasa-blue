@@ -2,7 +2,7 @@ project "CEFLauncher DLL"
 	language "C++"
 	kind "SharedLib"
 	targetname "ceflauncher_dll"
-	targetdir(buildpath("Client"))
+	targetdir(buildpath("mta/cef"))
 	
 	includedirs { 
 		"../../vendor/cef3" 

@@ -2,6 +2,7 @@ project "Core"
 	language "C++"
 	kind "SharedLib"
 	targetname "core"
+	targetdir(buildpath("server"))
 	
 	includedirs { 
 		"../sdk", 

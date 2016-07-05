@@ -2,7 +2,7 @@ project "Deathmatch"
 	language "C++"
 	kind "SharedLib"
 	targetname "deathmatch"
-	targetdir(buildpath("Server"))
+	targetdir(buildpath("server/mods/deathmatch"))
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"

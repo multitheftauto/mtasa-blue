@@ -2,7 +2,7 @@ project "Client Launcher"
 	language "C++"
 	kind "WindowedApp"
 	targetname "Multi Theft Auto"
-	targetdir(buildpath("Client"))
+	targetdir(buildpath("."))
 	
 	includedirs { "../sdk" }
 	pchheader "StdInc.h"

@@ -2,7 +2,7 @@ project "Launcher"
 	language "C++"
 	kind "ConsoleApp"
 	targetname "MTA Server"
-	targetdir(buildpath("Server"))
+	targetdir(buildpath("server"))
 	
 	includedirs { "../sdk" }
 	
