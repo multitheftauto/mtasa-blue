@@ -28,10 +28,11 @@ project "Core"
 		"*.cpp"
 	}
 
-	filter "architecture:x64"
-		flags { "ExcludeFromBuild" } 
       
-	filter "configurations: windows"
+	filter "system:windows"
+		libdirs {
+			"../../vendor/detours/lib"
+		}
 		includedirs { "../../vendor/detours/include" }
-		links { "../../vendor/detours/lib/detours.lib", "Imagehlp" }
+		links { "detours", "Imagehlp" }
 	

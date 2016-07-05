@@ -38,7 +38,7 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8", 
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi", 
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "libcef", "CEF"
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "libcef", "CEF", "detours"
 	}
 
 	defines {
@@ -47,6 +47,8 @@ project "Client Core"
 		"PNG_SETJMP_NOT_SUPPORTED"
 	}
 
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 
 	
 	filter "configurations:Debug"		
 		libdirs { "../../vendor/cef3/Debug" }
