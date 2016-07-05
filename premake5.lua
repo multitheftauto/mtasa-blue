@@ -46,7 +46,7 @@ workspace "MTASA"
 
 	
 	-- Only build the client on Windows
-	filter "system:windows"	
+	if not premake.LINUX then 
 		group "Client"
 		include "Client/ceflauncher"
 		include "Client/ceflauncher_DLL"
@@ -69,8 +69,8 @@ workspace "MTASA"
 		include "vendor/jpeg-8d"
 		include "vendor/libpng"
 		include "vendor/tinygettext"
-		
-	filter {}
+	end 
+	
 		group "Server"
 		include "Server/core"
 		include "Server/dbconmy"
