@@ -10,11 +10,7 @@ workspace "MTASA"
 	dxdir = os.getenv("DXSDK_DIR")
 	includedirs { 
 		"Shared/sdk", 
-		"vendor",
-		dxdir.."Include"
-	}
-	libdirs {
-		dxdir.."Lib/x86"
+		"vendor"
 	}
 
 	defines { 
@@ -41,6 +37,12 @@ workspace "MTASA"
 		
 	filter "system:windows"
 		defines { "WIN32", "_WIN32" }
+		includedirs { 
+			dxdir.."Include"
+		}
+		libdirs {
+			dxdir.."Lib/x86"
+		}
 
 	
 	-- Only build the client on Windows
