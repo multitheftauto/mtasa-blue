@@ -22,3 +22,5 @@ project "Client Launcher"
 		"*.cpp"
 	}
 	
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 

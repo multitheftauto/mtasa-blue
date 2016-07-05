@@ -31,4 +31,5 @@ project "CEFLauncher DLL"
 	filter "configurations:Release"
 		links { "../../vendor/cef3/Release/libcef.lib" }
 
-	
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 

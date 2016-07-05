@@ -19,3 +19,6 @@ project "CEF"
 		"**.cc",
 		"**.h",
 	}
+
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 

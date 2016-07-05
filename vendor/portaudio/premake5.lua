@@ -15,3 +15,5 @@ project "portaudio"
 		"*.c"
 	}
 	
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 

@@ -17,3 +17,5 @@ project "tinygettext"
 		"*.cpp"
 	}
 	
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 

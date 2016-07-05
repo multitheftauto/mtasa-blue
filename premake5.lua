@@ -40,7 +40,7 @@ workspace "MTASA"
 		flags { "Optimize" }
 		
 	filter "system:windows"
-		defines { "WIN32" }
+		defines { "WIN32", "_WIN32" }
 
 	
 	-- Only build the client on Windows

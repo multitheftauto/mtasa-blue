@@ -33,3 +33,5 @@ project "GUI"
 		"*.cpp"
 	}
 	
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 

@@ -13,8 +13,6 @@ project "Dbconmy"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
-	-- TODO: Link Breakpad
-	
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources"] = "*.c",
@@ -27,11 +25,14 @@ project "Dbconmy"
 		"*.cpp"
 	}
 	
-	configuration "not windows"
+	filter "system:not windows"
 		includedirs { "/usr/include/mysql" }
 		links { "mysqlclient" }
 	
-	configuration "windows"
+	filter "system:windows"
 		includedirs { "../../vendor/mysql/include" }
+	filter { "system:windows", "architecture:x64" }
+		links { "../../vendor/mysql/lib/x64/libmysql.lib" }
+	filter { "system:windows", "architecture:x86" }
 		links { "../../vendor/mysql/lib/x86/libmysql.lib" }
-		
+	

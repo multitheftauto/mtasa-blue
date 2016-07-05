@@ -27,3 +27,5 @@ project "Game SA"
 		"*.cpp"
 	}
 	
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 

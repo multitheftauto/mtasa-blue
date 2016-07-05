@@ -10,7 +10,8 @@ project "cryptopp"
 	}
 	
 	defines {
-		"_WINSOCK_DEPRECATED_NO_WARNINGS"
+		"_WINSOCK_DEPRECATED_NO_WARNINGS",
+		"_LIB"
 	}
 	
 	files {
@@ -137,5 +138,11 @@ project "cryptopp"
 		"xtrcrypt.cpp",
 		"zdeflate.cpp",
 		"zinflate.cpp",
-		"zlib.cpp"
+		"zlib.cpp",
+		"x64dll.asm",
+		"x64masm.asm"
 	}
+	
+	filter { "system:windows", "architecture:x86" }
+		links { "../../vendor/mysql/lib/x86/libmysql.lib" }
+	

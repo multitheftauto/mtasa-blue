@@ -14,9 +14,13 @@ project "CEFLauncher"
 		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
-	
+
+		
 	files {
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
 	}
+
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 

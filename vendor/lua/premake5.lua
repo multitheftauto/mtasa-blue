@@ -2,6 +2,7 @@ project "Lua"
 	language "C++"
 	kind "SharedLib"
 	targetname "Lua"
+	targetdir(buildpath("server/mods/deathmatch"))
 
 	vpaths { 
 		["Headers"] = "**.h",
@@ -15,7 +16,6 @@ project "Lua"
 		"src/**.h",
 	}
 	
-	-- Todo: Client only
 	defines {
 		"LUA_USE_APICHECK"
 	}
@@ -23,4 +23,7 @@ project "Lua"
 	configuration "windows"
 		defines { "LUA_BUILD_AS_DLL" }
 
-	
+	filter "system:windows"
+		postbuildcommands {
+			copy "mta"
+		}

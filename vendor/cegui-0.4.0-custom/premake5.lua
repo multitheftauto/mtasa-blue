@@ -40,3 +40,6 @@ project "CEGUI"
 		flags { "NoPCH" }	
 	filter "files:src/pcre/**.c"
 		flags { "NoPCH" }
+	
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 

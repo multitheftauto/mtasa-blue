@@ -22,3 +22,5 @@ project "DirectX9GUIRenderer"
 		"../../../include/renderers/d3d9renderer.h"
 	}
 	
+	filter "architecture:x64"
+		flags { "ExcludeFromBuild" } 
