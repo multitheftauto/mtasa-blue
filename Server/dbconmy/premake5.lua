@@ -7,8 +7,7 @@ project "Dbconmy"
 	includedirs { 
 		"../sdk", 
 		"../../vendor/google-breakpad/src",
-		"../../vendor/sparsehash/current/src/",
-		"../../vendor/sparsehash/current/src/windows"
+		"../../vendor/sparsehash/current/src/"
 	}
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
@@ -30,7 +29,10 @@ project "Dbconmy"
 		links { "mysqlclient" }
 	
 	filter "system:windows"
-		includedirs { "../../vendor/mysql/include" }
+		includedirs { 
+			"../../vendor/mysql/include",
+			"../../vendor/sparsehash/current/src/windows"
+		}
 	filter { "system:windows", "architecture:x64" }
 		links { "../../vendor/mysql/lib/x64/libmysql.lib" }
 	filter { "system:windows", "architecture:x86" }
