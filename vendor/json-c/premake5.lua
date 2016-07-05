@@ -3,7 +3,7 @@ project "json-c"
 	kind "StaticLib"
 	targetname "json-c"
 	
-	includedirs { "shipped_for_mta_win32", "." }
+	includedirs { "." }
 	defines { "_LIB" }
 	
 	vpaths { 
@@ -18,3 +18,8 @@ project "json-c"
 		"*.c"
 	}
 	
+	filter "system:windows"
+		includedirs { "shipped_for_mta_win32" }
+	
+	filter "system:not windows"
+		includedirs { "shipped_for_mta_linux" }
