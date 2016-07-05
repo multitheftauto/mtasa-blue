@@ -9,7 +9,6 @@ project "Deathmatch"
 
 	includedirs { 
 		"../../sdk", 
-		"../../../vendor/pthreads/include", 
 		"../../../vendor/bochs", 
 		"../../../vendor/pme", 
 		"../../../vendor/zip", 
@@ -57,7 +56,7 @@ project "Deathmatch"
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",
 	}
 	
-	
-	configuration "windows"
+	filter "system: windows"
+		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
 	
