@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef WIN32
 #pragma message("Compiling precompiled header.\n")
 
