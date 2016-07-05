@@ -30,7 +30,6 @@ project "cryptopp"
 		"bfinit.cpp",
 		"blowfish.cpp",
 		"blumshub.cpp",
-		"camellia.cpp",
 		"cast.cpp",
 		"casts.cpp",
 		"cbcmac.cpp",
