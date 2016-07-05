@@ -28,7 +28,7 @@ project "Deathmatch"
 	}
 	
 	links {
-		"Lua", "pthread", "ws2_32", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"
+		"Lua", "pthread", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"
 	}
 	
 	
@@ -56,7 +56,8 @@ project "Deathmatch"
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",
 	}
 	
-	filter "system: windows"
+	filter "system:windows"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
+		links { "ws2_32" }
 	
