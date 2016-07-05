@@ -8,7 +8,6 @@ project "Core"
 		"../sdk", 
 		"../../vendor/google-breakpad/src",
 		"../../vendor/sparsehash/current/src/",
-		"../../vendor/sparsehash/current/src/windows"
 	}
 	
 	pchheader "StdInc.h"
@@ -33,6 +32,11 @@ project "Core"
 		libdirs {
 			"../../vendor/detours/lib"
 		}
-		includedirs { "../../vendor/detours/include" }
+		includedirs { 
+			"../../vendor/detours/include" 
+			"../../vendor/sparsehash/current/src/windows"
+		}
 		links { "detours", "Imagehlp" }
 	
+	filter "system:not windows"
+		excludes { "CExceptionInformation_Impl.cpp" }
