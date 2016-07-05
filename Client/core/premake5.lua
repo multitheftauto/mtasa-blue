@@ -55,3 +55,6 @@ project "Client Core"
 
 	filter "configurations:Release"
 		libdirs { "../../vendor/cef3/Release" }
+		
+	filter "system:not windows"
+		flags { "ExcludeFromBuild" } 

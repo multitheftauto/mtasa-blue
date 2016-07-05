@@ -24,3 +24,5 @@ project "CEFLauncher"
 
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
+	filter "system:not windows"
+		flags { "ExcludeFromBuild" } 

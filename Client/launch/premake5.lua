@@ -24,3 +24,6 @@ project "Client Launcher"
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
+		
+	filter "system:not windows"
+		flags { "ExcludeFromBuild" } 

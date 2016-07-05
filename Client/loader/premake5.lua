@@ -35,3 +35,6 @@ project "Loader"
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
+	
+	filter "system:not windows"
+		flags { "ExcludeFromBuild" } 
