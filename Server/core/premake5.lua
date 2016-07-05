@@ -33,7 +33,7 @@ project "Core"
 			"../../vendor/detours/lib"
 		}
 		includedirs { 
-			"../../vendor/detours/include" 
+			"../../vendor/detours/include",
 			"../../vendor/sparsehash/current/src/windows"
 		}
 		links { "detours", "Imagehlp" }
