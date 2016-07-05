@@ -2,7 +2,7 @@ project "ehs"
 	language "C++"
 	kind "StaticLib"
 	targetname "ehs"
-	
+	includedirs { "../pme" }
 
 	defines { "WIN32_LEAN_AND_MEAN", "_LIB" }
 	
