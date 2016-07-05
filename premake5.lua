@@ -7,7 +7,7 @@ workspace "MTASA"
 	flags { "C++14", "Symbols" }
 	characterset "MBCS"
 	
-	dxdir = os.getenv("DXSDK_DIR")
+	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs { 
 		"Shared/sdk", 
 		"vendor"
