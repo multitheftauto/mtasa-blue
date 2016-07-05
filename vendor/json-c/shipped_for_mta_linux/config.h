@@ -119,3 +119,5 @@
 #define HAVE_STRDUP 1
 
 #define HAVE_SNPRINTF 1
+
+#define HAVE_VSNPRINTF 1
