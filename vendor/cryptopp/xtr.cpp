@@ -1,9 +1,11 @@
 // cryptlib.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+
 #include "xtr.h"
 #include "nbtheory.h"
-
+#include "integer.h"
+#include "modarith.h"
 #include "algebra.cpp"
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -27,9 +29,9 @@ void XTR_FindPrimesAndGenerator(RandomNumberGenerator &rng, Integer &p, Integer 
 	do
 	{
 		bool qFound = q.Randomize(rng, minQ, maxQ, Integer::PRIME, 7, 12);
-		assert(qFound);
+		CRYPTOPP_UNUSED(qFound); assert(qFound);
 		bool solutionsExist = SolveModularQuadraticEquation(r1, r2, 1, -1, 1, q);
-		assert(solutionsExist);
+		CRYPTOPP_UNUSED(solutionsExist); assert(solutionsExist);
 	} while (!p.Randomize(rng, minP, maxP, Integer::PRIME, CRT(rng.GenerateBit()?r1:r2, q, 2, 3, EuclideanMultiplicativeInverse(p, 3)), 3*q));
 	assert(((p.Squared() - p + 1) % q).IsZero());
 

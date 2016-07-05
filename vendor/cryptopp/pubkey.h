@@ -3,96 +3,202 @@
 #ifndef CRYPTOPP_PUBKEY_H
 #define CRYPTOPP_PUBKEY_H
 
-/** \file
+//! \file
+//! \brief This file contains helper classes/functions for implementing public key algorithms.
+//! \details the class hierachies in this header file tend to look like this:
+//! 
+//! <pre>
+//!                   x1
+//!                  +--+
+//!                  |  |
+//!                 y1  z1
+//!                  |  |
+//!             x2<y1>  x2<z1>
+//!                  |  |
+//!                 y2  z2
+//!                  |  |
+//!             x3<y2>  x3<z2>
+//!                  |  |
+//!                 y3  z3
+//! </pre>
+//! 
+//! <ul>
+//!   <li>x1, y1, z1 are abstract interface classes defined in cryptlib.h
+//!   <li>x2, y2, z2 are implementations of the interfaces using "abstract policies", which
+//! 	  are pure virtual functions that should return interfaces to interchangeable algorithms.
+//! 	  These classes have \p Base suffixes.
+//!   <li>x3, y3, z3 hold actual algorithms and implement those virtual functions.
+//! 	  These classes have \p Impl suffixes.
+//! </ul>
+//! 
+//! \details The \p TF_ prefix means an implementation using trapdoor functions on integers.
+//! \details The \p DL_ prefix means an implementation using group operations (in groups where discrete log is hard).
 
-	This file contains helper classes/functions for implementing public key algorithms.
+#include "config.h"
 
-	The class hierachies in this .h file tend to look like this:
-<pre>
-                  x1
-                 / \
-                y1  z1
-                 |  |
-            x2<y1>  x2<z1>
-                 |  |
-                y2  z2
-                 |  |
-            x3<y2>  x3<z2>
-                 |  |
-                y3  z3
-</pre>
-	- x1, y1, z1 are abstract interface classes defined in cryptlib.h
-	- x2, y2, z2 are implementations of the interfaces using "abstract policies", which
-	  are pure virtual functions that should return interfaces to interchangeable algorithms.
-	  These classes have "Base" suffixes.
-	- x3, y3, z3 hold actual algorithms and implement those virtual functions.
-	  These classes have "Impl" suffixes.
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(push)
+# pragma warning(disable: 4702)
+#endif
 
-	The "TF_" prefix means an implementation using trapdoor functions on integers.
-	The "DL_" prefix means an implementation using group operations (in groups where discrete log is hard).
-*/
-
+#include "cryptlib.h"
+#include "integer.h"
 #include "modarith.h"
 #include "filters.h"
 #include "eprecomp.h"
 #include "fips140.h"
 #include "argnames.h"
-#include <memory>
+#include "smartptr.h"
+#include "stdcpp.h"
 
 // VC60 workaround: this macro is defined in shlobj.h and conflicts with a template parameter used in this file
 #undef INTERFACE
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! _
+//! \class TrapdoorFunctionBounds
+//! \brief Provides range for plaintext and ciphertext lengths
+//! \details A trapdoor function is a function that is easy to compute in one direction,
+//!   but difficult to compute in the opposite direction without special knowledge.
+//!   The special knowledge is usually the private key.
+//! \details Trapdoor functions only handle messages of a limited length or size.
+//!   \p MaxPreimage is the plaintext's maximum length, and \p MaxImage is the
+//!   ciphertext's maximum length.
+//! \sa TrapdoorFunctionBounds(), RandomizedTrapdoorFunction(), TrapdoorFunction(),
+//!   RandomizedTrapdoorFunctionInverse() and TrapdoorFunctionInverse()
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE TrapdoorFunctionBounds
 {
 public:
 	virtual ~TrapdoorFunctionBounds() {}
 
+	//! \brief Returns the maximum size of a message before the trapdoor function is applied
+	//! \returns the maximum size of a message before the trapdoor function is applied
+	//! \details Derived classes must implement \p PreimageBound().
 	virtual Integer PreimageBound() const =0;
+	//! \brief Returns the maximum size of a message after the trapdoor function is applied
+	//! \returns the maximum size of a message after the trapdoor function is applied
+	//! \details Derived classes must implement \p ImageBound().
 	virtual Integer ImageBound() const =0;
+	//! \brief Returns the maximum size of a message before the trapdoor function is applied bound to a public key
+	//! \returns the maximum size of a message before the trapdoor function is applied bound to a public key
+	//! \details The default implementation returns <tt>PreimageBound() - 1</tt>.
 	virtual Integer MaxPreimage() const {return --PreimageBound();}
+	//! \brief Returns the maximum size of a message after the trapdoor function is applied bound to a public key
+	//! \returns the the maximum size of a message after the trapdoor function is applied bound to a public key
+	//! \details The default implementation returns <tt>ImageBound() - 1</tt>.
 	virtual Integer MaxImage() const {return --ImageBound();}
 };
 
-//! _
+//! \class RandomizedTrapdoorFunction
+//! \brief Applies the trapdoor function, using random data if required
+//! \details \p ApplyFunction() is the foundation for encrypting a message under a public key.
+//!   Derived classes will override it at some point.
+//! \sa TrapdoorFunctionBounds(), RandomizedTrapdoorFunction(), TrapdoorFunction(),
+//!   RandomizedTrapdoorFunctionInverse() and TrapdoorFunctionInverse()
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE RandomizedTrapdoorFunction : public TrapdoorFunctionBounds
 {
 public:
+
+	//! \brief Applies the trapdoor function, using random data if required
+	//! \param rng a \p RandomNumberGenerator derived class
+	//! \param x the message on which the encryption function is applied
+	//! \returns the message \p x encrypted under the public key
+	//! \details \p ApplyRandomizedFunction is a generalization of encryption under a public key
+	//!    cryptosystem. The \p RandomNumberGenerator may (or may not) be required.
+	//!    Derived classes must implement it.
 	virtual Integer ApplyRandomizedFunction(RandomNumberGenerator &rng, const Integer &x) const =0;
+	
+	//! \brief Determines if the encryption algorithm is randomized
+	//! \returns \p true if the encryption algorithm is randomized, \p false otherwise
+	//! \details If \p IsRandomized() returns \p false, then \p NullRNG() can be used.
 	virtual bool IsRandomized() const {return true;}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~RandomizedTrapdoorFunction() { }
+#endif
 };
 
-//! _
+//! \class TrapdoorFunction
+//! \brief Applies the trapdoor function
+//! \details \p ApplyFunction() is the foundation for encrypting a message under a public key.
+//!    Derived classes will override it at some point.
+//! \sa TrapdoorFunctionBounds(), RandomizedTrapdoorFunction(), TrapdoorFunction(),
+//!   RandomizedTrapdoorFunctionInverse() and TrapdoorFunctionInverse()
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE TrapdoorFunction : public RandomizedTrapdoorFunction
 {
 public:
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TrapdoorFunction() { }
+#endif
+
+	//! \brief Applies the trapdoor function
+	//! \param rng a \p RandomNumberGenerator derived class
+	//! \param x the message on which the encryption function is applied
+	//! \details \p ApplyRandomizedFunction is a generalization of encryption under a public key
+	//!    cryptosystem. The \p RandomNumberGenerator may (or may not) be required.
+	//! \details Internally, \p ApplyRandomizedFunction() calls \p ApplyFunction() \a
+	//!   without the \p RandomNumberGenerator.
 	Integer ApplyRandomizedFunction(RandomNumberGenerator &rng, const Integer &x) const
-		{return ApplyFunction(x);}
+		{CRYPTOPP_UNUSED(rng); return ApplyFunction(x);}
 	bool IsRandomized() const {return false;}
 
+	//! \brief Applies the trapdoor
+	//! \param x the message on which the encryption function is applied
+	//! \returns the message \p x encrypted under the public key
+	//! \details \p ApplyFunction is a generalization of encryption under a public key
+	//!    cryptosystem. Derived classes must implement it.
 	virtual Integer ApplyFunction(const Integer &x) const =0;
 };
 
-//! _
+//! \class RandomizedTrapdoorFunctionInverse
+//! \brief Applies the inverse of the trapdoor function, using random data if required
+//! \details \p CalculateInverse() is the foundation for decrypting a message under a private key
+//!   in a public key cryptosystem. Derived classes will override it at some point.
+//! \sa TrapdoorFunctionBounds(), RandomizedTrapdoorFunction(), TrapdoorFunction(),
+//!   RandomizedTrapdoorFunctionInverse() and TrapdoorFunctionInverse()
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE RandomizedTrapdoorFunctionInverse
 {
 public:
 	virtual ~RandomizedTrapdoorFunctionInverse() {}
 
+	//! \brief Applies the inverse of the trapdoor function, using random data if required
+	//! \param rng a \p RandomNumberGenerator derived class
+	//! \param x the message on which the decryption function is applied
+	//! \returns the message \p x decrypted under the private key
+	//! \details \p CalculateRandomizedInverse is a generalization of decryption using the private key
+	//!    The \p RandomNumberGenerator may (or may not) be required. Derived classes must implement it.
 	virtual Integer CalculateRandomizedInverse(RandomNumberGenerator &rng, const Integer &x) const =0;
+	
+	//! \brief Determines if the decryption algorithm is randomized
+	//! \returns \p true if the decryption algorithm is randomized, \p false otherwise
+	//! \details If \p IsRandomized() returns \p false, then \p NullRNG() can be used.
 	virtual bool IsRandomized() const {return true;}
 };
 
-//! _
+//! \class TrapdoorFunctionInverse
+//! \brief Applies the inverse of the trapdoor function
+//! \details \p CalculateInverse() is the foundation for decrypting a message under a private key
+//!   in a public key cryptosystem. Derived classes will override it at some point.
+//! \sa TrapdoorFunctionBounds(), RandomizedTrapdoorFunction(), TrapdoorFunction(),
+//!   RandomizedTrapdoorFunctionInverse() and TrapdoorFunctionInverse()
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE TrapdoorFunctionInverse : public RandomizedTrapdoorFunctionInverse
 {
 public:
 	virtual ~TrapdoorFunctionInverse() {}
 
+	//! \brief Applies the inverse of the trapdoor function
+	//! \param rng a \p RandomNumberGenerator derived class
+	//! \param x the message on which the decryption function is applied
+	//! \returns the message \p x decrypted under the private key
+	//! \details \p CalculateRandomizedInverse is a generalization of decryption using the private key
+	//! \details Internally, \p CalculateRandomizedInverse() calls \p CalculateInverse() \a
+	//!   without the \p RandomNumberGenerator.
 	Integer CalculateRandomizedInverse(RandomNumberGenerator &rng, const Integer &x) const
 		{return CalculateInverse(rng, x);}
+	
+	//! \brief Determines if the decryption algorithm is randomized
+	//! \returns \p true if the decryption algorithm is randomized, \p false otherwise
+	//! \details If \p IsRandomized() returns \p false, then \p NullRNG() can be used.
 	bool IsRandomized() const {return false;}
 
 	virtual Integer CalculateInverse(RandomNumberGenerator &rng, const Integer &x) const =0;
@@ -100,13 +206,15 @@ public:
 
 // ********************************************************
 
-//! message encoding method for public key encryption
+//! \class PK_EncryptionMessageEncodingMethod
+//! \brief Message encoding method for public key encryption
 class CRYPTOPP_NO_VTABLE PK_EncryptionMessageEncodingMethod
 {
 public:
 	virtual ~PK_EncryptionMessageEncodingMethod() {}
 
-	virtual bool ParameterSupported(const char *name) const {return false;}
+	virtual bool ParameterSupported(const char *name) const
+		{CRYPTOPP_UNUSED(name); return false;}
 
 	//! max size of unpadded message in bytes, given max size of padded message in bits (1 less than size of modulus)
 	virtual size_t MaxUnpaddedLength(size_t paddedLength) const =0;
@@ -118,7 +226,10 @@ public:
 
 // ********************************************************
 
-//! _
+//! \class TF_Base
+//! \brief The base for trapdoor based cryptosystems
+//! \tparam TFI trapdoor function interface derived class
+//! \tparam MEI message encoding interface derived class
 template <class TFI, class MEI>
 class CRYPTOPP_NO_VTABLE TF_Base
 {
@@ -130,11 +241,17 @@ protected:
 
 	typedef MEI MessageEncodingInterface;
 	virtual const MessageEncodingInterface & GetMessageEncodingInterface() const =0;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_Base() { }
+#endif
 };
 
 // ********************************************************
 
-//! _
+//! \class PK_FixedLengthCryptoSystemImpl
+//! \brief Public key trapdoor function base class
+//! \tparam BASE public key cryptosystem with a fixed length
 template <class BASE>
 class CRYPTOPP_NO_VTABLE PK_FixedLengthCryptoSystemImpl : public BASE
 {
@@ -146,9 +263,16 @@ public:
 
 	virtual size_t FixedMaxPlaintextLength() const =0;
 	virtual size_t FixedCiphertextLength() const =0;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~PK_FixedLengthCryptoSystemImpl() { }
+#endif
 };
 
-//! _
+//! \class TF_CryptoSystemBase
+//! \brief Trapdoor function cryptosystem base class
+//! \tparam INTERFACE public key cryptosystem base interface
+//! \tparam BASE public key cryptosystem implementation base
 template <class INTERFACE, class BASE>
 class CRYPTOPP_NO_VTABLE TF_CryptoSystemBase : public PK_FixedLengthCryptoSystemImpl<INTERFACE>, protected BASE
 {
@@ -159,37 +283,57 @@ public:
 
 protected:
 	size_t PaddedBlockByteLength() const {return BitsToBytes(PaddedBlockBitLength());}
-	size_t PaddedBlockBitLength() const {return this->GetTrapdoorFunctionBounds().PreimageBound().BitCount()-1;}
+	// Coverity finding on potential overflow/underflow.
+	size_t PaddedBlockBitLength() const {return SaturatingSubtract(this->GetTrapdoorFunctionBounds().PreimageBound().BitCount(),1U);}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_CryptoSystemBase() { }
+#endif
 };
 
-//! _
+//! \class TF_DecryptorBase
+//! \brief Trapdoor function cryptosystems decryption base class
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE TF_DecryptorBase : public TF_CryptoSystemBase<PK_Decryptor, TF_Base<TrapdoorFunctionInverse, PK_EncryptionMessageEncodingMethod> >
 {
 public:
 	DecodingResult Decrypt(RandomNumberGenerator &rng, const byte *ciphertext, size_t ciphertextLength, byte *plaintext, const NameValuePairs &parameters = g_nullNameValuePairs) const;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_DecryptorBase() { }
+#endif
 };
 
-//! _
+//! \class TF_DecryptorBase
+//! \brief Trapdoor function cryptosystems encryption base class
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE TF_EncryptorBase : public TF_CryptoSystemBase<PK_Encryptor, TF_Base<RandomizedTrapdoorFunction, PK_EncryptionMessageEncodingMethod> >
 {
 public:
 	void Encrypt(RandomNumberGenerator &rng, const byte *plaintext, size_t plaintextLength, byte *ciphertext, const NameValuePairs &parameters = g_nullNameValuePairs) const;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_EncryptorBase() { }
+#endif
 };
 
 // ********************************************************
 
 typedef std::pair<const byte *, size_t> HashIdentifier;
 
-//! interface for message encoding method for public key signature schemes
+//! \class PK_SignatureMessageEncodingMethod
+//! \brief Interface for message encoding method for public key signature schemes.
+//! \details \p PK_SignatureMessageEncodingMethod provides interfaces for message
+//!   encoding method for public key signature schemes. The methods support both
+//!   trapdoor functions (<tt>TF_*</tt>) and discrete logarithm (<tt>DL_*</tt>)
+//!   based schemes.
 class CRYPTOPP_NO_VTABLE PK_SignatureMessageEncodingMethod
 {
 public:
 	virtual ~PK_SignatureMessageEncodingMethod() {}
 
 	virtual size_t MinRepresentativeBitLength(size_t hashIdentifierLength, size_t digestLength) const
-		{return 0;}
+		{CRYPTOPP_UNUSED(hashIdentifierLength); CRYPTOPP_UNUSED(digestLength); return 0;}
 	virtual size_t MaxRecoverableLength(size_t representativeBitLength, size_t hashIdentifierLength, size_t digestLength) const
-		{return 0;}
+		{CRYPTOPP_UNUSED(representativeBitLength); CRYPTOPP_UNUSED(representativeBitLength); CRYPTOPP_UNUSED(hashIdentifierLength); CRYPTOPP_UNUSED(digestLength); return 0;}
 
 	bool IsProbabilistic() const 
 		{return true;}
@@ -199,7 +343,8 @@ public:
 		{throw NotImplemented("PK_MessageEncodingMethod: this signature scheme does not support message recovery");}
 
 	// for verification, DL
-	virtual void ProcessSemisignature(HashTransformation &hash, const byte *semisignature, size_t semisignatureLength) const {}
+	virtual void ProcessSemisignature(HashTransformation &hash, const byte *semisignature, size_t semisignatureLength) const
+		{CRYPTOPP_UNUSED(hash); CRYPTOPP_UNUSED(semisignature); CRYPTOPP_UNUSED(semisignatureLength);}
 
 	// for signature
 	virtual void ProcessRecoverableMessage(HashTransformation &hash, 
@@ -207,6 +352,8 @@ public:
 		const byte *presignature, size_t presignatureLength,
 		SecByteBlock &semisignature) const
 	{
+		CRYPTOPP_UNUSED(hash);CRYPTOPP_UNUSED(recoverableMessage); CRYPTOPP_UNUSED(recoverableMessageLength);
+		CRYPTOPP_UNUSED(presignature); CRYPTOPP_UNUSED(presignatureLength); CRYPTOPP_UNUSED(semisignature);
 		if (RecoverablePartFirst())
 			assert(!"ProcessRecoverableMessage() not implemented");
 	}
@@ -224,14 +371,18 @@ public:
 		HashTransformation &hash, HashIdentifier hashIdentifier, bool messageEmpty,
 		byte *representative, size_t representativeBitLength,
 		byte *recoveredMessage) const
-		{throw NotImplemented("PK_MessageEncodingMethod: this signature scheme does not support message recovery");}
+		{CRYPTOPP_UNUSED(hash);CRYPTOPP_UNUSED(hashIdentifier); CRYPTOPP_UNUSED(messageEmpty);
+		CRYPTOPP_UNUSED(representative); CRYPTOPP_UNUSED(representativeBitLength); CRYPTOPP_UNUSED(recoveredMessage);
+		throw NotImplemented("PK_MessageEncodingMethod: this signature scheme does not support message recovery");}
 
 	virtual DecodingResult RecoverMessageFromSemisignature(		// for DL
 		HashTransformation &hash, HashIdentifier hashIdentifier,
 		const byte *presignature, size_t presignatureLength,
 		const byte *semisignature, size_t semisignatureLength,
 		byte *recoveredMessage) const
-		{throw NotImplemented("PK_MessageEncodingMethod: this signature scheme does not support message recovery");}
+		{CRYPTOPP_UNUSED(hash);CRYPTOPP_UNUSED(hashIdentifier); CRYPTOPP_UNUSED(presignature); CRYPTOPP_UNUSED(presignatureLength); 
+		CRYPTOPP_UNUSED(semisignature); CRYPTOPP_UNUSED(semisignatureLength); CRYPTOPP_UNUSED(recoveredMessage); 
+		throw NotImplemented("PK_MessageEncodingMethod: this signature scheme does not support message recovery");}
 
 	// VC60 workaround
 	struct HashIdentifierLookup
@@ -246,6 +397,10 @@ public:
 	};
 };
 
+//! \class PK_DeterministicSignatureMessageEncodingMethod
+//! \brief Interface for message encoding method for public key signature schemes.
+//! \details \p PK_DeterministicSignatureMessageEncodingMethod provides interfaces
+//!   for message encoding method for public key signature schemes.
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE PK_DeterministicSignatureMessageEncodingMethod : public PK_SignatureMessageEncodingMethod
 {
 public:
@@ -254,6 +409,10 @@ public:
 		byte *representative, size_t representativeBitLength) const;
 };
 
+//! \class PK_RecoverableSignatureMessageEncodingMethod
+//! \brief Interface for message encoding method for public key signature schemes.
+//! \details \p PK_RecoverableSignatureMessageEncodingMethod provides interfaces
+//!   for message encoding method for public key signature schemes.
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE PK_RecoverableSignatureMessageEncodingMethod : public PK_SignatureMessageEncodingMethod
 {
 public:
@@ -262,6 +421,10 @@ public:
 		byte *representative, size_t representativeBitLength) const;
 };
 
+//! \class DL_SignatureMessageEncodingMethod_DSA
+//! \brief Interface for message encoding method for public key signature schemes.
+//! \details \p DL_SignatureMessageEncodingMethod_DSA provides interfaces
+//!   for message encoding method for DSA.
 class CRYPTOPP_DLL DL_SignatureMessageEncodingMethod_DSA : public PK_DeterministicSignatureMessageEncodingMethod
 {
 public:
@@ -271,6 +434,10 @@ public:
 		byte *representative, size_t representativeBitLength) const;
 };
 
+//! \class DL_SignatureMessageEncodingMethod_NR
+//! \brief Interface for message encoding method for public key signature schemes.
+//! \details \p DL_SignatureMessageEncodingMethod_NR provides interfaces
+//!   for message encoding method for Nyberg-Rueppel.
 class CRYPTOPP_DLL DL_SignatureMessageEncodingMethod_NR : public PK_DeterministicSignatureMessageEncodingMethod
 {
 public:
@@ -280,6 +447,10 @@ public:
 		byte *representative, size_t representativeBitLength) const;
 };
 
+//! \class PK_MessageAccumulatorBase
+//! \brief Interface for message encoding method for public key signature schemes.
+//! \details \p PK_MessageAccumulatorBase provides interfaces
+//!   for message encoding method.
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE PK_MessageAccumulatorBase : public PK_MessageAccumulator
 {
 public:
@@ -298,6 +469,10 @@ public:
 	bool m_empty;
 };
 
+//! \class PK_MessageAccumulatorImpl
+//! \brief Interface for message encoding method for public key signature schemes.
+//! \details \p PK_MessageAccumulatorBase provides interfaces
+//!   for message encoding method.
 template <class HASH_ALGORITHM>
 class PK_MessageAccumulatorImpl : public PK_MessageAccumulatorBase, protected ObjectHolder<HASH_ALGORITHM>
 {
@@ -315,7 +490,7 @@ public:
 	size_t MaxRecoverableLength() const 
 		{return this->GetMessageEncodingInterface().MaxRecoverableLength(MessageRepresentativeBitLength(), GetHashIdentifier().second, GetDigestSize());}
 	size_t MaxRecoverableLengthFromSignatureLength(size_t signatureLength) const
-		{return this->MaxRecoverableLength();}
+		{CRYPTOPP_UNUSED(signatureLength); return this->MaxRecoverableLength();}
 
 	bool IsProbabilistic() const 
 		{return this->GetTrapdoorFunctionInterface().IsRandomized() || this->GetMessageEncodingInterface().IsProbabilistic();}
@@ -323,10 +498,15 @@ public:
 		{return this->GetMessageEncodingInterface().AllowNonrecoverablePart();}
 	bool RecoverablePartFirst() const 
 		{return this->GetMessageEncodingInterface().RecoverablePartFirst();}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_SignatureSchemeBase() { }
+#endif
 
 protected:
 	size_t MessageRepresentativeLength() const {return BitsToBytes(MessageRepresentativeBitLength());}
-	size_t MessageRepresentativeBitLength() const {return this->GetTrapdoorFunctionBounds().ImageBound().BitCount()-1;}
+	// Coverity finding on potential overflow/underflow.
+	size_t MessageRepresentativeBitLength() const {return SaturatingSubtract(this->GetTrapdoorFunctionBounds().ImageBound().BitCount(),1U);}
 	virtual HashIdentifier GetHashIdentifier() const =0;
 	virtual size_t GetDigestSize() const =0;
 };
@@ -337,6 +517,10 @@ class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE TF_SignerBase : public TF_SignatureSchemeB
 public:
 	void InputRecoverableMessage(PK_MessageAccumulator &messageAccumulator, const byte *recoverableMessage, size_t recoverableMessageLength) const;
 	size_t SignAndRestart(RandomNumberGenerator &rng, PK_MessageAccumulator &messageAccumulator, byte *signature, bool restart=true) const;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_SignerBase() { }
+#endif
 };
 
 //! _
@@ -346,6 +530,10 @@ public:
 	void InputSignature(PK_MessageAccumulator &messageAccumulator, const byte *signature, size_t signatureLength) const;
 	bool VerifyAndRestart(PK_MessageAccumulator &messageAccumulator) const;
 	DecodingResult RecoverAndRestart(byte *recoveredMessage, PK_MessageAccumulator &recoveryAccumulator) const;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_VerifierBase() { }
+#endif
 };
 
 // ********************************************************
@@ -389,12 +577,17 @@ public:
 
 	PK_MessageAccumulator * NewSignatureAccumulator(RandomNumberGenerator &rng) const
 	{
+		CRYPTOPP_UNUSED(rng);
 		return new PK_MessageAccumulatorImpl<CPP_TYPENAME SCHEME_OPTIONS::HashFunction>;
 	}
 	PK_MessageAccumulator * NewVerificationAccumulator() const
 	{
 		return new PK_MessageAccumulatorImpl<CPP_TYPENAME SCHEME_OPTIONS::HashFunction>;
 	}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_ObjectImplBase() { }
+#endif
 
 protected:
 	const typename BASE::MessageEncodingInterface & GetMessageEncodingInterface() const 
@@ -428,6 +621,10 @@ public:
 	const KEY & GetKey() const {return *m_pKey;}
 	KEY & AccessKey() {throw NotImplemented("TF_ObjectImplExtRef: cannot modify refererenced key");}
 
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_ObjectImplExtRef() { }
+#endif
+
 private:
 	const KEY * m_pKey;
 };
@@ -441,6 +638,10 @@ public:
 
 	const KeyClass & GetKey() const {return m_trapdoorFunction;}
 	KeyClass & AccessKey() {return m_trapdoorFunction;}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~TF_ObjectImpl() { }
+#endif
 
 private:
 	KeyClass m_trapdoorFunction;
@@ -601,6 +802,10 @@ public:
 	virtual bool IsIdentity(const Element &element) const =0;
 	virtual void SimultaneousExponentiate(Element *results, const Element &base, const Integer *exponents, unsigned int exponentsCount) const =0;
 
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_GroupParameters() { }
+#endif
+
 protected:
 	void ParametersChanged() {m_validationLevel = 0;}
 
@@ -621,6 +826,10 @@ public:
 	const DL_FixedBasePrecomputation<Element> & GetBasePrecomputation() const {return m_gpc;}
 	DL_FixedBasePrecomputation<Element> & AccessBasePrecomputation() {return m_gpc;}
 
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_GroupParametersImpl() { }
+#endif
+	
 protected:
 	GROUP_PRECOMP m_groupPrecomputation;
 	BASE_PRECOMP m_gpc;
@@ -668,6 +877,10 @@ public:
 
 	virtual const DL_FixedBasePrecomputation<T> & GetPublicPrecomputation() const =0;
 	virtual DL_FixedBasePrecomputation<T> & AccessPublicPrecomputation() =0;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_PublicKey() { }
+#endif
 };
 
 //! interface for DL private keys
@@ -700,6 +913,10 @@ public:
 
 	virtual const Integer & GetPrivateExponent() const =0;
 	virtual void SetPrivateExponent(const Integer &x) =0;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_PrivateKey() { }
+#endif
 };
 
 template <class T>
@@ -903,7 +1120,10 @@ public:
 	virtual void Sign(const DL_GroupParameters<T> &params, const Integer &privateKey, const Integer &k, const Integer &e, Integer &r, Integer &s) const =0;
 	virtual bool Verify(const DL_GroupParameters<T> &params, const DL_PublicKey<T> &publicKey, const Integer &e, const Integer &r, const Integer &s) const =0;
 	virtual Integer RecoverPresignature(const DL_GroupParameters<T> &params, const DL_PublicKey<T> &publicKey, const Integer &r, const Integer &s) const
-		{throw NotImplemented("DL_ElgamalLikeSignatureAlgorithm: this signature scheme does not support message recovery");}
+	{
+		CRYPTOPP_UNUSED(params); CRYPTOPP_UNUSED(publicKey); CRYPTOPP_UNUSED(r); CRYPTOPP_UNUSED(s);
+		throw NotImplemented("DL_ElgamalLikeSignatureAlgorithm: this signature scheme does not support message recovery");
+	}
 	virtual size_t RLen(const DL_GroupParameters<T> &params) const
 		{return params.GetSubgroupOrder().ByteCount();}
 	virtual size_t SLen(const DL_GroupParameters<T> &params) const
@@ -919,6 +1139,10 @@ public:
 
 	virtual Element AgreeWithEphemeralPrivateKey(const DL_GroupParameters<Element> &params, const DL_FixedBasePrecomputation<Element> &publicPrecomputation, const Integer &privateExponent) const =0;
 	virtual Element AgreeWithStaticPrivateKey(const DL_GroupParameters<Element> &params, const Element &publicElement, bool validateOtherPublicKey, const Integer &privateExponent) const =0;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_KeyAgreementAlgorithm() { }
+#endif
 };
 
 //! interface for key derivation algorithms used in DL cryptosystems
@@ -926,20 +1150,30 @@ template <class T>
 class CRYPTOPP_NO_VTABLE DL_KeyDerivationAlgorithm
 {
 public:
-	virtual bool ParameterSupported(const char *name) const {return false;}
+	virtual bool ParameterSupported(const char *name) const
+		{CRYPTOPP_UNUSED(name); return false;}
 	virtual void Derive(const DL_GroupParameters<T> &groupParams, byte *derivedKey, size_t derivedLength, const T &agreedElement, const T &ephemeralPublicKey, const NameValuePairs &derivationParams) const =0;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_KeyDerivationAlgorithm() { }
+#endif
 };
 
 //! interface for symmetric encryption algorithms used in DL cryptosystems
 class CRYPTOPP_NO_VTABLE DL_SymmetricEncryptionAlgorithm
 {
 public:
-	virtual bool ParameterSupported(const char *name) const {return false;}
+	virtual bool ParameterSupported(const char *name) const
+		{CRYPTOPP_UNUSED(name); return false;}
 	virtual size_t GetSymmetricKeyLength(size_t plaintextLength) const =0;
 	virtual size_t GetSymmetricCiphertextLength(size_t plaintextLength) const =0;
 	virtual size_t GetMaxSymmetricPlaintextLength(size_t ciphertextLength) const =0;
 	virtual void SymmetricEncrypt(RandomNumberGenerator &rng, const byte *key, const byte *plaintext, size_t plaintextLength, byte *ciphertext, const NameValuePairs &parameters) const =0;
 	virtual DecodingResult SymmetricDecrypt(const byte *key, const byte *ciphertext, size_t ciphertextLength, byte *plaintext, const NameValuePairs &parameters) const =0;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_SymmetricEncryptionAlgorithm() { }
+#endif
 };
 
 //! _
@@ -955,6 +1189,10 @@ protected:
 
 	virtual KeyInterface & AccessKeyInterface() =0;
 	virtual const KeyInterface & GetKeyInterface() const =0;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_Base() { }
+#endif
 };
 
 //! _
@@ -970,7 +1208,7 @@ public:
 	size_t MaxRecoverableLength() const 
 		{return GetMessageEncodingInterface().MaxRecoverableLength(0, GetHashIdentifier().second, GetDigestSize());}
 	size_t MaxRecoverableLengthFromSignatureLength(size_t signatureLength) const
-		{assert(false); return 0;}	// TODO
+		{CRYPTOPP_UNUSED(signatureLength); assert(false); return 0;}	// TODO
 
 	bool IsProbabilistic() const 
 		{return true;}
@@ -978,6 +1216,10 @@ public:
 		{return GetMessageEncodingInterface().AllowNonrecoverablePart();}
 	bool RecoverablePartFirst() const 
 		{return GetMessageEncodingInterface().RecoverablePartFirst();}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_SignatureSchemeBase() { }
+#endif
 
 protected:
 	size_t MessageRepresentativeLength() const {return BitsToBytes(MessageRepresentativeBitLength());}
@@ -1060,6 +1302,10 @@ public:
 
 		return this->SignatureLength();
 	}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_SignerBase() { }
+#endif
 
 protected:
 	void RestartMessageAccumulator(RandomNumberGenerator &rng, PK_MessageAccumulatorBase &ma) const
@@ -1075,6 +1321,7 @@ protected:
 		ma.m_presignature.New(params.GetEncodedElementSize(false));
 		params.ConvertElementToInteger(params.ExponentiateBase(ma.m_k)).Encode(ma.m_presignature, ma.m_presignature.size());
 		*/
+		CRYPTOPP_UNUSED(rng); CRYPTOPP_UNUSED(ma); 
 	}
 };
 
@@ -1085,6 +1332,7 @@ class CRYPTOPP_NO_VTABLE DL_VerifierBase : public DL_SignatureSchemeBase<PK_Veri
 public:
 	void InputSignature(PK_MessageAccumulator &messageAccumulator, const byte *signature, size_t signatureLength) const
 	{
+		CRYPTOPP_UNUSED(signature); CRYPTOPP_UNUSED(signatureLength); 
 		PK_MessageAccumulatorBase &ma = static_cast<PK_MessageAccumulatorBase &>(messageAccumulator);
 		const DL_ElgamalLikeSignatureAlgorithm<T> &alg = this->GetSignatureAlgorithm();
 		const DL_GroupParameters<T> &params = this->GetAbstractGroupParameters();
@@ -1144,6 +1392,10 @@ public:
 			ma.m_semisignature, ma.m_semisignature.size(),
 			recoveredMessage);
 	}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_VerifierBase() { }
+#endif
 };
 
 //! _
@@ -1167,6 +1419,10 @@ public:
 
 	bool ParameterSupported(const char *name) const
 		{return GetKeyDerivationAlgorithm().ParameterSupported(name) || GetSymmetricEncryptionAlgorithm().ParameterSupported(name);}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_CryptoSystemBase() { }
+#endif
 
 protected:
 	virtual const DL_KeyAgreementAlgorithm<Element> & GetKeyAgreementAlgorithm() const =0;
@@ -1185,6 +1441,7 @@ public:
 	{
 		try
 		{
+			CRYPTOPP_UNUSED(rng);
 			const DL_KeyAgreementAlgorithm<T> &agreeAlg = this->GetKeyAgreementAlgorithm();
 			const DL_KeyDerivationAlgorithm<T> &derivAlg = this->GetKeyDerivationAlgorithm();
 			const DL_SymmetricEncryptionAlgorithm &encAlg = this->GetSymmetricEncryptionAlgorithm();
@@ -1208,6 +1465,10 @@ public:
 			return DecodingResult();
 		}
 	}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_DecryptorBase() { }
+#endif
 };
 
 //! _
@@ -1238,6 +1499,10 @@ public:
 
 		encAlg.SymmetricEncrypt(rng, derivedKey, plaintext, plaintextLength, ciphertext, parameters);
 	}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_EncryptorBase() { }
+#endif
 };
 
 //! _
@@ -1290,6 +1555,10 @@ public:
 	// KeyAccessor
 	const KEY & GetKey() const {return m_key;}
 	KEY & AccessKey() {return m_key;}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_ObjectImplBase() { }
+#endif
 
 protected:
 	typename BASE::KeyInterface & AccessKeyInterface() {return m_key;}
@@ -1317,6 +1586,10 @@ class CRYPTOPP_NO_VTABLE DL_ObjectImpl : public DL_ObjectImplBase<BASE, SCHEME_O
 {
 public:
 	typedef typename KEY::Element Element;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_ObjectImpl() { }
+#endif
 
 protected:
 	const DL_ElgamalLikeSignatureAlgorithm<Element> & GetSignatureAlgorithm() const
@@ -1340,7 +1613,7 @@ class DL_SignerImpl : public DL_ObjectImpl<DL_SignerBase<typename SCHEME_OPTIONS
 public:
 	PK_MessageAccumulator * NewSignatureAccumulator(RandomNumberGenerator &rng) const
 	{
-		std::auto_ptr<PK_MessageAccumulatorBase> p(new PK_MessageAccumulatorImpl<CPP_TYPENAME SCHEME_OPTIONS::HashFunction>);
+		member_ptr<PK_MessageAccumulatorBase> p(new PK_MessageAccumulatorImpl<CPP_TYPENAME SCHEME_OPTIONS::HashFunction>);
 		this->RestartMessageAccumulator(rng, *p);
 		return p.release();
 	}
@@ -1391,6 +1664,7 @@ public:
 
 	void GeneratePublicKey(RandomNumberGenerator &rng, const byte *privateKey, byte *publicKey) const
 	{
+		CRYPTOPP_UNUSED(rng);
 		const DL_GroupParameters<T> &params = GetAbstractGroupParameters();
 		Integer x(privateKey, PrivateKeyLength());
 		Element y = params.ExponentiateBase(x);
@@ -1417,6 +1691,10 @@ public:
 	}
 
 	const Element &GetGenerator() const {return GetAbstractGroupParameters().GetSubgroupGenerator();}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_SimpleKeyAgreementDomainBase() { }
+#endif
 
 protected:
 	virtual const DL_KeyAgreementAlgorithm<Element> & GetKeyAgreementAlgorithm() const =0;
@@ -1479,6 +1757,10 @@ public:
 			}
 		}
 	}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_KeyAgreementAlgorithm_DH() {}
+#endif
 };
 
 // ********************************************************
@@ -1593,10 +1875,14 @@ public:
 #endif
 };
 
-//! Base class for public key encryption standard classes. These classes are used to select from variants of algorithms. Note that not all standards apply to all algorithms.
+//! \brief Base class for public key encryption standard classes.
+//! \details These classes are used to select from variants of algorithms.
+//! \note Not all standards apply to all algorithms.
 struct EncryptionStandard {};
 
-//! Base class for public key signature standard classes. These classes are used to select from variants of algorithms. Note that not all standards apply to all algorithms.
+//! \brief Base class for public key signature standard classes.
+//! \details These classes are used to select from variants of algorithms.
+//! \note Not all standards apply to all algorithms.
 struct SignatureStandard {};
 
 template <class STANDARD, class KEYS, class ALG_INFO>
@@ -1674,5 +1960,9 @@ public:
 };
 
 NAMESPACE_END
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(pop)
+#endif
 
 #endif

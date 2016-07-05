@@ -18,16 +18,18 @@ template <class T, class BASE> void IteratedHashBase<T, BASE>::Update(const byte
 	if (m_countHi < oldCountHi || SafeRightShift<2*8*sizeof(HashWordType)>(len) != 0)
 		throw HashInputTooLong(this->AlgorithmName());
 
-	unsigned int blockSize = this->BlockSize();
+	const unsigned int blockSize = this->BlockSize();
 	unsigned int num = ModPowerOf2(oldCountLo, blockSize);
+
 	T* dataBuf = this->DataBuf();
 	byte* data = (byte *)dataBuf;
+	assert(dataBuf && data);
 
 	if (num != 0)	// process left over data
 	{
 		if (num+len >= blockSize)
 		{
-			memcpy(data+num, input, blockSize-num);
+			if (data && input) {memcpy(data+num, input, blockSize-num);}
 			HashBlock(dataBuf);
 			input += (blockSize-num);
 			len -= (blockSize-num);
@@ -36,7 +38,7 @@ template <class T, class BASE> void IteratedHashBase<T, BASE>::Update(const byte
 		}
 		else
 		{
-			memcpy(data+num, input, len);
+			if (data && input && len) {memcpy(data+num, input, len);}
 			return;
 		}
 	}
@@ -59,14 +61,14 @@ template <class T, class BASE> void IteratedHashBase<T, BASE>::Update(const byte
 		else
 			do
 			{   // copy input first if it's not aligned correctly
-				memcpy(data, input, blockSize);
+				if (data && input) memcpy(data, input, blockSize);
 				HashBlock(dataBuf);
 				input+=blockSize;
 				len-=blockSize;
 			} while (len >= blockSize);
 	}
 
-	if (len && data != input)
+	if (data && input && len && data != input)
 		memcpy(data, input, len);
 }
 

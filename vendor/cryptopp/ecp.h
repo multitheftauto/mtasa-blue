@@ -1,6 +1,13 @@
+// ecp.h - written and placed in the public domain by Wei Dai
+
+//! \file ecp.h
+//! \brief Classes for Elliptic Curves over prime fields
+
 #ifndef CRYPTOPP_ECP_H
 #define CRYPTOPP_ECP_H
 
+#include "cryptlib.h"
+#include "integer.h"
 #include "modarith.h"
 #include "eprecomp.h"
 #include "smartptr.h"
@@ -19,6 +26,10 @@ struct CRYPTOPP_DLL ECPPoint
 		{return (identity && t.identity) || (!identity && !t.identity && x==t.x && y==t.y);}
 	bool operator< (const ECPPoint &t) const
 		{return identity ? !t.identity : (!t.identity && (x<t.x || (x==t.x && y<t.y)));}
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~ECPPoint() {}
+#endif
 
 	bool identity;
 	Integer x, y;
@@ -81,6 +92,10 @@ public:
 
 	bool operator==(const ECP &rhs) const
 		{return GetField() == rhs.GetField() && m_a == rhs.m_a && m_b == rhs.m_b;}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~ECP() {}
+#endif
 
 private:
 	clonable_ptr<Field> m_fieldPtr;
@@ -116,6 +131,10 @@ public:
 		m_ecOriginal = ec;
 	}
 	const ECP & GetCurve() const {return *m_ecOriginal;}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~EcPrecomputation() {}
+#endif
 
 private:
 	value_ptr<ECP> m_ec, m_ecOriginal;

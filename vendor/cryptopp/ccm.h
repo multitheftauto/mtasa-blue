@@ -1,3 +1,9 @@
+// ccm.h - written and placed in the public domain by Wei Dai
+
+//! \file
+//! \headerfile ccm.h
+//! \brief CCM block cipher mode of operation
+
 #ifndef CRYPTOPP_CCM_H
 #define CRYPTOPP_CCM_H
 
@@ -6,12 +12,11 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! .
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE CCM_Base : public AuthenticatedSymmetricCipherBase
 {
 public:
 	CCM_Base()
-		: m_digestSize(0), m_L(0) {}
+		: m_digestSize(0), m_L(0), m_messageLength(0), m_aadLength(0) {}
 
 	// AuthenticatedSymmetricCipher
 	std::string AlgorithmName() const
@@ -72,7 +77,6 @@ protected:
 	CTR_Mode_ExternalCipher::Encryption m_ctr;
 };
 
-//! .
 template <class T_BlockCipher, int T_DefaultDigestSize, bool T_IsEncryption>
 class CCM_Final : public CCM_Base
 {
@@ -89,6 +93,7 @@ private:
 };
 
 /// <a href="http://www.cryptolounge.org/wiki/CCM">CCM</a>
+//! \brief CCM mode of operation
 template <class T_BlockCipher, int T_DefaultDigestSize = 16>
 struct CCM : public AuthenticatedSymmetricCipherDocumentation
 {

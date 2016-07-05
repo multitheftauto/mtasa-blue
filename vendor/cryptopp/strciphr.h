@@ -28,6 +28,14 @@
 #ifndef CRYPTOPP_STRCIPHR_H
 #define CRYPTOPP_STRCIPHR_H
 
+#include "config.h"
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(push)
+# pragma warning(disable: 4127 4189)
+#endif
+
+#include "cryptlib.h"
 #include "seckey.h"
 #include "secblock.h"
 #include "argnames.h"
@@ -73,11 +81,14 @@ struct CRYPTOPP_DLL CRYPTOPP_NO_VTABLE AdditiveCipherAbstractPolicy
 	virtual void WriteKeystream(byte *keystream, size_t iterationCount)
 		{OperateKeystream(KeystreamOperation(INPUT_NULL | (KeystreamOperationFlags)IsAlignedOn(keystream, GetAlignment())), keystream, NULL, iterationCount);}
 	virtual bool CanOperateKeystream() const {return false;}
-	virtual void OperateKeystream(KeystreamOperation operation, byte *output, const byte *input, size_t iterationCount) {assert(false);}
+	virtual void OperateKeystream(KeystreamOperation operation, byte *output, const byte *input, size_t iterationCount)
+		{CRYPTOPP_UNUSED(operation); CRYPTOPP_UNUSED(output); CRYPTOPP_UNUSED(input); CRYPTOPP_UNUSED(iterationCount); assert(false);}
 	virtual void CipherSetKey(const NameValuePairs &params, const byte *key, size_t length) =0;
-	virtual void CipherResynchronize(byte *keystreamBuffer, const byte *iv, size_t length) {throw NotImplemented("SimpleKeyingInterface: this object doesn't support resynchronization");}
+	virtual void CipherResynchronize(byte *keystreamBuffer, const byte *iv, size_t length)
+		{CRYPTOPP_UNUSED(keystreamBuffer); CRYPTOPP_UNUSED(iv); CRYPTOPP_UNUSED(length); throw NotImplemented("SimpleKeyingInterface: this object doesn't support resynchronization");}
 	virtual bool CipherIsRandomAccess() const =0;
-	virtual void SeekToIteration(lword iterationCount) {assert(!CipherIsRandomAccess()); throw NotImplemented("StreamTransformation: this object doesn't support random access");}
+	virtual void SeekToIteration(lword iterationCount)
+		{CRYPTOPP_UNUSED(iterationCount); assert(!CipherIsRandomAccess()); throw NotImplemented("StreamTransformation: this object doesn't support random access");}
 };
 
 template <typename WT, unsigned int W, unsigned int X = 1, class BASE = AdditiveCipherAbstractPolicy>
@@ -97,7 +108,7 @@ struct CRYPTOPP_NO_VTABLE AdditiveCipherConcretePolicy : public BASE
 
 // use these to implement OperateKeystream
 #define CRYPTOPP_KEYSTREAM_OUTPUT_WORD(x, b, i, a)	\
-	PutWord(bool(x & OUTPUT_ALIGNED), b, output+i*sizeof(WordType), (x & INPUT_NULL) ? a : a ^ GetWord<WordType>(bool(x & INPUT_ALIGNED), b, input+i*sizeof(WordType)));
+	PutWord(bool(x & OUTPUT_ALIGNED), b, output+i*sizeof(WordType), (x & INPUT_NULL) ? (a) : (a) ^ GetWord<WordType>(bool(x & INPUT_ALIGNED), b, input+i*sizeof(WordType)));
 #define CRYPTOPP_KEYSTREAM_OUTPUT_XMM(x, i, a)	{\
 	__m128i t = (x & INPUT_NULL) ? a : _mm_xor_si128(a, (x & INPUT_ALIGNED) ? _mm_load_si128((__m128i *)input+i) : _mm_loadu_si128((__m128i *)input+i));\
 	if (x & OUTPUT_ALIGNED) _mm_store_si128((__m128i *)output+i, t);\
@@ -168,9 +179,12 @@ public:
 	virtual byte * GetRegisterBegin() =0;
 	virtual void TransformRegister() =0;
 	virtual bool CanIterate() const {return false;}
-	virtual void Iterate(byte *output, const byte *input, CipherDir dir, size_t iterationCount) {assert(false); throw 0;}
+	virtual void Iterate(byte *output, const byte *input, CipherDir dir, size_t iterationCount)
+		{CRYPTOPP_UNUSED(output); CRYPTOPP_UNUSED(input); CRYPTOPP_UNUSED(dir); CRYPTOPP_UNUSED(iterationCount);
+		 assert(false); /*throw 0;*/ throw Exception(Exception::OTHER_ERROR, "SimpleKeyingInterface: unexpected error");}
 	virtual void CipherSetKey(const NameValuePairs &params, const byte *key, size_t length) =0;
-	virtual void CipherResynchronize(const byte *iv, size_t length) {throw NotImplemented("SimpleKeyingInterface: this object doesn't support resynchronization");}
+	virtual void CipherResynchronize(const byte *iv, size_t length)
+		{CRYPTOPP_UNUSED(iv); CRYPTOPP_UNUSED(length); throw NotImplemented("SimpleKeyingInterface: this object doesn't support resynchronization");}
 };
 
 template <typename WT, unsigned int W, class BASE = CFB_CipherAbstractPolicy>
@@ -301,6 +315,11 @@ CRYPTOPP_DLL_TEMPLATE_CLASS AdditiveCipherTemplate<AbstractPolicyHolder<Additive
 CRYPTOPP_DLL_TEMPLATE_CLASS CFB_CipherTemplate<AbstractPolicyHolder<CFB_CipherAbstractPolicy, SymmetricCipher> >;
 CRYPTOPP_DLL_TEMPLATE_CLASS CFB_EncryptionTemplate<AbstractPolicyHolder<CFB_CipherAbstractPolicy, SymmetricCipher> >;
 CRYPTOPP_DLL_TEMPLATE_CLASS CFB_DecryptionTemplate<AbstractPolicyHolder<CFB_CipherAbstractPolicy, SymmetricCipher> >;
+
 NAMESPACE_END
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(pop)
+#endif
 
 #endif

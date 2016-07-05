@@ -1,6 +1,7 @@
 // asn.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
@@ -74,7 +75,7 @@ bool BERLengthDecode(BufferedTransformation &bt, lword &length, bool &definiteLe
 
 bool BERLengthDecode(BufferedTransformation &bt, size_t &length)
 {
-	lword lw;
+	lword lw = 0;
 	bool definiteLength;
 	if (!BERLengthDecode(bt, lw, definiteLength))
 		BERDecodeError();
@@ -123,7 +124,7 @@ size_t BERDecodeOctetString(BufferedTransformation &bt, SecByteBlock &str)
 	if (!BERLengthDecode(bt, bc))
 		BERDecodeError();
 
-	str.resize(bc);
+	str.New(bc);
 	if (bc != bt.Get(str, bc))
 		BERDecodeError();
 	return bc;
@@ -348,6 +349,10 @@ void EncodedObjectFilter::Put(const byte *inString, size_t length)
 
 			if (m_lengthRemaining == 0)
 				m_state = IDENTIFIER;
+
+		case TAIL:			// silence warnings
+		case ALL_DONE:
+		default: ;; 
 		}
 
 		if (m_state == IDENTIFIER && m_level == 0)
@@ -405,8 +410,9 @@ BERGeneralDecoder::~BERGeneralDecoder()
 		if (!m_finished)
 			MessageEnd();
 	}
-	catch (...)
+	catch (const Exception&)
 	{
+		assert(0);
 	}
 }
 
@@ -480,12 +486,14 @@ lword BERGeneralDecoder::ReduceLength(lword delta)
 }
 
 DERGeneralEncoder::DERGeneralEncoder(BufferedTransformation &outQueue, byte asnTag)
-	: m_outQueue(outQueue), m_finished(false), m_asnTag(asnTag)
+	: ByteQueue(), m_outQueue(outQueue), m_finished(false), m_asnTag(asnTag)
 {
 }
 
+// TODO: GCC (and likely other compilers) identify this as a copy constructor; and not a constructor.
+//   We have to wait until Crypto++ 6.0 to fix it becuase the signature change breaks versioning.
 DERGeneralEncoder::DERGeneralEncoder(DERGeneralEncoder &outQueue, byte asnTag)
-	: m_outQueue(outQueue), m_finished(false), m_asnTag(asnTag)
+	: ByteQueue(), m_outQueue(outQueue), m_finished(false), m_asnTag(asnTag)
 {
 }
 
@@ -496,8 +504,9 @@ DERGeneralEncoder::~DERGeneralEncoder()
 		if (!m_finished)
 			MessageEnd();
 	}
-	catch (...)
+	catch (const Exception&)
 	{
+		assert(0);
 	}
 }
 

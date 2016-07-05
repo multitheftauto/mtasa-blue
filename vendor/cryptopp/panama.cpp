@@ -7,16 +7,21 @@
 #ifndef CRYPTOPP_GENERATE_X64_MASM
 
 #include "panama.h"
+#include "secblock.h"
 #include "misc.h"
 #include "cpu.h"
 
 NAMESPACE_BEGIN(CryptoPP)
+	
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4731)
+#endif
 
 template <class B>
 void Panama<B>::Reset()
 {
 	memset(m_state, 0, m_state.SizeInBytes());
-#if CRYPTOPP_BOOL_SSSE3_ASM_AVAILABLE
+#if CRYPTOPP_BOOL_SSSE3_ASM_AVAILABLE && !defined(CRYPTOPP_DISABLE_PANAMA_ASM)
 	m_state[17] = HasSSSE3();
 #endif
 }
@@ -27,7 +32,7 @@ void Panama<B>::Reset()
 extern "C" {
 void Panama_SSE2_Pull(size_t count, word32 *state, word32 *z, const word32 *y);
 }
-#elif CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE
+#elif CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE && !defined(CRYPTOPP_DISABLE_PANAMA_ASM)
 
 #ifdef CRYPTOPP_GENERATE_X64_MASM
 	Panama_SSE2_Pull	PROC FRAME
@@ -37,14 +42,13 @@ void Panama_SSE2_Pull(size_t count, word32 *state, word32 *z, const word32 *y);
 	save_xmm128 xmm7, 10h
 	.endprolog
 #else
-#pragma warning(disable: 4731)	// frame pointer register 'ebp' modified by inline assembly code
 void CRYPTOPP_NOINLINE Panama_SSE2_Pull(size_t count, word32 *state, word32 *z, const word32 *y)
 {
-#ifdef CRYPTOPP_GNU_STYLE_INLINE_ASSEMBLY
+#if defined(CRYPTOPP_GNU_STYLE_INLINE_ASSEMBLY)
 	asm __volatile__
 	(
-		".intel_syntax noprefix;"
-		AS_PUSH_IF86(	bx)
+	INTEL_NOPREFIX
+	AS_PUSH_IF86(	bx)
 #else
 	AS2(	mov		AS_REG_1, count)
 	AS2(	mov		AS_REG_2, state)
@@ -53,7 +57,9 @@ void CRYPTOPP_NOINLINE Panama_SSE2_Pull(size_t count, word32 *state, word32 *z, 
 #endif
 #endif	// #ifdef CRYPTOPP_GENERATE_X64_MASM
 
-#if CRYPTOPP_BOOL_X86
+#if CRYPTOPP_BOOL_X32
+	#define REG_loopEnd			r8d
+#elif CRYPTOPP_BOOL_X86
 	#define REG_loopEnd			[esp]
 #elif defined(CRYPTOPP_GENERATE_X64_MASM)
 	#define REG_loopEnd			rdi
@@ -69,8 +75,9 @@ void CRYPTOPP_NOINLINE Panama_SSE2_Pull(size_t count, word32 *state, word32 *z, 
 	#if CRYPTOPP_BOOL_X64
 		AS2(	mov		REG_loopEnd, AS_REG_1)
 	#else
-		AS1(	push	ebp)
-		AS1(	push	AS_REG_1)
+		AS_PUSH_IF86(	bp)
+		// AS1(	push	AS_REG_1) // AS_REG_1 is defined as ecx uner X86 and X32 (see cpu.h)
+		AS_PUSH_IF86(	cx)
 	#endif
 
 	AS2(	movdqa	xmm0, XMMWORD_PTR [AS_REG_2+0*16])
@@ -279,15 +286,18 @@ void CRYPTOPP_NOINLINE Panama_SSE2_Pull(size_t count, word32 *state, word32 *z, 
 	AS2(	movdqa	XMMWORD_PTR [AS_REG_2+1*16], xmm1)
 	AS2(	movdqa	XMMWORD_PTR [AS_REG_2+0*16], xmm0)
 
-	#if CRYPTOPP_BOOL_X86
+	#if CRYPTOPP_BOOL_X32
+		AS2(	add		esp, 8)
+		AS_POP_IF86(	bp)
+	#elif CRYPTOPP_BOOL_X86
 		AS2(	add		esp, 4)
-		AS1(	pop		ebp)
+		AS_POP_IF86(	bp)
 	#endif
 	ASL(5)
 
-#ifdef CRYPTOPP_GNU_STYLE_INLINE_ASSEMBLY
+#if defined(CRYPTOPP_GNU_STYLE_INLINE_ASSEMBLY)
 		AS_POP_IF86(	bx)
-		".att_syntax prefix;"
+		ATT_PREFIX
 			:
 	#if CRYPTOPP_BOOL_X64
 			: "D" (count), "S" (state), "d" (z), "c" (y)
@@ -298,6 +308,7 @@ void CRYPTOPP_NOINLINE Panama_SSE2_Pull(size_t count, word32 *state, word32 *z, 
 	#endif
 	);
 #endif
+
 #ifdef CRYPTOPP_GENERATE_X64_MASM
 	movdqa	xmm6, [rsp + 0h]
 	movdqa	xmm7, [rsp + 10h]
@@ -439,6 +450,7 @@ void PanamaHash<B>::TruncatedFinal(byte *hash, size_t size)
 template <class B>
 void PanamaCipherPolicy<B>::CipherSetKey(const NameValuePairs &params, const byte *key, size_t length)
 {
+	CRYPTOPP_UNUSED(params); CRYPTOPP_UNUSED(length);
 	assert(length==32);
 	memcpy(m_key, key, 32);
 }
@@ -446,6 +458,7 @@ void PanamaCipherPolicy<B>::CipherSetKey(const NameValuePairs &params, const byt
 template <class B>
 void PanamaCipherPolicy<B>::CipherResynchronize(byte *keystreamBuffer, const byte *iv, size_t length)
 {
+	CRYPTOPP_UNUSED(keystreamBuffer); CRYPTOPP_UNUSED(iv); CRYPTOPP_UNUSED(length);
 	assert(length==32);
 	this->Reset();
 	this->Iterate(1, m_key);
@@ -461,7 +474,7 @@ void PanamaCipherPolicy<B>::CipherResynchronize(byte *keystreamBuffer, const byt
 		this->Iterate(1, buf);
 	}
 
-#if CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || defined(CRYPTOPP_X64_MASM_AVAILABLE)
+#if (CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || defined(CRYPTOPP_X64_MASM_AVAILABLE)) && !defined(CRYPTOPP_DISABLE_PANAMA_ASM)
 	if (B::ToEnum() == LITTLE_ENDIAN_ORDER && HasSSE2() && !IsP4())		// SSE2 code is slower on P4 Prescott
 		Panama_SSE2_Pull(32, this->m_state, NULL, NULL);
 	else
@@ -469,23 +482,21 @@ void PanamaCipherPolicy<B>::CipherResynchronize(byte *keystreamBuffer, const byt
 		this->Iterate(32);
 }
 
-#if CRYPTOPP_BOOL_X86 || CRYPTOPP_BOOL_X64
 template <class B>
 unsigned int PanamaCipherPolicy<B>::GetAlignment() const
 {
-#if CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || defined(CRYPTOPP_X64_MASM_AVAILABLE)
+#if (CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || defined(CRYPTOPP_X64_MASM_AVAILABLE)) && !defined(CRYPTOPP_DISABLE_PANAMA_ASM)
 	if (B::ToEnum() == LITTLE_ENDIAN_ORDER && HasSSE2())
 		return 16;
 	else
 #endif
 		return 1;
 }
-#endif
 
 template <class B>
 void PanamaCipherPolicy<B>::OperateKeystream(KeystreamOperation operation, byte *output, const byte *input, size_t iterationCount)
 {
-#if CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || defined(CRYPTOPP_X64_MASM_AVAILABLE)
+#if (CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || defined(CRYPTOPP_X64_MASM_AVAILABLE)) && !defined(CRYPTOPP_DISABLE_PANAMA_ASM)
 	if (B::ToEnum() == LITTLE_ENDIAN_ORDER && HasSSE2())
 		Panama_SSE2_Pull(iterationCount, this->m_state, (word32 *)output, (const word32 *)input);
 	else

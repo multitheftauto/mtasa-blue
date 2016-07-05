@@ -1,12 +1,18 @@
 #ifndef CRYPTOPP_VMAC_H
 #define CRYPTOPP_VMAC_H
 
+#include "cryptlib.h"
 #include "iterhash.h"
 #include "seckey.h"
 
+#if CRYPTOPP_BOOL_X32
+# define CRYPTOPP_DISABLE_VMAC_ASM
+#endif
+
 NAMESPACE_BEGIN(CryptoPP)
 
-/// .
+//! \class VMAC_Base
+//! \brief Class specific methods used to operate the MAC.
 class VMAC_Base : public IteratedHashBase<word64, MessageAuthenticationCode>
 {
 public:
@@ -20,6 +26,7 @@ public:
 	void TruncatedFinal(byte *mac, size_t size);
 	unsigned int BlockSize() const {return m_L1KeyLength;}
 	ByteOrder GetByteOrder() const {return LITTLE_ENDIAN_ORDER;}
+	unsigned int OptimalDataAlignment() const;
 
 protected:
 	virtual BlockCipher & AccessCipher() =0;
@@ -38,6 +45,10 @@ protected:
 	void VHASH_Update_Template(const word64 *data, size_t blockRemainingInWord128);
 	void VHASH_Update(const word64 *data, size_t blocksRemainingInWord128);
 
+#if CRYPTOPP_DOXYGEN_PROCESSING
+	private:  // hide from documentation
+#endif
+
 	CRYPTOPP_BLOCK_1(polyState, word64, 4*(m_is128+1))
 	CRYPTOPP_BLOCK_2(nhKey, word64, m_L1KeyLength/sizeof(word64) + 2*m_is128)
 	CRYPTOPP_BLOCK_3(data, byte, m_L1KeyLength)
@@ -50,7 +61,14 @@ protected:
 	int m_L1KeyLength;
 };
 
-/// <a href="http://www.cryptolounge.org/wiki/VMAC">VMAC</a>
+//! \class VMAC
+//! \brief The VMAC message authentication code
+//! \details VMAC is a block cipher-based message authentication code algorithm
+//!   using a universal hash proposed by Ted Krovetz and Wei Dai in April 2007. The
+//!   algorithm was designed for high performance backed by a formal analysis.
+//! \tparam T_BlockCipher block cipher
+//! \tparam T_DigestBitSize digest size, in bits
+//! \sa <a href="http://www.cryptolounge.org/wiki/VMAC">VMAC</a> at the Crypto Lounge.
 template <class T_BlockCipher, int T_DigestBitSize = 128>
 class VMAC : public SimpleKeyingInterfaceImpl<VMAC_Base, SameKeyLengthAs<T_BlockCipher, SimpleKeyingInterface::UNIQUE_IV, T_BlockCipher::BLOCKSIZE> >
 {

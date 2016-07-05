@@ -3,6 +3,11 @@
 // use "cl /EP /P /DCRYPTOPP_GENERATE_X64_MASM gcm.cpp" to generate MASM code
 
 #include "pch.h"
+#include "config.h"
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4189)
+#endif
 
 #ifndef CRYPTOPP_IMPORTS
 #ifndef CRYPTOPP_GENERATE_X64_MASM
@@ -140,7 +145,8 @@ void GCM_Base::SetKeyWithoutResync(const byte *userKey, size_t keylength, const 
 #if CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE
 	if (HasCLMUL())
 	{
-		params.GetIntValue(Name::TableSize(), tableSize);	// avoid "parameter not used" error
+		// Avoid "parameter not used" error and suppress Coverity finding
+		(void)params.GetIntValue(Name::TableSize(), tableSize);
 		tableSize = s_clmulTableSizeInBlocks * REQUIRED_BLOCKSIZE;
 	}
 	else
@@ -222,12 +228,12 @@ void GCM_Base::SetKeyWithoutResync(const byte *userKey, size_t keylength, const 
 			s_reductionTable[0] = 0;
 			word16 x = 0x01c2;
 			s_reductionTable[1] = ByteReverse(x);
-			for (int i=2; i<=0x80; i*=2)
+			for (unsigned int ii=2; ii<=0x80; ii*=2)
 			{
 				x <<= 1;
-				s_reductionTable[i] = ByteReverse(x);
-				for (int j=1; j<i; j++)
-					s_reductionTable[i+j] = s_reductionTable[i] ^ s_reductionTable[j];
+				s_reductionTable[ii] = ByteReverse(x);
+				for (unsigned int jj=1; jj<ii; jj++)
+					s_reductionTable[ii+jj] = s_reductionTable[ii] ^ s_reductionTable[jj];
 			}
 			s_reductionTableInitialized = true;
 		}
@@ -334,7 +340,9 @@ unsigned int GCM_Base::OptimalDataAlignment() const
 		GetBlockCipher().OptimalDataAlignment();
 }
 
-#pragma warning(disable: 4731)	// frame pointer register 'ebp' modified by inline assembly code
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4731)	// frame pointer register 'ebp' modified by inline assembly code
+#endif
 
 #endif	// #ifndef CRYPTOPP_GENERATE_X64_MASM
 
@@ -572,7 +580,7 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 		#ifdef __GNUC__
 			__asm__ __volatile__
 			(
-			".intel_syntax noprefix;"
+			INTEL_NOPREFIX
 		#elif defined(CRYPTOPP_GENERATE_X64_MASM)
 			ALIGN   8
 			GCM_AuthenticateBlocks_2K	PROC FRAME
@@ -589,8 +597,13 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 			AS2(	shr		WORD_REG(dx), 4				)
 		#endif
 
-		AS_PUSH_IF86(	bx)
-		AS_PUSH_IF86(	bp)
+		#if CRYPTOPP_BOOL_X32
+			AS1(push	rbx)
+			AS1(push	rbp)
+		#else
+			AS_PUSH_IF86(	bx)
+			AS_PUSH_IF86(	bp)
+		#endif
 
 		#ifdef __GNUC__
 			AS2(	mov		AS_REG_7, WORD_REG(di))
@@ -671,7 +684,13 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 		AS2(	pxor	xmm5, xmm2						)
 
 		AS2(	psrldq	xmm0, 15						)
-		AS2(	movd	WORD_REG(di), xmm0					)
+#if (CRYPTOPP_CLANG_VERSION >= 30600) || (CRYPTOPP_APPLE_CLANG_VERSION >= 70000)
+		AS2(	movd	edi, xmm0						)
+#elif defined(CRYPTOPP_CLANG_VERSION) || defined(CRYPTOPP_APPLE_CLANG_VERSION)
+		AS2(	mov		WORD_REG(di), xmm0				)
+#else	// GNU Assembler
+		AS2(	movd	WORD_REG(di), xmm0				)
+#endif
 		AS2(	movzx	eax, WORD PTR [RED_TABLE + WORD_REG(di)*2]	)
 		AS2(	shl		eax, 8							)
 
@@ -680,27 +699,44 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 		AS2(	pxor	xmm4, xmm5						)
 
 		AS2(	psrldq	xmm1, 15						)
-		AS2(	movd	WORD_REG(di), xmm1					)
+#if (CRYPTOPP_CLANG_VERSION >= 30600) || (CRYPTOPP_APPLE_CLANG_VERSION >= 70000)
+		AS2(	movd	edi, xmm1						)
+#elif defined(CRYPTOPP_CLANG_VERSION) || defined(CRYPTOPP_APPLE_CLANG_VERSION)
+		AS2(	mov		WORD_REG(di), xmm1				)
+#else
+		AS2(	movd	WORD_REG(di), xmm1				)
+#endif
 		AS2(	xor		ax, WORD PTR [RED_TABLE + WORD_REG(di)*2]	)
 		AS2(	shl		eax, 8							)
 
 		AS2(	psrldq	xmm0, 15						)
-		AS2(	movd	WORD_REG(di), xmm0					)
+#if (CRYPTOPP_CLANG_VERSION >= 30600) || (CRYPTOPP_APPLE_CLANG_VERSION >= 70000)
+		AS2(	movd	edi, xmm0						)	
+#elif defined(CRYPTOPP_CLANG_VERSION) || defined(CRYPTOPP_APPLE_CLANG_VERSION)		
+		AS2(	mov		WORD_REG(di), xmm0				)
+#else
+		AS2(	movd	WORD_REG(di), xmm0				)
+#endif
 		AS2(	xor		ax, WORD PTR [RED_TABLE + WORD_REG(di)*2]	)
 
 		AS2(	movd	xmm0, eax						)
 		AS2(	pxor	xmm0, xmm4						)
 
-		AS2(	add		WORD_REG(cx), 16					)
-		AS2(	sub		WORD_REG(dx), 1						)
+		AS2(	add		WORD_REG(cx), 16				)
+		AS2(	sub		WORD_REG(dx), 1					)
 		ASJ(	jnz,	0, b							)
-		AS2(	movdqa	[WORD_REG(si)], xmm0				)
+		AS2(	movdqa	[WORD_REG(si)], xmm0			)
 
-		AS_POP_IF86(	bp)
-		AS_POP_IF86(	bx)
+		#if CRYPTOPP_BOOL_X32
+			AS1(pop		rbp)
+			AS1(pop		rbx)
+		#else
+			AS_POP_IF86(	bp)
+			AS_POP_IF86(	bx)
+		#endif
 
 		#ifdef __GNUC__
-				".att_syntax prefix;"
+				ATT_PREFIX
 					: 
 					: "c" (data), "d" (len/16), "S" (hashBuffer), "D" (s_reductionTable)
 					: "memory", "cc", "%eax"
@@ -723,7 +759,7 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 		#ifdef __GNUC__
 			__asm__ __volatile__
 			(
-			".intel_syntax noprefix;"
+			INTEL_NOPREFIX
 		#elif defined(CRYPTOPP_GENERATE_X64_MASM)
 			ALIGN   8
 			GCM_AuthenticateBlocks_64K	PROC FRAME
@@ -777,7 +813,7 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 		AS2(	movdqa	[WORD_REG(si)], xmm0				)
 
 		#ifdef __GNUC__
-				".att_syntax prefix;"
+				ATT_PREFIX
 					: 
 					: "c" (data), "d" (len/16), "S" (hashBuffer)
 					: "memory", "cc", "%edi", "%eax"

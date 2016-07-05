@@ -24,7 +24,8 @@ double TimerBase::ConvertTo(TimerWord t, Unit unit)
 {
 	static unsigned long unitsPerSecondTable[] = {1, 1000, 1000*1000, 1000*1000*1000};
 
-	assert(unit < sizeof(unitsPerSecondTable) / sizeof(unitsPerSecondTable[0]));
+	// When 'unit' is an enum 'Unit', a Clang warning is generated.
+	assert(static_cast<unsigned int>(unit) < COUNTOF(unitsPerSecondTable));
 	return (double)CRYPTOPP_VC6_INT64 t * unitsPerSecondTable[unit] / CRYPTOPP_VC6_INT64 TicksPerSecond();
 }
 
@@ -61,7 +62,8 @@ unsigned long TimerBase::ElapsedTime()
 TimerWord Timer::GetCurrentTimerValue()
 {
 #if defined(CRYPTOPP_WIN32_AVAILABLE)
-	LARGE_INTEGER now;
+	// Use the first union member to avoid an uninitialized warning
+	LARGE_INTEGER now = {0,0};
 	if (!QueryPerformanceCounter(&now))
 		throw Exception(Exception::OTHER_ERROR, "Timer: QueryPerformanceCounter failed with error " + IntToString(GetLastError()));
 	return now.QuadPart;
@@ -70,7 +72,7 @@ TimerWord Timer::GetCurrentTimerValue()
 	gettimeofday(&now, NULL);
 	return (TimerWord)now.tv_sec * 1000000 + now.tv_usec;
 #else
-	clock_t now;
+	// clock_t now;
 	return clock();
 #endif
 }
@@ -78,7 +80,8 @@ TimerWord Timer::GetCurrentTimerValue()
 TimerWord Timer::TicksPerSecond()
 {
 #if defined(CRYPTOPP_WIN32_AVAILABLE)
-	static LARGE_INTEGER freq = {0};
+	// Use the second union member to avoid an uninitialized warning
+	static LARGE_INTEGER freq = {0,0};
 	if (freq.QuadPart == 0)
 	{
 		if (!QueryPerformanceFrequency(&freq))

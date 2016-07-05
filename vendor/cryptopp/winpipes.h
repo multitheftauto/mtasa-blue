@@ -1,10 +1,9 @@
 #ifndef CRYPTOPP_WINPIPES_H
 #define CRYPTOPP_WINPIPES_H
 
-#include "config.h"
-
 #ifdef WINDOWS_PIPES_AVAILABLE
 
+#include "cryptlib.h"
 #include "network.h"
 #include "queue.h"
 #include <winsock2.h>
@@ -22,7 +21,7 @@ public:
 	bool GetOwnership() const {return m_own;}
 	void SetOwnership(bool own) {m_own = own;}
 
-	operator HANDLE() {return m_h;}
+	operator HANDLE() const {return m_h;}
 	HANDLE GetHandle() const {return m_h;}
 	bool HandleValid() const;
 	void AttachHandle(HANDLE h, bool own=false);
@@ -68,6 +67,7 @@ public:
 	unsigned int GetReceiveResult();
 	bool EofReceived() const {return m_eofReceived;}
 
+	HANDLE GetHandle() const {return m_event;}
 	unsigned int GetMaxWaitObjectCount() const {return 1;}
 	void GetWaitObjects(WaitObjectContainer &container, CallStack const& callStack);
 
@@ -91,6 +91,7 @@ public:
 	bool MustWaitForEof() { return false; }
 	void SendEof() {}
 
+	HANDLE GetHandle() const {return m_event;}
 	unsigned int GetMaxWaitObjectCount() const {return 1;}
 	void GetWaitObjects(WaitObjectContainer &container, CallStack const& callStack);
 
@@ -112,8 +113,8 @@ public:
 			PumpAll();
 	}
 
-	NetworkSource::GetMaxWaitObjectCount;
-	NetworkSource::GetWaitObjects;
+	using NetworkSource::GetMaxWaitObjectCount;
+	using NetworkSource::GetWaitObjects;
 
 private:
 	HANDLE GetHandle() const {return WindowsHandle::GetHandle();}
@@ -127,8 +128,8 @@ public:
 	WindowsPipeSink(HANDLE h=INVALID_HANDLE_VALUE, unsigned int maxBufferSize=0, unsigned int autoFlushBound=16*1024)
 		: WindowsHandle(h), NetworkSink(maxBufferSize, autoFlushBound) {}
 
-	NetworkSink::GetMaxWaitObjectCount;
-	NetworkSink::GetWaitObjects;
+	using NetworkSink::GetMaxWaitObjectCount;
+	using NetworkSink::GetWaitObjects;
 
 private:
 	HANDLE GetHandle() const {return WindowsHandle::GetHandle();}
@@ -137,6 +138,6 @@ private:
 
 NAMESPACE_END
 
-#endif
+#endif // WINDOWS_PIPES_AVAILABLE
 
 #endif

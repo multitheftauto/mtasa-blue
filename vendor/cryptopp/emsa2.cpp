@@ -7,11 +7,12 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-void EMSA2Pad::ComputeMessageRepresentative(RandomNumberGenerator &rng, 
-	const byte *recoverableMessage, size_t recoverableMessageLength,
+void EMSA2Pad::ComputeMessageRepresentative(RandomNumberGenerator& /*rng*/, 
+	const byte* recoverableMessage, size_t recoverableMessageLength,
 	HashTransformation &hash, HashIdentifier hashIdentifier, bool messageEmpty,
 	byte *representative, size_t representativeBitLength) const
 {
+	CRYPTOPP_UNUSED(recoverableMessage), CRYPTOPP_UNUSED(recoverableMessageLength), CRYPTOPP_UNUSED(representativeBitLength);
 	assert(representativeBitLength >= MinRepresentativeBitLength(hashIdentifier.second, hash.DigestSize()));
 
 	if (representativeBitLength % 8 != 7)

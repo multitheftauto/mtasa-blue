@@ -1,14 +1,26 @@
+// mqv.h - written and placed in the public domain by Wei Dai
+
+//! \file mqv.h
+//! \brief Classes for Menezes–Qu–Vanstone (MQV) key agreement
+
 #ifndef CRYPTOPP_MQV_H
 #define CRYPTOPP_MQV_H
 
-/** \file
-*/
-
+#include "cryptlib.h"
 #include "gfpcrypt.h"
+#include "modarith.h"
+#include "integer.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! _
+//! \class MQV_Domain
+//! \brief MQV domain for performing authenticated key agreement
+//! \tparam GROUP_PARAMETERS doamin parameters
+//! \tparam COFACTOR_OPTION cofactor option
+//! \details GROUP_PARAMETERS paramters include the curve coefcients and the base point.
+//!   Binary curves use a polynomial to represent its characteristic, while prime curves
+//!   use a prime number.
 template <class GROUP_PARAMETERS, class COFACTOR_OPTION = CPP_TYPENAME GROUP_PARAMETERS::DefaultCofactorOption>
 class MQV_Domain : public AuthenticatedKeyAgreementDomain
 {
@@ -54,6 +66,7 @@ public:
 
 	void GenerateStaticPublicKey(RandomNumberGenerator &rng, const byte *privateKey, byte *publicKey) const
 	{
+		CRYPTOPP_UNUSED(rng);
 		const DL_GroupParameters<Element> &params = GetAbstractGroupParameters();
 		Integer x(privateKey, StaticPrivateKeyLength());
 		Element y = params.ExponentiateBase(x);
@@ -74,6 +87,7 @@ public:
 
 	void GenerateEphemeralPublicKey(RandomNumberGenerator &rng, const byte *privateKey, byte *publicKey) const
 	{
+		CRYPTOPP_UNUSED(rng);
 		memcpy(publicKey, privateKey+StaticPrivateKeyLength(), EphemeralPublicKeyLength());
 	}
 

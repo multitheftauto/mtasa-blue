@@ -1,6 +1,13 @@
+// sha.h - written and placed in the public domain by Wei Dai
+
+//! \file
+//! \headerfile sha.h
+//! \brief Classes for SHA-1 and SHA-2 family of message digests
+
 #ifndef CRYPTOPP_SHA_H
 #define CRYPTOPP_SHA_H
 
+#include "config.h"
 #include "iterhash.h"
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -20,7 +27,7 @@ typedef SHA1 SHA;	// for backwards compatibility
 class CRYPTOPP_DLL SHA256 : public IteratedHashWithStaticTransform<word32, BigEndian, 64, 32, SHA256, 32, true>
 {
 public:
-#if defined(CRYPTOPP_X86_ASM_AVAILABLE) || defined(CRYPTOPP_X64_MASM_AVAILABLE)
+#if defined(CRYPTOPP_X86_ASM_AVAILABLE) || defined(CRYPTOPP_X32_ASM_AVAILABLE) || defined(CRYPTOPP_X64_MASM_AVAILABLE) && !defined(CRYPTOPP_DISABLE_SHA_ASM)
 	size_t HashMultipleBlocks(const word32 *input, size_t length);
 #endif
 	static void CRYPTOPP_API InitState(HashWordType *state);
@@ -32,7 +39,7 @@ public:
 class CRYPTOPP_DLL SHA224 : public IteratedHashWithStaticTransform<word32, BigEndian, 64, 32, SHA224, 28, true>
 {
 public:
-#if defined(CRYPTOPP_X86_ASM_AVAILABLE) || defined(CRYPTOPP_X64_MASM_AVAILABLE)
+#if defined(CRYPTOPP_X86_ASM_AVAILABLE) || defined(CRYPTOPP_X32_ASM_AVAILABLE) || defined(CRYPTOPP_X64_MASM_AVAILABLE) && !defined(CRYPTOPP_DISABLE_SHA_ASM)
 	size_t HashMultipleBlocks(const word32 *input, size_t length);
 #endif
 	static void CRYPTOPP_API InitState(HashWordType *state);
@@ -41,7 +48,7 @@ public:
 };
 
 //! implements the SHA-512 standard
-class CRYPTOPP_DLL SHA512 : public IteratedHashWithStaticTransform<word64, BigEndian, 128, 64, SHA512, 64, CRYPTOPP_BOOL_X86>
+class CRYPTOPP_DLL SHA512 : public IteratedHashWithStaticTransform<word64, BigEndian, 128, 64, SHA512, 64, (CRYPTOPP_BOOL_X86|CRYPTOPP_BOOL_X32)>
 {
 public:
 	static void CRYPTOPP_API InitState(HashWordType *state);
@@ -50,7 +57,7 @@ public:
 };
 
 //! implements the SHA-384 standard
-class CRYPTOPP_DLL SHA384 : public IteratedHashWithStaticTransform<word64, BigEndian, 128, 64, SHA384, 48, CRYPTOPP_BOOL_X86>
+class CRYPTOPP_DLL SHA384 : public IteratedHashWithStaticTransform<word64, BigEndian, 128, 64, SHA384, 48, (CRYPTOPP_BOOL_X86|CRYPTOPP_BOOL_X32)>
 {
 public:
 	static void CRYPTOPP_API InitState(HashWordType *state);

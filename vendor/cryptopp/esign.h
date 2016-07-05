@@ -6,9 +6,11 @@
 	ESIGN signature schemes as defined in IEEE P1363a.
 */
 
+#include "cryptlib.h"
 #include "pubkey.h"
 #include "integer.h"
 #include "asn.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -43,7 +45,8 @@ public:
 	void SetPublicExponent(const Integer &e) {m_e = e;}
 
 protected:
-	unsigned int GetK() const {return m_n.BitCount()/3-1;}
+	// Covertiy finding on overflow. The library allows small values for research purposes.
+	unsigned int GetK() const {return SaturatingSubtract(m_n.BitCount()/3, 1U);}
 
 	Integer m_n, m_e;
 };
@@ -94,6 +97,8 @@ public:
 		HashTransformation &hash, HashIdentifier hashIdentifier, bool messageEmpty,
 		byte *representative, size_t representativeBitLength) const
 	{
+		CRYPTOPP_UNUSED(rng), CRYPTOPP_UNUSED(recoverableMessage), CRYPTOPP_UNUSED(recoverableMessageLength);
+		CRYPTOPP_UNUSED(messageEmpty), CRYPTOPP_UNUSED(hashIdentifier);
 		SecByteBlock digest(hash.DigestSize());
 		hash.Final(digest);
 		size_t representativeByteLength = BitsToBytes(representativeBitLength);

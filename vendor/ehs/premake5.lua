@@ -24,4 +24,4 @@ project "ehs"
 	}
 	
 	filter "system: windows"
-		includedirs { "../pme", "../pcre", "../pthreads/include" }
+		includedirs { "../pcre", "../pthreads/include" }

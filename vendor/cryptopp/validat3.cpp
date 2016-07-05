@@ -1,9 +1,14 @@
 // validat3.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
-#include "validate.h"
 
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
+
+#include "cryptlib.h"
+#include "pubkey.h"
+#include "gfpcrypt.h"
+#include "eccrypto.h"
+
 #include "smartptr.h"
 #include "crc.h"
 #include "adler32.h"
@@ -13,18 +18,27 @@
 #include "sha.h"
 #include "tiger.h"
 #include "ripemd.h"
-
+#include "whrlpool.h"
+#include "hkdf.h"
 #include "hmac.h"
 #include "ttmac.h"
-
 #include "integer.h"
 #include "pwdbased.h"
 #include "filters.h"
-#include "hex.h"
 #include "files.h"
+#include "hex.h"
+#include "smartptr.h"
 
 #include <iostream>
+#include <sstream>
 #include <iomanip>
+
+#include "validate.h"
+
+// Aggressive stack checking with VS2005 SP1 and above.
+#if (CRYPTOPP_MSC_VERSION >= 1410)
+# pragma strict_gs_check (on)
+#endif
 
 USING_NAMESPACE(CryptoPP)
 USING_NAMESPACE(std)
@@ -47,6 +61,10 @@ bool HashModuleTest(HashTransformation &md, const HashTestTuple *testSet, unsign
 	bool pass=true, fail;
 	SecByteBlock digest(md.DigestSize());
 
+	// Coverity finding (http://stackoverflow.com/a/30968371 does not squash the finding)
+	std::ostringstream out;
+	out.copyfmt(cout);
+
 	for (unsigned int i=0; i<testSetSize; i++)
 	{
 		unsigned j;
@@ -57,15 +75,16 @@ bool HashModuleTest(HashTransformation &md, const HashTestTuple *testSet, unsign
 		fail = memcmp(digest, testSet[i].output, md.DigestSize()) != 0;
 		pass = pass && !fail;
 
-		cout << (fail ? "FAILED   " : "passed   ");
+		out << (fail ? "FAILED   " : "passed   ");
 		for (j=0; j<md.DigestSize(); j++)
-			cout << setw(2) << setfill('0') << hex << (int)digest[j];
-		cout << "   \"" << (char *)testSet[i].input << '\"';
+			out << setw(2) << setfill('0') << hex << (int)digest[j];
+		out << "   \"" << (char *)testSet[i].input << '\"';
 		if (testSet[i].repeatTimes != 1)
-			cout << " repeated " << dec << testSet[i].repeatTimes << " times";
-		cout  << endl;
+			out << " repeated " << dec << testSet[i].repeatTimes << " times";
+		out  << endl;
 	}
 
+	cout << out.str();
 	return pass;
 }
 
@@ -494,7 +513,7 @@ bool ValidateTTMAC()
 	cout << "\nTwo-Track-MAC validation suite running...\n";
 
 	TTMAC mac(key, sizeof(key));
-	for (int k=0; k<sizeof(TestVals)/sizeof(TestVals[0]); k++)
+	for (unsigned int k=0; k<sizeof(TestVals)/sizeof(TestVals[0]); k++)
 	{
 		mac.Update((byte *)TestVals[k], strlen(TestVals[k]));
 		mac.Final(digest);
@@ -587,5 +606,136 @@ bool ValidatePBKDF()
 	pass = TestPBKDF(pbkdf, testSet, sizeof(testSet)/sizeof(testSet[0])) && pass;
 	}
 
+	return pass;
+}
+
+struct HKDF_TestTuple
+{
+	const char *hexSecret, *hexSalt, *hexInfo, *hexExpected;
+	size_t len;
+};
+
+bool TestHKDF(KeyDerivationFunction &kdf, const HKDF_TestTuple *testSet, unsigned int testSetSize)
+{
+	bool pass = true;
+
+	for (unsigned int i=0; i<testSetSize; i++)
+	{
+		const HKDF_TestTuple &tuple = testSet[i];
+
+		std::string secret, salt, info, expected;
+		StringSource(tuple.hexSecret, true, new HexDecoder(new StringSink(secret)));
+		StringSource(tuple.hexSalt ? tuple.hexSalt : "", true, new HexDecoder(new StringSink(salt)));
+		StringSource(tuple.hexInfo ? tuple.hexInfo : "", true, new HexDecoder(new StringSink(info)));
+		StringSource(tuple.hexExpected, true, new HexDecoder(new StringSink(expected)));
+
+		SecByteBlock derived(expected.size());
+		unsigned int ret = kdf.DeriveKey(derived, derived.size(),
+                                         reinterpret_cast<const unsigned char*>(secret.data()), secret.size(),
+                                         (tuple.hexSalt ? reinterpret_cast<const unsigned char*>(salt.data()) : NULL), salt.size(),
+                                         (tuple.hexInfo ? reinterpret_cast<const unsigned char*>(info.data()) : NULL), info.size());
+
+		bool fail = !VerifyBufsEqual(derived, reinterpret_cast<const unsigned char*>(expected.data()), derived.size());
+		pass = pass && (ret == tuple.len) && !fail;
+
+		HexEncoder enc(new FileSink(std::cout));
+		std::cout << (fail ? "FAILED   " : "passed   ");
+		std::cout << " " << tuple.hexSecret << " ";
+		std::cout << (tuple.hexSalt ? (strlen(tuple.hexSalt) ? tuple.hexSalt : "<0-LEN SALT>") : "<NO SALT>");
+		std::cout << " ";
+		std::cout << (tuple.hexInfo ? (strlen(tuple.hexInfo) ? tuple.hexInfo : "<0-LEN INFO>") : "<NO INFO>");
+		std::cout << " ";
+		enc.Put(derived, derived.size());
+		std::cout << std::endl;
+	}
+
+	return pass;
+}
+
+bool ValidateHKDF()
+{
+	bool pass = true;
+
+	{
+	// SHA-1 from RFC 5869, Appendix A, https://tools.ietf.org/html/rfc5869
+	static const HKDF_TestTuple testSet[] =
+	{
+		// Test Case #4
+		{"0b0b0b0b0b0b0b0b0b0b0b", "000102030405060708090a0b0c", "f0f1f2f3f4f5f6f7f8f9", "085a01ea1b10f36933068b56efa5ad81 a4f14b822f5b091568a9cdd4f155fda2 c22e422478d305f3f896", 42},
+		// Test Case #5
+		{"000102030405060708090a0b0c0d0e0f 101112131415161718191a1b1c1d1e1f 202122232425262728292a2b2c2d2e2f 303132333435363738393a3b3c3d3e3f 404142434445464748494a4b4c4d4e4f", "606162636465666768696a6b6c6d6e6f 707172737475767778797a7b7c7d7e7f 808182838485868788898a8b8c8d8e8f 909192939495969798999a9b9c9d9e9f a0a1a2a3a4a5a6a7a8a9aaabacadaeaf", "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf c0c1c2c3c4c5c6c7c8c9cacbcccdcecf d0d1d2d3d4d5d6d7d8d9dadbdcdddedf e0e1e2e3e4e5e6e7e8e9eaebecedeeef f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff", "0bd770a74d1160f7c9f12cd5912a06eb ff6adcae899d92191fe4305673ba2ffe 8fa3f1a4e5ad79f3f334b3b202b2173c 486ea37ce3d397ed034c7f9dfeb15c5e 927336d0441f4c4300e2cff0d0900b52 d3b4", 82},
+		// Test Case #6
+		{"0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b", "", "", "0ac1af7002b3d761d1e55298da9d0506 b9ae52057220a306e07b6b87e8df21d0 ea00033de03984d34918", 42},
+		// Test Case #7		                                                            
+		{"0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c", NULL, "", "2c91117204d745f3500d636a62f64f0 ab3bae548aa53d423b0d1f27ebba6f5e5 673a081d70cce7acfc48", 42}
+	};
+
+	HKDF<SHA1> hkdf;
+
+	std::cout << "\nRFC 5869 HKDF(SHA-1) validation suite running...\n\n";
+	pass = TestHKDF(hkdf, testSet, COUNTOF(testSet)) && pass;
+	}
+
+	{
+	// SHA-256 from RFC 5869, Appendix A, https://tools.ietf.org/html/rfc5869
+	static const HKDF_TestTuple testSet[] =
+	{
+		// Test Case #1
+		{"0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b", "000102030405060708090a0b0c", "f0f1f2f3f4f5f6f7f8f9", "3cb25f25faacd57a90434f64d0362f2a 2d2d0a90cf1a5a4c5db02d56ecc4c5bf 34007208d5b887185865", 42},
+		// Test Case #2
+		{"000102030405060708090a0b0c0d0e0f 101112131415161718191a1b1c1d1e1f 202122232425262728292a2b2c2d2e2f 303132333435363738393a3b3c3d3e3f 404142434445464748494a4b4c4d4e4f", "606162636465666768696a6b6c6d6e6f 707172737475767778797a7b7c7d7e7f 808182838485868788898a8b8c8d8e8f 909192939495969798999a9b9c9d9e9f a0a1a2a3a4a5a6a7a8a9aaabacadaeaf", "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf c0c1c2c3c4c5c6c7c8c9cacbcccdcecf d0d1d2d3d4d5d6d7d8d9dadbdcdddedf e0e1e2e3e4e5e6e7e8e9eaebecedeeef f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff", "b11e398dc80327a1c8e7f78c596a4934 4f012eda2d4efad8a050cc4c19afa97c 59045a99cac7827271cb41c65e590e09 da3275600c2f09b8367793a9aca3db71 cc30c58179ec3e87c14c01d5c1f3434f 1d87", 82},
+		// Test Case #3
+		{"0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b", "", "", "8da4e775a563c18f715f802a063c5a31 b8a11f5c5ee1879ec3454e5f3c738d2d 9d201395faa4b61a96c8", 42}
+	};
+
+	HKDF<SHA256> hkdf;
+
+	std::cout << "\nRFC 5869 HKDF(SHA-256) validation suite running...\n\n";
+	pass = TestHKDF(hkdf, testSet, COUNTOF(testSet)) && pass;
+	}
+
+	{
+	// SHA-512, Crypto++ generated, based on RFC 5869, https://tools.ietf.org/html/rfc5869
+	static const HKDF_TestTuple testSet[] =
+	{
+		// Test Case #0
+		{"0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b", "000102030405060708090a0b0c", "f0f1f2f3f4f5f6f7f8f9", "832390086CDA71FB47625BB5CEB168E4 C8E26A1A16ED34D9FC7FE92C14815793 38DA362CB8D9F925D7CB", 42},
+		// Test Case #0
+		{"000102030405060708090a0b0c0d0e0f 101112131415161718191a1b1c1d1e1f 202122232425262728292a2b2c2d2e2f 303132333435363738393a3b3c3d3e3f 404142434445464748494a4b4c4d4e4f", "606162636465666768696a6b6c6d6e6f 707172737475767778797a7b7c7d7e7f 808182838485868788898a8b8c8d8e8f 909192939495969798999a9b9c9d9e9f a0a1a2a3a4a5a6a7a8a9aaabacadaeaf", "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf c0c1c2c3c4c5c6c7c8c9cacbcccdcecf d0d1d2d3d4d5d6d7d8d9dadbdcdddedf e0e1e2e3e4e5e6e7e8e9eaebecedeeef f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff", "CE6C97192805B346E6161E821ED16567 3B84F400A2B514B2FE23D84CD189DDF1 B695B48CBD1C8388441137B3CE28F16A A64BA33BA466B24DF6CFCB021ECFF235 F6A2056CE3AF1DE44D572097A8505D9E 7A93", 82},
+		// Test Case #0
+		{"0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b", "", "", "F5FA02B18298A72A8C23898A8703472C 6EB179DC204C03425C970E3B164BF90F FF22D04836D0E2343BAC", 42},
+		// Test Case #0
+		{"0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c", NULL, "", "1407D46013D98BC6DECEFCFEE55F0F90 B0C7F63D68EB1A80EAF07E953CFC0A3A 5240A155D6E4DAA965BB", 42}
+	};
+
+	HKDF<SHA512> hkdf;
+
+	std::cout << "\nRFC 5869 HKDF(SHA-512) validation suite running...\n\n";
+	pass = TestHKDF(hkdf, testSet, COUNTOF(testSet)) && pass;
+	}
+
+
+
+	{
+	// Whirlpool, Crypto++ generated, based on RFC 5869, https://tools.ietf.org/html/rfc5869
+	static const HKDF_TestTuple testSet[] =
+	{
+		// Test Case #0
+		{"0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b", "000102030405060708090a0b0c", "f0f1f2f3f4f5f6f7f8f9", "0D29F74CCD8640F44B0DD9638111C1B5 766EFED752AF358109E2E7C9CD4A28EF 2F90B2AD461FBA0744D4", 42},
+		// Test Case #0
+		{"000102030405060708090a0b0c0d0e0f 101112131415161718191a1b1c1d1e1f 202122232425262728292a2b2c2d2e2f 303132333435363738393a3b3c3d3e3f 404142434445464748494a4b4c4d4e4f", "606162636465666768696a6b6c6d6e6f 707172737475767778797a7b7c7d7e7f 808182838485868788898a8b8c8d8e8f 909192939495969798999a9b9c9d9e9f a0a1a2a3a4a5a6a7a8a9aaabacadaeaf", "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf c0c1c2c3c4c5c6c7c8c9cacbcccdcecf d0d1d2d3d4d5d6d7d8d9dadbdcdddedf e0e1e2e3e4e5e6e7e8e9eaebecedeeef f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff", "4EBE4FE2DCCEC42661699500BE279A99 3FED90351E19373B3926FAA3A410700B2 BBF77E254CF1451AE6068D64A0904D96 6F4FF25498445A501B88F50D21E3A68A8 90E09445DC5886DD00E7F4F7C58A5121 70", 82},
+		// Test Case #0
+		{"0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b", "", "", "110632D0F7AEFAC31771FC66C22BB346 2614B81E4B04BA7F2B662E0BD694F564 58615F9A9CB56C57ECF2", 42},
+		// Test Case #0
+		{"0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c" /*key*/, NULL /*salt*/, "" /*info*/, "4089286EBFB23DD8A02F0C9DAA35D538 EB09CD0A8CBAB203F39083AA3E0BD313 E6F91E64F21A187510B0", 42}
+	};
+
+	HKDF<Whirlpool> hkdf;
+
+	std::cout << "\nRFC 5869 HKDF(Whirlpool) validation suite running...\n\n";
+	pass = TestHKDF(hkdf, testSet, COUNTOF(testSet)) && pass;
+	}
+	
+	
 	return pass;
 }

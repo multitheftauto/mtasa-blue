@@ -1,10 +1,14 @@
-// specification file for an unlimited queue for storing bytes
+// queue.h - written and placed in the public domain by Wei Dai
+
+//! \file
+//! \headerfile queue.h
+//! \brief Classes for an unlimited queue to store bytes
 
 #ifndef CRYPTOPP_QUEUE_H
 #define CRYPTOPP_QUEUE_H
 
+#include "cryptlib.h"
 #include "simple.h"
-//#include <algorithm>
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -66,7 +70,8 @@ public:
 	{
 	public:
 		Walker(const ByteQueue &queue)
-			: m_queue(queue) {Initialize();}
+			: m_queue(queue), m_node(NULL), m_position(0), m_offset(0), m_lazyString(NULL), m_lazyLength(0)
+				{Initialize();}
 
 		lword GetCurrentPosition() {return m_position;}
 
@@ -115,7 +120,7 @@ public:
 	LazyPutter(ByteQueue &bq, const byte *inString, size_t size)
 		: m_bq(bq) {bq.LazyPut(inString, size);}
 	~LazyPutter()
-		{try {m_bq.FinalizeLazyPut();} catch(...) {}}
+		{try {m_bq.FinalizeLazyPut();} catch(const Exception&) {assert(0);}}
 protected:
 	LazyPutter(ByteQueue &bq) : m_bq(bq) {}
 private:

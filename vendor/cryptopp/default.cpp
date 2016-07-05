@@ -1,8 +1,18 @@
 // default.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4127 4189)
+#endif
+
+#include "cryptlib.h"
+#include "filters.h"
+#include "smartptr.h"
 #include "default.h"
 #include "queue.h"
+
 #include <time.h>
 #include <memory>
 
@@ -10,8 +20,8 @@ NAMESPACE_BEGIN(CryptoPP)
 
 static const unsigned int MASH_ITERATIONS = 200;
 static const unsigned int SALTLENGTH = 8;
-static const unsigned int BLOCKSIZE = Default_BlockCipher::Encryption::BLOCKSIZE;
-static const unsigned int KEYLENGTH = Default_BlockCipher::Encryption::DEFAULT_KEYLENGTH;
+static const unsigned int BLOCKSIZE = DefaultBlockCipher::Encryption::BLOCKSIZE;
+static const unsigned int KEYLENGTH = DefaultBlockCipher::Encryption::DEFAULT_KEYLENGTH;
 
 // The purpose of this function Mash() is to take an arbitrary length input
 // string and *deterministicly* produce an arbitrary length output string such
@@ -117,6 +127,7 @@ void DefaultEncryptor::FirstPut(const byte *)
 
 void DefaultEncryptor::LastPut(const byte *inString, size_t length)
 {
+	CRYPTOPP_UNUSED(inString); CRYPTOPP_UNUSED(length);
 	m_filter->MessageEnd();
 }
 
@@ -145,6 +156,7 @@ void DefaultDecryptor::FirstPut(const byte *inString)
 
 void DefaultDecryptor::LastPut(const byte *inString, size_t length)
 {
+	CRYPTOPP_UNUSED(inString); CRYPTOPP_UNUSED(length);
 	if (m_filter.get() == NULL)
 	{
 		m_state = KEY_BAD;
@@ -172,7 +184,7 @@ void DefaultDecryptor::CheckKey(const byte *salt, const byte *keyCheck)
 	GenerateKeyIV(m_passphrase, m_passphrase.size(), salt, SALTLENGTH, key, IV);
 
 	m_cipher.SetKeyWithIV(key, key.size(), IV);
-	std::auto_ptr<StreamTransformationFilter> decryptor(new StreamTransformationFilter(m_cipher));
+	member_ptr<StreamTransformationFilter> decryptor(new StreamTransformationFilter(m_cipher));
 
 	decryptor->Put(keyCheck, BLOCKSIZE);
 	decryptor->ForceNextPut();
@@ -217,6 +229,7 @@ DefaultEncryptorWithMAC::DefaultEncryptorWithMAC(const byte *passphrase, size_t 
 
 void DefaultEncryptorWithMAC::LastPut(const byte *inString, size_t length)
 {
+	CRYPTOPP_UNUSED(inString); CRYPTOPP_UNUSED(length);
 	m_filter->MessageEnd();
 }
 
@@ -250,9 +263,11 @@ bool DefaultDecryptorWithMAC::CheckLastMAC() const
 
 void DefaultDecryptorWithMAC::LastPut(const byte *inString, size_t length)
 {
+	CRYPTOPP_UNUSED(inString); CRYPTOPP_UNUSED(length);
 	m_filter->MessageEnd();
 	if (m_throwException && !CheckLastMAC())
 		throw MACBadErr();
 }
 
 NAMESPACE_END
+

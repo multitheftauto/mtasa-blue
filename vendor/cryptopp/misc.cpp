@@ -1,23 +1,37 @@
 // misc.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4189)
+# if (CRYPTOPP_MSC_VERSION >= 1400)
+#  pragma warning(disable: 6237)
+# endif
+#endif
 
 #ifndef CRYPTOPP_IMPORTS
 
 #include "misc.h"
 #include "words.h"
-#include <new>
+#include "words.h"
+#include "stdcpp.h"
+#include "integer.h"
 
+// for memalign
 #if defined(CRYPTOPP_MEMALIGN_AVAILABLE) || defined(CRYPTOPP_MM_MALLOC_AVAILABLE) || defined(QNX)
-#include <malloc.h>
+# include <malloc.h>
 #endif
 
 NAMESPACE_BEGIN(CryptoPP)
 
 void xorbuf(byte *buf, const byte *mask, size_t count)
 {
-	size_t i;
+	assert(buf != NULL);
+	assert(mask != NULL);
+	assert(count > 0);
 
+	size_t i=0;
 	if (IsAligned<word32>(buf) && IsAligned<word32>(mask))
 	{
 		if (!CRYPTOPP_BOOL_SLOW_WORD64 && IsAligned<word64>(buf) && IsAligned<word64>(mask))
@@ -46,8 +60,11 @@ void xorbuf(byte *buf, const byte *mask, size_t count)
 
 void xorbuf(byte *output, const byte *input, const byte *mask, size_t count)
 {
-	size_t i;
+	assert(output != NULL);
+	assert(input != NULL);
+	assert(count > 0);
 
+	size_t i=0;
 	if (IsAligned<word32>(output) && IsAligned<word32>(input) && IsAligned<word32>(mask))
 	{
 		if (!CRYPTOPP_BOOL_SLOW_WORD64 && IsAligned<word64>(output) && IsAligned<word64>(input) && IsAligned<word64>(mask))
@@ -78,7 +95,11 @@ void xorbuf(byte *output, const byte *input, const byte *mask, size_t count)
 
 bool VerifyBufsEqual(const byte *buf, const byte *mask, size_t count)
 {
-	size_t i;
+	assert(buf != NULL);
+	assert(mask != NULL);
+	assert(count > 0);
+
+	size_t i=0;
 	byte acc8 = 0;
 
 	if (IsAligned<word32>(buf) && IsAligned<word32>(mask))
@@ -129,19 +150,21 @@ void CallNewHandler()
 		throw std::bad_alloc();
 }
 
-#if CRYPTOPP_BOOL_ALIGN16_ENABLED
+#if CRYPTOPP_BOOL_ALIGN16
 
 void * AlignedAllocate(size_t size)
 {
 	byte *p;
-#ifdef CRYPTOPP_MM_MALLOC_AVAILABLE
-	while (!(p = (byte *)_mm_malloc(size, 16)))
+#if defined(CRYPTOPP_APPLE_ALLOC_AVAILABLE)
+	while ((p = (byte *)calloc(1, size)) == NULL)
+#elif defined(CRYPTOPP_MM_MALLOC_AVAILABLE)
+	while ((p = (byte *)_mm_malloc(size, 16)) == NULL)
 #elif defined(CRYPTOPP_MEMALIGN_AVAILABLE)
-	while (!(p = (byte *)memalign(16, size)))
+	while ((p = (byte *)memalign(16, size)) == NULL)
 #elif defined(CRYPTOPP_MALLOC_ALIGNMENT_IS_16)
-	while (!(p = (byte *)malloc(size)))
+	while ((p = (byte *)malloc(size)) == NULL)
 #else
-	while (!(p = (byte *)malloc(size + 16)))
+	while ((p = (byte *)malloc(size + 16)) == NULL)
 #endif
 		CallNewHandler();
 
@@ -172,7 +195,7 @@ void AlignedDeallocate(void *p)
 void * UnalignedAllocate(size_t size)
 {
 	void *p;
-	while (!(p = malloc(size)))
+	while ((p = malloc(size)) == NULL)
 		CallNewHandler();
 	return p;
 }

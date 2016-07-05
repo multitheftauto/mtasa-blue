@@ -2,6 +2,8 @@
 
 #include "pch.h"
 #include "pssr.h"
+#include "misc.h"
+
 #include <functional>
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -47,6 +49,8 @@ void PSSR_MEM_Base::ComputeMessageRepresentative(RandomNumberGenerator &rng,
 	HashTransformation &hash, HashIdentifier hashIdentifier, bool messageEmpty,
 	byte *representative, size_t representativeBitLength) const
 {
+	CRYPTOPP_UNUSED(rng), CRYPTOPP_UNUSED(recoverableMessage), CRYPTOPP_UNUSED(recoverableMessageLength);
+	CRYPTOPP_UNUSED(messageEmpty), CRYPTOPP_UNUSED(hashIdentifier);
 	assert(representativeBitLength >= MinRepresentativeBitLength(hashIdentifier.second, hash.DigestSize()));
 
 	const size_t u = hashIdentifier.second + 1;
@@ -73,10 +77,18 @@ void PSSR_MEM_Base::ComputeMessageRepresentative(RandomNumberGenerator &rng,
 	GetMGF().GenerateAndMask(hash, representative, representativeByteLength - u - digestSize, h, digestSize, false);
 	byte *xorStart = representative + representativeByteLength - u - digestSize - salt.size() - recoverableMessageLength - 1;
 	xorStart[0] ^= 1;
-	xorbuf(xorStart + 1, recoverableMessage, recoverableMessageLength);
+	if (recoverableMessage && recoverableMessageLength)
+		xorbuf(xorStart + 1, recoverableMessage, recoverableMessageLength);
 	xorbuf(xorStart + 1 + recoverableMessageLength, salt, salt.size());
-	memcpy(representative + representativeByteLength - u, hashIdentifier.first, hashIdentifier.second);
-	representative[representativeByteLength - 1] = hashIdentifier.second ? 0xcc : 0xbc;
+	if (hashIdentifier.first && hashIdentifier.second)
+	{
+		memcpy(representative + representativeByteLength - u, hashIdentifier.first, hashIdentifier.second);
+		representative[representativeByteLength - 1] = 0xcc;
+	}
+	else
+	{
+		representative[representativeByteLength - 1] = 0xbc;
+	}
 	if (representativeBitLength % 8 != 0)
 		representative[0] = (byte)Crop(representative[0], representativeBitLength % 8);
 }
@@ -86,6 +98,7 @@ DecodingResult PSSR_MEM_Base::RecoverMessageFromRepresentative(
 	byte *representative, size_t representativeBitLength,
 	byte *recoverableMessage) const
 {
+	CRYPTOPP_UNUSED(recoverableMessage), CRYPTOPP_UNUSED(messageEmpty), CRYPTOPP_UNUSED(hashIdentifier);
 	assert(representativeBitLength >= MinRepresentativeBitLength(hashIdentifier.second, hash.DigestSize()));
 
 	const size_t u = hashIdentifier.second + 1;
@@ -102,7 +115,9 @@ DecodingResult PSSR_MEM_Base::RecoverMessageFromRepresentative(
 	size_t &recoverableMessageLength = result.messageLength;
 
 	valid = (representative[representativeByteLength - 1] == (hashIdentifier.second ? 0xcc : 0xbc)) && valid;
-	valid = VerifyBufsEqual(representative + representativeByteLength - u, hashIdentifier.first, hashIdentifier.second) && valid;
+
+	if (hashIdentifier.first && hashIdentifier.second)
+		valid = VerifyBufsEqual(representative + representativeByteLength - u, hashIdentifier.first, hashIdentifier.second) && valid;
 
 	GetMGF().GenerateAndMask(hash, representative, representativeByteLength - u - digestSize, h, digestSize);
 	if (representativeBitLength % 8 != 0)
@@ -110,13 +125,14 @@ DecodingResult PSSR_MEM_Base::RecoverMessageFromRepresentative(
 
 	// extract salt and recoverableMessage from DB = 00 ... || 01 || M || salt
 	byte *salt = representative + representativeByteLength - u - digestSize - saltSize;
-	byte *M = std::find_if(representative, salt-1, std::bind2nd(std::not_equal_to<byte>(), 0));
+	byte *M = std::find_if(representative, salt-1, std::bind2nd(std::not_equal_to<byte>(), byte(0)));
 	recoverableMessageLength = salt-M-1;
-	if (*M == 0x01 
-		&& (size_t)(M - representative - (representativeBitLength % 8 != 0)) >= MinPadLen(digestSize)
-		&& recoverableMessageLength <= MaxRecoverableLength(representativeBitLength, hashIdentifier.second, digestSize))
+	if (*M == 0x01 &&
+	   (size_t)(M - representative - (representativeBitLength % 8 != 0)) >= MinPadLen(digestSize) &&
+	   recoverableMessageLength <= MaxRecoverableLength(representativeBitLength, hashIdentifier.second, digestSize))
 	{
-		memcpy(recoverableMessage, M+1, recoverableMessageLength);
+		if (recoverableMessage)
+			memcpy(recoverableMessage, M+1, recoverableMessageLength);
 	}
 	else
 	{

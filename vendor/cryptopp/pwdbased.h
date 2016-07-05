@@ -4,9 +4,9 @@
 #define CRYPTOPP_PWDBASED_H
 
 #include "cryptlib.h"
-#include "hmac.h"
 #include "hrtimer.h"
 #include "integer.h"
+#include "hmac.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -56,6 +56,7 @@ public:
 template <class T>
 unsigned int PKCS5_PBKDF1<T>::DeriveKey(byte *derived, size_t derivedLen, byte purpose, const byte *password, size_t passwordLen, const byte *salt, size_t saltLen, unsigned int iterations, double timeInSeconds) const
 {
+	CRYPTOPP_UNUSED(purpose);
 	assert(derivedLen <= MaxDerivedKeyLength());
 	assert(iterations > 0 || timeInSeconds > 0);
 
@@ -85,6 +86,7 @@ unsigned int PKCS5_PBKDF1<T>::DeriveKey(byte *derived, size_t derivedLen, byte p
 template <class T>
 unsigned int PKCS5_PBKDF2_HMAC<T>::DeriveKey(byte *derived, size_t derivedLen, byte purpose, const byte *password, size_t passwordLen, const byte *salt, size_t saltLen, unsigned int iterations, double timeInSeconds) const
 {
+	CRYPTOPP_UNUSED(purpose);
 	assert(derivedLen <= MaxDerivedKeyLength());
 	assert(iterations > 0 || timeInSeconds > 0);
 
@@ -107,8 +109,13 @@ unsigned int PKCS5_PBKDF2_HMAC<T>::DeriveKey(byte *derived, size_t derivedLen, b
 		}
 		hmac.Final(buffer);
 
-		size_t segmentLen = STDMIN(derivedLen, buffer.size());
+#if CRYPTOPP_MSC_VERSION
+		const size_t segmentLen = STDMIN(derivedLen, buffer.size());
+		memcpy_s(derived, segmentLen, buffer, segmentLen);
+#else
+		const size_t segmentLen = STDMIN(derivedLen, buffer.size());
 		memcpy(derived, buffer, segmentLen);
+#endif
 
 		if (timeInSeconds)
 		{
@@ -200,8 +207,14 @@ unsigned int PKCS12_PBKDF<T>::DeriveKey(byte *derived, size_t derivedLen, byte p
 		for (i=0; i<ILen; i+=v)
 			(Integer(I+i, v) + B1).Encode(I+i, v);
 
-		size_t segmentLen = STDMIN(derivedLen, Ai.size());
-		memcpy(derived, Ai, segmentLen);
+#if CRYPTOPP_MSC_VERSION
+		const size_t segmentLen = STDMIN(derivedLen, Ai.size());
+		memcpy_s(derived, segmentLen, Ai, segmentLen);
+#else
+		const size_t segmentLen = STDMIN(derivedLen, Ai.size());
+		std::memcpy(derived, Ai, segmentLen);
+#endif
+
 		derived += segmentLen;
 		derivedLen -= segmentLen;
 	}

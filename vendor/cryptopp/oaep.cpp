@@ -5,7 +5,8 @@
 #ifndef CRYPTOPP_IMPORTS
 
 #include "oaep.h"
-#include <functional>
+#include "stdcpp.h"
+#include "smartptr.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -28,7 +29,7 @@ void OAEP_Base::Pad(RandomNumberGenerator &rng, const byte *input, size_t inputL
 	}
 	oaepBlockLen /= 8;
 
-	std::auto_ptr<HashTransformation> pHash(NewHash());
+	member_ptr<HashTransformation> pHash(NewHash());
 	const size_t hLen = pHash->DigestSize();
 	const size_t seedLen = hLen, dbLen = oaepBlockLen-seedLen;
 	byte *const maskedSeed = oaepBlock;
@@ -44,7 +45,7 @@ void OAEP_Base::Pad(RandomNumberGenerator &rng, const byte *input, size_t inputL
 	memcpy(maskedDB+dbLen-inputLength, input, inputLength);
 
 	rng.GenerateBlock(maskedSeed, seedLen);
-	std::auto_ptr<MaskGeneratingFunction> pMGF(NewMGF());
+	member_ptr<MaskGeneratingFunction> pMGF(NewMGF());
 	pMGF->GenerateAndMask(*pHash, maskedDB, dbLen, maskedSeed, seedLen);
 	pMGF->GenerateAndMask(*pHash, maskedSeed, seedLen, maskedDB, dbLen);
 }
@@ -61,7 +62,7 @@ DecodingResult OAEP_Base::Unpad(const byte *oaepBlock, size_t oaepBlockLen, byte
 	}
 	oaepBlockLen /= 8;
 
-	std::auto_ptr<HashTransformation> pHash(NewHash());
+	member_ptr<HashTransformation> pHash(NewHash());
 	const size_t hLen = pHash->DigestSize();
 	const size_t seedLen = hLen, dbLen = oaepBlockLen-seedLen;
 
@@ -71,7 +72,7 @@ DecodingResult OAEP_Base::Unpad(const byte *oaepBlock, size_t oaepBlockLen, byte
 	byte *const maskedSeed = t;
 	byte *const maskedDB = t+seedLen;
 
-	std::auto_ptr<MaskGeneratingFunction> pMGF(NewMGF());
+	member_ptr<MaskGeneratingFunction> pMGF(NewMGF());
 	pMGF->GenerateAndMask(*pHash, maskedSeed, seedLen, maskedDB, dbLen);
 	pMGF->GenerateAndMask(*pHash, maskedDB, dbLen, maskedSeed, seedLen);
 
@@ -81,7 +82,7 @@ DecodingResult OAEP_Base::Unpad(const byte *oaepBlock, size_t oaepBlockLen, byte
 	// DB = pHash' || 00 ... || 01 || M
 	byte *M = std::find(maskedDB+hLen, maskedDB+dbLen, 0x01);
 	invalid = (M == maskedDB+dbLen) || invalid;
-	invalid = (std::find_if(maskedDB+hLen, M, std::bind2nd(std::not_equal_to<byte>(), 0)) != M) || invalid;
+	invalid = (std::find_if(maskedDB+hLen, M, std::bind2nd(std::not_equal_to<byte>(), byte(0))) != M) || invalid;
 	invalid = !pHash->VerifyDigest(maskedDB, encodingParameters.begin(), encodingParameters.size()) || invalid;
 
 	if (invalid)

@@ -1,9 +1,12 @@
 // xtrcrypt.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+
+#include "asn.h"
+#include "integer.h"
 #include "xtrcrypt.h"
 #include "nbtheory.h"
-#include "asn.h"
+#include "modarith.h"
 #include "argnames.h"
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -82,6 +85,7 @@ void XTR_DH::GeneratePrivateKey(RandomNumberGenerator &rng, byte *privateKey) co
 
 void XTR_DH::GeneratePublicKey(RandomNumberGenerator &rng, const byte *privateKey, byte *publicKey) const
 {
+	CRYPTOPP_UNUSED(rng);
 	Integer x(privateKey, PrivateKeyLength());
 	GFP2Element y = XTR_Exponentiate(m_g, x, m_p);
 	y.Encode(publicKey, PublicKeyLength());

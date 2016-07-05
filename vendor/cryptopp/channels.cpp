@@ -4,6 +4,7 @@
 
 #ifndef CRYPTOPP_IMPORTS
 
+#include "cryptlib.h"
 #include "channels.h"
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -167,8 +168,9 @@ WasBlocked:
 	return 0;
 }
 
-void ChannelSwitch::IsolatedInitialize(const NameValuePairs &parameters/* =g_nullNameValuePairs */)
+void ChannelSwitch::IsolatedInitialize(const NameValuePairs& parameters)
 {
+	CRYPTOPP_UNUSED(parameters);
 	m_routeMap.clear();
 	m_defaultRoutes.clear();
 	m_blocked = false;
@@ -201,6 +203,7 @@ bool ChannelSwitch::ChannelFlush(const std::string &channel, bool completeFlush,
 
 bool ChannelSwitch::ChannelMessageSeriesEnd(const std::string &channel, int propagation, bool blocking)
 {
+	CRYPTOPP_UNUSED(blocking);
 	if (m_blocked)
 	{
 		m_blocked = false;
@@ -230,10 +233,10 @@ byte * ChannelSwitch::ChannelCreatePutSpace(const std::string &channel, size_t &
 	if (!m_it.End())
 	{
 		BufferedTransformation &target = m_it.Destination();
-		const std::string &channel = m_it.Channel();
+		const std::string &ch = m_it.Channel();
 		m_it.Next();
 		if (m_it.End())	// there is only one target channel
-			return target.ChannelCreatePutSpace(channel, size);
+			return target.ChannelCreatePutSpace(ch, size);
 	}
 	size = 0;
 	return NULL;

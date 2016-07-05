@@ -1,21 +1,29 @@
 // bench.cpp - written and placed in the public domain by Wei Dai
 
-#define _CRT_SECURE_NO_DEPRECATE
-
+#include "cryptlib.h"
 #include "bench.h"
 #include "validate.h"
+
 #include "aes.h"
 #include "blumshub.h"
 #include "files.h"
+#include "filters.h"
 #include "hex.h"
 #include "modes.h"
 #include "factory.h"
+#include "smartptr.h"
 #include "cpu.h"
 
 #include <time.h>
 #include <math.h>
 #include <iostream>
+#include <sstream>
 #include <iomanip>
+
+// These are noisy enoguh due to test.cpp. Turn them off here.
+#if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 USING_NAMESPACE(CryptoPP)
 USING_NAMESPACE(std)
@@ -28,46 +36,72 @@ const double CLOCK_TICKS_PER_SECOND = (double)CLK_TCK;
 const double CLOCK_TICKS_PER_SECOND = 1000000.0;
 #endif
 
-double logtotal = 0, g_allocatedTime, g_hertz;
+double logtotal = 0.0, g_allocatedTime = 0, g_hertz = 0;
 unsigned int logcount = 0;
 
-static const byte *const key=(byte *)"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+static const byte defaultKey[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
 void OutputResultBytes(const char *name, double length, double timeTaken)
 {
+	// Coverity finding (http://stackoverflow.com/a/30968371 does not squash the finding)
+	std::ostringstream out;
+	out.copyfmt(cout);
+	
+	// Coverity finding
+	if (length < 0.0000000001f) length = 0.000001f;
+	if (timeTaken < 0.0000000001f) timeTaken = 0.000001f;
+
 	double mbs = length / timeTaken / (1024*1024);
-	cout << "\n<TR><TH>" << name;
-//	cout << "<TD>" << setprecision(3) << length / (1024*1024);
-	cout << setiosflags(ios::fixed);
-//	cout << "<TD>" << setprecision(3) << timeTaken;
-	cout << "<TD>" << setprecision(0) << setiosflags(ios::fixed) << mbs;
+	out << "\n<TR><TH>" << name;
+//	out << "<TD>" << setprecision(3) << length / (1024*1024);
+	out << setiosflags(ios::fixed);
+//	out << "<TD>" << setprecision(3) << timeTaken;
+	out << "<TD>" << setprecision(0) << setiosflags(ios::fixed) << mbs;
 	if (g_hertz)
-		cout << "<TD>" << setprecision(1) << setiosflags(ios::fixed) << timeTaken * g_hertz / length;
-	cout << resetiosflags(ios::fixed);
+		out << "<TD>" << setprecision(1) << setiosflags(ios::fixed) << timeTaken * g_hertz / length;
 	logtotal += log(mbs);
 	logcount++;
+	
+	cout << out.str(); 
 }
 
 void OutputResultKeying(double iterations, double timeTaken)
 {
-	cout << "<TD>" << setprecision(3) << setiosflags(ios::fixed) << (1000*1000*timeTaken/iterations);
+	// Coverity finding (http://stackoverflow.com/a/30968371 does not squash the finding)
+	std::ostringstream out;
+	out.copyfmt(cout);
+	
+	// Coverity finding
+	if (iterations < 0.0000000001f) iterations = 0.000001f;
+	if (timeTaken < 0.0000000001f) timeTaken = 0.000001f;
+
+	out << "<TD>" << setprecision(3) << setiosflags(ios::fixed) << (1000*1000*timeTaken/iterations);
 	if (g_hertz)
-		cout << "<TD>" << setprecision(0) << setiosflags(ios::fixed) << timeTaken * g_hertz / iterations;
+		out << "<TD>" << setprecision(0) << setiosflags(ios::fixed) << timeTaken * g_hertz / iterations;
+	
+	cout << out.str(); 
 }
 
 void OutputResultOperations(const char *name, const char *operation, bool pc, unsigned long iterations, double timeTaken)
 {
-	cout << "\n<TR><TH>" << name << " " << operation << (pc ? " with precomputation" : "");
-//	cout << "<TD>" << iterations;
-//	cout << setiosflags(ios::fixed);
-//	cout << "<TD>" << setprecision(3) << timeTaken;
-	cout << "<TD>" << setprecision(2) << setiosflags(ios::fixed) << (1000*timeTaken/iterations);
+	// Coverity finding (http://stackoverflow.com/a/30968371 does not squash the finding)
+	std::ostringstream out;
+	out.copyfmt(cout);
+	
+	// Coverity finding
+	if (!iterations) iterations++;
+	if (timeTaken < 0.0000000001f) timeTaken = 0.000001f;
+
+	out << "\n<TR><TH>" << name << " " << operation << (pc ? " with precomputation" : "");
+	out << "<TD>" << setprecision(2) << setiosflags(ios::fixed) << (1000*timeTaken/iterations);
 	if (g_hertz)
-		cout << "<TD>" << setprecision(2) << setiosflags(ios::fixed) << timeTaken * g_hertz / iterations / 1000000;
-	cout << resetiosflags(ios::fixed);
+		out << "<TD>" << setprecision(2) << setiosflags(ios::fixed) << timeTaken * g_hertz / iterations / 1000000;
 
 	logtotal += log(iterations/timeTaken);
 	logcount++;
+	
+	cout << out.str(); 
 }
 
 /*
@@ -172,7 +206,7 @@ void BenchMarkKeying(SimpleKeyingInterface &c, size_t keyLength, const NameValue
 	do
 	{
 		for (unsigned int i=0; i<1024; i++)
-			c.SetKey(key, keyLength, params);
+			c.SetKey(defaultKey, keyLength, params);
 		timeTaken = double(clock() - start) / CLOCK_TICKS_PER_SECOND;
 		iterations += 1024;
 	}
@@ -186,35 +220,43 @@ void BenchMarkKeying(SimpleKeyingInterface &c, size_t keyLength, const NameValue
 template <class T_FactoryOutput, class T_Interface>
 void BenchMarkByName2(const char *factoryName, size_t keyLength = 0, const char *displayName=NULL, const NameValuePairs &params = g_nullNameValuePairs, T_FactoryOutput *x=NULL, T_Interface *y=NULL)
 {
-	std::string name = factoryName;
+	CRYPTOPP_UNUSED(x), CRYPTOPP_UNUSED(y), CRYPTOPP_UNUSED(params);
+
+	std::string name(factoryName ? factoryName : "");
+	member_ptr<T_FactoryOutput> obj(ObjectFactoryRegistry<T_FactoryOutput>::Registry().CreateObject(name.c_str()));
+	
+	if (!keyLength)
+		keyLength = obj->DefaultKeyLength();
+
 	if (displayName)
 		name = displayName;
 	else if (keyLength)
 		name += " (" + IntToString(keyLength * 8) + "-bit key)";
 
-	std::auto_ptr<T_FactoryOutput> obj(ObjectFactoryRegistry<T_FactoryOutput>::Registry().CreateObject(factoryName));
-	if (!keyLength)
-		keyLength = obj->DefaultKeyLength();
-	obj->SetKey(key, keyLength, CombinedNameValuePairs(params, MakeParameters(Name::IV(), ConstByteArrayParameter(key, obj->IVSize()), false)));
+	obj->SetKey(defaultKey, keyLength, CombinedNameValuePairs(params, MakeParameters(Name::IV(), ConstByteArrayParameter(defaultKey, obj->IVSize()), false)));
 	BenchMark(name.c_str(), *static_cast<T_Interface *>(obj.get()), g_allocatedTime);
-	BenchMarkKeying(*obj, keyLength, CombinedNameValuePairs(params, MakeParameters(Name::IV(), ConstByteArrayParameter(key, obj->IVSize()), false)));
+	BenchMarkKeying(*obj, keyLength, CombinedNameValuePairs(params, MakeParameters(Name::IV(), ConstByteArrayParameter(defaultKey, obj->IVSize()), false)));
 }
 
 //VC60 workaround: compiler bug triggered without the extra dummy parameters
 template <class T_FactoryOutput>
 void BenchMarkByName(const char *factoryName, size_t keyLength = 0, const char *displayName=NULL, const NameValuePairs &params = g_nullNameValuePairs, T_FactoryOutput *x=NULL)
 {
+	CRYPTOPP_UNUSED(x), CRYPTOPP_UNUSED(params);
+
 	BenchMarkByName2<T_FactoryOutput, T_FactoryOutput>(factoryName, keyLength, displayName, params, x, x);
 }
 
 template <class T>
 void BenchMarkByNameKeyLess(const char *factoryName, const char *displayName=NULL, const NameValuePairs &params = g_nullNameValuePairs, T *x=NULL)
 {
+	CRYPTOPP_UNUSED(x), CRYPTOPP_UNUSED(params);
+
 	std::string name = factoryName;
 	if (displayName)
 		name = displayName;
 
-	std::auto_ptr<T> obj(ObjectFactoryRegistry<T>::Registry().CreateObject(factoryName));
+	member_ptr<T> obj(ObjectFactoryRegistry<T>::Registry().CreateObject(factoryName));
 	BenchMark(name.c_str(), *obj, g_allocatedTime);
 }
 
@@ -334,10 +376,24 @@ void BenchmarkAll(double t, double hertz)
 	cout << "</TABLE>" << endl;
 
 	BenchmarkAll2(t, hertz);
+	cout << "Throughput Geometric Average: " << setiosflags(ios::fixed) << exp(logtotal/(logcount ? logcount : 1)) << endl;
 
-	cout << "Throughput Geometric Average: " << setiosflags(ios::fixed) << exp(logtotal/logcount) << endl;
+// Safer functions on Windows for C&A, https://github.com/weidai11/cryptopp/issues/55
+#if (CRYPTOPP_MSC_VERSION >= 1400)
+	tm localTime = {};
+	char timeBuf[64];
+	errno_t err;
 
-	time_t endTime = time(NULL);
+	const time_t endTime = time(NULL);
+	err = localtime_s(&localTime, &endTime);
+	assert(err == 0);
+	err = asctime_s(timeBuf, sizeof(timeBuf), &localTime);
+	assert(err == 0);
+
+	cout << "\nTest ended at " << timeBuf;
+#else
+	const time_t endTime = time(NULL);
 	cout << "\nTest ended at " << asctime(localtime(&endTime));
+#endif
 #endif
 }

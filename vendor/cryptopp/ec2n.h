@@ -1,7 +1,16 @@
+// ec2n.h - written and placed in the public domain by Wei Dai
+
+//! \file
+//! \headerfile ec2n.h
+//! \brief Classes for Elliptic Curves over binary fields
+
+
 #ifndef CRYPTOPP_EC2N_H
 #define CRYPTOPP_EC2N_H
 
+#include "cryptlib.h"
 #include "gf2n.h"
+#include "integer.h"
 #include "eprecomp.h"
 #include "smartptr.h"
 #include "pubkey.h"
@@ -19,6 +28,10 @@ struct CRYPTOPP_DLL EC2NPoint
 		{return (identity && t.identity) || (!identity && !t.identity && x==t.x && y==t.y);}
 	bool operator< (const EC2NPoint &t) const
 		{return identity ? !t.identity : (!t.identity && (x<t.x || (x==t.x && y<t.y)));}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~EC2NPoint() {}
+#endif
 
 	bool identity;
 	PolynomialMod2 x, y;
@@ -77,6 +90,10 @@ public:
 
 	bool operator==(const EC2N &rhs) const
 		{return GetField() == rhs.GetField() && m_a == rhs.m_a && m_b == rhs.m_b;}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~EC2N() {}
+#endif
 
 private:
 	clonable_ptr<Field> m_field;
@@ -103,6 +120,10 @@ public:
 	// non-inherited
 	void SetCurve(const EC2N &ec) {m_ec = ec;}
 	const EC2N & GetCurve() const {return m_ec;}
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~EcPrecomputation() {}
+#endif
 
 private:
 	EC2N m_ec;

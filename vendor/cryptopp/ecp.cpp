@@ -6,8 +6,10 @@
 
 #include "ecp.h"
 #include "asn.h"
+#include "integer.h"
 #include "nbtheory.h"
-
+#include "modarith.h"
+#include "filters.h"
 #include "algebra.cpp"
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -299,6 +301,7 @@ public:
 	ProjectiveDoubling(const ModularArithmetic &mr, const Integer &m_a, const Integer &m_b, const ECPPoint &Q)
 		: mr(mr), firstDoubling(true), negated(false)
 	{
+		CRYPTOPP_UNUSED(m_b);
 		if (Q.identity)
 		{
 			sixteenY4 = P.x = P.y = mr.MultiplicativeIdentity();

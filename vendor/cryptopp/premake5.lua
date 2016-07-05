@@ -143,6 +143,4 @@ project "cryptopp"
 		"x64masm.asm"
 	}
 	
-	filter { "system:windows", "architecture:x86" }
-		links { "../../vendor/mysql/lib/x86/libmysql.lib" }
 	

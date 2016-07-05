@@ -1,11 +1,14 @@
+// tea.h - written and placed in the public domain by Wei Dai
+
+//! \file tea.h
+//! \brief Classes for the TEA, BTEA and XTEA block ciphers
+
 #ifndef CRYPTOPP_TEA_H
 #define CRYPTOPP_TEA_H
 
-/** \file
-*/
-
 #include "seckey.h"
 #include "secblock.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -99,6 +102,7 @@ class BTEA : public BTEA_Info, public BlockCipherDocumentation
 	public:
 		void UncheckedSetKey(const byte *key, unsigned int length, const NameValuePairs &params)
 		{
+			CRYPTOPP_UNUSED(length), CRYPTOPP_UNUSED(params);
 			m_blockSize = params.GetIntValueWithDefault("BlockSize", 60*4);
 			GetUserKey(BIG_ENDIAN_ORDER, m_k.begin(), 4, key, KEYLENGTH);
 		}
