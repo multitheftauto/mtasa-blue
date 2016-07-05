@@ -115,3 +115,7 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
+
+#define HAVE_STRDUP 1
+
+#define HAVE_SNPRINTF 1
