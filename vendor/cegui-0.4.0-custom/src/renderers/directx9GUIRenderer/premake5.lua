@@ -24,3 +24,5 @@ project "DirectX9GUIRenderer"
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
+	filter "system:not windows"
+        flags { "ExcludeFromBuild" }
