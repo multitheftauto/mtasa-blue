@@ -5,7 +5,7 @@ project "zlib"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources/*"] = "*.cpp",
+		["Sources/*"] = "*.c",
 		["*"] = "premake5.lua"
 	}
 	
@@ -13,5 +13,9 @@ project "zlib"
 		"premake5.lua",
 		"*.h",
 		"*.c"
+	}
+
+	excludes {
+		"example.c"
 	}
 	
