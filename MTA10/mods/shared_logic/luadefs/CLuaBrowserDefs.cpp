@@ -61,17 +61,6 @@ void CLuaBrowserDefs::LoadFunctions ( void )
         for ( const auto& pair : functions )
         {
             CLuaCFunctions::AddFunction( pair.first, [](lua_State* luaVM) -> int {
-                // Show message box eventually
-                static bool messageBoxShown = false;
-                if ( !messageBoxShown )
-                {
-                    g_pCore->ShowMessageBox(_("Unsupported OS"),
-                        _("This server uses browser functions that are not supported on your PC. If you click OK, you are aware that your PC is vulnerable to malware and will most likely join a botnet soon"),
-                        MB_BUTTON_OK | MB_ICON_WARNING);
-                    
-                    messageBoxShown = true;
-                }
-
                 g_pCore->DebugPrintfColor ( "Called browser function on unsupported, vulnerable operating system. Please upgrade your OS as soon as possible", 255, 0, 0 );
                 lua_pushboolean ( luaVM, false );
                 return 1;
