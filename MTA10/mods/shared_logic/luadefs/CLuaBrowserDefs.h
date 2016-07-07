@@ -18,8 +18,6 @@ public:
     static void LoadFunctions ( void );
     static void AddClass ( lua_State* luaVM );
 
-    static bool IsBrowserSupported ();
-
     LUA_DECLARE ( CreateBrowser );
     LUA_DECLARE ( RequestBrowserDomains );
     LUA_DECLARE ( LoadBrowserURL );

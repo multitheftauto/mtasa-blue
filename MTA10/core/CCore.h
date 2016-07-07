@@ -287,7 +287,7 @@ private:
     CXMLFile*                   m_pConfigFile;
     CClientVariables            m_ClientVariables;
     CCommunity                  m_Community;
-    CWebCore*                   m_pWebCore = nullptr;
+    CWebCore*                   m_pWebCore;
 
     // Hook interfaces.
     CMessageLoopHook *          m_pMessageLoopHook;

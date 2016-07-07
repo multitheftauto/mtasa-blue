@@ -129,6 +129,7 @@ CCore::CCore ( void )
     m_pGraphics                 = new CGraphics ( m_pLocalGUI );
     g_pGraphics                 = m_pGraphics;
     m_pGUI                      = NULL;
+    m_pWebCore                  = NULL;
 
     // Create the mod manager
     m_pModManager               = new CModManager;
@@ -225,7 +226,7 @@ CCore::~CCore ( void )
     delete m_pGraphics;
 
     // Delete the web
-    SAFE_DELETE ( m_pWebCore );
+    delete m_pWebCore;
 
     // Delete lazy subsystems
     DestroyGUI ();
@@ -1151,8 +1152,7 @@ void CCore::DestroyNetwork ( )
 void CCore::InitialiseWeb ()
 {
     // Don't initialise webcore twice
-    // Also disable webbrowser stuff if this PC still uses deprecated, vulnerable software e.g. XP
-    if ( m_pWebCore || !IsWindows7OrGreater() )
+    if ( m_pWebCore )
         return;
 
     // Ensure DllDirectory has not been changed
@@ -1367,8 +1367,7 @@ void CCore::OnModUnload ( )
     m_uiClientScriptFrameRateLimit = 0;
 
     // Clear web whitelist
-    if ( m_pWebCore )
-        m_pWebCore->ResetFilter ();
+    m_pWebCore->ResetFilter ();
 }
 
 
