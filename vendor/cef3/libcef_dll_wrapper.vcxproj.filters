@@ -1984,18 +1984,6 @@
     <Filter Include="libcef_dll\ctocpp">
       <UniqueIdentifier>{DB43CDD1-2824-1B32-3992-B9BA77D7F6A1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\capi\views">
-      <UniqueIdentifier>{66384c17-c836-4405-802f-b1507907694c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\views">
-      <UniqueIdentifier>{39ee8270-42bd-468c-8278-4a5667b9989e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libcef_dll\ctocpp\views">
-      <UniqueIdentifier>{eec6dc61-ad85-494d-9b8a-4972ccb2124e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libcef_dll\cpptoc\views">
-      <UniqueIdentifier>{8a58ad44-e00f-44d8-abed-d0798e5b6fa8}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\base\cef_atomic_ref_count.h">
@@ -2095,6 +2083,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\cef_pack_strings.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cef_runnable.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\cef_version.h">
@@ -3045,6 +3036,7 @@
     <ClInclude Include="libcef_dll\ctocpp\zip_reader_ctocpp.h">
       <Filter>libcef_dll\ctocpp</Filter>
     </ClInclude>
+    <None Include="cefclient.gyp" />
     <ClInclude Include="include\cef_find_handler.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -3117,207 +3109,6 @@
     <ClInclude Include="libcef_dll\cpptoc\resolve_callback_cpptoc.h">
       <Filter>libcef_dll\cpptoc</Filter>
     </ClInclude>
-    <ClInclude Include="include\capi\cef_image_capi.h">
-      <Filter>include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\cef_menu_model_delegate_capi.h">
-      <Filter>include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_display_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_fill_layout_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_label_button_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_layout_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_menu_button_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_menu_button_delegate_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_panel_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_panel_delegate_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_scroll_view_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_textfield_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_textfield_delegate_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_view_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_view_delegate_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_window_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_window_delegate_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_box_layout_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_browser_view_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_browser_view_delegate_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_button_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\capi\views\cef_button_delegate_capi.h">
-      <Filter>include\capi\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\cef_menu_model_delegate.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\cef_image.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_button_delegate.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_display.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_fill_layout.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_label_button.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_layout.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_menu_button.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_menu_button_delegate.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_panel.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_panel_delegate.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_scroll_view.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_textfield.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_textfield_delegate.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_view.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_view_delegate.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_window.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_window_delegate.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_box_layout.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_browser_view.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_browser_view_delegate.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="include\views\cef_button.h">
-      <Filter>include\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\download_image_callback_cpptoc.h">
-      <Filter>libcef_dll\cpptoc</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\menu_model_delegate_cpptoc.h">
-      <Filter>libcef_dll\cpptoc</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\image_ctocpp.h">
-      <Filter>libcef_dll\ctocpp</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\box_layout_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\browser_view_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\button_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\display_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\fill_layout_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\label_button_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\layout_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\menu_button_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\panel_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\scroll_view_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\textfield_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\view_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\ctocpp\views\window_ctocpp.h">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\views\button_delegate_cpptoc.h">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\views\menu_button_delegate_cpptoc.h">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\views\panel_delegate_cpptoc.h">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\views\textfield_delegate_cpptoc.h">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\views\view_delegate_cpptoc.h">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\views\window_delegate_cpptoc.h">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClInclude>
-    <ClInclude Include="libcef_dll\cpptoc\views\browser_view_delegate_cpptoc.h">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libcef_dll\cpptoc\find_handler_cpptoc.cc">
@@ -3364,75 +3155,6 @@
     </ClCompile>
     <ClCompile Include="libcef_dll\cpptoc\resolve_callback_cpptoc.cc">
       <Filter>libcef_dll\cpptoc</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\menu_model_delegate_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\download_image_callback_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\image_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\box_layout_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\browser_view_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\button_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\display_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\fill_layout_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\label_button_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\layout_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\menu_button_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\panel_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\scroll_view_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\textfield_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\view_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\ctocpp\views\window_ctocpp.cc">
-      <Filter>libcef_dll\ctocpp\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\views\menu_button_delegate_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\views\panel_delegate_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\views\textfield_delegate_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\views\view_delegate_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\views\window_delegate_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\views\browser_view_delegate_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc\views</Filter>
-    </ClCompile>
-    <ClCompile Include="libcef_dll\cpptoc\views\button_delegate_cpptoc.cc">
-      <Filter>libcef_dll\cpptoc\views</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -39,7 +39,6 @@
 #pragma once
 
 #include "include/capi/cef_base_capi.h"
-#include "include/capi/cef_menu_model_delegate_capi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -380,13 +379,6 @@ typedef struct _cef_menu_model_t {
       int index, int* key_code, int* shift_pressed, int* ctrl_pressed,
       int* alt_pressed);
 } cef_menu_model_t;
-
-
-///
-// Create a new MenuModel with the specified |delegate|.
-///
-CEF_EXPORT cef_menu_model_t* cef_menu_model_create(
-    struct _cef_menu_model_delegate_t* delegate);
 
 
 #ifdef __cplusplus

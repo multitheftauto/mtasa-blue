@@ -71,8 +71,7 @@ class CefResourceHandler : public virtual CefBase {
   // false or the specified number of bytes have been read. Use the |response|
   // object to set the mime type, http status code and other optional header
   // values. To redirect the request to a new URL set |redirectUrl| to the new
-  // URL. If an error occured while setting up the request you can call
-  // SetError() on |response| to indicate the error condition.
+  // URL.
   ///
   /*--cef()--*/
   virtual void GetResponseHeaders(CefRefPtr<CefResponse> response,

@@ -31,8 +31,6 @@ class CefResponseCToCpp
 
   // CefResponse methods.
   bool IsReadOnly() OVERRIDE;
-  cef_errorcode_t GetError() OVERRIDE;
-  void SetError(cef_errorcode_t error) OVERRIDE;
   int GetStatus() OVERRIDE;
   void SetStatus(int status) OVERRIDE;
   CefString GetStatusText() OVERRIDE;

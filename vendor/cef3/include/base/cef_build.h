@@ -32,10 +32,10 @@
 #define CEF_INCLUDE_BASE_CEF_BUILD_H_
 #pragma once
 
-#if defined(USING_CHROMIUM_INCLUDES)
+#if defined(BUILDING_CEF_SHARED)
 // When building CEF include the Chromium header directly.
 #include "base/compiler_specific.h"
-#else  // !USING_CHROMIUM_INCLUDES
+#else  // !BUILDING_CEF_SHARED
 // The following is substantially similar to the Chromium implementation.
 // If the Chromium implementation diverges the below implementation should be
 // updated to match.
@@ -165,7 +165,7 @@
 #define ALLOW_UNUSED_LOCAL(x) false ? (void)x : (void)0
 #endif
 
-#endif  // !USING_CHROMIUM_INCLUDES
+#endif  // !BUILDING_CEF_SHARED
 
 // Annotate a virtual method indicating it must be overriding a virtual method
 // in the parent class.

@@ -23,13 +23,9 @@ namespace logging {
 namespace {
 
 #if defined(OS_POSIX)
-// From base/posix/safe_strerror.cc
+// From base/safe_strerror_posix.cc.
 
-#if defined(__GLIBC__) || defined(OS_NACL)
-#define USE_HISTORICAL_STRERRO_R 1
-#else
-#define USE_HISTORICAL_STRERRO_R 0
-#endif
+#define USE_HISTORICAL_STRERRO_R (defined(__GLIBC__) || defined(OS_NACL))
 
 #if USE_HISTORICAL_STRERRO_R && defined(__GNUC__)
 // GCC will complain about the unused second wrap function unless we tell it
