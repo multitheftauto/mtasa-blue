@@ -21,7 +21,6 @@ public:
     static bool IsBrowserSupported ();
 
     LUA_DECLARE ( CreateBrowser );
-    LUA_DECLARE ( IsBrowserSupported );
     LUA_DECLARE ( RequestBrowserDomains );
     LUA_DECLARE ( LoadBrowserURL );
     LUA_DECLARE ( IsBrowserLoading );
