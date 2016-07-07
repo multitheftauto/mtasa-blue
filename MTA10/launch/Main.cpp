@@ -16,11 +16,11 @@
     IMPORTANT
 
     If this project changes, a new release build should be copied into
-    the launch/output diectory.
+    the Shared\data\launchers directory.
 
-    The .exe in launch/output will be used by the installer and updater.
+    The .exe in Shared\data\launchers will be used by the installer and updater.
 
-    (set flag.newexe on the build server to generate new exe)
+    (set flag.new_client_exe on the build server to generate new exe)
 */
 
 ///////////////////////////////////////////////////////////////
@@ -69,17 +69,9 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         SString strMessage ( "Failed to load: '%s'\n\n%s", *strLoaderDllPathFilename, *strError );
         AddReportLog ( 5711, strMessage );
 
-        // Check if runtime is loadable
-        HMODULE hModule = LoadLibrary ( MSVCR_DLL );
-        if ( hModule )
-        {
-            BrowseToSolution ( "loader-dll-missing", ASK_GO_ONLINE, strMessage );
-            FreeLibrary ( hModule );
-        }
-        else
-        {
-            BrowseToSolution ( "launch-" MSVCR_DLL "-missing", ASK_GO_ONLINE, "Redistributable Packages for Visual Studio are not installed" );     
-        }
+        // Error could be due to missing VC Redist.
+        // Online help page will have VC Redist download link.
+        BrowseToSolution ( "loader-dll-not-loadable", ASK_GO_ONLINE, strMessage );
     }
 
     return iReturnCode;

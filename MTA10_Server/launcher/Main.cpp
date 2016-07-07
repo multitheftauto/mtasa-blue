@@ -14,11 +14,11 @@
     IMPORTANT (Windows only)
 
     If this project changes, a new release build should be copied into
-    the launcher/output diectory.
+    the Shared\data\launchers directory.
 
-    The 'MTA Server.exe' in launcher/output will be used by the installer and updater.
+    The .exe in Shared\data\launchers will be used by the installer and updater.
 
-    (set flag.new_server_exe on the build server to generate a new 'MTA Server.exe')
+    (set flag.new_server_exe on the build server to generate new exe)
 */
 
 #include "CDynamicLibrary.h"
@@ -172,7 +172,7 @@ int main ( int argc, char* argv [] )
         printf ( "ERROR: Could not load %s\n", LIB_CORE );
         printf ( "* Check installed data files.\n" );
 #ifdef WIN32
-        printf ( "* Check installed Microsoft Visual C++ 2013 Redistributable Package (x86).\n" );
+        printf ( "* Check installed Microsoft Visual C++ Redistributable Package (x86).\n" );
 #endif
     }
 
