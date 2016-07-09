@@ -1189,7 +1189,7 @@ FunctionEnd
 ;====================================================================================
 ; Download and install Microsoft Visual Studio 2015 redistributable
 ;====================================================================================
-!define VC14_REDIST_VER    "14.0.23918"     ; Version number of update 2
+!define VC14_REDIST_VER    "14.0.24210"     ; Version number of update 3
 Var REDISTVC14
 
 LangString MSGBOX_VC14RED_ERROR1 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2015 redistributable"
@@ -1201,7 +1201,7 @@ Function InstallVC14Redistributable
     ${LogText} "Function begin - InstallVC14Redistributable"
     DetailPrint "Installing Microsoft Visual Studio 2015 redistributable ..."
     StrCpy $REDISTVC14 "$TEMP\vcredist14_x86.exe"
-    NSISdl::download "http://download.microsoft.com/download/0/5/0/0504B211-6090-48B1-8DEE-3FF879C29968/vc_redist.x86.exe" $REDISTVC14
+    NSISdl::download "http://download.microsoft.com/download/4/2/F/42FF78CE-8DE0-4C88-AD7A-5F8DFFB49F74/vc_redist.x86.exe" $REDISTVC14
     Pop $0
 
     ${If} $0 != "success"
