@@ -2031,12 +2031,6 @@ bool VerifyEmbeddedSignature( const SString& strFilename )
     WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
     WinTrustData.pFile = &FileData;
 
-    if ( !IsWindows7OrGreater() )
-    {
-        // Basic check for Vista and down due to incompatibility with current signing methodology
-        WinTrustData.dwProvFlags = WTD_HASH_ONLY_FLAG;
-    }
-
     GUID WVTPolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
     LONG lStatus = WinVerifyTrust( NULL, &WVTPolicyGUID, &WinTrustData );
     return lStatus == ERROR_SUCCESS;
