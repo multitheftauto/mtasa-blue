@@ -295,7 +295,7 @@ SString CheckOnRestartCommand ( void )
             {
                 // If extract failed and update file is an exe, try to run it
                 if ( ExtractExtension ( strFile ).CompareI ( "exe" ) )
-                    ShellExecuteBlocking ( "open", strFile, "-s" );
+                    ShellExecuteBlocking ( "open", strFile, strParameters.SplitRight( "###" ) );
             }
 
             // Stop progress bar
