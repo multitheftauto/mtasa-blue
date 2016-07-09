@@ -12,7 +12,7 @@
 
 #ifdef MTA_DEBUG
     #define ELEMENT_REF_DEBUG( ptr, desc ) \
-        SString ( "%08x %s", (int)ptr, desc )
+        SString ( "%p %s", (int)ptr, desc )
 #else
     #define ELEMENT_REF_DEBUG( ptr, desc ) \
         NULL
