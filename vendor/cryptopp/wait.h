@@ -1,25 +1,43 @@
+// wait.h - written and placed in the public domain by Wei Dai
+
 #ifndef CRYPTOPP_WAIT_H
 #define CRYPTOPP_WAIT_H
 
 #include "config.h"
 
-#ifdef SOCKETS_AVAILABLE
+#if !defined(NO_OS_DEPENDENCE) && (defined(SOCKETS_AVAILABLE) || defined(WINDOWS_PIPES_AVAILABLE))
 
-#include "misc.h"
 #include "cryptlib.h"
-#include <vector>
+#include "misc.h"
+#include "stdcpp.h"
 
 #ifdef USE_WINDOWS_STYLE_SOCKETS
 #include <winsock2.h>
 #else
 #include <sys/types.h>
-#endif
-
-#if defined(__ANDROID__)
 #include <sys/select.h>
 #endif
 
+// For defintions of VOID, PVOID, HANDLE, PHANDLE, etc.
+#if defined(CRYPTOPP_WIN32_AVAILABLE)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 #include "hrtimer.h"
+
+#if defined(__has_feature)
+# if __has_feature(memory_sanitizer)
+#  define CRYPTOPP_MSAN 1
+# endif
+#endif
+
+// http://connect.microsoft.com/VisualStudio/feedback/details/1581706
+//   and http://github.com/weidai11/cryptopp/issues/214
+#if CRYPTOPP_MSC_VERSION == 1900
+# pragma warning(push)
+# pragma warning(disable: 4589)
+#endif
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -211,6 +229,10 @@ private:
 };
 
 NAMESPACE_END
+
+#if CRYPTOPP_MSC_VERSION == 1900
+# pragma warning(pop)
+#endif
 
 #endif
 

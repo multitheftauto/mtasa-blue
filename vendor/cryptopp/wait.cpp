@@ -7,17 +7,30 @@
 # pragma warning(disable: 4189)
 #endif
 
+#if !defined(NO_OS_DEPENDENCE) && (defined(SOCKETS_AVAILABLE) || defined(WINDOWS_PIPES_AVAILABLE))
+
 #include "wait.h"
 #include "misc.h"
 #include "smartptr.h"
 
-#ifdef SOCKETS_AVAILABLE
+// Windows 8, Windows Server 2012, and Windows Phone 8.1 need <synchapi.h> and <ioapiset.h>
+#if defined(CRYPTOPP_WIN32_AVAILABLE)
+# if ((WINVER >= 0x0602 /*_WIN32_WINNT_WIN8*/) || (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/))
+#  include <synchapi.h>
+#  include <ioapiset.h>
+#  define USE_WINDOWS8_API
+# endif
+#endif
 
 #ifdef USE_BERKELEY_STYLE_SOCKETS
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <unistd.h>
+#endif
+
+#if defined(CRYPTOPP_MSAN)
+# include <sanitizer/msan_interface.h>
 #endif
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -47,6 +60,10 @@ void WaitObjectContainer::Clear()
 	m_maxFd = 0;
 	FD_ZERO(&m_readfds);
 	FD_ZERO(&m_writefds);
+# ifdef CRYPTOPP_MSAN
+	__msan_unpoison(&m_readfds, sizeof(m_readfds));
+	__msan_unpoison(&m_writefds, sizeof(m_writefds));
+# endif	
 #endif
 	m_noWait = false;
 	m_firstEventTime = 0;
@@ -138,8 +155,13 @@ WaitObjectContainer::~WaitObjectContainer()
 			assert(bResult != 0); CRYPTOPP_UNUSED(bResult);
 	
 			// Enterprise Analysis warning
+#if defined(USE_WINDOWS8_API)
+			DWORD dwResult = ::WaitForMultipleObjectsEx((DWORD)m_threads.size(), threadHandles, TRUE, INFINITE, FALSE);
+			assert((dwResult >= WAIT_OBJECT_0) && (dwResult < (DWORD)m_threads.size()));
+#else
 			DWORD dwResult = ::WaitForMultipleObjects((DWORD)m_threads.size(), threadHandles, TRUE, INFINITE);
 			assert((dwResult >= WAIT_OBJECT_0) && (dwResult < (DWORD)m_threads.size()));
+#endif
 
 			for (i=0; i<m_threads.size(); i++)
 			{
@@ -177,8 +199,13 @@ DWORD WINAPI WaitingThread(LPVOID lParam)
 	while (true)
 	{
 		thread.waitingToWait = true;
+#if defined(USE_WINDOWS8_API)
+		DWORD result = ::WaitForSingleObjectEx(thread.startWaiting, INFINITE, FALSE);
+		assert(result != WAIT_FAILED);
+#else
 		DWORD result = ::WaitForSingleObject(thread.startWaiting, INFINITE);
 		assert(result != WAIT_FAILED);
+#endif
 		
 		thread.waitingToWait = false;
 		if (thread.terminate)
@@ -190,8 +217,13 @@ DWORD WINAPI WaitingThread(LPVOID lParam)
 		handles[0] = thread.stopWaiting;
 		std::copy(thread.waitHandles, thread.waitHandles+thread.count, handles.begin()+1);
 
+#if defined(USE_WINDOWS8_API)
+		result = ::WaitForMultipleObjectsEx((DWORD)handles.size(), &handles[0], FALSE, INFINITE, FALSE);
+		assert(result != WAIT_FAILED);
+#else
 		result = ::WaitForMultipleObjects((DWORD)handles.size(), &handles[0], FALSE, INFINITE);
 		assert(result != WAIT_FAILED);
+#endif
 
 		if (result == WAIT_OBJECT_0)
 			continue;	// another thread finished waiting first, so do nothing
@@ -294,8 +326,13 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 		ResetEvent(m_stopWaiting);
 		PulseEvent(m_startWaiting);
 
+#if defined(USE_WINDOWS8_API)
+		DWORD result = ::WaitForSingleObjectEx(m_stopWaiting, milliseconds, FALSE);
+		assert(result != WAIT_FAILED);
+#else
 		DWORD result = ::WaitForSingleObject(m_stopWaiting, milliseconds);
 		assert(result != WAIT_FAILED);
+#endif
 
 		if (result == WAIT_OBJECT_0)
 		{
@@ -320,7 +357,13 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 		static unsigned long lastTime = 0;
 		unsigned long timeBeforeWait = t.ElapsedTime();
 #endif
+#if defined(USE_WINDOWS8_API)
+		DWORD result = ::WaitForMultipleObjectsEx((DWORD)m_handles.size(), &m_handles[0], FALSE, milliseconds, FALSE);
+		assert(result != WAIT_FAILED);
+#else
 		DWORD result = ::WaitForMultipleObjects((DWORD)m_handles.size(), &m_handles[0], FALSE, milliseconds);
+		assert(result != WAIT_FAILED);
+#endif
 #if TRACE_WAIT
 		if (milliseconds > 0)
 		{

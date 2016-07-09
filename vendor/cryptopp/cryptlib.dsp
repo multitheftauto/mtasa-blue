@@ -234,6 +234,10 @@ SOURCE=.\blowfish.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\blake2.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\blumshub.cpp
 # End Source File
 # Begin Source File
@@ -255,6 +259,10 @@ SOURCE=.\cbcmac.cpp
 # Begin Source File
 
 SOURCE=.\ccm.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\chacha.cpp
 # End Source File
 # Begin Source File
 
@@ -729,6 +737,10 @@ SOURCE=.\basecode.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\blake2.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\blowfish.h
 # End Source File
 # Begin Source File
@@ -750,6 +762,10 @@ SOURCE=.\cbcmac.h
 # Begin Source File
 
 SOURCE=.\ccm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\chacha.h
 # End Source File
 # Begin Source File
 

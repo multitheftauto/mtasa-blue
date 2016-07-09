@@ -19,7 +19,12 @@ NAMESPACE_BEGIN(CryptoPP)
 #include <intrin.h>
 #endif
 
-#define VMAC_BOOL_WORD128 (defined(CRYPTOPP_WORD128_AVAILABLE) && !defined(CRYPTOPP_X64_ASM_AVAILABLE))
+#if defined(CRYPTOPP_WORD128_AVAILABLE) && !defined(CRYPTOPP_X64_ASM_AVAILABLE)
+# define VMAC_BOOL_WORD128 1
+#else
+# define VMAC_BOOL_WORD128 0
+#endif
+
 #ifdef __BORLANDC__
 #define const	// Turbo C++ 2006 workaround
 #endif
@@ -82,6 +87,8 @@ void VMAC_Base::UncheckedSetKey(const byte *userKey, unsigned int keylength, con
 	in[0] = 0xE0;
 	in[15] = 0;
 	word64 *l3Key = m_l3Key();
+	assert(IsAlignedOn(l3Key,GetAlignmentOf<word64>()));
+
 	for (i = 0; i <= (size_t)m_is128; i++)
 		do
 		{
@@ -163,10 +170,14 @@ __attribute__ ((noinline))		// Intel Compiler 9.1 workaround
 #endif
 VMAC_Base::VHASH_Update_SSE2(const word64 *data, size_t blocksRemainingInWord64, int tagPart)
 {
+	assert(IsAlignedOn(m_polyState(),GetAlignmentOf<word64>()));
+	assert(IsAlignedOn(m_nhKey(),GetAlignmentOf<word64>()));
+
 	const word64 *nhK = m_nhKey();
-	word64 *polyS = m_polyState();
+	word64 *polyS = (word64*)(void*)m_polyState();
 	word32 L1KeyLength = m_L1KeyLength;
 
+	// These are used in the ASM, but some analysis engines cnnot determine it.
 	CRYPTOPP_UNUSED(data); CRYPTOPP_UNUSED(tagPart); CRYPTOPP_UNUSED(L1KeyLength);
 	CRYPTOPP_UNUSED(blocksRemainingInWord64);
 
@@ -467,7 +478,7 @@ VMAC_Base::VHASH_Update_SSE2(const word64 *data, size_t blocksRemainingInWord64,
 	#define AccumulateNH(a, b, c) a += word128(b)*(c)
 	#define Multiply128(r, i1, i2) r = word128(word64(i1)) * word64(i2)
 #else
-	#if _MSC_VER >= 1400 && !defined(__INTEL_COMPILER)
+	#if _MSC_VER >= 1400 && !defined(__INTEL_COMPILER) && !defined(_M_ARM)
 		#define MUL32(a, b) __emulu(word32(a), word32(b))
 	#else
 		#define MUL32(a, b) ((word64)((word32)(a)) * (word32)(b))
@@ -527,6 +538,9 @@ template <bool T_128BitTag>
 #endif
 void VMAC_Base::VHASH_Update_Template(const word64 *data, size_t blocksRemainingInWord64)
 {
+	assert(IsAlignedOn(m_polyState(),GetAlignmentOf<word64>()));
+	assert(IsAlignedOn(m_nhKey(),GetAlignmentOf<word64>()));
+
 	#define INNER_LOOP_ITERATION(j)	{\
 		word64 d0 = ConditionalByteReverse(LITTLE_ENDIAN_ORDER, data[i+2*j+0]);\
 		word64 d1 = ConditionalByteReverse(LITTLE_ENDIAN_ORDER, data[i+2*j+1]);\
@@ -541,7 +555,7 @@ void VMAC_Base::VHASH_Update_Template(const word64 *data, size_t blocksRemaining
 	size_t L1KeyLengthInWord64 = m_L1KeyLength / 8;
 	size_t innerLoopEnd = L1KeyLengthInWord64;
 	const word64 *nhK = m_nhKey();
-	word64 *polyS = m_polyState();
+	word64 *polyS = (word64*)(void*)m_polyState();
 	bool isFirstBlock = true;
 	size_t i;
 
@@ -856,6 +870,8 @@ static word64 L3Hash(const word64 *input, const word64 *l3Key, size_t len)
 
 void VMAC_Base::TruncatedFinal(byte *mac, size_t size)
 {
+	assert(IsAlignedOn(DataBuf(),GetAlignmentOf<word64>()));
+	assert(IsAlignedOn(m_polyState(),GetAlignmentOf<word64>()));
 	size_t len = ModPowerOf2(GetBitCountLo()/8, m_L1KeyLength);
 
 	if (len)

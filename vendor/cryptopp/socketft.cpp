@@ -1,14 +1,23 @@
 // socketft.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
+
+#if !defined(NO_OS_DEPENDENCE) && defined(SOCKETS_AVAILABLE)
 
 // TODO: http://github.com/weidai11/cryptopp/issues/19
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "socketft.h"
-
-#ifdef SOCKETS_AVAILABLE
-
 #include "wait.h"
+
+// Windows 8, Windows Server 2012, and Windows Phone 8.1 need <synchapi.h> and <ioapiset.h>
+#if defined(CRYPTOPP_WIN32_AVAILABLE)
+# if ((WINVER >= 0x0602 /*_WIN32_WINNT_WIN8*/) || (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/))
+#  include <synchapi.h>
+#  include <ioapiset.h>
+#  define USE_WINDOWS8_API
+# endif
+#endif
 
 #ifdef USE_BERKELEY_STYLE_SOCKETS
 #include <errno.h>
@@ -17,6 +26,10 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/ioctl.h>
+#endif
+
+#if defined(CRYPTOPP_MSAN)
+# include <sanitizer/msan_interface.h>
 #endif
 
 #ifdef PREFER_WINDOWS_STYLE_SOCKETS
@@ -92,8 +105,17 @@ void Socket::CloseSocket()
 	if (m_s != INVALID_SOCKET)
 	{
 #ifdef USE_WINDOWS_STYLE_SOCKETS
-		CancelIo((HANDLE) m_s);
+# if defined(USE_WINDOWS8_API)
+		BOOL result = CancelIoEx((HANDLE) m_s, NULL);
+		assert(result || (!result && GetLastError() == ERROR_NOT_FOUND));
 		CheckAndHandleError_int("closesocket", closesocket(m_s));
+		CRYPTOPP_UNUSED(result);	// Used by assert in debug builds
+# else
+		BOOL result = CancelIo((HANDLE) m_s);
+		assert(result || (!result && GetLastError() == ERROR_NOT_FOUND));
+		CheckAndHandleError_int("closesocket", closesocket(m_s));
+		CRYPTOPP_UNUSED(result);
+# endif
 #else
 		CheckAndHandleError_int("close", close(m_s));
 #endif
@@ -121,7 +143,7 @@ void Socket::Bind(unsigned int port, const char *addr)
 		sa.sin_addr.s_addr = result;
 	}
 
-	sa.sin_port = htons((u_short)port);
+	sa.sin_port = htons((unsigned short)port);
 
 	Bind((sockaddr *)&sa, sizeof(sa));
 }
@@ -158,11 +180,12 @@ bool Socket::Connect(const char *addr, unsigned int port)
 		}
 		else
 		{
-			sa.sin_addr.s_addr = ((in_addr *)lphost->h_addr)->s_addr;
+			assert(IsAlignedOn(lphost->h_addr,GetAlignmentOf<in_addr>()));
+			sa.sin_addr.s_addr = ((in_addr *)(void *)lphost->h_addr)->s_addr;
 		}
 	}
 
-	sa.sin_port = htons((u_short)port);
+	sa.sin_port = htons((unsigned short)port);
 
 	return Connect((const sockaddr *)&sa, sizeof(sa));
 }
@@ -238,6 +261,10 @@ bool Socket::SendReady(const timeval *timeout)
 	fd_set fds;
 	FD_ZERO(&fds);
 	FD_SET(m_s, &fds);
+#ifdef CRYPTOPP_MSAN
+	__msan_unpoison(&fds, sizeof(fds));
+#endif
+
 	int ready;
 	if (timeout == NULL)
 		ready = select((int)m_s+1, NULL, &fds, NULL, NULL);
@@ -255,6 +282,10 @@ bool Socket::ReceiveReady(const timeval *timeout)
 	fd_set fds;
 	FD_ZERO(&fds);
 	FD_SET(m_s, &fds);
+#ifdef CRYPTOPP_MSAN
+	__msan_unpoison(&fds, sizeof(fds));
+#endif
+
 	int ready;
 	if (timeout == NULL)
 		ready = select((int)m_s+1, &fds, NULL, NULL, NULL);
@@ -336,7 +367,15 @@ SocketReceiver::SocketReceiver(Socket &s)
 SocketReceiver::~SocketReceiver()
 {
 #ifdef USE_WINDOWS_STYLE_SOCKETS
-	CancelIo((HANDLE) m_s.GetSocket());
+# if defined(USE_WINDOWS8_API)
+	BOOL result = CancelIoEx((HANDLE) m_s.GetSocket(), NULL);
+	assert(result || (!result && GetLastError() == ERROR_NOT_FOUND));
+	CRYPTOPP_UNUSED(result);	// Used by assert in debug builds
+# else
+	BOOL result = CancelIo((HANDLE) m_s.GetSocket());
+	assert(result || (!result && GetLastError() == ERROR_NOT_FOUND));
+	CRYPTOPP_UNUSED(result);
+# endif
 #endif
 }
 
@@ -418,7 +457,15 @@ SocketSender::SocketSender(Socket &s)
 SocketSender::~SocketSender()
 {
 #ifdef USE_WINDOWS_STYLE_SOCKETS
-	CancelIo((HANDLE) m_s.GetSocket());
+# if defined(USE_WINDOWS8_API)
+	BOOL result = CancelIoEx((HANDLE) m_s.GetSocket(), NULL);
+	assert(result || (!result && GetLastError() == ERROR_NOT_FOUND));
+	CRYPTOPP_UNUSED(result);	// Used by assert in debug builds
+# else
+	BOOL result = CancelIo((HANDLE) m_s.GetSocket());
+	assert(result || (!result && GetLastError() == ERROR_NOT_FOUND));
+	CRYPTOPP_UNUSED(result);
+# endif
 #endif
 }
 
@@ -539,8 +586,8 @@ void SocketSender::GetWaitObjects(WaitObjectContainer &container, CallStack cons
 	container.AddWriteFd(m_s, CallStack("SocketSender::GetWaitObjects()", &callStack));
 }
 
-#endif
+#endif  // USE_BERKELEY_STYLE_SOCKETS
 
 NAMESPACE_END
 
-#endif	// #ifdef SOCKETS_AVAILABLE
+#endif	// SOCKETS_AVAILABLE

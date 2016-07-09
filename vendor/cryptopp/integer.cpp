@@ -32,7 +32,7 @@
 
 #include <iostream>
 
-#if _MSC_VER >= 1400
+#if (_MSC_VER >= 1400) && !defined(_M_ARM)
 	#include <intrin.h>
 #endif
 
@@ -42,6 +42,15 @@
 
 #ifdef CRYPTOPP_MSVC6_NO_PP
 	#pragma message("You do not seem to have the Visual C++ Processor Pack installed, so use of SSE2 instructions will be disabled.")
+#endif
+
+// "Error: The operand ___LKDB cannot be assigned to", http://github.com/weidai11/cryptopp/issues/188
+#if (__SUNPRO_CC >= 0x5130)
+# define MAYBE_CONST
+# define MAYBE_UNCONST_CAST const_cast<word*>
+#else
+# define MAYBE_CONST const
+# define MAYBE_UNCONST_CAST
 #endif
 
 // "Inline assembly operands don't work with .intel_syntax",
@@ -58,27 +67,17 @@
 # define CRYPTOPP_INTEGER_SSE2 (CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE && CRYPTOPP_BOOL_X86)
 #endif
 
-NAMESPACE_BEGIN(CryptoPP)
-	
 // Debian QEMU/ARMEL issue in MultiplyTop; see http://github.com/weidai11/cryptopp/issues/31.
-#if __ARMEL__ && (CRYPTOPP_GCC_VERSION >= 50200) && (CRYPTOPP_GCC_VERSION < 50300) && __OPTIMIZE__
+#if __ARMEL__ && (CRYPTOPP_GCC_VERSION >= 40900) && (CRYPTOPP_GCC_VERSION < 70000) && __OPTIMIZE__
 # define WORKAROUND_ARMEL_BUG 1
-#endif
-
-// Debian QEMU/ARM64 issue in Integer or ModularArithmetic; see http://github.com/weidai11/cryptopp/issues/61.
-#if (__aarch64__ || __AARCH64EL__) && (CRYPTOPP_GCC_VERSION >= 50200) && (CRYPTOPP_GCC_VERSION < 50300)
-# define WORKAROUND_ARM64_BUG 1
 #endif
 
 #if WORKAROUND_ARMEL_BUG
 # pragma GCC push_options
 # pragma GCC optimize("O1")
 #endif
-	
-#if WORKAROUND_ARM64_BUG
-# pragma GCC push_options
-# pragma GCC optimize("no-devirtualize")
-#endif
+
+NAMESPACE_BEGIN(CryptoPP)
 
 bool AssignIntToInteger(const std::type_info &valueType, void *pInteger, const void *pInt)
 {
@@ -186,7 +185,7 @@ static word AtomicInverseModPower2(word A)
 	#define GetBorrow(u)				u##1
 #else
 	#define Declare2Words(x)			dword x;
-	#if _MSC_VER >= 1400 && !defined(__INTEL_COMPILER)
+	#if _MSC_VER >= 1400 && !defined(__INTEL_COMPILER) && !defined(_M_ARM)
 		#define MultiplyWords(p, a, b)		p = __emulu(a, b);
 	#else
 		#define MultiplyWords(p, a, b)		p = (dword)a*b;
@@ -222,7 +221,7 @@ public:
 	DWord() : m_whole(0) {memset(&m_whole, 0xa, sizeof(m_whole));}
 #elif (defined(__COVERITY__) || !defined(NDEBUG)) && !defined(CRYPTOPP_NATIVE_DWORD_AVAILABLE)
 	// Repeating pattern of 1010 for debug builds to break things...
-	DWord() : m_halfs() {memset(&m_halfs, 0xa, sizeof(m_halfs));}
+	DWord() : m_halfs() {memset(&m_halfs, 0xaa, sizeof(m_halfs));}
 #else
 	DWord() {}
 #endif
@@ -355,7 +354,7 @@ public:
 	Word() : m_whole(0) {}
 #elif !defined(NDEBUG)
 	// Repeating pattern of 1010 for debug builds to break things...
-	Word() : m_whole(0) {memset(&m_whole, 0xa, sizeof(m_whole));}
+	Word() : m_whole(0) {memset(&m_whole, 0xaa, sizeof(m_whole));}
 #else
 	Word() {}
 #endif
@@ -399,7 +398,7 @@ public:
 	hword GetLowHalf() const {return hword(m_whole);}
 	hword GetHighHalf() const {return hword(m_whole>>(WORD_BITS/2));}
 	hword GetHighHalfAsBorrow() const {return 0-hword(m_whole>>(WORD_BITS/2));}
-	
+
 private:
 	word m_whole;
 };
@@ -455,7 +454,7 @@ inline D DivideFourWordsByTwo(S *T, const D &Al, const D &Ah, const D &B)
 	{
 		S Q[2];
 		T[0] = Al.GetLowHalf();
-		T[1] = Al.GetHighHalf(); 
+		T[1] = Al.GetHighHalf();
 		T[2] = Ah.GetLowHalf();
 		T[3] = Ah.GetHighHalf();
 		Q[1] = DivideThreeWordsByTwo<S, D>(T+1, B.GetLowHalf(), B.GetHighHalf());
@@ -498,7 +497,7 @@ inline word DWord::operator%(word a)
 
 // ********************************************************
 
-// Use some tricks to share assembly code between MSVC and GCC
+// Use some tricks to share assembly code between MSVC, GCC, Clang and Sun CC.
 #if defined(__GNUC__)
 	#define AddPrologue \
 		int result;	\
@@ -506,7 +505,7 @@ inline word DWord::operator%(word a)
 		( \
 			INTEL_NOPREFIX
 	#define AddEpilogue \
-			".att_syntax prefix;" \
+			ATT_PREFIX \
 					: "=a" (result)\
 					: "d" (C), "a" (A), "D" (B), "c" (N) \
 					: "%esi", "memory", "cc" \
@@ -515,12 +514,12 @@ inline word DWord::operator%(word a)
 	#define MulPrologue \
 		__asm__ __volatile__ \
 		( \
-			".intel_syntax noprefix;" \
+			INTEL_NOPREFIX \
 			AS1(	push	ebx) \
 			AS2(	mov		ebx, edx)
 	#define MulEpilogue \
 			AS1(	pop		ebx) \
-			".att_syntax prefix;" \
+			ATT_PREFIX \
 			: \
 			: "d" (s_maskLow16), "c" (C), "a" (A), "D" (B) \
 			: "%esi", "memory", "cc" \
@@ -528,7 +527,7 @@ inline word DWord::operator%(word a)
 	#define SquPrologue		MulPrologue
 	#define SquEpilogue	\
 			AS1(	pop		ebx) \
-			".att_syntax prefix;" \
+			ATT_PREFIX \
 			: \
 			: "d" (s_maskLow16), "c" (C), "a" (A) \
 			: "%esi", "%edi", "memory", "cc" \
@@ -536,7 +535,7 @@ inline word DWord::operator%(word a)
 	#define TopPrologue		MulPrologue
 	#define TopEpilogue	\
 			AS1(	pop		ebx) \
-			".att_syntax prefix;" \
+			ATT_PREFIX \
 			: \
 			: "d" (s_maskLow16), "c" (C), "a" (A), "D" (B), "S" (L) \
 			: "memory", "cc" \
@@ -881,8 +880,11 @@ int CRYPTOPP_FASTCALL Baseline_Sub(size_t N, word *C, const word *A, const word 
 }
 #endif
 
-static word LinearMultiply(word *C, const word *A, word B, size_t N)
+static word LinearMultiply(word *C, const word *AA, word B, size_t N)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+
 	word carry=0;
 	for(unsigned i=0; i<N; i++)
 	{
@@ -1062,7 +1064,7 @@ static word LinearMultiply(word *C, const word *A, word B, size_t N)
 	Mul_SaveAcc(13, 0, 14) Mul_Acc(1, 13) Mul_Acc(2, 12) Mul_Acc(3, 11) Mul_Acc(4, 10) Mul_Acc(5, 9) Mul_Acc(6, 8) Mul_Acc(7, 7) Mul_Acc(8, 6) Mul_Acc(9, 5) Mul_Acc(10, 4) Mul_Acc(11, 3) Mul_Acc(12, 2) Mul_Acc(13, 1) Mul_Acc(14, 0) \
 	Bot_SaveAcc(14, 0, 15) Bot_Acc(1, 14) Bot_Acc(2, 13) Bot_Acc(3, 12) Bot_Acc(4, 11) Bot_Acc(5, 10) Bot_Acc(6, 9) Bot_Acc(7, 8) Bot_Acc(8, 7) Bot_Acc(9, 6) Bot_Acc(10, 5) Bot_Acc(11, 4) Bot_Acc(12, 3) Bot_Acc(13, 2) Bot_Acc(14, 1) Bot_Acc(15, 0) \
 	Bot_End(16)
-	
+
 #endif
 
 #if 0
@@ -1180,48 +1182,81 @@ static word LinearMultiply(word *C, const word *A, word B, size_t N)
 	R[2*n-1] = HighWord(p);
 
 
-void Baseline_Multiply2(word *R, const word *A, const word *B)
+void Baseline_Multiply2(word *R, const word *AA, const word *BB)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Mul_2
 }
 
-void Baseline_Multiply4(word *R, const word *A, const word *B)
+void Baseline_Multiply4(word *R, const word *AA, const word *BB)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Mul_4
 }
 
-void Baseline_Multiply8(word *R, const word *A, const word *B)
+void Baseline_Multiply8(word *R, const word *AA, const word *BB)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Mul_8
 }
 
-void Baseline_Square2(word *R, const word *A)
+void Baseline_Square2(word *R, const word *AA)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+
 	Squ_2
 }
 
-void Baseline_Square4(word *R, const word *A)
+void Baseline_Square4(word *R, const word *AA)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+
 	Squ_4
 }
 
-void Baseline_Square8(word *R, const word *A)
+void Baseline_Square8(word *R, const word *AA)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+
 	Squ_8
 }
 
-void Baseline_MultiplyBottom2(word *R, const word *A, const word *B)
+void Baseline_MultiplyBottom2(word *R, const word *AA, const word *BB)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Bot_2
 }
 
-void Baseline_MultiplyBottom4(word *R, const word *A, const word *B)
+void Baseline_MultiplyBottom4(word *R, const word *AA, const word *BB)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Bot_4
 }
 
-void Baseline_MultiplyBottom8(word *R, const word *A, const word *B)
+void Baseline_MultiplyBottom8(word *R, const word *AA, const word *BB)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Bot_8
 }
 
@@ -1257,8 +1292,12 @@ void Baseline_MultiplyTop2(word *R, const word *A, const word *B, word L)
 	R[1] = T[3];
 }
 
-void Baseline_MultiplyTop4(word *R, const word *A, const word *B, word L)
+void Baseline_MultiplyTop4(word *R, const word *AA, const word *BB, word L)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Top_Begin(4)
 	Top_Acc(1, 1) Top_Acc(2, 0)  \
 	Top_SaveAcc0(0, 3) Mul_Acc(1, 2) Mul_Acc(2, 1) Mul_Acc(3, 0)  \
@@ -1267,8 +1306,12 @@ void Baseline_MultiplyTop4(word *R, const word *A, const word *B, word L)
 	Mul_End(1, 3)
 }
 
-void Baseline_MultiplyTop8(word *R, const word *A, const word *B, word L)
+void Baseline_MultiplyTop8(word *R, const word *AA, const word *BB, word L)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Top_Begin(8)
 	Top_Acc(1, 5) Top_Acc(2, 4) Top_Acc(3, 3) Top_Acc(4, 2) Top_Acc(5, 1) Top_Acc(6, 0) \
 	Top_SaveAcc0(0, 7) Mul_Acc(1, 6) Mul_Acc(2, 5) Mul_Acc(3, 4) Mul_Acc(4, 3) Mul_Acc(5, 2) Mul_Acc(6, 1) Mul_Acc(7, 0) \
@@ -1282,23 +1325,38 @@ void Baseline_MultiplyTop8(word *R, const word *A, const word *B, word L)
 }
 
 #if !CRYPTOPP_INTEGER_SSE2	// save memory by not compiling these functions when SSE2 is available
-void Baseline_Multiply16(word *R, const word *A, const word *B)
+void Baseline_Multiply16(word *R, const word *AA, const word *BB)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Mul_16
 }
 
-void Baseline_Square16(word *R, const word *A)
+void Baseline_Square16(word *R, const word *AA)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+
 	Squ_16
 }
 
-void Baseline_MultiplyBottom16(word *R, const word *A, const word *B)
+void Baseline_MultiplyBottom16(word *R, const word *AA, const word *BB)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Bot_16
 }
 
-void Baseline_MultiplyTop16(word *R, const word *A, const word *B, word L)
+void Baseline_MultiplyTop16(word *R, const word *AA, const word *BB, word L)
 {
+	// http://github.com/weidai11/cryptopp/issues/188
+	MAYBE_CONST word* A = MAYBE_UNCONST_CAST(AA);
+	MAYBE_CONST word* B = MAYBE_UNCONST_CAST(BB);
+
 	Top_Begin(16)
 	Top_Acc(1, 13) Top_Acc(2, 12) Top_Acc(3, 11) Top_Acc(4, 10) Top_Acc(5, 9) Top_Acc(6, 8) Top_Acc(7, 7) Top_Acc(8, 6) Top_Acc(9, 5) Top_Acc(10, 4) Top_Acc(11, 3) Top_Acc(12, 2) Top_Acc(13, 1) Top_Acc(14, 0) \
 	Top_SaveAcc0(0, 15) Mul_Acc(1, 14) Mul_Acc(2, 13) Mul_Acc(3, 12) Mul_Acc(4, 11) Mul_Acc(5, 10) Mul_Acc(6, 9) Mul_Acc(7, 8) Mul_Acc(8, 7) Mul_Acc(9, 6) Mul_Acc(10, 5) Mul_Acc(11, 4) Mul_Acc(12, 3) Mul_Acc(13, 2) Mul_Acc(14, 1) Mul_Acc(15, 0) \
@@ -1443,7 +1501,7 @@ CRYPTOPP_ALIGN_DATA(16) static const word32 s_maskLow16[4] CRYPTOPP_SECTION_ALIG
 	AS2(	paddd		xmm6, xmm3)			\
 	AS2(	paddd		xmm7, xmm1)		\
 
-#define Squ_Acc1(i)		
+#define Squ_Acc1(i)
 #define Squ_Acc2(i)		ASC(call, LSqu##i)
 #define Squ_Acc3(i)		Squ_Acc2(i)
 #define Squ_Acc4(i)		Squ_Acc2(i)
@@ -1577,7 +1635,7 @@ CRYPTOPP_ALIGN_DATA(16) static const word32 s_maskLow16[4] CRYPTOPP_SECTION_ALIG
 	AS2(	paddd		xmm6, xmm3)			\
 	AS2(	paddd		xmm7, xmm1)		\
 
-#define Mul_Acc1(i)		
+#define Mul_Acc1(i)
 #define Mul_Acc2(i)		ASC(call, LMul##i)
 #define Mul_Acc3(i)		Mul_Acc2(i)
 #define Mul_Acc4(i)		Mul_Acc2(i)
@@ -2799,7 +2857,7 @@ InitializeInteger::InitializeInteger()
 	if (!g_pAssignIntToInteger)
 	{
 		SetFunctionPointers();
-		g_pAssignIntToInteger = AssignIntToInteger;
+		g_pAssignIntToInteger = (CryptoPP::PAssignIntToInteger)AssignIntToInteger;
 	}
 }
 
@@ -2881,13 +2939,40 @@ signed long Integer::ConvertToLong() const
 	return sign==POSITIVE ? value : -(signed long)value;
 }
 
-Integer::Integer(BufferedTransformation &encodedInteger, size_t byteCount, Signedness s)
+Integer::Integer(BufferedTransformation &encodedInteger, size_t byteCount, Signedness s, ByteOrder o)
 {
+	assert(o == BIG_ENDIAN_ORDER || o == LITTLE_ENDIAN_ORDER);
+
+	if(o == LITTLE_ENDIAN_ORDER)
+	{
+		SecByteBlock block(byteCount);
+		encodedInteger.Get(block, block.size());
+		std::reverse(block.begin(), block.begin()+block.size());
+
+		Decode(block.begin(), block.size(), s);
+		return;
+	}
+
 	Decode(encodedInteger, byteCount, s);
 }
 
-Integer::Integer(const byte *encodedInteger, size_t byteCount, Signedness s)
+Integer::Integer(const byte *encodedInteger, size_t byteCount, Signedness s, ByteOrder o)
 {
+	assert(o == BIG_ENDIAN_ORDER || o == LITTLE_ENDIAN_ORDER);
+
+	if(o == LITTLE_ENDIAN_ORDER)
+	{
+		SecByteBlock block(byteCount);
+#if (CRYPTOPP_MSC_VERSION >= 1500)
+		std::reverse_copy(encodedInteger, encodedInteger+byteCount,
+			stdext::make_checked_array_iterator(block.begin(), block.size()));
+#else
+		std::reverse_copy(encodedInteger, encodedInteger+byteCount, block.begin());
+#endif
+		Decode(block.begin(), block.size(), s);
+		return;
+	}
+
 	Decode(encodedInteger, byteCount, s);
 }
 
@@ -3029,9 +3114,11 @@ Integer::Integer(word value, size_t length)
 }
 
 template <class T>
-static Integer StringToInteger(const T *str)
+static Integer StringToInteger(const T *str, ByteOrder order)
 {
-	int radix;
+	assert( order == BIG_ENDIAN_ORDER || order == LITTLE_ENDIAN_ORDER );
+
+	int radix, sign = 1;
 	// GCC workaround
 	// std::char_traits<wchar_t>::length() not defined in GCC 3.2 and STLport 4.5.3
 	unsigned int length;
@@ -3040,7 +3127,7 @@ static Integer StringToInteger(const T *str)
 	Integer v;
 
 	if (length == 0)
-		return v;
+		return Integer::Zero();
 
 	switch (str[length-1])
 	{
@@ -3060,45 +3147,117 @@ static Integer StringToInteger(const T *str)
 		radix=10;
 	}
 
-	if (length > 2 && str[0] == '0' && str[1] == 'x')
-		radix = 16;
-
-	for (unsigned i=0; i<length; i++)
+	// 'str' is of length 1 or more
+	if (str[0] == '-')
 	{
-		int digit;
+		sign = -1;
+		str += 1, length -= 1;
+	}
 
-		if (str[i] >= '0' && str[i] <= '9')
-			digit = str[i] - '0';
-		else if (str[i] >= 'A' && str[i] <= 'F')
-			digit = str[i] - 'A' + 10;
-		else if (str[i] >= 'a' && str[i] <= 'f')
-			digit = str[i] - 'a' + 10;
-		else
-			digit = radix;
+	if (length > 2 && str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+	{
+		radix = 16;
+		str += 2, length -= 2;
+	}
 
-		if (digit < radix)
+	if(order == BIG_ENDIAN_ORDER)
+	{
+		for (unsigned int i=0; i<length; i++)
 		{
-			v *= radix;
-			v += digit;
+			int digit, ch = static_cast<int>(str[i]);
+
+			if (ch >= '0' && ch <= '9')
+				digit = ch - '0';
+			else if (ch >= 'A' && ch <= 'F')
+				digit = ch - 'A' + 10;
+			else if (ch >= 'a' && ch <= 'f')
+				digit = ch - 'a' + 10;
+			else
+				digit = radix;
+
+			if (digit < radix)
+			{
+				v *= radix;
+				v += digit;
+			}
+		}
+	}
+	else if(radix == 16 && order == LITTLE_ENDIAN_ORDER)
+	{
+		// Nibble high, low and count
+		unsigned int nh = 0, nl = 0, nc = 0;
+		Integer position(Integer::One());
+
+		for (unsigned int i=0; i<length; i++)
+		{
+			int digit, ch = static_cast<int>(str[i]);
+
+			if (ch >= '0' && ch <= '9')
+				digit = ch - '0';
+			else if (ch >= 'A' && ch <= 'F')
+				digit = ch - 'A' + 10;
+			else if (ch >= 'a' && ch <= 'f')
+				digit = ch - 'a' + 10;
+			else
+				digit = radix;
+
+			if (digit < radix)
+			{
+				if(nc++ == 0)
+					nh = digit;
+				else
+					nl = digit;
+
+				if(nc == 2)
+				{
+					v += position * (nh << 4 | nl);
+					nc = 0, position <<= 8;
+				}
+			}
+		}
+
+		if(nc == 1)
+			v += nh * position;
+	}
+	else // LITTLE_ENDIAN_ORDER && radix != 16
+	{
+		for (int i=static_cast<int>(length)-1; i>=0; i--)
+		{
+			int digit, ch = static_cast<int>(str[i]);
+
+			if (ch >= '0' && ch <= '9')
+				digit = ch - '0';
+			else if (ch >= 'A' && ch <= 'F')
+				digit = ch - 'A' + 10;
+			else if (ch >= 'a' && ch <= 'f')
+				digit = ch - 'a' + 10;
+			else
+				digit = radix;
+
+			if (digit < radix)
+			{
+				v *= radix;
+				v += digit;
+			}
 		}
 	}
 
-	if (str[0] == '-')
+	if (sign == -1)
 		v.Negate();
 
 	return v;
 }
 
-Integer::Integer(const char *str)
+Integer::Integer(const char *str, ByteOrder order)
 	: reg(2), sign(POSITIVE)
 {
-	*this = StringToInteger(str);
+	*this = StringToInteger(str,order);
 }
 
-Integer::Integer(const wchar_t *str)
+Integer::Integer(const wchar_t *str, ByteOrder order)
 	: reg(2), sign(POSITIVE)
 {
-	*this = StringToInteger(str);
+	*this = StringToInteger(str,order);
 }
 
 unsigned int Integer::WordCount() const
@@ -3461,7 +3620,7 @@ std::ostream& operator<<(std::ostream& out, const Integer &a)
 	}
 
 	Integer temp1=a, temp2;
-    
+
 	if (a.IsNegative())
 	{
 		out << '-';
@@ -3493,7 +3652,14 @@ std::ostream& operator<<(std::ostream& out, const Integer &a)
 //			out << ",";
 	}
 
-	return out << suffix;
+#ifdef CRYPTOPP_USE_STD_SHOWBASE
+	if(out.flags() & std::ios_base::showbase)
+		out << suffix;
+
+	return out;
+#else
+ 	return out << suffix;
+#endif
 }
 
 Integer& Integer::operator++()
@@ -4343,7 +4509,7 @@ std::string IntToString<Integer>(Integer value, unsigned int base)
 
 	std::string result;
 	result.reserve(i+2);
-	
+
 	if (negative)
 		result += '-';
 
@@ -4370,13 +4536,13 @@ std::string IntToString<Integer>(Integer value, unsigned int base)
 
 // Specialization declared in misc.h to avoid Coverity findings.
 template <> CRYPTOPP_DLL
-std::string IntToString<unsigned long long>(unsigned long long value, unsigned int base)
+std::string IntToString<word64>(word64 value, unsigned int base)
 {
 	// Hack... set the high bit for uppercase.
 	static const unsigned int HIGH_BIT = (1U << 31);
 	const char CH = !!(base & HIGH_BIT) ? 'A' : 'a';
 	base &= ~HIGH_BIT;
-	
+
 	assert(base >= 2);
 	if (value == 0)
 		return "0";
@@ -4384,7 +4550,7 @@ std::string IntToString<unsigned long long>(unsigned long long value, unsigned i
 	std::string result;
 	while (value > 0)
 	{
-		unsigned long long digit = value % base;
+		word64 digit = value % base;
 		result = char((digit < 10 ? '0' : (CH - 10)) + digit) + result;
 		value /= base;
 	}
@@ -4392,12 +4558,8 @@ std::string IntToString<unsigned long long>(unsigned long long value, unsigned i
 }
 
 NAMESPACE_END
-	
+
 #if WORKAROUND_ARMEL_BUG
-# pragma GCC pop_options
-#endif
-	
-#if WORKAROUND_ARM64_BUG
 # pragma GCC pop_options
 #endif
 

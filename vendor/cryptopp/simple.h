@@ -1,7 +1,7 @@
 // simple.h - written and placed in the public domain by Wei Dai
 
 //! \file simple.h
-//! \brief Classes providing simple keying interfaces.
+//! \brief Classes providing basic library services.
 
 #ifndef CRYPTOPP_SIMPLE_H
 #define CRYPTOPP_SIMPLE_H
@@ -56,6 +56,22 @@ class CRYPTOPP_DLL InvalidRounds : public InvalidArgument
 {
 public:
 	explicit InvalidRounds(const std::string &algorithm, unsigned int rounds) : InvalidArgument(algorithm + ": " + IntToString(rounds) + " is not a valid number of rounds") {}
+};
+
+//! \class InvalidPersonalizationLength
+//! \brief Exception thrown when an invalid personalization string length is encountered
+class CRYPTOPP_DLL InvalidPersonalizationLength : public InvalidArgument
+{
+public:
+	explicit InvalidPersonalizationLength(const std::string &algorithm, size_t length) : InvalidArgument(algorithm + ": " + IntToString(length) + " is not a valid salt length") {}
+};
+
+//! \class InvalidSaltLength
+//! \brief Exception thrown when an invalid salt length is encountered
+class CRYPTOPP_DLL InvalidSaltLength : public InvalidArgument
+{
+public:
+	explicit InvalidSaltLength(const std::string &algorithm, size_t length) : InvalidArgument(algorithm + ": " + IntToString(length) + " is not a valid salt length") {}
 };
 
 // *****************************
@@ -228,6 +244,7 @@ private:
 class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE Store : public AutoSignaling<InputRejecting<BufferedTransformation> >
 {
 public:
+	//! \brief Construct a Store
 	Store() : m_messageEnd(false) {}
 
 	void IsolatedInitialize(const NameValuePairs &parameters)

@@ -1,6 +1,7 @@
 // fipstest.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
@@ -11,8 +12,20 @@
 #include "smartptr.h"
 #include "misc.h"
 
+// Simply disable CRYPTOPP_WIN32_AVAILABLE for Windows Phone and Windows Store apps
 #ifdef CRYPTOPP_WIN32_AVAILABLE
+# if defined(WINAPI_FAMILY)
+#   if !(WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP))
+#	  undef CRYPTOPP_WIN32_AVAILABLE
+#   endif
+# endif
+#endif
+
+#ifdef CRYPTOPP_WIN32_AVAILABLE
+#ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0400
+#endif
+
 #include <windows.h>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -21,7 +34,11 @@
 #else
 #define _CRT_DEBUGGER_HOOK __crt_debugger_hook
 #endif
+#if _MSC_VER < 1900
 extern "C" {_CRTIMP void __cdecl _CRT_DEBUGGER_HOOK(int);}
+#else
+extern "C" {void __cdecl _CRT_DEBUGGER_HOOK(int); }
+#endif
 #endif
 #endif
 
