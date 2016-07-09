@@ -3236,6 +3236,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
                              "_%s"
                              "_%s"
                              "_%d"
+                             "_%s"
                              , GetApplicationSettingInt( "vs2013-runtime-installed" )
                              , *GetApplicationSetting ( "real-os-build" )
                              , *GetApplicationSetting ( "locale" ).Replace( "_", "-" )
