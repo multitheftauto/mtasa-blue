@@ -1,6 +1,7 @@
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 	platforms { "x86", "x64"}
+	targetprefix ("")
 	
 	location "Build"
 	
@@ -43,6 +44,8 @@ workspace "MTASA"
 		libdirs {
 			dxdir.."Lib/x86"
 		}
+	filter "system:not windows"
+		buildoptions { "-fPIC" }
 
 	
 	-- Only build the client on Windows
@@ -95,9 +98,3 @@ workspace "MTASA"
 		include "vendor/zip"
 		include "vendor/zlib"
 		
-		
-	filter "platforms:x86"
-		architecture "x86"
-
-	filter "platforms:x64"
-		architecture "x86_64"
