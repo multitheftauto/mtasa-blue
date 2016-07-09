@@ -8,7 +8,7 @@ project "cryptopp"
 		["Sources"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
-	
+		
 	defines {
 		"_WINSOCK_DEPRECATED_NO_WARNINGS",
 		"_LIB"
@@ -142,4 +142,8 @@ project "cryptopp"
 		"x64masm.asm"
 	}
 	
-	
+	-- C++11 build fails with GCC4.8/4.9
+	-- See https://github.com/weidai11/cryptopp/issues/206
+	filter "system:not windows"
+		buildoptions { "-std=c++03" }
+
