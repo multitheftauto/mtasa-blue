@@ -515,8 +515,8 @@ void CClientObject::Create ( void )
 
                 UpdateVisibility ();
                 if ( !m_bUsesCollision ) SetCollisionEnabled ( false );
-                if ( m_vecScale.fX != 1.0f &&
-                     m_vecScale.fY != 1.0f &&
+                if ( m_vecScale.fX != 1.0f ||
+                     m_vecScale.fY != 1.0f ||
                      m_vecScale.fZ != 1.0f)
                     SetScale ( m_vecScale );
                 m_pObject->SetAreaCode ( m_ucInterior );
