@@ -102,7 +102,6 @@ public:
     void                            AddGuiTabPanelClass     ( lua_State* luaVM );
     void                            AddGuiTabClass          ( lua_State* luaVM );
 
-    void                            AddResourceClass        ( lua_State* luaVM );
     void                            AddTimerClass           ( lua_State* luaVM );
     void                            AddXMLClass             ( lua_State* luaVM );
 
