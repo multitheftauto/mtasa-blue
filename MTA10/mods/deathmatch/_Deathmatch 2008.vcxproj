@@ -377,6 +377,7 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaPointLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPedDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaRadarAreaDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaResourceDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp" />
@@ -579,7 +580,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Resource.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Shape.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Team.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Util.cpp" />
@@ -768,6 +768,7 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaPointLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPedDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaRadarAreaDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaResourceDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h" />

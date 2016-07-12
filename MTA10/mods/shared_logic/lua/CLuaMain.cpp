@@ -684,36 +684,6 @@ void CLuaMain::AddGuiFontClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "GuiFont", "Element" );
 }
 
-
-void CLuaMain::AddResourceClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "getResourceFromName" );
-    lua_classfunction ( luaVM, "getFromName", "getResourceFromName" );
-    
-    lua_classfunction ( luaVM, "getGuiElement", "getResourceGUIElement" );
-    lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
-    lua_classfunction ( luaVM, "getName", "getResourceName" );
-    lua_classfunction ( luaVM, "getThis", "getThisResource" );
-    lua_classfunction ( luaVM, "getConfig", "getResourceConfig" );
-    lua_classfunction ( luaVM, "getConfig", "getResourceConfig" );
-    lua_classfunction ( luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot" );
-    lua_classfunction ( luaVM, "getExportedFunctions", "getResourceExportedFunctions" );
-    lua_classfunction ( luaVM, "getState", "getResourceState" );
-    
-    lua_classvariable ( luaVM, "config", NULL, "getResourceConfig" );
-    lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
-    lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
-    lua_classvariable ( luaVM, "guiElement", NULL, "getResourceGUIElement" );
-    lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
-    lua_classvariable ( luaVM, "name", NULL, "getResourceName" );
-    lua_classvariable ( luaVM, "rootElement", NULL, "getResourceRootElement" );
-    
-    lua_registerclass ( luaVM, "Resource" );
-}
-
-
 void CLuaMain::AddTimerClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -729,7 +699,6 @@ void CLuaMain::AddTimerClass ( lua_State* luaVM )
 
     lua_registerclass ( luaVM, "Timer" );
 }
-
 
 void CLuaMain::AddXMLClass ( lua_State* luaVM )
 {
@@ -949,7 +918,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddGuiTabClass              ( luaVM );
     AddGuiFontClass             ( luaVM );
 
-    AddResourceClass            ( luaVM );
     AddTimerClass               ( luaVM );
     AddXMLClass                 ( luaVM );
 
@@ -974,6 +942,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaPlayerDefs::AddClass ( luaVM );
     CLuaPointLightDefs::AddClass ( luaVM );
     CLuaRadarAreaDefs::AddClass ( luaVM );
+    CLuaResourceDefs::AddClass ( luaVM );
     CLuaSearchLightDefs::AddClass ( luaVM );
     CLuaVehicleDefs::AddClass ( luaVM );
 }

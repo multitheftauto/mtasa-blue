@@ -42,20 +42,6 @@ public:
     // Reserved functions
     LUA_DECLARE ( DisabledFunction );
 
-    // Resource functions
-    LUA_DECLARE ( Call );
-    LUA_DECLARE ( GetThisResource );
-    LUA_DECLARE ( GetResourceConfig );
-    LUA_DECLARE ( GetResourceName );
-    LUA_DECLARE ( GetResourceFromName );
-    LUA_DECLARE ( GetResourceRootElement );
-    LUA_DECLARE ( GetResourceGUIElement );
-    LUA_DECLARE ( GetResourceDynamicElementRoot );
-    LUA_DECLARE ( GetResourceExportedFunctions );
-    LUA_DECLARE ( GetResourceState );
-    LUA_DECLARE ( LoadString );
-    LUA_DECLARE ( Load );
-
     // Event functions
     LUA_DECLARE ( AddEvent );
     LUA_DECLARE ( AddEventHandler );

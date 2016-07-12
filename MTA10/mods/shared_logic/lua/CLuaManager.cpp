@@ -216,20 +216,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaFunctionDefs::GUIMemoSetCaretIndex );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
-    // Resource funcs
-    CLuaCFunctions::AddFunction ( "call", CLuaFunctionDefs::Call );
-    CLuaCFunctions::AddFunction ( "getThisResource", CLuaFunctionDefs::GetThisResource );
-    CLuaCFunctions::AddFunction ( "getResourceConfig", CLuaFunctionDefs::GetResourceConfig );
-    CLuaCFunctions::AddFunction ( "getResourceName", CLuaFunctionDefs::GetResourceName );
-    CLuaCFunctions::AddFunction ( "getResourceFromName", CLuaFunctionDefs::GetResourceFromName );
-    CLuaCFunctions::AddFunction ( "getResourceRootElement", CLuaFunctionDefs::GetResourceRootElement );
-    CLuaCFunctions::AddFunction ( "getResourceGUIElement", CLuaFunctionDefs::GetResourceGUIElement );
-    CLuaCFunctions::AddFunction ( "getResourceDynamicElementRoot", CLuaFunctionDefs::GetResourceDynamicElementRoot );
-    CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", CLuaFunctionDefs::GetResourceExportedFunctions );
-    CLuaCFunctions::AddFunction ( "getResourceState", CLuaFunctionDefs::GetResourceState );
-    CLuaCFunctions::AddFunction ( "loadstring", CLuaFunctionDefs::LoadString );
-    CLuaCFunctions::AddFunction ( "load", CLuaFunctionDefs::Load );
-
     // Event funcs
     CLuaCFunctions::AddFunction ( "addEvent", CLuaFunctionDefs::AddEvent );
     CLuaCFunctions::AddFunction ( "addEventHandler", CLuaFunctionDefs::AddEventHandler );
@@ -766,6 +752,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaPlayerDefs::LoadFunctions ();
     CLuaPointLightDefs::LoadFunctions ();
     CLuaRadarAreaDefs::LoadFunctions ();
+    CLuaResourceDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
     CLuaVehicleDefs::LoadFunctions ();
