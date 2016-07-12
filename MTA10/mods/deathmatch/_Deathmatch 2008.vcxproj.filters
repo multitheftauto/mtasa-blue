@@ -602,9 +602,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Radar.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Resource.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
@@ -788,9 +785,6 @@
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp">
       <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp">
-      <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vendor\lua\src\lmathlib.c">
       <Filter>Source Files\utils\lualib</Filter>
     </ClCompile>
@@ -930,6 +924,9 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaElementDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaRadarAreaDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1688,6 +1685,9 @@
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaElementDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaRadarAreaDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>

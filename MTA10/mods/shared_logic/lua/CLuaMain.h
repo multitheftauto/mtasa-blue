@@ -79,7 +79,6 @@ public:
     void                            AddPickupClass          ( lua_State* luaVM );
     void                            AddColShapeClass        ( lua_State* luaVM );
     void                            AddProjectileClass      ( lua_State* luaVM );
-    void                            AddRadarAreaClass       ( lua_State* luaVM );
     void                            AddTeamClass            ( lua_State* luaVM );
     void                            AddWaterClass           ( lua_State* luaVM );
     void                            AddWeaponClass          ( lua_State* luaVM );

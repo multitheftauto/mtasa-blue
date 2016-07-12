@@ -95,16 +95,6 @@ public:
     // Fire functions
     LUA_DECLARE ( CreateFire );
 
-    // Radar-area funcs
-    LUA_DECLARE ( CreateRadarArea );
-    LUA_DECLARE ( GetRadarAreaColor );
-    LUA_DECLARE ( GetRadarAreaSize );
-    LUA_DECLARE ( IsRadarAreaFlashing );
-    LUA_DECLARE ( SetRadarAreaColor );
-    LUA_DECLARE ( SetRadarAreaFlashing );
-    LUA_DECLARE ( SetRadarAreaSize );
-    LUA_DECLARE ( IsInsideRadarArea );
-
     // Pickup create/destroy funcs
     LUA_DECLARE ( CreatePickup );
 

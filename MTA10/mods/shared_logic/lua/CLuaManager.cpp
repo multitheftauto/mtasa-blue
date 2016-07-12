@@ -329,16 +329,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "dxIsAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled );
     CLuaCFunctions::AddFunction ( "dxSetTextureEdge", CLuaFunctionDefs::dxSetTextureEdge );
 
-    // Radar-area funcs
-    CLuaCFunctions::AddFunction ( "createRadarArea", CLuaFunctionDefs::CreateRadarArea );
-    CLuaCFunctions::AddFunction ( "getRadarAreaColor", CLuaFunctionDefs::GetRadarAreaColor  );
-    CLuaCFunctions::AddFunction ( "getRadarAreaSize", CLuaFunctionDefs::GetRadarAreaSize );
-    CLuaCFunctions::AddFunction ( "isRadarAreaFlashing", CLuaFunctionDefs::IsRadarAreaFlashing );
-    CLuaCFunctions::AddFunction ( "setRadarAreaColor", CLuaFunctionDefs::SetRadarAreaColor );
-    CLuaCFunctions::AddFunction ( "setRadarAreaFlashing", CLuaFunctionDefs::SetRadarAreaFlashing );
-    CLuaCFunctions::AddFunction ( "setRadarAreaSize", CLuaFunctionDefs::SetRadarAreaSize );
-    CLuaCFunctions::AddFunction ( "isInsideRadarArea", CLuaFunctionDefs::IsInsideRadarArea );
-
     // Pickup create/destroy funcs
     CLuaCFunctions::AddFunction ( "createPickup", CLuaFunctionDefs::CreatePickup );
 
@@ -796,6 +786,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaPedDefs::LoadFunctions ();
     CLuaPlayerDefs::LoadFunctions ();
     CLuaPointLightDefs::LoadFunctions ();
+    CLuaRadarAreaDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
     CLuaVehicleDefs::LoadFunctions ();
