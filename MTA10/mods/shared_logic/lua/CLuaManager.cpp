@@ -339,29 +339,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPickupAmmo", CLuaFunctionDefs::GetPickupAmmo );
 
     // Pickup set funcs
-    CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );
-
-    // Cam get funcs
-    CLuaCFunctions::AddFunction ( "getCamera", CLuaFunctionDefs::GetCamera );
-    CLuaCFunctions::AddFunction ( "getCameraViewMode", CLuaFunctionDefs::GetCameraViewMode );
-    CLuaCFunctions::AddFunction ( "getCameraMatrix", CLuaFunctionDefs::GetCameraMatrix );
-    CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaFunctionDefs::GetCameraTarget );
-    CLuaCFunctions::AddFunction ( "getCameraInterior", CLuaFunctionDefs::GetCameraInterior );
-    CLuaCFunctions::AddFunction ( "getCameraGoggleEffect", CLuaFunctionDefs::GetCameraGoggleEffect );
-    CLuaCFunctions::AddFunction ( "getCameraShakeLevel", CLuaFunctionDefs::GetCameraShakeLevel );
-    CLuaCFunctions::AddFunction ( "getCameraFieldOfView", CLuaFunctionDefs::GetCameraFieldOfView );
-
-    // Cam set funcs
-    CLuaCFunctions::AddFunction ( "setCameraMatrix", CLuaFunctionDefs::SetCameraMatrix );
-    CLuaCFunctions::AddFunction ( "setCameraFieldOfView", CLuaFunctionDefs::SetCameraFieldOfView );
-    CLuaCFunctions::AddFunction ( "setCameraTarget", CLuaFunctionDefs::SetCameraTarget );
-    CLuaCFunctions::AddFunction ( "setCameraInterior", CLuaFunctionDefs::SetCameraInterior );
-    CLuaCFunctions::AddFunction ( "fadeCamera", CLuaFunctionDefs::FadeCamera );
-    CLuaCFunctions::AddFunction ( "setCameraClip", CLuaFunctionDefs::SetCameraClip );
-    CLuaCFunctions::AddFunction ( "getCameraClip", CLuaFunctionDefs::GetCameraClip );
-    CLuaCFunctions::AddFunction ( "setCameraViewMode", CLuaFunctionDefs::SetCameraViewMode );
-    CLuaCFunctions::AddFunction ( "setCameraGoggleEffect", CLuaFunctionDefs::SetCameraGoggleEffect );
-    CLuaCFunctions::AddFunction ( "setCameraShakeLevel", CLuaFunctionDefs::SetCameraShakeLevel );
+    CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );    
 
     // Cursor funcs
     CLuaCFunctions::AddFunction ( "getCursorPosition", CLuaFunctionDefs::GetCursorPosition );
@@ -778,6 +756,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaBitDefs::LoadFunctions ();
     CLuaBlipDefs::LoadFunctions ();
     CLuaBrowserDefs::LoadFunctions ();
+    CLuaCameraDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();

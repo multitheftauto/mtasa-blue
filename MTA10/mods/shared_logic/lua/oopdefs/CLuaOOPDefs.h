@@ -31,13 +31,6 @@ public:
     LUA_DECLARE ( SetElementRotation );
     LUA_DECLARE ( GetElementVelocity );
 
-    // Camera
-    LUA_DECLARE ( GetCameraMatrix );
-    LUA_DECLARE ( GetCameraPosition );
-    LUA_DECLARE ( SetCameraPosition );
-    LUA_DECLARE ( GetCameraRotation );
-    LUA_DECLARE ( SetCameraRotation );
-
     // Drawing
     LUA_DECLARE ( DxGetFontHeight );
     LUA_DECLARE ( DxGetTextWidth );

@@ -110,6 +110,7 @@
 #include <luadefs/CLuaBlipDefs.h>
 #include <luadefs/CLuaBrowserDefs.h>
 #include <luadefs/CLuaClassDefs.h>
+#include <luadefs/CLuaCameraDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaObjectDefs.h>

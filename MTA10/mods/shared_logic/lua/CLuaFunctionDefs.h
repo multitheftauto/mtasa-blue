@@ -107,28 +107,6 @@ public:
     // Pickup get funcs
     LUA_DECLARE ( SetPickupType );
 
-    // Cam get funcs
-    LUA_DECLARE ( GetCamera );
-    LUA_DECLARE ( GetCameraViewMode );
-    LUA_DECLARE ( GetCameraMatrix );
-    LUA_DECLARE ( GetCameraTarget );
-    LUA_DECLARE ( GetCameraInterior );
-    LUA_DECLARE ( GetCameraGoggleEffect );
-    LUA_DECLARE ( GetCameraShakeLevel );
-    LUA_DECLARE ( GetCameraFieldOfView );
-
-    // Cam set funcs
-    LUA_DECLARE ( SetCameraMatrix );
-    LUA_DECLARE ( SetCameraTarget );
-    LUA_DECLARE ( SetCameraInterior );
-    LUA_DECLARE ( SetCameraFieldOfView );
-    LUA_DECLARE ( FadeCamera );
-    LUA_DECLARE ( SetCameraClip );
-    LUA_DECLARE ( GetCameraClip );
-    LUA_DECLARE ( SetCameraViewMode );
-    LUA_DECLARE ( SetCameraGoggleEffect );
-    LUA_DECLARE ( SetCameraShakeLevel );
-
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );
     LUA_DECLARE ( SetCursorPosition );
