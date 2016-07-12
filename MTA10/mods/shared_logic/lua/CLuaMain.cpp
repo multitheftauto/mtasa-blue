@@ -136,131 +136,6 @@ void CLuaMain::InitSecurity ( void )
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefs::DisabledFunction );
 }
 
-
-// TODO: specials
-void CLuaMain::AddElementClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    // Class functions
-    lua_classfunction ( luaVM, "getByID", "getElementByID" );
-    lua_classfunction ( luaVM, "getAllByType", "getElementsByType" );
-    
-    // Action functions
-    lua_classfunction ( luaVM, "create", "createElement" );
-    lua_classfunction ( luaVM, "clone", "cloneElement" );
-    lua_classfunction ( luaVM, "attach", "attachElements" );
-    lua_classfunction ( luaVM, "detach", "detachElements" );
-    lua_classfunction ( luaVM, "destroy", "destroyElement" );
-    lua_classfunction ( luaVM, "removeData", "removeElementData" );
-    lua_classfunction ( luaVM, "clearVisibleTo", "clearElementVisibleTo" );
-
-    // Get functions
-    lua_classfunction ( luaVM, "areCollisionsEnabled", "areElementCollisionsEnabled" );
-    lua_classfunction ( luaVM, "isWithinColShape", "isElementWithinColShape" );
-    lua_classfunction ( luaVM, "isWithinMarker", "isElementWithinMarker" );
-    lua_classfunction ( luaVM, "isInWater", "isElementInWater" );
-    lua_classfunction ( luaVM, "isFrozen", "isElementFrozen" );
-    lua_classfunction ( luaVM, "isLowLOD", "isElementLowLOD" );
-    lua_classfunction ( luaVM, "isDoubleSided", "isElementDoubleSided" );
-    lua_classfunction ( luaVM, "isVisibleTo", "isElementVisibleTo" );
-    lua_classfunction ( luaVM, "isCollidableWith", "isElementCollidableWith" );
-    lua_classfunction ( luaVM, "isAttached", "isElementAttached" );
-    lua_classfunction ( luaVM, "isCallPropagationEnabled", "isElementCallPropagationEnabled" );
-    lua_classfunction ( luaVM, "isWaitingForGroundToLoad", "isElementWaitingForGroundToLoad" );
-    lua_classfunction ( luaVM, "isOnScreen", "isElementOnScreen" );
-    lua_classfunction ( luaVM, "isStreamedIn", "isElementStreamedIn" );
-    lua_classfunction ( luaVM, "isStreamable", "isElementStreamable" );
-    lua_classfunction ( luaVM, "isLocal", "isElementLocal" );
-    lua_classfunction ( luaVM, "isSyncer", "isElementSyncer" );
-    lua_classfunction ( luaVM, "getChildren", "getElementChildren" );
-    lua_classfunction ( luaVM, "getChild", "getElementChild" );
-    lua_classfunction ( luaVM, "getChildrenCount", "getElementChildrenCount" );
-    lua_classfunction ( luaVM, "getAllData", "getAllElementData" );
-    lua_classfunction ( luaVM, "getID", "getElementID" );
-    lua_classfunction ( luaVM, "getParent", "getElementParent" );
-    lua_classfunction ( luaVM, "getBoundingBox", "getElementBoundingBox" );
-    lua_classfunction ( luaVM, "getPosition", CLuaOOPDefs::GetElementPosition );
-    lua_classfunction ( luaVM, "getRotation", CLuaOOPDefs::GetElementRotation );
-    lua_classfunction ( luaVM, "getMatrix", CLuaOOPDefs::GetElementMatrix );
-    lua_classfunction ( luaVM, "getVelocity", CLuaOOPDefs::GetElementVelocity );
-    lua_classfunction ( luaVM, "getByType", "getElementsByType" );
-    lua_classfunction ( luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "getElementDistanceFromCentreOfMassToBaseOfModel" );
-    lua_classfunction ( luaVM, "getRadius", "getElementRadius" );
-    lua_classfunction ( luaVM, "getType", "getElementType" );
-    lua_classfunction ( luaVM, "getInterior", "getElementInterior" );
-    lua_classfunction ( luaVM, "getWithinColShape", "getElementsWithinColShape" );
-    lua_classfunction ( luaVM, "getDimension", "getElementDimension" );
-    lua_classfunction ( luaVM, "getZoneName", "getElementZoneName" );
-    lua_classfunction ( luaVM, "getColShape", "getElementColShape" );
-    lua_classfunction ( luaVM, "getAlpha", "getElementAlpha" );
-    lua_classfunction ( luaVM, "getHealth", "getElementHealth" );
-    lua_classfunction ( luaVM, "getModel", "getElementModel" );
-    lua_classfunction ( luaVM, "getLowLOD", "getLowLODElement" );
-    lua_classfunction ( luaVM, "getAttachedElements", "getAttachedElements" );
-    lua_classfunction ( luaVM, "getAttachedTo", "getElementAttachedTo" );
-    lua_classfunction ( luaVM, "getAttachedOffsets", "getElementAttachedOffsets" );
-    lua_classfunction ( luaVM, "getData", "getElementData" );
-    
-    lua_classfunction ( luaVM, "setAttachedOffsets", "setElementAttachedOffsets" );
-    lua_classfunction ( luaVM, "setData", "setElementData" );
-    lua_classfunction ( luaVM, "setID", "setElementID" );
-    lua_classfunction ( luaVM, "setParent", "setElementParent" );
-    lua_classfunction ( luaVM, "setPosition", "setElementPosition" );
-    lua_classfunction ( luaVM, "setRotation", CLuaOOPDefs::SetElementRotation );
-    lua_classfunction ( luaVM, "setMatrix", "setElementMatrix" );
-    lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
-    lua_classfunction ( luaVM, "setVisibleTo", "setElementVisibleTo" );
-    lua_classfunction ( luaVM, "setInterior", "setElementInterior" );
-    lua_classfunction ( luaVM, "setDimension", "setElementDimension" );
-    lua_classfunction ( luaVM, "setAlpha", "setElementAlpha" );
-    lua_classfunction ( luaVM, "setDoubleSided", "setElementDoubleSided" );
-    lua_classfunction ( luaVM, "setHealth", "setElementHealth" );
-    lua_classfunction ( luaVM, "setModel", "setElementModel" );
-    lua_classfunction ( luaVM, "setCollisionsEnabled", "setElementCollisionsEnabled" );
-    lua_classfunction ( luaVM, "setCollidableWith", "setElementCollidableWith" );
-    lua_classfunction ( luaVM, "setFrozen", "setElementFrozen" );
-    lua_classfunction ( luaVM, "setLowLOD", "setLowLODElement" );
-    lua_classfunction ( luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled" );
-    lua_classfunction ( luaVM, "setStreamable", "setElementStreamable" );
-
-    lua_classvariable ( luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled" );
-    lua_classvariable ( luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad" );
-    lua_classvariable ( luaVM, "onScreen", NULL, "isElementOnScreen" );
-    lua_classvariable ( luaVM, "streamedIn", NULL, "isElementStreamedIn" );
-    lua_classvariable ( luaVM, "streamable", "setElementStreamable", "isElementStreamable" );
-    lua_classvariable ( luaVM, "localElement", NULL, "isElementLocal" );
-    lua_classvariable ( luaVM, "id", "setElementID", "getElementID" );
-    lua_classvariable ( luaVM, "type", NULL, "getElementType" );
-    lua_classvariable ( luaVM, "colShape", NULL, "getElementColShape" );
-    lua_classvariable ( luaVM, "parent", "setElementParent", "getElementParent" );
-    lua_classvariable ( luaVM, "attachedTo", "attachElements", "getElementAttachedTo" );
-    lua_classvariable ( luaVM, "attached", NULL, "isElementAttached" );
-    lua_classvariable ( luaVM, "health", "setElementHealth", "getElementHealth" );
-    lua_classvariable ( luaVM, "alpha", "setElementAlpha", "getElementAlpha" );
-    lua_classvariable ( luaVM, "doubleSided", "setElementDoubleSided", "isElementDoubleSided" );
-    lua_classvariable ( luaVM, "model", "setElementModel", "getElementModel" );
-    lua_classvariable ( luaVM, "syncedByLocalPlayer", NULL, "isElementSyncer" );
-    lua_classvariable ( luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled" );
-    lua_classvariable ( luaVM, "frozen", "setElementFrozen", "isElementFrozen" );
-    lua_classvariable ( luaVM, "inWater", NULL, "isElementInWater" );
-    lua_classvariable ( luaVM, "lowLOD", "setLowLODElement", "getLowLODElement" );
-    lua_classvariable ( luaVM, "dimension", "setElementDimension", "getElementDimension" );
-    lua_classvariable ( luaVM, "interior", "setElementInterior", "getElementInterior" );
-    lua_classvariable ( luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "getElementDistanceFromCentreOfMassToBaseOfModel" );
-    lua_classvariable ( luaVM, "radius", NULL, "getElementRadius" );
-    lua_classvariable ( luaVM, "childrenCount", NULL, "getElementChildrenCount" );
-    lua_classvariable ( luaVM, "position", CLuaFunctionDefs::SetElementPosition, CLuaOOPDefs::GetElementPosition );
-    lua_classvariable ( luaVM, "rotation", CLuaOOPDefs::SetElementRotation, CLuaOOPDefs::GetElementRotation );
-    lua_classvariable ( luaVM, "matrix", CLuaFunctionDefs::SetElementMatrix, CLuaOOPDefs::GetElementMatrix );
-    lua_classvariable ( luaVM, "velocity", CLuaFunctionDefs::SetElementVelocity, CLuaOOPDefs::GetElementVelocity );
-    lua_classvariable ( luaVM, "isElement", NULL, "isElement" );
-    lua_classvariable ( luaVM, "data", NULL, "getAllElementData" ); // TODO: .data["age"] = 1337;
-    
-    lua_registerclass ( luaVM, "Element" );
-}
-
-
 void CLuaMain::AddPickupClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -1119,7 +994,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     if ( !m_bEnableOOP )
         return;
 
-    AddElementClass             ( luaVM );
+    CLuaElementDefs::AddClass ( luaVM );
     AddPickupClass              ( luaVM );
     AddColShapeClass            ( luaVM );
     AddProjectileClass          ( luaVM );
