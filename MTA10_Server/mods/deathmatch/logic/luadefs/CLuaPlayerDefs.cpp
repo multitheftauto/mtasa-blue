@@ -64,8 +64,8 @@ void CLuaPlayerDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "takePlayerScreenShot", TakePlayerScreenShot );
 
     // All seeing eye
-    CLuaCFunctions::AddFunction ( "getAnnounceValue", GetPlayerAnnounceValue );
-    CLuaCFunctions::AddFunction ( "setAnnounceValue", SetPlayerAnnounceValue );
+    CLuaCFunctions::AddFunction ( "getPlayerAnnounceValue", GetPlayerAnnounceValue );
+    CLuaCFunctions::AddFunction ( "setPlayerAnnounceValue", SetPlayerAnnounceValue );
 
     // Audio funcs
     //CLuaCFunctions::AddFunction ( "playMissionAudio", CLuaFunctionDefinitions::PlayMissionAudio );
