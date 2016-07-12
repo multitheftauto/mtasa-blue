@@ -76,7 +76,6 @@ public:
     unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
     unsigned long                   GetElementCount         ( void ) const;
 
-    void                            AddElementClass         ( lua_State* luaVM );
     void                            AddPickupClass          ( lua_State* luaVM );
     void                            AddColShapeClass        ( lua_State* luaVM );
     void                            AddProjectileClass      ( lua_State* luaVM );

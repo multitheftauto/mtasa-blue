@@ -369,6 +369,7 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaBitDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaBlipDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaBrowserDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaElementDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaMarkerDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaObjectDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPlayerDefs.cpp" />
@@ -571,7 +572,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Commands.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Drawing.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Element.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Engine.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Event.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.GUI.cpp" />
@@ -597,7 +597,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaTimerManager.cpp" />
     <ClCompile Include="..\shared_logic\lua\LuaCommon.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp" />
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp" />
     <ClCompile Include="..\..\..\vendor\bochs\bochs_internal\crc32.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaClassDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaDefs.cpp" />
@@ -763,6 +762,7 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaBitDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaBlipDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaBrowserDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaElementDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaMarkerDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaObjectDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPlayerDefs.h" />

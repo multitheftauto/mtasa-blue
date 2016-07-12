@@ -581,9 +581,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Drawing.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Element.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Engine.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
@@ -657,9 +654,6 @@
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp">
-      <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp">
       <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vendor\bochs\bochs_internal\crc32.cpp">
@@ -933,6 +927,9 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaObjectDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaElementDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1688,6 +1685,9 @@
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaObjectDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaElementDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>
