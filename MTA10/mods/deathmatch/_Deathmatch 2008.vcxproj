@@ -375,6 +375,7 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaPlayerDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPointLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPedDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaRadarAreaDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp" />
@@ -384,7 +385,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector4.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp" />
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp" />
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp" />
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
@@ -579,7 +579,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Radar.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Resource.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Shape.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Team.cpp" />
@@ -768,6 +767,7 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaPlayerDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPointLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPedDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaRadarAreaDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h" />

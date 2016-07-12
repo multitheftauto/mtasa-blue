@@ -198,30 +198,6 @@ void CLuaMain::AddProjectileClass ( lua_State* luaVM )
 
 
 // TODO: specials
-void CLuaMain::AddRadarAreaClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "createRadarArea" );
-    lua_classfunction ( luaVM, "isInside", "isInsideRadarArea" );
-
-    lua_classfunction ( luaVM, "isFlashing", "isRadarAreaFlashing" );
-    lua_classfunction ( luaVM, "getSize", "getRadarAreaSize" );
-    lua_classfunction ( luaVM, "getColor", "getRadarAreaColor" );
-
-    lua_classfunction ( luaVM, "setSize", "setRadarAreaSize" );
-    lua_classfunction ( luaVM, "setFlashing", "setRadarAreaFlashing" );
-    lua_classfunction ( luaVM, "setColor", "setRadarAreaColor" );
-
-    lua_classvariable ( luaVM, "flashing", "setRadarAreaFlashing", "isRadarAreaFlashing" );
-    //lua_classvariable ( luaVM, "color", "setRadarAreaColor", "getRadarAreaColor" );
-    lua_classvariable ( luaVM, "size", CLuaFunctionDefs::SetRadarAreaSize, CLuaOOPDefs::GetRadarAreaSize );
-    
-    lua_registerclass ( luaVM, "RadarArea", "Element" );
-}
-
-
-// TODO: specials
 void CLuaMain::AddTeamClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -996,7 +972,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddPickupClass              ( luaVM );
     AddColShapeClass            ( luaVM );
     AddProjectileClass          ( luaVM );
-    AddRadarAreaClass           ( luaVM );
+    
     AddTeamClass                ( luaVM );
     AddWaterClass               ( luaVM );
     CLuaAudioDefs::AddClass     ( luaVM );
@@ -1045,6 +1021,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaPedDefs::AddClass ( luaVM );
     CLuaPlayerDefs::AddClass ( luaVM );
     CLuaPointLightDefs::AddClass ( luaVM );
+    CLuaRadarAreaDefs::AddClass ( luaVM );
     CLuaSearchLightDefs::AddClass ( luaVM );
     CLuaVehicleDefs::AddClass ( luaVM );
 }
