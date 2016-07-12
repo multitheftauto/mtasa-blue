@@ -569,9 +569,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.BodyClothes.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Camera.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Commands.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
@@ -649,9 +646,6 @@
     </ClCompile>
     <ClCompile Include="..\shared_logic\lua\LuaCommon.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp">
-      <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vendor\bochs\bochs_internal\crc32.cpp">
       <Filter>Source Files\shared_logic\utils</Filter>
@@ -927,6 +921,9 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaRadarAreaDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaCameraDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1688,6 +1685,9 @@
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaRadarAreaDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaCameraDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>

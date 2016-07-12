@@ -111,8 +111,6 @@ public:
     void                            AddEngineTxdClass       ( lua_State* luaVM );
     void                            AddEngineDffClass       ( lua_State* luaVM );
     
-    void                            AddCameraClass          ( lua_State* luaVM );
-
     void                            AddDxMaterialClass      ( lua_State* luaVM );
     void                            AddDxTextureClass       ( lua_State* luaVM );
     void                            AddDxFontClass          ( lua_State* luaVM );
