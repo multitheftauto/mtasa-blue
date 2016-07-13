@@ -1,8 +1,8 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CTrackTrackManager.h
+*  FILE:        sdk/game/CTrainTrack.h
 *  PURPOSE:     Train Track Interface
 
 *  DEVELOPERS:  Cazomino05 < Cazomino05@gmail.com >
@@ -11,14 +11,14 @@
 *
 *****************************************************************************/
 
-#ifndef __CTRAINTRACK_H
-#define __CTRAINTRACK_H
+#pragma once;
 
 class CTrainTrack
 {
 public:
     virtual bool                            SetRailNodePosition             ( unsigned int uiNode, CVector vecPosition ) = 0;
     virtual bool                            GetRailNodePosition             ( unsigned int uiNode, CVector& vecPosition ) = 0;
+    virtual bool                            GetRailNodeDistance             ( unsigned int uiNode, float& fDistance ) = 0;
 
     virtual bool                            SetTrackLength                  ( float fLength ) = 0;
     virtual float                           GetTrackLength                  ( void ) = 0;
@@ -31,5 +31,3 @@ public:
     virtual void                            SetLastNodesLinked              ( bool bLinked ) = 0;
 
 };
-
-#endif

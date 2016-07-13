@@ -58,6 +58,7 @@ public:
 
     bool            SetRailNodePosition             ( unsigned int uiNode, CVector vecPosition );
     bool            GetRailNodePosition             ( unsigned int uiNode, CVector& vecPosition );
+    bool            GetRailNodeDistance             ( unsigned int uiNode, float& fDistance );
 
     bool            SetTrackLength                  ( float fLength ); 
     float           GetTrackLength                  ( void );

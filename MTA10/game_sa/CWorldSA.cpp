@@ -543,19 +543,25 @@ int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, uchar& ucOu
     // Original function @ 0x6F7550
     int iNodeId = -1;
     float fMinDistance = 99999.898f;
-    int* aNumTrackNodes = (int*)ARRAY_NumRailTrackNodes;
-    SRailNodeSA** aTrackNodes = (SRailNodeSA**)ARRAY_RailTrackNodePointers;
     uchar ucDesiredTrackId = ucOutTrackId;
+    CTrainTrackManager* pTrainTrackManager = g_pCore->GetGame ()->GetTrainTrackManager ();
 
-    for ( uchar ucTrackId = 0; ucTrackId < NUM_RAILTRACKS; ++ucTrackId )
+    for ( uchar ucTrackId = 0; ucTrackId < MAX_TOTAL_TRACKS; ++ucTrackId )
     {
-        if ( ( ucDesiredTrackId == 0xFF || ucTrackId == ucDesiredTrackId ) && aNumTrackNodes[ucTrackId] > 0 )
+        CTrainTrack* pTrack = pTrainTrackManager->GetTrainTrack ( ucTrackId );
+        if ( pTrack && ( ucDesiredTrackId == 0xFF || ucTrackId == ucDesiredTrackId ) && (pTrack->GetNumberOfNodes() > 0) )
         {
-            for ( int i = 0; i < aNumTrackNodes[ucTrackId]; ++i )
+            for ( int i = 0; i < pTrack->GetNumberOfNodes(); ++i )
             {
-                SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
+                CVector vecRailNodePos;
+                pTrack->GetRailNodePosition ( i, vecRailNodePos );
 
-                float fDistance = sqrt ( pow(vecPosition.fZ - railNode.sZ * 0.125f, 2) + pow(vecPosition.fY - railNode.sY * 0.125f, 2) + pow(vecPosition.fX - railNode.sX * 0.125f, 2) );
+                float fDistance = sqrt ( 
+                    pow(vecPosition.fZ - vecRailNodePos.fZ * 0.125f, 2) +
+                    pow(vecPosition.fY - vecRailNodePos.fY * 0.125f, 2) +
+                    pow(vecPosition.fX - vecRailNodePos.fX * 0.125f, 2)
+                );
+                
                 if ( fDistance < fMinDistance )
                 {
                     fMinDistance = fDistance;
@@ -567,7 +573,8 @@ int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, uchar& ucOu
     }
 
     // Read rail distance
-    fOutRailDistance = aTrackNodes[ucOutTrackId][iNodeId].sRailDistance * 3.33333334f;
+    pTrainTrackManager->GetTrainTrack ( ucOutTrackId )->GetRailNodeDistance ( iNodeId, fOutRailDistance );
+    fOutRailDistance *= 3.33333334f;
     
     return iNodeId;
     

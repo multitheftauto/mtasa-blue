@@ -236,6 +236,16 @@ bool CTrainTrackSA::GetRailNodePosition ( unsigned int uiNode, CVector& vecPosit
     return false;
 }
 
+bool CTrainTrackSA::GetRailNodeDistance ( unsigned int uiNode, float& fDistance ) {
+    SRailNodeSA* pNode = GetRailNode ( uiNode );
+    if (!pNode) {
+        return false;
+    }
+
+    fDistance = pNode->sRailDistance;
+    return true;
+}
+
 bool CTrainTrackSA::SetNumberOfNodes ( unsigned int uiNodes )
 {
     m_pManager->Reallocate ( this, uiNodes );

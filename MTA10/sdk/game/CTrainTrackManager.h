@@ -11,8 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CTRAINTRACKMANAGER_H
-#define __CTRAINTRACKMANAGER_H
+#pragma once;
 
 class CTrainTrackManager
 {
@@ -32,5 +31,3 @@ public:
 
     virtual bool                IsValid                         ( unsigned char ucTrack ) = 0;
 };
-
-#endif
