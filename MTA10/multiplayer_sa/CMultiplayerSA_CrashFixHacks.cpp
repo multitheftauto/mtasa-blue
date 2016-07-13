@@ -1536,7 +1536,11 @@ void _cdecl OnMY_printf ( DWORD dwCalledFrom, const char* szMessage )
     else
     if ( strMessage == "Too many objects without modelinfo structures" )
     {
-        // Corrupted gta3.img - TODO: Inform user one day
+        // An img file contains errors
+        if ( GetApplicationSetting ( "diagnostics", "img-file-corrupt" ).empty () )
+        {
+            SetApplicationSetting ( "diagnostics", "img-file-corrupt", "gta3.img" );
+        }
     }
 }
 

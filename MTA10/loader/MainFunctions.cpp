@@ -931,6 +931,7 @@ int LaunchGame ( SString strCmdLine )
 {
     CheckAndShowModelProblems();
     CheckAndShowUpgradeProblems();
+    CheckAndShowImgProblems ();
 
     const SString strGTAPath = GetGTAPath ();
     const SString strMTASAPath = GetMTASAPath ();
