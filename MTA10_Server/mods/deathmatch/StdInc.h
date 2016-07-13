@@ -135,6 +135,7 @@ struct SAclRequest;
 #include "luadefs/CLuaResourceDefs.h"
 #include "luadefs/CLuaTeamDefs.h"
 #include "luadefs/CLuaTextDefs.h"
+#include "luadefs/CLuaTrainTrackDefs.h"
 #include "luadefs/CLuaTimerDefs.h"
 #include "luadefs/CLuaVector2Defs.h"
 #include "luadefs/CLuaVector3Defs.h"

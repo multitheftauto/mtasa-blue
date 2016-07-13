@@ -923,6 +923,9 @@
     <ClCompile Include="..\shared_logic\CClientTrainTrack.cpp">
       <Filter>Source Files\shared_logic</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaTrainTrackDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CClient.h">
@@ -1698,6 +1701,9 @@
     </ClInclude>
     <ClInclude Include="..\shared_logic\CClientTrainTrack.h">
       <Filter>Header Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaTrainTrackDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

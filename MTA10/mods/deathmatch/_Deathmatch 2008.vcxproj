@@ -382,6 +382,7 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaResourceDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaTeamDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaTrainTrackDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector4Defs.cpp" />
@@ -773,6 +774,7 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaResourceDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaTeamDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaTrainTrackDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector4Defs.h" />

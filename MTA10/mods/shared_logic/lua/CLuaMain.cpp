@@ -832,6 +832,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaResourceDefs::AddClass ( luaVM );
     CLuaSearchLightDefs::AddClass ( luaVM );
     CLuaTeamDefs::AddClass ( luaVM );
+    CLuaTrainTrackDefs::AddClass ( luaVM );
     CLuaVehicleDefs::AddClass ( luaVM );
 }
 

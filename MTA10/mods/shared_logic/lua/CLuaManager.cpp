@@ -560,12 +560,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setPedTargetingMarkerEnabled", CLuaFunctionDefs::SetPedTargetingMarkerEnabled );
     CLuaCFunctions::AddFunction ( "isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled );
 
-    // Train functions
-    CLuaCFunctions::AddFunction ( "getTrainTrackNumberOfNodes", CLuaFunctionDefs::GetTrainTrackNumberOfNodes );
-    CLuaCFunctions::AddFunction ( "getTrainTrackID", CLuaFunctionDefs::GetTrainTrackID );
-    CLuaCFunctions::AddFunction ( "getTrainTrackLength", CLuaFunctionDefs::GetTrainTrackLength );
-    CLuaCFunctions::AddFunction ( "getTrainTrackPosition", CLuaFunctionDefs::GetTrainTrackPosition );
-
     // Input functions
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );
     CLuaCFunctions::AddFunction ( "unbindKey", CLuaFunctionDefs::UnbindKey );
@@ -718,5 +712,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaSearchLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
     CLuaTeamDefs::LoadFunctions ();
+    CLuaTrainTrackDefs::LoadFunctions ();
     CLuaVehicleDefs::LoadFunctions ();
 }

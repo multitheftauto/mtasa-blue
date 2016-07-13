@@ -121,6 +121,7 @@
 #include <luadefs/CLuaPlayerDefs.h>
 #include <luadefs/CLuaRadarAreaDefs.h>
 #include <luadefs/CLuaResourceDefs.h>
+#include <luadefs/CLuaTrainTrackDefs.h>
 #include <luadefs/CLuaVector2Defs.h>
 #include <luadefs/CLuaVector3Defs.h>
 #include <luadefs/CLuaVector4Defs.h>
