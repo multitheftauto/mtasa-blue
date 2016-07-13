@@ -772,91 +772,6 @@ void CLuaMain::AddEngineDffClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "EngineDFF", "Element" );
 }
 
-
-void CLuaMain::AddDxMaterialClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "getSize", "dxGetMaterialSize" );
-    
-    lua_registerclass ( luaVM, "DxMaterial", "Element" );
-}
-
-
-void CLuaMain::AddDxTextureClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "dxCreateTexture");
-    
-    lua_classfunction ( luaVM, "setEdge", "dxSetTextureEdge");
-    lua_classfunction ( luaVM, "setPixels", "dxSetTexturePixels");
-    lua_classfunction ( luaVM, "getPixels", "dxGetTexturePixels");
-    
-    lua_registerclass ( luaVM, "DxTexture", "DxMaterial" );
-}
-
-
-// TODO: function specials
-void CLuaMain::AddDxFontClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "dxCreateFont");
-
-    lua_classfunction ( luaVM, "getHeight", CLuaOOPDefs::DxGetFontHeight );
-    lua_classfunction ( luaVM, "getTextWidth", CLuaOOPDefs::DxGetTextWidth );
-    
-    //lua_classvariable ( luaVM, "height", NULL, "dxGetFontHeight"); // swap arguments, .height[scale] = int(height);
-    
-    lua_registerclass ( luaVM, "DxFont" );
-
-}
-
-
-// TODO: specials
-void CLuaMain::AddDxShaderClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "dxCreateShader" );
-    lua_classfunction ( luaVM, "applyToWorldTexture", "engineApplyShaderToWorldTexture" );
-    lua_classfunction ( luaVM, "removeFromWorldTexture", "engineRemoveShaderFromWorldTexture" );
-    
-    lua_classfunction ( luaVM, "setValue", "dxSetShaderValue" );
-    lua_classfunction ( luaVM, "setTessellation", "dxSetShaderTessellation" );
-    lua_classfunction ( luaVM, "setTransform", "dxSetShaderTransform" );
-    
-    //lua_classvariable ( luaVM, "value", CLuaOOPDefs::SetShaderValue, NULL); // .value["param"] = value
-    lua_classvariable ( luaVM, "tessellation", "dxSetShaderTessellation", NULL );
-
-    lua_registerclass ( luaVM, "DxShader", "DxMaterial" );
-}
-
-
-void CLuaMain::AddDxScreenSourceClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "dxCreateScreenSource");
-    lua_classfunction ( luaVM, "update", "dxUpdateScreenSource");
-    
-    lua_registerclass ( luaVM, "DxScreenSource", "DxTexture" );
-}
-
-
-void CLuaMain::AddDxRenderTargetClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "dxCreateRenderTarget");
-
-    lua_classfunction ( luaVM, "setAsTarget", "dxSetRenderTarget");
-    
-    lua_registerclass ( luaVM, "DxRenderTarget", "DxTexture" );
-}
-
-
 void CLuaMain::InitClasses ( lua_State* luaVM )
 {
     lua_initclasses             ( luaVM );
@@ -905,15 +820,10 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddEngineTxdClass           ( luaVM );
     AddEngineDffClass           ( luaVM );
     
-    AddDxMaterialClass          ( luaVM );
-    AddDxTextureClass           ( luaVM );
-    AddDxFontClass              ( luaVM );
-    AddDxShaderClass            ( luaVM );
-    AddDxScreenSourceClass      ( luaVM );
-    AddDxRenderTargetClass      ( luaVM );
     CLuaBlipDefs::AddClass      ( luaVM );
-    CLuaBrowserDefs::AddClass   ( luaVM );
     CLuaCameraDefs::AddClass ( luaVM );
+    CLuaDrawingDefs::AddClass ( luaVM );
+    CLuaBrowserDefs::AddClass ( luaVM ); // browser must be after drawing, since it extends DxTexture
     CLuaFileDefs::AddClass ( luaVM );
     CLuaMarkerDefs::AddClass ( luaVM );
     CLuaObjectDefs::AddClass ( luaVM );

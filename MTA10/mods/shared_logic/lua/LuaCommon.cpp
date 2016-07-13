@@ -274,6 +274,7 @@ void lua_registerclass ( lua_State* luaVM, const char* szName, const char* szPar
         lua_rawget ( luaVM, LUA_REGISTRYINDEX ); // class table, mt table
         lua_getfield ( luaVM, -1, szParent ); // class table, mt table, parent table
 
+        // Error if we can't find the parent class to extend from
         assert ( lua_istable ( luaVM, -1 ) );
 
         lua_setfield ( luaVM, -3, "__parent" ); // class table, mt table

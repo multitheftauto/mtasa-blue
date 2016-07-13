@@ -17,9 +17,6 @@
     <Filter Include="Source Files\shared_logic\lua">
       <UniqueIdentifier>{72ea805f-d464-4727-b50e-22ef5cedd747}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\shared_logic\lua\oopdefs">
-      <UniqueIdentifier>{f9f63459-5d42-4049-bbb3-64799e25b896}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\shared_logic\utils">
       <UniqueIdentifier>{55d7d751-fc86-415e-89a5-6d757b618ebb}</UniqueIdentifier>
     </Filter>
@@ -575,9 +572,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Drawing.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Engine.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
@@ -770,9 +764,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp">
-      <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vendor\lua\src\lmathlib.c">
       <Filter>Source Files\utils\lualib</Filter>
     </ClCompile>
@@ -924,6 +915,9 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaTeamDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaDrawingDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1694,6 +1688,9 @@
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaTeamDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaDrawingDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>

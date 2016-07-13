@@ -370,6 +370,7 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaBlipDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaBrowserDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaCameraDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaDrawingDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaElementDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaMarkerDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaObjectDefs.cpp" />
@@ -387,7 +388,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector4.cpp" />
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp" />
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp" />
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
@@ -573,7 +573,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.BodyClothes.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Commands.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Drawing.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Engine.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Event.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.GUI.cpp" />
@@ -761,6 +760,7 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaBlipDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaBrowserDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaCameraDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaDrawingDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaElementDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaMarkerDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaObjectDefs.h" />
