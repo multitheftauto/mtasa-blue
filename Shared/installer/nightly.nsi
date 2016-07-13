@@ -88,7 +88,8 @@ Var ShowLastUsed
     !endif
     !define VI_PRODUCT_NAME "MTA San Andreas"
     !define VI_COMPANY_NAME "Multi Theft Auto"
-    !define VI_LEGAL_COPYRIGHT "(C) 2003 - 2014 Multi Theft Auto"
+    !define /date DATE_YEAR "%Y"
+    !define VI_LEGAL_COPYRIGHT "(C) 2003 - ${DATE_YEAR} Multi Theft Auto"
     !ifndef LIGHTBUILD
         !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
     !else
