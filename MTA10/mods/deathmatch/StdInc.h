@@ -111,6 +111,7 @@
 #include <luadefs/CLuaBrowserDefs.h>
 #include <luadefs/CLuaClassDefs.h>
 #include <luadefs/CLuaCameraDefs.h>
+#include <luadefs/CLuaDrawingDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
@@ -129,7 +130,6 @@
 #include <luadefs/CLuaTeamDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
-#include <lua/oopdefs/CLuaOOPDefs.h>
 #include <CRemoteCalls.h>
 
 // Shared includes

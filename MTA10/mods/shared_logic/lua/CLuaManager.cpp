@@ -278,43 +278,6 @@ void CLuaManager::LoadCFunctions ( void )
     //CLuaCFunctions::AddFunction ( "engineAddAllAtomics", CLuaFunctionDefs::EngineAddAllAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", CLuaFunctionDefs::EngineReplaceVehiclePart );
 
-    // Drawing funcs
-    CLuaCFunctions::AddFunction ( "dxDrawLine", CLuaFunctionDefs::dxDrawLine );
-    CLuaCFunctions::AddFunction ( "dxDrawMaterialLine3D", CLuaFunctionDefs::dxDrawMaterialLine3D );
-    CLuaCFunctions::AddFunction ( "dxDrawMaterialSectionLine3D", CLuaFunctionDefs::dxDrawMaterialSectionLine3D );
-    CLuaCFunctions::AddFunction ( "dxDrawLine3D", CLuaFunctionDefs::dxDrawLine3D );
-    CLuaCFunctions::AddFunction ( "dxDrawText", CLuaFunctionDefs::dxDrawText );
-    CLuaCFunctions::AddFunction ( "dxDrawRectangle", CLuaFunctionDefs::dxDrawRectangle );
-    CLuaCFunctions::AddFunction ( "dxDrawImage", CLuaFunctionDefs::dxDrawImage );
-    CLuaCFunctions::AddFunction ( "dxDrawImageSection", CLuaFunctionDefs::dxDrawImageSection );
-    CLuaCFunctions::AddFunction ( "dxGetTextWidth", CLuaFunctionDefs::dxGetTextWidth );
-    CLuaCFunctions::AddFunction ( "dxGetFontHeight", CLuaFunctionDefs::dxGetFontHeight );
-    CLuaCFunctions::AddFunction ( "dxCreateFont", CLuaFunctionDefs::dxCreateFont );
-    CLuaCFunctions::AddFunction ( "dxCreateTexture", CLuaFunctionDefs::dxCreateTexture );
-    CLuaCFunctions::AddFunction ( "dxCreateShader", CLuaFunctionDefs::dxCreateShader );
-    CLuaCFunctions::AddFunction ( "dxCreateRenderTarget", CLuaFunctionDefs::dxCreateRenderTarget );
-    CLuaCFunctions::AddFunction ( "dxCreateScreenSource", CLuaFunctionDefs::dxCreateScreenSource );
-    CLuaCFunctions::AddFunction ( "dxGetMaterialSize", CLuaFunctionDefs::dxGetMaterialSize );
-    CLuaCFunctions::AddFunction ( "dxSetShaderValue", CLuaFunctionDefs::dxSetShaderValue );
-    CLuaCFunctions::AddFunction ( "dxSetShaderTessellation", CLuaFunctionDefs::dxSetShaderTessellation );
-    CLuaCFunctions::AddFunction ( "dxSetShaderTransform", CLuaFunctionDefs::dxSetShaderTransform );
-    CLuaCFunctions::AddFunction ( "dxSetRenderTarget", CLuaFunctionDefs::dxSetRenderTarget );
-    CLuaCFunctions::AddFunction ( "dxUpdateScreenSource", CLuaFunctionDefs::dxUpdateScreenSource );
-    CLuaCFunctions::AddFunction ( "dxGetStatus", CLuaFunctionDefs::dxGetStatus );
-    CLuaCFunctions::AddFunction ( "dxSetTestMode", CLuaFunctionDefs::dxSetTestMode );
-    CLuaCFunctions::AddFunction ( "dxGetTexturePixels", CLuaFunctionDefs::dxGetTexturePixels );
-    CLuaCFunctions::AddFunction ( "dxSetTexturePixels", CLuaFunctionDefs::dxSetTexturePixels );
-    CLuaCFunctions::AddFunction ( "dxGetPixelsSize", CLuaFunctionDefs::dxGetPixelsSize );
-    CLuaCFunctions::AddFunction ( "dxGetPixelsFormat", CLuaFunctionDefs::dxGetPixelsFormat );
-    CLuaCFunctions::AddFunction ( "dxConvertPixels", CLuaFunctionDefs::dxConvertPixels );
-    CLuaCFunctions::AddFunction ( "dxGetPixelColor", CLuaFunctionDefs::dxGetPixelColor );
-    CLuaCFunctions::AddFunction ( "dxSetPixelColor", CLuaFunctionDefs::dxSetPixelColor );
-    CLuaCFunctions::AddFunction ( "dxSetBlendMode", CLuaFunctionDefs::dxSetBlendMode );
-    CLuaCFunctions::AddFunction ( "dxGetBlendMode", CLuaFunctionDefs::dxGetBlendMode );
-    CLuaCFunctions::AddFunction ( "dxSetAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxSetAspectRatioAdjustmentEnabled );
-    CLuaCFunctions::AddFunction ( "dxIsAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled );
-    CLuaCFunctions::AddFunction ( "dxSetTextureEdge", CLuaFunctionDefs::dxSetTextureEdge );
-
     // Pickup create/destroy funcs
     CLuaCFunctions::AddFunction ( "createPickup", CLuaFunctionDefs::CreatePickup );
 
@@ -735,6 +698,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaBlipDefs::LoadFunctions ();
     CLuaBrowserDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();
+    CLuaDrawingDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();

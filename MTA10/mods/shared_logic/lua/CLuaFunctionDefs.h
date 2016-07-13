@@ -127,43 +127,6 @@ public:
     LUA_DECLARE ( EngineGetModelTextureNames );
     LUA_DECLARE ( EngineGetVisibleTextureNames );
 
-    // Drawing funcs (low-level)
-    LUA_DECLARE ( dxDrawLine );
-    LUA_DECLARE ( dxDrawLine3D );
-    LUA_DECLARE ( dxDrawMaterialLine3D );
-    LUA_DECLARE ( dxDrawMaterialSectionLine3D );
-    LUA_DECLARE ( dxDrawText );
-    LUA_DECLARE ( dxDrawRectangle );
-    LUA_DECLARE ( dxDrawImage );
-    LUA_DECLARE ( dxDrawImageSection );
-    LUA_DECLARE ( dxGetTextWidth );
-    LUA_DECLARE ( dxGetFontHeight );
-    LUA_DECLARE ( dxCreateFont );
-    LUA_DECLARE ( dxCreateTexture );
-    LUA_DECLARE ( dxCreateShader );
-    LUA_DECLARE ( dxCreateRenderTarget );
-    LUA_DECLARE ( dxCreateScreenSource );
-    LUA_DECLARE ( dxGetMaterialSize );
-    LUA_DECLARE ( dxSetShaderValue );
-    LUA_DECLARE ( dxSetShaderTessellation );
-    LUA_DECLARE ( dxSetShaderTransform );
-    LUA_DECLARE ( dxSetRenderTarget );
-    LUA_DECLARE ( dxUpdateScreenSource );
-    LUA_DECLARE ( dxGetStatus );
-    LUA_DECLARE ( dxSetTestMode );
-    LUA_DECLARE ( dxGetTexturePixels );
-    LUA_DECLARE ( dxSetTexturePixels );
-    LUA_DECLARE ( dxGetPixelsSize );
-    LUA_DECLARE ( dxGetPixelsFormat );
-    LUA_DECLARE ( dxConvertPixels );
-    LUA_DECLARE ( dxGetPixelColor );
-    LUA_DECLARE ( dxSetPixelColor );
-    LUA_DECLARE ( dxSetBlendMode );
-    LUA_DECLARE ( dxGetBlendMode );
-    LUA_DECLARE ( dxSetAspectRatioAdjustmentEnabled );
-    LUA_DECLARE ( dxIsAspectRatioAdjustmentEnabled );
-    LUA_DECLARE ( dxSetTextureEdge );
-
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
     LUA_DECLARE ( GetTok );

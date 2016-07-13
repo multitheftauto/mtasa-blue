@@ -25,7 +25,6 @@ void CLuaTeamDefs::LoadFunctions ( void )
 
 void CLuaTeamDefs::AddClass ( lua_State* luaVM )
 {
-
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "getTeamFromName" );

@@ -109,13 +109,6 @@ public:
     void                            AddEngineTxdClass       ( lua_State* luaVM );
     void                            AddEngineDffClass       ( lua_State* luaVM );
     
-    void                            AddDxMaterialClass      ( lua_State* luaVM );
-    void                            AddDxTextureClass       ( lua_State* luaVM );
-    void                            AddDxFontClass          ( lua_State* luaVM );
-    void                            AddDxShaderClass        ( lua_State* luaVM );
-    void                            AddDxScreenSourceClass  ( lua_State* luaVM );
-    void                            AddDxRenderTargetClass  ( lua_State* luaVM );
-    
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );
     const SString&                  GetFunctionTag          ( int iLuaFunction );
