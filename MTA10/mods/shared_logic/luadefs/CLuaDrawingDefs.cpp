@@ -312,7 +312,20 @@ int CLuaDrawingDefs::DxDrawText ( lua_State* luaVM )
         if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
         if ( !bClip )               ulFormat |= DT_NOCLIP;
 
-        CStaticFunctionDefinitions::DrawText ( vecTopLeft.fX, vecTopLeft.fY, vecBottomRight.fX, vecBottomRight.fY, color, strText, fScaleX, fScaleY, ulFormat, pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, vecRotationOrigin.fX, vecRotationOrigin.fY );
+        g_pCore->GetGraphics ()->DrawTextQueued (
+            vecTopLeft.fX, vecTopLeft.fY,
+            vecBottomRight.fX, vecBottomRight.fY,
+            color,
+            strText,
+            fScaleX, fScaleY,
+            ulFormat,
+            pD3DXFont,
+            bPostGUI,
+            bColorCoded,
+            bSubPixelPositioning,
+            fRotation,
+            vecRotationOrigin.fX, vecRotationOrigin.fY
+        );
 
         lua_pushboolean ( luaVM, true );
         return 1;
