@@ -465,14 +465,6 @@ public:
     LUA_DECLARE ( CreateColPolygon );
     LUA_DECLARE ( CreateColTube );
 
-    // Team get funcs  
-    LUA_DECLARE ( GetTeamFromName );
-    LUA_DECLARE ( GetTeamName  );
-    LUA_DECLARE ( GetTeamColor );
-    LUA_DECLARE ( GetTeamFriendlyFire );
-    LUA_DECLARE ( GetPlayersInTeam );
-    LUA_DECLARE ( CountPlayersInTeam );
-
     // Weapon funcs
     LUA_DECLARE ( GetWeaponNameFromID );
     LUA_DECLARE ( GetWeaponIDFromName );

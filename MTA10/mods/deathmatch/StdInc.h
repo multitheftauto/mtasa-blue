@@ -126,6 +126,7 @@
 #include <luadefs/CLuaMatrixDefs.h>
 #include <luadefs/CLuaSearchLightDefs.h>
 #include <luadefs/CLuaTaskDefs.h>
+#include <luadefs/CLuaTeamDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
 #include <lua/oopdefs/CLuaOOPDefs.h>
