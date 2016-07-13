@@ -80,6 +80,7 @@ bool            CheckAndShowFileOpenFailureMessage  ( void );
 void            CheckAndShowMissingFileMessage      ( void );
 void            CheckAndShowModelProblems           ( void );
 void            CheckAndShowUpgradeProblems         ( void );
+void            CheckAndShowImgProblems             ( void );
 
 void            BsodDetectionPreLaunch              ( void );
 void            BsodDetectionOnGameBegin            ( void );
