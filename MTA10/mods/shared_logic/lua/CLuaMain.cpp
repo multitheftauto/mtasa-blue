@@ -196,28 +196,6 @@ void CLuaMain::AddProjectileClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Projectile", "Element" );
 }
 
-
-// TODO: specials
-void CLuaMain::AddTeamClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "getTeamFromName" );
-    lua_classfunction ( luaVM, "getFromName", "getTeamFromName" );
-    lua_classfunction ( luaVM, "countPlayers", "countPlayersInTeam" );
-    lua_classfunction ( luaVM, "getFriendlyFire", "getTeamFriendlyFire" );
-    lua_classfunction ( luaVM, "getName", "getTeamName" );
-    lua_classfunction ( luaVM, "getColor", "getTeamColor" );
-    
-    lua_classvariable ( luaVM, "playerCount", NULL, "countPlayersInTeam" );
-    lua_classvariable ( luaVM, "friendlyFire", NULL, "getTeamFriendlyFire" );
-    lua_classvariable ( luaVM, "name", NULL, "getTeamName" );
-    //lua_classvariable ( luaVM, "color", NULL, "getTeamColor" );
-    
-    lua_registerclass ( luaVM, "Team", "Element" );
-}
-
-
 // TODO: specials
 void CLuaMain::AddWaterClass ( lua_State* luaVM )
 {
@@ -894,7 +872,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddColShapeClass            ( luaVM );
     AddProjectileClass          ( luaVM );
     
-    AddTeamClass                ( luaVM );
     AddWaterClass               ( luaVM );
     CLuaAudioDefs::AddClass     ( luaVM );
     AddWeaponClass              ( luaVM );
@@ -944,6 +921,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaRadarAreaDefs::AddClass ( luaVM );
     CLuaResourceDefs::AddClass ( luaVM );
     CLuaSearchLightDefs::AddClass ( luaVM );
+    CLuaTeamDefs::AddClass ( luaVM );
     CLuaVehicleDefs::AddClass ( luaVM );
 }
 
