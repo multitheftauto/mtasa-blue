@@ -84,6 +84,7 @@ public:
         SCRIPTFILE,
         WATER,
         WEAPON,
+        POINTLIGHTS_UNUSED,
         TRAINTRACK,
         DATABASE_CONNECTION,
         ROOT,
