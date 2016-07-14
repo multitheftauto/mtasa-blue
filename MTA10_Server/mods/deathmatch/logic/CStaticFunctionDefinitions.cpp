@@ -12136,22 +12136,6 @@ bool CStaticFunctionDefinitions::DestroyTrainTrack ( CTrainTrack * pTrainTrack )
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetTrainTrackPosition ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector vecPosition )
-{
-    assert ( pTrainTrack );
-    
-    if ( pTrainTrack->SetRailNodePosition ( uiTrackNode, vecPosition ) )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( uiTrackNode );
-        BitStream.pBitStream->Write ( vecPosition.fX );
-        BitStream.pBitStream->Write ( vecPosition.fY );
-        BitStream.pBitStream->Write ( vecPosition.fZ );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTrainTrack, SET_TRAIN_TRACK_POSITION, *BitStream.pBitStream ) );
-        return true;
-    }
-    return false;
-}
 
 bool CStaticFunctionDefinitions::GetTrainTrackPosition ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector& vecPosition )
 {
@@ -12173,17 +12157,6 @@ bool CStaticFunctionDefinitions::SetTrainTrackLength ( CTrainTrack * pTrainTrack
 bool CStaticFunctionDefinitions::GetTrainTrackLength ( CTrainTrack * pTrainTrack, float &fLength )
 {
     fLength = pTrainTrack->GetTrackLength ( );
-    return true;
-}
-
-bool CStaticFunctionDefinitions::SetTrainTrackNumberOfNodes ( CTrainTrack * pTrainTrack, unsigned int uiNodes )
-{
-    if ( pTrainTrack->SetNumberOfNodes ( uiNodes ) )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( uiNodes );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTrainTrack, SET_TRAIN_TRACK_NUMBER_OF_NODES, *BitStream.pBitStream ) );
-    }
     return true;
 }
 

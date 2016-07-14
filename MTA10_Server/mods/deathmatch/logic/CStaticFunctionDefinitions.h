@@ -718,14 +718,12 @@ public:
 
     
     // Train track funcs
-    static bool                         SetTrainTrackPosition               ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector vecPosition );
     static bool                         GetTrainTrackPosition               ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector& vecPosition );
     static CTrainTrack*                 CreateTrainTrack                    ( CResource * pResource, const std::vector<CVector>& vecNodeList );
     static bool                         DestroyTrainTrack                   ( CTrainTrack* pTrainTrack );
     static CTrainTrack*                 GetDefaultTrack                     ( uchar ucTrack );
     static bool                         SetTrainTrackLength                 ( CTrainTrack* pTrainTrack, float fLength );
     static bool                         GetTrainTrackLength                 ( CTrainTrack* pTrainTrack, float &fLength );
-    static bool                         SetTrainTrackNumberOfNodes          ( CTrainTrack* pTrainTrack, unsigned int uiNodes );
     static bool                         GetTrainTrackNumberOfNodes          ( CTrainTrack* pTrainTrack, unsigned int &uiNodes );
     static bool                         GetTrainTrackID                     ( CTrainTrack* pTrainTrack, unsigned char &ucTrack );
 };

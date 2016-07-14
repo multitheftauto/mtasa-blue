@@ -22,8 +22,6 @@ void CLuaTrainTrackDefs::LoadFunctions ()
     CLuaCFunctions::AddFunction ( "getTrackNodes", GetTrainTrackNumberOfNodes );
 
     CLuaCFunctions::AddFunction ( "setTrackLength", SetTrainTrackLength );
-    CLuaCFunctions::AddFunction ( "setTrackNode", SetTrainTrackPosition );
-    CLuaCFunctions::AddFunction ( "setTrackNodes", SetTrainTrackNumberOfNodes );
 }
 
 
@@ -40,41 +38,12 @@ void CLuaTrainTrackDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getNodes", "getTrackNodes" );
 
     lua_classfunction ( luaVM, "setLength", "setTrackLength" );
-    lua_classfunction ( luaVM, "setNode", "setTrackNode" );
-    lua_classfunction ( luaVM, "setNodes", "setTrackNodes" );
 
     lua_classvariable ( luaVM, "length", "setTrackLength", "getTrackLength" );
     lua_classvariable ( luaVM, "trackID", NULL, "getTrackID" );
 
     lua_registerclass ( luaVM, "TrainTrack", "Element" );
 }
-
-int CLuaTrainTrackDefs::SetTrainTrackPosition ( lua_State* luaVM )
-{
-    unsigned int uiTrackNode = 0;
-    CVector vecPosition;
-    CTrainTrack* pTrack;
-
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTrack );
-    argStream.ReadNumber ( uiTrackNode );
-    argStream.ReadVector3D ( vecPosition );
-    
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::SetTrainTrackPosition ( pTrack, uiTrackNode, vecPosition ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 
 int CLuaTrainTrackDefs::GetTrainTrackPosition ( lua_State* luaVM )
 {
@@ -173,29 +142,6 @@ int CLuaTrainTrackDefs::GetTrainTrackLength ( lua_State* luaVM )
         if ( CStaticFunctionDefinitions::GetTrainTrackLength ( pTrainTrack, fLength ) )
         {
             lua_pushnumber ( luaVM, fLength );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaTrainTrackDefs::SetTrainTrackNumberOfNodes ( lua_State* luaVM )
-{
-    unsigned int uiNodes = 0;
-    CTrainTrack * pTrainTrack = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTrainTrack );
-    argStream.ReadNumber ( uiNodes );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::SetTrainTrackNumberOfNodes ( pTrainTrack, uiNodes ) )
-        {
-            lua_pushboolean ( luaVM, true );
             return 1;
         }
     }
