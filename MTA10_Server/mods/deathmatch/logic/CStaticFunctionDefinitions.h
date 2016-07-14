@@ -272,7 +272,7 @@ public:
     static bool                 IsTrainDerailable                   ( CVehicle* pVehicle, bool& bDerailable );
     static bool                 GetTrainDirection                   ( CVehicle* pVehicle, bool& bDirection );
     static bool                 GetTrainSpeed                       ( CVehicle* pVehicle, float& fSpeed );
-    static bool                 GetTrainTrack                       ( CVehicle* pVehicle, uchar& ucTrack );
+    static CTrainTrack*         GetTrainTrack                       ( CVehicle* pVehicle );
     static bool                 GetTrainPosition                    ( CVehicle* pVehicle, float& fPosition );
     static bool                 IsVehicleBlown                      ( CVehicle* pVehicle );
     static bool                 GetVehicleHeadLightColor            ( CVehicle* pVehicle, SColor& outColor );
@@ -332,7 +332,7 @@ public:
     static bool                 SetTrainDerailable                  ( CVehicle* pVehicle, bool bDerailable );
     static bool                 SetTrainDirection                   ( CVehicle* pVehicle, bool bDirection );
     static bool                 SetTrainSpeed                       ( CVehicle* pVehicle, float fSpeed );
-    static bool                 SetTrainTrack                       ( CVehicle* pVehicle, uchar ucTrack );
+    static bool                 SetTrainTrack                       ( CVehicle* pVehicle, CTrainTrack* pTrack );
     static bool                 SetTrainPosition                    ( CVehicle* pVehicle, float fPosition );
     static bool                 SetVehicleHeadLightColor            ( CVehicle* pVehicle, const SColor color );
     static bool                 SetVehicleTurretPosition            ( CVehicle* pVehicle, float fHorizontal, float fVertical );
@@ -718,15 +718,16 @@ public:
 
     
     // Train track funcs
-    static bool                         SetTrainTrackPosition               ( unsigned char ucTrackID, unsigned int uiTrackNode, CVector vecPosition );
-    static bool                         GetTrainTrackPosition               ( unsigned char ucTrackID, unsigned int uiTrackNode, CVector& vecPosition );
-    static CTrainTrack *                CreateTrainTrack                    ( CResource * pResource, unsigned int uiTrackNodes );
-    static bool                         DestroyTrainTrack                   ( CTrainTrack * pTrainTrack );
-    static bool                         SetTrainTrackLength                 ( CTrainTrack * pTrainTrack, float fLength );
-    static bool                         GetTrainTrackLength                 ( CTrainTrack * pTrainTrack, float &fLength );
-    static bool                         SetTrainTrackNumberOfNodes          ( CTrainTrack * pTrainTrack, unsigned int uiNodes );
-    static bool                         GetTrainTrackNumberOfNodes          ( CTrainTrack * pTrainTrack, unsigned int &uiNodes );
-    static bool                         GetTrainTrackID                     ( CTrainTrack * pTrainTrack, unsigned char &ucTrack );
+    static bool                         SetTrainTrackPosition               ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector vecPosition );
+    static bool                         GetTrainTrackPosition               ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector& vecPosition );
+    static CTrainTrack*                 CreateTrainTrack                    ( CResource * pResource, unsigned int uiTrackNodes );
+    static bool                         DestroyTrainTrack                   ( CTrainTrack* pTrainTrack );
+    static CTrainTrack*                 GetDefaultTrack                     ( uchar ucTrack );
+    static bool                         SetTrainTrackLength                 ( CTrainTrack* pTrainTrack, float fLength );
+    static bool                         GetTrainTrackLength                 ( CTrainTrack* pTrainTrack, float &fLength );
+    static bool                         SetTrainTrackNumberOfNodes          ( CTrainTrack* pTrainTrack, unsigned int uiNodes );
+    static bool                         GetTrainTrackNumberOfNodes          ( CTrainTrack* pTrainTrack, unsigned int &uiNodes );
+    static bool                         GetTrainTrackID                     ( CTrainTrack* pTrainTrack, unsigned char &ucTrack );
 };
 
 #endif

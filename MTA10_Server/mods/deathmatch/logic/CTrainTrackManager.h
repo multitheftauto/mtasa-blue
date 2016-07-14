@@ -1,6 +1,6 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/deathmatch/logic/CTrainTrackManager.h
 *  PURPOSE:     Header file for train node manager class
@@ -10,13 +10,12 @@
 *
 *****************************************************************************/
 
-#ifndef __TRAINNODEMANAGER_H
-#define __TRAINNODEMANAGER_H
+#pragma once
 
 #include "CTrainTrack.h"
 
-#define NUM_RAILTRACKS                          4
-#define MAX_TOTAL_TRACKS                        50+NUM_RAILTRACKS   // decent amount.
+#define NUM_RAILTRACKS   4
+#define MAX_TOTAL_TRACKS 50 + NUM_RAILTRACKS   // decent amount.
 
 class CTrainTrackManager
 {
@@ -51,5 +50,3 @@ private:
 
    
 };
-
-#endif

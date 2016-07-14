@@ -11744,7 +11744,7 @@ CTrainTrack * CTrainTrackManager::GetTrainTrack ( unsigned char ucTrack )
     {
         return m_pTrainTracks[ucTrack];
     }
-    return NULL;
+    return nullptr;
 }
 
 void CTrainTrackManager::Initialise ( )

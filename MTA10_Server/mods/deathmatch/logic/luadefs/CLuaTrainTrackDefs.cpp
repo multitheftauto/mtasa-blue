@@ -13,39 +13,81 @@
 
 void CLuaTrainTrackDefs::LoadFunctions ()
 {
-    CLuaCFunctions::AddFunction ( "setTrainTrackPosition", SetTrainTrackPosition );
-    CLuaCFunctions::AddFunction ( "getTrainTrackNumberOfNodes", GetTrainTrackNumberOfNodes );
-    CLuaCFunctions::AddFunction ( "getTrainTrackID", GetTrainTrackID );
-    CLuaCFunctions::AddFunction ( "getTrainTrackLength", GetTrainTrackLength );
+    CLuaCFunctions::AddFunction ( "createTrack", CreateTrainTrack );
+    CLuaCFunctions::AddFunction ( "getDefaultTrack", GetDefaultTrack );
 
-    CLuaCFunctions::AddFunction ( "createTrainTrack", CreateTrainTrack );
-    CLuaCFunctions::AddFunction ( "getTrainTrackPosition", GetTrainTrackPosition );
-    CLuaCFunctions::AddFunction ( "setTrainTrackLength", SetTrainTrackLength );
-    CLuaCFunctions::AddFunction ( "setTrainTrackNumberOfNodes", SetTrainTrackNumberOfNodes );
+    CLuaCFunctions::AddFunction ( "getTrackID", GetTrainTrackID );
+    CLuaCFunctions::AddFunction ( "getTrackLength", GetTrainTrackLength );
+    CLuaCFunctions::AddFunction ( "getTrackNode", GetTrainTrackPosition );
+    CLuaCFunctions::AddFunction ( "getTrackNodes", GetTrainTrackNumberOfNodes );
+
+    CLuaCFunctions::AddFunction ( "setTrackLength", SetTrainTrackLength );
+    CLuaCFunctions::AddFunction ( "setTrackNode", SetTrainTrackPosition );
+    CLuaCFunctions::AddFunction ( "setTrackNodes", SetTrainTrackNumberOfNodes );
 }
 
 
 void CLuaTrainTrackDefs::AddClass ( lua_State* luaVM )
 {
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "create", "createTrack" );
+    lua_classfunction ( luaVM, "getDefault", "getDefaultTrack" );
+
+    lua_classfunction ( luaVM, "getTrackID", "getTrackID" );
+    lua_classfunction ( luaVM, "getLength", "getTrackLength" );
+    lua_classfunction ( luaVM, "getNode", "getTrackNode" );
+    lua_classfunction ( luaVM, "getNodes", "getTrackNodes" );
+
+    lua_classfunction ( luaVM, "setLength", "setTrackLength" );
+    lua_classfunction ( luaVM, "setNode", "setTrackNode" );
+    lua_classfunction ( luaVM, "setNodes", "setTrackNodes" );
+
+    lua_classvariable ( luaVM, "length", "setTrackLength", "getTrackLength" );
+    lua_classvariable ( luaVM, "trackID", NULL, "getTrackID" );
+
+    lua_registerclass ( luaVM, "TrainTrack", "Element" );
 }
 
-
-int CLuaTrainTrackDefs::SetTrainTrackPosition ( lua_State* luaVM )
+int CLuaTrainTrackDefs::GetDefaultTrack ( lua_State* luaVM )
 {
-    unsigned char ucTrackID = 0;
-    unsigned int uiTrackNode = 0;
-    CVector vecPosition;
-
+    uchar ucTrack = 0;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( ucTrackID );
-    argStream.ReadNumber ( uiTrackNode );
-    argStream.ReadNumber ( vecPosition.fX );
-    argStream.ReadNumber ( vecPosition.fY );
-    argStream.ReadNumber ( vecPosition.fZ );
+    argStream.ReadNumber ( ucTrack );
+
+    //if (ucTrack > 3 )
+    //    argStream.SetCustomError ( "Invalid track number range (0-3)" );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetTrainTrackPosition ( ucTrackID, uiTrackNode, vecPosition ) )
+        CTrainTrack* pTrack = CStaticFunctionDefinitions::GetDefaultTrack ( ucTrack );
+        if ( pTrack != nullptr )
+        {
+            lua_pushuserdata ( luaVM, pTrack );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaTrainTrackDefs::SetTrainTrackPosition ( lua_State* luaVM )
+{
+    unsigned int uiTrackNode = 0;
+    CVector vecPosition;
+    CTrainTrack* pTrack;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pTrack );
+    argStream.ReadNumber ( uiTrackNode );
+    argStream.ReadVector3D ( vecPosition );
+    
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetTrainTrackPosition ( pTrack, uiTrackNode, vecPosition ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -61,22 +103,20 @@ int CLuaTrainTrackDefs::SetTrainTrackPosition ( lua_State* luaVM )
 
 int CLuaTrainTrackDefs::GetTrainTrackPosition ( lua_State* luaVM )
 {
-    unsigned char ucTrackID = 0;
     unsigned int uiTrackNode = 0;
     CVector vecPosition;
+    CTrainTrack* pTrack;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( ucTrackID );
+    argStream.ReadUserData ( pTrack );
     argStream.ReadNumber ( uiTrackNode );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::GetTrainTrackPosition ( ucTrackID, uiTrackNode, vecPosition ) )
+        if ( CStaticFunctionDefinitions::GetTrainTrackPosition ( pTrack, uiTrackNode, vecPosition ) )
         {
-            lua_pushnumber ( luaVM, vecPosition.fX );
-            lua_pushnumber ( luaVM, vecPosition.fY );
-            lua_pushnumber ( luaVM, vecPosition.fZ );
-            return 3;
+            lua_pushvector ( luaVM, vecPosition );
+            return 1;
         }
     }
     else

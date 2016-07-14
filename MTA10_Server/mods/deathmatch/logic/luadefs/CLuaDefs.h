@@ -81,6 +81,7 @@ protected:
     static CScriptDebugging*            m_pScriptDebugging;
     static CVehicleManager*             m_pVehicleManager;
     static CTeamManager*                m_pTeamManager;
+    static CTrainTrackManager*          m_pTrainTrackManager;
     static CAccountManager*             m_pAccountManager;
     static CColManager*                 m_pColManager;
     static CResourceManager*            m_pResourceManager;

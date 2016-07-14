@@ -21,6 +21,7 @@ public:
     LUA_DECLARE ( SetTrainTrackPosition );
     LUA_DECLARE ( GetTrainTrackPosition );
     LUA_DECLARE ( CreateTrainTrack );
+    LUA_DECLARE ( GetDefaultTrack );
     LUA_DECLARE ( SetTrainTrackLength );
     LUA_DECLARE ( GetTrainTrackLength );
     LUA_DECLARE ( SetTrainTrackNumberOfNodes );

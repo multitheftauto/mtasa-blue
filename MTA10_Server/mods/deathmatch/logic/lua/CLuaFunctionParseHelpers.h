@@ -56,6 +56,7 @@ inline eEntityType GetClassType ( class CPickup* )        { return CElement::PIC
 inline eEntityType GetClassType ( class CRadarArea* )     { return CElement::RADAR_AREA; }
 inline eEntityType GetClassType ( class CMarker* )        { return CElement::MARKER; }
 inline eEntityType GetClassType ( class CTeam* )          { return CElement::TEAM; }
+inline eEntityType GetClassType ( class CTrainTrack* )    { return CElement::TRAINTRACK; }
 inline eEntityType GetClassType ( class CPed* )           { return CElement::PED; }
 inline eEntityType GetClassType ( class CColShape* )      { return CElement::COLSHAPE; }
 inline eEntityType GetClassType ( class CDummy* )         { return CElement::DUMMY; }
@@ -75,6 +76,7 @@ inline SString GetClassTypeName ( CPickup* )                    { return "pickup
 inline SString GetClassTypeName ( CRadarArea* )                 { return "radararea"; }
 inline SString GetClassTypeName ( CMarker* )                    { return "marker"; }
 inline SString GetClassTypeName ( CTeam* )                      { return "team"; }
+inline SString GetClassTypeName ( CTrainTrack* )                { return "train-track"; }
 inline SString GetClassTypeName ( CPed* )                       { return "ped"; }
 inline SString GetClassTypeName ( CColShape* )                  { return "colshape"; }
 inline SString GetClassTypeName ( CDummy* )                     { return "dummy"; }

@@ -14,21 +14,16 @@
 
 CTrainTrack::CTrainTrack( unsigned char ucTrackID, CTrainTrackManager * pManager, CElement * pParent, CXMLNode * pNode ) : CElement ( pParent, pNode )
 {
-    // set our track ID
-    m_ucTrackID = ucTrackID;
-    // set our manager
+    m_iType = CElement::TRAINTRACK;
+    SetTypeName ( "train-track" );
     m_pManager = pManager;
 
-    // Unitialised
+    m_ucTrackID = ucTrackID;
     m_bInitialised = false;
-
-    // Linked
     m_bLinkLastNodes = false;
 
     // Do not ever modify track positions in the constructor as nothing has loaded at this point.
 
-    m_iType = CElement::TRAINTRACK;
-    SetTypeName ( "train-track" );
 }
 
 CTrainTrack::~CTrainTrack ( void )

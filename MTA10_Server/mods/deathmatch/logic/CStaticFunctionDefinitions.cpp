@@ -35,6 +35,7 @@ static CMapManager*                                 m_pMapManager;
 static CBlipManager*                                m_pBlipManager;
 static CRadarAreaManager*                           m_pRadarAreaManager;
 static CTeamManager*                                m_pTeamManager;
+static CTrainTrackManager*                          m_pTrainTrackManager;
 static CClock*                                      m_pClock;
 static CEvents*                                     m_pEvents;
 static CElementDeleter*                             m_pElementDeleter;
@@ -72,6 +73,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions ( CGame * pGame )
     m_pBlipManager = pGame->GetBlipManager ();
     m_pRadarAreaManager = pGame->GetRadarAreaManager ();
     m_pTeamManager = pGame->GetTeamManager ();
+    m_pTrainTrackManager = pGame->GetTrainTrackManager ();
     m_pClock = pGame->GetClock ();
     m_pEvents = pGame->GetEvents ();
     m_pElementDeleter = pGame->GetElementDeleter ();
@@ -5303,17 +5305,16 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CVehicle* pVehicle, float& fSpe
 }
 
 
-bool CStaticFunctionDefinitions::GetTrainTrack ( CVehicle* pVehicle, uchar& ucTrack )
+CTrainTrack* CStaticFunctionDefinitions::GetTrainTrack ( CVehicle* pVehicle )
 {
     assert ( pVehicle );
     
     if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
-        return false;
+        return nullptr;
     else if ( pVehicle->IsDerailed () )
-        return false;
+        return nullptr;
 
-    ucTrack = pVehicle->GetTrainTrack ();
-    return true;
+    return m_pTrainTrackManager->GetTrainTrack ( pVehicle->GetTrainTrack () );
 }
 
 
@@ -7240,15 +7241,17 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CVehicle* pVehicle, float fSpee
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainTrack ( CVehicle* pVehicle, uchar ucTrack )
+bool CStaticFunctionDefinitions::SetTrainTrack ( CVehicle* pVehicle, CTrainTrack* pTrack )
 {
     assert ( pVehicle );
+    assert ( pTrack );
 
     if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
         return false;
     else if ( pVehicle->IsDerailed () )
         return false;
 
+    uchar ucTrack = pTrack->GetTrackID ();
     pVehicle->SetTrainTrack ( ucTrack );
 
     CBitStream BitStream;
@@ -12133,33 +12136,27 @@ bool CStaticFunctionDefinitions::DestroyTrainTrack ( CTrainTrack * pTrainTrack )
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetTrainTrackPosition ( unsigned char ucTrackID, unsigned int uiTrackNode, CVector vecPosition )
+bool CStaticFunctionDefinitions::SetTrainTrackPosition ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector vecPosition )
 {
-    CTrainTrack * pTrainTrack = g_pGame->GetTrainTrackManager ( )->GetTrainTrack ( ucTrackID );
-    if ( pTrainTrack )
+    assert ( pTrainTrack );
+    
+    if ( pTrainTrack->SetRailNodePosition ( uiTrackNode, vecPosition ) )
     {
-        if ( pTrainTrack->SetRailNodePosition ( uiTrackNode, vecPosition ) )
-        {
-            CBitStream BitStream;
-            BitStream.pBitStream->Write ( uiTrackNode );
-            BitStream.pBitStream->Write ( vecPosition.fX );
-            BitStream.pBitStream->Write ( vecPosition.fY );
-            BitStream.pBitStream->Write ( vecPosition.fZ );
-            m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTrainTrack, SET_TRAIN_TRACK_POSITION, *BitStream.pBitStream ) );
-            return true;
-        }
+        CBitStream BitStream;
+        BitStream.pBitStream->Write ( uiTrackNode );
+        BitStream.pBitStream->Write ( vecPosition.fX );
+        BitStream.pBitStream->Write ( vecPosition.fY );
+        BitStream.pBitStream->Write ( vecPosition.fZ );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTrainTrack, SET_TRAIN_TRACK_POSITION, *BitStream.pBitStream ) );
+        return true;
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetTrainTrackPosition ( unsigned char ucTrackID, unsigned int uiTrackNode, CVector& vecPosition )
+bool CStaticFunctionDefinitions::GetTrainTrackPosition ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector& vecPosition )
 {
-    CTrainTrack * pTrainTrack = g_pGame->GetTrainTrackManager ( )->GetTrainTrack ( ucTrackID );
-    if ( pTrainTrack )
-    {
-        return pTrainTrack->GetRailNodePosition ( uiTrackNode, vecPosition );
-    }
-    return false;
+    assert ( pTrainTrack );
+    return pTrainTrack->GetRailNodePosition ( uiTrackNode, vecPosition );
 }
 
 bool CStaticFunctionDefinitions::SetTrainTrackLength ( CTrainTrack * pTrainTrack, float fLength )
@@ -12200,4 +12197,13 @@ bool CStaticFunctionDefinitions::GetTrainTrackID ( CTrainTrack * pTrainTrack, un
 {
     ucTrack = pTrainTrack->GetTrackID ( );
     return true;
+}
+
+CTrainTrack* CStaticFunctionDefinitions::GetDefaultTrack ( uchar ucTrack )
+{
+    if (ucTrack > 3) {
+        return nullptr;
+    }
+
+    return m_pTrainTrackManager->GetTrainTrack ( ucTrack );
 }

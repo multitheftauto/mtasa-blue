@@ -1,8 +1,8 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CTrainTrackSA.h
+*  FILE:        game_sa/CTrainTrack.h
 *  PURPOSE:     Header file for train node class
 *  DEVELOPERS:  Cazomino05 <Cazomino05@gmail.com>
 *
@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __TRAINNODE_H
-#define __TRAINNODE_H
+#pragma once
 
 class CTrainTrackManager;
 
@@ -77,5 +76,3 @@ private:
     std::map < int, SRailNode * >   m_RailNodes;
     bool                            m_bLinkLastNodes;
 };
-
-#endif

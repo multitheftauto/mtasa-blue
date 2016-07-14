@@ -43,6 +43,7 @@ CElement* CLuaDefs::m_pRootElement = NULL;
 CScriptDebugging* CLuaDefs::m_pScriptDebugging = NULL;
 CVehicleManager* CLuaDefs::m_pVehicleManager = NULL;
 CTeamManager* CLuaDefs::m_pTeamManager = NULL;
+CTrainTrackManager* CLuaDefs::m_pTrainTrackManager = NULL;
 CAccountManager* CLuaDefs::m_pAccountManager = NULL;
 CColManager* CLuaDefs::m_pColManager = NULL;
 CResourceManager* CLuaDefs::m_pResourceManager = NULL;
@@ -65,6 +66,7 @@ void CLuaDefs::Initialize ( CGame *pGame )
     m_pScriptDebugging = pGame->GetScriptDebugging();
     m_pVehicleManager = pGame->GetVehicleManager();
     m_pTeamManager = pGame->GetTeamManager();
+    m_pTrainTrackManager = pGame->GetTrainTrackManager();
     m_pAccountManager = pGame->GetAccountManager();
     m_pColManager = pGame->GetColManager();
     m_pResourceManager = pGame->GetResourceManager();
