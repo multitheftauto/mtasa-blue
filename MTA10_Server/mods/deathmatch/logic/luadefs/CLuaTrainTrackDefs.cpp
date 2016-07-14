@@ -103,11 +103,15 @@ int CLuaTrainTrackDefs::GetTrainTrackPosition ( lua_State* luaVM )
 
 int CLuaTrainTrackDefs::CreateTrainTrack ( lua_State* luaVM )
 {
-    unsigned int uiTrackNodes = 0;
-    float fLength = 0.0f;
-    CTrainTrack * pTrainTrack = NULL;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( uiTrackNodes );
+    
+    std::vector<CVector> vecNodeList;
+    for ( uint i = 0; i == 0 || argStream.NextIsVector3D (); i++ )
+    {
+        CVector vecNode;
+        argStream.ReadVector3D ( vecNode );
+        vecNodeList.push_back ( vecNode );
+    }
 
     if ( !argStream.HasErrors () )
     {
@@ -117,7 +121,7 @@ int CLuaTrainTrackDefs::CreateTrainTrack ( lua_State* luaVM )
             CResource * pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                CTrainTrack * pTrainTrack = CStaticFunctionDefinitions::CreateTrainTrack ( pResource, uiTrackNodes );
+                CTrainTrack * pTrainTrack = CStaticFunctionDefinitions::CreateTrainTrack ( pResource, vecNodeList );
                 if ( pTrainTrack != NULL )
                 {
                     lua_pushelement ( luaVM, pTrainTrack );

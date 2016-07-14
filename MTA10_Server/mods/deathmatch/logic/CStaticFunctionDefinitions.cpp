@@ -12117,10 +12117,10 @@ SString CStaticFunctionDefinitions::GetVersionSortable ()
 }
 
 
-CTrainTrack * CStaticFunctionDefinitions::CreateTrainTrack ( CResource * pResource, unsigned int uiTrackNodes )
+CTrainTrack * CStaticFunctionDefinitions::CreateTrainTrack ( CResource * pResource, const std::vector<CVector>& vecNodeList )
 {
     CTrainTrackManager * pTrainTrackManager = g_pGame->GetTrainTrackManager ( ) ;
-    CTrainTrack * pTrainTrack = pTrainTrackManager->CreateTrainTrack ( uiTrackNodes, pResource->GetDynamicElementRoot(), NULL );
+    CTrainTrack * pTrainTrack = pTrainTrackManager->CreateTrainTrack ( vecNodeList, pResource->GetDynamicElementRoot(), NULL );
     if ( pResource->HasStarted ( ) )
     {
         CEntityAddPacket Packet;

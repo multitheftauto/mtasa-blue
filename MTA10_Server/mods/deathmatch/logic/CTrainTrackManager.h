@@ -32,7 +32,7 @@ public:
     bool                SetRailLength                   ( unsigned char ucTrack, float fLength )            { m_fRailTrackLengths[ucTrack] = fLength; return true; };
     DWORD               SetNumberOfRailNodes            ( unsigned char ucTrack, DWORD dwTrackNodes )       { return m_dwNumberOfTrackNodes[ucTrack] = dwTrackNodes; };
 
-    CTrainTrack *       CreateTrainTrack                ( unsigned int uiNodes, CElement * pParent, CXMLNode * pNode );
+    CTrainTrack *       CreateTrainTrack                ( const std::vector<CVector>& vecNodeList, CElement * pParent, CXMLNode * pNode );
 
 
     bool                UnreferenceTrainTrack           ( DWORD dwTrackID );

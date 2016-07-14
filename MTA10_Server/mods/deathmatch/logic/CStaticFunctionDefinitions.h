@@ -720,7 +720,7 @@ public:
     // Train track funcs
     static bool                         SetTrainTrackPosition               ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector vecPosition );
     static bool                         GetTrainTrackPosition               ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector& vecPosition );
-    static CTrainTrack*                 CreateTrainTrack                    ( CResource * pResource, unsigned int uiTrackNodes );
+    static CTrainTrack*                 CreateTrainTrack                    ( CResource * pResource, const std::vector<CVector>& vecNodeList );
     static bool                         DestroyTrainTrack                   ( CTrainTrack* pTrainTrack );
     static CTrainTrack*                 GetDefaultTrack                     ( uchar ucTrack );
     static bool                         SetTrainTrackLength                 ( CTrainTrack* pTrainTrack, float fLength );

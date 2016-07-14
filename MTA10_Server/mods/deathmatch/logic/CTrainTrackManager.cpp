@@ -11798,7 +11798,7 @@ void CTrainTrackManager::ResetTracks ( )
     m_dwNumberOfTracks = MAX_TOTAL_TRACKS;
 }
 
-CTrainTrack * CTrainTrackManager::CreateTrainTrack ( unsigned int uiNodes, CElement * pParent, CXMLNode * pNode )
+CTrainTrack * CTrainTrackManager::CreateTrainTrack ( const std::vector<CVector>& vecNodeList, CElement * pParent, CXMLNode * pNode )
 {
     if ( m_dwNumberOfTracks < MAX_TOTAL_TRACKS )
     {
@@ -11806,11 +11806,19 @@ CTrainTrack * CTrainTrackManager::CreateTrainTrack ( unsigned int uiNodes, CElem
         m_pTrainTracks[m_dwNumberOfTracks] = pTrainTrack;
 
         // Reallocate and initialise
-        Reallocate ( pTrainTrack, uiNodes );
+        Reallocate ( pTrainTrack, vecNodeList.size() );
+
         pTrainTrack->Initialise();
         
         // Set our number of tracks and update a comparison instruction
         m_dwNumberOfTracks++;
+
+        auto it = vecNodeList.begin ();
+        uint uiNode = 0;
+        for ( it; it != vecNodeList.end (); it++ ) {
+            pTrainTrack->SetRailNodePosition ( uiNode, *it );
+            uiNode++;
+        }
 
         return pTrainTrack;
     }
