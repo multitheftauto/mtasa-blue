@@ -49,31 +49,6 @@ void CLuaTrainTrackDefs::AddClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "TrainTrack", "Element" );
 }
 
-int CLuaTrainTrackDefs::GetDefaultTrack ( lua_State* luaVM )
-{
-    uchar ucTrack = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( ucTrack );
-
-    //if (ucTrack > 3 )
-    //    argStream.SetCustomError ( "Invalid track number range (0-3)" );
-
-    if ( !argStream.HasErrors () )
-    {
-        CTrainTrack* pTrack = CStaticFunctionDefinitions::GetDefaultTrack ( ucTrack );
-        if ( pTrack != nullptr )
-        {
-            lua_pushuserdata ( luaVM, pTrack );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 int CLuaTrainTrackDefs::SetTrainTrackPosition ( lua_State* luaVM )
 {
     unsigned int uiTrackNode = 0;
@@ -249,6 +224,7 @@ int CLuaTrainTrackDefs::GetTrainTrackNumberOfNodes ( lua_State* luaVM )
     return 1;
 }
 
+// DEBUG: Gives ID of track
 int CLuaTrainTrackDefs::GetTrainTrackID ( lua_State* luaVM )
 {
     unsigned char ucTrack = 0;
@@ -261,6 +237,32 @@ int CLuaTrainTrackDefs::GetTrainTrackID ( lua_State* luaVM )
         if ( CStaticFunctionDefinitions::GetTrainTrackID ( pTrainTrack, ucTrack ) )
         {
             lua_pushnumber ( luaVM, ucTrack );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+// DEBUG: Gets track by ID
+int CLuaTrainTrackDefs::GetDefaultTrack ( lua_State* luaVM )
+{
+    uchar ucTrack = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( ucTrack );
+
+    //if (ucTrack > 3 )
+    //    argStream.SetCustomError ( "Invalid track number range (0-3)" );
+
+    if ( !argStream.HasErrors () )
+    {
+        CTrainTrack* pTrack = CStaticFunctionDefinitions::GetDefaultTrack ( ucTrack );
+        if ( pTrack != nullptr )
+        {
+            lua_pushuserdata ( luaVM, pTrack );
             return 1;
         }
     }

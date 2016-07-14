@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CTrainTrack.h
+*  FILE:        MTA10_Server/mods/deathmatch/logic/CTrainTrack.h
 *  PURPOSE:     Header file for train node class
 *  DEVELOPERS:  Cazomino05 <Cazomino05@gmail.com>
 *

@@ -1775,7 +1775,12 @@ int CLuaVehicleDefs::GetTrainTrack ( lua_State* luaVM )
         CTrainTrack* pTrack = CStaticFunctionDefinitions::GetTrainTrack ( pVehicle );
         if (pTrack != nullptr)
         {
-            lua_pushelement ( luaVM, pTrack );
+            if (pTrack->GetTrackID() <= 3) {
+                lua_pushinteger ( luaVM, pTrack->GetTrackID () );
+            }
+            else {
+                lua_pushelement ( luaVM, pTrack );
+            }
             return 1;
         }
     }
@@ -2797,7 +2802,19 @@ int CLuaVehicleDefs::SetTrainTrack ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
-    argStream.ReadUserData ( pTrack );
+
+    if ( argStream.NextIsUserDataOfType<CTrainTrack> () ) {
+        argStream.ReadUserData ( pTrack );
+    } else {
+        uchar ucTrack = 0;
+        argStream.ReadNumber ( ucTrack );
+
+        if ( ucTrack > 3 ) {
+            argStream.SetCustomError ( "Invalid track number range (0-3)" );
+        } else {
+            pTrack = m_pTrainTrackManager->GetTrainTrack ( ucTrack );
+        }
+    }
 
     if ( !argStream.HasErrors () )
     {

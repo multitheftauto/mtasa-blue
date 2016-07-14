@@ -1,8 +1,8 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CTrainTrack.cpp
+*  FILE:        MTA10_Server/mods/deathmatch/logic/CTrainTrack.cpp
 *  PURPOSE:     Train Node class
 *  DEVELOPERS:  Cazomino05 <Cazomino05@gmail.com>
 *
