@@ -14,15 +14,25 @@ using std::list;
 
 void CLuaTrainTrackDefs::LoadFunctions ( void )
 {
-    CLuaCFunctions::AddFunction ( "getTrainTrackNumberOfNodes", GetTrainTrackNumberOfNodes );
-    CLuaCFunctions::AddFunction ( "getTrainTrackID", GetTrainTrackID );
-    CLuaCFunctions::AddFunction ( "getTrainTrackLength", GetTrainTrackLength );
-    CLuaCFunctions::AddFunction ( "getTrainTrackPosition", GetTrainTrackPosition );
+    CLuaCFunctions::AddFunction ( "getTrackNodes", GetTrainTrackNumberOfNodes );
+    CLuaCFunctions::AddFunction ( "getTrackID", GetTrainTrackID );
+    CLuaCFunctions::AddFunction ( "getTrackLength", GetTrainTrackLength );
+    CLuaCFunctions::AddFunction ( "getTrackNode", GetTrainTrackPosition );
 }
-
 
 void CLuaTrainTrackDefs::AddClass ( lua_State* luaVM )
 {
+    lua_newclass ( luaVM );
+
+    lua_classfunction ( luaVM, "getTrackID", "getTrackID" );
+    lua_classfunction ( luaVM, "getLength", "getTrackLength" );
+    lua_classfunction ( luaVM, "getNode", "getTrackNode" );
+    lua_classfunction ( luaVM, "getNodes", "getTrackNodes" );
+
+    lua_classvariable ( luaVM, "length", NULL, "getTrackLength" );
+    lua_classvariable ( luaVM, "trackID", NULL, "getTrackID" );
+
+    lua_registerclass ( luaVM, "TrainTrack", "Element" );
 }
 
 int CLuaTrainTrackDefs::GetTrainTrackPosition ( lua_State* luaVM )

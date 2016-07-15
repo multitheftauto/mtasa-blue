@@ -296,6 +296,7 @@ const char* CLuaClassDefs::GetEntityClass ( CClientEntity* pEntity )
         case CCLIENTRADARAREA: return "RadarArea";
         case CCLIENTMARKER: return "Marker";
         case CCLIENTTEAM: return "Team";
+        case CCLIENTTRAINTRACK: return "TrainTrack";
         case CCLIENTPED: return "Ped";
         case CCLIENTPROJECTILE: return "Projectile";
         case CCLIENTGUI:
