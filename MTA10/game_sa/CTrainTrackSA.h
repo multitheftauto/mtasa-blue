@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CGAMESA_TRAINNODESA
-#define __CGAMESA_TRAINNODESA
+#pragma once
 
 class CTrainTrackManagerSA;
 
@@ -80,5 +79,3 @@ private:
     unsigned char           m_ucTrackID;
     CTrainTrackManagerSA *  m_pManager;
 };
-
-#endif

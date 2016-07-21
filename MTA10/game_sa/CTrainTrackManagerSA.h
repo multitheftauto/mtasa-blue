@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CGAMESA_TRAINNODEMANAGERSA
-#define __CGAMESA_TRAINNODEMANAGERSA
+#pragma once
 
 #include <game/CTrainTrackManager.h>
 #include "CTrainTrackSA.h"
@@ -75,5 +74,3 @@ private:
     float                                               m_fDefaultRailTrackLengths;
     DWORD                                               m_dwDefaultNumberOfTrackNodes;
 };
-
-#endif

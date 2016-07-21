@@ -14,7 +14,7 @@
 
 class CTrainTrackManager;
 
-#define NUM_RAILTRACKS                          4
+#define NUM_RAILTRACKS 4
 
 typedef struct
 {
