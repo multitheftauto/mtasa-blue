@@ -4074,7 +4074,7 @@ void GetDeathAnim( CClientPed* pDamagedPed, CEventDamage* pEvent, AssocGroupId& 
 {
     if ( pEvent )
     {
-        pEvent->ComputeDeathAnim ( pDamagedPed->GetGamePlayer(), true );
+        pEvent->ComputeDeathAnim ( pDamagedPed->GetGamePlayer(), false );
         outAnimGroup = pEvent->GetAnimGroup ();
         outAnimID = pEvent->GetAnimId ();
     }
