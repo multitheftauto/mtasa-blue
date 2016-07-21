@@ -433,7 +433,7 @@ int CLuaFunctionDefs::SetWaterLevel ( lua_State* luaVM )
 
         if ( !argStream.HasErrors () )
         {
-            if ( CStaticFunctionDefinitions::SetElementWaterLevel ( pWater, fLevel, pResource ) )
+            if ( pWater->SetLevel(fLevel, pResource) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

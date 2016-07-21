@@ -19,8 +19,7 @@
 
 class CStaticFunctionDefinitions;
 
-#ifndef __CSTATICFUNCTIONDEFINITIONS_H
-#define __CSTATICFUNCTIONDEFINITIONS_H
+#pragma once
 
 #include <gui/CGUI.h>
 #include <gui/CGUIElement.h>
@@ -498,7 +497,6 @@ public:
     static bool                         GetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
     static bool                         SetWorldWaterLevel                  ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel );
     static bool                         SetPositionWaterLevel               ( const CVector& vecPosition, float fLevel, void* pChangeSource );
-    static bool                         SetElementWaterLevel                ( CClientWater* pWater, float fLevel, void* pChangeSource );
     static bool                         SetAllElementWaterLevel             ( float fLevel, void* pChangeSource );
     static bool                         ResetWorldWaterLevel                ( void );
     static bool                         SetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
@@ -719,4 +717,3 @@ public:
     static const char*                  GetVersionBuildTag                  ( );
     static SString                      GetVersionSortable                  ( );
 };
-#endif

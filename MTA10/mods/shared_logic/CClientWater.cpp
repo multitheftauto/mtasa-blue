@@ -27,6 +27,7 @@ CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& ve
     m_bShallow = bShallow;
 
     Create();
+
     m_pWaterManager->AddToList ( this );
 }
 
@@ -166,4 +167,15 @@ void CClientWater::RelateDimension(unsigned short usWorldDimension)
         Create();
     else
         Destroy();
+}
+
+bool CClientWater::SetLevel(float fLevel, void* pChangeSource ) {
+    CVector vecVertexPos;
+    for ( int i = 0; i < GetNumVertices (); i++ )
+    {
+        GetVertexPosition ( i, vecVertexPos );
+        vecVertexPos.fZ = fLevel;
+        SetVertexPosition ( i, vecVertexPos, pChangeSource );
+    }
+    return true;
 }

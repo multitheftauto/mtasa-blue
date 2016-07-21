@@ -6010,11 +6010,6 @@ bool CStaticFunctionDefinitions::SetPositionWaterLevel ( const CVector& vecPosit
     return g_pClientGame->GetManager ()->GetWaterManager ()->SetPositionWaterLevel ( vecPosition, fLevel, pChangeSource );
 }
 
-bool CStaticFunctionDefinitions::SetElementWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
-{
-    return g_pClientGame->GetManager ()->GetWaterManager ()->SetElementWaterLevel ( pWater, fLevel, pChangeSource );
-}
-
 bool CStaticFunctionDefinitions::SetAllElementWaterLevel ( float fLevel, void* pChangeSource )
 {
     return g_pClientGame->GetManager ()->GetWaterManager ()->SetAllElementWaterLevel ( fLevel, pChangeSource );

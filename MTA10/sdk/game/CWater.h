@@ -9,8 +9,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CWATER_H
-#define __CWATER_H
+#pragma once
 
 enum EWaterPolyType
 {
@@ -40,5 +39,3 @@ public:
     virtual CWaterVertex*       GetVertex         ( int index ) = 0;
     virtual bool                ContainsPoint     ( float fX, float fY ) = 0;
 };
-
-#endif

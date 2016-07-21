@@ -29,6 +29,7 @@ public:
     bool                       GetVertexPosition      ( int iVertexIndex, CVector& vecPosition );
     void                       SetPosition            ( const CVector& vecPosition );
     bool                       SetVertexPosition      ( int iVertexIndex, CVector& vecPosition, void* pChangeSource = nullptr );
+    bool                       SetLevel               ( float fWaterLevel, void *pChangeSource = nullptr );
     void                       Unlink                 ();
 
     void                       SetDimension           (unsigned short usDimension);

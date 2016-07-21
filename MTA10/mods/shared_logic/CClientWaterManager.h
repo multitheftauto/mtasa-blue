@@ -11,8 +11,7 @@
 
 class CClientWaterManager;
 
-#ifndef __CCLIENTWATERMANAGER_H
-#define __CCLIENTWATERMANAGER_H
+#pragma once
 
 #include "CClientManager.h"
 #include "CClientWater.h"
@@ -32,7 +31,6 @@ public:
     bool                                            GetWaterLevel               ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
     bool                                            SetPositionWaterLevel       ( const CVector& vecPosition, float fLevel, void* pChangeSource );
     bool                                            SetWorldWaterLevel          ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel );
-    bool                                            SetElementWaterLevel        ( CClientWater* pWater, float fLevel, void* pChangeSource );
     bool                                            SetAllElementWaterLevel     ( float fLevel, void* pChangeSource );
     void                                            ResetWorldWaterLevel        ( void );
 
@@ -58,5 +56,3 @@ private:
     bool                                            m_bDontRemoveFromList;
     unsigned short                                  m_usDimension;
 };
-
-#endif
