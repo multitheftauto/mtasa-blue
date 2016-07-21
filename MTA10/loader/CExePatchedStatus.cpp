@@ -299,12 +299,31 @@ EPatchResult UpdatePatchStatusTimestamp( const SString& strGTAEXEPath, EPatchMod
 //////////////////////////////////////////////////////////
 EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode mode )
 {
-    // Get the value from the header
-    ushort usCharacteristics = 0;
+    // Get file position of IMAGE_FILE_HEADER->Characteristics
+    uint uiFilePosition = 0;
     FILE* fh = fopen ( strGTAEXEPath, "rb" );
     if ( fh )
     {
-        if ( !fseek ( fh, 0x96, SEEK_SET ) )
+        // 60 is offset of IMAGE_DOS_HEADER->e_lfanew
+        if ( !fseek ( fh, 60, SEEK_SET ) )
+        {
+            long e_lfanew;
+            if ( fread ( &e_lfanew, sizeof ( e_lfanew ), 1, fh ) == 1 )
+            {
+                // 4 is offset of IMAGE_NT_HEADERS->FileHeader
+                // 18 is offset of IMAGE_FILE_HEADER->Characteristics
+                uiFilePosition = e_lfanew + 4 + 18;
+            }
+        }
+        fclose ( fh );
+    }
+
+    // Get the value from the header
+    ushort usCharacteristics = 0;
+    fh = fopen ( strGTAEXEPath, "rb" );
+    if ( fh )
+    {
+        if ( !fseek ( fh, uiFilePosition, SEEK_SET ) )
         {
             if ( fread ( &usCharacteristics, sizeof ( usCharacteristics ), 1, fh ) != 1 )
             {
@@ -341,12 +360,16 @@ EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode
             {
                 return PATCH_SET_RESULT_REQ_ADMIN;
             }
-            if ( !fseek ( fh, 0x96, SEEK_SET ) )
+            if ( !fseek ( fh, uiFilePosition, SEEK_SET ) )
             {
                 fwrite ( &usCharacteristicsRequired, sizeof ( usCharacteristicsRequired ), 1, fh );
             }
             fclose ( fh );
         }
+    }
+    else
+    {
+        WriteDebugEventAndReport ( 9805, SString ( "Unable to set LARGE_ADDRESS_AWARE [FilePosition=0x%x Characteristics=0x%x]", uiFilePosition, usCharacteristics ) );
     }
     return PATCH_SET_RESULT_OK;
 }
