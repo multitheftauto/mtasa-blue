@@ -5556,6 +5556,9 @@ void CClientGame::ResetMapInfo ( void )
         pGarage->SetOpen ( false );
     }
 
+    // Train tracks
+    g_pGame->GetTrainTrackManager ()->ResetTracks ();
+
     // Player specific stuff
     if ( m_pLocalPlayer )
     {
@@ -6488,11 +6491,6 @@ void CClientGame::OutputServerInfo( void )
                         );
 
         strTotalOutput += SString( "Tick rates: %s\n", *strTickRates );
-    }
-
-    if ( g_pGame->GetTrainTrackManager () )
-    {
-        g_pGame->GetTrainTrackManager ()->ResetTracks ();
     }
 
     {
