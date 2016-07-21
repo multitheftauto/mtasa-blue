@@ -99,6 +99,10 @@ bool CClientWaterManager::SetWorldWaterLevel ( float fLevel, void* pChangeSource
 
 bool CClientWaterManager::SetElementWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
 {
+    if (!pWater->m_pPoly) {
+        return false;
+    }
+
     // Not calling CClientWater::SetPosition as x and y are not changing so the poly zone will not change
     return g_pGame->GetWaterManager ()->SetPolyWaterLevel ( pWater->m_pPoly, fLevel, pChangeSource );
 }
