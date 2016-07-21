@@ -39,6 +39,9 @@ public:
     float                                           GetWaveLevel                ();
     void                                            SetWaveLevel                ( float fWaveLevel );
 
+    inline unsigned short                           GetDimension                (void)                   { return m_usDimension; };
+    void                                            SetDimension                (unsigned short usDimension);
+
     inline std::list < CClientWater* > ::const_iterator  IterBegin                   ( void )            { return m_List.begin (); };
     inline std::list < CClientWater* > ::const_iterator  IterEnd                     ( void )            { return m_List.end (); };
 
@@ -53,6 +56,7 @@ private:
 
     std::list < CClientWater* >                     m_List;
     bool                                            m_bDontRemoveFromList;
+    unsigned short                                  m_usDimension;
 };
 
 #endif

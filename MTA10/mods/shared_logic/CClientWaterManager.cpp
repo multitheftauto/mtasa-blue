@@ -128,3 +128,14 @@ void CClientWaterManager::SetWaveLevel ( float fWaveLevel )
 {
     g_pGame->GetWaterManager ()->SetWaveLevel ( fWaveLevel );
 }
+
+void CClientWaterManager::SetDimension(unsigned short usDimension)
+{
+    m_usDimension = usDimension;
+
+    list < CClientWater* > ::const_iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
+    {
+        (*iter)->RelateDimension(m_usDimension);
+    }
+}

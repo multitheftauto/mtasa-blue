@@ -2316,6 +2316,7 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
     m_pManager->GetRadarMarkerManager ()->SetDimension ( usDimension );
     m_pManager->GetSoundManager ()->SetDimension ( usDimension );
     m_pManager->GetPointLightsManager ()->SetDimension ( usDimension );
+    m_pManager->GetWaterManager()->SetDimension( usDimension );
     m_pNametags->SetDimension ( usDimension );
 }
 

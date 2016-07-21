@@ -1266,6 +1266,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, un
         case CCLIENTRADARAREA:
         case CCLIENTWORLDMESH:
         case CCLIENTSOUND:
+        case CCLIENTWATER:
         {
             Entity.SetDimension ( usDimension );
 
@@ -5968,7 +5969,7 @@ CClientWater* CStaticFunctionDefinitions::CreateWater ( CResource& resource, CVe
         pWater = new CClientWater ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, *pV4, bShallow );
     else
         pWater = new CClientWater ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, bShallow );
-    if ( !pWater->Valid () ) {
+    if ( !pWater->Exists () ) {
         delete pWater;
         return NULL;
     }

@@ -20,7 +20,9 @@ public:
                                CClientWater           ( CClientManager* pManager, ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow = false );
                                ~CClientWater          ();
 
-    bool                       Valid                  () { return m_pPoly != NULL; }
+    bool                       Create                 ( void );
+    bool                       Destroy                ( void );
+    bool                       Exists                 () { return m_pPoly != NULL; }
 
     eClientEntityType          GetType                () const { return CCLIENTWATER; }
     int                        GetNumVertices         () const;
@@ -30,9 +32,20 @@ public:
     bool                       SetVertexPosition      ( int iVertexIndex, CVector& vecPosition, void* pChangeSource = NULL );
     void                       Unlink                 ();
 
+    void                       SetDimension           (unsigned short usDimension);
+    void                       RelateDimension        (unsigned short usWorldDimension);
+
 private:
     CWaterPoly*                m_pPoly;
     CClientWaterManager*       m_pWaterManager;
+    bool                       m_bTriangle;    // Is this water a triangle or a quad type?
+    bool                       m_bShallow; // Shallow water?
+    CVector                    m_vec1;
+    CVector                    m_vec2;
+    CVector                    m_vec3;
+    CVector                    m_vec4;
+    std::vector<CVector>       m_Verticies; // List of verticies for this water
+    unsigned short             m_usDimension;
 
     friend class CClientWaterManager;
 };

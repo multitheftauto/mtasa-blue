@@ -1525,6 +1525,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
         case CElement::PICKUP:
         case CElement::RADAR_AREA:
         case CElement::WORLD_MESH_UNUSED:
+        case CElement::WATER:
         {
             pElement->SetDimension ( usDimension );
             CBitStream bitStream;
