@@ -26,7 +26,7 @@ CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& ve
     m_Vertices.push_back(vecTR);
     m_bShallow = bShallow;
 
-    Create();
+    RelateDimension(m_pManager->GetWaterManager()->GetDimension());
 
     m_pWaterManager->AddToList ( this );
 }
@@ -43,7 +43,7 @@ CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& ve
     m_Vertices.push_back(vecTB);
     m_bShallow = bShallow;
 
-    Create();
+    RelateDimension(m_pManager->GetWaterManager()->GetDimension());
     m_pWaterManager->AddToList ( this );
 }
 

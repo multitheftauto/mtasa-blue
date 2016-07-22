@@ -5969,10 +5969,6 @@ CClientWater* CStaticFunctionDefinitions::CreateWater ( CResource& resource, CVe
         pWater = new CClientWater ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, *pV4, bShallow );
     else
         pWater = new CClientWater ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, bShallow );
-    if ( !pWater->Exists () ) {
-        delete pWater;
-        return NULL;
-    }
 
     pWater->SetParent ( resource.GetResourceDynamicEntity () );
     resource.AddToElementGroup ( pWater);
