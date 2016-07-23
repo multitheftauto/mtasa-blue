@@ -119,6 +119,7 @@ public:
     LUA_DECLARE ( OutputConsole );
     LUA_DECLARE ( OutputDebugString );
     LUA_DECLARE ( OutputServerLog );
+    LUA_DECLARE ( luaB_print );
     LUA_DECLARE ( GetServerName );
     LUA_DECLARE ( GetServerHttpPort );
     LUA_DECLARE ( GetServerIP );

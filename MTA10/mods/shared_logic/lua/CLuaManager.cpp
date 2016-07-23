@@ -236,6 +236,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "showChat", CLuaFunctionDefs::ShowChat );
     CLuaCFunctions::AddFunction ( "isChatVisible", CLuaFunctionDefs::IsChatVisible );
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefs::OutputClientDebugString );
+    CLuaCFunctions::AddFunction ( "print", CLuaFunctionDefs::luaB_print );
     CLuaCFunctions::AddFunction ( "setClipboard", CLuaFunctionDefs::SetClipboard );
     //CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
     CLuaCFunctions::AddFunction ( "setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing );

@@ -65,6 +65,7 @@ public:
     LUA_DECLARE ( ShowChat );
     LUA_DECLARE ( IsChatVisible );
     LUA_DECLARE ( OutputClientDebugString );
+    LUA_DECLARE ( luaB_print );
     LUA_DECLARE ( SetClipboard );
     LUA_DECLARE ( GetClipboard );
     LUA_DECLARE ( SetWindowFlashing );
