@@ -2048,6 +2048,7 @@ bool CStaticFunctionDefinitions::SetPlayerName ( CElement* pElement, const char*
                             CLuaArguments Arguments;
                             Arguments.PushString ( szNick );
                             Arguments.PushString ( szName );
+                            Arguments.PushBoolean ( false ); // manually changed
                             pPlayer->CallEvent ( "onPlayerChangeNick", Arguments );
 
                             // Tell the console

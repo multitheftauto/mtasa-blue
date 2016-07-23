@@ -753,6 +753,7 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                                 CLuaArguments Arguments;
                                 Arguments.PushString ( pClient->GetNick () );
                                 Arguments.PushString ( szNewNick );
+                                Arguments.PushBoolean ( true ); // manually changed
                                 if ( pPlayer->CallEvent ( "onPlayerChangeNick", Arguments ) )
                                 {
                                     // Tell the console
