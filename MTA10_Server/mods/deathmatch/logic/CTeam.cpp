@@ -30,7 +30,7 @@ CTeam::CTeam ( CTeamManager* pTeamManager, CElement* pParent, CXMLNode* pNode, c
 
 CTeam::~CTeam ( void )
 {
-    RemoveAllPlayers ();
+    //RemoveAllPlayers (); // Already called in CElementDeleter::Delete
     Unlink ();
 }
 

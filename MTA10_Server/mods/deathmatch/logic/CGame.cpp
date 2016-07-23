@@ -1483,7 +1483,8 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerModInfo", "filename, itemlist", NULL, false );
     m_Events.AddEvent ( "onPlayerACInfo", "aclist, size, md5, sha256", NULL, false );
     m_Events.AddEvent ( "onPlayerNetworkStatus", "type, ticks", NULL, false );
-    m_Events.AddEvent ( "onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false );
+    m_Events.AddEvent ( "onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
+    m_Events.AddEvent ( "onPlayerTeamChange", "previous, current", NULL, false);
 
     // Ped events
     m_Events.AddEvent ( "onPedWasted", "ammo, killer, weapon, bodypart", NULL, false );
