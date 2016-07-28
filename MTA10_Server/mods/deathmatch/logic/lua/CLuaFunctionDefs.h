@@ -198,6 +198,7 @@ public:
     LUA_DECLARE ( GetModules );
     LUA_DECLARE ( GetModuleInfo );
     LUA_DECLARE ( IsOOPEnabled );
+    LUA_DECLARE ( GetUserdataType );
 
 private:
     // Static references to objects

@@ -325,7 +325,7 @@ T* GetElementFromId( ElementID elementId )
 
 
 class CScriptArgReader;
-SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
+SString GetUserDataClassName ( void* ptr, lua_State* luaVM, bool bFindElementType = true );
 void MixedReadResourceString ( CScriptArgReader& argStream, SString& strOutResourceName );
 void MixedReadResourceString ( CScriptArgReader& argStream, CResource*& pOutResource );
 bool StringToBool ( const SString& strText );

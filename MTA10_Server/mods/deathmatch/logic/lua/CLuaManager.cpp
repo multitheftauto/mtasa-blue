@@ -367,6 +367,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getLoadedModules", CLuaFunctionDefs::GetModules );
     CLuaCFunctions::AddFunction ( "getModuleInfo", CLuaFunctionDefs::GetModuleInfo );
     CLuaCFunctions::AddFunction ( "isOOPEnabled", CLuaFunctionDefs::IsOOPEnabled );
+    CLuaCFunctions::AddFunction ( "getUserdataType", CLuaFunctionDefs::GetUserdataType );
 
     // Backward compat functions at the end, so the new function name is used in ACL
 

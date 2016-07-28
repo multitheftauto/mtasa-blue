@@ -477,6 +477,7 @@ public:
     LUA_DECLARE ( AddDebugHook );
     LUA_DECLARE ( RemoveDebugHook );
     LUA_DECLARE ( IsOOPEnabled );
+    LUA_DECLARE ( GetUserdataType );
 
     LUA_DECLARE ( GetVersion );
 

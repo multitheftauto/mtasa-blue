@@ -439,3 +439,31 @@ int CLuaFunctionDefs::fromJSON ( lua_State* luaVM )
     lua_pushnil ( luaVM );
     return 1;
 }
+
+int CLuaFunctionDefs::GetUserdataType(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    int iArgument = lua_type(luaVM, 1);
+
+    if (argStream.NextIsUserData())
+    {
+        SString strType;
+        if (iArgument == LUA_TLIGHTUSERDATA)
+            strType = GetUserDataClassName(lua_touserdata(luaVM, 1), luaVM, false);
+        else if (iArgument == LUA_TUSERDATA)
+            strType = GetUserDataClassName(*((void**)lua_touserdata(luaVM, 1)), luaVM, false);
+
+        strType = strType.empty() ? "userdata" : strType;
+
+        lua_pushstring(luaVM, strType.c_str());
+        return 1;
+    }
+    else
+    {
+        argStream.SetCustomError(SString("Bad Argument: Expected userdata, got " + EnumToString((eLuaType)iArgument)));
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}

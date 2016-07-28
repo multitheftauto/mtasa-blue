@@ -276,31 +276,40 @@ IMPLEMENT_ENUM_END ( "account-password-type" )
 //
 // Get best guess at name of userdata type
 //
-SString GetUserDataClassName ( void* ptr, lua_State* luaVM )
+SString GetUserDataClassName ( void* ptr, lua_State* luaVM, bool bFindElementType )
 {
-    // Try element
-    if ( CElement* pElement = UserDataCast < CElement > ( (CElement*)NULL, ptr, NULL ) )
-    {
-        return pElement->GetTypeName ();
-    }
-
-    // Try xml node
-    if ( CXMLNode* pXMLNode = UserDataCast < CXMLNode > ( (CXMLNode*)NULL, ptr, NULL ) )
-    {
-        return GetClassTypeName ( pXMLNode );
-    }
-
-    // Try timer
-    if ( CLuaTimer* pLuaTimer = UserDataCast < CLuaTimer > ( (CLuaTimer*)NULL, ptr, luaVM ) )
-    {
-        return GetClassTypeName ( pLuaTimer );
-    }
-
-    // Try resource
-    if ( CResource* pResource = UserDataCast < CResource > ( (CResource*)NULL, ptr, NULL ) )
-    {
-        return GetClassTypeName ( pResource );
-    }
+    if (CElement* pVar = UserDataCast < CElement >((CElement*)NULL, ptr, luaVM)) // Try element
+        return bFindElementType ? pVar->GetTypeName() : GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CResource >((CResource*)NULL, ptr, luaVM)) // Try resource
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CXMLNode >((CXMLNode*)NULL, ptr, luaVM)) // Try xml node
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CLuaTimer >((CLuaTimer*)NULL, ptr, luaVM)) // Try timer
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CAccount >((CAccount*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CDbJobData >((CDbJobData*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CAccessControlList >((CAccessControlList*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CAccessControlListGroup >((CAccessControlListGroup*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CCustomWeapon >((CCustomWeapon*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CBan >((CBan*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CTextItem >((CTextItem*)NULL, ptr, luaVM)) 
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CTextDisplay >((CTextDisplay*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CLuaVector2D >((CLuaVector2D*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CLuaVector3D >((CLuaVector3D*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CLuaVector4D >((CLuaVector4D*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CLuaMatrix >((CLuaMatrix*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
 
     return "";
 }

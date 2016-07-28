@@ -474,36 +474,34 @@ IMPLEMENT_ENUM_END ( "json-pretty-type" )
 //
 // Get best guess at name of userdata type
 //
-SString GetUserDataClassName ( void* ptr, lua_State* luaVM )
+SString GetUserDataClassName ( void* ptr, lua_State* luaVM, bool bFindElementType )
 {
     // Try element
     if ( CClientEntity* pClientElement = UserDataCast < CClientEntity > ( (CClientEntity*)NULL, ptr, NULL ) )
     {
-        // Try gui element
-        if ( CClientGUIElement* pGuiElement = DynamicCast < CClientGUIElement > ( pClientElement ) )
-        {
-            return EnumToString ( pGuiElement->GetCGUIElement ()->GetType () );
-        }
-        return pClientElement->GetTypeName ();
+        if (bFindElementType)
+            // Try gui element first
+            if ( CClientGUIElement* pGuiElement = DynamicCast < CClientGUIElement > ( pClientElement ) )
+                return EnumToString ( pGuiElement->GetCGUIElement ()->GetType () );
+            else
+                return pClientElement->GetTypeName ();
+        else
+            return GetClassTypeName(pClientElement);
     }
 
-    // Try xml node
-    if ( CXMLNode* pXMLNode = UserDataCast < CXMLNode > ( (CXMLNode*)NULL, ptr, NULL ) )
-    {
-        return GetClassTypeName ( pXMLNode );
-    }
+    if (auto* pVar = UserDataCast < CResource >((CResource*)NULL, ptr, luaVM)) // Try resource
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CXMLNode >((CXMLNode*)NULL, ptr, luaVM)) // Try xml node
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CLuaTimer >((CLuaTimer*)NULL, ptr, luaVM)) // Try timer
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CLuaVector2D >((CLuaVector2D*)NULL, ptr, luaVM)) // Try 2D Vector
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CLuaVector3D >((CLuaVector3D*)NULL, ptr, luaVM)) // Try 3D Vector
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast < CLuaVector4D >((CLuaVector4D*)NULL, ptr, luaVM))
+        return GetClassTypeName(pVar);
 
-    // Try timer
-    if ( CLuaTimer* pLuaTimer = UserDataCast < CLuaTimer > ( (CLuaTimer*)NULL, ptr, luaVM ) )
-    {
-        return GetClassTypeName ( pLuaTimer );
-    }
-
-    // Try resource
-    if ( CResource* pResource = UserDataCast < CResource > ( (CResource*)NULL, ptr, NULL ) )
-    {
-        return GetClassTypeName ( pResource );
-    }
 
     return "";
 }
