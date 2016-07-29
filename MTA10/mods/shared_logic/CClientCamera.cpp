@@ -285,11 +285,12 @@ void CClientCamera::SetOrbitTarget ( const CVector& vecPosition )
     {
         CClientEntity* pCameraTarget = GetTargetEntity ( );
 
-        if ( pCameraTarget != NULL ){
+        if ( pCameraTarget != nullptr )
+        {
             CVector vecTargetPosition;
             pCameraTarget->GetPosition ( vecTargetPosition );
-            if ( pCameraTarget->GetType ( ) == CCLIENTPLAYER )
-                vecTargetPosition.fZ += 0.6;
+            if ( pCameraTarget->GetType () == CCLIENTPLAYER )
+                vecTargetPosition.fZ += 0.6f;
 
             CVector vecDirection = vecPosition - vecTargetPosition;
             vecDirection.Normalize ();
