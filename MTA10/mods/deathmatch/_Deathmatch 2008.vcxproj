@@ -1018,6 +1018,11 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\coroutine_debug.lua" />
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\exports.lua" />
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\inspect.lua" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

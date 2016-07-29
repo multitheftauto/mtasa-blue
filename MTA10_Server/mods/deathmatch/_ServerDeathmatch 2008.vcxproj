@@ -1182,6 +1182,9 @@
     <Xml Include="editor_acl.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\coroutine_debug.lua" />
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\exports.lua" />
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\inspect.lua" />
     <None Include="editor.conf" />
     <None Include="local.conf" />
     <None Include="Makefile.am" />

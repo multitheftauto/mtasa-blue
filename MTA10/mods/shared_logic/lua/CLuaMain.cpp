@@ -27,56 +27,8 @@ SString CLuaMain::ms_strExpectedUndumpHash;
 #define HOOK_INSTRUCTION_COUNT 1000000
 #define HOOK_MAXIMUM_TIME 5000
 
-
-// This script is loaded into all VM's created.
-const char szPreloadedScript [] = ""\
-
-    // Code for allowing this syntax:   exports.resourceName:exportedFunctionName (...)
-    //                                  exports["resourceName"]:exportedFunctionName (...)
-    //                                  exports[resourcePointer]:exportedFunctionName (...)
-    // Aswell as the old:               call ( getResourceFromName ( "resourceName" ), "exportedFunctionName", ... )
-    "local rescallMT = {}\n" \
-    "function rescallMT:__index(k)\n" \
-    "        if type(k) ~= 'string' then k = tostring(k) end\n" \
-    "        self[k] = function(resExportTable, ...)\n" \
-    "                if type(self.res) == 'userdata' and getResourceRootElement(self.res) then\n" \
-    "                        return call(self.res, k, ...)\n" \
-    "                else\n" \
-    "                        return nil\n" \
-    "                end\n" \
-    "        end\n" \
-    "        return self[k]\n" \
-    "end\n" \
-    "local exportsMT = {}\n" \
-    "function exportsMT:__index(k)\n" \
-    "        if type(k) == 'userdata' and getResourceRootElement(k) then\n" \
-    "                return setmetatable({ res = k }, rescallMT)\n" \
-    "        elseif type(k) ~= 'string' then\n" \
-    "                k = tostring(k)\n" \
-    "        end\n" \
-    "        local res = getResourceFromName(k)\n" \
-    "        if res then\n" \
-    "                return setmetatable({ res = res }, rescallMT)\n" \
-    "        else\n" \
-    "                outputDebugString('exports: Call to non-running client resource (' .. k .. ')', 1)\n" \
-    "                return setmetatable({}, rescallMT)\n" \
-    "        end\n" \
-    "end\n" \
-    "exports = setmetatable({}, exportsMT)\n"
-
-    //
-    // Output errors that occur inside coroutines
-    //
-    "coroutine._resume = coroutine.resume\n"    // For access to the original function
-    "local _coroutine_resume = coroutine.resume\n"
-    "function coroutine.resume(...)\n"
-    "    local state,result = _coroutine_resume(...)\n"
-    "    if not state then\n"
-    "        outputDebugString( tostring(result), 1 )\n"
-    "    end\n"
-    "    return state,result\n"
-    "end\n"
-    ;
+SString SCRIPT_STACK = "";
+char Luaify = 127;
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP )
 {
@@ -879,9 +831,18 @@ void CLuaMain::InitVM ( void )
     lua_pushelement ( m_luaVM, g_pClientGame->GetLocalPlayer() );
     lua_setglobal ( m_luaVM, "localPlayer" );
 
-    // Load pre-loaded lua code
+    // Load pre-loaded lua scripts
     DECLARE_PROFILER_SECTION( OnPreLoadScript )
-    LoadScript ( szPreloadedScript );
+    #include "luascripts/exports.lua"
+    LoadScript(SCRIPT_STACK);
+
+    #include "luascripts/coroutine_debug.lua"
+    LoadScript(SCRIPT_STACK);
+
+    #include "luascripts/inspect.lua"
+    LoadScript(SCRIPT_STACK);
+
+    SCRIPT_STACK.clear();
     DECLARE_PROFILER_SECTION( OnPostLoadScript )
 }
 

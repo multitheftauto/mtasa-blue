@@ -75,6 +75,9 @@
     <Filter Include="Source Files\utils\lualib">
       <UniqueIdentifier>{4ab2244d-178c-4ef0-856a-d8bc3800ebf7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shared\luascripts">
+      <UniqueIdentifier>{4e6bc0f9-67f1-4e13-a9e6-7478a8bf8a66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CClient.cpp">
@@ -1693,5 +1696,16 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaDrawingDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\coroutine_debug.lua">
+      <Filter>Source Files\shared\luascripts</Filter>
+    </None>
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\exports.lua">
+      <Filter>Source Files\shared\luascripts</Filter>
+    </None>
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\inspect.lua">
+      <Filter>Source Files\shared\luascripts</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -73,6 +73,9 @@
     <Filter Include="Resource Files\output">
       <UniqueIdentifier>{4a26eed3-0f7c-400a-b106-efff6f2b1bb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shared\luascripts">
+      <UniqueIdentifier>{00ed2c51-2063-4817-8c19-220d8d32275c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CServer.cpp">
@@ -1922,6 +1925,15 @@
     </None>
     <None Include="..\..\output\README">
       <Filter>Resource Files\output</Filter>
+    </None>
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\inspect.lua">
+      <Filter>Source Files\shared\luascripts</Filter>
+    </None>
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\coroutine_debug.lua">
+      <Filter>Source Files\shared\luascripts</Filter>
+    </None>
+    <None Include="..\..\..\Shared\mods\deathmatch\logic\luascripts\exports.lua">
+      <Filter>Source Files\shared\luascripts</Filter>
     </None>
   </ItemGroup>
 </Project>
