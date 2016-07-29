@@ -6,6 +6,7 @@ project "Core"
 	
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		linkoptions { "/SAFESEH\:NO" }
 	
 	filter {}
 		includedirs { 

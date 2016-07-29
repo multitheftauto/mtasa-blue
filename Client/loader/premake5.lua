@@ -4,6 +4,9 @@ project "Loader"
 	targetname "loader"
 	targetdir(buildpath("mta"))
 	
+	filter "system:windows"
+		linkoptions { "/SAFESEH\:NO" }
+	
 	includedirs { 
 		"../sdk",
 		"../../vendor"

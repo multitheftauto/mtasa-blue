@@ -17,13 +17,14 @@ project "Client Deathmatch"
 	}
 	
 	vpaths { 
-		["Headers/*"] = "**.h",
-		["Sources"] = "*.c",
+		["Headers/**"] = {"../**.h", "../../../Shared**.h"},
+		["Sources/*"] = {"../**.cpp", "../**.c", "../../../Shared/**.cpp"},
 		["*"] = "premake5.lua"
 	}
 	
 	filter "system:windows"
 		includedirs { "../../../vendor/sparsehash/current/src/windows" }
+		linkoptions { "/SAFESEH\:NO" }
 	
 	filter {}
 		includedirs {
