@@ -6,6 +6,7 @@ project "cryptopp"
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources"] = "**.cpp",
+		["Assembly"] = "**.asm",
 		["*"] = "premake5.lua"
 	}
 		
@@ -137,10 +138,14 @@ project "cryptopp"
 		"xtrcrypt.cpp",
 		"zdeflate.cpp",
 		"zinflate.cpp",
-		"zlib.cpp",
-		"x64dll.asm",
-		"x64masm.asm"
+		"zlib.cpp"
 	}
+	
+	filter "platforms:x64"
+		files {
+			"x64dll.asm",
+			"x64masm.asm"
+		}
 	
 	-- C++11 build fails with GCC4.8/4.9
 	-- See https://github.com/weidai11/cryptopp/issues/206
