@@ -7,6 +7,7 @@ workspace "MTASA"
 	
 	flags { "C++14", "Symbols" }
 	characterset "MBCS"
+	pic "On"
 	
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs { 
@@ -44,12 +45,9 @@ workspace "MTASA"
 		libdirs {
 			dxdir.."Lib/x86"
 		}
-	filter "system:not windows"
-		buildoptions { "-fPIC" }
-
 	
 	-- Only build the client on Windows
-	filter "system:windows"
+	if os.get() == "windows" then
 		group "Client"
 		include "Client/ceflauncher"
 		include "Client/ceflauncher_DLL"
@@ -74,7 +72,8 @@ workspace "MTASA"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/curl/lib"
-
+	end
+	
 	filter {}
 		group "Server"
 		include "Server/core"
