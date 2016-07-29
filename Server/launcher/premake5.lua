@@ -9,6 +9,7 @@ project "Launcher"
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
+		["Resources/*"] = {"*.rc", "**.ico"},
 		["*"] = "premake5.lua"
 	}
 	
@@ -17,6 +18,12 @@ project "Launcher"
 		"*.h",
 		"*.cpp"
 	}
+	
+	filter "system:windows"
+		files {
+			"launcher.rc",
+			"resource/mtaicon.ico"
+		}
 
 	filter "system:linux"
 		links { "dl" }

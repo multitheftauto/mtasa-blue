@@ -24,6 +24,7 @@ project "Loader"
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources"] = "*.c",
+		["Resources/*"] = {"*.rc", "**.bmp"},
 		["*"] = "premake5.lua"
 	}
 	
@@ -32,6 +33,12 @@ project "Loader"
 		"*.h",
 		"*.cpp"
 	}
+	
+	filter "system:windows"
+		files {
+			"loader.rc",
+			"resource/splash.bmp"
+		}
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 

@@ -13,6 +13,7 @@ project "Client Launcher"
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
+		["Resources/*"] = {"*.rc", "*.ico", "**.xml"},
 		["*"] = "premake5.lua"
 	}
 	
@@ -21,6 +22,14 @@ project "Client Launcher"
 		"*.h",
 		"*.cpp"
 	}
+	
+	filter "system:windows"
+		files {
+			"NEU/GDFImp.gdf.xml",
+			"GDFImp.rc",
+			"launch.rc",
+			"mtaicon.ico"
+		}
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
