@@ -1,14 +1,14 @@
 project "Client Deathmatch"
 	language "C++"
 	kind "SharedLib"
-	targetname "deathmatch"
+	targetname "client"
 	targetdir(buildpath("mods/deathmatch"))
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
 	links {
-		"Lua", "pcre", "json-c", "ws2_32", "portaudio", "zlib", 
+		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", 
 		"../../../vendor/libspeex/libspeexd2013", -- todo: use debug variant
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",

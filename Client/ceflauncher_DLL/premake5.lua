@@ -28,7 +28,7 @@ project "CEFLauncher DLL"
 	filter "configurations:Debug"
 		links { "../../vendor/cef3/Debug/libcef.lib" }
 
-	filter "configurations:Release"
+	filter "configurations:Release or configurations:Nightly"
 		links { "../../vendor/cef3/Release/libcef.lib" }
 
 	filter "architecture:x64"

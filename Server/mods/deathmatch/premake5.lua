@@ -31,7 +31,7 @@ project "Deathmatch"
 		}
 	
 	links {
-		"Lua", "pthread", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"
+		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"
 	}
 	
 	

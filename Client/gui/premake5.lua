@@ -1,7 +1,7 @@
 project "GUI"
 	language "C++"
 	kind "SharedLib"
-	targetname "gui"
+	targetname "cgui"
 	targetdir(buildpath("mta"))
 	
 	filter "system:windows"

@@ -1,8 +1,29 @@
-project "Lua"
+project "Lua_Server"
 	language "C++"
 	kind "SharedLib"
 	targetname "lua5.1"
 	targetdir(buildpath("server/mods/deathmatch"))
+
+	vpaths { 
+		["Headers"] = "**.h",
+		["Sources"] = "**.c",
+		["*"] = "premake5.lua"
+	}
+	
+	files {
+		"premake5.lua",
+		"src/**.c",
+		"src/**.h",
+	}
+
+	configuration "windows"
+		defines { "LUA_BUILD_AS_DLL" }
+
+project "Lua_Client"
+	language "C++"
+	kind "SharedLib"
+	targetname "lua5.1"
+	targetdir(buildpath("mods/deathmatch"))
 
 	vpaths { 
 		["Headers"] = "**.h",
@@ -22,8 +43,3 @@ project "Lua"
 
 	configuration "windows"
 		defines { "LUA_BUILD_AS_DLL" }
-
-	filter "system:windows"
-		postbuildcommands {
-			copy "mta"
-		}

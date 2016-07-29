@@ -20,6 +20,14 @@ project "CEF"
 		"**.h",
 	}
 
+	local path = buildpath(".")
+	local cef_path = "%{wks.location}/../Vendor/cef3/"
+	postbuildcommands {
+		"{COPY} "..cef_path.."Release/* "..path.."mta",
+		"{COPY} "..cef_path.."Resources/* "..path.."mta",
+		"{COPY} "..cef_path.."Resources/locales/* "..path.."mta/locales"
+	}
+
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
 	filter "system:not windows"
