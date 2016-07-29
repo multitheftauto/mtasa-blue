@@ -1,7 +1,7 @@
 project "Lua"
 	language "C++"
 	kind "SharedLib"
-	targetname "Lua"
+	targetname "lua5.1"
 	targetdir(buildpath("server/mods/deathmatch"))
 
 	vpaths { 

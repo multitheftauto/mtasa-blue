@@ -1,7 +1,7 @@
 project "XML"
 	language "C++"
 	kind "SharedLib"
-	targetname "xml"
+	targetname "xmll"
 	targetdir(buildpath("server"))
 	
 	includedirs { 
