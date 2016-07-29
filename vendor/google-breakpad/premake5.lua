@@ -3,7 +3,7 @@ project "breakpad"
 	kind "StaticLib"
 	targetname "breakpad"
 	
-	includedirs { "src", "src/common/android/include" }
+	includedirs { "src", "src/third_party/glog/src" }
 	
 	vpaths { 
 		["Headers/*"] = "src/**.h",
@@ -17,6 +17,7 @@ project "breakpad"
 		"src/**.h",
 		"src/client/*.cc",
 		"src/common/*.cc",
+		"src/common/*.c",
 		"src/processor/*.cc",
 		
 		"src/third_party/glog/src/*.cc",
@@ -30,6 +31,18 @@ project "breakpad"
 			"src/common/linux/**.cc",
 			"src/common/dwarf/**.cc"
 		}
+
+	-- Ignore tests
+	excludes(os.matchfiles("**/*_unittest.cc"))
+	excludes(os.matchfiles("**/*_test.cc"))
+	excludes(os.matchfiles("**/*_selftest.cc"))
+
+	excludes {
+		"src/client/linux/sender/google_crash_report_sender.cc",
+		"src/common/linux/tests/**.cc",
+		"src/common/stabs_reader.cc"
+	}
+
 
 	--[[filter "system:windows"
 		files {
