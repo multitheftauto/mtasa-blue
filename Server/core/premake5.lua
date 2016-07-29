@@ -18,8 +18,6 @@ project "Core"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
-	-- TODO: Link Breakpad
-	
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources"] = "*.c",
@@ -46,4 +44,4 @@ project "Core"
 		excludes { "CExceptionInformation_Impl.cpp" }
 
 	filter "system:linux"
-		links { "ncurses", "ncursesw" }
+		links { "ncurses", "ncursesw", "breakpad" }
