@@ -260,7 +260,7 @@ bool CheckWrappedUserDataType ( CClientGUIElement*& pGuiElement, SString& strErr
 }
 
 
-SString GetUserDataClassName ( void* ptr, lua_State* luaVM );
+SString GetUserDataClassName ( void* ptr, lua_State* luaVM, bool bFindElementType = true );
 
 
 //

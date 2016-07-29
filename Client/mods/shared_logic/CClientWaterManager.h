@@ -11,8 +11,7 @@
 
 class CClientWaterManager;
 
-#ifndef __CCLIENTWATERMANAGER_H
-#define __CCLIENTWATERMANAGER_H
+#pragma once
 
 #include "CClientManager.h"
 #include "CClientWater.h"
@@ -32,12 +31,14 @@ public:
     bool                                            GetWaterLevel               ( CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown );
     bool                                            SetPositionWaterLevel       ( const CVector& vecPosition, float fLevel, void* pChangeSource );
     bool                                            SetWorldWaterLevel          ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel );
-    bool                                            SetElementWaterLevel        ( CClientWater* pWater, float fLevel, void* pChangeSource );
     bool                                            SetAllElementWaterLevel     ( float fLevel, void* pChangeSource );
     void                                            ResetWorldWaterLevel        ( void );
 
     float                                           GetWaveLevel                ();
     void                                            SetWaveLevel                ( float fWaveLevel );
+
+    inline unsigned short                           GetDimension                (void)                   { return m_usDimension; };
+    void                                            SetDimension                (unsigned short usDimension);
 
     inline std::list < CClientWater* > ::const_iterator  IterBegin                   ( void )            { return m_List.begin (); };
     inline std::list < CClientWater* > ::const_iterator  IterEnd                     ( void )            { return m_List.end (); };
@@ -53,6 +54,5 @@ private:
 
     std::list < CClientWater* >                     m_List;
     bool                                            m_bDontRemoveFromList;
+    unsigned short                                  m_usDimension;
 };
-
-#endif

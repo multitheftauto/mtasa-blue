@@ -1634,8 +1634,10 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
     if ( !argStream.HasErrors () && pElement->GetType () == CElement::RADAR_AREA )
     {
         // radar areas only take x and y
-        argStream.ReadNumber ( vecPosition.fX );
-        argStream.ReadNumber ( vecPosition.fY );
+        CVector2D vecRadarPos;
+        argStream.ReadVector2D ( vecRadarPos );
+        vecPosition.fX = vecRadarPos.fX;
+        vecPosition.fY = vecRadarPos.fY;
     }
     else
     {

@@ -8,6 +8,7 @@
 !include WinVer.nsh
 !include nsArray.nsh
 !include Utils.nsh
+!include WordFunc.nsh
 
 XPStyle on
 RequestExecutionLevel user
@@ -20,7 +21,6 @@ Var CreateSMShortcuts
 Var CreateDesktopIcon
 Var RegisterProtocol
 Var AddToGameExplorer
-Var RedistVC12Installed
 Var ExeMD5
 Var PatchInstalled
 Var DEFAULT_INSTDIR
@@ -88,7 +88,8 @@ Var ShowLastUsed
     !endif
     !define VI_PRODUCT_NAME "MTA San Andreas"
     !define VI_COMPANY_NAME "Multi Theft Auto"
-    !define VI_LEGAL_COPYRIGHT "(C) 2003 - 2014 Multi Theft Auto"
+    !define /date DATE_YEAR "%Y"
+    !define VI_LEGAL_COPYRIGHT "(C) 2003 - ${DATE_YEAR} Multi Theft Auto"
     !ifndef LIGHTBUILD
         !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
     !else
@@ -248,19 +249,6 @@ Function .onInit
     ${LogText} "${PRODUCT_VERSION}"
     ${LogText} "Function begin - .onInit"
 
-    ; Check if we must install the Microsoft Visual Studio 2013 redistributable
-    ClearErrors
-    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum" "Install"
-    StrCmp "$0" "1" DontInstallVC12Redist
-    StrCpy $RedistVC12Installed "0"
-    ${LogText} " VS2013 runtime not installed"
-    Goto PostVC12Check
-DontInstallVC12Redist:
-    StrCpy $RedistVC12Installed "1"
-    ${LogText} " VS2013 runtime already installed"
-PostVC12Check:
-
-    
     ; Try to find previously saved MTA:SA install path
     ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
     ${If} $Install_Dir == "" 
@@ -465,11 +453,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SectionIn 1 RO ; section is required
         ${LogText} "Section begin - CLIENT CORE"
 
-        StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
-        Call InstallVC12Redistributable
-        StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
-        Abort
-DontInstallRedistVC12:
+        Call UpdateVCRedistributables
 
         SetShellVarContext all
 
@@ -809,11 +793,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         ${LogText} "Section begin - SERVER CORE"
         SectionIn 1 2 RO ; section is required
         
-        StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
-        Call InstallVC12Redistributable
-        StrCmp "$RedistVC12Installed" "1" DontInstallRedistVC12
-        Abort
-    DontInstallRedistVC12:
+        Call UpdateVCRedistributables
 
         SetOutPath "$INSTDIR\server"
         SetOverwrite on
@@ -1144,6 +1124,21 @@ FunctionEnd
 
 
 ;====================================================================================
+; Download and install Microsoft Visual Studio redistributables if required
+;====================================================================================
+Function UpdateVCRedistributables
+    Call IsVC12RedistributableInstalled
+    ${If} $0 != "1"
+        Call InstallVC12Redistributable
+    ${EndIf}
+    Call IsVC14RedistributableInstalled
+    ${If} $0 != "1"
+        Call InstallVC14Redistributable
+    ${EndIf}
+FunctionEnd
+
+
+;====================================================================================
 ; Download and install Microsoft Visual Studio 2013 redistributable
 ;====================================================================================
 Var REDISTVC12
@@ -1159,41 +1154,98 @@ Function InstallVC12Redistributable
     StrCpy $REDISTVC12 "$TEMP\vcredist12_x86.exe"
     NSISdl::download "http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe" $REDISTVC12
     Pop $0
-    StrCmp "$0" "success" DownloadSuccessful
-    
-    DetailPrint "* Download of Microsoft Visual Studio 2013 redistributable failed:"
-    DetailPrint "* $0"
-    DetailPrint "* Installation continuing anyway"
-    MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR1)"
-    Goto InstallEnd
-    
-DownloadSuccessful:
-    ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
-    ; /quiet = 'This option will suppress all UI and perform an install.'
-    ExecWait '"$REDISTVC12" /quiet'
-    ClearErrors
-    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum" "Install"
-    StrCmp "$0" "1" 0 VC12RedistInstallFailed
-    
-    StrCpy $RedistVC12Installed "1"
-    Goto InstallEnd
 
-VC12RedistInstallFailed:
-    StrCpy $RedistVC12Installed "0"
-    DetailPrint "* Some error occured installing Microsoft Visual Studio 2013 redistributable"
-    DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
-    DetailPrint "* Installation continuing anyway"
-    MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR2)"
+    ${If} $0 != "success"
+        DetailPrint "* Download of Microsoft Visual Studio 2013 redistributable failed:"
+        DetailPrint "* $0"
+        DetailPrint "* Installation continuing anyway"
+        MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR3)"
+    ${Else}
+        ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
+        ; /quiet = 'This option will suppress all UI and perform an install.'
+        ExecWait '"$REDISTVC12" /quiet'
+        Call IsVC12RedistributableInstalled
+        ${If} $0 != "1"
+            DetailPrint "* Some error occured installing Microsoft Visual Studio 2013 redistributable"
+            DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
+            DetailPrint "* Installation continuing anyway"
+            MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR2)"
+            MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR3)"
+        ${EndIf}
+    ${EndIf}
 
-    
-InstallEnd:
-
-    StrCmp "$RedistVC12Installed" "1" InstallEnd2
-    MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR3)"
-    StrCpy $RedistVC12Installed "1"
-
-InstallEnd2:
     ${LogText} "Function end - InstallVC12Redistributable"
+FunctionEnd
+
+;----------------------------------------
+; Out $0 = result   ("1" = yes, "0" = no)
+Function IsVC12RedistributableInstalled
+    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum" "Install"
+    ${If} $0 != "1"
+        StrCpy $0 "0"
+    ${EndIf}
+FunctionEnd
+
+
+;====================================================================================
+; Download and install Microsoft Visual Studio 2015 redistributable
+;====================================================================================
+!define VC14_REDIST_VER    "14.0.24210"     ; Version number of update 3
+Var REDISTVC14
+
+LangString MSGBOX_VC14RED_ERROR1 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2015 redistributable"
+LangString MSGBOX_VC14RED_ERROR2 ${LANG_ENGLISH}    "Unable to install Microsoft Visual Studio 2015 redistributable"
+LangString MSGBOX_VC14RED_ERROR3 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2015 redistributable.\
+$\r$\nHowever installation will continue.\
+$\r$\nPlease reinstall if there are problems later."
+Function InstallVC14Redistributable
+    ${LogText} "Function begin - InstallVC14Redistributable"
+    DetailPrint "Installing Microsoft Visual Studio 2015 redistributable ..."
+    StrCpy $REDISTVC14 "$TEMP\vcredist14_x86.exe"
+    NSISdl::download "http://download.microsoft.com/download/4/2/F/42FF78CE-8DE0-4C88-AD7A-5F8DFFB49F74/vc_redist.x86.exe" $REDISTVC14
+    Pop $0
+
+    ${If} $0 != "success"
+        DetailPrint "* Download of Microsoft Visual Studio 2015 redistributable failed:"
+        DetailPrint "* $0"
+        DetailPrint "* Installation continuing anyway"
+        MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR3)"
+    ${Else}
+        ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
+        ; /quiet = 'This option will suppress all UI and perform an install.'
+        ExecWait '"$REDISTVC14" /quiet'
+        Call IsVC14RedistributableInstalled
+        ${If} $0 != "1"
+            DetailPrint "* Some error occured installing Microsoft Visual Studio 2015 redistributable"
+            DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
+            DetailPrint "* Installation continuing anyway"
+            MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR2)"
+            MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR3)"
+        ${EndIf}
+    ${EndIf}
+
+    ${LogText} "Function end - InstallVC14Redistributable"
+FunctionEnd
+
+;----------------------------------------
+; Out $0 = result   ("1" = yes, "0" = no)
+Function IsVC14RedistributableInstalled
+    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Install"
+    ${If} $0 == "1" 
+        ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Version"
+
+        ; ${VersionCompare} "[Version1]" "[Version2]" $result
+        ;   0 = Versions are equal
+        ;   1 = Version1 is newer
+        ;   2 = Version2 is newer
+        ${VersionCompare} $0 ${VC14_REDIST_VER} $1
+        ${If} $1 != "2"     ; Version2 is not newer
+            StrCpy $0 "1"
+            Return
+        ${EndIf}
+
+    ${EndIf}
+    StrCpy $0 "0"
 FunctionEnd
 
 ;====================================================================================
@@ -1209,36 +1261,29 @@ Function InstallPatch
     StrCpy $PATCHFILE "$TEMP\$ExeMD5.GTASAPatch"
     NSISdl::download "http://mirror.multitheftauto.com/gdata/$ExeMD5.GTASAPatch" $PATCHFILE
     Pop $0
-    StrCmp "$0" "success" PatchDownloadSuccessful
-    
-    DetailPrint "* Download of patch file failed:"
-    DetailPrint "* $0"
-    DetailPrint "* Installation continuing anyway"
-    MessageBox MB_ICONSTOP "$(MSGBOX_PATCH_FAIL1)"
-    StrCpy $PatchInstalled "0"
-    Goto FinishPatch
-    
-PatchDownloadSuccessful:
-    DetailPrint "Patch download successful.  Installing patch..."
-    vpatch::vpatchfile "$PATCHFILE" "$GTA_DIR\gta_sa.exe.bak" "$GTA_DIR\gta_sa.exe"
-    Pop $R0
-    
-    ${If} $R0 == "OK"
-        StrCpy $PatchInstalled "1"
-        Goto FinishPatch
-    ${ElseIf} $R0 == "OK, new version already installed"
-        StrCpy $PatchInstalled "1"
-        Goto FinishPatch
+    ${If} $0 != "success"
+        DetailPrint "* Download of patch file failed:"
+        DetailPrint "* $0"
+        DetailPrint "* Installation continuing anyway"
+        MessageBox MB_ICONSTOP "$(MSGBOX_PATCH_FAIL1)"
+        StrCpy $PatchInstalled "0"
+    ${Else}
+        DetailPrint "Patch download successful.  Installing patch..."
+        vpatch::vpatchfile "$PATCHFILE" "$GTA_DIR\gta_sa.exe.bak" "$GTA_DIR\gta_sa.exe"
+        Pop $R0
+        ${If} $R0 == "OK"
+            StrCpy $PatchInstalled "1"
+        ${ElseIf} $R0 == "OK, new version already installed"
+            StrCpy $PatchInstalled "1"
+        ${Else}
+            StrCpy $PatchInstalled "0"
+            DetailPrint "* Some error occured installing the patch for Grand Theft Auto: San Andreas:"
+            DetailPrint "* $R0"
+            DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
+            DetailPrint "* Installation continuing anyway"
+            MessageBox MB_ICONSTOP MSGBOX_PATCH_FAIL2
+        ${EndIf}
     ${EndIf}
-    
-    DetailPrint "* Some error occured installing the patch for Grand Theft Auto: San Andreas:"
-    DetailPrint "* $R0"
-    DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
-    DetailPrint "* Installation continuing anyway"
-    MessageBox MB_ICONSTOP MSGBOX_PATCH_FAIL2
-    StrCpy $PatchInstalled "0"
-    
-    FinishPatch:
     ${LogText} "Function end - InstallPatch"
 FunctionEnd
 
@@ -1254,22 +1299,22 @@ LangString UAC_RIGHTS4 ${LANG_ENGLISH}  "Unable to elevate"
     !insertmacro UAC_RunElevated
     #MessageBox mb_TopMost "0=$0 1=$1 2=$2 3=$3"
     ${Switch} $0
-    ${Case} 0
-        ${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
-        ${IfThen} $3 <> 0 ${|} ${Break} ${|} ;we are admin, let the show go on
-        ${If} $1 = 3 ;RunAs completed successfully, but with a non-admin user
-            MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "${AdminError}" /SD IDNO IDOK uac_tryagain IDNO 0
-        ${EndIf}
-        ;fall-through and die
-    ${Case} 1223
-        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "${AdminError}"
-        Quit
-    ${Case} 1062
-        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS3)"
-        Quit
-    ${Default}
-        MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS4), error $0"
-        Quit
+        ${Case} 0
+            ${IfThen} $1 = 1 ${|} Quit ${|}         ; we are the outer process, the inner process has done its work, we are done
+            ${IfThen} $3 <> 0 ${|} ${Break} ${|}    ; we are admin, let the show go on
+            ${If} $1 = 3                            ; RunAs completed successfully, but with a non-admin user
+                MessageBox mb_IconExclamation|mb_TopMost|mb_SetForeground "${AdminError}" /SD IDNO IDOK uac_tryagain IDNO 0
+            ${EndIf}
+            ;fall-through and die
+        ${Case} 1223
+            MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "${AdminError}"
+            Quit
+        ${Case} 1062
+            MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS3)"
+            Quit
+        ${Default}
+            MessageBox mb_IconStop|mb_TopMost|mb_SetForeground "$(UAC_RIGHTS4), error $0"
+            Quit
     ${EndSwitch}
 !macroend
 

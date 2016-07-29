@@ -17,8 +17,16 @@ CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& ve
 {
     m_pManager = pManager;
     m_pWaterManager = pManager->GetWaterManager ();
-    m_pPoly = g_pGame->GetWaterManager ()->CreateQuad ( vecBL, vecBR, vecTL, vecTR, bShallow );
     SetTypeName ( "water" );
+
+    m_bTriangle = false;
+    m_Vertices.push_back(vecBL);
+    m_Vertices.push_back(vecBR);
+    m_Vertices.push_back(vecTL);
+    m_Vertices.push_back(vecTR);
+    m_bShallow = bShallow;
+
+    RelateDimension(m_pManager->GetWaterManager()->GetDimension());
 
     m_pWaterManager->AddToList ( this );
 }
@@ -27,25 +35,59 @@ CClientWater::CClientWater ( CClientManager* pManager, ElementID ID, CVector& ve
 {
     m_pManager = pManager;
     m_pWaterManager = pManager->GetWaterManager ();
-    m_pPoly = g_pGame->GetWaterManager ()->CreateTriangle ( vecL, vecR, vecTB, bShallow );
     SetTypeName ( "water" );
 
+    m_bTriangle = true;
+    m_Vertices.push_back(vecL);
+    m_Vertices.push_back(vecR);
+    m_Vertices.push_back(vecTB);
+    m_bShallow = bShallow;
+
+    RelateDimension(m_pManager->GetWaterManager()->GetDimension());
     m_pWaterManager->AddToList ( this );
 }
 
 CClientWater::~CClientWater ()
 {
     Unlink ();
-    if ( m_pPoly )
-        g_pGame->GetWaterManager ()->DeletePoly ( m_pPoly );
+    Destroy();
+}
+
+bool CClientWater::Create ( void )
+{
+    if (m_pPoly)
+        return false;
+
+    if (m_bTriangle)
+        m_pPoly = g_pGame->GetWaterManager()->CreateTriangle(m_Vertices[0], m_Vertices[1], m_Vertices[2], m_bShallow);
+    else
+        m_pPoly = g_pGame->GetWaterManager()->CreateQuad(m_Vertices[0], m_Vertices[1], m_Vertices[2], m_Vertices[3], m_bShallow);
+    
+#ifdef MTA_DEBUG
+    g_pCore->GetConsole ()->Printf ( "CClientWater::Create %d", GetID() );
+#endif
+
+    return true;
+}
+
+bool CClientWater::Destroy ( void )
+{
+    if (!m_pPoly)
+        return false;
+    
+#ifdef MTA_DEBUG
+    g_pCore->GetConsole ()->Printf ( "CClientWater::Destroy %d", GetID() );
+#endif
+
+    g_pGame->GetWaterManager()->DeletePoly(m_pPoly);
+    m_pPoly = nullptr;
+
+    return true;
 }
 
 int CClientWater::GetNumVertices () const
 {
-    if ( !m_pPoly )
-        return 0;
-    
-    return m_pPoly->GetNumVertices ();
+    return m_bTriangle ? 3 : 4;
 }
 
 void CClientWater::GetPosition ( CVector& vecPosition ) const
@@ -54,28 +96,19 @@ void CClientWater::GetPosition ( CVector& vecPosition ) const
     vecPosition.fX = 0.0f;
     vecPosition.fY = 0.0f;
     vecPosition.fZ = 0.0f;
-    if ( !m_pPoly )
-        return;
 
-    CVector vecVertexPos;
-    for ( int i = 0; i < GetNumVertices (); i++ )
-    {
-        m_pPoly->GetVertex ( i )->GetPosition ( vecVertexPos );
+    for ( CVector vecVertexPos : m_Vertices )
         vecPosition += vecVertexPos;
-    }
-    vecPosition /= static_cast < float > ( m_pPoly->GetNumVertices () );
+
+    vecPosition /= static_cast < float > ( GetNumVertices () );
 }
 
 bool CClientWater::GetVertexPosition ( int iVertexIndex, CVector& vecPosition )
 {
-    if ( !m_pPoly )
+    if (iVertexIndex < 0 || iVertexIndex >= GetNumVertices())
         return false;
 
-    CWaterVertex* pVertex = m_pPoly->GetVertex ( iVertexIndex );
-    if ( !pVertex )
-        return false;
-
-    pVertex->GetPosition ( vecPosition );
+    vecPosition = m_Vertices.at(iVertexIndex);
     return true;
 }
 
@@ -88,29 +121,61 @@ void CClientWater::SetPosition ( const CVector& vecPosition )
     GetPosition ( vecCurrentPosition );
     CVector vecDelta = vecPosition - vecCurrentPosition;
 
-    CVector vecVertexPos;
-    for ( int i = 0; i < GetNumVertices (); i++ )
+    int i = 0;
+    for (CVector& vecVertexPos : m_Vertices)
     {
-        m_pPoly->GetVertex ( i )->GetPosition ( vecVertexPos );
         vecVertexPos += vecDelta;
-        m_pPoly->GetVertex ( i )->SetPosition ( vecVertexPos );
+        if (m_pPoly)
+            m_pPoly->GetVertex(i)->SetPosition(vecVertexPos);
+        i++;
+
     }
+
     g_pGame->GetWaterManager ()->RebuildIndex ();
 }
 
 bool CClientWater::SetVertexPosition ( int iVertexIndex, CVector& vecPosition, void* pChangeSource )
 {
-    if ( !m_pPoly )
+    if (iVertexIndex < 0 || iVertexIndex >= GetNumVertices())
         return false;
 
-    CWaterVertex* pVertex = m_pPoly->GetVertex ( iVertexIndex );
-    if ( !pVertex )
-        return false;
+    m_Vertices.at(iVertexIndex) = vecPosition;
 
-    return pVertex->SetPosition ( vecPosition, pChangeSource );
+    if (m_pPoly)
+    {
+        CWaterVertex* pVertex = m_pPoly->GetVertex(iVertexIndex);
+        if (pVertex)
+            return pVertex->SetPosition(vecPosition, pChangeSource);
+    }
+    return true;   
 }
 
 void CClientWater::Unlink ()
 {
     m_pWaterManager->RemoveFromList ( this );
+}
+
+void CClientWater::SetDimension(unsigned short usDimension)
+{
+    m_usDimension = usDimension;
+    RelateDimension ( m_pManager->GetWaterManager ()->GetDimension () );
+}
+
+void CClientWater::RelateDimension(unsigned short usWorldDimension)
+{
+    if (usWorldDimension == m_usDimension)
+        Create();
+    else
+        Destroy();
+}
+
+bool CClientWater::SetLevel(float fLevel, void* pChangeSource ) {
+    CVector vecVertexPos;
+    for ( int i = 0; i < GetNumVertices (); i++ )
+    {
+        GetVertexPosition ( i, vecVertexPos );
+        vecVertexPos.fZ = fLevel;
+        SetVertexPosition ( i, vecVertexPos, pChangeSource );
+    }
+    return true;
 }

@@ -2030,7 +2030,7 @@ void CVersionUpdater::_DialogUpdateResult(void)
         {
             // 'files'/'silent' - Self extracting archive 
             SetOnQuitCommand ( "restart" );
-            SetOnRestartCommand ( "files", m_JobInfo.strSaveLocation );
+            SetOnRestartCommand ( "files", m_JobInfo.strSaveLocation, m_JobInfo.strParameters );
             _PollAnyButton();
             SetPostUpdateConnect( m_strServerSaysHost );
             _ExitGame();
@@ -3177,6 +3177,14 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
         }
     }
 
+    // Get version of installed VS2015 runtime
+    SString strVS2015Version = "0";
+    SString strVS2015Install = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\14.0\\RuntimeMinimum", "Install" );
+    if ( strVS2015Install == "\x01" )
+    {
+        strVS2015Version = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\14.0\\RuntimeMinimum", "Version" );
+    }
+
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager ()->GetDxStatus ( dxStatus );
@@ -3228,10 +3236,12 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
                              "_%s"
                              "_%s"
                              "_%d"
+                             "_%s"
                              , GetApplicationSettingInt( "vs2013-runtime-installed" )
                              , *GetApplicationSetting ( "real-os-build" )
                              , *GetApplicationSetting ( "locale" ).Replace( "_", "-" )
                              , (uint)FileSize( PathJoin( GetSystemSystemPath(), "normaliz.dll" ) )
+                             , *strVS2015Version
                            );
 
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );

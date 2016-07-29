@@ -51,7 +51,7 @@ void CWaterRPCs::SetElementWaterLevel ( CClientEntity* pSource, NetBitStreamInte
         CClientWater* pWater = m_pWaterManager->Get ( pSource->GetID () );
         if ( pWater )
         {
-            m_pWaterManager->SetElementWaterLevel ( pWater, fLevel, NULL );
+            pWater->SetLevel ( fLevel );
         }
     }
 }

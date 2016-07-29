@@ -110,11 +110,16 @@
 #include <luadefs/CLuaBlipDefs.h>
 #include <luadefs/CLuaBrowserDefs.h>
 #include <luadefs/CLuaClassDefs.h>
+#include <luadefs/CLuaCameraDefs.h>
+#include <luadefs/CLuaDrawingDefs.h>
+#include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
 #include <luadefs/CLuaPointLightDefs.h>
 #include <luadefs/CLuaPedDefs.h>
 #include <luadefs/CLuaPlayerDefs.h>
+#include <luadefs/CLuaRadarAreaDefs.h>
+#include <luadefs/CLuaResourceDefs.h>
 #include <luadefs/CLuaVector2Defs.h>
 #include <luadefs/CLuaVector3Defs.h>
 #include <luadefs/CLuaVector4Defs.h>
@@ -122,9 +127,9 @@
 #include <luadefs/CLuaMatrixDefs.h>
 #include <luadefs/CLuaSearchLightDefs.h>
 #include <luadefs/CLuaTaskDefs.h>
+#include <luadefs/CLuaTeamDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
-#include <lua/oopdefs/CLuaOOPDefs.h>
 #include <CRemoteCalls.h>
 
 // Shared includes

@@ -9,9 +9,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CWATERMANAGER_H
-#define __CWATERMANAGER_H
-
+#pragma once
 #include "CWater.h"
 
 class CWaterManager
@@ -39,5 +37,3 @@ public:
     virtual void                RebuildIndex      () = 0;       // Call this after moving a polygon's vertices
     virtual void                Reset             () = 0;       // Reset all water to SA default
 };
-
-#endif

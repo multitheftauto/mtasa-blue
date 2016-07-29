@@ -42,20 +42,6 @@ public:
     // Reserved functions
     LUA_DECLARE ( DisabledFunction );
 
-    // Resource functions
-    LUA_DECLARE ( Call );
-    LUA_DECLARE ( GetThisResource );
-    LUA_DECLARE ( GetResourceConfig );
-    LUA_DECLARE ( GetResourceName );
-    LUA_DECLARE ( GetResourceFromName );
-    LUA_DECLARE ( GetResourceRootElement );
-    LUA_DECLARE ( GetResourceGUIElement );
-    LUA_DECLARE ( GetResourceDynamicElementRoot );
-    LUA_DECLARE ( GetResourceExportedFunctions );
-    LUA_DECLARE ( GetResourceState );
-    LUA_DECLARE ( LoadString );
-    LUA_DECLARE ( Load );
-
     // Event functions
     LUA_DECLARE ( AddEvent );
     LUA_DECLARE ( AddEventHandler );
@@ -79,85 +65,10 @@ public:
     LUA_DECLARE ( ShowChat );
     LUA_DECLARE ( IsChatVisible );
     LUA_DECLARE ( OutputClientDebugString );
+    LUA_DECLARE ( luaB_print );
     LUA_DECLARE ( SetClipboard );
     LUA_DECLARE ( GetClipboard );
     LUA_DECLARE ( SetWindowFlashing );
-
-    // Element get functions
-    LUA_DECLARE ( GetRootElement );
-    LUA_DECLARE ( IsElement );
-    LUA_DECLARE ( GetElementChildren );
-    LUA_DECLARE ( GetElementChild );
-    LUA_DECLARE ( GetElementChildrenCount );
-    LUA_DECLARE ( GetElementID );
-    LUA_DECLARE ( GetElementByID );
-    LUA_DECLARE ( GetElementByIndex );
-    LUA_DECLARE ( GetElementData );
-    LUA_DECLARE ( GetElementParent );
-    LUA_DECLARE ( GetElementMatrix );
-    LUA_DECLARE ( GetElementPosition );
-    LUA_DECLARE ( GetElementRotation );
-    LUA_DECLARE ( GetElementVelocity );
-    LUA_DECLARE ( GetElementType );
-    LUA_DECLARE ( GetElementsByType );
-    LUA_DECLARE ( GetElementInterior );
-    LUA_DECLARE ( IsElementWithinColShape );
-    LUA_DECLARE ( IsElementWithinMarker );
-    LUA_DECLARE ( GetElementsWithinColShape );
-    LUA_DECLARE ( GetElementDimension );
-    LUA_DECLARE ( GetElementZoneName );
-    LUA_DECLARE ( GetElementBoundingBox );
-    LUA_DECLARE ( GetElementRadius );
-    LUA_DECLARE ( IsElementAttached );
-    LUA_DECLARE ( GetElementAttachedTo );
-    LUA_DECLARE ( GetAttachedElements );
-    LUA_DECLARE ( GetElementDistanceFromCentreOfMassToBaseOfModel );
-    LUA_DECLARE ( IsElementLocal );
-    LUA_DECLARE ( GetElementAttachedOffsets );
-    LUA_DECLARE ( GetElementAlpha );
-    LUA_DECLARE ( IsElementOnScreen );
-    LUA_DECLARE ( GetElementHealth );
-    LUA_DECLARE ( IsElementStreamedIn );
-    LUA_DECLARE ( IsElementStreamable );
-    LUA_DECLARE ( GetElementModel );
-    LUA_DECLARE ( GetElementColShape );
-    LUA_DECLARE ( IsElementInWater );
-    LUA_DECLARE ( IsElementSyncer );
-    LUA_DECLARE ( IsElementCollidableWith );
-    LUA_DECLARE ( IsElementDoubleSided );
-    LUA_DECLARE ( GetElementCollisionsEnabled );
-    LUA_DECLARE ( IsElementFrozen );
-    LUA_DECLARE ( GetLowLodElement );
-    LUA_DECLARE ( IsElementLowLod );
-    LUA_DECLARE ( IsElementCallPropagationEnabled );
-    LUA_DECLARE ( IsElementWaitingForGroundToLoad );
-
-    // Element set funcs
-    LUA_DECLARE ( CreateElement );
-    LUA_DECLARE ( DestroyElement );
-    LUA_DECLARE ( SetElementID );
-    LUA_DECLARE ( SetElementData );
-    LUA_DECLARE ( RemoveElementData );
-    LUA_DECLARE ( SetElementMatrix );
-    LUA_DECLARE ( SetElementPosition );
-    LUA_DECLARE ( SetElementRotation );
-    LUA_DECLARE ( SetElementVelocity );
-    LUA_DECLARE ( SetElementParent );  
-    LUA_DECLARE ( SetElementInterior );
-    LUA_DECLARE ( SetElementDimension );
-    LUA_DECLARE ( AttachElements );
-    LUA_DECLARE ( DetachElements );
-    LUA_DECLARE ( SetElementAttachedOffsets );
-    LUA_DECLARE ( SetElementCollisionsEnabled );
-    LUA_DECLARE ( SetElementAlpha );
-    LUA_DECLARE ( SetElementHealth );
-    LUA_DECLARE ( SetElementStreamable );
-    LUA_DECLARE ( SetElementModel );
-    LUA_DECLARE ( SetElementCollidableWith );
-    LUA_DECLARE ( SetElementDoubleSided );
-    LUA_DECLARE ( SetElementFrozen );
-    LUA_DECLARE ( SetLowLodElement );
-    LUA_DECLARE ( SetElementCallPropagationEnabled );
 
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );
@@ -171,16 +82,6 @@ public:
     // Fire functions
     LUA_DECLARE ( CreateFire );
 
-    // Radar-area funcs
-    LUA_DECLARE ( CreateRadarArea );
-    LUA_DECLARE ( GetRadarAreaColor );
-    LUA_DECLARE ( GetRadarAreaSize );
-    LUA_DECLARE ( IsRadarAreaFlashing );
-    LUA_DECLARE ( SetRadarAreaColor );
-    LUA_DECLARE ( SetRadarAreaFlashing );
-    LUA_DECLARE ( SetRadarAreaSize );
-    LUA_DECLARE ( IsInsideRadarArea );
-
     // Pickup create/destroy funcs
     LUA_DECLARE ( CreatePickup );
 
@@ -192,28 +93,6 @@ public:
 
     // Pickup get funcs
     LUA_DECLARE ( SetPickupType );
-
-    // Cam get funcs
-    LUA_DECLARE ( GetCamera );
-    LUA_DECLARE ( GetCameraViewMode );
-    LUA_DECLARE ( GetCameraMatrix );
-    LUA_DECLARE ( GetCameraTarget );
-    LUA_DECLARE ( GetCameraInterior );
-    LUA_DECLARE ( GetCameraGoggleEffect );
-    LUA_DECLARE ( GetCameraShakeLevel );
-    LUA_DECLARE ( GetCameraFieldOfView );
-
-    // Cam set funcs
-    LUA_DECLARE ( SetCameraMatrix );
-    LUA_DECLARE ( SetCameraTarget );
-    LUA_DECLARE ( SetCameraInterior );
-    LUA_DECLARE ( SetCameraFieldOfView );
-    LUA_DECLARE ( FadeCamera );
-    LUA_DECLARE ( SetCameraClip );
-    LUA_DECLARE ( GetCameraClip );
-    LUA_DECLARE ( SetCameraViewMode );
-    LUA_DECLARE ( SetCameraGoggleEffect );
-    LUA_DECLARE ( SetCameraShakeLevel );
 
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );
@@ -248,43 +127,6 @@ public:
     LUA_DECLARE ( EngineGetModelIDFromName );
     LUA_DECLARE ( EngineGetModelTextureNames );
     LUA_DECLARE ( EngineGetVisibleTextureNames );
-
-    // Drawing funcs (low-level)
-    LUA_DECLARE ( dxDrawLine );
-    LUA_DECLARE ( dxDrawLine3D );
-    LUA_DECLARE ( dxDrawMaterialLine3D );
-    LUA_DECLARE ( dxDrawMaterialSectionLine3D );
-    LUA_DECLARE ( dxDrawText );
-    LUA_DECLARE ( dxDrawRectangle );
-    LUA_DECLARE ( dxDrawImage );
-    LUA_DECLARE ( dxDrawImageSection );
-    LUA_DECLARE ( dxGetTextWidth );
-    LUA_DECLARE ( dxGetFontHeight );
-    LUA_DECLARE ( dxCreateFont );
-    LUA_DECLARE ( dxCreateTexture );
-    LUA_DECLARE ( dxCreateShader );
-    LUA_DECLARE ( dxCreateRenderTarget );
-    LUA_DECLARE ( dxCreateScreenSource );
-    LUA_DECLARE ( dxGetMaterialSize );
-    LUA_DECLARE ( dxSetShaderValue );
-    LUA_DECLARE ( dxSetShaderTessellation );
-    LUA_DECLARE ( dxSetShaderTransform );
-    LUA_DECLARE ( dxSetRenderTarget );
-    LUA_DECLARE ( dxUpdateScreenSource );
-    LUA_DECLARE ( dxGetStatus );
-    LUA_DECLARE ( dxSetTestMode );
-    LUA_DECLARE ( dxGetTexturePixels );
-    LUA_DECLARE ( dxSetTexturePixels );
-    LUA_DECLARE ( dxGetPixelsSize );
-    LUA_DECLARE ( dxGetPixelsFormat );
-    LUA_DECLARE ( dxConvertPixels );
-    LUA_DECLARE ( dxGetPixelColor );
-    LUA_DECLARE ( dxSetPixelColor );
-    LUA_DECLARE ( dxSetBlendMode );
-    LUA_DECLARE ( dxGetBlendMode );
-    LUA_DECLARE ( dxSetAspectRatioAdjustmentEnabled );
-    LUA_DECLARE ( dxIsAspectRatioAdjustmentEnabled );
-    LUA_DECLARE ( dxSetTextureEdge );
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -587,14 +429,6 @@ public:
     LUA_DECLARE ( CreateColPolygon );
     LUA_DECLARE ( CreateColTube );
 
-    // Team get funcs  
-    LUA_DECLARE ( GetTeamFromName );
-    LUA_DECLARE ( GetTeamName  );
-    LUA_DECLARE ( GetTeamColor );
-    LUA_DECLARE ( GetTeamFriendlyFire );
-    LUA_DECLARE ( GetPlayersInTeam );
-    LUA_DECLARE ( CountPlayersInTeam );
-
     // Weapon funcs
     LUA_DECLARE ( GetWeaponNameFromID );
     LUA_DECLARE ( GetWeaponIDFromName );
@@ -643,6 +477,7 @@ public:
     LUA_DECLARE ( AddDebugHook );
     LUA_DECLARE ( RemoveDebugHook );
     LUA_DECLARE ( IsOOPEnabled );
+    LUA_DECLARE ( GetUserdataType );
 
     LUA_DECLARE ( GetVersion );
 

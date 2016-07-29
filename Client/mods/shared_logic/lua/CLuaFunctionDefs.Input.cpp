@@ -603,11 +603,12 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
     if ( !argStream.HasErrors ( ) )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
         if ( pLuaMain )
         {
             const char* szHitState = strHitState == "" ? NULL : strHitState.c_str();
-
             bool bCheckHitState = false, bHitState = true;
+
             if ( szHitState )
             {
                 if ( stricmp ( szHitState, "down" ) == 0 )
@@ -620,25 +621,28 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
             lua_newtable ( luaVM );
 
             // Add all the bound commands to it
-            unsigned int uiIndex = 0;
             list < CKeyBind* > ::const_iterator iter = g_pCore->GetKeyBinds ()->IterBegin ();
+
             for ( ; iter != g_pCore->GetKeyBinds ()->IterEnd (); iter++ )
             {
                 CKeyBind* pKeyBind = *iter;
+
                 if ( !pKeyBind->IsBeingDeleted () && pKeyBind->bActive && pKeyBind->GetType () == KEY_BIND_COMMAND )
                 {
-                    CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
-                    if ( !bCheckHitState || pBind->bHitState == bHitState )
+                    CCommandBind* pCommandBind = static_cast < CCommandBind* > ( pKeyBind );
+
+                    if ( !bCheckHitState || pCommandBind->bHitState == bHitState )
                     {
-                        if ( strcmp ( strKey, pBind->boundKey->szKey ) == 0 )
+                        if ( strcmp ( strKey, pCommandBind->boundKey->szKey ) == 0 )
                         {
-                            lua_pushstring ( luaVM, pBind->szCommand );
-                            lua_pushstring ( luaVM, pBind->szArguments );
+                            lua_pushstring ( luaVM, pCommandBind->szCommand );
+                            lua_pushstring ( luaVM, ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' ) ? pCommandBind->szArguments : "" );
                             lua_settable ( luaVM, -3 );
                         }
                     }
                 }
             }
+
             return 1;
         }
     }

@@ -440,7 +440,7 @@ void lua_classfunction ( lua_State* luaVM, const char* szFunction, const char* f
     {
         lua_classfunction ( luaVM, szFunction, szFunction, pFunction->GetAddress () );
     }
-    else 
+    else
         dassert ( false );
 }
 

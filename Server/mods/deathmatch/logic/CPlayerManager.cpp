@@ -391,7 +391,7 @@ void CPlayerManager::RemoveFromList ( CPlayer* pPlayer )
         (*iter)->RemovePlayerFromDistLists ( pPlayer );
 
         // Update lowest player version
-        if ( (*iter)->GetPlayerVersion() < m_strLowestConnectedPlayerVersion || m_strLowestConnectedPlayerVersion.empty() )
+        if ( (*iter)->IsJoined () && ( (*iter)->GetPlayerVersion() < m_strLowestConnectedPlayerVersion || m_strLowestConnectedPlayerVersion.empty() ) )
             m_strLowestConnectedPlayerVersion = (*iter)->GetPlayerVersion();
     }
     g_pGame->CalculateMinClientRequirement();    

@@ -212,6 +212,28 @@ int CLuaFunctionDefs::OutputDebugString ( lua_State* luaVM )
     return 1;
 }
 
+/* Modified from Lua's own print */
+int CLuaFunctionDefs::luaB_print(lua_State *L) {
+    int n = lua_gettop(L);  /* number of arguments */
+    int i;
+    SString output = "";
+    lua_getglobal(L, "tostring");
+    for (i = 1; i <= n; i++) {
+        const char *s;
+        lua_pushvalue(L, -1);  /* function to be called */
+        lua_pushvalue(L, i);   /* value to print */
+        lua_call(L, 1, 1);
+        s = lua_tostring(L, -1);  /* get result */
+        if (s == NULL)
+            return luaL_error(L, LUA_QL("tostring") " must return a string to "
+            LUA_QL("print"));
+        if (i>1) output += "    ";
+        output += s;
+        lua_pop(L, 1);  /* pop result */
+    }
+    m_pScriptDebugging->LogInformation(L, "%s", output.c_str());
+    return 0;
+}
 
 int CLuaFunctionDefs::AddCommandHandler ( lua_State* luaVM )
 {

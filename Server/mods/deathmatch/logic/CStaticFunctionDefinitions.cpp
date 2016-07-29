@@ -1525,6 +1525,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CElement* pElement, unsig
         case CElement::PICKUP:
         case CElement::RADAR_AREA:
         case CElement::WORLD_MESH_UNUSED:
+        case CElement::WATER:
         {
             pElement->SetDimension ( usDimension );
             CBitStream bitStream;
@@ -2047,6 +2048,7 @@ bool CStaticFunctionDefinitions::SetPlayerName ( CElement* pElement, const char*
                             CLuaArguments Arguments;
                             Arguments.PushString ( szNick );
                             Arguments.PushString ( szName );
+                            Arguments.PushBoolean ( false ); // manually changed
                             pPlayer->CallEvent ( "onPlayerChangeNick", Arguments );
 
                             // Tell the console

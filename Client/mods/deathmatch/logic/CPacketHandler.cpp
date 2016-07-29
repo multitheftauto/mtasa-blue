@@ -1613,6 +1613,15 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                             static_cast < CDeathmatchVehicle* > ( pVehicle )->SetTyresCanBurst ( true );
                             */
                         }
+                        else
+                        {
+                            // Call the onClientVehicleStartEnter event for remote players
+                            CLuaArguments Arguments;
+                            Arguments.PushElement ( pPlayer );     // player
+                            Arguments.PushNumber ( ucSeat );        // seat
+                            Arguments.PushNumber ( ucDoor );        // Door
+                            pVehicle->CallEvent ( "onClientVehicleStartEnter", Arguments, true );
+                        }
 
                         // Start animating him in
                         pPlayer->GetIntoVehicle ( pVehicle, ucSeat, ucDoor + 2 );
@@ -1622,13 +1631,6 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                         pVehicle->CalcAndUpdateCanBeDamagedFlag ();
                         pVehicle->CalcAndUpdateTyresCanBurstFlag ();
-
-                        // Call the onClientVehicleStartEnter event
-                        CLuaArguments Arguments;
-                        Arguments.PushElement ( pPlayer );     // player
-                        Arguments.PushNumber ( ucSeat );        // seat
-                        Arguments.PushNumber ( ucDoor );        // Door
-                        pVehicle->CallEvent ( "onClientVehicleStartEnter", Arguments, true );
                         break;
                     }
 
@@ -1835,6 +1837,14 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                                 g_pClientGame->m_bIsGettingJacked = true;
                                 g_pClientGame->m_pGettingJackedBy = pPlayer;
                             }
+
+                            // Call the onClientVehicleStartEnter event for remote players 
+                            // Local player triggered before sending packet in CClientGame
+                            CLuaArguments Arguments;
+                            Arguments.PushElement(pPlayer);      // player
+                            Arguments.PushNumber(ucSeat);        // seat
+                            Arguments.PushNumber(ucDoor);        // Door
+                            pVehicle->CallEvent("onClientVehicleStartEnter", Arguments, true);
                         }
 
                         // Remember that this player is working on leaving a vehicle
@@ -1846,13 +1856,6 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                         // Remember that this player is working on leaving a vehicle
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_JACKING );
-
-                        // Call the onClientVehicleStartEnter event
-                        CLuaArguments Arguments;
-                        Arguments.PushElement ( pPlayer );      // player
-                        Arguments.PushNumber ( ucSeat );        // seat
-                        Arguments.PushNumber ( ucDoor );        // Door
-                        pVehicle->CallEvent ( "onClientVehicleStartEnter", Arguments, true );
 
                         CLuaArguments Arguments2;
                         Arguments2.PushElement ( pJacked );         // player
@@ -3937,7 +3940,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                     {
                         pWater = new CClientWater ( g_pClientGame->GetManager (), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3] );
                     }
-                    if ( !pWater->Valid () )
+                    if ( !pWater->Exists () )
                     {
                         delete pWater;
                         pWater = NULL;

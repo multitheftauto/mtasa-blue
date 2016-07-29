@@ -9,8 +9,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CCLIENTWATER_H
-#define __CCLIENTWATER_H
+#pragma once
 
 class CClientWater : public CClientEntity
 {
@@ -20,21 +19,29 @@ public:
                                CClientWater           ( CClientManager* pManager, ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow = false );
                                ~CClientWater          ();
 
-    bool                       Valid                  () { return m_pPoly != NULL; }
+    bool                       Create                 ( void );
+    bool                       Destroy                ( void );
+    bool                       Exists                 () { return m_pPoly != nullptr; }
 
     eClientEntityType          GetType                () const { return CCLIENTWATER; }
     int                        GetNumVertices         () const;
     void                       GetPosition            ( CVector& vecPosition ) const;
     bool                       GetVertexPosition      ( int iVertexIndex, CVector& vecPosition );
     void                       SetPosition            ( const CVector& vecPosition );
-    bool                       SetVertexPosition      ( int iVertexIndex, CVector& vecPosition, void* pChangeSource = NULL );
+    bool                       SetVertexPosition      ( int iVertexIndex, CVector& vecPosition, void* pChangeSource = nullptr );
+    bool                       SetLevel               ( float fWaterLevel, void *pChangeSource = nullptr );
     void                       Unlink                 ();
+
+    void                       SetDimension           (unsigned short usDimension);
+    void                       RelateDimension        (unsigned short usWorldDimension);
 
 private:
     CWaterPoly*                m_pPoly;
     CClientWaterManager*       m_pWaterManager;
+    bool                       m_bTriangle;    // Is this water a triangle or a quad type?
+    bool                       m_bShallow; // Shallow water?
+    std::vector<CVector>       m_Vertices; // List of vertices for this water
+    unsigned short             m_usDimension;
 
     friend class CClientWaterManager;
 };
-
-#endif

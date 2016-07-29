@@ -19,8 +19,7 @@
 
 class CStaticFunctionDefinitions;
 
-#ifndef __CSTATICFUNCTIONDEFINITIONS_H
-#define __CSTATICFUNCTIONDEFINITIONS_H
+#pragma once
 
 #include <gui/CGUI.h>
 #include <gui/CGUIElement.h>
@@ -383,7 +382,6 @@ public:
     static bool                         SetCursorAlpha                      ( float fAlpha );
 
     // Drawing funcs
-    static void                         DrawText                            ( float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning, float fRotation, float fRotationCenterX, float fRotationCenterY );
     static CClientDxFont*               CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold, const SString& strMetaPath, CResource* pResource );
     static CClientGuiFont*              CreateGuiFont                       ( const SString& strFullFilePath, uint uiSize, const SString& strMetaPath, CResource* pResource );
     static ID3DXFont*                   ResolveD3DXFont                     ( eFontType fontType, CClientDxFont* pDxFontElement );
@@ -457,8 +455,8 @@ public:
     static inline void                  GUIGridListSetColumnTitle           ( CClientGUIElement& GUIElement, unsigned int uiColumn, const char *szTitle )               { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetColumnTitle ( uiColumn, szTitle ); };
     //static const char*                GUIGridListGetColumnTitle           ( CClientGUIElement& GUIElement, int iColumn );                                  
     static void                         GUIGridListSetScrollBars            ( CClientEntity& Element, bool bH, bool bV );
-    static inline int                   GUIGridListAddRow                   ( CClientGUIElement& GUIElement, bool bFast )                                                           { return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AddRow ( bFast ); };
-    static inline int                   GUIGridListInsertRowAfter           ( CClientGUIElement& GUIElement, int iRow )                                             { return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> InsertRowAfter ( iRow ); };
+    static inline int                   GUIGridListAddRow                    (CClientGUIElement& GUIElement, bool bFast, std::vector < pair<SString, bool> > *m_items = NULL)       { return static_cast < CGUIGridList* > (GUIElement.GetCGUIElement())->AddRow(bFast,m_items); };
+    static inline int                   GUIGridListInsertRowAfter           ( CClientGUIElement& GUIElement, int iRow, std::vector < pair<SString, bool> > *m_items = NULL )            { return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> InsertRowAfter ( iRow, m_items ); };
     static inline void                  GUIGridListRemoveRow                ( CClientGUIElement& GUIElement, int iRow )                                             { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveRow ( iRow ); };
     static inline void                  GUIGridListAutoSizeColumn           ( CClientGUIElement& GUIElement, unsigned int uiColumn )                                    { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AutoSizeColumn ( uiColumn ); };
     static void                         GUIGridListClear                    ( CClientEntity& Element );
@@ -499,7 +497,6 @@ public:
     static bool                         GetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
     static bool                         SetWorldWaterLevel                  ( float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel );
     static bool                         SetPositionWaterLevel               ( const CVector& vecPosition, float fLevel, void* pChangeSource );
-    static bool                         SetElementWaterLevel                ( CClientWater* pWater, float fLevel, void* pChangeSource );
     static bool                         SetAllElementWaterLevel             ( float fLevel, void* pChangeSource );
     static bool                         ResetWorldWaterLevel                ( void );
     static bool                         SetWaterVertexPosition              ( CClientWater* pWater, int iVertexIndex, CVector& vecPosition );
@@ -720,4 +717,3 @@ public:
     static const char*                  GetVersionBuildTag                  ( );
     static SString                      GetVersionSortable                  ( );
 };
-#endif

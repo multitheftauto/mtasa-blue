@@ -165,8 +165,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPlayerContactElement", CLuaPedDefs::GetPedContactElement );
     CLuaCFunctions::AddFunction ( "isPlayerInVehicle", CLuaPedDefs::IsPedInVehicle );
     CLuaCFunctions::AddFunction ( "doesPlayerHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack );
-    CLuaCFunctions::AddFunction ( "isPlayerInWater", CLuaFunctionDefs::IsElementInWater );
-    CLuaCFunctions::AddFunction ( "isPedInWater", CLuaFunctionDefs::IsElementInWater );
+    CLuaCFunctions::AddFunction ( "isPlayerInWater", CLuaElementDefs::IsElementInWater );
+    CLuaCFunctions::AddFunction ( "isPedInWater", CLuaElementDefs::IsElementInWater );
     CLuaCFunctions::AddFunction ( "isPedOnFire", CLuaPedDefs::IsPedOnFire );
     CLuaCFunctions::AddFunction ( "setPedOnFire", CLuaPedDefs::SetPedOnFire );
     CLuaCFunctions::AddFunction ( "isPlayerOnGround", CLuaPedDefs::IsPedOnGround );
@@ -185,27 +185,27 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPedWeaponMuzzlePosition", CLuaPedDefs::GetPedWeaponMuzzlePosition );
     CLuaCFunctions::AddFunction ( "getPlayerOccupiedVehicle", CLuaPedDefs::GetPedOccupiedVehicle );
     CLuaCFunctions::AddFunction ( "getPlayerArmor", CLuaPedDefs::GetPedArmor );
-    CLuaCFunctions::AddFunction ( "getPlayerSkin", CLuaFunctionDefs::GetElementModel );
+    CLuaCFunctions::AddFunction ( "getPlayerSkin", CLuaElementDefs::GetElementModel );
     CLuaCFunctions::AddFunction ( "isPlayerChoking", CLuaPedDefs::IsPedChoking );
     CLuaCFunctions::AddFunction ( "isPlayerDucked", CLuaPedDefs::IsPedDucked );
     CLuaCFunctions::AddFunction ( "getPlayerStat", CLuaPedDefs::GetPedStat );
     CLuaCFunctions::AddFunction ( "setPlayerWeaponSlot", CLuaPedDefs::SetPedWeaponSlot );
-    CLuaCFunctions::AddFunction ( "setPlayerSkin", CLuaFunctionDefs::SetElementModel );
+    CLuaCFunctions::AddFunction ( "setPlayerSkin", CLuaElementDefs::SetElementModel );
     CLuaCFunctions::AddFunction ( "setPlayerRotation", CLuaPedDefs::SetPedRotation );
     CLuaCFunctions::AddFunction ( "setPlayerCanBeKnockedOffBike", CLuaPedDefs::SetPedCanBeKnockedOffBike );
-    CLuaCFunctions::AddFunction ( "setVehicleModel", CLuaFunctionDefs::SetElementModel );
-    CLuaCFunctions::AddFunction ( "getVehicleModel", CLuaFunctionDefs::GetElementModel );
-    CLuaCFunctions::AddFunction ( "getPedSkin", CLuaFunctionDefs::GetElementModel );
-    CLuaCFunctions::AddFunction ( "setPedSkin", CLuaFunctionDefs::SetElementModel );
-    CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaFunctionDefs::GetElementRotation );
-    CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaFunctionDefs::SetElementRotation );
+    CLuaCFunctions::AddFunction ( "setVehicleModel", CLuaElementDefs::SetElementModel );
+    CLuaCFunctions::AddFunction ( "getVehicleModel", CLuaElementDefs::GetElementModel );
+    CLuaCFunctions::AddFunction ( "getPedSkin", CLuaElementDefs::GetElementModel );
+    CLuaCFunctions::AddFunction ( "setPedSkin", CLuaElementDefs::SetElementModel );
+    CLuaCFunctions::AddFunction ( "getObjectRotation", CLuaElementDefs::GetElementRotation );
+    CLuaCFunctions::AddFunction ( "setObjectRotation", CLuaElementDefs::SetElementRotation );
     CLuaCFunctions::AddFunction ( "getVehicleIDFromName", CLuaVehicleDefs::GetVehicleModelFromName );    
-    CLuaCFunctions::AddFunction ( "getVehicleID", CLuaFunctionDefs::GetElementModel );    
-    CLuaCFunctions::AddFunction ( "getVehicleRotation", CLuaFunctionDefs::GetElementRotation );
+    CLuaCFunctions::AddFunction ( "getVehicleID", CLuaElementDefs::GetElementModel );
+    CLuaCFunctions::AddFunction ( "getVehicleRotation", CLuaElementDefs::GetElementRotation );
     CLuaCFunctions::AddFunction ( "getVehicleNameFromID", CLuaVehicleDefs::GetVehicleNameFromModel );
-    CLuaCFunctions::AddFunction ( "setVehicleRotation", CLuaFunctionDefs::SetElementRotation );
-    CLuaCFunctions::AddFunction ( "attachElementToElement", CLuaFunctionDefs::AttachElements );
-    CLuaCFunctions::AddFunction ( "detachElementFromElement", CLuaFunctionDefs::DetachElements );
+    CLuaCFunctions::AddFunction ( "setVehicleRotation", CLuaElementDefs::SetElementRotation );
+    CLuaCFunctions::AddFunction ( "attachElementToElement", CLuaElementDefs::AttachElements );
+    CLuaCFunctions::AddFunction ( "detachElementFromElement", CLuaElementDefs::DetachElements );
     CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaFunctionDefs::XMLNodeFindChild );
     CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaFunctionDefs::XMLNodeGetChildren );
     CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaFunctionDefs::XMLNodeFindChild );
@@ -215,20 +215,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaFunctionDefs::GUIEditSetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaFunctionDefs::GUIMemoSetCaretIndex );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
-
-    // Resource funcs
-    CLuaCFunctions::AddFunction ( "call", CLuaFunctionDefs::Call );
-    CLuaCFunctions::AddFunction ( "getThisResource", CLuaFunctionDefs::GetThisResource );
-    CLuaCFunctions::AddFunction ( "getResourceConfig", CLuaFunctionDefs::GetResourceConfig );
-    CLuaCFunctions::AddFunction ( "getResourceName", CLuaFunctionDefs::GetResourceName );
-    CLuaCFunctions::AddFunction ( "getResourceFromName", CLuaFunctionDefs::GetResourceFromName );
-    CLuaCFunctions::AddFunction ( "getResourceRootElement", CLuaFunctionDefs::GetResourceRootElement );
-    CLuaCFunctions::AddFunction ( "getResourceGUIElement", CLuaFunctionDefs::GetResourceGUIElement );
-    CLuaCFunctions::AddFunction ( "getResourceDynamicElementRoot", CLuaFunctionDefs::GetResourceDynamicElementRoot );
-    CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", CLuaFunctionDefs::GetResourceExportedFunctions );
-    CLuaCFunctions::AddFunction ( "getResourceState", CLuaFunctionDefs::GetResourceState );
-    CLuaCFunctions::AddFunction ( "loadstring", CLuaFunctionDefs::LoadString );
-    CLuaCFunctions::AddFunction ( "load", CLuaFunctionDefs::Load );
 
     // Event funcs
     CLuaCFunctions::AddFunction ( "addEvent", CLuaFunctionDefs::AddEvent );
@@ -250,84 +236,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "showChat", CLuaFunctionDefs::ShowChat );
     CLuaCFunctions::AddFunction ( "isChatVisible", CLuaFunctionDefs::IsChatVisible );
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefs::OutputClientDebugString );
+    CLuaCFunctions::AddFunction ( "print", CLuaFunctionDefs::luaB_print );
     CLuaCFunctions::AddFunction ( "setClipboard", CLuaFunctionDefs::SetClipboard );
     //CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
     CLuaCFunctions::AddFunction ( "setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing );
-
-    // Element get funcs
-    CLuaCFunctions::AddFunction ( "getRootElement", CLuaFunctionDefs::GetRootElement );
-    CLuaCFunctions::AddFunction ( "isElement", CLuaFunctionDefs::IsElement );
-    CLuaCFunctions::AddFunction ( "getElementByID", CLuaFunctionDefs::GetElementByID );
-    CLuaCFunctions::AddFunction ( "getElementByIndex", CLuaFunctionDefs::GetElementByIndex );
-    CLuaCFunctions::AddFunction ( "getElementData", CLuaFunctionDefs::GetElementData );
-    CLuaCFunctions::AddFunction ( "getElementMatrix", CLuaFunctionDefs::GetElementMatrix );
-    CLuaCFunctions::AddFunction ( "getElementPosition", CLuaFunctionDefs::GetElementPosition );
-    CLuaCFunctions::AddFunction ( "getElementRotation", CLuaFunctionDefs::GetElementRotation );
-    CLuaCFunctions::AddFunction ( "getElementVelocity", CLuaFunctionDefs::GetElementVelocity );
-    CLuaCFunctions::AddFunction ( "getElementType", CLuaFunctionDefs::GetElementType );
-    CLuaCFunctions::AddFunction ( "getElementChildren", CLuaFunctionDefs::GetElementChildren );
-    CLuaCFunctions::AddFunction ( "getElementChild", CLuaFunctionDefs::GetElementChild );
-    CLuaCFunctions::AddFunction ( "getElementChildrenCount", CLuaFunctionDefs::GetElementChildrenCount );
-    CLuaCFunctions::AddFunction ( "getElementID", CLuaFunctionDefs::GetElementID );
-    CLuaCFunctions::AddFunction ( "getElementParent", CLuaFunctionDefs::GetElementParent );
-    CLuaCFunctions::AddFunction ( "getElementsByType", CLuaFunctionDefs::GetElementsByType );
-    CLuaCFunctions::AddFunction ( "getElementInterior", CLuaFunctionDefs::GetElementInterior );
-    CLuaCFunctions::AddFunction ( "isElementWithinColShape", CLuaFunctionDefs::IsElementWithinColShape );
-    CLuaCFunctions::AddFunction ( "isElementWithinMarker", CLuaFunctionDefs::IsElementWithinMarker );
-    CLuaCFunctions::AddFunction ( "getElementsWithinColShape", CLuaFunctionDefs::GetElementsWithinColShape );
-    CLuaCFunctions::AddFunction ( "getElementDimension", CLuaFunctionDefs::GetElementDimension );
-    CLuaCFunctions::AddFunction ( "getElementBoundingBox", CLuaFunctionDefs::GetElementBoundingBox );
-    CLuaCFunctions::AddFunction ( "getElementRadius", CLuaFunctionDefs::GetElementRadius );
-    CLuaCFunctions::AddFunction ( "isElementAttached", CLuaFunctionDefs::IsElementAttached );
-    CLuaCFunctions::AddFunction ( "getElementAttachedTo", CLuaFunctionDefs::GetElementAttachedTo );
-    CLuaCFunctions::AddFunction ( "getAttachedElements", CLuaFunctionDefs::GetAttachedElements );
-    CLuaCFunctions::AddFunction ( "getElementDistanceFromCentreOfMassToBaseOfModel", CLuaFunctionDefs::GetElementDistanceFromCentreOfMassToBaseOfModel );
-    CLuaCFunctions::AddFunction ( "isElementLocal", CLuaFunctionDefs::IsElementLocal );
-    CLuaCFunctions::AddFunction ( "getElementAttachedOffsets", CLuaFunctionDefs::GetElementAttachedOffsets );
-    CLuaCFunctions::AddFunction ( "getElementAlpha", CLuaFunctionDefs::GetElementAlpha );
-    CLuaCFunctions::AddFunction ( "isElementOnScreen", CLuaFunctionDefs::IsElementOnScreen );
-    CLuaCFunctions::AddFunction ( "getElementHealth", CLuaFunctionDefs::GetElementHealth );
-    CLuaCFunctions::AddFunction ( "getElementModel", CLuaFunctionDefs::GetElementModel );
-    CLuaCFunctions::AddFunction ( "isElementStreamedIn", CLuaFunctionDefs::IsElementStreamedIn );
-    CLuaCFunctions::AddFunction ( "isElementStreamable", CLuaFunctionDefs::IsElementStreamable );
-    CLuaCFunctions::AddFunction ( "getElementColShape", CLuaFunctionDefs::GetElementColShape );
-    CLuaCFunctions::AddFunction ( "isElementInWater", CLuaFunctionDefs::IsElementInWater );
-    CLuaCFunctions::AddFunction ( "isElementSyncer", CLuaFunctionDefs::IsElementSyncer );
-    CLuaCFunctions::AddFunction ( "isElementCollidableWith", CLuaFunctionDefs::IsElementCollidableWith );
-    CLuaCFunctions::AddFunction ( "isElementDoubleSided", CLuaFunctionDefs::IsElementDoubleSided );
-    CLuaCFunctions::AddFunction ( "getElementCollisionsEnabled", CLuaFunctionDefs::GetElementCollisionsEnabled );
-    CLuaCFunctions::AddFunction ( "isElementFrozen", CLuaFunctionDefs::IsElementFrozen );
-    CLuaCFunctions::AddFunction ( "getLowLODElement", CLuaFunctionDefs::GetLowLodElement );
-    CLuaCFunctions::AddFunction ( "isElementLowLOD", CLuaFunctionDefs::IsElementLowLod );
-    CLuaCFunctions::AddFunction ( "isElementCallPropagationEnabled", CLuaFunctionDefs::IsElementCallPropagationEnabled );
-    CLuaCFunctions::AddFunction ( "isElementWaitingForGroundToLoad", CLuaFunctionDefs::IsElementWaitingForGroundToLoad );
-
-    // Element set funcs
-    CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );
-    CLuaCFunctions::AddFunction ( "destroyElement", CLuaFunctionDefs::DestroyElement );
-    CLuaCFunctions::AddFunction ( "setElementID", CLuaFunctionDefs::SetElementID );
-    CLuaCFunctions::AddFunction ( "setElementParent", CLuaFunctionDefs::SetElementParent );
-    CLuaCFunctions::AddFunction ( "setElementData", CLuaFunctionDefs::SetElementData );
-    //CLuaCFunctions::AddFunction ( "removeElementData", CLuaFunctionDefs::RemoveElementData ); TODO Clientside
-    CLuaCFunctions::AddFunction ( "setElementMatrix", CLuaFunctionDefs::SetElementMatrix );
-    CLuaCFunctions::AddFunction ( "setElementPosition", CLuaFunctionDefs::SetElementPosition );
-    CLuaCFunctions::AddFunction ( "setElementRotation", CLuaFunctionDefs::SetElementRotation );
-    CLuaCFunctions::AddFunction ( "setElementVelocity", CLuaFunctionDefs::SetElementVelocity );
-    CLuaCFunctions::AddFunction ( "setElementInterior", CLuaFunctionDefs::SetElementInterior );
-    CLuaCFunctions::AddFunction ( "setElementDimension", CLuaFunctionDefs::SetElementDimension );
-    CLuaCFunctions::AddFunction ( "attachElements", CLuaFunctionDefs::AttachElements );
-    CLuaCFunctions::AddFunction ( "detachElements", CLuaFunctionDefs::DetachElements );
-    CLuaCFunctions::AddFunction ( "setElementAttachedOffsets", CLuaFunctionDefs::SetElementAttachedOffsets );
-    CLuaCFunctions::AddFunction ( "setElementAlpha", CLuaFunctionDefs::SetElementAlpha );
-    CLuaCFunctions::AddFunction ( "setElementHealth", CLuaFunctionDefs::SetElementHealth );
-    CLuaCFunctions::AddFunction ( "setElementModel", CLuaFunctionDefs::SetElementModel );
-    CLuaCFunctions::AddFunction ( "setElementStreamable", CLuaFunctionDefs::SetElementStreamable );
-    CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", CLuaFunctionDefs::SetElementCollisionsEnabled );
-    CLuaCFunctions::AddFunction ( "setElementCollidableWith", CLuaFunctionDefs::SetElementCollidableWith );
-    CLuaCFunctions::AddFunction ( "setElementDoubleSided", CLuaFunctionDefs::SetElementDoubleSided );
-    CLuaCFunctions::AddFunction ( "setElementFrozen", CLuaFunctionDefs::SetElementFrozen );
-    CLuaCFunctions::AddFunction ( "setLowLODElement", CLuaFunctionDefs::SetLowLodElement );
-    CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", CLuaFunctionDefs::SetElementCallPropagationEnabled );
 
     // Clothes and body functions
     CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefs::GetBodyPartName );
@@ -367,53 +279,6 @@ void CLuaManager::LoadCFunctions ( void )
     //CLuaCFunctions::AddFunction ( "engineAddAllAtomics", CLuaFunctionDefs::EngineAddAllAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", CLuaFunctionDefs::EngineReplaceVehiclePart );
 
-    // Drawing funcs
-    CLuaCFunctions::AddFunction ( "dxDrawLine", CLuaFunctionDefs::dxDrawLine );
-    CLuaCFunctions::AddFunction ( "dxDrawMaterialLine3D", CLuaFunctionDefs::dxDrawMaterialLine3D );
-    CLuaCFunctions::AddFunction ( "dxDrawMaterialSectionLine3D", CLuaFunctionDefs::dxDrawMaterialSectionLine3D );
-    CLuaCFunctions::AddFunction ( "dxDrawLine3D", CLuaFunctionDefs::dxDrawLine3D );
-    CLuaCFunctions::AddFunction ( "dxDrawText", CLuaFunctionDefs::dxDrawText );
-    CLuaCFunctions::AddFunction ( "dxDrawRectangle", CLuaFunctionDefs::dxDrawRectangle );
-    CLuaCFunctions::AddFunction ( "dxDrawImage", CLuaFunctionDefs::dxDrawImage );
-    CLuaCFunctions::AddFunction ( "dxDrawImageSection", CLuaFunctionDefs::dxDrawImageSection );
-    CLuaCFunctions::AddFunction ( "dxGetTextWidth", CLuaFunctionDefs::dxGetTextWidth );
-    CLuaCFunctions::AddFunction ( "dxGetFontHeight", CLuaFunctionDefs::dxGetFontHeight );
-    CLuaCFunctions::AddFunction ( "dxCreateFont", CLuaFunctionDefs::dxCreateFont );
-    CLuaCFunctions::AddFunction ( "dxCreateTexture", CLuaFunctionDefs::dxCreateTexture );
-    CLuaCFunctions::AddFunction ( "dxCreateShader", CLuaFunctionDefs::dxCreateShader );
-    CLuaCFunctions::AddFunction ( "dxCreateRenderTarget", CLuaFunctionDefs::dxCreateRenderTarget );
-    CLuaCFunctions::AddFunction ( "dxCreateScreenSource", CLuaFunctionDefs::dxCreateScreenSource );
-    CLuaCFunctions::AddFunction ( "dxGetMaterialSize", CLuaFunctionDefs::dxGetMaterialSize );
-    CLuaCFunctions::AddFunction ( "dxSetShaderValue", CLuaFunctionDefs::dxSetShaderValue );
-    CLuaCFunctions::AddFunction ( "dxSetShaderTessellation", CLuaFunctionDefs::dxSetShaderTessellation );
-    CLuaCFunctions::AddFunction ( "dxSetShaderTransform", CLuaFunctionDefs::dxSetShaderTransform );
-    CLuaCFunctions::AddFunction ( "dxSetRenderTarget", CLuaFunctionDefs::dxSetRenderTarget );
-    CLuaCFunctions::AddFunction ( "dxUpdateScreenSource", CLuaFunctionDefs::dxUpdateScreenSource );
-    CLuaCFunctions::AddFunction ( "dxGetStatus", CLuaFunctionDefs::dxGetStatus );
-    CLuaCFunctions::AddFunction ( "dxSetTestMode", CLuaFunctionDefs::dxSetTestMode );
-    CLuaCFunctions::AddFunction ( "dxGetTexturePixels", CLuaFunctionDefs::dxGetTexturePixels );
-    CLuaCFunctions::AddFunction ( "dxSetTexturePixels", CLuaFunctionDefs::dxSetTexturePixels );
-    CLuaCFunctions::AddFunction ( "dxGetPixelsSize", CLuaFunctionDefs::dxGetPixelsSize );
-    CLuaCFunctions::AddFunction ( "dxGetPixelsFormat", CLuaFunctionDefs::dxGetPixelsFormat );
-    CLuaCFunctions::AddFunction ( "dxConvertPixels", CLuaFunctionDefs::dxConvertPixels );
-    CLuaCFunctions::AddFunction ( "dxGetPixelColor", CLuaFunctionDefs::dxGetPixelColor );
-    CLuaCFunctions::AddFunction ( "dxSetPixelColor", CLuaFunctionDefs::dxSetPixelColor );
-    CLuaCFunctions::AddFunction ( "dxSetBlendMode", CLuaFunctionDefs::dxSetBlendMode );
-    CLuaCFunctions::AddFunction ( "dxGetBlendMode", CLuaFunctionDefs::dxGetBlendMode );
-    CLuaCFunctions::AddFunction ( "dxSetAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxSetAspectRatioAdjustmentEnabled );
-    CLuaCFunctions::AddFunction ( "dxIsAspectRatioAdjustmentEnabled", CLuaFunctionDefs::dxIsAspectRatioAdjustmentEnabled );
-    CLuaCFunctions::AddFunction ( "dxSetTextureEdge", CLuaFunctionDefs::dxSetTextureEdge );
-
-    // Radar-area funcs
-    CLuaCFunctions::AddFunction ( "createRadarArea", CLuaFunctionDefs::CreateRadarArea );
-    CLuaCFunctions::AddFunction ( "getRadarAreaColor", CLuaFunctionDefs::GetRadarAreaColor  );
-    CLuaCFunctions::AddFunction ( "getRadarAreaSize", CLuaFunctionDefs::GetRadarAreaSize );
-    CLuaCFunctions::AddFunction ( "isRadarAreaFlashing", CLuaFunctionDefs::IsRadarAreaFlashing );
-    CLuaCFunctions::AddFunction ( "setRadarAreaColor", CLuaFunctionDefs::SetRadarAreaColor );
-    CLuaCFunctions::AddFunction ( "setRadarAreaFlashing", CLuaFunctionDefs::SetRadarAreaFlashing );
-    CLuaCFunctions::AddFunction ( "setRadarAreaSize", CLuaFunctionDefs::SetRadarAreaSize );
-    CLuaCFunctions::AddFunction ( "isInsideRadarArea", CLuaFunctionDefs::IsInsideRadarArea );
-
     // Pickup create/destroy funcs
     CLuaCFunctions::AddFunction ( "createPickup", CLuaFunctionDefs::CreatePickup );
 
@@ -424,29 +289,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPickupAmmo", CLuaFunctionDefs::GetPickupAmmo );
 
     // Pickup set funcs
-    CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );
-
-    // Cam get funcs
-    CLuaCFunctions::AddFunction ( "getCamera", CLuaFunctionDefs::GetCamera );
-    CLuaCFunctions::AddFunction ( "getCameraViewMode", CLuaFunctionDefs::GetCameraViewMode );
-    CLuaCFunctions::AddFunction ( "getCameraMatrix", CLuaFunctionDefs::GetCameraMatrix );
-    CLuaCFunctions::AddFunction ( "getCameraTarget", CLuaFunctionDefs::GetCameraTarget );
-    CLuaCFunctions::AddFunction ( "getCameraInterior", CLuaFunctionDefs::GetCameraInterior );
-    CLuaCFunctions::AddFunction ( "getCameraGoggleEffect", CLuaFunctionDefs::GetCameraGoggleEffect );
-    CLuaCFunctions::AddFunction ( "getCameraShakeLevel", CLuaFunctionDefs::GetCameraShakeLevel );
-    CLuaCFunctions::AddFunction ( "getCameraFieldOfView", CLuaFunctionDefs::GetCameraFieldOfView );
-
-    // Cam set funcs
-    CLuaCFunctions::AddFunction ( "setCameraMatrix", CLuaFunctionDefs::SetCameraMatrix );
-    CLuaCFunctions::AddFunction ( "setCameraFieldOfView", CLuaFunctionDefs::SetCameraFieldOfView );
-    CLuaCFunctions::AddFunction ( "setCameraTarget", CLuaFunctionDefs::SetCameraTarget );
-    CLuaCFunctions::AddFunction ( "setCameraInterior", CLuaFunctionDefs::SetCameraInterior );
-    CLuaCFunctions::AddFunction ( "fadeCamera", CLuaFunctionDefs::FadeCamera );
-    CLuaCFunctions::AddFunction ( "setCameraClip", CLuaFunctionDefs::SetCameraClip );
-    CLuaCFunctions::AddFunction ( "getCameraClip", CLuaFunctionDefs::GetCameraClip );
-    CLuaCFunctions::AddFunction ( "setCameraViewMode", CLuaFunctionDefs::SetCameraViewMode );
-    CLuaCFunctions::AddFunction ( "setCameraGoggleEffect", CLuaFunctionDefs::SetCameraGoggleEffect );
-    CLuaCFunctions::AddFunction ( "setCameraShakeLevel", CLuaFunctionDefs::SetCameraShakeLevel );
+    CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );    
 
     // Cursor funcs
     CLuaCFunctions::AddFunction ( "getCursorPosition", CLuaFunctionDefs::GetCursorPosition );
@@ -774,14 +617,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "createColPolygon", CLuaFunctionDefs::CreateColPolygon );
     CLuaCFunctions::AddFunction ( "createColTube", CLuaFunctionDefs::CreateColTube );
 
-    // Team get funcs
-    CLuaCFunctions::AddFunction ( "getTeamFromName", CLuaFunctionDefs::GetTeamFromName );
-    CLuaCFunctions::AddFunction ( "getTeamName", CLuaFunctionDefs::GetTeamName );
-    CLuaCFunctions::AddFunction ( "getTeamColor", CLuaFunctionDefs::GetTeamColor );
-    CLuaCFunctions::AddFunction ( "getTeamFriendlyFire", CLuaFunctionDefs::GetTeamFriendlyFire );
-    CLuaCFunctions::AddFunction ( "getPlayersInTeam", CLuaFunctionDefs::GetPlayersInTeam );
-    CLuaCFunctions::AddFunction ( "countPlayersInTeam", CLuaFunctionDefs::CountPlayersInTeam );
-
     // Weapon funcs
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefs::GetWeaponNameFromID );
     CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefs::GetWeaponIDFromName );
@@ -832,6 +667,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefs::AddDebugHook );
     CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefs::RemoveDebugHook );
     CLuaCFunctions::AddFunction ( "isOOPEnabled", CLuaFunctionDefs::IsOOPEnabled );
+    CLuaCFunctions::AddFunction ( "getUserdataType", CLuaFunctionDefs::GetUserdataType );
 
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );
@@ -863,6 +699,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaBitDefs::LoadFunctions ();
     CLuaBlipDefs::LoadFunctions ();
     CLuaBrowserDefs::LoadFunctions ();
+    CLuaCameraDefs::LoadFunctions ();
+    CLuaDrawingDefs::LoadFunctions ();
+    CLuaElementDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
     CLuaFxDefs::LoadFunctions ();
     CLuaMarkerDefs::LoadFunctions ();
@@ -870,7 +709,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaPedDefs::LoadFunctions ();
     CLuaPlayerDefs::LoadFunctions ();
     CLuaPointLightDefs::LoadFunctions ();
+    CLuaRadarAreaDefs::LoadFunctions ();
+    CLuaResourceDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
+    CLuaTeamDefs::LoadFunctions ();
     CLuaVehicleDefs::LoadFunctions ();
 }

@@ -1860,6 +1860,25 @@ void CheckAndShowUpgradeProblems ( void )
 
 //////////////////////////////////////////////////////////
 //
+// CheckAndShowImgProblems
+//
+// Check for flagged img problems
+//
+//////////////////////////////////////////////////////////
+void CheckAndShowImgProblems ( void )
+{
+    SString strFilename = GetApplicationSetting ( "diagnostics", "img-file-corrupt" );
+    SetApplicationSetting ( "diagnostics", "img-file-corrupt", "" );
+    if ( !strFilename.empty () )
+    {
+        SString strMsg ( _("GTA:SA found errors in the file '%s'"), *strFilename );
+        DisplayErrorMessageBox ( strMsg, _E("CL44"), SString( "img-file-corrupt&name=%s", *strFilename ) );
+    }
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // LoadFunction
 //
 // Load a library function
@@ -2030,12 +2049,6 @@ bool VerifyEmbeddedSignature( const SString& strFilename )
     WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE; 
     WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
     WinTrustData.pFile = &FileData;
-
-    if ( !IsWindows7OrGreater() )
-    {
-        // Basic check for Vista and down due to incompatibility with current signing methodology
-        WinTrustData.dwProvFlags = WTD_HASH_ONLY_FLAG;
-    }
 
     GUID WVTPolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
     LONG lStatus = WinVerifyTrust( NULL, &WVTPolicyGUID, &WinTrustData );

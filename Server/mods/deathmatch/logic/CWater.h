@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CWATER_H
-#define __CWATER_H
+#pragma once
 
 class CWaterManager;
 
@@ -54,5 +53,3 @@ private:
     SFixedArray < CVector, 4 >  m_Vertices;
     EWaterType                  m_WaterType;
 };
-
-#endif

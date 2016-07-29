@@ -50,8 +50,15 @@ public:
     template < typename T >
     void ReadNumber ( T& outValue, bool checkSign = true )
     {
-        if ( lua_isnumber( m_luaVM, m_iIndex ) == 1 )
+        int iArgument = lua_type ( m_luaVM, m_iIndex );
+        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
         {
+            // The string received may not actually be a number
+            if ( !lua_isnumber ( m_luaVM, m_iIndex ) ) {
+                SetCustomWarning ( "Expected number, got non-convertible string. This warning may be an error in future versions." );
+            }
+
+            // Returns 0 even if the string cannot be parsed as a number
             lua_Number number = lua_tonumber ( m_luaVM, m_iIndex++ );
 
             if ( std::isnan( number ) )
@@ -83,6 +90,12 @@ public:
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
         {
+            // The string received may not actually be a number
+            if ( !lua_isnumber ( m_luaVM, m_iIndex ) ) {
+                SetCustomWarning ( "Expected number, got non-convertible string. This warning may be an error in future versions." );
+            }
+
+            // Returns 0 even if the string cannot be parsed as a number
             lua_Number number = lua_tonumber ( m_luaVM, m_iIndex++ );
 
             if ( std::isnan ( number ) )
@@ -100,8 +113,7 @@ public:
 
             return;
         }
-        else
-        if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
+        else if ( iArgument == LUA_TNONE || iArgument == LUA_TNIL )
         {
             outValue = static_cast < T > ( defaultValue );
             m_iIndex++;

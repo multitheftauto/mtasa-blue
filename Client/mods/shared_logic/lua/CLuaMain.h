@@ -76,12 +76,9 @@ public:
     unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
     unsigned long                   GetElementCount         ( void ) const;
 
-    void                            AddElementClass         ( lua_State* luaVM );
     void                            AddPickupClass          ( lua_State* luaVM );
     void                            AddColShapeClass        ( lua_State* luaVM );
     void                            AddProjectileClass      ( lua_State* luaVM );
-    void                            AddRadarAreaClass       ( lua_State* luaVM );
-    void                            AddTeamClass            ( lua_State* luaVM );
     void                            AddWaterClass           ( lua_State* luaVM );
     void                            AddWeaponClass          ( lua_State* luaVM );
     void                            AddEffectClass          ( lua_State* luaVM );
@@ -104,7 +101,6 @@ public:
     void                            AddGuiTabPanelClass     ( lua_State* luaVM );
     void                            AddGuiTabClass          ( lua_State* luaVM );
 
-    void                            AddResourceClass        ( lua_State* luaVM );
     void                            AddTimerClass           ( lua_State* luaVM );
     void                            AddXMLClass             ( lua_State* luaVM );
 
@@ -112,15 +108,6 @@ public:
     void                            AddEngineColClass       ( lua_State* luaVM );
     void                            AddEngineTxdClass       ( lua_State* luaVM );
     void                            AddEngineDffClass       ( lua_State* luaVM );
-    
-    void                            AddCameraClass          ( lua_State* luaVM );
-
-    void                            AddDxMaterialClass      ( lua_State* luaVM );
-    void                            AddDxTextureClass       ( lua_State* luaVM );
-    void                            AddDxFontClass          ( lua_State* luaVM );
-    void                            AddDxShaderClass        ( lua_State* luaVM );
-    void                            AddDxScreenSourceClass  ( lua_State* luaVM );
-    void                            AddDxRenderTargetClass  ( lua_State* luaVM );
     
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );

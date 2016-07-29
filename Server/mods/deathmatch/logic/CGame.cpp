@@ -1474,7 +1474,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerBan", "ban", NULL, false );
     m_Events.AddEvent ( "onPlayerLogin", "guest_account, account, auto-login", NULL, false );
     m_Events.AddEvent ( "onPlayerLogout", "account, guest_account", NULL, false );
-    m_Events.AddEvent ( "onPlayerChangeNick", "oldnick, newnick", NULL, false );
+    m_Events.AddEvent ( "onPlayerChangeNick", "oldnick, newnick, manuallyChanged", NULL, false );
     m_Events.AddEvent ( "onPlayerPrivateMessage", "text, player", NULL, false );
     m_Events.AddEvent ( "onPlayerStealthKill", "target", NULL, false );
     m_Events.AddEvent ( "onPlayerMute", "", NULL, false );

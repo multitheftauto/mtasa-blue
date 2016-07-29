@@ -1266,6 +1266,7 @@ bool CStaticFunctionDefinitions::SetElementDimension ( CClientEntity& Entity, un
         case CCLIENTRADARAREA:
         case CCLIENTWORLDMESH:
         case CCLIENTSOUND:
+        case CCLIENTWATER:
         {
             Entity.SetDimension ( usDimension );
 
@@ -4690,26 +4691,6 @@ bool CStaticFunctionDefinitions::GetCursorPosition ( CVector2D& vecCursor, CVect
     return false;
 }
 
-
-void CStaticFunctionDefinitions::DrawText ( float fLeft, float fTop,
-                                 float fRight, float fBottom,
-                                 unsigned long dwColor,
-                                 const char* szText,
-                                 float fScaleX,
-                                 float fScaleY,
-                                 unsigned long ulFormat,
-                                 ID3DXFont* pDXFont,
-                                 bool bPostGUI,
-                                 bool bColorCoded,
-                                 bool bSubPixelPositioning,
-                                 float fRotation,
-                                 float fRotationCenterX,
-                                 float fRotationCenterY )
-{
-    g_pCore->GetGraphics ()->DrawTextQueued ( fLeft, fTop, fRight, fBottom, dwColor, szText, fScaleX, fScaleY, ulFormat, pDXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, fRotationCenterX, fRotationCenterY );
-}
-
-
 // Find custom font from an element, or a standard font from a name.
 ID3DXFont* CStaticFunctionDefinitions::ResolveD3DXFont ( eFontType fontType, CClientDxFont* pDxFontElement )
 {
@@ -5988,10 +5969,6 @@ CClientWater* CStaticFunctionDefinitions::CreateWater ( CResource& resource, CVe
         pWater = new CClientWater ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, *pV4, bShallow );
     else
         pWater = new CClientWater ( g_pClientGame->GetManager (), INVALID_ELEMENT_ID, *pV1, *pV2, *pV3, bShallow );
-    if ( !pWater->Valid () ) {
-        delete pWater;
-        return NULL;
-    }
 
     pWater->SetParent ( resource.GetResourceDynamicEntity () );
     resource.AddToElementGroup ( pWater);
@@ -6027,11 +6004,6 @@ bool CStaticFunctionDefinitions::SetWorldWaterLevel ( float fLevel, void* pChang
 bool CStaticFunctionDefinitions::SetPositionWaterLevel ( const CVector& vecPosition, float fLevel, void* pChangeSource )
 {
     return g_pClientGame->GetManager ()->GetWaterManager ()->SetPositionWaterLevel ( vecPosition, fLevel, pChangeSource );
-}
-
-bool CStaticFunctionDefinitions::SetElementWaterLevel ( CClientWater* pWater, float fLevel, void* pChangeSource )
-{
-    return g_pClientGame->GetManager ()->GetWaterManager ()->SetElementWaterLevel ( pWater, fLevel, pChangeSource );
 }
 
 bool CStaticFunctionDefinitions::SetAllElementWaterLevel ( float fLevel, void* pChangeSource )
