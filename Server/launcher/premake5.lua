@@ -1,7 +1,6 @@
 project "Launcher"
 	language "C++"
 	kind "ConsoleApp"
-	targetname "MTA Server"
 	targetdir(buildpath("server"))
 	
 	includedirs { "../sdk" }
@@ -20,6 +19,7 @@ project "Launcher"
 	}
 	
 	filter "system:windows"
+		targetname "MTA Server"
 		files {
 			"launcher.rc",
 			"resource/mtaicon.ico"
@@ -27,3 +27,9 @@ project "Launcher"
 
 	filter "system:linux"
 		links { "dl" }
+
+	filter {"system:linux", "platforms:x86"}
+		targetname "mta-server"
+
+	filter {"system:linux", "platforms:x64"}
+		targetname "mta-server64"

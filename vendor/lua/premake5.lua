@@ -19,27 +19,29 @@ project "Lua_Server"
 	configuration "windows"
 		defines { "LUA_BUILD_AS_DLL" }
 
-project "Lua_Client"
-	language "C++"
-	kind "SharedLib"
-	targetname "lua5.1"
-	targetdir(buildpath("mods/deathmatch"))
+if os.get() == "windows" then
+	project "Lua_Client"
+		language "C++"
+		kind "SharedLib"
+		targetname "lua5.1"
+		targetdir(buildpath("mods/deathmatch"))
 
-	vpaths { 
-		["Headers"] = "**.h",
-		["Sources"] = "**.c",
-		["*"] = "premake5.lua"
-	}
+		vpaths { 
+			["Headers"] = "**.h",
+			["Sources"] = "**.c",
+			["*"] = "premake5.lua"
+		}
 	
-	files {
-		"premake5.lua",
-		"src/**.c",
-		"src/**.h",
-	}
+		files {
+			"premake5.lua",
+			"src/**.c",
+			"src/**.h",
+		}
 	
-	defines {
-		"LUA_USE_APICHECK"
-	}
+		defines {
+			"LUA_USE_APICHECK"
+		}
 
-	configuration "windows"
-		defines { "LUA_BUILD_AS_DLL" }
+		configuration "windows"
+			defines { "LUA_BUILD_AS_DLL" }
+end

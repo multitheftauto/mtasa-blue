@@ -44,3 +44,6 @@ project "Core"
 	
 	filter "system:not windows"
 		excludes { "CExceptionInformation_Impl.cpp" }
+
+	filter "system:linux"
+		links { "ncurses", "ncursesw" }
