@@ -2,7 +2,7 @@ project "ehs"
 	language "C++"
 	kind "StaticLib"
 	targetname "ehs"
-	includedirs { "../pme", "../pcre", "../pthreads/include" }
+	includedirs { "../pme" }
 
 	defines { "WIN32_LEAN_AND_MEAN", "_LIB" }
 	
@@ -23,5 +23,5 @@ project "ehs"
 		"socket.cpp"
 	}
 	
-	filter "system: windows"
+	filter "system:windows"
 		includedirs { "../pcre", "../pthreads/include" }
