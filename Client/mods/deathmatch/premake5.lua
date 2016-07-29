@@ -22,23 +22,26 @@ project "Client Deathmatch"
 		["*"] = "premake5.lua"
 	}
 	
-	includedirs {
-		".",
-		"../shared_logic",
-		"../../sdk/",
-		"../../../vendor/pthreads/include", 
-		"../../../vendor/bochs", 
-		"../../../vendor/bass", 
-		"../../../vendor/libspeex", 
-		"../../../vendor/zlib", 
-		"../../../vendor/pcre", 
-		"../../../vendor/json-c", 
-		"../../../vendor/bob_withers", 
-		"../../../vendor/lua/src", 
-		"../../../Shared/mods/deathmatch/logic", 
-		"../../../Shared/animation", 
-		"../../../vendor/sparsehash/current/src/",
-		"../../../vendor/sparsehash/current/src/windows"
+	filter "system:windows"
+		includedirs { "../../../vendor/sparsehash/current/src/windows" }
+	
+	filter {}
+		includedirs {
+			".",
+			"../shared_logic",
+			"../../sdk/",
+			"../../../vendor/pthreads/include", 
+			"../../../vendor/bochs", 
+			"../../../vendor/bass", 
+			"../../../vendor/libspeex", 
+			"../../../vendor/zlib", 
+			"../../../vendor/pcre", 
+			"../../../vendor/json-c", 
+			"../../../vendor/bob_withers", 
+			"../../../vendor/lua/src", 
+			"../../../Shared/mods/deathmatch/logic", 
+			"../../../Shared/animation", 
+			"../../../vendor/sparsehash/current/src/"
 	}
 	
 	files {

@@ -4,12 +4,15 @@ project "GUI"
 	targetname "gui"
 	targetdir(buildpath("mta"))
 	
-	includedirs { 
-		"../sdk",
-		"../../vendor/cegui-0.4.0-custom/include",
-		"../../vendor/sparsehash/current/src/",
-		"../../vendor/sparsehash/current/src/windows"
-	}
+	filter "system:windows"
+		includedirs { "../../vendor/sparsehash/current/src/windows" }
+	
+	filter {}
+		includedirs { 
+			"../sdk",
+			"../../vendor/cegui-0.4.0-custom/include",
+			"../../vendor/sparsehash/current/src/"
+		}
 	 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"

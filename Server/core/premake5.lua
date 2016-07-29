@@ -4,11 +4,15 @@ project "Core"
 	targetname "core"
 	targetdir(buildpath("server"))
 	
-	includedirs { 
-		"../sdk", 
-		"../../vendor/google-breakpad/src",
-		"../../vendor/sparsehash/current/src/",
-	}
+	filter "system:windows"
+		includedirs { "../../vendor/sparsehash/current/src/windows" }
+	
+	filter {}
+		includedirs { 
+			"../sdk", 
+			"../../vendor/google-breakpad/src",
+			"../../vendor/sparsehash/current/src/",
+		}
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
@@ -33,8 +37,7 @@ project "Core"
 			"../../vendor/detours/lib"
 		}
 		includedirs { 
-			"../../vendor/detours/include",
-			"../../vendor/sparsehash/current/src/windows"
+			"../../vendor/detours/include"
 		}
 		links { "detours", "Imagehlp" }
 	

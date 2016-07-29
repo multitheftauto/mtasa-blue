@@ -14,11 +14,14 @@ project "Game SA"
 		["*"] = "premake5.lua"
 	}
 	
-	includedirs {
-		"../sdk",
-		"../../vendor/sparsehash/current/src/",
-		"../../vendor/sparsehash/current/src/windows"
-	}
+	filter "system:windows"
+		includedirs { "../../vendor/sparsehash/current/src/windows" }
+	
+	filter {}
+		includedirs {
+			"../sdk",
+			"../../vendor/sparsehash/current/src/"
+		}
 	
 	files {
 		"premake5.lua",

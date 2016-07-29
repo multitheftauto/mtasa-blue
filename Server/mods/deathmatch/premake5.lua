@@ -7,25 +7,28 @@ project "Deathmatch"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
-	includedirs { 
-		"../../sdk", 
-		"../../../vendor/bochs", 
-		"../../../vendor/pme", 
-		"../../../vendor/zip", 
-		"../../../vendor/zlib", 
-		"../../../vendor/pcre", 
-		"../../../vendor/json-c", 
-		"../../../vendor/bob_withers", 
-		"../../../vendor/lua/src", 
-		"../../../Shared/mods/deathmatch/logic", 
-		"../../../Shared/animation", 
-		"../../../Shared/publicsdk/include", 
-		"../../../vendor/sparsehash/current/src/",
-		"../../../vendor/sparsehash/current/src/windows",
-		"logic", 
-		"utils",
-		"."
-	}
+	filter "system:windows"
+		includedirs { "../../../vendor/sparsehash/current/src/windows" }
+	
+	filter {}
+		includedirs { 
+			"../../sdk", 
+			"../../../vendor/bochs", 
+			"../../../vendor/pme", 
+			"../../../vendor/zip", 
+			"../../../vendor/zlib", 
+			"../../../vendor/pcre", 
+			"../../../vendor/json-c", 
+			"../../../vendor/bob_withers", 
+			"../../../vendor/lua/src", 
+			"../../../Shared/mods/deathmatch/logic", 
+			"../../../Shared/animation", 
+			"../../../Shared/publicsdk/include", 
+			"../../../vendor/sparsehash/current/src/",
+			"logic", 
+			"utils",
+			"."
+		}
 	
 	links {
 		"Lua", "pthread", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"

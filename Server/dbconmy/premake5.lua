@@ -4,11 +4,19 @@ project "Dbconmy"
 	targetname "dbconmy"
 	targetdir(buildpath("server/mods/deathmatch"))
 	
-	includedirs { 
-		"../sdk", 
-		"../../vendor/google-breakpad/src",
-		"../../vendor/sparsehash/current/src/"
-	}
+	filter "system:windows"
+		includedirs { 
+			"../../vendor/mysql/include",
+			"../../vendor/sparsehash/current/src/windows"
+		}
+	
+	filter {}
+		includedirs { 
+			"../sdk", 
+			"../../vendor/google-breakpad/src",
+			"../../vendor/sparsehash/current/src/"
+		}
+		
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
@@ -28,11 +36,6 @@ project "Dbconmy"
 		includedirs { "/usr/include/mysql" }
 		links { "mysqlclient" }
 	
-	filter "system:windows"
-		includedirs { 
-			"../../vendor/mysql/include",
-			"../../vendor/sparsehash/current/src/windows"
-		}
 	filter { "system:windows", "architecture:x64" }
 		links { "../../vendor/mysql/lib/x64/libmysql.lib" }
 	filter { "system:windows", "architecture:x86" }

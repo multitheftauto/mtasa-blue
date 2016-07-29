@@ -4,16 +4,19 @@ project "Client Core"
 	targetname "core"
 	targetdir(buildpath("mta"))
 	
-	includedirs { 
-		"../sdk",
-		"../../vendor/cef3",
-		"../../vendor/tinygettext",
-		"../../vendor/zlib",
-		"../../vendor/jpeg-8d",
-		"../../vendor/pthreads/include",
-		"../../vendor/sparsehash/current/src/",
-		"../../vendor/sparsehash/current/src/windows"
-	}
+	filter "system:windows"
+		includedirs { "../../vendor/sparsehash/current/src/windows" }
+	
+	filter {}
+		includedirs { 
+			"../sdk",
+			"../../vendor/cef3",
+			"../../vendor/tinygettext",
+			"../../vendor/zlib",
+			"../../vendor/jpeg-8d",
+			"../../vendor/pthreads/include",
+			"../../vendor/sparsehash/current/src/"
+		}
 
 	libdirs {
 		"../../vendor/detours/lib"

@@ -4,11 +4,14 @@ project "Multiplayer SA"
 	targetname "multiplayer_sa"
 	targetdir(buildpath("mta"))
 	
-	includedirs { 
-		"../sdk",
-		"../../vendor/sparsehash/current/src/",
-		"../../vendor/sparsehash/current/src/windows"
-	}
+	filter "system:windows"
+		includedirs { "../../vendor/sparsehash/current/src/windows" }
+	
+	filter {}
+		includedirs { 
+			"../sdk",
+			"../../vendor/sparsehash/current/src/"
+		}
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
