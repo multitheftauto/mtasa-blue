@@ -90,10 +90,10 @@ them both to 0; an emulation function will be used. */
 #define HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strtoll' function. */
-/* #undef HAVE_STRTOLL */
+#define HAVE_STRTOLL 1
 
 /* Define to 1 if you have the `strtoq' function. */
-#define HAVE_STRTOQ 1
+//#define HAVE_STRTOQ 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
