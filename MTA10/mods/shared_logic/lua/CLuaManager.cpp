@@ -277,19 +277,7 @@ void CLuaManager::LoadCFunctions ( void )
     //CLuaCFunctions::AddFunction ( "enginePositionAtomic", CLuaFunctionDefs::EnginePositionAtomic );
     //CLuaCFunctions::AddFunction ( "enginePositionSeats", CLuaFunctionDefs::EnginePositionSeats );
     //CLuaCFunctions::AddFunction ( "engineAddAllAtomics", CLuaFunctionDefs::EngineAddAllAtomics );
-    //CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", CLuaFunctionDefs::EngineReplaceVehiclePart );
-
-    // Pickup create/destroy funcs
-    CLuaCFunctions::AddFunction ( "createPickup", CLuaFunctionDefs::CreatePickup );
-
-    // Pickup get funcs
-    CLuaCFunctions::AddFunction ( "getPickupType", CLuaFunctionDefs::GetPickupType );
-    CLuaCFunctions::AddFunction ( "getPickupWeapon", CLuaFunctionDefs::GetPickupWeapon );
-    CLuaCFunctions::AddFunction ( "getPickupAmount", CLuaFunctionDefs::GetPickupAmount );
-    CLuaCFunctions::AddFunction ( "getPickupAmmo", CLuaFunctionDefs::GetPickupAmmo );
-
-    // Pickup set funcs
-    CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );    
+    //CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", CLuaFunctionDefs::EngineReplaceVehiclePart ); 
 
     // Cursor funcs
     CLuaCFunctions::AddFunction ( "getCursorPosition", CLuaFunctionDefs::GetCursorPosition );
@@ -463,9 +451,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getGroundPosition", CLuaFunctionDefs::GetGroundPosition );
     CLuaCFunctions::AddFunction ( "processLineOfSight", CLuaFunctionDefs::ProcessLineOfSight );
     CLuaCFunctions::AddFunction ( "isLineOfSightClear", CLuaFunctionDefs::IsLineOfSightClear );
-    CLuaCFunctions::AddFunction ( "testLineAgainstWater", CLuaFunctionDefs::TestLineAgainstWater );
-    CLuaCFunctions::AddFunction ( "getWaterLevel", CLuaFunctionDefs::GetWaterLevel );
-    CLuaCFunctions::AddFunction ( "getWaterVertexPosition", CLuaFunctionDefs::GetWaterVertexPosition );
     CLuaCFunctions::AddFunction ( "getWorldFromScreenPosition", CLuaFunctionDefs::GetWorldFromScreenPosition );
     CLuaCFunctions::AddFunction ( "getScreenFromWorldPosition", CLuaFunctionDefs::GetScreenFromWorldPosition );
     CLuaCFunctions::AddFunction ( "getWeather", CLuaFunctionDefs::GetWeather );
@@ -484,7 +469,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "areTrafficLightsLocked", CLuaFunctionDefs::AreTrafficLightsLocked );
     CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaFunctionDefs::GetSkyGradient );
     CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaFunctionDefs::GetHeatHaze );
-    CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefs::GetWaterColor );
     CLuaCFunctions::AddFunction ( "getJetpackMaxHeight", CLuaFunctionDefs::GetJetpackMaxHeight );
     CLuaCFunctions::AddFunction ( "getWindVelocity", CLuaFunctionDefs::GetWindVelocity );
     CLuaCFunctions::AddFunction ( "getInteriorSoundsEnabled", CLuaFunctionDefs::GetInteriorSoundsEnabled );
@@ -508,18 +492,10 @@ void CLuaManager::LoadCFunctions ( void )
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefs::SetTime );
-    CLuaCFunctions::AddFunction ( "createWater", CLuaFunctionDefs::CreateWater );
-    CLuaCFunctions::AddFunction ( "setWaterLevel", CLuaFunctionDefs::SetWaterLevel );
-    CLuaCFunctions::AddFunction ( "resetWaterLevel", CLuaFunctionDefs::ResetWaterLevel );
-    CLuaCFunctions::AddFunction ( "setWaterVertexPosition", CLuaFunctionDefs::SetWaterVertexPosition );
-    CLuaCFunctions::AddFunction ( "setWaterDrawnLast", CLuaFunctionDefs::SetWaterDrawnLast );
-    CLuaCFunctions::AddFunction ( "isWaterDrawnLast", CLuaFunctionDefs::IsWaterDrawnLast );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaFunctionDefs::SetSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaFunctionDefs::ResetSkyGradient );
     CLuaCFunctions::AddFunction ( "setHeatHaze", CLuaFunctionDefs::SetHeatHaze );
     CLuaCFunctions::AddFunction ( "resetHeatHaze", CLuaFunctionDefs::ResetHeatHaze );
-    CLuaCFunctions::AddFunction ( "setWaterColor", CLuaFunctionDefs::SetWaterColor );
-    CLuaCFunctions::AddFunction ( "resetWaterColor", CLuaFunctionDefs::ResetWaterColor );
     CLuaCFunctions::AddFunction ( "setWeather", CLuaFunctionDefs::SetWeather );
     CLuaCFunctions::AddFunction ( "setWeatherBlended", CLuaFunctionDefs::SetWeatherBlended );
     CLuaCFunctions::AddFunction ( "setGravity", CLuaFunctionDefs::SetGravity );
@@ -600,46 +576,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "xmlNodeGetName", CLuaFunctionDefs::XMLNodeGetName );
     CLuaCFunctions::AddFunction ( "xmlNodeSetName", CLuaFunctionDefs::XMLNodeSetName );
 
-    // Projectile funcs
-    CLuaCFunctions::AddFunction ( "createProjectile", CLuaFunctionDefs::CreateProjectile );
-    CLuaCFunctions::AddFunction ( "getProjectileType", CLuaFunctionDefs::GetProjectileType );
-    CLuaCFunctions::AddFunction ( "getProjectileTarget", CLuaFunctionDefs::GetProjectileTarget );
-    CLuaCFunctions::AddFunction ( "getProjectileCreator", CLuaFunctionDefs::GetProjectileCreator );
-    CLuaCFunctions::AddFunction ( "getProjectileForce", CLuaFunctionDefs::GetProjectileForce );
-    CLuaCFunctions::AddFunction ( "setProjectileCounter", CLuaFunctionDefs::SetProjectileCounter );
-    CLuaCFunctions::AddFunction ( "getProjectileCounter", CLuaFunctionDefs::GetProjectileCounter );
-
-    // Shape create funcs
-    CLuaCFunctions::AddFunction ( "createColCircle", CLuaFunctionDefs::CreateColCircle );
-    CLuaCFunctions::AddFunction ( "createColCuboid", CLuaFunctionDefs::CreateColCuboid );
-    CLuaCFunctions::AddFunction ( "createColSphere", CLuaFunctionDefs::CreateColSphere );
-    CLuaCFunctions::AddFunction ( "createColRectangle", CLuaFunctionDefs::CreateColRectangle );
-    CLuaCFunctions::AddFunction ( "createColPolygon", CLuaFunctionDefs::CreateColPolygon );
-    CLuaCFunctions::AddFunction ( "createColTube", CLuaFunctionDefs::CreateColTube );
-
-    // Weapon funcs
-    CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefs::GetWeaponNameFromID );
-    CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefs::GetWeaponIDFromName );
-    CLuaCFunctions::AddFunction ( "getSlotFromWeapon", CLuaFunctionDefs::GetSlotFromWeapon );
-    CLuaCFunctions::AddFunction ( "createWeapon", CLuaFunctionDefs::CreateWeapon );
-    CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefs::SetWeaponProperty );
-    CLuaCFunctions::AddFunction ( "fireWeapon", CLuaFunctionDefs::FireWeapon );
-    CLuaCFunctions::AddFunction ( "setWeaponState", CLuaFunctionDefs::SetWeaponState );
-    CLuaCFunctions::AddFunction ( "getWeaponState", CLuaFunctionDefs::GetWeaponState );
-    CLuaCFunctions::AddFunction ( "setWeaponTarget", CLuaFunctionDefs::SetWeaponTarget );
-    CLuaCFunctions::AddFunction ( "getWeaponTarget", CLuaFunctionDefs::GetWeaponTarget );
-    //CLuaCFunctions::AddFunction ( "setWeaponOwner", CLuaFunctionDefs::SetWeaponOwner );
-    CLuaCFunctions::AddFunction ( "getWeaponOwner", CLuaFunctionDefs::GetWeaponOwner );
-    CLuaCFunctions::AddFunction ( "setWeaponFlags", CLuaFunctionDefs::SetWeaponFlags );
-    CLuaCFunctions::AddFunction ( "getWeaponFlags", CLuaFunctionDefs::GetWeaponFlags );
-    CLuaCFunctions::AddFunction ( "setWeaponFiringRate", CLuaFunctionDefs::SetWeaponFiringRate );
-    CLuaCFunctions::AddFunction ( "getWeaponFiringRate", CLuaFunctionDefs::GetWeaponFiringRate );
-    CLuaCFunctions::AddFunction ( "resetWeaponFiringRate", CLuaFunctionDefs::ResetWeaponFiringRate );
-    CLuaCFunctions::AddFunction ( "getWeaponAmmo", CLuaFunctionDefs::GetWeaponAmmo );
-    CLuaCFunctions::AddFunction ( "getWeaponClipAmmo", CLuaFunctionDefs::GetWeaponClipAmmo );
-    CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefs::SetWeaponAmmo );
-    CLuaCFunctions::AddFunction ( "setWeaponClipAmmo", CLuaFunctionDefs::SetWeaponClipAmmo );
-
     // Command funcs
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefs::AddCommandHandler );
     CLuaCFunctions::AddFunction ( "removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler );
@@ -700,6 +636,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaBlipDefs::LoadFunctions ();
     CLuaBrowserDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();
+    CLuaColShapeDefs::LoadFunctions ();
     CLuaDrawingDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
@@ -707,12 +644,16 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaMarkerDefs::LoadFunctions ();
     CLuaObjectDefs::LoadFunctions ();
     CLuaPedDefs::LoadFunctions ();
+    CLuaPickupDefs::LoadFunctions ();
     CLuaPlayerDefs::LoadFunctions ();
+    CLuaProjectileDefs::LoadFunctions ();
     CLuaPointLightDefs::LoadFunctions ();
     CLuaRadarAreaDefs::LoadFunctions ();
     CLuaResourceDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
     CLuaTeamDefs::LoadFunctions ();
+    CLuaWaterDefs::LoadFunctions ();
     CLuaVehicleDefs::LoadFunctions ();
+    CLuaWeaponDefs::LoadFunctions ();
 }

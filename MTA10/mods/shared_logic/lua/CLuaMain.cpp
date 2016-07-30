@@ -88,138 +88,6 @@ void CLuaMain::InitSecurity ( void )
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefs::DisabledFunction );
 }
 
-void CLuaMain::AddPickupClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "createPickup" );
-    lua_classfunction ( luaVM, "getAmmo", "getPickupAmmo" );
-    lua_classfunction ( luaVM, "getAmount", "getPickupAmount" );
-    lua_classfunction ( luaVM, "getWeapon", "getPickupWeapon" );
-    lua_classfunction ( luaVM, "getType", "getPickupType" );
-    lua_classfunction ( luaVM, "setType", "setPickupType" );
-    
-    lua_classvariable ( luaVM, "ammo", NULL, "getPickupAmmo" );
-    lua_classvariable ( luaVM, "amount", NULL, "getPickupAmount" );
-    lua_classvariable ( luaVM, "weapon", NULL, "getPickupWeapon" );
-    lua_classvariable ( luaVM, "type", "setPickupType", "getPickupType" );
-    
-    lua_registerclass ( luaVM, "Pickup", "Element" );
-}
-
-
-// TODO: function special
-void CLuaMain::AddColShapeClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "Circle", "createColCircle" );
-    lua_classfunction ( luaVM, "Cuboid", "createColCuboid" );
-    lua_classfunction ( luaVM, "Rectangle", "createColRectangle" );
-    lua_classfunction ( luaVM, "Sphere", "createColSphere" );
-    lua_classfunction ( luaVM, "Tube", "createColTube" );
-    lua_classfunction ( luaVM, "Polygon", "createColPolygon" );
-    lua_classfunction ( luaVM, "getElementsWithin", "getElementsWithinColShape" );
-
-    lua_classvariable ( luaVM, "elementsWithin", NULL, "getElementsWithinColShape" );    
-    
-    lua_registerclass ( luaVM, "ColShape", "Element" );
-}
-
-
-void CLuaMain::AddProjectileClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "createProjectile" );
-    lua_classfunction ( luaVM, "getCreator", "getProjectileCreator" );
-    lua_classfunction ( luaVM, "getForce", "getProjectileForce" );
-    lua_classfunction ( luaVM, "getTarget", "getProjectileTarget" );
-    lua_classfunction ( luaVM, "getType", "getProjectileType" );
-    lua_classfunction ( luaVM, "getCounter", "getProjectileCounter" );
-    lua_classfunction ( luaVM, "setCounter", "setProjectileCounter" );
-    
-    lua_classvariable ( luaVM, "creator", NULL, "getProjectileCreator" );
-    lua_classvariable ( luaVM, "force", NULL, "getProjectileForce" );
-    lua_classvariable ( luaVM, "target", NULL, "getProjectileTarget" );
-    lua_classvariable ( luaVM, "type", NULL, "getProjectileType" );
-    lua_classvariable ( luaVM, "counter", "setProjectileCounter", "getProjectileCounter" );
-    
-    lua_registerclass ( luaVM, "Projectile", "Element" );
-}
-
-// TODO: specials
-void CLuaMain::AddWaterClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "create", "createWater" );
-    lua_classfunction ( luaVM, "testLineAgainst", "testLineAgainstWater" );
-    lua_classfunction ( luaVM, "isDrawnLast", "isWaterDrawnLast" ); // Drawn last property affects all water instances
-    lua_classfunction ( luaVM, "setDrawnLast", "setWaterDrawnLast" );
-    
-    // Static variables (not implemented yet!)
-    //lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
-
-    lua_classfunction ( luaVM, "getLevel", "getWaterLevel" );
-    lua_classfunction ( luaVM, "getVertexPosition", "getWaterVertexPosition" );
-    lua_classfunction ( luaVM, "getWaveHeight", "getWaveHeight" );
-    lua_classfunction ( luaVM, "getColor", "getWaterColor" );
-    
-    lua_classfunction ( luaVM, "setWaveHeight", "setWaveHeight" );
-    lua_classfunction ( luaVM, "setColor", "setWaterColor" );
-    lua_classfunction ( luaVM, "setVertexPosition", "setWaterVertexPosition" );
-    lua_classfunction ( luaVM, "setLevel", "setWaterLevel" );
-
-    lua_classfunction ( luaVM, "resetColor", "resetWaterColor" );
-    lua_classfunction ( luaVM, "resetLevel", "resetWaterLevel" );
-    
-    lua_classvariable ( luaVM, "level", "setWaterLevel", "getWaterLevel" );
-    lua_classvariable ( luaVM, "height", "setWaveHeight", "getWaveHeight" );
-    //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" );
-
-    lua_registerclass ( luaVM, "Water", "Element" );
-}
-
-
-// TODO: special table
-void CLuaMain::AddWeaponClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "createWeapon" );
-    lua_classfunction ( luaVM, "fire", "fireWeapon" );
-    lua_classfunction ( luaVM, "resetFiringRate", "resetWeaponFiringRate" );
-    
-    lua_classfunction ( luaVM, "setProperty", "setWeaponProperty" );
-    lua_classfunction ( luaVM, "setTarget", "setWeaponTarget" );
-    lua_classfunction ( luaVM, "setFiringRate", "setWeaponFiringRate" );
-    lua_classfunction ( luaVM, "setState", "setWeaponState" );
-    lua_classfunction ( luaVM, "setFlags", "setWeaponFlags" );
-    lua_classfunction ( luaVM, "setAmmo", "setWeaponAmmo" );
-    lua_classfunction ( luaVM, "setClipAmmo", "setWeaponClipAmmo" );
-
-    lua_classfunction ( luaVM, "getProperty", "setWeaponProperty" );
-    lua_classfunction ( luaVM, "getOwner", "getWeaponOwner" );
-    lua_classfunction ( luaVM, "getTarget", "getWeaponTarget" );
-    lua_classfunction ( luaVM, "getFiringRate", "getWeaponFiringRate" );
-    lua_classfunction ( luaVM, "getState", "getWeaponState" );
-    lua_classfunction ( luaVM, "getFlags", "getWeaponFlags" );
-    lua_classfunction ( luaVM, "getAmmo", "getWeaponAmmo" );
-    lua_classfunction ( luaVM, "getClipAmmo", "getWeaponClipAmmo" );
-    
-    lua_classvariable ( luaVM, "target", NULL, "getWeaponTarget" );
-    lua_classvariable ( luaVM, "firingRate", "setWeaponFiringRate", "getWeaponFiringRate" );
-    lua_classvariable ( luaVM, "state", "setWeaponState", "getWeaponState" );
-    lua_classvariable ( luaVM, "ammo", "setWeaponAmmo", "getWeaponAmmo" );
-    lua_classvariable ( luaVM, "clipAmmo", "setWeaponClipAmmo", "getWeaponClipAmmo" );
-    //lua_classvariable ( luaVM, "property" "setWeaponProperty", "getWeaponProperty" ); todo: .property[wepID/name]["skill"] = property
-    //lua_classvariable ( luaVM, "flags" "setWeaponFlags", "getWeaponFlags" ); todo: .flags[flag] = value
-    
-    lua_registerclass ( luaVM, "Weapon", "Element" );
-}
-
-
 void CLuaMain::AddEffectClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
@@ -735,13 +603,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
         return;
 
     CLuaElementDefs::AddClass ( luaVM );
-    AddPickupClass              ( luaVM );
-    AddColShapeClass            ( luaVM );
-    AddProjectileClass          ( luaVM );
-    
-    AddWaterClass               ( luaVM );
-    CLuaAudioDefs::AddClass     ( luaVM );
-    AddWeaponClass              ( luaVM );
+  
     AddEffectClass              ( luaVM );
 
     AddGuiElementClass          ( luaVM );
@@ -770,20 +632,25 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     AddEngineTxdClass           ( luaVM );
     AddEngineDffClass           ( luaVM );
     
+    CLuaAudioDefs::AddClass ( luaVM );
     CLuaBlipDefs::AddClass      ( luaVM );
     CLuaCameraDefs::AddClass ( luaVM );
-    CLuaDrawingDefs::AddClass ( luaVM );
-    CLuaBrowserDefs::AddClass ( luaVM ); // browser must be after drawing, since it extends DxTexture
+    CLuaColShapeDefs::AddClass ( luaVM );
+    CLuaDrawingDefs::AddClass ( luaVM ); CLuaBrowserDefs::AddClass ( luaVM ); // browser must be after drawing, since it extends DxTexture
     CLuaFileDefs::AddClass ( luaVM );
     CLuaMarkerDefs::AddClass ( luaVM );
     CLuaObjectDefs::AddClass ( luaVM );
     CLuaPedDefs::AddClass ( luaVM );
+    CLuaPickupDefs::AddClass ( luaVM );
     CLuaPlayerDefs::AddClass ( luaVM );
     CLuaPointLightDefs::AddClass ( luaVM );
+    CLuaProjectileDefs::AddClass ( luaVM );
     CLuaRadarAreaDefs::AddClass ( luaVM );
     CLuaResourceDefs::AddClass ( luaVM );
     CLuaSearchLightDefs::AddClass ( luaVM );
     CLuaTeamDefs::AddClass ( luaVM );
+    CLuaWaterDefs::AddClass ( luaVM );
+    CLuaWeaponDefs::AddClass ( luaVM );
     CLuaVehicleDefs::AddClass ( luaVM );
 }
 

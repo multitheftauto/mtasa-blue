@@ -82,18 +82,6 @@ public:
     // Fire functions
     LUA_DECLARE ( CreateFire );
 
-    // Pickup create/destroy funcs
-    LUA_DECLARE ( CreatePickup );
-
-    // Pickup get funcs
-    LUA_DECLARE ( GetPickupType );
-    LUA_DECLARE ( GetPickupWeapon );
-    LUA_DECLARE ( GetPickupAmount );
-    LUA_DECLARE ( GetPickupAmmo );
-
-    // Pickup get funcs
-    LUA_DECLARE ( SetPickupType );
-
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );
     LUA_DECLARE ( SetCursorPosition );
@@ -278,10 +266,6 @@ public:
     LUA_DECLARE ( GetGroundPosition );
     LUA_DECLARE ( ProcessLineOfSight );
     LUA_DECLARE ( IsLineOfSightClear );
-    LUA_DECLARE ( TestLineAgainstWater );
-    LUA_DECLARE ( CreateWater );
-    LUA_DECLARE ( GetWaterLevel );
-    LUA_DECLARE ( GetWaterVertexPosition );
     LUA_DECLARE ( GetWorldFromScreenPosition );
     LUA_DECLARE ( GetScreenFromWorldPosition  );
     LUA_DECLARE ( GetWeather );
@@ -310,19 +294,11 @@ public:
     LUA_DECLARE ( GetHeatHaze );
     LUA_DECLARE ( SetHeatHaze );
     LUA_DECLARE ( ResetHeatHaze );
-    LUA_DECLARE ( GetWaterColor );
-    LUA_DECLARE ( SetWaterColor );
-    LUA_DECLARE ( ResetWaterColor );
     LUA_DECLARE ( SetWeather );
     LUA_DECLARE ( SetWeatherBlended );
     LUA_DECLARE ( SetGravity );
     LUA_DECLARE ( SetGameSpeed );
     LUA_DECLARE ( SetMinuteDuration );
-    LUA_DECLARE ( SetWaterLevel );
-    LUA_DECLARE ( ResetWaterLevel );
-    LUA_DECLARE ( IsWaterDrawnLast );
-    LUA_DECLARE ( SetWaterDrawnLast );
-    LUA_DECLARE ( SetWaterVertexPosition );
     LUA_DECLARE ( SetWaveHeight );
     LUA_DECLARE ( SetGarageOpen );
     LUA_DECLARE ( SetWorldSpecialPropertyEnabled );
@@ -411,46 +387,6 @@ public:
     LUA_DECLARE ( XMLCopyFile );
     LUA_DECLARE ( XMLNodeGetName );
     LUA_DECLARE ( XMLNodeSetName );
-
-    // Projectile funcs
-    LUA_DECLARE ( CreateProjectile );
-    LUA_DECLARE ( GetProjectileType );
-    LUA_DECLARE ( GetProjectileTarget );
-    LUA_DECLARE ( GetProjectileCreator );
-    LUA_DECLARE ( GetProjectileForce );
-    LUA_DECLARE ( GetProjectileCounter );
-    LUA_DECLARE ( SetProjectileCounter );
-
-    // Shape create funcs
-    LUA_DECLARE ( CreateColCircle );
-    LUA_DECLARE ( CreateColCuboid );
-    LUA_DECLARE ( CreateColSphere );
-    LUA_DECLARE ( CreateColRectangle );
-    LUA_DECLARE ( CreateColPolygon );
-    LUA_DECLARE ( CreateColTube );
-
-    // Weapon funcs
-    LUA_DECLARE ( GetWeaponNameFromID );
-    LUA_DECLARE ( GetWeaponIDFromName );
-    LUA_DECLARE ( GetSlotFromWeapon );
-    LUA_DECLARE ( CreateWeapon );
-    LUA_DECLARE ( FireWeapon );
-    LUA_DECLARE ( SetWeaponProperty );
-    LUA_DECLARE ( SetWeaponState );
-    LUA_DECLARE ( GetWeaponState );
-    LUA_DECLARE ( SetWeaponTarget );
-    LUA_DECLARE ( GetWeaponTarget );
-    LUA_DECLARE ( SetWeaponOwner );
-    LUA_DECLARE ( GetWeaponOwner );
-    LUA_DECLARE ( SetWeaponFlags );
-    LUA_DECLARE ( GetWeaponFlags );
-    LUA_DECLARE ( SetWeaponFiringRate );
-    LUA_DECLARE ( GetWeaponFiringRate );
-    LUA_DECLARE ( ResetWeaponFiringRate );
-    LUA_DECLARE ( GetWeaponAmmo );
-    LUA_DECLARE ( GetWeaponClipAmmo );
-    LUA_DECLARE ( SetWeaponAmmo );
-    LUA_DECLARE ( SetWeaponClipAmmo );
 
     // Command funcs
     LUA_DECLARE ( AddCommandHandler );

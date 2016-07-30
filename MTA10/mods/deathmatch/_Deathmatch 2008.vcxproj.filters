@@ -590,22 +590,10 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Shape.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Util.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Voice.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Weapon.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.World.cpp">
@@ -921,6 +909,21 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaDrawingDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaColShapeDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaPickupDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaProjectileDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaWeaponDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaWaterDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1694,6 +1697,21 @@
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaDrawingDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaColShapeDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaPickupDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaProjectileDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaWeaponDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaWaterDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>
