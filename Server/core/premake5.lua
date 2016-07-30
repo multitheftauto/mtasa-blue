@@ -44,4 +44,4 @@ project "Core"
 		excludes { "CExceptionInformation_Impl.cpp" }
 
 	filter "system:linux"
-		links { "ncurses", "ncursesw", "breakpad" }
+		links { "ncurses", "ncursesw", "breakpad", "pthread", "stdc++" }
