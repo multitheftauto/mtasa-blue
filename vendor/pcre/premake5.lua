@@ -1,8 +1,6 @@
 project "pcre"
 	language "C++"
-	kind "SharedLib"
 	targetname "pcre3"
-	targetdir(buildpath("server/mods/deathmatch"))
 	
 	defines { "HAVE_CONFIG_H" }
 	includedirs { ".", "shipped_for_mta_win32" }
@@ -53,6 +51,13 @@ project "pcre"
 	}
 	
 	filter "system:windows"
+		kind "SharedLib"
+		 targetdir(buildpath("server/mods/deathmatch"))
+		
 		postbuildcommands {
 			copy "mods/deathmatch"
 		}
+
+	filter "system:not windows"
+		kind "StaticLib"
+

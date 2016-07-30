@@ -1,8 +1,6 @@
 project "Lua_Server"
 	language "C++"
-	kind "SharedLib"
 	targetname "lua5.1"
-	targetdir(buildpath("server/mods/deathmatch"))
 
 	vpaths { 
 		["Headers"] = "**.h",
@@ -16,8 +14,14 @@ project "Lua_Server"
 		"src/**.h",
 	}
 
-	configuration "windows"
+	filter "system:windows"
 		defines { "LUA_BUILD_AS_DLL" }
+		kind "SharedLib"
+		targetdir(buildpath("server/mods/deathmatch"))
+
+	filter "system:not windows"
+		kind "StaticLib"
+
 
 if os.get() == "windows" then
 	project "Lua_Client"
