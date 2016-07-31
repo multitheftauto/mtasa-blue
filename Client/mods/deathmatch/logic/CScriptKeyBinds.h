@@ -13,10 +13,9 @@
 *
 *****************************************************************************/
 
-#ifndef __CScriptKeyBinds_H
-#define __CScriptKeyBinds_H
+#pragma once
 
-#include "../../shared_logic/lua/CLuaMain.h"
+#include "lua/CLuaMain.h"
 #include <list>
 
 enum eScriptKeyBindType
@@ -121,5 +120,3 @@ protected:
     std::list < CScriptKeyBind* >   m_List;
     bool                            m_bProcessingKey;
 };
-
-#endif

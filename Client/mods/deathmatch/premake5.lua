@@ -29,7 +29,7 @@ project "Client Deathmatch"
 	filter {}
 		includedirs {
 			".",
-			"../shared_logic",
+			"./logic",
 			"../../sdk/",
 			"../../../vendor/pthreads/include", 
 			"../../../vendor/bochs", 
@@ -49,8 +49,6 @@ project "Client Deathmatch"
 		"premake5.lua",
 		"**.h",
 		"**.cpp",
-		"../shared_logic/**.h",
-		"../shared_logic/**.cpp",
 		"../../../Shared/mods/deathmatch/logic/**.cpp",
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp", 

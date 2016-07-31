@@ -20,8 +20,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CCLIENTGAME_H
-#define __CCLIENTGAME_H
+#pragma once
 
 #include "CPacketHandler.h"
 #include <CClientCommon.h>
@@ -42,16 +41,16 @@
 #include "CRadarMap.h"
 #include "CClientTeamManager.h"
 #include "CClientPedManager.h"
-#include "../../shared_logic/lua/CLuaManager.h"
-#include "../../shared_logic/CScriptDebugging.h"
+#include "lua/CLuaManager.h"
+#include "CScriptDebugging.h"
 #include "CZoneNames.h"
 #include "CEvents.h"
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
 #include "CElementDeleter.h"
 #include "CFoo.h"
-#include "../../shared_logic/CRegisteredCommands.h"
-#include "../../shared_logic/CClientGUIElement.h"
+#include "CRegisteredCommands.h"
+#include "CClientGUIElement.h"
 #include "CLocalServer.h"
 #include "CVoiceRecorder.h"
 #include "CSingularFileDownloadManager.h"
@@ -797,5 +796,3 @@ private:
 };
 
 extern CClientGame* g_pClientGame;
-
-#endif

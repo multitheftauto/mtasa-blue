@@ -14,10 +14,9 @@
 *
 *****************************************************************************/
 
-#ifndef CRESOURCE_H
-#define CRESOURCE_H
+#pragma once
 
-#include "..\shared_logic\lua\CLuaManager.h"
+#include "lua/CLuaManager.h"
 #include "CClientEntity.h"
 #include "CResourceConfigItem.h"
 #include "CResourceFile.h"
@@ -153,5 +152,3 @@ private:
     CElementGroup *                             m_pDefaultElementGroup;     // stores elements created by scripts in this resource
     std::list < SNoClientCacheScript >          m_NoClientCacheScriptList;
 };
-
-#endif
