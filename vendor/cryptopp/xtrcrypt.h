@@ -5,7 +5,9 @@
 	"The XTR public key system" by Arjen K. Lenstra and Eric R. Verheul
 */
 
+#include "cryptlib.h"
 #include "xtr.h"
+#include "integer.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

@@ -15,7 +15,7 @@ void Gzip::WritePrestreamHeader()
 	AttachedTransformation()->Put(DEFLATED);
 	AttachedTransformation()->Put(0);		// general flag
 	AttachedTransformation()->PutWord32(0);	// time stamp
-	byte extra = (GetDeflateLevel() == 1) ? FAST : ((GetDeflateLevel() == 9) ? SLOW : 0);
+	byte extra = byte((GetDeflateLevel() == 1) ? FAST : ((GetDeflateLevel() == 9) ? SLOW : 0));
 	AttachedTransformation()->Put(extra);
 	AttachedTransformation()->Put(GZIP_OS_CODE);
 }
@@ -37,7 +37,7 @@ void Gzip::WritePoststreamTail()
 // *************************************************************
 
 Gunzip::Gunzip(BufferedTransformation *attachment, bool repeat, int propagation)
-	: Inflator(attachment, repeat, propagation)
+	: Inflator(attachment, repeat, propagation), m_length(0)
 {
 }
 

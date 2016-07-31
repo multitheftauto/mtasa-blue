@@ -1,15 +1,24 @@
 // esign.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
+
+// TODO: fix the C4589 warnings
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4589)
+#endif
+
 #include "esign.h"
-#include "asn.h"
 #include "modarith.h"
+#include "integer.h"
 #include "nbtheory.h"
-#include "sha.h"
 #include "algparam.h"
+#include "sha.h"
+#include "asn.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
+#if !defined(NDEBUG) && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
 void ESIGN_TestInstantiations()
 {
 	ESIGN<SHA>::Verifier x1(1, 1);
@@ -23,6 +32,7 @@ void ESIGN_TestInstantiations()
 	x3 = ESIGN<SHA>::Verifier(x2);
 	x4 = x2.GetKey();
 }
+#endif
 
 void ESIGNFunction::BERDecode(BufferedTransformation &bt)
 {
@@ -46,8 +56,9 @@ Integer ESIGNFunction::ApplyFunction(const Integer &x) const
 	return STDMIN(a_exp_b_mod_c(x, m_e, m_n) >> (2*GetK()+2), MaxImage());
 }
 
-bool ESIGNFunction::Validate(RandomNumberGenerator &rng, unsigned int level) const
+bool ESIGNFunction::Validate(RandomNumberGenerator& rng, unsigned int level) const
 {
+	CRYPTOPP_UNUSED(rng), CRYPTOPP_UNUSED(level);
 	bool pass = true;
 	pass = pass && m_n > Integer::One() && m_n.IsOdd();
 	pass = pass && m_e >= 8 && m_e < m_n;
@@ -114,7 +125,7 @@ void InvertibleESIGNFunction::GenerateRandom(RandomNumberGenerator &rng, const N
 
 	m_n = m_p * m_p * m_q;
 
-	assert(m_n.BitCount() == modulusSize);
+	assert(m_n.BitCount() == (unsigned int)modulusSize);
 }
 
 void InvertibleESIGNFunction::BERDecode(BufferedTransformation &bt)
@@ -158,13 +169,13 @@ Integer InvertibleESIGNFunction::CalculateRandomizedInverse(RandomNumberGenerato
 			w1 = pq - w1;
 		}
 	}
-	while ((w1 >> 2*GetK()+1).IsPositive());
+	while ((w1 >> (2*GetK()+1)).IsPositive());
 
 	ModularArithmetic modp(m_p);
 	Integer t = modp.Divide(w0 * r % m_p, m_e * re % m_p);
 	Integer s = r + t*pq;
 	assert(s < m_n);
-/*
+#if 0
 	using namespace std;
 	cout << "f = " << x << endl;
 	cout << "r = " << r << endl;
@@ -174,7 +185,7 @@ Integer InvertibleESIGNFunction::CalculateRandomizedInverse(RandomNumberGenerato
 	cout << "w1 = " << w1 << endl;
 	cout << "t = " << t << endl;
 	cout << "s = " << s << endl;
-*/
+#endif
 	return s;
 }
 

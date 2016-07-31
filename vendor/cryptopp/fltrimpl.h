@@ -1,6 +1,16 @@
 #ifndef CRYPTOPP_FLTRIMPL_H
 #define CRYPTOPP_FLTRIMPL_H
 
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(push)
+# pragma warning(disable: 4100)
+#endif
+
+#if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wunused-value"
+#endif
+
 #define FILTER_BEGIN	\
 	switch (m_continueAt)	\
 	{	\
@@ -63,5 +73,13 @@
 
 #define FILTER_OUTPUT_MAYBE_MODIFIABLE(site, output, length, messageEnd, modifiable)	\
 	FILTER_OUTPUT2_MAYBE_MODIFIABLE(site, 0, output, length, messageEnd, modifiable)
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(pop)
+#endif
+
+#if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
+# pragma GCC diagnostic pop
+#endif
 
 #endif

@@ -30,7 +30,7 @@ CFG=cryptlib - Win32 Debug
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "cryptlib - Win32 DLL-Import Release"
+!IF "$(CFG)" == "cryptlib - Win32 DLL-Import Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -53,7 +53,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
-!ELSEIF  "$(CFG)" == "cryptlib - Win32 DLL-Import Debug"
+!ELSEIF "$(CFG)" == "cryptlib - Win32 DLL-Import Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -76,7 +76,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
-!ELSEIF  "$(CFG)" == "cryptlib - Win32 Release"
+!ELSEIF "$(CFG)" == "cryptlib - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -99,7 +99,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
-!ELSEIF  "$(CFG)" == "cryptlib - Win32 Debug"
+!ELSEIF "$(CFG)" == "cryptlib - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -141,7 +141,7 @@ SOURCE=.\3way.cpp
 
 SOURCE=.\adhoc.cpp.proto
 
-!IF  "$(CFG)" == "cryptlib - Win32 DLL-Import Release"
+!IF "$(CFG)" == "cryptlib - Win32 DLL-Import Release"
 
 # Begin Custom Build
 InputPath=.\adhoc.cpp.proto
@@ -152,7 +152,7 @@ InputPath=.\adhoc.cpp.proto
 	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "cryptlib - Win32 DLL-Import Debug"
+!ELSEIF "$(CFG)" == "cryptlib - Win32 DLL-Import Debug"
 
 # Begin Custom Build
 InputPath=.\adhoc.cpp.proto
@@ -163,7 +163,7 @@ InputPath=.\adhoc.cpp.proto
 	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "cryptlib - Win32 Release"
+!ELSEIF "$(CFG)" == "cryptlib - Win32 Release"
 
 # Begin Custom Build
 InputPath=.\adhoc.cpp.proto
@@ -174,7 +174,7 @@ InputPath=.\adhoc.cpp.proto
 	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "cryptlib - Win32 Debug"
+!ELSEIF "$(CFG)" == "cryptlib - Win32 Debug"
 
 # Begin Custom Build
 InputPath=.\adhoc.cpp.proto
@@ -234,6 +234,10 @@ SOURCE=.\blowfish.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\blake2.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\blumshub.cpp
 # End Source File
 # Begin Source File
@@ -255,6 +259,10 @@ SOURCE=.\cbcmac.cpp
 # Begin Source File
 
 SOURCE=.\ccm.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\chacha.cpp
 # End Source File
 # Begin Source File
 
@@ -729,6 +737,10 @@ SOURCE=.\basecode.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\blake2.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\blowfish.h
 # End Source File
 # Begin Source File
@@ -750,6 +762,10 @@ SOURCE=.\cbcmac.h
 # Begin Source File
 
 SOURCE=.\ccm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\chacha.h
 # End Source File
 # Begin Source File
 
@@ -882,6 +898,10 @@ SOURCE=.\gzip.h
 # Begin Source File
 
 SOURCE=.\hex.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\hkdf.h
 # End Source File
 # Begin Source File
 

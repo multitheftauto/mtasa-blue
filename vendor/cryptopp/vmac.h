@@ -1,12 +1,23 @@
+// vmac.h - written and placed in the public domain by Wei Dai
+
+//! \file vmac.h
+//! \brief Classes for the VMAC message authentication code
+
 #ifndef CRYPTOPP_VMAC_H
 #define CRYPTOPP_VMAC_H
 
+#include "cryptlib.h"
 #include "iterhash.h"
 #include "seckey.h"
 
+#if CRYPTOPP_BOOL_X32
+# define CRYPTOPP_DISABLE_VMAC_ASM
+#endif
+
 NAMESPACE_BEGIN(CryptoPP)
 
-/// .
+//! \class VMAC_Base
+//! \brief VMAC message authentication code base class
 class VMAC_Base : public IteratedHashBase<word64, MessageAuthenticationCode>
 {
 public:
@@ -20,6 +31,7 @@ public:
 	void TruncatedFinal(byte *mac, size_t size);
 	unsigned int BlockSize() const {return m_L1KeyLength;}
 	ByteOrder GetByteOrder() const {return LITTLE_ENDIAN_ORDER;}
+	unsigned int OptimalDataAlignment() const;
 
 protected:
 	virtual BlockCipher & AccessCipher() =0;
@@ -29,7 +41,7 @@ protected:
 	size_t HashMultipleBlocks(const word64 *input, size_t length);
 	void Init() {}
 	word64* StateBuf() {return NULL;}
-	word64* DataBuf() {return (word64 *)m_data();}
+	word64* DataBuf() {return (word64 *)(void*)m_data();}
 
 	void VHASH_Update_SSE2(const word64 *data, size_t blocksRemainingInWord64, int tagPart);
 #if !(defined(_MSC_VER) && _MSC_VER < 1300)		// can't use function template here with VC6
@@ -50,7 +62,16 @@ protected:
 	int m_L1KeyLength;
 };
 
-/// <a href="http://www.cryptolounge.org/wiki/VMAC">VMAC</a>
+//! \class VMAC
+//! \brief VMAC message authentication code
+//! \tparam T_BlockCipher block cipher
+//! \tparam T_DigestBitSize digest size, in bits
+//! \details VMAC is a block cipher-based message authentication code algorithm
+//!   using a universal hash proposed by Ted Krovetz and Wei Dai in April 2007. The
+//!   algorithm was designed for high performance backed by a formal analysis.
+//! \details The implementation is based on Ted Krovetz's public domain vmac.c
+//!   and <a href="http://tools.ietf.org/html/draft-krovetz-vmac-01">draft-krovetz-vmac-01.txt</a>.
+//! \sa <a href="http://www.cryptolounge.org/wiki/VMAC">VMAC</a>.
 template <class T_BlockCipher, int T_DigestBitSize = 128>
 class VMAC : public SimpleKeyingInterfaceImpl<VMAC_Base, SameKeyLengthAs<T_BlockCipher, SimpleKeyingInterface::UNIQUE_IV, T_BlockCipher::BLOCKSIZE> >
 {

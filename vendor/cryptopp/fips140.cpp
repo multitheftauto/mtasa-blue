@@ -5,6 +5,7 @@
 #ifndef CRYPTOPP_IMPORTS
 
 #include "fips140.h"
+#include "misc.h"
 #include "trdlocal.h"	// needs to be included last for cygwin
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -60,6 +61,7 @@ bool PowerUpSelfTestInProgressOnThisThread()
 
 void SetPowerUpSelfTestInProgressOnThisThread(bool inProgress)
 {
+	CRYPTOPP_UNUSED(inProgress);
 #if CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2
 	AccessPowerUpSelfTestInProgress().SetValue((void *)inProgress);
 #endif
@@ -67,6 +69,7 @@ void SetPowerUpSelfTestInProgressOnThisThread(bool inProgress)
 
 void EncryptionPairwiseConsistencyTest_FIPS_140_Only(const PK_Encryptor &encryptor, const PK_Decryptor &decryptor)
 {
+	CRYPTOPP_UNUSED(encryptor), CRYPTOPP_UNUSED(decryptor);
 #if CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2
 	EncryptionPairwiseConsistencyTest(encryptor, decryptor);
 #endif
@@ -74,6 +77,7 @@ void EncryptionPairwiseConsistencyTest_FIPS_140_Only(const PK_Encryptor &encrypt
 
 void SignaturePairwiseConsistencyTest_FIPS_140_Only(const PK_Signer &signer, const PK_Verifier &verifier)
 {
+	CRYPTOPP_UNUSED(signer), CRYPTOPP_UNUSED(verifier);
 #if CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2
 	SignaturePairwiseConsistencyTest(signer, verifier);
 #endif

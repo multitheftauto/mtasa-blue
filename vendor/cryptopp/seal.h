@@ -1,7 +1,13 @@
+// seal.h - written and placed in the public domain by Wei Dai
+
+//! \file seal.h
+//! \brief Classes for SEAL stream cipher
+
 #ifndef CRYPTOPP_SEAL_H
 #define CRYPTOPP_SEAL_H
 
 #include "strciphr.h"
+#include "secblock.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 

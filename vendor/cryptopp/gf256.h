@@ -2,6 +2,7 @@
 #define CRYPTOPP_GF256_H
 
 #include "cryptlib.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -15,7 +16,7 @@ public:
 	GF256(byte modulus) : m_modulus(modulus) {}
 
 	Element RandomElement(RandomNumberGenerator &rng, int ignored = 0) const
-		{return rng.GenerateByte();}
+		{CRYPTOPP_UNUSED(ignored); return rng.GenerateByte();}
 
 	bool Equal(Element a, Element b) const
 		{return a==b;}
@@ -39,7 +40,7 @@ public:
 		{return a^=b;}
 
 	Element Double(Element a) const
-		{return 0;}
+		{CRYPTOPP_UNUSED(a); return 0;}
 
 	Element One() const
 		{return 1;}

@@ -1,6 +1,15 @@
 // basecode.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4100)
+#endif
+
+#if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
+# pragma GCC diagnostic ignored "-Wunused-value"
+#endif
 
 #ifndef CRYPTOPP_IMPORTS
 
@@ -48,8 +57,8 @@ size_t BaseN_Encoder::Put2(const byte *begin, size_t length, int messageEnd, boo
 		unsigned int b = begin[m_inputPosition++], bitsLeftInSource = 8;
 		while (true)
 		{
-			assert(m_bitPos < m_bitsPerChar);
-			unsigned int bitsLeftInTarget = m_bitsPerChar-m_bitPos;
+			assert(m_bitsPerChar-m_bitPos >= 0);
+			unsigned int bitsLeftInTarget = (unsigned int)(m_bitsPerChar-m_bitPos);
 			m_outBuf[m_bytePos] |= b >> (8-bitsLeftInTarget);
 			if (bitsLeftInSource >= bitsLeftInTarget)
 			{

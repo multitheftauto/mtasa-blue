@@ -2,18 +2,36 @@
 
 #include "pch.h"
 
+#include "config.h"
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(push)
+# pragma warning(disable: 4127 4189)
+#endif
+
+#if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wunused-function"
+#endif
+
 #ifndef CRYPTOPP_IMPORTS
 
 #include "eccrypto.h"
+#include "integer.h"
 #include "nbtheory.h"
-#include "oids.h"
-#include "hex.h"
+#include "filters.h"
 #include "argnames.h"
+#include "smartptr.h"
+#include "oids.h"
+#include "asn.h"
+#include "hex.h"
 #include "ec2n.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
 #if 0
+#if !defined(NDEBUG) && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
 static void ECDSA_TestInstantiations()
 {
 	ECDSA<EC2N>::Signer t1;
@@ -25,6 +43,7 @@ static void ECDSA_TestInstantiations()
 	ECDH<ECP>::Domain t7;
 	ECMQV<ECP>::Domain t8;
 }
+#endif
 #endif
 
 // VC60 workaround: complains when these functions are put into an anonymous namespace
@@ -429,14 +448,16 @@ template <class EC> void DL_GroupParameters_EC<EC>::Initialize(const OID &oid)
 
 	const EcRecommendedParameters<EllipticCurve> &param = *it;
 	m_oid = oid;
-	std::auto_ptr<EllipticCurve> ec(param.NewEC());
+	member_ptr<EllipticCurve> ec(param.NewEC());
 	this->m_groupPrecomputation.SetCurve(*ec);
 
 	StringSource ssG(param.g, true, new HexDecoder);
 	Element G;
 	bool result = GetCurve().DecodePoint(G, ssG, (size_t)ssG.MaxRetrievable());
 	this->SetSubgroupGenerator(G);
-	assert(result);
+
+	// TODO: this fails in practice. Should it throw?
+	CRYPTOPP_UNUSED(result); assert(result);
 
 	StringSource ssN(param.n, true, new HexDecoder);
 	m_n.Decode(ssN, (size_t)ssN.MaxRetrievable());
@@ -486,6 +507,7 @@ void DL_GroupParameters_EC<EC>::GenerateRandom(RandomNumberGenerator &rng, const
 {
 	try
 	{
+		CRYPTOPP_UNUSED(rng);
 		AssignFrom(alg);
 	}
 	catch (InvalidArgument &)
@@ -626,6 +648,8 @@ OID DL_GroupParameters_EC<EC>::GetAlgorithmID() const
 template <class EC>
 void DL_PublicKey_EC<EC>::BERDecodePublicKey(BufferedTransformation &bt, bool parametersPresent, size_t size)
 {
+	CRYPTOPP_UNUSED(parametersPresent);
+
 	typename EC::Point P;
 	if (!this->GetGroupParameters().GetCurve().DecodePoint(P, bt, size))
 		BERDecodeError();
@@ -643,6 +667,7 @@ void DL_PublicKey_EC<EC>::DEREncodePublicKey(BufferedTransformation &bt) const
 template <class EC>
 void DL_PrivateKey_EC<EC>::BERDecodePrivateKey(BufferedTransformation &bt, bool parametersPresent, size_t size)
 {
+	CRYPTOPP_UNUSED(size);
 	BERSequenceDecoder seq(bt);
 		word32 version;
 		BERDecodeUnsigned<word32>(seq, version, INTEGER, 1, 1);	// check version
