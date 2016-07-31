@@ -206,14 +206,14 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleRotation", CLuaElementDefs::SetElementRotation );
     CLuaCFunctions::AddFunction ( "attachElementToElement", CLuaElementDefs::AttachElements );
     CLuaCFunctions::AddFunction ( "detachElementFromElement", CLuaElementDefs::DetachElements );
-    CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaFunctionDefs::XMLNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaFunctionDefs::XMLNodeGetChildren );
-    CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaFunctionDefs::XMLNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaFunctionDefs::XMLCreateChild );
-    CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaFunctionDefs::XMLNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaXMLDefs::XMLNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaXMLDefs::XMLNodeGetChildren );
+    CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaXMLDefs::XMLNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaXMLDefs::XMLCreateChild );
+    CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaXMLDefs::XMLNodeFindChild );
     CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaPedDefs::IsPedDead );
-    CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaFunctionDefs::GUIEditSetCaretIndex );
-    CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaFunctionDefs::GUIMemoSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex );
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
     // Event funcs
@@ -253,44 +253,6 @@ void CLuaManager::LoadCFunctions ( void )
     // Fire funcs
     CLuaCFunctions::AddFunction ( "createFire", CLuaFunctionDefs::CreateFire );
 
-    // Engine funcs
-    CLuaCFunctions::AddFunction ( "engineLoadTXD", CLuaFunctionDefs::EngineLoadTXD );
-    CLuaCFunctions::AddFunction ( "engineLoadCOL", CLuaFunctionDefs::EngineLoadCOL );
-    CLuaCFunctions::AddFunction ( "engineLoadDFF", CLuaFunctionDefs::EngineLoadDFF );
-    CLuaCFunctions::AddFunction ( "engineImportTXD", CLuaFunctionDefs::EngineImportTXD );
-    CLuaCFunctions::AddFunction ( "engineReplaceCOL", CLuaFunctionDefs::EngineReplaceCOL );
-    CLuaCFunctions::AddFunction ( "engineRestoreCOL", CLuaFunctionDefs::EngineRestoreCOL );
-    CLuaCFunctions::AddFunction ( "engineReplaceModel", CLuaFunctionDefs::EngineReplaceModel );
-    CLuaCFunctions::AddFunction ( "engineRestoreModel", CLuaFunctionDefs::EngineRestoreModel );
-    CLuaCFunctions::AddFunction ( "engineGetModelLODDistance", CLuaFunctionDefs::EngineGetModelLODDistance );
-    CLuaCFunctions::AddFunction ( "engineSetModelLODDistance", CLuaFunctionDefs::EngineSetModelLODDistance );
-    CLuaCFunctions::AddFunction ( "engineSetAsynchronousLoading", CLuaFunctionDefs::EngineSetAsynchronousLoading );
-    CLuaCFunctions::AddFunction ( "engineApplyShaderToWorldTexture", CLuaFunctionDefs::EngineApplyShaderToWorldTexture );
-    CLuaCFunctions::AddFunction ( "engineRemoveShaderFromWorldTexture", CLuaFunctionDefs::EngineRemoveShaderFromWorldTexture );
-    CLuaCFunctions::AddFunction ( "engineGetModelNameFromID", CLuaFunctionDefs::EngineGetModelNameFromID );
-    CLuaCFunctions::AddFunction ( "engineGetModelIDFromName", CLuaFunctionDefs::EngineGetModelIDFromName );
-    CLuaCFunctions::AddFunction ( "engineGetModelTextureNames", CLuaFunctionDefs::EngineGetModelTextureNames );
-    CLuaCFunctions::AddFunction ( "engineGetVisibleTextureNames", CLuaFunctionDefs::EngineGetVisibleTextureNames );
-
-    //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", CLuaFunctionDefs::EngineReplaceMatchingAtomics );
-    //CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", CLuaFunctionDefs::EngineReplaceWheelAtomics );
-    //CLuaCFunctions::AddFunction ( "enginePositionAtomic", CLuaFunctionDefs::EnginePositionAtomic );
-    //CLuaCFunctions::AddFunction ( "enginePositionSeats", CLuaFunctionDefs::EnginePositionSeats );
-    //CLuaCFunctions::AddFunction ( "engineAddAllAtomics", CLuaFunctionDefs::EngineAddAllAtomics );
-    //CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", CLuaFunctionDefs::EngineReplaceVehiclePart );
-
-    // Pickup create/destroy funcs
-    CLuaCFunctions::AddFunction ( "createPickup", CLuaFunctionDefs::CreatePickup );
-
-    // Pickup get funcs
-    CLuaCFunctions::AddFunction ( "getPickupType", CLuaFunctionDefs::GetPickupType );
-    CLuaCFunctions::AddFunction ( "getPickupWeapon", CLuaFunctionDefs::GetPickupWeapon );
-    CLuaCFunctions::AddFunction ( "getPickupAmount", CLuaFunctionDefs::GetPickupAmount );
-    CLuaCFunctions::AddFunction ( "getPickupAmmo", CLuaFunctionDefs::GetPickupAmmo );
-
-    // Pickup set funcs
-    CLuaCFunctions::AddFunction ( "setPickupType", CLuaFunctionDefs::SetPickupType );    
-
     // Cursor funcs
     CLuaCFunctions::AddFunction ( "getCursorPosition", CLuaFunctionDefs::GetCursorPosition );
     CLuaCFunctions::AddFunction ( "setCursorPosition", CLuaFunctionDefs::SetCursorPosition );
@@ -299,156 +261,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getCursorAlpha", CLuaFunctionDefs::GetCursorAlpha );
     CLuaCFunctions::AddFunction ( "setCursorAlpha", CLuaFunctionDefs::SetCursorAlpha );
 
-    // GUI funcs
-    CLuaCFunctions::AddFunction ( "guiGetInputEnabled", CLuaFunctionDefs::GUIGetInputEnabled );
-    CLuaCFunctions::AddFunction ( "guiSetInputEnabled", CLuaFunctionDefs::GUISetInputEnabled );
-    CLuaCFunctions::AddFunction ( "guiGetInputMode", CLuaFunctionDefs::GUIGetInputMode );
-    CLuaCFunctions::AddFunction ( "guiSetInputMode", CLuaFunctionDefs::GUISetInputMode );
-
-    CLuaCFunctions::AddFunction ( "isChatBoxInputActive", CLuaFunctionDefs::GUIIsChatBoxInputActive );
-    CLuaCFunctions::AddFunction ( "isConsoleActive", CLuaFunctionDefs::GUIIsConsoleActive );
-    CLuaCFunctions::AddFunction ( "isDebugViewActive", CLuaFunctionDefs::GUIIsDebugViewActive );
-    CLuaCFunctions::AddFunction ( "isMainMenuActive", CLuaFunctionDefs::GUIIsMainMenuActive );
-    CLuaCFunctions::AddFunction ( "isMTAWindowActive", CLuaFunctionDefs::GUIIsMTAWindowActive );
-    CLuaCFunctions::AddFunction ( "isTransferBoxActive", CLuaFunctionDefs::GUIIsTransferBoxActive );
-
-    CLuaCFunctions::AddFunction ( "guiCreateWindow", CLuaFunctionDefs::GUICreateWindow );
-    CLuaCFunctions::AddFunction ( "guiCreateLabel", CLuaFunctionDefs::GUICreateLabel );
-    CLuaCFunctions::AddFunction ( "guiCreateButton", CLuaFunctionDefs::GUICreateButton );
-    CLuaCFunctions::AddFunction ( "guiCreateEdit", CLuaFunctionDefs::GUICreateEdit );
-    CLuaCFunctions::AddFunction ( "guiCreateMemo", CLuaFunctionDefs::GUICreateMemo );
-    CLuaCFunctions::AddFunction ( "guiCreateGridList", CLuaFunctionDefs::GUICreateGridList );
-    CLuaCFunctions::AddFunction ( "guiCreateScrollPane", CLuaFunctionDefs::GUICreateScrollPane );
-    CLuaCFunctions::AddFunction ( "guiCreateScrollBar", CLuaFunctionDefs::GUICreateScrollBar );
-    CLuaCFunctions::AddFunction ( "guiCreateTabPanel", CLuaFunctionDefs::GUICreateTabPanel );
-    CLuaCFunctions::AddFunction ( "guiCreateTab", CLuaFunctionDefs::GUICreateTab );
-    CLuaCFunctions::AddFunction ( "guiCreateProgressBar", CLuaFunctionDefs::GUICreateProgressBar );
-    CLuaCFunctions::AddFunction ( "guiCreateCheckBox", CLuaFunctionDefs::GUICreateCheckBox );
-    CLuaCFunctions::AddFunction ( "guiCreateRadioButton", CLuaFunctionDefs::GUICreateRadioButton );
-    CLuaCFunctions::AddFunction ( "guiCreateStaticImage", CLuaFunctionDefs::GUICreateStaticImage );
-    CLuaCFunctions::AddFunction ( "guiCreateComboBox", CLuaFunctionDefs::GUICreateComboBox );
-    CLuaCFunctions::AddFunction ( "guiCreateFont", CLuaFunctionDefs::GUICreateFont );
-
-    CLuaCFunctions::AddFunction ( "guiStaticImageLoadImage", CLuaFunctionDefs::GUIStaticImageLoadImage );
-    CLuaCFunctions::AddFunction ( "guiStaticImageGetNativeSize", CLuaFunctionDefs::GUIStaticImageGetNativeSize );
-    CLuaCFunctions::AddFunction ( "guiGetSelectedTab", CLuaFunctionDefs::GUIGetSelectedTab );
-    CLuaCFunctions::AddFunction ( "guiSetSelectedTab", CLuaFunctionDefs::GUISetSelectedTab );
-    CLuaCFunctions::AddFunction ( "guiDeleteTab", CLuaFunctionDefs::GUIDeleteTab );
-
-    CLuaCFunctions::AddFunction ( "guiGridListSetSortingEnabled", CLuaFunctionDefs::GUIGridListSetSortingEnabled );
-    CLuaCFunctions::AddFunction ( "guiGridListAddColumn", CLuaFunctionDefs::GUIGridListAddColumn );
-    CLuaCFunctions::AddFunction ( "guiGridListRemoveColumn", CLuaFunctionDefs::GUIGridListRemoveColumn );
-    CLuaCFunctions::AddFunction ( "guiGridListSetColumnWidth", CLuaFunctionDefs::GUIGridListSetColumnWidth );
-    CLuaCFunctions::AddFunction ( "guiGridListGetColumnWidth", CLuaFunctionDefs::GUIGridListGetColumnWidth );
-    CLuaCFunctions::AddFunction ( "guiGridListSetColumnTitle", CLuaFunctionDefs::GUIGridListSetColumnTitle );
-    CLuaCFunctions::AddFunction ( "guiGridListGetColumnTitle", CLuaFunctionDefs::GUIGridListGetColumnTitle );
-    CLuaCFunctions::AddFunction ( "guiGridListSetScrollBars", CLuaFunctionDefs::GUIGridListSetScrollBars );
-    CLuaCFunctions::AddFunction ( "guiGridListGetRowCount", CLuaFunctionDefs::GUIGridListGetRowCount );
-    CLuaCFunctions::AddFunction ( "guiGridListGetColumnCount", CLuaFunctionDefs::GUIGridListGetColumnCount );
-    CLuaCFunctions::AddFunction ( "guiGridListAddRow", CLuaFunctionDefs::GUIGridListAddRow );
-    CLuaCFunctions::AddFunction ( "guiGridListInsertRowAfter", CLuaFunctionDefs::GUIGridListInsertRowAfter );
-    CLuaCFunctions::AddFunction ( "guiGridListRemoveRow", CLuaFunctionDefs::GUIGridListRemoveRow );
-    CLuaCFunctions::AddFunction ( "guiGridListAutoSizeColumn", CLuaFunctionDefs::GUIGridListAutoSizeColumn );
-    CLuaCFunctions::AddFunction ( "guiGridListClear", CLuaFunctionDefs::GUIGridListClear );
-    CLuaCFunctions::AddFunction ( "guiGridListSetItemText", CLuaFunctionDefs::GUIGridListSetItemText );
-    CLuaCFunctions::AddFunction ( "guiGridListGetItemText", CLuaFunctionDefs::GUIGridListGetItemText );
-    CLuaCFunctions::AddFunction ( "guiGridListSetItemData", CLuaFunctionDefs::GUIGridListSetItemData );
-    CLuaCFunctions::AddFunction ( "guiGridListGetItemData", CLuaFunctionDefs::GUIGridListGetItemData );
-    CLuaCFunctions::AddFunction ( "guiGridListSetItemColor", CLuaFunctionDefs::GUIGridListSetItemColor );
-    CLuaCFunctions::AddFunction ( "guiGridListGetItemColor", CLuaFunctionDefs::GUIGridListGetItemColor );
-    CLuaCFunctions::AddFunction ( "guiGridListSetSelectionMode", CLuaFunctionDefs::GUIGridListSetSelectionMode );
-    CLuaCFunctions::AddFunction ( "guiGridListGetSelectedItem", CLuaFunctionDefs::GUIGridListGetSelectedItem );
-    CLuaCFunctions::AddFunction ( "guiGridListGetSelectedItems", CLuaFunctionDefs::GUIGridListGetSelectedItems );
-    CLuaCFunctions::AddFunction ( "guiGridListGetSelectedCount", CLuaFunctionDefs::GUIGridListGetSelectedCount );
-    CLuaCFunctions::AddFunction ( "guiGridListSetSelectedItem", CLuaFunctionDefs::GUIGridListSetSelectedItem );
-    CLuaCFunctions::AddFunction ( "guiGridListSetHorizontalScrollPosition", CLuaFunctionDefs::GUIGridListSetHorizontalScrollPosition );
-    CLuaCFunctions::AddFunction ( "guiGridListGetHorizontalScrollPosition", CLuaFunctionDefs::GUIGridListGetHorizontalScrollPosition );
-    CLuaCFunctions::AddFunction ( "guiGridListSetVerticalScrollPosition", CLuaFunctionDefs::GUIGridListSetVerticalScrollPosition );
-    CLuaCFunctions::AddFunction ( "guiGridListGetVerticalScrollPosition", CLuaFunctionDefs::GUIGridListGetVerticalScrollPosition );
-
-    CLuaCFunctions::AddFunction ( "guiScrollPaneSetScrollBars", CLuaFunctionDefs::GUIScrollPaneSetScrollBars );
-    CLuaCFunctions::AddFunction ( "guiScrollPaneSetHorizontalScrollPosition", CLuaFunctionDefs::GUIScrollPaneSetHorizontalScrollPosition );
-    CLuaCFunctions::AddFunction ( "guiScrollPaneGetHorizontalScrollPosition", CLuaFunctionDefs::GUIScrollPaneGetHorizontalScrollPosition );
-    CLuaCFunctions::AddFunction ( "guiScrollPaneSetVerticalScrollPosition", CLuaFunctionDefs::GUIScrollPaneSetVerticalScrollPosition );
-    CLuaCFunctions::AddFunction ( "guiScrollPaneGetVerticalScrollPosition", CLuaFunctionDefs::GUIScrollPaneGetVerticalScrollPosition );
-
-    CLuaCFunctions::AddFunction ( "guiScrollBarSetScrollPosition", CLuaFunctionDefs::GUIScrollBarSetScrollPosition );
-    CLuaCFunctions::AddFunction ( "guiScrollBarGetScrollPosition", CLuaFunctionDefs::GUIScrollBarGetScrollPosition );
-
-    CLuaCFunctions::AddFunction ( "guiSetEnabled", CLuaFunctionDefs::GUISetEnabled );
-    CLuaCFunctions::AddFunction ( "guiSetProperty", CLuaFunctionDefs::GUISetProperty );
-    CLuaCFunctions::AddFunction ( "guiSetAlpha", CLuaFunctionDefs::GUISetAlpha );
-    CLuaCFunctions::AddFunction ( "guiSetText", CLuaFunctionDefs::GUISetText );
-    CLuaCFunctions::AddFunction ( "guiSetFont", CLuaFunctionDefs::GUISetFont );
-    CLuaCFunctions::AddFunction ( "guiSetSize", CLuaFunctionDefs::GUISetSize );
-    CLuaCFunctions::AddFunction ( "guiSetPosition", CLuaFunctionDefs::GUISetPosition );
-    CLuaCFunctions::AddFunction ( "guiSetVisible", CLuaFunctionDefs::GUISetVisible );
-
-    CLuaCFunctions::AddFunction ( "guiBringToFront", CLuaFunctionDefs::GUIBringToFront );
-    CLuaCFunctions::AddFunction ( "guiMoveToBack", CLuaFunctionDefs::GUIMoveToBack );
-
-    CLuaCFunctions::AddFunction ( "guiCheckBoxSetSelected", CLuaFunctionDefs::GUICheckBoxSetSelected );
-    CLuaCFunctions::AddFunction ( "guiRadioButtonSetSelected", CLuaFunctionDefs::GUIRadioButtonSetSelected );
-
-    CLuaCFunctions::AddFunction ( "guiGetEnabled", CLuaFunctionDefs::GUIGetEnabled );
-    CLuaCFunctions::AddFunction ( "guiGetProperty", CLuaFunctionDefs::GUIGetProperty );
-    CLuaCFunctions::AddFunction ( "guiGetProperties", CLuaFunctionDefs::GUIGetProperties );
-    CLuaCFunctions::AddFunction ( "guiGetAlpha", CLuaFunctionDefs::GUIGetAlpha );
-    CLuaCFunctions::AddFunction ( "guiGetText", CLuaFunctionDefs::GUIGetText );
-    CLuaCFunctions::AddFunction ( "guiGetFont", CLuaFunctionDefs::GUIGetFont );
-    CLuaCFunctions::AddFunction ( "guiGetSize", CLuaFunctionDefs::GUIGetSize );
-    CLuaCFunctions::AddFunction ( "guiGetPosition", CLuaFunctionDefs::GUIGetPosition );
-    CLuaCFunctions::AddFunction ( "guiGetVisible", CLuaFunctionDefs::GUIGetVisible );
-
-    CLuaCFunctions::AddFunction ( "guiCheckBoxGetSelected", CLuaFunctionDefs::GUICheckBoxGetSelected );
-    CLuaCFunctions::AddFunction ( "guiRadioButtonGetSelected", CLuaFunctionDefs::GUIRadioButtonGetSelected );
-
-    CLuaCFunctions::AddFunction ( "guiProgressBarSetProgress", CLuaFunctionDefs::GUIProgressBarSetProgress );
-    CLuaCFunctions::AddFunction ( "guiProgressBarGetProgress", CLuaFunctionDefs::GUIProgressBarGetProgress );
-
-    CLuaCFunctions::AddFunction ( "guiGetScreenSize", CLuaFunctionDefs::GUIGetScreenSize );
-
-    CLuaCFunctions::AddFunction ( "guiEditSetCaretIndex", CLuaFunctionDefs::GUIEditSetCaretIndex );
-    CLuaCFunctions::AddFunction ( "guiEditGetCaretIndex", CLuaFunctionDefs::GUIEditGetCaretIndex );
-    CLuaCFunctions::AddFunction ( "guiEditSetMasked", CLuaFunctionDefs::GUIEditSetMasked );
-    CLuaCFunctions::AddFunction ( "guiEditSetMaxLength", CLuaFunctionDefs::GUIEditSetMaxLength );
-    CLuaCFunctions::AddFunction ( "guiEditSetReadOnly", CLuaFunctionDefs::GUIEditSetReadOnly );
-
-    CLuaCFunctions::AddFunction ( "guiMemoSetCaretIndex", CLuaFunctionDefs::GUIMemoSetCaretIndex );
-    CLuaCFunctions::AddFunction ( "guiMemoGetCaretIndex", CLuaFunctionDefs::GUIMemoGetCaretIndex );
-    CLuaCFunctions::AddFunction ( "guiMemoSetReadOnly", CLuaFunctionDefs::GUIMemoSetReadOnly );
-
-    CLuaCFunctions::AddFunction ( "guiLabelSetColor", CLuaFunctionDefs::GUILabelSetColor );
-    CLuaCFunctions::AddFunction ( "guiLabelGetColor", CLuaFunctionDefs::GUILabelGetColor );
-    CLuaCFunctions::AddFunction ( "guiLabelSetVerticalAlign", CLuaFunctionDefs::GUILabelSetVerticalAlign );
-    CLuaCFunctions::AddFunction ( "guiLabelSetHorizontalAlign", CLuaFunctionDefs::GUILabelSetHorizontalAlign );
-
-    CLuaCFunctions::AddFunction ( "guiLabelGetTextExtent", CLuaFunctionDefs::GUILabelGetTextExtent );
-    CLuaCFunctions::AddFunction ( "guiLabelGetFontHeight", CLuaFunctionDefs::GUILabelGetFontHeight );
-
-    CLuaCFunctions::AddFunction ( "guiWindowSetMovable", CLuaFunctionDefs::GUIWindowSetMovable );
-    CLuaCFunctions::AddFunction ( "guiWindowSetSizable", CLuaFunctionDefs::GUIWindowSetSizable );
-
-    CLuaCFunctions::AddFunction ( "getChatboxLayout", CLuaFunctionDefs::GUIGetChatboxLayout );
-
-    CLuaCFunctions::AddFunction ( "guiComboBoxAddItem", CLuaFunctionDefs::GUIComboBoxAddItem );
-    CLuaCFunctions::AddFunction ( "guiComboBoxRemoveItem", CLuaFunctionDefs::GUIComboBoxRemoveItem );
-    CLuaCFunctions::AddFunction ( "guiComboBoxClear", CLuaFunctionDefs::GUIComboBoxClear );
-    CLuaCFunctions::AddFunction ( "guiComboBoxGetSelected", CLuaFunctionDefs::GUIComboBoxGetSelected );
-    CLuaCFunctions::AddFunction ( "guiComboBoxSetSelected", CLuaFunctionDefs::GUIComboBoxSetSelected );
-    CLuaCFunctions::AddFunction ( "guiComboBoxGetItemText", CLuaFunctionDefs::GUIComboBoxGetItemText );
-    CLuaCFunctions::AddFunction ( "guiComboBoxSetItemText", CLuaFunctionDefs::GUIComboBoxSetItemText );
-
-
     // Util functions
     CLuaCFunctions::AddFunction ( "gettok", CLuaFunctionDefs::GetTok );
     CLuaCFunctions::AddFunction ( "split", CLuaFunctionDefs::Split );
-    CLuaCFunctions::AddFunction ( "setTimer", CLuaFunctionDefs::SetTimer );
-    CLuaCFunctions::AddFunction ( "killTimer", CLuaFunctionDefs::KillTimer );
-    CLuaCFunctions::AddFunction ( "resetTimer", CLuaFunctionDefs::ResetTimer );
-    CLuaCFunctions::AddFunction ( "getTimers", CLuaFunctionDefs::GetTimers );
-    CLuaCFunctions::AddFunction ( "isTimer", CLuaFunctionDefs::IsTimer );
-    CLuaCFunctions::AddFunction ( "getTimerDetails", CLuaFunctionDefs::GetTimerDetails );
     CLuaCFunctions::AddFunction ( "getTickCount", CLuaFunctionDefs::GetTickCount_ );
     CLuaCFunctions::AddFunction ( "getRealTime", CLuaFunctionDefs::GetCTime );
     CLuaCFunctions::AddFunction ( "tocolor", CLuaFunctionDefs::tocolor );
@@ -463,9 +278,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getGroundPosition", CLuaFunctionDefs::GetGroundPosition );
     CLuaCFunctions::AddFunction ( "processLineOfSight", CLuaFunctionDefs::ProcessLineOfSight );
     CLuaCFunctions::AddFunction ( "isLineOfSightClear", CLuaFunctionDefs::IsLineOfSightClear );
-    CLuaCFunctions::AddFunction ( "testLineAgainstWater", CLuaFunctionDefs::TestLineAgainstWater );
-    CLuaCFunctions::AddFunction ( "getWaterLevel", CLuaFunctionDefs::GetWaterLevel );
-    CLuaCFunctions::AddFunction ( "getWaterVertexPosition", CLuaFunctionDefs::GetWaterVertexPosition );
     CLuaCFunctions::AddFunction ( "getWorldFromScreenPosition", CLuaFunctionDefs::GetWorldFromScreenPosition );
     CLuaCFunctions::AddFunction ( "getScreenFromWorldPosition", CLuaFunctionDefs::GetScreenFromWorldPosition );
     CLuaCFunctions::AddFunction ( "getWeather", CLuaFunctionDefs::GetWeather );
@@ -484,7 +296,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "areTrafficLightsLocked", CLuaFunctionDefs::AreTrafficLightsLocked );
     CLuaCFunctions::AddFunction ( "getSkyGradient", CLuaFunctionDefs::GetSkyGradient );
     CLuaCFunctions::AddFunction ( "getHeatHaze", CLuaFunctionDefs::GetHeatHaze );
-    CLuaCFunctions::AddFunction ( "getWaterColor", CLuaFunctionDefs::GetWaterColor );
     CLuaCFunctions::AddFunction ( "getJetpackMaxHeight", CLuaFunctionDefs::GetJetpackMaxHeight );
     CLuaCFunctions::AddFunction ( "getWindVelocity", CLuaFunctionDefs::GetWindVelocity );
     CLuaCFunctions::AddFunction ( "getInteriorSoundsEnabled", CLuaFunctionDefs::GetInteriorSoundsEnabled );
@@ -508,18 +319,10 @@ void CLuaManager::LoadCFunctions ( void )
 
     // World set funcs
     CLuaCFunctions::AddFunction ( "setTime", CLuaFunctionDefs::SetTime );
-    CLuaCFunctions::AddFunction ( "createWater", CLuaFunctionDefs::CreateWater );
-    CLuaCFunctions::AddFunction ( "setWaterLevel", CLuaFunctionDefs::SetWaterLevel );
-    CLuaCFunctions::AddFunction ( "resetWaterLevel", CLuaFunctionDefs::ResetWaterLevel );
-    CLuaCFunctions::AddFunction ( "setWaterVertexPosition", CLuaFunctionDefs::SetWaterVertexPosition );
-    CLuaCFunctions::AddFunction ( "setWaterDrawnLast", CLuaFunctionDefs::SetWaterDrawnLast );
-    CLuaCFunctions::AddFunction ( "isWaterDrawnLast", CLuaFunctionDefs::IsWaterDrawnLast );
     CLuaCFunctions::AddFunction ( "setSkyGradient", CLuaFunctionDefs::SetSkyGradient );
     CLuaCFunctions::AddFunction ( "resetSkyGradient", CLuaFunctionDefs::ResetSkyGradient );
     CLuaCFunctions::AddFunction ( "setHeatHaze", CLuaFunctionDefs::SetHeatHaze );
     CLuaCFunctions::AddFunction ( "resetHeatHaze", CLuaFunctionDefs::ResetHeatHaze );
-    CLuaCFunctions::AddFunction ( "setWaterColor", CLuaFunctionDefs::SetWaterColor );
-    CLuaCFunctions::AddFunction ( "resetWaterColor", CLuaFunctionDefs::ResetWaterColor );
     CLuaCFunctions::AddFunction ( "setWeather", CLuaFunctionDefs::SetWeather );
     CLuaCFunctions::AddFunction ( "setWeatherBlended", CLuaFunctionDefs::SetWeatherBlended );
     CLuaCFunctions::AddFunction ( "setGravity", CLuaFunctionDefs::SetGravity );
@@ -578,67 +381,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setControlState", CLuaFunctionDefs::SetControlState );
     CLuaCFunctions::AddFunction ( "toggleControl", CLuaFunctionDefs::ToggleControl );
     CLuaCFunctions::AddFunction ( "toggleAllControls", CLuaFunctionDefs::ToggleAllControls );
-
-    // XML functions
-    CLuaCFunctions::AddFunction ( "xmlFindChild", CLuaFunctionDefs::XMLNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetChildren", CLuaFunctionDefs::XMLNodeGetChildren );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetValue", CLuaFunctionDefs::XMLNodeGetValue );
-    CLuaCFunctions::AddFunction ( "xmlNodeSetValue", CLuaFunctionDefs::XMLNodeSetValue );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetAttributes", CLuaFunctionDefs::XMLNodeGetAttributes );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetAttribute", CLuaFunctionDefs::XMLNodeGetAttribute );
-    CLuaCFunctions::AddFunction ( "xmlNodeSetAttribute", CLuaFunctionDefs::XMLNodeSetAttribute );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetParent", CLuaFunctionDefs::XMLNodeGetParent );
-    CLuaCFunctions::AddFunction ( "xmlLoadFile", CLuaFunctionDefs::XMLLoadFile );
-    CLuaCFunctions::AddFunction ( "xmlCreateFile", CLuaFunctionDefs::XMLCreateFile );
-    CLuaCFunctions::AddFunction ( "xmlUnloadFile", CLuaFunctionDefs::XMLUnloadFile );
-    CLuaCFunctions::AddFunction ( "xmlSaveFile", CLuaFunctionDefs::XMLSaveFile );
-
-    CLuaCFunctions::AddFunction ( "xmlCreateChild", CLuaFunctionDefs::XMLCreateChild );
-    CLuaCFunctions::AddFunction ( "xmlDestroyNode", CLuaFunctionDefs::XMLDestroyNode );
-    CLuaCFunctions::AddFunction ( "xmlCopyFile", CLuaFunctionDefs::XMLCopyFile );
-
-    CLuaCFunctions::AddFunction ( "xmlNodeGetName", CLuaFunctionDefs::XMLNodeGetName );
-    CLuaCFunctions::AddFunction ( "xmlNodeSetName", CLuaFunctionDefs::XMLNodeSetName );
-
-    // Projectile funcs
-    CLuaCFunctions::AddFunction ( "createProjectile", CLuaFunctionDefs::CreateProjectile );
-    CLuaCFunctions::AddFunction ( "getProjectileType", CLuaFunctionDefs::GetProjectileType );
-    CLuaCFunctions::AddFunction ( "getProjectileTarget", CLuaFunctionDefs::GetProjectileTarget );
-    CLuaCFunctions::AddFunction ( "getProjectileCreator", CLuaFunctionDefs::GetProjectileCreator );
-    CLuaCFunctions::AddFunction ( "getProjectileForce", CLuaFunctionDefs::GetProjectileForce );
-    CLuaCFunctions::AddFunction ( "setProjectileCounter", CLuaFunctionDefs::SetProjectileCounter );
-    CLuaCFunctions::AddFunction ( "getProjectileCounter", CLuaFunctionDefs::GetProjectileCounter );
-
-    // Shape create funcs
-    CLuaCFunctions::AddFunction ( "createColCircle", CLuaFunctionDefs::CreateColCircle );
-    CLuaCFunctions::AddFunction ( "createColCuboid", CLuaFunctionDefs::CreateColCuboid );
-    CLuaCFunctions::AddFunction ( "createColSphere", CLuaFunctionDefs::CreateColSphere );
-    CLuaCFunctions::AddFunction ( "createColRectangle", CLuaFunctionDefs::CreateColRectangle );
-    CLuaCFunctions::AddFunction ( "createColPolygon", CLuaFunctionDefs::CreateColPolygon );
-    CLuaCFunctions::AddFunction ( "createColTube", CLuaFunctionDefs::CreateColTube );
-
-    // Weapon funcs
-    CLuaCFunctions::AddFunction ( "getWeaponNameFromID", CLuaFunctionDefs::GetWeaponNameFromID );
-    CLuaCFunctions::AddFunction ( "getWeaponIDFromName", CLuaFunctionDefs::GetWeaponIDFromName );
-    CLuaCFunctions::AddFunction ( "getSlotFromWeapon", CLuaFunctionDefs::GetSlotFromWeapon );
-    CLuaCFunctions::AddFunction ( "createWeapon", CLuaFunctionDefs::CreateWeapon );
-    CLuaCFunctions::AddFunction ( "setWeaponProperty", CLuaFunctionDefs::SetWeaponProperty );
-    CLuaCFunctions::AddFunction ( "fireWeapon", CLuaFunctionDefs::FireWeapon );
-    CLuaCFunctions::AddFunction ( "setWeaponState", CLuaFunctionDefs::SetWeaponState );
-    CLuaCFunctions::AddFunction ( "getWeaponState", CLuaFunctionDefs::GetWeaponState );
-    CLuaCFunctions::AddFunction ( "setWeaponTarget", CLuaFunctionDefs::SetWeaponTarget );
-    CLuaCFunctions::AddFunction ( "getWeaponTarget", CLuaFunctionDefs::GetWeaponTarget );
-    //CLuaCFunctions::AddFunction ( "setWeaponOwner", CLuaFunctionDefs::SetWeaponOwner );
-    CLuaCFunctions::AddFunction ( "getWeaponOwner", CLuaFunctionDefs::GetWeaponOwner );
-    CLuaCFunctions::AddFunction ( "setWeaponFlags", CLuaFunctionDefs::SetWeaponFlags );
-    CLuaCFunctions::AddFunction ( "getWeaponFlags", CLuaFunctionDefs::GetWeaponFlags );
-    CLuaCFunctions::AddFunction ( "setWeaponFiringRate", CLuaFunctionDefs::SetWeaponFiringRate );
-    CLuaCFunctions::AddFunction ( "getWeaponFiringRate", CLuaFunctionDefs::GetWeaponFiringRate );
-    CLuaCFunctions::AddFunction ( "resetWeaponFiringRate", CLuaFunctionDefs::ResetWeaponFiringRate );
-    CLuaCFunctions::AddFunction ( "getWeaponAmmo", CLuaFunctionDefs::GetWeaponAmmo );
-    CLuaCFunctions::AddFunction ( "getWeaponClipAmmo", CLuaFunctionDefs::GetWeaponClipAmmo );
-    CLuaCFunctions::AddFunction ( "setWeaponAmmo", CLuaFunctionDefs::SetWeaponAmmo );
-    CLuaCFunctions::AddFunction ( "setWeaponClipAmmo", CLuaFunctionDefs::SetWeaponClipAmmo );
 
     // Command funcs
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefs::AddCommandHandler );
@@ -700,19 +442,28 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaBlipDefs::LoadFunctions ();
     CLuaBrowserDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();
+    CLuaColShapeDefs::LoadFunctions ();
     CLuaDrawingDefs::LoadFunctions ();
+    CLuaEffectDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
+    CLuaEngineDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
-    CLuaFxDefs::LoadFunctions ();
+    CLuaGUIDefs::LoadFunctions ();
     CLuaMarkerDefs::LoadFunctions ();
     CLuaObjectDefs::LoadFunctions ();
     CLuaPedDefs::LoadFunctions ();
+    CLuaPickupDefs::LoadFunctions ();
     CLuaPlayerDefs::LoadFunctions ();
+    CLuaProjectileDefs::LoadFunctions ();
     CLuaPointLightDefs::LoadFunctions ();
     CLuaRadarAreaDefs::LoadFunctions ();
     CLuaResourceDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
     CLuaTeamDefs::LoadFunctions ();
+    CLuaTimerDefs::LoadFunctions ();
     CLuaVehicleDefs::LoadFunctions ();
+    CLuaWaterDefs::LoadFunctions ();
+    CLuaWeaponDefs::LoadFunctions ();
+    CLuaXMLDefs::LoadFunctions ();
 }

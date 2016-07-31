@@ -349,7 +349,7 @@ void lua_classfunction ( lua_State* luaVM, const char* szFunction, const char* f
         lua_classfunction ( luaVM, szFunction, pFunction->GetFunctionAddress () );
     }
     else
-        dassert ( false );
+        dassert ( "lua_classfunction function does not exist" && 0 );
 }
 
 void lua_classvariable ( lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get )
@@ -404,7 +404,7 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* s
         if ( CLuaCFunction* pSet = CLuaCFunctions::GetFunction ( set ) )
             fnSet = pSet->GetFunctionAddress ();
         else
-            dassert ( false );
+            dassert ( "lua_classvariable set function does not exist" && 0 );
     }
         
 
@@ -413,7 +413,7 @@ void lua_classvariable ( lua_State* luaVM, const char* szVariable, const char* s
         if ( CLuaCFunction* pGet = CLuaCFunctions::GetFunction ( get ) )
             fnGet = pGet->GetFunctionAddress ();
         else
-            dassert ( false );
+            dassert ( "lua_classvariable get function does not exist" && 0 );
     }
         
 

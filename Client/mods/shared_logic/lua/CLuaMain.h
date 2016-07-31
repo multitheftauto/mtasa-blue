@@ -55,8 +55,6 @@ public:
     const char*                     GetScriptName           ( void ) const                  { return m_strScriptName; }
     void                            SetScriptName           ( const char* szName )          { m_strScriptName.AssignLeft ( szName, MAX_SCRIPTNAME_LENGTH ); }
 
-    void                            RegisterFunction        ( const char* szFunction, lua_CFunction function );
-
     inline lua_State*               GetVM                   ( void )                        { return m_luaVM; };
     inline CLuaTimerManager*        GetTimerManager         ( void ) const                  { return m_pLuaTimerManager; };
 
@@ -71,43 +69,9 @@ public:
     void                            DestroyXML              ( CXMLFile* pFile );
     void                            DestroyXML              ( CXMLNode* pRootNode );
     void                            SaveXML                 ( CXMLNode * pRootNode );
-    bool                            XMLExists               ( CXMLFile* pFile );
     unsigned long                   GetXMLFileCount         ( void ) const                  { return m_XMLFiles.size (); };
     unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
     unsigned long                   GetElementCount         ( void ) const;
-
-    void                            AddPickupClass          ( lua_State* luaVM );
-    void                            AddColShapeClass        ( lua_State* luaVM );
-    void                            AddProjectileClass      ( lua_State* luaVM );
-    void                            AddWaterClass           ( lua_State* luaVM );
-    void                            AddWeaponClass          ( lua_State* luaVM );
-    void                            AddEffectClass          ( lua_State* luaVM );
-
-    void                            AddGuiElementClass      ( lua_State* luaVM );
-    void                            AddGuiFontClass         ( lua_State* luaVM );
-    void                            AddGuiWindowClass       ( lua_State* luaVM );
-    void                            AddGuiButtonClass       ( lua_State* luaVM );
-    void                            AddGuiEditClass         ( lua_State* luaVM );
-    void                            AddGuiLabelClass        ( lua_State* luaVM );
-    void                            AddGuiMemoClass         ( lua_State* luaVM );
-    void                            AddGuiImageClass        ( lua_State* luaVM );
-    void                            AddGuiComboBoxClass     ( lua_State* luaVM );
-    void                            AddGuiCheckBoxClass     ( lua_State* luaVM );
-    void                            AddGuiRadioButtonClass  ( lua_State* luaVM );
-    void                            AddGuiScrollPaneClass   ( lua_State* luaVM );
-    void                            AddGuiScrollBarClass    ( lua_State* luaVM );
-    void                            AddGuiProgressBarClass  ( lua_State* luaVM );
-    void                            AddGuiGridlistClass     ( lua_State* luaVM );
-    void                            AddGuiTabPanelClass     ( lua_State* luaVM );
-    void                            AddGuiTabClass          ( lua_State* luaVM );
-
-    void                            AddTimerClass           ( lua_State* luaVM );
-    void                            AddXMLClass             ( lua_State* luaVM );
-
-    void                            AddEngineClass          ( lua_State* luaVM );
-    void                            AddEngineColClass       ( lua_State* luaVM );
-    void                            AddEngineTxdClass       ( lua_State* luaVM );
-    void                            AddEngineDffClass       ( lua_State* luaVM );
     
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );

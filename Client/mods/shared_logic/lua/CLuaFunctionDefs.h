@@ -82,18 +82,6 @@ public:
     // Fire functions
     LUA_DECLARE ( CreateFire );
 
-    // Pickup create/destroy funcs
-    LUA_DECLARE ( CreatePickup );
-
-    // Pickup get funcs
-    LUA_DECLARE ( GetPickupType );
-    LUA_DECLARE ( GetPickupWeapon );
-    LUA_DECLARE ( GetPickupAmount );
-    LUA_DECLARE ( GetPickupAmmo );
-
-    // Pickup get funcs
-    LUA_DECLARE ( SetPickupType );
-
     // Cursor funcs
     LUA_DECLARE ( GetCursorPosition );
     LUA_DECLARE ( SetCursorPosition );
@@ -103,41 +91,10 @@ public:
     
     LUA_DECLARE ( ShowCursor );
 
-    // Engine (RenderWare lower-level) functions
-    LUA_DECLARE ( EngineLoadDFF );
-    LUA_DECLARE ( EngineLoadTXD );
-    LUA_DECLARE ( EngineLoadCOL );
-    LUA_DECLARE ( EngineImportTXD );
-    LUA_DECLARE ( EngineReplaceCOL );
-    LUA_DECLARE ( EngineRestoreCOL );
-    LUA_DECLARE ( EngineReplaceModel );
-    LUA_DECLARE ( EngineRestoreModel );
-    LUA_DECLARE ( EngineReplaceMatchingAtomics );
-    LUA_DECLARE ( EngineReplaceWheelAtomics );
-    LUA_DECLARE ( EnginePositionAtomic );
-    LUA_DECLARE ( EnginePositionSeats );
-    LUA_DECLARE ( EngineAddAllAtomics );
-    LUA_DECLARE ( EngineReplaceVehiclePart );
-    LUA_DECLARE ( EngineGetModelLODDistance );
-    LUA_DECLARE ( EngineSetModelLODDistance );
-    LUA_DECLARE ( EngineSetAsynchronousLoading );
-    LUA_DECLARE ( EngineApplyShaderToWorldTexture );
-    LUA_DECLARE ( EngineRemoveShaderFromWorldTexture );
-    LUA_DECLARE ( EngineGetModelNameFromID );
-    LUA_DECLARE ( EngineGetModelIDFromName );
-    LUA_DECLARE ( EngineGetModelTextureNames );
-    LUA_DECLARE ( EngineGetVisibleTextureNames );
-
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
     LUA_DECLARE ( GetTok );
     LUA_DECLARE ( Split );
-    LUA_DECLARE ( SetTimer );
-    LUA_DECLARE ( KillTimer );
-    LUA_DECLARE ( ResetTimer );
-    LUA_DECLARE ( GetTimers );
-    LUA_DECLARE ( IsTimer );
-    LUA_DECLARE ( GetTimerDetails );
     LUA_DECLARE ( GetTickCount_ );
     LUA_DECLARE ( GetCTime );
     LUA_DECLARE ( tocolor );
@@ -148,140 +105,11 @@ public:
     LUA_DECLARE ( SetDevelopmentMode );
     LUA_DECLARE ( GetDevelopmentMode );
 
-    // GUI funcs
-    LUA_DECLARE ( GUIGetInputEnabled );
-    LUA_DECLARE ( GUIGetInputMode );
-    LUA_DECLARE ( GUISetInputEnabled );
-    LUA_DECLARE ( GUISetInputMode );
-    LUA_DECLARE ( GUIIsChatBoxInputActive );
-    LUA_DECLARE ( GUIIsConsoleActive );
-    LUA_DECLARE ( GUIIsDebugViewActive );
-    LUA_DECLARE ( GUIIsMainMenuActive );
-    LUA_DECLARE ( GUIIsMTAWindowActive );
-    LUA_DECLARE ( GUIIsTransferBoxActive );
-    LUA_DECLARE ( GUICreateWindow );
-    LUA_DECLARE ( GUICreateLabel );
-    LUA_DECLARE ( GUICreateButton );
-    LUA_DECLARE ( GUICreateEdit );
-    LUA_DECLARE ( GUICreateMemo );
-    LUA_DECLARE ( GUICreateGridList );
-    LUA_DECLARE ( GUICreateScrollBar );
-    LUA_DECLARE ( GUICreateScrollPane );
-    LUA_DECLARE ( GUICreateTabPanel );
-    LUA_DECLARE ( GUICreateTab );
-    LUA_DECLARE ( GUICreateProgressBar );
-    LUA_DECLARE ( GUICreateCheckBox );
-    LUA_DECLARE ( GUICreateRadioButton );
-    LUA_DECLARE ( GUICreateStaticImage );
-    LUA_DECLARE ( GUICreateFont );
-    LUA_DECLARE ( GUIStaticImageLoadImage );
-    LUA_DECLARE ( GUIStaticImageGetNativeSize );
-    LUA_DECLARE ( GUIGetSelectedTab );
-    LUA_DECLARE ( GUISetSelectedTab );
-    LUA_DECLARE ( GUIDeleteTab );
-    LUA_DECLARE ( GUIScrollBarSetScrollPosition );
-    LUA_DECLARE ( GUIScrollBarGetScrollPosition );
-    LUA_DECLARE ( GUIGridListSetSortingEnabled );
-    LUA_DECLARE ( GUIGridListAddColumn );
-    LUA_DECLARE ( GUIGridListRemoveColumn );
-    LUA_DECLARE ( GUIGridListSetColumnWidth );
-    LUA_DECLARE ( GUIGridListGetColumnWidth );
-    LUA_DECLARE ( GUIGridListSetColumnTitle );
-    LUA_DECLARE ( GUIGridListGetColumnTitle );
-    LUA_DECLARE ( GUIGridListSetScrollBars );
-    LUA_DECLARE ( GUIGridListGetRowCount );
-    LUA_DECLARE ( GUIGridListGetColumnCount );
-    LUA_DECLARE ( GUIGridListAddRow );
-    LUA_DECLARE ( GUIGridListInsertRowAfter );
-    LUA_DECLARE ( GUIGridListRemoveRow );
-    LUA_DECLARE ( GUIGridListAutoSizeColumn );
-    LUA_DECLARE ( GUIGridListClear );
-    LUA_DECLARE ( GUIGridListSetItemText );
-    LUA_DECLARE ( GUIGridListGetItemText );
-    LUA_DECLARE ( GUIGridListSetItemData );
-    LUA_DECLARE ( GUIGridListGetItemData );
-    LUA_DECLARE ( GUIGridListSetItemColor );
-    LUA_DECLARE ( GUIGridListGetItemColor );
-    LUA_DECLARE ( GUIGridListSetSelectionMode );
-    LUA_DECLARE ( GUIGridListGetSelectedItem );
-    LUA_DECLARE ( GUIGridListGetSelectedItems );
-    LUA_DECLARE ( GUIGridListGetSelectedCount );
-    LUA_DECLARE ( GUIGridListSetSelectedItem );
-    LUA_DECLARE ( GUIGridListSetHorizontalScrollPosition );
-    LUA_DECLARE ( GUIGridListGetHorizontalScrollPosition );
-    LUA_DECLARE ( GUIGridListSetVerticalScrollPosition );
-    LUA_DECLARE ( GUIGridListGetVerticalScrollPosition );
-    LUA_DECLARE ( GUIScrollPaneSetScrollBars );
-    LUA_DECLARE ( GUIScrollPaneSetHorizontalScrollPosition );
-    LUA_DECLARE ( GUIScrollPaneGetHorizontalScrollPosition );
-    LUA_DECLARE ( GUIScrollPaneSetVerticalScrollPosition );
-    LUA_DECLARE ( GUIScrollPaneGetVerticalScrollPosition );
-    LUA_DECLARE ( GUIDestroyElement );
-    LUA_DECLARE ( GUISetEnabled );
-    LUA_DECLARE ( GUISetText );
-    LUA_DECLARE ( GUISetFont );
-    LUA_DECLARE ( GUISetSize );
-    LUA_DECLARE ( GUISetPosition );
-    LUA_DECLARE ( GUISetVisible );
-    LUA_DECLARE ( GUISetAlpha );
-    LUA_DECLARE ( GUISetProperty );
-    LUA_DECLARE ( GUIBringToFront );
-    LUA_DECLARE ( GUIMoveToBack );
-    LUA_DECLARE ( GUICheckBoxSetSelected );
-    LUA_DECLARE ( GUIRadioButtonSetSelected );    
-    LUA_DECLARE ( GUIGetEnabled );
-    LUA_DECLARE ( GUIGetText );
-    LUA_DECLARE ( GUIGetFont );
-    LUA_DECLARE ( GUIGetSize );
-    LUA_DECLARE ( GUIGetPosition );
-    LUA_DECLARE ( GUIGetVisible );
-    LUA_DECLARE ( GUIGetAlpha );
-    LUA_DECLARE ( GUIGetProperty );
-    LUA_DECLARE ( GUIGetProperties );
-    LUA_DECLARE ( GUICheckBoxGetSelected );
-    LUA_DECLARE ( GUIRadioButtonGetSelected );
-    LUA_DECLARE ( GUIGetScreenSize );
-    LUA_DECLARE ( GUIProgressBarSetProgress );
-    LUA_DECLARE ( GUIProgressBarGetProgress );
-    LUA_DECLARE ( GUIEditSetReadOnly );
-    LUA_DECLARE ( GUIEditSetMasked );
-    LUA_DECLARE ( GUIEditSetMaxLength );
-    LUA_DECLARE ( GUIEditSetCaretIndex );
-    LUA_DECLARE ( GUIEditGetCaretIndex );
-    LUA_DECLARE ( GUIMemoSetReadOnly );
-    LUA_DECLARE ( GUIMemoSetCaretIndex );
-    LUA_DECLARE ( GUIMemoGetCaretIndex );
-    LUA_DECLARE ( GUIWindowSetMovable );
-    LUA_DECLARE ( GUIWindowSetSizable );
-    LUA_DECLARE ( GUIWindowGetMovable );
-    LUA_DECLARE ( GUIWindowGetSizable );
-    LUA_DECLARE ( GUIWindowGetCloseButtonEnabled );
-    LUA_DECLARE ( GUIWindowGetTitleBarEnabled );
-    LUA_DECLARE ( GUILabelSetColor );
-    LUA_DECLARE ( GUILabelGetColor );
-    LUA_DECLARE ( GUILabelSetVerticalAlign );
-    LUA_DECLARE ( GUILabelSetHorizontalAlign );
-    LUA_DECLARE ( GUILabelGetTextExtent );
-    LUA_DECLARE ( GUILabelGetFontHeight );
-    LUA_DECLARE ( GUIGetChatboxLayout );
-    LUA_DECLARE ( GUICreateComboBox );
-    LUA_DECLARE ( GUIComboBoxAddItem );
-    LUA_DECLARE ( GUIComboBoxRemoveItem );
-    LUA_DECLARE ( GUIComboBoxClear );
-    LUA_DECLARE ( GUIComboBoxGetSelected );
-    LUA_DECLARE ( GUIComboBoxSetSelected );
-    LUA_DECLARE ( GUIComboBoxGetItemText );
-    LUA_DECLARE ( GUIComboBoxSetItemText );
-
     // World functions
     LUA_DECLARE ( GetTime_ );
     LUA_DECLARE ( GetGroundPosition );
     LUA_DECLARE ( ProcessLineOfSight );
     LUA_DECLARE ( IsLineOfSightClear );
-    LUA_DECLARE ( TestLineAgainstWater );
-    LUA_DECLARE ( CreateWater );
-    LUA_DECLARE ( GetWaterLevel );
-    LUA_DECLARE ( GetWaterVertexPosition );
     LUA_DECLARE ( GetWorldFromScreenPosition );
     LUA_DECLARE ( GetScreenFromWorldPosition  );
     LUA_DECLARE ( GetWeather );
@@ -310,19 +138,11 @@ public:
     LUA_DECLARE ( GetHeatHaze );
     LUA_DECLARE ( SetHeatHaze );
     LUA_DECLARE ( ResetHeatHaze );
-    LUA_DECLARE ( GetWaterColor );
-    LUA_DECLARE ( SetWaterColor );
-    LUA_DECLARE ( ResetWaterColor );
     LUA_DECLARE ( SetWeather );
     LUA_DECLARE ( SetWeatherBlended );
     LUA_DECLARE ( SetGravity );
     LUA_DECLARE ( SetGameSpeed );
     LUA_DECLARE ( SetMinuteDuration );
-    LUA_DECLARE ( SetWaterLevel );
-    LUA_DECLARE ( ResetWaterLevel );
-    LUA_DECLARE ( IsWaterDrawnLast );
-    LUA_DECLARE ( SetWaterDrawnLast );
-    LUA_DECLARE ( SetWaterVertexPosition );
     LUA_DECLARE ( SetWaveHeight );
     LUA_DECLARE ( SetGarageOpen );
     LUA_DECLARE ( SetWorldSpecialPropertyEnabled );
@@ -392,65 +212,6 @@ public:
     LUA_DECLARE ( SetControlState );
     LUA_DECLARE ( ToggleControl );
     LUA_DECLARE ( ToggleAllControls );
-
-    // XML Functions
-    LUA_DECLARE ( XMLNodeFindChild );
-    LUA_DECLARE ( XMLNodeGetChildren );
-    LUA_DECLARE ( XMLNodeGetValue );
-    LUA_DECLARE ( XMLNodeSetValue );
-    LUA_DECLARE ( XMLNodeGetAttributes );
-    LUA_DECLARE ( XMLNodeGetAttribute );
-    LUA_DECLARE ( XMLNodeSetAttribute );
-    LUA_DECLARE ( XMLNodeGetParent );
-    LUA_DECLARE ( XMLLoadFile );
-    LUA_DECLARE ( XMLCreateFile );
-    LUA_DECLARE ( XMLUnloadFile );
-    LUA_DECLARE ( XMLSaveFile );
-    LUA_DECLARE ( XMLCreateChild );
-    LUA_DECLARE ( XMLDestroyNode );
-    LUA_DECLARE ( XMLCopyFile );
-    LUA_DECLARE ( XMLNodeGetName );
-    LUA_DECLARE ( XMLNodeSetName );
-
-    // Projectile funcs
-    LUA_DECLARE ( CreateProjectile );
-    LUA_DECLARE ( GetProjectileType );
-    LUA_DECLARE ( GetProjectileTarget );
-    LUA_DECLARE ( GetProjectileCreator );
-    LUA_DECLARE ( GetProjectileForce );
-    LUA_DECLARE ( GetProjectileCounter );
-    LUA_DECLARE ( SetProjectileCounter );
-
-    // Shape create funcs
-    LUA_DECLARE ( CreateColCircle );
-    LUA_DECLARE ( CreateColCuboid );
-    LUA_DECLARE ( CreateColSphere );
-    LUA_DECLARE ( CreateColRectangle );
-    LUA_DECLARE ( CreateColPolygon );
-    LUA_DECLARE ( CreateColTube );
-
-    // Weapon funcs
-    LUA_DECLARE ( GetWeaponNameFromID );
-    LUA_DECLARE ( GetWeaponIDFromName );
-    LUA_DECLARE ( GetSlotFromWeapon );
-    LUA_DECLARE ( CreateWeapon );
-    LUA_DECLARE ( FireWeapon );
-    LUA_DECLARE ( SetWeaponProperty );
-    LUA_DECLARE ( SetWeaponState );
-    LUA_DECLARE ( GetWeaponState );
-    LUA_DECLARE ( SetWeaponTarget );
-    LUA_DECLARE ( GetWeaponTarget );
-    LUA_DECLARE ( SetWeaponOwner );
-    LUA_DECLARE ( GetWeaponOwner );
-    LUA_DECLARE ( SetWeaponFlags );
-    LUA_DECLARE ( GetWeaponFlags );
-    LUA_DECLARE ( SetWeaponFiringRate );
-    LUA_DECLARE ( GetWeaponFiringRate );
-    LUA_DECLARE ( ResetWeaponFiringRate );
-    LUA_DECLARE ( GetWeaponAmmo );
-    LUA_DECLARE ( GetWeaponClipAmmo );
-    LUA_DECLARE ( SetWeaponAmmo );
-    LUA_DECLARE ( SetWeaponClipAmmo );
 
     // Command funcs
     LUA_DECLARE ( AddCommandHandler );
