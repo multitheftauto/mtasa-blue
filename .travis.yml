@@ -1,5 +1,27 @@
-language: cpp
-compiler: 
-  - gcc
+sudo: false
+language: csharp
+mono:
+    - alpha
 
-script: make config=release_x64
+solution: SteamKit2/SteamKit2.sln
+
+install:
+    - nuget restore SteamKit2/SteamKit2.sln
+    - nuget restore Samples/Samples.sln
+    - nuget install xunit.runner.console -Version 2.0.0 -o SteamKit2/packages
+
+script:
+    - xbuild /p:NoWarn=1584 SteamKit2/SteamKit2.sln /target:SteamKit2 /target:Tests
+    - xbuild Samples/Samples.sln
+    - mono SteamKit2/packages/xunit.runner.console.2.0.0/tools/xunit.console.exe SteamKit2/Tests/bin/Debug/Tests.dll
+
+notifications:
+    irc:
+        channels:
+            - "irc.gamesurge.net#opensteamworks"
+        on_success: never
+        on_failure: always
+
+cache:
+    directories:
+        - "~/.local/share/NuGet/Cache"
