@@ -1,7 +1,7 @@
 project "CEFLauncher"
 	language "C++"
 	kind "WindowedApp"
-	targetname "ceflauncher"
+	targetname "CEFLauncher"
 	targetdir(buildpath("mta/cef"))
 	
 	includedirs { "../sdk" }

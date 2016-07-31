@@ -27,7 +27,7 @@ if os.get() == "windows" then
 	project "Lua_Client"
 		language "C++"
 		kind "SharedLib"
-		targetname "lua5.1"
+		targetname "lua5.1c"
 		targetdir(buildpath("mods/deathmatch"))
 
 		vpaths { 
