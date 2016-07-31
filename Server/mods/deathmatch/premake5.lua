@@ -63,4 +63,7 @@ project "Deathmatch"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
 		links { "ws2_32" }
+		
+	filter "system:not windows"
+		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
 	
