@@ -13,10 +13,9 @@
 
 class CElementGroup;
 
-#ifndef CELEMENTGROUP_H
-#define CELEMENTGROUP_H
+#pragma once
 
-#include "../../shared_logic/CClientEntity.h"
+#include "CClientEntity.h"
 
 class CElementGroup
 {
@@ -28,5 +27,3 @@ public:
     void                            Remove ( CClientEntity * element );
     unsigned int                    GetCount ( void );
 };
-
-#endif
