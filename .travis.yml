@@ -4,6 +4,14 @@ sudo: required
 compiler: 
   - gcc
 
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-5
+    - g++-5
+    
 before_script:
   - utils/premake5_x64 gmake
   - cd Build
