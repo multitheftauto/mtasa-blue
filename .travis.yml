@@ -17,5 +17,5 @@ before_script:
   - utils/premake5_x64 gmake
   - cd Build
 
-script: make CXX=$COMPILER config=release_x64
+script: echo breakpad.make
  
