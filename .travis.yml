@@ -17,5 +17,5 @@ before_script:
   - utils/premake5_x64 gmake
   - cd Build
 
-script: make CXX=g++-5 CC=g++-5 release_x64
+script: make CXX=g++-5 CC=g++-5 config=release_x64
  
