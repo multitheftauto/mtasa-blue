@@ -1,3 +1,7 @@
+-- Add buildactions to path
+premake.path = premake.path..";utils/buildactions"
+require "compose_files"
+
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 	platforms { "x86", "x64"}
