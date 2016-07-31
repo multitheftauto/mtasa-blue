@@ -1,6 +1,4 @@
 language: cpp
-dist: trusty
-sudo: required
 compiler: 
   - gcc
 
@@ -11,6 +9,7 @@ addons:
     packages:
     - gcc-5
     - g++-5
+    env: COMPILER=g++-5
     
 before_script:
   - utils/premake5_x64 gmake
