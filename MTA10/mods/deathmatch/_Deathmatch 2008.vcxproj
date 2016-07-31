@@ -373,6 +373,8 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaColShapeDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaDrawingDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaElementDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaEngineDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaGUIDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaMarkerDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaObjectDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaPickupDefs.cpp" />
@@ -578,9 +580,7 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.BodyClothes.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Commands.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Engine.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Event.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.GUI.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Input.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Util.cpp" />
@@ -764,6 +764,8 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaColShapeDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaDrawingDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaElementDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaEngineDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaGUIDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaMarkerDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaObjectDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaPickupDefs.h" />

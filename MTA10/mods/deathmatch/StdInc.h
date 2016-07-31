@@ -114,8 +114,10 @@
 #include <luadefs/CLuaColShapeDefs.h>
 #include <luadefs/CLuaDrawingDefs.h>
 #include <luadefs/CLuaElementDefs.h>
+#include <luadefs/CLuaEngineDefs.h>
 #include <luadefs/CLuaFileDefs.h>
 #include <luadefs/CLuaFxDefs.h>
+#include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaMatrixDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
