@@ -19,3 +19,9 @@ before_script:
 
 script: make CXX=g++-5 CC=gcc-5 config=release_x64
  
+notifications:
+  irc:
+    channels:
+      - "irc.gtanet.com#mta"
+    on_success: change
+    on_failure: always
