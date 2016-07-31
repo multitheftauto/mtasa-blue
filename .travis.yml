@@ -1,5 +1,9 @@
-language: ruby
-rvm:
- - 2.2
- - jruby
- - rbx-2
+language: cpp
+compiler: 
+  - gcc
+
+before_script:
+  - utils/premake5_x64 gmake
+  - cd Build
+
+script: make config=release_x64
