@@ -2375,10 +2375,13 @@ int CLuaVehicleDefs::SetTrainTrack ( lua_State* luaVM )
 int CLuaVehicleDefs::SetTrainPosition ( lua_State* luaVM )
 {
     CClientVehicle* pVehicle = NULL;
-    float fPosition;
+    float fPosition = 0;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
     argStream.ReadNumber ( fPosition );
+
+    if (abs(fPosition) > LONG_MAX)
+        argStream.SetCustomError ( "Train position supplied is too large" );
 
     if ( !argStream.HasErrors () )
     {
