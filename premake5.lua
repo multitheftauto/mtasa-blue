@@ -37,6 +37,10 @@ workspace "MTASA"
 	filter "configurations:Release or configurations:Nightly"
 		flags { "Optimize" }
 		
+	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
+		os.mkdir("Build/Symbols")
+		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
+		
 	filter "system:windows"
 		defines { "WIN32", "_WIN32" }
 		includedirs { 

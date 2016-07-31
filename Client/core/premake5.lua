@@ -57,7 +57,7 @@ project "Client Core"
 	filter "configurations:Debug"		
 		libdirs { "../../vendor/cef3/Debug" }
 
-	filter "configurations:Release"
+	filter "configurations:Release or configurations:Nightly"
 		libdirs { "../../vendor/cef3/Release" }
 		
 	filter "system:not windows"
