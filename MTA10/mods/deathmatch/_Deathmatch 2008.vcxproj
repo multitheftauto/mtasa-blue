@@ -372,6 +372,7 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaCameraDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaColShapeDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaDrawingDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaEffectDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaElementDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaEngineDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaGUIDefs.cpp" />
@@ -386,12 +387,14 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaResourceDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaTeamDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaTimerDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector4Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVehicleDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaWaterDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaWeaponDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaXMLDefs.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector4.cpp" />
@@ -586,7 +589,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Util.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Voice.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.World.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.XML.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionParseHelpers.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionRef.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaMain.cpp" />
@@ -599,7 +601,6 @@
     <ClCompile Include="..\shared_logic\luadefs\CLuaClassDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaFileDefs.cpp" />
-    <ClCompile Include="..\shared_logic\luadefs\CLuaFxDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaMatrixDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaTaskDefs.cpp" />
     <ClCompile Include="..\..\..\vendor\bob_withers\base64.cpp" />
@@ -763,6 +764,7 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaCameraDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaColShapeDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaDrawingDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaEffectDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaElementDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaEngineDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaGUIDefs.h" />
@@ -777,12 +779,14 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaResourceDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaTeamDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaTimerDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector4Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVehicleDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaWaterDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaWeaponDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaXMLDefs.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaVector2.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaVector3.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaVector4.h" />
@@ -1001,7 +1005,6 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaClassDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaFileDefs.h" />
-    <ClInclude Include="..\shared_logic\luadefs\CLuaFxDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaMatrixDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaTaskDefs.h" />
     <ClInclude Include="..\shared_logic\lua\oopdefs\CLuaOOPDefs.h" />

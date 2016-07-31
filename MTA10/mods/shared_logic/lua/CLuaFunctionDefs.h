@@ -95,12 +95,6 @@ public:
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
     LUA_DECLARE ( GetTok );
     LUA_DECLARE ( Split );
-    LUA_DECLARE ( SetTimer );
-    LUA_DECLARE ( KillTimer );
-    LUA_DECLARE ( ResetTimer );
-    LUA_DECLARE ( GetTimers );
-    LUA_DECLARE ( IsTimer );
-    LUA_DECLARE ( GetTimerDetails );
     LUA_DECLARE ( GetTickCount_ );
     LUA_DECLARE ( GetCTime );
     LUA_DECLARE ( tocolor );
@@ -218,25 +212,6 @@ public:
     LUA_DECLARE ( SetControlState );
     LUA_DECLARE ( ToggleControl );
     LUA_DECLARE ( ToggleAllControls );
-
-    // XML Functions
-    LUA_DECLARE ( XMLNodeFindChild );
-    LUA_DECLARE ( XMLNodeGetChildren );
-    LUA_DECLARE ( XMLNodeGetValue );
-    LUA_DECLARE ( XMLNodeSetValue );
-    LUA_DECLARE ( XMLNodeGetAttributes );
-    LUA_DECLARE ( XMLNodeGetAttribute );
-    LUA_DECLARE ( XMLNodeSetAttribute );
-    LUA_DECLARE ( XMLNodeGetParent );
-    LUA_DECLARE ( XMLLoadFile );
-    LUA_DECLARE ( XMLCreateFile );
-    LUA_DECLARE ( XMLUnloadFile );
-    LUA_DECLARE ( XMLSaveFile );
-    LUA_DECLARE ( XMLCreateChild );
-    LUA_DECLARE ( XMLDestroyNode );
-    LUA_DECLARE ( XMLCopyFile );
-    LUA_DECLARE ( XMLNodeGetName );
-    LUA_DECLARE ( XMLNodeSetName );
 
     // Command funcs
     LUA_DECLARE ( AddCommandHandler );

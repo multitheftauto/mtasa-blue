@@ -593,9 +593,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.World.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.XML.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionParseHelpers.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
@@ -630,9 +627,6 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaFileDefs.cpp">
-      <Filter>Source Files\shared_logic\luadefs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\luadefs\CLuaFxDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaMatrixDefs.cpp">
@@ -924,6 +918,15 @@
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\luadefs\CLuaGUIDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaTimerDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaXMLDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaEffectDefs.cpp">
       <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1567,9 +1570,6 @@
     <ClInclude Include="..\shared_logic\luadefs\CLuaFileDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared_logic\luadefs\CLuaFxDefs.h">
-      <Filter>Header Files\shared_logic\luadefs</Filter>
-    </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaMatrixDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
@@ -1718,6 +1718,15 @@
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
     <ClInclude Include="..\shared_logic\luadefs\CLuaGUIDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaTimerDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaXMLDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaEffectDefs.h">
       <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>

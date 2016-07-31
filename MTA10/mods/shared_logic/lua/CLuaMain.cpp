@@ -88,88 +88,6 @@ void CLuaMain::InitSecurity ( void )
     lua_register ( m_luaVM, "newproxy", CLuaFunctionDefs::DisabledFunction );
 }
 
-void CLuaMain::AddEffectClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "createEffect" );
-    lua_classfunction ( luaVM, "addBlood", "fxAddBlood" );
-    lua_classfunction ( luaVM, "addBulletImpact", "fxAddBulletImpact" );
-    lua_classfunction ( luaVM, "addBulletSplash", "fxAddBulletSplash" );
-    lua_classfunction ( luaVM, "addDebris", "fxAddDebris" );
-    lua_classfunction ( luaVM, "addFootSplash", "fxAddFootSplash" );
-    lua_classfunction ( luaVM, "addGlass", "fxAddGlass" );
-    lua_classfunction ( luaVM, "addGunshot", "fxAddGunshot" );
-    lua_classfunction ( luaVM, "addPunchImpact", "fxAddPunchImpact" );
-    lua_classfunction ( luaVM, "addSparks", "fxAddSparks" );
-    lua_classfunction ( luaVM, "addTankFire", "fxAddTankFire" );
-    lua_classfunction ( luaVM, "addTyreBurst", "fxAddTyreBurst" );
-    lua_classfunction ( luaVM, "addWaterHydrant", "fxAddWaterHydrant" );
-    lua_classfunction ( luaVM, "addWaterSplash", "fxAddWaterSplash" );
-    lua_classfunction ( luaVM, "addWood", "fxAddWood" );
-
-    lua_classfunction ( luaVM, "setDensity", "setEffectDensity" );
-    lua_classfunction ( luaVM, "setSpeed", "setEffectSpeed" );
-
-    lua_classfunction ( luaVM, "getDensity", "getEffectDensity" );
-    lua_classfunction ( luaVM, "getSpeed", "getEffectSpeed" );
-    
-    lua_classvariable ( luaVM, "density", "setEffectDensity", "getEffectDensity" );
-    lua_classvariable ( luaVM, "speed", "setEffectSpeed", "getEffectSpeed" );
-    
-    lua_registerclass ( luaVM, "Effect", "Element" );
-}
-
-void CLuaMain::AddTimerClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-
-    lua_classfunction ( luaVM, "create", "setTimer" );
-    lua_classfunction ( luaVM, "destroy", "killTimer" );
-    lua_classfunction ( luaVM, "reset", "resetTimer" );
-    lua_classfunction ( luaVM, "isValid", "isTimer" );
-    
-    lua_classfunction ( luaVM, "getDetails", "getTimerDetails" );
-    
-    lua_classvariable ( luaVM, "valid", NULL, "isTimer" );
-
-    lua_registerclass ( luaVM, "Timer" );
-}
-
-void CLuaMain::AddXMLClass ( lua_State* luaVM )
-{
-    lua_newclass ( luaVM );
-    
-    lua_classfunction ( luaVM, "load", "xmlLoadFile" );
-    lua_classfunction ( luaVM, "unload", "xmlUnloadFile" );
-    lua_classfunction ( luaVM, "copy", "xmlCopyFile" );
-    lua_classfunction ( luaVM, "create", "xmlCreateFile" );
-    lua_classfunction ( luaVM, "destroy", "xmlDestroyNode" );
-    
-    lua_classfunction ( luaVM, "getValue", "xmlNodeGetValue" );
-    lua_classfunction ( luaVM, "setAttribute", "xmlNodeSetAttribute" );
-    lua_classfunction ( luaVM, "setValue", "xmlNodeSetValue" );
-    lua_classfunction ( luaVM, "saveFile", "xmlSaveFile" );
-    lua_classfunction ( luaVM, "createChild", "xmlCreateChild" );
-    lua_classfunction ( luaVM, "findChild", "xmlFindChild" );
-    
-    lua_classfunction ( luaVM, "getAttributes", "xmlNodeGetAttributes" );
-    lua_classfunction ( luaVM, "getChildren", "xmlNodeGetChildren" );
-    lua_classfunction ( luaVM, "getName", "xmlNodeGetName" );
-    lua_classfunction ( luaVM, "getParent", "xmlNodeGetParent" );
-    lua_classfunction ( luaVM, "getAttribute", "xmlNodeGetAttribute" ); // table classvar?
-    
-    lua_classfunction ( luaVM, "setName", "xmlNodeSetName" );
-    
-    lua_classvariable ( luaVM, "value", "xmlNodeSetValue", "xmlNodeGetValue" );
-    lua_classvariable ( luaVM, "name", "xmlNodeSetName", "xmlNodeGetName" );
-    lua_classvariable ( luaVM, "attributes", NULL, "xmlNodeGetAttributes" );
-    lua_classvariable ( luaVM, "children", NULL, "xmlNodeGetChildren" );
-    lua_classvariable ( luaVM, "parent", NULL, "xmlNodeGetParent" );
-    
-    lua_registerclass ( luaVM, "XML" );
-}
-
 void CLuaMain::InitClasses ( lua_State* luaVM )
 {
     lua_initclasses             ( luaVM );
@@ -183,10 +101,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
         return;
 
     CLuaElementDefs::AddClass ( luaVM );
-  
-    AddEffectClass              ( luaVM );
-    AddTimerClass               ( luaVM );
-    AddXMLClass                 ( luaVM );
 
     CLuaAudioDefs::AddClass ( luaVM );
     CLuaBlipDefs::AddClass      ( luaVM );
@@ -194,6 +108,7 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaColShapeDefs::AddClass ( luaVM );
     CLuaDrawingDefs::AddClass ( luaVM );
     CLuaEngineDefs::AddClass ( luaVM );
+    CLuaEffectDefs::AddClass ( luaVM );
     CLuaFileDefs::AddClass ( luaVM );
     CLuaGUIDefs::AddClass ( luaVM ); CLuaBrowserDefs::AddClass ( luaVM ); // browser must be after drawing/gui, since it extends DxTexture/GUIElement
     CLuaMarkerDefs::AddClass ( luaVM );
@@ -207,9 +122,11 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaResourceDefs::AddClass ( luaVM );
     CLuaSearchLightDefs::AddClass ( luaVM );
     CLuaTeamDefs::AddClass ( luaVM );
+    CLuaTimerDefs::AddClass ( luaVM );
+    CLuaVehicleDefs::AddClass ( luaVM );
     CLuaWaterDefs::AddClass ( luaVM );
     CLuaWeaponDefs::AddClass ( luaVM );
-    CLuaVehicleDefs::AddClass ( luaVM );
+    CLuaXMLDefs::AddClass ( luaVM );
 }
 
 void CLuaMain::InitVM ( void )

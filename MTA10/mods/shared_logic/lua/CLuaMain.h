@@ -55,8 +55,6 @@ public:
     const char*                     GetScriptName           ( void ) const                  { return m_strScriptName; }
     void                            SetScriptName           ( const char* szName )          { m_strScriptName.AssignLeft ( szName, MAX_SCRIPTNAME_LENGTH ); }
 
-    void                            RegisterFunction        ( const char* szFunction, lua_CFunction function );
-
     inline lua_State*               GetVM                   ( void )                        { return m_luaVM; };
     inline CLuaTimerManager*        GetTimerManager         ( void ) const                  { return m_pLuaTimerManager; };
 
@@ -71,14 +69,9 @@ public:
     void                            DestroyXML              ( CXMLFile* pFile );
     void                            DestroyXML              ( CXMLNode* pRootNode );
     void                            SaveXML                 ( CXMLNode * pRootNode );
-    bool                            XMLExists               ( CXMLFile* pFile );
     unsigned long                   GetXMLFileCount         ( void ) const                  { return m_XMLFiles.size (); };
     unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
     unsigned long                   GetElementCount         ( void ) const;
-
-    void                            AddEffectClass          ( lua_State* luaVM );
-    void                            AddTimerClass           ( lua_State* luaVM );
-    void                            AddXMLClass             ( lua_State* luaVM );
     
     void                            InitClasses             ( lua_State* luaVM );
     void                            InitVM                  ( void );

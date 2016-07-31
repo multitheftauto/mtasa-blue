@@ -113,10 +113,10 @@
 #include <luadefs/CLuaCameraDefs.h>
 #include <luadefs/CLuaColShapeDefs.h>
 #include <luadefs/CLuaDrawingDefs.h>
+#include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaEngineDefs.h>
 #include <luadefs/CLuaFileDefs.h>
-#include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaMatrixDefs.h>
@@ -131,12 +131,14 @@
 #include <luadefs/CLuaSearchLightDefs.h>
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaTeamDefs.h>
-#include <luadefs/CLuaWaterDefs.h>
+#include <luadefs/CLuaTimerDefs.h>
 #include <luadefs/CLuaVector2Defs.h>
 #include <luadefs/CLuaVector3Defs.h>
 #include <luadefs/CLuaVector4Defs.h>
 #include <luadefs/CLuaVehicleDefs.h>
+#include <luadefs/CLuaWaterDefs.h>
 #include <luadefs/CLuaWeaponDefs.h>
+#include <luadefs/CLuaXMLDefs.h>
 #include <CRemoteCalls.h>
 
 // Shared includes

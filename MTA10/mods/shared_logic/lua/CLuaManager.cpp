@@ -206,11 +206,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleRotation", CLuaElementDefs::SetElementRotation );
     CLuaCFunctions::AddFunction ( "attachElementToElement", CLuaElementDefs::AttachElements );
     CLuaCFunctions::AddFunction ( "detachElementFromElement", CLuaElementDefs::DetachElements );
-    CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaFunctionDefs::XMLNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaFunctionDefs::XMLNodeGetChildren );
-    CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaFunctionDefs::XMLNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaFunctionDefs::XMLCreateChild );
-    CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaFunctionDefs::XMLNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaXMLDefs::XMLNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaXMLDefs::XMLNodeGetChildren );
+    CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaXMLDefs::XMLNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaXMLDefs::XMLCreateChild );
+    CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaXMLDefs::XMLNodeFindChild );
     CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaPedDefs::IsPedDead );
     CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex );
@@ -264,12 +264,6 @@ void CLuaManager::LoadCFunctions ( void )
     // Util functions
     CLuaCFunctions::AddFunction ( "gettok", CLuaFunctionDefs::GetTok );
     CLuaCFunctions::AddFunction ( "split", CLuaFunctionDefs::Split );
-    CLuaCFunctions::AddFunction ( "setTimer", CLuaFunctionDefs::SetTimer );
-    CLuaCFunctions::AddFunction ( "killTimer", CLuaFunctionDefs::KillTimer );
-    CLuaCFunctions::AddFunction ( "resetTimer", CLuaFunctionDefs::ResetTimer );
-    CLuaCFunctions::AddFunction ( "getTimers", CLuaFunctionDefs::GetTimers );
-    CLuaCFunctions::AddFunction ( "isTimer", CLuaFunctionDefs::IsTimer );
-    CLuaCFunctions::AddFunction ( "getTimerDetails", CLuaFunctionDefs::GetTimerDetails );
     CLuaCFunctions::AddFunction ( "getTickCount", CLuaFunctionDefs::GetTickCount_ );
     CLuaCFunctions::AddFunction ( "getRealTime", CLuaFunctionDefs::GetCTime );
     CLuaCFunctions::AddFunction ( "tocolor", CLuaFunctionDefs::tocolor );
@@ -388,27 +382,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "toggleControl", CLuaFunctionDefs::ToggleControl );
     CLuaCFunctions::AddFunction ( "toggleAllControls", CLuaFunctionDefs::ToggleAllControls );
 
-    // XML functions
-    CLuaCFunctions::AddFunction ( "xmlFindChild", CLuaFunctionDefs::XMLNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetChildren", CLuaFunctionDefs::XMLNodeGetChildren );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetValue", CLuaFunctionDefs::XMLNodeGetValue );
-    CLuaCFunctions::AddFunction ( "xmlNodeSetValue", CLuaFunctionDefs::XMLNodeSetValue );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetAttributes", CLuaFunctionDefs::XMLNodeGetAttributes );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetAttribute", CLuaFunctionDefs::XMLNodeGetAttribute );
-    CLuaCFunctions::AddFunction ( "xmlNodeSetAttribute", CLuaFunctionDefs::XMLNodeSetAttribute );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetParent", CLuaFunctionDefs::XMLNodeGetParent );
-    CLuaCFunctions::AddFunction ( "xmlLoadFile", CLuaFunctionDefs::XMLLoadFile );
-    CLuaCFunctions::AddFunction ( "xmlCreateFile", CLuaFunctionDefs::XMLCreateFile );
-    CLuaCFunctions::AddFunction ( "xmlUnloadFile", CLuaFunctionDefs::XMLUnloadFile );
-    CLuaCFunctions::AddFunction ( "xmlSaveFile", CLuaFunctionDefs::XMLSaveFile );
-
-    CLuaCFunctions::AddFunction ( "xmlCreateChild", CLuaFunctionDefs::XMLCreateChild );
-    CLuaCFunctions::AddFunction ( "xmlDestroyNode", CLuaFunctionDefs::XMLDestroyNode );
-    CLuaCFunctions::AddFunction ( "xmlCopyFile", CLuaFunctionDefs::XMLCopyFile );
-
-    CLuaCFunctions::AddFunction ( "xmlNodeGetName", CLuaFunctionDefs::XMLNodeGetName );
-    CLuaCFunctions::AddFunction ( "xmlNodeSetName", CLuaFunctionDefs::XMLNodeSetName );
-
     // Command funcs
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefs::AddCommandHandler );
     CLuaCFunctions::AddFunction ( "removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler );
@@ -471,10 +444,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCameraDefs::LoadFunctions ();
     CLuaColShapeDefs::LoadFunctions ();
     CLuaDrawingDefs::LoadFunctions ();
+    CLuaEffectDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaEngineDefs::LoadFunctions ();
     CLuaFileDefs::LoadFunctions ();
-    CLuaFxDefs::LoadFunctions ();
     CLuaGUIDefs::LoadFunctions ();
     CLuaMarkerDefs::LoadFunctions ();
     CLuaObjectDefs::LoadFunctions ();
@@ -488,7 +461,9 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaSearchLightDefs::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
     CLuaTeamDefs::LoadFunctions ();
-    CLuaWaterDefs::LoadFunctions ();
+    CLuaTimerDefs::LoadFunctions ();
     CLuaVehicleDefs::LoadFunctions ();
+    CLuaWaterDefs::LoadFunctions ();
     CLuaWeaponDefs::LoadFunctions ();
+    CLuaXMLDefs::LoadFunctions ();
 }
