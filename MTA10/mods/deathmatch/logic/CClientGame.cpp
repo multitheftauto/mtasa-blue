@@ -285,6 +285,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetGameEntityRenderHandler( CClientGame::StaticGameEntityRenderHandler );
     g_pMultiplayer->SetFxSystemDestructionHandler ( CClientGame::StaticFxSystemDestructionHandler );
     g_pMultiplayer->SetDrivebyAnimationHandler( CClientGame::StaticDrivebyAnimationHandler );
+    g_pMultiplayer->SetAudioZoneRadioSwitchHandler ( CClientGame::StaticAudioZoneRadioSwitchHandler );
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     g_pGame->SetTaskSimpleBeHitHandler ( CClientGame::StaticTaskSimpleBeHitHandler );
@@ -3827,6 +3828,11 @@ AnimationId CClientGame::StaticDrivebyAnimationHandler(AnimationId animGroup, As
     return g_pClientGame->DrivebyAnimationHandler(animGroup, animId);
 }
 
+void CClientGame::StaticAudioZoneRadioSwitchHandler ( DWORD dwStationID )
+{
+    g_pClientGame->AudioZoneRadioSwitchHandler ( dwStationID );
+}
+
 void CClientGame::DrawRadarAreasHandler ( void )
 {
     m_pRadarAreaManager->DoPulse ();
@@ -6581,6 +6587,11 @@ AnimationId CClientGame::DrivebyAnimationHandler(AnimationId animId, AssocGroupI
         return 231;
 
     return animId;
+}
+
+void CClientGame::AudioZoneRadioSwitchHandler ( DWORD dwStationID )
+{
+    m_pPlayerManager->GetLocalPlayer ()->SetCurrentRadioChannel ( dwStationID );
 }
 
 

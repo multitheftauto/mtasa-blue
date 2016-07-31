@@ -292,6 +292,9 @@ DWORD RETURN_CTaskSimplyGangDriveBy__ProcessPed = 0x62D5AC;
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex             = 0x4EA2A0;
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex_Regenerate  = 0x04EA286;
 
+#define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio    0x4D7198
+#define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio     0x4D71E7
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -361,6 +364,7 @@ ObjectDamageHandler* m_pObjectDamageHandler = NULL;
 ObjectBreakHandler* m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler* m_pDrivebyAnimationHandler = NULL;
+AudioZoneRadioSwitchHandler* m_pAudioZoneRadioSwitchHandler = NULL;
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
@@ -505,6 +509,9 @@ void HOOK_FxManager_c__DestroyFxSystem ();
 void HOOK_CTaskSimpleGangDriveBy__ProcessPed();
 
 void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( );
+
+void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio ( );
+void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio ( );
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -719,6 +726,9 @@ void CMultiplayerSA::InitHooks()
         // CAERadioTrackManager::ChooseMusicTrackIndex hook for fixing a crash with the steam audio files
         HookInstall(HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex, (DWORD) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex, 10);
     }
+    
+    HookInstall ( HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, (DWORD) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5 );
+    HookInstall ( HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, (DWORD) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, 5 );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -2224,6 +2234,11 @@ void CMultiplayerSA::SetFxSystemDestructionHandler ( FxSystemDestructionHandler 
 void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler * pHandler)
 {
     m_pDrivebyAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetAudioZoneRadioSwitchHandler ( AudioZoneRadioSwitchHandler * pHandler )
+{
+    m_pAudioZoneRadioSwitchHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -6866,5 +6881,51 @@ void _declspec(naked) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( )
         mov ecx, dwNumberOfTracks
         // jump back to normal processing
         jmp RETURN_CAERadioTrackManager__ChooseMusicTrackIndex
+    }
+}
+
+DWORD dwLastRequestedStation = -1;
+void CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume ( DWORD dwStationID )
+{
+    // Avoid event spam.
+    if ( dwLastRequestedStation != dwStationID )
+    {
+        if ( m_pAudioZoneRadioSwitchHandler  )
+        {
+            m_pAudioZoneRadioSwitchHandler ( dwStationID );
+        }
+    }
+    dwLastRequestedStation = dwStationID;
+}
+
+void _declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio ( )
+{
+    _asm
+    {
+        push    [esi+3]
+        call    CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume
+        add     esp, 4
+        pop     edi
+        pop     esi
+        pop     ebp
+        pop     ebx
+        add     esp, 36
+        retn
+    }
+}
+
+void _declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio ( )
+{
+    _asm
+    {
+        push    0
+        call    CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume
+        add     esp, 4
+        pop     edi
+        pop     esi
+        pop     ebp
+        pop     ebx
+        add     esp, 36
+        retn
     }
 }
