@@ -18,3 +18,4 @@ before_script:
   - cd Build
 
 script: make CXX=$COMPILER config=release_x64
+ 
