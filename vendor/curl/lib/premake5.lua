@@ -257,6 +257,7 @@ project "curl"
 		}
 		links { "ws2_32", "Normaliz" }
 		
+	filter {"system:windows", "platforms:x86"}
 		postbuildcommands {
 			copy "mta"
 		}

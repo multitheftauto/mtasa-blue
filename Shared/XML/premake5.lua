@@ -30,7 +30,7 @@ project "XML"
 		"*.cpp"
 	}
 	
-	filter "system:windows"
+	filter {"system:windows", "platforms:x86"}
 		postbuildcommands {
 			copy "mta"
 		}

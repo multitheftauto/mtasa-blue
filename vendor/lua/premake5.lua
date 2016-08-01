@@ -48,4 +48,7 @@ if os.get() == "windows" then
 
 		configuration "windows"
 			defines { "LUA_BUILD_AS_DLL" }
+
+        filter "architecture:x64"
+            flags { "ExcludeFromBuild" } 
 end

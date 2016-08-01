@@ -54,6 +54,7 @@ project "pcre"
 		kind "SharedLib"
 		 targetdir(buildpath("server/mods/deathmatch"))
 		
+	filter {"system:windows", "platforms:x86"}
 		postbuildcommands {
 			copy "mods/deathmatch"
 		}

@@ -26,10 +26,12 @@ project "pthread"
 		"include/semaphore.h",
 	}
 
-	filter "system:windows"
+	filter {"system:windows", "platforms:x86"}
 		postbuildcommands {
 			copy "mta"
 		}		
+
+	filter "system:windows"
 		defines {
 			"HAVE_PTW32_CONFIG_H",
 			"PTW32_BUILD_INLINED"
