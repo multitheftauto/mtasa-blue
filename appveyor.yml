@@ -1,0 +1,14 @@
+version: 1.6-{build}-ci
+os: Visual Studio 2015
+
+configuration:
+  - Release
+
+before_build:
+  - utils\premake5 vs2013
+  
+clone_depth: 1
+
+build:
+  parallel: true
+  project: Build/MTASA.sln

@@ -4,6 +4,8 @@ require "compose_files"
 require "install_data"
 require "install_resources"
 
+CI_BUILD = os.getenv("CI"):lower() == "true"
+
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 	platforms { "x86", "x64"}
@@ -40,11 +42,14 @@ workspace "MTASA"
 		defines { "MTA_DEBUG" }
 		targetsuffix "_d"
 	
-	-- Skip Optimization in CI Builds for build speed
-	if os.getenv("CONTINUOUS_INTEGRATION") ~= "true" then
-	filter "configurations:Release or configurations:Nightly"
-		flags { "Optimize" }
-	end
+	if not CI_BUILD then
+		-- Only optimize outside of CI Builds
+		filter "configurations:Release or configurations:Nightly"
+			flags { "Optimize" }
+	else
+		filter {}
+			defines { "CI_BUILD=1" }
+	end 
 	
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
 		os.mkdir("Build/Symbols")
