@@ -12,8 +12,8 @@ addons:
     env: COMPILER=g++-5
     
 before_script:
-  - wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha9/premake-5.0.0-alpha9-linux.tar.gz
-  - tar xzf premake-5.0.0-alpha9-linux.tar.gz
+  - wget https://github.com/sbx320/premake5-travis/blob/master/premake5?raw=true
+  - chmod +x ./premake5
   - ./premake5 gmake
   - cd Build
 
