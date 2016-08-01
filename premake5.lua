@@ -16,8 +16,8 @@ workspace "MTASA"
 	
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs { 
+		"vendor",
 		"Shared/sdk", 
-		"vendor"
 	}
 
 	defines { 
@@ -28,7 +28,7 @@ workspace "MTASA"
 		
 	-- Helper function for output path 
 	buildpath = function(p) return "%{wks.location}../Bin/"..p.."/" end
-	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} %{wks.location}../Bin/"..p end 
+	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} %{wks.location}../Bin/"..p.."/" end 
 	
 	filter "platforms:x86"
 		architecture "x86"
