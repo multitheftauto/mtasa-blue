@@ -16,9 +16,9 @@ project "Client Deathmatch"
 		"../../../vendor/bass/lib/tags"
 	}
 	
-	vpaths { 
-		["Headers/**"] = {"../**.h", "../../../Shared**.h"},
-		["Sources/*"] = {"../**.cpp", "../**.c", "../../../Shared/**.cpp"},
+	vpaths {
+		["Headers/*"] = {"**.h", "../../../**.h"},
+		["Sources/*"] = {"**.cpp", "../../../**.cpp"},
 		["*"] = "premake5.lua"
 	}
 	

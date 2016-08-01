@@ -35,7 +35,7 @@ project "Deathmatch"
 	}
 	
 	
-	vpaths { 
+	vpaths {
 		["Headers/*"] = {"**.h", "../../../**.h"},
 		["Sources/*"] = {"**.cpp", "../../../**.cpp"},
 		["*"] = "premake5.lua"
