@@ -964,12 +964,6 @@ BOOL CreateProcessWithMitigationPolicy (
             MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_EXTENSION_POINT_DISABLE_ALWAYS_ON;
         }
 
-        if ( IsWindows10OrGreater () )
-        {
-            // Win 10
-            MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_FONT_DISABLE_ALWAYS_ON;
-        }
-
         if ( IsWindows10Threshold2OrGreater () )
         {
             // Win 10 build something
