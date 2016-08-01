@@ -2226,7 +2226,7 @@ int CLuaGUIDefs::GUIGridListAddRow ( lua_State* luaVM )
         else
         {
             // Vector containing our string arguments.  We add a bool to store whether it was originally a number.
-            std::vector < pair<SString,bool> > m_items;
+            std::vector < std::pair<SString,bool> > m_items;
             std::vector < CLuaArgument* > ::const_iterator it = Arguments.IterBegin();
             for (it; it != Arguments.IterEnd(); it++)
             {
@@ -2292,7 +2292,7 @@ int CLuaGUIDefs::GUIGridListInsertRowAfter ( lua_State* luaVM )
         else
         {
             // Vector containing our string arguments.  We add a bool to store whether it was originally a number.
-            std::vector < pair<SString, bool> > m_items;
+            std::vector < std::pair<SString, bool> > m_items;
             std::vector < CLuaArgument* > ::const_iterator it = Arguments.IterBegin();
             for (it; it != Arguments.IterEnd(); it++)
             {

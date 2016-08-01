@@ -183,7 +183,7 @@ void CGUIGridList_Impl::ForceUpdate ( void )
 }
 
 
-int CGUIGridList_Impl::AddRow(bool fast, std::vector < pair<SString, bool> > *m_items)
+int CGUIGridList_Impl::AddRow(bool fast, std::vector < std::pair<SString, bool> > *m_items)
 {
     try
     {
@@ -198,11 +198,11 @@ int CGUIGridList_Impl::AddRow(bool fast, std::vector < pair<SString, bool> > *m_
     }
 }
 
-int CGUIGridList_Impl::SetRowItemsText(int iRow, std::vector < pair<SString, bool> > *m_items)
+int CGUIGridList_Impl::SetRowItemsText(int iRow, std::vector < std::pair<SString, bool> > *m_items)
 {
     int iSortColumn = reinterpret_cast < CEGUI::MultiColumnList* > (m_pWindow)->getSortColumn() + 1; // MTA columns start at 1, CEGUI at 0
 
-    std::vector < pair<SString, bool> >::iterator it = m_items->begin();
+    std::vector < std::pair<SString, bool> >::iterator it = m_items->begin();
     int col = 1;
     for (it; it != m_items->end(); it++)
     {
@@ -229,7 +229,7 @@ void CGUIGridList_Impl::RemoveRow ( int iRow )
 }
 
 
-int CGUIGridList_Impl::InsertRowAfter(int iRow, std::vector < pair<SString, bool> > *m_items)
+int CGUIGridList_Impl::InsertRowAfter(int iRow, std::vector < std::pair<SString, bool> > *m_items)
 {
     try
     {

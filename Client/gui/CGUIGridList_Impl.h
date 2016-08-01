@@ -36,12 +36,12 @@ public:
     const char*                         GetColumnTitle          ( int hColumn );
 
     void                                SetSelectionMode        ( SelectionMode mode );
-    int                                 SetRowItemsText         ( int iRow, std::vector < pair<SString,bool> > *m_items );
+    int                                 SetRowItemsText         ( int iRow, std::vector < std::pair<SString,bool> > *m_items );
 
     void                                ForceUpdate             ( void );
-    int                                 AddRow                  ( bool bFast = false, std::vector < pair<SString,bool> > *m_items = NULL );
+    int                                 AddRow                  ( bool bFast = false, std::vector < std::pair<SString,bool> > *m_items = NULL );
     void                                RemoveRow               ( int iRow );
-    int                                 InsertRowAfter          ( int iRow, std::vector < pair<SString, bool> > *m_items = NULL );
+    int                                 InsertRowAfter          ( int iRow, std::vector < std::pair<SString, bool> > *m_items = NULL );
     void                                Clear                   ( void );
     CGUIListItem*                       GetItem                 ( int iRow, int hColumn );
     const char*                         GetItemText             ( int iRow, int hColumn );

@@ -62,9 +62,9 @@ public:
     virtual void                    SetSelectionMode        ( SelectionMode mode ) = 0;
 
     virtual void                    ForceUpdate             ( void ) = 0;
-    virtual int                     AddRow                  ( bool bFast = false, std::vector < pair<SString,bool> > *m_items = NULL ) = 0;
+    virtual int                     AddRow                  ( bool bFast = false, std::vector < std::pair<SString,bool> > *m_items = NULL ) = 0;
     virtual void                    RemoveRow               ( int iRow ) = 0;
-    virtual int                     InsertRowAfter          ( int iRow, std::vector < pair<SString,bool> > *m_items = NULL ) = 0;
+    virtual int                     InsertRowAfter          ( int iRow, std::vector < std::pair<SString,bool> > *m_items = NULL ) = 0;
     virtual void                    Clear                   ( void ) = 0;
     virtual CGUIListItem*           GetItem                 ( int iRow, int hColumn ) = 0;
     virtual const char*             GetItemText             ( int iRow, int hColumn ) = 0;
