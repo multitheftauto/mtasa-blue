@@ -104,14 +104,17 @@ namespace SharedUtil
 
 
 // Calculate a hash value for SString
-template<>
-struct std::hash<SString>
+namespace std 
 {
-    size_t operator()(const SString& str) const
+    template<>
+    struct hash<SString>
     {
-        return std::hash<std::string>()(str);
-    }
-};
+        size_t operator()(const SString& str) const
+        {
+            return std::hash<std::string>()(str);
+        }
+    };
+}
 
 #if defined(WIN32)
 inline size_t hash_value ( const SString& strString ) // Required for sparsehash
@@ -120,7 +123,7 @@ inline size_t hash_value ( const SString& strString ) // Required for sparsehash
     return hashFunction ( strString );
 }
 #elif defined(__GNUC__) && (__GNUC__ >= 3)
-namespace std
+namespace __gnu_cxx
 {
     template<>
     struct hash < SString >
