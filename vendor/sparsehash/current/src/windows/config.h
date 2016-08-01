@@ -6,26 +6,53 @@
 /* Namespace for Google classes */
 #define GOOGLE_NAMESPACE  ::google
 
-/* the location of <hash_fun.h>/<stl_hash_fun.h> */
+#if (_MSC_VER >= 1800 )
+
+/* the location of the header defining hash functions */
+#define HASH_FUN_H  <unordered_map>
+
+/* the location of <unordered_map> or <hash_map> */
+#define HASH_MAP_H  <unordered_map>
+
+/* the location of <unordered_set> or <hash_set> */
+#define HASH_SET_H  <unordered_set>
+
+/* define if the compiler has hash_map */
+#define HAVE_HASH_MAP  0
+
+/* define if the compiler has hash_set */
+#define HAVE_HASH_SET  0
+
+/* define if the compiler supports unordered_{map,set} */
+#define HAVE_UNORDERED_MAP 1
+
+#else /* Earlier than VSC++ 2013 */ 
+
+/* the location of the header defining hash functions */
 #define HASH_FUN_H  <hash_map>
 
-/* the location of <hash_map> */
+/* the location of <unordered_map> or <hash_map> */
 #define HASH_MAP_H  <hash_map>
 
-/* the namespace of hash_map/hash_set */
-#define HASH_NAMESPACE  stdext
-
-/* the location of <hash_set> */
+/* the location of <unordered_set> or <hash_set> */
 #define HASH_SET_H  <hash_set>
-
-/* Define to 1 if you have the <google/malloc_extension.h> header file. */
-#undef HAVE_GOOGLE_MALLOC_EXTENSION_H
 
 /* define if the compiler has hash_map */
 #define HAVE_HASH_MAP  1
 
 /* define if the compiler has hash_set */
 #define HAVE_HASH_SET  1
+
+/* define if the compiler supports unordered_{map,set} */
+#undef HAVE_UNORDERED_MAP
+
+#endif
+
+/* the namespace of the hash<> function */
+#define HASH_NAMESPACE  stdext
+
+/* Define to 1 if you have the <google/malloc_extension.h> header file. */
+#undef HAVE_GOOGLE_MALLOC_EXTENSION_H
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -102,6 +129,9 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -117,9 +147,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS  1
-
-/* the namespace where STL code like vector<> is defined */
-#define STL_NAMESPACE  std
 
 /* Version number of package */
 #undef VERSION
@@ -138,7 +165,7 @@
 
 // This makes sure the definitions in config.h and sparseconfig.h match
 // up.  If they don't, the compiler will complain about redefinition.
-#include <google/sparsehash/sparseconfig.h>
+#include <sparsehash/internal/sparseconfig.h>
 
 // TODO(csilvers): include windows/port.h in every relevant source file instead?
 #include "windows/port.h"

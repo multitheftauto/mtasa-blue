@@ -1,6 +1,6 @@
 This project has been ported to Windows.  A working solution file
 exists in this directory:
-    google-sparsehash.sln
+    sparsehash.sln
 
 You can load this solution file into either VC++ 7.1 (Visual Studio
 2003) or VC++ 8.0 (Visual Studio 2005) -- in the latter case, it will
@@ -18,8 +18,8 @@ You may want to change them to Release mode.
 I have little experience with Windows programming, so there may be
 better ways to set this up than I've done!  If you run across any
 problems, please post to the google-sparsehash Google Group, or report
-them on the google-sparsehash Google Code site:
+them on the sparsehash Google Code site:
    http://groups.google.com/group/google-sparsehash
-   http://code.google.com/p/google-sparsehash/issues/list
+   http://code.google.com/p/sparsehash/issues/list
 
 -- craig
