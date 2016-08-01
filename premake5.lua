@@ -3,6 +3,8 @@ premake.path = premake.path..";utils/buildactions"
 require "compose_files"
 require "install_resources"
 
+CI_BUILD = os.getenv("CI"):lower() == "true"
+
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 	platforms { "x86", "x64"}
@@ -39,14 +41,13 @@ workspace "MTASA"
 		defines { "MTA_DEBUG" }
 		targetsuffix "_d"
 	
-	if os.getenv("CI") ~= "true" then
+	if not CI_BUILD then
 		-- Only optimize outside of CI Builds
 		filter "configurations:Release or configurations:Nightly"
 			flags { "Optimize" }
 	else
-		-- Ignore DXSDK version issue in CI builds
-		filter "configurations:Release or configurations:Nightly"
-			defines { "D3DX_SDK_VERSION=42" }
+		filter {}
+			defines { "CI_BUILD=1" }
 	end 
 	
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
