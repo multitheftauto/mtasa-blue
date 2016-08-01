@@ -33,10 +33,13 @@ workspace "MTASA"
 	filter "configurations:Debug"
 		defines { "MTA_DEBUG" }
 		targetsuffix "_d"
-		
+	
+	-- Skip Optimization in CI Builds for build speed
+	if os.getenv("CONTINUOUS_INTEGRATION") ~= "true" then
 	filter "configurations:Release or configurations:Nightly"
 		flags { "Optimize" }
-		
+	end
+	
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
 		os.mkdir("Build/Symbols")
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
