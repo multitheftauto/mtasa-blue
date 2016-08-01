@@ -120,7 +120,7 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     // Maybe show help if trouble was encountered
     ProcessPendingBrowseToSolution();
 
-    AddReportLog ( 1044, SString ( "* End (%d)* pid:%d",  iReturnCode, GetCurrentProcessId() ) );
+    AddReportLog ( 1044, SString ( "* End (0x%X)* pid:%d", iReturnCode, GetCurrentProcessId() ) );
 
     RemoveUtf8FileHooks();
     return iReturnCode;

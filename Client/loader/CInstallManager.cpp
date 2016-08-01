@@ -26,11 +26,11 @@ namespace
     void UpdateSettingsForReportLog ( void )
     {
         UpdateMTAVersionApplicationSetting ();
-        SetApplicationSetting ( "os-version",       GetOSVersion () );
-        SetApplicationSetting ( "real-os-version",  GetRealOSVersion () );
+        SetApplicationSetting ( "os-version",       SString ( "%d.%d", GetOSVersion ().dwMajor, GetOSVersion ().dwMinor ) );
+        SetApplicationSetting ( "real-os-version",  SString ( "%d.%d", GetRealOSVersion ().dwMajor, GetRealOSVersion ().dwMinor ) );
         SetApplicationSetting ( "is-admin",         IsUserAdmin () ? "1" : "0" );
         SetApplicationSettingInt ( "last-server-ip", 0 );
-        SetApplicationSetting ( "real-os-build",    GetRealOSBuildNumber () );
+        SetApplicationSetting ( "real-os-build",    SString ( "%d", GetRealOSVersion ().dwBuild ) );
         SetApplicationSettingInt ( "vs2013-runtime-installed",  IsVS2013RuntimeInstalled () ? 1 : 0 );
     }
 

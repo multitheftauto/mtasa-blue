@@ -114,6 +114,7 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
     // Ensure correct pthreadVC2.dll is gotted
     CallRemoteFunction( hProcess, "SetDllDirectoryW", FromUTF8( ExtractPath( ToUTF8( strLibPath ) ) ) );
     CallRemoteFunction( hProcess, "LoadLibraryW", strLibPath );
+    CheckService( CHECK_SERVICE_POST_CREATE );
 
     // Allow GTA to continue
     RemoveWinMainBlock( hProcess );
@@ -1060,13 +1061,13 @@ void MakeRandomIndexList ( int Size, std::vector < int >& outList )
 // Affected by compatibility mode
 //
 ///////////////////////////////////////////////////////////////
-SString GetOSVersion ( void )
+SOSVersionInfo GetOSVersion ( void )
 {
     OSVERSIONINFO versionInfo;
     memset ( &versionInfo, 0, sizeof ( versionInfo ) );
     versionInfo.dwOSVersionInfoSize = sizeof ( versionInfo );
     GetVersionEx ( &versionInfo );
-    return SString ( "%d.%d", versionInfo.dwMajorVersion, versionInfo.dwMinorVersion );
+    return { versionInfo.dwMajorVersion, versionInfo.dwMinorVersion, versionInfo.dwBuildNumber };
 }
 
 
@@ -1077,48 +1078,37 @@ SString GetOSVersion ( void )
 // Ignoring compatibility mode
 //
 ///////////////////////////////////////////////////////////////
-SString GetRealOSVersion ( void )
+SOSVersionInfo GetRealOSVersion ( void )
 {
-    SString strVersionAndBuild = GetWMIOSVersion ();
-    std::vector < SString > parts;
-    strVersionAndBuild.Split ( ".", parts );
-    uint uiMajor = parts.size () > 0 ? atoi ( parts[0] ) : 0;
-    uint uiMinor = parts.size () > 1 ? atoi ( parts[1] ) : 0;
+    static SOSVersionInfo versionInfo = { 0 };
 
-    if ( uiMajor == 0 )
+    // Try WMI first
+    if ( versionInfo.dwMajor == 0 )
     {
-        SLibVersionInfo fileInfo;
-        if ( GetLibVersionInfo ( "ntdll.dll", &fileInfo ) )
+        SString strVersionAndBuild = GetWMIOSVersion ();
+        std::vector < SString > parts;
+        strVersionAndBuild.Split ( ".", parts );
+        if ( parts.size () == 3 )
         {
-            uiMajor = HIWORD( fileInfo.dwFileVersionMS );
-            uiMinor = LOWORD( fileInfo.dwFileVersionMS );
+            versionInfo.dwMajor = atoi ( parts[0] );
+            versionInfo.dwMinor = atoi ( parts[1] );
+            versionInfo.dwBuild = atoi ( parts[2] );
         }
     }
 
-    return SString ( "%u.%u", uiMajor, uiMinor );
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// GetRealOSBuildNumber
-//
-// Ignoring compatibility mode
-//
-///////////////////////////////////////////////////////////////
-SString GetRealOSBuildNumber( void )
-{
-    uint uiBuild = 0;
-    uint uiRev = 0;
-
-    SLibVersionInfo fileInfo;
-    if ( GetLibVersionInfo( "ntdll.dll", &fileInfo ) )
+    // Fallback to checking file version of kernel32.dll
+    if ( versionInfo.dwMajor == 0 )
     {
-        uiBuild = HIWORD( fileInfo.dwFileVersionLS );
-        uiRev = LOWORD( fileInfo.dwFileVersionLS );
+        SLibVersionInfo fileInfo;
+        if ( GetLibVersionInfo ( "kernel32.dll", &fileInfo ) )
+        {
+            versionInfo.dwMajor = HIWORD ( fileInfo.dwFileVersionMS );
+            versionInfo.dwMinor = LOWORD ( fileInfo.dwFileVersionMS );
+            versionInfo.dwBuild = HIWORD ( fileInfo.dwFileVersionLS );
+        }
     }
 
-    return SString( "%u.%u", uiBuild, uiRev );
+    return versionInfo;
 }
 
 
@@ -1129,9 +1119,16 @@ SString GetRealOSBuildNumber( void )
 // Works around limit for applications not manifested for Windows 10
 //
 ///////////////////////////////////////////////////////////////
-bool IsWindows10OrGreater( void )
+bool IsWindows10OrGreater ( void )
 {
-    return atoi( GetRealOSVersion() ) >= 10;
+    SOSVersionInfo info = GetRealOSVersion ();
+    return info.dwMajor >= 10;
+}
+
+bool IsWindows10Threshold2OrGreater ( void )
+{
+    SOSVersionInfo info = GetRealOSVersion ();
+    return info.dwMajor > 10 || ( info.dwMajor == 10 && info.dwBuild >= 10586 );
 }
 
 

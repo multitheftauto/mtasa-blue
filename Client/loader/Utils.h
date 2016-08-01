@@ -27,8 +27,23 @@ enum
     CHECK_SERVICE_PRE_GAME = 4,
     CHECK_SERVICE_POST_GAME = 5,
     CHECK_SERVICE_PRE_CREATE = 6,
+    CHECK_SERVICE_POST_CREATE = 7,
 };
 
+#ifndef PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_PREFER_SYSTEM32_ALWAYS_ON
+    #define PROCESS_CREATION_MITIGATION_POLICY_EXTENSION_POINT_DISABLE_ALWAYS_ON       (0x00000001ui64 << 32)
+    #define PROCESS_CREATION_MITIGATION_POLICY_PROHIBIT_DYNAMIC_CODE_ALWAYS_ON         (0x00000001ui64 << 36)
+    #define PROCESS_CREATION_MITIGATION_POLICY_FONT_DISABLE_ALWAYS_ON                  (0x00000001ui64 << 48)
+    #define PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_NO_REMOTE_ALWAYS_ON          (0x00000001ui64 << 52)
+    #define PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_PREFER_SYSTEM32_ALWAYS_ON    (0x00000001ui64 << 60)
+#endif
+
+struct SOSVersionInfo
+{
+    DWORD dwMajor;
+    DWORD dwMinor;
+    DWORD dwBuild;
+};
 
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
 // remote dll module on success.
@@ -52,10 +67,11 @@ SString         GetGTAPath                          ( void );
 bool            HasGTAPath                          ( void );
 
 void            FindFilesRecursive                  ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
-SString         GetOSVersion                        ( void );
-SString         GetRealOSVersion                    ( void );
-SString         GetRealOSBuildNumber                ( void );
+SOSVersionInfo  GetOSVersion                        ( void );
+SOSVersionInfo  GetRealOSVersion                    ( void );
 bool            IsWindows10OrGreater                ( void );
+bool            IsWindows10Threshold2OrGreater      ( void );
+
 bool            IsVS2013RuntimeInstalled            ( void );
 BOOL            IsUserAdmin                         ( void );
 
@@ -237,6 +253,36 @@ public:
     *FUNC_WscGetSecurityProviderHealth)(DWORD Providers,
                                     PWSC_SECURITY_PROVIDER_HEALTH pHealth);
 
+    typedef
+    BOOL
+    (WINAPI
+    *FUNC_InitializeProcThreadAttributeList)(
+        _Out_writes_bytes_to_opt_(*lpSize, *lpSize) LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList,
+        _In_ DWORD dwAttributeCount,
+        _Reserved_ DWORD dwFlags,
+        _When_(lpAttributeList == nullptr, _Out_) _When_(lpAttributeList != nullptr, _Inout_) PSIZE_T lpSize
+        );
+
+    typedef
+    VOID
+    (WINAPI
+    *FUNC_DeleteProcThreadAttributeList)(
+        _Inout_ LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList
+        );
+
+    typedef
+    BOOL
+    (WINAPI
+    *FUNC_UpdateProcThreadAttribute)(
+        _Inout_ LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList,
+        _In_ DWORD dwFlags,
+        _In_ DWORD_PTR Attribute,
+        _In_reads_bytes_opt_(cbSize) PVOID lpValue,
+        _In_ SIZE_T cbSize,
+        _Out_writes_bytes_opt_(cbSize) PVOID lpPreviousValue,
+        _In_opt_ PSIZE_T lpReturnSize
+        );
+
     void* LoadFunction ( const char* szLibName, const char* c, const char* a, const char* b );
 
     #define _DEFFUNCTION( lib, name, a,b,c ) \
@@ -258,6 +304,9 @@ public:
     #define _CreateProcessW                 __CreateProcessW()
     #define _CreateRemoteThread             __CreateRemoteThread()
     #define _WscGetSecurityProviderHealth   __WscGetSecurityProviderHealth()
+    #define _InitializeProcThreadAttributeList  __InitializeProcThreadAttributeList()
+    #define _DeleteProcThreadAttributeList      __DeleteProcThreadAttributeList()
+    #define _UpdateProcThreadAttribute          __UpdateProcThreadAttribute()
 
     DEFFUNCTION( "kernel32", Virt,ualAll,ocEx )
     DEFFUNCTION( "kernel32", Virt,ualPro,tectEx )
@@ -267,5 +316,8 @@ public:
     DEFFUNCTION( "kernel32", Crea,teProc,essW )
     DEFFUNCTION( "kernel32", Crea,teRemo,teThread )
     DEFFUNCTION( "Wscapi", WscGetSecurityProviderHeal,t,h )
+    DEFFUNCTION( "kernel32", Initiali,zeProcT,hreadAttributeList )
+    DEFFUNCTION( "kernel32", Dele,teProcT,hreadAttributeList )
+    DEFFUNCTION( "kernel32", Upda,teProcT,hreadAttribute )
 
 #endif

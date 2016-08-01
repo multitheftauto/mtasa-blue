@@ -922,6 +922,136 @@ void CheckLibVersions( void )
 
 //////////////////////////////////////////////////////////
 //
+// CreateProcessWithMitigationPolicy
+//
+// Create process with extra security stuff
+//
+//////////////////////////////////////////////////////////
+BOOL CreateProcessWithMitigationPolicy (
+        LPCWSTR lpApplicationName,
+        LPWSTR lpCommandLine,
+        LPSECURITY_ATTRIBUTES lpProcessAttributes,
+        LPSECURITY_ATTRIBUTES lpThreadAttributes,
+        BOOL bInheritHandles,
+        DWORD dwCreationFlags,
+        LPVOID lpEnvironment,
+        LPCWSTR lpCurrentDirectory,
+        LPPROCESS_INFORMATION lpProcessInformation,
+        DWORD& dwOutError,
+        SString& strOutErrorContext
+    )
+{
+    DWORD64 MitigationPolicy = 0;
+    STARTUPINFOEXW StartupInfoEx = { 0 };
+    StartupInfoEx.StartupInfo.cb = sizeof ( StartupInfoEx.StartupInfo );
+
+    if ( IsWindowsVistaOrGreater () )
+    {
+        // We can use extended startup info for Vista and up
+        StartupInfoEx.StartupInfo.cb = sizeof ( StartupInfoEx );
+        dwCreationFlags |= EXTENDED_STARTUPINFO_PRESENT;
+
+        // Win7 32 bit can only handle DWORD MitigationPolicy
+        size_t MitigationPolicySize = sizeof ( DWORD );
+        MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_DEP_ENABLE
+                          | PROCESS_CREATION_MITIGATION_POLICY_DEP_ATL_THUNK_ENABLE
+                          | PROCESS_CREATION_MITIGATION_POLICY_SEHOP_ENABLE;
+
+        if ( IsWindows8OrGreater () )
+        {
+            // We can use more bigger MitigationPolicy for Win8 and up
+            MitigationPolicySize = sizeof( DWORD64 );
+            MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_EXTENSION_POINT_DISABLE_ALWAYS_ON;
+        }
+
+        if ( IsWindows10OrGreater () )
+        {
+            // Win 10
+            MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_FONT_DISABLE_ALWAYS_ON;
+        }
+
+        if ( IsWindows10Threshold2OrGreater () )
+        {
+            // Win 10 build something
+            MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_NO_REMOTE_ALWAYS_ON;
+        }
+
+        #if 0   // TODO
+        if ( IsWindows10FoamybananaOrGreater () )
+        {
+            // Win 10 build something else
+            MitigationPolicy |= PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_PREFER_SYSTEM32_ALWAYS_ON;
+        }
+        #endif
+
+        // Create AttributeList for mitigation policy application system
+        SIZE_T AttributeListSize;
+        if ( _InitializeProcThreadAttributeList ( nullptr, 1, 0, &AttributeListSize ) == FALSE )
+        {
+            dwOutError = GetLastError ();
+            if ( dwOutError != ERROR_INSUFFICIENT_BUFFER )
+            {
+                strOutErrorContext = "InitializeProcThreadAttributeList #1";
+                return false;
+            }
+        }
+        else
+        {
+            dwOutError = ERROR_SUCCESS;
+            strOutErrorContext = "InitializeProcThreadAttributeList #1 expected error";
+            return false;
+        }
+
+        StartupInfoEx.lpAttributeList = (LPPROC_THREAD_ATTRIBUTE_LIST) HeapAlloc ( GetProcessHeap () ,0, AttributeListSize );
+
+        if ( _InitializeProcThreadAttributeList ( StartupInfoEx. lpAttributeList, 1, 0, &AttributeListSize ) == FALSE )
+        {
+            dwOutError = GetLastError ();
+            strOutErrorContext = "InitializeProcThreadAttributeList #2";
+            HeapFree ( GetProcessHeap (), 0, (LPVOID)StartupInfoEx.lpAttributeList );
+            return false;
+        }
+
+        if ( _UpdateProcThreadAttribute ( StartupInfoEx.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY, &MitigationPolicy, MitigationPolicySize, nullptr, nullptr ) == FALSE )
+        {
+            dwOutError = GetLastError ();
+            strOutErrorContext = "UpdateProcThreadAttribute";
+            _DeleteProcThreadAttributeList ( StartupInfoEx.lpAttributeList );
+            HeapFree ( GetProcessHeap (), 0, (LPVOID)StartupInfoEx.lpAttributeList );
+            return false;
+        }
+    }
+
+    // Start GTA
+    BOOL bResult = _CreateProcessW ( lpApplicationName,
+                            lpCommandLine,
+                            lpProcessAttributes,
+                            lpThreadAttributes,
+                            bInheritHandles,
+                            dwCreationFlags,
+                            nullptr,
+                            lpCurrentDirectory,
+                            (LPSTARTUPINFOW)&StartupInfoEx,
+                            lpProcessInformation );
+
+    if ( bResult == FALSE )
+    {
+        dwOutError = GetLastError ();
+        strOutErrorContext = "CreateProcess";
+    }
+
+    if ( IsWindowsVistaOrGreater () )
+    {
+        // Clean up
+        _DeleteProcThreadAttributeList ( StartupInfoEx.lpAttributeList );
+        HeapFree ( GetProcessHeap (), 0, (LPVOID)StartupInfoEx.lpAttributeList );
+    }
+    return bResult;
+}
+
+
+//////////////////////////////////////////////////////////
+//
 // LaunchGame
 //
 // Create GTA process, hook it and go go go
@@ -948,17 +1078,6 @@ int LaunchGame ( SString strCmdLine )
     SString strGTAEXEPath = GetInstallManager()->MaybeRenameExe( strGTAPath );
     SetCurrentDirectory ( strGTAPath );
 
-    //////////////////////////////////////////////////////////
-    //
-    // Hook 'n' go
-    //
-    // Launch GTA using CreateProcess
-    PROCESS_INFORMATION piLoadee;
-    STARTUPINFOW siLoadee;
-    memset( &piLoadee, 0, sizeof ( PROCESS_INFORMATION ) );
-    memset( &siLoadee, 0, sizeof ( STARTUPINFO ) );
-    siLoadee.cb = sizeof ( STARTUPINFO );
-
     WatchDogBeginSection ( "L2" );      // Gets closed when loading screen is shown
     WatchDogBeginSection ( "L3" );      // Gets closed when loading screen is shown, or a startup problem is handled elsewhere
     WatchDogBeginSection ( WD_SECTION_NOT_USED_MAIN_MENU );      // Gets closed when the main menu is used
@@ -974,8 +1093,14 @@ int LaunchGame ( SString strCmdLine )
 
     WString wstrCmdLine = FromUTF8( strCmdLine );
 
-    // Start GTA
-    if ( 0 == _CreateProcessW( FromUTF8( strGTAEXEPath ),
+    //
+    // Launch GTA using CreateProcess
+    //
+    PROCESS_INFORMATION piLoadee = { 0 };
+    DWORD dwError;
+    SString strErrorContext;
+    if ( FALSE == CreateProcessWithMitigationPolicy (
+                              FromUTF8( strGTAEXEPath ),
                               (LPWSTR)*wstrCmdLine,
                               NULL,
                               NULL,
@@ -983,11 +1108,11 @@ int LaunchGame ( SString strCmdLine )
                               CREATE_SUSPENDED,
                               NULL,
                               FromUTF8( strMtaDir ),    //    strMTASAPath\mta is used so pthreadVC2.dll can be found
-                              &siLoadee,
-                              &piLoadee ) )
+                              &piLoadee,
+                              dwError,
+                              strErrorContext ) )
     {
-        DWORD dwError = GetLastError ();
-        WriteDebugEvent( SString( "Loader - Process not created[%d]: %s", dwError, *strGTAEXEPath ) );
+        WriteDebugEvent( SString( "Loader - Process not created[%d (%s)]: %s", dwError, *strErrorContext, *strGTAEXEPath ) );
 
         if ( dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin )
         {
@@ -999,7 +1124,7 @@ int LaunchGame ( SString strCmdLine )
         else
         {
             // Otherwise, show error message
-            SString strError = GetSystemErrorMessage ( dwError );            
+            SString strError = GetSystemErrorMessage ( dwError ) + " (" + strErrorContext + ")";            
             DisplayErrorMessageBox ( SString(_("Could not start Grand Theft Auto: San Andreas.  "
                                 "Please try restarting, or if the problem persists,"
                                 "contact MTA at www.multitheftauto.com. \n\n[%s]"),*strError), _E("CL22"), "createprocess-fail&err=" + strError ); // Could not start GTA:SA
