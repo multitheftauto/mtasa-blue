@@ -39,6 +39,8 @@ Download and install the [EditorConfig](https://visualstudiogallery.msdn.microso
 1. Execute `create-projects.bat`
 2. Open `Build\MTASA.sln`
 3. Compile
+4. Install data files: `utils\premake5.exe install_data`
+5. Install resources: `utils\premake5.exe install_resources` (optional step)
 
 #### Linux
 1. Execute `utils/premake5_x86 gmake` (32-bit OS) or `utils/premake5_x64 gmake` (64-bit OS)

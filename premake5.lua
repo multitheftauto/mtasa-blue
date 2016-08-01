@@ -1,6 +1,7 @@
 -- Add buildactions to path
 premake.path = premake.path..";utils/buildactions"
 require "compose_files"
+require "install_data"
 require "install_resources"
 
 workspace "MTASA"
