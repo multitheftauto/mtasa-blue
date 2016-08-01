@@ -4,7 +4,13 @@ require "compose_files"
 require "install_data"
 require "install_resources"
 
-CI_BUILD = os.getenv("CI"):lower() == "true"
+-- Set CI Build global
+local ci = os.getenv("CI")
+if ci and ci:lower() == "true" then 
+	CI_BUILD = true 
+else 
+	CI_BUILD = false
+end 
 
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
