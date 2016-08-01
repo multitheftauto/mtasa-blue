@@ -5,9 +5,9 @@ configuration:
   - Release
 
 before_build:
-  - create-projects.bat
+  - utils\premake5 vs2013
 
-clone_depth: 5 
+clone_depth: 1
 
 build:
   parallel: true
