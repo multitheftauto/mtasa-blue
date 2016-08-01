@@ -14,7 +14,7 @@ addons:
 before_script:
   - wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha9/premake-5.0.0-alpha9-linux.tar.gz
   - tar xzf premake-5.0.0-alpha9-linux.tar.gz
-  - ./premake gmake
+  - ./premake5 gmake
   - cd Build
 
 script: make -j 3 CXX=g++-5 CC=gcc-5 config=release_x64
