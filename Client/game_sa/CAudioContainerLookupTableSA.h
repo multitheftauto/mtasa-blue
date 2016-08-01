@@ -43,6 +43,6 @@ struct SAudioLookupEntrySA
     uint32 offset;
     uint32 length;
 }; // size = 12 = 0xC
-C_ASSERT ( sizeof ( SAudioLookupEntrySA ) == 0xC );
+static_assert ( sizeof ( SAudioLookupEntrySA ) == 0xC, "Invalid size for SAudioLookupEntrySA");
 
 #endif

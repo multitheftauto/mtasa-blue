@@ -38,7 +38,7 @@ public:
     uint8               ucFlag2;
     uint16              usPad;
 };
-C_ASSERT(sizeof(CFlameShotInfo) == 0x2c );
+static_assert(sizeof(CFlameShotInfo) == 0x2c , "Invalid size for CFlameShotInfo");
 
 class CWeaponInfoSAInterface // 112 byte long class
 {

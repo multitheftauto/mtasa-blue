@@ -40,7 +40,7 @@ public:
 	uint8 m_ucFlags1;
 	uint8 m_ucFlags2;
 };
-C_ASSERT(sizeof(CRopesSAInterface) == 0x328);
+static_assert(sizeof(CRopesSAInterface) == 0x328, "Invalid size for CRopesSAInterface");
 
 class CRopesSA : public CRopes
 {

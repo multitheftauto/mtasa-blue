@@ -398,7 +398,7 @@ public:
     DWORD   m_uiFadeTimeStarted;
     DWORD   m_uiFadeTimeStartedMusic;
 };
-// C_ASSERT(sizeof(CCameraSAInterface) == 0xD78);
+// static_assert(sizeof(CCameraSAInterface) == 0xD78, "Invalid size for CCameraSAInterface");
 
 class CCameraSA : public CCamera
 {

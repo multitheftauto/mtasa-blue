@@ -55,7 +55,7 @@ public:
     RwMatrix *               apmatMatrices[8];      // 0x8C
     CFxMemoryPoolSAInterface fxMemoryPool;          // 0xAC
 };
-C_ASSERT(sizeof(CFxManagerSAInterface) == 0xB8);
+static_assert(sizeof(CFxManagerSAInterface) == 0xB8, "Invalid size for CFxManagerSAInterface");
 
 class CFxManagerSA : public CFxManager
 {

@@ -8,8 +8,7 @@ project "Game SA"
 	pchsource "StdInc.cpp"
 	
 	vpaths { 
-		["Headers/*"] = "**.h",
-		["Headers/*"] = "**.hpp",
+		["Headers/*"] = { "**.h", "**.hpp" },
 		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}

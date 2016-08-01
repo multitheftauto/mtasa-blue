@@ -30,7 +30,7 @@ struct SAudioEntrySA
     uint16 sampleRate;
     uint16 unknown2;
 };
-C_ASSERT ( sizeof ( SAudioEntrySA ) == 0xC );
+static_assert ( sizeof ( SAudioEntrySA ) == 0xC, "Invalid size for SAudioLookupEntrySA");
 
 struct SAudioBankHeaderSA
 {
@@ -56,7 +56,8 @@ struct SRiffWavePCMHeader
     uint32 subchunk2Id; // big-endian // 36
     uint32 subchunk2Size; // 40
 }; // size = 44 = 0x2C
-C_ASSERT ( sizeof ( SRiffWavePCMHeader ) == 0x2C );
+static_assert (sizeof(SRiffWavePCMHeader) == 0x2C, "Invalid size for SRiffWavePCMHeader");
+
 
 // Documentation by SAAT //
 // http://pdescobar.home.comcast.net/~pdescobar/gta/saat/ //
@@ -64,20 +65,20 @@ struct SBeatEntry {
     int32 timing;
     int32 control;
 };
-C_ASSERT ( sizeof ( SBeatEntry ) == 8 );
+static_assert(sizeof(SBeatEntry) == 0x8, "Invalid size for SBeatEntry");
 
 struct SLengthEntry {
     uint32 length;
     uint32 extra;
 };
-C_ASSERT ( sizeof ( SBeatEntry ) == 8 );
+static_assert(sizeof(SLengthEntry) == 0x8, "Invalid size for SLengthEntry");
 
 struct SRadioTrackHeader {
     SBeatEntry beats[NUM_BEAT_ENTRIES];
     SLengthEntry lengths[NUM_LENGTH_ENTRIES];
     uint32 trailer;
 };
-C_ASSERT ( sizeof ( SRadioTrackHeader ) == 8068 );
+static_assert(sizeof(SRadioTrackHeader) == 8068, "Invalid size for SRadioTrackHeader");
 
 // End of documentation by SAAT //
 // http://pdescobar.home.comcast.net/~pdescobar/gta/saat/ //

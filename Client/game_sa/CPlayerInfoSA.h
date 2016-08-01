@@ -153,7 +153,7 @@ public:
     CPedSAInterface * m_pCurrentProstitutePed;
     CPedSAInterface * m_pLastProstituteShagged;
 };
-C_ASSERT(sizeof(CPlayerPedDataSAInterface) == 172 );
+static_assert(sizeof(CPlayerPedDataSAInterface) == 172 , "Invalid size for CPlayerPedDataSAInterface");
 #pragma pack(pop)
 
 class CPlayerInfoSAInterface

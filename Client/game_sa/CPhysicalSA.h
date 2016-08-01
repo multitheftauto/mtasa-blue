@@ -111,7 +111,7 @@ public:
     float m_fLighting2; // 304
     class CShadowDataSA *m_pShadowData; // 308
 };
-C_ASSERT(sizeof(CPhysicalSAInterface) == 0x138);
+static_assert(sizeof(CPhysicalSAInterface) == 0x138, "Invalid size for CPhysicalSAInterface");
 
 class CPhysicalSA : public virtual CPhysical, public virtual CEntitySA
 {

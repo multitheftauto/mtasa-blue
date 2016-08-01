@@ -100,7 +100,7 @@ public:
     XYZ * pPrev;
     XYZ * pNext;
 };
-C_ASSERT(sizeof(XYZ) == 0x54);
+static_assert(sizeof(XYZ) == 0x54, "Invalid size for XYZ");
 
 class XYZStore
 {
@@ -113,7 +113,7 @@ public:
     XYZ freeListTail;
     XYZ * pPool;
 };
-C_ASSERT(sizeof(XYZStore) == 0x1FC);
+static_assert(sizeof(XYZStore) == 0x1FC, "Invalid size for XYZStore");
 
 
 class CSimpleTransformSAInterface   // 16 bytes
@@ -239,7 +239,7 @@ public:
         return -1;
     }
 };
-C_ASSERT(sizeof(CEntitySAInterface) == 0x38);
+static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 
 class CEntitySA : public virtual CEntity
 {

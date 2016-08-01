@@ -47,7 +47,7 @@ class CAEFireAudioEntitySAInterface
     // todo: reverse this structure and CAEAudioEntity
     int unk[0x22]; 
 };
-C_ASSERT(sizeof(CAEFireAudioEntitySAInterface) == 0x88);
+static_assert(sizeof(CAEFireAudioEntitySAInterface) == 0x88, "Invalid size for CAEFireAudioEntitySAInterface");
 
 class CFxSystemBPSAInterface;
 class CFxSystemSAInterface // Internal SA Name: FxSystem_c
@@ -77,7 +77,7 @@ public:
     void ** ppParticleEmitters;             // 0x78 (Array of particle emitters, amount is defined by the blueprint)
     CAEFireAudioEntitySAInterface audioEntity; // 0x7C
 };
-C_ASSERT(sizeof(CFxSystemSAInterface) == 0x104);
+static_assert(sizeof(CFxSystemSAInterface) == 0x104, "Invalid size for CFxSystemSAInterface");
 
 class CFxSystemSA : public CFxSystem
 {

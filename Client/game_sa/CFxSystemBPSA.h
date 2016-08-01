@@ -30,6 +30,6 @@ public:
     void ** pPrims;                 // 0x1C (pPrims[0] to pPrims[cNumOfPrims-1])
     void * pBoundingSphere;         // 0x20
 };
-C_ASSERT(sizeof(CFxSystemBPSAInterface) == 0x24);
+static_assert(sizeof(CFxSystemBPSAInterface) == 0x24, "Invalid size for CFxSystemBPSAInterface");
 
 #endif

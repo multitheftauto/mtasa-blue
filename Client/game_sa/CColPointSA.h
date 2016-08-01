@@ -33,7 +33,7 @@ public:
 	uint8           pad2;           // 39
 	float           fDepth;         // 40
 };
-C_ASSERT(sizeof(CColPointSAInterface) == 0x2C);
+static_assert(sizeof(CColPointSAInterface) == 0x2C, "Invalid size for CColPointSAInterface");
 
 class CColPointSA : public CColPoint
 {

@@ -159,7 +159,7 @@ public:
     CPedSAInterface         *m_pLastPedLookedAt;// So interpolation works 
     bool        m_bFirstPersonRunAboutActive; // 564
 };
-C_ASSERT(sizeof(CCamSAInterface) == 0x238);
+static_assert(sizeof(CCamSAInterface) == 0x238, "Invalid size for CCamSAInterface");
 
 class CCamSA : public CCam
 {

@@ -508,7 +508,7 @@ public:
     // 2276
     float m_fBurningTime;
 };
-C_ASSERT(sizeof(CVehicleSAInterface) == 1688 + 576 + 4 );
+static_assert(sizeof(CVehicleSAInterface) == 1688 + 576 + 4 , "Invalid size for CVehicleSAInterface");
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {

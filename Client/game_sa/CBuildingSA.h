@@ -22,7 +22,7 @@
 class CBuildingSAInterface : public CEntitySAInterface
 {
 };
-C_ASSERT(sizeof(CBuildingSAInterface) == sizeof(CEntitySAInterface));
+static_assert(sizeof(CBuildingSAInterface) == sizeof(CEntitySAInterface), "Invalid size for CBuildingSAInterface");
 
 class CBuildingSA : public virtual CBuilding, public virtual CEntitySA
 {

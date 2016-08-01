@@ -458,8 +458,8 @@ namespace
                               0x00000000, 0x4e000000, 0x74704f76, 0x73756d69,   //  .......NvOptimus
                               0x62616e45, 0x656d656c, 0x0000746e, 0x00000000 }; //  Enablement......
 
-    C_ASSERT( sizeof( oldExportDir ) == sizeof( newExportDir ) );
-    C_ASSERT( sizeof( oldExportTable ) == sizeof( newExportTable ) );
+    static_assert( sizeof( oldExportDir ) == sizeof( newExportDir ), "Invalid export dir size" );
+    static_assert( sizeof( oldExportTable ) == sizeof( newExportTable ), "Invalid export table size" );
 
     struct SDataumRow
     {

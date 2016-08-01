@@ -50,6 +50,6 @@ public:
 	CVector vecMoveForce; // 192
 	uint32 pad8; // 204
 };
-C_ASSERT(sizeof(CBuoyancySA) == 0xD0);
+static_assert(sizeof(CBuoyancySA) == 0xD0, "Invalid size for CBuoyancySA");
 
 #endif

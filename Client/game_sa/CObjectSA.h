@@ -52,7 +52,7 @@ public:
     uint32 uiSparksOnImpact; // 76
 };
 // TODO: Find out correct size
-//C_ASSERT(sizeof(CObjectInfo) == 0x50);
+//static_assert(sizeof(CObjectInfo) == 0x50, "Invalid size for CObjectInfo");
 
 class CObjectSAInterface : public CPhysicalSAInterface
 {
@@ -123,7 +123,7 @@ public:
     uint32 pad21; // 372
     uint32 pad22; // 376
 };
-C_ASSERT(sizeof(CObjectSAInterface) == 0x17C);
+static_assert(sizeof(CObjectSAInterface) == 0x17C, "Invalid size for CObjectSAInterface");
 
 class CObjectSA : public virtual CObject, public virtual CPhysicalSA
 {

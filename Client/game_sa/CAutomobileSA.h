@@ -169,7 +169,7 @@ public:
     FLOAT       GasPedalAudioRevs;  // 1480
     DWORD       m_aWheelState[4];   // 1484
 };
-// C_ASSERT(sizeof(CAutomobileSAInterface) == 0x988);
+// static_assert(sizeof(CAutomobileSAInterface) == 0x988, "Invalid size for CAutomobileSAInterface");
 
 class CAutomobileSA : public virtual CAutomobile, public virtual CVehicleSA
 {
