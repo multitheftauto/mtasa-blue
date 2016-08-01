@@ -19,7 +19,6 @@
 #endif
 
 #include <google/dense_hash_set>
-using namespace google;
 
 #ifdef WIN32
     #pragma pop_macro("assert")

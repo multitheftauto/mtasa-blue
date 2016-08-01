@@ -69,6 +69,10 @@ workspace "MTASA"
 		libdirs {
 			dxdir.."Lib/x86"
 		}
+		
+	if _ACTION == "vs2015" then
+		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
+	end
 	
 	-- Only build the client on Windows
 	if os.get() == "windows" then

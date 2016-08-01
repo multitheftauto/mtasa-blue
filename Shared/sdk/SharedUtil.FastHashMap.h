@@ -9,6 +9,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+#pragma once
 
 #if WITH_ALLOC_TRACKING
     #define CFastHashMap std::CMap
@@ -19,7 +20,7 @@
 #endif
 
 #include <google/dense_hash_map>
-using namespace google;
+#undef BASE_TEMPLATE_UTIL_H_ // HACK: Sparsehash and CEF share the same include guard name (NEVER USE MACROS AS INCLUDE GUARDS)
 
 #ifdef WIN32
     #pragma pop_macro("assert")
