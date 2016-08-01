@@ -4,7 +4,6 @@ project "breakpad"
 	targetname "breakpad"
 	
 	includedirs { "src", "src/third_party/glog/src" }
-	
 	vpaths { 
 		["Headers/*"] = "src/**.h",
 		["Sources/*"] = {"src/**.cc", "src/**.c"},

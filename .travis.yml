@@ -1,0 +1,27 @@
+language: cpp
+compiler: 
+  - gcc
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-5
+    - g++-5
+    env: COMPILER=g++-5
+    
+before_script:
+  - wget https://github.com/sbx320/premake5-travis/blob/master/premake5?raw=true -O ./premake5
+  - chmod +x ./premake5
+  - ./premake5 gmake
+  - cd Build
+
+script: make -j 3 CXX=g++-5 CC=gcc-5 config=release_x64
+ 
+notifications:
+  irc:
+    channels:
+      - "irc.gtanet.com#mta.dev"
+    on_success: change
+    on_failure: always
