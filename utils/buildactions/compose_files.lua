@@ -27,6 +27,9 @@ newaction {
 		-- Copy compiled binaries
 		os.copydir(BIN_DIR, OUTPUT_DIR, "**.exe")
 		os.copydir(BIN_DIR, OUTPUT_DIR, "**.dll")
+		
+		-- Copy publicsdk
+		os.copydir("Shared/publicsdk", OUTPUT_DIR.."/development/publicsdk")
 	end
 }
 

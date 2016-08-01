@@ -44,9 +44,9 @@ Var ShowLastUsed
 ; ###########################################################################################################
 !ifndef FILES_ROOT
     !define LIGHTBUILD    ; enable LIGHTBUILD for nightly
-    !define FILES_ROOT "Install files builder/output"
-    !define SERVER_FILES_ROOT "Install files builder/output/MTA San Andreas/server"
-    !define FILES_MODULE_SDK "Install files builder/output/MTA San Andreas/development/publicsdk"
+    !define FILES_ROOT "../../InstallFiles"
+    !define SERVER_FILES_ROOT "${FILES_ROOT}/server"
+    !define FILES_MODULE_SDK "${FILES_ROOT}/development/publicsdk"
     !define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
     !define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
     !define REVISION "0"
@@ -617,14 +617,14 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         Call IsDll32Bit
         Pop $0
         ${If} $0 != 1
-            File "${FILES_ROOT}\MTA San Andreas\redist\msvcp120.dll"
+            File "${FILES_ROOT}\redist\msvcp120.dll"
         ${EndIf}
 
         Push $SYSDIR\msvcr120.dll
         Call IsDll32Bit
         Pop $0
         ${If} $0 != 1
-            File "${FILES_ROOT}\MTA San Andreas\redist\msvcr120.dll"
+            File "${FILES_ROOT}\redist\msvcr120.dll"
         ${EndIf}
         #############################################################
 
@@ -634,7 +634,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${If} ${AtMostWinXP}
             ${IfNot} ${FileExists} $SYSDIR\normaliz.dll
                 ${LogText} " Did not find $SYSDIR\normaliz.dll"
-                File "${FILES_ROOT}\MTA San Andreas\redist\idndl.x86.exe"
+                File "${FILES_ROOT}\redist\idndl.x86.exe"
                 ExecWait '"$TEMP\idndl.x86.exe" /passive'
             ${EndIf}
         ${EndIf}
@@ -647,33 +647,33 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "(BU)" "FullAccess"
 
         SetOutPath "$INSTDIR\MTA"
-        File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\pthread.dll"
+        File "${FILES_ROOT}\mta\cgui.dll"
+        File "${FILES_ROOT}\mta\core.dll"
+        File "${FILES_ROOT}\mta\xmll.dll"
+        File "${FILES_ROOT}\mta\game_sa.dll"
+        File "${FILES_ROOT}\mta\multiplayer_sa.dll"
+        File "${FILES_ROOT}\mta\netc.dll"
+        File "${FILES_ROOT}\mta\libcurl.dll"
+        File "${FILES_ROOT}\mta\loader.dll"
+        File "${FILES_ROOT}\mta\pthread.dll"
         
         SetOutPath "$INSTDIR\MTA"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libcef.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\icudtl.dat"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\natives_blob.bin"
-        File "${FILES_ROOT}\MTA San Andreas\mta\snapshot_blob.bin"
+        File "${FILES_ROOT}\mta\libcef.dll"
+        File "${FILES_ROOT}\mta\icudtl.dat"
+        File "${FILES_ROOT}\mta\libEGL.dll"
+        File "${FILES_ROOT}\mta\libGLESv2.dll"
+        File "${FILES_ROOT}\mta\natives_blob.bin"
+        File "${FILES_ROOT}\mta\snapshot_blob.bin"
         
         SetOutPath "$INSTDIR\MTA\CEF"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher.exe"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher_DLL.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef.pak"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_100_percent.pak"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_200_percent.pak"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\devtools_resources.pak"
-        #File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_extensions.pak"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\locales\en-US.pak"
+        File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
+        File "${FILES_ROOT}\mta\CEF\CEFLauncher_DLL.dll"
+        File "${FILES_ROOT}\mta\CEF\cef.pak"
+        File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
+        #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
+        File "${FILES_ROOT}\mta\CEF\locales\en-US.pak"
 
 
         ${If} "$(LANGUAGE_CODE)" != ""
@@ -684,82 +684,82 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         !ifndef LIGHTBUILD
 
             SetOutPath "$INSTDIR\MTA"
-            File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\D3DCompiler_42.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\basswma.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bassmidi.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bassopus.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
-            File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\vvo.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\vvof.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
+            File "${FILES_ROOT}\mta\d3dx9_42.dll"
+            File "${FILES_ROOT}\mta\D3DCompiler_42.dll"
+            File "${FILES_ROOT}\mta\bass.dll"
+            File "${FILES_ROOT}\mta\basswma.dll"
+            File "${FILES_ROOT}\mta\bassmidi.dll"
+            File "${FILES_ROOT}\mta\bassflac.dll"
+            File "${FILES_ROOT}\mta\bass_aac.dll"
+            File "${FILES_ROOT}\mta\bass_ac3.dll"
+            File "${FILES_ROOT}\mta\bassmix.dll"
+            File "${FILES_ROOT}\mta\bass_fx.dll"
+            File "${FILES_ROOT}\mta\bassopus.dll"
+            File "${FILES_ROOT}\mta\tags.dll"
+            File "${FILES_ROOT}\mta\sa.dat"
+            File "${FILES_ROOT}\mta\vea.dll"
+            File "${FILES_ROOT}\mta\vog.dll"
+            File "${FILES_ROOT}\mta\vvo.dll"
+            File "${FILES_ROOT}\mta\vvof.dll"
+            File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
 
-            File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
+            File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
+            File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
 
             SetOutPath "$INSTDIR\MTA\config"
-            File "${FILES_ROOT}\MTA San Andreas\mta\config\chatboxpresets.xml"
+            File "${FILES_ROOT}\mta\config\chatboxpresets.xml"
 
             SetOutPath "$INSTDIR\skins\Classic"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.lnf.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.png"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.xml"
+            File "${FILES_ROOT}\skins\Classic\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\Classic\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\Classic\CGUI.png"
+            File "${FILES_ROOT}\skins\Classic\CGUI.xml"
             
             SetOutPath "$INSTDIR\skins\Default"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.is.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
+            File "${FILES_ROOT}\skins\Default\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\Default\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\Default\CGUI.png"
+            File "${FILES_ROOT}\skins\Default\CGUI.xml"
             
             SetOutPath "$INSTDIR\skins\Lighter black"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.is.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
+            File "${FILES_ROOT}\skins\Lighter black\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\Lighter black\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\Lighter black\CGUI.png"
+            File "${FILES_ROOT}\skins\Lighter black\CGUI.xml"
 
             SetOutPath "$INSTDIR\MTA\cgui"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Font.xsd"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\GUIScheme.xsd"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Imageset.xsd"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\pricedown.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sabankgothic.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
+            File "${FILES_ROOT}\mta\cgui\Falagard.xsd"
+            File "${FILES_ROOT}\mta\cgui\Font.xsd"
+            File "${FILES_ROOT}\mta\cgui\GUIScheme.xsd"
+            File "${FILES_ROOT}\mta\cgui\Imageset.xsd"
+            File "${FILES_ROOT}\mta\cgui\pricedown.ttf"
+            File "${FILES_ROOT}\mta\cgui\sabankgothic.ttf"
+            File "${FILES_ROOT}\mta\cgui\sagothic.ttf"
+            File "${FILES_ROOT}\mta\cgui\saheader.ttf"
+            File "${FILES_ROOT}\mta\cgui\sans.ttf"
+            File "${FILES_ROOT}\mta\cgui\unifont-5.1.20080907.ttf"
 
             SetOutPath "$INSTDIR\MTA\cgui\images"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.png"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.jpg"
+            File "${FILES_ROOT}\mta\cgui\images\*.png"
+            File "${FILES_ROOT}\mta\cgui\images\*.jpg"
 
             SetOutPath "$INSTDIR\MTA\cgui\images\radarset"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\radarset\*.png"
+            File "${FILES_ROOT}\mta\cgui\images\radarset\*.png"
 
             SetOutPath "$INSTDIR\MTA\cgui\images\transferset"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\transferset\*.png"
+            File "${FILES_ROOT}\mta\cgui\images\transferset\*.png"
 
             SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
+            File "${FILES_ROOT}\mta\cgui\images\serverbrowser\*.png"
 
         !endif
             
         SetOutPath "$INSTDIR\MTA\locale\"
-        File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.png"
-        File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.po"
+        File /r "${FILES_ROOT}\mta\locale\*.png"
+        File /r "${FILES_ROOT}\mta\locale\*.po"
 
         SetOutPath "$INSTDIR"
-        File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe"
+        File "${FILES_ROOT}\Multi Theft Auto.exe"
 
         # Ensure exe file can be updated without admin
         AccessControl::GrantOnFile "$INSTDIR\Multi Theft Auto.exe" "(BU)" "FullAccess"
@@ -781,8 +781,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${LogText} "Section begin - CLIENT GAME"
         SectionIn 1 RO
         SetOutPath "$INSTDIR\mods\deathmatch"
-        File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\pcre3.dll"
+        File "${FILES_ROOT}\mods\deathmatch\Client.dll"
+        File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
         SetOutPath "$INSTDIR\mods\deathmatch\resources"
         ${LogText} "Section end - CLIENT GAME"
     SectionEnd
@@ -798,11 +798,11 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         SetOutPath "$INSTDIR\server"
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\core.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
+        File "${FILES_ROOT}\mta\xmll.dll"
         File "${SERVER_FILES_ROOT}\MTA Server.exe"
         File "${SERVER_FILES_ROOT}\net.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\pthread.dll"
+        File "${FILES_ROOT}\mta\libcurl.dll"
+        File "${FILES_ROOT}\mta\pthread.dll"
         ${LogText} "Section end - SERVER CORE"
     SectionEnd
 
@@ -814,7 +814,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
         File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\pcre3.dll"
+        File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
         File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
