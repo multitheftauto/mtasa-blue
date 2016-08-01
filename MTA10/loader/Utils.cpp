@@ -114,10 +114,10 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
     // Ensure correct pthreadVC2.dll is gotted
     CallRemoteFunction( hProcess, "SetDllDirectoryW", FromUTF8( ExtractPath( ToUTF8( strLibPath ) ) ) );
     CallRemoteFunction( hProcess, "LoadLibraryW", strLibPath );
-    CheckService( CHECK_SERVICE_POST_CREATE );
 
     // Allow GTA to continue
     RemoveWinMainBlock( hProcess );
+    CheckService( CHECK_SERVICE_POST_CREATE );
 
     /* Success */
     return ( HINSTANCE )( 1 );
