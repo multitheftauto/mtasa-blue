@@ -7,5 +7,8 @@ configuration:
 before_build:
   - create-projects.bat
 
-build_script:
-  - msbuild Build\MTASA.sln
+clone_depth: 5 
+
+build:
+  parallel: true
+  project: Build/MTASA.sln
