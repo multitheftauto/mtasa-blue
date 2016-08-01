@@ -87,8 +87,10 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9 ( UINT SDKVersion )
     #if D3DX_SDK_VERSION != 42
         WriteDebugEvent( "D3DX_SDK_VERSION incorrect " QUOTE_DEFINE( D3DX_SDK_VERSION ) );
         #pragma message( "WARNING: Microsoft DirectX SDK (August 2009) includes missing" )
-        #ifndef MTA_DEBUG
-            #error "Microsoft DirectX SDK (August 2009) includes missing"
+        #ifndef CI_BUILD
+            #ifndef MTA_DEBUG
+                #error "Microsoft DirectX SDK (August 2009) includes missing"
+            #endif
         #endif
     #endif
     if ( !D3DXCheckVersion( D3D_SDK_VERSION, D3DX_SDK_VERSION ) )
