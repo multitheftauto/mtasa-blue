@@ -12,7 +12,9 @@ addons:
     env: COMPILER=g++-5
     
 before_script:
-  - utils/premake5_x86 gmake
+  - wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha9/premake-5.0.0-alpha9-linux.tar.gz
+  - tar xzf premake-5.0.0-alpha9-linux.tar.gz
+  - ./premake gmake
   - cd Build
 
 script: make -j 3 CXX=g++-5 CC=gcc-5 config=release_x64
@@ -21,5 +23,5 @@ notifications:
   irc:
     channels:
       - "irc.gtanet.com#mta.dev"
-    on_success: change
-    on_failure: always
+    on_success: never
+    on_failure: never
