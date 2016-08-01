@@ -120,7 +120,7 @@ inline size_t hash_value ( const SString& strString ) // Required for sparsehash
     return hashFunction ( strString );
 }
 #elif defined(__GNUC__) && (__GNUC__ >= 3)
-namespace __gnu_cxx
+namespace std
 {
     template<>
     struct hash < SString >
