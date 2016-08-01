@@ -1272,6 +1272,7 @@ void HandleOnQuitCommand( void )
         {
             strOperation = "open";
             strFile = PathJoin( strMTASAPath, MTA_EXE_NAME );
+            CheckService ( CHECK_SERVICE_RESTART_GAME );
         }
         else
             CheckService ( CHECK_SERVICE_POST_GAME );     // Stop service here if quit command is not 'restart'
