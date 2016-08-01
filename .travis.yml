@@ -12,7 +12,7 @@ addons:
     env: COMPILER=g++-5
     
 before_script:
-  - wget https://github.com/sbx320/premake5-travis/blob/master/premake5?raw=true
+  - wget https://github.com/sbx320/premake5-travis/blob/master/premake5?raw=true -O ./premake5
   - chmod +x ./premake5
   - ./premake5 gmake
   - cd Build
