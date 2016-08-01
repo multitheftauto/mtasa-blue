@@ -6,7 +6,12 @@ configuration:
 
 before_build:
   - utils\premake5 vs2013
-
+  - echo #ifndef TERRIBLEDXSDKHACK >> C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\d3dx9core.h
+  - echo #undef D3DX_SDK_VERSION >> C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\d3dx9core.h
+  - echo #define D3DX_SDK_VERSION 43 >> C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\d3dx9core.h 
+  - echo #define TERRIBLEDXSDKHACK >> C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\d3dx9core.h 
+  - echo #endif >> C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\d3dx9core.h 
+  
 clone_depth: 1
 
 build:
