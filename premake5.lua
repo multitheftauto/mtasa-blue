@@ -39,11 +39,15 @@ workspace "MTASA"
 		defines { "MTA_DEBUG" }
 		targetsuffix "_d"
 	
-	-- Skip Optimization in CI Builds for build speed
-	if os.getenv("CONTINUOUS_INTEGRATION") ~= "true" then
-	filter "configurations:Release or configurations:Nightly"
-		flags { "Optimize" }
-	end
+	if os.getenv("CI") ~= "true" then
+		-- Only optimize outside of CI Builds
+		filter "configurations:Release or configurations:Nightly"
+			flags { "Optimize" }
+	else
+		-- Ignore DXSDK version issue in CI builds
+		filter "configurations:Release or configurations:Nightly"
+			defines { "D3DX_SDK_VERSION=42" }
+	end 
 	
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
 		os.mkdir("Build/Symbols")
