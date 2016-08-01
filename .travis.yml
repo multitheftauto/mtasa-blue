@@ -23,5 +23,5 @@ notifications:
   irc:
     channels:
       - "irc.gtanet.com#mta.dev"
-    on_success: never
-    on_failure: never
+    on_success: change
+    on_failure: always
