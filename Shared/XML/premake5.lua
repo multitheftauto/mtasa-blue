@@ -35,3 +35,5 @@ project "XML"
 			copy "mta"
 		}
 	
+	filter {"system:windows", "platforms:x64"}
+		targetdir(buildpath("server/x64"))

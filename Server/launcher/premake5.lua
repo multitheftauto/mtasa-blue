@@ -33,3 +33,6 @@ project "Launcher"
 
 	filter {"system:linux", "platforms:x64"}
 		targetname "mta-server64"
+	
+	filter {"system:windows", "platforms:x64"}
+		targetname "MTA Server64"

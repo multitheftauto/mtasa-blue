@@ -52,13 +52,15 @@ project "pcre"
 	
 	filter "system:windows"
 		kind "SharedLib"
-		 targetdir(buildpath("server/mods/deathmatch"))
+		targetdir(buildpath("server/mods/deathmatch"))
 		
 	filter {"system:windows", "platforms:x86"}
 		postbuildcommands {
 			copy "mods/deathmatch"
 		}
 
+	filter {"system:windows", "platforms:x64"}
+		targetdir(buildpath("server/x64"))
+
 	filter "system:not windows"
 		kind "StaticLib"
-

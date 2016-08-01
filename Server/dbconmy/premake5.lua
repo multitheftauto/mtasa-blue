@@ -36,8 +36,10 @@ project "Dbconmy"
 		includedirs { "/usr/include/mysql" }
 		links { "mysqlclient" }
 	
-	filter { "system:windows", "architecture:x64" }
+	filter { "system:windows", "platforms:x64" }
 		links { "../../vendor/mysql/lib/x64/libmysql.lib" }
-	filter { "system:windows", "architecture:x86" }
+	filter { "system:windows", "platforms:x86" }
 		links { "../../vendor/mysql/lib/x86/libmysql.lib" }
 	
+	filter "platforms:x64"
+		targetdir(buildpath("server/x64"))

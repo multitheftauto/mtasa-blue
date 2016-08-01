@@ -22,6 +22,9 @@ project "Lua_Server"
 	filter "system:not windows"
 		kind "StaticLib"
 
+	filter {"system:windows", "platforms:x64"}
+		targetdir(buildpath("server/x64"))
+
 
 if os.get() == "windows" then
 	project "Lua_Client"
@@ -49,6 +52,6 @@ if os.get() == "windows" then
 		configuration "windows"
 			defines { "LUA_BUILD_AS_DLL" }
 
-        filter "architecture:x64"
+        filter "platforms:x64"
             flags { "ExcludeFromBuild" } 
 end

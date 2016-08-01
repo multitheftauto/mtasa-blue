@@ -29,7 +29,10 @@ project "pthread"
 	filter {"system:windows", "platforms:x86"}
 		postbuildcommands {
 			copy "mta"
-		}		
+		}
+	
+	filter {"system:windows", "platforms:x64"}
+		targetdir(buildpath("server/x64"))
 
 	filter "system:windows"
 		defines {

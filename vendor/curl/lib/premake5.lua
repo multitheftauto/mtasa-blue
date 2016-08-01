@@ -8,7 +8,6 @@ project "curl"
 		"../include",
 		"../../zlib"
 	}
-
 	
 	vpaths { 
 		["Headers"] = "**.h",
@@ -261,4 +260,7 @@ project "curl"
 		postbuildcommands {
 			copy "mta"
 		}
+
+	filter "platforms:x64"
+		targetdir(buildpath("server/x64"))
 	

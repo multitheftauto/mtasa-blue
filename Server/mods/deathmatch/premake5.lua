@@ -34,7 +34,6 @@ project "Deathmatch"
 		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"
 	}
 	
-	
 	vpaths {
 		["Headers/*"] = {"**.h", "../../../**.h"},
 		["Sources/*"] = {"**.cpp", "../../../**.cpp"},
@@ -65,3 +64,5 @@ project "Deathmatch"
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
 	
+	filter "platforms:x64"
+		targetdir(buildpath("server/x64"))

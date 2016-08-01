@@ -45,3 +45,6 @@ project "Core"
 
 	filter "system:linux"
 		links { "ncurses", "ncursesw", "breakpad", "pthread", "stdc++" }
+
+	filter "platforms:x64"
+		targetdir(buildpath("server/x64"))
