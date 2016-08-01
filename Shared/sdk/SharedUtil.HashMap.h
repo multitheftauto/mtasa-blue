@@ -113,10 +113,24 @@ struct std::hash<SString>
     }
 };
 
+#if defined(WIN32)
 inline size_t hash_value ( const SString& strString ) // Required for sparsehash
 {
     std::hash<std::string> hashFunction;
     return hashFunction ( strString );
 }
+#elif defined(__GNUC__) && (__GNUC__ >= 3)
+namespace __gnu_cxx
+{
+    template<>
+    struct hash < SString >
+    {
+        size_t operator () ( const SString& strString ) const
+        {
+            return __stl_hash_string ( strString );
+        }
+    };
+}
+#endif
 
 #endif  // WITH_ALLOC_TRACKING
