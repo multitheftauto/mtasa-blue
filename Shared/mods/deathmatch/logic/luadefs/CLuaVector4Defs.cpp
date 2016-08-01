@@ -1,10 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CLuaVectorDefs.cpp
+*  FILE:        Shared/mods/deathmatch/logic/luadefs/CLuaVector4Defs.cpp
 *  PURPOSE:     Lua general class functions
-*  DEVELOPERS:  Stanislav Bobrov <lil_toady@hotmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -28,6 +27,8 @@ void CLuaVector4Defs::AddClass ( lua_State* luaVM )
     lua_classmetamethod ( luaVM, "__eq", Eq );
     lua_classmetamethod ( luaVM, "__len", GetLength );
 
+#ifdef MTA_CLIENT
+    // Client
     lua_classfunction ( luaVM, "create", Create );
     lua_classfunction ( luaVM, "normalize", Normalize );
     lua_classfunction ( luaVM, "dot", Dot );
@@ -53,10 +54,37 @@ void CLuaVector4Defs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "length", NULL, GetLength );
     lua_classvariable ( luaVM, "squaredLength", NULL, GetLengthSquared );
     lua_classvariable ( luaVM, "normalized", NULL, GetNormalized );
+#else
+    // Server
+    lua_classfunction ( luaVM, "create", "", Create );
+    lua_classfunction ( luaVM, "normalize", "", Normalize );
+    lua_classfunction ( luaVM, "dot", "", Dot );
+
+    lua_classfunction ( luaVM, "getLength", "", GetLength );
+    lua_classfunction ( luaVM, "getSquaredLength", "", GetLengthSquared );
+    lua_classfunction ( luaVM, "getNormalized", "", GetNormalized );
+    lua_classfunction ( luaVM, "getX", "", GetX );
+    lua_classfunction ( luaVM, "getY", "", GetY );
+    lua_classfunction ( luaVM, "getZ", "", GetZ );
+    lua_classfunction ( luaVM, "getW", "", GetW );
+
+    lua_classfunction ( luaVM, "setX", "", SetX );
+    lua_classfunction ( luaVM, "setY", "", SetY );
+    lua_classfunction ( luaVM, "setZ", "", SetZ );
+    lua_classfunction ( luaVM, "setW", "", SetW );
+
+    lua_classvariable ( luaVM, "x", "", "", SetX, GetX );
+    lua_classvariable ( luaVM, "y", "", "", SetY, GetY );
+    lua_classvariable ( luaVM, "z", "", "", SetZ, GetZ );
+    lua_classvariable ( luaVM, "w", "", "", SetW, GetW );
+
+    lua_classvariable ( luaVM, "length", "", "", NULL, GetLength );
+    lua_classvariable ( luaVM, "squaredLength", "", "", NULL, GetLengthSquared );
+    lua_classvariable ( luaVM, "normalized", "", "", NULL, GetNormalized );
+#endif
 
     lua_registerclass ( luaVM, "Vector4" );
 }
-
 
 int CLuaVector4Defs::Create ( lua_State* luaVM )
 {
@@ -147,7 +175,6 @@ int CLuaVector4Defs::Create ( lua_State* luaVM )
     {
         argStream.ReadVector4D ( vector );
     }
-
     lua_pushvector ( luaVM, vector );
     return 1;
 }
@@ -564,7 +591,7 @@ int CLuaVector4Defs::Mul ( lua_State* luaVM )
     }
     else
     {
-        // vector3 * ?
+        // vector4 * ?
         argStream.ReadUserData ( pVector1 );
         if ( argStream.NextIsNumber ( ) )
         {

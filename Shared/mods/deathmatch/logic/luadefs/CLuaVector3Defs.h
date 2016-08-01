@@ -1,10 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CLuaVectorDefs.h
+*  FILE:        Shared/mods/deathmatch/logic/luadefs/CLuaVector3Defs.h
 *  PURPOSE:     Lua general class functions
-*  DEVELOPERS:  Stanislav Bobrov <lil_toady@hotmail.com>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
