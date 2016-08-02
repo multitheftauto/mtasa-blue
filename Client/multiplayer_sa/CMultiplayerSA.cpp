@@ -6638,6 +6638,7 @@ void CTaskSimpleGangDriveBy__ProcessPed()
         *pRequiredAnim = m_pDrivebyAnimationHandler(*pRequiredAnim, requiredAnimGroup);
 }
 
+DWORD RETURN_CTaskSimpleGangDriveBy_ProcessPed_Cancel = 0x62D5C1;
 void _declspec(naked) HOOK_CTaskSimpleGangDriveBy__ProcessPed()
 {
     // esi contains 'this'
@@ -6649,14 +6650,16 @@ void _declspec(naked) HOOK_CTaskSimpleGangDriveBy__ProcessPed()
     CTaskSimpleGangDriveBy__ProcessPed();
     _asm
     {
-        popad;
+        popad
         // Replaced code
-        cmp[esi + 28h], edi;    // .text:0062D5A7
-        jnz 0x62D5C1;           // .text:0062D5AA
+        cmp[esi + 28h], edi                // .text:0062D5A7
+        jnz GangDriveBy_ProcessPed_Cancel  // .text:0062D5AA
         // Return to original code
-        jmp RETURN_CTaskSimplyGangDriveBy__ProcessPed;
+        jmp RETURN_CTaskSimplyGangDriveBy__ProcessPed
+
+    GangDriveBy_ProcessPed_Cancel:
+        jmp RETURN_CTaskSimpleGangDriveBy_ProcessPed_Cancel
     }
-     
 }
 
 

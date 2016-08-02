@@ -1437,8 +1437,11 @@ void _declspec( naked ) HOOK_CWorld_RemoveFallenCars ( )
         popad
         mov eax, [esi + 14h]
         test eax, eax
-        jz 565F57h
+        jz RemoveFallenCars_Cancel
         jmp RETURN_CWorld_RemoveFallenCars_Cont
+
+     RemoveFallenCars_Cancel:
+        jmp HOOK_CWorld_RemoveFallenCars_Cont1
     }
 }
 
@@ -1608,8 +1611,11 @@ void _declspec( naked ) HOOK_CMultiplayerSA_ToggleTyreSmoke ( )
     {
         popad
         test eax, 20000h
-        jnz 06DF3B9h
+        jnz ToggleTyreSmoke_Cancel
         jmp dwReturnAddressTyreSmoke
+
+    ToggleTyreSmoke_Cancel:
+        jmp dwReturnIgnorePed
     }
 }
 
