@@ -63,7 +63,7 @@ CCredits::CCredits ( void )
                               "Iztas\n"
                               "impulze\n"
                               "JoeBullet\n"
-                              "qaisjp\n"
+                              "Qais \"qaisjp\" Patankar\n"
                               "\n";
 
     m_strCredits +=           _("Game Design / Scripting");
@@ -124,6 +124,9 @@ CCredits::CCredits ( void )
                               "W\n"
                               "TheKiller 'Dutchman' 101\n"
                               "Fedor Sinev\n"
+                              "lopezloo\n"
+                              "Marek \"Necktrox\" Kulik\n"
+                              "zneext\n"
                               "\n";
                               "\n";
 
@@ -162,9 +165,9 @@ CCredits::CCredits ( void )
                               "\n";
     m_strCredits +=           _("This software makes use of the following libraries and software:");
     m_strCredits +=           "\n"
-                              "RakNet (http://www.jenkinssoftware.com)\n"
+                              "RakNet (http://www.jenkinssoftware.com/)\n"
                               "SA Limit adjuster source code (Credits to Sacky)\n"
-                              "CEGUI (http://www.cegui.org.uk/wiki/index.php/Main_Page)\n"
+                              "CEGUI (http://www.cegui.org.uk/)\n"
                               "cURL (http://curl.haxx.se/)\n"
                               "libpcre (http://www.pcre.org/)\n"
                               "Lua (http://www.lua.org/)\n"
@@ -174,10 +177,10 @@ CCredits::CCredits ( void )
                               "zlib (http://zlib.net/)\n"
                               "bzip2 (http://bzip.org/)\n"
                               "UnRAR (http://www.rarlab.com/)\n"
-                              "tinygettext (http://code.google.com/p/tinygettext/)\n"
+                              "tinygettext (https://github.com/tinygettext/tinygettext/)\n"
                               "PortAudio (http://www.portaudio.com/)\n"
                               "speex (http://www.speex.org/)\n"
-                              "CEF (https://code.google.com/p/chromiumembedded/)\n"
+                              "CEF (https://bitbucket.org/chromiumembedded/cef/)\n"
                               ;
 
     // Create our window
