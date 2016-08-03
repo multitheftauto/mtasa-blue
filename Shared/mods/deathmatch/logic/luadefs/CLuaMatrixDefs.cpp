@@ -24,8 +24,9 @@ void CLuaMatrixDefs::AddClass ( lua_State* luaVM )
     lua_classmetamethod ( luaVM, "__mul", Mul );
     lua_classmetamethod ( luaVM, "__div", Div );
 
+#ifdef MTA_CLIENT
+    // Client
     lua_classfunction ( luaVM, "create", Create );
-
     lua_classfunction ( luaVM, "transformPosition", TransformPosition );
     lua_classfunction ( luaVM, "transformDirection", TransformDirection );
     lua_classfunction ( luaVM, "inverse", Inverse );
@@ -47,6 +48,31 @@ void CLuaMatrixDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "forward", SetForward, GetForward );
     lua_classvariable ( luaVM, "right", SetRight, GetRight );
     lua_classvariable ( luaVM, "up", SetUp, GetUp );
+#else
+    // Server
+    lua_classfunction ( luaVM, "create", "", Create );
+    lua_classfunction ( luaVM, "transformPosition", "", TransformPosition );
+    lua_classfunction ( luaVM, "transformDirection", "", TransformDirection );
+    lua_classfunction ( luaVM, "inverse", "", Inverse );
+
+    lua_classfunction ( luaVM, "getPosition", "", GetPosition );
+    lua_classfunction ( luaVM, "getRotation", "", GetRotation );
+    lua_classfunction ( luaVM, "getForward", "", GetForward );
+    lua_classfunction ( luaVM, "getRight", "", GetRight );
+    lua_classfunction ( luaVM, "getUp", "", GetUp );
+
+    lua_classfunction ( luaVM, "setPosition", "", SetPosition );
+    lua_classfunction ( luaVM, "setRotation", "", SetRotation );
+    lua_classfunction ( luaVM, "setForward", "", SetForward );
+    lua_classfunction ( luaVM, "setRight", "", SetRight );
+    lua_classfunction ( luaVM, "setUp", "", SetUp );
+
+    lua_classvariable ( luaVM, "position", "", "", SetPosition, GetPosition );
+    lua_classvariable ( luaVM, "rotation", "", "", SetRotation, GetRotation );
+    lua_classvariable ( luaVM, "forward", "", "", SetForward, GetForward );
+    lua_classvariable ( luaVM, "right", "", "", SetRight, GetRight );
+    lua_classvariable ( luaVM, "up", "", "", SetUp, GetUp );
+#endif
 
     lua_registerclass ( luaVM, "Matrix" );
 }
@@ -78,10 +104,10 @@ int CLuaMatrixDefs::Create ( lua_State* luaVM )
         argStream.ReadMatrix ( matrix );
         matrix = CMatrix ( matrix );
     }
-    else if ( !argStream.NextIsNone () ) {
+    else if ( !argStream.NextIsNone() ) {
         argStream.SetCustomError ( "Expected vector3, matrix or nothing" );
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
+        
         lua_pushboolean ( luaVM, false );
         return 1;
     }
@@ -121,7 +147,7 @@ int CLuaMatrixDefs::ToString ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString string = SString ( "Matrix: { %.3f, %.3f, %.3f } { %.3f, %.3f, %.3f } { %.3f, %.3f, %.3f } { %.3f, %.3f, %.3f }",
+        SString string = SString ( "Matrix: { %.3f, %.3f, %.3f } { %.3f, %.3f, %.3f } { %.3f, %.3f, %.3f } { %.3f, %.3f, %.3f }", 
             pMatrix->vRight.fX, pMatrix->vRight.fY, pMatrix->vRight.fZ,
             pMatrix->vFront.fX, pMatrix->vFront.fY, pMatrix->vFront.fZ,
             pMatrix->vUp.fX, pMatrix->vUp.fY, pMatrix->vUp.fZ,
@@ -351,7 +377,7 @@ int CLuaMatrixDefs::SetRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        ConvertRadiansToDegrees ( vecRotation );
+        ConvertRadiansToDegreesNoWrap ( vecRotation );
         pMatrix->SetRotation ( vecRotation );
 
         lua_pushboolean ( luaVM, true );

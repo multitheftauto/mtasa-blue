@@ -18,10 +18,10 @@ class CLuaMain;
 #pragma once
 
 #include "CLuaTimerManager.h"
-#include "CLuaVector2.h"
-#include "CLuaVector3.h"
-#include "CLuaVector4.h"
-#include "CLuaMatrix.h"
+#include "lua/CLuaVector2.h"
+#include "lua/CLuaVector3.h"
+#include "lua/CLuaVector4.h"
+#include "lua/CLuaMatrix.h"
 
 #include "CLuaFunctionDefs.h"
 

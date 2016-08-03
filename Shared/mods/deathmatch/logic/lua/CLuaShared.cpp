@@ -1,9 +1,8 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CLuaShared.cpp
+*  FILE:        Shared/mods/logic/lua/CLuaShared.cpp
 *
 *****************************************************************************/
 

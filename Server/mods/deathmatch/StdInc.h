@@ -173,7 +173,7 @@ struct SAclRequest;
 #include "CPositionRotationAnimation.h"
 #include "CLatentTransferManager.h"
 #include "CDebugHookManager.h"
-#include "CLuaShared.h"
+#include "lua/CLuaShared.h"
 
 // Logic includes
 #include "ASE.h"

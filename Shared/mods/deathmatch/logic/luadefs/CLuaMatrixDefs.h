@@ -11,7 +11,6 @@
 *****************************************************************************/
 
 #pragma once
-
 extern "C"
 {
     #include "lua.h"
@@ -22,7 +21,7 @@ extern "C"
 class CLuaMatrixDefs: public CLuaDefs
 {
 public:
-    static void AddClass ( lua_State* luaVM );
+    static void     AddClass                        ( lua_State* luaVM );
     LUA_DECLARE ( Create );
     LUA_DECLARE ( Destroy );
 

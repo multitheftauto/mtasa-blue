@@ -146,7 +146,7 @@
 #include "CPositionRotationAnimation.h"
 #include "CLatentTransferManager.h"
 #include "CDebugHookManager.h"
-#include "CLuaShared.h"
+#include "lua/CLuaShared.h"
 
 // Deathmatch includes
 #include "ClientCommands.h"

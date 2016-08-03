@@ -1,17 +1,15 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/logic/lua/CLuaVector4.h
-*  PURPOSE:     Lua vector class
-*  DEVELOPERS:  Stanislav Bobrov <lil_toady@hotmail.com>
+*  FILE:        Shared/mods/logic/lua/CLuaVector4.cpp
+*  PURPOSE:     Lua vector4 class
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
 
-#ifndef __CLUAVECTOR4_H
-#define __CLUAVECTOR4_H
+#pragma once
 
 class CLuaVector4D : public CVector4D
 {
@@ -32,5 +30,3 @@ private:
     unsigned int    m_uiScriptID;
 
 };
-
-#endif
