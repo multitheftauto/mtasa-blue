@@ -1870,18 +1870,17 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         // Read out the player that's going into the vehicle
                         ElementID PlayerInside = INVALID_ELEMENT_ID;
                         bitStream.Read ( PlayerInside );
-                        CClientPlayer* pInsidePlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerInside );
+                        CClientPed* pInsidePlayer = g_pClientGame->m_pPedManager->Get ( PlayerInside, true );
                         if ( pInsidePlayer )
                         {
                             // And the one dumping out on the outside
                             ElementID PlayerOutside = INVALID_ELEMENT_ID;
                             bitStream.Read ( PlayerOutside );
-                            CClientPlayer* pOutsidePlayer = g_pClientGame->m_pPlayerManager->Get ( PlayerOutside );
+                            CClientPed* pOutsidePlayer = g_pClientGame->m_pPedManager->Get ( PlayerOutside, true );
                             if ( pOutsidePlayer )
                             {
                                 // If local player, we are now allowed to enter it again
-                                if ( pInsidePlayer->IsLocalPlayer () ||
-                                        pOutsidePlayer->IsLocalPlayer () )
+                                if ( pInsidePlayer->IsLocalPlayer () || pOutsidePlayer->IsLocalPlayer () )
                                 {
                                     g_pClientGame->ResetVehicleInOut ();
                                 }

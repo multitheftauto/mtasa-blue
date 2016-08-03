@@ -57,11 +57,11 @@ void CClientPedManager::DoPulse ( bool bDoStandardPulses )
 }
 
 
-CClientPed* CClientPedManager::Get ( ElementID ID, bool bCheckPlayers )
+CClientPed* CClientPedManager::Get ( ElementID ID, bool bIncludePlayers )
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-    if ( pEntity && ( pEntity->GetType () == CCLIENTPED || ( bCheckPlayers && pEntity->GetType () == CCLIENTPLAYER ) ) )
+    if ( pEntity && ( pEntity->GetType () == CCLIENTPED || ( bIncludePlayers && pEntity->GetType () == CCLIENTPLAYER ) ) )
     {
         return static_cast < CClientPed* > ( pEntity );
     }
