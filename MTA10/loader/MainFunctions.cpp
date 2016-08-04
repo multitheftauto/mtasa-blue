@@ -945,9 +945,10 @@ BOOL CreateProcessWithMitigationPolicy (
     STARTUPINFOEXW StartupInfoEx = { 0 };
     StartupInfoEx.StartupInfo.cb = sizeof ( StartupInfoEx.StartupInfo );
 
-    if ( IsWindowsVistaOrGreater () )
+    if ( IsWindows7OrGreater () )
     {
         // We can use extended startup info for Vista and up
+        // however mitigation policies are not available until Windows 7
         StartupInfoEx.StartupInfo.cb = sizeof ( StartupInfoEx );
         dwCreationFlags |= EXTENDED_STARTUPINFO_PRESENT;
 
@@ -1034,7 +1035,7 @@ BOOL CreateProcessWithMitigationPolicy (
         strOutErrorContext = "CreateProcess";
     }
 
-    if ( IsWindowsVistaOrGreater () )
+    if ( IsWindows7OrGreater () )
     {
         // Clean up
         _DeleteProcThreadAttributeList ( StartupInfoEx.lpAttributeList );
