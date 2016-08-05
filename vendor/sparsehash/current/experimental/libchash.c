@@ -118,6 +118,7 @@
  *  is defined correctly for your machine!  (5 for 32 bit words, 6 for 64).
  */
 
+#include <sparsehash/internal/sparseconfig.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>       /* for strcmp, memcmp, etc */

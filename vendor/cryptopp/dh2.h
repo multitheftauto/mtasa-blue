@@ -1,8 +1,11 @@
+// dh2.h - written and placed in the public domain by Wei Dai
+
+//! \file
+//! \headerfile dh2.h
+//! \brief Classes for Diffie-Hellman authenticated key exchange
+
 #ifndef CRYPTOPP_DH2_H
 #define CRYPTOPP_DH2_H
-
-/** \file
-*/
 
 #include "cryptlib.h"
 
@@ -48,6 +51,10 @@ public:
 		const byte *staticPrivateKey, const byte *ephemeralPrivateKey, 
 		const byte *staticOtherPublicKey, const byte *ephemeralOtherPublicKey,
 		bool validateStaticOtherPublicKey=true) const;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DH2() {}
+#endif
 
 protected:
 	SimpleKeyAgreementDomain &d1, &d2;

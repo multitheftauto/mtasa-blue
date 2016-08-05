@@ -17,8 +17,7 @@
 
 class CEasingCurve;
 
-#ifndef __CEASINGCURVE_H
-#define __CEASINGCURVE_H
+#pragma once
 
 //Real implementation class defined in .cpp
 class CEasingCurve_Impl;
@@ -82,5 +81,3 @@ public:
 protected:
     CEasingCurve_Impl*  m_pImplementation;
 };
-
-#endif

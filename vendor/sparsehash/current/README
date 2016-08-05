@@ -15,7 +15,7 @@ COMPILING
 To compile test applications with these classes, run ./configure
 followed by make.  To install these header files on your system, run
 'make install'.  (On Windows, the instructions are different; see
-README.windows.)  See INSTALL for more details.
+README_windows.txt.)  See INSTALL for more details.
 
 This code should work on any modern C++ system.  It has been tested on
 Linux (Ubuntu, Fedora, RedHat, Debian), Solaris 10 x86, FreeBSD 6.0,
@@ -26,7 +26,7 @@ USING
 See the html files in the doc directory for small example programs
 that use these classes.  It's enough to just include the header file:
 
-   #include <google/sparse_hash_map> // or sparse_hash_set, dense_hash_map, ...
+   #include <sparsehash/sparse_hash_map> // or sparse_hash_set, dense_hash_map, ...
    google::sparse_hash_set<int, int> number_mapper;
 
 and use the class the way you would other hash-map implementations.
@@ -75,15 +75,9 @@ There are also some smaller differences:
         if (...) ht.erase(it);
    As another consequence, a series of erase() calls can leave your
    hashtable using more memory than it needs to.  The hashtable will
-   automatically compact() at the next call to insert(), but to
+   automatically compact at the next call to insert(), but to
    manually compact a hashtable, you can call
       ht.resize(0)
-
-3) While sparse_hash_map et al. accept an Allocator template argument,
-   they ignore it.  They use malloc() and free() for all memory
-   allocations.
-
-4) sparse_hash_map et al. do not use exceptions.
 
 I/O
 ---
@@ -112,20 +106,24 @@ SPARSETABLE
 In addition to the hash-map and hash-set classes, this package also
 provides sparsetable.h, an array implementation that uses space
 proportional to the number of elements in the array, rather than the
-maximum element index.  It uses very little space overhead: 1 bit per
-entry.  See doc/sparsetable.html for the API.
+maximum element index.  It uses very little space overhead: 2 to 5
+bits per entry.  See doc/sparsetable.html for the API.
 
 RESOURCE USAGE
 --------------
-* sparse_hash_map has memory overhead of about 2 bits per hash-map
-  entry.
+* sparse_hash_map has memory overhead of about 4 to 10 bits per 
+  hash-map entry, assuming a typical average occupancy of 50%.
 * dense_hash_map has a factor of 2-3 memory overhead: if your
   hashtable data takes X bytes, dense_hash_map will use 3X-4X memory
   total.
 
 Hashtables tend to double in size when resizing, creating an
 additional 50% space overhead.  dense_hash_map does in fact have a
-significant "high water mark" memory use requirement.
+significant "high water mark" memory use requirement, which is 6 times
+the size of hash entries in the table when resizing (when reaching 
+50% occupancy, the table resizes to double the previous size, and the 
+old table (2x) is copied to the new table (4x)).
+
 sparse_hash_map, however, is written to need very little space
 overhead when resizing: only a few bits per hashtable entry.
 
@@ -146,4 +144,4 @@ and performance data.
 
 ---
 16 March 2005
-(Last updated: 20 March 2007)
+(Last updated: 12 September 2010)

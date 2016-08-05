@@ -1,21 +1,43 @@
+// wait.h - written and placed in the public domain by Wei Dai
+
 #ifndef CRYPTOPP_WAIT_H
 #define CRYPTOPP_WAIT_H
 
 #include "config.h"
 
-#ifdef SOCKETS_AVAILABLE
+#if !defined(NO_OS_DEPENDENCE) && (defined(SOCKETS_AVAILABLE) || defined(WINDOWS_PIPES_AVAILABLE))
 
-#include "misc.h"
 #include "cryptlib.h"
-#include <vector>
+#include "misc.h"
+#include "stdcpp.h"
 
 #ifdef USE_WINDOWS_STYLE_SOCKETS
 #include <winsock2.h>
 #else
 #include <sys/types.h>
+#include <sys/select.h>
+#endif
+
+// For defintions of VOID, PVOID, HANDLE, PHANDLE, etc.
+#if defined(CRYPTOPP_WIN32_AVAILABLE)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #endif
 
 #include "hrtimer.h"
+
+#if defined(__has_feature)
+# if __has_feature(memory_sanitizer)
+#  define CRYPTOPP_MSAN 1
+# endif
+#endif
+
+// http://connect.microsoft.com/VisualStudio/feedback/details/1581706
+//   and http://github.com/weidai11/cryptopp/issues/214
+#if CRYPTOPP_MSC_VERSION == 1900
+# pragma warning(push)
+# pragma warning(disable: 4589)
+#endif
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -59,10 +81,10 @@ protected:
 	public: DERIVED(unsigned int level = 0) : Tracer(level) {}
 
 #define CRYPTOPP_BEGIN_TRACER_CLASS_1(DERIVED, BASE1) \
-	class DERIVED : virtual public BASE1 { CRYPTOPP_TRACER_CONSTRUCTOR(DERIVED)
+	class DERIVED : virtual public BASE1, public NotCopyable { CRYPTOPP_TRACER_CONSTRUCTOR(DERIVED)
 
 #define CRYPTOPP_BEGIN_TRACER_CLASS_2(DERIVED, BASE1, BASE2) \
-	class DERIVED : virtual public BASE1, virtual public BASE2 { CRYPTOPP_TRACER_CONSTRUCTOR(DERIVED)
+	class DERIVED : virtual public BASE1, virtual public BASE2, public NotCopyable { CRYPTOPP_TRACER_CONSTRUCTOR(DERIVED)
 
 #define CRYPTOPP_END_TRACER_CLASS };
 
@@ -133,6 +155,7 @@ protected:
 	char const* m_z;
 };
 
+// Thanks to Maximilian Zamorsky for help with http://connect.microsoft.com/VisualStudio/feedback/details/1570496/
 CRYPTOPP_BEGIN_TRACER_CLASS_1(WaitObjectsTracer, Tracer)
 	CRYPTOPP_BEGIN_TRACER_EVENTS(0x48752841)
 		CRYPTOPP_TRACER_EVENT(NoWaitLoop)
@@ -164,7 +187,11 @@ public:
 	bool Wait(unsigned long milliseconds);
 
 #ifdef USE_WINDOWS_STYLE_SOCKETS
+# ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~WaitObjectContainer();
+# else
 	~WaitObjectContainer();
+#endif
 	void AddHandle(HANDLE handle, CallStack const& callStack);
 #else
 	void AddReadFd(int fd, CallStack const& callStack);
@@ -202,6 +229,10 @@ private:
 };
 
 NAMESPACE_END
+
+#if CRYPTOPP_MSC_VERSION == 1900
+# pragma warning(pop)
+#endif
 
 #endif
 

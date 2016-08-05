@@ -3,8 +3,9 @@
 
 #include "config.h"
 
-#ifdef SOCKETS_AVAILABLE
+#if !defined(NO_OS_DEPENDENCE) && defined(SOCKETS_AVAILABLE)
 
+#include "cryptlib.h"
 #include "network.h"
 #include "queue.h"
 
@@ -90,7 +91,7 @@ public:
 	void CheckAndHandleError_int(const char *operation, int result) const
 		{if (result == SOCKET_ERROR) HandleError(operation);}
 	void CheckAndHandleError(const char *operation, socket_t result) const
-		{if (result == SOCKET_ERROR) HandleError(operation);}
+		{if (result == static_cast<socket_t>(SOCKET_ERROR)) HandleError(operation);}
 #ifdef USE_WINDOWS_STYLE_SOCKETS
 	void CheckAndHandleError(const char *operation, BOOL result) const
 		{assert(result==TRUE || result==FALSE); if (!result) HandleError(operation);}
@@ -120,7 +121,7 @@ class SocketsInitializer
 {
 public:
 	SocketsInitializer() {Socket::StartSockets();}
-	~SocketsInitializer() {try {Socket::ShutdownSockets();} catch (...) {}}
+	~SocketsInitializer() {try {Socket::ShutdownSockets();} catch (const Exception&) {assert(0);}}
 };
 
 class SocketReceiver : public NetworkReceiver
@@ -219,6 +220,6 @@ private:
 
 NAMESPACE_END
 
-#endif	// #ifdef SOCKETS_AVAILABLE
+#endif	// SOCKETS_AVAILABLE
 
-#endif
+#endif  // CRYPTOPP_SOCKETFT_H

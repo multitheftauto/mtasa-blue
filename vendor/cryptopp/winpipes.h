@@ -3,15 +3,16 @@
 
 #include "config.h"
 
-#ifdef WINDOWS_PIPES_AVAILABLE
+#if !defined(NO_OS_DEPENDENCE) && defined(WINDOWS_PIPES_AVAILABLE)
 
+#include "cryptlib.h"
 #include "network.h"
 #include "queue.h"
 #include <winsock2.h>
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! Windows Handle
+//! \brief Windows Handle
 class WindowsHandle
 {
 public:
@@ -22,7 +23,7 @@ public:
 	bool GetOwnership() const {return m_own;}
 	void SetOwnership(bool own) {m_own = own;}
 
-	operator HANDLE() {return m_h;}
+	operator HANDLE() const {return m_h;}
 	HANDLE GetHandle() const {return m_h;}
 	bool HandleValid() const;
 	void AttachHandle(HANDLE h, bool own=false);
@@ -36,7 +37,7 @@ protected:
 	bool m_own;
 };
 
-//! Windows Pipe
+//! \brief Windows Pipe
 class WindowsPipe
 {
 public:
@@ -57,7 +58,7 @@ protected:
 		{assert(result==TRUE || result==FALSE); if (!result) HandleError(operation);}
 };
 
-//! pipe-based implementation of NetworkReceiver
+//! \brief Pipe-based implementation of NetworkReceiver
 class WindowsPipeReceiver : public WindowsPipe, public NetworkReceiver
 {
 public:
@@ -68,6 +69,7 @@ public:
 	unsigned int GetReceiveResult();
 	bool EofReceived() const {return m_eofReceived;}
 
+	HANDLE GetHandle() const {return m_event;}
 	unsigned int GetMaxWaitObjectCount() const {return 1;}
 	void GetWaitObjects(WaitObjectContainer &container, CallStack const& callStack);
 
@@ -79,7 +81,7 @@ private:
 	bool m_eofReceived;
 };
 
-//! pipe-based implementation of NetworkSender
+//! \brief Pipe-based implementation of NetworkSender
 class WindowsPipeSender : public WindowsPipe, public NetworkSender
 {
 public:
@@ -91,6 +93,7 @@ public:
 	bool MustWaitForEof() { return false; }
 	void SendEof() {}
 
+	HANDLE GetHandle() const {return m_event;}
 	unsigned int GetMaxWaitObjectCount() const {return 1;}
 	void GetWaitObjects(WaitObjectContainer &container, CallStack const& callStack);
 
@@ -101,7 +104,7 @@ private:
 	DWORD m_lastResult;
 };
 
-//! Windows Pipe Source
+//! \brief Windows Pipe Source
 class WindowsPipeSource : public WindowsHandle, public NetworkSource, public WindowsPipeReceiver
 {
 public:
@@ -112,23 +115,23 @@ public:
 			PumpAll();
 	}
 
-	NetworkSource::GetMaxWaitObjectCount;
-	NetworkSource::GetWaitObjects;
+	using NetworkSource::GetMaxWaitObjectCount;
+	using NetworkSource::GetWaitObjects;
 
 private:
 	HANDLE GetHandle() const {return WindowsHandle::GetHandle();}
 	NetworkReceiver & AccessReceiver() {return *this;}
 };
 
-//! Windows Pipe Sink
+//! \brief Windows Pipe Sink
 class WindowsPipeSink : public WindowsHandle, public NetworkSink, public WindowsPipeSender
 {
 public:
 	WindowsPipeSink(HANDLE h=INVALID_HANDLE_VALUE, unsigned int maxBufferSize=0, unsigned int autoFlushBound=16*1024)
 		: WindowsHandle(h), NetworkSink(maxBufferSize, autoFlushBound) {}
 
-	NetworkSink::GetMaxWaitObjectCount;
-	NetworkSink::GetWaitObjects;
+	using NetworkSink::GetMaxWaitObjectCount;
+	using NetworkSink::GetWaitObjects;
 
 private:
 	HANDLE GetHandle() const {return WindowsHandle::GetHandle();}
@@ -137,6 +140,6 @@ private:
 
 NAMESPACE_END
 
-#endif
+#endif // WINDOWS_PIPES_AVAILABLE
 
 #endif

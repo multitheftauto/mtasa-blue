@@ -1,3 +1,8 @@
+// pkcspad.h - written and placed in the public domain by Wei Dai
+
+//! \headerfile pkcspad.h
+//! \brief Classes for PKCS padding schemes
+
 #ifndef CRYPTOPP_PKCSPAD_H
 #define CRYPTOPP_PKCSPAD_H
 
@@ -71,7 +76,7 @@ public:
 		{
 			static HashIdentifier Lookup()
 			{
-				return HashIdentifier(PKCS_DigestDecoration<H>::decoration, PKCS_DigestDecoration<H>::length);
+				return HashIdentifier(PKCS_DigestDecoration<H>::decoration, (size_t)PKCS_DigestDecoration<H>::length);
 			}
 		};
 	};

@@ -25,7 +25,6 @@
 				RuntimeLibrary="5"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -70,7 +69,6 @@
 				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -154,13 +152,13 @@
 				RelativePath="..\..\src\windows\port.h">
 			</File>
 			<File
-				RelativePath="..\..\src\windows\google\sparsehash\sparseconfig.h">
+				RelativePath="..\..\src\windows\sparsehash\internal\sparseconfig.h">
 			</File>
 			<File
-				RelativePath="..\..\src\google\sparsetable">
+				RelativePath="..\..\src\sparsehash\sparsetable">
 			</File>
 			<File
-				RelativePath="..\..\src\google\type_traits.h">
+				RelativePath="..\..\src\sparsehash\type_traits.h">
 			</File>
 		</Filter>
 	</Files>

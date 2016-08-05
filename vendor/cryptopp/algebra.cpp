@@ -206,7 +206,8 @@ template <class Element, class Iterator> Element GeneralCascadeMultiplication(co
 struct WindowSlider
 {
 	WindowSlider(const Integer &expIn, bool fastNegate, unsigned int windowSizeIn=0)
-		: exp(expIn), windowModulus(Integer::One()), windowSize(windowSizeIn), windowBegin(0), fastNegate(fastNegate), firstTime(true), finished(false)
+		: exp(expIn), windowModulus(Integer::One()), windowSize(windowSizeIn), windowBegin(0), expWindow(0)
+		, fastNegate(fastNegate), negateNext(false), firstTime(true), finished(false)
 	{
 		if (windowSize == 0)
 		{
@@ -264,7 +265,7 @@ void AbstractGroup<T>::SimultaneousMultiply(T *results, const T &base, const Int
 		assert(expBegin->NotNegative());
 		exponents.push_back(WindowSlider(*expBegin++, InversionIsFast(), 0));
 		exponents[i].FindNextWindow();
-		buckets[i].resize(1<<(exponents[i].windowSize-1), Identity());
+		buckets[i].resize(((size_t) 1) << (exponents[i].windowSize-1), Identity());
 	}
 
 	unsigned int expBitPosition = 0;

@@ -6,6 +6,7 @@
 *  FILE:        mods/shared_logic/CZoneNames.h
 *
 *****************************************************************************/
+#pragma once
 
 #include "RTree.h"
 

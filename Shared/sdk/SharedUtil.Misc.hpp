@@ -50,7 +50,7 @@ CDuplicateLineFilter < SReportLine > ms_ReportLineFilter;
 
 
 #ifndef MTA_DM_ASE_VERSION
-    #include <../../MTA10/version.h>
+    #include <../../Client/version.h>
 #endif
 
 //

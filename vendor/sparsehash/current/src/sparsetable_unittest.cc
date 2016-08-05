@@ -1,10 +1,10 @@
 // Copyright (c) 2005, Google Inc.
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright
 // notice, this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above
@@ -14,7 +14,7 @@
 //     * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
 // this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -28,28 +28,30 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---
-// Author: Craig Silverstein
-//
-// This tests <google/sparsetable>
 //
 // Since sparsetable is templatized, it's important that we test every
 // function in every class in this file -- not just to see if it
 // works, but even if it compiles.
 
-#include "config.h"
-#include <string>
+#include <sparsehash/internal/sparseconfig.h>
+#include <config.h>
 #include <stdio.h>
-#include <string.h>         // for memcmp()
+#include <string.h>
+#include <sys/types.h>      // for size_t
 #include <stdlib.h>         // defines unlink() on some windows platforms(?)
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>         // for unlink()
-#include <sys/types.h>      // for size_t
+# include <unistd.h>
+#endif         // for unlink()
+#include <memory>           // for allocator
 #include <string>
-#endif
-#include <google/sparsetable>
-
-using STL_NAMESPACE::string;
+#include <sparsehash/sparsetable>
+using std::string;
+using std::allocator;
 using GOOGLE_NAMESPACE::sparsetable;
+using GOOGLE_NAMESPACE::DEFAULT_SPARSEGROUP_SIZE;
+
+typedef u_int16_t uint16;
+string FLAGS_test_tmpdir = "/tmp/";
 
 // Many sparsetable operations return a size_t.  Rather than have to
 // use PRIuS everywhere, we'll just cast to a "big enough" value.
@@ -271,13 +273,35 @@ void TestInt() {
   TEST(z.begin() != z.end());
 
   // ----------------------------------------------------------------------
+  // Test the non-empty iterators get_pos function
+
+  sparsetable<unsigned int> gp(100);
+  for (int i = 0; i < 100; i += 9) {
+    gp.set(i,i);
+  }
+
+  for (sparsetable<unsigned int>::const_nonempty_iterator
+           it = gp.nonempty_begin(); it != gp.nonempty_end(); ++it) {
+    out += snprintf(out, LEFT,
+                    "get_pos() for const nonempty_iterator: %u == %lu\n",
+                    *it, UL(gp.get_pos(it)));
+  }
+
+  for (sparsetable<unsigned int>::nonempty_iterator
+           it = gp.nonempty_begin(); it != gp.nonempty_end(); ++it) {
+    out += snprintf(out, LEFT,
+                    "get_pos() for nonempty_iterator: %u == %lu\n",
+                    *it, UL(gp.get_pos(it)));
+  }
+
+  // ----------------------------------------------------------------------
   // Test sparsetable functions
   out += snprintf(out, LEFT, "x has %lu/%lu buckets, "
                   "y %lu/%lu, z %lu/%lu\n",
                   UL(x.num_nonempty()), UL(x.size()),
                   UL(y.num_nonempty()), UL(y.size()),
                   UL(z.num_nonempty()), UL(z.size()));
-  
+
   y.resize(48);              // should get rid of 48 and 49
   y.resize(70);              // 48 and 49 should still be gone
   out += snprintf(out, LEFT, "y shrank and grew: it's now %lu/%lu\n",
@@ -319,13 +343,13 @@ void TestInt() {
     out += snprintf(out, LEFT, "y[??] = %d\n", *--it);
 
   // ----------------------------------------------------------------------
-  // Test I/O
-  string filestr = "/tmp/#sparsetable.test";
+  // Test I/O using deprecated read/write_metadata
+  string filestr = FLAGS_test_tmpdir + "/.sparsetable.test";
   const char *file = filestr.c_str();
   FILE *fp = fopen(file, "wb");
   if ( fp == NULL ) {
     // maybe we can't write to /tmp/.  Try the current directory
-    file = "#sparsetable.test";
+    file = ".sparsetable.test";
     fp = fopen(file, "wb");
   }
   if ( fp == NULL ) {
@@ -342,6 +366,31 @@ void TestInt() {
     sparsetable<int> y2;
     y2.read_metadata(fp);
     y2.read_nopointer_data(fp);
+    fclose(fp);
+
+    for ( sparsetable<int>::const_iterator it = y2.begin(); it != y2.end(); ++it ) {
+      if ( y2.test(it) )
+        out += snprintf(out, LEFT, "y2[%lu] is %d\n", UL(it - y2.begin()), *it);
+    }
+    out += snprintf(out, LEFT, "That's %lu set buckets\n", UL(y2.num_nonempty()));
+  }
+  unlink(file);
+
+  // ----------------------------------------------------------------------
+  // Also test I/O using serialize()/unserialize()
+  fp = fopen(file, "wb");
+  if ( fp == NULL ) {
+    out += snprintf(out, LEFT, "Can't open %s, skipping disk write...\n", file);
+  } else {
+    y.serialize(sparsetable<int>::NopointerSerializer(), fp);
+    fclose(fp);
+  }
+  fp = fopen(file, "rb");
+  if ( fp == NULL ) {
+    out += snprintf(out, LEFT, "Can't open %s, skipping disk read...\n", file);
+  } else {
+    sparsetable<int> y2;
+    y2.unserialize(sparsetable<int>::NopointerSerializer(), fp);
     fclose(fp);
 
     for ( sparsetable<int>::const_iterator it = y2.begin(); it != y2.end(); ++it ) {
@@ -443,7 +492,182 @@ void TestString() {
     out += snprintf(out, LEFT, "y[??] = %s\n", (*--it).c_str());
 }
 
-// The expected output from all of the above: TestInt() and TestString()
+// An instrumented allocator that keeps track of all calls to
+// allocate/deallocate/construct/destroy. It stores the number of times
+// they were called and the values they were called with. Such information is
+// stored in the following global variables.
+
+static size_t sum_allocate_bytes;
+static size_t sum_deallocate_bytes;
+
+void ResetAllocatorCounters() {
+  sum_allocate_bytes = 0;
+  sum_deallocate_bytes = 0;
+}
+
+template <class T> class instrumented_allocator {
+ public:
+  typedef T value_type;
+  typedef uint16 size_type;
+  typedef ptrdiff_t difference_type;
+
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  typedef T& reference;
+  typedef const T& const_reference;
+
+  instrumented_allocator() {}
+  instrumented_allocator(const instrumented_allocator&) {}
+  ~instrumented_allocator() {}
+
+  pointer address(reference r) const  { return &r; }
+  const_pointer address(const_reference r) const  { return &r; }
+
+  pointer allocate(size_type n, const_pointer = 0) {
+    sum_allocate_bytes += n * sizeof(value_type);
+    return static_cast<pointer>(malloc(n * sizeof(value_type)));
+  }
+  void deallocate(pointer p, size_type n) {
+    sum_deallocate_bytes += n * sizeof(value_type);
+    free(p);
+  }
+
+  size_type max_size() const  {
+    return static_cast<size_type>(-1) / sizeof(value_type);
+  }
+
+  void construct(pointer p, const value_type& val) {
+    new(p) value_type(val);
+  }
+  void destroy(pointer p) {
+    p->~value_type();
+  }
+
+  template <class U>
+  explicit instrumented_allocator(const instrumented_allocator<U>&) {}
+
+  template<class U>
+  struct rebind {
+    typedef instrumented_allocator<U> other;
+  };
+
+ private:
+  void operator=(const instrumented_allocator&);
+};
+
+template<class T>
+inline bool operator==(const instrumented_allocator<T>&,
+                       const instrumented_allocator<T>&) {
+  return true;
+}
+
+template<class T>
+inline bool operator!=(const instrumented_allocator<T>&,
+                       const instrumented_allocator<T>&) {
+  return false;
+}
+
+// Test sparsetable with instrumented_allocator.
+void TestAllocator() {
+  out += snprintf(out, LEFT, "allocator test\n");
+
+  ResetAllocatorCounters();
+
+  // POD (int32) with instrumented_allocator.
+  typedef sparsetable<int, DEFAULT_SPARSEGROUP_SIZE,
+                      instrumented_allocator<int> > IntSparseTable;
+
+  IntSparseTable* s1 = new IntSparseTable(10000);
+  TEST(sum_allocate_bytes > 0);
+  for (int i = 0; i < 10000; ++i) {
+    s1->set(i, 0);
+  }
+  TEST(sum_allocate_bytes >= 10000 * sizeof(int));
+  ResetAllocatorCounters();
+  delete s1;
+  TEST(sum_deallocate_bytes >= 10000 * sizeof(int));
+
+  IntSparseTable* s2 = new IntSparseTable(1000);
+  IntSparseTable* s3 = new IntSparseTable(1000);
+
+  for (int i = 0; i < 1000; ++i) {
+    s2->set(i, 0);
+    s3->set(i, 0);
+  }
+  TEST(sum_allocate_bytes >= 2000 * sizeof(int));
+
+  ResetAllocatorCounters();
+  s3->clear();
+  TEST(sum_deallocate_bytes >= 1000 * sizeof(int));
+
+  ResetAllocatorCounters();
+  s2->swap(*s3);  // s2 is empty after the swap
+  s2->clear();
+  TEST(sum_deallocate_bytes < 1000 * sizeof(int));
+  for (int i = 0; i < s3->size(); ++i) {
+    s3->erase(i);
+  }
+  TEST(sum_deallocate_bytes >= 1000 * sizeof(int));
+  delete s2;
+  delete s3;
+
+  // POD (int) with default allocator.
+  sparsetable<int> x, y;
+  for (int s = 1000; s <= 40000; s += 1000) {
+    x.resize(s);
+    for (int i = 0; i < s; ++i) {
+      x.set(i, i + 1);
+    }
+    y = x;
+    for (int i = 0; i < s; ++i) {
+      y.erase(i);
+    }
+    y.swap(x);
+  }
+  TEST(x.num_nonempty() == 0);
+  out += snprintf(out, LEFT, "y[0]: %d\n", int(y[0]));
+  out += snprintf(out, LEFT, "y[39999]: %d\n", int(y[39999]));
+  y.clear();
+
+  // POD (int) with std allocator.
+  sparsetable<int, DEFAULT_SPARSEGROUP_SIZE, allocator<int> > u, v;
+  for (int s = 1000; s <= 40000; s += 1000) {
+    u.resize(s);
+    for (int i = 0; i < s; ++i) {
+      u.set(i, i + 1);
+    }
+    v = u;
+    for (int i = 0; i < s; ++i) {
+      v.erase(i);
+    }
+    v.swap(u);
+  }
+  TEST(u.num_nonempty() == 0);
+  out += snprintf(out, LEFT, "v[0]: %d\n", int(v[0]));
+  out += snprintf(out, LEFT, "v[39999]: %d\n", int(v[39999]));
+  v.clear();
+
+  // Non-POD (string) with default allocator.
+  sparsetable<string> a, b;
+  for (int s = 1000; s <= 40000; s += 1000) {
+    a.resize(s);
+    for (int i = 0; i < s; ++i) {
+      a.set(i, "aa");
+    }
+    b = a;
+    for (int i = 0; i < s; ++i) {
+      b.erase(i);
+    }
+    b.swap(a);
+  }
+  TEST(a.num_nonempty() == 0);
+  out += snprintf(out, LEFT, "b[0]: %s\n", b.get(0).c_str());
+  out += snprintf(out, LEFT, "b[39999]: %s\n", b.get(39999).c_str());
+  b.clear();
+}
+
+// The expected output from all of the above: TestInt(), TestString() and
+// TestAllocator().
 static const char g_expected[] = (
     "int test\n"
     "x[0]: 0\n"
@@ -580,6 +804,30 @@ static const char g_expected[] = (
     "first non-empty x: 10\n"
     "x.begin() == x.begin() + 1 - 1? yes\n"
     "z.begin() != z.end()? no\n"
+    "get_pos() for const nonempty_iterator: 0 == 0\n"
+    "get_pos() for const nonempty_iterator: 9 == 9\n"
+    "get_pos() for const nonempty_iterator: 18 == 18\n"
+    "get_pos() for const nonempty_iterator: 27 == 27\n"
+    "get_pos() for const nonempty_iterator: 36 == 36\n"
+    "get_pos() for const nonempty_iterator: 45 == 45\n"
+    "get_pos() for const nonempty_iterator: 54 == 54\n"
+    "get_pos() for const nonempty_iterator: 63 == 63\n"
+    "get_pos() for const nonempty_iterator: 72 == 72\n"
+    "get_pos() for const nonempty_iterator: 81 == 81\n"
+    "get_pos() for const nonempty_iterator: 90 == 90\n"
+    "get_pos() for const nonempty_iterator: 99 == 99\n"
+    "get_pos() for nonempty_iterator: 0 == 0\n"
+    "get_pos() for nonempty_iterator: 9 == 9\n"
+    "get_pos() for nonempty_iterator: 18 == 18\n"
+    "get_pos() for nonempty_iterator: 27 == 27\n"
+    "get_pos() for nonempty_iterator: 36 == 36\n"
+    "get_pos() for nonempty_iterator: 45 == 45\n"
+    "get_pos() for nonempty_iterator: 54 == 54\n"
+    "get_pos() for nonempty_iterator: 63 == 63\n"
+    "get_pos() for nonempty_iterator: 72 == 72\n"
+    "get_pos() for nonempty_iterator: 81 == 81\n"
+    "get_pos() for nonempty_iterator: 90 == 90\n"
+    "get_pos() for nonempty_iterator: 99 == 99\n"
     "x has 3/7 buckets, y 4/70, z 0/0\n"
     "y shrank and grew: it's now 2/70\n"
     "y[12] = -12, y.get(12) = -12\n"
@@ -612,6 +860,19 @@ static const char g_expected[] = (
     "y[??] = -13\n"
     "y[??] = -11\n"
     "y[??] = -10\n"
+    "y2[10] is -10\n"
+    "y2[11] is -11\n"
+    "y2[13] is -13\n"
+    "y2[14] is -14\n"
+    "y2[30] is -30\n"
+    "y2[31] is -31\n"
+    "y2[32] is -32\n"
+    "y2[33] is -33\n"
+    "y2[35] is -35\n"
+    "y2[36] is -36\n"
+    "y2[37] is -37\n"
+    "y2[9898] is -9898\n"
+    "That's 12 set buckets\n"
     "y2[10] is -10\n"
     "y2[11] is -11\n"
     "y2[13] is -13\n"
@@ -675,17 +936,38 @@ static const char g_expected[] = (
     "y[??] = -13\n"
     "y[??] = -11\n"
     "y[??] = -10\n"
+    "allocator test\n"
+    "sum_allocate_bytes > 0? yes\n"
+    "sum_allocate_bytes >= 10000 * sizeof(int)? yes\n"
+    "sum_deallocate_bytes >= 10000 * sizeof(int)? yes\n"
+    "sum_allocate_bytes >= 2000 * sizeof(int)? yes\n"
+    "sum_deallocate_bytes >= 1000 * sizeof(int)? yes\n"
+    "sum_deallocate_bytes < 1000 * sizeof(int)? yes\n"
+    "sum_deallocate_bytes >= 1000 * sizeof(int)? yes\n"
+    "x.num_nonempty() == 0? yes\n"
+    "y[0]: 1\n"
+    "y[39999]: 40000\n"
+    "u.num_nonempty() == 0? yes\n"
+    "v[0]: 1\n"
+    "v[39999]: 40000\n"
+    "a.num_nonempty() == 0? yes\n"
+    "b[0]: aa\n"
+    "b[39999]: aa\n"
     );
 
 // defined at bottom of file for ease of maintainence
 int main(int argc, char **argv) {          // though we ignore the args
+  (void)argc;
+  (void)argv;
+
   TestInt();
   TestString();
+  TestAllocator();
 
   // Finally, check to see if our output (in out) is what it's supposed to be.
   const size_t r = sizeof(g_expected) - 1;
-  if ( r != out - outbuf ||               // output not the same size
-       memcmp(outbuf, g_expected, r) ) {  // or bytes differed
+  if ( r != static_cast<size_t>(out - outbuf) ||   // output not the same size
+       memcmp(outbuf, g_expected, r) ) {           // or bytes differed
     fprintf(stderr, "TESTS FAILED\n\nEXPECTED:\n\n%s\n\nACTUAL:\n\n%s\n\n",
             g_expected, outbuf);
     return 1;

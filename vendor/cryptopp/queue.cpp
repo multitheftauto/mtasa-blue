@@ -41,6 +41,8 @@ public:
 
 	inline size_t Put(const byte *begin, size_t length)
 	{
+		// Avoid passing NULL to memcpy
+		if (!begin || !length) return length;
 		size_t l = STDMIN(length, MaxSize()-m_tail);
 		if (buf+m_tail != begin)
 			memcpy(buf+m_tail, begin, l);
@@ -129,7 +131,8 @@ public:
 // ********************************************************
 
 ByteQueue::ByteQueue(size_t nodeSize)
-	: m_lazyString(NULL), m_lazyLength(0)
+	: Bufferless<BufferedTransformation>(), m_autoNodeSize(!nodeSize), m_nodeSize(nodeSize)
+	, m_head(NULL), m_tail(NULL), m_lazyString(NULL), m_lazyLength(0), m_lazyStringModifiable(false)
 {
 	SetNodeSize(nodeSize);
 	m_head = m_tail = new ByteQueueNode(m_nodeSize);
@@ -142,7 +145,7 @@ void ByteQueue::SetNodeSize(size_t nodeSize)
 }
 
 ByteQueue::ByteQueue(const ByteQueue &copy)
-	: m_lazyString(NULL)
+	: Bufferless<BufferedTransformation>(copy), m_lazyString(NULL), m_lazyLength(0)
 {
 	CopyFrom(copy);
 }
@@ -216,6 +219,8 @@ void ByteQueue::Clear()
 
 size_t ByteQueue::Put2(const byte *inString, size_t length, int messageEnd, bool blocking)
 {
+	CRYPTOPP_UNUSED(messageEnd), CRYPTOPP_UNUSED(blocking);
+
 	if (m_lazyLength > 0)
 		FinalizeLazyPut();
 
@@ -239,14 +244,16 @@ size_t ByteQueue::Put2(const byte *inString, size_t length, int messageEnd, bool
 
 void ByteQueue::CleanupUsedNodes()
 {
-	while (m_head != m_tail && m_head->UsedUp())
+	// Test for m_head due to Enterprise Anlysis finding
+	while (m_head && m_head != m_tail && m_head->UsedUp())
 	{
 		ByteQueueNode *temp=m_head;
 		m_head=m_head->next;
 		delete temp;
 	}
 
-	if (m_head->CurrentSize() == 0)
+	// Test for m_head due to Enterprise Anlysis finding
+	if (m_head && m_head->CurrentSize() == 0)
 		m_head->Clear();
 }
 
@@ -476,6 +483,8 @@ void ByteQueue::swap(ByteQueue &rhs)
 
 void ByteQueue::Walker::IsolatedInitialize(const NameValuePairs &parameters)
 {
+	CRYPTOPP_UNUSED(parameters);
+
 	m_node = m_queue.m_head;
 	m_position = 0;
 	m_offset = 0;

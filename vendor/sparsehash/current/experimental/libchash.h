@@ -115,6 +115,7 @@
  *        from disk.
  */
 
+#include <sparsehash/internal/sparseconfig.h>
 #include <sys/types.h>         /* includes definition of "ulong", we hope */
 #define ulong u_long
 

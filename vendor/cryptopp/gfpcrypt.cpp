@@ -1,16 +1,26 @@
 // dsa.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
+
+// TODO: fix the C4589 warnings
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4189 4589)
+#endif
 
 #ifndef CRYPTOPP_IMPORTS
 
 #include "gfpcrypt.h"
+#include "nbtheory.h"
+#include "modarith.h"
+#include "integer.h"
 #include "asn.h"
 #include "oids.h"
-#include "nbtheory.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
+#if !defined(NDEBUG) && !defined(CRYPTOPP_DOXYGEN_PROCESSING)
 void TestInstantiations_gfpcrypt()
 {
 	GDSA<SHA>::Signer test;
@@ -22,6 +32,7 @@ void TestInstantiations_gfpcrypt()
 	DLIES<>::Encryptor test6;
 	DLIES<>::Decryptor test7;
 }
+#endif
 
 void DL_GroupParameters_DSA::GenerateRandom(RandomNumberGenerator &rng, const NameValuePairs &alg)
 {
@@ -69,8 +80,11 @@ void DL_SignatureMessageEncodingMethod_DSA::ComputeMessageRepresentative(RandomN
 	HashTransformation &hash, HashIdentifier hashIdentifier, bool messageEmpty,
 	byte *representative, size_t representativeBitLength) const
 {
+	CRYPTOPP_UNUSED(rng), CRYPTOPP_UNUSED(recoverableMessage), CRYPTOPP_UNUSED(recoverableMessageLength);
+	CRYPTOPP_UNUSED(messageEmpty), CRYPTOPP_UNUSED(hashIdentifier);
 	assert(recoverableMessageLength == 0);
 	assert(hashIdentifier.second == 0);
+
 	const size_t representativeByteLength = BitsToBytes(representativeBitLength);
 	const size_t digestSize = hash.DigestSize();
 	const size_t paddingLength = SaturatingSubtract(representativeByteLength, digestSize);
@@ -91,6 +105,10 @@ void DL_SignatureMessageEncodingMethod_NR::ComputeMessageRepresentative(RandomNu
 	HashTransformation &hash, HashIdentifier hashIdentifier, bool messageEmpty,
 	byte *representative, size_t representativeBitLength) const
 {
+	CRYPTOPP_UNUSED(rng);CRYPTOPP_UNUSED(recoverableMessage); CRYPTOPP_UNUSED(recoverableMessageLength);
+	CRYPTOPP_UNUSED(hash); CRYPTOPP_UNUSED(hashIdentifier); CRYPTOPP_UNUSED(messageEmpty);
+	CRYPTOPP_UNUSED(representative); CRYPTOPP_UNUSED(representativeBitLength);
+
 	assert(recoverableMessageLength == 0);
 	assert(hashIdentifier.second == 0);
 	const size_t representativeByteLength = BitsToBytes(representativeBitLength);
@@ -186,8 +204,23 @@ void DL_GroupParameters_IntegerBased::GenerateRandom(RandomNumberGenerator &rng,
 	Initialize(p, q, g);
 }
 
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+void DL_GroupParameters_IntegerBased::EncodeElement(bool reversible, const Element &element, byte *encoded) const
+{
+	CRYPTOPP_UNUSED(reversible);
+	element.Encode(encoded, GetModulus().ByteCount());	
+}
+
+unsigned int DL_GroupParameters_IntegerBased::GetEncodedElementSize(bool reversible) const
+{
+	CRYPTOPP_UNUSED(reversible);
+	return GetModulus().ByteCount();
+}
+#endif
+
 Integer DL_GroupParameters_IntegerBased::DecodeElement(const byte *encoded, bool checkForGroupMembership) const
 {
+	CRYPTOPP_UNUSED(checkForGroupMembership);
 	Integer g(encoded, GetModulus().ByteCount());
 	if (!ValidateElement(1, g, NULL))
 		throw DL_BadElement();

@@ -1,9 +1,10 @@
-This package was debianized by Google Inc. <opensource@google.com> on
-15 February 2005.
+This package was debianized by Donovan Hide <google-sparsehash@googlegroups.com>
+on Wed, Thu, 23 Feb 2012 23:47:18 +0000.
 
-It was downloaded from http://code.google.com/
+It was downloaded from
+http://code.google.com/p/sparsehash/downloads/list
 
-Upstream Author: opensource@google.com
+Upstream Author: google-sparsehash@googlegroups.com
 
 Copyright (c) 2005, Google Inc.
 All rights reserved.

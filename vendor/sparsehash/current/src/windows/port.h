@@ -32,7 +32,7 @@
  *
  * These are some portability typedefs and defines to make it a bit
  * easier to compile this code -- in particular, unittests -- under VC++.
- * Other portability code is found in windows/google/sparsehash/sparseconfig.h.
+ * Other portability code is found in windows/sparsehash/internal/sparseconfig.h.
  *
  * Several of these are taken from glib:
  *    http://developer.gnome.org/doc/API/glib/glib-windows-compatability-functions.html
@@ -41,6 +41,7 @@
 #ifndef SPARSEHASH_WINDOWS_PORT_H_
 #define SPARSEHASH_WINDOWS_PORT_H_
 
+#include <sparsehash/internal/sparseconfig.h>
 #include "config.h"
 
 #ifdef WIN32
@@ -52,22 +53,12 @@
 
 // 4996: Yes, we're ok using the "unsafe" functions like _vsnprintf and fopen
 // 4127: We use "while (1)" sometimes: yes, we know it's a constant
-#pragma warning(disable:4996 4127)
+// 4181: type_traits_test is explicitly testing 'qualifier applied to reference'
+#pragma warning(disable:4996 4127 4181)
 
 
 // file I/O
-#define PATH_MAX 1024
-#define access  _access
-#define getcwd  _getcwd
-#define open    _open
-#define read    _read
-#define write   _write
-#define lseek   _lseek
-#define close   _close
 #define unlink  _unlink
-#define popen   _popen
-#define pclose  _pclose
-
 #define strdup  _strdup
 
 // We can't just use _snprintf as a drop-in replacement, because it

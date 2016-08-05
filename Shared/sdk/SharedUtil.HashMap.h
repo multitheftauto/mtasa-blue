@@ -9,19 +9,13 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+#pragma once
 
 #if WITH_ALLOC_TRACKING
     #define CHashMap CMap
 #else
 
-#if defined(WIN32)
-    #include <hash_map>
-    #define HASH_MAP_TYPE stdext::hash_map
-#elif defined(__GNUC__) && (__GNUC__ >= 3)
-    #include <ext/hash_map>
-    #define HASH_MAP_TYPE __gnu_cxx::hash_map
-#endif
-
+#include <unordered_map>
 #include <functional>
 
 namespace SharedUtil
@@ -32,7 +26,7 @@ namespace SharedUtil
     // Using hash_map
     //
     template < class K, class V >
-    class CHashMap : public HASH_MAP_TYPE < K, V >
+    class CHashMap : public std::unordered_map < K, V >
     {
     public:
     };
@@ -110,8 +104,20 @@ namespace SharedUtil
 
 
 // Calculate a hash value for SString
+namespace std 
+{
+    template<>
+    struct hash<SString>
+    {
+        size_t operator()(const SString& str) const
+        {
+            return std::hash<std::string>()(str);
+        }
+    };
+}
+
 #if defined(WIN32)
-inline size_t hash_value ( const SString& strString )
+inline size_t hash_value ( const SString& strString ) // Required for sparsehash
 {
     std::hash<std::string> hashFunction;
     return hashFunction ( strString );
@@ -129,4 +135,5 @@ namespace __gnu_cxx
     };
 }
 #endif
+
 #endif  // WITH_ALLOC_TRACKING
