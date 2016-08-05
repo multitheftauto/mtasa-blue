@@ -2777,7 +2777,6 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                 }
                                                 else
                                                 {
-                                                    // TODO: support jacking peds (not simple!)
                                                     // Is the jacked person a player and stationary in the car (ie not getting in or out)
                                                     if ( pOccupant->GetVehicleAction () == CPed::VEHICLEACTION_NONE )
                                                     {
