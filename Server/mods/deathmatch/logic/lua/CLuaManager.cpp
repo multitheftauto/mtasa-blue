@@ -43,7 +43,7 @@ CLuaManager::CLuaManager ( CObjectManager* pObjectManager,
     m_pLuaModuleManager = new CLuaModuleManager ( this );
     m_pLuaModuleManager->SetScriptDebugging ( g_pGame->GetScriptDebugging() );
 
-    // Load our C Functions into LUA and hook callback
+    // Load our C Functions into Lua and hook callback
     LoadCFunctions ();
     lua_registerPreCallHook ( CLuaDefs::CanUseFunction );
     lua_registerUndumpHook ( CLuaMain::OnUndump );
@@ -229,15 +229,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setWeaponClipAmmo", CLuaFunctionDefs::SetWeaponClipAmmo );
 #endif
 
-
     // Console funcs
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefs::AddCommandHandler );
     CLuaCFunctions::AddFunction ( "removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler );
     CLuaCFunctions::AddFunction ( "executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler );
-
-    // JSON funcs
-    CLuaCFunctions::AddFunction ( "toJSON", CLuaFunctionDefs::toJSON );
-    CLuaCFunctions::AddFunction ( "fromJSON", CLuaFunctionDefs::fromJSON );
 
     // Server standard funcs
     CLuaCFunctions::AddFunction ( "getMaxPlayers", CLuaFunctionDefs::GetMaxPlayers );
@@ -246,7 +241,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "outputConsole", CLuaFunctionDefs::OutputConsole );
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefs::OutputDebugString );
     CLuaCFunctions::AddFunction ( "outputServerLog", CLuaFunctionDefs::OutputServerLog );
-    CLuaCFunctions::AddFunction ( "print", CLuaFunctionDefs::luaB_print );
     CLuaCFunctions::AddFunction ( "getServerName", CLuaFunctionDefs::GetServerName );
     CLuaCFunctions::AddFunction ( "getServerHttpPort", CLuaFunctionDefs::GetServerHttpPort );
     CLuaCFunctions::AddFunction ( "getServerPassword", CLuaFunctionDefs::GetServerPassword );
@@ -256,31 +250,8 @@ void CLuaManager::LoadCFunctions ( void )
 
     CLuaCFunctions::AddFunction ( "shutdown", CLuaFunctionDefs::shutdown, true );
 
-    // Utility vector math functions
-    CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints2D", CLuaFunctionDefs::GetDistanceBetweenPoints2D );
-    CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints3D", CLuaFunctionDefs::GetDistanceBetweenPoints3D );
-    CLuaCFunctions::AddFunction ( "getEasingValue", CLuaFunctionDefs::GetEasingValue );
-    CLuaCFunctions::AddFunction ( "interpolateBetween", CLuaFunctionDefs::InterpolateBetween );
-
     // Util funcs
-    CLuaCFunctions::AddFunction ( "getTickCount", CLuaFunctionDefs::GetTickCount_ );
-    CLuaCFunctions::AddFunction ( "getRealTime", CLuaFunctionDefs::GetCTime );
-    CLuaCFunctions::AddFunction ( "split", CLuaFunctionDefs::Split );
     CLuaCFunctions::AddFunction ( "gettok", CLuaFunctionDefs::GetTok );
-    CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefs::GetColorFromString );
-    CLuaCFunctions::AddFunction ( "ref", CLuaFunctionDefs::Reference );
-    CLuaCFunctions::AddFunction ( "deref", CLuaFunctionDefs::Dereference );
-    // UTF functions
-    CLuaCFunctions::AddFunction ( "utfLen", CLuaFunctionDefs::UtfLen );
-    CLuaCFunctions::AddFunction ( "utfSeek", CLuaFunctionDefs::UtfSeek );
-    CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefs::UtfSub );
-    CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
-    CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
-
-    // PCRE functions
-    CLuaCFunctions::AddFunction ( "pregFind", CLuaFunctionDefs::PregFind );
-    CLuaCFunctions::AddFunction ( "pregReplace", CLuaFunctionDefs::PregReplace );
-    CLuaCFunctions::AddFunction ( "pregMatch", CLuaFunctionDefs::PregMatch );
 
     // Loaded map funcs
     CLuaCFunctions::AddFunction ( "getRootElement", CLuaFunctionDefs::GetRootElement );
@@ -306,6 +277,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaPlayerDefs::LoadFunctions ();
     CLuaRadarAreaDefs::LoadFunctions ();
     CLuaResourceDefs::LoadFunctions ();
+    CLuaShared::LoadFunctions ();
     CLuaTeamDefs::LoadFunctions ();
     CLuaTextDefs::LoadFunctions ();
     CLuaTimerDefs::LoadFunctions ();
@@ -334,7 +306,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "banPlayer", CLuaFunctionDefinitions::BanPlayer );
     CLuaCFunctions::AddFunction ( "banPlayerIP", CLuaFunctionDefinitions::BanPlayerIP );
     CLuaCFunctions::AddFunction ( "setPlayerMuted", CLuaFunctionDefinitions::SetPlayerMuted );
-    CLuaCFunctions::AddFunction ( "shutdown", CLuaFunctionDefinitions::Shutdown );
     CLuaCFunctions::AddFunction ( "whoWas", CLuaFunctionDefinitions::WhoWas );
 
     CLuaCFunctions::AddFunction ( "addAccount", CLuaFunctionDefinitions::AddAccount );
@@ -354,20 +325,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "set", CLuaFunctionDefs::Set );
 
     // Utility
-    CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefs::Md5 );
-    CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefs::Sha256 );
-    CLuaCFunctions::AddFunction ( "hash", CLuaFunctionDefs::Hash );
-    CLuaCFunctions::AddFunction ( "teaEncode", CLuaFunctionDefs::TeaEncode );
-    CLuaCFunctions::AddFunction ( "teaDecode", CLuaFunctionDefs::TeaDecode );
-    CLuaCFunctions::AddFunction ( "base64Encode", CLuaFunctionDefs::Base64encode );
-    CLuaCFunctions::AddFunction ( "base64Decode", CLuaFunctionDefs::Base64decode );
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefs::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getLoadedModules", CLuaFunctionDefs::GetModules );
     CLuaCFunctions::AddFunction ( "getModuleInfo", CLuaFunctionDefs::GetModuleInfo );
-    CLuaCFunctions::AddFunction ( "isOOPEnabled", CLuaFunctionDefs::IsOOPEnabled );
-    CLuaCFunctions::AddFunction ( "getUserdataType", CLuaFunctionDefs::GetUserdataType );
 
     // Backward compat functions at the end, so the new function name is used in ACL
 

@@ -63,13 +63,3 @@ void CLuaFunctionDefs::Initialize ( CLuaManager* pLuaManager, CScriptDebugging* 
     m_pColModelManager = m_pManager->GetColModelManager ();
     m_pRegisteredCommands = m_pClientGame->GetRegisteredCommands ();
 }
-
-int CLuaFunctionDefs::DisabledFunction ( lua_State* luaVM )
-{
-    m_pScriptDebugging->LogError ( luaVM, "Unsafe function was called." );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-

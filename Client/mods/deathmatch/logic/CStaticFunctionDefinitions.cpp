@@ -7255,14 +7255,6 @@ bool CStaticFunctionDefinitions::SetWeaponClipAmmo ( CClientWeapon * pWeapon, in
     return false;
 }
 
-
-bool CStaticFunctionDefinitions::GetTickCount_ ( double& dCount )
-{
-    dCount = static_cast < double > ( GetTickCount64_() );
-    return true;
-}
-
-
 bool CStaticFunctionDefinitions::ForcePlayerMap ( bool & bForced )
 {
     m_pClientGame->GetRadarMap ()->SetForcedState ( bForced );

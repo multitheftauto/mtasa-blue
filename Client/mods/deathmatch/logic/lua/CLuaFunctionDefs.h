@@ -39,9 +39,6 @@ public:
                               class CScriptDebugging* pScriptDebugging,
                               class CClientGame* pClientGame );
 
-    // Reserved functions
-    LUA_DECLARE ( DisabledFunction );
-
     // Event functions
     LUA_DECLARE ( AddEvent );
     LUA_DECLARE ( AddEventHandler );
@@ -65,7 +62,6 @@ public:
     LUA_DECLARE ( ShowChat );
     LUA_DECLARE ( IsChatVisible );
     LUA_DECLARE ( OutputClientDebugString );
-    LUA_DECLARE ( luaB_print );
     LUA_DECLARE ( SetClipboard );
     LUA_DECLARE ( GetClipboard );
     LUA_DECLARE ( SetWindowFlashing );
@@ -94,13 +90,7 @@ public:
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
     LUA_DECLARE ( GetTok );
-    LUA_DECLARE ( Split );
-    LUA_DECLARE ( GetTickCount_ );
-    LUA_DECLARE ( GetCTime );
     LUA_DECLARE ( tocolor );
-    LUA_DECLARE ( Reference );
-    LUA_DECLARE ( Dereference );
-    LUA_DECLARE ( GetColorFromString );
     LUA_DECLARE ( GetValidPedModels );
     LUA_DECLARE ( SetDevelopmentMode );
     LUA_DECLARE ( GetDevelopmentMode );
@@ -218,49 +208,16 @@ public:
     LUA_DECLARE ( RemoveCommandHandler );
     LUA_DECLARE ( ExecuteCommandHandler );
 
-    // Utility vector math functions
-    LUA_DECLARE ( GetDistanceBetweenPoints2D );
-    LUA_DECLARE ( GetDistanceBetweenPoints3D );
-    LUA_DECLARE ( GetEasingValue );
-    LUA_DECLARE ( InterpolateBetween );
-
     // Utility
-    LUA_DECLARE ( Md5 );
-    LUA_DECLARE ( Sha256 );
-    LUA_DECLARE ( Hash );
-    LUA_DECLARE ( TeaEncode );
-    LUA_DECLARE ( TeaDecode );
-    LUA_DECLARE ( Base64encode );
-    LUA_DECLARE ( Base64decode );
     LUA_DECLARE ( GetNetworkUsageData );
     LUA_DECLARE ( GetNetworkStats );
     LUA_DECLARE ( GetPerformanceStats );
     LUA_DECLARE ( AddDebugHook );
     LUA_DECLARE ( RemoveDebugHook );
-    LUA_DECLARE ( IsOOPEnabled );
-    LUA_DECLARE ( GetUserdataType );
-
     LUA_DECLARE ( GetVersion );
 
     // L10n
     LUA_DECLARE ( GetLocalization );
-
-    // JSON funcs
-    LUA_DECLARE ( toJSON );
-    LUA_DECLARE ( fromJSON );
-
-    // UTF functions
-    LUA_DECLARE ( UtfLen );
-    LUA_DECLARE ( UtfSeek );
-    LUA_DECLARE ( UtfSub );
-    LUA_DECLARE ( UtfChar );
-    LUA_DECLARE ( UtfCode );
-
-    // PCRE functions
-
-    LUA_DECLARE ( PregFind );
-    LUA_DECLARE ( PregReplace );
-    LUA_DECLARE ( PregMatch );
 
     // Voice functions
     LUA_DECLARE ( IsVoiceEnabled );

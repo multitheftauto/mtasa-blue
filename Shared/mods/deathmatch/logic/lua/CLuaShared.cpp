@@ -65,3 +65,10 @@ bool CLuaShared::CheckUTF8BOMAndUpdate ( const char ** pcpOutBuffer, uint * puiO
     // Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
     return GetUTF8Confidence ( (const unsigned char*) cpBuffer, uiSize ) >= 80;
 }
+
+void CLuaShared::LoadFunctions ( void )
+{
+    CLuaCryptDefs::LoadFunctions ();
+    CLuaUTFDefs::LoadFunctions ();
+    CLuaUtilDefs::LoadFunctions ();
+}

@@ -112,7 +112,7 @@ struct SAclRequest;
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CVoiceEndPacket.h"
 
-// Lua function definition includes
+// Lua function definitions
 #include "luadefs/CLuaElementDefs.h"
 #include "luadefs/CLuaAccountDefs.h"
 #include "luadefs/CLuaACLDefs.h"
@@ -128,7 +128,6 @@ struct SAclRequest;
 #include "luadefs/CLuaHTTPDefs.h"
 #include "luadefs/CLuaHandlingDefs.h"
 #include "luadefs/CLuaMarkerDefs.h"
-#include "luadefs/CLuaMatrixDefs.h"
 #include "luadefs/CLuaObjectDefs.h"
 #include "luadefs/CLuaPedDefs.h"
 #include "luadefs/CLuaPickupDefs.h"
@@ -138,9 +137,6 @@ struct SAclRequest;
 #include "luadefs/CLuaTeamDefs.h"
 #include "luadefs/CLuaTextDefs.h"
 #include "luadefs/CLuaTimerDefs.h"
-#include "luadefs/CLuaVector2Defs.h"
-#include "luadefs/CLuaVector3Defs.h"
-#include "luadefs/CLuaVector4Defs.h"
 #include "luadefs/CLuaVehicleDefs.h"
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWaterDefs.h"

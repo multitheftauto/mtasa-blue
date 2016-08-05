@@ -236,7 +236,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "showChat", CLuaFunctionDefs::ShowChat );
     CLuaCFunctions::AddFunction ( "isChatVisible", CLuaFunctionDefs::IsChatVisible );
     CLuaCFunctions::AddFunction ( "outputDebugString", CLuaFunctionDefs::OutputClientDebugString );
-    CLuaCFunctions::AddFunction ( "print", CLuaFunctionDefs::luaB_print );
     CLuaCFunctions::AddFunction ( "setClipboard", CLuaFunctionDefs::SetClipboard );
     //CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
     CLuaCFunctions::AddFunction ( "setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing );
@@ -263,13 +262,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Util functions
     CLuaCFunctions::AddFunction ( "gettok", CLuaFunctionDefs::GetTok );
-    CLuaCFunctions::AddFunction ( "split", CLuaFunctionDefs::Split );
-    CLuaCFunctions::AddFunction ( "getTickCount", CLuaFunctionDefs::GetTickCount_ );
-    CLuaCFunctions::AddFunction ( "getRealTime", CLuaFunctionDefs::GetCTime );
     CLuaCFunctions::AddFunction ( "tocolor", CLuaFunctionDefs::tocolor );
-    CLuaCFunctions::AddFunction ( "ref", CLuaFunctionDefs::Reference );
-    CLuaCFunctions::AddFunction ( "deref", CLuaFunctionDefs::Dereference );
-    CLuaCFunctions::AddFunction ( "getColorFromString", CLuaFunctionDefs::GetColorFromString );
     CLuaCFunctions::AddFunction ( "getValidPedModels", CLuaFunctionDefs::GetValidPedModels );
     CLuaCFunctions::AddFunction ( "downloadFile", CLuaFunctionDefs::DownloadFile );
 
@@ -387,20 +380,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler );
     CLuaCFunctions::AddFunction ( "executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler );
 
-    // Utility vector math functions
-    CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints2D", CLuaFunctionDefs::GetDistanceBetweenPoints2D );
-    CLuaCFunctions::AddFunction ( "getDistanceBetweenPoints3D", CLuaFunctionDefs::GetDistanceBetweenPoints3D );
-    CLuaCFunctions::AddFunction ( "getEasingValue", CLuaFunctionDefs::GetEasingValue );
-    CLuaCFunctions::AddFunction ( "interpolateBetween", CLuaFunctionDefs::InterpolateBetween );
-
     // Utility
-    CLuaCFunctions::AddFunction ( "md5", CLuaFunctionDefs::Md5 );
-    CLuaCFunctions::AddFunction ( "sha256", CLuaFunctionDefs::Sha256 );
-    CLuaCFunctions::AddFunction ( "hash", CLuaFunctionDefs::Hash );
-    CLuaCFunctions::AddFunction ( "teaEncode", CLuaFunctionDefs::TeaEncode );
-    CLuaCFunctions::AddFunction ( "teaDecode", CLuaFunctionDefs::TeaDecode );
-    CLuaCFunctions::AddFunction ( "base64Encode", CLuaFunctionDefs::Base64encode );
-    CLuaCFunctions::AddFunction ( "base64Decode", CLuaFunctionDefs::Base64decode );
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefs::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats );
@@ -408,8 +388,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode );
     CLuaCFunctions::AddFunction ( "addDebugHook", CLuaFunctionDefs::AddDebugHook );
     CLuaCFunctions::AddFunction ( "removeDebugHook", CLuaFunctionDefs::RemoveDebugHook );
-    CLuaCFunctions::AddFunction ( "isOOPEnabled", CLuaFunctionDefs::IsOOPEnabled );
-    CLuaCFunctions::AddFunction ( "getUserdataType", CLuaFunctionDefs::GetUserdataType );
 
     // Version functions
     CLuaCFunctions::AddFunction ( "getVersion", CLuaFunctionDefs::GetVersion );
@@ -417,24 +395,8 @@ void CLuaManager::LoadCFunctions ( void )
     // Localization functions
     CLuaCFunctions::AddFunction ( "getLocalization", CLuaFunctionDefs::GetLocalization );
 
-    // UTF functions
-    CLuaCFunctions::AddFunction ( "utfLen", CLuaFunctionDefs::UtfLen );
-    CLuaCFunctions::AddFunction ( "utfSeek", CLuaFunctionDefs::UtfSeek );
-    CLuaCFunctions::AddFunction ( "utfSub", CLuaFunctionDefs::UtfSub );
-    CLuaCFunctions::AddFunction ( "utfChar", CLuaFunctionDefs::UtfChar );
-    CLuaCFunctions::AddFunction ( "utfCode", CLuaFunctionDefs::UtfCode );
-
-    // PCRE functions
-    CLuaCFunctions::AddFunction ( "pregFind", CLuaFunctionDefs::PregFind );
-    CLuaCFunctions::AddFunction ( "pregReplace", CLuaFunctionDefs::PregReplace );
-    CLuaCFunctions::AddFunction ( "pregMatch", CLuaFunctionDefs::PregMatch );
-
     // Voice functions
     CLuaCFunctions::AddFunction ( "isVoiceEnabled", CLuaFunctionDefs::IsVoiceEnabled );
-
-    // JSON funcs
-    CLuaCFunctions::AddFunction ( "toJSON", CLuaFunctionDefs::toJSON );
-    CLuaCFunctions::AddFunction ( "fromJSON", CLuaFunctionDefs::fromJSON );
 
     // Luadef definitions
     CLuaAudioDefs::LoadFunctions ();
@@ -459,6 +421,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaRadarAreaDefs::LoadFunctions ();
     CLuaResourceDefs::LoadFunctions ();
     CLuaSearchLightDefs::LoadFunctions ();
+    CLuaShared::LoadFunctions ();
     CLuaTaskDefs::LoadFunctions ();
     CLuaTeamDefs::LoadFunctions ();
     CLuaTimerDefs::LoadFunctions ();

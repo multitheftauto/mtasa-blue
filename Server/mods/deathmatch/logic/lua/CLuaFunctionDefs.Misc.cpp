@@ -22,16 +22,6 @@
 
 #include "StdInc.h"
 
-
-int CLuaFunctionDefs::DisabledFunction ( lua_State* luaVM )
-{
-    m_pScriptDebugging->LogError ( luaVM, "Unsafe function was called." );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-
 int CLuaFunctionDefs::CreateExplosion ( lua_State* luaVM )
 {
     CVector vecPosition;
