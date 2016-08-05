@@ -119,7 +119,6 @@
 #include <luadefs/CLuaFileDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
-#include <luadefs/CLuaMatrixDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
 #include <luadefs/CLuaPointLightDefs.h>
 #include <luadefs/CLuaPedDefs.h>
@@ -132,9 +131,6 @@
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaTeamDefs.h>
 #include <luadefs/CLuaTimerDefs.h>
-#include <luadefs/CLuaVector2Defs.h>
-#include <luadefs/CLuaVector3Defs.h>
-#include <luadefs/CLuaVector4Defs.h>
 #include <luadefs/CLuaVehicleDefs.h>
 #include <luadefs/CLuaWaterDefs.h>
 #include <luadefs/CLuaWeaponDefs.h>

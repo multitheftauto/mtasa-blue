@@ -103,7 +103,7 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 
 //
 // Returns true if definitely not a registered function.
-// Note: Returning false does not mean it is a registered function
+// Note: Returning false does not necessarily mean it is a registered function
 //
 bool CLuaCFunctions::IsNotFunction ( lua_CFunction f )
 {

@@ -614,9 +614,6 @@ public:
     static bool                         SetWeaponAmmo                       ( CClientWeapon * pWeapon, int iAmmo );
     static bool                         SetWeaponClipAmmo                   ( CClientWeapon * pWeapon, int iAmmo );
 
-    // Util funcs
-    static bool                         GetTickCount_                       ( double& dCount );
-
     // Map funcs
     static bool                         ForcePlayerMap                      ( bool & bForced );
     static bool                         IsPlayerMapForced                   ( bool & bForced );

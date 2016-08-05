@@ -44,7 +44,6 @@ class CLuaFunctionDefs
 public:
     static void     Initialize ( class CLuaManager* pLuaManager, class CGame* pClientGame );
 
-    LUA_DECLARE ( DisabledFunction );
     LUA_DECLARE ( CallRemote );
     LUA_DECLARE ( FetchRemote );
 
@@ -108,10 +107,6 @@ public:
     LUA_DECLARE ( RemoveCommandHandler );
     LUA_DECLARE ( ExecuteCommandHandler );
 
-    // JSON functions
-    LUA_DECLARE ( toJSON );
-    LUA_DECLARE ( fromJSON );
-
     // Standard server functions
     LUA_DECLARE ( GetMaxPlayers );
     LUA_DECLARE ( SetMaxPlayers );
@@ -119,7 +114,6 @@ public:
     LUA_DECLARE ( OutputConsole );
     LUA_DECLARE ( OutputDebugString );
     LUA_DECLARE ( OutputServerLog );
-    LUA_DECLARE ( luaB_print );
     LUA_DECLARE ( GetServerName );
     LUA_DECLARE ( GetServerHttpPort );
     LUA_DECLARE ( GetServerIP );
@@ -130,31 +124,9 @@ public:
 
     LUA_DECLARE ( shutdown );
 
-    // Utility vector math functions
-    LUA_DECLARE ( GetDistanceBetweenPoints2D );
-    LUA_DECLARE ( GetDistanceBetweenPoints3D );
-    LUA_DECLARE ( GetEasingValue );
-    LUA_DECLARE ( InterpolateBetween );
-
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-    LUA_DECLARE ( GetTickCount_ );
-    LUA_DECLARE ( GetCTime );
-    LUA_DECLARE ( Split );
     LUA_DECLARE ( GetTok );
-    LUA_DECLARE ( GetColorFromString );
-    LUA_DECLARE ( Reference );
-    LUA_DECLARE ( Dereference );
-    LUA_DECLARE ( UtfLen );
-    LUA_DECLARE ( UtfSeek );
-    LUA_DECLARE ( UtfSub );
-    LUA_DECLARE ( UtfChar );
-    LUA_DECLARE ( UtfCode );
-
-    // PCRE functions
-    LUA_DECLARE ( PregFind );
-    LUA_DECLARE ( PregReplace );
-    LUA_DECLARE ( PregMatch );
 
     // Loaded Map Functions
     LUA_DECLARE ( GetRootElement );
@@ -185,20 +157,11 @@ public:
     LUA_DECLARE ( Set );
 
     // Utility
-    LUA_DECLARE ( Md5 );
-    LUA_DECLARE ( Sha256 );
-    LUA_DECLARE ( Hash );
-    LUA_DECLARE ( TeaEncode );
-    LUA_DECLARE ( TeaDecode );
-    LUA_DECLARE ( Base64encode );
-    LUA_DECLARE ( Base64decode );
     LUA_DECLARE ( GetNetworkUsageData );
     LUA_DECLARE ( GetNetworkStats );
     LUA_DECLARE ( GetVersion );
     LUA_DECLARE ( GetModules );
     LUA_DECLARE ( GetModuleInfo );
-    LUA_DECLARE ( IsOOPEnabled );
-    LUA_DECLARE ( GetUserdataType );
 
 private:
     // Static references to objects
