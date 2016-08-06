@@ -400,7 +400,6 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Luadef definitions
     CLuaAudioDefs::LoadFunctions ();
-    CLuaBitDefs::LoadFunctions ();
     CLuaBlipDefs::LoadFunctions ();
     CLuaBrowserDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();

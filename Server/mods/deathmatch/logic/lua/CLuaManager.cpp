@@ -262,7 +262,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaACLDefs::LoadFunctions ();
     CLuaAccountDefs::LoadFunctions ();
     CLuaBanDefs::LoadFunctions ();
-    CLuaBitDefs::LoadFunctions ();
     CLuaBlipDefs::LoadFunctions ();
     CLuaCameraDefs::LoadFunctions ();
     CLuaColShapeDefs::LoadFunctions ();
