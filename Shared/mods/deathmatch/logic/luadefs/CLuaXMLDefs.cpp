@@ -2,7 +2,7 @@
 *
 *  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        Shared/mods/logic/luadefs/CLuaSharedXMLDefs.cpp
+*  FILE:        Shared/mods/logic/luadefs/CLuaXMLDefs.cpp
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
