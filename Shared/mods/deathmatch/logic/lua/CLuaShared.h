@@ -15,6 +15,7 @@
 #include "luadefs/CLuaVector2Defs.h"
 #include "luadefs/CLuaVector3Defs.h"
 #include "luadefs/CLuaVector4Defs.h"
+#include "luadefs/CLuaXMLDefs.h"
 
 class CLuaShared
 {
@@ -22,4 +23,5 @@ public:
     static void EmbedChunkName ( SString strChunkName, const char** pcpOutBuffer, uint* puiOutSize );
     static bool CheckUTF8BOMAndUpdate ( const char** pcpOutBuffer, uint* puiOutSize );
     static void LoadFunctions ( void );
+    static void AddClasses ( lua_State* luaVM );
 };

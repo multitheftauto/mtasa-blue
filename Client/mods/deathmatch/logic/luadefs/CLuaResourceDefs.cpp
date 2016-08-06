@@ -192,7 +192,7 @@ int CLuaResourceDefs::GetResourceConfig ( lua_State* luaVM )
             // We have both a resource file to grab the config from and a config name?
             if ( pResource )
             {
-                if ( CResourceManager::ParseResourcePathInput ( strInput, pResource, strAbsPath, strMetaPath ) )
+                if ( CResourceManager::ParseResourcePathInput ( strInput, pResource, &strAbsPath, &strMetaPath ) )
                 {
                     // Loop through the configs in that resource
                     list < CResourceConfigItem* >::iterator iter = pResource->ConfigIterBegin ();

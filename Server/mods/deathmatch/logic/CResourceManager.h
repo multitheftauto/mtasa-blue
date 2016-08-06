@@ -18,8 +18,7 @@
 // This class controls all the resources that are loaded, and loads
 // new resources on demand
 
-#ifndef CRESOURCEMANAGER_H
-#define CRESOURCEMANAGER_H
+#pragma once
 
 #include "CResource.h"
 #include "CElement.h"
@@ -111,7 +110,7 @@ public:
     bool                        MoveDirToTrash                  ( const SString& strPathDirName );
     SString                     GetResourceOrganizationalPath   ( CResource* pResource );
 
-    static bool                 ParseResourcePathInput          ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath );
+    static bool                 ParseResourcePathInput          ( std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath = nullptr );
 
     void                        NotifyResourceVMOpen            ( CResource* pResource, CLuaMain* pVM );
     void                        NotifyResourceVMClose           ( CResource* pResource, CLuaMain* pVM );
@@ -157,5 +156,3 @@ private:
     ushort                      m_usNextNetId;
     std::map < SString, SString > m_BlockedFileReasonMap;
 };
-
-#endif

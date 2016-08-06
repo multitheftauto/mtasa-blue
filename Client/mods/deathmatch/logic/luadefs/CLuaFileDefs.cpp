@@ -92,7 +92,7 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
             SString strMetaPath;
             CResource* pThisResource = pLuaMain->GetResource ();
             CResource* pResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, strMetaPath ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, &strAbsPath, &strMetaPath ) )
             {
                 // Inform file verifier
                 g_pClientGame->GetResourceManager()->OnFileModifedByScript( strAbsPath, "fileCreate" );
@@ -159,7 +159,7 @@ int CLuaFileDefs::fileExists ( lua_State* luaVM )
         {
             std::string strAbsPath;
             CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, &strAbsPath ) )
             {
                 bool bResult = FileExists ( strAbsPath );
                 lua_pushboolean ( luaVM, bResult );
@@ -196,7 +196,7 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
             SString strMetaPath;
             CResource* pThisResource = pLuaMain->GetResource ();
             CResource* pResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strAbsPath, strMetaPath ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, &strAbsPath, &strMetaPath ) )
             {
                 // Create the file to create
                 eAccessType accessType = filePath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
@@ -501,7 +501,7 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
         {
             std::string strPath;
             CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, strPath ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pResource, &strPath ) )
             {
                 // Inform file verifier
                 g_pClientGame->GetResourceManager()->OnFileModifedByScript( strPath, "fileDelete" );
@@ -555,8 +555,8 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
             CResource* pThisResource = pLuaMain->GetResource ();
             CResource* pCurResource = pThisResource;
             CResource* pNewResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pCurResource, strCurAbsPath ) &&
-                 CResourceManager::ParseResourcePathInput ( newFilePath, pNewResource, strNewAbsPath ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pCurResource, &strCurAbsPath ) &&
+                 CResourceManager::ParseResourcePathInput ( newFilePath, pNewResource, &strNewAbsPath ) )
             {
                  // Does source file exist?
                 if ( FileExists ( strCurAbsPath.c_str() ) )
@@ -632,8 +632,8 @@ int CLuaFileDefs::fileCopy ( lua_State* luaVM )
             CResource* pThisResource = pLuaMain->GetResource ();
             CResource* pCurResource = pThisResource;
             CResource* pNewResource = pThisResource;
-            if ( CResourceManager::ParseResourcePathInput ( filePath, pCurResource, strCurAbsPath ) &&
-                 CResourceManager::ParseResourcePathInput ( newFilePath, pNewResource, strNewAbsPath ) )
+            if ( CResourceManager::ParseResourcePathInput ( filePath, pCurResource, &strCurAbsPath ) &&
+                 CResourceManager::ParseResourcePathInput ( newFilePath, pNewResource, &strNewAbsPath ) )
             {
                  // Does source file exist?
                 if ( FileExists ( strCurAbsPath ) )

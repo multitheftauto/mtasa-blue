@@ -206,11 +206,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehicleRotation", CLuaElementDefs::SetElementRotation );
     CLuaCFunctions::AddFunction ( "attachElementToElement", CLuaElementDefs::AttachElements );
     CLuaCFunctions::AddFunction ( "detachElementFromElement", CLuaElementDefs::DetachElements );
-    CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaXMLDefs::XMLNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaXMLDefs::XMLNodeGetChildren );
-    CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaXMLDefs::XMLNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaXMLDefs::XMLCreateChild );
-    CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaXMLDefs::XMLNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaXMLDefs::xmlNodeGetChildren );
+    CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaXMLDefs::xmlNodeFindChild );
+    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaXMLDefs::xmlCreateChild );
+    CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaXMLDefs::xmlNodeFindChild );
     CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaPedDefs::IsPedDead );
     CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex );

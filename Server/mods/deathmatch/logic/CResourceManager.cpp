@@ -1224,7 +1224,7 @@ SString CResourceManager::GetResourceOrganizationalPath ( CResource* pResource )
 
 
 // pResource may be changed on return, and it could be NULL if the function returns false.
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*& pResource, std::string* pstrPath, std::string* pstrMetaPath )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pstrMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
     std::string strMetaPath;
@@ -1250,8 +1250,8 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
                     *pstrMetaPath = strMetaPath;
                 if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    if ( pstrPath && !pResource->GetFilePath ( strMetaPath.c_str (), *pstrPath ) )
-                        *pstrPath = pResource->GetResourceDirectoryPath () + strMetaPath;
+                    if ( pStrPath && !pResource->GetFilePath ( strMetaPath.c_str (), *pStrPath ) )
+                        *pStrPath = pResource->GetResourceDirectoryPath () + strMetaPath;
                     return true;
                 }
             }
@@ -1262,8 +1262,8 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
         strMetaPath = strInput;
         if ( pstrMetaPath )
             *pstrMetaPath = strMetaPath;
-        if ( pstrPath && !pResource->GetFilePath ( strMetaPath.c_str (), *pstrPath ) )
-            *pstrPath = pResource->GetResourceDirectoryPath () + strMetaPath;
+        if ( pStrPath && !pResource->GetFilePath ( strMetaPath.c_str (), *pStrPath ) )
+            *pStrPath = pResource->GetResourceDirectoryPath () + strMetaPath;
         return true;
     }
     return false;

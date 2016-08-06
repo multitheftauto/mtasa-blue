@@ -69,6 +69,12 @@ bool CLuaShared::CheckUTF8BOMAndUpdate ( const char ** pcpOutBuffer, uint * puiO
 void CLuaShared::LoadFunctions ( void )
 {
     CLuaCryptDefs::LoadFunctions ();
+    CLuaXMLDefs::LoadFunctions ();
     CLuaUTFDefs::LoadFunctions ();
     CLuaUtilDefs::LoadFunctions ();
+}
+
+void CLuaShared::AddClasses(lua_State* luaVM)
+{
+    CLuaXMLDefs::AddClass ( luaVM );
 }

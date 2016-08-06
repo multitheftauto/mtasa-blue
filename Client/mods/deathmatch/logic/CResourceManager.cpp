@@ -159,17 +159,12 @@ void CResourceManager::StopAll ( void )
     }
 }
 
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath )
-{
-	std::string dummy;
-	return ParseResourcePathInput ( strInput, pResource, strPath, dummy );
-}
-
 // pResource may be changed on return, and it could be NULL if the function returns false.
-bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath )
+bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource* &pResource, std::string* pStrPath, std::string* pStrMetaPath )
 {
     ReplaceOccurrencesInString ( strInput, "\\", "/" );
     eAccessType accessType = ACCESS_PUBLIC;
+    std::string strMetaPath;
 
     if ( strInput[0] == '@' )
     {
@@ -186,10 +181,15 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
             pResource = g_pClientGame->GetResourceManager()->GetResource ( strResourceName.c_str() );
             if ( pResource && strInput[iEnd+1] )
             {
-                strMetaPath = strInput.substr(iEnd+1);
+                strMetaPath = strInput.substr ( iEnd + 1 );
+
+                if ( pStrMetaPath )
+                    *pStrMetaPath = strMetaPath;
+
                 if ( IsValidFilePath ( strMetaPath.c_str() ) )
                 {
-                    strPath = pResource->GetResourceDirectoryPath ( accessType, strMetaPath );
+                    if (pStrPath)
+                        *pStrPath = pResource->GetResourceDirectoryPath ( accessType, strMetaPath );
                     return true;
                 }
             }
@@ -197,8 +197,10 @@ bool CResourceManager::ParseResourcePathInput ( std::string strInput, CResource*
     }
     else if ( pResource && IsValidFilePath ( strInput.c_str() ) )
     {
-        strPath = pResource->GetResourceDirectoryPath ( accessType, strInput );
-        strMetaPath = strInput;
+        if (pStrPath)
+            *pStrPath = pResource->GetResourceDirectoryPath ( accessType, strInput );
+        if (pStrMetaPath)
+            *pStrMetaPath = strInput;
         return true;
     }
     return false;

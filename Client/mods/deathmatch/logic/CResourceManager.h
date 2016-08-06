@@ -17,8 +17,7 @@
 
 class CResourceManager;
 
-#ifndef __CRESOURCEMANAGER_H
-#define __CRESOURCEMANAGER_H
+#pragma once
 
 #include <list>
 
@@ -61,8 +60,7 @@ public:
     void                          ValidateResourceFile        ( const SString& strFilename, const CBuffer& fileData );
     inline CDownloadableResource* GetDownloadableResourceFile ( const SString& strFilename ) { return MapFindRef ( m_ResourceFileMap, strFilename ); }
 
-    static bool                   ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath, std::string &strMetaPath );
-    static bool                   ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string &strPath );
+    static bool                   ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string* pStrPath, std::string* pStrMetaPath = nullptr );
 
 private:
 
@@ -70,5 +68,3 @@ private:
     std::map < ushort, CResource* >     m_NetIdResourceMap;
     std::map < SString, CDownloadableResource* > m_ResourceFileMap;
 };
-
-#endif

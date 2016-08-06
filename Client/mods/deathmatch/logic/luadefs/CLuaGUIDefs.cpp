@@ -730,7 +730,7 @@ int CLuaGUIDefs::GUICreateStaticImage ( lua_State* luaVM )
         {
             CResource* pResource = pLuaMain->GetResource();
             SString strPath;
-            if ( CResourceManager::ParseResourcePathInput( path, pResource, strPath ) )
+            if ( CResourceManager::ParseResourcePathInput( path, pResource, &strPath ) )
             {
                 CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage ( *pLuaMain, x, y, width, height, strPath, relative, parent );
                 lua_pushelement ( luaVM, pGUIElement );
@@ -1103,7 +1103,7 @@ int CLuaGUIDefs::GUIStaticImageLoadImage ( lua_State* luaVM )
         {
             CResource* pResource =  pLuaMain->GetResource();
             SString strPath;
-            if ( CResourceManager::ParseResourcePathInput( filename, pResource, strPath ) )
+            if ( CResourceManager::ParseResourcePathInput( filename, pResource, &strPath ) )
             {
                 if ( CStaticFunctionDefinitions::GUIStaticImageLoadImage ( *theElement, strPath ) )
                 {
@@ -3675,7 +3675,7 @@ int CLuaGUIDefs::GUICreateFont ( lua_State* luaVM )
             CResource* pParentResource = pLuaMain->GetResource ();
             CResource* pFileResource = pParentResource;
             SString strPath, strMetaPath;
-            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, strPath, strMetaPath ) )
+            if ( CResourceManager::ParseResourcePathInput( strFilePath, pFileResource, &strPath, &strMetaPath ) )
             {
                 if ( FileExists ( strPath ) )
                 {

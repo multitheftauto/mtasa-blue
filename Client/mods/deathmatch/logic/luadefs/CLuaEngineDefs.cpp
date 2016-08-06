@@ -119,7 +119,7 @@ int CLuaEngineDefs::EngineLoadCOL ( lua_State* luaVM )
                 bool bIsRawData = CClientColModel::IsCOLData( strFile );
                 SString strPath;
                 // Is this a legal filepath?
-                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, &strPath ) )
                 {
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceCOLModelRoot ();
@@ -178,7 +178,7 @@ int CLuaEngineDefs::EngineLoadDFF ( lua_State* luaVM )
                 bool bIsRawData = CClientDFF::IsDFFData( strFile );
                 SString strPath;
                 // Is this a legal filepath?
-                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, &strPath ) )
                 {
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
@@ -240,7 +240,7 @@ int CLuaEngineDefs::EngineLoadTXD ( lua_State* luaVM )
                 bool bIsRawData = CClientTXD::IsTXDData( strFile );
                 SString strPath;
                 // Is this a legal filepath?
-                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, strPath ) )
+                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, &strPath ) )
                 {
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
