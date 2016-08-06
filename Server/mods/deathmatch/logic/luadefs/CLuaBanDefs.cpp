@@ -44,7 +44,7 @@ void CLuaBanDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "create", "addBan" );
     lua_classfunction ( luaVM, "remove", "removeBan" );
     lua_classfunction ( luaVM, "getList", "getBans" );
-    lua_classvariable ( luaVM, "list", NULL, "getBans" );
+    lua_classfunction ( luaVM, "reload", "reloadBans" );
 
     lua_classfunction ( luaVM, "getAdmin", "getBanAdmin" );
     lua_classfunction ( luaVM, "getIP", "getBanIP" );
