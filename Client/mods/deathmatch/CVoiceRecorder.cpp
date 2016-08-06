@@ -2,8 +2,8 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CVoiceRecorderRecorder.cpp
-*  PURPOSE:     Transfer box GUI
+*  FILE:        mods/deathmatch/logic/CVoiceRecorder.cpp
+*  PURPOSE:     Recording voice
 *  DEVELOPERS:  Philip Farquharson <philip@philipfarquharson.co.uk>
 *               Talidan <>
 *
@@ -32,8 +32,6 @@ CVoiceRecorder::CVoiceRecorder( void )
     m_bIsSendingVoiceData = false;
 
     m_ulTimeOfLastSend = 0;
-
-    m_uiBufferSizeBytes = 0;
 }
 
 CVoiceRecorder::~CVoiceRecorder( void )
@@ -41,15 +39,14 @@ CVoiceRecorder::~CVoiceRecorder( void )
     DeInit();
 }
 
-// TODO: Replace this with BASS
-int CVoiceRecorder::PACallback( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData )
+int CVoiceRecorder::BASSCallback(HRECORD handle, const void *buffer, DWORD length, void *user)
 {
     // This assumes that PACallback will only be called when userData is a valid CVoiceRecorder pointer
-    CVoiceRecorder* pVoiceRecorder = static_cast < CVoiceRecorder* > ( userData );
+    CVoiceRecorder* pVoiceRecorder = static_cast < CVoiceRecorder* > ( user );
     pVoiceRecorder->m_CS.Lock ();
 
     if ( pVoiceRecorder->IsEnabled() )
-        pVoiceRecorder->SendFrame(inputBuffer);
+        pVoiceRecorder->SendFrame(buffer, length);
 
     pVoiceRecorder->m_CS.Unlock ();
     return 0;
@@ -70,10 +67,6 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
 
     // State is awaiting input
     m_VoiceState = VOICESTATE_AWAITING_INPUT;
- 
-    // Calculate how many frames we are storing and then the buffer size in bytes
-    unsigned int iFramesPerBuffer = ( 2048 / ( 32000 / m_SampleRate ));
-    m_uiBufferSizeBytes = iFramesPerBuffer * sizeof(short);
 
     // Time of last send, this is used to limit sending
     m_ulTimeOfLastSend = 0;
@@ -82,29 +75,11 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
     const SpeexMode* speexMode = getSpeexModeFromSampleRate();
     m_pSpeexEncoderState = speex_encoder_init(speexMode);
 
-    Pa_Initialize();
+    // Initialize recording with the default device
+    BASS_RecordInit(-1);
 
-    int count = Pa_GetHostApiCount();
-
-    PaStreamParameters inputDevice;
-    inputDevice.channelCount = 1;
-    inputDevice.device = Pa_GetDefaultInputDevice();
-    inputDevice.sampleFormat = paInt16;
-    inputDevice.hostApiSpecificStreamInfo = NULL;
-    inputDevice.suggestedLatency = 0;
-
-
-    Pa_OpenStream (
-            &m_pAudioStream, 
-            &inputDevice, 
-            NULL, 
-            m_SampleRate, 
-            iFramesPerBuffer, 
-            paNoFlag, 
-            PACallback, 
-            this );
-    
-    Pa_StartStream( m_pAudioStream );
+    // Start recording
+    BASS_RecordStart(SAMPLERATE_WIDEBAND, 1, BASS_SAMPLE_FLOAT, &BASSCallback, this);
 
     // Initialize our outgoing buffer
     speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexOutgoingFrameSampleCount);
@@ -113,7 +88,7 @@ void CVoiceRecorder::Init( bool bEnabled, unsigned int uiServerSampleRate, unsig
     if ( iBitRate )
         speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_BITRATE, &iBitRate );
 
-    m_pOutgoingBuffer = (char*) malloc(m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT);
+    m_pOutgoingBuffer = (char*) malloc(2048 * FRAME_OUTGOING_BUFFER_COUNT);
     m_uiOutgoingReadIndex = 0;
     m_uiOutgoingWriteIndex = 0;
 
@@ -143,8 +118,7 @@ void CVoiceRecorder::DeInit( void )
     {
         m_bEnabled = false;
 
-        Pa_CloseStream( m_pAudioStream );
-        Pa_Terminate();
+        BASS_RecordFree();
 
         // Assumes now that PACallback will not be called in this context
         m_CS.Lock ();
@@ -174,7 +148,6 @@ void CVoiceRecorder::DeInit( void )
         m_uiOutgoingWriteIndex = 0;
         m_bIsSendingVoiceData = false;
         m_ulTimeOfLastSend = 0;
-        m_uiBufferSizeBytes = 0;
     }
 }
 
@@ -258,7 +231,6 @@ void CVoiceRecorder::DoPulse( void )
 
     char *pInputBuffer;
     char bufTempOutput[2048];
-    unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
 
     // Only send every 100 ms
     if ( CClientTime::GetTime () - m_ulTimeOfLastSend > 100 && m_VoiceState != VOICESTATE_AWAITING_INPUT)
@@ -269,7 +241,7 @@ void CVoiceRecorder::DoPulse( void )
         if (m_uiOutgoingWriteIndex >= m_uiOutgoingReadIndex)
             uiBytesAvailable = m_uiOutgoingWriteIndex - m_uiOutgoingReadIndex;
         else
-            uiBytesAvailable = m_uiOutgoingWriteIndex + (uiTotalBufferSize - m_uiOutgoingReadIndex);
+            uiBytesAvailable = m_uiOutgoingWriteIndex + (m_uiAudioBufferSize - m_uiOutgoingReadIndex);
 
         unsigned int uiSpeexBlockSize = m_iSpeexOutgoingFrameSampleCount * VOICE_SAMPLE_SIZE;
 
@@ -285,11 +257,11 @@ void CVoiceRecorder::DoPulse( void )
                 speex_bits_reset(&speexBits);
 
                 // Does the input data wrap around the buffer? Copy it first then
-                if (m_uiOutgoingReadIndex + uiSpeexBlockSize >= uiTotalBufferSize)
+                if (m_uiOutgoingReadIndex + uiSpeexBlockSize >= m_uiAudioBufferSize)
                 {
                     unsigned t;
                     for (t=0; t < uiSpeexBlockSize; t++)
-                        bufTempOutput[t] = m_pOutgoingBuffer[t%uiTotalBufferSize];
+                        bufTempOutput[t] = m_pOutgoingBuffer[t%m_uiAudioBufferSize];
                     pInputBuffer=bufTempOutput;
                 }
                 else
@@ -301,7 +273,7 @@ void CVoiceRecorder::DoPulse( void )
                 // Encode our audio stream with speex
                 speex_encode_int(m_pSpeexEncoderState, (spx_int16_t*)pInputBuffer, &speexBits);
 
-                m_uiOutgoingReadIndex = (m_uiOutgoingReadIndex + uiSpeexBlockSize)%uiTotalBufferSize;
+                m_uiOutgoingReadIndex = (m_uiOutgoingReadIndex + uiSpeexBlockSize)% m_uiAudioBufferSize;
 
                 m_bIsSendingVoiceData = true;
 
@@ -350,12 +322,12 @@ void CVoiceRecorder::DoPulse( void )
 }
 
 // Called from other thread. Critical section is already locked.
-void CVoiceRecorder::SendFrame( const void* inputBuffer )
+void CVoiceRecorder::SendFrame( const void* inputBuffer, DWORD uiLength )
 {
     if ( m_VoiceState != VOICESTATE_AWAITING_INPUT && m_bEnabled && inputBuffer )
     {
         unsigned int remainingBufferSize = 0;
-        unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
+        unsigned int uiTotalBufferSize = uiLength * FRAME_OUTGOING_BUFFER_COUNT;
 
         // Calculate how much of our buffer is remaining
         if ( m_uiOutgoingWriteIndex >= m_uiOutgoingReadIndex )
@@ -364,17 +336,17 @@ void CVoiceRecorder::SendFrame( const void* inputBuffer )
             remainingBufferSize = m_uiOutgoingReadIndex - m_uiOutgoingWriteIndex;
 
         // Copy from our input buffer to our outgoing buffer at write index
-        memcpy(m_pOutgoingBuffer + m_uiOutgoingWriteIndex, inputBuffer, m_uiBufferSizeBytes);
+        memcpy(m_pOutgoingBuffer + m_uiOutgoingWriteIndex, inputBuffer, uiLength);
 
         // Re-align our write index
-        m_uiOutgoingWriteIndex += m_uiBufferSizeBytes;
+        m_uiOutgoingWriteIndex += uiLength;
 
         // If we have reached the end of the buffer, go back to the start
         if ( m_uiOutgoingWriteIndex == uiTotalBufferSize )
             m_uiOutgoingWriteIndex = 0;
 
         // Wrap around the buffer?
-        if ( m_uiBufferSizeBytes >= remainingBufferSize )
+        if ( uiLength >= remainingBufferSize )
             m_uiOutgoingReadIndex = ( m_uiOutgoingReadIndex + m_iSpeexOutgoingFrameSampleCount * VOICE_SAMPLE_SIZE ) % uiTotalBufferSize;
     }
 }

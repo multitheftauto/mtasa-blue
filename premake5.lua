@@ -94,7 +94,6 @@ workspace "MTASA"
 		include "vendor/cegui-0.4.0-custom"
 		
 		group "Vendor"
-		include "vendor/portaudio"
 		include "vendor/cef3"
 		include "vendor/jpeg-8d"
 		include "vendor/libpng"

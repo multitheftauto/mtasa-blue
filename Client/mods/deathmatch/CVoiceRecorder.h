@@ -26,7 +26,7 @@
 
 #include <speex/speex.h>
 #include <speex/speex_preprocess.h>
-#include <portaudio/portaudio.h>
+#include <bass/bass.h>
 
 enum eVoiceState
 {
@@ -70,14 +70,14 @@ public:
 
 private:  
     void                                DeInit                      ( void );
-    void                                SendFrame                   ( const void* inputBuffer );
+    void                                SendFrame                   ( const void* inputBuffer, DWORD length );
 
-    static int                          PACallback                  ( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData );
+    static int __stdcall                BASSCallback                (HRECORD handle, const void *buffer, DWORD length, void *user);
 
     bool                                m_bEnabled;
     eVoiceState                         m_VoiceState;
 
-    PaStream*                           m_pAudioStream;
+    HSTREAM*                            m_pAudioStream;
 
     void*                               m_pSpeexEncoderState;
     SpeexPreprocessState*               m_pSpeexPreprocState;
@@ -90,7 +90,7 @@ private:
 
     unsigned long                       m_ulTimeOfLastSend;
 
-    unsigned int                        m_uiBufferSizeBytes;
+    int                                 m_uiAudioBufferSize = 2048 * FRAME_OUTGOING_BUFFER_COUNT;
     eSampleRate                         convertServerSampleRate         ( unsigned int uiServerSampleRate );
 
     eSampleRate                         m_SampleRate;
