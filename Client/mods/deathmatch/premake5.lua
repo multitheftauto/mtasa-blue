@@ -8,8 +8,7 @@ project "Client Deathmatch"
 	pchsource "StdInc.cpp"
 	
 	links {
-		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp",
-		"../../../vendor/libspeex/libspeexd2013", -- todo: use debug variant
+		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex",
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
 		"../../../vendor/bass/lib/bassmix",
