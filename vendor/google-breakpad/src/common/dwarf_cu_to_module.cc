@@ -43,6 +43,7 @@
 #include <cxxabi.h>
 #endif
 #include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include <algorithm>
@@ -140,7 +141,7 @@ DwarfCUToModule::FileContext::~FileContext() {
 }
 
 void DwarfCUToModule::FileContext::AddSectionToSectionMap(
-    const string& name, const char* contents, uint64 length) {
+    const string& name, const uint8_t *contents, uint64 length) {
   section_map_[name] = std::make_pair(contents, length);
 }
 
@@ -383,17 +384,17 @@ string DwarfCUToModule::GenericDIEHandler::ComputeQualifiedName() {
     qualified_name = &specification_->qualified_name;
   }
 
-  const string *unqualified_name;
+  const string *unqualified_name = NULL;
   const string *enclosing_name;
   if (!qualified_name) {
-    // Find our unqualified name. If the DIE has its own DW_AT_name
-    // attribute, then use that; otherwise, check our specification.
-    if (name_attribute_.empty() && specification_)
-      unqualified_name = &specification_->unqualified_name;
-    else
+    // Find the unqualified name. If the DIE has its own DW_AT_name
+    // attribute, then use that; otherwise, check the specification.
+    if (!name_attribute_.empty())
       unqualified_name = &name_attribute_;
+    else if (specification_)
+      unqualified_name = &specification_->unqualified_name;
 
-    // Find the name of our enclosing context. If we have a
+    // Find the name of the enclosing context. If this DIE has a
     // specification, it's the specification's enclosing context that
     // counts; otherwise, use this DIE's context.
     if (specification_)
@@ -407,7 +408,7 @@ string DwarfCUToModule::GenericDIEHandler::ComputeQualifiedName() {
   string return_value;
   if (qualified_name) {
     return_value = *qualified_name;
-  } else {
+  } else if (unqualified_name && enclosing_name) {
     // Combine the enclosing name and unqualified name to produce our
     // own fully-qualified name.
     return_value = cu_context_->language->MakeQualifiedName(*enclosing_name,
@@ -416,7 +417,8 @@ string DwarfCUToModule::GenericDIEHandler::ComputeQualifiedName() {
 
   // If this DIE was marked as a declaration, record its names in the
   // specification table.
-  if (declaration_) {
+  if ((declaration_ && qualified_name) ||
+      (unqualified_name && enclosing_name)) {
     Specification spec;
     if (qualified_name) {
       spec.qualified_name = *qualified_name;
@@ -814,7 +816,7 @@ void DwarfCUToModule::ReadSourceLines(uint64 offset) {
     cu_context_->reporter->MissingSection(".debug_line");
     return;
   }
-  const char *section_start = map_entry->second.first;
+  const uint8_t *section_start = map_entry->second.first;
   uint64 section_length = map_entry->second.second;
   if (offset >= section_length) {
     cu_context_->reporter->BadLineInfoOffset(offset);
