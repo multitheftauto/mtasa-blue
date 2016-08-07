@@ -16,7 +16,7 @@ project "Client Core"
 			"../../vendor/cef3",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
-			"../../vendor/jpeg-8d",
+			"../../vendor/jpeg-9b",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/current/src/"
 		}
