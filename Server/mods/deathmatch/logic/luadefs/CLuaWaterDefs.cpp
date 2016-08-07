@@ -28,22 +28,19 @@ void CLuaWaterDefs::AddClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "createWater" );
+    lua_classfunction ( luaVM, "resetColor", "resetWaterColor" );
+    lua_classfunction ( luaVM, "resetLevel", "resetWaterLevel" );
+    lua_classfunction ( luaVM, "getWaveHeight", "getWaveHeight" );
+    lua_classfunction ( luaVM, "setWaveHeight", "setWaveHeight" );
 
     lua_classfunction ( luaVM, "getVertexPosition", "getWaterVertexPosition" );
-    lua_classfunction ( luaVM, "getWaveHeight", "getWaveHeight" );
     lua_classfunction ( luaVM, "getColor", "getWaterColor" );
 
-    lua_classfunction ( luaVM, "setWaveHeight", "setWaveHeight" );
     lua_classfunction ( luaVM, "setColor", "setWaterColor" );
     lua_classfunction ( luaVM, "setVertexPosition", "setWaterVertexPosition" );
     lua_classfunction ( luaVM, "setLevel", "setWaterLevel" );
 
-    lua_classfunction ( luaVM, "resetColor", "resetWaterColor" );
-    lua_classfunction ( luaVM, "resetLevel", "resetWaterLevel" );
-
     lua_classvariable ( luaVM, "level", "setWaterLevel", NULL );
-    lua_classvariable ( luaVM, "height", "setWaveHeight", "getWaveHeight" );
-    //lua_classvariable ( luaVM, "color", "setWaterColor", "getWaterColor" );
 
     lua_registerclass ( luaVM, "Water", "Element" );
 }

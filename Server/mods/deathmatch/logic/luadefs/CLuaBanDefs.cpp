@@ -36,16 +36,15 @@ void CLuaBanDefs::LoadFunctions ()
 
 }
 
-// TODO: The "set" attribute of .admin, .reason and .unbanTime needs to be checked for syntax
 void CLuaBanDefs::AddClass ( lua_State* luaVM )
 {
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "addBan" );
-    lua_classfunction ( luaVM, "remove", "removeBan" );
     lua_classfunction ( luaVM, "getList", "getBans" );
     lua_classfunction ( luaVM, "reload", "reloadBans" );
 
+    lua_classfunction ( luaVM, "remove", "removeBan" );
     lua_classfunction ( luaVM, "getAdmin", "getBanAdmin" );
     lua_classfunction ( luaVM, "getIP", "getBanIP" );
     lua_classfunction ( luaVM, "getNick", "getBanNick" );
