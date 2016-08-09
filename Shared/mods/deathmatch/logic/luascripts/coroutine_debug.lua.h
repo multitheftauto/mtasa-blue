@@ -1,4 +1,7 @@
---Luaify;SCRIPT_STACK=R"~LUACODE~(
+namespace EmbeddedLuaCode
+{
+    const SString coroutine_debug = R"~LUA~(
+
 --[[
     SERVER AND CLIENT.
 
@@ -19,4 +22,5 @@ function coroutine.resume(...)
     return state,result
 end
 
---)~LUACODE~";
+    )~LUA~";
+}

@@ -1,4 +1,7 @@
---Luaify;SCRIPT_STACK=R"~LUACODE~(
+namespace EmbeddedLuaCode
+{
+    const SString inspect = R"~LUA~(
+
 --[[
     SERVER AND CLIENT.
 
@@ -440,4 +443,6 @@ end
 
 setmetatable(inspect, { __call = function(_, ...) return inspect.inspect(...) end })
 
---)~LUACODE~";
+
+    )~LUA~";
+}

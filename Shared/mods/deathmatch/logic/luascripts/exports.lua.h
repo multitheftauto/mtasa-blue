@@ -1,4 +1,7 @@
---Luaify;SCRIPT_STACK=R"~LUACODE~(
+namespace EmbeddedLuaCode
+{
+    const SString exports = R"~LUA~(
+
 --[[
     SERVER AND CLIENT.
 
@@ -46,4 +49,5 @@ function exportsMT:__index(k)
 end
 exports = setmetatable({}, exportsMT)
 
---)~LUACODE~";
+    )~LUA~";
+}
