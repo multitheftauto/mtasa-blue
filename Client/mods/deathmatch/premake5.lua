@@ -63,7 +63,7 @@ project "Client Deathmatch"
 	}
 	
 	configuration "windows"
-		buildoptions { "-Zm130" }
+		buildoptions { "-Zm180" }
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
