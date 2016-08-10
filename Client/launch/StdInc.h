@@ -17,7 +17,7 @@
 #elif _MSC_VER == 1800      // MSVC++ 12.0 (Visual Studio 2013)
     #define MSVCR_DLL "msvcr120.dll"
 #elif _MSC_VER == 1900 // MSVC++ 14.0 (Visual Studio 2015)
-    #define MSVCR_DLL "msvcr140.dll"
+    #define MSVCR_DLL "ucrtbase.dll"
 #else
     #error "Insert VCR info"
 #endif
