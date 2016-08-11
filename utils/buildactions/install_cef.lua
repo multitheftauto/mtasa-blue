@@ -49,9 +49,10 @@ newaction {
 		-- Extract first bz2 and then tar
 		os.extract_archive(archive_path, CEF_PATH, true) -- Extract .tar.bz2 to .tar
 		os.extract_archive(CEF_PATH.."temp.tar", CEF_PATH, true) -- Extract .tar
-		os.executef("{MOVE} %scef_binary*/* %s", CEF_PATH, CEF_PATH)
-		os.remove_wildcard(CEF_PATH.."cef_binary*")
-
+		
+		-- Move all files from cef_binary*/* to ./
+		os.expanddir_wildcard(CEF_PATH.."cef_binary*", CEF_PATH)
+		
 		-- Delete .tar archive, but keep .tar.bz2 for checksumming
 		os.remove(CEF_PATH.."temp.tar")
 	end

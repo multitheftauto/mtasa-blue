@@ -64,9 +64,19 @@ function os.remove_wildcard(path)
 	end
 end
 
+function os.expanddir_wildcard(from, to)
+	local dir = os.matchdirs(from)[1]
+	if not dir then return end
+	
+	-- TODO: Optimize this
+	os.copydir(dir, to)
+	os.rmdir(dir)
+end
+
 function os.md5_file(path)
 	if os.get() == "windows" then
-		return os.outputof(string.format("call \"utils\\MD5.exe\" \"%s\"", path))
+		local s = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
+		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
 	else
 		return os.outputof(string.format("md5sum \"%s\" | awk '{ print $1 }'", path))
 	end
