@@ -129,13 +129,6 @@ void CLuaMain::InitSecurity ( void )
     lua_register ( m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction );
     lua_register ( m_luaVM, "getfenv", CLuaUtilDefs::DisabledFunction );
     lua_register ( m_luaVM, "newproxy", CLuaUtilDefs::DisabledFunction );
-
-    // Wrap debug.getregistry to make it safe.
-    lua_getglobal(m_luaVM, "debug");                                // stack: [tbl_debug]
-    lua_pushstring(m_luaVM, "getregistry");                         // stack: [tbl_debug,"getregistry"]
-    lua_pushcfunction(m_luaVM, CLuaUtilDefs::Debug_getregistry);    // stack: [tbl_debug,"getregistry",CLuaUtilDefs::Debug_getregistry]
-    lua_rawset(m_luaVM, -3);                                        // stack: [tbl_debug]
-    lua_pop(m_luaVM, -1);                                           // stack: []
 }
 
 
