@@ -120,11 +120,8 @@ public:
     static int                      LuaLoadBuffer           ( lua_State *L, const char *buff, size_t sz, const char *name );
     static int                      OnUndump                ( const char* p, size_t n );
 
-    bool                            SetPackagePaths         ( SString strPath, SString strCPath );
-
 private:
     void                            InitSecurity            ( void );
-    void                            InitPackageSecurity     ( void );
     void                            InitClasses             ( lua_State* luaVM );
 
 public:
@@ -137,7 +134,6 @@ private:
     SString                         m_strScriptName;
 
     lua_State*                      m_luaVM;
-    int                             m_iPackageRef;
     CLuaTimerManager*               m_pLuaTimerManager;
 
     class CResource*                m_pResource;

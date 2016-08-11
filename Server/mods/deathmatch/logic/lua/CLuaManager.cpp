@@ -76,10 +76,7 @@ CLuaMain * CLuaManager::CreateVirtualMachine ( CResource* pResourceOwner, bool b
     CLuaMain * pLuaMain = new CLuaMain ( this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager, pResourceOwner, bEnableOOP );
     m_virtualMachines.push_back ( pLuaMain );
     pLuaMain->InitVM ();
-    pLuaMain->SetPackagePaths(
-            pResourceOwner->IsResourceZip() ? pResourceOwner->GetResourceCacheDirectoryPath() : pResourceOwner->GetResourceDirectoryPath(),
-            PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules")
-        );
+
     m_pLuaModuleManager->RegisterFunctions ( pLuaMain->GetVirtualMachine() );
 
     return pLuaMain;

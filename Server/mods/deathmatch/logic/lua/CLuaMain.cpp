@@ -63,7 +63,6 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
 
     m_bEnableOOP = bEnableOOP;
 
-    m_iPackageRef = -1;
 
     CPerfStatLuaMemory::GetSingleton ()->OnLuaMainCreate ( this );
     CPerfStatLuaTiming::GetSingleton ()->OnLuaMainCreate ( this );
@@ -127,30 +126,10 @@ void CLuaMain::InitSecurity ( void )
 {
     lua_register ( m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction );
     lua_register ( m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction );
+    lua_register ( m_luaVM, "require", CLuaUtilDefs::DisabledFunction );
+    lua_register ( m_luaVM, "loadlib", CLuaUtilDefs::DisabledFunction );
     lua_register ( m_luaVM, "getfenv", CLuaUtilDefs::DisabledFunction );
     lua_register ( m_luaVM, "newproxy", CLuaUtilDefs::DisabledFunction );
-}
-
-
-void CLuaMain::InitPackageSecurity(void)
-{
-    // Grab our original package library
-    lua_getglobal(m_luaVM, "package");                          // stack: [tbl_package]
-
-    // Create a new package library, with only whitelisted functions
-    lua_newtable(m_luaVM);                                      // stack: [tbl_package,tbl_new]
-    std::vector<const char*> szWhitelist = { "loaded", "seeall" };
-    for (auto it = szWhitelist.begin(); it != szWhitelist.end(); it++)
-    {
-        lua_pushstring(m_luaVM, *it);                           // stack: [tbl_package,tbl_new,"loaded"]
-        lua_pushstring(m_luaVM, *it);                           // stack: [tbl_package,tbl_new,"loaded","loaded"]
-        lua_gettable(m_luaVM, -4);                              // stack: [tbl_package,tbl_new,"loaded",package.loaded]
-        lua_settable(m_luaVM, -3);                              // stack: [tbl_package,tbl_new]
-    }
-    lua_setglobal(m_luaVM, "package");                          // stack: [tbl_package]
-    
-    // Keep the original package library safe in the registry
-    m_iPackageRef = luaL_ref(m_luaVM, LUA_REGISTRYINDEX);       // stack: []
 }
 
 
@@ -206,27 +185,13 @@ void CLuaMain::InitVM ( void )
     lua_sethook ( m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT );
 
     // Load LUA libraries
-    const luaL_Reg lualibs[] = {
-        { "", luaopen_base },
-        { LUA_LOADLIBNAME, luaopen_package },
-        { LUA_TABLIBNAME, luaopen_table },
-        { LUA_STRLIBNAME, luaopen_string },
-        { LUA_MATHLIBNAME, luaopen_math },
-        { LUA_DBLIBNAME, luaopen_debug },
-        { "utf8", luaopen_utf8 },
-        { NULL, NULL }
-    };
+    luaopen_base ( m_luaVM );
+    luaopen_math ( m_luaVM );
+    luaopen_string ( m_luaVM );
+    luaopen_table ( m_luaVM );
+    luaopen_debug ( m_luaVM );
+    luaopen_utf8 ( m_luaVM );
 
-    const luaL_Reg *lib = lualibs;
-    for (; lib->func; lib++) {
-        lua_pushcfunction(m_luaVM, lib->func);
-        lua_pushstring(m_luaVM, lib->name);
-        lua_call(m_luaVM, 1, 0);
-    }
-   
-    // Initialize our customized 'package' library with restricted functions
-    InitPackageSecurity ();
-    
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity ();
 
@@ -720,40 +685,4 @@ int CLuaMain::OnUndump( const char* p, size_t n )
         return 0;
     }
     return 1;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CLuaMain::SetPackagePaths
-//
-// Sets module directories for pure lua and C lua modules
-//
-///////////////////////////////////////////////////////////////
-bool CLuaMain::SetPackagePaths(SString strPath, SString strCPath)
-{
-    if (!m_luaVM || m_iPackageRef < 0 )
-        return false;
-
-    // Setup our wildcards for searching
-    strPath = PathJoin(strPath, "?.lua") + ";" + PathJoin(strPath, "?/init.lua");
-
-#ifdef WIN32
-    strCPath = PathJoin(strCPath, "?.dll");
-#else
-    strCPath = PathJoin(strCPath, "?.so");
-#endif
-
-    // Overwrite our path variable function from the registry (saved earlier)
-    lua_rawgeti(m_luaVM, LUA_REGISTRYINDEX, m_iPackageRef);         // stack: [tbl_hiddenPackage]
-    lua_pushstring(m_luaVM, "path");                                // stack: [tbl_hiddenPackage,"path"]
-    lua_pushstring(m_luaVM, strPath.c_str());                       // stack: [tbl_hiddenPackage,"path","C:/someresource/?.lua"]
-    lua_settable(m_luaVM, -3);                                      // stack: [tbl_hiddenPackage]
-
-    lua_pushstring(m_luaVM, "cpath");                               // stack: [tbl_hiddenPackage,"cpath"]
-    lua_pushstring(m_luaVM, strCPath.c_str());                      // stack: [tbl_hiddenPackage,"cpath","C:/somemodules/?.dll"]
-    lua_settable(m_luaVM, -3);                                      // stack: [tbl_hiddenPackage]
-    lua_pop(m_luaVM, -1);                                           // stack: []
-
-    return true;
 }
