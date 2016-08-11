@@ -48,6 +48,23 @@ int CLuaUtilDefs::DisabledFunction ( lua_State* luaVM )
     return 1;
 }
 
+
+// Get a copy of the registry with whitelisted values
+int CLuaUtilDefs::Debug_getregistry(lua_State* luaVM)
+{
+    // Create a new registry library, with only whitelisted sections
+    lua_newtable(luaVM);                                      // stack: [tbl_new]
+    std::vector<const char*> szWhitelist = { "ud", "mt" };
+    for (auto it = szWhitelist.begin(); it != szWhitelist.end(); it++)
+    {
+        lua_pushstring(luaVM, *it);                           // stack: [tbl_new,"ud"]
+        lua_pushstring(luaVM, *it);                           // stack: [tbl_new,"ud","ud"]
+        lua_gettable(luaVM, LUA_REGISTRYINDEX);               // stack: [tbl_new,"ud",REGISTRY.ud]
+        lua_settable(luaVM, -3);                              // stack: [tbl_new]
+    }
+    return 1;
+}
+
 int CLuaUtilDefs::Dereference ( lua_State* luaVM )
 {
     int iPointer = 0;
