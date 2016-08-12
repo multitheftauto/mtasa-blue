@@ -664,3 +664,15 @@ LUALIB_API int luaopen_package (lua_State *L) {
   return 1;  /* return 'package' table */
 }
 
+
+/////////////////////////////
+// MTA EXTENSIONS
+/////////////////////////////
+
+// API to direct load a C library.
+LUA_API int luaL_loader_C(lua_State *L, const char* name, const char* filename) {
+    const char* funcname = mkfuncname(L, name);
+    if (ll_loadfunc(L, filename, funcname) != 0)
+        loaderror(L, filename);
+    return 1;  /* library loaded successfully */
+}

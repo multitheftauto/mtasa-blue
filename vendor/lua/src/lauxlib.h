@@ -172,3 +172,8 @@ LUALIB_API void (luaL_pushresult) (luaL_Buffer *B);
 #endif
 
 
+/////////////////////////////
+// MTA EXTENSIONS
+/////////////////////////////
+LUALIB_API int luaL_loader_C(lua_State *L, const char* name, const char* filename);
+

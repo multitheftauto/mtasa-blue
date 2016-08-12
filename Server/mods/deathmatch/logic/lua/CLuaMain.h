@@ -59,7 +59,7 @@ public:
 
                                     ~CLuaMain               ( void );
 
-    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName );
+    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bClearReturnValues = true );
     bool                            LoadScript              ( const char* szLUAScript );
     void                            UnloadScript            ( void );
 
@@ -119,6 +119,12 @@ public:
     void                            CheckExecutionTime      ( void );
     static int                      LuaLoadBuffer           ( lua_State *L, const char *buff, size_t sz, const char *name );
     static int                      OnUndump                ( const char* p, size_t n );
+
+    void                            InitPackageStorage      ( lua_State* L );  // Create a psuedo package.loaded table
+    void                            GetPackage              ( lua_State *L, SString &strName ); // Push the package value to the top of the stack
+    void                            SetPackage              ( lua_State *L, SString &strName ); // Set the package to the value at the top of the stack
+    bool                            LoadLuaLib              ( lua_State *L, SString strName ); // Load a lua library of a given name
+    bool                            LoadClib                ( lua_State *L, SString strName ); // Load a C Lib of a given name
 
 private:
     void                            InitSecurity            ( void );

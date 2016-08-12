@@ -38,6 +38,9 @@ void CLuaUtilDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "pregFind", PregFind );
     CLuaCFunctions::AddFunction ( "pregReplace", PregReplace );
     CLuaCFunctions::AddFunction ( "pregMatch", PregMatch );
+
+    // Package functions
+    CLuaCFunctions::AddFunction ( "require", Require );
 }
 
 int CLuaUtilDefs::DisabledFunction ( lua_State* luaVM )
@@ -557,5 +560,40 @@ int CLuaUtilDefs::PregMatch ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaUtilDefs::Require(lua_State* luaVM)
+{
+#ifndef MTA_CLIENT
+    //  table require ( string name )
+    SString strMod;
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strMod);
+
+    if (!argStream.HasErrors())
+    {
+        // Check if package exists already, if so load it
+                                                        // stack: ["moduleName"]
+        pLuaMain->GetPackage(luaVM, strMod);            // stack: ["moduleName",pkgModule/nil]
+        if (lua_type(luaVM, -1) != LUA_TNIL)
+            return 1;
+        lua_pop(luaVM,1);                               // stack: ["moduleName"]
+
+        // Check whether the appropriate pure lua module exists
+        if (pLuaMain->LoadLuaLib(luaVM, strMod))        // stack: ["moduleName",pkgLuaMod/nil]
+            return 1;
+
+        // Check if a C library exists
+        if (pLuaMain->LoadClib(luaVM, strMod))          // stack: ["moduleName",fncModule/nil]
+            return 1;
+        lua_pop(luaVM,2);                               // stack: []
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+#endif
+    lua_pushboolean(luaVM, false);
     return 1;
 }

@@ -45,4 +45,7 @@ public:
     LUA_DECLARE ( PregFind );
     LUA_DECLARE ( PregReplace );
     LUA_DECLARE ( PregMatch );
+
+    // Package functions
+    LUA_DECLARE ( Require );
 };

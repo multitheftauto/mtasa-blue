@@ -126,7 +126,6 @@ void CLuaMain::InitSecurity ( void )
 {
     lua_register ( m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction );
     lua_register ( m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction );
-    lua_register ( m_luaVM, "require", CLuaUtilDefs::DisabledFunction );
     lua_register ( m_luaVM, "loadlib", CLuaUtilDefs::DisabledFunction );
     lua_register ( m_luaVM, "getfenv", CLuaUtilDefs::DisabledFunction );
     lua_register ( m_luaVM, "newproxy", CLuaUtilDefs::DisabledFunction );
@@ -192,6 +191,9 @@ void CLuaMain::InitVM ( void )
     luaopen_debug ( m_luaVM );
     luaopen_utf8 ( m_luaVM );
 
+    // Initialize packages system
+    InitPackageStorage(m_luaVM);
+
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity ();
 
@@ -250,7 +252,7 @@ void CLuaMain::InstructionCountHook ( lua_State* luaVM, lua_Debug* pDebug )
 }
 
 
-bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInSize, const char* szFileName )
+bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSize, const char* szFileName, bool bClearReturnValues )
 {
     SString strNiceFilename = ConformResourcePath( szFileName );
 
@@ -320,7 +322,7 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
                 g_pGame->GetScriptDebugging()->LogPCallError( m_luaVM, strRes, true );
             }
             // Cleanup any return values
-            if ( lua_gettop ( m_luaVM ) > luaSavedTop )
+            if ( bClearReturnValues && lua_gettop ( m_luaVM ) > luaSavedTop )
                 lua_settop( m_luaVM, luaSavedTop );
             return true;
         }
@@ -685,4 +687,165 @@ int CLuaMain::OnUndump( const char* p, size_t n )
         return 0;
     }
     return 1;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::InitPackageStorage
+//
+// Create a table for storage of Lua packages - stored in the Lua VM
+//
+///////////////////////////////////////////////////////////////
+void CLuaMain::InitPackageStorage(lua_State* L)
+{
+    lua_newtable(L);                                            // stack: [tbl_new]
+    lua_pushstring(L, "loaded");                                // stack: [tbl_new,"loaded"]
+    lua_newtable(L);                                            // stack: [tbl_new,"loaded",tbl_new2]
+
+    // We push our default Lua libs are loaded packages
+    std::vector<const char*> szDefaultLibs = { "math", "string", "table", "debug", "utf8" };
+    for (auto it : szDefaultLibs)
+    {
+        lua_pushstring(L, it);                                  // stack: [tbl_new,"loaded",tbl_new2,"math"]
+        lua_getglobal(L, it);                                   // stack: [tbl_new,"loaded",tbl_new2,"math",_G.math]
+        lua_settable(L, -3);                                    // stack: [tbl_new,"loaded",tbl_new2]
+    }
+
+    // Finally, store our original table as package.loaded
+    lua_settable(L, -3);                                        // stack: [tbl_new]
+    lua_setglobal(L, "package");                                // stack: []
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::SetPackage
+//
+// Pop the top most value as a package
+//
+///////////////////////////////////////////////////////////////
+void CLuaMain::SetPackage(lua_State* L, SString &strName )
+{
+    // We set varPkg, which is already on the stack, into package.loaded.moduleName = varPkg.
+                                                    // stack: [varPkg]
+    int iPkg = luaL_ref(L, LUA_REGISTRYINDEX);      // stack: []
+    lua_getglobal(L, "package");                    // stack: [tbl_package]
+    if (lua_type(L, -1) == LUA_TNIL )
+        InitPackageStorage(L);
+
+    lua_pushstring(L, "loaded");                    // stack: [tbl_package,"loaded"]
+    lua_rawget(L, -2);                              // stack: [tbl_package,tbl_loaded]
+    if (lua_type(L, -1) == LUA_TNIL)
+        InitPackageStorage(L);
+
+
+    lua_pushstring(L, strName.c_str());             // stack: [tbl_package,tbl_loaded,"moduleName"]
+    lua_rawgeti(L, LUA_REGISTRYINDEX, iPkg);        // stack: [tbl_package,tbl_loaded,"moduleName",varPkg]
+    lua_rawset(L, -3);                              // stack: [tbl_package,tbl_loaded]
+    lua_pop(L, 2);                                  // stack: []
+    lua_rawgeti(L, LUA_REGISTRYINDEX, iPkg);        // stack: [varPkg]
+
+    // Cleanup our used registry entry, REGISTRY[i] = nil.
+    lua_pushnil(L);                                 // stack: [varPkg,nil]
+    lua_rawseti(L, LUA_REGISTRYINDEX, iPkg);        // stack: [varPkg]
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::GetPackage
+//
+// Push the value of a package of name to the stack
+//
+///////////////////////////////////////////////////////////////
+void CLuaMain::GetPackage(lua_State* L, SString &strName)
+{
+    lua_getglobal(L, "package");                    // stack: [tbl_package]
+    if (lua_type(L, -1) == LUA_TNIL )
+        InitPackageStorage(m_luaVM);
+
+    lua_pushstring(L, "loaded");                    // stack: [tbl_package,"loaded"]
+    if (lua_type(L, -1) == LUA_TNIL)
+        InitPackageStorage(m_luaVM);
+
+    lua_rawget(L, -2);                              // stack: [tbl_package,tbl_loaded]
+    lua_pushstring(L, strName.c_str());             // stack: [tbl_package,tbl_loaded,"moduleName"]
+    lua_rawget(L, -2);                              // stack: [tbl_package,varPkg]
+    lua_remove(L, -2);                              // stack: [varPkg]
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::LoadLuaLib
+//
+// Load a Lua lib of a given name
+//
+///////////////////////////////////////////////////////////////
+bool CLuaMain::LoadLuaLib(lua_State *L, SString strName)
+{
+    SString strPath = strName;
+    // Name format shouldn't include slashes.  Subdirs are dots.
+    ReplaceOccurrencesInString(strPath, "\\", "");
+    ReplaceOccurrencesInString(strPath, "/", "");
+    ReplaceOccurrencesInString(strPath, ".", "/");
+
+    SString strResPath = m_pResource->IsResourceZip() ? m_pResource->GetResourceCacheDirectoryPath() : m_pResource->GetResourceDirectoryPath();
+
+    std::vector < char > buffer;
+    // Try <resource>/?.lua
+    SString strFilePath = PathJoin(strResPath, strPath + ".lua");
+    if (FileExists(strFilePath))
+        FileLoad(strFilePath, buffer);
+    else
+    {
+        // Try <resource>/?/init.lua
+        strFilePath = PathJoin(strResPath, strPath, "init.lua");
+        if (FileExists(strFilePath))
+            FileLoad(strFilePath, buffer);
+    }
+
+    if (buffer.size() > 0)
+    {
+        int luaSavedTop = lua_gettop(L);
+        LoadScriptFromBuffer(&buffer.at(0), buffer.size(), strFilePath.c_str(), false);
+        // Only keep the first return value
+        if (lua_gettop(L) > luaSavedTop)
+            lua_settop(L, luaSavedTop+1);
+
+        SetPackage(L, strName);  // Store our package into package.loaded
+        GetPackage(L, strName);  // Grab it back as a return value.
+        return true;
+    }
+
+    return false;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::LoadClib
+//
+// Load a C lib of a given name
+//
+///////////////////////////////////////////////////////////////
+bool CLuaMain::LoadClib(lua_State* L, SString strName)
+{
+    SString strPath = strName;
+    // Name format shouldn't include slashes.  Subdirs are dots.
+    ReplaceOccurrencesInString(strPath, "\\", "");
+    ReplaceOccurrencesInString(strPath, "/", "");
+    ReplaceOccurrencesInString(strPath, ".", "/");
+
+    strPath = PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", strPath);
+
+#ifdef WIN32
+    strPath += ".dll";
+#else
+    strPath += ".so";
+#endif
+
+    luaL_loader_C(L, strName.c_str(), strPath.c_str());
+    if (lua_type(L, -1) == LUA_TNIL)
+        return false;
+
+    SetPackage(L, strName);
+    return true;
 }
