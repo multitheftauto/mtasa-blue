@@ -126,7 +126,7 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
                 }
 #ifndef MTA_CLIENT
                 else
-                    argStream.SetCustomError ( SString ( "ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName (), pOtherResource->GetName ()), "Access denied" );
+                    argStream.SetCustomError ( SString ( "ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName ().c_str (), pOtherResource->GetName ().c_str () ), "Access denied" );
 #endif // !MTA_CLIENT
             }
         }
@@ -297,7 +297,7 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
                         }
                     }
                     else
-                        argStream.SetCustomError ( SString ( "Unable to copy XML file %s", strFile ), "Bad filepath" );
+                        argStream.SetCustomError ( SString ( "Unable to copy XML file %s", strFile.c_str () ), "Bad filepath" );
                 }
 #ifndef MTA_CLIENT
                 else
