@@ -141,6 +141,7 @@ private:
 
     lua_State*                      m_luaVM;
     CLuaTimerManager*               m_pLuaTimerManager;
+    int                             m_iPackageLoadedRef;
 
     class CResource*                m_pResource;
     class CResourceFile*            m_pResourceFile;

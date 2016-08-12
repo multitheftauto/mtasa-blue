@@ -63,6 +63,7 @@ CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
 
     m_bEnableOOP = bEnableOOP;
 
+    m_iPackageLoadedRef = -1;
 
     CPerfStatLuaMemory::GetSingleton ()->OnLuaMainCreate ( this );
     CPerfStatLuaTiming::GetSingleton ()->OnLuaMainCreate ( this );
@@ -712,7 +713,11 @@ void CLuaMain::InitPackageStorage(lua_State* L)
         lua_settable(L, -3);                                    // stack: [tbl_new,"loaded",tbl_new2]
     }
 
-    // Finally, store our original table as package.loaded
+    // Keep our package.loaded table safely in registry
+    m_iPackageLoadedRef = luaL_ref(L, LUA_REGISTRYINDEX);       // stack: [tbl_new,"loaded"]
+    lua_rawgeti(L, LUA_REGISTRYINDEX, m_iPackageLoadedRef);     // stack: [tbl_new,"loaded",tbl_new2]
+
+    // Finally, store our original table as global package.loaded
     lua_settable(L, -3);                                        // stack: [tbl_new]
     lua_setglobal(L, "package");                                // stack: []
 }
@@ -721,33 +726,28 @@ void CLuaMain::InitPackageStorage(lua_State* L)
 //
 // CLuaMain::SetPackage
 //
-// Pop the top most value as a package
+// Set the top most value as a package (No pop)
 //
 ///////////////////////////////////////////////////////////////
 void CLuaMain::SetPackage(lua_State* L, SString &strName )
 {
+    if (m_iPackageLoadedRef < 0)
+        return;
     // We set varPkg, which is already on the stack, into package.loaded.moduleName = varPkg.
-                                                    // stack: [varPkg]
-    int iPkg = luaL_ref(L, LUA_REGISTRYINDEX);      // stack: []
-    lua_getglobal(L, "package");                    // stack: [tbl_package]
-    if (lua_type(L, -1) == LUA_TNIL )
-        InitPackageStorage(L);
-
-    lua_pushstring(L, "loaded");                    // stack: [tbl_package,"loaded"]
-    lua_rawget(L, -2);                              // stack: [tbl_package,tbl_loaded]
-    if (lua_type(L, -1) == LUA_TNIL)
-        InitPackageStorage(L);
+                                                            // stack: [varPkg]
+    int iPkg = luaL_ref(L, LUA_REGISTRYINDEX);              // stack: []
+    lua_rawgeti(L, LUA_REGISTRYINDEX, m_iPackageLoadedRef); // [tbl_loaded]
 
 
-    lua_pushstring(L, strName.c_str());             // stack: [tbl_package,tbl_loaded,"moduleName"]
-    lua_rawgeti(L, LUA_REGISTRYINDEX, iPkg);        // stack: [tbl_package,tbl_loaded,"moduleName",varPkg]
-    lua_rawset(L, -3);                              // stack: [tbl_package,tbl_loaded]
-    lua_pop(L, 2);                                  // stack: []
-    lua_rawgeti(L, LUA_REGISTRYINDEX, iPkg);        // stack: [varPkg]
+    lua_pushstring(L, strName.c_str());                     // stack: [tbl_loaded,"moduleName"]
+    lua_rawgeti(L, LUA_REGISTRYINDEX, iPkg);                // stack: [tbl_loaded,"moduleName",varPkg]
+    lua_rawset(L, -3);                                      // stack: [tbl_loaded]
+    lua_pop(L, 2);                                          // stack: []
+    lua_rawgeti(L, LUA_REGISTRYINDEX, iPkg);                // stack: [varPkg]
 
-    // Cleanup our used registry entry, REGISTRY[i] = nil.
-    lua_pushnil(L);                                 // stack: [varPkg,nil]
-    lua_rawseti(L, LUA_REGISTRYINDEX, iPkg);        // stack: [varPkg]
+    // Cleanup our used registry entry, i.e. REGISTRY[i] = nil.
+    lua_pushnil(L);                                         // stack: [varPkg,nil]
+    lua_rawseti(L, LUA_REGISTRYINDEX, iPkg);                // stack: [varPkg]
 }
 
 ///////////////////////////////////////////////////////////////
@@ -759,18 +759,13 @@ void CLuaMain::SetPackage(lua_State* L, SString &strName )
 ///////////////////////////////////////////////////////////////
 void CLuaMain::GetPackage(lua_State* L, SString &strName)
 {
-    lua_getglobal(L, "package");                    // stack: [tbl_package]
-    if (lua_type(L, -1) == LUA_TNIL )
-        InitPackageStorage(m_luaVM);
+    if (m_iPackageLoadedRef < 0)
+        return;
 
-    lua_pushstring(L, "loaded");                    // stack: [tbl_package,"loaded"]
-    if (lua_type(L, -1) == LUA_TNIL)
-        InitPackageStorage(m_luaVM);
-
-    lua_rawget(L, -2);                              // stack: [tbl_package,tbl_loaded]
-    lua_pushstring(L, strName.c_str());             // stack: [tbl_package,tbl_loaded,"moduleName"]
-    lua_rawget(L, -2);                              // stack: [tbl_package,varPkg]
-    lua_remove(L, -2);                              // stack: [varPkg]
+    lua_rawgeti(L, LUA_REGISTRYINDEX, m_iPackageLoadedRef); // stack: [tbl_loaded]
+    lua_pushstring(L, strName.c_str());                     // stack: [tbl_loaded,"moduleName"]
+    lua_rawget(L, -2);                                      // stack: [tbl_loaded,varPkg]
+    lua_remove(L, -2);                                      // stack: [varPkg]
 }
 
 ///////////////////////////////////////////////////////////////
@@ -812,7 +807,6 @@ bool CLuaMain::LoadLuaLib(lua_State *L, SString strName)
             lua_settop(L, luaSavedTop+1);
 
         SetPackage(L, strName);  // Store our package into package.loaded
-        GetPackage(L, strName);  // Grab it back as a return value.
         return true;
     }
 
