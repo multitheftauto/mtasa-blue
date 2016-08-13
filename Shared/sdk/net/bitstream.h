@@ -240,7 +240,7 @@ public:
     void WriteString ( const std::string& value )
     {
         // Write the length
-        unsigned short usLength = value.length ();
+        auto usLength = static_cast<unsigned short>(value.length ());
         Write ( usLength );
 
         // Write the characters

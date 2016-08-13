@@ -249,9 +249,9 @@ CServerBrowser::CServerBrowser ( void )
                              {  25, iBase + iGap * 1 + 5,  16, 16, "cgui\\images\\serverbrowser\\favorite.png", },
                              {  20, iBase + iGap * 2,      26, 26, "cgui\\images\\serverbrowser\\connect.png", },
                              {  20, iBase + iGap * 3,      26, 26, "cgui\\images\\serverbrowser\\info.png", },
-                             {  80 + fMaxLeft, iBase + iGap * 0 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-servers.png", },
-                             {  80 + fMaxLeft, iBase + iGap * 1 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-players.png", },
-                             {  80 + fMaxLeft, iBase + iGap * 2 + 5,  16, 16, "cgui\\images\\serverbrowser\\search.png", },
+                             {  80 + static_cast<int>(fMaxLeft), iBase + iGap * 0 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-servers.png", },
+                             {  80 + static_cast<int>(fMaxLeft), iBase + iGap * 1 + 5,  29, 16, "cgui\\images\\serverbrowser\\search-players.png", },
+                             {  80 + static_cast<int>(fMaxLeft), iBase + iGap * 2 + 5,  16, 16, "cgui\\images\\serverbrowser\\search.png", },
                         };
 
         for ( uint i = 0 ; i < NUMELMS( iconInfoList ) ; i++ )
@@ -271,9 +271,9 @@ CServerBrowser::CServerBrowser ( void )
              {  20, iBase + iGap * 1,       _("Add Favorite") },
              {  20, iBase + iGap * 2,       _("Connect") },
              {  20, iBase + iGap * 3,       _("Server information") },
-             {  80 + fMaxLeft, iBase + iGap * 0,  _("Search servers") },
-             {  80 + fMaxLeft, iBase + iGap * 1,  _("Search players") },
-             {  80 + fMaxLeft, iBase + iGap * 2,  _("Start search") },
+             {  80 + static_cast<int>(fMaxLeft), iBase + iGap * 0,  _("Search servers") },
+             {  80 + static_cast<int>(fMaxLeft), iBase + iGap * 1,  _("Search players") },
+             {  80 + static_cast<int>(fMaxLeft), iBase + iGap * 2,  _("Start search") },
         };
 
         for ( uint i = 0 ; i < NUMELMS( helpInfoList ) ; i++ )

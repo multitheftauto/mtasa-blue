@@ -363,7 +363,7 @@ public:
 
     inline list < CResourceFile* >::iterator    IterBegin   ( void )        { return m_resourceFiles.begin(); }
     inline list < CResourceFile* >::iterator    IterEnd     ( void )        { return m_resourceFiles.end(); }
-    inline unsigned short                       IterCount   ( void )        { return m_resourceFiles.size(); }
+    inline size_t                               IterCount   ( void )        { return m_resourceFiles.size(); }
 
     inline list < CExportedFunction >::iterator    IterBeginExportedFunctions   ( void )        { return m_exportedFunctions.begin(); }
     inline list < CExportedFunction >::iterator    IterEndExportedFunctions     ( void )        { return m_exportedFunctions.end(); }

@@ -241,7 +241,7 @@ void CVideoModeManager::PostReset ( D3DPRESENT_PARAMETERS* pp )
         SetWindowLong ( m_hDeviceWindow, GWL_EXSTYLE, ExStyle );
 
         // Ensure client area of window is correct size
-        RECT ClientRect = { 0, 0, pp->BackBufferWidth, pp->BackBufferHeight };
+        RECT ClientRect = { 0, 0, static_cast<LONG>(pp->BackBufferWidth), static_cast<LONG>(pp->BackBufferHeight) };
         AdjustWindowRect( &ClientRect, GetWindowLong(m_hDeviceWindow,GWL_STYLE), FALSE );
 
         int SizeX = ClientRect.right - ClientRect.left;
