@@ -2,6 +2,10 @@ project "cryptopp"
 	language "C++"
 	kind "StaticLib"
 	targetname "cryptopp"
+
+	disablewarnings { "4005" }
+	filter {"system:windows"}
+		linkoptions { "/ignore:4221" }
 	
 	vpaths { 
 		["Headers/*"] = "**.h",

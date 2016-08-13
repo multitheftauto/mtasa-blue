@@ -14,6 +14,10 @@ project "CEGUI"
 	defines {
 		"CEGUIBASE_EXPORTS"
 	}
+
+	disablewarnings { "4221" }
+	filter {"system:windows"}
+		linkoptions { "/ignore:4221" }
 	
 	vpaths { 
 		["Headers/*"] = "include/**.h",

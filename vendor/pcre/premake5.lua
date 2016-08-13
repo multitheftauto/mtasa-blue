@@ -4,6 +4,10 @@ project "pcre"
 	
 	defines { "HAVE_CONFIG_H" }
 	includedirs { ".", "shipped_for_mta_win32" }
+	disablewarnings { "4251" }
+
+	filter {"system:windows"}
+		linkoptions { "/ignore:4217", "/ignore:4049" }
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
