@@ -565,7 +565,6 @@ int CLuaUtilDefs::PregMatch ( lua_State* luaVM )
 
 int CLuaUtilDefs::Require(lua_State* luaVM)
 {
-#ifndef MTA_CLIENT
     //  table require ( string name )
     SString strMod;
 
@@ -587,17 +586,16 @@ int CLuaUtilDefs::Require(lua_State* luaVM)
         if (pLuaMain->LoadLuaLib(luaVM, strMod,strError))        // stack: ["moduleName",pkgLuaMod/nil]
             return 1;
         strError += "\n";
-
+#ifndef MTA_CLIENT
         // Check if a C library exists
         if (pLuaMain->LoadClib(luaVM, strMod,strError))          // stack: ["moduleName",fncModule/nil]
             return 1;
+#endif
         m_pScriptDebugging->LogCustom(luaVM, strError);
-
-        lua_pop(luaVM,2);                               // stack: []
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-#endif
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

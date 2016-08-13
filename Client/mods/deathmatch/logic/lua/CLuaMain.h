@@ -44,7 +44,7 @@ public:
                                     CLuaMain                ( class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP );
                                     ~CLuaMain               ( void );
 
-    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName );
+    bool                            LoadScriptFromBuffer    ( const char* cpBuffer, unsigned int uiSize, const char* szFileName, bool bClearReturnValues = true );
     bool                            LoadScript              ( const char* szLUAScript );
     void                            UnloadScript            ( void );
 
@@ -80,6 +80,11 @@ public:
     static int                      LuaLoadBuffer           ( lua_State *L, const char *buff, size_t sz, const char *name );
     static int                      OnUndump                ( const char* p, size_t n );
 
+    void                            InitPackageStorage(lua_State* L);  // Create a psuedo package.loaded table
+    void                            GetPackage(lua_State *L, SString &strName); // Push the package value to the top of the stack
+    void                            SetPackage(lua_State *L, SString &strName); // Set the package to the value at the top of the stack
+    bool                            LoadLuaLib(lua_State *L, SString strName, SString &strError); // Load a lua library of a given name
+
     bool                            IsOOPEnabled            ( void )                        { return m_bEnableOOP; }
 private:
     void                            InitSecurity            ( void );
@@ -90,6 +95,7 @@ private:
 
     lua_State*                      m_luaVM;
     CLuaTimerManager*               m_pLuaTimerManager;
+    int                             m_iPackageLoadedRef;
 
     bool                            m_bBeingDeleted; // prevent it being deleted twice
 
