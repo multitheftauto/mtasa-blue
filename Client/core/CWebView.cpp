@@ -613,7 +613,7 @@ void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle c
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadStart(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame )
+void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transitionType )
 {
     SString strURL = UTF16ToMbUTF8 ( frame->GetURL () );
     if ( strURL == "blank" )
