@@ -106,6 +106,7 @@ public:
     LUA_DECLARE ( AddCommandHandler );
     LUA_DECLARE ( RemoveCommandHandler );
     LUA_DECLARE ( ExecuteCommandHandler );
+    LUA_DECLARE ( GetCommandHandlers );
 
     // Standard server functions
     LUA_DECLARE ( GetMaxPlayers );

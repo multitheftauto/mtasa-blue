@@ -271,6 +271,60 @@ void CRegisteredCommands::CallCommandHandler ( CLuaMain* pLuaMain, const CLuaFun
 }
 
 
+void CRegisteredCommands::GetCommands ( lua_State* luaVM )
+{
+    unsigned int uiIndex = 0;
+    m_bIteratingList = true;
+    list < SCommand* > ::iterator iter = m_Commands.begin ();
+
+    // Create the main table
+    lua_newtable( luaVM );
+
+    for ( ; iter != m_Commands.end (); iter++ )
+    {
+        // Create a subtable ({'command', resource})
+        lua_pushinteger ( luaVM, ++uiIndex );
+        lua_createtable ( luaVM, 0, 2 );
+        {
+            lua_pushstring ( luaVM, (*iter)->strKey );
+            lua_rawseti ( luaVM, -2, 1 );
+
+            lua_pushresource ( luaVM, (*iter)->pLuaMain->GetResource() );
+            lua_rawseti ( luaVM, -2, 2 );
+        }
+        lua_settable ( luaVM, -3 );
+    }
+
+    m_bIteratingList = false;
+}
+
+
+void CRegisteredCommands::GetCommands ( lua_State* luaVM, CLuaMain* pTargetLuaMain )
+{
+    unsigned int uiIndex = 0;
+    m_bIteratingList = true;
+    list < SCommand* > ::iterator iter = m_Commands.begin ();
+
+    // Create the table
+    lua_newtable( luaVM );
+
+    for ( ; iter != m_Commands.end (); iter++ )
+    {
+        // Matching VMs?
+        if ( (*iter)->pLuaMain == pTargetLuaMain )
+        {
+            lua_pushinteger ( luaVM, ++uiIndex );
+            lua_pushstring ( luaVM, (*iter)->strKey );
+            lua_settable ( luaVM, -3 );
+        }
+    }
+
+    //lua_settable ( luaVM, -3 );
+
+    m_bIteratingList = false;
+}
+
+
 void CRegisteredCommands::TakeOutTheTrash ( void )
 {
     list < SCommand* > ::iterator iter = m_TrashCan.begin ();
