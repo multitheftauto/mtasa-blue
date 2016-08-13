@@ -4,9 +4,8 @@ premake.modules.install_cef = {}
 
 -- Config variables
 local CEF_PATH = "vendor/cef3/"
-local CEF_URL = "http://opensource.spotify.com/cefbuilds/cef_binary_3.2743.1444.g7c94121_windows32_minimal.tar.bz2"
---local CEF_URL = "http://mirror.mtasa.com/cef-latest.tar.bz2" -- TODO
-local CEF_URL_MD5 = "http://do-not.press/cef-latest.tar.bz2.md5" -- "http://mirror.mtasa.com/cef-latest.tar.bz2.md5"
+local CEF_URL = "https://mirror.mtasa.com/bdata/cef-latest.tar.bz2"
+local CEF_URL_MD5 = "https://mirror.mtasa.com/bdata/cef-latest.tar.bz2.md5"
 
 newaction {
 	trigger = "install_cef",
