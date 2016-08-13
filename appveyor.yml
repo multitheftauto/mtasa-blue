@@ -5,6 +5,7 @@ configuration:
   - Release
 
 before_build:
+  - utils\premake5 install_cef
   - utils\premake5 vs2015
   
 clone_depth: 1
