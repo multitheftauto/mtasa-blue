@@ -757,7 +757,7 @@ void CLuaMain::SetPackage(lua_State* L, SString &strName )
 // Push the value of a package of name to the stack
 //
 ///////////////////////////////////////////////////////////////
-void CLuaMain::GetPackage(lua_State* L, SString &strName)
+void CLuaMain::GetPackage(lua_State* L, SString &strName )
 {
     if (m_iPackageLoadedRef < 0)
         return;
@@ -775,7 +775,7 @@ void CLuaMain::GetPackage(lua_State* L, SString &strName)
 // Load a Lua lib of a given name
 //
 ///////////////////////////////////////////////////////////////
-bool CLuaMain::LoadLuaLib(lua_State *L, SString strName)
+bool CLuaMain::LoadLuaLib(lua_State *L, SString strName, SString &strError)
 {
     SString strPath = strName;
     // Name format shouldn't include slashes.  Subdirs are dots.
@@ -792,10 +792,21 @@ bool CLuaMain::LoadLuaLib(lua_State *L, SString strName)
         FileLoad(strFilePath, buffer);
     else
     {
+        // Don't use a format string for safety, so we construct the error by hand
+        strError += "error loading module " + strName + " from file " + strFilePath + 
+            ":\n\t The specified module could not be found";
+
         // Try <resource>/?/init.lua
         strFilePath = PathJoin(strResPath, strPath, "init.lua");
         if (FileExists(strFilePath))
             FileLoad(strFilePath, buffer);
+        else
+        {
+            strError += "\n";
+            strError += "error loading module " + strName + " from file " + strFilePath +
+                ":\n\t The specified module could not be found";
+            return false;
+        }
     }
 
     if (buffer.size() > 0)
@@ -806,9 +817,19 @@ bool CLuaMain::LoadLuaLib(lua_State *L, SString strName)
         if (lua_gettop(L) > luaSavedTop)
             lua_settop(L, luaSavedTop+1);
 
+        if (lua_type(L, -1) == LUA_TNIL)
+        {
+            strError += "error loading module " + strName + " from file " + strFilePath +
+                ":\n\t Module didn't return a value";
+            return false;
+        }
+
         SetPackage(L, strName);  // Store our package into package.loaded
         return true;
     }
+    else
+        strError += "error loading module " + strName + " from file " + strFilePath +
+            ":\n\t Error loading script file";
 
     return false;
 }
@@ -820,7 +841,7 @@ bool CLuaMain::LoadLuaLib(lua_State *L, SString strName)
 // Load a C lib of a given name
 //
 ///////////////////////////////////////////////////////////////
-bool CLuaMain::LoadClib(lua_State* L, SString strName)
+bool CLuaMain::LoadClib(lua_State* L, SString strName, SString &strError )
 {
     SString strPath = strName;
     // Name format shouldn't include slashes.  Subdirs are dots.
@@ -836,9 +857,19 @@ bool CLuaMain::LoadClib(lua_State* L, SString strName)
     strPath += ".so";
 #endif
 
-    luaL_loader_C(L, strName.c_str(), strPath.c_str());
-    if (lua_type(L, -1) == LUA_TNIL)
+    if (!FileExists(strPath))
+    {
+        strError += "error loading module " + strName + " from file " + strPath +
+            ":\n\t The specified module could not be found";
         return false;
+    }
+
+    if (!luaL_loader_C(L, strName.c_str(), strPath.c_str()) || lua_type(L, -1) == LUA_TNIL)
+    {
+        strError += "error loading module " + strName + " from file " + strPath +
+            ":\n\t Failed to load module";
+        return false;
+    }
 
     SetPackage(L, strName);
     return true;

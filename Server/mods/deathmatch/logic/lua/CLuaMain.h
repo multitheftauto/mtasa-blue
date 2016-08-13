@@ -123,8 +123,8 @@ public:
     void                            InitPackageStorage      ( lua_State* L );  // Create a psuedo package.loaded table
     void                            GetPackage              ( lua_State *L, SString &strName ); // Push the package value to the top of the stack
     void                            SetPackage              ( lua_State *L, SString &strName ); // Set the package to the value at the top of the stack
-    bool                            LoadLuaLib              ( lua_State *L, SString strName ); // Load a lua library of a given name
-    bool                            LoadClib                ( lua_State *L, SString strName ); // Load a C Lib of a given name
+    bool                            LoadLuaLib              ( lua_State *L, SString strName, SString &strError ); // Load a lua library of a given name
+    bool                            LoadClib                ( lua_State *L, SString strName, SString &strError ); // Load a C Lib of a given name
 
 private:
     void                            InitSecurity            ( void );

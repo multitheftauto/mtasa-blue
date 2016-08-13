@@ -575,6 +575,7 @@ int CLuaUtilDefs::Require(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        SString strError = "";
         // Check if package exists already, if so load it
                                                         // stack: ["moduleName"]
         pLuaMain->GetPackage(luaVM, strMod);            // stack: ["moduleName",pkgModule/nil]
@@ -583,12 +584,15 @@ int CLuaUtilDefs::Require(lua_State* luaVM)
         lua_pop(luaVM,1);                               // stack: ["moduleName"]
 
         // Check whether the appropriate pure lua module exists
-        if (pLuaMain->LoadLuaLib(luaVM, strMod))        // stack: ["moduleName",pkgLuaMod/nil]
+        if (pLuaMain->LoadLuaLib(luaVM, strMod,strError))        // stack: ["moduleName",pkgLuaMod/nil]
             return 1;
+        strError += "\n";
 
         // Check if a C library exists
-        if (pLuaMain->LoadClib(luaVM, strMod))          // stack: ["moduleName",fncModule/nil]
+        if (pLuaMain->LoadClib(luaVM, strMod,strError))          // stack: ["moduleName",fncModule/nil]
             return 1;
+        m_pScriptDebugging->LogCustom(luaVM, strError);
+
         lua_pop(luaVM,2);                               // stack: []
     }
     else

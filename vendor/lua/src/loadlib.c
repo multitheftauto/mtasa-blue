@@ -673,6 +673,6 @@ LUALIB_API int luaopen_package (lua_State *L) {
 LUA_API int luaL_loader_C(lua_State *L, const char* name, const char* filename) {
     const char* funcname = mkfuncname(L, name);
     if (ll_loadfunc(L, filename, funcname) != 0)
-        loaderror(L, filename);
+        return 0;
     return 1;  /* library loaded successfully */
 }
