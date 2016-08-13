@@ -864,6 +864,24 @@ bool CLuaMain::LoadClib(lua_State* L, SString strName, SString &strError )
         return false;
     }
 
+    // Check ACL permissions
+    if ( !g_pGame->GetACLManager()->CanObjectUseRight(m_pResource->GetName().c_str(),
+            CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+            "*",
+            CAccessControlListRight::RIGHT_TYPE_MODULE,
+            false) &&
+         !g_pGame->GetACLManager()->CanObjectUseRight(m_pResource->GetName().c_str(),
+            CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+            strName.c_str(),
+            CAccessControlListRight::RIGHT_TYPE_MODULE,
+            false)
+        )
+    {
+        strError += "error loading module " + strName + " from file " + strPath +
+            ":\n\t ACL access denied.  Grant \"module." + strName + "\" right to resource " + m_pResource->GetName();
+        return false;
+    }
+
     if (!luaL_loader_C(L, strName.c_str(), strPath.c_str()) || lua_type(L, -1) == LUA_TNIL)
     {
         strError += "error loading module " + strName + " from file " + strPath +

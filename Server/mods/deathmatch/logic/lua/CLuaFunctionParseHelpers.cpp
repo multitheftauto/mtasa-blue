@@ -240,6 +240,7 @@ IMPLEMENT_ENUM_BEGIN( CAccessControlListRight::ERightType )
     ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_FUNCTION,     "function" )
     ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_RESOURCE,     "resource" )
     ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_GENERAL,      "general" )
+    ADD_ENUM ( CAccessControlListRight::RIGHT_TYPE_MODULE,       "module" )
 IMPLEMENT_ENUM_END( "right-type" )
 
 IMPLEMENT_ENUM_BEGIN( CElement::EElementType )

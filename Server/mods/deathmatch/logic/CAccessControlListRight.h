@@ -25,7 +25,8 @@ public:
         RIGHT_TYPE_COMMAND,
         RIGHT_TYPE_FUNCTION,
         RIGHT_TYPE_RESOURCE,
-        RIGHT_TYPE_GENERAL
+        RIGHT_TYPE_GENERAL,
+        RIGHT_TYPE_MODULE
     };
 
 public:

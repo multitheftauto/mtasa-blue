@@ -144,6 +144,10 @@ bool CAccessControlListManager::Load ( void )
                             {
                                 pRight = pACL->AddRight ( &szRightName[8], CAccessControlListRight::RIGHT_TYPE_GENERAL, bAccess );
                             }
+                            else if ( StringBeginsWith ( szRightName, "module." ) )
+                            {
+                                pRight = pACL->AddRight ( &szRightName[7], CAccessControlListRight::RIGHT_TYPE_MODULE, bAccess );
+                            }
                             else continue;
 
                             // Set all the extra attributes
@@ -551,6 +555,11 @@ const char* CAccessControlListManager::ExtractRightName ( const char* szRightNam
     {
         eType = CAccessControlListRight::RIGHT_TYPE_GENERAL;
         return szRightName + 8;
+    }
+    else if ( StringBeginsWith( szRightName, "module." ) )
+    {
+        eType = CAccessControlListRight::RIGHT_TYPE_MODULE;
+        return szRightName + 7;
     }
 
     // Failed
