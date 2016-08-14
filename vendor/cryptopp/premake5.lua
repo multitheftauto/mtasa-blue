@@ -2,10 +2,6 @@ project "cryptopp"
 	language "C++"
 	kind "StaticLib"
 	targetname "cryptopp"
-
-	disablewarnings { "4005" }
-	filter {"system:windows"}
-		linkoptions { "/ignore:4221" }
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
@@ -155,4 +151,7 @@ project "cryptopp"
 	-- See https://github.com/weidai11/cryptopp/issues/206
 	filter "system:not windows"
 		removeflags { "C++14" }
-
+	
+	disablewarnings { "4005" }
+	filter {"system:windows"}
+		linkoptions { "/ignore:4221" }
