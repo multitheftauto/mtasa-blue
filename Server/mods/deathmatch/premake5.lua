@@ -52,7 +52,6 @@ project "Deathmatch"
 		"../../sdk/MTAPlatform.h",
 		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bob_withers/base64.cpp",
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",
 	}
 	

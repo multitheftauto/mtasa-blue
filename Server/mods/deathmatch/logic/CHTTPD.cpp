@@ -11,10 +11,10 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #include "StdInc.h"
 #include <cryptopp/rsa.h>
 #include <cryptopp/osrng.h>
+#include <SharedUtil.Crypto.h>
 
 extern CGame * g_pGame;
 
@@ -133,8 +133,7 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
         {
             // Load public RSA key from disk
             RSA::PublicKey publicKey;
-            std::string base64Data;
-            Base64::decode ( encodedPublicKey, base64Data );
+            std::string base64Data = SharedUtil::Base64decode(encodedPublicKey);
             StringSource stringSource ( base64Data, true );
             publicKey.Load ( stringSource );
 
@@ -197,8 +196,7 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
         if ( authorization.substr(0,6) == "Basic " )
         {
             // Basic auth
-            std::string strAuthDecoded;
-            Base64::decode ( authorization.substr(6), strAuthDecoded );
+            std::string strAuthDecoded = SharedUtil::Base64decode(authorization.substr(6));
 
             string authName;
             string authPassword;

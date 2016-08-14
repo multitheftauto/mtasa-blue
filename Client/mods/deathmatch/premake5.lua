@@ -8,7 +8,7 @@ project "Client Deathmatch"
 	pchsource "StdInc.cpp"
 	
 	links {
-		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", 
+		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp",
 		"../../../vendor/libspeex/libspeexd2013", -- todo: use debug variant
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
@@ -54,7 +54,6 @@ project "Client Deathmatch"
 		"../../../Shared/animation/CEasingCurve.cpp", 
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bob_withers/base64.cpp",
 		"../../../vendor/bochs/bochs_internal/crc32.cpp"
 	}
 	

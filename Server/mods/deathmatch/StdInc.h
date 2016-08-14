@@ -300,7 +300,6 @@ struct SAclRequest;
 
 // Utility includes
 #include "utils/CZipMaker.h"
-#include <base64.h>
 
 // Module includes
 #include "CServer.h"

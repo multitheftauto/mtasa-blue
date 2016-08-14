@@ -22,7 +22,6 @@
 #include <cstdio>
 #include <cstring>
 
-#include <base64.h>
 #include <zlib.h>
 
 // SDK includes
