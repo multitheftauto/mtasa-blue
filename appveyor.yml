@@ -13,3 +13,8 @@ clone_depth: 1
 build:
   parallel: true
   project: Build/MTASA.sln
+  
+notifications:
+  - provider: Slack
+    incoming_webhook:
+      secure: GMy2h7KrBeqM46INusj3AEZvef5jyFQRUeKqcJjfttHc/Iujje6YN398t7mo5UeMZjkDN2azgcb/R79wU/BvJot8iiu/4AtEBGwLffzrpCw=
