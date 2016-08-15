@@ -283,7 +283,7 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
             if ( weaponType == WEAPONTYPE_SHOTGUN || weaponType == WEAPONTYPE_SAWNOFF_SHOTGUN || weaponType == WEAPONTYPE_SPAS12_SHOTGUN )
             {
                 if ( g_pClientGame->GetMiscGameSettings().bAllowShotgunDamageFix )
-                    g_iDamageEventLimit = 2;
+                    g_iDamageEventLimit = 7;
             }
 
             // Fire
