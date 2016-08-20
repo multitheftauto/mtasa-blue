@@ -28,9 +28,9 @@ class CCore;
 #include "CSingleton.h"
 #include "CGUI.h"
 #include "CConnectManager.h"
-#include "CDirect3DHookManager.h"
-#include "CDirectInputHookManager.h"
-#include "CGraphics.h"
+#include <DXHook/CDirect3DHookManager.h>
+#include <DXHook/CDirectInputHookManager.h>
+#include <Graphics/CGraphics.h>
 #include "CSetCursorPosHook.h"
 #include "CMessageLoopHook.h"
 #include "CConsoleLogger.h"
@@ -38,7 +38,7 @@ class CCore;
 #include <core/CClientBase.h>
 #include <core/CClientEntityBase.h>
 #include <core/CCoreInterface.h>
-#include "CDirect3DData.h"
+#include <DXHook/CDirect3DData.h>
 #include "CClientVariables.h"
 #include "CKeyBinds.h"
 #include "CMouseControl.h"
@@ -46,7 +46,7 @@ class CCore;
 #include "CCommunity.h"
 #include <xml/CXML.h>
 #include <ijsify.h>
-#include "CWebCore.h"
+#include <Webbrowser/CWebCore.h>
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>

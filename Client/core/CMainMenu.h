@@ -19,11 +19,11 @@ class CMainMenu;
 #include "CCore.h"
 #include "CQuickConnect.h"
 #include "CQuestionBox.h"
-#include "CServerBrowser.h"
-#include "CServerInfo.h"
+#include <Serverbrowser/CServerBrowser.h>
+#include <Serverbrowser/CServerInfo.h>
 #include "CSettings.h"
 #include "CCredits.h"
-#include "CGraphics.h"
+#include <Graphics/CGraphics.h>
 #include "CMainMenuScene.h"
 class CNewsBrowser;
 

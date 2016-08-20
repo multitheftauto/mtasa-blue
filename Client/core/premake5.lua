@@ -10,6 +10,7 @@ project "Client Core"
 	
 	filter {}
 		includedirs { 
+			".",
 			"../sdk",
 			"../../vendor/cef3",
 			"../../vendor/tinygettext",
@@ -36,8 +37,8 @@ project "Client Core"
 	
 	files {
 		"premake5.lua",
-		"*.h",
-		"*.cpp"
+		"**.h",
+		"**.cpp"
 	}
 
 	links {

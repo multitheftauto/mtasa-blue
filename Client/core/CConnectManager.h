@@ -16,7 +16,7 @@
 
 #include <ctime>
 #include <gui/CGUI.h>
-#include "CServerInfo.h"
+#include <Serverbrowser/CServerInfo.h>
 
 class CConnectManager
 {
