@@ -34,7 +34,6 @@ class CServerBrowser;
 #include "CMainMenu.h"
 #include "CServerList.h"
 #include "CSingleton.h"
-#include "CFavouritesAddByIP.h"
 #include "CCommunityLogin.h"
 #include "CServerInfo.h"
 #include <ctime>

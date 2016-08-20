@@ -24,7 +24,6 @@ class CMainMenu;
 #include "CSettings.h"
 #include "CCredits.h"
 #include <Graphics/CGraphics.h>
-#include "CMainMenuScene.h"
 class CNewsBrowser;
 
 #define CORE_MTA_NEWS_ITEMS         3
