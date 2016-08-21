@@ -673,6 +673,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
         File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
         #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
+        
+        SetOutPath "$INSTDIR\MTA\CEF\locales"
         File "${FILES_ROOT}\mta\CEF\locales\en-US.pak"
 
 
