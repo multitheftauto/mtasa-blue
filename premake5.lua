@@ -20,7 +20,7 @@ workspace "MTASA"
 	
 	location "Build"
 	
-	flags { "C++14", "Symbols" }
+	flags { "C++11", "Symbols" }
 	characterset "MBCS"
 	pic "On"
 	

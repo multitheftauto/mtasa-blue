@@ -3,6 +3,8 @@ project "breakpad"
 	kind "StaticLib"
 	targetname "breakpad"
 	
+	removeflags { "C++11" }
+
 	includedirs { "src", "src/third_party/glog/src" }
 	vpaths { 
 		["Headers/*"] = "src/**.h",

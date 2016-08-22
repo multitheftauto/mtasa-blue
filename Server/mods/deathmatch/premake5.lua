@@ -31,7 +31,7 @@ project "Deathmatch"
 		}
 	
 	links {
-		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"
+		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib"
 	}
 	
 	vpaths {
@@ -62,6 +62,7 @@ project "Deathmatch"
 		
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
+		links { "rt" }
 	
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
