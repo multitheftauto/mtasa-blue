@@ -208,7 +208,6 @@ void CClientManager::DoPulse ( bool bDoStandardPulses, bool bDoVehicleManagerPul
             m_pPathManager->DoPulse ();
             m_pRadarMarkerManager->DoPulse ();
             m_pPedManager->DoPulse ( true );
-            m_pObjectManager->DoPulse ();
             m_pProjectileManager->DoPulse ();
             m_pSoundManager->DoPulse ();
             m_pPlayerManager->DoPulse ();

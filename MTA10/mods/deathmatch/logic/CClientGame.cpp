@@ -3904,6 +3904,7 @@ void CClientGame::PostWorldProcessHandler ( void )
 {
     m_pManager->GetMarkerManager ()->DoPulse ();
     m_pManager->GetPointLightsManager ()->DoPulse ();
+    m_pManager->GetObjectManager()->DoPulse ();
 
     // Update frame time slice
     uint uiCurrentTick = GetTickCount32 ();
