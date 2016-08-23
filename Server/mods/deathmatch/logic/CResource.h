@@ -84,7 +84,7 @@ public:
 class CIncludedResources 
 {
 private:
-    std::string             m_strResourceName;
+    SString                 m_strResourceName;
     unsigned int            m_uiMinimumVersion;
     unsigned int            m_uiMaximumVersion;
     SVersion                m_MinVersion;
@@ -145,7 +145,7 @@ class CResource : public EHS
 private:
     bool                    m_bHandlingHTTPRequest;
     bool                    m_bResourceIsZip;
-    std::string             m_strResourceName;
+    SString                 m_strResourceName;
     SString                 m_strAbsPath;               // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
     std::string             m_strResourceZip;           // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip
     std::string             m_strResourceDirectoryPath; // Absolute path to resource files (if a dir)   i.e. m_strAbsPath/resource_name
@@ -320,7 +320,7 @@ public:
     inline bool             IsLoaded ( void ) { return m_bLoaded; }
     inline bool             IsStarting ( void ) { return m_bStarting; }
     inline bool             IsStopping ( void ) { return m_bStopping; }
-    inline const std::string&   GetName ( void ) { return m_strResourceName; }
+    inline const SString&   GetName ( void ) { return m_strResourceName; }
     inline CLuaMain *       GetVirtualMachine ( void ) { return m_pVM; }
     void                    AddDependent ( CResource * resource );
     void                    RemoveDependent ( CResource * resource );

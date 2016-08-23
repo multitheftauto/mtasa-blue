@@ -110,7 +110,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaDrawingDefs::AddClass ( luaVM );
     CLuaEngineDefs::AddClass ( luaVM );
     CLuaEffectDefs::AddClass ( luaVM );
-    CLuaFileDefs::AddClass ( luaVM );
     CLuaGUIDefs::AddClass ( luaVM ); CLuaBrowserDefs::AddClass ( luaVM ); // browser must be after drawing/gui, since it extends DxTexture/GUIElement
     CLuaMarkerDefs::AddClass ( luaVM );
     CLuaObjectDefs::AddClass ( luaVM );

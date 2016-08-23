@@ -22,7 +22,6 @@ CScriptFile::CScriptFile( uint uiScriptId, const char* szFilename, unsigned long
     m_ulMaxSize = ulMaxSize;
     m_uiScriptId = uiScriptId;
     m_accessType = accessType;
-
 }
 
 

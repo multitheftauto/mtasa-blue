@@ -70,6 +70,7 @@ void CLuaShared::LoadFunctions ( void )
 {
     CLuaBitDefs::LoadFunctions ();
     CLuaCryptDefs::LoadFunctions ();
+    CLuaFileDefs::LoadFunctions ();
     CLuaXMLDefs::LoadFunctions ();
     CLuaUTFDefs::LoadFunctions ();
     CLuaUtilDefs::LoadFunctions ();
@@ -77,5 +78,6 @@ void CLuaShared::LoadFunctions ( void )
 
 void CLuaShared::AddClasses(lua_State* luaVM)
 {
+    CLuaFileDefs::AddClass ( luaVM );
     CLuaXMLDefs::AddClass ( luaVM );
 }

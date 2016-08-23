@@ -155,7 +155,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaBlipDefs      ::AddClass ( luaVM );
     CLuaColShapeDefs  ::AddClass ( luaVM );
     CLuaDatabaseDefs  ::AddClass ( luaVM );
-    CLuaFileDefs      ::AddClass ( luaVM );
     CLuaMarkerDefs    ::AddClass ( luaVM );
     CLuaObjectDefs    ::AddClass ( luaVM );
     CLuaPedDefs       ::AddClass ( luaVM );

@@ -408,7 +408,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaEffectDefs::LoadFunctions ();
     CLuaElementDefs::LoadFunctions ();
     CLuaEngineDefs::LoadFunctions ();
-    CLuaFileDefs::LoadFunctions ();
     CLuaGUIDefs::LoadFunctions ();
     CLuaMarkerDefs::LoadFunctions ();
     CLuaObjectDefs::LoadFunctions ();
