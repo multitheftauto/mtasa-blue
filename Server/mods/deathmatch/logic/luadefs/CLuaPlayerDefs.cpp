@@ -1878,14 +1878,12 @@ int CLuaPlayerDefs::KickPlayer ( lua_State* luaVM )
 
     if ( argStream.NextIsUserData () )
     {
-        CElement* pResponsible;
+        CPlayer* pResponsible;
         argStream.ReadUserData ( pResponsible );
-        if ( CPlayer* pResponsiblePlayer = dynamic_cast <CPlayer*> ( pResponsible ) )
-            strResponsible = pResponsiblePlayer->GetNick ();
-        else
-            strResponsible = "Console";
-
-        argStream.ReadString ( strReason, "" );
+        if ( !argStream.HasErrors () ) {
+            strResponsible = pResponsible->GetNick ();
+            argStream.ReadString ( strReason, "" );
+        }
     }
     else
     {
@@ -1897,7 +1895,7 @@ int CLuaPlayerDefs::KickPlayer ( lua_State* luaVM )
         else
         {
             argStream.ReadString ( strReason, "" );
-            strResponsible = "";
+            strResponsible = "Console";
         }
     }
 
