@@ -1,10 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/deathmatch/logic/CResourceChecker.Data.h
 *  PURPOSE:     Resource file content checker/validator/upgrader
-*  DEVELOPERS:  Developer wishes to remain anonymous
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -315,6 +314,7 @@ namespace
         { false, "setVehicleFrozen",               "setElementFrozen" },
         { false, "setObjectStatic",                "setElementFrozen" },
         { false, "isPlayerDead",                   "isPedDead" },
+        { false, "showPlayerHudComponent",         "setPlayerHudComponentVisible" },
         // Edit
         { false, "guiEditSetCaratIndex",           "guiEditSetCaretIndex" },
         { false, "guiMemoSetCaratIndex",           "guiMemoSetCaretIndex" },
@@ -373,6 +373,7 @@ namespace
         { false, "removePlayerFromVehicle",        "removePedFromVehicle" },
         { false, "attachElementToElement",         "attachElements" },
         { false, "detachElementFromElement",       "detachElements" },
+        { false, "showPlayerHudComponent",         "setPlayerHudComponentVisible"},
         // XML
         { false, "xmlNodeGetSubNodes",             "xmlNodeGetChildren" },
         { false, "xmlCreateSubNode",               "xmlCreateChild" },
