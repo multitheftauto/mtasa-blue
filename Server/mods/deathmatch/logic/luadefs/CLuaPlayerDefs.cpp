@@ -1117,7 +1117,7 @@ int CLuaPlayerDefs::RedirectPlayer ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::RedirectPlayer ( pElement, strHost, usPort, strPassword.empty () ? NULL : strPassword.c_str () ) )
+        if ( CStaticFunctionDefinitions::RedirectPlayer ( pElement, strHost, usPort, strPassword.empty () ? nullptr : *strPassword ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

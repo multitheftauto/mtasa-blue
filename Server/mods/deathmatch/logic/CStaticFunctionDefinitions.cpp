@@ -3484,7 +3484,14 @@ bool CStaticFunctionDefinitions::RedirectPlayer ( CElement* pElement, const char
             BitStream.pBitStream->Write ( szPassword, ucPasswordLength );
         }
         pPlayer->Send ( CLuaPacket ( FORCE_RECONNECT, *BitStream.pBitStream ) );
-        pPlayer->SetQuitReasonForLog( SString( "[Redirected to %s:%d]", szHost, usPort ? usPort : g_pGame->GetConfig()->GetServerPort() ) );
+
+        usPort = usPort ? usPort : g_pGame->GetConfig ()->GetServerPort ();
+        if (szHost[0]) {
+            pPlayer->SetQuitReasonForLog ( SString ( "[Redirected to %s:%d]", szHost, usPort ) );
+        } else {
+            pPlayer->SetQuitReasonForLog ( SString ( "[Redirected to port %d]", usPort ) );
+        }
+
         return true;
     }
     return false;
