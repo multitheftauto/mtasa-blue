@@ -33,10 +33,11 @@ std::map < ushort, CModelTexturesInfo > ms_ModelTexturesInfoMap;
 ////////////////////////////////////////////////////////////////
 CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo ( ushort usModelId )
 {
-    if ( !pGame->GetModelInfo ( usModelId ) )
+    CModelInfoSA* pModelInfo = dynamic_cast < CModelInfoSA* > ( pGame->GetModelInfo ( usModelId ) );
+    if ( !pModelInfo )
         return NULL;
 
-    ushort usTxdId = pGame->GetModelInfo ( usModelId )->GetTextureDictionaryID ();
+    ushort usTxdId = pModelInfo->GetTextureDictionaryID ();
 
     CModelTexturesInfo* pInfo = MapFind ( ms_ModelTexturesInfoMap, usTxdId );
     if ( !pInfo )
@@ -46,7 +47,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo ( ushort usModelId )
 
         if ( !pTxd )
         {
-            pGame->GetModelInfo ( usModelId )->Request ( BLOCKING, "CRenderWareSA::GetModelTexturesInfo" );
+            pModelInfo->Request ( BLOCKING, "CRenderWareSA::GetModelTexturesInfo" );
             CTxdStore_AddRef ( usTxdId );
             ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( usModelId );
             pTxd = CTxdStore_GetTxd ( usTxdId );
@@ -54,6 +55,12 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo ( ushort usModelId )
         else
         {
             CTxdStore_AddRef ( usTxdId );
+            if ( pModelInfo->GetModelType () == MODEL_INFO_TYPE_PED )
+            {
+                // Mystery fix for #9336: (MTA sometimes fails at loading custom textures)
+                // Possibly forces the ped model to be reloaded in some way
+                ( (void (__cdecl *)(unsigned short))FUNC_RemoveModel )( usModelId );
+            }
         }
 
         if ( !pTxd )
