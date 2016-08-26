@@ -67,7 +67,7 @@ public:
                                 ~CResourceManager               ( void );
 
     CResource *                 Load                            ( bool bIsZipped, const char * szAbsPath, const char * szResourceName );
-    void                        Unload                          ( CResource * resource );
+    void                        UnloadAndDelete                 ( CResource * resource );
     CResource *                 GetResource                     ( const char * szResourceName );
     CResource*                  GetResourceFromScriptID         ( uint uiScriptID );
     void                        UnloadRemovedResources          ( void );

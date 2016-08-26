@@ -23,11 +23,6 @@
 #define BLOCKED_DB_FILE_NAME    "fileblock.db"
 #define BLOCKED_DB_TABLE_NAME   "`block_reasons`"
 
-extern CServerInterface* g_pServerInterface;
-
-static bool s_bNotFirstTime = false; // if true, outputs "new resource loaded" messages, doesn't do it
-                                     // first time to prevent console spam on startup
-
 // SResInfo - Item in list of potential resources - Used in Refresh()
 struct SResInfo
 {
@@ -241,8 +236,6 @@ bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisRes
     if ( bShowTiming )
         CLogger::LogPrintf( "Timing info: %s\n", *marker.GetString() );
 
-    s_bNotFirstTime = true;
-
     return true;
 }
 
@@ -354,18 +347,17 @@ void CResourceManager::UnloadRemovedResources ( void )
             else
                 CLogger::LogPrintf ( "Resource '%s' has been removed, unloading\n", (*iter)->GetName().c_str () );
             resourcesToDelete.push_back ( (*iter) );
-            m_bResourceListChanged = true;
         }
     }
 
     iter = resourcesToDelete.begin ();
     for ( ; iter != resourcesToDelete.end (); iter++ )
     {
-        Unload ( *iter );
+        UnloadAndDelete ( *iter );
     }
 }
 
-void CResourceManager::Unload ( CResource * resource )
+void CResourceManager::UnloadAndDelete ( CResource * resource )
 {
     RemoveResourceFromLists ( resource );
     m_resourcesToStartAfterRefresh.remove ( resource );
@@ -375,74 +367,60 @@ void CResourceManager::Unload ( CResource * resource )
 
 CResource * CResourceManager::Load ( bool bIsZipped, const char * szAbsPath, const char * szResourceName )
 {
-    CResource * loadedResource = NULL;
     bool bStartAfterLoading = false;
 
     // check to see if we've already loaded this resource - we can only
     // load each resource once
-
-    list < CResource* > resourcesToDelete;
-    list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); iter++ )
+    CResource* pResource = GetResource ( szResourceName );
+    if ( pResource )
     {
-        if ( stricmp ( (*iter)->GetName().c_str (), szResourceName ) == 0 )
+        if ( !pResource->HasResourceChanged() )
         {
-            if ( (*iter)->HasResourceChanged() )
-            {
-                if ( (*iter)->IsActive() )
-                {
-                    CLogger::LogPrintf ( "Resource '%s' changed while running, reloading and restarting\n", szResourceName );
-                    bStartAfterLoading = true;
-                }
-                else
-                {
-                    CLogger::LogPrintf ( "Resource '%s' changed, reloading\n", szResourceName );
-                }
-
-                resourcesToDelete.push_back ( (*iter) );
-            }
-            else
-                return (*iter);
+            // Already loaded and no reload required
+            return pResource;
         }
-    }
 
-    iter = resourcesToDelete.begin ();
-    for ( ; iter != resourcesToDelete.end (); iter++ )
-    {
+        if ( pResource->IsActive() )
+        {
+            CLogger::LogPrintf ( "Resource '%s' changed while running, reloading and restarting\n", szResourceName );
+            bStartAfterLoading = true;
+        }
+        else
+        {
+            CLogger::LogPrintf ( "Resource '%s' changed, reloading\n", szResourceName );
+        }
+
         // Stop it first. This fixes bug #3729 because it isn't removed from the list before it's stopped.
         // Removing it from the resources list first caused the resource pointer to be unverifyable, and
         // the pointer wouldn't work in resource LUA functions.
-        (*iter)->Stop ( true );
+        pResource->Stop ( true );
 
-        RemoveResourceFromLists ( *iter );
-        m_resourcesToStartAfterRefresh.remove ( *iter );
-        RemoveFromQueue ( *iter );
-        delete *iter;
-
-        m_bResourceListChanged = true;
+        UnloadAndDelete ( pResource );
+        pResource = nullptr;
     }
 
-    loadedResource = new CResource ( this, bIsZipped, szAbsPath, szResourceName );
-    if ( !loadedResource->IsLoaded() )
+    // Load resource
+    CResource* pLoadedResource = new CResource ( this, bIsZipped, szAbsPath, szResourceName );
+    pLoadedResource->SetNetID ( GenerateID () );
+    AddResourceToLists ( pLoadedResource );
+    if ( bStartAfterLoading )
+        m_resourcesToStartAfterRefresh.push_back ( pLoadedResource );
+
+    // Check load succeeded
+    if ( !pLoadedResource->IsLoaded() )
     {
         CLogger::LogPrintf("Loading of resource '%s' failed\n", szResourceName );
-        m_resourcesToStartAfterRefresh.remove ( loadedResource );
-        RemoveFromQueue ( loadedResource );
-        delete loadedResource;
-        loadedResource = NULL;
+        UnloadAndDelete ( pLoadedResource );
+        pLoadedResource = nullptr;
     }
     else
     {
-        if ( bStartAfterLoading )
-            m_resourcesToStartAfterRefresh.push_back ( loadedResource );
-        if ( s_bNotFirstTime )
-            CLogger::LogPrintf("New resource '%s' loaded\n", loadedResource->GetName().c_str () );
-        loadedResource->SetNetID ( GenerateID () );
-        AddResourceToLists ( loadedResource );
-        m_bResourceListChanged = true;
+        // Don't log new resources during server startup
+        if ( g_pGame->IsServerFullyUp () )
+            CLogger::LogPrintf("New resource '%s' loaded\n", pLoadedResource->GetName().c_str () );
     }
 
-    return loadedResource;
+    return pLoadedResource;
 }
 
 CResource * CResourceManager::GetResource ( const char * szResourceName )
@@ -579,6 +557,7 @@ void CResourceManager::AddResourceToLists ( CResource* pResource )
     assert ( !pLuaMain );
     MapSet ( m_NameResourceMap, strResourceNameKey, pResource );
     MapSet ( m_NetIdResourceMap, pResource->GetNetID(), pResource );
+    m_bResourceListChanged = true;
 }
 
 //
@@ -594,6 +573,7 @@ void CResourceManager::RemoveResourceFromLists ( CResource* pResource )
     m_resources.remove ( pResource );
     MapRemove ( m_NameResourceMap, strResourceNameKey );
     MapRemove ( m_NetIdResourceMap, pResource->GetNetID() );
+    m_bResourceListChanged = true;
 }
 
 
@@ -698,9 +678,6 @@ bool CResourceManager::Reload ( CResource* pResource )
     // Was it loaded successfully?
     if ( pResource->IsLoaded () )
     {
-        // Add the resource back to the list
-        m_bResourceListChanged = true;
-
         // Generate a new ID for it
         assert ( MapContains ( m_NetIdResourceMap, pResource->GetNetID() ) );
         MapRemove( m_NetIdResourceMap, pResource->GetNetID() );
@@ -1120,7 +1097,7 @@ CResource* CResourceManager::RenameResource ( CResource* pSourceResource, const 
     }
 
     // Unload - this will also free the resource object
-    Unload ( pSourceResource );
+    UnloadAndDelete ( pSourceResource );
     pSourceResource = NULL;
 
     // Rename
@@ -1174,7 +1151,7 @@ bool CResourceManager::DeleteResource ( const SString& strResourceName, SString&
     }
 
     // Unload - this will also free the resource object
-    Unload ( pSourceResource );
+    UnloadAndDelete ( pSourceResource );
     pSourceResource = NULL;
 
     // Move resource dir/zip to the trash
