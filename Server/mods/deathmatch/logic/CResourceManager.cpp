@@ -368,6 +368,7 @@ void CResourceManager::UnloadAndDelete ( CResource * resource )
 CResource * CResourceManager::Load ( bool bIsZipped, const char * szAbsPath, const char * szResourceName )
 {
     bool bStartAfterLoading = false;
+    bool bProtected = false;
 
     // check to see if we've already loaded this resource - we can only
     // load each resource once
@@ -380,6 +381,7 @@ CResource * CResourceManager::Load ( bool bIsZipped, const char * szAbsPath, con
             return pResource;
         }
 
+        bProtected = pResource->IsProtected ();
         if ( pResource->IsActive() )
         {
             CLogger::LogPrintf ( "Resource '%s' changed while running, reloading and restarting\n", szResourceName );
@@ -401,6 +403,7 @@ CResource * CResourceManager::Load ( bool bIsZipped, const char * szAbsPath, con
 
     // Load resource
     CResource* pLoadedResource = new CResource ( this, bIsZipped, szAbsPath, szResourceName );
+    pLoadedResource->SetProtected ( bProtected );
     pLoadedResource->SetNetID ( GenerateID () );
     AddResourceToLists ( pLoadedResource );
     if ( bStartAfterLoading )
