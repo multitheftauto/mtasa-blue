@@ -1647,7 +1647,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 
             // Check the size of the nick
             size_t sizeNick = strlen ( szNick );
-            if ( sizeNick >= MIN_NICK_LENGTH && sizeNick <= MAX_NICK_LENGTH )
+            if ( sizeNick >= MIN_PLAYER_NICK_LENGTH && sizeNick <= MAX_PLAYER_NICK_LENGTH )
             {
                 // Someone here with the same name?
                 CPlayer* pTempPlayer = m_pPlayerManager->Get ( szNick );

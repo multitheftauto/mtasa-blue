@@ -28,7 +28,7 @@ public:
     bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
 
     inline const char*      GetNewNick                  ( void )                    { return m_strNewNick; }
-    inline void             SetNewNick                  ( const char* szNewNick )   { m_strNewNick.AssignLeft( szNewNick, MAX_NICK_LENGTH ); }
+    inline void             SetNewNick                  ( const char* szNewNick )   { m_strNewNick.AssignLeft( szNewNick, MAX_PLAYER_NICK_LENGTH ); }
 
 private:
     SString                 m_strNewNick;

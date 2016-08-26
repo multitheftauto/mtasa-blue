@@ -53,7 +53,7 @@ bool CPlayerListPacket::Write ( NetBitStreamInterface& BitStream ) const
         // Write the nick length
         const char* szNickPointer = pPlayer->GetNick ();
         unsigned char ucNickLength = static_cast < unsigned char > ( strlen ( szNickPointer ) );
-        if ( ucNickLength < MIN_NICK_LENGTH || ucNickLength > MAX_NICK_LENGTH )
+        if ( ucNickLength < MIN_PLAYER_NICK_LENGTH || ucNickLength > MAX_PLAYER_NICK_LENGTH )
         {
             BitStream.Write ( static_cast < unsigned char > ( 3 ) );
             BitStream.Write ( "???", 3 );

@@ -38,7 +38,7 @@ public:
     inline const SString&   GetPlayerVersion            ( void )                            { return m_strPlayerVersion; };
 
     inline const char*      GetNick                     ( void )                            { return m_strNick; };
-    inline void             SetNick                     ( const char* szNick )              { m_strNick.AssignLeft( szNick, MAX_NICK_LENGTH ); };
+    inline void             SetNick                     ( const char* szNick )              { m_strNick.AssignLeft( szNick, MAX_PLAYER_NICK_LENGTH ); };
 
     inline const MD5&       GetPassword                 ( void )                            { return m_Password; };
     inline void             SetPassword                 ( const MD5& Password )             { m_Password = Password; };

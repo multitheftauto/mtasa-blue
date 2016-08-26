@@ -217,7 +217,7 @@ void CPlayer::SetNick ( const char* szNick )
         g_pGame->GetConsole ()->GetWhoWas ()->Add ( szNick, inet_addr ( GetSourceIP() ), GetSerial (), GetPlayerVersion (), GetAccount ()->GetName () );
     }
 
-    m_strNick.AssignLeft ( szNick, MAX_NICK_LENGTH );
+    m_strNick.AssignLeft ( szNick, MAX_PLAYER_NICK_LENGTH );
 }
 
 const char* CPlayer::GetSourceIP ( void )

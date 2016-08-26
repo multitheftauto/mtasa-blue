@@ -2035,7 +2035,7 @@ bool CStaticFunctionDefinitions::SetPlayerName ( CElement* pElement, const char*
             {
                 // Verify the length
                 size_t sizeNewNick = strlen ( szName );
-                if ( sizeNewNick >= MIN_NICK_LENGTH && sizeNewNick <= MAX_NICK_LENGTH )
+                if ( sizeNewNick >= MIN_PLAYER_NICK_LENGTH && sizeNewNick <= MAX_PLAYER_NICK_LENGTH )
                 {
                     // Does the nickname differ from the previous nickname?
                     const char* szNick = pPlayer->GetNick ();

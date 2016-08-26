@@ -1,6 +1,6 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/deathmatch/Config.h
 *  PURPOSE:     Header for platform specific functions, types and defines
@@ -11,8 +11,7 @@
 
 // Header file for platform specific functions, types and defines
 
-#ifndef __CONFIG_H
-#define __CONFIG_H
+#pragma once
 
 #include <MTAPlatform.h>
 #include <Common.h>
@@ -39,12 +38,12 @@ public:
 /*** va_pass() (passing of ... variable length arguments ***/
 
 // Min and max number of characters in player nicknames (this must match the client's)
-#define MIN_NICK_LENGTH 1
-#define MAX_NICK_LENGTH 22
+#define MIN_PLAYER_NICK_LENGTH 1
+#define MAX_PLAYER_NICK_LENGTH 22
 
 // Min and max number of characters in player nametags (this must match the client's)
-#define MIN_NAMETAG_LENGTH 1
-#define MAX_NAMETAG_LENGTH 22
+#define MIN_PLAYER_NAMETAG_LENGTH 1
+#define MAX_PLAYER_NAMETAG_LENGTH 22
 
 #define MAX_TEAM_NAME_LENGTH 255
 
@@ -159,5 +158,3 @@ public:
 
 // MTA minclientversion auto update and others
 #define HQCOMMS_URL                 "http://updatesa.multitheftauto.com/sa/server/hqcomms/"
-
-#endif
