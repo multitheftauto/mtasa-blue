@@ -738,7 +738,7 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                 {
                     // Verify the length
                     size_t sizeNewNick = strlen ( szNewNick );
-                    if ( sizeNewNick >= MIN_NICK_LENGTH && sizeNewNick <= MAX_NICK_LENGTH )
+                    if ( sizeNewNick >= MIN_PLAYER_NICK_LENGTH && sizeNewNick <= MAX_PLAYER_NICK_LENGTH )
                     {
                         // Does the nickname differ from the previous nickname?
                         const char* szNick = pClient->GetNick ();
@@ -786,7 +786,7 @@ bool CConsoleCommands::Nick ( CConsole* pConsole, const char* szArguments, CClie
                     else
                     {
                         // Tell the player
-                        pEchoClient->SendEcho ( SString ( "nick: Nick must be between %u and %u characters", MIN_NICK_LENGTH, MAX_NICK_LENGTH ) );
+                        pEchoClient->SendEcho ( SString ( "nick: Nick must be between %u and %u characters", MIN_PLAYER_NICK_LENGTH, MAX_PLAYER_NICK_LENGTH ) );
                     }
                 }
                 else

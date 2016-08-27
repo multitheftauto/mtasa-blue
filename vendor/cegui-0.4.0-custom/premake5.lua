@@ -45,3 +45,8 @@ project "CEGUI"
 		flags { "ExcludeFromBuild" } 
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" } 
+
+	
+	disablewarnings { "4221" }
+	filter {"system:windows"}
+		linkoptions { "/ignore:4221" }

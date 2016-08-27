@@ -1,0 +1,8 @@
+*.tar.bz2
+
+cmake/
+include/
+libcef_dll/
+Release/
+Resources/
+*.txt

@@ -2035,7 +2035,7 @@ bool CStaticFunctionDefinitions::SetPlayerName ( CElement* pElement, const char*
             {
                 // Verify the length
                 size_t sizeNewNick = strlen ( szName );
-                if ( sizeNewNick >= MIN_NICK_LENGTH && sizeNewNick <= MAX_NICK_LENGTH )
+                if ( sizeNewNick >= MIN_PLAYER_NICK_LENGTH && sizeNewNick <= MAX_PLAYER_NICK_LENGTH )
                 {
                     // Does the nickname differ from the previous nickname?
                     const char* szNick = pPlayer->GetNick ();
@@ -3484,7 +3484,14 @@ bool CStaticFunctionDefinitions::RedirectPlayer ( CElement* pElement, const char
             BitStream.pBitStream->Write ( szPassword, ucPasswordLength );
         }
         pPlayer->Send ( CLuaPacket ( FORCE_RECONNECT, *BitStream.pBitStream ) );
-        pPlayer->SetQuitReasonForLog( SString( "[Redirected to %s:%d]", szHost, usPort ? usPort : g_pGame->GetConfig()->GetServerPort() ) );
+
+        usPort = usPort ? usPort : g_pGame->GetConfig ()->GetServerPort ();
+        if (szHost[0]) {
+            pPlayer->SetQuitReasonForLog ( SString ( "[Redirected to %s:%d]", szHost, usPort ) );
+        } else {
+            pPlayer->SetQuitReasonForLog ( SString ( "[Redirected to port %d]", usPort ) );
+        }
+
         return true;
     }
     return false;

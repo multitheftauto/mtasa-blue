@@ -73,14 +73,14 @@ VOID CPopulationSA::AddPed ( CPedSAInterface * ped )
 
     char szDebug[255] = {'\0'};
     DWORD dwPedInterface = (DWORD)pedSA->GetInterface();
-    sprintf ( szDebug, "Civ ped added (%d) (0x%X -> 0x%X)\n", dwPedCount+1, ped, dwPedInterface);
+    sprintf ( szDebug, "Civ ped added (%d) (0x%p -> 0x%X)\n", dwPedCount+1, ped, dwPedInterface);
     //OutputDebugString ( szDebug );
 
     if ( m_pCivilianAddHandler )
         m_pCivilianAddHandler ( pedSA );
 
     peds.push_back (pedSA);
-    dwPedCount ++;
+    ++dwPedCount;
 }
 
 VOID CPopulationSA::RemovePed ( CCivilianPed * ped )

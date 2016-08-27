@@ -124,7 +124,6 @@ struct SAclRequest;
 #include "luadefs/CLuaColShapeDefs.h"
 #include "luadefs/CLuaDatabaseDefs.h"
 #include "luadefs/CLuaDefs.h"
-#include "luadefs/CLuaFileDefs.h"
 #include "luadefs/CLuaHTTPDefs.h"
 #include "luadefs/CLuaHandlingDefs.h"
 #include "luadefs/CLuaMarkerDefs.h"
@@ -141,7 +140,6 @@ struct SAclRequest;
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
-#include "luadefs/CLuaXMLDefs.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"
@@ -301,7 +299,6 @@ struct SAclRequest;
 
 // Utility includes
 #include "utils/CZipMaker.h"
-#include <base64.h>
 
 // Module includes
 #include "CServer.h"

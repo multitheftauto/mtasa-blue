@@ -160,5 +160,5 @@ CXMLNode * CCustomData::OutputToXML ( CXMLNode * pNode )
 
 unsigned short CCustomData::CountOnlySynchronized ( void )
 {
-    return m_SyncedData.size ( ); 
+    return static_cast<unsigned short>(m_SyncedData.size ()); 
 }

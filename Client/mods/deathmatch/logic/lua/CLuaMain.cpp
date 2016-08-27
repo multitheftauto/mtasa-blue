@@ -27,8 +27,9 @@ SString CLuaMain::ms_strExpectedUndumpHash;
 #define HOOK_INSTRUCTION_COUNT 1000000
 #define HOOK_MAXIMUM_TIME 5000
 
-SString SCRIPT_STACK = "";
-char Luaify = 127;
+#include "luascripts/coroutine_debug.lua.h"
+#include "luascripts/exports.lua.h"
+#include "luascripts/inspect.lua.h"
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP )
 {
@@ -109,7 +110,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaDrawingDefs::AddClass ( luaVM );
     CLuaEngineDefs::AddClass ( luaVM );
     CLuaEffectDefs::AddClass ( luaVM );
-    CLuaFileDefs::AddClass ( luaVM );
     CLuaGUIDefs::AddClass ( luaVM ); CLuaBrowserDefs::AddClass ( luaVM ); // browser must be after drawing/gui, since it extends DxTexture/GUIElement
     CLuaMarkerDefs::AddClass ( luaVM );
     CLuaObjectDefs::AddClass ( luaVM );
@@ -126,7 +126,8 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaVehicleDefs::AddClass ( luaVM );
     CLuaWaterDefs::AddClass ( luaVM );
     CLuaWeaponDefs::AddClass ( luaVM );
-    CLuaXMLDefs::AddClass ( luaVM );
+
+    CLuaShared::AddClasses ( luaVM );
 }
 
 void CLuaMain::InitVM ( void )
@@ -175,16 +176,9 @@ void CLuaMain::InitVM ( void )
 
     // Load pre-loaded lua scripts
     DECLARE_PROFILER_SECTION( OnPreLoadScript )
-    #include "luascripts/exports.lua"
-    LoadScript(SCRIPT_STACK);
-
-    #include "luascripts/coroutine_debug.lua"
-    LoadScript(SCRIPT_STACK);
-
-    #include "luascripts/inspect.lua"
-    LoadScript(SCRIPT_STACK);
-
-    SCRIPT_STACK.clear();
+    LoadScript(EmbeddedLuaCode::exports);
+    LoadScript(EmbeddedLuaCode::coroutine_debug);
+    LoadScript(EmbeddedLuaCode::inspect);
     DECLARE_PROFILER_SECTION( OnPostLoadScript )
 }
 

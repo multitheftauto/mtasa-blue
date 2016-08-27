@@ -945,6 +945,7 @@ BOOL CreateProcessWithMitigationPolicy (
     STARTUPINFOEXW StartupInfoEx = { 0 };
     StartupInfoEx.StartupInfo.cb = sizeof ( StartupInfoEx.StartupInfo );
 
+#ifdef PANIC_OVER
     if ( IsWindows7OrGreater () )
     {
         // We can use extended startup info for Vista and up
@@ -1016,7 +1017,7 @@ BOOL CreateProcessWithMitigationPolicy (
             return false;
         }
     }
-
+#endif
     // Start GTA
     BOOL bResult = _CreateProcessW ( lpApplicationName,
                             lpCommandLine,
@@ -1035,12 +1036,14 @@ BOOL CreateProcessWithMitigationPolicy (
         strOutErrorContext = "CreateProcess";
     }
 
+#ifdef PANIC_OVER
     if ( IsWindows7OrGreater () )
     {
         // Clean up
         _DeleteProcThreadAttributeList ( StartupInfoEx.lpAttributeList );
         HeapFree ( GetProcessHeap (), 0, (LPVOID)StartupInfoEx.lpAttributeList );
     }
+#endif
     return bResult;
 }
 

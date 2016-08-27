@@ -29,7 +29,6 @@
 #include "CEGUISystem.h"
 
 #include <d3dx9.h>
-#include <dxerr.h>
 #include <algorithm>
 #undef min
 

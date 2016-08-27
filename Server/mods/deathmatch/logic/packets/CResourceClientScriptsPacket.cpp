@@ -28,7 +28,7 @@ bool CResourceClientScriptsPacket::Write ( NetBitStreamInterface& BitStream ) co
 
     BitStream.Write ( m_pResource->GetNetID() );
 
-    unsigned short usItemCount = m_vecItems.size();
+    auto usItemCount = static_cast<unsigned short>(m_vecItems.size());
     BitStream.Write ( usItemCount );
 
     for ( std::vector<CResourceClientScriptItem*>::const_iterator iter = m_vecItems.begin ();

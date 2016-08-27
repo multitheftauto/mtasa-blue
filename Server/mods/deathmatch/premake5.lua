@@ -31,12 +31,12 @@ project "Deathmatch"
 		}
 	
 	links {
-		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"
+		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib"
 	}
 	
 	vpaths {
-		["Headers/*"] = {"**.h", "../../../**.h"},
-		["Sources/*"] = {"**.cpp", "../../../**.cpp"},
+		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h", "../../../**.h"},
+		["Sources/*"] = {"**.cpp", "../../../Shared/mods/deathmatch/**.cpp", "../../../Shared/**.cpp", "../../../vendor/**.cpp", "../../../**.cpp"},
 		["*"] = "premake5.lua"
 	}
 	
@@ -52,7 +52,6 @@ project "Deathmatch"
 		"../../sdk/MTAPlatform.h",
 		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bob_withers/base64.cpp",
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",
 	}
 	
@@ -63,6 +62,7 @@ project "Deathmatch"
 		
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
+		links { "rt" }
 	
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

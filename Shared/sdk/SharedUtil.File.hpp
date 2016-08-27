@@ -227,7 +227,7 @@ void SharedUtil::MakeSureDirExists ( const SString& strPath )
         #ifdef WIN32
             mkdir ( strTemp );
         #else
-            mkdir ( strTemp ,0775 );
+            mkdir ( strTemp, 0775 );
         #endif
     }
 }

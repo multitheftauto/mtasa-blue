@@ -7,6 +7,7 @@ project "Falagard"
 	pchsource "src/StdInc.cpp"
 	
 	defines { "FALAGARDBASE_EXPORTS" }
+	disablewarnings { "4297" }
 	
 	includedirs { 
 		"include",

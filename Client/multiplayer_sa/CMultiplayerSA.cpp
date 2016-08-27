@@ -3527,7 +3527,11 @@ void _declspec(naked) HOOK_CObject_Render ()
     {
         popad
         jmp         FUNC_CEntity_Render
-    render_a_tag:
+    }
+
+render_a_tag:
+    _asm
+    {
         popad
         // We simulate here the header of the CEntity::Render function
         // but then go straight to CTagManager::RenderTagForPC.
@@ -3634,7 +3638,11 @@ void _declspec(naked) HOOK_ComputeDamageResponse_StartChoking ()
         mov     ecx, [edi]
         mov     eax, [ecx+0x47C]
         jmp     dwChokingChoke
+    }
+
 dont_choke:
+    _asm
+    {
         popad
         jmp     dwChokingDontchoke
     }
@@ -6226,8 +6234,11 @@ void _declspec(naked) HOOK_CEntity_IsOnScreen_FixObjectScale ()
         popad
         mov     esi, ecx
         jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
+    }
 
 IsOnScreen_IsObject:
+    _asm
+    {
         popad
         fld     [eax+0x24]
         fld     [esi+0x15C]

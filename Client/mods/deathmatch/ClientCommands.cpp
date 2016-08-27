@@ -961,8 +961,8 @@ void COMMAND_Modules ( const char *szCmdLine )
                     // Print it
                     fprintf ( pFile, "** MODULE **\n"
                                      "Name: %s\n"
-                                     "Base: 0x%P\n"
-                                     "Size: 0x%P\n"
+                                     "Base: 0x%p\n"
+                                     "Size: 0x%x\n"
                                      "\n",
                                      ModuleEntry.szModule,
                                      ModuleEntry.modBaseAddr,

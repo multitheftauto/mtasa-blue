@@ -145,7 +145,7 @@ int CLuaAudioDefs::PlaySound ( lua_State* luaVM )
             {
                 SString strFilename;
                 bool bIsURL = false;
-                if ( CResourceManager::ParseResourcePathInput ( strSound, pResource, strFilename ) )
+                if ( CResourceManager::ParseResourcePathInput ( strSound, pResource, &strFilename ) )
                     strSound = strFilename;
                 else
                     bIsURL = true;
@@ -199,7 +199,7 @@ int CLuaAudioDefs::PlaySound3D ( lua_State* luaVM )
             {
                 SString strFilename;
                 bool bIsURL = false;
-                if ( CResourceManager::ParseResourcePathInput ( strSound, pResource, strFilename ) )
+                if ( CResourceManager::ParseResourcePathInput ( strSound, pResource, &strFilename ) )
                     strSound = strFilename;
                 else
                     bIsURL = true;

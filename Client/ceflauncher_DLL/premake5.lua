@@ -23,13 +23,7 @@ project "CEFLauncher DLL"
 		"*.cpp"
 	}
 	
-	links { "CEF" }
-		
-	filter "configurations:Debug"
-		links { "../../vendor/cef3/Debug/libcef.lib" }
-
-	filter "configurations:Release or configurations:Nightly"
-		links { "../../vendor/cef3/Release/libcef.lib" }
+	links { "CEF",  "../../vendor/cef3/Release/libcef.lib" }
 
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 

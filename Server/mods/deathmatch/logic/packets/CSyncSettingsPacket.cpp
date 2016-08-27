@@ -41,7 +41,7 @@ bool CSyncSettingsPacket::Read ( NetBitStreamInterface& BitStream )
 
 bool CSyncSettingsPacket::Write ( NetBitStreamInterface& BitStream ) const
 {
-    uchar ucNumWeapons = m_weaponTypesUsingBulletSync.size ();
+    uchar ucNumWeapons = static_cast<uchar>(m_weaponTypesUsingBulletSync.size ());
     BitStream.Write ( ucNumWeapons );
 
     for ( std::set < eWeaponType >::const_iterator iter = m_weaponTypesUsingBulletSync.begin () ; iter != m_weaponTypesUsingBulletSync.end () ; ++iter )

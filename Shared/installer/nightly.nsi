@@ -673,6 +673,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
         File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
         #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
+        
+        SetOutPath "$INSTDIR\MTA\CEF\locales"
         File "${FILES_ROOT}\mta\CEF\locales\en-US.pak"
 
 
@@ -1202,7 +1204,7 @@ Function InstallVC14Redistributable
     ${LogText} "Function begin - InstallVC14Redistributable"
     DetailPrint "Installing Microsoft Visual Studio 2015 redistributable ..."
     StrCpy $REDISTVC14 "$TEMP\vcredist14_x86.exe"
-    NSISdl::download "http://download.microsoft.com/download/4/2/F/42FF78CE-8DE0-4C88-AD7A-5F8DFFB49F74/vc_redist.x86.exe" $REDISTVC14
+    NSISdl::download "http://mirror.multitheftauto.com/mtasa/installer/9875/vc_redist_2015u3.x86.exe" $REDISTVC14
     Pop $0
 
     ${If} $0 != "success"

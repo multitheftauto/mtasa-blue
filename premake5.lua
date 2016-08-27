@@ -3,6 +3,7 @@ premake.path = premake.path..";utils/buildactions"
 require "compose_files"
 require "install_data"
 require "install_resources"
+require "install_cef"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -19,7 +20,7 @@ workspace "MTASA"
 	
 	location "Build"
 	
-	flags { "C++14", "Symbols" }
+	flags { "C++11", "Symbols" }
 	characterset "MBCS"
 	pic "On"
 	

@@ -22,7 +22,6 @@
 #include <cstdio>
 #include <cstring>
 
-#include <base64.h>
 #include <zlib.h>
 
 // SDK includes
@@ -116,7 +115,6 @@
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaEngineDefs.h>
-#include <luadefs/CLuaFileDefs.h>
 #include <luadefs/CLuaGUIDefs.h>
 #include <luadefs/CLuaMarkerDefs.h>
 #include <luadefs/CLuaObjectDefs.h>
@@ -134,7 +132,6 @@
 #include <luadefs/CLuaVehicleDefs.h>
 #include <luadefs/CLuaWaterDefs.h>
 #include <luadefs/CLuaWeaponDefs.h>
-#include <luadefs/CLuaXMLDefs.h>
 #include <CRemoteCalls.h>
 
 // Shared includes

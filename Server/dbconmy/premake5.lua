@@ -34,7 +34,7 @@ project "Dbconmy"
 	
 	filter "system:not windows"
 		includedirs { "/usr/include/mysql" }
-		links { "mysqlclient" }
+		links { "mysqlclient", "rt" }
 	
 	filter { "system:windows", "platforms:x64" }
 		links { "../../vendor/mysql/lib/x64/libmysql.lib" }

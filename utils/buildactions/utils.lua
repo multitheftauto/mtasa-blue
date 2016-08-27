@@ -30,11 +30,11 @@ function os.copydir(src_dir, dst_dir, filter, single_dst_dir)
 	print('copy "' .. src_dir .. filter .. '" to "' .. dst_dir .. '".')
 	dst_dir = dst_dir .. "/"
 	local dir = path.rebase(".",path.getabsolute("."), src_dir) -- root dir, relative from src_dir
- 
+
 	os.chdir( src_dir ) -- change current directory to src_dir
 		local matches = os.matchfiles(filter)
 	os.chdir( dir ) -- change current directory back to root
- 
+
 	local counter = 0
 	for k, v in ipairs(matches) do
 		local target = iif(single_dst_dir, path.getname(v), v)
@@ -44,12 +44,50 @@ function os.copydir(src_dir, dst_dir, filter, single_dst_dir)
 			counter = counter + 1
 		end
 	end
- 
+
 	if counter == #matches then
 		print( counter .. " files copied.")
 		return true
 	else
 		print( "Error: " .. counter .. "/" .. #matches .. " files copied.")
 		return nil
+	end
+end
+
+function os.remove_wildcard(path)
+	for k, path in ipairs(table.merge(os.matchfiles(path), os.matchdirs(path))) do
+		if os.isfile(path) then
+			os.remove(path)
+		else
+			os.rmdir(path)
+		end
+	end
+end
+
+function os.expanddir_wildcard(from, to)
+	local dir = os.matchdirs(from)[1]
+	if not dir then return end
+	
+	-- TODO: Optimize this
+	os.copydir(dir, to)
+	os.rmdir(dir)
+end
+
+function os.md5_file(path)
+	if os.get() == "windows" then
+		local s = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
+		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
+	else
+		return os.outputof(string.format("md5sum \"%s\" | awk '{ print $1 }'", path))
+	end
+end
+
+function os.extract_archive(archive_path, target_path, override)
+	local flags = override and "-aoa" or "-aos"
+
+	if os.get() == "windows" then
+		os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
+	else
+		os.executef("7z x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	end
 end

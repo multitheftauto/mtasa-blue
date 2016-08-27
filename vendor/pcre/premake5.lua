@@ -7,8 +7,7 @@ project "pcre"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
-		["Sources/*"] = "**.c",
-		["Sources/*"] = "**.cc",
+		["Sources/*"] = {"**.c", "**.cc"},
 		["*"] = "premake5.lua"
 	}
 	
@@ -64,3 +63,7 @@ project "pcre"
 
 	filter "system:not windows"
 		kind "StaticLib"
+
+	disablewarnings { "4251" }
+	filter {"system:windows"}
+		linkoptions { "/ignore:4217", "/ignore:4049" }

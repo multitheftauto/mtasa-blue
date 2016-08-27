@@ -45,14 +45,14 @@ SString& SString::vFormat ( const char* szFormat, va_list vl )
     }
 
     // Allocate buffer
-    char* szDest = static_cast < char* > ( malloc ( iRequiredCapacity + 1 ) );
+    char* szDest = static_cast < char* > ( malloc ( iRequiredCapacity + 2 ) );
 
     // Try to format the string into the buffer.
     va_copy ( vlLocal, vl );
     int iSize;
     __try
     {
-        iSize = vsnprintf ( szDest, iRequiredCapacity, szFormat, vlLocal );
+        iSize = vsnprintf ( szDest, iRequiredCapacity + 1, szFormat, vlLocal );
     }
     __except ( EXCEPTION_EXECUTE_HANDLER )
     {

@@ -715,7 +715,7 @@ bool IsNametagValid ( const char* szNick )
 {
     // Grab the size of the nick. Check that it's not to long or short
     size_t sizeNick = strlen ( szNick );
-    if ( sizeNick < MIN_NICK_LENGTH || sizeNick > MAX_NAMETAG_LENGTH )
+    if ( sizeNick < MIN_PLAYER_NAMETAG_LENGTH || sizeNick > MAX_PLAYER_NAMETAG_LENGTH )
     {
         return false;
     }
@@ -740,7 +740,7 @@ bool IsNickValid ( const char* szNick )
 {
     // Grab the size of the nick. Check that it's within the player 
     size_t sizeNick = strlen ( szNick );
-    if ( sizeNick < MIN_NICK_LENGTH || sizeNick > MAX_NICK_LENGTH )
+    if ( sizeNick < MIN_PLAYER_NICK_LENGTH || sizeNick > MAX_PLAYER_NICK_LENGTH )
     {
         return false;
     }

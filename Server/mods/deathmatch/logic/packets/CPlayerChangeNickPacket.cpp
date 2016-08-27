@@ -15,7 +15,7 @@
 
 CPlayerChangeNickPacket::CPlayerChangeNickPacket ( const char* szNewNick )
 {
-    m_strNewNick.AssignLeft ( szNewNick, MAX_NICK_LENGTH );
+    m_strNewNick.AssignLeft ( szNewNick, MAX_PLAYER_NICK_LENGTH );
 }
 
 

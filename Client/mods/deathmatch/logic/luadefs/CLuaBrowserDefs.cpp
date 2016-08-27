@@ -275,7 +275,7 @@ int CLuaBrowserDefs::LoadBrowserURL ( lua_State* luaVM )
         {
             SString strAbsPath;
             CResource* pResource = pLuaMain->GetResource ();
-            if ( CResourceManager::ParseResourcePathInput ( strURL, pResource, strAbsPath ) && pWebBrowser->IsLocal () )
+            if ( CResourceManager::ParseResourcePathInput ( strURL, pResource, &strAbsPath ) && pWebBrowser->IsLocal () )
             {
                 // Output deprecated warning, TODO: Remove this at a later point
                 m_pScriptDebugging->LogWarning ( luaVM, "This URL scheme is deprecated and may not work in future versions. Please consider using http://mta/* instead. See https://wiki.mtasa.com/wiki/LoadBrowserURL for details" );

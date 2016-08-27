@@ -5,6 +5,7 @@ project "json-c"
 	
 	includedirs { "." }
 	defines { "_LIB" }
+	disablewarnings { "4244" }
 	
 	vpaths { 
 		["Headers/*"] = "**.h",

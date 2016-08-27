@@ -8,6 +8,7 @@ project "curl"
 		"../include",
 		"../../zlib"
 	}
+	disablewarnings { "4996" }
 	
 	vpaths { 
 		["Headers"] = "**.h",

@@ -8,7 +8,7 @@ project "Client Deathmatch"
 	pchsource "StdInc.cpp"
 	
 	links {
-		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", 
+		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp",
 		"../../../vendor/libspeex/libspeexd2013", -- todo: use debug variant
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
@@ -17,8 +17,8 @@ project "Client Deathmatch"
 	}
 	
 	vpaths {
-		["Headers/*"] = {"**.h", "../../../**.h"},
-		["Sources/*"] = {"**.cpp", "../../../**.cpp"},
+		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h"},
+		["Sources/*"] = {"**.cpp", "../../../Shared/mods/deathmatch/**.cpp", "../../../Shared/**.cpp", "../../../vendor/**.cpp"},
 		["*"] = "premake5.lua"
 	}
 	
@@ -54,7 +54,6 @@ project "Client Deathmatch"
 		"../../../Shared/animation/CEasingCurve.cpp", 
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bob_withers/base64.cpp",
 		"../../../vendor/bochs/bochs_internal/crc32.cpp"
 	}
 	
@@ -63,7 +62,7 @@ project "Client Deathmatch"
 	}
 	
 	configuration "windows"
-		buildoptions { "-Zm130" }
+		buildoptions { "-Zm180" }
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 

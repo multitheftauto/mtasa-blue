@@ -4,6 +4,7 @@ project "tinygettext"
 	targetname "tinygettext"
 	
 	includedirs { "." }
+	disablewarnings { "4800", "4309", "4503", "4099", "4503" }
 	
 	vpaths { 
 		["Headers/*"] = "**.hpp",

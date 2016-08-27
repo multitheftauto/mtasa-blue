@@ -7,8 +7,8 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #include "StdInc.h"
+#include <SharedUtil.Crypto.h>
 
 void CLuaCryptDefs::LoadFunctions ( void )
 {
@@ -101,7 +101,7 @@ int CLuaCryptDefs::TeaEncode ( lua_State* luaVM )
         SString result;
         SString humanReadableResult;
         SharedUtil::TeaEncode ( str, key, &result );
-        humanReadableResult = Base64::encode ( result );
+        humanReadableResult = SharedUtil::Base64encode(result);
         lua_pushstring ( luaVM, humanReadableResult );
         return 1;
     }
@@ -123,8 +123,7 @@ int CLuaCryptDefs::TeaDecode ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString result;
-        Base64::decode ( str, result );
+        SString result = SharedUtil::Base64decode(str);
         SharedUtil::TeaDecode ( result, key, &str );
         lua_pushstring ( luaVM, str );
         return 1;
@@ -145,8 +144,7 @@ int CLuaCryptDefs::Base64encode ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString result = Base64::encode ( str );
-        lua_pushstring ( luaVM, result );
+        lua_pushstring ( luaVM, SharedUtil::Base64encode(str) );
         return 1;
     }
     else
@@ -165,8 +163,7 @@ int CLuaCryptDefs::Base64decode ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString result;
-        Base64::decode ( str, result );
+        SString result = SharedUtil::Base64decode(str);
         lua_pushlstring ( luaVM, result, result.length () );
         return 1;
     }

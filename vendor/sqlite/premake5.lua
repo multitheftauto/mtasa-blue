@@ -2,6 +2,8 @@ project "sqlite"
 	language "C++"
 	kind "StaticLib"
 	targetname "sqlite"
+
+	disablewarnings { "4996" }
 	
 	vpaths { 
 		["Headers/*"] = "**.h",

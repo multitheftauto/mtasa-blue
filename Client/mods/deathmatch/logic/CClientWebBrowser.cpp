@@ -256,7 +256,7 @@ bool CClientWebBrowser::Events_OnResourcePathCheck ( SString& strURL )
         return true;
 
     CResource* pTempResource = m_pResource; // Make a copy to ignore a changed resource
-    if ( CResourceManager::ParseResourcePathInput ( strURL, pTempResource, strURL ) )
+    if ( CResourceManager::ParseResourcePathInput ( strURL, pTempResource, &strURL ) )
         return true;
 
     return false;

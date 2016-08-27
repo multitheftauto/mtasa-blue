@@ -10,6 +10,7 @@ project "Client Core"
 	
 	filter {}
 		includedirs { 
+			".",
 			"../sdk",
 			"../../vendor/cef3",
 			"../../vendor/tinygettext",
@@ -20,7 +21,8 @@ project "Client Core"
 		}
 
 	libdirs {
-		"../../vendor/detours/lib"
+		"../../vendor/detours/lib",
+		"../../vendor/cef3/Release"
 	}
 	
 
@@ -35,8 +37,8 @@ project "Client Core"
 	
 	files {
 		"premake5.lua",
-		"*.h",
-		"*.cpp"
+		"**.h",
+		"**.cpp"
 	}
 
 	links {
@@ -53,12 +55,6 @@ project "Client Core"
 
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
-	
-	filter "configurations:Debug"		
-		libdirs { "../../vendor/cef3/Debug" }
-
-	filter "configurations:Release or configurations:Nightly"
-		libdirs { "../../vendor/cef3/Release" }
 		
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" } 

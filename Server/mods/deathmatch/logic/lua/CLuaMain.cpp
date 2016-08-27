@@ -29,8 +29,9 @@ SString CLuaMain::ms_strExpectedUndumpHash;
 extern CGame* g_pGame;
 extern CNetServer* g_pRealNetServer;
 
-SString SCRIPT_STACK = "";
-char Luaify = 127;
+#include "luascripts/coroutine_debug.lua.h"
+#include "luascripts/exports.lua.h"
+#include "luascripts/inspect.lua.h"
 
 CLuaMain::CLuaMain ( CLuaManager* pLuaManager,
                      CObjectManager* pObjectManager,
@@ -154,7 +155,6 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaBlipDefs      ::AddClass ( luaVM );
     CLuaColShapeDefs  ::AddClass ( luaVM );
     CLuaDatabaseDefs  ::AddClass ( luaVM );
-    CLuaFileDefs      ::AddClass ( luaVM );
     CLuaMarkerDefs    ::AddClass ( luaVM );
     CLuaObjectDefs    ::AddClass ( luaVM );
     CLuaPedDefs       ::AddClass ( luaVM );
@@ -167,7 +167,8 @@ void CLuaMain::InitClasses ( lua_State* luaVM )
     CLuaTimerDefs     ::AddClass ( luaVM );
     CLuaVehicleDefs   ::AddClass ( luaVM );
     CLuaWaterDefs     ::AddClass ( luaVM );
-    CLuaXMLDefs       ::AddClass ( luaVM );
+
+    CLuaShared::AddClasses ( luaVM );
 }
 
 
@@ -212,16 +213,9 @@ void CLuaMain::InitVM ( void )
     lua_setglobal ( m_luaVM, "resourceRoot" );
 
     // Load pre-loaded lua scripts
-    #include "luascripts/exports.lua"
-    LoadScript(SCRIPT_STACK);
-
-    #include "luascripts/coroutine_debug.lua"
-    LoadScript(SCRIPT_STACK);
-
-    #include "luascripts/inspect.lua"
-    LoadScript(SCRIPT_STACK);
-
-    SCRIPT_STACK.clear();
+    LoadScript(EmbeddedLuaCode::exports);
+    LoadScript(EmbeddedLuaCode::coroutine_debug);
+    LoadScript(EmbeddedLuaCode::inspect);
 }
 
 
