@@ -5643,7 +5643,7 @@ void CClientPed::RunAnimation ( AssocGroupId animGroup, AnimationId animID )
 }
 
 
-void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame )
+void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame )
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5678,7 +5678,8 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
             }
             
             if ( !bFreezeLastFrame ) flags |= 0x08; // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
-            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
+            float fBlendDelta =  1 / Max ( (float)iBlend, 1.0f ) * 1000;
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, fBlendDelta, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );

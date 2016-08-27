@@ -2187,6 +2187,7 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
     bool bUpdatePosition = true;
     bool bInterruptable = true;
     bool bFreezeLastFrame = true;
+    int iBlend = 250;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
@@ -2203,12 +2204,13 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
     argStream.ReadBool ( bUpdatePosition, true );
     argStream.ReadBool ( bInterruptable, true );
     argStream.ReadBool ( bFreezeLastFrame, true );
+    argStream.ReadNumber ( iBlend, 250 );
 
     if ( !argStream.HasErrors () )
     {
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, strBlockName == "" ? NULL : strBlockName.c_str (), strAnimName == "" ? NULL : strAnimName.c_str (), iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, strBlockName == "" ? NULL : strBlockName.c_str (), strAnimName == "" ? NULL : strAnimName.c_str (), iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, iBlend ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
