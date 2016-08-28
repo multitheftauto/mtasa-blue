@@ -263,7 +263,7 @@ int CLuaMarkerDefs::GetMarkerIcon ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         char szMarkerIcon[64];
-        if ( CStaticFunctionDefinitions::GetMarkerType ( pMarker, szMarkerIcon ) )
+        if ( CStaticFunctionDefinitions::GetMarkerIcon ( pMarker, szMarkerIcon ) )
         {
             lua_pushstring ( luaVM, szMarkerIcon );
             return 1;
