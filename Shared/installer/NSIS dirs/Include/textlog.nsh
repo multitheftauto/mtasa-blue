@@ -38,10 +38,11 @@ Function ${UN}__TimeStamp
     IntFmt $4 "%02i" $4
     IntFmt $5 "%02i" $5
     IntFmt $6 "%02i" $6
+    IntFmt $7 "%03i" $7
 
     ## Generate Timestamp
     ;StrCpy $0 "YEAR=$1$\nMONTH=$2$\nDAY=$3$\nHOUR=$4$\nMINUITES=$5$\nSECONDS=$6$\nMS$7"
-    StrCpy $0 "$1-$2-$3 $4:$5:$6"
+    StrCpy $0 "$1-$2-$3 $4:$5:$6.$7"
 
     ## Restore the Registers and add Timestamp to the Stack
     ;Pop $8  ; Stack $7 $6 $5 $4 $3 $2 $1 $0
@@ -67,6 +68,7 @@ FunctionEnd
 # Written on by Mike Schinkel [http://www.mikeschinkel.com/blog/]
  
 Var /GLOBAL __TextLog_FileName
+Var /GLOBAL __TextLog_Indent
  
 !define LogText '!insertmacro LogTextCall'
 !macro LogTextCall _text
@@ -78,7 +80,25 @@ Function LogText
     Exch $0     ; pABC -> 0ABC
     Push $1
     Push $2
+    Push $3
     ${If} $__TextLog_FileName != ""
+        ; Indent
+        StrCpy $1 $0 1
+        ${If} $1 == "-"
+            IntOp $__TextLog_Indent $__TextLog_Indent - 1
+            StrCpy $0 $0 "" 1
+        ${EndIf}
+        StrCpy $2 ""
+        ${ForEach} $3 0 $__TextLog_Indent + 1
+            StrCpy $2 "$2  "
+        ${Next}
+        ${If} $1 == "+"
+            IntOp $__TextLog_Indent $__TextLog_Indent + 1
+            StrCpy $0 $0 "" 1
+        ${EndIf}
+        StrCpy $0 "$2$0"
+
+        ; Prepend time
         ${TimeStamp} $1
         ${IfNot} ${UAC_IsInnerInstance}
             StrCpy $1 "$1 [Outer]"
@@ -86,11 +106,13 @@ Function LogText
             StrCpy $1 "$1 [Inner]"
         ${EndIf}
         StrCpy $0 "$1 $0"
+
         FileOpen $2  "$__TextLog_FileName"  a
         FileSeek $2 0 END
         FileWrite $2 "$0$\r$\n"
         FileClose $2
     ${EndIf}
+    Pop $3
     Pop $2
     Pop $1
     Pop $0      ; 0ABC -> ABC
@@ -116,7 +138,7 @@ Function LogSetFileName
         FileOpen $1 $__TextLog_FileName "r"
         FileSeek $1 0 END $0
         FileClose $1
-        IntCmp $0 15000 toosmall toosmall
+        IntCmp $0 60000 toosmall toosmall
             StrCpy $1 "$__TextLog_FileName_old"
             Delete $1
             Rename $__TextLog_FileName $1
