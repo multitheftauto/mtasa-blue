@@ -450,8 +450,11 @@ void CCommandFuncs::Test ( const char* szParameters )
         CVARS_GET ( "nick", strNick );
         if ( strNick == szParameters )
         {
-            int* pData = NULL;
-            *pData = 0;
+            if ( FileExists ( CalcMTASAPath ( "debug.txt" ) ) )
+            {
+                int* pData = NULL;
+                *pData = 0;
+            }
         }
     }
 }

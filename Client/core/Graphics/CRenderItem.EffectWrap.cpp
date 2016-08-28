@@ -1215,8 +1215,8 @@ SString CEffectWrapImpl::GetAnnotationNameAndValue( D3DXHANDLE hParameter, uint 
     D3DXPARAMETER_DESC AnnotDesc;
     m_pD3DEffect->GetParameterDesc( hAnnotation, &AnnotDesc );
     LPCSTR szAnnotValue;
-    m_pD3DEffect->GetString( hAnnotation, &szAnnotValue );
-    strOutValue = szAnnotValue;
+    if ( SUCCEEDED( m_pD3DEffect->GetString( hAnnotation, &szAnnotValue ) ) )
+        strOutValue = szAnnotValue;
     return AnnotDesc.Name;
 }
 

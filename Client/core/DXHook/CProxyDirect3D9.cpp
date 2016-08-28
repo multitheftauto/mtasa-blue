@@ -717,6 +717,15 @@ bool CreateDeviceSecondCallCheck( HRESULT& hOutResult, IDirect3D9* pDirect3D, UI
         return true;
     }
 
+    // Also check for calls from other threads
+    if ( !IsMainThread () )
+    {
+        SString strMessage ( " Passing through call #%d to CreateDevice because not main thread", uiCreateCount );
+        WriteDebugEvent ( strMessage );
+        AddReportLog ( 8627, strMessage );
+        return true;
+    }
+
     if ( ++uiCreateCount == 1 )
         return false;
     WriteDebugEvent ( SString ( " Passing through call #%d to CreateDevice", uiCreateCount ) );
