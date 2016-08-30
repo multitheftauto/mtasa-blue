@@ -56,9 +56,6 @@ bool CWebCore::Initialise ()
     sandboxInfo = scopedSandbox.sandbox_info();
 #endif
 
-    if ( CefExecuteProcess ( mainArgs, app, sandboxInfo ) >= 0 )
-        return false;
-
     CefSettings settings;
 #if !CEF_ENABLE_SANDBOX
     settings.no_sandbox = true;
