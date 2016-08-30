@@ -7,9 +7,7 @@
 *  PURPOSE:     Webbrowser class
 *
 *****************************************************************************/
-
-#ifndef __CWEBCORE_H
-#define __CWEBCORE_H
+#pragma once
 
 #undef GetNextSibling
 #undef GetFirstChild
@@ -116,19 +114,3 @@ private:
     int                                     m_iWhitelistRevision;
     int                                     m_iBlacklistRevision;
 };
-
-class CCefApp : public CefApp, public CefSchemeHandlerFactory
-{
-public:
-    // Error Handler
-    static CefRefPtr<CefResourceHandler> CCefApp::HandleError ( const SString& strError, unsigned int uiError );
-
-    virtual void OnRegisterCustomSchemes ( CefRefPtr<CefSchemeRegistrar> registrar ) override;
-
-    // CefSchemeHandlerFactory methods
-    virtual CefRefPtr<CefResourceHandler> Create ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request ) override;
-
-    IMPLEMENT_REFCOUNTING(CCefApp);
-};
-
-#endif
