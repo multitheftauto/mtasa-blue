@@ -16,6 +16,8 @@ project "Game SA"
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/current/src/windows" }
 	
+	filter {}
+
 	includedirs {
 		"../sdk/",
 		"../../vendor/sparsehash/current/src/"
