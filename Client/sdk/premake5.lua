@@ -1,7 +1,7 @@
-project "Game SA"
+project "SDK"
 	language "C++"
 	kind "SharedLib"
-	targetname "game_sa"
+	targetname "sdk"
 	targetdir(buildpath("mta"))
 	
 	pchheader "StdInc.h"
@@ -17,7 +17,6 @@ project "Game SA"
 		includedirs { "../../vendor/sparsehash/current/src/windows" }
 	
 	includedirs {
-		"../sdk/",
 		"../../vendor/sparsehash/current/src/"
 	}
 	
