@@ -401,9 +401,11 @@ SString SharedUtil::GetLaunchPathFilename( void )
     {
         wchar_t szBuffer[2048];
         GetModuleFileNameW( NULL, szBuffer, NUMELMS(szBuffer) - 1 );
-        if ( IsShortPathName( szBuffer ) )
-            return GetSystemLongPathName( ToUTF8( szBuffer ) );
-        strLaunchPathFilename = ToUTF8( szBuffer );
+        
+        wchar_t fullPath[MAX_PATH];
+        GetFullPathNameW(szBuffer, MAX_PATH, fullPath, nullptr);
+
+        strLaunchPathFilename = ToUTF8(fullPath);
     }
     return strLaunchPathFilename;
 }

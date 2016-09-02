@@ -19,6 +19,7 @@ workspace "MTASA"
 	targetprefix ("")
 	
 	location "Build"
+	startproject "Client Launcher"
 	
 	flags { "C++11", "Symbols" }
 	characterset "MBCS"
