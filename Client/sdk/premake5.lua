@@ -1,7 +1,7 @@
-project "Client_SDK"
+project "Client SDK"
 	language "C++"
 	kind "StaticLib"
-	targetname "Client_SDK"
+	targetname "sdk"
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
