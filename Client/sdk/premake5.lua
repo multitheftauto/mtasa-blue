@@ -1,8 +1,7 @@
-project "SDK"
+project "Client_SDK"
 	language "C++"
-	kind "SharedLib"
-	targetname "sdk"
-	targetdir(buildpath("mta"))
+	kind "StaticLib"
+	targetname "Client_SDK"
 	
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
@@ -12,9 +11,6 @@ project "SDK"
 		["Sources/*"] = "**.cpp",
 		["*"] = "premake5.lua"
 	}
-	
-	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
 	
 	includedirs {
 		"../../vendor/sparsehash/current/src/"
@@ -27,8 +23,11 @@ project "SDK"
 		"**.cpp"
 	}
 	
+	filter "system:windows"
+		includedirs { "../../vendor/sparsehash/current/src/windows" }
+
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
-		
+
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }
