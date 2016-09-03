@@ -776,9 +776,8 @@ CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBro
         else
             return RV_CONTINUE;
     }
-    else if ( scheme == L"mtalocal" )
+    else if ( scheme == L"mtalocal" ||  scheme == L"blob" )
     {
-        // Allow :)
         return RV_CONTINUE;
     }
 
