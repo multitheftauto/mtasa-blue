@@ -4294,10 +4294,10 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby ( CElement * pElement, b
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, int iBlend )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CElement * pElement, const char * szBlockName, const char * szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame )
 {
     assert ( pElement );
-    RUN_CHILDREN( SetPedAnimation ( *iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, iBlend ) )
+    RUN_CHILDREN( SetPedAnimation ( *iter, szBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
 
     if ( IS_PED ( pElement ) )
     {

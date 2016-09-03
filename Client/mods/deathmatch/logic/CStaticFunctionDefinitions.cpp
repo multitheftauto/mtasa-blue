@@ -2100,9 +2100,9 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike ( CClientEntity& Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, int iBlend )
+bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const char * szBlockName, const char * szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame )
 {
-    RUN_CHILDREN ( SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, iBlend ) )
+    RUN_CHILDREN ( SetPedAnimation ( **iter, szBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
 
     if ( IS_PED ( &Entity ) )
     {

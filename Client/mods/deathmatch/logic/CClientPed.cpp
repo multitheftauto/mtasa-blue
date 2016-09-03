@@ -2737,7 +2737,7 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
                 // Copy our name incase it gets deleted
                 SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, 0, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }            
         }
 
@@ -3588,7 +3588,7 @@ void CClientPed::_CreateModel ( void )
             // Copy our anim name incase it gets deleted
             SString strAnimName = m_strAnimationName;
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+            RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, 0, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
         }
 
         // Set the voice that corresponds to our model
@@ -3885,7 +3885,7 @@ void CClientPed::_ChangeModel ( void )
                 // Copy our anim name incase it gets deleted
                 SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, 0, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }
 
             // Set the voice that corresponds to the new model
