@@ -2338,8 +2338,11 @@ bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bI
         {
             auto pWebCore = g_pCore->GetWebCore();
             auto pFocusedBrowser = pWebCore ? pWebCore->GetFocusedWebView () : nullptr;
+            bool isMouseKey = strKey.substr(0, 5) == "mouse";
 
-            if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey ) || ( pFocusedBrowser && !pFocusedBrowser->IsLocal () ) )
+            if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey )
+                || ( pFocusedBrowser && !pFocusedBrowser->IsLocal () && !isMouseKey ) )
+                
                 bIgnore = true;                         // Ignore this keydown and the matching keyup
             else
                 MapInsert( m_AllowKeyUpMap, strKey );   // Use this keydown and the matching keyup
