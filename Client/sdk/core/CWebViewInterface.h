@@ -7,10 +7,7 @@
 *  PURPOSE:     WebView interface class
 *
 *****************************************************************************/
-
-#ifndef __CWEBVIEWINTERFACE_H
-#define __CWEBVIEWINTERFACE_H
-
+#pragma once
 #include "CWebCoreInterface.h"
 
 class CWebBrowserEventsInterface;
@@ -49,6 +46,9 @@ public:
 
     virtual void GetSourceCode      ( const std::function<void( const std::string& code )>& callback ) = 0;
 
+    virtual void Resize             (const CVector2D& size) = 0;
+    virtual CVector2D GetSize       () = 0;
+
     // Ajax Handlers
     using ajax_callback_t = const std::function<const SString ( std::vector<SString>& vecGet, std::vector<SString>& vecPost )>;
     
@@ -63,5 +63,3 @@ public:
     virtual bool GoForward          () = 0;
     virtual void Refresh            ( bool bIgnoreCache ) = 0;
 };
-
-#endif

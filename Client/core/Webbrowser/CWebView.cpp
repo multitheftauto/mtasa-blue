@@ -14,7 +14,7 @@
 #include <cef3/include/cef_task.h>
 #include "CWebDevTools.h"
 
-CWebView::CWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
+CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent)
 {
     m_bIsLocal = bIsLocal;
     m_bIsTransparent = bTransparent;
@@ -330,6 +330,20 @@ void CWebView::GetSourceCode ( const std::function<void( const std::string& code
     m_pWebView->GetMainFrame ()->GetSource ( visitor );
 }
 
+void CWebView::Resize(const CVector2D& size)
+{
+    // Resize underlying texture
+    m_pWebBrowserRenderItem->Resize(size);
+
+    // Send resize event to CEF
+    m_pWebView->GetHost()->WasResized();
+}
+
+CVector2D CWebView::GetSize()
+{
+    return CVector2D(m_pWebBrowserRenderItem->m_uiSizeX, m_pWebBrowserRenderItem->m_uiSizeY);
+}
+
 bool CWebView::GetFullPathFromLocal ( SString& strPath )
 {
      return m_pEventsInterface->Events_OnResourcePathCheck ( strPath );
@@ -486,17 +500,10 @@ bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
     if ( m_bBeingDestroyed )
         return false;
 
-    IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
-    if ( !pD3DSurface )
-        return false;
-
-    D3DSURFACE_DESC SurfaceDesc;
-    pD3DSurface->GetDesc ( &SurfaceDesc );
-
     rect.x = 0;
     rect.y = 0;
-    rect.width = SurfaceDesc.Width;
-    rect.height = SurfaceDesc.Height;
+    rect.width = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeX);
+    rect.height = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeY);
     return true;
 }
 

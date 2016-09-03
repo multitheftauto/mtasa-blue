@@ -8,8 +8,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-#ifndef __CGUIWEBBROWSER_IMPL_H
-#define __CGUIWEBBROWSER_IMPL_H
+#pragma once
 
 #include <gui/CGUIWebBrowser.h>
 #include "CGUITexture_Impl.h"
@@ -30,8 +29,7 @@ public:
                                 ~CGUIWebBrowser_Impl    ();
     void                        Clear                   ();
 
-    void                        LoadFromWebView         ( CWebViewInterface* pWebView );
-    bool                        LoadFromTexture         ( IDirect3DTexture9* pD3DTexture );
+    void                        LoadFromWebView         (CWebViewInterface* pWebView);
 
     void                        SetFrameEnabled         ( bool bFrameEnabled );
     bool                        IsFrameEnabled          ();
@@ -42,6 +40,8 @@ public:
     virtual eCGUIType           GetType                 () override { return CGUI_WEBBROWSER; }
 
     bool                        HasInputFocus           ();
+
+    virtual void                SetSize                 (const CVector2D& vecSize, bool bRelative = false) override;
 
 protected:
     bool                        Event_MouseButtonDown   ( const CEGUI::EventArgs& e );
@@ -55,11 +55,13 @@ private:
     CGUI_Impl*                  m_pGUI;
     CEGUI::ImagesetManager*     m_pImagesetManager;
     CEGUI::Imageset*            m_pImageset;
-    const CEGUI::Image*         m_pImage;
+    CEGUI::Image*               m_pImage;
 
     CWebViewInterface*          m_pWebView;
 
+    #define EXCLUDE_SET_SIZE // WTF? TODO: Refactor this
     #include "CGUIElement_Inc.h"
+    #undef EXCLUDE_SET_SIZE
 };
 
 
@@ -67,23 +69,19 @@ private:
 class CGUIWebBrowserTexture : public CEGUI::DirectX9Texture
 {
 public:
-    CGUIWebBrowserTexture ( CEGUI::Renderer* pOwner, IDirect3DTexture9* pTexture );
+    CGUIWebBrowserTexture(CEGUI::Renderer* pOwner, CWebViewInterface* pWebView);
 
-    virtual ushort getWidth () const override { return m_Width; };
-    virtual ushort getHeight () const override { return m_Height; };
+    virtual ushort getWidth() const override;
+    virtual ushort getHeight() const override;
 
     // Override with empty function (--> eliminate the functinions from DirectX9Texture)
     virtual void loadFromFile ( const CEGUI::String& filename, const CEGUI::String& resourceGroup ) override {};
     virtual void loadFromMemory ( const void* buffPtr, uint buffWidth, uint buffHeight ) override {};
 
-    virtual LPDIRECT3DTEXTURE9 getD3DTexture () const override { return m_pTexture; };
+    virtual LPDIRECT3DTEXTURE9 getD3DTexture() const override;
     virtual void preD3DReset () {};
     virtual void postD3DReset () {};
 
 private:
-    IDirect3DTexture9* m_pTexture;
-    ushort m_Width;
-    ushort m_Height;
+    CWebViewInterface* m_pWebView;
 };
-
-#endif

@@ -54,6 +54,8 @@ public:
 
     void                        GetSourceCode       ( const std::function<void( const std::string& code )>& callback );
 
+    void                        Resize              (const CVector2D& size);
+
     using ajax_callback_t = const std::function<const SString ( std::vector<SString>& vecGet, std::vector<SString>& vecPost )>;
     
     bool                        AddAjaxHandler      ( const SString& strURL, ajax_callback_t& handler );

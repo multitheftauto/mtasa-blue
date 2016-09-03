@@ -32,7 +32,7 @@
 class CWebView : public CWebViewInterface, private CefClient, private CefRenderHandler, private CefLoadHandler, private CefRequestHandler, private CefLifeSpanHandler, private CefJSDialogHandler, private CefDialogHandler, private CefDisplayHandler
 {
 public:
-    CWebView                    ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false );
+    CWebView                    (bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false);
     virtual ~CWebView           ();
     void                        Initialise ();
     void                        SetWebBrowserEvents ( CWebBrowserEventsInterface* pInterface ) { m_pEventsInterface = pInterface; };
@@ -72,6 +72,9 @@ public:
     bool SetAudioVolume         ( float fVolume );
 
     void GetSourceCode          ( const std::function<void( const std::string& code )>& callback );
+
+    virtual void Resize         (const CVector2D& size) override;
+    virtual CVector2D GetSize   () override;
 
     bool GetFullPathFromLocal   ( SString& strPath );
     bool VerifyFile             ( const SString& strPath );

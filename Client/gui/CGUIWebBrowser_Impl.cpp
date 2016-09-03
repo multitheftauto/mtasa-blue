@@ -78,47 +78,38 @@ void CGUIWebBrowser_Impl::Clear ()
     }
 }
 
-bool CGUIWebBrowser_Impl::LoadFromTexture ( IDirect3DTexture9* pTexture )
-{
-    if ( m_pImageset && m_pImage )
-    {
-        m_pImageset->undefineAllImages ();
-    }
-
-    CGUIWebBrowserTexture* pCEGUITexture = new CGUIWebBrowserTexture ( m_pGUI->GetRenderer (), pTexture );
-
-    // Get an unique identifier for CEGUI for the imageset
-    char szUnique [CGUI_CHAR_SIZE];
-    m_pGUI->GetUniqueName ( szUnique );
-
-    // Create an imageset
-    if ( !m_pImageset )
-    {
-        while ( m_pImagesetManager->isImagesetPresent( szUnique ) )
-            m_pGUI->GetUniqueName ( szUnique );
-        m_pImageset = m_pImagesetManager->createImageset ( szUnique, pCEGUITexture, true );
-    }
-
-    // Get an unique identifier for CEGUI for the image
-    m_pGUI->GetUniqueName ( szUnique );
-    
-    // Define an image and get its pointer
-    m_pImageset->defineImage ( szUnique, CEGUI::Point ( 0, 0 ), CEGUI::Size ( pCEGUITexture->getWidth (), pCEGUITexture->getHeight () ), CEGUI::Point ( 0, 0 ) );
-    m_pImage = &m_pImageset->getImage ( szUnique );
-
-    // Set the image just loaded as the image to be drawn for the widget
-    reinterpret_cast < CEGUI::StaticImage* > ( m_pWindow )->setImage ( m_pImage );
-
-    // Success
-    return true;
-}
-
-void CGUIWebBrowser_Impl::LoadFromWebView ( CWebViewInterface* pWebView )
+void CGUIWebBrowser_Impl::LoadFromWebView(CWebViewInterface* pWebView)
 {
     m_pWebView = pWebView;
 
-    // Load webview texture
-    LoadFromTexture ( pWebView->GetTexture () );
+    if (m_pImageset && m_pImage)
+    {
+        m_pImageset->undefineAllImages();
+    }
+
+    CGUIWebBrowserTexture* pCEGUITexture = new CGUIWebBrowserTexture(m_pGUI->GetRenderer(), m_pWebView);
+
+    // Get an unique identifier for CEGUI for the imageset
+    char szUnique[CGUI_CHAR_SIZE];
+    m_pGUI->GetUniqueName(szUnique);
+
+    // Create an imageset
+    if (!m_pImageset)
+    {
+        while (m_pImagesetManager->isImagesetPresent(szUnique))
+            m_pGUI->GetUniqueName(szUnique);
+        m_pImageset = m_pImagesetManager->createImageset(szUnique, pCEGUITexture, true);
+    }
+
+    // Get an unique identifier for CEGUI for the image
+    m_pGUI->GetUniqueName(szUnique);
+
+    // Define an image and get its pointer
+    m_pImageset->defineImage(szUnique, CEGUI::Point(0, 0), CEGUI::Size(pCEGUITexture->getWidth(), pCEGUITexture->getHeight()), CEGUI::Point(0, 0));
+    m_pImage = const_cast<CEGUI::Image*>(&m_pImageset->getImage(szUnique)); // const_cast here is a huge hack, but is okay here since all images generated here are unique
+
+    // Set the image just loaded as the image to be drawn for the widget
+    reinterpret_cast<CEGUI::StaticImage*>(m_pWindow)->setImage(m_pImage);
 }
 
 void CGUIWebBrowser_Impl::SetFrameEnabled ( bool bFrameEnabled )
@@ -146,6 +137,21 @@ void CGUIWebBrowser_Impl::Render ()
 bool CGUIWebBrowser_Impl::HasInputFocus ()
 {
     return m_pWebView->HasInputFocus ();
+}
+
+void CGUIWebBrowser_Impl::SetSize(const CVector2D& vecSize, bool bRelative)
+{
+    // Call base class function
+    CGUIElement_Impl::SetSize(vecSize, bRelative);
+    auto absSize = CGUIElement_Impl::GetSize(false);
+
+    // Update image area
+    if (m_pImage)
+        m_pImage->setSourceTextureArea(CEGUI::Rect(0, 0, absSize.fX, absSize.fY));
+
+    // Resize underlying web view as well
+    if (m_pWebView)
+        m_pWebView->Resize(absSize);
 }
 
 bool CGUIWebBrowser_Impl::Event_MouseButtonDown ( const CEGUI::EventArgs& e )
@@ -205,15 +211,21 @@ bool CGUIWebBrowser_Impl::Event_Deactivated ( const CEGUI::EventArgs& e )
 }
 
 
-CGUIWebBrowserTexture::CGUIWebBrowserTexture ( CEGUI::Renderer* pOwner, IDirect3DTexture9* pTexture ) : CEGUI::DirectX9Texture ( pOwner )
+CGUIWebBrowserTexture::CGUIWebBrowserTexture(CEGUI::Renderer* pOwner, CWebViewInterface* pWebView) : CEGUI::DirectX9Texture(pOwner), m_pWebView(pWebView)
 {
-    m_pTexture = pTexture;
+}
 
-    // Get width and height
-    D3DSURFACE_DESC SurfaceDesc;
-    if ( pTexture->GetLevelDesc ( 0, &SurfaceDesc ) == ERROR_SUCCESS )
-    {
-        m_Width = SurfaceDesc.Width;
-        m_Height = SurfaceDesc.Height;
-    }
+ushort CGUIWebBrowserTexture::getWidth() const
+{
+    return static_cast<ushort>(m_pWebView->GetSize().fX);
+}
+
+ushort CGUIWebBrowserTexture::getHeight() const
+{
+    return static_cast<ushort>(m_pWebView->GetSize().fY);
+}
+
+LPDIRECT3DTEXTURE9 CGUIWebBrowserTexture::getD3DTexture() const
+{
+    return m_pWebView->GetTexture();
 }

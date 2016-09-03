@@ -536,6 +536,7 @@ class CWebBrowserItem : public CTextureItem
     virtual void    OnResetDevice           ( void );
     void            CreateUnderlyingData    ( void );
     void            ReleaseUnderlyingData   ( void );
+    void            Resize                  (const CVector2D& size);
 
     IDirect3DSurface9*    m_pD3DRenderTargetSurface;
 };

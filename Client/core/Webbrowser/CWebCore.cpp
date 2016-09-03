@@ -91,7 +91,7 @@ bool CWebCore::Initialise ()
 CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
 {
     // Create our webview implementation
-    CefRefPtr<CWebView> pWebView = new CWebView ( uiWidth, uiHeight, bIsLocal, pWebBrowserRenderItem, bTransparent );
+    CefRefPtr<CWebView> pWebView = new CWebView(bIsLocal, pWebBrowserRenderItem, bTransparent);
     m_WebViews.push_back ( pWebView );
 
     return static_cast < CWebViewInterface* > ( pWebView.get () );

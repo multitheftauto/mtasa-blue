@@ -43,7 +43,9 @@ void GetPosition ( CVector2D& vecPosition, bool bRelative = false )         { CG
 void SetWidth ( float fX, bool bRelative = false )                          { CGUIElement_Impl::SetWidth ( fX, bRelative ); };
 void SetHeight ( float fY, bool bRelative = false )                         { CGUIElement_Impl::SetHeight ( fY, bRelative ); };
 
+#ifndef EXCLUDE_SET_SIZE // WTF? TODO: Refactor this
 void SetSize ( const CVector2D& vecSize, bool bRelative = false )           { CGUIElement_Impl::SetSize ( vecSize, bRelative ); };
+#endif
 CVector2D GetSize ( bool bRelative = false )                                { return CGUIElement_Impl::GetSize ( bRelative ); };
 void GetSize ( CVector2D& vecSize, bool bRelative = false )                 { CGUIElement_Impl::GetSize ( vecSize, bRelative ); };
 

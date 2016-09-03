@@ -137,6 +137,11 @@ void CClientWebBrowser::GetSourceCode ( const std::function<void( const std::str
     return m_pWebView->GetSourceCode ( callback );
 }
 
+void CClientWebBrowser::Resize(const CVector2D& size)
+{
+    m_pWebView->Resize(size);
+}
+
 bool CClientWebBrowser::CanGoBack ()
 {
     return m_pWebView->CanGoBack ();

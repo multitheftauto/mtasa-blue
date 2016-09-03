@@ -48,7 +48,8 @@ public:
     LUA_DECLARE ( NavigateBrowserForward );
     LUA_DECLARE ( NavigateBrowserBack );
     LUA_DECLARE ( ReloadBrowserPage );
-    LUA_DECLARE ( ToggleBrowserDevTools )
+    LUA_DECLARE ( ToggleBrowserDevTools );
+    LUA_DECLARE(ResizeBrowser);
     LUA_DECLARE ( GUICreateBrowser );
     LUA_DECLARE ( GUIGetBrowser );
 };

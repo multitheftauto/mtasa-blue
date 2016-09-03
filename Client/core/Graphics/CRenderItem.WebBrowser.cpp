@@ -125,3 +125,14 @@ void CWebBrowserItem::ReleaseUnderlyingData ( void )
     SAFE_RELEASE( m_pD3DRenderTargetSurface )
     SAFE_RELEASE( m_pD3DTexture )
 }
+
+void CWebBrowserItem::Resize(const CVector2D& size)
+{
+    // Update size
+    m_uiSizeX = static_cast<uint>(size.fX);
+    m_uiSizeY = static_cast<uint>(size.fY);
+
+    // Recreate texture
+    ReleaseUnderlyingData();
+    CreateUnderlyingData();
+}

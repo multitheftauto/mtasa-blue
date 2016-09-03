@@ -46,6 +46,7 @@ void CLuaBrowserDefs::LoadFunctions ( void )
             { "navigateBrowserForward", NavigateBrowserForward },
             { "reloadBrowserPage", ReloadBrowserPage },
             { "toggleBrowserDevTools", ToggleBrowserDevTools },
+            { "resizeBrowser", ResizeBrowser },
             { "guiCreateBrowser", GUICreateBrowser },
             { "guiGetBrowser", GUIGetBrowser },
         };
@@ -114,6 +115,7 @@ void CLuaBrowserDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "navigateForward", "navigateBrowserForward" );
     lua_classfunction ( luaVM, "reloadPage", "reloadBrowserPage" );
     lua_classfunction ( luaVM, "toggleDevTools", "toggleBrowserDevTools" );
+    lua_classfunction(luaVM, "resize", "resizeBrowser");
 
     lua_classfunction ( luaVM, "requestDomains", "requestBrowserDomains" );
     lua_classfunction ( luaVM, "isDomainBlocked", "isBrowserDomainBlocked" );
@@ -750,6 +752,28 @@ int CLuaBrowserDefs::ToggleBrowserDevTools ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaBrowserDefs::ResizeBrowser(lua_State* luaVM)
+{
+//  bool resizeBrowser(browser webBrowser, float width, float height)
+    CClientWebBrowser* pWebBrowser; CVector2D size;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pWebBrowser);
+    argStream.ReadVector2D(size);
+
+    if (!argStream.HasErrors())
+    {
+        pWebBrowser->Resize(size);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
