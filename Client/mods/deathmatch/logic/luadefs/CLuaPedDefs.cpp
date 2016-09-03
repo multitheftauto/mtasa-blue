@@ -2183,11 +2183,11 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
     SString strBlockName = "";
     SString strAnimName = "";
     int iTime = -1;
+    int iBlend = 250;
     bool bLoop = true;
     bool bUpdatePosition = true;
     bool bInterruptable = true;
     bool bFreezeLastFrame = true;
-    int iBlend = 250;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
@@ -2227,6 +2227,7 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPedDefs::SetPedAnimationProgress ( lua_State* luaVM )
 {
