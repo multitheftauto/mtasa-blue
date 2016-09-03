@@ -591,6 +591,7 @@ public:
     SString                     m_strAnimationName;
     bool                        m_bRequestedAnimation;
     int                         m_iTimeAnimation;
+    int                         m_iBlendAnimation;
     bool                        m_bLoopAnimation;
     bool                        m_bUpdatePositionAnimation;
     bool                        m_bInterruptableAnimation;

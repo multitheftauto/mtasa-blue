@@ -162,6 +162,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_pAnimationBlock = NULL;
     m_bRequestedAnimation = false;
     m_iTimeAnimation = -1;
+    m_iBlendAnimation = 250;
     m_bLoopAnimation = false;    
     m_bUpdatePositionAnimation = false;
     m_bInterruptableAnimation = false;
@@ -3588,7 +3589,7 @@ void CClientPed::_CreateModel ( void )
             // Copy our anim name incase it gets deleted
             SString strAnimName = m_strAnimationName;
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, 0, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+            RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
         }
 
         // Set the voice that corresponds to our model
@@ -5700,6 +5701,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
     m_pAnimationBlock = pBlock;
     m_strAnimationName = szAnimName; 
     m_iTimeAnimation = iTime;
+    m_iBlendAnimation = iBlend;
     m_bLoopAnimation = bLoop;
     m_bUpdatePositionAnimation = bUpdatePosition;
     m_bInterruptableAnimation = bInterruptable;
