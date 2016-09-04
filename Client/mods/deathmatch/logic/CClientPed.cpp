@@ -2738,7 +2738,7 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
                 // Copy our name incase it gets deleted
                 SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, 0, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }            
         }
 
@@ -3886,7 +3886,7 @@ void CClientPed::_ChangeModel ( void )
                 // Copy our anim name incase it gets deleted
                 SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, 0, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }
 
             // Set the voice that corresponds to the new model
@@ -5684,13 +5684,13 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
-            }                
+            }
         }
         else
         {
-            SString strMessage ( "%s %d (%s)", pBlock->GetName (), pBlock->GetIndex (), szAnimName ); 
+            SString strMessage ( "%s %d (%s)", pBlock->GetName (), pBlock->GetIndex (), szAnimName );
             g_pCore->LogEvent ( 543, "Blocking anim load fail", "", strMessage );
-            AddReportLog ( 5431, SString ( "Failed to load animation %s", *strMessage ) );           
+            AddReportLog ( 5431, SString ( "Failed to load animation %s", *strMessage ) );
 /*
             // TODO: unload unreferenced blocks later on
             g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );
@@ -5699,7 +5699,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         }
     }
     m_pAnimationBlock = pBlock;
-    m_strAnimationName = szAnimName; 
+    m_strAnimationName = szAnimName;
     m_iTimeAnimation = iTime;
     m_iBlendAnimation = iBlend;
     m_bLoopAnimation = bLoop;
