@@ -8,9 +8,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#if !defined USING_VCEXPRESS
 #include "afxres.h"
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
