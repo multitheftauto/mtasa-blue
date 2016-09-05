@@ -2200,12 +2200,11 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
             argStream.ReadString ( strBlockName, "" );
     argStream.ReadString ( strAnimName, "" );
     argStream.ReadNumber ( iTime, -1 );
-    if ( argStream.NextIsNumber ( ) )
-        argStream.ReadNumber ( iBlend, 250 );
     argStream.ReadBool ( bLoop, true );
     argStream.ReadBool ( bUpdatePosition, true );
     argStream.ReadBool ( bInterruptable, true );
     argStream.ReadBool ( bFreezeLastFrame, true );
+    argStream.ReadNumber ( iBlend, 250 );
 
     if ( !argStream.HasErrors () )
     {
