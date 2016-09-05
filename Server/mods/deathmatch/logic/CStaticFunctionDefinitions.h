@@ -21,12 +21,7 @@
 
 class CStaticFunctionDefinitions;
 
-#ifndef __CSTATICFUNCTIONDEFINITIONS_H
-#define __CSTATICFUNCTIONDEFINITIONS_H
-
-#ifndef NULL
-#define NULL 0
-#endif
+#pragma once
 
 class CStaticFunctionDefinitions
 {
@@ -109,10 +104,6 @@ public:
     static bool                 SetElementFrozen                    ( CElement* pElement, bool bFrozen );
     static bool                 SetLowLodElement                    ( CElement* pElement, CElement* pLowLodElement );
     static bool                 SetElementCallPropagationEnabled    ( CElement* pElement, bool bEnable );
-
-    // Scoreboard
-    static bool                 AddScoreboardColumn                 ( const char* szID, const char* szName, float fWidth );
-    static bool                 RemoveScoreboardColumn              ( const char* szID );
 
     // Player get funcs
     static unsigned int         GetPlayerCount                      ( void );
@@ -259,8 +250,6 @@ public:
     static bool                 GetVehicleLightState                ( CVehicle* pVehicle, unsigned char ucLight, unsigned char& ucState );
     static bool                 GetVehiclePanelState                ( CVehicle* pVehicle, unsigned char ucPanel, unsigned char& ucState );
     static bool                 GetVehicleOverrideLights            ( CVehicle* pVehicle, unsigned char& ucLights );
-    static bool                 GetVehicleDoorsLocked               ( CVehicle* pVehicle, bool& bLocked );
-    static bool                 GetVehicleGunsEnabled               ( CVehicle* pVehicle, bool& bGunsEnabled );
     static bool                 GetVehiclePaintjob                  ( CVehicle* pVehicle, unsigned char& ucPaintjob );
     static bool                 GetVehiclePlateText                 ( CVehicle* pVehicle, char* szPlateText );
     static bool                 IsVehicleDamageProof                ( CVehicle* pVehicle, bool& bDamageProof );
@@ -385,7 +374,6 @@ public:
     // Blip create/destroy functions
     static CBlip*               CreateBlip                          ( CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo );
     static CBlip*               CreateBlipAttachedTo                ( CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo );
-    static bool                 DestroyBlipsAttachedTo              ( CElement* pElement );
 
     // Blip get functions
     static bool                 GetBlipIcon                         ( CBlip* pBlip, unsigned char& ucIcon );
@@ -613,8 +601,6 @@ public:
     static bool                 RestoreWorldModel                   ( unsigned short usModel, float fRadius, const CVector& vecPosition, char cInterior );
     static bool                 RestoreAllWorldModels               ( void );
     static bool                 SendSyncIntervals                   ( CPlayer* pPlayer = NULL );
-    static bool                 SetPedTargetingMarkerEnabled        ( bool bEnabled );
-    static bool                 IsPedTargetingMarkerEnabled         ( void );
     static bool                 SetMoonSize                         ( int iMoonSize );
     static bool                 ResetMoonSize                       ( void );
 
@@ -716,5 +702,3 @@ public:
     static const char*          GetVersionBuildTag                  ( );
     static SString              GetVersionSortable                  ( );
 };
-
-#endif

@@ -38,7 +38,6 @@ public:
     static bool                         AddEvent                            ( CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger );
     static bool                         AddEventHandler                     ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     static bool                         RemoveEventHandler                  ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction );
-    static bool                         GetEventHandlers                    ( CLuaMain& LuaMain, const char* szName );
     static bool                         TriggerEvent                        ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled );
     static bool                         TriggerServerEvent                  ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments );
     static bool                         TriggerLatentServerEvent            ( const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain, ushort usResourceNetId );
@@ -66,7 +65,6 @@ public:
     static bool                         GetElementRotation                  ( CClientEntity& Entity, CVector & vecRotation, eEulerRotationOrder rotationOrder );
     static bool                         GetElementVelocity                  ( CClientEntity& Entity, CVector& vecVelocity );
     static bool                         GetElementInterior                  ( CClientEntity& Entity, unsigned char& ucInterior );
-    static bool                         GetElementZoneName                  ( CClientEntity& Entity, SString& strOutName, bool bCitiesOnly = false );
     static bool                         GetElementBoundingBox               ( CClientEntity& Entity, CVector &vecMin, CVector &vecMax );
     static bool                         GetElementRadius                    ( CClientEntity& Entity, float &fRadius );
     static CClientEntity*               GetElementAttachedTo                ( CClientEntity& Entity );
@@ -203,7 +201,6 @@ public:
     static bool                         GetVehicleModelFromName             ( const char* szName, unsigned short& usModel );
     static bool                         GetVehicleUpgradeSlotName           ( unsigned char ucSlot, SString& strOutName );
     static bool                         GetVehicleUpgradeSlotName           ( unsigned short usUpgrade, SString& strOutName );
-    static bool                         GetVehicleDoorsLocked               ( CClientVehicle& Vehicle, bool& bLocked );
     static bool                         GetVehicleNameFromModel             ( unsigned short usModel, SString& strOutName );
     static bool                         GetHelicopterRotorSpeed             ( CClientVehicle& Vehicle, float& fSpeed );
     static bool                         GetVehicleEngineState               ( CClientVehicle& Vehicle, bool& bState );
@@ -382,8 +379,6 @@ public:
     static bool                         SetCursorAlpha                      ( float fAlpha );
 
     // Drawing funcs
-    static CClientDxFont*               CreateDxFont                        ( const SString& strFullFilePath, uint uiSize, bool bBold, const SString& strMetaPath, CResource* pResource );
-    static CClientGuiFont*              CreateGuiFont                       ( const SString& strFullFilePath, uint uiSize, const SString& strMetaPath, CResource* pResource );
     static ID3DXFont*                   ResolveD3DXFont                     ( eFontType fontType, CClientDxFont* pDxFontElement );
 
     // GUI funcs
@@ -453,9 +448,8 @@ public:
     static inline void                  GUIGridListRemoveColumn             ( CClientGUIElement& GUIElement, unsigned int uiColumn )                                    { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveColumn ( uiColumn ); };
     static inline void                  GUIGridListSetColumnWidth           ( CClientGUIElement& GUIElement, unsigned int uiColumn, float fWidth, bool bRelative = true )   { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetColumnWidth ( uiColumn, fWidth, bRelative ); };
     static inline void                  GUIGridListSetColumnTitle           ( CClientGUIElement& GUIElement, unsigned int uiColumn, const char *szTitle )               { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> SetColumnTitle ( uiColumn, szTitle ); };
-    //static const char*                GUIGridListGetColumnTitle           ( CClientGUIElement& GUIElement, int iColumn );                                  
     static void                         GUIGridListSetScrollBars            ( CClientEntity& Element, bool bH, bool bV );
-    static inline int                   GUIGridListAddRow                    (CClientGUIElement& GUIElement, bool bFast, std::vector < std::pair<SString, bool> > *m_items = NULL)       { return static_cast < CGUIGridList* > (GUIElement.GetCGUIElement())->AddRow(bFast,m_items); };
+    static inline int                   GUIGridListAddRow                   ( CClientGUIElement& GUIElement, bool bFast, std::vector < std::pair<SString, bool> > *m_items = NULL)       { return static_cast < CGUIGridList* > (GUIElement.GetCGUIElement())->AddRow(bFast,m_items); };
     static inline int                   GUIGridListInsertRowAfter           ( CClientGUIElement& GUIElement, int iRow, std::vector < std::pair<SString, bool> > *m_items = NULL )            { return static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> InsertRowAfter ( iRow, m_items ); };
     static inline void                  GUIGridListRemoveRow                ( CClientGUIElement& GUIElement, int iRow )                                             { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> RemoveRow ( iRow ); };
     static inline void                  GUIGridListAutoSizeColumn           ( CClientGUIElement& GUIElement, unsigned int uiColumn )                                    { static_cast < CGUIGridList* > ( GUIElement.GetCGUIElement () ) -> AutoSizeColumn ( uiColumn ); };
@@ -681,11 +675,6 @@ public:
     static float*                       GetSoundWaveData                    ( CClientPlayer& Player, int iLength );
     static bool                         GetSoundLevelData                   ( CClientPlayer& Player, DWORD& dwLeft, DWORD& dwRight );
     static bool                         GetSoundSpeed                       ( CClientPlayer& Player, float& fSpeed );
-    static bool                         SetSoundMinDistance                 ( CClientPlayer& Player, float fDistance );
-    static bool                         GetSoundMinDistance                 ( CClientPlayer& Player, float& fDistance );
-    static bool                         SetSoundMaxDistance                 ( CClientPlayer& Player, float fDistance );
-    static bool                         GetSoundMaxDistance                 ( CClientPlayer& Player, float& fDistance );
-    static bool                         GetSoundMetaTags                    ( CClientPlayer& Player, const SString& strFormat, SString& strMetaTags );
     static bool                         SetSoundEffectEnabled               ( CClientPlayer& Player, const SString& strEffectName, bool bEnable );
     static bool                         SetSoundPan                         ( CClientPlayer& Player, float fPan );
     static bool                         GetSoundPan                         ( CClientPlayer& Player, float& fPan );
