@@ -2183,6 +2183,7 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
     SString strBlockName = "";
     SString strAnimName = "";
     int iTime = -1;
+    int iBlend = 250;
     bool bLoop = true;
     bool bUpdatePosition = true;
     bool bInterruptable = true;
@@ -2199,6 +2200,8 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
             argStream.ReadString ( strBlockName, "" );
     argStream.ReadString ( strAnimName, "" );
     argStream.ReadNumber ( iTime, -1 );
+    if ( argStream.NextIsNumber ( ) )
+        argStream.ReadNumber ( iBlend, 250 );
     argStream.ReadBool ( bLoop, true );
     argStream.ReadBool ( bUpdatePosition, true );
     argStream.ReadBool ( bInterruptable, true );
@@ -2208,7 +2211,7 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
     {
         if ( pEntity )
         {
-            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, strBlockName == "" ? NULL : strBlockName.c_str (), strAnimName == "" ? NULL : strAnimName.c_str (), iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
+            if ( CStaticFunctionDefinitions::SetPedAnimation ( *pEntity, strBlockName == "" ? NULL : strBlockName.c_str (), strAnimName == "" ? NULL : strAnimName.c_str (), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
@@ -2224,6 +2227,7 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPedDefs::SetPedAnimationProgress ( lua_State* luaVM )
 {

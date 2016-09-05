@@ -405,7 +405,7 @@ public:
 
     bool                        IsRunningAnimation      ( void );
     void                        RunAnimation            ( AssocGroupId animGroup, AnimationId animID );
-    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
+    void                        RunNamedAnimation       ( CAnimBlock * pBlock, const char * szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true, bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false, bool bOffsetPed = false, bool bHoldLastFrame = false );
     void                        KillAnimation           ( void );
     inline CAnimBlock *         GetAnimationBlock       ( void )                                        { return m_pAnimationBlock; }
     const char*                 GetAnimationName        ( void )                                        { return m_strAnimationName; }
@@ -591,6 +591,7 @@ public:
     SString                     m_strAnimationName;
     bool                        m_bRequestedAnimation;
     int                         m_iTimeAnimation;
+    int                         m_iBlendAnimation;
     bool                        m_bLoopAnimation;
     bool                        m_bUpdatePositionAnimation;
     bool                        m_bInterruptableAnimation;

@@ -261,10 +261,10 @@ void CPedRPCs::SetPedDoingGangDriveby ( CClientEntity* pSource, NetBitStreamInte
 
 void CPedRPCs::SetPedAnimation ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
-    // Read out the player and vehicle id
     char szBlockName [ 64 ], szAnimName [ 64 ];
     unsigned char ucBlockSize, ucAnimSize;
     int iTime;
+    int iBlend = 250;
     bool bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
 
     if ( bitStream.Read ( ucBlockSize ) )
@@ -286,12 +286,15 @@ void CPedRPCs::SetPedAnimation ( CClientEntity* pSource, NetBitStreamInterface& 
                          bitStream.ReadBit ( bInterruptable ) &&
                          bitStream.ReadBit ( bFreezeLastFrame ) )
                     {
-                        szAnimName [ ucAnimSize ] = 0;
+                        if ( bitStream.Version ( ) >= 0x065 )
+                            bitStream.Read ( iBlend );
+
+                        szAnimName[ucAnimSize] = 0;
 
                         CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( szBlockName );
                         if ( pBlock )
                         {
-                            pPed->RunNamedAnimation ( pBlock, szAnimName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
+                            pPed->RunNamedAnimation ( pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
                         }
                     }
                 }

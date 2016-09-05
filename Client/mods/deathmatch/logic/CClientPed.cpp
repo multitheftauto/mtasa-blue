@@ -162,6 +162,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_pAnimationBlock = NULL;
     m_bRequestedAnimation = false;
     m_iTimeAnimation = -1;
+    m_iBlendAnimation = 250;
     m_bLoopAnimation = false;    
     m_bUpdatePositionAnimation = false;
     m_bInterruptableAnimation = false;
@@ -2737,7 +2738,7 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
                 // Copy our name incase it gets deleted
                 SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }            
         }
 
@@ -3588,7 +3589,7 @@ void CClientPed::_CreateModel ( void )
             // Copy our anim name incase it gets deleted
             SString strAnimName = m_strAnimationName;
             // Run our animation
-            RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+            RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
         }
 
         // Set the voice that corresponds to our model
@@ -3885,7 +3886,7 @@ void CClientPed::_ChangeModel ( void )
                 // Copy our anim name incase it gets deleted
                 SString strAnimName = m_strAnimationName;
                 // Run our animation
-                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
+                RunNamedAnimation ( m_pAnimationBlock, strAnimName, m_iTimeAnimation, m_iBlendAnimation, m_bLoopAnimation, m_bUpdatePositionAnimation, m_bInterruptableAnimation, m_bFreezeLastFrameAnimation );
             }
 
             // Set the voice that corresponds to the new model
@@ -5643,7 +5644,7 @@ void CClientPed::RunAnimation ( AssocGroupId animGroup, AnimationId animID )
 }
 
 
-void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame )
+void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame )
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5678,17 +5679,18 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
             }
             
             if ( !bFreezeLastFrame ) flags |= 0x08; // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
-            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, 4.0f, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
+            float fBlendDelta =  1 / Max ( (float)iBlend, 1.0f ) * 1000;
+            CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, fBlendDelta, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
             if ( pTask )
             {
                 pTask->SetAsPedTask ( m_pPlayerPed, TASK_PRIORITY_PRIMARY );
-            }                
+            }
         }
         else
         {
-            SString strMessage ( "%s %d (%s)", pBlock->GetName (), pBlock->GetIndex (), szAnimName ); 
+            SString strMessage ( "%s %d (%s)", pBlock->GetName (), pBlock->GetIndex (), szAnimName );
             g_pCore->LogEvent ( 543, "Blocking anim load fail", "", strMessage );
-            AddReportLog ( 5431, SString ( "Failed to load animation %s", *strMessage ) );           
+            AddReportLog ( 5431, SString ( "Failed to load animation %s", *strMessage ) );
 /*
             // TODO: unload unreferenced blocks later on
             g_pGame->GetStreaming ()->RequestAnimations ( pBlock->GetIndex (), 8 );
@@ -5697,8 +5699,9 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
         }
     }
     m_pAnimationBlock = pBlock;
-    m_strAnimationName = szAnimName; 
+    m_strAnimationName = szAnimName;
     m_iTimeAnimation = iTime;
+    m_iBlendAnimation = iBlend;
     m_bLoopAnimation = bLoop;
     m_bUpdatePositionAnimation = bUpdatePosition;
     m_bInterruptableAnimation = bInterruptable;

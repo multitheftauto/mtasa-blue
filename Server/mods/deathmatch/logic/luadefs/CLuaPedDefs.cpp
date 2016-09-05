@@ -407,10 +407,11 @@ int CLuaPedDefs::IsPedFrozen ( lua_State* luaVM )
 
 int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
 {
-    // bool setPedAnimation ( ped thePed [, string block=nil, string anim=nil, int time=-1, bool loop=true, bool updatePosition=true, bool interruptable=true, bool freezeLastFrame = true] )
+    // bool setPedAnimation ( ped thePed [, string block=nil, string anim=nil, int time=-1, int blend=250, bool loop=true, bool updatePosition=true, bool interruptable=true, bool freezeLastFrame = true] )
     CElement * pPed;
     SString strBlockName, strAnimName;
     int iTime;
+    int iBlend = 250;
     bool bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
     bool bDummy;
 
@@ -428,6 +429,8 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
         argStream.ReadNumber ( iTime, -1 );
     else
         iTime = -1;
+    if ( argStream.NextIsNumber ( ) )
+        argStream.ReadNumber ( iBlend, 250 );
     argStream.ReadBool ( bLoop, true );
     argStream.ReadBool ( bUpdatePosition, true );
     argStream.ReadBool ( bInterruptable, true );
@@ -439,7 +442,7 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
         szBlock = strBlockName.empty () ? NULL : strBlockName.c_str ();
         szAnim = strAnimName.empty () ? NULL : strAnimName.c_str ();
 
-        if ( CStaticFunctionDefinitions::SetPedAnimation ( pPed, szBlock, szAnim, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
+        if ( CStaticFunctionDefinitions::SetPedAnimation ( pPed, szBlock, szAnim, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
