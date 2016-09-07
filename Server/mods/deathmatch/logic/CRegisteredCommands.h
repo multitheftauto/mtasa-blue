@@ -15,8 +15,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CREGISTEREDCOMMANDS_H
-#define __CREGISTEREDCOMMANDS_H
+#pragma once
 
 #include <list>
 
@@ -59,5 +58,3 @@ private:
 
     class CAccessControlListManager*    m_pACLManager;
 };
-
-#endif
