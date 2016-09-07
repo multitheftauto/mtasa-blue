@@ -84,6 +84,7 @@
 #include <CClientDxFont.h>
 #include <CClientGuiFont.h>
 #include <CClientMaterial.h>
+#include <CClientModel.h>
 #include <CClientTexture.h>
 #include <CClientShader.h>
 #include <CClientWebBrowser.h>

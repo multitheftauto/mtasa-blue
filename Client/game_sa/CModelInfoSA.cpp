@@ -256,23 +256,8 @@ BOOL CModelInfoSA::IsVehicle ( )
 
 bool CModelInfoSA::IsPlayerModel ( )
 {
-    return ( m_dwModelID == 0 ||
-             m_dwModelID == 1 ||
-             m_dwModelID == 2 ||
-             m_dwModelID == 7 ||
-             (m_dwModelID >= 9 &&
-             m_dwModelID != 208 &&
-             m_dwModelID != 149 &&
-             m_dwModelID != 119 &&
-             m_dwModelID != 86 &&
-             m_dwModelID != 74 &&
-             m_dwModelID != 65 &&
-             m_dwModelID != 42 &&
-             m_dwModelID <= 272) ||
-             (m_dwModelID >= 274 &&
-             m_dwModelID <= 288) ||
-             (m_dwModelID >= 290 &&
-             m_dwModelID <= 312 ) );
+    // Every ped model uses same collision
+    return ( GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == ( CColModelSAInterface * ) VAR_CTempColModels_ModelPed1 );
 }
 
 BOOL CModelInfoSA::IsUpgrade ( void )
@@ -447,6 +432,7 @@ VOID CModelInfoSA::Remove ( )
                 call    dwFunction
                 add     esp, 4
             }
+
         }
     }
 }
@@ -1164,6 +1150,11 @@ void CModelInfoSA::MakePedModel ( char * szTexture )
     pGame->GetStreaming ()->RequestSpecialModel ( m_dwModelID, szTexture, 0 );
 }
 
+void CModelInfoSA::DeallocateModel ( void )
+{
+    Remove ();
+    ppModelInfo [ m_dwModelID ] = NULL;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //

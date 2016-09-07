@@ -290,12 +290,12 @@ bool CGameSA::IsInForeground ()
     return *VAR_IsForegroundWindow;
 }
 
-CModelInfo  * CGameSA::GetModelInfo(DWORD dwModelID )
+CModelInfo  * CGameSA::GetModelInfo ( DWORD dwModelID, bool canBeInvalid )
 { 
     DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID )");
     if (dwModelID < MODELINFO_MAX) 
     {
-        if ( ModelInfo [dwModelID ].IsValid () )
+        if ( ModelInfo [dwModelID ].IsValid () || canBeInvalid )
         {
             return &ModelInfo[dwModelID];
         }

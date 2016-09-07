@@ -160,7 +160,7 @@ public:
     CFxManagerSA*                   GetFxManagerSA ()            { return m_pFxManager; }
 
     CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
-    CModelInfo              * GetModelInfo( DWORD dwModelID );
+    CModelInfo              * GetModelInfo ( DWORD dwModelID, bool canBeInvalid = false );
 
     inline DWORD            GetSystemTime (  )      { DEBUG_TRACE("DWORD     GetSystemTime (  )");return *VAR_SystemTime; };
     inline BOOL             IsAtMenu (  )           { DEBUG_TRACE("BOOL     IsAtMenu (  )");if(*VAR_IsAtMenu) return TRUE; else return FALSE; };
