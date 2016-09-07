@@ -9,6 +9,7 @@ before_build:
   - utils\premake5 vs2015
 
 after_build:
+  - utils\premake5 install_data
   - utils\premake5 compose_files
 
 clone_depth: 1
@@ -24,3 +25,4 @@ notifications:
 
 artifacts:
   - path: InstallFiles
+    name: MTASA
