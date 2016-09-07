@@ -2272,11 +2272,6 @@ void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
-        // Remove bad net fix data if disabled
-        if ( !GetConfig()->GetBadNetBulletFixEnabled() )
-        {
-            Packet.m_DamagedPlayerID = INVALID_ELEMENT_ID;
-        }
         // Relay to other players
         RelayNearbyPacket ( Packet );
 

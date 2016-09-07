@@ -123,7 +123,6 @@ public:
     bool                            GetUseAltPulseOrder             ( void ) const              { return m_bUseAltPulseOrder != 0; }
     const SString&                  GetLoadstringLogFilename        ( void ) const              { return m_strLoadstringLogFilename; }
     bool                            GetLoadstringLogEnabled         ( void ) const              { return !m_strLoadstringLogFilename.empty(); }
-    bool                            GetBadNetBulletFixEnabled       ( void ) const              { return m_bBadNetBulletFixEnabled != 0; }
     bool                            GetCrashDumpUploadEnabled       ( void ) const              { return m_bCrashDumpUploadEnabled != 0; }
     bool                            GetFilterDuplicateLogLinesEnabled ( void ) const            { return m_bFilterDuplicateLogLinesEnabled != 0; }
 
@@ -214,7 +213,6 @@ private:
     SString                         m_strLoadstringLogFilename;
     int                             m_iMinClientVersionAutoUpdate;
     int                             m_iServerLogicFpsLimit;
-    int                             m_bBadNetBulletFixEnabled;
     int                             m_bCrashDumpUploadEnabled;
     int                             m_bFilterDuplicateLogLinesEnabled;
 };

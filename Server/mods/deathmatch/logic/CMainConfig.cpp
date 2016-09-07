@@ -1447,7 +1447,6 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { false, false, 0,      1,      2,      "compact_internal_databases",           &m_iCompactInternalDatabases,               NULL },
             { true, true,   0,      1,      2,      "minclientversion_auto_update",         &m_iMinClientVersionAutoUpdate,             NULL },
             { true, true,   0,      0,      100,    "server_logic_fps_limit",               &m_iServerLogicFpsLimit,                    NULL },
-            { true, true,   0,      1,      1,      "bad_net_bullet_fix",                   &m_bBadNetBulletFixEnabled,                 NULL },
             { true, true,   0,      1,      1,      "crash_dump_upload",                    &m_bCrashDumpUploadEnabled,                 NULL },
             { true, true,   0,      1,      1,      "filter_duplicate_log_lines",           &m_bFilterDuplicateLogLinesEnabled,         NULL },
         };
