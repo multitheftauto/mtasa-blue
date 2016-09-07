@@ -134,17 +134,13 @@ public:
     bool                        SaveSettings                ( void );
     bool                        IntegrityCheck              ( void );
 
-    CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
-    CAccount*                   Get                         ( const char* szName, const char* szIP );
+    CAccount*                   Get                         ( const char* szName );
     CAccount*                   GetAccountFromScriptID      ( uint uiScriptID );
     SString                     GetActiveCaseVariation      ( const SString& strName );
 
     bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword );
-    bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount, bool bAutoLogin = false );
+    bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount );
     bool                        LogOut                      ( CClient* pClient, CClient* pEchoClient );
-
-    inline bool                 IsAutoLoginEnabled          ( void )                    { return m_bAutoLogin; }
-    inline void                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; }
 
     std::shared_ptr<CLuaArgument> GetAccountData              ( CAccount* pAccount, const char* szKey );
     bool                        SetAccountData              ( CAccount* pAccount, const char* szKey, const SString& strValue, int iType );
@@ -175,9 +171,6 @@ public:
 
 protected:
     CMappedAccountList          m_List;
-
-    bool                        m_bAutoLogin;
-
     bool                        m_bChangedSinceSaved;
     long long                   m_llLastTimeSaved;
     CConnectHistory             m_AccountProtect;

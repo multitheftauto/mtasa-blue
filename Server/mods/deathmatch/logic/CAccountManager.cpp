@@ -18,7 +18,6 @@
 CAccountManager::CAccountManager ( const SString& strDbPathFilename )
     : m_AccountProtect( 6, 30000, 60000 * 1 )     // Max of 6 attempts per 30 seconds, then 1 minute ignore
 {
-    m_bAutoLogin = false;
     m_llLastTimeSaved = GetTickCount64_ ();
     m_bChangedSinceSaved = false;
     m_iAccounts = 1;
@@ -82,9 +81,6 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
-
-    //Check whether autologin was enabled in the main config
-    m_bAutoLogin = g_pGame->GetConfig()->IsAutoLoginEnabled();
 }
 
 
@@ -145,7 +141,7 @@ bool CAccountManager::Load( void )
             }
 
             // If name gone doolally or account with this name already exists, remove account
-            if ( strName.length () > 256 || Get ( strName, true ) )
+            if ( strName.length () > 256 || Get ( strName ) )
             {
                 bNeedsVacuum = true;
                 bRemoveAccount = true;
@@ -373,7 +369,7 @@ bool CAccountManager::IntegrityCheck ()
 }
 
 
-CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
+CAccount* CAccountManager::Get ( const char* szName )
 {
     if ( szName && szName [ 0 ] )
     {
@@ -382,31 +378,9 @@ CAccount* CAccountManager::Get ( const char* szName, bool bRegistered )
         for ( uint i = 0 ; i < results.size () ; i++ )
         {
             CAccount* pAccount = results[i];
-            if ( pAccount->IsRegistered () == bRegistered )
-            {
-                return pAccount;
-            }
-        }
-    }
-    return NULL;
-}
-
-
-CAccount* CAccountManager::Get ( const char* szName, const char* szIP )
-{
-    if ( szName && szName [ 0 ] && szIP && szIP [ 0 ] )
-    {
-        std::vector < CAccount* > results;
-        m_List.FindAccountMatches ( &results, szName, true );
-        for ( uint i = 0 ; i < results.size () ; i++ )
-        {
-            CAccount* pAccount = results[i];
             if ( pAccount->IsRegistered () )
             {
-                if ( pAccount->GetIP ().compare ( szIP ) == 0 )
-                {
-                    return pAccount;
-                }
+                return pAccount;
             }
         }
     }
@@ -520,7 +494,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
     return LogIn ( pClient, pEchoClient, pAccount );
 }
 
-bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount, bool bAutoLogin )
+bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount )
 {
     // Log him in
     CAccount* pCurrentAccount = pClient->GetAccount ();
@@ -562,7 +536,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
         CLuaArguments Arguments;
         Arguments.PushAccount ( pCurrentAccount );
         Arguments.PushAccount ( pAccount );
-        Arguments.PushBoolean ( bAutoLogin );
+        Arguments.PushBoolean ( false );    // was bAutoLogin
         if ( !pClientElement->CallEvent ( "onPlayerLogin", Arguments ) )
         {
             // DENIED!
@@ -585,10 +559,7 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* 
     // Tell the player
     if ( pEchoClient )
     {
-        if ( bAutoLogin )
-            pEchoClient->SendEcho ( "auto-login: You successfully logged in" );
-        else
-            pEchoClient->SendEcho ( "login: You successfully logged in" );
+        pEchoClient->SendEcho ( "login: You successfully logged in" );
     }
 
     // Update who was info

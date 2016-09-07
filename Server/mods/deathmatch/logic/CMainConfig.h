@@ -100,7 +100,6 @@ public:
     SString                         GetMinClientVersion             ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     int                             GetMinClientVersionAutoUpdate   ( void )                    { return m_iMinClientVersionAutoUpdate; }
-    inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
     bool                            GetThreadNetEnabled             ( void )                    { return m_bThreadNetEnabled; }
     const SString&                  GetGlobalDatabasesPath          ( void )                    { return m_strGlobalDatabasesPath; }
@@ -191,7 +190,6 @@ private:
     std::set < SString >            m_EnableDiagnosticMap;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
-    bool                            m_bAutoLogin;
     SString                         m_strIdFile;
     SString                         m_strGlobalDatabasesPath;
     SString                         m_strSystemDatabasesPath;

@@ -85,7 +85,6 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_uiScriptDebugLogLevel = 0;
     m_bDontBroadcastLan = false;
     m_usFPSLimit = 36;
-    m_bAutoLogin = false;
     m_uiVoiceSampleRate = 1;
     m_ucVoiceQuality = 4;
     m_bVoiceEnabled = false;
@@ -487,8 +486,6 @@ bool CMainConfig::Load ( void )
     // Grab the backup count
     GetInteger ( m_pRootNode, "backup_copies", m_iBackupAmount );
     m_iBackupAmount = Clamp ( 0, m_iBackupAmount, 100 );
-
-    GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
 
     // bandwidth_reduction
     GetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );

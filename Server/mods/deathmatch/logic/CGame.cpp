@@ -1323,28 +1323,6 @@ void CGame::InitialDataStream ( CPlayer& Player )
 
     marker.Set ( "onPlayerJoin" );
 
-    // If auto-login is enabled, try and log him in
-    if ( m_pAccountManager->IsAutoLoginEnabled () )
-    {
-        std::string strIP = Player.GetSourceIP ();
-        std::string strPlayerSerial = Player.GetSerial();
-        CAccount* pAccount = m_pAccountManager->Get ( Player.GetNick (), strIP.c_str () );
-        if ( pAccount )
-        {
-            if ( !pAccount->GetClient ( ) )
-            {
-                m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
-            }
-            else
-            {
-                CLogger::AuthPrintf ( "LOGIN: %s failed to login in as '%s' (IP: %s  Serial: %s) due to the account already being in use.\n", Player.GetNick (), pAccount->GetName ().c_str (), strIP.c_str (), strPlayerSerial.c_str () );
-                Player.SendEcho ( "auto-login: You could not login because your account is already in use." );
-            }
-        }
-    }
-
-    marker.Set ( "AutoLogin" );
-
     // Register them on the lightweight sync manager.
     m_lightsyncManager.RegisterPlayer ( &Player );
 
