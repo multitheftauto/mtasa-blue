@@ -17,7 +17,6 @@ class CAccountManager;
 #define __CACCOUNTMANAGER_H
 
 #include "CAccount.h"
-#include "CXMLConfig.h"
 typedef uint SDbConnectionId;
 
 #define GUEST_ACCOUNT_NAME          "guest"
@@ -119,20 +118,17 @@ bool ListContains ( const CMappedAccountList& itemList, const T& item )
 //
 // CAccountManager
 //
-class CAccountManager: public CXMLConfig
+class CAccountManager
 {
     friend class CAccount;
 public:
-                                CAccountManager             ( const char* szFileName, SString strBuffer );
+                                CAccountManager             ( const SString& strDbPathFilename );
                                 ~CAccountManager            ( void );
 
     void                        DoPulse                     ( void );
 
     bool                        Load                        ( void );
-    bool                        Load                        ( CXMLNode* pParent );
-    bool                        LoadSetting                 ( CXMLNode* pNode );
     bool                        Save                        ( void );
-    bool                        Save                        ( CXMLNode* pParent );
     void                        Save                        ( CAccount* pParent, bool bCheckForErrors = true );
 
     bool                        SaveSettings                ( void );
@@ -157,9 +153,6 @@ public:
 
     void                        GetAccountsBySerial         ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
 
-    bool                        ConvertXMLToSQL             ( const char* szFileName );
-    bool                        LoadXML                     ( CXMLNode* pParent );
-    void                        SmartLoad                   ( void );
     void                        Register                    ( CAccount* pAccount );
     void                        RemoveAccount               ( CAccount* pAccount );
 protected:
@@ -168,7 +161,6 @@ protected:
 
     void                        MarkAsChanged               ( CAccount* pAccount );
     void                        ChangingName                ( CAccount* pAccount, const SString& strOldName, const SString& strNewName );
-    void                        ClearSQLDatabase            ( void );
 public:
     void                        RemoveAll                   ( void );
     static void                 StaticDbCallback            ( CDbJobData* pJobData, void* pContext );
@@ -191,7 +183,6 @@ protected:
     CConnectHistory             m_AccountProtect;
     SDbConnectionId             m_hDbConnection;
     CDatabaseManager*           m_pDatabaseManager;
-    bool                        m_bLoadXML;
     int                         m_iAccounts;
 };
 

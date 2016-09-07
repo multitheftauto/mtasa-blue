@@ -15,19 +15,17 @@
 
 #include "StdInc.h"
 
-CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): CXMLConfig ( szFileName )
-    , m_AccountProtect( 6, 30000, 60000 * 1 )     // Max of 6 attempts per 30 seconds, then 1 minute ignore
+CAccountManager::CAccountManager ( const SString& strDbPathFilename )
+    : m_AccountProtect( 6, 30000, 60000 * 1 )     // Max of 6 attempts per 30 seconds, then 1 minute ignore
 {
     m_bAutoLogin = false;
     m_llLastTimeSaved = GetTickCount64_ ();
     m_bChangedSinceSaved = false;
-    //set loadXML to false
-    m_bLoadXML = false;
     m_iAccounts = 1;
 
     //Load internal.db
     m_pDatabaseManager = g_pGame->GetDatabaseManager ();
-    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( strBuffer ) );
+    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( strDbPathFilename ) );
 
     // Check if new installation
     CRegistryResult result;
@@ -37,7 +35,6 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
     //Create all our tables (Don't echo the results)
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT)" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS userdata (id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER)" );
-    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, key TEXT, value INTEGER)" );
 
     // Check if unique index on accounts exists
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'" );
@@ -86,57 +83,10 @@ CAccountManager::CAccountManager ( const char* szFileName, SString strBuffer ): 
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
 
-    //Pull our settings
-    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT key, value from settings" );
-
-    //Did we get any results
-    if ( result->nRows == 0 )
-    {
-        //Set our settings and clear the accounts/userdata tables just in case
-        m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO settings (key, value) VALUES(?,?)", SQLITE_TEXT, "XMLParsed", SQLITE_INTEGER, 0 );
-        //Tell the Server to load the xml file rather than the SQL
-        m_bLoadXML = true;
-    }
-    else
-    {
-        bool bLoadXMLMissing = true;
-        for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
-        {
-            const CRegistryResultRow& row = *iter;
-            SString strSetting = (const char *)row[0].pVal;
-
-            //Do we have a result for XMLParsed
-            if ( strSetting == "XMLParsed" ) 
-            {
-                //Is XMLParsed zero
-                if ( row[1].nVal == 0 ) 
-                {
-                    //Tell the Server to load the xml file rather than the SQL
-                    m_bLoadXML = true;
-                }
-                bLoadXMLMissing = false;
-            }
-        }
-        //if we didn't load the XMLParsed variable
-        if ( bLoadXMLMissing )
-        {
-            //Insert it
-            m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO settings (key, value) VALUES(?,?)", SQLITE_TEXT, "XMLParsed", SQLITE_INTEGER, 0 );
-            //Tell the Server to load the xml file rather than the SQL
-            m_bLoadXML = true;
-        }
-    }
-
     //Check whether autologin was enabled in the main config
     m_bAutoLogin = g_pGame->GetConfig()->IsAutoLoginEnabled();
 }
-void CAccountManager::ClearSQLDatabase ( void )
-{    
-    //No settings file or server owner wants to reload from the accounts file
-    //Clear the accounts and userdata tables
-    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE from accounts" );
-    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE from userdata");
-}
+
 
 CAccountManager::~CAccountManager ( void )
 {
@@ -157,180 +107,6 @@ void CAccountManager::DoPulse ( void )
         // Save it
         Save ();
     }
-}
-
-bool CAccountManager::ConvertXMLToSQL ( const char* szFileName )
-{
-    //##Keep for backwards compatability with accounts.xml##
-    if ( szFileName == NULL )
-        szFileName = m_strFileName.c_str ();
-
-    if ( szFileName && szFileName [ 0 ] )
-    {
-        // Delete existing XML
-        if ( m_pFile )
-        {
-            delete m_pFile;
-        }
-
-        // Create new one
-        m_pFile = g_pServerInterface->GetXML ()->CreateXML ( szFileName );
-        if ( m_pFile )
-        {
-            if ( m_pFile->Parse () )
-            {
-                CXMLNode* pRootNode = m_pFile->GetRootNode ();
-                if ( pRootNode )
-                {
-                    ClearSQLDatabase();
-                    return LoadXML ( pRootNode );
-                }
-            }
-            else
-            {
-                //Save the settings to SQL
-                SaveSettings();
-                if ( FileExists ( szFileName ) )
-                    CLogger::LogPrint ( "Conversion Failed: 'accounts.xml' failed to load.\n" );
-                //Add Console to the SQL Database (You don't need to create an account since the server takes care of that (Have to do this here or Console may be created after other accounts if the owner uses addaccount too early)
-                m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, "Console", SQLITE_TEXT, "" );
-                ++m_iAccounts;
-            }
-        }
-    }
-    return false;
-}
-
-
-bool CAccountManager::LoadXML ( CXMLNode* pParent )
-{
-    CLogger::LogPrint ( "Converting Accounts.xml into internal.db\n" );
-
-    //##Keep for backwards compatability with accounts.xml##
-    #define ACCOUNT_VALUE_LENGTH 128
-
-    std::string strBuffer, strName, strPassword, strIP, strDataKey, strDataValue;
-
-    if ( pParent )
-    {
-        CXMLNode* pAccountNode = NULL;
-        unsigned int uiAccountNodesCount = pParent->GetSubNodeCount ();
-        for ( unsigned int i = 0 ; i < uiAccountNodesCount ; i++ )
-        {
-            pAccountNode = pParent->GetSubNode ( i );
-            if ( pAccountNode == NULL )
-                continue;
-
-            strBuffer = pAccountNode->GetTagName ();
-            if ( strBuffer.compare ( "account" ) == 0 )
-            {
-                CXMLAttribute* pAttribute = pAccountNode->GetAttributes ().Find ( "name" );
-                if ( pAttribute )
-                {
-                    strName = pAttribute->GetValue ();
-
-                    pAttribute = pAccountNode->GetAttributes ().Find ( "password" );
-                    if ( pAttribute )
-                    {
-                        strPassword = pAttribute->GetValue ();
-                        if ( !strName.empty () && !strPassword.empty () )
-                        {
-                            pAttribute = pAccountNode->GetAttributes ().Find ( "ip" );
-                            if ( pAttribute )
-                            {
-                                strIP = pAttribute->GetValue ();
-                                CAccount* pAccount = NULL;
-                                pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
-                                if ( pAttribute )
-                                {
-                                    //Insert the entry into the accounts database
-                                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, ip, serial, password) VALUES(?,?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strIP.c_str(), SQLITE_TEXT, pAttribute->GetValue ().c_str(), SQLITE_TEXT, strPassword.c_str() );
-                                    pAccount = new CAccount ( this, true, strName, strPassword, strIP, m_iAccounts++, pAttribute->GetValue () );
-                                
-                                }
-                                else
-                                {
-                                    //Insert the entry into the accounts database
-                                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, ip, password) VALUES(?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strIP.c_str(), SQLITE_TEXT, strPassword.c_str() );
-                                    pAccount = new CAccount ( this, true, strName, strPassword, strIP, m_iAccounts++ );
-                                }
-
-                                // Grab the data on this account
-                                CXMLNode* pDataNode = NULL;
-                                int iType = LUA_TNIL;
-                                unsigned int uiDataNodesCount = pAccountNode->GetSubNodeCount ();
-                                for ( unsigned int j = 0 ; j < uiDataNodesCount ; j++ )
-                                {
-                                    pDataNode = pAccountNode->GetSubNode ( j );
-                                    if ( pDataNode == NULL )
-                                        continue;
-                                    strBuffer = pDataNode->GetTagName ();
-                                    if ( strBuffer == "nil_data" )
-                                        iType = LUA_TNIL;
-                                    else if ( strBuffer == "boolean_data" )
-                                        iType = LUA_TBOOLEAN;
-                                    else if ( strBuffer == "string_data" )
-                                        iType = LUA_TSTRING;
-                                    else if ( strBuffer == "number_data" )
-                                        iType = LUA_TNUMBER;
-
-                                    CXMLAttributes* pAttributes = &(pDataNode->GetAttributes ());
-                                    CXMLAttribute* pAttribute = NULL;
-                                    unsigned int uiDataValuesCount = pAttributes->Count ();
-                                    for ( unsigned int a = 0 ; a < uiDataValuesCount ; a++ )
-                                    {
-                                        pAttribute = pAttributes->Get ( a );
-                                        strDataKey = pAttribute->GetName ();
-                                        strDataValue = pAttribute->GetValue ();
-                                        char szKey[128];
-                                        STRNCPY( szKey, strDataKey.c_str(), 128 );
-                                        SetAccountData( pAccount, szKey, strDataValue, iType );
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                pAttribute = pAccountNode->GetAttributes ().Find ( "serial" );
-                                if ( pAttribute )
-                                {
-                                    //Insert the entry into the accounts database
-                                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password, serial) VALUES(?,?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strPassword.c_str(), SQLITE_TEXT, pAttribute->GetValue().c_str() );
-                                    new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, pAttribute->GetValue () );
-                                }
-                                else
-                                {
-                                    //Insert the entry into the accounts database
-                                    m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strPassword.c_str() );
-                                    new CAccount ( this, true, strName, strPassword, "", m_iAccounts++, "" );
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if ( strName == CONSOLE_ACCOUNT_NAME )
-                            {
-                                //Add Console to the SQL Database (You don't need to create an account since the server takes care of that
-                                m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT INTO accounts (name, password) VALUES(?,?)", SQLITE_TEXT, "Console", SQLITE_TEXT, "" );
-                                ++m_iAccounts;
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                //Load the settings from XML
-                LoadSetting ( pAccountNode );
-            }
-        }
-        //Save the settings to SQL
-        SaveSettings();
-        CLogger::LogPrint ( "Conversion Complete.\n" );
-        m_bChangedSinceSaved = false;
-        return true;
-    }
-
-    return false;
 }
 
 
@@ -471,24 +247,6 @@ bool CAccountManager::Load( void )
 }
 
 
-bool CAccountManager::LoadSetting ( CXMLNode* pNode )
-{
-    //##Keep for backwards compatability with accounts.xml##
-    if ( pNode->GetTagName ().compare ( "autologin" ) == 0 )
-    {
-        bool bTemp;
-        if ( pNode->GetTagContent ( bTemp ) )
-        {
-            m_bAutoLogin = bTemp;
-        }
-    }
-    else
-        return false;
-
-    return true;
-}
-
-
 void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
 {
     SString strName = pAccount->GetName();
@@ -531,14 +289,6 @@ bool CAccountManager::Save ( void )
         if ( (*iter)->IsRegistered () && (*iter)->HasChanged() )
             Save ( *iter );
 
-    return true;
-}
-
-
-bool CAccountManager::SaveSettings ()
-{
-    //Update our XML Load SQL entry
-    m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE settings SET value=? WHERE key=?", SQLITE_INTEGER, 1, SQLITE_TEXT, "XMLParsed" );
     return true;
 }
 
@@ -1182,22 +932,6 @@ void CAccountManager::GetAccountsBySerial ( const SString& strSerial, std::vecto
     }
 }
 
-
-void CAccountManager::SmartLoad ()
-{
-    //##Function to work out if we need to reload the accounts.xml file into internal.db##
-    //If we need to reload the XML file do it
-    if ( m_bLoadXML ) {
-        //Convert XML to SQL with our filename
-        ConvertXMLToSQL( m_strFileName.c_str () );
-        //Set loadXML to false so when we save internal.db it won't reload our XML file next run
-        m_bLoadXML = false;
-    }
-    else
-        //else load our internal.db
-        Load ();
-
-}
 
 void CAccountManager::Register( CAccount* pAccount )
 {

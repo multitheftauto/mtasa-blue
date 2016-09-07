@@ -602,7 +602,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pDatabaseManager = NewDatabaseManager ();
     m_pLuaCallbackManager = new CLuaCallbackManager ();
     m_pRegistryManager = new CRegistryManager ();
-    m_pAccountManager = new CAccountManager ( NULL, strBuffer );
+    m_pAccountManager = new CAccountManager ( strBuffer );
 
     // Create and start the HTTP server
     m_pHTTPD = new CHTTPD;
@@ -828,9 +828,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pRegistry->IntegrityCheck ();
 
     // Load the accounts
-    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "accounts.xml" );
-    m_pAccountManager->SetFileName ( strBuffer );
-    m_pAccountManager->SmartLoad ();
+    m_pAccountManager->Load ();
 
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket );
