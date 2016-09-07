@@ -7,11 +7,12 @@ local BIN_DIR = "Bin"
 local DATA_DIR = "Shared/data/MTA San Andreas"
 
 -- TODO
-local NET_PATH_X86_WIN = "https://"
+local NET_PATH_X86_WIN = "https://mirror.mtasa.com/bdata/net.dll"
 --local NET_PATH_X64_WIN = "https://"
-local NET_PATH_X86_LINUX = "https://"
---local NET_PATH_X64_LINUX = "https://"
-local NETC_PATH_WIN = "https://"
+local NETC_PATH_WIN = "https://mirror.mtasa.com/bdata/netc.dll"
+
+local NET_PATH_X86_LINUX = "https://mirror.mtasa.com/bdata/net.so"
+local NET_PATH_X64_LINUX = "https://mirror.mtasa.com/bdata/net_64.so"
 
 newaction {
 	trigger = "install_data",
@@ -24,22 +25,20 @@ newaction {
 		-- Copy data files
 		os.copydir(DATA_DIR, BIN_DIR)
 
-		if false then -- TODO
-			if os.get() == "windows" then
-				http.download(NET_PATH_X86_WIN, BIN_DIR.."/server/net.dll")
-				--http.download(NET_PATH_X64_WIN, BIN_DIR.."/server/x64/mods/net.dll")
-				http.download(NETC_PATH_WIN, BIN_DIR.."/MTA/netc.dll")
-				
-				os.copyfile("/MTA/netc.dll", "/MTA/netc_d.dll")
-				os.copyfile("/server/net.dll", "/server/net_d.dll")
-				--os.copyfile("/server/x64/net.dll", "/server/x64/net_d.dll")
-			else
-				http.download(NET_PATH_X86_LINUX, BIN_DIR.."/server/net.so")
-				--http.download(NET_PATH_X64_LINUX, BIN_DIR.."/server/x64/mods/net.so")
-				
-				os.copyfile("/server/net.so", "/server/net_d.so")
-				--os.copyfile("/server/x64/net.so", "/server/x64/net_d.so")
-			end
+		if os.get() == "windows" then
+			http.download(NET_PATH_X86_WIN, BIN_DIR.."/server/net.dll")
+			--http.download(NET_PATH_X64_WIN, BIN_DIR.."/server/x64/mods/net.dll")
+			http.download(NETC_PATH_WIN, BIN_DIR.."/MTA/netc.dll")
+			
+			os.copyfile(BIN_DIR.."/MTA/netc.dll", BIN_DIR.."/MTA/netc_d.dll")
+			os.copyfile(BIN_DIR.."/server/net.dll", BIN_DIR.."/server/net_d.dll")
+			--os.copyfile("/server/x64/net.dll", "/server/x64/net_d.dll")
+		else
+			http.download(NET_PATH_X86_LINUX, BIN_DIR.."/server/net.so")
+			http.download(NET_PATH_X64_LINUX, BIN_DIR.."/server/x64/mods/net.so")
+			
+			os.copyfile(BIN_DIR.."/server/net.so", BIN_DIR.."/server/net_d.so")
+			os.copyfile(BIN_DIR.."/server/x64/net.so", BIN_DIR.."/server/x64/net_d.so")
 		end
 	end
 }
