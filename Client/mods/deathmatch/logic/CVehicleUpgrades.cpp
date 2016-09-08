@@ -88,7 +88,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
             bReturn = ( us == 1005 || us == 1004 || us == 1142 || us == 1143 || us == 1144 || us == 114 || us == 1020 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1003 || us == 1017 || us == 1007 );
         break;
         case 402: 
-            bReturn = ( us == 1009 || us == 1009 || us == 1010 );
+            bReturn = ( us == 1009 || us == 1010 );
         break;
         case 404: 
             bReturn = ( us == 1020 || us == 1021 || us == 1019 || us == 1013 || us == 1008 || us == 1009 || us == 1010 || us == 1002 || us == 1016 || us == 1000 || us == 1017 || us == 1007 );
@@ -262,7 +262,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible ( unsigned short usUpgrade )
             bReturn = ( us == 1092 || us == 1089 || us == 1166 || us == 1165 || us == 1008 || us == 1009 || us == 1010 || us == 1168 || us == 1167 || us == 1088 || us == 1091 || us == 1164 || us == 1163 || us == 1094 || us == 1090 || us == 1095 || us == 1093 );
         break;
         case 559: 
-            bReturn = ( us == 1065 || us == 1066 || us == 1160 || us == 1173 || us == 1008 || us == 1009 || us == 1010 || us == 1159 || us == 1161 || us == 1162 || us == 1158 || us == 1067 || us == 1068 || us == 1071 || us == 1069 || us == 1072 || us == 1070 || us == 1009 );
+            bReturn = ( us == 1065 || us == 1066 || us == 1160 || us == 1173 || us == 1008 || us == 1009 || us == 1010 || us == 1159 || us == 1161 || us == 1162 || us == 1158 || us == 1067 || us == 1068 || us == 1071 || us == 1069 || us == 1072 || us == 1070 );
         break;
         case 560: 
             bReturn = ( us == 1028 || us == 1029 || us == 1169 || us == 1170 || us == 1008 || us == 1009 || us == 1010 || us == 1141 || us == 1140 || us == 1032 || us == 1033 || us == 1138 || us == 1139 || us == 1027 || us == 1026 || us == 1030 || us == 1031 );

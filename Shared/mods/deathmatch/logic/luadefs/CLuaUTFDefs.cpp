@@ -78,7 +78,7 @@ int CLuaUTFDefs::UtfSub ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         std::wstring strUTF = MbUTF8ToUTF16 ( strInput );
-        size_t l = static_cast <int> ( strUTF.size () );
+        size_t l = strUTF.size ();
 
         //posrelat them both
         if ( iStart < 0 ) iStart += (ptrdiff_t) l + 1;

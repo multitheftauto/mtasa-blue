@@ -1273,7 +1273,7 @@ int CLuaDrawingDefs::DxSetTexturePixels ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CVector2D vecEndPosition = vecEndPosition + vecSize;
+        CVector2D vecEndPosition = vecPosition + vecSize;
         RECT rc = { (int) vecPosition.fX, (int) vecPosition.fY, (int) vecEndPosition.fX, (int) vecEndPosition.fY };
         if ( g_pCore->GetGraphics ()->GetPixelsManager ()->SetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, vecSize.fY == 0 ? NULL : &rc, surfaceIndex ) )
         {
