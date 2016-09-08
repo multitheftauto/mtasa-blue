@@ -1,4 +1,4 @@
-##Multi Theft Auto: San Andreas 
+##Multi Theft Auto: San Andreas
 [![Build Status](https://img.shields.io/travis/multitheftauto/mtasa-blue/master.svg?label=Linux:master)](https://travis-ci.org/multitheftauto/mtasa-blue)
 [![Build Status](https://img.shields.io/travis/multitheftauto/mtasa-blue/1.5.2.svg?label=Linux:1.5.2)](https://travis-ci.org/multitheftauto/mtasa-blue)
 [![Build Status](https://img.shields.io/appveyor/ci/multitheftauto/mtasa-blue/master.svg?label=Windows:master)](https://ci.appveyor.com/project/multitheftauto/mtasa-blue)
