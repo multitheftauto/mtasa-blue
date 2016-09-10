@@ -588,11 +588,11 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
         RemoveDirectory ( ExtractPath ( strTestFilePath ) );
     }
 
-    // Check reg key exists
+    /* Check reg key exists
     {
         if ( GetRegistryValue ( "", "Last Install Location" ).empty () )
             ShowLayoutError ( "[Registry key not present]" );   // Can't find reg key
-    }
+    } */
 
     // Check reg key writable
     {
