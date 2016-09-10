@@ -32,11 +32,14 @@ project "Client Core"
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
+		["Resources/*"] = {"**.rc", "../launch/resource/mtaicon.ico"},
 		["*"] = "premake5.lua"
 	}
 	
 	files {
 		"premake5.lua",
+		"../launch/resource/mtaicon.ico",
+		"core.rc",
 		"**.h",
 		"**.cpp"
 	}

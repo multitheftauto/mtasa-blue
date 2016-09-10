@@ -287,6 +287,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "chat_use_cegui",             false );                        // chatbox uses cegui
     DEFAULT ( "chat_nickcompletion",        true );                         // chatbox nick completion
     DEFAULT ( "server_can_flash_window",    true );                         // allow server to flash the window
+    DEFAULT ( "allow_tray_notifications",   false );                        // allow scripts to create tray balloon notifications
     DEFAULT ( "text_scale",                 1.0f );                         // text scale
     DEFAULT ( "invert_mouse",               false );                        // mouse inverting
     DEFAULT ( "fly_with_mouse",             false );                        // flying with mouse controls

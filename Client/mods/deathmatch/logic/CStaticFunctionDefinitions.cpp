@@ -346,6 +346,23 @@ bool CStaticFunctionDefinitions::SetWindowFlashing ( bool flash, uint count )
 }
 
 
+bool CStaticFunctionDefinitions::CreateTrayNotification ( SString strText, eTrayIconType eType, bool useSound )
+{
+    // Don't create notifications if window is active
+    if ( /*g_pCore->IsFocused ( ) ||*/ !g_pCore->GetCVars ( )->GetValue < bool > ( "allow_tray_notifications", false ) )
+        return false;
+
+    // Create tray notification
+    return g_pCore->GetTrayIcon ( )->CreateTrayBallon ( strText, eType, useSound );
+}
+
+
+bool CStaticFunctionDefinitions::GetTrayNotificationEnabled ( void )
+{
+    return g_pCore->GetCVars ( )->GetValue < bool > ( "allow_tray_notifications", false );
+}
+
+
 CClientEntity* CStaticFunctionDefinitions::GetRootElement ( void )
 {
     return m_pRootEntity;

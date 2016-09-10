@@ -42,6 +42,7 @@ DECLARE_ENUM( eAspectRatio );
 DECLARE_ENUM( eRadioStreamIndex );
 DECLARE_ENUM( EComponentBase::EComponentBaseType );
 DECLARE_ENUM( eWebBrowserMouseButton );
+DECLARE_ENUM( eTrayIconType )
 
 enum eDXHorizontalAlign
 {

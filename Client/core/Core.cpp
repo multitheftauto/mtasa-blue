@@ -19,6 +19,8 @@ CCore* g_pCore = NULL;
 CGraphics* g_pGraphics = NULL;
 CLocalization* g_pLocalization = NULL;
 
+HINSTANCE g_hModule = NULL;
+
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
     CFilePathTranslator     FileTranslator;
@@ -45,6 +47,7 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
             // http://msdn.microsoft.com/en-us/library/ms682586%28VS.85%29.aspx
             SetDllDirectory( CalcMTASAPath ( "MTA" ) );
 
+            g_hModule = hModule;
             g_pCore = new CCore;
 
             FileTranslator.GetGTARootDirectory ( WorkingDirectory );
@@ -67,6 +70,8 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
                 delete g_pCore;
                 g_pCore = NULL;
             }
+
+            g_hModule = NULL;
         }
     }
 
