@@ -620,7 +620,7 @@ void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle c
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadStart(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transitionType )
+void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame )
 {
     SString strURL = UTF16ToMbUTF8 ( frame->GetURL () );
     if ( strURL == "blank" )
@@ -853,7 +853,7 @@ void CWebView::OnAfterCreated ( CefRefPtr<CefBrowser> browser )
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefJSDialogHandler.html#OnJSDialog(CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,JSDialogType,constCefString&,constCefString&,CefRefPtr%3CCefJSDialogCallback%3E,bool&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnJSDialog ( CefRefPtr<CefBrowser> browser, const CefString& origin_url, CefJSDialogHandler::JSDialogType dialog_type, const CefString& message_text, const CefString& default_prompt_text, CefRefPtr<CefJSDialogCallback> callback, bool& suppress_message )
+bool CWebView::OnJSDialog ( CefRefPtr<CefBrowser> browser, const CefString& origin_url, const CefString& accept_lang, CefJSDialogHandler::JSDialogType dialog_type, const CefString& message_text, const CefString& default_prompt_text, CefRefPtr<CefJSDialogCallback> callback, bool& suppress_message )
 {
     // TODO: Provide a way to influence Javascript dialogs via Lua
     // e.g. addEventHandler("onClientBrowserDialog", browser, function(message, defaultText) continueBrowserDialog("My input") end)
