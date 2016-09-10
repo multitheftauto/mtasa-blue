@@ -4,8 +4,8 @@ premake.modules.install_cef = {}
 
 -- Config variables
 local CEF_PATH = "vendor/cef3/"
-local CEF_URL = "https://mirror.mtasa.com/bdata/cef-latest.tar.bz2"
-local CEF_URL_MD5 = "https://mirror.mtasa.com/bdata/cef-latest.tar.bz2.md5"
+local CEF_URL = "https://mirror.mtasa.com/bdata/cef-latest_xp.tar.bz2"
+local CEF_URL_MD5 = "https://mirror.mtasa.com/bdata/cef-latest_xp.tar.bz2.md5"
 
 newaction {
 	trigger = "install_cef",
