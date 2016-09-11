@@ -588,11 +588,13 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
         RemoveDirectory ( ExtractPath ( strTestFilePath ) );
     }
 
+#if MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
     // Check reg key exists
     {
         if ( GetRegistryValue ( "", "Last Install Location" ).empty () )
             ShowLayoutError ( "[Registry key not present]" );   // Can't find reg key
     }
+#endif
 
     // Check reg key writable
     {
