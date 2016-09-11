@@ -304,6 +304,9 @@ bool CWebView::SetAudioVolume ( float fVolume )
 
 void CWebView::GetSourceCode ( const std::function<void( const std::string& code )>& callback )
 {
+    if (!m_pWebView)
+        return;
+
     class MyStringVisitor : public CefStringVisitor
     {
     private:
