@@ -269,7 +269,6 @@ public:
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );
-    static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
     static bool                         GetObjectScale                      ( CClientObject& Object, CVector& vecScale );
     static bool                         IsObjectBreakable                   ( CClientObject& Object, bool& bBreakable );
     static bool                         GetObjectMass                       ( CClientObject& Object, float& fMass );
