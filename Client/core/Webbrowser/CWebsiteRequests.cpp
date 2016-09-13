@@ -118,8 +118,8 @@ void CWebsiteRequests::Callback ( bool bAllow )
 
 bool CWebsiteRequests::OnAllowButtonClick ( CGUIElement* pElement )
 {
+    g_pCore->GetWebCore()->AllowPendingPages(m_pCheckRemember->GetSelected());
     Callback ( true );
-    g_pCore->GetWebCore ()->AllowPendingPages ( m_pCheckRemember->GetSelected () );
     Hide ();
 
     return true;
