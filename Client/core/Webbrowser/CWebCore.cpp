@@ -104,7 +104,6 @@ void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
     {
         // Ensure that no attached events are in the queue
         RemoveWebViewEvents ( pWebView );
-        pWebView->NotifyPaint ();
 
         m_WebViews.remove ( pWebView );
         //pWebView->Release(); // Do not release since other references get corrupted then
@@ -177,7 +176,7 @@ void CWebCore::DoEventQueuePulse ()
     // Invoke paint method if necessary on the main thread
     for ( auto& view : m_WebViews )
     {
-        view->NotifyPaint ();
+        view->UpdateTexture();
     }
 }
 
