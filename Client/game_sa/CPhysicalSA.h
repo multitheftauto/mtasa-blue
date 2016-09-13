@@ -128,10 +128,14 @@ public:
     void        SetMass                     ( float fMass );
     float       GetTurnMass                 ( void );
     void        SetTurnMass                 ( float fTurnMass );
+    float       GetAirResistance            ( void );
+    void        SetAirResistance            ( float fAirResistance );
     float       GetElasticity               ( void );
     void        SetElasticity               ( float fElasticity );
     float       GetBuoyancyConstant         ( void );
     void        SetBuoyancyConstant         ( float fBuoyancyConstant );
+	void        GetCenterOfMass             ( CVector & vecCenterOfMass );
+    void        SetCenterOfMass             ( CVector & vecCenterOfMass );
 
     void        ProcessCollision            ( void );
     void        AddToMovingList             ( void );

@@ -21,6 +21,11 @@ void CLuaObjectDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getObjectScale", GetObjectScale );
     CLuaCFunctions::AddFunction ( "isObjectBreakable", IsObjectBreakable );
     CLuaCFunctions::AddFunction ( "getObjectMass", GetObjectMass );
+    CLuaCFunctions::AddFunction ( "getObjectTurnMass", GetObjectTurnMass );
+    CLuaCFunctions::AddFunction ( "getObjectAirResistance", GetObjectAirResistance );
+    CLuaCFunctions::AddFunction ( "getObjectElasticity", GetObjectElasticity );
+    CLuaCFunctions::AddFunction ( "getObjectBuoyancyConstant", GetObjectBuoyancyConstant );
+    CLuaCFunctions::AddFunction ( "getObjectCenterOfMass", GetObjectCenterOfMass );
 
     // Object set funcs
     CLuaCFunctions::AddFunction ( "moveObject", MoveObject );
@@ -32,6 +37,11 @@ void CLuaObjectDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "respawnObject", RespawnObject );
     CLuaCFunctions::AddFunction ( "toggleObjectRespawn", ToggleObjectRespawn );
     CLuaCFunctions::AddFunction ( "setObjectMass", SetObjectMass );
+    CLuaCFunctions::AddFunction ( "setObjectTurnMass", SetObjectTurnMass );
+    CLuaCFunctions::AddFunction ( "setObjectAirResistance", SetObjectAirResistance );
+    CLuaCFunctions::AddFunction ( "setObjectElasticity", SetObjectElasticity );
+    CLuaCFunctions::AddFunction ( "setObjectBuoyancyConstant", SetObjectBuoyancyConstant );
+    CLuaCFunctions::AddFunction ( "setObjectCenterOfMass", SetObjectCenterOfMass );
 }
 
 
@@ -57,6 +67,11 @@ void CLuaObjectDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "scale", "setObjectScale", "getObjectScale" );
     lua_classvariable ( luaVM, "breakable", "setObjectBreakable", "isObjectBreakable" );
     lua_classvariable ( luaVM, "mass", "setObjectMass", "getObjectMass" );
+    lua_classvariable ( luaVM, "turnmass", "setObjectTurnMass", "getObjectTurnMass" );
+    lua_classvariable ( luaVM, "resistance", "setObjectAirResistance", "getObjectAirResistance" );
+    lua_classvariable ( luaVM, "elasticity", "setObjectElasticity", "getObjectElasticity" );
+    lua_classvariable ( luaVM, "buoyancy", "setObjectBuoyancyConstant", "getObjectBuoyancyConstant" );
+    lua_classvariable ( luaVM, "centermass", "setObjectCenterOfMass", "getObjectCenterOfMass" );
 
     lua_registerclass ( luaVM, "Object", "Element" );
 }
@@ -221,6 +236,126 @@ int CLuaObjectDefs::GetObjectMass ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaObjectDefs::GetObjectTurnMass ( lua_State* luaVM )
+{
+//  float getObjectTurnMass ( object theObject )
+    CClientObject* pObject; float fTurnMass;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetObjectTurnMass ( *pObject, fTurnMass ) )
+        {
+            lua_pushnumber ( luaVM, fTurnMass );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::GetObjectAirResistance ( lua_State* luaVM )
+{
+//  float getObjectAirResistance ( object theObject )
+    CClientObject* pObject; float fAirResistance;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetObjectAirResistance ( *pObject, fAirResistance ) )
+        {
+            lua_pushnumber ( luaVM, fAirResistance );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::GetObjectElasticity ( lua_State* luaVM )
+{
+//  float getObjectElasticity ( object theObject )
+    CClientObject* pObject; float fElasticity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetObjectElasticity ( *pObject, fElasticity ) )
+        {
+            lua_pushnumber ( luaVM, fElasticity );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::GetObjectBuoyancyConstant ( lua_State* luaVM )
+{
+//  float getObjectBuoyancyConstant ( object theObject )
+    CClientObject* pObject; float fBuoyancyConstant;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::GetObjectBuoyancyConstant ( *pObject, fBuoyancyConstant ) )
+        {
+            lua_pushnumber ( luaVM, fBuoyancyConstant );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::GetObjectCenterOfMass ( lua_State* luaVM )
+{
+//  float getObjectCenterOfMass ( object theObject )
+    CClientObject* pObject;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+
+    if ( !argStream.HasErrors () )
+    {
+        CVector vecCenterOfMass;
+        if ( CStaticFunctionDefinitions::GetObjectCenterOfMass ( *pObject, vecCenterOfMass ) )
+        {
+            lua_pushnumber ( luaVM, vecCenterOfMass.fX );
+            lua_pushnumber ( luaVM, vecCenterOfMass.fY );
+            lua_pushnumber ( luaVM, vecCenterOfMass.fZ );
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaObjectDefs::MoveObject ( lua_State* luaVM )
 {
@@ -464,6 +599,142 @@ int CLuaObjectDefs::SetObjectMass ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::SetObjectTurnMass ( lua_State* luaVM )
+{
+//  bool setObjectTurnMass ( object theObject, float fTurnMass )
+    CClientEntity* pEntity; float fTurnMass;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fTurnMass );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetObjectTurnMass ( *pEntity, fTurnMass ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::SetObjectAirResistance ( lua_State* luaVM )
+{
+//  bool setObjectAirResistance ( object theObject, float fAirResistance )
+    CClientEntity* pEntity; float fAirResistance;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fAirResistance );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetObjectAirResistance ( *pEntity, fAirResistance ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::SetObjectElasticity ( lua_State* luaVM )
+{
+//  bool setObjectElasticity ( object theObject, float fElasticity )
+    CClientEntity* pEntity; float fElasticity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fElasticity );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetObjectElasticity ( *pEntity, fElasticity ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::SetObjectBuoyancyConstant ( lua_State* luaVM )
+{
+//  bool setObjectBuoyancyConstant ( object theObject, float fBuoyancyConstant )
+    CClientEntity* pEntity; float fBuoyancyConstant;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( fBuoyancyConstant );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetObjectBuoyancyConstant ( *pEntity, fBuoyancyConstant ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::SetObjectCenterOfMass ( lua_State* luaVM )
+{
+//  bool setObjectCenterOfMass ( object theObject, float centerOfMassX, float centerOfMassY, float centerOfMassZ )
+    CClientEntity* pEntity;
+    CVector vecCenterOfMass;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( argStream.NextIsVector3D ( ) )
+    {
+        argStream.ReadVector3D ( vecCenterOfMass );
+    }
+    else
+    {
+        // Caz - Here is what I am talking about.
+        argStream.ReadNumber ( vecCenterOfMass.fX );
+        argStream.ReadNumber ( vecCenterOfMass.fY );
+        argStream.ReadNumber ( vecCenterOfMass.fZ );
+    }
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetObjectCenterOfMass ( *pEntity, vecCenterOfMass ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }

@@ -146,6 +146,18 @@ void CPhysicalSA::SetTurnMass ( float fTurnMass )
 }
 
 
+float CPhysicalSA::GetAirResistance ( void )
+{
+    return ((CPhysicalSAInterface *)this->GetInterface())->m_fAirResistance;
+}
+
+
+void CPhysicalSA::SetAirResistance ( float fAirResistance )
+{
+    ((CPhysicalSAInterface *)this->GetInterface())->m_fAirResistance = fAirResistance;
+}
+
+
 float CPhysicalSA::GetElasticity ( void )
 {
     return ((CPhysicalSAInterface *)this->GetInterface())->m_fElasticity;
@@ -167,6 +179,18 @@ float CPhysicalSA::GetBuoyancyConstant ( void )
 void CPhysicalSA::SetBuoyancyConstant ( float fBuoyancyConstant )
 {
     ((CPhysicalSAInterface *)this->GetInterface())->m_fBuoyancyConstant = fBuoyancyConstant;
+}
+
+
+void CPhysicalSA::GetCenterOfMass ( CVector & vecCenterOfMass )
+{
+	vecCenterOfMass = ((CPhysicalSAInterface *)this->GetInterface())->m_vecCenterOfMass;
+}
+
+
+void CPhysicalSA::SetCenterOfMass ( CVector & vecCenterOfMass )
+{
+    ((CPhysicalSAInterface *)this->GetInterface())->m_vecCenterOfMass = vecCenterOfMass;
 }
 
 

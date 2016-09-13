@@ -97,6 +97,16 @@ public:
 
     float                           GetMass                 ( void );
     void                            SetMass                 ( float fMass );
+    float                           GetTurnMass             ( void );
+    void                            SetTurnMass             ( float fTurnMass );
+    float                           GetAirResistance        ( void );
+    void                            SetAirResistance        ( float fAirResistance );
+    float                           GetElasticity           ( void );
+    void                            SetElasticity           ( float fElasticity );
+    float                           GetBuoyancyConstant     ( void );
+    void                            SetBuoyancyConstant     ( float fBuoyancyConstant );
+    void                            GetCenterOfMass         ( CVector& vecCenterOfMass) const;
+    void                            SetCenterOfMass         ( const CVector& vecCenterOfMass);
 
     void                            ReCreate                ( void );
     void                            UpdateVisibility        ( void );
@@ -134,6 +144,11 @@ protected:
     bool                                m_bBeingRespawned;
     bool                                m_bRespawnEnabled;
     float                               m_fMass;
+	float                               m_fTurnMass;
+	float                               m_fAirResistance;
+	float                               m_fElasticity;
+	float                               m_fBuoyancyConstant;
+    CVector                             m_vecCenterOfMass;
 
     CVector                             m_vecMoveSpeed;
 
