@@ -209,7 +209,7 @@ int CLuaBrowserDefs::RequestBrowserDomains ( lua_State* luaVM )
             }
         }
 
-        WebRequestCallback callback = [=] ( bool bAllow, const std::vector<SString>& domains ) {
+        WebRequestCallback callback = [=] ( bool bAllow, const std::unordered_set<SString>& domains ) {
             // Test if luaVM is still available
             if ( m_pLuaManager->IsLuaVMValid ( luaVM ) && VERIFY_FUNCTION ( callbackFunction ) )
             {

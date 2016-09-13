@@ -85,12 +85,12 @@ bool CWebsiteRequests::IsVisible ()
     return m_pWindow->IsVisible ();
 }
 
-void CWebsiteRequests::SetPendingRequests ( const std::vector<SString>& pendingRequests, WebRequestCallback* pCallback )
+void CWebsiteRequests::SetPendingRequests ( const std::unordered_set<SString>& pendingRequests, WebRequestCallback* pCallback )
 {
     SString content = "";
-    for ( std::vector<SString>::const_iterator iter = pendingRequests.begin(); iter != pendingRequests.end(); ++iter )
+    for (auto& domain : pendingRequests)
     {
-        content += *iter + "\n";
+        content += domain + "\n";
     }
 
     // Apply text
@@ -107,29 +107,34 @@ void CWebsiteRequests::Clear ()
 
 void CWebsiteRequests::Callback ( bool bAllow )
 {
+    // Make a copy of the callbacks list to be able to add new callbacks in this 'cycle'
+    std::list<WebRequestCallback> callbacks = m_Callbacks;
+
+    // Clear callback list
+    m_Callbacks.clear();
+
     // Call callbacks and clear list
     const auto& pendingRequests = g_pCore->GetWebCore ()->GetPendingRequests ();
-    for ( auto&& callback : m_Callbacks )
+    for ( auto& callback : callbacks)
     {
         callback ( bAllow, pendingRequests );
     }
-    m_Callbacks.clear ();
 }
 
 bool CWebsiteRequests::OnAllowButtonClick ( CGUIElement* pElement )
 {
+    Hide();
     g_pCore->GetWebCore()->AllowPendingPages(m_pCheckRemember->GetSelected());
     Callback ( true );
-    Hide ();
 
     return true;
 }
 
 bool CWebsiteRequests::OnDenyButtonClick ( CGUIElement* pElement )
 {
+    Hide();
+    g_pCore->GetWebCore()->DenyPendingPages();
     Callback ( false );
-    g_pCore->GetWebCore ()->DenyPendingPages ();
-    Hide ();
 
     return true;
 }
