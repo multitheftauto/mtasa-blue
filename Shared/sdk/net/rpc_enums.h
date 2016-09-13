@@ -252,6 +252,7 @@ enum eElementRPCFunctions
 
     SET_TRAIN_TRACK,
     SET_TRAIN_POSITION,
+	SET_ELEMENT_TURNSPEED,
 
     NUM_RPC_FUNCS
 };

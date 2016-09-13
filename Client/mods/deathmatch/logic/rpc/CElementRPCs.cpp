@@ -23,6 +23,7 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( REMOVE_ELEMENT_DATA,            RemoveElementData,           "RemoveElementData" );
     AddHandler ( SET_ELEMENT_POSITION,           SetElementPosition,          "SetElementPosition" );
     AddHandler ( SET_ELEMENT_VELOCITY,           SetElementVelocity,          "SetElementVelocity" );
+    AddHandler ( SET_ELEMENT_TURNSPEED,          SetElementTurnVelocity,      "SetElementTurnVelocity" );
     AddHandler ( SET_ELEMENT_INTERIOR,           SetElementInterior,          "SetElementInterior" );
     AddHandler ( SET_ELEMENT_DIMENSION,          SetElementDimension,         "SetElementDimension" );
     AddHandler ( ATTACH_ELEMENTS,                AttachElements,              "AttachElements" );
@@ -214,6 +215,45 @@ void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInte
             {
                 CClientObject * pObject = static_cast < CClientObject * > ( pSource );
                 pObject->SetMoveSpeed ( vecVelocity );
+                
+                break;
+            }
+        }
+    }
+}
+
+
+void CElementRPCs::SetElementTurnVelocity ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    // Read out the entity id and the turn speed
+    CVector vecTurnVelocity;
+    if ( bitStream.Read ( vecTurnVelocity.fX ) &&
+         bitStream.Read ( vecTurnVelocity.fY ) &&
+         bitStream.Read ( vecTurnVelocity.fZ ) )
+    {
+        switch ( pSource->GetType () )
+        {
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
+            {
+                CClientPed* pPed = static_cast < CClientPed* > ( pSource );
+
+                pPed->SetTurnSpeed ( vecTurnVelocity );
+
+                break;
+            }
+            case CCLIENTVEHICLE:
+            {
+                CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );                    
+                pVehicle->SetTurnSpeed ( vecTurnVelocity );
+
+                break;
+            }
+            case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
+            {
+                CClientObject * pObject = static_cast < CClientObject * > ( pSource );
+                pObject->SetTurnSpeed ( vecTurnVelocity );
                 
                 break;
             }

@@ -25,6 +25,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementPosition", GetElementPosition );
     CLuaCFunctions::AddFunction ( "getElementRotation", GetElementRotation );
     CLuaCFunctions::AddFunction ( "getElementVelocity", GetElementVelocity );
+    CLuaCFunctions::AddFunction ( "getElementTurnVelocity", GetElementTurnVelocity );
     CLuaCFunctions::AddFunction ( "getElementType", GetElementType );
     CLuaCFunctions::AddFunction ( "getElementChildren", GetElementChildren );
     CLuaCFunctions::AddFunction ( "getElementChild", GetElementChild );
@@ -74,6 +75,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementPosition", SetElementPosition );
     CLuaCFunctions::AddFunction ( "setElementRotation", SetElementRotation );
     CLuaCFunctions::AddFunction ( "setElementVelocity", SetElementVelocity );
+    CLuaCFunctions::AddFunction ( "setElementTurnVelocity", SetElementTurnVelocity );
     CLuaCFunctions::AddFunction ( "setElementInterior", SetElementInterior );
     CLuaCFunctions::AddFunction ( "setElementDimension", SetElementDimension );
     CLuaCFunctions::AddFunction ( "attachElements", AttachElements );
@@ -134,6 +136,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getRotation", OOP_GetElementRotation );
     lua_classfunction ( luaVM, "getMatrix", OOP_GetElementMatrix );
     lua_classfunction ( luaVM, "getVelocity", OOP_GetElementVelocity );
+    lua_classfunction ( luaVM, "getTurnVelocity", OOP_GetElementTurnVelocity );
     lua_classfunction ( luaVM, "getByType", "getElementsByType" );
     lua_classfunction ( luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "getElementDistanceFromCentreOfMassToBaseOfModel" );
     lua_classfunction ( luaVM, "getRadius", "getElementRadius" );
@@ -159,6 +162,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setRotation", OOP_SetElementRotation );
     lua_classfunction ( luaVM, "setMatrix", "setElementMatrix" );
     lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
+    lua_classfunction ( luaVM, "setTurnVelocity", "setElementTurnVelocity" );
     lua_classfunction ( luaVM, "setInterior", "setElementInterior" );
     lua_classfunction ( luaVM, "setDimension", "setElementDimension" );
     lua_classfunction ( luaVM, "setAlpha", "setElementAlpha" );
@@ -202,6 +206,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "rotation", OOP_SetElementRotation, OOP_GetElementRotation );
     lua_classvariable ( luaVM, "matrix", SetElementMatrix, OOP_GetElementMatrix );
     lua_classvariable ( luaVM, "velocity", SetElementVelocity, OOP_GetElementVelocity );
+    lua_classvariable ( luaVM, "turnVelocity", SetElementTurnVelocity, OOP_GetElementTurnVelocity );
     lua_classvariable ( luaVM, "isElement", NULL, "isElement" );
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
@@ -629,6 +634,62 @@ int CLuaElementDefs::OOP_GetElementVelocity ( lua_State* luaVM )
         CStaticFunctionDefinitions::GetElementVelocity ( *pEntity, vecVelocity );
 
         lua_pushvector ( luaVM, vecVelocity );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaElementDefs::GetElementTurnVelocity ( lua_State* luaVM )
+{
+    // Verify the argument
+    CClientEntity* pEntity = NULL;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        // Grab the element, verify it
+        if ( pEntity )
+        {
+            // Grab the turn velocity
+            CVector vecTurnVelocity;
+            if ( CStaticFunctionDefinitions::GetElementTurnVelocity ( *pEntity, vecTurnVelocity ) )
+            {
+                // Return it
+                lua_pushnumber ( luaVM, vecTurnVelocity.fX );
+                lua_pushnumber ( luaVM, vecTurnVelocity.fY );
+                lua_pushnumber ( luaVM, vecTurnVelocity.fZ );
+                return 3;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaElementDefs::OOP_GetElementTurnVelocity ( lua_State* luaVM )
+{
+    CClientEntity* pEntity = NULL;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+
+    if ( !argStream.HasErrors () )
+    {
+        CVector vecTurnVelocity;
+        CStaticFunctionDefinitions::GetElementTurnVelocity ( *pEntity, vecTurnVelocity );
+
+        lua_pushvector ( luaVM, vecTurnVelocity );
         return 1;
     }
     else
@@ -2046,6 +2107,38 @@ int CLuaElementDefs::SetElementVelocity ( lua_State* luaVM )
         {
             // Set the velocity
             if ( CStaticFunctionDefinitions::SetElementVelocity ( *pEntity, vecVelocity ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaElementDefs::SetElementTurnVelocity ( lua_State* luaVM )
+{
+    CClientEntity* pEntity;
+    CVector vecTurnVelocity;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadVector3D ( vecTurnVelocity );
+
+    // Verify the arguments
+    if ( !argStream.HasErrors () )
+    {
+        if ( pEntity )
+        {
+            // Set the turn velocity
+            if ( CStaticFunctionDefinitions::SetElementTurnVelocity ( *pEntity, vecTurnVelocity ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;

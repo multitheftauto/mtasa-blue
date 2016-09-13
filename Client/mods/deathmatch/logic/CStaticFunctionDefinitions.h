@@ -64,6 +64,7 @@ public:
     static bool                         GetElementPosition                  ( CClientEntity& Entity, CVector & vecPosition );
     static bool                         GetElementRotation                  ( CClientEntity& Entity, CVector & vecRotation, eEulerRotationOrder rotationOrder );
     static bool                         GetElementVelocity                  ( CClientEntity& Entity, CVector& vecVelocity );
+    static bool                         GetElementTurnVelocity              ( CClientEntity& Entity, CVector& vecTurnVelocity );
     static bool                         GetElementInterior                  ( CClientEntity& Entity, unsigned char& ucInterior );
     static bool                         GetElementBoundingBox               ( CClientEntity& Entity, CVector &vecMin, CVector &vecMax );
     static bool                         GetElementRadius                    ( CClientEntity& Entity, float &fRadius );
@@ -93,6 +94,7 @@ public:
     static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true );
     static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay );
     static bool                         SetElementVelocity                  ( CClientEntity& Element, const CVector& vecVelocity );
+    static bool                         SetElementTurnVelocity              ( CClientEntity& Element, const CVector& vecTurnVelocity );
     static bool                         SetElementParent                    ( CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain );
     static bool                         SetElementInterior                  ( CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
     static bool                         SetElementDimension                 ( CClientEntity& Entity, unsigned short usDimension );

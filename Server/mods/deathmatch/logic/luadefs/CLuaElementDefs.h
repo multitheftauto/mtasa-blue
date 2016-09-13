@@ -43,6 +43,7 @@ public:
     LUA_DECLARE_OOP ( getElementPosition );
     LUA_DECLARE_OOP ( getElementRotation );
     LUA_DECLARE_OOP ( getElementVelocity );
+    LUA_DECLARE_OOP ( getElementTurnVelocity );
     LUA_DECLARE ( getElementType );
     LUA_DECLARE ( getElementsByType  );
     LUA_DECLARE ( getElementInterior );
@@ -88,6 +89,7 @@ public:
     LUA_DECLARE ( setElementPosition );
     LUA_DECLARE_OOP ( setElementRotation );
     LUA_DECLARE ( setElementVelocity );
+    LUA_DECLARE ( setElementTurnVelocity );
     LUA_DECLARE ( setElementInterior );
     LUA_DECLARE ( setElementDimension );
     LUA_DECLARE ( setElementAlpha );
