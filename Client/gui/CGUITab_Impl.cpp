@@ -51,7 +51,11 @@ CGUITab_Impl::CGUITab_Impl ( CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const c
 
 CGUITab_Impl::~CGUITab_Impl ( void )
 {
-    DestroyElement ();
+    CGUIElement_Impl* pParent = static_cast < CGUIElement_Impl* > (m_pParent);
+    CEGUI::TabControl* pControl = reinterpret_cast < CEGUI::TabControl* > ( ( ( CGUITabPanel_Impl* ) pParent )->m_pWindow );
+    pControl->removeTab ( this->GetWindow ( )->getName ( ) );
+
+    DestroyElement();
 }
 
 
