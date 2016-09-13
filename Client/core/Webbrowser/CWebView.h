@@ -146,7 +146,7 @@ private:
     float               m_fVolume;
     std::mutex          m_PaintMutex;
     std::condition_variable m_PaintCV;
-    int                 m_RenderPopupOffsetX, m_RenderPopupOffsetY;
+    CefRect             m_PopupRect;
     std::map<SString, SString> m_Properties;
     bool                m_bHasInputFocus;
     std::set<std::string> m_AjaxHandlers;

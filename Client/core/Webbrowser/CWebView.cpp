@@ -518,8 +518,7 @@ bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnPopupSize ( CefRefPtr<CefBrowser> browser, const CefRect& rect )
 {
-    m_RenderPopupOffsetX = rect.x;
-    m_RenderPopupOffsetY = rect.y;
+    m_PopupRect = rect;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -551,45 +550,37 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
         D3DSURFACE_DESC SurfaceDesc;
 
         pD3DSurface->GetDesc ( &SurfaceDesc );
-        pD3DSurface->LockRect ( &LockedRect, NULL, 0 );
+        pD3DSurface->LockRect ( &LockedRect, nullptr, 0 );
 
         // Dirty rect implementation, don't use this as loops are significantly slower than memcpy
-        /*auto surfaceData = (int*)LockedRect.pBits;
-        auto sourceData = (const int*)buffer;
+        auto surfaceData = static_cast<byte*>(LockedRect.pBits);
+        auto sourceData = static_cast<const byte*>(buffer);
         auto pitch = LockedRect.Pitch;
 
-        for (auto& rect : dirtyRects)
+        // We've to skip a few rows if this is a popup draw
+        if (paintType == PET_POPUP)
         {
-            for (int y = rect.y; y < rect.y+rect.height; ++y)
+            auto popupPitch = m_PopupRect.width * 4;
+            for (auto& rect : dirtyRects)
             {
-                for (int x = rect.x; x < rect.x+rect.width; ++x)
+                for (int y = rect.y; y < rect.y + rect.height; ++y)
                 {
-                    int index = y * pitch / 4 + x;
-                    surfaceData[index] = sourceData[index];
+                    int sourceIndex = y * popupPitch + rect.x * 4;
+                    int destIndex = (y + m_PopupRect.y) * pitch + (rect.x + m_PopupRect.x) * 4;
+
+                    memcpy(&surfaceData[destIndex], &sourceData[sourceIndex], m_PopupRect.width * 4);
                 }
             }
-        }*/
-
-        // Copy entire texture
-        int theoreticalPitch = width * 4;
-        if ( LockedRect.Pitch == theoreticalPitch )
-            memcpy ( LockedRect.pBits, buffer, theoreticalPitch * height );
+        }
         else
         {
-            // We've to skip a few rows if this is a popup draw
-            // The pitch will never equal the theoretical pitch (see above) by definition
-            int skipRows = 0;
-            int skipPixels = 0;
-            if ( paintType == PaintElementType::PET_POPUP )
+            for (auto& rect : dirtyRects)
             {
-                skipRows = m_RenderPopupOffsetY;
-                skipPixels = m_RenderPopupOffsetX;
-            }
-
-            uint32 destAddress = (uint32)LockedRect.pBits + skipPixels * 4;
-            for ( int i = 0; i < height; ++i )
-            {
-                memcpy ( (void*)(destAddress + LockedRect.Pitch * (i + skipRows)), (void*)((uint32)buffer + theoreticalPitch * i), theoreticalPitch );
+                for (int y = rect.y; y < rect.y + rect.height; ++y)
+                {
+                    int index = y * pitch + rect.x * 4;
+                    memcpy(&surfaceData[index], &sourceData[index], rect.width * 4);
+                }
             }
         }
 
