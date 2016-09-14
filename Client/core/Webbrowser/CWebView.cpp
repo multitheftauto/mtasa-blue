@@ -34,6 +34,9 @@ CWebView::~CWebView ()
     {
         if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
             g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
+
+        // Make sure we don't dead lock the CEF render thread
+        m_RenderData.cv.notify_all();
     }
 
     // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
@@ -185,6 +188,68 @@ void CWebView::ClearTexture ()
     pD3DSurface->UnlockRect();
 }
 
+void CWebView::UpdateTexture()
+{
+    std::lock_guard<std::mutex> lock(m_RenderData.dataMutex);
+
+    auto pSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
+    if (m_bBeingDestroyed || !pSurface)
+        return;
+
+    // Discard current buffer if size doesn't match
+    // This happens when resizing the browser as OnPaint is called asynchronously
+    if (m_RenderData.changed && (m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height))
+        m_RenderData.changed = false;
+
+    if (m_RenderData.changed)
+    {
+        // Update changed state
+        m_RenderData.changed = false;
+
+        // Lock surface
+        D3DLOCKED_RECT LockedRect;
+        pSurface->LockRect(&LockedRect, nullptr, 0);
+
+        // Dirty rect implementation, don't use this as loops are significantly slower than memcpy
+        auto surfaceData = static_cast<byte*>(LockedRect.pBits);
+        auto sourceData = static_cast<const byte*>(m_RenderData.buffer);
+        auto pitch = LockedRect.Pitch;
+
+        // We've to skip a few rows if this is a popup draw
+        if (m_RenderData.paintType == PET_POPUP)
+        {
+            auto popupPitch = m_RenderData.popupRect.width * 4;
+            for (auto& rect : m_RenderData.dirtyRects)
+            {
+                for (int y = rect.y; y < rect.y + rect.height; ++y)
+                {
+                    int sourceIndex = y * popupPitch + rect.x * 4;
+                    int destIndex = (y + m_RenderData.popupRect.y) * pitch + (rect.x + m_RenderData.popupRect.x) * 4;
+
+                    memcpy(&surfaceData[destIndex], &sourceData[sourceIndex], m_RenderData.popupRect.width * 4);
+                }
+            }
+        }
+        else
+        {
+            for (auto& rect : m_RenderData.dirtyRects)
+            {
+                for (int y = rect.y; y < rect.y + rect.height; ++y)
+                {
+                    int index = y * pitch + rect.x * 4;
+                    memcpy(&surfaceData[index], &sourceData[index], rect.width * 4);
+                }
+            }
+        }
+
+        // Unlock surface
+        pSurface->UnlockRect();
+    }
+
+    // Resume CEF render thread
+    m_RenderData.cv.notify_all();
+}
+
 void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
 {
     if ( m_pWebView )
@@ -304,6 +369,9 @@ bool CWebView::SetAudioVolume ( float fVolume )
 
 void CWebView::GetSourceCode ( const std::function<void( const std::string& code )>& callback )
 {
+    if (!m_pWebView)
+        return;
+
     class MyStringVisitor : public CefStringVisitor
     {
     private:
@@ -337,6 +405,9 @@ void CWebView::Resize(const CVector2D& size)
 
     // Send resize event to CEF
     m_pWebView->GetHost()->WasResized();
+
+    // Tell CEF to render a new frame
+    m_RenderData.cv.notify_all();
 }
 
 CVector2D CWebView::GetSize()
@@ -515,8 +586,7 @@ bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnPopupSize ( CefRefPtr<CefBrowser> browser, const CefRect& rect )
 {
-    m_RenderPopupOffsetX = rect.x;
-    m_RenderPopupOffsetY = rect.y;
+    m_RenderData.popupRect = rect;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -530,72 +600,20 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
     if ( m_bBeingDestroyed )
         return;
 
-    IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
-    if ( !pD3DSurface )
-        return;
+    // Store render data
+    {
+        std::lock_guard<std::mutex> lock(m_RenderData.dataMutex);
+        m_RenderData.buffer = buffer;
+        m_RenderData.width = width;
+        m_RenderData.height = height;
+        m_RenderData.dirtyRects = dirtyRects;
+        m_RenderData.paintType = paintType;
+        m_RenderData.changed = true;
+    }
 
-    /*
-        DirectX9 is not thread safe, so locking the texture from another thread causes D3DDevice::Present to block forever (-> client freeze)
-        The only way we can get rid of this problem is (imo) locking CEF until the texture has been written (unlocking/notifying is done in CWebCore::DoEventQueuePulse).
-        If someone knows a better solution than this weird construction, feel free to contact me (Jusonex).
-    */
-
-    auto f = [&]() {
-        if ( m_bBeingDestroyed )
-            return;
-
-        D3DLOCKED_RECT LockedRect;
-        D3DSURFACE_DESC SurfaceDesc;
-
-        pD3DSurface->GetDesc ( &SurfaceDesc );
-        pD3DSurface->LockRect ( &LockedRect, NULL, 0 );
-
-        // Dirty rect implementation, don't use this as loops are significantly slower than memcpy
-        /*auto surfaceData = (int*)LockedRect.pBits;
-        auto sourceData = (const int*)buffer;
-        auto pitch = LockedRect.Pitch;
-
-        for (auto& rect : dirtyRects)
-        {
-            for (int y = rect.y; y < rect.y+rect.height; ++y)
-            {
-                for (int x = rect.x; x < rect.x+rect.width; ++x)
-                {
-                    int index = y * pitch / 4 + x;
-                    surfaceData[index] = sourceData[index];
-                }
-            }
-        }*/
-
-        // Copy entire texture
-        int theoreticalPitch = width * 4;
-        if ( LockedRect.Pitch == theoreticalPitch )
-            memcpy ( LockedRect.pBits, buffer, theoreticalPitch * height );
-        else
-        {
-            // We've to skip a few rows if this is a popup draw
-            // The pitch will never equal the theoretical pitch (see above) by definition
-            int skipRows = 0;
-            int skipPixels = 0;
-            if ( paintType == PaintElementType::PET_POPUP )
-            {
-                skipRows = m_RenderPopupOffsetY;
-                skipPixels = m_RenderPopupOffsetX;
-            }
-
-            uint32 destAddress = (uint32)LockedRect.pBits + skipPixels * 4;
-            for ( int i = 0; i < height; ++i )
-            {
-                memcpy ( (void*)(destAddress + LockedRect.Pitch * (i + skipRows)), (void*)((uint32)buffer + theoreticalPitch * i), theoreticalPitch );
-            }
-        }
-
-        pD3DSurface->UnlockRect ();
-    };
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( f, this, "OnPaint" );
-
-    std::unique_lock<std::mutex> lock ( m_PaintMutex );
-    m_PaintCV.wait ( lock );
+    // Wait for the main thread to handle drawing the texture
+    std::unique_lock<std::mutex> lock(m_RenderData.cvMutex);
+    m_RenderData.cv.wait(lock);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -799,7 +817,6 @@ void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
 {
     // Remove events owned by this webview and invoke left callbacks
     g_pCore->GetWebCore ()->RemoveWebViewEvents ( this );
-    NotifyPaint ();
 
     m_pWebView = nullptr;
 

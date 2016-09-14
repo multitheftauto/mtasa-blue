@@ -915,7 +915,7 @@ bool CStaticFunctionDefinitions::IsElementFrozen ( CClientEntity& Entity, bool& 
         case CCLIENTOBJECT:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            bFrozen = Object.IsStatic ();
+            bFrozen = Object.IsFrozen ();
             break;
         }
         default: return false;
@@ -3596,7 +3596,7 @@ bool CStaticFunctionDefinitions::SetElementFrozen ( CClientEntity& Entity, bool 
         case CCLIENTOBJECT:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            Object.SetStatic ( bFrozen );
+            Object.SetFrozen ( bFrozen );
             break;
         }
         default: return false;
@@ -3730,13 +3730,6 @@ CClientObject* CStaticFunctionDefinitions::CreateObject ( CResource& Resource, u
     }
 
     return NULL;
-}
-
-
-bool CStaticFunctionDefinitions::IsObjectStatic ( CClientObject & Object, bool & bStatic )
-{
-    bStatic = Object.IsStatic ();
-    return true;
 }
 
 

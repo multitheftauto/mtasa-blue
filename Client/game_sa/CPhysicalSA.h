@@ -153,6 +153,8 @@ public:
     float       GetLighting                 ( void );
     void        SetLighting                 ( float fLighting );
 
+    void        SetFrozen                   ( bool bFrozen );
+
     /*
     VOID        SetMassMultiplier(FLOAT fMassMultiplier);
     FLOAT       GetMassMultiplier();

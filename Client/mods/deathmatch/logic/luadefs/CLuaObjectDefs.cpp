@@ -123,7 +123,7 @@ int CLuaObjectDefs::IsObjectStatic ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         bool bStatic;
-        if ( CStaticFunctionDefinitions::IsObjectStatic ( *pObject, bStatic ) )
+        if ( CStaticFunctionDefinitions::IsElementFrozen ( *pObject, bStatic ) )
         {
             lua_pushboolean ( luaVM, bStatic );
             return 1;
@@ -324,15 +324,15 @@ int CLuaObjectDefs::SetObjectScale ( lua_State* luaVM )
 int CLuaObjectDefs::SetObjectStatic ( lua_State* luaVM )
 {
 //  bool setObjectStatic ( object theObject, bool toggle )
-    CClientEntity* pEntity; bool bStatic;
+    CClientObject* pObject; bool bStatic;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pEntity );
+    argStream.ReadUserData ( pObject );
     argStream.ReadBool ( bStatic );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetObjectStatic ( *pEntity, bStatic ) )
+        if ( CStaticFunctionDefinitions::SetElementFrozen ( *pObject, bStatic ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

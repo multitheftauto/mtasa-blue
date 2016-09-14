@@ -59,6 +59,9 @@ project "Deathmatch"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
 		links { "ws2_32" }
+
+	filter {"system:windows", "toolset:*120*"}
+		links { "Psapi.lib" }
 		
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point

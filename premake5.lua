@@ -63,7 +63,11 @@ workspace "MTASA"
 		os.mkdir("Build/Symbols")
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
 		
+	filter {"system:windows", "toolset:*140*"}
+		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
+	
 	filter "system:windows"
+		toolset "v140"
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
 			dxdir.."Include"
@@ -71,10 +75,6 @@ workspace "MTASA"
 		libdirs {
 			dxdir.."Lib/x86"
 		}
-		
-	if _ACTION == "vs2015" then
-		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
-	end
 	
 	-- Only build the client on Windows
 	if os.get() == "windows" then

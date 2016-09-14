@@ -262,7 +262,7 @@ void CClient::IdleHandler ( void )
 }
 
 
-bool CClient::WebsiteRequestResultHandler ( const std::vector<SString>& newPages )
+bool CClient::WebsiteRequestResultHandler ( const std::unordered_set<SString>& newPages )
 {
     if ( g_pClientGame )
         return g_pClientGame->TriggerBrowserRequestResultEvent ( newPages );

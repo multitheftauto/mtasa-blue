@@ -7,9 +7,7 @@
 *  PURPOSE:     Website requests GUI class
 *
 *****************************************************************************/
-
-#ifndef __CWEBSITEREQUESTS_H
-#define __CWEBSITEREQUESTS_H
+#pragma once
 
 #define WEBSITEREQUESTS_WINDOW_DEFAULTWIDTH 476
 #define WEBSITEREQUESTS_WINDOW_DEFAULTHEIGHT 297
@@ -28,7 +26,7 @@ public:
     void Hide ();
     bool IsVisible ();
 
-    void SetPendingRequests ( const std::vector<SString>& pendingRequests, WebRequestCallback* pCallback = nullptr );
+    void SetPendingRequests ( const std::unordered_set<SString>& pendingRequests, WebRequestCallback* pCallback = nullptr );
     void Clear ();
 
 protected:
@@ -47,5 +45,3 @@ private:
     bool OnDenyButtonClick  ( CGUIElement* pElement );
 
 };
-
-#endif

@@ -13,6 +13,7 @@
 #undef GetFirstChild
 #include <functional>
 #include <mutex>
+#include <unordered_set>
 #include <core/CWebCoreInterface.h>
 #include <cef3/include/cef_app.h>
 #define MTA_BROWSERDATA_PATH "mta/cef/browserdata.xml"
@@ -65,7 +66,7 @@ public:
     void                RequestPages        ( const std::vector<SString>& pages, WebRequestCallback* pCallback = nullptr );
     void                AllowPendingPages   ( bool bRemember );
     void                DenyPendingPages    ();
-    std::vector<SString>& GetPendingRequests () { return m_PendingRequests; };
+    std::unordered_set<SString>& GetPendingRequests () { return m_PendingRequests; };
     bool                IsRequestsGUIVisible();
 
     inline bool         IsTestModeEnabled   () { return m_bTestmodeEnabled; };
@@ -107,7 +108,7 @@ private:
     std::mutex                              m_EventQueueMutex;
 
     CFastHashMap<SString, WebFilterPair>    m_Whitelist;
-    std::vector<SString>                    m_PendingRequests;
+    std::unordered_set<SString>             m_PendingRequests;
     std::recursive_mutex                    m_FilterMutex;
 
     CXMLFile*                               m_pXmlConfig;

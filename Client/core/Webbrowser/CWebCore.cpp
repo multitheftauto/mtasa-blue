@@ -104,7 +104,6 @@ void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
     {
         // Ensure that no attached events are in the queue
         RemoveWebViewEvents ( pWebView );
-        pWebView->NotifyPaint ();
 
         m_WebViews.remove ( pWebView );
         //pWebView->Release(); // Do not release since other references get corrupted then
@@ -177,7 +176,7 @@ void CWebCore::DoEventQueuePulse ()
     // Invoke paint method if necessary on the main thread
     for ( auto& view : m_WebViews )
     {
-        view->NotifyPaint ();
+        view->UpdateTexture();
     }
 }
 
@@ -307,7 +306,7 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallb
         if ( status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED )
             continue;
 
-        m_PendingRequests.push_back ( page );
+        m_PendingRequests.insert ( page );
         bNewItem = true;
     }
 
@@ -326,7 +325,7 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallb
         // Call callback immediately if nothing has changed (all entries are most likely already on the whitelist)
         // There is still the possibility that all websites are blacklisted; this is not the usual case tho, so ignore for now (TODO)
         if ( pCallback )
-            (*pCallback)( true, pages );
+            (*pCallback)(true, std::unordered_set<SString>(pages.begin(), pages.end()));
     }
 }
 

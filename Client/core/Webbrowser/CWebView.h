@@ -51,7 +51,8 @@ public:
     void Focus                  ( bool state = true );
     IDirect3DTexture9* GetTexture () { return static_cast<IDirect3DTexture9*>(m_pWebBrowserRenderItem->m_pD3DTexture); }
     void ClearTexture           ();
-    inline void NotifyPaint     () { m_PaintCV.notify_one (); }
+
+    void UpdateTexture          ();
 
     inline bool HasInputFocus   () { return m_bHasInputFocus; }
 
@@ -144,12 +145,24 @@ private:
     bool                m_mouseButtonStates[3];
     SString             m_CurrentTitle;
     float               m_fVolume;
-    std::mutex          m_PaintMutex;
-    std::condition_variable m_PaintCV;
-    int                 m_RenderPopupOffsetX, m_RenderPopupOffsetY;
     std::map<SString, SString> m_Properties;
     bool                m_bHasInputFocus;
     std::set<std::string> m_AjaxHandlers;
+
+    struct
+    {
+        bool changed = false;
+        std::mutex dataMutex;
+        std::mutex cvMutex;
+        std::condition_variable cv;
+
+        const void* buffer;
+        int width, height;
+        CefRenderHandler::RectList dirtyRects;
+        cef_paint_element_type_t paintType;
+        CefRect popupRect;
+
+    } m_RenderData;
 
     CWebBrowserEventsInterface* m_pEventsInterface;
 

@@ -6654,16 +6654,16 @@ void CClientGame::SetFileCacheRoot ( void )
     }
 }
 
-bool CClientGame::TriggerBrowserRequestResultEvent ( const std::vector<SString>& newPages )
+bool CClientGame::TriggerBrowserRequestResultEvent ( const std::unordered_set<SString>& newPages )
 {
     CLuaArguments Arguments;
     CLuaArguments LuaTable;
     int i = 0;
 
-    for ( std::vector<SString>::const_iterator iter = newPages.begin (); iter != newPages.end (); ++iter )
+    for ( auto& domain : newPages )
     {
         LuaTable.PushNumber ( ++i );
-        LuaTable.PushString ( *iter );
+        LuaTable.PushString ( domain );
     }
     Arguments.PushTable ( &LuaTable );
 
