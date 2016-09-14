@@ -42,6 +42,9 @@ CWebView::~CWebView ()
     // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
     m_pWebView = nullptr;
 
+    // Make sure we don't dead lock the CEF render thread
+    m_RenderData.cv.notify_all();
+
 #ifdef MTA_DEBUG
     OutputDebugLine ( "CWebView::~CWebView" );
 #endif
@@ -77,6 +80,9 @@ void CWebView::CloseBrowser ()
 {
     // CefBrowserHost::CloseBrowser calls the destructor after the browser has been destroyed
     m_bBeingDestroyed = true;
+
+    // Make sure we don't dead lock the CEF render thread
+    m_RenderData.cv.notify_all();
 
     if ( m_pWebView )
         m_pWebView->GetHost ()->CloseBrowser ( true );
@@ -404,7 +410,8 @@ void CWebView::Resize(const CVector2D& size)
     m_pWebBrowserRenderItem->Resize(size);
 
     // Send resize event to CEF
-    m_pWebView->GetHost()->WasResized();
+    if ( m_pWebView )
+        m_pWebView->GetHost()->WasResized();
 
     // Tell CEF to render a new frame
     m_RenderData.cv.notify_all();

@@ -58,10 +58,9 @@ public:
     virtual eURLState           GetURLState        ( const SString& strURL, bool bOutputDebug = false ) = 0;
     virtual SString             GetDomainFromURL   ( const SString& strURL ) = 0;
     virtual void                ResetFilter        ( bool bResetRequestsOnly ) = 0;
-    //virtual void                AddAllowedPage     ( const SString& strURL ) = 0;
     virtual void                RequestPages       ( const std::vector<SString>& pages, WebRequestCallback* pCallback = nullptr ) = 0;
-    virtual void                AllowPendingPages  ( bool bRemember ) = 0;
-    virtual void                DenyPendingPages   () = 0;
+    virtual std::unordered_set<SString> AllowPendingPages( bool bRemember ) = 0;
+    virtual std::unordered_set<SString>  DenyPendingPages() = 0;
     virtual std::unordered_set<SString>& GetPendingRequests () = 0;
     virtual bool                IsRequestsGUIVisible() = 0;
 

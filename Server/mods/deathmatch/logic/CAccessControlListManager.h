@@ -26,11 +26,13 @@ class CAccessControlListManager;
 class CAccessControlListManager : public CXMLConfig
 {
 public:
+    ZERO_ON_NEW
                                                 CAccessControlListManager   ( void );
     virtual                                     ~CAccessControlListManager  ( void );
 
     void                                        DoPulse                     ( void );
     bool                                        Load                        ( void );
+    bool                                        Reload                      ( void );
     bool                                        Save                        ( void );
 
     class CAccessControlListGroup*              GetGroup                    ( const char* szGroupName );
@@ -85,6 +87,7 @@ private:
     CFastHashMap < SString, bool >              m_ReadCacheMap;
 
     bool                                        m_bNeedsSave;
+    bool                                        m_bAllowSave;
     CElapsedTime                                m_AutoSaveTimer;
     uint                                        m_uiGlobalRevision;
 };

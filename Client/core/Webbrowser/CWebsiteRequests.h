@@ -40,7 +40,7 @@ protected:
     std::list<WebRequestCallback> m_Callbacks;
 
 private:
-    void Callback ( bool bAllow );
+    void Callback(bool bAllow, const std::unordered_set<SString>& requests);
     bool OnAllowButtonClick ( CGUIElement* pElement );
     bool OnDenyButtonClick  ( CGUIElement* pElement );
 

@@ -329,7 +329,7 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallb
     }
 }
 
-void CWebCore::AllowPendingPages ( bool bRemember )
+std::unordered_set<SString> CWebCore::AllowPendingPages ( bool bRemember )
 {
     for ( const auto& request : m_PendingRequests )
     {
@@ -339,10 +339,9 @@ void CWebCore::AllowPendingPages ( bool bRemember )
     // Trigger an event now
     auto pCurrentMod = CModManager::GetSingleton ().GetCurrentMod ();
     if ( !pCurrentMod )
-        return;
+        return std::unordered_set<SString>();
 
     pCurrentMod->WebsiteRequestResultHandler ( m_PendingRequests );
-    m_PendingRequests.clear ();
 
     if ( bRemember )
     {
@@ -354,11 +353,19 @@ void CWebCore::AllowPendingPages ( bool bRemember )
 
         WriteCustomList ( "customwhitelist", customWhitelist, false );
     }
+
+    auto allowedRequests(std::move(m_PendingRequests));
+    m_PendingRequests.clear(); // MSVC's move constructor already clears the list which isn't specified by the C++ standard though
+
+    return allowedRequests;
 }
 
-void CWebCore::DenyPendingPages ()
+std::unordered_set<SString> CWebCore::DenyPendingPages ()
 {
-    m_PendingRequests.clear ();
+    auto deniedRequests(std::move(m_PendingRequests));
+    m_PendingRequests.clear();
+
+    return deniedRequests;
 }
 
 bool CWebCore::IsRequestsGUIVisible ()

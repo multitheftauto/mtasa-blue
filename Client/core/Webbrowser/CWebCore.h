@@ -64,8 +64,8 @@ public:
     void                AddAllowedPage      ( const SString& strURL, eWebFilterType filterType );
     void                AddBlockedPage      ( const SString& strURL, eWebFilterType filterType );
     void                RequestPages        ( const std::vector<SString>& pages, WebRequestCallback* pCallback = nullptr );
-    void                AllowPendingPages   ( bool bRemember );
-    void                DenyPendingPages    ();
+    std::unordered_set<SString> AllowPendingPages( bool bRemember );
+    std::unordered_set<SString> DenyPendingPages();
     std::unordered_set<SString>& GetPendingRequests () { return m_PendingRequests; };
     bool                IsRequestsGUIVisible();
 
