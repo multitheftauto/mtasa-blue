@@ -166,7 +166,7 @@ int CLuaFunctionDefs::OutputDebugString ( lua_State* luaVM )
     unsigned char ucR, ucG, ucB;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strMessage );
+    argStream.ReadAnyAsString( strMessage );
     argStream.ReadNumber ( uiLevel, 3 );
 
     if ( uiLevel == 0 )

@@ -148,7 +148,7 @@ int CLuaFunctionDefs::OutputClientDebugString ( lua_State* luaVM )
     unsigned char ucGreen = 255;
     unsigned char ucBlue = 255;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strText );
+    argStream.ReadAnyAsString ( strText );
     argStream.ReadNumber ( uiLevel, 3 );
     argStream.ReadNumber ( ucRed, 255 );
     argStream.ReadNumber ( ucGreen, 255 );
