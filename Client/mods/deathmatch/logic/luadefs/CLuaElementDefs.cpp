@@ -652,22 +652,16 @@ int CLuaElementDefs::GetElementTurnVelocity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        // Grab the element, verify it
-        if ( pEntity )
+        // Grab the turn velocity
+        CVector vecTurnVelocity;
+        if ( CStaticFunctionDefinitions::GetElementTurnVelocity ( *pEntity, vecTurnVelocity ) )
         {
-            // Grab the turn velocity
-            CVector vecTurnVelocity;
-            if ( CStaticFunctionDefinitions::GetElementTurnVelocity ( *pEntity, vecTurnVelocity ) )
-            {
-                // Return it
-                lua_pushnumber ( luaVM, vecTurnVelocity.fX );
-                lua_pushnumber ( luaVM, vecTurnVelocity.fY );
-                lua_pushnumber ( luaVM, vecTurnVelocity.fZ );
-                return 3;
-            }
+            // Return it
+            lua_pushnumber ( luaVM, vecTurnVelocity.fX );
+            lua_pushnumber ( luaVM, vecTurnVelocity.fY );
+            lua_pushnumber ( luaVM, vecTurnVelocity.fZ );
+            return 3;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2135,17 +2129,12 @@ int CLuaElementDefs::SetElementTurnVelocity ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Set the turn velocity
+        if ( CStaticFunctionDefinitions::SetElementTurnVelocity ( *pEntity, vecTurnVelocity ) )
         {
-            // Set the turn velocity
-            if ( CStaticFunctionDefinitions::SetElementTurnVelocity ( *pEntity, vecTurnVelocity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
