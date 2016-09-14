@@ -105,7 +105,7 @@ void CWebsiteRequests::Clear ()
     m_Callbacks.clear ();
 }
 
-void CWebsiteRequests::Callback ( bool bAllow )
+void CWebsiteRequests::Callback(bool bAllow, const std::unordered_set<SString>& requests)
 {
     // Make a copy of the callbacks list to be able to add new callbacks in this 'cycle'
     std::list<WebRequestCallback> callbacks = m_Callbacks;
@@ -114,18 +114,17 @@ void CWebsiteRequests::Callback ( bool bAllow )
     m_Callbacks.clear();
 
     // Call callbacks and clear list
-    const auto& pendingRequests = g_pCore->GetWebCore ()->GetPendingRequests ();
-    for ( auto& callback : callbacks)
+    for (auto& callback : callbacks)
     {
-        callback ( bAllow, pendingRequests );
+        callback(bAllow, requests);
     }
 }
 
 bool CWebsiteRequests::OnAllowButtonClick ( CGUIElement* pElement )
 {
     Hide();
-    g_pCore->GetWebCore()->AllowPendingPages(m_pCheckRemember->GetSelected());
-    Callback ( true );
+    auto requests = g_pCore->GetWebCore()->AllowPendingPages(m_pCheckRemember->GetSelected());
+    Callback(true, requests);
 
     return true;
 }
@@ -133,8 +132,8 @@ bool CWebsiteRequests::OnAllowButtonClick ( CGUIElement* pElement )
 bool CWebsiteRequests::OnDenyButtonClick ( CGUIElement* pElement )
 {
     Hide();
-    g_pCore->GetWebCore()->DenyPendingPages();
-    Callback ( false );
+    auto requests = g_pCore->GetWebCore()->DenyPendingPages();
+    Callback(false, requests);
 
     return true;
 }
