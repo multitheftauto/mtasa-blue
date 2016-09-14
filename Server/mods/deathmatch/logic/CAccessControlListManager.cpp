@@ -46,6 +46,8 @@ CAccessControlListManager::~CAccessControlListManager ( void )
 
 bool CAccessControlListManager::Load ( void )
 {
+    m_bAllowSave = true;
+
     // Eventually destroy the previously loaded xml
     if ( m_pXML )
     {
@@ -80,6 +82,7 @@ bool CAccessControlListManager::Load ( void )
     // Clear previous ACL stuff
     ClearACLs ();
     ClearGroups ();
+    ClearReadCache ();
 
     // load the acl's
     CXMLNode* pSubNode = NULL;
@@ -220,8 +223,23 @@ bool CAccessControlListManager::Load ( void )
 }
 
 
+bool CAccessControlListManager::Reload ( void )
+{
+    // Flush any pending saves - This is ok because reloading is for loading manual changes to acl.xml
+    // and manual changes are subject to being overwritten by server actions at any time.
+    if ( m_bNeedsSave )
+        Save ();
+
+    return Load ();
+}
+
+
 bool CAccessControlListManager::Save ( void )
 {
+    // Only allow save after a load was attempted
+    if ( !m_bAllowSave )
+        return false;
+
     m_bNeedsSave = false;
     m_AutoSaveTimer.Reset ();
 
@@ -298,8 +316,8 @@ void CAccessControlListManager::DoPulse ( void )
     if ( m_bReadCacheDirty || GetTickCount64_ () - m_llLastTimeReadCacheCleared > 1000 * 60 * 60 * 12 )
         ClearReadCache ();
 
-    // Save when needed, but no more than once every 10 seconds
-    if ( m_AutoSaveTimer.Get () > 10000 && m_bNeedsSave )
+    // Save when needed, but no more than once a second
+    if ( m_AutoSaveTimer.Get () > 1000 && m_bNeedsSave )
         Save ();
 }
 
