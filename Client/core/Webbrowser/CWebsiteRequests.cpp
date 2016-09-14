@@ -123,13 +123,8 @@ void CWebsiteRequests::Callback(bool bAllow, const std::unordered_set<SString>& 
 bool CWebsiteRequests::OnAllowButtonClick ( CGUIElement* pElement )
 {
     Hide();
-<<<<<<< HEAD
-    g_pCore->GetWebCore()->AllowPendingPages(m_pCheckRemember->GetSelected());
-    Callback ( true );
-=======
     auto requests = g_pCore->GetWebCore()->AllowPendingPages(m_pCheckRemember->GetSelected());
     Callback(true, requests);
->>>>>>> origin/master
 
     return true;
 }
@@ -137,13 +132,8 @@ bool CWebsiteRequests::OnAllowButtonClick ( CGUIElement* pElement )
 bool CWebsiteRequests::OnDenyButtonClick ( CGUIElement* pElement )
 {
     Hide();
-<<<<<<< HEAD
-    g_pCore->GetWebCore()->DenyPendingPages();
-    Callback ( false );
-=======
     auto requests = g_pCore->GetWebCore()->DenyPendingPages();
     Callback(false, requests);
->>>>>>> origin/master
 
     return true;
 }
