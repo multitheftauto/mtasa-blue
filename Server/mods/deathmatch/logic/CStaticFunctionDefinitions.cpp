@@ -1464,7 +1464,7 @@ bool CStaticFunctionDefinitions::SetElementTurnVelocity ( CElement* pElement, co
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-	        pVehicle->SetTurnSpeed ( vecTurnVelocity );
+            pVehicle->SetTurnSpeed ( vecTurnVelocity );
 
             break;
         }
@@ -1483,7 +1483,7 @@ bool CStaticFunctionDefinitions::SetElementTurnVelocity ( CElement* pElement, co
     BitStream.pBitStream->Write ( vecTurnVelocity.fZ );
     m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_TURNSPEED, *BitStream.pBitStream ) );
 
-	return true;
+    return true;
 }
 
 
