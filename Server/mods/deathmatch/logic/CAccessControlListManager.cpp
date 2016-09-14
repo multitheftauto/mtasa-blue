@@ -575,6 +575,22 @@ const char* CAccessControlListManager::ExtractRightName ( const char* szRightNam
     return NULL;
 }
 
+
+//
+// Get list of group names the supplied object belongs to
+//
+std::vector < SString > CAccessControlListManager::GetObjectGroupNames ( const SString& strObjectName, CAccessControlListGroupObject::EObjectType objectType )
+{
+    std::vector < SString > groupNameList;
+    for ( auto pGroup : m_Groups )
+        for ( auto itero = pGroup->IterBeginObjects () ; itero != pGroup->IterEndObjects (); itero++ )
+            if ( (*itero)->GetObjectType () == objectType )
+                if ( strObjectName == (*itero)->GetObjectName () || strcmp ( (*itero)->GetObjectName (), "*" ) == 0 )
+                    groupNameList.push_back ( pGroup->GetGroupName () );
+    return groupNameList;
+}
+
+
 //
 // Called when an item within the ACL is modified
 //
