@@ -254,7 +254,7 @@ namespace
     {
         bool bRemoved;
         SString strOldName;
-        SString strNewName;      
+        SString strNewName;
     };
 
     SDeprecatedItem clientDeprecatedList[] = {
@@ -315,6 +315,8 @@ namespace
         { false, "setObjectStatic",                "setElementFrozen" },
         { false, "isPlayerDead",                   "isPedDead" },
         { false, "showPlayerHudComponent",         "setPlayerHudComponentVisible" },
+        { false, "getVehicleTurnVelocity",         "getElementTurnVelocity" },
+        { false, "setVehicleTurnVelocity",         "setElementTurnVelocity" },
         // Edit
         { false, "guiEditSetCaratIndex",           "guiEditSetCaretIndex" },
         { false, "guiMemoSetCaratIndex",           "guiMemoSetCaretIndex" },
@@ -374,6 +376,8 @@ namespace
         { false, "attachElementToElement",         "attachElements" },
         { false, "detachElementFromElement",       "detachElements" },
         { false, "showPlayerHudComponent",         "setPlayerHudComponentVisible"},
+        { false, "getVehicleTurnVelocity",         "getElementTurnVelocity" },
+        { false, "setVehicleTurnVelocity",         "setElementTurnVelocity" },
         // XML
         { false, "xmlNodeGetSubNodes",             "xmlNodeGetChildren" },
         { false, "xmlCreateSubNode",               "xmlCreateChild" },
