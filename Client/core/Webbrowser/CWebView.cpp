@@ -404,7 +404,8 @@ void CWebView::Resize(const CVector2D& size)
     m_pWebBrowserRenderItem->Resize(size);
 
     // Send resize event to CEF
-    m_pWebView->GetHost()->WasResized();
+    if ( m_pWebView )
+        m_pWebView->GetHost()->WasResized();
 
     // Tell CEF to render a new frame
     m_RenderData.cv.notify_all();
