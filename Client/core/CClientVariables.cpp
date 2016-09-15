@@ -325,7 +325,6 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "fov",                        70 );                           // Camera field of view
     DEFAULT ( "browser_remote_websites",    true );                         // Load remote websites?
     DEFAULT ( "browser_remote_javascript",  true );                         // Execute javascript on remote websites?
-    DEFAULT ( "browser_plugins",            false );                         // Enable browser plugins?
     DEFAULT ( "filter_duplicate_log_lines", true );                         // Filter duplicate log lines for debug view and clientscript.log
 
     if (!Exists("locale"))

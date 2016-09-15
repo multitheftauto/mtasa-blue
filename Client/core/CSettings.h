@@ -331,7 +331,6 @@ protected:
     CGUILabel*          m_pLabelBrowserGeneral;
     CGUICheckBox*       m_pCheckBoxRemoteBrowser;
     CGUICheckBox*       m_pCheckBoxRemoteJavascript;
-    CGUICheckBox*       m_pCheckBoxBrowserPluginsEnabled;
     CGUILabel*          m_pLabelBrowserCustomBlacklist;
     CGUIEdit*           m_pEditBrowserBlacklistAdd;
     CGUIButton*         m_pButtonBrowserBlacklistAdd;

@@ -80,7 +80,6 @@ public:
 
     bool                GetRemotePagesEnabled ();
     bool                GetRemoteJavascriptEnabled ();
-    bool                GetPluginsEnabled   ();
 
     void                OnPreScreenshot     ();
     void                OnPostScreenshot    ();

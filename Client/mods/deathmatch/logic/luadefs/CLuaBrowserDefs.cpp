@@ -681,7 +681,7 @@ int CLuaBrowserDefs::GetBrowserSettings ( lua_State* luaVM )
     lua_settable ( luaVM, -3 );
 
     lua_pushstring ( luaVM, "PluginsEnabled" );
-    lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetPluginsEnabled () );
+    lua_pushboolean ( luaVM, false );
     lua_settable ( luaVM, -3 );
 
     return 1;

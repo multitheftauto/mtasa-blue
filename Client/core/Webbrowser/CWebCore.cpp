@@ -394,13 +394,6 @@ bool CWebCore::GetRemoteJavascriptEnabled ()
     return bIsRemoteJavascriptEnabled;
 }
 
-bool CWebCore::GetPluginsEnabled ()
-{
-    bool bArePluginsEnabled;
-    CVARS_GET ( "browser_plugins", bArePluginsEnabled );
-    return bArePluginsEnabled;
-}
-
 void CWebCore::OnPreScreenshot ()
 {
     // Clear all textures
