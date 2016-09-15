@@ -28,7 +28,7 @@ public:
     };
 
                                     CClient3DMarker                     ( CClientMarker * pThis );
-                                    ~CClient3DMarker                    ( void );
+                                    ~CClient3DMarker                    ( void ) = default;
 
     inline unsigned int             GetMarkerType                       ( void ) const                      { return CClientMarkerCommon::CLASS_3DMARKER; };
 

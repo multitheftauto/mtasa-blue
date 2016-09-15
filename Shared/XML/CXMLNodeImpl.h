@@ -34,10 +34,7 @@ public:
     CXMLNode*               GetSubNode          ( unsigned int uiIndex );
     CXMLNode*               FindSubNode         ( const char* szTagName, unsigned int uiIndex = 0 );
 
-    std::list < CXMLNode* > ::iterator
-                            ChildrenBegin       ( void ) { return m_Children.begin (); };
-    std::list < CXMLNode* > ::iterator
-                            ChildrenEnd         ( void ) { return m_Children.end (); };
+    const std::list<CXMLNode*>& GetChildren     ( void ) { return m_Children; }
 
     CXMLAttributes&         GetAttributes       ( void );
     CXMLNode*               GetParent           ( void );

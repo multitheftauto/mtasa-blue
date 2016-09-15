@@ -233,13 +233,6 @@ void COMMAND_RadioPrevious ( const char* szCmdLine )
     }
 }
 
-/*
-void COMMAND_Screenshot ( const char* szCmdLine )
-{
-    g_pClientGame->GetScreenshot ()->SetScreenshotKey ( true );
-}
-*/
-
 void COMMAND_RadarMap ( const char* szCmdLine )
 {
     int iCmd = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
@@ -730,11 +723,10 @@ void COMMAND_DumpPlayers ( const char* szCmdLine )
         fprintf ( pFile, "Used point single link pool: %u\n\n\n", g_pGame->GetPools ()->GetNumberOfUsedSpaces ( POINTER_SINGLE_LINK_POOL ) );
 
         // Loop through all players
-        vector < CClientPlayer* > ::const_iterator iter = g_pClientGame->GetPlayerManager ()->IterBegin ();
-        for ( ; iter != g_pClientGame->GetPlayerManager ()->IterEnd (); iter++ )
+        for ( auto& pPlayer : g_pClientGame->GetPlayerManager()->GetPlayers() )
         {
             // Write the player dump
-            DumpPlayer ( *iter, pFile );
+            DumpPlayer ( pPlayer, pFile );
         }
 
         // End of the dump. Close it
@@ -790,15 +782,6 @@ void COMMAND_ServerInfo ( const char* szCmdLine )
 void COMMAND_ShowSyncing ( const char *szCmdLine )
 {
     g_pClientGame->ShowSyncingInfo ( atoi ( szCmdLine ) == 1 );
-}
-
-#endif
-
-#ifdef MTA_DEBUG
-
-void COMMAND_Foo ( const char* szCmdLine )
-{
-    g_pClientGame->m_Foo.Test ( szCmdLine );
 }
 
 #endif

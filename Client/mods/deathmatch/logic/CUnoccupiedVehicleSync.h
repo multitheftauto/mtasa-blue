@@ -32,11 +32,7 @@ public:
     void                            AddVehicle                          ( CDeathmatchVehicle* pVehicle );
     void                            RemoveVehicle                       ( CDeathmatchVehicle* pVehicle );
     void                            ClearVehicles                       ( void );
-
-    inline std::list < CDeathmatchVehicle* > ::const_iterator
-                                    IterBegin                           ( void )    { return m_List.begin (); };
-    inline std::list < CDeathmatchVehicle* > ::const_iterator
-                                    IterEnd                             ( void )    { return m_List.end (); };
+    const CMappedList < CDeathmatchVehicle* >& GetVehicles              ( void ) { return m_List; }
 
     bool                            Exists                              ( CDeathmatchVehicle * pVehicle );
 private:

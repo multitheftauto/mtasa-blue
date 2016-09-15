@@ -299,7 +299,7 @@ public:
     VOID                            Request                 ( EModelRequestType requestType, const char* szTag );
     VOID                            Remove                  ( void );
     BYTE                            GetLevelFromPosition    ( CVector * vecPosition );
-    BOOL                            IsLoaded                ( void );
+    bool                            IsLoaded                ( void );
     BOOL                            DoIsLoaded              ( void );
     BYTE                            GetFlags                ( void );
     CBoundingBox *                  GetBoundingBox          ( void );

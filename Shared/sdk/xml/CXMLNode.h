@@ -30,10 +30,7 @@ public:
     virtual CXMLNode*           GetSubNode          ( unsigned int uiIndex ) = 0;
     virtual CXMLNode*           FindSubNode         ( const char* szTagName, unsigned int uiIndex = 0 ) = 0;
 
-    virtual std::list < CXMLNode* > ::iterator
-                                ChildrenBegin       ( void ) = 0;
-    virtual std::list < CXMLNode* > ::iterator
-                                ChildrenEnd         ( void ) = 0;
+    virtual const std::list < CXMLNode* >& GetChildren         ( void ) = 0;
 
     virtual CXMLAttributes&     GetAttributes       ( void ) = 0;
     virtual CXMLNode*           GetParent           ( void ) = 0;

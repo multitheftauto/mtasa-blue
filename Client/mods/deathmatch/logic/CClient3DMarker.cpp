@@ -29,12 +29,6 @@ CClient3DMarker::CClient3DMarker ( CClientMarker * pThis )
 }
 
 
-CClient3DMarker::~CClient3DMarker ( void )
-{
-
-}
-
-
 unsigned long CClient3DMarker::Get3DMarkerType ( void )
 {
     switch ( m_dwType )

@@ -12,8 +12,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 extern CCoreInterface* g_pCore;
 extern CLocalizationInterface* g_pLocalization;
 extern CClientGame* g_pClientGame;
@@ -202,10 +200,8 @@ bool CLocalServer::Load ( void )
         if ( pServerPlayers ) m_pEditPlayers->SetText ( pServerPlayers->GetTagContent().c_str() );
 
         // Read the startup resources
-        list < CXMLNode* > ::const_iterator iter = pRoot->ChildrenBegin ();
-        for ( ; iter != pRoot->ChildrenEnd (); ++iter )
+        for ( auto& pNode : pRoot->GetChildren() )
         {
-            CXMLNode* pNode = reinterpret_cast < CXMLNode* > ( *iter );
             if ( pNode->GetTagName ().compare ( "resource" ) == 0 )
             {
                 CXMLAttribute* src = pNode->GetAttributes().Find ( "src" );
@@ -352,14 +348,14 @@ bool CLocalServer::Save ( void )
 
         // Remove old resources from the config
         CXMLNode* pRoot = m_pConfig->GetRootNode();
-        list < CXMLNode* > ::const_iterator iter = pRoot->ChildrenBegin ();
-        for ( ; iter != pRoot->ChildrenEnd (); ++iter )
+        auto& list = pRoot->GetChildren();
+        for ( auto& iter = list.begin(); iter != list.end(); ++iter )
         {
             CXMLNode* pNode = reinterpret_cast < CXMLNode* > ( *iter );
             if ( pNode->GetTagName().compare ( "resource" ) == 0 )
             {
                 pRoot->DeleteSubNode ( pNode );
-                iter = pRoot->ChildrenBegin ();
+                iter = list.begin();
             }
         }
 

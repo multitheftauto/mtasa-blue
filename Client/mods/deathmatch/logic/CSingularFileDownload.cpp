@@ -45,23 +45,10 @@ CSingularFileDownload::CSingularFileDownload ( CResource* pResource, const char 
 }
 
 
-CSingularFileDownload::~CSingularFileDownload ( void )
-{
-}
-
-
 void CSingularFileDownload::DownloadFinishedCallBack ( char *data, size_t dataLength, void *obj, bool bSuccess, int iErrorCode )
 {
-    if ( bSuccess )
-    {
-        CSingularFileDownload * pFile = (CSingularFileDownload*)obj;
-        pFile->CallFinished ( true );
-    }
-    else
-    {
-        CSingularFileDownload * pFile = (CSingularFileDownload*)obj;
-        pFile->CallFinished ( false );
-    }
+    CSingularFileDownload * pFile = reinterpret_cast<CSingularFileDownload*>(obj);
+    pFile->CallFinished ( bSuccess );
 }
 
 

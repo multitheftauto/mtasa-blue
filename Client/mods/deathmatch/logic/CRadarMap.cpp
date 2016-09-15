@@ -16,7 +16,6 @@
 #include "StdInc.h"
 
 using SharedUtil::CalcMTASAPath;
-using std::list;
 
 enum
 {
@@ -270,12 +269,8 @@ void CRadarMap::DoRender ( void )
 
         // Now loop our radar areas
         unsigned short usDimension = m_pRadarAreaManager->GetDimension ();
-        CClientRadarArea * pArea = NULL;
-        list < CClientRadarArea* > ::const_iterator areaIter = m_pRadarAreaManager->IterBegin ();
-        for ( ; areaIter != m_pRadarAreaManager->IterEnd (); ++areaIter )
+        for ( auto& pArea : m_pRadarAreaManager->GetRadarAreas() )
         {
-            pArea = *areaIter;
-
             if ( pArea->GetDimension() == usDimension )
             {
                 // Grab the area image and calculate the position to put it on the screen
@@ -284,8 +279,8 @@ void CRadarMap::DoRender ( void )
 
                 // Get the area size and work out the ratio
                 CVector2D vecSize;
-                float fX = (*areaIter)->GetSize ().fX;
-                float fY = (*areaIter)->GetSize ().fY;
+                float fX = pArea->GetSize ().fX;
+                float fY = pArea->GetSize ().fY;
                 float fRatio = 6000.0f / m_fMapSize;
 
                 // Calculate the size of the area
@@ -304,20 +299,19 @@ void CRadarMap::DoRender ( void )
 
         // Now loop our radar markers
         usDimension = m_pRadarMarkerManager->GetDimension();
-        list < CClientRadarMarker* > ::const_iterator markerIter = m_pRadarMarkerManager->IterBegin ();
-        for ( ; markerIter != m_pRadarMarkerManager->IterEnd (); ++markerIter )
+        for ( auto& pMarker : m_pRadarMarkerManager->GetMarkers())
         {
-            if ( (*markerIter)->IsVisible () && (*markerIter)->GetDimension() == usDimension )
+            if ( pMarker->IsVisible () && pMarker->GetDimension() == usDimension )
             {
                 // Grab the marker image and calculate the position to put it on the screen
                 float fScale = 1;
                 SColor color;
-                CTextureItem* pTexture = GetMarkerTexture ( *markerIter, vecLocal.fZ, &fScale, &color );
+                CTextureItem* pTexture = GetMarkerTexture ( pMarker, vecLocal.fZ, &fScale, &color );
 
                 if ( pTexture )
                 {
                     CVector2D vecPos;
-                    CalculateEntityOnScreenPosition ( *markerIter, vecPos );
+                    CalculateEntityOnScreenPosition ( pMarker, vecPos );
                     g_pCore->GetGraphics()->DrawTexture ( pTexture, vecPos.fX, vecPos.fY, fScale, fScale, 0.0f, 0.5f, 0.5f, color );
                 }
             }

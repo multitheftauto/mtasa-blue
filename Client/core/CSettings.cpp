@@ -3492,10 +3492,8 @@ void CSettings::LoadChatPresets( )
         if ( !pPresetsRoot )
             pPresetsRoot = pPresetsFile->CreateRootNode ( CHAT_PRESETS_ROOT );
 
-        list < CXMLNode* >::const_iterator iter = pPresetsRoot->ChildrenBegin ();
-        for ( ; iter != pPresetsRoot->ChildrenEnd (); iter++ )
+        for ( auto& pNode : pPresetsRoot->GetChildren() )
         {
-            CXMLNode* pNode = reinterpret_cast < CXMLNode* > ( *iter );
             if ( pNode->GetTagName ().compare ( "preset" ) == 0 )
             {
                 CXMLAttribute* pName = pNode->GetAttributes().Find ( "name" );
@@ -3572,11 +3570,9 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
     if ( !pNode )
         return true;
 
-    list < CXMLNode* >::const_iterator iter = pNode->ChildrenBegin ();
-    for ( ; iter != pNode->ChildrenEnd (); iter++ )
+    for ( auto& pSubNode : pNode->GetChildren() )
     {
         // Load all settings provided
-        CXMLNode* pSubNode = reinterpret_cast < CXMLNode* > ( *iter );
         string strTag = pSubNode->GetTagName ();
         string strValue = pSubNode->GetTagContent();
         

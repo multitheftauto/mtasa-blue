@@ -60,10 +60,9 @@ void CClientTeam::RemovePlayer ( CClientPlayer* pPlayer, bool bChangePlayer )
 
 void CClientTeam::RemoveAll ( void )
 {
-    list < CClientPlayer* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for(auto& pPlayer : m_List) 
     {
-        (*iter)->SetTeam ( NULL, false );
+        pPlayer->SetTeam ( nullptr, false );
     }
     m_List.clear ();
 }
@@ -71,10 +70,9 @@ void CClientTeam::RemoveAll ( void )
 
 bool CClientTeam::Exists ( CClientPlayer* pPlayer )
 {
-    list < CClientPlayer* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for (auto& pIterPlayer : m_List)
     {
-        if ( *iter == pPlayer )
+        if ( pIterPlayer == pPlayer )
             return true;
     }
 
