@@ -34,7 +34,7 @@ public:
     CXMLNode*               GetSubNode          ( unsigned int uiIndex );
     CXMLNode*               FindSubNode         ( const char* szTagName, unsigned int uiIndex = 0 );
 
-    auto&                   GetChildren         ( void ) { return m_Children; }
+    const std::list<CXMLNode*>& GetChildren     ( void ) { return m_Children; }
 
     CXMLAttributes&         GetAttributes       ( void );
     CXMLNode*               GetParent           ( void );
