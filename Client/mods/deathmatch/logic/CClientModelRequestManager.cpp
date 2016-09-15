@@ -222,7 +222,7 @@ void CClientModelRequestManager::Cancel ( CClientEntity* pEntity, bool bAllowQue
         {
             // Anything requested by the given class?
             SClientModelRequest* pEntry;
-            for ( auto& iter = m_Requests.begin(); iter != m_Requests.end(); )
+            for ( auto iter = m_Requests.begin(); iter != m_Requests.end(); )
             {
                 pEntry = *iter;
 
@@ -259,7 +259,7 @@ void CClientModelRequestManager::DoPulse ( void )
 
         // Call the callback for those finished loading and remove them from the list
         SClientModelRequest* pEntry;
-        for ( auto& iter = m_Requests.begin (); iter != m_Requests.end (); )
+        for ( auto iter = m_Requests.begin (); iter != m_Requests.end (); )
         {
             pEntry = *iter;
 
@@ -323,7 +323,7 @@ void CClientModelRequestManager::DoPulse ( void )
 bool CClientModelRequestManager::GetRequestEntry ( CClientEntity* pRequester, std::list < SClientModelRequest* > ::iterator& iterOut )
 {
     // Look through the list
-    for ( auto& iter = m_Requests.begin() ; iter != m_Requests.end (); iter++ )
+    for ( auto iter = m_Requests.begin() ; iter != m_Requests.end (); iter++ )
     {
         // Same requester as we check for? He has requested something.
         if ( (*iter)->pEntity == pRequester )

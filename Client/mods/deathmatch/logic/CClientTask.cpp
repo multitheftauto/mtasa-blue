@@ -306,8 +306,8 @@ bool CClientTask::WriteParameters ( lua_State* luaVM, int iTableIndex )
     }
 
     // Push the values to it.
-    auto& iterKey = m_Keys.begin ();
-    auto& iterValue = m_Values.begin ();
+    auto iterKey = m_Keys.begin ();
+    auto iterValue = m_Values.begin ();
     while ( iterKey != m_Keys.end () )
     {
         // Add the entries to it

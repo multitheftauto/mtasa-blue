@@ -103,7 +103,7 @@ bool CDebugHookManager::RemoveDebugHook( EDebugHookType hookType, const CLuaFunc
     CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( functionRef.GetLuaVM() );
 
     std::vector < SDebugHookCallInfo >& hookInfoList = GetHookInfoListForType( hookType );
-    for( auto& iter = hookInfoList.begin() ; iter != hookInfoList.end() ; ++iter )
+    for( auto iter = hookInfoList.begin() ; iter != hookInfoList.end() ; ++iter )
     {
         if ( (*iter).pLuaMain == pLuaMain && (*iter).functionRef == functionRef )
         {

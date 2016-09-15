@@ -99,7 +99,7 @@ void CScriptKeyBinds::Add ( CScriptKeyBind* pKeyBind )
 
 void CScriptKeyBinds::Clear ( eScriptKeyBindType bindType )
 {
-    auto& iter = m_List.begin ();
+    auto iter = m_List.begin ();
     while ( iter != m_List.end () )
     {
         auto& pKeyBind = *iter;
@@ -279,7 +279,7 @@ bool CScriptKeyBinds::RemoveKeyFunction ( const SScriptBindableKey* pKey, CLuaMa
     bool bFound = false;
     CScriptKeyFunctionBind* pBind = NULL;
     auto cloneList = m_List;
-    auto& iter = cloneList.begin ();
+    auto iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_FUNCTION )
@@ -357,7 +357,7 @@ void CScriptKeyBinds::RemoveAllKeys ( CLuaMain* pLuaMain )
 {
     CScriptKeyBind * pBind = NULL;
     auto cloneList = m_List;
-    auto& iter = cloneList.begin ();
+    auto iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
         pBind = *iter;
@@ -437,7 +437,7 @@ bool CScriptKeyBinds::RemoveControlFunction ( const SScriptBindableGTAControl* p
     bool bFound = false;
     CScriptControlFunctionBind* pBind = NULL;
     auto cloneList = m_List;
-    auto& iter = cloneList.begin ();
+    auto iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_CONTROL_FUNCTION )

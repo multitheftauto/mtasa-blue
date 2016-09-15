@@ -19,7 +19,7 @@ void CMovingObjectsManager::DoPulse ( void )
     // Pulse all the objects we're moving
     bool bRemoved = false;
     CDeathmatchObject* pObject;
-    auto& iter = m_List.begin ();
+    auto iter = m_List.begin ();
     while ( iter != m_List.end () )
     {
         pObject = *iter;

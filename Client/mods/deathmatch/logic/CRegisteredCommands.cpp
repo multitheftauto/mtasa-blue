@@ -61,7 +61,7 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey 
     
     int iCompareResult;
 
-    auto& iter = m_Commands.begin();
+    auto iter = m_Commands.begin();
     while ( iter != m_Commands.end () )
     {
         if ( (*iter)->bCaseSensitive )
@@ -111,7 +111,7 @@ void CRegisteredCommands::CleanUpForVM ( CLuaMain* pLuaMain )
     assert ( pLuaMain );
 
     // Delete every command that matches
-    for ( auto& iter = m_Commands.begin() ; iter != m_Commands.end (); )
+    for ( auto iter = m_Commands.begin() ; iter != m_Commands.end (); )
     {
         // Matching VM's?
         if ( (*iter)->pLuaMain == pLuaMain )
