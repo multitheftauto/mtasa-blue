@@ -201,8 +201,15 @@ void CWebView::UpdateTexture()
 
     // Discard current buffer if size doesn't match
     // This happens when resizing the browser as OnPaint is called asynchronously
-    if (m_RenderData.changed && (m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height))
+    bool viewSizeMismatches = m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height;
+    bool popupSizeMismatches = m_RenderData.popupRect.x + m_RenderData.popupRect.width >= (int)m_pWebBrowserRenderItem->m_uiSizeX 
+        || m_RenderData.popupRect.y + m_RenderData.popupRect.height >= (int)m_pWebBrowserRenderItem->m_uiSizeY;
+
+    if (m_RenderData.changed
+        && ((m_RenderData.paintType == PET_VIEW && viewSizeMismatches) || (m_RenderData.paintType == PET_POPUP && popupSizeMismatches)))
+    {
         m_RenderData.changed = false;
+    }
 
     if (m_RenderData.changed)
     {
