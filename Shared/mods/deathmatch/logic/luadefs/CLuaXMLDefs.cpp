@@ -468,10 +468,10 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
         {
             lua_newtable ( luaVM );
             uiIndex = 0;
-            for (auto iter = pNode->ChildrenBegin (); iter != pNode->ChildrenEnd (); ++iter )
+            for (auto& pChild : pNode->GetChildren () )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
-                lua_pushxmlnode ( luaVM, *iter );
+                lua_pushxmlnode ( luaVM, pChild );
                 lua_settable ( luaVM, -3 );
             }
             return 1;

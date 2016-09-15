@@ -19,8 +19,6 @@
 #include "profiler/SharedUtil.Profiler.h"
 #include "CServerIdManager.h"
 
-using namespace std;
-
 extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
@@ -132,25 +130,22 @@ CResource::~CResource ( void )
     m_pRootEntity = NULL;
     m_pResourceEntity = NULL;
 
-    list < CResourceFile* >::iterator iter = m_ResourceFiles.begin ();
-    for ( ; iter != m_ResourceFiles.end (); ++iter )
+    for ( auto& pResourceFile : m_ResourceFiles )
     {
-        delete ( *iter );
+        delete pResourceFile;
     }
     m_ResourceFiles.clear ();
 
-    list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
-    for ( ; iterc != m_ConfigFiles.end (); ++iterc )
+    for ( auto& pConfig : m_ConfigFiles )
     {
-        delete ( *iterc );
+        delete pConfig;
     }
     m_ConfigFiles.clear ();
 
     // Delete the exported functions
-    list < CExportedFunction* >::iterator iterExportedFunction = m_exportedFunctions.begin();
-    for ( ; iterExportedFunction != m_exportedFunctions.end(); ++iterExportedFunction )
+    for ( auto& pFunction : m_exportedFunctions )
     {
-        delete ( *iterExportedFunction );
+        delete pFunction;
     }
     m_exportedFunctions.clear();
 }
@@ -205,10 +200,9 @@ void CResource::AddExportedFunction ( const char *szFunctionName )
 
 bool CResource::CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller )
 {
-    list < CExportedFunction* > ::iterator iter =  m_exportedFunctions.begin ();
-    for ( ; iter != m_exportedFunctions.end (); ++iter )
+    for ( auto& pFunc : m_exportedFunctions )
     {
-        if ( strcmp ( (*iter)->GetFunctionName(), szFunctionName ) == 0 )
+        if ( strcmp ( pFunc->GetFunctionName(), szFunctionName ) == 0 )
         {
             if ( args.CallGlobal ( m_pLuaVM, szFunctionName, &returns ) )
             {
@@ -226,13 +220,13 @@ bool CResource::CanBeLoaded( void )
 
 bool CResource::IsWaitingForInitialDownloads( void )
 {
-    for ( std::list < CResourceConfigItem* >::iterator iter = m_ConfigFiles.begin ( ); iter != m_ConfigFiles.end () ; ++iter )
-        if ( (*iter)->IsWaitingForDownload() )
+    for ( auto& pConfig : m_ConfigFiles )
+        if ( pConfig->IsWaitingForDownload() )
             return true;
 
-    for ( std::list < CResourceFile* >::iterator iter = m_ResourceFiles.begin ( ); iter != m_ResourceFiles.end () ; ++iter )
-        if ( (*iter)->IsAutoDownload() )
-            if ( (*iter)->IsWaitingForDownload() )
+    for ( auto& pFile : m_ResourceFiles )
+        if ( pFile->IsAutoDownload() )
+            if ( pFile->IsWaitingForDownload() )
                 return true;
     return false;
 }
@@ -269,30 +263,26 @@ void CResource::Load ( void )
             (*iter)->SetDownloaded();
 
     // Load config files
-    list < CResourceConfigItem* >::iterator iterc = m_ConfigFiles.begin ();
-    for ( ; iterc != m_ConfigFiles.end (); ++iterc )
+    for ( auto& pConfig : m_ConfigFiles )
     {
-        if ( !(*iterc)->Start() )
+        if ( !pConfig->Start() )
         {
-            CLogger::LogPrintf ( "Failed to start resource item %s in %s\n", (*iterc)->GetName(), *m_strResourceName );
+            CLogger::LogPrintf ( "Failed to start resource item %s in %s\n", pConfig->GetName(), *m_strResourceName );
         }
     }
 
     // Load the no cache scripts first
-    for ( std::list < SNoClientCacheScript >::iterator iter = m_NoClientCacheScriptList.begin() ; iter != m_NoClientCacheScriptList.end() ; ++iter )
+    for ( auto& item : m_NoClientCacheScriptList )
     {
         DECLARE_PROFILER_SECTION( OnPreLoadNoClientCacheScript )
-        const SNoClientCacheScript& item = *iter;
         GetVM()->LoadScriptFromBuffer ( item.buffer.GetData(), item.buffer.GetSize(), item.strFilename );
         DECLARE_PROFILER_SECTION( OnPostLoadNoClientCacheScript )
     }
     m_NoClientCacheScriptList.clear();
 
     // Load the files that are queued in the list "to be loaded"
-    list < CResourceFile* > ::iterator iter = m_ResourceFiles.begin ();
-    for ( ; iter != m_ResourceFiles.end (); ++iter )
+    for ( auto& pResourceFile : m_ResourceFiles )
     {
-        CResourceFile* pResourceFile = *iter;
         // Only load the resource file if it is a client script
         if ( pResourceFile->GetResourceType () == CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT )
         {

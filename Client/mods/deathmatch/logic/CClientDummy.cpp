@@ -28,7 +28,7 @@ CClientDummy::CClientDummy ( CClientManager* pManager, ElementID ID, const char 
     }
     else
     {
-        m_pGroups = NULL;
+        m_pGroups = nullptr;
     }
 }
 

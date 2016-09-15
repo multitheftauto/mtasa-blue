@@ -332,9 +332,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     // Add our lua events
     AddBuiltInEvents ();
 
-    // Init debugger class
-    m_Foo.Init ( this );
-
     // Load some stuff from the core config
     float fScale;
     g_pCore->GetCVars ()->Get ( "text_scale", fScale );
@@ -379,10 +376,8 @@ CClientGame::~CClientGame ( void )
 
     // Destroy mimics
     #ifdef MTA_DEBUG
-        list < CClientPlayer* > ::const_iterator iterMimics = m_Mimics.begin ();
-        for ( ; iterMimics != m_Mimics.end (); iterMimics++ )
+        for ( auto& pPlayer : m_Mimics )
         {
-            CClientPlayer* pPlayer = *iterMimics;
             CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
             if ( pVehicle )
                 delete pVehicle;
@@ -897,10 +892,8 @@ void CClientGame::DoPulsePostFrame ( void )
             DrawPlayerDetails ( m_pShowPlayer );
         }
 
-        std::vector < CClientPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
+        for ( auto& pPlayer : m_pPlayerManager->GetPlayers() )
         {
-            CClientPlayer* pPlayer = *iter;
             if ( pPlayer->IsStreamedIn () && pPlayer->IsShowingWepdata () )
                 DrawWeaponsyncData ( pPlayer );
         }
@@ -914,12 +907,9 @@ void CClientGame::DoPulsePostFrame ( void )
             m_pDisplayManager->DrawText2D ( "Syncing vehicles:", vecPosition, 1.0f, 0xFFFFFFFF );
 
             // Print each vehicle we're syncing
-            CDeathmatchVehicle* pVehicle;
-            list < CDeathmatchVehicle* > ::const_iterator iter = m_pUnoccupiedVehicleSync->IterBegin ();
-            for ( ; iter != m_pUnoccupiedVehicleSync->IterEnd (); iter++ )
+            for ( auto& pVehicle : m_pUnoccupiedVehicleSync->GetVehicles() )
             {
                 vecPosition.fY += 0.03f;
-                pVehicle = *iter;
 
                 SString strBuffer ( "ID: %u (%s)", pVehicle->GetID (), pVehicle->GetNamePointer () );
 
@@ -965,9 +955,6 @@ void CClientGame::DoPulses ( void )
         m_pManager->GetPacketRecorder ()->StartPlayback ( "log.rec", false );
         m_bFirstPlaybackFrame = false;
     }
-
-    // Call debug code if debug mode
-    m_Foo.DoPulse ();
 
     // Output stuff from our internal server eventually
     m_Server.DoPulse ();
@@ -1995,10 +1982,8 @@ void CClientGame::UpdateTrailers ( void )
     CClientVehicle * pVehicle = NULL, * pTrailer = NULL;
     CVehicle * pGameVehicle = NULL, * pGameTrailer = NULL;
     unsigned long ulIllegalTowBreakTime;
-    vector < CClientVehicle* > ::const_iterator iterVehicles = m_pVehicleManager->StreamedBegin ();
-    for ( ; iterVehicles != m_pVehicleManager->StreamedEnd (); iterVehicles++ )
+    for ( auto& pVehicle : m_pVehicleManager->GetStreamedVehicles() )
     {
-        pVehicle = *iterVehicles;
         ulIllegalTowBreakTime = pVehicle->GetIllegalTowBreakTime ();
 
         // Do we have an illegal break?
@@ -2134,10 +2119,6 @@ void CClientGame::UpdateFireKey ( void )
                                     CBitStream bitStream;
                                     bitStream.pBitStream->Write ( pTargetPed->GetID () );
                                     m_pNetAPI->RPC ( REQUEST_STEALTH_KILL, bitStream.pBitStream );
-                                }
-                                else
-                                {
-                                    return;
                                 }
                             }
                         }
@@ -2408,7 +2389,7 @@ bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
         if ( wChar >= 32 )
         {
             // Generate a null-terminating string for our character
-            wchar_t wUNICODE[2] = { wChar, '\0' };
+            wchar_t wUNICODE[2] = { (wchar_t)wChar, '\0' };
 
             // Convert our UTF character into an ANSI string
             SString strANSI = UTF16ToMbUTF8 ( wUNICODE );
@@ -2711,26 +2692,27 @@ CClientPlayer * CClientGame::GetClosestRemotePlayer ( const CVector & vecPositio
     CClientPlayer * pClosest = NULL;
     float fDistance = 0.0f, fTemp;
     CVector vecTemp;
-    CClientPlayer * pPlayer;
-    vector < CClientPlayer * > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-    for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
+    for (auto& pPlayer : m_pPlayerManager->GetPlayers())
     {
-        pPlayer = *iter;
-        if ( !pPlayer->IsLocalPlayer () && !pPlayer->IsDeadOnNetwork () && pPlayer->GetHealth () > 0 )
+        // Ensure remote player is alive and sending position updates
+        if (pPlayer->IsLocalPlayer())
+            continue;
+        if (pPlayer->IsDeadOnNetwork())
+            continue;
+        if (pPlayer->GetHealth() <= 0)
+            continue;
+
+        ulong ulTimeSinceLastPuresync = CClientTime::GetTime() - pPlayer->GetLastPuresyncTime();
+        if (ulTimeSinceLastPuresync < static_cast <ulong> (g_TickRateSettings.iPureSync) * 2)
         {
-            // Ensure remote player is alive and sending position updates
-            ulong ulTimeSinceLastPuresync = CClientTime::GetTime () - pPlayer->GetLastPuresyncTime ();
-            if ( ulTimeSinceLastPuresync < static_cast < ulong > ( g_TickRateSettings.iPureSync ) * 2 )
+            pPlayer->GetPosition(vecTemp);
+            fTemp = DistanceBetweenPoints3D(vecPosition, vecTemp);
+            if (fTemp < fMaxDistance)
             {
-                pPlayer->GetPosition ( vecTemp );
-                fTemp = DistanceBetweenPoints3D ( vecPosition, vecTemp );
-                if ( fTemp < fMaxDistance )
+                if (!pClosest || fTemp < fDistance)
                 {
-                    if ( !pClosest || fTemp < fDistance )
-                    {
-                        pClosest = pPlayer;
-                        fDistance = fTemp;
-                    }
+                    pClosest = pPlayer;
+                    fDistance = fTemp;
                 }
             }
         }
@@ -3268,14 +3250,11 @@ void CClientGame::UpdateMimics ( void )
 
             // Apply this to each of our mimic players
             unsigned int uiMimicIndex = 0;
-            list < CClientPlayer* > ::const_iterator iterMimics = m_Mimics.begin ();
-            for ( ; iterMimics != m_Mimics.end (); ++iterMimics, ++uiMimicIndex )
+            for ( auto& pMimic : m_Mimics )
             {
                 vecPosition.fX += 4.0f;
                 vecOrigin.fX += 4.0f;
                 vecTarget.fX += 4.0f;
-
-                CClientPlayer* pMimic = *iterMimics;
 
                 pMimic->SetHealth ( fHealth );
                 pMimic->LockHealth ( fHealth );
@@ -3998,12 +3977,11 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
         m_BuiltCollisionMapThisFrame = true;
         m_CachedCollisionMap.clear ();
 
-        std::map < CClientEntity*, bool > ::iterator iter = m_AllDisabledCollisions.begin ();
-        for ( ; iter != m_AllDisabledCollisions.end () ; ++iter )
+        for ( auto iter : m_AllDisabledCollisions )
         {
-            CClientEntity* pEntity = iter->first;
+            CClientEntity* pEntity = iter.first;
             CEntity* pGameEntity = pEntity->GetGameEntity ();
-            CEntitySAInterface* pInterface = pGameEntity ? pGameEntity->GetInterface () : NULL;
+            CEntitySAInterface* pInterface = pGameEntity ? pGameEntity->GetInterface () : nullptr;
 
             if ( pInterface )
                 m_CachedCollisionMap[ pInterface ] = pEntity;
@@ -4011,10 +3989,10 @@ bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, 
     }
 
     // Check both elements appear in the cached map before doing extra processing
-    std::map < CEntitySAInterface*, CClientEntity* > ::iterator iter1 = m_CachedCollisionMap.find ( (CEntitySAInterface*)pThisInterface );
+    auto iter1 = m_CachedCollisionMap.find ( (CEntitySAInterface*)pThisInterface );
     if ( iter1 != m_CachedCollisionMap.end () )
     {
-        std::map < CEntitySAInterface*, CClientEntity* > ::iterator iter2 = m_CachedCollisionMap.find ( (CEntitySAInterface*)pOtherInterface );
+        auto iter2 = m_CachedCollisionMap.find ( (CEntitySAInterface*)pOtherInterface );
         if ( iter2 != m_CachedCollisionMap.end () )
         {
             // Re-get the entity pointers using a safer method
@@ -4941,7 +4919,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
     CTask * pTask = m_pLocalPlayer->GetCurrentPrimaryTask ();
     if ( pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP ) // Kill jump task - breaks warp in entry and doesn't really matter
     {
-        CClientVehicle* pVehicle = m_pLocalPlayer->GetClosestVehicleInRange ( true, !bPassenger, bPassenger, false, nullptr, nullptr, 20.0f );
+        CClientVehicle* pVehicle = m_pLocalPlayer->GetClosestVehicleInRange ( true, !bPassenger, bPassenger, nullptr, nullptr, 20.0f );
         if ( pVehicle && ( pVehicle->IsInWater() || m_pLocalPlayer->IsInWater() ) ) // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
         {
             m_pLocalPlayer->KillTask ( 3, true ); // Kill jump task if we are about to warp in
@@ -4974,7 +4952,7 @@ void CClientGame::ProcessVehicleInOutKey ( bool bPassenger )
 
     // Grab the closest vehicle
     unsigned int uiDoor = 0;
-    CClientVehicle* pVehicle = m_pLocalPlayer->GetClosestVehicleInRange ( true, !bPassenger, bPassenger, false, &uiDoor, nullptr, 20.0f );
+    CClientVehicle* pVehicle = m_pLocalPlayer->GetClosestVehicleInRange ( true, !bPassenger, bPassenger, &uiDoor, nullptr, 20.0f );
     unsigned int uiSeat = uiDoor;
 
     if ( bPassenger && uiDoor == 0 ) {
@@ -6136,9 +6114,8 @@ void CClientGame::DebugElementRender ( void )
     GetClientSpatialDatabase()->SphereQuery ( result, CSphere ( vecCameraPos, fDrawRadius ) );
  
     // For each entity found
-    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
+    for ( auto& pEntity : result  )
     {
-        CClientEntity* pEntity = *it;
         if ( pEntity->GetParent () )
             pEntity->DebugRender ( vecCameraPos, fDrawRadius );
     }
@@ -6476,9 +6453,8 @@ void CClientGame::OutputServerInfo( void )
 
     {
         SString strEnabledBulletSync;
-        for( std::set < eWeaponType >::iterator iter = m_weaponTypesUsingBulletSync.begin() ; iter != m_weaponTypesUsingBulletSync.end() ; ++iter )
+        for( eWeaponType weaponType : m_weaponTypesUsingBulletSync )
         {
-            eWeaponType weaponType = *iter;
             if ( !strEnabledBulletSync.empty() )
                 strEnabledBulletSync += ",";
             strEnabledBulletSync += SString( "%d", weaponType );

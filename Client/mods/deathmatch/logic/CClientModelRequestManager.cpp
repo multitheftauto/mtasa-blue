@@ -12,8 +12,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 CClientModelRequestManager::CClientModelRequestManager ( void )
 {
     m_bDoingPulse = false;
@@ -23,10 +21,9 @@ CClientModelRequestManager::CClientModelRequestManager ( void )
 CClientModelRequestManager::~CClientModelRequestManager ( void )
 {
     // Delete all our requests.
-    list < SClientModelRequest* > ::iterator iter;
-    for ( iter = m_Requests.begin (); iter != m_Requests.end (); iter++ )
+    for ( auto& pRequest : m_Requests )
     {
-        delete *iter;
+        delete pRequest;
     }
 
     m_Requests.clear ();
@@ -38,9 +35,7 @@ bool CClientModelRequestManager::IsLoaded ( unsigned short usModelID )
     // Grab the model info
     CModelInfo* pInfo = g_pGame->GetModelInfo ( usModelID );
     if ( pInfo )
-    {
-        return pInfo->IsLoaded () ? true:false;
-    }
+        return pInfo->IsLoaded ();
 
     return false;
 }
@@ -49,11 +44,10 @@ bool CClientModelRequestManager::IsLoaded ( unsigned short usModelID )
 bool CClientModelRequestManager::IsRequested ( CModelInfo* pModelInfo )
 {
     // Look through the list
-    std::list < SClientModelRequest* > :: iterator iter = m_Requests.begin ();
-    for ( ; iter != m_Requests.end (); iter++ )
+    for ( auto pRequest : m_Requests )
     {
         // Same model as this entry?
-        if ( (*iter)->pModel == pModelInfo )
+        if ( pRequest->pModel == pModelInfo )
         {
             return true;
         }
@@ -69,11 +63,10 @@ bool CClientModelRequestManager::HasRequested ( CClientEntity* pRequester )
     assert ( pRequester );
 
     // Look through the list
-    std::list < SClientModelRequest* > :: iterator iter = m_Requests.begin ();
-    for ( ; iter != m_Requests.end (); iter++ )
+    for (auto pRequest : m_Requests)
     {
         // Same requester as we check for? He has requested something.
-        if ( (*iter)->pEntity == pRequester )
+        if ( pRequest->pEntity == pRequester )
         {
             return true;
         }
@@ -90,14 +83,13 @@ CModelInfo* CClientModelRequestManager::GetRequestedModelInfo ( CClientEntity* p
     assert ( pRequester );
 
     // Look through the list
-    std::list < SClientModelRequest* > :: iterator iter = m_Requests.begin ();
-    for ( ; iter != m_Requests.end (); iter++ )
+    for (auto pRequest : m_Requests)
     {
         // Same requester as we check for? He has requested something.
-        if ( (*iter)->pEntity == pRequester )
+        if ( pRequest->pEntity == pRequester )
         {
             // Return the model info he requested
-            return (*iter)->pModel;
+            return pRequest->pModel;
         }
     }
 
@@ -136,7 +128,7 @@ bool CClientModelRequestManager::Request ( unsigned short usModelID, CClientEnti
     if ( pInfo )
     {
         // Has it already requested something?
-        list < SClientModelRequest* > ::iterator iter;
+        std::list < SClientModelRequest* > ::iterator iter;
         if ( GetRequestEntry ( pRequester, iter ) )
         {
             // Get the entry
@@ -230,8 +222,7 @@ void CClientModelRequestManager::Cancel ( CClientEntity* pEntity, bool bAllowQue
         {
             // Anything requested by the given class?
             SClientModelRequest* pEntry;
-            list < SClientModelRequest* > ::iterator iter;
-            for ( iter = m_Requests.begin (); iter != m_Requests.end (); )
+            for ( auto& iter = m_Requests.begin(); iter != m_Requests.end(); )
             {
                 pEntry = *iter;
 
@@ -242,7 +233,7 @@ void CClientModelRequestManager::Cancel ( CClientEntity* pEntity, bool bAllowQue
                     pEntry->pModel->RemoveRef ();
 
                     // Delete the entry
-                    delete *iter;
+                    delete pEntry;
                     
                     // Remove from the list
                     iter = m_Requests.erase ( iter );
@@ -268,8 +259,7 @@ void CClientModelRequestManager::DoPulse ( void )
 
         // Call the callback for those finished loading and remove them from the list
         SClientModelRequest* pEntry;
-        list < SClientModelRequest* > ::iterator iter;
-        for ( iter = m_Requests.begin (); iter != m_Requests.end (); )
+        for ( auto& iter = m_Requests.begin (); iter != m_Requests.end (); )
         {
             pEntry = *iter;
 
@@ -286,7 +276,7 @@ void CClientModelRequestManager::DoPulse ( void )
                 pEntry->pModel->RemoveRef ();
 
                 // Delete the request entry. Remove from the list and continue from after it
-                delete *iter;
+                delete pEntry;
                 iter = m_Requests.erase ( iter );
             }
             else
@@ -317,13 +307,12 @@ void CClientModelRequestManager::DoPulse ( void )
         if ( m_CancelQueue.size () > 0 )
         {
             // Cancel every entity in our cancel list
-            list < CClientEntity* > cancelQueueCopy = m_CancelQueue;
+            std::list < CClientEntity* > cancelQueueCopy = m_CancelQueue;
             m_CancelQueue.clear ();
 
-            list < CClientEntity* > ::iterator iter = cancelQueueCopy.begin ();
-            for ( ; iter != cancelQueueCopy.end (); ++iter )
+            for ( auto pEntry : cancelQueueCopy )
             {
-                Cancel ( *iter, false );
+                Cancel ( pEntry, false );
             }
 
         }
@@ -331,11 +320,10 @@ void CClientModelRequestManager::DoPulse ( void )
 }
 
 
-bool CClientModelRequestManager::GetRequestEntry ( CClientEntity* pRequester, list < SClientModelRequest* > ::iterator& iterOut )
+bool CClientModelRequestManager::GetRequestEntry ( CClientEntity* pRequester, std::list < SClientModelRequest* > ::iterator& iterOut )
 {
     // Look through the list
-    std::list < SClientModelRequest* > :: iterator iter = m_Requests.begin ();
-    for ( ; iter != m_Requests.end (); iter++ )
+    for ( auto& iter = m_Requests.begin() ; iter != m_Requests.end (); iter++ )
     {
         // Same requester as we check for? He has requested something.
         if ( (*iter)->pEntity == pRequester )

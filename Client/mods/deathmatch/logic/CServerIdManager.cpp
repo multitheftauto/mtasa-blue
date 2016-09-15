@@ -310,9 +310,9 @@ const CServerIdInfo& CServerIdManagerImpl::GetServerIdInfo ( const SString& strS
         while ( bAgain )
         {
             bAgain = false;
-            for ( std::map < CServerIdKey, CServerIdInfo >::iterator it = m_ServerIdMap.begin () ; it != m_ServerIdMap.end () ; ++it )
+            for ( auto& it : m_ServerIdMap )
             {
-                const CServerIdInfo& info = it->second;
+                const CServerIdInfo& info = it.second;
                 if ( strDir == info.strDir )
                 {
                     strDir = IncrementCounter ( strDir );

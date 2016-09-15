@@ -13,8 +13,6 @@
 
 #include <StdInc.h>
 
-using namespace std;
-
 FILE* CLogger::m_pLogFile = NULL;
 
 #define MAX_STRING_LENGTH 2048
@@ -51,13 +49,6 @@ void CLogger::LogPrintfNoStamp ( const char* szFormat, ... )
     HandleLogPrint ( false, "", szBuffer, true, true );
 }
 
-#if 0   // Currently unused
-void CLogger::LogPrintNoStamp ( const char* szText )
-{
-    // Send to the console and logfile
-    HandleLogPrint ( false, "", szText, true, true );
-}
-#endif
 
 void CLogger::ErrorPrintf ( const char* szFormat, ... )
 {
@@ -72,22 +63,6 @@ void CLogger::ErrorPrintf ( const char* szFormat, ... )
     HandleLogPrint ( true, "ERROR: ", szBuffer, true, true );
 }
 
-#if 0   // Currently unused
-void CLogger::DebugPrintf ( const char* szFormat, ... )
-{
-    #ifdef MTA_DEBUG
-        // Compose the formatted message
-        char szBuffer [MAX_STRING_LENGTH];
-        va_list marker;
-        va_start ( marker, szFormat );
-        VSNPRINTF ( szBuffer, MAX_STRING_LENGTH, szFormat, marker );
-        va_end ( marker );
-
-        // Timestamp and send to the console and logfile
-        HandleLogPrint ( true, "DEBUG: ", szBuffer, true, true );
-    #endif
-}
-#endif
 
 void CLogger::SetLogFile ( const char* szLogFile )
 {
@@ -118,11 +93,7 @@ void CLogger::HandleLogPrint ( bool bTimeStamp, const char* szPrePend, const cha
         time_t timeNow;
         time ( &timeNow );
         tm* pCurrentTime = localtime ( &timeNow );
-#if 0
-        if ( !strftime ( szBuffer, MAX_STRING_LENGTH - 1, "[%H:%M:%S] ", pCurrentTime ) )
-            szBuffer[0] = 0;
-        strOutputShort = szBuffer;
-#endif
+
         if ( !strftime ( szBuffer, MAX_STRING_LENGTH - 1, "[%Y-%m-%d %H:%M:%S] ", pCurrentTime ) )
             szBuffer[0] = 0;
         strOutputLong = szBuffer;

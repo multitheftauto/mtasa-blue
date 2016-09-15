@@ -58,10 +58,9 @@ void CClientPickupManager::DeleteAll ( void )
 {
     // Delete each pickup
     m_bDontRemoveFromList = true;
-    list < CClientPickup* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for ( auto& pPickup : m_List )
     {
-        delete *iter;
+        delete pPickup;
     }
 
     m_bDontRemoveFromList = false;
@@ -73,10 +72,9 @@ void CClientPickupManager::DeleteAll ( void )
 
 bool CClientPickupManager::Exists ( CClientPickup* pPickup )
 {
-    list < CClientPickup* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
+    for ( auto& pIterPickup : m_List )
     {
-        if ( *iter == pPickup )
+        if ( pIterPickup == pPickup )
         {
             return true;
         }

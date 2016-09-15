@@ -12,8 +12,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 extern CClientGame* g_pClientGame;
 
 #define PED_SYNC_RATE   ( g_TickRateSettings.iPedSync )
@@ -23,13 +21,6 @@ CPedSync::CPedSync ( CClientPedManager* pPedManager )
     m_pPedManager = pPedManager;
     m_ulLastSyncTime = 0;
 }
-
-
-CPedSync::~CPedSync ( void )
-{
-
-}
-
 
 bool CPedSync::ProcessPacket ( unsigned char ucPacketID, NetBitStreamInterface& BitStream )
 {
@@ -236,10 +227,9 @@ void CPedSync::Update ( void )
         if ( pBitStream )
         {
             // Write each ped to it
-            list < CClientPed* > ::const_iterator iter = m_List.begin ();
-            for ( ; iter != m_List.end (); ++iter )
+            for ( auto& pPed : m_List )
             {
-                WritePedInformation ( pBitStream, *iter );
+                WritePedInformation ( pBitStream, pPed );
             }
 
             // Send and destroy the packet

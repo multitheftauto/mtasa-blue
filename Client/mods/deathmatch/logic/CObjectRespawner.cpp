@@ -16,11 +16,6 @@
 #include "StdInc.h"
 #include "CObjectRespawner.h"
 
-CObjectRespawner::CObjectRespawner ()
-{
-
-}
-
 
 void CObjectRespawner::Respawn ( CClientObject* pObject )
 {
@@ -41,10 +36,8 @@ void CObjectRespawner::Respawn ( CClientObject* pObject )
 
 void CObjectRespawner::DoRespawnAll ( void )
 {
-    for ( uint i = 0; i < m_List.size (); i++ )
+    for ( auto& pObject : m_List )
     {
-        CClientObject* pObject = m_List[i];
-
         // Only recreate if we're still valid and streamed in
         if ( pObject && !pObject->IsBeingDeleted ( ) && pObject->IsStreamedIn ( ) )
         {

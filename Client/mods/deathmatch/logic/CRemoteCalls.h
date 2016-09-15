@@ -34,7 +34,7 @@ public:
                         CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
                         CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
                         CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
-                        ~CRemoteCall ();
+                        ~CRemoteCall () = default;
     void                MakeCall();
     static void         DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode );
     CLuaMain *          GetVM() {return m_VM;};
@@ -52,7 +52,7 @@ class CRemoteCalls
 private:
     std::list<CRemoteCall*> m_calls;
 public:
-                        CRemoteCalls();
+                        CRemoteCalls() = default;
                         ~CRemoteCalls();
 
     void                Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );

@@ -50,13 +50,12 @@ void CClientPointLightsManager::DeleteAll ( void )
 {
     // Delete all the lights
     m_bDontRemoveFromList = true;
-    list < CClientPointLights* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for ( auto& pPointLight : m_List )
     {
-        delete *iter;
+        delete pPointLight;
     }
 
-    for ( auto pLight : m_SearchLightList )
+    for ( auto& pLight : m_SearchLightList )
     {
         delete pLight;
     }
@@ -82,10 +81,9 @@ CClientPointLights* CClientPointLightsManager::Get ( ElementID ID )
 
 void CClientPointLightsManager::SetDimension ( unsigned short usDimension )
 {
-    list < CClientPointLights* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for ( auto& pPointLight : m_List )
     {
-        (*iter)->RelateDimension ( usDimension );
+        pPointLight->RelateDimension ( usDimension );
     }
 
     m_usDimension = usDimension;
@@ -95,10 +93,9 @@ void CClientPointLightsManager::SetDimension ( unsigned short usDimension )
 void CClientPointLightsManager::DoPulse ( void )
 {
     // Pulse each light
-    list < CClientPointLights* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); ++iter )
+    for (auto& pPointLight : m_List) 
     {
-        (*iter)->DoPulse ();
+        pPointLight->DoPulse ();
     }
 }
 

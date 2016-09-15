@@ -13,8 +13,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 CRegisteredCommands::CRegisteredCommands ( void )
 {
     m_bIteratingList = false;
@@ -60,9 +58,10 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey 
 
     // Call the handler for every virtual machine that matches the given key
     bool bFound = false;
-    list < SCommand* > ::iterator iter = m_Commands.begin ();
+    
     int iCompareResult;
 
+    auto& iter = m_Commands.begin();
     while ( iter != m_Commands.end () )
     {
         if ( (*iter)->bCaseSensitive )
@@ -97,10 +96,9 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey 
 void CRegisteredCommands::ClearCommands ( void )
 {
     // Delete all the commands
-    list < SCommand* > ::const_iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); iter++ )
+    for ( auto& pCommand : m_Commands )
     {
-        delete *iter;
+        delete pCommand;
     }
 
     // Clear the list
@@ -113,8 +111,7 @@ void CRegisteredCommands::CleanUpForVM ( CLuaMain* pLuaMain )
     assert ( pLuaMain );
 
     // Delete every command that matches
-    list < SCommand* > ::iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); )
+    for ( auto& iter = m_Commands.begin() ; iter != m_Commands.end (); )
     {
         // Matching VM's?
         if ( (*iter)->pLuaMain == pLuaMain )
@@ -147,19 +144,18 @@ bool CRegisteredCommands::ProcessCommand ( const char* szKey, const char* szArgu
     int iCompareResult;
     bool bHandled = false;
     m_bIteratingList = true;
-    list < SCommand* > ::const_iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); iter++ )
+    for ( auto& pCommand : m_Commands )
     {
-        if ( (*iter)->bCaseSensitive )
-            iCompareResult = strcmp ( (*iter)->strKey, szKey );
+        if ( pCommand->bCaseSensitive )
+            iCompareResult = strcmp ( pCommand->strKey, szKey );
         else
-            iCompareResult = stricmp ( (*iter)->strKey, szKey );
+            iCompareResult = stricmp ( pCommand->strKey, szKey );
 
         // Matching names?
         if ( iCompareResult == 0 )
         {
             // Call it
-            CallCommandHandler ( (*iter)->pLuaMain, (*iter)->iLuaFunction, (*iter)->strKey, szArguments );
+            CallCommandHandler ( pCommand->pLuaMain, pCommand->iLuaFunction, pCommand->strKey, szArguments );
             bHandled = true;
         }
     }
@@ -176,20 +172,18 @@ CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand ( const char* szK
     assert ( szKey );
 
     // Try to find an entry with a matching name in our list
-    list < SCommand* > ::const_iterator iter = m_Commands.begin ();
     int iCompareResult;
-
-    for ( ; iter != m_Commands.end (); iter++ )
+    for (auto& pCommand : m_Commands)
     {
-        if ( (*iter)->bCaseSensitive )
-            iCompareResult = strcmp ( (*iter)->strKey, szKey );
+        if (pCommand->bCaseSensitive)
+            iCompareResult = strcmp(pCommand->strKey, szKey);
         else
-            iCompareResult = stricmp ( (*iter)->strKey, szKey );
+            iCompareResult = stricmp(pCommand->strKey, szKey);
 
         // Matching name and no given VM or matching VM
-        if ( iCompareResult == 0 && ( !pLuaMain || pLuaMain == (*iter)->pLuaMain ) )
+        if ( iCompareResult == 0 && ( !pLuaMain || pLuaMain == pCommand->pLuaMain ) )
         {
-            return *iter;
+            return pCommand;
         }
     }
 
@@ -228,11 +222,10 @@ void CRegisteredCommands::CallCommandHandler ( CLuaMain* pLuaMain, const CLuaFun
 
 void CRegisteredCommands::TakeOutTheTrash ( void )
 {
-    list < SCommand* > ::iterator iter = m_TrashCan.begin ();
-    for ( ; iter != m_TrashCan.end (); iter++ )
+    for ( auto& pCommand : m_TrashCan )
     {
-        SCommand* pCommand = *iter;
-        if ( !m_Commands.empty() ) m_Commands.remove ( pCommand );
+        if ( !m_Commands.empty() ) 
+            m_Commands.remove ( pCommand );
         delete pCommand;
     }
     m_TrashCan.clear ();

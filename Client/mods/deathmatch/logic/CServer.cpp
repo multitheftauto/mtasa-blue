@@ -77,15 +77,14 @@ void CServer::DoPulse ( void )
         if ( m_OutputQueue.size () > 0 )
         {
             // Loop through our output queue and echo it to console
-            std::list < std::string >::const_iterator iter = m_OutputQueue.begin ();
-            for ( ; iter != m_OutputQueue.end (); ++iter )
+            for ( auto& strString : m_OutputQueue )
             {
                 // Echo it
-                const char* szString = iter->c_str ();
+                const char* szString = strString.c_str ();
                 g_pCore->GetConsole ()->Echo ( szString );
 
                 // Does the message end with "Server started and is ready to accept connections!\n"?
-                size_t sizeString = iter->length ();
+                size_t sizeString = strString.length();
                 if ( sizeString >= 51 &&
                     stricmp ( szString + sizeString - 51, "Server started and is ready to accept connections!\n" ) == 0 )
                 {

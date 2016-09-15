@@ -20,20 +20,17 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 extern CClientGame * g_pClientGame;
 
 CElementGroup::~CElementGroup()
 {
     CElementDeleter * deleter = g_pClientGame->GetElementDeleter();
-
-    CFastList < CClientEntity* > ::iterator iter = m_elements.begin ();
-    for ( ; iter != m_elements.end (); ++iter )
+    
+    for ( auto& pElement : m_elements)
     {
-        ( *iter )->SetElementGroup ( NULL );
-        ( *iter )->DeleteAllEvents ();
-        deleter->Delete ( *iter );
+        pElement->SetElementGroup ( nullptr );
+        pElement->DeleteAllEvents ();
+        deleter->Delete ( pElement );
     }
 }
 

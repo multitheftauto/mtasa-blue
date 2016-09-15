@@ -12,9 +12,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-using std::vector;
-
 CClientPedManager::CClientPedManager ( CClientManager* pManager )
 {
     m_pManager = pManager;
@@ -31,10 +28,9 @@ CClientPedManager::~CClientPedManager ( void )
 void CClientPedManager::DeleteAll ( void )
 {
     m_bRemoveFromList = false;
-    vector < CClientPed* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for ( auto& pPed : m_List )
     {
-        delete *iter;
+        delete pPed;
     }
     m_List.clear ();
     m_bRemoveFromList = true;
@@ -45,11 +41,9 @@ void CClientPedManager::DoPulse ( bool bDoStandardPulses )
 {
     CClientPed * pPed = NULL;
     // Loop through our streamed-in peds
-    vector < CClientPed * > List = m_StreamedIn;
-    vector < CClientPed* > ::iterator iter = List.begin ();
-    for ( ; iter != List.end (); ++iter )
+    auto List = m_StreamedIn;
+    for (auto& pPed : List)
     {
-        pPed = *iter;
         // We should have a game ped here
         assert ( pPed->GetGamePlayer () );
         pPed->StreamedInPulse ( bDoStandardPulses );
@@ -85,10 +79,9 @@ CClientPed* CClientPedManager::GetSafe ( CEntity * pEntity, bool bCheckPlayers )
 bool CClientPedManager::Exists ( CClientPed* pPed )
 {
     // Is it in our list?
-    vector < CClientPed* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    for (auto& pPedEntry : m_List)
     {
-        if ( *iter == pPed )
+        if (pPedEntry == pPed )
             return true;
     }
 
@@ -124,11 +117,8 @@ void CClientPedManager::RestreamPeds ( unsigned short usModel )
     g_pClientGame->GetModelCacheManager ()->OnRestreamModel ( usModel );
 
     // Store the affected vehicles
-    CClientPed* pPed;
-    std::vector < CClientPed* > ::const_iterator iter = IterBegin ();
-    for ( ; iter != IterEnd (); iter++ )
+    for (auto& pPed : m_List)
     {
-        pPed = *iter;
 
         // Streamed in and same vehicle ID?
         if ( pPed->IsStreamedIn () && pPed->GetModel () == usModel )
@@ -151,12 +141,8 @@ void CClientPedManager::RestreamWeapon ( unsigned short usModel )
 {    
     eWeaponSlot eSlot = (eWeaponSlot) GetWeaponSlotFromModel ( usModel );
     // Store the affected vehicles
-    CClientPed* pPed;
-    std::vector < CClientPed* > ::const_iterator iter = IterBegin ();
-    for ( ; iter != IterEnd (); iter++ )
+    for (auto& pPed : m_List)
     {
-        pPed = *iter;
-
         // Streamed in and same vehicle ID?
         if ( pPed->IsStreamedIn () && 
             pPed->GetWeapon ( eSlot ) && 

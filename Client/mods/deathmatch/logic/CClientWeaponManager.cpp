@@ -10,7 +10,6 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-using namespace std;
 
 CClientWeaponManager::CClientWeaponManager ( CClientManager * pManager )
 {
@@ -22,10 +21,9 @@ CClientWeaponManager::CClientWeaponManager ( CClientManager * pManager )
 CClientWeaponManager::~CClientWeaponManager ( void )
 {
     m_bDeleteAll = true;
-    list < CClientWeapon * > ::iterator iter = m_Weapons.begin ();
-    for ( ; iter != m_Weapons.end () ; iter++ )
+    for ( auto& pWeapon : m_Weapons )
     {
-        delete *iter;
+        delete pWeapon;
     }
     m_bDeleteAll = false;
 }
@@ -41,9 +39,8 @@ void CClientWeaponManager::RemoveFromList ( CClientWeapon * pWeapon )
 
 void CClientWeaponManager::DoPulse ( void )
 {    
-    list < CClientWeapon * > ::iterator iter = m_Weapons.begin ();
-    for ( ; iter != m_Weapons.end () ; iter++ )
+    for (auto& pWeapon : m_Weapons)
     {
-        (*iter)->DoPulse ();
+        pWeapon->DoPulse();
     }
 }
