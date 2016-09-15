@@ -702,7 +702,7 @@ int CLuaBrowserDefs::GetBrowserSource ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain && VERIFY_FUNCTION ( callbackFunction ) )
         {
-            pWebBrowser->GetSourceCode ( [callbackFunction, pLuaMain] ( const std::string& code ) {
+            pWebBrowser->GetSourceCode ( [callbackFunction, pLuaMain, pWebBrowser] ( const std::string& code ) {
                 /*
                 This function should not be called when the resource is about to stop as
                 stopping the resource destroys the browser element and thus cancels the
@@ -713,6 +713,7 @@ int CLuaBrowserDefs::GetBrowserSource ( lua_State* luaVM )
                     CLuaArguments arguments;
                     // TODO: Use SCharStringRef/direct string access instead of copying strings around
                     arguments.PushString ( code );
+                    arguments.PushElement(pWebBrowser);
                     arguments.Call ( pLuaMain, callbackFunction );
                 }
             } );
