@@ -16,6 +16,7 @@
 class CClientColManager;
 class CClientColModelManager;
 class CClientDFFManager;
+class CClientModelManager;
 class CClientEntity;
 class CClientGame;
 class CClientGUIManager;
@@ -65,6 +66,7 @@ public:
     static CClientMarkerManager*        m_pMarkerManager;
     static CClientPickupManager*        m_pPickupManager;
     static CClientDFFManager*           m_pDFFManager;
+    //static CClientModelManager*         m_pModelManager;
     static CClientColModelManager*      m_pColModelManager;
     static CRegisteredCommands*         m_pRegisteredCommands;  
 };

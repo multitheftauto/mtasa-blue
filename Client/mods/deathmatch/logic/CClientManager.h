@@ -22,6 +22,7 @@ class CClientManager;
 #include "CClientCivilianManager.h"
 #include "CClientColModelManager.h"
 #include "CClientDFFManager.h"
+#include "CClientModelManager.h"
 #include "CClientEntity.h"
 #include "CClientGUIManager.h"
 #include "CClientMarkerManager.h"
@@ -67,6 +68,7 @@ public:
     inline CClientCivilianManager*      GetCivilianManager          ( void )        { return m_pCivilianManager; }
     inline CClientColModelManager*      GetColModelManager          ( void )        { return m_pColModelManager; }
     inline CClientDFFManager*           GetDFFManager               ( void )        { return m_pDFFManager; }
+    inline CClientModelManager*         GetModelManager             ( void )        { return m_pModelManager; }
     inline CClientGUIManager*           GetGUIManager               ( void )        { return m_pGUIManager; }
     inline CClientMarkerManager*        GetMarkerManager            ( void )        { return m_pMarkerManager; }
     inline CClientStreamer*             GetMarkerStreamer           ( void )        { return m_pMarkerStreamer; }
@@ -120,6 +122,7 @@ private:
     CClientCivilianManager*             m_pCivilianManager;
     CClientColModelManager*             m_pColModelManager;
     CClientDFFManager*                  m_pDFFManager;
+    CClientModelManager*                m_pModelManager;
     CClientGUIManager*                  m_pGUIManager;
     CClientMarkerManager*               m_pMarkerManager;
     CClientStreamer*                    m_pMarkerStreamer;

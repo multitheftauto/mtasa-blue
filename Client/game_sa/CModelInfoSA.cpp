@@ -256,21 +256,8 @@ BOOL CModelInfoSA::IsVehicle ( )
 
 bool CModelInfoSA::IsPlayerModel ( )
 {
-    return ( ( m_dwModelID >= 0 && m_dwModelID <= 312 ) || m_dwModelID == 329 || m_dwModelID == 340 || m_dwModelID == 382 ||
-         m_dwModelID == 383 || m_dwModelID == 398 || m_dwModelID == 399 || ( m_dwModelID >= 612 &&  m_dwModelID <= 614 ) ||
-         m_dwModelID == 662 || m_dwModelID == 663 || ( m_dwModelID >= 665 && m_dwModelID <= 699 ) ||
-         ( m_dwModelID >= 793 && m_dwModelID <= 799 ) || ( m_dwModelID >= 907 && m_dwModelID <= 909 ) || 
-         m_dwModelID == 965 || m_dwModelID == 999 || ( m_dwModelID >= 1194 && m_dwModelID <= 1206 ) ||
-         m_dwModelID == 1326 || m_dwModelID == 1573 || m_dwModelID == 1699 || m_dwModelID == 2883 || m_dwModelID == 2884 ||
-         ( m_dwModelID >= 3176 && m_dwModelID <= 3197 ) || ( m_dwModelID >= 3215 && m_dwModelID <= 3220 ) ||
-         m_dwModelID == 3245 || m_dwModelID == 3247 || m_dwModelID == 3248 || m_dwModelID == 3251 || m_dwModelID == 3254 ||
-         m_dwModelID == 3266 || m_dwModelID == 3348 || m_dwModelID == 3349 || m_dwModelID == 3416 || m_dwModelID == 3429 ||
-         m_dwModelID == 3610 || m_dwModelID == 3611 || m_dwModelID == 3784 || m_dwModelID == 3870 || m_dwModelID == 3871 ||
-         m_dwModelID == 3883 || m_dwModelID == 3889 || m_dwModelID == 3974 || ( m_dwModelID >= 4542 && m_dwModelID <= 4549 ) ||
-         m_dwModelID == 5090 || m_dwModelID == 5104 || ( m_dwModelID >= 3136 && m_dwModelID <= 3166 ) ||
-         ( m_dwModelID >= 3194 && m_dwModelID <= 3213 ) || ( m_dwModelID >= 3222 && m_dwModelID <= 3240 ) ||
-         ( m_dwModelID >= 4763 && m_dwModelID <= 4805 ) || ( m_dwModelID >= 5376 && m_dwModelID <= 5389 )
-        );
+    // Every ped model uses same collision
+    return ( GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == ( CColModelSAInterface * ) VAR_CTempColModels_ModelPed1 );
 }
 
 BOOL CModelInfoSA::IsUpgrade ( void )
@@ -445,6 +432,7 @@ VOID CModelInfoSA::Remove ( )
                 call    dwFunction
                 add     esp, 4
             }
+
         }
     }
 }
@@ -1162,6 +1150,11 @@ void CModelInfoSA::MakePedModel ( char * szTexture )
     pGame->GetStreaming ()->RequestSpecialModel ( m_dwModelID, szTexture, 0 );
 }
 
+void CModelInfoSA::DeallocateModel ( void )
+{
+    Remove ();
+    ppModelInfo [ m_dwModelID ] = NULL;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //

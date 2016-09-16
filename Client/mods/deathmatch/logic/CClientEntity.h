@@ -84,6 +84,7 @@ enum eClientEntityType
     CCLIENTBROWSER,
     CCLIENTSEARCHLIGHT,
     CCLIENTUNKNOWN,
+    CCLIENTMODEL,
 };
 
 class CClientColShape;
@@ -108,6 +109,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientCivilian,
     CLASS_CClientColModel,
     CLASS_CClientDFF,
+    CLASS_CClientModel,
     CLASS_CClientGUIElement,
     CLASS_CClientStreamElement,
     CLASS_CClientColShape,

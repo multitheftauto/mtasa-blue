@@ -39,6 +39,7 @@ class CPedModelInfoSAInterface;
 #define     FUNC_AtomicsReplacer            0x537150
 
 #define     ARRAY_ModelInfo                 0xA9B0C8
+#define     ARRAY_CStreaming_aInfoForModel  0x8E4CC0
 #define     CLASS_CText                     0xC1B340
 #define     FUNC_CText_Get                  0x6A0050
 #define     FUNC_GetModelFlags              0x4044E0
@@ -345,10 +346,11 @@ public:
     void                            RestoreColModel         ( void );
     void                            MakeCustomModel         ( void );
 
-    inline void                     SetModelID              ( DWORD dwModelID ) { m_dwModelID = dwModelID; }
+    inline void                     SetModelID              ( DWORD dwModelID ) { m_dwModelID = dwModelID; };
 
     inline RwObject*                GetRwObject             ( void ) { return m_pInterface ? m_pInterface->pRwObject : NULL; }
-
+    
+    void                            DeallocateModel         ( void );
     // CModelInfoSA methods
     void                            MakePedModel            ( char * szTexture );
 

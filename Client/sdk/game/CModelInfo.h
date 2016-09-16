@@ -118,6 +118,7 @@ public:
     virtual BOOL            IsBmx                   () = 0;
     virtual BOOL            IsTrailer               () = 0;
     virtual BOOL            IsVehicle               () = 0;
+    virtual bool            IsPlayerModel           () = 0;
 
     virtual char*           GetNameIfVehicle        () = 0;
 
@@ -136,6 +137,7 @@ public:
     virtual void            RemoveRef               ( bool bRemoveExtraGTARef = false ) = 0;
     virtual int             GetRefCount             () = 0;
     virtual bool            ForceUnload             ( void ) = 0;
+    virtual void            DeallocateModel         ( void ) = 0;
 
     virtual float           GetDistanceFromCentreOfMassToBaseOfModel () = 0;
 
@@ -169,6 +171,8 @@ public:
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void            MakeCustomModel         ( void ) = 0;
     virtual RwObject*       GetRwObject             ( void ) = 0;
+
+    virtual void            MakePedModel            ( char * szTexture ) = 0;
 
 
     virtual SVehicleSupportedUpgrades               GetVehicleSupportedUpgrades         ( void ) = 0;

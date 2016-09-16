@@ -30,6 +30,9 @@ void CLuaEngineDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineGetModelIDFromName", EngineGetModelIDFromName );
     CLuaCFunctions::AddFunction ( "engineGetModelTextureNames", EngineGetModelTextureNames );
     CLuaCFunctions::AddFunction ( "engineGetVisibleTextureNames", EngineGetVisibleTextureNames );
+    CLuaCFunctions::AddFunction ( "engineAllocateModel", EngineAllocateModel );
+    CLuaCFunctions::AddFunction ( "engineDeallocateModel", EngineDeallocateModel );
+    CLuaCFunctions::AddFunction ( "engineGetModelFromID", EngineGetModelFromID );
 
     //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -810,3 +813,104 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaEngineDefs::EngineAllocateModel ( lua_State* luaVM )
+{
+//  model engineAllocateModel ( string modelName, string type )
+    SString strModelName; SString strModelType;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strModelName );
+    argStream.ReadString ( strModelType );
+
+    eClientModelType eModelType;
+    if ( stricmp ( strModelType, "ped" ) == 0 )
+    {
+        eModelType = CCLIENTMODELPED;
+    }
+    else
+    {
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    if ( pLuaMain )
+    {
+        CResource* pResource = pLuaMain->GetResource ();
+        if ( pResource )
+        {
+            ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+            if ( usModelID != INVALID_MODEL_ID && m_pManager->GetModelManager ()->FindModelByID ( usModelID ) == NULL )
+            {
+                CClientModel* pModel = pModel = new CClientModel ( m_pManager, INVALID_ELEMENT_ID, usModelID, eModelType );
+                if ( pModel )
+                {
+                    pModel->SetParent ( (*pResource).GetResourceDynamicEntity () );
+                    if ( pModel->Allocate() )
+                    {
+                        lua_pushelement ( luaVM, pModel );
+                        return 1;
+                    }
+                    else
+                    {
+                        delete pModel;
+                    }
+                }
+            }
+        }
+    }
+
+    // Failure
+    lua_pushnil ( luaVM );
+    return 1;
+}
+
+int CLuaEngineDefs::EngineDeallocateModel ( lua_State* luaVM )
+{
+//  model engineDeallocateModel ( string modelName )
+    SString strModelName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strModelName );
+
+    ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+    if ( usModelID != INVALID_MODEL_ID )
+    {
+        CClientModel* pModel = m_pManager->GetModelManager ()->FindModelByID ( usModelID );
+        if ( pModel )
+        {
+            delete pModel;
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+
+    // Failure
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelFromID ( lua_State* luaVM )
+{
+//  model engineGetModelFromID ( stringm modelName )
+    SString strModelName;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strModelName );
+
+    ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+    if ( usModelID != INVALID_MODEL_ID )
+    {
+        CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID ( usModelID );
+        lua_pushelement ( luaVM, pModel );
+        return 1;
+    }
+
+    // Failure
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
