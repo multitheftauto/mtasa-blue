@@ -68,6 +68,7 @@ public:
 
     void                                        OnChange                    ( void );
     uint                                        GetGlobalRevision           ( void )        { return m_uiGlobalRevision; }
+    std::vector < SString >                     GetObjectGroupNames         ( const SString& strObjectName, CAccessControlListGroupObject::EObjectType objectType );
 
 private:
     void                                        ClearReadCache              ( void );

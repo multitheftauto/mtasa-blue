@@ -113,10 +113,7 @@ bool CClientColShape::ColliderExists ( CClientEntity* pEntity )
 
 void CClientColShape::RemoveAllColliders ( void )
 {
-    CFastList < CClientEntity* > ::iterator iter = m_Colliders.begin ();
-    for ( ; iter != m_Colliders.end () ; iter++ )
-    {
-        (*iter)->RemoveCollision ( this );
-    }
+    for (auto& iter : m_Colliders)
+        iter->RemoveCollision ( this );
     m_Colliders.clear ();
 }

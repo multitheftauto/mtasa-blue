@@ -13,8 +13,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 extern CClientGame * g_pClientGame;
 
 #ifdef WITH_OBJECT_SYNC
@@ -186,11 +184,8 @@ void CDeathmatchObject::UpdateContacting ( const CVector& vecCenterOfRotation, c
         return;
 
     // Step through each contacting ped
-    list < CClientPed * > ::iterator iter = m_Contacts.begin ();
-    for ( ; iter != m_Contacts.end () ; ++iter )
+    for ( auto& pPed : m_Contacts )
     {
-        CClientPed* pPed = *iter;
-
         // Do not move the ped if it is frozen
         if ( pPed->IsFrozen () )
             continue;
@@ -220,9 +215,8 @@ void CDeathmatchObject::UpdateContacting ( const CVector& vecCenterOfRotation, c
     }
 
     // Look in attached objects for more ped contacts
-    for ( uint i = 0 ; i < m_AttachedEntities.size () ; ++i )
+    for(auto& pEntity : m_AttachedEntities)
     {
-        CClientEntity* pEntity = m_AttachedEntities[i];
         if ( IS_OBJECT ( pEntity ) )
         {
             CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > ( pEntity );

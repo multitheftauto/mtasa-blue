@@ -26,7 +26,7 @@ CHTTPD::CHTTPD ( void )
     m_server = NULL;
     m_bStartedServer = false;
 
-    m_pGuestAccount = new CAccount ( g_pGame->GetAccountManager (), false, HTTP_GUEST_ACCOUNT_NAME );
+    m_pGuestAccount = g_pGame->GetAccountManager ()->AddGuestAccount ( HTTP_GUEST_ACCOUNT_NAME );
 
     m_HttpDosProtect = CConnectHistory ( g_pGame->GetConfig ()->GetHTTPDosThreshold (), 10000, 60000 * 1 );     // Max of 'n' connections per 10 seconds, then 1 minute ignore
 

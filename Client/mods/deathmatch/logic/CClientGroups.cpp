@@ -12,8 +12,6 @@
 
 #include <StdInc.h>
 
-using std::list;
-
 void CClientGroups::DeleteAll ( void )
 {
     // Delete all the elements
@@ -21,9 +19,8 @@ void CClientGroups::DeleteAll ( void )
 
     if ( !m_List.empty () )
     {
-        for ( list < CClientDummy* >::iterator iter = m_List.begin () ; iter != m_List.end () ; ++iter )
+        for ( auto& pDummy : m_List )
         {
-            CClientDummy* pDummy = *iter;
             if ( pDummy )
             {
                 delete pDummy;
@@ -42,7 +39,7 @@ void CClientGroups::RemoveFromList ( CClientDummy* pDummy )
     {
         if ( !m_List.empty () )
         {
-            for ( list < CClientDummy* >::iterator iter = m_List.begin () ; iter != m_List.end () ; )
+            for ( auto iter = m_List.begin(); iter != m_List.end(); )
             {
                 CClientDummy* pCurrentDummy = *iter;
                 if ( pCurrentDummy == pDummy )

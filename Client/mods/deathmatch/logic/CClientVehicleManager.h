@@ -65,10 +65,9 @@ public:
     void                            RestreamVehicles        ( unsigned short usModel );
     void                            RestreamVehicleUpgrades ( unsigned short usModel );
 
-    std::vector < CClientVehicle* > ::const_iterator            IterBegin           ( void )    { return m_List.begin (); };
-    std::vector < CClientVehicle* > ::const_iterator            IterEnd             ( void )    { return m_List.end (); };
-    std::vector < CClientVehicle* > ::const_iterator            StreamedBegin       ( void )    { return m_StreamedIn.begin (); };
-    std::vector < CClientVehicle* > ::const_iterator            StreamedEnd         ( void )    { return m_StreamedIn.end (); };
+    const CMappedArray < CClientVehicle* > & GetVehicles(void)         { return m_List; }
+    const CMappedArray < CClientVehicle* > & GetStreamedVehicles(void) { return m_StreamedIn; }
+
 
     inline void                     AddToList               ( CClientVehicle* pVehicle )    { m_List.push_back ( pVehicle ); };
     void                            RemoveFromLists         ( CClientVehicle* pVehicle );

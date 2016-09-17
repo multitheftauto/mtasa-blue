@@ -106,9 +106,9 @@ bool CClientDFF::LoadDFF ( const SString& strFile, bool bIsRawData )
 
 void CClientDFF::UnloadDFF ( void )
 {
-    for ( std::map < ushort, SLoadedClumpInfo >::iterator iter = m_LoadedClumpInfoMap.begin () ; iter != m_LoadedClumpInfoMap.end () ; ++iter )
+    for ( auto iter : m_LoadedClumpInfoMap )
     {
-        SLoadedClumpInfo& info = iter->second;
+        SLoadedClumpInfo& info = iter.second;
         if ( info.pClump )
             g_pGame->GetRenderWare ()->DestroyDFF ( info.pClump );
     }
@@ -187,18 +187,8 @@ bool CClientDFF::DoReplaceModel ( unsigned short usModel, bool bAlphaTransparenc
 bool CClientDFF::HasReplaced ( unsigned short usModel )
 {
     // See if we have a match in our list
-    std::list < unsigned short > ::iterator iter = m_Replaced.begin ();
-    for ( ; iter != m_Replaced.end (); iter++ )
-    {
-        // Compare the models
-        if ( *iter == usModel )
-        {
-            return true;
-        }
-    }
-
-    // We haven't replaced this model
-    return false;
+    auto iter = std::find(m_Replaced.begin(), m_Replaced.end(), usModel);
+    return iter != m_Replaced.end();
 }
 
 
@@ -213,11 +203,10 @@ void CClientDFF::RestoreModel ( unsigned short usModel )
 void CClientDFF::RestoreModels ( void )
 {
     // Loop through our list over replaced models
-    std::list < unsigned short > ::iterator iter = m_Replaced.begin ();
-    for ( ; iter != m_Replaced.end (); iter++ )
+    for ( auto iter : m_Replaced )
     {
         // Restore this model
-        InternalRestoreModel ( *iter );
+        InternalRestoreModel ( iter );
     }
 
     // Clear the list

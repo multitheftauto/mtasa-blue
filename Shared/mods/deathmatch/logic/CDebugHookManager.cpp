@@ -71,9 +71,9 @@ std::vector < SDebugHookCallInfo >& CDebugHookManager::GetHookInfoListForType( E
 bool CDebugHookManager::AddDebugHook( EDebugHookType hookType, const CLuaFunctionRef& functionRef, const std::vector < SString >& allowedNameList )
 {
     std::vector < SDebugHookCallInfo >& hookInfoList = GetHookInfoListForType( hookType );
-    for( std::vector < SDebugHookCallInfo >::iterator iter = hookInfoList.begin() ; iter != hookInfoList.end() ; ++iter )
+    for( auto& pHook : hookInfoList )
     {
-        if ( (*iter).functionRef == functionRef )
+        if ( pHook.functionRef == functionRef )
             return false;
     }
 
@@ -83,8 +83,8 @@ bool CDebugHookManager::AddDebugHook( EDebugHookType hookType, const CLuaFunctio
     if ( !info.pLuaMain )
         return false;
 
-    for( uint i = 0 ; i < allowedNameList.size() ; i++ )
-        MapInsert( info.allowedNameMap, allowedNameList[i] );
+    for( auto& allowedName : allowedNameList )
+        MapInsert( info.allowedNameMap, allowedName );
 
     hookInfoList.push_back( info );
     return true;
@@ -103,7 +103,7 @@ bool CDebugHookManager::RemoveDebugHook( EDebugHookType hookType, const CLuaFunc
     CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( functionRef.GetLuaVM() );
 
     std::vector < SDebugHookCallInfo >& hookInfoList = GetHookInfoListForType( hookType );
-    for( std::vector < SDebugHookCallInfo >::iterator iter = hookInfoList.begin() ; iter != hookInfoList.end() ; ++iter )
+    for( auto iter = hookInfoList.begin() ; iter != hookInfoList.end() ; ++iter )
     {
         if ( (*iter).pLuaMain == pLuaMain && (*iter).functionRef == functionRef )
         {
@@ -373,10 +373,8 @@ void CDebugHookManager::OnPostEvent( const char* szName, const CLuaArguments& Ar
 ///////////////////////////////////////////////////////////////
 bool CDebugHookManager::IsNameAllowed( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, bool bNameMustBeExplicitlyAllowed )
 {
-    for( uint i = 0 ; i < eventHookList.size() ; i++ )
+    for( auto& info : eventHookList )
     {
-        const SDebugHookCallInfo& info = eventHookList[i];
-
         if ( info.allowedNameMap.empty() && !bNameMustBeExplicitlyAllowed )
             return true;    // All names allowed
 

@@ -12,8 +12,6 @@
 
 #include <StdInc.h>
 
-using namespace std;
-
 SFixedArray < CClientEntity*, MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS > CElementIDs::m_Elements;
 CStack < ElementID, MAX_CLIENT_ELEMENTS - 2 > CElementIDs::m_ClientStack;
 
@@ -30,11 +28,6 @@ CClientEntity* CElementIDs::GetElement ( ElementID ID )
         return m_Elements [ID.Value()];
     }
 
-/*
-#ifdef MTA_DEBUG
-    assert ( 0 );
-#endif
-*/
     return NULL;
 }
 

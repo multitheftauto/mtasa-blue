@@ -11202,9 +11202,7 @@ CAccount* CStaticFunctionDefinitions::AddAccount ( const SString& strName, const
     }
     else
     {
-        CAccount* pAccount = new CAccount ( m_pAccountManager, true, strName );
-        pAccount->SetPassword ( strPassword );
-        g_pGame->GetAccountManager ()->Register( pAccount );
+        CAccount* pAccount = g_pGame->GetAccountManager ()->AddNewPlayerAccount ( strName, strPassword );
         return pAccount;
     }
     return NULL;
@@ -11226,20 +11224,13 @@ bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
     lua_State* pLua = pLuaMain->GetVM();
     CMappedAccountList::const_iterator iter = m_pAccountManager->IterBegin();
     unsigned int uiIndex = 0;
-    const char* szGuest =  GUEST_ACCOUNT_NAME;
-    const char* szHTTPGuest = HTTP_GUEST_ACCOUNT_NAME;
-    const char* szConsole = CONSOLE_ACCOUNT_NAME;
-    unsigned int uiGuest = HashString ( szGuest );
-    unsigned int uiHTTPGuest = HashString ( szHTTPGuest );
-    unsigned int uiConsole = HashString ( szConsole );
     for ( ; iter != m_pAccountManager->IterEnd(); iter++ )
     {
-        if ( ( (*iter)->GetNameHash() != uiGuest || (*iter)->GetName() != szGuest ) &&
-             ( (*iter)->GetNameHash() != uiHTTPGuest || (*iter)->GetName() != szHTTPGuest ) &&
-             ( (*iter)->GetNameHash() != uiConsole || (*iter)->GetName() != szConsole ) )
+        CAccount* pAccount = *iter;
+        if ( pAccount->IsRegistered () && !pAccount->IsConsoleAccount () )
         {
             lua_pushnumber ( pLua, ++uiIndex );
-            lua_pushaccount ( pLua, *iter );
+            lua_pushaccount ( pLua, pAccount );
             lua_settable ( pLua, -3 );
         }
     }
@@ -11260,9 +11251,7 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
 
             pClient->SendEcho ( "You were logged out of your account due to it being deleted" );
         }
-        g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
-        delete pAccount;
-        return true;
+        return g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
     }
 
     return false;

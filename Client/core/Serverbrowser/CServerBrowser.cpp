@@ -289,6 +289,10 @@ CServerBrowser::CServerBrowser ( void )
 
 CServerBrowser::~CServerBrowser ( void )
 {
+    // Save options now and disable selection handler
+    SaveOptions ( );
+    m_pPanel->SetSelectionHandler ( nullptr );
+
     // Delete the Tabs
     DeleteTab ( ServerBrowserTypes::INTERNET );
     DeleteTab ( ServerBrowserTypes::LAN );

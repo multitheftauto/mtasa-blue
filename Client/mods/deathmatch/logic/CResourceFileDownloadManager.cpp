@@ -76,7 +76,7 @@ void CResourceFileDownloadManager::UpdatePendingDownloads( void )
 
     // Start (or add to) matching group
     std::vector < CDownloadableResource* > pendingListCopy = m_PendingFileDownloadList;
-    for( auto pResourceFile : pendingListCopy )
+    for( auto& pResourceFile : pendingListCopy )
     {
         if ( pResourceFile->GetDownloadPriorityGroup() == iGroup )
         {

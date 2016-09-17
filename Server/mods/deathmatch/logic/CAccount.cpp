@@ -14,28 +14,21 @@
 
 #include "StdInc.h"
 
-CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::string& strName, const std::string& strPassword, const std::string& strIP, int iUserID, const std::string& strSerial )
+CAccount::CAccount ( CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword, int iUserID, const std::string& strIP, const std::string& strSerial )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACCOUNT );
     m_pClient = NULL;
 
-    m_iUserID = 0;
     m_bChanged = false;
-
     m_pManager = pManager;
-
-    m_bRegistered = bRegistered;
-
-    m_uiNameHash = 0;
-    SetName ( strName );
-
-    SetIP ( strIP );
-    SetSerial ( strSerial );
-    SetID ( iUserID );
+    m_AccountType = accountType;
+    m_strName = strName;
+    m_iUserID = iUserID;
+    m_strIP = strIP;
+    m_strSerial = strSerial;
 
     m_pManager->AddToList ( this );
 
-    m_bChanged = false;
     if ( m_Password.SetPassword( strPassword ) )
         m_pManager->MarkAsChanged ( this );     // Save if password upgraded
 }
@@ -52,27 +45,12 @@ CAccount::~CAccount ( void )
 }
 
 
-void CAccount::Register ( const char* szPassword )
-{
-    SetPassword( szPassword );
-    m_bRegistered = true;
-    m_Data.clear();
-
-    m_pManager->MarkAsChanged ( this );
-}
-
-
 void CAccount::SetName ( const std::string& strName )
 {
     if ( m_strName != strName )
     {
         m_pManager->ChangingName ( this, m_strName, strName );
-
         m_strName = strName;
-
-        if ( !m_strName.empty () )
-            m_uiNameHash = HashString ( m_strName.c_str () );
-
         m_pManager->MarkAsChanged ( this );
     }
 }
@@ -108,31 +86,6 @@ SString CAccount::GetPasswordHash ( void )
     return m_Password.GetPasswordHash();
 }
 
-void CAccount::SetIP ( const std::string& strIP )
-{
-    if ( m_strIP != strIP )
-    {
-        m_strIP = strIP;
-        m_pManager->MarkAsChanged ( this );
-    }
-}
-
-void CAccount::SetSerial ( const std::string& strSerial )
-{
-    if ( m_strSerial != strSerial )
-    {
-        m_strSerial = strSerial;
-        m_pManager->MarkAsChanged ( this );
-    }
-}
-
-void CAccount::SetID ( int iUserID )
-{
-    if ( m_iUserID != iUserID )
-    {
-        m_iUserID = iUserID;
-    }
-}
 
 CAccountData* CAccount::GetDataPointer ( const std::string& strKey )
 {
@@ -208,4 +161,15 @@ bool CAccount::HasData ( const std::string& strKey )
 void CAccount::RemoveData ( const std::string& strKey )
 {
     MapRemove( m_Data, strKey );
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// Called when the player has successful logged in
+//////////////////////////////////////////////////////////////////////
+void CAccount::OnLoginSuccess ( const SString& strSerial, const SString& strIp )
+{
+    m_strIP = strIp;
+    m_strSerial = strSerial;
+    m_pManager->MarkAsChanged ( this );
 }

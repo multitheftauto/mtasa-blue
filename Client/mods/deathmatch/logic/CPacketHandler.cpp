@@ -17,8 +17,6 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-using std::list;
-
 class CCore;
 
 // TODO: Make this independant of g_pClientGame. Just moved it here to get it out of the 
@@ -2655,7 +2653,7 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     ElementID EntityAttachedToID;
 
     // HACK: store new entities and link up anything depending on other entities after
-    list < SEntityDependantStuff* > newEntitiesStuff;
+    std::list < SEntityDependantStuff* > newEntitiesStuff;
 
     unsigned int NumEntities = 0;
     if ( !bitStream.ReadCompressed ( NumEntities ) || NumEntities == 0 )
@@ -3992,10 +3990,8 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
     g_pClientGame->m_pPathManager->LinkNodes ();
 
     // Link the entity dependant stuff
-    list < SEntityDependantStuff* > ::iterator iter = newEntitiesStuff.begin ();
-    for ( ; iter != newEntitiesStuff.end () ; ++iter )
+    for ( auto& pEntityStuff : newEntitiesStuff )
     {
-        SEntityDependantStuff* pEntityStuff = *iter;
         CClientEntity* pTempEntity = pEntityStuff->pEntity;
         ElementID TempParent = pEntityStuff->Parent;
         ElementID TempAttachedToID = pEntityStuff->AttachedToID;

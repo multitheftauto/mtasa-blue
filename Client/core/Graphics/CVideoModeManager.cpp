@@ -329,10 +329,18 @@ void CVideoModeManager::OnLoseFocus ( void )
                 memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ) );
                 dmScreenSettings.dmSize = sizeof( dmScreenSettings );
 
-                dmScreenSettings.dmFields = 0;
-
-                if( ChangeDisplaySettingsEx( GetCurrentAdapterDeviceName(), &dmScreenSettings, NULL, CDS_RESET, NULL ) != DISP_CHANGE_SUCCESSFUL )
+                if ( !EnumDisplaySettings( GetCurrentAdapterDeviceName(), ENUM_REGISTRY_SETTINGS, &dmScreenSettings ) )
+                {
+                    AddReportLog( 7340, SString( "EnumDisplaySettings failed for %s", *GetCurrentAdapterDeviceName() ) );
                     return;
+                }
+
+                int iChangeResult = ChangeDisplaySettingsEx( GetCurrentAdapterDeviceName(), &dmScreenSettings, NULL, CDS_RESET, NULL );
+                if ( iChangeResult != DISP_CHANGE_SUCCESSFUL )
+                {
+                    AddReportLog( 7341, SString( "ChangeDisplaySettingsEx failed for %s (%d)", *GetCurrentAdapterDeviceName(), iChangeResult ) );
+                    return;
+                }
             }
         }
     }
@@ -712,5 +720,5 @@ SString CVideoModeManager::GetCurrentAdapterDeviceName( void )
     monitorInfo.cbSize = sizeof( MONITORINFOEX );
     if ( GetMonitorInfo( m_hCurrentMonitor, &monitorInfo ) )
         return monitorInfo.szDevice;
-    return "";
+   return "";
 }

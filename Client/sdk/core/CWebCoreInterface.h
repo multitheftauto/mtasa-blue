@@ -74,7 +74,6 @@ public:
 
     virtual bool                GetRemotePagesEnabled () = 0;
     virtual bool                GetRemoteJavascriptEnabled () = 0;
-    virtual bool                GetPluginsEnabled () = 0;
 
     virtual void                OnPreScreenshot    () = 0;
     virtual void                OnPostScreenshot   () = 0;

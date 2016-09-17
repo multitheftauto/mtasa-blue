@@ -1199,11 +1199,6 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxRemoteJavascript->GetPosition ( vecTemp );
     m_pCheckBoxRemoteJavascript->AutoSize ( NULL, 20.0f );
 
-    m_pCheckBoxBrowserPluginsEnabled = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox(pTabBrowser, _("Enable plugins (like Flash, Silverlight; Java is disabled by default)"), true ) );
-    m_pCheckBoxBrowserPluginsEnabled->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
-    m_pCheckBoxBrowserPluginsEnabled->GetPosition ( vecTemp );
-    m_pCheckBoxBrowserPluginsEnabled->AutoSize ( NULL, 20.0f );
-
     m_pLabelBrowserCustomBlacklist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("Custom blacklist") ) );
     m_pLabelBrowserCustomBlacklist->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pLabelBrowserCustomBlacklist->GetPosition ( vecTemp );
@@ -3040,7 +3035,6 @@ void CSettings::LoadData ( void )
     // Browser
     CVARS_GET ( "browser_remote_websites", bVar ); m_pCheckBoxRemoteBrowser->SetSelected ( bVar );
     CVARS_GET ( "browser_remote_javascript", bVar ); m_pCheckBoxRemoteJavascript->SetSelected ( bVar );
-    CVARS_GET ( "browser_plugins", bVar ); m_pCheckBoxBrowserPluginsEnabled->SetSelected ( bVar );
 
     m_pGridBrowserBlacklist->Clear ();
     m_pGridBrowserWhitelist->Clear ();
@@ -3341,17 +3335,14 @@ void CSettings::SaveData ( void )
     bool bOldRemoteWebsites, bOldRemoteJavascript, bOldPlugins;
     CVARS_GET ( "browser_remote_websites", bOldRemoteWebsites );
     CVARS_GET ( "browser_remote_javascript", bOldRemoteJavascript );
-    CVARS_GET ( "browser_plugins", bOldPlugins );
 
     bool bBrowserSettingChanged = false;
     if ( bOldRemoteWebsites != m_pCheckBoxRemoteBrowser->GetSelected()
-        || bOldRemoteJavascript != m_pCheckBoxRemoteJavascript->GetSelected()
-        || bOldPlugins != m_pCheckBoxBrowserPluginsEnabled->GetSelected())
+        || bOldRemoteJavascript != m_pCheckBoxRemoteJavascript->GetSelected())
     {
         bBrowserSettingChanged = true;
         CVARS_SET ( "browser_remote_websites", m_pCheckBoxRemoteBrowser->GetSelected () );
         CVARS_SET ( "browser_remote_javascript", m_pCheckBoxRemoteJavascript->GetSelected () );
-        CVARS_SET ("browser_plugins", m_pCheckBoxBrowserPluginsEnabled->GetSelected () );
     }
 
     auto pWebCore = CCore::GetSingleton().GetWebCore();
@@ -3538,10 +3529,8 @@ void CSettings::LoadChatPresets( )
         if ( !pPresetsRoot )
             pPresetsRoot = pPresetsFile->CreateRootNode ( CHAT_PRESETS_ROOT );
 
-        list < CXMLNode* >::const_iterator iter = pPresetsRoot->ChildrenBegin ();
-        for ( ; iter != pPresetsRoot->ChildrenEnd (); iter++ )
+        for ( auto& pNode : pPresetsRoot->GetChildren() )
         {
-            CXMLNode* pNode = reinterpret_cast < CXMLNode* > ( *iter );
             if ( pNode->GetTagName ().compare ( "preset" ) == 0 )
             {
                 CXMLAttribute* pName = pNode->GetAttributes().Find ( "name" );
@@ -3618,11 +3607,9 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
     if ( !pNode )
         return true;
 
-    list < CXMLNode* >::const_iterator iter = pNode->ChildrenBegin ();
-    for ( ; iter != pNode->ChildrenEnd (); iter++ )
+    for ( auto& pSubNode : pNode->GetChildren() )
     {
         // Load all settings provided
-        CXMLNode* pSubNode = reinterpret_cast < CXMLNode* > ( *iter );
         string strTag = pSubNode->GetTagName ();
         string strValue = pSubNode->GetTagContent();
         

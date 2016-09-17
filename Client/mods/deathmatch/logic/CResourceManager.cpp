@@ -14,14 +14,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #include "StdInc.h"
-
-using std::list;
-
-CResourceManager::CResourceManager ( void )
-{
-}
 
 
 CResourceManager::~CResourceManager ( void )
@@ -56,13 +49,12 @@ CResource* CResourceManager::GetResourceFromNetID ( unsigned short usNetID )
         return pResource;
     }
 
-    list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); ++iter )
+    for ( auto& pResource : m_resources )
     {
-        if ( ( *iter )->GetNetID() == usNetID )
+        if ( pResource->GetNetID() == usNetID )
         {
             assert( 0 );    // Should be in map
-            return ( *iter );
+            return pResource;
         }
     }
     return NULL;
@@ -93,11 +85,10 @@ SString CResourceManager::GetResourceName ( lua_State* luaVM )
 
 CResource* CResourceManager::GetResource ( const char* szResourceName )
 {
-    list < CResource* > ::const_iterator iter = m_resources.begin ();
-    for ( ; iter != m_resources.end (); ++iter )
+    for (auto& pResource : m_resources)
     {
-        if ( stricmp ( ( *iter )->GetName(), szResourceName ) == 0 )
-            return ( *iter );
+        if ( stricmp ( pResource->GetName(), szResourceName ) == 0 )
+            return pResource;
     }
     return NULL;
 }
@@ -105,9 +96,8 @@ CResource* CResourceManager::GetResource ( const char* szResourceName )
 void CResourceManager::OnDownloadGroupFinished( void )
 {
     // Try to load newly ready resources
-    for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
+    for (auto& pResource : m_resources) 
     {
-        CResource* pResource = *iter;
         if ( !pResource->IsActive() )
         {
             // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
@@ -283,8 +273,7 @@ void CResourceManager::ValidateResourceFile( const SString& strInFilename, const
                     g_pCore->GetConsole ()->Print( strMessage );
                     AddReportLog( 7057, strMessage + g_pNet->GetConnectedServer( true ), 10 );
                 }
-                else
-                if ( pResourceFile->IsAutoDownload() )
+                else if ( pResourceFile->IsAutoDownload() )
                 {
                     char szMd5[33];
                     CMD5Hasher::ConvertToHex( checksum.md5, szMd5 );

@@ -42,9 +42,7 @@ public:
     bool                        Exists                          ( CClientPlayer* pPlayer );
 
     static bool                 IsPlayerLimitReached            ( void );
-
-    std::vector < CClientPlayer* > ::const_iterator IterBegin   ( void )                                                { return m_Players.begin (); };
-    std::vector < CClientPlayer* > ::const_iterator IterEnd     ( void )                                                { return m_Players.end (); };
+    const CMappedArray < CClientPlayer* >& GetPlayers           ( void ) { return m_Players; }
 
     static bool                 IsValidModel                    ( unsigned long ulModel );
 

@@ -29,16 +29,12 @@ CClientDisplayManager::~CClientDisplayManager ( void )
 CClientDisplay* CClientDisplayManager::Get ( unsigned long ulID )
 {
     // Find the display with the given id
-    list < CClientDisplay* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        if ( (*iter)->GetID () == ulID )
-        {
-            return *iter;
+    for (auto& iter : m_List) {
+        if ( iter->GetID() == ulID ) {
+            return iter;
         }
     }
-
-    return NULL;
+    return nullptr;
 }
 
 
@@ -67,11 +63,8 @@ void CClientDisplayManager::RemoveAll ( void )
 {
     // Delete all the items in the list
     m_bCanRemoveFromList = false;
-    list < CClientDisplay* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
-    {
-        delete *iter;
-    }
+    for ( auto& pDisplay : m_List )
+        delete pDisplay;
 
     // Clear the list
     m_List.clear ();
@@ -94,7 +87,7 @@ void CClientDisplayManager::DoPulse ( void )
 {
     // Render all our displays
     m_bCanRemoveFromList = false;
-    list < CClientDisplay* > ::iterator iter = m_List.begin ();
+    auto iter  = m_List.begin ();
     while ( iter != m_List.end () )
     {
         CClientDisplay* pObject = *iter;

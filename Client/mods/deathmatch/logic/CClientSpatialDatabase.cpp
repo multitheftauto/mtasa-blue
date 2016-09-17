@@ -153,8 +153,8 @@ void CClientSpatialDatabaseImpl::AllQuery ( CClientEntityResult& outResult )
 
     // Copy results from map to output
     outResult.clear ();
-    for ( std::map < CClientEntity*, SEntityInfo >::iterator it = m_InfoMap.begin (); it != m_InfoMap.end (); ++it )
-        outResult.push_back ( it->first );
+    for ( auto iter : m_InfoMap )
+        outResult.push_back ( iter.first );
 }
 
 
@@ -169,9 +169,9 @@ void CClientSpatialDatabaseImpl::FlushUpdateQueue ( void )
 {
     std::map < CClientEntity*, int > updateQueueCopy = m_UpdateQueue;
     m_UpdateQueue.clear ();
-    for ( std::map < CClientEntity*, int >::iterator it = updateQueueCopy.begin (); it != updateQueueCopy.end (); ++it )
+    for ( auto& it : updateQueueCopy )
     {
-        CClientEntity* pEntity = it->first;
+        CClientEntity* pEntity = it.first;
 
         // Get the new bounding box
         SEntityInfo newInfo;

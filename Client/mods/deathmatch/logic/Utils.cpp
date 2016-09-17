@@ -17,9 +17,6 @@
 
 #include <StdInc.h>
 
-using namespace std;
-
-
 char* ReplaceAnyStringOccurrence ( char* szBuffer, const char* szWhat, const char* szWith, size_t sizeMax )
 {
     // TODO: Check for max size

@@ -955,9 +955,7 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                     // Try creating the account
                     if ( !g_pGame->GetAccountManager ()->Get ( szNick ) )
                     {
-                        CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), true, szNick );
-                        pAccount->SetPassword ( szPassword );
-                        g_pGame->GetAccountManager ()->Register( pAccount );
+                        g_pGame->GetAccountManager ()->AddNewPlayerAccount ( szNick, szPassword );
 
                         // Tell the user
                         pClient->SendEcho ( SString ( "addaccount: Added account '%s' with password '%s'", szNick, szPassword ) );
@@ -1021,15 +1019,19 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
                 pAccountClient->SendEcho ( SString ( "logout: You were logged out of account '%s' due to it being deleted", szArguments ) );
             }
 
+            // Delete it
+            if ( !g_pGame->GetAccountManager ()->RemoveAccount ( pAccount ) )
+            {
+                pEchoClient->SendEcho ( "delaccount: Unable to delete account" );
+                return false;
+            }
+
             // Tell the client
             pEchoClient->SendEcho ( SString ( "delaccount: Account '%s' deleted", szArguments ) );
 
             // Tell the console
             CLogger::LogPrintf ( "ACCOUNTS: %s deleted account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szArguments );
 
-            // Delete it
-            g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
-            delete pAccount;
             return true;
         }
         else

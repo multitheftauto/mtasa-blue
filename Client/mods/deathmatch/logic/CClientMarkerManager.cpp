@@ -63,10 +63,9 @@ void CClientMarkerManager::DeleteAll ( void )
 {
     // Delete each checkpoint
     m_bCanRemoveFromList = false;
-    CFastList < CClientMarker* > ::const_iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end (); iter++ )
+    for ( auto& pMarker : m_Markers )
     {
-        delete *iter;
+        delete pMarker;
     }
 
     m_bCanRemoveFromList = true;
@@ -79,9 +78,6 @@ void CClientMarkerManager::DeleteAll ( void )
 void CClientMarkerManager::DoPulse ( void )
 {
     // Pulse all our markers
-    CFastList < CClientMarker* > ::const_iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end (); iter++ )
-    {
-        (*iter)->DoPulse ();
-    }
+    for ( auto pMarker : m_Markers)
+        pMarker->DoPulse ();
 }

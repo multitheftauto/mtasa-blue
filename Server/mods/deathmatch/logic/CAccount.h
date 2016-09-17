@@ -42,17 +42,25 @@ protected:
     SString     m_strType; // can be "1", "0" or "" as shown in EAccountPasswordType
 };
 
+enum class EAccountType
+{
+    Guest,
+    Console,
+    Player,
+};
+
 class CAccountData;
 class CAccount
 {
 public:
-                                CAccount                ( class CAccountManager* pManager, bool bRegistered, const std::string& strName, const std::string& strPassword = "", const std::string& strIP = "", int iUserID = 0, const std::string& strSerial = "");
+    ZERO_ON_NEW
+                                CAccount                ( class CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword = "", int iUserID = 0, const std::string& strIP = "", const std::string& strSerial = "" );
                                 ~CAccount               ( void );
 
-    inline bool                 IsRegistered            ( void )                    { return m_bRegistered; }
-    void                        Register                ( const char* szPassword );
+    bool                        IsRegistered            ( void )                    { return m_AccountType != EAccountType::Guest; }
+    bool                        IsConsoleAccount        ( void )                    { return m_AccountType == EAccountType::Console; }
+    void                        OnLoginSuccess          ( const SString& strSerial, const SString& strIp );
 
-    unsigned int                GetNameHash             ( void )                    { return m_uiNameHash; }
     const SString&              GetName                 ( void )                    { return m_strName; }
     void                        SetName                 ( const std::string& strName );
 
@@ -61,13 +69,8 @@ public:
     SString                     GetPasswordHash         ( void );
 
     inline const std::string&   GetIP                   ( void )                    { return m_strIP; }
-    void                        SetIP                   ( const std::string& strIP );
-
     inline const std::string&   GetSerial               ( void )                    { return m_strSerial; }
-    void                        SetSerial               ( const std::string& strSerial );
-
     inline int                  GetID                   ( void )                    { return m_iUserID; }
-    void                        SetID                   ( int iUserID );
 
     CClient*                    GetClient               ( void )                    { return m_pClient; }
     void                        SetClient               ( CClient* pClient );
@@ -88,7 +91,7 @@ public:
 
     CAccountManager*            m_pManager;
 
-    bool                        m_bRegistered;
+    EAccountType                m_AccountType;
     SString                     m_strName;
     CAccountPassword            m_Password;
     std::string                 m_strIP;
@@ -96,8 +99,6 @@ public:
     int                         m_iUserID;
 
     bool                        m_bChanged;
-
-    unsigned int                m_uiNameHash;
 
     class CClient*              m_pClient;
     uint                        m_uiScriptID;
