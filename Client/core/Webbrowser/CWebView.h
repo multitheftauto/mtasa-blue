@@ -105,6 +105,7 @@ public:
 
     // CefRenderHandler methods
     virtual bool GetViewRect    ( CefRefPtr<CefBrowser> browser, CefRect& rect ) override;
+    virtual void OnPopupShow    (CefRefPtr<CefBrowser> browser, bool show) override;
     virtual void OnPopupSize    ( CefRefPtr<CefBrowser> browser, const CefRect& rect ) override;
     virtual void OnPaint        ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height ) override;
     virtual void OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo ) override;
@@ -159,9 +160,10 @@ private:
         const void* buffer;
         int width, height;
         CefRenderHandler::RectList dirtyRects;
-        cef_paint_element_type_t paintType;
-        CefRect popupRect;
 
+        CefRect popupRect;
+        bool popupShown = false;
+        std::unique_ptr<byte[]> popupBuffer;
     } m_RenderData;
 
     CWebBrowserEventsInterface* m_pEventsInterface;
