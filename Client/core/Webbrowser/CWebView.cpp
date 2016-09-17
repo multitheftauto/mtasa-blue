@@ -34,9 +34,6 @@ CWebView::~CWebView ()
     {
         if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
             g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
-
-        // Make sure we don't dead lock the CEF render thread
-        m_RenderData.cv.notify_all();
     }
 
     // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
