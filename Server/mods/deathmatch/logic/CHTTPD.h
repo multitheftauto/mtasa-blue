@@ -57,6 +57,8 @@ private:
     CConnectHistory             m_BruteForceProtect;
     CConnectHistory             m_HttpDosProtect;
     std::set < SString >        m_HttpDosExcludeMap;
+    std::mutex                  m_mutexHttpDosProtect;
+    std::mutex                  m_mutexLoggedInMap;
 };
 
 #endif

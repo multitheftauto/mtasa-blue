@@ -91,7 +91,7 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
     return bResult;
 }
 
-// Called from worker thread.
+// Called from worker thread. Careful now.
 // Do some stuff before allowing EHS to do the proper routing
 HttpResponse * CHTTPD::RouteRequest ( HttpRequest * ipoHttpRequest )
 {
@@ -227,6 +227,7 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                     if ( strAccountName.compare ( CONSOLE_ACCOUNT_NAME ) != 0 )
                     {
                         // Handle initial login logging
+                        std::lock_guard< std::mutex > guard( m_mutexLoggedInMap );
                         if ( m_LoggedInMap.find ( authName ) == m_LoggedInMap.end () )
                             CLogger::AuthPrintf ( "HTTP: '%s' entered correct password from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
                         m_LoggedInMap[authName] = GetTickCount64_ ();
@@ -245,15 +246,10 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
     return m_pGuestAccount;
 }
 
+// Called from worker thread. Careful now.
 void CHTTPD::HttpPulse ( void )
 {
-    // Prevent more than one thread running this at once
-    static int iBusy = 0;
-    if ( ++iBusy > 1 )
-    {
-        iBusy--;
-        return;
-    }
+    std::lock_guard< std::mutex > guard( m_mutexLoggedInMap );
 
     long long llExpireTime = GetTickCount64_ () - 1000 * 60 * 5;    // 5 minute timeout
 
@@ -263,23 +259,21 @@ void CHTTPD::HttpPulse ( void )
         // Remove if too long since last request
         if ( iter->second < llExpireTime )
         {
-            g_pGame->Lock(); // get the mutex (blocking)
             CLogger::AuthPrintf ( "HTTP: '%s' no longer connected\n", iter->first.c_str () );
             m_LoggedInMap.erase ( iter++ );
-            g_pGame->Unlock();
         }
         else
             iter++;
     }
-
-    iBusy--;
 }
 
 //
 // Do DoS check here
-//
+// Called from worker thread. Careful now.
 bool CHTTPD::ShouldAllowConnection ( const char * szAddress )
 {
+    std::lock_guard< std::mutex > guard( m_mutexHttpDosProtect );
+
     if ( MapContains( m_HttpDosExcludeMap, szAddress ) )
         return true;
 
