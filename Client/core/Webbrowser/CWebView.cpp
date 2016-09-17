@@ -200,21 +200,11 @@ void CWebView::UpdateTexture()
 
     // Discard current buffer if size doesn't match
     // This happens when resizing the browser as OnPaint is called asynchronously
-    bool viewSizeMismatches = m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height;
-    bool popupSizeMismatches = m_RenderData.popupRect.x + m_RenderData.popupRect.width >= (int)m_pWebBrowserRenderItem->m_uiSizeX 
-        || m_RenderData.popupRect.y + m_RenderData.popupRect.height >= (int)m_pWebBrowserRenderItem->m_uiSizeY;
-
-    if (m_RenderData.changed
-        && ((m_RenderData.paintType == PET_VIEW && viewSizeMismatches) || (m_RenderData.paintType == PET_POPUP && popupSizeMismatches)))
-    {
-        m_RenderData.changed = false;
-    }
-
-    if (m_RenderData.changed)
-    {
-        // Update changed state
+    if (m_RenderData.changed && (m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height))
         m_RenderData.changed = false;
 
+    if (m_RenderData.changed || m_RenderData.popupShown)
+    {
         // Lock surface
         D3DLOCKED_RECT LockedRect;
         pSurface->LockRect(&LockedRect, nullptr, 0);
@@ -224,30 +214,44 @@ void CWebView::UpdateTexture()
         auto sourceData = static_cast<const byte*>(m_RenderData.buffer);
         auto pitch = LockedRect.Pitch;
 
-        // We've to skip a few rows if this is a popup draw
-        if (m_RenderData.paintType == PET_POPUP)
+        // Update view area
+        if (m_RenderData.changed)
         {
-            auto popupPitch = m_RenderData.popupRect.width * 4;
-            for (auto& rect : m_RenderData.dirtyRects)
-            {
-                for (int y = rect.y; y < rect.y + rect.height; ++y)
-                {
-                    int sourceIndex = y * popupPitch + rect.x * 4;
-                    int destIndex = (y + m_RenderData.popupRect.y) * pitch + (rect.x + m_RenderData.popupRect.x) * 4;
+            // Update changed state
+            m_RenderData.changed = false;
 
-                    memcpy(&surfaceData[destIndex], &sourceData[sourceIndex], m_RenderData.popupRect.width * 4);
+            if (m_RenderData.dirtyRects.size() > 0 && m_RenderData.dirtyRects[0].width == m_RenderData.width && m_RenderData.dirtyRects[0].height == m_RenderData.height)
+            {
+                // Update whole texture
+                memcpy(surfaceData, sourceData, m_RenderData.width * m_RenderData.height * 4);
+            }
+            else
+            {
+                // Update dirty rects
+                for (auto& rect : m_RenderData.dirtyRects)
+                {
+                    for (int y = rect.y; y < rect.y + rect.height; ++y)
+                    {
+                        int index = y * pitch + rect.x * 4;
+                        memcpy(&surfaceData[index], &sourceData[index], rect.width * 4);
+                    }
                 }
             }
         }
-        else
+
+        // Update popup area (override certain areas of the view texture)
+        bool popupSizeMismatches = m_RenderData.popupRect.x + m_RenderData.popupRect.width >= (int)m_pWebBrowserRenderItem->m_uiSizeX
+            || m_RenderData.popupRect.y + m_RenderData.popupRect.height >= (int)m_pWebBrowserRenderItem->m_uiSizeY;
+
+        if (m_RenderData.popupShown && !popupSizeMismatches)
         {
-            for (auto& rect : m_RenderData.dirtyRects)
+            auto popupPitch = m_RenderData.popupRect.width * 4;
+            for (int y = 0; y < m_RenderData.popupRect.height; ++y)
             {
-                for (int y = rect.y; y < rect.y + rect.height; ++y)
-                {
-                    int index = y * pitch + rect.x * 4;
-                    memcpy(&surfaceData[index], &sourceData[index], rect.width * 4);
-                }
+                int sourceIndex = y * popupPitch;
+                int destIndex = (y + m_RenderData.popupRect.y) * pitch + m_RenderData.popupRect.x * 4;
+
+                memcpy(&surfaceData[destIndex], &m_RenderData.popupBuffer[sourceIndex], popupPitch);
             }
         }
 
@@ -590,13 +594,35 @@ bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
+// Implementation: CefRenderHandler::OnPopupShow                  //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPopupShow(CefRefPtr<CefBrowser>,bool) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show)
+{
+    std::lock_guard<std::mutex>(m_RenderData.dataMutex);
+    m_RenderData.popupShown = show;
+
+    // Free popup buffer memory if hidden
+    if (!show)
+        m_RenderData.popupBuffer.reset();
+}
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
 // Implementation: CefRenderHandler::OnPopupSize                  //
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPopupSize(CefRefPtr<CefBrowser>,constCefRect&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnPopupSize ( CefRefPtr<CefBrowser> browser, const CefRect& rect )
 {
+    std::lock_guard<std::mutex>(m_RenderData.dataMutex);
+
+    // Update rect
     m_RenderData.popupRect = rect;
+
+    // Resize buffer
+    m_RenderData.popupBuffer.reset(new byte[rect.width * rect.height * 4]);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -610,14 +636,21 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
     if ( m_bBeingDestroyed )
         return;
 
-    // Store render data
     {
         std::lock_guard<std::mutex> lock(m_RenderData.dataMutex);
+
+        // Copy popup buffer
+        if (paintType == PET_POPUP)
+        {
+            memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * 4);
+            return; // We don't have to wait as we've copied the buffer already
+        }
+
+        // Store render data
         m_RenderData.buffer = buffer;
         m_RenderData.width = width;
         m_RenderData.height = height;
         m_RenderData.dirtyRects = dirtyRects;
-        m_RenderData.paintType = paintType;
         m_RenderData.changed = true;
     }
 
