@@ -241,12 +241,21 @@ void CWebView::UpdateTexture()
         }
         else
         {
-            for (auto& rect : m_RenderData.dirtyRects)
+            if (m_RenderData.dirtyRects.size() > 0 && m_RenderData.dirtyRects[0].width == m_RenderData.width && m_RenderData.dirtyRects[0].height == m_RenderData.height)
             {
-                for (int y = rect.y; y < rect.y + rect.height; ++y)
+                // Update whole texture
+                memcpy(surfaceData, sourceData, m_RenderData.width * m_RenderData.height * 4);
+            }
+            else
+            {
+                // Update dirty rects
+                for (auto& rect : m_RenderData.dirtyRects)
                 {
-                    int index = y * pitch + rect.x * 4;
-                    memcpy(&surfaceData[index], &sourceData[index], rect.width * 4);
+                    for (int y = rect.y; y < rect.y + rect.height; ++y)
+                    {
+                        int index = y * pitch + rect.x * 4;
+                        memcpy(&surfaceData[index], &sourceData[index], rect.width * 4);
+                    }
                 }
             }
         }
