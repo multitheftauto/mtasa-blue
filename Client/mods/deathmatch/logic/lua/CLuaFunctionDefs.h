@@ -68,7 +68,7 @@ public:
 
     // Notification functions
     LUA_DECLARE ( CreateTrayNotification );
-    LUA_DECLARE ( GetTrayNotificationEnabled );
+    LUA_DECLARE ( IsTrayNotificationEnabled );
 
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );

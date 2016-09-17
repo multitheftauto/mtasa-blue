@@ -57,7 +57,7 @@ public:
 
     // Notification funcs
     static bool                         CreateTrayNotification              ( SString strText, eTrayIconType eType, bool useSound );
-    static bool                         GetTrayNotificationEnabled          ( void );
+    static bool                         IsTrayNotificationEnabled           ( void );
 
     // Element get funcs
     static CClientEntity*               GetRootElement                      ( void );

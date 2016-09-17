@@ -34,9 +34,9 @@ int CLuaFunctionDefs::CreateTrayNotification ( lua_State* luaVM )
 }
 
 
-int CLuaFunctionDefs::GetTrayNotificationEnabled ( lua_State* luaVM )
+int CLuaFunctionDefs::IsTrayNotificationEnabled ( lua_State* luaVM )
 {
-    // bool areTrayNotificationEnabled ( )
-    lua_pushboolean( luaVM, CStaticFunctionDefinitions::GetTrayNotificationEnabled ( ) );
+    // bool isTrayNotificationEnabled ( )
+    lua_pushboolean( luaVM, CStaticFunctionDefinitions::IsTrayNotificationEnabled ( ) );
     return 1;
 }

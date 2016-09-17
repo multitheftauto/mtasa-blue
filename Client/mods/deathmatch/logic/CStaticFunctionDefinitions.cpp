@@ -347,7 +347,7 @@ bool CStaticFunctionDefinitions::SetWindowFlashing ( bool flash, uint count )
 bool CStaticFunctionDefinitions::CreateTrayNotification ( SString strText, eTrayIconType eType, bool useSound )
 {
     // Don't create notifications if window is active
-    if ( g_pCore->IsFocused ( ) || !GetTrayNotificationEnabled ( ) )
+    if ( g_pCore->IsFocused ( ) || !IsTrayNotificationEnabled ( ) )
         return false;
 
     // Create tray notification
@@ -355,7 +355,7 @@ bool CStaticFunctionDefinitions::CreateTrayNotification ( SString strText, eTray
 }
 
 
-bool CStaticFunctionDefinitions::GetTrayNotificationEnabled ( void )
+bool CStaticFunctionDefinitions::IsTrayNotificationEnabled ( void )
 {
     return g_pCore->GetCVars ( )->GetValue < bool > ( "allow_tray_notifications", true );
 }

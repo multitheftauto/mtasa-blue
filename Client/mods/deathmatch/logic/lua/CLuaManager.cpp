@@ -242,7 +242,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Notification funcs
     CLuaCFunctions::AddFunction ( "createTrayNotification", CLuaFunctionDefs::CreateTrayNotification );
-    CLuaCFunctions::AddFunction ( "areTrayNotificationEnabled", CLuaFunctionDefs::GetTrayNotificationEnabled );
+    CLuaCFunctions::AddFunction ( "isTrayNotificationEnabled", CLuaFunctionDefs::IsTrayNotificationEnabled );
 
     // Clothes and body functions
     CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefs::GetBodyPartName );
