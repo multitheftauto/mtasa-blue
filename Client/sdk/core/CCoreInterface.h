@@ -23,6 +23,7 @@
 #include "CKeyBindsInterface.h"
 #include "CCVarsInterface.h"
 #include "CWebCoreInterface.h"
+#include "CTrayIconInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -82,6 +83,7 @@ public:
     virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
     virtual CLocalizationInterface*     GetLocalization                 ( void ) = 0;
     virtual CWebCoreInterface*          GetWebCore                      ( void ) = 0;
+    virtual CTrayIconInterface*         GetTrayIcon                     ( void ) = 0;
     
 
     // Temporary functions for r1

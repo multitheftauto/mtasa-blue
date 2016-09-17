@@ -66,6 +66,10 @@ public:
     LUA_DECLARE ( GetClipboard );
     LUA_DECLARE ( SetWindowFlashing );
 
+    // Notification functions
+    LUA_DECLARE ( CreateTrayNotification );
+    LUA_DECLARE ( GetTrayNotificationEnabled );
+
     // Clothes and body functions
     LUA_DECLARE ( GetBodyPartName );
     LUA_DECLARE ( GetClothesByTypeIndex );
