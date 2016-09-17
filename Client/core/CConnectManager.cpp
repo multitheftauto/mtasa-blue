@@ -149,9 +149,6 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     CCore::GetSingleton ().ShowMessageBox ( _("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
     WriteDebugEvent( SString( "Connecting to %s:%u ...", m_strHost.c_str(), m_usPort ) );
 
-    // Create tray icon
-    g_pCore->GetTrayIcon ( )->CreateTrayIcon ( );
-
     return true;
 }
 
