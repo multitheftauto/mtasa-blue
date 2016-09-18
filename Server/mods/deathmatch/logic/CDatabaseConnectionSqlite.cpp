@@ -264,7 +264,7 @@ bool CDatabaseConnectionSqlite::QueryInternal ( const SString& strQuery, CRegist
                     case SQLITE_NULL:
                         break;
                     case SQLITE_INTEGER:
-                        cell.nVal = sqlite3_column_int ( pStmt, i );
+                        cell.nVal = sqlite3_column_int64 ( pStmt, i );
                         break;
                     case SQLITE_FLOAT:
                         cell.fVal = (float)sqlite3_column_double ( pStmt, i );
@@ -496,6 +496,13 @@ SString InsertQueryArgumentsSqlite ( const char* szQuery, va_list vl )
                 {
                     int iValue = va_arg( vl, int );
                     strParsedQuery += SString ( "%d", iValue );
+                }
+                break;
+
+                case SQLITE_INTEGER64:
+                {
+                    long long int llValue = va_arg( vl, long long int );
+                    strParsedQuery += SString( "%" PRId64, llValue );
                 }
                 break;
 
