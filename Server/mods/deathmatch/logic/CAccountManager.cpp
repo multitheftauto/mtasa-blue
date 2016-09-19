@@ -40,6 +40,17 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
     //Create all our tables (Don't echo the results)
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT)" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS userdata (id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER)" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS serialusage (id INTEGER PRIMARY KEY, userid INTEGER, "
+                                                                                                "serial TEXT, "
+                                                                                                "added_ip TEXT, "
+                                                                                                "added_date INTEGER, "
+                                                                                                "auth_who INTEGER, "
+                                                                                                "auth_date INTEGER, "
+                                                                                                "last_login_ip TEXT, "
+                                                                                                "last_login_date INTEGER, "
+                                                                                                "last_login_http_date INTEGER )" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE INDEX IF NOT EXISTS IDX_SERIALUSAGE_USERID on serialusage(userid)" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE UNIQUE INDEX IF NOT EXISTS IDX_SERIALUSAGE_USERID_SERIAL_U on serialusage(userid,serial)" );
 
     // Check if unique index on accounts exists
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'" );
@@ -164,6 +175,7 @@ bool CAccountManager::Load( void )
         {
             m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
             m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+            m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM serialusage WHERE userid=?", SQLITE_INTEGER, iUserID );
             continue;
         }
 
@@ -254,6 +266,8 @@ void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
             //If we don't have a serial then IP and password will suffice
             m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
     }
+
+    SaveAccountSerialUsage( pAccount );
 
     //Set changed since saved to false
     pAccount->SetChanged( false );
@@ -477,6 +491,20 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
         CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' with an invalid password (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szAccountName, strPlayerIP.c_str (), strPlayerSerial.c_str () );
         m_AccountProtect.AddConnect ( strPlayerIP.c_str () );
         return false;
+    }
+
+    // Check serial authorization
+    if ( IsAuthorizedSerialRequired( pAccount ) )
+    {
+        pAccount->AddSerialForAuthorization( strPlayerSerial, strPlayerIP );
+        if ( !pAccount->IsSerialAuthorized( strPlayerSerial ) )
+        {
+            if ( pEchoClient )
+                pEchoClient->SendEcho( SString( "login: Serial pending authorization for account '%s' - See https:""//mtasa.com/authserial", szAccountName ) );
+            CLogger::AuthPrintf( "LOGIN: %s tried to log in as '%s' with an unauthorized serial (IP: %s  Serial: %s)\n", *strPlayerName, szAccountName, *strPlayerIP, *strPlayerSerial );
+            CLogger::AuthPrintf( "LOGIN: See https:""//mtasa.com/authserial\n" );
+            return false;
+        }
     }
 
     // Log him in
@@ -865,6 +893,7 @@ bool CAccountManager::RemoveAccount ( CAccount* pAccount )
         int iUserID = pAccount->GetID();
         m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
         m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM serialusage WHERE userid=?", SQLITE_INTEGER, iUserID );
     }
     delete pAccount;
     return true;
@@ -946,4 +975,137 @@ bool CAccountManager::IsValidNewPassword( const SString& strPassword )
         return false;
 
     return true;
+}
+
+//
+// Return true if account is member of a restricted group
+//
+bool CAccountManager::IsAuthorizedSerialRequired( CAccount* pAccount )
+{
+    for ( const auto& strGroup : g_pGame->GetACLManager()->GetObjectGroupNames( pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER ) )
+    {
+        if ( g_pGame->GetConfig()->IsAuthSerialGroup( strGroup ) )
+            return true;
+    }
+    return false;
+}
+
+//
+// Return true if account and supplied IP is allowed by auth serial rules
+//
+bool CAccountManager::IsHttpLoginAllowed( CAccount* pAccount, const SString& strIp )
+{
+    if ( !g_pGame->GetConfig()->IsAuthSerialHttpEnabled() ||
+         !IsAuthorizedSerialRequired( pAccount ) ||
+         pAccount->IsIpAuthorized( strIp ) )
+    {
+        return true;
+    }
+    return false;
+}
+
+//
+// Load authorized serial list for the supplied account
+//
+void CAccountManager::LoadAccountSerialUsage( CAccount* pAccount )
+{
+    auto& outSerialUsageList = pAccount->GetSerialUsageList();
+    outSerialUsageList.clear();
+
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf( m_hDbConnection, &result, 
+        "SELECT "
+        " serial"
+        " ,added_ip"
+        " ,added_date"
+        " ,auth_who"
+        " ,auth_date"
+        " ,last_login_ip"
+        " ,last_login_date"
+        " ,last_login_http_date"
+        " FROM serialusage"
+        " WHERE userid=?"
+        , SQLITE_INTEGER, pAccount->GetID()
+        );
+
+    for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
+    {
+        const CRegistryResultRow& row = *iter;
+        outSerialUsageList.push_back( CAccount::SSerialUsage() ) ;
+        CAccount::SSerialUsage& info = outSerialUsageList.back();
+        info.strSerial = (const char *)row[0].pVal;
+        info.strAddedIp = (const char *)row[1].pVal;
+        info.tAddedDate = row[2].GetNumber<time_t>();
+        info.strAuthWho = (const char *)row[3].pVal;
+        info.tAuthDate = row[4].GetNumber<time_t>();
+        info.strLastLoginIp = (const char *)row[5].pVal;
+        info.tLastLoginDate = row[6].GetNumber<time_t>();
+        info.tLastLoginHttpDate = row[7].GetNumber<time_t>();
+    }
+}
+
+//
+// Save authorized serial list (if it exists) for the supplied account
+//
+void CAccountManager::SaveAccountSerialUsage( CAccount* pAccount )
+{
+    if ( !pAccount->HasLoadedSerialUsage() )
+        return;
+
+    // Update/add active serials
+    for ( auto& info : pAccount->GetSerialUsageList() )
+    {
+        m_pDatabaseManager->Execf( m_hDbConnection,
+            "INSERT OR IGNORE INTO serialusage"
+            " ("
+            "  userid"
+            " ,serial"
+            " )"
+            " VALUES(?,?)"
+            , SQLITE_INTEGER, pAccount->GetID()
+            , SQLITE_TEXT, *info.strSerial
+            );
+
+        m_pDatabaseManager->QueryWithCallbackf( m_hDbConnection, StaticDbCallback, this,
+            "UPDATE serialusage "
+            " SET "
+            "  added_ip=?"
+            " ,added_date=?"
+            " ,auth_who=?"
+            " ,auth_date=?"
+            " ,last_login_ip=?"
+            " ,last_login_date=?"
+            " ,last_login_http_date=?"
+            " WHERE userid=? AND serial=?"
+            // SET
+            , SQLITE_TEXT,   *info.strAddedIp
+            , SQLITE_INTEGER, (int)info.tAddedDate
+            , SQLITE_TEXT,   *info.strAuthWho
+            , SQLITE_INTEGER, (int)info.tAuthDate
+            , SQLITE_TEXT,   *info.strLastLoginIp
+            , SQLITE_INTEGER, (int)info.tLastLoginDate
+            , SQLITE_INTEGER, (int)info.tLastLoginHttpDate
+            // WHERE
+            , SQLITE_INTEGER, pAccount->GetID ()
+            , SQLITE_TEXT,   *info.strSerial
+            );
+    }
+
+    // Delete removed serials
+    SString strQuery = m_pDatabaseManager->PrepareStringf( m_hDbConnection, 
+            "DELETE FROM serialusage"
+            " WHERE"
+            " userid=?"
+            , SQLITE_INTEGER, pAccount->GetID ()
+            );
+
+    for ( auto& info : pAccount->GetSerialUsageList() )
+    {
+        strQuery += m_pDatabaseManager->PrepareStringf( m_hDbConnection, 
+            " AND serial!=?"
+            , SQLITE_TEXT, *info.strSerial
+            );
+    }
+
+    m_pDatabaseManager->QueryWithCallbackf( m_hDbConnection, StaticDbCallback, this, strQuery );
 }

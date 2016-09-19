@@ -1696,6 +1696,118 @@ bool CConsoleCommands::AclRequest ( CConsole* pConsole, const char* szArguments,
 }
 
 
+bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( !pClient->GetClientType() == CClient::CLIENT_CONSOLE )
+    {
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight( pClient->GetAccount()->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "authserial", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole( "authserial: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    std::vector < SString > parts;
+    SStringX( szArguments ).Split( " ", parts );
+    const SString& strAccountName   = parts.size() > 0 ? parts[0] : "";
+    const SString& strAction        = parts.size() > 1 ? parts[1] : "";
+
+    bool bList  = strAction == "list";
+    bool bAllow = strAction == "";
+    bool bRemove = strAction == "removelast";
+
+    if ( ( !bList && !bAllow && !bRemove ) || strAccountName.empty() )
+    {
+        pEchoClient->SendConsole( "Usage: authserial account_name [list|removelast]" );
+        return false;
+    }
+
+    CAccount* pAccount = g_pGame->GetAccountManager()->Get( strAccountName );
+    if ( !pAccount )
+    {
+        pEchoClient->SendConsole( SString( "authserial: No known account for '%s'", *strAccountName ) );
+        return false;
+    }
+
+    if ( bList )
+    {
+        // List authserial info
+        if ( pAccount->GetSerialUsageList().empty() )
+        {
+            pEchoClient->SendConsole( SString( "authserial: No serial usage for '%s'", *strAccountName ) );
+            return true;
+        }
+        pEchoClient->SendConsole( SString( "authserial: Serial usage for '%s':", *strAccountName ) );
+        for ( const auto& info : pAccount->GetSerialUsageList() )
+        {
+            char szAddedDate[64], szAuthDate[64], szLastLoginDate[64], szLastLoginHttpDate[64];
+            strftime( szAddedDate, 32, "%Y-%m-%d %H:%M", localtime( &info.tAddedDate ) );
+            strftime( szAuthDate, 32, "%Y-%m-%d %H:%M", localtime( &info.tAuthDate ) );
+            strftime( szLastLoginDate, 32, "%Y-%m-%d %H:%M", localtime( &info.tLastLoginDate ) );
+            strftime( szLastLoginHttpDate, 32, "%Y-%m-%d %H:%M", localtime( &info.tLastLoginHttpDate ) );
+            pEchoClient->SendConsole( SString( "  Serial: %s", *info.strSerial ) );
+            pEchoClient->SendConsole( SString( "    Added: %s (%s)", szAddedDate, *info.strAddedIp ) );
+            if ( info.IsAuthorized() )
+            {
+                if ( info.strAuthWho.empty() )
+                    pEchoClient->SendConsole( SString( "    Authorized: %s", szAuthDate ) );
+                else
+                    pEchoClient->SendConsole( SString( "    Authorized: %s (by %s)", szAuthDate, *info.strAuthWho ) );
+            }
+            if ( info.tLastLoginDate )
+            {
+                pEchoClient->SendConsole( SString( "    Last login: %s (%s)", szLastLoginDate, *info.strLastLoginIp ) );
+            }
+            if ( info.tLastLoginHttpDate )
+            {
+                pEchoClient->SendConsole( SString( "    Http login: %s ", szLastLoginHttpDate ) );
+            }
+        }
+        return true;
+    }
+    else
+    if ( bAllow )
+    {
+        // Authorize pending serial (there should be no more than one)
+        for ( const auto& info : pAccount->GetSerialUsageList() )
+        {
+            if ( !info.IsAuthorized() )
+            {
+                pEchoClient->SendConsole( SString( "authserial: Serial %s is authorized for '%s'", *info.strSerial, *strAccountName ) );
+                CLogger::LogPrintf( "AUTHSERIAL: Serial %s is authorized for '%s' (by %s)\n", *info.strSerial, *strAccountName, GetAdminNameForLog( pClient ).c_str() );
+                pAccount->AuthorizeSerial( info.strSerial, GetAdminNameForLog( pClient ) );
+                return true;
+            }
+        }
+        pEchoClient->SendConsole( SString( "authserial: No serials require authorization for '%s'", *strAccountName ) );
+        return false;
+    }
+    else // Remove
+    {
+        // Find newest serial
+        time_t tNewestDate = 0;
+        SString strNewestSerial;
+        for ( const auto& info : pAccount->GetSerialUsageList() )
+        {
+            if ( info.tAddedDate >= tNewestDate )
+            {
+                tNewestDate = info.tAddedDate;
+                strNewestSerial = info.strSerial;
+            }
+        }
+        if ( !strNewestSerial.empty() )
+        {
+            pEchoClient->SendConsole( SString( "authserial: Serial %s is removed for '%s'", *strNewestSerial, *strAccountName ) );
+            CLogger::LogPrintf( "AUTHSERIAL: Serial %s is removed for '%s' (by %s)\n", *strNewestSerial, *strAccountName, GetAdminNameForLog( pClient ).c_str() );
+            pAccount->RemoveSerial( strNewestSerial );
+            return true;
+        }
+        pEchoClient->SendConsole( SString( "authserial: No serial usage for '%s'", *strAccountName ) );
+        return false;
+    }
+}
+
+
 bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
 #if defined(MTA_DEBUG) || defined(MTA_BETA)

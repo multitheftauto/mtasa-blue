@@ -42,7 +42,7 @@ public:
     inline CResource *          GetResource ( void ) { return m_resource; }
     class CAccount *            CheckAuthentication ( HttpRequest * ipoHttpRequest );
     inline void                 SetDefaultResource ( const char * szResourceName ) { m_strDefaultResourceName = szResourceName ? szResourceName : ""; }
-    ResponseCode                RequestLogin ( HttpResponse * ipoHttpResponse );
+    ResponseCode                RequestLogin ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse );
 private:
     CResource *                 m_resource;
     CHTTPD *                    m_server;
@@ -59,6 +59,7 @@ private:
     std::set < SString >        m_HttpDosExcludeMap;
     std::mutex                  m_mutexHttpDosProtect;
     std::mutex                  m_mutexLoggedInMap;
+    SString                     m_strWarnMessageForIp;
 };
 
 #endif

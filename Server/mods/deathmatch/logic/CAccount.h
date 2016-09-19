@@ -53,6 +53,19 @@ class CAccountData;
 class CAccount
 {
 public:
+    struct SSerialUsage
+    {
+        SString     strSerial;
+        SString     strAddedIp;
+        time_t      tAddedDate;
+        SString     strAuthWho;
+        time_t      tAuthDate;
+        SString     strLastLoginIp;
+        time_t      tLastLoginDate;
+        time_t      tLastLoginHttpDate;
+        bool        IsAuthorized ( void ) const   { return tAuthDate != 0; }
+    };
+
     ZERO_ON_NEW
                                 CAccount                ( class CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword = "", int iUserID = 0, const std::string& strIP = "", const std::string& strSerial = "" );
                                 ~CAccount               ( void );
@@ -60,6 +73,7 @@ public:
     bool                        IsRegistered            ( void )                    { return m_AccountType != EAccountType::Guest; }
     bool                        IsConsoleAccount        ( void )                    { return m_AccountType == EAccountType::Console; }
     void                        OnLoginSuccess          ( const SString& strSerial, const SString& strIp );
+    void                        OnLoginHttpSuccess      ( const SString& strIp );
 
     const SString&              GetName                 ( void )                    { return m_strName; }
     void                        SetName                 ( const std::string& strName );
@@ -71,6 +85,17 @@ public:
     inline const std::string&   GetIP                   ( void )                    { return m_strIP; }
     inline const std::string&   GetSerial               ( void )                    { return m_strSerial; }
     inline int                  GetID                   ( void )                    { return m_iUserID; }
+
+    bool                        HasLoadedSerialUsage    ( void );
+    void                        EnsureLoadedSerialUsage ( void );
+    std::vector< SSerialUsage >& GetSerialUsageList     ( void );
+    SSerialUsage*               GetSerialUsage          ( const SString& strSerial );
+    bool                        IsIpAuthorized          ( const SString& strIp );
+    bool                        IsSerialAuthorized      ( const SString& strSerial );
+    bool                        AddSerialForAuthorization ( const SString& strSerial, const SString& strIp );
+    bool                        AuthorizeSerial         ( const SString& strSerial, const SString& strWho );
+    bool                        RemoveSerial            ( const SString& strSerial );
+    void                        RemoveUnauthorizedSerials ( void );
 
     CClient*                    GetClient               ( void )                    { return m_pClient; }
     void                        SetClient               ( CClient* pClient );
@@ -97,6 +122,8 @@ public:
     std::string                 m_strIP;
     std::string                 m_strSerial;
     int                         m_iUserID;
+    bool                        m_bLoadedSerialUsage;
+    std::vector< SSerialUsage > m_SerialUsageList;
 
     bool                        m_bChanged;
 

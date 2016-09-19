@@ -179,8 +179,18 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
     return HTTPRESPONSECODE_200_OK;
 }
 
-ResponseCode CHTTPD::RequestLogin ( HttpResponse * ipoHttpResponse )
+ResponseCode CHTTPD::RequestLogin ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
+    if ( m_strWarnMessageForIp == ipoHttpRequest->GetAddress() )
+    {
+        m_strWarnMessageForIp.clear();
+        SString strMessage;
+        strMessage += SString( "Your IP address ('%s') is not associated with an authorized serial.", ipoHttpRequest->GetAddress().c_str() );
+        strMessage += SString( "<br/><a href='%s'>See here for more information</a>", "https:""//mtasa.com/authserialhttp" );
+        ipoHttpResponse->SetBody( strMessage, strMessage.length() );
+        return HTTPRESPONSECODE_401_UNAUTHORIZED;
+    }
+
     const char* szAuthenticateMessage = "Access denied, please login";
     ipoHttpResponse->SetBody ( szAuthenticateMessage, strlen(szAuthenticateMessage) );
     SString strName ( "Basic realm=\"%s\"", g_pGame->GetConfig ()->GetServerName ().c_str () );
@@ -196,19 +206,10 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
         if ( authorization.substr(0,6) == "Basic " )
         {
             // Basic auth
-            std::string strAuthDecoded = SharedUtil::Base64decode(authorization.substr(6));
+            SString strAuthDecoded = SharedUtil::Base64decode( authorization.substr( 6 ) );
 
-            string authName;
-            string authPassword;
-            for ( size_t i = 0; i < strAuthDecoded.length(); i++ )
-            {
-                if ( strAuthDecoded.substr(i, 1) == ":" )
-                {
-                    authName = strAuthDecoded.substr(0,i);
-                    authPassword = strAuthDecoded.substr(i+1);
-                    break;
-                }
-            }
+            SString authName, authPassword;
+            strAuthDecoded.Split( ":", &authName, &authPassword );
 
             if ( m_BruteForceProtect.IsFlooding ( ipoHttpRequest->GetAddress ().c_str () ) )
             {
@@ -226,12 +227,19 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                     std::string strAccountName = account->GetName ();
                     if ( strAccountName.compare ( CONSOLE_ACCOUNT_NAME ) != 0 )
                     {
+                        if ( !g_pGame->GetAccountManager()->IsHttpLoginAllowed( account, ipoHttpRequest->GetAddress() ) )
+                        {
+                            m_strWarnMessageForIp = ipoHttpRequest->GetAddress();
+                            CLogger::AuthPrintf( "HTTP: Failed login for user '%s' because %s not associated with authorized serial\n", authName.c_str(), ipoHttpRequest->GetAddress().c_str() );
+                            return m_pGuestAccount;
+                        }
+
                         // Handle initial login logging
                         std::lock_guard< std::mutex > guard( m_mutexLoggedInMap );
                         if ( m_LoggedInMap.find ( authName ) == m_LoggedInMap.end () )
                             CLogger::AuthPrintf ( "HTTP: '%s' entered correct password from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
                         m_LoggedInMap[authName] = GetTickCount64_ ();
-                        // @@@@@ Check they can access HTTP
+                        account->OnLoginHttpSuccess( ipoHttpRequest->GetAddress() );
                         return account;
                     }
                 }

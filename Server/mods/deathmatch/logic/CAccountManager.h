@@ -153,12 +153,18 @@ public:
     CAccount*                   AddPlayerAccount            ( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial );
     CAccount*                   AddNewPlayerAccount         ( const SString& strName, const SString& strPassword );
     bool                        RemoveAccount               ( CAccount* pAccount );
+    bool                        IsAuthorizedSerialRequired  ( CAccount* pAccount );
+    bool                        IsHttpLoginAllowed          ( CAccount* pAccount, const SString& strIp );
+
 protected:
     void                        AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
     void                        RemoveFromList              ( CAccount* pAccount );
 
     void                        MarkAsChanged               ( CAccount* pAccount );
     void                        ChangingName                ( CAccount* pAccount, const SString& strOldName, const SString& strNewName );
+    void                        LoadAccountSerialUsage      ( CAccount* pAccount );
+    void                        SaveAccountSerialUsage      ( CAccount* pAccount );
+
 public:
     void                        RemoveAll                   ( void );
     static void                 StaticDbCallback            ( CDbJobData* pJobData, void* pContext );

@@ -503,6 +503,24 @@ bool CMainConfig::Load ( void )
     m_bThreadNetEnabled = true;
     ApplyThreadNetEnabled ();
 
+    // auth_serial_groups
+    SString strGroupList;
+    if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList, 1 ) != IS_SUCCESS )
+    {
+        strGroupList = "Admin";
+    }
+    strGroupList.Split( ",", m_AuthSerialGroupList );
+    for ( auto& strGroup : m_AuthSerialGroupList )
+    {
+        strGroup = strGroup.TrimEnd( " " ).TrimStart( " " );
+    }
+
+    // auth_serial_http_enable
+    if ( GetBoolean( m_pRootNode, "auth_serial_http_enable", m_bAuthSerialHttpEnabled ) != IS_SUCCESS )
+    {
+        m_bAuthSerialHttpEnabled = true;
+    }
+
     // Check settings in this list here
     const std::vector < SIntSetting >& settingList = GetIntSettingList ();
     for ( uint i = 0 ; i < settingList.size () ; i++ )
@@ -810,6 +828,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "reloadbans", CConsoleCommands::ReloadBans, false );
 
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
+    RegisterCommand ( "authserial", CConsoleCommands::AuthorizeSerial, false );
     RegisterCommand ( "debugjoinflood", CConsoleCommands::DebugJoinFlood, false );
     RegisterCommand ( "debuguptime", CConsoleCommands::DebugUpTime, false );
 #if defined(MTA_DEBUG) || defined(MTA_BETA)

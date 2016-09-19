@@ -164,12 +164,189 @@ void CAccount::RemoveData ( const std::string& strKey )
 }
 
 
-//////////////////////////////////////////////////////////////////////
-// Called when the player has successful logged in
-//////////////////////////////////////////////////////////////////////
-void CAccount::OnLoginSuccess ( const SString& strSerial, const SString& strIp )
+//
+// Authorized aerial stuff
+//
+// Account serial usage is only recorded for accounts that require serial authorization,
+// and is only loaded when required.
+void CAccount::EnsureLoadedSerialUsage( void )
 {
+    if ( !m_bLoadedSerialUsage )
+    {
+        m_bLoadedSerialUsage = true;
+        m_pManager->LoadAccountSerialUsage( this );
+    }
+}
+
+
+bool CAccount::HasLoadedSerialUsage( void )
+{
+    return m_bLoadedSerialUsage;
+}
+
+
+std::vector<CAccount::SSerialUsage>& CAccount::GetSerialUsageList( void )
+{
+    EnsureLoadedSerialUsage();
+    return m_SerialUsageList;
+}
+
+
+CAccount::SSerialUsage* CAccount::GetSerialUsage( const SString& strSerial )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto& info : m_SerialUsageList )
+    {
+        if ( info.strSerial == strSerial )
+            return &info; 
+    }
+    return nullptr;
+}
+
+//
+// Check if the supplied serial had been authorized for this account
+//
+bool CAccount::IsSerialAuthorized( const SString& strSerial )
+{
+    SSerialUsage* pInfo = GetSerialUsage( strSerial );
+    if ( pInfo )
+    {
+        return pInfo->IsAuthorized();
+    }
+    return false;
+}
+
+//
+// Check if the supplied IP was last used by an authorized serial
+//
+bool CAccount::IsIpAuthorized( const SString& strIp )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto& info : m_SerialUsageList )
+    {
+        if ( info.strLastLoginIp == strIp && info.IsAuthorized() )
+            return true; 
+    }
+    return false;
+}
+
+//
+// Mark pending serial as authorized for this account
+//
+bool CAccount::AuthorizeSerial( const SString& strSerial, const SString& strWho )
+{
+    SSerialUsage* pInfo = GetSerialUsage( strSerial );
+    if ( pInfo )
+    {
+        if ( !pInfo->IsAuthorized() )
+        {
+            pInfo->tAuthDate = time( nullptr );
+            pInfo->strAuthWho = strWho;
+            m_pManager->MarkAsChanged( this );
+            return true;
+        }
+    }
+    return false;
+}
+
+//
+// Unconditionally remove usage info for a serial
+//
+bool CAccount::RemoveSerial( const SString& strSerial )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto iter = m_SerialUsageList.begin() ; iter != m_SerialUsageList.end() ; ++iter )
+    {
+        SSerialUsage& info = *iter;
+        if ( info.strSerial == strSerial )
+        {
+            iter = m_SerialUsageList.erase( iter );
+            m_pManager->MarkAsChanged( this );
+            return true;
+        }
+    }
+    return false;
+}
+
+//
+// Cleanup unauthorized serials
+//
+void CAccount::RemoveUnauthorizedSerials( void )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto iter = m_SerialUsageList.begin() ; iter != m_SerialUsageList.end() ; )
+    {
+        SSerialUsage& info = *iter;
+        if ( !info.IsAuthorized() )
+            iter = m_SerialUsageList.erase( iter );
+        else
+            ++iter;
+    }
+    m_pManager->MarkAsChanged( this );
+}
+
+//
+// If serial not already present, add for possible authorization
+//
+bool CAccount::AddSerialForAuthorization( const SString& strSerial, const SString& strIp )
+{
+    SSerialUsage* pInfo = GetSerialUsage( strSerial );
+    if ( !pInfo )
+    {
+        // Only one new serial at a time, so remove all other unauthorized serials for this account
+        RemoveUnauthorizedSerials();
+
+        SSerialUsage info;
+        info.strSerial = strSerial;
+        info.strAddedIp = strIp;
+        info.tAddedDate = time( nullptr );
+        info.tAuthDate = 0;
+        info.tLastLoginDate = 0;
+        info.tLastLoginHttpDate = 0;
+
+        // First one doesn't require authorization
+        if ( m_SerialUsageList.size() == 0 )
+        {
+            info.tAuthDate = time( nullptr );
+        }
+        m_SerialUsageList.push_back( info );
+        m_pManager->MarkAsChanged( this );
+        return true;
+    }
+    return false;
+}
+
+//
+// Called when the player has successful logged in
+//
+void CAccount::OnLoginSuccess( const SString& strSerial, const SString& strIp )
+{
+    SSerialUsage* pInfo = GetSerialUsage( strSerial );
+    if ( pInfo )
+    {
+        pInfo->strLastLoginIp = strIp;
+        pInfo->tLastLoginDate = time( nullptr );
+
+        // On successful login, delete all other unauthorized serials for this account
+        RemoveUnauthorizedSerials();
+    }
     m_strIP = strIp;
     m_strSerial = strSerial;
-    m_pManager->MarkAsChanged ( this );
+    m_pManager->MarkAsChanged( this );
+}
+
+//
+// Called when the player has successful logged in via the http interface
+//
+void CAccount::OnLoginHttpSuccess( const SString& strIp )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto& info : m_SerialUsageList )
+    {
+        if ( info.strLastLoginIp == strIp && info.IsAuthorized() )
+        {
+            info.tLastLoginHttpDate = time( nullptr );
+            m_pManager->MarkAsChanged( this );
+        }
+    }
 }
