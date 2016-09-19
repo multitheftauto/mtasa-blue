@@ -18,10 +18,19 @@ before_script:
   - cd Build
 
 script: make -j 3 CXX=g++-5 CC=gcc-5 config=release_x64
- 
+
+after_success:
+  - cp README.md Artifact.zip
+  - curl -i -F "branch_name=$TRAVIS_BRANCH" -F "commit_hash=$TRAVIS_COMMIT" -F "commit_title=$(git log -1 --pretty=%B)" -F build_type=linux64 -F "secret=$UPLOAD_SECRET" -F build_upload=@Artifact.zip http://do-not.press:5000/api/upload
+
 notifications:
   irc:
     channels:
       - "irc.gtanet.com#mta.dev"
     on_success: change
     on_failure: always
+
+env:
+  matrix:
+      secure: UP9uJ0eV5MXu/iT0AchrN1ATWxRlGdTCj7xkcBmEuXHN9+sNGTLP6w8CWx7sznEcAEOaTVogkssY8qm4mEii5QQrfKtT2bKcYNZr1naUJOzc32SY/DDE5nHDdp/fIyST3jtUjjLNaErn187E3YdTCjHIl+Lvyn4GQvHF7oIlhO0=
+
