@@ -1599,7 +1599,7 @@ bool CConsoleCommands::OpenPortsTest ( CConsole* pConsole, const char* szArgumen
 
 bool CConsoleCommands::SetDbLogLevel ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debugdb", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
@@ -1626,7 +1626,7 @@ bool CConsoleCommands::SetDbLogLevel ( CConsole* pConsole, const char* szArgumen
 
 bool DoAclRequest ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "aclrequest", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
@@ -1698,7 +1698,7 @@ bool CConsoleCommands::AclRequest ( CConsole* pConsole, const char* szArguments,
 
 bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( !pClient->GetClientType() == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight( pClient->GetAccount()->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "authserial", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
@@ -1812,7 +1812,7 @@ bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CC
 {
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
 
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "sfakelag", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
@@ -1847,7 +1847,7 @@ bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CC
 
 bool CConsoleCommands::DebugJoinFlood ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debugjoinflood", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
@@ -1871,7 +1871,7 @@ bool CConsoleCommands::DebugJoinFlood ( CConsole* pConsole, const char* szArgume
 
 bool CConsoleCommands::DebugUpTime ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debuguptime", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
