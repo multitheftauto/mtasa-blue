@@ -50,11 +50,10 @@ workspace "MTASA"
 		defines { "MTA_DEBUG" }
 		targetsuffix "_d"
 	
-	if not CI_BUILD then
-		-- Only optimize outside of CI Builds
-		filter "configurations:Release or configurations:Nightly"
-			flags { "Optimize" }
-	else
+	filter "configurations:Release or configurations:Nightly"
+		flags { "Optimize" }
+	
+	if CI_BUILD then
 		filter {}
 			defines { "CI_BUILD=1" }
 	end 

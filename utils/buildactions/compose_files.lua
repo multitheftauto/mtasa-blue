@@ -34,11 +34,11 @@ newaction {
 			os.copydir(BIN_DIR, OUTPUT_DIR, "**.pak")
 		else
 			os.copydir(BIN_DIR, OUTPUT_DIR, "**.so")
-			os.copydir(BIN_DIR, OUTPUT_DIR, "mta-server*")
+			os.copydir(BIN_DIR, OUTPUT_DIR, "**mta-server*")
 		end
 
 		-- Copy publicsdk
-		os.copydir("Shared/publicsdk", OUTPUT_DIR.."/development/publicsdk")
+		-- os.copydir("Shared/publicsdk", OUTPUT_DIR.."/development/publicsdk")
 	end
 }
 
