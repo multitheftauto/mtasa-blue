@@ -56,6 +56,9 @@ workspace "MTASA"
 	if CI_BUILD then
 		filter {}
 			defines { "CI_BUILD=1" }
+		
+		filter { "system:linux" }
+			linkoptions { "-s" }
 	end 
 	
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
