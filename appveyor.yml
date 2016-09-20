@@ -28,11 +28,10 @@ artifacts:
     name: MTASA
 
 on_success:
-  - ps: |
-  if ($env:UPLOAD_SECRET -ne $null)
-  {
+  - cmd: |
+  if not %UPLOAD_SECRET% == "" (
     curl -i -F "branch_name=%APPVEYOR_REPO_BRANCH%" -F "commit_hash=%APPVEYOR_REPO_COMMIT%" -F "commit_title=%APPVEYOR_REPO_COMMIT_MESSAGE%" -F build_type=windows32 -F "secret=%UPLOAD_SECRET%" -F build_upload=@MTASA.zip http://do-not.press:5000/api/upload
-  }
+  )
 
 environment:
   UPLOAD_SECRET:
