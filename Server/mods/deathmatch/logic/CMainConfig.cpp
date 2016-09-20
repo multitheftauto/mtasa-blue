@@ -515,8 +515,8 @@ bool CMainConfig::Load ( void )
         strGroup = strGroup.TrimEnd( " " ).TrimStart( " " );
     }
 
-    // auth_serial_http_enable
-    if ( GetBoolean( m_pRootNode, "auth_serial_http_enable", m_bAuthSerialHttpEnabled ) != IS_SUCCESS )
+    // auth_serial_http
+    if ( GetBoolean( m_pRootNode, "auth_serial_http", m_bAuthSerialHttpEnabled ) != IS_SUCCESS )
     {
         m_bAuthSerialHttpEnabled = true;
     }
