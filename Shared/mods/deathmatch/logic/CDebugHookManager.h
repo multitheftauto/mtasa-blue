@@ -50,10 +50,12 @@ protected:
     bool                CallHook                    ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments, bool bNameMustBeExplicitlyAllowed = false );
     bool                IsNameAllowed               ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, bool bNameMustBeExplicitlyAllowed = false );
     bool                MustNameBeExplicitlyAllowed ( const SString& strName );
+    void                MaybeMaskArgumentValues     ( const SString& strFunctionName, CLuaArguments& FunctionArguments );
 
     uint                                m_uiPostFunctionOverride;
     std::vector < SDebugHookCallInfo >  m_PreEventHookList;
     std::vector < SDebugHookCallInfo >  m_PostEventHookList;
     std::vector < SDebugHookCallInfo >  m_PreFunctionHookList;
     std::vector < SDebugHookCallInfo >  m_PostFunctionHookList;
+    std::map< SString, std::vector<uint> > m_MaskArgumentsMap;
 };
