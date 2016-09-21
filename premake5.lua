@@ -28,7 +28,7 @@ workspace "MTASA"
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs { 
 		"vendor",
-		"Shared/sdk", 
+		"Shared/sdk",
 	}
 
 	defines { 
@@ -125,7 +125,7 @@ workspace "MTASA"
 		include "vendor/pcre"
 		include "vendor/pme"
 		include "vendor/sqlite"
-		include "vendor/tinyxml"
+		include "vendor/pugixml"
 		include "vendor/unrar"
 		include "vendor/zip"
 		include "vendor/zlib"
