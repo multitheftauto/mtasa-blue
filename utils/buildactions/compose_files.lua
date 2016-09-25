@@ -18,7 +18,7 @@ newaction {
 		-- Copy data files
 		if WINDOWS then
 			os.copydir(DATA_DIR.."/MTA", OUTPUT_DIR.."/MTA")
-			os.copydir(DATA_DIR.."/skins/Classic", OUTPUT_DIR.."/skins/Default", "*.xml")
+			os.copydir(DATA_DIR.."/skins", OUTPUT_DIR.."/skins")
 			os.copydir(DATA_DIR.."/server/mods/deathmatch", OUTPUT_DIR.."/server/mods/deathmatch", "*.dll")
 			os.copydir(DATA_DIR.."/redist", OUTPUT_DIR.."/redist")
 		end
