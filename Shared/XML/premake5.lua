@@ -6,7 +6,7 @@ project "XML"
 	
 	includedirs { 
 		"../sdk",
-		"../../vendor/tinyxml"
+		"../../vendor/pugixml/src"
 	}
 	
 	pchheader "StdInc.h"
@@ -18,11 +18,7 @@ project "XML"
 		["*"] = "premake5.lua"
 	}
 	
-	links { "tinyxml" }
-	
-	defines {
-		"TIXML_USE_STL"
-	}
+	links { "pugixml" }
 	
 	files {
 		"premake5.lua",
@@ -34,9 +30,6 @@ project "XML"
 		postbuildcommands {
 			copy "mta"
 		}
-	
-	filter "system:not windows"
-		links { "rt" }
 	
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

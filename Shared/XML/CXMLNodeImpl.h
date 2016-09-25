@@ -2,94 +2,79 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/CXMLNodeImpl.h
-*  PURPOSE:     XML node class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+#pragma once
 
-#ifndef __CXMLNODEIMPL_H
-#define __CXMLNODEIMPL_H
-
-#include "CXMLAttributesImpl.h"
-#include <tinyxml.h>
+#include <pugixml.hpp>
 #include <xml/CXMLNode.h>
-
-#include <list>
-#include <string>
 
 class CXMLNodeImpl : public CXMLNode
 {
 public:
-                            CXMLNodeImpl        ( class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node );
-                            ~CXMLNodeImpl       ( void );
+    // CXMLNode Interface
+    CXMLNodeImpl(pugi::xml_node &node, bool bUsingIDs);
+    ~CXMLNodeImpl();
 
-    CXMLNode*               CreateSubNode       ( const char* szTagName );
-    void                    DeleteSubNode       ( CXMLNode* pNode ) { delete pNode; };
-    void                    DeleteAllSubNodes   ( void );
+    CXMLNode *GetParent() override { return m_pParent; }
+    CXMLNode *CreateChild(const std::string& strName) override;
+    void RemoveChild(CXMLNode *pNode) override;
 
-    unsigned int            GetSubNodeCount     ( void );
-    CXMLNode*               GetSubNode          ( unsigned int uiIndex );
-    CXMLNode*               FindSubNode         ( const char* szTagName, unsigned int uiIndex = 0 );
+    void RemoveAllChildren() override;
+    unsigned int GetChildCount() override;
+    CXMLNode *GetChild(unsigned int uiIndex) override;
+    CXMLNode *GetChild(const std::string& strTagName, unsigned int uiIndex = 0) override;
+    const std::list<std::unique_ptr<CXMLNode>> &GetChildren() override
+    {
+        return m_Children;
+    }
 
-    const std::list<CXMLNode*>& GetChildren     ( void ) { return m_Children; }
+    const std::string GetTagName() override;
+    void SetTagName(const std::string &strString) override;
 
-    CXMLAttributes&         GetAttributes       ( void );
-    CXMLNode*               GetParent           ( void );
+    const std::string GetTagContent() override;
+    bool GetTagContent(bool &bContent) override;
+    bool GetTagContent(int &iContent) override;
+    bool GetTagContent(unsigned int &uiContent) override;
+    bool GetTagContent(float &fContent) override;
 
-    int                     GetLine             ( void );
+    void SetTagContent(const std::string& strContent, bool bCDATA = false) override;
+    void SetTagContent(const char *szContent, bool bCDATA = false) override;
+    void SetTagContent(bool bContent) override;
+    void SetTagContent(int iContent) override;
+    void SetTagContent(unsigned int uiContent) override;
+    void SetTagContent(float fContent) override;
+    void SetTagContentf(const char *szFormat, ...) override;
 
-    const std::string&      GetTagName          ( void );
-    void                    SetTagName          ( const std::string& strString );
+    CXMLAttribute *AddAttribute(const std::string &strName) override;
+    bool RemoveAttribute(const std::string &strName) override;
+    CXMLAttribute *GetAttribute(const std::string &strName) override;
+    const std::list<std::unique_ptr<CXMLAttribute>> &GetAttributes() override
+    {
+        return m_Attributes;
+    }
 
-    const std::string       GetTagContent       ( void );
-    bool                    GetTagContent       ( bool& bContent );
-    bool                    GetTagContent       ( int& iContent );
-    bool                    GetTagContent       ( unsigned int& uiContent );
-    bool                    GetTagContent       ( float& fContent );
+    // CXMLCommon Interface
+    eXMLClass GetClassType() override { return CXML_NODE; };
+    unsigned long GetID() override { return m_ulID; };
 
-    void                    SetTagContent       ( const char* szContent, bool bCDATA = false );
-    void                    SetTagContent       ( bool bContent );
-    void                    SetTagContent       ( int iContent );
-    void                    SetTagContent       ( unsigned int uiContent );
-    void                    SetTagContent       ( float fContent );
-    void                    SetTagContentf      ( const char* szFormat, ... );
-
-    eXMLClass               GetClassType        ( void )    { return CXML_NODE; };
-    unsigned long           GetID               ( void )    { dassert ( m_pFile && m_pFile->IsUsingIDs () ); return m_ulID; };
-    bool                    IsUsingIDs          ( void )    { return m_bUsingIDs; };
-
-    CXMLNode*               CopyNode            ( CXMLNode* pParent = NULL );
-    bool                    CopyChildrenInto    ( CXMLNode* pDestination, bool bRecursive );
-
-    TiXmlElement*           GetNode             ( void );
-    void                    DeleteWrapper       ( void );
-
-    void                    AddToList           ( CXMLNode* pNode );
-    void                    RemoveFromList      ( CXMLNode* pNode );
-    void                    RemoveAllFromList   ( void );
-
-    bool                    IsValid             ( void ) { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
-
-    virtual SString         GetAttributeValue   ( const SString& strAttributeName );
+    // CXMLNodeImpl
+    void AddAttribute(std::unique_ptr<CXMLAttribute> pAttribute);
+    void AddChild(std::unique_ptr<CXMLNode> pNode);
+    pugi::xml_node &GetNode() { return m_node; }
 
 private:
-    bool                    StringToLong        ( const char* szString, long& lValue );
+    bool StringToNumber(const char *szString, long &lValue);
+    bool StringToNumber(const char *szString, unsigned int &uiValue);
+    bool StringToNumber(const char *szString, int &lValue);
+    bool StringToNumber(const char *szString, float &fValue);
 
-    unsigned long               m_ulID;
-    const bool                  m_bUsingIDs;
-
-    class CXMLFileImpl*         m_pFile;
-    CXMLNodeImpl*               m_pParent;
-    TiXmlElement*               m_pNode;
-    TiXmlDocument*              m_pDocument;
-
-    std::list < CXMLNode* >     m_Children;
-    bool                        m_bCanRemoveFromList;
-
-    CXMLAttributesImpl          m_Attributes;
+private:
+    unsigned long m_ulID;
+    pugi::xml_node m_node;
+    std::list<std::unique_ptr<CXMLAttribute>> m_Attributes;
+    std::list<std::unique_ptr<CXMLNode>> m_Children;
+    CXMLNodeImpl *m_pParent;
 };
-
-#endif

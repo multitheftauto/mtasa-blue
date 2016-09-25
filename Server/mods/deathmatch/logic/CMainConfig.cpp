@@ -250,16 +250,16 @@ bool CMainConfig::Load ( void )
     do
     {
         // Grab the current script node
-        pNode = m_pRootNode->FindSubNode ( "client_file", uiCurrentIndex++ );
+        pNode = m_pRootNode->GetChild ( "client_file", uiCurrentIndex++ );
         if ( pNode )
         {
             // Grab its "name" attribute
-            CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( "name" );
+            CXMLAttribute* pAttribute = pNode->GetAttribute ( "name" );
             SString strName = pAttribute ? pAttribute->GetValue () : "";
             strName = strName.Replace ( "\\", "/" ).ToLower ();
 
             // Grab its "verify" attribute
-            pAttribute = pNode->GetAttributes ().Find ( "verify" );
+            pAttribute = pNode->GetAttribute ( "verify" );
             SString strVerify = pAttribute ? pAttribute->GetValue () : "";
             bool bVerify = strVerify == "true" || strVerify == "yes" || strVerify == "1";
 
@@ -532,7 +532,7 @@ bool CMainConfig::Load ( void )
     }
 
     // Handle recently retired lightsync_rate
-    if ( m_pRootNode->FindSubNode ( "lightweight_sync_interval" ) == NULL )
+    if ( m_pRootNode->GetChild ( "lightweight_sync_interval" ) == NULL )
     {
         GetInteger ( m_pRootNode, "lightsync_rate", g_TickRateSettings.iLightSync );
         g_TickRateSettings.iLightSync = Clamp ( 200, g_TickRateSettings.iLightSync, 4000 );
@@ -663,10 +663,10 @@ bool CMainConfig::LoadExtended ( void )
     unsigned int uiCurrentIndex = 0;
     do
     {
-        pNode = m_pRootNode->FindSubNode ( "module", uiCurrentIndex++ );
+        pNode = m_pRootNode->GetChild ( "module", uiCurrentIndex++ );
         if ( pNode )
         {
-            CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( "src" );
+            CXMLAttribute* pAttribute = pNode->GetAttribute ( "src" );
             if ( pAttribute )
             {
                 std::string strBuffer = pAttribute->GetValue ();
@@ -696,11 +696,11 @@ bool CMainConfig::LoadExtended ( void )
             return false;
 
         // Grab the current script node
-        pNode = m_pRootNode->FindSubNode ( "resource", uiCurrentIndex++ );
+        pNode = m_pRootNode->GetChild ( "resource", uiCurrentIndex++ );
         if ( pNode )
         {
             // Grab its "src" attribute
-            CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( "src" );
+            CXMLAttribute* pAttribute = pNode->GetAttribute ( "src" );
             if ( pAttribute )
             {
                 // Grab the text in it and convert iwt to a path inside "scripts"
@@ -715,7 +715,7 @@ bool CMainConfig::LoadExtended ( void )
                 {
                     loadedResource->SetPersistent ( true );
 
-                    pAttribute = pNode->GetAttributes ().Find ( "startup" );
+                    pAttribute = pNode->GetAttribute ( "startup" );
                     if ( pAttribute )
                     {
                         std::string strStartup = pAttribute->GetValue ();
@@ -734,7 +734,7 @@ bool CMainConfig::LoadExtended ( void )
                         }
                     }
 
-                    pAttribute = pNode->GetAttributes ().Find ( "protected" );
+                    pAttribute = pNode->GetAttribute ( "protected" );
                     if ( pAttribute )
                     {
                         std::string strProtected = pAttribute->GetValue ();
@@ -745,7 +745,7 @@ bool CMainConfig::LoadExtended ( void )
                     }
 
                     // Default resource
-                    pAttribute = pNode->GetAttributes ().Find ( "default" );
+                    pAttribute = pNode->GetAttribute ( "default" );
                     if ( pAttribute )
                     {
                         if ( !bFoundDefault )
@@ -1067,14 +1067,12 @@ bool CMainConfig::GetSettingTable ( const SString& strName, const char** szAttri
     do
     {
         // Grab the current script node
-        pNode = m_pRootNode->FindSubNode ( strName, uiXMLIndex++ );
+        pNode = m_pRootNode->GetChild ( strName, uiXMLIndex++ );
         if ( pNode )
         {
             CLuaArguments resultLine;
-            CXMLAttributes& attributes = pNode->GetAttributes();
-            for ( uint i = 0 ; i < attributes.Count() ; i++ )
+            for ( auto& pAttribute : pNode->GetAttributes() )
             {
-                CXMLAttribute* pAttribute = attributes.Get( i );
                 resultLine.PushString( pAttribute->GetName() );
                 resultLine.PushString( pAttribute->GetValue() );
             }

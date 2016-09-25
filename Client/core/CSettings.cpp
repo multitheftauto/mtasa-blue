@@ -3533,11 +3533,11 @@ void CSettings::LoadChatPresets( )
         {
             if ( pNode->GetTagName ().compare ( "preset" ) == 0 )
             {
-                CXMLAttribute* pName = pNode->GetAttributes().Find ( "name" );
+                CXMLAttribute* pName = pNode->GetAttribute ( "name" );
                 if ( pName && pName->GetValue()[1] )
                 {
                     CGUIListItem* pItem = m_pChatPresets->AddItem ( pName->GetValue ().c_str () );
-                    pItem->SetData ( pNode );
+                    pItem->SetData ( pNode.get() );
                 }
             }
         }

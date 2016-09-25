@@ -9,9 +9,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
-#ifndef __CXMLFILE_H
-#define __CXMLFILE_H
+#pragma once
 
 #include "CXMLCommon.h"
 #include "CXMLErrorCodes.h"
@@ -23,23 +21,17 @@ class CXMLNode;
 class CXMLFile: public CXMLCommon
 {
 public:
-    virtual                         ~CXMLFile           ( void ) {};
+    virtual                         ~CXMLFile     () = default;
 
-    virtual const char*             GetFilename         ( void ) = 0;
-    virtual void                    SetFilename         ( const char* szFilename ) = 0;
+    virtual const std::string&      GetFilename   () = 0;
+    virtual void                    SetFilename   (const std::string& strFilename) = 0;
 
-    virtual bool                    Parse               ( std::vector < char >* pOutFileContents = NULL ) = 0;
-    virtual bool                    Write               ( void ) = 0;
-    virtual void                    Clear               ( void ) = 0;
-    virtual void                    Reset               ( void ) = 0;
+    virtual bool                    Parse         (std::vector<char>* pOutFileContents = nullptr) = 0;
+    virtual bool                    Write         () = 0;
+    virtual void                    Reset         () = 0;
 
-    virtual CXMLNode*               CreateRootNode      ( const std::string& strTagName ) = 0;
-    virtual CXMLNode*               GetRootNode         ( void ) = 0;
+    virtual CXMLNode*               CreateRootNode(const std::string& strTagName) = 0;
+    virtual CXMLNode*               GetRootNode   () = 0;
 
-    virtual CXMLErrorCodes::Code    GetLastError        ( std::string& strOut ) = 0;
-    virtual void                    ResetLastError      ( void ) = 0;
-
-    virtual bool                    IsValid             ( void ) = 0;
+    virtual CXMLErrorCodes::Code    GetLastError  (std::string& strOut) = 0;
 };
-
-#endif

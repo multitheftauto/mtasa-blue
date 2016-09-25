@@ -275,14 +275,14 @@ CXMLNode* CVersionUpdater::GetXMLConfigNode ( bool bCreateIfRequired )
         return NULL;
 
     // Get the top config node
-    CXMLNode* pSectionNode = pRoot->FindSubNode ( CONFIG_NODE_UPDATER );
+    CXMLNode* pSectionNode = pRoot->GetChild ( CONFIG_NODE_UPDATER );
     if ( !pSectionNode )
     {
         if ( !bCreateIfRequired )
             return NULL;
 
         // Non-existent, create a new node
-        pSectionNode = pRoot->CreateSubNode ( CONFIG_NODE_UPDATER );
+        pSectionNode = pRoot->CreateChild ( CONFIG_NODE_UPDATER );
     }
 
     return pSectionNode;
@@ -312,7 +312,7 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
     if ( !pMainNode )
         return false;
 
-    if ( CXMLNode* pVar = pMainNode->FindSubNode ( "var" ) )
+    if ( CXMLNode* pVar = pMainNode->GetChild ( "var" ) )
     {
         CXMLAccess XMLAccess ( pVar );
         // Stuff for here
@@ -324,7 +324,7 @@ bool CVersionUpdater::EnsureLoadedConfigFromXML ( void )
         XMLAccess.GetSubNodeValue ( "crashdump_historylist",        m_VarConfig.crashdump_history );
     }
 
-    if ( CXMLNode* pMaster = pMainNode->FindSubNode ( "mastercache" ) )
+    if ( CXMLNode* pMaster = pMainNode->GetChild ( "mastercache" ) )
     {
         CXMLAccess XMLAccess ( pMaster );
         // Stuff from master
@@ -376,9 +376,9 @@ bool CVersionUpdater::SaveConfigToXML ( void )
     if ( !pMainNode )
         return false;
 
-    pMainNode->DeleteAllSubNodes ();
+    pMainNode->RemoveAllChildren();
 
-    if ( CXMLNode* pVar = pMainNode->CreateSubNode ( "var" ) )
+    if ( CXMLNode* pVar = pMainNode->CreateChild ( "var" ) )
     {
         CXMLAccess XMLAccess ( pVar );
         // Stuff for here
@@ -390,7 +390,7 @@ bool CVersionUpdater::SaveConfigToXML ( void )
         XMLAccess.SetSubNodeValue ( "crashdump_historylist",        m_VarConfig.crashdump_history );
     }
 
-    if ( CXMLNode* pMaster = pMainNode->CreateSubNode ( "mastercache" ) )
+    if ( CXMLNode* pMaster = pMainNode->CreateChild ( "mastercache" ) )
     {
         CXMLAccess XMLAccess ( pMaster );
         // Stuff from master

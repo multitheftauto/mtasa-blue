@@ -192,11 +192,11 @@ bool CLocalServer::Load ( void )
     if ( m_pConfig && m_pConfig->Parse() )
     {
         CXMLNode* pRoot = m_pConfig->GetRootNode();
-        CXMLNode* pServerName = pRoot->FindSubNode ( "servername", 0 );
+        CXMLNode* pServerName = pRoot->GetChild ( "servername", 0 );
         if ( pServerName ) m_pEditName->SetText ( pServerName->GetTagContent().c_str() );
-        CXMLNode* pServerPass = pRoot->FindSubNode ( "password", 0 );
+        CXMLNode* pServerPass = pRoot->GetChild ( "password", 0 );
         if ( pServerPass ) m_pEditPass->SetText ( pServerPass->GetTagContent().c_str() );
-        CXMLNode* pServerPlayers = pRoot->FindSubNode ( "maxplayers", 0 );
+        CXMLNode* pServerPlayers = pRoot->GetChild ( "maxplayers", 0 );
         if ( pServerPlayers ) m_pEditPlayers->SetText ( pServerPlayers->GetTagContent().c_str() );
 
         // Read the startup resources
@@ -204,7 +204,7 @@ bool CLocalServer::Load ( void )
         {
             if ( pNode->GetTagName ().compare ( "resource" ) == 0 )
             {
-                CXMLAttribute* src = pNode->GetAttributes().Find ( "src" );
+                CXMLAttribute* src = pNode->GetAttribute ( "src" );
                 if ( src && src->GetValue()[1] )
                 {
                     m_pResourcesCur->SetItemText ( m_pResourcesCur->AddRow (), m_hResourcesCur, src->GetValue().c_str() );
@@ -351,10 +351,10 @@ bool CLocalServer::Save ( void )
         auto& list = pRoot->GetChildren();
         for ( auto iter = list.begin(); iter != list.end(); ++iter )
         {
-            CXMLNode* pNode = reinterpret_cast < CXMLNode* > ( *iter );
+            CXMLNode* pNode = iter->get();
             if ( pNode->GetTagName().compare ( "resource" ) == 0 )
             {
-                pRoot->DeleteSubNode ( pNode );
+                pRoot->RemoveChild ( pNode );
                 iter = list.begin();
             }
         }
@@ -362,10 +362,10 @@ bool CLocalServer::Save ( void )
         // Add new resources to the config
         for ( int i = 0; i < m_pResourcesCur->GetRowCount(); i++ )
         {
-            CXMLNode* pResourceNode = pRoot->CreateSubNode ( "resource" );
-            pResourceNode->GetAttributes().Create ( "src" )->SetValue ( m_pResourcesCur->GetItemText ( i, 1 ) );
-            pResourceNode->GetAttributes().Create ( "startup" )->SetValue ( "1" );
-            pResourceNode->GetAttributes().Create ( "protected" )->SetValue ( "0" );
+            CXMLNode* pResourceNode = pRoot->CreateChild ( "resource" );
+            pResourceNode->AddAttribute( "src" )->SetValue ( m_pResourcesCur->GetItemText ( i, 1 ) );
+            pResourceNode->AddAttribute( "startup" )->SetValue ( "1" );
+            pResourceNode->AddAttribute( "protected" )->SetValue ( "0" );
         }
         m_pConfig->Write ();
     }
@@ -376,14 +376,14 @@ bool CLocalServer::Save ( void )
 void CLocalServer::StoreConfigValue ( const char* szNode, const char* szValue )
 {
     CXMLNode* pRoot = m_pConfig->GetRootNode();
-    CXMLNode* pNode = pRoot->FindSubNode ( szNode, 0 );
+    CXMLNode* pNode = pRoot->GetChild ( szNode, 0 );
     if ( pNode )
     {
         pNode->SetTagContent ( szValue );
     }
     else
     {
-        pNode = pRoot->CreateSubNode ( szNode );
+        pNode = pRoot->CreateChild ( szNode );
         pNode->SetTagContent ( szValue );
     }
 }

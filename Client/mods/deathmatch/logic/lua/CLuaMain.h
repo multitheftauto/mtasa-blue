@@ -66,6 +66,7 @@ public:
     inline class CResource*         GetResource             ( void )                        { return m_pResource; }
 
     CXMLFile *                      CreateXML               ( const char* szFilename );
+    CXMLFile *                      CopyXML                 ( const char * szFilename, CXMLNode * pNode );
     void                            DestroyXML              ( CXMLFile* pFile );
     void                            DestroyXML              ( CXMLNode* pRootNode );
     void                            SaveXML                 ( CXMLNode * pRootNode );

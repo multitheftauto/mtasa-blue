@@ -146,7 +146,7 @@ CServerBrowser::CServerBrowser ( void )
     m_pCommunityLogin.SetCallback ( &CServerBrowser::CompleteConnect );
 
     // Load options
-    LoadOptions ( CCore::GetSingletonPtr ()->GetConfig ( )->FindSubNode ( CONFIG_NODE_SERVER_OPTIONS ) );
+    LoadOptions ( CCore::GetSingletonPtr ()->GetConfig ( )->GetChild ( CONFIG_NODE_SERVER_OPTIONS ) );
 
     // Save the active tab, needs to be done after at least one tab exists
     m_pPanel->SetSelectionHandler ( GUI_CALLBACK( &CServerBrowser::OnTabChanged, this ) );
@@ -1677,15 +1677,15 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTag
         return false;
 
     // Loop through all subnodes looking for relevant nodes
-    unsigned int uiCount = pNode->GetSubNodeCount ();
+    unsigned int uiCount = pNode->GetChildCount ();
     for ( unsigned int i = 0; i < uiCount; i++ )
     {
-        pSubNode = pNode->GetSubNode ( i );
+        pSubNode = pNode->GetChild ( i );
         if ( pSubNode && pSubNode->GetTagName ().compare ( strTagName ) == 0 )
         {
             // This node is relevant, so get the attributes we need and add it to the list
-            CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Find ( "host" );
-            CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Find ( "port" );
+            CXMLAttribute* pHostAttribute = pSubNode->GetAttribute ( "host" );
+            CXMLAttribute* pPortAttribute = pSubNode->GetAttribute ( "port" );
             if ( pHostAttribute && pPortAttribute ) {
                 if ( CServerListItem::Parse ( pHostAttribute->GetValue ().c_str (), Address ) )
                 {
@@ -1704,15 +1704,15 @@ bool CServerBrowser::LoadServerList ( CXMLNode* pNode, const std::string& strTag
 void CServerBrowser::SaveRecentlyPlayedList()
 {
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    CXMLNode* pRecent = pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC );
+    CXMLNode* pRecent = pConfig->GetChild ( CONFIG_NODE_SERVER_REC );
     if ( !pRecent )
-        pRecent = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_REC );
+        pRecent = pConfig->CreateChild ( CONFIG_NODE_SERVER_REC );
     SaveServerList ( pRecent, CONFIG_RECENT_LIST_TAG, GetRecentList () );
 
     // Save address history
-    CXMLNode* pHistory = pConfig->FindSubNode ( CONFIG_NODE_SERVER_HISTORY );
+    CXMLNode* pHistory = pConfig->GetChild ( CONFIG_NODE_SERVER_HISTORY );
     if ( !pHistory )
-        pHistory = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_HISTORY );
+        pHistory = pConfig->CreateChild ( CONFIG_NODE_SERVER_HISTORY );
     SaveServerList ( pHistory, CONFIG_HISTORY_LIST_TAG, GetHistoryList (), CONNECT_HISTORY_LIMIT );
 }
 
@@ -1720,9 +1720,9 @@ void CServerBrowser::SaveRecentlyPlayedList()
 void CServerBrowser::SaveFavouritesList()
 {
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    CXMLNode* pFavourites = pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV );
+    CXMLNode* pFavourites = pConfig->GetChild ( CONFIG_NODE_SERVER_FAV );
     if ( !pFavourites )
-        pFavourites = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_FAV );
+        pFavourites = pConfig->CreateChild ( CONFIG_NODE_SERVER_FAV );
     SaveServerList ( pFavourites, CONFIG_FAVOURITE_LIST_TAG, GetFavouritesList () );
 }
 
@@ -1733,7 +1733,7 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
         return false;
 
     // Start by clearing out all previous nodes
-    pNode->DeleteAllSubNodes ();
+    pNode->RemoveAllChildren ();
 
     // Iterate through the list, adding any items to our node
     unsigned int iProcessed = 0;
@@ -1745,16 +1745,16 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
         CServerListItem * pServer = *i;
 
         // Add the item to the node
-        CXMLNode * pSubNode = pNode->CreateSubNode ( strTagName.c_str () );
+        CXMLNode * pSubNode = pNode->CreateChild ( strTagName.c_str () );
         if ( pSubNode )
         {
-            CXMLAttribute* pHostAttribute = pSubNode->GetAttributes ().Create ( "host" );
+            CXMLAttribute* pHostAttribute = pSubNode->AddAttribute ( "host" );
             std::string strHost = pServer->strHost;
             if ( !pServer->strHostName.empty () )
                 strHost = pServer->strHostName;
             pHostAttribute->SetValue ( strHost.c_str () );
             
-            CXMLAttribute* pPortAttribute = pSubNode->GetAttributes ().Create ( "port" );
+            CXMLAttribute* pPortAttribute = pSubNode->AddAttribute ( "port" );
             pPortAttribute->SetValue ( pServer->usGamePort );
         }
         ++iProcessed;
@@ -1771,13 +1771,13 @@ void CServerBrowser::LoadOptions ( CXMLNode* pNode )
     }
 
     // loop through all subnodes
-    unsigned int uiCount = pNode->GetSubNodeCount ( ); 
+    unsigned int uiCount = pNode->GetChildCount ( ); 
     for ( unsigned int ui = 0; ui < uiCount; ui ++ )
     {
-        CXMLNode * pSubNode = pNode->GetSubNode ( ui );
+        CXMLNode * pSubNode = pNode->GetChild ( ui );
         if ( pSubNode && pSubNode->GetTagName ( ).compare ( "list" ) == 0 )
         {
-            CXMLAttribute* pListID = pSubNode->GetAttributes ( ).Find ( "id" );
+            CXMLAttribute* pListID = pSubNode->GetAttribute ( "id" );
             if ( pListID )
             {
                 // Check for a valid list ID
@@ -1785,36 +1785,36 @@ void CServerBrowser::LoadOptions ( CXMLNode* pNode )
                 if ( i >= 0 && i < SERVER_BROWSER_TYPE_COUNT )
                 {
                     // load all checkbox options
-                    CXMLAttribute* pIncludeEmpty = pSubNode->GetAttributes ( ).Find ( "include_empty" );
+                    CXMLAttribute* pIncludeEmpty = pSubNode->GetAttribute ( "include_empty" );
                     if ( pIncludeEmpty )
                         m_pIncludeEmpty[ i ]->SetSelected ( pIncludeEmpty->GetValue ( ).compare ( "1" ) == 0 );
 
-                    CXMLAttribute* pIncludeFull = pSubNode->GetAttributes ( ).Find ( "include_full" );
+                    CXMLAttribute* pIncludeFull = pSubNode->GetAttribute ( "include_full" );
                     if ( pIncludeFull )
                         m_pIncludeFull[ i ]->SetSelected ( pIncludeFull->GetValue ( ).compare ( "1" ) == 0 );
 
-                    CXMLAttribute* pIncludeLocked = pSubNode->GetAttributes ( ).Find ( "include_locked" );
+                    CXMLAttribute* pIncludeLocked = pSubNode->GetAttribute ( "include_locked" );
                     if ( pIncludeLocked )
                         m_pIncludeLocked[ i ]->SetSelected ( pIncludeLocked->GetValue ( ).compare ( "1" ) == 0 );
 
-                    //CXMLAttribute* pIncludeOtherVersions = pSubNode->GetAttributes ( ).Find ( "include_other_versions" );
+                    //CXMLAttribute* pIncludeOtherVersions = pSubNode->GetAttribute ( "include_other_versions" );
                     //if ( pIncludeOtherVersions )
                     //    m_pIncludeOtherVersions[ i ]->SetSelected ( pIncludeOtherVersions->GetValue ( ).compare ( "1" ) == 0 );
 
                     // load 'include offline' if the checkbox exists
                     if ( m_pIncludeOffline[ i ] )
                     {
-                        CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes ( ).Find ( "include_offline" );
+                        CXMLAttribute* pIncludeOffline = pSubNode->GetAttribute ( "include_offline" );
                         if ( pIncludeOffline )
                             m_pIncludeOffline[ i ]->SetSelected ( pIncludeOffline->GetValue ( ).compare ( "1" ) == 0 );
                     }
 
-                    CXMLAttribute* pDisabled = pSubNode->GetAttributes ( ).Find ( "disabled" );
+                    CXMLAttribute* pDisabled = pSubNode->GetAttribute ( "disabled" );
                     if ( pDisabled )
                         m_pTab [ i ]->SetEnabled( pDisabled->GetValue ( ).compare ( "1" ) == 0 );
 
                     // restore the active tab
-                    CXMLAttribute* pActiveTab = pSubNode->GetAttributes ( ).Find ( "active" );
+                    CXMLAttribute* pActiveTab = pSubNode->GetAttribute ( "active" );
                     if ( pActiveTab && pActiveTab->GetValue ( ).compare ( "1" ) == 0 )
                         m_pPanel->SetSelectedTab ( m_pTab [ i ] );
 
@@ -1836,15 +1836,15 @@ void CServerBrowser::SaveOptions ( )
         return;
 
     CXMLNode* pConfig = CCore::GetSingletonPtr ( )->GetConfig ( );
-    CXMLNode* pOptions = pConfig->FindSubNode ( CONFIG_NODE_SERVER_OPTIONS );
+    CXMLNode* pOptions = pConfig->GetChild ( CONFIG_NODE_SERVER_OPTIONS );
     if ( !pOptions )
     {
-        pOptions = pConfig->CreateSubNode ( CONFIG_NODE_SERVER_OPTIONS );
+        pOptions = pConfig->CreateChild ( CONFIG_NODE_SERVER_OPTIONS );
     }
     else
     {
         // start with a clean node
-        pOptions->DeleteAllSubNodes ( );
+        pOptions->RemoveAllChildren( );
     }
 
     int iCurrentType = GetCurrentServerBrowserTypeForSave ( );
@@ -1852,43 +1852,43 @@ void CServerBrowser::SaveOptions ( )
     // Save the options for all four lists
     for ( unsigned int ui = 0; ui < SERVER_BROWSER_TYPE_COUNT; ui++ )
     {
-        CXMLNode * pSubNode = pOptions->CreateSubNode ( "list" );
+        CXMLNode * pSubNode = pOptions->CreateChild ( "list" );
         if ( pSubNode ) 
         {
             // ID of the list to save
-            CXMLAttribute* pListID = pSubNode->GetAttributes ( ).Create ( "id" );
+            CXMLAttribute* pListID = pSubNode->AddAttribute( "id" );
             pListID->SetValue ( ui );
 
             // Checkboxes
-            CXMLAttribute* pIncludeEmpty = pSubNode->GetAttributes ( ).Create ( "include_empty" );
+            CXMLAttribute* pIncludeEmpty = pSubNode->AddAttribute( "include_empty" );
             pIncludeEmpty->SetValue ( m_pIncludeEmpty [ ui ]->GetSelected ( ) );
 
-            CXMLAttribute* pIncludeFull = pSubNode->GetAttributes ( ).Create ( "include_full" );
+            CXMLAttribute* pIncludeFull = pSubNode->AddAttribute( "include_full" );
             pIncludeFull->SetValue ( m_pIncludeFull [ ui ]->GetSelected ( ) );
 
-            CXMLAttribute* pIncludeLocked = pSubNode->GetAttributes ( ).Create ( "include_locked" );
+            CXMLAttribute* pIncludeLocked = pSubNode->AddAttribute( "include_locked" );
             pIncludeLocked->SetValue ( m_pIncludeLocked [ ui ]->GetSelected ( ) );
 
-            //CXMLAttribute* pIncludeOtherVersions = pSubNode->GetAttributes ( ).Create ( "include_other_versions" );
+            //CXMLAttribute* pIncludeOtherVersions = pSubNode->AddAttribute( "include_other_versions" );
             //pIncludeOtherVersions->SetValue ( m_pIncludeOtherVersions [ ui ]->GetSelected ( ) );
 
             // Only recently played & favorites have 'Include offline'
             if ( m_pIncludeOffline [ ui ] )
             {
-                CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes ( ).Create ( "include_offline" );
+                CXMLAttribute* pIncludeOffline = pSubNode->AddAttribute( "include_offline" );
                 pIncludeOffline->SetValue ( m_pIncludeOffline [ ui ]->GetSelected ( ) );
             }
 
             if ( !m_pTab[ ui ]->IsEnabled() )
             {
-                CXMLAttribute* pIncludeOffline = pSubNode->GetAttributes().Create( "disabled" );
+                CXMLAttribute* pIncludeOffline = pSubNode->AddAttribute( "disabled" );
                 pIncludeOffline->SetValue( !m_pTab[ ui ]->IsEnabled() );
             }
 
             // Save the active Tab
             if ( iCurrentType == ui )
             {
-                CXMLAttribute* pActive = pSubNode->GetAttributes ( ).Create ( "active" );
+                CXMLAttribute* pActive = pSubNode->AddAttribute( "active" );
                 pActive->SetValue ( 1 );
             }
 
@@ -1911,36 +1911,29 @@ void CServerBrowser::SetServerPassword ( const std::string& strHost, const std::
         return;
 
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
+    CXMLNode* pServerPasswords = pConfig->GetChild ( CONFIG_NODE_SERVER_SAVED );
     if ( !pServerPasswords )
     {
-        pServerPasswords = pConfig ->CreateSubNode ( CONFIG_NODE_SERVER_SAVED );
+        pServerPasswords = pConfig ->CreateChild ( CONFIG_NODE_SERVER_SAVED );
     }
     //Check if the server password already exists
-    for ( unsigned int i = 0 ; i < pServerPasswords->GetSubNodeCount() ; i++ )
-    {    
-        CXMLAttributes* pAttributes = &(pServerPasswords->GetSubNode(i)->GetAttributes());
-        if ( pAttributes->Find( "host" ) )
+    for (auto& pSubNode : pServerPasswords->GetChildren())
+    {
+        if (CXMLAttribute* pHost = pSubNode->GetAttribute("host"))
         {
-            if ( CXMLAttribute* pHost = pAttributes->Find ( "host" ) )
+            const std::string& strXMLHost = pHost->GetValue();
+            if (strXMLHost == strHost)
             {
-                const std::string& strXMLHost = pHost->GetValue();
-                if ( strXMLHost == strHost )
-                {
-                    CXMLAttribute* pPassword = pAttributes->Create( "password" );
-                    pPassword->SetValue(strPassword.c_str());
-                    return;
-                }
+                pSubNode->AddAttribute("password")->SetValue(strPassword.c_str());
+                return;
             }
         }
     }
 
     // Otherwise create the node from scratch
-    CXMLNode* pNode = pServerPasswords->CreateSubNode( "server" );
-    CXMLAttribute* pHostAttribute = pNode->GetAttributes().Create ( "host" );
-    pHostAttribute->SetValue(strHost.c_str());
-    CXMLAttribute* pPasswordAttribute = pNode->GetAttributes().Create ( "password" );
-    pPasswordAttribute->SetValue(strPassword.c_str());
+    CXMLNode* pNode = pServerPasswords->CreateChild( "server" );
+    pNode->AddAttribute( "host" )->SetValue(strHost.c_str());
+    pNode->AddAttribute( "password" )->SetValue(strPassword.c_str());
 }
 
 
@@ -1953,29 +1946,24 @@ std::string CServerBrowser::GetServerPassword ( const std::string& strHost )
         return "";
 
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
+    CXMLNode* pServerPasswords = pConfig->GetChild ( CONFIG_NODE_SERVER_SAVED );
     if ( !pServerPasswords )
     {
-        pServerPasswords = pConfig ->CreateSubNode ( CONFIG_NODE_SERVER_SAVED );
+        pServerPasswords = pConfig ->CreateChild ( CONFIG_NODE_SERVER_SAVED );
     }
     //Check if the server password already exists
-    for ( unsigned int i = 0 ; i < pServerPasswords->GetSubNodeCount() ; i++ )
-    {    
-        CXMLAttributes* pAttributes = &(pServerPasswords->GetSubNode(i)->GetAttributes());
-        if ( pAttributes->Find( "host" ) )
+    for ( auto& pSubNode : pServerPasswords->GetChildren() )
+    {   
+        if (CXMLAttribute* pHost = pSubNode->GetAttribute("host"))
         {
-            if ( CXMLAttribute* pHost = pAttributes->Find ( "host" ) )
+            const std::string& strXMLHost = pHost->GetValue();
+            if (pHost->GetValue() == strHost)
             {
-                const std::string& strXMLHost = pHost->GetValue();
-                if ( pHost->GetValue() == strHost )
-                {
-                    CXMLAttribute* pPassword = pAttributes->Create( "password" );
-                    const std::string& strPassword = pPassword->GetValue();
-                    return strPassword;
-                }
+                CXMLAttribute* pPassword = pSubNode->GetAttribute("password");
+                const std::string& strPassword = pPassword->GetValue();
+                return strPassword;
             }
         }
-        
     }
 
 	// If the server is the one from old quick connect, try importing the password from that
@@ -1999,11 +1987,11 @@ std::string CServerBrowser::GetServerPassword ( const std::string& strHost )
 void CServerBrowser::ClearServerPasswords ()
 {
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    CXMLNode* pServerPasswords = pConfig->FindSubNode ( CONFIG_NODE_SERVER_SAVED );
+    CXMLNode* pServerPasswords = pConfig->GetChild ( CONFIG_NODE_SERVER_SAVED );
     if ( pServerPasswords )
     {
-        pServerPasswords->DeleteAllSubNodes();
-        pConfig->DeleteSubNode ( pServerPasswords );
+        pServerPasswords->RemoveAllChildren();
+        pConfig->RemoveChild ( pServerPasswords );
     }
 }
 

@@ -303,16 +303,16 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
     // Load the server lists
     CXMLNode* pConfig = CCore::GetSingletonPtr ()->GetConfig ();
-    m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_FAV ),
+    m_ServerBrowser.LoadServerList ( pConfig->GetChild ( CONFIG_NODE_SERVER_FAV ),
         CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList () );
-    m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_REC ),
+    m_ServerBrowser.LoadServerList ( pConfig->GetChild ( CONFIG_NODE_SERVER_REC ),
         CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList () );
-    m_ServerBrowser.LoadServerList ( pConfig->FindSubNode ( CONFIG_NODE_SERVER_HISTORY ),
+    m_ServerBrowser.LoadServerList ( pConfig->GetChild ( CONFIG_NODE_SERVER_HISTORY ),
         CONFIG_HISTORY_LIST_TAG, m_ServerBrowser.GetHistoryList () );
 
     // Remove unused node
-    if ( CXMLNode* pOldNode = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ) )
-        pConfig->DeleteSubNode ( pOldNode );
+    if ( CXMLNode* pOldNode = pConfig->GetChild ( CONFIG_NODE_SERVER_INT ) )
+        pConfig->RemoveChild ( pOldNode );
 }
 
 

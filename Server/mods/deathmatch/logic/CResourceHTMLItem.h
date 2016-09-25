@@ -25,7 +25,7 @@ class CResourceHTMLItem : public CResourceFile
 
 public:
 
-                                        CResourceHTMLItem               ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes, bool bIsDefault, bool bIsRaw, bool bRestricted, bool bOOPEnabled );
+                                        CResourceHTMLItem               ( class CResource * resource, const char * szShortName, const char * szResourceFileName, const std::list<std::unique_ptr<CXMLAttribute>>& xmlAttributes, bool bIsDefault, bool bIsRaw, bool bRestricted, bool bOOPEnabled );
                                         ~CResourceHTMLItem              ( void );
 
     bool                                Start                           ( void );

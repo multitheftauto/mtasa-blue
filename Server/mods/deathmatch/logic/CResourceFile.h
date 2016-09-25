@@ -52,7 +52,7 @@ protected:
     map < string, string >      m_attributeMap; // Map of attributes from the meta.xml file
     
 public:
-                                CResourceFile ( class CResource * resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes );
+                                CResourceFile ( class CResource * resource, const char* szShortName, const char* szResourceFileName, const std::list<std::unique_ptr<CXMLAttribute>>& xmlAttributes );
     virtual                     ~CResourceFile ( void );
 
     virtual ResponseCode        Request ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse );

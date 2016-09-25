@@ -37,14 +37,14 @@ void CAccessControlListRight::WriteToXMLNode ( CXMLNode* pNode )
     SString strRightFullName = CAclRightName ( m_eRightType, m_strRightName ).GetFullName ();
     SString strAccess = m_bAccess ? "true" : "false";
 
-    CXMLNode* pRightNode = pNode->CreateSubNode ( "right" );
-    pRightNode->GetAttributes ().Create ( "name" )->SetValue ( strRightFullName );
-    pRightNode->GetAttributes ().Create ( "access" )->SetValue ( strAccess );
+    CXMLNode* pRightNode = pNode->CreateChild ( "right" );
+    pRightNode->AddAttribute ( "name" )->SetValue ( strRightFullName );
+    pRightNode->AddAttribute ( "access" )->SetValue ( strAccess );
 
     // Create tha extra attributes
     for ( std::map < SString, SString >::reverse_iterator iter = m_ExtraAttributeMap.rbegin () ; iter != m_ExtraAttributeMap.rend () ; ++iter )
     {
-        pRightNode->GetAttributes ().Create ( iter->first )->SetValue ( iter->second );
+        pRightNode->AddAttribute ( iter->first )->SetValue ( iter->second );
     }
 }
 

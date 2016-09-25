@@ -395,12 +395,12 @@ bool CBanManager::LoadBanList ( void )
 
     // Iterate the nodes
     CXMLNode* pNode = NULL;
-    unsigned int uiCount = pRootNode->GetSubNodeCount ();
+    unsigned int uiCount = pRootNode->GetChildCount ();
 
     for ( unsigned int i = 0; i < uiCount; i++ )
     {
         // Grab the node
-        pNode = pRootNode->GetSubNode ( i );
+        pNode = pRootNode->GetChild ( i );
 
         if ( pNode )
         {
@@ -479,7 +479,7 @@ void CBanManager::SaveBanList ( void )
             list < CBan* >::const_iterator iter = m_BanManager.begin ();
             for ( ; iter != m_BanManager.end (); iter++ )
             {
-                pNode = pRootNode->CreateSubNode ( "ban" );
+                pNode = pRootNode->CreateChild ( "ban" );
 
                 if ( pNode )
                 {
@@ -513,7 +513,7 @@ void CBanManager::SafeSetValue ( CXMLNode* pNode, const char* szKey, const std::
 {
     if ( !strValue.empty() )
     {
-        CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( szKey );
+        CXMLAttribute* pAttribute = pNode->AddAttribute ( szKey );
         if ( pAttribute )
         {
             pAttribute->SetValue ( strValue.c_str () );
@@ -526,7 +526,7 @@ void CBanManager::SafeSetValue ( CXMLNode* pNode, const char* szKey, unsigned in
 {
     if ( uiValue )
     {
-        CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( szKey );
+        CXMLAttribute* pAttribute = pNode->AddAttribute ( szKey );
         if ( pAttribute )
         {
             pAttribute->SetValue ( uiValue );
@@ -537,7 +537,7 @@ void CBanManager::SafeSetValue ( CXMLNode* pNode, const char* szKey, unsigned in
 
 std::string CBanManager::SafeGetValue ( CXMLNode* pNode, const char* szKey )
 {
-    CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( szKey );
+    CXMLAttribute* pAttribute = pNode->GetAttribute ( szKey );
 
     if ( pAttribute )
     {

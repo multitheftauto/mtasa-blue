@@ -2283,14 +2283,14 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
     if ( pMainNode )
     {
         CXMLNode* pNode = NULL;
-        unsigned int uiCount = pMainNode->GetSubNodeCount ();
+        unsigned int uiCount = pMainNode->GetChildCount ();
         
         if ( uiCount == 0 )
             bLoadDefaults = true;
 
         for ( unsigned int i = 0; i < uiCount; i++ )
         {
-            pNode = pMainNode->GetSubNode ( i );
+            pNode = pMainNode->GetChild ( i );
 
             if ( pNode == NULL ) continue;
 
@@ -2298,7 +2298,7 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
             strValue = pNode->GetTagName ();
             if ( strValue.compare ( "bind" ) == 0 )
             {
-                CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( "key" );
+                CXMLAttribute* pAttribute = pNode->GetAttribute ( "key" );
 
                 if ( pAttribute )
                 {
@@ -2307,7 +2307,7 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
                     
                     if ( !strKey.empty () )
                     {
-                        pAttribute = pNode->GetAttributes ().Find ( "command" );
+                        pAttribute = pNode->GetAttribute ( "command" );
 
                         if ( pAttribute )
                         {
@@ -2318,9 +2318,9 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
                             {
                                 // HACK
                                 std::string strState, strArguments, strResource ;
-                                pNode = pMainNode->GetSubNode ( i );
+                                pNode = pMainNode->GetChild ( i );
 
-                                pAttribute = pNode->GetAttributes ().Find ( "state" );
+                                pAttribute = pNode->GetAttribute ( "state" );
 
                                 if ( pAttribute )
                                 {
@@ -2328,19 +2328,19 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
                                 }
                                 bool bState = strState.compare ( "up" ) != 0;
 
-                                pAttribute = pNode->GetAttributes ().Find ( "arguments" );
+                                pAttribute = pNode->GetAttribute ( "arguments" );
                                 
                                 if ( pAttribute )
                                 {
                                     strArguments = pAttribute->GetValue ();
                                 }
 
-                                pAttribute = pNode->GetAttributes ().Find ( "resource" );
+                                pAttribute = pNode->GetAttribute ( "resource" );
                                 if ( pAttribute )
                                 {
                                     strResource = pAttribute->GetValue ();
 
-                                    pAttribute = pNode->GetAttributes ().Find ( "default" );
+                                    pAttribute = pNode->GetAttribute ( "default" );
                                     SString strOriginalScriptKey = pAttribute ? pAttribute->GetValue () : "";
 
                                     AddCommand ( strKey.c_str (), strCommand.c_str (), strArguments.c_str (), bState, strResource.c_str(), false, strOriginalScriptKey );
@@ -2352,7 +2352,7 @@ bool CKeyBinds::LoadFromXML ( CXMLNode* pMainNode )
                         }
                         else
                         {
-                            pAttribute = pNode->GetAttributes ().Find ( "control" );
+                            pAttribute = pNode->GetAttribute ( "control" );
 
                             if ( pAttribute )
                             {
@@ -2394,96 +2394,84 @@ bool CKeyBinds::SaveToXML ( CXMLNode* pMainNode )
     if ( pMainNode )
     {
         // Clear our current bind nodes
-        pMainNode->DeleteAllSubNodes ();
+        pMainNode->RemoveAllChildren ();
 
         // Iterate the key binds adding them to the XML tree
         CXMLNode* pNode = NULL;
-        CXMLAttributes * pAttributes;
-        list < CKeyBind* >::const_iterator iter = m_pList->begin ();
-        for ( ; iter != m_pList->end (); iter++ )
+        for ( auto& pKeyBind : *m_pList )
         {
-            if ( (*iter)->boundKey == NULL )
+            if ( pKeyBind->boundKey == NULL )
                 continue;
 
             // Create the new 'bind' node
-            pNode = pMainNode->CreateSubNode ( "bind" );
+            pNode = pMainNode->CreateChild ( "bind" );
 
             // If it was created
             if ( pNode )
             {
-                pAttributes = &pNode->GetAttributes ();
-
-                eKeyBindType type = (*iter)->GetType ();
+                eKeyBindType type = pKeyBind->GetType ();
                 if ( type == KEY_BIND_COMMAND )
                 {
                     // Create the key attribute
-                    const char* szKey = (*iter)->boundKey->szKey;
+                    const char* szKey = pKeyBind->boundKey->szKey;
                     if ( szKey )
                     {
-                        pA = pAttributes->Create ( "key" );
-                        pA->SetValue ( szKey );
+                        pNode->AddAttribute ( "key" )->SetValue ( szKey );
                     }
 
-                    CCommandBind* pBind = static_cast < CCommandBind* > ( *iter );
+                    CCommandBind* pBind = static_cast < CCommandBind* > (pKeyBind);
                     char* szState = ( pBind->bHitState ) ? "down" : "up";
 
 
-                    pA = pAttributes->Create ( "state" );
-                    pA->SetValue ( szState );
+                    pNode->AddAttribute( "state" )->SetValue ( szState );
 
                     char* szCommand = pBind->szCommand;
                     if ( szCommand )
                     {
-                        pA = pAttributes->Create ( "command" );                     
-                        pA->SetValue ( szCommand );
+                        pNode->AddAttribute ( "command" )->SetValue ( szCommand );
                     }
 
                     char* szArguments = pBind->szArguments;
                     if ( szArguments )
                     {
-                        pA = pAttributes->Create ( "arguments" );                       
-                        pA->SetValue ( szArguments );
+                        pNode->AddAttribute ( "arguments" )->SetValue ( szArguments );
                     }
 
                     char* szResource = pBind->szResource;
                     if ( szResource )
                     {
-                        pA = pAttributes->Create ( "resource" );                        
-                        pA->SetValue ( szResource );
+                        pNode->AddAttribute ( "resource" )->SetValue ( szResource );
 
                         if ( !pBind->strOriginalScriptKey.empty() )
                         {
-                            pA = pAttributes->Create ( "default" );                        
-                            pA->SetValue ( pBind->strOriginalScriptKey );
+                            pNode->AddAttribute ( "default" )->SetValue ( pBind->strOriginalScriptKey );
                         }
 
                         // Don't save script added binds
                         if ( pBind->bScriptCreated && !pBind->bIsReplacingScriptKey )
-                            pNode->GetParent()->DeleteSubNode(pNode);
+                            pNode->GetParent()->RemoveChild(pNode);
                     }
                 }
                 else if ( type == KEY_BIND_GTA_CONTROL )
                 {
                     // Create the key attribute
-                    const char* szKey = (*iter)->boundKey->szKey;
+                    const char* szKey = pKeyBind->boundKey->szKey;
                     if ( szKey )
                     {
-                        pA = pAttributes->Create ( "key" );
-                        pA->SetValue ( szKey );
+                        pNode->AddAttribute ( "key" )->SetValue ( szKey );
                     }
 
-                    CGTAControlBind* pBind = static_cast < CGTAControlBind* > ( *iter );
+                    CGTAControlBind* pBind = static_cast < CGTAControlBind* > ( pKeyBind );
                     const char* szControl = pBind->control->szControl;
                     if ( szControl )
                     {
-                        pA = pAttributes->Create ( "control" );
-                        pA->SetValue ( szControl );
+                        pNode->AddAttribute ( "control" )->SetValue ( szControl );
                     }
                 }
                 else
                 {
                     // Type doesn't require saving
-                    pNode->GetParent()->DeleteSubNode( pNode );
+                    pNode->GetParent()->RemoveChild( pNode );
                 }
             }
         }

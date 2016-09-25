@@ -87,27 +87,27 @@ void CNewsBrowser::InitNewsItemList ( void )
             if ( pRoot )
             {
                 // Headline text
-                CXMLNode* pHeadline = pRoot->FindSubNode ( "headline", 0 );
+                CXMLNode* pHeadline = pRoot->GetChild ( "headline", 0 );
                 if ( pHeadline )
                     newsItem.strHeadline = pHeadline->GetTagContent ();
 
                 // Date text
-                CXMLNode* pDate = pRoot->FindSubNode ( "date", 0 );
+                CXMLNode* pDate = pRoot->GetChild ( "date", 0 );
                 if ( pDate )
                     newsItem.strDate = pDate->GetTagContent ();
                 else
                     newsItem.strHeadline.Split ( " - ", &newsItem.strHeadline, &newsItem.strDate, true );
 
                 // Layout filename
-                CXMLNode* pLayout = pRoot->FindSubNode ( "layout", 0 );
+                CXMLNode* pLayout = pRoot->GetChild ( "layout", 0 );
                 if ( pLayout )
                     newsItem.strLayoutFilename = pLayout->GetTagContent ();
 
                 // Imageset filenames
-                CXMLNode* pImages = pRoot->FindSubNode ( "imagesetlist", 0 );
+                CXMLNode* pImages = pRoot->GetChild ( "imagesetlist", 0 );
                 if ( pImages )
-                    for ( uint i = 0 ; i < pImages->GetSubNodeCount () ; i++ )
-                        newsItem.imagesetFilenameList.push_back ( pImages->GetSubNode ( i )->GetTagContent () );
+                    for ( uint i = 0 ; i < pImages->GetChildCount () ; i++ )
+                        newsItem.imagesetFilenameList.push_back ( pImages->GetChild ( i )->GetTagContent () );
             }
 
             delete pFile;

@@ -262,7 +262,7 @@ void CServerCache::StaticSaveServerCache ( void )
         return;
 
     // Start by clearing out all previous nodes
-    pNode->DeleteAllSubNodes ();
+    pNode->RemoveAllChildren();
 
     // Transfer each item from m_ServerCachedMap into dataSet
     CDataInfoSet dataSet;

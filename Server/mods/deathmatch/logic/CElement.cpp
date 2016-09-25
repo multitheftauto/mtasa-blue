@@ -49,7 +49,7 @@ CElement::CElement ( CElement* pParent, CXMLNode* pNode )
     // Store the line
     if ( m_pXMLNode )
     {
-        m_uiLine = m_pXMLNode->GetLine ();
+        m_uiLine = 0;// TODO
     }
     else
     {
@@ -435,7 +435,7 @@ void CElement::SetXMLNode ( CXMLNode* pNode )
     // If the node exists, set our line
     if ( pNode )
     {
-        m_uiLine = pNode->GetLine ();
+        m_uiLine = 0;// TODO pNode->GetLine();
     }
     else
     {
@@ -513,17 +513,12 @@ void CElement::ReadCustomData ( CEvents* pEvents )
     if ( m_pXMLNode )
     {
         // Iterate the attributes of our XML node
-        CXMLAttributes* pAttributes = &(m_pXMLNode->GetAttributes ());
-        unsigned int uiAttributeCount = pAttributes->Count ();
-        for ( unsigned int uiIndex = 0; uiIndex < uiAttributeCount; uiIndex++ )
+        for ( auto& pAttribute : m_pXMLNode->GetAttributes() )
         {
-            // Grab the node (we can assume it exists here)
-            CXMLAttribute* pAttribute = pAttributes->Get ( uiIndex );
-
             // Make a lua argument from it and set the content
             CLuaArguments args;
-            if ( !args.ReadFromJSONString ( pAttribute->GetValue ().c_str() ) )
-                args.PushString ( pAttribute->GetValue ().c_str () );
+            if ( !args.ReadFromJSONString ( std::string(pAttribute->GetValue () ).c_str()) )
+                args.PushString ( pAttribute->GetValue () );
 
             // Don't trigger onElementDataChanged event
             SetCustomData ( pAttribute->GetName ().c_str (), *args[0], g_pGame->GetConfig ()->GetSyncMapElementData (), NULL, false );
@@ -813,7 +808,7 @@ void CElement::SendAllCustomData ( CPlayer* pPlayer )
 CXMLNode* CElement::OutputToXML ( CXMLNode* pNodeParent )
 {
     // Create a new node for this element
-    CXMLNode * pNode = pNodeParent->CreateSubNode ( GetTypeName ().c_str () );
+    CXMLNode * pNode = pNodeParent->CreateChild ( GetTypeName ().c_str () );
 
     // Output the custom data values to it as arguments
     m_pCustomData->OutputToXML ( pNode );

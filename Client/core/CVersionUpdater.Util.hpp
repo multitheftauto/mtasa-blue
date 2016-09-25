@@ -452,9 +452,9 @@ namespace
             CXMLNode* pNode = m_pRoot;
             for ( uint i = 0 ; i < parts.size () && pNode ; i++ )
             {
-                CXMLNode* pNext = pNode->FindSubNode ( parts[i], 0 );
+                CXMLNode* pNext = pNode->GetChild ( parts[i], 0 );
                 if ( !pNext )
-                    pNext = pNode->CreateSubNode ( parts[i] );
+                    pNext = pNode->CreateChild ( parts[i] );
                 pNode = pNext;
             }
             return pNode;
@@ -489,7 +489,7 @@ namespace
             {
                 // Process each subnode
                 for ( uint i = 0 ; i < valueList.size () ; i++ )
-                    if ( CXMLNode* pSubNode = pNode->CreateSubNode ( strKey ) )
+                    if ( CXMLNode* pSubNode = pNode->CreateChild ( strKey ) )
                         pSubNode->SetTagContent ( valueList[i] );
                 return true;
             }
@@ -505,14 +505,12 @@ namespace
                 for ( uint i = 0 ; i < dataInfoSet.size () ; i++ )
                 {
                     const SDataInfoItem& item = dataInfoSet[i];
-                    if ( CXMLNode* pSubNode = pNode->CreateSubNode ( item.strName ) )
+                    if ( CXMLNode* pSubNode = pNode->CreateChild( item.strName ) )
                     {
                         pSubNode->SetTagContent ( item.strValue );
-                        CXMLAttributes& attributes = pSubNode->GetAttributes ();
-                        for ( std::map < SString, SString >::const_iterator iter = item.attributeMap.begin () ; iter != item.attributeMap.end () ; ++iter )
+                        for ( auto& iter : item.attributeMap )
                         {
-                            CXMLAttribute* attrib = attributes.Create ( iter->first );
-                            attrib->SetValue ( iter->second );
+                            pSubNode->AddAttribute(iter.first)->SetValue(iter.second);
                         }
                     }
                 }
@@ -553,8 +551,8 @@ namespace
             if ( CXMLNode* pNode = GetSubNode ( strPath ) )
             {
                 // Process each subnode
-                for ( uint i = 0 ; i < pNode->GetSubNodeCount () ; i++ )
-                    outList.push_back ( pNode->GetSubNode ( i )->GetTagContent () );
+                for ( uint i = 0 ; i < pNode->GetChildCount () ; i++ )
+                    outList.push_back ( pNode->GetChild( i )->GetTagContent () );
                 return true;
             }
             return false;
@@ -566,17 +564,15 @@ namespace
             if ( CXMLNode* pNode = GetSubNode ( strPath ) )
             {
                 // Process each subnode
-                for ( uint i = 0 ; i < pNode->GetSubNodeCount () ; i++ )
+                for ( uint i = 0 ; i < pNode->GetChildCount () ; i++ )
                 {
-                    CXMLNode* pSubNode = pNode->GetSubNode ( i );
+                    CXMLNode* pSubNode = pNode->GetChild ( i );
 
                     SDataInfoItem item;
                     item.strName = pSubNode->GetTagName ();
                     item.strValue = pSubNode->GetTagContent ();
-                    CXMLAttributes& attributes = pSubNode->GetAttributes ();
-                    for ( uint i = 0 ; i < attributes.Count () ; i++ )
+                    for ( auto& attribute : pSubNode->GetAttributes() )
                     {
-                        CXMLAttribute* attribute = attributes.Get ( i );
                         MapSet ( item.attributeMap, SString ( attribute->GetName () ), SString ( attribute->GetValue () ) );
                     }
                     outMap.push_back ( item );

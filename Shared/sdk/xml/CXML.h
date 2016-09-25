@@ -9,9 +9,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
-#ifndef __CXML_H
-#define __CXML_H
+#pragma once
 
 class CXMLNode;
 class CXMLFile;
@@ -20,13 +18,12 @@ class CXMLAttribute;
 class CXML
 {
 public:
-    virtual CXMLFile*           CreateXML           ( const char* szFilename, bool bUseIDs = false ) = 0;
-    virtual void                DeleteXML           ( CXMLFile* pFile ) = 0;
-    virtual CXMLNode*           CreateDummyNode     ( void ) = 0;
+    virtual CXMLFile*           CreateXML      (const std::string& strFilename, bool bUseIDs = false) = 0;
+    virtual void                DeleteXML      (CXMLFile* pFile) = 0;
+    virtual CXMLFile*           CopyXML        (const std::string& strFilename, CXMLNode* pNode) = 0;
+    virtual CXMLNode*           CreateDummyNode() = 0;
 
-    virtual CXMLAttribute*      GetAttrFromID       ( unsigned long ulID ) = 0;
-    virtual CXMLFile*           GetFileFromID       ( unsigned long ulID ) = 0;
-    virtual CXMLNode*           GetNodeFromID       ( unsigned long ulID ) = 0;
+    virtual CXMLAttribute*      GetAttrFromID(unsigned long ulID) = 0;
+    virtual CXMLFile*           GetFileFromID(unsigned long ulID) = 0;
+    virtual CXMLNode*           GetNodeFromID(unsigned long ulID) = 0;
 };
-
-#endif

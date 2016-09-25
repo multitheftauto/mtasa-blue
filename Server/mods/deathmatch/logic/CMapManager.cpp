@@ -908,11 +908,11 @@ bool CMapManager::LoadSubNodes ( CResource& Loader, CXMLNode& Node, CElement* pP
 {
     // Iterate the nodes
     CXMLNode* pNode = NULL;
-    unsigned int uiCount = Node.GetSubNodeCount ();
+    unsigned int uiCount = Node.GetChildCount ();
     for ( unsigned int i = 0; i < uiCount; i++ )
     {
         // Grab the node
-        pNode = Node.GetSubNode ( i );
+        pNode = Node.GetChild ( i );
         if ( pNode )
         {
             // Handle it

@@ -36,7 +36,7 @@ void CXMLConfig::SetFileName ( const char* szFileName )
 int CXMLConfig::GetBoolean ( CXMLNode* pParent, const char* szKey, bool& bResult )
 {
     // Grab the XML node
-    CXMLNode* pNode = pParent->FindSubNode ( szKey );
+    CXMLNode* pNode = pParent->GetChild ( szKey );
     if ( pNode )
     {
         if ( pNode->GetTagContent ( bResult ) )
@@ -54,7 +54,7 @@ int CXMLConfig::GetBoolean ( CXMLNode* pParent, const char* szKey, bool& bResult
 int CXMLConfig::GetInteger ( CXMLNode* pParent, const char* szKey, int& iResult, int iMin, int iMax )
 {
     // Grab the XML node
-    CXMLNode* pNode = pParent->FindSubNode ( szKey );
+    CXMLNode* pNode = pParent->GetChild ( szKey );
     if ( pNode )
     {
         if ( pNode->GetTagContent ( iResult ) )
@@ -76,7 +76,7 @@ int CXMLConfig::GetInteger ( CXMLNode* pParent, const char* szKey, int& iResult,
 int CXMLConfig::GetString ( CXMLNode* pParent, const char *szKey, std::string& strValue, int iMinLength, int iMaxLength )
 {
     // Grab the XML node
-    CXMLNode* pNode = pParent->FindSubNode ( szKey );
+    CXMLNode* pNode = pParent->GetChild ( szKey );
     if ( pNode )
     {
         // Grab the string
@@ -103,7 +103,7 @@ int CXMLConfig::GetRGBA ( CXMLNode* pParent, const char* szKey, unsigned char& R
     int iR, iG, iB, iA;
 
     // Grab the XML node
-    CXMLNode* pNode = pParent->FindSubNode ( szKey );
+    CXMLNode* pNode = pParent->GetChild ( szKey );
     if ( pNode )
     {
         char cDelimiter;
@@ -127,8 +127,8 @@ int CXMLConfig::GetRGBA ( CXMLNode* pParent, const char* szKey, unsigned char& R
 void CXMLConfig::SetBoolean ( CXMLNode* pParent, const char* szKey, bool bValue )
 {
     // Create the XML node
-    CXMLNode* pNode = pParent->FindSubNode ( szKey );
-    if ( !pNode ) pNode = pParent->CreateSubNode ( szKey );
+    CXMLNode* pNode = pParent->GetChild ( szKey );
+    if ( !pNode ) pNode = pParent->CreateChild ( szKey );
     if ( pNode )
     {
         pNode->SetTagContent ( bValue );
@@ -139,8 +139,8 @@ void CXMLConfig::SetBoolean ( CXMLNode* pParent, const char* szKey, bool bValue 
 void CXMLConfig::SetInteger ( CXMLNode* pParent, const char* szKey, int iValue )
 {
     // Create the XML node
-    CXMLNode* pNode = pParent->FindSubNode ( szKey );
-    if ( !pNode ) pNode = pParent->CreateSubNode ( szKey );
+    CXMLNode* pNode = pParent->GetChild ( szKey );
+    if ( !pNode ) pNode = pParent->CreateChild ( szKey );
     if ( pNode )
     {
         pNode->SetTagContent ( iValue );
@@ -151,8 +151,8 @@ void CXMLConfig::SetInteger ( CXMLNode* pParent, const char* szKey, int iValue )
 void CXMLConfig::SetString ( CXMLNode* pParent, const char* szKey, const std::string& strValue )
 {
     // Create the XML node
-    CXMLNode* pNode = pParent->FindSubNode ( szKey );
-    if ( !pNode ) pNode = pParent->CreateSubNode ( szKey );
+    CXMLNode* pNode = pParent->GetChild ( szKey );
+    if ( !pNode ) pNode = pParent->CreateChild ( szKey );
     if ( pNode )
     {
         pNode->SetTagContent ( strValue.c_str () );
@@ -163,8 +163,8 @@ void CXMLConfig::SetString ( CXMLNode* pParent, const char* szKey, const std::st
 void CXMLConfig::SetRGBA ( CXMLNode* pParent, const char* szKey, unsigned char R, unsigned char G, unsigned char B, unsigned char A )
 {
     // Create the XML node
-    CXMLNode* pNode = pParent->FindSubNode ( szKey );
-    if ( !pNode ) pNode = pParent->CreateSubNode ( szKey );
+    CXMLNode* pNode = pParent->GetChild ( szKey );
+    if ( !pNode ) pNode = pParent->CreateChild ( szKey );
     if ( pNode )
     {
         char szBuffer [ 256 ];
@@ -176,8 +176,8 @@ void CXMLConfig::SetRGBA ( CXMLNode* pParent, const char* szKey, unsigned char R
 
 CXMLNode* CXMLConfig::GetNodeForSave ( CXMLNode* pParent, const char* szKey )
 {
-    CXMLNode* pNode = pParent->FindSubNode ( szKey );
-    if ( !pNode ) pNode = pParent->CreateSubNode ( szKey );    
+    CXMLNode* pNode = pParent->GetChild ( szKey );
+    if ( !pNode ) pNode = pParent->CreateChild ( szKey );    
 
     return pNode;
 }

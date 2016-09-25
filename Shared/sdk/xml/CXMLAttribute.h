@@ -9,9 +9,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
-#ifndef __CXMLATTRIBUTE_H
-#define __CXMLATTRIBUTE_H
+#pragma once 
 
 #include "CXMLCommon.h"
 #include <string>
@@ -19,18 +17,15 @@
 class CXMLAttribute: public CXMLCommon
 {
 public:
-    virtual                     ~CXMLAttribute          ( void ) {};
+    virtual                     ~CXMLAttribute() = default;
 
-    virtual const std::string   GetName                 ( void ) const = 0;
-    virtual const std::string&  GetValue                ( void ) const = 0;
+    virtual const std::string   GetName () const = 0;
+    virtual const std::string   GetValue() const = 0;
 
-    virtual void                SetValue                ( const char* szValue ) = 0;
-    virtual void                SetValue                ( bool bValue ) = 0;
-    virtual void                SetValue                ( int iValue ) = 0;
-    virtual void                SetValue                ( unsigned int uiValue ) = 0;
-    virtual void                SetValue                ( float fValue ) = 0;
-    
-    virtual void                DeleteWrapper           ( void ) = 0;
+    virtual void                SetValue(const std::string& strValue) = 0;
+    virtual void                SetValue(const char* szValue) = 0;
+    virtual void                SetValue(bool bValue) = 0;
+    virtual void                SetValue(int iValue) = 0;
+    virtual void                SetValue(unsigned int uiValue) = 0;
+    virtual void                SetValue(float fValue) = 0;
 };
-
-#endif

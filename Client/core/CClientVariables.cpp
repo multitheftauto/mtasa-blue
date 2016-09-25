@@ -37,10 +37,10 @@ bool CClientVariables::Load ( void )
     m_iRevision++;
 
     // Load the cvars
-    m_pStorage = pRoot->FindSubNode ( CONFIG_NODE_CVARS );
+    m_pStorage = pRoot->GetChild ( CONFIG_NODE_CVARS );
     if ( !m_pStorage ) {
         // Non-existant, create a new node
-        m_pStorage = pRoot->CreateSubNode ( CONFIG_NODE_CVARS );
+        m_pStorage = pRoot->CreateChild ( CONFIG_NODE_CVARS );
     }
 
     // Verify that at least all the defaults are in
@@ -160,10 +160,10 @@ CXMLNode* CClientVariables::Node ( const std::string& strVariable )
     if ( !m_pStorage ) return NULL;
 
     // Try and grab the sub node
-    pNode = m_pStorage->FindSubNode ( strVariable.c_str () );
+    pNode = m_pStorage->GetChild ( strVariable.c_str () );
     if ( !pNode ) {
         // Non-existant, create a new sub node
-        pNode = m_pStorage->CreateSubNode ( strVariable.c_str () );
+        pNode = m_pStorage->CreateChild ( strVariable.c_str () );
     }
     return pNode;
 }
@@ -173,7 +173,7 @@ bool CClientVariables::Exists ( const std::string& strVariable )
 {
     // Check whether this node exists, thus if it is a valid cvar
     if ( !m_pStorage ) return false;
-    return (m_pStorage->FindSubNode ( strVariable.c_str () ) != NULL);
+    return (m_pStorage->GetChild ( strVariable.c_str () ) != NULL);
 }
 
 

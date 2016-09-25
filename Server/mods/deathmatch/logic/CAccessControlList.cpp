@@ -99,11 +99,11 @@ void CAccessControlList::WriteToXMLNode ( CXMLNode* pNode )
     assert ( pNode );
 
     // Create the subnode for this
-    CXMLNode* pSubNode = pNode->CreateSubNode ( "acl" );
+    CXMLNode* pSubNode = pNode->CreateChild ( "acl" );
     assert ( pSubNode );
 
     // Create attribute for the name and set it
-    CXMLAttribute* pAttribute = pSubNode->GetAttributes ().Create ( "name" );
+    CXMLAttribute* pAttribute = pSubNode->AddAttribute ( "name" );
     pAttribute->SetValue ( m_strACLName );
 
     // Loop through each right and write it to the ACL

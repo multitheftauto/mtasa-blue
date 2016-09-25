@@ -191,7 +191,7 @@ private:
     class CResourceManager *      m_resourceManager; 
     class CLuaMain *        m_pVM;
 
-    CXMLNode *              m_pNodeSettings;        // Settings XML node, read from meta.xml and copied into it's own instance
+    CXMLFile *              m_pNodeSettings;        // Settings XML node, read from meta.xml and copied into it's own instance
     CXMLNode *              m_pNodeStorage;         // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
 
     SString                 m_strMinClientReqFromMetaXml;    // Min MTA client version as declared in meta.xml
@@ -300,7 +300,7 @@ public:
     { 
         return m_strFailureReason.TrimEnd( "\n" ); 
     }
-    inline CXMLNode *       GetSettingsNode ( void ) { return m_pNodeSettings; }
+    inline CXMLNode *       GetSettingsNode ( void ) { return m_pNodeSettings->GetRootNode(); }
     inline CXMLNode *       GetStorageNode ( void ) { return m_pNodeStorage; }
 
     bool                    CallExportedFunction ( const char * szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller );

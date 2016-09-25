@@ -10947,7 +10947,7 @@ CElement* CStaticFunctionDefinitions::GetRootElement ( void )
     assert ( pNode );
 
     // Make sure it has no subnodes already
-    pNode->DeleteAllSubNodes();
+    pNode->RemoveAllChildren();
 
     if ( bChildren )
     {

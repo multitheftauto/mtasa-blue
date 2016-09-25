@@ -44,7 +44,6 @@
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
 #include <xml/CXMLAttribute.h>
-#include <xml/CXMLAttributes.h>
 #include <Common.h>
 
 #include <net/CNet.h>

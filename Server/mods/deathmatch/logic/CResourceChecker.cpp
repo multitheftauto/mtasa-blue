@@ -327,15 +327,15 @@ void CResourceChecker::CheckMetaSourceForIssues ( CXMLNode* pRootNode, const str
     // Find the client and server version requirements
     SString strMinClientReqFromMetaXml = "";
     SString strMinServerReqFromMetaXml = "";
-    CXMLNode* pNodeMinMtaVersion = pRootNode->FindSubNode ( "min_mta_version", 0 );
+    CXMLNode* pNodeMinMtaVersion = pRootNode->GetChild ( "min_mta_version", 0 );
 
     if ( pNodeMinMtaVersion )
     {
-        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "server" ) )
+        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttribute ( "server" ) )
             strMinServerReqFromMetaXml = pAttr->GetValue ();
-        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "client" ) )
+        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttribute ( "client" ) )
             strMinClientReqFromMetaXml = pAttr->GetValue ();
-        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "both" ) )
+        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttribute ( "both" ) )
             strMinServerReqFromMetaXml = strMinClientReqFromMetaXml = pAttr->GetValue ();
     }
 
@@ -359,23 +359,20 @@ void CResourceChecker::CheckMetaSourceForIssues ( CXMLNode* pRootNode, const str
         {
             // Create min_mta_version node if required
             if ( !pNodeMinMtaVersion )
-                pNodeMinMtaVersion = pRootNode->CreateSubNode ( "min_mta_version" );
+                pNodeMinMtaVersion = pRootNode->CreateChild ( "min_mta_version" );
 
-            CXMLAttributes& attributes = pNodeMinMtaVersion->GetAttributes ();
-            attributes.Delete ( "server" );
-            attributes.Delete ( "client" );
-            attributes.Delete ( "both" );
+            pNodeMinMtaVersion->RemoveAttribute("server");
+            pNodeMinMtaVersion->RemoveAttribute("client");
+            pNodeMinMtaVersion->RemoveAttribute("both");
 
             if ( !m_strReqServerVersion.empty () )
             {
-                CXMLAttribute* pAttr = attributes.Create ( "server" );
-                pAttr->SetValue ( m_strReqServerVersion );
+                pNodeMinMtaVersion->AddAttribute("server")->SetValue(m_strReqServerVersion);
             }
 
             if ( !m_strReqClientVersion.empty () )
             {
-                CXMLAttribute* pAttr = attributes.Create ( "client" );
-                pAttr->SetValue ( m_strReqClientVersion );
+                pNodeMinMtaVersion->AddAttribute("client")->SetValue(m_strReqClientVersion);
             }
 
             if ( pbOutHasChanged )

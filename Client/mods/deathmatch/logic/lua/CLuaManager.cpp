@@ -209,7 +209,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild );
     CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaXMLDefs::xmlNodeGetChildren );
     CLuaCFunctions::AddFunction ( "xmlNodeFindSubNode", CLuaXMLDefs::xmlNodeFindChild );
-    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaXMLDefs::xmlCreateChild );
+    CLuaCFunctions::AddFunction ( "xmlCreateChild", CLuaXMLDefs::xmlCreateChild );
     CLuaCFunctions::AddFunction ( "xmlNodeFindChild", CLuaXMLDefs::xmlNodeFindChild );
     CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaPedDefs::IsPedDead );
     CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex );

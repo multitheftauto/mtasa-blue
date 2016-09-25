@@ -2,390 +2,156 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/CXMLFileImpl.cpp
-*  PURPOSE:     XML file class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #include "StdInc.h"
-SString CXMLFileImpl::ms_strSaveFlagFile;
 
-CXMLFileImpl::CXMLFileImpl ( const char* szFilename, bool bUseIDs ) :
-    m_ulID ( INVALID_XML_ID ),
-    m_bUsingIDs ( bUseIDs )
+CXMLFileImpl::CXMLFileImpl(const std::string &strFilename, bool bUsingIDs) : 
+    m_ulID(INVALID_XML_ID), 
+    m_strFilename(strFilename)
 {
-    // Init
-    m_pDocument = NULL;
-    m_pRootNode = NULL;
-    ResetLastError ();
+    if (bUsingIDs)
+        m_ulID = CXMLArray::PopUniqueID(this);
+}
 
-    // Create the document
-    m_pDocument = new TiXmlDocument;
+CXMLFileImpl::CXMLFileImpl(const std::string &strFilename, CXMLNode *pNode) : 
+    m_ulID(INVALID_XML_ID), 
+    m_strFilename(strFilename)
+{
+    bool bUsingIDs = pNode->GetID() != INVALID_XML_ID;
+    if (bUsingIDs)
+        m_ulID = CXMLArray::PopUniqueID(this);
 
-    // Set the filename
-    if ( szFilename )
+    // Create document
+    m_pDocument = std::make_unique<pugi::xml_document>();
+
+    // Copy root node info
+    auto &root = reinterpret_cast<CXMLNodeImpl*>(pNode)->GetNode();
+    m_pDocument->set_name(root.name());
+    m_pDocument->set_value(root.value());
+
+    for (auto &child : root.children())
     {
-        m_strFilename = szFilename;
+        m_pDocument->append_copy(child);
+    }
+    for (auto &attr : root.attributes())
+    {
+        m_pDocument->append_copy(attr);
     }
 
-    // Add to array over XML stuff
-    if ( m_bUsingIDs )
-        m_ulID = CXMLArray::PopUniqueID ( this );
+    // Construct Wrapper tree
+    BuildWrapperTree(bUsingIDs);
 }
 
-
-CXMLFileImpl::~CXMLFileImpl ( void )
+CXMLFileImpl::~CXMLFileImpl(void)
 {
-    // Remove from array over XML stuff
-    if ( m_bUsingIDs )
-        CXMLArray::PushUniqueID ( this );
-
-    // Delete our wrappers
-    ClearWrapperTree ();
-
-    // Delete the document and the builder
-    delete m_pDocument;
+    if (m_ulID != INVALID_XML_ID)
+        CXMLArray::PushUniqueID(this);
 }
 
-
-const char* CXMLFileImpl::GetFilename ( void )
+bool CXMLFileImpl::Parse(std::vector<char> *pOutFileContents)
 {
-    return m_strFilename.c_str ();
-}
-
-
-void CXMLFileImpl::SetFilename ( const char* szFilename )
-{
-    // Valid?
-    if ( szFilename )
-        m_strFilename = szFilename;
-    else
-        m_strFilename = "";
-}
-
-
-bool CXMLFileImpl::Parse ( std::vector < char >* pOutFileContents )
-{
-    // Do we have a filename?
-    if ( m_strFilename != "" )
+    if (!m_strFilename.empty())
     {
         // Reset previous file
-        Reset ();
+        Reset();
 
-        // Parse from the current file
-        FILE* file;
-        if ( m_pDocument->LoadFile ( m_strFilename.c_str (), TIXML_DEFAULT_ENCODING, &file ) )
-        {        
-            // Also read the file bytes to a buffer if requested
-            if ( pOutFileContents )
-            {
-                fseek( file, 0, SEEK_END );
-                long size = ftell ( file );
-                fseek( file, 0, SEEK_SET );
-                if ( size > 0 )
-                {
-                    pOutFileContents->resize( size );
-                    fread( &pOutFileContents->at(0), 1, size, file );
-                }
-            }
-		    fclose( file );
-
-            // Build our wrapper
-            if ( BuildWrapperTree () )
-            {
-                ResetLastError ();
-                return true;
-            }
-            else
-            {
-                SetLastError ( CXMLErrorCodes::OtherError, "Out of Elements" );
-                return false;
-            }
-        }
-
-        SString strErrorDesc;
-        if ( m_pDocument->Error() )
-            strErrorDesc = SString( "Line %d: %s", m_pDocument->ErrorRow(), m_pDocument->ErrorDesc() );
-        else
-            strErrorDesc = "Invalid file";
-        SetLastError ( CXMLErrorCodes::OtherError, strErrorDesc );
-        return false;
-    }
-
-    // No filename specified
-    SetLastError ( CXMLErrorCodes::NoFileSpecified, "No file specified" );
-    return false;
-}
-
-
-bool CXMLFileImpl::Write ( void )
-{
-    // We have a filename?
-    if ( m_strFilename != "" )
-    {
-        // Try a safe method of saving first
-        if ( WriteSafer () )
+        // Load file
+        m_pDocument = std::make_unique<pugi::xml_document>();
+        m_parserResult = m_pDocument->load_file(m_strFilename.c_str());
+        if (!m_parserResult)
         {
-            return true;
-        }
-        if ( m_pDocument->SaveFile ( m_strFilename.c_str () ) )
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-bool CXMLFileImpl::WriteSafer ( void )
-{
-    // We have a filename?
-    if ( m_strFilename != "" )
-    {
-        SString strFilename = m_strFilename;
-        SString strTemp     = strFilename + "_new_";
-        SString strBackup   = strFilename + "_old_";
-
-        // Save to temp
-        if ( !m_pDocument->SaveFile ( strTemp ) )
-        {
-            SetLastError ( CXMLErrorCodes::OtherError, "Could not save temporary file" );
             return false;
         }
 
-        // Delete any leftover backup
-        unlink ( strBackup );
-
-        // Save filename being saved
-        FileRecoveryPreSave( strFilename );
-
-        // Rename current to backup
-        rename ( strFilename, strBackup );
-
-        // Rename temp to current
-        if ( rename ( strTemp, strFilename ) )
-        {
-            SetLastError ( CXMLErrorCodes::OtherError, "Could not rename temporary to current" );
-            return false;
-        }
-
-        // Unsave filename being saved
-        FileRecoveryPostSave();
-
-        // Delete backup
-        unlink ( strBackup );
-
-        return true;
-    }
-
-    return false;
-}
-
-
-
-void CXMLFileImpl::Clear ( void )
-{
-    if ( m_pRootNode )
-    {
-        delete m_pRootNode;
-        m_pRootNode = NULL;
-    }
-}
-
-
-void CXMLFileImpl::Reset ( void )
-{
-    // Clear our wrapper tree
-    ClearWrapperTree ();
-
-    // Delete our document and recreate it
-    delete m_pDocument;
-    m_pDocument = new TiXmlDocument;
-}
-
-
-CXMLNode* CXMLFileImpl::CreateRootNode ( const std::string& strTagName )
-{
-    // Make sure we always have a root node
-    if ( !m_pRootNode )
-    {
-        // Grab the document's root, create it if neccessary
-        TiXmlElement* pRootNode = m_pDocument->RootElement ();
-        if ( !pRootNode )
-        {
-            pRootNode = new TiXmlElement ( strTagName );
-            m_pDocument->LinkEndChild ( pRootNode );
-        }
-
-        m_pRootNode = new CXMLNodeImpl ( this, NULL, *pRootNode );
-    }
-
-    // We have a root node now. Make sure ith as the correct name.
-    m_pRootNode->SetTagName ( strTagName );
-    return m_pRootNode;
-}
-
-
-CXMLNode* CXMLFileImpl::GetRootNode ( void )
-{
-    // Return it
-    return m_pRootNode;
-}
-
-
-CXMLErrorCodes::Code CXMLFileImpl::GetLastError ( std::string& strOut )
-{
-    // Copy out the last error string and return the last error
-    strOut = m_strLastError;
-    return m_errLastError;
-}
-
-
-void CXMLFileImpl::ResetLastError ( void )
-{
-    // Set the code and the string
-    m_errLastError = CXMLErrorCodes::NoError;
-    m_strLastError = "";
-}
-
-
-void CXMLFileImpl::SetLastError ( CXMLErrorCodes::Code errCode, const std::string& strDescription )
-{
-    // Set the code and the string
-    m_errLastError = errCode;
-    m_strLastError = strDescription;
-}
-
-
-TiXmlDocument* CXMLFileImpl::GetDocument ( void )
-{
-    return m_pDocument;
-}
-
-
-bool CXMLFileImpl::BuildWrapperTree ( void )
-{
-    // Clear the previous tree
-    ClearWrapperTree ();
-
-    // Grab the root element
-    TiXmlElement* pRootNode = m_pDocument->RootElement ();
-    if ( pRootNode )
-    {
-        // Create an XML node for it
-        m_pRootNode = new CXMLNodeImpl ( this, NULL, *pRootNode );
-
-        // And build all sub-nodes
-        if ( !BuildSubElements ( m_pRootNode ) )
-        {
-            Reset ( );
-            return false;
-        }
+        BuildWrapperTree(m_ulID != INVALID_XML_ID);
         return true;
     }
     return false;
 }
 
-
-bool CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
+void CXMLFileImpl::BuildWrapperTree(bool bUsingIDs)
 {
-    // Grab the node
-    TiXmlElement* pRawNode = pNode->GetNode ();
-    if ( pRawNode )
-    {
-        // Iterate the children
-        TiXmlNode* pChild = NULL;
-        TiXmlElement* pElement;
-        while ( ( pChild = pRawNode->IterateChildren ( pChild ) ) )
-        {
-            // If it's not a comment or something else, build it to our tree
-            // TODO: Support comments
-            if ( ( pElement = pChild->ToElement () ) )
-            {
-                // Create the child and build its subnodes again
-                CXMLNodeImpl* pTempNode = new CXMLNodeImpl ( this, pNode, *pElement );
-                if ( pTempNode->IsValid ( ) )
-                {
-                    if ( !BuildSubElements ( pTempNode ) )
-                    {
-                        delete pTempNode;
-                        return false;
-                    }
-                }
-                else
-                {
-                    delete pTempNode;
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
+    m_pRoot = WrapperTreeWalker(m_pDocument.get(), bUsingIDs);
 }
 
-
-void CXMLFileImpl::ClearWrapperTree ( void )
+std::unique_ptr<CXMLNodeImpl> CXMLFileImpl::WrapperTreeWalker(pugi::xml_node * node, bool bUsingIDs)
 {
-    // Delete the previous wrapper tree
-    if ( m_pRootNode )
+    // Construct wrapper for this node
+    auto wrapperNode = std::make_unique<CXMLNodeImpl>(*node, bUsingIDs);
+
+    // Construct Attributes
+    for (auto &attribute : node->attributes())
     {
-        m_pRootNode->DeleteWrapper ();
-        m_pRootNode = NULL;
-    }
-}
-
-//
-// Initialize and do any file recovery as necessary
-//
-void CXMLFileImpl::InitFileRecovery( const char* szSaveFlagDirectory )
-{
-    if ( !szSaveFlagDirectory )
-        return;
-    ms_strSaveFlagFile = PathJoin( szSaveFlagDirectory, "_xml_save.info" );
-
-    // Check if recover is required
-    SString strFilename;
-    FileLoad( ms_strSaveFlagFile, strFilename );
-    if ( strFilename.empty() )
-        return;
-
-    if ( !FileExists( strFilename ) )
-    {
-        // Try to recover from new file
-        SString strTemp = strFilename + "_new_";
-        if ( FileExists( strTemp ) )
-        {
-            rename( strTemp, strFilename );
-        }
+        wrapperNode->AddAttribute(std::make_unique<CXMLAttributeImpl>(attribute, bUsingIDs));
     }
 
-    if ( !FileExists( strFilename ) )
+    // Recursively call on our children
+    for (auto &child : node->children())
     {
-        // Try to recover from old file
-        SString strBackup = strFilename + "_old_";
-        if ( FileExists( strBackup ) )
-        {
-            rename( strBackup, strFilename );
-        }
+        wrapperNode->AddChild(WrapperTreeWalker(&child, bUsingIDs));
     }
-    FileDelete( ms_strSaveFlagFile );
+
+    return wrapperNode;
 }
 
-// Store filename in case of problems during save
-void CXMLFileImpl::FileRecoveryPreSave( const SString& strFilename )
+void CXMLFileImpl::Reset() 
+{ 
+    m_pRoot.reset(nullptr); 
+}
+
+bool CXMLFileImpl::Write(void)
 {
-    if ( !ms_strSaveFlagFile.empty() )
-        FileSave( ms_strSaveFlagFile, strFilename );
+    // We have a filename?
+    if (!m_strFilename.empty())
+    {
+        return m_pDocument->save_file(m_strFilename.c_str());
+    }
+
+    return false;
 }
 
-// Unstore filename in case of problems during save
-void CXMLFileImpl::FileRecoveryPostSave( void )
+CXMLNode *CXMLFileImpl::CreateRootNode(const std::string &strTagName)
 {
-    if ( !ms_strSaveFlagFile.empty() )
-        FileDelete( ms_strSaveFlagFile );
+    if (m_pRoot)
+    {
+        m_pRoot->GetNode().set_name(strTagName.c_str());
+        return GetRootNode();
+    }
+    else
+    {
+        m_pDocument = std::make_unique<pugi::xml_document>();
+        auto innerRoot = m_pDocument->append_child(strTagName.c_str());
+        auto rootWrapper = std::make_unique<CXMLNodeImpl>(*m_pDocument.get(),
+                                                          m_ulID != INVALID_XML_ID);
+        rootWrapper->AddChild(
+            std::make_unique<CXMLNodeImpl>(innerRoot, m_ulID != INVALID_XML_ID));
+        m_pRoot = std::move(rootWrapper);
+        return GetRootNode();
+    }
 }
 
+CXMLNode *CXMLFileImpl::GetRootNode()
+{
+    // The root node for pugixml is the first child of the document node
+    if (m_pRoot)
+        return m_pRoot->GetChildren().front().get();
+    return nullptr;
+}
+
+CXMLErrorCodes::Code CXMLFileImpl::GetLastError(std::string &strOut)
+{
+    auto parserStatus = m_parserResult.status;
+
+    if (parserStatus == pugi::status_ok)
+    {
+        return CXMLErrorCodes::NoError;
+    }
+    else
+    {
+        strOut = m_parserResult.description();
+        return CXMLErrorCodes::OtherError;
+    }
+}

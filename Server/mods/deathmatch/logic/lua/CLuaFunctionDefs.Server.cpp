@@ -466,9 +466,9 @@ int CLuaFunctionDefs::Get ( lua_State* luaVM )
                 unsigned int uiArgCount = 1;
 
                 // See if we need to return a table with single or multiple entries
-                if ( pNode->GetSubNodeCount () == 0 ) {
+                if ( pNode->GetChildCount () == 0 ) {
                     // See if required attribute exists
-                    CXMLAttribute *pAttribute = pNode->GetAttributes ().Find ( strAttribute.c_str () );
+                    CXMLAttribute *pAttribute = pNode->GetAttribute ( strAttribute.c_str () );
                     if ( !pAttribute )
                     {
                         if ( bDeleteNode )
@@ -496,11 +496,10 @@ int CLuaFunctionDefs::Get ( lua_State* luaVM )
                 }
                 else {
                     // We need to return multiply entries, so push all subnodes
-                    while ( ( pSubNode = pNode->FindSubNode ( "setting", uiIndex++ ) ) )
+                    while ( ( pSubNode = pNode->GetChild ( "setting", uiIndex++ ) ) )
                     {
-                        CXMLAttributes& attributes = pSubNode->GetAttributes ();
-                        Args.PushString ( attributes.Find ( "name" )->GetValue () );
-                        const std::string& strDataValue = attributes.Find ( "value" )->GetValue ();
+                        Args.PushString ( pSubNode->GetAttribute( "name" )->GetName () );
+                        const std::string& strDataValue = pSubNode->GetAttribute( "value" )->GetValue ();
                         if ( !Args.ReadFromJSONString ( strDataValue.c_str () ) )
                         {
                             Args.PushString ( strDataValue );

@@ -1,30 +1,24 @@
-
 #ifdef WIN32
 #pragma message("Compiling precompiled header.\n")
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#else
-#include <limits.h>
 #endif
 
-#include <errno.h>
-#include <stdarg.h>
-#include <stdio.h>
-#ifndef WIN32
-    #include <unistd.h>
-#endif
+// STL
+#include <algorithm>
+#include <memory>
+#include <string>
+#include <vector>
+#include <functional>
+#include <list>
+#include <memory>
 
-// SDK includes
-
+// SDK
 #include "Common.h"
+#include "../../Server/version.h"
 #include "SharedUtil.h"
+
+// Implementation
 #include "CXMLAttributeImpl.h"
-#include "CXMLAttributesImpl.h"
 #include "CXMLFileImpl.h"
 #include "CXMLNodeImpl.h"
 #include "CXMLImpl.h"
 #include "CXMLArray.h"
-#include "../../Server/version.h"
-
-// XML includes
-#include <xml/CXMLCommon.h>

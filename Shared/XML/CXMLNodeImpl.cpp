@@ -2,511 +2,312 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/CXMLNodeImpl.cpp
-*  PURPOSE:     XML node class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #include "StdInc.h"
 
-using std::list;
-
-CXMLNodeImpl::CXMLNodeImpl ( CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node ) :
-    m_ulID ( INVALID_XML_ID ),
-    m_bUsingIDs ( pFile && pFile->IsUsingIDs () ),
-    m_pNode ( &Node ),
-    m_Attributes ( Node, pFile && pFile->IsUsingIDs () )
+CXMLNodeImpl::CXMLNodeImpl(pugi::xml_node &node, bool bUsingIDs) : 
+    m_ulID(INVALID_XML_ID), 
+    m_node(node)
 {
-    // Init
-    m_pFile = pFile;
-    m_pParent = pParent;
-    m_bCanRemoveFromList = true;
-
-    if ( m_pFile )
-        m_pDocument = pFile->GetDocument ();
-    else
-        m_pDocument = NULL;
-
-    // Add to parent list
-    if ( m_pParent )
-    {
-        m_pParent->AddToList ( this );
-    }
-
-    // Add to array over XML stuff
-    if ( m_bUsingIDs )
-        m_ulID = CXMLArray::PopUniqueID ( this );
+    if (bUsingIDs)
+        m_ulID = CXMLArray::PopUniqueID(this);
 }
 
-
-CXMLNodeImpl::~CXMLNodeImpl ( void )
+CXMLNodeImpl::~CXMLNodeImpl()
 {
-    // Remove from array over XML stuff
-    if ( m_bUsingIDs )
-        CXMLArray::PushUniqueID ( this );
+    if (m_ulID != INVALID_XML_ID)
+        CXMLArray::PushUniqueID(this);
+}
 
-    // Delete our children
-    DeleteAllSubNodes ();
+CXMLNode *CXMLNodeImpl::CreateChild(const std::string& strTagName)
+{
+    auto node = m_node.append_child(strTagName.c_str());
+    auto wrapper = std::make_unique<CXMLNodeImpl>(node, m_ulID != INVALID_XML_ID);
+    m_Children.push_back(std::move(wrapper));
+    return m_Children.back().get();
+}
 
-    // We need a parent to delete the node
-    if ( m_pParent )
-    {
-        // Remove from parent list
-        m_pParent->RemoveFromList ( this );
-    }
-    else
-    {
-        // NULL it in the file if any
-        if ( m_pFile )
+void CXMLNodeImpl::RemoveChild(CXMLNode *pNode)
+{
+    // Remove from pugixml node
+    m_node.remove_child(((CXMLNodeImpl *)pNode)->GetNode());
+
+    // Remove from child list
+    m_Children.erase(std::remove_if(m_Children.begin(), m_Children.end(),
+        [pNode](const auto &pEntry) 
         {
-            m_pFile->m_pRootNode = NULL;
+            return pNode == pEntry.get();
+        }),
+    m_Children.end());
+}
+
+unsigned int CXMLNodeImpl::GetChildCount()
+{
+    return static_cast<unsigned int>(m_Children.size());
+}
+
+CXMLNode *CXMLNodeImpl::GetChild(unsigned int uiIndex)
+{
+    // Lookup the node
+    for (auto &pChild : m_Children)
+    {
+        if (uiIndex == 0)
+        {
+            return pChild.get();
         }
+        --uiIndex;
     }
 
-    // Need to delete the node?
-    if ( m_pNode )
-    {
-        // Grab the parent of our node and delete it using that if any to prevent crashing.
-        // Otherwize delete it directly.
-        TiXmlNode* pParent = m_pNode->Parent ();
-        if ( pParent )
-            pParent->RemoveChild ( m_pNode );
-        else
-            delete m_pNode;
-    }
+    // No such node
+    return nullptr;
 }
 
-
-CXMLNode* CXMLNodeImpl::CreateSubNode ( const char* szTagName )
+CXMLNode *CXMLNodeImpl::GetChild(const std::string& strTagName, unsigned int uiIndex)
 {
-    // Create a new subnode after the last child
-    TiXmlElement* pNewNode = new TiXmlElement ( szTagName );
-    m_pNode->LinkEndChild ( pNewNode );
-
-    // Create and return the wrapper element
-    CXMLNode* xmlNode = new CXMLNodeImpl ( m_pFile, this, *pNewNode );
-    if ( xmlNode->IsValid( ) )
-        return xmlNode;
-    else
+    // Lookup the node
+    for (auto &pNode : m_Children)
     {
-        delete xmlNode;
-        return NULL;
-    }
-}
-
-
-void CXMLNodeImpl::DeleteAllSubNodes ( void )
-{
-    // Don't let the nodes remove themselves from this list
-    m_bCanRemoveFromList = false;
-
-    // Delete each item in the list
-    list < CXMLNode* > ::iterator iter;
-    for ( iter = m_Children.begin (); iter != m_Children.end (); iter++ )
-    {
-        delete *iter;
-    }
-
-    // Clear the list
-    m_bCanRemoveFromList = true;
-    m_Children.clear ();
-}
-
-
-unsigned int CXMLNodeImpl::GetSubNodeCount ( void )
-{
-    return static_cast < unsigned int > ( m_Children.size () );
-}
-
-
-CXMLNode* CXMLNodeImpl::GetSubNode ( unsigned int uiIndex )
-{
-    // Find the given index in the list
-    unsigned int uiTemp = 0;
-    list < CXMLNode* > ::iterator iter;
-    for ( iter = m_Children.begin (); iter != m_Children.end (); iter++ )
-    {
-        if ( uiIndex == uiTemp )
+        if (pNode->GetTagName() == strTagName)
         {
-            return *iter;
-        }
-
-        ++uiTemp;
-    }
-    // Couldn't find it
-    return NULL;
-}
-
-
-CXMLNode* CXMLNodeImpl::FindSubNode ( const char* szTagName, unsigned int uiIndex )
-{
-    std::string TagName ( szTagName );
-
-    // Find the item with the given name
-    unsigned int uiTemp = 0;
-    list < CXMLNode* > ::iterator iter;
-    for ( iter = m_Children.begin (); iter != m_Children.end (); iter++ )
-    {
-        if ( dynamic_cast < CXMLNodeImpl* > ( (*iter) )->GetNode ()->ValueStr () == szTagName )
-        {
-            if ( uiTemp == uiIndex )
+            if (uiIndex == 0)
             {
-                return *iter;
+                return pNode.get();
             }
-            
-            ++uiTemp;
+            --uiIndex;
         }
     }
 
-    // Couldn't find it
-    return NULL;
+    // No such node
+    return nullptr;
 }
 
-
-CXMLAttributes& CXMLNodeImpl::GetAttributes ( void )
-{
-    return m_Attributes;
+const std::string CXMLNodeImpl::GetTagName() { 
+    return m_node.name(); 
 }
 
-
-CXMLNode* CXMLNodeImpl::GetParent ( void )
+void CXMLNodeImpl::SetTagName(const std::string &strString)
 {
-    return m_pParent;
+    m_node.set_name(strString.c_str());
 }
 
-
-int CXMLNodeImpl::GetLine ( void )
+const std::string CXMLNodeImpl::GetTagContent()
 {
-    return m_pNode->Row ();
+    const char *szSubText = m_node.child_value();
+    return szSubText ? std::string(szSubText) : std::string("");
 }
 
-
-const std::string& CXMLNodeImpl::GetTagName ( void )
+bool CXMLNodeImpl::GetTagContent(bool &bContent)
 {
-    return m_pNode->ValueStr ();
-}
-
-
-void CXMLNodeImpl::SetTagName ( const std::string& strString )
-{
-    m_pNode->SetValue ( strString );
-}
-
-
-const std::string CXMLNodeImpl::GetTagContent ( void )
-{
-    // FIXME: This can be sort of misleading as sub-tags are not included
-    const char* szSubText = m_pNode->GetText ();
-    return szSubText ? std::string ( szSubText ) : std::string ( "" );
-}
-
-
-bool CXMLNodeImpl::GetTagContent ( bool& bContent )
-{
-    // Get boolean value
-    const char* szText = m_pNode->GetText ();
-    if ( !szText )
+    const char *szText = m_node.child_value();
+    if (!szText)
         return false;
 
-    if ( m_pNode->GetText () [0] == '1' )
+    std::string strText = szText;
+    if(strText == "1") 
     {
         bContent = true;
         return true;
-    }
-    else if ( m_pNode->GetText () [0] == '0' )
+    } 
+    if (strText == "0")
     {
         bContent = false;
         return true;
     }
-
-    return false;   // Invalid
+    return false; 
 }
 
-
-bool CXMLNodeImpl::GetTagContent ( int& iContent )
+bool CXMLNodeImpl::GetTagContent(int &iContent)
 {
-    long lValue;
-
-    const char* szText = m_pNode->GetText ();
-    if ( !szText )
+    const char *szText = m_node.child_value();
+    if (!szText)
         return false;
 
-    if ( !StringToLong ( szText, lValue ) )
-        return false;
-
-    // Check the range
-    if ( lValue < INT_MIN || lValue > INT_MAX )
-        return false;
-    else
-    {
-        iContent = static_cast < int > ( lValue );
-        return true;
-    }
+    return StringToNumber(szText, iContent);
 }
 
-
-bool CXMLNodeImpl::GetTagContent ( unsigned int& uiContent )
+bool CXMLNodeImpl::GetTagContent(unsigned int &uiContent)
 {
-    long lValue;
-
-    const char* szText = m_pNode->GetText ();
-    if ( !szText )
+    const char *szText = m_node.child_value();
+    if (!szText)
         return false;
 
-    if ( !StringToLong ( szText, lValue ) )
-        return false;
-
-    // Check the range
-    if ( lValue < 0 /*|| lValue > UINT_MAX*/ )
-        return false;
-    else
-    {
-        uiContent = static_cast < unsigned int > ( lValue );
-        return true;
-    }
+    return StringToNumber(szText, uiContent);
 }
 
-
-bool CXMLNodeImpl::GetTagContent ( float& fContent )
+bool CXMLNodeImpl::GetTagContent(float &fContent)
 {
-    const char* szText = m_pNode->GetText ();
-    if ( !szText )
+    const char *szText = m_node.child_value();
+    if (!szText)
         return false;
 
-    fContent = static_cast < float > ( atof ( szText ) );
-    return true;
+    return StringToNumber(szText, fContent);
 }
 
-
-void CXMLNodeImpl::SetTagContent ( const char* szText, bool bCDATA )
+void CXMLNodeImpl::SetTagContent(const std::string & strContent, bool bCDATA)
 {
-    m_pNode->Clear();
-    TiXmlText* pNewNode = new TiXmlText ( szText );
-    pNewNode->SetCDATA ( bCDATA );
-    m_pNode->LinkEndChild ( pNewNode );
+    SetTagContent(strContent.c_str(), bCDATA);
+}
+
+// TODO CDATA?
+void CXMLNodeImpl::SetTagContent(const char *szText, bool bCDATA)
+{
+    // Remove children if any
+    for (auto &child : m_node.children())
+        m_node.remove_child(child);
     m_Children.clear();
+
+    m_node.text().set(szText);
 }
 
-
-void CXMLNodeImpl::SetTagContent ( bool bContent )
+void CXMLNodeImpl::SetTagContent(bool bContent)
 {
-    // Convert to string and set it
-    char szBuffer[2];
-    szBuffer[1] = 0;
-    if ( bContent ) szBuffer[0] = '1';
-    else szBuffer[0] = '0';
-
-    SetTagContent ( szBuffer );
+    if (bContent)
+        SetTagContent("1");
+    else
+        SetTagContent("0");
 }
 
-
-void CXMLNodeImpl::SetTagContent ( int iContent )
+void CXMLNodeImpl::SetTagContent(int iContent)
 {
-    // Convert to string and set it
-    char szBuffer[40];
-    sprintf ( szBuffer, "%i", iContent );
-    SetTagContent ( szBuffer );
+    SetTagContent(std::to_string(iContent));
 }
 
-
-void CXMLNodeImpl::SetTagContent ( unsigned int uiContent )
+void CXMLNodeImpl::SetTagContent(unsigned int uiContent)
 {
-    // Convert to string and set it
-    char szBuffer [40];
-    sprintf ( szBuffer, "%u", uiContent );
-    SetTagContent ( szBuffer );
+    SetTagContent(std::to_string(uiContent));
 }
 
-
-void CXMLNodeImpl::SetTagContent ( float fContent )
+void CXMLNodeImpl::SetTagContent(float fContent)
 {
-    // Convert to string and set it
-    char szBuffer [40];
-    sprintf ( szBuffer, "%f", fContent );
-    SetTagContent ( szBuffer );
+    SetTagContent(std::to_string(fContent));
 }
 
-
-void CXMLNodeImpl::SetTagContentf ( const char* szFormat, ... )
+void CXMLNodeImpl::SetTagContentf(const char *szFormat, ...)
 {
     // Convert the formatted string to a string (MAX 1024 BYTES) and set it
-    char szBuffer [1024];
+    char szBuffer[1024];
     va_list va;
-    va_start ( va, szFormat );
-    VSNPRINTF ( szBuffer, 1024, szFormat, va );
-    va_end ( va );
-    SetTagContent ( szBuffer );
+    va_start(va, szFormat);
+    VSNPRINTF(szBuffer, 1024, szFormat, va);
+    va_end(va);
+    SetTagContent(szBuffer);
 }
 
-
-TiXmlElement* CXMLNodeImpl::GetNode ( void )
+bool CXMLNodeImpl::RemoveAttribute(const std::string &strName)
 {
-    return m_pNode;
-}
+    bool bRemoved = false;
 
-
-CXMLNode* CXMLNodeImpl::CopyNode ( CXMLNode *pParent )
-{
-    CXMLNodeImpl *pNew = new CXMLNodeImpl ( NULL, reinterpret_cast < CXMLNodeImpl* > ( pParent ), *m_pNode->Clone ()->ToElement () );
-
-    // Copy the list, so we don't end up in an endless loop
-    std::list < CXMLNode* > ChildrenCopy ( m_Children );
-
-    // Recursively copy each child
-    list < CXMLNode* > ::iterator iter;
-    for ( iter = ChildrenCopy.begin (); iter != ChildrenCopy.end (); iter++ )
-    {
-        (*iter)->CopyNode ( pNew );
-    }
-
-    return dynamic_cast < CXMLNode* > ( pNew );
-}
-
-
-bool CXMLNodeImpl::CopyChildrenInto ( CXMLNode* pDestination, bool bRecursive )
-{
-    // Delete all the children of the target
-    pDestination->DeleteAllSubNodes ();
-
-    // Iterate through our children if we have. Otherwize just copy the content
-    if ( m_Children.size () > 0 )
-    {
-        std::list < CXMLNode* > ::iterator iter = m_Children.begin ();
-        CXMLNode* pMyChildNode;
-        CXMLNode* pNewChildNode;
-        for ( ; iter != m_Children.end (); iter++ )
+    // Remove from attributes list
+    m_Attributes.erase(std::remove_if(m_Attributes.begin(), m_Attributes.end(),
+        [&bRemoved, strName](const auto &pNode) 
         {
-            // Grab its tag name
-            pMyChildNode = *iter;
-            const std::string& strTagName = pMyChildNode->GetTagName ();
-
-            // Create at the destination
-            pNewChildNode = pDestination->CreateSubNode ( strTagName.c_str () );
-            if ( pNewChildNode )
+            if (pNode->GetName() == strName)
             {
-                // Copy our child's attributes into it
-                int iAttributeCount = pMyChildNode->GetAttributes ().Count ();
-                int i = 0;
-                CXMLAttribute* pAttribute;
-                for ( ; i < iAttributeCount; i++ )
-                {
-                    // Create a copy of every attribute into our destination
-                    pAttribute = pMyChildNode->GetAttributes ().Get ( i );
-                    if ( pAttribute )
-                    {
-                        pNewChildNode->GetAttributes ().Create ( *pAttribute );
-                    }
-                }
+                bRemoved = true;
+                return true;
+            }
+            return false;
+        }),
+    m_Attributes.end());
 
-                // Run it recursively if asked to. Copy child child nodes etc..
-                if ( bRecursive )
-                {
-                    if ( !pMyChildNode->CopyChildrenInto ( pNewChildNode, true ) )
-                    {
-                        pDestination->DeleteAllSubNodes ();
-                        return false;
-                    }
-                }
-            }
-            else
-            {
-                pDestination->DeleteAllSubNodes ();
-                return false;
-            }
+    // Remove from pugixml node
+    m_node.remove_attribute(strName.c_str());
+
+    return bRemoved;
+}
+
+CXMLAttribute *CXMLNodeImpl::AddAttribute(const std::string &strName)
+{
+    auto xmlAttribute = m_node.append_attribute(strName.c_str());
+    auto wrapper = std::make_unique<CXMLAttributeImpl>(xmlAttribute, m_ulID != INVALID_XML_ID);
+    AddAttribute(std::move(wrapper));
+    return m_Attributes.back().get();
+}
+
+CXMLAttribute *CXMLNodeImpl::GetAttribute(const std::string &strName)
+{
+    for (auto &pAttribute : m_Attributes)
+    {
+        if (pAttribute->GetName() == strName)
+        {
+            return pAttribute.get();
         }
     }
-    else
-    {
-        const char* szText = m_pNode->GetText ();
-        if ( szText )
-            pDestination->SetTagContent ( szText );
-    }
+    return nullptr;
+}
 
-    // Success
+void CXMLNodeImpl::RemoveAllChildren()
+{
+    for (auto &pChild : m_Children)
+        m_node.remove_child(reinterpret_cast<CXMLNodeImpl *>(pChild.get())->m_node);
+}
+
+void CXMLNodeImpl::AddAttribute(std::unique_ptr<CXMLAttribute> pAttribute)
+{
+    m_Attributes.push_back(std::move(pAttribute));
+}
+
+void CXMLNodeImpl::AddChild(std::unique_ptr<CXMLNode> pChild)
+{
+    m_Children.push_back(std::move(pChild));
+}
+
+bool CXMLNodeImpl::StringToNumber(const char *szString, long &lValue)
+{
+    try
+    {
+        lValue = std::stol(szString);
+    }
+    catch (...)
+    {
+        return false;
+    }
     return true;
 }
 
-
-void CXMLNodeImpl::DeleteWrapper ( void )
+bool CXMLNodeImpl::StringToNumber(const char *szString, unsigned int &uiValue)
 {
-    // Don't let the nodes remove themselves from this list
-    m_bCanRemoveFromList = false;
-
-    // Delete each wrapper item in the list
-    list < CXMLNode* > ::iterator iter;
-    for ( iter = m_Children.begin (); iter != m_Children.end (); iter++ )
+    try
     {
-        reinterpret_cast < CXMLNodeImpl* > (*iter)->DeleteWrapper ();
-    }
-
-    // Clear the list
-    m_bCanRemoveFromList = true;
-    m_Children.clear ();
-
-    // Prevent our destructor from deleting the node
-    m_pNode = NULL;
-
-    // Remove from parent list
-    if ( m_pParent )
-    {
-        m_pParent->RemoveFromList ( this );
-        m_pParent = NULL;
-    }
-
-    // Delete us
-    delete this;
-}
-
-
-void CXMLNodeImpl::AddToList ( CXMLNode* pNode )
-{
-    m_Children.push_back ( pNode );
-}
-
-
-void CXMLNodeImpl::RemoveFromList ( CXMLNode* pNode )
-{
-    if ( m_bCanRemoveFromList )
-    {
-        if ( !m_Children.empty() ) m_Children.remove ( pNode );
-    }
-}
-
-
-void CXMLNodeImpl::RemoveAllFromList ( void )
-{
-    m_Children.clear ();
-}
-
-
-bool CXMLNodeImpl::StringToLong ( const char* szString, long& lValue )
-{
-    char* pEnd;
-    lValue = strtol ( szString, &pEnd, 0 );
-
-#ifndef WIN32
-    if ( ERANGE == errno )
-    {
-        return false;
-    }
-    else
-    if ( pEnd == szString )
-    {
-        return false;
-    }
-    else
-#endif
-    {
+        // Sadly there's no stoui
+        unsigned long temp = std::stoul(szString);
+        if (temp > std::numeric_limits<unsigned int>::max())
+            return false;
+        uiValue = temp;
         return true;
     }
+    catch (...)
+    {
+        return false;
+    }
+    return true;
 }
 
-
-SString CXMLNodeImpl::GetAttributeValue ( const SString& strAttributeName )
+bool CXMLNodeImpl::StringToNumber(const char *szString, int &iValue)
 {
-    CXMLAttribute* pAttribute = GetAttributes ().Find ( strAttributeName );
-    return pAttribute ? pAttribute->GetValue () : "";
+    try
+    {
+        iValue = std::stoi(szString);
+    }
+    catch (...)
+    {
+        return false;
+    }
+    return true;
+}
+
+bool CXMLNodeImpl::StringToNumber(const char *szString, float &fValue)
+{
+    try
+    {
+        fValue = std::stof(szString);
+    }
+    catch (...)
+    {
+        return false;
+    }
+    return true;
 }

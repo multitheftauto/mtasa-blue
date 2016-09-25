@@ -23,7 +23,7 @@ class CResourceClientConfigItem : public CResourceFile
     
 public:
 
-                                        CResourceClientConfigItem       ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes );
+                                        CResourceClientConfigItem       ( class CResource * resource, const char * szShortName, const char * szResourceFileName, const std::list<std::unique_ptr<CXMLAttribute>>& xmlAttributes );
                                         ~CResourceClientConfigItem      ( void );
 
     bool                                Start                           ( void );

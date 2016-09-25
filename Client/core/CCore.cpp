@@ -330,9 +330,9 @@ void CCore::SaveConfig ( bool bWaitUntilFinished )
 {
     if ( m_pConfigFile )
     {
-        CXMLNode* pBindsNode = GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS );
+        CXMLNode* pBindsNode = GetConfig ()->GetChild ( CONFIG_NODE_KEYBINDS );
         if ( !pBindsNode )
-            pBindsNode = GetConfig ()->CreateSubNode ( CONFIG_NODE_KEYBINDS );
+            pBindsNode = GetConfig ()->CreateChild ( CONFIG_NODE_KEYBINDS );
         m_pKeyBinds->SaveToXML ( pBindsNode );
         GetVersionUpdater ()->SaveConfigToXML ();
         m_pConfigFile->Write ();
@@ -1083,7 +1083,7 @@ void CCore::CreateXML ( )
     // Load the keybinds (loads defaults if the subnode doesn't exist)
     if ( m_pKeyBinds )
     {
-        m_pKeyBinds->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
+        m_pKeyBinds->LoadFromXML ( GetConfig ()->GetChild ( CONFIG_NODE_KEYBINDS ) );
         m_pKeyBinds->LoadDefaultCommands( false );
     }
 

@@ -104,12 +104,12 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
     }
 
     // Iterate through all the setting subnodes
-    while ( ( pNode = pSource->FindSubNode ( "setting", uiCurrentIndex++ ) ) ) {
+    while ( ( pNode = pSource->GetChild ( "setting", uiCurrentIndex++ ) ) ) {
         std::string strContent;
         unsigned int uiResourceNameLength = 0;
 
-        CXMLAttribute* pName    = pNode->GetAttributes ().Find ( "name" );
-        CXMLAttribute* pValue   = pNode->GetAttributes ().Find ( strAttribute );
+        CXMLAttribute* pName    = pNode->GetAttribute ( "name" );
+        CXMLAttribute* pValue   = pNode->GetAttribute ( strAttribute );
 
         // Check if both attibutes exist (otherwise ignore the entry)
         if ( pName && pValue ) {
@@ -142,7 +142,7 @@ CXMLNode* CSettings::Get ( CXMLNode *pSource, CXMLNode *pStorage, const char *sz
                     if ( pMultiresultParentNode == NULL ) {
                         // Create a new temporary node (in which we can put all nodes we have access to), and add it as temporary subnode of pSource
                         // The node itself will be deleted
-                        pMultiresultParentNode = pStorage->CreateSubNode ( "setting" );
+                        pMultiresultParentNode = pStorage->CreateChild ( "setting" );
                     }
 
                     // We are meant to return an entire node. Since we are allowed to read this node, copy it and add it to our storage node
@@ -239,12 +239,11 @@ CXMLNode* CSettings::Get ( const char *szLocalResource, const char *szSetting, b
 CXMLNode* CSettings::CreateSetting ( CXMLNode *pDst, const char *szName, const char *szContent )
 {
     // Create the node
-    CXMLNode *pNode = pDst->CreateSubNode ( "setting" );
-    CXMLAttributes *pAttributes = &(pNode->GetAttributes ());
-
+    CXMLNode *pNode = pDst->CreateChild ( "setting" );
+    
     // Add the attributes with the corresponding values
-    pAttributes->Create ( "name" )->SetValue ( szName );
-    pAttributes->Create ( "value" )->SetValue ( szContent );
+    pNode->AddAttribute( "name" )->SetValue ( szName );
+    pNode->AddAttribute( "value" )->SetValue ( szContent );
 
     return pNode;
 }
@@ -254,7 +253,6 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
 {
     CXMLNode *pNode;
     CResource *pResource;
-    CXMLAttributes *pAttributes;
     char szBuffer[MAX_SETTINGS_LENGTH] = {0};
     char szQueryResource[MAX_RESOURCE_LENGTH] = {0};
     SettingStatus eStatus;
@@ -309,24 +307,21 @@ bool CSettings::Set ( const char *szLocalResource, const char *szSetting, const 
             if ( !bExists || !pNode ) {             // No existing settings registry entry, so create a new setting
                 CreateSetting ( m_pNodeGlobalSettings, szBuffer, szContent );
             } else {                        // Existing settings registry entry
-                // Get the attributes
-                pAttributes = &(pNode->GetAttributes ());
-
                 // Abort if this value isnt public (but protected or private), and if the local resource
                 // (doing the query) doesn't equal the setting's resource name
-                if ( GetAccessType ( pAttributes->Find ( "name" )->GetValue()[0] ) != CSettings::Public &&
+                if ( GetAccessType ( pNode->GetAttribute( "name" )->GetValue()[0] ) != CSettings::Public &&
                      stricmp ( pResource->GetName ().c_str (), szLocalResource ) != 0 )
                     return false;
 
                 // Get the node's current value
-                strOldValue = pAttributes->Find ( "value" )->GetValue ();
+                strOldValue = pNode->GetAttribute("value" )->GetValue ();
 
                 // Set the node's value
-                pAttributes->Find ( "value" )->SetValue ( szContent );
+                pNode->GetAttribute( "value" )->SetValue ( szContent );
 
                 // If a prefix was given, set the node's name (to override any access operators)
                 if ( bPrefix )
-                    pAttributes->Find ( "name" )->SetValue ( szBuffer );
+                    pNode->GetAttribute ( "name" )->SetValue ( szBuffer );
             }
 
             // Trigger onSettingChange

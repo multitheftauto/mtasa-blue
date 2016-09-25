@@ -176,11 +176,11 @@ void CAccessControlListGroup::WriteToXMLNode ( CXMLNode* pNode )
     assert ( pNode );
 
     // Create the subnode for this
-    CXMLNode* pSubNode = pNode->CreateSubNode ( "group" );
+    CXMLNode* pSubNode = pNode->CreateChild ( "group" );
     assert ( pSubNode );
 
     // Create attribute for the name and set it
-    CXMLAttribute* pAttribute = pSubNode->GetAttributes ().Create ( "name" );
+    CXMLAttribute* pAttribute = pSubNode->AddAttribute ( "name" );
     pAttribute->SetValue ( m_strGroupName );
 
     // Write the ACL's this group use
@@ -190,8 +190,8 @@ void CAccessControlListGroup::WriteToXMLNode ( CXMLNode* pNode )
         CAccessControlList* pACL = *iterACL;
 
         // Create the subnode for this object and write the name attribute we generated
-        CXMLNode* pObjectNode = pSubNode->CreateSubNode ( "acl" );
-        pAttribute = pObjectNode->GetAttributes ().Create ( "name" );
+        CXMLNode* pObjectNode = pSubNode->CreateChild ( "acl" );
+        pAttribute = pObjectNode->AddAttribute ( "name" );
         pAttribute->SetValue ( pACL->GetName () );
     }
 
@@ -223,8 +223,8 @@ void CAccessControlListGroup::WriteToXMLNode ( CXMLNode* pNode )
         strncat ( szObjectType, pObject->GetObjectName (), NUMELMS( szObjectType ) - 1 );
 
         // Create the subnode for this object and write the name attribute we generated
-        CXMLNode* pObjectNode = pSubNode->CreateSubNode ( "object" );
-        pAttribute = pObjectNode->GetAttributes ().Create ( "name" );
+        CXMLNode* pObjectNode = pSubNode->CreateChild ( "object" );
+        pAttribute = pObjectNode->AddAttribute ( "name" );
         pAttribute->SetValue ( szObjectType );
     }
 }

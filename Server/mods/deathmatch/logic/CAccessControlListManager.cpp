@@ -86,33 +86,33 @@ bool CAccessControlListManager::Load ( void )
 
     // load the acl's
     CXMLNode* pSubNode = NULL;
-    unsigned int uiSubNodesCount = m_pRootNode->GetSubNodeCount ();
+    unsigned int uiSubNodesCount = m_pRootNode->GetChildCount ();
     for ( unsigned int i = 0 ; i < uiSubNodesCount ; i++ )
     {
-        pSubNode = m_pRootNode->GetSubNode ( i );
+        pSubNode = m_pRootNode->GetChild ( i );
         if ( !pSubNode ) continue;
 
         if ( pSubNode->GetTagName ().compare ( "acl" ) == 0 )
         {
-            CXMLAttribute* pAttribute = pSubNode->GetAttributes ().Find ( "name" );
+            CXMLAttribute* pAttribute = pSubNode->GetAttribute ( "name" );
             if ( pAttribute )
             {
                 CAccessControlList* pACL = AddACL ( pAttribute->GetValue ().c_str () );
 
                 CXMLNode* pSubSubNode = NULL;
-                unsigned int uiSubSubNodesCount = pSubNode->GetSubNodeCount ();
+                unsigned int uiSubSubNodesCount = pSubNode->GetChildCount ();
                 for ( unsigned int j = 0 ; j < uiSubSubNodesCount ; j++ )
                 {
                     // If this subnode doesn't exist, return to the for loop and continue it
-                    pSubSubNode = pSubNode->GetSubNode ( j );
+                    pSubSubNode = pSubNode->GetChild ( j );
                     if ( !pSubSubNode ) continue;
 
                     // Check that this subsub node is named "right"
                     if ( pSubSubNode->GetTagName ().compare ( "right" ) == 0 )
                     {
                         // Grab the name and the access attributes
-                        CXMLAttribute* pNameAttribute = pSubSubNode->GetAttributes ().Find ( "name" );
-                        CXMLAttribute* pAccessAttribute = pSubSubNode->GetAttributes ().Find ( "access" );
+                        CXMLAttribute* pNameAttribute = pSubSubNode->GetAttribute ( "name" );
+                        CXMLAttribute* pAccessAttribute = pSubSubNode->GetAttribute ( "access" );
                         if ( pNameAttribute && pAccessAttribute )
                         {
                             // See if the access attribute is true or false
@@ -150,9 +150,8 @@ bool CAccessControlListManager::Load ( void )
                             else continue;
 
                             // Set all the extra attributes
-                            for ( uint i = 0 ; i < pSubSubNode->GetAttributes ().Count () ; i++ )
+                            for ( auto& pAttribute : pSubSubNode->GetAttributes() )
                             {
-                                CXMLAttribute* pAttribute = pSubSubNode->GetAttributes ().Get ( i );
                                 pRight->SetAttributeValue ( pAttribute->GetName (), pAttribute->GetValue () );
                             }
                         }
@@ -164,29 +163,29 @@ bool CAccessControlListManager::Load ( void )
 
     // Load the groups
     pSubNode = NULL;
-    uiSubNodesCount = m_pRootNode->GetSubNodeCount ();
+    uiSubNodesCount = m_pRootNode->GetChildCount ();
     for ( unsigned int i = 0 ; i < uiSubNodesCount ; i++ )
     {
-        pSubNode = m_pRootNode->GetSubNode ( i );
+        pSubNode = m_pRootNode->GetChild ( i );
         if ( !pSubNode ) continue;
 
         if ( pSubNode->GetTagName ().compare ( "group" ) == 0 )
         {
-            CXMLAttribute* pAttribute = pSubNode->GetAttributes ().Find ( "name" );
+            CXMLAttribute* pAttribute = pSubNode->GetAttribute ( "name" );
             if ( pAttribute )
             {
                 CAccessControlListGroup* pGroup = AddGroup ( pAttribute->GetValue ().c_str () );
 
                 CXMLNode* pSubSubNode = NULL;
-                unsigned int uiSubSubNodesCount = pSubNode->GetSubNodeCount ();
+                unsigned int uiSubSubNodesCount = pSubNode->GetChildCount ();
                 for ( unsigned int j = 0 ; j < uiSubSubNodesCount ; j++ )
                 {
-                    pSubSubNode = pSubNode->GetSubNode ( j );
+                    pSubSubNode = pSubNode->GetChild ( j );
                     if ( !pSubSubNode ) continue;
 
                     if ( pSubSubNode->GetTagName ().compare ( "object" ) == 0 )
                     {
-                        CXMLAttribute* pSubAttribute = pSubSubNode->GetAttributes ().Find ( "name" );
+                        CXMLAttribute* pSubAttribute = pSubSubNode->GetAttribute ( "name" );
                         if ( pSubAttribute )
                         {
                             const char *szAccountName = pSubAttribute->GetValue ().c_str ();
@@ -203,7 +202,7 @@ bool CAccessControlListManager::Load ( void )
                     }
                     else if ( pSubSubNode->GetTagName ().compare ( "acl" ) == 0 )
                     {
-                        CXMLAttribute* pSubAttribute = pSubSubNode->GetAttributes ().Find ( "name" );
+                        CXMLAttribute* pSubAttribute = pSubSubNode->GetAttribute ( "name" );
                         if ( pSubAttribute )
                         {
                             CAccessControlList* pACL = GetACL ( pSubAttribute->GetValue ().c_str () );
@@ -247,7 +246,7 @@ bool CAccessControlListManager::Save ( void )
     if ( m_pXML )
     {
         // Clear it
-        m_pXML->Clear ();
+        m_pXML->Reset ();
 
         // Create a root node
         CXMLNode* pNode = m_pXML->CreateRootNode ( "acl" );

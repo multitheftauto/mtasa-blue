@@ -2,140 +2,65 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/CXMLAttributeImpl.cpp
-*  PURPOSE:     XML attribute class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #include "StdInc.h"
 
-#define XML_ATTRIBUTE_VALUE_BUFFER  40
-
-CXMLAttributeImpl::CXMLAttributeImpl ( CXMLAttributesImpl& Attributes, TiXmlElement& Node, const std::string& strName ) :
-    m_ulID ( INVALID_XML_ID ),
-    m_bUsingIDs ( Attributes.IsUsingIDs () ),
-    m_Attributes ( Attributes ),
-    m_Node ( Node ),
-    m_Attribute ( *new TiXmlAttribute ( strName.c_str (), "" ) )
+CXMLAttributeImpl::CXMLAttributeImpl(pugi::xml_attribute &attribute, bool bUsingIDs) : 
+    m_ulID(INVALID_XML_ID), 
+    m_Attribute(attribute)
 {
-    // Init and link it to the node
-    m_bDeleteAttribute = true;
-    Node.AddAttribute ( m_Attribute );
-
-    // Add us to parent list, if any
-    m_Attributes.AddToList ( this );
-
-    // Add to array over XML stuff
-    if ( m_bUsingIDs )
-        m_ulID = CXMLArray::PopUniqueID ( this );
+    if (bUsingIDs)
+        m_ulID = CXMLArray::PopUniqueID(this);
 }
 
-CXMLAttributeImpl::CXMLAttributeImpl ( CXMLAttributesImpl& Attributes, TiXmlElement& Node, TiXmlAttribute& Attribute ) :
-    m_ulID ( INVALID_XML_ID ),
-    m_bUsingIDs ( Attributes.IsUsingIDs () ),
-    m_Attributes ( Attributes ),
-    m_Node ( Node ),
-    m_Attribute ( Attribute )
+CXMLAttributeImpl::~CXMLAttributeImpl()
 {
-    // Init
-    m_bDeleteAttribute = true;
-
-    // Add us to parent list, if any
-    m_Attributes.AddToList ( this );
-
-    // Add to array over XML stuff
-    if ( m_bUsingIDs )
-        m_ulID = CXMLArray::PopUniqueID ( this );
+    if (m_ulID != INVALID_XML_ID)
+        CXMLArray::PushUniqueID(this);
 }
 
-
-CXMLAttributeImpl::~CXMLAttributeImpl ( void )
+const std::string CXMLAttributeImpl::GetName() const
 {
-    // Remove from array over XML stuff
-    if ( m_bUsingIDs )
-        CXMLArray::PushUniqueID ( this );
-
-    // Delete the attribute from the node aswell if we're supposed to
-    if ( m_bDeleteAttribute )
-    {
-        m_Node.RemoveAttribute ( GetName () );
-    }
-
-    // Remove us from parent list
-    m_Attributes.RemoveFromList ( this );
+    return std::string(m_Attribute.name());
 }
 
-
-const std::string CXMLAttributeImpl::GetName ( void ) const
+const std::string CXMLAttributeImpl::GetValue() const
 {
-    return std::string ( m_Attribute.Name () );
+    return std::string(m_Attribute.value());
 }
 
-
-const std::string& CXMLAttributeImpl::GetValue ( void ) const
+void CXMLAttributeImpl::SetValue(const std::string &strValue)
 {
-    return m_Attribute.ValueStr ();
+    SetValue(strValue.c_str());
 }
 
-
-void CXMLAttributeImpl::SetValue ( const char* szValue )
+void CXMLAttributeImpl::SetValue(const char *szValue)
 {
-    m_Attribute.SetValue ( szValue );
+    m_Attribute.set_value(szValue);
 }
 
-
-void CXMLAttributeImpl::SetValue ( bool bValue )
+void CXMLAttributeImpl::SetValue(bool bValue)
 {
-    // Convert to string and set it
-    char szBuffer [2];
-    szBuffer [1] = 0;
-
-    if ( bValue )
-    {
-        szBuffer [0] = '1';
-    }
-    else
-    {
-        szBuffer [0] = '0';
-    }
-
-    SetValue ( szBuffer );
+    if(bValue)
+        SetValue("1");
+    else 
+        SetValue("0");
 }
 
-
-void CXMLAttributeImpl::SetValue ( int iValue )
+void CXMLAttributeImpl::SetValue(int iValue)
 {
-    // Convert to string and set it
-    char szBuffer [XML_ATTRIBUTE_VALUE_BUFFER];
-    snprintf ( szBuffer, XML_ATTRIBUTE_VALUE_BUFFER - 1, "%i", iValue );
-    SetValue ( szBuffer );
+    SetValue(std::to_string(iValue));
 }
 
-
-void CXMLAttributeImpl::SetValue ( unsigned int uiValue )
+void CXMLAttributeImpl::SetValue(unsigned int uiValue)
 {
-    // Convert to string and set it
-    char szBuffer [XML_ATTRIBUTE_VALUE_BUFFER];
-    snprintf ( szBuffer, XML_ATTRIBUTE_VALUE_BUFFER - 1, "%u", uiValue );
-    SetValue ( szBuffer );
+    SetValue(std::to_string(uiValue));
 }
 
-
-void CXMLAttributeImpl::SetValue ( float fValue )
+void CXMLAttributeImpl::SetValue(float fValue)
 {
-    // Convert to string and set it
-    char szBuffer [XML_ATTRIBUTE_VALUE_BUFFER];
-    snprintf ( szBuffer, XML_ATTRIBUTE_VALUE_BUFFER - 1, "%f", fValue );
-    SetValue ( szBuffer );
-}
-
-
-void CXMLAttributeImpl::DeleteWrapper ( void )
-{
-    // Delete us, but don't delete the attribute
-    m_bDeleteAttribute = false;
-    delete this;
+    SetValue(std::to_string(fValue));
 }

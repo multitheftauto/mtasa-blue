@@ -113,12 +113,12 @@ bool CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
 
     for ( uint uiIndex = 0 ; true ; uiIndex++ )
     {
-        CXMLNode* pNodeRight = pNodeAclRequest->FindSubNode ( "right", uiIndex );
+        CXMLNode* pNodeRight = pNodeAclRequest->GetChild ( "right", uiIndex );
         if ( !pNodeRight )
             break;
 
         // Find existing
-        SAclRequest request ( CAclRightName ( pNodeRight->GetAttributeValue ( "name" ) ) );
+        SAclRequest request ( CAclRightName ( pNodeRight->GetAttribute("name")->GetValue ( ) ) );
         if ( !FindAclRequest ( request ) )
         {
             // Add new request
@@ -128,7 +128,7 @@ bool CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
             request.strDate = "";
 
             // Validate request
-            if ( !request.rightName.IsValid () || !StringToBool ( pNodeRight->GetAttributeValue ( "access" ) ) )
+            if ( !request.rightName.IsValid () || !StringToBool ( pNodeRight->GetAttribute( "access" )->GetValue() ) )
             {
                 CLogger::ErrorPrintf ( "Invalid aclrequest line in %s (%s)\n", GetName ().c_str (), *request.rightName.GetFullName () );
                 return false;

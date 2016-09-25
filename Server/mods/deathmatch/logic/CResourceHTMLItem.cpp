@@ -18,7 +18,7 @@
 extern CServerInterface* g_pServerInterface;
 extern CGame* g_pGame;
 
-CResourceHTMLItem::CResourceHTMLItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes, bool bIsDefault, bool bIsRaw, bool bRestricted, bool bOOPEnabled ) : CResourceFile ( resource, szShortName, szResourceFileName, xmlAttributes )
+CResourceHTMLItem::CResourceHTMLItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, const std::list<std::unique_ptr<CXMLAttribute>>& xmlAttributes, bool bIsDefault, bool bIsRaw, bool bRestricted, bool bOOPEnabled ) : CResourceFile ( resource, szShortName, szResourceFileName, xmlAttributes )
 {
     m_bIsRaw = bIsRaw;
     m_type = RESOURCE_FILE_TYPE_HTML;

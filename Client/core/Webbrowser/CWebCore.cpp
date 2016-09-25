@@ -460,19 +460,19 @@ bool CWebCore::UpdateListsFromMaster ()
         return false;
 
     // Fetch white- and blacklist revision from config
-    CXMLNode* pWhiteRevNode = pRootNode->FindSubNode ( "whitelistrev" );
+    CXMLNode* pWhiteRevNode = pRootNode->GetChild ( "whitelistrev" );
     if ( !pWhiteRevNode || !pWhiteRevNode->GetTagContent ( m_iWhitelistRevision ) )
     {
        m_iWhitelistRevision = 0;
     }
-    CXMLNode* pBlackRevNode = pRootNode->FindSubNode ( "blacklistrev" );
+    CXMLNode* pBlackRevNode = pRootNode->GetChild ( "blacklistrev" );
     if ( !pBlackRevNode || !pBlackRevNode->GetTagContent ( m_iBlacklistRevision ) )
     {
        m_iBlacklistRevision = 0;
     }
 
     // Get last update timestamp and compare with current time
-    CXMLNode* pLastUpdateNode = pRootNode->FindSubNode ( "lastupdate" );
+    CXMLNode* pLastUpdateNode = pRootNode->GetChild ( "lastupdate" );
     if ( pLastUpdateNode )
     {
         SString lastUpdateTime = pLastUpdateNode->GetTagContent ();
@@ -518,48 +518,48 @@ bool CWebCore::MakeSureXMLNodesExist ()
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "lastupdate" ) )
+    if ( !pRootNode->GetChild ( "lastupdate" ) )
     {
-        CXMLNode* pNode = pRootNode->CreateSubNode ( "lastupdate" );
+        CXMLNode* pNode = pRootNode->CreateChild ( "lastupdate" );
         if ( !pNode )
             return false;
 
         pNode->SetTagContent ( 0 );
     }
 
-    if ( !pRootNode->FindSubNode ( "whitelistrev" ) )
+    if ( !pRootNode->GetChild ( "whitelistrev" ) )
     {
-        if ( !pRootNode->CreateSubNode ( "whitelistrev" ) )
+        if ( !pRootNode->CreateChild ( "whitelistrev" ) )
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "blacklistrev" ) )
+    if ( !pRootNode->GetChild ( "blacklistrev" ) )
     {
-        if ( !pRootNode->CreateSubNode ( "blacklistrev" ) )
+        if ( !pRootNode->CreateChild ( "blacklistrev" ) )
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "globalwhitelist" ) )
+    if ( !pRootNode->GetChild ( "globalwhitelist" ) )
     {
-        if ( !pRootNode->CreateSubNode ( "globalwhitelist" ) )
+        if ( !pRootNode->CreateChild ( "globalwhitelist" ) )
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "globalblacklist" ) )
+    if ( !pRootNode->GetChild ( "globalblacklist" ) )
     {
-        if ( !pRootNode->CreateSubNode ( "globalblacklist" ) )
+        if ( !pRootNode->CreateChild ( "globalblacklist" ) )
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "customblacklist" ) )
+    if ( !pRootNode->GetChild ( "customblacklist" ) )
     {
-        if ( !pRootNode->CreateSubNode ( "customblacklist" ) )
+        if ( !pRootNode->CreateChild ( "customblacklist" ) )
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "customwhitelist" ) )
+    if ( !pRootNode->GetChild ( "customwhitelist" ) )
     {
-        if ( !pRootNode->CreateSubNode ( "customwhitelist" ) )
+        if ( !pRootNode->CreateChild ( "customwhitelist" ) )
             return false;
     }
 
@@ -577,7 +577,7 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
 
     if ( bWhitelist )
     {
-        CXMLNode* pWhiteSubNode = pRootNode->FindSubNode ( "globalwhitelist" );
+        CXMLNode* pWhiteSubNode = pRootNode->GetChild ( "globalwhitelist" );
         if ( pWhiteSubNode )
         {
             for ( auto& pChild : pWhiteSubNode->GetChildren() )
@@ -589,7 +589,7 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
     
     if ( bBlacklist )
     {
-        CXMLNode* pBlackSubNode = pRootNode->FindSubNode ( "globalblacklist" );
+        CXMLNode* pBlackSubNode = pRootNode->GetChild ( "globalblacklist" );
         if ( pBlackSubNode )
         {
             for (auto& pChild : pBlackSubNode->GetChildren())
@@ -601,7 +601,7 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
 
     if ( bCustomLists )
     {
-        CXMLNode* pBlackSubNode = pRootNode->FindSubNode ( "customblacklist" );
+        CXMLNode* pBlackSubNode = pRootNode->GetChild ( "customblacklist" );
         if ( pBlackSubNode )
         {
             for (auto& pChild : pBlackSubNode->GetChildren())
@@ -609,7 +609,7 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
                 AddBlockedPage (pChild->GetTagContent (), eWebFilterType::WEBFILTER_USER );
             }
         }
-        CXMLNode* pWhiteSubNode = pRootNode->FindSubNode ( "customwhitelist" );
+        CXMLNode* pWhiteSubNode = pRootNode->GetChild ( "customwhitelist" );
         if ( pWhiteSubNode )
         {
             for (auto& pChild : pWhiteSubNode->GetChildren())
@@ -629,14 +629,14 @@ void CWebCore::WriteCustomList ( const SString& strListName, const std::vector<S
     if ( !pRootNode )
         return;
 
-    CXMLNode* pCustomListNode = pRootNode->FindSubNode ( strListName );
+    CXMLNode* pCustomListNode = pRootNode->GetChild ( strListName );
     if ( !pCustomListNode )
         return;
 
-    pCustomListNode->DeleteAllSubNodes();
+    pCustomListNode->RemoveAllChildren();
     for ( std::vector<SString>::const_iterator iter = customList.begin (); iter != customList.end (); ++iter )
     {
-        CXMLNode* pNode = pCustomListNode->CreateSubNode ( "url" );
+        CXMLNode* pNode = pCustomListNode->CreateChild ( "url" );
         if ( pNode )
             pNode->SetTagContent ( *iter );
     }
@@ -713,19 +713,19 @@ void CWebCore::StaticFetchWhitelistFinished ( char* pCompletedData, size_t compl
     std::vector<SString> whitelist;
     SString strData = pCompletedData;
     strData.Split ( ";", whitelist );
-    CXMLNode* pListNode = pRootNode->FindSubNode ( "globalwhitelist" );
+    CXMLNode* pListNode = pRootNode->GetChild ( "globalwhitelist" );
     if ( !pListNode )
         return;
-    pListNode->DeleteAllSubNodes ();
+    pListNode->RemoveAllChildren();
 
     for ( std::vector<SString>::const_iterator iter = whitelist.begin (); iter != whitelist.end (); ++iter )
     {
-        CXMLNode* pNode = pListNode->CreateSubNode ( "url" );
+        CXMLNode* pNode = pListNode->CreateChild ( "url" );
         pNode->SetTagContent ( *iter );
     }
 
     // Set whitelist revision
-    CXMLNode* pNode = pRootNode->FindSubNode ( "whitelistrev" );
+    CXMLNode* pNode = pRootNode->GetChild ( "whitelistrev" );
     if ( !pNode )
         return;
     pNode->SetTagContent ( pWebCore->m_iWhitelistRevision );
@@ -756,19 +756,19 @@ void CWebCore::StaticFetchBlacklistFinished ( char* pCompletedData, size_t compl
     std::vector<SString> blacklist;
     SString strData = pCompletedData;
     strData.Split ( ";", blacklist );
-    CXMLNode* pListNode = pRootNode->FindSubNode ( "globalblacklist" );
+    CXMLNode* pListNode = pRootNode->GetChild ( "globalblacklist" );
     if ( !pListNode )
         return;
-    pListNode->DeleteAllSubNodes ();
+    pListNode->RemoveAllChildren();
 
     for ( std::vector<SString>::const_iterator iter = blacklist.begin (); iter != blacklist.end (); ++iter )
     {
-        CXMLNode* pNode = pListNode->CreateSubNode ( "url" );
+        CXMLNode* pNode = pListNode->CreateChild ( "url" );
         pNode->SetTagContent ( *iter );
     }
 
     // Set blacklist revision
-    CXMLNode* pNode = pRootNode->FindSubNode ( "blacklistrev" );
+    CXMLNode* pNode = pRootNode->GetChild ( "blacklistrev" );
     if ( !pNode )
         return;
     pNode->SetTagContent ( pWebCore->m_iBlacklistRevision );

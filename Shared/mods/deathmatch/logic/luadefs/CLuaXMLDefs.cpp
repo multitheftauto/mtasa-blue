@@ -261,39 +261,12 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
                         // Make sure the dir exists so we can successfully make the file
                         MakeSureDirExists ( strPath );
 
-                        // Grab the roots tag name
-                        std::string strRootTagName;
-                        strRootTagName = pSourceNode->GetTagName ();
-
-                        // Create the new XML file and its root node
-                        CXMLFile* pNewXML = pLUA->CreateXML ( strPath.c_str () );
+                        // Clone XML 
+                        CXMLFile* pNewXML = pLUA->CopyXML(strFile.c_str(), pSourceNode);
                         if ( pNewXML )
                         {
-                            // Grab the root of the new XML
-                            CXMLNode* pNewRoot = pNewXML->CreateRootNode ( strRootTagName );
-                            if ( pNewRoot )
-                            {
-                                // Copy over the attributes from the root
-                                int iAttributeCount = pSourceNode->GetAttributes ().Count ();
-                                int i = 0;
-                                CXMLAttribute* pAttribute;
-                                for ( ; i < iAttributeCount; i++ )
-                                {
-                                    pAttribute = pSourceNode->GetAttributes ().Get ( i );
-                                    if ( pAttribute )
-                                        pNewRoot->GetAttributes ().Create ( *pAttribute );
-                                }
-
-                                // Copy the stuff from the given source node to the destination root
-                                if ( pSourceNode->CopyChildrenInto ( pNewRoot, true ) )
-                                {
-                                    lua_pushxmlnode ( luaVM, pNewRoot );
-                                    return 1;
-                                }
-                            }
-
-                            // Delete the XML again
-                            pLUA->DestroyXML ( pNewXML );
+                            lua_pushxmlnode(luaVM, pNewXML->GetRootNode());
+                            return 1;
                         }
                     }
                     else
@@ -374,7 +347,7 @@ int CLuaXMLDefs::xmlCreateChild ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CXMLNode* pXMLSubNode = pNode->CreateSubNode ( strChildName );
+        CXMLNode* pXMLSubNode = pNode->CreateChild ( strChildName );
         if ( pXMLSubNode )
         {
             lua_pushxmlnode ( luaVM, pXMLSubNode );
@@ -402,7 +375,7 @@ int CLuaXMLDefs::xmlDestroyNode ( lua_State* luaVM )
         if ( pParent )
         {
             // Delete it
-            pParent->DeleteSubNode ( pNode );
+            pParent->RemoveChild ( pNode );
 
             // Return success
             lua_pushboolean ( luaVM, true );
@@ -429,7 +402,7 @@ int CLuaXMLDefs::xmlNodeFindChild ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CXMLNode * pFoundNode = pNode->FindSubNode ( strTagName, uiIndex );
+        CXMLNode * pFoundNode = pNode->GetChild ( strTagName, uiIndex );
         if ( pFoundNode )
         {
             lua_pushxmlnode ( luaVM, pFoundNode );
@@ -457,7 +430,7 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
         bool bGetAllChildren = uiIndex == -1;
         if ( !bGetAllChildren )
         {
-            CXMLNode* pFoundNode = pNode->GetSubNode ( uiIndex );
+            CXMLNode* pFoundNode = pNode->GetChild ( uiIndex );
             if ( pFoundNode )
             {
                 lua_pushxmlnode ( luaVM, pFoundNode );
@@ -471,7 +444,7 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
             for (auto& pChild : pNode->GetChildren () )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
-                lua_pushxmlnode ( luaVM, pChild );
+                lua_pushxmlnode ( luaVM, pChild.get() );
                 lua_settable ( luaVM, -3 );
             }
             return 1;
@@ -534,10 +507,10 @@ int CLuaXMLDefs::xmlNodeGetAttributes ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         lua_newtable ( luaVM );
-        for (auto iter = pNode->GetAttributes ().ListBegin (); iter != pNode->GetAttributes ().ListEnd (); ++iter )
+        for (auto& pAttribute : pNode->GetAttributes ())
         {
-            lua_pushstring ( luaVM, ( *iter )->GetName ().c_str () );
-            lua_pushstring ( luaVM, ( *iter )->GetValue ().c_str () );
+            lua_pushstring ( luaVM, std::string(pAttribute->GetName ()).c_str () );
+            lua_pushstring ( luaVM, std::string(pAttribute->GetValue ()).c_str () );
             lua_settable ( luaVM, -3 );
         }
         return 1;
@@ -560,7 +533,7 @@ int CLuaXMLDefs::xmlNodeGetAttribute ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Find the attribute with that name
-        CXMLAttribute * pAttribute = pNode->GetAttributes ().Find ( strAttributeName );
+        CXMLAttribute * pAttribute = pNode->GetAttribute ( strAttributeName );
         if ( pAttribute )
         {
             // Read the attribute and return the string
@@ -634,7 +607,7 @@ int CLuaXMLDefs::xmlNodeSetAttribute ( lua_State* luaVM )
         if ( argStream.NextCouldBeString ( -1 ) )
         {
             // Write the node
-            CXMLAttribute* pAttribute = pNode->GetAttributes ().Create ( strAttributeName );
+            CXMLAttribute* pAttribute = pNode->AddAttribute ( strAttributeName );
             if ( pAttribute )
             {
                 pAttribute->SetValue ( strAttributeValue );
@@ -646,7 +619,7 @@ int CLuaXMLDefs::xmlNodeSetAttribute ( lua_State* luaVM )
         else
         {
             // Delete the attribute if it exists
-            CXMLAttribute* pAttribute = pNode->GetAttributes ().Find ( strAttributeName );
+            CXMLAttribute* pAttribute = pNode->GetAttribute ( strAttributeName );
             if ( pAttribute )
             {
                 delete pAttribute;

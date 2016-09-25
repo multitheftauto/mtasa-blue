@@ -137,19 +137,19 @@ CXMLNode * CCustomData::OutputToXML ( CXMLNode * pNode )
         {
         case LUA_TSTRING:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create( iter->first.c_str () );
+                CXMLAttribute* attr = pNode->AddAttribute( iter->first.c_str () );
                 attr->SetValue ( arg->GetString ().c_str () );
                 break;
             }
         case LUA_TNUMBER:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create( iter->first.c_str () );
+                CXMLAttribute* attr = pNode->AddAttribute( iter->first.c_str () );
                 attr->SetValue ( (float)arg->GetNumber () );
                 break;
             }
         case LUA_TBOOLEAN:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create( iter->first.c_str () );
+                CXMLAttribute* attr = pNode->AddAttribute( iter->first.c_str () );
                 attr->SetValue ( arg->GetBoolean () );
                 break;
             }

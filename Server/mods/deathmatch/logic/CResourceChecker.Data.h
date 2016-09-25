@@ -376,7 +376,7 @@ namespace
         { false, "showPlayerHudComponent",         "setPlayerHudComponentVisible"},
         // XML
         { false, "xmlNodeGetSubNodes",             "xmlNodeGetChildren" },
-        { false, "xmlCreateSubNode",               "xmlCreateChild" },
+        { false, "xmlCreateChild",               "xmlCreateChild" },
         { false, "xmlFindSubNode",                 "xmlFindChild" },
         // Frozen
         { false, "isPedFrozen",                    "isElementFrozen" },

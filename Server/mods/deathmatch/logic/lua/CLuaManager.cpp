@@ -385,7 +385,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getPedSkin", CLuaElementDefs::getElementModel );
     CLuaCFunctions::AddFunction ( "setPedSkin", CLuaElementDefs::setElementModel );
     CLuaCFunctions::AddFunction ( "xmlNodeGetSubNodes", CLuaXMLDefs::xmlNodeGetChildren );
-    CLuaCFunctions::AddFunction ( "xmlCreateSubNode", CLuaXMLDefs::xmlCreateChild );
+    CLuaCFunctions::AddFunction ( "xmlCreateChild", CLuaXMLDefs::xmlCreateChild );
     CLuaCFunctions::AddFunction ( "xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild );
     CLuaCFunctions::AddFunction ( "attachElementToElement", CLuaElementDefs::attachElements );
     CLuaCFunctions::AddFunction ( "detachElementFromElement", CLuaElementDefs::detachElements );

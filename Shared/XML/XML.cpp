@@ -12,15 +12,12 @@
 
 #include "StdInc.h"
 
-CXMLImpl* pXMLInterface = NULL;
+CXMLImpl *pXMLInterface = NULL;
 
-_DECLSPEC_EX CXML* InitXMLInterface( const char* szSaveFlagDirectory )
+_DECLSPEC_EX CXML *InitXMLInterface(const char *szSaveFlagDirectory)
 {
     // Initialize and do any file recovery as necessary
-    CXMLFileImpl::InitFileRecovery( szSaveFlagDirectory );
-
-    // this is required during parsing, see resources project fallout/help.xml @r659
-    TiXmlBase::SetCondenseWhiteSpace(false);
+    //    CXMLFileImpl::InitFileRecovery( szSaveFlagDirectory );
 
     pXMLInterface = new CXMLImpl;
     return pXMLInterface;
@@ -28,7 +25,7 @@ _DECLSPEC_EX CXML* InitXMLInterface( const char* szSaveFlagDirectory )
 
 _DECLSPEC_EX void ReleaseXMLInterface()
 {
-    if ( pXMLInterface )
+    if (pXMLInterface)
     {
         delete pXMLInterface;
         pXMLInterface = NULL;
@@ -36,13 +33,14 @@ _DECLSPEC_EX void ReleaseXMLInterface()
 }
 
 #ifdef WIN32
+#include <Windows.h>
 
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
     // Kill the interface on detach
     if (dwReason == DLL_PROCESS_DETACH)
     {
-        ReleaseXMLInterface ();
+        ReleaseXMLInterface();
     }
 
     return TRUE;
@@ -50,7 +48,6 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
 #else
 
-void __attribute__ ((destructor)) ReleaseXMLInterface(void);
+void __attribute__((destructor)) ReleaseXMLInterface(void);
 
 #endif
-

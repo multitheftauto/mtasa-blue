@@ -9,97 +9,71 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #include "StdInc.h"
-#define ALLOC_STATS_MODULE_NAME "xml"
-#include <sys/stat.h>
-#ifndef MAX_PATH
-#define MAX_PATH 260
-#endif
-#include "SharedUtil.hpp"
 
-CXMLImpl::CXMLImpl ( void )
+CXMLImpl::CXMLImpl(void)
 {
     // Init array stuff
-    CXMLArray::Initialize ();
+    CXMLArray::Initialize();
 }
 
-
-CXMLImpl::~CXMLImpl ( void )
+CXMLFile *CXMLImpl::CreateXML(const std::string& strFilename, bool bUseIDs)
 {
-
+    return new CXMLFileImpl(strFilename, bUseIDs);
 }
 
+void CXMLImpl::DeleteXML(CXMLFile *pFile) 
+{ 
+    delete pFile; 
+}
 
-CXMLFile* CXMLImpl::CreateXML ( const char* szFilename, bool bUseIDs )
+CXMLFile *CXMLImpl::CopyXML(const std::string& strFilename, CXMLNode *pNode)
 {
-    CXMLFile* xmlFile = new CXMLFileImpl ( szFilename, bUseIDs );
-    if ( xmlFile->IsValid( ) )
-        return xmlFile;
-    else
-    {
-        delete xmlFile;
-        return NULL;
-    }
+    return new CXMLFileImpl(strFilename, pNode);
 }
 
-
-void CXMLImpl::DeleteXML ( CXMLFile* pFile )
+CXMLNode *CXMLImpl::CreateDummyNode()
 {
-    delete pFile;
+    pugi::xml_node node;
+    node.set_name("dummy_storage");
+    return new CXMLNodeImpl(node, false);
 }
 
-
-CXMLNode* CXMLImpl::CreateDummyNode ( void )
-{
-    CXMLNode* xmlNode = new CXMLNodeImpl ( NULL, NULL, *new TiXmlElement ( "dummy_storage" ) );
-    if ( xmlNode->IsValid( ) )
-        return xmlNode;
-    else
-    {
-        delete xmlNode;
-        return NULL;
-    }
-}
-
-
-CXMLAttribute* CXMLImpl::GetAttrFromID ( unsigned long ulID )
+CXMLAttribute *CXMLImpl::GetAttrFromID(unsigned long ulID)
 {
     // Grab it and verify the type
-    CXMLCommon* pCommon = CXMLArray::GetEntry ( ulID );
-    if ( pCommon && pCommon->GetClassType () == CXML_ATTR )
+    CXMLCommon *pCommon = CXMLArray::GetEntry(ulID);
+    if (pCommon && pCommon->GetClassType() == CXML_ATTR)
     {
-        return reinterpret_cast < CXMLAttribute* > ( pCommon );
+        return reinterpret_cast<CXMLAttribute *>(pCommon);
     }
 
     // Doesn't exist or bad type
-    return NULL;
+    return nullptr;
 }
 
-
-CXMLFile* CXMLImpl::GetFileFromID ( unsigned long ulID )
+CXMLFile *CXMLImpl::GetFileFromID(unsigned long ulID)
 {
     // Grab it and verify the type
-    CXMLCommon* pCommon = CXMLArray::GetEntry ( ulID );
-    if ( pCommon && pCommon->GetClassType () == CXML_FILE )
+    CXMLCommon *pCommon = CXMLArray::GetEntry(ulID);
+    if (pCommon && pCommon->GetClassType() == CXML_FILE)
     {
-        return reinterpret_cast < CXMLFile* > ( pCommon );
+        return reinterpret_cast<CXMLFile *>(pCommon);
     }
 
     // Doesn't exist or bad type
-    return NULL;
+    return nullptr;
 }
 
-
-CXMLNode* CXMLImpl::GetNodeFromID ( unsigned long ulID )
+CXMLNode *CXMLImpl::GetNodeFromID(unsigned long ulID)
 {
     // Grab it and verify the type
-    CXMLCommon* pCommon = CXMLArray::GetEntry ( ulID );
-    if ( pCommon && pCommon->GetClassType () == CXML_NODE )
+    CXMLCommon *pCommon = CXMLArray::GetEntry(ulID);
+    if (pCommon && pCommon->GetClassType() == CXML_NODE)
     {
-        return reinterpret_cast < CXMLNode* > ( pCommon );
+        return reinterpret_cast<CXMLNode *>(pCommon);
     }
 
     // Doesn't exist or bad type
-    return NULL;
+    return nullptr;
 }

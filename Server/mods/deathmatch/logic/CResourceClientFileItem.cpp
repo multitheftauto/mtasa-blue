@@ -17,7 +17,7 @@
 
 extern CGame* g_pGame;
 
-CResourceClientFileItem::CResourceClientFileItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes, bool bClientAutoDownload ) : CResourceFile ( resource, szShortName, szResourceFileName, xmlAttributes )
+CResourceClientFileItem::CResourceClientFileItem ( CResource * resource, const char * szShortName, const char * szResourceFileName, const std::list<std::unique_ptr<CXMLAttribute>>& xmlAttributes, bool bClientAutoDownload ) : CResourceFile ( resource, szShortName, szResourceFileName, xmlAttributes )
 {
     m_type = RESOURCE_FILE_TYPE_CLIENT_FILE;
     m_bClientAutoDownload = bClientAutoDownload;

@@ -20,7 +20,7 @@ class CResourceScriptItem : public CResourceFile
     
 public:
 
-                                        CResourceScriptItem             ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes );
+                                        CResourceScriptItem             ( class CResource * resource, const char * szShortName, const char * szResourceFileName, const std::list<std::unique_ptr<CXMLAttribute>>& xmlAttributes );
                                         ~CResourceScriptItem            ( void );
 
     bool                                Start                           ( void );

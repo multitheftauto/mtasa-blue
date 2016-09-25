@@ -32,7 +32,6 @@
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
-#include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
 #include <net/CNet.h>
 #include <net/packetenums.h>

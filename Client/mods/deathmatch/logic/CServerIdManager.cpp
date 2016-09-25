@@ -152,14 +152,14 @@ bool CServerIdManagerImpl::LoadServerIdMap ( void )
     m_ServerIdMap.clear ();
 
     // Read each node
-    for ( uint i = 0 ; i < pRoot->GetSubNodeCount () ; i++ )
+    for ( uint i = 0 ; i < pRoot->GetChildCount () ; i++ )
     {
-        CXMLNode* pSubNode = pRoot->GetSubNode ( i );
+        CXMLNode* pSubNode = pRoot->GetChild ( i );
 
         CServerIdKey key;
         CServerIdInfo info;
         key.strId = pSubNode->GetTagContent ();
-        if ( CXMLAttribute* pAttribute = pSubNode->GetAttributes().Find ( "dir" ) )
+        if ( CXMLAttribute* pAttribute = pSubNode->GetAttribute ( "dir" ) )
             info.strDir = pAttribute->GetValue ();
 
         if ( !info.strDir.empty () )
@@ -253,9 +253,9 @@ void CServerIdManagerImpl::StaticSaveServerIdMap ( void )
         const SString& strId = it->first.strId;
         const SString& strDir = it->second.strDir;
 
-        CXMLNode* pSubNode = pRoot->CreateSubNode ( "id" );
+        CXMLNode* pSubNode = pRoot->CreateChild ( "id" );
         pSubNode->SetTagContent ( strId );
-        pSubNode->GetAttributes().Create ( "dir" )->SetValue ( strDir );
+        pSubNode->AddAttribute( "dir" )->SetValue ( strDir );
     }
 
     pConfigFile->Write ();

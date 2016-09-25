@@ -80,6 +80,7 @@ public:
     inline CMapManager*             GetMapManager           ( void ) const                  { return m_pMapManager; };
     
     CXMLFile *                      CreateXML               ( const char* szFilename );
+    CXMLFile *                      CopyXML                 ( const char* szFilename, CXMLNode* pNode );
     void                            DestroyXML              ( CXMLFile* pFile );
     void                            DestroyXML              ( CXMLNode* pRootNode );
     void                            SaveXML                 ( CXMLNode * pRootNode );

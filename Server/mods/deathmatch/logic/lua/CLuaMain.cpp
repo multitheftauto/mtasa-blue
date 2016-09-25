@@ -431,6 +431,21 @@ CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
     return pFile;
 }
 
+CXMLFile * CLuaMain::CopyXML(const char * szFilename, CXMLNode * pNode)
+{
+    CXMLFile * pFile = g_pServerInterface->GetXML()->CopyXML(szFilename, pNode);
+    if (pFile)
+    {
+        m_XMLFiles.push_back(pFile);
+        if (m_XMLFiles.size() >= m_uiOpenXMLFileCountWarnThresh)
+        {
+            m_uiOpenXMLFileCountWarnThresh = m_XMLFiles.size() * 2;
+            CLogger::LogPrintf("Notice: There are now %d open XML files in resource '%s'\n", m_XMLFiles.size(), GetScriptName());
+        }
+    }
+    return pFile;
+}
+
 
 void CLuaMain::DestroyXML ( CXMLFile * pFile )
 {

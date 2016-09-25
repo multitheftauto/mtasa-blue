@@ -20,7 +20,7 @@ class CResourceClientFileItem : public CResourceFile
     
 public:
 
-                                        CResourceClientFileItem         ( class CResource * resource, const char * szShortName, const char * szResourceFileName, CXMLAttributes * xmlAttributes, bool bClientAutoDownload = true );
+                                        CResourceClientFileItem         ( class CResource * resource, const char * szShortName, const char * szResourceFileName, const std::list<std::unique_ptr<CXMLAttribute>>& xmlAttributes, bool bClientAutoDownload = true );
                                         ~CResourceClientFileItem        ( void );
 
     bool                                Start                           ( void );

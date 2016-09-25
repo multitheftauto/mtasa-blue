@@ -364,6 +364,17 @@ CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
     return pFile;
 }
 
+CXMLFile * CLuaMain::CopyXML(const char * szFilename, CXMLNode * pNode)
+{
+    CXMLFile * pFile = g_pCore->GetXML()->CopyXML(szFilename, pNode);
+    if (pFile)
+    {
+        m_XMLFiles.push_back(pFile);
+    }
+    return pFile;
+}
+
+
 void CLuaMain::DestroyXML ( CXMLFile * pFile )
 {
     if ( !m_XMLFiles.empty() ) m_XMLFiles.remove ( pFile );

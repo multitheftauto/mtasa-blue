@@ -1239,14 +1239,14 @@ CXMLNode* CJoystickManager::GetConfigNode ( bool bCreateIfRequired )
         return NULL;
 
     // Get the top joypad config node
-    CXMLNode* pSectionNode = pRoot->FindSubNode ( CONFIG_NODE_JOYPAD );
+    CXMLNode* pSectionNode = pRoot->GetChild ( CONFIG_NODE_JOYPAD );
     if ( !pSectionNode )
     {
         if ( !bCreateIfRequired )
             return NULL;
 
         // Non-existant, create a new node
-        pSectionNode = pRoot->CreateSubNode ( CONFIG_NODE_JOYPAD );
+        pSectionNode = pRoot->CreateChild ( CONFIG_NODE_JOYPAD );
     }
 
     // Get the node for this joystick's GUID
@@ -1255,16 +1255,16 @@ CXMLNode* CJoystickManager::GetConfigNode ( bool bCreateIfRequired )
     // Find existing node
     for( int i=0; true; i++ )
     {
-        CXMLNode* pNode = pSectionNode->FindSubNode ( "product", i );
+        CXMLNode* pNode = pSectionNode->GetChild ( "product", i );
 
         if ( !pNode )
             break;
 
-        CXMLAttributes* pAttributes = &pNode->GetAttributes ();
+        CXMLAttribute* pAttribute = pNode->GetAttribute ("guid");
 
-        if ( CXMLAttribute* pA = pAttributes->Find ( "guid" ) )
+        if ( pAttribute )
         {
-            string value = pA->GetValue ();
+            std::string value = pAttribute->GetValue ();
             if ( value == m_DevInfo.strGuid )
             {
                 pItemNode = pNode;
@@ -1279,15 +1279,11 @@ CXMLNode* CJoystickManager::GetConfigNode ( bool bCreateIfRequired )
             return NULL;
 
         // Non-existant, create a new node
-        pItemNode = pSectionNode->CreateSubNode ( "product" );
+        pItemNode = pSectionNode->CreateChild ( "product" );
 
         if ( pItemNode )
         {
-            CXMLAttributes* pAttributes = &pItemNode->GetAttributes ();
-
-            CXMLAttribute* pA = NULL;
-            pA = pAttributes->Create ( "guid" );
-            pA->SetValue ( m_DevInfo.strGuid.c_str () );
+            pItemNode->AddAttribute("guid")->SetValue(m_DevInfo.strGuid);
         }
 
     }
@@ -1402,20 +1398,18 @@ bool CJoystickManager::LoadFromXML ( void )
 
     {
         // Find the 'info' node
-        CXMLNode* pNode = pMainNode->FindSubNode ( "info" );
+        CXMLNode* pNode = pMainNode->GetChild ( "info" );
 
         // If it was found
         if ( pNode )
         {
-            CXMLAttributes* pAttributes = &pNode->GetAttributes ();
-
             CXMLAttribute* pA = NULL;
-            if ( pA = pAttributes->Find( "deadzone" ) )
+            if ( pA = pNode->GetAttribute( "deadzone" ) )
                 m_DevInfo.iDeadZone = Clamp ( 0, atoi ( pA->GetValue ().c_str () ), 49 );
             else
                 iErrors++;
 
-            if ( pA = pAttributes->Find( "saturation" ) )
+            if ( pA = pNode->GetAttribute( "saturation" ) )
                 m_DevInfo.iSaturation = Clamp ( 51, atoi ( pA->GetValue ().c_str () ), 100 );
             else
                 iErrors++;
@@ -1431,40 +1425,38 @@ bool CJoystickManager::LoadFromXML ( void )
         SMappingLine& line = m_currentMapping[i];
 
         // Find the 'axis' node
-        CXMLNode* pNode = pMainNode->FindSubNode( "axis", i );
+        CXMLNode* pNode = pMainNode->GetChild( "axis", i );
 
         // If it was found
         if ( pNode )
         {
-            CXMLAttributes* pAttributes = &pNode->GetAttributes ();
-
-            CXMLAttribute* pA = NULL;
-            if ( pA = pAttributes->Find( "source_index" ) )
+            CXMLAttribute* pA = nullptr;
+            if ( pA = pNode->GetAttribute( "source_index" ) )
                 line.SourceAxisIndex = (eJoy)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eJoyMax );
             else
                 iErrors++;
 
-            if ( pA = pAttributes->Find( "source_dir" ) )
+            if ( pA = pNode->GetAttribute( "source_dir" ) )
                 line.SourceAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
             else
                 iErrors++;
 
-            if ( pA = pAttributes->Find( "output_index" ) )
+            if ( pA = pNode->GetAttribute( "output_index" ) )
                 line.OutputAxisIndex = (eStick)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eStickMax );
             else
                 iErrors++;
 
-            if ( pA = pAttributes->Find( "output_dir" ) )
+            if ( pA = pNode->GetAttribute( "output_dir" ) )
                 line.OutputAxisDir = (eDir)Clamp < int > ( 0, atoi ( pA->GetValue ().c_str () ), eDirMax );
             else
                 iErrors++;
 
-            if ( pA = pAttributes->Find( "enabled" ) )
+            if ( pA = pNode->GetAttribute( "enabled" ) )
                 line.bEnabled = atoi ( pA->GetValue ().c_str () ) ? true : false;
             else
                 iErrors++;
 
-            if ( pA = pAttributes->Find( "max_value" ) )
+            if ( pA = pNode->GetAttribute( "max_value" ) )
                 line.MaxValue = atoi ( pA->GetValue ().c_str () );
             else
                 iErrors++;
@@ -1503,26 +1495,18 @@ bool CJoystickManager::SaveToXML ( void )
     if ( pMainNode )
     {
         // Clear our current bind nodes
-        pMainNode->DeleteAllSubNodes ();
+        pMainNode->RemoveAllChildren ();
 
         {
             // Create a new 'info' node
-            CXMLNode* pNode = pMainNode->CreateSubNode ( "info" );
+            CXMLNode* pNode = pMainNode->CreateChild ( "info" );
 
             // If it was created
             if ( pNode )
             {
-                CXMLAttributes* pAttributes = &pNode->GetAttributes ();
-
-                CXMLAttribute* pA = NULL;
-                pA = pAttributes->Create ( "deadzone" );
-                pA->SetValue ( m_DevInfo.iDeadZone );
-
-                pA = pAttributes->Create ( "saturation" );
-                pA->SetValue ( m_DevInfo.iSaturation );
-
-                pA = pAttributes->Create ( "product_name" );
-                pA->SetValue ( m_DevInfo.strProductName.c_str () );
+                pNode->AddAttribute ( "deadzone" )->SetValue ( m_DevInfo.iDeadZone );
+                pNode->AddAttribute ( "saturation" )->SetValue ( m_DevInfo.iSaturation );
+                pNode->AddAttribute ( "product_name" )->SetValue ( m_DevInfo.strProductName.c_str () );
             }
         }
 
@@ -1532,32 +1516,17 @@ bool CJoystickManager::SaveToXML ( void )
             const SMappingLine& line = m_currentMapping[i];
 
             // Create the new 'axis' node
-            CXMLNode* pNode = pMainNode->CreateSubNode ( "axis" );
+            CXMLNode* pNode = pMainNode->CreateChild ( "axis" );
 
             // If it was created
-            if ( pNode )
+            if (pNode)
             {
-                CXMLAttributes* pAttributes = &pNode->GetAttributes ();
-
-                CXMLAttribute* pA = NULL;
-                pA = pAttributes->Create ( "source_index" );
-                pA->SetValue ( line.SourceAxisIndex );
-
-                pA = pAttributes->Create ( "source_dir" );
-                pA->SetValue ( line.SourceAxisDir );
-
-                pA = pAttributes->Create ( "output_index" );
-                pA->SetValue ( line.OutputAxisIndex );
-
-                pA = pAttributes->Create ( "output_dir" );
-                pA->SetValue ( line.OutputAxisDir );
-
-                pA = pAttributes->Create ( "enabled" );
-                pA->SetValue ( line.bEnabled );
-
-                pA = pAttributes->Create ( "max_value" );
-                pA->SetValue ( line.MaxValue );
-
+                pNode->AddAttribute("source_index")->SetValue(line.SourceAxisIndex);
+                pNode->AddAttribute("source_dir")->SetValue(line.SourceAxisDir);
+                pNode->AddAttribute("output_index")->SetValue(line.OutputAxisIndex);
+                pNode->AddAttribute("output_dir")->SetValue(line.OutputAxisDir);
+                pNode->AddAttribute("enabled")->SetValue(line.bEnabled);
+                pNode->AddAttribute("max_value")->SetValue(line.MaxValue);
             }
         }
         return true;

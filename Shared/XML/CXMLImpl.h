@@ -2,33 +2,26 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/CXMLImpl.h
-*  PURPOSE:     XML handler class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
-#ifndef __CXMLIMPL_H
-#define __CXMLIMPL_H
+#pragma once
 
 #include <xml/CXML.h>
 
 class CXMLImpl : public CXML
 {
 public:
-                        CXMLImpl            ( void );
-    virtual             ~CXMLImpl           ( void );
+    CXMLImpl();
+    
+    CXMLFile *      CreateXML(const std::string& strFilename, bool bUseIDs) override;
+    void            DeleteXML(CXMLFile *pFile) override;
+    CXMLFile *      CopyXML  (const std::string& strFilename, CXMLNode *pNode) override;
 
-    CXMLFile*           CreateXML           ( const char* szFilename, bool bUseIDs );
-    void                DeleteXML           ( CXMLFile* pFile );
+    CXMLNode *      CreateDummyNode() override;
 
-    CXMLNode*           CreateDummyNode     ( void );
-
-    CXMLAttribute*      GetAttrFromID       ( unsigned long ulID );
-    CXMLFile*           GetFileFromID       ( unsigned long ulID );
-    CXMLNode*           GetNodeFromID       ( unsigned long ulID );
+    CXMLAttribute * GetAttrFromID(unsigned long ulID) override;
+    CXMLFile *      GetFileFromID(unsigned long ulID) override;
+    CXMLNode *      GetNodeFromID(unsigned long ulID) override;
 };
-
-#endif
