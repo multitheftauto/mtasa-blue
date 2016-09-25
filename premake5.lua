@@ -21,7 +21,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 	
-	flags { "C++11", "Symbols" }
+	flags { "C++14", "Symbols" }
 	characterset "MBCS"
 	pic "On"
 	
