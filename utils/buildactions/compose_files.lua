@@ -32,6 +32,8 @@ newaction {
 			os.copydir(BIN_DIR, OUTPUT_DIR, "**.exe")
 			os.copydir(BIN_DIR, OUTPUT_DIR, "**.dll")
 			os.copydir(BIN_DIR, OUTPUT_DIR, "**.pak")
+			os.copydir(BIN_DIR, OUTPUT_DIR, "**.bin")
+			os.copydir(BIN_DIR, OUTPUT_DIR, "**.dat")
 		else
 			os.copydir(BIN_DIR, OUTPUT_DIR, "**.so")
 			os.copydir(BIN_DIR, OUTPUT_DIR, "**mta-server*")
