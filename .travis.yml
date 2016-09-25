@@ -25,7 +25,7 @@ after_success:
   - ./premake5 install_data
   - ./premake5 compose_files
   - zip -r Artifact.zip InstallFiles/
-  - curl -i -F "branch_name=$TRAVIS_BRANCH" -F "commit_hash=$TRAVIS_COMMIT" -F "commit_title=$(git log -1 --pretty=%B)" -F build_type=linux64 -F "secret=$UPLOAD_SECRET" -F build_upload=@Artifact.zip http://do-not.press:5000/api/upload
+  - curl -i -F "branch_name=$TRAVIS_BRANCH" -F "commit_hash=$TRAVIS_COMMIT" -F "commit_title=$(git log -1 --pretty=%B)" -F build_type=linux64 -F "secret=$UPLOAD_SECRET" -F build_upload=@Artifact.zip https://nightlytest.mtasa.com/api/upload
 
 notifications:
   irc:
@@ -36,5 +36,5 @@ notifications:
 
 env:
   matrix:
-      secure: UP9uJ0eV5MXu/iT0AchrN1ATWxRlGdTCj7xkcBmEuXHN9+sNGTLP6w8CWx7sznEcAEOaTVogkssY8qm4mEii5QQrfKtT2bKcYNZr1naUJOzc32SY/DDE5nHDdp/fIyST3jtUjjLNaErn187E3YdTCjHIl+Lvyn4GQvHF7oIlhO0=
+      secure: fk2kDz4BD3S4cuUihwn7D+rr8X0ZGltahpYJfZzCL5teSJmwIuJOprlsP92x9eacWLzbOdy1cQxj6FfVIeRxiy2hdyx1q+tloA1i7v+rQmErxzPEkSMMJ2dHemUvG5FzfvH5ZzUarFBZwezIxI78eTs5JLBcwoAVMVIJumoqGqI=
 

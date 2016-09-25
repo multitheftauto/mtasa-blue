@@ -12,7 +12,7 @@ after_build:
   - utils\premake5 install_data
   - utils\premake5 compose_files
   - 7z a InstallFiles.zip InstallFiles
-  - cmd: if not %UPLOAD_SECRET% == "" curl -i -F "branch_name=%APPVEYOR_REPO_BRANCH%" -F "commit_hash=%APPVEYOR_REPO_COMMIT%" -F "commit_title=%APPVEYOR_REPO_COMMIT_MESSAGE%" -F build_type=windows32 -F "secret=%UPLOAD_SECRET%" -F build_upload=@InstallFiles.zip http://do-not.press:5000/api/upload
+  - cmd: if not %UPLOAD_SECRET% == "" curl -i -F "branch_name=%APPVEYOR_REPO_BRANCH%" -F "commit_hash=%APPVEYOR_REPO_COMMIT%" -F "commit_title=%APPVEYOR_REPO_COMMIT_MESSAGE%" -F build_type=windows32 -F "secret=%UPLOAD_SECRET%" -F build_upload=@InstallFiles.zip https://nightlytest.mtasa.com/api/upload
 
 clone_depth: 1
 
@@ -31,4 +31,4 @@ artifacts:
 
 environment:
   UPLOAD_SECRET:
-    secure: eN3uzp1cQTfJDIduB9UzRlir+apOTWNquM3uta21Fl4=
+    secure: 5PjW2ChD6CvgnKi1T4d19cV6cX8SN6d8N/keVeszzmQ=
