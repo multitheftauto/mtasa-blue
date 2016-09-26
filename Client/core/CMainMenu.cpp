@@ -316,9 +316,6 @@ CMainMenu::~CMainMenu ( void )
     delete m_pVersion;
     delete m_pMenuArea;
 
-    // Destroy community label
-    delete m_pCommunityLabel;
-
     // Destroy the menu items. Note: The disconnect item isn't always in the
     // list of menu items (it's only in there when we're in game). This means we
     // don't delete it when we iterate the list and delete it separately - the
@@ -679,7 +676,6 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay, bool bFrameDelay )
         m_ServerBrowser.SetVisible ( false );
         m_Settings.SetVisible ( false );
         m_Credits.SetVisible ( false );
-        m_pCommunityLabel->SetVisible ( false );
         m_pNewsBrowser->SetVisible ( false );
 
 //        m_bIsInSubWindow = false;
@@ -690,7 +686,6 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay, bool bFrameDelay )
         m_pFiller2->SetVisible ( true );
         m_pCanvas->SetVisible( true );
         m_pBackground->SetVisible ( true );
-        m_pCommunityLabel->SetVisible ( true );
     }
 
     m_bHideGame = !bOverlay;
@@ -1011,20 +1006,6 @@ bool CMainMenu::SetItemHoverProgress ( sMenuItem* pItem, float fProgress, bool b
 
         //Return whether the hovering has maxed out
         return bHovering ? (fProgress == 1) : (fProgress == 0);
-}
-
-void CMainMenu::ChangeCommunityState ( bool bIn, const std::string& strUsername )
-{
-    if ( bIn )
-    {
-        SString strText ( "Logged in as: %s", strUsername.c_str () );
-
-        m_pCommunityLabel->SetText ( strText );
-        m_pCommunityLabel->AutoSize ( strText );
-        return;
-    }
-    m_pCommunityLabel->SetText ( "Not logged in" );
-    m_pCommunityLabel->AutoSize ( "Not logged in" );
 }
 
 
