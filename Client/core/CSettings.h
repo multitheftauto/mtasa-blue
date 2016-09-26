@@ -134,9 +134,6 @@ public:
     void                RemoveKeyBindSection    ( char * szSectionName );
     void                RemoveAllKeyBindSections ( void );
 
-    static void         OnLoginCallback         ( bool bResult, char* szError, void* obj );
-    void                OnLoginStateChange      ( bool bResult );
-
     void                RequestNewNickname      ( void );
     void                ShowRestartQuestion     ( void );
     void                ShowDisconnectQuestion  ( void );
@@ -272,14 +269,6 @@ protected:
     std::vector < CGUIButton* > m_pJoypadButtons;
     int                         m_JoypadSettingsRevision;
 
-    CGUILabel*          m_pLabelCommunity;
-    CGUILabel*          m_pLabelUser;
-    CGUILabel*          m_pLabelPass;
-    CGUIEdit*           m_pEditUser;
-    CGUIEdit*           m_pEditPass;
-    CGUIButton*         m_pButtonLogin;
-    CGUIButton*         m_pButtonRegister;
-
     CGUILabel*          m_pControlsMouseLabel;
     CGUICheckBox*       m_pInvertMouse;
     CGUICheckBox*       m_pSteerWithMouse;
@@ -353,8 +342,6 @@ protected:
     bool                OnBindsListClick        ( CGUIElement* pElement );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
-    bool                OnLoginButtonClick      ( CGUIElement* pElement );
-    bool                OnRegisterButtonClick   ( CGUIElement* pElement );
     bool                OnFieldOfViewChanged    ( CGUIElement* pElement );
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );

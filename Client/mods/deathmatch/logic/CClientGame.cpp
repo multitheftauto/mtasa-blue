@@ -614,9 +614,8 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServe
             pBitStream->Write ( strTemp.c_str (), MAX_PLAYER_NICK_LENGTH );
             pBitStream->Write ( reinterpret_cast < const char* > ( Password.data ), sizeof ( MD5 ) );
 
-            // Append community information
+            // Append community information (Removed)
             std::string strUser;
-            g_pCore->GetCommunity ()->GetUsername ( strUser );
             pBitStream->Write ( strUser.c_str (), MAX_SERIAL_LENGTH );
 
             // Send the packet as joindata

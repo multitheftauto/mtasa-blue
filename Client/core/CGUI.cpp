@@ -152,10 +152,6 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
     m_pConsole = new CConsole ( pGUI );
     m_pConsole->SetVisible ( false );
 
-    // Create community registration window
-    m_CommunityRegistration.CreateWindows ();
-    m_CommunityRegistration.SetVisible ( false );
-
     // Create our news headlines if we're already ingame
     if ( bGameIsAlreadyLoaded )
         m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
@@ -204,7 +200,6 @@ void CLocalGUI::DestroyObjects ( void )
 
 void CLocalGUI::DoPulse ( void )
 {
-    m_CommunityRegistration.DoPulse ();
     m_pVersionUpdater->DoPulse ();
 
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();

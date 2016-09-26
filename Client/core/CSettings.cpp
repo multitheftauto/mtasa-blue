@@ -366,52 +366,6 @@ void CSettings::CreateGUI ( void )
         m_hSecKeys[k] = m_pBindsList->AddColumn ( _("ALT. KEY"), 0.24f );
 
     /**
-     *  Community tab
-     **/
-
-    m_pTabs->DeleteTab ( pTabCommunity );
-
-    m_pLabelCommunity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, CORE_SETTINGS_COMMUNITY_TEXT ) );
-    m_pLabelCommunity->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
-    m_pLabelCommunity->SetSize ( CVector2D ( 9.956f, 4.414f ), true );
-    //m_pLabelCommunity->AutoSize ( CORE_SETTINGS_COMMUNITY_TEXT );
-
-    m_pLabelUser = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, _("Username:") ) );
-    m_pLabelUser->SetPosition ( CVector2D ( 0.022f, 0.46f ), true );
-    m_pLabelUser->GetPosition ( vecTemp, false );
-    m_pLabelUser->AutoSize ( );
-
-    m_pLabelPass = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, _("Password:") ) );
-    m_pLabelPass->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-    m_pLabelPass->AutoSize ( );
-
-    m_pEditUser = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabCommunity ) );
-    m_pEditUser->SetPosition ( CVector2D ( 0.16f, 0.45f ), true );
-    m_pEditUser->GetPosition ( vecTemp, false );
-    m_pEditUser->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-    m_pEditUser->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnLoginButtonClick, this ) );
-//    m_pEditUser->SetMaxLength ( 64 );
-
-    m_pEditPass = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabCommunity ) );
-    m_pEditPass->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-    m_pEditPass->GetPosition ( vecTemp, false );
-    m_pEditPass->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-//    m_pEditPass->SetMaxLength ( 64 );
-    m_pEditPass->SetMasked ( true );
-    m_pEditPass->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnLoginButtonClick, this ) );
-
-    m_pButtonLogin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, _("Login") ) );
-    m_pButtonLogin->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-    m_pButtonLogin->GetPosition ( vecTemp, false );
-    m_pButtonLogin->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-    m_pButtonLogin->SetZOrderingEnabled ( false );
-
-    m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, _("Register") ) );
-    m_pButtonRegister->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-    m_pButtonRegister->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-    m_pButtonRegister->SetZOrderingEnabled ( false );
-
-    /**
      *	Multiplayer tab
      **/
     m_pLabelNick = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabMultiplayer, _("Nick:") ) );
@@ -1523,9 +1477,7 @@ void CSettings::CreateGUI ( void )
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
     m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
-    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
-    m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
-    m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
+    m_pButtonCancel->SetClickHandler(GUI_CALLBACK(&CSettings::OnCancelButtonClick, this));
     m_pChatLoadPreset->SetClickHandler ( GUI_CALLBACK( &CSettings::OnChatLoadPresetClick, this ) );
     m_pInterfaceLanguageSelector->SetSelectionHandler ( GUI_CALLBACK(&CSettings::OnLanguageChanged, this) );
     m_pInterfaceSkinSelector->SetSelectionHandler ( GUI_CALLBACK(&CSettings::OnSkinChanged, this) );
@@ -2753,84 +2705,6 @@ bool CSettings::OnCancelButtonClick ( CGUIElement* pElement )
     return true;
 }
 
-
-bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
-{
-    if ( strcmp ( m_pButtonLogin->GetText().c_str(), "Login" ) == 0 )
-    {
-        if ( m_pEditUser->GetText().empty() ||
-            m_pEditPass->GetText().empty() )
-        {
-            g_pCore->ShowMessageBox ( _("Login Error"), _("Invalid username/password"), MB_BUTTON_OK | MB_ICON_ERROR );
-            return true;
-        }
-        else
-        {
-            m_pEditUser->SetEnabled ( false );
-            m_pEditPass->SetEnabled ( false );
-            m_pButtonLogin->SetEnabled ( false );
-            m_pButtonLogin->SetText ( _("Logging in...") );
-
-            // Hash password
-            char szPassword[33];
-            std::string strPassword;
-            MD5 Password;
-            CMD5Hasher Hasher;
-            Hasher.Calculate ( m_pEditPass->GetText ().c_str(), m_pEditPass->GetText().length(), Password );
-            Hasher.ConvertToHex ( Password, szPassword );
-            strPassword = std::string ( szPassword );
-
-            // Check if we need to use the stored password
-            std::string strCommunityPassword;
-            CVARS_GET ( "community_password", strCommunityPassword );
-            if ( m_pEditPass->GetText ().compare ( strCommunityPassword ) == 0 )
-                strPassword = strCommunityPassword;
-
-            // Store the user/pass and log in using community
-            CCommunity *pCommunity = CCommunity::GetSingletonPtr ();
-            pCommunity->SetUsername ( m_pEditUser->GetText () );
-            pCommunity->SetPassword ( strPassword );
-            CVARS_SET ( "community_username", m_pEditUser->GetText () );
-            CVARS_SET ( "community_password", strPassword );
-            pCommunity->Login ( OnLoginCallback, this );
-        }
-        return false;
-    }
-    else
-    {
-        CCommunity::GetSingleton ().Logout ();
-        m_pEditPass->SetText ( "" );
-    }
-    return true;
-}
-
-
-bool CSettings::OnRegisterButtonClick ( CGUIElement* pElement )
-{
-    g_pCore->GetLocalGUI()->GetCommunityRegistration()->Open ();
-    return true;
-}
-
-
-void CSettings::OnLoginCallback ( bool bResult, char* szError, void* obj )
-{   // This callback function is called by CCommunity whenever an error has occurred
-    if ( !bResult )
-    {
-        g_pCore->ShowMessageBox ( _("Login Error"), szError, MB_BUTTON_OK | MB_ICON_ERROR );
-    }
-}
-
-
-void CSettings::OnLoginStateChange ( bool bResult )
-{   // This function is called by CCommunity whenever the logged-in status changes
-    m_pEditUser->SetEnabled ( !bResult );
-    m_pEditPass->SetEnabled ( !bResult );
-    m_pButtonLogin->SetText ( ( bResult ) ? _("Logout") : _("Login") );
-    m_pButtonLogin->SetEnabled ( true );
-    m_pButtonRegister->SetVisible ( !bResult );
-}
-
-
 void CSettings::LoadData ( void )
 {
     // Ensure CVARS ranges ok
@@ -2867,12 +2741,6 @@ void CSettings::LoadData ( void )
     m_pMouseSensitivity->SetScrollPosition ( gameSettings->GetMouseSensitivity () );
     pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
     m_pVerticalAimSensitivity->SetScrollPosition( pController->GetVerticalAimSensitivity() );
-
-    // Community
-    CVARS_GET ( "community_username", strVar );
-    if ( !strVar.empty () ) m_pEditUser->SetText ( strVar.c_str () );
-    CVARS_GET ( "community_password", strVar );
-    if ( !strVar.empty () ) m_pEditPass->SetText ( strVar.c_str () );
 
     // Audio
     m_ucOldRadioVolume = gameSettings->GetRadioVolume();

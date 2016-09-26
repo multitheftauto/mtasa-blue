@@ -141,10 +141,6 @@ CServerBrowser::CServerBrowser ( void )
     CreateTab ( ServerBrowserTypes::FAVOURITES, _("Favourites") );
     CreateTab ( ServerBrowserTypes::RECENTLY_PLAYED, _("Recent") );
 
-    // Login dialog
-    m_pCommunityLogin.SetVisible ( false );
-    m_pCommunityLogin.SetCallback ( &CServerBrowser::CompleteConnect );
-
     // Load options
     LoadOptions ( CCore::GetSingletonPtr ()->GetConfig ( )->FindSubNode ( CONFIG_NODE_SERVER_OPTIONS ) );
 
@@ -1293,9 +1289,8 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
     // If there is one item selected
     if ( CServerListItem * pServer = FindSelectedServer ( Type ) )
     {
-        if ( ( pServer->bSerials ) && ( !g_pCore->GetCommunity()->IsLoggedIn() ) )
+        if ( pServer->bSerials  )
         {
-            m_pCommunityLogin.SetVisible ( true );
             return true;
         }
         // Get the nick from the config

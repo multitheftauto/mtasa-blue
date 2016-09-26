@@ -34,7 +34,6 @@ class CServerBrowser;
 #include "CMainMenu.h"
 #include "CServerList.h"
 #include "CSingleton.h"
-#include "CCommunityLogin.h"
 #include "CServerInfo.h"
 #include <ctime>
 
@@ -138,9 +137,6 @@ protected:
     CGUIElement*        m_pTopWindow;
     CGUITabPanel*       m_pPanel;
     CGUIStaticImage*    m_pLockedIcon;
-
-    // Classes
-    CCommunityLogin     m_pCommunityLogin;
   
     // Tab controls
     CGUITab*            m_pTab [ SERVER_BROWSER_TYPE_COUNT ];

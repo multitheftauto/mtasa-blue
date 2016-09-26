@@ -80,7 +80,6 @@ public:
     virtual CKeyBindsInterface*         GetKeyBinds                     ( void ) = 0;
     virtual CXMLNode*                   GetConfig                       ( void ) = 0;
     virtual CCVarsInterface*            GetCVars                        ( void ) = 0;
-    virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
     virtual CLocalizationInterface*     GetLocalization                 ( void ) = 0;
     virtual CWebCoreInterface*          GetWebCore                      ( void ) = 0;
     virtual CTrayIconInterface*         GetTrayIcon                     ( void ) = 0;

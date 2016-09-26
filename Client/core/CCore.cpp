@@ -619,13 +619,6 @@ void CCore::ApplyGameSettings ( void )
     pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
 }
 
-void CCore::ApplyCommunityState ( void )
-{
-    bool bLoggedIn = g_pCore->GetCommunity()->IsLoggedIn();
-    if ( bLoggedIn )
-        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow()->OnLoginStateChange ( true );
-}
-
 void CCore::SetConnected ( bool bConnected )
 {
     m_pLocalGUI->GetMainMenu ( )->SetIsIngame ( bConnected );
@@ -1243,8 +1236,6 @@ void CCore::DoPostFramePulse ( )
         ApplyGameSettings ();
 
         m_pGUI->SelectInputHandlers( INPUT_CORE );
-
-        m_Community.Initialize ();
     }
 
     if ( m_pGame->GetSystemState () == 5 ) // GS_INIT_ONCE
@@ -1350,8 +1341,6 @@ void CCore::DoPostFramePulse ( )
     GetMemStats ()->Draw ();
     GetGraphStats ()->Draw();
     m_pConnectManager->DoPulse ();
-
-    m_Community.DoPulse ();
 
     TIMING_CHECKPOINT( "-CorePostFrame2" );
 }
