@@ -585,8 +585,8 @@ int CLuaUtilDefs::Require(lua_State* luaVM)
         // Check whether the appropriate pure lua module exists
         if (pLuaMain->LoadLuaLib(luaVM, strMod,strError))        // stack: ["moduleName",pkgLuaMod/nil]
             return 1;
-        strError += "\n";
 #ifndef MTA_CLIENT
+        strError += "\n";
         // Check if a C library exists
         if (pLuaMain->LoadClib(luaVM, strMod,strError))          // stack: ["moduleName",fncModule/nil]
             return 1;
