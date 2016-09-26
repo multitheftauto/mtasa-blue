@@ -35,13 +35,13 @@ public:
     bool                                        Reload                      ( void );
     bool                                        Save                        ( void );
 
-    class CAccessControlListGroup*              GetGroup                    ( const char* szGroupName );
-    class CAccessControlList*                   GetACL                      ( const char* szACLName );
+    class CAccessControlListGroup*              GetGroup                    ( const std::string& strGroupName );
+    class CAccessControlList*                   GetACL                      ( const std::string& strACLName );
 
-    bool                                        CanObjectUseRight           ( const char* szObjectName, CAccessControlListGroupObject::EObjectType, const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bDefaultAccessRight );
+    bool                                        CanObjectUseRight           ( const std::string& strObjectName, CAccessControlListGroupObject::EObjectType, const std::string& strRightName, CAccessControlListRight::ERightType eRightType, bool bDefaultAccessRight );
 
-    class CAccessControlListGroup*              AddGroup                    ( const char* szGroupName );
-    class CAccessControlList*                   AddACL                      ( const char* szACLName );
+    class CAccessControlListGroup*              AddGroup                    ( const std::string& strGroupName );
+    class CAccessControlList*                   AddACL                      ( const std::string& strACLName );
 
     void                                        DeleteGroup                 ( class CAccessControlListGroup* pGroup );
     void                                        DeleteACL                   ( class CAccessControlList* pACL );
@@ -60,10 +60,10 @@ public:
     list < class CAccessControlListGroup* > ::const_iterator        Groups_End      ( void )    { return m_Groups.end (); };
     size_t                                                          Groups_Count    ( void )    { return m_Groups.size (); };
 
-    static const char*                          ExtractObjectName           ( const char* szObjectName,
+    static std::string                          ExtractObjectName           ( const std::string& strObjectName,
                                                                               CAccessControlListGroupObject::EObjectType& eType );
 
-    static const char*                          ExtractRightName            ( const char* szRightName,
+    static std::string                          ExtractRightName            ( const std::string& strRightName,
                                                                               CAccessControlListRight::ERightType& eType );
 
     void                                        OnChange                    ( void );
@@ -72,7 +72,7 @@ public:
 
 private:
     void                                        ClearReadCache              ( void );
-    bool                                        InternalCanObjectUseRight   ( const char* szObjectName, CAccessControlListGroupObject::EObjectType, const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bDefaultAccessRight );
+    bool                                        InternalCanObjectUseRight   ( const std::string& strObjectName, CAccessControlListGroupObject::EObjectType, const std::string& strRightName, CAccessControlListRight::ERightType eRightType, bool bDefaultAccessRight );
     void                                        RemoveACLDependencies       ( class CAccessControlList* pACL );
 
     list < class CAccessControlListGroup* >     m_Groups;

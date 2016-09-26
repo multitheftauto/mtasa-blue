@@ -205,9 +205,11 @@ bool CLocalServer::Load ( void )
             if ( pNode->GetTagName ().compare ( "resource" ) == 0 )
             {
                 CXMLAttribute* src = pNode->GetAttribute ( "src" );
+                
                 if ( src && src->GetValue()[1] )
                 {
-                    m_pResourcesCur->SetItemText ( m_pResourcesCur->AddRow (), m_hResourcesCur, src->GetValue().c_str() );
+                    std::string strValue = src->GetValue();
+                    m_pResourcesCur->SetItemText ( m_pResourcesCur->AddRow (), m_hResourcesCur, strValue.c_str() );
                 }
             }
         }

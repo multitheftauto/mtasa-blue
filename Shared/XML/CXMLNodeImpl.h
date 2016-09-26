@@ -15,7 +15,7 @@ class CXMLNodeImpl : public CXMLNode
 {
 public:
     // CXMLNode Interface
-    CXMLNodeImpl(pugi::xml_node &node, bool bUsingIDs);
+    CXMLNodeImpl(pugi::xml_node &node, bool bUsingIDs, CXMLNodeImpl* pParent = nullptr);
     ~CXMLNodeImpl();
 
     CXMLNode *GetParent() override { return m_pParent; }

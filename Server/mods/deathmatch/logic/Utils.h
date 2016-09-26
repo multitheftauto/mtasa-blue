@@ -39,7 +39,7 @@ bool            IsIn                        ( const char* szShortText, const cha
 char*           uppercase                   ( char* s );
 void            stripString                 ( char* szString );
 void            stripControlCodes           ( char* szString );
-bool            StringBeginsWith            ( const char* szText, const char* szBegins );
+bool            StringBeginsWith            ( const std::string& strText, const std::string& strBegins);
 bool            IsNumericString             ( const char* szString );
 bool            IsNumericString             ( const char* szString, size_t sizeString );
 

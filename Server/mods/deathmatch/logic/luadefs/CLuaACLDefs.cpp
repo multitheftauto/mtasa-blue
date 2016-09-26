@@ -935,8 +935,7 @@ int CLuaACLDefs::hasObjectPermissionTo ( lua_State* luaVM )
         else
         {
             // Extract the object name itself including the type
-            const char * szName = CAccessControlListManager::ExtractObjectName ( strObject.c_str (), eObjectType );
-            strObject = szName ? szName : "";
+            strObject  = CAccessControlListManager::ExtractObjectName ( strObject, eObjectType );
         }
 
         // Got a string?

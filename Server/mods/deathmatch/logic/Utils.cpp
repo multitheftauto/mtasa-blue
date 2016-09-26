@@ -232,6 +232,13 @@ void stripControlCodes(char* szString)
     }
 }
 
+bool StringBeginsWith(const std::string& strText, const std::string& strBegins) 
+{
+    if (strText.length() < strBegins.length())
+        return false;
+    return strText.substr(0, strBegins.length()) == strBegins;
+}
+
 bool StringBeginsWith ( const char* szText, const char* szBegins )
 {
     if ( szText && szBegins )

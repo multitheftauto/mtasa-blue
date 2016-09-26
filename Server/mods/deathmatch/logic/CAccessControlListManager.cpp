@@ -97,7 +97,7 @@ bool CAccessControlListManager::Load ( void )
             CXMLAttribute* pAttribute = pSubNode->GetAttribute ( "name" );
             if ( pAttribute )
             {
-                CAccessControlList* pACL = AddACL ( pAttribute->GetValue ().c_str () );
+                CAccessControlList* pACL = AddACL ( pAttribute->GetValue () );
 
                 CXMLNode* pSubSubNode = NULL;
                 unsigned int uiSubSubNodesCount = pSubNode->GetChildCount ();
@@ -127,32 +127,20 @@ bool CAccessControlListManager::Load ( void )
                             }
 
                             // Grab the name of the 'right' name
-                            const char *szRightName = pNameAttribute->GetValue ().c_str ();
-
+                            std::string strFullRightName = pNameAttribute->GetValue();
+                            
                             // Create the rights control list
-                            CAccessControlListRight* pRight = NULL;
-                            if ( StringBeginsWith ( szRightName, "command." ) )
+                            CAccessControlListRight::ERightType eRightType;
+                            std::string strRightName = CAccessControlListManager::ExtractRightName(strFullRightName, eRightType);
+                            if (!strRightName.empty())
                             {
-                                pRight = pACL->AddRight ( &szRightName[8], CAccessControlListRight::RIGHT_TYPE_COMMAND, bAccess );
-                            }
-                            else if ( StringBeginsWith ( szRightName, "function." ) )
-                            {
-                                pRight = pACL->AddRight ( &szRightName[9], CAccessControlListRight::RIGHT_TYPE_FUNCTION, bAccess );
-                            }
-                            else if ( StringBeginsWith ( szRightName, "resource." ) )
-                            {
-                                pRight = pACL->AddRight ( &szRightName[9], CAccessControlListRight::RIGHT_TYPE_RESOURCE, bAccess );
-                            }
-                            else if ( StringBeginsWith ( szRightName, "general." ) )
-                            {
-                                pRight = pACL->AddRight ( &szRightName[8], CAccessControlListRight::RIGHT_TYPE_GENERAL, bAccess );
-                            }
-                            else continue;
+                                CAccessControlListRight* pRight = pACL->AddRight(strRightName.c_str(), eRightType, bAccess);
 
-                            // Set all the extra attributes
-                            for ( auto& pAttribute : pSubSubNode->GetAttributes() )
-                            {
-                                pRight->SetAttributeValue ( pAttribute->GetName (), pAttribute->GetValue () );
+                                // Set all the extra attributes
+                                for (auto& pAttribute : pSubSubNode->GetAttributes())
+                                {
+                                    pRight->SetAttributeValue(pAttribute->GetName(), pAttribute->GetValue());
+                                }
                             }
                         }
                     }
@@ -174,7 +162,7 @@ bool CAccessControlListManager::Load ( void )
             CXMLAttribute* pAttribute = pSubNode->GetAttribute ( "name" );
             if ( pAttribute )
             {
-                CAccessControlListGroup* pGroup = AddGroup ( pAttribute->GetValue ().c_str () );
+                CAccessControlListGroup* pGroup = AddGroup ( pAttribute->GetValue () );
 
                 CXMLNode* pSubSubNode = NULL;
                 unsigned int uiSubSubNodesCount = pSubNode->GetChildCount ();
@@ -188,15 +176,13 @@ bool CAccessControlListManager::Load ( void )
                         CXMLAttribute* pSubAttribute = pSubSubNode->GetAttribute ( "name" );
                         if ( pSubAttribute )
                         {
-                            const char *szAccountName = pSubAttribute->GetValue ().c_str ();
+                            std::string strAccountName = pSubAttribute->GetValue ();
 
-                            if ( StringBeginsWith ( szAccountName, "user." ) )
+                            CAccessControlListGroupObject::EObjectType eObjectType;
+                            std::string strObjectName = CAccessControlListManager::ExtractObjectName(strAccountName, eObjectType);
+                            if (!strObjectName.empty()) 
                             {
-                                pGroup->AddObject ( &szAccountName[5], CAccessControlListGroupObject::OBJECT_TYPE_USER );
-                            }
-                            else if ( StringBeginsWith ( szAccountName, "resource." ) )
-                            {
-                                pGroup->AddObject ( &szAccountName[9], CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE );
+                                pGroup->AddObject(strObjectName.c_str(), eObjectType);
                             }
                         }
                     }
@@ -205,7 +191,7 @@ bool CAccessControlListManager::Load ( void )
                         CXMLAttribute* pSubAttribute = pSubSubNode->GetAttribute ( "name" );
                         if ( pSubAttribute )
                         {
-                            CAccessControlList* pACL = GetACL ( pSubAttribute->GetValue ().c_str () );
+                            CAccessControlList* pACL = GetACL ( pSubAttribute->GetValue () );
                             if ( pACL )
                             {
                                 pGroup->AddACL ( pACL );
@@ -277,35 +263,29 @@ bool CAccessControlListManager::Save ( void )
 }
 
 
-CAccessControlListGroup* CAccessControlListManager::GetGroup ( const char* szGroupName )
+CAccessControlListGroup* CAccessControlListManager::GetGroup ( const std::string& strGroupName )
 {
     // Loop through the list and find the group with a matching name
-    list < CAccessControlListGroup* > ::iterator iter = m_Groups.begin ();
-    for ( ; iter != m_Groups.end (); iter++ )
+    for ( auto& pGroup : m_Groups )
     {
-        if ( strcmp ( szGroupName, (*iter)->GetGroupName () ) == 0 )
-        {
-            return *iter;
-        }
+        if (pGroup->GetGroupName() == strGroupName)
+            return pGroup;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
-CAccessControlList* CAccessControlListManager::GetACL ( const char* szACLName )
+CAccessControlList* CAccessControlListManager::GetACL ( const std::string& strACLName )
 {
     // Loop through the list and find the ACL with a matching name
-    list < CAccessControlList* > ::iterator iter = m_ACLs.begin ();
-    for ( ; iter != m_ACLs.end (); iter++ )
+    for (auto& pACL : m_ACLs)
     {
-        if ( strcmp ( szACLName, (*iter)->GetName () ) == 0 )
-        {
-            return *iter;
-        }
+        if (pACL->GetName() == strACLName)
+            return pACL;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -330,9 +310,9 @@ void CAccessControlListManager::ClearReadCache ( void )
 }
 
 
-bool CAccessControlListManager::CanObjectUseRight ( const char* szObjectName,
+bool CAccessControlListManager::CanObjectUseRight ( const std::string& strObjectName,
                                                     CAccessControlListGroupObject::EObjectType eObjectType,
-                                                    const char* szRightName,
+                                                    const std::string& strRightName,
                                                     CAccessControlListRight::ERightType eRightType,
                                                     bool bDefaultAccessRight )
 {
@@ -344,26 +324,26 @@ bool CAccessControlListManager::CanObjectUseRight ( const char* szObjectName,
     if ( eObjectType == CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE )
     {
         // Make unique key for this query
-        SString strKey ( "%s %s %d %d", szObjectName, szRightName, eRightType, bDefaultAccessRight );
+        SString strKey ( "%s %s %d %d", strObjectName.c_str(), strRightName.c_str(), eRightType, bDefaultAccessRight );
         // Check if this query has been done before
         bool* pResult = MapFind( m_ReadCacheMap, strKey );
         if ( !pResult )
         {
             // If not, do query now and add result to the cache
-            bool bResult = InternalCanObjectUseRight ( szObjectName, eObjectType, szRightName, eRightType, bDefaultAccessRight );
+            bool bResult = InternalCanObjectUseRight ( strObjectName, eObjectType, strRightName, eRightType, bDefaultAccessRight );
             MapSet ( m_ReadCacheMap, strKey, bResult );
             pResult = MapFind( m_ReadCacheMap, strKey );
         }
         // Return cached result
         return *pResult;
     }
-    return InternalCanObjectUseRight ( szObjectName, eObjectType, szRightName, eRightType, bDefaultAccessRight );
+    return InternalCanObjectUseRight ( strObjectName, eObjectType, strRightName, eRightType, bDefaultAccessRight );
 }
 
 
-bool CAccessControlListManager::InternalCanObjectUseRight ( const char* szObjectName,
+bool CAccessControlListManager::InternalCanObjectUseRight ( const std::string& strObjectName,
                                                     CAccessControlListGroupObject::EObjectType eObjectType,
-                                                    const char* szRightName,
+                                                    const std::string& strRightName,
                                                     CAccessControlListRight::ERightType eRightType,
                                                     bool bDefaultAccessRight )
 {
@@ -375,14 +355,14 @@ bool CAccessControlListManager::InternalCanObjectUseRight ( const char* szObject
     for ( ; group != m_Groups.end (); group++ )
     {
         // Look for a group that has our user/resource in it
-        if ( (*group)->FindObjectMatch ( szObjectName, eObjectType ) )
+        if ( (*group)->FindObjectMatch ( strObjectName.c_str(), eObjectType ) )
         {
             // Look through its access lists for our 'right' name
             list < CAccessControlList* > ::iterator acl = (*group)->IterBeginACL ();
             for ( ; acl != (*group)->IterEndACL (); acl++ )
             {
                 // Grab the right with this name
-                CAccessControlListRight* pRight = (*acl)->GetRight ( szRightName, eRightType );
+                CAccessControlListRight* pRight = (*acl)->GetRight ( strRightName.c_str(), eRightType );
                 if ( pRight )
                 {
                     // If he has access, return that he can use this object. Otherwize keep looking
@@ -409,14 +389,14 @@ bool CAccessControlListManager::InternalCanObjectUseRight ( const char* szObject
 }
 
 
-CAccessControlListGroup* CAccessControlListManager::AddGroup ( const char* szGroupName )
+CAccessControlListGroup* CAccessControlListManager::AddGroup ( const std::string& strGroupName )
 {
     // Grab the group with that name already. Only add it if it doesn't exist already
-    CAccessControlListGroup* pGroup = GetGroup ( szGroupName );
+    CAccessControlListGroup* pGroup = GetGroup ( strGroupName );
     if ( !pGroup )
     {
         // Create it and put it back in our list
-        pGroup = new CAccessControlListGroup ( szGroupName );
+        pGroup = new CAccessControlListGroup ( strGroupName.c_str() );
         m_Groups.push_back ( pGroup );
         OnChange ();
     }
@@ -425,14 +405,14 @@ CAccessControlListGroup* CAccessControlListManager::AddGroup ( const char* szGro
 }
 
 
-CAccessControlList* CAccessControlListManager::AddACL ( const char* szACLName )
+CAccessControlList* CAccessControlListManager::AddACL ( const std::string& strACLName )
 {
     // Grab the ACL with that name. Only add it if we don't already have it
-    CAccessControlList* pACL = GetACL ( szACLName );
+    CAccessControlList* pACL = GetACL ( strACLName );
     if ( !pACL )
     {
         // Create it and put it back in our list
-        pACL = new CAccessControlList ( szACLName, this );
+        pACL = new CAccessControlList ( strACLName.c_str(), this );
         m_ACLs.push_back ( pACL );
         OnChange ();
     }
@@ -523,51 +503,51 @@ void CAccessControlListManager::RemoveACLDependencies ( class CAccessControlList
 }
 
 
-const char* CAccessControlListManager::ExtractObjectName ( const char* szObjectName,
+std::string CAccessControlListManager::ExtractObjectName ( const std::string& strObjectName,
                                                            CAccessControlListGroupObject::EObjectType& eType )
 {
     // Pick the correct type based on what the string starts with.
     // Return where the name of the right begins.
-    if ( StringBeginsWith ( szObjectName, "user." ) )
+    if ( StringBeginsWith ( strObjectName, "user." ) )
     {
         eType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
-        return szObjectName + 5;
+        return strObjectName.substr(5);
     }
-    else if ( StringBeginsWith ( szObjectName, "resource." ) )
+    else if ( StringBeginsWith (strObjectName, "resource." ) )
     {
         eType = CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE;
-        return szObjectName + 9;
+        return strObjectName.substr(9);
     }
 
     // Failed
-    return NULL;
+    return "";
 }
 
 
-const char* CAccessControlListManager::ExtractRightName ( const char* szRightName,
+std::string CAccessControlListManager::ExtractRightName ( const std::string& strRightName,
                                                           CAccessControlListRight::ERightType& eType )
 {
     // Pick the correct type based on what the string starts with.
     // Return where the name of the object begins.
-    if ( StringBeginsWith ( szRightName, "command." ) )
+    if ( StringBeginsWith ( strRightName, "command." ) )
     {
         eType = CAccessControlListRight::RIGHT_TYPE_COMMAND;
-        return szRightName + 8;
+        return strRightName.substr(8);
     }
-    else if ( StringBeginsWith ( szRightName, "function." ) )
+    else if ( StringBeginsWith ( strRightName, "function." ) )
     {
         eType = CAccessControlListRight::RIGHT_TYPE_FUNCTION;
-        return szRightName + 9;
+        return strRightName.substr(9);
     }
-    else if ( StringBeginsWith ( szRightName, "resource." ) )
+    else if ( StringBeginsWith ( strRightName, "resource." ) )
     {
         eType = CAccessControlListRight::RIGHT_TYPE_RESOURCE;
-        return szRightName + 9;
+        return strRightName.substr(9);
     }
-    else if ( StringBeginsWith ( szRightName, "general." ) )
+    else if ( StringBeginsWith ( strRightName, "general." ) )
     {
         eType = CAccessControlListRight::RIGHT_TYPE_GENERAL;
-        return szRightName + 8;
+        return strRightName.substr(8);
     }
 
     // Failed

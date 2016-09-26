@@ -8,9 +8,10 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-CXMLNodeImpl::CXMLNodeImpl(pugi::xml_node &node, bool bUsingIDs) : 
+CXMLNodeImpl::CXMLNodeImpl(pugi::xml_node &node, bool bUsingIDs, CXMLNodeImpl* pParent) : 
     m_ulID(INVALID_XML_ID), 
-    m_node(node)
+    m_node(node),
+    m_pParent(pParent)
 {
     if (bUsingIDs)
         m_ulID = CXMLArray::PopUniqueID(this);
@@ -25,7 +26,7 @@ CXMLNodeImpl::~CXMLNodeImpl()
 CXMLNode *CXMLNodeImpl::CreateChild(const std::string& strTagName)
 {
     auto node = m_node.append_child(strTagName.c_str());
-    auto wrapper = std::make_unique<CXMLNodeImpl>(node, m_ulID != INVALID_XML_ID);
+    auto wrapper = std::make_unique<CXMLNodeImpl>(node, m_ulID != INVALID_XML_ID, this);
     m_Children.push_back(std::move(wrapper));
     return m_Children.back().get();
 }
@@ -33,7 +34,7 @@ CXMLNode *CXMLNodeImpl::CreateChild(const std::string& strTagName)
 void CXMLNodeImpl::RemoveChild(CXMLNode *pNode)
 {
     // Remove from pugixml node
-    m_node.remove_child(((CXMLNodeImpl *)pNode)->GetNode());
+    m_node.remove_child(reinterpret_cast<CXMLNodeImpl*>(pNode)->GetNode());
 
     // Remove from child list
     m_Children.erase(std::remove_if(m_Children.begin(), m_Children.end(),

@@ -29,17 +29,7 @@ CXMLFileImpl::CXMLFileImpl(const std::string &strFilename, CXMLNode *pNode) :
 
     // Copy root node info
     auto &root = reinterpret_cast<CXMLNodeImpl*>(pNode)->GetNode();
-    m_pDocument->set_name(root.name());
-    m_pDocument->set_value(root.value());
-
-    for (auto &child : root.children())
-    {
-        m_pDocument->append_copy(child);
-    }
-    for (auto &attr : root.attributes())
-    {
-        m_pDocument->append_copy(attr);
-    }
+    m_pDocument->append_copy(root);
 
     // Construct Wrapper tree
     BuildWrapperTree(bUsingIDs);
@@ -80,7 +70,7 @@ void CXMLFileImpl::BuildWrapperTree(bool bUsingIDs)
 std::unique_ptr<CXMLNodeImpl> CXMLFileImpl::WrapperTreeWalker(pugi::xml_node * node, bool bUsingIDs)
 {
     // Construct wrapper for this node
-    auto wrapperNode = std::make_unique<CXMLNodeImpl>(*node, bUsingIDs);
+    auto wrapperNode = std::make_unique<CXMLNodeImpl>(*node, bUsingIDs, nullptr);
 
     // Construct Attributes
     for (auto &attribute : node->attributes())
