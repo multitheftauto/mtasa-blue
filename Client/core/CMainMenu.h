@@ -166,6 +166,10 @@ private:
     CGUILabel*          m_pNewsItemDateLabels[CORE_MTA_NEWS_ITEMS];
     CGUILabel*          m_pNewsItemNEWLabels[CORE_MTA_NEWS_ITEMS];
 
+    std::unique_ptr<CGUITexture> m_pAlertTexture;
+    std::unique_ptr<CGUIStaticImage> m_pAlertImage;
+    std::unique_ptr<CGUILabel> m_pAlertLabel;
+
     // Fade states
     enum eFadeStates {
         FADE_VISIBLE,
