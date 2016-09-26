@@ -70,7 +70,6 @@ public:
     void                SetMenuVerticalPosition         ( int iPosY );
     void                SetMenuUnhovered                ( void );
 
-    void                ChangeCommunityState            ( bool bIn, const std::string& strUsername );
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
     void                SetNewsHeadline                 ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew );
@@ -151,9 +150,6 @@ private:
     CGraphics *         m_pGraphics;
     bool                m_bStarted;
     CVector2D           m_ScreenSize;
-
-    // Community
-    CGUILabel*          m_pCommunityLabel;
 
     // Fade variables
     unsigned char       m_ucFade;
