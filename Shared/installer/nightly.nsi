@@ -180,6 +180,8 @@ Page custom CustomDirectoryPage CustomDirectoryPageLeave
 !insertmacro MUI_LANGUAGE "English"
 ;@INSERT_TRANSLATIONS@
 
+LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
+LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access may be requested for Vista and up]\n\n\
@@ -229,6 +231,20 @@ Function .onInit
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
     
+	!ifdef XPVISTABUILD
+		${If} ${AtLeastWin7}
+			MessageBox MB_OK "$(GET_MASTER_PLEASE)"
+			ExecShell "open" "http://mtasa.com"
+			Quit
+		${EndIf}	
+	!else
+		${If} ${AtMostWinVista}
+			MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
+			ExecShell "open" "http://mtasa.com"
+			Quit
+		${EndIf}
+	!endif
+
     File /oname=$TEMP\image.bmp "connect.bmp"
     
     ; #############################################
@@ -2256,8 +2272,8 @@ Function CustomDirectoryPageUpdateINSTDIR
     ${EndSwitch}
 FunctionEnd
 
-; Out <stack> = "1" - Is Windows Classic
 Function IsWindowsClassicTheme
+; Out <stack> = "1" - Is Windows Classic
     System::Call "UxTheme::IsThemeActive() i .r3"
     StrCpy $1 "1"
     ${If} $3 == 1
