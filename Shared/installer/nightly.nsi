@@ -232,8 +232,8 @@ Function .onInit
     ${EndIf}
     
 	
-	${If} ${AtMostWinVista}
-		MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
+	${If} ${AtLeastWin7}
+		MessageBox MB_OK "$(GET_MASTER_PLEASE)"
 		ExecShell "open" "http://mtasa.com"
 		Quit
 	${EndIf}
