@@ -231,19 +231,12 @@ Function .onInit
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
     
-	!ifdef XPVISTABUILD
-		${If} ${AtLeastWin7}
-			MessageBox MB_OK "$(GET_MASTER_PLEASE)"
-			ExecShell "open" "http://mtasa.com"
-			Quit
-		${EndIf}	
-	!else
-		${If} ${AtMostWinVista}
-			MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
-			ExecShell "open" "http://mtasa.com"
-			Quit
-		${EndIf}
-	!endif
+	
+	${If} ${AtMostWinVista}
+		MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
+		ExecShell "open" "http://mtasa.com"
+		Quit
+	${EndIf}
 
     File /oname=$TEMP\image.bmp "connect.bmp"
     
