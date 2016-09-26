@@ -9,6 +9,7 @@ addons:
     packages:
     - gcc-5
     - g++-5
+    - zip
     env: COMPILER=g++-5
     
 before_script:
@@ -18,10 +19,22 @@ before_script:
   - cd Build
 
 script: make -j 3 CXX=g++-5 CC=gcc-5 config=release_x64
- 
+
+after_success:
+  - cd ..
+  - ./premake5 install_data
+  - ./premake5 compose_files
+  - zip -r Artifact.zip InstallFiles/
+  - curl -i -F "branch_name=$TRAVIS_BRANCH" -F "commit_hash=$TRAVIS_COMMIT" -F "commit_title=$(git log -1 --pretty=%B)" -F build_type=linux64 -F "secret=$UPLOAD_SECRET" -F build_upload=@Artifact.zip https://nightlytest.mtasa.com/api/upload
+
 notifications:
   irc:
     channels:
       - "irc.gtanet.com#mta.dev"
     on_success: change
     on_failure: always
+
+env:
+  matrix:
+      secure: fk2kDz4BD3S4cuUihwn7D+rr8X0ZGltahpYJfZzCL5teSJmwIuJOprlsP92x9eacWLzbOdy1cQxj6FfVIeRxiy2hdyx1q+tloA1i7v+rQmErxzPEkSMMJ2dHemUvG5FzfvH5ZzUarFBZwezIxI78eTs5JLBcwoAVMVIJumoqGqI=
+

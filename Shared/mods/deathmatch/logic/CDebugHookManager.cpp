@@ -26,6 +26,13 @@
 ///////////////////////////////////////////////////////////////
 CDebugHookManager::CDebugHookManager( void )
 {
+#ifndef MTA_CLIENT
+    m_MaskArgumentsMap["dbConnect"]             = { 1, 2, 3 };      // type, 1=HOST, 2=USERNAME, 3=PASSWORD, options
+    m_MaskArgumentsMap["logIn"]                 = { 2 };            // player, account, 2=PASSWORD
+    m_MaskArgumentsMap["addAccount"]            = { 1 };            // name, 1=PASSWORD
+    m_MaskArgumentsMap["getAccount"]            = { 1 };            // name, 1=PASSWORD
+    m_MaskArgumentsMap["setAccountPassword"]    = { 1 };            // account, 1=PASSWORD
+#endif
 }
 
 
@@ -219,6 +226,7 @@ bool CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool b
 
     CLuaArguments FunctionArguments;
     FunctionArguments.ReadArguments( luaVM );
+    MaybeMaskArgumentValues( strName, FunctionArguments );
     NewArguments.PushArguments( FunctionArguments );
 
     return CallHook( strName, m_PreFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed );
@@ -271,6 +279,7 @@ void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
 
     CLuaArguments FunctionArguments;
     FunctionArguments.ReadArguments( luaVM );
+    MaybeMaskArgumentValues( strName, FunctionArguments );
     NewArguments.PushArguments( FunctionArguments );
 
     CallHook( strName, m_PostFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed );
@@ -395,6 +404,28 @@ bool CDebugHookManager::IsNameAllowed( const char* szName, const std::vector < S
 bool CDebugHookManager::MustNameBeExplicitlyAllowed( const SString& strName )
 {
     return strName == "addDebugHook" || strName == "removeDebugHook";
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::MaybeMaskArgumentValues
+//
+// Mask security sensitive argument values
+//
+///////////////////////////////////////////////////////////////
+void CDebugHookManager::MaybeMaskArgumentValues( const SString& strFunctionName, CLuaArguments& FunctionArguments )
+{
+    auto* pArgIndexList = MapFind( m_MaskArgumentsMap, strFunctionName );
+    if ( pArgIndexList )
+    {
+        for ( uint uiIndex : *pArgIndexList )
+        {
+            CLuaArgument* pArgument = FunctionArguments[uiIndex];
+            if ( pArgument )
+                pArgument->ReadString( "***" );
+        }
+    }
 }
 
 

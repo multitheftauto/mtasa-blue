@@ -633,6 +633,14 @@ void CClientObject::StreamedInPulse ( void )
 
         UpdateVisibility ();
     }
+    else
+    {
+        // Fixed attachment bug #9339 where [object1] -> [object2] -> [vehicle] causes positional lag for [object1]
+        if ( m_pAttachedToEntity && m_pAttachedToEntity->GetAttachedTo() )
+        {
+            DoAttaching ();
+        }
+    }
 
     // Are we not frozen
     if ( !m_bIsFrozen )
