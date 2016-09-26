@@ -104,7 +104,6 @@ void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
     {
         // Ensure that no attached events are in the queue
         RemoveWebViewEvents ( pWebView );
-        pWebView->NotifyPaint ();
 
         m_WebViews.remove ( pWebView );
         //pWebView->Release(); // Do not release since other references get corrupted then
@@ -177,7 +176,7 @@ void CWebCore::DoEventQueuePulse ()
     // Invoke paint method if necessary on the main thread
     for ( auto& view : m_WebViews )
     {
-        view->NotifyPaint ();
+        view->UpdateTexture();
     }
 }
 
@@ -307,7 +306,7 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallb
         if ( status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED )
             continue;
 
-        m_PendingRequests.push_back ( page );
+        m_PendingRequests.insert ( page );
         bNewItem = true;
     }
 
@@ -326,11 +325,11 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallb
         // Call callback immediately if nothing has changed (all entries are most likely already on the whitelist)
         // There is still the possibility that all websites are blacklisted; this is not the usual case tho, so ignore for now (TODO)
         if ( pCallback )
-            (*pCallback)( true, pages );
+            (*pCallback)(true, std::unordered_set<SString>(pages.begin(), pages.end()));
     }
 }
 
-void CWebCore::AllowPendingPages ( bool bRemember )
+std::unordered_set<SString> CWebCore::AllowPendingPages ( bool bRemember )
 {
     for ( const auto& request : m_PendingRequests )
     {
@@ -340,10 +339,9 @@ void CWebCore::AllowPendingPages ( bool bRemember )
     // Trigger an event now
     auto pCurrentMod = CModManager::GetSingleton ().GetCurrentMod ();
     if ( !pCurrentMod )
-        return;
+        return std::unordered_set<SString>();
 
     pCurrentMod->WebsiteRequestResultHandler ( m_PendingRequests );
-    m_PendingRequests.clear ();
 
     if ( bRemember )
     {
@@ -355,11 +353,19 @@ void CWebCore::AllowPendingPages ( bool bRemember )
 
         WriteCustomList ( "customwhitelist", customWhitelist, false );
     }
+
+    auto allowedRequests(std::move(m_PendingRequests));
+    m_PendingRequests.clear(); // MSVC's move constructor already clears the list which isn't specified by the C++ standard though
+
+    return allowedRequests;
 }
 
-void CWebCore::DenyPendingPages ()
+std::unordered_set<SString> CWebCore::DenyPendingPages ()
 {
-    m_PendingRequests.clear ();
+    auto deniedRequests(std::move(m_PendingRequests));
+    m_PendingRequests.clear();
+
+    return deniedRequests;
 }
 
 bool CWebCore::IsRequestsGUIVisible ()
@@ -386,13 +392,6 @@ bool CWebCore::GetRemoteJavascriptEnabled ()
     bool bIsRemoteJavascriptEnabled;
     CVARS_GET ( "browser_remote_javascript", bIsRemoteJavascriptEnabled );
     return bIsRemoteJavascriptEnabled;
-}
-
-bool CWebCore::GetPluginsEnabled ()
-{
-    bool bArePluginsEnabled;
-    CVARS_GET ( "browser_plugins", bArePluginsEnabled );
-    return bArePluginsEnabled;
 }
 
 void CWebCore::OnPreScreenshot ()
@@ -581,9 +580,9 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
         CXMLNode* pWhiteSubNode = pRootNode->FindSubNode ( "globalwhitelist" );
         if ( pWhiteSubNode )
         {
-            for ( std::list<CXMLNode*>::iterator iter = pWhiteSubNode->ChildrenBegin (); iter != pWhiteSubNode->ChildrenEnd (); ++iter )
+            for ( auto& pChild : pWhiteSubNode->GetChildren() )
             {
-                AddAllowedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
+                AddAllowedPage ( pChild->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
             }
         }
     }
@@ -593,9 +592,9 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
         CXMLNode* pBlackSubNode = pRootNode->FindSubNode ( "globalblacklist" );
         if ( pBlackSubNode )
         {
-            for ( std::list<CXMLNode*>::iterator iter = pBlackSubNode->ChildrenBegin (); iter != pBlackSubNode->ChildrenEnd (); ++iter )
+            for (auto& pChild : pBlackSubNode->GetChildren())
             {
-                AddBlockedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
+                AddBlockedPage (pChild->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
             }
         }
     }
@@ -605,17 +604,17 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
         CXMLNode* pBlackSubNode = pRootNode->FindSubNode ( "customblacklist" );
         if ( pBlackSubNode )
         {
-            for ( std::list<CXMLNode*>::iterator iter = pBlackSubNode->ChildrenBegin (); iter != pBlackSubNode->ChildrenEnd (); ++iter )
+            for (auto& pChild : pBlackSubNode->GetChildren())
             {
-                AddBlockedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_USER );
+                AddBlockedPage (pChild->GetTagContent (), eWebFilterType::WEBFILTER_USER );
             }
         }
         CXMLNode* pWhiteSubNode = pRootNode->FindSubNode ( "customwhitelist" );
         if ( pWhiteSubNode )
         {
-            for ( std::list<CXMLNode*>::iterator iter = pWhiteSubNode->ChildrenBegin (); iter != pWhiteSubNode->ChildrenEnd (); ++iter )
+            for (auto& pChild : pWhiteSubNode->GetChildren())
             {
-                AddAllowedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_USER );
+                AddAllowedPage (pChild->GetTagContent (), eWebFilterType::WEBFILTER_USER );
             }
         }
     }

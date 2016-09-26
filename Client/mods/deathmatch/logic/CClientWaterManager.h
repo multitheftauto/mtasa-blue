@@ -39,10 +39,6 @@ public:
 
     inline unsigned short                           GetDimension                (void)                   { return m_usDimension; };
     void                                            SetDimension                (unsigned short usDimension);
-
-    inline std::list < CClientWater* > ::const_iterator  IterBegin                   ( void )            { return m_List.begin (); };
-    inline std::list < CClientWater* > ::const_iterator  IterEnd                     ( void )            { return m_List.end (); };
-
 private:
                                                     CClientWaterManager         ( CClientManager* pManager );
                                                     ~CClientWaterManager        ( void );

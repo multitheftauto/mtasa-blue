@@ -32,8 +32,7 @@ public:
     void                                                    Delete                              ( CClientRadarArea* pRadarArea );
     void                                                    DeleteAll                           ( void );
 
-    inline std::list < CClientRadarArea* > ::const_iterator IterBegin                           ( void )                                { return m_List.begin (); };
-    inline std::list < CClientRadarArea* > ::const_iterator IterEnd                             ( void )                                { return m_List.end (); };
+    const auto&                                             GetRadarAreas                       ( void )                                { return m_List; }
 
     static CClientRadarArea*                                Get                                 ( ElementID ID );
 

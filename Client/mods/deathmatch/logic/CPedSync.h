@@ -20,7 +20,7 @@ class CPedSync
 {
 public:
                                     CPedSync                            ( CClientPedManager* pPedManager );
-                                    ~CPedSync                           ( void );
+                                    ~CPedSync                           ( void ) = default;
 
     bool                            ProcessPacket                       ( unsigned char ucPacketID, NetBitStreamInterface& bitStream );
     void                            DoPulse                             ( void );

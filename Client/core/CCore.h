@@ -43,10 +43,10 @@ class CCore;
 #include "CKeyBinds.h"
 #include "CMouseControl.h"
 #include "CScreenShot.h"
-#include "CCommunity.h"
 #include <xml/CXML.h>
 #include <ijsify.h>
 #include <Webbrowser/CWebCore.h>
+#include "CTrayIcon.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -106,9 +106,9 @@ public:
     CKeyBindsInterface*     GetKeyBinds                     ( void );
     CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
-    CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
     CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
     CWebCoreInterface*      GetWebCore                      ( void )                { return m_pWebCore; };
+    CTrayIconInterface*     GetTrayIcon                     ( void )                { return m_pTrayIcon; };
 
     void                    SaveConfig                      ( bool bWaitUntilFinished = false );
 
@@ -286,8 +286,8 @@ private:
     // Instances (put new classes here!)
     CXMLFile*                   m_pConfigFile;
     CClientVariables            m_ClientVariables;
-    CCommunity                  m_Community;
     CWebCore*                   m_pWebCore = nullptr;
+    CTrayIcon*                  m_pTrayIcon;
 
     // Hook interfaces.
     CMessageLoopHook *          m_pMessageLoopHook;

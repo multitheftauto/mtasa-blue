@@ -55,6 +55,10 @@ public:
     static bool                         GetClipboard                        ( SString& strText );
     static bool                         SetWindowFlashing                   ( bool flash, uint count );
 
+    // Notification funcs
+    static bool                         CreateTrayNotification              ( SString strText, eTrayIconType eType, bool useSound );
+    static bool                         IsTrayNotificationEnabled           ( void );
+
     // Element get funcs
     static CClientEntity*               GetRootElement                      ( void );
     static CClientEntity*               GetElementByID                      ( const char* szID, unsigned int uiIndex );
@@ -269,7 +273,6 @@ public:
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );
-    static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
     static bool                         GetObjectScale                      ( CClientObject& Object, CVector& vecScale );
     static bool                         IsObjectBreakable                   ( CClientObject& Object, bool& bBreakable );
     static bool                         GetObjectMass                       ( CClientObject& Object, float& fMass );

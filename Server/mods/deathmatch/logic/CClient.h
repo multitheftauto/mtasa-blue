@@ -38,7 +38,7 @@ public:
     };
 
 public:
-                            CClient                 ( void );
+                            CClient                 ( bool bAddGuestAccount = true );
                             ~CClient                ( void );
 
     virtual int             GetClientType           ( void ) = 0;

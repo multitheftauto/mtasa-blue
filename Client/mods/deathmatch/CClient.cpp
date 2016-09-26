@@ -102,9 +102,6 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "showsync",          "show sync data",                                   COMMAND_ShowSyncData );
     //g_pCore->GetCommands ()->Add ( "dumpall",           "dump internals (comment)",                           COMMAND_DumpPlayers );
 #endif
-    #ifdef MTA_DEBUG
-        g_pCore->GetCommands ()->Add ( "foo",      "debug command for devs", COMMAND_Foo );
-    #endif
 
     // Debug commands
     #if defined (MTA_DEBUG) || defined(MTA_BETA)
@@ -262,7 +259,7 @@ void CClient::IdleHandler ( void )
 }
 
 
-bool CClient::WebsiteRequestResultHandler ( const std::vector<SString>& newPages )
+bool CClient::WebsiteRequestResultHandler ( const std::unordered_set<SString>& newPages )
 {
     if ( g_pClientGame )
         return g_pClientGame->TriggerBrowserRequestResultEvent ( newPages );
@@ -309,14 +306,12 @@ bool CClient::HandleException ( CExceptionInformation* pExceptionInformation )
 
 void CClient::GetPlayerNames ( std::vector<SString> &vPlayerNames )
 {
-    if ( g_pClientGame ) {
+    if ( g_pClientGame ) 
+    {
         vPlayerNames.clear ();
-        for ( std::vector<CClientPlayer*>::const_iterator iter = g_pClientGame->GetPlayerManager ()->IterBegin ();
-            iter != g_pClientGame->GetPlayerManager ()->IterEnd ();
-            ++iter )
+        for ( auto& pPlayer : g_pClientGame->GetPlayerManager()->GetPlayers() )
         {
-            CClientPlayer* pClient = *iter;
-            SString strPlayerName = pClient->GetNametagText ();
+            SString strPlayerName = pPlayer->GetNametagText ();
             vPlayerNames.push_back ( strPlayerName );
         }
     }

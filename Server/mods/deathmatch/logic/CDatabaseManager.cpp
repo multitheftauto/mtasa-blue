@@ -35,6 +35,7 @@ public:
     virtual SConnectionHandle       Connect                     ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
     virtual bool                    Disconnect                  ( SConnectionHandle hConnection );
     virtual SString                 PrepareString               ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual SString                 PrepareStringf              ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual CDbJobData*             Exec                        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
     virtual CDbJobData*             Execf                       ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
@@ -234,6 +235,32 @@ CDbJobData* CDatabaseManagerImpl::Exec ( SConnectionHandle hConnection, const SS
     // Ignore result
     m_JobQueue->FreeCommand ( pJobData );
     return pJobData;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::PrepareStringf
+//
+// Safely insert supplied arguments into string
+//
+///////////////////////////////////////////////////////////////
+SString CDatabaseManagerImpl::PrepareStringf ( SConnectionHandle hConnection, const char* szQuery, ... )
+{
+    va_list vl;
+    va_start ( vl, szQuery );
+
+    ClearLastErrorMessage ();
+
+    // Check connection
+    if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
+    {
+        SetLastErrorMessage ( "Invalid connection" );
+        return NULL;
+    }
+
+    // Insert arguments with correct escapement
+    return InsertQueryArguments ( hConnection, szQuery, vl );
 }
 
 

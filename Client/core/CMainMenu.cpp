@@ -169,18 +169,6 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pVersion->SetSize ( CVector2D((32/NATIVE_RES_X)*m_iMenuSizeX,(32/NATIVE_RES_Y)*m_iMenuSizeY), false);
     m_pVersion->SetProperty("InheritsAlpha", "False" );
 
-    m_pCommunityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pFiller, "Not logged in" ) );
-    m_pCommunityLabel->AutoSize ( "Not logged in" );
-    m_pCommunityLabel->SetAlwaysOnTop ( true );
-    m_pCommunityLabel->SetAlpha ( 0 ); // disabled, previous alpha was 0.7f
-    m_pCommunityLabel->SetVisible ( false );
-    m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
-
-    std::string strUsername;
-    CCore::GetSingleton().GetCommunity()->GetUsername ( strUsername );
-    if ( CCore::GetSingleton().GetCommunity()->IsLoggedIn() && !strUsername.empty() )
-        ChangeCommunityState ( true, strUsername );
-
     float fBase = 0.613f;
     float fGap = 0.043f;
     // Our disconnect item is shown/hidden dynamically, so we store it seperately

@@ -11,8 +11,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 CClientStreamSector::CClientStreamSector ( CClientStreamSectorRow * pRow, CVector2D & vecBottomLeft, CVector2D & vecTopRight )
 {
     m_pRow = pRow;
@@ -104,7 +102,7 @@ bool CClientStreamSector::IsMySurroundingSector ( CClientStreamSector * pSector 
 }
 
 
-void CClientStreamSector::CompareSurroundings ( CClientStreamSector * pSector, list < CClientStreamSector * > * pCommon, list < CClientStreamSector * > * pUncommon, bool bIncludeCenter )
+void CClientStreamSector::CompareSurroundings ( CClientStreamSector * pSector, std::list < CClientStreamSector * > * pCommon, std::list < CClientStreamSector * > * pUncommon, bool bIncludeCenter )
 {
     // Make sure our lists are cleared
     pCommon->clear ();
@@ -129,25 +127,23 @@ void CClientStreamSector::CompareSurroundings ( CClientStreamSector * pSector, l
 }
 
 
-void CClientStreamSector::AddElements ( list < CClientStreamElement * > * pList )
+void CClientStreamSector::AddElements ( std::list < CClientStreamElement * > * pList )
 {
-    list < CClientStreamElement * > ::iterator iter = m_Elements.begin ();
-    for ( ; iter != m_Elements.end () ; iter++ )
+    for ( auto& pElement : m_Elements )
     {
         // Don't add if already in the list
-        if ( ListContains ( *pList, *iter ) )
+        if ( ListContains ( *pList, pElement ) )
             continue;
 
-        pList->push_back ( *iter );
+        pList->push_back ( pElement );
     }
 }
 
 
-void CClientStreamSector::RemoveElements ( list < CClientStreamElement * > * pList )
+void CClientStreamSector::RemoveElements ( std::list < CClientStreamElement * > * pList )
 {
-    list < CClientStreamElement * > ::iterator iter = m_Elements.begin ();
-    for ( ; iter != m_Elements.end () ; iter++ )
+    for ( auto& pElement : m_Elements )
     {
-        pList->remove ( *iter );
+        pList->remove ( pElement );
     }
 }

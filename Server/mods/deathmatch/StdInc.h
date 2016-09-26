@@ -20,6 +20,7 @@
 #include <vector>
 #include <ctime>
 #include <sstream>
+#include <mutex>
 
 // Forward declarations
 class CAclRightName;

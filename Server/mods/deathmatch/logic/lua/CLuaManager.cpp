@@ -233,6 +233,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefs::AddCommandHandler );
     CLuaCFunctions::AddFunction ( "removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler );
     CLuaCFunctions::AddFunction ( "executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler );
+    CLuaCFunctions::AddFunction ( "getCommandHandlers", CLuaFunctionDefs::GetCommandHandlers );
 
     // Server standard funcs
     CLuaCFunctions::AddFunction ( "getMaxPlayers", CLuaFunctionDefs::GetMaxPlayers );

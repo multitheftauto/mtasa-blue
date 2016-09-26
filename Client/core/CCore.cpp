@@ -183,11 +183,17 @@ CCore::CCore ( void )
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+
+    // Create tray icon
+    m_pTrayIcon = new CTrayIcon ( );
 }
 
 CCore::~CCore ( void )
 {
     WriteDebugEvent ( "CCore::~CCore" );
+
+    // Destroy tray icon
+    delete m_pTrayIcon;
 
     // Delete the mod manager
     delete m_pModManager;
@@ -611,13 +617,6 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
     CVARS_GET ( "tyre_smoke_enabled", bval ); m_pMultiplayer->SetTyreSmokeEnabled ( bval );
     pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
-}
-
-void CCore::ApplyCommunityState ( void )
-{
-    bool bLoggedIn = g_pCore->GetCommunity()->IsLoggedIn();
-    if ( bLoggedIn )
-        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow()->OnLoginStateChange ( true );
 }
 
 void CCore::SetConnected ( bool bConnected )
@@ -1237,8 +1236,6 @@ void CCore::DoPostFramePulse ( )
         ApplyGameSettings ();
 
         m_pGUI->SelectInputHandlers( INPUT_CORE );
-
-        m_Community.Initialize ();
     }
 
     if ( m_pGame->GetSystemState () == 5 ) // GS_INIT_ONCE
@@ -1345,8 +1342,6 @@ void CCore::DoPostFramePulse ( )
     GetGraphStats ()->Draw();
     m_pConnectManager->DoPulse ();
 
-    m_Community.DoPulse ();
-
     TIMING_CHECKPOINT( "-CorePostFrame2" );
 }
 
@@ -1369,6 +1364,9 @@ void CCore::OnModUnload ( )
     // Clear web whitelist
     if ( m_pWebCore )
         m_pWebCore->ResetFilter ();
+
+    // Destroy tray icon
+    m_pTrayIcon->DestroyTrayIcon ( );
 }
 
 

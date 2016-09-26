@@ -29,7 +29,7 @@ class CSingularFileDownload
     
 public:
                         CSingularFileDownload           ( CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum serverChecksum );
-                        ~CSingularFileDownload          ( void );
+                        ~CSingularFileDownload          ( void ) = default;
 
         static void     DownloadFinishedCallBack       ( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode );
 

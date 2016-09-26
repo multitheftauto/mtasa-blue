@@ -21,8 +21,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 extern CClientGame* g_pClientGame;
 std::set < const CClientEntity* > ms_AttachedVehiclesToIgnore;
 
@@ -879,41 +877,40 @@ void CClientVehicle::Fix ( void )
             szFixComponentName = fixRotationsList[i].szComponentName;
 
     // Grab our component data
-    std::map < SString, SVehicleComponentData > ::iterator iter = m_ComponentData.begin ();
     // Loop through our component data
-    for ( ; iter != m_ComponentData.end () ; iter++ )
+    for ( auto& iter : m_ComponentData )
     {
         // store our string in a temporary variable
-        SString strTemp = (*iter).first;
+        SString strTemp = iter.first;
 
         // Do rotation fix if required
         if ( szFixComponentName && strTemp == szFixComponentName )
         {
-            SetComponentRotation( strTemp, (*iter).second.m_vecComponentRotation );
+            SetComponentRotation( strTemp, iter.second.m_vecComponentRotation );
         }
 
         // is our position changed?
-        if ( (*iter).second.m_bPositionChanged )
+        if ( iter.second.m_bPositionChanged )
         {
             // Make sure it's different
-            if ( (*iter).second.m_vecOriginalComponentPosition != (*iter).second.m_vecComponentPosition )
+            if ( iter.second.m_vecOriginalComponentPosition != iter.second.m_vecComponentPosition )
             {
                 // apply our new position
-                SetComponentPosition( strTemp, (*iter).second.m_vecComponentPosition );
+                SetComponentPosition( strTemp, iter.second.m_vecComponentPosition );
             }
         }
         // is our rotation changed?
-        if ( (*iter).second.m_bRotationChanged )
+        if ( iter.second.m_bRotationChanged )
         {
             // Make sure it's different
-            if ( (*iter).second.m_vecOriginalComponentRotation != (*iter).second.m_vecComponentRotation )
+            if ( iter.second.m_vecOriginalComponentRotation != iter.second.m_vecComponentRotation )
             {
                 // apply our new rotation
-                SetComponentRotation( strTemp, (*iter).second.m_vecComponentRotation );
+                SetComponentRotation( strTemp, iter.second.m_vecComponentRotation );
             }
         }
         // set our visibility
-        SetComponentVisible ( strTemp, (*iter).second.m_bVisible );
+        SetComponentVisible ( strTemp, iter.second.m_bVisible );
     }
 }
 
@@ -1302,7 +1299,7 @@ bool CClientVehicle::IsDriven ( void ) const
 {
     if ( m_pVehicle )
     {
-        return m_pVehicle->IsBeingDriven () ? true:false;
+        return m_pVehicle->IsBeingDriven();
     }
     else
     {
@@ -2298,7 +2295,7 @@ void CClientVehicle::StreamedInPulse ( void )
         // Handle door ratio auto reallowment
         if ( !m_AutoReallowDoorRatioMap.empty() )
         {
-            for ( std::map < eDoors, CTickCount >::iterator iter = m_AutoReallowDoorRatioMap.begin() ; iter != m_AutoReallowDoorRatioMap.end() ; )
+            for ( auto iter = m_AutoReallowDoorRatioMap.begin() ; iter != m_AutoReallowDoorRatioMap.end() ; )
             {
                 if ( ( CTickCount::Now() - iter->second ).ToInt() > 4000 )
                 {
@@ -2864,15 +2861,12 @@ void CClientVehicle::Create ( void )
 
         if ( m_ComponentData.empty ( ) )
         {
-            // grab our map of components
-            std::map < SString, SVehicleFrame > componentMap = m_pVehicle->GetComponentMap ( );
-            // get our beginning
-            std::map < SString, SVehicleFrame >::iterator iter = componentMap.begin ( );
+            auto& componentMap = m_pVehicle->GetComponentMap();
             // loop through all the components.... we don't care about the RwFrame we just want the names.
-            for ( ; iter != componentMap.end () ; iter++ )
+            for ( auto& iter : componentMap )
             {
-                const SString& strName = iter->first;
-                const SVehicleFrame& frame = iter->second;
+                const SString& strName = iter.first;
+                const SVehicleFrame& frame = iter.second;
 
                 SVehicleComponentData vehicleComponentData;
 
@@ -2880,66 +2874,64 @@ void CClientVehicle::Create ( void )
                 if ( !frame.frameList.empty() )
                 {
                     RwFrame* pParentRwFrame = frame.frameList.back();
-                    for ( std::map < SString, SVehicleFrame >::const_iterator iter2 = componentMap.begin() ; iter2 != componentMap.end () ; iter2++ )
+                    for ( auto& iter2 : componentMap )
                     {
-                        if ( iter2->second.pFrame == pParentRwFrame )
+                        if ( iter2.second.pFrame == pParentRwFrame )
                         {
-                            vehicleComponentData.m_strParentName = iter2->first;
+                            vehicleComponentData.m_strParentName = iter2.first;
                             break;
                         }
                     }
                 }
 
                 // Grab our start position
-                GetComponentPosition ( (*iter).first, vehicleComponentData.m_vecComponentPosition );
-                GetComponentRotation ( (*iter).first, vehicleComponentData.m_vecComponentRotation );
+                GetComponentPosition ( iter.first, vehicleComponentData.m_vecComponentPosition );
+                GetComponentRotation ( iter.first, vehicleComponentData.m_vecComponentRotation );
                 
                 // copy it into our original positions
                 vehicleComponentData.m_vecOriginalComponentPosition = vehicleComponentData.m_vecComponentPosition;
                 vehicleComponentData.m_vecOriginalComponentRotation = vehicleComponentData.m_vecComponentRotation;
                 
                 // insert it into our component data list
-                m_ComponentData.insert ( std::pair < SString, SVehicleComponentData > ( (*iter).first, vehicleComponentData ) );
+                m_ComponentData.insert ( std::pair < SString, SVehicleComponentData > ( iter.first, vehicleComponentData ) );
                 
                 // # prefix means hidden by default.
-                if ( (*iter).first[0] == '#' )
+                if ( iter.first[0] == '#' )
                 {
-                    SetComponentVisible ( (*iter).first, false );
+                    SetComponentVisible ( iter.first, false );
                 }
             }
         }
-        // Grab our component data
-        std::map < SString, SVehicleComponentData > ::iterator iter = m_ComponentData.begin ();
         // Loop through our component data
-        for ( ; iter != m_ComponentData.end () ; iter++ )
+        for ( auto& iter : m_ComponentData )
         {
             // store our string in a temporary variable
-            SString strTemp = (*iter).first;
+            SString strTemp = iter.first;
             // get our poisition and rotation and store it into 
             //GetComponentPosition ( strTemp, (*iter).second.m_vecComponentPosition );
             //GetComponentRotation ( strTemp, (*iter).second.m_vecComponentRotation );
             // is our position changed?
-            if ( (*iter).second.m_bPositionChanged )
+            if ( iter.second.m_bPositionChanged )
             {
                 // Make sure it's different
-                if ( (*iter).second.m_vecOriginalComponentPosition != (*iter).second.m_vecComponentPosition )
+                if ( iter.second.m_vecOriginalComponentPosition != iter.second.m_vecComponentPosition )
                 {
                     // apply our new position
-                    SetComponentPosition( strTemp, (*iter).second.m_vecComponentPosition );
+                    SetComponentPosition( strTemp, iter.second.m_vecComponentPosition );
                 }
             }
             // is our position changed?
-            if ( (*iter).second.m_bRotationChanged )
+            if ( iter.second.m_bRotationChanged )
             {
                 // Make sure it's different
-                if ( (*iter).second.m_vecOriginalComponentRotation != (*iter).second.m_vecComponentRotation )
+                if ( iter.second.m_vecOriginalComponentRotation != iter.second.m_vecComponentRotation )
                 {
                     // apple our new position
-                    SetComponentRotation( strTemp, (*iter).second.m_vecComponentRotation );
+                    SetComponentRotation( strTemp, iter.second.m_vecComponentRotation );
                 }
             }
             // set our visibility
-            SetComponentVisible ( strTemp, (*iter).second.m_bVisible );
+            SetComponentVisible ( strTemp, iter.second.m_bVisible );
         }
         // store our spawn position in case we fall through the map
         m_matCreate = m_Matrix;
@@ -3667,7 +3659,6 @@ void CClientVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOO
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
-        case VT_BLOODRA:
             memset ( &ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS );
 
             // Keep the bonet and boot intact
@@ -3874,10 +3865,8 @@ void CClientVehicle::UpdateTargetPosition ( void )
         // Update our contact players
         CVector vecPlayerPosition;
         CVector vecOffset;
-        list < CClientPed * > ::iterator iter = m_Contacts.begin ();
-        for ( ; iter != m_Contacts.end () ; iter++ )
+        for ( auto& pModel : m_Contacts )
         {
-            CClientPed * pModel = *iter;
             pModel->GetPosition ( vecPlayerPosition );                
             vecOffset = vecPlayerPosition - vecCurrentPosition;
             vecPlayerPosition = vecNewPosition + vecOffset;
@@ -4006,10 +3995,8 @@ bool CClientVehicle::HasPoliceRadio ( void )
 void CClientVehicle::RemoveAllProjectiles ( void )
 {
     CClientProjectile * pProjectile = NULL;
-    list < CClientProjectile* > ::iterator iter = m_Projectiles.begin ();
-    for ( ; iter != m_Projectiles.end () ; iter++ )
+    for ( auto& pProjectile : m_Projectiles )
     {
-        pProjectile = *iter;
         pProjectile->m_pCreator = NULL;
         g_pClientGame->GetElementDeleter ()->Delete ( pProjectile );        
     }
@@ -4390,9 +4377,9 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
     GetPosition ( vecPosition );
     CClientEntityResult result;
     GetClientSpatialDatabase ()->SphereQuery ( result, CSphere ( vecPosition + CVector ( 0, 0, -3 ), 5 ) );
-    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
+    for ( auto& pElement : result )
     {
-        if  ( (*it)->GetType () == CCLIENTOBJECT )
+        if  ( pElement->GetType () == CCLIENTOBJECT )
         {
             bNearObject = true;
             break;

@@ -14,28 +14,21 @@
 
 #include "StdInc.h"
 
-CAccount::CAccount ( CAccountManager* pManager, bool bRegistered, const std::string& strName, const std::string& strPassword, const std::string& strIP, int iUserID, const std::string& strSerial )
+CAccount::CAccount ( CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword, int iUserID, const std::string& strIP, const std::string& strSerial )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACCOUNT );
     m_pClient = NULL;
 
-    m_iUserID = 0;
     m_bChanged = false;
-
     m_pManager = pManager;
-
-    m_bRegistered = bRegistered;
-
-    m_uiNameHash = 0;
-    SetName ( strName );
-
-    SetIP ( strIP );
-    SetSerial ( strSerial );
-    SetID ( iUserID );
+    m_AccountType = accountType;
+    m_strName = strName;
+    m_iUserID = iUserID;
+    m_strIP = strIP;
+    m_strSerial = strSerial;
 
     m_pManager->AddToList ( this );
 
-    m_bChanged = false;
     if ( m_Password.SetPassword( strPassword ) )
         m_pManager->MarkAsChanged ( this );     // Save if password upgraded
 }
@@ -52,27 +45,12 @@ CAccount::~CAccount ( void )
 }
 
 
-void CAccount::Register ( const char* szPassword )
-{
-    SetPassword( szPassword );
-    m_bRegistered = true;
-    m_Data.clear();
-
-    m_pManager->MarkAsChanged ( this );
-}
-
-
 void CAccount::SetName ( const std::string& strName )
 {
     if ( m_strName != strName )
     {
         m_pManager->ChangingName ( this, m_strName, strName );
-
         m_strName = strName;
-
-        if ( !m_strName.empty () )
-            m_uiNameHash = HashString ( m_strName.c_str () );
-
         m_pManager->MarkAsChanged ( this );
     }
 }
@@ -108,31 +86,6 @@ SString CAccount::GetPasswordHash ( void )
     return m_Password.GetPasswordHash();
 }
 
-void CAccount::SetIP ( const std::string& strIP )
-{
-    if ( m_strIP != strIP )
-    {
-        m_strIP = strIP;
-        m_pManager->MarkAsChanged ( this );
-    }
-}
-
-void CAccount::SetSerial ( const std::string& strSerial )
-{
-    if ( m_strSerial != strSerial )
-    {
-        m_strSerial = strSerial;
-        m_pManager->MarkAsChanged ( this );
-    }
-}
-
-void CAccount::SetID ( int iUserID )
-{
-    if ( m_iUserID != iUserID )
-    {
-        m_iUserID = iUserID;
-    }
-}
 
 CAccountData* CAccount::GetDataPointer ( const std::string& strKey )
 {
@@ -208,4 +161,192 @@ bool CAccount::HasData ( const std::string& strKey )
 void CAccount::RemoveData ( const std::string& strKey )
 {
     MapRemove( m_Data, strKey );
+}
+
+
+//
+// Authorized aerial stuff
+//
+// Account serial usage is only recorded for accounts that require serial authorization,
+// and is only loaded when required.
+void CAccount::EnsureLoadedSerialUsage( void )
+{
+    if ( !m_bLoadedSerialUsage )
+    {
+        m_bLoadedSerialUsage = true;
+        m_pManager->LoadAccountSerialUsage( this );
+    }
+}
+
+
+bool CAccount::HasLoadedSerialUsage( void )
+{
+    return m_bLoadedSerialUsage;
+}
+
+
+std::vector<CAccount::SSerialUsage>& CAccount::GetSerialUsageList( void )
+{
+    EnsureLoadedSerialUsage();
+    return m_SerialUsageList;
+}
+
+
+CAccount::SSerialUsage* CAccount::GetSerialUsage( const SString& strSerial )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto& info : m_SerialUsageList )
+    {
+        if ( info.strSerial == strSerial )
+            return &info; 
+    }
+    return nullptr;
+}
+
+//
+// Check if the supplied serial had been authorized for this account
+//
+bool CAccount::IsSerialAuthorized( const SString& strSerial )
+{
+    SSerialUsage* pInfo = GetSerialUsage( strSerial );
+    if ( pInfo )
+    {
+        return pInfo->IsAuthorized();
+    }
+    return false;
+}
+
+//
+// Check if the supplied IP was last used by an authorized serial
+//
+bool CAccount::IsIpAuthorized( const SString& strIp )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto& info : m_SerialUsageList )
+    {
+        if ( info.strLastLoginIp == strIp && info.IsAuthorized() )
+            return true; 
+    }
+    return false;
+}
+
+//
+// Mark pending serial as authorized for this account
+//
+bool CAccount::AuthorizeSerial( const SString& strSerial, const SString& strWho )
+{
+    SSerialUsage* pInfo = GetSerialUsage( strSerial );
+    if ( pInfo )
+    {
+        if ( !pInfo->IsAuthorized() )
+        {
+            pInfo->tAuthDate = time( nullptr );
+            pInfo->strAuthWho = strWho;
+            m_pManager->MarkAsChanged( this );
+            return true;
+        }
+    }
+    return false;
+}
+
+//
+// Unconditionally remove usage info for a serial
+//
+bool CAccount::RemoveSerial( const SString& strSerial )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto iter = m_SerialUsageList.begin() ; iter != m_SerialUsageList.end() ; ++iter )
+    {
+        SSerialUsage& info = *iter;
+        if ( info.strSerial == strSerial )
+        {
+            iter = m_SerialUsageList.erase( iter );
+            m_pManager->MarkAsChanged( this );
+            return true;
+        }
+    }
+    return false;
+}
+
+//
+// Cleanup unauthorized serials
+//
+void CAccount::RemoveUnauthorizedSerials( void )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto iter = m_SerialUsageList.begin() ; iter != m_SerialUsageList.end() ; )
+    {
+        SSerialUsage& info = *iter;
+        if ( !info.IsAuthorized() )
+            iter = m_SerialUsageList.erase( iter );
+        else
+            ++iter;
+    }
+    m_pManager->MarkAsChanged( this );
+}
+
+//
+// If serial not already present, add for possible authorization
+//
+bool CAccount::AddSerialForAuthorization( const SString& strSerial, const SString& strIp )
+{
+    SSerialUsage* pInfo = GetSerialUsage( strSerial );
+    if ( !pInfo )
+    {
+        // Only one new serial at a time, so remove all other unauthorized serials for this account
+        RemoveUnauthorizedSerials();
+
+        SSerialUsage info;
+        info.strSerial = strSerial;
+        info.strAddedIp = strIp;
+        info.tAddedDate = time( nullptr );
+        info.tAuthDate = 0;
+        info.tLastLoginDate = 0;
+        info.tLastLoginHttpDate = 0;
+
+        // First one doesn't require authorization
+        if ( m_SerialUsageList.size() == 0 )
+        {
+            info.tAuthDate = time( nullptr );
+        }
+        m_SerialUsageList.push_back( info );
+        m_pManager->MarkAsChanged( this );
+        return true;
+    }
+    return false;
+}
+
+//
+// Called when the player has successful logged in
+//
+void CAccount::OnLoginSuccess( const SString& strSerial, const SString& strIp )
+{
+    SSerialUsage* pInfo = GetSerialUsage( strSerial );
+    if ( pInfo )
+    {
+        pInfo->strLastLoginIp = strIp;
+        pInfo->tLastLoginDate = time( nullptr );
+
+        // On successful login, delete all other unauthorized serials for this account
+        RemoveUnauthorizedSerials();
+    }
+    m_strIP = strIp;
+    m_strSerial = strSerial;
+    m_pManager->MarkAsChanged( this );
+}
+
+//
+// Called when the player has successful logged in via the http interface
+//
+void CAccount::OnLoginHttpSuccess( const SString& strIp )
+{
+    EnsureLoadedSerialUsage();
+    for ( auto& info : m_SerialUsageList )
+    {
+        if ( info.strLastLoginIp == strIp && info.IsAuthorized() )
+        {
+            info.tLastLoginHttpDate = time( nullptr );
+            m_pManager->MarkAsChanged( this );
+        }
+    }
 }

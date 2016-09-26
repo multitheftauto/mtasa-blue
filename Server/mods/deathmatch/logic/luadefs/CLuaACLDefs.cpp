@@ -119,7 +119,7 @@ void CLuaACLDefs::AddClass ( lua_State* luaVM )
 int CLuaACLDefs::aclReload ( lua_State* luaVM )
 {
     // Just reload the XML file
-    bool bSuccess = m_pACLManager->Load ();
+    bool bSuccess = m_pACLManager->Reload ();
 
     // Return whether we succeeded or not
     lua_pushboolean ( luaVM, bSuccess );

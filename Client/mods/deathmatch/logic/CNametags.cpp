@@ -15,8 +15,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 #define MELEE_VISIBLE_RANGE         60.0f
 #define AIM_VISIBLE_RANGE           300.0f
 #define SNIPER_AIM_VISIBLE_RANGE    300.0f
@@ -219,11 +217,8 @@ void CNametags::DrawFromAim ( void )
 
             // Draw the nametags we need to
             CClientPlayer* pPlayer;
-            CClientStreamElement * pElement;
-            list < CClientStreamElement* > ::const_iterator iter = m_pPlayerStreamer->ActiveElementsBegin ();
-            for ( ; iter != m_pPlayerStreamer->ActiveElementsEnd (); ++iter )
+            for ( auto pElement : m_pPlayerStreamer->GetActiveElements() )
             {
-                pElement = *iter;
                 if ( !pElement->IsStreamedIn () ) continue;
                 if ( pElement->GetType () != CCLIENTPLAYER ) continue;
                 pPlayer = static_cast < CClientPlayer * > ( pElement );
@@ -270,13 +265,13 @@ void CNametags::DrawDefault ( void )
     static float fResHeight = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportHeight () );
         
     // Got any players that are not local?
-    if ( m_pPlayerManager->Count () <= 1 ) return;
-
-    list < CClientPlayer * > playerTags;
+    if ( m_pPlayerManager->Count () <= 1 ) 
+        return;
 
     // Grab the local player
     CClientPlayer* pLocalPlayer = m_pPlayerManager->GetLocalPlayer ();
-    if ( !pLocalPlayer ) return;
+    if ( !pLocalPlayer ) 
+        return;
 
     CClientVehicle* pSniperTargetedVehicle = NULL;
     CClientPlayer* pSniperTargetedPlayer = NULL;
@@ -357,11 +352,9 @@ void CNametags::DrawDefault ( void )
     CEntity * pGameEntity = NULL;
     CClientEntity * pEntity = NULL;
     CClientPlayer* pPlayer;
-    CClientStreamElement * pElement;
-    list < CClientStreamElement* > ::const_iterator iter = m_pPlayerStreamer->ActiveElementsBegin ();
-    for ( ; iter != m_pPlayerStreamer->ActiveElementsEnd (); ++iter )
+    std::list < CClientPlayer * > playerTags;
+    for (auto pElement : m_pPlayerStreamer->GetActiveElements())
     {
-        pElement = *iter;
         if ( !pElement->IsStreamedIn () ) continue;
         if ( pElement->GetType () != CCLIENTPLAYER ) continue;
         pPlayer = static_cast < CClientPlayer * > ( pElement );
@@ -404,10 +397,8 @@ void CNametags::DrawDefault ( void )
     float fAlphaModifier;
     unsigned char ucAlpha;
     float fDistance;
-    list < CClientPlayer * > ::iterator iterTags = playerTags.begin ();
-    for ( ; iterTags != playerTags.end () ; ++iterTags )
+    for ( auto& pPlayer : playerTags )
     {
-        pPlayer = *iterTags;
         fDistance = pPlayer->GetNametagDistance ();
 
         static float fFullAlphaDistance = 7.0f;

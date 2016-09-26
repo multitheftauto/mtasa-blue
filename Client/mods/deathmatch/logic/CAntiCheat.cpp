@@ -39,27 +39,25 @@ void CAntiCheat::AddModule ( CAntiCheatModule& Module )
 void CAntiCheat::RemoveModule ( CAntiCheatModule& Module )
 {
     // Find the entry
-    std::list < CAntiCheatModule* > ::iterator iter = m_Entries.begin ();
-    for ( ; iter != m_Entries.end (); iter++ )
+    auto iter = std::find(m_Entries.begin(), m_Entries.end(), &Module);
+    // Did we find it?
+    if (iter == m_Entries.end())
+        return;
+
+    // Does this iterator match our last index?
+    if (m_LastEntry == iter)
     {
-        // Is this the module?
-        if ( *iter == &Module )
-        {
-            // Does this iterator match our last index?
-            if ( m_LastEntry == iter )
-            {
-                // Make it our last entry. This might be end(), but it'll be valid.
-                m_LastEntry = m_Entries.erase ( iter );
-                return;
-            }
-            else
-            {
-                // Just erase it and return. Our last entry should be valid.
-                m_Entries.erase ( iter );
-                return;
-            }
-        }
+        // Make it our last entry. This might be end(), but it'll be valid.
+        m_LastEntry = m_Entries.erase(iter);
+        return;
     }
+    else
+    {
+        // Just erase it and return. Our last entry should be valid.
+        m_Entries.erase(iter);
+        return;
+    }
+
 }
 
 

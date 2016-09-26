@@ -32,10 +32,10 @@ void CClientEffect::Unlink()
 {
     m_pManager->GetEffectManager ( )->RemoveFromList ( this );
 
-    if ( m_pFxSystem != NULL )
+    if ( m_pFxSystem != nullptr )
     {
         g_pGame->GetFxManager ( )->DestroyFxSystem ( m_pFxSystem );
-        m_pFxSystem = NULL;
+        m_pFxSystem = nullptr;
     }
 }
 

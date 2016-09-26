@@ -26,6 +26,13 @@
 ///////////////////////////////////////////////////////////////
 CDebugHookManager::CDebugHookManager( void )
 {
+#ifndef MTA_CLIENT
+    m_MaskArgumentsMap["dbConnect"]             = { 1, 2, 3 };      // type, 1=HOST, 2=USERNAME, 3=PASSWORD, options
+    m_MaskArgumentsMap["logIn"]                 = { 2 };            // player, account, 2=PASSWORD
+    m_MaskArgumentsMap["addAccount"]            = { 1 };            // name, 1=PASSWORD
+    m_MaskArgumentsMap["getAccount"]            = { 1 };            // name, 1=PASSWORD
+    m_MaskArgumentsMap["setAccountPassword"]    = { 1 };            // account, 1=PASSWORD
+#endif
 }
 
 
@@ -71,9 +78,9 @@ std::vector < SDebugHookCallInfo >& CDebugHookManager::GetHookInfoListForType( E
 bool CDebugHookManager::AddDebugHook( EDebugHookType hookType, const CLuaFunctionRef& functionRef, const std::vector < SString >& allowedNameList )
 {
     std::vector < SDebugHookCallInfo >& hookInfoList = GetHookInfoListForType( hookType );
-    for( std::vector < SDebugHookCallInfo >::iterator iter = hookInfoList.begin() ; iter != hookInfoList.end() ; ++iter )
+    for( auto& pHook : hookInfoList )
     {
-        if ( (*iter).functionRef == functionRef )
+        if ( pHook.functionRef == functionRef )
             return false;
     }
 
@@ -83,8 +90,8 @@ bool CDebugHookManager::AddDebugHook( EDebugHookType hookType, const CLuaFunctio
     if ( !info.pLuaMain )
         return false;
 
-    for( uint i = 0 ; i < allowedNameList.size() ; i++ )
-        MapInsert( info.allowedNameMap, allowedNameList[i] );
+    for( auto& allowedName : allowedNameList )
+        MapInsert( info.allowedNameMap, allowedName );
 
     hookInfoList.push_back( info );
     return true;
@@ -103,7 +110,7 @@ bool CDebugHookManager::RemoveDebugHook( EDebugHookType hookType, const CLuaFunc
     CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( functionRef.GetLuaVM() );
 
     std::vector < SDebugHookCallInfo >& hookInfoList = GetHookInfoListForType( hookType );
-    for( std::vector < SDebugHookCallInfo >::iterator iter = hookInfoList.begin() ; iter != hookInfoList.end() ; ++iter )
+    for( auto iter = hookInfoList.begin() ; iter != hookInfoList.end() ; ++iter )
     {
         if ( (*iter).pLuaMain == pLuaMain && (*iter).functionRef == functionRef )
         {
@@ -219,6 +226,7 @@ bool CDebugHookManager::OnPreFunction( lua_CFunction f, lua_State* luaVM, bool b
 
     CLuaArguments FunctionArguments;
     FunctionArguments.ReadArguments( luaVM );
+    MaybeMaskArgumentValues( strName, FunctionArguments );
     NewArguments.PushArguments( FunctionArguments );
 
     return CallHook( strName, m_PreFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed );
@@ -271,6 +279,7 @@ void CDebugHookManager::OnPostFunction( lua_CFunction f, lua_State* luaVM )
 
     CLuaArguments FunctionArguments;
     FunctionArguments.ReadArguments( luaVM );
+    MaybeMaskArgumentValues( strName, FunctionArguments );
     NewArguments.PushArguments( FunctionArguments );
 
     CallHook( strName, m_PostFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed );
@@ -373,10 +382,8 @@ void CDebugHookManager::OnPostEvent( const char* szName, const CLuaArguments& Ar
 ///////////////////////////////////////////////////////////////
 bool CDebugHookManager::IsNameAllowed( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, bool bNameMustBeExplicitlyAllowed )
 {
-    for( uint i = 0 ; i < eventHookList.size() ; i++ )
+    for( auto& info : eventHookList )
     {
-        const SDebugHookCallInfo& info = eventHookList[i];
-
         if ( info.allowedNameMap.empty() && !bNameMustBeExplicitlyAllowed )
             return true;    // All names allowed
 
@@ -397,6 +404,28 @@ bool CDebugHookManager::IsNameAllowed( const char* szName, const std::vector < S
 bool CDebugHookManager::MustNameBeExplicitlyAllowed( const SString& strName )
 {
     return strName == "addDebugHook" || strName == "removeDebugHook";
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::MaybeMaskArgumentValues
+//
+// Mask security sensitive argument values
+//
+///////////////////////////////////////////////////////////////
+void CDebugHookManager::MaybeMaskArgumentValues( const SString& strFunctionName, CLuaArguments& FunctionArguments )
+{
+    auto* pArgIndexList = MapFind( m_MaskArgumentsMap, strFunctionName );
+    if ( pArgIndexList )
+    {
+        for ( uint uiIndex : *pArgIndexList )
+        {
+            CLuaArgument* pArgument = FunctionArguments[uiIndex];
+            if ( pArgument )
+                pArgument->ReadString( "***" );
+        }
+    }
 }
 
 

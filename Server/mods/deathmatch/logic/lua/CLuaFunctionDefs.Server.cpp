@@ -166,7 +166,7 @@ int CLuaFunctionDefs::OutputDebugString ( lua_State* luaVM )
     unsigned char ucR, ucG, ucB;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strMessage );
+    argStream.ReadAnyAsString( strMessage );
     argStream.ReadNumber ( uiLevel, 3 );
 
     if ( uiLevel == 0 )
@@ -317,6 +317,49 @@ int CLuaFunctionDefs::ExecuteCommandHandler ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaFunctionDefs::GetCommandHandlers ( lua_State* luaVM )
+{
+    // table getCommandHandlers ( [ resource sourceResource ] );
+    CResource* pResource;
+    bool bSpecificResource = false;
+
+    CScriptArgReader argStream ( luaVM );
+    if ( !argStream.NextIsNone() )
+    {
+        argStream.ReadUserData ( pResource );
+        bSpecificResource = true;
+    }
+
+    if ( !argStream.HasErrors() )
+    {
+        if ( bSpecificResource )
+        {
+            // Grab resource virtual machine
+            CLuaMain* pLuaMain = pResource->GetVirtualMachine ();
+
+            if ( pLuaMain )
+            {
+                m_pRegisteredCommands->GetCommands( luaVM, pLuaMain );
+
+                return 1;
+            }
+        }
+        else
+        {
+            m_pRegisteredCommands->GetCommands( luaVM );
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::OutputServerLog ( lua_State* luaVM )
 {

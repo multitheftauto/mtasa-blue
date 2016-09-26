@@ -125,6 +125,8 @@ public:
     bool                            GetLoadstringLogEnabled         ( void ) const              { return !m_strLoadstringLogFilename.empty(); }
     bool                            GetCrashDumpUploadEnabled       ( void ) const              { return m_bCrashDumpUploadEnabled != 0; }
     bool                            GetFilterDuplicateLogLinesEnabled ( void ) const            { return m_bFilterDuplicateLogLinesEnabled != 0; }
+    bool                            IsAuthSerialGroup               ( const SString& strGroup ) const   { return ListContains ( m_AuthSerialGroupList, strGroup ); };
+    bool                            IsAuthSerialHttpEnabled         ( void ) const                      { return m_bAuthSerialHttpEnabled; };
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -187,6 +189,8 @@ private:
     int                             m_bDontBroadcastLan;
     std::set < SString >            m_DisableComboACMap;
     std::set < SString >            m_EnableDiagnosticMap;
+    std::vector < SString >         m_AuthSerialGroupList;
+    bool                            m_bAuthSerialHttpEnabled;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
     SString                         m_strIdFile;

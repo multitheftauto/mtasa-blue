@@ -160,11 +160,8 @@ bool CResourceMapItem::LoadSubNodes ( CXMLNode& Node, CElement* pParent, vector 
 {
     // Iterate the nodes
     CXMLNode* pNode = NULL;
-    list < CXMLNode * > ::iterator iter = Node.ChildrenBegin ();
-    for ( ; iter != Node.ChildrenEnd () ; iter++ )
+    for ( auto& pNode : Node.GetChildren() )
     {
-        // Grab the node
-        pNode = *iter;
         if ( pNode )
         {
             // Handle it (if it can't be handled, just ignore it and continue to the next)

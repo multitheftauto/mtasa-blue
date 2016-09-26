@@ -51,7 +51,8 @@ public:
     void Focus                  ( bool state = true );
     IDirect3DTexture9* GetTexture () { return static_cast<IDirect3DTexture9*>(m_pWebBrowserRenderItem->m_pD3DTexture); }
     void ClearTexture           ();
-    inline void NotifyPaint     () { m_PaintCV.notify_one (); }
+
+    void UpdateTexture          ();
 
     inline bool HasInputFocus   () { return m_bHasInputFocus; }
 
@@ -104,6 +105,7 @@ public:
 
     // CefRenderHandler methods
     virtual bool GetViewRect    ( CefRefPtr<CefBrowser> browser, CefRect& rect ) override;
+    virtual void OnPopupShow    (CefRefPtr<CefBrowser> browser, bool show) override;
     virtual void OnPopupSize    ( CefRefPtr<CefBrowser> browser, const CefRect& rect ) override;
     virtual void OnPaint        ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height ) override;
     virtual void OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo ) override;
@@ -144,12 +146,25 @@ private:
     bool                m_mouseButtonStates[3];
     SString             m_CurrentTitle;
     float               m_fVolume;
-    std::mutex          m_PaintMutex;
-    std::condition_variable m_PaintCV;
-    int                 m_RenderPopupOffsetX, m_RenderPopupOffsetY;
     std::map<SString, SString> m_Properties;
     bool                m_bHasInputFocus;
     std::set<std::string> m_AjaxHandlers;
+
+    struct
+    {
+        bool changed = false;
+        std::mutex dataMutex;
+        std::mutex cvMutex;
+        std::condition_variable cv;
+
+        const void* buffer;
+        int width, height;
+        CefRenderHandler::RectList dirtyRects;
+
+        CefRect popupRect;
+        bool popupShown = false;
+        std::unique_ptr<byte[]> popupBuffer;
+    } m_RenderData;
 
     CWebBrowserEventsInterface* m_pEventsInterface;
 

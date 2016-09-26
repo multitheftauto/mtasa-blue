@@ -180,6 +180,8 @@ Page custom CustomDirectoryPage CustomDirectoryPageLeave
 !insertmacro MUI_LANGUAGE "English"
 ;@INSERT_TRANSLATIONS@
 
+LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
+LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access may be requested for Vista and up]\n\n\
@@ -229,6 +231,13 @@ Function .onInit
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
     
+	
+	${If} ${AtMostWinVista}
+		MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
+		ExecShell "open" "http://mtasa.com"
+		Quit
+	${EndIf}
+
     File /oname=$TEMP\image.bmp "connect.bmp"
     
     ; #############################################
@@ -593,6 +602,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                     ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam                   2007-12-04 11:50:50     5697536
                     ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update) 2014-10-14 21:58:05     5971456
                     ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update) 2014-12-01 20:43:21     5971456
+                    ${Case} "d9cb35c898d3298ca904a63e10ee18d7" #DE 3.02 Steam (2014 Dec update) 2016-08-11 20:57:22     5971456
                         #Copy gta-sa.exe to gta_sa.exe and commence patching process
                         CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
                         Call InstallPatch
@@ -2257,8 +2267,8 @@ Function CustomDirectoryPageUpdateINSTDIR
     ${EndSwitch}
 FunctionEnd
 
-; Out <stack> = "1" - Is Windows Classic
 Function IsWindowsClassicTheme
+; Out <stack> = "1" - Is Windows Classic
     System::Call "UxTheme::IsThemeActive() i .r3"
     StrCpy $1 "1"
     ${If} $3 == 1

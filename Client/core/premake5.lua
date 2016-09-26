@@ -7,6 +7,7 @@ project "Client Core"
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/current/src/windows" }
 		linkoptions { "/SAFESEH\:NO" }
+		buildoptions { "-Zm130" }
 	
 	filter {}
 		includedirs { 
@@ -15,7 +16,7 @@ project "Client Core"
 			"../../vendor/cef3",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
-			"../../vendor/jpeg-8d",
+			"../../vendor/jpeg-9b",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/current/src/"
 		}
@@ -32,11 +33,14 @@ project "Client Core"
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
+		["Resources/*"] = {"**.rc", "../launch/resource/mtaicon.ico"},
 		["*"] = "premake5.lua"
 	}
 	
 	files {
 		"premake5.lua",
+		"../launch/resource/mtaicon.ico",
+		"core.rc",
 		"**.h",
 		"**.cpp"
 	}

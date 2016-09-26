@@ -36,10 +36,9 @@ void CClientPathManager::DeleteAll ( void )
     // Delete all nodes in the list
     m_bRemoveFromList = false;
 
-    list < CClientPathNode* > ::const_iterator iter = m_PathNodeList.begin ();
-    for ( ; iter != m_PathNodeList.end (); iter++ )
+    for ( auto& pPath : m_PathNodeList )
     {
-        delete *iter;
+        delete pPath;
     }
 
     // Clear the list
@@ -50,10 +49,9 @@ void CClientPathManager::DeleteAll ( void )
 
 void CClientPathManager::DoPulse ( void )
 {
-    list < CClientPathNode* > ::const_iterator iter = m_PathNodeList.begin ();
-    for ( ; iter != m_PathNodeList.end () ; ++iter )
+    for (auto& pPath : m_PathNodeList)
     {
-        (*iter)->DoPulse ();
+        pPath->DoPulse ();
     }
 }
 
@@ -61,23 +59,21 @@ void CClientPathManager::DoPulse ( void )
 void CClientPathManager::LinkNodes ( void )
 {
     // Link our nodes with the IDs
-    list < CClientPathNode* > ::const_iterator iterList = m_PathNodeList.begin ();
-    for ( ; iterList != m_PathNodeList.end () ; iterList++ )
+    for (auto& pPath : m_PathNodeList) 
     {
         // Grab the ID of the next node
-        ElementID NextNodeID = (*iterList)->m_NextNodeID;
+        ElementID NextNodeID = pPath->m_NextNodeID;
 
         // If it was set
         if ( NextNodeID != INVALID_ELEMENT_ID )
         {
             // Try to find and assign it from the rest
-            list < CClientPathNode* > ::const_iterator iter = m_PathNodeList.begin ();
-            for ( ; iter != m_PathNodeList.end () ; iter++ )
+            for (auto& pPath2 : m_PathNodeList) 
             {
-                if ( (*iter) != (*iterList) && (*iter)->GetID () == NextNodeID )
+                if ( pPath2 != pPath && pPath2->GetID () == NextNodeID )
                 {
-                    (*iter)->SetPreviousNode ( *iterList );
-                    (*iterList)->SetNextNode ( *iter );
+                    pPath2->SetPreviousNode ( pPath );
+                    pPath->SetNextNode ( pPath2 );
                 }
             }
         }
@@ -110,17 +106,15 @@ void CClientPathManager::ReverseNodes ( CClientPathNode* pPathNode )
 bool CClientPathManager::DetachEntity ( CClientEntity* pEntity )
 {
     // Loop through the nodes
-    list < CClientPathNode* > ::const_iterator iterList = m_PathNodeList.begin ();
-    for ( ; iterList != m_PathNodeList.end (); iterList++ )
+    for (auto& pPath : m_PathNodeList)
     {
         // Loop through each node's attached entities
-        list < CClientEntity* > ::const_iterator iter = (*iterList)->AttachedIterBegin ();
-        for ( ; iter != (*iterList)->AttachedIterEnd (); iter++ )
+        for (auto& pAttachedEntity : pPath->GetAttachedEntities() )
         {
             // If we found it, it should only be on one, so detach and return
-            if ( *iter == pEntity )
+            if ( pAttachedEntity == pEntity )
             { 
-                (*iterList)->DetachEntity ( pEntity );
+                pPath->DetachEntity ( pEntity );
                 return true;
             }
         }
@@ -147,6 +141,7 @@ void CClientPathManager::RemoveFromList ( CClientPathNode* pPathNode )
 {
     if ( m_bRemoveFromList )
     {
-        if ( !m_PathNodeList.empty() ) m_PathNodeList.remove ( pPathNode );
+        if ( !m_PathNodeList.empty() ) 
+            m_PathNodeList.remove ( pPathNode );
     }
 }

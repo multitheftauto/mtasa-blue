@@ -12,7 +12,9 @@
 
 bool CWebDevTools::Show ( CWebView* pWebView )
 {
-    auto browser = pWebView->GetCefBrowser ();
+    auto pBrowser = pWebView->GetCefBrowser ();
+    if (!pBrowser)
+        return false;
 
     // Default settings are suitable
     CefBrowserSettings settings;
@@ -24,13 +26,17 @@ bool CWebDevTools::Show ( CWebView* pWebView )
     CefRefPtr<CefClient> client { new CDevToolsClient };
 
     // ...and show the devtools
-    browser->GetHost ()->ShowDevTools ( windowInfo, client, settings, CefPoint () );
+    pBrowser->GetHost ()->ShowDevTools ( windowInfo, client, settings, CefPoint () );
     return true;
 }
 
 bool CWebDevTools::Close ( CWebView* pWebView )
 {
-    pWebView->GetCefBrowser ()->GetHost ()->CloseDevTools ();
+    auto pBrowser = pWebView->GetCefBrowser();
+    if (!pBrowser)
+        return false;
+
+    pBrowser->GetHost ()->CloseDevTools ();
     return true;
 }
 

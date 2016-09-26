@@ -2599,7 +2599,7 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     // If denied with both 'new way' and 'old way' then stop here
     if ( !bResourceBlahHttp && ( !bResourceBlah || !bGeneralHttp ) )
     {
-        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
     }
 
     #define MAX_INPUT_VARIABLES       25
@@ -2841,12 +2841,12 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
                 }
                 else
                 {
-                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
                 }
             }
             else
             {
-                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
             }
         }
     }
@@ -2922,7 +2922,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
                         // If denied with both 'new way' and 'old way' then stop here
                         if ( !bResourceBlahHttp && ( !bResourceBlah || !bGeneralHttp ) )
                         {
-                            return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                            return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
                         }
 
                         assert ( bResourceBlahHttp || ( bResourceBlah && bGeneralHttp ) );
@@ -2938,7 +2938,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
                             return pHtml->Request ( ipoHttpRequest, ipoHttpResponse, account );
                         }
 
-                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
                     }
                     else
                     {
@@ -2984,7 +2984,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
             // If denied with both 'new way' and 'old way' then stop here
             if ( !bResourceBlahHttp && !bGeneralHttp )
             {
-                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
             }
 
             if ( pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML )
@@ -3011,7 +3011,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
                     }
                     else
                     {
-                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
                     }
                 }
             }

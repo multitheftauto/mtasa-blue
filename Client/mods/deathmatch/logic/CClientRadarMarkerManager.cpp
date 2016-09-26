@@ -13,8 +13,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 CClientRadarMarkerManager::CClientRadarMarkerManager ( CClientManager* pManager )
 {
     m_pManager = pManager;
@@ -35,11 +33,11 @@ void CClientRadarMarkerManager::DoPulse ( void )
 {   
     // Grab the camera position here (so it isn't done for every marker)
     m_pManager->GetCamera ()->GetPosition ( m_vecCameraPosition );
-    list < CClientRadarMarker* > ::iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end (); ++iter )
+    for (auto& pMarker : m_Markers) 
     {
-        (*iter)->DoPulse ();
+        pMarker->DoPulse ();
     }
+
     if ( m_bOrderOnPulse )
     {
         OrderMarkers ();
@@ -52,10 +50,9 @@ void CClientRadarMarkerManager::DeleteAll ( void )
 {
     // Delete all the markers in our list
     m_bCanRemoveFromList = false;
-    list < CClientRadarMarker* > ::const_iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end (); iter++ )
+    for (auto& pMarker : m_Markers)
     {
-        delete *iter;
+        delete pMarker;
     }
 
     // Clear the list
@@ -95,10 +92,9 @@ void CClientRadarMarkerManager::SetDimension ( unsigned short usDimension )
 
 bool CClientRadarMarkerManager::Exists ( CClientRadarMarker* pRadarMarker )
 {
-    list < CClientRadarMarker* > ::const_iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end () ; iter++ )
+    for (auto& pMarker : m_Markers)
     {
-        if ( *iter == pRadarMarker )
+        if ( pMarker == pRadarMarker )
         {
             return true;
         }
@@ -112,17 +108,16 @@ void CClientRadarMarkerManager::OrderMarkers ( void )
 {
     m_Markers.sort ( CompareOrderingIndex );
 
-    list < CClientRadarMarker * > ::iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end () ; iter++ )
+    for (auto& pMarker : m_Markers)
     {
-        (*iter)->DestroyMarker ();
+        pMarker->DestroyMarker ();
     }
-    iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end () ; iter++ )
+
+    for (auto& pMarker : m_Markers)
     {
-        if ( (*iter)->GetDimension() == m_usDimension )
+        if ( pMarker->GetDimension() == m_usDimension )
         {
-            (*iter)->CreateMarker ();
+            pMarker->CreateMarker ();
         }
     }
 }

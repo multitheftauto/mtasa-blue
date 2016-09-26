@@ -48,7 +48,6 @@
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
 #include "CElementDeleter.h"
-#include "CFoo.h"
 #include "CRegisteredCommands.h"
 #include "CClientGUIElement.h"
 #include "CLocalServer.h"
@@ -434,7 +433,7 @@ public:
     void                                ChangeFloatPrecision            ( bool bHigh );
     bool                                IsHighFloatPrecision            ( void ) const;
 
-    bool                                TriggerBrowserRequestResultEvent( const std::vector<SString>& newPages );
+    bool                                TriggerBrowserRequestResultEvent( const std::unordered_set<SString>& newPages );
     void                                RestreamModel                   ( unsigned short usModel );
 
 private:
@@ -767,9 +766,6 @@ private:
     bool                                m_bShowCollision;
     bool                                m_bShowSound;
 
-    // Debug class. Empty in release.
-public:
-    CFoo                                m_Foo;
 
 private:
 

@@ -337,9 +337,9 @@ void CClientSoundManager::UpdateDistanceStreaming ( const CVector& vecListenerPo
         GetClientSpatialDatabase()->SphereQuery ( result, CSphere( vecListenerPosition, 0 ) );
 
         // Extract relevant types
-        for ( CClientEntityResult::const_iterator iter = result.begin () ; iter != result.end (); ++iter )
+        for ( auto& pElement : result)
         {
-            if ( CClientSound* pSound = DynamicCast < CClientSound > ( *iter ) )
+            if ( CClientSound* pSound = DynamicCast < CClientSound > ( pElement ) )
             {
                 if ( pSound->IsSound3D() )
                 {
@@ -355,10 +355,8 @@ void CClientSoundManager::UpdateDistanceStreaming ( const CVector& vecListenerPo
     //  If the sound is more than 40 units away (or in another dimension), make sure it is deactivated
     //  If the sound is less than 20 units away, make sure it is activated
     //
-    for ( std::set < CClientSound* >::iterator iter = considerMap.begin () ; iter != considerMap.end () ; ++iter )
+    for ( auto& pSound : considerMap )
     {
-        CClientSound* pSound = *iter;
-
         // Calculate distance to the edge of the sphere
         CSphere sphere = pSound->GetWorldBoundingSphere ();
         float fDistance = ( vecListenerPosition - sphere.vecPosition ).Length () - sphere.fRadius;
@@ -411,7 +409,7 @@ void CClientSoundManager::ProcessStopQueues( bool bFlush )
         }
     }
 
-    for( std::map < CBassAudio*, CElapsedTime >::iterator iter = m_AudioStopQueue.begin() ; iter != m_AudioStopQueue.end() ; )
+    for( auto iter = m_AudioStopQueue.begin() ; iter != m_AudioStopQueue.end() ;)
     {
         if ( iter->second.Get() > 100 || bFlush )
         {

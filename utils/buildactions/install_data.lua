@@ -23,7 +23,13 @@ newaction {
 		os.mkdir(BIN_DIR)
 		
 		-- Copy data files
-		os.copydir(DATA_DIR, BIN_DIR)
+		if os.get() == "windows" then
+			os.copydir(DATA_DIR, BIN_DIR)
+		end
+
+		-- Copy configs
+		os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.conf")
+		os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.xml")
 
 		if os.get() == "windows" then
 			http.download(NET_PATH_X86_WIN, BIN_DIR.."/server/net.dll")

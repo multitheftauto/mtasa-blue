@@ -983,15 +983,14 @@ int CLuaElementDefs::GetElementsWithinColShape ( lua_State* luaVM )
 
                 // Add all the elements within the shape to it
                 unsigned int uiIndex = 0;
-                CFastList < CClientEntity* > ::iterator iter = pColShape->CollidersBegin ();
-                for ( ; iter != pColShape->CollidersEnd (); iter++ )
+                for ( auto& iter : pColShape->GetColliders() )
                 {
-                    if ( szType == NULL || strcmp ( ( *iter )->GetTypeName (), szType ) == 0 )
+                    if ( szType == NULL || strcmp ( iter->GetTypeName (), szType ) == 0 )
                     {
-                        if ( !( *iter )->IsBeingDeleted () )
+                        if ( !iter->IsBeingDeleted () )
                         {
                             lua_pushnumber ( luaVM, ++uiIndex );
-                            lua_pushelement ( luaVM, *iter );
+                            lua_pushelement ( luaVM, iter );
                             lua_settable ( luaVM, -3 );
                         }
                     }
