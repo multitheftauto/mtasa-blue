@@ -69,7 +69,7 @@ workspace "MTASA"
 		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
 	
 	filter "system:windows"
-		toolset "v120_xp"
+		toolset "v140_xp"
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
 			dxdir.."Include"

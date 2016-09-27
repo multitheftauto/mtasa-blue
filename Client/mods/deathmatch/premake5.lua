@@ -25,7 +25,7 @@ project "Client Deathmatch"
 		includedirs { "../../../vendor/sparsehash/current/src/windows" }
 		linkoptions { "/SAFESEH\:NO" }
 
-	filter {"system:windows", "toolset:*120*"}
+	filter {"system:windows", "toolset:*_xp*"}
 		links { "Psapi.lib" }
 	
 	filter {}

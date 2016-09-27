@@ -60,7 +60,7 @@ project "Deathmatch"
 		buildoptions { "-Zm130" }
 		links { "ws2_32" }
 
-	filter {"system:windows", "toolset:*120*"}
+	filter {"system:windows", "toolset:*_xp*"}
 		links { "Psapi.lib" }
 		
 	filter "system:not windows"
