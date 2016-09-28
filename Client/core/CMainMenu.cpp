@@ -301,6 +301,26 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Remove unused node
     if ( CXMLNode* pOldNode = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ) )
         pConfig->DeleteSubNode ( pOldNode );
+
+#ifdef CI_BUILD
+    // Add feature branch alert
+    m_pFeatureBranchAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
+    std::int32_t buffer = 0xFFFF0000;
+    m_pFeatureBranchAlertTexture->LoadFromMemory(&buffer, 1, 1); // HACK: Load red dot
+
+    m_pFeatureBranchAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
+    m_pFeatureBranchAlertImage->LoadFromTexture(m_pFeatureBranchAlertTexture.get());
+    m_pFeatureBranchAlertImage->SetPosition({ 0.0f, 0.0f }, false);
+    m_pFeatureBranchAlertImage->SetSize({ ScreenSize.fX, 35.0f });
+
+    m_pFeatureBranchAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pFeatureBranchAlertImage.get())));
+    m_pFeatureBranchAlertLabel->SetText(_("You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"));
+    m_pFeatureBranchAlertLabel->SetPosition({ 0.0f, 0.0f }, false);
+    m_pFeatureBranchAlertLabel->SetSize({ ScreenSize.fX, 35.0f });
+    m_pFeatureBranchAlertLabel->SetFont("clear-normal");
+    m_pFeatureBranchAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
+    m_pFeatureBranchAlertLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+#endif
 }
 
 
