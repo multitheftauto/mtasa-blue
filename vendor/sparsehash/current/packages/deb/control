@@ -1,7 +1,7 @@
 Source: sparsehash
 Section: libdevel
 Priority: optional
-Maintainer: Google Inc. <opensource@google.com>
+Maintainer: Google Inc. and others <google-sparsehash@googlegroups.com>
 Build-Depends: debhelper (>= 4.0.0)
 Standards-Version: 3.6.1
 

@@ -1,21 +1,26 @@
+// serpent.h - written and placed in the public domain by Wei Dai
+
+//! \file serpent.h
+//! \brief Classes for the Serpent block cipher
+
 #ifndef CRYPTOPP_SERPENT_H
 #define CRYPTOPP_SERPENT_H
-
-/** \file
-*/
 
 #include "seckey.h"
 #include "secblock.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! _
+//! \class Serpent_Info
+//! \brief Serpent block cipher information
 struct Serpent_Info : public FixedBlockSize<16>, public VariableKeyLength<16, 0, 32>, public FixedRounds<32>
 {
 	static const char *StaticAlgorithmName() {return "Serpent";}
 };
 
-/// <a href="http://www.weidai.com/scan-mirror/cs.html#Serpent">Serpent</a>
+//! \class Serpent
+//! \brief Serpent block cipher
+/// \sa <a href="http://www.weidai.com/scan-mirror/cs.html#Serpent">Serpent</a>
 class Serpent : public Serpent_Info, public BlockCipherDocumentation
 {
 	class CRYPTOPP_NO_VTABLE Base : public BlockCipherImpl<Serpent_Info>

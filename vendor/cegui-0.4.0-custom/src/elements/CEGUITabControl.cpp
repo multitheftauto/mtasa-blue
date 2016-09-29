@@ -569,7 +569,7 @@ void TabControl::onFontChanged(WindowEventArgs& e)
     // Propagate font change to buttons
     TabButtonIndexMap::iterator i, iend;
     iend = d_tabButtonIndexMap.end();
-    for (i = d_tabButtonIndexMap.end(); i != iend; ++i)
+    for (i = d_tabButtonIndexMap.begin(); i != iend; ++i)
     {
         i->second->setFont(getFont());
     }

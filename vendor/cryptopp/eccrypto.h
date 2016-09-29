@@ -1,9 +1,13 @@
+// eccrypto.h - written and placed in the public domain by Wei Dai
+
+//! \file eccrypto.h
+//! \brief Classes and functions for Elliptic Curves over prime and binary fields
+
 #ifndef CRYPTOPP_ECCRYPTO_H
 #define CRYPTOPP_ECCRYPTO_H
 
-/*! \file
-*/
-
+#include "config.h"
+#include "cryptlib.h"
 #include "pubkey.h"
 #include "integer.h"
 #include "asn.h"
@@ -73,7 +77,7 @@ public:
 		else
 			element.x.Encode(encoded, GetEncodedElementSize(false));
 	}
-	unsigned int GetEncodedElementSize(bool reversible) const
+	virtual unsigned int GetEncodedElementSize(bool reversible) const
 	{
 		if (reversible)
 			return GetCurve().EncodedPointSize(m_compress);
@@ -122,9 +126,13 @@ public:
 		{return this->m_groupPrecomputation.GetCurve() == rhs.m_groupPrecomputation.GetCurve() && this->m_gpc.GetBase(this->m_groupPrecomputation) == rhs.m_gpc.GetBase(rhs.m_groupPrecomputation);}
 
 #ifdef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY
-	const Point& GetBasePoint() const {return GetSubgroupGenerator();}
-	const Integer& GetBasePointOrder() const {return GetSubgroupOrder();}
+	const Point& GetBasePoint() const {return this->GetSubgroupGenerator();}
+	const Integer& GetBasePointOrder() const {return this->GetSubgroupOrder();}
 	void LoadRecommendedParameters(const OID &oid) {Initialize(oid);}
+#endif
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_GroupParameters_EC() {}
 #endif
 
 protected:
@@ -133,8 +141,8 @@ protected:
 
 	OID m_oid;			// set if parameters loaded from a recommended curve
 	Integer m_n;		// order of base point
-	bool m_compress, m_encodeAsOID;
 	mutable Integer m_k;		// cofactor
+	mutable bool m_compress, m_encodeAsOID;		// presentation details
 };
 
 //! EC public key
@@ -152,6 +160,10 @@ public:
 	// X509PublicKey
 	void BERDecodePublicKey(BufferedTransformation &bt, bool parametersPresent, size_t size);
 	void DEREncodePublicKey(BufferedTransformation &bt) const;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_PublicKey_EC() {}
+#endif
 };
 
 //! EC private key
@@ -173,6 +185,10 @@ public:
 	// PKCS8PrivateKey
 	void BERDecodePrivateKey(BufferedTransformation &bt, bool parametersPresent, size_t size);
 	void DEREncodePrivateKey(BufferedTransformation &bt) const;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_PrivateKey_EC() {}
+#endif
 };
 
 //! Elliptic Curve Diffie-Hellman, AKA <a href="http://www.weidai.com/scan-mirror/ka.html#ECDH">ECDH</a>
@@ -180,6 +196,10 @@ template <class EC, class COFACTOR_OPTION = CPP_TYPENAME DL_GroupParameters_EC<E
 struct ECDH
 {
 	typedef DH_Domain<DL_GroupParameters_EC<EC>, COFACTOR_OPTION> Domain;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~ECDH() {}
+#endif
 };
 
 /// Elliptic Curve Menezes-Qu-Vanstone, AKA <a href="http://www.weidai.com/scan-mirror/ka.html#ECMQV">ECMQV</a>
@@ -187,6 +207,10 @@ template <class EC, class COFACTOR_OPTION = CPP_TYPENAME DL_GroupParameters_EC<E
 struct ECMQV
 {
 	typedef MQV_Domain<DL_GroupParameters_EC<EC>, COFACTOR_OPTION> Domain;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~ECMQV() {}
+#endif
 };
 
 //! EC keys
@@ -195,6 +219,10 @@ struct DL_Keys_EC
 {
 	typedef DL_PublicKey_EC<EC> PublicKey;
 	typedef DL_PrivateKey_EC<EC> PrivateKey;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_Keys_EC() {}
+#endif
 };
 
 template <class EC, class H>
@@ -206,6 +234,10 @@ struct DL_Keys_ECDSA
 {
 	typedef DL_PublicKey_EC<EC> PublicKey;
 	typedef DL_PrivateKey_WithSignaturePairwiseConsistencyTest<DL_PrivateKey_EC<EC>, ECDSA<EC, SHA256> > PrivateKey;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_Keys_ECDSA() {}
+#endif
 };
 
 //! ECDSA algorithm
@@ -214,6 +246,10 @@ class DL_Algorithm_ECDSA : public DL_Algorithm_GDSA<typename EC::Point>
 {
 public:
 	static const char * CRYPTOPP_API StaticAlgorithmName() {return "ECDSA";}
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_Algorithm_ECDSA() {}
+#endif
 };
 
 //! ECNR algorithm
@@ -222,18 +258,28 @@ class DL_Algorithm_ECNR : public DL_Algorithm_NR<typename EC::Point>
 {
 public:
 	static const char * CRYPTOPP_API StaticAlgorithmName() {return "ECNR";}
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_Algorithm_ECNR() {}
+#endif
 };
 
 //! <a href="http://www.weidai.com/scan-mirror/sig.html#ECDSA">ECDSA</a>
 template <class EC, class H>
 struct ECDSA : public DL_SS<DL_Keys_ECDSA<EC>, DL_Algorithm_ECDSA<EC>, DL_SignatureMessageEncodingMethod_DSA, H>
 {
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~ECDSA() {}
+#endif
 };
 
 //! ECNR
 template <class EC, class H = SHA>
 struct ECNR : public DL_SS<DL_Keys_EC<EC>, DL_Algorithm_ECNR<EC>, DL_SignatureMessageEncodingMethod_NR, H>
 {
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~ECNR() {}
+#endif
 };
 
 //! Elliptic Curve Integrated Encryption Scheme, AKA <a href="http://www.weidai.com/scan-mirror/ca.html#ECIES">ECIES</a>
@@ -250,7 +296,18 @@ struct ECIES
 		ECIES<EC> >
 {
 	static std::string CRYPTOPP_API StaticAlgorithmName() {return "ECIES";}	// TODO: fix this after name is standardized
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~ECIES() {}
+#endif
+
+#if (CRYPTOPP_GCC_VERSION >= 40500) || (CRYPTOPP_LLVM_CLANG_VERSION >= 20800)
+} __attribute__((deprecated ("ECIES will be changing in the near future due to (1) an implementation bug and (2) an interop issue")));
+#elif (CRYPTOPP_GCC_VERSION)
+} __attribute__((deprecated));
+#else
 };
+#endif
 
 NAMESPACE_END
 

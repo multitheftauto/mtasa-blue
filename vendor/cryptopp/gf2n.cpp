@@ -1,13 +1,18 @@
 // gf2n.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
 
 #ifndef CRYPTOPP_IMPORTS
 
-#include "gf2n.h"
+#include "cryptlib.h"
 #include "algebra.h"
-#include "words.h"
 #include "randpool.h"
+#include "filters.h"
+#include "smartptr.h"
+#include "words.h"
+#include "misc.h"
+#include "gf2n.h"
 #include "asn.h"
 #include "oids.h"
 
@@ -49,7 +54,7 @@ void PolynomialMod2::Randomize(RandomNumberGenerator &rng, size_t nbits)
 PolynomialMod2 PolynomialMod2::AllOnes(size_t bitLength)
 {
 	PolynomialMod2 result((word)0, bitLength);
-	SetWords(result.reg, ~(word)0, result.reg.size());
+	SetWords(result.reg, word(SIZE_MAX), result.reg.size());
 	if (bitLength%WORD_BITS)
 		result.reg[result.reg.size()-1] = (word)Crop(result.reg[result.reg.size()-1], bitLength%WORD_BITS);
 	return result;
@@ -320,6 +325,11 @@ PolynomialMod2 PolynomialMod2::Modulo(const PolynomialMod2 &b) const
 
 PolynomialMod2& PolynomialMod2::operator<<=(unsigned int n)
 {
+#if !defined(NDEBUG)
+	int x; CRYPTOPP_UNUSED(x);
+	assert(SafeConvert(n,x));
+#endif
+
 	if (!reg.size())
 		return *this;
 
@@ -348,8 +358,8 @@ PolynomialMod2& PolynomialMod2::operator<<=(unsigned int n)
 		return *this;
 	}
 
-	int shiftWords = n / WORD_BITS;
-	int shiftBits = n % WORD_BITS;
+	const int shiftWords = n / WORD_BITS;
+	const int shiftBits = n % WORD_BITS;
 
 	if (shiftBits)
 	{
@@ -365,8 +375,10 @@ PolynomialMod2& PolynomialMod2::operator<<=(unsigned int n)
 
 	if (carry)
 	{
-		reg.Grow(reg.size()+shiftWords+1);
-		reg[reg.size()-1] = carry;
+		// Thanks to Apatryda, http://github.com/weidai11/cryptopp/issues/64
+		const size_t carryIndex = reg.size();
+		reg.Grow(reg.size()+shiftWords+!!shiftBits);
+		reg[carryIndex] = carry;
 	}
 	else
 		reg.Grow(reg.size()+shiftWords);
@@ -673,6 +685,8 @@ const GF2NT::Element& GF2NT::MultiplicativeInverse(const Element &a) const
 			b[i] = b[i+1];
 		b[BitsToWords(m)-1] = 0;
 
+		// TODO: the shift by "t1+j" (64-bits) is being flagged as potential UB
+		//   temp ^= ((temp >> j) & 1) << ((t1 + j) & (sizeof(temp)*8-1));
 		if (t1 < WORD_BITS)
 			for (unsigned int j=0; j<WORD_BITS-t1; j++)
 				temp ^= ((temp >> j) & 1) << (t1 + j);
@@ -699,10 +713,18 @@ const GF2NT::Element& GF2NT::MultiplicativeInverse(const Element &a) const
 		ShiftWordsRightByBits(b, BitsToWords(m), k);
 
 		if (t1 < WORD_BITS)
+		{
 			for (unsigned int j=0; j<WORD_BITS-t1; j++)
+			{
+				// Coverity finding on shift amount of 'word x << (t1+j)'.
+				assert(t1+j < WORD_BITS);
 				temp ^= ((temp >> j) & 1) << (t1 + j);
+			}
+		}
 		else
+		{
 			b[t1/WORD_BITS-1] ^= temp << t1%WORD_BITS;
+		}
 
 		if (t1 % WORD_BITS)
 			b[t1/WORD_BITS] ^= temp >> (WORD_BITS - t1%WORD_BITS);
@@ -840,7 +862,6 @@ void GF2NPP::DEREncode(BufferedTransformation &bt) const
 
 GF2NP * BERDecodeGF2NP(BufferedTransformation &bt)
 {
-	// VC60 workaround: auto_ptr lacks reset()
 	member_ptr<GF2NP> result;
 
 	BERSequenceDecoder seq(bt);

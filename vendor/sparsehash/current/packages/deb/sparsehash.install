@@ -1,2 +1,6 @@
 usr/include/google/*
+usr/include/sparsehash/*
+usr/lib/pkgconfig/*
 debian/tmp/usr/include/google/*
+debian/tmp/usr/include/sparsehash/*
+debian/tmp/usr/lib/pkgconfig/*

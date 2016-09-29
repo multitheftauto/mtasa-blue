@@ -1,21 +1,26 @@
+// seed.h - written and placed in the public domain by Wei Dai
+
+//! \file seed.h
+//! \brief Classes for the SEED block cipher
+
 #ifndef CRYPTOPP_SEED_H
 #define CRYPTOPP_SEED_H
-
-/** \file
-*/
 
 #include "seckey.h"
 #include "secblock.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! _
+//! \class SEED_Info
+//! \brief SEED block cipher information
 struct SEED_Info : public FixedBlockSize<16>, public FixedKeyLength<16>, public FixedRounds<16>
 {
 	static const char *StaticAlgorithmName() {return "SEED";}
 };
 
-/// <a href="http://www.cryptolounge.org/wiki/SEED">SEED</a>
+//! \class SEED
+//! \brief SEED block cipher
+//! \sa <a href="http://www.cryptolounge.org/wiki/SEED">SEED</a>
 class SEED : public SEED_Info, public BlockCipherDocumentation
 {
 	class CRYPTOPP_NO_VTABLE Base : public BlockCipherImpl<SEED_Info>

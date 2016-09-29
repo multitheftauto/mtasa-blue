@@ -1,0 +1,34 @@
+version: ci-{build}
+os: Visual Studio 2015
+
+configuration:
+  - Release
+
+before_build:
+  - utils\premake5 install_cef
+  - utils\premake5 vs2015
+
+after_build:
+  - utils\premake5 install_data
+  - utils\premake5 compose_files
+  - 7z a InstallFiles.zip InstallFiles
+  - cmd: if not %UPLOAD_SECRET% == "" curl -i -F "branch_name=%APPVEYOR_REPO_BRANCH%" -F "commit_hash=%APPVEYOR_REPO_COMMIT%" -F "commit_title=%APPVEYOR_REPO_COMMIT_MESSAGE%" -F build_type=windows32 -F "secret=%UPLOAD_SECRET%" -F build_upload=@InstallFiles.zip https://nightlytest.mtasa.com/api/upload
+
+clone_depth: 1
+
+build:
+  parallel: true
+  project: Build/MTASA.sln
+  
+notifications:
+  - provider: Slack
+    incoming_webhook:
+      secure: GMy2h7KrBeqM46INusj3AEZvef5jyFQRUeKqcJjfttHc/Iujje6YN398t7mo5UeMZjkDN2azgcb/R79wU/BvJot8iiu/4AtEBGwLffzrpCw=
+
+artifacts:
+  - path: InstallFiles.zip
+    name: MTASA
+
+environment:
+  UPLOAD_SECRET:
+    secure: 5PjW2ChD6CvgnKi1T4d19cV6cX8SN6d8N/keVeszzmQ=

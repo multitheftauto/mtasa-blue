@@ -1,21 +1,26 @@
+// skipjack.h - written and placed in the public domain by Wei Dai
+
+//! \file skipjack.h
+//! \brief Classes for the SKIPJACK block cipher
+
 #ifndef CRYPTOPP_SKIPJACK_H
 #define CRYPTOPP_SKIPJACK_H
-
-/** \file
-*/
 
 #include "seckey.h"
 #include "secblock.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! _
+//! \class SKIPJACK_Info
+//! \brief SKIPJACK block cipher information
 struct SKIPJACK_Info : public FixedBlockSize<8>, public FixedKeyLength<10>
 {
 	CRYPTOPP_DLL static const char * CRYPTOPP_API StaticAlgorithmName() {return "SKIPJACK";}
 };
 
-/// <a href="http://www.weidai.com/scan-mirror/cs.html#SKIPJACK">SKIPJACK</a>
+//! \class SKIPJACK
+//! \brief SKIPJACK block cipher information
+//! \sa <a href="http://www.weidai.com/scan-mirror/cs.html#SKIPJACK">SKIPJACK</a>
 class SKIPJACK : public SKIPJACK_Info, public BlockCipherDocumentation
 {
 	class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE Base : public BlockCipherImpl<SKIPJACK_Info>

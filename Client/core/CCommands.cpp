@@ -1,0 +1,229 @@
+/*****************************************************************************
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        core/CCommands.cpp
+*  PURPOSE:     Management for dynamically added commands
+*  DEVELOPERS:  Christian Myhre Lundheim <>
+*               Derek Abdine <>
+*               Jax <>
+*
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
+*
+*****************************************************************************/
+
+#include "StdInc.h"
+
+void TrimWhiteSpace ( std::string & str )  
+{  
+    unsigned long k = str.find_first_not_of(" \t");
+    unsigned long l = str.find_last_not_of (" \t");
+
+    if ( (k == std::string::npos) || (l == std::string::npos) )
+        str = "";
+    else
+        str = str.substr ( k, l-k+1 );
+}
+
+template<> CCommands * CSingleton< CCommands >::m_pSingleton = NULL;
+
+
+void CCommands::Add ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand, bool bAllowScriptedBind )
+{
+    m_CommandList.emplace_back();
+    auto& command = m_CommandList.back();
+
+    // Copy the command name and description to the new command entry.
+    STRNCPY (command.szCommandName, szCommand, MAX_COMMAND_NAME_LENGTH );
+    STRNCPY (command.szDescription, szDescription, MAX_COMMAND_DESCRIPTION_LENGTH );
+
+    // Set the command.
+    command.pfnCmdFunc = pfnHandler;
+
+    // Set the mod bool
+    command.bModCommand = bModCommand;
+    command.bAllowScriptedBind = bAllowScriptedBind;
+
+    // Set the enabled bool
+    command.bEnabled = true;
+}
+
+
+unsigned int CCommands::Count ( void )
+{
+    return static_cast < unsigned int > ( m_CommandList.size () );
+}
+
+
+bool CCommands::Exists ( const char* szCommand )
+{
+    return Get ( szCommand ) != NULL;
+}
+
+
+bool CCommands::Execute ( const char* szCommandLine )
+{
+    // Parse out the command name and command line
+    std::string strCmd;
+    std::string strCmdLine;
+    CLocalGUI::GetSingleton ().GetConsole () ->GetCommandInfo ( szCommandLine, strCmd, strCmdLine );
+
+    return Execute ( strCmd.c_str (), strCmdLine.c_str () );
+}
+
+
+bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, bool bHandleRemotely, bool bIsScriptedBind )
+{
+    // Copy szParametersIn so the contents can be changed
+    char* szParameters = NULL;
+    if ( szParametersIn )
+    {
+        size_t sizeParameters = strlen ( szParametersIn ) + 1;
+        szParameters = static_cast < char* > ( alloca ( sizeParameters ) );
+        memcpy ( szParameters, szParametersIn, sizeParameters );
+    }
+
+    // HACK: if its a 'chatboxsay' command, use the next parameter
+    // Is the command "say" and the arguments start with /? (command comes from the chatbox)
+    if ( !bIsScriptedBind && !stricmp ( szCommand, "chatboxsay" ) )
+    {
+        if ( szParameters )
+        {
+            // His line starts with '/'?
+            if ( *szParameters == '/' )
+            {
+                // Copy the characters after the slash to the 0 terminator to a seperate buffer
+                char szBuffer [256];
+                strncpy ( szBuffer, szParameters + 1, 256 );
+                szBuffer [ 255 ] = 0;
+
+                // Split it into command and arguments
+                szCommand = strtok ( szBuffer, " " );
+                szParameters = strtok ( NULL, "\0" );
+                if ( szCommand == NULL )
+                {
+                    return false;
+                }
+                if ( szParameters == NULL )
+                {
+                    szParameters = "";
+                }
+            }
+        }
+        else
+            return false;
+    }
+
+    // Grab the command
+    tagCOMMANDENTRY* pEntry = Get ( szCommand );
+    if ( pEntry )
+    {
+        // If its a core command, or if its enabled
+        if ( !pEntry->bModCommand || pEntry->bEnabled )
+        {
+            // Execute it
+            if ( !bIsScriptedBind || pEntry->bAllowScriptedBind )
+                ExecuteHandler ( pEntry->pfnCmdFunc, szParameters );
+            return true;
+        }
+    }
+
+    // Is it a cvar? (syntax: cvar[ = value])
+    std::string val = std::string ( szCommand ) + " " + std::string ( szParameters ? szParameters : "" );
+    unsigned int nOpIndex = val.find ( '=' );
+    std::string key = val.substr ( 0, nOpIndex );
+    if (val.find(" = ") != std::string::npos) {
+        key = val.substr ( 0, nOpIndex-1 );
+    }
+    if ( CClientVariables::GetSingleton ().Exists ( key ) && !bIsScriptedBind ) {
+        std::stringstream ss;
+
+        // Determine whether this is an atomic get or set query
+        if ( nOpIndex != std::string::npos ) {
+            // (set) some_cvar=value
+            val = val.substr ( nOpIndex + 1 );
+            TrimWhiteSpace ( val );
+            CVARS_SET ( key, val );
+        } else {
+            // (get) some_cvar
+            CVARS_GET ( key, val );
+        }
+        ss << key << " = " << val;
+        val = ss.str ();
+        CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
+        return true;
+    }
+
+    // HACK: if its a 'nick' command, save it here
+    bool bIsNickCommand = !stricmp(szCommand, "nick");
+    if (bIsNickCommand && szParameters && !bIsScriptedBind)
+    {
+        if ( CCore::GetSingleton ().IsValidNick ( szParameters ) )
+        {
+            CVARS_SET ( "nick", std::string ( szParameters ) );
+
+            if (!CCore::GetSingleton().IsConnected())
+            {
+                CCore::GetSingleton().GetConsole()->Printf("nick: You are now known as %s", szParameters);
+            }
+        }
+        else if (!CCore::GetSingleton().IsConnected())
+        {
+            CCore::GetSingleton().GetConsole()->Print("nick: Chosen nickname contains illegal characters");
+        }
+    }
+
+    // Try to execute the handler
+    if ( m_pfnExecuteHandler )
+    {
+        if ( m_pfnExecuteHandler ( szCommand, szParameters, bHandleRemotely, ( pEntry != NULL ), bIsScriptedBind ) )
+            return true;
+    }
+
+    // Unknown command
+    val = _( "Unknown command or cvar: " ) + szCommand;
+    if (!bIsScriptedBind && !bIsNickCommand)
+        CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
+    return false;
+}
+
+
+void CCommands::Delete ( const char* szCommand )
+{
+    m_CommandList.erase(std::remove_if(m_CommandList.begin(), m_CommandList.end(), 
+        [szCommand](auto& command)
+    {
+        return stricmp(szCommand, command.szCommandName) == 0;
+    }));
+}
+
+
+void CCommands::DeleteAll ( void )
+{
+    // Delete all the commands
+    m_CommandList.clear ();
+
+    // Re-register our commands
+    CCore::GetSingleton ().RegisterCommands ();
+}
+
+
+tagCOMMANDENTRY* CCommands::Get ( const char* szCommand, bool bCheckIfMod, bool bModCommand )
+{
+    // Find the entry we're looking for
+    auto iter = std::find_if(m_CommandList.begin(), m_CommandList.end(),
+        [szCommand](auto& command)
+    {
+        return stricmp(szCommand, command.szCommandName) == 0;
+    });
+
+    if (iter != m_CommandList.end())
+        return &(*iter);
+    return nullptr;
+}
+
+
+void CCommands::ExecuteHandler ( PFNCOMMAND pfnHandler, const char* szParameters )
+{
+    pfnHandler ( szParameters );
+}

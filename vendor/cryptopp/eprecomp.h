@@ -1,9 +1,15 @@
+// eprecomp.h - written and placed in the public domain by Wei Dai
+
+//! \file eprecomp.h
+//! \brief Classes for precomputation in a group
+
 #ifndef CRYPTOPP_EPRECOMP_H
 #define CRYPTOPP_EPRECOMP_H
 
+#include "cryptlib.h"
 #include "integer.h"
 #include "algebra.h"
-#include <vector>
+#include "stdcpp.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -19,6 +25,10 @@ public:
 	virtual const AbstractGroup<Element> & GetGroup() const =0;
 	virtual Element BERDecodeElement(BufferedTransformation &bt) const =0;
 	virtual void DEREncodeElement(BufferedTransformation &bt, const Element &P) const =0;
+	
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_GroupPrecomputation() {}
+#endif
 };
 
 template <class T>
@@ -35,6 +45,10 @@ public:
 	virtual void Save(const DL_GroupPrecomputation<Element> &group, BufferedTransformation &storedPrecomputation) const =0;
 	virtual Element Exponentiate(const DL_GroupPrecomputation<Element> &group, const Integer &exponent) const =0;
 	virtual Element CascadeExponentiate(const DL_GroupPrecomputation<Element> &group, const Integer &exponent, const DL_FixedBasePrecomputation<Element> &pc2, const Integer &exponent2) const =0;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_FixedBasePrecomputation() {}
+#endif
 };
 
 template <class T>
@@ -56,6 +70,10 @@ public:
 	void Save(const DL_GroupPrecomputation<Element> &group, BufferedTransformation &storedPrecomputation) const;
 	Element Exponentiate(const DL_GroupPrecomputation<Element> &group, const Integer &exponent) const;
 	Element CascadeExponentiate(const DL_GroupPrecomputation<Element> &group, const Integer &exponent, const DL_FixedBasePrecomputation<Element> &pc2, const Integer &exponent2) const;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~DL_FixedBasePrecomputationImpl() {}
+#endif
 
 private:
 	void PrepareCascade(const DL_GroupPrecomputation<Element> &group, std::vector<BaseAndExponent<Element> > &eb, const Integer &exponent) const;

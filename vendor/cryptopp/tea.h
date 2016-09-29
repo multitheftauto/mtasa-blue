@@ -1,21 +1,27 @@
+// tea.h - written and placed in the public domain by Wei Dai
+
+//! \file tea.h
+//! \brief Classes for the TEA, BTEA and XTEA block ciphers
+
 #ifndef CRYPTOPP_TEA_H
 #define CRYPTOPP_TEA_H
 
-/** \file
-*/
-
 #include "seckey.h"
 #include "secblock.h"
+#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! _
+//! \class TEA_Info
+//! \brief TEA block cipher information
 struct TEA_Info : public FixedBlockSize<8>, public FixedKeyLength<16>, public VariableRounds<32>
 {
 	static const char *StaticAlgorithmName() {return "TEA";}
 };
 
-/// <a href="http://www.weidai.com/scan-mirror/cs.html#TEA">TEA</a>
+//! \class TEA
+//! \brief TEA block cipher
+//! \sa <a href="http://www.weidai.com/scan-mirror/cs.html#TEA">TEA</a>
 class TEA : public TEA_Info, public BlockCipherDocumentation
 {
 	class CRYPTOPP_NO_VTABLE Base : public BlockCipherImpl<TEA_Info>
@@ -48,13 +54,16 @@ public:
 typedef TEA::Encryption TEAEncryption;
 typedef TEA::Decryption TEADecryption;
 
-//! _
+//! \class XTEA_Info
+//! \brief XTEA block cipher information
 struct XTEA_Info : public FixedBlockSize<8>, public FixedKeyLength<16>, public VariableRounds<32>
 {
 	static const char *StaticAlgorithmName() {return "XTEA";}
 };
 
-/// <a href="http://www.weidai.com/scan-mirror/cs.html#TEA">XTEA</a>
+//! \class XTEA
+//! \brief XTEA block cipher
+//! \sa <a href="http://www.weidai.com/scan-mirror/cs.html#TEA">XTEA</a>
 class XTEA : public XTEA_Info, public BlockCipherDocumentation
 {
 	class CRYPTOPP_NO_VTABLE Base : public BlockCipherImpl<XTEA_Info>
@@ -84,14 +93,17 @@ public:
 	typedef BlockCipherFinal<DECRYPTION, Dec> Decryption;
 };
 
-//! _
+//! \class BTEA_Info
+//! \brief BTEA block cipher information
 struct BTEA_Info : public FixedKeyLength<16>
 {
 	static const char *StaticAlgorithmName() {return "BTEA";}
 };
 
-//! <a href="http://www.weidai.com/scan-mirror/cs.html#TEA">corrected Block TEA</a> (as described in "xxtea").
-/*! This class hasn't been tested yet. */
+//! \class BTEA
+//! \brief BTEA block cipher
+//! \details Corrected Block TEA as described in "xxtea". This class hasn't been tested yet.
+//! \sa <a href="http://www.weidai.com/scan-mirror/cs.html#TEA">Corrected Block TEA</a>.
 class BTEA : public BTEA_Info, public BlockCipherDocumentation
 {
 	class CRYPTOPP_NO_VTABLE Base : public AlgorithmImpl<SimpleKeyingInterfaceImpl<BlockCipher, BTEA_Info>, BTEA_Info>, public BTEA_Info
@@ -99,6 +111,7 @@ class BTEA : public BTEA_Info, public BlockCipherDocumentation
 	public:
 		void UncheckedSetKey(const byte *key, unsigned int length, const NameValuePairs &params)
 		{
+			CRYPTOPP_UNUSED(length), CRYPTOPP_UNUSED(params);
 			m_blockSize = params.GetIntValueWithDefault("BlockSize", 60*4);
 			GetUserKey(BIG_ENDIAN_ORDER, m_k.begin(), 4, key, KEYLENGTH);
 		}

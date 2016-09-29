@@ -28,18 +28,21 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---
-// Author: Craig Silverstein
 //
 // This tests mostly that we can #include the files correctly
 // and have them work.  This unittest purposefully does not
 // #include <config.h>; it's meant to emulate what a 'regular
 // install' of sparsehash would be able to see.
 
+#include <sparsehash/internal/sparseconfig.h>
+#include <config.h>
 #include <stdio.h>
-#include <google/sparse_hash_set>
-#include <google/sparse_hash_map>
-#include <google/dense_hash_set>
-#include <google/dense_hash_map>
+#include <sparsehash/sparse_hash_set>
+#include <sparsehash/sparse_hash_map>
+#include <sparsehash/dense_hash_set>
+#include <sparsehash/dense_hash_map>
+#include <sparsehash/template_util.h>
+#include <sparsehash/type_traits.h>
 
 #define CHECK_IFF(cond, when) do {                                      \
   if (when) {                                                           \
@@ -55,7 +58,7 @@
   }                                                                     \
 } while (0)
 
-int main(int argc, char** argv) {
+int main(int argc, char**) {
   // Run with an argument to get verbose output
   const bool verbose = argc > 1;
 

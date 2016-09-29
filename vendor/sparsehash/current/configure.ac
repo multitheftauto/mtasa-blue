@@ -4,7 +4,7 @@
 # make sure we're interpreted by some minimal autoconf
 AC_PREREQ(2.57)
 
-AC_INIT(sparsehash, 1.4, opensource@google.com)
+AC_INIT(sparsehash, 2.0.2, google-sparsehash@googlegroups.com)
 # The argument here is just something that should be in the current directory
 # (for sanity checking)
 AC_CONFIG_SRCDIR(README)
@@ -12,9 +12,9 @@ AM_INIT_AUTOMAKE([dist-zip])
 AM_CONFIG_HEADER(src/config.h)
 
 # Checks for programs.
+AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
-AC_PROG_CXX
 AM_CONDITIONAL(GCC, test "$GCC" = yes)   # let the Makefile know if we're gcc
 
 # Check whether some low-level functions/files are available
@@ -51,9 +51,8 @@ AC_SUBST(tcmalloc_libs)
 AC_CXX_STL_HASH
 AC_CXX_STL_HASH_FUN
 
-# Find out what namespace 'normal' STL code lives in, and also what namespace
-# the user wants our classes to be defined in
-AC_CXX_STL_NAMESPACE
+# Find out what namespace the user wants our classes to be defined in.
+# TODO(csilvers): change this to default to sparsehash instead.
 AC_DEFINE_GOOGLE_NAMESPACE(google)
 
 # In unix-based systems, hash is always defined as hash<> (in namespace.

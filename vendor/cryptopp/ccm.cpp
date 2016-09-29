@@ -48,7 +48,7 @@ void CCM_Base::Resync(const byte *iv, size_t len)
 	m_messageLength = 0;
 }
 
-void CCM_Base::UncheckedSpecifyDataLengths(lword headerLength, lword messageLength, lword footerLength)
+void CCM_Base::UncheckedSpecifyDataLengths(lword headerLength, lword messageLength, lword /*footerLength*/)
 {
 	if (m_state != State_IVSet)
 		throw BadState(AlgorithmName(), "SpecifyDataLengths", "or after State_IVSet");

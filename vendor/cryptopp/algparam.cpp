@@ -5,6 +5,7 @@
 #ifndef CRYPTOPP_IMPORTS
 
 #include "algparam.h"
+#include "integer.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -18,8 +19,9 @@ bool CombinedNameValuePairs::GetVoidValue(const char *name, const std::type_info
 		return m_pairs1.GetVoidValue(name, valueType, pValue) || m_pairs2.GetVoidValue(name, valueType, pValue);
 }
 
-void AlgorithmParametersBase::operator=(const AlgorithmParametersBase& rhs)
+void AlgorithmParametersBase::operator=(const AlgorithmParametersBase &rhs)
 {
+	CRYPTOPP_UNUSED(rhs);
 	assert(false);
 }
 

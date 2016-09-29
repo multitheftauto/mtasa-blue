@@ -44,9 +44,9 @@ Var ShowLastUsed
 ; ###########################################################################################################
 !ifndef FILES_ROOT
     !define LIGHTBUILD    ; enable LIGHTBUILD for nightly
-    !define FILES_ROOT "Install files builder/output"
-    !define SERVER_FILES_ROOT "Install files builder/output/MTA San Andreas/server"
-    !define FILES_MODULE_SDK "Install files builder/output/MTA San Andreas/development/publicsdk"
+    !define FILES_ROOT "../../InstallFiles"
+    !define SERVER_FILES_ROOT "${FILES_ROOT}/server"
+    !define FILES_MODULE_SDK "${FILES_ROOT}/development/publicsdk"
     !define INSTALL_OUTPUT "mtasa-${0.0.0}-unstable-00000-0-000-nsis.exe"
     !define PRODUCT_VERSION "v${0.0.0}-unstable-00000-0-000"
     !define REVISION "0"
@@ -127,12 +127,14 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
 
 ; License page
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "LicenseShowProc"
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE "LicenseLeaveProc"
 !insertmacro MUI_PAGE_LICENSE                   "eula.txt"
 
 Page custom CustomNetMessagePage CustomNetMessagePageLeave
 
 ; Components page
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW "ComponentsShowProc"
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE "ComponentsLeaveProc"
 !insertmacro MUI_PAGE_COMPONENTS
 
 ; Game directory page
@@ -141,7 +143,7 @@ Page custom CustomNetMessagePage CustomNetMessagePageLeave
 #!define MUI_CUSTOMFUNCTION_ABORT "DirectoryAbort"
 #!define MUI_DIRECTORYPAGE_VARIABLE             $INSTDIR
 #!insertmacro MUI_PAGE_DIRECTORY
-Page custom CustomDirectoryPage DirectoryLeaveProc
+Page custom CustomDirectoryPage CustomDirectoryPageLeave
 
 ; Language Tools ----
 ;Note: Assumes NSIS Unicode edition compiler
@@ -178,6 +180,8 @@ Page custom CustomDirectoryPage DirectoryLeaveProc
 !insertmacro MUI_LANGUAGE "English"
 ;@INSERT_TRANSLATIONS@
 
+LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
+LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access may be requested for Vista and up]\n\n\
@@ -216,7 +220,7 @@ Function LaunchLink
 FunctionEnd
 
 Function .onInstFailed
-    ${LogText} "Function begin - .onInstFailed"
+    ${LogText} "+Function begin - .onInstFailed"
 FunctionEnd
 
 Function .onInit
@@ -227,6 +231,13 @@ Function .onInit
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
     
+	
+	${If} ${AtMostWinVista}
+		MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
+		ExecShell "open" "http://mtasa.com"
+		Quit
+	${EndIf}
+
     File /oname=$TEMP\image.bmp "connect.bmp"
     
     ; #############################################
@@ -246,8 +257,8 @@ Function .onInit
     SetShellVarContext all
 
     ${LogSetFileName} "$APPDATA\MTA San Andreas All\Common\Installer" "nsis.log"
-    ${LogText} "${PRODUCT_VERSION}"
-    ${LogText} "Function begin - .onInit"
+    ${LogText} "${PRODUCT_VERSION} ${REVISION_TAG}"
+    ${LogText} "+Function begin - .onInit"
 
     ; Try to find previously saved MTA:SA install path
     ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
@@ -262,7 +273,7 @@ Function .onInit
         strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas ${0.0}"
     ${EndIf}
     strcpy $INSTDIR $Install_Dir
-    ${LogText} " Using install directory:'$INSTDIR'"
+    ${LogText} "Using install directory:'$INSTDIR'"
 
     ; Setup for install dir dialog
     strcpy $DEFAULT_INSTDIR "$PROGRAMFILES\MTA San Andreas ${0.0}"
@@ -329,15 +340,15 @@ Function .onInit
         strcpy $GTA_DIR "$PROGRAMFILES\Rockstar Games\GTA San Andreas\"
     ${EndIf}
 
-    ${LogText} " Default GTA install directory:'$GTA_DIR'"
+    ${LogText} "Default GTA install directory:'$GTA_DIR'"
 
     InitPluginsDir
     ;File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
-    ${LogText} "Function end - .onInit"
+    ${LogText} "-Function end - .onInit"
 FunctionEnd
 
 Function .onInstSuccess
-    ${LogText} "Function begin - .onInstSuccess"
+    ${LogText} "+Function begin - .onInstSuccess"
     SetShellVarContext all
 
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
@@ -391,7 +402,7 @@ Function .onInstSuccess
     ${EndIf}
 
     ;UAC::Unload ;Must call unload!
-    ${LogText} "Function end - .onInstSuccess"
+    ${LogText} "-Function end - .onInstSuccess"
 FunctionEnd
 
 LangString INST_CLIENTSERVER ${LANG_ENGLISH}    "Client and Server"
@@ -451,7 +462,7 @@ LangString INST_SEC_EDITOR ${LANG_ENGLISH}  "Editor"
 SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
     Section "$(INST_SEC_CORE)" SEC01
         SectionIn 1 RO ; section is required
-        ${LogText} "Section begin - CLIENT CORE"
+        ${LogText} "+Section begin - CLIENT CORE"
 
         Call UpdateVCRedistributables
 
@@ -507,7 +518,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 StrCpy $3 "1"
             ${EndIf}
 
-            ${LogText} " FullAccess $INSTDIR"
+            ${LogText} "FullAccess $INSTDIR"
             ${If} $3 == "1"
                 FastPerms::FullAccessPlox "$INSTDIR"
             ${Else}
@@ -522,7 +533,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 FastPerms::FullAccessPlox "$INSTDIR\server"
                 FastPerms::FullAccessPlox "$INSTDIR\skins"
             ${EndIf}
-            ${LogText} " FullAccess $APPDATA\MTA San Andreas All"
+            ${LogText} "FullAccess $APPDATA\MTA San Andreas All"
             FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
 
             # Remove MTA virtual store
@@ -554,7 +565,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             StrCmp "$0" "0" TrySteamExe
             !insertmacro GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5
             DetailPrint "gta_sa.exe successfully detected ($ExeMD5)"
-            ${LogText} " GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
+            ${LogText} "GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
             ${Switch} $ExeMD5
                 ${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
                 ${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
@@ -586,11 +597,12 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 IfFileExists $GTA_DIR\$1 0 TrySteamNext
                 !insertmacro GetMD5 $GTA_DIR\$1 $ExeMD5
                 DetailPrint "$1 successfully detected ($ExeMD5)"
-                ${LogText} " GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
+                ${LogText} "GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
                 ${Switch} $ExeMD5
                     ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam                   2007-12-04 11:50:50     5697536
                     ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update) 2014-10-14 21:58:05     5971456
                     ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update) 2014-12-01 20:43:21     5971456
+                    ${Case} "d9cb35c898d3298ca904a63e10ee18d7" #DE 3.02 Steam (2014 Dec update) 2016-08-11 20:57:22     5971456
                         #Copy gta-sa.exe to gta_sa.exe and commence patching process
                         CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
                         Call InstallPatch
@@ -617,14 +629,14 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         Call IsDll32Bit
         Pop $0
         ${If} $0 != 1
-            File "${FILES_ROOT}\MTA San Andreas\redist\msvcp120.dll"
+            File "${FILES_ROOT}\redist\msvcp120.dll"
         ${EndIf}
 
         Push $SYSDIR\msvcr120.dll
         Call IsDll32Bit
         Pop $0
         ${If} $0 != 1
-            File "${FILES_ROOT}\MTA San Andreas\redist\msvcr120.dll"
+            File "${FILES_ROOT}\redist\msvcr120.dll"
         ${EndIf}
         #############################################################
 
@@ -633,8 +645,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SetOutPath "$TEMP"
         ${If} ${AtMostWinXP}
             ${IfNot} ${FileExists} $SYSDIR\normaliz.dll
-                ${LogText} " Did not find $SYSDIR\normaliz.dll"
-                File "${FILES_ROOT}\MTA San Andreas\redist\idndl.x86.exe"
+                ${LogText} "Did not find $SYSDIR\normaliz.dll"
+                File "${FILES_ROOT}\redist\idndl.x86.exe"
                 ExecWait '"$TEMP\idndl.x86.exe" /passive'
             ${EndIf}
         ${EndIf}
@@ -647,33 +659,35 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "(BU)" "FullAccess"
 
         SetOutPath "$INSTDIR\MTA"
-        File "${FILES_ROOT}\MTA San Andreas\mta\cgui.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\core.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\game_sa.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\multiplayer_sa.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\netc.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\loader.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\pthread.dll"
+        File "${FILES_ROOT}\mta\cgui.dll"
+        File "${FILES_ROOT}\mta\core.dll"
+        File "${FILES_ROOT}\mta\xmll.dll"
+        File "${FILES_ROOT}\mta\game_sa.dll"
+        File "${FILES_ROOT}\mta\multiplayer_sa.dll"
+        File "${FILES_ROOT}\mta\netc.dll"
+        File "${FILES_ROOT}\mta\libcurl.dll"
+        File "${FILES_ROOT}\mta\loader.dll"
+        File "${FILES_ROOT}\mta\pthread.dll"
         
         SetOutPath "$INSTDIR\MTA"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libcef.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\icudtl.dat"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\natives_blob.bin"
-        File "${FILES_ROOT}\MTA San Andreas\mta\snapshot_blob.bin"
+        File "${FILES_ROOT}\mta\libcef.dll"
+        File "${FILES_ROOT}\mta\icudtl.dat"
+        File "${FILES_ROOT}\mta\libEGL.dll"
+        File "${FILES_ROOT}\mta\libGLESv2.dll"
+        File "${FILES_ROOT}\mta\natives_blob.bin"
+        File "${FILES_ROOT}\mta\snapshot_blob.bin"
         
         SetOutPath "$INSTDIR\MTA\CEF"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher.exe"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\CEFLauncher_DLL.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef.pak"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_100_percent.pak"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_200_percent.pak"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\devtools_resources.pak"
-        #File "${FILES_ROOT}\MTA San Andreas\mta\CEF\cef_extensions.pak"
-        File "${FILES_ROOT}\MTA San Andreas\mta\CEF\locales\en-US.pak"
+        File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
+        File "${FILES_ROOT}\mta\CEF\CEFLauncher_DLL.dll"
+        File "${FILES_ROOT}\mta\CEF\cef.pak"
+        File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
+        #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
+        
+        SetOutPath "$INSTDIR\MTA\CEF\locales"
+        File "${FILES_ROOT}\mta\CEF\locales\en-US.pak"
 
 
         ${If} "$(LANGUAGE_CODE)" != ""
@@ -684,82 +698,82 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         !ifndef LIGHTBUILD
 
             SetOutPath "$INSTDIR\MTA"
-            File "${FILES_ROOT}\MTA San Andreas\mta\d3dx9_42.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\D3DCompiler_42.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bass.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\basswma.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bassmidi.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bassflac.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bass_aac.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\bassopus.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
-            File "${FILES_ROOT}\MTA San Andreas\mta\vea.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\vvo.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\vvof.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\XInput9_1_0_mta.dll"
+            File "${FILES_ROOT}\mta\d3dx9_42.dll"
+            File "${FILES_ROOT}\mta\D3DCompiler_42.dll"
+            File "${FILES_ROOT}\mta\bass.dll"
+            File "${FILES_ROOT}\mta\basswma.dll"
+            File "${FILES_ROOT}\mta\bassmidi.dll"
+            File "${FILES_ROOT}\mta\bassflac.dll"
+            File "${FILES_ROOT}\mta\bass_aac.dll"
+            File "${FILES_ROOT}\mta\bass_ac3.dll"
+            File "${FILES_ROOT}\mta\bassmix.dll"
+            File "${FILES_ROOT}\mta\bass_fx.dll"
+            File "${FILES_ROOT}\mta\bassopus.dll"
+            File "${FILES_ROOT}\mta\tags.dll"
+            File "${FILES_ROOT}\mta\sa.dat"
+            File "${FILES_ROOT}\mta\vea.dll"
+            File "${FILES_ROOT}\mta\vog.dll"
+            File "${FILES_ROOT}\mta\vvo.dll"
+            File "${FILES_ROOT}\mta\vvof.dll"
+            File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
 
-            File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
+            File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
+            File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
 
             SetOutPath "$INSTDIR\MTA\config"
-            File "${FILES_ROOT}\MTA San Andreas\mta\config\chatboxpresets.xml"
+            File "${FILES_ROOT}\mta\config\chatboxpresets.xml"
 
             SetOutPath "$INSTDIR\skins\Classic"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.is.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.lnf.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.png"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.xml"
+            File "${FILES_ROOT}\skins\Classic\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\Classic\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\Classic\CGUI.png"
+            File "${FILES_ROOT}\skins\Classic\CGUI.xml"
             
             SetOutPath "$INSTDIR\skins\Default"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.is.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
+            File "${FILES_ROOT}\skins\Default\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\Default\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\Default\CGUI.png"
+            File "${FILES_ROOT}\skins\Default\CGUI.xml"
             
             SetOutPath "$INSTDIR\skins\Lighter black"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.is.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
-            File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
+            File "${FILES_ROOT}\skins\Lighter black\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\Lighter black\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\Lighter black\CGUI.png"
+            File "${FILES_ROOT}\skins\Lighter black\CGUI.xml"
 
             SetOutPath "$INSTDIR\MTA\cgui"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Font.xsd"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\GUIScheme.xsd"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Imageset.xsd"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\pricedown.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sabankgothic.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
+            File "${FILES_ROOT}\mta\cgui\Falagard.xsd"
+            File "${FILES_ROOT}\mta\cgui\Font.xsd"
+            File "${FILES_ROOT}\mta\cgui\GUIScheme.xsd"
+            File "${FILES_ROOT}\mta\cgui\Imageset.xsd"
+            File "${FILES_ROOT}\mta\cgui\pricedown.ttf"
+            File "${FILES_ROOT}\mta\cgui\sabankgothic.ttf"
+            File "${FILES_ROOT}\mta\cgui\sagothic.ttf"
+            File "${FILES_ROOT}\mta\cgui\saheader.ttf"
+            File "${FILES_ROOT}\mta\cgui\sans.ttf"
+            File "${FILES_ROOT}\mta\cgui\unifont-5.1.20080907.ttf"
 
             SetOutPath "$INSTDIR\MTA\cgui\images"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.png"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.jpg"
+            File "${FILES_ROOT}\mta\cgui\images\*.png"
+            File "${FILES_ROOT}\mta\cgui\images\*.jpg"
 
             SetOutPath "$INSTDIR\MTA\cgui\images\radarset"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\radarset\*.png"
+            File "${FILES_ROOT}\mta\cgui\images\radarset\*.png"
 
             SetOutPath "$INSTDIR\MTA\cgui\images\transferset"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\transferset\*.png"
+            File "${FILES_ROOT}\mta\cgui\images\transferset\*.png"
 
             SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
-            File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
+            File "${FILES_ROOT}\mta\cgui\images\serverbrowser\*.png"
 
         !endif
             
         SetOutPath "$INSTDIR\MTA\locale\"
-        File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.png"
-        File /r "${FILES_ROOT}\MTA San Andreas\mta\locale\*.po"
+        File /r "${FILES_ROOT}\mta\locale\*.png"
+        File /r "${FILES_ROOT}\mta\locale\*.po"
 
         SetOutPath "$INSTDIR"
-        File "${FILES_ROOT}\MTA San Andreas\Multi Theft Auto.exe"
+        File "${FILES_ROOT}\Multi Theft Auto.exe"
 
         # Ensure exe file can be updated without admin
         AccessControl::GrantOnFile "$INSTDIR\Multi Theft Auto.exe" "(BU)" "FullAccess"
@@ -774,23 +788,23 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${EndIf}
 
         Call DoServiceInstall
-        ${LogText} "Section end - CLIENT CORE"
+        ${LogText} "-Section end - CLIENT CORE"
     SectionEnd
 
     Section "$(INST_SEC_GAME)" SEC02
-        ${LogText} "Section begin - CLIENT GAME"
+        ${LogText} "+Section begin - CLIENT GAME"
         SectionIn 1 RO
         SetOutPath "$INSTDIR\mods\deathmatch"
-        File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\Client.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\pcre3.dll"
+        File "${FILES_ROOT}\mods\deathmatch\Client.dll"
+        File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
         SetOutPath "$INSTDIR\mods\deathmatch\resources"
-        ${LogText} "Section end - CLIENT GAME"
+        ${LogText} "-Section end - CLIENT GAME"
     SectionEnd
 SectionGroupEnd
 
 SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
     Section "$(INST_SEC_CORE)" SEC04
-        ${LogText} "Section begin - SERVER CORE"
+        ${LogText} "+Section begin - SERVER CORE"
         SectionIn 1 2 RO ; section is required
         
         Call UpdateVCRedistributables
@@ -798,23 +812,23 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         SetOutPath "$INSTDIR\server"
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\core.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\xmll.dll"
+        File "${FILES_ROOT}\mta\xmll.dll"
         File "${SERVER_FILES_ROOT}\MTA Server.exe"
         File "${SERVER_FILES_ROOT}\net.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\libcurl.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mta\pthread.dll"
-        ${LogText} "Section end - SERVER CORE"
+        File "${FILES_ROOT}\mta\libcurl.dll"
+        File "${FILES_ROOT}\mta\pthread.dll"
+        ${LogText} "-Section end - SERVER CORE"
     SectionEnd
 
     Section "$(INST_SEC_GAME)" SEC05
-        ${LogText} "Section begin - SERVER GAME"
+        ${LogText} "+Section begin - SERVER GAME"
         SectionIn 1 2 RO ; section is required
         SetOutPath "$INSTDIR\server\mods\deathmatch"
         
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
         File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
-        File "${FILES_ROOT}\MTA San Andreas\mods\deathmatch\pcre3.dll"
+        File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
         File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
@@ -840,12 +854,12 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
             SetOutPath "$INSTDIR\server\mods\deathmatch\resource-cache"
             SetOutPath "$INSTDIR\server\mods\deathmatch\logs"
         !endif
-        ${LogText} "Section end - SERVER GAME"
+        ${LogText} "-Section end - SERVER GAME"
     SectionEnd
 
     !ifndef LIGHTBUILD
         Section "$(INST_SEC_CORE_RESOURCES)" SEC06
-            ${LogText} "Section begin - SERVER CORE_RESOURCES"
+            ${LogText} "+Section begin - SERVER CORE_RESOURCES"
             SectionIn 1 2 ; RO section is now optional
             SetOutPath "$INSTDIR\server\mods\deathmatch\resources\"
             File "${SERVER_FILES_ROOT}\mods\deathmatch\resources\Directory layout readme.txt"
@@ -864,7 +878,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
             File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[managers]\*.zip"
             SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[web]"
             File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[web]\*.zip"
-            ${LogText} "Section end - SERVER CORE_RESOURCES"
+            ${LogText} "-Section end - SERVER CORE_RESOURCES"
         SectionEnd
     !endif
 
@@ -990,7 +1004,7 @@ LangString INST_SEC_DEVELOPER ${LANG_ENGLISH}   "Development"
 
 
 Section -Post
-    ${LogText} "Section begin - -Post"
+    ${LogText} "+Section begin - -Post"
     WriteUninstaller "$INSTDIR\Uninstall.exe"
     ;WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Multi Theft Auto.exe"
 
@@ -1000,7 +1014,7 @@ Section -Post
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
-    ${LogText} "Section end - -Post"
+    ${LogText} "-Section end - -Post"
 SectionEnd
 
 LangString UNINST_SUCCESS ${LANG_ENGLISH}   "$(^Name) was successfully removed from your computer."
@@ -1149,7 +1163,7 @@ LangString MSGBOX_VC12RED_ERROR3 ${LANG_ENGLISH}    "Unable to download Microsof
 $\r$\nHowever installation will continue.\
 $\r$\nPlease reinstall if there are problems later."
 Function InstallVC12Redistributable
-    ${LogText} "Function begin - InstallVC12Redistributable"
+    ${LogText} "+Function begin - InstallVC12Redistributable"
     DetailPrint "Installing Microsoft Visual Studio 2013 redistributable ..."
     StrCpy $REDISTVC12 "$TEMP\vcredist12_x86.exe"
     NSISdl::download "http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe" $REDISTVC12
@@ -1174,7 +1188,7 @@ Function InstallVC12Redistributable
         ${EndIf}
     ${EndIf}
 
-    ${LogText} "Function end - InstallVC12Redistributable"
+    ${LogText} "-Function end - InstallVC12Redistributable"
 FunctionEnd
 
 ;----------------------------------------
@@ -1199,10 +1213,10 @@ LangString MSGBOX_VC14RED_ERROR3 ${LANG_ENGLISH}    "Unable to download Microsof
 $\r$\nHowever installation will continue.\
 $\r$\nPlease reinstall if there are problems later."
 Function InstallVC14Redistributable
-    ${LogText} "Function begin - InstallVC14Redistributable"
+    ${LogText} "+Function begin - InstallVC14Redistributable"
     DetailPrint "Installing Microsoft Visual Studio 2015 redistributable ..."
     StrCpy $REDISTVC14 "$TEMP\vcredist14_x86.exe"
-    NSISdl::download "http://download.microsoft.com/download/4/2/F/42FF78CE-8DE0-4C88-AD7A-5F8DFFB49F74/vc_redist.x86.exe" $REDISTVC14
+    NSISdl::download "http://mirror.multitheftauto.com/mtasa/installer/9875/vc_redist_2015u3.x86.exe" $REDISTVC14
     Pop $0
 
     ${If} $0 != "success"
@@ -1224,7 +1238,7 @@ Function InstallVC14Redistributable
         ${EndIf}
     ${EndIf}
 
-    ${LogText} "Function end - InstallVC14Redistributable"
+    ${LogText} "-Function end - InstallVC14Redistributable"
 FunctionEnd
 
 ;----------------------------------------
@@ -1256,7 +1270,7 @@ Var PATCHFILE
 LangString MSGBOX_PATCH_FAIL1 ${LANG_ENGLISH}   "Unable to download the patch file for your version of Grand Theft Auto: San Andreas"
 LangString MSGBOX_PATCH_FAIL2 ${LANG_ENGLISH}   "Unable to install the patch file for your version of Grand Theft Auto: San Andreas"
 Function InstallPatch
-    ${LogText} "Function begin - InstallPatch"
+    ${LogText} "+Function begin - InstallPatch"
     DetailPrint "Incompatible version of San Andreas detected.  Patching executable..."
     StrCpy $PATCHFILE "$TEMP\$ExeMD5.GTASAPatch"
     NSISdl::download "http://mirror.multitheftauto.com/gdata/$ExeMD5.GTASAPatch" $PATCHFILE
@@ -1284,7 +1298,7 @@ Function InstallPatch
             MessageBox MB_ICONSTOP MSGBOX_PATCH_FAIL2
         ${EndIf}
     ${EndIf}
-    ${LogText} "Function end - InstallPatch"
+    ${LogText} "-Function end - InstallPatch"
 FunctionEnd
 
 ;====================================================================================
@@ -1319,9 +1333,9 @@ LangString UAC_RIGHTS4 ${LANG_ENGLISH}  "Unable to elevate"
 !macroend
 
 Function DoRightsElevation
-    ${LogText} "Function begin - RightsElevation"
+    ${LogText} "+Function begin - RightsElevation"
     !insertmacro RightsElevation "$(UAC_RIGHTS1)"
-    ${LogText} "Function end - RightsElevation"
+    ${LogText} "-Function end - RightsElevation"
 FunctionEnd
 
 Function un.DoRightsElevation
@@ -1694,49 +1708,62 @@ FunctionEnd
 Var COMPONENTS_EXPAND_STATUS
 
 Function "WelcomePreProc"
-    ${LogText} "Function begin - WelcomePreProc"
+    ${LogText} "+Function begin - WelcomePreProc"
     !insertmacro UAC_IsInnerInstance
     ${If} ${UAC_IsInnerInstance} 
         ; If switched to admin, don't show welcome window again
+        ${LogText} "-Function end - WelcomePreProc (IsInnerInstance)"
         Abort
     ${EndIf}
-    ${LogText} "Function end - WelcomePreProc"
+    ${LogText} "-Function end - WelcomePreProc"
 FunctionEnd
 
 Function "WelcomeShowProc"
-    ${LogText} "Function begin - WelcomeShowProc"
+    ${LogText} "+Function begin - WelcomeShowProc"
     BringToFront
-    ${LogText} "Function end - WelcomeShowProc"
+    ${LogText} "-Function end - WelcomeShowProc"
 FunctionEnd
 
 Function "WelcomeLeaveProc"
-    ${LogText} "Function begin - WelcomeLeaveProc"
+    ${LogText} "+Function begin - WelcomeLeaveProc"
     HideWindow
     ; Maybe switch to admin after welcome window
     Call DoRightsElevation
     ShowWindow $HWNDPARENT ${SW_SHOW}
-    ${LogText} "Function end - WelcomeLeaveProc"
+    ${LogText} "-Function end - WelcomeLeaveProc"
 FunctionEnd
 
 
 Function "LicenseShowProc"
-    ${LogText} "Function begin - LicenseShowProc"
-    ${If} $COMPONENTS_EXPAND_STATUS == 1
-        StrCpy $COMPONENTS_EXPAND_STATUS 0
-        IntOp $RESIZE_X 0 - ${EXPAND_DIALOG_X}
-        IntOp $RESIZE_Y 0 - ${EXPAND_DIALOG_Y}
-        Call ResizeSharedDialogContents
-        Call ResizeMainWindow
-    ${Endif}
+    ${LogText} "+Function begin - LicenseShowProc"
+    Call UnexpandComponentsPage
     Call HideBackButton
     BringToFront
-    ${LogText} "Function end - LicenseShowProc"
+    ${LogText} "-Function end - LicenseShowProc"
+FunctionEnd
+
+Function "LicenseLeaveProc"
+    ${LogText} "+Function begin - LicenseLeaveProc"
+    ${LogText} "-Function end - LicenseLeaveProc"
 FunctionEnd
 
 
 Function "ComponentsShowProc"
-    ${LogText} "Function begin - ComponentsShowProc"
+    ${LogText} "+Function begin - ComponentsShowProc"
+    Call ExpandComponentsPage
+    ${LogText} "-Function end - ComponentsShowProc"
+FunctionEnd
+
+Function "ComponentsLeaveProc"
+    ${LogText} "+Function begin - ComponentsLeaveProc"
+    ${LogText} "-Function end - ComponentsLeaveProc"
+FunctionEnd
+
+
+Function "ExpandComponentsPage"
+    ${LogText} "+Function begin - ExpandComponentsPage"
     ${If} $COMPONENTS_EXPAND_STATUS != 1
+        ${LogText} "Doing expand"
         StrCpy $COMPONENTS_EXPAND_STATUS 1
         IntOp $RESIZE_X 0 + ${EXPAND_DIALOG_X}
         IntOp $RESIZE_Y 0 + ${EXPAND_DIALOG_Y}
@@ -1744,20 +1771,20 @@ Function "ComponentsShowProc"
         Call ResizeSharedDialogContents
         Call ResizeMainWindow
     ${Endif}
-    ${LogText} "Function end - ComponentsShowProc"
+    ${LogText} "-Function end - ExpandComponentsPage"
 FunctionEnd
 
-
-Function "DirectoryShowProc"
-    ${LogText} "Function begin - DirectoryShowProc"
+Function "UnexpandComponentsPage"
+    ${LogText} "+Function begin - UnexpandComponentsPage"
     ${If} $COMPONENTS_EXPAND_STATUS == 1
+        ${LogText} "Doing unexpand"
         StrCpy $COMPONENTS_EXPAND_STATUS 0
         IntOp $RESIZE_X 0 - ${EXPAND_DIALOG_X}
         IntOp $RESIZE_Y 0 - ${EXPAND_DIALOG_Y}
         Call ResizeSharedDialogContents
         Call ResizeMainWindow
     ${Endif}
-    ${LogText} "Function end - DirectoryShowProc"
+    ${LogText} "-Function end - UnexpandComponentsPage"
 FunctionEnd
 
 
@@ -1772,12 +1799,12 @@ Function RemoveVirtualStore
     StrCpy $3 "$LOCALAPPDATA\VirtualStore\$2"
     StrCpy $4 "$0\FromVirtualStore"
     IfFileExists $3 0 NoVirtualStore
-        ${LogText} " Moving VirtualStore files from $3 to $4"
+        ${LogText} "Moving VirtualStore files from $3 to $4"
         CopyFiles $3\*.* $4
         RmDir /r "$3"
         Goto done
     NoVirtualStore:
-        ${LogText} " NoVirtualStore detected at $3"
+        ${LogText} "NoVirtualStore detected at $3"
     done:
 FunctionEnd
 
@@ -1804,7 +1831,7 @@ done:
     ${If} $2 == 332     ; 0x014c IMAGE_FILE_MACHINE_I386
         StrCpy $1 "1"
     ${EndIf}
-    ${LogText} " IsDll32Bit($3) result:$1"
+    ${LogText} "IsDll32Bit($3) result:$1"
     Push $1
 FunctionEnd
 
@@ -1821,6 +1848,7 @@ FunctionEnd
 ;          "overwrite" - In place copy different Major.Minor
 ;     <stack> = "Maj.Min"
 Function GetInstallType
+    ${LogText} "+Function begin - GetInstallType"
     Pop $0
     Push $0
     Call GetVersionAtLocation
@@ -1834,9 +1862,10 @@ Function GetInstallType
         StrCpy $2 "overwrite"
     ${EndIf}
     Pop $0
-    ${LogText} " GetInstallType($0) result:$1,$2"
+    ${LogText} "GetInstallType($0) result:$1,$2"
     Push $1
     Push $2
+    ${LogText} "-Function end - GetInstallType"
 FunctionEnd
 
 
@@ -1878,7 +1907,8 @@ LangString INST_GTA_ERROR1 ${LANG_ENGLISH} "The selected directory does not exis
 LangString INST_GTA_ERROR2 ${LANG_ENGLISH} "Could not find GTA:SA installed at $GTA_DIR $\n$\n\
             Are you sure you want to continue ?"
             
-Function "DirectoryLeaveProc"
+Function "CustomDirectoryPageLeave"
+    ${LogText} "+Function begin - CustomDirectoryPageLeave"
     Call CustomDirectoryPageUpdateINSTDIR
 
     # Check if user is trying to install MTA into GTA directory
@@ -1896,6 +1926,7 @@ Function "DirectoryLeaveProc"
             MessageBox MB_OKCANCEL|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
                 "$(INST_GTA_CONFLICT)" \
                 IDOK cont2
+                ${LogText} "-Function end - CustomDirectoryPageLeave (GTA_CONFLICT)"
                 Abort
             cont2:
             StrCpy $INSTDIR $DEFAULT_INSTDIR
@@ -1911,18 +1942,22 @@ Function "DirectoryLeaveProc"
         MessageBox MB_OKCANCEL|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
             "$(INST_MTA_CONFLICT)" \
             IDOK cont
+            ${LogText} "-Function end - CustomDirectoryPageLeave (MTA_CONFLICT)"
             Abort
         cont:
     ${Endif}
+    ${LogText} "-Function end - CustomDirectoryPageLeave"
 FunctionEnd
 
 
 Function "GTADirectoryLeaveProc"
+    ${LogText} "+Function begin - GTADirectoryLeaveProc"
 
     ; Directory must exist
     IfFileExists "$GTA_DIR\*.*" hasdir
         MessageBox MB_ICONEXCLAMATION|MB_TOPMOST|MB_SETFOREGROUND \
             "$(INST_GTA_ERROR1)"
+            ${LogText} "-Function end - GTADirectoryLeaveProc (GTA_ERROR1)"
             Abort
     hasdir:
 
@@ -1931,10 +1966,11 @@ Function "GTADirectoryLeaveProc"
         MessageBox MB_OKCANCEL|MB_ICONQUESTION|MB_TOPMOST|MB_SETFOREGROUND \
             "$(INST_GTA_ERROR2)" \
             IDOK cont1
+            ${LogText} "-Function end - GTADirectoryLeaveProc (GTA_ERROR2)"
             Abort
         cont1:
     cont:
-
+    ${LogText} "-Function end - GTADirectoryLeaveProc"
 FunctionEnd
 
 ;****************************************************************
@@ -2002,12 +2038,15 @@ LangString INST_CHOOSE_LOC_DEFAULT ${LANG_ENGLISH} "Default"
 LangString INST_CHOOSE_LOC_LAST_USED ${LANG_ENGLISH} "Last used"
 LangString INST_CHOOSE_LOC_CUSTOM ${LANG_ENGLISH} "Custom"
 Function CustomDirectoryPage
+    ${LogText} "+Function begin - CustomDirectoryPage"
 
     nsDialogs::Create 1018
     Pop $Dialog
     ${If} $Dialog == error
+        ${LogText} "-Function end - CustomDirectoryPage (error)"
         Abort
     ${EndIf}
+    ${LogText} "nsDialogs::Create success"
 
     GetDlgItem $0 $HWNDPARENT 1037
     ${NSD_SetText} $0 "$(INST_CHOOSE_LOC)"
@@ -2016,6 +2055,7 @@ Function CustomDirectoryPage
 
     ${NSD_CreateLabel} 0 0 100% 50u "$(INST_CHOOSE_LOC2)"
     Pop $0
+    ${LogText} "Did CreateLabel"
 
     # Calculate size and position of install dir options
     IntOp $SizeY 27 + 90    # 27 + 30 + 30 + 30
@@ -2046,6 +2086,7 @@ Function CustomDirectoryPage
     ${NSD_CreateText} $PosX $PosY $Length 12u $DEFAULT_INSTDIR
     Pop $LabelDefault
     SendMessage $LabelDefault ${EM_SETREADONLY} 1 0
+    ${LogText} "Did SendMessage"
     IntOp $PosY $PosY + 30
 
     # Add last used option
@@ -2080,6 +2121,7 @@ Function CustomDirectoryPage
     ${NSD_OnClick} $BrowseButton CustomDirectoryPageBrowseButtonClick
     ${NSD_OnClick} $SetDefaultButton CustomDirectoryPageSetDefaultButtonClick
     ${NSD_OnChange} $DirRequest CustomDirectoryPageDirRequestChange
+    ${LogText} "Did Ons"
 
     # Install type message
     ${NSD_CreateLabel} 0 203 100% 12u ""
@@ -2088,8 +2130,9 @@ Function CustomDirectoryPage
 
     Call CustomDirectoryPageShowWhichRadio
 
-    Call DirectoryShowProc
+    Call UnexpandComponentsPage
     nsDialogs::Show
+    ${LogText} "-Function end - CustomDirectoryPage"
 FunctionEnd
 
 # Called when radion button is clicked
@@ -2222,8 +2265,8 @@ Function CustomDirectoryPageUpdateINSTDIR
     ${EndSwitch}
 FunctionEnd
 
-; Out <stack> = "1" - Is Windows Classic
 Function IsWindowsClassicTheme
+; Out <stack> = "1" - Is Windows Classic
     System::Call "UxTheme::IsThemeActive() i .r3"
     StrCpy $1 "1"
     ${If} $3 == 1
@@ -2439,11 +2482,12 @@ LangString NETTEST_STATUS1  ${LANG_ENGLISH} "Checking for installer update infor
 LangString NETTEST_STATUS2  ${LANG_ENGLISH} "Please ensure your firewall is not blocking"
 
 Function CustomNetMessagePage
-    ${LogText} "Function begin - CustomNetMessagePage"
+    ${LogText} "+Function begin - CustomNetMessagePage"
     # Initial try with blank page
     Call TryToSendInfo
     ${If} $NetDone == 1
         # If it works, then skip this page
+        ${LogText} "-Function end - CustomNetMessagePage (NetDone)"
         Return
     ${EndIf}
 
@@ -2451,6 +2495,7 @@ Function CustomNetMessagePage
     nsDialogs::Create 1018
     Pop $NetDialog
     ${If} $NetDialog == error
+        ${LogText} "-Function end - CustomNetMessagePage (error)"
         Abort
     ${EndIf}
 
@@ -2478,22 +2523,23 @@ Function CustomNetMessagePage
         EnableWindow $0 0
     ${EndIf}
 
-    Call DirectoryShowProc
+    Call UnexpandComponentsPage
     ${NSD_CreateTimer} NetFuncTimer 1000
     nsDialogs::Show
     ${NSD_FreeImage} $NetImageHandle
-    ${LogText} "Function end - CustomNetMessagePage"
+    ${LogText} "-Function end - CustomNetMessagePage"
 FunctionEnd
 
 Function CustomNetMessagePageLeave
-    ${LogText} "Function begin - CustomNetMessagePageLeave"
+    ${LogText} "+Function begin - CustomNetMessagePageLeave"
     ${NSD_KillTimer} NetFuncTimer
     Call TryToSendInfo
-    Call DirectoryShowProc
-    ${LogText} "Function end - CustomNetMessagePageLeave"
+    Call UnexpandComponentsPage
+    ${LogText} "-Function end - CustomNetMessagePageLeave"
 FunctionEnd
 
 Function NetFuncTimer
+    ${LogText} "+Function begin - NetFuncTimer"
     ${NSD_KillTimer} NetFuncTimer
     IntOp $NetTryCount $NetTryCount + 1
     Call TryToSendInfo
@@ -2515,6 +2561,7 @@ Function NetFuncTimer
         # Otherwise, try again in a second
         ${NSD_CreateTimer} NetFuncTimer 1000
     ${EndIf}
+    ${LogText} "-Function end - NetFuncTimer"
 FunctionEnd
 
 ;--------------------------
@@ -2525,7 +2572,7 @@ Function TryToSendInfo
         Return
     ${EndIf}
 
-    ${LogText} "Function begin - TryToSendInfo"
+    ${LogText} "+Function begin - TryToSendInfo"
 
     # Do attempt
     Call NetComposeURL
@@ -2549,7 +2596,7 @@ Function TryToSendInfo
             ${EndIf}
         ${EndIf}
     ${EndIf}
-    ${LogText} "Function end - TryToSendInfo"
+    ${LogText} "-Function end - TryToSendInfo"
 FunctionEnd
 
 ;--------------------------
@@ -2557,10 +2604,10 @@ FunctionEnd
 ; In $1 = Timeout
 ; Out $0 = result   (1 = success)
 Function DoSendInfo
-    ${LogText} "Function begin - DoSendInfo($0,$1)"
+    ${LogText} "+Function begin - DoSendInfo($0,$1)"
     NSISdl::download_quiet /TIMEOUT=$1 "$0" "$TEMP\prev_install"
     Pop $R0
-    ${LogText} " NSISdl::download_quiet result:$R0"
+    ${LogText} "NSISdl::download_quiet result:$R0"
 
     # Allow for server errors #1
     StrCpy $0 $R0 14
@@ -2579,7 +2626,7 @@ Function DoSendInfo
     ${If} $R0 == "success"
         StrCpy $0 1
     ${EndIf}
-    ${LogText} "Function end - DoSendInfo result:$0"
+    ${LogText} "-Function end - DoSendInfo result:$0"
 FunctionEnd
 
 ;--------------------------
@@ -2611,7 +2658,7 @@ Function NetComposeURL
     StrCpy $NetMsgURL "$NetMsgURL$NetPrevInfo"
     StrCpy $NetMsgURL "$NetMsgURL&try=$NetTryCount"
     StrCpy $NetMsgURL "$NetMsgURL&other=$NetOtherSuccessCount"
-    ${LogText} " NetComposeURL result:$NetMsgURL"
+    ${LogText} "NetComposeURL result:$NetMsgURL"
 FunctionEnd
 
 Function NoteMTAWasPresent

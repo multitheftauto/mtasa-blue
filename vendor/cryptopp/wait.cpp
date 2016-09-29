@@ -1,16 +1,36 @@
 // wait.cpp - written and placed in the public domain by Wei Dai
 
 #include "pch.h"
+#include "config.h"
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4189)
+#endif
+
+#if !defined(NO_OS_DEPENDENCE) && (defined(SOCKETS_AVAILABLE) || defined(WINDOWS_PIPES_AVAILABLE))
+
 #include "wait.h"
 #include "misc.h"
+#include "smartptr.h"
 
-#ifdef SOCKETS_AVAILABLE
+// Windows 8, Windows Server 2012, and Windows Phone 8.1 need <synchapi.h> and <ioapiset.h>
+#if defined(CRYPTOPP_WIN32_AVAILABLE)
+# if ((WINVER >= 0x0602 /*_WIN32_WINNT_WIN8*/) || (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/))
+#  include <synchapi.h>
+#  include <ioapiset.h>
+#  define USE_WINDOWS8_API
+# endif
+#endif
 
 #ifdef USE_BERKELEY_STYLE_SOCKETS
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <unistd.h>
+#endif
+
+#if defined(CRYPTOPP_MSAN)
+# include <sanitizer/msan_interface.h>
 #endif
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -25,7 +45,7 @@ unsigned int WaitObjectContainer::MaxWaitObjects()
 }
 
 WaitObjectContainer::WaitObjectContainer(WaitObjectsTracer* tracer)
-	: m_tracer(tracer), m_eventTimer(Timer::MILLISECONDS)
+	: m_tracer(tracer), m_eventTimer(Timer::MILLISECONDS), m_lastResult(0)
 	, m_sameResultCount(0), m_noWaitTimer(Timer::MILLISECONDS)
 {
 	Clear();
@@ -40,6 +60,10 @@ void WaitObjectContainer::Clear()
 	m_maxFd = 0;
 	FD_ZERO(&m_readfds);
 	FD_ZERO(&m_writefds);
+# ifdef CRYPTOPP_MSAN
+	__msan_unpoison(&m_readfds, sizeof(m_readfds));
+	__msan_unpoison(&m_writefds, sizeof(m_writefds));
+# endif	
 #endif
 	m_noWait = false;
 	m_firstEventTime = 0;
@@ -80,14 +104,14 @@ void WaitObjectContainer::DetectNoWait(LastResultType result, CallStack const& c
 
 void WaitObjectContainer::SetNoWait(CallStack const& callStack)
 {
-	DetectNoWait(LASTRESULT_NOWAIT, CallStack("WaitObjectContainer::SetNoWait()", &callStack));
+	DetectNoWait(LastResultType(LASTRESULT_NOWAIT), CallStack("WaitObjectContainer::SetNoWait()", &callStack));
 	m_noWait = true;
 }
 
 void WaitObjectContainer::ScheduleEvent(double milliseconds, CallStack const& callStack)
 {
 	if (milliseconds <= 3)
-		DetectNoWait(LASTRESULT_SCHEDULED, CallStack("WaitObjectContainer::ScheduleEvent()", &callStack));
+		DetectNoWait(LastResultType(LASTRESULT_SCHEDULED), CallStack("WaitObjectContainer::ScheduleEvent()", &callStack));
 	double thisEventTime = m_eventTimer.ElapsedTimeAsDouble() + milliseconds;
 	if (!m_firstEventTime || thisEventTime < m_firstEventTime)
 		m_firstEventTime = thisEventTime;
@@ -112,29 +136,53 @@ WaitObjectContainer::~WaitObjectContainer()
 	{
 		if (!m_threads.empty())
 		{
-			HANDLE threadHandles[MAXIMUM_WAIT_OBJECTS];
+			HANDLE threadHandles[MAXIMUM_WAIT_OBJECTS] = {0};
+			
 			unsigned int i;
 			for (i=0; i<m_threads.size(); i++)
 			{
+				// Enterprise Analysis warning
+				if(!m_threads[i]) continue;
+
 				WaitingThreadData &thread = *m_threads[i];
 				while (!thread.waitingToWait)	// spin until thread is in the initial "waiting to wait" state
 					Sleep(0);
 				thread.terminate = true;
 				threadHandles[i] = thread.threadHandle;
 			}
-			PulseEvent(m_startWaiting);
-			::WaitForMultipleObjects((DWORD)m_threads.size(), threadHandles, TRUE, INFINITE);
+
+			BOOL bResult = PulseEvent(m_startWaiting);
+			assert(bResult != 0); CRYPTOPP_UNUSED(bResult);
+	
+			// Enterprise Analysis warning
+#if defined(USE_WINDOWS8_API)
+			DWORD dwResult = ::WaitForMultipleObjectsEx((DWORD)m_threads.size(), threadHandles, TRUE, INFINITE, FALSE);
+			assert((dwResult >= WAIT_OBJECT_0) && (dwResult < (DWORD)m_threads.size()));
+#else
+			DWORD dwResult = ::WaitForMultipleObjects((DWORD)m_threads.size(), threadHandles, TRUE, INFINITE);
+			assert((dwResult >= WAIT_OBJECT_0) && (dwResult < (DWORD)m_threads.size()));
+#endif
+
 			for (i=0; i<m_threads.size(); i++)
-				CloseHandle(threadHandles[i]);
-			CloseHandle(m_startWaiting);
-			CloseHandle(m_stopWaiting);
+			{
+				// Enterprise Analysis warning
+				if (!threadHandles[i]) continue;
+									
+				bResult = CloseHandle(threadHandles[i]);
+				assert(bResult != 0);
+			}
+
+			bResult = CloseHandle(m_startWaiting);
+			assert(bResult != 0);
+			bResult = CloseHandle(m_stopWaiting);
+			assert(bResult != 0);
 		}
 	}
-	catch (...)
+	catch (const Exception&)
 	{
+		assert(0);
 	}
 }
-
 
 void WaitObjectContainer::AddHandle(HANDLE handle, CallStack const& callStack)
 {
@@ -144,16 +192,22 @@ void WaitObjectContainer::AddHandle(HANDLE handle, CallStack const& callStack)
 
 DWORD WINAPI WaitingThread(LPVOID lParam)
 {
-	std::auto_ptr<WaitingThreadData> pThread((WaitingThreadData *)lParam);
+	member_ptr<WaitingThreadData> pThread((WaitingThreadData *)lParam);
 	WaitingThreadData &thread = *pThread;
 	std::vector<HANDLE> handles;
 
 	while (true)
 	{
 		thread.waitingToWait = true;
-		::WaitForSingleObject(thread.startWaiting, INFINITE);
+#if defined(USE_WINDOWS8_API)
+		DWORD result = ::WaitForSingleObjectEx(thread.startWaiting, INFINITE, FALSE);
+		assert(result != WAIT_FAILED);
+#else
+		DWORD result = ::WaitForSingleObject(thread.startWaiting, INFINITE);
+		assert(result != WAIT_FAILED);
+#endif
+		
 		thread.waitingToWait = false;
-
 		if (thread.terminate)
 			break;
 		if (!thread.count)
@@ -163,7 +217,13 @@ DWORD WINAPI WaitingThread(LPVOID lParam)
 		handles[0] = thread.stopWaiting;
 		std::copy(thread.waitHandles, thread.waitHandles+thread.count, handles.begin()+1);
 
-		DWORD result = ::WaitForMultipleObjects((DWORD)handles.size(), &handles[0], FALSE, INFINITE);
+#if defined(USE_WINDOWS8_API)
+		result = ::WaitForMultipleObjectsEx((DWORD)handles.size(), &handles[0], FALSE, INFINITE, FALSE);
+		assert(result != WAIT_FAILED);
+#else
+		result = ::WaitForMultipleObjects((DWORD)handles.size(), &handles[0], FALSE, INFINITE);
+		assert(result != WAIT_FAILED);
+#endif
 
 		if (result == WAIT_OBJECT_0)
 			continue;	// another thread finished waiting first, so do nothing
@@ -192,6 +252,9 @@ void WaitObjectContainer::CreateThreads(unsigned int count)
 		m_threads.resize(count);
 		for (size_t i=currentCount; i<count; i++)
 		{
+			// Enterprise Analysis warning
+			if(!m_threads[i]) continue;
+	
 			m_threads[i] = new WaitingThreadData;
 			WaitingThreadData &thread = *m_threads[i];
 			thread.terminate = false;
@@ -207,7 +270,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 {
 	if (m_noWait || (m_handles.empty() && !m_firstEventTime))
 	{
-		SetLastResult(LASTRESULT_NOWAIT);
+		SetLastResult(LastResultType(LASTRESULT_NOWAIT));
 		return true;
 	}
 
@@ -244,6 +307,9 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 		
 		for (unsigned int i=0; i<m_threads.size(); i++)
 		{
+			// Enterprise Analysis warning
+			if(!m_threads[i]) continue;
+
 			WaitingThreadData &thread = *m_threads[i];
 			while (!thread.waitingToWait)	// spin until thread is in the initial "waiting to wait" state
 				Sleep(0);
@@ -260,7 +326,14 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 		ResetEvent(m_stopWaiting);
 		PulseEvent(m_startWaiting);
 
+#if defined(USE_WINDOWS8_API)
+		DWORD result = ::WaitForSingleObjectEx(m_stopWaiting, milliseconds, FALSE);
+		assert(result != WAIT_FAILED);
+#else
 		DWORD result = ::WaitForSingleObject(m_stopWaiting, milliseconds);
+		assert(result != WAIT_FAILED);
+#endif
+
 		if (result == WAIT_OBJECT_0)
 		{
 			if (error == S_OK)
@@ -284,7 +357,13 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 		static unsigned long lastTime = 0;
 		unsigned long timeBeforeWait = t.ElapsedTime();
 #endif
+#if defined(USE_WINDOWS8_API)
+		DWORD result = ::WaitForMultipleObjectsEx((DWORD)m_handles.size(), &m_handles[0], FALSE, milliseconds, FALSE);
+		assert(result != WAIT_FAILED);
+#else
 		DWORD result = ::WaitForMultipleObjects((DWORD)m_handles.size(), &m_handles[0], FALSE, milliseconds);
+		assert(result != WAIT_FAILED);
+#endif
 #if TRACE_WAIT
 		if (milliseconds > 0)
 		{
@@ -318,12 +397,14 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 
 void WaitObjectContainer::AddReadFd(int fd, CallStack const& callStack)	// TODO: do something with callStack
 {
+	CRYPTOPP_UNUSED(callStack);
 	FD_SET(fd, &m_readfds);
 	m_maxFd = STDMAX(m_maxFd, fd);
 }
 
 void WaitObjectContainer::AddWriteFd(int fd, CallStack const& callStack) // TODO: do something with callStack
 {
+	CRYPTOPP_UNUSED(callStack);
 	FD_SET(fd, &m_writefds);
 	m_maxFd = STDMAX(m_maxFd, fd);
 }
@@ -363,7 +444,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 	else if (result == 0)
 		return timeoutIsScheduledEvent;
 	else
-		throw Err("WaitObjectContainer: select failed with error " + errno);
+		throw Err("WaitObjectContainer: select failed with error " + IntToString(errno));
 }
 
 #endif

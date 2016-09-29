@@ -1,8 +1,10 @@
 #ifndef CRYPTOPP_DLL_ONLY
-#define CRYPTOPP_DEFAULT_NO_DLL
+# define CRYPTOPP_DEFAULT_NO_DLL
 #endif
 
 #include "dll.h"
+#include "cryptlib.h"
+#include "filters.h"
 
 USING_NAMESPACE(CryptoPP)
 USING_NAMESPACE(std)

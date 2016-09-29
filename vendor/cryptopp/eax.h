@@ -1,3 +1,8 @@
+// eax.h - written and placed in the public domain by Wei Dai
+
+//! \file eax.h
+//! \brief EAX block cipher mode of operation
+
 #ifndef CRYPTOPP_EAX_H
 #define CRYPTOPP_EAX_H
 
@@ -7,7 +12,9 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! .
+//! \class EAX_Base
+//! \brief EAX block cipher base implementation
+//! \details Base implementation of the AuthenticatedSymmetricCipher interface
 class CRYPTOPP_NO_VTABLE EAX_Base : public AuthenticatedSymmetricCipherBase
 {
 public:
@@ -59,7 +66,10 @@ protected:
 	CTR_Mode_ExternalCipher::Encryption m_ctr;
 };
 
-//! .
+//! \class EAX_Final
+//! \brief EAX block cipher final implementation
+//! \tparam T_BlockCipher block cipher
+//! \tparam T_IsEncryption direction in which to operate the cipher
 template <class T_BlockCipher, bool T_IsEncryption>
 class EAX_Final : public EAX_Base
 {
@@ -78,7 +88,12 @@ private:
 #undef EAX
 #endif
 
-/// <a href="http://www.cryptolounge.org/wiki/EAX">EAX</a>
+//! \class EAX
+//! \brief EAX block cipher mode of operation
+//! \tparam T_BlockCipher block cipher
+//! \details \p EAX provides the \p Encryption and \p Decryption typedef. See EAX_Base
+//!   and EAX_Final for the AuthenticatedSymmetricCipher implementation.
+//! \sa <a href="http://www.cryptolounge.org/wiki/EAX">EAX</a> at the Crypto Lounge
 template <class T_BlockCipher>
 struct EAX : public AuthenticatedSymmetricCipherDocumentation
 {

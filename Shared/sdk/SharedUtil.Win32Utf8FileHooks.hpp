@@ -71,6 +71,12 @@ BUT
     #else
         #define MSVCR_DLL "msvcr120.dll"
     #endif
+#elif _MSC_VER == 1900      // MSVC++ 14.0 (Visual Studio 2015)
+    #ifdef _DEBUG
+        #define MSVCR_DLL "ucrtbased.dll"
+    #else
+        #define MSVCR_DLL "ucrtbase.dll"
+    #endif
 #else
     #error "Insert VCR info"
 #endif
