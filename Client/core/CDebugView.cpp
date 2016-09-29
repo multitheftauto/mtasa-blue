@@ -59,11 +59,11 @@ CDebugView::CDebugView ( CGUI * pManager, const CVector2D & vecPosition ) : CCha
     m_TextColor = DEBUGVIEW_TEXT_COLOR;
     unsigned long ulBackgroundColor = COLOR_ARGB ( m_Color.A, m_Color.R, m_Color.G, m_Color.B );
 
-    m_pBackground = m_pManager->CreateStaticImage ();
-    m_pBackgroundTexture = m_pManager->CreateTexture ();
+    m_pBackground.reset(m_pManager->CreateStaticImage ());
+    m_pBackgroundTexture.reset(m_pManager->CreateTexture ());
 
     m_pBackgroundTexture->LoadFromMemory ( &ulBackgroundColor, 1, 1 );
-    m_pBackground->LoadFromTexture ( m_pBackgroundTexture );
+    m_pBackground->LoadFromTexture ( m_pBackgroundTexture.get() );
     m_pBackground->MoveToBack ();
     m_pBackground->SetPosition ( m_vecBackgroundPosition );
     m_pBackground->SetSize ( m_vecBackgroundSize );

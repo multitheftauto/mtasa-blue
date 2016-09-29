@@ -444,11 +444,9 @@ void CEffectTemplateImpl::ReleaseUnderlyingData ( void )
 ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, HRESULT& outHResult )
 {
     // Clone D3DXEffect
-    ID3DXEffect* pNewD3DEffect = NULL;
+    ID3DXEffect* pNewD3DEffect = m_pD3DEffect;
     outHResult = D3D_OK;
-    pNewD3DEffect = m_pD3DEffect;
-    pNewD3DEffect->AddRef();
-
+    
     m_DebugInfo.cloneResult = outHResult;
     if ( !pNewD3DEffect )
     {
@@ -456,6 +454,7 @@ ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& 
         return NULL;
     }
     m_DebugInfo.uiCloneSuccessCount++;
+    pNewD3DEffect->AddRef();
 
     // Set the same technique
     {

@@ -60,18 +60,18 @@ void CConsoleHistory::Add ( const char* szLine )
 
     // Write the history, one per line
     std::ofstream outfile ( FromUTF8( m_strFilename ) );
-    for ( std::list < SString > ::iterator iter = m_History.begin () ; iter != m_History.end (); iter++ )
-        outfile << *iter << std::endl;
-    outfile.close ();
+    for ( auto& strHistory : m_History )
+        outfile << strHistory << std::endl;
 }
 
 const char* CConsoleHistory::Get ( unsigned int uiIndex )
 {
     // Grab the item with the chosen index
-    uint i = 0;
-    for ( std::list < SString > ::iterator iter = m_HistoryNotSaved.begin (); iter != m_HistoryNotSaved.end (); iter++, i++ )
-        if ( i == uiIndex )
-            return *iter;
-
+    for (auto& pHistory : m_HistoryNotSaved) 
+    {
+        if (uiIndex == 0)
+            return pHistory;
+        --uiIndex;
+    }
     return NULL;
 }

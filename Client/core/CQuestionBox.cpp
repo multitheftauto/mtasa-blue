@@ -29,23 +29,14 @@ CQuestionBox::CQuestionBox ( void )
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Create the window
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "" ) );
+    m_pWindow.reset( pManager->CreateWnd ( NULL, "" ) );
     m_pWindow->SetCloseButtonEnabled ( false );
     m_pWindow->SetVisible ( false );
     m_pWindow->SetSizingEnabled ( false );
     m_pWindow->SetAlwaysOnTop ( true );
 
     // Message label
-    m_pMessage = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, "" ) );
-}
-
-
-CQuestionBox::~CQuestionBox ( void )
-{
-    for ( unsigned int i = 0 ; i < m_ButtonList.size () ; i++ )
-        delete m_ButtonList[ i ];
-    delete m_pMessage;
-    delete m_pWindow;
+    m_pMessage.reset(pManager->CreateLabel(m_pWindow.get(), ""));
 }
 
 
@@ -88,7 +79,7 @@ void CQuestionBox::Show ( void )
     }
 
     // Position the buttons evenly across the bottom
-    float fSpaceBetween = ( fWinWidth - ( m_uiActiveButtons * 112 ) ) / ( m_uiActiveButtons + 1 ) + m_uiActiveEditboxes ? fEditSpacer : 0;
+    float fSpaceBetween = ( fWinWidth - ( m_uiActiveButtons * 112 ) ) / ( m_uiActiveButtons + 1 ) + (m_uiActiveEditboxes ? fEditSpacer : 0);
 
     for ( unsigned int i = 0 ; i < m_ButtonList.size () ; i++ )
     {
@@ -152,12 +143,12 @@ void CQuestionBox::SetButton ( unsigned int uiButton, const SString& strText )
     m_uiActiveButtons = Max ( m_uiActiveButtons, uiButton + 1 );
     while ( m_ButtonList.size () < m_uiActiveButtons )
     {
-        CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( g_pCore->GetGUI ()->CreateButton ( m_pWindow, "" ) );
+        std::unique_ptr<CGUIButton> pButton( g_pCore->GetGUI ()->CreateButton ( m_pWindow.get(), "" ) );
         pButton->SetClickHandler ( GUI_CALLBACK ( &CQuestionBox::OnButtonClick, this ) );
         pButton->SetUserData ( reinterpret_cast < void* > ( m_ButtonList.size () ) );
         pButton->SetVisible ( false );
         pButton->SetZOrderingEnabled ( false );
-        m_ButtonList.push_back ( pButton );
+        m_ButtonList.push_back(std::move(pButton));
     }
 
     m_ButtonList[ uiButton ]->SetText ( strText );
@@ -169,16 +160,16 @@ CGUIEdit* CQuestionBox::SetEditbox ( unsigned int uiEditbox, const SString& strT
     m_uiActiveEditboxes = Max ( m_uiActiveEditboxes, uiEditbox + 1 );
     while ( m_EditList.size () < m_uiActiveEditboxes )
     {
-        CGUIEdit* pEdit = reinterpret_cast < CGUIEdit* > ( g_pCore->GetGUI ()->CreateEdit ( m_pWindow ) );
+        std::unique_ptr<CGUIEdit> pEdit( g_pCore->GetGUI ()->CreateEdit ( m_pWindow.get() ) );
         pEdit->SetTextAcceptedHandler ( GUI_CALLBACK ( &CQuestionBox::OnButtonClick, this ) );
         pEdit->SetUserData ( reinterpret_cast < void* > ( m_EditList.size () ) );
         pEdit->SetVisible ( false );
-        m_EditList.push_back ( pEdit );
+        m_EditList.push_back(std::move(pEdit));
     }
 
     m_EditList[ uiEditbox ]->SetText ( strText );
     m_EditList[ uiEditbox ]->SetVisible ( true );
-    return m_EditList [ uiEditbox ];
+    return m_EditList [ uiEditbox ].get();
 }
 
 

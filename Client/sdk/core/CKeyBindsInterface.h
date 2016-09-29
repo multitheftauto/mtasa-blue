@@ -77,8 +77,8 @@ public:
     const SBindableKey*     boundKey;
     bool                    beingDeleted;
     bool                    bActive;
-    inline bool             IsBeingDeleted ( void ) { return beingDeleted; }
-    virtual eKeyBindType    GetType    ( void ) = 0;
+    inline bool             IsBeingDeleted ( void ) const { return beingDeleted; }
+    virtual eKeyBindType    GetType    ( void ) const = 0;
 };
 
 class CKeyBindWithState: public CKeyBind
@@ -95,7 +95,7 @@ class CCommandBind: public CKeyBindWithState
 public:
     inline          CCommandBind    ( void ) { szCommand = NULL; szArguments = NULL; szResource = NULL; bScriptCreated = false; ; bIsReplacingScriptKey = false; }
     inline          ~CCommandBind   ( void ) { delete [] szCommand; if ( szArguments ) delete [] szArguments; if ( szResource ) delete [] szResource; }
-    eKeyBindType    GetType         ( void ) { return KEY_BIND_COMMAND; }
+    eKeyBindType    GetType         ( void ) const  { return KEY_BIND_COMMAND; }
     char*           szCommand;
     char*           szArguments;
     char*           szResource;
@@ -107,7 +107,7 @@ public:
 class CKeyFunctionBind: public CKeyBindWithState
 {
 public:
-    eKeyBindType            GetType         ( void ) { return KEY_BIND_FUNCTION; }
+    eKeyBindType            GetType         ( void ) const { return KEY_BIND_FUNCTION; }
     KeyFunctionBindHandler  Handler;
     bool                    bIgnoreGUI;
 };
@@ -115,7 +115,7 @@ public:
 class CControlFunctionBind: public CKeyBindWithState
 {
 public:
-    eKeyBindType               GetType         ( void ) { return KEY_BIND_CONTROL_FUNCTION; }
+    eKeyBindType               GetType         ( void ) const { return KEY_BIND_CONTROL_FUNCTION; }
     SBindableGTAControl*       control;
     ControlFunctionBindHandler Handler;
 };
@@ -123,7 +123,7 @@ public:
 class CGTAControlBind: public CKeyBind
 {
 public:
-    eKeyBindType    GetType       ( void ) { return KEY_BIND_GTA_CONTROL; }
+    eKeyBindType    GetType       ( void ) const { return KEY_BIND_GTA_CONTROL; }
     SBindableGTAControl* control;
     bool            bState;
     bool            bEnabled;
@@ -135,13 +135,10 @@ public:
     virtual bool                    ProcessMessage              ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) = 0;
 
     // Basic funcs
-    virtual void                    Add                         ( CKeyBind* pKeyBind ) = 0;
     virtual void                    Remove                      ( CKeyBind* pKeyBind ) = 0;
+    virtual const std::list< std::unique_ptr<CKeyBind>>&    GetBinds(void) = 0;
     virtual void                    Clear                       ( void ) = 0;
     virtual bool                    Call                        ( CKeyBind* pKeyBind ) = 0;
-
-    virtual std::list < CKeyBind* > ::const_iterator IterBegin  ( void ) = 0;
-    virtual std::list < CKeyBind* > ::const_iterator IterEnd    ( void ) = 0;
 
     // Command-bind funcs
     virtual bool                    AddCommand                  ( const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL , bool bScriptCreated = false, const char* szOriginalScriptKey = NULL ) = 0;

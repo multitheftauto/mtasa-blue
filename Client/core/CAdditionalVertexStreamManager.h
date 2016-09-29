@@ -2,13 +2,12 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:
-*  PURPOSE:
 *  DEVELOPERS:  D3DOCD
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+#pragma once
 
 //
 // SAdditionalStreamInfo
@@ -79,8 +78,8 @@ class CAdditionalVertexStreamManager
 {
 public:
     ZERO_ON_NEW
-                            CAdditionalVertexStreamManager      ( void );
-    virtual                 ~CAdditionalVertexStreamManager     ( void );
+                            CAdditionalVertexStreamManager      ( void ) = default;
+    virtual                 ~CAdditionalVertexStreamManager     ( void ) = default;
 
     void                    OnDeviceCreate                      ( IDirect3DDevice9* pDevice );
     bool                    MaybeSetAdditionalVertexStream      ( D3DPRIMITIVETYPE PrimitiveType,INT BaseVertexIndex,UINT MinVertexIndex,UINT NumVertices,UINT startIndex,UINT primCount );

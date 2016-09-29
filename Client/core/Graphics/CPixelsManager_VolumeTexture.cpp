@@ -2,7 +2,6 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -12,6 +11,8 @@
 #include "CFileFormat.h"
 #include "CPixelsManager.h"
 
+// conversion from 'UINT' to 'LONG' requires a narrowing conversion
+#pragma warning( disable : 4838 )
 
 ////////////////////////////////////////////////////////////////
 //

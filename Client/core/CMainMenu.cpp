@@ -51,7 +51,11 @@
 #define CORE_MTA_LATEST_NEWS        "cgui\\images\\latest_news.png"
 
 static int WaitForMenu = 0;
-static const SColor headlineColors [] = { SColorRGBA ( 233, 234, 106, 255 ), SColorRGBA ( 233/6*4, 234/6*4, 106/6*4, 255 ), SColorRGBA ( 233/7*3, 234/7*3, 106/7*3, 255 ) };
+static const SColor headlineColors [] = { 
+    SColorRGBA ( 233, 234, 106, 255 ), 
+    SColorRGBA ( 233/6*4, 234/6*4, 106/6*4, 255 ), 
+    SColorRGBA ( 233/7*3, 234/7*3, 106/7*3, 255 ) 
+};
 
 // Improve alignment with magical mystery values!
 static const int BODGE_FACTOR_1 = -5;
@@ -64,8 +68,6 @@ static const CVector2D BODGE_FACTOR_6 ( 0,100 );
 
 CMainMenu::CMainMenu ( CGUI* pManager )
 {
-    m_pNewsBrowser = new CNewsBrowser ();
-
     ulPreviousTick = GetTickCount32 ();
     m_pHoveredItem = NULL;
     m_iMoveStartPos = 0;
@@ -113,7 +115,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         iBackgroundSizeY = NATIVE_BG_Y * iRatioSizeX;
     }
     // First create our filler black background image, which covers the whole screen
-    m_pFiller = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+    m_pFiller = std::unique_ptr<CGUIStaticImage>(pManager->CreateStaticImage () );
     m_pFiller->LoadFromFile ( CORE_MTA_FILLER );
     m_pFiller->SetVisible ( false );
     m_pFiller->MoveToBack ();
@@ -123,7 +125,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pFiller->SetSize(CVector2D(ScreenSize.fX,iBackgroundY),false);
 
     // Background image
-    m_pBackground = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+    m_pBackground = std::unique_ptr<CGUIStaticImage>( pManager->CreateStaticImage () );
     m_pBackground->LoadFromFile ( CORE_MTA_STATIC_BG );
     m_pBackground->SetProperty("InheritsAlpha", "False" );
     m_pBackground->SetPosition ( CVector2D(iBackgroundX,iBackgroundY), false);   
@@ -134,7 +136,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pBackground->SetAlpha(0);
     m_pBackground->SetVisible ( false );
 
-    m_pFiller2 = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+    m_pFiller2 = std::unique_ptr<CGUIStaticImage>(pManager->CreateStaticImage());
     m_pFiller2->LoadFromFile ( CORE_MTA_FILLER );
     m_pFiller2->SetVisible ( false );
     m_pFiller2->SetZOrderingEnabled ( false );
@@ -143,7 +145,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pFiller2->SetPosition(CVector2D(0,iBackgroundY + iBackgroundSizeY));
     m_pFiller2->SetSize(ScreenSize,false);
 
-    m_pCanvas = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane () ); 
+    m_pCanvas = std::unique_ptr<CGUIScrollPane>(pManager->CreateScrollPane());
     m_pCanvas->SetProperty ( "ContentPaneAutoSized", "False" );
     m_pCanvas->SetPosition ( CVector2D(m_iXOff,m_iYOff), false);
     m_pCanvas->SetSize ( CVector2D(m_iMenuSizeX,m_iMenuSizeY), false);
@@ -154,7 +156,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
     // Create our MTA logo
     CVector2D logoSize = CVector2D( (NATIVE_LOGO_X/NATIVE_RES_X)*m_iMenuSizeX, (NATIVE_LOGO_Y/NATIVE_RES_Y)*m_iMenuSizeY );
-    m_pLogo = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage ( m_pCanvas ) );
+    m_pLogo = std::unique_ptr<CGUIStaticImage>(pManager->CreateStaticImage(m_pCanvas.get()));
     m_pLogo->LoadFromFile ( CORE_MTA_LOGO );
     m_pLogo->SetProperty("InheritsAlpha", "False" );
     m_pLogo->SetSize ( logoSize, false);
@@ -162,9 +164,9 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pLogo->SetZOrderingEnabled ( false );
 
     // Create the image showing the version number
-    m_pVersion = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+    m_pVersion.reset(pManager->CreateStaticImage());
     m_pVersion->LoadFromFile ( CORE_MTA_VERSION );
-    m_pVersion->SetParent ( m_pCanvas );
+    m_pVersion->SetParent ( m_pCanvas.get() );
     m_pVersion->SetPosition ( CVector2D(0.845f,0.528f), true);
     m_pVersion->SetSize ( CVector2D((32/NATIVE_RES_X)*m_iMenuSizeX,(32/NATIVE_RES_Y)*m_iMenuSizeY), false);
     m_pVersion->SetProperty("InheritsAlpha", "False" );
@@ -199,7 +201,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 	m_menuBX =  m_menuAX + ((390/NATIVE_RES_X)*m_iMenuSizeX); //Right side of the items. We add the longest picture (browse_servers)
 	m_menuAY += BODGE_FACTOR_1;
 
-    m_pMenuArea = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage(m_pCanvas) );
+    m_pMenuArea = std::unique_ptr<CGUIStaticImage>(pManager->CreateStaticImage(m_pCanvas.get()));
     m_pMenuArea->LoadFromFile ( CORE_MTA_FILLER );
     m_pMenuArea->SetPosition ( CVector2D(m_menuAX-m_iXOff,m_menuAY-m_iYOff) + BODGE_FACTOR_5 , false);
     m_pMenuArea->SetSize ( CVector2D(m_menuBX-m_menuAX,m_menuBY-m_menuAY) + BODGE_FACTOR_6, false);
@@ -213,9 +215,9 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     float fDrawSizeY = (52/NATIVE_RES_Y)*m_iMenuSizeY;
     float fDrawPosX = 0.83f*m_iMenuSizeX - fDrawSizeX;
     float fDrawPosY = 0.60f*m_iMenuSizeY;
-    m_pLatestNews = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage () );
+    m_pLatestNews = std::unique_ptr<CGUIStaticImage>(pManager->CreateStaticImage());
     m_pLatestNews->LoadFromFile ( CORE_MTA_LATEST_NEWS );
-    m_pLatestNews->SetParent ( m_pCanvas );
+    m_pLatestNews->SetParent ( m_pCanvas.get() );
     m_pLatestNews->SetPosition ( CVector2D(fDrawPosX,fDrawPosY), false);
     m_pLatestNews->SetSize ( CVector2D(fDrawSizeX,fDrawSizeY), false);
     m_pLatestNews->SetProperty("InheritsAlpha", "False" );
@@ -228,8 +230,8 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     {
         fDrawPosY += 20;
         // Create our shadow and item
-        CGUILabel * pItemShadow = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pCanvas, " " ) );
-        CGUILabel * pItem = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pCanvas, " " ) );
+        auto pItemShadow = std::unique_ptr<CGUILabel>(m_pManager->CreateLabel ( m_pCanvas.get(), " " ) );
+        auto pItem = std::unique_ptr<CGUILabel>(m_pManager->CreateLabel ( m_pCanvas.get(), " " ) );
 
         pItem->SetFont ( "sans" );
         pItemShadow->SetFont ( "sans" );
@@ -248,12 +250,12 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         pItem->SetClickHandler ( GUI_CALLBACK ( &CMainMenu::OnNewsButtonClick, this )  );
 
         // Store the item in the array
-        m_pNewsItemLabels[i] = pItem;
-        m_pNewsItemShadowLabels[i] = pItemShadow;
+        m_pNewsItemLabels[i] = std::move(pItem);
+        m_pNewsItemShadowLabels[i] = std::move(pItemShadow);
 
         // Create our date label
         fDrawPosY += 15;
-        CGUILabel * pItemDate = reinterpret_cast < CGUILabel* > ( m_pManager->CreateLabel ( m_pCanvas, " " ) );
+        auto pItemDate = std::unique_ptr<CGUILabel>(m_pManager->CreateLabel(m_pCanvas.get(), " "));
 
         pItemDate->SetFont ( "default-small" );
         pItemDate->SetHorizontalAlign ( CGUI_ALIGN_RIGHT );
@@ -261,11 +263,11 @@ CMainMenu::CMainMenu ( CGUI* pManager )
         pItemDate->SetSize( CVector2D (fDrawSizeX, 13), false );
         pItemDate->SetPosition( CVector2D (fDrawPosX, fDrawPosY), false );
 
-        m_pNewsItemDateLabels[i] = pItemDate;
+        m_pNewsItemDateLabels[i] = std::move(pItemDate);
 
         // Create 'NEW' sticker
-        CGUILabel*& pLabel =  m_pNewsItemNEWLabels[i];
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pCanvas, "NEW" ) );
+        auto& pLabel =  m_pNewsItemNEWLabels[i];
+        pLabel.reset(pManager->CreateLabel(m_pCanvas.get(), "NEW"));
         pLabel->SetFont ( "default-small" );
         pLabel->SetTextColor ( 255, 0, 0 );
         pLabel->AutoSize ( pLabel->GetText ().c_str () );
@@ -276,12 +278,11 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pLogo->MoveToBack ();
 
     // Submenus
-    m_QuickConnect.SetVisible ( false );
     m_ServerBrowser.SetVisible ( false );
     m_ServerInfo.Hide ( );
     m_Settings.SetVisible ( false );
     m_Credits.SetVisible ( false );
-    m_pNewsBrowser->SetVisible ( false );
+    m_NewsBrowser.SetVisible ( false );
 
     // We're not ingame
     SetIsIngame ( false );
@@ -326,27 +327,17 @@ CMainMenu::CMainMenu ( CGUI* pManager )
 
 CMainMenu::~CMainMenu ( void )
 {
-    // Destroy GUI items
-    delete m_pBackground;   
-    delete m_pCanvas;  
-    delete m_pFiller;
-    delete m_pFiller2;
-    delete m_pLogo;
-    delete m_pLatestNews;
-    delete m_pVersion;
-    delete m_pMenuArea;
-
     // Destroy the menu items. Note: The disconnect item isn't always in the
     // list of menu items (it's only in there when we're in game). This means we
     // don't delete it when we iterate the list and delete it separately - the
     // menu item itself still exists even when it's no in the list of menu
     // items. Perhaps there should be a separate list of loaded items really.
-    for ( std::deque<sMenuItem*>::iterator it = m_menuItems.begin(); it != m_menuItems.end(); ++it )
+    for ( auto pItem : m_menuItems )
     {   
-        if ( (*it) != m_pDisconnect )
+        if ( pItem != m_pDisconnect )
         {
-            delete (*it)->image;
-            delete (*it);
+            delete pItem->image;
+            delete pItem;
         }   
     }
 
@@ -365,12 +356,11 @@ void CMainMenu::SetMenuVerticalPosition ( int iPosY )
     float fFirstItemSize = m_menuItems.front()->image->GetSize(false).fY;
     int iMoveY = iPosY - m_menuItems.front()->image->GetPosition(false).fY - fFirstItemSize*0.5f;
     
-    std::deque<sMenuItem*>::iterator it = m_menuItems.begin();
-    for ( it; it != m_menuItems.end(); it++ )
+    for ( auto& pItem : m_menuItems)
     {
-        CVector2D vOrigPos = (*it)->image->GetPosition(false);
-        (*it)->drawPositionY = (*it)->drawPositionY + iMoveY;
-        (*it)->image->SetPosition( CVector2D(vOrigPos.fX,vOrigPos.fY + iMoveY), false);
+        CVector2D vOrigPos = pItem->image->GetPosition(false);
+        pItem->drawPositionY += iMoveY;
+        pItem->image->SetPosition( CVector2D(vOrigPos.fX,vOrigPos.fY + iMoveY), false);
     }
 	
     m_menuAY = m_menuAY + iMoveY;
@@ -389,10 +379,9 @@ void CMainMenu::SetMenuUnhovered () //Dehighlight all our items
         SetItemHoverProgress ( m_pDisconnect, 0, false );
     }
     m_pHoveredItem = NULL;
-    std::deque<sMenuItem*>::iterator it = m_menuItems.begin();
-    for ( it; it != m_menuItems.end(); it++ )
+    for ( auto& pItem : m_menuItems )
     {
-        SetItemHoverProgress ( (*it), 0, false );
+        SetItemHoverProgress ( pItem, 0, false );
     }
 }
 
@@ -616,7 +605,7 @@ void CMainMenu::Update ( void )
 
         // Create headlines while the screen is still black
         if ( WaitForMenu == 250 )
-            m_pNewsBrowser->CreateHeadlines ();
+            m_NewsBrowser.CreateHeadlines ();
 
         // Start updater after fade up is complete
         if ( WaitForMenu == 275 )
@@ -673,7 +662,7 @@ void CMainMenu::OnEscapePressedOffLine ( void )
 {
     m_ServerBrowser.SetVisible ( false );
     m_Credits.SetVisible ( false );
-    m_pNewsBrowser->SetVisible ( false );
+    m_NewsBrowser.SetVisible ( false );
 }
 
 void CMainMenu::SetVisible ( bool bVisible, bool bOverlay, bool bFrameDelay )
@@ -692,11 +681,10 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay, bool bFrameDelay )
     {
         m_bFrameDelay = bFrameDelay;
         SetMenuUnhovered ();
-        m_QuickConnect.SetVisible ( false );
         m_ServerBrowser.SetVisible ( false );
         m_Settings.SetVisible ( false );
         m_Credits.SetVisible ( false );
-        m_pNewsBrowser->SetVisible ( false );
+        m_NewsBrowser.SetVisible ( false );
 
 //        m_bIsInSubWindow = false;
     } else {
@@ -945,8 +933,8 @@ bool CMainMenu::OnNewsButtonClick ( CGUIElement* pElement )
                 iIndex = i;
     }
 
-    m_pNewsBrowser->SetVisible ( true );
-    m_pNewsBrowser->SwitchToTab ( iIndex );
+    m_NewsBrowser.SetVisible ( true );
+    m_NewsBrowser.SwitchToTab ( iIndex );
 
     return true;
 }
@@ -985,7 +973,7 @@ sMenuItem* CMainMenu::CreateItem ( unsigned char menuType, const char* szFilenam
 	// Grab our draw position from which we enlarge from
     iPosY = iPosY - (iSizeY/2);
 
-    pImage->SetParent ( m_pCanvas );
+    pImage->SetParent ( m_pCanvas.get() );
     pImage->SetPosition ( CVector2D(iPosX,iPosY), false);
     pImage->SetSize ( CVector2D(iSizeX,iSizeY), false);
     pImage->SetProperty("InheritsAlpha", "False" );
@@ -1037,8 +1025,8 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const 
     m_pLatestNews->SetVisible(true);
 
     // Headline
-    CGUILabel* pItem = m_pNewsItemLabels[ iIndex ];
-    CGUILabel* pItemShadow = m_pNewsItemShadowLabels[ iIndex ];
+    auto& pItem = m_pNewsItemLabels[ iIndex ];
+    auto& pItemShadow = m_pNewsItemShadowLabels[ iIndex ];
     SColor color = headlineColors[ iIndex ];
     pItem->SetTextColor ( color.R, color.G, color.B );
     pItem->SetText ( strHeadline );
@@ -1062,11 +1050,11 @@ void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const 
     }
 
     // Set our Date labels
-    CGUILabel* pItemDate = m_pNewsItemDateLabels[ iIndex ];
+    auto& pItemDate = m_pNewsItemDateLabels[ iIndex ];
     pItemDate->SetText ( strDate );
 
     // 'NEW' sticker
-    CGUILabel* pNewLabel = m_pNewsItemNEWLabels[ iIndex ];
+    auto& pNewLabel = m_pNewsItemNEWLabels[ iIndex ];
     pNewLabel->SetVisible ( bIsNew );
     pNewLabel->SetPosition ( CVector2D ( pItem->GetPosition ().fX + 4, pItem->GetPosition ().fY - 4 ) );
 }
@@ -1121,7 +1109,7 @@ void CMainMenu::WantsToDisconnectCallBack( void* pData, uint uiButton )
 
     if ( uiButton == 1 )
     {
-        uchar menuType = (uchar)pData;
+        int menuType = (int)pData;
         switch( menuType )
         {
             case MENU_ITEM_HOST_GAME:       OnHostGameButtonClick ();    break;

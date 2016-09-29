@@ -219,7 +219,7 @@ public:
     // Read characters into a std::string
     bool ReadStringCharacters ( std::string& result, uint uiLength )
     {
-        result = "";
+        result.clear();
         if ( uiLength )
         {
             if ( !CanReadNumberOfBytes( uiLength ) )
@@ -250,7 +250,7 @@ public:
     // Read a string (incl. ushort size header)
     bool ReadString ( std::string& result )
     {
-        result = "";
+        result.clear();
 
         // Read the length
         unsigned short usLength = 0;
@@ -320,7 +320,7 @@ public:
     // Read a string (incl. variable size header)
     bool ReadStr( std::string& result )
     {
-        result = "";
+        result.clear();
         uint uiLength = 0;
         if ( !ReadLength ( uiLength ) )
             return false;

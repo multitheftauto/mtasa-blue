@@ -23,15 +23,16 @@ class CGraphics;
 #include "CGUI.h"
 #include "CSingleton.h"
 #include "CRenderItemManager.h"
+#include "CTileBatcher.h"
+#include "CLine3DBatcher.h"
+#include "CMaterialLine3DBatcher.h"
+#include "CAspectRatioConverter.h"
 
 #define DUMMY_PROGRESS_INITIAL_DELAY        1000    // Game stall time before spinner is displayed
 #define DUMMY_PROGRESS_MIN_DISPLAY_TIME     1000    // Minimum time spinner is drawn (to prevent flicker)
 #define DUMMY_PROGRESS_ANIMATION_INTERVAL   100     // Animation speed
 
-class CTileBatcher;
-class CLine3DBatcher;
-class CMaterialLine3DBatcher;
-class CAspectRatioConverter;
+
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
 
@@ -183,7 +184,7 @@ public:
     void                OnChangingRenderTarget  ( uint uiNewViewportSizeX, uint uiNewViewportSizeY );
 
     // Subsystems
-    CRenderItemManagerInterface* GetRenderItemManager   ( void )        { return m_pRenderItemManager; }
+    CRenderItemManagerInterface* GetRenderItemManager   ( void )        { return &m_RenderItemManager; }
     CScreenGrabberInterface*     GetScreenGrabber       ( void )        { return m_pScreenGrabber; }
     CPixelsManagerInterface*     GetPixelsManager       ( void )        { return m_pPixelsManager; }
 
@@ -234,14 +235,14 @@ private:
 
     IDirect3DDevice9 *  m_pDevice;
 
-    CRenderItemManager*         m_pRenderItemManager;
+    CRenderItemManager         m_RenderItemManager;
     CScreenGrabberInterface*    m_pScreenGrabber;
     CPixelsManagerInterface*    m_pPixelsManager;
-    CTileBatcher*               m_pTileBatcher;
-    CLine3DBatcher*             m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*             m_pLine3DBatcherPostGUI;
-    CMaterialLine3DBatcher*     m_pMaterialLine3DBatcher;
-    CAspectRatioConverter*      m_pAspectRatioConverter;
+    CTileBatcher               m_TileBatcher;
+    CLine3DBatcher             m_Line3DBatcherPreGUI;
+    CLine3DBatcher             m_Line3DBatcherPostGUI;
+    CMaterialLine3DBatcher     m_MaterialLine3DBatcher;
+    CAspectRatioConverter      m_AspectRatioConverter;
 
     // Fonts
     ID3DXFont*          m_pDXFonts [ NUM_FONTS ];
