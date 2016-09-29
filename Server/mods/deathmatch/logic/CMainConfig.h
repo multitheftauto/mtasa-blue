@@ -126,7 +126,9 @@ public:
     bool                            GetCrashDumpUploadEnabled       ( void ) const              { return m_bCrashDumpUploadEnabled != 0; }
     bool                            GetFilterDuplicateLogLinesEnabled ( void ) const            { return m_bFilterDuplicateLogLinesEnabled != 0; }
     bool                            IsAuthSerialGroup               ( const SString& strGroup ) const   { return ListContains ( m_AuthSerialGroupList, strGroup ); };
-    bool                            IsAuthSerialHttpEnabled         ( void ) const                      { return m_bAuthSerialHttpEnabled; };
+    bool                            GetAuthSerialEnabled            ( void ) const                      { return !m_AuthSerialGroupList.empty(); };
+    bool                            GetAuthSerialHttpEnabled        ( void ) const                      { return m_bAuthSerialHttpEnabled && GetAuthSerialEnabled(); };
+    const std::vector< SString >&   GetAuthSerialGroupList          ( void ) const                      { return m_AuthSerialGroupList; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );

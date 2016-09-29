@@ -507,12 +507,18 @@ bool CMainConfig::Load ( void )
     SString strGroupList;
     if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList, 1 ) != IS_SUCCESS )
     {
-        strGroupList = "Admin";
+        // If not defined in conf file, then default to disabled
+        strGroupList = "";
     }
     strGroupList.Split( ",", m_AuthSerialGroupList );
-    for ( auto& strGroup : m_AuthSerialGroupList )
+    for ( auto iter = m_AuthSerialGroupList.begin() ; iter != m_AuthSerialGroupList.end() ; )
     {
+        SString& strGroup = *iter;
         strGroup = strGroup.TrimEnd( " " ).TrimStart( " " );
+        if ( strGroup.empty() )
+            iter = m_AuthSerialGroupList.erase( iter );
+        else
+            ++iter;
     }
 
     // auth_serial_http
