@@ -356,9 +356,9 @@ void CLuaMain::DoPulse ( void )
 }
 
 
-CXMLFile * CLuaMain::CreateXML ( const char * szFilename )
+CXMLFile * CLuaMain::CreateXML ( const char * szFilename, bool bUseIDs, bool bReadOnly )
 {
-    CXMLFile * pFile = g_pCore->GetXML ()->CreateXML ( szFilename, true );
+    CXMLFile * pFile = g_pCore->GetXML ()->CreateXML ( szFilename, bUseIDs, bReadOnly );
     if ( pFile )
         m_XMLFiles.push_back ( pFile );
     return pFile;
@@ -388,7 +388,7 @@ void CLuaMain::DestroyXML ( CXMLNode * pRootNode )
     }
 }
 
-void CLuaMain::SaveXML ( CXMLNode * pRootNode )
+bool CLuaMain::SaveXML ( CXMLNode * pRootNode )
 {
     list<CXMLFile *>::iterator iter;
     for ( iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); iter++ )
@@ -398,8 +398,7 @@ void CLuaMain::SaveXML ( CXMLNode * pRootNode )
         {
             if ( file->GetRootNode() == pRootNode )
             {
-                file->Write();
-                break;
+                return file->Write();
             }
         }
     }
@@ -414,12 +413,13 @@ void CLuaMain::SaveXML ( CXMLNode * pRootNode )
                 CXMLFile* pFile = pConfigItem->GetFile ();
                 if ( pFile )
                 {
-                    pFile->Write ();
+                    return pFile->Write ();
                 }
-                break;
+                return false;
             }
         }
     }
+    return false;
 }
 
 

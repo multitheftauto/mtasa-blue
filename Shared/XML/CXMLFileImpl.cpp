@@ -13,9 +13,10 @@
 #include "StdInc.h"
 SString CXMLFileImpl::ms_strSaveFlagFile;
 
-CXMLFileImpl::CXMLFileImpl ( const char* szFilename, bool bUseIDs ) :
+CXMLFileImpl::CXMLFileImpl ( const char* szFilename, bool bUseIDs, bool bReadOnly ) :
     m_ulID ( INVALID_XML_ID ),
-    m_bUsingIDs ( bUseIDs )
+    m_bUsingIDs ( bUseIDs ),
+    m_bReadOnly ( bReadOnly )
 {
     // Init
     m_pDocument = NULL;
@@ -123,6 +124,9 @@ bool CXMLFileImpl::Parse ( std::vector < char >* pOutFileContents )
 
 bool CXMLFileImpl::Write ( void )
 {
+    if ( m_bReadOnly )
+        return false;
+
     // We have a filename?
     if ( m_strFilename != "" )
     {

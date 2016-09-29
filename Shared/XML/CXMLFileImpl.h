@@ -23,7 +23,7 @@ class CXMLFileImpl : public CXMLFile
     friend class CXMLNodeImpl;
 
 public:
-                                    CXMLFileImpl        ( const char* szFilename, bool bUseIDs );
+                                    CXMLFileImpl        ( const char* szFilename, bool bUseIDs, bool bReadOnly );
                                     ~CXMLFileImpl       ( void );
 
     const char*                     GetFilename         ( void );
@@ -70,6 +70,7 @@ private:
     class CXMLNodeImpl*             m_pRootNode;
     unsigned long                   m_ulID;
     const bool                      m_bUsingIDs;
+    const bool                      m_bReadOnly;
 
     static SString                  ms_strSaveFlagFile;
 };

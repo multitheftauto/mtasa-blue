@@ -151,9 +151,11 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
     if ( pLuaMain )
     {
         SString strFileInput;
+        bool bReadOnly;
 
         CScriptArgReader argStream ( luaVM );
         argStream.ReadString ( strFileInput );
+        argStream.ReadIfNextIsBool( bReadOnly, false );
 
         if ( !argStream.HasErrors () )
         {
@@ -180,7 +182,7 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
                     MakeSureDirExists ( strPath );
 
                     // Create the XML
-                    CXMLFile* xmlFile = pLuaMain->CreateXML ( strPath.c_str () );
+                    CXMLFile* xmlFile = pLuaMain->CreateXML ( strPath.c_str (), true, bReadOnly );
                     if ( xmlFile )
                     {
                         // Try to parse it
@@ -327,9 +329,11 @@ int CLuaXMLDefs::xmlSaveFile ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            luaMain->SaveXML ( pNode );
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( luaMain->SaveXML ( pNode ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
     else
