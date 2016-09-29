@@ -21,7 +21,7 @@ public:
     void                        SetActive(bool bActive) { m_bActive = bActive; }
 
     inline unsigned long        GetCreationTime(void) { return m_ulCreationTime; }
-    inline void                 UpdateCreationTime(void);
+    void                        UpdateCreationTime(void);
 
 protected:
 
