@@ -423,7 +423,7 @@ public:
     CServerListIterator                     IteratorEnd             ( void )                        { return m_Servers.end (); };
     CServerListReverseIterator              ReverseIteratorBegin    ( void )                        { return m_Servers.rbegin (); };
     CServerListReverseIterator              ReverseIteratorEnd      ( void )                        { return m_Servers.rend (); };
-    unsigned int                            GetServerCount          ( void )                        { return m_Servers.size (); };
+    std::size_t                             GetServerCount          ( void )                        { return m_Servers.size (); };
 
     bool                                    AddUnique               ( in_addr Address, ushort usGamePort, bool addAtFront = false );
     void                                    Clear                   ( void );

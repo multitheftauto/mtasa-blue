@@ -13,17 +13,7 @@
 
 #include "StdInc.h"
 
-using std::string;
-
-CFilePathTranslator::CFilePathTranslator ( )
-{
-}
-
-CFilePathTranslator::~CFilePathTranslator ( )
-{
-}
-
-bool CFilePathTranslator::GetFileFromModPath ( const string& FileToGet, string & TranslatedFilePathOut )
+bool CFilePathTranslator::GetFileFromModPath ( const std::string& FileToGet, std::string & TranslatedFilePathOut )
 {
     // Translate the path to this file.
     TranslatedFilePathOut =  m_ModPath;
@@ -33,7 +23,7 @@ bool CFilePathTranslator::GetFileFromModPath ( const string& FileToGet, string &
     return true;
 }
 
-bool CFilePathTranslator::GetFileFromWorkingDirectory ( const string& FileToGet, string & TranslatedFilePathOut )
+bool CFilePathTranslator::GetFileFromWorkingDirectory ( const std::string& FileToGet, std::string & TranslatedFilePathOut )
 {
     // Translate the path to this file.
     TranslatedFilePathOut =  m_WorkingDirectory;
@@ -43,21 +33,21 @@ bool CFilePathTranslator::GetFileFromWorkingDirectory ( const string& FileToGet,
     return true;
 }
 
-void CFilePathTranslator::GetModPath ( string & ModPathOut )
+void CFilePathTranslator::GetModPath (std::string & ModPathOut )
 {
     ModPathOut = m_ModPath;
 }
 
-void CFilePathTranslator::SetModPath ( const string& PathBasedOffWorkingDirectory )
+void CFilePathTranslator::SetModPath ( const std::string& PathBasedOffWorkingDirectory )
 {
     m_ModPath =  m_WorkingDirectory;
     m_ModPath += '\\';
     m_ModPath += PathBasedOffWorkingDirectory;
 }
 
-void CFilePathTranslator::SetCurrentWorkingDirectory ( const string& PathBasedOffModuleRoot )
+void CFilePathTranslator::SetCurrentWorkingDirectory ( const std::string& PathBasedOffModuleRoot )
 {
-    string RootDirectory;
+    std::string RootDirectory;
 
     // Get the root directory.
     GetMTASARootDirectory ( RootDirectory );
@@ -73,18 +63,18 @@ void CFilePathTranslator::UnSetCurrentWorkingDirectory ( )
     m_WorkingDirectory = "";
 }
 
-void CFilePathTranslator::GetCurrentWorkingDirectory ( string & WorkingDirectoryOut )
+void CFilePathTranslator::GetCurrentWorkingDirectory (std::string & WorkingDirectoryOut )
 {
     WorkingDirectoryOut = m_WorkingDirectory;
 }
 
-void CFilePathTranslator::GetGTARootDirectory ( string & ModuleRootDirOut )
+void CFilePathTranslator::GetGTARootDirectory (std::string & ModuleRootDirOut )
 {
     ModuleRootDirOut = GetLaunchPath();
 }
 
 
-void CFilePathTranslator::GetMTASARootDirectory ( string & InstallRootDirOut )
+void CFilePathTranslator::GetMTASARootDirectory (std::string & InstallRootDirOut )
 {
     InstallRootDirOut = GetMTASABaseDir ();
 }

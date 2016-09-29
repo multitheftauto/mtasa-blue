@@ -8,6 +8,7 @@
 *
 *
 *****************************************************************************/
+#pragma once 
 
 // Vertex type used by the tile batcher
 struct SPDTVertex

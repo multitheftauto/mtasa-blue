@@ -13,8 +13,6 @@
 
 #include "StdInc.h"
 
-using namespace std;
-
 template<> CDirect3DData * CSingleton< CDirect3DData >::m_pSingleton = NULL;
 
 CDirect3DData::CDirect3DData ( void ) 
@@ -30,12 +28,6 @@ CDirect3DData::CDirect3DData ( void )
     m_dwViewportWidth   = 0;
     m_dwViewportHeight  = 0;
 }
-
-CDirect3DData::~CDirect3DData ( void ) 
-{
-
-}
-
 
 void CDirect3DData::StoreTransform ( D3DTRANSFORMSTATETYPE dwMatrixToStore, const D3DMATRIX* pMatrix ) 
 {

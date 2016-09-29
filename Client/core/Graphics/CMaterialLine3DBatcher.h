@@ -8,7 +8,7 @@
 *
 *
 *****************************************************************************/
-
+#pragma once
 typedef uint LINEINDEX;
 
 struct SMaterialLine3DItem

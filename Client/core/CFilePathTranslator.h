@@ -19,9 +19,6 @@
 class CFilePathTranslator 
 {
 public:
-                CFilePathTranslator ( );
-               ~CFilePathTranslator ( );
-    
     void        SetCurrentWorkingDirectory       ( const std::string& PathBasedOffModuleRoot );
     void        UnSetCurrentWorkingDirectory     ( ); 
     void        SetModPath                       ( const std::string& PathBasedOffWorkingDirectory );

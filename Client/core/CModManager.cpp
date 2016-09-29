@@ -104,7 +104,7 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     CMessageLoopHook::GetSingleton ().SetRefreshMsgQueueEnabled( false );
 
     // Get the entry for the given name
-    std::map < std::string, std::string >::iterator itMod = m_ModDLLFiles.find ( szName );
+    auto itMod = m_ModDLLFiles.find ( szName );
     if ( itMod == m_ModDLLFiles.end () )
     {
         CCore::GetSingleton ().GetConsole ()->Printf ( "Unable to load %s (unknown mod)", szName );
@@ -144,7 +144,7 @@ CClientBase* CModManager::Load ( const char* szName, const char* szArguments )
     }
 
     // Get the address of InitClient
-    typedef CClientBase* (__cdecl pfnClientInitializer) ( void );     /* FIXME: Should probably not be here */
+    using pfnClientInitializer = CClientBase* (__cdecl) ( void );     /* FIXME: Should probably not be here */
 
     pfnClientInitializer* pClientInitializer = reinterpret_cast < pfnClientInitializer* > ( GetProcAddress ( m_hClientDLL, "InitClient" ) );
     if ( pClientInitializer == NULL )
