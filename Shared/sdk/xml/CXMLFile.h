@@ -26,7 +26,7 @@ public:
     virtual const std::string&      GetFilename   () = 0;
     virtual void                    SetFilename   (const std::string& strFilename) = 0;
 
-    virtual bool                    Parse         (std::vector<char>* pOutFileContents = nullptr) = 0;
+    virtual bool                    Parse         () = 0;
     virtual bool                    Write         () = 0;
     virtual void                    Reset         () = 0;
 

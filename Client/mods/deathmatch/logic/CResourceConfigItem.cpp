@@ -51,14 +51,10 @@ bool CResourceConfigItem::Start ( void )
         if ( m_pXMLFile )
         {
             // Parse the XML
-            std::vector < char > fileContents;
-            if ( m_pXMLFile->Parse ( &fileContents ) )
+            if ( m_pXMLFile->Parse (  ) )
             {
-                if ( CChecksum::GenerateChecksumFromBuffer( &fileContents.at ( 0 ), fileContents.size() ) == GetServerChecksum() )
-                {
-                    m_pXMLRootNode = m_pXMLFile->GetRootNode ();
-                    return true;
-                }
+                m_pXMLRootNode = m_pXMLFile->GetRootNode ();
+                return true;
             }
             else
             {

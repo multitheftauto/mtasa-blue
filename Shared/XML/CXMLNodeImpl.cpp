@@ -152,7 +152,6 @@ void CXMLNodeImpl::SetTagContent(const std::string & strContent, bool bCDATA)
     SetTagContent(strContent.c_str(), bCDATA);
 }
 
-// TODO CDATA?
 void CXMLNodeImpl::SetTagContent(const char *szText, bool bCDATA)
 {
     // Remove children if any
@@ -160,7 +159,7 @@ void CXMLNodeImpl::SetTagContent(const char *szText, bool bCDATA)
         m_node.remove_child(child);
     m_Children.clear();
 
-    m_node.text().set(szText);
+    m_node.append_child(bCDATA ? pugi::node_cdata : pugi::node_pcdata).set_value(szText);
 }
 
 void CXMLNodeImpl::SetTagContent(bool bContent)
@@ -244,6 +243,7 @@ void CXMLNodeImpl::RemoveAllChildren()
 {
     for (auto &pChild : m_Children)
         m_node.remove_child(reinterpret_cast<CXMLNodeImpl *>(pChild.get())->m_node);
+    m_Children.clear();
 }
 
 void CXMLNodeImpl::AddAttribute(std::unique_ptr<CXMLAttribute> pAttribute)

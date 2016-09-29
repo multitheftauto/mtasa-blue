@@ -22,7 +22,7 @@ public:
     const std::string& GetFilename()                 override { return m_strFilename; }
     void SetFilename(const std::string& strFilename) override { m_strFilename = strFilename; } 
 
-    bool Parse(std::vector<char> *pOutFileContents = nullptr);
+    bool Parse() override;
     bool Write() override;
     void Reset() override;
 
@@ -41,8 +41,7 @@ private:
 private:
     std::unique_ptr<class CXMLNodeImpl> m_pRoot;
     std::unique_ptr<pugi::xml_document> m_pDocument;
-    pugi::xml_parse_result m_parserResult;
-    std::string m_strFilename;
-
-    unsigned long m_ulID;
+    pugi::xml_parse_result  m_parserResult;
+    std::string             m_strFilename;
+    unsigned long           m_ulID;
 };

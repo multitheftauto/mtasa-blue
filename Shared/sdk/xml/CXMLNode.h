@@ -53,7 +53,4 @@ public:
     virtual bool                RemoveAttribute(const std::string& strName) = 0;
     virtual CXMLAttribute*      GetAttribute(const std::string& strName) = 0;
     virtual const std::list<std::unique_ptr<CXMLAttribute>>& GetAttributes() = 0;
-
-
-
 };

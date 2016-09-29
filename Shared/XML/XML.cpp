@@ -16,9 +16,6 @@ CXMLImpl *pXMLInterface = NULL;
 
 _DECLSPEC_EX CXML *InitXMLInterface(const char *szSaveFlagDirectory)
 {
-    // Initialize and do any file recovery as necessary
-    //    CXMLFileImpl::InitFileRecovery( szSaveFlagDirectory );
-
     pXMLInterface = new CXMLImpl;
     return pXMLInterface;
 }

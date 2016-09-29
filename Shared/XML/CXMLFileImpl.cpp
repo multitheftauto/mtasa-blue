@@ -41,7 +41,7 @@ CXMLFileImpl::~CXMLFileImpl(void)
         CXMLArray::PushUniqueID(this);
 }
 
-bool CXMLFileImpl::Parse(std::vector<char> *pOutFileContents)
+bool CXMLFileImpl::Parse()
 {
     if (!m_strFilename.empty())
     {
@@ -81,7 +81,9 @@ std::unique_ptr<CXMLNodeImpl> CXMLFileImpl::WrapperTreeWalker(pugi::xml_node * n
     // Recursively call on our children
     for (auto &child : node->children())
     {
-        wrapperNode->AddChild(WrapperTreeWalker(&child, bUsingIDs));
+        // Only for actual child nodes
+        if(child.type() == pugi::node_element)
+            wrapperNode->AddChild(WrapperTreeWalker(&child, bUsingIDs));
     }
 
     return wrapperNode;
@@ -92,7 +94,7 @@ void CXMLFileImpl::Reset()
     m_pRoot.reset(nullptr); 
 }
 
-bool CXMLFileImpl::Write(void)
+bool CXMLFileImpl::Write()
 {
     // We have a filename?
     if (!m_strFilename.empty())
@@ -102,6 +104,8 @@ bool CXMLFileImpl::Write(void)
 
     return false;
 }
+
+
 
 CXMLNode *CXMLFileImpl::CreateRootNode(const std::string &strTagName)
 {
@@ -145,3 +149,4 @@ CXMLErrorCodes::Code CXMLFileImpl::GetLastError(std::string &strOut)
         return CXMLErrorCodes::OtherError;
     }
 }
+
