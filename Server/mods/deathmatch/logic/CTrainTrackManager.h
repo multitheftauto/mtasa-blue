@@ -9,7 +9,6 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #pragma once
 
 #include "CTrainTrack.h"
@@ -42,7 +41,6 @@ private:
 
 
     CTrainTrack *                                       m_pTrainTracks[MAX_TOTAL_TRACKS];
-    static std::map< unsigned int, SRailNode >          m_OriginalTrainTrackData[4];
     float                                               m_fRailTrackLengths[MAX_TOTAL_TRACKS];
     DWORD                                               m_dwNumberOfTrackNodes[MAX_TOTAL_TRACKS];
     unsigned char                                       m_dwNumberOfTracks;

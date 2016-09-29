@@ -20,7 +20,8 @@ project "Game SA"
 
 	includedirs {
 		"../sdk/",
-		"../../vendor/sparsehash/current/src/"
+		"../../vendor/sparsehash/current/src",
+		"../../Shared/gta"
 	}
 	
 	files {

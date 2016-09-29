@@ -9,7 +9,6 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #pragma once
 
 #include <game/CTrainTrackManager.h>
@@ -23,7 +22,7 @@
 
 #define COMP_NumberOfTracks                     0x6F6CA9
 
-#define NUM_RAILTRACKS                          4
+constexpr std::size_t NumRailTracks = 4;
 #define ARRAY_NumRailTrackNodes                 0xC38014            // NUM_RAILTRACKS dwords
 #define ARRAY_TrackLengths                      0xC37FEC            // Track Length floats
 #define ARRAY_RailTrackNodePointers             0xC38024            // NUM_RAILTRACKS pointers to arrays of SRailNode
@@ -37,7 +36,7 @@ public:
                         ~CTrainTrackManagerSA           ( );
     CTrainTrackSA *     GetTrainTrack                   ( unsigned char ucTrack );
     void                Initialise                      ( void );
-    bool                GetOriginalRailNode             ( unsigned char ucTrack, unsigned short usNode, SRailNodeSA * pNode );
+    bool                GetOriginalRailNode             ( unsigned char ucTrack, unsigned short usNode, SRailNode* pNode );
     void                ResetTracks                     ( void );
     void *              GetRailNodePointer              ( unsigned char ucTrack );
     float               GetRailLength                   ( unsigned char ucTrack );
@@ -56,21 +55,28 @@ public:
     bool                IsValid                         ( unsigned char ucTrack );
 
 private:
-    bool                Reallocate                      ( CTrainTrackSA * pTrainTrack, unsigned int uiNodes );
+    bool                Reallocate                      ( CTrainTrackSA * pTrainTrack, std::size_t numNodes );
     void *              AllocateDefault                 ( void );
     void                SetRailNodePointer              ( unsigned char ucTrack, void * pRailNodePointers );
 
 
-    CTrainTrackSA *                                     m_pTrainTracks[MAX_TOTAL_TRACKS];
+    std::vector<std::unique_ptr<CTrainTrackSA>>         m_TrainTracks;
     void *                                              m_pRailNodePointers[MAX_TOTAL_TRACKS];
     float                                               m_fRailTrackLengths[MAX_TOTAL_TRACKS];
     DWORD                                               m_dwNumberOfTrackNodes[MAX_TOTAL_TRACKS];
     unsigned char                                       m_dwNumberOfTracks;
     bool                                                m_bInitialised;
-    static std::map< unsigned int, SRailNodeSA >        m_OriginalTrainTrackData[4];
 
     // Default
     void *                                              m_pDefaultRailNodePointer;
     float                                               m_fDefaultRailTrackLengths;
     DWORD                                               m_dwDefaultNumberOfTrackNodes;
 };
+
+/*
+DOCUMENTATION:
+- m_pTrainTracks: Currently used train tracks (includes new tracks as well)
+- m_pRailNodePointers: Contains ALL track nodes for ALL tracks
+- m_fRailTrackLengths: Contains overall track lengths
+
+*/

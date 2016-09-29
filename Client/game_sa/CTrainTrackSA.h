@@ -9,36 +9,17 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #pragma once
 
+struct SRailNode;
 class CTrainTrackManagerSA;
 
 //006F6BD0  int GetTrainNodeNearPoint(float x, float y, float z, int* pTrackID) places track ID in *pTrackID and returns node ID
 #define FUNC_GetTrainNodeNearPoint              0x6F6BD0
 
-
 #define NUM_RAILTRACKS                          4
 #define ARRAY_NumRailTrackNodes                 0xC38014    // NUM_RAILTRACKS dwords
 #define ARRAY_RailTrackNodePointers             0xC38024    // NUM_RAILTRACKS pointers to arrays of SRailNode
-
-typedef struct
-{
-    short sX;               // x coordinate times 8
-    short sY;               // y coordinate times 8
-    short sZ;               // z coordinate times 8
-    WORD  sRailDistance;    // on-rail distance times 3
-    WORD  padding;
-    void Init ( short sX, short sY, short sZ, WORD sRailDistance, WORD padding )
-    {
-        this->sX = sX;
-        this->sY = sY;
-        this->sZ = sZ;
-        this->sRailDistance = sRailDistance;
-        this->padding = padding;
-    }
-} SRailNodeSA;
-C_ASSERT ( sizeof ( SRailNodeSA ) == 0xA );
 
 class CTrainTrackSA : public CTrainTrack
 {
@@ -70,11 +51,11 @@ public:
     void            SetLastNodesLinked              ( bool bLinked );
 
 private:
-    SRailNodeSA *   GetRailNode             ( unsigned int uiNode );
+    SRailNode*   GetRailNode             ( unsigned int uiNode );
 
     bool                    m_bLinkLastNodes;
     bool                    m_bInitialised;
-    SRailNodeSA *           m_pRailNodes;
+    SRailNode*           m_pRailNodes;
     DWORD                   m_dwNumberOfNodes;
     unsigned char           m_ucTrackID;
     CTrainTrackManagerSA *  m_pManager;

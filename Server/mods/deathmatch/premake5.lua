@@ -27,7 +27,8 @@ project "Deathmatch"
 			"../../../vendor/sparsehash/current/src/",
 			"logic", 
 			"utils",
-			"."
+			".",
+			"../../../Shared/gta"
 		}
 	
 	links {
