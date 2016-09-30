@@ -53,11 +53,16 @@ static_assert(sizeof(STrackNode) == 12, "Size mismatch");
 class CTrainTrack
 {
 public:
-    virtual unsigned int GetTrackIndex() = 0;
+    virtual unsigned int GetIndex() = 0;
+
+    virtual float GetLength() = 0;
 
     virtual void SetLastNodesLinked(bool linked) = 0;
 
     virtual STrackNode* AddNode(const CVector& position) = 0;
 
     virtual const std::vector<STrackNode>& GetNodes() const = 0;
+
+    virtual bool SetNodePosition(unsigned int nodeIndex, const CVector& position) = 0;
+    virtual bool GetNodePosition(unsigned int nodeIndex, CVector& position) = 0;
 };

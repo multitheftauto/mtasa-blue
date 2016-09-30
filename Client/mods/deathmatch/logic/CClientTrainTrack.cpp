@@ -8,59 +8,41 @@
 *  DEVELOPERS:  Cazomino05 <>
 *
 *****************************************************************************/
-
 #include <StdInc.h>
+#include "CClientTrainTrack.h"
 
-CClientTrainTrack::CClientTrainTrack ( class CClientManager* pManager, ElementID ID, unsigned int uiNodes, unsigned char ucTrackID, bool bLinkedLastNode ) : CClientEntity ( ID )
+CClientTrainTrack::CClientTrainTrack(ElementID ID, const std::vector<STrackNode>& trackNodes, bool linkLastNode) : CClientEntity(ID)
 {
-    // Init
-    SetTypeName ( "train-track" );
-    m_pTrainTrack = g_pGame->GetTrainTrackManager ( )->CreateTrainTrack ( uiNodes, ucTrackID, bLinkedLastNode );
+    SetTypeName("train-track");
+    m_pTrainTrack = g_pGame->GetTrainTrackManager()->CreateTrainTrack(trackNodes, linkLastNode);
 }
 
-CClientTrainTrack::~CClientTrainTrack ( void )
+CClientTrainTrack::~CClientTrainTrack()
 {
-    g_pGame->GetTrainTrackManager ( )->DestroyTrainTrack ( m_pTrainTrack->GetTrackID ( ) );
-    m_pTrainTrack = NULL;
+    g_pGame->GetTrainTrackManager()->DestroyTrainTrack(m_pTrainTrack);
 }
 
-bool CClientTrainTrack::SetNodePosition ( unsigned int uiNode, CVector vecPosition )
+bool CClientTrainTrack::SetNodePosition(uint nodeIndex, const CVector& position)
 {
-    return m_pTrainTrack->SetRailNodePosition ( uiNode, vecPosition );
+    return m_pTrainTrack->SetNodePosition(nodeIndex, position);
 }
 
-bool CClientTrainTrack::GetNodePosition ( unsigned int uiNode, CVector& vecPosition )
+bool CClientTrainTrack::GetNodePosition(uint nodeIndex, CVector& position)
 {
-    return m_pTrainTrack->GetRailNodePosition ( uiNode, vecPosition );
+    return m_pTrainTrack->GetNodePosition(nodeIndex, position);
 }
 
-bool CClientTrainTrack::SetTrackLength ( float fLength )
+float CClientTrainTrack::GetLength()
 {
-    return m_pTrainTrack->SetTrackLength ( fLength );
+    return m_pTrainTrack->GetLength();
 }
 
-float CClientTrainTrack::GetTrackLength ( void )
+uint CClientTrainTrack::GetTrackIndex()
 {
-    return m_pTrainTrack->GetTrackLength ( );
+    return m_pTrainTrack->GetIndex();
 }
 
-bool CClientTrainTrack::SetNumberOfNodes ( unsigned int uiNodes )
+void CClientTrainTrack::SetLastNodesLinked(bool linked)
 {
-    return m_pTrainTrack->SetNumberOfNodes ( uiNodes );
-}
-
-unsigned int CClientTrainTrack::GetNumberOfNodes ( void )
-{
-    return m_pTrainTrack->GetNumberOfNodes ( );
-}
-
-unsigned char CClientTrainTrack::GetTrackID ( void )
-{
-    return m_pTrainTrack->GetTrackID ( );
-}
-
-bool CClientTrainTrack::SetLastNodesLinked ( bool bLinked )
-{
-    m_pTrainTrack->SetLastNodesLinked ( bLinked );
-    return true;
+    m_pTrainTrack->SetLastNodesLinked(linked);
 }

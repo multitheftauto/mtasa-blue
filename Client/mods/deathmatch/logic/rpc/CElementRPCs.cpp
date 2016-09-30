@@ -48,7 +48,6 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( SET_WEAPON_OWNER,               SetWeaponOwner,              "setWeaponOwner" );
     AddHandler ( SET_CUSTOM_WEAPON_FLAGS,        SetWeaponConfig,             "setWeaponFlags" );
     AddHandler ( SET_PROPAGATE_CALLS_ENABLED,    SetCallPropagationEnabled,   "setCallPropagationEnabled" );
-    AddHandler ( SET_TRAIN_TRACK_LENGTH,         SetTrainTrackLength,         "setTrainTrackLength" );
 }
 
 #define RUN_CHILDREN_SERVER( func ) \
@@ -711,18 +710,5 @@ void CElementRPCs::SetCallPropagationEnabled ( CClientEntity * pSource, NetBitSt
     if ( bitStream.ReadBit ( bEnabled ) )
     {
         pSource->SetCallPropagationEnabled ( bEnabled );
-    }
-}
-
-void CElementRPCs::SetTrainTrackLength ( CClientEntity * pSource, NetBitStreamInterface& bitStream )
-{
-    if ( pSource->GetType() == CCLIENTTRAINTRACK )
-    {
-        float fLength = 0.0f;
-        CClientTrainTrack * pTrack = static_cast < CClientTrainTrack * > ( pSource );
-        if ( bitStream.Read ( fLength ) )
-        {
-            pTrack->SetTrackLength ( fLength );
-        }
     }
 }

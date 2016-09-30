@@ -8878,31 +8878,3 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight ( CResource& R
 
     return nullptr;
 }
-
-bool CStaticFunctionDefinitions::GetTrainTrackLength ( CClientTrainTrack& TrainTrack, float &fLength )
-{
-    fLength = TrainTrack.GetTrackLength ();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainTrackNumberOfNodes ( CClientTrainTrack& TrainTrack, unsigned int &uiNodes )
-{
-    uiNodes = TrainTrack.GetNumberOfNodes ();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainTrackID ( CClientTrainTrack& TrainTrack, unsigned char &ucTrack )
-{
-    ucTrack = TrainTrack.GetTrackID ();
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainTrackPosition ( unsigned char ucTrackID, unsigned int uiTrackNode, CVector& vecPosition )
-{
-    CTrainTrack * pTrainTrack = g_pGame->GetTrainTrackManager ()->GetTrainTrack ( ucTrackID );
-    if ( pTrainTrack )
-    {
-        return pTrainTrack->GetRailNodePosition ( uiTrackNode, vecPosition );
-    }
-    return false;
-}

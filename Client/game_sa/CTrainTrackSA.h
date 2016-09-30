@@ -20,16 +20,19 @@ class CTrainTrackSA : public CTrainTrack
 public:
     CTrainTrackSA(uint index, const std::vector<STrackNode>& nodes, bool linkLastNode, CTrainTrackManagerSA* pManager);
 
-    virtual uint GetTrackIndex() override { return m_Index; }
+    virtual uint GetIndex() override { return m_Index; }
 
     inline STrackNode* GetNodesData() { return m_Nodes.data(); }
-    inline float GetLength() { return m_Length; }
+    virtual inline float GetLength() override { return m_Length; }
     inline std::size_t GetNumberOfNodes() { return m_Nodes.size(); }
     
     virtual void SetLastNodesLinked(bool linked) override;
 
     virtual STrackNode* AddNode(const CVector& position) override;
     virtual const std::vector<STrackNode>& GetNodes() const override { return m_Nodes; }
+
+    virtual bool SetNodePosition(uint nodeIndex, const CVector& position) override;
+    virtual bool GetNodePosition(uint nodeIndex, CVector& position) override;
 
     void Recalculate();
 

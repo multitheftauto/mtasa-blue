@@ -6488,7 +6488,7 @@ void CClientGame::OutputServerInfo( void )
 
     if ( g_pGame->GetTrainTrackManager () )
     {
-        g_pGame->GetTrainTrackManager ()->ResetTracks ();
+        g_pGame->GetTrainTrackManager ()->Reset ();
     }
 
     {

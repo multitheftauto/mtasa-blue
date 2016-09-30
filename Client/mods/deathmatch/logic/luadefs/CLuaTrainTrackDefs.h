@@ -8,7 +8,6 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #pragma once
 #include "CLuaDefs.h"
 
@@ -21,9 +20,6 @@ public:
     LUA_DECLARE ( SetTrainTrackPosition );
     LUA_DECLARE ( GetTrainTrackPosition );
     LUA_DECLARE ( CreateTrainTrack );
-    LUA_DECLARE ( SetTrainTrackLength );
     LUA_DECLARE ( GetTrainTrackLength );
-    LUA_DECLARE ( SetTrainTrackNumberOfNodes );
-    LUA_DECLARE ( GetTrainTrackNumberOfNodes );
     LUA_DECLARE ( GetTrainTrackID );
 };

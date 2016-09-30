@@ -3949,23 +3949,26 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
                 case CClientGame::TRAINTRACK:
                 {
-                    unsigned char ucTrackID = 0;
-                    unsigned int uiNumberOfNodes = 0;
-                    bool bLinkedLastNode = false;
-                    bitStream.Read ( ucTrackID );
-                    bitStream.Read ( uiNumberOfNodes );
-                    bitStream.ReadBit ( bLinkedLastNode );
+                    std::uint8_t trackId; // TODO
+                    std::uint32_t numNodes;
+                    bool linkLastNode;
+                    bitStream.Read(trackId);
+                    bitStream.Read(numNodes);
+                    bitStream.ReadBit(linkLastNode);
 
-                    CClientTrainTrack * pTrainTrack = new CClientTrainTrack ( g_pClientGame->GetManager ( ), EntityID, uiNumberOfNodes, ucTrackID, bLinkedLastNode );
-                    CVector vecTrackPos;
-                    for ( unsigned int i = 0; i < uiNumberOfNodes; i++ )
+                    std::vector<STrackNode> trackNodes(numNodes);
+                    for (uint i = 0; i < numNodes; ++i)
                     {
-                        bitStream.Read ( vecTrackPos.fX );
-                        bitStream.Read ( vecTrackPos.fY );
-                        bitStream.Read ( vecTrackPos.fZ );
-                        pTrainTrack->SetNodePosition ( i, vecTrackPos );
+                        CVector position;
+                        bitStream.Read(position.fX );
+                        bitStream.Read(position.fY );
+                        bitStream.Read(position.fZ );
+
+                        STrackNode trackNode;
+                        trackNode.SetPosition(position);
+                        trackNodes.push_back(std::move(trackNode));
                     }
-                    pEntity = pTrainTrack;
+                    pEntity = new CClientTrainTrack(EntityID, trackNodes, linkLastNode);
                     break;
                 }
 

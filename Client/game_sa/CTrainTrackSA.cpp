@@ -48,6 +48,26 @@ STrackNode* CTrainTrackSA::AddNode(const CVector& position)
     return &m_Nodes.back();
 }
 
+bool CTrainTrackSA::SetNodePosition(uint nodeIndex, const CVector& position)
+{
+    if (nodeIndex >= m_Nodes.size())
+        return false;
+
+    auto& node = m_Nodes[nodeIndex];
+    node.SetPosition(position);
+    return true;
+}
+
+bool CTrainTrackSA::GetNodePosition(uint nodeIndex, CVector& position)
+{
+    if (nodeIndex >= m_Nodes.size())
+        return false;
+
+    auto& node = m_Nodes[nodeIndex];
+    position = node.GetPosition();
+    return true;
+}
+
 void CTrainTrackSA::Recalculate()
 {
     // Default our distance to 0

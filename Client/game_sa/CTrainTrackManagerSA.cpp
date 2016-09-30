@@ -19,47 +19,47 @@ CTrainTrackManagerSA::CTrainTrackManagerSA()
     Reset();
 
     // pGlobalTrainNodes 0xC38014
-    MemPut<DWORD>(0x6F58D2, (DWORD)&m_TrackNodePointers); // 1
-    MemPut<DWORD>(0x6F59FE, (DWORD)&m_TrackNodePointers); // 2
-    MemPut<DWORD>(0x6F6C06, (DWORD)&m_TrackNodePointers); // 3
-    MemPut<DWORD>(0x6F6D0A, (DWORD)&m_TrackNodePointers); // 4
-    MemPut<DWORD>(0x6F6EB1, (DWORD)&m_TrackNodePointers); // 5
-    MemPut<DWORD>(0x6F6F79, (DWORD)&m_TrackNodePointers); // 6
-    MemPut<DWORD>(0x6F7442, (DWORD)&m_TrackNodePointers); // 7
-    MemPut<DWORD>(0x6F7467, (DWORD)&m_TrackNodePointers); // 8
-    MemPut<DWORD>(0x6F74EC, (DWORD)&m_TrackNodePointers); // 9
-    MemPut<DWORD>(0x6F75B7, (DWORD)&m_TrackNodePointers); // 10
-    MemPut<DWORD>(0x6F7B73, (DWORD)&m_TrackNodePointers); // 11
-    MemPut<DWORD>(0x6F7C60, (DWORD)&m_TrackNodePointers); // 12
-    MemPut<DWORD>(0x6F7DC5, (DWORD)&m_TrackNodePointers); // 13
-    MemPut<DWORD>(0x6F7EE9, (DWORD)&m_TrackNodePointers); // 14
-    MemPut<DWORD>(0x6F8007, (DWORD)&m_TrackNodePointers); // 15
-    MemPut<DWORD>(0x6F809C, (DWORD)&m_TrackNodePointers); // 16
-    MemPut<DWORD>(0x6F871C, (DWORD)&m_TrackNodePointers); // 17
+    MemPut(0x6F58D2, &m_TrackNodePointers); // 1
+    MemPut(0x6F59FE, &m_TrackNodePointers); // 2
+    MemPut(0x6F6C06, &m_TrackNodePointers); // 3
+    MemPut(0x6F6D0A, &m_TrackNodePointers); // 4
+    MemPut(0x6F6EB1, &m_TrackNodePointers); // 5
+    MemPut(0x6F6F79, &m_TrackNodePointers); // 6
+    MemPut(0x6F7442, &m_TrackNodePointers); // 7
+    MemPut(0x6F7467, &m_TrackNodePointers); // 8
+    MemPut(0x6F74EC, &m_TrackNodePointers); // 9
+    MemPut(0x6F75B7, &m_TrackNodePointers); // 10
+    MemPut(0x6F7B73, &m_TrackNodePointers); // 11
+    MemPut(0x6F7C60, &m_TrackNodePointers); // 12
+    MemPut(0x6F7DC5, &m_TrackNodePointers); // 13
+    MemPut(0x6F7EE9, &m_TrackNodePointers); // 14
+    MemPut(0x6F8007, &m_TrackNodePointers); // 15
+    MemPut(0x6F809C, &m_TrackNodePointers); // 16
+    MemPut(0x6F871C, &m_TrackNodePointers); // 17
 
     // fRailTrackOneLength 0xC37FEC
-    MemPut<DWORD>(0x6F5BC4, (DWORD)&m_TrackLengths); // 1
-    MemPut<DWORD>(0x6F5BD9, (DWORD)&m_TrackLengths); // 2
-    MemPut<DWORD>(0x6F5C15, (DWORD)&m_TrackLengths); // 3
-    MemPut<DWORD>(0x6F5C32, (DWORD)&m_TrackLengths); // 4
-    MemPut<DWORD>(0x6F745D, (DWORD)&m_TrackLengths); // 5
-    MemPut<DWORD>(0x6F8712, (DWORD)&m_TrackLengths); // 6
-    MemPut<DWORD>(0x6F6FE8, (DWORD)&m_TrackLengths); // 7
+    MemPut(0x6F5BC4, &m_TrackLengths); // 1
+    MemPut(0x6F5BD9, &m_TrackLengths); // 2
+    MemPut(0x6F5C15, &m_TrackLengths); // 3
+    MemPut(0x6F5C32, &m_TrackLengths); // 4
+    MemPut(0x6F745D, &m_TrackLengths); // 5
+    MemPut(0x6F8712, &m_TrackLengths); // 6
+    MemPut(0x6F6FE8, &m_TrackLengths); // 7
 
     // iNumberOfTrackNodes 0xC38014
-    MemPut<DWORD>(0x6F59EB, (DWORD)&m_NumberOfTrackNodes); // 1
-    MemPut<DWORD>(0x6F6BF3, (DWORD)&m_NumberOfTrackNodes); // 2
-    MemPut<DWORD>(0x6F6C96, (DWORD)&m_NumberOfTrackNodes); // 3
-    MemPut<DWORD>(0x6F6CD1, (DWORD)&m_NumberOfTrackNodes); // 4
-    MemPut<DWORD>(0x6F6D04, (DWORD)&m_NumberOfTrackNodes); // 5
-    MemPut<DWORD>(0x6F6F52, (DWORD)&m_NumberOfTrackNodes); // 6
-    MemPut<DWORD>(0x6F7DB6, (DWORD)&m_NumberOfTrackNodes); // 7
-    MemPut<DWORD>(0x6F7F05, (DWORD)&m_NumberOfTrackNodes); // 8
-    MemPut<DWORD>(0x6F7F12, (DWORD)&m_NumberOfTrackNodes); // 9
-    MemPut<DWORD>(0x6F8001, (DWORD)&m_NumberOfTrackNodes); // 10
-    MemPut<DWORD>(0x6F80B6, (DWORD)&m_NumberOfTrackNodes); // 11
-    MemPut<DWORD>(0x6F80C3, (DWORD)&m_NumberOfTrackNodes); // 12
-    MemPut<DWORD>(0x6F8723, (DWORD)&m_NumberOfTrackNodes); // 13
+    MemPut(0x6F59EB, &m_NumberOfTrackNodes); // 1
+    MemPut(0x6F6BF3, &m_NumberOfTrackNodes); // 2
+    MemPut(0x6F6C96, &m_NumberOfTrackNodes); // 3
+    MemPut(0x6F6CD1, &m_NumberOfTrackNodes); // 4
+    MemPut(0x6F6D04, &m_NumberOfTrackNodes); // 5
+    MemPut(0x6F6F52, &m_NumberOfTrackNodes); // 6
+    MemPut(0x6F7DB6, &m_NumberOfTrackNodes); // 7
+    MemPut(0x6F7F05, &m_NumberOfTrackNodes); // 8
+    MemPut(0x6F7F12, &m_NumberOfTrackNodes); // 9
+    MemPut(0x6F8001, &m_NumberOfTrackNodes); // 10
+    MemPut(0x6F80B6, &m_NumberOfTrackNodes); // 11
+    MemPut(0x6F80C3, &m_NumberOfTrackNodes); // 12
+    MemPut(0x6F8723, &m_NumberOfTrackNodes); // 13
 }
 
 CTrainTrack* CTrainTrackManagerSA::CreateTrainTrack(const std::vector<STrackNode>& nodes, bool bLinkedLastNode)
@@ -86,7 +86,7 @@ CTrainTrack* CTrainTrackManagerSA::CreateTrainTrack(const std::vector<STrackNode
 
 void CTrainTrackManagerSA::UpdateTrackData(CTrainTrackSA* pTrainTrack)
 {
-    auto trackIndex = pTrainTrack->GetTrackIndex();
+    auto trackIndex = pTrainTrack->GetIndex();
 
     // Update length
     m_TrackLengths[trackIndex] = pTrainTrack->GetLength();
@@ -100,7 +100,7 @@ void CTrainTrackManagerSA::UpdateTrackData(CTrainTrackSA* pTrainTrack)
 
 CTrainTrack* CTrainTrackManagerSA::GetTrainTrackByIndex(uint trackIndex)
 {
-    auto iter = std::find_if(m_Tracks.begin(), m_Tracks.end(), [trackIndex](auto& pTrainTrack) { return pTrainTrack->GetTrackIndex() == trackIndex; });
+    auto iter = std::find_if(m_Tracks.begin(), m_Tracks.end(), [trackIndex](auto& pTrainTrack) { return pTrainTrack->GetIndex() == trackIndex; });
     if (iter == m_Tracks.end())
         return nullptr;
 
@@ -110,7 +110,7 @@ CTrainTrack* CTrainTrackManagerSA::GetTrainTrackByIndex(uint trackIndex)
 void CTrainTrackManagerSA::DestroyTrainTrack(CTrainTrack* pTrainTrack)
 {
     // Remove track from arrays
-    auto trackIndex = pTrainTrack->GetTrackIndex();
+    auto trackIndex = pTrainTrack->GetIndex();
     m_TrackNodePointers[trackIndex] = nullptr; // Mark as free
     m_TrackLengths[trackIndex] = 0.0f;
     m_NumberOfTrackNodes[trackIndex] = 0;
