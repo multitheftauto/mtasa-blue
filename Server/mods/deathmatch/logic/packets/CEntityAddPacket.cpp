@@ -1056,18 +1056,16 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
 
                 case CElement::TRAINTRACK:
                 {
-                    CTrainTrack * pTrack = static_cast < CTrainTrack* > ( pElement );
-                    CVector vecTrackPos;
-                    unsigned int uiNumberOfPositions = pTrack->GetNumberOfNodes ( );
-                    BitStream.Write ( pTrack->GetTrackID ( ) );
-                    BitStream.Write ( pTrack->GetNumberOfNodes ( ) );
-                    BitStream.WriteBit ( pTrack->GetLastNodesLinked ( ) );
-                    for ( unsigned int i = 0; i < uiNumberOfPositions; i++ )
+                    auto pTrack = static_cast<CTrainTrack*>(pElement);
+
+                    BitStream.Write(pTrack->GetNumberOfNodes());
+                    BitStream.WriteBit(pTrack->GetLastNodesLinked());
+
+                    for (auto& trackNode : pTrack->GetNodes())
                     {
-                        pTrack->GetRailNodePosition ( i, vecTrackPos );
-                        BitStream.Write ( vecTrackPos.fX );
-                        BitStream.Write ( vecTrackPos.fY );
-                        BitStream.Write ( vecTrackPos.fZ );
+                        BitStream.Write(trackNode.position.fX);
+                        BitStream.Write(trackNode.position.fX);
+                        BitStream.Write(trackNode.position.fX);
                     }
                     break;
                 }

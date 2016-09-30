@@ -8,217 +8,91 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #include "StdInc.h"
 
-void CLuaTrainTrackDefs::LoadFunctions ()
+void CLuaTrainTrackDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction ( "createTrack", CreateTrainTrack );
-    CLuaCFunctions::AddFunction ( "getDefaultTrack", GetDefaultTrack );
+    CLuaCFunctions::AddFunction("createTrack", CreateTrainTrack);
 
-    CLuaCFunctions::AddFunction ( "getTrackID", GetTrainTrackID );
-    CLuaCFunctions::AddFunction ( "getTrackLength", GetTrainTrackLength );
-    CLuaCFunctions::AddFunction ( "getTrackNode", GetTrainTrackPosition );
-    CLuaCFunctions::AddFunction ( "getTrackNodes", GetTrainTrackNumberOfNodes );
-
-    CLuaCFunctions::AddFunction ( "setTrackLength", SetTrainTrackLength );
+    //CLuaCFunctions::AddFunction ( "getTrackNode", GetTrainTrackPosition );
+    //CLuaCFunctions::AddFunction ( "getTrackNodes", GetTrainTrackNumberOfNodes );
 }
 
 
-void CLuaTrainTrackDefs::AddClass ( lua_State* luaVM )
+void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
 {
-    lua_newclass ( luaVM );
+    lua_newclass(luaVM);
 
-    lua_classfunction ( luaVM, "create", "createTrack" );
-    lua_classfunction ( luaVM, "getDefault", "getDefaultTrack" );
+    lua_classfunction(luaVM, "create", "createTrack");
 
-    lua_classfunction ( luaVM, "getTrackID", "getTrackID" );
-    lua_classfunction ( luaVM, "getLength", "getTrackLength" );
-    lua_classfunction ( luaVM, "getNode", "getTrackNode" );
-    lua_classfunction ( luaVM, "getNodes", "getTrackNodes" );
+    //lua_classfunction(luaVM, "getNode", "getTrackNode");
+    //lua_classfunction(luaVM, "getNodes", "getTrackNodes");
 
-    lua_classfunction ( luaVM, "setLength", "setTrackLength" );
-
-    lua_classvariable ( luaVM, "length", "setTrackLength", "getTrackLength" );
-    lua_classvariable ( luaVM, "trackID", NULL, "getTrackID" );
-
-    lua_registerclass ( luaVM, "TrainTrack", "Element" );
+    lua_registerclass(luaVM, "TrainTrack", "Element");
 }
 
-int CLuaTrainTrackDefs::GetTrainTrackPosition ( lua_State* luaVM )
+int CLuaTrainTrackDefs::GetTrainTrackPosition(lua_State* luaVM)
 {
-    unsigned int uiTrackNode = 0;
-    CVector vecPosition;
     CTrainTrack* pTrack;
+    uint nodeIndex;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTrack );
-    argStream.ReadNumber ( uiTrackNode );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pTrack);
+    argStream.ReadNumber(nodeIndex);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::GetTrainTrackPosition ( pTrack, uiTrackNode, vecPosition ) )
+        CVector position;
+        if (pTrack->GetTrackNodePosition(nodeIndex, position))
         {
-            lua_pushvector ( luaVM, vecPosition );
+            lua_pushvector(luaVM, position);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaTrainTrackDefs::CreateTrainTrack ( lua_State* luaVM )
+int CLuaTrainTrackDefs::CreateTrainTrack(lua_State* luaVM)
 {
-    CScriptArgReader argStream ( luaVM );
-    
+    bool linkLastNodes;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(linkLastNodes);
+
+    // TODO: Refactor the following
     std::vector<CVector> vecNodeList;
-    for ( uint i = 0; i == 0 || argStream.NextIsVector3D (); i++ )
+    for (uint i = 0; i == 0 || argStream.NextIsVector3D(); i++)
     {
         CVector vecNode;
-        argStream.ReadVector3D ( vecNode );
-        vecNodeList.push_back ( vecNode );
+        argStream.ReadVector3D(vecNode);
+        vecNodeList.push_back(vecNode);
     }
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        CLuaMain * pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        auto pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+        if (pLuaMain)
         {
-            CResource * pResource = pLuaMain->GetResource ();
-            if ( pResource )
+            auto pResource = pLuaMain->GetResource();
+            if (pResource)
             {
-                CTrainTrack * pTrainTrack = CStaticFunctionDefinitions::CreateTrainTrack ( pResource, vecNodeList );
-                if ( pTrainTrack != NULL )
+                auto pTrainTrack = CStaticFunctionDefinitions::CreateTrainTrack(pResource, vecNodeList, linkLastNodes);
+                if (pTrainTrack)
                 {
-                    lua_pushelement ( luaVM, pTrainTrack );
+                    lua_pushelement(luaVM, pTrainTrack);
                     return 1;
                 }
             }
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-
-int CLuaTrainTrackDefs::SetTrainTrackLength ( lua_State* luaVM )
-{
-    float fLength = 0.0f;
-    CTrainTrack * pTrainTrack = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTrainTrack );
-    argStream.ReadNumber ( fLength );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::SetTrainTrackLength ( pTrainTrack, fLength ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaTrainTrackDefs::GetTrainTrackLength ( lua_State* luaVM )
-{
-    float fLength = 0.0f;
-    CTrainTrack * pTrainTrack = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTrainTrack );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::GetTrainTrackLength ( pTrainTrack, fLength ) )
-        {
-            lua_pushnumber ( luaVM, fLength );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaTrainTrackDefs::GetTrainTrackNumberOfNodes ( lua_State* luaVM )
-{
-    unsigned int uiNodes = 0;
-    CTrainTrack * pTrainTrack = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTrainTrack );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::GetTrainTrackNumberOfNodes ( pTrainTrack, uiNodes ) )
-        {
-            lua_pushnumber ( luaVM, uiNodes );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-// DEBUG: Gives ID of track
-int CLuaTrainTrackDefs::GetTrainTrackID ( lua_State* luaVM )
-{
-    unsigned char ucTrack = 0;
-    CTrainTrack * pTrainTrack = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pTrainTrack );
-
-    if ( !argStream.HasErrors () )
-    {
-        if ( CStaticFunctionDefinitions::GetTrainTrackID ( pTrainTrack, ucTrack ) )
-        {
-            lua_pushnumber ( luaVM, ucTrack );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-// DEBUG: Gets track by ID
-int CLuaTrainTrackDefs::GetDefaultTrack ( lua_State* luaVM )
-{
-    uchar ucTrack = 0;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( ucTrack );
-
-    //if (ucTrack > 3 )
-    //    argStream.SetCustomError ( "Invalid track number range (0-3)" );
-
-    if ( !argStream.HasErrors () )
-    {
-        CTrainTrack* pTrack = CStaticFunctionDefinitions::GetDefaultTrack ( ucTrack );
-        if ( pTrack != nullptr )
-        {
-            lua_pushuserdata ( luaVM, pTrack );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}

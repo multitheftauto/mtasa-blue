@@ -24,9 +24,9 @@ struct STrackNode
 
     inline void SetPosition(const CVector& position)
     {
-        x = static_cast<std::int16_t>(position.fX);
-        y = static_cast<std::int16_t>(position.fY);
-        z = static_cast<std::int16_t>(position.fZ);
+        x = static_cast<std::int16_t>(position.fX * 8);
+        y = static_cast<std::int16_t>(position.fY * 8);
+        z = static_cast<std::int16_t>(position.fZ * 8);
     }
 
     inline CVector GetPosition() const

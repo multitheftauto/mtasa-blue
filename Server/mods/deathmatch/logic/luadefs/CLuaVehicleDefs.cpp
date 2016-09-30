@@ -1767,27 +1767,22 @@ int CLuaVehicleDefs::GetTrainTrack ( lua_State* luaVM )
 {
     CVehicle* pVehicle;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVehicle );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        CTrainTrack* pTrack = CStaticFunctionDefinitions::GetTrainTrack ( pVehicle );
-        if (pTrack != nullptr)
+        auto pTrack = CStaticFunctionDefinitions::GetTrainTrack(pVehicle);
+        if (pTrack)
         {
-            if (pTrack->GetTrackID() <= 3) {
-                lua_pushinteger ( luaVM, pTrack->GetTrackID () );
-            }
-            else {
-                lua_pushelement ( luaVM, pTrack );
-            }
+            lua_pushelement(luaVM, pTrack);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 

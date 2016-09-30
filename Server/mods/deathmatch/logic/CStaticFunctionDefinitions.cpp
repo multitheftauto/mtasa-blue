@@ -12116,66 +12116,25 @@ SString CStaticFunctionDefinitions::GetVersionSortable ()
 }
 
 
-CTrainTrack * CStaticFunctionDefinitions::CreateTrainTrack ( CResource * pResource, const std::vector<CVector>& vecNodeList )
+CTrainTrack* CStaticFunctionDefinitions::CreateTrainTrack(CResource* pResource, const std::vector<CVector>& nodes, bool linkLastNodes)
 {
-    CTrainTrackManager * pTrainTrackManager = g_pGame->GetTrainTrackManager ( ) ;
-    CTrainTrack * pTrainTrack = pTrainTrackManager->CreateTrainTrack ( vecNodeList, pResource->GetDynamicElementRoot(), NULL );
-    if ( pResource->HasStarted ( ) )
+    auto pTrainTrackManager = g_pGame->GetTrainTrackManager();
+
+    // Convert vector of vectors to vector of track nodes
+    std::vector<STrackNode> trackNodes(nodes.size());
+    for (auto& node : nodes)
+    {
+        trackNodes.push_back(STrackNode(node));
+    }
+
+    // Create track
+    auto pTrainTrack = pTrainTrackManager->CreateTrainTrack(trackNodes, linkLastNodes, pResource->GetDynamicElementRoot(), nullptr);
+
+    if (pResource->HasStarted())
     {
         CEntityAddPacket Packet;
-        Packet.Add ( pTrainTrack );
-        m_pPlayerManager->BroadcastOnlyJoined ( Packet );
+        Packet.Add(pTrainTrack);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
     }
     return pTrainTrack;
-}
-
-bool CStaticFunctionDefinitions::DestroyTrainTrack ( CTrainTrack * pTrainTrack )
-{
-    delete pTrainTrack;
-    return true;
-}
-
-
-bool CStaticFunctionDefinitions::GetTrainTrackPosition ( CTrainTrack* pTrainTrack, unsigned int uiTrackNode, CVector& vecPosition )
-{
-    assert ( pTrainTrack );
-    return pTrainTrack->GetRailNodePosition ( uiTrackNode, vecPosition );
-}
-
-bool CStaticFunctionDefinitions::SetTrainTrackLength ( CTrainTrack * pTrainTrack, float fLength )
-{
-    if ( pTrainTrack->SetTrackLength ( fLength ) )
-    {
-        CBitStream BitStream;
-        BitStream.pBitStream->Write ( fLength );
-        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pTrainTrack, SET_TRAIN_TRACK_LENGTH, *BitStream.pBitStream ) );
-    }
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainTrackLength ( CTrainTrack * pTrainTrack, float &fLength )
-{
-    fLength = pTrainTrack->GetTrackLength ( );
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainTrackNumberOfNodes ( CTrainTrack * pTrainTrack, unsigned int &uiNodes )
-{
-    uiNodes = pTrainTrack->GetNumberOfNodes ( );
-    return true;
-}
-
-bool CStaticFunctionDefinitions::GetTrainTrackID ( CTrainTrack * pTrainTrack, unsigned char &ucTrack )
-{
-    ucTrack = pTrainTrack->GetTrackID ( );
-    return true;
-}
-
-CTrainTrack* CStaticFunctionDefinitions::GetDefaultTrack ( uchar ucTrack )
-{
-    if (ucTrack > 3) {
-        return nullptr;
-    }
-
-    return m_pTrainTrackManager->GetTrainTrack ( ucTrack );
 }
