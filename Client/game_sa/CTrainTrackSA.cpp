@@ -9,44 +9,13 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
 #include "StdInc.h"
 
-inline float DistanceBetweenPoints3D ( const CVector& vecPosition1, const CVector& vecPosition2 )
+CTrainTrackSA::CTrainTrackSA(uint32 index, bool linkedLastNode, CTrainTrackManagerSA* pManager) : m_Index(index), m_pManager(pManager), m_LinkLastNodes(linkedLastNode)
 {
-    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
-    float fDistanceZ = vecPosition2.fZ - vecPosition1.fZ;
-
-    return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ );
 }
 
-inline float DistanceBetweenPoints2D ( const CVector& vecPosition1, const CVector& vecPosition2 )
-{
-    float fDistanceX = vecPosition2.fX - vecPosition1.fX;
-    float fDistanceY = vecPosition2.fY - vecPosition1.fY;
-
-    return sqrt ( fDistanceX * fDistanceX + fDistanceY * fDistanceY );
-}
-
-CTrainTrackSA::CTrainTrackSA( unsigned char ucTrackID, bool bLinkedLastNode, CTrainTrackManagerSA * pManager )
-{
-    // set our track ID
-    m_ucTrackID = ucTrackID;
-    // set our manager
-    m_pManager = pManager;
-
-    // Unitialised
-    m_bInitialised = false;
-
-    // Linked last nodes
-    m_bLinkLastNodes = bLinkedLastNode;
-
-    // Do not ever modify track positions in the constructor as nothing has loaded at this point.
-
-}
-
-SRailNodeSA * CTrainTrackSA::GetRailNode ( unsigned int uiNode )
+SRailNodeSA* CTrainTrackSA::GetRailNode ( unsigned int uiNode )
 {
     // Make sure we are within the realm of possibility
     if ( uiNode < m_dwNumberOfNodes )

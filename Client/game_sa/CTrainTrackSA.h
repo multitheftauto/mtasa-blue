@@ -11,21 +11,18 @@
 *****************************************************************************/
 #pragma once
 
-struct SRailNode;
+struct STrackNode;
 class CTrainTrackManagerSA;
 
 //006F6BD0  int GetTrainNodeNearPoint(float x, float y, float z, int* pTrackID) places track ID in *pTrackID and returns node ID
 #define FUNC_GetTrainNodeNearPoint              0x6F6BD0
 
-#define NUM_RAILTRACKS                          4
-#define ARRAY_NumRailTrackNodes                 0xC38014    // NUM_RAILTRACKS dwords
-#define ARRAY_RailTrackNodePointers             0xC38024    // NUM_RAILTRACKS pointers to arrays of SRailNode
-
 class CTrainTrackSA : public CTrainTrack
 {
     friend class CTrainTrackManagerSA;
+
 public:
-                    CTrainTrackSA                   ( unsigned char ucTrackID, bool bLinkedLastNode, CTrainTrackManagerSA * pManager );
+    CTrainTrackSA                   (uint index, bool linkedLastNode, CTrainTrackManagerSA* pManager);
 
 private:
     void            Recalculate                     ( );
@@ -48,15 +45,16 @@ public:
 
     unsigned char   GetTrackID                      ( void )                                            { return m_ucTrackID; };
 
+    inline STrackNode* GetTrackNodes() { return m_TrackNodes; }
+
     void            SetLastNodesLinked              ( bool bLinked );
 
 private:
-    SRailNode*   GetRailNode             ( unsigned int uiNode );
+    STrackNode*   GetRailNode             ( unsigned int uiNode );
 
-    bool                    m_bLinkLastNodes;
-    bool                    m_bInitialised;
-    SRailNode*           m_pRailNodes;
+    uint                    m_Index;
+    bool                    m_LinkLastNodes;
+    STrackNode*             m_TrackNodes;
     DWORD                   m_dwNumberOfNodes;
-    unsigned char           m_ucTrackID;
     CTrainTrackManagerSA *  m_pManager;
 };

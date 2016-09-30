@@ -12,7 +12,7 @@
 #include <array>
 #include <vector>
 
-struct SRailNode
+struct STrackNode
 {
     std::int16_t x, y, z; // coordinate times 8
     std::int16_t railDistance; // on-rail distance times 3
@@ -22,10 +22,10 @@ struct SRailNode
 #endif
 };
 #ifdef MTA_CLIENT
-static_assert(sizeof(SRailNode) == 12, "Size mismatch");
+static_assert(sizeof(STrackNode) == 12, "Size mismatch");
 #endif
 
-std::vector<SRailNode> OriginalTrackNodes[4] = {
+std::vector<STrackNode> OriginalTrackNodes[4] = {
 
     // Track 1
     {
