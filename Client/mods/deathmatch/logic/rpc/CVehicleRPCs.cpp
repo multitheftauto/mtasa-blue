@@ -531,15 +531,17 @@ void CVehicleRPCs::SetTrainSpeed ( CClientEntity* pSource, NetBitStreamInterface
 }
 
 
-void CVehicleRPCs::SetTrainTrack ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CVehicleRPCs::SetTrainTrack(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    uchar ucTrack;
-    if ( bitStream.Read ( ucTrack ) )
+    ElementID trainTrackId;
+    if (bitStream.Read(trainTrackId))
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get ( pSource->GetID () );
-        if ( pVehicle )
+        CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
+        CClientTrainTrack* pTrainTrack = m_pTrainTrackManager->Get(trainTrackId);
+
+        if (pVehicle && pTrainTrack)
         {
-            pVehicle->SetTrainTrack ( ucTrack );
+            pVehicle->SetTrainTrack(pTrainTrack);
         }
     }
 }

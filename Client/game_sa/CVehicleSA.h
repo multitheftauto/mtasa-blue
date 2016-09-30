@@ -555,8 +555,8 @@ public:
     void                        SetTrainSpeed                   ( float fSpeed );
     bool                        GetTrainDirection               ();
     void                        SetTrainDirection               ( bool bDirection );
-    BYTE                        GetRailTrack                    ();
-    void                        SetRailTrack                    ( BYTE ucTrackID );
+    CTrainTrack*                GetTrainTrack                   ();
+    void                        SetTrainTrack                   (CTrainTrack* pTrainTrack);
     float                       GetTrainPosition                ( void );
     void                        SetTrainPosition                ( float fPosition, bool bRecalcOnRailDistance = true );
 

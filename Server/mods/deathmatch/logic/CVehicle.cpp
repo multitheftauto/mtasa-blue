@@ -72,7 +72,6 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bIsDerailable = true;
     m_fTrainSpeed = 0.0f;
     m_fTrainPosition = 0.0f;
-    m_ucTrackID = 0;
     m_bTaxiLightState = false;
     m_bTrainDirection = false;
     m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );

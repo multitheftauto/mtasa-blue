@@ -340,8 +340,8 @@ public:
     float                       GetTrainPosition        ( void );
     void                        SetTrainPosition        ( float fTrainPosition, bool bRecalcOnRailDistance = true );
 
-    uchar                       GetTrainTrack           ( void );
-    void                        SetTrainTrack           ( uchar ucTrack );
+    CClientTrainTrack*          GetTrainTrack           ();
+    void                        SetTrainTrack           (CClientTrainTrack* pTrainTrack);
 
 
     inline unsigned char        GetOverrideLights       ( void )                            { return m_ucOverrideLights; }
@@ -614,7 +614,7 @@ protected:
     bool                        m_bTrainDirection;
     float                       m_fTrainSpeed;
     float                       m_fTrainPosition;
-    uchar                       m_ucTrackID;
+    CClientTrainTrack*          m_pTrainTrack = nullptr;
     bool                        m_bJustStreamedIn;
 
     // Time dependent error compensation interpolation

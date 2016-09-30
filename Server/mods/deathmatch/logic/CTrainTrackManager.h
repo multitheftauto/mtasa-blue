@@ -21,7 +21,7 @@ public:
     CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode);
     void DestroyTrainTrack(CTrainTrack* pTrainTrack);
 
-    CTrainTrack* GetTrainTrack(uint trackIndex);
+    inline const std::vector<CTrainTrack*>& GetTracks() { return m_Tracks; }
 
 private:
     constexpr static std::size_t MaxTracks = 255;

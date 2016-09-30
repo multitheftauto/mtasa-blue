@@ -5324,7 +5324,7 @@ CTrainTrack* CStaticFunctionDefinitions::GetTrainTrack ( CVehicle* pVehicle )
     else if ( pVehicle->IsDerailed () )
         return nullptr;
 
-    return m_pTrainTrackManager->GetTrainTrack ( pVehicle->GetTrainTrack () );
+    return pVehicle->GetTrainTrack();
 }
 
 
@@ -7251,24 +7251,19 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CVehicle* pVehicle, float fSpee
 }
 
 
-bool CStaticFunctionDefinitions::SetTrainTrack ( CVehicle* pVehicle, CTrainTrack* pTrack )
+bool CStaticFunctionDefinitions::SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrack)
 {
-    assert ( pVehicle );
-    assert ( pTrack );
-
-    if ( pVehicle->GetVehicleType () != VEHICLE_TRAIN )
+    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
         return false;
-    else if ( pVehicle->IsDerailed () )
+    else if (pVehicle->IsDerailed())
         return false;
 
-    uchar ucTrack = pTrack->GetTrackID ();
-    pVehicle->SetTrainTrack ( ucTrack );
+    pVehicle->SetTrainTrack(pTrack);
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( ucTrack );
+    BitStream.pBitStream->Write(pTrack->GetID());
 
-    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream ) );
-
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream));
     return true;
 }
 
@@ -12121,7 +12116,7 @@ CTrainTrack* CStaticFunctionDefinitions::CreateTrainTrack(CResource* pResource, 
     auto pTrainTrackManager = g_pGame->GetTrainTrackManager();
 
     // Convert vector of vectors to vector of track nodes
-    std::vector<STrackNode> trackNodes(nodes.size());
+    std::vector<STrackNode> trackNodes;
     for (auto& node : nodes)
     {
         trackNodes.push_back(STrackNode(node));

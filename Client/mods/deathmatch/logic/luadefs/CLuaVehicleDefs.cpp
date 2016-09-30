@@ -1344,25 +1344,25 @@ int CLuaVehicleDefs::GetTrainSpeed ( lua_State* luaVM )
 }
 
 
-int CLuaVehicleDefs::GetTrainTrack ( lua_State* luaVM )
+int CLuaVehicleDefs::GetTrainTrack(lua_State* luaVM)
 {
-    CClientVehicle* pVehicle = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVehicle );
+    CClientVehicle* pVehicle;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        uchar ucTrack;
-        if ( CStaticFunctionDefinitions::GetTrainTrack ( *pVehicle, ucTrack ) )
+        CClientTrainTrack* pTrainTrack;
+        if (CStaticFunctionDefinitions::GetTrainTrack(*pVehicle, pTrainTrack))
         {
-            lua_pushnumber ( luaVM, ucTrack );
+            lua_pushelement(luaVM, pTrainTrack);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -2345,29 +2345,27 @@ int CLuaVehicleDefs::SetTrainSpeed ( lua_State* luaVM )
 }
 
 
-int CLuaVehicleDefs::SetTrainTrack ( lua_State* luaVM )
+int CLuaVehicleDefs::SetTrainTrack(lua_State* luaVM)
 {
-    CClientVehicle* pVehicle = NULL;
-    uchar ucTrack;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pVehicle );
-    argStream.ReadNumber ( ucTrack );
+    CClientVehicle* pVehicle;
+    CClientTrainTrack* pTrainTrack;
 
-    if ( ucTrack > 3 )
-        argStream.SetCustomError ( "Invalid track number range (0-3)" );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadUserData(pTrainTrack);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        if ( CStaticFunctionDefinitions::SetTrainTrack ( *pVehicle, ucTrack ) )
+        if (CStaticFunctionDefinitions::SetTrainTrack(*pVehicle, pTrainTrack))
         {
-            lua_pushboolean ( luaVM, true );
+            lua_pushboolean(luaVM, true);
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 

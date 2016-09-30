@@ -57,6 +57,7 @@ CClientManager::CClientManager ( void )
     m_pEffectManager = new CClientEffectManager ( this );
     m_pPointLightsManager = new CClientPointLightsManager ( this );
     m_pPacketRecorder = new CClientPacketRecorder ( this );
+    m_pTrainTrackManager = new CClientTrainTrackManager;
 
     m_bBeingDeleted = false;
     m_bGameUnloadedFlag = false;
@@ -118,6 +119,9 @@ CClientManager::~CClientManager ( void )
 
     delete m_pTeamManager;
     m_pTeamManager = NULL;
+
+    delete m_pTrainTrackManager;
+    m_pTrainTrackManager = nullptr;
 
     delete m_pSoundManager;
     m_pSoundManager = NULL;

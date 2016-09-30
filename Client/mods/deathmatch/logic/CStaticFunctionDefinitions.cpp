@@ -2580,14 +2580,14 @@ bool CStaticFunctionDefinitions::GetTrainSpeed ( CClientVehicle& Vehicle, float&
 }
 
 
-bool CStaticFunctionDefinitions::GetTrainTrack ( CClientVehicle& Vehicle, uchar& ucTrack )
+bool CStaticFunctionDefinitions::GetTrainTrack ( CClientVehicle& Vehicle, CClientTrainTrack*& pTrainTrack )
 {
     if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
         return false;
     else if ( Vehicle.IsDerailed () )
         return false;
 
-    ucTrack = Vehicle.GetTrainTrack ();
+    pTrainTrack = Vehicle.GetTrainTrack ();
     return true;
 }
 
@@ -3270,14 +3270,14 @@ bool CStaticFunctionDefinitions::SetTrainSpeed ( CClientVehicle& Vehicle, float 
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetTrainTrack ( CClientVehicle& Vehicle, uchar ucTrack )
+bool CStaticFunctionDefinitions::SetTrainTrack(CClientVehicle& Vehicle, CClientTrainTrack* pTrainTrack)
 {
-    if ( Vehicle.GetVehicleType () != CLIENTVEHICLE_TRAIN )
+    if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)
         return false;
-    else if ( Vehicle.IsDerailed () )
+    else if (Vehicle.IsDerailed())
         return false;
 
-    Vehicle.SetTrainTrack ( ucTrack );
+    Vehicle.SetTrainTrack(pTrainTrack);
     return true;
 }
 

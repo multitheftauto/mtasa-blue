@@ -48,12 +48,3 @@ void CTrainTrackManager::Reset()
         CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, nullptr);
     }
 }
-
-CTrainTrack* CTrainTrackManager::GetTrainTrack(uint trackIndex)
-{
-    auto iter = std::find_if(m_Tracks.begin(), m_Tracks.end(), [trackIndex](auto& pTrack) { return pTrack->GetTrackIndex() == pTrainTrack; });
-    if (iter == m_Tracks.end())
-        return nullptr;
-    
-    return *iter;
-}

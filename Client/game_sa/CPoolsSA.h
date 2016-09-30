@@ -102,7 +102,7 @@ public:
     // Others
     CBuilding*              AddBuilding         ( DWORD dwModelID );
     void                    DeleteAllBuildings  ( );
-    CVehicle*               AddTrain            ( CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF );
+    CVehicle*               AddTrain            ( CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, CTrainTrack* pTrainTrack = nullptr );
 
     int                     GetNumberOfUsedSpaces   ( ePools pools );
     void                    DumpPoolsStatus         ( );

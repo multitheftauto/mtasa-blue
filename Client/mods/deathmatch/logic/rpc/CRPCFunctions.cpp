@@ -45,6 +45,7 @@ CClientDisplayManager*      CRPCFunctions::m_pDisplayManager;
 CClientVehicleManager*      CRPCFunctions::m_pVehicleManager;
 CClientPathManager*         CRPCFunctions::m_pPathManager;
 CClientTeamManager*         CRPCFunctions::m_pTeamManager;
+CClientTrainTrackManager*   CRPCFunctions::m_pTrainTrackManager;
 CClientPedManager*          CRPCFunctions::m_pPedManager;
 CBlendedWeather*            CRPCFunctions::m_pBlendedWeather;
 CClientGame*                CRPCFunctions::m_pClientGame;
@@ -68,6 +69,7 @@ CRPCFunctions::CRPCFunctions ( CClientGame* pClientGame )
     m_pVehicleManager = m_pManager->GetVehicleManager ();
     m_pPathManager = m_pManager->GetPathManager ();
     m_pTeamManager = m_pManager->GetTeamManager ();
+    m_pTrainTrackManager = m_pManager->GetTrainTrackManager();
     m_pPedManager = m_pManager->GetPedManager ();
     m_pBlendedWeather = pClientGame->GetBlendedWeather ();
     m_pWaterManager = m_pManager->GetWaterManager ();

@@ -2797,19 +2797,7 @@ int CLuaVehicleDefs::SetTrainTrack ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
-
-    if ( argStream.NextIsUserDataOfType<CTrainTrack> () ) {
-        argStream.ReadUserData ( pTrack );
-    } else {
-        uchar ucTrack = 0;
-        argStream.ReadNumber ( ucTrack );
-
-        if ( ucTrack > 3 ) {
-            argStream.SetCustomError ( "Invalid track number range (0-3)" );
-        } else {
-            pTrack = m_pTrainTrackManager->GetTrainTrack ( ucTrack );
-        }
-    }
+    argStream.ReadUserData ( pTrack );
 
     if ( !argStream.HasErrors () )
     {

@@ -62,6 +62,7 @@ protected:
     static class CClientVehicleManager*         m_pVehicleManager;
     static class CClientPathManager*            m_pPathManager;
     static class CClientTeamManager*            m_pTeamManager;
+    static class CClientTrainTrackManager*      m_pTrainTrackManager;
     static class CClientPedManager*             m_pPedManager;
     static class CClientWaterManager*           m_pWaterManager;
 

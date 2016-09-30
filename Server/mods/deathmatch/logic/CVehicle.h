@@ -28,6 +28,8 @@ class CVehicle;
 #define DEFAULT_VEHICLE_HEALTH 1000
 #define MAX_VEHICLE_HEALTH 10000
 
+class CTrainTrack;
+
 enum eWheelStatus {
     DT_WHEEL_INTACT=0,
     DT_WHEEL_BURST,
@@ -293,8 +295,8 @@ public:
     inline float                    GetTrainPosition        ( void )                        { return m_fTrainPosition; }
     inline void                     SetTrainPosition        ( float fPosition )             { m_fTrainPosition = fPosition; }
 
-    inline uchar                    GetTrainTrack           ( void )                        { return m_ucTrackID; }
-    inline void                     SetTrainTrack           ( uchar ucTrack )               { m_ucTrackID = ucTrack; }
+    inline CTrainTrack*             GetTrainTrack           ( void )                        { return m_pTrainTrack; }
+    inline void                     SetTrainTrack           (CTrainTrack* pTrainTrack)      { m_pTrainTrack = pTrainTrack; }
 
     inline SColor                   GetHeadLightColor       ( void )                        { return m_HeadLightColor; }
     inline void                     SetHeadLightColor       ( const SColor color )          { m_HeadLightColor = color; }
@@ -399,12 +401,12 @@ private:
     bool                            m_bHeliSearchLightVisible;
 
     // Train specific data
-    bool                        m_bDerailed;
-    bool                        m_bIsDerailable;
-    bool                        m_bTrainDirection;
-    float                       m_fTrainSpeed;
-    float                       m_fTrainPosition;
-    uchar                       m_ucTrackID;
+    bool                            m_bDerailed;
+    bool                            m_bIsDerailable;
+    bool                            m_bTrainDirection;
+    float                           m_fTrainSpeed;
+    float                           m_fTrainPosition;
+    CTrainTrack*                    m_pTrainTrack = nullptr;
 
     // Used to remember where this vehicle spawns
     CVector                         m_vecRespawnPosition;

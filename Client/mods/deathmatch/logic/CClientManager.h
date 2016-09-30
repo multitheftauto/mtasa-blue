@@ -35,6 +35,7 @@ class CClientManager;
 #include "CClientRadarMarkerManager.h"
 #include "CClientStreamer.h"
 #include "CClientTeamManager.h"
+#include "CClientTrainTrackManager.h"
 #include "CClientSoundManager.h"
 #include "CClientRenderElementManager.h"
 #include "CClientDisplayManager.h"
@@ -84,6 +85,7 @@ public:
     inline CClientSoundManager*         GetSoundManager             ( void )        { return m_pSoundManager; }
     inline CClientRenderElementManager* GetRenderElementManager     ( void )        { return m_pRenderElementManager; }
     inline CClientTeamManager*          GetTeamManager              ( void )        { return m_pTeamManager; }
+    inline CClientTrainTrackManager*    GetTrainTrackManager        ( void )        { return m_pTrainTrackManager; }
     inline CClientDisplayManager*       GetDisplayManager           ( void )        { return m_pDisplayManager; }
     inline CClientVehicleManager*       GetVehicleManager           ( void )        { return m_pVehicleManager; }
     inline CClientStreamer*             GetVehicleStreamer          ( void )        { return m_pVehicleStreamer; }
@@ -137,6 +139,7 @@ private:
     CClientStreamer*                    m_pObjectStreamer;
     CClientStreamer*                    m_pObjectLodStreamer;
     CClientTeamManager*                 m_pTeamManager;
+    CClientTrainTrackManager*           m_pTrainTrackManager;
     CClientDisplayManager*              m_pDisplayManager;
     CClientVehicleManager*              m_pVehicleManager;
     CClientStreamer*                    m_pVehicleStreamer;

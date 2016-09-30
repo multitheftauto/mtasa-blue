@@ -26,6 +26,7 @@ struct STrackNode
     }
 
     STrackNode(const CVector& pos) : position(pos) {}
+    STrackNode() {}
 };
 
 class CTrainTrack : public CElement

@@ -35,6 +35,7 @@ enum eWinchType
 class CPed;
 class CObject;
 class CColModel;
+class CTrainTrack;
 
 #define SIREN_TYPE_FIRST 1
 #define SIREN_TYPE_LAST 6
@@ -105,8 +106,8 @@ public:
     virtual void                SetTrainSpeed               ( float fSpeed ) = 0;
     virtual bool                GetTrainDirection           () = 0;
     virtual void                SetTrainDirection           ( bool bDirection ) = 0;
-    virtual BYTE                GetRailTrack                () = 0;
-    virtual void                SetRailTrack                ( BYTE ucTrackID ) = 0;
+    virtual CTrainTrack*        GetTrainTrack               () = 0;
+    virtual void                SetTrainTrack               (CTrainTrack* pTrainTrack) = 0;
     virtual float               GetTrainPosition            ( void ) = 0;
     virtual void                SetTrainPosition            ( float fPosition, bool bRecalcOnRailDistance = true ) = 0;
 

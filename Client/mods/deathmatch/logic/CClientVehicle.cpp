@@ -129,7 +129,6 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bTrainDirection = false;
     m_fTrainSpeed = 0.0f;
     m_fTrainPosition = -1.0f;
-    m_ucTrackID = 0xFF;
     m_bChainEngine = false;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector ( 0.0f, 0.0f, -1.0f );
@@ -356,7 +355,7 @@ void CClientVehicle::SetPosition ( const CVector& vecPosition, bool bResetInterp
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN && !IsDerailed () && !IsStreamedIn () )
         {
             m_fTrainPosition = -1.0f;
-            m_ucTrackID = 0xFF;
+            m_pTrainTrack = nullptr;
         }
     }
 }
@@ -2224,22 +2223,18 @@ void CClientVehicle::SetTrainPosition ( float fTrainPosition, bool bRecalcOnRail
     m_fTrainPosition = fTrainPosition;
 }
 
-uchar CClientVehicle::GetTrainTrack ( void )
+CClientTrainTrack* CClientVehicle::GetTrainTrack()
 {
-    if ( m_pVehicle )
-    {
-        return m_pVehicle->GetRailTrack ();
-    }
-    return m_ucTrackID;
+    return m_pTrainTrack;
 }
 
-void CClientVehicle::SetTrainTrack ( uchar ucTrack )
+void CClientVehicle::SetTrainTrack(CClientTrainTrack* pTrainTrack)
 {
-    if ( m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN )
+    if (m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN)
     {
-        m_pVehicle->SetRailTrack ( ucTrack );
+        m_pVehicle->SetTrainTrack(pTrainTrack->GetTrainTrack());
     }
-    m_ucTrackID = ucTrack;
+    m_pTrainTrack = pTrainTrack;
 }
 
 
@@ -2405,7 +2400,7 @@ void CClientVehicle::StreamedInPulse ( void )
             {
                 float fNewTrainPosition = pCarriage->GetTrainPosition () + fCarriageDistance;
                 pCarriage->m_pNextLink->SetTrainPosition ( fNewTrainPosition );
-                g_pGame->GetWorld ()->FindWorldPositionForRailTrackPosition ( fNewTrainPosition, GetTrainTrack (), &vecPosition );
+                g_pGame->GetWorld ()->FindWorldPositionForRailTrackPosition ( fNewTrainPosition, GetTrainTrack()->GetTrackIndex(), &vecPosition );
                 pCarriage->m_pNextLink->UpdatePedPositions ( vecPosition );
 
                 pCarriage = pCarriage->m_pNextLink;
@@ -2416,7 +2411,7 @@ void CClientVehicle::StreamedInPulse ( void )
             {
                 float fNewTrainPosition = pCarriage->GetTrainPosition () - fCarriageDistance;
                 pCarriage->m_pPreviousLink->SetTrainPosition ( fNewTrainPosition );
-                g_pGame->GetWorld ()->FindWorldPositionForRailTrackPosition ( fNewTrainPosition, GetTrainTrack (), &vecPosition );
+                g_pGame->GetWorld ()->FindWorldPositionForRailTrackPosition ( fNewTrainPosition, GetTrainTrack()->GetTrackIndex(), &vecPosition );
                 pCarriage->m_pPreviousLink->UpdatePedPositions ( vecPosition );
 
                 pCarriage = pCarriage->m_pPreviousLink;
@@ -2613,7 +2608,7 @@ void CClientVehicle::Create ( void )
         {
             DWORD dwModels [1];
             dwModels [0] = m_usModel;
-            m_pVehicle = g_pGame->GetPools ()->AddTrain ( &m_Matrix.vPos, dwModels, 1, m_bTrainDirection, m_ucTrackID );
+            m_pVehicle = g_pGame->GetPools ()->AddTrain ( &m_Matrix.vPos, dwModels, 1, m_bTrainDirection, m_pTrainTrack->GetTrainTrack() );
         }
         else
         {            
@@ -2693,8 +2688,8 @@ void CClientVehicle::Create ( void )
             m_pVehicle->SetDerailable ( m_bIsDerailable );
             m_pVehicle->SetTrainDirection ( m_bTrainDirection );
             m_pVehicle->SetTrainSpeed ( m_fTrainSpeed );
-            if ( m_ucTrackID != 0xFF )
-                m_pVehicle->SetRailTrack ( m_ucTrackID );
+            if (m_pTrainTrack)
+                m_pVehicle->SetTrainTrack(m_pTrainTrack->GetTrainTrack());
 
             if ( m_fTrainPosition >= 0 && !m_bIsDerailed )
                 m_pVehicle->SetTrainPosition ( m_fTrainPosition, true );
@@ -3038,7 +3033,7 @@ void CClientVehicle::Destroy ( void )
         if ( GetVehicleType () == CLIENTVEHICLE_TRAIN )
         {
             m_bIsDerailed = IsDerailed ();
-            m_ucTrackID = m_pVehicle->GetRailTrack ();
+            m_pTrainTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->Get(m_pVehicle->GetTrainTrack());
             m_fTrainPosition = m_pVehicle->GetTrainPosition ();
             m_fTrainSpeed = m_pVehicle->GetTrainSpeed ();
 

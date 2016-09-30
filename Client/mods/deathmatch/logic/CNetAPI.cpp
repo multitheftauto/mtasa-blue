@@ -1346,21 +1346,22 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
         if ( remoteVehicleType == CLIENTVEHICLE_TRAIN )
         {
             // Train specific data
-            float fPosition = 0.0f;
-            uchar ucTrack = 0;
-            bool bDirection = false;
-            float fSpeed = 0.0f;
-            BitStream.Read ( fPosition );
-            BitStream.ReadBit ( bDirection );
-            BitStream.Read ( ucTrack );
-            BitStream.Read ( fSpeed );
+            float fPosition;
+            bool bDirection;
+            ElementID trainTrackID;
+            float fSpeed;
+            BitStream.Read(fPosition);
+            BitStream.ReadBit(bDirection);
+            BitStream.Read(trainTrackID);
+            BitStream.Read(fSpeed);
 
-            if ( vehicleType == CLIENTVEHICLE_TRAIN )
+            CClientTrainTrack* pTrainTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->Get(trainTrackID);
+            if (pTrainTrack && vehicleType == CLIENTVEHICLE_TRAIN)
             {
                 if ( !pVehicle->IsStreamedIn ( ) )
                     pVehicle->SetPosition ( position.data.vecPosition, true );
 
-                pVehicle->SetTrainTrack ( ucTrack );
+                pVehicle->SetTrainTrack ( pTrainTrack );
                 pVehicle->SetTrainPosition ( fPosition, false );
                 pVehicle->SetTrainDirection ( bDirection );
                 pVehicle->SetTrainSpeed ( fSpeed );
@@ -1616,14 +1617,14 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
     if ( pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN )
     {
         // Train specific data
-        float fPosition = pVehicle->GetTrainPosition ( );
-        uchar ucTrack = pVehicle->GetTrainTrack ( );
-        bool bDirection = pVehicle->GetTrainDirection ( );
-        float fSpeed = pVehicle->GetTrainSpeed ( );
-        BitStream.Write ( fPosition );
-        BitStream.WriteBit ( bDirection );
-        BitStream.Write ( ucTrack );
-        BitStream.Write ( fSpeed );
+        float fPosition = pVehicle->GetTrainPosition();
+        auto pTrainTrack = pVehicle->GetTrainTrack();
+        bool bDirection = pVehicle->GetTrainDirection();
+        float fSpeed = pVehicle->GetTrainSpeed();
+        BitStream.Write(fPosition);
+        BitStream.WriteBit(bDirection);
+        BitStream.Write(pTrainTrack->GetID());
+        BitStream.Write(fSpeed);
     }
 
     // Write the camera orientation

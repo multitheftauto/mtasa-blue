@@ -642,16 +642,14 @@ void CVehicleSA::SetTrainDirection ( bool bDirection )
     }
 }
 
-BYTE CVehicleSA::GetRailTrack ()
+CTrainTrack* CVehicleSA::GetTrainTrack()
 {
-    return GetVehicleInterface ()->m_ucRailTrackID;
+    return pGame->GetTrainTrackManager()->GetTrainTrackByIndex(GetVehicleInterface()->m_ucRailTrackID);
 }
 
-void CVehicleSA::SetRailTrack ( BYTE ucTrackID )
+void CVehicleSA::SetTrainTrack(CTrainTrack* pTrainTrack)
 {
-    if (!pGame->GetTrainTrackManager()->GetTrainTrackByIndex(ucTrackID))
-        return;
-
+    auto ucTrackID = static_cast<uchar>(pTrainTrack->GetIndex());
     CVehicleSAInterface* pInterf = GetVehicleInterface ();
     if ( pInterf->m_ucRailTrackID != ucTrackID )
     {

@@ -67,20 +67,21 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             if ( remoteVehicleType == VEHICLE_TRAIN )
             {
                 // Train specific data
-                float fPosition = 0.0f;
-                uchar ucTrack = 0;
-                bool bDirection = false;
-                float fSpeed = 0.0f;
+                float fPosition;
+                ElementID trainTrackID;
+                bool bDirection;
+                float fSpeed;
                 BitStream.Read ( fPosition );
                 BitStream.ReadBit ( bDirection );
-                BitStream.Read ( ucTrack );
+                BitStream.Read(trainTrackID);
                 BitStream.Read ( fSpeed );
 
+                CTrainTrack* pTrainTrack = GetElementFromId<CTrainTrack>(trainTrackID);
                 if ( vehicleType == VEHICLE_TRAIN )
                 {
                     pVehicle->SetTrainPosition ( fPosition );
                     pVehicle->SetTrainDirection ( bDirection );
-                    pVehicle->SetTrainTrack ( ucTrack );
+                    pVehicle->SetTrainTrack(pTrainTrack);
                     pVehicle->SetTrainSpeed ( fSpeed );
                 }
             }
@@ -488,12 +489,12 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                 {
                     // Train specific data
                     float fPosition = pVehicle->GetTrainPosition ( );
-                    uchar ucTrack = pVehicle->GetTrainTrack ( );
+                    auto pTrainTrack = pVehicle->GetTrainTrack();
                     bool bDirection = pVehicle->GetTrainDirection ( );
                     float fSpeed = pVehicle->GetTrainSpeed ( );
                     BitStream.Write ( fPosition );
                     BitStream.WriteBit ( bDirection );
-                    BitStream.Write ( ucTrack );
+                    BitStream.Write(pTrainTrack->GetID());
                     BitStream.Write ( fSpeed );
                 }
 

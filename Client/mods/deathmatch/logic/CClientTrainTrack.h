@@ -18,6 +18,7 @@ public:
     ~CClientTrainTrack();
 
     virtual eClientEntityType GetType() const { return CCLIENTTRAINTRACK; }
+    CTrainTrack* GetTrainTrack() { return m_pTrainTrack; }
 
     bool SetNodePosition(uint nodeInex, const CVector& position);
     bool GetNodePosition(uint nodeInex, CVector& position);
