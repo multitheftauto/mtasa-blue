@@ -332,6 +332,7 @@ bool StringToBool ( const SString& strText );
 void MinServerReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
 void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions );
 bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix );
+void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 = nullptr );
 
 
 //

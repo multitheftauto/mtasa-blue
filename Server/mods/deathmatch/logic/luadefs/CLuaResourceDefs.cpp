@@ -284,13 +284,8 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
 
                 if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, &strPath, NULL ) )
                 {
-                    // Do we have permissions?
-                    if ( pResource == pThisResource ||
-                         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                                        "ModifyOtherObjects",
-                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                        false ) )
+                    CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                    if ( !argStream.HasErrors() )
                     {
                         // Add the resource map and return it if we succeeded
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceMap ( pResource, strPath, strMetaName, usDimension, pLUA );
@@ -301,12 +296,11 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
                         }
                     }
                 }
-                else
-                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
     }
-    else
+
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -354,13 +348,8 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
 
                 if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, &strPath, &strConfigName ) )
                 {
-                    // Do we have permissions?
-                    if ( pResource == pThisResource ||
-                         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                                        "ModifyOtherObjects",
-                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                        false ) )
+                    CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                    if ( !argStream.HasErrors() )
                     {
                         // Add the resource map and return it if we succeeded
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceConfig ( pResource, strPath, strConfigName, iType, pLUA );
@@ -374,7 +363,8 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
             }
         }
     }
-    else
+
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -740,12 +730,8 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
             CResource* pThisResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                if ( pResource == pThisResource ||
-                    m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                                        "ModifyOtherObjects",
-                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                        false ) )
+                CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                if ( !argStream.HasErrors() )
                 {
                     if ( pResource->IsLoaded() )
                     {
@@ -755,12 +741,10 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
                         return 1;
                     }
                 }
-                else
-                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
     }
-    else
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -781,15 +765,9 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
 
         if ( pThisResource && CResourceManager::ParseResourcePathInput ( strConfigName, pResource, NULL, &strMetaPath ) )
         {
-            // We have access to modify other resource?
-            if (pResource == pThisResource ||
-                m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(),
-                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                "ModifyOtherObjects",
-                CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                false))
+            CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+            if ( !argStream.HasErrors() )
             {
-
                 list<CResourceFile *> * resourceFileList = pResource->GetFiles();
                 list<CResourceFile *>::iterator iterd = resourceFileList->begin();
                 for (; iterd != resourceFileList->end(); ++iterd)
@@ -808,10 +786,6 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
                         }
                     }
                 }
-            }
-            else
-            {
-                argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName().c_str(), pResource->GetName().c_str()), "Access denied");
             }
         }
     }

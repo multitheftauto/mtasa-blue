@@ -505,3 +505,30 @@ uint GetWeaponPropertyFlagBit( eWeaponProperty weaponProperty )
     uint uiFlagBit = 1 << uiFlagIndex;
     return uiFlagBit;
 }
+
+
+//
+// Set error if pThisResource does not have permission to modify pOtherResource
+//
+void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 )
+{
+    // Check if other object is different and right is denied
+    if ( ( pThisResource != pOtherResource || ( pOtherResource2 != nullptr && pThisResource != pOtherResource2 ) ) &&
+         ( g_pGame->GetACLManager()->CanObjectUseRight( pThisResource->GetName(),
+            CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+            "ModifyOtherObjects",
+            CAccessControlListRight::RIGHT_TYPE_GENERAL,
+            false ) == false ) )
+    {
+        SString strWho;
+        if ( pThisResource != pOtherResource )
+            strWho += pOtherResource->GetName ();
+        if ( pOtherResource2 != nullptr && pThisResource != pOtherResource2 && pOtherResource != pOtherResource2 )
+        {
+            if ( !strWho.empty () )
+                strWho += " and ";
+            strWho += pOtherResource2->GetName ();
+        }
+        argStream.SetCustomError( SString( "ModifyOtherObjects in ACL denied resource %s to access %s", *pThisResource->GetName(), *strWho ), "Access denied" );
+    }
+}
