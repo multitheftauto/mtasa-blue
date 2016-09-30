@@ -389,7 +389,8 @@ protected:
     CAccessControlList* FindAutoAcl                     ( void );
 
     void                RemoveAutoPermissions           ( void );
-    bool                RefreshAutoPermissions          ( CXMLNode* pNodeAclRequest );
+    bool                HasAutoPermissions              ( CXMLNode* pNodeAclRequest );
+    void                RefreshAutoPermissions          ( CXMLNode* pNodeAclRequest );
 
     void                CommitAclRequest                ( const SAclRequest& request );
     bool                FindAclRequest                  ( SAclRequest& request );
