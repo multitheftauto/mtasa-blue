@@ -12,9 +12,9 @@
 #pragma once
 
 #include <game/CTrainTrackManager.h>
-#include "CTrainTrackSA.h"
 
 struct STrackNode;
+class CTrainTrackSA;
 
 #define COMP_NumberOfTracks                     0x6F6CA9
 

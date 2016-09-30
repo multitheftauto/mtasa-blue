@@ -12,13 +12,14 @@
 #include "StdInc.h"
 #include <TrackNodes.h>
 #include <algorithm>
+#include "CTrainTrackSA.h"
 
 CTrainTrackManagerSA::CTrainTrackManagerSA()
 {
     for (std::size_t i = 0; i < 4; ++i)
     {
         // Create train tracks
-        auto pTrainTrack = CreateTrainTrack(OriginalTrackNodes[i], true);
+        CreateTrainTrack(OriginalTrackNodes[i], true);
     }
 
     // pGlobalTrainNodes 0xC38014
@@ -69,7 +70,7 @@ CTrainTrackSA* CTrainTrackManagerSA::CreateTrainTrack(const std::vector<STrackNo
 {
     // Dynamically allocate new track
     auto index = AllocateTrainTrackIndex();
-    auto pTrainTrack = std::make_unique<CTrainTrackSA>(index, false, this);
+    auto pTrainTrack = std::make_unique<CTrainTrackSA>(index, nodes, false, this);
 
     // Update internal track data
     UpdateTrackData(pTrainTrack.get());
@@ -82,7 +83,7 @@ CTrainTrackSA* CTrainTrackManagerSA::CreateTrainTrack(const std::vector<STrackNo
 
 void CTrainTrackManagerSA::UpdateTrackData(CTrainTrackSA* pTrainTrack)
 {
-    auto trackIndex = pTrainTrack->GetTrackID();
+    auto trackIndex = pTrainTrack->GetTrackIndex();
 
     // Update length
     m_TrackLengths[trackIndex] = pTrainTrack->GetLength();
@@ -98,7 +99,7 @@ void CTrainTrackManagerSA::DestroyTrainTrack(CTrainTrackSA* pTrainTrack)
 {
     // Remove track from arrays
     auto trackIndex = pTrainTrack->GetTrackID();
-    m_TrackNodePointers[trackIndex] = nullptr;
+    m_TrackNodePointers[trackIndex] = nullptr; // Mark as free
     m_TrackLengths[trackIndex] = 0.0f;
     m_NumberOfTrackNodes[trackIndex] = 0;
 

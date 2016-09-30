@@ -12,19 +12,6 @@
 #include <array>
 #include <vector>
 
-struct STrackNode
-{
-    std::int16_t x, y, z; // coordinate times 8
-    std::int16_t railDistance; // on-rail distance times 3
-
-#ifdef MTA_CLIENT
-    std::int32_t pad;
-#endif
-};
-#ifdef MTA_CLIENT
-static_assert(sizeof(STrackNode) == 12, "Size mismatch");
-#endif
-
 std::vector<STrackNode> OriginalTrackNodes[4] = {
 
     // Track 1

@@ -19,42 +19,52 @@ class CTrainTrackManagerSA;
 
 class CTrainTrackSA : public CTrainTrack
 {
-    friend class CTrainTrackManagerSA;
-
 public:
-    CTrainTrackSA                   (uint index, bool linkedLastNode, CTrainTrackManagerSA* pManager);
+    CTrainTrackSA(uint index, const std::vector<STrackNode>& nodes, bool linkLastNode, CTrainTrackManagerSA* pManager);
+
+    inline uint GetTrackIndex() { return m_Index; }
+    inline STrackNode* GetTrackNodes() { return m_Nodes.data(); }
+    inline float GetLength() { return m_Length; }
+    inline std::size_t GetNumberOfNodes() { return m_Nodes.size(); }
+    
+    void SetLastNodesLinked(bool linked);
+
+    STrackNode* AddNode(const CVector& position);
+
+    void Recalculate();
 
 private:
-    void            Recalculate                     ( );
-    void            Initialise                      ( void );
-    bool            SetLength                       ( float fLength );
-    float           GetLength                       ( void );
-    void            DumpTrainData                   ( unsigned char ucTrackID );
-    void            Reset                           ( void );
-public:
+    uint m_Index;
+    bool m_LinkLastNodes;
+    CTrainTrackManagerSA* m_pManager;
 
-    bool            SetRailNodePosition             ( unsigned int uiNode, CVector vecPosition );
-    bool            GetRailNodePosition             ( unsigned int uiNode, CVector& vecPosition );
-    bool            GetRailNodeDistance             ( unsigned int uiNode, float& fDistance );
-
-    bool            SetTrackLength                  ( float fLength ); 
-    float           GetTrackLength                  ( void );
-
-    bool            SetNumberOfNodes                ( unsigned int uiNumberOfNodes );
-    unsigned int    GetNumberOfNodes                ( void )                                            { return m_dwNumberOfNodes; };
-
-    unsigned char   GetTrackID                      ( void )                                            { return m_ucTrackID; };
-
-    inline STrackNode* GetTrackNodes() { return m_TrackNodes; }
-
-    void            SetLastNodesLinked              ( bool bLinked );
-
-private:
-    STrackNode*   GetRailNode             ( unsigned int uiNode );
-
-    uint                    m_Index;
-    bool                    m_LinkLastNodes;
-    STrackNode*             m_TrackNodes;
-    DWORD                   m_dwNumberOfNodes;
-    CTrainTrackManagerSA *  m_pManager;
+    std::vector<STrackNode> m_Nodes;
+    float m_Length = 0.0f;
 };
+
+struct STrackNode
+{
+    std::int16_t x, y, z; // coordinate times 8
+    std::int16_t railDistance; // on-rail distance times
+
+    inline void SetPosition(const CVector& position)
+    {
+        x = static_cast<std::int16_t>(position.fX);
+        y = static_cast<std::int16_t>(position.fY);
+        z = static_cast<std::int16_t>(position.fZ);
+    }
+
+    inline CVector GetPosition()
+    {
+        return CVector(x / 8.0f, y / 8.0f, z / 8.0f);
+    }
+
+    inline void SetDistance(float distance)
+    {
+        railDistance = static_cast<std::uint16_t>(distance * 3);
+    }
+
+private:
+    std::int32_t pad;
+};
+static_assert(sizeof(STrackNode) == 12, "Size mismatch");
