@@ -189,7 +189,7 @@ public:
     virtual void        SetOcclusionsEnabled        ( bool bEnabled ) = 0;
     virtual bool        GetOcclusionsEnabled        ( void ) = 0;
     virtual void        FindWorldPositionForRailTrackPosition ( float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition ) = 0;
-    virtual int         FindClosestRailTrackNode    ( const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance ) = 0;
+    virtual unsigned int FindClosestRailTrackNode   (const CVector& vecPosition, CTrainTrack*& pTrainTrack, float& railDistance) = 0;
 
     virtual void        RemoveBuilding              ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL ) = 0;
     virtual bool        IsRemovedModelInRadius      ( SIPLInst* pInst ) = 0;

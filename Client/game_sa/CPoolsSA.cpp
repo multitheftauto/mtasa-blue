@@ -952,7 +952,10 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
 
     // Find closest track node
     float fRailDistance;
-    int iNodeId = pGame->GetWorld ()->FindClosestRailTrackNode ( *vecPosition, ucTrackId, fRailDistance );
+    auto pTrainTrackManager = g_pCore->GetGame()->GetTrainTrackManager();
+    auto pTrainTrack = pTrainTrackManager->GetTrainTrackByIndex(ucTrackId);
+
+    auto nodeIndex = pGame->GetWorld ()->FindClosestRailTrackNode ( *vecPosition, pTrainTrack, fRailDistance ); // TODO
     int iDesiredTrackId = ucTrackId;
 
     DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
@@ -960,7 +963,7 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
     {
         push    0 // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from 1 to 0)
         push    iDesiredTrackId // track ID
-        push    iNodeId // node to start at (-1 for closest node)
+        push    nodeIndex // node to start at (-1 for closest node)
         lea     ecx, pTrainEnd
         push    ecx // end of train
         lea     ecx, pTrainBeginning 

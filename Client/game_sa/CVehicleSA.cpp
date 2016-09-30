@@ -649,7 +649,7 @@ BYTE CVehicleSA::GetRailTrack ()
 
 void CVehicleSA::SetRailTrack ( BYTE ucTrackID )
 {
-    if ( pGame->GetTrainTrackManager ( )->IsValid ( ucTrackID ) == false )
+    if (!pGame->GetTrainTrackManager()->GetTrainTrackByIndex(ucTrackID))
         return;
 
     CVehicleSAInterface* pInterf = GetVehicleInterface ();

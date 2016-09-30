@@ -23,10 +23,10 @@ CTrainTrackSA::CTrainTrackSA(uint index, const std::vector<STrackNode>& nodes, b
 void CTrainTrackSA::SetLastNodesLinked(bool linked)
 {
     // Store the updated status
-    bool bRecalculate = linked != m_LinkLastNodes;
+    bool recalculate = linked != m_LinkLastNodes;
     m_LinkLastNodes = linked;
 
-    if (Recalculate)
+    if (recalculate)
         Recalculate();
 }
 
@@ -38,6 +38,9 @@ STrackNode* CTrainTrackSA::AddNode(const CVector& position)
 
     // Add new node to the vector
     m_Nodes.push_back(node);
+
+    // Recalculate lengths
+    Recalculate();
 
     // Don't forget to update references in manager (as std::vector might have relocated the underlying data)
     m_pManager->UpdateTrackData(this);

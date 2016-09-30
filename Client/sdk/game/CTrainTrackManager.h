@@ -4,30 +4,24 @@
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        sdk/game/CTrackTrackManager.h
 *  PURPOSE:     Train Track Manager Interface
-
 *  DEVELOPERS:  Cazomino05 < Cazomino05@gmail.com >
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
-#pragma once;
+#pragma once
+#include <vector>
+#include <memory>
+#include "CTrainTrack.h"
 
 class CTrainTrackManager
 {
 public:
-    virtual CTrainTrack *       GetTrainTrack                   ( unsigned char ucTrack ) = 0;
-    virtual void                Initialise                      ( void ) = 0;
-    virtual void                ResetTracks                     ( void ) = 0;
+    virtual CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool bLinkedLastNode) = 0;
+    virtual void DestroyTrainTrack(CTrainTrack* pTrainTrack) = 0;
 
-    virtual CTrainTrack *       CreateTrainTrack                ( unsigned int uiNodes, unsigned char ucTrackID, bool bLinkedLastNodes ) = 0;
-    virtual bool                DestroyTrainTrack               ( DWORD dwTrackID ) = 0;
+    virtual CTrainTrack* GetTrainTrackByIndex(unsigned int trackIndex) = 0;
 
-    virtual float               GetRailLength                   ( unsigned char ucTrack ) = 0;
-    virtual DWORD               GetNumberOfRailNodes            ( unsigned char ucTrack ) = 0;
-
-    virtual bool                SetRailLength                   ( unsigned char ucTrack, float fLength ) = 0;
-    virtual DWORD               SetNumberOfRailNodes            ( unsigned char ucTrack, DWORD dwTrackNodes ) = 0;
-
-    virtual bool                IsValid                         ( unsigned char ucTrack ) = 0;
+    virtual std::size_t GetNumberOfTrainTracks() const = 0;
+    virtual const std::vector<std::unique_ptr<CTrainTrack>>& GetTrackNodes() const = 0;
 };

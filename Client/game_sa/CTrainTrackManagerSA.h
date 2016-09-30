@@ -10,30 +10,32 @@
 *
 *****************************************************************************/
 #pragma once
-
 #include <game/CTrainTrackManager.h>
+#include <game/CTrainTrack.h>
 
 struct STrackNode;
 class CTrainTrackSA;
-
-#define COMP_NumberOfTracks                     0x6F6CA9
 
 class CTrainTrackManagerSA : public CTrainTrackManager
 {
 public:
     CTrainTrackManagerSA();
 
-    CTrainTrackSA* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool bLinkedLastNode);
-    void DestroyTrainTrack(CTrainTrackSA* pTrainTrack);
+    virtual CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool bLinkedLastNode) override;
+    virtual void DestroyTrainTrack(CTrainTrack* pTrainTrack) override;
 
     void UpdateTrackData(CTrainTrackSA* pTrainTrack);
 
-    inline CTrainTrackSA* GetTrainTrack(uint trackId) { return m_Tracks[trackId].get(); }
+    virtual CTrainTrack* GetTrainTrackByIndex(uint trackIndex) override;
+
+    virtual std::size_t GetNumberOfTrainTracks() const override { return m_Tracks.size(); }
+    virtual const std::vector<std::unique_ptr<CTrainTrack>>& GetTrackNodes() const override { return m_Tracks; }
 
 private:
     uint AllocateTrainTrackIndex();
+    void PatchNumberOfTracks(std::uint8_t numTracks);
 
-    std::vector<std::unique_ptr<CTrainTrackSA>> m_Tracks;
+    std::vector<std::unique_ptr<CTrainTrack>> m_Tracks;
 
     // Arrays that are directly passed to SA
     uint m_CurrentTrackNodeSize;
@@ -52,4 +54,5 @@ MEMORY ADDRESSES:
 - 0xC38014: NUM_RAILTRACKS dwords
 - 0xC37FEC: Track Length floats
 - 0xC38024: NUM_RAILTRACKS pointers to arrays of STrackNode
+- 0x6F6BD0: int GetTrainNodeNearPoint(float x, float y, float z, int* pTrackID) places track ID in *pTrackID and returns node ID
 */

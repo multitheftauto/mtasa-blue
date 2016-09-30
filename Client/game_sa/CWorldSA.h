@@ -83,7 +83,7 @@ public:
     void        SetOcclusionsEnabled      ( bool bEnabled );
     bool        GetOcclusionsEnabled      ( void );
     void        FindWorldPositionForRailTrackPosition ( float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition );
-    int         FindClosestRailTrackNode  ( const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance );
+    uint        FindClosestRailTrackNode  (const CVector& vecPosition, CTrainTrack*& pTrainTrack, float& railDistance);
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)

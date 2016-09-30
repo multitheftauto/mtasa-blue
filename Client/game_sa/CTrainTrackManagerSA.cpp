@@ -66,8 +66,11 @@ CTrainTrackManagerSA::CTrainTrackManagerSA()
     MemPut<DWORD>(0x6F8723, (DWORD)&m_NumberOfTrackNodes); // 13
 }
 
-CTrainTrackSA* CTrainTrackManagerSA::CreateTrainTrack(const std::vector<STrackNode>& nodes, bool bLinkedLastNode)
+CTrainTrack* CTrainTrackManagerSA::CreateTrainTrack(const std::vector<STrackNode>& nodes, bool bLinkedLastNode)
 {
+    if (m_Tracks.size() >= 255)
+        return nullptr;
+
     // Dynamically allocate new track
     auto index = AllocateTrainTrackIndex();
     auto pTrainTrack = std::make_unique<CTrainTrackSA>(index, nodes, false, this);
@@ -77,6 +80,10 @@ CTrainTrackSA* CTrainTrackManagerSA::CreateTrainTrack(const std::vector<STrackNo
 
     // Add to tracks list
     m_Tracks.push_back(std::move(pTrainTrack));
+
+    // Patch internal track counter
+    // TODO: Check if we can remove this
+    PatchNumberOfTracks(static_cast<std::uint8_t>(m_Tracks.size()));
 
     return m_Tracks.back().get();
 }
@@ -92,19 +99,32 @@ void CTrainTrackManagerSA::UpdateTrackData(CTrainTrackSA* pTrainTrack)
     m_NumberOfTrackNodes[trackIndex] = pTrainTrack->GetNumberOfNodes();
 
     // Update nodes pointers in array
-    m_TrackNodePointers[trackIndex] = pTrainTrack->GetTrackNodes();
+    m_TrackNodePointers[trackIndex] = pTrainTrack->GetNodesData();
 }
 
-void CTrainTrackManagerSA::DestroyTrainTrack(CTrainTrackSA* pTrainTrack)
+CTrainTrack* CTrainTrackManagerSA::GetTrainTrackByIndex(uint trackIndex)
+{
+    auto iter = std::find_if(m_Tracks.begin(), m_Tracks.end(), [trackIndex](auto& pTrainTrack) { return pTrainTrack->GetTrackIndex() == trackIndex; });
+    if (iter == m_Tracks.end())
+        return nullptr;
+
+    return iter->get();
+}
+
+void CTrainTrackManagerSA::DestroyTrainTrack(CTrainTrack* pTrainTrack)
 {
     // Remove track from arrays
-    auto trackIndex = pTrainTrack->GetTrackID();
+    auto trackIndex = pTrainTrack->GetTrackIndex();
     m_TrackNodePointers[trackIndex] = nullptr; // Mark as free
     m_TrackLengths[trackIndex] = 0.0f;
     m_NumberOfTrackNodes[trackIndex] = 0;
 
     // Remove track from list
-    m_Tracks.erase(std::remove(m_Tracks.begin(), m_Tracks.end(), pTrainTrack));
+    m_Tracks.erase(std::remove_if(m_Tracks.begin(), m_Tracks.end(), [pTrainTrack](auto& pTrack) { return pTrack.get() == pTrainTrack; }));
+
+    // Patch internal track counter
+    // TODO: Check if we can remove this
+    PatchNumberOfTracks(static_cast<std::uint8_t>(m_Tracks.size()));
 }
 
 uint CTrainTrackManagerSA::AllocateTrainTrackIndex()
@@ -141,4 +161,10 @@ uint CTrainTrackManagerSA::AllocateTrainTrackIndex()
 
     // Return new id
     return m_CurrentTrackNodeSize + 1;
+}
+
+void CTrainTrackManagerSA::PatchNumberOfTracks(std::uint8_t numTracks)
+{
+    // .text:006F6CA7 cmp esi, 4
+    MemPut(0x6F6CA9, numTracks);
 }

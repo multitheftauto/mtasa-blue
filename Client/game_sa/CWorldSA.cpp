@@ -538,65 +538,39 @@ void CWorldSA::FindWorldPositionForRailTrackPosition ( float fRailTrackPosition,
     }
 }
 
-int CWorldSA::FindClosestRailTrackNode ( const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance )
+uint CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, CTrainTrack*& pTrainTrack, float& railDistance)
 {
+    auto pTrainTrackManager = g_pCore->GetGame()->GetTrainTrackManager();
+
     // Original function @ 0x6F7550
-    int iNodeId = -1;
-    float fMinDistance = 99999.898f;
-    uchar ucDesiredTrackId = ucOutTrackId;
-    CTrainTrackManager* pTrainTrackManager = g_pCore->GetGame ()->GetTrainTrackManager ();
+    uint foundNodeIndex = -1;
+    float minDistance = 99999.898f;
 
-    for ( uchar ucTrackId = 0; ucTrackId < MAX_TOTAL_TRACKS; ++ucTrackId )
+    bool checkAllTracks = pTrainTrack == nullptr;
+    for (auto& trainTrack : pTrainTrackManager->GetTrackNodes())
     {
-        CTrainTrack* pTrack = pTrainTrackManager->GetTrainTrack ( ucTrackId );
-        if ( pTrack && ( ucDesiredTrackId == 0xFF || ucTrackId == ucDesiredTrackId ) && (pTrack->GetNumberOfNodes() > 0) )
+        if (checkAllTracks || trainTrack.get() == pTrainTrack)
         {
-            for ( int i = 0; i < pTrack->GetNumberOfNodes(); ++i )
+            auto& nodes = trainTrack->GetNodes();
+            for (uint i = 0; nodes.size(); ++i)
             {
-                CVector vecRailNodePos;
-                pTrack->GetRailNodePosition ( i, vecRailNodePos );
+                auto& trackNode = nodes[i];
+                auto distance = (vecPosition - trackNode.GetPosition()).Length();
 
-                float fDistance = sqrt ( 
-                    pow(vecPosition.fZ - vecRailNodePos.fZ * 0.125f, 2) +
-                    pow(vecPosition.fY - vecRailNodePos.fY * 0.125f, 2) +
-                    pow(vecPosition.fX - vecRailNodePos.fX * 0.125f, 2)
-                );
-                
-                if ( fDistance < fMinDistance )
+                if (distance < minDistance)
                 {
-                    fMinDistance = fDistance;
-                    iNodeId = i;
-                    ucOutTrackId = ucTrackId;
+                    minDistance = distance;
+                    foundNodeIndex = i;
+                    pTrainTrack = trainTrack.get();
+
+                    // Set output rail distance
+                    railDistance = trackNode.GetDistance();
                 }
             }
         }
     }
-
-    // Read rail distance
-    pTrainTrackManager->GetTrainTrack ( ucOutTrackId )->GetRailNodeDistance ( iNodeId, fOutRailDistance );
-    fOutRailDistance *= 3.33333334f;
     
-    return iNodeId;
-    
-    /*DWORD dwFunc = FUNC_GetTrainNodeNearPoint; // __cdecl
-    int iNodeId;
-    *pOutTrackId = 0;
-    float fX = vecPosition.fX;
-    float fY = vecPosition.fY;
-    float fZ = vecPosition.fZ;
-
-    _asm
-    {
-        push pOutTrackId
-        push fZ
-        push fY
-        push fZ
-        call dwFunc
-        mov iNodeId, eax
-        add esp, 4*4
-    }
-    
-    return iNodeId;*/
+    return foundNodeIndex;
 }
 
 void CWorldSA::RemoveBuilding ( unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior, uint* pOutAmount )
