@@ -16,11 +16,7 @@
 
 CTrainTrackManagerSA::CTrainTrackManagerSA()
 {
-    for (std::size_t i = 0; i < 4; ++i)
-    {
-        // Create train tracks
-        CreateTrainTrack(OriginalTrackNodes[i], true);
-    }
+    Reset();
 
     // pGlobalTrainNodes 0xC38014
     MemPut<DWORD>(0x6F58D2, (DWORD)&m_TrackNodePointers); // 1
@@ -127,6 +123,30 @@ void CTrainTrackManagerSA::DestroyTrainTrack(CTrainTrack* pTrainTrack)
     PatchNumberOfTracks(static_cast<std::uint8_t>(m_Tracks.size()));
 }
 
+void CTrainTrackManagerSA::Reset()
+{
+    // Clear tracks
+    m_Tracks.clear();
+
+    // Clear SA data
+    if (m_TrackNodePointers != nullptr)
+    {
+        delete m_TrackNodePointers;
+        delete m_TrackLengths;
+        delete m_NumberOfTrackNodes;
+    }
+    m_TrackNodePointers = nullptr;
+    m_TrackLengths = nullptr;
+    m_NumberOfTrackNodes = nullptr;
+
+    // Create default tracks
+    for (std::size_t i = 0; i < 4; ++i)
+    {
+        // Create train tracks
+        CreateTrainTrack(OriginalTrackNodes[i], true);
+    }
+}
+
 uint CTrainTrackManagerSA::AllocateTrainTrackIndex()
 {
     // Check if there is a free index
@@ -144,15 +164,18 @@ uint CTrainTrackManagerSA::AllocateTrainTrackIndex()
     auto trackLengths = new float[m_CurrentTrackNodeSize];
     auto numTrackNodes = new std::uint32_t[m_CurrentTrackNodeSize];
     
-    // Copy previous data into these arrays
-    std::memcpy(trackNodePtrs, m_TrackNodePointers, previousTrackNodeSize);
-    std::memcpy(trackLengths, m_TrackLengths, previousTrackNodeSize);
-    std::memcpy(numTrackNodes, m_NumberOfTrackNodes, previousTrackNodeSize);
+    if (m_TrackNodePointers != nullptr)
+    {
+        // Copy previous data into these arrays
+        std::memcpy(trackNodePtrs, m_TrackNodePointers, previousTrackNodeSize);
+        std::memcpy(trackLengths, m_TrackLengths, previousTrackNodeSize);
+        std::memcpy(numTrackNodes, m_NumberOfTrackNodes, previousTrackNodeSize);
 
-    // Delete old memory
-    delete m_TrackNodePointers;
-    delete m_TrackLengths;
-    delete m_NumberOfTrackNodes;
+        // Delete old memory
+        delete m_TrackNodePointers;
+        delete m_TrackLengths;
+        delete m_NumberOfTrackNodes;
+    }
 
     // Replace with new
     m_TrackNodePointers = trackNodePtrs;

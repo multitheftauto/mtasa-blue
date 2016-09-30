@@ -24,6 +24,8 @@ public:
     virtual CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool bLinkedLastNode) override;
     virtual void DestroyTrainTrack(CTrainTrack* pTrainTrack) override;
 
+    virtual void Reset() override;
+
     void UpdateTrackData(CTrainTrackSA* pTrainTrack);
 
     virtual CTrainTrack* GetTrainTrackByIndex(uint trackIndex) override;
@@ -38,10 +40,10 @@ private:
     std::vector<std::unique_ptr<CTrainTrack>> m_Tracks;
 
     // Arrays that are directly passed to SA
-    uint m_CurrentTrackNodeSize;
-    STrackNode** m_TrackNodePointers;
-    float* m_TrackLengths;
-    std::uint32_t* m_NumberOfTrackNodes;
+    uint m_CurrentTrackNodeSize = 0;
+    STrackNode** m_TrackNodePointers = nullptr;
+    float* m_TrackLengths = nullptr;
+    std::uint32_t* m_NumberOfTrackNodes = nullptr;
 };
 
 /*

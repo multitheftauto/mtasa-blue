@@ -20,6 +20,8 @@ public:
     virtual CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool bLinkedLastNode) = 0;
     virtual void DestroyTrainTrack(CTrainTrack* pTrainTrack) = 0;
 
+    virtual void Reset() = 0;
+
     virtual CTrainTrack* GetTrainTrackByIndex(unsigned int trackIndex) = 0;
 
     virtual std::size_t GetNumberOfTrainTracks() const = 0;
