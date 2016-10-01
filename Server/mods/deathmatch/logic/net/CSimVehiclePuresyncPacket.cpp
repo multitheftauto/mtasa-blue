@@ -75,17 +75,17 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
         if ( CVehicleManager::GetVehicleType(m_Cache.iModelID) == VEHICLE_TRAIN )
         {
             // Train specific data
-            float fRailPosition = 0.0f;
-            uchar ucRailTrack = 0;
-            bool bRailDirection = false;
-            float fRailSpeed = 0.0f;
-            if ( !BitStream.Read ( fRailPosition ) || !BitStream.ReadBit ( bRailDirection ) || !BitStream.Read ( ucRailTrack ) || !BitStream.Read ( fRailSpeed ) )
+            float fRailPosition;
+            ElementID trainTrackID;
+            bool bRailDirection;
+            float fRailSpeed;
+            if ( !BitStream.Read ( fRailPosition ) || !BitStream.ReadBit ( bRailDirection ) || !BitStream.Read (trainTrackID) || !BitStream.Read ( fRailSpeed ) )
             {
                 return false;
             }
             m_Cache.fRailPosition = fRailPosition;
             m_Cache.bRailDirection = bRailDirection;
-            m_Cache.ucRailTrack = ucRailTrack;
+            m_Cache.trainTrackID = trainTrackID;
             m_Cache.fRailSpeed = fRailSpeed;
         }
 
@@ -309,7 +309,7 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             {
                 BitStream.Write ( m_Cache.fRailPosition );
                 BitStream.WriteBit ( m_Cache.bRailDirection );
-                BitStream.Write ( m_Cache.ucRailTrack );
+                BitStream.Write ( m_Cache.trainTrackID );
                 BitStream.Write ( m_Cache.fRailSpeed );
             }
 

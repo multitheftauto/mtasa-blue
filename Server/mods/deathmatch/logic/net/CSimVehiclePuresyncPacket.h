@@ -104,7 +104,7 @@ private:
         ushort          usAdjustableProperty;
 
         float           fRailPosition;
-        uchar           ucRailTrack;
+        ElementID       trainTrackID;
         bool            bRailDirection;
         float           fRailSpeed;
 

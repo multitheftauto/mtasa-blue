@@ -1356,12 +1356,14 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
             BitStream.Read(fSpeed);
 
             CClientTrainTrack* pTrainTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->Get(trainTrackID);
-            if (pTrainTrack && vehicleType == CLIENTVEHICLE_TRAIN)
+            if (vehicleType == CLIENTVEHICLE_TRAIN)
             {
                 if ( !pVehicle->IsStreamedIn ( ) )
                     pVehicle->SetPosition ( position.data.vecPosition, true );
 
-                pVehicle->SetTrainTrack ( pTrainTrack );
+                pVehicle->SetTrainTrack(pTrainTrack);
+                pVehicle->SetDerailed(pTrainTrack == nullptr);
+
                 pVehicle->SetTrainPosition ( fPosition, false );
                 pVehicle->SetTrainDirection ( bDirection );
                 pVehicle->SetTrainSpeed ( fSpeed );
@@ -1621,9 +1623,10 @@ void CNetAPI::WriteVehiclePuresync ( CClientPed* pPlayerModel, CClientVehicle* p
         auto pTrainTrack = pVehicle->GetTrainTrack();
         bool bDirection = pVehicle->GetTrainDirection();
         float fSpeed = pVehicle->GetTrainSpeed();
+
         BitStream.Write(fPosition);
         BitStream.WriteBit(bDirection);
-        BitStream.Write(pTrainTrack->GetID());
+        BitStream.Write(pTrainTrack ? pTrainTrack->GetID() : INVALID_ELEMENT_ID);
         BitStream.Write(fSpeed);
     }
 

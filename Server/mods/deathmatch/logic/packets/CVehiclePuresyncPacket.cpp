@@ -494,7 +494,7 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                     float fSpeed = pVehicle->GetTrainSpeed ( );
                     BitStream.Write ( fPosition );
                     BitStream.WriteBit ( bDirection );
-                    BitStream.Write(pTrainTrack->GetID());
+                    BitStream.Write(pTrainTrack ? pTrainTrack->GetID() : INVALID_ELEMENT_ID);
                     BitStream.Write ( fSpeed );
                 }
 

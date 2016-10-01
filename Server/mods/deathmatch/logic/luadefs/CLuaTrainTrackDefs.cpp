@@ -83,6 +83,10 @@ int CLuaTrainTrackDefs::CreateTrainTrack(lua_State* luaVM)
                 auto pTrainTrack = CStaticFunctionDefinitions::CreateTrainTrack(pResource, vecNodeList, linkLastNodes);
                 if (pTrainTrack)
                 {
+                    auto pGroup = pResource->GetElementGroup();
+                    if (pGroup)
+                        pGroup->Add(pTrainTrack);
+
                     lua_pushelement(luaVM, pTrainTrack);
                     return 1;
                 }

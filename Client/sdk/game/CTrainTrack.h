@@ -45,9 +45,9 @@ struct STrackNode
     }
 
 private:
-    std::int32_t pad = 0;
+    std::int16_t pad = 0; // TODO: This is not a pad
 };
-static_assert(sizeof(STrackNode) == 12, "Size mismatch");
+static_assert(sizeof(STrackNode) == 10, "Size mismatch");
 
 
 class CTrainTrack
