@@ -12,6 +12,8 @@
 #include "CFileFormat.h"
 #include "CPixelsManager.h"
 
+// conversion from 'UINT' to 'LONG' requires a narrowing conversion
+#pragma warning( disable : 4838 )
 
 ///////////////////////////////////////////////////////////////
 // Object creation

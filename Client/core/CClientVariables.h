@@ -10,9 +10,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
-#ifndef __CCLIENTVARIABLES_H
-#define __CCLIENTVARIABLES_H
+#pragma once
 
 #include <string>
 #include "CSingleton.h"
@@ -21,7 +19,7 @@
 #include <xml/CXMLFile.h>
 #include <CVector.h>
 #include <CVector2D.h>
-#include "CChat.h"
+#include "Chat/CChat.h"
 
 // Macros
 #define CVARS_GET       CClientVariables::GetSingleton().Get
@@ -78,5 +76,3 @@ private:
     CXMLNode        *m_pStorage;
     int             m_iRevision;
 };
-
-#endif

@@ -185,7 +185,7 @@ CCredits::CCredits ( void )
 
     // Create our window
     CVector2D RelativeWindow = CVector2D ( fWindowX / pManager->GetResolution ().fX, fWindowY / pManager->GetResolution ().fY );
-    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "Multi Theft Auto: San Andreas " MTA_DM_BUILDTAG_SHORT ) );
+    m_pWindow.reset( pManager->CreateWnd ( NULL, "Multi Theft Auto: San Andreas " MTA_DM_BUILDTAG_SHORT ) );
     m_pWindow->SetCloseButtonEnabled ( false );
     m_pWindow->SetMovable ( false );
     m_pWindow->SetPosition ( CVector2D ( 0.5f - RelativeWindow.fX*0.5f, 0.5f - RelativeWindow.fY*0.5f ), true );
@@ -225,7 +225,7 @@ CCredits::CCredits ( void )
             ++szCreditsBegin;
 
             // Create the label
-            m_pLabels [uiLabelIndex] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pWindow, szBuffer ) );
+            m_pLabels [uiLabelIndex].reset ( pManager->CreateLabel ( m_pWindow.get(), szBuffer ) );
             m_pLabels [uiLabelIndex]->SetPosition ( CVector2D ( 0.022f, fStartPosition ), true );
             m_pLabels [uiLabelIndex]->SetSize ( CVector2D ( 532.0f, 1200.0f ) );            // relative 0.95, 6.0
             m_pLabels [uiLabelIndex]->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER );
@@ -244,7 +244,7 @@ CCredits::CCredits ( void )
     }
 
     // Create the OK button
-    m_pButtonOK = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "OK" ) );
+    m_pButtonOK.reset( pManager->CreateButton ( m_pWindow.get(), "OK" ) );
     m_pButtonOK->SetPosition ( CVector2D ( 0.77f, 0.90f ), true );
     m_pButtonOK->SetSize ( CVector2D ( 112.0f, 21.0f ) );       // relative 0.20, 0.07
     m_pButtonOK->SetVisible ( true );
@@ -253,27 +253,6 @@ CCredits::CCredits ( void )
     // Set up the event handlers
     m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CCredits::OnOKButtonClick, this ) );
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CCredits::OnOKButtonClick, this ) );
-}
-
-
-CCredits::~CCredits ( void )
-{
-    // Delete all the labels
-    int i = 0;
-    for ( ; i < 30; i++ )
-    {
-        if ( m_pLabels [i] )
-        {
-            delete m_pLabels [i];
-            m_pLabels [i] = NULL;
-        }
-    }
-
-    // Delete the controls
-    delete m_pButtonOK;
-
-    // Delete our window
-    delete m_pWindow;
 }
 
 void CCredits::Update ( void )

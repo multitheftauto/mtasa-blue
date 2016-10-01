@@ -40,11 +40,11 @@ class CScriptKeyBind
 public:
                                 CScriptKeyBind      ( void ) : boundKey ( NULL ), luaMain ( NULL ), beingDeleted ( false ) {}
     virtual                     ~CScriptKeyBind     ( void ) {}
-    bool                        IsBeingDeleted      ( void ) { return beingDeleted; }
+    bool                        IsBeingDeleted      ( void ) const { return beingDeleted; }
     const SScriptBindableKey*   boundKey;
     CLuaMain*                   luaMain;
     bool                        beingDeleted;
-    virtual eScriptKeyBindType  GetType             ( void ) = 0;
+    virtual eScriptKeyBindType  GetType             ( void ) const = 0;
 };
 
 class CScriptKeyBindWithState: public CScriptKeyBind
@@ -64,14 +64,14 @@ public:
 class CScriptKeyFunctionBind: public CScriptKeyBindWithState, public CScriptFunctionBind
 {
 public:
-    inline eScriptKeyBindType     GetType               ( void )        { return SCRIPT_KEY_BIND_FUNCTION; }
+    inline eScriptKeyBindType     GetType               ( void ) const { return SCRIPT_KEY_BIND_FUNCTION; }
     
 };
 
 class CScriptControlFunctionBind: public CScriptKeyBindWithState, public CScriptFunctionBind
 {
 public:
-    inline eScriptKeyBindType     GetType              ( void )    { return SCRIPT_KEY_BIND_CONTROL_FUNCTION; }
+    inline eScriptKeyBindType     GetType              ( void ) const { return SCRIPT_KEY_BIND_CONTROL_FUNCTION; }
     const SScriptBindableGTAControl*    boundControl;
 };
 

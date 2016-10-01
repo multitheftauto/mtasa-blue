@@ -15,8 +15,6 @@
 #include "XInput.h"
 #include <dinputd.h>
 
-using std::string;
-
 extern IDirectInput8* g_pDirectInput8;
 
 //////////////////////////////////////////////////////////
@@ -105,8 +103,8 @@ struct SInputDeviceInfo
     int                     iDeadZone;
     int                     iSaturation;
     GUID                    guidProduct;
-    string                  strGuid;
-    string                  strProductName;
+    std::string                  strGuid;
+    std::string                  strProductName;
 
     struct
     {
@@ -139,8 +137,7 @@ class CJoystickManager : public CJoystickManagerInterface
 {
 public:
     ZERO_ON_NEW
-                        CJoystickManager            ( void );
-                        ~CJoystickManager           ( void );
+    CJoystickManager();
 
     // CJoystickManagerInterface methods
     virtual void        OnSetDataFormat             ( IDirectInputDevice8A* pDevice, LPCDIDATAFORMAT a ) {}
@@ -152,7 +149,7 @@ public:
     virtual bool        IsJoypadConnected           ( void );
 
     // Settings
-    virtual string      GetControllerName           ( void );
+    virtual std::string GetControllerName           ( void );
     virtual int         GetDeadZone                 ( void );
     virtual int         GetSaturation               ( void );
     virtual void        SetDeadZone                 ( int iDeadZone );
@@ -163,8 +160,8 @@ public:
 
     // Binding
     virtual int         GetOutputCount              ( void );
-    virtual string      GetOutputName               ( int iOutputIndex );
-    virtual string      GetOutputInputName          ( int iOutputIndex );
+    virtual std::string GetOutputName               ( int iOutputIndex );
+    virtual std::string GetOutputInputName          ( int iOutputIndex );
     virtual bool        BindNextUsedAxisToOutput    ( int iOutputIndex );
     virtual bool        IsAxisBindComplete          ( void );
     virtual bool        IsCapturingAxis             ( void );
@@ -215,13 +212,13 @@ CJoystickManagerInterface* NewJoystickManager ( void )
 }
 
 // This is nice so there
-CJoystickManagerInterface* g_pJoystickManager = NULL;
+std::unique_ptr<CJoystickManager> g_pJoystickManager;
 
 CJoystickManagerInterface* GetJoystickManager ( void )
 {
-    if ( !g_pJoystickManager )
-        g_pJoystickManager = NewJoystickManager ();
-    return g_pJoystickManager;
+    if (!g_pJoystickManager)
+        g_pJoystickManager = std::make_unique<CJoystickManager>();
+    return g_pJoystickManager.get();
 }
 
 
@@ -261,11 +258,6 @@ CJoystickManager::CJoystickManager ( void )
     }
 
     SetDefaults();
-}
-
-
-CJoystickManager::~CJoystickManager ( void )
-{
 }
 
 
@@ -1183,7 +1175,7 @@ bool CJoystickManager::IsJoypadConnected ( void )
 //
 ///////////////////////////////////////////////////////////////
 
-string CJoystickManager::GetControllerName ( void )
+std::string CJoystickManager::GetControllerName ( void )
 {
     return m_DevInfo.strProductName;
 }
@@ -1264,7 +1256,7 @@ CXMLNode* CJoystickManager::GetConfigNode ( bool bCreateIfRequired )
 
         if ( CXMLAttribute* pA = pAttributes->Find ( "guid" ) )
         {
-            string value = pA->GetValue ();
+            std::string value = pA->GetValue ();
             if ( value == m_DevInfo.strGuid )
             {
                 pItemNode = pNode;
@@ -1579,7 +1571,7 @@ bool CJoystickManager::SaveToXML ( void )
 // Text versions of some enums.
 //
 ///////////////////////////////////////////////////////////////
-static string ToString( eJoy value )
+static std::string ToString( eJoy value )
 {
     if ( value == eJoyX )     return "X";
     if ( value == eJoyY )     return "Y";
@@ -1591,7 +1583,7 @@ static string ToString( eJoy value )
     return "unknown";
 }
 
-static string ToString( eStick value )
+static std::string ToString( eStick value )
 {
     if ( value == eLeftStickX )   return "LeftStickX";
     if ( value == eLeftStickY )   return "LeftStickY";
@@ -1602,7 +1594,7 @@ static string ToString( eStick value )
     return "unknown";
 }
 
-static string ToString( eDir value )
+static std::string ToString( eDir value )
 {
     if ( value == eDirNeg )   return "-";
     if ( value == eDirPos )   return "+";
@@ -1630,20 +1622,20 @@ int CJoystickManager::GetOutputCount ( )
 // Get text name of an output(GTA Game) axis.
 //
 ///////////////////////////////////////////////////////////////
-string CJoystickManager::GetOutputName ( int iOutputIndex )
+std::string CJoystickManager::GetOutputName ( int iOutputIndex )
 {
     if ( !VALID_INDEX_FOR ( m_currentMapping, iOutputIndex ) )
         return "";
 
     const SMappingLine& line = m_currentMapping[iOutputIndex];
 
-    string strStickName  = ToString ( line.OutputAxisIndex );
-    string strDirName  = ToString ( line.OutputAxisDir );
+    std::string strStickName  = ToString ( line.OutputAxisIndex );
+    std::string strDirName  = ToString ( line.OutputAxisDir );
 
     if ( line.OutputAxisIndex == eAccelerate || line.OutputAxisIndex == eBrake )
         return strStickName;
 
-    return strStickName + string ( " " ) + strDirName;
+    return strStickName + " " + strDirName;
 }
 
 
@@ -1654,7 +1646,7 @@ string CJoystickManager::GetOutputName ( int iOutputIndex )
 // Get text name of the input(physical) axis mapped to this output(GTA Game) axis.
 //
 ///////////////////////////////////////////////////////////////
-string CJoystickManager::GetOutputInputName ( int iOutputIndex )
+std::string CJoystickManager::GetOutputInputName ( int iOutputIndex )
 {
     if ( !VALID_INDEX_FOR ( m_currentMapping, iOutputIndex ) )
         return "";
@@ -1664,10 +1656,10 @@ string CJoystickManager::GetOutputInputName ( int iOutputIndex )
     if ( !line.bEnabled )
         return "";
 
-    string strJoyName  = ToString ( line.SourceAxisIndex );
-    string strDirName  = ToString ( line.SourceAxisDir );
+    std::string strJoyName  = ToString ( line.SourceAxisIndex );
+    std::string strDirName  = ToString ( line.SourceAxisDir );
 
-    return strJoyName + string ( " " ) + strDirName;
+    return strJoyName + " " + strDirName;
 }
 
 

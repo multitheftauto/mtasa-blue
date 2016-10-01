@@ -995,7 +995,7 @@ bool CAccountManager::IsAuthorizedSerialRequired( CAccount* pAccount )
 //
 bool CAccountManager::IsHttpLoginAllowed( CAccount* pAccount, const SString& strIp )
 {
-    if ( !g_pGame->GetConfig()->IsAuthSerialHttpEnabled() ||
+    if ( !g_pGame->GetConfig()->GetAuthSerialHttpEnabled() ||
          !IsAuthorizedSerialRequired( pAccount ) ||
          pAccount->IsIpAuthorized( strIp ) )
     {

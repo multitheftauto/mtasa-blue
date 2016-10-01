@@ -13,9 +13,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
-#ifndef __CCOMMANDFUNCS_H
-#define __CCOMMANDFUNCS_H
+#pragma once
 
 #include <string>
 
@@ -59,5 +57,3 @@ public:
     DECLARE_COMMAND_HANDLER ( FakeLag );
     DECLARE_COMMAND_HANDLER ( JingleBells );
 };
-
-#endif

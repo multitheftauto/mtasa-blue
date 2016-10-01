@@ -174,7 +174,7 @@ public:
     SUpdaterMasterConfig                m_MasterConfig;
     SUpdaterVarConfig                   m_VarConfig;
 
-    CThreadHandle*                      m_pProgramThreadHandle;
+    CThreadHandle                       m_ProgramThreadHandle;
 
     // Shared variables
     struct
@@ -213,10 +213,10 @@ CVersionUpdaterInterface* GetVersionUpdater ()
 //
 //
 ///////////////////////////////////////////////////////////////
-CVersionUpdater::CVersionUpdater ( void )
+CVersionUpdater::CVersionUpdater ( void ) :
+    m_ProgramThreadHandle(CVersionUpdater::StaticThreadProc, this)
 {
     shared.m_Mutex.Lock ();
-    m_pProgramThreadHandle = new CThreadHandle( CVersionUpdater::StaticThreadProc, this );
 }
 
 
@@ -230,7 +230,6 @@ CVersionUpdater::CVersionUpdater ( void )
 CVersionUpdater::~CVersionUpdater ( void )
 {
     StopThread();
-    SAFE_DELETE ( m_pProgramThreadHandle );
     SAFE_DELETE ( m_pReportWrap );
 }
 
@@ -256,7 +255,7 @@ void CVersionUpdater::StopThread( void )
     }
 
     // If thread not stopped, (async) cancel it
-    m_pProgramThreadHandle->Cancel();
+    m_ProgramThreadHandle.Cancel();
 }
 
 

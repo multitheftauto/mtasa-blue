@@ -7,7 +7,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
+#pragma once
 //
 // Convert positions of items that align with GTA Hud elements
 //

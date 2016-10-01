@@ -13,6 +13,7 @@
 #define __CCOMMANDSINTERFACE_H
 
 #include <list>
+#include <memory>
 
 typedef void (*PFNCOMMANDHANDLER)               ( const char* );
 typedef bool (*pfnExecuteCommandHandler)        ( const char*, const char*, bool, bool, bool );
@@ -49,8 +50,7 @@ public:
     virtual void            SetExecuteHandler                   ( pfnExecuteCommandHandler pfnHandler ) = 0;
 
     virtual COMMANDENTRY*   Get                                 ( const char* szCommand, bool bCheckIfMod = false, bool bModCommand = false ) = 0;
-    virtual std::list < COMMANDENTRY* > ::iterator IterBegin    ( void ) = 0;
-    virtual std::list < COMMANDENTRY* > ::iterator IterEnd      ( void ) = 0;
+    virtual std::list<COMMANDENTRY>& GetCommands                ( void ) = 0;
 
 };
 

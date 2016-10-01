@@ -615,7 +615,7 @@ namespace SharedUtil
             return m_ulCapacity;
         }
 
-        unsigned long GetUnusedAmount ( void ) const
+        std::size_t GetUnusedAmount ( void ) const
         {
             return m_Queue.size ();
         }
@@ -913,8 +913,8 @@ namespace SharedUtil
     class CMappedArray : public CMappedContainer < T, std::vector < T > >
     {
     public:
-        const T& operator[] ( int idx ) const   { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
-        T& operator[] ( int idx )               { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
+        const T& operator[] ( std::size_t idx ) const   { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
+        T& operator[] ( std::size_t idx )               { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
     };
 
 
@@ -1500,7 +1500,8 @@ namespace SharedUtil
             for ( uint i = 0; i < partList.size () ; i++ )
             {
                 const SString& part = partList [ i ];
-                char cType = part.Left ( 1 )[0];
+                auto strLeft = part.Left(1);
+                char cType = strLeft[0];
 
                 SString strRest = part.Right ( (int)part.length () - 1 );
                 strRest = strRest.Replace ( "{", "" ).Replace ( "}", "" );
@@ -1631,13 +1632,13 @@ namespace SharedUtil
     template < class T, int SIZE >
     struct SFixedArray
     {
-        T& operator[] ( uint uiIndex )
+        T& operator[] ( std::size_t uiIndex )
         {
             assert ( uiIndex < SIZE );
             return data [ uiIndex ];
         }
 
-        const T& operator[] ( uint uiIndex ) const
+        const T& operator[] ( std::size_t uiIndex ) const
         {
             assert ( uiIndex < SIZE );
             return data [ uiIndex ];

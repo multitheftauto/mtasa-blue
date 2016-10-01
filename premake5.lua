@@ -68,6 +68,9 @@ workspace "MTASA"
 	filter {"system:windows", "toolset:*140*"}
 		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
 	
+	filter {"system:windows", "toolset:*_xp*"}
+		buildoptions { "/Zc:threadSafeInit-" } -- Fix Windows XP not initialising TLS early
+	
 	filter "system:windows"
 		toolset "v140_xp"
 		defines { "WIN32", "_WIN32" }

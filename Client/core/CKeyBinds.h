@@ -10,11 +10,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
-class CKeyBinds;
-
-#ifndef __CKEYBINDS_H
-#define __CKEYBINDS_H
+#pragma once
 
 #include <windows.h>
 #include <string.h>
@@ -35,7 +31,6 @@ class CKeyBinds: public CKeyBindsInterface
 {
 public:
                             CKeyBinds                   ( class CCore* pCore );
-                            ~CKeyBinds                  ( void );
 
     bool                    ProcessMessage              ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 protected:
@@ -50,9 +45,7 @@ public:
     void                    RemoveDeletedBinds          ( void );
     void                    ClearCommandsAndControls    ( void );
     bool                    Call                        ( CKeyBind* pKeyBind );
-    
-    std::list < CKeyBind* > ::const_iterator IterBegin  ( void )    { return m_pList->begin (); }
-    std::list < CKeyBind* > ::const_iterator IterEnd    ( void )    { return m_pList->end (); }
+    const std::list < std::unique_ptr<CKeyBind> >& GetBinds              ( void ) { return m_List; }
 
     // Command-bind funcs
     bool                    AddCommand                  ( const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL , bool bScriptCreated = false, const char* szOriginalScriptKey = NULL );
@@ -152,7 +145,7 @@ public:
 private:    
     CCore*                      m_pCore;
 
-    std::list < CKeyBind* >*    m_pList;
+    std::list < std::unique_ptr<CKeyBind> >      m_List;
     bool                        m_bMouseWheel;
     bool                        m_bInVehicle;
     CCommandBind*               m_pChatBoxBind;
@@ -162,4 +155,3 @@ private:
     bool                        m_bWaitingToLoadDefaults;
 };
 
-#endif

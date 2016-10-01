@@ -13,8 +13,6 @@
 
 #include "StdInc.h"
 
-using namespace std;
-
 #define MAX_STRING_LENGTH 2048
 template<> CConsoleLogger * CSingleton< CConsoleLogger >::m_pSingleton = NULL;
 
@@ -41,17 +39,11 @@ CConsoleLogger::CConsoleLogger ( )
     CycleFile( m_strFilename, 100, 5 );
 
     // get the file stream
-    File.open ( m_strFilename.c_str(), ios::app );
+    File.open ( m_strFilename.c_str(), std::ios::app );
 }
 
 
-CConsoleLogger::~CConsoleLogger ( )
-{
-    File.close();
-}
-
-
-void CConsoleLogger::WriteLine ( const string& strInLine )
+void CConsoleLogger::WriteLine ( const std::string& strInLine )
 {
     SString strLine = strInLine;
     CleanLine( strLine );
@@ -60,7 +52,7 @@ void CConsoleLogger::WriteLine ( const string& strInLine )
                         << GetLocalTimeString ( true )
                         << "] "
                         << strLine
-                        << endl; 
+                        << std::endl; 
 }
 
 
