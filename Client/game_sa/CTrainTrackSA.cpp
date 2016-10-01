@@ -18,6 +18,12 @@ CTrainTrackSA::CTrainTrackSA(uint index, const std::vector<STrackNode>& nodes, b
     m_Nodes = nodes;
     m_LinkLastNodes = linkLastNode;
     m_pManager = pManager;
+
+    // Recalculate lengths
+    //Recalculate();
+
+    // Don't forget to update references in manager (as std::vector might have relocated the underlying data)
+    m_pManager->UpdateTrackData(this);
 }
 
 void CTrainTrackSA::SetLastNodesLinked(bool linked)
@@ -73,11 +79,10 @@ void CTrainTrackSA::Recalculate()
     // Default our distance to 0
     float distance = 0.0f;
 
-    for (auto iter = m_Nodes.begin(); iter != m_Nodes.end() - 2; ++iter)
+    for (auto iter = m_Nodes.begin(); iter != m_Nodes.end() - 1; ++iter)
     {
         auto& node = *iter;
         auto& nextNode = *(iter + 1);
-
         auto position = node.GetPosition();
         auto nextPosition = nextNode.GetPosition();
 
@@ -93,6 +98,6 @@ void CTrainTrackSA::Recalculate()
 
     // Calculate distance from last node to the start again
     auto& startNode = *m_Nodes.begin();
-    auto& endNode = *(m_Nodes.end() - 1);
-    endNode.SetDistance((endNode.GetPosition() - endNode.GetPosition()).Length());
+    auto& endNode = m_Nodes.back();
+    endNode.SetDistance((endNode.GetPosition() - startNode.GetPosition()).Length());
 }

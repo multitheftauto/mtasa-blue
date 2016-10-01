@@ -35,7 +35,8 @@ public:
 
 private:
     uint AllocateTrainTrackIndex();
-    void PatchNumberOfTracks(std::uint8_t numTracks);
+    void PatchReferences();
+	void PatchNumberOfTracks(std::uint8_t numTracks);
 
     std::vector<std::unique_ptr<CTrainTrack>> m_Tracks;
 

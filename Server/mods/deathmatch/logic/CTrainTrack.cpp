@@ -11,7 +11,7 @@
 *****************************************************************************/
 #include "StdInc.h"
 
-CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode)
+CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, bool default)
     : CElement(pParent, pNode), m_pManager(pManager)
 {
     m_iType = CElement::TRAINTRACK;
@@ -19,6 +19,7 @@ CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackN
 
     m_LinkLastNodes = linkLastNodes;
     m_Nodes = nodes;
+    m_Default = default;
 }
 
 CTrainTrack::~CTrainTrack()
@@ -33,6 +34,7 @@ bool CTrainTrack::SetTrackNodePosition(uint nodeIndex, const CVector& position)
 
     auto& node = m_Nodes[nodeIndex];
     node.position = position;
+    return true;
 }
 
 bool CTrainTrack::GetTrackNodePosition(uint nodeIndex, CVector& position)
@@ -42,4 +44,5 @@ bool CTrainTrack::GetTrackNodePosition(uint nodeIndex, CVector& position)
 
     auto& node = m_Nodes[nodeIndex];
     position = node.position;
+    return true;
 }

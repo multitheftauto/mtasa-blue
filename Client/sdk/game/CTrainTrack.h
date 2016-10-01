@@ -45,7 +45,7 @@ struct STrackNode
     }
 
 private:
-    std::int32_t pad;
+    std::int32_t pad = 0;
 };
 static_assert(sizeof(STrackNode) == 12, "Size mismatch");
 

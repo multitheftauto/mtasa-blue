@@ -1058,14 +1058,14 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                 {
                     auto pTrack = static_cast<CTrainTrack*>(pElement);
 
-                    BitStream.Write(pTrack->GetNumberOfNodes());
+                    BitStream.Write(static_cast<std::uint32_t>(pTrack->GetNumberOfNodes()));
                     BitStream.WriteBit(pTrack->GetLastNodesLinked());
 
                     for (auto& trackNode : pTrack->GetNodes())
                     {
                         BitStream.Write(trackNode.position.fX);
-                        BitStream.Write(trackNode.position.fX);
-                        BitStream.Write(trackNode.position.fX);
+                        BitStream.Write(trackNode.position.fY);
+                        BitStream.Write(trackNode.position.fZ);
                     }
                     break;
                 }

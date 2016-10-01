@@ -3949,20 +3949,19 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
 
                 case CClientGame::TRAINTRACK:
                 {
-                    std::uint8_t trackId; // TODO
                     std::uint32_t numNodes;
                     bool linkLastNode;
-                    bitStream.Read(trackId);
                     bitStream.Read(numNodes);
                     bitStream.ReadBit(linkLastNode);
 
-                    std::vector<STrackNode> trackNodes(numNodes);
+                    std::vector<STrackNode> trackNodes;
+                    trackNodes.reserve(numNodes);
                     for (uint i = 0; i < numNodes; ++i)
                     {
                         CVector position;
-                        bitStream.Read(position.fX );
-                        bitStream.Read(position.fY );
-                        bitStream.Read(position.fZ );
+                        bitStream.Read(position.fX);
+                        bitStream.Read(position.fY);
+                        bitStream.Read(position.fZ);
 
                         STrackNode trackNode;
                         trackNode.SetPosition(position);

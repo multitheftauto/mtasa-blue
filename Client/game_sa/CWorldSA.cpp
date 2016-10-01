@@ -552,7 +552,7 @@ uint CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, CTrainTrack*
         if (checkAllTracks || trainTrack.get() == pTrainTrack)
         {
             auto& nodes = trainTrack->GetNodes();
-            for (uint i = 0; nodes.size(); ++i)
+            for (uint i = 0; i < nodes.size(); ++i)
             {
                 auto& trackNode = nodes[i];
                 auto distance = (vecPosition - trackNode.GetPosition()).Length();

@@ -292,7 +292,8 @@ void CMapManager::SendMapInformation ( CPlayer& Player )
     CTrainTrackManager* pTrainTrackManager = g_pGame->GetTrainTrackManager();
     for (auto& pTrainTrack : pTrainTrackManager->GetTracks())
     {
-        EntityPacket.Add(pTrainTrack);
+        if (!pTrainTrack->IsDefault())
+            EntityPacket.Add(pTrainTrack);
     }
 
     marker.Set ( "TrainTracks" );
