@@ -308,7 +308,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     std::int32_t buffer = 0xFFFF0000;
     m_pAlertTexture->LoadFromMemory(&buffer, 1, 1); // HACK: Load red dot
 
-    m_pAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
+    m_pAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground.get())));
     m_pAlertImage->LoadFromTexture(m_pAlertTexture.get());
     m_pAlertImage->SetPosition({ 0.0f, 0.0f }, false);
     m_pAlertImage->SetSize({ ScreenSize.fX, 20.0f });
