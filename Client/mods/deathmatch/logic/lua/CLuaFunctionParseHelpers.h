@@ -275,6 +275,7 @@ bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix );
 void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
 void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions );
 void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 = nullptr );
+void CheckCanAccessOtherResourceFile( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly = nullptr );
 
 
 //

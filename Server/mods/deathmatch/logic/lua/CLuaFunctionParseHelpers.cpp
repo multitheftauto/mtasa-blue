@@ -532,3 +532,30 @@ void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisR
         argStream.SetCustomError( SString( "ModifyOtherObjects in ACL denied resource %s to access %s", *pThisResource->GetName(), *strWho ), "Access denied" );
     }
 }
+
+
+//
+// Set error if resource file access is blocked due to reasons
+//
+void CheckCanAccessOtherResourceFile( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly )
+{
+    if ( !g_pGame->GetConfig()->IsDatabaseCredentialsProtectionEnabled() )
+        return;
+
+    // Is other resource different and requested access denied
+    if ( ( pThisResource != pOtherResource ) &&
+         pOtherResource->IsFileDbConnectMysqlProtected( strAbsPath, pbReadOnly ? *pbReadOnly : false ) )
+    {
+        // No access - See if we can change to readonly
+        if ( pbReadOnly && *pbReadOnly == false )
+        {
+            if ( !pOtherResource->IsFileDbConnectMysqlProtected( strAbsPath, true ) )
+            {
+                // Yes readonly access
+                *pbReadOnly = true;
+                return;
+            }
+        }
+        argStream.SetCustomError( SString( "Database credentials protection denied resource %s to access %s", *pThisResource->GetName(), *pOtherResource->GetName() ), "Access denied" );
+    }
+}

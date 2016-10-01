@@ -97,6 +97,7 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( strInputPath, pOtherResource, &strPath, nullptr ) )
             {
                 CheckCanModifyOtherResource( argStream, pThisResource, pOtherResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pOtherResource, strPath );
                 if ( !argStream.HasErrors() )
                 {
                     // Make sure the dir exists so we can successfully make the file
@@ -156,6 +157,7 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( strFileInput, pOtherResource, &strPath ) )
             {
                 CheckCanModifyOtherResource( argStream, pThisResource, pOtherResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pOtherResource, strPath, &bReadOnly );
                 if ( !argStream.HasErrors() )
                 {
                     // Make sure the dir exists so we can successfully make the file
@@ -225,6 +227,7 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( strFile, pOtherResource, &strPath, NULL ) )
             {
                 CheckCanModifyOtherResource( argStream, pThisResource, pOtherResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pOtherResource, strPath );
                 if ( !argStream.HasErrors() )
                 {
                     if ( pSourceNode )

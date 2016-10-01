@@ -1474,6 +1474,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      0,      100,    "server_logic_fps_limit",               &m_iServerLogicFpsLimit,                    NULL },
             { true, true,   0,      1,      1,      "crash_dump_upload",                    &m_bCrashDumpUploadEnabled,                 NULL },
             { true, true,   0,      1,      1,      "filter_duplicate_log_lines",           &m_bFilterDuplicateLogLinesEnabled,         NULL },
+            { false, false, 0,      1,      1,      "database_credentials_protection",      &m_bDatabaseCredentialsProtectionEnabled,   NULL },
         };
 
     static std::vector < SIntSetting > settingsList;

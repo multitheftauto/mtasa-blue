@@ -229,11 +229,9 @@ int CLuaDatabaseDefs::DbConnect ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource ( luaVM );
+        if ( pThisResource )
         {
-            CResource* pThisResource = pLuaMain->GetResource ();
-
             // If type is sqlite, and has a host, try to resolve path
             if ( strType == "sqlite" && !strHost.empty () )
             {
@@ -270,6 +268,9 @@ int CLuaDatabaseDefs::DbConnect ( lua_State* luaVM )
 
             if ( !argStream.HasErrors() )
             {
+                if ( strType == "mysql" )
+                    pThisResource->SetUsingDbConnectMysql( true );
+
                 // Add logging options
                 bool bLoggingEnabled;
                 SString strLogTag;
@@ -287,6 +288,7 @@ int CLuaDatabaseDefs::DbConnect ( lua_State* luaVM )
                 else
                 {
                     // Use an element to wrap the connection for auto disconnected when the resource stops
+                    // Don't set a parent because the element should not be accessible from other resources
                     CDatabaseConnectionElement* pElement = new CDatabaseConnectionElement ( NULL, connection );
                     CElementGroup * pGroup = pThisResource->GetElementGroup ();
                     if ( pGroup )

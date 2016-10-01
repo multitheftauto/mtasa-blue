@@ -374,22 +374,32 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
 
 int CLuaResourceDefs::removeResourceFile ( lua_State* luaVM )
 {
-    CResource * pResource;
+    CResource * pOtherResource;
     SString strFileName;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pResource );
+    argStream.ReadUserData ( pOtherResource );
     argStream.ReadString ( strFileName );
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::RemoveResourceFile ( pResource, strFileName ) )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CResource* pThisResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+        if ( pThisResource )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            CheckCanModifyOtherResource( argStream, pThisResource, pOtherResource );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pOtherResource, strFileName );
+            if ( !argStream.HasErrors() )
+            {
+                if ( CStaticFunctionDefinitions::RemoveResourceFile ( pOtherResource, strFileName ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
         }
     }
-    else
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );

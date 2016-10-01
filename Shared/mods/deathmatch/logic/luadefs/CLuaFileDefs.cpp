@@ -92,6 +92,7 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( strInputPath, pResource, &strAbsPath, &strMetaPath ) )
             {
                 CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pResource, strAbsPath, &bReadOnly );
                 if ( !argStream.HasErrors() )
                 {
 #ifndef MTA_CLIENT // IF SERVER
@@ -186,6 +187,7 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
         if ( CResourceManager::ParseResourcePathInput ( strInputPath, pResource, &strAbsPath, &strMetaPath ) )
         {
             CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pResource, strAbsPath );
             if ( !argStream.HasErrors() )
             {
 #ifdef MTA_CLIENT
@@ -322,6 +324,8 @@ int CLuaFileDefs::fileCopy ( lua_State* luaVM )
             CResourceManager::ParseResourcePathInput ( strInputDestPath, pDestResource, &strDestAbsPath ) )
         {
             CheckCanModifyOtherResource( argStream, pThisResource, pSrcResource, pDestResource );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pSrcResource, strSrcAbsPath );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pDestResource, strDestAbsPath );
             if ( !argStream.HasErrors() )
             {
                 // Does `current` file path exist and `new` file path doesn't exist?
@@ -408,6 +412,8 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                 CResourceManager::ParseResourcePathInput ( strInputDestPath, pDestResource, &strDestAbsPath ) )
         {
             CheckCanModifyOtherResource( argStream, pThisResource, pSrcResource, pDestResource );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pSrcResource, strSrcAbsPath );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pDestResource, strDestAbsPath );
             if ( !argStream.HasErrors() )
             {
                 // Does `current` file path exist and `new` file path doesn't exist?
@@ -475,6 +481,7 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
             if ( CResourceManager::ParseResourcePathInput ( strInputPath, pResource, &strAbsPath ) )
             {
                 CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pResource, strAbsPath );
                 if ( !argStream.HasErrors() )
                 {
 #ifdef MTA_CLIENT

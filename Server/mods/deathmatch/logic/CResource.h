@@ -216,6 +216,8 @@ private:
     bool                    m_bOOPEnabledInMetaXml;
     uint                    m_uiFunctionRightCacheRevision;
     CFastHashMap < lua_CFunction, bool > m_FunctionRightCacheMap;
+    bool                    m_bDoneDbConnectMysqlScan;
+    bool                    m_bUsingDbConnectMysql;
 
     bool                    CheckState ( void ); // if the resource has no Dependents, stop it, if it has, start it. returns true if the resource is started.
     bool                    ReadIncludedResources ( class CXMLNode * root );
@@ -244,6 +246,7 @@ private:
         pthread_mutex_unlock ( &m_mutex );
     }
 public:
+    ZERO_ON_NEW
                             CResource ( CResourceManager * resourceManager, bool bIsZipped, const char * szAbsPath, const char * szResourceName );
                             ~CResource ( );
 
@@ -381,6 +384,9 @@ public:
     void                UpdateFunctionRightCache        ( lua_CFunction f, bool bAllowed );
     bool                IsFilenameUsed                  ( const SString& strFilename, bool bClient );
     int                 GetDownloadPriorityGroup        ( void )                                { return m_iDownloadPriorityGroup; }
+    void                SetUsingDbConnectMysql          ( bool bUsingDbConnectMysql )           { m_bUsingDbConnectMysql = bUsingDbConnectMysql; }
+    bool                IsUsingDbConnectMysql           ( void );
+    bool                IsFileDbConnectMysqlProtected   ( const SString& strFilename, bool bReadOnly );
 
 protected:
     SString             GetAutoGroupName                ( void );

@@ -743,3 +743,12 @@ void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisR
 {
     // No operation on the client
 }
+
+
+//
+// Set error if resource file access is blocked due to reasons
+//
+void CheckCanAccessOtherResourceFile( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly )
+{
+    // No operation on the client
+}
