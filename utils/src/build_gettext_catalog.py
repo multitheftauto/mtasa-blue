@@ -26,8 +26,8 @@ parser.add_option("-v", "--version", dest="version",
 (options, args) = parser.parse_args()
 
 directories = {
-    "client.pot" : [ "../MTA10", "../Shared" ],
-    #"../MTA10/locale/client.pot" : [ "../MTA10_Server", "../Shared" ],
+    "client.pot" : [ "../Client", "../Shared" ],
+    #"../Server/locale/client.pot" : [ "../Server", "../Shared" ],
 }
 
 scanDirsList = []
