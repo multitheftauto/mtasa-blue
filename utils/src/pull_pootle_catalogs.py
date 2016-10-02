@@ -68,7 +68,7 @@ parser = OptionParser()
 parser.add_option("-u", "--url", dest="url",
             help="Pootle homepage URL", default="http://translate.mtasa.com/")
 parser.add_option("-o", "--output", dest="output",
-            help="Output directory", default="../output/MTA San Andreas/mta/locale")
+            help="Output directory", default="../Shared/data/MTA San Andreas/MTA/locale")
 parser.add_option("-p", "--project", dest="project",
             help="Internal name of the pootle project", default="client")
 parser.add_option("-G", "--gnu",action="store_true", dest="gnu", default=False,
