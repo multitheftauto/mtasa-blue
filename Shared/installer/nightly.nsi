@@ -719,8 +719,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
             File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
             File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\dbghelp.dll"
-            File "${FILES_ROOT}\MTA San Andreas\mta\wow_helper.exe"
+            File "${FILES_ROOT}\mta\dbghelp.dll"
+            File "${FILES_ROOT}\mta\wow_helper.exe"
 
             SetOutPath "$INSTDIR\MTA\config"
             File "${FILES_ROOT}\mta\config\chatboxpresets.xml"
