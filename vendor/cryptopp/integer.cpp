@@ -67,16 +67,6 @@
 # define CRYPTOPP_INTEGER_SSE2 (CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE && CRYPTOPP_BOOL_X86)
 #endif
 
-// Debian QEMU/ARMEL issue in MultiplyTop; see http://github.com/weidai11/cryptopp/issues/31.
-#if __ARMEL__ && (CRYPTOPP_GCC_VERSION >= 40900) && (CRYPTOPP_GCC_VERSION < 70000) && __OPTIMIZE__
-# define WORKAROUND_ARMEL_BUG 1
-#endif
-
-#if WORKAROUND_ARMEL_BUG
-# pragma GCC push_options
-# pragma GCC optimize("O1")
-#endif
-
 NAMESPACE_BEGIN(CryptoPP)
 
 bool AssignIntToInteger(const std::type_info &valueType, void *pInteger, const void *pInt)
@@ -2963,7 +2953,7 @@ Integer::Integer(const byte *encodedInteger, size_t byteCount, Signedness s, Byt
 	if(o == LITTLE_ENDIAN_ORDER)
 	{
 		SecByteBlock block(byteCount);
-#if (CRYPTOPP_MSC_VERSION >= 1500)
+#if (CRYPTOPP_MSC_VERSION >= 1400)
 		std::reverse_copy(encodedInteger, encodedInteger+byteCount,
 			stdext::make_checked_array_iterator(block.begin(), block.size()));
 #else
@@ -4558,9 +4548,5 @@ std::string IntToString<word64>(word64 value, unsigned int base)
 }
 
 NAMESPACE_END
-
-#if WORKAROUND_ARMEL_BUG
-# pragma GCC pop_options
-#endif
 
 #endif
