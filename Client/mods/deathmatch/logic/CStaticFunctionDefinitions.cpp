@@ -4748,6 +4748,13 @@ eInputMode CStaticFunctionDefinitions::GUIGetInputMode ( void )
     return m_pGUI->GetGUIInputMode();
 }
 
+
+eCursorType CStaticFunctionDefinitions::GUIGetCursorType ( void )
+{
+    return m_pGUI->GetCursorType ( );
+}
+
+
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative )
 {
     CGUIElement *pElement = m_pGUI->CreateWnd ( NULL, szCaption );

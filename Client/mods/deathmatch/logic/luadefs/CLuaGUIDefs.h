@@ -141,6 +141,7 @@ public:
     LUA_DECLARE ( GUIComboBoxSetSelected );
     LUA_DECLARE ( GUIComboBoxGetItemText );
     LUA_DECLARE ( GUIComboBoxSetItemText );
+    LUA_DECLARE ( GUIGetCursorType );
 
 private:
     static void AddGuiElementClass ( lua_State* luaVM );

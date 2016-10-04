@@ -388,6 +388,7 @@ public:
     static bool                         GUIGetInputEnabled                  ( void );
     static eInputMode                   GUIGetInputMode                     ( void );
     static void                         GUISetInputMode                     ( eInputMode inputMode );
+    static eCursorType                  GUIGetCursorType                    ( void );
 
     static CClientGUIElement*           GUICreateWindow                     ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative );
     static CClientGUIElement*           GUICreateLabel                      ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );

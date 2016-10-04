@@ -112,6 +112,7 @@ void CLuaGUIDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiGetSize", GUIGetSize );
     CLuaCFunctions::AddFunction ( "guiGetPosition", GUIGetPosition );
     CLuaCFunctions::AddFunction ( "guiGetVisible", GUIGetVisible );
+    CLuaCFunctions::AddFunction ( "guiGetCursorType", GUIGetCursorType );
 
     CLuaCFunctions::AddFunction ( "guiCheckBoxGetSelected", GUICheckBoxGetSelected );
     CLuaCFunctions::AddFunction ( "guiRadioButtonGetSelected", GUIRadioButtonGetSelected );
@@ -190,6 +191,7 @@ void CLuaGUIDefs::AddGuiElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isTransferBoxActive", "isTransferBoxActive" );
     lua_classfunction ( luaVM, "isInputEnabled", "guiGetInputEnabled" );
     lua_classfunction ( luaVM, "getInputMode", "guiGetInputMode" );
+    lua_classfunction ( luaVM, "getCursorType", "guiGetCursorType" );
 
     lua_classfunction ( luaVM, "getScreenSize", "guiGetScreenSize" );
     lua_classfunction ( luaVM, "getProperties", "guiGetProperties" );
@@ -222,6 +224,7 @@ void CLuaGUIDefs::AddGuiElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "inputEnabled", "guiSetInputEnabled", "guiGetInputEnabled" );
     lua_classvariable ( luaVM, "inputMode", "guiGetInputMode", "guiSetInputMode" );
     lua_classvariable ( luaVM, "cursorAlpha", "setCursorAlpha", "getCursorAlpha" );
+    lua_classvariable ( luaVM, "cursorType", NULL, "guiGetCursorType" );
     lua_classvariable ( luaVM, "font", "guiSetFont", "guiGetFont" );
     lua_classvariable ( luaVM, "visible", "guiSetVisible", "guiGetVisible" );
     lua_classvariable ( luaVM, "properties", NULL, "guiGetProperties" );
@@ -3702,5 +3705,14 @@ int CLuaGUIDefs::GUICreateFont ( lua_State* luaVM )
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaGUIDefs::GUIGetCursorType ( lua_State* luaVM )
+{
+//  string guiGetCursorType ( )
+    auto eType = CStaticFunctionDefinitions::GUIGetCursorType ( );
+    lua_pushstring (luaVM, EnumToString ( eType ) );
     return 1;
 }

@@ -147,6 +147,7 @@ public:
     bool                            IsCursorEnabled             ( void );
     void                            SetCursorAlpha              ( float fAlpha, bool bOnlyCurrentServer = false );
     float                           GetCurrentServerCursorAlpha ( void );
+    eCursorType                     GetCursorType               ( void );
 
     void                            AddChild                    ( CGUIElement_Impl* pChild );
     CEGUI::FontManager*             GetFontManager              ( void );

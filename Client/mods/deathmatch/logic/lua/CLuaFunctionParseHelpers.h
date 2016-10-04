@@ -9,8 +9,11 @@
 *
 *****************************************************************************/
 
+#pragma once
+
 // Forward declare enum reflection stuff
-#include <gui/CGUI.h>
+#include <gui/CGUIEnumDefs.h>
+
 enum eLuaType { };
 DECLARE_ENUM( eLuaType );
 DECLARE_ENUM( CGUIVerticalAlign );
@@ -43,6 +46,7 @@ DECLARE_ENUM( eRadioStreamIndex );
 DECLARE_ENUM( EComponentBase::EComponentBaseType );
 DECLARE_ENUM( eWebBrowserMouseButton );
 DECLARE_ENUM( eTrayIconType )
+DECLARE_ENUM( eCursorType )
 
 enum eDXHorizontalAlign
 {
