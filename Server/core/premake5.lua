@@ -44,7 +44,7 @@ project "Core"
 		excludes { "CExceptionInformation_Impl.cpp" }
 
 	filter "system:linux"
-		links { "ncurses", "ncursesw", "breakpad", "pthread", "stdc++", "rt" }
+		links { "ncursesw", "breakpad", "pthread", "stdc++", "rt" }
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
