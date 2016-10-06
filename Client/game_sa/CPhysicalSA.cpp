@@ -111,7 +111,6 @@ VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)");
     ((CPhysicalSAInterface *)this->GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
-    ((CPhysicalSAInterface *)this->GetInterface())->m_vecCollisionAngularVelocity = *vecTurnSpeed;
 }
 
 float CPhysicalSA::GetMass ( void )

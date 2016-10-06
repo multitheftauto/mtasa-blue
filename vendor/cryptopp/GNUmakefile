@@ -35,10 +35,11 @@ CLANG_COMPILER := $(shell $(CXX) --version 2>&1 | $(EGREP) -i -c "clang")
 INTEL_COMPILER := $(shell $(CXX) --version 2>&1 | $(EGREP) -i -c "\(icc\)")
 MACPORTS_COMPILER := $(shell $(CXX) --version 2>&1 | $(EGREP) -i -c "macports")
 
-# Sun Studio 12.0 (0x0510) and 12.3 (0x0512)
-SUNCC_120_OR_LATER := $(shell $(CXX) -V 2>&1 | $(EGREP) -c "CC: (Sun|Studio) .* (5\.1[0-9]|5\.[2-9]|6\.)")
-SUNCC_122_OR_LATER := $(shell $(CXX) -V 2>&1 | $(EGREP) -c "CC: (Sun|Studio) .* (5\.1[1-9]|5\.[2-9]|6\.)")
-SUNCC_123_OR_LATER := $(shell $(CXX) -V 2>&1 | $(EGREP) -c "CC: (Sun|Studio) .* (5\.1[2-9]|5\.[2-9]|6\.)")
+# Sun Studio 12.0 provides SunCC 0x0510; and Sun Studio 12.3 provides SunCC 0x0512
+SUNCC_510_OR_LATER := $(shell $(CXX) -V 2>&1 | $(EGREP) -c "CC: (Sun|Studio) .* (5\.1[0-9]|5\.[2-9]|6\.)")
+SUNCC_511_OR_LATER := $(shell $(CXX) -V 2>&1 | $(EGREP) -c "CC: (Sun|Studio) .* (5\.1[1-9]|5\.[2-9]|6\.)")
+SUNCC_512_OR_LATER := $(shell $(CXX) -V 2>&1 | $(EGREP) -c "CC: (Sun|Studio) .* (5\.1[2-9]|5\.[2-9]|6\.)")
+SUNCC_513_OR_LATER := $(shell $(CXX) -V 2>&1 | $(EGREP) -c "CC: (Sun|Studio) .* (5\.1[3-9]|5\.[2-9]|6\.)")
 
 HAS_SOLIB_VERSION := $(IS_LINUX)
 
@@ -54,7 +55,7 @@ endif
 
 # Base CXXFLAGS used if the user did not specify them
 ifeq ($(SUN_COMPILER),1)
-  ifeq ($(SUNCC_123_OR_LATER),1)
+  ifeq ($(SUNCC_512_OR_LATER),1)
     CXXFLAGS ?= -DNDEBUG -g3 -xO2
   else
     CXXFLAGS ?= -DNDEBUG -g -xO2
@@ -141,17 +142,21 @@ else
   endif # X86/X32/X64
 endif
 
-# Aligned access required at -O3 for GCC due to vectorization (circa 08/2008). Expect other compilers to do the same.
+# Aligned access required for -O3 and above due to vectorization
 UNALIGNED_ACCESS := $(shell $(EGREP) -c "^[[:space:]]*//[[:space:]]*\#[[:space:]]*define[[:space:]]*CRYPTOPP_NO_UNALIGNED_DATA_ACCESS" config.h)
-ifeq ($(findstring -O3,$(CXXFLAGS)),-O3)
 ifneq ($(UNALIGNED_ACCESS),0)
-ifeq ($(GCC46_OR_LATER),1)
 ifeq ($(findstring -DCRYPTOPP_NO_UNALIGNED_DATA_ACCESS,$(CXXFLAGS)),)
+ifeq ($(findstring -O3,$(CXXFLAGS)),-O3)
 CXXFLAGS += -DCRYPTOPP_NO_UNALIGNED_DATA_ACCESS
+endif # -O3
+ifeq ($(findstring -O5,$(CXXFLAGS)),-O5)
+CXXFLAGS += -DCRYPTOPP_NO_UNALIGNED_DATA_ACCESS
+endif # -O5
+ifeq ($(findstring -Ofast,$(CXXFLAGS)),-Ofast)
+CXXFLAGS += -DCRYPTOPP_NO_UNALIGNED_DATA_ACCESS
+endif # -Ofast
 endif # CRYPTOPP_NO_UNALIGNED_DATA_ACCESS
-endif # GCC 4.6
 endif # UNALIGNED_ACCESS
-endif # Vectorization
 
 ifneq ($(INTEL_COMPILER),0)
 CXXFLAGS += -wd68 -wd186 -wd279 -wd327 -wd161 -wd3180
@@ -176,6 +181,7 @@ endif
 endif
 
 # Tell MacPorts GCC to use Clang integrated assembler
+#   http://github.com/weidai11/cryptopp/issues/190
 ifeq ($(GCC_COMPILER)$(MACPORTS_COMPILER),11)
 ifneq ($(findstring -Wa,-q,$(CXXFLAGS)),-Wa,-q)
 CXXFLAGS += -Wa,-q
@@ -183,6 +189,12 @@ endif
 ifneq ($(findstring -Wa,-q,$(CXXFLAGS)),-DCRYPTOPP_CLANG_INTEGRATED_ASSEMBLER)
 CXXFLAGS += -DCRYPTOPP_CLANG_INTEGRATED_ASSEMBLER=1
 endif
+endif
+
+# GCC on Solaris needs -m64. Otherwise, i386 is default
+#   http://github.com/weidai11/cryptopp/issues/230
+ifeq ($(IS_SUN)$(GCC_COMPILER)$(IS_X64),111)
+CXXFLAGS += -m64
 endif
 
 # Allow use of "/" operator for GNU Assembler.
@@ -218,6 +230,22 @@ ifeq ($(findstring -save-temps,$(CXXFLAGS)),)
 CXXFLAGS += -pipe
 endif
 endif
+
+# Aligned access required for -O3 and above due to vectorization
+UNALIGNED_ACCESS := $(shell $(EGREP) -c "^[[:space:]]*//[[:space:]]*\#[[:space:]]*define[[:space:]]*CRYPTOPP_NO_UNALIGNED_DATA_ACCESS" config.h)
+ifneq ($(UNALIGNED_ACCESS),0)
+ifeq ($(findstring -DCRYPTOPP_NO_UNALIGNED_DATA_ACCESS,$(CXXFLAGS)),)
+ifeq ($(findstring -O3,$(CXXFLAGS)),-O3)
+CXXFLAGS += -DCRYPTOPP_NO_UNALIGNED_DATA_ACCESS
+endif # -O3
+ifeq ($(findstring -O5,$(CXXFLAGS)),-O5)
+CXXFLAGS += -DCRYPTOPP_NO_UNALIGNED_DATA_ACCESS
+endif # -O5
+ifeq ($(findstring -Ofast,$(CXXFLAGS)),-Ofast)
+CXXFLAGS += -DCRYPTOPP_NO_UNALIGNED_DATA_ACCESS
+endif # -Ofast
+endif # CRYPTOPP_NO_UNALIGNED_DATA_ACCESS
+endif # UNALIGNED_ACCESS
 
 endif	# IS_X86
 
@@ -257,9 +285,12 @@ endif
 ifneq ($(SUN_COMPILER),0)	# override flags for CC Sun C++ compiler
 IS_64 := $(shell isainfo -b 2>/dev/null | grep -i -c "64")
 ifeq ($(IS_64),1)
-CXXFLAGS += -native -m64
+CXXFLAGS += -m64
 else ifeq ($(IS_64),0)
-CXXFLAGS += -native -m32
+CXXFLAGS += -m32
+endif
+ifneq ($(SUNCC_513_OR_LATER),0)
+CXXFLAGS += -native
 endif
 # Add for non-i386
 ifneq ($(IS_X86),1)
@@ -268,7 +299,7 @@ endif
 # Add to all Solaris
 CXXFLAGS += -template=no%extdef
 # Add to Sun Studio 12.2 and above
-ifneq ($(SUNCC_122_OR_LATER),0)
+ifneq ($(SUNCC_511_OR_LATER),0)
 CXXFLAGS += -w -erroff=wvarhidemem -erroff=voidretw
 endif
 SUN_CC10_BUGGY := $(shell $(CXX) -V 2>&1 | $(EGREP) -c "CC: Sun .* 5\.10 .* (2009|2010/0[1-4])")
@@ -277,7 +308,7 @@ ifneq ($(SUN_CC10_BUGGY),0)
 # remove it if you get "already had a body defined" errors in vector.cc
 CXXFLAGS += -DCRYPTOPP_INCLUDE_VECTOR_CC
 endif
-#ifneq ($SUNCC_123_OR_LATER),0)
+#ifneq ($SUNCC_512_OR_LATER),0)
 #CXXFLAGS += -xarch=aes -D__AES__=1 -xarch=no%sse4_1 -xarch=no%sse4_2
 #endif
 AR = $(CXX)
@@ -388,7 +419,7 @@ endif # HAS_SOLIB_VERSION
 # List cryptlib.cpp first and cpu.cpp second in an attempt to tame C++ static initialization problems.
 #  The issue spills into POD data types of cpu.cpp due to the storage class of the bools, so cpu.cpp
 #  is the second candidate for explicit initialization order.
-SRCS := cryptlib.cpp cpu.cpp $(filter-out cryptlib.cpp cpu.cpp pch.cpp simple.cpp winpipes.cpp cryptlib_bds.cpp,$(wildcard *.cpp))
+SRCS := cryptlib.cpp cpu.cpp integer.cpp $(filter-out cryptlib.cpp cpu.cpp integer.cpp pch.cpp simple.cpp winpipes.cpp cryptlib_bds.cpp,$(wildcard *.cpp))
 
 # Need CPU for X86/X64/X32 and ARM
 ifeq ($(IS_X86)$(IS_X64)$(IS_ARM32)$(IS_ARM64),0000)
@@ -412,7 +443,7 @@ TESTOBJS := $(TESTSRCS:.cpp=.o)
 LIBOBJS := $(filter-out $(TESTOBJS),$(OBJS))
 
 # List cryptlib.cpp first in an attempt to tame C++ static initialization problems
-DLLSRCS := cryptlib.cpp cpu.cpp shacal2.cpp md5.cpp shark.cpp zinflate.cpp gf2n.cpp salsa.cpp xtr.cpp oaep.cpp polynomi.cpp rc2.cpp default.cpp wait.cpp wake.cpp twofish.cpp iterhash.cpp adler32.cpp elgamal.cpp marss.cpp blowfish.cpp ecp.cpp filters.cpp strciphr.cpp camellia.cpp ida.cpp zlib.cpp des.cpp crc.cpp algparam.cpp dessp.cpp tea.cpp eax.cpp network.cpp emsa2.cpp pkcspad.cpp squaretb.cpp idea.cpp authenc.cpp hmac.cpp zdeflate.cpp xtrcrypt.cpp queue.cpp mars.cpp rc5.cpp blake2.cpp hrtimer.cpp eprecomp.cpp hex.cpp dsa.cpp sha.cpp fips140.cpp gzip.cpp seal.cpp files.cpp base32.cpp vmac.cpp tigertab.cpp sharkbox.cpp safer.cpp randpool.cpp esign.cpp arc4.cpp osrng.cpp skipjack.cpp seed.cpp integer.cpp sha3.cpp sosemanuk.cpp bfinit.cpp rabin.cpp 3way.cpp rw.cpp rdrand.cpp rsa.cpp rdtables.cpp gost.cpp socketft.cpp tftables.cpp nbtheory.cpp panama.cpp modes.cpp rijndael.cpp casts.cpp chacha.cpp gfpcrypt.cpp poly1305.cpp dll.cpp ec2n.cpp blumshub.cpp algebra.cpp basecode.cpp base64.cpp cbcmac.cpp rc6.cpp dh2.cpp gf256.cpp mqueue.cpp misc.cpp pssr.cpp channels.cpp tiger.cpp cast.cpp rng.cpp square.cpp asn.cpp whrlpool.cpp md4.cpp dh.cpp ccm.cpp md2.cpp mqv.cpp gf2_32.cpp ttmac.cpp luc.cpp trdlocal.cpp pubkey.cpp gcm.cpp ripemd.cpp eccrypto.cpp serpent.cpp cmac.cpp
+DLLSRCS := cryptlib.cpp cpu.cpp integer.cpp shacal2.cpp md5.cpp shark.cpp zinflate.cpp gf2n.cpp salsa.cpp xtr.cpp oaep.cpp polynomi.cpp rc2.cpp default.cpp wait.cpp wake.cpp twofish.cpp iterhash.cpp adler32.cpp elgamal.cpp marss.cpp blowfish.cpp ecp.cpp filters.cpp strciphr.cpp camellia.cpp ida.cpp zlib.cpp des.cpp crc.cpp algparam.cpp dessp.cpp tea.cpp eax.cpp network.cpp emsa2.cpp pkcspad.cpp squaretb.cpp idea.cpp authenc.cpp hmac.cpp zdeflate.cpp xtrcrypt.cpp queue.cpp mars.cpp rc5.cpp blake2.cpp hrtimer.cpp eprecomp.cpp hex.cpp dsa.cpp sha.cpp fips140.cpp gzip.cpp seal.cpp files.cpp base32.cpp vmac.cpp tigertab.cpp sharkbox.cpp safer.cpp randpool.cpp esign.cpp arc4.cpp osrng.cpp skipjack.cpp seed.cpp sha3.cpp sosemanuk.cpp bfinit.cpp rabin.cpp 3way.cpp rw.cpp rdrand.cpp rsa.cpp rdtables.cpp gost.cpp socketft.cpp tftables.cpp nbtheory.cpp panama.cpp modes.cpp rijndael.cpp casts.cpp chacha.cpp gfpcrypt.cpp poly1305.cpp dll.cpp ec2n.cpp blumshub.cpp algebra.cpp basecode.cpp base64.cpp cbcmac.cpp rc6.cpp dh2.cpp gf256.cpp mqueue.cpp misc.cpp pssr.cpp channels.cpp tiger.cpp cast.cpp rng.cpp square.cpp asn.cpp whrlpool.cpp md4.cpp dh.cpp ccm.cpp md2.cpp mqv.cpp gf2_32.cpp ttmac.cpp luc.cpp trdlocal.cpp pubkey.cpp gcm.cpp ripemd.cpp eccrypto.cpp serpent.cpp cmac.cpp
 DLLOBJS := $(DLLSRCS:.cpp=.export.o)
 
 # Import lib testing
@@ -506,6 +537,9 @@ endif
 ifneq ($(wildcard *.exe.dSYM),)
 	-$(RM) -r *.exe.dSYM/
 endif
+ifneq ($(wildcard *.dylib.dSYM),)
+	-$(RM) -r *.dylib.dSYM/
+endif
 ifneq ($(wildcard cov-int/),)
 	-$(RM) -r cov-int/
 endif
@@ -514,7 +548,7 @@ endif
 distclean: clean
 	-$(RM) adhoc.cpp adhoc.cpp.copied GNUmakefile.deps benchmarks.html cryptest.txt cryptest-*.txt
 	-$(RM) CMakeCache.txt Makefile CTestTestfile.cmake cmake_install.cmake cryptopp-config-version.cmake
-	-$(RM) cryptopp.tgz *.o *.ii *.s *~
+	-$(RM) cryptopp.tgz *.o *.bc *.ii *.s *~
 ifneq ($(wildcard CMakeFiles/),)
 	-$(RM) -r CMakeFiles/
 endif
@@ -637,7 +671,7 @@ dlltest.exe: cryptopp.dll $(DLLTESTOBJS)
 	$(CXX) -o $@ $(CXXFLAGS) $(DLLTESTOBJS) -L. -lcryptopp.dll $(LDFLAGS) $(LDLIBS)
 
 # This recipe prepares the distro files
-TEXT_FILES := *.h *.cpp adhoc.cpp.proto License.txt Readme.txt Install.txt Filelist.txt CMakeLists.txt config.recommend Doxyfile cryptest* cryptlib* dlltest* cryptdll* *.sln *.vcproj *.dsw *.dsp cryptopp.rc TestVectors/*.txt TestData/*.dat
+TEXT_FILES := *.h *.cpp adhoc.cpp.proto License.txt Readme.txt Install.txt Filelist.txt CMakeLists.txt config.recommend Doxyfile cryptest* cryptlib* dlltest* cryptdll* *.sln *.vcxproj cryptopp.rc TestVectors/*.txt TestData/*.dat
 EXEC_FILES := GNUmakefile GNUmakefile-cross TestData/ TestVectors/
 
 ifeq ($(wildcard Filelist.txt),Filelist.txt)
@@ -739,10 +773,13 @@ endif
 %.export.o : %.cpp
 	$(CXX) $(CXXFLAGS) -DCRYPTOPP_EXPORTS -c $< -o $@
 
+%.bc : %.cpp
+	$(CXX) $(CXXFLAGS) -c $<
+
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-# Warn of potential configuration issues. They will go away after 5.6.3.
+# Warn of potential configuration issues. They will go away after 5.6.4.
 UNALIGNED_ACCESS := $(shell $(EGREP) -c "^[[:space:]]*//[[:space:]]*\#[[:space:]]*define[[:space:]]*CRYPTOPP_NO_UNALIGNED_DATA_ACCESS" config.h)
 NO_INIT_PRIORITY := $(shell $(EGREP) -c "^[[:space:]]*//[[:space:]]*\#[[:space:]]*define[[:space:]]*CRYPTOPP_INIT_PRIORITY" config.h)
 COMPATIBILITY_562 := $(shell $(EGREP) -c "^[[:space:]]*\#[[:space:]]*define[[:space:]]*CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562" config.h)

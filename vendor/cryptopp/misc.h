@@ -63,20 +63,22 @@
 #if defined(__GNUC__) && defined(__BMI__)
 # include <immintrin.h>
 # if defined(__clang__)
-#ifndef _tzcnt_u32
-#  define _tzcnt_u32(x) __tzcnt_u32(x)
-#endif
-#ifndef _tzcnt_u64
-#  define _tzcnt_u64(x) __tzcnt_u64(x)
-#endif
-#ifndef _blsr_u32
-#  define  _blsr_u32(x)  __blsr_u32(x)
-#endif
-#ifndef _blsr_u64
-#  define  _blsr_u64(x)  __blsr_u64(x)
-#endif
-# endif
-#endif
+#  ifndef _tzcnt_u32
+#   define _tzcnt_u32(x) __tzcnt_u32(x)
+#  endif
+#  ifndef _blsr_u32
+#    define  _blsr_u32(x)  __blsr_u32(x)
+#  endif
+#  ifdef __x86_64__
+#   ifndef _tzcnt_u64
+#    define _tzcnt_u64(x) __tzcnt_u64(x)
+#   endif
+#   ifndef _blsr_u64
+#     define  _blsr_u64(x)  __blsr_u64(x)
+#   endif
+#  endif  // x86_64
+# endif  // Clang
+#endif  // GNUC and BMI
 
 #endif // CRYPTOPP_DOXYGEN_PROCESSING
 
@@ -425,6 +427,21 @@ inline void memmove_s(void *dest, size_t sizeInBytes, const void *src, size_t co
 
 #endif // __STDC_WANT_SECURE_LIB__
 
+//! \brief Swaps two variables which are arrays
+//! \param a the first value
+//! \param b the second value
+//! \details C++03 does not provide support for <tt>std::swap(__m128i a, __m128i b)</tt>
+//!   because <tt>__m128i</tt> is an <tt>unsigned long long[2]</tt>. Most compilers
+//!   support it out of the box, but Sun Studio C++ compilers 12.2 and 12.3 do not.
+//! \sa <A HREF="http://stackoverflow.com/q/38417413">How to swap two __m128i variables
+//!   in C++03 given its an opaque type and an array?</A> on Stack Overflow.
+template <class T>
+inline void vec_swap(T& a, T& b)
+{
+	T t;
+	t=a, a=b, b=t;
+}
+
 //! \brief Memory block initializer and eraser that attempts to survive optimizations
 //! \param ptr pointer to the memory block being written
 //! \param value the integer value to write for each byte
@@ -687,7 +704,7 @@ inline unsigned int TrailingZeros(word64 v)
 	// We don't enable for Microsoft because it requires a runtime check.
 	// http://msdn.microsoft.com/en-us/library/hh977023%28v=vs.110%29.aspx
 	assert(v != 0);
-#if defined(__GNUC__) && defined(__BMI__)
+#if defined(__GNUC__) && defined(__BMI__) && defined(__x86_64__)
 	return (unsigned int)_tzcnt_u64(v);
 #elif defined(__GNUC__) && (CRYPTOPP_GCC_VERSION >= 30400)
 	return (unsigned int)__builtin_ctzll(v);
@@ -800,11 +817,13 @@ inline bool IsPowerOf2<word32>(const word32 &value)
 	return value > 0 && _blsr_u32(value) == 0;
 }
 
+# if defined(__x86_64__)
 template <>
 inline bool IsPowerOf2<word64>(const word64 &value)
 {
 	return value > 0 && _blsr_u64(value) == 0;
 }
+# endif
 #endif
 
 //! \brief Tests whether the residue of a value is a power of 2
@@ -1274,6 +1293,7 @@ CRYPTOPP_DLL void CRYPTOPP_API UnalignedDeallocate(void *ptr);
 // ************** rotate functions ***************
 
 //! \brief Performs a left rotate
+//! \tparam T the word type
 //! \param x the value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a portable C/C++ implementation. The value x to be rotated can be 8 to 64-bits.
@@ -1295,6 +1315,7 @@ template <class T> inline T rotlFixed(T x, unsigned int y)
 }
 
 //! \brief Performs a right rotate
+//! \tparam T the word type
 //! \param x the value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a portable C/C++ implementation. The value x to be rotated can be 8 to 64-bits.
@@ -1316,6 +1337,7 @@ template <class T> inline T rotrFixed(T x, unsigned int y)
 }
 
 //! \brief Performs a left rotate
+//! \tparam T the word type
 //! \param x the value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a portable C/C++ implementation. The value x to be rotated can be 8 to 64-bits.
@@ -1333,6 +1355,7 @@ template <class T> inline T rotlVariable(T x, unsigned int y)
 }
 
 //! \brief Performs a right rotate
+//! \tparam T the word type
 //! \param x the value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a portable C/C++ implementation. The value x to be rotated can be 8 to 64-bits.
@@ -1350,6 +1373,7 @@ template <class T> inline T rotrVariable(T x, unsigned int y)
 }
 
 //! \brief Performs a left rotate
+//! \tparam T the word type
 //! \param x the value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a portable C/C++ implementation. The value x to be rotated can be 8 to 64-bits.
@@ -1363,6 +1387,7 @@ template <class T> inline T rotlMod(T x, unsigned int y)
 }
 
 //! \brief Performs a right rotate
+//! \tparam T the word type
 //! \param x the value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a portable C/C++ implementation. The value x to be rotated can be 8 to 64-bits.
@@ -1378,6 +1403,7 @@ template <class T> inline T rotrMod(T x, unsigned int y)
 #ifdef _MSC_VER
 
 //! \brief Performs a left rotate
+//! \tparam T the word type
 //! \param x the 32-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotl</tt> provided by
@@ -1392,6 +1418,7 @@ template<> inline word32 rotlFixed<word32>(word32 x, unsigned int y)
 }
 
 //! \brief Performs a right rotate
+//! \tparam T the word type
 //! \param x the 32-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotr</tt> provided by
@@ -1406,6 +1433,7 @@ template<> inline word32 rotrFixed<word32>(word32 x, unsigned int y)
 }
 
 //! \brief Performs a left rotate
+//! \tparam T the word type
 //! \param x the 32-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotl</tt> provided by
@@ -1419,6 +1447,7 @@ template<> inline word32 rotlVariable<word32>(word32 x, unsigned int y)
 }
 
 //! \brief Performs a right rotate
+//! \tparam T the word type
 //! \param x the 32-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotr</tt> provided by
@@ -1432,6 +1461,7 @@ template<> inline word32 rotrVariable<word32>(word32 x, unsigned int y)
 }
 
 //! \brief Performs a left rotate
+//! \tparam T the word type
 //! \param x the 32-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotl</tt> provided by
@@ -1444,6 +1474,7 @@ template<> inline word32 rotlMod<word32>(word32 x, unsigned int y)
 }
 
 //! \brief Performs a right rotate
+//! \tparam T the word type
 //! \param x the 32-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotr</tt> provided by
@@ -1461,6 +1492,7 @@ template<> inline word32 rotrMod<word32>(word32 x, unsigned int y)
 // Intel C++ Compiler 10.0 calls a function instead of using the rotate instruction when using these instructions
 
 //! \brief Performs a left rotate
+//! \tparam T the word type
 //! \param x the 64-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotl</tt> provided by
@@ -1475,6 +1507,7 @@ template<> inline word64 rotlFixed<word64>(word64 x, unsigned int y)
 }
 
 //! \brief Performs a right rotate
+//! \tparam T the word type
 //! \param x the 64-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotr</tt> provided by
@@ -1489,6 +1522,7 @@ template<> inline word64 rotrFixed<word64>(word64 x, unsigned int y)
 }
 
 //! \brief Performs a left rotate
+//! \tparam T the word type
 //! \param x the 64-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotl</tt> provided by
@@ -1502,6 +1536,7 @@ template<> inline word64 rotlVariable<word64>(word64 x, unsigned int y)
 }
 
 //! \brief Performs a right rotate
+//! \tparam T the word type
 //! \param x the 64-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotr</tt> provided by
@@ -1515,6 +1550,7 @@ template<> inline word64 rotrVariable<word64>(word64 x, unsigned int y)
 }
 
 //! \brief Performs a left rotate
+//! \tparam T the word type
 //! \param x the 64-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotl</tt> provided by
@@ -1527,6 +1563,7 @@ template<> inline word64 rotlMod<word64>(word64 x, unsigned int y)
 }
 
 //! \brief Performs a right rotate
+//! \tparam T the word type
 //! \param x the 64-bit value to rotate
 //! \param y the number of bit positions to rotate the value
 //! \details This is a Microsoft specific implementation using <tt>_lrotr</tt> provided by
