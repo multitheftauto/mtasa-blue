@@ -11,50 +11,44 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+
 #ifdef WIN32
+
 #include "CThreadCommandQueue.h"
 #include "CModManagerImpl.h"
 
-using std::string;
-
 void CThreadCommandQueue::Add ( const char* szCommand )
 {
-    // Lock the critical section, add it, then unlock
-    m_Critical.Lock ();
-    m_Commands.push_back ( szCommand );
-    m_Critical.Unlock ();
+    // Add command to queue thread-safe
+    m_Mutex.lock ( );
+    m_Commands.push ( szCommand );
+    m_Mutex.unlock ( );
 }
 
 
 void CThreadCommandQueue::Process ( bool& bRequestedQuit, CModManagerImpl* pModManager )
 {
     // Lock the critical section
-    m_Critical.Lock ();
+    m_Mutex.lock ( );
 
     // Got commands to process?
-    while ( m_Commands.size () > 0 )
+    while ( !m_Commands.empty ( ) )
     {
         // Grab the string
-        const string& str = m_Commands.front ();
+        auto str = m_Commands.front ( );
 
         // Check for the most important command: quit and exit.
         if ( str == "quit" || str == "exit" )
-        {
             bRequestedQuit = true;
-        }
-        else
-        {
-            // Otherwise, pass the command to the mod's input handler
-            if ( pModManager )
-                pModManager->HandleInput ( str.c_str () );
-        }
+        else if ( pModManager )
+            pModManager->HandleInput ( str.c_str ( ) );
 
         // Remove it from the queue
-        m_Commands.pop_front ();
+        m_Commands.pop ( );
     }
 
     // Unlock the critical section
-    m_Critical.Unlock ();
+    m_Mutex.unlock ( );
 }
 
 #endif

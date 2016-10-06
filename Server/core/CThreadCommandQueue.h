@@ -10,12 +10,12 @@
 *
 *****************************************************************************/
 
-#ifndef __CTHREADCOMMANDQUEUE_H
-#define __CTHREADCOMMANDQUEUE_H
+#pragma once
 
 #ifdef WIN32
 
-#include <list>
+#include <mutex>
+#include <queue>
 #include <string>
 
 class CThreadCommandQueue
@@ -25,10 +25,8 @@ public:
     void                Process         ( bool& bRequestedQuit, class CModManagerImpl* pModManager );
 
 private:
-    std::list < std::string >       m_Commands;
-    CCriticalSection                m_Critical;
+    std::queue < std::string >  m_Commands;
+    std::mutex                  m_Mutex;
 };
-
-#endif
 
 #endif
