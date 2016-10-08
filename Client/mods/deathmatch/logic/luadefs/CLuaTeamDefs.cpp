@@ -161,7 +161,7 @@ int CLuaTeamDefs::GetPlayersInTeam ( lua_State* luaVM )
 
             unsigned int uiIndex = 0;
 
-            for ( auto& pPlayer : pTeam->GetChildList() )
+            for ( auto& pPlayer : pTeam->GetPlayers() )
             {
                 if ( !pPlayer->IsBeingDeleted () )
                 {
