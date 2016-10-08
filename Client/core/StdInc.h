@@ -67,7 +67,6 @@
 #include <DXHook/CDirect3DEvents9.h>
 #include <DXHook/CProxyDirectInput8.h>
 #include <DXHook/CProxyDirect3D9.h>
-#include "CPEHookUtils.h"
 #include "CCommandFuncs.h"
 #include "CExceptionInformation_Impl.h"
 #include "CJoystickManager.h"
