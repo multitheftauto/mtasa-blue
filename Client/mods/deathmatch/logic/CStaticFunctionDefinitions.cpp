@@ -3842,7 +3842,7 @@ bool CStaticFunctionDefinitions::SetObjectStatic ( CClientEntity& Entity, bool b
     if ( IS_OBJECT ( &Entity ) )
     {
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-        Object.SetStatic ( bStatic );
+        Object.SetFrozen ( bStatic );
         return true;
     }
 

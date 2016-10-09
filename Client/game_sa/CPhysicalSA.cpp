@@ -366,7 +366,7 @@ void CPhysicalSA::SetFrozen ( bool bFrozen )
 {
     CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
     // Set movement ability
-    pInterface->bDisableMovement = bFrozen;
+    pInterface->bDontApplySpeed = bFrozen;
     // Set rotation movement ability
     pInterface->bDisableFriction = bFrozen;
 }

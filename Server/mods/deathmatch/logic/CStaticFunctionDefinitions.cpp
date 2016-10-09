@@ -924,7 +924,7 @@ bool CStaticFunctionDefinitions::IsElementFrozen ( CElement* pElement, bool &bFr
         case CElement::OBJECT:
         {
             CObject* pObject = static_cast < CObject* > ( pElement );
-            bFrozen = pObject->IsStatic ();
+            bFrozen = pObject->IsFrozen ();
             break;
         }
         default: return false;
@@ -1938,7 +1938,7 @@ bool CStaticFunctionDefinitions::SetElementFrozen ( CElement* pElement, bool bFr
         case CElement::OBJECT:
         {
             CObject * pObject = static_cast < CObject* > ( pElement );
-            pObject->SetStatic ( bFrozen );
+            pObject->SetFrozen ( bFrozen );
             break;
         }
         default: return false;
