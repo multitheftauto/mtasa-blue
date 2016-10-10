@@ -19,7 +19,7 @@
 
 void CCustomData::Copy ( CCustomData* pCustomData )
 {
-    for ( auto& iter : pCustomData->GetData() )
+    for ( auto& iter : m_Data )
     {
         Set ( iter.first.c_str (), iter.second.Variable );
     }

@@ -1391,8 +1391,8 @@ void CClientEntity::AddEntityFromRoot ( unsigned int uiTypeHash, CClientEntity* 
     listEntities.push_front ( pEntity );
 
     // Apply to child elements as well
-    for (auto& pElement : pEntity->GetChildList ())
-        CClientEntity::AddEntityFromRoot ( pElement->GetTypeHash (), pElement, false );
+    for (auto& pEntity : pEntity->GetChildList ())
+        CClientEntity::AddEntityFromRoot ( pEntity->GetTypeHash (), pEntity, false );
 
 #if CHECK_ENTITIES_FROM_ROOT
     if ( bDebugCheck )
@@ -1413,8 +1413,8 @@ void CClientEntity::RemoveEntityFromRoot ( unsigned int uiTypeHash, CClientEntit
     }
 
     // Apply to child elements as well
-    for (auto& pElement : pEntity->GetChildList())
-        CClientEntity::RemoveEntityFromRoot (pElement->GetTypeHash(), pElement);
+    for (auto& pEntity : pEntity->GetChildList())
+        CClientEntity::RemoveEntityFromRoot (pEntity->GetTypeHash(), pEntity);
 }
 
 void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn )
