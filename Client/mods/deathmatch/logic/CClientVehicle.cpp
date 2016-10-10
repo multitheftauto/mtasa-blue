@@ -2295,7 +2295,7 @@ void CClientVehicle::StreamedInPulse ( void )
         // Handle door ratio auto reallowment
         if ( !m_AutoReallowDoorRatioMap.empty() )
         {
-            for ( auto iter = m_AutoReallowDoorRatioMap.begin() ; iter != m_AutoReallowDoorRatioMap.end() ; )
+            for ( auto& iter = m_AutoReallowDoorRatioMap.begin() ; iter != m_AutoReallowDoorRatioMap.end() ; )
             {
                 if ( ( CTickCount::Now() - iter->second ).ToInt() > 4000 )
                 {

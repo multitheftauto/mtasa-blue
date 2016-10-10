@@ -349,7 +349,7 @@ bool CLocalServer::Save ( void )
         // Remove old resources from the config
         CXMLNode* pRoot = m_pConfig->GetRootNode();
         auto& list = pRoot->GetChildren();
-        for ( auto iter = list.begin(); iter != list.end(); ++iter )
+        for ( auto& iter = list.begin(); iter != list.end(); ++iter )
         {
             CXMLNode* pNode = reinterpret_cast < CXMLNode* > ( *iter );
             if ( pNode->GetTagName().compare ( "resource" ) == 0 )

@@ -87,7 +87,7 @@ void CClientDisplayManager::DoPulse ( void )
 {
     // Render all our displays
     m_bCanRemoveFromList = false;
-    auto iter  = m_List.begin ();
+    auto& iter  = m_List.begin ();
     while ( iter != m_List.end () )
     {
         CClientDisplay* pObject = *iter;

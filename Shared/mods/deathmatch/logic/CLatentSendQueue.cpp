@@ -170,7 +170,7 @@ SSendHandle CLatentSendQueue::AddSend ( CBufferRef bufferRef, uint uiRate, ushor
 ///////////////////////////////////////////////////////////////
 bool CLatentSendQueue::CancelSend ( SSendHandle handle )
 {
-    for ( auto iter = m_TxQueue.begin(); iter != m_TxQueue.end(); ++iter )
+    for ( auto& iter = m_TxQueue.begin(); iter != m_TxQueue.end(); ++iter )
     {
         if ( iter->uiId == handle )
         {
@@ -330,7 +330,7 @@ void CLatentSendQueue::SendCancelNotification ( SSendItem& activeTx )
 ///////////////////////////////////////////////////////////////
 bool CLatentSendQueue::OnLuaMainDestroy ( void* pLuaMain )
 {
-    for ( auto iter = m_TxQueue.begin () ; iter != m_TxQueue.end () ;  )
+    for ( auto& iter = m_TxQueue.begin () ; iter != m_TxQueue.end () ;  )
     {
         if ( iter->pLuaMain == pLuaMain && !iter->bSendFinishing )
         {

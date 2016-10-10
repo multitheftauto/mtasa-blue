@@ -409,7 +409,7 @@ void CClientSoundManager::ProcessStopQueues( bool bFlush )
         }
     }
 
-    for( auto iter = m_AudioStopQueue.begin() ; iter != m_AudioStopQueue.end() ;)
+    for( auto& iter = m_AudioStopQueue.begin() ; iter != m_AudioStopQueue.end() ;)
     {
         if ( iter->second.Get() > 100 || bFlush )
         {
