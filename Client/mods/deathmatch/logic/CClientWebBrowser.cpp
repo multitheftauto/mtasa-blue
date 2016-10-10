@@ -335,9 +335,8 @@ CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, bool isTransparent, u
     : CClientGUIElement ( pManager, pLuaMain, pCGUIElement, ID )
 {
     m_pManager = pManager;
-    m_pBrowser.reset(g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser(width, height, isLocal, isTransparent));
-    m_pBrowser->SetParent(this); // Memory management is no longer done via element tree logic, but is kept here for backwards compatibility
-    m_pBrowser->MakeSystemEntity(); // Mark element as system entity so it isn't destroyed automatically
+    m_pBrowser = g_pClientGame->GetManager ()->GetRenderElementManager ()->CreateWebBrowser ( width, height, isLocal, isTransparent );
+    m_pBrowser->SetParent ( this ); // m_pBrowser gets deleted automatically by the element tree logic
     
     // Set our owner resource
     m_pBrowser->SetResource ( pLuaMain->GetResource () );
