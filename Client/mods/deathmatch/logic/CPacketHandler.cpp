@@ -2911,9 +2911,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
                         pObject->SetScale ( vecScale );
 
-                        bool bStatic;
-                        if ( bitStream.ReadBit ( bStatic ) )
-                            pObject->SetStatic ( bStatic );
+                        bool bFrozen;
+                        if ( bitStream.ReadBit ( bFrozen ) )
+                            pObject->SetFrozen ( bFrozen );
 
                         SObjectHealthSync health;
                         if ( bitStream.Read ( &health ) )
