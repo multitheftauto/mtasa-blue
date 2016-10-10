@@ -148,7 +148,6 @@ public:
     // Configuration
     void                    ApplyConsoleSettings            ( void );
     void                    ApplyGameSettings               ( void );
-    void                    ApplyCommunityState             ( void );
     void                    UpdateRecentlyPlayed            ( void );
 
     // Net

@@ -27,13 +27,6 @@ using namespace std;
 #define CORE_SETTINGS_HEADERS           3
 #define CORE_SETTINGS_HEADER_SPACER     " "
 #define CORE_SETTINGS_NO_KEY            " "
-#define CORE_SETTINGS_COMMUNITY_TEXT    \
-    "Multi Theft Auto: Community is a voluntary community service offering everything\n" \
-    "from third-party resources to user-based statistics.\n" \
-    "\n" \
-    "If you have already registered at community.mtasa.com,\n" \
-    "you can fill in your account details below to complete your registration.\n" \
-    "This computer will then automatically link to your personal account."
 
 extern CCore* g_pCore;
 extern SBindableGTAControl g_bcControls[];
@@ -66,7 +59,7 @@ void CSettings::CreateGUI ( void )
     if ( m_pWindow )
         DestroyGUI ();
 
-    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabInterface, *pTabBrowser, *pTabAdvanced;
+    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabInterface, *pTabBrowser, *pTabAdvanced;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -130,7 +123,6 @@ void CSettings::CreateGUI ( void )
     pTabInterface = m_pTabs->CreateTab ( _("Interface") );
     pTabBrowser = m_pTabs->CreateTab ( _("Web Browser") );
     pTabAdvanced = m_pTabs->CreateTab ( _("Advanced") );
-    pTabCommunity = m_pTabs->CreateTab ( _("Community") );
 
     // Create buttons
     //  OK button
@@ -1502,10 +1494,6 @@ void CSettings::CreateGUI ( void )
     m_pButtonBrowserBlacklistRemove->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserBlacklistRemove, this ) );
     m_pButtonBrowserWhitelistAdd->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserWhitelistAdd, this ) );
     m_pButtonBrowserWhitelistRemove->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserWhitelistRemove, this ) );
-    /*
-    // Give a warning if no community account settings were stored in config
-    CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, _("Multi Theft Auto: Community settings"), MB_ICON_WARNING );
-    */
 
     // Set up the events for advanced description 
     m_pPriorityLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
