@@ -22,11 +22,11 @@ extern CCore* g_pCore;
 extern bool g_bInGTAScene;
 extern bool g_bInMTAScene;
 
+using namespace std;
+
 template<> CGraphics * CSingleton< CGraphics >::m_pSingleton = NULL;
 
-CGraphics::CGraphics ( CLocalGUI* pGUI ) :
-    m_Line3DBatcherPreGUI(true),
-    m_Line3DBatcherPostGUI(false)
+CGraphics::CGraphics ( CLocalGUI* pGUI )
 {
     m_pGUI = pGUI;
     memset ( m_pDXFonts, 0, sizeof ( m_pDXFonts ) );
@@ -40,9 +40,17 @@ CGraphics::CGraphics ( CLocalGUI* pGUI ) :
     m_ActiveBlendMode = EBlendMode::BLEND;
     m_CurDrawMode = EDrawMode::NONE;
     m_CurBlendMode = EBlendMode::BLEND;
+
+    m_pRenderItemManager = new CRenderItemManager ();
+    m_pTileBatcher = new CTileBatcher ();
+    m_pLine3DBatcherPreGUI = new CLine3DBatcher ( true );
+    m_pLine3DBatcherPostGUI = new CLine3DBatcher ( false );
+    m_pMaterialLine3DBatcher = new CMaterialLine3DBatcher ();
+
     m_pScreenGrabber = NewScreenGrabber ();
     m_pPixelsManager = NewPixelsManager ();
     m_LastLostDeviceTimer.SetMaxIncrement( 250 );
+    m_pAspectRatioConverter = new CAspectRatioConverter();
 }
 
 
@@ -55,8 +63,14 @@ CGraphics::~CGraphics ( void )
 
     SAFE_RELEASE ( m_ProgressSpinnerTexture );
     SAFE_RELEASE ( m_RectangleEdgeTexture );
+    SAFE_DELETE ( m_pRenderItemManager );
+    SAFE_DELETE ( m_pTileBatcher );
+    SAFE_DELETE ( m_pLine3DBatcherPreGUI );
+    SAFE_DELETE ( m_pLine3DBatcherPostGUI );
+    SAFE_DELETE ( m_pMaterialLine3DBatcher );
     SAFE_DELETE ( m_pScreenGrabber );
     SAFE_DELETE ( m_pPixelsManager );
+    SAFE_DELETE ( m_pAspectRatioConverter );
 }
 
 
@@ -199,33 +213,33 @@ void CGraphics::DrawRectangle ( float fX, float fY, float fWidth, float fHeight,
 // 
 void CGraphics::SetAspectRatioAdjustmentEnabled( bool bEnabled, float fSourceRatio )
 {
-    m_AspectRatioConverter.SetSourceRatioValue( bEnabled ? fSourceRatio : 0 );
+    m_pAspectRatioConverter->SetSourceRatioValue( bEnabled ? fSourceRatio : 0 );
 }
 
 bool CGraphics::IsAspectRatioAdjustmentEnabled( void )
 {
-    return m_AspectRatioConverter.IsEnabled();
+    return m_pAspectRatioConverter->IsEnabled();
 }
 
 float CGraphics::GetAspectRatioAdjustmentSourceRatio( void )
 {
-    return m_AspectRatioConverter.GetSourceRatioValue();
+    return m_pAspectRatioConverter->GetSourceRatioValue();
 }
 
 void CGraphics::SetAspectRatioAdjustmentSuspended( bool bSuspended )
 {
-    m_AspectRatioConverter.SetSuspended( bSuspended );
+    m_pAspectRatioConverter->SetSuspended( bSuspended );
 }
 
 
 float CGraphics::ConvertPositionForAspectRatio( float fY )
 {
-    return m_AspectRatioConverter.ConvertPositionForAspectRatio( fY );
+    return m_pAspectRatioConverter->ConvertPositionForAspectRatio( fY );
 }
 
 void CGraphics::ConvertSideForAspectRatio( float* pfY, float* pfHeight )
 {
-    m_AspectRatioConverter.ConvertSideForAspectRatio( pfY, pfHeight );
+    m_pAspectRatioConverter->ConvertSideForAspectRatio( pfY, pfHeight );
 }
 
 
@@ -428,7 +442,7 @@ void CGraphics::CheckModes ( EDrawModeType newDrawMode, EBlendModeType newBlendM
         else
         if ( m_CurDrawMode == EDrawMode::TILE_BATCHER )
         {
-            m_TileBatcher.Flush ();
+            m_pTileBatcher->Flush ();
         }
 
 
@@ -442,7 +456,11 @@ void CGraphics::CheckModes ( EDrawModeType newDrawMode, EBlendModeType newBlendM
         {
             m_pLineInterface->Begin ();
         }
+    }
 
+    // Blend mode changing?
+    if ( bDrawModeChanging || bBlendModeChanging )
+    {
         SetBlendModeRenderStates ( newBlendMode );
     }
 
@@ -679,8 +697,8 @@ void CGraphics::DrawLineQueued ( float fX1, float fY1,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
-    fY1 = m_AspectRatioConverter.ConvertPositionForAspectRatio( fY1 );
-    fY2 = m_AspectRatioConverter.ConvertPositionForAspectRatio( fY2 );
+    fY1 = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fY1 );
+    fY2 = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fY2 );
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -709,9 +727,9 @@ void CGraphics::DrawLine3DQueued ( const CVector& vecBegin,
 
     // Add it to the queue
     if ( bPostGUI )
-        m_Line3DBatcherPostGUI.AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
+        m_pLine3DBatcherPostGUI->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
     else
-        m_Line3DBatcherPreGUI.AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
+        m_pLine3DBatcherPreGUI->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor ); 
 }
 
 void CGraphics::DrawMaterialLine3DQueued ( const CVector& vecBegin,
@@ -735,7 +753,7 @@ void CGraphics::DrawMaterialLine3DQueued ( const CVector& vecBegin,
     }
 
     // Add it to the queue
-    m_MaterialLine3DBatcher.AddLine3D ( vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward, vecFaceToward ); 
+    m_pMaterialLine3DBatcher->AddLine3D ( vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward, vecFaceToward ); 
 }
 
 
@@ -746,7 +764,7 @@ void CGraphics::DrawRectQueued ( float fX, float fY,
                                  bool bPostGUI,
                                  bool bSubPixelPositioning )
 {
-    m_AspectRatioConverter.ConvertSideForAspectRatio( &fY, &fHeight );
+    m_pAspectRatioConverter->ConvertSideForAspectRatio( &fY, &fHeight );
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -776,7 +794,7 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
                                  unsigned long ulColor,
                                  bool bPostGUI )
 {
-    m_AspectRatioConverter.ConvertSideForAspectRatio( &fY, &fHeight );
+    m_pAspectRatioConverter->ConvertSideForAspectRatio( &fY, &fHeight );
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -847,8 +865,8 @@ void CGraphics::DrawTextQueued ( float fLeft, float fTop,
     if ( !pDXFont )
         return;
 
-    fTop = m_AspectRatioConverter.ConvertPositionForAspectRatio( fTop );
-    fBottom = m_AspectRatioConverter.ConvertPositionForAspectRatio( fBottom );
+    fTop = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fTop );
+    fBottom = m_pAspectRatioConverter->ConvertPositionForAspectRatio( fBottom );
 
     if ( !bColorCoded )
     {
@@ -1256,16 +1274,16 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     // Create drawing devices
     D3DXCreateLine ( pDevice, &m_pLineInterface );
 
-    m_TileBatcher.OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
-    m_Line3DBatcherPreGUI.OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
-    m_Line3DBatcherPostGUI.OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
-    m_MaterialLine3DBatcher.OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
-    m_RenderItemManager.OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pTileBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pLine3DBatcherPreGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pLine3DBatcherPostGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pMaterialLine3DBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pScreenGrabber->OnDeviceCreate ( pDevice );
     m_pPixelsManager->OnDeviceCreate ( pDevice );
     m_ProgressSpinnerTexture = GetRenderItemManager ()->CreateTexture ( CalcMTASAPath( "MTA\\cgui\\images\\busy_spinner.png" ), NULL, false, -1, -1, RFORMAT_DXT3, TADDRESS_CLAMP );
     m_RectangleEdgeTexture = GetRenderItemManager ()->CreateTexture ( CalcMTASAPath( "MTA\\cgui\\images\\rect_edge.png" ), NULL, false, 8, 8, RFORMAT_ARGB, TADDRESS_CLAMP );
-    m_AspectRatioConverter.Init( GetViewportHeight () );
+    m_pAspectRatioConverter->Init( GetViewportHeight () );
 }
 
 
@@ -1287,7 +1305,7 @@ void CGraphics::OnDeviceInvalidate ( IDirect3DDevice9 * pDevice )
     if ( m_pLineInterface )
         m_pLineInterface->OnLostDevice ();
 
-    m_RenderItemManager.OnLostDevice ();
+    m_pRenderItemManager->OnLostDevice ();
     m_pScreenGrabber->OnLostDevice ();
     SAFE_RELEASE( m_pSavedFrontBufferData );
     SAFE_RELEASE( m_pTempBackBufferData );
@@ -1312,20 +1330,20 @@ void CGraphics::OnDeviceRestore ( IDirect3DDevice9 * pDevice )
     if ( m_pLineInterface )
         m_pLineInterface->OnResetDevice ();
 
-    m_RenderItemManager.OnResetDevice ();
+    m_pRenderItemManager->OnResetDevice ();
     m_pScreenGrabber->OnResetDevice ();
 }
 
 
 void CGraphics::OnZBufferModified ( void )
 {
-    m_TileBatcher.OnZBufferModified ();
+    m_pTileBatcher->OnZBufferModified ();
 }
 
 
 void CGraphics::DrawPreGUIQueue ( void )
 {
-    m_Line3DBatcherPreGUI.Flush ();
+    m_pLine3DBatcherPreGUI->Flush ();
     DrawQueue ( m_PreGUIQueue );
 }
 
@@ -1333,7 +1351,7 @@ void CGraphics::DrawPreGUIQueue ( void )
 void CGraphics::DrawPostGUIQueue ( void )
 {
     DrawQueue ( m_PostGUIQueue );
-    m_Line3DBatcherPostGUI.Flush ();
+    m_pLine3DBatcherPostGUI->Flush ();
 
     // Both queues should be empty now, and there should be no outstanding refs
     assert ( m_PreGUIQueue.empty () && m_iDebugQueueRefs == 0 );
@@ -1341,12 +1359,12 @@ void CGraphics::DrawPostGUIQueue ( void )
 
 void CGraphics::DrawMaterialLine3DQueue ( void )
 {
-    m_MaterialLine3DBatcher.Flush ();
+    m_pMaterialLine3DBatcher->Flush ();
 }
 
 bool CGraphics::HasMaterialLine3DQueueItems ( void )
 {
-    return m_MaterialLine3DBatcher.HasItems ();
+    return m_pMaterialLine3DBatcher->HasItems ();
 }
 
 
@@ -1357,10 +1375,11 @@ void CGraphics::DrawQueue ( std::vector < sDrawQueueItem >& Queue )
     if ( Queue.size () > 0 )
     {
         // Loop through it
-        for ( auto& pItem : Queue )
+        std::vector < sDrawQueueItem >::iterator iter = Queue.begin ();
+        for ( ; iter != Queue.end (); iter++ )
         {
             // Draw the item
-            DrawQueueItem ( pItem );
+            DrawQueueItem ( *iter );
         }
 
         // Clear the list
@@ -1496,7 +1515,7 @@ void CGraphics::DrawQueueItem ( const sDrawQueueItem& Item )
                 fV2 *= fVScale;
             }
             CheckModes ( EDrawMode::TILE_BATCHER );
-            m_TileBatcher.AddTile ( t.fX, t.fY, t.fX+t.fWidth, t.fY+t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY, t.ulColor );
+            m_pTileBatcher->AddTile ( t.fX, t.fY, t.fX+t.fWidth, t.fY+t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY, t.ulColor );
             RemoveQueueRef ( Item.Texture.pMaterial );
             break;
         }
@@ -1532,8 +1551,9 @@ ID3DXFont* CGraphics::MaybeGetBigFont ( ID3DXFont* pDXFont, float& fScaleX, floa
 //
 void CGraphics::ClearDrawQueue ( std::vector < sDrawQueueItem >& Queue )
 {
-    for ( const auto& item : Queue )
+    for ( std::vector < sDrawQueueItem >::const_iterator iter = Queue.begin () ; iter != Queue.end (); iter++ )
     {
+        const sDrawQueueItem& item = *iter;
         if ( item.eType == QUEUE_TEXTURE || item.eType == QUEUE_SHADER )
             RemoveQueueRef ( item.Texture.pMaterial );
         else
@@ -1577,7 +1597,7 @@ void CGraphics::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewView
     // Flush dx draws
     DrawPreGUIQueue ();
     // Inform tile batcher
-    m_TileBatcher.OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
+    m_pTileBatcher->OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
 }
 
 
@@ -1731,7 +1751,7 @@ void CGraphics::DidRenderScene( void )
     float fTargetAspectRatioValue = 0;
     if ( CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) )
         fTargetAspectRatioValue = CCore::GetSingleton ().GetGame ()->GetSettings ()->GetAspectRatioValue();
-    m_AspectRatioConverter.Pulse( fTargetAspectRatioValue );
+    m_pAspectRatioConverter->Pulse( fTargetAspectRatioValue );
 }
 
 
@@ -1757,7 +1777,7 @@ void CGraphics::SetProgressMessage( const SString& strMessage )
     if ( g_pCore->IsWindowMinimized() )
         return;
 
-    if ( !m_RenderItemManager.IsUsingDefaultRenderTarget() )
+    if ( !m_pRenderItemManager->IsUsingDefaultRenderTarget() )
         return;
 
     if ( m_LastDrawnProgressTimer.Get() < 100 )

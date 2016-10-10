@@ -14,6 +14,7 @@
 
 #include "StdInc.h"
 #include "net/packetenums.h"
+using namespace std;
 
 static CConnectManager* g_pConnectManager = NULL;
 extern CCore* g_pCore;
@@ -30,7 +31,7 @@ CConnectManager::CConnectManager ( void )
     m_bSave = true;
     m_tConnectStarted = 0;
 
-    m_pOnCancelClick = std::make_unique<GUI_CALLBACK>( &CConnectManager::Event_OnCancelClick, this );
+    m_pOnCancelClick = new GUI_CALLBACK ( &CConnectManager::Event_OnCancelClick, this );
 
     m_pServerItem = NULL;
     m_bNotifyServerBrowser = false;
@@ -39,6 +40,13 @@ CConnectManager::CConnectManager ( void )
 
 CConnectManager::~CConnectManager ( void )
 {
+    if ( m_pOnCancelClick )
+    {
+        delete m_pOnCancelClick;
+        m_pOnCancelClick = NULL;
+    }
+
+    SAFE_DELETE ( m_pServerItem );
     g_pConnectManager = NULL;
 }
 
@@ -130,14 +138,15 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
         m_strPassword = CServerBrowser::GetSingletonPtr()->GetServerPassword ( m_strHost + ":" + SString ( "%u", m_usPort ) );
 
     // Start server version detection
-    m_pServerItem = std::make_unique<CServerListItem>(m_Address, m_usPort);
+    SAFE_DELETE ( m_pServerItem );
+    m_pServerItem = new CServerListItem ( m_Address, m_usPort );
     m_pServerItem->m_iTimeoutLength = 2000;
     m_bIsDetectingVersion = true;
     OpenServerFirewall( m_Address, 80, true );
 
     // Display the status box
     SString strBuffer ( _("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort );
-    CCore::GetSingleton ().ShowMessageBox ( _("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick.get() );
+    CCore::GetSingleton ().ShowMessageBox ( _("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick );
     WriteDebugEvent( SString( "Connecting to %s:%u ...", m_strHost.c_str(), m_usPort ) );
 
     return true;
@@ -208,7 +217,7 @@ bool CConnectManager::Abort ( void )
     m_bIsConnecting = false;
     m_bIsDetectingVersion = false;
     m_tConnectStarted = 0;
-    m_pServerItem.reset();
+    SAFE_DELETE ( m_pServerItem );
 
     // Success
     return true;
@@ -310,6 +319,7 @@ void CConnectManager::DoPulse ( void )
                 else // Otherwise, remove the message box and hide quick connect
                 {
                     CCore::GetSingleton ().RemoveMessageBox( false );
+                    CCore::GetSingleton ().HideQuickConnect ();
                 }
 
                 CCore::GetSingleton ().GetNetwork ()->SetConnectionError ( 0 );
@@ -357,6 +367,11 @@ bool CConnectManager::StaticProcessPacket ( unsigned char ucPacketID, NetBitStre
 
                 // Hide the messagebox we're currently showing
                 CCore::GetSingleton ().RemoveMessageBox ();
+
+                // If we connected from quick-connect, get rid of it
+                CQuickConnect * pQuickConnect = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuickConnectWindow ();
+                if ( pQuickConnect->IsVisible () )
+                    pQuickConnect->SetVisible ( false );
 
                 // Save the connection details into the config
                 if ( g_pConnectManager->m_bSave )

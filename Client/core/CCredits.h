@@ -22,6 +22,7 @@ class CCredits
 {
 public:
                     CCredits            ( void );
+                    ~CCredits           ( void );
 
     void            SetVisible          ( bool bVisible );
     bool            IsVisible           ( void );
@@ -31,9 +32,9 @@ public:
     bool            OnOKButtonClick     ( CGUIElement* pElement );
 
 private:
-    std::unique_ptr<CGUIWindow> m_pWindow;
-    std::unique_ptr<CGUILabel>  m_pLabels [30];
-    std::unique_ptr<CGUIButton> m_pButtonOK;
+    CGUIWindow*             m_pWindow;
+    CGUILabel*              m_pLabels [30];
+    CGUIButton*             m_pButtonOK;
     SString                 m_strCredits;
 
     clock_t                 m_clkStart;

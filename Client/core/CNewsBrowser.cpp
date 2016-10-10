@@ -40,6 +40,7 @@ CNewsBrowser::CNewsBrowser ( void )
 ////////////////////////////////////////////////////
 CNewsBrowser::~CNewsBrowser ( void )
 {
+    DestroyGUI ();
 }
 
 
@@ -155,7 +156,7 @@ void CNewsBrowser::CreateGUI ( void )
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Create the window
-    m_pWindow.reset(pManager->CreateWnd(NULL, "NEWS"));
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( pManager->CreateWnd ( NULL, "NEWS" ) );
     m_pWindow->SetCloseButtonEnabled ( true );
     m_pWindow->SetMovable ( true );
 
@@ -168,7 +169,7 @@ void CNewsBrowser::CreateGUI ( void )
 
     // Create buttons
     //  OK button
-    m_pButtonOK.reset( pManager->CreateButton ( m_pWindow.get(), "OK" ) );
+    m_pButtonOK = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pWindow, "OK" ) );
     m_pButtonOK->SetPosition ( CVector2D ( 560.0f - 60, 480.0f - 30 ) );
     m_pButtonOK->SetZOrderingEnabled ( false );
 
@@ -177,14 +178,51 @@ void CNewsBrowser::CreateGUI ( void )
     m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CNewsBrowser::OnOKButtonClick, this ) );
 
     // Create the tab panel and necessary tabs
-    m_pTabPanel.reset( pManager->CreateTabPanel ( m_pWindow.get() ) );
+    m_pTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
     m_pTabPanel->SetPosition ( CVector2D ( 0, 20.0f ) );
     m_pTabPanel->SetSize ( CVector2D ( 640.0f, 480.0f - 60 ) );
 
-    for ( auto& tab : m_NewsitemList )
+    for ( uint i = 0; i < m_NewsitemList.size () ; i++ )
     {
-        AddNewsTab ( tab );
+        AddNewsTab ( m_NewsitemList[i] );
     }
+}
+
+
+////////////////////////////////////////////////////
+//
+//  CNewsBrowser::DestroyGUI
+//
+//
+//
+////////////////////////////////////////////////////
+void CNewsBrowser::DestroyGUI ( void )
+{
+    // Destroy
+    for ( uint i = 0 ; i < m_TabList.size () ; i++ )
+    {
+        CGUITab* pTab = m_TabList[i];
+        if ( pTab )
+            delete pTab;
+    }
+    m_TabList.clear ();
+    for ( uint i = 0 ; i < m_TabContentList.size () ; i++ )
+    {
+        CGUIWindow* pWindow = m_TabContentList[i];
+        if ( pWindow )
+        {
+            CGUIElement* m_pScrollPane = pWindow->GetParent ();
+            if ( m_pScrollPane )
+            {
+                delete m_pScrollPane;
+            }
+            delete pWindow;
+        }
+    }
+    m_TabContentList.clear ();
+    SAFE_DELETE ( m_pTabPanel );
+    SAFE_DELETE ( m_pButtonOK );
+    SAFE_DELETE ( m_pWindow );
 }
 
 
@@ -200,7 +238,7 @@ void CNewsBrowser::AddNewsTab ( const SNewsItem& newsItem )
     CGUI *pManager = g_pCore->GetGUI ();
 
     CGUITab* pTab = m_pTabPanel->CreateTab ( "News" );
-    m_TabList.push_back(std::unique_ptr<CGUITab>(pTab));
+    m_TabList.push_back ( pTab );
 
     //Create everything under a scrollpane
     CGUIScrollPane* m_pScrollPane = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTab ) ); 
@@ -215,7 +253,7 @@ void CNewsBrowser::AddNewsTab ( const SNewsItem& newsItem )
 
     // Load files
     CGUIWindow* pWindow = LoadLayoutAndImages ( m_pScrollPane, newsItem );
-    m_TabContentList.push_back(std::unique_ptr<CGUIWindow>(pWindow));
+    m_TabContentList.push_back ( pWindow );
 
     // Set tab name from content window title
     if ( pWindow )
@@ -279,7 +317,7 @@ CGUIWindow* CNewsBrowser::LoadLayoutAndImages ( CGUIElement* pParent, const SNew
 void CNewsBrowser::SwitchToTab ( int iIndex )
 {
     if ( iIndex >= 0 && iIndex < (int)m_TabList.size () )
-        m_pTabPanel->SetSelectedTab ( m_TabList[iIndex].get() );
+        m_pTabPanel->SetSelectedTab ( m_TabList[iIndex] );
 }
 
 
@@ -294,6 +332,13 @@ void CNewsBrowser::SetVisible ( bool bVisible )
 {
     if ( !bVisible && !m_pWindow )
         return;
+
+    // HACK: Recreate GUI if left shift held (for editing)
+    if ( ( GetAsyncKeyState ( VK_LSHIFT ) & 0x8000 ) != 0 )
+    {
+        DestroyGUI ();
+        CreateGUI ();
+    }
 
     if ( !m_pWindow )
         CreateGUI ();
