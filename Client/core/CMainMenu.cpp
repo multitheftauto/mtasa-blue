@@ -309,7 +309,7 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     std::int32_t buffer = 0xFFFF0000;
     m_pFeatureBranchAlertTexture->LoadFromMemory(&buffer, 1, 1); // HACK: Load red dot
 
-    m_pFeatureBranchAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground.get())));
+    m_pFeatureBranchAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
     m_pFeatureBranchAlertImage->LoadFromTexture(m_pFeatureBranchAlertTexture.get());
     m_pFeatureBranchAlertImage->SetPosition({ 0.0f, 0.0f }, false);
     m_pFeatureBranchAlertImage->SetSize({ ScreenSize.fX, 35.0f });
