@@ -48,6 +48,7 @@
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
 #include "CElementDeleter.h"
+#include "CFoo.h"
 #include "CRegisteredCommands.h"
 #include "CClientGUIElement.h"
 #include "CLocalServer.h"
@@ -766,6 +767,9 @@ private:
     bool                                m_bShowCollision;
     bool                                m_bShowSound;
 
+    // Debug class. Empty in release.
+public:
+    CFoo                                m_Foo;
 
 private:
 

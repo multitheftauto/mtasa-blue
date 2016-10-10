@@ -19,7 +19,7 @@
 class CObjectRespawner
 {
 public:
-                                CObjectRespawner        ( void ) = default;
+                                CObjectRespawner        ( void );
     inline                      ~CObjectRespawner       ( void )        { DoRespawnAll (); };
 
     void                        Respawn                 ( CClientObject* pObject );

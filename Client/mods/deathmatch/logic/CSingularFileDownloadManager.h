@@ -30,7 +30,7 @@ class CSingularFileDownloadManager
 
 public:
     
-                                CSingularFileDownloadManager    ( void ) = default;
+                                CSingularFileDownloadManager    ( void );
                                 ~CSingularFileDownloadManager   ( void );
 
     CSingularFileDownload*      AddFile                         ( CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum checksum = CChecksum () );

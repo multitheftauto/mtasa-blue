@@ -183,7 +183,7 @@ public:
     //
     // ConstIterator / Iterator
     //
-    class ConstIterator : std::iterator<std::forward_iterator_tag, T, std::size_t, T*, T&>
+    class ConstIterator
     {
     public:
         typename MapType::const_iterator iter;
@@ -196,7 +196,7 @@ public:
         const T& operator* ( void ) const                           { return iter->second; }
     };
 
-    class Iterator : public std::iterator<std::forward_iterator_tag, T, std::size_t, T*, T&>
+    class Iterator
     {
     public:
         typename MapType::iterator iter;
@@ -213,7 +213,7 @@ public:
     //
     // ConstReverseIterator / ReverseIterator
     //
-    class ConstReverseIterator : public std::iterator<std::forward_iterator_tag, T, std::size_t, T*, T&>
+    class ConstReverseIterator
     {
     public:
         typename MapType::const_reverse_iterator iter;
@@ -226,7 +226,7 @@ public:
         const T& operator* ( void ) const                           { return iter->second; }
     };
 
-    class ReverseIterator : public std::iterator<std::forward_iterator_tag, T, std::size_t, T*, T&>
+    class ReverseIterator
     {
     public:
         typename MapType::reverse_iterator iter;

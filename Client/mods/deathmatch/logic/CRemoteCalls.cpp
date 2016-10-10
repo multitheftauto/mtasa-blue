@@ -12,11 +12,19 @@
 
 #include "StdInc.h"
 
+using std::list;
+
+CRemoteCalls::CRemoteCalls()
+{
+    
+}
+
 CRemoteCalls::~CRemoteCalls()
 {
-    for ( auto& pCall : m_calls )
+    list< CRemoteCall* >::iterator iter = m_calls.begin ();
+    for ( ; iter != m_calls.end (); iter++ )
     {
-        delete pCall;
+        delete (*iter);
     }
 
     m_calls.clear();
@@ -43,19 +51,21 @@ void CRemoteCalls::Call ( const char * szURL, CLuaArguments * fetchArguments, co
 
 void CRemoteCalls::Remove ( CLuaMain * lua )
 {
-    std::list<CRemoteCall *> trash;
-    for ( auto& pCall : m_calls )
+    list<CRemoteCall *> trash;
+    list< CRemoteCall* >::iterator iter = m_calls.begin ();
+    for ( ; iter != m_calls.end (); iter++ )
     {
-        if ( pCall->GetVM() == lua )
+        if ( (*iter)->GetVM() == lua )
         {
-            trash.push_back(pCall);
+            trash.push_back((*iter));
         }
     }
 
-    for ( auto& pCall : trash )
+    iter = trash.begin ();
+    for ( ; iter != trash.end (); iter++ )
     {
-        m_calls.remove (pCall);
-        delete pCall;
+        m_calls.remove ( (*iter));
+        delete (*iter);
     }
 }
 
@@ -67,9 +77,10 @@ void CRemoteCalls::Remove ( CRemoteCall * call )
 
 bool CRemoteCalls::CallExists ( CRemoteCall * call )
 {
-    for ( auto& pCall : m_calls )
+    list< CRemoteCall* >::iterator iter = m_calls.begin ();
+    for ( ; iter != m_calls.end (); iter++ )
     {
-        if ( pCall == call )
+        if ( (*iter) == call )
             return true;
     }
     return false;
@@ -120,6 +131,11 @@ CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, c
     m_strURL = szURL;
     m_uiConnectionAttempts = uiConnectionAttempts;
     m_uiConnectTimeoutMs = uiConnectTimeoutMs;
+}
+
+
+CRemoteCall::~CRemoteCall () 
+{
 }
 
 void CRemoteCall::MakeCall()

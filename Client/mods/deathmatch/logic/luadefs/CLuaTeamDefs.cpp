@@ -161,8 +161,10 @@ int CLuaTeamDefs::GetPlayersInTeam ( lua_State* luaVM )
 
             unsigned int uiIndex = 0;
 
-            for ( auto& pPlayer : pTeam->GetChildList() )
+            list < CClientPlayer* > ::const_iterator iter = pTeam->IterBegin ();
+            for ( ; iter != pTeam->IterEnd (); iter++ )
             {
+                CClientPlayer* pPlayer = *iter;
                 if ( !pPlayer->IsBeingDeleted () )
                 {
                     lua_pushnumber ( luaVM, ++uiIndex );

@@ -807,16 +807,10 @@ namespace SharedUtil
         bool Contains ( const T& item ) const { return MapContains ( m_Map, item ); }
 
         // list only
-        using iterator = typename LIST_TYPE::iterator;
-        using const_iterator = typename LIST_TYPE::const_iterator;
-        using reverse_iterator = typename LIST_TYPE::reverse_iterator;
-
-        iterator                                    begin ( void )          { return m_List.begin (); }
-        iterator                                    end ( void )            { return m_List.end (); }
-        const_iterator                              begin ( void ) const    { return m_List.begin(); }
-        const_iterator                              end ( void ) const      { return m_List.end(); }  
-        reverse_iterator                            rbegin ( void )         { return m_List.rbegin (); }
-        reverse_iterator                            rend ( void )           { return m_List.rend (); }
+        typename LIST_TYPE ::iterator               begin ( void )          { return m_List.begin (); }
+        typename LIST_TYPE ::iterator               end ( void )            { return m_List.end (); }
+        typename LIST_TYPE ::reverse_iterator       rbegin ( void )         { return m_List.rbegin (); }
+        typename LIST_TYPE ::reverse_iterator       rend ( void )           { return m_List.rend (); }
         uint                                        size ( void ) const     { return m_List.size (); }
         bool                                        empty ( void ) const    { return m_List.empty (); }
         const T&                                    back ( void ) const     { return m_List.back (); }

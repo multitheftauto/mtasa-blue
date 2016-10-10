@@ -17,6 +17,7 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
+using std::list;
 
 extern CClientGame* g_pClientGame;
 
@@ -94,9 +95,10 @@ void CUnoccupiedVehicleSync::RemoveVehicle ( CDeathmatchVehicle* pVehicle )
 void CUnoccupiedVehicleSync::ClearVehicles ( void )
 {
     // Mark all vehicles as 'not syncing'
-    for ( auto& pVehicle : m_List )
+    list < CDeathmatchVehicle* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        pVehicle->SetIsSyncing ( false );
+        (*iter)->SetIsSyncing ( false );
     }
 
     // Clear the list
@@ -225,10 +227,11 @@ void CUnoccupiedVehicleSync::UpdateDamageModels ( void )
     // Got any items?
     if ( m_List.size () > 0 )
     {
-        for ( auto& pVehicle : m_List )
+        list < CDeathmatchVehicle* > ::const_iterator iter = m_List.begin ();
+        for ( ; iter != m_List.end (); iter++ )
         {
             // Sync its damage model changes if neccessary
-            pVehicle->SyncDamageModel ();
+            (*iter)->SyncDamageModel ();
         }           
     }
 }
@@ -245,9 +248,10 @@ void CUnoccupiedVehicleSync::UpdateStates ( void )
         {
             // Write each vehicle to it
             bool bAnyVehicleAdded = false;
-            for (auto& pVehicle : m_List)
+            list < CDeathmatchVehicle* > ::const_iterator iter = m_List.begin ();
+            for ( ; iter != m_List.end (); iter++ )
             {
-                if ( WriteVehicleInformation ( pBitStream, pVehicle ) )
+                if ( WriteVehicleInformation ( pBitStream, *iter ) )
                     bAnyVehicleAdded = true;
             }
 

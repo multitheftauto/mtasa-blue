@@ -35,7 +35,7 @@ class CResourceManager
 {  
 
 public:
-                                  CResourceManager            ( void ) = default;
+                                  CResourceManager            ( void );
                                   ~CResourceManager           ( void );
 
     CResource*                    Add                         ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP );

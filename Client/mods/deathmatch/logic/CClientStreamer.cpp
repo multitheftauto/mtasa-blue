@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+using std::list;
 
 void* CClientStreamer::pAddingElement = NULL;
 
@@ -46,22 +47,24 @@ CClientStreamer::CClientStreamer ( StreamerLimitReachedFunction* pLimitReachedFu
 CClientStreamer::~CClientStreamer ( void )
 {
     // Clear our mainland rows
-    for ( auto& pRow : m_WorldRows )
+    list < CClientStreamSectorRow * > ::iterator iter = m_WorldRows.begin ();
+    for ( ; iter != m_WorldRows.end () ; iter++ )
     {
-        delete pRow;
+        delete *iter;
     }
     m_WorldRows.clear ();
     
     // Clear our extra rows
-    for (auto& pRow : m_ExtraRows)
+    iter = m_ExtraRows.begin ();
+    for ( ; iter != m_ExtraRows.end () ; iter++ )
     {
-        delete pRow;
+        delete *iter;
     }
     m_ExtraRows.clear ();
 }
 
 
-void CClientStreamer::CreateSectors ( std::list < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight )
+void CClientStreamer::CreateSectors ( list < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight )
 {
     // Creates our sectors within rows, filling up our rectangle, connecting each sector and row
     CClientStreamSector * pCurrent = NULL, * pPrevious = NULL, *pPreviousRowSector = NULL;
@@ -197,8 +200,11 @@ void CClientStreamer::SetDimension ( unsigned short usDimension )
 
         // That means all of the currently streamed in elements will have to
         // go. Unstream all elements that are streamed in.
-        for (auto& pElement : m_ActiveElements)
+        CClientStreamElement * pElement = NULL;
+        list < CClientStreamElement * > ::iterator iter = m_ActiveElements.begin ();
+        for ( ; iter != m_ActiveElements.end () ; iter++ )
         {
+            pElement = *iter;
             if ( pElement->IsStreamedIn () )
             {
                 // Unstream it
@@ -221,8 +227,12 @@ CClientStreamSectorRow * CClientStreamer::FindOrCreateRow ( CVector & vecPositio
             return pSurrounding->m_pBottom;
     }
 
-    for (auto& pRow : m_WorldRows)
+    // Search through our main world rows
+    CClientStreamSectorRow * pRow = NULL;
+    list < CClientStreamSectorRow * > ::iterator iter = m_WorldRows.begin ();
+    for ( ; iter != m_WorldRows.end () ; iter++ )
     {
+        pRow = *iter;
         if ( pRow->DoesContain ( vecPosition ) )
         {
             return pRow;
@@ -230,8 +240,10 @@ CClientStreamSectorRow * CClientStreamer::FindOrCreateRow ( CVector & vecPositio
     }
     
     // Search through our extra rows
-    for (auto& pRow : m_ExtraRows)
+    iter = m_ExtraRows.begin ();
+    for ( ; iter != m_ExtraRows.end () ; iter++ )
     {
+        pRow = *iter;
         if ( pRow->DoesContain ( vecPosition ) )
         {
             return pRow;
@@ -240,7 +252,7 @@ CClientStreamSectorRow * CClientStreamer::FindOrCreateRow ( CVector & vecPositio
     // We need a new row, align it with the others
     float fBottom = float ( ( int ) ( vecPosition.fY / m_fRowSize ) ) * m_fRowSize;
     if ( vecPosition.fY < 0.0f ) fBottom -= m_fRowSize;
-    auto pRow = new CClientStreamSectorRow ( fBottom, fBottom + m_fRowSize, m_fSectorSize, m_fRowSize );
+    pRow = new CClientStreamSectorRow ( fBottom, fBottom + m_fRowSize, m_fSectorSize, m_fRowSize );
     ConnectRow ( pRow );
     pRow->SetExtra ( true );
     m_ExtraRows.push_back ( pRow );
@@ -252,8 +264,10 @@ CClientStreamSectorRow * CClientStreamer::FindRow ( float fY )
 {
     // Search through our main world rows
     CClientStreamSectorRow * pRow = NULL;
-    for (auto& pRow : m_WorldRows)
+    list < CClientStreamSectorRow * > ::iterator iter = m_WorldRows.begin ();
+    for ( ; iter != m_WorldRows.end () ; iter++ )
     {
+        pRow = *iter;
         if ( pRow->DoesContain ( fY ) )
         {
             return pRow;
@@ -261,8 +275,10 @@ CClientStreamSectorRow * CClientStreamer::FindRow ( float fY )
     }
     
     // Search through our extra rows
-    for (auto& pRow : m_ExtraRows)
+    iter = m_ExtraRows.begin ();
+    for ( ; iter != m_ExtraRows.end () ; iter++ )
     {
+        pRow = *iter;
         if ( pRow->DoesContain ( fY ) )
         {
             return pRow;
@@ -319,18 +335,21 @@ void CClientStreamer::RemoveElement ( CClientStreamElement * pElement )
 }
 
 
-void CClientStreamer::SetExpDistances ( std::list < CClientStreamElement * > * pList )
+void CClientStreamer::SetExpDistances ( list < CClientStreamElement * > * pList )
 {
     // Run through our list setting distances to world center
-    for (auto& pElement : *pList)
+    CClientStreamElement * pElement = NULL;
+    list < CClientStreamElement* >:: iterator iter = pList->begin ();
+    for ( ; iter != pList->end (); iter++ )
     {
+        pElement = *iter;
         // Set its distance ^ 2
         pElement->SetExpDistance ( pElement->GetDistanceToBoundingBoxSquared ( m_vecPosition ) );
     }
 }
 
 
-void CClientStreamer::AddToSortedList ( std::list < CClientStreamElement* > * pList, CClientStreamElement * pElement )
+void CClientStreamer::AddToSortedList ( list < CClientStreamElement* > * pList, CClientStreamElement * pElement )
 {
     // Make sure it's exp distance is updated
     float fDistance = pElement->GetDistanceToBoundingBoxSquared ( m_vecPosition );
@@ -341,10 +360,12 @@ void CClientStreamer::AddToSortedList ( std::list < CClientStreamElement* > * pL
         return;
 
     // Search through our list. Add it behind the first item further away than this
-    for ( auto iter = pList->begin(); iter != pList->end (); iter++ )
+    CClientStreamElement * pTemp = NULL;
+    list < CClientStreamElement* > :: iterator iter = pList->begin ();
+    for ( ; iter != pList->end (); iter++ )
     {
-        auto pTemp = *iter;
-        
+        pTemp = *iter;
+
         // Is it further than the one we add?
         if ( pTemp->GetDistanceToBoundingBoxSquared ( m_vecPosition ) > fDistance )
         {
@@ -367,9 +388,10 @@ bool CClientStreamer::CompareExpDistance ( CClientStreamElement* p1, CClientStre
 
 bool CClientStreamer::IsActiveElement ( CClientStreamElement * pElement )
 {
-    for ( auto& pActiveElement : m_ActiveElements )
+    list < CClientStreamElement * > ::iterator iter = m_ActiveElements.begin ();
+    for ( ; iter != m_ActiveElements.end () ; iter++ )
     {
-        if ( pActiveElement == pElement )
+        if ( *iter == pElement )
         {
             return true;
         }
@@ -414,8 +436,10 @@ void CClientStreamer::Restream ( bool bMovedFar )
 
     bool bReachedLimit = ReachedLimit ();
     // Loop through our active elements list (they should be ordered closest to furthest)
-    for (auto& pElement : m_ActiveElements)
+    list < CClientStreamElement* > ::iterator iter = m_ActiveElements.begin ();
+    for ( ; iter != m_ActiveElements.end (); iter++ )
     {
+        CClientStreamElement* pElement = *iter;
         float fElementDistanceExp = pElement->GetExpDistance ();
         
         // Is this element streamed in?
@@ -606,21 +630,24 @@ void CClientStreamer::OnEnterSector ( CClientStreamSector * pSector )
     if ( m_pSector )
     {                
         // Grab the unwanted sectors
-        std::list < CClientStreamSector * > common, uncommon;
+        list < CClientStreamSector * > common, uncommon;
         pSector->CompareSurroundings ( m_pSector, &common, &uncommon, true );
 
         // Deactivate the unwanted sectors
         CClientStreamSector * pTempSector = NULL;
-        for ( auto& pTempSector : uncommon )
+        list < CClientStreamSector * > ::iterator iter = uncommon.begin ();
+        for ( ; iter != uncommon.end () ; iter++ )
         {
+            pTempSector = *iter;
             // Make sure we dont unload our new sector
             if ( pTempSector != pSector )
             {            
                 if ( pTempSector->IsActivated () )
                 {
-                    
-                    for ( auto& pElement : pTempSector->GetElements() )
+                    list < CClientStreamElement * > ::iterator iter = pTempSector->Begin ();
+                    for ( ; iter != pTempSector->End () ; iter++ )
                     {
+                        pElement = *iter;
                         if ( pElement->IsStreamedIn () )
                         {
                             // Add it to our streaming out list
@@ -637,8 +664,10 @@ void CClientStreamer::OnEnterSector ( CClientStreamSector * pSector )
         m_pSector->CompareSurroundings ( pSector, &common, &uncommon, true );
 
         // Activate the unwanted sectors
-        for ( auto& pTempSector : uncommon )
+        iter = uncommon.begin ();
+        for ( ; iter != uncommon.end () ; iter++ )
         {
+            pTempSector = *iter;
             if ( !pTempSector->IsActivated () )
             {
                 pTempSector->AddElements ( &m_ActiveElements );

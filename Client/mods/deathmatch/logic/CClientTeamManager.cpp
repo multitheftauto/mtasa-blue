@@ -14,6 +14,8 @@
 
 #include <StdInc.h>
 
+using std::list;
+
 CClientTeamManager::CClientTeamManager ( void )
 {
     m_bRemoveFromList = true;
@@ -38,11 +40,11 @@ void CClientTeamManager::RemoveAll ( void )
 {
     m_bRemoveFromList = false;
 
-    for (auto& pTeam : m_List)
+    list < CClientTeam* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        delete pTeam;
+        delete *iter;
     }
-
     m_List.clear ();
 
     m_bRemoveFromList = true;
@@ -51,9 +53,10 @@ void CClientTeamManager::RemoveAll ( void )
 
 bool CClientTeamManager::Exists ( CClientTeam* pTeam )
 {
-    for (auto& pIterTeam : m_List)
+    list < CClientTeam* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        if ( pIterTeam == pTeam )
+        if ( *iter == pTeam )
         {
             return true;
         }
@@ -76,10 +79,11 @@ CClientTeam* CClientTeamManager::GetTeam ( ElementID ID )
 
 CClientTeam* CClientTeamManager::GetTeam ( const char* szName )
 {
-    for (auto& pTeam : m_List)
+    list < CClientTeam* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        if ( strcmp ( pTeam->GetTeamName (), szName ) == 0 )
-            return pTeam;
+        if ( strcmp ( (*iter)->GetTeamName (), szName ) == 0 )
+            return *iter;
     }
     
     return NULL;

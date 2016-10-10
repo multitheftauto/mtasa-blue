@@ -131,9 +131,10 @@ void CClientObjectManager::DeleteAll ( void )
 {
     // Delete all the objects
     m_bCanRemoveFromList = false;
-    for ( auto& pObject : m_Objects )
+    std::vector < CClientObject* > ::const_iterator iter = m_Objects.begin ();
+    for ( ; iter != m_Objects.end (); iter++ )
     {
-        delete pObject;
+        delete *iter;
     }
 
     // Clear the list
@@ -334,12 +335,16 @@ bool CClientObjectManager::StaticIsLowLodObjectLimitReached ( void )
 
 bool CClientObjectManager::IsObjectLimitReached ( void )
 {
-    return IsHardObjectLimitReached() || m_uiStreamedInCount >= m_uiMaxStreamedInCount;
+    if ( IsHardObjectLimitReached() || m_uiStreamedInCount >= m_uiMaxStreamedInCount )
+        return true;
+    return false;
 }
 
 bool CClientObjectManager::IsLowLodObjectLimitReached ( void )
 {
-    return IsHardObjectLimitReached() || m_uiLowLodStreamedInCount >= m_uiMaxLowLodStreamedInCount;
+    if ( IsHardObjectLimitReached() || m_uiLowLodStreamedInCount >= m_uiMaxLowLodStreamedInCount )
+        return true;
+    return false;
 }
 
 
@@ -375,8 +380,10 @@ bool CClientObjectManager::IsHardObjectLimitReached ( void )
 
 void CClientObjectManager::RestreamObjects ( unsigned short usModel )
 {
-    for ( auto& pObject : m_Objects )
+    for ( uint i = 0 ; i < m_Objects.size() ; i++ )
     {
+        CClientObject* pObject = m_Objects[i];
+
         // Streamed in and same model ID?
         if ( pObject->IsStreamedIn () && pObject->GetModel () == usModel )
         {

@@ -16,6 +16,9 @@
 
 #include "StdInc.h"
 
+using std::list;
+using std::vector;
+
 extern CClientGame* g_pClientGame;
 
 #ifndef M_PI
@@ -317,9 +320,10 @@ CClientPed::~CClientPed ( void )
     CClientVehicle::UnpairPedAndVehicle ( this );
 
     // Delete delayed sync data
-    for ( auto& pDelayedSyncData : m_SyncBuffer )
+    list < SDelayedSyncData* > ::iterator iter = m_SyncBuffer.begin ();
+    for ( ; iter != m_SyncBuffer.end () ; iter++ )
     {
-        delete pDelayedSyncData;
+        delete *iter;
     }
 
     m_SyncBuffer.clear ();
@@ -1100,7 +1104,7 @@ CClientVehicle* CClientPed::GetRealOccupiedVehicle ( void )
 }
 
 
-CClientVehicle* CClientPed::GetClosestVehicleInRange ( bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int* uiClosestDoor, CVector* pClosestDoorPosition, float fWithinRange )
+CClientVehicle* CClientPed::GetClosestVehicleInRange ( bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors, bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor, CVector* pClosestDoorPosition, float fWithinRange )
 {
     if ( bGetPositionFromClosestDoor )
     {
@@ -1117,8 +1121,21 @@ CClientVehicle* CClientPed::GetClosestVehicleInRange ( bool bGetPositionFromClos
 
     float fClosestDistance = 0.0f;
     CVector vecVehiclePosition;
-    for ( auto pTempVehicle : m_pManager->GetVehicleManager()->GetStreamedVehicles())
+    CClientVehicle* pTempVehicle = NULL;
+    vector < CClientVehicle * > ::const_iterator iter, listEnd;
+    if ( bCheckStreamedOutVehicles )
+    {
+        iter = m_pManager->GetVehicleManager ()->IterBegin ();
+        listEnd = m_pManager->GetVehicleManager ()->IterEnd ();
+    }
+    else
+    {
+        iter = m_pManager->GetVehicleManager ()->StreamedBegin ();
+        listEnd = m_pManager->GetVehicleManager ()->StreamedEnd ();
+    }
+    for ( ; iter != listEnd; iter++ )
     {            
+        pTempVehicle = *iter;
         CVehicle* pGameVehicle = pTempVehicle->GetGameVehicle ();
         
         if ( !pGameVehicle && bGetPositionFromClosestDoor ) continue;
@@ -4813,9 +4830,10 @@ unsigned int CClientPed::CountProjectiles ( eWeaponType weaponType )
         return static_cast < unsigned int > ( m_Projectiles.size () );
 
     unsigned int uiCount = 0;
-    for ( auto& pProjectile : m_Projectiles )
+    list < CClientProjectile* > ::iterator iter = m_Projectiles.begin ();
+    for ( ; iter != m_Projectiles.end () ; iter++ )
     {
-        if ( pProjectile->GetWeaponType () == weaponType )
+        if ( (*iter)->GetWeaponType () == weaponType )
         {
             uiCount++;
         }
@@ -4826,8 +4844,11 @@ unsigned int CClientPed::CountProjectiles ( eWeaponType weaponType )
 
 void CClientPed::RemoveAllProjectiles ( void )
 {
-    for (auto& pProjectile : m_Projectiles)
+    CClientProjectile * pProjectile = NULL;
+    list < CClientProjectile* > ::iterator iter = m_Projectiles.begin ();
+    for ( ; iter != m_Projectiles.end () ; iter++ )
     {
+        pProjectile = *iter;
         pProjectile->m_pCreator = NULL;
         pProjectile->Destroy ( );
     }
@@ -4844,8 +4865,11 @@ void CClientPed::DestroySatchelCharges ( bool bBlow, bool bDestroy )
     CClientProjectile * pProjectile = NULL;
     CVector vecPosition;
     
-    for (auto& pProjectile : m_Projectiles)
+    list < CClientProjectile* > ::iterator iter = m_Projectiles.begin ();
+    while ( iter != m_Projectiles.end () )
     {
+        pProjectile = *iter;
+
         if ( pProjectile->GetWeaponType () == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
         {
             if ( bBlow )
@@ -4866,6 +4890,7 @@ void CClientPed::DestroySatchelCharges ( bool bBlow, bool bDestroy )
                 pProjectile->Destroy ( bBlow );
             }
         }
+        iter++;
     }
 
     m_bDestroyingSatchels = false;

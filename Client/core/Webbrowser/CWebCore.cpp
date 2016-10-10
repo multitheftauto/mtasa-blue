@@ -580,9 +580,9 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
         CXMLNode* pWhiteSubNode = pRootNode->FindSubNode ( "globalwhitelist" );
         if ( pWhiteSubNode )
         {
-            for ( auto& pChild : pWhiteSubNode->GetChildren() )
+            for ( std::list<CXMLNode*>::iterator iter = pWhiteSubNode->ChildrenBegin (); iter != pWhiteSubNode->ChildrenEnd (); ++iter )
             {
-                AddAllowedPage ( pChild->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
+                AddAllowedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
             }
         }
     }
@@ -592,9 +592,9 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
         CXMLNode* pBlackSubNode = pRootNode->FindSubNode ( "globalblacklist" );
         if ( pBlackSubNode )
         {
-            for (auto& pChild : pBlackSubNode->GetChildren())
+            for ( std::list<CXMLNode*>::iterator iter = pBlackSubNode->ChildrenBegin (); iter != pBlackSubNode->ChildrenEnd (); ++iter )
             {
-                AddBlockedPage (pChild->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
+                AddBlockedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
             }
         }
     }
@@ -604,17 +604,17 @@ void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustom
         CXMLNode* pBlackSubNode = pRootNode->FindSubNode ( "customblacklist" );
         if ( pBlackSubNode )
         {
-            for (auto& pChild : pBlackSubNode->GetChildren())
+            for ( std::list<CXMLNode*>::iterator iter = pBlackSubNode->ChildrenBegin (); iter != pBlackSubNode->ChildrenEnd (); ++iter )
             {
-                AddBlockedPage (pChild->GetTagContent (), eWebFilterType::WEBFILTER_USER );
+                AddBlockedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_USER );
             }
         }
         CXMLNode* pWhiteSubNode = pRootNode->FindSubNode ( "customwhitelist" );
         if ( pWhiteSubNode )
         {
-            for (auto& pChild : pWhiteSubNode->GetChildren())
+            for ( std::list<CXMLNode*>::iterator iter = pWhiteSubNode->ChildrenBegin (); iter != pWhiteSubNode->ChildrenEnd (); ++iter )
             {
-                AddAllowedPage (pChild->GetTagContent (), eWebFilterType::WEBFILTER_USER );
+                AddAllowedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_USER );
             }
         }
     }

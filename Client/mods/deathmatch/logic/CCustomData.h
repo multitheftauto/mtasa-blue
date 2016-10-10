@@ -34,7 +34,9 @@ public:
     void                    Set                 ( const char* szName, const CLuaArgument& Variable);
 
     bool                    Delete              ( const char* szName );
-    const std::map < std::string, SCustomData >&       GetData(void) { return m_Data; }
+
+    std::map < std::string, SCustomData > :: const_iterator IterBegin   ( void )   { return m_Data.begin (); }
+    std::map < std::string, SCustomData > :: const_iterator IterEnd     ( void )   { return m_Data.end (); }
 
 private:
     std::map < std::string, SCustomData >       m_Data;

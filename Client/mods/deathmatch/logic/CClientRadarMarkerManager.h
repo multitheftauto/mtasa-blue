@@ -36,7 +36,8 @@ public:
     inline unsigned short                                       GetDimension                    ( void )                                    { return m_usDimension; }
     void                                                        SetDimension                    ( unsigned short usDimension );
 
-    const auto&                                                 GetMarkers                      ( void )                                    { return m_Markers; }
+    inline std::list < CClientRadarMarker* > ::const_iterator   IterBegin                       ( void )                                    { return m_Markers.begin (); };
+    inline std::list < CClientRadarMarker* > ::const_iterator   IterEnd                         ( void )                                    { return m_Markers.end (); };
 
     bool                                                        Exists                          ( CClientRadarMarker* pMarker );
 

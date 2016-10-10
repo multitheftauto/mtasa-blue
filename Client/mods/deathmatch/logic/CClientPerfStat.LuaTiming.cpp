@@ -75,9 +75,9 @@ namespace
         void Pulse1s( int flags )
         {
             ResourceTiming.Pulse1s( flags );
-            for ( auto& iter : EventTimingMap )
+            for ( CEventTimingMap::iterator iter = EventTimingMap.begin () ; iter != EventTimingMap.end () ; ++iter )
             {
-                CTimingBlock& EventTiming = iter.second;
+                CTimingBlock& EventTiming = iter->second;
                 EventTiming.Pulse1s( flags );
             }
         }
@@ -92,9 +92,9 @@ namespace
 
         void Pulse1s( int flags )
         {
-            for ( auto& iter : LuaMainTimingMap )
+            for ( CLuaMainTimingMap::iterator iter = LuaMainTimingMap.begin () ; iter != LuaMainTimingMap.end () ; ++iter )
             {
-                CLuaMainTiming& LuaMainTiming = iter.second;
+                CLuaMainTiming& LuaMainTiming = iter->second;
                 LuaMainTiming.Pulse1s( flags );
             }
         }

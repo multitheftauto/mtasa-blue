@@ -13,6 +13,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CClientRadarAreaManager::CClientRadarAreaManager ( CClientManager* pManager )
 {
     // Init
@@ -50,8 +52,10 @@ void CClientRadarAreaManager::DeleteAll ( void )
 {
     // Delete all the radar areas
     m_bDontRemoveFromList = true;
-    for (auto& pRadarArea : m_List) {
-        delete pRadarArea;
+    list < CClientRadarArea* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
+    {
+        delete *iter;
     }
     m_bDontRemoveFromList = false;
 
@@ -74,9 +78,10 @@ CClientRadarArea* CClientRadarAreaManager::Get ( ElementID ID )
 
 void CClientRadarAreaManager::SetDimension ( unsigned short usDimension )
 {
-    for (auto& pRadarArea : m_List) 
+    list < CClientRadarArea* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        pRadarArea->RelateDimension ( usDimension );
+        (*iter)->RelateDimension ( usDimension );
     }
 
     m_usDimension = usDimension;
@@ -93,8 +98,10 @@ void CClientRadarAreaManager::DoPulse ( void )
 void CClientRadarAreaManager::DoPulse ( bool bRender )
 {
     // Pulse each radar area marker
-    for (auto& pRadarArea : m_List) {
-        pRadarArea->DoPulse( bRender );
+    list < CClientRadarArea* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); ++iter )
+    {
+        (*iter)->DoPulse ( bRender );
     }
 }
 
@@ -102,7 +109,6 @@ void CClientRadarAreaManager::RemoveFromList ( CClientRadarArea* pRadarArea )
 {
     if ( !m_bDontRemoveFromList )
     {
-        if ( !m_List.empty() ) 
-            m_List.remove ( pRadarArea );
+        if ( !m_List.empty() ) m_List.remove ( pRadarArea );
     }
 }

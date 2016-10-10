@@ -630,6 +630,7 @@ bool CClientWeapon::GetFlags ( SLineOfSightFlags &flags )
 
 void CClientWeapon::DoGunShells ( CVector vecOrigin, CVector vecDirection )
 {
+
     float fShellSize = 0.0f;
 
     switch( m_Type )

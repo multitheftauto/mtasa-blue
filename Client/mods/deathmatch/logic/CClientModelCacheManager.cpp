@@ -151,12 +151,12 @@ void CClientModelCacheManagerImpl::DoPulse ( void )
         g_pMultiplayer->FlushClothesCache();
 
         CClientPlayerManager* pPlayerManager = g_pClientGame->GetPlayerManager();
-        for ( auto& pPlayer : pPlayerManager->GetPlayers() )
-            pPlayer->RebuildModel( false );
+        for ( std::vector < CClientPlayer* > ::const_iterator iter = pPlayerManager->IterBegin(); iter != pPlayerManager->IterEnd(); ++iter )
+            (*iter)->RebuildModel( false );
 
         CClientPedManager* pPedManager = g_pClientGame->GetPedManager();
-        for ( auto& pPed : pPedManager->GetPeds() )
-            pPed->RebuildModel(false);
+        for ( std::vector < CClientPed* > ::const_iterator iter = pPedManager->IterBegin(); iter != pPedManager->IterEnd(); ++iter )
+            (*iter)->RebuildModel( false );
     }
 }
 
@@ -181,16 +181,16 @@ void CClientModelCacheManagerImpl::DoPulsePedModels ( void )
     std::vector < CClientPlayer* > playerList;
 
     // For each entity found
-    for ( auto& pEntity : result )
+    for ( CClientEntityResult::const_iterator iter = result.begin () ; iter != result.end (); ++iter )
     {
-        switch ( pEntity->GetType () )
+        switch ( (*iter)->GetType () )
         {
             case CCLIENTPED:
-                pedList.push_back ( (CClientPed*)pEntity);
+                pedList.push_back ( (CClientPed*)*iter );
                 break;
 
             case CCLIENTPLAYER:
-                playerList.push_back ( (CClientPlayer*)pEntity);
+                playerList.push_back ( (CClientPlayer*)*iter );
                 break;
         }
     }
@@ -224,12 +224,12 @@ void CClientModelCacheManagerImpl::DoPulseVehicleModels ( void )
     std::vector < CClientVehicle* > vehicleList;
 
     // For each entity found
-    for ( auto& pEntity : result ) 
+    for ( CClientEntityResult::const_iterator iter = result.begin () ; iter != result.end (); ++iter )
     {
-        switch ( pEntity->GetType () )
+        switch ( (*iter)->GetType () )
         {
             case CCLIENTVEHICLE:
-                vehicleList.push_back ( (CClientVehicle*)pEntity );
+                vehicleList.push_back ( (CClientVehicle*)*iter );
                 break;
         }
     }
@@ -251,8 +251,9 @@ void CClientModelCacheManagerImpl::DoPulseVehicleModels ( void )
 void CClientModelCacheManagerImpl::ProcessPlayerList ( std::map < ushort, float >& outNeedCacheList, const std::vector < CClientPlayer* >& playerList, float fMaxStreamDistanceSq )
 {
     const ulong ulTimeNow = CClientTime::GetTime ();
-    for ( auto& pPlayer : playerList )
+    for (  std::vector < CClientPlayer* >::const_iterator iter = playerList.begin () ; iter != playerList.end (); ++iter )
     {
+        CClientPlayer* pPlayer = *iter;
         ushort usModelId = (ushort)pPlayer->GetModel ();
 
         if ( usModelId < 7 || usModelId > 312 )
@@ -327,8 +328,9 @@ void CClientModelCacheManagerImpl::ProcessPlayerList ( std::map < ushort, float 
 void CClientModelCacheManagerImpl::ProcessPedList ( std::map < ushort, float >& outNeedCacheList, const std::vector < CClientPed* >& pedList, float fMaxStreamDistanceSq )
 {
     const ulong ulTimeNow = CClientTime::GetTime ();
-    for ( auto& pPed : pedList )
+    for (  std::vector < CClientPed* >::const_iterator iter = pedList.begin () ; iter != pedList.end (); ++iter )
     {
+        CClientPed* pPed = *iter;
         const ushort usModelId = (ushort)pPed->GetModel ();
 
         if ( usModelId < 7 || usModelId > 312 )
@@ -391,8 +393,9 @@ void CClientModelCacheManagerImpl::ProcessPedList ( std::map < ushort, float >& 
 void CClientModelCacheManagerImpl::ProcessVehicleList ( std::map < ushort, float >& outNeedCacheList, const std::vector < CClientVehicle* >& vehicleList, float fMaxStreamDistanceSq )
 {
     const ulong ulTimeNow = CClientTime::GetTime ();
-    for ( auto& pVehicle : vehicleList )
+    for (  std::vector < CClientVehicle* >::const_iterator iter = vehicleList.begin () ; iter != vehicleList.end (); ++iter )
     {
+        CClientVehicle* pVehicle = *iter;
         const ushort usModelId = pVehicle->GetModel ();
 
         if ( usModelId < 400 || usModelId > 611 )

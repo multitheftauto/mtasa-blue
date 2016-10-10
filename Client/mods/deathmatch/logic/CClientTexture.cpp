@@ -4,6 +4,8 @@
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        mods/shared_logic/CClientTexture.cpp
+*  PURPOSE:
+*  DEVELOPERS:  idiot
 *
 *****************************************************************************/
 
