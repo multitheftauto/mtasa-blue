@@ -212,13 +212,9 @@ tagCOMMANDENTRY* CCommands::Get ( const char* szCommand, bool bCheckIfMod, bool 
 {
     // Find the entry we're looking for
     auto iter = std::find_if(m_CommandList.begin(), m_CommandList.end(),
-        [szCommand, bCheckIfMod, bModCommand](auto& command)
+        [szCommand](auto& command)
     {
-        if ( !bCheckIfMod || ( bModCommand == command.bModCommand ) )
-        {
-            return stricmp(szCommand, command.szCommandName) == 0;
-        }
-        return false;
+        return stricmp(szCommand, command.szCommandName) == 0;
     });
 
     if (iter != m_CommandList.end())

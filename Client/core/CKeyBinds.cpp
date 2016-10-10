@@ -507,7 +507,7 @@ void CKeyBinds::RemoveDeletedBinds ( void )
 void CKeyBinds::ClearCommandsAndControls ( void )
 {
     m_List.remove_if([](auto& pBind) {
-        return pBind->GetType() != KEY_BIND_FUNCTION && pBind->GetType() != KEY_BIND_CONTROL_FUNCTION;
+        return pBind->GetType() == KEY_BIND_FUNCTION || pBind->GetType() == KEY_BIND_CONTROL_FUNCTION;
     });
 }
 
@@ -706,10 +706,6 @@ bool CKeyBinds::RemoveAllCommands ( void )
             return false;
         if (pBind->GetType() != KEY_BIND_COMMAND)
             return false;
-        if (m_bProcessingKeyStroke) {
-            pBind->beingDeleted = true;
-            return false;
-        }
         return true;
     });
     return bFound;
@@ -1614,7 +1610,7 @@ bool CKeyBinds::RemoveAllControlFunctions ( ControlFunctionBindHandler Handler )
         [&](auto& pBind) {
         if (pBind->IsBeingDeleted())
             return false;
-        if (pBind->GetType() != KEY_BIND_CONTROL_FUNCTION)
+        if (pBind->GetType() == KEY_BIND_CONTROL_FUNCTION)
             return false;
         CControlFunctionBind* pControlBind = static_cast<CControlFunctionBind*>(pBind.get());
         if (pControlBind->Handler != Handler)
@@ -1640,7 +1636,7 @@ bool CKeyBinds::RemoveAllControlFunctions ( void )
     [&](auto& pBind) {
         if (pBind->IsBeingDeleted())
             return false;
-        if (pBind->GetType() != KEY_BIND_CONTROL_FUNCTION)
+        if (pBind->GetType() == KEY_BIND_CONTROL_FUNCTION)
             return false;
         bFound = true;
 

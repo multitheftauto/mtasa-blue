@@ -395,7 +395,7 @@ void CBindSettingsTab::Initialize(void)
                         for (int k = 0; k < SecKeyNum; k++)
                             m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
                         m_pBindsList->SetItemData(iBind, m_hBind, (void*)KEY_BIND_GTA_CONTROL);
-                        m_pBindsList->SetItemData(iBind, m_hPriKey, (void*)pGTABind);
+                        m_pBindsList->SetItemData(iBind, m_hPriKey, (void*)&pGTABind);
                         iGameRowCount++;
                     }
                     // Secondary keys?
@@ -404,7 +404,7 @@ void CBindSettingsTab::Initialize(void)
                             if (uiMatchCount == k + 1)
                             {
                                 m_pBindsList->SetItemText(iBind, m_hSecKeys[k], pGTABind->boundKey->szKey);
-                                m_pBindsList->SetItemData(iBind, m_hSecKeys[k], (void*)pGTABind);
+                                m_pBindsList->SetItemData(iBind, m_hSecKeys[k], (void*)&pGTABind);
                             }
                     uiMatchCount++;
                 }
@@ -460,7 +460,7 @@ void CBindSettingsTab::Initialize(void)
                                 if (pListedCommand->uiMatchCount == k)
                                 {
                                     m_pBindsList->SetItemText(pListedCommand->iIndex, m_hSecKeys[k], pCommandBind->boundKey->szKey);
-                                    m_pBindsList->SetItemData(pListedCommand->iIndex, m_hSecKeys[k], (void*)pCommandBind);
+                                    m_pBindsList->SetItemData(pListedCommand->iIndex, m_hSecKeys[k], (void*)&pCommandBind);
                                 }
                             pListedCommand->uiMatchCount++;
                         }
