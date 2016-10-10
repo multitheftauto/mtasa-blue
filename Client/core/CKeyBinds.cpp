@@ -651,7 +651,7 @@ bool CKeyBinds::RemoveCommand ( const char* szKey, const char* szCommand, bool b
             return false;
         if (bCheckState && pCommandBind->bHitState != bState)
             return false;
-        if (pCommandBind->szResource)
+        if (!pCommandBind->szResource)
             return false;
         bFound = true;
         if (m_bProcessingKeyStroke) {
