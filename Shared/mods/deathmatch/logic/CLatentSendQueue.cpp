@@ -268,8 +268,9 @@ void CLatentSendQueue::UpdateEstimatedDurations ( void )
 {
     uint uiUsingRate = MIN_SEND_RATE;
     // Recalculate estimated times for all transfers
-    for (auto& tx : m_TxQueue)
+    for (auto iter = m_TxQueue.rbegin(); iter != m_TxQueue.rend(); ++iter)
     {
+        auto& tx = *iter;
         uiUsingRate = Max ( uiUsingRate, tx.uiRate );
         tx.iEstSendDurationMsRemaining = tx.bufferRef->GetSize () * 1000 / uiUsingRate;
         tx.iEstSendDurationMsUsed = 0;
