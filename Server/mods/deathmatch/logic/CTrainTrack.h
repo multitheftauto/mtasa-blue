@@ -32,7 +32,7 @@ struct STrackNode
 class CTrainTrack : public CElement
 {
 public:
-    CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, bool default = false);
+    CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, bool defaultTrack = false);
     // TODO: Add move constructor
     virtual ~CTrainTrack();
 
