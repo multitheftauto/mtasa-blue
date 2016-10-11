@@ -29,3 +29,8 @@ CClientTrainTrack* CClientTrainTrackManager::Get(CTrainTrack* pTrainTrack)
 
     return nullptr;
 }
+
+CClientTrainTrack* CClientTrainTrackManager::GetTrainTrackByIndex(unsigned int index)
+{
+    return Get(g_pGame->GetTrainTrackManager()->GetTrainTrackByIndex(index));
+}

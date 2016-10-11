@@ -16,6 +16,8 @@ public:
     static CClientTrainTrack* Get(ElementID ID);
     CClientTrainTrack* Get(CTrainTrack* pTrainTrack);
 
+    CClientTrainTrack* GetTrainTrackByIndex(unsigned int index);
+
 private:
     std::unordered_map<CTrainTrack*, CClientTrainTrack*> m_Map;
 };

@@ -15,14 +15,14 @@
 class CLuaTrainTrackDefs : public CLuaDefs
 {
 public:
-    static void     LoadFunctions ( void );
-    static void     AddClass ( lua_State* luaVM );
+    static void LoadFunctions();
+    static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE ( GetTrainTrackPosition );
-    LUA_DECLARE ( CreateTrainTrack );
-    LUA_DECLARE ( GetDefaultTrack );
-    LUA_DECLARE ( SetTrainTrackLength );
-    LUA_DECLARE ( GetTrainTrackLength );
-    LUA_DECLARE ( GetTrainTrackNumberOfNodes );
-    LUA_DECLARE ( GetTrainTrackID );
+    LUA_DECLARE(CreateTrack);
+    LUA_DECLARE(GetDefaultTrack);
+
+    LUA_DECLARE(GetTrackNodePosition);
+    LUA_DECLARE(SetTrackNodePosition);
+
+    LUA_DECLARE(GetTrackNodeCount);
 };

@@ -42,6 +42,11 @@ uint CClientTrainTrack::GetTrackIndex()
     return m_pTrainTrack->GetIndex();
 }
 
+size_t CClientTrainTrack::GetNumberOfNodes()
+{
+    return m_pTrainTrack->GetNodes().size();
+}
+
 void CClientTrainTrack::SetLastNodesLinked(bool linked)
 {
     m_pTrainTrack->SetLastNodesLinked(linked);

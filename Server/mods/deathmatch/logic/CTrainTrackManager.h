@@ -23,6 +23,8 @@ public:
 
     inline const std::vector<CTrainTrack*>& GetTracks() { return m_Tracks; }
 
+    CTrainTrack* GetTrainTrackByIndex(unsigned int index);
+
 private:
     constexpr static std::size_t MaxTracks = 255;
     std::vector<CTrainTrack*> m_Tracks;

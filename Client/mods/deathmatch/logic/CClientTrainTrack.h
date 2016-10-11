@@ -26,6 +26,8 @@ public:
     float GetLength();
     uint GetTrackIndex();
 
+    size_t GetNumberOfNodes();
+
     void SetLastNodesLinked(bool linked);
 
     // Sorta a hack that these are required by CClientEntity
