@@ -53,7 +53,7 @@ void CLuaVehicleDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isTrainDerailable", IsTrainDerailable );
     CLuaCFunctions::AddFunction ( "getTrainDirection", GetTrainDirection );
     CLuaCFunctions::AddFunction ( "getTrainSpeed", GetTrainSpeed );
-    //CLuaCFunctions::AddFunction ( "getTrainTrack", GetTrainTrack );
+    CLuaCFunctions::AddFunction ( "getTrainTrack", GetTrainTrack );
     CLuaCFunctions::AddFunction ( "getTrainPosition", GetTrainPosition );
     CLuaCFunctions::AddFunction ( "isTrainChainEngine", IsTrainChainEngine );
     CLuaCFunctions::AddFunction ( "getVehicleGravity", GetVehicleGravity );
@@ -104,7 +104,7 @@ void CLuaVehicleDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setTrainDerailable", SetTrainDerailable );
     CLuaCFunctions::AddFunction ( "setTrainDirection", SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", SetTrainSpeed );
-    //CLuaCFunctions::AddFunction ( "setTrainTrack", SetTrainTrack );
+    CLuaCFunctions::AddFunction ( "setTrainTrack", SetTrainTrack );
     CLuaCFunctions::AddFunction ( "setTrainPosition", SetTrainPosition );
     CLuaCFunctions::AddFunction ( "setVehicleTaxiLightOn", SetVehicleTaxiLightOn );
     CLuaCFunctions::AddFunction ( "setVehicleGravity", SetVehicleGravity );
@@ -153,7 +153,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getNitroLevel", "getVehicleNitroLevel" );
     lua_classfunction ( luaVM, "getDirection", "getTrainDirection" );
     lua_classfunction ( luaVM, "getTrainSpeed", "getTrainSpeed" );
-    //lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
+    lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
     lua_classfunction ( luaVM, "getTrainPosition", "getTrainPosition" );
     lua_classfunction ( luaVM, "getName", "getVehicleName" );
     lua_classfunction ( luaVM, "getVehicleType", "getVehicleType" );
