@@ -14,6 +14,8 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 
+using std::string;
+
 template<> CLocalGUI * CSingleton < CLocalGUI >::m_pSingleton = NULL;
 
 #ifndef HIWORD
@@ -121,11 +123,11 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
     CGUI* pGUI = CCore::GetSingleton ().GetGUI ();
 
     // Create chatbox
-    m_pChat = std::make_unique<CChat>( pGUI, CVector2D ( 0.0125f, 0.015f ) );
+    m_pChat = new CChat ( pGUI, CVector2D ( 0.0125f, 0.015f ) );
     m_pChat->SetVisible ( false );
 
     // Create the debug view
-    m_pDebugView = std::make_unique<CDebugView>( pGUI, CVector2D ( 0.23f, 0.785f ) );
+    m_pDebugView = new CDebugView ( pGUI, CVector2D ( 0.23f, 0.785f ) );
     m_pDebugView->SetVisible ( false );
 
     // Create the overlayed version labels
@@ -133,7 +135,7 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
     SString strText = "MTA:SA " MTA_DM_BUILDTAG_SHORT;
     if ( _NETCODE_VERSION_BRANCH_ID != 0x04 )
         strText += SString( " (%X)", _NETCODE_VERSION_BRANCH_ID );
-    m_pLabelVersionTag = std::unique_ptr<CGUILabel>( pGUI->CreateLabel ( strText ) );
+    m_pLabelVersionTag = reinterpret_cast < CGUILabel* > ( pGUI->CreateLabel ( strText ) );
     m_pLabelVersionTag->SetSize ( CVector2D ( m_pLabelVersionTag->GetTextExtent() + 5, 18 ) );
     m_pLabelVersionTag->SetPosition ( CVector2D ( ScreenSize.fX - m_pLabelVersionTag->GetTextExtent() - 5, ScreenSize.fY - 15 ) );
     m_pLabelVersionTag->SetAlpha ( 0.5f );
@@ -143,11 +145,11 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
     m_pLabelVersionTag->SetVisible ( false );
 
     // Create mainmenu
-    m_pMainMenu = std::make_unique<CMainMenu>( pGUI );
+    m_pMainMenu = new CMainMenu ( pGUI );
     m_pMainMenu->SetVisible ( bGameIsAlreadyLoaded, !bGameIsAlreadyLoaded, false );
 
     // Create console
-    m_pConsole = std::make_unique<CConsole>( pGUI );
+    m_pConsole = new CConsole ( pGUI );
     m_pConsole->SetVisible ( false );
 
     // Create our news headlines if we're already ingame
@@ -179,18 +181,20 @@ void CLocalGUI::CreateObjects ( IUnknown* pDevice )
 
 void CLocalGUI::DestroyWindows ( void )
 {
-    m_pLabelVersionTag.reset();
-    m_pConsole.reset();
-    m_pMainMenu.reset();
-    m_pChat.reset();
-    m_pDebugView.reset();
+    SAFE_DELETE ( m_pLabelVersionTag );
+    SAFE_DELETE ( m_pConsole );
+    SAFE_DELETE ( m_pMainMenu );
+    SAFE_DELETE ( m_pChat );
+    SAFE_DELETE ( m_pDebugView );
 }
 
 
 void CLocalGUI::DestroyObjects ( void )
 {
     DestroyWindows ();
-    m_pLabelVersionTag.reset();
+
+    // Destroy and NULL all elements
+    SAFE_DELETE ( m_pLabelVersionTag );
 }
 
 
@@ -356,7 +360,7 @@ void CLocalGUI::DrawMouseCursor ( void )
 
 CConsole* CLocalGUI::GetConsole ( void )
 {
-    return m_pConsole.get();
+    return m_pConsole;
 }
 
 
@@ -401,7 +405,7 @@ void CLocalGUI::EchoConsole ( const char* szText )
 
 CMainMenu* CLocalGUI::GetMainMenu ( void )
 {
-    return m_pMainMenu.get();
+    return m_pMainMenu;
 }
 
 
@@ -444,13 +448,13 @@ bool CLocalGUI::IsMainMenuVisible ( void )
 
 CChat* CLocalGUI::GetChat ( void )
 {
-    return m_pChat.get();
+    return m_pChat;
 }
 
 
 CDebugView* CLocalGUI::GetDebugView ( void )
 {
-    return m_pDebugView.get();
+    return m_pDebugView;
 }
 
 void CLocalGUI::SetChatBoxVisible ( bool bVisible )

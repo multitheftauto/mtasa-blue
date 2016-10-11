@@ -33,8 +33,11 @@ void CClientDFFManager::RemoveAll ( void )
     m_bRemoveFromList = false;
 
     // Run through our list deleting the DFF's
-    for (auto& iter : m_List)
-        delete iter;
+    std::list < CClientDFF* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
+    {
+        delete *iter;
+    }
 
     // Allow list removal again
     m_bRemoveFromList = true;
@@ -43,26 +46,40 @@ void CClientDFFManager::RemoveAll ( void )
 
 bool CClientDFFManager::Exists ( CClientDFF* pDFF )
 {
-    auto iter = std::find(m_List.begin(), m_List.end(), pDFF);
-    return iter != m_List.end();
+    // Matches given DFF?
+    std::list < CClientDFF* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
+    {
+        // Match?
+        if ( pDFF == *iter )
+        {
+            // It exists
+            return true;
+        }
+    }
+
+    // It doesn't
+    return false;
 }
 
 
 CClientDFF* CClientDFFManager::GetElementThatReplaced  ( unsigned short usModel, CClientDFF* pDontSearch )
 {
     // Matches given DFF?
-    for (auto& iter : m_List) 
+    std::list < CClientDFF* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
         // Match?
-        if ( iter != pDontSearch &&
-             iter->HasReplaced ( usModel ) )
+        if ( *iter != pDontSearch &&
+             (*iter)->HasReplaced ( usModel ) )
         {
             // It exists
-            return iter;
+            return *iter;
         }
     }
 
-    return nullptr;
+    // None
+    return NULL;
 }
 
 

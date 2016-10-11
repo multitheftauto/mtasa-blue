@@ -38,7 +38,7 @@ workspace "MTASA"
 	}
 		
 	-- Helper function for output path 
-	buildpath = function(p) return "%{wks.location}../Bin/"..p.."/" end
+	buildpath = function(p) return "%{wks.location}/../Bin/"..p.."/" end
 	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} %{wks.location}../Bin/"..p.."/" end 
 	
 	filter "platforms:x86"
@@ -74,6 +74,7 @@ workspace "MTASA"
 	filter "system:windows"
 		toolset "v140"
 		defines { "WIN32", "_WIN32" }
+		linkoptions "/DYNAMICBASE:NO"
 		includedirs { 
 			dxdir.."Include"
 		}

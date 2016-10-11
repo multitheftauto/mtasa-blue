@@ -310,12 +310,14 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 
     m_pTab [ type ] = m_pPanel->CreateTab ( szName );
 
-    //Make our playerlist smaller, if it's a small panel - either 15%, or a max of 200px in size.
-    float fPlayerListSizeX = Min < float >(m_WidgetSize.fX*0.15, SB_PLAYERLIST_SIZE_X);
+    float fPlayerListSizeX = SB_PLAYERLIST_SIZE_X;
     float fSearchBarSizeX = pManager->GetTextExtent ( _("Search players..."), "default-bold-small" ) + 90;
     Max ( fSearchBarSizeX, pManager->GetTextExtent ( _("Search servers..."), "default-bold-small" ) + 60 );
 
     float fConnectButtonWidth = 26 + pManager->GetTextExtent ( _("Connect"), "default-bold-small" ) + 5;
+
+	//Make our playerlist smaller, if it's a small panel - either 15%, or a max of 200px in size.
+    fPlayerListSizeX = Min < float >( m_WidgetSize.fX*0.15, SB_PLAYERLIST_SIZE_X );
 
     // Formulate our navigation bar
 
@@ -1413,7 +1415,7 @@ bool CServerBrowser::OnAddressChanged ( CGUIElement* pElement )
     }
 
     // If this address exists in favourites, change our favourites icon
-    CServerListIterator i_b = m_ServersFavourites.IteratorBegin (), i_e = m_ServersFavourites.IteratorEnd ();
+    CServerListIterator i, i_b = m_ServersFavourites.IteratorBegin (), i_e = m_ServersFavourites.IteratorEnd ();
     for ( CServerListIterator i = i_b; i != i_e; i++ )
     {
         CServerListItem * pServer = *i;
@@ -1730,7 +1732,7 @@ bool CServerBrowser::SaveServerList ( CXMLNode* pNode, const std::string& strTag
 
     // Iterate through the list, adding any items to our node
     unsigned int iProcessed = 0;
-    CServerListIterator i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
+    CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
     for ( CServerListIterator i = i_b; i != i_e; i++ )
     {
         if ( iLimit && iProcessed == iLimit )
@@ -2046,7 +2048,7 @@ CServerListItem* CServerBrowser::FindServer ( std::string strHost, unsigned shor
     ServerBrowserType Type = GetCurrentServerBrowserType ();
     CServerList * pList = GetServerList ( Type );
 
-    CServerListIterator i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
+    CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd ();
     
     for ( CServerListIterator i = i_b; i != i_e; i++ )
     {

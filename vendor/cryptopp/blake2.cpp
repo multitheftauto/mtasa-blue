@@ -13,25 +13,9 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-// Uncomment for benchmarking C++ against NEON
+// Uncomment for benchmarking C++ against SSE2 or NEON
+// #undef CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
 // #undef CRYPTOPP_BOOL_NEON_INTRINSICS_AVAILABLE
-
-// Visual Studio needs both VS2005 (1400) and _M_64 for SSE2 and _mm_set_epi64x()
-//  http://msdn.microsoft.com/en-us/library/y0dh78ez%28v=vs.80%29.aspx
-#if defined(_MSC_VER) && ((_MSC_VER < 1400) || !defined(_M_X64))
-# undef CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
-#endif
-
-// Testing shows Sun CC needs 12.4 for _mm_set_epi64x
-#if (__SUNPRO_CC <= 0x5130)
-# undef CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
-#endif
-
-// Visual Studio needs VS2008 (1500); no dependency on _mm_set_epi64x()
-//   http://msdn.microsoft.com/en-us/library/bb892950%28v=vs.90%29.aspx
-#if defined(_MSC_VER) && (_MSC_VER < 1500)
-# undef CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
-#endif
 
 // Apple Clang 6.0/Clang 3.5 does not have SSSE3 intrinsics
 //   http://llvm.org/bugs/show_bug.cgi?id=20213
@@ -39,13 +23,32 @@ NAMESPACE_BEGIN(CryptoPP)
 # undef CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
 #endif
 
+// Sun Studio 12.3 and earlier lack SSE2's _mm_set_epi64x. Win32 lacks _mm_set_epi64x (Win64 supplies it except for VS2008).
+// Also see http://stackoverflow.com/a/38547909/608639
+#if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE && ((__SUNPRO_CC >= 0x5100 && __SUNPRO_CC < 0x5130) || (_MSC_VER >= 1200 && _MSC_VER < 1600) || (defined(_M_IX86) && _MSC_VER >= 1600))
+inline __m128i _mm_set_epi64x(const word64 a, const word64 b)
+{
+    union INT_128_64x2 {
+        __m128i   v128;
+        word64  v64[2];
+    };
+
+    INT_128_64x2 val;
+    val.v64[0] = b; val.v64[1] = a;
+    return val.v128;
+}
+#endif
+
 // C/C++ implementation
 static void BLAKE2_CXX_Compress32(const byte* input, BLAKE2_State<word32, false>& state);
 static void BLAKE2_CXX_Compress64(const byte* input, BLAKE2_State<word64, true>& state);
 
+// Also see http://github.com/weidai11/cryptopp/issues/247 for singling out SunCC 5.12
 #if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
 static void BLAKE2_SSE2_Compress32(const byte* input, BLAKE2_State<word32, false>& state);
+# if (__SUNPRO_CC != 0x5120)
 static void BLAKE2_SSE2_Compress64(const byte* input, BLAKE2_State<word64, true>& state);
+# endif
 #endif
 
 #if CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
@@ -161,9 +164,11 @@ pfnCompress64 InitializeCompress64Fn()
 	else
 #endif
 #if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
+# if (__SUNPRO_CC != 0x5120)
 	if (HasSSE2())
 		return &BLAKE2_SSE2_Compress64;
 	else
+# endif
 #endif
 #if CRYPTOPP_BOOL_NEON_INTRINSICS_AVAILABLE
 	if (HasNEON())
@@ -1032,6 +1037,7 @@ static void BLAKE2_SSE2_Compress32(const byte* input, BLAKE2_State<word32, false
   _mm_storeu_si128((__m128i *)(void*)(&state.h[4]),_mm_xor_si128(ff1,_mm_xor_si128(row2,row4)));
 }
 
+# if (__SUNPRO_CC != 0x5120)
 static void BLAKE2_SSE2_Compress64(const byte* input, BLAKE2_State<word64, true>& state)
 {
   word64 m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15;
@@ -1916,6 +1922,7 @@ static void BLAKE2_SSE2_Compress64(const byte* input, BLAKE2_State<word64, true>
   _mm_storeu_si128((__m128i *)(void*)(&state.h[4]), _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)(&state.h[4])), row2l));
   _mm_storeu_si128((__m128i *)(void*)(&state.h[6]), _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)(&state.h[6])), row2h));
 }
+# endif // (__SUNPRO_CC != 0x5120)
 #endif  // CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
 
 #if CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
@@ -3987,7 +3994,7 @@ static void BLAKE2_NEON_Compress64(const byte* input, BLAKE2_State<word64, true>
 
   uint64x2_t row1l, row1h, row2l, row2h;
   uint64x2_t row3l, row3h, row4l, row4h;
-  uint64x2_t b0, b1, t0, t1;
+  uint64x2_t b0 = {0,0}, b1 = {0,0}, t0, t1;
 
   row1l = vld1q_u64((const uint64_t *)&state.h[0]);
   row1h = vld1q_u64((const uint64_t *)&state.h[2]);

@@ -10,8 +10,11 @@
 *               Jax <>
 *
 *****************************************************************************/
+
 #include "StdInc.h"
 
+using std::list;
+using std::map;
 
 CClientGUIManager::CClientGUIManager ( void )
 {
@@ -32,9 +35,10 @@ void CClientGUIManager::DeleteAll ( void )
     m_bCanRemoveFromList = false;
 
     // Delete all the gui elements
-    for ( auto& pElement : m_Elements )
+    list < CClientGUIElement* > ::const_iterator iter = m_Elements.begin ();
+    for ( ; iter != m_Elements.end (); iter++ )
     {
-        delete pElement;
+        delete *iter;
     }
 
     // Clear the list
@@ -51,7 +55,20 @@ bool CClientGUIManager::Exists ( CClientGUIElement* pGUIElement )
 
 bool CClientGUIManager::Exists ( CGUIElement* pCGUIElement )
 {
-    return Get(pCGUIElement) != nullptr;
+    if ( pCGUIElement ) {
+        // Find the object in the list
+        list < CClientGUIElement* > ::const_iterator iter = m_Elements.begin ();
+        for ( ; iter != m_Elements.end (); iter++ )
+        {
+            if ( (*iter)->GetCGUIElement () == pCGUIElement )
+            {
+                return true;
+            }
+        }
+    }
+
+    // Doesn't exist
+    return false;
 }
 
 
@@ -59,17 +76,18 @@ CClientGUIElement* CClientGUIManager::Get ( CGUIElement* pCGUIElement )
 {
     if ( pCGUIElement ) {
         // Find the object in the list
-        for (auto& pElement : m_Elements)
+        list < CClientGUIElement* > ::const_iterator iter = m_Elements.begin ();
+        for ( ; iter != m_Elements.end (); iter++ )
         {
-            if ( pElement->GetCGUIElement () == pCGUIElement )
+            if ( (*iter)->GetCGUIElement () == pCGUIElement )
             {
-                return pElement;
+                return *iter;
             }
         }
     }
 
     // Doesn't exist
-    return nullptr;
+    return NULL;
 }
 
 
@@ -101,9 +119,10 @@ void CClientGUIManager::QueueGridListUpdate ( CClientGUIElement *pGUIElement )
 
 void CClientGUIManager::FlushQueuedUpdates ()
 {
-    for ( auto& iter : m_QueuedGridListUpdates)
+    map < ElementID, bool >::iterator iter = m_QueuedGridListUpdates.begin ();
+    for ( ; iter != m_QueuedGridListUpdates.end () ; ++iter )
     {
-        CClientEntity* pEntity = CElementIDs::GetElement ( iter.first );
+        CClientEntity* pEntity = CElementIDs::GetElement ( iter->first );
         if ( pEntity && !pEntity->IsBeingDeleted () && pEntity->GetType () == CCLIENTGUI )
         {
             CClientGUIElement* pGUIElement = static_cast < CClientGUIElement* > ( pEntity );

@@ -1,0 +1,3315 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-01-18 20:10+0000\n"
+"PO-Revision-Date: 2014-07-20 06:46+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: lv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
+"Translators: Vigo \"VirtualGamingLV\" Krūmiņš; Jānis \"Jesha\" Lanka; ccw; Dan "
+"\"Talidan\" Chowdhury\n"
+"X-POOTLE-MTIME: 1405838813.0\n"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:36
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ KOMANDAS PALIDZIBA ]***\n"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:190
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Pareizs laiks ir %d:%02d:%02d"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:280
+msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
+msgstr "connect: Sintakse 'connect <hosts> <ports> [<segvārds> <parole>]'"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:288
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:339
+msgid "connect: Bad port number"
+msgstr "connect: Nepareizs ports"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:304
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:354
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "connect: Pieslēdzas pie %s:%u..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:308
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:358
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "connect: neizdevās pieslēgties pie %s:%u!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:313
+msgid "connect: Failed to unload current mod"
+msgstr "connect: Neizdevās izlādēt esošo modu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:392
+msgid "Bound all controls from GTA"
+msgstr "Sasaistītas visas kontroles no GTA"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:406
+msgid "Saved configuration file"
+msgstr "Saglabāja konfigurācijas failu"
+
+#. Print it
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:466
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* Jūsu seriāls ir: %s"
+
+#. Unknown command
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommands.cpp:201
+msgid "Unknown command or cvar: "
+msgstr "Nezināma komanda vai cvar:"
+
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunity.cpp:154
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:218
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:232
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:234
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:240
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:248
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:274
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:276
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:278
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:280
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:282
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:85
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:112
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:128
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:266
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:316
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:407
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:414
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:424
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1281
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1294
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CDirect3DHook9.cpp:118
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CGUI.cpp:85
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:149
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:158
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:163
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:172
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1224
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1246
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1304
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1354
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2678
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3665
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3694
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4078
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:533
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:542
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:227
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:240
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:243
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:781
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:563
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:638
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:663
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:685
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1020
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1099
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1109
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1178
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1212
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1252
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1264
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:138
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CServer.cpp:194
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:374
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:75
+msgid "Error"
+msgstr "Kļūda"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunity.cpp:154
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:218
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:240
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:248
+msgid "Services currently unavailable"
+msgstr "Pakalpojums šobrīd nav pieejams"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityLogin.cpp:112
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityLogin.cpp:150
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2718
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2773
+msgid "Login Error"
+msgstr "Autorizācijas Kļūda"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityLogin.cpp:112
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2718
+msgid "Invalid username/password"
+msgstr "Nederīgs lietotājvārds/parole"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:222
+msgid "Success"
+msgstr "Izdevās"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:222
+msgid "Successfully registered!"
+msgstr "Reģistrācija veiksmīga!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:274
+msgid "Username missing"
+msgstr "Lietotājvārds nav ievadīts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:276
+msgid "Email missing"
+msgstr "E-pasts nav ievadīts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:278
+msgid "Password missing"
+msgstr "Parole nav ievadīta"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:280
+msgid "Passwords do not match"
+msgstr "Paroles nesakrīt"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommunityRegistration.cpp:282
+msgid "Validation code missing"
+msgstr "Apstiprinājuma kods nav ievadīts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:84
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Savienojums neizdevās. Norādīts nederīgs segvārds!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:111
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Savienošanās neizdevās. Norādīts nederīgs hosts!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:127
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Savienošanās ar %s caur %u portu neizdevās!"
+
+#. Display the status box
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:148
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Savienojas ar %s:%u ..."
+
+#. Display the status box
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:149
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:579
+msgid "CONNECTING"
+msgstr "SAVIENOJAS"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:266
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1178
+msgid "Connection timed out"
+msgstr "Savienojums iztecējis"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:280
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:283
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1223
+msgid "Disconnected: unknown protocol error"
+msgstr "Atvienošanās: nezināma protokola kļūda"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:286
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1226
+msgid "Disconnected: disconnected remotely"
+msgstr "Atvienošanās: savienojums pazuda attālināti"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:289
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1229
+msgid "Disconnected: connection lost remotely"
+msgstr "Atvienošanās: savienojums pazuda attālināti"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:292
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1232
+msgid "Disconnected: you are banned from this server"
+msgstr "Atvienots: jums ir liegta piekļuve šim serverim"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:298
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1238
+msgid "Disconnected: disconnected from the server"
+msgstr "Atvienots: atvienojās no servera"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:301
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1241
+msgid "Disconnected: connection to the server was lost"
+msgstr "Atvienojās: pārtrūka savienojums ar serveri"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:307
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1247
+msgid "Disconnected: connection was refused"
+msgstr "Atvienots: neizdevās savienoties"
+
+#. Failed loading the mod
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:406
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Nav ieinstalēta šī modifikācija (%s)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:414
+msgid "Bad server response (2)"
+msgstr "Nav servera atbildes (2)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:424
+msgid "Bad server response (1)"
+msgstr "Nav servera atbildes (1)"
+
+#. Create window
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConsole.cpp:423
+msgid "CONSOLE"
+msgstr "KONSOLE"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:710
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuestionBox.cpp:202
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:618
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr ""
+"Vai jūs vēlaties atrast kādu tiešsaistes palīdzību saistībā ar šo problēmu ?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:715
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1101
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuestionBox.cpp:204
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:482
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1617
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1643
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3925
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3973
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1597
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1616
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1901
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1921
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:33
+msgid "No"
+msgstr "Nē"
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:716
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1102
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuestionBox.cpp:205
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:482
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1618
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1644
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3926
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3974
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1598
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1617
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1902
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1922
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\gui\CGUIMessageBox_Impl.cpp:68
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:32
+msgid "Yes"
+msgstr "Jā"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:771
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:686
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:773
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\shared_logic\Utils.cpp:152
+msgid "Fatal error"
+msgstr "Fatāla kļūda"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:947
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s modulis ir nepareizs!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1281
+msgid "Error executing URL"
+msgstr "Kļūda izpildot URL"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1293
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Kļūda darbinot modifikāciju, kura norādīta komandrindā ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1378
+msgid "this help screen"
+msgstr "šis palīdzības ekrāns"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1379
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1380
+msgid "exits the application"
+msgstr "iziet no aplikācijas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1381
+msgid "shows the version"
+msgstr "uzrāda versiju"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1382
+msgid "shows the time"
+msgstr "uzrāda laiku"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1383
+msgid "shows the hud"
+msgstr "uzrāda hud"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1384
+msgid "shows all the binds"
+msgstr "uzrāda visas saistības"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1385
+msgid "shows your serial"
+msgstr "uzrāda jūsu seriālu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1394
+msgid "connects to a server (host port nick pass)"
+msgstr "savienojās ar serveri (hosts pors segvārds parole)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1395
+msgid "connects to a previous server"
+msgstr "savienojās ar iepriekšējo serveri"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1396
+msgid "binds a key (key control)"
+msgstr "savieno pogu (pogu kontrole)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1397
+msgid "unbinds a key (key)"
+msgstr "atvieno pogu (poga)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1398
+msgid "copies the default gta controls"
+msgstr "nokopē noklusējuma gta vadības"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1399
+msgid "outputs a screenshot"
+msgstr "izveido ekrānšāviņu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1400
+msgid "immediately saves the config"
+msgstr "nekavējoties saglabā konfigurāciju"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1402
+msgid "clears the debug view"
+msgstr "iztīra atkļūdošanās logu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1403
+msgid "scrolls the chatbox upwards"
+msgstr "pavirza saraksti uz augšu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1404
+msgid "scrolls the chatbox downwards"
+msgstr "pavirza saraksti uz leju"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1405
+msgid "scrolls the debug view upwards"
+msgstr "pavirza atkļūdošanās skatu uz augšu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1406
+msgid "scrolls the debug view downwards"
+msgstr "pavirza atkļūdošanās skatu uz leju"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1409
+msgid "shows the memory statistics"
+msgstr "uzrāda atmiņas statistiku"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1410
+msgid "shows the frame timing graph"
+msgstr "uzrāda kadru laikošanas grafiku"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.h:55
+msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:32
+msgid "Programming"
+msgstr "Programmēšana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:57
+msgid "Contributors"
+msgstr "Atbalstītāji"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:69
+msgid "Game Design / Scripting"
+msgstr "Spēles Dizains / Kodējums"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:85
+msgid "Patch contributors"
+msgstr "Ielāpa atbalstītāji"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:132
+msgid "Language Localization"
+msgstr "Valodas Lokalizācija"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:138
+msgid "Special Thanks"
+msgstr "Īpašas Pateicības"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:163
+msgid "This software makes use of the following libraries and software:"
+msgstr "Šī programmatūra liek mums sekot bibliotēkām un programmatūrām:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CDirect3DEvents9.cpp:234
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Ekrānšāviņš aizņēma %d baitus, bet paredzēts %d"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CDirect3DEvents9.cpp:240
+msgid "Screenshot failed"
+msgstr "Ekrānšāviņš neizdevās"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CDirect3DHook9.cpp:115
+msgid ""
+"Could not initialize Direct3D9.\n"
+"\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr ""
+"Nespēj inicializēt Direct3D9.\n"
+"\n"
+"Lūdzu pārliecinieties, ka DirectX End-User Runtime un\n"
+"pēdējās Windows Servisu Pakotnes ir uzstādītas pareizi."
+
+#. Even the default skin doesn't work, so give up
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CGUI.cpp:85
+msgid ""
+"The skin you selected could not be loaded, and the default skin also could "
+"not be loaded, please reinstall MTA."
+msgstr ""
+"Motīvs, kuru Jūs izvēlējaties, nav iespējams ielādēt un sākotnējo motīvu arī "
+"nevar ielādēt, lūdzu pārinstalējiet MTA."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CJoystickManager.cpp:1600
+msgid "Accelerate Axis"
+msgstr "Akselerācijas Ass"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CJoystickManager.cpp:1601
+msgid "Brake Axis"
+msgstr "Bremžu Ass"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:187
+msgid "Fire"
+msgstr "Uguns"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:188
+msgid "Next weapon"
+msgstr "Nākošais ierocis"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:189
+msgid "Previous weapon"
+msgstr "Iepriekšējais ierocis"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:190
+msgid "Forwards"
+msgstr "Uz priekšu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:191
+msgid "Backwards"
+msgstr "Atpakaļ"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:192
+msgid "Left"
+msgstr "Pa kreisi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:193
+msgid "Right"
+msgstr "Pa labi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:194
+msgid "Zoom in"
+msgstr "Pietuvināšana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:195
+msgid "Zoom out"
+msgstr "Attālināšana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:196
+msgid "Enter/Exit"
+msgstr "Iekāpšana/Izkāpšana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:197
+msgid "Change camera"
+msgstr "Mainīt kameru"
+
+#. 10
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:198
+msgid "Jump"
+msgstr "Lekt"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:199
+msgid "Sprint"
+msgstr "Skriet"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:200
+msgid "Look behind"
+msgstr "Paskatīties uz atpakaļu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:201
+msgid "Crouch"
+msgstr "Notupties"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:202
+msgid "Action"
+msgstr "Darbība"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:203
+msgid "Walk"
+msgstr "Iet"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:204
+msgid "Vehicle fire"
+msgstr "Šaušana no transporta"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:205
+msgid "Vehicle secondary fire"
+msgstr "Transportlīdzekļa alternatīvā šaušana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:206
+msgid "Vehicle left"
+msgstr "Braukt pa kreisi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:207
+msgid "Vehicle right"
+msgstr "Braukt pa labi"
+
+#. 20
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:208
+msgid "Steer forwards/down"
+msgstr "Stūrēt uz priekšu/atpakaļ"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:209
+msgid "Steer backwards/up"
+msgstr "Stūrēt atpakaļ/uz priekšu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:210
+msgid "Accelerate"
+msgstr "Akselerācija"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:211
+msgid "Brake/Reverse"
+msgstr "Bremzes/Atpakaļgaita"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:212
+msgid "Radio next"
+msgstr "Nākošais radio"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:213
+msgid "Radio previous"
+msgstr "Iepriekšējais radio"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:214
+msgid "Radio user track skip"
+msgstr "Lietotāja dziesmas pārslēgšana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:215
+msgid "Horn"
+msgstr "Signāls"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:216
+msgid "Sub-mission"
+msgstr "Pieteikšanās"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:217
+msgid "Handbrake"
+msgstr "Rokas bremze"
+
+#. 30
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:218
+msgid "Vehicle look left"
+msgstr "Skats pa kreisi no transportlīdzekļa"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:219
+msgid "Vehicle look right"
+msgstr "Transportlīdzekļa skats pa labi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:220
+msgid "Vehicle look behind"
+msgstr "Transportlīdzekļa aizmugurējais skats"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:221
+msgid "Vehicle mouse look"
+msgstr "Transportlīdzekļa peles skats"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:222
+msgid "Special control left"
+msgstr "Īpašā vadība pa kreisi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:223
+msgid "Special control right"
+msgstr "Īpašā vadība pa labi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:224
+msgid "Special control down"
+msgstr "Īpašā vadība uz leju"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:225
+msgid "Special control up"
+msgstr "Īpašā vadība uz augšu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:226
+msgid "Aim weapon"
+msgstr "Ieroča mērķēšana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:227
+msgid "Conversation yes"
+msgstr "Sarunas piekrišana"
+
+#. 40
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:228
+msgid "Conversation no"
+msgstr "Sarunas noraidījums"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:229
+msgid "Group control forwards"
+msgstr "Grupas kontrole uz priekšu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:230
+msgid "Group control backwards"
+msgstr "Grupas kontrole uz atpakaļu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1095
+msgid ""
+"This will disconnect you from the current server.\n"
+"\n"
+"Are you sure you want to disconnect?"
+msgstr ""
+"Šī darbība Jūs atslēgs no esošā servera.\n"
+"\n"
+"Vai Jūs tik tiešām vēlaties atslēgties?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1099
+msgid "DISCONNECT WARNING"
+msgstr "ATSLĒGŠANĀS BRĪDINĀJUMS"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:149
+msgid "No host specified!"
+msgstr "Nav norādīts hosts!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:158
+msgid "No port specified!"
+msgstr "Nav norādīts ports!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:163
+msgid "Invalid port specified!"
+msgstr "Norādīts nederīgs ports!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuickConnect.cpp:172
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1246
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1304
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:563
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:663
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Nederīgs segvārds! Lūdzu dodieties uz Uzstādījumiem un uzstādiet citu!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CScreenShot.cpp:53
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Ekrāņšāviņš izveidots: '%s'"
+
+#. Create the window
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:91
+msgid "SERVER BROWSER"
+msgstr "SERVERA PĀRLŪKS"
+
+#. Create the tabs
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:139
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:92
+msgid "Internet"
+msgstr "Interneta"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:140
+msgid "Local"
+msgstr "Lokālie"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:141
+msgid "Favourites"
+msgstr "Favorīti"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:142
+msgid "Recent"
+msgstr "Nesenie"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:201
+msgid ""
+"FOR QUICK CONNECT:\n"
+"\n"
+"Type the address and port into the address bar.\n"
+"Or select a server from the history list and press 'Connect'"
+msgstr ""
+"ĀTRAIS SAVIENOJUMS:\n"
+"\n"
+"Ievadiet servera adresi un portu adrešu joslā.\n"
+"Vai izvēlieties serveri no vēstures un spiediet 'Vienoties'"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:214
+msgid "HELP"
+msgstr "PALĪDZĪBA"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:224
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:270
+msgid "Refresh"
+msgstr "Atjaunot"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:225
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:271
+msgid "Add Favorite"
+msgstr "Pievienot Favorītiem"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:226
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:272
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:317
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:376
+msgid "Connect"
+msgstr "Vienoties"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:227
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:273
+msgid "Server information"
+msgstr "Servera informācija"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:230
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:274
+msgid "Search servers"
+msgstr "Meklēt serverus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:231
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:275
+msgid "Search players"
+msgstr "Meklēt spēlētājus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:232
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:276
+msgid "Start search"
+msgstr "Sākt meklēt"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:314
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1643
+msgid "Search players..."
+msgstr "Meklēt spēlētājus..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:315
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:426
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1641
+msgid "Search servers..."
+msgstr "Meklēt serverus..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:457
+msgid "Name"
+msgstr "Vārds"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:458
+msgid "Players"
+msgstr "Spēlētāji"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:459
+msgid "Ping"
+msgstr "Pings"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:460
+msgid "Gamemode"
+msgstr "Gamemods"
+
+#. Player List Columns
+#. Column for player names
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:482
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:145
+msgid "Player list"
+msgstr "Spēlētāju saraksts"
+
+#. Include label
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:490
+msgid "Include:"
+msgstr "Iekļaut:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:496
+msgid "Empty"
+msgstr "Tukšs"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:502
+msgid "Full"
+msgstr "Pilns"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:508
+msgid "Locked"
+msgstr "Slēgts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:520
+msgid "Offline"
+msgstr "Nepieejams"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:533
+msgid "Other Versions"
+msgstr "Citas Versijas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:554
+msgid "Back"
+msgstr "Atpakaļ"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:560
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:36
+msgid "Help"
+msgstr "Palīdzība"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:743
+msgid "Loading..."
+msgstr "Ielādē..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1193
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:2120
+msgid "  ..loading.."
+msgstr "  ..ielādē.."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1224
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1354
+msgid "No address specified!"
+msgstr "Nav norādīta adrese!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1237
+msgid "Unknown protocol"
+msgstr "Nezināms protokols"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1237
+msgid "Please use the mtasa:// protocol!"
+msgstr "Lūdzu izmantojiet mtasa:// protokolu!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1326
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:322
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:552
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:557
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:1063
+msgid "Information"
+msgstr "Informācija"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1326
+msgid "You have to select a server to connect to."
+msgstr "Jums ir jāizvēlas serveris, pie kura pievienoties."
+
+#. Create queue window
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:32
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:305
+msgid "SERVER IS FULL"
+msgstr "SERVERIS IR PILNS"
+
+#. Start position
+#. Server Name
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:45
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:59
+msgid "Name:"
+msgstr "Nosaukums:"
+
+#. Server IP
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:46
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:71
+msgid "Server Address:"
+msgstr "Servera Adrese:"
+
+#. Gamemode
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:47
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:83
+msgid "Gamemode:"
+msgstr "Gamemods:"
+
+#. Map
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:48
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:94
+msgid "Map:"
+msgstr "Mape:"
+
+#. Players
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:49
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:105
+msgid "Players:"
+msgstr "Spēlētāji:"
+
+#. Passworded
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:50
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:116
+msgid "Passworded:"
+msgstr "Parole:"
+
+#. Latency
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:51
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:127
+msgid "Latency:"
+msgstr "Latensija:"
+
+#. Close button
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:151
+msgid "Close"
+msgstr "Aizvērt"
+
+#. Join Game button
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:158
+msgid "Join Game"
+msgstr "Pievienoties"
+
+#. Please enter password label
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:172
+msgid "Please enter the password to the server:"
+msgstr "Lūdzu ievadiet servera paroli:"
+
+#. Autojoin checkbox
+#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:182
+msgid "Join the server as soon as a player slot is available."
+msgstr "Pievienoties serverim, kad tajā atbrīvojās brīva vieta."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:313
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "LŪDZU IEVADIET SERVERA PAROLI"
+
+#. The server has timed out
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:405
+msgid "Timed Out"
+msgstr "Noilgums"
+
+#. Set every GUI elements text to blank
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:434
+msgid "Querying..."
+msgstr "Pārbauda..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:26
+msgid "Idle"
+msgstr "Dīkstāve"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:154
+msgid "player"
+msgid_plural "players"
+msgstr[0] "spēlētājs"
+msgstr[1] "spēlētāji"
+msgstr[2] "spēlētāji"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:155
+msgid "on"
+msgstr "uz"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:158
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "serveris"
+msgstr[1] "serveri"
+msgstr[2] "serveri"
+
+#. We are polling for the master server list (first pass)
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:249
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Pieprasa serveru sarakstu (%lu ms pagājušas)"
+
+#. Abort
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:263
+msgid "Master server list could not be parsed."
+msgstr "Servera sarakstu nespēj parsēt."
+
+#. Abort
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:270
+msgid "Master server list could not be retrieved."
+msgstr "Servera sarakstu nespēj saņemt."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:280
+msgid "(Backup server list)"
+msgstr "(Rezerves servera saraksts)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:330
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "Nespēj savienot LAN-apraides soketu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:350
+msgid "Attempting to discover LAN servers"
+msgstr "Mēģina atklāt LAN serverus"
+
+#. Create window (with frame) if it will fit inside the screen resolution
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:94
+msgid "SETTINGS"
+msgstr "UZSTĀDĪJUMI"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:125
+msgid "Multiplayer"
+msgstr "Daudzspēlētāju"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:126
+msgid "Video"
+msgstr "Video"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:127
+msgid "Audio"
+msgstr "Skaņa"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:128
+msgid "Binds"
+msgstr "Saistības"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:129
+msgid "Controls"
+msgstr "Vadība"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:130
+msgid "Interface"
+msgstr "Intrefeiss"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:131
+msgid "Web Browser"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:132
+msgid "Advanced"
+msgstr "Paplašināts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:133
+msgid "Community"
+msgstr "Kopiena"
+
+#. Create buttons
+#. OK button
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:137
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4099
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1635
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1864
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1962
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1985
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2004
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2017
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2175
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2185
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2194
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2209
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\gui\CGUIMessageBox_Impl.cpp:64
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:34
+msgid "OK"
+msgstr "LABI"
+
+#. Cancel button
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:142
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4098
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1829
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1846
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1883
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\gui\CGUIMessageBox_Impl.cpp:66
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:37
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:125
+msgid "Cancel"
+msgstr "Atcelt"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:157
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:356
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:625
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:880
+msgid "Load defaults"
+msgstr "Ielādēt noklusējuma"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:168
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:194
+msgid "Mouse sensitivity:"
+msgstr "Peles jūtīgums:"
+
+#. VerticalAimSensitivity
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:169
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:212
+msgid "Vertical aim sensitivity:"
+msgstr "Vertikālās mērķēšanas jūtīgums:"
+
+#. Mouse Options
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:173
+msgid "Mouse options"
+msgstr "Peles opcijas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:180
+msgid "Invert mouse vertically"
+msgstr "Apvērst peli vertikāli"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:184
+msgid "Steer with mouse"
+msgstr "Stūrēt ar peli"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:188
+msgid "Fly with mouse"
+msgstr "Lidot ar peli"
+
+#. Joypad options
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:230
+msgid "Joypad options"
+msgstr "Joypada opcijas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:243
+msgid "Standard controls (Mouse + Keyboard)"
+msgstr "Standarta vadība (Pele + Tastatūra)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:250
+msgid "Classic controls (Joypad)"
+msgstr "Klasiska vadība (Joypad)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:287
+msgid "Dead Zone"
+msgstr "Dead Zone"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:292
+msgid "Saturation"
+msgstr "Piesātinājums"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:298
+msgid "Use the 'Binds' tab for joypad buttons."
+msgstr "Izmantojiet 'Saistības' sadaļu priekš joypada pogām."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:341
+msgid "Left Stick"
+msgstr "Kreisā"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:347
+msgid "Right Stick"
+msgstr "Labā"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:363
+msgid "DESCRIPTION"
+msgstr "APRAKSTS"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:364
+msgid "KEY"
+msgstr "POGA"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:366
+msgid "ALT. KEY"
+msgstr "ALT. POGA"
+
+#. m_pLabelCommunity->AutoSize ( CORE_SETTINGS_COMMUNITY_TEXT );
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:379
+msgid "Username:"
+msgstr "Lietotājvārds:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:384
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:66
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:68
+msgid "Password:"
+msgstr "Parole:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:403
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2782
+msgid "Login"
+msgstr "Autorizēties"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:409
+msgid "Register"
+msgstr "Reģistrēt"
+
+#. *
+#. *	Multiplayer tab
+#. *
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:417
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:420
+msgid "Nick:"
+msgstr "Segvārds:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:430
+msgid "Save server passwords"
+msgstr "Saglabāt serveru paroles"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:435
+msgid "Auto-refresh server browser"
+msgstr "Automātiskā atjaunošanās serveru pārlūkā"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:440
+msgid "Allow screen upload"
+msgstr "Ļaut ekrāna augšupielādi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:445
+msgid "Use customized GTA:SA files"
+msgstr "Lietot pārveidotos GTA:SA failus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:450
+msgid "Map rendering options"
+msgstr "Kartes utilizācijas opcijas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:456
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:644
+msgid "Opacity:"
+msgstr "Caurredzamība:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:478
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:491
+msgid "Radio volume:"
+msgstr "Radio skaļums:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:479
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:510
+msgid "SFX volume:"
+msgstr "SFX skaļums:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:480
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:529
+msgid "MTA volume:"
+msgstr "MTA skaļums:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:481
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:548
+msgid "Voice volume:"
+msgstr "Balss skaļums:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:482
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:606
+msgid "Play mode:"
+msgstr "Spēlēšanas veids:"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:485
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:647
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:891
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1154
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:53
+msgid "General"
+msgstr "Vispārējs"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:569
+msgid "Mute Radio sounds when minimized"
+msgstr "Apklusināt Radio skaņas, ja minimizēts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:574
+msgid "Mute SFX sounds when minimized"
+msgstr "Apklusināt SFX skaņas, ja minimizēts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:579
+msgid "Mute MTA sounds when minimized"
+msgstr "Apklusināt MTA skaņas, ja minimizēts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:584
+msgid "Mute Voice sounds when minimized"
+msgstr "Apklusināt Balss skaņas, ja minimizēts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:591
+msgid "Radio Equalizer"
+msgstr "Radio Ekvalaizers"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:595
+msgid "Radio Auto-tune"
+msgstr "Radio Automātiskā Uzstādīšana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:600
+msgid "Usertrack options"
+msgstr "Lietotāja dziesmu opcijas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:614
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2851
+msgid "Radio"
+msgstr "Radio"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:615
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2852
+msgid "Random"
+msgstr "Nejaušs"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:616
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2853
+msgid "Sequential"
+msgstr "Secīgs"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:619
+msgid "Automatic Media Scan"
+msgstr "Automātiskā Multivides Pārbaudīšana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:636
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:653
+msgid "Resolution:"
+msgstr "Izšķirtspēja:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:637
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:694
+msgid "FOV:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:638
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:710
+msgid "Draw Distance:"
+msgstr "Redzamības Attālums:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:639
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:728
+msgid "Brightness:"
+msgstr "Spilgtums:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:640
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:746
+msgid "FX Quality:"
+msgstr "FX Kvalitāte:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:641
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:760
+msgid "Anisotropic filtering:"
+msgstr "Anizotropā filtrēšana:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:642
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:787
+msgid "Anti-aliasing:"
+msgstr "Anti-aliasingi:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:643
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:802
+msgid "Aspect Ratio:"
+msgstr "Izmēru Attiecība:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:665
+msgid "Windowed"
+msgstr "Loga režīms"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:673
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1250
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:354
+msgid "Fullscreen mode:"
+msgstr "Pilnekrāna režīms:"
+
+#. Fullscreen style
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:680
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1797
+msgid "Standard"
+msgstr "Standarta"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:681
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1798
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:354
+msgid "Borderless window"
+msgstr "Bez-rāmju logs"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:682
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1799
+msgid "Borderless keep res"
+msgstr "Bez-rāmju keep res"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:686
+msgid "Mip Mapping"
+msgstr "Mip Mappings"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:754
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1732
+msgid "Low"
+msgstr "Zema"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:755
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1733
+msgid "Medium"
+msgstr "Vidēja"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:756
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1734
+msgid "High"
+msgstr "Augsta"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:757
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1735
+msgid "Very high"
+msgstr "Ļoti augsta"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:772
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:795
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1268
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1322
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1434
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1738
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2901
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2923
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2941
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3734
+msgid "Off"
+msgstr "Izslēgts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:796
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1739
+msgid "1x"
+msgstr "1x"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:797
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1740
+msgid "2x"
+msgstr "2x"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:798
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1741
+msgid "3x"
+msgstr "3x"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:812
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1270
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1746
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2902
+msgid "Auto"
+msgstr "Automātiski"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:813
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1747
+msgid "4:3"
+msgstr "4:3"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:814
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1748
+msgid "16:10"
+msgstr "16:10"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:815
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1749
+msgid "16:9"
+msgstr "16:9"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:818
+msgid "HUD Match Aspect Ratio"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:824
+msgid "Volumetric Shadows"
+msgstr "Volumetriskas Ēnas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:828
+msgid "Grass effect"
+msgstr "Zāles efekts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:832
+msgid "Heat haze"
+msgstr "Siltuma tveice"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:836
+msgid "Tyre Smoke etc"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:841
+msgid "Full Screen Minimize"
+msgstr "Pilnekrāna Minimizēšana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:853
+msgid "Enable Device Selection Dialog"
+msgstr "Iespējot Ierīces Izvēles Dialogu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:865
+msgid "Show unsafe resolutions"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:898
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:904
+msgid "Language:"
+msgstr "Valoda:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:899
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:926
+msgid "Skin:"
+msgstr "Motīvs:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:900
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:947
+msgid "Presets:"
+msgstr "Iepriekšējie:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:937
+msgid "Chat"
+msgstr "Sarakste"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:957
+msgid "Load"
+msgstr "Ielādēt"
+
+#. Color selection
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:963
+msgid "Chat BG"
+msgstr "Sarakstes BG"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:964
+msgid "Chat Text"
+msgstr "Sarakstes Teksts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:965
+msgid "Input BG"
+msgstr "Ievades BG"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:966
+msgid "Input Text"
+msgstr "Ievades Teksts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:992
+msgid "Font:"
+msgstr "Fonts:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1020
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1046
+msgid "Lines:"
+msgstr "Līnijas:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1021
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1057
+msgid "Scale:"
+msgstr "Mērogs:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1022
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1078
+msgid "Width:"
+msgstr "Platums:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1093
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1101
+msgid "after"
+msgstr "pēc"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1094
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1114
+msgid "for"
+msgstr "priekš"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1097
+msgid "Fade out old lines"
+msgstr "Izgaisināt vecās līnijas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1110
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1123
+msgid "sec"
+msgstr "sek"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1135
+msgid "Hide background when not typing"
+msgstr "Paslēpt fonu, ja neraksta"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1140
+msgid "Nickname completion using the \"Tab\" key"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1145
+msgid "Allow server to flash the window"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1160
+msgid "Enable remote websites"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1165
+msgid "Enable Javascript on remote websites"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1170
+msgid "Enable plugins (like Flash, Silverlight; Java is disabled by default)"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1175
+msgid "Custom blacklist"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1185
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1213
+msgid "Enter a domain e.g. google.com"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1187
+msgid "Block"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1195
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1223
+msgid "Domain"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1197
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1225
+msgid "Remove domain"
+msgstr ""
+
+#. Reset vecTemp
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1203
+msgid "Custom whitelist"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1215
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:48
+msgid "Allow"
+msgstr ""
+
+#. Misc section label
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1238
+msgid "Misc"
+msgstr "Dažādi"
+
+#. Fast clothes loading
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1245
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1261
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4117
+msgid "Fast CJ clothes loading:"
+msgstr "Ātrā CJ apģērbu ielādēšana:"
+
+#. Browser scan speed
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1246
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1275
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4119
+msgid "Browser speed:"
+msgstr "Pārlūkošanas ātrums:"
+
+#. Single download
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1247
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1289
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4121
+msgid "Single connection:"
+msgstr "Viens savienojums:"
+
+#. Packet tag
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1248
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1302
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4123
+msgid "Packet tag:"
+msgstr ""
+
+#. Progress animation
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1249
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1315
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4125
+msgid "Progress animation:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1251
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4115
+msgid "Process priority:"
+msgstr "Procesu prioritāte:"
+
+#. Debug setting
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1252
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1342
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4127
+msgid "Debug setting:"
+msgstr "Atkļūdošanas uzstādījumi:"
+
+#. Streaming memory
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1253
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1365
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4129
+msgid "Streaming memory:"
+msgstr "Straumēšanas atmiņa:"
+
+#. Update build type
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1254
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1448
+msgid "Update build type:"
+msgstr "Atjauninājumu veids:"
+
+#. UpdateAutoInstall
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1255
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1427
+msgid "Install important updates:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1269
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1297
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1310
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2903
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2914
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2919
+msgid "On"
+msgstr "Ieslēgts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1282
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2907
+msgid "Very slow"
+msgstr "Ļoti lēni"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1283
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1296
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1309
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1323
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1349
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1361
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1435
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1455
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2908
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2913
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2918
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2924
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2936
+msgid "Default"
+msgstr "Noklusējuma"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1284
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2909
+msgid "Fast"
+msgstr "Ātri"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1372
+msgid "Min"
+msgstr "Min"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1385
+msgid "Max"
+msgstr "Max"
+
+#. Windows 8 compatibility
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1392
+msgid "Windows 8 compatibility:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1397
+msgid "16-bit color"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1402
+msgid "Mouse fix"
+msgstr ""
+
+#. Auto updater section label
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1420
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1423
+msgid "Auto updater"
+msgstr "Automātiskais atjaunotājs"
+
+#. Check for updates
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1461
+msgid "Check for update now"
+msgstr "Pārbaudīt atjauninājumus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1611
+#, fuzzy
+msgid "Some settings will be changed when you next start MTA"
+msgstr "Some settings stāsies spēkā pie nākošās MTA startēšanas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1612
+msgid ""
+"\n"
+"\n"
+"Do you want to restart now?"
+msgstr ""
+"\n"
+"\n"
+"Vai vēlaties restartēt šobrīd?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1615
+msgid "RESTART REQUIRED"
+msgstr "NEPIECIEŠAMS RESTARTS"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1637
+msgid "Some settings will be changed when you disconnect the current server"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1638
+#, fuzzy
+msgid ""
+"\n"
+"\n"
+"Do you want to disconnect now?"
+msgstr ""
+"\n"
+"\n"
+"Vai vēlaties restartēt šobrīd?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1641
+msgid "DISCONNECT REQUIRED"
+msgstr ""
+
+#. Update the joystick name
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1922
+msgid "Joypad not detected  -  Check connections and restart game"
+msgstr "Joypad nav atrasts  -  Pārbaudiet savienojumu un restartējiet spēli"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2085
+msgid "Binding axis"
+msgstr "Saistīt asis"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2085
+msgid "Move an axis to bind, or escape to clear"
+msgstr "Pakustiniet asi, lai savienotu, vai esc, lai iztīrītu"
+
+#. Determine if the primary or secondary column was selected
+#. m_hPriKey  Note: handle is not the same as index
+#. Create a messagebox to notify the user
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. Create a messagebox to notify the user
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2363
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2368
+msgid "Press a key to bind, or escape to clear"
+msgstr "Nospiediet pogu, pie kuras piesaistīt, vai arī esc, lai iztīrītu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2364
+msgid "Binding a primary key"
+msgstr "Saistīt primāro pogu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2369
+msgid "Binding a secondary key"
+msgstr "Saistīt sekundāro pogu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2445
+msgid "GTA GAME CONTROLS"
+msgstr "GTA SPĒLES KONTROLES"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2447
+msgid "MULTIPLAYER CONTROLS"
+msgstr "MULTIPLAYER KONTROLES"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2678
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4078
+msgid "Your nickname contains invalid characters!"
+msgstr "Jūsu segvārds satur neatļautas rakstzīmes!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2726
+msgid "Logging in..."
+msgstr "Savienojās..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:2782
+msgid "Logout"
+msgstr "Atslēgties"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3366
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3369
+msgid "Red:"
+msgstr "Sarkans:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3381
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3384
+msgid "Green:"
+msgstr "Zaļš:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3396
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3399
+msgid "Blue:"
+msgstr "Zils:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3411
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3414
+msgid "Transparency:"
+msgstr "Caurredzamība:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3665
+msgid "Please disconnect before changing language"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3694
+msgid "Please disconnect before changing skin"
+msgstr "Lūdzu atslēdzieties pirms maināt motīvu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3919
+msgid ""
+"Volmetric shadows can cause some systems to slow down.\n"
+"\n"
+"Are you sure you want to enable them?"
+msgstr ""
+"Volumektriskās ēnas var palēlināt sistēmas darbīnu.\n"
+"\n"
+"Vai Jūs tik tiešām vēlaties tās iespējot?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3923
+msgid "PERFORMANCE WARNING"
+msgstr "VEIKTSPĒJAS BRĪDINĀJUMS"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3942
+msgid ""
+"Screen upload is required by some servers for anti-cheat purposes.\n"
+"\n"
+"(The chat box and GUI is excluded from the upload)\n"
+msgstr ""
+"Ekrāna augšupielāde ir dažos serveros nepieciešama kā anti-chear līdzeklis.\n"
+"\n"
+"(Sarakste un GUI logi netiek attēloti augšupielādēs)\n"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3944
+msgid "SCREEN UPLOAD INFORMATION"
+msgstr "EKRĀNA AUGŠUPIELĀDES INFORMĀCIJA"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3965
+msgid ""
+"Some files in your GTA:SA data directory are customized.\n"
+"MTA will only use these modified files if this check box is ticked.\n"
+"\n"
+"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n"
+"\n"
+"Are you sure you want to use them?"
+msgstr ""
+"Daži faili iekš Jūsu GTA:SA datu mapē ir laboti.\n"
+"MTA izmantos tikai šos failus, ja šī rūtiņa ir ieķeksēta.\n"
+"\n"
+"Jebkurā ziņā, LABOTI GTA:SA FAILI IR BLOĶĒTI VAIRĀKOS SERVEROS\n"
+"\n"
+"Vai Jūs tik tiešām vēlaties izmantot?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3971
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2135
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "PĀRVEIDOTIE GTA:SA FAILI"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4096
+msgid "Please enter a nickname"
+msgstr "Lūdzu ievadiet segvārdu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4097
+msgid ""
+"Please enter a nickname to be used ingame.  \n"
+"This will be your name when you connect to and play in a server"
+msgstr ""
+"Lūdzu ievadiet segvārdu, kuru izmantosiet spēlējot.  \n"
+"Tas būs Jūsu vārds, ar kuru savienosieties uz spēlēsiet serverī"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4115
+msgid "Very experimental feature."
+msgstr "Ļoti eksperimentāla funkcija."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4117
+msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
+msgstr "Aptur stendus ar CJ variācijām (Izmanto 65MB vairāk RAM)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4119
+msgid "Older routers may require a slower scan speed."
+msgstr "Vecākiem maršrutētājiem ieteicams lēnāks meklēšanas ātrums."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4121
+msgid "Switch on to use only one connection when downloading."
+msgstr "Ieslēdziet, lai izmantotu tikai vienu savienojumu lejupielādējot."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4123
+msgid "Tag network packets to help ISPs identify MTA traffic."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4125
+msgid "Spinning circle animation at the bottom of the screen"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4127
+msgid "Select default always. (This setting is not saved)"
+msgstr "Vienmēr izvēlēts sākotnēs. (Šis uzstādījums netiek saglabāts)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4129
+msgid "Maximum is usually best"
+msgstr "Maksimālais vienmēr ir labākais"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4131
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4133
+msgid "Auto updater:"
+msgstr "Automātiskais atjaunotājs:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4131
+msgid "Select default unless you like filling out bug reports."
+msgstr "Izvēlieties sākotnēju, ja vien jums patīk aizpildīt kļūdu ziņojumus."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4133
+msgid "Select default to automatically install important updates."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4135
+msgid "16-bit color:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4135
+msgid "Enable 16 bit color modes - Requires MTA restart"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4137
+msgid "Mouse fix:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4137
+msgid "Mouse movement fix - May need PC restart"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:637
+msgid "Busy"
+msgstr "Aizņemts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:637
+msgid "Can't check for updates right now"
+msgstr "Šobrīd nespēj pārbaudīt atjauninājumus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1594
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1614
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1633
+#, c-format
+msgid "MTA:SA %s required"
+msgstr "MTA:SA %s pieprasa"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1595
+#, c-format
+msgid ""
+"An updated version of MTA:SA %s is required to join the selected server.\n"
+"\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr ""
+"MTA:SA %s atjauninājums ir nepieciešams, lai pievienotos izvēlētajam "
+"serverim.\n"
+"\n"
+"Vai vēlaties lejupielādēt un instalēt MTA:SA %s ?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1615
+#, c-format
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr "Vai Jūs vēlaties palaist MTA:SA %s un pievienoties šim serverim ?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1634
+msgid ""
+"It is not possible to connect at this time.\n"
+"\n"
+"Please try later."
+msgstr ""
+"Šobrīd, nav iespējams savienoties.\n"
+"\n"
+"Mēģiniet vēlāk."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1827
+msgid "Connecting"
+msgstr "Savienojās"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1828
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1845
+msgid "Please wait..."
+msgstr "Lūdzu uzgaidiet..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1844
+msgid "CHECKING"
+msgstr "PĀRBAUDA"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1862
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1960
+msgid "UPDATE CHECK"
+msgstr "ATJAUNINĀJUMA PĀRBAUDE"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1863
+msgid "No update needed"
+msgstr "Nav nepieciešams atjauninājums"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1881
+msgid "DOWNLOADING"
+msgstr "LEJUPIELĀDĒ"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1882
+msgid "waiting..."
+msgstr "gaida..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1899
+msgid "MANDATORY UPDATE"
+msgstr "OBLIGĀTS ATJAUNINĀJUMS"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1900
+msgid ""
+"To join this server, you must update MTA.\n"
+"\n"
+" Do you want to update now ?"
+msgstr ""
+"Lai pievienotos šim serverim, Jums ir jāatjauno MTA.\n"
+"\n"
+" Vai Jūs vēlaties atjaunot tagad ?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1919
+msgid "OPTIONAL UPDATE"
+msgstr "IETEICAMS ATJAUNINĀJUMS"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1920
+msgid ""
+"Server says an update is recommended, but not essential.\n"
+"\n"
+" Do you want to update now ?"
+msgstr ""
+"Serveris saka, ka ir atjauninājums ir ieteicams, bet ne obligāti.\n"
+"\n"
+"Vai Jūs vēlaties atjaunot tagad ?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1961
+msgid ""
+"Update not currently avalable.\n"
+"\n"
+"Please check www.mtasa.com"
+msgstr ""
+"Atjauninājums šobrīd nav pieejams.\n"
+"\n"
+"Lūdzu pārbaudiet www.mtasa.com"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1983
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2173
+msgid "ERROR SAVING"
+msgstr "KĻŪDAS SAGLABĀŠANA"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1984
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2174
+msgid "Unable to create the file."
+msgstr "Nespēj izveidot failu."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1993
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2002
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2183
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2192
+msgid "ERROR DOWNLOADING"
+msgstr "KĻŪDA LEJUPIELĀDĒJOT"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1994
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2184
+msgid "The downloaded file appears to be incorrect."
+msgstr "Lejupielādētais fails izskatās nederīgs."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2003
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2193
+msgid "For some reason."
+msgstr "Kāda iemesla dēļ."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2015
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2207
+msgid "DOWNLOAD COMPLETE"
+msgstr "LEJUPIELĀDE PABEIGTA"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2040
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr " - Nezināma problēma iekš _DialogUpdateResult"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2142
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2152
+msgid "Ok"
+msgstr "Labi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2150
+msgid "ERROR"
+msgstr "KĻŪDA"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2151
+msgid ""
+"Some MTA:SA data files are missing.\n"
+"\n"
+"\n"
+"Please reinstall MTA:SA"
+msgstr ""
+"Daži MTA:SA datu faili ir pazuduši.\n"
+"\n"
+"\n"
+"Lūdzu pārinstalējiet MTA:SA"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2792
+#, c-format
+msgid "%3d %% completed"
+msgstr "%3d %% pabeigti"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:2794
+#, c-format
+msgid ""
+"\n"
+"\n"
+"Waiting for response  -  %-3d"
+msgstr ""
+"\n"
+"\n"
+"Gaida atbildi  -  %-3d"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:26
+msgid ""
+"The server requests the following websites in order to load them (later):"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:31
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:43
+msgid "Remember decision"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:54
+msgid "Deny"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\game_sa\CSettingsSA.cpp:639
+msgid "Can't find valid screen resolution."
+msgstr ""
+
+#. Confirm that res should be used
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\game_sa\CSettingsSA.cpp:716
+msgid "Are you sure you want to use this screen resolution?"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\game_sa\CSettingsSA.cpp:718
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:94
+msgid "MTA: San Andreas"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:145
+msgid "Update Aero setting"
+msgstr "Atjaunot Aero uzstādījumus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:147
+msgid "Update Large Memory setting"
+msgstr "Atjaunot Lielās Atmiņas uzstādījumus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:149
+#, fuzzy
+msgid "Update DEP setting"
+msgstr "Atjaunot Aero uzstādījumus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:151
+msgid "Update graphics driver compliance"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:153
+msgid "Fix file issues"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CExePatchedStatus.cpp:154
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:336
+#, c-format
+msgid ""
+"MTA:SA needs Administrator access for the following task:\n"
+"\n"
+"  '%s'\n"
+"\n"
+"Please confirm in the next window."
+msgstr ""
+"MTA:SA ir nepieciešama Administratora piekļuve sekojošam uzdevumam:\n"
+"\n"
+"  '%s'\n"
+"\n"
+"Lūdzu apstipriniet nākošajā logā."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:350
+#, c-format
+msgid ""
+"MTA:SA could not complete the following task:\n"
+"\n"
+"  '%s'\n"
+msgstr ""
+"MTA:SA nespēj izpildīt sekojošu uzdevumu:\n"
+"\n"
+"  '%s'\n"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:401
+msgid ""
+"** The crash was caused by a graphics driver error **\n"
+"\n"
+"** Please update your graphics drivers **"
+msgstr ""
+"** Avārija notika graphics driver error **\n"
+"\n"
+"** Lūdzu atjaunojiet graphics drivers **"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:512
+msgid "Install updated MTA:SA files"
+msgstr "Instalēt atjaunotos MTA:SA failus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:533
+msgid ""
+"Could not update due to file conflicts. Please close other applications and "
+"retry"
+msgstr ""
+"Nespēj atjaunot failu konfliktu dēļ. Lūdzu aizveriet citas aplikācijas un "
+"atkārtojiet"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:542
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto netika uzinstalēts pareizi, lūdzu pārinstalējiet. %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:743
+msgid "Missing file:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:747
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:872
+msgid "Update install settings"
+msgstr "Atjaunot instalācijas uzstādījumus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\CInstallManager.cpp:984
+msgid "Update compatibility settings"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:35
+msgid "Quit"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:51
+msgid "MTA: San Andreas has encountered a problem"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:52
+msgid "Crash information"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:53
+msgid ""
+"Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:54
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:55
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:62
+msgid "MTA: San Andreas - Warning"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:63
+msgid ""
+"Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
+"file:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:64
+msgid ""
+"The file is not required and may interfere with the graphical features in "
+"this version of MTA:SA.\n"
+"\n"
+"It is recommended that you remove or rename d3d9.dll"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:66
+msgid "Do not tell me about this d3d9.dll again"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:67
+msgid "Show me the file"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:68
+msgid "Play MTA:SA"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:75
+msgid "MTA: San Andreas - Confusing options"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:76
+msgid "NVidia Optimus detected!"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:77
+msgid "Try each option and see what works:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:78
+msgid "A - Standard NVidia"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:79
+msgid "B - Alternate NVidia"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:80
+msgid "C - Standard NVidia with exe rename"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:81
+msgid "D - Alternate NVidia with exe rename"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:82
+msgid "E - Standard Intel"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:83
+msgid "F - Alternate Intel"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:84
+msgid "G - Standard Intel with exe rename"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:85
+msgid "H - Alternate Intel with exe rename"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:86
+msgid "If you get desperate, this might help:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:87
+msgid "Force windowed mode"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:95
+msgid "Warning: Could not detect anti-virus product"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:96
+msgid ""
+"MTA could not detect an anti-virus on your PC.\n"
+"\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n"
+"\n"
+"Press 'Help' for more information."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:99
+msgid "I have already installed an anti-virus"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:100
+msgid ""
+"I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:702
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:757
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "Meklē pēc Grand Theft Auto San Andreas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:705
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:759
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Lūdzu palaidiet Grand Theft Auto San Andreas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:713
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Install.cpp:189
+msgid "Installing update..."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:721
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Install.cpp:291
+msgid "Extracting files..."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:726
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1628
+msgid "Copying files..."
+msgstr "Kopē failus..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:731
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1688
+msgid "Copy finished early. Everything OK."
+msgstr "Kopēšana pabeigta. Viss kārtībā."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:736
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1694
+msgid "Finishing..."
+msgstr "Pabeidz..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Dialogs.cpp:740
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1696
+msgid "Done!"
+msgstr "Gatavs!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Install.cpp:95
+msgid "Do you want to terminate the MTA Server and continue updating?"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:223
+msgid ""
+"Trouble restarting MTA:SA\n"
+"\n"
+"If the problem persists, open Task Manager and\n"
+"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n"
+"\n"
+"\n"
+"Try to launch MTA:SA again?"
+msgstr ""
+"Kļūda restartējot MTA:SA\n"
+"\n"
+"Ja problēma atkartojās, atveriet Uzdevumu Pārvaldnieku un\n"
+"apstādiniet 'gta_sa.exe' un 'Multi Theft Auto.exe' procesus\n"
+"\n"
+"\n"
+"Mēģināt palaist MTA:SA vēlreiz?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:240
+msgid ""
+"Another instance of MTA is already running.\n"
+"\n"
+"If this problem persists, please restart your computer"
+msgstr ""
+"Cita MTA instance darbojās.\n"
+"\n"
+"Ja šī problēma atkārtojās, lūdzu restartējiet savu datoru"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:243
+msgid ""
+"Another instance of MTA is already running.\n"
+"\n"
+"Do you want to terminate it?"
+msgstr ""
+"Cita MTA instance darbojās.\n"
+"\n"
+"Vai vēlaties to izbeigt?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:267
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Do you want to revert to an earlier version?"
+msgstr ""
+"Vai Jums ir problēmas ar MTA:SA darbību?\n"
+"\n"
+"Vai vēlaties atgriezt vecāku versiju?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:295
+msgid ""
+"There seems to be a problem launching MTA:SA.\n"
+"Resetting GTA settings can sometimes fix this problem.\n"
+"\n"
+"Do you want to reset GTA settings now?"
+msgstr ""
+"Notika problēma palaižot MTA:SA.\n"
+"Atgriežot GTA iestatījumus, dažreiz šo problēmu izdodās salabot.\n"
+"\n"
+"Vai jūs vēlaties atgriezt GTA iestatījumus?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:304
+msgid ""
+"GTA settings have been reset.\n"
+"\n"
+"Press OK to continue."
+msgstr ""
+"GTA uzstādījumi tika atgriezti.\n"
+"\n"
+"Spiediet LABI, lai turpinātu."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:309
+#, c-format
+msgid "File could not be deleted: '%s'"
+msgstr "Failu nevar izdzēst: '%s'"
+
+#. No settings to delete, or can't find them
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:316
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Do you want to see some online help?"
+msgstr ""
+"Vai jums ir problēmas ar MTA:SA dabināšanu?.\n"
+"\n"
+"Vai jūs vēlaties saņemt tiešsaistes palīdzību?"
+
+#. Inform user
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:353
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Do you want to change the following setting?"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:385
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Try disabling the following products for GTA and MTA:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:415
+msgid ""
+"WARNING\n"
+"\n"
+"MTA:SA has detected unusual activity.\n"
+"Please run a virus scan to ensure your system is secure.\n"
+"\n"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:418
+#, c-format
+msgid "The detected file was:  %s\n"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:552
+msgid ""
+"An instance of GTA: San Andreas is already running. It needs to be "
+"terminated before MTA:SA can be started. Do you want to do that now?"
+msgstr ""
+"Kāda no GTA: San Andreas instancēm šobrīd darbojās. Tām ir jābūt aizvērtām, "
+"pirms startējat MTA:SA. Vai vēlaties to darīt tagad?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:557
+msgid ""
+"Unable to terminate GTA: San Andreas. If the problem persists, please "
+"restart your computer."
+msgstr ""
+"Nespēj apturēt GTA: San Andreas. Ja problēma joprojām pastāv, restartējiet "
+"datoru."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:579
+msgid ""
+"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+msgstr ""
+"Iztrūkst reģistru ieraksti. Lūdzu pārinstalējiet Multi Theft Auto: San "
+"Andreas."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:583
+msgid ""
+"The path to your installation of GTA: San Andreas contains unsupported "
+"(unicode) characters. Please move your Grand Theft Auto: San Andreas "
+"installation to a compatible path that contains only standard ASCII "
+"characters and reinstall Multi Theft Auto: San Andreas."
+msgstr ""
+"Ceļs uz Jūsu GTA: San Andreas instalāciju satur neatbalstītas (unicode) "
+"rakstzīmes. Lūdzu pārvietojiet savu Grand Theft Auto: San Andreas "
+"instalāciju, lai izveidotu saderīgu ceļu, kurš satur standarta ASCII "
+"rakstzīmes un lūdzu pārinstalējiet Multi Theft Auto San Andreas."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:587
+msgid ""
+"It appears you have a Steam version of GTA:SA, which is currently "
+"incompatible with MTASA.  You are now being redirected to a page where you "
+"can find information to resolve this issue."
+msgstr ""
+"Izskatās, ka Jūs izmantojāt GTA:SA Steam versiju, kura šobrīd nav saderīga "
+"ar MTA:SA.  Jūs tiekāt novirzīts uz lapu, kur varat atrast informāciju kā "
+"atrisināt šo problēmu."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:600
+msgid ""
+"The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+"contains a ';' (semicolon).\n"
+"\n"
+" If you experience problems when running MTA:SA,\n"
+" move your installation(s) to a path that does not contain a semicolon."
+msgstr ""
+"Ceļš uz jūsu 'MTA:SA' vai 'GTA: San Andreas'\n"
+"instalāciju satur ';' (semikolu).\n"
+"\n"
+" Ja jūs satopieties ar problēmām darbinot MTA:SA,\n"
+" pārvietojiet instalāciju(s) uz vietu kura nesatur semikolu."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:741
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:748
+msgid ""
+"Load failed. Please ensure that the latest data files have been installed "
+"correctly."
+msgstr ""
+"Ielāde neizdevās. Lūdzu pārliecinieties, ka pēdējie datu faili ir "
+"uzinstalēti pareizi."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:755
+#, c-format
+msgid "Load failed. Please ensure that %s is installed correctly."
+msgstr "Ielāde neizdevās. Lūdzu pārliecinieties, ka %s ir instalēts pareizi."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:762
+#, c-format
+msgid "Load failed. Could not find gta_sa.exe in %s."
+msgstr "Ielāde neizdevās. Nespēj atrast gta_sa.exe iekš %s."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:772
+#, c-format
+msgid ""
+"Load failed. %s exists in the GTA directory. Please delete before continuing."
+msgstr ""
+"Ielāde neizdevās. %s atrodas GTA mapē. Lūdzu izdzēsiet, pirms turpiniet."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:780
+#, c-format
+msgid "Main file has an incorrect name (%s)"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:791
+msgid ""
+"Main file is unsigned. Possible virus activity.\n"
+"\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:819
+msgid ""
+"Data files modified. Possible virus activity.\n"
+"\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:830
+msgid ""
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
+"directory.\n"
+"\n"
+"Remove these .asi files if you experience problems with MTA:SA."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:894
+msgid ""
+"File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:903
+msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:915
+msgid ""
+"MTA:SA is not compatible with Windows 'Safe Mode'.\n"
+"\n"
+"Please restart your PC.\n"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:1002
+#, c-format
+msgid ""
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
+"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"\n"
+"[%s]"
+msgstr ""
+"Nespēj palaist Grand Theft Auto: San Andreas.  Lūdzu mēģiniet restartēt, ja "
+"problēma turpinās,kontaktējiet MTA iekš www.multitheftauto.com. \n"
+"\n"
+"[%s]"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:1063
+msgid ""
+"GTA: San Andreas may not have launched correctly. Do you want to terminate "
+"it?"
+msgstr ""
+"GTA: San Andreas varētu būt palaists nepareizi. Vai vēlaties to izslēgt?"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:850
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Izvēlieties Jūsu Grand Theft Auto: San Andreas instalācijas mapi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1302
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "Kļūda ielādējot %s moduli! (%s)"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1737
+#, c-format
+msgid ""
+"New installation of %s detected.\n"
+"\n"
+"Do you want to copy your settings from %s ?"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1777
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1800
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1826
+msgid "GTA:SA had trouble loading a model."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1828
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1854
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr ""
+
+#. Ask user to confirm
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1930
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:2002
+msgid "Please terminate the following programs before continuing:"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:41
+msgid "This version has expired."
+msgstr "Šī versija ir iztecējusi."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:62
+msgid "disconnect from the game"
+msgstr "atslēgties no spēles"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:63
+msgid "shows the nametags"
+msgstr "parāda namtagus"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:64
+msgid "shows the chatbox"
+msgstr "uzrāda saraksti"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:65
+msgid "shows the network statistics"
+msgstr "uzrāda tīkla statistiku"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:69
+msgid "open the chat input"
+msgstr "atver sarakstes ievadi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:70
+msgid "transmits voice to other players"
+msgstr "pārraida balsi citiem spēlētājiem"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:71
+msgid "enters a car as passenger"
+msgstr "iekāp kā pasažieris"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:72
+msgid "next radio channel"
+msgstr "nākošā radio stacija"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:73
+msgid "previous radio channel"
+msgstr "iepriekšējā radio stacija"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:74
+msgid "enables the radar view"
+msgstr "iespējo radara skatu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:75
+msgid "zooms the radar in"
+msgstr "pietuvina radaru"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:76
+msgid "zooms the radar out"
+msgstr "attālina radaru"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:77
+msgid "moves the radar north"
+msgstr "pārvieto radaru uz ziemeļiem"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:78
+msgid "moves the radar south"
+msgstr "pārvieto radaru uz dienvidiem"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:79
+msgid "moves the radar east"
+msgstr "pārvieto radaru uz austrumiem"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:80
+msgid "moves the radar west"
+msgstr "pārvieto radaru uz rietumiem"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:81
+msgid "attaches the radar"
+msgstr "piesaista radaru"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:82
+msgid "reduces radar opacity"
+msgstr "samazina radara caurredzamību"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:83
+msgid "increases radar opacity"
+msgstr "palielina radara caurredzamību"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:84
+msgid "toggles radar help text"
+msgstr "iespējo radara palīdzības tekstu"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:85
+msgid "sends a message to the targetted player"
+msgstr "nosūta ziņojumu mērķētajam spēlētājam"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:86
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "pārmaina uz nākošo ieroci atrodoties transportlīdzeklī"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:87
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "pārmaina uz iepriekšējo ieroci atrodoties transportlīdzeklī"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:88
+msgid "outputs info about the current server"
+msgstr ""
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:91
+msgid "defines the scale multiplier of all text-displays"
+msgstr "definē mērogu reizinātāju visiem attēlotajiem tekstiem"
+
+#. Development mode
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:98
+msgid "(Development mode) shows the colshapes"
+msgstr "(Izstrādātāja režīms) attēlo colshapes"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:99
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(Izstrādātāja režīms) attēlo pasaules skaņas id iekš atkļūdošanas loga"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:579
+msgid "Entering the game ..."
+msgstr "Ieiet spēlē ..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:638
+msgid ""
+"Not connected; please use Quick Connect or the 'connect' command to connect "
+"to a server."
+msgstr ""
+"Nepieslēdzās; līdzu izmantojiet Ātro Savienojumu vai 'connect' komandu, lai "
+"pieslēgtos serverim."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:685
+msgid "The server is not installed"
+msgstr "Serveris nav instalēts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:695
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1088
+msgid "Local Server"
+msgstr "Lokālais Serveris"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:695
+msgid "Starting local server ..."
+msgstr "Startē lokālo serveri ..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1020
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "Jūs tikāt izmests no spēles ( %s )"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1088
+msgid "Connecting to local server..."
+msgstr "Savienojās ar lokālo serveri..."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1099
+msgid "Error connecting to server."
+msgstr "Kļūda savienojoties ar serveri."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1109
+msgid "Connecting to local server timed out. See console for details."
+msgstr ""
+"Savienošanās ar lokālo serveri iztecēja. Apskaties konsoli priekš detaļām."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1212
+msgid "Connection with the server was lost"
+msgstr "Savienojums ar serveri pazuda"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1235
+msgid "Disconnected: the server is currently full"
+msgstr "Atslēgšanās: serveris šobrīd ir pilns"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1244
+msgid "Disconnected: invalid password specified"
+msgstr "Atslēgšanās: norādīta nederīga parole"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1264
+msgid "MTA Client verification failed!"
+msgstr "MTA Klineta pārbaude neizdevās!"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:39
+msgid "HOST GAME"
+msgstr "HOSTĒT SPĒLI"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:55
+msgid "Resources"
+msgstr "Resursi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:57
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:59
+msgid "Server name:"
+msgstr "Servera nosaukums:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:75
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:77
+msgid "Max players:"
+msgstr "Max spēlētāji:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:84
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:86
+msgid "Broadcast:"
+msgstr "Apraide:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:88
+msgid "LAN"
+msgstr "LAN"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:101
+msgid "Selected"
+msgstr "Izvēlēts"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:118
+msgid "All"
+msgstr "Visi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CLocalServer.cpp:120
+msgid "Start"
+msgstr "Sākt"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:472
+msgid "Disconnected: Invalid nickname"
+msgstr "Atslēgšanās: Nederīgs segvārds"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:475
+msgid "Disconnect from server"
+msgstr "Atslēgties no servera"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:478
+#, c-format
+msgid ""
+"Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr ""
+"Atslēgšanās: Seriāls ir melnajā sarakstā.\n"
+"Iemesls: %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:483
+#, c-format
+msgid ""
+"Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr ""
+"Atslēgšanās: Jūs esat melnajā sarakstā.\n"
+"Iemesls: %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:488
+#, c-format
+msgid ""
+"Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr ""
+"Atslēgšanās: Kontam ir liegta piekļuve.\n"
+"Iemesls: %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:492
+msgid "Disconnected: Version mismatch"
+msgstr "Atslēgšanās: Versijas nesakrišana"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:495
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr ""
+"Atslēgšanās: Pārmērīga pieslēgšanās. Uzgaidiet minūti, un tad mēģiniet "
+"vēlreiz."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:498
+#, c-format
+msgid ""
+"Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr ""
+"Atslēgšanās: Serveris ir no citas nozares.\n"
+"Informācija: %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:502
+#, c-format
+msgid ""
+"Disconnected: Bad version.\n"
+"Information: %s"
+msgstr ""
+"Atslēgšanās: Nepareiza versija.\n"
+"Informācija: %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:506
+#, c-format
+msgid ""
+"Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr ""
+"Atslēgšanās: Serveris darbojās zem jaunākas būvversijas.\n"
+"Informācija: %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:510
+#, c-format
+msgid ""
+"Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr ""
+"Atslēgšanās: Serveris darbojās uz vecāku būvējumu.\n"
+"Informācija: %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:514
+msgid "Disconnected: Nick already in use"
+msgstr "Atslēgšanās: Segvārds jau tiek izmantots"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:517
+msgid "Disconnected: Player Element Could not be created."
+msgstr "Atslēgšanās: Spēlētāja Elementu Nespēj izveidot."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:520
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "Atslēgšanās: Serveris noraida savienojumu: %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:524
+msgid "Disconnected: Serial verification failed"
+msgstr "Atslēgšanās: Seriāla pārbaude neizdevās"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:527
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "Atslēgšanās: Savienojuma pārsinhronizēja %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:535
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "Atslēgšanās: Jūs izmeta %s no servera"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:539
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "Atslēgšanās: %s liedza Jums piekļuvi"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:548
+msgid "Disconnected: Server shutdown or restarting"
+msgstr ""
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:571
+msgid "Time Remaining: "
+msgstr "Atlikušais Laiks: "
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:579
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d diena"
+msgstr[1] "%d dienas"
+msgstr[2] "%d dienas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:581
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d stunda"
+msgstr[1] "%d stundas"
+msgstr[2] "%d stundas"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:583
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minūte"
+msgstr[1] "%d minūtes"
+msgstr[2] "%d minūtes"
+
+#. Display the error
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:587
+msgid "Disconnected"
+msgstr "Atslēdzies"
+
+#. Throw the error and disconnect
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
+#, c-format
+msgid "Download error: %s"
+msgstr "Lejupielādes kļūda: %s"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CServer.cpp:194
+msgid "Could not start the local server. See console for details."
+msgstr "Nespēj palaist lokālo serveri. Skatiet konsoli, lai redzēti detaļas."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CServer.cpp:195
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Kļīda: Nevar palaist lokālo serveri. [%s]"
+
+#. Create our text for each transfer type
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:30
+msgid "Download Progress:"
+msgstr "Lejupielādes Progress:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:31
+msgid "Map download progress:"
+msgstr "Mapes lejupielādes progress:"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:36
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:122
+#, c-format
+msgid "%s of %s"
+msgstr "%s no %s"
+
+#. stats label
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:37
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CTransferBox.cpp:63
+msgid "Disconnect to cancel download"
+msgstr "Atslēdzieties, lai atceltu lejupielādi"
+
+#. Populate the message and show the box
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\shared_logic\Utils.cpp:150
+#, c-format
+msgid ""
+"Fatal error (%u). If this problem persists, please check out mtasa.com for "
+"support."
+msgstr ""
+"Fatāla kļūda (%u). Ja šī problēma atkārtojās, lūdzu skatiet pēc palīdzības "
+"iekš mtasa.com."
+
+#. #ifdef MTA_DEBUG
+#. assert ( 0 );
+#. #endif
+#. Populate the message and show the box
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\shared_logic\Utils.cpp:167
+#, c-format
+msgid ""
+"Protocol error (%u). If this problem persists, please check out mtasa.com "
+"for support."
+msgstr ""
+"Protokola kļūda (%u). Ja šī problēma atkārtojās, meklējiet pēc palīdzības "
+"iekš mtasa.com."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\shared_logic\Utils.cpp:169
+msgid "Connection error"
+msgstr "Savienojuma kļūda"
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:75
+msgid "Multi Theft Auto has not been installed properly, please reinstall."
+msgstr "Multi Theft Auto nav ticis pareizi uzinstalēts, lūdzu pārinstalējiet."
+
+#: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:630
+msgid ""
+"Your browser will now display a web page with some help infomation.\n"
+"\n"
+"(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
+msgstr ""
+"Jūsu pārlūks uzrādīs tīmekļa vietni ar palīdzības informāciju.\n"
+"\n"
+"(Ja tīmekļa vietne neielādējās, ielīmējiet (CTRL-V) vietni interneta "
+"pārlūkā)"
+
+#, fuzzy
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
+
+#~ msgid "Disable Aero Desktop"
+#~ msgstr "Atspējot Darbvirsmas Aero"
+
+#~ msgid "Experimental feature."
+#~ msgstr "Eksperimentāla funkcija."
+
+#~ msgid "DATA FILES"
+#~ msgstr "DATU FAILI"
+
+#~ msgid ""
+#~ "Data files not currently avalable.\n"
+#~ "\n"
+#~ "Please check www.mtasa.com"
+#~ msgstr ""
+#~ "Šobrīd, datu faili nav pieejami.\n"
+#~ "\n"
+#~ "Lūdzu pārbaudiet www.mtasa.com"
+
+#~ msgid "Slow"
+#~ msgstr "Lēni"
+
+#~ msgid "General  "
+#~ msgstr "Vispārīgi  "
+
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "Copyright (C) 2003 - 2013 Multi Theft Auto"
+
+#~ msgid "Resolution"
+#~ msgstr "Izšķirtspēja"
+
+#~ msgid " and "
+#~ msgstr " un "
+
+#~ msgid "Anti-aliasing"
+#~ msgstr "Anti-aliasingi"
+
+#~ msgid "Aero setting"
+#~ msgstr "Aero uzstādījumi"
+
+#, c-format
+#~ msgid "%s will be changed when you next start MTA"
+#~ msgstr "%s stāsies spēkā pie nākošās MTA startēšanas"
+
+#~ msgid "/Full Screen Minimize"
+#~ msgstr "/Full Screen Minimize"
+
+#~ msgid "Customized GTA:SA files setting"
+#~ msgstr "Pārveidoto GTA:SA failu uzstādījumi"
+
+#~ msgid "Language setting"
+#~ msgstr "Valodas uzstādījumi"
+
+#~ msgid "Some settings"
+#~ msgstr "Daži uzstādījumi"
+
+#~ msgid "Error! (CTRL+C to copy)"
+#~ msgstr "Kļūda! (CTRL+C lai kopētu)"
+
+#, c-format
+#~ msgid ""
+#~ "GTA:SA had trouble opening the file '%s'\n"
+#~ "\n"
+#~ "Try reinstalling GTA:SA to fix it"
+#~ msgstr ""
+#~ "GTA:SA notika kļūda atverot failu '%s'\n"
+#~ "\n"
+#~ "Mēģiniet pārinstalēt GTA:SA, lai to salabotu"

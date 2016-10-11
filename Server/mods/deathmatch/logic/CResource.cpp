@@ -116,6 +116,7 @@ bool CResource::Load ( void )
         m_pResourceDynamicElementRoot = NULL;
         m_bProtected = false;
         m_bStartedManually = false;
+        m_bDoneDbConnectMysqlScan = false;
 
         m_uiVersionMajor = 0;
         m_uiVersionMinor = 0;
@@ -3464,4 +3465,72 @@ bool CResource::CheckFunctionRightCache( lua_CFunction f, bool* pbOutAllowed )
 void CResource::UpdateFunctionRightCache( lua_CFunction f, bool bAllowed )
 {
     MapSet( m_FunctionRightCacheMap, f, bAllowed );
+}
+
+
+//
+// Check resource files for probable use of dbConnect + mysql
+//
+bool CResource::IsUsingDbConnectMysql( void )
+{
+    if ( !m_bDoneDbConnectMysqlScan )
+    {
+        m_bDoneDbConnectMysqlScan = true;
+        for ( auto pResourceFile : m_resourceFiles )
+        {
+            if ( pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT )
+            {
+                SString strLuaSource;
+                FileLoad( pResourceFile->GetFullName(), strLuaSource );
+
+                for ( size_t curPos = 0 ; curPos < strLuaSource.length() ; curPos++ )
+                {
+                    curPos = strLuaSource.find( "dbConnect", curPos );
+                    if ( curPos == SString::npos )
+                        break;
+
+                    size_t foundPos = strLuaSource.find( "mysql", curPos );
+                    if ( foundPos > curPos && foundPos < curPos + 40 )
+                    {
+                        m_bUsingDbConnectMysql = true;
+                    }
+                }
+            }
+        }
+    }
+    return m_bUsingDbConnectMysql;
+}
+
+
+//
+// Return true if file access should be denied to other resources
+//
+bool CResource::IsFileDbConnectMysqlProtected( const SString& strAbsFilename, bool bReadOnly )
+{
+    if ( !IsUsingDbConnectMysql() )
+        return false;
+
+    SString strFilename = ExtractFilename( strAbsFilename );
+    if ( strFilename.CompareI( "meta.xml" ) )
+    {
+        if ( !bReadOnly )
+        {
+            // No write access to meta.xml
+            return true;
+        }
+    }
+
+    for ( auto pResourceFile : m_resourceFiles )
+    {
+        if ( pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT )
+        {
+            SString strResourceFilename = ExtractFilename( pResourceFile->GetName() );
+            if ( strFilename.CompareI( strResourceFilename ) )
+            {
+                // No read/write access to server script files
+                return true;
+            }
+        }
+    }
+    return false;
 }

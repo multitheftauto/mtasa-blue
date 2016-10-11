@@ -197,8 +197,8 @@ public:
     inline void                                 SetBeingDeleted         ( bool bBeingDeleted )      { m_bBeingDeleted = bBeingDeleted; }
     void                                        ClearChildren           ( void );
 
-    // This should be called GetChildren, but that name is currently used for some Lua things...
-    const auto&                                 GetChildList            ( void )                    { return m_Children; }
+    CChildListType ::const_iterator             IterBegin               ( void )                    { return m_Children.begin (); }
+    CChildListType ::const_iterator             IterEnd                 ( void )                    { return m_Children.end (); }
     CElementListSnapshot*                       GetChildrenListSnapshot ( void );
 
     inline ElementID                            GetID                   ( void )                    { return m_ID; };
@@ -275,7 +275,8 @@ public:
     void                                        RemoveCollision             ( CClientColShape* pShape )     { if ( !m_Collisions.empty() ) m_Collisions.remove ( pShape ); }
     bool                                        CollisionExists             ( CClientColShape* pShape );
     void                                        RemoveAllCollisions         ( void );
-    const CFastList < CClientColShape* >&       GetCollisions               ( void )                        { return m_Collisions;}
+    CFastList < CClientColShape* > ::iterator   CollisionsBegin             ( void )                        { return m_Collisions.begin (); }
+    CFastList < CClientColShape* > ::iterator   CollisionsEnd               ( void )                        { return m_Collisions.end (); }
 
     inline CElementGroup*                       GetElementGroup             ( void )                        { return m_pElementGroup; }
     inline void                                 SetElementGroup             ( CElementGroup * elementGroup ){ m_pElementGroup = elementGroup; }

@@ -14,7 +14,6 @@
 
 #include "CConsoleInterface.h"
 #include "CCommandsInterface.h"
-#include "CCommunityInterface.h"
 #include "CRenderItemManagerInterface.h"
 #include "CScreenGrabberInterface.h"
 #include "CPixelsManagerInterface.h"

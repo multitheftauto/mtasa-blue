@@ -893,6 +893,16 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Flush any pending master server announce messages
     g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
 
+    if ( m_pMainConfig->GetAuthSerialEnabled() )
+    {
+        CLogger::LogPrintf( "Authorized serial account protection is enabled for the ACL group(s): `%s`  See http:""//mtasa.com/authserial\n",
+                            *SString::Join( ",", m_pMainConfig->GetAuthSerialGroupList() ) );
+    }
+    else
+    {
+        CLogger::LogPrint( "Authorized serial account protection is DISABLED. See http:""//mtasa.com/authserial\n" );
+    }
+
     // Done
     // If you're ever going to change this message, update the "server ready" determination
     // inside CServer.cpp in deathmatch mod aswell.

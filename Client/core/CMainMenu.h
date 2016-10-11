@@ -17,11 +17,11 @@ class CMainMenu;
 #define __CMAINMENU_H
 
 #include "CCore.h"
+#include "CQuickConnect.h"
 #include "CQuestionBox.h"
-#include "CNewsBrowser.h"
 #include <Serverbrowser/CServerBrowser.h>
 #include <Serverbrowser/CServerInfo.h>
-#include "Settings/CSettings.h"
+#include "CSettings.h"
 #include "CCredits.h"
 #include <Graphics/CGraphics.h>
 class CNewsBrowser;
@@ -63,8 +63,9 @@ public:
 
     CServerBrowser*     GetServerBrowser                ( void ) { return &m_ServerBrowser; };
     CSettings*          GetSettingsWindow               ( void ) { return &m_Settings; };
+    CQuickConnect*      GetQuickConnectWindow           ( void ) { return &m_QuickConnect; };
     CQuestionBox*       GetQuestionWindow               ( void ) { return &m_QuestionBox; };
-    CNewsBrowser*       GetNewsBrowser                  ( void ) { return &m_NewsBrowser; };
+    CNewsBrowser*       GetNewsBrowser                  ( void ) { return m_pNewsBrowser; };
 
     void                SetMenuVerticalPosition         ( int iPosY );
     void                SetMenuUnhovered                ( void );
@@ -101,15 +102,15 @@ private:
     CGUI*               m_pManager;
 
     // Images
-    std::unique_ptr<CGUIStaticImage>    m_pBackground;
-    std::unique_ptr<CGUIStaticImage>    m_pLogo;
-    std::unique_ptr<CGUIStaticImage>    m_pLatestNews;
-    std::unique_ptr<CGUIStaticImage>    m_pFiller;
-    std::unique_ptr<CGUIStaticImage>    m_pFiller2;
-    std::unique_ptr<CGUIStaticImage>    m_pVersion;
-    std::unique_ptr<CGUIStaticImage>    m_pMenuArea;
+    CGUIStaticImage*    m_pBackground;
+    CGUIStaticImage*    m_pLogo;
+    CGUIStaticImage*    m_pLatestNews;
+    CGUIStaticImage*    m_pFiller;
+    CGUIStaticImage*    m_pFiller2;
+    CGUIStaticImage*    m_pVersion;
+    CGUIStaticImage*    m_pMenuArea;
 
-    std::unique_ptr<CGUIScrollPane>    m_pCanvas;
+    CGUIScrollPane*     m_pCanvas;
 
     std::deque < sMenuItem* >    m_menuItems;
     std::set < sMenuItem* >      m_unhoveredItems;
@@ -119,8 +120,9 @@ private:
 
     // Submenu classes
     CQuestionBox        m_QuestionBox;
+    CQuickConnect       m_QuickConnect;
     CSettings           m_Settings;
-    CNewsBrowser        m_NewsBrowser;
+    CNewsBrowser*       m_pNewsBrowser;
     CCredits            m_Credits;
     CServerBrowser      m_ServerBrowser;
     CServerInfo         m_ServerInfo;
@@ -159,10 +161,10 @@ private:
     int                 m_iMoveTargetPos;
     unsigned long       m_ulMoveStartTick;
 
-    std::unique_ptr<CGUILabel>          m_pNewsItemLabels[CORE_MTA_NEWS_ITEMS];
-    std::unique_ptr<CGUILabel>          m_pNewsItemShadowLabels[CORE_MTA_NEWS_ITEMS];
-    std::unique_ptr<CGUILabel>          m_pNewsItemDateLabels[CORE_MTA_NEWS_ITEMS];
-    std::unique_ptr<CGUILabel>          m_pNewsItemNEWLabels[CORE_MTA_NEWS_ITEMS];
+    CGUILabel*          m_pNewsItemLabels[CORE_MTA_NEWS_ITEMS];
+    CGUILabel*          m_pNewsItemShadowLabels[CORE_MTA_NEWS_ITEMS];
+    CGUILabel*          m_pNewsItemDateLabels[CORE_MTA_NEWS_ITEMS];
+    CGUILabel*          m_pNewsItemNEWLabels[CORE_MTA_NEWS_ITEMS];
 
 #ifdef CI_BUILD
     std::unique_ptr<CGUITexture> m_pFeatureBranchAlertTexture;

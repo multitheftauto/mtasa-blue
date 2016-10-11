@@ -21,7 +21,7 @@ class CDirect3DData : public CSingleton < CDirect3DData >
 {
 public:
                 CDirect3DData       ( void );
-               ~CDirect3DData       ( void ) = default;
+               ~CDirect3DData       ( void );
 
     void        StoreTransform      ( D3DTRANSFORMSTATETYPE dwMatrixToStore, const D3DMATRIX* pMatrix );
     void        GetTransform        ( D3DTRANSFORMSTATETYPE dwRequestedMatrix, D3DMATRIX * pMatrixOut );

@@ -12,6 +12,9 @@
 
 #include "StdInc.h"
 
+using std::list;
+using std::vector;
+
 CClientColManager::~CClientColManager ( void )
 {
     DeleteAll ();
@@ -56,8 +59,9 @@ void CClientColManager::DoHitDetectionForColShape ( CClientColShape* pShape )
     GetClientSpatialDatabase()->SphereQuery ( result, querySphere );
  
     // Extract relevant types
-    for ( auto& pEntity : result ) 
+    for ( CClientEntityResult::const_iterator it = result.begin () ; it != result.end (); ++it )
     {
+        CClientEntity* pEntity = *it;
         switch ( pEntity->GetType () )
         {
             case CCLIENTRADARMARKER:
@@ -79,15 +83,15 @@ void CClientColManager::DoHitDetectionForColShape ( CClientColShape* pShape )
     }
 
     // Add existing colliders, so they can be disconnected if required
-    for (auto& it : pShape->GetColliders() )
+    for ( CFastList < CClientEntity* > ::const_iterator it = pShape->CollidersBegin () ; it != pShape->CollidersEnd (); ++it )
     {
-       entityList[ it ] = 1;
+       entityList[ *it ] = 1;
     }
 
     // Test each entity against the colshape
-    for (auto& it : entityList) 
-    {    
-        CClientEntity* pEntity = it.first;
+    for ( std::map < CClientEntity*, int > ::const_iterator it = entityList.begin () ; it != entityList.end (); ++it )
+    {
+        CClientEntity* pEntity = it->first;
         CVector vecPosition;
         pEntity->GetPosition ( vecPosition );
 
@@ -110,18 +114,18 @@ void CClientColManager::DoHitDetectionForEntity ( const CVector& vecNowPosition,
     GetClientSpatialDatabase()->SphereQuery ( queryResult, CSphere ( vecNowPosition, fRadius ) );
 
     // Extract colshapes
-    for ( auto& pColShape : queryResult )
-        if ( pColShape->GetType () == CCLIENTCOLSHAPE )
-            shortList[ (CClientColShape*)pColShape ] = 1;
+    for ( CClientEntityResult ::const_iterator it = queryResult.begin () ; it != queryResult.end (); ++it )
+        if ( (*it)->GetType () == CCLIENTCOLSHAPE )
+            shortList[ (CClientColShape*)*it ] = 1;
 
     // Add existing collisions, so they can be disconnected if required
-    for ( auto& it : pEntity->GetCollisions() )
-        shortList[ it ] = 1;
+    for ( CFastList < CClientColShape* > ::const_iterator it = pEntity->CollisionsBegin () ; it != pEntity->CollisionsEnd (); ++it )
+        shortList[ *it ] = 1;
 
     // Test each colshape against the entity
-    for ( auto& it : shortList )
+    for ( std::map < CClientColShape*, int > ::const_iterator it = shortList.begin () ; it != shortList.end (); ++it )
     {
-        CClientColShape* pShape = it.first;
+        CClientColShape* pShape = it->first;
 
         // Enabled and not being deleted?
         if ( !pShape->IsBeingDeleted () && pShape->IsEnabled () )
@@ -203,10 +207,11 @@ bool CClientColManager::Exists ( CClientColShape* pShape )
 void CClientColManager::DeleteAll ( void )
 {
     // Delete all of them
-    std::vector < CClientColShape * > cloneList = m_List;
-    for ( auto& iter : cloneList )
+    vector < CClientColShape * > cloneList = m_List;
+    vector < CClientColShape* > ::const_iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end (); ++iter )
     {
-        delete iter;
+        delete *iter;
     }
     m_List.clear ();
 }

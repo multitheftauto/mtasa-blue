@@ -15,6 +15,9 @@
 
 #include "StdInc.h"
 
+using std::list;
+using std::vector;
+
 // List over all vehicles with their passenger max counts
 const SFixedArray < unsigned char, 212 > g_ucMaxPassengers = {
                                        3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,              // 400->415
@@ -363,10 +366,10 @@ void CClientVehicleManager::DeleteAll ( void )
 {
     // Delete all the vehicles
     m_bCanRemoveFromList = false;
-    
-    for (auto& pVehicle : m_List)
+    vector < CClientVehicle* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        delete pVehicle;
+        delete *iter;
     }
 
     // Clear the list
@@ -380,8 +383,9 @@ void CClientVehicleManager::DoPulse ( void )
 {
     CClientVehicle * pVehicle = NULL;
     // Loop through our streamed-in vehicles
-    for (auto& pVehicle : m_StreamedIn)
+    for( uint i = 0 ; i < m_StreamedIn.size() ; i++ )
     {
+        CClientVehicle* pVehicle = m_StreamedIn[i];
         // We should have a game vehicle here
         assert ( pVehicle->GetGameVehicle () );
         pVehicle->StreamedInPulse ();
@@ -419,15 +423,16 @@ CClientVehicle* CClientVehicleManager::GetClosest ( CVector& vecPosition, float 
     float fClosestDistance = 0.0f;
     CVector vecVehiclePosition;
     CClientVehicle* pClosest = NULL;
-    for (auto& pVehicle : m_StreamedIn)
+    vector < CClientVehicle* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        pVehicle->GetPosition ( vecVehiclePosition );
+        (*iter)->GetPosition ( vecVehiclePosition );
         float fDistance = DistanceBetweenPoints3D ( vecPosition, vecVehiclePosition );
         if ( fDistance <= fRadius )
         {
             if ( pClosest == NULL || fDistance < fClosestDistance )
             {
-                pClosest = pVehicle;
+                pClosest = *iter;
                 fClosestDistance = fDistance;
             }
         }
@@ -769,8 +774,10 @@ void CClientVehicleManager::RestreamVehicles ( unsigned short usModel )
     if ( m_StreamedIn.empty() )
         return;
 
-    for (auto& pVehicle : m_List)
+    for( uint i = 0 ; i < m_List.size() ; i++ )
     {
+        CClientVehicle* pVehicle = m_List[i];
+
         // Streamed in and same vehicle ID?
         if ( pVehicle->IsStreamedIn () && pVehicle->GetModel () == usModel )
         {
@@ -784,8 +791,9 @@ void CClientVehicleManager::RestreamVehicles ( unsigned short usModel )
 
 void CClientVehicleManager::RestreamVehicleUpgrades ( unsigned short usModel )
 {
-    for (auto& pVehicle : m_List)
+    for( uint i = 0 ; i < m_List.size() ; i++ )
     {
+        CClientVehicle* pVehicle = m_List[i];
         pVehicle->GetUpgrades ()->RestreamVehicleUpgrades ( usModel );
     }
 }

@@ -19,9 +19,10 @@
 
 void CCustomData::Copy ( CCustomData* pCustomData )
 {
-    for ( auto& iter : m_Data )
+    std::map < std::string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();
+    for ( ; iter != pCustomData->IterEnd (); iter++ )
     {
-        Set ( iter.first.c_str (), iter.second.Variable );
+        Set ( iter->first.c_str (), iter->second.Variable );
     }
 }
 
@@ -29,7 +30,7 @@ SCustomData* CCustomData::Get ( const char* szName )
 {
     assert ( szName );
 
-    auto& it = m_Data.find ( szName );
+    std::map < std::string, SCustomData > :: iterator it = m_Data.find ( szName );
     if ( it != m_Data.end () )
         return &it->second;
 
@@ -61,7 +62,7 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable )
 bool CCustomData::Delete ( const char* szName )
 {
     // Find the item and delete it
-    auto& it = m_Data.find ( szName );
+    std::map < std::string, SCustomData > :: iterator it = m_Data.find ( szName );
     if ( it != m_Data.end () )
     {
         m_Data.erase ( it );

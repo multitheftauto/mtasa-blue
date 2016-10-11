@@ -55,8 +55,8 @@ void CElementRPCs::LoadFunctions ( void )
     { \
         CElementListSnapshot* pList = pSource->GetChildrenListSnapshot(); \
         pList->AddRef();    /* Keep list alive during use */ \
-        for ( auto& pEntity : *pList ) \
-            if ( !pEntity->IsBeingDeleted() && !pEntity->IsLocalEntity() ) \
+        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
+            if ( !(*iter)->IsBeingDeleted() && !(*iter)->IsLocalEntity() ) \
                 func; \
         pList->Release(); \
     }
@@ -251,8 +251,10 @@ void CElementRPCs::SetElementDimension ( CClientEntity* pSource, NetBitStreamInt
         if ( pSource->GetType () == CCLIENTTEAM )
         {
             CClientTeam* pTeam = static_cast < CClientTeam* > ( pSource );
-            for ( auto& pPlayer : pTeam->GetPlayers() )
+            list < CClientPlayer* > ::const_iterator iter = pTeam->IterBegin ();
+            for ( ; iter != pTeam->IterEnd () ; iter++ )
             {
+                CClientPlayer* pPlayer = *iter;
                 if ( pPlayer->IsLocalPlayer () )
                 {
                     // Update all of our streamers/managers to the local player's dimension
@@ -522,7 +524,7 @@ void CElementRPCs::SetElementFrozen ( CClientEntity* pSource, NetBitStreamInterf
             case CCLIENTOBJECT:
             {
                 CClientObject* pObject = static_cast < CClientObject * > ( pSource );
-                pObject->SetStatic ( bFrozen );
+                pObject->SetFrozen ( bFrozen );
                 break;
             }
         }

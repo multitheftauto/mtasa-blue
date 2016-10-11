@@ -216,7 +216,7 @@ public:
     inline CClientVehicle*      GetOccupyingVehicle         ( void )                                    { return m_pOccupyingVehicle; };
 
     CClientVehicle*             GetRealOccupiedVehicle      ( void );
-    CClientVehicle*             GetClosestVehicleInRange    ( bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL, float fWithinRange = 6000.0f );
+    CClientVehicle*             GetClosestVehicleInRange    ( bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors, bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL, float fWithinRange = 6000.0f );
     bool                        GetClosestDoor              ( CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor, CVector* pClosestDoorPosition = NULL );
 
     void                        GetIntoVehicle              ( CClientVehicle* pVehicle, unsigned int uiSeat = 0, unsigned char ucDoor = 0 );

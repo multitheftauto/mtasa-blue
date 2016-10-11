@@ -102,6 +102,9 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     g_pCore->GetCommands ()->Add ( "showsync",          "show sync data",                                   COMMAND_ShowSyncData );
     //g_pCore->GetCommands ()->Add ( "dumpall",           "dump internals (comment)",                           COMMAND_DumpPlayers );
 #endif
+    #ifdef MTA_DEBUG
+        g_pCore->GetCommands ()->Add ( "foo",      "debug command for devs", COMMAND_Foo );
+    #endif
 
     // Debug commands
     #if defined (MTA_DEBUG) || defined(MTA_BETA)
@@ -306,12 +309,14 @@ bool CClient::HandleException ( CExceptionInformation* pExceptionInformation )
 
 void CClient::GetPlayerNames ( std::vector<SString> &vPlayerNames )
 {
-    if ( g_pClientGame ) 
-    {
+    if ( g_pClientGame ) {
         vPlayerNames.clear ();
-        for ( auto& pPlayer : g_pClientGame->GetPlayerManager()->GetPlayers() )
+        for ( std::vector<CClientPlayer*>::const_iterator iter = g_pClientGame->GetPlayerManager ()->IterBegin ();
+            iter != g_pClientGame->GetPlayerManager ()->IterEnd ();
+            ++iter )
         {
-            SString strPlayerName = pPlayer->GetNametagText ();
+            CClientPlayer* pClient = *iter;
+            SString strPlayerName = pClient->GetNametagText ();
             vPlayerNames.push_back ( strPlayerName );
         }
     }

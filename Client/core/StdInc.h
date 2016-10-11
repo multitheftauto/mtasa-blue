@@ -55,19 +55,12 @@
 #include "CrashHandler.h"
 #include "CCore.h"
 #include "CDebugView.h"
-
-#include "CColor.h"
-#include "Chat/CChatLineSection.h"
-#include "Chat/CChatLine.h"
-#include "Chat/CChatInputLine.h"
-#include "Chat/CChat.h"
-
+#include "CChat.h"
 #include <DXHook/CDirect3DHookManager.h>
 #include <DXHook/CDirectInputHookManager.h>
 #include <DXHook/CDirect3DEvents9.h>
 #include <DXHook/CProxyDirectInput8.h>
 #include <DXHook/CProxyDirect3D9.h>
-#include "CPEHookUtils.h"
 #include "CCommandFuncs.h"
 #include "CExceptionInformation_Impl.h"
 #include "CJoystickManager.h"

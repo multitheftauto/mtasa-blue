@@ -11,6 +11,12 @@
 *****************************************************************************/
 
 #include <StdInc.h>
+using std::list;
+
+CSingularFileDownloadManager::CSingularFileDownloadManager ( void )
+{
+}
+
 
 CSingularFileDownloadManager::~CSingularFileDownloadManager ( void )
 {
@@ -27,18 +33,20 @@ CSingularFileDownload* CSingularFileDownloadManager::AddFile ( CResource* pResou
 
 void CSingularFileDownloadManager::CancelResourceDownloads ( CResource* pResource )
 {
-    for ( auto& pDownload : m_Downloads )
+    list < CSingularFileDownload* > ::const_iterator iter = m_Downloads.begin ();
+    for ( ; iter != m_Downloads.end (); ++iter )
     {
-        if ( pDownload->GetResource () == pResource )
-            pDownload->Cancel ();
+        if ( (*iter)->GetResource () == pResource )
+            (*iter)->Cancel ();
     }
 }
 
 void CSingularFileDownloadManager::ClearList ( void )
 {
-    for (auto& pDownload : m_Downloads)
+    list < CSingularFileDownload* > ::const_iterator iter = m_Downloads.begin();
+    for ( ; iter != m_Downloads.end(); ++iter )
     {
-        delete pDownload;
+        delete *iter;
     }
     m_Downloads.clear();
 }
@@ -46,9 +54,10 @@ void CSingularFileDownloadManager::ClearList ( void )
 
 bool CSingularFileDownloadManager::AllComplete ( void )
 {
-    for (auto& pDownload : m_Downloads)
+    list < CSingularFileDownload* > ::const_iterator iter = m_Downloads.begin();
+    for ( ; iter != m_Downloads.end(); ++iter )
     {
-        if ( !pDownload->GetComplete() )
+        if ( !(*iter)->GetComplete() )
             return false;
     }
     return true;

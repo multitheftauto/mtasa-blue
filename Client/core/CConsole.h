@@ -28,6 +28,7 @@ class CConsole : public CConsoleInterface
 {
 public:
                         CConsole                        ( CGUI* pManager, CGUIElement* pParent = NULL );
+                        ~CConsole                       ( void );
 
     void                Echo                            ( const char* szText );
     void                Print                           ( const char* szText );
@@ -45,6 +46,7 @@ public:
     bool                IsInputActive                   ( void );
     void                ActivateInput                   ( void );
 
+    void                HandleTextAccepted              ( bool bHandled );
     void                GetCommandInfo                  ( const std::string &strIn, std::string & strCmdOut, std::string & strCmdLineOut );
 
     void                SetNextHistoryText              ( void );
@@ -66,18 +68,20 @@ protected:
 
 private:
     void                CreateElements                  ( CGUIElement* pParent = NULL );
+    void                DestroyElements                 ( void );
+
     bool                OnWindowSize                    ( CGUIElement* pElement );
 
     CGUI*               m_pManager;
 
-    CConsoleHistory     m_ConsoleHistory;
+    CConsoleHistory*    m_pConsoleHistory;
     int                 m_iHistoryIndex;
     std::vector < int > m_AutoCompleteList;
     int                 m_iAutoCompleteIndex;
 
-    std::unique_ptr<CGUIWindow> m_pWindow;
-    std::unique_ptr<CGUIEdit>   m_pInput;
-    std::unique_ptr<CGUIMemo>   m_pHistory;
+    CGUIWindow*         m_pWindow;
+    CGUIEdit*           m_pInput;
+    CGUIMemo*           m_pHistory;
 
     bool                m_bIsEnabled;
 

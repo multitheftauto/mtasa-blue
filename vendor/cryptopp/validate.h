@@ -71,6 +71,8 @@ bool ValidateCMAC();
 bool ValidateBBS();
 bool ValidateDH();
 bool ValidateMQV();
+bool ValidateHMQV();
+bool ValidateFHMQV();
 bool ValidateRSA();
 bool ValidateElGamal();
 bool ValidateDLIES();
@@ -91,6 +93,7 @@ bool ValidateESIGN();
 #if !defined(NDEBUG)
 bool TestSecBlock();
 bool TestPolynomialMod2();
+bool TestHuffmanCodes();
 #endif
 
 // Coverity finding

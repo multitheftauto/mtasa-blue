@@ -170,7 +170,7 @@ SSendHandle CLatentSendQueue::AddSend ( CBufferRef bufferRef, uint uiRate, ushor
 ///////////////////////////////////////////////////////////////
 bool CLatentSendQueue::CancelSend ( SSendHandle handle )
 {
-    for ( auto iter = m_TxQueue.begin(); iter != m_TxQueue.end(); ++iter )
+    for ( std::list < SSendItem >::iterator iter = m_TxQueue.begin () ; iter != m_TxQueue.end () ; ++iter )
     {
         if ( iter->uiId == handle )
         {
@@ -205,8 +205,8 @@ void CLatentSendQueue::CancelAllSends ( void )
 {
     // Use a copy because CancelSend will not remove a finishing transfer
     std::list < SSendItem > listCopy = m_TxQueue;
-    for ( auto& sendItem : listCopy )
-        CancelSend ( sendItem.uiId );
+    for ( std::list < SSendItem >::iterator iter = listCopy.begin () ; iter != listCopy.end () ; ++iter )
+        CancelSend ( iter->uiId );
     m_TxQueue.clear ();
 }
 
@@ -223,17 +223,17 @@ bool CLatentSendQueue::GetSendStatus ( SSendHandle handle, SSendStatus* pOutSend
     UpdateEstimatedDurations ();
 
     int iTimeMsBefore = 0;
-    for ( auto& sendItem : m_TxQueue )
+    for ( std::list < SSendItem >::iterator iter = m_TxQueue.begin () ; iter != m_TxQueue.end () ; ++iter )
     {
-        if ( sendItem.uiId == handle )
+        if ( iter->uiId == handle )
         {
-            pOutSendStatus->iStartTimeMsOffset = iTimeMsBefore - sendItem.iEstSendDurationMsUsed;
-            pOutSendStatus->iEndTimeMsOffset = iTimeMsBefore + sendItem.iEstSendDurationMsRemaining;
-            pOutSendStatus->iTotalSize = sendItem.bufferRef->GetSize ();
-            pOutSendStatus->iPercentComplete = sendItem.uiReadPosition * 100 / Max ( 1, pOutSendStatus->iTotalSize );
+            pOutSendStatus->iStartTimeMsOffset = iTimeMsBefore - iter->iEstSendDurationMsUsed;
+            pOutSendStatus->iEndTimeMsOffset = iTimeMsBefore + iter->iEstSendDurationMsRemaining;
+            pOutSendStatus->iTotalSize = iter->bufferRef->GetSize ();
+            pOutSendStatus->iPercentComplete = iter->uiReadPosition * 100 / Max ( 1, pOutSendStatus->iTotalSize );
             return true;
         }
-        iTimeMsBefore += sendItem.iEstSendDurationMsRemaining;
+        iTimeMsBefore += iter->iEstSendDurationMsRemaining;
     }
 
     return false;
@@ -250,9 +250,9 @@ bool CLatentSendQueue::GetSendStatus ( SSendHandle handle, SSendStatus* pOutSend
 void CLatentSendQueue::GetSendHandles ( std::vector < SSendHandle >& outResultList )
 {
     outResultList.clear();
-    for (auto& sendItem : m_TxQueue)
+    for ( std::list < SSendItem >::iterator iter = m_TxQueue.begin () ; iter != m_TxQueue.end () ; ++iter )
     {
-        outResultList.push_back ( sendItem.uiId );
+        outResultList.push_back ( iter->uiId );
     }
 }
 
@@ -268,8 +268,10 @@ void CLatentSendQueue::UpdateEstimatedDurations ( void )
 {
     uint uiUsingRate = MIN_SEND_RATE;
     // Recalculate estimated times for all transfers
-    for (auto& tx : m_TxQueue)
+    for ( std::list < SSendItem >::reverse_iterator iter = m_TxQueue.rbegin () ; iter != m_TxQueue.rend () ; ++iter )
     {
+        SSendItem& tx = *iter;
+
         uiUsingRate = Max ( uiUsingRate, tx.uiRate );
         tx.iEstSendDurationMsRemaining = tx.bufferRef->GetSize () * 1000 / uiUsingRate;
         tx.iEstSendDurationMsUsed = 0;
@@ -297,8 +299,8 @@ void CLatentSendQueue::PostQueueRemove ( void )
 {
     // Recalculate the current transfer rate
     m_uiCurrentRate = MIN_SEND_RATE;
-    for (auto& tx : m_TxQueue)
-        m_uiCurrentRate = Max ( m_uiCurrentRate, tx.uiRate );
+    for ( std::list < SSendItem >::iterator iter = m_TxQueue.begin () ; iter != m_TxQueue.end () ; ++iter )
+        m_uiCurrentRate = Max ( m_uiCurrentRate, iter->uiRate );
 }
 
 
@@ -330,7 +332,7 @@ void CLatentSendQueue::SendCancelNotification ( SSendItem& activeTx )
 ///////////////////////////////////////////////////////////////
 bool CLatentSendQueue::OnLuaMainDestroy ( void* pLuaMain )
 {
-    for ( auto iter = m_TxQueue.begin () ; iter != m_TxQueue.end () ;  )
+    for ( std::list < SSendItem >::iterator iter = m_TxQueue.begin () ; iter != m_TxQueue.end () ;  )
     {
         if ( iter->pLuaMain == pLuaMain && !iter->bSendFinishing )
         {

@@ -206,12 +206,12 @@ void CModelCacheManagerImpl::GetStats ( SModelCacheStats& outStats )
     outStats.uiNumPedModels = 0;
     outStats.uiNumVehicleModels = 0;
 
-    for ( auto& iter : m_PedModelCacheInfoMap )
-        if ( iter.second.bIsModelCachedHere )
+    for ( std::map < ushort, SModelCacheInfo >::const_iterator iter = m_PedModelCacheInfoMap.begin () ; iter != m_PedModelCacheInfoMap.end () ; ++iter )
+        if ( iter->second.bIsModelCachedHere )
             outStats.uiNumPedModels++;
 
-    for ( auto& iter : m_VehicleModelCacheInfoMap )
-        if ( iter.second.bIsModelCachedHere )
+    for ( std::map < ushort, SModelCacheInfo >::const_iterator iter = m_VehicleModelCacheInfoMap.begin () ; iter != m_VehicleModelCacheInfoMap.end () ; ++iter )
+        if ( iter->second.bIsModelCachedHere )
             outStats.uiNumVehicleModels++;
 }
 
@@ -297,10 +297,10 @@ void CModelCacheManagerImpl::UpdateVehicleModelCaching ( const std::map < ushort
 ///////////////////////////////////////////////////////////////
 void CModelCacheManagerImpl::RemoveCacheRefs ( std::map < ushort, SModelCacheInfo >& currentCacheInfoMap )
 {
-    for ( auto& iter : currentCacheInfoMap )
+    for ( std::map < ushort, SModelCacheInfo >::iterator iter = currentCacheInfoMap.begin () ; iter != currentCacheInfoMap.end () ; ++iter )
     {
-        const ushort usModelId = iter.first;
-        SModelCacheInfo& info = iter.second;
+        const ushort usModelId = iter->first;
+        SModelCacheInfo& info = iter->second;
 
         if ( info.bIsModelCachedHere )
         {
@@ -319,7 +319,7 @@ void CModelCacheManagerImpl::RemoveCacheRefs ( std::map < ushort, SModelCacheInf
 void CModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort, float >& newNeedCacheList, std::map < ushort, SModelCacheInfo >& currentCacheInfoMap, uint uiMaxCachedAllowed )
 {
     // Update some flags and remove info for uncached and unneeded
-    for ( auto iter = currentCacheInfoMap.begin () ; iter != currentCacheInfoMap.end () ; )
+    for ( std::map < ushort, SModelCacheInfo >::iterator iter = currentCacheInfoMap.begin () ; iter != currentCacheInfoMap.end () ; )
     {
         const ushort usModelId = iter->first;
         SModelCacheInfo& info = iter->second;
@@ -340,10 +340,10 @@ void CModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort, float
 
 
     // Update current from new needed 
-    for (auto& iter : newNeedCacheList)
+    for ( std::map < ushort, float >::const_iterator iter = newNeedCacheList.begin () ; iter != newNeedCacheList.end () ; ++iter )
     {
-        SModelCacheInfo& info = MapGet ( currentCacheInfoMap, iter.first );
-        info.fClosestDistSq = iter.second;
+        SModelCacheInfo& info = MapGet ( currentCacheInfoMap, iter->first );
+        info.fClosestDistSq = iter->second;
         info.lastNeeded = m_TickCountNow;
         if ( info.firstNeeded.ToInt () == 0 )
             info.firstNeeded = m_TickCountNow;
@@ -357,10 +357,10 @@ void CModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort, float
     std::map < uint, ushort > maybeCacheList;
 
     // Update active 
-    for ( auto& iter : currentCacheInfoMap )
+    for ( std::map < ushort, SModelCacheInfo >::iterator iter = currentCacheInfoMap.begin () ; iter != currentCacheInfoMap.end () ; ++iter )
     {
-        const ushort usModelId = iter.first;
-        SModelCacheInfo& info = iter.second;
+        const ushort usModelId = iter->first;
+        SModelCacheInfo& info = iter->second;
 
         if ( info.bIsModelLoadedByGame )
         {

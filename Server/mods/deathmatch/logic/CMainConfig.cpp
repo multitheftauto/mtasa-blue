@@ -507,12 +507,18 @@ bool CMainConfig::Load ( void )
     SString strGroupList;
     if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList, 1 ) != IS_SUCCESS )
     {
-        strGroupList = "Admin";
+        // If not defined in conf file, then default to disabled
+        strGroupList = "";
     }
     strGroupList.Split( ",", m_AuthSerialGroupList );
-    for ( auto& strGroup : m_AuthSerialGroupList )
+    for ( auto iter = m_AuthSerialGroupList.begin() ; iter != m_AuthSerialGroupList.end() ; )
     {
+        SString& strGroup = *iter;
         strGroup = strGroup.TrimEnd( " " ).TrimStart( " " );
+        if ( strGroup.empty() )
+            iter = m_AuthSerialGroupList.erase( iter );
+        else
+            ++iter;
     }
 
     // auth_serial_http
@@ -1468,6 +1474,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      0,      100,    "server_logic_fps_limit",               &m_iServerLogicFpsLimit,                    NULL },
             { true, true,   0,      1,      1,      "crash_dump_upload",                    &m_bCrashDumpUploadEnabled,                 NULL },
             { true, true,   0,      1,      1,      "filter_duplicate_log_lines",           &m_bFilterDuplicateLogLinesEnabled,         NULL },
+            { false, false, 0,      1,      1,      "database_credentials_protection",      &m_bDatabaseCredentialsProtectionEnabled,   NULL },
         };
 
     static std::vector < SIntSetting > settingsList;

@@ -46,9 +46,12 @@ void CClientProjectileManager::DoPulse ( void )
 {
     CElementDeleter* pElementDeleter = g_pClientGame->GetElementDeleter();
     CClientProjectile* pProjectile = NULL;
-    auto cloneList = m_List;
-    for ( auto& pProjectile : cloneList )
+    list < CClientProjectile* > cloneList = m_List;
+    list < CClientProjectile* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; ++iter )
     {
+        pProjectile = *iter;
+
         // Is this projectile still active?
         if ( pProjectile->IsActive () )
         {
@@ -60,10 +63,11 @@ void CClientProjectileManager::DoPulse ( void )
 
 void CClientProjectileManager::RemoveAll ( void )
 {
-    auto cloneList = m_List;
-    for (auto& pProjectile : cloneList)
+    list < CClientProjectile * > cloneList = m_List;
+    list < CClientProjectile* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; ++iter )
     {
-        delete pProjectile;
+        delete *iter;
     }
     m_List.clear ();
 }
@@ -71,26 +75,30 @@ void CClientProjectileManager::RemoveAll ( void )
 
 bool CClientProjectileManager::Exists ( CClientProjectile * pProjectile )
 {
-    for (auto& pProjectileEntry : m_List) 
+    list < CClientProjectile* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
     {
-        if (pProjectileEntry == pProjectile)
+        if ( *iter == pProjectile )
+        {
             return true;
+        }
     }
     return false;
 }
 
-CClientProjectile* CClientProjectileManager::Get ( CEntitySAInterface * pGameProjectile )
+CClientProjectile* CClientProjectileManager::Get ( CEntitySAInterface * pProjectile )
 {
     int iCount = m_List.size();
     assert ( iCount <= 32 );
-    for (auto& pProjectile : m_List)
+    list < CClientProjectile* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
     {
-        if ( pProjectile->GetGameEntity ( )->GetInterface() == pGameProjectile )
+        if ( (*iter)->GetGameEntity ( )->GetInterface() == pProjectile )
         {
-            return pProjectile;
+            return (*iter);
         }
     }
-    return nullptr;
+    return NULL;
 }
 
 void CClientProjectileManager::RemoveFromList ( CClientProjectile* pProjectile )

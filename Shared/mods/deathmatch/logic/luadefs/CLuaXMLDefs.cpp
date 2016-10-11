@@ -96,15 +96,9 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
             // Resolve other resource from name
             if ( CResourceManager::ParseResourcePathInput ( strInputPath, pOtherResource, &strPath, nullptr ) )
             {
-#ifndef MTA_CLIENT
-                // We have access to modify other resource?
-                if ( pOtherResource == pThisResource ||
-                    m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                        "ModifyOtherObjects",
-                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                        false ) )
-#endif // !MTA_CLIENT
+                CheckCanModifyOtherResource( argStream, pThisResource, pOtherResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pOtherResource, strPath );
+                if ( !argStream.HasErrors() )
                 {
                     // Make sure the dir exists so we can successfully make the file
                     MakeSureDirExists ( strPath );
@@ -124,10 +118,6 @@ int CLuaXMLDefs::xmlCreateFile ( lua_State* luaVM )
                         pLuaMain->DestroyXML ( xmlFile );
                     }
                 }
-#ifndef MTA_CLIENT
-                else
-                    argStream.SetCustomError ( SString ( "ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName ().c_str (), pOtherResource->GetName ().c_str () ), "Access denied" );
-#endif // !MTA_CLIENT
             }
         }
 
@@ -151,9 +141,11 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
     if ( pLuaMain )
     {
         SString strFileInput;
+        bool bReadOnly;
 
         CScriptArgReader argStream ( luaVM );
         argStream.ReadString ( strFileInput );
+        argStream.ReadIfNextIsBool( bReadOnly, false );
 
         if ( !argStream.HasErrors () )
         {
@@ -164,23 +156,15 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
             // Resolve other resource from name
             if ( CResourceManager::ParseResourcePathInput ( strFileInput, pOtherResource, &strPath ) )
             {
-                // SS only
-#ifndef MTA_CLIENT
-                // We have access to modify other resource?
-                if ( pOtherResource == pThisResource ||
-                    m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                        "ModifyOtherObjects",
-                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                        false ) )
-#endif // !MTA_CLIENT
+                CheckCanModifyOtherResource( argStream, pThisResource, pOtherResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pOtherResource, strPath, &bReadOnly );
+                if ( !argStream.HasErrors() )
                 {
-
                     // Make sure the dir exists so we can successfully make the file
                     MakeSureDirExists ( strPath );
 
                     // Create the XML
-                    CXMLFile* xmlFile = pLuaMain->CreateXML ( strPath.c_str () );
+                    CXMLFile* xmlFile = pLuaMain->CreateXML ( strPath.c_str (), true, bReadOnly );
                     if ( xmlFile )
                     {
                         // Try to parse it
@@ -204,10 +188,6 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
                         pLuaMain->DestroyXML ( xmlFile );
                     }
                 }
-#ifndef MTA_CLIENT
-                else
-                    argStream.SetCustomError ( SString ( "ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName ().c_str (), pOtherResource->GetName ().c_str () ), "Access denied" );
-#endif // !MTA_CLIENT
             }
         }
 
@@ -246,18 +226,12 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
             // Resolve other resource from name
             if ( CResourceManager::ParseResourcePathInput ( strFile, pOtherResource, &strPath, NULL ) )
             {
-#ifndef MTA_CLIENT
-                // We have access to modify other resource?
-                if ( pOtherResource == pThisResource ||
-                    m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                        "ModifyOtherObjects",
-                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                        false ) )
-#endif // !MTA_CLIENT
+                CheckCanModifyOtherResource( argStream, pThisResource, pOtherResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pOtherResource, strPath );
+                if ( !argStream.HasErrors() )
                 {
-                    if ( pSourceNode ) {
-
+                    if ( pSourceNode )
+                    {
                         // Make sure the dir exists so we can successfully make the file
                         MakeSureDirExists ( strPath );
 
@@ -299,10 +273,6 @@ int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
                     else
                         argStream.SetCustomError ( SString ( "Unable to copy XML file %s", strFile.c_str () ), "Bad filepath" );
                 }
-#ifndef MTA_CLIENT
-                else
-                    argStream.SetCustomError ( SString ( "ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName ().c_str (), pOtherResource->GetName ().c_str () ), "Access denied" );
-#endif
             }
         }
 
@@ -327,9 +297,11 @@ int CLuaXMLDefs::xmlSaveFile ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            luaMain->SaveXML ( pNode );
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( luaMain->SaveXML ( pNode ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
     else
@@ -468,10 +440,10 @@ int CLuaXMLDefs::xmlNodeGetChildren ( lua_State* luaVM )
         {
             lua_newtable ( luaVM );
             uiIndex = 0;
-            for (auto& pChild : pNode->GetChildren () )
+            for (auto iter = pNode->ChildrenBegin (); iter != pNode->ChildrenEnd (); ++iter )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
-                lua_pushxmlnode ( luaVM, pChild );
+                lua_pushxmlnode ( luaVM, *iter );
                 lua_settable ( luaVM, -3 );
             }
             return 1;

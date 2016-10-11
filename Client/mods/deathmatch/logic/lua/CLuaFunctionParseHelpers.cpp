@@ -734,3 +734,21 @@ uint GetWeaponPropertyFlagBit( eWeaponProperty weaponProperty )
     uint uiFlagBit = 1 << uiFlagIndex;
     return uiFlagBit;
 }
+
+
+//
+// Set error if pThisResource does not have permission to modify pOtherResource
+//
+void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 )
+{
+    // No operation on the client
+}
+
+
+//
+// Set error if resource file access is blocked due to reasons
+//
+void CheckCanAccessOtherResourceFile( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly )
+{
+    // No operation on the client
+}

@@ -11,7 +11,9 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-#pragma once
+
+#ifndef __CCOMMANDS_H
+#define __CCOMMANDS_H
 
 #include <core/CCommandsInterface.h>
 #include <string>
@@ -20,8 +22,8 @@
 class CCommands : public CCommandsInterface, public CSingleton < CCommands >
 {
 public:
-                        CCommands                   ( void ) = default;
-                        ~CCommands                  ( void ) = default;
+                        CCommands                   ( void );
+                        ~CCommands                  ( void );
 
     void                Add                         ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand = false, bool bAllowScriptedBind = false );
 
@@ -38,12 +40,15 @@ public:
 
     tagCOMMANDENTRY*    Get                         ( const char* szCommand, bool bCheckIfMod = false, bool bModCommand = false );
 
-    std::list<COMMANDENTRY>& GetCommands            ( void ) { return m_CommandList; }
+    std::list < COMMANDENTRY* > ::iterator IterBegin( void )                                        { return m_CommandList.begin (); }
+    std::list < COMMANDENTRY* > ::iterator IterEnd  ( void )                                        { return m_CommandList.end (); }
 private:    
 
     void                ExecuteHandler              ( PFNCOMMAND pfnHandler, const char* szParameters );
 
-    std::list <COMMANDENTRY>     m_CommandList;
+    std::list < COMMANDENTRY* >     m_CommandList;
 
-    pfnExecuteCommandHandler        m_pfnExecuteHandler = nullptr;
+    pfnExecuteCommandHandler        m_pfnExecuteHandler;
 };
+
+#endif

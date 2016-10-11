@@ -17,10 +17,12 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 
+using std::list;
+
 extern CCore* g_pCore;
 extern bool g_bBoundsChecker;
 
-constexpr size_t MTA_HELP_SPACING = 32;
+#define MTA_HELP_SPACING    32
 
 void CCommandFuncs::Help ( const char* szParameters )
 {
@@ -33,24 +35,29 @@ void CCommandFuncs::Help ( const char* szParameters )
 
     pConsole->Print ( _("***[ COMMAND HELP ]***\n") );
 
+    // Loop through all the available commands
+    list < COMMANDENTRY* > ::iterator iter = CCommands::GetSingletonPtr ()->IterBegin ();
+    list < COMMANDENTRY* > ::iterator iterEnd = CCommands::GetSingletonPtr ()->IterEnd ();
+
     char spacer[MTA_HELP_SPACING+1];
-    for ( auto& pCommand : CCommands::GetSingletonPtr()->GetCommands()) {
-        const char *szCommandName = pCommand.szCommandName;
-        const char *szDescription = pCommand.szDescription;
+    for ( ; iter != iterEnd ; iter++ ) {
+        const char *szCommandName = (*iter)->szCommandName;
+        const char *szDescription = (*iter)->szDescription;
 
         // Space out the name and description evenly (tab-like)
-        auto spacing = MTA_HELP_SPACING - strlen ( szCommandName );
+        unsigned char spacing = MTA_HELP_SPACING - strlen ( szCommandName );
         if ( spacing <= 0 ) spacing = 1;
 
         memset(&spacer[0], ' ', MTA_HELP_SPACING);
         spacer[spacing] = NULL;
 
-        pConsole->Printf ( "* %s%s%s\n", pCommand.szCommandName, &spacer[0], pCommand.szDescription );
+        pConsole->Printf ( "* %s%s%s\n", (*iter)->szCommandName, &spacer[0], (*iter)->szDescription );
     }
 
     pConsole->Printf ( "***[--------------]***\n" );
 }
 
+void dumpbasj ();
 void CCommandFuncs::Exit ( const char* szParameters )
 {
     g_pCore->Quit ();
@@ -80,6 +87,97 @@ void CCommandFuncs::ScreenShot ( const char* szParameters )
     g_pCore->TakeScreenShot ();
 }
 
+
+void CCommandFuncs::Vid ( const char* szParameters )
+{
+#if 0
+    // ripped from the renderware sdk
+    CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+
+    if ( strlen(szParameters) == 0 )
+    {
+        VideoMode           vidModemInfo;
+        int                 vidMode, numVidModes, currentVidMode;
+
+        numVidModes = gameSettings->GetNumVideoModes();
+        currentVidMode = gameSettings->GetCurrentVideoMode();
+        // Add the available video modes to the dialog
+        for (vidMode = 0; vidMode < numVidModes; vidMode++)
+        {
+            gameSettings->GetVideoModeInfo(&vidModemInfo, vidMode);
+
+            SString strMode ( "%d: %lu x %lu x %lu %s %s",
+                    vidMode, vidModemInfo.width, vidModemInfo.height,
+                    vidModemInfo.depth,
+                    vidModemInfo.flags & rwVIDEOMODEEXCLUSIVE ?
+                    "(Fullscreen)" : "",
+                    currentVidMode == vidMode ? "(Current)" : "" );
+
+            CCore::GetSingleton ().GetConsole ()->Printf ( strMode );
+        }
+        CCore::GetSingleton ().GetConsole ()->Printf( "* Syntax: vid <mode>" );
+    }
+    else
+    {
+        // Make sure no mod is loaded
+        if ( !CCore::GetSingleton ().GetModManager ()->IsLoaded () )
+        {
+            // Grab the device window and what mode to switch to
+            int iParameter = atoi ( szParameters );
+
+            // Change the video mode
+            GetVideoModeManager ()->ChangeVideoMode ( iParameter );
+
+            // Grab viewport settings
+            int iViewportX = CCore::GetSingleton ().GetGraphics()->GetViewportWidth ();
+            int iViewportY = CCore::GetSingleton ().GetGraphics()->GetViewportHeight ();
+
+            // Re-create all CGUI windows, for correct absolute sizes that depend on the (new) screen resolution
+            CCore::GetSingleton ().GetLocalGUI ()->DestroyWindows ();
+            CCore::GetSingleton ().GetGUI ()->SetResolution ( (float) iViewportX, (float) iViewportY );
+            CCore::GetSingleton ().GetLocalGUI ()->CreateWindows ();
+
+            // Reload console, serverbrowser and chat settings (removed in DestroyWindows)
+            g_pCore->ApplyConsoleSettings ();
+            g_pCore->ApplyMenuSettings ();
+        }
+        else
+        {
+            g_pCore->GetConsole ()->Echo ( "vid: Please disconnect before changing video mode" );
+        }
+    }
+#endif
+}
+
+
+void CCommandFuncs::Window ( const char* szParameters )
+{
+#if 0
+    // Make sure no mod is loaded
+    if ( !CCore::GetSingleton ().GetModManager ()->IsLoaded () )
+    {
+        CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
+        unsigned int currentMode = gameSettings->GetCurrentVideoMode();
+
+        if ( currentMode == 0 )
+        {
+            GetVideoModeManager ()->ChangeVideoMode ( VIDEO_MODE_FULLSCREEN );
+            g_pCore->GetLocalGUI()->GetMainMenu ()->RefreshPositions();
+        }
+        else
+        {
+            // Run "vid 0"
+            Vid ( "0" );
+        }
+    }
+    else
+    {
+        g_pCore->GetConsole ()->Echo ( "window: Please disconnect first" );
+    }
+#endif
+}
+
+
 void CCommandFuncs::Time ( const char* szParameters )
 {
     time_t rawtime;
@@ -96,6 +194,50 @@ void CCommandFuncs::Time ( const char* szParameters )
 void CCommandFuncs::Clear ( const char* szParameters )
 {
     CCore::GetSingleton ().GetConsole ()->Clear ();
+}
+
+
+void CCommandFuncs::Load ( const char* szParameters )
+{
+    if ( !szParameters )
+    {
+        CCore::GetSingleton ().GetConsole ()->Printf( "* Syntax: load <mod-name> [<arguments>]" );
+        return;
+    }
+
+    // Copy the buffer
+    char* szTemp = new char [ strlen ( szParameters ) + 1 ];
+    strcpy ( szTemp, szParameters );
+
+    // Split it up into mod name and the arguments
+    char* szModName = strtok ( szTemp, " " );
+    char* szArguments = strtok ( NULL, "\0" );
+
+    if ( szModName )
+    {
+        // Load the mod with the given arguments
+        CModManager::GetSingleton ().RequestLoad ( szModName, szArguments );
+    }
+    else
+        CCore::GetSingleton ().GetConsole ()->Printf( "* Syntax: load <mod-name> [<arguments>]" );
+
+    // Free the temp buffer
+    delete [] szTemp;
+}
+
+
+void CCommandFuncs::Unload ( const char* szParameters )
+{
+    // Any mod loaded?
+    if ( CModManager::GetSingleton ().GetCurrentMod () )
+    {
+        // Unload it
+        CModManager::GetSingleton ().RequestUnload ();
+    }
+    else
+    {
+        CCore::GetSingleton ().GetConsole ()->Print ( "No mod loaded!" );
+    }
 }
 
 

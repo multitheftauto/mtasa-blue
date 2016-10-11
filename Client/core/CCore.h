@@ -93,7 +93,7 @@ public:
     eCoreVersion            GetVersion                      ( void );
     CConsoleInterface*      GetConsole                      ( void );
     CCommandsInterface*     GetCommands                     ( void );
-    inline CConnectManager* GetConnectManager               ( void )                { return &m_ConnectManager; };
+    inline CConnectManager* GetConnectManager               ( void )                { return m_pConnectManager; };
     CGame*                  GetGame                         ( void );
     CGUI*                   GetGUI                          ( void );
     CGraphicsInterface*     GetGraphics                     ( void );
@@ -104,11 +104,11 @@ public:
     CXMLNode*               GetConfig                       ( void );
     CClientVariables*       GetCVars                        ( void )                { return &m_ClientVariables; };
     CKeyBindsInterface*     GetKeyBinds                     ( void );
-    CMouseControl*          GetMouseControl                 ( void )                { return &m_MouseControl; };
+    CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
     CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
-    CWebCoreInterface*      GetWebCore                      ( void )                { return m_pWebCore.get(); };
-    CTrayIconInterface*     GetTrayIcon                     ( void )                { return &m_TrayIcon; };
+    CWebCoreInterface*      GetWebCore                      ( void )                { return m_pWebCore; };
+    CTrayIconInterface*     GetTrayIcon                     ( void )                { return m_pTrayIcon; };
 
     void                    SaveConfig                      ( bool bWaitUntilFinished = false );
 
@@ -140,6 +140,7 @@ public:
     bool                    IsCursorForcedVisible           ( void );
     bool                    IsCursorControlsToggled         ( void ) { return m_bCursorToggleControls; }
     void                    HideMainMenu                    ( void );
+    void                    HideQuickConnect                ( void );
     void                    SetCenterCursor                 ( bool bEnabled );
 
     void                    ShowServerInfo                  ( unsigned int WindowType );
@@ -211,9 +212,9 @@ public:
     void                    RegisterCommands                ( void );
     bool                    IsValidNick                     ( const char* szNick );     // Move somewhere else
     void                    Quit                            ( bool bInstantly = true );
-    void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost )      { m_LocalGUI.InitiateUpdate ( szType, szData, szHost ); }
-    bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_LocalGUI.IsOptionalUpdateInfoRequired ( szHost ); }
-    void                    InitiateDataFilesFix            ( void )                                        { m_LocalGUI.InitiateDataFilesFix (); }
+    void                    InitiateUpdate                  ( const char* szType, const char* szData, const char* szHost )      { m_pLocalGUI->InitiateUpdate ( szType, szData, szHost ); }
+    bool                    IsOptionalUpdateInfoRequired    ( const char* szHost )                          { return m_pLocalGUI->IsOptionalUpdateInfoRequired ( szHost ); }
+    void                    InitiateDataFilesFix            ( void )                                        { m_pLocalGUI->InitiateDataFilesFix (); }
 
     uint                    GetFrameRateLimit               ( void )                                        { return m_uiFrameRateLimit; }
     void                    RecalculateFrameRateLimit       ( uint uiServerFrameRateLimit = -1, bool bLogToConsole = true );
@@ -272,48 +273,42 @@ public:
     bool                    GetRightSizeTxdEnabled          ( void );
 
 private:
-    // Module loader objects.
-    // These are at the top to make sure they're unloaded last
-    CModuleLoader               m_GameModule;
-    CModuleLoader               m_MultiplayerModule;
-    CModuleLoader               m_NetModule;
-    CModuleLoader               m_XMLModule;
-    CModuleLoader               m_GUIModule;
-
-    // XML
+    // Core devices.
     CXML*                       m_pXML;
-    CXMLFile*                   m_pConfigFile;
-    CClientVariables            m_ClientVariables;
-
-    // Controls
-    CKeyBinds                   m_KeyBinds;
-    CMouseControl               m_MouseControl;
-
-    // Core devices
-    CLocalGUI                   m_LocalGUI;
-    CGraphics                   m_Graphics;
-    CCommands                   m_Commands;
-    CDirect3DData               m_Direct3DData;
-    CConnectManager             m_ConnectManager;
+    CLocalGUI *                 m_pLocalGUI;
+    CGraphics *                 m_pGraphics;
+    CCommands *                 m_pCommands;
+    CDirect3DData *             m_pDirect3DData;
+    CConnectManager*            m_pConnectManager;
     CModelCacheManager*         m_pModelCacheManager;
 
     // Instances (put new classes here!)
-    std::unique_ptr<CWebCore>   m_pWebCore;
-    CTrayIcon                   m_TrayIcon;
+    CXMLFile*                   m_pConfigFile;
+    CClientVariables            m_ClientVariables;
+    CWebCore*                   m_pWebCore = nullptr;
+    CTrayIcon*                  m_pTrayIcon;
 
     // Hook interfaces.
-    CMessageLoopHook            m_MessageLoopHook;
-    CDirectInputHookManager     m_DirectInputHookManager;
-    CDirect3DHookManager        m_Direct3DHookManager;
-    CSetCursorPosHook           m_SetCursorPosHook;
+    CMessageLoopHook *          m_pMessageLoopHook;
+    CDirectInputHookManager *   m_pDirectInputHookManager;
+    CDirect3DHookManager *      m_pDirect3DHookManager;
+    //CFileSystemHook *           m_pFileSystemHook;
+    CSetCursorPosHook *         m_pSetCursorPosHook;
 
     bool                        m_bLastFocused;
     int                         m_iUnminimizeFrameCounter;
     bool                        m_bDidRecreateRenderTargets;
     bool                        m_bIsWindowMinimized;
 
+    // Module loader objects.
+    CModuleLoader               m_GameModule;
+    CModuleLoader               m_MultiplayerModule;
+    CModuleLoader               m_NetModule;
+    CModuleLoader               m_XMLModule;
+    CModuleLoader               m_GUIModule;
+
     // Mod manager
-    CModManager                 m_ModManager; 
+    CModManager*                m_pModManager; 
 
     // Module interfaces.
     CGame *                     m_pGame;
@@ -322,17 +317,19 @@ private:
     CGUI*                       m_pGUI;
 
     // Logger utility interface.
-    CConsoleLogger              m_ConsoleLogger;
+    CConsoleLogger *            m_pConsoleLogger;
 
     CLocalization*              m_pLocalization;
 
+    CKeyBinds*                  m_pKeyBinds;
+    CMouseControl*              m_pMouseControl;
     
     bool                        m_bFirstFrame;
     bool                        m_bIsOfflineMod;
     bool                        m_bCursorToggleControls;
     pfnProcessMessage           m_pfnMessageProcessor;
 
-    std::unique_ptr<CGUIMessageBox>  m_pMessageBox;
+    CGUIMessageBox*             m_pMessageBox;
 
     // screen res
     DEVMODE                     m_Current;

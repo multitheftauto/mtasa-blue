@@ -14,6 +14,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CElementDeleter::CElementDeleter ()
 {
     // Allow unrefernces
@@ -48,16 +50,18 @@ void CElementDeleter::Delete ( class CClientEntity* pElement )
 void CElementDeleter::DeleteRecursive ( class CClientEntity* pElement )
 {
     // Gather a list over children (we can't use the list as it changes)
-    std::list < CClientEntity* > Children;
-    for ( auto& pChild : pElement->GetChildList() )
+    list < CClientEntity* > Children;
+    CChildListType ::const_iterator iterCopy = pElement->IterBegin ();
+    for ( ; iterCopy != pElement->IterEnd (); ++iterCopy )
     {
-        Children.push_back ( pChild );
+        Children.push_back ( *iterCopy );
     }
 
     // Call ourselves on each child of this to go as deep as possible and start deleting there
-    for (auto& pElement : Children )
+    list < CClientEntity* > ::const_iterator iter = Children.begin ();
+    for ( ; iter != Children.end (); ++iter )
     {
-        DeleteRecursive ( pElement );
+        DeleteRecursive ( *iter );
     }
 
     // At this point we're sure that this element has no more children left.
@@ -80,7 +84,7 @@ void CElementDeleter::DoDeleteAll ( void )
     m_bAllowUnreference = false;
 
     // Delete all the elements
-    auto iter = m_List.begin ();
+    list < CClientEntity* > ::iterator iter = m_List.begin ();
     while ( iter != m_List.end () )
     {
         CClientEntity* pEntity = *iter;
@@ -113,6 +117,7 @@ void CElementDeleter::Unreference ( class CClientEntity* pElement )
 
 void CElementDeleter::CleanUpForVM ( CLuaMain* pLuaMain )
 {
-    for(auto& pElement : m_List)
-        pElement->DeleteEvents ( pLuaMain, false );
+    list < CClientEntity* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; ++iter )
+        (*iter)->DeleteEvents ( pLuaMain, false );
 }

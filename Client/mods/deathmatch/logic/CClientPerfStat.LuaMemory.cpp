@@ -238,9 +238,9 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
 
     // Fetch mem stats from Lua
     {
-        for ( auto iter : m_LuaMainMap )
+        for ( std::map < CLuaMain*, int >::iterator iter = m_LuaMainMap.begin () ; iter != m_LuaMainMap.end () ; ++iter )
         {
-            CLuaMain* pLuaMain = iter.first;
+            CLuaMain* pLuaMain = iter->first;
             if ( pLuaMain->GetVM() )
             {
                 if ( bAccurate )
@@ -275,9 +275,9 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
         int calcedCurrent = 0;
         int calcedDelta = 0;
         int calcedMax = 0;
-        for ( auto& iter : AllLuaMemory.LuaMainMemoryMap )
+        for ( CLuaMainMemoryMap::iterator iter = AllLuaMemory.LuaMainMemoryMap.begin () ; iter != AllLuaMemory.LuaMainMemoryMap.end () ; ++iter )
         {
-            CLuaMainMemory& LuaMainMemory = iter.second;
+            CLuaMainMemory& LuaMainMemory = iter->second;
             calcedCurrent += LuaMainMemory.Current;
             calcedDelta += LuaMainMemory.Delta;
             calcedMax += LuaMainMemory.Max;
