@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CClientWaterManager::CClientWaterManager ( CClientManager* pManager )
 {
     m_pManager = pManager;
@@ -33,7 +35,7 @@ CClientWater* CClientWaterManager::Get ( ElementID ID )
         return static_cast < CClientWater* > ( pEntity );
     }
 
-    return nullptr;
+    return NULL;
 }
 
 
@@ -41,9 +43,10 @@ void CClientWaterManager::DeleteAll ( void )
 {
     // Delete each water poly
     m_bDontRemoveFromList = true;
-    for (auto& pWater : m_List)
+    list < CClientWater* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        delete pWater;
+        delete *iter;
     }
 
     m_bDontRemoveFromList = false;
@@ -55,7 +58,15 @@ void CClientWaterManager::DeleteAll ( void )
 
 bool CClientWaterManager::Exists ( CClientWater* pWater )
 {
-    return std::find(m_List.begin(), m_List.end(), pWater) != m_List.end();
+    list < CClientWater* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end () ; iter++ )
+    {
+        if ( *iter == pWater )
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void CClientWaterManager::AddToList ( CClientWater* pWater )
@@ -67,8 +78,7 @@ void CClientWaterManager::RemoveFromList ( CClientWater* pWater )
 {
     if ( !m_bDontRemoveFromList )
     {
-        if ( !m_List.empty() ) 
-            m_List.remove ( pWater );
+        if ( !m_List.empty() ) m_List.remove ( pWater );
     }
 }
 
@@ -89,9 +99,10 @@ bool CClientWaterManager::SetWorldWaterLevel ( float fLevel, void* pChangeSource
 
 bool CClientWaterManager::SetAllElementWaterLevel ( float fLevel, void* pChangeSource )
 {
-    for (auto& pWater : m_List )
+    list < CClientWater* > ::const_iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        pWater->SetLevel ( fLevel, pChangeSource );
+        ( *iter )->SetLevel ( fLevel, pChangeSource );
     }
     return true;
 }
@@ -115,8 +126,10 @@ void CClientWaterManager::SetWaveLevel ( float fWaveLevel )
 void CClientWaterManager::SetDimension(unsigned short usDimension)
 {
     m_usDimension = usDimension;
-    for (auto& pWater : m_List)
+
+    list < CClientWater* > ::const_iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
     {
-        pWater->RelateDimension(m_usDimension);
+        (*iter)->RelateDimension(m_usDimension);
     }
 }

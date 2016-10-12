@@ -71,9 +71,9 @@ public:
     WString& vFormat ( const wchar_t* szFormat, va_list vl );
 
     // Access
-    wchar_t& operator[]( std::size_t uiOffset )
+    wchar_t& operator[]( int iOffset )
     {
-        return std::wstring::operator[]( uiOffset );
+        return std::wstring::operator[]( iOffset );
     }
 
     // Operators  

@@ -621,11 +621,15 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
             lua_newtable ( luaVM );
 
             // Add all the bound commands to it
-            for ( auto& pKeyBind : g_pCore->GetKeyBinds()->GetBinds() )
+            list < CKeyBind* > ::const_iterator iter = g_pCore->GetKeyBinds ()->IterBegin ();
+
+            for ( ; iter != g_pCore->GetKeyBinds ()->IterEnd (); iter++ )
             {
-                if (!pKeyBind->IsBeingDeleted() && pKeyBind->bActive && pKeyBind->GetType() == KEY_BIND_COMMAND)
+                CKeyBind* pKeyBind = *iter;
+
+                if ( !pKeyBind->IsBeingDeleted () && pKeyBind->bActive && pKeyBind->GetType () == KEY_BIND_COMMAND )
                 {
-                    CCommandBind* pCommandBind = (CCommandBind*)pKeyBind.get();
+                    CCommandBind* pCommandBind = static_cast < CCommandBind* > ( pKeyBind );
 
                     if ( !bCheckHitState || pCommandBind->bHitState == bHitState )
                     {
@@ -662,16 +666,18 @@ int CLuaFunctionDefs::GetKeyBoundToCommand ( lua_State* luaVM )
         if ( pLuaMain )
         {
             // get the key
-            for ( auto& pBind : g_pCore->GetKeyBinds ()->GetBinds ())
+            list < CKeyBind* > ::const_iterator iter = g_pCore->GetKeyBinds ()->IterBegin ();
+            for ( ; iter != g_pCore->GetKeyBinds ()->IterEnd (); iter++ )
             {
-                if ( !pBind->IsBeingDeleted () && pBind->bActive )
+                CKeyBind* pKeyBind = *iter;
+                if ( !pKeyBind->IsBeingDeleted () && pKeyBind->bActive )
                 {
-                    if (pBind->GetType () == KEY_BIND_COMMAND )
+                    if ( pKeyBind->GetType () == KEY_BIND_COMMAND )
                     {
-                        const CCommandBind* pCommandBind = static_cast < const CCommandBind* > (pBind.get());
-                        if ( strcmp ( strCommand, pCommandBind->szCommand ) == 0 )
+                        CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
+                        if ( strcmp ( strCommand, pBind->szCommand ) == 0 )
                         {
-                            lua_pushstring ( luaVM, pCommandBind->boundKey->szKey );
+                            lua_pushstring ( luaVM, pBind->boundKey->szKey );
                             return 1;
                         }
                     }

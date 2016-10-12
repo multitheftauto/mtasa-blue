@@ -35,7 +35,8 @@ public:
 
     void                                            Add                     ( CClientStreamElement * pElement )     { m_Elements.push_back ( pElement ); }
     void                                            Remove                  ( CClientStreamElement * pElement )     { m_Elements.remove ( pElement ); }
-    const std::list < CClientStreamElement * >&     GetElements             ( void )    { return m_Elements;  }
+    std::list < CClientStreamElement * > ::iterator Begin                   ( void )    { return m_Elements.begin (); }
+    std::list < CClientStreamElement * > ::iterator End                     ( void )    { return m_Elements.end (); }
 
     void                                            AddElements             ( std::list < CClientStreamElement * > * pList );
     void                                            RemoveElements          ( std::list < CClientStreamElement * > * pList );

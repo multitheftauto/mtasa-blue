@@ -156,8 +156,10 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
     for ( EventsIter iter = itPair.first ; iter != itPair.second ; ++iter )
         matchingEvents.push_back(iter->second);
 
-    for ( auto& pMapEvent : matchingEvents )
+    for ( std::vector< CMapEvent* >::iterator iter = matchingEvents.begin() ; iter != matchingEvents.end() ; ++iter )
     {
+        CMapEvent* pMapEvent = *iter;
+
         // If it's not being destroyed
         if ( !pMapEvent->IsBeingDestroyed () )
         {
@@ -308,8 +310,11 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 void CMapEventManager::TakeOutTheTrash ( void )
 {
     // Loop through our trashcan deleting every item
-    for ( auto& pMapEvent : m_TrashCan )
+    std::list < CMapEvent* > ::const_iterator iterTrash = m_TrashCan.begin ();
+    for ( ; iterTrash != m_TrashCan.end (); iterTrash++ )
     {
+        CMapEvent* pMapEvent = *iterTrash;
+
         // Remove from the eventhandler list
         EventsIter iterMap = m_EventsMap.begin ();
         while ( iterMap != m_EventsMap.end () )

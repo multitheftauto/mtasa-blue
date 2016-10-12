@@ -14,6 +14,8 @@
 
 #include "StdInc.h"
 
+using namespace std;
+
 void TrimWhiteSpace ( std::string & str )  
 {  
     unsigned long k = str.find_first_not_of(" \t");
@@ -27,25 +29,40 @@ void TrimWhiteSpace ( std::string & str )
 
 template<> CCommands * CSingleton< CCommands >::m_pSingleton = NULL;
 
+CCommands::CCommands ( void )
+{
+    WriteDebugEvent ( "CCommands::CCommands" );
+    m_pfnExecuteHandler = NULL;
+}
+
+
+CCommands::~CCommands ( void )
+{
+    WriteDebugEvent ( "CCommands::~CCommands" );
+    DeleteAll ();
+}
+
 
 void CCommands::Add ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand, bool bAllowScriptedBind )
 {
-    m_CommandList.emplace_back();
-    auto& command = m_CommandList.back();
+    COMMANDENTRY* pCommand = new COMMANDENTRY;
 
     // Copy the command name and description to the new command entry.
-    STRNCPY (command.szCommandName, szCommand, MAX_COMMAND_NAME_LENGTH );
-    STRNCPY (command.szDescription, szDescription, MAX_COMMAND_DESCRIPTION_LENGTH );
+    STRNCPY ( pCommand->szCommandName, szCommand, MAX_COMMAND_NAME_LENGTH );
+    STRNCPY ( pCommand->szDescription, szDescription, MAX_COMMAND_DESCRIPTION_LENGTH );
 
     // Set the command.
-    command.pfnCmdFunc = pfnHandler;
+    pCommand->pfnCmdFunc = pfnHandler;
 
     // Set the mod bool
-    command.bModCommand = bModCommand;
-    command.bAllowScriptedBind = bAllowScriptedBind;
+    pCommand->bModCommand = bModCommand;
+    pCommand->bAllowScriptedBind = bAllowScriptedBind;
 
     // Set the enabled bool
-    command.bEnabled = true;
+    pCommand->bEnabled = true;
+
+    // Insert it into the list.
+    m_CommandList.push_back ( pCommand );
 }
 
 
@@ -64,8 +81,8 @@ bool CCommands::Exists ( const char* szCommand )
 bool CCommands::Execute ( const char* szCommandLine )
 {
     // Parse out the command name and command line
-    std::string strCmd;
-    std::string strCmdLine;
+    string strCmd;
+    string strCmdLine;
     CLocalGUI::GetSingleton ().GetConsole () ->GetCommandInfo ( szCommandLine, strCmd, strCmdLine );
 
     return Execute ( strCmd.c_str (), strCmdLine.c_str () );
@@ -190,17 +207,31 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
 
 void CCommands::Delete ( const char* szCommand )
 {
-    m_CommandList.erase(std::remove_if(m_CommandList.begin(), m_CommandList.end(), 
-        [szCommand](auto& command)
+    // Find the entry we're looking for
+    list < COMMANDENTRY* > ::iterator iter = m_CommandList.begin ();
+    while ( iter != m_CommandList.end () )
     {
-        return stricmp(szCommand, command.szCommandName) == 0;
-    }));
+        // Check to see if this is the variable
+        if ( stricmp ( szCommand, (*iter)->szCommandName ) == 0 ) 
+        { 
+            // It is, so remove it
+            delete *iter;
+            iter = m_CommandList.erase ( iter );
+        }
+        else
+            ++iter;
+    }
 }
 
 
 void CCommands::DeleteAll ( void )
 {
     // Delete all the commands
+    list < COMMANDENTRY* > ::iterator iter = m_CommandList.begin ();
+    for ( ; iter != m_CommandList.end () ; iter++ )
+    {
+        delete *iter;
+    }
     m_CommandList.clear ();
 
     // Re-register our commands
@@ -211,19 +242,21 @@ void CCommands::DeleteAll ( void )
 tagCOMMANDENTRY* CCommands::Get ( const char* szCommand, bool bCheckIfMod, bool bModCommand )
 {
     // Find the entry we're looking for
-    auto iter = std::find_if(m_CommandList.begin(), m_CommandList.end(),
-        [szCommand, bCheckIfMod, bModCommand](auto& command)
+    list < COMMANDENTRY* > ::iterator iter = m_CommandList.begin ();
+    for ( ; iter != m_CommandList.end () ; iter++ )
     {
-        if ( !bCheckIfMod || ( bModCommand == command.bModCommand ) )
+        // Check to see if this is the variable
+        if ( stricmp( szCommand, (*iter)->szCommandName ) == 0 ) 
         {
-            return stricmp(szCommand, command.szCommandName) == 0;
-        }
-        return false;
-    });
+            if ( !bCheckIfMod || ( bModCommand == (*iter)->bModCommand ) )
+            {
+                return *iter;
+            }
+        }    
+    }
 
-    if (iter != m_CommandList.end())
-        return &(*iter);
-    return nullptr;
+    // Couldn't find it
+    return NULL;
 }
 
 

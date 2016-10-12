@@ -18,7 +18,10 @@ class CClientEntity;
 #define SPATIAL_2D_Z    0
 
 // Result of a Query
-typedef std::vector < CClientEntity* >  CClientEntityResult;
+class CClientEntityResult : public std::vector < CClientEntity* >
+{
+public:
+};
 
 //
 // CClientSpatialDatabase

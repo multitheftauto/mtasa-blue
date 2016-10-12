@@ -35,8 +35,10 @@ public:
 
     bool                            Exists                          ( CClientPed* pPed );
 
-    const std::vector < CClientPed* >& GetPeds                      ( void ) { return m_List;  }
-    const std::vector < CClientPed* >& GetStreamedPeds              ( void ) { return m_StreamedIn; }
+    std::vector < CClientPed* > ::const_iterator  IterBegin         ( void ) { return m_List.begin (); };
+    std::vector < CClientPed* > ::const_iterator  IterEnd           ( void ) { return m_List.end (); };
+    std::vector < CClientPed* > ::const_iterator  StreamedBegin     ( void ) { return m_StreamedIn.begin (); };
+    std::vector < CClientPed* > ::const_iterator  StreamedEnd       ( void ) { return m_StreamedIn.end (); };
 
     static unsigned short           GetWeaponSlotFromModel          ( DWORD dwModelID );
     static bool                     IsValidWeaponModel              ( DWORD dwModelID );

@@ -466,7 +466,7 @@ BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )
     return bReturn;
 }
 
-bool CModelInfoSA::IsLoaded ( )
+BOOL CModelInfoSA::IsLoaded ( )
 {
     if ( DoIsLoaded () )
     {

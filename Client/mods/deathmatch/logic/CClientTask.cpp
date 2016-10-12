@@ -273,12 +273,14 @@ bool CClientTask::WriteElements ( lua_State* luaVM, int iTableIndex )
 
     // Push the values to it.
     unsigned int uiIndex = 1;
-    for(auto& element : m_Elements)
+    list < ElementID > ::iterator iterElements = m_Elements.begin ();
+    while ( iterElements != m_Elements.end () )
     {
         // Add the entries to it
         lua_pushnumber ( luaVM, uiIndex );
-        lua_pushnumber ( luaVM, element.Value() );
+        lua_pushnumber ( luaVM, (*iterElements).Value() );
         lua_settable ( luaVM, iNewTableIndex );
+
         // Increment index
         ++uiIndex;
     }
@@ -306,8 +308,8 @@ bool CClientTask::WriteParameters ( lua_State* luaVM, int iTableIndex )
     }
 
     // Push the values to it.
-    auto iterKey = m_Keys.begin ();
-    auto iterValue = m_Values.begin ();
+    list < std::string > ::iterator iterKey = m_Keys.begin ();
+    list < CLuaArgument > ::iterator iterValue = m_Values.begin ();
     while ( iterKey != m_Keys.end () )
     {
         // Add the entries to it
@@ -361,10 +363,11 @@ bool CClientTask::IsElementIn ( CClientEntity* pElement )
     ElementID ID = pElement->GetID ();
 
     // Loop through all the elements
-    for (auto& pElement : m_Elements)
+    std::list < ElementID > ::iterator iter = m_Elements.begin ();
+    for ( ; iter != m_Elements.end (); iter++ )
     {
         // Matching ids? Exists
-        if ( ID == pElement )
+        if ( ID == *iter )
         {
             return true;
         }

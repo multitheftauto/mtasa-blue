@@ -12,7 +12,11 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+
 #include "StdInc.h"
+
+using SharedUtil::CalcMTASAPath;
+using std::string;
 
 #define CONSOLE_HISTORY_LENGTH 128
 #define CONSOLE_SIZE 4096
@@ -20,12 +24,13 @@
 #define NATIVE_RES_X    1152.0f
 #define NATIVE_RES_Y    864.0f
 
-CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent ) : 
-    m_ConsoleHistory(CONSOLE_HISTORY_LENGTH)
+CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
 {
     // Store the GUI manager
     m_pManager = pManager;
 
+    // Create our history
+    m_pConsoleHistory = new CConsoleHistory ( CONSOLE_HISTORY_LENGTH );
     m_iHistoryIndex = -1;
     m_iAutoCompleteIndex = -1;
     m_bIsEnabled = true;
@@ -48,7 +53,16 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent ) :
     m_pHistory->SetTextChangedHandler ( GUI_CALLBACK ( &CConsole::History_OnTextChanged, this ) );
 
     // Load the console history from a file
-    m_ConsoleHistory.LoadFromFile ();
+    m_pConsoleHistory->LoadFromFile ();
+}
+
+CConsole::~CConsole ( void )
+{
+    // Delete the GUI elements
+    DestroyElements ();
+
+    // Delete our history
+    delete m_pConsoleHistory;
 }
 
 void CConsole::Echo ( const char* szText )
@@ -203,19 +217,23 @@ bool CConsole::History_OnTextChanged ( CGUIElement* pElement )
 
 bool CConsole::Edit_OnTextAccepted ( CGUIElement* pElement )
 {
-    std::string          strInput;
-    std::string          strCmd;
-    std::string          strCmdLine;
+    string          strInput;
+    string          strHistory;
+    string          strCmd;
+    string          strCmdLine;
 
     // Get the text object from our input window.
     strInput = m_pInput->GetText ();
 
     // Add the input text to the console history
-    m_ConsoleHistory.Add ( strInput.c_str () );
+    m_pConsoleHistory->Add ( strInput.c_str () );
         
     // Clear the input text.
     m_pInput->SetText ( "" );
     m_iHistoryIndex = -1;
+
+    // Add the text to the history buffer.
+    //Echo ( strInput.c_str () );
 
     // Write to console log
     CConsoleLogger::GetSingleton().LinePrintf ( "[Input]  : %s", strInput.c_str() );
@@ -230,7 +248,7 @@ bool CConsole::Edit_OnTextAccepted ( CGUIElement* pElement )
     return true;
 }
 
-void CConsole::GetCommandInfo ( const std::string &strIn, std::string & strCmdOut, std::string & strCmdLineOut )
+void CConsole::GetCommandInfo ( const string &strIn, string & strCmdOut, string & strCmdLineOut )
 {
     int pos;
 
@@ -238,12 +256,12 @@ void CConsole::GetCommandInfo ( const std::string &strIn, std::string & strCmdOu
 
     if ( pos > 0 )
     {
-        strCmdOut       = strIn.substr ( 0, pos );
-        strCmdLineOut   = strIn.substr ( pos+1, strIn.size ( )-1 );
+        strCmdOut       = strIn.substr ( 0, pos ).c_str ( );
+        strCmdLineOut   = strIn.substr ( pos+1, strIn.size ( )-1 ).c_str ( );
     }
     else
     {
-        strCmdOut       = strIn;
+        strCmdOut       = strIn.c_str ( );
         strCmdLineOut   = "";
     }
 }
@@ -276,13 +294,13 @@ void CConsole::SetNextHistoryText ( void )
     if ( m_iHistoryIndex == 0 )
     {
         // Get the text object from our input window.
-        std::string strInput = m_pInput->GetText ();
+        string strInput = m_pInput->GetText ();
         // Add our current text to the console history
-        m_ConsoleHistory.Add ( strInput.c_str () );
+        m_pConsoleHistory->Add ( strInput.c_str () );
     }
 
     // Grab the item and set the input text to it
-    const char* szItem = m_ConsoleHistory.Get ( m_iHistoryIndex );
+    const char* szItem = m_pConsoleHistory->Get ( m_iHistoryIndex );
     if ( szItem )
     {      
         m_pInput->SetText ( szItem );
@@ -308,13 +326,13 @@ void CConsole::SetPreviousHistoryText ( void )
     if ( m_iHistoryIndex <= 0 )
     {
         // Get the text object from our input window.
-        std::string strInput = m_pInput->GetText ();
+        string strInput = m_pInput->GetText ();
         const char * szInputText = strInput.c_str ();
         // Do we currently have some text?
         if ( szInputText && szInputText [ 0 ] )
         {
             // Add our current text to the console history
-            m_ConsoleHistory.Add ( szInputText );
+            m_pConsoleHistory->Add ( szInputText );
 
             // Clear our current text
             m_pInput->SetText ( "" );
@@ -324,7 +342,7 @@ void CConsole::SetPreviousHistoryText ( void )
     }
 
     // Grab the item and set the input text to it
-    const char* szItem = m_ConsoleHistory.Get ( m_iHistoryIndex - 1 );
+    const char* szItem = m_pConsoleHistory->Get ( m_iHistoryIndex - 1 );
     if ( szItem )
     {       
         m_pInput->SetText ( szItem );
@@ -349,13 +367,13 @@ void CConsole::SetNextAutoCompleteMatch ( void )
         m_AutoCompleteList.clear();
 
         // Get current input
-        std::string strInput = m_pInput->GetText ();
+        string strInput = m_pInput->GetText ();
 
         if ( strInput.length () > 0 )
         {
             // Step through the history
             int iIndex = -1;
-            while( const char* szItem = m_ConsoleHistory.Get ( ++iIndex ) )
+            while( const char* szItem = m_pConsoleHistory->Get ( ++iIndex ) )
             {
                 if ( strlen(szItem) < 3 )   // Skip very short lines
                     continue;
@@ -365,7 +383,7 @@ void CConsole::SetNextAutoCompleteMatch ( void )
                 {
                     if ( m_AutoCompleteList.size () )   // Dont add duplicates of the previously added line
                     {
-                        const char* szPrevItem = m_ConsoleHistory.Get ( m_AutoCompleteList.at ( m_AutoCompleteList.size () - 1 ) );
+                        const char* szPrevItem = m_pConsoleHistory->Get ( m_AutoCompleteList.at ( m_AutoCompleteList.size () - 1 ) );
                         if ( strcmp ( szItem, szPrevItem ) == 0 )
                             continue;
                     }
@@ -384,7 +402,7 @@ void CConsole::SetNextAutoCompleteMatch ( void )
     m_iAutoCompleteIndex = ( m_iAutoCompleteIndex + 1 ) % m_AutoCompleteList.size ();
 
     // Grab the item and set the input text to it
-    const char* szItem = m_ConsoleHistory.Get ( m_AutoCompleteList.at ( m_iAutoCompleteIndex ) );
+    const char* szItem = m_pConsoleHistory->Get ( m_AutoCompleteList.at ( m_iAutoCompleteIndex ) );
     if ( szItem )
     {       
         m_pInput->SetText ( szItem );
@@ -402,7 +420,7 @@ void CConsole::CreateElements ( CGUIElement* pParent )
     m_fWindowY *= ScreenSize.fY / NATIVE_RES_Y;
 
     // Create window
-    m_pWindow.reset( m_pManager->CreateWnd ( pParent, _("CONSOLE") ) );
+    m_pWindow = reinterpret_cast < CGUIWindow* > ( m_pManager->CreateWnd ( pParent, _("CONSOLE") ) );
     m_pWindow->SetAlwaysOnTop ( true );
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
@@ -419,7 +437,7 @@ void CConsole::CreateElements ( CGUIElement* pParent )
         size y: SPACER (TOP) - [WINDOW HEIGHT] - SPACER/2 - INPUT HEIGHT - SPACER
     */
     CVector2D HistorySize = CVector2D ( m_fWindowX - m_fWindowSpacer*2.0f, m_fWindowY - m_fWindowSpacer*1.5f - m_fWindowSpacerTop - m_fInputHeight );
-    m_pHistory.reset( m_pManager->CreateMemo ( m_pWindow.get() ) );
+    m_pHistory = reinterpret_cast < CGUIMemo* > ( m_pManager->CreateMemo ( m_pWindow ) );
     m_pHistory->SetPosition ( CVector2D ( m_fWindowSpacer, m_fWindowSpacerTop ) );
     CVector2D RelHistorySize = m_pWindow->AbsoluteToRelative ( HistorySize );
     m_pHistory->SetSize ( HistorySize );
@@ -429,10 +447,17 @@ void CConsole::CreateElements ( CGUIElement* pParent )
         pos x: SPACER
         pos y: SPACER (TOP) + HISTORY HEIGHT + SPACER
     */
-    m_pInput.reset( m_pManager->CreateEdit ( m_pWindow.get() ) );
+    m_pInput = reinterpret_cast < CGUIEdit* > ( m_pManager->CreateEdit ( m_pWindow ) );
     m_pInput->SetPosition ( CVector2D ( m_fWindowSpacer, HistorySize.fY + m_fWindowSpacer*0.5f + m_fWindowSpacerTop ) );
     m_pInput->SetWidth ( HistorySize.fX );
     m_pInput->SetHeight ( m_fInputHeight );
+}
+
+
+void CConsole::DestroyElements ( void )
+{
+    if ( m_pWindow )
+        delete m_pWindow;
 }
 
 

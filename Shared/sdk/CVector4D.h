@@ -173,7 +173,7 @@ public:
         fX /= vecRight.fX;
         fY /= vecRight.fY;
         fZ /= vecRight.fZ;
-        fW /= vecRight.fW;
+        fW /= vecRight.fZ;
     }
 
     bool operator== ( const CVector4D& param ) const

@@ -47,7 +47,8 @@ public:
 
     bool                        Exists              ( CClientPlayer* pPlayer );
 
-    const auto&                 GetPlayers          ( void )  { return m_List; }
+    std::list < CClientPlayer* > ::const_iterator IterBegin ( void )         { return m_List.begin (); }
+    std::list < CClientPlayer* > ::const_iterator IterEnd   ( void )         { return m_List.end (); }
 
     void                        GetPosition         ( CVector& vecPosition ) const  { vecPosition = m_vecPosition; }
     void                        SetPosition         ( const CVector& vecPosition )  { m_vecPosition = vecPosition; }

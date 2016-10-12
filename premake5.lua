@@ -74,7 +74,6 @@ workspace "MTASA"
 	filter "system:windows"
 		toolset "v140_xp"
 		defines { "WIN32", "_WIN32" }
-		linkoptions "/DYNAMICBASE:NO"
 		includedirs { 
 			dxdir.."Include"
 		}

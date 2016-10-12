@@ -8,7 +8,7 @@
 *
 *
 *****************************************************************************/
-#pragma once
+
 // Vertex type used by the line3d batcher
 struct SPDVertex
 {

@@ -100,15 +100,15 @@ private:
 
     DWORD                   TranslateScanCodeToGUIKey   ( DWORD dwCharacter );
 
-    std::unique_ptr<CConsole>  m_pConsole;
-    std::unique_ptr<CMainMenu> m_pMainMenu;
-    std::unique_ptr<CChat>     m_pChat;
-    std::unique_ptr<CDebugView>m_pDebugView;
+    CConsole*               m_pConsole;
+    CMainMenu*              m_pMainMenu;
+    CChat*                  m_pChat;
+    CDebugView*             m_pDebugView;
 
     CVersionUpdaterInterface* m_pVersionUpdater;
 
 
-    std::unique_ptr<CGUILabel> m_pLabelVersionTag;
+    CGUILabel*              m_pLabelVersionTag;
 
     bool                    m_bForceCursorVisible;
     bool                    m_bChatboxVisible;

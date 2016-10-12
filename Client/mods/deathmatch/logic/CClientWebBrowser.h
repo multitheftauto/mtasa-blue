@@ -7,9 +7,10 @@
 *  PURPOSE:     ClientEntity webbrowser tab class
 *
 *****************************************************************************/
-#pragma once
 
-#include <memory>
+#ifndef __CCLIENTWEBBROWSER_H
+#define __CCLIENTWEBBROWSER_H
+
 #include <core/CWebViewInterface.h>
 #include <core/CAjaxResourceHandlerInterface.h>
 #include <core/CWebBrowserEventsInterface.h>
@@ -95,8 +96,10 @@ class CClientGUIWebBrowser : public CClientGUIElement
 public:
     CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID = INVALID_ELEMENT_ID );
     
-    inline CClientWebBrowser* GetBrowser () { return m_pBrowser.get(); }
+    inline CClientWebBrowser* GetBrowser () { return m_pBrowser; }
 
 private:
-    std::unique_ptr<CClientWebBrowser> m_pBrowser;
+    CClientWebBrowser* m_pBrowser;
 };
+
+#endif

@@ -12,6 +12,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CEvents::CEvents ( void )
 {
     m_bWasEventCancelled = false;
@@ -115,11 +117,13 @@ SEvent* CEvents::Get ( const char* szName )
 void CEvents::RemoveAllEvents ( void )
 {
     // Delete all items
-    for ( auto& iter : m_EventHashMap )
+    CFastHashMap < SString, SEvent* > ::const_iterator iter = m_EventHashMap.begin ();
+    for ( ; iter != m_EventHashMap.end (); iter++ )
     {
-        SEvent * pEvent = iter.second;
+        SEvent * pEvent = (*iter).second;
         delete pEvent;
     }
+
     m_EventHashMap.clear ( );
 }
 

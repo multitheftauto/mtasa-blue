@@ -55,8 +55,9 @@ private:
     time_t          m_tConnectStarted;
     bool            m_bHasTriedSecondConnect;
 
-    std::unique_ptr<GUI_CALLBACK>   m_pOnCancelClick;
-    std::unique_ptr<CServerListItem> m_pServerItem;
+    GUI_CALLBACK*   m_pOnCancelClick;
+
+    CServerListItem* m_pServerItem;
     bool            m_bNotifyServerBrowser;
 
     bool CheckNickProvided ( const char* szNick );

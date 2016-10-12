@@ -40,14 +40,15 @@ protected:
     void                AddNewsTab              ( const SNewsItem& newsItem );
     CGUIWindow*         LoadLayoutAndImages     ( CGUIElement* pParent, const SNewsItem& newsItem );
     void                CreateGUI               ( void );
+    void                DestroyGUI              ( void );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
 
     std::vector < SNewsItem >       m_NewsitemList;
-    std::unique_ptr<CGUIWindow>     m_pWindow;
-    std::unique_ptr<CGUITabPanel>   m_pTabPanel;
-    std::unique_ptr<CGUIButton>     m_pButtonOK;
-    std::vector < std::unique_ptr<CGUITab> >        m_TabList;
-    std::vector < std::unique_ptr<CGUIWindow> >     m_TabContentList;
+    CGUIWindow*                     m_pWindow;
+    CGUITabPanel*                   m_pTabPanel;
+    CGUIButton*                     m_pButtonOK;
+    std::vector < CGUITab* >        m_TabList;
+    std::vector < CGUIWindow* >     m_TabContentList;
 };
 
 #endif

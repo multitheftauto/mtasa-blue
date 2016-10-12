@@ -25,9 +25,9 @@ CClientEffectManager::~CClientEffectManager ( )
 void CClientEffectManager::DeleteAll( )
 {
     m_bCanRemoveFromList = false;
-    for ( auto& iter : m_Effects )
+    for ( std::list<CClientEffect*>::iterator i = m_Effects.begin(); i != m_Effects.end(); ++i)
     {
-        delete iter;
+        delete *i;
     }
     m_Effects.clear();
     m_bCanRemoveFromList = true;
@@ -36,11 +36,11 @@ void CClientEffectManager::DeleteAll( )
 CClientEffect * CClientEffectManager::Create(const SString& strEffectName, const CVector &vecPosition, ElementID ID)
 {
     if ( strEffectName.length () >= 0x60 )
-        return nullptr;
+        return NULL;
 
     CFxSystem * pFxSA = g_pGame->GetFxManager()->CreateFxSystem ( strEffectName, vecPosition, NULL, true );
-    if ( pFxSA == nullptr)
-        return nullptr; // GTA was unable to create the effect (e.g. wrong effect name)
+    if ( pFxSA == NULL )
+        return NULL; // GTA was unable to create the effect (e.g. wrong effect name)
 
     CClientEffect * pFx = new CClientEffect ( m_pManager, pFxSA, strEffectName, ID );
     m_Effects.push_back( pFx );
@@ -67,20 +67,21 @@ CClientEffect* CClientEffectManager::Get ( ElementID ID )
         return static_cast < CClientEffect* > ( pEntity );
     }
 
-    return nullptr;
+    return NULL;
 }
 
 CClientEffect* CClientEffectManager::Get( void* pFxSAInterface )
 {
-    for ( auto& pEffect : m_Effects )
+    CClientEffect *pFx = NULL;
+    for ( std::list<CClientEffect*>::iterator i = m_Effects.begin(); i != m_Effects.end(); ++i)
     {
-        if( pEffect->GetFxSystem()->GetInterface() == pFxSAInterface )
+        if( (*i)->GetFxSystem()->GetInterface() == pFxSAInterface )
         {
-            return pEffect;
+            return *i;
         }
     }
     
-    return nullptr;
+    return NULL;
 }
 
 void CClientEffectManager::SAEffectDestroyed ( void *pFxSAInterface )
@@ -89,9 +90,9 @@ void CClientEffectManager::SAEffectDestroyed ( void *pFxSAInterface )
 
     g_pGame->GetFxManager()->OnFxSystemSAInterfaceDestroyed( (CFxSystemSAInterface*)pFxSAInterface );
 
-    if(pFx == nullptr)
+    if(pFx == NULL)
         return; // We didn't create that effect
 
-    pFx->SetFxSystem ( nullptr );
+    pFx->SetFxSystem ( NULL );
     g_pClientGame->GetElementDeleter()->Delete(pFx);
 }

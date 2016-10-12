@@ -12,7 +12,10 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+
 #include "StdInc.h"
+
+using std::list;
 
 static const SFixedArray < SScriptBindableKey, 107 > g_bkKeys = 
 { {
@@ -99,17 +102,15 @@ void CScriptKeyBinds::Add ( CScriptKeyBind* pKeyBind )
 
 void CScriptKeyBinds::Clear ( eScriptKeyBindType bindType )
 {
-    auto iter = m_List.begin ();
+    list < CScriptKeyBind* > ::iterator iter = m_List.begin ();
     while ( iter != m_List.end () )
     {
-        auto& pKeyBind = *iter;
-        if ( !pKeyBind->IsBeingDeleted () && bindType == SCRIPT_KEY_BIND_UNDEFINED || pKeyBind->GetType () == bindType )
+        if ( !(*iter)->IsBeingDeleted () && bindType == SCRIPT_KEY_BIND_UNDEFINED || (*iter)->GetType () == bindType )
         {
-            if ( m_bProcessingKey )
-                pKeyBind->beingDeleted = true;
+            if ( m_bProcessingKey ) (*iter)->beingDeleted = true;
             else
             {
-                delete pKeyBind;
+                delete *iter;
                 iter = m_List.erase ( iter );
                 continue;
             }
@@ -176,10 +177,11 @@ bool CScriptKeyBinds::ProcessKey ( const char* szKey, bool bHitState, eScriptKey
 
     bool bFound = false;
     CScriptKeyBind * pKeyBind = NULL;
-    auto cloneList = m_List;
-    
-    for ( auto& pKeyBind : cloneList )
+    list < CScriptKeyBind* > cloneList = m_List;
+    list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; ++iter )
     {
+        pKeyBind = *iter;
         if ( !pKeyBind->IsBeingDeleted () && pKeyBind->GetType () == bindType )
         {
             switch ( bindType )
@@ -278,8 +280,8 @@ bool CScriptKeyBinds::RemoveKeyFunction ( const SScriptBindableKey* pKey, CLuaMa
 {
     bool bFound = false;
     CScriptKeyFunctionBind* pBind = NULL;
-    auto cloneList = m_List;
-    auto iter = cloneList.begin ();
+    list < CScriptKeyBind * > cloneList = m_List;
+    list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_FUNCTION )
@@ -328,12 +330,13 @@ bool CScriptKeyBinds::KeyFunctionExists ( const char* szKey, CLuaMain* pLuaMain,
 bool CScriptKeyBinds::KeyFunctionExists ( const SScriptBindableKey* pKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction )
 {
     bool bFound = false;
-    auto cloneList = m_List;
-    for ( auto& iter : cloneList )
+    list < CScriptKeyBind* > cloneList = m_List;
+    list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; ++iter )
     {
-        if ( !iter->IsBeingDeleted () && iter->GetType () == SCRIPT_KEY_BIND_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_FUNCTION )
         {
-            CScriptKeyFunctionBind* pBind = static_cast < CScriptKeyFunctionBind* > ( iter ) ;
+            CScriptKeyFunctionBind* pBind = static_cast < CScriptKeyFunctionBind* > ( *iter );
             if ( pKey == pBind->boundKey )
             {
                 if ( pLuaMain == NULL || pBind->luaMain == pLuaMain )
@@ -356,8 +359,8 @@ bool CScriptKeyBinds::KeyFunctionExists ( const SScriptBindableKey* pKey, CLuaMa
 void CScriptKeyBinds::RemoveAllKeys ( CLuaMain* pLuaMain )
 {
     CScriptKeyBind * pBind = NULL;
-    auto cloneList = m_List;
-    auto iter = cloneList.begin ();
+    list < CScriptKeyBind * > cloneList = m_List;
+    list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
         pBind = *iter;
@@ -436,8 +439,8 @@ bool CScriptKeyBinds::RemoveControlFunction ( const SScriptBindableGTAControl* p
 {
     bool bFound = false;
     CScriptControlFunctionBind* pBind = NULL;
-    auto cloneList = m_List;
-    auto iter = cloneList.begin ();
+    list < CScriptKeyBind * > cloneList = m_List;
+    list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
     while ( iter != cloneList.end () )
     {
         if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_CONTROL_FUNCTION )
@@ -485,12 +488,13 @@ bool CScriptKeyBinds::ControlFunctionExists ( const char* szControl, CLuaMain* p
 bool CScriptKeyBinds::ControlFunctionExists ( const SScriptBindableGTAControl* pControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction )
 {
     bool bFound = false;
-    auto cloneList = m_List;
-    for ( auto pEntity : cloneList )
+    list < CScriptKeyBind* > cloneList = m_List;
+    list < CScriptKeyBind* > ::iterator iter = cloneList.begin ();
+    for ( ; iter != cloneList.end () ; ++iter )
     {
-        if ( !pEntity->IsBeingDeleted () && pEntity->GetType () == SCRIPT_KEY_BIND_CONTROL_FUNCTION )
+        if ( !(*iter)->IsBeingDeleted () && (*iter)->GetType () == SCRIPT_KEY_BIND_CONTROL_FUNCTION )
         {
-            CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( pEntity );
+            CScriptControlFunctionBind* pBind = static_cast < CScriptControlFunctionBind* > ( *iter );
             if ( pControl == pBind->boundControl )
             {
                 if ( pLuaMain == NULL || pBind->luaMain == pLuaMain )
@@ -512,7 +516,7 @@ bool CScriptKeyBinds::ControlFunctionExists ( const SScriptBindableGTAControl* p
 
 void CScriptKeyBinds::RemoveDeletedBinds ( void )
 {
-    auto iter = m_List.begin ();
+    list < CScriptKeyBind* > ::iterator iter = m_List.begin ();
     while ( iter != m_List.end () )
     {
         if ( (*iter)->IsBeingDeleted () )

@@ -15,6 +15,9 @@
 
 #define REMOTE_PLAYER_CONNECTION_TROUBLE_TIME 6000
 
+using std::list;
+using std::vector;
+
 CClientPlayerManager::CClientPlayerManager ( CClientManager* pManager )
 {
     // Initialize members
@@ -33,8 +36,12 @@ CClientPlayerManager::~CClientPlayerManager ( void )
 void CClientPlayerManager::DoPulse ( void )
 {
     unsigned long ulCurrentTime = CClientTime::GetTime ();
-    for ( auto& pPlayer : m_Players )
+    CClientPlayer * pPlayer = NULL;
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    for ( ; iter != m_Players.end (); ++iter )
     {
+        pPlayer = *iter;
+
         if ( !pPlayer->IsLocalPlayer () )
         {
             // Pulse voice data if voice is enabled
@@ -89,9 +96,10 @@ void CClientPlayerManager::DeleteAll ( void )
 {
     // Delete all the players
     m_bCanRemoveFromList = false;
-    for ( auto& pPlayer : m_Players )
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    for ( ; iter != m_Players.end (); iter++ )
     {
-        delete pPlayer;
+        delete *iter;
     }
 
     // Clear the list
@@ -118,14 +126,15 @@ CClientPlayer* CClientPlayerManager::Get ( const char* szNick, bool bCaseSensiti
     assert ( szNick );
 
     // Find a player with a matching nick in the list
-    for ( auto& pPlayer : m_Players )
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    for ( ; iter != m_Players.end (); iter++ )
     {
-        const char* szPtr = pPlayer->GetNick ();
+        const char* szPtr = (*iter)->GetNick ();
         if ( szPtr )
         {
             if ( bCaseSensitive && strcmp ( szNick, szPtr ) == 0 || !bCaseSensitive && stricmp ( szNick, szPtr ) == 0 )
             {
-                return pPlayer;
+                return *iter;
             }
         }
     }
@@ -135,24 +144,24 @@ CClientPlayer* CClientPlayerManager::Get ( const char* szNick, bool bCaseSensiti
 }
 
 
-CClientPlayer* CClientPlayerManager::Get ( CPlayerPed* pGamePlayer, bool bValidatePointer )
+CClientPlayer* CClientPlayerManager::Get ( CPlayerPed* pPlayer, bool bValidatePointer )
 {
-    if ( !pGamePlayer ) return NULL;
+    if ( !pPlayer ) return NULL;
 
     if ( bValidatePointer )
     {
-        
-        for ( auto& pPlayer : m_Players )
+        vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+        for ( ; iter != m_Players.end () ; iter++ )
         {
-            if ( pPlayer->GetGamePlayer () == pGamePlayer )
+            if ( (*iter)->GetGamePlayer () == pPlayer )
             {
-                return pPlayer;
+                return *iter;
             }
         }
     }
     else
     {
-        CClientPed* pPed = reinterpret_cast < CClientPed* > ( pGamePlayer->GetStoredPointer () );
+        CClientPed* pPed = reinterpret_cast < CClientPed* > ( pPlayer->GetStoredPointer () );
         if ( pPed->GetType () == CCLIENTPLAYER )
         {
             return static_cast < CClientPlayer * > ( pPed );
@@ -201,8 +210,10 @@ bool CClientPlayerManager::IsValidModel(unsigned long ulModel)
 
 void CClientPlayerManager::ResetAll ( void )
 {
-    for ( auto& pPlayer : m_Players )
+    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
+    for ( ; iter != m_Players.end (); iter++ )
     {
+        CClientPlayer * pPlayer = *iter;
         if ( pPlayer )
         {
             pPlayer->Reset ();

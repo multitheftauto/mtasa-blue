@@ -621,9 +621,9 @@ void CClientObject::StreamedInPulse ( void )
         m_IsHiddenLowLod = true;
         if ( m_HighLodObjectList.empty () )
             m_IsHiddenLowLod = false;
-        for ( auto& pClientObject : m_HighLodObjectList )
+        for ( std::vector < CClientObject* >::iterator iter = m_HighLodObjectList.begin () ; iter != m_HighLodObjectList.end () ; ++iter )
         {
-            CObject* pObject = pClientObject->m_pObject;
+            CObject* pObject = (*iter)->m_pObject;
             if ( !pObject || !pObject->IsFullyVisible () )
             {
                 m_IsHiddenLowLod = false;

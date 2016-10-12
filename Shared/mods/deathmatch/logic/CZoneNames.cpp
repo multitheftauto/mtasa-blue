@@ -466,8 +466,9 @@ const SZone* CZoneNames::GetSmallestZoneInSphere ( const CVector& vecPosition, f
 
     float fSmallestSize = 0;
     const SZone* pSmallestZone = NULL;
-    for ( auto& pZone : results )
+    for ( uint i = 0 ; i < results.size () ; i++ )
     {
+        const SZone* pZone = results[i];
         float sizeX = static_cast < float > ( pZone->x2 - pZone->x1 );
         float sizeY = static_cast < float > ( pZone->y2 - pZone->y1 );
         float sizeZ = static_cast < float > ( pZone->z2 - pZone->z1 );
@@ -526,8 +527,9 @@ const SZone* CZoneNames::GetCityZoneInSphere ( const CVector& vecPosition, float
     std::vector < const SZone* > results;
     m_ZoneTree.Search( &box.vecMin.fX, &box.vecMax.fX, results );
 
-    for (auto& pZone : results)
+    for ( uint i = 0 ; i < results.size () ; i++ )
     {
+        const SZone* pZone = results[i];
         if ( MapContains ( m_CityNameMap, pZone->szName ) )
             return pZone;
     }

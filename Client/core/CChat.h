@@ -9,22 +9,124 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-#pragma once 
+
+#ifndef __CCHAT_H
+#define __CCHAT_H
 
 #include "CGUI.h"
 #include <core/CCoreInterface.h>
 
-#include "CColor.h"
-#include "CChatLineSection.h"
-#include "CChatLine.h"
-#include "CChatInputLine.h"
-
+class CChatLineSection;
 
 #define CHAT_WIDTH              320                             // Chatbox default width
 #define CHAT_TEXT_COLOR         CColor(235, 221, 178)           // Chatbox default text color
 #define CHAT_MAX_LINES          100                             // Chatbox maximum chat lines
 #define CHAT_MAX_CHAT_LENGTH    96                              // Chatbox maximum chat message length
 #define CHAT_BUFFER             1024                            // Chatbox buffer size
+
+class CColor
+{
+public:
+    inline                      CColor              ( void )
+    {
+        R = G = B = A = 255;
+    }
+    inline                      CColor              ( unsigned char _R, unsigned char _G, unsigned char _B, unsigned char _A = 255 )
+    {
+        R = _R;
+        G = _G;
+        B = _B;
+        A = _A;
+    }
+    inline                      CColor              ( const CColor& other )
+    {
+        *this = other;
+    }
+    inline                      CColor              ( unsigned long ulColor )
+    {
+        *this = ulColor;
+    }
+    inline CColor&              operator =          ( const CColor& color )
+    {
+        R = color.R;
+        G = color.G;
+        B = color.B;
+        A = color.A;
+        return *this;
+    }
+    inline CColor&              operator =          ( unsigned long ulColor )
+    {
+        R = (ulColor >> 16) & 0xFF;
+        G = (ulColor >>  8) & 0xFF;
+        B = (ulColor      ) & 0xFF;
+        return *this;
+    }
+    bool                        operator ==         ( const CColor& other ) const
+    {
+        return R == other.R
+            && G == other.G
+            && B == other.B
+            && A == other.A;
+    }
+
+    unsigned char               R, G, B, A;
+};
+
+class CChatLineSection
+{
+public:
+    friend class CChatLine;
+
+                                CChatLineSection        ();
+                                CChatLineSection        ( const CChatLineSection& other );
+
+    CChatLineSection&           operator =              ( const CChatLineSection& other );
+
+    void                        Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );
+    float                       GetWidth                ( void );
+    inline const char*          GetText                 ( void )            { return m_strText.c_str (); }
+    void                        SetText                 ( const char* szText )  { m_strText = szText; }
+    inline void                 GetColor                ( CColor& color )   { color = m_Color; }
+    inline void                 SetColor                ( const CColor& color )   { m_Color = color; }
+
+protected:
+    std::string                 m_strText;
+    CColor                      m_Color;
+    float                       m_fCachedWidth;
+    unsigned int                m_uiCachedLength;
+};
+
+class CChatLine
+{
+public:
+                                CChatLine               ( void );
+
+    virtual const char*         Format                  ( const char* szText, float fWidth, CColor& color, bool bColorCoded );
+    virtual void                Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );    
+    virtual float               GetWidth                ( void );
+    bool                        IsActive                ( void )    { return m_bActive; }
+    void                        SetActive               ( bool bActive )    { m_bActive = bActive; }
+
+    inline unsigned long        GetCreationTime         ( void )    { return m_ulCreationTime; }
+    inline void                 UpdateCreationTime      ( void );
+
+protected:
+
+    bool                                m_bActive;
+    std::vector < CChatLineSection >    m_Sections;
+    unsigned long                       m_ulCreationTime;
+};
+
+class CChatInputLine : public CChatLine
+{
+public:
+    void                        Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow );
+    void                        Clear                   ( void );
+
+    CChatLineSection            m_Prefix;
+    std::vector < CChatLine >   m_ExtraLines;
+};
+
 
 //
 // SDrawListLineItem
@@ -156,10 +258,10 @@ protected:
     CVector2D                   m_vecInputPosition;
     CVector2D                   m_vecInputSize;
 
-    std::unique_ptr<CGUITexture>     m_pBackgroundTexture;
-    std::unique_ptr<CGUITexture>     m_pInputTexture;
-    std::unique_ptr<CGUIStaticImage> m_pBackground;
-    std::unique_ptr<CGUIStaticImage> m_pInput;
+    CGUITexture*                m_pBackgroundTexture;
+    CGUITexture*                m_pInputTexture;
+    CGUIStaticImage*            m_pBackground;
+    CGUIStaticImage*            m_pInput;
 
     std::string                 m_strInputText;
     std::string                 m_strCommand;
@@ -199,3 +301,4 @@ protected:
     bool                        m_bNickCompletion;
 };
 
+#endif

@@ -191,11 +191,11 @@ void CClientGUIElement::SetCallPropagationEnabled ( bool bEnabled )
 {
     CClientEntity::SetCallPropagationEnabled ( bEnabled );
 
-    for ( auto& pChild : m_Children )
+    for ( CFastList<CClientEntity*>::iterator iter = m_Children.begin (); iter != m_Children.end (); ++iter )
     {
-        if ( pChild->GetType () == CCLIENTGUI )
+        if ( (*iter)->GetType () == CCLIENTGUI )
         {
-            CClientGUIElement* pGUIElement = static_cast < CClientGUIElement* > ( pChild );
+            CClientGUIElement* pGUIElement = static_cast < CClientGUIElement* > ( *iter );
             pGUIElement->GetCGUIElement()->SetInheritsAlpha ( bEnabled );
         }
     }

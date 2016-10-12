@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CClientStreamSectorRow::CClientStreamSectorRow ( float fBottom, float fTop, float fSectorSize, float fRowSize )
     : m_fSectorSize ( fSectorSize )
     , m_fRowSize ( fRowSize )
@@ -25,9 +27,10 @@ CClientStreamSectorRow::CClientStreamSectorRow ( float fBottom, float fTop, floa
 CClientStreamSectorRow::~CClientStreamSectorRow ( void )
 {
     // Clear our sectors
-    for ( auto& pSector : m_Sectors)
+    list < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
+    for ( ; iter != m_Sectors.end () ; iter++ )
     {
-        delete pSector;
+        delete *iter;
     }
     m_Sectors.clear ();
 }
@@ -71,8 +74,11 @@ CClientStreamSector * CClientStreamSectorRow::FindOrCreateSector ( CVector & vec
     }
     
     // Search through our row of sectors
-    for (auto& pSector : m_Sectors)
+    CClientStreamSector * pSector = NULL;
+    list < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
+    for ( ; iter != m_Sectors.end () ; iter++ )
     {
+        pSector = *iter;
         if ( pSector->DoesContain ( vecPosition.fX ) )
         {
             return pSector;
@@ -84,7 +90,7 @@ CClientStreamSector * CClientStreamSectorRow::FindOrCreateSector ( CVector & vec
     if ( vecPosition.fX < 0.0f ) fLeft -= m_fSectorSize;
     CVector2D vecBottomLeft ( fLeft, m_fBottom );
     CVector2D vecTopRight ( vecBottomLeft.fX + m_fSectorSize, vecBottomLeft.fY + m_fRowSize );
-    auto pSector = new CClientStreamSector ( this, vecBottomLeft, vecTopRight );
+    pSector = new CClientStreamSector ( this, vecBottomLeft, vecTopRight );
     ConnectSector ( pSector );
     pSector->SetExtra ( true );
     m_Sectors.push_back ( pSector );
@@ -96,8 +102,11 @@ CClientStreamSector * CClientStreamSectorRow::FindOrCreateSector ( CVector & vec
 CClientStreamSector * CClientStreamSectorRow::FindSector ( float fX )
 {    
     // Search through our row of sectors
-    for (auto& pSector : m_Sectors)
+    CClientStreamSector * pSector = NULL;
+    list < CClientStreamSector * > ::iterator iter = m_Sectors.begin ();
+    for ( ; iter != m_Sectors.end () ; iter++ )
     {
+        pSector = *iter;
         if ( pSector->DoesContain ( fX ) )
         {
             return pSector;

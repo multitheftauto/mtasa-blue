@@ -21,15 +21,16 @@
 
 class CConsoleLogger : public CSingleton < CConsoleLogger >
 {
-public:
-    CConsoleLogger ( );
+    public:
+            CConsoleLogger ( );
+           ~CConsoleLogger ( );
 
 	void            LinePrintf          ( const char* szFormat, ... );
     void            WriteLine           ( const std::string& strLine );
     static void     CleanLine           ( SString& strLine );
     static int      ReplaceNextWord     ( SString& strLine, int iPos, const char* szBlanker );
 
-private:
+    private:
     
     std::string             m_strFilename;
     FILE*                   m_pFile;

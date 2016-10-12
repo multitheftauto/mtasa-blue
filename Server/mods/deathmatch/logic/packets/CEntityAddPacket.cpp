@@ -275,9 +275,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         BitStream.Write( vecScale.fX );
                     }
 
-                    // Static
-                    bool bStatic = pObject->IsStatic ();
-                    BitStream.WriteBit ( bStatic );
+                    // Frozen
+                    bool bFrozen = pObject->IsFrozen ();
+                    BitStream.WriteBit ( bFrozen );
 
                     // Health
                     SObjectHealthSync health;

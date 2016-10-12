@@ -96,8 +96,8 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::OnLostDevice ( void )
 {
-    for (auto& pItem : m_CreatedItemList)
-        pItem->OnLostDevice();
+    for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
+        (*iter)->OnLostDevice ();
 
     SAFE_RELEASE( m_pSavedSceneDepthSurface );
     SAFE_RELEASE( m_pSavedSceneRenderTargetAA );
@@ -117,8 +117,8 @@ void CRenderItemManager::OnLostDevice ( void )
 ////////////////////////////////////////////////////////////////
 void CRenderItemManager::OnResetDevice ( void )
 {
-    for ( auto& pItem : m_CreatedItemList )
-        pItem->OnResetDevice ();
+    for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
+        (*iter)->OnResetDevice ();
 
     UpdateMemoryUsage ();
 }
@@ -467,9 +467,9 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
     // Set what the max size requirement is for the back buffer copy
     uint uiSizeX = 0;
     uint uiSizeY = 0;
-    for ( auto& pItem : m_CreatedItemList )
+    for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
     {
-        if ( CScreenSourceItem* pScreenSourceItem = DynamicCast < CScreenSourceItem > ( pItem ) )
+        if ( CScreenSourceItem* pScreenSourceItem = DynamicCast < CScreenSourceItem > ( *iter ) )
         {
             uiSizeX = Max ( uiSizeX, pScreenSourceItem->m_uiSizeX );
             uiSizeY = Max ( uiSizeY, pScreenSourceItem->m_uiSizeY );
@@ -712,8 +712,9 @@ void CRenderItemManager::UpdateMemoryUsage ( void )
     m_iTextureMemoryKBUsed = 0;
     m_iRenderTargetMemoryKBUsed = 0;
     m_iFontMemoryKBUsed = 0;
-    for (auto& pRenderItem : m_CreatedItemList)
+    for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
     {
+        CRenderItem* pRenderItem = *iter;
         int iMemoryKBUsed = pRenderItem->GetVideoMemoryKBUsed ();
 
         if ( pRenderItem->IsA ( CFileTextureItem::GetClassId () ) )

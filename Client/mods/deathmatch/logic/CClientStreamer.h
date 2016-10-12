@@ -39,7 +39,8 @@ public:
 
     unsigned int                            CountActiveElements         ( void )    { return ( unsigned int ) m_ActiveElements.size (); }
     bool                                    IsActiveElement             ( CClientStreamElement * pElement );
-    const auto&                             GetActiveElements           ( void )    { return m_ActiveElements; }
+    std::list < CClientStreamElement * > ::iterator  ActiveElementsBegin( void )    { return m_ActiveElements.begin (); }
+    std::list < CClientStreamElement * > ::iterator  ActiveElementsEnd  ( void )    { return m_ActiveElements.end (); }
 
 private:
     void                                    CreateSectors               ( std::list < CClientStreamSectorRow * > * pList, CVector2D & vecSize, CVector2D & vecBottomLeft, CVector2D & vecTopRight );

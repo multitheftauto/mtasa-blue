@@ -18,14 +18,15 @@ class CQuestionBox;
 
 #include "CMainMenu.h"
 
-using pfnQuestionCallback =     void (*)        ( void*, unsigned int );
-using pfnQuestionEditCallback = void (*)        ( void*, unsigned int, std::string );
+typedef void (*pfnQuestionCallback)        ( void*, unsigned int );
+typedef void (*pfnQuestionEditCallback)        ( void*, unsigned int, std::string );
 
 
 class CQuestionBox
 {
 public:
                         CQuestionBox                ( void );
+                        ~CQuestionBox               ( void );
 
     void                Hide                        ( void );
     void                Show                        ( void );
@@ -46,10 +47,10 @@ public:
 private:
     bool                OnButtonClick               ( CGUIElement* pElement );
 
-    std::unique_ptr<CGUIWindow> m_pWindow;
-    std::unique_ptr<CGUILabel>  m_pMessage;
-    std::vector < std::unique_ptr<CGUIButton> > m_ButtonList;
-    std::vector < std::unique_ptr<CGUIEdit> >   m_EditList;
+    CGUIWindow*                 m_pWindow;
+    CGUILabel*                  m_pMessage;
+    std::vector < CGUIButton* > m_ButtonList;
+    std::vector < CGUIEdit* >   m_EditList;
     unsigned int                m_uiLastButton;
     unsigned int                m_uiActiveButtons;
     unsigned int                m_uiActiveEditboxes;

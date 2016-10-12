@@ -52,25 +52,28 @@ void CClientPathNode::Unlink ( void )
 
 void CClientPathNode::DoPulse ( void )
 {
-    for(auto& pEntity : m_List) 
+    list < CClientEntity* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        if ( pEntity->GetType () == CCLIENTVEHICLE )
+        // TEST!
+        if ( (*iter)->GetType () == CCLIENTVEHICLE )
         {
-            CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pEntity );
+            CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( *iter );
             CVector vecMoveSpeed;
             pVehicle->GetMoveSpeed ( vecMoveSpeed );
             vecMoveSpeed.fZ = 0.0f;
             pVehicle->SetMoveSpeed ( vecMoveSpeed );   
         }
-        pEntity->SetPosition ( m_vecPosition );        
+        (*iter)->SetPosition ( m_vecPosition );        
     }
 }
 
 bool CClientPathNode::IsEntityAttached ( CClientEntity* pEntity )
 {
-    for (auto& pAttachedEntity : m_List)
+    list < CClientEntity* > ::iterator iter = m_List.begin ();
+    for ( ; iter != m_List.end (); iter++ )
     {
-        if (pAttachedEntity == pEntity )
+        if ( *iter == pEntity )
             return true;
     }
 

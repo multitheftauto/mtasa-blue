@@ -32,6 +32,8 @@ class CGraphStats : public CGraphStatsInterface
 {
 public:
     ZERO_ON_NEW
+                        CGraphStats               ( void );
+                        ~CGraphStats              ( void );
 
     // CGraphStatsInterface methods
     virtual void        Draw                    ( void );
@@ -52,13 +54,27 @@ protected:
 // CGraphStats instantiation
 //
 ///////////////////////////////////////////////////////////////
-std::unique_ptr<CGraphStats> g_pGraphStats;
+CGraphStats* g_pGraphStats = NULL;
 
 CGraphStatsInterface* GetGraphStats ( void )
 {
-    if (!g_pGraphStats)
-        g_pGraphStats = std::make_unique<CGraphStats>();
-    return g_pGraphStats.get();
+    if ( !g_pGraphStats )
+        g_pGraphStats = new CGraphStats ();
+    return g_pGraphStats;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CGraphStats implementation
+//
+///////////////////////////////////////////////////////////////
+CGraphStats::CGraphStats ( void )
+{
+}
+
+CGraphStats::~CGraphStats ( void )
+{
 }
 
 
@@ -114,9 +130,9 @@ void CGraphStats::AddTimingPoint( const char* szName )
         if ( Dups > 0 )
         {
             Dups = Min( 100, Dups );
-            for ( auto& iter : m_LineList )
+            for ( std::map < SString, SGraphStatLine >::iterator iter = m_LineList.begin() ; iter != m_LineList.end() ; ++iter )
 	        {
-	            SGraphStatLine* pLine = &iter.second;
+	            SGraphStatLine* pLine = &iter->second;
 
                 float Data = pLine->dataHistory[ pLine->iDataPos ];
                 for ( int i = 0 ; i < Dups ; i++ )
@@ -201,9 +217,9 @@ void CGraphStats::Draw ( void )
 	pGraphics->DrawRectQueued( uiOriginX,  uiOriginY - uiSizeY,  uiSizeX, uiSizeY, SColorRGBA( 0, 0, 0, 128 ), true );
 
 	// Draw data line.
-    for ( auto& iter : m_LineList )
+    for ( std::map < SString, SGraphStatLine >::iterator iter = m_LineList.begin() ; iter != m_LineList.end() ; ++iter )
 	{
-	    SGraphStatLine& line = iter.second;
+	    SGraphStatLine& line = iter->second;
 
 		int iDataPos = line.iDataPos;
 		int iDataPosPrev = iDataPos;

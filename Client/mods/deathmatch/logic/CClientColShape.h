@@ -67,7 +67,8 @@ public:
     void                                RemoveCollider                  ( CClientEntity* pEntity )                          { m_Colliders.remove ( pEntity ); }
     bool                                ColliderExists                  ( CClientEntity* pEntity );
     void                                RemoveAllColliders              ( void );
-    const CFastList < CClientEntity* >& GetColliders                    ( void ) { return m_Colliders; }
+    CFastList < CClientEntity* > ::iterator  CollidersBegin             ( void )                                            { return m_Colliders.begin (); }
+    CFastList < CClientEntity* > ::iterator  CollidersEnd               ( void )                                            { return m_Colliders.end (); }
 
     void                                SizeChanged                     ( void );
 protected:

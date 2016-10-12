@@ -37,9 +37,9 @@ public:
 
     char*       GetData     ( void )        { return externalData.pData ? externalData.pData : buffer.GetData (); }
     const char* GetData     ( void ) const  { return externalData.pData ? externalData.pData : buffer.GetData (); }
-    std::size_t GetSize     ( void ) const  { return externalData.pData ? externalData.uiSize : buffer.GetSize (); }
+    uint        GetSize     ( void ) const  { return externalData.pData ? externalData.uiSize : buffer.GetSize (); }
 
-    void SetSize ( std::size_t uiSize )
+    void SetSize ( uint uiSize )
     {
         dassert ( externalData.pData == NULL || buffer.GetSize () == 0 );
         if ( externalData.pData )

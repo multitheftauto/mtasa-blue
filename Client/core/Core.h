@@ -2,21 +2,15 @@
 *
 *  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  DEVELOPERS:  Jax <>
+*  FILE:        core/Core.h
+*  PURPOSE:     Header file for core entry point code
+*  DEVELOPERS:  Derek Abdine <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-#pragma once 
 
-class CChatInputLine : public CChatLine
-{
-public:
-    void                        Draw(CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow);
-    void                        Clear(void);
+#ifndef __CORE_H
+#define __CORE_H
 
-    CChatLineSection            m_Prefix;
-    std::vector < CChatLine >   m_ExtraLines;
-};
-
-
+#endif

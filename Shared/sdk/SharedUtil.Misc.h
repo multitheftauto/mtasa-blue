@@ -615,7 +615,7 @@ namespace SharedUtil
             return m_ulCapacity;
         }
 
-        std::size_t GetUnusedAmount ( void ) const
+        unsigned long GetUnusedAmount ( void ) const
         {
             return m_Queue.size ();
         }
@@ -807,16 +807,10 @@ namespace SharedUtil
         bool Contains ( const T& item ) const { return MapContains ( m_Map, item ); }
 
         // list only
-        using iterator = typename LIST_TYPE::iterator;
-        using const_iterator = typename LIST_TYPE::const_iterator;
-        using reverse_iterator = typename LIST_TYPE::reverse_iterator;
-
-        iterator                                    begin ( void )          { return m_List.begin (); }
-        iterator                                    end ( void )            { return m_List.end (); }
-        const_iterator                              begin ( void ) const    { return m_List.begin(); }
-        const_iterator                              end ( void ) const      { return m_List.end(); }  
-        reverse_iterator                            rbegin ( void )         { return m_List.rbegin (); }
-        reverse_iterator                            rend ( void )           { return m_List.rend (); }
+        typename LIST_TYPE ::iterator               begin ( void )          { return m_List.begin (); }
+        typename LIST_TYPE ::iterator               end ( void )            { return m_List.end (); }
+        typename LIST_TYPE ::reverse_iterator       rbegin ( void )         { return m_List.rbegin (); }
+        typename LIST_TYPE ::reverse_iterator       rend ( void )           { return m_List.rend (); }
         uint                                        size ( void ) const     { return m_List.size (); }
         bool                                        empty ( void ) const    { return m_List.empty (); }
         const T&                                    back ( void ) const     { return m_List.back (); }
@@ -913,8 +907,8 @@ namespace SharedUtil
     class CMappedArray : public CMappedContainer < T, std::vector < T > >
     {
     public:
-        const T& operator[] ( std::size_t idx ) const   { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
-        T& operator[] ( std::size_t idx )               { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
+        const T& operator[] ( int idx ) const   { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
+        T& operator[] ( int idx )               { return CMappedContainer < T, std::vector < T > >::m_List[idx]; }
     };
 
 
@@ -1500,8 +1494,7 @@ namespace SharedUtil
             for ( uint i = 0; i < partList.size () ; i++ )
             {
                 const SString& part = partList [ i ];
-                auto strLeft = part.Left(1);
-                char cType = strLeft[0];
+                char cType = part.Left ( 1 )[0];
 
                 SString strRest = part.Right ( (int)part.length () - 1 );
                 strRest = strRest.Replace ( "{", "" ).Replace ( "}", "" );
@@ -1632,13 +1625,13 @@ namespace SharedUtil
     template < class T, int SIZE >
     struct SFixedArray
     {
-        T& operator[] ( std::size_t uiIndex )
+        T& operator[] ( uint uiIndex )
         {
             assert ( uiIndex < SIZE );
             return data [ uiIndex ];
         }
 
-        const T& operator[] ( std::size_t uiIndex ) const
+        const T& operator[] ( uint uiIndex ) const
         {
             assert ( uiIndex < SIZE );
             return data [ uiIndex ];
