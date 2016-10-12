@@ -462,7 +462,8 @@ public:
     CVehicleSAInterface* m_nextCarriage;
 
     //1496
-    BYTE padding270[112];
+    BYTE m_TrainDoors[28][4];
+
     // 1608
     RwFrame * pUnk0;
     // 1612

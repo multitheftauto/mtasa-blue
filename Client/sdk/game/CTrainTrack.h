@@ -45,7 +45,9 @@ struct STrackNode
     }
 
 private:
-    std::int16_t pad = 0; // TODO: This is not a pad
+    // Collision information used for lighting
+    std::uint8_t collisionFlags = 0;
+    std::uint8_t useStoredCollision = 0;
 };
 static_assert(sizeof(STrackNode) == 10, "Size mismatch");
 

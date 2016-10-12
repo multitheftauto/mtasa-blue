@@ -29,7 +29,7 @@ CTrainTrack* CTrainTrackManagerSA::CreateTrainTrack(const std::vector<STrackNode
 
     // Dynamically allocate new track
     auto index = AllocateTrainTrackIndex();
-    auto pTrainTrack = std::make_unique<CTrainTrackSA>(index, nodes, false, this);
+    auto pTrainTrack = std::make_unique<CTrainTrackSA>(index, nodes, bLinkedLastNode, this);
 
     // Add to tracks list
     m_Tracks.push_back(std::move(pTrainTrack));
