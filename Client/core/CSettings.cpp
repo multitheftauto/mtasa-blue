@@ -3188,7 +3188,7 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "streaming_memory", value );
 
     // Webbrowser settings
-    bool bOldRemoteWebsites, bOldRemoteJavascript, bOldPlugins;
+    bool bOldRemoteWebsites, bOldRemoteJavascript;
     CVARS_GET ( "browser_remote_websites", bOldRemoteWebsites );
     CVARS_GET ( "browser_remote_javascript", bOldRemoteJavascript );
 

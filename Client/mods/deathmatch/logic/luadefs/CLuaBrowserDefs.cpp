@@ -14,8 +14,6 @@
 void CLuaBrowserDefs::LoadFunctions ( void )
 {
     // Define browser functions
-    CLuaCFunctions::AddFunction( "isBrowserSupported", IsBrowserSupported );
-
     std::map<const char*, lua_CFunction> functions
         {
             { "createBrowser", CreateBrowser },
@@ -52,36 +50,10 @@ void CLuaBrowserDefs::LoadFunctions ( void )
         };
 
     // Add browser functions
-    if ( g_pCore->GetWebCore () )
+    for ( const auto& pair : functions )
     {
-        for ( const auto& pair : functions )
-        {
-            CLuaCFunctions::AddFunction ( pair.first, pair.second );
-        }
+        CLuaCFunctions::AddFunction ( pair.first, pair.second );
     }
-    else
-    {
-        for ( const auto& pair : functions )
-        {
-            CLuaCFunctions::AddFunction( pair.first, [](lua_State* luaVM) -> int {
-                // Show message box eventually
-                static bool messageBoxShown = false;
-                if ( !messageBoxShown )
-                {
-                    g_pCore->ShowMessageBox(_("Unsupported OS"),
-                        _("This server uses browser functions that are not supported on your PC. If you click OK, you are aware that your PC is vulnerable to malware and will most likely join a botnet soon"),
-                        MB_BUTTON_OK | MB_ICON_WARNING);
-                    
-                    messageBoxShown = true;
-                }
-
-                g_pCore->DebugPrintfColor ( "Called browser function on unsupported, vulnerable operating system. Please upgrade your OS as soon as possible", 255, 0, 0 );
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            } );
-        }
-    }
-    
 }
 
 
@@ -90,7 +62,6 @@ void CLuaBrowserDefs::AddClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "createBrowser" );
-    lua_classfunction ( luaVM, "isSupported", "isBrowserSupported" );
     lua_classfunction ( luaVM, "loadURL", "loadBrowserURL" );
     lua_classfunction ( luaVM, "isLoading", "isBrowserLoading" );
     lua_classfunction ( luaVM, "injectMouseMove", "injectBrowserMouseMove" );
@@ -178,12 +149,6 @@ int CLuaBrowserDefs::CreateBrowser ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaBrowserDefs::IsBrowserSupported ( lua_State* luaVM )
-{
-    lua_pushboolean ( luaVM, g_pCore->GetWebCore() != nullptr );
     return 1;
 }
 

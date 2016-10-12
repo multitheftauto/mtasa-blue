@@ -1150,8 +1150,7 @@ void CCore::DestroyNetwork ( )
 void CCore::InitialiseWeb ()
 {
     // Don't initialise webcore twice
-    // Also disable webbrowser stuff if this PC still uses deprecated, vulnerable software e.g. XP
-    if ( m_pWebCore || !IsWindows7OrGreater() )
+    if ( m_pWebCore )
         return;
 
     // Ensure DllDirectory has not been changed
