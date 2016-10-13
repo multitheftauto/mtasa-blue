@@ -21,6 +21,8 @@
 #include "whrlpool.h"
 #include "tiger.h"
 #include "smartptr.h"
+#include "ossig.h"
+#include "trap.h"
 
 #include "validate.h"
 #include "bench.h"
@@ -62,11 +64,6 @@
 // Aggressive stack checking with VS2005 SP1 and above.
 #if (CRYPTOPP_MSC_VERSION >= 1410)
 # pragma strict_gs_check (on)
-#endif
-
-// Quiet deprecated warnings intended to benefit users.
-#if CRYPTOPP_MSC_VERSION
-# pragma warning(disable: 4996)
 #endif
 
 #if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
@@ -122,11 +119,17 @@ void PrintSeedAndThreads(const std::string& seed);
 
 int (*AdhocTest)(int argc, char *argv[]) = NULL;
 
+namespace { OFB_Mode<AES>::Encryption s_globalRNG; }
 RandomNumberGenerator & GlobalRNG()
 {
-	static OFB_Mode<AES>::Encryption s_globalRNG;
 	return dynamic_cast<RandomNumberGenerator&>(s_globalRNG);
 }
+
+// See misc.h and trap.h for comments and usage
+#if CRYPTOPP_DEBUG && (defined(CRYPTOPP_BSD_AVAILABLE) || defined(CRYPTOPP_UNIX_AVAILABLE))
+static const SignalHandler<SIGTRAP, false> s_dummyHandler;
+// static const DebugTrapHandler s_dummyHandler;
+#endif
 
 int CRYPTOPP_API main(int argc, char *argv[])
 {
@@ -271,7 +274,7 @@ int CRYPTOPP_API main(int argc, char *argv[])
 
 			// compute MAC
 			member_ptr<MessageAuthenticationCode> pMac(NewIntegrityCheckingMAC());
-			assert(pMac->DigestSize() == sizeof(mac));
+			CRYPTOPP_ASSERT(pMac->DigestSize() == sizeof(mac));
 			MeterFilter f(new HashFilter(*pMac, new ArraySink(mac, sizeof(mac))));
 			f.AddRangeToSkip(0, checksumPos, 4);
 			f.AddRangeToSkip(0, certificateTableDirectoryPos, 8);
@@ -279,9 +282,18 @@ int CRYPTOPP_API main(int argc, char *argv[])
 			f.AddRangeToSkip(0, certificateTablePos, certificateTableSize);
 			f.PutMessageEnd(buf.begin(), buf.size());
 
+			// Encode MAC
+			string hexMac;
+			HexEncoder encoder;
+			encoder.Put(mac, sizeof(mac)), encoder.MessageEnd();
+			hexMac.resize(static_cast<size_t>(encoder.MaxRetrievable()));
+			encoder.Get(reinterpret_cast<byte*>(&hexMac[0]), hexMac.size());
+
+			// Report MAC and location
+			std::cout << "Placing MAC " << hexMac << " in " << fname << " at file offset " << macPos;
+			std::cout << " (0x" << std::hex << macPos << std::dec << ").\n";
+
 			// place MAC
-			cout << "Placing MAC in file " << fname << ", location " << macPos;
-			cout << " (0x" << std::hex << macPos << std::dec << ").\n";
 			dllFile.seekg(macPos, std::ios_base::beg);
 			dllFile.write((char *)mac, sizeof(mac));
 		}
@@ -351,9 +363,9 @@ int CRYPTOPP_API main(int argc, char *argv[])
 		else if (command == "v" || command == "vv")
 			return !Validate(argc>2 ? StringToValue<int, true>(argv[2]) : 0, argv[1][1] == 'v', argc>3 ? argv[3] : NULL);
 		else if (command == "b")
-			BenchmarkAll(argc<3 ? 1 : StringToValue<float, true>(argv[2]), argc<4 ? 0 : StringToValue<float, true>(argv[3])*1e9);
+			BenchmarkAll(argc<3 ? 1 : StringToValue<float, true>(argv[2]), argc<4 ? 0.0f : StringToValue<float, true>(argv[3])*1e9);
 		else if (command == "b2")
-			BenchmarkAll2(argc<3 ? 1 : StringToValue<float, true>(argv[2]), argc<4 ? 0 : StringToValue<float, true>(argv[3])*1e9);
+			BenchmarkAll2(argc<3 ? 1 : StringToValue<float, true>(argv[2]), argc<4 ? 0.0f : StringToValue<float, true>(argv[3])*1e9);
 		else if (command == "z")
 			GzipFile(argv[3], argv[4], argv[2][0]-'0');
 		else if (command == "u")
@@ -423,17 +435,20 @@ void FIPS140_GenerateRandomFiles()
 template <class T, bool NON_NEGATIVE>
 T StringToValue(const std::string& str) {
 	std::istringstream iss(str);
+
+	// Arbitrary, but we need to clear a Coverity finding TAINTED_SCALAR
+	if(iss.str().length() > 25)
+		throw InvalidArgument("cryptest.exe: '" + str +"' is tool ong");
+
 	T value;
-	iss >> value;
+	iss >> std::noskipws >> value;
 
 	// Use fail(), not bad()
-	if (iss.fail())
+	if (iss.fail() || !iss.eof())
 		throw InvalidArgument("cryptest.exe: '" + str +"' is not a value");
 
-#if NON_NEGATIVE
-	if (value < 0)
+	if (NON_NEGATIVE && value < 0)
 		throw InvalidArgument("cryptest.exe: '" + str +"' is negative");
-#endif
 
 	return value;
 }
@@ -628,7 +643,7 @@ void DecryptFile(const char *in, const char *out, const char *passPhrase)
 
 void SecretShareFile(int threshold, int nShares, const char *filename, const char *seed)
 {
-	assert(nShares >= 1 && nShares<=1000);
+	CRYPTOPP_ASSERT(nShares >= 1 && nShares<=1000);
 	if (nShares < 1 || nShares > 1000)
 		throw InvalidArgument("SecretShareFile: " + IntToString(nShares) + " is not in range [1, 1000]");
 
@@ -658,7 +673,7 @@ void SecretShareFile(int threshold, int nShares, const char *filename, const cha
 
 void SecretRecoverFile(int threshold, const char *outFilename, char *const *inFilenames)
 {
-	assert(threshold >= 1 && threshold <=1000);
+	CRYPTOPP_ASSERT(threshold >= 1 && threshold <=1000);
 	if (threshold < 1 || threshold > 1000)
 		throw InvalidArgument("SecretRecoverFile: " + IntToString(threshold) + " is not in range [1, 1000]");
 
@@ -685,7 +700,7 @@ void SecretRecoverFile(int threshold, const char *outFilename, char *const *inFi
 
 void InformationDisperseFile(int threshold, int nShares, const char *filename)
 {
-	assert(threshold >= 1 && threshold <=1000);
+	CRYPTOPP_ASSERT(threshold >= 1 && threshold <=1000);
 	if (threshold < 1 || threshold > 1000)
 		throw InvalidArgument("InformationDisperseFile: " + IntToString(nShares) + " is not in range [1, 1000]");
 
@@ -712,7 +727,7 @@ void InformationDisperseFile(int threshold, int nShares, const char *filename)
 
 void InformationRecoverFile(int threshold, const char *outFilename, char *const *inFilenames)
 {
-	assert(threshold<=1000);
+	CRYPTOPP_ASSERT(threshold<=1000);
 	if (threshold < 1 || threshold > 1000)
 		throw InvalidArgument("InformationRecoverFile: " + IntToString(threshold) + " is not in range [1, 1000]");
 
@@ -810,8 +825,9 @@ void ForwardTcpPort(const char *sourcePortName, const char *destinationHost, con
 	sockListen.Create();
 	sockListen.Bind(sourcePort);
 
-	int err = setsockopt(sockListen, IPPROTO_TCP, TCP_NODELAY, "\x01", 1);
-	assert(err == 0);
+	const int flag = 1;
+	int err = setsockopt(sockListen, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(int));
+	CRYPTOPP_ASSERT(err == 0);
 	if(err != 0)
 		throw Socket::Err(sockListen, "setsockopt", sockListen.GetLastError());
 
@@ -963,9 +979,9 @@ bool Validate(int alg, bool thorough, const char *seedInput)
 
 	const time_t endTime = time(NULL);
 	err = localtime_s(&localTime, &endTime);
-	assert(err == 0);
+	CRYPTOPP_ASSERT(err == 0);
 	err = asctime_s(timeBuf, sizeof(timeBuf), &localTime);
-	assert(err == 0);
+	CRYPTOPP_ASSERT(err == 0);
 
 	cout << "\nTest ended at " << timeBuf;
 #else

@@ -32,10 +32,6 @@
 # error Cygwin does not support Windows style sockets. See http://www.cygwin.com/faq.html#faq.api.winsock
 #endif
 
-// MacPorts/GCC does not provide init_priority(priority). Apple/GCC and Fink/GCC do provide it.
-#define HAVE_GCC_INIT_PRIORITY (__GNUC__ && (CRYPTOPP_INIT_PRIORITY > 0) && !(MACPORTS_GCC_COMPILER > 0))
-#define HAVE_MSC_INIT_PRIORITY (_MSC_VER && (CRYPTOPP_INIT_PRIORITY > 0))
-
 NAMESPACE_BEGIN(CryptoPP)
 
 CRYPTOPP_COMPILE_ASSERT(sizeof(byte) == 1);
@@ -181,9 +177,9 @@ void SimpleKeyingInterface::GetNextIV(RandomNumberGenerator &rng, byte *IV)
 
 size_t BlockTransformation::AdvancedProcessBlocks(const byte *inBlocks, const byte *xorBlocks, byte *outBlocks, size_t length, word32 flags) const
 {
-	assert(inBlocks);
-	assert(outBlocks);
-	assert(length);
+	CRYPTOPP_ASSERT(inBlocks);
+	CRYPTOPP_ASSERT(outBlocks);
+	CRYPTOPP_ASSERT(length);
 
 	size_t blockSize = BlockSize();
 	size_t inIncrement = (flags & (BT_InBlockIsCounter|BT_DontIncrementInOutPointers)) ? 0 : blockSize;
@@ -192,7 +188,7 @@ size_t BlockTransformation::AdvancedProcessBlocks(const byte *inBlocks, const by
 
 	if (flags & BT_ReverseDirection)
 	{
-		assert(length % blockSize == 0);
+		CRYPTOPP_ASSERT(length % blockSize == 0);
 		inBlocks += length - blockSize;
 		xorBlocks += length - blockSize;
 		outBlocks += length - blockSize;
@@ -206,7 +202,7 @@ size_t BlockTransformation::AdvancedProcessBlocks(const byte *inBlocks, const by
 		if (flags & BT_XorInput)
 		{
 			// Coverity finding. However, xorBlocks is never NULL if BT_XorInput.
-			assert(xorBlocks);
+			CRYPTOPP_ASSERT(xorBlocks);
 #if defined(__COVERITY__)
 			if (xorBlocks)
 #endif
@@ -247,7 +243,7 @@ unsigned int HashTransformation::OptimalDataAlignment() const
 
 void StreamTransformation::ProcessLastBlock(byte *outString, const byte *inString, size_t length)
 {
-	assert(MinLastBlockSize() == 0);	// this function should be overriden otherwise
+	CRYPTOPP_ASSERT(MinLastBlockSize() == 0);	// this function should be overriden otherwise
 
 	if (length == MandatoryBlockSize())
 		ProcessData(outString, inString, length);
@@ -320,7 +316,7 @@ word32 RandomNumberGenerator::GenerateWord32(word32 min, word32 max)
 // see https://github.com/weidai11/cryptopp/issues/38.
 //
 // According to Wei, RandomNumberGenerator is an interface, and it should not
-// be instantiable. Its now spilt milk, and we are going to assert it in Debug
+// be instantiable. Its now spilt milk, and we are going to CRYPTOPP_ASSERT it in Debug
 // builds to alert the programmer and throw in Release builds. Developers have
 // a reference implementation in case its needed. If a programmer
 // unintentionally lands here, then they should ensure use of a
@@ -353,7 +349,7 @@ void RandomNumberGenerator::GenerateIntoBufferedTransformation(BufferedTransform
 		size_t len = UnsignedMin(buffer.size(), length);
 		GenerateBlock(buffer, len);
 		size_t rem = target.ChannelPut(channel, buffer, len);
-		CRYPTOPP_UNUSED(rem); assert(rem == 0);
+		CRYPTOPP_UNUSED(rem); CRYPTOPP_ASSERT(rem == 0);
 		length -= len;
 	}
 }
@@ -439,21 +435,21 @@ void BufferedTransformation::GetWaitObjects(WaitObjectContainer &container, Call
 void BufferedTransformation::Initialize(const NameValuePairs &parameters, int propagation)
 {
 	CRYPTOPP_UNUSED(propagation);
-	assert(!AttachedTransformation());
+	CRYPTOPP_ASSERT(!AttachedTransformation());
 	IsolatedInitialize(parameters);
 }
 
 bool BufferedTransformation::Flush(bool hardFlush, int propagation, bool blocking)
 {
 	CRYPTOPP_UNUSED(propagation);
-	assert(!AttachedTransformation());
+	CRYPTOPP_ASSERT(!AttachedTransformation());
 	return IsolatedFlush(hardFlush, blocking);
 }
 
 bool BufferedTransformation::MessageSeriesEnd(int propagation, bool blocking)
 {
 	CRYPTOPP_UNUSED(propagation);
-	assert(!AttachedTransformation());
+	CRYPTOPP_ASSERT(!AttachedTransformation());
 	return IsolatedMessageSeriesEnd(blocking);
 }
 
@@ -592,7 +588,7 @@ bool BufferedTransformation::GetNextMessage()
 		return AttachedTransformation()->GetNextMessage();
 	else
 	{
-		assert(!AnyMessages());
+		CRYPTOPP_ASSERT(!AnyMessages());
 		return false;
 	}
 }
@@ -629,7 +625,7 @@ size_t BufferedTransformation::TransferMessagesTo2(BufferedTransformation &targe
 				return 1;
 
 			bool result = GetNextMessage();
-			CRYPTOPP_UNUSED(result); assert(result);
+			CRYPTOPP_UNUSED(result); CRYPTOPP_ASSERT(result);
 		}
 		return 0;
 	}
@@ -660,7 +656,7 @@ size_t BufferedTransformation::TransferAllTo2(BufferedTransformation &target, co
 		return AttachedTransformation()->TransferAllTo2(target, channel, blocking);
 	else
 	{
-		assert(!NumberOfMessageSeries());
+		CRYPTOPP_ASSERT(!NumberOfMessageSeries());
 
 		unsigned int messageCount;
 		do
@@ -692,7 +688,7 @@ void BufferedTransformation::CopyAllTo(BufferedTransformation &target, const std
 		AttachedTransformation()->CopyAllTo(target, channel);
 	else
 	{
-		assert(!NumberOfMessageSeries());
+		CRYPTOPP_ASSERT(!NumberOfMessageSeries());
 		while (CopyMessagesTo(target, UINT_MAX, channel)) {}
 	}
 }
