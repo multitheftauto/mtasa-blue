@@ -7,7 +7,6 @@ project "Falagard"
 	pchsource "src/StdInc.cpp"
 	
 	defines { "FALAGARDBASE_EXPORTS" }
-	disablewarnings { "4297" }
 	
 	includedirs { 
 		"include",
@@ -30,3 +29,6 @@ project "Falagard"
 		flags { "ExcludeFromBuild" } 
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" } 
+	
+	filter {"system:windows"}
+		disablewarnings { "4297" }
