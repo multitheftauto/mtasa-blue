@@ -81,6 +81,9 @@ workspace "MTASA"
 			dxdir.."Lib/x86"
 		}
 	
+	filter "system:linux"
+		vectorextensions "SSE2"
+	
 	-- Only build the client on Windows
 	if os.get() == "windows" then
 		group "Client"
