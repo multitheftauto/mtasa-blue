@@ -53,7 +53,7 @@ void CLuaWeaponDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setAmmo", "setWeaponAmmo" );
     lua_classfunction ( luaVM, "setClipAmmo", "setWeaponClipAmmo" );
 
-    lua_classfunction ( luaVM, "getProperty", "setWeaponProperty" );
+    lua_classfunction ( luaVM, "getProperty", "getWeaponProperty" );
     lua_classfunction ( luaVM, "getOwner", "getWeaponOwner" );
     lua_classfunction ( luaVM, "getTarget", "getWeaponTarget" );
     lua_classfunction ( luaVM, "getFiringRate", "getWeaponFiringRate" );
