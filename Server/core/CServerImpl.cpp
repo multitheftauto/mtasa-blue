@@ -938,6 +938,11 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
                     g_bNoCurses = false;
 #endif
                 }
+                else if ( strcmp ( szArguments[i], "-u" ) == 0 )
+                {
+                    std::setbuf ( stdout, nullptr) ;
+                    std::setbuf ( stderr, nullptr );
+                }
                 else if ( strcmp ( szArguments [i], "-x" ) == 0 )
                 {
                     g_bNoCrashHandler = true;
