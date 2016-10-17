@@ -337,7 +337,7 @@ std::unordered_set<SString> CWebCore::AllowPendingPages ( bool bRemember )
     }
 
     // Trigger an event now
-    auto pCurrentMod = CModManager::GetSingleton ().GetCurrentMod ();
+    auto pCurrentMod = g_pCore->GetModManager ()->GetCurrentMod ();
     if ( !pCurrentMod )
         return std::unordered_set<SString>();
 
@@ -346,7 +346,7 @@ std::unordered_set<SString> CWebCore::AllowPendingPages ( bool bRemember )
     if ( bRemember )
     {
         std::vector<std::pair<SString, bool>> result; // Contains only allowed entries
-        CCore::GetSingleton ().GetWebCore ()->GetFilterEntriesByType ( result, eWebFilterType::WEBFILTER_USER, eWebFilterState::WEBFILTER_ALLOWED );
+        g_pCore->GetWebCore ()->GetFilterEntriesByType ( result, eWebFilterType::WEBFILTER_USER, eWebFilterState::WEBFILTER_ALLOWED );
         std::vector<SString> customWhitelist;
         for ( std::vector<std::pair<SString, bool>>::iterator iter = result.begin (); iter != result.end (); ++iter )
             customWhitelist.push_back ( iter->first );
@@ -383,14 +383,14 @@ void CWebCore::DebugOutputThreadsafe ( const SString& message, unsigned char R, 
 bool CWebCore::GetRemotePagesEnabled ()
 {
     bool bCanLoadRemotePages;
-    CVARS_GET ( "browser_remote_websites", bCanLoadRemotePages );
+    g_pCore->GetCVars ()->Get ( "browser_remote_websites", bCanLoadRemotePages );
     return bCanLoadRemotePages;
 }
 
 bool CWebCore::GetRemoteJavascriptEnabled ()
 {
     bool bIsRemoteJavascriptEnabled;
-    CVARS_GET ( "browser_remote_javascript", bIsRemoteJavascriptEnabled );
+    g_pCore->GetCVars ()->Get ( "browser_remote_javascript", bIsRemoteJavascriptEnabled );
     return bIsRemoteJavascriptEnabled;
 }
 

@@ -231,7 +231,7 @@ CCore::~CCore ( void )
     delete m_pGraphics;
 
     // Delete the web
-    SAFE_DELETE ( m_pWebCore );
+    DestroyWeb ();
 
     // Delete lazy subsystems
     DestroyGUI ();
@@ -1153,17 +1153,15 @@ void CCore::InitialiseWeb ()
     if ( m_pWebCore )
         return;
 
-    // Ensure DllDirectory has not been changed
-    SString strDllDirectory = GetSystemDllDirectory();
-    SString strRequiredDllDirectory = CalcMTASAPath( "mta" );
-    if ( strRequiredDllDirectory.EqualsI( strDllDirectory ) == false )
-    {
-        AddReportLog( 3118, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *strRequiredDllDirectory ) );
-        SetDllDirectory( strRequiredDllDirectory );
-    }
+    m_pWebCore = CreateModule < CWebCoreInterface > ( m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this );
+}
 
-    m_pWebCore = new CWebCore;
-    m_pWebCore->Initialise ();
+
+void CCore::DestroyWeb ()
+{
+    WriteDebugEvent ( "CCore::DestroyWeb" );
+    SAFE_DELETE( m_pWebCore );
+    m_WebCoreModule.UnloadModule();
 }
 
 

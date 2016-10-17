@@ -70,5 +70,5 @@
 #include "CMemStats.h"
 #include "CGraphStats.h"
 #include "CNickGen.h"
-#include <Webbrowser/CWebView.h>
+#include <core/CWebViewInterface.h>
 #include "CTrayIcon.h"
