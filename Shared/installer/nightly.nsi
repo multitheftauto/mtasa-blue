@@ -668,6 +668,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\libcurl.dll"
         File "${FILES_ROOT}\mta\loader.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
+        File "${FILES_ROOT}\mta\cefweb.dll"
         
         SetOutPath "$INSTDIR\MTA"
         File "${FILES_ROOT}\mta\libcef.dll"
