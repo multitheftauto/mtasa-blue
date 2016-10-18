@@ -107,7 +107,7 @@ public:
     CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
     CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
-    CWebCoreInterface*      GetWebCore                      ( void )                { return m_pWebCore; };
+    CWebCoreInterface*      GetWebCore                      ( void );
     CTrayIconInterface*     GetTrayIcon                     ( void )                { return m_pTrayIcon; };
 
     void                    SaveConfig                      ( bool bWaitUntilFinished = false );
@@ -184,7 +184,7 @@ public:
     void                    DestroyGUI                      ( void );
 
     // Web
-    void                    InitialiseWeb                   ( void );
+    bool                    IsWebCoreLoaded                 ( void )                { return m_pWebCore != nullptr; }
     void                    DestroyWeb                      ( void );
 
     // Hooks

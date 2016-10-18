@@ -1147,13 +1147,13 @@ void CCore::DestroyNetwork ( )
 }
 
 
-void CCore::InitialiseWeb ()
+CWebCoreInterface* CCore::GetWebCore ()
 {
-    // Don't initialise webcore twice
-    if ( m_pWebCore )
-        return;
-
-    m_pWebCore = CreateModule < CWebCoreInterface > ( m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this );
+    if ( m_pWebCore == nullptr )
+    {
+        m_pWebCore = CreateModule < CWebCoreInterface > ( m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this );
+    }
+    return m_pWebCore;
 }
 
 
