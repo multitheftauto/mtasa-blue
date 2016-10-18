@@ -980,3 +980,15 @@ bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString
 
     return true;
 }
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// Implementation: CefContextMenuHandler::OnBeforeContextMenu     //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefContextMenuHandler.html#OnBeforeContextMenu(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefContextMenuParams%3E,CefRefPtr%3CCefMenuModel%3E) //
+//                                                                //
+////////////////////////////////////////////////////////////////////
+void CWebView::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model)
+{
+    // Show no context menu
+    model->Clear();
+}

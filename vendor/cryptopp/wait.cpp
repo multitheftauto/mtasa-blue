@@ -45,8 +45,12 @@ unsigned int WaitObjectContainer::MaxWaitObjects()
 }
 
 WaitObjectContainer::WaitObjectContainer(WaitObjectsTracer* tracer)
-	: m_tracer(tracer), m_eventTimer(Timer::MILLISECONDS), m_lastResult(0)
-	, m_sameResultCount(0), m_noWaitTimer(Timer::MILLISECONDS)
+	: m_tracer(tracer),
+#ifdef USE_WINDOWS_STYLE_SOCKETS
+	  m_startWaiting(0), m_stopWaiting(0),
+#endif
+	  m_firstEventTime(0.0f), m_eventTimer(Timer::MILLISECONDS), m_lastResult(0),
+	  m_sameResultCount(0), m_noWaitTimer(Timer::MILLISECONDS)
 {
 	Clear();
 	m_eventTimer.StartTimer();
@@ -152,15 +156,15 @@ WaitObjectContainer::~WaitObjectContainer()
 			}
 
 			BOOL bResult = PulseEvent(m_startWaiting);
-			assert(bResult != 0); CRYPTOPP_UNUSED(bResult);
+			CRYPTOPP_ASSERT(bResult != 0); CRYPTOPP_UNUSED(bResult);
 
 			// Enterprise Analysis warning
 #if defined(USE_WINDOWS8_API)
 			DWORD dwResult = ::WaitForMultipleObjectsEx((DWORD)m_threads.size(), threadHandles, TRUE, INFINITE, FALSE);
-			assert((dwResult >= WAIT_OBJECT_0) && (dwResult < (DWORD)m_threads.size()));
+			CRYPTOPP_ASSERT(dwResult < (DWORD)m_threads.size());
 #else
 			DWORD dwResult = ::WaitForMultipleObjects((DWORD)m_threads.size(), threadHandles, TRUE, INFINITE);
-			assert((dwResult >= WAIT_OBJECT_0) && (dwResult < (DWORD)m_threads.size()));
+			CRYPTOPP_ASSERT(dwResult < (DWORD)m_threads.size());
 #endif
 
 			for (i=0; i<m_threads.size(); i++)
@@ -169,18 +173,18 @@ WaitObjectContainer::~WaitObjectContainer()
 				if (!threadHandles[i]) continue;
 
 				bResult = CloseHandle(threadHandles[i]);
-				assert(bResult != 0);
+				CRYPTOPP_ASSERT(bResult != 0);
 			}
 
 			bResult = CloseHandle(m_startWaiting);
-			assert(bResult != 0);
+			CRYPTOPP_ASSERT(bResult != 0);
 			bResult = CloseHandle(m_stopWaiting);
-			assert(bResult != 0);
+			CRYPTOPP_ASSERT(bResult != 0);
 		}
 	}
 	catch (const Exception&)
 	{
-		assert(0);
+		CRYPTOPP_ASSERT(0);
 	}
 }
 
@@ -201,10 +205,10 @@ DWORD WINAPI WaitingThread(LPVOID lParam)
 		thread.waitingToWait = true;
 #if defined(USE_WINDOWS8_API)
 		DWORD result = ::WaitForSingleObjectEx(thread.startWaiting, INFINITE, FALSE);
-		assert(result != WAIT_FAILED);
+		CRYPTOPP_ASSERT(result != WAIT_FAILED);
 #else
 		DWORD result = ::WaitForSingleObject(thread.startWaiting, INFINITE);
-		assert(result != WAIT_FAILED);
+		CRYPTOPP_ASSERT(result != WAIT_FAILED);
 #endif
 
 		thread.waitingToWait = false;
@@ -219,10 +223,10 @@ DWORD WINAPI WaitingThread(LPVOID lParam)
 
 #if defined(USE_WINDOWS8_API)
 		result = ::WaitForMultipleObjectsEx((DWORD)handles.size(), &handles[0], FALSE, INFINITE, FALSE);
-		assert(result != WAIT_FAILED);
+		CRYPTOPP_ASSERT(result != WAIT_FAILED);
 #else
 		result = ::WaitForMultipleObjects((DWORD)handles.size(), &handles[0], FALSE, INFINITE);
-		assert(result != WAIT_FAILED);
+		CRYPTOPP_ASSERT(result != WAIT_FAILED);
 #endif
 
 		if (result == WAIT_OBJECT_0)
@@ -230,7 +234,7 @@ DWORD WINAPI WaitingThread(LPVOID lParam)
 		SetEvent(thread.stopWaiting);
 		if (!(result > WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + handles.size()))
 		{
-			assert(!"error in WaitingThread");	// break here so we can see which thread has an error
+			CRYPTOPP_ASSERT(!"error in WaitingThread");	// break here so we can see which thread has an error
 			*thread.error = ::GetLastError();
 		}
 	}
@@ -328,10 +332,10 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 
 #if defined(USE_WINDOWS8_API)
 		DWORD result = ::WaitForSingleObjectEx(m_stopWaiting, milliseconds, FALSE);
-		assert(result != WAIT_FAILED);
+		CRYPTOPP_ASSERT(result != WAIT_FAILED);
 #else
 		DWORD result = ::WaitForSingleObject(m_stopWaiting, milliseconds);
-		assert(result != WAIT_FAILED);
+		CRYPTOPP_ASSERT(result != WAIT_FAILED);
 #endif
 
 		if (result == WAIT_OBJECT_0)
@@ -359,10 +363,10 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 #endif
 #if defined(USE_WINDOWS8_API)
 		DWORD result = ::WaitForMultipleObjectsEx((DWORD)m_handles.size(), &m_handles[0], FALSE, milliseconds, FALSE);
-		assert(result != WAIT_FAILED);
+		CRYPTOPP_ASSERT(result != WAIT_FAILED);
 #else
 		DWORD result = ::WaitForMultipleObjects((DWORD)m_handles.size(), &m_handles[0], FALSE, milliseconds);
-		assert(result != WAIT_FAILED);
+		CRYPTOPP_ASSERT(result != WAIT_FAILED);
 #endif
 #if TRACE_WAIT
 		if (milliseconds > 0)
@@ -372,7 +376,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 			lastTime = timeAfterWait;
 		}
 #endif
-		if (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + m_handles.size())
+		if (result < WAIT_OBJECT_0 + m_handles.size())
 		{
 			if (result == m_lastResult)
 				m_sameResultCount++;

@@ -176,7 +176,7 @@ struct CRYPTOPP_DLL FilterPutSpaceHelper
 	//!   called \p m_tempSpace is resized and used for the caller.
 	byte *HelpCreatePutSpace(BufferedTransformation &target, const std::string &channel, size_t minSize, size_t desiredSize, size_t &bufferSize)
 	{
-		assert(desiredSize >= minSize && bufferSize >= minSize);
+		CRYPTOPP_ASSERT(desiredSize >= minSize && bufferSize >= minSize);
 		if (m_tempSpace.size() < minSize)
 		{
 			byte *result = target.ChannelCreatePutSpace(channel, desiredSize);
@@ -342,27 +342,36 @@ public:
 	{
 		return PutMaybeModifiable(inString, length, messageEnd, blocking, true);
 	}
-	/*! calls ForceNextPut() if hardFlush is true */
+
+	//! \brief Flushes data buffered by this object, without signal propagation
+	//! \param hardFlush indicates whether all data should be flushed
+	//! \param blocking specifies whether the object should block when processing input
+	//! \details IsolatedFlush() calls ForceNextPut() if hardFlush is true
+	//! \note  hardFlush must be used with care
 	bool IsolatedFlush(bool hardFlush, bool blocking);
 
-	/*! The input buffer may contain more than blockSize bytes if lastSize != 0.
-		ForceNextPut() forces a call to NextPut() if this is the case.
-	*/
+	//! \brief Flushes data buffered by this object
+	//! \details The input buffer may contain more than blockSize bytes if <tt>lastSize != 0</tt>.
+	//!   ForceNextPut() forces a call to NextPut() if this is the case.
 	void ForceNextPut();
 
 protected:
-	bool DidFirstPut() {return m_firstInputDone;}
+	virtual bool DidFirstPut() const {return m_firstInputDone;}
+	virtual size_t GetFirstPutSize() const {return m_firstSize;}
+	virtual size_t GetBlockPutSize() const {return m_blockSize;}
+	virtual size_t GetLastPutSize() const {return m_lastSize;}
 
 	virtual void InitializeDerivedAndReturnNewSizes(const NameValuePairs &parameters, size_t &firstSize, size_t &blockSize, size_t &lastSize)
 		{CRYPTOPP_UNUSED(parameters); CRYPTOPP_UNUSED(firstSize); CRYPTOPP_UNUSED(blockSize); CRYPTOPP_UNUSED(lastSize); InitializeDerived(parameters);}
 	virtual void InitializeDerived(const NameValuePairs &parameters)
 		{CRYPTOPP_UNUSED(parameters);}
 	// FirstPut() is called if (firstSize != 0 and totalLength >= firstSize)
-	// or (firstSize == 0 and (totalLength > 0 or a MessageEnd() is received))
+	// or (firstSize == 0 and (totalLength > 0 or a MessageEnd() is received)).
+	// inString is m_firstSize in length.
 	virtual void FirstPut(const byte *inString) =0;
 	// NextPut() is called if totalLength >= firstSize+blockSize+lastSize
 	virtual void NextPutSingle(const byte *inString)
-		{CRYPTOPP_UNUSED(inString); assert(false);}
+		{CRYPTOPP_UNUSED(inString); CRYPTOPP_ASSERT(false);}
 	// Same as NextPut() except length can be a multiple of blockSize
 	// Either NextPut() or NextPutMultiple() must be overriden
 	virtual void NextPutMultiple(const byte *inString, size_t length);
@@ -387,7 +396,7 @@ protected:
 	// This function should no longer be used, put this here to cause a compiler error
 	// if someone tries to override NextPut().
 	virtual int NextPut(const byte *inString, size_t length)
-		{CRYPTOPP_UNUSED(inString); CRYPTOPP_UNUSED(length); assert(false); return 0;}
+		{CRYPTOPP_UNUSED(inString); CRYPTOPP_UNUSED(length); CRYPTOPP_ASSERT(false); return 0;}
 
 	class BlockQueue
 	{
@@ -965,7 +974,7 @@ public:
 	//! \brief Construct a StringSinkTemplate
 	//! \param output std::basic_string<char> type
 	StringSinkTemplate(T &output)
-		: m_output(&output) {assert(sizeof(output[0])==1);}
+		: m_output(&output) {CRYPTOPP_ASSERT(sizeof(output[0])==1);}
 
 	void IsolatedInitialize(const NameValuePairs &parameters)
 		{if (!parameters.GetValue("OutputStringPointer", m_output)) throw InvalidArgument("StringSink: OutputStringPointer not specified");}

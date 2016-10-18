@@ -105,6 +105,7 @@ int main ( int argc, char* argv [] )
             printf ( "  -t                   Run server with a simple console\n" );
             printf ( "  -f                   Run server with a standard console (Default)\n" );
             printf ( "  -n                   Disable the usage of ncurses (For screenlog)\n" );
+            printf ( "  -u                   Disable output buffering and flush instantly (useful for screenlog)\n" );
 #ifndef WIN32
             printf ( "  -x                   Disable simplified crash reports (To allow core dumps)\n" );
             printf ( "  -q                   Do not add " LINUX_LIBS_PATH " directory to library search path\n" );

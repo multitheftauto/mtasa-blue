@@ -315,6 +315,10 @@ void BenchmarkAll(double t, double hertz)
 	BenchMarkByNameKeyLess<HashTransformation>("SHA-1");
 	BenchMarkByNameKeyLess<HashTransformation>("SHA-256");
 	BenchMarkByNameKeyLess<HashTransformation>("SHA-512");
+	BenchMarkByNameKeyLess<HashTransformation>("Keccak-224");
+	BenchMarkByNameKeyLess<HashTransformation>("Keccak-256");
+	BenchMarkByNameKeyLess<HashTransformation>("Keccak-384");
+	BenchMarkByNameKeyLess<HashTransformation>("Keccak-512");
 	BenchMarkByNameKeyLess<HashTransformation>("SHA3-224");
 	BenchMarkByNameKeyLess<HashTransformation>("SHA3-256");
 	BenchMarkByNameKeyLess<HashTransformation>("SHA3-384");
@@ -385,9 +389,9 @@ void BenchmarkAll(double t, double hertz)
 
 	const time_t endTime = time(NULL);
 	err = localtime_s(&localTime, &endTime);
-	assert(err == 0);
+	CRYPTOPP_ASSERT(err == 0);
 	err = asctime_s(timeBuf, sizeof(timeBuf), &localTime);
-	assert(err == 0);
+	CRYPTOPP_ASSERT(err == 0);
 
 	cout << "\nTest ended at " << timeBuf;
 #else

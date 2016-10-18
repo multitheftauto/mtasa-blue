@@ -3,7 +3,7 @@
 //! \file cryptlib.h
 //! \brief Abstract base classes that provide a uniform interface to this library.
 
-/*!	\mainpage Crypto++ Library 5.6.4 API Reference
+/*!	\mainpage Crypto++ Library 5.6.5 API Reference
 <dl>
 <dt>Abstract Base Classes<dd>
 	cryptlib.h
@@ -85,6 +85,11 @@ and getting us started on the manual.
 
 #include "config.h"
 #include "stdcpp.h"
+#include "trap.h"
+
+#if defined(CRYPTOPP_BSD_AVAILABLE) || defined(CRYPTOPP_UNIX_AVAILABLE)
+# include <signal.h>
+#endif
 
 #if CRYPTOPP_MSC_VERSION
 # pragma warning(push)
@@ -620,8 +625,9 @@ public:
 	bool CanUsePredictableIVs() const {return IVRequirement() <= RANDOM_IV;}
 
 	//! \brief Determines if the object can use structured IVs
-	//! returns whether the object can use structured IVs, for example a counter (in addition to ones returned by
-	//!    GetNextIV), false otherwise
+	//! \returns true if the object can use structured IVs, false otherwise
+	//! \details CanUseStructuredIVs() indicates whether the object can use structured IVs; for example a counter
+	//!    (in addition to ones returned by GetNextIV).
 	bool CanUseStructuredIVs() const {return IVRequirement() <= UNIQUE_IV;}
 
 	//! \brief Returns length of the IV accepted by this object
@@ -714,7 +720,7 @@ protected:
 	//! \brief Validates the key length
 	//! \param length the size of the keying material, in bytes
 	inline void AssertValidKeyLength(size_t length) const
-		{CRYPTOPP_UNUSED(length); assert(IsValidKeyLength(length));}
+		{CRYPTOPP_UNUSED(length); CRYPTOPP_ASSERT(IsValidKeyLength(length));}
 };
 
 //! \brief Interface for the data processing part of block ciphers
@@ -859,7 +865,10 @@ public:
 	//!   Currently the only use of this function is CBC-CTS mode.
 	virtual void ProcessLastBlock(byte *outString, const byte *inString, size_t length);
 
-	//! returns the minimum size of the last block, 0 indicating the last block is not special
+	//! \brief Provides the size of the last block
+	//! \returns the minimum size of the last block
+	//! \details MinLastBlockSize() returns the minimum size of the last block. 0 indicates the last
+	//!   block is not special.
 	virtual unsigned int MinLastBlockSize() const {return 0;}
 
 	//! \brief Encrypt or decrypt a string of bytes
@@ -891,11 +900,11 @@ public:
 	//! \param pos position to seek
 	//! \throws NotImplemented
 	//! \details The base class implementation throws NotImplemented. The function
-	//!   asserts  IsRandomAccess() in debug builds.
+	//!   \ref CRYPTOPP_ASSERT "asserts" IsRandomAccess() in debug builds.
 	virtual void Seek(lword pos)
 	{
 		CRYPTOPP_UNUSED(pos);
-		assert(!IsRandomAccess());
+		CRYPTOPP_ASSERT(!IsRandomAccess());
 		throw NotImplemented("StreamTransformation: this object doesn't support random access");
 	}
 
@@ -1028,10 +1037,8 @@ public:
 	//! \brief Computes the hash of the current message
 	//! \param digest a pointer to the buffer to receive the hash
 	//! \param digestSize the size of the truncated digest, in bytes
-	//! \details TruncatedFinal() call Final() and then copies digestSize bytes to digest
-	//! \details TruncatedFinal() restarts the hash for the next message.
-	//! \pre <tt>COUNTOF(digest) == DigestSize()</tt> or <tt>COUNTOF(digest) == HASH::DIGESTSIZE</tt> ensures
-	//!   the output byte buffer is large enough for the digest.
+	//! \details TruncatedFinal() call Final() and then copies digestSize bytes to digest.
+	//!   The hash is restarted the hash for the next message.
 	virtual void TruncatedFinal(byte *digest, size_t digestSize) =0;
 
 	//! \brief Updates the hash with additional input and computes the hash of the current message
@@ -1999,7 +2006,7 @@ public:
 		//! \return the attached transformation
 		//! \details AttachedTransformation() returns NULL if there is no attachment. The non-const
 		//!   version of AttachedTransformation() always returns NULL.
-		virtual BufferedTransformation *AttachedTransformation() {assert(!Attachable()); return 0;}
+		virtual BufferedTransformation *AttachedTransformation() {CRYPTOPP_ASSERT(!Attachable()); return 0;}
 
 		//! \brief Returns the object immediately attached to this object
 		//! \return the attached transformation
@@ -2015,7 +2022,7 @@ public:
 		//! \details If a derived class does not override  Detach, then the base class throws
 		//!   NotImplemented.
 		virtual void Detach(BufferedTransformation *newAttachment = 0) {
-			CRYPTOPP_UNUSED(newAttachment); assert(!Attachable());
+			CRYPTOPP_UNUSED(newAttachment); CRYPTOPP_ASSERT(!Attachable());
 			throw NotImplemented("BufferedTransformation: this object is not attachable");
 		}
 
@@ -2126,7 +2133,7 @@ public:
 	//!   NotImplemented.
 	//! \sa SupportsPrecomputation(), LoadPrecomputation(), SavePrecomputation()
 	virtual void Precompute(unsigned int precomputationStorage) {
-		CRYPTOPP_UNUSED(precomputationStorage); assert(!SupportsPrecomputation());
+		CRYPTOPP_UNUSED(precomputationStorage); CRYPTOPP_ASSERT(!SupportsPrecomputation());
 		throw NotImplemented("CryptoMaterial: this object does not support precomputation");
 	}
 
@@ -2135,13 +2142,13 @@ public:
 	//! \throws NotImplemented
 	//! \sa SupportsPrecomputation(), Precompute()
 	virtual void LoadPrecomputation(BufferedTransformation &storedPrecomputation)
-		{CRYPTOPP_UNUSED(storedPrecomputation); assert(!SupportsPrecomputation()); throw NotImplemented("CryptoMaterial: this object does not support precomputation");}
+		{CRYPTOPP_UNUSED(storedPrecomputation); CRYPTOPP_ASSERT(!SupportsPrecomputation()); throw NotImplemented("CryptoMaterial: this object does not support precomputation");}
 	//! \brief Save precomputation for later use
 	//! \param storedPrecomputation BufferedTransformation to write the precomputation
 	//! \throws NotImplemented
 	//! \sa SupportsPrecomputation(), Precompute()
 	virtual void SavePrecomputation(BufferedTransformation &storedPrecomputation) const
-		{CRYPTOPP_UNUSED(storedPrecomputation); assert(!SupportsPrecomputation()); throw NotImplemented("CryptoMaterial: this object does not support precomputation");}
+		{CRYPTOPP_UNUSED(storedPrecomputation); CRYPTOPP_ASSERT(!SupportsPrecomputation()); throw NotImplemented("CryptoMaterial: this object does not support precomputation");}
 
 	//! \brief Perform a quick sanity check
 	//! \details DoQuickSanityCheck() is for internal library use, and it should not be called by library users.

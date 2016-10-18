@@ -57,13 +57,13 @@
 // Define this to ensure C/C++ standard compliance and respect for GCC aliasing rules and other alignment fodder. If you
 // experience a break with GCC at -O3, you should try this first. Guard it in case its set on the command line (and it differs).
 #ifndef CRYPTOPP_NO_UNALIGNED_DATA_ACCESS
-// # define CRYPTOPP_NO_UNALIGNED_DATA_ACCESS
+# define CRYPTOPP_NO_UNALIGNED_DATA_ACCESS
 #endif
 
 // ***************** Less Important Settings ***************
 
 // Library version
-#define CRYPTOPP_VERSION 564
+#define CRYPTOPP_VERSION 565
 
 // Define this if you want to set a prefix for TestData/ and TestVectors/
 //   Be mindful of the trailing slash since its simple concatenation.
@@ -77,11 +77,7 @@
 
 // Define this to retain (as much as possible) ABI and binary compatibility with Crypto++ 5.6.2.
 // Also see https://cryptopp.com/wiki/Config.h#Avoid_MAINTAIN_BACKWARDS_COMPATIBILITY
-#if (CRYPTOPP_VERSION <= 600)
-# if !defined(CRYPTOPP_NO_BACKWARDS_COMPATIBILITY_562) && !defined(CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562)
-#  define CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
-# endif
-#endif
+// #define CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
 
 // Define this if you want or need the library's memcpy_s and memmove_s.
 //   See http://github.com/weidai11/cryptopp/issues/28.
@@ -123,11 +119,28 @@
 // set the name of Rijndael cipher, was "Rijndael" before version 5.3
 #define CRYPTOPP_RIJNDAEL_NAME "AES"
 
+// CRYPTOPP_DEBUG enables the library's CRYPTOPP_ASSERT. CRYPTOPP_ASSERT
+//   raises a SIGTRAP (Unix) or calls DebugBreak() (Windows). CRYPTOPP_ASSERT
+//   is only in effect when CRYPTOPP_DEBUG, DEBUG or _DEBUG is defined. Unlike
+//   Posix assert, CRYPTOPP_ASSERT is not affected by NDEBUG (or failure to
+//   define it).
+//   Also see http://github.com/weidai11/cryptopp/issues/277, CVE-2016-7420
+#if (defined(DEBUG) || defined(_DEBUG)) && !defined(CRYPTOPP_DEBUG)
+# define CRYPTOPP_DEBUG 1
+#endif
+
+// ***************** Initialization and Constructor priorities ********************
+
+// MacPorts/GCC and Solaris/GCC does not provide constructor(priority). Apple/GCC and Fink/GCC do provide it.
+// See http://cryptopp.com/wiki/Static_Initialization_Order_Fiasco
+
 // CRYPTOPP_INIT_PRIORITY attempts to manage initialization of C++ static objects.
 // Under GCC, the library uses init_priority attribute in the range
 // [CRYPTOPP_INIT_PRIORITY, CRYPTOPP_INIT_PRIORITY+100]. Under Windows,
 // CRYPTOPP_INIT_PRIORITY enlists "#pragma init_seg(lib)".
-// #define CRYPTOPP_INIT_PRIORITY 250
+#ifndef CRYPTOPP_INIT_PRIORITY
+# define CRYPTOPP_INIT_PRIORITY 250
+#endif
 
 // CRYPTOPP_USER_PRIORITY is for other libraries and user code that is using Crypto++
 // and managing C++ static object creation. It is guaranteed not to conflict with
@@ -135,7 +148,21 @@
 #if defined(CRYPTOPP_INIT_PRIORITY) && (CRYPTOPP_INIT_PRIORITY > 0)
 # define CRYPTOPP_USER_PRIORITY (CRYPTOPP_INIT_PRIORITY + 101)
 #else
-# define CRYPTOPP_USER_PRIORITY 250
+# define CRYPTOPP_USER_PRIORITY 350
+#endif
+
+// __attribute__(init_priority(250)) is supported
+#if (__GNUC__ && (CRYPTOPP_INIT_PRIORITY > 0) && ((CRYPTOPP_GCC_VERSION >= 40300) || (CRYPTOPP_LLVM_CLANG_VERSION >= 20900) || (_INTEL_COMPILER >= 300)) && !(MACPORTS_GCC_COMPILER > 0) && !defined(__sun__))
+# define HAVE_GCC_CONSTRUCTOR1 1
+#endif
+
+// __attribute__(init_priority()) is supported
+#if (__GNUC__ && (CRYPTOPP_INIT_PRIORITY > 0) && !HAVE_GCC_CONSTRUCTOR1 && !(MACPORTS_GCC_COMPILER > 0) && !defined(__sun__))
+# define HAVE_GCC_CONSTRUCTOR0 1
+#endif
+
+#if (_MSC_VER && (CRYPTOPP_INIT_PRIORITY > 0))
+# define HAVE_MSC_INIT_PRIORITY 1
 #endif
 
 // ***************** Important Settings Again ********************
@@ -210,7 +237,7 @@ typedef unsigned int word32;
 #if defined(_MSC_VER) || defined(__BORLANDC__)
 	typedef unsigned __int64 word64;
 	#define W64LIT(x) x##ui64
-#elif (_LP64 || __LP64__) && ((__arm64__ || __aarch64__) || !defined(CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562))
+#elif (_LP64 || __LP64__)
 	typedef unsigned long word64;
 	#define W64LIT(x) x##UL
 #else
@@ -425,7 +452,7 @@ NAMESPACE_END
 // Sun Studio 12 provides GCC inline assembly, http://blogs.oracle.com/x86be/entry/gcc_style_asm_inlining_support
 // We can enable SSE2 for Sun Studio in the makefile with -D__SSE2__, but users may not compile with it.
 #if !defined(CRYPTOPP_DISABLE_ASM) && !defined(__SSE2__) && defined(__x86_64__) && (__SUNPRO_CC >= 0x5100)
-# define __SSE2__
+# define __SSE2__ 1
 #endif
 
 #if !defined(CRYPTOPP_DISABLE_ASM) && ((defined(_MSC_VER) && defined(_M_IX86)) || (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))))
@@ -438,10 +465,7 @@ NAMESPACE_END
 		#define CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE 0
 	#endif
 
-	// SSE3 was actually introduced in GNU as 2.17, which was released 6/23/2006, but we can't tell what version of binutils is installed.
-	// GCC 4.1.2 was released on 2/13/2007, so we'll use that as a proxy for the binutils version. Also see the output of
-	// `gcc -dM -E -march=native - < /dev/null | grep -i SSE` for preprocessor defines available.
-	#if !defined(CRYPTOPP_DISABLE_SSSE3) && (_MSC_VER >= 1400 || CRYPTOPP_GCC_VERSION >= 40102 || defined(__SSSE3__))
+	#if !defined(CRYPTOPP_DISABLE_SSE3) && (_MSC_VER >= 1500 || (defined(__SSE3__) && defined(__SSSE3__)))
 		#define CRYPTOPP_BOOL_SSSE3_ASM_AVAILABLE 1
 	#else
 		#define CRYPTOPP_BOOL_SSSE3_ASM_AVAILABLE 0
@@ -456,7 +480,7 @@ NAMESPACE_END
 	#define CRYPTOPP_X64_ASM_AVAILABLE
 #endif
 
-#if !defined(CRYPTOPP_DISABLE_SSE2) && (defined(CRYPTOPP_MSVC6PP_OR_LATER) || defined(__SSE2__)) && !defined(_M_ARM)
+#if !defined(CRYPTOPP_DISABLE_ASM) && (defined(CRYPTOPP_MSVC6PP_OR_LATER) || defined(__SSE2__)) && !defined(_M_ARM)
 	#define CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE 1
 #else
 	#define CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE 0
@@ -464,18 +488,25 @@ NAMESPACE_END
 
 // Intrinsics availible in GCC 4.3 (http://gcc.gnu.org/gcc-4.3/changes.html) and
 //   MSVC 2008 (http://msdn.microsoft.com/en-us/library/bb892950%28v=vs.90%29.aspx)
-//   SunCC could generate SSE4 at 12.1, but the intrinsics are missing until 12.4. However, we don't know
-//     when to activate the code paths because SunCC does not indicate it in the preprocessor with macros.
-#if !defined(CRYPTOPP_DISABLE_SSE2) && !defined(CRYPTOPP_DISABLE_SSE4) && (((_MSC_VER >= 1500) && !defined(_M_ARM)) || (defined(__SSE4_1__) && defined(__SSE4_2__)))
+//   SunCC could generate SSE4 at 12.1, but the intrinsics are missing until 12.4.
+#if !defined(CRYPTOPP_DISABLE_ASM) && !defined(CRYPTOPP_DISABLE_SSE4) && !defined(_M_ARM) && ((_MSC_VER >= 1500) || (defined(__SSE4_1__) && defined(__SSE4_2__)))
 	#define CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE 1
 #else
 	#define CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE 0
 #endif
 
-#if !defined(CRYPTOPP_DISABLE_SSSE3) && !defined(CRYPTOPP_DISABLE_AESNI) && CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE && (CRYPTOPP_GCC_VERSION >= 40400 || _MSC_FULL_VER >= 150030729 || __INTEL_COMPILER >= 1110 || defined(__AES__))
+// Don't disgorge AES-NI from CLMUL. There will be two to four subtle breaks
+#if !defined(CRYPTOPP_DISABLE_ASM) && !defined(CRYPTOPP_DISABLE_AESNI) && !defined(_M_ARM) && (_MSC_FULL_VER >= 150030729 || __INTEL_COMPILER >= 1110 || (defined(__AES__) && defined(__PCLMUL__)))
 	#define CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE 1
 #else
 	#define CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE 0
+#endif
+
+// AVX2 in MSC 18.00
+#if !defined(CRYPTOPP_DISABLE_ASM) && !defined(CRYPTOPP_DISABLE_AVX) && !defined(_M_ARM) && ((_MSC_VER >= 1600) || (defined(__RDRND__) || defined(__RDSEED__) || defined(__AVX__)))
+	#define CRYPTOPP_BOOL_AVX_AVAILABLE 1
+#else
+	#define CRYPTOPP_BOOL_AVX_AVAILABLE 0
 #endif
 
 // Requires ARMv7 and ACLE 1.0. Testing shows ARMv7 is really ARMv7a under most toolchains.
@@ -659,6 +690,10 @@ NAMESPACE_END
 #	define THREADS_AVAILABLE
 #endif
 
+#if defined(CRYPTOPP_BSD_AVAILABLE) || defined(CRYPTOPP_UNIX_AVAILABLE) || defined(__CYGWIN__)
+# define UNIX_SIGNALS_AVAILABLE 1
+#endif
+
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 # if !defined(WINAPI_FAMILY)
 #	define HAS_WINTHREADS
@@ -737,7 +772,7 @@ NAMESPACE_END
 
 // Portable way to suppress warnings.
 //   Moved from misc.h due to circular depenedencies.
-#define CRYPTOPP_UNUSED(x) ((void)x)
+#define CRYPTOPP_UNUSED(x) ((void)(x))
 
 // ************** Deprecated ***************
 

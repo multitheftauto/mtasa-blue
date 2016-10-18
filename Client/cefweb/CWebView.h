@@ -20,6 +20,7 @@
 #include <cef3/include/cef_client.h>
 #include <cef3/include/cef_render_handler.h>
 #include <cef3/include/cef_life_span_handler.h>
+#include <cef3/include/cef_context_menu_handler.h>
 #include <SString.h>
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
@@ -29,7 +30,9 @@
 
 #define MTA_CEF_USERAGENT "Multi Theft Auto: San Andreas Client " MTA_DM_BUILDTAG_LONG
 
-class CWebView : public CWebViewInterface, private CefClient, private CefRenderHandler, private CefLoadHandler, private CefRequestHandler, private CefLifeSpanHandler, private CefJSDialogHandler, private CefDialogHandler, private CefDisplayHandler
+class CWebView : public CWebViewInterface, private CefClient,
+    private CefRenderHandler, private CefLoadHandler, private CefRequestHandler, private CefLifeSpanHandler,
+    private CefJSDialogHandler, private CefDialogHandler, private CefDisplayHandler, private CefContextMenuHandler
 {
 public:
     CWebView                    (bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent = false);
@@ -101,6 +104,7 @@ public:
     virtual CefRefPtr<CefJSDialogHandler>   GetJSDialogHandler() override { return this; };
     virtual CefRefPtr<CefDialogHandler>     GetDialogHandler() override { return this; };
     virtual CefRefPtr<CefDisplayHandler>    GetDisplayHandler() override { return this; };
+    virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() override { return this; };
     virtual bool OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message ) override;
 
     // CefRenderHandler methods
@@ -134,6 +138,9 @@ public:
     virtual void OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& title ) override;
     virtual bool OnTooltip     ( CefRefPtr<CefBrowser> browser, CefString& text ) override;
     virtual bool OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line ) override;
+
+    // CefContextMenuHandler methods
+    virtual void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model) override;
 
 private:
     CefRefPtr<CefBrowser> m_pWebView;

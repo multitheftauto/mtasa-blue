@@ -45,6 +45,7 @@
 #include "zdeflate.h"
 #include "smartptr.h"
 #include "channels.h"
+#include "misc.h"
 
 #include <time.h>
 #include <memory>
@@ -56,11 +57,6 @@
 // Aggressive stack checking with VS2005 SP1 and above.
 #if (CRYPTOPP_MSC_VERSION >= 1410)
 # pragma strict_gs_check (on)
-#endif
-
-// Quiet deprecated warnings intended to benefit users.
-#if CRYPTOPP_MSC_VERSION
-# pragma warning(disable: 4996)
 #endif
 
 #if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
@@ -82,7 +78,7 @@ bool ValidateAll(bool thorough)
 	pass=TestRDSEED() && pass;
 #endif
 
-#if !defined(NDEBUG) && !defined(CRYPTOPP_IMPORTS)
+#if CRYPTOPP_DEBUG && !defined(CRYPTOPP_IMPORTS)
 	// http://github.com/weidai11/cryptopp/issues/92
 	pass=TestSecBlock() && pass;
 	// http://github.com/weidai11/cryptopp/issues/64
@@ -216,7 +212,7 @@ bool TestSettings()
 	}
 
 #ifdef CRYPTOPP_ALLOW_UNALIGNED_DATA_ACCESS
-	// Don't assert the alignment of testvals. That's what this test is for.
+	// Don't CRYPTOPP_ASSERT the alignment of testvals. That's what this test is for.
 	byte testvals[10] = {1,2,2,3,3,3,3,2,2,1};
 	if (*(word32 *)(void *)(testvals+3) == 0x03030303 && *(word64 *)(void *)(testvals+1) == W64LIT(0x0202030303030202))
 		cout << "passed:  Your machine allows unaligned data access.\n";
@@ -311,8 +307,8 @@ bool TestSettings()
 		cout << "passed:  ";
 
 	cout << "hasMMX == " << hasMMX << ", hasISSE == " << hasISSE << ", hasSSE2 == " << hasSSE2 << ", hasSSSE3 == " << hasSSSE3 << ", hasSSE4 == " << hasSSE4;
-	cout << ", hasAESNI == " << HasAESNI() << ", hasRDRAND == " << HasRDRAND() << ", hasRDSEED == " << HasRDSEED() << ", hasCLMUL == " << HasCLMUL();
-	cout << ", isP4 == " << isP4 << ", cacheLineSize == " << cacheLineSize << ", AESNI_INTRINSICS == " << CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE << endl;
+	cout << ", hasAESNI == " << HasAESNI() << ", hasCLMUL == " << HasCLMUL() << ", hasRDRAND == " << HasRDRAND() << ", hasRDSEED == " << HasRDSEED();
+	cout << ", isP4 == " << isP4 << ", cacheLineSize == " << cacheLineSize << endl;
 
 #elif (CRYPTOPP_BOOL_ARM32 || CRYPTOPP_BOOL_ARM64)
 	bool hasNEON = HasNEON();
@@ -334,7 +330,7 @@ bool TestSettings()
 	return pass;
 }
 
-#if !defined(NDEBUG) && !defined(CRYPTOPP_IMPORTS)
+#if CRYPTOPP_DEBUG && !defined(CRYPTOPP_IMPORTS)
 bool TestSecBlock()
 {
 	cout << "\nTesting SecBlock...\n\n";
@@ -1268,7 +1264,7 @@ bool TestSecBlock()
 }
 #endif
 
-#if !defined(NDEBUG) && !defined(CRYPTOPP_IMPORTS)
+#if CRYPTOPP_DEBUG && !defined(CRYPTOPP_IMPORTS)
 bool TestHuffmanCodes()
 {
     cout << "\nTesting Huffman codes...\n\n";
@@ -1580,7 +1576,7 @@ bool TestRDRAND()
 		RandomNumberSource rns(rdrand, SIZE, true, new Redirector(chsw));
 		deflator.Flush(true);
 
-		assert(0 == maurer.BytesNeeded());
+		CRYPTOPP_ASSERT(0 == maurer.BytesNeeded());
 		const double mv = maurer.GetTestValue();
 		if (mv < 0.98f)
 		{
@@ -1659,7 +1655,7 @@ bool TestRDSEED()
 		RandomNumberSource rns(rdseed, SIZE, true, new Redirector(chsw));
 		deflator.Flush(true);
 
-		assert(0 == maurer.BytesNeeded());
+		CRYPTOPP_ASSERT(0 == maurer.BytesNeeded());
 		const double mv = maurer.GetTestValue();
 		if (mv < 0.98f)
 		{
@@ -1803,7 +1799,7 @@ public:
 		{
 			std::cerr << "incorrect output " << counter << ", " << (word16)validOutput[counter] << ", " << (word16)inByte << "\n";
 			fail = true;
-			assert(false);
+			CRYPTOPP_ASSERT(false);
 		}
 		counter++;
 	}
@@ -1818,7 +1814,7 @@ public:
 			if (counter != outputLen)
 			{
 				fail = true;
-				assert(false);
+				CRYPTOPP_ASSERT(false);
 			}
 
 		return 0;
@@ -2500,8 +2496,8 @@ bool ValidateMARS()
 	pass1 = enc.StaticGetValidKeyLength(16) == 16 && pass1;
 	pass1 = enc.StaticGetValidKeyLength(24) == 24 && pass1;
 	pass1 = enc.StaticGetValidKeyLength(32) == 32 && pass1;
-	pass1 = enc.StaticGetValidKeyLength(64) == 32 && pass1;
-	pass1 = enc.StaticGetValidKeyLength(128) == 32 && pass1;
+	pass1 = enc.StaticGetValidKeyLength(64) == 56 && pass1;
+	pass1 = enc.StaticGetValidKeyLength(128) == 56 && pass1;
 	pass1 = enc.StaticGetValidKeyLength(0) == enc.MinKeyLength() && pass1;
 	pass1 = enc.StaticGetValidKeyLength(SIZE_MAX) == enc.MaxKeyLength() && pass1;
 
@@ -2510,8 +2506,8 @@ bool ValidateMARS()
 	pass2 = dec.StaticGetValidKeyLength(16) == 16 && pass2;
 	pass2 = dec.StaticGetValidKeyLength(24) == 24 && pass2;
 	pass2 = dec.StaticGetValidKeyLength(32) == 32 && pass2;
-	pass2 = dec.StaticGetValidKeyLength(64) == 32 && pass2;
-	pass2 = dec.StaticGetValidKeyLength(128) == 32 && pass2;
+	pass2 = dec.StaticGetValidKeyLength(64) == 56 && pass2;
+	pass2 = dec.StaticGetValidKeyLength(128) == 56 && pass2;
 	pass2 = dec.StaticGetValidKeyLength(0) == dec.MinKeyLength() && pass2;
 	pass2 = dec.StaticGetValidKeyLength(SIZE_MAX) == dec.MaxKeyLength() && pass2;
 	cout << (pass1 && pass2 ? "passed:" : "FAILED:") << "  Algorithm key lengths\n";

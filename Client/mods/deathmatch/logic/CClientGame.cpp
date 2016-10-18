@@ -2335,8 +2335,7 @@ bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bI
         bool bIgnore = false;
         if ( bState )
         {
-            auto pWebCore = g_pCore->GetWebCore();
-            auto pFocusedBrowser = pWebCore ? pWebCore->GetFocusedWebView () : nullptr;
+            auto pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView () : nullptr;
             bool isMouseKey = strKey.substr(0, 5) == "mouse";
 
             if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey )
@@ -2398,8 +2397,7 @@ bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
     if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsInputActive() == false )
     {
         // Cancel event if remote browser is focused
-        auto pWebCore = g_pCore->GetWebCore();
-        auto pFocusedBrowser = pWebCore ? pWebCore->GetFocusedWebView () : nullptr;
+        auto pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView () : nullptr;
         if ( pFocusedBrowser && !pFocusedBrowser->IsLocal () )
             return false;
 
@@ -6370,7 +6368,7 @@ void CClientGame::SetDevelopmentMode ( bool bEnable, bool bEnableWeb )
     else
         g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
 
-    if ( g_pCore->GetWebCore() )
+    if ( g_pCore->IsWebCoreLoaded() )
         g_pCore->GetWebCore()->SetTestModeEnabled ( bEnableWeb );
 }
 
