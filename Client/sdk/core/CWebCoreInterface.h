@@ -48,8 +48,10 @@ using WebRequestCallback = std::function<void(bool, const std::unordered_set<SSt
 class CWebCoreInterface
 {
 public:
+    virtual                     ~CWebCoreInterface  () {} 
     virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent ) = 0;
     virtual void                DestroyWebView      ( CWebViewInterface* pWebView ) = 0;
+    virtual void                DoPulse             () = 0;
 
     virtual void                AddEventToEventQueue( std::function<void(void)> func, CWebView* pWebView, const SString& name ) = 0;
     virtual void                RemoveWebViewEvents ( CWebView* pWebView ) = 0;
@@ -57,7 +59,7 @@ public:
     
     virtual eURLState           GetURLState        ( const SString& strURL, bool bOutputDebug = false ) = 0;
     virtual SString             GetDomainFromURL   ( const SString& strURL ) = 0;
-    virtual void                ResetFilter        ( bool bResetRequestsOnly ) = 0;
+    virtual void                ResetFilter        ( bool bResetRequestsOnly = true ) = 0;
     virtual void                RequestPages       ( const std::vector<SString>& pages, WebRequestCallback* pCallback = nullptr ) = 0;
     virtual std::unordered_set<SString> AllowPendingPages( bool bRemember ) = 0;
     virtual std::unordered_set<SString>  DenyPendingPages() = 0;

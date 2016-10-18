@@ -12,6 +12,8 @@
 #ifndef __CMODMANAGERINTERFACE_H
 #define __CMODMANAGERINTERFACE_H
 
+class CClientBase;
+
 class CModManagerInterface
 {
 public:
@@ -20,6 +22,7 @@ public:
     virtual void        RequestUnload           ( void ) = 0;
 
     virtual bool        IsLoaded                ( void ) = 0;
+    virtual CClientBase* GetCurrentMod          ( void ) = 0;
 };
 
 #endif

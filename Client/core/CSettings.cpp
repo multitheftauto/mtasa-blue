@@ -2896,9 +2896,9 @@ void CSettings::LoadData ( void )
     m_pGridBrowserWhitelist->Clear ();
     m_bBrowserListsChanged = false;
 
-    auto pWebCore = CCore::GetSingleton().GetWebCore();
-    if ( pWebCore )
+    if ( g_pCore->IsWebCoreLoaded() )
     {
+        auto pWebCore = g_pCore->GetWebCore();
         std::vector<std::pair<SString, bool>> customBlacklist;
         pWebCore->GetFilterEntriesByType( customBlacklist, eWebFilterType::WEBFILTER_USER );
         for ( std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter )
@@ -3201,9 +3201,9 @@ void CSettings::SaveData ( void )
         CVARS_SET ( "browser_remote_javascript", m_pCheckBoxRemoteJavascript->GetSelected () );
     }
 
-    auto pWebCore = CCore::GetSingleton().GetWebCore();
-    if ( pWebCore )
+    if ( g_pCore->IsWebCoreLoaded() )
     {
+        auto pWebCore = g_pCore->GetWebCore();
         std::vector<SString> customBlacklist;
         for ( int i = 0; i < m_pGridBrowserBlacklist->GetRowCount (); ++i )
         {
