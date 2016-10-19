@@ -63,8 +63,9 @@ workspace "MTASA"
 	end 
 	
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
-		symbolspath "Build/Symbols/$(ProjectName).pdb"
-		
+		os.mkdir("Build/Symbols")
+		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
+
 	filter {"system:windows", "toolset:*140*"}
 		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
 	
