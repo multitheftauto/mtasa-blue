@@ -375,7 +375,14 @@ bool CWebView::SetAudioVolume ( float fVolume )
                "tags = document.getElementsByTagName('video'); for (var i = 0; i<tags.length; ++i) { mta_adjustAudioVol(tags[i], %f); }",
             fVolume, fVolume );
 
-    m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJSCode, "", 0 );
+    std::vector<CefString> frameNames;
+    m_pWebView->GetFrameNames(frameNames);
+
+    for (auto& name : frameNames)
+    {
+        auto frame = m_pWebView->GetFrame(name);
+        frame->ExecuteJavaScript(strJSCode, "", 0);
+    }
     m_fVolume = fVolume;
     return true;
 }
@@ -426,7 +433,7 @@ void CWebView::Resize(const CVector2D& size)
 
 CVector2D CWebView::GetSize()
 {
-    return CVector2D(m_pWebBrowserRenderItem->m_uiSizeX, m_pWebBrowserRenderItem->m_uiSizeY);
+    return CVector2D(static_cast<float>(m_pWebBrowserRenderItem->m_uiSizeX), static_cast<float>(m_pWebBrowserRenderItem->m_uiSizeY));
 }
 
 bool CWebView::GetFullPathFromLocal ( SString& strPath )
