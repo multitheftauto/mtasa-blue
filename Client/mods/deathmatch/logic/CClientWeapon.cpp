@@ -30,7 +30,7 @@ CClientWeapon::CClientWeapon ( CClientManager * pManager, ElementID ID, eWeaponT
 
     SetTypeName ( "weapon" );
 
-    SetStatic ( true );
+    SetFrozen ( true );
     Create ();
 #ifdef MARKER_DEBUG
     m_pMarker = new CClientMarker ( pManager, INVALID_ELEMENT_ID, 4 );
