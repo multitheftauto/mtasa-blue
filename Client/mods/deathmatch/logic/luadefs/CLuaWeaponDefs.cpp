@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 
+#define MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG     "1.3.5-9.06139"
+
 void CLuaWeaponDefs::LoadFunctions ( void )
 {
     CLuaCFunctions::AddFunction ( "getWeaponNameFromID", GetWeaponNameFromID );
@@ -18,6 +20,8 @@ void CLuaWeaponDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getSlotFromWeapon", GetSlotFromWeapon );
     CLuaCFunctions::AddFunction ( "createWeapon", CreateWeapon );
     CLuaCFunctions::AddFunction ( "setWeaponProperty", SetWeaponProperty );
+    CLuaCFunctions::AddFunction ( "getWeaponProperty", GetWeaponProperty );
+    CLuaCFunctions::AddFunction ( "getOriginalWeaponProperty", GetOriginalWeaponProperty );
     CLuaCFunctions::AddFunction ( "fireWeapon", FireWeapon );
     CLuaCFunctions::AddFunction ( "setWeaponState", SetWeaponState );
     CLuaCFunctions::AddFunction ( "getWeaponState", GetWeaponState );
@@ -684,6 +688,298 @@ int CLuaWeaponDefs::SetWeaponClipAmmo ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWeaponDefs::GetWeaponProperty ( lua_State* luaVM )
+{
+    eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
+    eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
+    eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
+    CClientWeapon * pWeapon;
+    CScriptArgReader argStream ( luaVM );
+
+    if ( argStream.NextIsUserData () )
+    {
+        argStream.ReadUserData ( pWeapon );
+        argStream.ReadEnumString ( eProp );
+
+        if ( !argStream.HasErrors () )
+        {
+            if ( eProp == WEAPON_DAMAGE )
+            {
+                short sData = 0;
+                if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, sData ) )
+                {
+                    lua_pushnumber ( luaVM, sData );
+                    return 1;
+                }
+            }
+            else
+                if ( eProp == WEAPON_FIRE_ROTATION )
+                {
+                    CVector vecWeaponInfo;
+                    if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, vecWeaponInfo ) )
+                    {
+                        lua_pushnumber ( luaVM, vecWeaponInfo.fX );
+                        lua_pushnumber ( luaVM, vecWeaponInfo.fY );
+                        lua_pushnumber ( luaVM, vecWeaponInfo.fZ );
+                        return 1;
+                    }
+                }
+                else
+                {
+                    float fData = 0;
+                    if ( CStaticFunctionDefinitions::GetWeaponProperty ( pWeapon, eProp, fData ) )
+                    {
+                        lua_pushnumber ( luaVM, fData );
+                        return 1;
+                    }
+                }
+        }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+        lua_pushboolean ( luaVM, false );
+        return 1;
+    }
+
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
+    argStream.ReadEnumString ( eProp );
+    if ( !argStream.HasErrors () )
+    {
+        switch ( eProp )
+        {
+        case WEAPON_WEAPON_RANGE:
+        case WEAPON_TARGET_RANGE:
+        case WEAPON_ACCURACY:
+        case WEAPON_FIRING_SPEED:
+        case WEAPON_LIFE_SPAN:
+        case WEAPON_SPREAD:
+        case WEAPON_MOVE_SPEED:
+            // Get only
+        case WEAPON_REQ_SKILL_LEVEL:
+        case WEAPON_ANIM_LOOP_START:
+        case WEAPON_ANIM_LOOP_STOP:
+        case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM2_LOOP_START:
+        case WEAPON_ANIM2_LOOP_STOP:
+        case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM_BREAKOUT_TIME:
+        case WEAPON_RADIUS:
+        {
+            float fWeaponInfo = 0.0f;
+
+            if ( CStaticFunctionDefinitions::GetWeaponProperty ( eProp, eWep, eWepSkill, fWeaponInfo ) )
+            {
+                lua_pushnumber ( luaVM, fWeaponInfo );
+                return 1;
+            }
+            break;
+        }
+        case WEAPON_DAMAGE:
+        case WEAPON_MAX_CLIP_AMMO:
+        case WEAPON_FLAGS:
+        case WEAPON_ANIM_GROUP:
+        case WEAPON_FIRETYPE:
+        case WEAPON_MODEL:
+        case WEAPON_MODEL2:
+        case WEAPON_SLOT:
+        case WEAPON_AIM_OFFSET:
+        case WEAPON_SKILL_LEVEL:
+        case WEAPON_DEFAULT_COMBO:
+        case WEAPON_COMBOS_AVAILABLE:
+        {
+            int sWeaponInfo = 0;
+
+            if ( CStaticFunctionDefinitions::GetWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
+            {
+                lua_pushinteger ( luaVM, sWeaponInfo );
+                return 1;
+            }
+            break;
+        }
+        case WEAPON_FIRE_OFFSET:
+        {
+            CVector vecWeaponInfo;
+
+            if ( CStaticFunctionDefinitions::GetWeaponProperty ( eProp, eWep, eWepSkill, vecWeaponInfo ) )
+            {
+                lua_pushnumber ( luaVM, vecWeaponInfo.fX );
+                lua_pushnumber ( luaVM, vecWeaponInfo.fY );
+                lua_pushnumber ( luaVM, vecWeaponInfo.fZ );
+                return 3;
+            }
+            break;
+        }
+        case WEAPON_FLAG_AIM_NO_AUTO:
+        case WEAPON_FLAG_AIM_ARM:
+        case WEAPON_FLAG_AIM_1ST_PERSON:
+        case WEAPON_FLAG_AIM_FREE:
+        case WEAPON_FLAG_MOVE_AND_AIM:
+        case WEAPON_FLAG_MOVE_AND_SHOOT:
+        case WEAPON_FLAG_TYPE_THROW:
+        case WEAPON_FLAG_TYPE_HEAVY:
+        case WEAPON_FLAG_TYPE_CONSTANT:
+        case WEAPON_FLAG_TYPE_DUAL:
+        case WEAPON_FLAG_ANIM_RELOAD:
+        case WEAPON_FLAG_ANIM_CROUCH:
+        case WEAPON_FLAG_ANIM_RELOAD_LOOP:
+        case WEAPON_FLAG_ANIM_RELOAD_LONG:
+        case WEAPON_FLAG_SHOT_SLOWS:
+        case WEAPON_FLAG_SHOT_RAND_SPEED:
+        case WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+        case WEAPON_FLAG_SHOT_EXPANDS:
+        {
+            MinClientReqCheck ( argStream, MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used" );
+            if ( !argStream.HasErrors () )
+            {
+                bool bEnable;
+                if ( CStaticFunctionDefinitions::GetWeaponPropertyFlag ( eProp, eWep, eWepSkill, bEnable ) )
+                {
+                    lua_pushboolean ( luaVM, bEnable );
+                    return 1;
+                }
+            }
+            break;
+        }
+        default:
+        {
+            argStream.SetCustomError ( "unsupported weapon property at argument 3" );
+            break;
+        }
+        }
+    }
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaWeaponDefs::GetOriginalWeaponProperty ( lua_State* luaVM )
+{
+    eWeaponSkill eWepSkill = eWeaponSkill::WEAPONSKILL_STD;
+    eWeaponType eWep = eWeaponType::WEAPONTYPE_UNARMED;
+    eWeaponProperty eProp = eWeaponProperty::WEAPON_INVALID_PROPERTY;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumStringOrNumber ( eWep );
+    argStream.ReadEnumStringOrNumber ( eWepSkill );
+    argStream.ReadEnumString ( eProp );
+    if ( !argStream.HasErrors () )
+    {
+        switch ( eProp )
+        {
+        case WEAPON_WEAPON_RANGE:
+        case WEAPON_TARGET_RANGE:
+        case WEAPON_ACCURACY:
+        case WEAPON_FIRING_SPEED:
+        case WEAPON_LIFE_SPAN:
+        case WEAPON_SPREAD:
+        case WEAPON_MOVE_SPEED:
+            // Get only
+        case WEAPON_REQ_SKILL_LEVEL:
+        case WEAPON_ANIM_LOOP_START:
+        case WEAPON_ANIM_LOOP_STOP:
+        case WEAPON_ANIM_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM2_LOOP_START:
+        case WEAPON_ANIM2_LOOP_STOP:
+        case WEAPON_ANIM2_LOOP_RELEASE_BULLET_TIME:
+        case WEAPON_ANIM_BREAKOUT_TIME:
+        case WEAPON_RADIUS:
+        {
+            float fWeaponInfo = 0.0f;
+
+            if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, fWeaponInfo ) )
+            {
+                lua_pushnumber ( luaVM, fWeaponInfo );
+                return 1;
+            }
+            break;
+        }
+        case WEAPON_DAMAGE:
+        case WEAPON_MAX_CLIP_AMMO:
+        case WEAPON_FLAGS:
+        case WEAPON_ANIM_GROUP:
+        case WEAPON_FIRETYPE:
+        case WEAPON_MODEL:
+        case WEAPON_MODEL2:
+        case WEAPON_SLOT:
+        case WEAPON_AIM_OFFSET:
+        case WEAPON_SKILL_LEVEL:
+        case WEAPON_DEFAULT_COMBO:
+        case WEAPON_COMBOS_AVAILABLE:
+        {
+            int sWeaponInfo = 0;
+
+            if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, sWeaponInfo ) )
+            {
+                lua_pushinteger ( luaVM, sWeaponInfo );
+                return 1;
+            }
+            break;
+        }
+        case WEAPON_FIRE_OFFSET:
+        {
+            CVector vecWeaponInfo;
+
+            if ( CStaticFunctionDefinitions::GetOriginalWeaponProperty ( eProp, eWep, eWepSkill, vecWeaponInfo ) )
+            {
+                lua_pushnumber ( luaVM, vecWeaponInfo.fX );
+                lua_pushnumber ( luaVM, vecWeaponInfo.fY );
+                lua_pushnumber ( luaVM, vecWeaponInfo.fZ );
+                return 3;
+            }
+            break;
+        }
+        case WEAPON_FLAG_AIM_NO_AUTO:
+        case WEAPON_FLAG_AIM_ARM:
+        case WEAPON_FLAG_AIM_1ST_PERSON:
+        case WEAPON_FLAG_AIM_FREE:
+        case WEAPON_FLAG_MOVE_AND_AIM:
+        case WEAPON_FLAG_MOVE_AND_SHOOT:
+        case WEAPON_FLAG_TYPE_THROW:
+        case WEAPON_FLAG_TYPE_HEAVY:
+        case WEAPON_FLAG_TYPE_CONSTANT:
+        case WEAPON_FLAG_TYPE_DUAL:
+        case WEAPON_FLAG_ANIM_RELOAD:
+        case WEAPON_FLAG_ANIM_CROUCH:
+        case WEAPON_FLAG_ANIM_RELOAD_LOOP:
+        case WEAPON_FLAG_ANIM_RELOAD_LONG:
+        case WEAPON_FLAG_SHOT_SLOWS:
+        case WEAPON_FLAG_SHOT_RAND_SPEED:
+        case WEAPON_FLAG_SHOT_ANIM_ABRUPT:
+        case WEAPON_FLAG_SHOT_EXPANDS:
+        {
+            MinClientReqCheck ( argStream, MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG, "flag name is being used" );
+            if ( !argStream.HasErrors () )
+            {
+                bool bEnable;
+                if ( CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag ( eProp, eWep, eWepSkill, bEnable ) )
+                {
+                    lua_pushboolean ( luaVM, bEnable );
+                    return 1;
+                }
+            }
+            break;
+        }
+        default:
+        {
+            argStream.SetCustomError ( "unsupported weapon property at argument 3" );
+            break;
+        }
+        }
+    }
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
