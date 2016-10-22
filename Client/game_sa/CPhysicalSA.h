@@ -29,6 +29,7 @@
 #define FUNC_CPhysical_RemoveFromMovingList     0x542860
 
 #define PHYSICAL_MAXNOOFCOLLISIONRECORDS        6
+#define PHYSICAL_MAXMASS                        99999.0
 
 class CPhysicalSAInterface : public CEntitySAInterface
 {
