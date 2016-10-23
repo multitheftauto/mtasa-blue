@@ -1217,7 +1217,7 @@ Function InstallVC14Redistributable
     ${LogText} "+Function begin - InstallVC14Redistributable"
     DetailPrint "Installing Microsoft Visual Studio 2015 redistributable ..."
     StrCpy $REDISTVC14 "$TEMP\vcredist14_x86.exe"
-    NSISdl::download "http://mirror.multitheftauto.com/mtasa/installer/9875/vc_redist_2015u3.x86.exe" $REDISTVC14
+    NSISdl::download "http://mirror.multitheftauto.com/mtasa/installer/10700/vcredist_2015_x86.exe" $REDISTVC14
     Pop $0
 
     ${If} $0 != "success"
@@ -1228,7 +1228,7 @@ Function InstallVC14Redistributable
     ${Else}
         ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
         ; /quiet = 'This option will suppress all UI and perform an install.'
-        ExecWait '"$REDISTVC14" /quiet'
+        ExecWait '"$REDISTVC14" /repair /passive /norestart'
         Call IsVC14RedistributableInstalled
         ${If} $0 != "1"
             DetailPrint "* Some error occured installing Microsoft Visual Studio 2015 redistributable"
@@ -1245,6 +1245,10 @@ FunctionEnd
 ;----------------------------------------
 ; Out $0 = result   ("1" = yes, "0" = no)
 Function IsVC14RedistributableInstalled
+    IfFileExists "$WINDIR\System32\api-ms-win-crt-runtime-l1-1-0.dll" FileFound 0
+        StrCpy $0 "0"
+        Return  
+    FileFound:
     ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Install"
     ${If} $0 == "1" 
         ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Version"
