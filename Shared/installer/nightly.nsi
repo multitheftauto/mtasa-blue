@@ -1141,13 +1141,20 @@ FunctionEnd
 ;====================================================================================
 ; Download and install Microsoft Visual Studio redistributables if required
 ;====================================================================================
+Var DONEUPDATE
 Function UpdateVCRedistributables
-    Call IsVC12RedistributableInstalled
-    ${If} $0 != "1"
+    ; Only check once
+    ${If} $DONEUPDATE == "1"
+        Return
+    ${EndIf}
+    StrCpy $DONEUPDATE "1"
+
+    Call ShouldInstallVC12Redistributable
+    ${If} $0 == "1"
         Call InstallVC12Redistributable
     ${EndIf}
-    Call IsVC14RedistributableInstalled
-    ${If} $0 != "1"
+    Call ShouldInstallVC14Redistributable
+    ${If} $0 == "1"
         Call InstallVC14Redistributable
     ${EndIf}
 FunctionEnd
@@ -1190,6 +1197,13 @@ Function InstallVC12Redistributable
     ${EndIf}
 
     ${LogText} "-Function end - InstallVC12Redistributable"
+FunctionEnd
+
+;----------------------------------------
+; Out $0 = result   ("1" = yes, "0" = no)
+Function ShouldInstallVC12Redistributable
+    Call IsVC12RedistributableInstalled
+    IntOp $0 $0 ^ 1
 FunctionEnd
 
 ;----------------------------------------
@@ -1244,11 +1258,19 @@ FunctionEnd
 
 ;----------------------------------------
 ; Out $0 = result   ("1" = yes, "0" = no)
-Function IsVC14RedistributableInstalled
-    IfFileExists "$WINDIR\System32\api-ms-win-crt-runtime-l1-1-0.dll" FileFound 0
-        StrCpy $0 "0"
+Function ShouldInstallVC14Redistributable
+    IfFileExists "$WINDIR\System32\api-ms-win-crt-runtime-*.dll" FileFound 0
+        ${LogText} "api-ms-win-crt-runtime-*.dll not found"
+        StrCpy $0 "1"
         Return  
     FileFound:
+    Call IsVC14RedistributableInstalled
+    IntOp $0 $0 ^ 1
+FunctionEnd
+
+;----------------------------------------
+; Out $0 = result   ("1" = yes, "0" = no)
+Function IsVC14RedistributableInstalled
     ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Install"
     ${If} $0 == "1" 
         ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Version"
