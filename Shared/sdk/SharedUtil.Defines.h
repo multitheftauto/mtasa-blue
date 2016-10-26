@@ -93,7 +93,6 @@
         STRNCPY( tempname, src, maxsize );
 
 #ifndef _MSC_VER
-    #define _isnan isnan
     #define wcsicmp wcscasecmp
 #endif
 

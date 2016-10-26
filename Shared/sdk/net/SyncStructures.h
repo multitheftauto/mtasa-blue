@@ -51,7 +51,7 @@ struct SFloatSync : public ISyncStructure
         double dValue = data.fValue;
 #ifdef WIN32
 #ifdef MTA_DEBUG
-        assert ( !_isnan ( dValue ) );
+        assert ( !std::isnan ( dValue ) );
 #endif
 #endif
         dValue = Clamp < double > ( limitsMin, dValue, limitsMax );

@@ -5597,7 +5597,7 @@ void _cdecl CheckMatrix ( float* pMatrix )
         for ( uint i = 12 ; i < 15 ; i++ )
         {
             float f = pMatrix[i];
-            if ( f < -10 || f > 10 || _isnan( f ) )
+            if ( f < -10 || f > 10 || std::isnan( f ) )
                 bFix = true;
         }
     }
