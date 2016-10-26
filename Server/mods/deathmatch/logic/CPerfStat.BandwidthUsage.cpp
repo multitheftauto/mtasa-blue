@@ -313,7 +313,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
         uint uiStatsHoursNow = UnixTimeToStatsHours ( tTime );          // Hours since 1/1/2011
         int iHoursElpased = uiStatsHoursNow - uiStatsHoursThen;
 
-        // std::max elapsed time of 13 months
+        // Max elapsed time of 13 months
         iHoursElpased = std::min( iHoursElpased, 730 * 13 );
 
         // Skip forward in time to clear out past data

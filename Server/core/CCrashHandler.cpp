@@ -84,7 +84,7 @@ static void SaveBacktraceSummary()
     // Collect backtrace information
     void * buffer [ 100 ];
     int iAmount = backtrace ( buffer, sizeof buffer );
-    iAmount = Min < int > ( iAmount, NUMELMS( buffer ) );
+    iAmount = std::min < int > ( iAmount, NUMELMS( buffer ) );
     char ** symbols = backtrace_symbols ( buffer, iAmount );
 
     // Generate a .log file

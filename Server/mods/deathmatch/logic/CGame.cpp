@@ -96,7 +96,7 @@ pthread_mutex_t mutexhttp;
 
 
 CGame::CGame ( void )
-    : m_FloodProtect( 4, 30000, 30000 )     // std::max of 4 connections per 30 seconds, then 30 second ignore
+    : m_FloodProtect( 4, 30000, 30000 )     // Max of 4 connections per 30 seconds, then 30 second ignore
 {
     // Set our global pointer
     g_pGame = this;

@@ -75,20 +75,20 @@ public:
 #define MIN_CONSOLEECHO_LENGTH 1
 #define MAX_CONSOLEECHO_LENGTH 1000
 
-// std::max servermessage size (this must match the client's)
+// Max servermessage size (this must match the client's)
 #define MIN_SERVERMESSAGE_LENGTH 1
 #define MAX_SERVERMESSAGE_LENGTH 64
 
-// std::max disconnect reason length that can be sent with the "you were disconnected" packet
+// Max disconnect reason length that can be sent with the "you were disconnected" packet
 #define MIN_DISCONNECT_REASON_LENGTH 1
 #define MAX_DISCONNECT_REASON_LENGTH 127
 
-// std::max kick string length that can be sent
+// Max kick string length that can be sent
 #define MIN_KICK_REASON_LENGTH      1
 #define MAX_KICK_REASON_LENGTH      64
 #define MAX_KICK_RESPONSIBLE_LENGTH 30
 
-// std::max ban string length that can be sent
+// Max ban string length that can be sent
 #define MIN_BAN_REASON_LENGTH      1
 #define MAX_BAN_REASON_LENGTH      64
 #define MAX_BAN_RESPONSIBLE_LENGTH 30
@@ -101,7 +101,7 @@ public:
 // Defines how long the whowas list can be
 #define MAX_WHOWAS_LENGTH 1024
 
-// std::max valid weather id
+// Max valid weather id
 #define MAX_VALID_WEATHER 255
 
 // Upper player limit
@@ -144,7 +144,7 @@ public:
 // Server FPS limit (in milliseconds)
 #define FPS_LIMIT                   16
 
-// std::max garages
+// Max garages
 #define MAX_GARAGES                 50
 
 // Game-monitor.com query URL (use %u for port input)

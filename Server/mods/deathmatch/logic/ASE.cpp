@@ -24,7 +24,7 @@ extern "C"
 ASE* ASE::_instance = NULL;
 
 ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList/*, bool bLan*/ )
-    : m_QueryDosProtect( 5, 6000, 7000 )        // std::max of 5 queries per 6 seconds, then 7 second ignore
+    : m_QueryDosProtect( 5, 6000, 7000 )        // Max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
     m_tStartTime = time( NULL );
