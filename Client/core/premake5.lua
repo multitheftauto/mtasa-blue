@@ -5,7 +5,7 @@ project "Client Core"
 	targetdir(buildpath("mta"))
 	
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../vendor/sparsehash/src/windows" }
 		linkoptions { "/SAFESEH\:NO" }
 		buildoptions { "-Zm130" }
 	
@@ -17,7 +17,7 @@ project "Client Core"
 			"../../vendor/zlib",
 			"../../vendor/jpeg-9b",
 			"../../vendor/pthreads/include",
-			"../../vendor/sparsehash/current/src/"
+			"../../vendor/sparsehash/src/"
 		}
 
 	libdirs {

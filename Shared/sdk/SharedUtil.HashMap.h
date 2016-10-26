@@ -25,12 +25,8 @@ namespace SharedUtil
     //
     // Using hash_map
     //
-    template < class K, class V >
-    class CHashMap : public std::unordered_map < K, V >
-    {
-    public:
-    };
-
+	template < class K, class V >
+	using CHashMap = std::unordered_map < K, V >;
 
     ////////////////////////////////////////////////
     //
@@ -115,25 +111,5 @@ namespace std
         }
     };
 }
-
-#if defined(WIN32)
-inline size_t hash_value ( const SString& strString ) // Required for sparsehash
-{
-    std::hash<std::string> hashFunction;
-    return hashFunction ( strString );
-}
-#elif defined(__GNUC__) && (__GNUC__ >= 3)
-namespace __gnu_cxx
-{
-    template<>
-    struct hash < SString >
-    {
-        size_t operator () ( const SString& strString ) const
-        {
-            return __stl_hash_string ( strString );
-        }
-    };
-}
-#endif
 
 #endif  // WITH_ALLOC_TRACKING
