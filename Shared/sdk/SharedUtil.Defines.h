@@ -97,14 +97,6 @@
     #define wcsicmp wcscasecmp
 #endif
 
-#ifdef _MSC_VER
-    #define PRId64  "I64d"
-    #define PRIx64  "I64x"
-#else
-    #define PRId64  "lld"
-    #define PRIx64  "llx"
-#endif
-
 //
 // Macro for counting the number of elements in a static array
 //
@@ -153,7 +145,7 @@
 #define LOCAL_FUNCTION_START    struct local {
 #define LOCAL_FUNCTION_END      };
 #define LOCAL_FUNCTION          local
-
+/*
 // Inline callback definition for std::sort
 #define sort_inline(a,b,c) \
         { \
@@ -171,7 +163,7 @@
             LOCAL_FUNCTION_END \
             a.sort ( LOCAL_FUNCTION::SortPredicate ); \
         }
-
+        */
 // printf/wprintf helpers
 //
 // http://www.firstobject.com/wchar_t-string-on-linux-osx-windows.htm

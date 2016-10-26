@@ -338,7 +338,7 @@ void SharedUtil::SetPostUpdateConnect( const SString& strHost )
 {
     CArgMap argMap;
     argMap.Set( "host", strHost );
-    argMap.Set( "time", SString( "%" PRId64, (int64)time( NULL ) ) );
+    argMap.Set( "time", std::to_string( (int64_t)time( nullptr ) ) );
     SetRegistryValue( "", "PostUpdateConnect", argMap.ToString() );
 }
 
