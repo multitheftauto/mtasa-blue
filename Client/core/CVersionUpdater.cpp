@@ -3190,12 +3190,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     g_pGraphics->GetRenderItemManager ()->GetDxStatus ( dxStatus );
     CGameSettings* gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
     SString strVideoCard = SStringX ( g_pDeviceState->AdapterState.Name ).Left ( 30 );
-    {
-        LOCAL_FUNCTION_START
-            static bool IsNotAlnum ( int c ) { return !isalnum(c); }
-        LOCAL_FUNCTION_END
-        std::replace_if( strVideoCard.begin(), strVideoCard.end(), LOCAL_FUNCTION::IsNotAlnum, '_' ); 
-    }
+    std::replace_if(strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
     SString strSystemStats ( "1_%d_%d_%d_%d_%d"
                              "_%d%d%d%d"
                              "_%s"

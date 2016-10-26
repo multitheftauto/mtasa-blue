@@ -797,18 +797,15 @@ SString SharedUtil::MakeUniquePath ( const SString& strInPathFilename )
 // Conform a path string for sorting
 SString SharedUtil::ConformPathForSorting ( const SString& strPathFilename )
 {
-    LOCAL_FUNCTION_START
-        static int mytolower( int c )
-        {
-            // Ignores locale and always does this:
-            if ( c >= 'A' && c <= 'Z' )
-                c = c - 'A' + 'a';
-            return c;
-        }
-    LOCAL_FUNCTION_END
-
     SString strResult = strPathFilename;
-    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), LOCAL_FUNCTION::mytolower );
+    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), 
+        [](int c)
+    {
+        // Ignores locale and always does this:
+        if (c >= 'A' && c <= 'Z')
+            c = c - 'A' + 'a';
+        return c;
+    });
     return strResult;
 }
 

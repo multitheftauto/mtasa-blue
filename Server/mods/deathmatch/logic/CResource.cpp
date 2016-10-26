@@ -1037,7 +1037,10 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_StartedResources.push_back ( this );
 
         // Sort by priority, for start grouping on the client
-        sort_list_inline ( m_StartedResources, ( CResource* a, CResource* b ) { return a->m_iDownloadPriorityGroup > b->m_iDownloadPriorityGroup; } );
+        m_StartedResources.sort([](CResource* a, CResource* b)
+        {
+            return a->m_iDownloadPriorityGroup > b->m_iDownloadPriorityGroup;
+        });
     }
     return m_bActive;
 }

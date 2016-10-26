@@ -156,7 +156,11 @@ void CMaterialLine3DBatcher::Flush ( void )
 
         // Sort index list by distance
         ms_pLines = &m_LineList [ 0 ];
-        sort_inline ( indexList.begin (), indexList.end (), ( const uint a, const uint b ) { return ms_pLines [ a ].fDistSq > ms_pLines [ b ].fDistSq; } );
+        std::sort ( indexList.begin (), indexList.end (), 
+            [](const uint a, const uint b)
+        {
+            return ms_pLines[a].fDistSq > ms_pLines[b].fDistSq;
+        });
 
         pIndices = &indexList [ 0 ];
 

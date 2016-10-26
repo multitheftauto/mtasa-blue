@@ -1121,7 +1121,7 @@ void CMainMenu::WantsToDisconnectCallBack( void* pData, uint uiButton )
 
     if ( uiButton == 1 )
     {
-        uchar menuType = (uchar)pData;
+        int menuType = (int)pData;
         switch( menuType )
         {
             case MENU_ITEM_HOST_GAME:       OnHostGameButtonClick ();    break;

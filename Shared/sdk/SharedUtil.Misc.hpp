@@ -1650,9 +1650,8 @@ namespace SharedUtil
 #endif
         if ( dwProcessorNumber == (DWORD)-1 )
         {
-            LOCAL_FUNCTION_START
-                static DWORD GetCurrentProcessorNumberXP(void)
-                {
+            auto GetCurrentProcessorNumberXP = []() -> int
+            {
 #ifdef WIN32
     #ifdef WIN_x64
                     return 0;
@@ -1667,9 +1666,9 @@ namespace SharedUtil
                     // This should work on Linux
                     return sched_getcpu();
 #endif
-                }
-            LOCAL_FUNCTION_END
-            dwProcessorNumber = LOCAL_FUNCTION::GetCurrentProcessorNumberXP();
+            };
+            
+            dwProcessorNumber = GetCurrentProcessorNumberXP();
         }
         return dwProcessorNumber;
     }

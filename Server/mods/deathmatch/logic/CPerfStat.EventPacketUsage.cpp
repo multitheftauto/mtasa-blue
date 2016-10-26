@@ -204,7 +204,12 @@ void CPerfStatEventPacketUsageImpl::MaybeRecordStats ( void )
                 iter->second.strName = iter->first;
                 m_EventUsageSortedList.push_back( iter->second );
             }
-            sort_inline ( m_EventUsageSortedList.begin (), m_EventUsageSortedList.end (), ( const SEventUsage& a, const SEventUsage& b ) { return a.iTotal > b.iTotal; } );
+
+            std::sort ( m_EventUsageSortedList.begin (), m_EventUsageSortedList.end (), 
+                [](const SEventUsage& a, const SEventUsage& b)
+            {
+                return a.iTotal > b.iTotal;
+            });
 
             m_EventUsageLiveMap.clear();
         }

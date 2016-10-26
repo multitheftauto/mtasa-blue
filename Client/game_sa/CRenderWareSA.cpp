@@ -294,15 +294,13 @@ RpClump * CRenderWareSA::ReadDFF ( const SString& strFilename, const CBuffer& fi
 //
 void CRenderWareSA::GetClumpAtomicList ( RpClump* pClump, std::vector < RpAtomic* >& outAtomicList )
 {
-    LOCAL_FUNCTION_START
-        static RpAtomic* GetClumpAtomicListCB ( RpAtomic* pAtomic, std::vector < RpAtomic* >* pData )
-        {
-            pData->push_back ( pAtomic );
-            return pAtomic;
-        }
-    LOCAL_FUNCTION_END
+    auto GetClumpAtomicListCB = [](RpAtomic* pAtomic, std::vector < RpAtomic* >* pData)
+    {
+        pData->push_back(pAtomic);
+        return pAtomic;
+    };
 
-    RpClumpForAllAtomics ( pClump, LOCAL_FUNCTION::GetClumpAtomicListCB, &outAtomicList );
+    RpClumpForAllAtomics ( pClump, (void*)&GetClumpAtomicListCB, &outAtomicList );
 }
 
 
