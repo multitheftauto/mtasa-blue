@@ -19,7 +19,7 @@
 extern CGame * g_pGame;
 
 CHTTPD::CHTTPD ( void )
-    : m_BruteForceProtect( 4, 30000, 60000 * 5 )     // Max of 4 attempts per 30 seconds, then 5 minute ignore
+    : m_BruteForceProtect( 4, 30000, 60000 * 5 )     // std::max of 4 attempts per 30 seconds, then 5 minute ignore
     , m_HttpDosProtect( 0, 0, 0 )
 {
     m_resource = NULL;
@@ -28,7 +28,7 @@ CHTTPD::CHTTPD ( void )
 
     m_pGuestAccount = g_pGame->GetAccountManager ()->AddGuestAccount ( HTTP_GUEST_ACCOUNT_NAME );
 
-    m_HttpDosProtect = CConnectHistory ( g_pGame->GetConfig ()->GetHTTPDosThreshold (), 10000, 60000 * 1 );     // Max of 'n' connections per 10 seconds, then 1 minute ignore
+    m_HttpDosProtect = CConnectHistory ( g_pGame->GetConfig ()->GetHTTPDosThreshold (), 10000, 60000 * 1 );     // std::max of 'n' connections per 10 seconds, then 1 minute ignore
 
     std::vector< SString > excludeList;
     g_pGame->GetConfig ()->GetHTTPDosExclude ().Split( ",", excludeList );

@@ -497,7 +497,7 @@ namespace SharedUtil
     void ConvertHexStringToData( const SString& strString, void* pOutData, uint uiLength )
     {
         memset( pOutData, 0, uiLength );
-        uint uiNibbleAmount = Min < uint > ( uiLength * 2, strString.length() );
+        uint uiNibbleAmount = std::min < uint > ( uiLength * 2, strString.length() );
         uchar* pOutput = (uchar*)pOutData;
         for ( uint i = 0; i < uiNibbleAmount; i++ )
         {
@@ -596,7 +596,7 @@ namespace SharedUtil
             {
                 CMD5Hasher Hasher;
                 Hasher.Init();
-                for( size_t n ; ( n = fread( buf, 1, Min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                for( size_t n ; ( n = fread( buf, 1, std::min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
                     Hasher.Update( buf, n );
                 Hasher.Finalize();
                 return ConvertDataToHexString( Hasher.GetResult(), 16 );
@@ -606,7 +606,7 @@ namespace SharedUtil
                 sha1_context ctx;
                 sha1_init( &ctx );
                 sha1_starts( &ctx );
-                for( size_t n ; ( n = fread( buf, 1, Min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                for( size_t n ; ( n = fread( buf, 1, std::min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
                     sha1_update( &ctx, buf, n );
                 uchar output[20];
                 sha1_finish( &ctx, output );
@@ -617,7 +617,7 @@ namespace SharedUtil
             {
                 sha224_ctx ctx;
                 sha224_init( &ctx );
-                for( size_t n ; ( n = fread( buf, 1, Min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                for( size_t n ; ( n = fread( buf, 1, std::min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
                     sha224_update( &ctx, buf, n );
                 uchar output[ SHA224_DIGEST_SIZE ];
                 sha224_final( &ctx, output );
@@ -627,7 +627,7 @@ namespace SharedUtil
             {
                 sha256_ctx ctx;
                 sha256_init(&ctx);
-                for( size_t n ; ( n = fread( buf, 1, Min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                for( size_t n ; ( n = fread( buf, 1, std::min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
                     sha256_update( &ctx, buf, n );
                 uchar output[ SHA256_DIGEST_SIZE ];
                 sha256_final(&ctx, output);
@@ -637,7 +637,7 @@ namespace SharedUtil
             {
                 sha384_ctx ctx;
                 sha384_init(&ctx);
-                for( size_t n ; ( n = fread( buf, 1, Min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                for( size_t n ; ( n = fread( buf, 1, std::min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
                     sha384_update( &ctx, buf, n );
                 uchar output[ SHA384_DIGEST_SIZE ];
                 sha384_final(&ctx, output);
@@ -647,7 +647,7 @@ namespace SharedUtil
             {
                 sha512_ctx ctx;
                 sha512_init(&ctx);
-                for( size_t n ; ( n = fread( buf, 1, Min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
+                for( size_t n ; ( n = fread( buf, 1, std::min < uint > ( sizeof( buf ), uiMaxSize ), fh ) ) > 0 ; uiMaxSize -= n )
                     sha512_update( &ctx, buf, n );
                 uchar output[ SHA512_DIGEST_SIZE ];
                 sha512_final(&ctx, output);

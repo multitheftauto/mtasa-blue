@@ -113,14 +113,14 @@ bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& bu
     int size = ftell ( fh );
 
     // Set offset
-    iOffset = Min ( iOffset, size );
+    iOffset = std::min ( iOffset, size );
     fseek ( fh, iOffset, SEEK_SET );
     size -= iOffset;
 
     int bytesRead = 0;
     if ( size > 0 && size < 1e9 )   // 1GB limit
     {
-        size = Min ( size, iMaxSize );
+        size = std::min ( size, iMaxSize );
         // Allocate space
         buffer.assign ( size, 0 );
         // Read into buffer

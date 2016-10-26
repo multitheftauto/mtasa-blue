@@ -59,8 +59,8 @@ void CClientColCircle::DebugRender ( const CVector& vecPosition, float fDrawRadi
     int iSkipEndSlices = 4;
 
     // Calc required detail level
-    uint uiNumPoints = Max ( 6, Round ( sqrt ( m_fRadius ) * 2.0f ) );
-    uint uiNumSlices = Max ( 2 + iSkipEndSlices * 2, Round ( sqrt ( fHeight ) * 2.0f ) );
+    uint uiNumPoints = std::max ( 6, Round ( sqrt ( m_fRadius ) * 2.0f ) );
+    uint uiNumSlices = std::max ( 2 + iSkipEndSlices * 2, Round ( sqrt ( fHeight ) * 2.0f ) );
 
     // Get the slice outline
     std::vector < CVector > vertexList;

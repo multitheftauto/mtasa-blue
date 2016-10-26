@@ -2046,14 +2046,14 @@ void CCore::CalculateStreamingMemoryRange ( void )
     fMaxAmount += fMaxAmount * fSizeScale;
 
     // Apply cap dependant on video memory
-    fMaxAmount = Min ( fMaxAmount, iVideoMemoryMB * 2.f );
-    fMinAmount = Min ( fMinAmount, iVideoMemoryMB * 1.f );
+    fMaxAmount = std::min ( fMaxAmount, iVideoMemoryMB * 2.f );
+    fMinAmount = std::min ( fMinAmount, iVideoMemoryMB * 1.f );
 
     // Apply 96MB lower limit
-    fMaxAmount = Max ( fMaxAmount, 96.f );
+    fMaxAmount = std::max ( fMaxAmount, 96.f );
 
     // Apply gap limit
-    fMinAmount = fMaxAmount - Max ( fMaxAmount - fMinAmount, 32.f );
+    fMinAmount = fMaxAmount - std::max ( fMaxAmount - fMinAmount, 32.f );
 
     m_fMinStreamingMemory = fMinAmount;
     m_fMaxStreamingMemory = fMaxAmount;

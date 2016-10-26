@@ -1377,7 +1377,7 @@ bool SharedUtil::IsLuaObfuscatedScript( const void* pData, uint uiLength )
 bool SharedUtil::IsValidVersionString ( const SString& strVersion )
 {
     const SString strCheck = "0.0.0-0.00000.0.000";
-    uint uiLength = Min ( strCheck.length (), strVersion.length () );
+    uint uiLength = std::min ( strCheck.length (), strVersion.length () );
     for ( unsigned int i = 0 ; i < uiLength ; i++ )
     {
         uchar c = strVersion[i];
@@ -1907,5 +1907,5 @@ MTAEXPORT void GetLibMtaVersion( char* pBuffer, uint uiMaxSize )
                             ,0
                             );
     uint uiLengthInclTerm = strVersion.length() + 1;
-    STRNCPY( pBuffer, *strVersion, Max( uiLengthInclTerm, uiMaxSize ) );
+    STRNCPY( pBuffer, *strVersion, std::max( uiLengthInclTerm, uiMaxSize ) );
 }

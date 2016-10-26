@@ -42,7 +42,7 @@ CSphere CClientColRectangle::GetWorldBoundingSphere ( void )
     sphere.vecPosition.fX = m_vecPosition.fX + m_vecSize.fX * 0.5f;
     sphere.vecPosition.fY = m_vecPosition.fY + m_vecSize.fY * 0.5f;
     sphere.vecPosition.fZ = SPATIAL_2D_Z;
-    sphere.fRadius        = Max ( m_vecSize.fX, m_vecSize.fY ) * 0.5f;
+    sphere.fRadius        = std::max ( m_vecSize.fX, m_vecSize.fY ) * 0.5f;
     return sphere;
 }
 
@@ -57,16 +57,16 @@ void CClientColRectangle::DebugRender ( const CVector& vecPosition, float fDrawR
     CVector vecSize ( m_vecSize.fX, m_vecSize.fY, fDrawRadius * 2.f );
 
     SColorARGB color ( 128, 255, 0, 255 );
-    float fLineWidth = 4.f + pow ( Max ( m_vecSize.fX, m_vecSize.fY ) * 0.5f, 0.5f );
+    float fLineWidth = 4.f + pow ( std::max ( m_vecSize.fX, m_vecSize.fY ) * 0.5f, 0.5f );
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
 
     // Don't draw a few end slices to show it goes on for ever
     int iSkipEndSlicesZ = 4;
 
     // Calc required detail level
-    uint uiNumSlicesX = Max ( 2, Round ( sqrt ( vecSize.fX ) * 1.5f ) );
-    uint uiNumSlicesY = Max ( 2, Round ( sqrt ( vecSize.fY ) * 1.5f ) );
-    uint uiNumSlicesZ = Max ( 2 + iSkipEndSlicesZ * 2, Round ( sqrt ( vecSize.fZ ) * 2.0f ) );
+    uint uiNumSlicesX = std::max ( 2, Round ( sqrt ( vecSize.fX ) * 1.5f ) );
+    uint uiNumSlicesY = std::max ( 2, Round ( sqrt ( vecSize.fY ) * 1.5f ) );
+    uint uiNumSlicesZ = std::max ( 2 + iSkipEndSlicesZ * 2, Round ( sqrt ( vecSize.fZ ) * 2.0f ) );
 
     // Draw Slices Z
     {

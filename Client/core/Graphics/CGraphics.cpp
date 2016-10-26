@@ -413,7 +413,7 @@ void CGraphics::EndDrawBatch ( void )
 {
     if ( --m_iDrawBatchRefCount == 0 )
         CheckModes ( EDrawMode::NONE, EBlendMode::BLEND );
-    m_iDrawBatchRefCount = Max ( 0, m_iDrawBatchRefCount );
+    m_iDrawBatchRefCount = std::max ( 0, m_iDrawBatchRefCount );
 }
 
 

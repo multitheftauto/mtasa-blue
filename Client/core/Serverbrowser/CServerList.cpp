@@ -69,9 +69,9 @@ void CServerList::Pulse ( void )
     m_llLastTickCount = Clamp ( llTickCount - 1000, m_llLastTickCount, llTickCount );
 
     // Calc number of queries this pulse
-    int iTicksPerQuery = 1000 / Max ( 1, iQueriesPerSecond );
+    int iTicksPerQuery = 1000 / std::max ( 1, iQueriesPerSecond );
     int iDeltaTicks = llTickCount - m_llLastTickCount;
-    int iNumQueries = iDeltaTicks / Max ( 1, iTicksPerQuery );
+    int iNumQueries = iDeltaTicks / std::max ( 1, iTicksPerQuery );
     iNumQueries = Clamp ( 0, iNumQueries, SERVER_LIST_QUERIES_PER_PULSE );
     int iNumTicksUsed = iNumQueries * iTicksPerQuery;
     m_llLastTickCount += iNumTicksUsed;

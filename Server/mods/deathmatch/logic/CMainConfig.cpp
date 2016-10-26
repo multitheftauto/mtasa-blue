@@ -966,7 +966,7 @@ unsigned int CMainConfig::GetHardMaxPlayers ( void )
 
 unsigned int CMainConfig::GetMaxPlayers ( void )
 {
-    return SharedUtil::Min ( GetHardMaxPlayers(), m_uiSoftMaxPlayers );
+    return std::min( GetHardMaxPlayers(), m_uiSoftMaxPlayers );
 }
 
 unsigned short CMainConfig::GetHTTPPort ( void )
@@ -991,7 +991,7 @@ int CMainConfig::GetPendingWorkToDoSleepTime ( void )
     if ( m_iPendingWorkToDoSleepTime != -1 )
     {
         if ( m_bThreadNetEnabled )
-            return Max ( 0, m_iPendingWorkToDoSleepTime );
+            return std::max ( 0, m_iPendingWorkToDoSleepTime );
         else
             return m_iPendingWorkToDoSleepTime;
     }
@@ -1008,7 +1008,7 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
 {
     if ( m_iNoWorkToDoSleepTime != -1 )
     {
-        return Max ( 10, m_iNoWorkToDoSleepTime );
+        return std::max ( 10, m_iNoWorkToDoSleepTime );
     }
 
     // -1 means auto

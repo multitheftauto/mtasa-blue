@@ -501,7 +501,7 @@ void CServerImpl::HandlePulseSleep( void )
     CTickCount sleepLimit = CTickCount::Now() + CTickCount( (long long)iSleepIdleMs );
 
     // Initial sleep period
-    int iInitialMs = Min( iSleepIdleMs, iSleepBusyMs );
+    int iInitialMs = std::min( iSleepIdleMs, iSleepBusyMs );
     Sleep( Clamp ( 1, iInitialMs, 50 ) );
 
     // Remaining idle sleep period

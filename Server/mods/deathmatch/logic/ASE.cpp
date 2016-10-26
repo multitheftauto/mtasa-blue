@@ -24,7 +24,7 @@ extern "C"
 ASE* ASE::_instance = NULL;
 
 ASE::ASE ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList/*, bool bLan*/ )
-    : m_QueryDosProtect( 5, 6000, 7000 )        // Max of 5 queries per 6 seconds, then 7 second ignore
+    : m_QueryDosProtect( 5, 6000, 7000 )        // std::max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
     m_tStartTime = time( NULL );
@@ -386,9 +386,9 @@ std::string ASE::QueryXfireLight ( void )
     // passworded
     reply << ( unsigned char ) ( ( m_pMainConfig->HasPassword () ) ? 1 : 0 );
     // players count
-    reply << ( unsigned char ) Min ( iJoinedPlayers, 255 );
+    reply << ( unsigned char ) std::min ( iJoinedPlayers, 255 );
     // players max
-    reply << ( unsigned char ) Min ( iMaxPlayers, 255 );
+    reply << ( unsigned char ) std::min( iMaxPlayers, 255 );
 
     return reply.str();
 }
@@ -469,9 +469,9 @@ std::string ASE::QueryLight ( void )
     // serial verification?
     reply << ( unsigned char ) ( ( m_pMainConfig->GetSerialVerificationEnabled() ) ? 1 : 0 );
     // players count
-    reply << ( unsigned char ) Min ( iJoinedPlayers, 255 );
+    reply << ( unsigned char )std::min( iJoinedPlayers, 255 );
     // players max
-    reply << ( unsigned char ) Min ( iMaxPlayers, 255 );
+    reply << ( unsigned char )std::min( iMaxPlayers, 255 );
 
     // players
     CPlayer* pPlayer = NULL;

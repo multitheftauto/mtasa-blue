@@ -749,9 +749,9 @@ void CJoystickManager::ReadCurrentState ( void )
                 float DeadZone = m_DevInfo.iDeadZone * (1/100.f);
 
                 if ( fResult >= 0.f  )
-                    fResult = Max ( 0.f, fResult - DeadZone );
+                    fResult = std::max ( 0.f, fResult - DeadZone );
                 else
-                    fResult = Min ( 0.f, fResult + DeadZone );
+                    fResult = std::min ( 0.f, fResult + DeadZone );
 
                 fResult = fResult * ( 1 / ( 1 - DeadZone ) );
 
@@ -1055,9 +1055,9 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
         float value = m_JoystickState.rgfAxis[ line.SourceAxisIndex ];
 
         if ( line.SourceAxisDir == eDirPos )
-            value = Max ( 0.f, value );
+            value = std::max ( 0.f, value );
         else
-            value = -Min ( 0.f, value );
+            value = -std::min ( 0.f, value );
 
         if ( line.OutputAxisDir == eDirNeg )
             value = -value;

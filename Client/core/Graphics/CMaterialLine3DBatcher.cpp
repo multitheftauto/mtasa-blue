@@ -141,7 +141,7 @@ void CMaterialLine3DBatcher::Flush ( void )
             if ( fRadiusSq < fSmallLineToleranceSq )
                 continue;
 
-            float fSphereDist = Max ( 0.f, ( item.vecAvgPosition - vecCameraPos ).Length () - sqrt ( fRadiusSq ) );
+            float fSphereDist = std::max ( 0.f, ( item.vecAvgPosition - vecCameraPos ).Length () - sqrt ( fRadiusSq ) );
             float fSphereDistSq = fSphereDist * fSphereDist;
             if ( fSphereDistSq > fMaxDrawDistanceSq )
                 continue;

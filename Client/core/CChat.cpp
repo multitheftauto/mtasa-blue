@@ -436,8 +436,8 @@ void CChat::UpdateSmoothScroll ( float* pfPixelScroll, int *piLineScroll )
 
 
     // Calc smooth scroll deceleration
-    float fFixedChange = ( m_fSmoothScroll < 0 ? -1 : 1 ) * -Min ( fDeltaSeconds / 0.2f, 1.0f );
-    float fLerpChange = m_fSmoothScroll * ( 1 - Min ( fDeltaSeconds / 0.3f, 1.0f ) ) - m_fSmoothScroll;
+    float fFixedChange = ( m_fSmoothScroll < 0 ? -1 : 1 ) * -std::min ( fDeltaSeconds / 0.2f, 1.0f );
+    float fLerpChange = m_fSmoothScroll * ( 1 - std::min ( fDeltaSeconds / 0.3f, 1.0f ) ) - m_fSmoothScroll;
     float fChange = fLerpChange * 0.7f + fFixedChange * 0.4f;
     fChange = Clamp ( -fabsf ( m_fSmoothScroll ), fChange, fabsf ( m_fSmoothScroll ) );
 
@@ -465,7 +465,7 @@ void CChat::UpdateSmoothScroll ( float* pfPixelScroll, int *piLineScroll )
     if ( m_uiScrollOffset != 0 )
         m_iScrollingBack = 10;
     else
-        m_iScrollingBack = Max ( 0, m_iScrollingBack - 1 );
+        m_iScrollingBack = std::max ( 0, m_iScrollingBack - 1 );
 
     //
     // Also update CssStyle override alpha
@@ -758,7 +758,7 @@ void CChat::SetChatFont ( eChatFont Font )
     CGUIFont* pFont = g_pCore->GetGUI ()->GetDefaultFont ();
     ID3DXFont* pDXFont = g_pCore->GetGraphics ()->GetFont ();
     float fUsingDxFontScale = 1;
-    float fReqestedDxFontScale = Max( m_vecScale.fX, m_vecScale.fY );
+    float fReqestedDxFontScale = std::max( m_vecScale.fX, m_vecScale.fY );
     switch ( Font )
     {
         case ChatFonts::CHAT_FONT_DEFAULT:
@@ -820,7 +820,7 @@ void CChat::UpdateGUI ( void )
     );
 
     // Make sure there is enough room for all the lines
-    uint uiMaxNumLines = g_pCore->GetGraphics ()->GetViewportHeight () / Max ( 1.f, CChat::GetFontHeight ( m_vecScale.fY ) ) - 3;
+    uint uiMaxNumLines = g_pCore->GetGraphics ()->GetViewportHeight () / std::max ( 1.f, CChat::GetFontHeight ( m_vecScale.fY ) ) - 3;
     if ( m_uiNumLines > uiMaxNumLines )
         SetNumLines ( uiMaxNumLines );
 
@@ -1197,7 +1197,7 @@ float CChatLineSection::GetWidth ()
 {
     if ( m_fCachedWidth < 0.0f || m_strText.size () != m_uiCachedLength )
     {
-        m_fCachedWidth = CChat::GetTextExtent ( m_strText.c_str (), g_pChat->m_vecScale.fX ) / Max ( 0.01f, g_pChat->m_vecScale.fX );
+        m_fCachedWidth = CChat::GetTextExtent ( m_strText.c_str (), g_pChat->m_vecScale.fX ) / std::max ( 0.01f, g_pChat->m_vecScale.fX );
         m_uiCachedLength = m_strText.size ();
     }
     return m_fCachedWidth * g_pChat->m_vecScale.fX;

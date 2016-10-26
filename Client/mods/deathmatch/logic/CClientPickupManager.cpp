@@ -118,7 +118,7 @@ bool CClientPickupManager::IsValidWeaponID ( unsigned short usWeaponID )
 
 bool CClientPickupManager::IsPickupLimitReached ( void )
 {
-    // Max 600 pickups
+    // std::max 600 pickups
     return ( m_uiPickupCount >= 64 );
 }
 

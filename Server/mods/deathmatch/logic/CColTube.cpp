@@ -52,6 +52,6 @@ CSphere CColTube::GetWorldBoundingSphere ( void )
     sphere.vecPosition.fX = m_vecPosition.fX;
     sphere.vecPosition.fY = m_vecPosition.fY;
     sphere.vecPosition.fZ = m_vecPosition.fZ + m_fHeight * 0.5f;
-    sphere.fRadius = Max ( m_fRadius, m_fHeight * 0.5f );
+    sphere.fRadius = std::max ( m_fRadius, m_fHeight * 0.5f );
     return sphere;
 }

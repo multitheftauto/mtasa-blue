@@ -869,7 +869,7 @@ void CMapManager::DoVehicleRespawning ( void )
         {
             // Check is far enough away from respawn point (Ignore first 20 units on z)
             CVector vecDif = pVehicle->GetRespawnPosition ( ) - pVehicle->GetPosition ( );
-            vecDif.fZ = Max ( 0.f, fabsf ( vecDif.fZ ) - 20.f );
+            vecDif.fZ = std::max ( 0.f, fabsf ( vecDif.fZ ) - 20.f );
             if ( vecDif.LengthSquared ( ) > 2 * 2 )
                 bRespawn = true;
             pVehicle->StopIdleTimer ( );

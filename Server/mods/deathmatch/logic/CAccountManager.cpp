@@ -16,7 +16,7 @@
 #include "StdInc.h"
 
 CAccountManager::CAccountManager ( const SString& strDbPathFilename )
-    : m_AccountProtect( 6, 30000, 60000 * 1 )     // Max of 6 attempts per 30 seconds, then 1 minute ignore
+    : m_AccountProtect( 6, 30000, 60000 * 1 )     // std::max of 6 attempts per 30 seconds, then 1 minute ignore
 {
     m_llLastTimeSaved = GetTickCount64_ ();
     m_bChangedSinceSaved = false;
@@ -184,7 +184,7 @@ bool CAccountManager::Load( void )
 
         if ( bChanged )
             pAccount->SetChanged ( bChanged );
-        m_iAccounts = Max ( m_iAccounts, iUserID );
+        m_iAccounts = std::max ( m_iAccounts, iUserID );
 
         // Feedback for the user
         if ( activityTimer.Get() > 5000 )

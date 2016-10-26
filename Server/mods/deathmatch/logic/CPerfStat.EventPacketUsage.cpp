@@ -195,7 +195,7 @@ void CPerfStatEventPacketUsageImpl::MaybeRecordStats ( void )
         long long llTime = GetTickCount64_ ();
         if ( llTime >= m_llNextRecordTime )
         {
-            m_llNextRecordTime = Max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
+            m_llNextRecordTime = std::max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
 
             // Copy into a list and sort
             m_EventUsageSortedList.clear();
