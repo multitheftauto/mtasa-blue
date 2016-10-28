@@ -83,13 +83,6 @@ extern "C" bool g_bNoTopBar;
     #include <sys/time.h>
     #include <sys/times.h>
     
-    // Non-standard hash include
-    #if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))
-        #include <hash_fun.h>
-    #else
-        #include <ext/hash_fun.h>
-    #endif
-
     #define MAX_PATH 255
 
     #ifndef stricmp
@@ -109,17 +102,7 @@ extern "C" bool g_bNoTopBar;
     // Itoa replacement function
     char* itoa ( int value, char* result, int base );
 
-    // Hash function
-    namespace __gnu_cxx
-    {
-        template<> struct hash < std::string >
-        {
-            size_t operator()( const std::string& str ) const
-            {
-                return hash< const char* >()( str.c_str() );
-            }   
-        };
-    }
+    
 #endif
 
 // This function should be used instead of mkdir to preserve multiplatform

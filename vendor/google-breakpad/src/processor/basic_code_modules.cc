@@ -46,8 +46,7 @@
 namespace google_breakpad {
 
 BasicCodeModules::BasicCodeModules(const CodeModules *that)
-    : main_address_(0),
-      map_(new RangeMap<uint64_t, linked_ptr<const CodeModule> >()) {
+    : main_address_(0), map_() {
   BPLOG_IF(ERROR, !that) << "BasicCodeModules::BasicCodeModules requires "
                             "|that|";
   assert(that);
@@ -66,30 +65,27 @@ BasicCodeModules::BasicCodeModules(const CodeModules *that)
     // GetModuleAtSequence.
     linked_ptr<const CodeModule> module(
         that->GetModuleAtIndex(module_sequence)->Copy());
-    if (!map_->StoreRange(module->base_address(), module->size(), module)) {
+    if (!map_.StoreRange(module->base_address(), module->size(), module)) {
       BPLOG(ERROR) << "Module " << module->code_file() <<
                       " could not be stored";
     }
   }
 }
 
-BasicCodeModules::BasicCodeModules()
-  : main_address_(0),
-    map_(new RangeMap<uint64_t, linked_ptr<const CodeModule> >()) {
-}
+BasicCodeModules::BasicCodeModules() : main_address_(0), map_() { }
 
 BasicCodeModules::~BasicCodeModules() {
-  delete map_;
 }
 
 unsigned int BasicCodeModules::module_count() const {
-  return map_->GetCount();
+  return map_.GetCount();
 }
 
 const CodeModule* BasicCodeModules::GetModuleForAddress(
     uint64_t address) const {
   linked_ptr<const CodeModule> module;
-  if (!map_->RetrieveRange(address, &module, NULL, NULL)) {
+  if (!map_.RetrieveRange(address, &module, NULL /* base */, NULL /* delta */,
+                          NULL /* size */)) {
     BPLOG(INFO) << "No module at " << HexString(address);
     return NULL;
   }
@@ -104,7 +100,8 @@ const CodeModule* BasicCodeModules::GetMainModule() const {
 const CodeModule* BasicCodeModules::GetModuleAtSequence(
     unsigned int sequence) const {
   linked_ptr<const CodeModule> module;
-  if (!map_->RetrieveRangeAtIndex(sequence, &module, NULL, NULL)) {
+  if (!map_.RetrieveRangeAtIndex(sequence, &module, NULL /* base */,
+                                 NULL /* delta */, NULL /* size */)) {
     BPLOG(ERROR) << "RetrieveRangeAtIndex failed for sequence " << sequence;
     return NULL;
   }

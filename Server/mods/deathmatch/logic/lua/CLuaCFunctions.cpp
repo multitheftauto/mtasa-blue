@@ -78,7 +78,7 @@ void CLuaCFunctions::RemoveFunction ( const SString& strName )
 CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 {
     // Quick cull of unknown pointer range
-    if ( f < ms_pFunctionPtrLow || f > ms_pFunctionPtrHigh )
+    if ( reinterpret_cast<void*>(f) < ms_pFunctionPtrLow || reinterpret_cast<void*>(f) > ms_pFunctionPtrHigh )
         return NULL;
 
     CFastHashMap < lua_CFunction, CLuaCFunction* >::iterator it;
@@ -108,7 +108,7 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 bool CLuaCFunctions::IsNotFunction ( lua_CFunction f )
 {
     // Return true if unknown pointer range
-    return ( f < ms_pFunctionPtrLow || f > ms_pFunctionPtrHigh );
+    return ( reinterpret_cast<void*>(f) < ms_pFunctionPtrLow || reinterpret_cast<void*>(f) > ms_pFunctionPtrHigh );
 }
 
 

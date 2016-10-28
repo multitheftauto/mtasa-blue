@@ -4,11 +4,11 @@
 /* Namespace for Google classes */
 #define GOOGLE_NAMESPACE ::google
 
-/* the location of <hash_fun.h>/<stl_hash_fun.h> */
+/* the location of the header defining hash functions */
 #define HASH_FUN_H <unordered_map>
 
-/* the location of <hash_map> */
-#define HASH_MAP_H <ext/unordered_map>
+/* the location of <unordered_map> or <hash_map> */
+#define HASH_MAP_H <unordered_map>
 
 /* the namespace of hash_map/hash_set */
 #define HASH_NAMESPACE std

@@ -852,7 +852,7 @@ void CServerImpl::HandleInput ( void )
             WCHAR wUNICODE[2] = { iStdIn, 0 };
             Printf ( "%s", UTF16ToMbUTF8(wUNICODE).c_str() );
 #else
-            wchar_t wUNICODE[2] = { iStdIn, 0 };
+            wchar_t wUNICODE[2] = { (wchar_t)iStdIn, 0 };
             if ( !g_bSilent && !g_bNoCurses )
                 wprintw ( m_wndInput, "%s", UTF16ToMbUTF8(wUNICODE).c_str() );
 #endif
