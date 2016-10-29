@@ -296,7 +296,7 @@ Function .onInit
             StrCpy $ShowLastUsed "1"
         ${EndIf}
     ${EndIf}
-    
+
     ; Try to find previously saved GTA:SA install path
     ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
     ${If} $2 == "" 
@@ -1259,11 +1259,13 @@ FunctionEnd
 ;----------------------------------------
 ; Out $0 = result   ("1" = yes, "0" = no)
 Function ShouldInstallVC14Redistributable
-    IfFileExists "$WINDIR\System32\api-ms-win-crt-runtime-*.dll" FileFound 0
-        ${LogText} "api-ms-win-crt-runtime-*.dll not found"
-        StrCpy $0 "1"
-        Return  
-    FileFound:
+    ${If} ${AtMostWin7}
+        IfFileExists "$WINDIR\System32\api-ms-win-crt-runtime-*.dll" FileFound 0
+            ${LogText} "api-ms-win-crt-runtime-*.dll not found"
+            StrCpy $0 "1"
+            Return  
+        FileFound:
+    ${EndIf}
     Call IsVC14RedistributableInstalled
     IntOp $0 $0 ^ 1
 FunctionEnd
