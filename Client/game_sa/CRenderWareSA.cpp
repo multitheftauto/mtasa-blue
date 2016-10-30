@@ -294,7 +294,7 @@ RpClump * CRenderWareSA::ReadDFF ( const SString& strFilename, const CBuffer& fi
 //
 void CRenderWareSA::GetClumpAtomicList ( RpClump* pClump, std::vector < RpAtomic* >& outAtomicList )
 {
-    auto GetClumpAtomicListCB = [](RpAtomic* pAtomic, std::vector < RpAtomic* >* pData)
+    RpAtomic*(__cdecl* GetClumpAtomicListCB)(RpAtomic*, std::vector<RpAtomic*>*) = [](RpAtomic* pAtomic, std::vector < RpAtomic* >* pData)
     {
         pData->push_back(pAtomic);
         return pAtomic;
