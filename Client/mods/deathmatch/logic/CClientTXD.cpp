@@ -51,7 +51,7 @@ bool CClientTXD::LoadTXD ( const SString& strFile, bool bFilteringEnabled, bool 
     else
     {
         m_FileData = CBuffer( strFile, strFile.length() );
-        if ( !g_pCore->GetNetwork()->CheckFile( "txd", "", m_FileData ) )
+        if ( !g_pCore->GetNetwork()->CheckFile( "txd", "", m_FileData.GetData(), m_FileData.GetSize() ) )
             return false;
 
         return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures( &m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled );
@@ -161,7 +161,7 @@ void CClientTXD::Restream ( unsigned short usModelID )
 bool CClientTXD::GetFilenameToUse( SString& strOutFilename )
 {
     g_pClientGame->GetResourceManager()->ValidateResourceFile( m_strFilename, CBuffer() );
-    if ( !g_pCore->GetNetwork()->CheckFile( "txd", m_strFilename, CBuffer() ) )
+    if ( !g_pCore->GetNetwork()->CheckFile( "txd", m_strFilename ) )
         return false;
 
     // Default: use original data
