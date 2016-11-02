@@ -30,7 +30,10 @@ newaction {
 		-- Copy configs
 		os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.conf", false, true)
 		os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.xml", false, true)
-
+		
+		-- Make sure server/x64 directory exists
+		os.mkdir(BIN_DIR.."/server/x64")
+		
 		if os.get() == "windows" then
 			http.download(NET_PATH_X86_WIN, BIN_DIR.."/server/net.dll")
 			--http.download(NET_PATH_X64_WIN, BIN_DIR.."/server/x64/mods/net.dll")
@@ -41,7 +44,7 @@ newaction {
 			--os.copyfile("/server/x64/net.dll", "/server/x64/net_d.dll")
 		else
 			http.download(NET_PATH_X86_LINUX, BIN_DIR.."/server/net.so")
-			http.download(NET_PATH_X64_LINUX, BIN_DIR.."/server/x64/mods/net.so")
+			http.download(NET_PATH_X64_LINUX, BIN_DIR.."/server/x64/net.so")
 			
 			os.copyfile(BIN_DIR.."/server/net.so", BIN_DIR.."/server/net_d.so")
 			os.copyfile(BIN_DIR.."/server/x64/net.so", BIN_DIR.."/server/x64/net_d.so")
