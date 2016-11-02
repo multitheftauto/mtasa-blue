@@ -28,8 +28,8 @@ newaction {
 		end
 
 		-- Copy configs
-		os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.conf")
-		os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.xml")
+		os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.conf", false, true)
+		os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.xml", false, true)
 
 		if os.get() == "windows" then
 			http.download(NET_PATH_X86_WIN, BIN_DIR.."/server/net.dll")
