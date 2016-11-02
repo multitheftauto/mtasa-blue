@@ -44,22 +44,10 @@
 
 using namespace std;
 
-#ifdef WIN32
-    #ifdef MTA_DEBUG
-        #define LIB_CORE SERVER_BIN_PATH "core_d.dll"
-        #define LIB_NET SERVER_BIN_PATH "net_d.dll"
-    #else
-        #define LIB_CORE SERVER_BIN_PATH "core.dll"
-        #define LIB_NET SERVER_BIN_PATH "net.dll"
-    #endif
-#else
-    #ifdef MTA_DEBUG
-        #define LIB_CORE "./" SERVER_BIN_PATH "core_d.so"
-        #define LIB_NET "./" SERVER_BIN_PATH "net_d.so"
-    #else
-        #define LIB_CORE "./" SERVER_BIN_PATH "core.so"
-        #define LIB_NET "./" SERVER_BIN_PATH "net.so"
-    #endif
+#define LIB_CORE SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
+#define LIB_NET SERVER_BIN_PATH "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
+
+#ifndef WIN32
     #ifdef ANY_x86
         #define LINUX_LIBS_PATH     "x86/linux-libs"
     #else

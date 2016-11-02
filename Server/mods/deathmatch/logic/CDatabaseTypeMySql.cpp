@@ -13,16 +13,7 @@
 #include "CDatabaseType.h"
 #include "CDynamicLibrary.h"
 
-#ifdef WIN32
-    #ifdef MTA_DEBUG
-        #define LIB_DBCONMY "dbconmy_d.dll"
-    #else
-        #define LIB_DBCONMY "dbconmy.dll"
-    #endif
-#else
-    #define LIB_DBCONMY "./dbconmy.so"
-#endif
-
+#define LIB_DBCONMY "dbconmy" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
 
 ///////////////////////////////////////////////////////////////
 //

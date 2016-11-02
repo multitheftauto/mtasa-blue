@@ -22,13 +22,7 @@ extern "C" bool g_bNoTopBar;
     #else
         #define MTA_OS_STRING   "Windows"
     #endif
-
     #define MTA_LIB_EXTENSION   ".dll"
-    #if defined(_DEBUG)
-        #define MTA_LIB_SUFFIX  "_d"
-    #else
-        #define MTA_LIB_SUFFIX
-    #endif
 #elif defined(__linux__)
     #ifdef __x86_64__
         #define MTA_OS_STRING   "GNU/Linux x64"
@@ -36,17 +30,20 @@ extern "C" bool g_bNoTopBar;
         #define MTA_OS_STRING   "GNU/Linux"
     #endif
     #define MTA_LIB_EXTENSION   ".so"
-    #define MTA_LIB_SUFFIX
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #define MTA_OS_STRING       "BSD"
     #define MTA_LIB_EXTENSION   ".so"
-    #define MTA_LIB_SUFFIX
 #elif defined(__APPLE__) && defined(__MACH__)
     #define MTA_OS_STRING       "Mac OS X"
     #define MTA_LIB_EXTENSION   ".so"
-    #define MTA_LIB_SUFFIX
 #else
     #error "Unsupported operating system"
+#endif
+
+#if defined(MTA_DEBUG)
+    #define MTA_LIB_SUFFIX  "_d"
+#else
+    #define MTA_LIB_SUFFIX
 #endif
 
 /** Multi-platform defines **/
