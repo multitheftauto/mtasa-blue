@@ -3251,22 +3251,22 @@ bool CStaticFunctionDefinitions::SetPlayerDebuggerVisible ( CElement* pElement, 
 }
 
 
-bool CStaticFunctionDefinitions::SetPlayerWantedLevel ( CElement* pElement, unsigned int iLevel )
+bool CStaticFunctionDefinitions::SetPlayerWantedLevel ( CElement* pElement, unsigned int uiLevel )
 {
     assert ( pElement );
 
-    // Make sure the health is above 0
-    if ( iLevel >= 0 && iLevel <= 6 )
+    // Make sure the wanted level is no more than 6
+    if ( uiLevel <= 6 )
     {
-        RUN_CHILDREN( SetPlayerWantedLevel ( *iter, iLevel ) )
+        RUN_CHILDREN( SetPlayerWantedLevel ( *iter, uiLevel ) )
 
         if ( IS_PLAYER ( pElement ) )
         {
             CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
-            pPlayer->SetWantedLevel ( iLevel );
+            pPlayer->SetWantedLevel ( uiLevel );
 
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( (unsigned char)iLevel );
+            BitStream.pBitStream->Write ( (unsigned char)uiLevel );
             pPlayer->Send ( CLuaPacket ( SET_WANTED_LEVEL, *BitStream.pBitStream ) );
 
             return true;

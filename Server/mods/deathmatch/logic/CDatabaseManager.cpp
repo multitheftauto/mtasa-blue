@@ -416,7 +416,7 @@ bool CDatabaseManagerImpl::QueryWithCallbackf ( SConnectionHandle hConnection, P
     if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
     {
         SetLastErrorMessage ( "Invalid connection" );
-        return NULL;
+        return false;
     }
 
     // Insert arguments with correct escapement
