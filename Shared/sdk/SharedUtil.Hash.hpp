@@ -404,9 +404,9 @@ namespace SharedUtil
 
     unsigned int HashString ( const char* szString, unsigned int length )
     {
-        register const char* k;             //< pointer to the string data to be hashed
-        register unsigned int a, b, c;      //< temporary variables
-        register unsigned int len;          //< length of the string left
+        const char* k;             //< pointer to the string data to be hashed
+        unsigned int a, b, c;      //< temporary variables
+        unsigned int len;          //< length of the string left
 
         k = szString;
         len = length;
@@ -673,8 +673,8 @@ namespace SharedUtil
     }
 
     void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k) {
-        register unsigned int v0=v[0], v1=v[1], i, sum=0;
-        register unsigned int delta=0x9E3779B9;
+        unsigned int v0=v[0], v1=v[1], i, sum=0;
+        unsigned int delta=0x9E3779B9;
         for(i=0; i<32; i++) {
            v0 += (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (sum + k[sum & 3]);
             sum += delta;
@@ -684,8 +684,8 @@ namespace SharedUtil
     }
      
     void decodeXtea(unsigned int* v, unsigned int* w, unsigned int* k) {
-        register unsigned int v0=v[0], v1=v[1], i, sum=0xC6EF3720;
-        register unsigned int delta=0x9E3779B9;
+        unsigned int v0=v[0], v1=v[1], i, sum=0xC6EF3720;
+        unsigned int delta=0x9E3779B9;
         for(i=0; i<32; i++) {
             v1 -= (((v0 << 4) ^ (v0 >> 5)) + v0) ^ (sum + k[(sum>>11) & 3]);
             sum -= delta;
