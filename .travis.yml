@@ -10,17 +10,23 @@ matrix:
           packages:
             - g++-5
             - zip
-      env: ENV_CXX=g++-5 ENV_CC=gcc-5
+      env: 
+        ENV_CXX=g++-5 
+        ENV_CC=gcc-5 
+        NIGHTLY_UPLOAD=1
     - compiler: clang
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.9
+            - llvm-toolchain-precise-3.8
           packages:
-            - clang-3.9
+            - clang-3.8
             - zip
-      env: ENV_CXX=clang++-3.9 ENV_CC=clang-3.9
+      env: 
+        ENV_CXX=clang++-3.8 
+        ENV_CC=clang-3.8 
+        NIGHTLY_UPLOAD=0
     
 before_script:
   - wget https://github.com/sbx320/premake5-travis/blob/master/premake5?raw=true -O ./premake5 &&
@@ -28,7 +34,7 @@ before_script:
     ./premake5 gmake && 
     cd Build
 
-script: make -j 3 CXX=ENV_CXX CC=ENV_CC config=release_x64
+script: make -j 3 CXX=$ENV_CXX CC=$ENV_CC config=release_x64
 
 # Only upload the gcc build
 after_success:
