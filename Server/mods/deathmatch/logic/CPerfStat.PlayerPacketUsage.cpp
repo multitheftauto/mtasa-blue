@@ -193,7 +193,7 @@ void CPerfStatPlayerPacketUsageImpl::DoPulse ( void )
         UpdatePlayerPacketUsage();
 
         m_LastTickCount = m_LastTickCount + 1000;
-        m_LastTickCount = Max ( m_LastTickCount, llTickCount - 1500 );
+        m_LastTickCount = std::max ( m_LastTickCount, llTickCount - 1500 );
 
         int flags = 0;
         m_SecondCounter++;

@@ -8,7 +8,7 @@ project "Deathmatch"
 	pchsource "StdInc.cpp"
 
 	filter "system:windows"
-		includedirs { "../../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../../vendor/sparsehash/src/windows" }
 	
 	filter {}
 		includedirs { 
@@ -24,7 +24,7 @@ project "Deathmatch"
 			"../../../Shared/mods/deathmatch/logic", 
 			"../../../Shared/animation", 
 			"../../../Shared/publicsdk/include", 
-			"../../../vendor/sparsehash/current/src/",
+			"../../../vendor/sparsehash/src/",
 			"logic", 
 			"utils",
 			"."

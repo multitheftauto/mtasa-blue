@@ -35,7 +35,8 @@ workspace "MTASA"
 	defines { 
 		"_CRT_SECURE_NO_WARNINGS",
 		"_SCL_SECURE_NO_WARNINGS",
-		"_CRT_NONSTDC_NO_DEPRECATE"
+		"_CRT_NONSTDC_NO_DEPRECATE",
+		"NOMINMAX"
 	}
 		
 	-- Helper function for output path 
@@ -52,7 +53,7 @@ workspace "MTASA"
 		targetsuffix "_d"
 	
 	filter "configurations:Release or configurations:Nightly"
-		flags { "Optimize" }
+		optimize "Speed"	-- "On"=MS:/Ox GCC:/O2  "Speed"=MS:/O2 GCC:/O3  "Full"=MS:/Ox GCC:/O3
 	
 	if CI_BUILD then
 		filter {}

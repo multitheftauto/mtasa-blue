@@ -38,7 +38,7 @@ CSphere CClientColTube::GetWorldBoundingSphere ( void )
     sphere.vecPosition.fX = m_vecPosition.fX;
     sphere.vecPosition.fY = m_vecPosition.fY;
     sphere.vecPosition.fZ = m_vecPosition.fZ + m_fHeight * 0.5f;
-    sphere.fRadius = Max ( m_fRadius, m_fHeight * 0.5f );
+    sphere.fRadius = std::max ( m_fRadius, m_fHeight * 0.5f );
     return sphere;
 }
 
@@ -53,8 +53,8 @@ void CClientColTube::DebugRender ( const CVector& vecPosition, float fDrawRadius
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
 
     // Calc required detail level
-    uint uiNumPoints = Max ( 6, Round ( sqrt ( m_fRadius ) * 2.0f ) );
-    uint uiNumSlices = Max ( 2, Round ( sqrt ( m_fHeight ) * 2.0f ) );
+    uint uiNumPoints = std::max ( 6, Round ( sqrt ( m_fRadius ) * 2.0f ) );
+    uint uiNumSlices = std::max ( 2, Round ( sqrt ( m_fHeight ) * 2.0f ) );
 
     // Get the slice outline
     std::vector < CVector > vertexList;

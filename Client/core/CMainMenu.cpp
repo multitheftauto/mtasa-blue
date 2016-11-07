@@ -500,7 +500,7 @@ void CMainMenu::Update ( void )
             float fProgress = ((*it)->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
 		    // Let's work out what the target progress should be by working out the time passed
             // Min of 0.5 progress fixes occasional graphical glitchekal
-		    fProgress = fProgress - Min ( 0.5f, ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA) );
+		    fProgress = fProgress - std::min ( 0.5f, ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA) );
             if ( SetItemHoverProgress ( (*it), fProgress, false ) )
             {
                 std::set<sMenuItem*>::iterator itToErase = it++;
@@ -600,7 +600,7 @@ void CMainMenu::Update ( void )
     {
         // Cope with early finish
         if ( pGame->HasCreditScreenFadedOut () )
-            WaitForMenu = Max ( WaitForMenu, 250 );
+            WaitForMenu = std::max ( WaitForMenu, 250 );
 
         // Fade up
         if ( WaitForMenu >= 250 )
@@ -1116,7 +1116,7 @@ void CMainMenu::WantsToDisconnectCallBack( void* pData, uint uiButton )
 
     if ( uiButton == 1 )
     {
-        uchar menuType = (uchar)pData;
+        int menuType = (int)pData;
         switch( menuType )
         {
             case MENU_ITEM_HOST_GAME:       OnHostGameButtonClick ();    break;

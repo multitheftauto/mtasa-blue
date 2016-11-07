@@ -419,7 +419,7 @@ SString SString::SubStr ( int iPos, int iCount ) const
         iCount += iPos;
         iPos = 0;
     }
-    iCount = Max ( 0, iCount );
+    iCount = std::max ( 0, iCount );
     if ( iPos + iCount > (int)length () )
     {
         iCount = length () - iPos;
@@ -466,8 +466,8 @@ bool SString::BeginsWithI ( const SString& strOther ) const
 SString SString::Join ( const SString& strDelim, const std::vector < SString >& parts, int iFirst, int iCount )
 {
     SString strResult;
-    int iLast = Min < int > ( iFirst + iCount, parts.size () ) - 1;
-    iFirst = Max < int > ( iFirst, 0 );
+    int iLast = std::min < int > ( iFirst + iCount, parts.size () ) - 1;
+    iFirst = std::max < int > (iFirst, 0);
     for ( int i = iFirst ; i <= iLast ; i++ )
     {
         if ( i != iFirst )

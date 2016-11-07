@@ -296,7 +296,7 @@ Function .onInit
             StrCpy $ShowLastUsed "1"
         ${EndIf}
     ${EndIf}
-    
+
     ; Try to find previously saved GTA:SA install path
     ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
     ${If} $2 == "" 
@@ -1143,13 +1143,20 @@ FunctionEnd
 ;====================================================================================
 ; Download and install Microsoft Visual Studio redistributables if required
 ;====================================================================================
+Var DONEUPDATE
 Function UpdateVCRedistributables
-    Call IsVC12RedistributableInstalled
-    ${If} $0 != "1"
+    ; Only check once
+    ${If} $DONEUPDATE == "1"
+        Return
+    ${EndIf}
+    StrCpy $DONEUPDATE "1"
+
+    Call ShouldInstallVC12Redistributable
+    ${If} $0 == "1"
         Call InstallVC12Redistributable
     ${EndIf}
-    Call IsVC14RedistributableInstalled
-    ${If} $0 != "1"
+    Call ShouldInstallVC14Redistributable
+    ${If} $0 == "1"
         Call InstallVC14Redistributable
     ${EndIf}
 FunctionEnd
@@ -1196,6 +1203,13 @@ FunctionEnd
 
 ;----------------------------------------
 ; Out $0 = result   ("1" = yes, "0" = no)
+Function ShouldInstallVC12Redistributable
+    Call IsVC12RedistributableInstalled
+    IntOp $0 $0 ^ 1
+FunctionEnd
+
+;----------------------------------------
+; Out $0 = result   ("1" = yes, "0" = no)
 Function IsVC12RedistributableInstalled
     ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum" "Install"
     ${If} $0 != "1"
@@ -1219,7 +1233,7 @@ Function InstallVC14Redistributable
     ${LogText} "+Function begin - InstallVC14Redistributable"
     DetailPrint "Installing Microsoft Visual Studio 2015 redistributable ..."
     StrCpy $REDISTVC14 "$TEMP\vcredist14_x86.exe"
-    NSISdl::download "http://mirror.multitheftauto.com/mtasa/installer/9875/vc_redist_2015u3.x86.exe" $REDISTVC14
+    NSISdl::download "http://mirror.multitheftauto.com/mtasa/installer/10700/vcredist_2015_x86.exe" $REDISTVC14
     Pop $0
 
     ${If} $0 != "success"
@@ -1230,7 +1244,7 @@ Function InstallVC14Redistributable
     ${Else}
         ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
         ; /quiet = 'This option will suppress all UI and perform an install.'
-        ExecWait '"$REDISTVC14" /quiet'
+        ExecWait '"$REDISTVC14" /repair /passive /norestart'
         Call IsVC14RedistributableInstalled
         ${If} $0 != "1"
             DetailPrint "* Some error occured installing Microsoft Visual Studio 2015 redistributable"
@@ -1242,6 +1256,20 @@ Function InstallVC14Redistributable
     ${EndIf}
 
     ${LogText} "-Function end - InstallVC14Redistributable"
+FunctionEnd
+
+;----------------------------------------
+; Out $0 = result   ("1" = yes, "0" = no)
+Function ShouldInstallVC14Redistributable
+    ${If} ${AtMostWin7}
+        IfFileExists "$WINDIR\System32\api-ms-win-crt-runtime-*.dll" FileFound 0
+            ${LogText} "api-ms-win-crt-runtime-*.dll not found"
+            StrCpy $0 "1"
+            Return  
+        FileFound:
+    ${EndIf}
+    Call IsVC14RedistributableInstalled
+    IntOp $0 $0 ^ 1
 FunctionEnd
 
 ;----------------------------------------

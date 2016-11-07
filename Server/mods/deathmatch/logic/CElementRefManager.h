@@ -8,7 +8,7 @@
 *  DEVELOPERS:
 *
 *****************************************************************************/
-
+#pragma once
 
 #ifdef MTA_DEBUG
     #define ELEMENT_REF_DEBUG( ptr, desc ) \

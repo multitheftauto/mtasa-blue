@@ -26,8 +26,8 @@ CLuaCFunction::CLuaCFunction ( const char* szName, lua_CFunction f, bool bRestri
 
 CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
-    ms_pFunctionPtrLow = Min < void* > ( ms_pFunctionPtrLow, (void*)f );
-    ms_pFunctionPtrHigh = Max < void* > ( ms_pFunctionPtrHigh, (void*)f );
+    ms_pFunctionPtrLow = std::min < void* > ( ms_pFunctionPtrLow, (void*)f );
+    ms_pFunctionPtrHigh = std::max < void* > ( ms_pFunctionPtrHigh, (void*)f );
 
     // See if we already have it added. Eventually just return it instead of adding it twice
     CLuaCFunction* pFunction = GetFunction ( szName, f );

@@ -307,7 +307,7 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
     shared.m_Mutex.Lock ();
 
     // Log to console if job count is creeping up
-    m_uiJobCount10sMin = Min < uint > ( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
+    m_uiJobCount10sMin = std::min < uint > ( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
     if ( m_uiJobCount10sMin > m_uiJobCountWarnThresh )
     {
         m_uiJobCountWarnThresh = m_uiJobCount10sMin * 2;
@@ -389,7 +389,7 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
         }
 
         CElapsedTime timer;
-        shared.m_Mutex.Wait ( Min( uiTimeout, 1000U ) );
+        shared.m_Mutex.Wait (std::min( uiTimeout, 1000U ) );
         uint uiDelta = (uint)timer.Get() + 1;
         uiTotalWaitTime += uiDelta;
 

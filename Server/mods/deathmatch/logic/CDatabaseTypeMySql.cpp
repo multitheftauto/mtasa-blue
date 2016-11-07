@@ -13,16 +13,7 @@
 #include "CDatabaseType.h"
 #include "CDynamicLibrary.h"
 
-#ifdef WIN32
-    #ifdef MTA_DEBUG
-        #define LIB_DBCONMY "dbconmy_d.dll"
-    #else
-        #define LIB_DBCONMY "dbconmy.dll"
-    #endif
-#else
-    #define LIB_DBCONMY "./dbconmy.so"
-#endif
-
+#define LIB_DBCONMY "dbconmy" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
 
 ///////////////////////////////////////////////////////////////
 //
@@ -328,7 +319,7 @@ SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArg
             {
                 double dNumber = pArgument->GetNumber ();
                 if ( dNumber == floor ( dNumber ) )
-                    strParsedQuery += SString ( "%" PRId64, (long long)dNumber );
+                    strParsedQuery += SString ( "%lld", (long long)dNumber );
                 else
                     strParsedQuery += SString ( "%f", dNumber );
             }
@@ -393,7 +384,7 @@ SString InsertQueryArgumentsMySql ( const char* szQuery, va_list vl )
                 case SQLITE_INTEGER64:
                 {
                     long long int llValue = va_arg( vl, long long int );
-                    strParsedQuery += SString( "%" PRId64, llValue );
+                    strParsedQuery += SString( "%lld", llValue );
                 }
                 break;
 

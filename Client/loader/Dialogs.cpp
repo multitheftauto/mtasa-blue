@@ -303,7 +303,7 @@ bool UpdateProgress( int iPos, int iMax, const SString& strMsg )
         if ( strMsg.length () > 0 && strMsg != buffer )
             SetWindowTextW ( hwndText, FromUTF8( strMsg ) );
         HWND hwndBar = GetDlgItem( hwndProgressDialog, IDC_PROGRESS_BAR );
-        PostMessage(hwndBar, PBM_SETPOS, iPos * 100 / Max ( 1, iMax ), 0 );
+        PostMessage(hwndBar, PBM_SETPOS, iPos * 100 / std::max ( 1, iMax ), 0 );
         MSG msg;
         while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
         {

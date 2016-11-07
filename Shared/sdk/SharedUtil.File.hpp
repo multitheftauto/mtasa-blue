@@ -113,14 +113,14 @@ bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& bu
     int size = ftell ( fh );
 
     // Set offset
-    iOffset = Min ( iOffset, size );
+    iOffset = std::min ( iOffset, size );
     fseek ( fh, iOffset, SEEK_SET );
     size -= iOffset;
 
     int bytesRead = 0;
     if ( size > 0 && size < 1e9 )   // 1GB limit
     {
-        size = Min ( size, iMaxSize );
+        size = std::min ( size, iMaxSize );
         // Allocate space
         buffer.assign ( size, 0 );
         // Read into buffer
@@ -797,18 +797,15 @@ SString SharedUtil::MakeUniquePath ( const SString& strInPathFilename )
 // Conform a path string for sorting
 SString SharedUtil::ConformPathForSorting ( const SString& strPathFilename )
 {
-    LOCAL_FUNCTION_START
-        static int mytolower( int c )
-        {
-            // Ignores locale and always does this:
-            if ( c >= 'A' && c <= 'Z' )
-                c = c - 'A' + 'a';
-            return c;
-        }
-    LOCAL_FUNCTION_END
-
     SString strResult = strPathFilename;
-    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), LOCAL_FUNCTION::mytolower );
+    std::transform ( strResult.begin(), strResult.end(), strResult.begin(), 
+        [](int c)
+    {
+        // Ignores locale and always does this:
+        if (c >= 'A' && c <= 'Z')
+            c = c - 'A' + 'a';
+        return c;
+    });
     return strResult;
 }
 

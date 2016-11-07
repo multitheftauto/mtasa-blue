@@ -3,6 +3,10 @@ Operating system: Android
 CPU: arm
      2 CPUs
 
+GPU: OpenGL ES 3.0 V@104.0 AU@  (GIT@Id3510ff6dc)
+     Qualcomm
+     Adreno (TM) 330
+
 Crash reason:  
 Crash address: 0x0
 Process uptime: not available

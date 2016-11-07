@@ -58,7 +58,7 @@ void CClientTextDisplay::Render ( void )
         if ( m_ulFormat & DT_BOTTOM )
             m_ulFormat |= DT_SINGLELINE;
 
-        unsigned int uiShadowOffset = Max ( 1, (int)(m_fScale * m_fGlobalScale) );
+        unsigned int uiShadowOffset = std::max ( 1, (int)(m_fScale * m_fGlobalScale) );
         SColorRGBA rgbaShadowColor ( 0, 0, 0, m_Color.A * m_ucShadowAlpha / 255 );
 
         if ( rgbaShadowColor.A > 0 )

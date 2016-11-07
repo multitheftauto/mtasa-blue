@@ -64,9 +64,9 @@ void CQuestionBox::Show ( void )
     float fEditHeight = 29.0f;
     float fEditSpacer = 10.0f;
 
-    float fMsgWidth = Max ( 400.f, m_pMessage->GetTextExtent () + 50.f );
-    float fMsgHeight = Max < float > ( 3, uiNumLines ) * ( m_pMessage->GetFontHeight () + 1 );
-    float fWinWidth = Max ( fMsgWidth, m_uiActiveButtons * ( 112 + 10.f ) );
+    float fMsgWidth = std::max ( 400.f, m_pMessage->GetTextExtent () + 50.f );
+    float fMsgHeight = std::max < float > ( 3, uiNumLines ) * ( m_pMessage->GetFontHeight () + 1 );
+    float fWinWidth = std::max ( fMsgWidth, m_uiActiveButtons * ( 112 + 10.f ) );
     float fWinHeight = 50 + fMsgHeight + 50 + 30 + ( m_uiActiveEditboxes * ( fEditHeight + 2*fEditSpacer ) ) ;
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
@@ -149,7 +149,7 @@ void CQuestionBox::AppendMessage ( const SString& strMsg )
 
 void CQuestionBox::SetButton ( unsigned int uiButton, const SString& strText )
 {
-    m_uiActiveButtons = Max ( m_uiActiveButtons, uiButton + 1 );
+    m_uiActiveButtons = std::max ( m_uiActiveButtons, uiButton + 1 );
     while ( m_ButtonList.size () < m_uiActiveButtons )
     {
         CGUIButton* pButton = reinterpret_cast < CGUIButton* > ( g_pCore->GetGUI ()->CreateButton ( m_pWindow, "" ) );
@@ -166,7 +166,7 @@ void CQuestionBox::SetButton ( unsigned int uiButton, const SString& strText )
 
 CGUIEdit* CQuestionBox::SetEditbox ( unsigned int uiEditbox, const SString& strText )
 {
-    m_uiActiveEditboxes = Max ( m_uiActiveEditboxes, uiEditbox + 1 );
+    m_uiActiveEditboxes = std::max ( m_uiActiveEditboxes, uiEditbox + 1 );
     while ( m_EditList.size () < m_uiActiveEditboxes )
     {
         CGUIEdit* pEdit = reinterpret_cast < CGUIEdit* > ( g_pCore->GetGUI ()->CreateEdit ( m_pWindow ) );

@@ -66,7 +66,7 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
     m_iVideoCardMemoryKBTotal = g_pDeviceState->AdapterState.InstalledMemoryKB;
 
     m_iVideoCardMemoryKBForMTATotal = ( m_iVideoCardMemoryKBTotal - ( 64 * 1024 ) ) * 4 / 5;
-    m_iVideoCardMemoryKBForMTATotal = Max ( 0, m_iVideoCardMemoryKBForMTATotal );
+    m_iVideoCardMemoryKBForMTATotal = std::max ( 0, m_iVideoCardMemoryKBForMTATotal );
 
     D3DCAPS9 caps;
     pDevice->GetDeviceCaps ( &caps );
@@ -471,8 +471,8 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
     {
         if ( CScreenSourceItem* pScreenSourceItem = DynamicCast < CScreenSourceItem > ( *iter ) )
         {
-            uiSizeX = Max ( uiSizeX, pScreenSourceItem->m_uiSizeX );
-            uiSizeY = Max ( uiSizeY, pScreenSourceItem->m_uiSizeY );
+            uiSizeX = std::max ( uiSizeX, pScreenSourceItem->m_uiSizeX );
+            uiSizeY = std::max ( uiSizeY, pScreenSourceItem->m_uiSizeY );
         }
     }
 
@@ -731,7 +731,7 @@ void CRenderItemManager::UpdateMemoryUsage ( void )
     m_iMemoryKBFreeForMTA -= m_iFontMemoryKBUsed / 2;
     m_iMemoryKBFreeForMTA -= m_iTextureMemoryKBUsed / 4;
     m_iMemoryKBFreeForMTA -= m_iRenderTargetMemoryKBUsed;
-    m_iMemoryKBFreeForMTA = Max ( 0, m_iMemoryKBFreeForMTA );
+    m_iMemoryKBFreeForMTA = std::max ( 0, m_iMemoryKBFreeForMTA );
 }
 
 

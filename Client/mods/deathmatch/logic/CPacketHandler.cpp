@@ -5238,7 +5238,7 @@ void CPacketHandler::RaiseEntityAddError( uint uiCode )
     AddReportLog( 8331, strLine );
 
     NetBitStreamInterface& bitStream = *m_pEntityAddBitStream;
-    for ( uint i = Max ( 0, (int)m_EntityAddReadOffsetStore.size() - 5 ) ; i < m_EntityAddReadOffsetStore.size() ; i++ )
+    for ( uint i = std::max ( 0, (int)m_EntityAddReadOffsetStore.size() - 5 ) ; i < m_EntityAddReadOffsetStore.size() ; i++ )
     {
         m_pEntityAddBitStream->SetReadOffsetAsBits( m_EntityAddReadOffsetStore[i] );
         SString strStatus = EntityAddDebugRead( *m_pEntityAddBitStream );

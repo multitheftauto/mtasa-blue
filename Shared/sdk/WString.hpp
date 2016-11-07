@@ -369,7 +369,7 @@ WString WString::SubStr ( int iPos, int iCount ) const
         iCount += iPos;
         iPos = 0;
     }
-    iCount = Max ( 0, iCount );
+    iCount = std::max ( 0, iCount );
     if ( iPos + iCount > (int)length () )
     {
         iCount = length () - iPos;
@@ -416,8 +416,8 @@ bool WString::BeginsWithI ( const WString& strOther ) const
 WString WString::Join ( const WString& strDelim, const std::vector < WString >& parts, int iFirst, int iCount )
 {
     WString strResult;
-    int iLast = Min < int > ( iFirst + iCount, parts.size () ) - 1;
-    iFirst = Max < int > ( iFirst, 0 );
+    int iLast = std::min < int > ( iFirst + iCount, parts.size () ) - 1;
+    iFirst = std::min < int > ( iFirst, 0 );
     for ( int i = iFirst ; i <= iLast ; i++ )
     {
         if ( i != iFirst )

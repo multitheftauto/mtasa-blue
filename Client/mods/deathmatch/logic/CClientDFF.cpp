@@ -95,7 +95,7 @@ bool CClientDFF::LoadDFF ( const SString& strFile, bool bIsRawData )
     else
     {
         m_RawDataBuffer = CBuffer( strFile, strFile.length() );
-        if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", "", m_RawDataBuffer ) )
+        if ( !g_pCore->GetNetwork ()->CheckFile ( "dff", "", m_RawDataBuffer.GetData(), m_RawDataBuffer.GetSize() ) )
             return false;
     }
 

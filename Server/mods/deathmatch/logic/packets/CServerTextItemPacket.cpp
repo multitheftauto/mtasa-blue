@@ -48,7 +48,7 @@ bool CServerTextItemPacket::Write ( NetBitStreamInterface &BitStream  ) const
         BitStream.Write ( m_ucShadowAlpha );
 
         // Grab the text length
-        size_t sizeText = Min < size_t > ( 1024, m_strText.length () );
+        size_t sizeText = std::min < size_t > ( 1024, m_strText.length () );
 
         // Write the text
         BitStream.WriteCompressed ( static_cast < unsigned short > ( sizeText ) );

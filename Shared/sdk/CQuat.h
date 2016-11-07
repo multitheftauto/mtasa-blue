@@ -33,10 +33,10 @@ public:
         x = y = z = w = 0;
     };
     CQuat(CMatrix* m) {
-        w = sqrt( SharedUtil::Max( (float)0, 1.0f + m->vRight.fX + m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
-        x = sqrt( SharedUtil::Max( (float)0, 1.0f + m->vRight.fX - m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
-        y = sqrt( SharedUtil::Max( (float)0, 1.0f - m->vRight.fX + m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
-        z = sqrt( SharedUtil::Max( (float)0, 1.0f - m->vRight.fX - m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
+        w = sqrt(std::max( (float)0, 1.0f + m->vRight.fX + m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
+        x = sqrt(std::max( (float)0, 1.0f + m->vRight.fX - m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
+        y = sqrt(std::max( (float)0, 1.0f - m->vRight.fX + m->vFront.fY - m->vUp.fZ ) ) * 0.5f;
+        z = sqrt(std::max( (float)0, 1.0f - m->vRight.fX - m->vFront.fY + m->vUp.fZ ) ) * 0.5f;
         
         x = static_cast < float > ( _copysign( x, m->vUp.fY - m->vFront.fZ ) );
         y = static_cast < float > ( _copysign( y, m->vRight.fZ - m->vUp.fX ) );

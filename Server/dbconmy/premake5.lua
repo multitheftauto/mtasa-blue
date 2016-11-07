@@ -7,14 +7,14 @@ project "Dbconmy"
 	filter "system:windows"
 		includedirs { 
 			"../../vendor/mysql/include",
-			"../../vendor/sparsehash/current/src/windows"
+			"../../vendor/sparsehash/src/windows"
 		}
 	
 	filter {}
 		includedirs { 
 			"../sdk", 
 			"../../vendor/google-breakpad/src",
-			"../../vendor/sparsehash/current/src/"
+			"../../vendor/sparsehash/src/"
 		}
 		
 	pchheader "StdInc.h"

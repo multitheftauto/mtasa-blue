@@ -164,7 +164,7 @@ namespace SharedUtil
             }
         }
 
-        int iExtraClocks = Max ( 0, iNumClocks - iNumUnclocks );
+        int iExtraClocks = std::max ( 0, iNumClocks - iNumUnclocks );
 
         for( int i = 0 ; i < iExtraClocks ; i++ )
         {
@@ -229,7 +229,7 @@ namespace SharedUtil
             int prevBufferPosMax = m_BufferPosMax;
 
             // Grow quickly, shrink slowly
-            m_BufferPosMax = Max ( m_BufferPos * 2, m_BufferPosMax * 10000 / 10001 );
+            m_BufferPosMax = std::max ( m_BufferPos * 2, m_BufferPosMax * 10000 / 10001 );
             m_BufferPosMax = Clamp ( 10, m_BufferPosMax, ( prevBufferPosMax + 1000 ) * 4 );
             if ( m_BufferPosMax > (int)m_ItemBufferArray.size () || m_BufferPosMax < (int)m_ItemBufferArray.size () / 4 )
                 m_ItemBufferArray.resize ( m_BufferPosMax );
@@ -458,7 +458,7 @@ namespace SharedUtil
             for ( std::map < std::string, SStatResultItem > :: iterator itItem = section.begin () ; itItem != section.end () ; ++itItem )
             {
                 SStatResultItem& item = itItem->second;
-                item.fMsMaxNext         = Max ( item.fMsMaxNext, item.fMs );
+                item.fMsMaxNext         = std::max ( item.fMsMaxNext, item.fMs );
                 item.fMsTotalAcc        += item.fMs;
                 item.iCounterTotalAcc   += item.iCounter;
             }
