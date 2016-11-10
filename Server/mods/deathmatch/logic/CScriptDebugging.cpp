@@ -248,7 +248,7 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
     assert ( szFilename );
 
     // Try to load the new file
-    FILE* pFile = fopen ( szFilename, "a+" );
+    FILE* pFile = File::Fopen ( szFilename, "a+" );
     if ( pFile )
     {
         // Close the previously loaded file

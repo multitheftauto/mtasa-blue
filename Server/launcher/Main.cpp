@@ -124,7 +124,7 @@ int main ( int argc, char* argv [] )
 #endif
 
     // If we are unable to access the core module, try changing to the directory of the launched file
-    FILE* fh = fopen ( LIB_CORE, "r" );
+    FILE* fh = File::Fopen ( LIB_CORE, "r" );
     if ( !fh )
     {
         #ifdef WIN32

@@ -3164,7 +3164,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     {
         SString strGTARootDir;
         CFilePathTranslator().GetGTARootDirectory( strGTARootDir );
-        if ( FILE* fh = fopen( PathJoin( strGTARootDir, "audio", "SFX", "SPC_EA" ), "rb" ) )
+        if ( FILE* fh = File::Fopen( PathJoin( strGTARootDir, "audio", "SFX", "SPC_EA" ), "rb" ) )
         {
             strSoundCut = "y";
             fseek( fh, 0x38BDC80, SEEK_SET );

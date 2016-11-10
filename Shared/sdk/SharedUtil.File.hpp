@@ -86,7 +86,7 @@ bool SharedUtil::FileDelete ( const SString& strFilename, bool bForce )
     if ( bForce )
         SetFileAttributes ( strFilename, FILE_ATTRIBUTE_NORMAL );
 #endif
-    return unlink ( strFilename ) == 0;
+    return File::Delete ( strFilename ) == 0;
 }
 
 bool SharedUtil::FileRename ( const SString& strFilenameOld, const SString& strFilenameNew )
@@ -105,7 +105,7 @@ bool SharedUtil::FileLoad ( const SString& strFilename, std::vector < char >& bu
 {
     buffer.clear ();
     // Open
-    FILE* fh = fopen ( strFilename, "rb" );
+    FILE* fh = File::Fopen ( strFilename, "rb" );
     if ( !fh )
         return false;
     // Get size
@@ -145,7 +145,7 @@ bool SharedUtil::FileSave ( const SString& strFilename, const void* pBuffer, uns
     if ( bForce )
         MakeSureDirExists ( strFilename );
 
-    FILE* fh = fopen ( strFilename, "wb" );
+    FILE* fh = File::Fopen ( strFilename, "wb" );
     if ( !fh )
         return false;
 
@@ -167,7 +167,7 @@ bool SharedUtil::FileAppend ( const SString& strFilename, const void* pBuffer, u
         SetFileAttributes ( strFilename, FILE_ATTRIBUTE_NORMAL );
 #endif
 
-    FILE* fh = fopen ( strFilename, "ab" );
+    FILE* fh = File::Fopen ( strFilename, "ab" );
     if ( !fh )
         return false;
 
@@ -185,7 +185,7 @@ bool SharedUtil::FileAppend ( const SString& strFilename, const void* pBuffer, u
 uint64 SharedUtil::FileSize ( const SString& strFilename  )
 {
     // Open
-    FILE* fh = fopen ( strFilename, "rb" );
+    FILE* fh = File::Fopen ( strFilename, "rb" );
     if ( !fh )
         return 0;
     // Get size
@@ -224,11 +224,7 @@ void SharedUtil::MakeSureDirExists ( const SString& strPath )
     {
         SString strTemp = SString::Join ( PATH_SEPERATOR, parts, 0, idx );
         // Call mkdir on this path
-        #ifdef WIN32
-            mkdir ( strTemp );
-        #else
-            mkdir ( strTemp, 0775 );
-        #endif
+        File::Mkdir ( strTemp );
     }
 }
 
@@ -580,13 +576,13 @@ bool SharedUtil::FileCopy ( const SString& strSrc, const SString& strDest, bool 
         SetFileAttributes ( strDest, FILE_ATTRIBUTE_NORMAL );
 #endif
 
-    FILE* fhSrc = fopen ( strSrc, "rb" );
+    FILE* fhSrc = File::Fopen ( strSrc, "rb" );
     if ( !fhSrc )
     {
         return false;
     }
 
-    FILE* fhDst = fopen ( strDest, "wb" );
+    FILE* fhDst = File::Fopen ( strDest, "wb" );
     if ( !fhDst )
     {
         fclose ( fhSrc );
@@ -850,3 +846,61 @@ SString SharedUtil::GetSystemLongPathName( const SString& strPath )
     return ToUTF8( szBuffer );
 }
 #endif // WIN32
+
+FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
+{
+#ifdef WIN32
+	FILE* fp = 0;
+	errno_t err = _wfopen_s( &fp, FromUTF8(szFilename), FromUTF8(szMode) );
+	if ( !err && fp )
+		return fp;
+	return 0;
+#else
+    return fopen(szFilename, szMode);
+#endif
+}
+
+int SharedUtil::File::Mkdir(const char* szPath, int iMode)
+{
+#ifdef WIN32
+    return _wmkdir(FromUTF8(szPath));
+#else
+    return mkdir(szPath, (mode_t)iMode);
+#endif
+}
+
+int SharedUtil::File::Chdir(const char* szPath)
+{
+#ifdef WIN32
+    return _wchdir(FromUTF8(szPath));
+#else
+    return chdir(szPath);
+#endif
+}
+
+int SharedUtil::File::Rmdir(const char* szPath)
+{
+#ifdef WIN32
+    return _wrmdir(FromUTF8(szPath));
+#else
+    return rmdir(szPath);
+#endif
+}
+
+int SharedUtil::File::Delete(const char* szFilename)
+{
+#ifdef WIN32
+    return _wremove(FromUTF8(szFilename));
+#else
+    return remove(szFilename);
+#endif
+}
+
+int SharedUtil::File::Rename(const char* szOldFilename, const char * szNewFilename)
+{
+#ifdef WIN32
+    return _wrename(FromUTF8(szOldFilename), FromUTF8(szNewFilename));
+#else
+    return rename(szOldFilename, szNewFilename);
+#endif
+}

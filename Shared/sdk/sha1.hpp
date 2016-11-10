@@ -361,7 +361,7 @@ int sha1_file( const char *path, unsigned char output[20] )
     sha1_context ctx;
     unsigned char buf[1024];
 
-    if( ( f = fopen( path, "rb" ) ) == NULL )
+    if( ( f = File::FOpen( path, "rb" ) ) == NULL )
         return( POLARSSL_ERR_SHA1_FILE_IO_ERROR );
 
     sha1_init( &ctx );
