@@ -56,32 +56,6 @@ BUT
 */
 
 
-//
-// Determine file name of Microsoft Visual Studio C/C++ Runtime dll
-//
-#if _MSC_VER == 1500        // MSVC++ 9.0 (Visual Studio 2008)
-    #ifdef _DEBUG
-        #define MSVCR_DLL "msvcr90d.dll"
-    #else
-        #define MSVCR_DLL "msvcr90.dll"
-    #endif
-#elif _MSC_VER == 1800      // MSVC++ 12.0 (Visual Studio 2013)
-    #ifdef _DEBUG
-        #define MSVCR_DLL "msvcr120d.dll"
-    #else
-        #define MSVCR_DLL "msvcr120.dll"
-    #endif
-#elif _MSC_VER == 1900      // MSVC++ 14.0 (Visual Studio 2015)
-    #ifdef _DEBUG
-        #define MSVCR_DLL "ucrtbased.dll"
-    #else
-        #define MSVCR_DLL "ucrtbase.dll"
-    #endif
-#else
-    #error "Insert VCR info"
-#endif
-
-
 namespace SharedUtil
 {
 
@@ -211,53 +185,6 @@ namespace SharedUtil
         __in_opt LPCSTR lpModuleName
         );
 
-    typedef
-    errno_t
-    (__cdecl
-    *FUNC__sopen_s)(
-        _Out_ int * _FileHandle,
-        _In_z_ const char * _Filename,
-        _In_ int _OpenFlag,
-        _In_ int _ShareFlag,
-        _In_ int _PermissionMode
-        );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC__chdir) (
-            const char *_Path
-            );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC__mkdir) (
-            const char *_Path
-            );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC__rmdir) (
-            const char *_Path
-            );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC_remove) (
-            const char *_Filename
-            );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC_rename) (
-            const char *_OldFilename,
-            const char *_NewFilename
-            );
-
     /////////////////////////////////////////////////////////////
     //
     // Hook variables
@@ -283,12 +210,6 @@ namespace SharedUtil
     HOOKVAR( MoveFileA )
     HOOKVAR( DeleteFileA )
     HOOKVAR( GetModuleHandleA )
-    HOOKVAR( _sopen_s )
-    HOOKVAR( _chdir )
-    HOOKVAR( _mkdir )
-    HOOKVAR( _rmdir )
-    HOOKVAR( remove )
-    HOOKVAR( rename )
 
 
 #ifdef MTA_CLIENT
@@ -507,45 +428,6 @@ namespace SharedUtil
         return GetModuleHandleW( FromUTF8( lpModuleName ) );
     }
 
-    errno_t
-    __cdecl
-    My_sopen_s(
-        _Out_ int * _FileHandle,
-        _In_z_ const char * _Filename,
-        _In_ int _OpenFlag,
-        _In_ int _ShareFlag,
-        _In_ int _PermissionMode
-    )
-    {
-        return _wsopen_s( _FileHandle, FromUTF8( _Filename ), _OpenFlag, _ShareFlag, _PermissionMode );
-    }
-
-
-    int __cdecl My_chdir( const char *_Path )
-    {
-        return _wchdir( FromUTF8( _Path ) );
-    }
-
-    int __cdecl My_mkdir( const char *_Path )
-    {
-        return _wmkdir( FromUTF8( _Path ) );
-    }
-
-    int __cdecl My_rmdir( const char *_Path )
-    {
-        return _wrmdir( FromUTF8( _Path ) );
-    }
-
-    int __cdecl Myremove( const char * _Filename )
-    {
-        return _wremove( FromUTF8( _Filename ) );
-    }
-
-    int __cdecl Myrename( const char * _OldFilename, const char * _NewFilename )
-    {
-        return _wrename( FromUTF8( _OldFilename ), FromUTF8( _NewFilename ) );
-    }
-
     /////////////////////////////////////////////////////////////
     //
     // Hook adding
@@ -574,12 +456,6 @@ namespace SharedUtil
         ADDHOOK( "Kernel32.dll", MoveFileA )
         ADDHOOK( "Kernel32.dll", DeleteFileA )
         ADDHOOK( "Kernel32.dll", GetModuleHandleA )
-        ADDHOOK( MSVCR_DLL, _sopen_s )
-        ADDHOOK( MSVCR_DLL, _chdir )
-        ADDHOOK( MSVCR_DLL, _mkdir )
-        ADDHOOK( MSVCR_DLL, _rmdir )
-        ADDHOOK( MSVCR_DLL, remove )
-        ADDHOOK( MSVCR_DLL, rename )
     }
 
 
@@ -615,11 +491,5 @@ namespace SharedUtil
         DELHOOK( MoveFileA )
         DELHOOK( DeleteFileA )
         DELHOOK( GetModuleHandleA )
-        DELHOOK( _sopen_s )
-        DELHOOK( _chdir )
-        DELHOOK( _mkdir )
-        DELHOOK( _rmdir )
-        DELHOOK( remove )
-        DELHOOK( rename )
     }
 }
