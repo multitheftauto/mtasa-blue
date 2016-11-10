@@ -46,7 +46,7 @@ namespace SharedUtil
     {
         //CRYPT_START
         // Try to load the file
-        FILE* pFile = fopen ( szFilename, "rb" );
+        FILE* pFile = File::Fopen ( szFilename, "rb" );
         if ( pFile )
         {
             // Init
@@ -661,7 +661,7 @@ namespace SharedUtil
 
     SString GenerateHashHexStringFromFile( EHashFunctionType hashFunction, const SString& strFilename, int iMaxSize, int iOffset )
     {
-        FILE* fh = fopen( strFilename, "rb" );
+        FILE* fh = File::Fopen( strFilename, "rb" );
         if ( fh )
         {
             SString strResult = GenerateHashHexStringFromFile( hashFunction, fh, iMaxSize, iOffset );

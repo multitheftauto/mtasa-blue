@@ -135,7 +135,7 @@ static void SaveBacktraceSummary()
 bool DumpCallback( const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded )
 {
     // Set inital dump file name (Safeish)
-    rename( descriptor.path(), ms_strDumpPathFilename );
+    File::Rename( descriptor.path(), ms_strDumpPathFilename );
 
     // Set final dump file name (Not so safe)
     time_t pTime = time( NULL );
@@ -149,7 +149,7 @@ bool DumpCallback( const google_breakpad::MinidumpDescriptor& descriptor, void* 
                                     tm->tm_min
                                 );
     SString strFinalDumpPathFilename = PathJoin( ms_strDumpPath, strFilename );
-    rename( ms_strDumpPathFilename, strFinalDumpPathFilename );
+    File::Rename( ms_strDumpPathFilename, strFinalDumpPathFilename );
 
     SaveBacktraceSummary();
     FileSave( PathJoin( ms_strDumpPath, "server_pending_upload_filename" ), strFinalDumpPathFilename );
@@ -256,7 +256,7 @@ void CCrashHandler::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionIn
             }
 
             // Write a log with the generic exception information
-            FILE* pFile = fopen ( PathJoin( ms_strDumpPath, "server_pending_upload.log" ), "a+" );
+            FILE* pFile = File::Fopen ( PathJoin( ms_strDumpPath, "server_pending_upload.log" ), "a+" );
             if ( pFile )
             {
                // Header

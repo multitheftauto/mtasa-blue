@@ -738,7 +738,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
         // Create cache readme
         SString strReadmeFilename ( "%s/DO_NOT_MODIFY_Readme.txt", strResourceCachePath.c_str () );
-        FILE *fh = fopen ( strReadmeFilename, "w" );
+        FILE *fh = File::Fopen ( strReadmeFilename, "w" );
         if ( fh )
         {
             fprintf ( fh, "---------------------------------------------------------------------------\n" );

@@ -1411,7 +1411,7 @@ void CPacketHandler::Packet_DebugEcho ( NetBitStreamInterface& bitStream )
             date[29] = '\0';
 
             // open the file for append access
-            FILE * pFile = fopen ( strFileName.c_str (), "a" );
+            FILE * pFile = File::Fopen ( strFileName.c_str (), "a" );
             if ( pFile )
             {
                 // write out the data

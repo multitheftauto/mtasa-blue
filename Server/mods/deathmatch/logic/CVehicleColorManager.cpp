@@ -46,7 +46,7 @@ bool CVehicleColorManager::Load ( const char* szFilename )
     Reset ();
 
     // Load vehiclecolors.conf
-    FILE* pFile = fopen ( szFilename, "r" );
+    FILE* pFile = File::Fopen ( szFilename, "r" );
     if ( pFile )
     {
         // Read each line of it
@@ -117,7 +117,7 @@ bool CVehicleColorManager::Load ( const char* szFilename )
 bool CVehicleColorManager::Generate ( const char* szFilename )
 {
     // Try to open the file
-    FILE* pFile = fopen ( szFilename, "w+" );
+    FILE* pFile = File::Fopen ( szFilename, "w+" );
     if ( pFile )
     {
         // Write the default colorfile to it
