@@ -464,8 +464,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SectionIn 1 RO ; section is required
         ${LogText} "+Section begin - CLIENT CORE"
 
-        Call UpdateVCRedistributables
-
         SetShellVarContext all
 
         #############################################################
@@ -808,8 +806,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         ${LogText} "+Section begin - SERVER CORE"
         SectionIn 1 2 RO ; section is required
         
-        Call UpdateVCRedistributables
-
         SetOutPath "$INSTDIR\server"
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\core.dll"
@@ -1137,159 +1133,6 @@ Function SkipDirectoryPage
     Abort
 FunctionEnd
 
-
-;====================================================================================
-; Download and install Microsoft Visual Studio redistributables if required
-;====================================================================================
-Var DONEUPDATE
-Function UpdateVCRedistributables
-    ; Only check once
-    ${If} $DONEUPDATE == "1"
-        Return
-    ${EndIf}
-    StrCpy $DONEUPDATE "1"
-
-    Call ShouldInstallVC12Redistributable
-    ${If} $0 == "1"
-        Call InstallVC12Redistributable
-    ${EndIf}
-    Call ShouldInstallVC14Redistributable
-    ${If} $0 == "1"
-        Call InstallVC14Redistributable
-    ${EndIf}
-FunctionEnd
-
-
-;====================================================================================
-; Download and install Microsoft Visual Studio 2013 redistributable
-;====================================================================================
-Var REDISTVC12
-
-LangString MSGBOX_VC12RED_ERROR1 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2013 redistributable"
-LangString MSGBOX_VC12RED_ERROR2 ${LANG_ENGLISH}    "Unable to install Microsoft Visual Studio 2013 redistributable"
-LangString MSGBOX_VC12RED_ERROR3 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2013 redistributable.\
-$\r$\nHowever installation will continue.\
-$\r$\nPlease reinstall if there are problems later."
-Function InstallVC12Redistributable
-    ${LogText} "+Function begin - InstallVC12Redistributable"
-    DetailPrint "Installing Microsoft Visual Studio 2013 redistributable ..."
-    StrCpy $REDISTVC12 "$TEMP\vcredist12_x86.exe"
-    NSISdl::download "http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe" $REDISTVC12
-    Pop $0
-
-    ${If} $0 != "success"
-        DetailPrint "* Download of Microsoft Visual Studio 2013 redistributable failed:"
-        DetailPrint "* $0"
-        DetailPrint "* Installation continuing anyway"
-        MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR3)"
-    ${Else}
-        ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
-        ; /quiet = 'This option will suppress all UI and perform an install.'
-        ExecWait '"$REDISTVC12" /quiet'
-        Call IsVC12RedistributableInstalled
-        ${If} $0 != "1"
-            DetailPrint "* Some error occured installing Microsoft Visual Studio 2013 redistributable"
-            DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
-            DetailPrint "* Installation continuing anyway"
-            MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR2)"
-            MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR3)"
-        ${EndIf}
-    ${EndIf}
-
-    ${LogText} "-Function end - InstallVC12Redistributable"
-FunctionEnd
-
-;----------------------------------------
-; Out $0 = result   ("1" = yes, "0" = no)
-Function ShouldInstallVC12Redistributable
-    Call IsVC12RedistributableInstalled
-    IntOp $0 $0 ^ 1
-FunctionEnd
-
-;----------------------------------------
-; Out $0 = result   ("1" = yes, "0" = no)
-Function IsVC12RedistributableInstalled
-    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum" "Install"
-    ${If} $0 != "1"
-        StrCpy $0 "0"
-    ${EndIf}
-FunctionEnd
-
-
-;====================================================================================
-; Download and install Microsoft Visual Studio 2015 redistributable
-;====================================================================================
-!define VC14_REDIST_VER    "14.0.24210"     ; Version number of update 3
-Var REDISTVC14
-
-LangString MSGBOX_VC14RED_ERROR1 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2015 redistributable"
-LangString MSGBOX_VC14RED_ERROR2 ${LANG_ENGLISH}    "Unable to install Microsoft Visual Studio 2015 redistributable"
-LangString MSGBOX_VC14RED_ERROR3 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2015 redistributable.\
-$\r$\nHowever installation will continue.\
-$\r$\nPlease reinstall if there are problems later."
-Function InstallVC14Redistributable
-    ${LogText} "+Function begin - InstallVC14Redistributable"
-    DetailPrint "Installing Microsoft Visual Studio 2015 redistributable ..."
-    StrCpy $REDISTVC14 "$TEMP\vcredist14_x86.exe"
-    NSISdl::download "http://mirror.multitheftauto.com/mtasa/installer/10700/vcredist_2015_x86.exe" $REDISTVC14
-    Pop $0
-
-    ${If} $0 != "success"
-        DetailPrint "* Download of Microsoft Visual Studio 2015 redistributable failed:"
-        DetailPrint "* $0"
-        DetailPrint "* Installation continuing anyway"
-        MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR3)"
-    ${Else}
-        ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
-        ; /quiet = 'This option will suppress all UI and perform an install.'
-        ExecWait '"$REDISTVC14" /repair /passive /norestart'
-        Call IsVC14RedistributableInstalled
-        ${If} $0 != "1"
-            DetailPrint "* Some error occured installing Microsoft Visual Studio 2015 redistributable"
-            DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
-            DetailPrint "* Installation continuing anyway"
-            MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR2)"
-            MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR3)"
-        ${EndIf}
-    ${EndIf}
-
-    ${LogText} "-Function end - InstallVC14Redistributable"
-FunctionEnd
-
-;----------------------------------------
-; Out $0 = result   ("1" = yes, "0" = no)
-Function ShouldInstallVC14Redistributable
-    ${If} ${AtMostWin7}
-        IfFileExists "$WINDIR\System32\api-ms-win-crt-runtime-*.dll" FileFound 0
-            ${LogText} "api-ms-win-crt-runtime-*.dll not found"
-            StrCpy $0 "1"
-            Return  
-        FileFound:
-    ${EndIf}
-    Call IsVC14RedistributableInstalled
-    IntOp $0 $0 ^ 1
-FunctionEnd
-
-;----------------------------------------
-; Out $0 = result   ("1" = yes, "0" = no)
-Function IsVC14RedistributableInstalled
-    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Install"
-    ${If} $0 == "1" 
-        ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Version"
-
-        ; ${VersionCompare} "[Version1]" "[Version2]" $result
-        ;   0 = Versions are equal
-        ;   1 = Version1 is newer
-        ;   2 = Version2 is newer
-        ${VersionCompare} $0 ${VC14_REDIST_VER} $1
-        ${If} $1 != "2"     ; Version2 is not newer
-            StrCpy $0 "1"
-            Return
-        ${EndIf}
-
-    ${EndIf}
-    StrCpy $0 "0"
-FunctionEnd
 
 ;====================================================================================
 ; Patcher related functions
