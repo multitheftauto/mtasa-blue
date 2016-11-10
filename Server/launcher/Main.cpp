@@ -25,8 +25,26 @@
 #include <iostream>
 #include "MTAPlatform.h"
 #include "SharedUtil.h"
-#include "SharedUtil.hpp"
-void HandleLinuxLibs( const SString& strLaunchDirectory, int argc, char* argv [] );
+#ifdef WIN32
+    // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
+    #include "SharedUtil.hpp"
+#else
+    FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
+    {
+        return fopen(szFilename, szMode);
+    }
+    bool SString::Contains ( const SString& strOther ) const
+    {
+        return find ( strOther ) != std::string::npos;
+    }
+    SString SharedUtil::GetSystemCurrentDirectory ( void )
+    {
+        char szBuffer[ MAX_PATH ];
+        getcwd ( szBuffer, MAX_PATH - 1 );
+        return szBuffer;
+    }
+    void HandleLinuxLibs( const SString& strLaunchDirectory, int argc, char* argv [] );
+#endif
 
 using namespace std;
 
