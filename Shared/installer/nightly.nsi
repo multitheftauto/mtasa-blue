@@ -715,6 +715,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\vvo.dll"
             File "${FILES_ROOT}\mta\vvof.dll"
             File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
+            File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
 
             File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
             File "${FILES_ROOT}\mta\d3dcompiler_47.dll"

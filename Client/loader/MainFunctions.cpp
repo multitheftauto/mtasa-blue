@@ -66,18 +66,23 @@ void InitLocalization( bool bNoFail )
     const SString strMTASAPath = GetMTASAPath ();
     SetDllDirectory( PathJoin( strMTASAPath, "mta" ) );
 
-    // See if xinput is loadable (XInput9_1_0.dll is core.dll dependency)
-    HMODULE hXInputModule = LoadLibrary( "XInput9_1_0.dll" );
-    if ( hXInputModule )
-        FreeLibrary( hXInputModule );
-    else
+    // See if xinput is loadable (core.dll dependency)
+    for ( const SString& strModuleName : std::vector<SString>({"XInput9_1_0", "xinput1_3"}) )
     {
-        // If not, do hack to use dll supplied with MTA
-        SString strDest = PathJoin( strMTASAPath, "mta", "XInput9_1_0.dll" );
-        if ( !FileExists( strDest ) )
+        HMODULE hXInputModule = LoadLibrary( strModuleName + ".dll" );
+        if ( hXInputModule )
         {
-            SString strSrc = PathJoin( strMTASAPath, "mta", "XInput9_1_0_mta.dll" );       
-            FileCopy( strSrc, strDest );
+            FreeLibrary( hXInputModule );
+        }
+        else
+        {
+            // If not, do hack to use dll supplied with MTA
+            SString strDest = PathJoin( strMTASAPath, "mta", strModuleName + ".dll" );
+            if ( !FileExists( strDest ) )
+            {
+                SString strSrc = PathJoin( strMTASAPath, "mta", strModuleName + "_mta.dll" );       
+                FileCopy( strSrc, strDest );
+            }
         }
     }
 
@@ -89,8 +94,7 @@ void InitLocalization( bool bNoFail )
         if ( !bNoFail )
             return;
         DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2013 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
+                            "the latest DirectX is correctly installed."), _E("CL24"), "core-not-loadable" );
         return ExitProcess( EXIT_ERROR );
     }
 
@@ -111,9 +115,8 @@ void InitLocalization( bool bNoFail )
         if ( !bNoFail )
             return;
 
-        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2013 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed."), _E("CL26"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
+        DisplayErrorMessageBox ( ("Loading localization failed.  Please ensure that \n"
+                            "the latest DirectX is correctly installed."), _E("CL26"), "localization-not-loadable" );
         FreeLibrary ( hCoreModule );
         return ExitProcess( EXIT_ERROR );
     }
