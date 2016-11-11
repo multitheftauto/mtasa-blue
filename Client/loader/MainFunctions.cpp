@@ -69,7 +69,9 @@ void InitLocalization( bool bNoFail )
     // See if xinput is loadable (core.dll dependency)
     for ( const SString& strModuleName : std::vector<SString>({"XInput9_1_0", "xinput1_3"}) )
     {
+        DWORD dwPrevMode = SetErrorMode( SEM_FAILCRITICALERRORS );
         HMODULE hXInputModule = LoadLibrary( strModuleName + ".dll" );
+        SetErrorMode( dwPrevMode );
         if ( hXInputModule )
         {
             FreeLibrary( hXInputModule );
