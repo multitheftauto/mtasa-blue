@@ -68,7 +68,7 @@ public:
         CefRefPtr<CV8Handler> handler = new CV8Handler ( frame );
 
         // Create MTA object
-        CefRefPtr<CefV8Value> mtaObject = CefV8Value::CreateObject ( nullptr, nullptr );
+        CefRefPtr<CefV8Value> mtaObject = CefV8Value::CreateObject ( NULL );
 
         // Bind V8 --> C++ functions
         V8Helpers::BindV8Function ( handler, mtaObject, "triggerEvent", Javascript_triggerEvent );
