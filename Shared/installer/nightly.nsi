@@ -195,6 +195,7 @@ LangString  DESC_Section10          ${LANG_ENGLISH} "Create a Start Menu group f
 LangString  DESC_Section11          ${LANG_ENGLISH} "Create a Desktop Shortcut for the MTA:SA Client."
 LangString  DESC_Section12          ${LANG_ENGLISH} "Register mtasa:// protocol for browser clickable-ness."
 LangString  DESC_Section13          ${LANG_ENGLISH} "Add to Windows Games Explorer (if present)."
+LangString  DESC_DirectX            ${LANG_ENGLISH} "Install or update DirectX (if required)."
 LangString  DESC_Section1           ${LANG_ENGLISH} "The core components required to run Multi Theft Auto."
 LangString  DESC_Section2           ${LANG_ENGLISH} "The MTA:SA modification, allowing you to play online."
 ;LangString DESC_Section3           ${LANG_ENGLISH} "The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
@@ -423,7 +424,8 @@ ShowUnInstDetails show
 LangString INST_STARTMENU_GROUP     ${LANG_ENGLISH} "Start menu group"
 LangString INST_DESKTOP_ICON        ${LANG_ENGLISH} "Desktop icon"
 LangString INST_PROTOCOL            ${LANG_ENGLISH} "Register mtasa:// protocol"
-LangString INST_GAMES_EXPLORER  ${LANG_ENGLISH} "Add to Games Explorer"
+LangString INST_GAMES_EXPLORER      ${LANG_ENGLISH} "Add to Games Explorer"
+LangString INST_DIRECTX             ${LANG_ENGLISH} "Install DirectX"
 
 Section "$(INST_STARTMENU_GROUP)" SEC10
     SectionIn 1 2
@@ -444,6 +446,18 @@ Section "$(INST_GAMES_EXPLORER)" SEC13
     SectionIn 1 2
     StrCpy $AddToGameExplorer 1
 SectionEnd
+
+Section "$(INST_DIRECTX)" SEC_DIRECTX
+    SectionIn 1 2
+    SetOutPath "$TEMP"
+    File "${FILES_ROOT}\redist\dxwebsetup.exe"
+    DetailPrint "Running DirectX Setup..."
+    ExecWait '"$TEMP\dxwebsetup.exe" /Q'
+    DetailPrint "Finished DirectX Setup"
+    Delete "$TEMP\dxwebsetup.exe"
+    SetOutPath "$INSTDIR"
+SectionEnd
+
 
 LangString INST_SEC_CLIENT      ${LANG_ENGLISH} "Game client"
 LangString INST_SEC_SERVER      ${LANG_ENGLISH} "Dedicated server"
@@ -984,6 +998,7 @@ LangString INST_SEC_DEVELOPER ${LANG_ENGLISH}   "Development"
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC12} $(DESC_Section12)
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC13} $(DESC_Section13)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SEC_DIRECTX} $(DESC_DirectX)
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} $(DESC_Section1)
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} $(DESC_Section2)
     ;!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $(DESC_Section3)
