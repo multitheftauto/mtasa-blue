@@ -38,7 +38,7 @@ script: make -j 3 CXX=$ENV_CXX CC=$ENV_CC config=release_x64
 
 # Only upload the gcc build
 after_success:
-  - "[ $NIGHTLY_UPLOAD -eq 1 ] && [ -z $TRAVIS_TAG ]
+  - "[ $NIGHTLY_UPLOAD -eq 1 ] && [ -z $TRAVIS_TAG ] &&
     cd .. &&
     ./premake5 install_data && 
     ./premake5 compose_files && 
