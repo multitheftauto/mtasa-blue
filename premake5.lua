@@ -75,6 +75,7 @@ workspace "MTASA"
 	
 	filter "system:windows"
 		toolset "v140_xp"
+		flags { "StaticRuntime" }
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
 			dxdir.."Include"
@@ -82,6 +83,9 @@ workspace "MTASA"
 		libdirs {
 			dxdir.."Lib/x86"
 		}
+	
+	filter {"system:windows", "configurations:Debug"}
+		buildoptions { "/MT" } -- Don't use debug runtime when static linking
 	
 	filter "system:linux"
 		vectorextensions "SSE2"

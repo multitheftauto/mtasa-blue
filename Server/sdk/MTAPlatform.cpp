@@ -19,13 +19,7 @@
 // Replacement functions
 int mymkdir ( const char* dirname )
 {
-    int ret=0;
-#ifdef WIN32
-    ret = mkdir(dirname);
-#else
-    ret = mkdir (dirname,0775);
-#endif
-    return ret;
+    return File::Mkdir(dirname);
 }
 
 // Platform specific functions

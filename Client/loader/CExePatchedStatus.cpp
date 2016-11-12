@@ -237,7 +237,7 @@ EPatchResult UpdatePatchStatusTimestamp( const SString& strGTAEXEPath, EPatchMod
 {
     // Get the top byte of the file link timestamp
     uchar ucTimeStamp = 0;
-    FILE* fh = fopen ( strGTAEXEPath, "rb" );
+    FILE* fh = File::Fopen ( strGTAEXEPath, "rb" );
     if ( fh )
     {
         if ( !fseek ( fh, 0x8B, SEEK_SET ) )
@@ -274,7 +274,7 @@ EPatchResult UpdatePatchStatusTimestamp( const SString& strGTAEXEPath, EPatchMod
         {
             // Change needed!
             SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+            FILE* fh = File::Fopen ( strGTAEXEPath, "r+b" );
             if ( !fh )
             {
                 return PATCH_SET_RESULT_REQ_ADMIN;
@@ -301,7 +301,7 @@ EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode
 {
     // Get file position of IMAGE_FILE_HEADER->Characteristics
     uint uiFilePosition = 0;
-    FILE* fh = fopen ( strGTAEXEPath, "rb" );
+    FILE* fh = File::Fopen ( strGTAEXEPath, "rb" );
     if ( fh )
     {
         // 60 is offset of IMAGE_DOS_HEADER->e_lfanew
@@ -320,7 +320,7 @@ EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode
 
     // Get the value from the header
     ushort usCharacteristics = 0;
-    fh = fopen ( strGTAEXEPath, "rb" );
+    fh = File::Fopen ( strGTAEXEPath, "rb" );
     if ( fh )
     {
         if ( !fseek ( fh, uiFilePosition, SEEK_SET ) )
@@ -355,7 +355,7 @@ EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode
         {
             // Change needed!
             SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+            FILE* fh = File::Fopen ( strGTAEXEPath, "r+b" );
             if ( !fh )
             {
                 return PATCH_SET_RESULT_REQ_ADMIN;
@@ -386,7 +386,7 @@ EPatchResult UpdatePatchStatusDep( const SString& strGTAEXEPath, EPatchMode mode
 {
     // Get the value from the header
     ulong ulDllCharacteristics = 0;
-    FILE* fh = fopen ( strGTAEXEPath, "rb" );
+    FILE* fh = File::Fopen ( strGTAEXEPath, "rb" );
     if ( fh )
     {
         if ( !fseek ( fh, 0xDC, SEEK_SET ) )
@@ -421,7 +421,7 @@ EPatchResult UpdatePatchStatusDep( const SString& strGTAEXEPath, EPatchMode mode
         {
             // Change needed!
             SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+            FILE* fh = File::Fopen ( strGTAEXEPath, "r+b" );
             if ( !fh )
             {
                 return PATCH_SET_RESULT_REQ_ADMIN;
@@ -487,7 +487,7 @@ EPatchResult UpdatePatchStatusNvightmare( const SString& strGTAEXEPath, EPatchMo
     bool bHasExportTable = true;
     uint uiExportValue = 0;
     bool bUnknownBytes = false;
-    FILE* fh = fopen( strGTAEXEPath, "rb" );
+    FILE* fh = File::Fopen( strGTAEXEPath, "rb" );
     bool bFileError = ( fh == NULL );
     if( !bFileError )
     {
@@ -548,7 +548,7 @@ EPatchResult UpdatePatchStatusNvightmare( const SString& strGTAEXEPath, EPatchMo
         {
             // Change needed!
             SetFileAttributes( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen( strGTAEXEPath, "r+b" );
+            FILE* fh = File::Fopen( strGTAEXEPath, "r+b" );
             if ( !fh )
             {
                 return PATCH_SET_RESULT_REQ_ADMIN;
@@ -668,7 +668,7 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
     uint uiNumOldNames = 0;
     uint uiNumNewNames = 0;
 
-    FILE* fh = fopen ( strGTAEXEPath, "rb" );
+    FILE* fh = File::Fopen ( strGTAEXEPath, "rb" );
     if ( fh )
     {
         for ( uint i = 0 ; i < NUMELMS( searchList ) ; i++ )
@@ -729,7 +729,7 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
         assert( !strGTAEXEPath.EndsWithI( "gta_sa.exe" ) );
 
         SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-        FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+        FILE* fh = File::Fopen ( strGTAEXEPath, "r+b" );
         if ( !fh )
         {
             return PATCH_SET_RESULT_REQ_ADMIN;

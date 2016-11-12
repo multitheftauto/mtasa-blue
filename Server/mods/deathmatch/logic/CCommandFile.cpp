@@ -20,7 +20,7 @@ m_Client ( Client )
 
 {
     // Load the given file
-    m_pFile = fopen ( szFilename, "r" );
+    m_pFile = File::Fopen ( szFilename, "r" );
     m_bEcho = true;
 }
 

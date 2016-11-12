@@ -710,7 +710,7 @@ SString CInstallManager::_ProcessLangFileChecks( void )
 
     // Get language that will be used
     SString strSettingsFilename = PathJoin( GetSystemPersonalPath(), "GTA San Andreas User Files", "gta_sa.set" );
-    FILE* fh = fopen( strSettingsFilename, "rb" );
+    FILE* fh = File::Fopen( strSettingsFilename, "rb" );
     if ( fh )
     {
         fseek( fh, 0xB3B, SEEK_SET );

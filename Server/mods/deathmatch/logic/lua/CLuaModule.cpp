@@ -52,7 +52,7 @@ CLuaModule::~CLuaModule ( void )
 #ifdef WIN32
 bool IsModule32Bit( const SString& strExpectedPathFilename )
 {
-    FILE* fh = fopen( strExpectedPathFilename, "rb" );
+    FILE* fh = File::Fopen( strExpectedPathFilename, "rb" );
     fseek( fh, 60, SEEK_SET );
     int offset = 0;
     fread( &offset, sizeof( offset ), 1, fh );

@@ -43,6 +43,23 @@ extern CGame* g_pGame;
 extern int errno;
 #endif
 
+//
+// Helper function to avoid fopen in Window builds
+//
+static unzFile unzOpenUtf8(const char *path)
+{
+#ifdef WIN32
+    // This will use CreateFile instead of fopen
+    zlib_filefunc_def ffunc;
+    fill_win32_filefunc (&ffunc);
+    return unzOpen2( path, &ffunc );
+#else
+    return unzOpen( path );
+#endif
+}
+
+
+
 // (IJs) This class contains very nasty unchecked and unproper code. Please revise.
 
 CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const char * szAbsPath, const char * szResourceName )
@@ -150,7 +167,7 @@ bool CResource::Load ( void )
         if ( m_bResourceIsZip )
         {
             // See if zip file is actually a zip file
-            m_zipfile = unzOpen ( m_strResourceZip.c_str () );
+            m_zipfile = unzOpenUtf8 ( m_strResourceZip.c_str () );
             if ( !m_zipfile )
             {
                 //Unregister EHS stuff
@@ -1284,7 +1301,7 @@ bool CResource::ExtractFile ( const char * szFilename )
     {
         // Load the zip file if it isn't already loaded. Return false if it can't be loaded.
         if ( !m_zipfile )
-            m_zipfile = unzOpen(m_strResourceZip.c_str ());
+            m_zipfile = unzOpenUtf8(m_strResourceZip.c_str ());
 
         if ( !m_zipfile ) return false;
 
@@ -1307,7 +1324,7 @@ bool CResource::ExtractFile ( const char * szFilename )
 bool CResource::DoesFileExistInZip ( const char * szFilename )
 {
     if ( !m_zipfile )
-        m_zipfile = unzOpen(m_strResourceZip.c_str ());
+        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str ());
     bool bRes = false;
     if ( m_zipfile )
     {
@@ -1336,7 +1353,7 @@ bool CResource::GetFilePath ( const char * szFilename, string& strPath )
 {
     // first, check the resource folder, then check the zip file
     strPath = m_strResourceDirectoryPath + szFilename;
-    FILE * temp = fopen ( strPath.c_str (), "r" );
+    FILE * temp = File::Fopen ( strPath.c_str (), "r" );
     if ( temp )
     {
         fclose ( temp );
@@ -1351,13 +1368,13 @@ bool CResource::GetFilePath ( const char * szFilename, string& strPath )
         return false;
 
     if ( !m_zipfile )
-        m_zipfile = unzOpen(m_strResourceZip.c_str ());
+        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str ());
     if ( m_zipfile )
     {
         if ( unzLocateFile ( m_zipfile, szFilename, false ) != UNZ_END_OF_LIST_OF_FILE )
         {
             strPath = m_strResourceCachePath + szFilename;
-            temp = fopen ( strPath.c_str (), "r" );
+            temp = File::Fopen ( strPath.c_str (), "r" );
             if ( temp )
             {
                 fclose ( temp );
@@ -2128,7 +2145,7 @@ bool CResource::RemoveFile ( const char* szName )
                     // Delete the file
                     char szFullFilepath [MAX_PATH + 1];
                     snprintf ( szFullFilepath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), szName );
-                    if ( unlink ( szFullFilepath ) != 0 )
+                    if ( File::Delete ( szFullFilepath ) != 0 )
                         CLogger::LogPrintf ( "WARNING: Problems deleting the actual file, but was removed from resource" );
 
                     // Delete the metafile
@@ -3328,7 +3345,7 @@ int do_extract_currentfile(unzFile uf,const int* popt_extract_without_path,int*p
 
         if ((skip==0) && (err==UNZ_OK))
         {
-            fout=fopen(szOutFile,"wb");
+            fout=File::Fopen(szOutFile,"wb");
 
             /* some zipfile don't contain directory alone before file */
             if ((fout==NULL) && ((*popt_extract_without_path)==0) &&
@@ -3339,7 +3356,7 @@ int do_extract_currentfile(unzFile uf,const int* popt_extract_without_path,int*p
                 *(filename_withoutpath-1)='\0';
                 //makedir((char *)write_filename);
                 *(filename_withoutpath-1)=c;
-                fout=fopen(szOutFile,"wb");
+                fout=File::Fopen(szOutFile,"wb");
             }
 
             if (fout==NULL)

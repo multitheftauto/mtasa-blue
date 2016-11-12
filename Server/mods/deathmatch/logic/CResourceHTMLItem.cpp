@@ -95,7 +95,7 @@ ResponseCode CResourceHTMLItem::Request ( HttpRequest * ipoHttpRequest, HttpResp
     else
     {
         // its a raw page
-        FILE * file = fopen ( m_strResourceFileName.c_str (), "rb" );
+        FILE * file = File::Fopen ( m_strResourceFileName.c_str (), "rb" );
         if ( file )
         {
             fseek ( file, 0, SEEK_END );
@@ -153,7 +153,7 @@ bool CResourceHTMLItem::Start ( void )
     if ( !m_bIsRaw )
     {
         // go through and search for <* or *>
-        FILE * pFile = fopen ( m_strResourceFileName.c_str (), "r" );
+        FILE * pFile = File::Fopen ( m_strResourceFileName.c_str (), "r" );
         if ( !pFile )
             return false;
 
@@ -268,7 +268,7 @@ bool CResourceHTMLItem::Start ( void )
     else
     {
         // its a raw page
-        FILE * file = fopen ( m_strResourceFileName.c_str (), "rb" );
+        FILE * file = File::Fopen ( m_strResourceFileName.c_str (), "rb" );
         if ( file )
         {
             GetMimeType ( m_strResourceFileName.c_str () );

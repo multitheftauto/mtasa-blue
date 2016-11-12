@@ -29,6 +29,10 @@
     // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
     #include "SharedUtil.hpp"
 #else
+    FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
+    {
+        return fopen(szFilename, szMode);
+    }
     bool SString::Contains ( const SString& strOther ) const
     {
         return find ( strOther ) != std::string::npos;
@@ -124,7 +128,7 @@ int main ( int argc, char* argv [] )
 #endif
 
     // If we are unable to access the core module, try changing to the directory of the launched file
-    FILE* fh = fopen ( LIB_CORE, "r" );
+    FILE* fh = File::Fopen ( LIB_CORE, "r" );
     if ( !fh )
     {
         #ifdef WIN32

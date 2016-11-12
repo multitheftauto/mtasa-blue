@@ -107,7 +107,7 @@ void CResourceChecker::CheckResourceForIssues( CResource* pResource, const strin
                 pathInArchiveList.push_back ( strPathInArchive );
             }
 
-            remove( strTempZip.c_str () );
+            File::Delete( strTempZip.c_str () );
 
             if ( !ReplaceFilesInZIP( strOrigZip, strTempZip, pathInArchiveList, m_upgradedFullPathList ) )
             {
@@ -121,14 +121,14 @@ void CResourceChecker::CheckResourceForIssues( CResource* pResource, const strin
                 }
                 else
                 {
-                    if ( rename( strTempZip.c_str (), strOrigZip.c_str () ) )
+                    if ( File::Rename( strTempZip.c_str (), strOrigZip.c_str () ) )
                     {
                         CLogger::LogPrintf ( "Failed to upgrade (rename) '%s'\n", strOrigZip.c_str () );
                     }
                 }
             }
 
-            remove( strTempZip.c_str () );
+            File::Delete( strTempZip.c_str () );
         }
     }
 
@@ -187,7 +187,7 @@ void CResourceChecker::CheckPngFileForIssues ( const string& strPath, const stri
     bool bIsBad         = false;
 
     // Open the file
-    if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
+    if ( FILE* pFile = File::Fopen ( strPath.c_str (), "rb" ) )
     {
         // This is what the png header should look like
         unsigned char pGoodHeaderPng [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
@@ -226,7 +226,7 @@ void CResourceChecker::CheckRwFileForIssues ( const string& strPath, const strin
     bool bIsBad         = false;
 
     // Open the file
-    if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
+    if ( FILE* pFile = File::Fopen ( strPath.c_str (), "rb" ) )
     {
         struct {
             int id;
@@ -430,7 +430,7 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
                 return;
 
             // Save new content
-            if ( FILE* pFile = fopen ( strPath.c_str (), "wb" ) )
+            if ( FILE* pFile = File::Fopen ( strPath.c_str (), "wb" ) )
             {
                 fwrite ( strNewFileContents.c_str (), 1, strNewFileContents.length (), pFile );
                 fclose ( pFile );
@@ -829,7 +829,7 @@ void CResourceChecker::CheckVersionRequirements ( const string& strIdentifierNam
 bool CResourceChecker::RenameBackupFile( const string& strOrigFilename, const string& strBakAppend )
 {
     string strBakFilename = strOrigFilename + strBakAppend;
-    for ( int i = 0 ; rename( strOrigFilename.c_str (), strBakFilename.c_str () ) ; i++ )
+    for ( int i = 0 ; File::Rename( strOrigFilename.c_str (), strBakFilename.c_str () ) ; i++ )
     {
         if ( i > 1000 )
         {
@@ -906,7 +906,7 @@ int CResourceChecker::ReplaceFilesInZIP( const string& strOrigZip, const string&
             unsigned long ulLength = 0;
 
             // Get new file into a buffer
-            if ( FILE* pFile = fopen ( fullPathReplacement.c_str (), "rb" ) )
+            if ( FILE* pFile = File::Fopen ( fullPathReplacement.c_str (), "rb" ) )
             {
                 // Get the file size,
                 fseek( pFile, 0, SEEK_END );

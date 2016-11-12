@@ -62,7 +62,7 @@ void CScreenShot::SetPath ( const char *szPath )
     strncpy ( szScreenShotPath, szPath, MAX_PATH - 1 );
 
     // make sure the directory exists
-    mkdir ( szPath );
+    File::Mkdir ( szPath );
 }
 
 int CScreenShot::GetScreenShots ( void )
@@ -164,7 +164,7 @@ DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
     }
 
     MakeSureDirExists( ms_strFileName );
-    FILE *file = fopen (ms_strFileName, "wb");
+    FILE *file = File::Fopen (ms_strFileName, "wb");
     if ( file )
     {
         png_struct* png_ptr = png_create_write_struct ( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
