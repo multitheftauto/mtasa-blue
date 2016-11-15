@@ -850,11 +850,7 @@ SString SharedUtil::GetSystemLongPathName( const SString& strPath )
 FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
 {
 #ifdef WIN32
-	FILE* fp = 0;
-	errno_t err = _wfopen_s( &fp, FromUTF8(szFilename), FromUTF8(szMode) );
-	if ( !err && fp )
-		return fp;
-	return 0;
+	return _wfsopen( FromUTF8(szFilename), FromUTF8(szMode), _SH_DENYNO );
 #else
     return fopen(szFilename, szMode);
 #endif
