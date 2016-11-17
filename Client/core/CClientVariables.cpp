@@ -342,7 +342,7 @@ void CClientVariables::LoadDefaults ( void )
         Set ( "display_resolution", SString ( "%dx%dx32", rect.right, rect.bottom ) );
     }
 
-    // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.
+    // We will default this one during CProxyDirect3DDevice9 constructor, because we need a valid direct3d device to give a proper default value.
 #if 0
     DEFAULT ( "streaming_memory",           50 );                           // Streaming memory
 #endif

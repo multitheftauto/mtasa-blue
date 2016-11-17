@@ -83,6 +83,10 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
                             , g_pDeviceState->AdapterState.MaxAnisotropicSetting
                             ) );
 
+    // Give a default value for the streaming memory setting
+    if ( g_pCore->GetCVars()->Exists( "streaming_memory" ) == false )
+        g_pCore->GetCVars()->Set( "streaming_memory", g_pCore->GetMaxStreamingMemory() );
+
     // Call event handler
     CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );
 }

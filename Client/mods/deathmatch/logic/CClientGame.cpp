@@ -345,10 +345,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Reset test mode script settings to default
     g_pCore->GetGraphics ()->GetRenderItemManager ()->SetTestMode ( DX_TEST_MODE_NONE );
-
-    // Give a default value for the streaming memory
-    if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
-        g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 }
 
 
