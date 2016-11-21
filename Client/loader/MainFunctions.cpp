@@ -92,7 +92,7 @@ void InitLocalization( bool bShowErrors )
         }
     }
 
-    // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
+    // Check if the core can be loaded - failure may mean d3dx9_40.dll etc is not installed
     // Use LOAD_WITH_ALTERED_SEARCH_PATH so the strCoreDLL path is searched first for dependent dlls
     if ( bShowErrors )
         SetErrorMode( dwPrevMode );
