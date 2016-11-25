@@ -459,7 +459,10 @@ void PreLaunchWatchDogs ( void )
     // Check for unclean stop on previous run
 #ifndef MTA_DEBUG
     if ( WatchDogIsSectionOpen ( "L0" ) )
+	{
         WatchDogSetUncleanStop ( true );    // Flag to maybe do things differently if MTA exit code on last run was not 0
+		CheckAndShowFileOpenFailureMessage();
+	}
     else
 #endif
         WatchDogSetUncleanStop ( false );
