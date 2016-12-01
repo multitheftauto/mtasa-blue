@@ -34,6 +34,6 @@ project "pcre"
 		defines { "HAVE_STRTOLL" }
 		kind "StaticLib"
 
-	disablewarnings { "4251" }
 	filter {"system:windows"}
 		linkoptions { "/ignore:4217", "/ignore:4049" }
+		disablewarnings { "4251" }

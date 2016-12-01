@@ -195,7 +195,7 @@ void CPerfStatEventPacketUsageImpl::MaybeRecordStats ( void )
         long long llTime = GetTickCount64_ ();
         if ( llTime >= m_llNextRecordTime )
         {
-            m_llNextRecordTime = Max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
+            m_llNextRecordTime = std::max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
 
             // Copy into a list and sort
             m_EventUsageSortedList.clear();
@@ -204,7 +204,12 @@ void CPerfStatEventPacketUsageImpl::MaybeRecordStats ( void )
                 iter->second.strName = iter->first;
                 m_EventUsageSortedList.push_back( iter->second );
             }
-            sort_inline ( m_EventUsageSortedList.begin (), m_EventUsageSortedList.end (), ( const SEventUsage& a, const SEventUsage& b ) { return a.iTotal > b.iTotal; } );
+
+            std::sort ( m_EventUsageSortedList.begin (), m_EventUsageSortedList.end (), 
+                [](const SEventUsage& a, const SEventUsage& b)
+            {
+                return a.iTotal > b.iTotal;
+            });
 
             m_EventUsageLiveMap.clear();
         }

@@ -63,14 +63,14 @@ void CResourceFileDownloadManager::UpdatePendingDownloads( void )
     if ( !m_ActiveFileDownloadList.empty() )
     {
         // Use active download group
-        iGroup = Max( iGroup, m_ActiveFileDownloadList[0]->GetDownloadPriorityGroup() );
+        iGroup = std::max( iGroup, m_ActiveFileDownloadList[0]->GetDownloadPriorityGroup() );
     }
     else
     {
         // If no resource files being downloaded, find highest pending download group
         for( auto pResourceFile : m_PendingFileDownloadList )
         {
-            iGroup = Max( iGroup, pResourceFile->GetDownloadPriorityGroup() );
+            iGroup = std::max( iGroup, pResourceFile->GetDownloadPriorityGroup() );
         }
     }
 

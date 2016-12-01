@@ -1,5 +1,6 @@
 OS|Android|OS 64 VERSION INFO
 CPU|arm64||2
+GPU|||
 Crash||0x0|0
 Module|breakpad_unittests||breakpad_unittests|D6D1FEC9A15DE7F38A236898871A2E770|0x555f608000|0x555f6c7fff|0
 Module|libnetd_client.so||libnetd_client.so|7735F44BA6D7C27FD5C3636A43369B7C0|0x7f801f6000|0x7f80208fff|0

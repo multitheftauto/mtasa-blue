@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef WIN32
 #pragma message("Compiling precompiled header.\n")
 
@@ -30,7 +28,6 @@ struct SAclRequest;
 #include "MTAPlatform.h"
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
-#include "gccHashSupport.h"
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>

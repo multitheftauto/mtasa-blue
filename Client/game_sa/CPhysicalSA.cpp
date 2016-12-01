@@ -365,8 +365,8 @@ void CPhysicalSA::SetLighting ( float fLighting )
 void CPhysicalSA::SetFrozen ( bool bFrozen )
 {
     CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
-    // Set movement ability
+
     pInterface->bDontApplySpeed = bFrozen;
-    // Set rotation movement ability
-    pInterface->bDisableFriction = bFrozen;
+    // Don't enable friction for static objects
+    pInterface->bDisableFriction = ( bFrozen || pInterface->m_fMass >= PHYSICAL_MAXMASS );
 }

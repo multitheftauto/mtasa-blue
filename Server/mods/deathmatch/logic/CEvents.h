@@ -40,7 +40,7 @@ public:
 
     inline bool                 Exists              ( const char* szName )  { return Get ( szName ) != NULL; };
     SEvent*                     Get                 ( const char* szName );
-
+    
     CFastHashMap < SString, SEvent * > ::const_iterator   IterBegin   ( void )                { return m_EventHashMap.begin (); };
     CFastHashMap < SString, SEvent * > ::const_iterator   IterEnd     ( void )                { return m_EventHashMap.end (); };
 

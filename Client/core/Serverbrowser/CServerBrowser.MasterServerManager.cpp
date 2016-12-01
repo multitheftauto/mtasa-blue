@@ -97,7 +97,7 @@ void CMasterServerManager::Refresh ( void )
     }
 
     // Pass on refresh request to first two servers
-    m_iActiveAmount = Min < uint > ( 2, m_MasterServerList.size () );
+    m_iActiveAmount = std::min < uint > ( 2, m_MasterServerList.size () );
     for ( uint i = 0 ; i < m_MasterServerList.size () && i < m_iActiveAmount ; i++ )
         m_MasterServerList[i]->Refresh ();
 

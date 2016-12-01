@@ -368,7 +368,7 @@ void COMMAND_RadarOpacityDown ( const char* szCmdLine )
     {
         int iAlpha;
         g_pCore->GetCVars ()->Get ( "mapalpha", iAlpha );
-        iAlpha = Max ( 0, iAlpha - 20 );
+        iAlpha = std::max ( 0, iAlpha - 20 );
         g_pCore->GetCVars ()->Set ( "mapalpha", iAlpha );
     }
 }
@@ -380,7 +380,7 @@ void COMMAND_RadarOpacityUp ( const char* szCmdLine )
     {
         int iAlpha;
         g_pCore->GetCVars ()->Get ( "mapalpha", iAlpha );
-        iAlpha = Min ( 255, iAlpha + 20 );
+        iAlpha = std::min( 255, iAlpha + 20 );
         g_pCore->GetCVars ()->Set ( "mapalpha", iAlpha );
     }
 }

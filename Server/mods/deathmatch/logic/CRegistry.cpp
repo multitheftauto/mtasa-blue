@@ -453,7 +453,7 @@ bool CRegistry::Query ( CRegistryResult* pResult, const char* szQuery, va_list v
                 case SQLITE_INTEGER64:
                 {
                     long long int llValue = va_arg( vl, long long int );
-                    strParsedQuery += SString( "%" PRId64, llValue );
+                    strParsedQuery += SString( "%lld", llValue );
                 }
                 break;
 

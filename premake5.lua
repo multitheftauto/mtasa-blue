@@ -21,9 +21,10 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 	
-	flags { "C++11", "Symbols" }
+	flags { "C++11" }
 	characterset "MBCS"
 	pic "On"
+	symbols "On"
 	
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs { 
@@ -34,7 +35,8 @@ workspace "MTASA"
 	defines { 
 		"_CRT_SECURE_NO_WARNINGS",
 		"_SCL_SECURE_NO_WARNINGS",
-		"_CRT_NONSTDC_NO_DEPRECATE"
+		"_CRT_NONSTDC_NO_DEPRECATE",
+		"NOMINMAX"
 	}
 		
 	-- Helper function for output path 
@@ -51,7 +53,7 @@ workspace "MTASA"
 		targetsuffix "_d"
 	
 	filter "configurations:Release or configurations:Nightly"
-		flags { "Optimize" }
+		optimize "Speed"	-- "On"=MS:/Ox GCC:/O2  "Speed"=MS:/O2 GCC:/O3  "Full"=MS:/Ox GCC:/O3
 	
 	if CI_BUILD then
 		filter {}
@@ -64,7 +66,7 @@ workspace "MTASA"
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
 		os.mkdir("Build/Symbols")
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
-		
+
 	filter {"system:windows", "toolset:*140*"}
 		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
 	
@@ -73,8 +75,8 @@ workspace "MTASA"
 	
 	filter "system:windows"
 		toolset "v140"
+		flags { "StaticRuntime" }
 		defines { "WIN32", "_WIN32" }
-		linkoptions "/DYNAMICBASE:NO"
 		includedirs { 
 			dxdir.."Include"
 		}
@@ -82,11 +84,18 @@ workspace "MTASA"
 			dxdir.."Lib/x86"
 		}
 	
+	filter {"system:windows", "configurations:Debug"}
+		buildoptions { "/MT" } -- Don't use debug runtime when static linking
+	
+	filter "system:linux"
+		vectorextensions "SSE2"
+	
 	-- Only build the client on Windows
 	if os.get() == "windows" then
 		group "Client"
 		include "Client/ceflauncher"
 		include "Client/ceflauncher_DLL"
+		include "Client/cefweb"
 		include "Client/core"
 		include "Client/game_sa"
 		include "Client/sdk"

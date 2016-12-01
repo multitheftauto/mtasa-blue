@@ -23,7 +23,7 @@
 -- @returns
 --    True if successful, otherwise nil.
 --
-function os.copydir(src_dir, dst_dir, filter, single_dst_dir)
+function os.copydir(src_dir, dst_dir, filter, single_dst_dir, skip_existing)
 	if not os.isdir(src_dir) then error(src_dir .. " is not an existing directory!") end
 	filter = filter or "**"
 	src_dir = src_dir .. "/"
@@ -36,20 +36,30 @@ function os.copydir(src_dir, dst_dir, filter, single_dst_dir)
 	os.chdir( dir ) -- change current directory back to root
 
 	local counter = 0
+	local skipped = 0
 	for k, v in ipairs(matches) do
 		local target = iif(single_dst_dir, path.getname(v), v)
 		--make sure, that directory exists or os.copyfile() fails
 		os.mkdir( path.getdirectory(dst_dir .. target))
-		if os.copyfile( src_dir .. v, dst_dir .. target) then
-			counter = counter + 1
+		if skip_existing and os.isfile( dst_dir .. target ) then
+			skipped = skipped + 1
+		else
+			if os.copyfile( src_dir .. v, dst_dir .. target) then
+				counter = counter + 1
+			end
 		end
 	end
 
-	if counter == #matches then
-		print( counter .. " files copied.")
+	if counter + skipped == #matches then
+		if counter ~= 0 then
+			print( counter .. " files copied.")
+		end
+		if skipped ~= 0 then
+			print( skipped .. " existing files not updated.")
+		end
 		return true
 	else
-		print( "Error: " .. counter .. "/" .. #matches .. " files copied.")
+		print( "Error: " .. #matches - counter - skipped .. "/" .. #matches .. " files failed to copy.")
 		return nil
 	end
 end

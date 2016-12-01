@@ -88,17 +88,17 @@ namespace
 
         TIMEUS llRecvTimeUs = ms_StatsTimePoint2 - ms_StatsTimePoint1;
         ms_StatsRecvTimeTotalUs += llRecvTimeUs;
-        ms_StatsRecvTimeMaxUs = Max( ms_StatsRecvTimeMaxUs, llRecvTimeUs );
+        ms_StatsRecvTimeMaxUs = std::max( ms_StatsRecvTimeMaxUs, llRecvTimeUs );
 
         TIMEUS llSendTimeUs = ms_StatsTimePoint3 - ms_StatsTimePoint2;
         ms_StatsSendTimeTotalUs += llSendTimeUs;
-        ms_StatsSendTimeMaxUs = Max( ms_StatsSendTimeMaxUs, llSendTimeUs );
+        ms_StatsSendTimeMaxUs = std::max( ms_StatsSendTimeMaxUs, llSendTimeUs );
 
         ms_StatsRecvMsgsTotal += ms_StatsRecvNumMessages;
-        ms_StatsRecvMsgsMax = Max( ms_StatsRecvMsgsMax, ms_StatsRecvNumMessages );
+        ms_StatsRecvMsgsMax = std::max( ms_StatsRecvMsgsMax, ms_StatsRecvNumMessages );
 
         ms_StatsSendCmdsTotal += ms_StatsSendNumCommands;
-        ms_StatsSendCmdsMax = Max( ms_StatsSendCmdsMax, ms_StatsSendNumCommands );
+        ms_StatsSendCmdsMax = std::max( ms_StatsSendCmdsMax, ms_StatsSendNumCommands );
     }
 }
 
@@ -411,8 +411,8 @@ bool CNetServerBuffer::GetSyncThreadStatistics ( SSyncThreadStatistics* pDest, b
     if ( !pDest )
         return false;
 
-    int iNumActiveRemoteSystems = Max( 1U, g_pGame->GetPlayerManager()->Count() );
-    int iLoopCount = Max( 1, ms_StatsLoopCount );
+    int iNumActiveRemoteSystems = std::max( 1U, g_pGame->GetPlayerManager()->Count() );
+    int iLoopCount = std::max( 1, ms_StatsLoopCount );
     pDest->uiRecvTimeAvgUs = (uint)( ms_StatsRecvTimeTotalUs / iLoopCount );
     pDest->uiSendTimeAvgUs = (uint)( ms_StatsSendTimeTotalUs / iLoopCount );
 

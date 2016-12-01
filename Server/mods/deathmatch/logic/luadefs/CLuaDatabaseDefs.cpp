@@ -254,7 +254,7 @@ int CLuaDatabaseDefs::DbConnect ( lua_State* luaVM )
 
                     // Parse path
                     CResource* pPathResource = pThisResource;
-                    if ( CResourceManager::ParseResourcePathInput ( strHost, pPathResource, &strHost ) )
+                    if ( CResourceManager::ParseResourcePathInput ( strHost, pPathResource, &strAbsPath ) )
                     {
                         strHost = strAbsPath;
                         CheckCanModifyOtherResource( argStream, pThisResource, pPathResource );

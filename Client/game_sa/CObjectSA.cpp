@@ -352,7 +352,7 @@ void CObjectSA::SetScale ( float fX, float fY, float fZ )
 {
     m_vecScale = CVector ( fX, fY, fZ );
     GetObjectInterface ()->bUpdateScale = true;
-    GetObjectInterface ()->fScale = Max( fX, Max( fY, fZ ) );
+    GetObjectInterface ()->fScale = std::max( fX, std::max( fY, fZ ) );
 }
 
 CVector* CObjectSA::GetScale ( )

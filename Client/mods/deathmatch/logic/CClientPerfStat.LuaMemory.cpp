@@ -174,7 +174,7 @@ void CClientPerfStatLuaMemoryImpl::UpdateLuaMemory ( CLuaMain* pLuaMain, int iMe
 
     pLuaMainMemory->Delta += iMemUsed - pLuaMainMemory->Current;
     pLuaMainMemory->Current = iMemUsed;
-    pLuaMainMemory->Max = Max ( pLuaMainMemory->Max, pLuaMainMemory->Current );
+    pLuaMainMemory->Max = std::max ( pLuaMainMemory->Max, pLuaMainMemory->Current );
 
     pLuaMainMemory->OpenXMLFiles = pLuaMain->GetXMLFileCount ();
     pLuaMainMemory->Refs = pLuaMain->m_CallbackTable.size ();
@@ -309,7 +309,7 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats ( CClientPerfStatResult* pR
         int RenderTargetCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetRenderTargetCount ();
         int ScreenSourceCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetScreenSourceCount ();
         int WebBrowserCount = g_pClientGame->GetManager ()->GetRenderElementManager ()->GetWebBrowserCount ();
-        TextItemCount = Max ( TextItemCount - 4, 0 );   // Remove count for radar items
+        TextItemCount = std::max ( TextItemCount - 4, 0 );   // Remove count for radar items
         row[c++] = !TextItemCount ? "-" : SString ( "%d", TextItemCount );
         row[c++] = !DxFontCount ? "-" : SString ( "%d", DxFontCount );
         row[c++] = !GuiFontCount ? "-" : SString ( "%d", GuiFontCount );

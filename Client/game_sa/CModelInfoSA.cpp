@@ -606,10 +606,10 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
     float fMaximumValue = Lerp ( 325.f, fDrawDistanceSetting, 170.f );
 
     // Ensure fDistance is in range
-    fDistance = Min ( fDistance, fMaximumValue );
+    fDistance = std::min ( fDistance, fMaximumValue );
 #endif
     // Limit to 325.f as it goes horrible after that
-    fDistance = Min ( fDistance, 325.f );
+    fDistance = std::min ( fDistance, 325.f );
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
     {
@@ -1223,7 +1223,7 @@ void OnMY_NodeNameStreamRead( RwStream* stream, char* pDest, uint uiSize )
 {
     // Calc sizes
     const uint uiMaxBufferSize = 24;
-    uint uiAmountToRead = Min( uiMaxBufferSize - 1, uiSize );
+    uint uiAmountToRead = std::min( uiMaxBufferSize - 1, uiSize );
     uint uiAmountToSkip = uiSize - uiAmountToRead;
 
     // Read good bit

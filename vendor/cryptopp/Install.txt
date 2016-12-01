@@ -3,9 +3,9 @@ CONTENTS OF THIS FILE
 
 * Introduction
 * Building the Library
+* Alternate Build Systems
 * Installing the Library
 * Makefile Targets
-* DataDir Patch
 * Dynamic Analysis
 * Acceptance Testing
 * Reporting problems
@@ -15,11 +15,13 @@ INTRODUCTION
 
 Crypto++ Library is a free C++ class library of cryptographic algorithms and schemes. It was written and placed in public domain by Wei Dai. The library homepage is at http://www.cryptopp.com/. The latest library source code can be found at http://github.com/weidai11/cryptopp. For licensing and copyright information, please see License.txt.
 
-These are general instructions for the BSDs, Linux, OS X, Solaris and Unix. On BSD and Solaris you will likely have to use `gmake` to build the library. On Linux, OS X, Solaris and Unix, the system's make should be OK. On Windows, Crypto++ provides Borland and Visual Studio solutions. Cmake is available, but its still maturing.
+These are general instructions for the BSDs, Linux, OS X, Solaris and Unix. The library uses a GNU makefile, which combines configuration and a non-anemic make. On BSD and Solaris you will likely have to use `gmake` to build the library. On Linux, OS X and Unix, the system's make should be OK. On Windows, Crypto++ provides Borland and Visual Studio solutions.
 
-Crypto++ uses a GNU makefile, which combines configuration and a non-anemic make. You should look through the GNUmakefile and config.h to ensure settings look reasonable before building. Please pay particular attention to CRYPTOPP_NO_UNALIGNED_DATA_ACCESS in config.h.
+You should look through the GNUmakefile and config.h to ensure settings look reasonable before building. If you need compatibility with Crypto++ 5.6.2, then you can use `config.compat` in place of `config.h`. You are discouraged from using `config.compat` because it re-introduces undefined behavior that was cleared at Crypto++ 5.6.3.
 
-Crypto++ does not depend upon other tools or libraries. It does not use Autotools, does not use Cmake, and does not use Boost.
+Wiki pages are available for some platforms with specific build instructions. The wiki can be found at http://cryptopp.com/wiki/. The pages include Android, ARM, iOS and Solaris. Solaris users should visit the wiki for important information on compiling the library with different versions of SunCC and options, and information on improving library performance and features.
+
+Crypto++ does not depend upon other tools or libraries. It does not use Autotools, does not use CMake, and does not use Boost. If you use an alternate build system, like Autotools or CMake, then see the warning below about CXXFLAGS and lack of -DNDEBUG. CMake is available in Master as a matter of convenience, but its not officially supported.
 
 
 BUILDING THE LIBRARY
@@ -59,6 +61,19 @@ LLVM's libc++ is also supported, so you can:
     CXXFLAGS="-std=c++11 -stdlib=libc++"
     make
 
+
+ALTERNATE BUILD SYSTEMS
+-----------------------
+
+The Crypto++ library is Make based and uses GNU Make by default. The makefile uses '-DNDEBUG -g2 -O2' CXXFLAGS by default. If you use an alternate build system, like Autotools or CMake, then ensure the build system includes '-DNDEBUG' for production or release builds. The Crypto++ library uses asserts for debugging and diagnostics during development; it does not rely on them to crash a program at runtime.
+
+If an assert triggers in production software, then unprotected sensitive information could be egressed from the program to the filesystem or the platform's error reporting program, like Apport on Ubuntu or CrashReporter on Apple.
+
+The makefile orders object files to help remediate problems associated with C++ static initialization order. The library does not use custom linker scripts. If you use an alternate build system, like Autotools or CMake, and collect source files into a list, then ensure these three are at the head of the list: 'cryptlib.cpp cpu.cpp integer.cpp <other sources>'. They should be linked in the same order: 'cryptlib.o cpu.o integer.o <other objects>'.
+
+If your linker supports initialization attributes, like init_priority, then you can define CRYPTOPP_INIT_PRIORITY to control object initialization order. Set it to a value like 250. User programs can use CRYPTOPP_USER_PRIORITY to avoid conflicts with library values. Initialization attributes are more reliable than object file ordering, but its not ubiquitously supported by linkers.
+
+The makefile links to the static version of the Crypto++ library to avoid binary planting and other LD_PRELOAD tricks. You should use the static version of the library in your programs to help avoid unwanted redirections.
 
 INSTALLING THE LIBRARY
 ----------------------
@@ -160,6 +175,7 @@ Fifth, the test harness provides a "test vector" option which uses many known te
     Tests complete. Total tests = 4094. Failed tests = 0.
 
 The library also offers its test script for those who want to use it. The test script is names cryptest.sh, and it repeatedly builds the library and exectues the tests under various configurations. It takes 2 to 4 hours to run on a semi-modern desktop or server; and days to run on an IoT gadget. Also see http://github.com/weidai11/cryptopp/blob/master/cryptest.sh and http://cryptopp.com/wiki/Cryptest.sh.
+
 
 REPORTING PROBLEMS
 ------------------

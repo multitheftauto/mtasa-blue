@@ -49,9 +49,6 @@ void CDirect3DEvents9::OnDirect3DDeviceCreate  ( IDirect3DDevice9 *pDevice )
 
     // Create the GUI elements
     CLocalGUI::GetSingleton().CreateObjects ( pDevice );
-
-    // Init webbrowser
-    CCore::GetSingleton ().InitialiseWeb ();
 }
 
 void CDirect3DEvents9::OnDirect3DDeviceDestroy ( IDirect3DDevice9 *pDevice )
@@ -147,11 +144,10 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     CGraphics::GetSingleton ().GetRenderItemManager ()->FlushNonAARenderTarget();
 
     bool bTookScreenShot = false;
-    auto pWebCore = g_pCore->GetWebCore ();
     if ( !CGraphics::GetSingleton ().GetScreenGrabber ()->IsQueueEmpty () )
     {
-        if ( pWebCore )
-            pWebCore->OnPreScreenshot ();
+        if ( g_pCore->IsWebCoreLoaded() )
+            g_pCore->GetWebCore()->OnPreScreenshot();
         
         bTookScreenShot = true;
     }
@@ -162,8 +158,8 @@ void CDirect3DEvents9::OnPresent ( IDirect3DDevice9 *pDevice )
     // Maybe grab screen for upload
     CGraphics::GetSingleton ().GetScreenGrabber ()->DoPulse ();
 
-    if ( bTookScreenShot && pWebCore )
-        pWebCore->OnPostScreenshot ();
+    if ( bTookScreenShot && g_pCore->IsWebCoreLoaded() )
+        g_pCore->GetWebCore()->OnPostScreenshot();
 
     // Draw the GUI
     CLocalGUI::GetSingleton().Draw ();

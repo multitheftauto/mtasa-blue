@@ -162,7 +162,7 @@ void WriteProcessMemoryChecked( HANDLE hProcess, void* dest, const void* src, ui
     if ( oldvalues )
     {
         char temp[30];
-        uint numBytesToCheck = Min( sizeof( temp ), size );
+        uint numBytesToCheck = std::min( sizeof( temp ), size );
         SIZE_T numBytesRead = 0;
         _ReadProcessMemory ( hProcess, dest, temp, numBytesToCheck, &numBytesRead );
         if ( memcmp( temp, oldvalues, numBytesToCheck ) )
@@ -178,7 +178,7 @@ void WriteProcessMemoryChecked( HANDLE hProcess, void* dest, const void* src, ui
     // Verify bytes were written ok
     {
         char temp[30];
-        uint numBytesToCheck = Min( sizeof( temp ), size );
+        uint numBytesToCheck = std::min( sizeof( temp ), size );
         SIZE_T numBytesRead = 0;
         _ReadProcessMemory ( hProcess, dest, temp, numBytesToCheck, &numBytesRead );
         if ( memcmp( temp, src, numBytesToCheck ) || numBytesRead != numBytesToCheck )
@@ -996,7 +996,7 @@ void FindRelevantFiles ( const SString& strPath, std::vector < SString >& outFil
             // Update progress bar if visible
             int NumItems = outFilePathList.size () + outDirPathList.size ();
             int MaxItems = ( MaxFiles ? MaxFiles : 25000 ) + ( MaxDirs ? MaxDirs : 5000 );
-            if ( UpdateProgress ( Min ( NumItems, MaxItems ), MaxItems * 2, "Checking files..." ) )
+            if ( UpdateProgress ( std::min ( NumItems, MaxItems ), MaxItems * 2, "Checking files..." ) )
                 return;
         }
 
@@ -1636,7 +1636,7 @@ void DirectoryCopy ( SString strSrcBase, SString strDestBase, bool bShowProgress
         fProgress += 0.5f;
         fUseProgress = fProgress;
         if ( fUseProgress > 50 )
-            fUseProgress = Min ( 100.f, pow ( fUseProgress - 50, 0.6f ) + 50 );
+            fUseProgress = std::min ( 100.f, pow ( fUseProgress - 50, 0.6f ) + 50 );
 
         SString strPathHereBaseRel = toDoList.front ();
         toDoList.pop_front ();
@@ -1687,7 +1687,7 @@ stop_copy:
         }
         else
         {
-            fUseProgress = Max ( 90.f, fUseProgress );
+            fUseProgress = std::max ( 90.f, fUseProgress );
             UpdateProgress ( (int)fUseProgress, 100, _("Finishing...") );
             Sleep ( 1000 );
             UpdateProgress ( 100, 100, _("Done!") );
@@ -1771,6 +1771,7 @@ bool CheckAndShowFileOpenFailureMessage ( void )
 
     if ( !strFilename.empty () )
     {
+	    SetApplicationSetting( "diagnostics", "gta-fopen-fail", "" );
         SString strMsg ( _("GTA:SA had trouble opening the file '%s'"), *strFilename );
         DisplayErrorMessageBox ( strMsg, _E("CL31"), SString( "gta-fopen-fail&name=%s", *strFilename ) );
         return true;

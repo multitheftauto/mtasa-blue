@@ -728,8 +728,8 @@ void CSettingsSA::SetValidVideoMode( void )
     }
 
     // Ensure res is no smaller than 640 x 480
-    iWidth = Max( 640, iWidth );
-    iHeight = Max( 480, iHeight );
+    iWidth = std::max( 640, iWidth );
+    iHeight = std::max( 480, iHeight );
 
     // Find mode number which best matches required settings
     uint uiUseVideoMode = FindVideoMode( iWidth, iHeight, iColorBits );

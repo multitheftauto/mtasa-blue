@@ -343,7 +343,7 @@ SString CPerfStatManager::GetScaledFloatString ( float fValue )
 ///////////////////////////////////////////////////////////////
 long long CPerfStatManager::GetPerSecond ( long long llValue, long long llDeltaTickCount )
 {
-    llDeltaTickCount = Max( 1LL, llDeltaTickCount );
+    llDeltaTickCount = std::max( 1LL, llDeltaTickCount );
     return ( llValue * 1000LL + ( llDeltaTickCount / 2 ) ) / llDeltaTickCount;
 }
 
@@ -357,7 +357,7 @@ long long CPerfStatManager::GetPerSecond ( long long llValue, long long llDeltaT
 ///////////////////////////////////////////////////////////////
 void CPerfStatManager::ToPerSecond ( long long& llValue, long long llDeltaTickCount )
 {
-    llDeltaTickCount = Max( 1LL, llDeltaTickCount );
+    llDeltaTickCount = std::max( 1LL, llDeltaTickCount );
     llValue = ( llValue * 1000LL + ( llDeltaTickCount / 2 ) ) / llDeltaTickCount;
 }
 
@@ -371,7 +371,7 @@ void CPerfStatManager::ToPerSecond ( long long& llValue, long long llDeltaTickCo
 ///////////////////////////////////////////////////////////////
 SString CPerfStatManager::GetPerSecondString ( long long llValue, double dDeltaTickCount )
 {
-    dDeltaTickCount = Max( 1.0, dDeltaTickCount );
+    dDeltaTickCount = std::max( 1.0, dDeltaTickCount );
     double dValue = llValue * 1000 / dDeltaTickCount;
     return SString ( dValue < 5 ? "%1.1f" : "%1.0f", dValue );
 }
@@ -386,7 +386,7 @@ SString CPerfStatManager::GetPerSecondString ( long long llValue, double dDeltaT
 ///////////////////////////////////////////////////////////////
 SString CPerfStatManager::GetPercentString ( long long llValue, long long llTotal )
 {
-    llTotal = Max ( 1LL, llTotal );
+    llTotal = std::max ( 1LL, llTotal );
     double dValue = llValue * 100 / (double)llTotal;
     dValue = Clamp ( 0.0, dValue, 100.0 );
     if ( dValue < 1 )

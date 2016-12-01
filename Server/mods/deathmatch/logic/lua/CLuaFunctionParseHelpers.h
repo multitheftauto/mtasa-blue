@@ -8,7 +8,7 @@
 *  DEVELOPERS:  Nobody knows
 *
 *****************************************************************************/
-
+#pragma once
 #include "CElementIDs.h"
 
 // Forward declare enum reflection stuff

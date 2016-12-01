@@ -192,18 +192,16 @@ BOOL __stdcall SetCrashHandlerFilter ( PFNCHFILTFN pFn )
 
             // Stop the OS from turning off our handler
             // Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
+            LONG(WINAPI *RedirectedSetUnhandledExceptionFilter)(EXCEPTION_POINTERS *) = [](EXCEPTION_POINTERS * /*ExceptionInfo*/) -> LONG
+            {
+                // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
+                // our handler will not get removed.
+                return 0;
+            };
 
-            LOCAL_FUNCTION_START
-                static LONG WINAPI RedirectedSetUnhandledExceptionFilter(EXCEPTION_POINTERS * /*ExceptionInfo*/)
-                {
-                    // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
-                    // our handler will not get removed.
-                    return 0;
-                }
-            LOCAL_FUNCTION_END
+            DetourFunction(DetourFindFunction("Kernel32.dll", "SetUnhandledExceptionFilter"),
+                reinterpret_cast <PBYTE> (RedirectedSetUnhandledExceptionFilter));
 
-            reinterpret_cast < LPTOP_LEVEL_EXCEPTION_FILTER > ( DetourFunction ( DetourFindFunction( "Kernel32.dll", "SetUnhandledExceptionFilter" ), 
-                                                                                  reinterpret_cast < PBYTE > ( LOCAL_FUNCTION::RedirectedSetUnhandledExceptionFilter ) ) );
         }
     }
     return ( TRUE ) ;

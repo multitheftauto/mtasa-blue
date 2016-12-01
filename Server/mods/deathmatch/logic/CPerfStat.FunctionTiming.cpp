@@ -244,7 +244,7 @@ void CPerfStatFunctionTimingImpl::DoPulse ( void )
                 item.prev60s.uiNumCalls += slot.uiNumCalls;
 
                 item.prev60s.fTotalMs += slot.fTotalMs;
-                item.prev60s.fPeakMs = Max ( item.prev60s.fPeakMs, slot.fPeakMs );
+                item.prev60s.fPeakMs = std::max ( item.prev60s.fPeakMs, slot.fPeakMs );
                 if ( item.prev60s.fResBiggestMs < slot.fTotalMs )
                 {
                     item.prev60s.fResBiggestMs = slot.fTotalMs;
@@ -252,7 +252,7 @@ void CPerfStatFunctionTimingImpl::DoPulse ( void )
                 }
 
                 item.prev60s.uiTotalBytes += slot.uiTotalBytes;
-                item.prev60s.uiPeakBytes = Max ( item.prev60s.uiPeakBytes, slot.uiPeakBytes );
+                item.prev60s.uiPeakBytes = std::max ( item.prev60s.uiPeakBytes, slot.uiPeakBytes );
                 if ( item.prev60s.uiResBiggestBytes < slot.uiTotalBytes )
                 {
                     item.prev60s.uiResBiggestBytes = slot.uiTotalBytes;
@@ -316,7 +316,7 @@ void CPerfStatFunctionTimingImpl::UpdateTiming ( const SString& strResourceName,
     item.now5s.uiNumCalls++;
 
     item.now5s.fTotalMs += fTimeMs;
-    item.now5s.fPeakMs = Max ( item.now5s.fPeakMs, fTimeMs );
+    item.now5s.fPeakMs = std::max ( item.now5s.fPeakMs, fTimeMs );
     if ( item.now5s.fResBiggestMs < fTimeMs )
     {
         item.now5s.fResBiggestMs = fTimeMs;
@@ -324,7 +324,7 @@ void CPerfStatFunctionTimingImpl::UpdateTiming ( const SString& strResourceName,
     }
 
     item.now5s.uiTotalBytes += uiDeltaBytes;
-    item.now5s.uiPeakBytes = Max ( item.now5s.uiPeakBytes, uiDeltaBytes );
+    item.now5s.uiPeakBytes = std::max ( item.now5s.uiPeakBytes, uiDeltaBytes );
     if ( item.now5s.uiResBiggestBytes < uiDeltaBytes )
     {
         item.now5s.uiResBiggestBytes = uiDeltaBytes;

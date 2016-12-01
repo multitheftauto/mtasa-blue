@@ -1531,7 +1531,7 @@ ResponseCode EHS::HandleRequest ( HttpRequest * ipoHttpRequest,
 
 	// otherwise, just send back the current time
 	char psTime [ 20 ];
-	sprintf ( psTime, "%d", time ( NULL ) );
+	sprintf ( psTime, "%lld", time ( NULL ) );
 	ipoHttpResponse->SetBody ( psTime, strlen ( psTime ) );
 	return HTTPRESPONSECODE_200_OK;
 

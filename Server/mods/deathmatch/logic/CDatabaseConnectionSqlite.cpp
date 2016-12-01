@@ -437,7 +437,7 @@ SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pAr
             {
                 double dNumber = pArgument->GetNumber ();
                 if ( dNumber == floor ( dNumber ) )
-                    strParsedQuery += SString ( "%" PRId64, (long long)dNumber );
+                    strParsedQuery += SString ( "%lld", (long long)dNumber );
                 else
                     strParsedQuery += SString ( "%f", dNumber );
             }
@@ -502,7 +502,7 @@ SString InsertQueryArgumentsSqlite ( const char* szQuery, va_list vl )
                 case SQLITE_INTEGER64:
                 {
                     long long int llValue = va_arg( vl, long long int );
-                    strParsedQuery += SString( "%" PRId64, llValue );
+                    strParsedQuery += SString( "%lld", llValue );
                 }
                 break;
 

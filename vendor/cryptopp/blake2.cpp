@@ -28,14 +28,9 @@ NAMESPACE_BEGIN(CryptoPP)
 #if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE && ((__SUNPRO_CC >= 0x5100 && __SUNPRO_CC < 0x5130) || (_MSC_VER >= 1200 && _MSC_VER < 1600) || (defined(_M_IX86) && _MSC_VER >= 1600))
 inline __m128i _mm_set_epi64x(const word64 a, const word64 b)
 {
-    union INT_128_64x2 {
-        __m128i   v128;
-        word64  v64[2];
-    };
-
-    INT_128_64x2 val;
-    val.v64[0] = b; val.v64[1] = a;
-    return val.v128;
+	const word64 t[2] = {b,a}; __m128i r;
+	memcpy(&r, &t, sizeof(r));
+	return r;
 }
 #endif
 
@@ -352,7 +347,7 @@ BLAKE2_Base<W, T_64bit>::BLAKE2_Base() : m_state(1), m_block(1), m_digestSize(DI
 template <class W, bool T_64bit>
 BLAKE2_Base<W, T_64bit>::BLAKE2_Base(bool treeMode, unsigned int digestSize) : m_state(1), m_block(1), m_digestSize(digestSize), m_treeMode(treeMode)
 {
-	assert(digestSize <= DIGESTSIZE);
+	CRYPTOPP_ASSERT(digestSize <= DIGESTSIZE);
 
 	UncheckedSetKey(NULL, 0, g_nullNameValuePairs);
 	Restart();
@@ -363,10 +358,10 @@ BLAKE2_Base<W, T_64bit>::BLAKE2_Base(const byte *key, size_t keyLength, const by
 	const byte* personalization, size_t personalizationLength, bool treeMode, unsigned int digestSize)
 	: m_state(1), m_block(1), m_digestSize(digestSize), m_treeMode(treeMode)
 {
-	assert(keyLength <= MAX_KEYLENGTH);
-	assert(digestSize <= DIGESTSIZE);
-	assert(saltLength <= SALTSIZE);
-	assert(personalizationLength <= PERSONALIZATIONSIZE);
+	CRYPTOPP_ASSERT(keyLength <= MAX_KEYLENGTH);
+	CRYPTOPP_ASSERT(digestSize <= DIGESTSIZE);
+	CRYPTOPP_ASSERT(saltLength <= SALTSIZE);
+	CRYPTOPP_ASSERT(personalizationLength <= PERSONALIZATIONSIZE);
 
 	UncheckedSetKey(key, static_cast<unsigned int>(keyLength), MakeParameters(Name::DigestSize(),(int)digestSize)(Name::TreeMode(),treeMode, false)
 		(Name::Salt(), ConstByteArrayParameter(salt, saltLength))(Name::Personalization(), ConstByteArrayParameter(personalization, personalizationLength)));
@@ -439,7 +434,7 @@ void BLAKE2_Base<W, T_64bit>::Update(const byte *input, size_t length)
 	// Copy tail bytes
 	if (input && length)
 	{
-		assert(length <= BLOCKSIZE - state.length);
+		CRYPTOPP_ASSERT(length <= BLOCKSIZE - state.length);
 		memcpy_s(&state.buffer[state.length], length, input, length);
 		state.length += static_cast<unsigned int>(length);
 	}
@@ -3470,10 +3465,10 @@ static const int LANE_L64 = 0;
 
 static void BLAKE2_NEON_Compress32(const byte* input, BLAKE2_State<word32, false>& state)
 {
-  //assert(IsAlignedOn(input,GetAlignmentOf<uint8_t*>()));
-  assert(IsAlignedOn(&state.h[0],GetAlignmentOf<uint32x4_t>()));
-  assert(IsAlignedOn(&state.h[4],GetAlignmentOf<uint32x4_t>()));
-  assert(IsAlignedOn(&state.t[0],GetAlignmentOf<uint32x4_t>()));
+  //CRYPTOPP_ASSERT(IsAlignedOn(input,GetAlignmentOf<uint8_t*>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.h[0],GetAlignmentOf<uint32x4_t>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.h[4],GetAlignmentOf<uint32x4_t>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.t[0],GetAlignmentOf<uint32x4_t>()));
 
   CRYPTOPP_ALIGN_DATA(16) uint32_t m0[4], m1[4], m2[4], m3[4], m4[4], m5[4], m6[4], m7[4];
   CRYPTOPP_ALIGN_DATA(16) uint32_t m8[4], m9[4], m10[4], m11[4], m12[4], m13[4], m14[4], m15[4];
@@ -3976,10 +3971,10 @@ static void BLAKE2_NEON_Compress32(const byte* input, BLAKE2_State<word32, false
 
 static void BLAKE2_NEON_Compress64(const byte* input, BLAKE2_State<word64, true>& state)
 {
-  //assert(IsAlignedOn(input,GetAlignmentOf<uint8_t*>()));
-  assert(IsAlignedOn(&state.h[0],GetAlignmentOf<uint64x2_t>()));
-  assert(IsAlignedOn(&state.h[4],GetAlignmentOf<uint64x2_t>()));
-  assert(IsAlignedOn(&state.t[0],GetAlignmentOf<uint64x2_t>()));
+  //CRYPTOPP_ASSERT(IsAlignedOn(input,GetAlignmentOf<uint8_t*>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.h[0],GetAlignmentOf<uint64x2_t>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.h[4],GetAlignmentOf<uint64x2_t>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.t[0],GetAlignmentOf<uint64x2_t>()));
 
   uint64x2_t m0m1,m2m3,m4m5,m6m7,m8m9,m10m11,m12m13,m14m15;
 

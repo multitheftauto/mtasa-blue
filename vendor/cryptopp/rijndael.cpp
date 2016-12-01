@@ -233,13 +233,18 @@ void Rijndael::Base::UncheckedSetKey(const byte *userKey, unsigned int keylen, c
 			0x10, 0x20, 0x40, 0x80,
 			0x1B, 0x36, /* for 128-bit blocks, Rijndael never uses more than 10 rcon values */
 		};
-		const word32 *rc = rcLE;
+
+		// Coverity finding, appears to be false positive. Assert the condition.
+		const word32 *ro = rcLE, *rc = rcLE;
+		CRYPTOPP_UNUSED(ro);
 
 		__m128i temp = _mm_loadu_si128((__m128i *)(void *)(userKey+keylen-16));
 		memcpy(rk, userKey, keylen);
 
 		while (true)
 		{
+			// Coverity finding, appears to be false positive. Assert the condition.
+			CRYPTOPP_ASSERT(rc < ro + COUNTOF(rcLE));
 			rk[keylen/4] = rk[0] ^ _mm_extract_epi32(_mm_aeskeygenassist_si128(temp, 0), 3) ^ *(rc++);
 			rk[keylen/4+1] = rk[1] ^ rk[keylen/4];
 			rk[keylen/4+2] = rk[2] ^ rk[keylen/4+1];
@@ -252,19 +257,29 @@ void Rijndael::Base::UncheckedSetKey(const byte *userKey, unsigned int keylen, c
 			{
 				rk[10] = rk[ 4] ^ rk[ 9];
 				rk[11] = rk[ 5] ^ rk[10];
+				// Coverity finding, appears to be false positive. Assert the condition.
+				CRYPTOPP_ASSERT(m_key.size() >= 12);
 				temp = _mm_insert_epi32(temp, rk[11], 3);
 			}
 			else if (keylen == 32)
 			{
+				// Coverity finding, appears to be false positive. Assert the condition.
+				CRYPTOPP_ASSERT(m_key.size() >= 12);
 				temp = _mm_insert_epi32(temp, rk[11], 3);
     			rk[12] = rk[ 4] ^ _mm_extract_epi32(_mm_aeskeygenassist_si128(temp, 0), 2);
     			rk[13] = rk[ 5] ^ rk[12];
     			rk[14] = rk[ 6] ^ rk[13];
     			rk[15] = rk[ 7] ^ rk[14];
+				// Coverity finding, appears to be false positive. Assert the condition.
+				CRYPTOPP_ASSERT(m_key.size() >= 16);
 				temp = _mm_insert_epi32(temp, rk[15], 3);
 			}
 			else
+			{
+				// Coverity finding, appears to be false positive. Assert the condition.
+				CRYPTOPP_ASSERT(m_key.size() >= 8);
 				temp = _mm_insert_epi32(temp, rk[7], 3);
+			}
 
 			rk += keylen/4;
 		}
@@ -1035,10 +1050,33 @@ void Rijndael_Enc_AdvancedProcessBlocks(void *locals, const word32 *k);
 
 #if CRYPTOPP_BOOL_X64 || CRYPTOPP_BOOL_X32 || CRYPTOPP_BOOL_X86
 
+// Determine whether the range between begin and end overlaps
+//   with the same 4k block offsets as the Te table. Logically,
+//   the code is trying to create the condition:
+//
+// Two sepearate memory pages:
+//
+//  +-----+   +-----+
+//  |XXXXX|   |YYYYY|
+//  |XXXXX|   |YYYYY|
+//  |     |   |     |
+//  |     |   |     |
+//  +-----+   +-----+
+//  Te Table   Locals
+//
+// Have a logical cache view of (X and Y may be inverted):
+//
+// +-----+
+// |XXXXX|
+// |XXXXX|
+// |YYYYY|
+// |YYYYY|
+// +-----+
+//
 static inline bool AliasedWithTable(const byte *begin, const byte *end)
 {
-	size_t s0 = size_t(begin)%4096, s1 = size_t(end)%4096;
-	size_t t0 = size_t(Te)%4096, t1 = (size_t(Te)+sizeof(Te))%4096;
+	ptrdiff_t s0 = uintptr_t(begin)%4096, s1 = uintptr_t(end)%4096;
+	ptrdiff_t t0 = uintptr_t(Te)%4096, t1 = (uintptr_t(Te)+sizeof(Te))%4096;
 	if (t1 > t0)
 		return (s0 >= t0 && s0 < t1) || (s1 > t0 && s1 <= t1);
 	else
@@ -1128,7 +1166,7 @@ inline size_t AESNI_AdvancedProcessBlocks(F1 func1, F4 func4, MAYBE_CONST __m128
 
 	if (flags & BlockTransformation::BT_ReverseDirection)
 	{
-		assert(length % blockSize == 0);
+		CRYPTOPP_ASSERT(length % blockSize == 0);
 		inBlocks += length - blockSize;
 		xorBlocks += length - blockSize;
 		outBlocks += length - blockSize;
@@ -1163,6 +1201,8 @@ inline size_t AESNI_AdvancedProcessBlocks(F1 func1, F4 func4, MAYBE_CONST __m128
 
 			if (flags & BlockTransformation::BT_XorInput)
 			{
+				// Coverity finding, appears to be false positive. Assert the condition.
+				CRYPTOPP_ASSERT(xorBlocks);
 				block0 = _mm_xor_si128(block0, _mm_loadu_si128((const __m128i *)(const void *)xorBlocks));
 				xorBlocks += xorIncrement;
 				block1 = _mm_xor_si128(block1, _mm_loadu_si128((const __m128i *)(const void *)xorBlocks));
@@ -1227,6 +1267,23 @@ inline size_t AESNI_AdvancedProcessBlocks(F1 func1, F4 func4, MAYBE_CONST __m128
 }
 #endif
 
+#if CRYPTOPP_BOOL_X64 || CRYPTOPP_BOOL_X32 || CRYPTOPP_BOOL_X86
+struct Locals
+{
+	word32 subkeys[4*12], workspace[8];
+	const byte *inBlocks, *inXorBlocks, *outXorBlocks;
+	byte *outBlocks;
+	size_t inIncrement, inXorIncrement, outXorIncrement, outIncrement;
+	size_t regSpill, lengthAndCounterFlag, keysBegin;
+};
+
+const size_t s_aliasPageSize = 4096;
+const size_t s_aliasBlockSize = 256;
+const size_t s_sizeToAllocate = s_aliasPageSize + s_aliasBlockSize + sizeof(Locals);
+
+Rijndael::Enc::Enc() : m_aliasBlock(s_sizeToAllocate) { }
+#endif
+
 size_t Rijndael::Enc::AdvancedProcessBlocks(const byte *inBlocks, const byte *xorBlocks, byte *outBlocks, size_t length, word32 flags) const
 {
 #if CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE
@@ -1240,34 +1297,21 @@ size_t Rijndael::Enc::AdvancedProcessBlocks(const byte *inBlocks, const byte *xo
 		if (length < BLOCKSIZE)
 			return length;
 
-		struct Locals
+		static const byte *zeros = (const byte*)(Te+256);
+		byte *space = NULL, *originalSpace = const_cast<byte*>(m_aliasBlock.data());
+
+		// round up to nearest 256 byte boundary
+		space = originalSpace +	(s_aliasBlockSize - (uintptr_t)originalSpace % s_aliasBlockSize) % s_aliasBlockSize;
+		while (AliasedWithTable(space, space + sizeof(Locals)))
 		{
-			word32 subkeys[4*12], workspace[8];
-			const byte *inBlocks, *inXorBlocks, *outXorBlocks;
-			byte *outBlocks;
-			size_t inIncrement, inXorIncrement, outXorIncrement, outIncrement;
-			size_t regSpill, lengthAndCounterFlag, keysBegin;
-		};
-
-		const byte* zeros = (byte *)(Te+256);
-		byte *space = NULL;
-
-		do {
-#if (CRYPTOPP_MSC_VERSION >= 1400)
-			// http://msdn.microsoft.com/en-us/library/5471dc8s.aspx
-			space = (byte *)_malloca(255+sizeof(Locals));
-			space += (256-(size_t)space%256)%256;
-#else
-			space = (byte *)alloca(255+sizeof(Locals));
-			space += (256-(size_t)space%256)%256;
-#endif
+			space += 256;
+			CRYPTOPP_ASSERT(space < (originalSpace + s_aliasPageSize));
 		}
-		while (AliasedWithTable(space, space+sizeof(Locals)));
 
 		size_t increment = BLOCKSIZE;
 		if (flags & BT_ReverseDirection)
 		{
-			assert(length % BLOCKSIZE == 0);
+			CRYPTOPP_ASSERT(length % BLOCKSIZE == 0);
 			inBlocks += length - BLOCKSIZE;
 			xorBlocks += length - BLOCKSIZE;
 			outBlocks += length - BLOCKSIZE;
@@ -1291,10 +1335,6 @@ size_t Rijndael::Enc::AdvancedProcessBlocks(const byte *inBlocks, const byte *xo
 		locals.keysBegin = (12-keysToCopy)*16;
 
 		Rijndael_Enc_AdvancedProcessBlocks(&locals, m_key);
-
-#if (CRYPTOPP_MSC_VERSION >= 1400)
-		_freea(space);
-#endif
 
 		return length % BLOCKSIZE;
 	}

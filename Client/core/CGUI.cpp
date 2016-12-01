@@ -525,10 +525,9 @@ void CLocalGUI::EchoChat ( const char* szText, bool bColorCoded )
 
 bool CLocalGUI::IsWebRequestGUIVisible ()
 {
-    auto pWebCore = g_pCore->GetWebCore ();
-    if ( pWebCore )
+    if ( g_pCore->IsWebCoreLoaded () )
     {
-        return pWebCore->IsRequestsGUIVisible ();
+        return g_pCore->GetWebCore ()->IsRequestsGUIVisible ();
     }
     return false;
 }

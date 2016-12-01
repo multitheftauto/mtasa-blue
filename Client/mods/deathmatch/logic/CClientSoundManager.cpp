@@ -274,7 +274,7 @@ void CClientSoundManager::UpdateVolume ()
             if ( fValue*10000 == BASS_GetConfig ( BASS_CONFIG_GVOL_STREAM ) )
                 return;
 
-            fValue = Max( 0.0f, Min( 1.0f, fValue ) );
+            fValue = std::max( 0.0f, std::min( 1.0f, fValue ) );
         }
         else
         {

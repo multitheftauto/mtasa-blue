@@ -345,10 +345,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Reset test mode script settings to default
     g_pCore->GetGraphics ()->GetRenderItemManager ()->SetTestMode ( DX_TEST_MODE_NONE );
-
-    // Give a default value for the streaming memory
-    if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
-        g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 }
 
 
@@ -2335,8 +2331,7 @@ bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bI
         bool bIgnore = false;
         if ( bState )
         {
-            auto pWebCore = g_pCore->GetWebCore();
-            auto pFocusedBrowser = pWebCore ? pWebCore->GetFocusedWebView () : nullptr;
+            auto pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView () : nullptr;
             bool isMouseKey = strKey.substr(0, 5) == "mouse";
 
             if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey )
@@ -2398,8 +2393,7 @@ bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
     if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsInputActive() == false )
     {
         // Cancel event if remote browser is focused
-        auto pWebCore = g_pCore->GetWebCore();
-        auto pFocusedBrowser = pWebCore ? pWebCore->GetFocusedWebView () : nullptr;
+        auto pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView () : nullptr;
         if ( pFocusedBrowser && !pFocusedBrowser->IsLocal () )
             return false;
 
@@ -2595,9 +2589,9 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                     }
                     if ( szButton && szState )
                     {
-                        if ( _isnan( vecCollision.fX ) ) vecCollision.fX = 0;
-                        if ( _isnan( vecCollision.fY ) ) vecCollision.fY = 0;
-                        if ( _isnan( vecCollision.fZ ) ) vecCollision.fZ = 0;
+                        if ( std::isnan( vecCollision.fX ) ) vecCollision.fX = 0;
+                        if ( std::isnan( vecCollision.fY ) ) vecCollision.fY = 0;
+                        if ( std::isnan( vecCollision.fZ ) ) vecCollision.fZ = 0;
 
                         // Call the event for the client
                         CLuaArguments Arguments;
@@ -6024,7 +6018,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     }
 
     m_pBigPacketTransferBox->DoPulse ();
-    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ), CTransferBox::PACKET );
+    m_pBigPacketTransferBox->SetInfo (std::min( ulTotalSize, ulBytesReceived ), CTransferBox::PACKET );
 }
 
 bool CClientGame::SetGlitchEnabled ( unsigned char ucGlitch, bool bEnabled )
@@ -6252,8 +6246,8 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer* pBuffer, uint uiTimeSp
     const long long llPacketInterval = 1000 / uiSendRate;
     const uint uiTotalByteSize = pBuffer->GetSize ();
     const char* pData = pBuffer->GetData ();
-    const uint uiBytesPerPart = Min ( Min ( Max ( 100U, uiMaxBandwidth / uiSendRate ), uiTotalByteSize ), 30000U );
-    const uint uiNumParts = Max ( 1U, ( uiTotalByteSize + uiBytesPerPart - 1 ) / uiBytesPerPart );
+    const uint uiBytesPerPart = std::min(std::min( std::max ( 100U, uiMaxBandwidth / uiSendRate ), uiTotalByteSize ), 30000U );
+    const uint uiNumParts = std::max ( 1U, ( uiTotalByteSize + uiBytesPerPart - 1 ) / uiBytesPerPart );
 
     // Calc variables stuff
     CTickCount tickCount = CTickCount::Now () + CTickCount ( llPacketInterval );
@@ -6266,7 +6260,7 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer* pBuffer, uint uiTimeSp
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
 
         ushort usPartNumber = i;
-        ushort usBytesThisPart = Min ( uiBytesRemaining, uiBytesPerPart );
+        ushort usBytesThisPart = std::min (uiBytesRemaining, uiBytesPerPart);
         assert ( usBytesThisPart != 0 );
 
         pBitStream->Write ( (uchar)EPlayerScreenShotResult::SUCCESS );
@@ -6370,7 +6364,7 @@ void CClientGame::SetDevelopmentMode ( bool bEnable, bool bEnableWeb )
     else
         g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
 
-    if ( g_pCore->GetWebCore() )
+    if ( g_pCore->IsWebCoreLoaded() )
         g_pCore->GetWebCore()->SetTestModeEnabled ( bEnableWeb );
 }
 

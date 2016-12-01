@@ -12,7 +12,7 @@ after_build:
   - utils\premake5 install_data
   - utils\premake5 compose_files
   - 7z a InstallFiles.zip InstallFiles
-  - cmd: if "%APPVEYOR_PULL_REQUEST_TITLE%" == "" curl -i -F "branch_name=%APPVEYOR_REPO_BRANCH%" -F "commit_hash=%APPVEYOR_REPO_COMMIT%" -F "commit_title=%APPVEYOR_REPO_COMMIT_MESSAGE%" -F build_type=windows32 -F "secret=%UPLOAD_SECRET%" -F build_upload=@InstallFiles.zip https://nightlytest.mtasa.com/api/upload
+  - cmd: if "%APPVEYOR_PULL_REQUEST_TITLE%" == "" if "%APPVEYOR_REPO_TAG%" == "false" curl -i -F "branch_name=%APPVEYOR_REPO_BRANCH%" -F "commit_hash=%APPVEYOR_REPO_COMMIT%" -F "commit_title=%APPVEYOR_REPO_COMMIT_MESSAGE%" -F build_type=windows32 -F "secret=%UPLOAD_SECRET%" -F build_upload=@InstallFiles.zip https://nightlytest.mtasa.com/api/upload
 
 clone_depth: 1
 

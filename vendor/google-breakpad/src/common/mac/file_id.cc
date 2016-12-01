@@ -34,6 +34,7 @@
 // Author: Dan Waylonis
 
 #include <fcntl.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -45,7 +46,7 @@ using MacFileUtilities::MachoID;
 namespace google_breakpad {
 
 FileID::FileID(const char *path) {
-  strlcpy(path_, path, sizeof(path_));
+  snprintf(path_, sizeof(path_), "%s", path);
 }
 
 bool FileID::FileIdentifier(unsigned char identifier[16]) {

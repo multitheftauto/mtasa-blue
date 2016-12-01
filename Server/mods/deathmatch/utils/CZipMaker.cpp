@@ -20,7 +20,14 @@
 ///////////////////////////////////////////////////////////////
 CZipMaker::CZipMaker ( const SString& strZipPathFilename )
 {
+#ifdef WIN32
+    // This will use CreateFile instead of fopen
+    zlib_filefunc_def ffunc;
+    fill_win32_filefunc (&ffunc);
+	m_uzFile = zipOpen2 ( strZipPathFilename, APPEND_STATUS_CREATE, nullptr, &ffunc );
+#else
 	m_uzFile = zipOpen ( strZipPathFilename, APPEND_STATUS_CREATE );      // Use APPEND_STATUS_ADDINZIP to open existing
+#endif
 }
 
 

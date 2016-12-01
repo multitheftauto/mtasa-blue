@@ -33,8 +33,8 @@ CTransferBox::CTransferBox ( void )
     // Find our largest piece of text, so we can size accordingly
     float fTransferBoxWidth = 0;
     for (int i=0; i<Type::MAX_TYPES; i++)
-        fTransferBoxWidth = Max < float > ( fTransferBoxWidth, pGUI->GetTextExtent ( m_strTransferText[i] + " " + SString(_("%s of %s"),"999.99 kB","999.99 kB"), "default-bold-small" ) );
-    fTransferBoxWidth = Max < float > ( fTransferBoxWidth, pGUI->GetTextExtent ( _("Disconnect to cancel download"), "default-normal" ) );
+        fTransferBoxWidth = std::max < float > ( fTransferBoxWidth, pGUI->GetTextExtent ( m_strTransferText[i] + " " + SString(_("%s of %s"),"999.99 kB","999.99 kB"), "default-bold-small" ) );
+    fTransferBoxWidth = std::max < float > ( fTransferBoxWidth, pGUI->GetTextExtent ( _("Disconnect to cancel download"), "default-normal" ) );
 
     // Add some padding to our text for the size of the window
     fTransferBoxWidth += 80;

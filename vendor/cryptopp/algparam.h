@@ -74,7 +74,7 @@ public:
 	void Assign(const byte *data, size_t size, bool deepCopy)
 	{
 		// This fires, which means: no data with a size, or data with no size.
-		// assert((data && size) || !(data || size));
+		// CRYPTOPP_ASSERT((data && size) || !(data || size));
 		if (deepCopy)
 			m_block.Assign(data, size);
 		else
@@ -459,11 +459,20 @@ public:
 		}
 	}
 
+#if defined(DEBUG_NEW) && (_MSC_VER >= 1300)
+# pragma push_macro("new")
+# undef new
+#endif
+
 	void MoveInto(void *buffer) const
 	{
 		AlgorithmParametersTemplate<T>* p = new(buffer) AlgorithmParametersTemplate<T>(*this);
 		CRYPTOPP_UNUSED(p);	// silence warning
 	}
+
+#if defined(DEBUG_NEW) && (_MSC_VER >= 1300)
+# pragma pop_macro("new")
+#endif
 
 protected:
 	T m_value;

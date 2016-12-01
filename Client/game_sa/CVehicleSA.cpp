@@ -68,14 +68,14 @@ namespace
         rwInOutMatrix.pos = (RwV3d&)vecPosition;
     }
 
-    RpAtomic* ClumpDumpCB (RpAtomic* pAtomic, void * data)
+    bool ClumpDumpCB (RpAtomic* pAtomic, void * data)
     {
         CVehicleSA * pVehicleSA = (CVehicleSA *)data;
         RwFrame* pFrame = RpGetFrame ( pAtomic );   
         pVehicleSA->AddComponent ( pFrame, false );
         //g_pCore->GetConsole()->Print ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
         //OutputDebugLine ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
-        return pAtomic;
+        return true;
     }
 
     void ClumpDump ( RpClump* pClump, CVehicleSA * pVehicleSA )

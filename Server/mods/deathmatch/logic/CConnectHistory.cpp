@@ -171,11 +171,11 @@ SString CConnectHistory::DebugDump ( long long llTickCountAdd )
     std::stringstream strOutput;
 
     long long llCurrentTime = GetModuleTickCount64 ();
-    strOutput << SString( "CurrentTime: 0x%" PRIx64 "\n", llCurrentTime );
-    strOutput << SString( "TimeLastRemoveExpired: 0x%" PRIx64 "\n", m_llTimeLastRemoveExpired );
+    strOutput << SString( "CurrentTime: 0x%llx\n", llCurrentTime );
+    strOutput << SString( "TimeLastRemoveExpired: 0x%llx\n", m_llTimeLastRemoveExpired );
     strOutput << SString( "HistoryItems: %d\n", m_HistoryItemMap.size() );
-    strOutput << SString( "TickCountAdd: 0x%" PRIx64 "\n", llTickCountAdd );
-    strOutput << SString( "DebugTickCountOffset: 0x%" PRIx64 "\n", m_llDebugTickCountOffset );
+    strOutput << SString( "TickCountAdd: 0x%llx\n", llTickCountAdd );
+    strOutput << SString( "DebugTickCountOffset: 0x%llx\n", m_llDebugTickCountOffset );
 
     // Step through each IP's connect history
     for ( HistoryItemMap::iterator mapIt = m_HistoryItemMap.begin () ; mapIt != m_HistoryItemMap.end (); ++mapIt )
@@ -189,7 +189,7 @@ SString CConnectHistory::DebugDump ( long long llTickCountAdd )
             {
                 long long llTime = historyItem.joinTimes[i];
                 long long llAge = llCurrentTime - historyItem.joinTimes[i];
-                strInfo += SString ( "%" PRId64 "(0x%" PRIx64 ")  ", llAge, llTime );
+                strInfo += SString ( "%lld(0x%llx)  ", llAge, llTime );
             }
             strInfo += "\n";
             strOutput << strInfo;

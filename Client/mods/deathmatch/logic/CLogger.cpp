@@ -101,7 +101,7 @@ void CLogger::SetLogFile ( const char* szLogFile )
     // Eventually open a new file
     if ( szLogFile && szLogFile[0] )
     {
-        m_pLogFile = fopen ( szLogFile, "a+" );
+        m_pLogFile = File::Fopen ( szLogFile, "a+" );
     }
 }
 

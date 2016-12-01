@@ -68,7 +68,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
     if ( ( g_pDeviceState->DeviceCaps.TextureFilterCaps & D3DPTFILTERCAPS_MINFANISOTROPIC )
          && ( g_pDeviceState->DeviceCaps.TextureFilterCaps & D3DPTFILTERCAPS_MIPFLINEAR ) )
     {
-        int iLevel = Max < int > ( 1, g_pDeviceState->DeviceCaps.MaxAnisotropy );
+        int iLevel = std::max < int > ( 1, g_pDeviceState->DeviceCaps.MaxAnisotropy );
         // Convert level 1/2/4/8/16 into setting 0/1/2/3/4
         while ( iLevel >>= 1 )
             g_pDeviceState->AdapterState.MaxAnisotropicSetting++;
@@ -82,6 +82,10 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9 ( IDirect3DDevice9 * pDevice  )
                             , g_pDeviceState->AdapterState.InstalledMemoryKB
                             , g_pDeviceState->AdapterState.MaxAnisotropicSetting
                             ) );
+
+    // Give a default value for the streaming memory setting
+    if ( g_pCore->GetCVars()->Exists( "streaming_memory" ) == false )
+        g_pCore->GetCVars()->Set( "streaming_memory", g_pCore->GetMaxStreamingMemory() );
 
     // Call event handler
     CDirect3DEvents9::OnDirect3DDeviceCreate ( pDevice );

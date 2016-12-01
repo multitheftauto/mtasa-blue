@@ -162,8 +162,8 @@ RwTexture* CRenderWareSA::RightSizeTexture( RwTexture* pTexture, uint uiSizeLimi
         uiSizeLimit *= 2;
 
     // Change size
-    uint uiReqWidth = Min( uiSizeLimit, uiWidth );
-    uint uiReqHeight = Min( uiSizeLimit, uiHeight );
+    uint uiReqWidth = std::min( uiSizeLimit, uiWidth );
+    uint uiReqHeight = std::min( uiSizeLimit, uiHeight );
     if ( uiReqWidth == uiWidth && uiReqHeight == uiHeight )
         return NULL;
 

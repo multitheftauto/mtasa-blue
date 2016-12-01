@@ -48,7 +48,7 @@ channels.h
 cmac.cpp
 cmac.h
 config.h
-config.recommend
+config.compat
 cpu.cpp
 cpu.h
 crc.cpp
@@ -179,6 +179,7 @@ oaep.h
 oids.h
 osrng.cpp
 osrng.h
+ossig.h
 panama.cpp
 panama.h
 pch.cpp
@@ -263,6 +264,7 @@ strciphr.h
 tea.cpp
 tea.h
 test.cpp
+trap.h
 tftables.cpp
 tiger.cpp
 tiger.h
@@ -310,8 +312,6 @@ License.txt
 Readme.txt
 Install.txt
 Filelist.txt
-CMakeLists.txt
-cryptopp-config.cmake
 TestData/3desval.dat
 TestData/3wayval.dat
 TestData/camellia.dat

@@ -25,6 +25,7 @@ project "Client Launcher"
 	}
 	
 	filter "system:windows"
+		flags { "StaticRuntime" } 
 		files {
 			"NEU/GDFImp.gdf.xml",
 			"GDFImp.rc",

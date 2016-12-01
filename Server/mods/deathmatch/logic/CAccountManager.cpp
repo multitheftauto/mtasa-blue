@@ -184,7 +184,7 @@ bool CAccountManager::Load( void )
 
         if ( bChanged )
             pAccount->SetChanged ( bChanged );
-        m_iAccounts = Max ( m_iAccounts, iUserID );
+        m_iAccounts = std::max ( m_iAccounts, iUserID );
 
         // Feedback for the user
         if ( activityTimer.Get() > 5000 )

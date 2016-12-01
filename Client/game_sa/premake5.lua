@@ -14,13 +14,13 @@ project "Game SA"
 	}
 	
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../vendor/sparsehash/src/windows" }
 	
 	filter {}
 
 	includedirs {
 		"../sdk/",
-		"../../vendor/sparsehash/current/src",
+		"../../vendor/sparsehash/src/"
 		"../../Shared/gta"
 	}
 	

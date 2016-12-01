@@ -5,7 +5,7 @@ project "Client Core"
 	targetdir(buildpath("mta"))
 	
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../vendor/sparsehash/src/windows" }
 		linkoptions { "/SAFESEH\:NO" }
 		buildoptions { "-Zm130" }
 	
@@ -13,17 +13,15 @@ project "Client Core"
 		includedirs { 
 			".",
 			"../sdk",
-			"../../vendor/cef3",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
 			"../../vendor/jpeg-9b",
 			"../../vendor/pthreads/include",
-			"../../vendor/sparsehash/current/src/"
+			"../../vendor/sparsehash/src/"
 		}
 
 	libdirs {
 		"../../vendor/detours/lib",
-		"../../vendor/cef3/Release"
 	}
 	
 
@@ -48,7 +46,7 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8", 
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi", 
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "libcef", "CEF", "detours"
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours"
 	}
 
 	defines {

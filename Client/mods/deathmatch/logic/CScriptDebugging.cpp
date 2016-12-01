@@ -246,7 +246,7 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
 
 
     // Try to load the new file
-    FILE* pFile = fopen ( szFilename, "a+" );
+    FILE* pFile = File::Fopen ( szFilename, "a+" );
     if ( pFile )
     {
         // [2014-07-09 14:39:31] WARNING: Bad argument @ 'setElementPosition' [Expected element at argument 1, got nil] [string "return addEventHandler("onClientRender", ro..."]

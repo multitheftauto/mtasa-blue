@@ -287,26 +287,26 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox ( SCurrentS
             CVector* pPos2 = (CVector*)( pSourceArrayBytes + v2 * StridePT );
 
             // Update min/max
-            vecMin.fX = Min ( vecMin.fX, pPos0->fX );
-            vecMin.fY = Min ( vecMin.fY, pPos0->fY );
-            vecMin.fZ = Min ( vecMin.fZ, pPos0->fZ );
-            vecMax.fX = Max ( vecMax.fX, pPos0->fX );
-            vecMax.fY = Max ( vecMax.fY, pPos0->fY );
-            vecMax.fZ = Max ( vecMax.fZ, pPos0->fZ );
+            vecMin.fX = std::min ( vecMin.fX, pPos0->fX );
+            vecMin.fY = std::min ( vecMin.fY, pPos0->fY );
+            vecMin.fZ = std::min ( vecMin.fZ, pPos0->fZ );
+            vecMax.fX = std::max ( vecMax.fX, pPos0->fX );
+            vecMax.fY = std::max ( vecMax.fY, pPos0->fY );
+            vecMax.fZ = std::max ( vecMax.fZ, pPos0->fZ );
 
-            vecMin.fX = Min ( vecMin.fX, pPos1->fX );
-            vecMin.fY = Min ( vecMin.fY, pPos1->fY );
-            vecMin.fZ = Min ( vecMin.fZ, pPos1->fZ );
-            vecMax.fX = Max ( vecMax.fX, pPos1->fX );
-            vecMax.fY = Max ( vecMax.fY, pPos1->fY );
-            vecMax.fZ = Max ( vecMax.fZ, pPos1->fZ );
+            vecMin.fX = std::min ( vecMin.fX, pPos1->fX );
+            vecMin.fY = std::min ( vecMin.fY, pPos1->fY );
+            vecMin.fZ = std::min ( vecMin.fZ, pPos1->fZ );
+            vecMax.fX = std::max ( vecMax.fX, pPos1->fX );
+            vecMax.fY = std::max ( vecMax.fY, pPos1->fY );
+            vecMax.fZ = std::max ( vecMax.fZ, pPos1->fZ );
 
-            vecMin.fX = Min ( vecMin.fX, pPos2->fX );
-            vecMin.fY = Min ( vecMin.fY, pPos2->fY );
-            vecMin.fZ = Min ( vecMin.fZ, pPos2->fZ );
-            vecMax.fX = Max ( vecMax.fX, pPos2->fX );
-            vecMax.fY = Max ( vecMax.fY, pPos2->fY );
-            vecMax.fZ = Max ( vecMax.fZ, pPos2->fZ );
+            vecMin.fX = std::min ( vecMin.fX, pPos2->fX );
+            vecMin.fY = std::min ( vecMin.fY, pPos2->fY );
+            vecMin.fZ = std::min ( vecMin.fZ, pPos2->fZ );
+            vecMax.fX = std::max ( vecMax.fX, pPos2->fX );
+            vecMax.fY = std::max ( vecMax.fY, pPos2->fY );
+            vecMax.fZ = std::max ( vecMax.fZ, pPos2->fZ );
         }
     }
 

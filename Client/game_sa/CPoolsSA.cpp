@@ -1042,7 +1042,7 @@ void CPoolsSA::DumpPoolsStatus ()
     int iPosition = 0;
     char percent = '%';
     iPosition += snprintf ( szOutput, 1024, "-----------------\n" );
-    int iAmount = Min < int > ( MAX_POOLS, Min( NUMELMS( poolNames ), NUMELMS( poolSizes ) ) );
+    int iAmount = std::min < int >(MAX_POOLS, std::min(NUMELMS(poolNames), NUMELMS(poolSizes)));
     for ( int i = 0; i < iAmount; i++ )
     {
         int usedSpaces = GetNumberOfUsedSpaces ( (ePools)i );

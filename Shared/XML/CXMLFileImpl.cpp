@@ -162,16 +162,16 @@ bool CXMLFileImpl::WriteSafer ( void )
         }
 
         // Delete any leftover backup
-        unlink ( strBackup );
+        File::Delete ( strBackup );
 
         // Save filename being saved
         FileRecoveryPreSave( strFilename );
 
         // Rename current to backup
-        rename ( strFilename, strBackup );
+        File::Rename ( strFilename, strBackup );
 
         // Rename temp to current
-        if ( rename ( strTemp, strFilename ) )
+        if ( File::Rename ( strTemp, strFilename ) )
         {
             SetLastError ( CXMLErrorCodes::OtherError, "Could not rename temporary to current" );
             return false;
@@ -181,7 +181,7 @@ bool CXMLFileImpl::WriteSafer ( void )
         FileRecoveryPostSave();
 
         // Delete backup
-        unlink ( strBackup );
+        File::Delete ( strBackup );
 
         return true;
     }
@@ -363,7 +363,7 @@ void CXMLFileImpl::InitFileRecovery( const char* szSaveFlagDirectory )
         SString strTemp = strFilename + "_new_";
         if ( FileExists( strTemp ) )
         {
-            rename( strTemp, strFilename );
+            File::Rename( strTemp, strFilename );
         }
     }
 
@@ -373,7 +373,7 @@ void CXMLFileImpl::InitFileRecovery( const char* szSaveFlagDirectory )
         SString strBackup = strFilename + "_old_";
         if ( FileExists( strBackup ) )
         {
-            rename( strBackup, strFilename );
+            File::Rename( strBackup, strFilename );
         }
     }
     FileDelete( ms_strSaveFlagFile );

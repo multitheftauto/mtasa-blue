@@ -116,12 +116,14 @@ void CMessageLoopHook::MaybeRefreshMsgQueue( void )
     	  || msg.message == WM_VSCROLL
     	  ) 
     	  return; 
-    if ( PeekMessage( &msg, NULL, 0, 0,PM_REMOVE ) )
-    {
-    	TranslateMessage( &msg );
-    	DispatchMessage( &msg );
-    }
+
+    // Voodoo
+    uint uiUnusedMessageId = 0x3039;
+    PostMessage( m_HookedWindowHandle, uiUnusedMessageId, 0, 0 );
+    PeekMessage( &msg, NULL, uiUnusedMessageId, uiUnusedMessageId, PM_REMOVE );
+    PeekMessage( &msg, NULL, uiUnusedMessageId, uiUnusedMessageId, PM_REMOVE );
 }
+
 
 LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd, 
                                                     UINT uMsg, 

@@ -5,12 +5,12 @@ project "Multiplayer SA"
 	targetdir(buildpath("mta"))
 	
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../vendor/sparsehash/src/windows" }
 	
 	filter {}
 		includedirs { 
 			"../sdk",
-			"../../vendor/sparsehash/current/src/"
+			"../../vendor/sparsehash/src/"
 		}
 	
 	pchheader "StdInc.h"

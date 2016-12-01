@@ -61,7 +61,7 @@ void CLuaFileDefs::AddClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "pos", "fileSetPos", "fileGetPos" );
     lua_classvariable ( luaVM, "size", nullptr, "fileGetSize" );
-    lua_classvariable ( luaVM, "isEOF", nullptr, "fileIsEOF" );
+    lua_classvariable ( luaVM, "eof", nullptr, "fileIsEOF" );
     lua_classvariable ( luaVM, "path", nullptr, "fileGetPath" );
 
     lua_registerclass ( luaVM, "File" );

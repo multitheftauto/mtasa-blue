@@ -918,7 +918,7 @@ void CSettings::CreateGUI ( void )
 
     // Add 30 for each tab
     fColorTabsTextWidth += 30 * 4;
-    float fColorTabPanelWidth = Max ( 350.f, fColorTabsTextWidth );
+    float fColorTabPanelWidth = std::max ( 350.f, fColorTabsTextWidth );
 
     CGUITabPanel* pColorTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( pTabInterface ) );
     pColorTabPanel->SetPosition ( CVector2D ( 10.0f, 150.0f ) );
@@ -2896,9 +2896,9 @@ void CSettings::LoadData ( void )
     m_pGridBrowserWhitelist->Clear ();
     m_bBrowserListsChanged = false;
 
-    auto pWebCore = CCore::GetSingleton().GetWebCore();
-    if ( pWebCore )
+    if ( g_pCore->IsWebCoreLoaded() )
     {
+        auto pWebCore = g_pCore->GetWebCore();
         std::vector<std::pair<SString, bool>> customBlacklist;
         pWebCore->GetFilterEntriesByType( customBlacklist, eWebFilterType::WEBFILTER_USER );
         for ( std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter )
@@ -2993,11 +2993,11 @@ void CSettings::SaveData ( void )
     SetApplicationSettingInt ( "customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0 );
 
     // iFieldOfView
-    int iFieldOfView = Min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
+    int iFieldOfView = std::min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
     CVARS_SET ( "fov", iFieldOfView );
 
     // Anisotropic filtering
-    int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
+    int iAnisotropic = std::min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
     CVARS_SET( "anisotropic", iAnisotropic );
 
     // Visual FX Quality
@@ -3188,7 +3188,7 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "streaming_memory", value );
 
     // Webbrowser settings
-    bool bOldRemoteWebsites, bOldRemoteJavascript, bOldPlugins;
+    bool bOldRemoteWebsites, bOldRemoteJavascript;
     CVARS_GET ( "browser_remote_websites", bOldRemoteWebsites );
     CVARS_GET ( "browser_remote_javascript", bOldRemoteJavascript );
 
@@ -3201,9 +3201,9 @@ void CSettings::SaveData ( void )
         CVARS_SET ( "browser_remote_javascript", m_pCheckBoxRemoteJavascript->GetSelected () );
     }
 
-    auto pWebCore = CCore::GetSingleton().GetWebCore();
-    if ( pWebCore )
+    if ( g_pCore->IsWebCoreLoaded() )
     {
+        auto pWebCore = g_pCore->GetWebCore();
         std::vector<SString> customBlacklist;
         for ( int i = 0; i < m_pGridBrowserBlacklist->GetRowCount (); ++i )
         {
@@ -3614,7 +3614,7 @@ bool CSettings::OnSkinChanged ( CGUIElement* pElement )
 
 bool CSettings::OnFieldOfViewChanged ( CGUIElement* pElement )
 {
-    int iFieldOfView = Min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
+    int iFieldOfView = std::min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
 
     m_pFieldOfViewValueLabel->SetText ( SString("%i", iFieldOfView).c_str() );
     return true;
@@ -3638,7 +3638,7 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
 
 bool CSettings::OnAnisotropicChanged ( CGUIElement* pElement )
 {
-    int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
+    int iAnisotropic = std::min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
 
     SString strLabel;
     if ( iAnisotropic > 0 )

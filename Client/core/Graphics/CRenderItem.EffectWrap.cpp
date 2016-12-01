@@ -853,10 +853,10 @@ bool CEffectWrapImpl::ApplyCommonHandles ( void )
 
         if ( m_CommonHandles.hLightAmbient )
         {
-            totalAmbient.a = Min ( totalAmbient.a, 1.0f );
-            totalAmbient.r = Min ( totalAmbient.r, 1.0f );
-            totalAmbient.g = Min ( totalAmbient.g, 1.0f );
-            totalAmbient.b = Min ( totalAmbient.b, 1.0f );
+            totalAmbient.a = std::min ( totalAmbient.a, 1.0f );
+            totalAmbient.r = std::min ( totalAmbient.r, 1.0f );
+            totalAmbient.g = std::min ( totalAmbient.g, 1.0f );
+            totalAmbient.b = std::min ( totalAmbient.b, 1.0f );
             m_pD3DEffect->SetFloatArray ( m_CommonHandles.hLightAmbient, (float*)&totalAmbient, 4 );
         }
 

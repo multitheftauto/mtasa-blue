@@ -1,5 +1,5 @@
 Crypto++: a C++ Class Library of Cryptographic Schemes
-Version 5.6.4 - SEPT/10/2016
+Version 5.6.4 - SEPT/11/2016
 
 Crypto++ Library is a free C++ class library of cryptographic schemes.
 Currently the library contains the following algorithms:
@@ -114,7 +114,7 @@ all three forms, and sample applications using each of the three forms
 are also included.
 
 To compile Crypto++ with MSVC, open  "cryptest.sln" (for MSVC 2005 - 2015)
-or "cryptest.dsw" (for MSVC 6 and MSVC .NET 2003) workspace file and build
+or "cryptest.dsw" (for MSVC 6 - MSVC .NET 2003) workspace file and build
 one or more of the following projects:
 
 cryptdll - This builds the DLL. Please note that if you wish to use Crypto++
@@ -162,12 +162,40 @@ and "SetNewAndDeleteFromCryptoPP". If one of these functions is found,
 Crypto++ uses methods 1 or 2, respectively, by calling the function.
 Otherwise, method 3 is used.
 
-*** GCC-Specific Information ***
+*** Linux and Unix-like Specific Information ***
 
-A makefile is included for you to compile Crypto++ with GCC. Make sure
-you are using GNU Make and GNU ld. The make process will produce two files,
-libcryptopp.a and cryptest.exe. Run "cryptest.exe v" for the validation
-suite.
+A makefile is included for you to compile Crypto++ with GCC and compatibles.
+Make sure you are using GNU Make and GNU ld. The make process will produce
+two files, libcryptopp.a and cryptest.exe. Run "cryptest.exe v" for the
+validation suite and "cryptest.exe tv all" for additional test vectors.
+
+The makefile uses '-DNDEBUG -g2 -O2' CXXFLAGS by default. If you use an
+alternate build system, like Autotools or CMake, then ensure the build system
+includes '-DNDEBUG' for production or release builds. The Crypto++ library uses
+asserts for debugging and diagnostics during development; it does not
+rely on them to crash a program at runtime.
+
+If an assert triggers in production software, then unprotected sensitive
+information could be egressed from the program to the filesystem or the
+platform's error reporting program, like Apport on Ubuntu or CrashReporter
+on Apple.
+
+The makefile orders object files to help remediate problems associated with
+C++ static initialization order. The library does not use custom linker scripts.
+If you use an alternate build system, like Autotools or CMake, and collect source
+files into a list, then ensure these three are at the head of the list: 'cryptlib.cpp
+cpu.cpp integer.cpp <other sources>'. They should be linked in the same order:
+'cryptlib.o cpu.o integer.o <other objects>'.
+
+If your linker supports initialization attributes, like init_priority, then you can
+define CRYPTOPP_INIT_PRIORITY to control object initialization order. Set it to a
+value like 250. User programs can use CRYPTOPP_USER_PRIORITY to avoid conflicts with
+library values. Initialization attributes are more reliable than object file ordering,
+but its not ubiquitously supported by linkers.
+
+The makefile links to the static version of the Crypto++ library to avoid binary
+planting and other LD_PRELOAD tricks. You should use the static version of the
+library in your programs to help avoid unwanted redirections.
 
 *** Documentation and Support ***
 

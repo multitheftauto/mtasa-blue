@@ -407,13 +407,13 @@ void CMemStats::Draw ( void )
 
     if ( bHoldingPageUp )
     {
-        m_fPosY = Max ( 0.f, m_fPosY - 10 );
+        m_fPosY = std::max ( 0.f, m_fPosY - 10 );
     }
     if ( bHoldingPageDown )
     {
         float fScrollHeight = fTotalHeight - ( fResHeight - 200 );
         if ( fScrollHeight > 0 )
-            m_fPosY = Min ( fScrollHeight, m_fPosY + 10 );
+            m_fPosY = std::min ( fScrollHeight, m_fPosY + 10 );
     }
 }
 
@@ -447,7 +447,7 @@ void CMemStats::UpdateFrameStats ( void )
 
     for ( uint i = 0 ; i < NUMELMS( nowList ) ; i++ )
     {
-        maxList[i]->iLockedCount = Max ( maxList[i]->iLockedCount, nowList[i]->iLockedCount - prevList[i]->iLockedCount );
+        maxList[i]->iLockedCount = std::max ( maxList[i]->iLockedCount, nowList[i]->iLockedCount - prevList[i]->iLockedCount );
         prevList[i]->iLockedCount = nowList[i]->iLockedCount;
     }
 }

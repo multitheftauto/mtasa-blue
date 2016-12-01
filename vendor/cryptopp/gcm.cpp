@@ -12,23 +12,36 @@
 #ifndef CRYPTOPP_IMPORTS
 #ifndef CRYPTOPP_GENERATE_X64_MASM
 
-// Clang 3.3 integrated assembler crash on Linux. MacPorts GCC compile error. SunCC crash under SunCC 5.14 and below.
-#if (defined(CRYPTOPP_LLVM_CLANG_VERSION) && (CRYPTOPP_LLVM_CLANG_VERSION < 30400)) || defined(CRYPTOPP_CLANG_INTEGRATED_ASSEMBLER) || (defined(__SUNPRO_CC) && __SUNPRO_CC <= 0x5140)
-# undef CRYPTOPP_X86_ASM_AVAILABLE
-# undef CRYPTOPP_X32_ASM_AVAILABLE
-# undef CRYPTOPP_X64_ASM_AVAILABLE
+// Clang 3.3 integrated assembler crash on Linux.
+#if (defined(CRYPTOPP_LLVM_CLANG_VERSION) && (CRYPTOPP_LLVM_CLANG_VERSION < 30400))
 # undef CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE
-# undef CRYPTOPP_BOOL_SSSE3_ASM_AVAILABLE
-# undef CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
-# define CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE 0
-# define CRYPTOPP_BOOL_SSSE3_ASM_AVAILABLE 0
-# define CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE 0
+#endif
+
+// SunCC 5.13 and below crash with AES-NI/CLMUL and C++{03|11}. Disable one or the other.
+//   Also see http://github.com/weidai11/cryptopp/issues/226
+#if defined(__SUNPRO_CC) && (__SUNPRO_CC <= 0x513)
+# undef CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE
 #endif
 
 #include "gcm.h"
 #include "cpu.h"
 
 NAMESPACE_BEGIN(CryptoPP)
+
+// Different assemblers accept different mnemonics: 'movd eax, xmm0' vs 'movd rax, xmm0' vs 'mov eax, xmm0' vs 'mov rax, xmm0'
+#if (CRYPTOPP_LLVM_CLANG_VERSION >= 30600) || (CRYPTOPP_APPLE_CLANG_VERSION >= 70000) || defined(CRYPTOPP_CLANG_INTEGRATED_ASSEMBLER)
+// 'movd eax, xmm0' only. REG_WORD() macro not used.
+# define USE_MOVD_REG32 1
+#elif (defined(CRYPTOPP_LLVM_CLANG_VERSION) || defined(CRYPTOPP_APPLE_CLANG_VERSION)) && defined(CRYPTOPP_X64_ASM_AVAILABLE)
+// 'movd eax, xmm0' or 'movd rax, xmm0'. REG_WORD() macro supplies REG32 or REG64.
+# define USE_MOVD_REG32_OR_REG64 1
+#elif defined(__GNUC__) || defined(_MSC_VER)
+// 'movd eax, xmm0' or 'movd rax, xmm0'. REG_WORD() macro supplies REG32 or REG64.
+# define USE_MOVD_REG32_OR_REG64 1
+#else
+// 'mov eax, xmm0' or 'mov rax, xmm0'. REG_WORD() macro supplies REG32 or REG64.
+# define USE_MOV_REG32_OR_REG64 1
+#endif
 
 word16 GCM_Base::s_reductionTable[256];
 volatile bool GCM_Base::s_reductionTableInitialized = false;
@@ -81,32 +94,36 @@ __m128i _mm_clmulepi64_si128(const __m128i &a, const __m128i &b, int i)
 #if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE || CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE
 inline static void SSE2_Xor16(byte *a, const byte *b, const byte *c)
 {
-#if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
-	assert(IsAlignedOn(a,GetAlignmentOf<__m128i>()));
-	assert(IsAlignedOn(b,GetAlignmentOf<__m128i>()));
-	assert(IsAlignedOn(c,GetAlignmentOf<__m128i>()));
+// SunCC 5.14 crash (bewildering since asserts are not in effect in release builds)
+//   Also see http://github.com/weidai11/cryptopp/issues/226 and http://github.com/weidai11/cryptopp/issues/284
+# if __SUNPRO_CC
 	*(__m128i *)(void *)a = _mm_xor_si128(*(__m128i *)(void *)b, *(__m128i *)(void *)c);
-#else
+# elif CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
+	CRYPTOPP_ASSERT(IsAlignedOn(a,GetAlignmentOf<__m128i>()));
+	CRYPTOPP_ASSERT(IsAlignedOn(b,GetAlignmentOf<__m128i>()));
+	CRYPTOPP_ASSERT(IsAlignedOn(c,GetAlignmentOf<__m128i>()));
+	*(__m128i *)(void *)a = _mm_xor_si128(*(__m128i *)(void *)b, *(__m128i *)(void *)c);
+# else
 	asm ("movdqa %1, %%xmm0; pxor %2, %%xmm0; movdqa %%xmm0, %0;" : "=m" (a[0]) : "m"(b[0]), "m"(c[0]));
-#endif
+# endif
 }
 #endif
 
 #if CRYPTOPP_BOOL_NEON_INTRINSICS_AVAILABLE
 inline static void NEON_Xor16(byte *a, const byte *b, const byte *c)
 {
-	assert(IsAlignedOn(a,GetAlignmentOf<uint64x2_t>()));
-	assert(IsAlignedOn(b,GetAlignmentOf<uint64x2_t>()));
-	assert(IsAlignedOn(c,GetAlignmentOf<uint64x2_t>()));
+	CRYPTOPP_ASSERT(IsAlignedOn(a,GetAlignmentOf<uint64x2_t>()));
+	CRYPTOPP_ASSERT(IsAlignedOn(b,GetAlignmentOf<uint64x2_t>()));
+	CRYPTOPP_ASSERT(IsAlignedOn(c,GetAlignmentOf<uint64x2_t>()));
 	*(uint64x2_t*)a = veorq_u64(*(uint64x2_t*)b, *(uint64x2_t*)c);
 }
 #endif
 
 inline static void Xor16(byte *a, const byte *b, const byte *c)
 {
-	assert(IsAlignedOn(a,GetAlignmentOf<word64>()));
-	assert(IsAlignedOn(b,GetAlignmentOf<word64>()));
-	assert(IsAlignedOn(c,GetAlignmentOf<word64>()));
+	CRYPTOPP_ASSERT(IsAlignedOn(a,GetAlignmentOf<word64>()));
+	CRYPTOPP_ASSERT(IsAlignedOn(b,GetAlignmentOf<word64>()));
+	CRYPTOPP_ASSERT(IsAlignedOn(c,GetAlignmentOf<word64>()));
 	((word64 *)(void *)a)[0] = ((word64 *)(void *)b)[0] ^ ((word64 *)(void *)c)[0];
 	((word64 *)(void *)a)[1] = ((word64 *)(void *)b)[1] ^ ((word64 *)(void *)c)[1];
 }
@@ -628,7 +645,7 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 
 	typedef BlockGetAndPut<word64, NativeByteOrder> Block;
 	word64 *hashBuffer = (word64 *)(void *)HashBuffer();
-	assert(IsAlignedOn(hashBuffer,GetAlignmentOf<word64>()));
+	CRYPTOPP_ASSERT(IsAlignedOn(hashBuffer,GetAlignmentOf<word64>()));
 
 	switch (2*(m_buffer.size()>=64*1024)
 #if CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || defined(CRYPTOPP_X64_MASM_AVAILABLE)
@@ -889,9 +906,9 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 		AS2(	pxor	xmm5, xmm2						)
 
 		AS2(	psrldq	xmm0, 15						)
-#if (CRYPTOPP_LLVM_CLANG_VERSION >= 30600) || (CRYPTOPP_APPLE_CLANG_VERSION >= 70000)
+#if USE_MOVD_REG32
 		AS2(	movd	edi, xmm0						)
-#elif (defined(CRYPTOPP_LLVM_CLANG_VERSION) || defined(CRYPTOPP_APPLE_CLANG_VERSION)) && defined(CRYPTOPP_X64_ASM_AVAILABLE)
+#elif USE_MOV_REG32_OR_REG64
 		AS2(	mov		WORD_REG(di), xmm0				)
 #else	// GNU Assembler
 		AS2(	movd	WORD_REG(di), xmm0				)
@@ -904,9 +921,9 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 		AS2(	pxor	xmm4, xmm5						)
 
 		AS2(	psrldq	xmm1, 15						)
-#if (CRYPTOPP_LLVM_CLANG_VERSION >= 30600) || (CRYPTOPP_APPLE_CLANG_VERSION >= 70000)
+#if USE_MOVD_REG32
 		AS2(	movd	edi, xmm1						)
-#elif (defined(CRYPTOPP_LLVM_CLANG_VERSION) || defined(CRYPTOPP_APPLE_CLANG_VERSION)) && defined(CRYPTOPP_X64_ASM_AVAILABLE)
+#elif USE_MOV_REG32_OR_REG64
 		AS2(	mov		WORD_REG(di), xmm1				)
 #else
 		AS2(	movd	WORD_REG(di), xmm1				)
@@ -915,9 +932,9 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 		AS2(	shl		eax, 8							)
 
 		AS2(	psrldq	xmm0, 15						)
-#if (CRYPTOPP_LLVM_CLANG_VERSION >= 30600) || (CRYPTOPP_APPLE_CLANG_VERSION >= 70000)
+#if USE_MOVD_REG32
 		AS2(	movd	edi, xmm0						)
-#elif (defined(CRYPTOPP_LLVM_CLANG_VERSION) || defined(CRYPTOPP_APPLE_CLANG_VERSION)) && defined(CRYPTOPP_X64_ASM_AVAILABLE)
+#elif USE_MOV_REG32_OR_REG64
 		AS2(	mov		WORD_REG(di), xmm0				)
 #else
 		AS2(	movd	WORD_REG(di), xmm0				)

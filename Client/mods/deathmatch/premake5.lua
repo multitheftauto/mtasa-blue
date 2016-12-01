@@ -22,7 +22,7 @@ project "Client Deathmatch"
 	}
 	
 	filter "system:windows"
-		includedirs { "../../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../../vendor/sparsehash/src/windows" }
 		linkoptions { "/SAFESEH\:NO" }
 
 	filter {"system:windows", "toolset:*120*"}
@@ -44,7 +44,7 @@ project "Client Deathmatch"
 			"../../../vendor/lua/src", 
 			"../../../Shared/mods/deathmatch/logic", 
 			"../../../Shared/animation", 
-			"../../../vendor/sparsehash/current/src/"
+			"../../../vendor/sparsehash/src/"
 	}
 	
 	files {
