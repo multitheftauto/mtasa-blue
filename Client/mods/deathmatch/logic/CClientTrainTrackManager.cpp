@@ -34,3 +34,13 @@ CClientTrainTrack* CClientTrainTrackManager::GetTrainTrackByIndex(unsigned int i
 {
     return Get(g_pGame->GetTrainTrackManager()->GetTrainTrackByIndex(index));
 }
+
+void CClientTrainTrackManager::RegisterTrainTrack(CClientTrainTrack* pTrainTrack)
+{
+    m_Map.insert({ pTrainTrack->GetTrainTrack(), pTrainTrack });
+}
+
+void CClientTrainTrackManager::UnregisterTrainTrack(CClientTrainTrack* pTrainTrack)
+{
+    m_Map.erase(pTrainTrack->GetTrainTrack());
+}

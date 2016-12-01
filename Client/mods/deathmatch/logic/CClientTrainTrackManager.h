@@ -18,6 +18,9 @@ public:
 
     CClientTrainTrack* GetTrainTrackByIndex(unsigned int index);
 
+    void RegisterTrainTrack(CClientTrainTrack* pTrainTrack);
+    void UnregisterTrainTrack(CClientTrainTrack* pTrainTrack);
+
 private:
     std::unordered_map<CTrainTrack*, CClientTrainTrack*> m_Map;
 };

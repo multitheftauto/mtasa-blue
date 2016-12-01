@@ -11,11 +11,11 @@
 #pragma once
 #include "CClientEntity.h"
 
-class CClientTrainTrack: public CClientEntity
+class CClientTrainTrack : public CClientEntity
 {
 public:
     CClientTrainTrack(ElementID ID, const std::vector<STrackNode>& trackNodes, bool linkLastNode);
-    ~CClientTrainTrack();
+    virtual ~CClientTrainTrack();
 
     virtual eClientEntityType GetType() const { return CCLIENTTRAINTRACK; }
     CTrainTrack* GetTrainTrack() { return m_pTrainTrack; }

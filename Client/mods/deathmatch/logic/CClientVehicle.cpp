@@ -2228,12 +2228,15 @@ void CClientVehicle::SetTrainPosition ( float fTrainPosition, bool bRecalcOnRail
 
 CClientTrainTrack* CClientVehicle::GetTrainTrack()
 {
+    if (m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN)
+        return g_pClientGame->GetManager()->GetTrainTrackManager()->Get(m_pVehicle->GetTrainTrack());
+
     return m_pTrainTrack;
 }
 
 void CClientVehicle::SetTrainTrack(CClientTrainTrack* pTrainTrack)
 {
-    if (m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN)
+    if (m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN && pTrainTrack)
     {
         m_pVehicle->SetTrainTrack(pTrainTrack->GetTrainTrack());
     }

@@ -15,11 +15,27 @@ CClientTrainTrack::CClientTrainTrack(ElementID ID, const std::vector<STrackNode>
 {
     SetTypeName("train-track");
     m_pTrainTrack = g_pGame->GetTrainTrackManager()->CreateTrainTrack(trackNodes, linkLastNode);
+
+    g_pClientGame->GetManager()->GetTrainTrackManager()->RegisterTrainTrack(this);
 }
 
 CClientTrainTrack::~CClientTrainTrack()
 {
+    // Remove all vehicles from the track
+    CClientVehicleManager* pVehicleManager = g_pClientGame->GetVehicleManager();
+    for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
+    {
+        CClientVehicle* pVehicle = *iter;
+        if (pVehicle->GetTrainTrack() == this)
+        {
+            pVehicle->SetTrainTrack(nullptr);
+            pVehicle->SetDerailed(true);
+        }
+    }
+
+    // Unreference train track
     g_pGame->GetTrainTrackManager()->DestroyTrainTrack(m_pTrainTrack);
+    g_pClientGame->GetManager()->GetTrainTrackManager()->UnregisterTrainTrack(this);
 }
 
 bool CClientTrainTrack::SetNodePosition(uint nodeIndex, const CVector& position)

@@ -24,6 +24,19 @@ CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackN
 
 CTrainTrack::~CTrainTrack()
 {
+    // Remove all vehicles from the track
+    CVehicleManager* pVehicleManager = g_pGame->GetVehicleManager();
+    for (auto iter = pVehicleManager->IterBegin(); iter != pVehicleManager->IterEnd(); ++iter)
+    {
+        CVehicle* pVehicle = *iter;
+        if (pVehicle->GetTrainTrack() == this)
+        {
+            pVehicle->SetTrainTrack(nullptr);
+            pVehicle->SetDerailed(true);
+        }
+    }
+
+    // Unreference train track
     m_pManager->DestroyTrainTrack(this);
 }
 
