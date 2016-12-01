@@ -12111,7 +12111,7 @@ SString CStaticFunctionDefinitions::GetVersionSortable ()
 }
 
 
-CTrainTrack* CStaticFunctionDefinitions::CreateTrainTrack(CResource* pResource, const std::vector<CVector>& nodes, bool linkLastNodes)
+CTrainTrack* CStaticFunctionDefinitions::CreateTrainTrack(CResource* pResource, const std::vector<CLuaVector3D*>& nodes, bool linkLastNodes)
 {
     auto pTrainTrackManager = g_pGame->GetTrainTrackManager();
 
@@ -12119,7 +12119,7 @@ CTrainTrack* CStaticFunctionDefinitions::CreateTrainTrack(CResource* pResource, 
     std::vector<STrackNode> trackNodes;
     for (auto& node : nodes)
     {
-        trackNodes.push_back(STrackNode(node));
+        trackNodes.push_back(STrackNode(*node));
     }
 
     // Create track

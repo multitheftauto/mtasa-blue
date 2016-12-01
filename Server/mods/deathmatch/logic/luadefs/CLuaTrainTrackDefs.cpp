@@ -38,19 +38,12 @@ void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
 
 int CLuaTrainTrackDefs::CreateTrack(lua_State* luaVM)
 {
-    bool linkLastNodes;
+//  train-track createTrack ( table nodes, bool linkNodes )
+    bool linkLastNodes; std::vector<CLuaVector3D*> vecNodeList;
 
     CScriptArgReader argStream(luaVM);
+    argStream.ReadUserDataTable(vecNodeList);
     argStream.ReadBool(linkLastNodes);
-
-    // TODO: Refactor the following
-    std::vector<CVector> vecNodeList;
-    for (uint i = 0; i == 0 || argStream.NextIsVector3D(); i++)
-    {
-        CVector vecNode;
-        argStream.ReadVector3D(vecNode);
-        vecNodeList.push_back(vecNode);
-    }
 
     if (!argStream.HasErrors())
     {

@@ -704,5 +704,5 @@ public:
 
     
     // Train track funcs
-    static CTrainTrack*                 CreateTrainTrack            (CResource* pResource, const std::vector<CVector>&, bool linkLastNodes);
+    static CTrainTrack*                 CreateTrainTrack            (CResource* pResource, const std::vector<CLuaVector3D*>&, bool linkLastNodes);
 };
