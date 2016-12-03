@@ -13,7 +13,7 @@
 *****************************************************************************/
 
 #include "UTF8.h"
-#include "UTF8Detect.cpp"
+#include "UTF8Detect.hpp"
 #ifdef WIN32
     #include <ctime>
     #include <direct.h>
