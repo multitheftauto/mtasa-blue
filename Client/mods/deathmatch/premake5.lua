@@ -16,7 +16,7 @@ project "Client Deathmatch"
 	}
 	
 	vpaths {
-		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h"},
+		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h", "../../**.h"},
 		["Sources/*"] = {"**.cpp", "../../../Shared/mods/deathmatch/**.cpp", "../../../Shared/**.cpp", "../../../vendor/**.cpp"},
 		["*"] = "premake5.lua"
 	}
@@ -55,6 +55,7 @@ project "Client Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp", 
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
+		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bochs/bochs_internal/crc32.cpp"
 	}

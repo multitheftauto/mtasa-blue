@@ -129,6 +129,7 @@ workspace "MTASA"
 		include "Server/mods/deathmatch"
 		
 		group "Shared"
+		include "Shared"
 		include "Shared/XML"
 		
 		group "Vendor"

@@ -1771,6 +1771,7 @@ bool CheckAndShowFileOpenFailureMessage ( void )
 
     if ( !strFilename.empty () )
     {
+	    SetApplicationSetting( "diagnostics", "gta-fopen-fail", "" );
         SString strMsg ( _("GTA:SA had trouble opening the file '%s'"), *strFilename );
         DisplayErrorMessageBox ( strMsg, _E("CL31"), SString( "gta-fopen-fail&name=%s", *strFilename ) );
         return true;
