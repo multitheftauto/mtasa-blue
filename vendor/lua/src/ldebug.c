@@ -605,13 +605,22 @@ int luaG_ordererror (lua_State *L, const TValue *p1, const TValue *p2) {
 
 
 static void addinfo (lua_State *L, const char *msg) {
-  CallInfo *ci = L->ci;
-  if (isLua(ci)) {  /* is Lua code? */
-    char buff[LUA_IDSIZE];  /* add file:line information */
-    int line = currentline(L, ci);
-    luaO_chunkid(buff, getstr(getluaproto(ci)->source), LUA_IDSIZE);
-    luaO_pushfstring(L, "%s:%d: %s", buff, line, msg);
-  }
+    // MTA modification - Deeper check for debug info
+    lua_Debug ar;
+    for (int level = 0; level < 4; level++)
+    {
+        if (lua_getstack(L, level, &ar))
+        {
+            CallInfo *ci = L->base_ci + ar.i_ci;
+            if (isLua(ci)) {  /* is Lua code? */
+                char buff[LUA_IDSIZE];  /* add file:line information */
+                int line = currentline(L, ci);
+                luaO_chunkid(buff, getstr(getluaproto(ci)->source), LUA_IDSIZE);
+                luaO_pushfstring(L, "%s:%d: %s", buff, line, msg);
+                break;
+            }
+        }
+    }
 }
 
 
