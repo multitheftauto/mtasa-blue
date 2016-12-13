@@ -160,8 +160,11 @@ CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint u
     if ( !bForce && !CanCreateRenderItem ( CRenderTargetItem::GetClassId () ) )
         return NULL;
 
+    // Include in memory stats only if render target is not for MTA internal use
+    bool bIncludeInMemoryStats = (bForce == false);
+
     CRenderTargetItem* pRenderTargetItem = new CRenderTargetItem ();
-    pRenderTargetItem->PostConstruct ( this, uiSizeX, uiSizeY, bWithAlphaChannel );
+    pRenderTargetItem->PostConstruct ( this, uiSizeX, uiSizeY, bWithAlphaChannel, bIncludeInMemoryStats );
 
     if ( !pRenderTargetItem->IsValid () )
     {
@@ -715,6 +718,8 @@ void CRenderItemManager::UpdateMemoryUsage ( void )
     for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
     {
         CRenderItem* pRenderItem = *iter;
+        if ( !pRenderItem->GetIncludeInMemoryStats() )
+            continue;
         int iMemoryKBUsed = pRenderItem->GetVideoMemoryKBUsed ();
 
         if ( pRenderItem->IsA ( CFileTextureItem::GetClassId () ) )
