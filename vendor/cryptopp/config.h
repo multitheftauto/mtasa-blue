@@ -837,6 +837,10 @@ NAMESPACE_END
 #  define CRYPTOPP_CXX11_SYNCHRONIZATION 1
 #endif // synchronization
 
+#pragma message("MTA HACK: undefining CRYPTOPP_CXX11_ATOMICS and CRYPTOPP_CXX11_SYNCHRONIZATION in XP build due to TLS problem")
+#undef CRYPTOPP_CXX11_ATOMICS
+#undef CRYPTOPP_CXX11_SYNCHRONIZATION
+
 // alignof/alignas: MS at VS2015 (19.00); GCC at 4.8; Clang at 3.3; Intel 15.0; SunCC 12.4.
 #if (CRYPTOPP_MSC_VERSION >= 1900)
 #  define CRYPTOPP_CXX11_ALIGNAS 1

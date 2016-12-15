@@ -16,6 +16,11 @@
 #include <cryptopp/osrng.h>
 #include <SharedUtil.Crypto.h>
 
+// Check std::lock_guard has been excluded in XP build due to TLS problem
+#if defined(CRYPTOPP_CXX11_ATOMICS) || defined(CRYPTOPP_CXX11_SYNCHRONIZATION)
+    #error "CRYPTOPP_CXX11_ATOMICS and CRYPTOPP_CXX11_SYNCHRONIZATION should not be defined for XP"
+#endif
+
 extern CGame * g_pGame;
 
 CHTTPD::CHTTPD ( void )
