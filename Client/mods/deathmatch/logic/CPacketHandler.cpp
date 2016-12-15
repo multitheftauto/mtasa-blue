@@ -735,23 +735,10 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         bool bIsFrozen = bitStream.ReadBit ();
 
         // Player nametag text
-        char szNametagText [MAX_PLAYER_NAMETAG_LENGTH + 1];
-        szNametagText[0] = '\0';
-
-        unsigned char ucNametagTextLength;
-        if ( !bitStream.Read ( ucNametagTextLength ) || ucNametagTextLength > MAX_PLAYER_NAMETAG_LENGTH )
-        {
-            // Nametag length all wrong
-            RaiseProtocolError ( 9 );
-            return;
-        }
-
-        if ( ucNametagTextLength > 0 )
-        {
-            bitStream.Read ( szNametagText, ucNametagTextLength );
-            szNametagText [ ucNametagTextLength ] = '\0';
-            StripUnwantedCharacters ( szNametagText, '_' );
-        }
+        uchar ucNametagTextLength = 0;
+        bitStream.Read( ucNametagTextLength );
+        SString strNametagText;
+        bitStream.ReadStringCharacters( strNametagText, ucNametagTextLength );
 
         // Read out the nametag override color if it's overridden
         unsigned char ucNametagR, ucNametagG, ucNametagB;
@@ -853,8 +840,8 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
             pPlayer->SetNick ( szNickBuffer );
             pPlayer->SetDeadOnNetwork ( false );
 
-            if ( szNametagText [ 0 ] )
-                pPlayer->SetNametagText ( szNametagText );
+            if ( !strNametagText.empty() )
+                pPlayer->SetNametagText( strNametagText );
 
             // Set the nametag override color if it's overridden
             if ( bHasNametagColorOverridden )
