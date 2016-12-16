@@ -3551,7 +3551,8 @@ void CClientPed::_CreateModel ( void )
         {
             if ( m_WeaponTypes [ i ] != WEAPONTYPE_UNARMED )
             {
-                GiveWeapon ( m_WeaponTypes [ i ], m_usWeaponAmmo [ i ] );
+                bool bSetAsCurrent = (i == m_CurrentWeaponSlot);
+                GiveWeapon ( m_WeaponTypes [ i ], m_usWeaponAmmo [ i ], bSetAsCurrent );
             }
         }
 
