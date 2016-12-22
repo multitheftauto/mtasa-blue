@@ -126,7 +126,7 @@ public:
         int iPollInterval = 0;
         bitStream->Read( iPollInterval );
         if ( iPollInterval )
-            m_iPollInterval = Max( TICKS_FROM_MINUTES( 5 ), iPollInterval );
+            m_iPollInterval = std::max( TICKS_FROM_MINUTES( 5 ), iPollInterval );
     }
 
     // Auto update of min client check
@@ -219,7 +219,7 @@ public:
             bitStream->ReadStr( strDesc );
             if ( !bitStream->ReadStr( strUrl ) )
                 break;
-            g_pGame->GetMasterServerAnnouncer()->AddServer( bAcceptsPush != 0, bDoReminders != 0, bHideProblems != 0, bHideSuccess != 0, Max( 5U, uiReminderIntervalMins ), strDesc, strUrl );
+            g_pGame->GetMasterServerAnnouncer()->AddServer( bAcceptsPush != 0, bDoReminders != 0, bHideProblems != 0, bHideSuccess != 0, std::max( 5U, uiReminderIntervalMins ), strDesc, strUrl );
         }
     }
 

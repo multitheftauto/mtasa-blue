@@ -102,7 +102,7 @@ namespace SharedUtil
     void CVehicleColor::SetRGBColor ( uint uiSlot, SColor color )
     {
         ValidateRGBColors ();
-        uiSlot = Min ( uiSlot, static_cast < uint > ( NUMELMS( m_RGBColors ) ) );
+        uiSlot = std::min ( uiSlot, static_cast < uint > ( NUMELMS( m_RGBColors ) ) );
         if ( m_RGBColors [ uiSlot ] != color )
         {
             m_RGBColors [ uiSlot ] = color;
@@ -113,7 +113,7 @@ namespace SharedUtil
     void CVehicleColor::SetPaletteColor ( uint uiSlot, uchar ucColor )
     {
         ValidatePaletteColors ();
-        uiSlot = Min ( uiSlot, static_cast < uint > ( NUMELMS( m_ucPaletteColors ) ) );
+        uiSlot = std::min ( uiSlot, static_cast < uint > ( NUMELMS( m_ucPaletteColors ) ) );
         if ( m_ucPaletteColors [ uiSlot ] != ucColor )
         {
             m_ucPaletteColors [ uiSlot ] = ucColor;
@@ -125,7 +125,7 @@ namespace SharedUtil
     uchar CVehicleColor::GetPaletteColor ( uint uiSlot )
     {
         ValidatePaletteColors ();
-        uiSlot = Min ( uiSlot, static_cast < uint > ( NUMELMS( m_ucPaletteColors ) ) );
+        uiSlot = std::min ( uiSlot, static_cast < uint > ( NUMELMS( m_ucPaletteColors ) ) );
         return m_ucPaletteColors [ uiSlot ];
     }
 
@@ -133,7 +133,7 @@ namespace SharedUtil
     SColor CVehicleColor::GetRGBColor ( uint uiSlot )
     {
         ValidateRGBColors ();
-        uiSlot = Min ( uiSlot, static_cast < uint > ( NUMELMS( m_RGBColors ) ) );
+        uiSlot = std::min ( uiSlot, static_cast < uint > ( NUMELMS( m_RGBColors ) ) );
         return m_RGBColors [ uiSlot ];
     }
 
@@ -246,7 +246,7 @@ namespace SharedUtil
 
     SColor CVehicleColor::GetRGBFromPaletteIndex ( uchar ucColor )
     {
-        ucColor = Min < uchar > ( ucColor, static_cast < uint > ( NUMELMS( paletteColorTable8 ) / 4 ) );
+        ucColor = std::min < uchar > ( ucColor, static_cast < uint > ( NUMELMS( paletteColorTable8 ) / 4 ) );
         uchar r = paletteColorTable8[ ucColor * 4 ];
         uchar g = paletteColorTable8[ ucColor * 4 + 1 ];
         uchar b = paletteColorTable8[ ucColor * 4 + 2 ];

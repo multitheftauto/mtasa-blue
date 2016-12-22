@@ -9,22 +9,79 @@
 
 #include "config.h"
 
+// ARM32/ARM64 Headers
 #if (CRYPTOPP_BOOL_ARM32 || CRYPTOPP_BOOL_ARM64)
-# if defined(_MSC_VER) || defined(__BORLANDC__)
-#  define CRYPTOPP_MS_STYLE_INLINE_ASSEMBLY
-# else
-#  define CRYPTOPP_GNU_STYLE_INLINE_ASSEMBLY
+# if defined(__GNUC__)
+#  include <stdint.h>
 # endif
-# if CRYPTOPP_BOOL_NEON_INTRINSICS_AVAILABLE
+# if CRYPTOPP_BOOL_NEON_INTRINSICS_AVAILABLE || defined(__ARM_NEON)
 #  include <arm_neon.h>
 # endif
-# if (CRYPTOPP_BOOL_ARM_CRYPTO_INTRINSICS_AVAILABLE || CRYPTOPP_BOOL_ARM_CRC32_INTRINSICS_AVAILABLE)
-#  include <stdint.h>
-#  if (defined(__ARM_ACLE) || defined(__GNUC__)) && !defined(__APPLE__)
-#   include <arm_acle.h>
-#  endif
+# if (CRYPTOPP_BOOL_ARM_CRYPTO_INTRINSICS_AVAILABLE || CRYPTOPP_BOOL_ARM_CRC32_INTRINSICS_AVAILABLE) || defined(__ARM_ACLE)
+#  include <arm_acle.h>
 # endif
-#endif  // ARM-32 or ARM-64
+#endif  // ARM32 and ARM64 Headers
+
+// X86/X64/X32 Headers
+#if CRYPTOPP_BOOL_X86 || CRYPTOPP_BOOL_X32 || CRYPTOPP_BOOL_X64
+
+// GCC X86 super-include
+#if (CRYPTOPP_GCC_VERSION >= 40800)
+#  include <x86intrin.h>
+#endif
+#if (CRYPTOPP_MSC_VERSION >= 1400)
+#  include <intrin.h>
+#endif
+
+// Baseline include
+#if CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
+#  include <emmintrin.h>    // __m64, __m128i, _mm_set_epi64x
+#endif
+#if CRYPTOPP_BOOL_SSSE3_ASM_AVAILABLE
+#  include <tmmintrin.h>    // _mm_shuffle_pi8, _mm_shuffle_epi8
+#endif // tmmintrin.h
+#if CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
+#  include <smmintrin.h>    // _mm_blend_epi16
+#  include <nmmintrin.h>    // _mm_crc32_u{8|16|32}
+#endif // smmintrin.h
+#if CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE
+#  include <wmmintrin.h>    // aesenc, aesdec, etc
+#endif // wmmintrin.h
+#if CRYPTOPP_BOOL_AVX_INTRINSICS_AVAILABLE
+#  include <immintrin.h>    // RDRAND, RDSEED and AVX
+#endif
+#if CRYPTOPP_BOOL_AVX2_INTRINSICS_AVAILABLE
+#  include <zmmintrin.h>    // AVX 512-bit extensions
+#endif
+#endif  // X86/X64/X32 Headers
+
+// Applies to both X86/X32/X64 and ARM32/ARM64. And we've got MIPS devices on the way.
+#if defined(_MSC_VER) || defined(__BORLANDC__)
+# define CRYPTOPP_MS_STYLE_INLINE_ASSEMBLY
+#else
+# define CRYPTOPP_GNU_STYLE_INLINE_ASSEMBLY
+#endif
+
+// Applies to both X86/X32/X64 and ARM32/ARM64
+#if defined(CRYPTOPP_LLVM_CLANG_VERSION) || defined(CRYPTOPP_APPLE_CLANG_VERSION) || defined(CRYPTOPP_CLANG_INTEGRATED_ASSEMBLER)
+	#define NEW_LINE "\n"
+	#define INTEL_PREFIX ".intel_syntax;"
+	#define INTEL_NOPREFIX ".intel_syntax;"
+	#define ATT_PREFIX ".att_syntax;"
+	#define ATT_NOPREFIX ".att_syntax;"
+#elif defined(__GNUC__)
+	#define NEW_LINE
+	#define INTEL_PREFIX ".intel_syntax prefix;"
+	#define INTEL_NOPREFIX ".intel_syntax noprefix;"
+	#define ATT_PREFIX ".att_syntax prefix;"
+	#define ATT_NOPREFIX ".att_syntax noprefix;"
+#else
+	#define NEW_LINE
+	#define INTEL_PREFIX
+	#define INTEL_NOPREFIX
+	#define ATT_PREFIX
+	#define ATT_NOPREFIX
+#endif
 
 #ifdef CRYPTOPP_GENERATE_X64_MASM
 
@@ -34,108 +91,6 @@
 #define NAMESPACE_END
 
 #else
-
-# if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
-#  include <emmintrin.h>
-# endif
-
-#if CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE
-
-// GCC 5.3/i686 fails to declare __m128 in the headers we use when compiling with -std=c++11 or -std=c++14.
-// Consequently, our _mm_shuffle_epi8, _mm_extract_epi32, etc fails to compile.
-#if defined(__has_include)
-# if __has_include(<xmmintrin.h>)
-#  include <xmmintrin.h>
-# endif
-#endif
-
-// PUSHFB needs Clang 3.3 and Apple Clang 5.0.
-#if !defined(__GNUC__) || defined(__SSSE3__)|| defined(__INTEL_COMPILER) || (CRYPTOPP_LLVM_CLANG_VERSION >= 30300) || (CRYPTOPP_APPLE_CLANG_VERSION >= 50000)
-#include <tmmintrin.h>
-#else
-NAMESPACE_BEGIN(CryptoPP)
-__inline __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_shuffle_epi8 (__m128i a, __m128i b)
-{
-	asm ("pshufb %1, %0" : "+x"(a) : "xm"(b));
-  	return a;
-}
-NAMESPACE_END
-#endif // tmmintrin.h
-
-// PEXTRD needs Clang 3.3 and Apple Clang 5.0.
-#if !defined(__GNUC__) || defined(__SSE4_1__)|| defined(__INTEL_COMPILER) || (CRYPTOPP_LLVM_CLANG_VERSION >= 30300) || (CRYPTOPP_APPLE_CLANG_VERSION >= 50000)
-#include <smmintrin.h>
-#else
-NAMESPACE_BEGIN(CryptoPP)
-__inline int __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_extract_epi32 (__m128i a, const int i)
-{
-	int r;
-	asm ("pextrd %2, %1, %0" : "=rm"(r) : "x"(a), "i"(i));
-  	return r;
-}
-__inline __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_insert_epi32 (__m128i a, int b, const int i)
-{
-	asm ("pinsrd %2, %1, %0" : "+x"(a) : "rm"(b), "i"(i));
-  	return a;
-}
-NAMESPACE_END
-#endif // smmintrin.h
-
-// AES needs Clang 2.8 and Apple Clang 4.6. PCLMUL needs Clang 3.4 and Apple Clang 6.0
-#if !defined(__GNUC__) || (defined(__AES__) && defined(__PCLMUL__)) || defined(__INTEL_COMPILER) || (CRYPTOPP_LLVM_CLANG_VERSION >= 30400) || (CRYPTOPP_APPLE_CLANG_VERSION >= 60000)
-#include <wmmintrin.h>
-#else
-NAMESPACE_BEGIN(CryptoPP)
-__inline __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_clmulepi64_si128 (__m128i a, __m128i b, const int i)
-{
-	asm ("pclmulqdq %2, %1, %0" : "+x"(a) : "xm"(b), "i"(i));
-  	return a;
-}
-__inline __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_aeskeygenassist_si128 (__m128i a, const int i)
-{
-	__m128i r;
-	asm ("aeskeygenassist %2, %1, %0" : "=x"(r) : "xm"(a), "i"(i));
-  	return r;
-}
-__inline __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_aesimc_si128 (__m128i a)
-{
-	__m128i r;
-	asm ("aesimc %1, %0" : "=x"(r) : "xm"(a));
-  	return r;
-}
-__inline __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_aesenc_si128 (__m128i a, __m128i b)
-{
-	asm ("aesenc %1, %0" : "+x"(a) : "xm"(b));
-  	return a;
-}
-__inline __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_aesenclast_si128 (__m128i a, __m128i b)
-{
-	asm ("aesenclast %1, %0" : "+x"(a) : "xm"(b));
-  	return a;
-}
-__inline __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_aesdec_si128 (__m128i a, __m128i b)
-{
-	asm ("aesdec %1, %0" : "+x"(a) : "xm"(b));
-  	return a;
-}
-__inline __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-_mm_aesdeclast_si128 (__m128i a, __m128i b)
-{
-	asm ("aesdeclast %1, %0" : "+x"(a) : "xm"(b));
-  	return a;
-}
-NAMESPACE_END
-#endif // wmmintrin.h
-#endif // CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -351,7 +306,7 @@ inline int GetCacheLineSize()
 #elif (CRYPTOPP_BOOL_ARM32 || CRYPTOPP_BOOL_ARM64)
 
 extern bool g_ArmDetectionDone;
-extern bool g_hasNEON, g_hasCRC32, g_hasAES, g_hasSHA1, g_hasSHA2;
+extern bool g_hasNEON, g_hasPMULL, g_hasCRC32, g_hasAES, g_hasSHA1, g_hasSHA2;
 void CRYPTOPP_API DetectArmFeatures();
 
 //! \brief Determine if an ARM processor has Advanced SIMD available
@@ -365,6 +320,19 @@ inline bool HasNEON()
 	if (!g_ArmDetectionDone)
 		DetectArmFeatures();
 	return g_hasNEON;
+}
+
+//! \brief Determine if an ARM processor provides Polynomial Multiplication (long)
+//! \returns true if the hardware is capable of polynomial multiplications at runtime, false otherwise.
+//! \details The multiplication instructions are available under Aarch64 (ARM-64) and Aarch32 (ARM-32).
+//! \details Runtime support requires compile time support. When compiling with GCC, you may
+//!   need to compile with <tt>-march=armv8-a+crypto</tt>; while Apple requires
+//!   <tt>-arch arm64</tt>. Also see ARM's <tt>__ARM_FEATURE_CRYPTO</tt> preprocessor macro.
+inline bool HasPMULL()
+{
+	if (!g_ArmDetectionDone)
+		DetectArmFeatures();
+	return g_hasPMULL;
 }
 
 //! \brief Determine if an ARM processor has CRC32 available
@@ -472,20 +440,6 @@ inline int GetCacheLineSize()
 #else
 	#define CRYPTOPP_GNU_STYLE_INLINE_ASSEMBLY
 
-#if defined(CRYPTOPP_LLVM_CLANG_VERSION) || defined(CRYPTOPP_APPLE_CLANG_VERSION) || defined(CRYPTOPP_CLANG_INTEGRATED_ASSEMBLER)
-	#define NEW_LINE "\n"
-	#define INTEL_PREFIX ".intel_syntax;"
-	#define INTEL_NOPREFIX ".intel_syntax;"
-	#define ATT_PREFIX ".att_syntax;"
-	#define ATT_NOPREFIX ".att_syntax;"
-#else
-	#define NEW_LINE
-	#define INTEL_PREFIX ".intel_syntax prefix;"
-	#define INTEL_NOPREFIX ".intel_syntax noprefix;"
-	#define ATT_PREFIX ".att_syntax prefix;"
-	#define ATT_NOPREFIX ".att_syntax noprefix;"
-#endif
-
 	// define these in two steps to allow arguments to be expanded
 	#define GNU_AS1(x) #x ";" NEW_LINE
 	#define GNU_AS2(x, y) #x ", " #y ";" NEW_LINE
@@ -505,21 +459,6 @@ inline int GetCacheLineSize()
 
 #define IF0(y)
 #define IF1(y) y
-
-// Should be confined to GCC, but its used to help manage Clang 3.4 compiler error.
-//   Also see LLVM Bug 24232, http://llvm.org/bugs/show_bug.cgi?id=24232 .
-#ifndef INTEL_PREFIX
-	#define INTEL_PREFIX
-#endif
-#ifndef INTEL_NOPREFIX
-	#define INTEL_NOPREFIX
-#endif
-#ifndef ATT_PREFIX
-	#define ATT_PREFIX
-#endif
-#ifndef ATT_NOPREFIX
-	#define ATT_NOPREFIX
-#endif
 
 #ifdef CRYPTOPP_GENERATE_X64_MASM
 #define ASM_MOD(x, y) ((x) MOD (y))

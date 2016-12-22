@@ -197,7 +197,7 @@ namespace SharedUtil
             uchar ucCount = DoGetCount();
             uint uiTimeDelta = ( ucCount - m_ucUpdateCount ) * 100U;
             m_ucUpdateCount = ucCount;
-            m_uiElapsedTime += Min( uiTimeDelta, m_uiMaxIncrement );
+            m_uiElapsedTime += std::min( uiTimeDelta, m_uiMaxIncrement );
             return m_uiElapsedTime;
         }
 

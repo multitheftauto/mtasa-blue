@@ -240,6 +240,10 @@ void CLuaManager::LoadCFunctions ( void )
     //CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
     CLuaCFunctions::AddFunction ( "setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing );
 
+    // Notification funcs
+    CLuaCFunctions::AddFunction ( "createTrayNotification", CLuaFunctionDefs::CreateTrayNotification );
+    CLuaCFunctions::AddFunction ( "isTrayNotificationEnabled", CLuaFunctionDefs::IsTrayNotificationEnabled );
+
     // Clothes and body functions
     CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefs::GetBodyPartName );
     CLuaCFunctions::AddFunction ( "getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex );

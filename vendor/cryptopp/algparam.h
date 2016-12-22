@@ -74,7 +74,7 @@ public:
 	void Assign(const byte *data, size_t size, bool deepCopy)
 	{
 		// This fires, which means: no data with a size, or data with no size.
-		// assert((data && size) || !(data || size));
+		// CRYPTOPP_ASSERT((data && size) || !(data || size));
 		if (deepCopy)
 			m_block.Assign(data, size);
 		else
@@ -176,7 +176,7 @@ public:
 
 		if (!m_found && searchFirst)
 			m_found = searchFirst->GetVoidValue(m_name, valueType, pValue);
-		
+
 		if (!m_found && typeid(T) != typeid(BASE))
 			m_found = pObject->BASE::GetVoidValue(m_name, valueType, pValue);
 	}
@@ -378,7 +378,7 @@ public:
 	//! \brief Exception thrown when an AlgorithmParameter is unused
 	class ParameterNotUsed : public Exception
 	{
-	public: 
+	public:
 		ParameterNotUsed(const char *name) : Exception(OTHER_ERROR, std::string("AlgorithmParametersBase: parameter \"") + name + "\" not used") {}
 	};
 
@@ -417,7 +417,7 @@ public:
 	}
 
 	bool GetVoidValue(const char *name, const std::type_info &valueType, void *pValue) const;
-	
+
 protected:
 	friend class AlgorithmParameters;
 	void operator=(const AlgorithmParametersBase& rhs);	// assignment not allowed, declare this for VC60
@@ -459,11 +459,20 @@ public:
 		}
 	}
 
+#if defined(DEBUG_NEW) && (_MSC_VER >= 1300)
+# pragma push_macro("new")
+# undef new
+#endif
+
 	void MoveInto(void *buffer) const
 	{
 		AlgorithmParametersTemplate<T>* p = new(buffer) AlgorithmParametersTemplate<T>(*this);
 		CRYPTOPP_UNUSED(p);	// silence warning
 	}
+
+#if defined(DEBUG_NEW) && (_MSC_VER >= 1300)
+# pragma pop_macro("new")
+#endif
 
 protected:
 	T m_value;

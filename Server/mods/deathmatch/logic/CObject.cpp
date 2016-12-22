@@ -33,7 +33,7 @@ CObject::CObject ( CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMa
     m_fHealth = 1000.0f;
     m_bSyncable = true;
     m_pSyncer = NULL;
-    m_bIsStatic = false;
+    m_bIsFrozen = false;
 
     m_bCollisionsEnabled = true;
 
@@ -171,7 +171,7 @@ bool CObject::ReadSpecialData ( void )
 
     bool bFrozen;
     if ( GetCustomDataBool ( "frozen", bFrozen, true ) )
-        m_bIsStatic = bFrozen;
+        m_bIsFrozen = bFrozen;
 
     // Success
     return true;

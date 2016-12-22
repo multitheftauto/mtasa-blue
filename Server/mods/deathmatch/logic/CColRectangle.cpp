@@ -59,6 +59,6 @@ CSphere CColRectangle::GetWorldBoundingSphere ( void )
     sphere.vecPosition.fX = m_vecPosition.fX + m_vecSize.fX * 0.5f;
     sphere.vecPosition.fY = m_vecPosition.fY + m_vecSize.fY * 0.5f;
     sphere.vecPosition.fZ = SPATIAL_2D_Z;
-    sphere.fRadius        = Max ( m_vecSize.fX, m_vecSize.fY ) * 0.5f;
+    sphere.fRadius        = std::max ( m_vecSize.fX, m_vecSize.fY ) * 0.5f;
     return sphere;
 }

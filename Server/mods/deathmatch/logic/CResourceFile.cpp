@@ -63,9 +63,9 @@ ResponseCode CResourceFile::Request ( HttpRequest * ipoHttpRequest, HttpResponse
     // HACK - Use http-client-files if possible as the resources directory may have been changed since the resource was loaded.
     SString strDstFilePath = GetCachedPathFilename ();
 
-    FILE * file = fopen ( strDstFilePath.c_str (), "rb" );
+    FILE * file = File::Fopen ( strDstFilePath.c_str (), "rb" );
     if ( !file )
-        file = fopen ( m_strResourceFileName.c_str (), "rb" );
+        file = File::Fopen ( m_strResourceFileName.c_str (), "rb" );
 
     // its a raw page
     if ( file )

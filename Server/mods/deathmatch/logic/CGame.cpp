@@ -404,7 +404,7 @@ void CGame::DoPulse ( void )
 
     // Update the progress rotator
     uchar ucDelta = (uchar)llCurrentTime - ucProgressSkip;
-    ushort usReqDelta = 80 - ( 100 - Min < ushort > ( 100, m_usFPS ) ) / 5;
+    ushort usReqDelta = 80 - ( 100 - std::min < ushort > ( 100, m_usFPS ) ) / 5;
     
     if ( ucDelta > usReqDelta ) {
         // Clamp ucProgress between 0 and 3
@@ -738,7 +738,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
         // Create cache readme
         SString strReadmeFilename ( "%s/DO_NOT_MODIFY_Readme.txt", strResourceCachePath.c_str () );
-        FILE *fh = fopen ( strReadmeFilename, "w" );
+        FILE *fh = File::Fopen ( strReadmeFilename, "w" );
         if ( fh )
         {
             fprintf ( fh, "---------------------------------------------------------------------------\n" );
@@ -892,6 +892,16 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Flush any pending master server announce messages
     g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
+
+    if ( m_pMainConfig->GetAuthSerialEnabled() )
+    {
+        CLogger::LogPrintf( "Authorized serial account protection is enabled for the ACL group(s): `%s`  See http:""//mtasa.com/authserial\n",
+                            *SString::Join( ",", m_pMainConfig->GetAuthSerialGroupList() ) );
+    }
+    else
+    {
+        CLogger::LogPrint( "Authorized serial account protection is DISABLED. See http:""//mtasa.com/authserial\n" );
+    }
 
     // Done
     // If you're ever going to change this message, update the "server ready" determination
@@ -3994,7 +4004,7 @@ void CGame::HandleBackup ( void )
     {
         SString strName = fileList[f];
         const SString strCheck = "0000-00-00.zip";
-        for ( uint i = 0 ; i < Min ( strCheck.length (), strName.length () ) ; i++ )
+        for ( uint i = 0 ; i < std::min( strCheck.length (), strName.length () ) ; i++ )
             if ( !isdigit( (uchar)strName[i] ) || !isdigit( (uchar)strCheck[i] ) )
                 if ( strName[i] != strCheck[i] )
                 {

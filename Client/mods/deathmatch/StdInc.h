@@ -1,7 +1,6 @@
 #pragma message("Compiling precompiled header.\n")
 
 #define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
 #include <windows.h>
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
@@ -26,6 +25,7 @@
 
 // SDK includes
 #include <core/CLocalizationInterface.h>
+#include <core/CTrayIconInterface.h>
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>

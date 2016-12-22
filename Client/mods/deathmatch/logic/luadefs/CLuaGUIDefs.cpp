@@ -21,6 +21,7 @@ void CLuaGUIDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isChatBoxInputActive", GUIIsChatBoxInputActive );
     CLuaCFunctions::AddFunction ( "isConsoleActive", GUIIsConsoleActive );
     CLuaCFunctions::AddFunction ( "isDebugViewActive", GUIIsDebugViewActive );
+    CLuaCFunctions::AddFunction ( "setDebugViewActive", GUISetDebugViewActive );
     CLuaCFunctions::AddFunction ( "isMainMenuActive", GUIIsMainMenuActive );
     CLuaCFunctions::AddFunction ( "isMTAWindowActive", GUIIsMTAWindowActive );
     CLuaCFunctions::AddFunction ( "isTransferBoxActive", GUIIsTransferBoxActive );
@@ -185,6 +186,7 @@ void CLuaGUIDefs::AddGuiElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isChatBoxInputActive", "isChatBoxInputActive" );
     lua_classfunction ( luaVM, "isConsoleActive", "isConsoleActive" );
     lua_classfunction ( luaVM, "isDebugViewActive", "isDebugViewActive" );
+    lua_classfunction ( luaVM, "setDebugViewActive", "setDebugViewActive" );
     lua_classfunction ( luaVM, "isMainMenuActive", "isMainMenuActive" );
     lua_classfunction ( luaVM, "isMTAWindowActive", "isMTAWindowActive" );
     lua_classfunction ( luaVM, "isTransferBoxActive", "isTransferBoxActive" );
@@ -215,7 +217,7 @@ void CLuaGUIDefs::AddGuiElementClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "chatBoxInputActive", NULL, "isChatBoxInputActive" );
     lua_classvariable ( luaVM, "consoleActive", NULL, "isConsoleActive" );
-    lua_classvariable ( luaVM, "debugViewActive", NULL, "isDebugViewActive" );
+    lua_classvariable ( luaVM, "debugViewActive", "setDebugViewActive", "isDebugViewActive" );
     lua_classvariable ( luaVM, "mainMenuActive", NULL, "isMainMenuActive" );
     lua_classvariable ( luaVM, "mtaWindowActive", NULL, "isMTAWindowActive" );
     lua_classvariable ( luaVM, "transferBoxActive", NULL, "isTransferBoxActive" );
@@ -611,6 +613,28 @@ int CLuaGUIDefs::GUIIsConsoleActive ( lua_State* luaVM )
 int CLuaGUIDefs::GUIIsDebugViewActive ( lua_State* luaVM )
 {
     lua_pushboolean ( luaVM, g_pCore->IsDebugVisible () );
+    return 1;
+}
+
+
+int CLuaGUIDefs::GUISetDebugViewActive(lua_State* luaVM)
+{
+    bool enabled;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(enabled);
+
+    if (!argStream.HasErrors())
+    {
+        g_pCore->SetDebugVisible(enabled);
+
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 

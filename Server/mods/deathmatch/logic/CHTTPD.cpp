@@ -26,7 +26,7 @@ CHTTPD::CHTTPD ( void )
     m_server = NULL;
     m_bStartedServer = false;
 
-    m_pGuestAccount = new CAccount ( g_pGame->GetAccountManager (), false, HTTP_GUEST_ACCOUNT_NAME );
+    m_pGuestAccount = g_pGame->GetAccountManager ()->AddGuestAccount ( HTTP_GUEST_ACCOUNT_NAME );
 
     m_HttpDosProtect = CConnectHistory ( g_pGame->GetConfig ()->GetHTTPDosThreshold (), 10000, 60000 * 1 );     // Max of 'n' connections per 10 seconds, then 1 minute ignore
 
@@ -91,7 +91,7 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
     return bResult;
 }
 
-// Called from worker thread.
+// Called from worker thread. Careful now.
 // Do some stuff before allowing EHS to do the proper routing
 HttpResponse * CHTTPD::RouteRequest ( HttpRequest * ipoHttpRequest )
 {
@@ -179,8 +179,18 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
     return HTTPRESPONSECODE_200_OK;
 }
 
-ResponseCode CHTTPD::RequestLogin ( HttpResponse * ipoHttpResponse )
+ResponseCode CHTTPD::RequestLogin ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
+    if ( m_strWarnMessageForIp == ipoHttpRequest->GetAddress() )
+    {
+        m_strWarnMessageForIp.clear();
+        SString strMessage;
+        strMessage += SString( "Your IP address ('%s') is not associated with an authorized serial.", ipoHttpRequest->GetAddress().c_str() );
+        strMessage += SString( "<br/><a href='%s'>See here for more information</a>", "https:""//mtasa.com/authserialhttp" );
+        ipoHttpResponse->SetBody( strMessage, strMessage.length() );
+        return HTTPRESPONSECODE_401_UNAUTHORIZED;
+    }
+
     const char* szAuthenticateMessage = "Access denied, please login";
     ipoHttpResponse->SetBody ( szAuthenticateMessage, strlen(szAuthenticateMessage) );
     SString strName ( "Basic realm=\"%s\"", g_pGame->GetConfig ()->GetServerName ().c_str () );
@@ -196,19 +206,10 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
         if ( authorization.substr(0,6) == "Basic " )
         {
             // Basic auth
-            std::string strAuthDecoded = SharedUtil::Base64decode(authorization.substr(6));
+            SString strAuthDecoded = SharedUtil::Base64decode( authorization.substr( 6 ) );
 
-            string authName;
-            string authPassword;
-            for ( size_t i = 0; i < strAuthDecoded.length(); i++ )
-            {
-                if ( strAuthDecoded.substr(i, 1) == ":" )
-                {
-                    authName = strAuthDecoded.substr(0,i);
-                    authPassword = strAuthDecoded.substr(i+1);
-                    break;
-                }
-            }
+            SString authName, authPassword;
+            strAuthDecoded.Split( ":", &authName, &authPassword );
 
             if ( m_BruteForceProtect.IsFlooding ( ipoHttpRequest->GetAddress ().c_str () ) )
             {
@@ -226,11 +227,19 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
                     std::string strAccountName = account->GetName ();
                     if ( strAccountName.compare ( CONSOLE_ACCOUNT_NAME ) != 0 )
                     {
+                        if ( !g_pGame->GetAccountManager()->IsHttpLoginAllowed( account, ipoHttpRequest->GetAddress() ) )
+                        {
+                            m_strWarnMessageForIp = ipoHttpRequest->GetAddress();
+                            CLogger::AuthPrintf( "HTTP: Failed login for user '%s' because %s not associated with authorized serial\n", authName.c_str(), ipoHttpRequest->GetAddress().c_str() );
+                            return m_pGuestAccount;
+                        }
+
                         // Handle initial login logging
+                        std::lock_guard< std::mutex > guard( m_mutexLoggedInMap );
                         if ( m_LoggedInMap.find ( authName ) == m_LoggedInMap.end () )
                             CLogger::AuthPrintf ( "HTTP: '%s' entered correct password from %s\n", authName.c_str () , ipoHttpRequest->GetAddress ().c_str () );
                         m_LoggedInMap[authName] = GetTickCount64_ ();
-                        // @@@@@ Check they can access HTTP
+                        account->OnLoginHttpSuccess( ipoHttpRequest->GetAddress() );
                         return account;
                     }
                 }
@@ -245,15 +254,10 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
     return m_pGuestAccount;
 }
 
+// Called from worker thread. Careful now.
 void CHTTPD::HttpPulse ( void )
 {
-    // Prevent more than one thread running this at once
-    static int iBusy = 0;
-    if ( ++iBusy > 1 )
-    {
-        iBusy--;
-        return;
-    }
+    std::lock_guard< std::mutex > guard( m_mutexLoggedInMap );
 
     long long llExpireTime = GetTickCount64_ () - 1000 * 60 * 5;    // 5 minute timeout
 
@@ -263,23 +267,21 @@ void CHTTPD::HttpPulse ( void )
         // Remove if too long since last request
         if ( iter->second < llExpireTime )
         {
-            g_pGame->Lock(); // get the mutex (blocking)
             CLogger::AuthPrintf ( "HTTP: '%s' no longer connected\n", iter->first.c_str () );
             m_LoggedInMap.erase ( iter++ );
-            g_pGame->Unlock();
         }
         else
             iter++;
     }
-
-    iBusy--;
 }
 
 //
 // Do DoS check here
-//
+// Called from worker thread. Careful now.
 bool CHTTPD::ShouldAllowConnection ( const char * szAddress )
 {
+    std::lock_guard< std::mutex > guard( m_mutexHttpDosProtect );
+
     if ( MapContains( m_HttpDosExcludeMap, szAddress ) )
         return true;
 

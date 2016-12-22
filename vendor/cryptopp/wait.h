@@ -117,7 +117,7 @@ protected:
 	and would pass this parameter to subsequent functions they call using the construct:
 
 	SubFunc(arg1, arg2, CallStack("my func at place such and such", &callStack));
-	
+
 	The advantage of this approach is that it is easy to use and should be very efficient,
 	involving no allocation from the heap, just a linked list of stack objects containing
 	pointers to static ASCIIZ strings (or possibly additional but simple data if derived). */
@@ -211,9 +211,9 @@ private:
 	fd_set m_readfds, m_writefds;
 	int m_maxFd;
 #endif
-	bool m_noWait;
 	double m_firstEventTime;
 	Timer m_eventTimer;
+	bool m_noWait;
 
 #ifdef USE_WINDOWS_STYLE_SOCKETS
 	typedef size_t LastResultType;

@@ -70,7 +70,6 @@ public:
     void                SetMenuVerticalPosition         ( int iPosY );
     void                SetMenuUnhovered                ( void );
 
-    void                ChangeCommunityState            ( bool bIn, const std::string& strUsername );
     bool                HasStarted                      ( void ) { return m_bStarted; };
 
     void                SetNewsHeadline                 ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew );
@@ -152,9 +151,6 @@ private:
     bool                m_bStarted;
     CVector2D           m_ScreenSize;
 
-    // Community
-    CGUILabel*          m_pCommunityLabel;
-
     // Fade variables
     unsigned char       m_ucFade;
     float               m_fFader;
@@ -169,6 +165,12 @@ private:
     CGUILabel*          m_pNewsItemShadowLabels[CORE_MTA_NEWS_ITEMS];
     CGUILabel*          m_pNewsItemDateLabels[CORE_MTA_NEWS_ITEMS];
     CGUILabel*          m_pNewsItemNEWLabels[CORE_MTA_NEWS_ITEMS];
+
+#ifdef CI_BUILD
+    std::unique_ptr<CGUITexture> m_pFeatureBranchAlertTexture;
+    std::unique_ptr<CGUIStaticImage> m_pFeatureBranchAlertImage;
+    std::unique_ptr<CGUILabel> m_pFeatureBranchAlertLabel;
+#endif
 
     // Fade states
     enum eFadeStates {

@@ -50,6 +50,7 @@
 #include "seal.h"
 #include "crc.h"
 #include "adler32.h"
+#include "keccak.h"
 #include "sha3.h"
 #include "blake2.h"
 #include "hkdf.h"
@@ -57,11 +58,6 @@
 // Aggressive stack checking with VS2005 SP1 and above.
 #if (CRYPTOPP_MSC_VERSION >= 1410)
 # pragma strict_gs_check (on)
-#endif
-
-// Quiet deprecated warnings intended to benefit users.
-#if CRYPTOPP_MSC_VERSION
-# pragma warning(disable: 4996)
 #endif
 
 #if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
@@ -94,6 +90,10 @@ void RegisterFactories()
 	RegisterDefaultFactoryFor<HashTransformation, RIPEMD256>();
 	RegisterDefaultFactoryFor<HashTransformation, Weak::PanamaHash<LittleEndian> >();
 	RegisterDefaultFactoryFor<HashTransformation, Weak::PanamaHash<BigEndian> >();
+	RegisterDefaultFactoryFor<HashTransformation, Keccak_224>();
+	RegisterDefaultFactoryFor<HashTransformation, Keccak_256>();
+	RegisterDefaultFactoryFor<HashTransformation, Keccak_384>();
+	RegisterDefaultFactoryFor<HashTransformation, Keccak_512>();
 	RegisterDefaultFactoryFor<HashTransformation, SHA3_224>();
 	RegisterDefaultFactoryFor<HashTransformation, SHA3_256>();
 	RegisterDefaultFactoryFor<HashTransformation, SHA3_384>();

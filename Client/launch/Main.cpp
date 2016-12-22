@@ -48,8 +48,23 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     SString strMTASAPath = PathJoin ( GetLaunchPath (), "mta" );
     SString strLoaderDllPathFilename = PathJoin ( strMTASAPath, strLoaderDllFilename );
 
-    // Load loader dll
-    HMODULE hModule = LoadLibraryW ( FromUTF8( strLoaderDllPathFilename ) );
+    // No Windows error box during first load attempt
+    DWORD dwPrevMode = SetErrorMode( SEM_FAILCRITICALERRORS );
+    HMODULE hModule = LoadLibraryW( FromUTF8( strLoaderDllPathFilename ) );
+    DWORD dwLoadLibraryError = GetLastError ();
+    SetErrorMode( dwPrevMode );
+
+    if ( !hModule )
+    {
+        // Retry using MTA current directory
+        SetCurrentDirectoryW( FromUTF8( strMTASAPath ) );
+        hModule = LoadLibraryW( FromUTF8( strLoaderDllPathFilename ) );
+        dwLoadLibraryError = GetLastError();
+        if ( hModule )
+        {
+            AddReportLog( 5712, SString( "LoadLibrary '%s' succeeded on change to directory '%s'", *strLoaderDllFilename, *strMTASAPath ) );
+        }
+    }
 
     int iReturnCode = 0;
     if ( hModule )
@@ -65,7 +80,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     else
     {
         iReturnCode = 1;
-        SString strError = GetSystemErrorMessage ( GetLastError () );
+        SString strError = GetSystemErrorMessage ( dwLoadLibraryError );
         SString strMessage ( "Failed to load: '%s'\n\n%s", *strLoaderDllPathFilename, *strError );
         AddReportLog ( 5711, strMessage );
 

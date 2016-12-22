@@ -153,7 +153,10 @@ MAKE_INTEGER_PARSER(int,                int)       /* Don't use semicolons   */
 MAKE_INTEGER_PARSER(unsigned int,       uint)      /* after these statement  */
 MAKE_INTEGER_PARSER(long,               long)      /* because they can cause */
 MAKE_INTEGER_PARSER(unsigned long,      ulong)     /* compiler warnings if   */
+                                                   /* the checking level is  */
 MAKE_INTEGER_PARSER(long long,          longlong)  /* turned up high enough. */
+                                                   /*                        */
+                                                   /*                        */
 MAKE_INTEGER_PARSER(unsigned long long, ulonglong) /*                        */
 
 #undef PCRE_IS_SET

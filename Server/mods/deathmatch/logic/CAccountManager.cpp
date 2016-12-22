@@ -21,10 +21,16 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
     m_llLastTimeSaved = GetTickCount64_ ();
     m_bChangedSinceSaved = false;
     m_iAccounts = 1;
+    m_pDatabaseManager = g_pGame->GetDatabaseManager ();
 
     //Load internal.db
-    m_pDatabaseManager = g_pGame->GetDatabaseManager ();
-    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( strDbPathFilename ) );
+    SString strOptions;
+#ifdef WITH_ACCOUNT_QUERY_LOGGING
+    g_pGame->GetDatabaseManager ()->SetLogLevel ( EJobLogLevel::ALL, g_pGame->GetConfig ()->GetDbLogFilename () );
+    SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
+    SetOption < CDbOptionsMap > ( strOptions, "tag", "accounts" );
+#endif
+    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( strDbPathFilename ), "", "", strOptions );
 
     // Check if new installation
     CRegistryResult result;
@@ -34,6 +40,17 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
     //Create all our tables (Don't echo the results)
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS accounts (id INTEGER PRIMARY KEY, name TEXT, password TEXT, ip TEXT, serial TEXT)" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS userdata (id INTEGER PRIMARY KEY, userid INTEGER, key TEXT, value TEXT, type INTEGER)" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE TABLE IF NOT EXISTS serialusage (id INTEGER PRIMARY KEY, userid INTEGER, "
+                                                                                                "serial TEXT, "
+                                                                                                "added_ip TEXT, "
+                                                                                                "added_date INTEGER, "
+                                                                                                "auth_who INTEGER, "
+                                                                                                "auth_date INTEGER, "
+                                                                                                "last_login_ip TEXT, "
+                                                                                                "last_login_date INTEGER, "
+                                                                                                "last_login_http_date INTEGER )" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE INDEX IF NOT EXISTS IDX_SERIALUSAGE_USERID on serialusage(userid)" );
+    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE UNIQUE INDEX IF NOT EXISTS IDX_SERIALUSAGE_USERID_SERIAL_U on serialusage(userid,serial)" );
 
     // Check if unique index on accounts exists
 	m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM sqlite_master WHERE type='index' AND name='IDX_ACCOUNTS_NAME_U'" );
@@ -114,19 +131,19 @@ bool CAccountManager::Load( void )
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT id,name,password,ip,serial from accounts" );
 
     //Initialize all our variables
-    SString strName, strPassword, strSerial, strIP;
-    int iUserID = 0;
     m_iAccounts = 0;
     bool bNeedsVacuum = false;
-    CAccount* pAccount = NULL;
     CElapsedTime activityTimer;
     bool bOutputFeedback = false;
     for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
     {
         const CRegistryResultRow& row = *iter;
         //Fill User ID, Name & Password (Required data)
-        iUserID = static_cast < int > ( row[0].nVal );
-        strName = (const char *)row[1].pVal;
+        int iUserID = static_cast < int > ( row[0].nVal );
+        SString strName = (const char *)row[1].pVal;
+        SString strPassword = (const char *)row[2].pVal;
+        SString strIP = (const char *)row[3].pVal;
+        SString strSerial = (const char *)row[4].pVal;
 
         // Check for overlong names and incorrect escapement
         bool bRemoveAccount = false;
@@ -150,7 +167,7 @@ bool CAccountManager::Load( void )
         }
 
         // Check for disallowed account names
-        if ( strName == "*****" )
+        if ( strName == "*****" || strName == CONSOLE_ACCOUNT_NAME )
             bRemoveAccount = true;
 
         // Do account remove if required
@@ -158,36 +175,16 @@ bool CAccountManager::Load( void )
         {
             m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
             m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+            m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM serialusage WHERE userid=?", SQLITE_INTEGER, iUserID );
             continue;
         }
 
-        strPassword = "";
-        // If we have an password
-        if ( row[2].pVal )
-            strPassword = (const char *)row[2].pVal;
+        //Create a new account with the specified information
+        CAccount* pAccount = g_pGame->GetAccountManager ()->AddPlayerAccount ( strName, strPassword, iUserID, strIP, strSerial );
 
-        //if we have an IP
-        if ( row[3].pVal ) {
-            //Fill the IP variable
-            strIP = (const char *)row[3].pVal;
-            //If we have a Serial
-            if ( row[4].pVal ) {
-                //Fill the serial variable
-                strSerial = (const char *)row[4].pVal;
-                //Create a new account with the specified information
-                pAccount = new CAccount ( this, true, strName, strPassword, strIP, iUserID, strSerial );
-            }
-            else
-                //Create a new account with the specified information
-                pAccount = new CAccount ( this, true, strName, strPassword, strIP, iUserID );
-        }
-        else {
-            //Create a new account with the specified information
-            pAccount = new CAccount ( this, true, strName, strPassword, "", iUserID );
-        }
         if ( bChanged )
             pAccount->SetChanged ( bChanged );
-        m_iAccounts = Max ( m_iAccounts, iUserID );
+        m_iAccounts = std::max ( m_iAccounts, iUserID );
 
         // Feedback for the user
         if ( activityTimer.Get() > 5000 )
@@ -210,7 +207,7 @@ bool CAccountManager::Load( void )
         for ( CMappedAccountList::const_iterator iter = m_List.begin () ; iter != m_List.end () ; iter++ )
         {
             CAccount* pAccount = *iter;
-            if ( pAccount->IsRegistered () && pAccount->HasChanged() )
+            if ( pAccount->IsRegistered () && pAccount->HasChanged () && !pAccount->IsConsoleAccount () )
             {
                 uiSaveCount++;
                 Save ( pAccount, false );
@@ -270,6 +267,8 @@ void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
             m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
     }
 
+    SaveAccountSerialUsage( pAccount );
+
     //Set changed since saved to false
     pAccount->SetChanged( false );
 }
@@ -280,11 +279,13 @@ bool CAccountManager::Save ( void )
     // Attempted save now
     m_bChangedSinceSaved = false;
 
-    CMappedAccountList::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; iter++ )
-        if ( (*iter)->IsRegistered () && (*iter)->HasChanged() )
-            Save ( *iter );
-
+    for ( auto pAccount : m_List )
+    {
+        if ( pAccount->IsRegistered () && pAccount->HasChanged () && !pAccount->IsConsoleAccount ()  )
+        {
+            Save ( pAccount );
+        }
+    }
     return true;
 }
 
@@ -430,7 +431,7 @@ void CAccountManager::ChangingName ( CAccount* pAccount, const SString& strOldNa
 
 void CAccountManager::MarkAsChanged ( CAccount* pAccount )
 {
-    if ( pAccount->IsRegistered () ) 
+    if ( pAccount->IsRegistered () && !pAccount->IsConsoleAccount () ) 
     {
         m_bChangedSinceSaved = true;
         pAccount->SetChanged ( true );
@@ -442,7 +443,7 @@ void CAccountManager::RemoveAll ( void )
     DeletePointersAndClearList ( m_List );
 }
 
-bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword )
+bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword )
 {
     // Is he already logged in?
     if ( pClient->IsRegistered () )
@@ -451,109 +452,83 @@ bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, const char
         return false;
     }
 
-    // Get the players details if relevant
-    string strPlayerName, strPlayerIP, strPlayerSerial;
-    if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
+    if ( pClient->GetClientType () != CClient::CLIENT_PLAYER )
     {
-        CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-        strPlayerIP = pPlayer->GetSourceIP ();
-        strPlayerName = pPlayer->GetNick ();
-        strPlayerSerial = pPlayer->GetSerial ();
+        if ( pEchoClient ) pEchoClient->SendEcho ( "login: Only players can log in" );
+        return false;
     }
+
+    // Get the players details
+    CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
+    SString strPlayerName = pPlayer->GetNick ();
+    SString strPlayerIP = pPlayer->GetSourceIP ();
+    SString strPlayerSerial = pPlayer->GetSerial ();
 
     if ( m_AccountProtect.IsFlooding ( strPlayerIP.c_str () ) )
     {
-        if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Account locked", szNick ).c_str() );
-        CLogger::AuthPrintf ( "LOGIN: Ignoring %s trying to log in as '%s' (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szNick, strPlayerIP.c_str (), strPlayerSerial.c_str () );
+        if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Account locked", szAccountName ).c_str() );
+        CLogger::AuthPrintf ( "LOGIN: Ignoring %s trying to log in as '%s' (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szAccountName, strPlayerIP.c_str (), strPlayerSerial.c_str () );
         return false;
     }
 
     // Grab the account on his nick if any
-    CAccount* pAccount = g_pGame->GetAccountManager ()->Get ( szNick );
+    CAccount* pAccount = g_pGame->GetAccountManager ()->Get ( szAccountName );
     if ( !pAccount )
     {
-        if ( pEchoClient ) pEchoClient->SendEcho( SString( "login: No known account for '%s'", szNick ).c_str() );
-        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' (Unknown account) (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szNick, strPlayerIP.c_str (), strPlayerSerial.c_str () );
+        if ( pEchoClient ) pEchoClient->SendEcho( SString( "login: No known account for '%s'", szAccountName ).c_str() );
+        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' (Unknown account) (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szAccountName, strPlayerIP.c_str (), strPlayerSerial.c_str () );
         return false;
     }
 
     if ( pAccount->GetClient () )
     {
-        if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Account for '%s' is already in use", szNick ).c_str() );
+        if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Account for '%s' is already in use", szAccountName ).c_str() );
         return false;
     }
     if ( !IsValidPassword( szPassword ) || !pAccount->IsPassword ( szPassword ) )
     {
-        if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Invalid password for account '%s'", szNick ).c_str() );
-        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' with an invalid password (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szNick, strPlayerIP.c_str (), strPlayerSerial.c_str () );
+        if ( pEchoClient ) pEchoClient->SendEcho ( SString( "login: Invalid password for account '%s'", szAccountName ).c_str() );
+        CLogger::AuthPrintf ( "LOGIN: %s tried to log in as '%s' with an invalid password (IP: %s  Serial: %s)\n", strPlayerName.c_str (), szAccountName, strPlayerIP.c_str (), strPlayerSerial.c_str () );
         m_AccountProtect.AddConnect ( strPlayerIP.c_str () );
         return false;
     }
 
-    // Try to log him in
-    return LogIn ( pClient, pEchoClient, pAccount );
-}
+    // Check serial authorization
+    if ( IsAuthorizedSerialRequired( pAccount ) )
+    {
+        pAccount->AddSerialForAuthorization( strPlayerSerial, strPlayerIP );
+        if ( !pAccount->IsSerialAuthorized( strPlayerSerial ) )
+        {
+            if ( pEchoClient )
+                pEchoClient->SendEcho( SString( "login: Serial pending authorization for account '%s' - See https:""//mtasa.com/authserial", szAccountName ) );
+            CLogger::AuthPrintf( "LOGIN: %s tried to log in as '%s' with an unauthorized serial (IP: %s  Serial: %s)\n", *strPlayerName, szAccountName, *strPlayerIP, *strPlayerSerial );
+            CLogger::AuthPrintf( "LOGIN: See https:""//mtasa.com/authserial\n" );
+            return false;
+        }
+    }
 
-bool CAccountManager::LogIn ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount )
-{
     // Log him in
     CAccount* pCurrentAccount = pClient->GetAccount ();
     pClient->SetAccount ( pAccount );
     pAccount->SetClient ( pClient );
 
-    string strPlayerIP, strPlayerSerial;
-    if ( pClient->GetClientType () == CClient::CLIENT_PLAYER )
+    // Call the onPlayerLogin script event
+    CLuaArguments Arguments;
+    Arguments.PushAccount ( pCurrentAccount );
+    Arguments.PushAccount ( pAccount );
+    Arguments.PushBoolean ( false );    // was bAutoLogin
+    if ( !pPlayer->CallEvent ( "onPlayerLogin", Arguments ) )
     {
-        CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-
-        // Get the players details
-        strPlayerIP = pPlayer->GetSourceIP () ;
-        strPlayerSerial = pPlayer->GetSerial ();
-        // Set in account
-        pAccount->SetIP ( strPlayerIP );
-        pAccount->SetSerial ( strPlayerSerial );
+        // DENIED!
+        pClient->SetAccount ( pCurrentAccount );
+        pAccount->SetClient ( NULL );
+        return false;
     }
 
-    // Call the onClientLogin script event
-    CElement* pClientElement = NULL;
-    switch ( pClient->GetClientType () )
-    {
-        case CClient::CLIENT_PLAYER:
-        {
-            CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-            pClientElement = static_cast < CElement* > ( pPlayer );
-            break;
-        }
-        case CClient::CLIENT_CONSOLE:
-        {
-            CConsoleClient* pConsoleClient = static_cast < CConsoleClient* > ( pClient );
-            pClientElement = static_cast < CElement* > ( pConsoleClient );
-            break;
-        }
-    }
-    if ( pClientElement )
-    {
-        CLuaArguments Arguments;
-        Arguments.PushAccount ( pCurrentAccount );
-        Arguments.PushAccount ( pAccount );
-        Arguments.PushBoolean ( false );    // was bAutoLogin
-        if ( !pClientElement->CallEvent ( "onPlayerLogin", Arguments ) )
-        {
-            // DENIED!
-            pClient->SetAccount ( pCurrentAccount );
-            pAccount->SetClient ( NULL );
-            return false;
-        }
-    }
+    // Success is here
+    pAccount->OnLoginSuccess ( strPlayerSerial, strPlayerIP );
 
-    // Get the names of the groups the client belongs to - I did it like this for a larf
-    string strGroupList;
-    for ( list <CAccessControlListGroup* > ::const_iterator iterg = g_pGame->GetACLManager ()->Groups_Begin () ; iterg != g_pGame->GetACLManager ()->Groups_End (); iterg++ )
-        for ( list <CAccessControlListGroupObject* > ::iterator itero = (*iterg)->IterBeginObjects () ; itero != (*iterg)->IterEndObjects (); itero++ )
-            if ( (*itero)->GetObjectType () == CAccessControlListGroupObject::OBJECT_TYPE_USER )
-                if ( (*itero)->GetObjectName () == pAccount->GetName () || strcmp ( (*itero)->GetObjectName (), "*" ) == 0 )
-                    strGroupList = string( (*iterg)->GetGroupName () ) + ( strGroupList.length() ? ", " : "" ) + strGroupList;
-
+    SString strGroupList = SString::Join ( ", ", g_pGame->GetACLManager ()->GetObjectGroupNames ( pAccount->GetName (), CAccessControlListGroupObject::OBJECT_TYPE_USER ) );
     CLogger::AuthPrintf ( "LOGIN: (%s) %s successfully logged in as '%s' (IP: %s  Serial: %s)\n", strGroupList.c_str (), pClient->GetNick (), pAccount->GetName ().c_str (), strPlayerIP.c_str (), strPlayerSerial.c_str () );
 
     // Tell the player
@@ -583,50 +558,31 @@ bool CAccountManager::LogOut ( CClient* pClient, CClient* pEchoClient )
         return false;
     }
 
-    if ( pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_PLAYER )
     {
         if ( pEchoClient )
-            pEchoClient->SendEcho ( "logout: Console may not log out" );
+            pEchoClient->SendEcho ( "logout: Only players can log out" );
         return false;
     }
+    CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
 
     CAccount* pCurrentAccount = pClient->GetAccount ();
     pCurrentAccount->SetClient ( NULL );
 
-    CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), false, GUEST_ACCOUNT_NAME );
+    CAccount* pAccount = g_pGame->GetAccountManager ()->AddGuestAccount( GUEST_ACCOUNT_NAME );
     pClient->SetAccount ( pAccount );
 
-    // Call the onClientLogout event
-    CElement* pClientElement = NULL;
-    switch ( pClient->GetClientType () )
+    // Call our script event
+    CLuaArguments Arguments;
+    Arguments.PushAccount ( pCurrentAccount );
+    Arguments.PushAccount ( pAccount );
+    if ( !pPlayer->CallEvent ( "onPlayerLogout", Arguments ) )
     {
-        case CClient::CLIENT_PLAYER:
-        {
-            CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-            pClientElement = static_cast < CElement* > ( pPlayer );
-            break;
-        }
-        case CClient::CLIENT_CONSOLE:
-        {
-            CConsoleClient* pConsoleClient = static_cast < CConsoleClient* > ( pClient );
-            pClientElement = static_cast < CElement* > ( pConsoleClient );
-            break;
-        }
-    }
-    if ( pClientElement )
-    {
-        // Call our script event
-        CLuaArguments Arguments;
-        Arguments.PushAccount ( pCurrentAccount );
-        Arguments.PushAccount ( pAccount );
-        if ( !pClientElement->CallEvent ( "onPlayerLogout", Arguments ) )
-        {
-            // DENIED!
-            pClient->SetAccount ( pCurrentAccount );
-            pCurrentAccount->SetClient ( pClient );
-            delete pAccount;
-            return false;
-        }
+        // DENIED!
+        pClient->SetAccount ( pCurrentAccount );
+        pCurrentAccount->SetClient ( pClient );
+        delete pAccount;
+        return false;
     }
 
     // Tell the console
@@ -903,23 +859,44 @@ void CAccountManager::GetAccountsBySerial ( const SString& strSerial, std::vecto
     }
 }
 
-
-void CAccountManager::Register( CAccount* pAccount )
+CAccount* CAccountManager::AddGuestAccount( const SString& strName )
 {
-    if ( pAccount->IsRegistered ()  )
-    {
-        //Give the Account an ID
-        pAccount->SetID( ++m_iAccounts );
-        //Force a save for this account
-        Save ( pAccount );
-    }
+    CAccount* pAccount = new CAccount ( this, EAccountType::Guest, strName );
+    return pAccount;
 }
 
-void CAccountManager::RemoveAccount ( CAccount* pAccount )
+CAccount* CAccountManager::AddConsoleAccount( const SString& strName )
 {
-    int iUserID = pAccount->GetID();
-    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
-    m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+    CAccount* pAccount = new CAccount ( this, EAccountType::Console, strName );
+    return pAccount;
+}
+
+CAccount* CAccountManager::AddPlayerAccount( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial )
+{
+    CAccount* pAccount = new CAccount ( this, EAccountType::Player, strName, strPassword, iUserID, strIP, strSerial );
+    return pAccount;
+}
+
+CAccount* CAccountManager::AddNewPlayerAccount( const SString& strName, const SString& strPassword )
+{
+    CAccount* pAccount = new CAccount ( this, EAccountType::Player, strName, strPassword, ++m_iAccounts );
+    Save ( pAccount );
+    return pAccount;
+}
+
+bool CAccountManager::RemoveAccount ( CAccount* pAccount )
+{
+    if ( pAccount->IsConsoleAccount () )
+        return false;
+    if ( pAccount->IsRegistered () )
+    {
+        int iUserID = pAccount->GetID();
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM accounts WHERE id=?", SQLITE_INTEGER, iUserID );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID );
+        m_pDatabaseManager->Execf ( m_hDbConnection, "DELETE FROM serialusage WHERE userid=?", SQLITE_INTEGER, iUserID );
+    }
+    delete pAccount;
+    return true;
 }
 
 
@@ -998,4 +975,137 @@ bool CAccountManager::IsValidNewPassword( const SString& strPassword )
         return false;
 
     return true;
+}
+
+//
+// Return true if account is member of a restricted group
+//
+bool CAccountManager::IsAuthorizedSerialRequired( CAccount* pAccount )
+{
+    for ( const auto& strGroup : g_pGame->GetACLManager()->GetObjectGroupNames( pAccount->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER ) )
+    {
+        if ( g_pGame->GetConfig()->IsAuthSerialGroup( strGroup ) )
+            return true;
+    }
+    return false;
+}
+
+//
+// Return true if account and supplied IP is allowed by auth serial rules
+//
+bool CAccountManager::IsHttpLoginAllowed( CAccount* pAccount, const SString& strIp )
+{
+    if ( !g_pGame->GetConfig()->GetAuthSerialHttpEnabled() ||
+         !IsAuthorizedSerialRequired( pAccount ) ||
+         pAccount->IsIpAuthorized( strIp ) )
+    {
+        return true;
+    }
+    return false;
+}
+
+//
+// Load authorized serial list for the supplied account
+//
+void CAccountManager::LoadAccountSerialUsage( CAccount* pAccount )
+{
+    auto& outSerialUsageList = pAccount->GetSerialUsageList();
+    outSerialUsageList.clear();
+
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf( m_hDbConnection, &result, 
+        "SELECT "
+        " serial"
+        " ,added_ip"
+        " ,added_date"
+        " ,auth_who"
+        " ,auth_date"
+        " ,last_login_ip"
+        " ,last_login_date"
+        " ,last_login_http_date"
+        " FROM serialusage"
+        " WHERE userid=?"
+        , SQLITE_INTEGER, pAccount->GetID()
+        );
+
+    for ( CRegistryResultIterator iter = result->begin() ; iter != result->end() ; ++iter )
+    {
+        const CRegistryResultRow& row = *iter;
+        outSerialUsageList.push_back( CAccount::SSerialUsage() ) ;
+        CAccount::SSerialUsage& info = outSerialUsageList.back();
+        info.strSerial = (const char *)row[0].pVal;
+        info.strAddedIp = (const char *)row[1].pVal;
+        info.tAddedDate = row[2].GetNumber<time_t>();
+        info.strAuthWho = (const char *)row[3].pVal;
+        info.tAuthDate = row[4].GetNumber<time_t>();
+        info.strLastLoginIp = (const char *)row[5].pVal;
+        info.tLastLoginDate = row[6].GetNumber<time_t>();
+        info.tLastLoginHttpDate = row[7].GetNumber<time_t>();
+    }
+}
+
+//
+// Save authorized serial list (if it exists) for the supplied account
+//
+void CAccountManager::SaveAccountSerialUsage( CAccount* pAccount )
+{
+    if ( !pAccount->HasLoadedSerialUsage() )
+        return;
+
+    // Update/add active serials
+    for ( auto& info : pAccount->GetSerialUsageList() )
+    {
+        m_pDatabaseManager->Execf( m_hDbConnection,
+            "INSERT OR IGNORE INTO serialusage"
+            " ("
+            "  userid"
+            " ,serial"
+            " )"
+            " VALUES(?,?)"
+            , SQLITE_INTEGER, pAccount->GetID()
+            , SQLITE_TEXT, *info.strSerial
+            );
+
+        m_pDatabaseManager->QueryWithCallbackf( m_hDbConnection, StaticDbCallback, this,
+            "UPDATE serialusage "
+            " SET "
+            "  added_ip=?"
+            " ,added_date=?"
+            " ,auth_who=?"
+            " ,auth_date=?"
+            " ,last_login_ip=?"
+            " ,last_login_date=?"
+            " ,last_login_http_date=?"
+            " WHERE userid=? AND serial=?"
+            // SET
+            , SQLITE_TEXT,   *info.strAddedIp
+            , SQLITE_INTEGER, (int)info.tAddedDate
+            , SQLITE_TEXT,   *info.strAuthWho
+            , SQLITE_INTEGER, (int)info.tAuthDate
+            , SQLITE_TEXT,   *info.strLastLoginIp
+            , SQLITE_INTEGER, (int)info.tLastLoginDate
+            , SQLITE_INTEGER, (int)info.tLastLoginHttpDate
+            // WHERE
+            , SQLITE_INTEGER, pAccount->GetID ()
+            , SQLITE_TEXT,   *info.strSerial
+            );
+    }
+
+    // Delete removed serials
+    SString strQuery = m_pDatabaseManager->PrepareStringf( m_hDbConnection, 
+            "DELETE FROM serialusage"
+            " WHERE"
+            " userid=?"
+            , SQLITE_INTEGER, pAccount->GetID ()
+            );
+
+    for ( auto& info : pAccount->GetSerialUsageList() )
+    {
+        strQuery += m_pDatabaseManager->PrepareStringf( m_hDbConnection, 
+            " AND serial!=?"
+            , SQLITE_TEXT, *info.strSerial
+            );
+    }
+
+    m_pDatabaseManager->QueryWithCallbackf( m_hDbConnection, StaticDbCallback, this, strQuery );
 }

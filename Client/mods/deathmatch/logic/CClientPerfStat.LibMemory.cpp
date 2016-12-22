@@ -158,7 +158,7 @@ void CClientPerfStatLibMemoryImpl::UpdateLibMemory ( const SString& strLibName, 
 
     pLibMemory->Delta += iMemUsed - pLibMemory->Current;
     pLibMemory->Current = iMemUsed;
-    pLibMemory->Max = Max ( pLibMemory->Max, iMemUsedMax );
+    pLibMemory->Max = std::max ( pLibMemory->Max, iMemUsedMax );
 }
 
 

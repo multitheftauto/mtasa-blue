@@ -111,7 +111,6 @@ VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)");
     ((CPhysicalSAInterface *)this->GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
-    ((CPhysicalSAInterface *)this->GetInterface())->m_vecCollisionAngularVelocity = *vecTurnSpeed;
 }
 
 float CPhysicalSA::GetMass ( void )
@@ -366,8 +365,8 @@ void CPhysicalSA::SetLighting ( float fLighting )
 void CPhysicalSA::SetFrozen ( bool bFrozen )
 {
     CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
-    // Set movement ability
-    pInterface->bDisableMovement = bFrozen;
-    // Set rotation movement ability
-    pInterface->bDisableFriction = bFrozen;
+
+    pInterface->bDontApplySpeed = bFrozen;
+    // Don't enable friction for static objects
+    pInterface->bDisableFriction = ( bFrozen || pInterface->m_fMass >= PHYSICAL_MAXMASS );
 }

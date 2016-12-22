@@ -242,7 +242,7 @@ class CRenderItem
     DECLARE_BASE_CLASS( CRenderItem )
                     CRenderItem             ( void ) : ClassInit ( this ) {}
     virtual         ~CRenderItem            ( void );
-    virtual void    PostConstruct           ( CRenderItemManager* pManager );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, bool bIncludeInMemoryStats = true );
     virtual void    PreDestruct             ( void );
     virtual void    Release                 ( void );
     virtual void    AddRef                  ( void );
@@ -251,12 +251,14 @@ class CRenderItem
     virtual void    OnResetDevice           ( void ) = 0;
     int             GetVideoMemoryKBUsed    ( void ) { return m_iMemoryKBUsed; }
     int             GetRevision             ( void ) { return m_iRevision; }
+    bool            GetIncludeInMemoryStats ( void ) { return m_bIncludeInMemoryStats; }
 
     CRenderItemManager* m_pManager;
     IDirect3DDevice9*   m_pDevice;
     int                 m_iRefCount;
     int                 m_iMemoryKBUsed;
     int                 m_iRevision;
+    bool                m_bIncludeInMemoryStats;
 };
 
 
@@ -483,7 +485,7 @@ class CRenderTargetItem : public CTextureItem
 {
     DECLARE_CLASS( CRenderTargetItem, CTextureItem )
                     CRenderTargetItem       ( void ) : ClassInit ( this ) {}
-    virtual void    PostConstruct           ( CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel );
+    virtual void    PostConstruct           ( CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bIncludeInMemoryStats );
     virtual void    PreDestruct             ( void );
     virtual bool    IsValid                 ( void );
     virtual void    OnLostDevice            ( void );
@@ -536,7 +538,7 @@ class CWebBrowserItem : public CTextureItem
     virtual void    OnResetDevice           ( void );
     void            CreateUnderlyingData    ( void );
     void            ReleaseUnderlyingData   ( void );
-    void            Resize                  (const CVector2D& size);
+    virtual void    Resize                  (const CVector2D& size);
 
     IDirect3DSurface9*    m_pD3DRenderTargetSurface;
 };

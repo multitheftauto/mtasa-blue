@@ -62,8 +62,8 @@ public:
     inline bool                 GetCollisionEnabled     ( void )                        { return m_bCollisionsEnabled; }
     inline void                 SetCollisionEnabled     ( bool bCollisionEnabled )      { m_bCollisionsEnabled = bCollisionEnabled; }
 
-    inline bool                 IsStatic                ( void )                        { return m_bIsStatic; }
-    inline void                 SetStatic               ( bool bStatic )                { m_bIsStatic = bStatic; }
+    inline bool                 IsFrozen                ( void )                        { return m_bIsFrozen; }
+    inline void                 SetFrozen               ( bool bFrozen )                { m_bIsFrozen = bFrozen; }
 
     inline float                GetHealth               ( void )                        { return m_fHealth; }
     inline void                 SetHealth               ( float fHealth )               { m_fHealth = fHealth; }
@@ -84,7 +84,7 @@ private:
     unsigned char               m_ucAlpha;
     unsigned short              m_usModel;
     CVector                     m_vecScale;
-    bool                        m_bIsStatic;
+    bool                        m_bIsFrozen;
     float                       m_fHealth;
     bool                        m_bBreakable;
     bool                        m_bSyncable;

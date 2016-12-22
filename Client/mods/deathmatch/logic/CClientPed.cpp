@@ -3551,7 +3551,8 @@ void CClientPed::_CreateModel ( void )
         {
             if ( m_WeaponTypes [ i ] != WEAPONTYPE_UNARMED )
             {
-                GiveWeapon ( m_WeaponTypes [ i ], m_usWeaponAmmo [ i ] );
+                bool bSetAsCurrent = (i == m_CurrentWeaponSlot);
+                GiveWeapon ( m_WeaponTypes [ i ], m_usWeaponAmmo [ i ], bSetAsCurrent );
             }
         }
 
@@ -5679,7 +5680,7 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
             }
             
             if ( !bFreezeLastFrame ) flags |= 0x08; // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
-            float fBlendDelta =  1 / Max ( (float)iBlend, 1.0f ) * 1000;
+            float fBlendDelta =  1 / std::max ( (float)iBlend, 1.0f ) * 1000;
             CTask * pTask = g_pGame->GetTasks ()->CreateTaskSimpleRunNamedAnim ( szAnimName, pBlock->GetName (), flags, fBlendDelta, iTime, !bInterruptable, bRunInSequence, bOffsetPed, bHoldLastFrame );
             if ( pTask )
             {
@@ -6081,7 +6082,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
         g_pGame->GetStreaming()->LoadAllRequestedModels ( false, "CClientPed::HandleWaitingForGroundToLoad" );
 
     // Start out with a fairly big radius to check, and shrink it down over time
-    float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );
+    float fUseRadius = 50.0f * ( 1.f - std::max ( 0.f, m_fObjectsAroundTolerance ) );
 
     // Gather up some flags
     CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ();
@@ -6105,7 +6106,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
     if ( ( !bHasModel || !bMTALoaded ) && m_fObjectsAroundTolerance < 1.f )
     {
         m_fGroundCheckTolerance = 0.f;
-        m_fObjectsAroundTolerance = Min ( 1.f, m_fObjectsAroundTolerance + 0.01f );
+        m_fObjectsAroundTolerance = std::min( 1.f, m_fObjectsAroundTolerance + 0.01f );
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
             status += ( "  FreezeUntilCollisionLoaded - wait" );
         #endif
@@ -6115,7 +6116,7 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
         // Models should be loaded, but sometimes the collision is still not ready
         // Do a ground distance check to make sure.
         // Make the check tolerance larger with each passing frame
-        m_fGroundCheckTolerance = Min ( 1.f, m_fGroundCheckTolerance + 0.01f );
+        m_fGroundCheckTolerance = std::min( 1.f, m_fGroundCheckTolerance + 0.01f );
         float fDist = GetDistanceFromGround ();
         float fUseDist = fDist * ( 1.f - m_fGroundCheckTolerance );
         if ( fUseDist > -0.2f && fUseDist < 1.5f )

@@ -169,18 +169,6 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     m_pVersion->SetSize ( CVector2D((32/NATIVE_RES_X)*m_iMenuSizeX,(32/NATIVE_RES_Y)*m_iMenuSizeY), false);
     m_pVersion->SetProperty("InheritsAlpha", "False" );
 
-    m_pCommunityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pFiller, "Not logged in" ) );
-    m_pCommunityLabel->AutoSize ( "Not logged in" );
-    m_pCommunityLabel->SetAlwaysOnTop ( true );
-    m_pCommunityLabel->SetAlpha ( 0 ); // disabled, previous alpha was 0.7f
-    m_pCommunityLabel->SetVisible ( false );
-    m_pCommunityLabel->SetPosition ( CVector2D ( 40.0f, ScreenSize.fY - 20.0f ) );
-
-    std::string strUsername;
-    CCore::GetSingleton().GetCommunity()->GetUsername ( strUsername );
-    if ( CCore::GetSingleton().GetCommunity()->IsLoggedIn() && !strUsername.empty() )
-        ChangeCommunityState ( true, strUsername );
-
     float fBase = 0.613f;
     float fGap = 0.043f;
     // Our disconnect item is shown/hidden dynamically, so we store it seperately
@@ -313,6 +301,26 @@ CMainMenu::CMainMenu ( CGUI* pManager )
     // Remove unused node
     if ( CXMLNode* pOldNode = pConfig->FindSubNode ( CONFIG_NODE_SERVER_INT ) )
         pConfig->DeleteSubNode ( pOldNode );
+
+#ifdef CI_BUILD
+    // Add feature branch alert
+    m_pFeatureBranchAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
+    std::int32_t buffer = 0xFFFF0000;
+    m_pFeatureBranchAlertTexture->LoadFromMemory(&buffer, 1, 1); // HACK: Load red dot
+
+    m_pFeatureBranchAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
+    m_pFeatureBranchAlertImage->LoadFromTexture(m_pFeatureBranchAlertTexture.get());
+    m_pFeatureBranchAlertImage->SetPosition({ 0.0f, 0.0f }, false);
+    m_pFeatureBranchAlertImage->SetSize({ ScreenSize.fX, 35.0f });
+
+    m_pFeatureBranchAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pFeatureBranchAlertImage.get())));
+    m_pFeatureBranchAlertLabel->SetText(_("You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"));
+    m_pFeatureBranchAlertLabel->SetPosition({ 0.0f, 0.0f }, false);
+    m_pFeatureBranchAlertLabel->SetSize({ ScreenSize.fX, 35.0f });
+    m_pFeatureBranchAlertLabel->SetFont("clear-normal");
+    m_pFeatureBranchAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
+    m_pFeatureBranchAlertLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+#endif
 }
 
 
@@ -327,9 +335,6 @@ CMainMenu::~CMainMenu ( void )
     delete m_pLatestNews;
     delete m_pVersion;
     delete m_pMenuArea;
-
-    // Destroy community label
-    delete m_pCommunityLabel;
 
     // Destroy the menu items. Note: The disconnect item isn't always in the
     // list of menu items (it's only in there when we're in game). This means we
@@ -500,7 +505,7 @@ void CMainMenu::Update ( void )
             float fProgress = ((*it)->image->GetAlpha()-CORE_MTA_NORMAL_ALPHA)/(CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
 		    // Let's work out what the target progress should be by working out the time passed
             // Min of 0.5 progress fixes occasional graphical glitchekal
-		    fProgress = fProgress - Min ( 0.5f, ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA) );
+		    fProgress = fProgress - std::min ( 0.5f, ((float)ulTimePassed/CORE_MTA_ANIMATION_TIME)*(CORE_MTA_HOVER_ALPHA-CORE_MTA_NORMAL_ALPHA) );
             if ( SetItemHoverProgress ( (*it), fProgress, false ) )
             {
                 std::set<sMenuItem*>::iterator itToErase = it++;
@@ -600,7 +605,7 @@ void CMainMenu::Update ( void )
     {
         // Cope with early finish
         if ( pGame->HasCreditScreenFadedOut () )
-            WaitForMenu = Max ( WaitForMenu, 250 );
+            WaitForMenu = std::max ( WaitForMenu, 250 );
 
         // Fade up
         if ( WaitForMenu >= 250 )
@@ -691,7 +696,6 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay, bool bFrameDelay )
         m_ServerBrowser.SetVisible ( false );
         m_Settings.SetVisible ( false );
         m_Credits.SetVisible ( false );
-        m_pCommunityLabel->SetVisible ( false );
         m_pNewsBrowser->SetVisible ( false );
 
 //        m_bIsInSubWindow = false;
@@ -702,7 +706,6 @@ void CMainMenu::SetVisible ( bool bVisible, bool bOverlay, bool bFrameDelay )
         m_pFiller2->SetVisible ( true );
         m_pCanvas->SetVisible( true );
         m_pBackground->SetVisible ( true );
-        m_pCommunityLabel->SetVisible ( true );
     }
 
     m_bHideGame = !bOverlay;
@@ -1025,20 +1028,6 @@ bool CMainMenu::SetItemHoverProgress ( sMenuItem* pItem, float fProgress, bool b
         return bHovering ? (fProgress == 1) : (fProgress == 0);
 }
 
-void CMainMenu::ChangeCommunityState ( bool bIn, const std::string& strUsername )
-{
-    if ( bIn )
-    {
-        SString strText ( "Logged in as: %s", strUsername.c_str () );
-
-        m_pCommunityLabel->SetText ( strText );
-        m_pCommunityLabel->AutoSize ( strText );
-        return;
-    }
-    m_pCommunityLabel->SetText ( "Not logged in" );
-    m_pCommunityLabel->AutoSize ( "Not logged in" );
-}
-
 
 void CMainMenu::SetNewsHeadline ( int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew )
 {
@@ -1132,7 +1121,7 @@ void CMainMenu::WantsToDisconnectCallBack( void* pData, uint uiButton )
 
     if ( uiButton == 1 )
     {
-        uchar menuType = (uchar)pData;
+        int menuType = (int)pData;
         switch( menuType )
         {
             case MENU_ITEM_HOST_GAME:       OnHostGameButtonClick ();    break;

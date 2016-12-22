@@ -126,6 +126,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setRotation", "setElementRotation" );
     lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
     lua_classfunction ( luaVM, "setTurnVelocity", "setElementTurnVelocity" );
+    lua_classfunction ( luaVM, "setVisibleTo", "setElementVisibleTo" );
     lua_classfunction ( luaVM, "setMatrix", "setElementMatrix" );
     lua_classfunction ( luaVM, "setID", "setElementID" );
     lua_classfunction ( luaVM, "setInterior", "setElementInterior" );

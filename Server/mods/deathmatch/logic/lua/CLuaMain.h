@@ -79,10 +79,10 @@ public:
     inline CVehicleManager*         GetVehicleManager       ( void ) const                  { return m_pVehicleManager; };
     inline CMapManager*             GetMapManager           ( void ) const                  { return m_pMapManager; };
     
-    CXMLFile *                      CreateXML               ( const char* szFilename );
+    CXMLFile *                      CreateXML               ( const char* szFilename, bool bUseIDs = true, bool bReadOnly = false );
     void                            DestroyXML              ( CXMLFile* pFile );
     void                            DestroyXML              ( CXMLNode* pRootNode );
-    void                            SaveXML                 ( CXMLNode * pRootNode );
+    bool                            SaveXML                 ( CXMLNode * pRootNode );
     bool                            XMLExists               ( CXMLFile* pFile );
     unsigned long                   GetXMLFileCount         ( void ) const                  { return m_XMLFiles.size (); };
     unsigned long                   GetOpenFileCount        ( void ) const                  { return m_OpenFilenameList.size(); };

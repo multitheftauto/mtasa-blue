@@ -7,9 +7,8 @@
 *  PURPOSE:     Webbrowser interface class
 *
 *****************************************************************************/
-
-#ifndef __CWEBCOREINTERFACE_H
-#define __CWEBCOREINTERFACE_H
+#pragma once
+#include <unordered_set>
 
 class CWebBrowserItem;
 class CWebViewInterface;
@@ -44,13 +43,15 @@ enum eWebBrowserMouseButton
     BROWSER_MOUSEBUTTON_RIGHT = 2
 };
 
-using WebRequestCallback = std::function<void(bool, const std::vector<SString>&)>;
+using WebRequestCallback = std::function<void(bool, const std::unordered_set<SString>&)>;
 
 class CWebCoreInterface
 {
 public:
+    virtual                     ~CWebCoreInterface  () {} 
     virtual CWebViewInterface*  CreateWebView       ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent ) = 0;
     virtual void                DestroyWebView      ( CWebViewInterface* pWebView ) = 0;
+    virtual void                DoPulse             () = 0;
 
     virtual void                AddEventToEventQueue( std::function<void(void)> func, CWebView* pWebView, const SString& name ) = 0;
     virtual void                RemoveWebViewEvents ( CWebView* pWebView ) = 0;
@@ -58,12 +59,11 @@ public:
     
     virtual eURLState           GetURLState        ( const SString& strURL, bool bOutputDebug = false ) = 0;
     virtual SString             GetDomainFromURL   ( const SString& strURL ) = 0;
-    virtual void                ResetFilter        ( bool bResetRequestsOnly ) = 0;
-    //virtual void                AddAllowedPage     ( const SString& strURL ) = 0;
+    virtual void                ResetFilter        ( bool bResetRequestsOnly = true ) = 0;
     virtual void                RequestPages       ( const std::vector<SString>& pages, WebRequestCallback* pCallback = nullptr ) = 0;
-    virtual void                AllowPendingPages  ( bool bRemember ) = 0;
-    virtual void                DenyPendingPages   () = 0;
-    virtual std::vector<SString>& GetPendingRequests () = 0;
+    virtual std::unordered_set<SString> AllowPendingPages( bool bRemember ) = 0;
+    virtual std::unordered_set<SString>  DenyPendingPages() = 0;
+    virtual std::unordered_set<SString>& GetPendingRequests () = 0;
     virtual bool                IsRequestsGUIVisible() = 0;
 
     virtual bool                IsTestModeEnabled  () = 0;
@@ -76,7 +76,6 @@ public:
 
     virtual bool                GetRemotePagesEnabled () = 0;
     virtual bool                GetRemoteJavascriptEnabled () = 0;
-    virtual bool                GetPluginsEnabled () = 0;
 
     virtual void                OnPreScreenshot    () = 0;
     virtual void                OnPostScreenshot   () = 0;
@@ -86,5 +85,3 @@ public:
     virtual void                WriteCustomList    ( const SString& strListName, const std::vector<SString>& customList, bool bReset = true ) = 0;
     virtual void                GetFilterEntriesByType  ( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType, eWebFilterState state = eWebFilterState::WEBFILTER_ALL ) = 0;
 };
-
-#endif

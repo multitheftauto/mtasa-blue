@@ -13,25 +13,9 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-// Uncomment for benchmarking C++ against NEON
+// Uncomment for benchmarking C++ against SSE2 or NEON
+// #undef CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
 // #undef CRYPTOPP_BOOL_NEON_INTRINSICS_AVAILABLE
-
-// Visual Studio needs both VS2005 (1400) and _M_64 for SSE2 and _mm_set_epi64x()
-//  http://msdn.microsoft.com/en-us/library/y0dh78ez%28v=vs.80%29.aspx
-#if defined(_MSC_VER) && ((_MSC_VER < 1400) || !defined(_M_X64))
-# undef CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
-#endif
-
-// Testing shows Sun CC needs 12.4 for _mm_set_epi64x
-#if (__SUNPRO_CC <= 0x5130)
-# undef CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
-#endif
-
-// Visual Studio needs VS2008 (1500); no dependency on _mm_set_epi64x()
-//   http://msdn.microsoft.com/en-us/library/bb892950%28v=vs.90%29.aspx
-#if defined(_MSC_VER) && (_MSC_VER < 1500)
-# undef CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
-#endif
 
 // Apple Clang 6.0/Clang 3.5 does not have SSSE3 intrinsics
 //   http://llvm.org/bugs/show_bug.cgi?id=20213
@@ -39,13 +23,27 @@ NAMESPACE_BEGIN(CryptoPP)
 # undef CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
 #endif
 
+// Sun Studio 12.3 and earlier lack SSE2's _mm_set_epi64x. Win32 lacks _mm_set_epi64x (Win64 supplies it except for VS2008).
+// Also see http://stackoverflow.com/a/38547909/608639
+#if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE && ((__SUNPRO_CC >= 0x5100 && __SUNPRO_CC < 0x5130) || (_MSC_VER >= 1200 && _MSC_VER < 1600) || (defined(_M_IX86) && _MSC_VER >= 1600))
+inline __m128i _mm_set_epi64x(const word64 a, const word64 b)
+{
+	const word64 t[2] = {b,a}; __m128i r;
+	memcpy(&r, &t, sizeof(r));
+	return r;
+}
+#endif
+
 // C/C++ implementation
 static void BLAKE2_CXX_Compress32(const byte* input, BLAKE2_State<word32, false>& state);
 static void BLAKE2_CXX_Compress64(const byte* input, BLAKE2_State<word64, true>& state);
 
+// Also see http://github.com/weidai11/cryptopp/issues/247 for singling out SunCC 5.12
 #if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
 static void BLAKE2_SSE2_Compress32(const byte* input, BLAKE2_State<word32, false>& state);
+# if (__SUNPRO_CC != 0x5120)
 static void BLAKE2_SSE2_Compress64(const byte* input, BLAKE2_State<word64, true>& state);
+# endif
 #endif
 
 #if CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
@@ -161,9 +159,11 @@ pfnCompress64 InitializeCompress64Fn()
 	else
 #endif
 #if CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
+# if (__SUNPRO_CC != 0x5120)
 	if (HasSSE2())
 		return &BLAKE2_SSE2_Compress64;
 	else
+# endif
 #endif
 #if CRYPTOPP_BOOL_NEON_INTRINSICS_AVAILABLE
 	if (HasNEON())
@@ -347,7 +347,7 @@ BLAKE2_Base<W, T_64bit>::BLAKE2_Base() : m_state(1), m_block(1), m_digestSize(DI
 template <class W, bool T_64bit>
 BLAKE2_Base<W, T_64bit>::BLAKE2_Base(bool treeMode, unsigned int digestSize) : m_state(1), m_block(1), m_digestSize(digestSize), m_treeMode(treeMode)
 {
-	assert(digestSize <= DIGESTSIZE);
+	CRYPTOPP_ASSERT(digestSize <= DIGESTSIZE);
 
 	UncheckedSetKey(NULL, 0, g_nullNameValuePairs);
 	Restart();
@@ -358,10 +358,10 @@ BLAKE2_Base<W, T_64bit>::BLAKE2_Base(const byte *key, size_t keyLength, const by
 	const byte* personalization, size_t personalizationLength, bool treeMode, unsigned int digestSize)
 	: m_state(1), m_block(1), m_digestSize(digestSize), m_treeMode(treeMode)
 {
-	assert(keyLength <= MAX_KEYLENGTH);
-	assert(digestSize <= DIGESTSIZE);
-	assert(saltLength <= SALTSIZE);
-	assert(personalizationLength <= PERSONALIZATIONSIZE);
+	CRYPTOPP_ASSERT(keyLength <= MAX_KEYLENGTH);
+	CRYPTOPP_ASSERT(digestSize <= DIGESTSIZE);
+	CRYPTOPP_ASSERT(saltLength <= SALTSIZE);
+	CRYPTOPP_ASSERT(personalizationLength <= PERSONALIZATIONSIZE);
 
 	UncheckedSetKey(key, static_cast<unsigned int>(keyLength), MakeParameters(Name::DigestSize(),(int)digestSize)(Name::TreeMode(),treeMode, false)
 		(Name::Salt(), ConstByteArrayParameter(salt, saltLength))(Name::Personalization(), ConstByteArrayParameter(personalization, personalizationLength)));
@@ -434,7 +434,7 @@ void BLAKE2_Base<W, T_64bit>::Update(const byte *input, size_t length)
 	// Copy tail bytes
 	if (input && length)
 	{
-		assert(length <= BLOCKSIZE - state.length);
+		CRYPTOPP_ASSERT(length <= BLOCKSIZE - state.length);
 		memcpy_s(&state.buffer[state.length], length, input, length);
 		state.length += static_cast<unsigned int>(length);
 	}
@@ -1032,6 +1032,7 @@ static void BLAKE2_SSE2_Compress32(const byte* input, BLAKE2_State<word32, false
   _mm_storeu_si128((__m128i *)(void*)(&state.h[4]),_mm_xor_si128(ff1,_mm_xor_si128(row2,row4)));
 }
 
+# if (__SUNPRO_CC != 0x5120)
 static void BLAKE2_SSE2_Compress64(const byte* input, BLAKE2_State<word64, true>& state)
 {
   word64 m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15;
@@ -1916,6 +1917,7 @@ static void BLAKE2_SSE2_Compress64(const byte* input, BLAKE2_State<word64, true>
   _mm_storeu_si128((__m128i *)(void*)(&state.h[4]), _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)(&state.h[4])), row2l));
   _mm_storeu_si128((__m128i *)(void*)(&state.h[6]), _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)(&state.h[6])), row2h));
 }
+# endif // (__SUNPRO_CC != 0x5120)
 #endif  // CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE
 
 #if CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE
@@ -3463,10 +3465,10 @@ static const int LANE_L64 = 0;
 
 static void BLAKE2_NEON_Compress32(const byte* input, BLAKE2_State<word32, false>& state)
 {
-  //assert(IsAlignedOn(input,GetAlignmentOf<uint8_t*>()));
-  assert(IsAlignedOn(&state.h[0],GetAlignmentOf<uint32x4_t>()));
-  assert(IsAlignedOn(&state.h[4],GetAlignmentOf<uint32x4_t>()));
-  assert(IsAlignedOn(&state.t[0],GetAlignmentOf<uint32x4_t>()));
+  //CRYPTOPP_ASSERT(IsAlignedOn(input,GetAlignmentOf<uint8_t*>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.h[0],GetAlignmentOf<uint32x4_t>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.h[4],GetAlignmentOf<uint32x4_t>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.t[0],GetAlignmentOf<uint32x4_t>()));
 
   CRYPTOPP_ALIGN_DATA(16) uint32_t m0[4], m1[4], m2[4], m3[4], m4[4], m5[4], m6[4], m7[4];
   CRYPTOPP_ALIGN_DATA(16) uint32_t m8[4], m9[4], m10[4], m11[4], m12[4], m13[4], m14[4], m15[4];
@@ -3969,10 +3971,10 @@ static void BLAKE2_NEON_Compress32(const byte* input, BLAKE2_State<word32, false
 
 static void BLAKE2_NEON_Compress64(const byte* input, BLAKE2_State<word64, true>& state)
 {
-  //assert(IsAlignedOn(input,GetAlignmentOf<uint8_t*>()));
-  assert(IsAlignedOn(&state.h[0],GetAlignmentOf<uint64x2_t>()));
-  assert(IsAlignedOn(&state.h[4],GetAlignmentOf<uint64x2_t>()));
-  assert(IsAlignedOn(&state.t[0],GetAlignmentOf<uint64x2_t>()));
+  //CRYPTOPP_ASSERT(IsAlignedOn(input,GetAlignmentOf<uint8_t*>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.h[0],GetAlignmentOf<uint64x2_t>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.h[4],GetAlignmentOf<uint64x2_t>()));
+  CRYPTOPP_ASSERT(IsAlignedOn(&state.t[0],GetAlignmentOf<uint64x2_t>()));
 
   uint64x2_t m0m1,m2m3,m4m5,m6m7,m8m9,m10m11,m12m13,m14m15;
 
@@ -3987,7 +3989,7 @@ static void BLAKE2_NEON_Compress64(const byte* input, BLAKE2_State<word64, true>
 
   uint64x2_t row1l, row1h, row2l, row2h;
   uint64x2_t row3l, row3h, row4l, row4h;
-  uint64x2_t b0, b1, t0, t1;
+  uint64x2_t b0 = {0,0}, b1 = {0,0}, t0, t1;
 
   row1l = vld1q_u64((const uint64_t *)&state.h[0]);
   row1h = vld1q_u64((const uint64_t *)&state.h[2]);

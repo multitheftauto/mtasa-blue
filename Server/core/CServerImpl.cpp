@@ -501,7 +501,7 @@ void CServerImpl::HandlePulseSleep( void )
     CTickCount sleepLimit = CTickCount::Now() + CTickCount( (long long)iSleepIdleMs );
 
     // Initial sleep period
-    int iInitialMs = Min( iSleepIdleMs, iSleepBusyMs );
+    int iInitialMs = std::min( iSleepIdleMs, iSleepBusyMs );
     Sleep( Clamp ( 1, iInitialMs, 50 ) );
 
     // Remaining idle sleep period
@@ -852,7 +852,7 @@ void CServerImpl::HandleInput ( void )
             WCHAR wUNICODE[2] = { iStdIn, 0 };
             Printf ( "%s", UTF16ToMbUTF8(wUNICODE).c_str() );
 #else
-            wchar_t wUNICODE[2] = { iStdIn, 0 };
+            wchar_t wUNICODE[2] = { (wchar_t)iStdIn, 0 };
             if ( !g_bSilent && !g_bNoCurses )
                 wprintw ( m_wndInput, "%s", UTF16ToMbUTF8(wUNICODE).c_str() );
 #endif
@@ -937,6 +937,11 @@ bool CServerImpl::ParseArguments ( int iArgumentCount, char* szArguments [] )
 #ifndef WIN32
                     g_bNoCurses = false;
 #endif
+                }
+                else if ( strcmp ( szArguments[i], "-u" ) == 0 )
+                {
+                    std::setbuf ( stdout, nullptr) ;
+                    std::setbuf ( stderr, nullptr );
                 }
                 else if ( strcmp ( szArguments [i], "-x" ) == 0 )
                 {

@@ -22,6 +22,9 @@ typedef CAutoRefedPointer < struct CRegistryResultData > CRegistryResult;
 #include <string>
 #include "../../../vendor/sqlite/sqlite3.h"
 
+// Only used for identifying 8 byte integers in varargs list
+#define SQLITE_INTEGER64 10
+
 class CRegistry
 {
     friend class CRegistryManager;
@@ -111,6 +114,22 @@ struct CRegistryResultCell
                                         memcpy ( pVal, cell.pVal, nLength );
                                     }
                                     return *this;
+                                }
+
+                                template< class T >
+                                void GetNumber( T& outValue ) const
+                                {
+                                    outValue = GetNumber< T >();
+                                }
+
+                                template< class T >
+                                T GetNumber( void ) const
+                                {
+                                    if ( nType == SQLITE_INTEGER )
+                                        return static_cast< T >( nVal );
+                                    if ( nType == SQLITE_FLOAT )
+                                        return static_cast< T >( fVal );
+                                    return 0;
                                 }
 
     int                         nType;      // Type identifier, SQLITE_*

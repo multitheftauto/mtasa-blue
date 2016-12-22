@@ -24,9 +24,9 @@ public:
 	//! \brief Provides the maximum derived key length
 	//! \returns maximum derived key length, in bytes
 	virtual size_t MaxDerivedKeyLength() const =0;
-	
+
 	//! \brief Determines if the derivation function uses the purpose byte
-	//! \returns true if the derivation function uses the purpose byte, false otherwise	
+	//! \returns true if the derivation function uses the purpose byte, false otherwise
 	virtual bool UsesPurposeByte() const =0;
 
 	//! \brief Derive key from the password
@@ -83,8 +83,8 @@ template <class T>
 unsigned int PKCS5_PBKDF1<T>::DeriveKey(byte *derived, size_t derivedLen, byte purpose, const byte *password, size_t passwordLen, const byte *salt, size_t saltLen, unsigned int iterations, double timeInSeconds) const
 {
 	CRYPTOPP_UNUSED(purpose);
-	assert(derivedLen <= MaxDerivedKeyLength());
-	assert(iterations > 0 || timeInSeconds > 0);
+	CRYPTOPP_ASSERT(derivedLen <= MaxDerivedKeyLength());
+	CRYPTOPP_ASSERT(iterations > 0 || timeInSeconds > 0);
 
 	if (!iterations)
 		iterations = 1;
@@ -113,8 +113,8 @@ template <class T>
 unsigned int PKCS5_PBKDF2_HMAC<T>::DeriveKey(byte *derived, size_t derivedLen, byte purpose, const byte *password, size_t passwordLen, const byte *salt, size_t saltLen, unsigned int iterations, double timeInSeconds) const
 {
 	CRYPTOPP_UNUSED(purpose);
-	assert(derivedLen <= MaxDerivedKeyLength());
-	assert(iterations > 0 || timeInSeconds > 0);
+	CRYPTOPP_ASSERT(derivedLen <= MaxDerivedKeyLength());
+	CRYPTOPP_ASSERT(iterations > 0 || timeInSeconds > 0);
 
 	if (!iterations)
 		iterations = 1;
@@ -183,8 +183,8 @@ public:
 template <class T>
 unsigned int PKCS12_PBKDF<T>::DeriveKey(byte *derived, size_t derivedLen, byte purpose, const byte *password, size_t passwordLen, const byte *salt, size_t saltLen, unsigned int iterations, double timeInSeconds) const
 {
-	assert(derivedLen <= MaxDerivedKeyLength());
-	assert(iterations > 0 || timeInSeconds > 0);
+	CRYPTOPP_ASSERT(derivedLen <= MaxDerivedKeyLength());
+	CRYPTOPP_ASSERT(iterations > 0 || timeInSeconds > 0);
 
 	if (!iterations)
 		iterations = 1;

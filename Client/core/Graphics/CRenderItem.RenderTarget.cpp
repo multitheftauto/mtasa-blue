@@ -18,9 +18,9 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderTargetItem::PostConstruct ( CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel )
+void CRenderTargetItem::PostConstruct ( CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bIncludeInMemoryStats )
 {
-    Super::PostConstruct ( pManager );
+    Super::PostConstruct ( pManager, bIncludeInMemoryStats );
     m_uiSizeX = uiSizeX;
     m_uiSizeY = uiSizeY;
     m_uiSurfaceSizeX = uiSizeX;

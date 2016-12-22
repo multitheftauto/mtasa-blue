@@ -115,7 +115,7 @@ void CPerfStatBandwidthReductionImpl::DoPulse ( void )
     // Record once every 5 seconds
     if ( llTime >= m_llNextRecordTime )
     {
-        m_llNextRecordTime = Max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
+        m_llNextRecordTime = std::max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
         RecordStats ();
     }
 }
@@ -137,8 +137,8 @@ void CPerfStatBandwidthReductionImpl::RecordStats ( void )
         m_Stats5Sec.puresync.llSkippedPacketsByZone [ i ] = g_pStats->puresync.llSkippedPacketsByZone[i] - m_PrevStats.puresync.llSkippedPacketsByZone[i];
         m_Stats5Sec.puresync.llSkippedBytesByZone [ i ]   = g_pStats->puresync.llSkippedBytesByZone[i]   - m_PrevStats.puresync.llSkippedBytesByZone[i];
     }
-    g_pStats->lightsync.llSyncPacketsSkipped = Max ( 0LL, g_pStats->lightsync.llSyncPacketsSkipped );
-    g_pStats->lightsync.llSyncBytesSkipped   = Max ( 0LL, g_pStats->lightsync.llSyncBytesSkipped );
+    g_pStats->lightsync.llSyncPacketsSkipped = std::max ( 0LL, g_pStats->lightsync.llSyncPacketsSkipped );
+    g_pStats->lightsync.llSyncBytesSkipped   = std::max ( 0LL, g_pStats->lightsync.llSyncBytesSkipped );
     m_Stats5Sec.lightsync.llLightSyncPacketsSent    = g_pStats->lightsync.llLightSyncPacketsSent   - m_PrevStats.lightsync.llLightSyncPacketsSent;
     m_Stats5Sec.lightsync.llLightSyncBytesSent      = g_pStats->lightsync.llLightSyncBytesSent     - m_PrevStats.lightsync.llLightSyncBytesSent;
     m_Stats5Sec.lightsync.llSyncPacketsSkipped      = g_pStats->lightsync.llSyncPacketsSkipped     - m_PrevStats.lightsync.llSyncPacketsSkipped;
@@ -297,11 +297,11 @@ void CPerfStatBandwidthReductionImpl::GetStats ( CPerfStatResult* pResult, const
         double dPacketsSentAll     = static_cast < double > ( llTotals[6] );
         double dPacketsSkippedAll  = static_cast < double > ( llTotals[7] );
 
-        double dBytesPercent5Sec   = 100 * dBytesSkipped5Sec / Max ( 1.0, dBytesSent5Sec + dBytesSkipped5Sec );
-        double dPacketsPercent5Sec = 100 * dPacketsSkipped5Sec / Max ( 1.0, dPacketsSent5Sec + dPacketsSkipped5Sec );
+        double dBytesPercent5Sec   = 100 * dBytesSkipped5Sec / std::max ( 1.0, dBytesSent5Sec + dBytesSkipped5Sec );
+        double dPacketsPercent5Sec = 100 * dPacketsSkipped5Sec / std::max ( 1.0, dPacketsSent5Sec + dPacketsSkipped5Sec );
 
-        double dBytesPercentAll    = 100 * dBytesSkippedAll / Max ( 1.0, dBytesSentAll + dBytesSkippedAll );
-        double dPacketsPercentAll  = 100 * dPacketsSkippedAll / Max ( 1.0, dPacketsSentAll + dPacketsSkippedAll );
+        double dBytesPercentAll    = 100 * dBytesSkippedAll / std::max ( 1.0, dBytesSentAll + dBytesSkippedAll );
+        double dPacketsPercentAll  = 100 * dPacketsSkippedAll / std::max ( 1.0, dPacketsSentAll + dPacketsSkippedAll );
 
         int c = 0;
         row[c++] = "Reduction percent";

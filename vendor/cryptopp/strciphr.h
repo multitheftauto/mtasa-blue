@@ -91,9 +91,9 @@ enum KeystreamOperationFlags {
 //!   and AdditiveCipherAbstractPolicy::GetAlignment()
 enum KeystreamOperation {
 	//! \brief Wirte the keystream to the output buffer, input is NULL
-	WRITE_KEYSTREAM				= INPUT_NULL, 
+	WRITE_KEYSTREAM				= INPUT_NULL,
 	//! \brief Wirte the keystream to the aligned output buffer, input is NULL
-	WRITE_KEYSTREAM_ALIGNED		= INPUT_NULL | OUTPUT_ALIGNED, 
+	WRITE_KEYSTREAM_ALIGNED		= INPUT_NULL | OUTPUT_ALIGNED,
 	//! \brief XOR the input buffer and keystream, write to the output buffer
 	XOR_KEYSTREAM				= 0,
 	//! \brief XOR the aligned input buffer and keystream, write to the output buffer
@@ -151,7 +151,7 @@ struct CRYPTOPP_DLL CRYPTOPP_NO_VTABLE AdditiveCipherAbstractPolicy
 	//!   which will be derived from GetBytesPerIteration().
 	//! \sa CanOperateKeystream(), OperateKeystream(), WriteKeystream(), KeystreamOperation()
 	virtual void OperateKeystream(KeystreamOperation operation, byte *output, const byte *input, size_t iterationCount)
-		{CRYPTOPP_UNUSED(operation); CRYPTOPP_UNUSED(output); CRYPTOPP_UNUSED(input); CRYPTOPP_UNUSED(iterationCount); assert(false);}
+		{CRYPTOPP_UNUSED(operation); CRYPTOPP_UNUSED(output); CRYPTOPP_UNUSED(input); CRYPTOPP_UNUSED(iterationCount); CRYPTOPP_ASSERT(false);}
 
 	//! \brief Key the cipher
 	//! \param params set of NameValuePairs use to initialize this object
@@ -175,7 +175,7 @@ struct CRYPTOPP_DLL CRYPTOPP_NO_VTABLE AdditiveCipherAbstractPolicy
 	//! \returns iterationCount
 	//! \sa CipherIsRandomAccess()
 	virtual void SeekToIteration(lword iterationCount)
-		{CRYPTOPP_UNUSED(iterationCount); assert(!CipherIsRandomAccess()); throw NotImplemented("StreamTransformation: this object doesn't support random access");}
+		{CRYPTOPP_UNUSED(iterationCount); CRYPTOPP_ASSERT(!CipherIsRandomAccess()); throw NotImplemented("StreamTransformation: this object doesn't support random access");}
 };
 
 //! \class AdditiveCipherConcretePolicy
@@ -382,7 +382,7 @@ public:
 	//! \sa IsSelfInverting() and IsForwardTransformation()
 	virtual void Iterate(byte *output, const byte *input, CipherDir dir, size_t iterationCount)
 		{CRYPTOPP_UNUSED(output); CRYPTOPP_UNUSED(input); CRYPTOPP_UNUSED(dir); CRYPTOPP_UNUSED(iterationCount);
-		 assert(false); /*throw 0;*/ throw Exception(Exception::OTHER_ERROR, "SimpleKeyingInterface: unexpected error");}
+		 CRYPTOPP_ASSERT(false); /*throw 0;*/ throw Exception(Exception::OTHER_ERROR, "SimpleKeyingInterface: unexpected error");}
 
 	//! \brief Key the cipher
 	//! \param params set of NameValuePairs use to initialize this object
@@ -425,7 +425,7 @@ struct CRYPTOPP_NO_VTABLE CFB_CipherConcretePolicy : public BASE
 	//! \brief Perform one iteration in the forward direction
 	void TransformRegister() {this->Iterate(NULL, NULL, ENCRYPTION, 1);}
 
-	//! \brief 
+	//! \brief
 	//! \tparam B enumeration indicating endianess
 	//! \details RegisterOutput() provides alternate access to the feedback register. The
 	//!   enumeration B is BigEndian or LittleEndian. Repeatedly applying operator()
@@ -441,8 +441,8 @@ struct CRYPTOPP_NO_VTABLE CFB_CipherConcretePolicy : public BASE
 		//! \returns reference to the next feedback register word
 		inline RegisterOutput& operator()(WordType &registerWord)
 		{
-			assert(IsAligned<WordType>(m_output));
-			assert(IsAligned<WordType>(m_input));
+			CRYPTOPP_ASSERT(IsAligned<WordType>(m_output));
+			CRYPTOPP_ASSERT(IsAligned<WordType>(m_input));
 
 			if (!NativeByteOrderIs(B::ToEnum()))
 				registerWord = ByteReverse(registerWord);
@@ -450,7 +450,9 @@ struct CRYPTOPP_NO_VTABLE CFB_CipherConcretePolicy : public BASE
 			if (m_dir == ENCRYPTION)
 			{
 				if (m_input == NULL)
-					assert(m_output == NULL);
+				{
+					CRYPTOPP_ASSERT(m_output == NULL);
+				}
 				else
 				{
 					WordType ct = *(const WordType *)m_input ^ registerWord;
@@ -574,7 +576,7 @@ public:
 };
 
 //! \class SymmetricCipherFinal
-//! \brief SymmetricCipher implementation 
+//! \brief SymmetricCipher implementation
 //! \tparam BASE AbstractPolicyHolder derived base class
 //! \tparam INFO AbstractPolicyHolder derived information class
 //! \sa Weak::ARC4, ChaCha8, ChaCha12, ChaCha20, Salsa20, SEAL, Sosemanuk, WAKE

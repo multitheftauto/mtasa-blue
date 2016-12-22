@@ -346,6 +346,23 @@ bool CStaticFunctionDefinitions::SetWindowFlashing ( bool flash, uint count )
 }
 
 
+bool CStaticFunctionDefinitions::CreateTrayNotification ( SString strText, eTrayIconType eType, bool useSound )
+{
+    // Don't create notifications if window is active
+    if ( g_pCore->IsFocused ( ) || !IsTrayNotificationEnabled ( ) )
+        return false;
+
+    // Create tray notification
+    return g_pCore->GetTrayIcon ( )->CreateTrayBallon ( strText, eType, useSound );
+}
+
+
+bool CStaticFunctionDefinitions::IsTrayNotificationEnabled ( void )
+{
+    return g_pCore->GetCVars ( )->GetValue < bool > ( "allow_tray_notifications", true );
+}
+
+
 CClientEntity* CStaticFunctionDefinitions::GetRootElement ( void )
 {
     return m_pRootEntity;
@@ -1952,12 +1969,7 @@ bool CStaticFunctionDefinitions::GivePedWeapon ( CClientEntity& Entity, uchar uc
         // Make sure it's a ped and not a player
         if ( Ped.GetType () == CCLIENTPED )
         {
-            CWeapon* pPlayerWeapon = NULL;
-            pPlayerWeapon = Ped.GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usWeaponAmmo );
-            
-            // Set as current weapon?
-            if ( pPlayerWeapon && bSetAsCurrent )
-                pPlayerWeapon->SetAsCurrentWeapon ();
+            Ped.GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usWeaponAmmo, bSetAsCurrent );
             
             // Store the ammo so it's not lost if a ped is streamed out
             uchar ucSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );
@@ -3894,7 +3906,7 @@ bool CStaticFunctionDefinitions::SetObjectStatic ( CClientEntity& Entity, bool b
     if ( IS_OBJECT ( &Entity ) )
     {
         CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-        Object.SetStatic ( bStatic );
+        Object.SetFrozen ( bStatic );
         return true;
     }
 

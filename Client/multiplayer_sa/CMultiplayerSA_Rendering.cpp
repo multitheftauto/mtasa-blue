@@ -70,6 +70,25 @@ void _declspec(naked) HOOK_CallIdle()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// IsEntityRenderable
+//
+// Return false if should not render
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool IsEntityRenderable( CEntitySAInterface* pEntity )
+{
+    bool bIsPlaceable = ((DWORD)(pEntity->vtbl) == VTBL_CPlaceable);
+    bool bHasRwObject = (pEntity->m_pRwObject != nullptr);
+    if (bIsPlaceable || !bHasRwObject)
+    {
+        AddReportLog( 8645, SString( "Error in render list: IsPlaceable:%d HasRwObject:%d", bIsPlaceable, bHasRwObject ) );
+    }
+    return !bIsPlaceable && bHasRwObject;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CEntity::Render
 //
 // Detect entity rendering
@@ -130,10 +149,11 @@ inner:
 // Detect entity rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CEntity_RenderOneNonRoad_Pre( CEntitySAInterface* pEntity )
+bool OnMY_CEntity_RenderOneNonRoad_Pre( CEntitySAInterface* pEntity )
 {
     ms_RenderingOneNonRoad = pEntity;
     CallGameEntityRenderHandler ( ms_RenderingOneNonRoad );
+    return IsEntityRenderable( pEntity );
 }
 
 void OnMY_CEntity_RenderOneNonRoad_Post( CEntitySAInterface* pEntity )
@@ -157,11 +177,14 @@ void _declspec(naked) HOOK_CEntity_RenderOneNonRoad()
         push    [esp+32+4*1]
         call    OnMY_CEntity_RenderOneNonRoad_Pre
         add     esp, 4*1
+        cmp     eax, 0
         popad
 
+        jz      skip_render
         push    [esp+4*1]
         call inner
         add     esp, 4*1
+skip_render:
 
         pushad
         push    [esp+32+4*1]
@@ -341,14 +364,14 @@ void OnMY_psGrabScreen_GetRect( HWND hWnd, LPRECT pRect )
     // Clip to desktop
     RECT desktopRect;
     GetWindowRect( GetDesktopWindow(), &desktopRect );
-    pRect->left = Max( pRect->left, desktopRect.left );
-    pRect->top = Max( pRect->top, desktopRect.top );
-    pRect->right = Min( pRect->right, desktopRect.right );
-    pRect->bottom = Min( pRect->bottom, desktopRect.bottom );
+    pRect->left = std::max( pRect->left, desktopRect.left );
+    pRect->top = std::max( pRect->top, desktopRect.top );
+    pRect->right = std::min( pRect->right, desktopRect.right );
+    pRect->bottom = std::min( pRect->bottom, desktopRect.bottom );
 
     // Ensure at least 1 pixel 
-    pRect->bottom = Max( pRect->bottom, pRect->top + 1 );
-    pRect->right = Max( pRect->right, pRect->left + 1 );
+    pRect->bottom = std::max( pRect->bottom, pRect->top + 1 );
+    pRect->right = std::max( pRect->right, pRect->left + 1 );
 }
 
 bool OnMY_psGrabScreen_ShouldUseRect( void )
@@ -449,7 +472,7 @@ float OnMY_RwCameraSetNearClipPlane( DWORD dwCalledFrom, void* pUnknown, float f
     if ( fSetting < DEFAULT_NEAR_CLIP_DISTANCE )
     {
         // If required setting is lower than default, ensure value used is not higher.
-        return Min( fSetting, fDistance );
+        return std::min( fSetting, fDistance );
     }
     else
     {

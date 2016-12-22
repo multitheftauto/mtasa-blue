@@ -311,8 +311,8 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
                 float fPreviousArmor = pBackupDamagedPlayer->m_fArmor;
 
                 // Calculate how much damage should be applied to health/armor
-                float fArmorDamage = Min( fBackupDamage, pBackupDamagedPlayer->m_fArmor ); 
-                float fHealthDamage = Min( fBackupDamage - fArmorDamage, pBackupDamagedPlayer->m_fHealth );
+                float fArmorDamage = std::min( fBackupDamage, pBackupDamagedPlayer->m_fArmor );
+                float fHealthDamage = std::min( fBackupDamage - fArmorDamage, pBackupDamagedPlayer->m_fHealth );
 
                 float fNewArmor = pBackupDamagedPlayer->m_fArmor - fArmorDamage;
                 float fNewHealth = pBackupDamagedPlayer->m_fHealth - fHealthDamage;

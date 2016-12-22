@@ -3325,7 +3325,7 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
 static RpMaterial* HOOK_GetAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
     ucCurrentAlpha[ uiAlphaIdx ] = pMaterial->color.a;
-    uiAlphaIdx = Min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
+    uiAlphaIdx = std::min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
 
     return pMaterial;
 }
@@ -3338,7 +3338,7 @@ static RpMaterial* HOOK_SetAlphaValues ( RpMaterial* pMaterial, unsigned char uc
 static RpMaterial* HOOK_RestoreAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
     pMaterial->color.a = ucCurrentAlpha[ uiAlphaIdx ];
-    uiAlphaIdx = Min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
+    uiAlphaIdx = std::min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
 
     return pMaterial;
 }
@@ -3471,7 +3471,7 @@ static void SetObjectAlpha ()
                 // For some weird reason, gang tags don't appear unsprayed
                 // if we don't set their alpha to a value less than 255.
                 bObjectIsAGangTag = true;
-                GetAlphaAndSetNewValues ( SharedUtil::Min ( pObject->GetAlpha (), (unsigned char)254 ) );
+                GetAlphaAndSetNewValues ( std::min ( pObject->GetAlpha (), (unsigned char)254 ) );
              }
              else
                 GetAlphaAndSetNewValues ( pObject->GetAlpha () );
@@ -4856,9 +4856,9 @@ void CVehicle_GetHeadLightColor ( CVehicleSAInterface * pInterface, float fR, fl
     }
     
     // Scale our color values to the defaults ..looks dodgy but its needed!
-    ulHeadLightR = (unsigned char) Min ( 255.f, color.R * ( 1 / 255.0f ) * fR );
-    ulHeadLightG = (unsigned char) Min ( 255.f, color.G * ( 1 / 255.0f ) * fG );
-    ulHeadLightB = (unsigned char) Min ( 255.f, color.B * ( 1 / 255.0f ) * fB );
+    ulHeadLightR = (unsigned char) std::min ( 255.f, color.R * ( 1 / 255.0f ) * fR );
+    ulHeadLightG = (unsigned char) std::min ( 255.f, color.G * ( 1 / 255.0f ) * fG );
+    ulHeadLightB = (unsigned char) std::min ( 255.f, color.B * ( 1 / 255.0f ) * fB );
 }
 
 CVehicleSAInterface * pHeadLightBeamVehicleInterface = NULL;
@@ -5597,7 +5597,7 @@ void _cdecl CheckMatrix ( float* pMatrix )
         for ( uint i = 12 ; i < 15 ; i++ )
         {
             float f = pMatrix[i];
-            if ( f < -10 || f > 10 || _isnan( f ) )
+            if ( f < -10 || f > 10 || std::isnan( f ) )
                 bFix = true;
         }
     }

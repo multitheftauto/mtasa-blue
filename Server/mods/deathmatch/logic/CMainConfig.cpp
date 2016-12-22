@@ -503,6 +503,30 @@ bool CMainConfig::Load ( void )
     m_bThreadNetEnabled = true;
     ApplyThreadNetEnabled ();
 
+    // auth_serial_groups
+    SString strGroupList;
+    if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList, 1 ) != IS_SUCCESS )
+    {
+        // If not defined in conf file, then default to disabled
+        strGroupList = "";
+    }
+    strGroupList.Split( ",", m_AuthSerialGroupList );
+    for ( auto iter = m_AuthSerialGroupList.begin() ; iter != m_AuthSerialGroupList.end() ; )
+    {
+        SString& strGroup = *iter;
+        strGroup = strGroup.TrimEnd( " " ).TrimStart( " " );
+        if ( strGroup.empty() )
+            iter = m_AuthSerialGroupList.erase( iter );
+        else
+            ++iter;
+    }
+
+    // auth_serial_http
+    if ( GetBoolean( m_pRootNode, "auth_serial_http", m_bAuthSerialHttpEnabled ) != IS_SUCCESS )
+    {
+        m_bAuthSerialHttpEnabled = true;
+    }
+
     // Check settings in this list here
     const std::vector < SIntSetting >& settingList = GetIntSettingList ();
     for ( uint i = 0 ; i < settingList.size () ; i++ )
@@ -810,6 +834,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "reloadbans", CConsoleCommands::ReloadBans, false );
 
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
+    RegisterCommand ( "authserial", CConsoleCommands::AuthorizeSerial, false );
     RegisterCommand ( "debugjoinflood", CConsoleCommands::DebugJoinFlood, false );
     RegisterCommand ( "debuguptime", CConsoleCommands::DebugUpTime, false );
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
@@ -941,7 +966,7 @@ unsigned int CMainConfig::GetHardMaxPlayers ( void )
 
 unsigned int CMainConfig::GetMaxPlayers ( void )
 {
-    return SharedUtil::Min ( GetHardMaxPlayers(), m_uiSoftMaxPlayers );
+    return std::min( GetHardMaxPlayers(), m_uiSoftMaxPlayers );
 }
 
 unsigned short CMainConfig::GetHTTPPort ( void )
@@ -966,7 +991,7 @@ int CMainConfig::GetPendingWorkToDoSleepTime ( void )
     if ( m_iPendingWorkToDoSleepTime != -1 )
     {
         if ( m_bThreadNetEnabled )
-            return Max ( 0, m_iPendingWorkToDoSleepTime );
+            return std::max ( 0, m_iPendingWorkToDoSleepTime );
         else
             return m_iPendingWorkToDoSleepTime;
     }
@@ -983,7 +1008,7 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
 {
     if ( m_iNoWorkToDoSleepTime != -1 )
     {
-        return Max ( 10, m_iNoWorkToDoSleepTime );
+        return std::max ( 10, m_iNoWorkToDoSleepTime );
     }
 
     // -1 means auto
@@ -1449,6 +1474,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      0,      100,    "server_logic_fps_limit",               &m_iServerLogicFpsLimit,                    NULL },
             { true, true,   0,      1,      1,      "crash_dump_upload",                    &m_bCrashDumpUploadEnabled,                 NULL },
             { true, true,   0,      1,      1,      "filter_duplicate_log_lines",           &m_bFilterDuplicateLogLinesEnabled,         NULL },
+            { false, false, 0,      1,      1,      "database_credentials_protection",      &m_bDatabaseCredentialsProtectionEnabled,   NULL },
         };
 
     static std::vector < SIntSetting > settingsList;

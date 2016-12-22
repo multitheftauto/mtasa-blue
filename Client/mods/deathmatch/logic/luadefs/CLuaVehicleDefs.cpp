@@ -53,7 +53,7 @@ void CLuaVehicleDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "isTrainDerailable", IsTrainDerailable );
     CLuaCFunctions::AddFunction ( "getTrainDirection", GetTrainDirection );
     CLuaCFunctions::AddFunction ( "getTrainSpeed", GetTrainSpeed );
-    CLuaCFunctions::AddFunction ( "getTrainTrack", GetTrainTrack );
+    //CLuaCFunctions::AddFunction ( "getTrainTrack", GetTrainTrack );
     CLuaCFunctions::AddFunction ( "getTrainPosition", GetTrainPosition );
     CLuaCFunctions::AddFunction ( "isTrainChainEngine", IsTrainChainEngine );
     CLuaCFunctions::AddFunction ( "getVehicleGravity", GetVehicleGravity );
@@ -104,7 +104,7 @@ void CLuaVehicleDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setTrainDerailable", SetTrainDerailable );
     CLuaCFunctions::AddFunction ( "setTrainDirection", SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", SetTrainSpeed );
-    CLuaCFunctions::AddFunction ( "setTrainTrack", SetTrainTrack );
+    //CLuaCFunctions::AddFunction ( "setTrainTrack", SetTrainTrack );
     CLuaCFunctions::AddFunction ( "setTrainPosition", SetTrainPosition );
     CLuaCFunctions::AddFunction ( "setVehicleTaxiLightOn", SetVehicleTaxiLightOn );
     CLuaCFunctions::AddFunction ( "setVehicleGravity", SetVehicleGravity );
@@ -153,7 +153,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getNitroLevel", "getVehicleNitroLevel" );
     lua_classfunction ( luaVM, "getDirection", "getTrainDirection" );
     lua_classfunction ( luaVM, "getTrainSpeed", "getTrainSpeed" );
-    lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
+    //lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
     lua_classfunction ( luaVM, "getTrainPosition", "getTrainPosition" );
     lua_classfunction ( luaVM, "getName", "getVehicleName" );
     lua_classfunction ( luaVM, "getVehicleType", "getVehicleType" );
@@ -186,6 +186,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
     lua_classfunction ( luaVM, "getColor", "getVehicleColor" );
     lua_classfunction ( luaVM, "getGravity", OOP_GetVehicleGravity );
+    lua_classfunction ( luaVM, "getSirenParams", "getVehicleSirenParams" );
     lua_classfunction ( luaVM, "getSirens", "getVehicleSirens" );
     lua_classfunction ( luaVM, "getSirensOn", "getVehicleSirensOn" );
     lua_classfunction ( luaVM, "getComponentPosition", "getVehicleComponentPosition" );
@@ -226,7 +227,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setNitroLevel", "setVehicleNitroLevel" );
     lua_classfunction ( luaVM, "setDirection", "setTrainDirection" );
     lua_classfunction ( luaVM, "setTrainSpeed", "setTrainSpeed" );
-    lua_classfunction ( luaVM, "setTrack", "setTrainTrack" );
+    //lua_classfunction ( luaVM, "setTrack", "setTrainTrack" );
     lua_classfunction ( luaVM, "setTrainPosition", "setTrainPosition" );
     lua_classfunction ( luaVM, "setDerailable", "setTrainDerailable" );
     lua_classfunction ( luaVM, "setDerailed", "setTrainDerailed" );
@@ -254,6 +255,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "damageProof", NULL, "isVehicleDamageProof" );
     lua_classvariable ( luaVM, "helicopterRotorSpeed", "setHelicopterRotorSpeed", "getHelicopterRotorSpeed" );
     lua_classvariable ( luaVM, "heliBladeCollisionsEnabled", "setHeliBladeCollisionsEnabled", "getHeliBladeCollisionsEnabled" );
+    lua_classvariable ( luaVM, "sirenParams", nullptr, "getVehicleSirenParams" );
     lua_classvariable ( luaVM, "sirensOn", "setVehicleSirensOn", "getVehicleSirensOn" );
     lua_classvariable ( luaVM, "sirens", NULL, "getVehicleSirens" );
     lua_classvariable ( luaVM, "upgrades", NULL, "getVehicleUpgrades" );
@@ -275,7 +277,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "towedByVehicle", NULL, "getVehicleTowedByVehicle" );
     lua_classvariable ( luaVM, "direction", "setTrainDirection", "getTrainDirection" );
     lua_classvariable ( luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed" );
-    lua_classvariable ( luaVM, "track", "setTrainTrack", "getTrainTrack" );
+    //lua_classvariable ( luaVM, "track", "setTrainTrack", "getTrainTrack" );
     lua_classvariable ( luaVM, "trainPosition", "setTrainPosition", "getTrainPosition" );
     lua_classvariable ( luaVM, "derailable", "setTrainDerailable", "isTrainDerailable" );
     lua_classvariable ( luaVM, "derailed", "setTrainDerailed", "isTrainDerailed" );

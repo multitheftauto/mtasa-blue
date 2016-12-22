@@ -13,7 +13,7 @@
 *****************************************************************************/
 
 #include "UTF8.h"
-#include "UTF8Detect.cpp"
+#include "UTF8Detect.hpp"
 #ifdef WIN32
     #include <ctime>
     #include <direct.h>
@@ -338,7 +338,7 @@ void SharedUtil::SetPostUpdateConnect( const SString& strHost )
 {
     CArgMap argMap;
     argMap.Set( "host", strHost );
-    argMap.Set( "time", SString( "%" PRId64, (int64)time( NULL ) ) );
+    argMap.Set( "time", std::to_string( (int64_t)time( nullptr ) ) );
     SetRegistryValue( "", "PostUpdateConnect", argMap.ToString() );
 }
 
@@ -1377,7 +1377,7 @@ bool SharedUtil::IsLuaObfuscatedScript( const void* pData, uint uiLength )
 bool SharedUtil::IsValidVersionString ( const SString& strVersion )
 {
     const SString strCheck = "0.0.0-0.00000.0.000";
-    uint uiLength = Min ( strCheck.length (), strVersion.length () );
+    uint uiLength = std::min ( strCheck.length (), strVersion.length () );
     for ( unsigned int i = 0 ; i < uiLength ; i++ )
     {
         uchar c = strVersion[i];
@@ -1650,9 +1650,8 @@ namespace SharedUtil
 #endif
         if ( dwProcessorNumber == (DWORD)-1 )
         {
-            LOCAL_FUNCTION_START
-                static DWORD GetCurrentProcessorNumberXP(void)
-                {
+            auto GetCurrentProcessorNumberXP = []() -> int
+            {
 #ifdef WIN32
     #ifdef WIN_x64
                     return 0;
@@ -1667,9 +1666,9 @@ namespace SharedUtil
                     // This should work on Linux
                     return sched_getcpu();
 #endif
-                }
-            LOCAL_FUNCTION_END
-            dwProcessorNumber = LOCAL_FUNCTION::GetCurrentProcessorNumberXP();
+            };
+            
+            dwProcessorNumber = GetCurrentProcessorNumberXP();
         }
         return dwProcessorNumber;
     }
@@ -1908,5 +1907,5 @@ MTAEXPORT void GetLibMtaVersion( char* pBuffer, uint uiMaxSize )
                             ,0
                             );
     uint uiLengthInclTerm = strVersion.length() + 1;
-    STRNCPY( pBuffer, *strVersion, Max( uiLengthInclTerm, uiMaxSize ) );
+    STRNCPY( pBuffer, *strVersion, std::max( uiLengthInclTerm, uiMaxSize ) );
 }

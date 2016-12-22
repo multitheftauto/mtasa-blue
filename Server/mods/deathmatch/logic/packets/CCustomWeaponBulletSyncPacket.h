@@ -7,7 +7,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
+#pragma once
 #include "CCustomWeapon.h"
 
 class CCustomWeaponBulletSyncPacket : public CPacket

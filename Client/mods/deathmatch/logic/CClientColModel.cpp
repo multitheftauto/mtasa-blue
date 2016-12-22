@@ -56,7 +56,7 @@ bool CClientColModel::LoadCol ( const SString& strFile, bool bIsRawData )
             buffer = CBuffer( strFile, strFile.length() );
         }
 
-        if ( !g_pCore->GetNetwork()->CheckFile( "col", strFilename, buffer ) )
+        if ( !g_pCore->GetNetwork()->CheckFile( "col", strFilename, buffer.GetData(), buffer.GetSize() ) )
             return false;
 
         // Load the collision file

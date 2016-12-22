@@ -8,7 +8,7 @@
 *  DEVELOPERS:  Nobody knows
 *
 *****************************************************************************/
-
+#pragma once
 #include "CElementIDs.h"
 
 // Forward declare enum reflection stuff
@@ -332,6 +332,8 @@ bool StringToBool ( const SString& strText );
 void MinServerReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
 void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions );
 bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix );
+void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 = nullptr );
+void CheckCanAccessOtherResourceFile( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly = nullptr );
 
 
 //

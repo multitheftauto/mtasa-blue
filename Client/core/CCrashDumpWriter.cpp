@@ -254,10 +254,10 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pExce
 void CCrashDumpWriter::DumpCoreLog ( CExceptionInformation* pExceptionInformation )
 {
     // Write crash flag for next launch (Simple flag in case of double faults later)
-    fclose( fopen ( CalcMTASAPath ( "mta\\core.log.flag" ), "w" ) );
+    fclose( File::Fopen ( CalcMTASAPath ( "mta\\core.log.flag" ), "w" ) );
 
     // Write a log with the generic exception information
-    FILE* pFile = fopen ( CalcMTASAPath ( "mta\\core.log" ), "a+" );
+    FILE* pFile = File::Fopen ( CalcMTASAPath ( "mta\\core.log" ), "a+" );
     if ( pFile )
     {
         // Header

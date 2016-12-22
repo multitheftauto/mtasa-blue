@@ -287,6 +287,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "chat_use_cegui",             false );                        // chatbox uses cegui
     DEFAULT ( "chat_nickcompletion",        true );                         // chatbox nick completion
     DEFAULT ( "server_can_flash_window",    true );                         // allow server to flash the window
+    DEFAULT ( "allow_tray_notifications",   true );                         // allow scripts to create tray balloon notifications
     DEFAULT ( "text_scale",                 1.0f );                         // text scale
     DEFAULT ( "invert_mouse",               false );                        // mouse inverting
     DEFAULT ( "fly_with_mouse",             false );                        // flying with mouse controls
@@ -325,7 +326,6 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "fov",                        70 );                           // Camera field of view
     DEFAULT ( "browser_remote_websites",    true );                         // Load remote websites?
     DEFAULT ( "browser_remote_javascript",  true );                         // Execute javascript on remote websites?
-    DEFAULT ( "browser_plugins",            false );                         // Enable browser plugins?
     DEFAULT ( "filter_duplicate_log_lines", true );                         // Filter duplicate log lines for debug view and clientscript.log
 
     if (!Exists("locale"))
@@ -342,7 +342,7 @@ void CClientVariables::LoadDefaults ( void )
         Set ( "display_resolution", SString ( "%dx%dx32", rect.right, rect.bottom ) );
     }
 
-    // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.
+    // We will default this one during CProxyDirect3DDevice9 constructor, because we need a valid direct3d device to give a proper default value.
 #if 0
     DEFAULT ( "streaming_memory",           50 );                           // Streaming memory
 #endif

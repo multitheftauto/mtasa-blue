@@ -15,7 +15,7 @@ namespace SharedUtil
     inline SString Base64encode(const SString& data)
     {
         SString result;
-        CryptoPP::StringSource ss(data.c_str(), true, new CryptoPP::Base64Encoder(new CryptoPP::StringSink(result), false)); // Memory is freed automatically
+        CryptoPP::StringSource ss(data, true, new CryptoPP::Base64Encoder(new CryptoPP::StringSink(result), false)); // Memory is freed automatically
 
         return result;
     }
@@ -23,7 +23,7 @@ namespace SharedUtil
     inline SString Base64decode(const SString& data)
     {
         SString result;
-        CryptoPP::StringSource ss(data.c_str(), true, new CryptoPP::Base64Decoder(new CryptoPP::StringSink(result))); // Memory is freed automatically
+        CryptoPP::StringSource ss(data, true, new CryptoPP::Base64Decoder(new CryptoPP::StringSink(result))); // Memory is freed automatically
 
         return result;
     }

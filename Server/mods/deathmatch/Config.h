@@ -43,7 +43,7 @@ public:
 
 // Min and max number of characters in player nametags (this must match the client's)
 #define MIN_PLAYER_NAMETAG_LENGTH 1
-#define MAX_PLAYER_NAMETAG_LENGTH 22
+#define MAX_PLAYER_NAMETAG_LENGTH 64
 
 #define MAX_TEAM_NAME_LENGTH 255
 

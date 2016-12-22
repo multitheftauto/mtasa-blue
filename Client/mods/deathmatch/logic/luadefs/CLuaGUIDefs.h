@@ -25,6 +25,7 @@ public:
     LUA_DECLARE ( GUIIsChatBoxInputActive );
     LUA_DECLARE ( GUIIsConsoleActive );
     LUA_DECLARE ( GUIIsDebugViewActive );
+    LUA_DECLARE ( GUISetDebugViewActive );
     LUA_DECLARE ( GUIIsMainMenuActive );
     LUA_DECLARE ( GUIIsMTAWindowActive );
     LUA_DECLARE ( GUIIsTransferBoxActive );

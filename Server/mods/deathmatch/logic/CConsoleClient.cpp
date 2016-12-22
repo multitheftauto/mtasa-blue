@@ -12,13 +12,14 @@
 
 #include "StdInc.h"
 
-CConsoleClient::CConsoleClient ( CConsole* pConsole ) : CElement ( pConsole->GetMapManager ()->GetRootElement (), NULL )
+CConsoleClient::CConsoleClient ( CConsole* pConsole )
+    : CElement ( pConsole->GetMapManager ()->GetRootElement (), NULL )
+    , CClient ( false )
 {
+    m_pAccount = g_pGame->GetAccountManager ()->AddConsoleAccount ( CONSOLE_ACCOUNT_NAME );
     m_iType = CElement::CONSOLE;
     SetTypeName ( "console" );
     m_strNick = "Console";
     m_pConsole = pConsole;
-    m_pAccount->SetName ( CONSOLE_ACCOUNT_NAME );
-    m_pAccount->Register ( "" );
 }
 

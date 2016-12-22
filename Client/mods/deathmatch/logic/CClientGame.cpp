@@ -345,10 +345,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
 
     // Reset test mode script settings to default
     g_pCore->GetGraphics ()->GetRenderItemManager ()->SetTestMode ( DX_TEST_MODE_NONE );
-
-    // Give a default value for the streaming memory
-    if ( g_pCore->GetCVars()->Exists ( "streaming_memory" ) == false )
-        g_pCore->GetCVars()->Set ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 }
 
 
@@ -619,9 +615,8 @@ bool CClientGame::StartGame ( const char* szNick, const char* szPassword, eServe
             pBitStream->Write ( strTemp.c_str (), MAX_PLAYER_NICK_LENGTH );
             pBitStream->Write ( reinterpret_cast < const char* > ( Password.data ), sizeof ( MD5 ) );
 
-            // Append community information
+            // Append community information (Removed)
             std::string strUser;
-            g_pCore->GetCommunity ()->GetUsername ( strUser );
             pBitStream->Write ( strUser.c_str (), MAX_SERIAL_LENGTH );
 
             // Send the packet as joindata
@@ -1399,7 +1394,7 @@ void CClientGame::HandleRadioPrevious ( CControlFunctionBind*  )
 bool CClientGame::IsNametagValid ( const char* szNick )
 {
     // Grab the size of the nametag. Check that it's not to long or short
-    size_t sizeNick = strlen ( szNick );
+    size_t sizeNick = MbUTF8ToUTF16( szNick ).size();
     if ( sizeNick < MIN_PLAYER_NAMETAG_LENGTH || sizeNick > MAX_PLAYER_NAMETAG_LENGTH )
     {
         return false;
@@ -2138,13 +2133,13 @@ void CClientGame::UpdateFireKey ( void )
                                 else
                                 {
                                     return;
-                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
     }
 }
 
@@ -2318,6 +2313,7 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
     m_pManager->GetPointLightsManager ()->SetDimension ( usDimension );
     m_pManager->GetWaterManager()->SetDimension( usDimension );
     m_pNametags->SetDimension ( usDimension );
+    m_pCamera->SetDimension( usDimension );
 }
 
 
@@ -2336,8 +2332,7 @@ bool CClientGame::KeyStrokeHandler ( const SString& strKey, bool bState, bool bI
         bool bIgnore = false;
         if ( bState )
         {
-            auto pWebCore = g_pCore->GetWebCore();
-            auto pFocusedBrowser = pWebCore ? pWebCore->GetFocusedWebView () : nullptr;
+            auto pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView () : nullptr;
             bool isMouseKey = strKey.substr(0, 5) == "mouse";
 
             if ( g_pCore->IsMenuVisible() || ( g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey )
@@ -2399,8 +2394,7 @@ bool CClientGame::CharacterKeyHandler ( WPARAM wChar )
     if ( m_pRootEntity && g_pCore->IsMenuVisible() == false && g_pCore->GetConsole()->IsInputActive() == false )
     {
         // Cancel event if remote browser is focused
-        auto pWebCore = g_pCore->GetWebCore();
-        auto pFocusedBrowser = pWebCore ? pWebCore->GetFocusedWebView () : nullptr;
+        auto pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView () : nullptr;
         if ( pFocusedBrowser && !pFocusedBrowser->IsLocal () )
             return false;
 
@@ -2596,9 +2590,9 @@ bool CClientGame::ProcessMessageForCursorEvents ( HWND hwnd, UINT uMsg, WPARAM w
                     }
                     if ( szButton && szState )
                     {
-                        if ( _isnan( vecCollision.fX ) ) vecCollision.fX = 0;
-                        if ( _isnan( vecCollision.fY ) ) vecCollision.fY = 0;
-                        if ( _isnan( vecCollision.fZ ) ) vecCollision.fZ = 0;
+                        if ( std::isnan( vecCollision.fX ) ) vecCollision.fX = 0;
+                        if ( std::isnan( vecCollision.fY ) ) vecCollision.fY = 0;
+                        if ( std::isnan( vecCollision.fZ ) ) vecCollision.fZ = 0;
 
                         // Call the event for the client
                         CLuaArguments Arguments;
@@ -2718,22 +2712,22 @@ CClientPlayer * CClientGame::GetClosestRemotePlayer ( const CVector & vecPositio
         pPlayer = *iter;
         if ( !pPlayer->IsLocalPlayer () && !pPlayer->IsDeadOnNetwork () && pPlayer->GetHealth () > 0 )
         {
-            // Ensure remote player is alive and sending position updates
+        // Ensure remote player is alive and sending position updates
             ulong ulTimeSinceLastPuresync = CClientTime::GetTime () - pPlayer->GetLastPuresyncTime ();
             if ( ulTimeSinceLastPuresync < static_cast < ulong > ( g_TickRateSettings.iPureSync ) * 2 )
-            {
+        {
                 pPlayer->GetPosition ( vecTemp );
                 fTemp = DistanceBetweenPoints3D ( vecPosition, vecTemp );
                 if ( fTemp < fMaxDistance )
-                {
+            {
                     if ( !pClosest || fTemp < fDistance )
-                    {
-                        pClosest = pPlayer;
-                        fDistance = fTemp;
-                    }
+                {
+                    pClosest = pPlayer;
+                    fDistance = fTemp;
                 }
             }
         }
+    }
     }
     return pClosest;
 }
@@ -6025,7 +6019,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     }
 
     m_pBigPacketTransferBox->DoPulse ();
-    m_pBigPacketTransferBox->SetInfo ( Min ( ulTotalSize, ulBytesReceived ), CTransferBox::PACKET );
+    m_pBigPacketTransferBox->SetInfo (std::min( ulTotalSize, ulBytesReceived ), CTransferBox::PACKET );
 }
 
 bool CClientGame::SetGlitchEnabled ( unsigned char ucGlitch, bool bEnabled )
@@ -6253,8 +6247,8 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer* pBuffer, uint uiTimeSp
     const long long llPacketInterval = 1000 / uiSendRate;
     const uint uiTotalByteSize = pBuffer->GetSize ();
     const char* pData = pBuffer->GetData ();
-    const uint uiBytesPerPart = Min ( Min ( Max ( 100U, uiMaxBandwidth / uiSendRate ), uiTotalByteSize ), 30000U );
-    const uint uiNumParts = Max ( 1U, ( uiTotalByteSize + uiBytesPerPart - 1 ) / uiBytesPerPart );
+    const uint uiBytesPerPart = std::min(std::min( std::max ( 100U, uiMaxBandwidth / uiSendRate ), uiTotalByteSize ), 30000U );
+    const uint uiNumParts = std::max ( 1U, ( uiTotalByteSize + uiBytesPerPart - 1 ) / uiBytesPerPart );
 
     // Calc variables stuff
     CTickCount tickCount = CTickCount::Now () + CTickCount ( llPacketInterval );
@@ -6267,7 +6261,7 @@ void CClientGame::GottenPlayerScreenShot ( const CBuffer* pBuffer, uint uiTimeSp
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();
 
         ushort usPartNumber = i;
-        ushort usBytesThisPart = Min ( uiBytesRemaining, uiBytesPerPart );
+        ushort usBytesThisPart = std::min (uiBytesRemaining, uiBytesPerPart);
         assert ( usBytesThisPart != 0 );
 
         pBitStream->Write ( (uchar)EPlayerScreenShotResult::SUCCESS );
@@ -6371,7 +6365,7 @@ void CClientGame::SetDevelopmentMode ( bool bEnable, bool bEnableWeb )
     else
         g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
 
-    if ( g_pCore->GetWebCore() )
+    if ( g_pCore->IsWebCoreLoaded() )
         g_pCore->GetWebCore()->SetTestModeEnabled ( bEnableWeb );
 }
 
@@ -6654,16 +6648,16 @@ void CClientGame::SetFileCacheRoot ( void )
     }
 }
 
-bool CClientGame::TriggerBrowserRequestResultEvent ( const std::vector<SString>& newPages )
+bool CClientGame::TriggerBrowserRequestResultEvent ( const std::unordered_set<SString>& newPages )
 {
     CLuaArguments Arguments;
     CLuaArguments LuaTable;
     int i = 0;
 
-    for ( std::vector<SString>::const_iterator iter = newPages.begin (); iter != newPages.end (); ++iter )
+    for ( auto& domain : newPages )
     {
         LuaTable.PushNumber ( ++i );
-        LuaTable.PushString ( *iter );
+        LuaTable.PushString ( domain );
     }
     Arguments.PushTable ( &LuaTable );
 

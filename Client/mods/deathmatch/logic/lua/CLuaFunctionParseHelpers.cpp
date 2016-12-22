@@ -465,6 +465,13 @@ IMPLEMENT_ENUM_BEGIN(eFieldOfViewMode)
     ADD_ENUM(FOV_MODE_AIMING, "aiming")
 IMPLEMENT_ENUM_END("fieldofview-mode")
 
+IMPLEMENT_ENUM_BEGIN(eTrayIconType)
+    ADD_ENUM(ICON_TYPE_DEFAULT, "default")
+    ADD_ENUM(ICON_TYPE_INFO, "info")
+    ADD_ENUM(ICON_TYPE_WARNING, "warning")
+    ADD_ENUM(ICON_TYPE_ERROR, "error")
+IMPLEMENT_ENUM_END("tray-icon-type")
+
 IMPLEMENT_ENUM_BEGIN ( eJSONPrettyType )
     ADD_ENUM ( JSONPRETTY_SPACES, "spaces" )
     ADD_ENUM ( JSONPRETTY_NONE, "none" )
@@ -726,4 +733,22 @@ uint GetWeaponPropertyFlagBit( eWeaponProperty weaponProperty )
     uint uiFlagIndex = ( weaponProperty - WEAPON_FLAG_FIRST );
     uint uiFlagBit = 1 << uiFlagIndex;
     return uiFlagBit;
+}
+
+
+//
+// Set error if pThisResource does not have permission to modify pOtherResource
+//
+void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 )
+{
+    // No operation on the client
+}
+
+
+//
+// Set error if resource file access is blocked due to reasons
+//
+void CheckCanAccessOtherResourceFile( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly )
+{
+    // No operation on the client
 }

@@ -16,8 +16,8 @@
 
 // New version info
 #define MTASA_VERSION_MAJOR         1
-#define MTASA_VERSION_MINOR         6
-#define MTASA_VERSION_MAINTENANCE   0
+#define MTASA_VERSION_MINOR         5
+#define MTASA_VERSION_MAINTENANCE   3
 #define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
 #define MTASA_VERSION_BUILD         0
 
@@ -78,9 +78,9 @@
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION_BRANCH_ID      0x4         // Use 0x1 - 0xF to indicate an incompatible branch is being used (0x0 is reserved, 0x4 is trunk)
-#define _SERVER_NET_MODULE_VERSION      0x09C       // (0x000 - 0xfff) Lvl9 wizards only
+#define _SERVER_NET_MODULE_VERSION      0x09E       // (0x000 - 0xfff) Lvl9 wizards only
 #define _NETCODE_VERSION                0x1DA       // (0x000 - 0xfff) Increment when net messages change (pre-release)
-#define MTA_DM_BITSTREAM_VERSION        0x065       // (0x000 - 0xfff) Increment when net messages change (post-release). (Changing will also require additional backward compatibility code).
+#define MTA_DM_BITSTREAM_VERSION        0x067       // (0x000 - 0xfff) Increment when net messages change (post-release). (Changing will also require additional backward compatibility code).
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
 #if defined(MTA_DM_CONNECT_FROM_PUBLIC)
@@ -98,7 +98,7 @@
 
 // Handy self compile message
 #ifndef MTA_DM_CONNECT_FROM_PUBLIC
-    #ifdef SHOW_SELF_COMPILE_WARNING
+    #if defined(SHOW_SELF_COMPILE_WARNING) && !defined(CI_BUILD)
         #ifdef WIN32
             #pragma message("-------------------------------------------------------------------------")
             #pragma message("MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE")
@@ -108,7 +108,7 @@
             #pragma message("set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in MTA10_Server/version.h")
             #pragma message("-------------------------------------------------------------------------")
         #else
-            #warning "-------------------------------------------------------------------------"
+            #pragma message ("-------------------------------------------------------------------------")
             #warning "MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE"
             #warning "Server will not work with release clients"
             #warning "-------------------------------------------------------------------------"

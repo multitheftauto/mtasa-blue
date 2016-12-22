@@ -25,7 +25,7 @@ namespace
         {
             calls += other.calls;
             total_us += other.total_us;
-            max_us = Max ( max_us, other.max_us );
+            max_us = std::max ( max_us, other.max_us );
             return *this;
         }
     };
@@ -253,7 +253,7 @@ void CClientPerfStatLuaTimingImpl::UpdateLuaTiming ( CLuaMain* pLuaMain, const c
         CTiming& acc = pEventTiming->s5.acc;
         acc.calls++;
         acc.total_us += timeUs;
-        acc.max_us = Max ( acc.max_us, timeUs );
+        acc.max_us = std::max ( acc.max_us, timeUs );
     }
 }
 
@@ -272,7 +272,7 @@ void CClientPerfStatLuaTimingImpl::DoPulse ( void )
     if ( llDelta >= 1000 )
     {
         m_LastTickCount = m_LastTickCount + 1000;
-        m_LastTickCount = Max ( m_LastTickCount, llTickCount - 1500 );
+        m_LastTickCount = std::max ( m_LastTickCount, llTickCount - 1500 );
 
         int flags = 0;
         m_SecondCounter++;

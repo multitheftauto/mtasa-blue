@@ -138,25 +138,33 @@ public:
     CAccount*                   GetAccountFromScriptID      ( uint uiScriptID );
     SString                     GetActiveCaseVariation      ( const SString& strName );
 
-    bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword );
-    bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount );
+    bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword );
     bool                        LogOut                      ( CClient* pClient, CClient* pEchoClient );
 
-    std::shared_ptr<CLuaArgument> GetAccountData              ( CAccount* pAccount, const char* szKey );
+    std::shared_ptr<CLuaArgument> GetAccountData            ( CAccount* pAccount, const char* szKey );
     bool                        SetAccountData              ( CAccount* pAccount, const char* szKey, const SString& strValue, int iType );
     bool                        CopyAccountData             ( CAccount* pFromAccount, CAccount* pToAccount );
     bool                        GetAllAccountData           ( CAccount* pAccount, lua_State* pLua );
 
     void                        GetAccountsBySerial         ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
 
-    void                        Register                    ( CAccount* pAccount );
-    void                        RemoveAccount               ( CAccount* pAccount );
+    CAccount*                   AddGuestAccount             ( const SString& strName );
+    CAccount*                   AddConsoleAccount           ( const SString& strName );
+    CAccount*                   AddPlayerAccount            ( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial );
+    CAccount*                   AddNewPlayerAccount         ( const SString& strName, const SString& strPassword );
+    bool                        RemoveAccount               ( CAccount* pAccount );
+    bool                        IsAuthorizedSerialRequired  ( CAccount* pAccount );
+    bool                        IsHttpLoginAllowed          ( CAccount* pAccount, const SString& strIp );
+
 protected:
     void                        AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
     void                        RemoveFromList              ( CAccount* pAccount );
 
     void                        MarkAsChanged               ( CAccount* pAccount );
     void                        ChangingName                ( CAccount* pAccount, const SString& strOldName, const SString& strNewName );
+    void                        LoadAccountSerialUsage      ( CAccount* pAccount );
+    void                        SaveAccountSerialUsage      ( CAccount* pAccount );
+
 public:
     void                        RemoveAll                   ( void );
     static void                 StaticDbCallback            ( CDbJobData* pJobData, void* pContext );

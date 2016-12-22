@@ -566,6 +566,47 @@ public:
 
 
     //
+    // Force-reads next argument as string
+    //
+    void ReadAnyAsString(SString& outValue)
+    {
+        if (luaL_callmeta(m_luaVM, m_iIndex, "__tostring"))
+        {
+            auto oldIndex = m_iIndex;
+            m_iIndex = -1;
+            ReadAnyAsString(outValue);
+
+            lua_pop(m_luaVM, 1); // Clean up stack
+            m_iIndex = oldIndex + 1;
+            return;
+        }
+        
+        switch (lua_type(m_luaVM, m_iIndex))
+        {
+        case LUA_TNUMBER:
+        case LUA_TSTRING:
+            outValue = lua_tostring(m_luaVM, m_iIndex);
+            break;
+        case LUA_TBOOLEAN:
+            outValue = lua_toboolean(m_luaVM, m_iIndex) ? "true" : "false";
+            break;
+        case LUA_TNIL:
+            outValue = "nil";
+            break;
+        case LUA_TNONE:
+            outValue = "";
+            SetTypeError("non-none");
+            break;
+        default:
+            outValue = SString("%s: %p", luaL_typename(m_luaVM, m_iIndex), lua_topointer(m_luaVM, m_iIndex));
+            break;
+        }
+
+        ++m_iIndex;
+    }
+
+
+    //
     // Read next string as a string reference
     //
     void ReadCharStringRef ( SCharStringRef& outValue )

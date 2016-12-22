@@ -214,7 +214,7 @@ void CSpatialDatabaseImpl::FlushUpdateQueue ( void )
 bool CSpatialDatabaseImpl::IsValidSphere ( const CSphere& sphere )
 {
     // Check for nan
-    if ( _isnan ( sphere.fRadius + sphere.vecPosition.fX + sphere.vecPosition.fY + sphere.vecPosition.fZ ) )
+    if ( std::isnan ( sphere.fRadius + sphere.vecPosition.fX + sphere.vecPosition.fY + sphere.vecPosition.fZ ) )
         return false;
 
     // Check radius within limits

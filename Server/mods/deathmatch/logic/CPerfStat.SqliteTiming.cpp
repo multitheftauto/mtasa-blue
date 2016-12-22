@@ -283,9 +283,9 @@ void CPerfStatSqliteTimingImpl::GetSqliteTimingStats ( CPerfStatResult* pResult,
         pResult->AddRow ()[0] ="Option a10 - Ignore age > 10s";
         pResult->AddRow ()[0] ="Option a100 - Ignore age > 100s";
         pResult->AddRow ()[0] ="Option a1000 - Ignore age > 1000s";
-        pResult->AddRow ()[0] ="Option m10 - Max 10 results";
-        pResult->AddRow ()[0] ="Option m100 - Max 100 results";
-        pResult->AddRow ()[0] ="Option m1000 - Max 1000 results";
+        pResult->AddRow ()[0] ="Option m10 - std::max 10 results";
+        pResult->AddRow ()[0] ="Option m100 - std::max 100 results";
+        pResult->AddRow ()[0] ="Option m1000 - std::max 1000 results";
         return;
     }
 

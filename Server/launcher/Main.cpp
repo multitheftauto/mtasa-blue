@@ -29,6 +29,10 @@
     // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
     #include "SharedUtil.hpp"
 #else
+    FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
+    {
+        return fopen(szFilename, szMode);
+    }
     bool SString::Contains ( const SString& strOther ) const
     {
         return find ( strOther ) != std::string::npos;
@@ -45,21 +49,12 @@
 using namespace std;
 
 #ifdef WIN32
-    #ifdef MTA_DEBUG
-        #define LIB_CORE SERVER_BIN_PATH "core_d.dll"
-        #define LIB_NET SERVER_BIN_PATH "net_d.dll"
-    #else
-        #define LIB_CORE SERVER_BIN_PATH "core.dll"
-        #define LIB_NET SERVER_BIN_PATH "net.dll"
-    #endif
+    #define LIB_CORE SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
 #else
-    #ifdef MTA_DEBUG
-        #define LIB_CORE "./" SERVER_BIN_PATH "core_d.so"
-        #define LIB_NET "./" SERVER_BIN_PATH "net_d.so"
-    #else
-        #define LIB_CORE "./" SERVER_BIN_PATH "core.so"
-        #define LIB_NET "./" SERVER_BIN_PATH "net.so"
-    #endif
+    #define LIB_CORE "./" SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
+#endif
+
+#ifndef WIN32
     #ifdef ANY_x86
         #define LINUX_LIBS_PATH     "x86/linux-libs"
     #else
@@ -105,6 +100,7 @@ int main ( int argc, char* argv [] )
             printf ( "  -t                   Run server with a simple console\n" );
             printf ( "  -f                   Run server with a standard console (Default)\n" );
             printf ( "  -n                   Disable the usage of ncurses (For screenlog)\n" );
+            printf ( "  -u                   Disable output buffering and flush instantly (useful for screenlog)\n" );
 #ifndef WIN32
             printf ( "  -x                   Disable simplified crash reports (To allow core dumps)\n" );
             printf ( "  -q                   Do not add " LINUX_LIBS_PATH " directory to library search path\n" );
@@ -135,7 +131,7 @@ int main ( int argc, char* argv [] )
 #endif
 
     // If we are unable to access the core module, try changing to the directory of the launched file
-    FILE* fh = fopen ( LIB_CORE, "r" );
+    FILE* fh = File::Fopen ( LIB_CORE, "r" );
     if ( !fh )
     {
         #ifdef WIN32

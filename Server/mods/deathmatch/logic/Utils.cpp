@@ -714,7 +714,7 @@ void ReadCameraOrientation ( const CVector& vecBasePosition, NetBitStreamInterfa
 bool IsNametagValid ( const char* szNick )
 {
     // Grab the size of the nick. Check that it's not to long or short
-    size_t sizeNick = strlen ( szNick );
+    size_t sizeNick = MbUTF8ToUTF16( szNick ).size();
     if ( sizeNick < MIN_PLAYER_NAMETAG_LENGTH || sizeNick > MAX_PLAYER_NAMETAG_LENGTH )
     {
         return false;

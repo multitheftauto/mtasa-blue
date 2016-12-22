@@ -66,7 +66,7 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
     m_iVideoCardMemoryKBTotal = g_pDeviceState->AdapterState.InstalledMemoryKB;
 
     m_iVideoCardMemoryKBForMTATotal = ( m_iVideoCardMemoryKBTotal - ( 64 * 1024 ) ) * 4 / 5;
-    m_iVideoCardMemoryKBForMTATotal = Max ( 0, m_iVideoCardMemoryKBForMTATotal );
+    m_iVideoCardMemoryKBForMTATotal = std::max ( 0, m_iVideoCardMemoryKBForMTATotal );
 
     D3DCAPS9 caps;
     pDevice->GetDeviceCaps ( &caps );
@@ -160,8 +160,11 @@ CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint u
     if ( !bForce && !CanCreateRenderItem ( CRenderTargetItem::GetClassId () ) )
         return NULL;
 
+    // Include in memory stats only if render target is not for MTA internal use
+    bool bIncludeInMemoryStats = (bForce == false);
+
     CRenderTargetItem* pRenderTargetItem = new CRenderTargetItem ();
-    pRenderTargetItem->PostConstruct ( this, uiSizeX, uiSizeY, bWithAlphaChannel );
+    pRenderTargetItem->PostConstruct ( this, uiSizeX, uiSizeY, bWithAlphaChannel, bIncludeInMemoryStats );
 
     if ( !pRenderTargetItem->IsValid () )
     {
@@ -471,8 +474,8 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
     {
         if ( CScreenSourceItem* pScreenSourceItem = DynamicCast < CScreenSourceItem > ( *iter ) )
         {
-            uiSizeX = Max ( uiSizeX, pScreenSourceItem->m_uiSizeX );
-            uiSizeY = Max ( uiSizeY, pScreenSourceItem->m_uiSizeY );
+            uiSizeX = std::max ( uiSizeX, pScreenSourceItem->m_uiSizeX );
+            uiSizeY = std::max ( uiSizeY, pScreenSourceItem->m_uiSizeY );
         }
     }
 
@@ -715,6 +718,8 @@ void CRenderItemManager::UpdateMemoryUsage ( void )
     for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
     {
         CRenderItem* pRenderItem = *iter;
+        if ( !pRenderItem->GetIncludeInMemoryStats() )
+            continue;
         int iMemoryKBUsed = pRenderItem->GetVideoMemoryKBUsed ();
 
         if ( pRenderItem->IsA ( CFileTextureItem::GetClassId () ) )
@@ -731,7 +736,7 @@ void CRenderItemManager::UpdateMemoryUsage ( void )
     m_iMemoryKBFreeForMTA -= m_iFontMemoryKBUsed / 2;
     m_iMemoryKBFreeForMTA -= m_iTextureMemoryKBUsed / 4;
     m_iMemoryKBFreeForMTA -= m_iRenderTargetMemoryKBUsed;
-    m_iMemoryKBFreeForMTA = Max ( 0, m_iMemoryKBFreeForMTA );
+    m_iMemoryKBFreeForMTA = std::max ( 0, m_iMemoryKBFreeForMTA );
 }
 
 

@@ -520,12 +520,20 @@ int CLuaResourceDefs::Load ( lua_State* luaVM )
         {
             CLuaArguments returnValues;
             callbackArguments.Call ( pLuaMain, iLuaFunction, &returnValues );
-            if ( returnValues.Count () )
+            if (returnValues.Count())
             {
-                CLuaArgument* returnedValue = *returnValues.IterBegin ();
-                if ( returnedValue->GetType () == LUA_TSTRING )
+                CLuaArgument* returnedValue = *returnValues.IterBegin();
+                int iType = returnedValue->GetType();
+                if (iType == LUA_TNIL)
+                    break;
+
+                else if (iType == LUA_TSTRING)
                 {
-                    strInput += returnedValue->GetString ();
+                    std::string str = returnedValue->GetString();
+                    if (str.length() == 0)
+                        break;
+
+                    strInput += str;
                     continue;
                 }
             }

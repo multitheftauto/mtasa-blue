@@ -8,7 +8,7 @@ project "Deathmatch"
 	pchsource "StdInc.cpp"
 
 	filter "system:windows"
-		includedirs { "../../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../../vendor/sparsehash/src/windows" }
 	
 	filter {}
 		includedirs { 
@@ -24,7 +24,7 @@ project "Deathmatch"
 			"../../../Shared/mods/deathmatch/logic", 
 			"../../../Shared/animation", 
 			"../../../Shared/publicsdk/include", 
-			"../../../vendor/sparsehash/current/src/",
+			"../../../vendor/sparsehash/src/",
 			"logic", 
 			"utils",
 			"."
@@ -35,8 +35,8 @@ project "Deathmatch"
 	}
 	
 	vpaths {
-		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h", "../../../Server/**.h", "../../../**.h"},
-		["Sources/*"] = {"**.cpp", "../../../Shared/mods/deathmatch/**.cpp", "../../../Shared/**.cpp", "../../../vendor/**.cpp", "../../../Server/**.cpp", "../../../**.cpp"},
+		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h", "../../**.h"},
+		["Sources/*"] = {"**.cpp", "../../../Shared/mods/deathmatch/**.cpp", "../../../Shared/**.cpp", "../../../vendor/**.cpp", "../../**.cpp"},
 		["*"] = "premake5.lua"
 	}
 	

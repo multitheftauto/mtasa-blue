@@ -43,6 +43,23 @@ extern CGame* g_pGame;
 extern int errno;
 #endif
 
+//
+// Helper function to avoid fopen in Window builds
+//
+static unzFile unzOpenUtf8(const char *path)
+{
+#ifdef WIN32
+    // This will use CreateFile instead of fopen
+    zlib_filefunc_def ffunc;
+    fill_win32_filefunc (&ffunc);
+    return unzOpen2( path, &ffunc );
+#else
+    return unzOpen( path );
+#endif
+}
+
+
+
 // (IJs) This class contains very nasty unchecked and unproper code. Please revise.
 
 CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const char * szAbsPath, const char * szResourceName )
@@ -116,6 +133,7 @@ bool CResource::Load ( void )
         m_pResourceDynamicElementRoot = NULL;
         m_bProtected = false;
         m_bStartedManually = false;
+        m_bDoneDbConnectMysqlScan = false;
 
         m_uiVersionMajor = 0;
         m_uiVersionMinor = 0;
@@ -149,7 +167,7 @@ bool CResource::Load ( void )
         if ( m_bResourceIsZip )
         {
             // See if zip file is actually a zip file
-            m_zipfile = unzOpen ( m_strResourceZip.c_str () );
+            m_zipfile = unzOpenUtf8 ( m_strResourceZip.c_str () );
             if ( !m_zipfile )
             {
                 //Unregister EHS stuff
@@ -1036,7 +1054,10 @@ bool CResource::Start ( list<CResource *> * dependents, bool bStartedManually, b
         m_StartedResources.push_back ( this );
 
         // Sort by priority, for start grouping on the client
-        sort_list_inline ( m_StartedResources, ( CResource* a, CResource* b ) { return a->m_iDownloadPriorityGroup > b->m_iDownloadPriorityGroup; } );
+        m_StartedResources.sort([](CResource* a, CResource* b)
+        {
+            return a->m_iDownloadPriorityGroup > b->m_iDownloadPriorityGroup;
+        });
     }
     return m_bActive;
 }
@@ -1280,7 +1301,7 @@ bool CResource::ExtractFile ( const char * szFilename )
     {
         // Load the zip file if it isn't already loaded. Return false if it can't be loaded.
         if ( !m_zipfile )
-            m_zipfile = unzOpen(m_strResourceZip.c_str ());
+            m_zipfile = unzOpenUtf8(m_strResourceZip.c_str ());
 
         if ( !m_zipfile ) return false;
 
@@ -1303,7 +1324,7 @@ bool CResource::ExtractFile ( const char * szFilename )
 bool CResource::DoesFileExistInZip ( const char * szFilename )
 {
     if ( !m_zipfile )
-        m_zipfile = unzOpen(m_strResourceZip.c_str ());
+        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str ());
     bool bRes = false;
     if ( m_zipfile )
     {
@@ -1332,7 +1353,7 @@ bool CResource::GetFilePath ( const char * szFilename, string& strPath )
 {
     // first, check the resource folder, then check the zip file
     strPath = m_strResourceDirectoryPath + szFilename;
-    FILE * temp = fopen ( strPath.c_str (), "r" );
+    FILE * temp = File::Fopen ( strPath.c_str (), "r" );
     if ( temp )
     {
         fclose ( temp );
@@ -1347,13 +1368,13 @@ bool CResource::GetFilePath ( const char * szFilename, string& strPath )
         return false;
 
     if ( !m_zipfile )
-        m_zipfile = unzOpen(m_strResourceZip.c_str ());
+        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str ());
     if ( m_zipfile )
     {
         if ( unzLocateFile ( m_zipfile, szFilename, false ) != UNZ_END_OF_LIST_OF_FILE )
         {
             strPath = m_strResourceCachePath + szFilename;
-            temp = fopen ( strPath.c_str (), "r" );
+            temp = File::Fopen ( strPath.c_str (), "r" );
             if ( temp )
             {
                 fclose ( temp );
@@ -2124,7 +2145,7 @@ bool CResource::RemoveFile ( const char* szName )
                     // Delete the file
                     char szFullFilepath [MAX_PATH + 1];
                     snprintf ( szFullFilepath, MAX_PATH, "%s%s", m_strResourceDirectoryPath.c_str (), szName );
-                    if ( unlink ( szFullFilepath ) != 0 )
+                    if ( File::Delete ( szFullFilepath ) != 0 )
                         CLogger::LogPrintf ( "WARNING: Problems deleting the actual file, but was removed from resource" );
 
                     // Delete the metafile
@@ -2599,7 +2620,7 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
     // If denied with both 'new way' and 'old way' then stop here
     if ( !bResourceBlahHttp && ( !bResourceBlah || !bGeneralHttp ) )
     {
-        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
     }
 
     #define MAX_INPUT_VARIABLES       25
@@ -2841,12 +2862,12 @@ ResponseCode CResource::HandleRequestCall ( HttpRequest * ipoHttpRequest, HttpRe
                 }
                 else
                 {
-                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                    return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
                 }
             }
             else
             {
-                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
             }
         }
     }
@@ -2922,7 +2943,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
                         // If denied with both 'new way' and 'old way' then stop here
                         if ( !bResourceBlahHttp && ( !bResourceBlah || !bGeneralHttp ) )
                         {
-                            return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                            return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
                         }
 
                         assert ( bResourceBlahHttp || ( bResourceBlah && bGeneralHttp ) );
@@ -2938,7 +2959,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
                             return pHtml->Request ( ipoHttpRequest, ipoHttpResponse, account );
                         }
 
-                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
                     }
                     else
                     {
@@ -2984,7 +3005,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
             // If denied with both 'new way' and 'old way' then stop here
             if ( !bResourceBlahHttp && !bGeneralHttp )
             {
-                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
             }
 
             if ( pFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML )
@@ -3011,7 +3032,7 @@ ResponseCode CResource::HandleRequestActive ( HttpRequest * ipoHttpRequest, Http
                     }
                     else
                     {
-                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpResponse );
+                        return g_pGame->GetHTTPD()->RequestLogin ( ipoHttpRequest, ipoHttpResponse );
                     }
                 }
             }
@@ -3324,7 +3345,7 @@ int do_extract_currentfile(unzFile uf,const int* popt_extract_without_path,int*p
 
         if ((skip==0) && (err==UNZ_OK))
         {
-            fout=fopen(szOutFile,"wb");
+            fout=File::Fopen(szOutFile,"wb");
 
             /* some zipfile don't contain directory alone before file */
             if ((fout==NULL) && ((*popt_extract_without_path)==0) &&
@@ -3335,7 +3356,7 @@ int do_extract_currentfile(unzFile uf,const int* popt_extract_without_path,int*p
                 *(filename_withoutpath-1)='\0';
                 //makedir((char *)write_filename);
                 *(filename_withoutpath-1)=c;
-                fout=fopen(szOutFile,"wb");
+                fout=File::Fopen(szOutFile,"wb");
             }
 
             if (fout==NULL)
@@ -3464,4 +3485,72 @@ bool CResource::CheckFunctionRightCache( lua_CFunction f, bool* pbOutAllowed )
 void CResource::UpdateFunctionRightCache( lua_CFunction f, bool bAllowed )
 {
     MapSet( m_FunctionRightCacheMap, f, bAllowed );
+}
+
+
+//
+// Check resource files for probable use of dbConnect + mysql
+//
+bool CResource::IsUsingDbConnectMysql( void )
+{
+    if ( !m_bDoneDbConnectMysqlScan )
+    {
+        m_bDoneDbConnectMysqlScan = true;
+        for ( auto pResourceFile : m_resourceFiles )
+        {
+            if ( pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT )
+            {
+                SString strLuaSource;
+                FileLoad( pResourceFile->GetFullName(), strLuaSource );
+
+                for ( size_t curPos = 0 ; curPos < strLuaSource.length() ; curPos++ )
+                {
+                    curPos = strLuaSource.find( "dbConnect", curPos );
+                    if ( curPos == SString::npos )
+                        break;
+
+                    size_t foundPos = strLuaSource.find( "mysql", curPos );
+                    if ( foundPos > curPos && foundPos < curPos + 40 )
+                    {
+                        m_bUsingDbConnectMysql = true;
+                    }
+                }
+            }
+        }
+    }
+    return m_bUsingDbConnectMysql;
+}
+
+
+//
+// Return true if file access should be denied to other resources
+//
+bool CResource::IsFileDbConnectMysqlProtected( const SString& strAbsFilename, bool bReadOnly )
+{
+    if ( !IsUsingDbConnectMysql() )
+        return false;
+
+    SString strFilename = ExtractFilename( strAbsFilename );
+    if ( strFilename.CompareI( "meta.xml" ) )
+    {
+        if ( !bReadOnly )
+        {
+            // No write access to meta.xml
+            return true;
+        }
+    }
+
+    for ( auto pResourceFile : m_resourceFiles )
+    {
+        if ( pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT )
+        {
+            SString strResourceFilename = ExtractFilename( pResourceFile->GetName() );
+            if ( strFilename.CompareI( strResourceFilename ) )
+            {
+                // No read/write access to server script files
+                return true;
+            }
+        }
+    }
+    return false;
 }

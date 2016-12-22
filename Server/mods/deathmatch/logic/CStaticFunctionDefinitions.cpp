@@ -924,7 +924,7 @@ bool CStaticFunctionDefinitions::IsElementFrozen ( CElement* pElement, bool &bFr
         case CElement::OBJECT:
         {
             CObject* pObject = static_cast < CObject* > ( pElement );
-            bFrozen = pObject->IsStatic ();
+            bFrozen = pObject->IsFrozen ();
             break;
         }
         default: return false;
@@ -1998,7 +1998,7 @@ bool CStaticFunctionDefinitions::SetElementFrozen ( CElement* pElement, bool bFr
         case CElement::OBJECT:
         {
             CObject * pObject = static_cast < CObject* > ( pElement );
-            pObject->SetStatic ( bFrozen );
+            pObject->SetFrozen ( bFrozen );
             break;
         }
         default: return false;
@@ -3311,22 +3311,22 @@ bool CStaticFunctionDefinitions::SetPlayerDebuggerVisible ( CElement* pElement, 
 }
 
 
-bool CStaticFunctionDefinitions::SetPlayerWantedLevel ( CElement* pElement, unsigned int iLevel )
+bool CStaticFunctionDefinitions::SetPlayerWantedLevel ( CElement* pElement, unsigned int uiLevel )
 {
     assert ( pElement );
 
-    // Make sure the health is above 0
-    if ( iLevel >= 0 && iLevel <= 6 )
+    // Make sure the wanted level is no more than 6
+    if ( uiLevel <= 6 )
     {
-        RUN_CHILDREN( SetPlayerWantedLevel ( *iter, iLevel ) )
+        RUN_CHILDREN( SetPlayerWantedLevel ( *iter, uiLevel ) )
 
         if ( IS_PLAYER ( pElement ) )
         {
             CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
-            pPlayer->SetWantedLevel ( iLevel );
+            pPlayer->SetWantedLevel ( uiLevel );
 
             CBitStream BitStream;
-            BitStream.pBitStream->Write ( (unsigned char)iLevel );
+            BitStream.pBitStream->Write ( (unsigned char)uiLevel );
             pPlayer->Send ( CLuaPacket ( SET_WANTED_LEVEL, *BitStream.pBitStream ) );
 
             return true;
@@ -4727,14 +4727,14 @@ bool CStaticFunctionDefinitions::GiveWeapon ( CElement* pElement, unsigned char 
 
                 // Client ammo emulation mode - Try to ensure that the ammo we set on the server will be the same as the client)
                 if ( ucWeaponSlot <= 1 || ucWeaponSlot >= 10 )
-                    uiTotalAmmo = Min( 1U, uiTotalAmmo + usAmmo );  // If slot 0,1,10,11,12 - Ammo is max 1
+                    uiTotalAmmo = std::min( 1U, uiTotalAmmo + usAmmo );  // If slot 0,1,10,11,12 - Ammo is max 1
                 else
                 if ( ( ucWeaponSlot >= 3 && ucWeaponSlot <= 5 ) || ucPreviousWeaponID == ucWeaponID )
                     uiTotalAmmo += usAmmo;                          // If slot 3,4,5 or slot weapon the same, ammo is shared, so add
                 else
                     uiTotalAmmo = usAmmo;                           // Otherwise ammo is not shared, so replace
 
-                uiTotalAmmo = Min( 0xFFFFU, uiTotalAmmo );
+                uiTotalAmmo = std::min( 0xFFFFU, uiTotalAmmo );
                 pPed->SetWeaponTotalAmmo ( uiTotalAmmo, ucWeaponSlot );
 
                 CBitStream BitStream;
@@ -11262,9 +11262,7 @@ CAccount* CStaticFunctionDefinitions::AddAccount ( const SString& strName, const
     }
     else
     {
-        CAccount* pAccount = new CAccount ( m_pAccountManager, true, strName );
-        pAccount->SetPassword ( strPassword );
-        g_pGame->GetAccountManager ()->Register( pAccount );
+        CAccount* pAccount = g_pGame->GetAccountManager ()->AddNewPlayerAccount ( strName, strPassword );
         return pAccount;
     }
     return NULL;
@@ -11281,29 +11279,20 @@ CAccount* CStaticFunctionDefinitions::GetAccount ( const char* szName, const cha
         return NULL;
 }
 
-bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
+void CStaticFunctionDefinitions::GetAccounts ( lua_State* pLua )
 {
-    lua_State* pLua = pLuaMain->GetVM();
     CMappedAccountList::const_iterator iter = m_pAccountManager->IterBegin();
     unsigned int uiIndex = 0;
-    const char* szGuest =  GUEST_ACCOUNT_NAME;
-    const char* szHTTPGuest = HTTP_GUEST_ACCOUNT_NAME;
-    const char* szConsole = CONSOLE_ACCOUNT_NAME;
-    unsigned int uiGuest = HashString ( szGuest );
-    unsigned int uiHTTPGuest = HashString ( szHTTPGuest );
-    unsigned int uiConsole = HashString ( szConsole );
     for ( ; iter != m_pAccountManager->IterEnd(); iter++ )
     {
-        if ( ( (*iter)->GetNameHash() != uiGuest || (*iter)->GetName() != szGuest ) &&
-             ( (*iter)->GetNameHash() != uiHTTPGuest || (*iter)->GetName() != szHTTPGuest ) &&
-             ( (*iter)->GetNameHash() != uiConsole || (*iter)->GetName() != szConsole ) )
+        CAccount* pAccount = *iter;
+        if ( pAccount->IsRegistered () && !pAccount->IsConsoleAccount () )
         {
             lua_pushnumber ( pLua, ++uiIndex );
-            lua_pushaccount ( pLua, *iter );
+            lua_pushaccount ( pLua, pAccount );
             lua_settable ( pLua, -3 );
         }
     }
-    return true;
 }
 
 bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
@@ -11320,9 +11309,7 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
 
             pClient->SendEcho ( "You were logged out of your account due to it being deleted" );
         }
-        g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
-        delete pAccount;
-        return true;
+        return g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
     }
 
     return false;

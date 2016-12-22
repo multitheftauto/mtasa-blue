@@ -735,23 +735,10 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
         bool bIsFrozen = bitStream.ReadBit ();
 
         // Player nametag text
-        char szNametagText [MAX_PLAYER_NAMETAG_LENGTH + 1];
-        szNametagText[0] = '\0';
-
-        unsigned char ucNametagTextLength;
-        if ( !bitStream.Read ( ucNametagTextLength ) || ucNametagTextLength > MAX_PLAYER_NAMETAG_LENGTH )
-        {
-            // Nametag length all wrong
-            RaiseProtocolError ( 9 );
-            return;
-        }
-
-        if ( ucNametagTextLength > 0 )
-        {
-            bitStream.Read ( szNametagText, ucNametagTextLength );
-            szNametagText [ ucNametagTextLength ] = '\0';
-            StripUnwantedCharacters ( szNametagText, '_' );
-        }
+        uchar ucNametagTextLength = 0;
+        bitStream.Read( ucNametagTextLength );
+        SString strNametagText;
+        bitStream.ReadStringCharacters( strNametagText, ucNametagTextLength );
 
         // Read out the nametag override color if it's overridden
         unsigned char ucNametagR, ucNametagG, ucNametagB;
@@ -853,8 +840,8 @@ void CPacketHandler::Packet_PlayerList ( NetBitStreamInterface& bitStream )
             pPlayer->SetNick ( szNickBuffer );
             pPlayer->SetDeadOnNetwork ( false );
 
-            if ( szNametagText [ 0 ] )
-                pPlayer->SetNametagText ( szNametagText );
+            if ( !strNametagText.empty() )
+                pPlayer->SetNametagText( strNametagText );
 
             // Set the nametag override color if it's overridden
             if ( bHasNametagColorOverridden )
@@ -1411,7 +1398,7 @@ void CPacketHandler::Packet_DebugEcho ( NetBitStreamInterface& bitStream )
             date[29] = '\0';
 
             // open the file for append access
-            FILE * pFile = fopen ( strFileName.c_str (), "a" );
+            FILE * pFile = File::Fopen ( strFileName.c_str (), "a" );
             if ( pFile )
             {
                 // write out the data
@@ -2913,9 +2900,9 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         }
                         pObject->SetScale ( vecScale );
 
-                        bool bStatic;
-                        if ( bitStream.ReadBit ( bStatic ) )
-                            pObject->SetStatic ( bStatic );
+                        bool bFrozen;
+                        if ( bitStream.ReadBit ( bFrozen ) )
+                            pObject->SetFrozen ( bFrozen );
 
                         SObjectHealthSync health;
                         if ( bitStream.Read ( &health ) )
@@ -5238,7 +5225,7 @@ void CPacketHandler::RaiseEntityAddError( uint uiCode )
     AddReportLog( 8331, strLine );
 
     NetBitStreamInterface& bitStream = *m_pEntityAddBitStream;
-    for ( uint i = Max ( 0, (int)m_EntityAddReadOffsetStore.size() - 5 ) ; i < m_EntityAddReadOffsetStore.size() ; i++ )
+    for ( uint i = std::max ( 0, (int)m_EntityAddReadOffsetStore.size() - 5 ) ; i < m_EntityAddReadOffsetStore.size() ; i++ )
     {
         m_pEntityAddBitStream->SetReadOffsetAsBits( m_EntityAddReadOffsetStore[i] );
         SString strStatus = EntityAddDebugRead( *m_pEntityAddBitStream );

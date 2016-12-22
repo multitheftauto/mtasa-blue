@@ -80,8 +80,8 @@ CServerBrowser::CServerBrowser ( void )
         m_WidgetSize = CVector2D ( resolution.fX*SB_SPAN, resolution.fY*SB_SPAN );
 
     // Limit size
-    m_WidgetSize.fX = Min ( m_WidgetSize.fX, 1200.f );
-    m_WidgetSize.fY = Min ( m_WidgetSize.fY, 1000.f );
+    m_WidgetSize.fX = std::min ( m_WidgetSize.fX, 1200.f );
+    m_WidgetSize.fY = std::min ( m_WidgetSize.fY, 1000.f );
 
     CVector2D widgetPosition ( ( resolution.fX - m_WidgetSize.fX ) / 2, ( resolution.fY - m_WidgetSize.fY ) / 2 );
 
@@ -140,10 +140,6 @@ CServerBrowser::CServerBrowser ( void )
     CreateTab ( ServerBrowserTypes::LAN, _("Local") );
     CreateTab ( ServerBrowserTypes::FAVOURITES, _("Favourites") );
     CreateTab ( ServerBrowserTypes::RECENTLY_PLAYED, _("Recent") );
-
-    // Login dialog
-    m_pCommunityLogin.SetVisible ( false );
-    m_pCommunityLogin.SetCallback ( &CServerBrowser::CompleteConnect );
 
     // Load options
     LoadOptions ( CCore::GetSingletonPtr ()->GetConfig ( )->FindSubNode ( CONFIG_NODE_SERVER_OPTIONS ) );
@@ -289,6 +285,10 @@ CServerBrowser::CServerBrowser ( void )
 
 CServerBrowser::~CServerBrowser ( void )
 {
+    // Save options now and disable selection handler
+    SaveOptions ( );
+    m_pPanel->SetSelectionHandler ( nullptr );
+
     // Delete the Tabs
     DeleteTab ( ServerBrowserTypes::INTERNET );
     DeleteTab ( ServerBrowserTypes::LAN );
@@ -312,12 +312,12 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
 
     float fPlayerListSizeX = SB_PLAYERLIST_SIZE_X;
     float fSearchBarSizeX = pManager->GetTextExtent ( _("Search players..."), "default-bold-small" ) + 90;
-    Max ( fSearchBarSizeX, pManager->GetTextExtent ( _("Search servers..."), "default-bold-small" ) + 60 );
+    std::max ( fSearchBarSizeX, pManager->GetTextExtent ( _("Search servers..."), "default-bold-small" ) + 60 );
 
     float fConnectButtonWidth = 26 + pManager->GetTextExtent ( _("Connect"), "default-bold-small" ) + 5;
 
 	//Make our playerlist smaller, if it's a small panel - either 15%, or a max of 200px in size.
-    fPlayerListSizeX = Min < float >( m_WidgetSize.fX*0.15, SB_PLAYERLIST_SIZE_X );
+    fPlayerListSizeX = std::min < float >( m_WidgetSize.fX*0.15, SB_PLAYERLIST_SIZE_X );
 
     // Formulate our navigation bar
 
@@ -1289,9 +1289,8 @@ bool CServerBrowser::ConnectToSelectedServer ( void )
     // If there is one item selected
     if ( CServerListItem * pServer = FindSelectedServer ( Type ) )
     {
-        if ( ( pServer->bSerials ) && ( !g_pCore->GetCommunity()->IsLoggedIn() ) )
+        if ( pServer->bSerials  )
         {
-            m_pCommunityLogin.SetVisible ( true );
             return true;
         }
         // Get the nick from the config

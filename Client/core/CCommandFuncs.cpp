@@ -140,7 +140,6 @@ void CCommandFuncs::Vid ( const char* szParameters )
             // Reload console, serverbrowser and chat settings (removed in DestroyWindows)
             g_pCore->ApplyConsoleSettings ();
             g_pCore->ApplyMenuSettings ();
-            g_pCore->ApplyCommunityState();
         }
         else
         {

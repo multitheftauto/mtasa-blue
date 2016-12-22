@@ -43,7 +43,7 @@ public:
             return 0;
         int iLowest = INT_MAX;
         for ( int i = dataList.size () - 1 ; i >= 0 && iAge > 0 ; i--, iAge-- )
-            iLowest = Min ( iLowest, dataList[i] );
+            iLowest = std::min ( iLowest, dataList[i] );
         return iLowest;
     }
 };

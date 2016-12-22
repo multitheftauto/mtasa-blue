@@ -16,15 +16,17 @@
 #include "gfpcrypt.h"
 #include "dh.h"
 #include "mqv.h"
+#include "hmqv.h"
+#include "fhmqv.h"
 #include "ecp.h"
 #include "ec2n.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
-//! Elliptic Curve Parameters
-/*! This class corresponds to the ASN.1 sequence of the same name
-    in ANSI X9.62 (also SEC 1).
-*/
+//! \brief Elliptic Curve Parameters
+//! \tparam EC elliptic curve field
+//! \details This class corresponds to the ASN.1 sequence of the same name
+//!   in ANSI X9.62 and SEC 1. EC is currently defined for ECP and EC2N.
 template <class EC>
 class DL_GroupParameters_EC : public DL_GroupParametersImpl<EcPrecomputation<EC> >
 {
@@ -213,6 +215,43 @@ struct ECMQV
 #endif
 };
 
+//! \brief Hashed Menezes-Qu-Vanstone in ECP or EC2N
+//! \details This implementation follows Hugo Krawczyk's <a href="http://eprint.iacr.org/2005/176">HMQV: A High-Performance
+//!   Secure Diffie-Hellman Protocol</a>. Note: this implements HMQV only. HMQV-C with Key Confirmation is not provided.
+template <class EC, class COFACTOR_OPTION = CPP_TYPENAME DL_GroupParameters_EC<EC>::DefaultCofactorOption, class HASH = SHA256>
+struct ECHMQV
+{
+	typedef HMQV_Domain<DL_GroupParameters_EC<EC>, COFACTOR_OPTION, HASH> Domain;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~ECHMQV() {}
+#endif
+};
+
+typedef ECHMQV< ECP, DL_GroupParameters_EC< ECP >::DefaultCofactorOption,   SHA1 >::Domain ECHMQV160;
+typedef ECHMQV< ECP, DL_GroupParameters_EC< ECP >::DefaultCofactorOption, SHA256 >::Domain ECHMQV256;
+typedef ECHMQV< ECP, DL_GroupParameters_EC< ECP >::DefaultCofactorOption, SHA384 >::Domain ECHMQV384;
+typedef ECHMQV< ECP, DL_GroupParameters_EC< ECP >::DefaultCofactorOption, SHA512 >::Domain ECHMQV512;
+
+//! \brief Fully Hashed Menezes-Qu-Vanstone in ECP or EC2N
+//! \details This implementation follows Augustin P. Sarr and Philippe Elbaz–Vincent, and Jean–Claude Bajard's
+//!   <a href="http://eprint.iacr.org/2009/408">A Secure and Efficient Authenticated Diffie-Hellman Protocol</a>.
+//!   Note: this is FHMQV, Protocol 5, from page 11; and not FHMQV-C.
+template <class EC, class COFACTOR_OPTION = CPP_TYPENAME DL_GroupParameters_EC<EC>::DefaultCofactorOption, class HASH = SHA256>
+struct ECFHMQV
+{
+	typedef FHMQV_Domain<DL_GroupParameters_EC<EC>, COFACTOR_OPTION, HASH> Domain;
+
+#ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
+	virtual ~ECFHMQV() {}
+#endif
+};
+
+typedef ECFHMQV< ECP, DL_GroupParameters_EC< ECP >::DefaultCofactorOption,   SHA1 >::Domain ECFHMQV160;
+typedef ECFHMQV< ECP, DL_GroupParameters_EC< ECP >::DefaultCofactorOption, SHA256 >::Domain ECFHMQV256;
+typedef ECFHMQV< ECP, DL_GroupParameters_EC< ECP >::DefaultCofactorOption, SHA384 >::Domain ECFHMQV384;
+typedef ECFHMQV< ECP, DL_GroupParameters_EC< ECP >::DefaultCofactorOption, SHA512 >::Domain ECFHMQV512;
+
 //! EC keys
 template <class EC>
 struct DL_Keys_EC
@@ -245,7 +284,7 @@ template <class EC>
 class DL_Algorithm_ECDSA : public DL_Algorithm_GDSA<typename EC::Point>
 {
 public:
-	static const char * CRYPTOPP_API StaticAlgorithmName() {return "ECDSA";}
+	CRYPTOPP_CONSTEXPR static const char * CRYPTOPP_API StaticAlgorithmName() {return "ECDSA";}
 
 #ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
 	virtual ~DL_Algorithm_ECDSA() {}
@@ -257,7 +296,7 @@ template <class EC>
 class DL_Algorithm_ECNR : public DL_Algorithm_NR<typename EC::Point>
 {
 public:
-	static const char * CRYPTOPP_API StaticAlgorithmName() {return "ECNR";}
+	CRYPTOPP_CONSTEXPR static const char * CRYPTOPP_API StaticAlgorithmName() {return "ECNR";}
 
 #ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
 	virtual ~DL_Algorithm_ECNR() {}

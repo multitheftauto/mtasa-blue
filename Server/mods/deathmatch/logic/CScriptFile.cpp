@@ -44,21 +44,21 @@ bool CScriptFile::Load ( CResource* pResourceForFilePath, eMode Mode )
             // Open file in read only binary mode
             case MODE_READ:
                 if ( pResourceForFilePath->GetFilePath ( m_strFilename.c_str(), strFilePath ) )
-                    m_pFile = fopen ( strFilePath.c_str (), "rb" );
+                    m_pFile = File::Fopen ( strFilePath.c_str (), "rb" );
                 break;
 
             // Open file in read write binary mode.
             case MODE_READWRITE:
                 // Try to load the file in rw mode. Use existing content.
                 if ( pResourceForFilePath->GetFilePath ( m_strFilename.c_str(), strFilePath ) )
-                    m_pFile = fopen ( strFilePath.c_str (), "rb+" );
+                    m_pFile = File::Fopen ( strFilePath.c_str (), "rb+" );
                 break;
 
             // Open file in read write binary mode. Truncate size to 0.
             case MODE_CREATE:
                 strFilePath = pResourceForFilePath->GetResourceDirectoryPath () + m_strFilename;
                 MakeSureDirExists ( strFilePath.c_str () );
-                m_pFile = fopen ( strFilePath.c_str (), "wb+" );
+                m_pFile = File::Fopen ( strFilePath.c_str (), "wb+" );
                 break;
         }
 
@@ -193,7 +193,7 @@ long CScriptFile::Read ( unsigned long ulSize, CBuffer& outBuffer )
         fseek ( m_pFile, 0, SEEK_END );
         long lFileSize = ftell ( m_pFile );
         fseek ( m_pFile, lCurrentPos, SEEK_SET );
-        ulSize = Min < unsigned long > ( 1 + lFileSize - lCurrentPos, ulSize );
+        ulSize = std::min < unsigned long > ( 1 + lFileSize - lCurrentPos, ulSize );
         // Note: Read extra byte at end so EOF indicator gets set
     }
 

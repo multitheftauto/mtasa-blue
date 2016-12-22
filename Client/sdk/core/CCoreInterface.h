@@ -14,7 +14,6 @@
 
 #include "CConsoleInterface.h"
 #include "CCommandsInterface.h"
-#include "CCommunityInterface.h"
 #include "CRenderItemManagerInterface.h"
 #include "CScreenGrabberInterface.h"
 #include "CPixelsManagerInterface.h"
@@ -23,6 +22,7 @@
 #include "CKeyBindsInterface.h"
 #include "CCVarsInterface.h"
 #include "CWebCoreInterface.h"
+#include "CTrayIconInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -79,9 +79,9 @@ public:
     virtual CKeyBindsInterface*         GetKeyBinds                     ( void ) = 0;
     virtual CXMLNode*                   GetConfig                       ( void ) = 0;
     virtual CCVarsInterface*            GetCVars                        ( void ) = 0;
-    virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
     virtual CLocalizationInterface*     GetLocalization                 ( void ) = 0;
     virtual CWebCoreInterface*          GetWebCore                      ( void ) = 0;
+    virtual CTrayIconInterface*         GetTrayIcon                     ( void ) = 0;
     
 
     // Temporary functions for r1
@@ -110,6 +110,7 @@ public:
     virtual void                    SetConnected                    ( bool bConnected ) = 0;
     virtual void                    SetOfflineMod                   ( bool bOffline ) = 0;
     virtual void                    ApplyHooks3                     ( bool bEnable ) = 0;
+    virtual bool                    IsWebCoreLoaded                 ( void ) = 0;
 
     virtual bool                    IsConnected                     ( void ) = 0;
     virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true ) = 0;
