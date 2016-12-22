@@ -277,8 +277,6 @@ public:
 
     virtual void*                GetPrivateSuspensionLines              ( void ) = 0;
 
-    virtual bool                 CheckVTBL                              ( void ) = 0;
-
     virtual bool                 DoesVehicleHaveSirens                  ( void ) = 0;
 
     virtual void                 RemoveVehicleSirens                    ( void ) = 0;

@@ -48,8 +48,11 @@
 
 using namespace std;
 
-#define LIB_CORE SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
-#define LIB_NET SERVER_BIN_PATH "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
+#ifdef WIN32
+    #define LIB_CORE SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
+#else
+    #define LIB_CORE "./" SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
+#endif
 
 #ifndef WIN32
     #ifdef ANY_x86

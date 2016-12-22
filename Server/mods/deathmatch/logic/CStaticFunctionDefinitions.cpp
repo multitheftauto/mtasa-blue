@@ -11219,9 +11219,8 @@ CAccount* CStaticFunctionDefinitions::GetAccount ( const char* szName, const cha
         return NULL;
 }
 
-bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
+void CStaticFunctionDefinitions::GetAccounts ( lua_State* pLua )
 {
-    lua_State* pLua = pLuaMain->GetVM();
     CMappedAccountList::const_iterator iter = m_pAccountManager->IterBegin();
     unsigned int uiIndex = 0;
     for ( ; iter != m_pAccountManager->IterEnd(); iter++ )
@@ -11234,7 +11233,6 @@ bool CStaticFunctionDefinitions::GetAccounts ( CLuaMain* pLuaMain )
             lua_settable ( pLua, -3 );
         }
     }
-    return true;
 }
 
 bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )

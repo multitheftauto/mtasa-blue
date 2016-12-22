@@ -224,18 +224,8 @@ int CLuaAccountDefs::GetAccount ( lua_State* luaVM )
 
 int CLuaAccountDefs::GetAccounts ( lua_State* luaVM )
 {
-    // Grab our virtual machine
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    if ( pLuaMain )
-    {
-        lua_newtable ( luaVM );
-
-        CStaticFunctionDefinitions::GetAccounts ( pLuaMain );
-
-        return 1;
-    }
-
-    lua_pushboolean ( luaVM, false );
+    lua_newtable ( luaVM );
+    CStaticFunctionDefinitions::GetAccounts ( luaVM );
     return 1;
 }
 

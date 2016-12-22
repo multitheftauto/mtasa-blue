@@ -630,7 +630,7 @@ public:
 
     // Account get funcs
     static CAccount*            GetAccount                          ( const char* szName, const char* szPassword );
-    static bool                 GetAccounts                         ( CLuaMain* pLuaMain );
+    static void                 GetAccounts                         ( lua_State* pLua );
     static CClient*             GetAccountPlayer                    ( CAccount* pAccount );
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
     static std::shared_ptr<CLuaArgument> GetAccountData             ( CAccount* pAccount, const char* szKey );
