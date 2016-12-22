@@ -529,6 +529,11 @@ void CConsole::FlushPendingAdd ( void )
         float fScroll = m_pHistory->GetVerticalScrollPosition ();
         float fMaxScroll = m_pHistory->GetScrollbarDocumentSize () - m_pHistory->GetScrollbarPageSize ();
 
+        // Grab selection
+        uint uiSelectionStart = m_pHistory->GetSelectionStart ();
+        uint uiSelectionEnd = m_pHistory->GetSelectionEnd ();
+        uint uiSelectionLength = m_pHistory->GetSelectionLength ();
+
         // Make new buffer
         SString strBuffer = m_pHistory->GetText ();
         strBuffer += m_strPendingAdd;
@@ -547,5 +552,9 @@ void CConsole::FlushPendingAdd ( void )
         // If not at the end, keep the scrollbar position
         if ( fScroll < fMaxScroll )
             m_pHistory->SetVerticalScrollPosition ( fScroll );
+
+        // Keep text selection if any
+        if ( uiSelectionLength > 0 )
+            m_pHistory->SetSelection ( uiSelectionStart, uiSelectionEnd );
     }
 }
