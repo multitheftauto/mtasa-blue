@@ -147,6 +147,30 @@ float CGUIMemo_Impl::GetScrollbarPageSize ( void )
 }
 
 
+void CGUIMemo_Impl::SetSelection ( unsigned int uiStart, unsigned int uiEnd )
+{
+    reinterpret_cast < CEGUI::MultiLineEditbox* > ( m_pWindow ) -> setSelection ( uiStart, uiEnd );
+}
+
+
+unsigned int CGUIMemo_Impl::GetSelectionStart ( void )
+{
+    return static_cast < unsigned int > ( reinterpret_cast < CEGUI::MultiLineEditbox* > ( m_pWindow ) -> getSelectionStartIndex () );
+}
+
+
+unsigned int CGUIMemo_Impl::GetSelectionEnd ( void )
+{
+    return static_cast < unsigned int > ( reinterpret_cast < CEGUI::MultiLineEditbox* > ( m_pWindow ) -> getSelectionEndIndex () );
+}
+
+
+unsigned int CGUIMemo_Impl::GetSelectionLength ( void )
+{
+    return static_cast < unsigned int > ( reinterpret_cast < CEGUI::MultiLineEditbox* > ( m_pWindow ) -> getSelectionLength () );
+}
+
+
 bool CGUIMemo_Impl::ActivateOnTab ( void )
 {
     // Only select this as active if its visible and writable
