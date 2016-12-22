@@ -57,6 +57,7 @@ public:
     LUA_DECLARE ( getResourceDynamicElementRoot );
     LUA_DECLARE ( getResourceMapRootElement );
     LUA_DECLARE ( getResourceExportedFunctions );
+    LUA_DECLARE ( getResourceOrganizationalPath );
 
     // Set stuff
     LUA_DECLARE ( setResourceInfo );
