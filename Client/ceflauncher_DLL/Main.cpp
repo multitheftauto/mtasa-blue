@@ -11,12 +11,6 @@
 #include <Windows.h>
 #include "CCefApp.h"
 #include <string>
-#include <cef3/include/cef_sandbox_win.h>
-
-#define CEF_ENABLE_SANDBOX
-#ifdef CEF_ENABLE_SANDBOX
-    #pragma comment(lib, "cef_sandbox.lib")
-#endif
 
 int _declspec(dllexport) InitCEF ()
 {
@@ -34,11 +28,5 @@ int _declspec(dllexport) InitCEF ()
     CefMainArgs mainArgs ( GetModuleHandle(NULL) );
     CefRefPtr<CCefApp> app { new CCefApp };
 
-    void* sandboxInfo = nullptr;
-#ifdef CEF_ENABLE_SANDBOX
-    CefScopedSandboxInfo scopedSandbox;
-    sandboxInfo = scopedSandbox.sandbox_info();
-#endif
-
-    return CefExecuteProcess ( mainArgs, app, sandboxInfo);
+    return CefExecuteProcess ( mainArgs, app, nullptr );
 }

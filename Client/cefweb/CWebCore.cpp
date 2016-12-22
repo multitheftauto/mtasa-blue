@@ -18,7 +18,6 @@
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
 
-#define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
     #pragma comment(lib, "cef_sandbox.lib")
 #endif
@@ -52,13 +51,13 @@ bool CWebCore::Initialise ()
     void* sandboxInfo = nullptr;
     CefRefPtr<CWebApp> app(new CWebApp);
 
-#ifdef CEF_ENABLE_SANDBOX
+#if CEF_ENABLE_SANDBOX
     CefScopedSandboxInfo scopedSandbox;
     sandboxInfo = scopedSandbox.sandbox_info();
 #endif
 
     CefSettings settings;
-#ifndef CEF_ENABLE_SANDBOX
+#if !CEF_ENABLE_SANDBOX
     settings.no_sandbox = true;
 #endif
 
