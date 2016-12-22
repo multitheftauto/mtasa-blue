@@ -38,11 +38,12 @@ project "Client Webbrowser"
 	}
 
 	links {
-		"libcef", "CEF"
+		"libcef", "CEF", "Psapi.lib", "version.lib", "Winmm.lib", "Ws2_32.lib", "DbgHelp.lib"
 	}
 
 	defines {
 		"_WIN32_WINNT=0x502",
+		"PSAPI_VERSION=1"
 	}
 
 	filter "architecture:x64"
