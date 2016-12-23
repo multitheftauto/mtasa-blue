@@ -907,7 +907,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
                         std::wstring tmp = MbUTF8ToUTF16(strEditText.c_str());
-                        if ( ( strClipboardText.length () + tmp.length () ) <= iMaxLength )
+                        if ( ( strClipboardText.length () + tmp.length () - iSelectionLength ) <= iMaxLength )
                         {
                             // Are there characters selected?
                             size_t sizeCaratIndex = 0;
