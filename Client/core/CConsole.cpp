@@ -18,8 +18,10 @@
 using SharedUtil::CalcMTASAPath;
 using std::string;
 
-#define CONSOLE_HISTORY_LENGTH 128
-#define CONSOLE_SIZE 4096
+#define CONSOLE_HISTORY_LENGTH      128
+#define CONSOLE_SIZE                4096
+
+#define MAX_CONSOLE_COMMAND_LENGTH  255
 
 #define NATIVE_RES_X    1152.0f
 #define NATIVE_RES_Y    864.0f
@@ -49,6 +51,7 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
     m_pWindow->SetSizedHandler ( GUI_CALLBACK ( &CConsole::OnWindowSize, this ) );
 
     m_pInput->SetTextAcceptedHandler ( GUI_CALLBACK ( &CConsole::Edit_OnTextAccepted, this ) );
+    m_pInput->SetMaxLength ( MAX_CONSOLE_COMMAND_LENGTH );
 
     m_pHistory->SetTextChangedHandler ( GUI_CALLBACK ( &CConsole::History_OnTextChanged, this ) );
 
