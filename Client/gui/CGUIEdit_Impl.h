@@ -42,21 +42,27 @@ public:
     void                SetCaretAtEnd           ( void );
     unsigned int        GetCaretIndex           ( void );
 
-    void                SetTextAcceptedHandler  ( GUI_CALLBACK Callback );
-    void                SetTextChangedHandler   ( GUI_CALLBACK Callback );
+    void                SetTextAcceptedHandler      ( GUI_CALLBACK Callback );
+    void                SetTextChangedHandler       ( GUI_CALLBACK Callback );
+    void                SetRenderingEndedHandler    ( GUI_CALLBACK Callback );
+    void                SetRenderingStartedHandler  ( GUI_CALLBACK Callback );
 
-    bool                ActivateOnTab           ( void );
+    bool                ActivateOnTab               ( void );
 
-    eCGUIType           GetType                 ( void ) { return CGUI_EDIT; };
+    eCGUIType           GetType                     ( void ) { return CGUI_EDIT; };
 
     #include "CGUIElement_Inc.h"
 
 protected:
-    bool                Event_OnTextChanged     ( const CEGUI::EventArgs& e );
-    bool                Event_OnKeyDown         ( const CEGUI::EventArgs& e );
+    bool                Event_OnTextChanged         ( const CEGUI::EventArgs& e );
+    bool                Event_OnKeyDown             ( const CEGUI::EventArgs& e );
+    bool                Event_OnRenderingEnded      ( const CEGUI::EventArgs& e );
+    bool                Event_OnRenderingStarted    ( const CEGUI::EventArgs& e );
 
     GUI_CALLBACK        m_OnTextAccepted;
     GUI_CALLBACK        m_OnTextChanged;
+    GUI_CALLBACK        m_OnRenderingEnded;
+    GUI_CALLBACK        m_OnRenderingStarted;
 };
 
 #endif
