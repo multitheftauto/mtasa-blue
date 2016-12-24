@@ -266,6 +266,31 @@ void CConsole::GetCommandInfo ( const string &strIn, string & strCmdOut, string 
     }
 }
 
+void CConsole::GracefullySetEditboxText ( const char * szText )
+{
+    m_pInput->SetText ( szText );
+
+    // Reset caret so input is scrolled back if it had a long text before
+    m_pInput->SetCaretAtStart ();
+
+    // Caret can't be set back to end yet because GUI will not detect any 
+    // state change and thus will not redraw anything. Just wait for next 
+    // rendering phase instead and then move the caret back.
+    //
+    // There is a minimal caret flickering, it can't be prevented without 
+    // some sort of custom rendering logic.
+    m_pInput->SetRenderingEndedHandler ( GUI_CALLBACK ( &CConsole::GracefullyMoveEditboxCaret, this ) );
+}
+
+bool CConsole::GracefullyMoveEditboxCaret( CGUIElement* pElement )
+{
+    m_pInput->SetCaretAtEnd ();
+
+    // Done, unhook itself
+    m_pInput->SetRenderingEndedHandler ( nullptr );
+
+    return true;
+}
 
 void CConsole::SetNextHistoryText ( void )
 {
@@ -303,9 +328,7 @@ void CConsole::SetNextHistoryText ( void )
     const char* szItem = m_pConsoleHistory->Get ( m_iHistoryIndex );
     if ( szItem )
     {      
-        m_pInput->SetText ( szItem );
-        m_pInput->SetCaretAtStart(); // Resetting so it scrolls the input back after long text
-        m_pInput->SetCaretAtEnd ();
+        GracefullySetEditboxText ( szItem );
     }
     else
     {
@@ -344,10 +367,8 @@ void CConsole::SetPreviousHistoryText ( void )
     // Grab the item and set the input text to it
     const char* szItem = m_pConsoleHistory->Get ( m_iHistoryIndex - 1 );
     if ( szItem )
-    {       
-        m_pInput->SetText ( szItem );
-        m_pInput->SetCaretAtStart(); // Resetting so it scrolls the input back after long text
-        m_pInput->SetCaretAtEnd ();
+    {
+        GracefullySetEditboxText ( szItem );
         --m_iHistoryIndex;
     }
 }
@@ -404,10 +425,8 @@ void CConsole::SetNextAutoCompleteMatch ( void )
     // Grab the item and set the input text to it
     const char* szItem = m_pConsoleHistory->Get ( m_AutoCompleteList.at ( m_iAutoCompleteIndex ) );
     if ( szItem )
-    {       
-        m_pInput->SetText ( szItem );
-        m_pInput->SetCaretAtStart (); // Resetting so it scrolls the input back after long text
-        m_pInput->SetCaretAtEnd ();
+    {
+        GracefullySetEditboxText ( szItem );
     }
 }
 

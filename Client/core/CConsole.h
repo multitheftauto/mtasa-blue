@@ -65,6 +65,8 @@ protected:
     bool                Edit_OnTextAccepted             ( CGUIElement* pElement );
     bool                History_OnTextChanged           ( CGUIElement* pElement );
     void                FlushPendingAdd                 ( void );
+    void                GracefullySetEditboxText        ( const char * szText );
+    bool                GracefullyMoveEditboxCaret      ( CGUIElement* pElement );
 
 private:
     void                CreateElements                  ( CGUIElement* pParent = NULL );
