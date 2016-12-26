@@ -55,6 +55,7 @@ void CLuaResourceDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getResourceDynamicElementRoot", getResourceDynamicElementRoot );
     CLuaCFunctions::AddFunction ( "getResourceMapRootElement", getResourceMapRootElement );
     CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", getResourceExportedFunctions );
+    CLuaCFunctions::AddFunction ( "getResourceOrganizationalPath", getResourceOrganizationalPath);
 
     // Set stuff
     CLuaCFunctions::AddFunction ( "setResourceInfo", setResourceInfo );
@@ -106,6 +107,7 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot" );
     lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
     lua_classfunction ( luaVM, "getExportedFunctions", "getResourceExportedFunctions" );
+    lua_classfunction ( luaVM, "getOrganizationalPath", "getResourceOrganizationalPath");
     lua_classfunction ( luaVM, "getLastStartTime", "getResourceLastStartTime" );
     lua_classfunction ( luaVM, "getLoadTime", "getResourceLoadTime" );
     lua_classfunction ( luaVM, "getInfo", "getResourceInfo" );
@@ -117,6 +119,7 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
     lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
+    lua_classvariable ( luaVM, "organizationalPath", nullptr, "getResourceOrganizationalPath" );
     lua_classvariable ( luaVM, "lastStartTime", NULL, "getResourceLastStartTime" );
     lua_classvariable ( luaVM, "aclRequests", NULL, "getResourceACLRequests" );
     lua_classvariable ( luaVM, "loadTime", NULL, "getResourceLoadTime" );
@@ -1061,6 +1064,41 @@ int CLuaResourceDefs::getResourceExportedFunctions ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaResourceDefs::getResourceOrganizationalPath ( lua_State* luaVM )
+{
+    // string getResourceOrganizationalPath ( resource theResource )
+    // Returns a string representing the resource organizational path, false if invalid resource was provided. 
+
+    CResource* pResource;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pResource );
+    
+    if ( !argStream.HasErrors() )
+    {
+        SString strOrganizationalPath = m_pResourceManager->GetResourceOrganizationalPath ( pResource );
+        
+        if ( !strOrganizationalPath.empty() )
+        {
+            // Normalize path separator, it is always slash on resources side
+            ReplaceOccurrencesInString ( strOrganizationalPath, "\\", "/" );
+
+            // The leading separator won't be needed
+            strOrganizationalPath = strOrganizationalPath.TrimStart ( "/" );
+        }
+        
+        lua_pushstring ( luaVM, strOrganizationalPath );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+     
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaResourceDefs::call ( lua_State* luaVM )
 {
