@@ -265,8 +265,8 @@ project "curl"
 	filter {"system:windows", "platforms:x86", "configurations:Debug"}
 		postbuildcommands {
 			-- Fix net(c).dll requiring the release build
-			"copy %{wks.location}..\\Bin\\server\\libcurl_d.dll %{wks.location}..\\Bin\\mta\\libcurl.dll",
-			"copy %{wks.location}..\\Bin\\server\\libcurl_d.dll %{wks.location}..\\Bin\\server\\libcurl.dll"
+			"copy \"%{wks.location}..\\Bin\\server\\libcurl_d.dll\" \"%{wks.location}..\\Bin\\mta\\libcurl.dll\"",
+			"copy \"%{wks.location}..\\Bin\\server\\libcurl_d.dll\" \"%{wks.location}..\\Bin\\server\\libcurl.dll\""
 		}
 
 	filter "platforms:x64"
