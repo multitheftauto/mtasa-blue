@@ -1870,6 +1870,10 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
     // Stop pressing buttons
     SetControllerState ( CControllerState () );
 
+    // Remove goggles #9477
+    if ( IsWearingGoggles ( ) )
+        m_pPlayerPed->SetGogglesState ( false );
+
     m_bDead = true;
 }
 
