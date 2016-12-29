@@ -2092,37 +2092,30 @@ int CLuaPedDefs::SetPedStat ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        // Valid ped?
-        if ( pPed )
-        {
-            // Only allow on local peds
-            if ( !pPed->IsLocalEntity ( ) )
-                argStream.SetCustomError ( "This client side function will only work with client created peds." );
-
-            // Check the stat and value
-            if ( !argStream.HasErrors ( ) )
-                if ( usStat > NUM_PLAYER_STATS || fValue < 0.0f || fValue > 1000.0f )
-                    argStream.SetCustomError ( "Stat must be below 230 and value must be 0 to 1000." );
+        // Only allow on local peds
+        if ( !pPed->IsLocalEntity ( ) )
+            argStream.SetCustomError ( "This client side function will only work with client created peds." );
+        
+        // Check the stat and value
+        if ( !argStream.HasErrors ( ) )
+            if ( usStat > NUM_PLAYER_STATS || usStat < 0 || fValue < 0.0f || fValue > 1000.0f )
+                argStream.SetCustomError ( "Stat must be 0 to 343 and value must be 0 to 1000." );
                
-            // Dont let them set visual stats if they don't have the CJ model
-            if ( !argStream.HasErrors ( ) )
-                if ( ( usStat == 21 /* FAT */ || usStat == 23 /* BODY_MUSCLE */ ) && pPed->GetModel () != 0 )
-                    argStream.SetCustomError( "Fat and muscle stat can only be set on CJ skin." );
+        // Dont let them set visual stats if they don't have the CJ model
+        if ( !argStream.HasErrors ( ) )
+            if ( ( usStat == 21 /* FAT */ || usStat == 23 /* BODY_MUSCLE */ ) && pPed->GetModel () != 0 )
+                argStream.SetCustomError( "Fat and muscle stat can only be set on CJ skin." );
 
-            if ( !argStream.HasErrors ( ) )
-            {
-                pPed->SetStat ( usStat, fValue );
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+        if ( !argStream.HasErrors ( ) )
+        {
+            pPed->SetStat ( usStat, fValue );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "ped", 1 );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
     lua_pushboolean ( luaVM, false );
