@@ -74,62 +74,55 @@ int CLuaResourceDefs::Call ( lua_State* luaVM )
             CResource* pThisResource = pLuaMain->GetResource ();
             if ( pThisResource )
             {
-                if ( pResource )
+                //Get the target Lua VM
+                lua_State* targetLuaVM = pResource->GetVM ()->GetVM ();
+
+                // Read out the vargs
+                CLuaArguments args;
+                args.ReadArguments ( luaVM, 3 );
+                CLuaArguments returns;
+
+                LUA_CHECKSTACK ( targetLuaVM, 1 );   // Ensure some room
+
+                                                        //Lets grab the original hidden variables so we can restore them later
+                lua_getglobal ( targetLuaVM, "sourceResource" );
+                CLuaArgument OldResource ( luaVM, -1 );
+                lua_pop ( targetLuaVM, 1 );
+
+                lua_getglobal ( targetLuaVM, "sourceResourceRoot" );
+                CLuaArgument OldResourceRoot ( luaVM, -1 );
+                lua_pop ( targetLuaVM, 1 );
+
+                //Set the new values for the current sourceResource, and sourceResourceRoot
+                lua_pushresource ( targetLuaVM, pThisResource );
+                lua_setglobal ( targetLuaVM, "sourceResource" );
+
+                lua_pushelement ( targetLuaVM, pThisResource->GetResourceEntity () );
+                lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
+
+                // Call the exported function with the given name and the args
+                if ( pResource->CallExportedFunction ( strFunctionName, args, returns, *pThisResource ) )
                 {
-                    //Get the target Lua VM
-                    lua_State* targetLuaVM = pResource->GetVM ()->GetVM ();
-
-                    // Read out the vargs
-                    CLuaArguments args;
-                    args.ReadArguments ( luaVM, 3 );
-                    CLuaArguments returns;
-
-                    LUA_CHECKSTACK ( targetLuaVM, 1 );   // Ensure some room
-
-                                                         //Lets grab the original hidden variables so we can restore them later
-                    lua_getglobal ( targetLuaVM, "sourceResource" );
-                    CLuaArgument OldResource ( luaVM, -1 );
-                    lua_pop ( targetLuaVM, 1 );
-
-                    lua_getglobal ( targetLuaVM, "sourceResourceRoot" );
-                    CLuaArgument OldResourceRoot ( luaVM, -1 );
-                    lua_pop ( targetLuaVM, 1 );
-
-                    //Set the new values for the current sourceResource, and sourceResourceRoot
-                    lua_pushresource ( targetLuaVM, pThisResource );
+                    // Push return arguments
+                    returns.PushArguments ( luaVM );
+                    //Restore the old variables
+                    OldResource.Push ( targetLuaVM );
                     lua_setglobal ( targetLuaVM, "sourceResource" );
 
-                    lua_pushelement ( targetLuaVM, pThisResource->GetResourceEntity () );
+                    OldResourceRoot.Push ( targetLuaVM );
                     lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
 
-                    // Call the exported function with the given name and the args
-                    if ( pResource->CallExportedFunction ( strFunctionName, args, returns, *pThisResource ) )
-                    {
-                        // Push return arguments
-                        returns.PushArguments ( luaVM );
-                        //Restore the old variables
-                        OldResource.Push ( targetLuaVM );
-                        lua_setglobal ( targetLuaVM, "sourceResource" );
-
-                        OldResourceRoot.Push ( targetLuaVM );
-                        lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
-
-                        return returns.Count ();
-                    }
-                    else
-                    {
-                        //Restore the old variables
-                        OldResource.Push ( targetLuaVM );
-                        lua_setglobal ( targetLuaVM, "sourceResource" );
-
-                        OldResourceRoot.Push ( targetLuaVM );
-                        lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
-                        m_pScriptDebugging->LogError ( luaVM, "call: failed to call '%s:%s'", pResource->GetName (), *strFunctionName );
-                    }
+                    return returns.Count ();
                 }
                 else
                 {
-                    m_pScriptDebugging->LogBadType ( luaVM );
+                    //Restore the old variables
+                    OldResource.Push ( targetLuaVM );
+                    lua_setglobal ( targetLuaVM, "sourceResource" );
+
+                    OldResourceRoot.Push ( targetLuaVM );
+                    lua_setglobal ( targetLuaVM, "sourceResourceRoot" );
+                    m_pScriptDebugging->LogError ( luaVM, "call: failed to call '%s:%s'", pResource->GetName (), *strFunctionName );
                 }
             }
         }
@@ -369,19 +362,14 @@ int CLuaResourceDefs::GetResourceDynamicElementRoot ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pResource )
+        CClientEntity* pEntity = pResource->GetResourceDynamicEntity ();
+        if ( pEntity )
         {
-            CClientEntity* pEntity = pResource->GetResourceDynamicEntity ();
-            if ( pEntity )
-            {
-                lua_pushelement ( luaVM, pEntity );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogError ( luaVM, "getResourceDynamicElementRoot: Resource %s Is Not Currently Running", pResource->GetName () );
+            lua_pushelement ( luaVM, pEntity );
+            return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "resource", 1 );
+            m_pScriptDebugging->LogError ( luaVM, "getResourceDynamicElementRoot: Resource %s Is Not Currently Running", pResource->GetName () );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

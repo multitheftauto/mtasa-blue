@@ -123,17 +123,12 @@ int CLuaMarkerDefs::GetMarkerType ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
+        SString strMarkerType;
+        if ( CClientMarker::TypeToString ( pMarker->GetMarkerType (), strMarkerType ) )
         {
-            SString strMarkerType;
-            if ( CClientMarker::TypeToString ( pMarker->GetMarkerType (), strMarkerType ) )
-            {
-                lua_pushstring ( luaVM, strMarkerType );
-                return 1;
-            }
+            lua_pushstring ( luaVM, strMarkerType );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -152,14 +147,9 @@ int CLuaMarkerDefs::GetMarkerSize ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
-        {
-            float fSize = pMarker->GetSize ();
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( fSize ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
+        float fSize = pMarker->GetSize ();
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( fSize ) );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -178,17 +168,12 @@ int CLuaMarkerDefs::GetMarkerColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
-        {
-            SColor color = pMarker->GetColor ();
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.R ) );
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.G ) );
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.B ) );
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.A ) );
-            return 4;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
+        SColor color = pMarker->GetColor ();
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.R ) );
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.G ) );
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.B ) );
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( color.A ) );
+        return 4;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -207,19 +192,14 @@ int CLuaMarkerDefs::GetMarkerTarget ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
+        CVector vecTarget;
+        if ( CStaticFunctionDefinitions::GetMarkerTarget ( *pMarker, vecTarget ) )
         {
-            CVector vecTarget;
-            if ( CStaticFunctionDefinitions::GetMarkerTarget ( *pMarker, vecTarget ) )
-            {
-                lua_pushnumber ( luaVM, vecTarget.fX );
-                lua_pushnumber ( luaVM, vecTarget.fY );
-                lua_pushnumber ( luaVM, vecTarget.fZ );
-                return 3;
-            }
+            lua_pushnumber ( luaVM, vecTarget.fX );
+            lua_pushnumber ( luaVM, vecTarget.fY );
+            lua_pushnumber ( luaVM, vecTarget.fZ );
+            return 3;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -263,19 +243,14 @@ int CLuaMarkerDefs::GetMarkerIcon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
+        CClientCheckpoint* pCheckpoint = pMarker->GetCheckpoint ();
+        if ( pCheckpoint )
         {
-            CClientCheckpoint* pCheckpoint = pMarker->GetCheckpoint ();
-            if ( pCheckpoint )
-            {
-                SString strMarkerIcon;
-                CClientCheckpoint::IconToString ( pCheckpoint->GetIcon (), strMarkerIcon );
-                lua_pushstring ( luaVM, strMarkerIcon );
-                return 1;
-            }
+            SString strMarkerIcon;
+            CClientCheckpoint::IconToString ( pCheckpoint->GetIcon (), strMarkerIcon );
+            lua_pushstring ( luaVM, strMarkerIcon );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "marker", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -296,14 +271,9 @@ int CLuaMarkerDefs::SetMarkerType ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
-        {
-            bool bSuccess = CStaticFunctionDefinitions::SetMarkerType ( *pEntity, strType );
-            lua_pushboolean ( luaVM, bSuccess );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        bool bSuccess = CStaticFunctionDefinitions::SetMarkerType ( *pEntity, strType );
+        lua_pushboolean ( luaVM, bSuccess );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -324,16 +294,11 @@ int CLuaMarkerDefs::SetMarkerSize ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetMarkerSize ( *pEntity, fSize ) )
         {
-            if ( CStaticFunctionDefinitions::SetMarkerSize ( *pEntity, fSize ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -360,31 +325,25 @@ int CLuaMarkerDefs::SetMarkerColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        // Verify the pointer
-        if ( pEntity )
+        // Check the ranges
+        if ( dRed >= 0 && dRed <= 255 &&
+            dGreen >= 0 && dGreen <= 255 &&
+            dBlue >= 0 && dBlue <= 255 &&
+            dAlpha >= 0 && dAlpha <= 255 )
         {
-            // Check the ranges
-            if ( dRed >= 0 && dRed <= 255 &&
-                dGreen >= 0 && dGreen <= 255 &&
-                dBlue >= 0 && dBlue <= 255 &&
-                dAlpha >= 0 && dAlpha <= 255 )
-            {
-                SColor color;
-                color.R = static_cast < unsigned char > ( dRed );
-                color.G = static_cast < unsigned char > ( dGreen );
-                color.B = static_cast < unsigned char > ( dBlue );
-                color.A = static_cast < unsigned char > ( dAlpha );
+            SColor color;
+            color.R = static_cast < unsigned char > ( dRed );
+            color.G = static_cast < unsigned char > ( dGreen );
+            color.B = static_cast < unsigned char > ( dBlue );
+            color.A = static_cast < unsigned char > ( dAlpha );
 
-                // Set the new color
-                if ( CStaticFunctionDefinitions::SetMarkerColor ( *pEntity, color ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+            // Set the new color
+            if ( CStaticFunctionDefinitions::SetMarkerColor ( *pEntity, color ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -431,16 +390,11 @@ int CLuaMarkerDefs::SetMarkerIcon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetMarkerIcon ( *pEntity, strIcon ) )
         {
-            if ( CStaticFunctionDefinitions::SetMarkerIcon ( *pEntity, strIcon ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
