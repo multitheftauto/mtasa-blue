@@ -77,6 +77,7 @@ void CLuaPedDefs::LoadFunctions ( void ) {
     CLuaCFunctions::AddFunction ( "setPedFootBloodEnabled", SetPedFootBloodEnabled );
     CLuaCFunctions::AddFunction ( "setPedCameraRotation", SetPedCameraRotation );
     CLuaCFunctions::AddFunction ( "setPedAimTarget", SetPedAimTarget );
+    CLuaCFunctions::AddFunction ( "setPedStat", SetPedStat );
     CLuaCFunctions::AddFunction ( "warpPedIntoVehicle", WarpPedIntoVehicle );
     CLuaCFunctions::AddFunction ( "removePedFromVehicle", RemovePedFromVehicle );
     CLuaCFunctions::AddFunction ( "setPedOxygenLevel", SetPedOxygenLevel );
@@ -160,6 +161,7 @@ void CLuaPedDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setLookAt", "setPedLookAt" );
     lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
     lua_classfunction ( luaVM, "giveWeapon", "givePedWeapon" );
+    lua_classfunction ( luaVM, "setStat", "setPedStat" );
 
     lua_classvariable ( luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle );
     lua_classvariable ( luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat" );
@@ -2072,6 +2074,50 @@ int CLuaPedDefs::SetPedAimTarget ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaPedDefs::SetPedStat ( lua_State* luaVM )
+{
+    // Verify the argument
+    CClientPed* pPed = NULL;
+    unsigned short usStat = 0;
+    float fValue = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pPed );
+    argStream.ReadNumber ( usStat );
+    argStream.ReadNumber ( fValue );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        // Only allow on local peds
+        if ( !pPed->IsLocalEntity ( ) )
+            argStream.SetCustomError ( "This client side function will only work with client created peds." );
+
+        // Check the stat and value
+        if ( !argStream.HasErrors ( ) )
+            if ( usStat > NUM_PLAYER_STATS || usStat < 0 || fValue < 0.0f || fValue > 1000.0f )
+                argStream.SetCustomError ( "Stat must be 0 to 343 and value must be 0 to 1000." );
+
+        // Dont let them set visual stats if they don't have the CJ model
+        if ( !argStream.HasErrors ( ) )
+            if ( ( usStat == 21 /* FAT */ || usStat == 23 /* BODY_MUSCLE */ ) && pPed->GetModel ( ) != 0 )
+                argStream.SetCustomError ( "Fat and muscle stat can only be set on CJ skin." );
+
+        if ( !argStream.HasErrors ( ) )
+        {
+            pPed->SetStat ( usStat, fValue );
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+
+    if ( argStream.HasErrors ( ) )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
