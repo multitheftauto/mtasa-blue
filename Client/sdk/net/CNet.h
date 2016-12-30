@@ -30,6 +30,7 @@ namespace EDownloadMode
         CALL_REMOTE,
         WEBBROWSER_LISTS,
         CONNECT_TCP_SEND,
+        CALL_REMOTE_ANY_HOST,
     };
 }
 using EDownloadMode::EDownloadModeType;

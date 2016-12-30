@@ -140,8 +140,18 @@ CRemoteCall::~CRemoteCall ()
 
 void CRemoteCall::MakeCall()
 {
-    CNetHTTPDownloadManagerInterface * downloadManager = g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE );
-    downloadManager->QueueFile ( m_strURL, NULL, 0, m_strData.c_str (), m_strData.length (), m_bPostBinary, this, DownloadFinishedCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs );
+    if (g_pCore->GetWebCore()->GetDomainState(g_pCore->GetWebCore()->GetDomainFromURL(m_strURL)) == eURLState::WEBPAGE_ALLOWED)
+    {
+        // Bypass IP check if we are allowed to access the URL
+        CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE_ANY_HOST);
+        pDownloadManager->QueueFile(m_strURL, NULL, 0, m_strData.c_str(), m_strData.length(), m_bPostBinary, this, DownloadFinishedCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs);
+    }
+    else
+    {
+        // Proceed with the normal way (IP check in net module)
+        CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE);
+        pDownloadManager->QueueFile(m_strURL, NULL, 0, m_strData.c_str(), m_strData.length(), m_bPostBinary, this, DownloadFinishedCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs);
+    }
 }
 
 void CRemoteCall::DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )

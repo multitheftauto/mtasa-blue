@@ -56,7 +56,7 @@ public:
     void                RemoveWebViewEvents ( CWebView* pWebView );
     void                DoEventQueuePulse   ();
     
-    eURLState           GetURLState         ( const SString& strURL, bool bOutputDebug = false );
+    eURLState           GetDomainState         ( const SString& strURL, bool bOutputDebug = false );
     SString             GetDomainFromURL    ( const SString& strURL );
     void                ResetFilter         ( bool bResetRequestsOnly = true );
     void                InitialiseWhiteAndBlacklist ( bool bAddHardcoded = true, bool bAddDynamic = true );

@@ -522,7 +522,7 @@ int CLuaBrowserDefs::IsBrowserDomainBlocked ( lua_State* luaVM )
 
         if ( !strURL.empty () )
         {
-            lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetURLState ( strURL ) != eURLState::WEBPAGE_ALLOWED );
+            lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetDomainState ( strURL ) != eURLState::WEBPAGE_ALLOWED );
             return 1;
         }
     }
