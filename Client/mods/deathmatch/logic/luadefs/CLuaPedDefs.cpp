@@ -1827,17 +1827,12 @@ int CLuaPedDefs::SetPedStat ( lua_State* luaVM )
     if ( !argStream.HasErrors ( ) )
     {
         // Check the stat and value
-        if ( !argStream.HasErrors ( ) )
-            if ( usStat > NUM_PLAYER_STATS || usStat < 0 || fValue < 0.0f || fValue > 1000.0f )
-                argStream.SetCustomError ( "Stat must be 0 to 343 and value must be 0 to 1000." );
-        
-        if ( !argStream.HasErrors ( ) )
+        if ( usStat > NUM_PLAYER_STATS - 1 || fValue < 0.0f || fValue > 1000.0f )
+            argStream.SetCustomError ( "Stat must be 0 to 342 and value must be 0 to 1000." );
+        else if ( CStaticFunctionDefinitions::SetPedStat ( *pEntity, usStat, fValue ) )
         {
-            if ( CStaticFunctionDefinitions::SetPedStat ( *pEntity, usStat, fValue ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
 
