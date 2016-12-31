@@ -2341,6 +2341,22 @@ bool CStaticFunctionDefinitions::SetPedAimTarget ( CClientEntity & Entity, CVect
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedStat ( CClientEntity & Entity, ushort usStat, float fValue )
+{
+    RUN_CHILDREN ( SetPedStat ( **iter, usStat, fValue ) )
+    if ( IS_PED ( &Entity ) && Entity.IsLocalEntity ( ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        // Dont let them set visual stats if they don't have the CJ model
+        if ( ( usStat == 21 /* FAT */ || usStat == 23 /* BODY_MUSCLE */ ) && Ped.GetModel ( ) != 0 )
+            return false;
+
+        Ped.SetStat ( usStat, fValue );
+        return true;
+    }
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::SetPedOnFire ( CClientEntity & Entity, bool bOnFire )
 {

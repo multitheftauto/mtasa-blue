@@ -1816,35 +1816,28 @@ int CLuaPedDefs::SetPedAimTarget ( lua_State* luaVM )
 int CLuaPedDefs::SetPedStat ( lua_State* luaVM )
 {
     // Verify the argument
-    CClientPed* pPed = NULL;
+    CClientEntity* pEntity = NULL;
     unsigned short usStat = 0;
     float fValue = 0;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pPed );
+    argStream.ReadUserData ( pEntity );
     argStream.ReadNumber ( usStat );
     argStream.ReadNumber ( fValue );
 
     if ( !argStream.HasErrors ( ) )
     {
-        // Only allow on local peds
-        if ( !pPed->IsLocalEntity ( ) )
-            argStream.SetCustomError ( "This client side function will only work with client created peds." );
-        
         // Check the stat and value
         if ( !argStream.HasErrors ( ) )
             if ( usStat > NUM_PLAYER_STATS || usStat < 0 || fValue < 0.0f || fValue > 1000.0f )
                 argStream.SetCustomError ( "Stat must be 0 to 343 and value must be 0 to 1000." );
-               
-        // Dont let them set visual stats if they don't have the CJ model
-        if ( !argStream.HasErrors ( ) )
-            if ( ( usStat == 21 /* FAT */ || usStat == 23 /* BODY_MUSCLE */ ) && pPed->GetModel ( ) != 0 )
-                argStream.SetCustomError( "Fat and muscle stat can only be set on CJ skin." );
-
+        
         if ( !argStream.HasErrors ( ) )
         {
-            pPed->SetStat ( usStat, fValue );
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( CStaticFunctionDefinitions::SetPedStat ( *pEntity, usStat, fValue ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
 
