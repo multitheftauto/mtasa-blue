@@ -543,10 +543,43 @@ void CConsole::FlushPendingAdd ( void )
         m_strPendingAdd = "";
 
         // Trim new buffer
-        if ( strBuffer.length () > CONSOLE_SIZE )
+        uint uiBufferLength = strBuffer.length ();
+
+        if ( uiBufferLength > CONSOLE_SIZE )
         {
             strBuffer = strBuffer.Right ( CONSOLE_SIZE );
             strBuffer = strBuffer.SplitRight ( "\n" );
+
+            // Fix text selection coords after trimming
+            if ( uiSelectionLength > 0 )
+            {
+                uint uiBufferLengthDiff = uiBufferLength - strBuffer.length ();
+
+                // Beware of underflows, all cases must be properly handled
+                if ( uiSelectionEnd < uiBufferLengthDiff )
+                {
+                    // Whole selection would be out of the screen now, so technically
+                    // it does not exist anymore
+                    uiSelectionStart = 0;
+                    uiSelectionEnd = 0;
+                    uiSelectionLength = 0;
+                }
+                else if ( uiSelectionStart < uiBufferLengthDiff )
+                {
+                    // Start of selection would be out of the screen now,
+                    // so it must be shortened
+                    uiSelectionLength -= uiBufferLengthDiff - uiSelectionStart;
+                    uiSelectionStart = 0;
+                    uiSelectionEnd -= uiBufferLengthDiff;
+                }
+                else // Both start and end of selection are greater than length difference
+                {
+                    // Whole selection would still be visible on the screen,
+                    // just a simple movement is needed
+                    uiSelectionStart -= uiBufferLengthDiff;
+                    uiSelectionEnd -= uiBufferLengthDiff;
+                }
+            }
         }
 
         // Set new buffer
@@ -556,7 +589,7 @@ void CConsole::FlushPendingAdd ( void )
         if ( fScroll < fMaxScroll )
             m_pHistory->SetVerticalScrollPosition ( fScroll );
 
-        // Keep text selection if any
+        // Restore text selection if any
         if ( uiSelectionLength > 0 )
             m_pHistory->SetSelection ( uiSelectionStart, uiSelectionEnd );
     }
