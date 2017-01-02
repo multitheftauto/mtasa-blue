@@ -73,17 +73,12 @@ int CLuaTeamDefs::GetTeamName ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pTeam )
+        const char* szName = pTeam->GetTeamName ();
+        if ( szName )
         {
-            const char* szName = pTeam->GetTeamName ();
-            if ( szName )
-            {
-                lua_pushstring ( luaVM, szName );
-                return 1;
-            }
+            lua_pushstring ( luaVM, szName );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -101,18 +96,13 @@ int CLuaTeamDefs::GetTeamColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pTeam )
-        {
-            unsigned char ucRed, ucGreen, ucBlue;
-            pTeam->GetColor ( ucRed, ucGreen, ucBlue );
+        unsigned char ucRed, ucGreen, ucBlue;
+        pTeam->GetColor ( ucRed, ucGreen, ucBlue );
 
-            lua_pushnumber ( luaVM, ucRed );
-            lua_pushnumber ( luaVM, ucGreen );
-            lua_pushnumber ( luaVM, ucBlue );
-            return 3;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+        lua_pushnumber ( luaVM, ucRed );
+        lua_pushnumber ( luaVM, ucGreen );
+        lua_pushnumber ( luaVM, ucBlue );
+        return 3;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -130,14 +120,9 @@ int CLuaTeamDefs::GetTeamFriendlyFire ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pTeam )
-        {
-            bool bFriendlyFire = pTeam->GetFriendlyFire ();
-            lua_pushboolean ( luaVM, bFriendlyFire );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+        bool bFriendlyFire = pTeam->GetFriendlyFire ();
+        lua_pushboolean ( luaVM, bFriendlyFire );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -155,28 +140,23 @@ int CLuaTeamDefs::GetPlayersInTeam ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pTeam )
+        lua_newtable ( luaVM );
+
+        unsigned int uiIndex = 0;
+
+        list < CClientPlayer* > ::const_iterator iter = pTeam->IterBegin ();
+        for ( ; iter != pTeam->IterEnd (); iter++ )
         {
-            lua_newtable ( luaVM );
-
-            unsigned int uiIndex = 0;
-
-            list < CClientPlayer* > ::const_iterator iter = pTeam->IterBegin ();
-            for ( ; iter != pTeam->IterEnd (); iter++ )
+            CClientPlayer* pPlayer = *iter;
+            if ( !pPlayer->IsBeingDeleted () )
             {
-                CClientPlayer* pPlayer = *iter;
-                if ( !pPlayer->IsBeingDeleted () )
-                {
-                    lua_pushnumber ( luaVM, ++uiIndex );
-                    lua_pushelement ( luaVM, pPlayer );
-                    lua_settable ( luaVM, -3 );
-                }
+                lua_pushnumber ( luaVM, ++uiIndex );
+                lua_pushelement ( luaVM, pPlayer );
+                lua_settable ( luaVM, -3 );
             }
-
-            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -194,14 +174,9 @@ int CLuaTeamDefs::CountPlayersInTeam ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pTeam )
-        {
-            unsigned int uiCount = pTeam->CountPlayers ();
-            lua_pushnumber ( luaVM, uiCount );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "team", 1 );
+        unsigned int uiCount = pTeam->CountPlayers ();
+        lua_pushnumber ( luaVM, uiCount );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

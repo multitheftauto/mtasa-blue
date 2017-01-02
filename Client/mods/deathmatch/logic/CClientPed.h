@@ -301,7 +301,7 @@ public:
     void                        SetChoking                  ( bool bChoking );
     bool                        IsChoking                   ( void );
   
-    void                        SetWearingGoggles           ( bool bWearing );
+    void                        SetWearingGoggles           ( bool bWearing, bool animationEnabled = true );
     bool                        IsWearingGoggles            ( bool bCheckMoving = false );
     bool                        IsMovingGoggles             ( bool & bPuttingOn );
 

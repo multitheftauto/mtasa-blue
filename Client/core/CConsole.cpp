@@ -18,8 +18,10 @@
 using SharedUtil::CalcMTASAPath;
 using std::string;
 
-#define CONSOLE_HISTORY_LENGTH 128
-#define CONSOLE_SIZE 4096
+#define CONSOLE_HISTORY_LENGTH      128
+#define CONSOLE_SIZE                4096
+
+#define MAX_CONSOLE_COMMAND_LENGTH  255
 
 #define NATIVE_RES_X    1152.0f
 #define NATIVE_RES_Y    864.0f
@@ -49,6 +51,7 @@ CConsole::CConsole ( CGUI* pManager, CGUIElement* pParent )
     m_pWindow->SetSizedHandler ( GUI_CALLBACK ( &CConsole::OnWindowSize, this ) );
 
     m_pInput->SetTextAcceptedHandler ( GUI_CALLBACK ( &CConsole::Edit_OnTextAccepted, this ) );
+    m_pInput->SetMaxLength ( MAX_CONSOLE_COMMAND_LENGTH );
 
     m_pHistory->SetTextChangedHandler ( GUI_CALLBACK ( &CConsole::History_OnTextChanged, this ) );
 
@@ -529,16 +532,54 @@ void CConsole::FlushPendingAdd ( void )
         float fScroll = m_pHistory->GetVerticalScrollPosition ();
         float fMaxScroll = m_pHistory->GetScrollbarDocumentSize () - m_pHistory->GetScrollbarPageSize ();
 
+        // Grab selection
+        uint uiSelectionStart = m_pHistory->GetSelectionStart ();
+        uint uiSelectionEnd = m_pHistory->GetSelectionEnd ();
+        uint uiSelectionLength = m_pHistory->GetSelectionLength ();
+
         // Make new buffer
         SString strBuffer = m_pHistory->GetText ();
         strBuffer += m_strPendingAdd;
         m_strPendingAdd = "";
 
         // Trim new buffer
-        if ( strBuffer.length () > CONSOLE_SIZE )
+        uint uiBufferLength = strBuffer.length ();
+
+        if ( uiBufferLength > CONSOLE_SIZE )
         {
             strBuffer = strBuffer.Right ( CONSOLE_SIZE );
             strBuffer = strBuffer.SplitRight ( "\n" );
+
+            // Fix text selection coords after trimming
+            if ( uiSelectionLength > 0 )
+            {
+                uint uiBufferLengthDiff = uiBufferLength - strBuffer.length ();
+
+                // Beware of underflows, all cases must be properly handled
+                if ( uiSelectionEnd < uiBufferLengthDiff )
+                {
+                    // Whole selection would be out of the screen now, so technically
+                    // it does not exist anymore
+                    uiSelectionStart = 0;
+                    uiSelectionEnd = 0;
+                    uiSelectionLength = 0;
+                }
+                else if ( uiSelectionStart < uiBufferLengthDiff )
+                {
+                    // Start of selection would be out of the screen now,
+                    // so it must be shortened
+                    uiSelectionLength -= uiBufferLengthDiff - uiSelectionStart;
+                    uiSelectionStart = 0;
+                    uiSelectionEnd -= uiBufferLengthDiff;
+                }
+                else // Both start and end of selection are greater than length difference
+                {
+                    // Whole selection would still be visible on the screen,
+                    // just a simple movement is needed
+                    uiSelectionStart -= uiBufferLengthDiff;
+                    uiSelectionEnd -= uiBufferLengthDiff;
+                }
+            }
         }
 
         // Set new buffer
@@ -547,5 +588,9 @@ void CConsole::FlushPendingAdd ( void )
         // If not at the end, keep the scrollbar position
         if ( fScroll < fMaxScroll )
             m_pHistory->SetVerticalScrollPosition ( fScroll );
+
+        // Restore text selection if any
+        if ( uiSelectionLength > 0 )
+            m_pHistory->SetSelection ( uiSelectionStart, uiSelectionEnd );
     }
 }

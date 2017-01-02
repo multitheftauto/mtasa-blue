@@ -180,7 +180,7 @@ void CWebCore::DoEventQueuePulse ()
     }
 }
 
-eURLState CWebCore::GetURLState ( const SString& strURL, bool bOutputDebug )
+eURLState CWebCore::GetDomainState ( const SString& strURL, bool bOutputDebug )
 {
     std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
     
@@ -302,7 +302,7 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallb
     bool bNewItem = false;
     for ( const auto& page : pages )
     {
-        eURLState status = GetURLState ( page );
+        eURLState status = GetDomainState ( page );
         if ( status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED )
             continue;
 

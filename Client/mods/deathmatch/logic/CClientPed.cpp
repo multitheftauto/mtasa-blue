@@ -1870,6 +1870,10 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
     // Stop pressing buttons
     SetControllerState ( CControllerState () );
 
+    // Remove goggles #9477
+    if ( IsWearingGoggles ( ) )
+        SetWearingGoggles ( false, false );
+
     m_bDead = true;
 }
 
@@ -4300,7 +4304,7 @@ bool CClientPed::IsChoking ( void )
 }
 
 
-void CClientPed::SetWearingGoggles ( bool bWearing )
+void CClientPed::SetWearingGoggles ( bool bWearing, bool animationEnabled )
 {
     if ( m_pPlayerPed )
     {
@@ -4310,10 +4314,13 @@ void CClientPed::SetWearingGoggles ( bool bWearing )
             m_pPlayerPed->SetGogglesState ( bWearing );
 
             // Are our goggle anims loaded?
-            CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( "GOGGLES" );
-            if ( pBlock->IsLoaded () )
+            if (animationEnabled)
             {
-                BlendAnimation ( ANIM_GROUP_GOGGLES, ANIM_ID_GOGGLES_ON, 4.0f );
+                CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("GOGGLES");
+                if (pBlock->IsLoaded())
+                {
+                    BlendAnimation(ANIM_GROUP_GOGGLES, ANIM_ID_GOGGLES_ON, 4.0f);
+                }
             }
         }
     }

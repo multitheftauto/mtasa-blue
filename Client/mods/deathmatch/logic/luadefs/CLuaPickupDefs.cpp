@@ -96,14 +96,9 @@ int CLuaPickupDefs::GetPickupType ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pPickup )
-        {
-            unsigned char ucType = pPickup->m_ucType;
-            lua_pushnumber ( luaVM, ucType );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "pickup", 1 );
+        unsigned char ucType = pPickup->m_ucType;
+        lua_pushnumber ( luaVM, ucType );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -121,14 +116,9 @@ int CLuaPickupDefs::GetPickupWeapon ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pPickup )
-        {
-            unsigned char ucWeapon = pPickup->m_ucWeaponType;
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucWeapon ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "pickup", 1 );
+        unsigned char ucWeapon = pPickup->m_ucWeaponType;
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucWeapon ) );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -146,14 +136,9 @@ int CLuaPickupDefs::GetPickupAmount ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pPickup )
-        {
-            float fAmount = pPickup->m_fAmount;
-            lua_pushnumber ( luaVM, fAmount );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "pickup", 1 );
+        float fAmount = pPickup->m_fAmount;
+        lua_pushnumber ( luaVM, fAmount );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -171,14 +156,9 @@ int CLuaPickupDefs::GetPickupAmmo ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pPickup )
-        {
-            unsigned short usAmmo = pPickup->m_usAmmo;
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( usAmmo ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "pickup", 1 );
+        unsigned short usAmmo = pPickup->m_usAmmo;
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( usAmmo ) );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -202,17 +182,12 @@ int CLuaPickupDefs::SetPickupType ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Do it
+        if ( CStaticFunctionDefinitions::SetPickupType ( *pEntity, ucType, dArgumentDependant, dblAmmo ) )
         {
-            // Do it
-            if ( CStaticFunctionDefinitions::SetPickupType ( *pEntity, ucType, dArgumentDependant, dblAmmo ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
