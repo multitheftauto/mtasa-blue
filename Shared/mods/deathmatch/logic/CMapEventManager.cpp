@@ -46,8 +46,7 @@ bool CMapEventManager::Add(CLuaMain* pLuaMain, const std::string& strName, const
     }
 
     // Emplace to the map
-    m_EventsMap.emplace_hint(iter, strName,
-                             std::make_unique<CMapEvent>(pLuaMain, strName, iLuaFunction, bPropagated, eventPriority, fPriorityMod));
+    m_EventsMap.emplace_hint(iter, strName, new CMapEvent(pLuaMain, strName, iLuaFunction, bPropagated, eventPriority, fPriorityMod));
     m_bHasEvents = true;
     return true;
 }
