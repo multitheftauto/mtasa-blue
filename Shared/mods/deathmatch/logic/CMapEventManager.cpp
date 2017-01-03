@@ -107,7 +107,7 @@ bool CMapEventManager::Delete(CLuaMain* pLuaMain)
 
 void CMapEventManager::DeleteAll(void)
 {
-    Delete([&](const auto&) { return true; });
+    Delete([&](const std::unique_ptr<CMapEvent>&) { return true; });
 }
 
 #ifdef MTA_CLIENT
