@@ -107,7 +107,7 @@ bool CMapEventManager::Delete(CLuaMain* pLuaMain)
 
 void CMapEventManager::DeleteAll(void)
 {
-    Delete([&](const std::unique_ptr<CMapEvent>&) { return true; });
+    Delete([](const std::unique_ptr<CMapEvent>&) { return true; });
 }
 
 #ifdef MTA_CLIENT
@@ -348,28 +348,29 @@ void CMapEventManager::TakeOutTheTrash()
     // Clear the trashcan
     m_TrashCan.clear();
 }
-
+template<typename T> struct foo{};
 bool CMapEventManager::HandleExists(CLuaMain* pLuaMain, const std::string& strName, const CLuaFunctionRef& iLuaFunction)
 {
     // Return true if we find an event which matches the handle
     EventsIterPair itPair = m_EventsMap.equal_range(strName);
     return std::find_if(itPair.first, itPair.second,
-                        [&](const auto& pair) {
-                            const auto& pMapEvent = pair.second;
-                            // Is it not being destroyed?
-                            if (pMapEvent->IsBeingDestroyed())
-                                return false;
-                            // Same lua main?
-                            if (pMapEvent->GetVM() != pLuaMain)
-                                return false;
-                            // Same name?
-                            dassert(pMapEvent->GetName() == strName);
-                            // Same lua function?
-                            if (pMapEvent->GetLuaFunction() != iLuaFunction)
-                                return false;
-                            // It exists
-                            return true;
-                        }) != itPair.second;
+                        [&](const std::pair<const std::string, std::unique_ptr<CMapEvent>>& pair)
+    {
+        const auto& pMapEvent = pair.second;
+        // Is it not being destroyed?
+        if (pMapEvent->IsBeingDestroyed())
+            return false;
+        // Same lua main?
+        if (pMapEvent->GetVM() != pLuaMain)
+            return false;
+        // Same name?
+        dassert(pMapEvent->GetName() == strName);
+        // Same lua function?
+        if (pMapEvent->GetLuaFunction() != iLuaFunction)
+            return false;
+        // It exists
+        return true;
+    }) != itPair.second;
 }
 
 void CMapEventManager::GetHandles(CLuaMain* pLuaMain, const std::string& strName, lua_State* luaVM)

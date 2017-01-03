@@ -42,7 +42,7 @@ private:
     using EventsIterPair = std::pair<EventsIter, EventsIter>;
 
     template <typename Predicate>
-    bool Delete(Predicate& pred)
+    bool Delete(const Predicate& pred)
     {
         bool bRemovedSomeone = false;
         auto iter = m_EventsMap.begin();
