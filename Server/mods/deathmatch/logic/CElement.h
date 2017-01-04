@@ -129,7 +129,8 @@ public:
 
     bool                                        AddEvent                    ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod );
     bool                                        CallEvent                   ( const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller = NULL );
-    bool                                        DeleteEvent                 ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
+    bool                                        DeleteEvent                 ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction );
+    bool                                        DeleteEvent                 ( CLuaMain* pLuaMain, const char* szName );
     void                                        DeleteEvents                ( CLuaMain* pLuaMain, bool bRecursive );
     void                                        DeleteAllEvents             ( void );
 

@@ -147,6 +147,22 @@ bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain& LuaMain, const c
     return false;
 }
 
+bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain& LuaMain, const char* szName, CClientEntity& Entity )
+{
+    assert ( szName );
+
+    // We got an event and handler with that name?
+    if ( m_pEvents->Exists ( szName ) )
+    {
+        // ACHTUNG: CHECK WHETHER THE LUA FUNCTION REF IS CORRECTLY FOUND
+        if ( Entity.DeleteEvent ( &LuaMain, szName ) )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 bool CStaticFunctionDefinitions::TriggerEvent ( const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled )
 {
