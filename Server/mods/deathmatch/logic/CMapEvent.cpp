@@ -14,7 +14,7 @@
 
 #include "StdInc.h"
 
-CMapEvent::CMapEvent(CLuaMain* pMain, std::string strName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod)
+CMapEvent::CMapEvent ( CLuaMain* pMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod )
 {
     // Init
     m_pMain = pMain;
@@ -24,20 +24,27 @@ CMapEvent::CMapEvent(CLuaMain* pMain, std::string strName, const CLuaFunctionRef
     m_bBeingDestroyed = false;
     m_eventPriority = eventPriority;
     m_fPriorityMod = fPriorityMod;
-    m_strName = strName;
-#ifdef MTA_CLIENT
-    // Only allow dxSetAspectRatioAdjustmentEnabled during these events
-    m_bAllowAspectRatioAdjustment = (m_strName == "onClientRender") || (m_strName == "onClientPreRender") || (m_strName == "onClientHUDRender");
-    // Force aspect ratio adjustment for 'customblips' resource
-    m_bForceAspectRatioAdjustment = m_bAllowAspectRatioAdjustment && SStringX(pMain->GetScriptName()) == "customblips";
-#endif
+    m_strName.AssignLeft ( szName, MAPEVENT_MAX_LENGTH_NAME );
 }
 
-void CMapEvent::Call(const CLuaArguments& Arguments)
+
+CMapEvent::~CMapEvent ( void )
 {
-    if (m_pMain)
+}
+
+
+void CMapEvent::Call ( const CLuaArguments& Arguments )
+{
+    if ( m_pMain )
     {
         // Call our function with the given arguments
-        Arguments.Call(m_pMain, m_iLuaFunction);
+        Arguments.Call ( m_pMain, m_iLuaFunction );
     }
+}
+
+bool CMapEvent::IsHigherPriorityThan ( const CMapEvent* pOther )
+{
+    return m_eventPriority > pOther->m_eventPriority ||
+         ( m_eventPriority == pOther->m_eventPriority &&
+           m_fPriorityMod > pOther->m_fPriorityMod );
 }

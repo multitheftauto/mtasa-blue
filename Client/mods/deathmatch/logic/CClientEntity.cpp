@@ -841,12 +841,6 @@ bool CClientEntity::DeleteEvent ( CLuaMain* pLuaMain, const char* szName, const 
 }
 
 
-bool CClientEntity::DeleteEvent ( CLuaMain* pLuaMain, const char* szName )
-{
-    return m_pEventManager->Delete ( pLuaMain, szName );
-}
-
-
 void CClientEntity::DeleteEvents ( CLuaMain* pLuaMain, bool bRecursive )
 {
     // Delete it from our events

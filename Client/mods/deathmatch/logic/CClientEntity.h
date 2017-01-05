@@ -251,7 +251,6 @@ public:
     void                                        CallEventNoParent       ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource );
     void                                        CallParentEvent         ( const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource );
     bool                                        DeleteEvent             ( CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction );
-    bool                                        DeleteEvent             ( CLuaMain* pLuaMain, const char* szName );
     void                                        DeleteEvents            ( CLuaMain* pLuaMain, bool bRecursive );
     void                                        DeleteAllEvents         ( void );
 
