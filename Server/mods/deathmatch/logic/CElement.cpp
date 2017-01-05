@@ -482,11 +482,6 @@ bool CElement::DeleteEvent ( CLuaMain* pLuaMain, const char* szName, const CLuaF
 }
 
 
-bool CElement::DeleteEvent ( CLuaMain* pLuaMain, const char* szName )
-{
-    return m_pEventManager->Delete ( pLuaMain, szName );
-}
-
 void CElement::DeleteEvents ( CLuaMain* pLuaMain, bool bRecursive )
 {
     // Delete it from our events

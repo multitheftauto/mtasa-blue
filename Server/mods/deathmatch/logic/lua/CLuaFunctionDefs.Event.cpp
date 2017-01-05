@@ -122,20 +122,14 @@ int CLuaFunctionDefs::AddEventHandler ( lua_State* luaVM )
 
 int CLuaFunctionDefs::RemoveEventHandler ( lua_State* luaVM )
 {
-    //  bool removeEventHandler ( string eventName, element attachedTo [, function functionVar] )
+    //  bool removeEventHandler ( string eventName, element attachedTo, function functionVar )
     SString strName; CElement* pElement; CLuaFunctionRef iLuaFunction;
 
-    bool bDeleteAll = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strName );
     argStream.ReadUserData ( pElement );
-
-    if ( !argStream.NextIsNone () )
-    {
-        argStream.ReadFunction ( iLuaFunction );
-        argStream.ReadFunctionComplete ( );
-        bDeleteAll = false;
-    }
+    argStream.ReadFunction ( iLuaFunction );
+    argStream.ReadFunctionComplete ();
 
     if ( !argStream.HasErrors () )
     {
@@ -143,11 +137,11 @@ int CLuaFunctionDefs::RemoveEventHandler ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            if ( bDeleteAll )
-                lua_pushboolean ( luaVM, CStaticFunctionDefinitions::RemoveEventHandler ( pLuaMain, strName, pElement ) );
-            else 
-                lua_pushboolean ( luaVM, CStaticFunctionDefinitions::RemoveEventHandler ( pLuaMain, strName, pElement, iLuaFunction ) );
-            return 1;
+            if ( CStaticFunctionDefinitions::RemoveEventHandler ( pLuaMain, strName, pElement, iLuaFunction ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
     else

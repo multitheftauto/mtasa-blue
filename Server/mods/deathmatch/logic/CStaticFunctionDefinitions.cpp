@@ -144,24 +144,6 @@ bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain* pLuaMain, const 
 }
 
 
-bool CStaticFunctionDefinitions::RemoveEventHandler ( CLuaMain* pLuaMain, const char* szName, CElement* pElement )
-{
-    assert ( pLuaMain );
-    assert ( szName );
-    assert ( pElement );
-
-    // We got an event and handler with that name?
-    if ( m_pEvents->Exists ( szName ) )
-    {
-        if ( pElement->DeleteEvent ( pLuaMain, szName ) )
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::TriggerEvent ( const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool & bWasCanceled )
 {
     // There is such event?
