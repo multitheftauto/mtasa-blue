@@ -134,6 +134,7 @@ workspace "MTASA"
 		
 		group "Vendor"
 		include "vendor/cryptopp"
+		include "vendor/detours"
 		include "vendor/ehs"
 		include "vendor/google-breakpad"
 		include "vendor/json-c"

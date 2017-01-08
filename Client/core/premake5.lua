@@ -20,11 +20,6 @@ project "Client Core"
 			"../../vendor/sparsehash/src/"
 		}
 
-	libdirs {
-		"../../vendor/detours/lib",
-	}
-	
-
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
