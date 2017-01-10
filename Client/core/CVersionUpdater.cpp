@@ -1525,21 +1525,6 @@ void CVersionUpdater::_CheckSidegradeRequirements ( void )
     bool bVersionMatch = ( strLaunchVersion == m_strSidegradeVersion );
     bool bLaunchPathValid = ( strLaunchHash == CMD5Hasher::CalculateHexString ( m_strSidegradePath ) );
 
-    if ( !bVersionMatch || !bLaunchPathValid )
-    {
-        // Try again with datum from legacy registry settings
-        if ( m_strSidegradeVersion == "1.0" )
-        {
-            m_strSidegradePath = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path" );
-            strLaunchHash = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path Hash" );
-            strLaunchVersion = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path Version" );
-
-            // Re-validate
-            bVersionMatch = ( strLaunchVersion == m_strSidegradeVersion );
-            bLaunchPathValid = ( strLaunchHash == CMD5Hasher::CalculateHexString ( m_strSidegradePath ) );
-        }
-    }
-
     if ( bVersionMatch && bLaunchPathValid )
     {
         // Check core.dll version in case user has installed over different major version

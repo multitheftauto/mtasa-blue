@@ -698,12 +698,6 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
         SetRegistryValue ( "", "Last Run Path Hash", strHash );
         SetRegistryValue ( "", "Last Run Path Version", MTA_DM_ASE_VERSION );
 
-        // Also save for legacy 1.0 to see
-        SString strThisVersion = SStringX ( MTA_DM_ASE_VERSION ).TrimEnd ( "n" );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path", strLaunchPathFilename );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Hash", strHash );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Version", MTA_DM_ASE_VERSION );
-
         // Strip the module name out of the path.
         SString strLaunchPath = GetLaunchPath();
 
@@ -792,11 +786,6 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 
     // Try HKLM "SOFTWARE\\Multi Theft Auto: San Andreas All\\Common\\"
     pathList.push_back ( GetCommonRegistryValue ( "", "GTA:SA Path" ) );
-    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.0\\"
-    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.0", "", "GTA:SA Path" ) );
-    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.1\\"
-    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.1", "", "GTA:SA Path Backup" ) );
-
 
     // Unicode character check on first one
     if ( strlen( pathList[0].c_str () ) )
@@ -1750,7 +1739,7 @@ void MaybeShowCopySettingsDialog ( void )
     // Copy some directories if empty
     SString strCurrentNewsDir = PathJoin ( GetMTADataPath (), "news" );
 
-    SString strPreviousDataPath = PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", strPreviousVersion );
+    SString strPreviousDataPath = PathJoin ( GetSystemCommonAppDataPath(), GetProductCommonDataDir(), strPreviousVersion );
     SString strPreviousNewsDir = PathJoin ( strPreviousDataPath, "news" );
 
     if ( IsDirectoryEmpty( strCurrentNewsDir ) && DirectoryExists( strPreviousNewsDir ) )

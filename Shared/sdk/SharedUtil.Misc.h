@@ -37,10 +37,6 @@ namespace SharedUtil
     void SetCommonRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue );
     SString GetCommonRegistryValue ( const SString& strPath, const SString& strName );
 
-    // Get/set registry values for particular version using the old (HKCU) layout
-    void SetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue );
-    SString GetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName );
-
 
     bool ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
     bool ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
@@ -122,6 +118,13 @@ namespace SharedUtil
     bool            WatchDogWasLastRunCrash         ( void );
     void            WatchDogSetLastRunCrash         ( bool bOn );
     void            WatchDogUserDidInteractWithMenu ( void );
+
+    void            SetProductRegistryPath          ( const SString& strRegistryPath );
+    const SString&  GetProductRegistryPath          ( void );
+    void            SetProductCommonDataDir         ( const SString& strCommonDataDir );
+    const SString&  GetProductCommonDataDir         ( void );
+    void            SetProductVersion               ( const SString& strVersion );
+    const SString&  GetProductVersion               ( void );
 
     // BrowseToSolution flags
     enum
