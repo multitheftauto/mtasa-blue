@@ -47,9 +47,8 @@ public:
 
 #define MAX_TEAM_NAME_LENGTH 255
 
-// Min and max number of characters in passwords
+// Min number of characters in passwords
 #define MIN_PASSWORD_LENGTH 1
-#define MAX_PASSWORD_LENGTH 30
 
 // Min and max number of characters in chat messages
 #define MIN_CHAT_LENGTH 1

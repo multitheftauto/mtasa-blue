@@ -942,7 +942,7 @@ bool CAccountManager::IsValidAccountName( const SString& strName )
 //
 bool CAccountManager::IsValidPassword( const SString& strPassword )
 {
-    if ( strPassword.length() < MIN_PASSWORD_LENGTH || strPassword.length() > MAX_PASSWORD_LENGTH )
+    if ( strPassword.length() < MIN_PASSWORD_LENGTH )
         return false;
     return true;
 }
