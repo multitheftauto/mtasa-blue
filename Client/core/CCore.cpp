@@ -25,7 +25,7 @@
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
-#include "detours/include/detours.h"
+#include "SharedUtil.Detours.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;

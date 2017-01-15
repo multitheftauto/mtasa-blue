@@ -638,15 +638,11 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
         }
     }
 
-    // If aero option reg entry doesn't exist in new, but does in old place, move it
+    // Set aero option if reg entry doesn't exist
     {
         if ( GetApplicationSetting ( "aero-enabled" ).empty () )
         {
-            SString strLegacyValue = GetVersionRegistryValueLegacy ( GetMajorVersionString (), PathJoin ( "Settings", "general" ), "aero-enabled" );
-            if ( !strLegacyValue.empty () )
-                SetApplicationSettingInt ( "aero-enabled", atoi ( strLegacyValue ) );
-            else
-                SetApplicationSettingInt ( "aero-enabled", 1 );
+            SetApplicationSettingInt ( "aero-enabled", 1 );
         }
     }
 

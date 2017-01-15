@@ -70,6 +70,25 @@ void _declspec(naked) HOOK_CallIdle()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// IsEntityRenderable
+//
+// Return false if should not render
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool IsEntityRenderable( CEntitySAInterface* pEntity )
+{
+    bool bIsPlaceable = ((DWORD)(pEntity->vtbl) == VTBL_CPlaceable);
+    bool bHasRwObject = (pEntity->m_pRwObject != nullptr);
+    if (bIsPlaceable || !bHasRwObject)
+    {
+        AddReportLog( 8645, SString( "Error in render list: IsPlaceable:%d HasRwObject:%d", bIsPlaceable, bHasRwObject ) );
+    }
+    return !bIsPlaceable && bHasRwObject;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CEntity::Render
 //
 // Detect entity rendering
@@ -130,10 +149,11 @@ inner:
 // Detect entity rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CEntity_RenderOneNonRoad_Pre( CEntitySAInterface* pEntity )
+bool OnMY_CEntity_RenderOneNonRoad_Pre( CEntitySAInterface* pEntity )
 {
     ms_RenderingOneNonRoad = pEntity;
     CallGameEntityRenderHandler ( ms_RenderingOneNonRoad );
+    return IsEntityRenderable( pEntity );
 }
 
 void OnMY_CEntity_RenderOneNonRoad_Post( CEntitySAInterface* pEntity )
@@ -157,11 +177,14 @@ void _declspec(naked) HOOK_CEntity_RenderOneNonRoad()
         push    [esp+32+4*1]
         call    OnMY_CEntity_RenderOneNonRoad_Pre
         add     esp, 4*1
+        cmp     eax, 0
         popad
 
+        jz      skip_render
         push    [esp+4*1]
         call inner
         add     esp, 4*1
+skip_render:
 
         pushad
         push    [esp+32+4*1]

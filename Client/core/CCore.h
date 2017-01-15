@@ -272,6 +272,9 @@ public:
     void                    NotifyRenderingGrass            ( bool bIsRenderingGrass );
     bool                    IsRenderingGrass                ( void )                { return m_bIsRenderingGrass; }
     bool                    GetRightSizeTxdEnabled          ( void );
+    const char*             GetProductRegistryPath          ( void )                { return SharedUtil::GetProductRegistryPath(); }
+    const char*             GetProductCommonDataDir         ( void )                { return SharedUtil::GetProductCommonDataDir(); }
+    const char*             GetProductVersion               ( void )                { return SharedUtil::GetProductVersion(); }
 
 private:
     // Core devices.

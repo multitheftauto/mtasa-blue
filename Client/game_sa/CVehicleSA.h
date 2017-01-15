@@ -738,8 +738,6 @@ public:
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 
-    bool                        CheckVTBL                       ( void ) { return (m_pInterface->vtbl && (DWORD)m_pInterface->vtbl == VTBL_CPlaceable); }
-
     bool                        DoesVehicleHaveSirens           ( void ) { return m_tSirenInfo.m_bOverrideSirens; }
 
     void                        GiveVehicleSirens               ( unsigned char ucSirenType, unsigned char ucSirenCount );

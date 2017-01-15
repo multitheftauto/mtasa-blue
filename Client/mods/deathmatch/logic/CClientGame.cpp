@@ -1180,6 +1180,7 @@ void CClientGame::DoPulses ( void )
         GetResourceFileDownloadManager()->DoPulse();
         DownloadSingularResourceFiles ();
         g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
+        g_pNet->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE_ANY_HOST)->ProcessQueuedFiles();
     }
 
     // Not waiting for local connect?
@@ -1394,7 +1395,7 @@ void CClientGame::HandleRadioPrevious ( CControlFunctionBind*  )
 bool CClientGame::IsNametagValid ( const char* szNick )
 {
     // Grab the size of the nametag. Check that it's not to long or short
-    size_t sizeNick = strlen ( szNick );
+    size_t sizeNick = MbUTF8ToUTF16( szNick ).size();
     if ( sizeNick < MIN_PLAYER_NAMETAG_LENGTH || sizeNick > MAX_PLAYER_NAMETAG_LENGTH )
     {
         return false;
@@ -2313,6 +2314,7 @@ void CClientGame::SetAllDimensions ( unsigned short usDimension )
     m_pManager->GetPointLightsManager ()->SetDimension ( usDimension );
     m_pManager->GetWaterManager()->SetDimension( usDimension );
     m_pNametags->SetDimension ( usDimension );
+    m_pCamera->SetDimension( usDimension );
 }
 
 

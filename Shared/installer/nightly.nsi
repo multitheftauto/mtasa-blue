@@ -683,6 +683,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\cefweb.dll"
         
         SetOutPath "$INSTDIR\MTA"
+		File "${FILES_ROOT}\mta\chrome_elf.dll"
         File "${FILES_ROOT}\mta\libcef.dll"
         File "${FILES_ROOT}\mta\icudtl.dat"
         File "${FILES_ROOT}\mta\libEGL.dll"

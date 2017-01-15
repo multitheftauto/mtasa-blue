@@ -617,7 +617,7 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
         long lBytesWritten = 0; // Total bytes written
         
         // While we're not out of string arguments
-        // (we will always have one string because we validated it above)
+        // (we will always have at least one string because we validated it above)
         while ( argStream.NextIsString () )
         {
             // Grab argument and length
@@ -737,7 +737,11 @@ int CLuaFileDefs::fileGetPath ( lua_State* luaVM )
             // we need to prepend :resourceName to the path
             if ( pThisResource != pFileResource )
             {
+#ifdef MTA_CLIENT
+                strFilePath = SString ( ":%s/%s", pFileResource->GetName (), *strFilePath );
+#else
                 strFilePath = SString ( ":%s/%s", *pFileResource->GetName (), *strFilePath );
+#endif
             }
 
             lua_pushlstring ( luaVM, strFilePath, strFilePath.length () );

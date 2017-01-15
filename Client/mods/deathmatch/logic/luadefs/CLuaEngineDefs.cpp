@@ -290,24 +290,18 @@ int CLuaEngineDefs::EngineReplaceCOL ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        // Valid collision model?
-        if ( pCol )
+        // Valid client DFF and model?
+        if ( CClientColModelManager::IsReplacableModel ( usModel ) )
         {
-            // Valid client DFF and model?
-            if ( CClientColModelManager::IsReplacableModel ( usModel ) )
+            // Replace the colmodel
+            if ( pCol->Replace ( usModel ) )
             {
-                // Replace the colmodel
-                if ( pCol->Replace ( usModel ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "col", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
@@ -354,28 +348,22 @@ int CLuaEngineDefs::EngineImportTXD ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
-        // Valid txd?
-        if ( pTXD )
+        // Valid importable model?
+        ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+        if ( usModelID == INVALID_MODEL_ID )
+            usModelID = CModelNames::ResolveClothesTexID ( strModelName );
+        if ( CClientTXD::IsImportableModel ( usModelID ) )
         {
-            // Valid importable model?
-            ushort usModelID = CModelNames::ResolveModelID ( strModelName );
-            if ( usModelID == INVALID_MODEL_ID )
-                usModelID = CModelNames::ResolveClothesTexID ( strModelName );
-            if ( CClientTXD::IsImportableModel ( usModelID ) )
+            // Try to import
+            if ( pTXD->Import ( usModelID ) )
             {
-                // Try to import
-                if ( pTXD->Import ( usModelID ) )
-                {
-                    // Success
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                // Success
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "txd", 1 );
+            m_pScriptDebugging->LogBadPointer ( luaVM, "number", 2 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );

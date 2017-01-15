@@ -1773,7 +1773,8 @@ bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArgume
         {
             if ( !info.IsAuthorized() )
             {
-                pEchoClient->SendConsole( SString( "authserial: Serial %s is authorized for '%s'", *info.strSerial, *strAccountName ) );
+                if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                    pEchoClient->SendConsole( SString( "authserial: Serial %s is authorized for '%s'", *info.strSerial, *strAccountName ) );
                 CLogger::LogPrintf( "AUTHSERIAL: Serial %s is authorized for '%s' (by %s)\n", *info.strSerial, *strAccountName, GetAdminNameForLog( pClient ).c_str() );
                 pAccount->AuthorizeSerial( info.strSerial, GetAdminNameForLog( pClient ) );
                 return true;
@@ -1797,7 +1798,8 @@ bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArgume
         }
         if ( !strNewestSerial.empty() )
         {
-            pEchoClient->SendConsole( SString( "authserial: Serial %s is removed for '%s'", *strNewestSerial, *strAccountName ) );
+            if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                pEchoClient->SendConsole( SString( "authserial: Serial %s is removed for '%s'", *strNewestSerial, *strAccountName ) );
             CLogger::LogPrintf( "AUTHSERIAL: Serial %s is removed for '%s' (by %s)\n", *strNewestSerial, *strAccountName, GetAdminNameForLog( pClient ).c_str() );
             pAccount->RemoveSerial( strNewestSerial );
             return true;

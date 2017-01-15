@@ -21,35 +21,40 @@
 class CGUIMemo_Impl : public CGUIMemo, public CGUIElement_Impl, public CGUITabListItem
 {
 public:
-                CGUIMemo_Impl           ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szText = "" );
-                ~CGUIMemo_Impl          ( void );
+                        CGUIMemo_Impl               ( class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szText = "" );
+                        ~CGUIMemo_Impl              ( void );
 
-    void        SetReadOnly             ( bool bReadOnly );
-    bool        IsReadOnly              ( void );
+    void                SetReadOnly                 ( bool bReadOnly );
+    bool                IsReadOnly                  ( void );
 
-    size_t      GetCaretIndex           ( void );
-    void        SetCaretIndex           ( size_t Index );
+    size_t              GetCaretIndex               ( void );
+    void                SetCaretIndex               ( size_t Index );
 
-    float       GetVerticalScrollPosition   ( void );
-    void        SetVerticalScrollPosition   ( float fPosition );
-    float       GetScrollbarDocumentSize    ( void );
-    float       GetScrollbarPageSize        ( void );
+    float               GetVerticalScrollPosition   ( void );
+    void                SetVerticalScrollPosition   ( float fPosition );
+    float               GetScrollbarDocumentSize    ( void );
+    float               GetScrollbarPageSize        ( void );
 
-    void        EnsureCaratIsVisible    ( void );
+    void                SetSelection                ( unsigned int uiStart, unsigned int uiEnd );
+    unsigned int        GetSelectionStart           ( void );
+    unsigned int        GetSelectionEnd             ( void );
+    unsigned int        GetSelectionLength          ( void );
 
-    bool        ActivateOnTab           ( void );
+    void                EnsureCaratIsVisible        ( void );
 
-    void        SetTextChangedHandler   ( const GUI_CALLBACK & Callback );
+    bool                ActivateOnTab               ( void );
 
-    eCGUIType   GetType                 ( void ) { return CGUI_MEMO; };
+    void                SetTextChangedHandler       ( const GUI_CALLBACK & Callback );
+
+    eCGUIType           GetType                     ( void ) { return CGUI_MEMO; };
 
     #include "CGUIElement_Inc.h"
 
 private:
-    bool        Event_TextChanged       ( const CEGUI::EventArgs& e );
-    bool        Event_OnKeyDown         ( const CEGUI::EventArgs& e );
+    bool                Event_TextChanged       ( const CEGUI::EventArgs& e );
+    bool                Event_OnKeyDown         ( const CEGUI::EventArgs& e );
 
-    GUI_CALLBACK    m_TextChanged;
+    GUI_CALLBACK        m_TextChanged;
 };
 
 #endif

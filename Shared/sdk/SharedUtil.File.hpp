@@ -375,12 +375,12 @@ SString SharedUtil::GetSystemTempPath ( void )
 
 SString SharedUtil::GetMTADataPath ( void )
 {
-    return PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", GetMajorVersionString () );
+    return PathJoin ( GetSystemCommonAppDataPath(), GetProductCommonDataDir(), GetMajorVersionString () );
 }
 
 SString SharedUtil::GetMTADataPathCommon ( void )
 {
-    return PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", "Common" );
+    return PathJoin ( GetSystemCommonAppDataPath(), GetProductCommonDataDir(), "Common" );
 }
 
 SString SharedUtil::GetMTATempPath ( void )

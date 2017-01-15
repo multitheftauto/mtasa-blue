@@ -1903,12 +1903,7 @@ bool CStaticFunctionDefinitions::GivePedWeapon ( CClientEntity& Entity, uchar uc
         // Make sure it's a ped and not a player
         if ( Ped.GetType () == CCLIENTPED )
         {
-            CWeapon* pPlayerWeapon = NULL;
-            pPlayerWeapon = Ped.GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usWeaponAmmo );
-            
-            // Set as current weapon?
-            if ( pPlayerWeapon && bSetAsCurrent )
-                pPlayerWeapon->SetAsCurrentWeapon ();
+            Ped.GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usWeaponAmmo, bSetAsCurrent );
             
             // Store the ammo so it's not lost if a ped is streamed out
             uchar ucSlot = CWeaponNames::GetSlotFromWeapon ( ucWeaponID );

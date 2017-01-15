@@ -32,14 +32,11 @@ project "Core"
 
       
 	filter "system:windows"
-		libdirs {
-			"../../vendor/detours/lib"
-		}
-		includedirs { 
-			"../../vendor/detours/include"
-		}
-		links { "detours", "Imagehlp" }
-	
+		links { "Imagehlp" }
+
+	filter {"system:windows", "platforms:x86"}
+		links { "detours" }
+
 	filter "system:not windows"
 		excludes { "CExceptionInformation_Impl.cpp" }
 

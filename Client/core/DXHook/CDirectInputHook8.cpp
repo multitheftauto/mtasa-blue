@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "detours/include/detours.h"
+#include "SharedUtil.Detours.h"
 
 template<> CDirectInputHook8 * CSingleton< CDirectInputHook8 >::m_pSingleton = NULL;
 IDirectInput8* g_pDirectInput8 = NULL;

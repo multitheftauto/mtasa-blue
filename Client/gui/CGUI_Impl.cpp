@@ -864,12 +864,18 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                 CloseClipboard();
                                 return true;
                             }
-                            strEditText = WndEdit->getText ();
+
+                            strEditText = WndEdit->getText();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
                             iCaratIndex = WndEdit->getCaratIndex();
                             bReplaceNewLines = false;
+
+                            // Plus one character, because there is always an extra '\n' in
+                            // MultiLineEditbox's text data and it causes MaxLength limit to 
+                            // be exceeded during pasting the text
+                            iMaxLength += 1;
                         }
 
                         std::wstring strClipboardText = ClipboardBuffer;
@@ -901,7 +907,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
                         std::wstring tmp = MbUTF8ToUTF16(strEditText.c_str());
-                        if ( ( strClipboardText.length () + tmp.length () ) < iMaxLength )
+                        if ( ( strClipboardText.length () + tmp.length () - iSelectionLength ) <= iMaxLength )
                         {
                             // Are there characters selected?
                             size_t sizeCaratIndex = 0;

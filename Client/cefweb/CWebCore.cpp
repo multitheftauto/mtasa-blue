@@ -18,6 +18,7 @@
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
 
+#define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
     #pragma comment(lib, "cef_sandbox.lib")
 #endif
@@ -51,13 +52,13 @@ bool CWebCore::Initialise ()
     void* sandboxInfo = nullptr;
     CefRefPtr<CWebApp> app(new CWebApp);
 
-#if CEF_ENABLE_SANDBOX
+#ifdef CEF_ENABLE_SANDBOX
     CefScopedSandboxInfo scopedSandbox;
     sandboxInfo = scopedSandbox.sandbox_info();
 #endif
 
     CefSettings settings;
-#if !CEF_ENABLE_SANDBOX
+#ifndef CEF_ENABLE_SANDBOX
     settings.no_sandbox = true;
 #endif
 
@@ -180,7 +181,7 @@ void CWebCore::DoEventQueuePulse ()
     }
 }
 
-eURLState CWebCore::GetURLState ( const SString& strURL, bool bOutputDebug )
+eURLState CWebCore::GetDomainState ( const SString& strURL, bool bOutputDebug )
 {
     std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
     
@@ -302,7 +303,7 @@ void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallb
     bool bNewItem = false;
     for ( const auto& page : pages )
     {
-        eURLState status = GetURLState ( page );
+        eURLState status = GetDomainState ( page );
         if ( status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED )
             continue;
 

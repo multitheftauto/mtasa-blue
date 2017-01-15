@@ -7,6 +7,8 @@
 *****************************************************************************/
 #pragma once
 
+#define LUA_GC_EXTRA_BYTES 30       // Used in hack to make lua GC more aggressive when using OOP Matrix & Vector
+
 // Lua function definitions (shared)
 #include "luadefs/CLuaBitDefs.h"
 #include "luadefs/CLuaCryptDefs.h"

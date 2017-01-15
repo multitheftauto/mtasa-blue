@@ -186,6 +186,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
     lua_classfunction ( luaVM, "getColor", "getVehicleColor" );
     lua_classfunction ( luaVM, "getGravity", OOP_GetVehicleGravity );
+    lua_classfunction ( luaVM, "getSirenParams", "getVehicleSirenParams" );
     lua_classfunction ( luaVM, "getSirens", "getVehicleSirens" );
     lua_classfunction ( luaVM, "getSirensOn", "getVehicleSirensOn" );
     lua_classfunction ( luaVM, "getComponentPosition", "getVehicleComponentPosition" );
@@ -254,6 +255,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "damageProof", NULL, "isVehicleDamageProof" );
     lua_classvariable ( luaVM, "helicopterRotorSpeed", "setHelicopterRotorSpeed", "getHelicopterRotorSpeed" );
     lua_classvariable ( luaVM, "heliBladeCollisionsEnabled", "setHeliBladeCollisionsEnabled", "getHeliBladeCollisionsEnabled" );
+    lua_classvariable ( luaVM, "sirenParams", nullptr, "getVehicleSirenParams" );
     lua_classvariable ( luaVM, "sirensOn", "setVehicleSirensOn", "getVehicleSirensOn" );
     lua_classvariable ( luaVM, "sirens", NULL, "getVehicleSirens" );
     lua_classvariable ( luaVM, "upgrades", NULL, "getVehicleUpgrades" );
@@ -411,32 +413,27 @@ int CLuaVehicleDefs::GetVehicleColor ( lua_State* luaVM )
         if ( argStream.NextIsBool () )
             argStream.ReadBool ( bRGB );
 
-        if ( pVehicle )
-        {
-            CVehicleColor& color = pVehicle->GetColor ();
+        CVehicleColor& color = pVehicle->GetColor ();
 
-            if ( bRGB )
+        if ( bRGB )
+        {
+            for ( uint i = 0; i < 4; i++ )
             {
-                for ( uint i = 0; i < 4; i++ )
-                {
-                    SColor RGBColor = color.GetRGBColor ( i );
-                    lua_pushnumber ( luaVM, RGBColor.R );
-                    lua_pushnumber ( luaVM, RGBColor.G );
-                    lua_pushnumber ( luaVM, RGBColor.B );
-                }
-                return 12;
+                SColor RGBColor = color.GetRGBColor ( i );
+                lua_pushnumber ( luaVM, RGBColor.R );
+                lua_pushnumber ( luaVM, RGBColor.G );
+                lua_pushnumber ( luaVM, RGBColor.B );
             }
-            else
-            {
-                lua_pushnumber ( luaVM, color.GetPaletteColor ( 0 ) );
-                lua_pushnumber ( luaVM, color.GetPaletteColor ( 1 ) );
-                lua_pushnumber ( luaVM, color.GetPaletteColor ( 2 ) );
-                lua_pushnumber ( luaVM, color.GetPaletteColor ( 3 ) );
-                return 4;
-            }
+            return 12;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        {
+            lua_pushnumber ( luaVM, color.GetPaletteColor ( 0 ) );
+            lua_pushnumber ( luaVM, color.GetPaletteColor ( 1 ) );
+            lua_pushnumber ( luaVM, color.GetPaletteColor ( 2 ) );
+            lua_pushnumber ( luaVM, color.GetPaletteColor ( 3 ) );
+            return 4;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1791,17 +1788,12 @@ int CLuaVehicleDefs::SetVehicleSirensOn ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Do it
+        if ( CStaticFunctionDefinitions::SetVehicleSirensOn ( *pEntity, bSirensOn ) )
         {
-            // Do it
-            if ( CStaticFunctionDefinitions::SetVehicleSirensOn ( *pEntity, bSirensOn ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

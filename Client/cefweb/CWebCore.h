@@ -19,7 +19,6 @@
 #define MTA_BROWSERDATA_PATH "mta/cef/browserdata.xml"
 #define BROWSER_LIST_UPDATE_INTERVAL (24*60*60)
 #define BROWSER_UPDATE_URL "http://cef.multitheftauto.com/get.php"
-#define CEF_ENABLE_SANDBOX 0
 #define GetNextSibling(hwnd) GetWindow(hwnd, GW_HWNDNEXT) // Re-define the conflicting macro
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
@@ -57,7 +56,7 @@ public:
     void                RemoveWebViewEvents ( CWebView* pWebView );
     void                DoEventQueuePulse   ();
     
-    eURLState           GetURLState         ( const SString& strURL, bool bOutputDebug = false );
+    eURLState           GetDomainState         ( const SString& strURL, bool bOutputDebug = false );
     SString             GetDomainFromURL    ( const SString& strURL );
     void                ResetFilter         ( bool bResetRequestsOnly = true );
     void                InitialiseWhiteAndBlacklist ( bool bAddHardcoded = true, bool bAddDynamic = true );

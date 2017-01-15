@@ -13,7 +13,7 @@
 *****************************************************************************/
 
 #include "UTF8.h"
-#include "UTF8Detect.cpp"
+#include "UTF8Detect.hpp"
 #ifdef WIN32
     #include <ctime>
     #include <direct.h>
@@ -34,6 +34,9 @@
 
 CCriticalSection CRefCountable::ms_CS;
 std::map < uint, uint > ms_ReportAmountMap;
+SString ms_strProductRegistryPath;
+SString ms_strProductCommonDataDir;
+SString ms_strProductVersion;
 
 struct SReportLine
 {
@@ -46,6 +49,8 @@ CDuplicateLineFilter < SReportLine > ms_ReportLineFilter;
 
 #ifdef MTA_CLIENT
 
+#define PRODUCT_REGISTRY_PATH       "Software\\Multi Theft Auto: San Andreas All"       // HKLM
+#define PRODUCT_COMMON_DATA_DIR     "MTA San Andreas All"                               // C:\ProgramData
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
 
@@ -192,36 +197,6 @@ SString SharedUtil::GetSystemRegistryValue ( uint hKey, const SString& strPath, 
 }
 
 
-
-// Old layout:
-//              HKCU Software\\Multi Theft Auto: San Andreas\\             - For 1.0
-//              HKCU Software\\Multi Theft Auto: San Andreas 1.1\\         - For 1.1
-//
-static SString MakeVersionRegistryPathLegacy ( const SString& strVersion, const SString& strPath )
-{
-    SString strResult = "Software\\Multi Theft Auto: San Andreas";
-    if ( strVersion != "1.0" )
-        strResult += " " + strVersion;
-
-    strResult = PathJoin ( strResult, strPath );
-    strResult = strResult.TrimEnd ( "\\" );
-    return strResult;
-}
-
-
-// Get/set registry values for a version using the old (HKCU) layout
-void SharedUtil::SetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue )
-{
-    WriteRegistryStringValue ( HKEY_CURRENT_USER, MakeVersionRegistryPathLegacy ( strVersion, strPath ), strName, strValue );
-}
-
-SString SharedUtil::GetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName )
-{
-    return ReadRegistryStringValue ( HKEY_CURRENT_USER, MakeVersionRegistryPathLegacy ( strVersion, strPath ), strName, NULL );
-}
-
-
-
 //
 // New layout:
 //              HKLM Software\\Multi Theft Auto: San Andreas All\\Common    - For all versions
@@ -230,7 +205,7 @@ SString SharedUtil::GetVersionRegistryValueLegacy ( const SString& strVersion, c
 //
 static SString MakeVersionRegistryPath ( const SString& strVersion, const SString& strPath )
 {
-    SString strResult = PathJoin ( "Software\\Multi Theft Auto: San Andreas All", strVersion, strPath );
+    SString strResult = PathJoin ( GetProductRegistryPath(), strVersion, strPath );
     return strResult.TrimEnd ( "\\" );
 }
 
@@ -541,6 +516,45 @@ void SharedUtil::WatchDogUserDidInteractWithMenu( void )
     WatchDogCompletedSection( WD_SECTION_POST_INSTALL );
 }
 
+
+void SharedUtil::SetProductRegistryPath( const SString& strRegistryPath )
+{
+    assert( ms_strProductRegistryPath.empty() && !strRegistryPath.empty() );
+    ms_strProductRegistryPath = strRegistryPath;
+}
+
+const SString& SharedUtil::GetProductRegistryPath( void )
+{
+    if ( ms_strProductRegistryPath.empty() )
+        ms_strProductRegistryPath = PRODUCT_REGISTRY_PATH;
+    return ms_strProductRegistryPath;
+}
+
+void SharedUtil::SetProductCommonDataDir( const SString& strCommonDataDir )
+{
+    assert( ms_strProductCommonDataDir.empty() && !strCommonDataDir.empty() );
+    ms_strProductCommonDataDir = strCommonDataDir;
+}
+
+const SString& SharedUtil::GetProductCommonDataDir( void )
+{
+    if ( ms_strProductCommonDataDir.empty() )
+        ms_strProductCommonDataDir = PRODUCT_COMMON_DATA_DIR;
+    return ms_strProductCommonDataDir;
+}
+
+void SharedUtil::SetProductVersion( const SString& strVersion )
+{
+    assert( ms_strProductVersion.empty() && !strVersion.empty() );
+    ms_strProductVersion = strVersion;
+}
+
+const SString& SharedUtil::GetProductVersion( void )
+{
+    if ( ms_strProductVersion.empty() )
+        ms_strProductVersion = SString( "%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD );
+    return ms_strProductVersion;
+}
 
 void SharedUtil::SetClipboardText ( const SString& strText )
 {
