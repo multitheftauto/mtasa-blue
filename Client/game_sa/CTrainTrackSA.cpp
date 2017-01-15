@@ -84,7 +84,8 @@ void CTrainTrackSA::Recalculate()
         auto nextPosition = nextNode.GetPosition();
 
         // Add to our distance
-        distance += (nextPosition - position).Length(); // TODO: Check if this must be 2D. Yes, it must! Maybe not
+        auto diff = nextPosition - position;
+        distance += std::sqrt(diff.fX * diff.fX + diff.fY * diff.fY);
 
         // Update rail distance
         nextNode.SetDistance(distance);
@@ -98,9 +99,6 @@ void CTrainTrackSA::Recalculate()
     {
         m_Length += (m_Nodes.front().GetPosition() - m_Nodes.back().GetPosition()).Length();
     }
-    //auto& startNode = *m_Nodes.begin();
-    //auto& endNode = m_Nodes.back();
-    //endNode.SetDistance((endNode.GetPosition() - startNode.GetPosition()).Length());
 
     // Don't forget to update references in manager (as std::vector might have relocated the underlying data)
     m_pManager->UpdateTrackData(this);
