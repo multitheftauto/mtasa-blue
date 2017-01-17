@@ -37,6 +37,7 @@ public:
 
     std::map < SString, CDatabaseConnection* >    m_SharedConnectionMap;
     std::set < CDatabaseConnection* >             m_AllConnectionMap;
+    SString                                       m_strStatsKeyHead;
 };
 
 
@@ -173,6 +174,10 @@ CDatabaseConnection* CDatabaseTypeSqlite::Connect ( const SString& strHost, cons
     if ( pConnection )
         MapInsert ( m_AllConnectionMap, pConnection );
 
+    // For stats
+    SString strQueueName;
+    GetOption<CDbOptionsMap>( strOptions, "queue", strQueueName );
+    m_strStatsKeyHead = SString( "dbcon sqlite [%s] ", *strQueueName );
     UpdateStats ();
 
     return pConnection;
@@ -191,7 +196,7 @@ void CDatabaseTypeSqlite::UpdateStats ( void )
     SString strModPath = PathConform ( g_pServerInterface->GetModManager ()->GetModPath () );
 
     // Remove all lines with this key
-    CPerfStatDebugTable::GetSingleton ()->RemoveLines ( "dbcon sqlite*" );
+    CPerfStatDebugTable::GetSingleton ()->RemoveLines ( m_strStatsKeyHead + "*" );
 
     int iIndex = 0;
     std::set < CDatabaseConnection* > unsharedConnectionMap = m_AllConnectionMap;
@@ -203,7 +208,7 @@ void CDatabaseTypeSqlite::UpdateStats ( void )
         CDatabaseConnection* pConnection = iter->second;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon sqlite %d", iIndex++ ), 0
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( m_strStatsKeyHead + SString( "%d", iIndex++ ), 0
                                                           ,"Database connection: sqlite (shared)"
                                                           ,*strShareKey
                                                           ,*SString ( "Share count: %d", pConnection->GetShareCount () )
@@ -220,7 +225,7 @@ void CDatabaseTypeSqlite::UpdateStats ( void )
         CDatabaseConnection* pConnection = *iter;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon sqlite %d", iIndex++ ), 0
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( m_strStatsKeyHead + SString( "%d", iIndex++ ), 0
                                                           ,"Database connection: sqlite (unshared)"
                                                           ,*pConnection->m_strOtherTag
                                                           ,*SString ( "Refs: %d", pConnection->GetShareCount () )

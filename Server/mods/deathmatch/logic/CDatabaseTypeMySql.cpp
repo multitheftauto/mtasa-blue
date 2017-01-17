@@ -42,6 +42,7 @@ public:
     NewDatabaseConnectionMySql_t*                   m_pfnNewDatabaseConnection;
     std::map < SString, CDatabaseConnection* >      m_SharedConnectionMap;
     std::set < CDatabaseConnection* >               m_AllConnectionMap;
+    SString                                         m_strStatsKeyHead;
 };
 
 
@@ -177,6 +178,10 @@ CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const
     if ( pConnection )
         MapInsert ( m_AllConnectionMap, pConnection );
 
+    // For stats
+    SString strQueueName;
+    GetOption<CDbOptionsMap>( strOptions, "queue", strQueueName );
+    m_strStatsKeyHead = SString( "dbcon mysql [%s] ", *strQueueName );
     UpdateStats ();
 
     return pConnection;
@@ -221,7 +226,7 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql ( CDatab
 void CDatabaseTypeMySql::UpdateStats ( void )
 {
     // Remove all lines with this key
-    CPerfStatDebugTable::GetSingleton ()->RemoveLines ( "dbcon mysql*" );
+    CPerfStatDebugTable::GetSingleton ()->RemoveLines ( m_strStatsKeyHead + "*" );
 
     int iIndex = 0;
     std::set < CDatabaseConnection* > unsharedConnectionMap = m_AllConnectionMap;
@@ -233,7 +238,7 @@ void CDatabaseTypeMySql::UpdateStats ( void )
         CDatabaseConnection* pConnection = iter->second;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), 0
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( m_strStatsKeyHead + SString( "%d", iIndex++ ), 0
                                                           ,"Database connection: mysql (shared)"
                                                           ,*strShareKey
                                                           ,*SString ( "Share count: %d", pConnection->GetShareCount () )
@@ -249,7 +254,7 @@ void CDatabaseTypeMySql::UpdateStats ( void )
         CDatabaseConnection* pConnection = *iter;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), 0
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( m_strStatsKeyHead + SString( "%d", iIndex++ ), 0
                                                           ,"Database connection: mysql (unshared)"
                                                           ,*pConnection->m_strOtherTag
                                                           ,*SString ( "Refs: %d", pConnection->GetShareCount () )

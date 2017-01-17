@@ -20,7 +20,6 @@
 #endif
 
 extern SThreadCPUTimesStore g_SyncThreadCPUTimes;
-extern SThreadCPUTimesStore g_DatabaseThreadCPUTimes;
 
 namespace
 {
@@ -371,7 +370,6 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_InfoList.push_back ( StringPair ( "Logic thread CPU",  MakeCPUUsageString( m_MainThreadCPUTimes ) ) );
     m_InfoList.push_back ( StringPair ( "Sync thread CPU",   MakeCPUUsageString( g_SyncThreadCPUTimes ) ) );
     m_InfoList.push_back ( StringPair ( "Raknet thread CPU", MakeCPUUsageString( m_PrevLiveStats.threadCPUTimes ) ) );
-    m_InfoList.push_back ( StringPair ( "DB thread CPU",     MakeCPUUsageString( g_DatabaseThreadCPUTimes ) ) );
 
     if ( bIncludeDebugInfo )
     {
@@ -390,7 +388,6 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_InfoList.push_back ( StringPair ( "Logic thread core #",       SString ( "%d", m_MainThreadCPUTimes.uiProcessorNumber ) ) );
         m_InfoList.push_back ( StringPair ( "Sync thread core #",        SString ( "%d", g_SyncThreadCPUTimes.uiProcessorNumber ) ) );
         m_InfoList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.threadCPUTimes.uiProcessorNumber ) ) );
-        m_InfoList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_DatabaseThreadCPUTimes.uiProcessorNumber ) ) );
 
         m_InfoList.push_back ( StringPair ( "Lowest connected player version",  g_pGame->GetPlayerManager()->GetLowestConnectedPlayerVersion() ) );
     }
