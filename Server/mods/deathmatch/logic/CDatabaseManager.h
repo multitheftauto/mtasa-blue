@@ -9,10 +9,13 @@
 *
 *****************************************************************************/
 
+class CDatabaseJobQueue;
 typedef uint SDbConnectionId;
 typedef intptr_t SDbJobId;
 typedef SDbConnectionId SConnectionHandle;
 #define INVALID_DB_HANDLE (0)
+#define DB_SQLITE_QUEUE_NAME_INTERNAL   "sqlite internal"
+#define DB_SQLITE_QUEUE_NAME_DEFAULT    "sqlite"            // Note: MySql default queue name is the host string
 
 namespace EJobResult
 {
@@ -85,13 +88,14 @@ class CDbJobData
 public:
     ZERO_ON_NEW
 
-                CDbJobData      ( void );
-                ~CDbJobData     ( void );
-    SDbJobId    GetId           ( void ) { return id; }
-    bool        SetCallback     ( PFN_DBRESULT pfnDbResult, void* pContext );
-    bool        HasCallback     ( void );
-    void        ProcessCallback ( void );
-    void        SetLuaDebugInfo ( const SLuaDebugInfo& luaDebugInfo ) { m_LuaDebugInfo = luaDebugInfo; }
+                        CDbJobData          ( void );
+                        ~CDbJobData         ( void );
+    SDbJobId            GetId               ( void ) { return id; }
+    bool                SetCallback         ( PFN_DBRESULT pfnDbResult, void* pContext );
+    bool                HasCallback         ( void );
+    void                ProcessCallback     ( void );
+    void                SetLuaDebugInfo     ( const SLuaDebugInfo& luaDebugInfo ) { m_LuaDebugInfo = luaDebugInfo; }
+    CDatabaseJobQueue*  GetQueue            ( void ) { return command.pJobQueue; }
 
     EJobStageType       stage;
     SDbJobId            id;
@@ -102,6 +106,7 @@ public:
         EJobCommandType     type;
         SConnectionHandle   connectionHandle;
         SString             strData;
+        CDatabaseJobQueue*  pJobQueue;
     } command;
 
     struct
@@ -110,7 +115,6 @@ public:
         uint                uiErrorCode;
         SString             strReason;
         bool                bErrorSuppressed;
-        SConnectionHandle   connectionHandle;
         CRegistryResult     registryResult;
         CTickCount          timeReady;
         bool                bLoggedWarning;

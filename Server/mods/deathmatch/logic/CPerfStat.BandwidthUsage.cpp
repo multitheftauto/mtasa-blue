@@ -158,7 +158,7 @@ CPerfStatBandwidthUsageImpl::CPerfStatBandwidthUsageImpl ( void )
 {
     m_strCategoryName = "Bandwidth usage";
     SString strDatabaseFilename = PathJoin ( g_pGame->GetConfig ()->GetSystemDatabasesPath (), "stats.db" );
-    m_DatabaseConnection = g_pGame->GetDatabaseManager ()->Connect ( "sqlite", strDatabaseFilename );
+    m_DatabaseConnection = g_pGame->GetDatabaseManager ()->Connect ( "sqlite", strDatabaseFilename, "", "", "queue=" DB_SQLITE_QUEUE_NAME_INTERNAL );
     LoadStats ();
 }
 

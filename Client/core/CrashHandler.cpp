@@ -28,7 +28,7 @@ CONDITIONAL COMPILATION :
 #include "CrashHandler.h"
 #include <dbghelp.h>
 #include <TLHELP32.h>
-#include "detours/include/detours.h"
+#include "SharedUtil.Detours.h"
 
 using namespace std;
 

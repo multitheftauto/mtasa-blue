@@ -30,6 +30,7 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
     SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
     SetOption < CDbOptionsMap > ( strOptions, "tag", "accounts" );
 #endif
+    SetOption < CDbOptionsMap > ( strOptions, "queue", DB_SQLITE_QUEUE_NAME_INTERNAL );
     m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( strDbPathFilename ), "", "", strOptions );
 
     // Check if new installation
@@ -942,7 +943,7 @@ bool CAccountManager::IsValidAccountName( const SString& strName )
 //
 bool CAccountManager::IsValidPassword( const SString& strPassword )
 {
-    if ( strPassword.length() < MIN_PASSWORD_LENGTH || strPassword.length() > MAX_PASSWORD_LENGTH )
+    if ( strPassword.length() < MIN_PASSWORD_LENGTH )
         return false;
     return true;
 }

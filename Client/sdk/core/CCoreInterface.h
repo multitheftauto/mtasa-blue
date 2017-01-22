@@ -172,6 +172,9 @@ public:
     virtual bool                    GetRequiredDisplayResolution    ( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions ) = 0;
     virtual void                    NotifyRenderingGrass            ( bool bIsRenderingGrass ) = 0;
     virtual bool                    GetRightSizeTxdEnabled          ( void ) = 0;
+    virtual const char*             GetProductRegistryPath          ( void ) = 0;
+    virtual const char*             GetProductCommonDataDir         ( void ) = 0;
+    virtual const char*             GetProductVersion               ( void ) = 0;
 };
 
 class CClientTime

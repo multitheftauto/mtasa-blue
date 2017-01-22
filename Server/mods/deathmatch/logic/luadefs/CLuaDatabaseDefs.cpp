@@ -274,11 +274,14 @@ int CLuaDatabaseDefs::DbConnect ( lua_State* luaVM )
                 // Add logging options
                 bool bLoggingEnabled;
                 SString strLogTag;
-                // Read value of 'log' and 'tag' if already set, otherwise use default
+                SString strQueueName;
+                // Set default values if required
                 GetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled, 1 );
                 GetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag, "script" );
+                GetOption < CDbOptionsMap > ( strOptions, "queue", strQueueName, (strType == "mysql") ? strHost : DB_SQLITE_QUEUE_NAME_DEFAULT );
                 SetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled );
                 SetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag );
+                SetOption < CDbOptionsMap > ( strOptions, "queue", strQueueName );
                 // Do connect
                 SConnectionHandle connection = g_pGame->GetDatabaseManager ()->Connect ( strType, strHost, strUsername, strPassword, strOptions );
                 if ( connection == INVALID_DB_HANDLE )
