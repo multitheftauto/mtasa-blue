@@ -409,7 +409,7 @@ bool CDatabaseManagerImpl::QueryWithResultf ( SConnectionHandle hConnection, CRe
     if ( !pJobData )
     {
         SetLastErrorMessage( "Invalid connection" );
-        return nullptr;
+        return false;
     }
 
     // Wait for result
