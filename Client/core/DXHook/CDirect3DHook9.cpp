@@ -38,14 +38,15 @@ bool CDirect3DHook9::ApplyHook ( )
     // Hook Direct3DCreate9.
     if ( !m_pfnDirect3DCreate9 )
     {
+        SString strError;
         m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" ), 
-                                                                      reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
+                                                                      reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ), &strError ) );
 
-        WriteDebugEvent ( SString( "Direct3D9 hook applied %08x", m_pfnDirect3DCreate9 ) );
+        WriteDebugEvent ( SString( "Direct3D9 hook applied %08x %s", m_pfnDirect3DCreate9, *strError ) );
 
         if ( !m_pfnDirect3DCreate9 )
         {
-            BrowseToSolution( "d3dapplyhook-fail", EXIT_GAME_FIRST | SHOW_MESSAGE_ONLY, "There was a problem hooking Direct3DCreate9" );
+            BrowseToSolution( "d3dapplyhook-fail&err=" + strError, EXIT_GAME_FIRST | ASK_GO_ONLINE, "There was a problem hooking Direct3DCreate9\n\n" + strError );
         }
     }
     else

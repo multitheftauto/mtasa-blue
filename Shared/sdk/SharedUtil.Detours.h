@@ -23,18 +23,46 @@ void DetourRemove(PBYTE pbTrampoline, PBYTE pbDetour)
 }
 
 template < class T >
-PBYTE DetourFunction(T pbTargetFunction, PBYTE pbDetourFunction)
+PBYTE DetourFunction(T pbTargetFunction, PBYTE pbDetourFunction, SString* pstrOutError=nullptr)
 {
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
+    if ( pbTargetFunction == nullptr )
+    {
+        if ( pstrOutError )
+            *pstrOutError += "[TargetFunction missing]";
+        return nullptr;
+    }
+
+    LONG hr = DetourTransactionBegin();
+    if ( hr != NO_ERROR )
+    {
+        if ( pstrOutError )
+            *pstrOutError += SString("[DetourTransactionBegin %u]", hr);
+        return nullptr;
+    }
+
+    hr = DetourUpdateThread(GetCurrentThread());
+    if ( hr != NO_ERROR )
+    {
+        if ( pstrOutError )
+            *pstrOutError += SString("[DetourUpdateThread %u]", hr);
+    }
+
     PVOID pTemp = pbTargetFunction;
-    if (DetourAttach(&(PVOID&)pTemp,pbDetourFunction) != NO_ERROR)
+    hr = DetourAttach(&(PVOID&)pTemp,pbDetourFunction);
+    if (hr != NO_ERROR)
     {
+        if ( pstrOutError )
+            *pstrOutError += SString("[DetourAttach %u]", hr);
         pTemp = nullptr;
     }
-    if (DetourTransactionCommit() != NO_ERROR)
+
+    hr = DetourTransactionCommit();
+    if (hr != NO_ERROR)
     {
+        if ( pstrOutError )
+            *pstrOutError += SString("[DetourTransactionCommit %u]", hr);
         pTemp = nullptr;
     }
+
     return (PBYTE)pTemp;
 }
