@@ -12,7 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "SharedUtil.Detours.h"
+#include "detours/include/detours.h"
 
 template<> CSetCursorPosHook * CSingleton< CSetCursorPosHook >::m_pSingleton = NULL;
 
