@@ -600,6 +600,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Create the account manager
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );
     m_pDatabaseManager = NewDatabaseManager ();
+    m_pDebugHookManager = new CDebugHookManager ();
     m_pLuaCallbackManager = new CLuaCallbackManager ();
     m_pRegistryManager = new CRegistryManager ();
     m_pAccountManager = new CAccountManager ( strBuffer );
@@ -607,7 +608,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Create and start the HTTP server
     m_pHTTPD = new CHTTPD;
     m_pLatentTransferManager = new CLatentTransferManager ();
-    m_pDebugHookManager = new CDebugHookManager ();
 
     // Enable it if required
     if ( m_pMainConfig->IsHTTPEnabled () )

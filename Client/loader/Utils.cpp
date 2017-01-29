@@ -1273,6 +1273,10 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
     HMODULE hModule = GetLibraryHandle ( strFilename, &dwLastError );
     if ( hModule )
     {
+        typedef void (*PFNINITNETREV) ( const char*, const char*, const char* );
+        PFNINITNETREV pfnInitNetRev = static_cast < PFNINITNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "InitNetRev" ) ) );
+        if ( pfnInitNetRev )
+            pfnInitNetRev ( GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion() );
         typedef unsigned short (*PFNGETNETREV) ( void );
         PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
         if ( pfnGetNetRev )

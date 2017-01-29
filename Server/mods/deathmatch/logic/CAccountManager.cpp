@@ -30,6 +30,7 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
     SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
     SetOption < CDbOptionsMap > ( strOptions, "tag", "accounts" );
 #endif
+    SetOption < CDbOptionsMap > ( strOptions, "queue", DB_SQLITE_QUEUE_NAME_INTERNAL );
     m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( strDbPathFilename ), "", "", strOptions );
 
     // Check if new installation

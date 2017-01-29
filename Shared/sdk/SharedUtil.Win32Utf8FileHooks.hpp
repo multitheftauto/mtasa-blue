@@ -9,7 +9,7 @@
 *
 *****************************************************************************/
 
-#include "SharedUtil.Detours.h"
+#include "detours/include/detours.h"
 
 /*
 The hooks in this file modify the following functions to work correctly with utf8 strings:
