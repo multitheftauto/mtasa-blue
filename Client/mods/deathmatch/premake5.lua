@@ -44,7 +44,8 @@ project "Client Deathmatch"
 			"../../../vendor/lua/src", 
 			"../../../Shared/mods/deathmatch/logic", 
 			"../../../Shared/animation", 
-			"../../../vendor/sparsehash/src/"
+			"../../../vendor/sparsehash/src",
+			"../../../Shared/gta"
 	}
 	
 	files {

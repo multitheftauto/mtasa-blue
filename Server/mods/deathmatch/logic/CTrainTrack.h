@@ -32,7 +32,7 @@ struct STrackNode
 class CTrainTrack : public CElement
 {
 public:
-    CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, bool defaultTrack = false);
+    CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, uchar defaultTrackId = 0xFF);
     // TODO: Add move constructor
     virtual ~CTrainTrack();
 
@@ -45,7 +45,8 @@ public:
     inline void SetLastNodesLinked(bool link) { m_LinkLastNodes = link; }
     inline bool GetLastNodesLinked() { return m_LinkLastNodes; }
 
-    inline bool IsDefault() { return m_Default; }
+    inline bool IsDefault() { return m_DefaultTrackId != 0xFF; }
+    inline uchar GetDefaultTrackId() { return m_DefaultTrackId; }
 
     // CClientEntity methods
     virtual void Unlink() override {}
@@ -57,4 +58,5 @@ private:
     std::vector<STrackNode> m_Nodes;
     bool m_LinkLastNodes;
     bool m_Default;
+    uchar m_DefaultTrackId;
 };

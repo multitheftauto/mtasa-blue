@@ -79,14 +79,25 @@ bool CSimVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             ElementID trainTrackID;
             bool bRailDirection;
             float fRailSpeed;
-            if ( !BitStream.Read ( fRailPosition ) || !BitStream.ReadBit ( bRailDirection ) || !BitStream.Read (trainTrackID) || !BitStream.Read ( fRailSpeed ) )
-            {
+            if ( !BitStream.Read ( fRailPosition ) || !BitStream.ReadBit ( bRailDirection ) || !BitStream.Read ( fRailSpeed ) )
                 return false;
-            }
+
             m_Cache.fRailPosition = fRailPosition;
             m_Cache.bRailDirection = bRailDirection;
-            m_Cache.trainTrackID = trainTrackID;
             m_Cache.fRailSpeed = fRailSpeed;
+
+            if (BitStream.ReadBit())
+            {
+                m_Cache.bIsDefaultTrack = true;
+                if (!BitStream.Read(m_Cache.trackIndex))
+                    return false;
+            }
+            else
+            {
+                m_Cache.bIsDefaultTrack = false;
+                if (!BitStream.Read(m_Cache.trackID))
+                    return false;
+            }
         }
 
         // Read the camera orientation
@@ -309,8 +320,13 @@ bool CSimVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
             {
                 BitStream.Write ( m_Cache.fRailPosition );
                 BitStream.WriteBit ( m_Cache.bRailDirection );
-                BitStream.Write ( m_Cache.trainTrackID );
                 BitStream.Write ( m_Cache.fRailSpeed );
+
+                BitStream.WriteBit(m_Cache.bIsDefaultTrack);
+                if (m_Cache.bIsDefaultTrack)
+                    BitStream.Write(m_Cache.trackIndex);
+                else
+                    BitStream.Write(m_Cache.trackID);
             }
 
             // Vehicle rotation

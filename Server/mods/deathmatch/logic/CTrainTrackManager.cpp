@@ -19,13 +19,13 @@ CTrainTrackManager::CTrainTrackManager ( )
     Reset();
 }
 
-CTrainTrack* CTrainTrackManager::CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, bool defaultTrack)
+CTrainTrack* CTrainTrackManager::CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, uchar defaultTrackId)
 {
     if (m_Tracks.size() >= MaxTracks)
         return nullptr;
 
     // Create new train track
-    auto pTrainTrack = new CTrainTrack(this, nodes, linkLastNodes, pParent, pNode, defaultTrack);
+    auto pTrainTrack = new CTrainTrack(this, nodes, linkLastNodes, pParent, pNode, defaultTrackId);
     m_Tracks.push_back(pTrainTrack);
 
     return pTrainTrack;
@@ -53,6 +53,6 @@ void CTrainTrackManager::Reset()
     for (std::size_t i = 0; i < 4; ++i)
     {
         // Create train tracks
-        CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, nullptr, true);
+        CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, nullptr, i);
     }
 }

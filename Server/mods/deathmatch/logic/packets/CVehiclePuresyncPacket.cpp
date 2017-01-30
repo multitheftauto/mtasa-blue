@@ -68,15 +68,28 @@ bool CVehiclePuresyncPacket::Read ( NetBitStreamInterface& BitStream )
             {
                 // Train specific data
                 float fPosition;
-                ElementID trainTrackID;
                 bool bDirection;
                 float fSpeed;
                 BitStream.Read ( fPosition );
                 BitStream.ReadBit ( bDirection );
-                BitStream.Read(trainTrackID);
-                BitStream.Read ( fSpeed );
+                BitStream.Read(fSpeed);
 
-                CTrainTrack* pTrainTrack = GetElementFromId<CTrainTrack>(trainTrackID);
+                CTrainTrack* pTrainTrack = nullptr;
+                if (BitStream.ReadBit())
+                {
+                    uint trackIndex;
+                    BitStream.Read(trackIndex);
+
+                    pTrainTrack = g_pGame->GetTrainTrackManager()->GetTrainTrackByIndex(trackIndex);
+                }
+                else
+                {
+                    ElementID trainTrackID;
+                    BitStream.Read(trainTrackID);
+
+                    pTrainTrack = GetElementFromId<CTrainTrack>(trainTrackID);
+                }
+                
                 if ( vehicleType == VEHICLE_TRAIN )
                 {
                     pVehicle->SetTrainPosition ( fPosition );
@@ -492,10 +505,27 @@ bool CVehiclePuresyncPacket::Write ( NetBitStreamInterface& BitStream ) const
                     auto pTrainTrack = pVehicle->GetTrainTrack();
                     bool bDirection = pVehicle->GetTrainDirection ( );
                     float fSpeed = pVehicle->GetTrainSpeed ( );
+
                     BitStream.Write ( fPosition );
                     BitStream.WriteBit ( bDirection );
-                    BitStream.Write(pTrainTrack ? pTrainTrack->GetID() : INVALID_ELEMENT_ID);
-                    BitStream.Write ( fSpeed );
+                    BitStream.Write(fSpeed);
+
+                    if (pTrainTrack && pTrainTrack->IsDefault())
+                    {
+                        BitStream.WriteBit(true); // is default track
+                        BitStream.Write(pTrainTrack->GetDefaultTrackId());
+                    }
+                    else if (!pTrainTrack || pVehicle->IsDerailed())
+                    {
+                        // place derailed tracks on track 0
+                        BitStream.WriteBit(true);
+                        BitStream.Write((uint)0);
+                    }
+                    else
+                    {
+                        BitStream.WriteBit(false); // isn't default track
+                        BitStream.Write(pTrainTrack->GetID());
+                    }
                 }
 
                 // Vehicle rotation

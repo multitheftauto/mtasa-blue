@@ -8,7 +8,27 @@
 *
 *****************************************************************************/
 #include <StdInc.h>
-#include "CClientTrainTrackManager.h"
+#include <TrackNodes.h>
+#include <game/CTrainTrackManager.h>
+
+void CClientTrainTrackManager::Reset()
+{
+    // Reset game
+    g_pGame->GetTrainTrackManager()->Reset();
+
+    // Create default tracks
+    for (std::size_t i = 0; i < 4; ++i)
+    {
+        // Delete old default tracks if exist
+        CClientTrainTrack* pTrainTrack = GetTrainTrackByIndex(i);
+        if (pTrainTrack)
+            delete pTrainTrack;
+
+        // Create train tracks
+        pTrainTrack = new CClientTrainTrack(INVALID_ELEMENT_ID, OriginalTrackNodes[i], true);
+        pTrainTrack->MakeSystemEntity();
+    }
+}
 
 CClientTrainTrack* CClientTrainTrackManager::Get(ElementID ID)
 {

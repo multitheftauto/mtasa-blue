@@ -18,7 +18,7 @@ public:
     CTrainTrackManager();
     void Reset();
 
-    CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, bool defaultTrack = false);
+    CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, CXMLNode* pNode, uchar defaultTrackId = 0xFF);
     void DestroyTrainTrack(CTrainTrack* pTrainTrack);
 
     inline const std::vector<CTrainTrack*>& GetTracks() { return m_Tracks; }

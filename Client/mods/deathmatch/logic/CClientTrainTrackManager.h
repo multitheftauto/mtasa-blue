@@ -13,6 +13,8 @@ class CClientTrainTrack;
 class CClientTrainTrackManager
 {
 public:
+    void Reset();
+
     static CClientTrainTrack* Get(ElementID ID);
     CClientTrainTrack* Get(CTrainTrack* pTrainTrack);
 

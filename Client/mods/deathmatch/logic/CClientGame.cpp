@@ -3617,6 +3617,9 @@ void CClientGame::Event_OnIngame ( void )
     // Make sure we never get tired
     g_pGame->GetPlayerInfo ()->SetDoesNotGetTired ( true );
 
+    // Reset default train tracks
+    m_pManager->GetTrainTrackManager()->Reset();
+
     // Tell doggy we got the game running
     WatchDogCompletedSection ( "L1" );
 }
@@ -6504,11 +6507,6 @@ void CClientGame::OutputServerInfo( void )
                         );
 
         strTotalOutput += SString( "Tick rates: %s\n", *strTickRates );
-    }
-
-    if ( g_pGame->GetTrainTrackManager () )
-    {
-        g_pGame->GetTrainTrackManager ()->Reset ();
     }
 
     {

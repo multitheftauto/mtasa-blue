@@ -10,14 +10,11 @@
 *
 *****************************************************************************/
 #include "StdInc.h"
-#include <TrackNodes.h>
 #include <algorithm>
 #include "CTrainTrackSA.h"
 
 CTrainTrackManagerSA::CTrainTrackManagerSA()
 {
-    Reset();
-
     // Disable CTrain::InitTrains
     MemPut(0x6F7440, 0xC3); // Write retn
 }
@@ -94,13 +91,6 @@ void CTrainTrackManagerSA::Reset()
     m_TrackLengths = nullptr;
     m_NumberOfTrackNodes = nullptr;
     m_CurrentTrackNodeSize = 0;
-
-    // Create default tracks
-    for (std::size_t i = 0; i < 4; ++i)
-    {
-        // Create train tracks
-        CreateTrainTrack(OriginalTrackNodes[i], true);
-    }
 }
 
 uint CTrainTrackManagerSA::AllocateTrainTrackIndex()

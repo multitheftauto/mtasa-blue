@@ -104,9 +104,11 @@ private:
         ushort          usAdjustableProperty;
 
         float           fRailPosition;
-        ElementID       trainTrackID;
         bool            bRailDirection;
         float           fRailSpeed;
+        bool            bIsDefaultTrack;
+        uint            trackIndex;
+        ElementID       trackID;
 
         SFixedArray < float, 4 >    fDoorOpenRatio;
     } m_Cache;
