@@ -474,6 +474,7 @@ class EHSServer {
 
 	/// this is the read set for sending to select(2)
 	fd_set m_oReadFds;
+	int m_TestPadding[2000];
 
 	/// List of all connections currently attached to the server
 	EHSConnectionList m_oEHSConnectionList;
