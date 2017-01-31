@@ -12,8 +12,12 @@ project "Loader"
 		"../../vendor"
 	}
 
+	libdirs {
+		"../../vendor/detours/lib"
+	}
+
 	links {
-		"unrar", "d3d9", "detours",
+		"unrar", "d3d9",
 		"../../vendor/nvapi/x86/nvapi.lib"
 	}
 

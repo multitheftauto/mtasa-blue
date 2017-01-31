@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "SharedUtil.Detours.h"
+#include "detours/include/detours.h"
 
 template<> CDirect3DHook9 * CSingleton< CDirect3DHook9 >::m_pSingleton = NULL;
 
@@ -38,14 +38,15 @@ bool CDirect3DHook9::ApplyHook ( )
     // Hook Direct3DCreate9.
     if ( !m_pfnDirect3DCreate9 )
     {
-        m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" ), 
-                                                                      reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
-
+        PBYTE pFunc = DetourFindFunction ( "D3D9.DLL", "Direct3DCreate9" );
+        if ( pFunc )
+        {
+            m_pfnDirect3DCreate9 = reinterpret_cast < pDirect3DCreate > ( DetourFunction ( pFunc, reinterpret_cast < PBYTE > ( API_Direct3DCreate9 ) ) );
+        }
         WriteDebugEvent ( SString( "Direct3D9 hook applied %08x", m_pfnDirect3DCreate9 ) );
-
         if ( !m_pfnDirect3DCreate9 )
         {
-            BrowseToSolution( "d3dapplyhook-fail", EXIT_GAME_FIRST | SHOW_MESSAGE_ONLY, "There was a problem hooking Direct3DCreate9" );
+            BrowseToSolution( "d3dapplyhook-fail", EXIT_GAME_FIRST | ASK_GO_ONLINE, "There was a problem hooking Direct3DCreate9" );
         }
     }
     else
