@@ -636,7 +636,7 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
                         if ( strcmp ( strKey, pCommandBind->boundKey->szKey ) == 0 )
                         {
                             lua_pushstring ( luaVM, pCommandBind->szCommand );
-                            lua_pushstring ( luaVM, ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' ) ? pCommandBind->szArguments : "" );
+                            lua_pushstring ( luaVM, ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' && pCommandBind->bScriptCreated ) ? pCommandBind->szArguments : "" );
                             lua_settable ( luaVM, -3 );
                         }
                     }
