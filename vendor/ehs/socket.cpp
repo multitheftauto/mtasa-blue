@@ -42,18 +42,6 @@ Zac Hansen ( xaxxon@slackworks.com )
 #endif
 #endif // sun
 
-#ifdef _WIN32
-    #include <Winsock2.h>
-#endif
-#if !defined(_WIN32) || _WIN32_WINNT >= 0x600
-    #define USE_POLL
-    #pragma message ("EHS Socket using poll()")
-    #ifdef _WIN32
-        #define poll WSAPoll
-    #else
-        #include <sys/poll.h>
-    #endif
-#endif
 
 #include "socket.h"
 
@@ -337,21 +325,10 @@ void Socket::SetReuseAddress( bool bOn )
 
 bool Socket::IsReadable( int inTimeoutMilliseconds )
 {
-#ifndef USE_POLL
-	timeval tv = { 0, inTimeoutMilliseconds * 1000 }; 
-	tv.tv_sec = tv.tv_usec / 1000000;
-	tv.tv_usec %= 1000000;
-    fd_set rfds;
-    FD_ZERO(&rfds);
-    FD_SET(nAcceptSocket, &rfds);
-    // See if socket it writable
-    int ret = select(nAcceptSocket+1, &rfds, NULL, NULL, &tv);
-#else
     pollfd fds[1] = { 0 };
     fds[0].fd = nAcceptSocket;
     fds[0].events = POLLIN;
     int ret = poll(fds, 1, inTimeoutMilliseconds);
-#endif
     if (ret == 0)
         return false;     // Not readable yet
     if (ret == -1)
@@ -362,21 +339,10 @@ bool Socket::IsReadable( int inTimeoutMilliseconds )
 
 bool Socket::IsWritable( int inTimeoutMilliseconds )
 {
-#ifndef USE_POLL
-	timeval tv = { 0, inTimeoutMilliseconds * 1000 }; 
-	tv.tv_sec = tv.tv_usec / 1000000;
-	tv.tv_usec %= 1000000;
-    fd_set wfds;
-    FD_ZERO(&wfds);
-    FD_SET(nAcceptSocket, &wfds);
-    // See if socket it writable
-    int ret = select(nAcceptSocket+1, NULL, &wfds, NULL, &tv);
-#else
     pollfd fds[1] = { 0 };
     fds[0].fd = nAcceptSocket;
     fds[0].events = POLLOUT;
     int ret = poll(fds, 1, inTimeoutMilliseconds);
-#endif
     if (ret == 0)
         return false;     // Not writable yet
     if (ret == -1)
@@ -387,21 +353,10 @@ bool Socket::IsWritable( int inTimeoutMilliseconds )
 
 bool Socket::IsAtError( int inTimeoutMilliseconds )
 {
-#ifndef USE_POLL
-	timeval tv = { 0, inTimeoutMilliseconds * 1000 }; 
-	tv.tv_sec = tv.tv_usec / 1000000;
-	tv.tv_usec %= 1000000;
-    fd_set efds;
-    FD_ZERO(&efds);
-    FD_SET(nAcceptSocket, &efds);
-    // See if socket it writable
-    int ret = select(nAcceptSocket+1, NULL, NULL, &efds, &tv);
-#else
     pollfd fds[1] = { 0 };
     fds[0].fd = nAcceptSocket;
     fds[0].events = POLLERR;
     int ret = poll(fds, 1, inTimeoutMilliseconds);
-#endif
     if (ret == 0)
         return false;     // Not error
     if (ret == -1)

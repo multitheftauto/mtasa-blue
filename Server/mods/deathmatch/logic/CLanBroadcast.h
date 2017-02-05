@@ -22,7 +22,6 @@ class CLanBroadcastDLL;
 
 #ifdef WIN32
     #include <conio.h>
-    #include <winsock.h>
 #else
     #include <sys/socket.h>
     #include <sys/stat.h>

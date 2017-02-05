@@ -49,6 +49,7 @@
 #pragma warning(disable : 4786)
 
 // to use winsock2.h instead of winsock.h
+#include <winsock2.h>
 #include <windows.h>
 
 #include <time.h>
@@ -473,8 +474,7 @@ class EHSServer {
 	int CreateFdSet ( );
 
 	/// this is the read set for sending to select(2)
-	fd_set m_oReadFds;
-	int m_TestPadding[2000];
+	CPollFdSet m_oReadFds;
 
 	/// List of all connections currently attached to the server
 	EHSConnectionList m_oEHSConnectionList;
