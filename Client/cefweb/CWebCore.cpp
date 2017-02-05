@@ -38,6 +38,9 @@ CWebCore::CWebCore ()
 
 CWebCore::~CWebCore ()
 {
+    // Unregister schema factories
+    CefClearSchemeHandlerFactories();
+
     // Shutdown CEF
     CefShutdown();
 

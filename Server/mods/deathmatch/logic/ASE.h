@@ -20,7 +20,6 @@ class ASE;
 
 #ifdef WIN32
     #include <conio.h>
-    #include <winsock.h>
     #define sockclose closesocket
 #else
     #include <sys/socket.h>
