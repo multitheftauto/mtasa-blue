@@ -27,7 +27,7 @@ project "Launcher"
 		}
 
 	filter "system:linux"
-		links { "dl" }
+		links { "dl", "pthread" }
 
 	filter {"system:linux", "platforms:x86"}
 		targetname "mta-server"
