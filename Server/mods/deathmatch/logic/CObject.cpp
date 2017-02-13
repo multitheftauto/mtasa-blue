@@ -150,7 +150,10 @@ bool CObject::ReadSpecialData ( void )
         m_ucInterior = static_cast < unsigned char > ( iTemp );
 
     if ( GetCustomDataInt ( "dimension", iTemp, true ) )
-        m_usDimension = static_cast < unsigned short > ( iTemp );
+        if ( iTemp == -1 )
+            m_bVisibleInAllDimensions = true;
+        else
+            m_usDimension = static_cast < unsigned short > ( iTemp );
 
     if ( !GetCustomDataBool ( "doublesided", m_bDoubleSided, true ) )
         m_bDoubleSided = false;

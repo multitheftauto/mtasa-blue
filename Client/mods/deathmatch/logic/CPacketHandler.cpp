@@ -2854,6 +2854,10 @@ void CPacketHandler::Packet_EntityAdd ( NetBitStreamInterface& bitStream )
                         if ( bitStream.ReadBit () )
                             pObject->SetDoubleSided ( true );
 
+                        if ( bitStream.Version ( ) >= 0x068 )
+                            if ( bitStream.ReadBit() )
+                                pObject->SetVisibleInAllDimensions ( true );
+
                         bool bIsMoving;
                         if ( bitStream.ReadBit ( bIsMoving ) && bIsMoving )
                         {

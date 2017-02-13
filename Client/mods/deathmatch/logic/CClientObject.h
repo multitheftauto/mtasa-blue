@@ -101,6 +101,9 @@ public:
     float                           GetMass                 ( void );
     void                            SetMass                 ( float fMass );
 
+    inline bool                     IsVisibleInAllDimensions  ( void )                          { return m_bVisibleInAllDimensions; };
+    void                            SetVisibleInAllDimensions ( bool bVisible, unsigned short usNewDimension = 0 );
+
     void                            ReCreate                ( void );
     void                            UpdateVisibility        ( void );
 
@@ -137,6 +140,7 @@ protected:
     bool                                m_bBeingRespawned;
     bool                                m_bRespawnEnabled;
     float                               m_fMass;
+    bool                                m_bVisibleInAllDimensions = false;
 
     CVector                             m_vecMoveSpeed;
     CVector                             m_vecTurnSpeed;
