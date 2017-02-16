@@ -101,3 +101,14 @@ function os.extract_archive(archive_path, target_path, override)
 		os.executef("7z x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	end
 end
+
+function http.download_print_errors(url, file, options)
+	local result_str, response_code = http.download(url, file, options)
+	if result_str ~= "OK" then
+		print( "\nERROR: Failed to download " .. url .. "\n" .. result_str )
+		if response_code == 0 then
+			-- No response code means server was unreachable
+			print( "Check premake5 is not blocked by firewall rules" )
+		end
+	end
+end
