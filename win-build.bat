@@ -1,5 +1,9 @@
 @echo off
 
+rem Create solution (ignoring pause)
+call win-create-projects.bat < nul
+echo.
+
 set MSBUILD_REG_KEY="HKLM\SOFTWARE\Microsoft\MSBuild\ToolsVersions\14.0"
 set MSBUILD_REG_SUBKEY="MSBuildToolsPath"
 
