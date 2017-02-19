@@ -665,7 +665,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
                 // Log info
                 OutputDebugString ( SString ( "Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex, i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols ) );
                 // Assert in debug
-                #if _DEBUG
+                #if MTA_DEBUG
                     assert ( pEntity->vtbl->DeleteRwObject == 0x00534030 );
                 #endif
                 pSectorEntry = (DWORD *)pSectorEntry [ 1 ];

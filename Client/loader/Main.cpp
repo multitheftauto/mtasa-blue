@@ -14,7 +14,7 @@
 
 #include "StdInc.h"
 #include "SharedUtil.Win32Utf8FileHooks.hpp"
-#if defined(_DEBUG) 
+#if defined(MTA_DEBUG) 
     #include "SharedUtil.Tests.hpp"
 #endif
 
@@ -35,7 +35,7 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 {
     AddUtf8FileHooks();
 
-#if defined(_DEBUG) 
+#if defined(MTA_DEBUG) 
     SharedUtil_Tests ();
 #endif
 
