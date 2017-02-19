@@ -86,7 +86,8 @@ workspace "MTASA"
 	
 	filter {"system:windows", "configurations:Debug"}
 		buildoptions { "/MT" } -- Don't use debug runtime when static linking
-	
+		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
+
 	filter "system:linux"
 		vectorextensions "SSE2"
 	

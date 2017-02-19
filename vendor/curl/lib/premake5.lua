@@ -269,6 +269,12 @@ project "curl"
 			"copy \"%{wks.location}..\\Bin\\server\\libcurl_d.dll\" \"%{wks.location}..\\Bin\\server\\libcurl.dll\""
 		}
 
+	filter {"system:windows", "platforms:x64", "configurations:Debug"}
+		postbuildcommands {
+			-- Fix net.dll requiring the release build
+			"copy \"%{wks.location}..\\Bin\\server\\x64\\libcurl_d.dll\" \"%{wks.location}..\\Bin\\server\\x64\\libcurl.dll\""
+		}
+
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
 	

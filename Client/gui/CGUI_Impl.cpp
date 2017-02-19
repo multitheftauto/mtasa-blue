@@ -67,7 +67,7 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     SetDefaultGuiWorkingDirectory ( CalcMTASAPath ( "MTA" ) );
 
     // Set logging to Informative for debug and Standard for release
-#if _DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
     CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Informative );
 #else
     CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Standard );
