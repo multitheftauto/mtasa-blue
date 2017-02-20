@@ -299,6 +299,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getInteriorFurnitureEnabled", CLuaFunctionDefs::GetInteriorFurnitureEnabled );
     CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance );
     CLuaCFunctions::AddFunction ( "getNearClipDistance", CLuaFunctionDefs::GetNearClipDistance );
+    CLuaCFunctions::AddFunction ( "getVehiclesLODDistance", CLuaFunctionDefs::GetVehiclesLODDistance );
     CLuaCFunctions::AddFunction ( "getFogDistance", CLuaFunctionDefs::GetFogDistance );
     CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
     CLuaCFunctions::AddFunction ( "getSunSize", CLuaFunctionDefs::GetSunSize );
@@ -343,6 +344,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "resetFarClipDistance", CLuaFunctionDefs::ResetFarClipDistance );
     CLuaCFunctions::AddFunction ( "setNearClipDistance", CLuaFunctionDefs::SetNearClipDistance );
     CLuaCFunctions::AddFunction ( "resetNearClipDistance", CLuaFunctionDefs::ResetNearClipDistance );
+    CLuaCFunctions::AddFunction ( "setVehiclesLODDistance", CLuaFunctionDefs::SetVehiclesLODDistance );
+    CLuaCFunctions::AddFunction ( "resetVehiclesLODDistance", CLuaFunctionDefs::ResetVehiclesLODDistance );
     CLuaCFunctions::AddFunction ( "setFogDistance", CLuaFunctionDefs::SetFogDistance );
     CLuaCFunctions::AddFunction ( "resetFogDistance", CLuaFunctionDefs::ResetFogDistance );
     CLuaCFunctions::AddFunction ( "setSunColor", CLuaFunctionDefs::SetSunColor );

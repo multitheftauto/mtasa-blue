@@ -783,6 +783,7 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.settings.aspectRatio = gameSettings->GetAspectRatio ();
     outStatus.settings.bHUDMatchAspectRatio = true;
     outStatus.settings.fFieldOfView = 70;
+    outStatus.settings.bHighDetailVehicles = false;
 
     CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
     CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
@@ -793,6 +794,7 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     CVARS_GET ( "anisotropic",          outStatus.settings.iAnisotropicFiltering );
     CVARS_GET ( "hud_match_aspect_ratio", outStatus.settings.bHUDMatchAspectRatio );
     CVARS_GET ( "fov",                  outStatus.settings.fFieldOfView );
+    CVARS_GET ( "high_detail_vehicles", outStatus.settings.bHighDetailVehicles );
 
     if ( outStatus.settings.iFXQuality == 0 )
     {

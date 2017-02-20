@@ -783,6 +783,10 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxTyreSmokeParticles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 90.0f ) );
     m_pCheckBoxTyreSmokeParticles->AutoSize ( NULL, 20.0f );
 
+    m_pCheckBoxHighDetailVehicles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Render vehicles always in high detail"), true ) );
+    m_pCheckBoxHighDetailVehicles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 110.0f ) );
+    m_pCheckBoxHighDetailVehicles->AutoSize ( NULL, 20.0f );
+
     float fPosY =  vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Full Screen Minimize"), true ) );
     m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 30.0f ) );
@@ -1776,6 +1780,11 @@ void CSettings::UpdateVideoTab ( void )
     bool bTyreSmokeEnabled;
     CVARS_GET ( "tyre_smoke_enabled", bTyreSmokeEnabled );
     m_pCheckBoxTyreSmokeParticles->SetSelected ( bTyreSmokeEnabled );
+
+    // High detail vehicles
+    bool bHighDetailVehicles;
+    CVARS_GET ( "high_detail_vehicles", bHighDetailVehicles );
+    m_pCheckBoxHighDetailVehicles->SetSelected ( bHighDetailVehicles );
 
     PopulateResolutionComboBox();
     
@@ -3049,6 +3058,10 @@ void CSettings::SaveData ( void )
     bool bTyreSmokeEnabled = m_pCheckBoxTyreSmokeParticles->GetSelected ();
     CVARS_SET ( "tyre_smoke_enabled", bTyreSmokeEnabled );
     g_pCore->GetMultiplayer ()->SetTyreSmokeEnabled ( bTyreSmokeEnabled );
+
+    // High detail vehicles (just set cvar, real change occur on next connect)
+    bool bHighDetailVehicles = m_pCheckBoxHighDetailVehicles->GetSelected ();
+    CVARS_SET ( "high_detail_vehicles", bHighDetailVehicles );
 
     // Fast clothes loading
     if ( CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem () )
