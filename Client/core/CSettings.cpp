@@ -2020,6 +2020,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     CVARS_SET ( "grass", true );
     CVARS_SET ( "heat_haze", true );
     CVARS_SET ( "tyre_smoke_enabled", true );
+    CVARS_SET ( "high_detail_vehicles", false );
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false, FULLSCREEN_STANDARD );
