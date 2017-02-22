@@ -78,6 +78,9 @@ public:
     bool                        SetLowLodObject         ( CObject* pLowLodObject );
     CObject*                    GetLowLodObject         ( void );
 
+    inline bool                 IsVisibleInAllDimensions ( void )                       { return m_bVisibleInAllDimensions; };
+    inline void                 SetVisibleInAllDimensions ( bool bVisible )             { m_bVisibleInAllDimensions = bVisible; };
+
 private:
     CObjectManager*             m_pObjectManager;
     CVector                     m_vecRotation;
@@ -89,6 +92,7 @@ private:
     bool                        m_bBreakable;
     bool                        m_bSyncable;
     CPlayer*                    m_pSyncer;
+    bool                        m_bVisibleInAllDimensions = false;
 
 protected:
     bool                        m_bCollisionsEnabled;

@@ -951,10 +951,19 @@ int CLuaElementDefs::GetElementDimension ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        // Grab the dimension
-        unsigned short usDimension = pEntity->GetDimension ();
-        lua_pushnumber ( luaVM, usDimension );
-        return 1;
+        if ( CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions ( *pEntity ) )
+        {
+            // The entity is visible in all dimensions, just return -1
+            lua_pushnumber ( luaVM, -1 );
+            return 1;
+        }
+        else
+        {
+            // Grab the dimension and return it
+            unsigned short usDimension = pEntity->GetDimension ();
+            lua_pushnumber ( luaVM, usDimension );
+            return 1;   
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1969,20 +1978,57 @@ int CLuaElementDefs::SetElementInterior ( lua_State* luaVM )
 int CLuaElementDefs::SetElementDimension ( lua_State* luaVM )
 {
     CClientEntity* pEntity;
-    unsigned short usDimension = 0;
+    int iDimension = 0;
+    bool bMakeVisibleInAllDimensions = false;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( usDimension );
+    argStream.ReadNumber ( iDimension );
+
+    if ( iDimension == -1 )
+    {
+        if ( IS_OBJECT ( pEntity ) )
+            bMakeVisibleInAllDimensions = true;
+        else
+            argStream.SetCustomError ( "The -1 value can be used only in objects!" );
+    }
+    else
+        if ( iDimension < 0 || iDimension > 65535 )
+            argStream.SetCustomError ( "Invalid dimension range specified!" );
 
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        // Change the dimension
-        if ( CStaticFunctionDefinitions::SetElementDimension ( *pEntity, usDimension ) )
+        if ( bMakeVisibleInAllDimensions )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            // Set the object visible in all dimensions
+            if ( CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions ( *pEntity, true ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+        {
+            // If it's an object and is visible in all dimensions
+            if ( IS_OBJECT ( pEntity ) && CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions ( *pEntity ) )
+            {
+                // Make it not visible in all dimensions and set its dimension
+                if ( CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions ( *pEntity, false, (unsigned short)iDimension ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+            {
+                // Just change the dimension
+                if ( CStaticFunctionDefinitions::SetElementDimension ( *pEntity, (unsigned short)iDimension ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
         }
     }
     else

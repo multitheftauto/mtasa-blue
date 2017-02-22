@@ -50,6 +50,8 @@ public:
 
     bool                        IsStreamingCompatibleClass  ( void )                            { return true; };
 
+    virtual bool                IsVisibleInAllDimensions    ( void )                            { return false; };
+
 private:
     void                        SetStreamRow                ( CClientStreamSectorRow * pRow )   { m_pStreamRow = pRow; }
     void                        SetStreamSector             ( CClientStreamSector * pSector )   { m_pStreamSector = pSector; }
