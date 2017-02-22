@@ -5497,6 +5497,9 @@ void CClientGame::ResetMapInfo ( void )
     // Fog distance
     g_pMultiplayer->RestoreFogDistance ( );
 
+    // Vehicles LOD distance
+    g_pGame->GetSettings()->ResetVehiclesLODDistance ( );
+
     // Sun color
     g_pMultiplayer->ResetSunColor ( );
 

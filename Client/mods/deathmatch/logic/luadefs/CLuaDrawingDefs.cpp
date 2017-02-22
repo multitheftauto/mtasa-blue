@@ -1212,6 +1212,9 @@ int CLuaDrawingDefs::DxGetStatus ( lua_State* luaVM )
         lua_pushnumber ( luaVM, dxStatus.settings.fFieldOfView );
         lua_settable ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "SettingHighDetailVehicles" );
+        lua_pushboolean ( luaVM, dxStatus.settings.bHighDetailVehicles );
+        lua_settable ( luaVM, -3 );
         return 1;
     }
     else

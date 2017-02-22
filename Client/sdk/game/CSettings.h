@@ -155,6 +155,10 @@ public:
     virtual float           GetFieldOfViewVehicle   ( void ) = 0;
     virtual float           GetFieldOfViewVehicleMax( void ) = 0;
 
+    virtual void            SetVehiclesLODDistance  ( float fVehiclesLODDistance, float fTrainsPlanesLODDistance ) = 0;
+    virtual void            ResetVehiclesLODDistance  ( void ) = 0;
+    virtual void            GetVehiclesLODDistance  ( float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance ) = 0;
+
     virtual void            Save                    ( void ) = 0;
 };
 

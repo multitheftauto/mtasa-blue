@@ -177,6 +177,7 @@ protected:
 	CGUICheckBox*       m_pCheckBoxGrass;
 	CGUICheckBox*       m_pCheckBoxHeatHaze;
     CGUICheckBox*       m_pCheckBoxTyreSmokeParticles;
+    CGUICheckBox*       m_pCheckBoxHighDetailVehicles;
     CGUILabel*          m_pFieldOfViewLabel;
     CGUIScrollBar*      m_pFieldOfView;
     CGUILabel*          m_pFieldOfViewValueLabel;

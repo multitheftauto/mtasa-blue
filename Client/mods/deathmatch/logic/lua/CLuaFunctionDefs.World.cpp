@@ -1543,6 +1543,49 @@ int CLuaFunctionDefs::ResetNearClipDistance ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetVehiclesLODDistance ( lua_State* luaVM )
+{
+//  float float getVehiclesLODDistance ( )
+    float fVehiclesDistance, fTrainsPlanesDistance;
+
+    g_pGame->GetSettings()->GetVehiclesLODDistance ( fVehiclesDistance, fTrainsPlanesDistance );
+    lua_pushnumber ( luaVM, fVehiclesDistance );
+    lua_pushnumber ( luaVM, fTrainsPlanesDistance );
+    return 2;
+}
+
+int CLuaFunctionDefs::SetVehiclesLODDistance ( lua_State* luaVM )
+{
+//  bool setVehiclesLODDistance ( float vehiclesDistance, float trainsAndPlanesDistance = vehiclesDistance * 2.14 )
+    float fVehiclesDistance, fTrainsPlanesDistance;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fVehiclesDistance );
+    fVehiclesDistance = Clamp ( 0.0f, fVehiclesDistance, 500.0f );
+
+    // Default train distance is 2.14 times bigger than normal vehicles
+    argStream.ReadNumber ( fTrainsPlanesDistance, Clamp ( 0.0f, fVehiclesDistance * 2.14f, 500.0f ) );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pGame->GetSettings()->SetVehiclesLODDistance ( fVehiclesDistance, fTrainsPlanesDistance );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetVehiclesLODDistance ( lua_State* luaVM )
+{
+    g_pGame->GetSettings()->ResetVehiclesLODDistance ();
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetFogDistance ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pMultiplayer->GetFogDistance());

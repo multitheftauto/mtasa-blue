@@ -35,6 +35,8 @@ void HOOK_GetFxQuality ();
 DWORD RETURN_StoreShadowForVehicle =        0x70BDA9;
 void HOOK_StoreShadowForVehicle ();
 
+float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance;
+
 CSettingsSA::CSettingsSA ( void )
 {
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
@@ -47,6 +49,9 @@ CSettingsSA::CSettingsSA ( void )
     m_iDesktopWidth = 0;
     m_iDesktopHeight = 0;
     MemPut < BYTE > ( 0x6FF420, 0xC3 );     // Truncate CalculateAspectRatio
+
+    MemPut ( 0x732926, &ms_fVehicleLODDistance );
+    MemPut ( 0x732940, &ms_fTrainPlaneLODDistance );
 
     // Set "radar map and radar" as default radar mode
     SetRadarMode ( RADAR_MODE_ALL );
@@ -532,6 +537,41 @@ void CSettingsSA::SetFieldOfViewVehicleMax ( float fAngle )
     ms_fFOVCarMax = fAngle;
     MemPut < void* > ( 0x0524BB4, &ms_fFOVCarMax );
     MemPut < float > ( 0x0524BC5, ms_fFOVCarMax );
+}
+
+
+////////////////////////////////////////////////
+//
+// Vehicles LOD draw distance
+//
+////////////////////////////////////////////////
+void CSettingsSA::SetVehiclesLODDistance ( float fVehiclesLODDistance, float fTrainsPlanesLODDistance )
+{
+    ms_fVehicleLODDistance = fVehiclesLODDistance;
+    ms_fTrainPlaneLODDistance = fTrainsPlanesLODDistance;
+}
+
+void CSettingsSA::ResetVehiclesLODDistance ( void )
+{
+    bool bHighDetailVehicles;
+    g_pCore->GetCVars()->Get ( "high_detail_vehicles", bHighDetailVehicles );
+
+    if ( bHighDetailVehicles )
+    {
+        ms_fVehicleLODDistance = MAX_VEHICLE_LOD_DISTANCE;
+        ms_fTrainPlaneLODDistance = MAX_VEHICLE_LOD_DISTANCE;
+    }
+    else
+    {
+        ms_fVehicleLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE;
+        ms_fTrainPlaneLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE * TRAIN_LOD_DISTANCE_MULTIPLIER;
+    }
+}
+
+void CSettingsSA::GetVehiclesLODDistance ( float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance )
+{
+    fVehiclesLODDistance = ms_fVehicleLODDistance;
+    fTrainsPlanesLODDistance = ms_fTrainPlaneLODDistance;
 }
 
 
