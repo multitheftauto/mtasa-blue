@@ -403,3 +403,15 @@ lua_State* CLuaModule::GetResourceFromName ( const char* szResourceName )
 
     return NULL;
 }
+
+bool CLuaModule::GetResourceName(lua_State* luaVM, char* szName, size_t length)
+{
+    std::string resourceName;
+    if (GetResourceName(luaVM, resourceName))
+    {
+        std::strncpy(szName, resourceName.c_str(), length);
+        return true;
+    }
+
+    return false;
+}
