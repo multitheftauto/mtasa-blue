@@ -67,6 +67,7 @@ public:
     lua_State*              GetResourceFromName     ( const char* szResourceName );
     // GetResourceName above might not work if module and MTA were compiled with different compiler versions
     bool                    GetResourceName         ( lua_State* luaVM, char* szName, size_t length ) override;
+    bool                    GetResourceFilePath     ( lua_State* luaVM, const char* fileName, char* path, size_t length ) override;
 
     // functions for deathmatch
     int                     _LoadModule             ( void );

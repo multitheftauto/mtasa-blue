@@ -61,6 +61,7 @@ public:
 
     // GetResourceName above doesn't work if module and MTA were compiled with different compiler versions
     virtual bool                GetResourceName         ( lua_State* luaVM, char* szName, size_t length ) = 0;
+    virtual bool                GetResourceFilePath     ( lua_State* luaVM, const char* fileName, char* path, size_t length ) = 0;
 };
 
 #endif
