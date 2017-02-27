@@ -846,6 +846,11 @@ json_object * CLuaArgument::WriteToJSONObject ( bool bSerialize, CFastHashMap < 
         case LUA_TSTRING:
         {
             SString strTemp = GetString ( );
+            if ( strTemp.length() > 3 && strTemp [0] == '^' && strTemp [2] == '^' && strTemp [1] != '^' )
+            {
+                // Prevent clash with how MTA stores elements, resources and table refs as strings
+                strTemp [2] = '~';
+            }
             if ( strTemp.length() <= USHRT_MAX )
             {
                 return json_object_new_string_len ( (char *)strTemp.c_str(), strTemp.length() );
