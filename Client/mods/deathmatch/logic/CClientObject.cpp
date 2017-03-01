@@ -773,3 +773,11 @@ void CClientObject::SetMass ( float fMass )
 
     m_fMass = fMass;
 }
+
+void CClientObject::SetVisibleInAllDimensions ( bool bVisible, unsigned short usNewDimension )
+{
+    m_bVisibleInAllDimensions = bVisible;
+
+    // Stream-in/out the object as needed
+    this->SetDimension ( bVisible ? g_pClientGame->GetLocalPlayer()->GetDimension() : usNewDimension );
+}

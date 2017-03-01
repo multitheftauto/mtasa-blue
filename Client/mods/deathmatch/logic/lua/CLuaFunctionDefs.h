@@ -162,6 +162,9 @@ public:
     LUA_DECLARE ( GetNearClipDistance );
     LUA_DECLARE ( SetNearClipDistance );
     LUA_DECLARE ( ResetNearClipDistance );
+    LUA_DECLARE ( GetVehiclesLODDistance );
+    LUA_DECLARE ( SetVehiclesLODDistance );
+    LUA_DECLARE ( ResetVehiclesLODDistance );
     LUA_DECLARE ( GetFogDistance );
     LUA_DECLARE ( SetFogDistance );
     LUA_DECLARE ( ResetFogDistance );

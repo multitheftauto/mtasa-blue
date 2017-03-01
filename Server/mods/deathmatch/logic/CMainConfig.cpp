@@ -310,14 +310,12 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        // Add support for SD #12, #14, #15, #16, #20, #22 and #28 (defaults to disabled)
-        MapInsert ( m_DisableComboACMap, "12" );
-        MapInsert ( m_DisableComboACMap, "14" );
-        MapInsert ( m_DisableComboACMap, "15" );
-        MapInsert ( m_DisableComboACMap, "16" );
-        MapInsert ( m_DisableComboACMap, "20" );
-        MapInsert ( m_DisableComboACMap, "22" );
-        MapInsert ( m_DisableComboACMap, "28" );
+        // Add support for detections which default to disabled
+        const char* defaultDisabledList[] = { "12", "14", "15", "16", "20", "22", "23", "28", "31", "32", "33", "34", "35", "36" };
+        for( uint i = 0 ; i < NUMELMS(defaultDisabledList) ; i++ )
+        {
+            MapInsert( m_DisableComboACMap, defaultDisabledList[i] );
+        }
 
         {
             SString strEnableSD;

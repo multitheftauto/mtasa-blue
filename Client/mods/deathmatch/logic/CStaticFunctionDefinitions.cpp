@@ -3919,6 +3919,32 @@ bool CStaticFunctionDefinitions::SetObjectMass ( CClientEntity& Entity, float fM
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions ( CClientEntity& Entity, bool bVisible, unsigned short usNewDimension )
+{
+    RUN_CHILDREN ( SetObjectVisibleInAllDimensions ( **iter, bVisible, usNewDimension ) )
+
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > (Entity);
+        Object.SetVisibleInAllDimensions ( bVisible, usNewDimension );
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions ( CClientEntity& Entity )
+{
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast <CDeathmatchObject&> (Entity);
+
+        return Object.IsVisibleInAllDimensions();
+    }
+
+    return false;
+}
+
 CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color )
 {
     // Create it
