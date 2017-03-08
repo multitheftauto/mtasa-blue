@@ -89,6 +89,10 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Save the nick too
     CVARS_SET ( "nick", std::string ( szNick ) );
 
+    // Reset fake lag
+    CCore::GetSingleton().SetFakeLagCommandEnabled( false );
+    pNet->SetFakeLag( 0, 0, 0, 0 );
+
     // Reset the network
     pNet->Reset ();
     assert ( pNet->GetServerBitStreamVersion () == 0 );

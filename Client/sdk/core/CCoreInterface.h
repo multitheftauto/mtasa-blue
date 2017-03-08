@@ -175,6 +175,7 @@ public:
     virtual const char*             GetProductRegistryPath          ( void ) = 0;
     virtual const char*             GetProductCommonDataDir         ( void ) = 0;
     virtual const char*             GetProductVersion               ( void ) = 0;
+    virtual void                    SetFakeLagCommandEnabled        ( bool bEnabled ) = 0;
 };
 
 class CClientTime

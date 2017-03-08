@@ -621,19 +621,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         }
     }
 
-    if ( m_pMainConfig->GetAseInternetListenEnabled() )
-    {
-        // Check if IP is one of the most common private IP addresses
-        in_addr serverIp;
-        serverIp.s_addr = inet_addr( strServerIP );
-        uchar a = ( (uchar*)&serverIp.s_addr )[0];
-        uchar b = ( (uchar*)&serverIp.s_addr )[1];
-        if ( a == 10 || a == 127 || ( a == 169 && b == 254 ) || ( a == 192 && b == 168 ) )
-        {
-            CLogger::LogPrintf ( "WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
-        }
-    }
-
     m_pFunctionUseLogger = new CFunctionUseLogger( m_pMainConfig->GetLoadstringLogFilename() );
 
     // Setup server id
@@ -715,6 +702,25 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Show startup messages from net module
     PrintLogOutputFromNetModule();
+
+    // Show some warnings if applicable
+    if ( m_pMainConfig->IsFakeLagCommandEnabled() )
+    {
+        CLogger::LogPrintf ( "WARNING: ase disabled due to fakelag command\n" );
+    }
+
+    if ( m_pMainConfig->GetAseInternetListenEnabled() )
+    {
+        // Check if IP is one of the most common private IP addresses
+        in_addr serverIp;
+        serverIp.s_addr = inet_addr( strServerIP );
+        uchar a = ( (uchar*)&serverIp.s_addr )[0];
+        uchar b = ( (uchar*)&serverIp.s_addr )[1];
+        if ( a == 10 || a == 127 || ( a == 169 && b == 254 ) || ( a == 192 && b == 168 ) )
+        {
+            CLogger::LogPrintf ( "WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
+        }
+    }
 
     // Check accounts database and print message if there is a problem
     if ( !m_pAccountManager->IntegrityCheck () )

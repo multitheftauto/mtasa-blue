@@ -471,7 +471,11 @@ void CCommandFuncs::Serial ( const char* szParameters )
 
 void CCommandFuncs::FakeLag ( const char *szCmdLine )
 {
-#if defined(MTA_DEBUG) || defined(MTA_BETA)
+    if ( !CCore::GetSingleton ().IsFakeLagCommandEnabled() )
+    {
+        g_pCore->GetConsole ()->Print( "fakelag command no enabled" );
+        return;
+    }
 
     std::vector < SString > parts;
     SStringX ( szCmdLine ).Split ( " ", parts );
@@ -491,8 +495,6 @@ void CCommandFuncs::FakeLag ( const char *szCmdLine )
 
     g_pCore->GetNetwork ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit );
     g_pCore->GetConsole ()->Print ( SString ( "Client send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
-
-#endif
 }
 
 void CCommandFuncs::ShowMemStat ( const char* szParameters )

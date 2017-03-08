@@ -389,6 +389,13 @@ void CPacketHandler::Packet_ServerJoined ( NetBitStreamInterface& bitStream )
 
     g_pClientGame->InitVoice ( bVoiceEnabled, (unsigned int)sampleRate, quality, iBitrate );
 
+    // Get fakelag command enabled
+    if ( bitStream.Version() >= 0x06A )
+    {
+        if ( bitStream.ReadBit() )
+            g_pCore->SetFakeLagCommandEnabled( true );
+    }
+
     // Limit number of http request if required by the server
     int iHTTPMaxConnectionsPerClient = 4;
     bitStream.Read ( iHTTPMaxConnectionsPerClient );
