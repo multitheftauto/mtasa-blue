@@ -230,7 +230,7 @@ bool CLatentSendQueue::GetSendStatus ( SSendHandle handle, SSendStatus* pOutSend
             pOutSendStatus->iStartTimeMsOffset = iTimeMsBefore - iter->iEstSendDurationMsUsed;
             pOutSendStatus->iEndTimeMsOffset = iTimeMsBefore + iter->iEstSendDurationMsRemaining;
             pOutSendStatus->iTotalSize = iter->bufferRef->GetSize ();
-            pOutSendStatus->iPercentComplete = iter->uiReadPosition * 100 / std::max ( 1, pOutSendStatus->iTotalSize );
+            pOutSendStatus->dPercentComplete = iter->uiReadPosition * 100.0 / std::max ( 1, pOutSendStatus->iTotalSize );
             return true;
         }
         iTimeMsBefore += iter->iEstSendDurationMsRemaining;
