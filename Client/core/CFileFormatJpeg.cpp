@@ -55,7 +55,7 @@ bool IsJpeg ( const void* pData, uint uiDataSize )
 // jpeg to XRGB
 //
 ///////////////////////////////////////////////////////////////
-bool JpegDecode ( const void* pData, uint uiDataSize, CBuffer& outBuffer, uint& uiOutWidth, uint& uiOutHeight )
+bool JpegDecode ( const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& uiOutWidth, uint& uiOutHeight )
 {
     struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
@@ -83,33 +83,37 @@ bool JpegDecode ( const void* pData, uint uiDataSize, CBuffer& outBuffer, uint& 
     uiOutWidth = uiWidth;
     uiOutHeight = uiHeight;
 
-    outBuffer.SetSize ( uiWidth * uiHeight * 4 );
-    char* pOutData = outBuffer.GetData ();
-
-    /* Process data */
-    JSAMPROW row_pointer[1];
-    CBuffer rowBuffer;
-    rowBuffer.SetSize ( uiWidth * 3 );
-    char* pRowTemp = rowBuffer.GetData ();
-
-    while (cinfo.output_scanline < cinfo.output_height)
+    if ( pOutBuffer )
     {
-        BYTE* pRowDest = (BYTE*)pOutData + cinfo.output_scanline * uiWidth * 4;
-        row_pointer[0] = (JSAMPROW)pRowTemp;
+        pOutBuffer->SetSize ( uiWidth * uiHeight * 4 );
+        char* pOutData = pOutBuffer->GetData ();
 
-        JDIMENSION num_scanlines = jpeg_read_scanlines(&cinfo, row_pointer, 1);
+        /* Process data */
+        JSAMPROW row_pointer[1];
+        CBuffer rowBuffer;
+        rowBuffer.SetSize ( uiWidth * 3 );
+        char* pRowTemp = rowBuffer.GetData ();
 
-        for ( uint i = 0 ; i < uiWidth ; i++ )
+        while (cinfo.output_scanline < cinfo.output_height)
         {
-            pRowDest[i*4+0] = pRowTemp[i*3+2];
-            pRowDest[i*4+1] = pRowTemp[i*3+1];
-            pRowDest[i*4+2] = pRowTemp[i*3+0];
-            pRowDest[i*4+3] = 255;
+            BYTE* pRowDest = (BYTE*)pOutData + cinfo.output_scanline * uiWidth * 4;
+            row_pointer[0] = (JSAMPROW)pRowTemp;
+
+            JDIMENSION num_scanlines = jpeg_read_scanlines(&cinfo, row_pointer, 1);
+
+            for ( uint i = 0 ; i < uiWidth ; i++ )
+            {
+                pRowDest[i*4+0] = pRowTemp[i*3+2];
+                pRowDest[i*4+1] = pRowTemp[i*3+1];
+                pRowDest[i*4+2] = pRowTemp[i*3+0];
+                pRowDest[i*4+3] = 255;
+            }
         }
+
+        // Finish decompression and release memory.
+        (void) jpeg_finish_decompress(&cinfo);
     }
 
-    // Finish decompression and release memory.
-    (void) jpeg_finish_decompress(&cinfo);
     jpeg_destroy_decompress(&cinfo);
 
     if ( jerr.num_warnings )
@@ -186,11 +190,10 @@ bool JpegEncode ( uint uiWidth, uint uiHeight, uint uiQuality, const void* pData
 //
 // JpegGetDimensions
 //
-// This needs optimizing
+//
 //
 ///////////////////////////////////////////////////////////////
 bool JpegGetDimensions ( const void* pData, uint uiDataSize, uint& uiOutWidth, uint& uiOutHeight )
 {
-    CBuffer temp;
-    return JpegDecode ( pData, uiDataSize, temp, uiOutWidth, uiOutHeight );
+    return JpegDecode ( pData, uiDataSize, nullptr, uiOutWidth, uiOutHeight );
 }
