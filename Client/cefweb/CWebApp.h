@@ -8,6 +8,7 @@
 *****************************************************************************/
 #pragma once
 #include <cef3/include/cef_app.h>
+#include <cef3/include/cef_scheme.h>
 
 class CWebApp : public CefApp, public CefSchemeHandlerFactory
 {
@@ -15,7 +16,7 @@ public:
     // Error Handler
     static CefRefPtr<CefResourceHandler> HandleError(const SString& strError, unsigned int uiError);
 
-    virtual void OnRegisterCustomSchemes(CefRefPtr<CefSchemeRegistrar> registrar) override;
+    virtual void OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar) override;
     virtual void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override;
 
     // CefSchemeHandlerFactory methods
