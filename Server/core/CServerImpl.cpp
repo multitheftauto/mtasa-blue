@@ -701,7 +701,7 @@ void CServerImpl::HandleInput ( void )
         // however, the encoding is dependent on the writer
         // so just accept ASCII here by convention
         DWORD read;
-        if (!ReadFile(GetStdHandle(STD_INPUT_HANDLE), &iStdIn, 1, &read, nullptr) || read == 0)
+        if (!ReadFile(m_hConsoleInput, &iStdIn, 1, &read, nullptr) || read == 0)
             iStdIn = 0;
     }
     else if ( kbhit () )
