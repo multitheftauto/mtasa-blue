@@ -153,6 +153,8 @@ public:
     LUA_DECLARE ( SetInteriorSoundsEnabled );
     LUA_DECLARE ( GetInteriorFurnitureEnabled );
     LUA_DECLARE ( SetInteriorFurnitureEnabled );
+    LUA_DECLARE ( SetRandomFoliageEnabled );
+    LUA_DECLARE ( IsRandomFoliageEnabled );
     LUA_DECLARE ( GetRainLevel );
     LUA_DECLARE ( SetRainLevel );
     LUA_DECLARE ( ResetRainLevel );

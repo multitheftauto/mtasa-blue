@@ -5523,6 +5523,9 @@ void CClientGame::ResetMapInfo ( void )
     for ( int i = 0; i <= 4; ++i )
         g_pMultiplayer->SetInteriorFurnitureEnabled ( i, true );
 
+    // Re-enable random foliage
+    g_pMultiplayer->SetRandomFoliageEnabled ( true );
+
      // Clouds
     g_pMultiplayer->SetCloudsEnabled ( true );
     g_pClientGame->SetCloudsEnabled ( true );

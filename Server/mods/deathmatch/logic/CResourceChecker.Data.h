@@ -164,6 +164,8 @@ namespace
         { "pregMatch",                     "1.3.5" },
         { "setInteriorFurnitureEnabled",   "1.3.5-9.06101" },
         { "getInteriorFurnitureEnabled",   "1.3.5-9.06101" },
+        { "setFoliageEnabled",             "1.5.4" },
+        { "getFoliageEnabled",             "1.5.4" },
         { "setElementCallPropagationEnabled",  "1.3.5-9.06118" },
         { "isElementCallPropagationEnabled",   "1.3.5-9.06118" },
         { "getResourceState",              "1.3.5-9.06194" },
