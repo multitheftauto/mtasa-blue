@@ -1288,11 +1288,12 @@ namespace SharedUtil
     //
     enum eDummy { };
 
+    template<class T>
     struct CEnumInfo
     {
         struct SEnumItem
         {
-            int iValue;
+            T iValue;
             const char* szName;
         };
 
@@ -1346,16 +1347,17 @@ namespace SharedUtil
     };
 
 
-    #define DECLARE_ENUM( T ) \
-        CEnumInfo*             GetEnumInfo     ( const T& ); \
+    #define DECLARE_ENUM2(T, U) \
+        CEnumInfo<U>*          GetEnumInfo     ( const T& ); \
         inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
         inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
         inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
         inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->ValueValid  ( (eDummy)value ); }\
 
-    #define IMPLEMENT_ENUM_BEGIN(cls) \
-        CEnumInfo* GetEnumInfo( const cls& ) \
+    #define IMPLEMENT_ENUM_BEGIN2(T, U) \
+        CEnumInfo<U>* GetEnumInfo( const T& ) \
         { \
+            using CEnumInfo = CEnumInfo<U>; \
             static const CEnumInfo::SEnumItem items[] = {
 
     #define IMPLEMENT_ENUM_END(name) \
@@ -1369,6 +1371,16 @@ namespace SharedUtil
 
     #define ADD_ENUM(value,name) {value, name},
     #define ADD_ENUM1(value)     {value, #value},
+
+    // enum
+    #define DECLARE_ENUM(T)                                             DECLARE_ENUM2(T, int)
+    #define IMPLEMENT_ENUM_BEGIN(T)                                     IMPLEMENT_ENUM_BEGIN2(T, int)
+
+    // enum class
+    #define DECLARE_ENUM_CLASS(T)                                       DECLARE_ENUM2(T, T)
+    #define IMPLEMENT_ENUM_CLASS_BEGIN(T)                               IMPLEMENT_ENUM_BEGIN2(T, T)
+    #define IMPLEMENT_ENUM_CLASS_END(name)                              IMPLEMENT_ENUM_END(name)
+    #define IMPLEMENT_ENUM_CLASS_END_DEFAULTS(name,defvalue,defname)    IMPLEMENT_ENUM_END_DEFAULTS(name,defvalue,defname)
 
 
     //
