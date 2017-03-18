@@ -80,6 +80,12 @@ bool CPlayerJoinCompletePacket::Write ( NetBitStreamInterface& BitStream ) const
     // Transmit the max bitrate for voice
     BitStream.WriteCompressed ( m_uiBitrate );
 
+    // fakelag command enabled
+    if ( BitStream.Version() >= 0x06A )
+    {
+        BitStream.WriteBit( g_pGame->GetConfig()->IsFakeLagCommandEnabled() );
+    }
+
     // Tellclient about maybe throttling back http client requests
     BitStream.Write ( m_iHTTPMaxConnectionsPerClient );
 

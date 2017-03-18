@@ -75,8 +75,8 @@ public:
     unsigned int                    GetVoiceQuality                 ( void )        { return m_ucVoiceQuality; };
     unsigned int                    GetVoiceBitrate                 ( void )        { return m_uiVoiceBitrate; };
 
-    bool                            GetAseInternetPushEnabled       ( void )        { return m_iAseMode == 2; }
-    bool                            GetAseInternetListenEnabled     ( void )        { return m_iAseMode == 1; }
+    bool                            GetAseInternetPushEnabled       ( void )        { return m_iAseMode == 2 && !IsFakeLagCommandEnabled(); }
+    bool                            GetAseInternetListenEnabled     ( void )        { return m_iAseMode == 1 && !IsFakeLagCommandEnabled(); }
     bool                            GetAseLanListenEnabled          ( void )        { return m_bDontBroadcastLan ? false : true; }
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
@@ -130,6 +130,7 @@ public:
     bool                            GetAuthSerialHttpEnabled        ( void ) const                      { return m_bAuthSerialHttpEnabled && GetAuthSerialEnabled(); };
     const std::vector< SString >&   GetAuthSerialGroupList          ( void ) const                      { return m_AuthSerialGroupList; }
     bool                            IsDatabaseCredentialsProtectionEnabled ( void ) const               { return m_bDatabaseCredentialsProtectionEnabled != 0; }
+    bool                            IsFakeLagCommandEnabled         ( void ) const                      { return m_bFakeLagCommandEnabled != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -222,7 +223,8 @@ private:
     int                             m_iServerLogicFpsLimit;
     int                             m_bCrashDumpUploadEnabled;
     int                             m_bFilterDuplicateLogLinesEnabled;
-    int                             m_bDatabaseCredentialsProtectionEnabled;    
+    int                             m_bDatabaseCredentialsProtectionEnabled;
+    int                             m_bFakeLagCommandEnabled;
 };
 
 #endif

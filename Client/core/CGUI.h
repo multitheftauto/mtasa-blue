@@ -61,7 +61,7 @@ public:
     void                Restore                     ( void );
 
     void                DrawMouseCursor             ( void );
-    void                SetCursorPos                ( int iX, int iY, bool bForce = false );
+    void                SetCursorPos                ( int iX, int iY, bool bForce = false, bool overrideStored = true );
 
     CConsole*           GetConsole                  ( void );
     void                SetConsoleVisible           ( bool bVisible );

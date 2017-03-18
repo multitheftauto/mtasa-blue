@@ -761,8 +761,15 @@ void CLocalGUI::UpdateCursor ( void )
             CCore::GetSingleton ().GetGame ()->GetPad ()->Disable ( false );
             CCore::GetSingleton ().GetGame ()->GetPad ()->Clear ();*/
 
+            // Update stored position
+            POINT point;
+            GetCursorPos(&point);
+
+            m_StoredMousePosition.x = point.x;
+            m_StoredMousePosition.y = point.y;
+
             // Set the mouse back to the center of the screen (to prevent the game from reacting to its movement)
-            SetCursorPos ( dwWidth / 2, dwHeight / 2 );
+            SetCursorPos ( dwWidth / 2, dwHeight / 2, false, false );
 
             // Disable our mouse cursor
             CSetCursorPosHook::GetSingleton ( ).EnableSetCursorPos ();
@@ -806,11 +813,14 @@ DWORD CLocalGUI::TranslateScanCodeToGUIKey ( DWORD dwCharacter )
     }
 }
 
-void CLocalGUI::SetCursorPos ( int iX, int iY, bool bForce )
+void CLocalGUI::SetCursorPos ( int iX, int iY, bool bForce, bool overrideStored )
 {
     // Update the stored position
-    m_StoredMousePosition.x = iX;
-    m_StoredMousePosition.y = iY;
+    if (overrideStored)
+    {
+        m_StoredMousePosition.x = iX;
+        m_StoredMousePosition.y = iY;
+    }
 
     // Apply the position
     if ( bForce )

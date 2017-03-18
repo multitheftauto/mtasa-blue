@@ -709,7 +709,7 @@ bool CPixelsManager::ChangePixelsFormat ( const CPixels& oldPixels, CPixels& new
         if ( oldFormat == EPixelsFormat::JPEG )
         {
             uint uiWidth, uiHeight;
-            if ( JpegDecode ( oldPixels.GetData (), oldPixels.GetSize (), newPixels.buffer, uiWidth, uiHeight ) )
+            if ( JpegDecode ( oldPixels.GetData (), oldPixels.GetSize (), &newPixels.buffer, uiWidth, uiHeight ) )
             {
                 newPixels.buffer.SetSize ( uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL );
                 return SetPlainDimensions ( newPixels, uiWidth, uiHeight );
@@ -719,7 +719,7 @@ bool CPixelsManager::ChangePixelsFormat ( const CPixels& oldPixels, CPixels& new
         if ( oldFormat == EPixelsFormat::PNG )
         {
             uint uiWidth, uiHeight;
-            if ( PngDecode ( oldPixels.GetData (), oldPixels.GetSize (), newPixels.buffer, uiWidth, uiHeight ) )
+            if ( PngDecode ( oldPixels.GetData (), oldPixels.GetSize (), &newPixels.buffer, uiWidth, uiHeight ) )
             {
                 newPixels.buffer.SetSize ( uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL );
                 return SetPlainDimensions ( newPixels, uiWidth, uiHeight );

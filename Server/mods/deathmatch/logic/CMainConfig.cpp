@@ -835,9 +835,7 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "authserial", CConsoleCommands::AuthorizeSerial, false );
     RegisterCommand ( "debugjoinflood", CConsoleCommands::DebugJoinFlood, false );
     RegisterCommand ( "debuguptime", CConsoleCommands::DebugUpTime, false );
-#if defined(MTA_DEBUG) || defined(MTA_BETA)
     RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );
-#endif
     return true;
 }
 
@@ -1473,6 +1471,7 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { true, true,   0,      1,      1,      "crash_dump_upload",                    &m_bCrashDumpUploadEnabled,                 NULL },
             { true, true,   0,      1,      1,      "filter_duplicate_log_lines",           &m_bFilterDuplicateLogLinesEnabled,         NULL },
             { false, false, 0,      1,      1,      "database_credentials_protection",      &m_bDatabaseCredentialsProtectionEnabled,   NULL },
+            { false, false, 0,      0,      1,      "fakelag",                              &m_bFakeLagCommandEnabled,                  NULL },
         };
 
     static std::vector < SIntSetting > settingsList;

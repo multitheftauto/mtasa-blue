@@ -24,6 +24,7 @@
 #include <signal.h>
 #ifdef WIN32
     #include <Mmsystem.h>
+    #include <io.h>
 #else
     #include <termios.h>
     #include <unistd.h>
@@ -160,6 +161,16 @@ void CServerImpl::Daemonize () const
     close ( 2 );
     assert ( open ( "/dev/null", O_WRONLY ) == 2 );
 }
+
+#endif
+
+#ifdef WIN32
+bool CServerImpl::HasConsole()
+{
+    // Getting it a single time is sufficient
+    static bool isTTY = _isatty(_fileno(stdin));
+    return isTTY;
+}
 #endif
 
 
@@ -196,36 +207,47 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
         std::setlocale(LC_ALL,"C");
         assert ( strcoll( "a", "B" ) > 0 );
 
-        // Disable QuickEdit mode to prevent text selection causing server freeze
-        HANDLE hConIn = GetStdHandle( STD_INPUT_HANDLE );
-        DWORD dwConInMode;
-        GetConsoleMode( hConIn, &dwConInMode );
-        SetConsoleMode( hConIn, dwConInMode & ~ENABLE_QUICK_EDIT_MODE );
+        // Get the console handles
+        m_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        m_hConsoleInput = GetStdHandle(STD_INPUT_HANDLE);
 
-        // Get the console handle
-        m_hConsole = GetStdHandle ( STD_OUTPUT_HANDLE );
-
-        // Enable the default grey color with a black background
-        SetConsoleTextAttribute ( m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
-
-        // Get the console's width
-        CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
-        if ( !GetConsoleScreenBufferInfo( m_hConsole, &ScrnBufferInfo ) )
+        // If stdout is piped GetConsoleScreenBufferInfo will fail
+        // ==> check if stdin is piped
+        if (HasConsole())
         {
-            Print ( "ERROR: GetConsoleScreenBufferInfo failed (%08x)\n", GetLastError() );
-            Print ( "Press Q to shut down the server!\n" );
-            WaitForKey ( 'q' );
-            DestroyWindow ( );
-            return ERROR_OTHER;
+            // Disable QuickEdit mode to prevent text selection causing server freeze
+            DWORD dwConInMode;
+            GetConsoleMode(m_hConsoleInput, &dwConInMode);
+            SetConsoleMode(m_hConsoleInput, dwConInMode & ~ENABLE_QUICK_EDIT_MODE);
+
+            // Enable the default grey color with a black background
+            SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+
+            // Get the console's width
+            CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
+            if (!GetConsoleScreenBufferInfo(m_hConsole, &ScrnBufferInfo))
+            {
+                Print("ERROR: GetConsoleScreenBufferInfo failed (%08x)\n", GetLastError());
+                Print("Press Q to shut down the server!\n");
+                WaitForKey('q');
+                DestroyWindow();
+                return ERROR_OTHER;
+            }
+
+            // Adjust the console's screenbuffer so we can disable a bar at the top
+            if (!g_bNoTopBar)
+                ScrnBufferInfo.dwSize.Y = ScrnBufferInfo.srWindow.Bottom + 1;
+
+            SetConsoleWindowInfo(m_hConsole, TRUE, &ScrnBufferInfo.srWindow);
+            SetConsoleScreenBufferSize(m_hConsole, ScrnBufferInfo.dwSize);
+            SetConsoleOutputCP(CP_UTF8);
         }
-
-        // Adjust the console's screenbuffer so we can disable a bar at the top
-        if ( !g_bNoTopBar )
-            ScrnBufferInfo.dwSize.Y = ScrnBufferInfo.srWindow.Bottom + 1;
-
-        SetConsoleWindowInfo ( m_hConsole, TRUE, &ScrnBufferInfo.srWindow );
-        SetConsoleScreenBufferSize( m_hConsole, ScrnBufferInfo.dwSize );
-        SetConsoleOutputCP(CP_UTF8);
+        else if (GetFileType(m_hConsoleInput) == FILE_TYPE_PIPE)
+        {
+            // Enable non-blocking read mode
+            DWORD pipeState = PIPE_NOWAIT;
+            SetNamedPipeHandleState(GetStdHandle(STD_INPUT_HANDLE), &pipeState, nullptr, nullptr);
+        }
 #else
         // support user locales
         std::setlocale(LC_ALL, "");
@@ -673,7 +695,16 @@ void CServerImpl::HandleInput ( void )
 
     // Get the STDIN input
 #ifdef WIN32
-    if ( kbhit () )
+    if (!HasConsole())
+    {
+        // Read from pipe instead of tty
+        // however, the encoding is dependent on the writer
+        // so just accept ASCII here by convention
+        DWORD read;
+        if (!ReadFile(m_hConsoleInput, &iStdIn, 1, &read, nullptr) || read == 0)
+            iStdIn = 0;
+    }
+    else if ( kbhit () )
     {
         iStdIn = _getwch();
     }
@@ -766,7 +797,7 @@ void CServerImpl::HandleInput ( void )
 #ifdef WIN32    // WIN32: we have to use a prefix code, this routine opens an extra switch
         case KEY_EXTENDED:
             // Color the text
-            if ( !g_bSilent )
+            if (!g_bSilent && HasConsole())
                 SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
 
             iStdIn = _getwch();
@@ -830,7 +861,7 @@ void CServerImpl::HandleInput ( void )
 #ifdef WIN32    // WIN32: Close the switch again
             }
             // Restore the color
-            if ( !g_bSilent )
+            if (!g_bSilent && HasConsole())
                 SetConsoleTextAttribute ( m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
 
         break;  // KEY_EXTENDED
@@ -845,7 +876,7 @@ void CServerImpl::HandleInput ( void )
 
 #ifdef WIN32
             // Color the text
-            if ( !g_bSilent )
+            if (!g_bSilent && HasConsole())
                 SetConsoleTextAttribute ( m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED );
 
             // Echo the input
@@ -861,7 +892,7 @@ void CServerImpl::HandleInput ( void )
 
 #ifdef WIN32
             // Restore the color
-            if ( !g_bSilent )
+            if (!g_bSilent && HasConsole())
                 SetConsoleTextAttribute ( m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE );
 #endif
         break;

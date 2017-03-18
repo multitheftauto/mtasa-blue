@@ -1812,7 +1812,11 @@ bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArgume
 
 bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-#if defined(MTA_DEBUG) || defined(MTA_BETA)
+    if ( !g_pGame->GetConfig()->IsFakeLagCommandEnabled() )
+    {
+        pEchoClient->SendConsole( "sfakelag is not enabled" );
+        return false;
+    }
 
     if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
@@ -1842,7 +1846,6 @@ bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CC
     g_pGame->GetConfig ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit );
     pEchoClient->SendConsole ( SString ( "Server send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
 
-#endif
     return true;
 }
 

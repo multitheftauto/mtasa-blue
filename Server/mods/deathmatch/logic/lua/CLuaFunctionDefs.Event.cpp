@@ -380,7 +380,7 @@ int CLuaFunctionDefs::GetLatentEventStatus ( lua_State* luaVM )
             lua_settable ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "percentComplete" );
-            lua_pushinteger ( luaVM, sendStatus.iPercentComplete );
+            lua_pushnumber  ( luaVM, sendStatus.dPercentComplete );
             lua_settable ( luaVM, -3 );
             return 1;
         }

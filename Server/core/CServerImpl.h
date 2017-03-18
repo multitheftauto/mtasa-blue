@@ -68,7 +68,7 @@ public:
 #ifndef WIN32
     void                Daemonize           () const;
 #else
-    bool                HasConsole          ( void )                { return m_hConsole != NULL; }
+    bool                HasConsole          ();
 #endif
 
 private:
@@ -109,6 +109,7 @@ private:
 
 #ifdef WIN32
     HANDLE              m_hConsole;
+    HANDLE              m_hConsoleInput;
     CHAR_INFO           m_ScrnBuffer[256];
 
     CThreadCommandQueue*    m_pThreadCommandQueue;
