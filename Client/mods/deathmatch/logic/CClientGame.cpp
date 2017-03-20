@@ -5544,6 +5544,9 @@ void CClientGame::ResetMapInfo ( void )
     // Cheats
     g_pGame->ResetCheats ();
 
+    // Moon Easter Egg
+    g_pGame->SetMoonEasterEggEnabled ( true );
+
     // Players
     m_pPlayerManager->ResetAll ();
 
