@@ -1126,6 +1126,31 @@ int CLuaFunctionDefs::SetWorldSpecialPropertyEnabled ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::IsMoonEasterEggEnabled ( lua_State* luaVM )
+{
+    lua_pushboolean ( luaVM, CStaticFunctionDefinitions::IsMoonEasterEggEnabled () );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetMoonEasterEggEnabled ( lua_State* luaVM )
+{
+    bool bEnable;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnable );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetMoonEasterEggEnabled ( bEnable ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::SetCloudsEnabled ( lua_State* luaVM )
 {
 //  bool setCloudsEnabled ( bool enabled )
@@ -1401,6 +1426,32 @@ int CLuaFunctionDefs::SetInteriorFurnitureEnabled ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::IsRandomFoliageEnabled ( lua_State* luaVM )
+{
+    // bool isRandomFoliageEnabled( )
+    lua_pushboolean( luaVM, g_pMultiplayer->IsRandomFoliageEnabled() );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetRandomFoliageEnabled ( lua_State* luaVM )
+{
+    // bool setRandomFoliageEnabled( bool enabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pMultiplayer->SetRandomFoliageEnabled ( bEnabled );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
 
     lua_pushboolean ( luaVM, false );
     return 1;

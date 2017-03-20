@@ -312,6 +312,7 @@ unsigned char ucTrafficLightState = 0;
 bool bTrafficLightsBlocked = false;
 bool bInteriorSoundsEnabled = true;
 bool bInteriorFurnitureStates[5] = {true, true, true, true, true};
+bool bRandomFoliageEnabled = true;
 
 bool bUsingCustomSkyGradient = false;
 BYTE ucSkyGradientTopR = 0;
@@ -1750,6 +1751,25 @@ void CMultiplayerSA::SetInteriorFurnitureEnabled ( char cRoomId, bool bEnabled )
     }
 
     bInteriorFurnitureStates[cRoomId] = bEnabled;
+}
+
+bool CMultiplayerSA::IsRandomFoliageEnabled ( )
+{
+    return bRandomFoliageEnabled;
+}
+
+void CMultiplayerSA::SetRandomFoliageEnabled ( bool bEnabled )
+{
+
+    DWORD originalCodeAddress = 0x53C159;
+    BYTE originalCode [5] = {0xE8, 0x42, 0x0E, 0x0A, 0x0};
+
+    if ( bEnabled )
+        MemCpy ( (void*)originalCodeAddress, &originalCode, 5 );
+    else
+        MemSet( (void*)originalCodeAddress, 0x90, 5 );
+
+    bRandomFoliageEnabled = bEnabled;
 }
 
 void CMultiplayerSA::SetWindVelocity ( float fX, float fY, float fZ )

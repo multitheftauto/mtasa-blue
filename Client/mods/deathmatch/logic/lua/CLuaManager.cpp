@@ -288,6 +288,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getGarageSize", CLuaFunctionDefs::GetGarageSize );
     CLuaCFunctions::AddFunction ( "getGarageBoundingBox", CLuaFunctionDefs::GetGarageBoundingBox );
     CLuaCFunctions::AddFunction ( "isWorldSpecialPropertyEnabled", CLuaFunctionDefs::IsWorldSpecialPropertyEnabled );
+    CLuaCFunctions::AddFunction ( "isMoonEasterEggEnabled", CLuaFunctionDefs::IsMoonEasterEggEnabled );
     CLuaCFunctions::AddFunction ( "getBlurLevel", CLuaFunctionDefs::GetBlurLevel );
     CLuaCFunctions::AddFunction ( "getTrafficLightState", CLuaFunctionDefs::GetTrafficLightState );
     CLuaCFunctions::AddFunction ( "areTrafficLightsLocked", CLuaFunctionDefs::AreTrafficLightsLocked );
@@ -297,6 +298,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getWindVelocity", CLuaFunctionDefs::GetWindVelocity );
     CLuaCFunctions::AddFunction ( "getInteriorSoundsEnabled", CLuaFunctionDefs::GetInteriorSoundsEnabled );
     CLuaCFunctions::AddFunction ( "getInteriorFurnitureEnabled", CLuaFunctionDefs::GetInteriorFurnitureEnabled );
+    CLuaCFunctions::AddFunction ( "isRandomFoliageEnabled", CLuaFunctionDefs::IsRandomFoliageEnabled );
     CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance );
     CLuaCFunctions::AddFunction ( "getNearClipDistance", CLuaFunctionDefs::GetNearClipDistance );
     CLuaCFunctions::AddFunction ( "getVehiclesLODDistance", CLuaFunctionDefs::GetVehiclesLODDistance );
@@ -329,6 +331,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setMinuteDuration", CLuaFunctionDefs::SetMinuteDuration );
     CLuaCFunctions::AddFunction ( "setGarageOpen", CLuaFunctionDefs::SetGarageOpen );
     CLuaCFunctions::AddFunction ( "setWorldSpecialPropertyEnabled", CLuaFunctionDefs::SetWorldSpecialPropertyEnabled );
+    CLuaCFunctions::AddFunction ( "setMoonEasterEggEnabled", CLuaFunctionDefs::SetMoonEasterEggEnabled );
     CLuaCFunctions::AddFunction ( "setBlurLevel", CLuaFunctionDefs::SetBlurLevel );
     CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight );
     CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled );
@@ -338,6 +341,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "resetWindVelocity", CLuaFunctionDefs::ResetWindVelocity );
     CLuaCFunctions::AddFunction ( "setInteriorSoundsEnabled", CLuaFunctionDefs::SetInteriorSoundsEnabled );
     CLuaCFunctions::AddFunction ( "setInteriorFurnitureEnabled", CLuaFunctionDefs::SetInteriorFurnitureEnabled );
+    CLuaCFunctions::AddFunction ( "setRandomFoliageEnabled", CLuaFunctionDefs::SetRandomFoliageEnabled );
     CLuaCFunctions::AddFunction ( "setRainLevel", CLuaFunctionDefs::SetRainLevel );
     CLuaCFunctions::AddFunction ( "resetRainLevel", CLuaFunctionDefs::ResetRainLevel );
     CLuaCFunctions::AddFunction ( "setFarClipDistance", CLuaFunctionDefs::SetFarClipDistance );

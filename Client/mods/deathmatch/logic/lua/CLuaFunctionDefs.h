@@ -117,6 +117,7 @@ public:
     LUA_DECLARE ( GetGarageSize );
     LUA_DECLARE ( GetGarageBoundingBox );
     LUA_DECLARE ( IsWorldSpecialPropertyEnabled );
+    LUA_DECLARE ( IsMoonEasterEggEnabled );
     LUA_DECLARE ( GetBlurLevel );
     LUA_DECLARE ( GetTrafficLightState );
     LUA_DECLARE ( AreTrafficLightsLocked );
@@ -140,6 +141,7 @@ public:
     LUA_DECLARE ( SetWaveHeight );
     LUA_DECLARE ( SetGarageOpen );
     LUA_DECLARE ( SetWorldSpecialPropertyEnabled );
+    LUA_DECLARE ( SetMoonEasterEggEnabled );
     LUA_DECLARE ( SetBlurLevel );
     LUA_DECLARE ( SetJetpackMaxHeight );
     LUA_DECLARE ( SetCloudsEnabled );
@@ -153,6 +155,8 @@ public:
     LUA_DECLARE ( SetInteriorSoundsEnabled );
     LUA_DECLARE ( GetInteriorFurnitureEnabled );
     LUA_DECLARE ( SetInteriorFurnitureEnabled );
+    LUA_DECLARE ( SetRandomFoliageEnabled );
+    LUA_DECLARE ( IsRandomFoliageEnabled );
     LUA_DECLARE ( GetRainLevel );
     LUA_DECLARE ( SetRainLevel );
     LUA_DECLARE ( ResetRainLevel );
