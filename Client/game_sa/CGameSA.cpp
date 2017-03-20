@@ -608,6 +608,17 @@ bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
     return false;
 }
 
+bool CGameSA::IsMoonEasterEggEnabled ()
+{
+    return *(unsigned char *)0x73ABCF == 0x75;
+}
+
+void CGameSA::SetMoonEasterEggEnabled ( bool bEnable )
+{
+    // replace JNZ with JMP (short)
+    MemPut < BYTE > ( 0x73ABCF, bEnable ? 0x75 : 0xEB );
+}
+
 void CGameSA::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )
 {
     if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )

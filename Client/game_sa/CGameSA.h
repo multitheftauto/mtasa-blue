@@ -213,6 +213,9 @@ public:
     bool                    SetCheatEnabled         ( const char* szCheatName, bool bEnable );
     void                    ResetCheats             ();
 
+    bool                    IsMoonEasterEggEnabled  ();
+    void                    SetMoonEasterEggEnabled ( bool bEnabled );
+
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();
     int&                    GetCheckStatus          ( void )            { return m_iCheckStatus; }
