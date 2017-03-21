@@ -87,6 +87,8 @@
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
+#define MOON_EASTER_EGG             "snipermoon"
+
 struct SCheatSA {
     BYTE*   m_byAddress; //Cheat Address
     bool    m_bEnabled; //Cheat State

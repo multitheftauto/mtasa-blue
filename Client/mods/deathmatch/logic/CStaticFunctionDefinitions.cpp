@@ -6290,11 +6290,6 @@ bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled ( const char* szP
     return g_pGame->IsCheatEnabled ( szPropName );
 }
 
-bool CStaticFunctionDefinitions::IsMoonEasterEggEnabled ( void )
-{
-    return g_pGame->IsMoonEasterEggEnabled ();
-}
-
 bool CStaticFunctionDefinitions::GetTrafficLightState ( unsigned char& ucState )
 {
     ucState = g_pMultiplayer->GetTrafficLightState ();
@@ -6493,12 +6488,6 @@ bool CStaticFunctionDefinitions::SetGarageOpen ( unsigned char ucGarageID, bool 
 bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled ( const char* szPropName, bool bEnabled )
 {
     return g_pGame->SetCheatEnabled ( szPropName, bEnabled );
-}
-
-bool CStaticFunctionDefinitions::SetMoonEasterEggEnabled ( bool bEnable )
-{
-    g_pGame->SetMoonEasterEggEnabled ( bEnable );
-    return true;
 }
 
 bool CStaticFunctionDefinitions::SetCloudsEnabled ( bool bEnabled )

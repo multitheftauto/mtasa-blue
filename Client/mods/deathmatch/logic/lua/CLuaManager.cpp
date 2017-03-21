@@ -288,7 +288,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getGarageSize", CLuaFunctionDefs::GetGarageSize );
     CLuaCFunctions::AddFunction ( "getGarageBoundingBox", CLuaFunctionDefs::GetGarageBoundingBox );
     CLuaCFunctions::AddFunction ( "isWorldSpecialPropertyEnabled", CLuaFunctionDefs::IsWorldSpecialPropertyEnabled );
-    CLuaCFunctions::AddFunction ( "isMoonEasterEggEnabled", CLuaFunctionDefs::IsMoonEasterEggEnabled );
     CLuaCFunctions::AddFunction ( "getBlurLevel", CLuaFunctionDefs::GetBlurLevel );
     CLuaCFunctions::AddFunction ( "getTrafficLightState", CLuaFunctionDefs::GetTrafficLightState );
     CLuaCFunctions::AddFunction ( "areTrafficLightsLocked", CLuaFunctionDefs::AreTrafficLightsLocked );
@@ -330,7 +329,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setMinuteDuration", CLuaFunctionDefs::SetMinuteDuration );
     CLuaCFunctions::AddFunction ( "setGarageOpen", CLuaFunctionDefs::SetGarageOpen );
     CLuaCFunctions::AddFunction ( "setWorldSpecialPropertyEnabled", CLuaFunctionDefs::SetWorldSpecialPropertyEnabled );
-    CLuaCFunctions::AddFunction ( "setMoonEasterEggEnabled", CLuaFunctionDefs::SetMoonEasterEggEnabled );
     CLuaCFunctions::AddFunction ( "setBlurLevel", CLuaFunctionDefs::SetBlurLevel );
     CLuaCFunctions::AddFunction ( "setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight );
     CLuaCFunctions::AddFunction ( "setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled );

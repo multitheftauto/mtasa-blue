@@ -569,6 +569,9 @@ void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 {
+    if ( !strcmp ( szCheatName, MOON_EASTER_EGG ) )
+        return IsMoonEasterEggEnabled ();
+
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -577,6 +580,12 @@ bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 
 bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 {
+    if ( !strcmp( szCheatName, MOON_EASTER_EGG ) )
+    {
+        SetMoonEasterEggEnabled ( bEnable );
+        return true;
+    }
+
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -589,6 +598,8 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 
 void CGameSA::ResetCheats ()
 {
+    SetMoonEasterEggEnabled ( true );
+
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
         if ( it->second->m_byAddress > (BYTE*)0x8A4000 )
@@ -597,15 +608,6 @@ void CGameSA::ResetCheats ()
             MemPut < BYTE > ( it->second->m_byAddress, 0 );
         it->second->m_bEnabled = false;
     }
-}
-
-bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
-{
-    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
-    {
-        return m_JetpackWeapons[weaponType];
-    }
-    return false;
 }
 
 bool CGameSA::IsMoonEasterEggEnabled ()
@@ -617,6 +619,15 @@ void CGameSA::SetMoonEasterEggEnabled ( bool bEnable )
 {
     // replace JNZ with JMP (short)
     MemPut < BYTE > ( 0x73ABCF, bEnable ? 0x75 : 0xEB );
+}
+
+bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
+{
+    if ( weaponType >= WEAPONTYPE_BRASSKNUCKLE && weaponType < WEAPONTYPE_LAST_WEAPONTYPE )
+    {
+        return m_JetpackWeapons[weaponType];
+    }
+    return false;
 }
 
 void CGameSA::SetJetpackWeaponEnabled ( eWeaponType weaponType, bool bEnabled )

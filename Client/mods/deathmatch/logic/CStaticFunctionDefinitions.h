@@ -514,7 +514,6 @@ public:
     static bool                         GetGarageSize                       ( unsigned char ucGarageID, float& fHeight, float& fWidth, float& fDepth );
     static bool                         GetGarageBoundingBox                ( unsigned char ucGarageID, float& fLeft, float& fRight, float& fFront, float& fBack );
     static bool                         IsWorldSpecialPropertyEnabled       ( const char* szPropName );
-    static bool                         IsMoonEasterEggEnabled              ( void );
     static bool                         SetCloudsEnabled                    ( bool bEnabled );
     static bool                         GetCloudsEnabled                    ( void );
     static bool                         GetTrafficLightState                ( unsigned char& ucState );
@@ -541,7 +540,6 @@ public:
     static bool                         SetMinuteDuration                   ( unsigned long ulDelay );
     static bool                         SetGarageOpen                       ( unsigned char ucGarageID, bool bIsOpen );
     static bool                         SetWorldSpecialPropertyEnabled      ( const char* szPropName, bool bEnabled );
-    static bool                         SetMoonEasterEggEnabled             ( bool bEnable );
     static bool                         SetBlurLevel                        ( unsigned char ucLevel );
     static bool                         SetJetpackMaxHeight                 ( float fHeight );
     static bool                         SetTrafficLightState                ( unsigned char ucState );
