@@ -1406,6 +1406,35 @@ int CLuaFunctionDefs::SetInteriorFurnitureEnabled ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::IsRandomFoliageEnabled ( lua_State* luaVM )
+{
+//  bool isRandomFoliageEnabled ()
+
+    lua_pushboolean ( luaVM, g_pMultiplayer->IsRandomFoliageEnabled () );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetRandomFoliageEnabled ( lua_State* luaVM )
+{
+//  bool setRandomFoliageEnabled ( bool enabled )
+
+    bool bEnabled;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadBool ( bEnabled );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pMultiplayer->SetRandomFoliageEnabled ( bEnabled );
+
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 int CLuaFunctionDefs::GetRainLevel ( lua_State* luaVM )
 {
     lua_pushnumber ( luaVM, g_pGame->GetWeather ()->GetAmountOfRain ());
