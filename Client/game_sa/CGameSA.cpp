@@ -598,7 +598,7 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 
 void CGameSA::ResetCheats ()
 {
-    SetMoonEasterEggEnabled ( true );
+    SetMoonEasterEggEnabled ( false );
 
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
