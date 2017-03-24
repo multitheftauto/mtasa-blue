@@ -69,7 +69,7 @@ if os.get() == "windows" then
             flags { "ExcludeFromBuild" } 
 end
 
--- Build shared version for the publicsdk
+-- Build static version for Linux module backwards compatibility
 project "Lua_Server_Static"
 	language "C++"
 	kind "StaticLib"
