@@ -2,7 +2,7 @@ project "Lua_Server"
 	language "C++"
 	targetname "lua5.1"
 
-	vpaths { 
+	vpaths {
 		["Headers"] = "**.h",
 		["Sources"] = "**.c",
 		["*"] = "premake5.lua"
@@ -33,7 +33,7 @@ if os.get() == "windows" then
 		targetname "lua5.1c"
 		targetdir(buildpath("mods/deathmatch"))
 
-		vpaths { 
+		vpaths {
 			["Headers"] = "**.h",
 			["Sources"] = "**.c",
 			["*"] = "premake5.lua"
@@ -55,3 +55,35 @@ if os.get() == "windows" then
         filter "platforms:x64"
             flags { "ExcludeFromBuild" } 
 end
+
+-- Build shared version for the publicsdk
+project "Lua_Server_publicsdk"
+	language "C++"
+	targetdir("%{wks.location}../Shared/publicsdk/lib")
+	targetname "lua5.1"
+	kind "SharedLib"
+
+	vpaths {
+		["Headers"] = "**.h",
+		["Sources"] = "**.c",
+		["*"] = "premake5.lua"
+	}
+	
+	files {
+		"premake5.lua",
+		"src/**.c",
+		"src/**.h",
+	}
+
+	local luapath = _SCRIPT_DIR.."/src/"
+	local targetpath = "%{wks.location}../Shared/publicsdk/include/"
+
+	postbuildcommands {
+		"{COPY} "..luapath.."lua.h "..targetpath,
+		"{COPY} "..luapath.."luaconf.h "..targetpath,
+		"{COPY} "..luapath.."lauxlib.h "..targetpath,
+		"{COPY} "..luapath.."lualib.h "..targetpath
+	}
+
+	filter "system:windows"
+		defines { "LUA_BUILD_AS_DLL" }
