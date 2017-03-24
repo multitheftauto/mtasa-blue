@@ -1,6 +1,8 @@
 project "Lua_Server"
 	language "C++"
 	targetname "lua5.1"
+	targetdir(buildpath("server/mods/deathmatch"))
+	kind "SharedLib"
 
 	vpaths {
 		["Headers"] = "**.h",
@@ -14,16 +16,27 @@ project "Lua_Server"
 		"src/**.h",
 	}
 
+	local luapath = _SCRIPT_DIR.."/src/"
+	local targetpath = "%{wks.location}/../Shared/publicsdk/include/"
+
+	postbuildcommands {
+		"{COPY} "..luapath.."lua.h "..targetpath,
+		"{COPY} "..luapath.."luaconf.h "..targetpath,
+		"{COPY} "..luapath.."lauxlib.h "..targetpath,
+		"{COPY} "..luapath.."lualib.h "..targetpath
+	}
+
 	filter "system:windows"
 		defines { "LUA_BUILD_AS_DLL" }
-		kind "SharedLib"
-		targetdir(buildpath("server/mods/deathmatch"))
 
-	filter "system:not windows"
-		kind "StaticLib"
-
-	filter {"system:windows", "platforms:x64"}
+	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
+
+	filter {"system:linux", "platforms:x86"}
+		postbuildcommands { "{COPY} "..buildpath("server/mods/deathmatch").."lua5.1 %{wks.location}/../Shared/publicsdk/lib/" }
+	
+	filter {"system:linux", "platforms:x64"}
+		postbuildcommands { "{COPY} "..buildpath("server/x64").."lua5.1 %{wks.location}/../Shared/publicsdk/lib/" }
 
 
 if os.get() == "windows" then
@@ -59,9 +72,7 @@ end
 -- Build shared version for the publicsdk
 project "Lua_Server_Static"
 	language "C++"
-	targetdir("%{wks.location}../Shared/publicsdk/lib")
-	targetname "lua5.1"
-	kind "SharedLib"
+	kind "StaticLib"
 
 	vpaths {
 		["Headers"] = "**.h",
@@ -74,18 +85,3 @@ project "Lua_Server_Static"
 		"src/**.c",
 		"src/**.h",
 	}
-
-	local luapath = _SCRIPT_DIR.."/src/"
-	local targetpath = "%{wks.location}/../Shared/publicsdk/include/"
-
-	postbuildcommands {
-		"{COPY} "..luapath.."lua.h "..targetpath,
-		"{COPY} "..luapath.."luaconf.h "..targetpath,
-		"{COPY} "..luapath.."lauxlib.h "..targetpath,
-		"{COPY} "..luapath.."lualib.h "..targetpath
-
-		"{COPY} %{wks.location}../Shared/publicsdk/lib/lua5.1.so "..buildpath("
-	}
-
-	filter "system:windows"
-		defines { "LUA_BUILD_AS_DLL" }
