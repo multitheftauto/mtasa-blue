@@ -1752,19 +1752,6 @@ void CMultiplayerSA::SetInteriorFurnitureEnabled ( char cRoomId, bool bEnabled )
     bInteriorFurnitureStates[cRoomId] = bEnabled;
 }
 
-bool CMultiplayerSA::IsRandomFoliageEnabled ()
-{
-    return *(unsigned char *)0x5DD01B == 0x74;
-}
-
-void CMultiplayerSA::SetRandomFoliageEnabled ( bool bEnabled )
-{
-    // 0xEB skip random foliage generation
-    MemPut < BYTE > ( 0x5DD01B, bEnabled ? 0x74 : 0xEB) ;
-    // 0x74 destroy random foliage loaded
-    MemPut < BYTE > ( 0x5DC536, bEnabled ? 0x75 : 0x74 );
-}
-
 void CMultiplayerSA::SetWindVelocity ( float fX, float fY, float fZ )
 {
     //Disable
