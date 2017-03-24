@@ -88,6 +88,7 @@
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
 #define PROP_RANDOM_FOLIAGE         "randomfoliage"
+#define PROP_SNIPER_MOON            "snipermoon"
 
 struct SCheatSA {
     BYTE*   m_byAddress; //Cheat Address
@@ -217,6 +218,9 @@ public:
 
     bool                    IsRandomFoliageEnabled  ();
     void                    SetRandomFoliageEnabled ( bool bEnable );
+
+    bool                    IsMoonEasterEggEnabled  ();
+    void                    SetMoonEasterEggEnabled ( bool bEnabled );
 
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();

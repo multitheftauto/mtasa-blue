@@ -213,6 +213,9 @@ public:
     virtual bool                IsRandomFoliageEnabled      () = 0;
     virtual void                SetRandomFoliageEnabled     ( bool bEnable ) = 0;
 
+    virtual bool                IsMoonEasterEggEnabled      () = 0;
+    virtual void                SetMoonEasterEggEnabled     ( bool bEnable ) = 0;
+
     virtual CWeapon *           CreateWeapon                ( void ) = 0;
     virtual CWeaponStat *       CreateWeaponStat            ( eWeaponType weaponType, eWeaponSkill weaponSkill ) = 0;
 

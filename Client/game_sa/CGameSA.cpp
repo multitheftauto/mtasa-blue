@@ -572,6 +572,9 @@ bool CGameSA::IsCheatEnabled ( const char* szCheatName )
     if (!strcmp ( szCheatName, PROP_RANDOM_FOLIAGE ))
         return IsRandomFoliageEnabled ();
 
+    if ( !strcmp ( szCheatName, PROP_SNIPER_MOON ) )
+        return IsMoonEasterEggEnabled ();
+
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -583,6 +586,12 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
     if (!strcmp ( szCheatName, PROP_RANDOM_FOLIAGE ))
     {
         SetRandomFoliageEnabled ( bEnable );
+        return true;
+    }
+  
+    if ( !strcmp( szCheatName, PROP_SNIPER_MOON ) )
+    {
+        SetMoonEasterEggEnabled ( bEnable );
         return true;
     }
 
@@ -599,6 +608,8 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 void CGameSA::ResetCheats ()
 {
     SetRandomFoliageEnabled ( true );
+
+    SetMoonEasterEggEnabled ( false );
 
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
@@ -621,6 +632,17 @@ void CGameSA::SetRandomFoliageEnabled ( bool bEnabled )
     MemPut < BYTE > ( 0x5DD01B, bEnabled ? 0x74 : 0xEB );
     // 0x74 destroy random foliage loaded
     MemPut < BYTE > ( 0x5DC536, bEnabled ? 0x75 : 0x74 );
+}
+
+bool CGameSA::IsMoonEasterEggEnabled ()
+{
+    return *(unsigned char *)0x73ABCF == 0x75;
+}
+
+void CGameSA::SetMoonEasterEggEnabled ( bool bEnable )
+{
+    // replace JNZ with JMP (short)
+    MemPut < BYTE > ( 0x73ABCF, bEnable ? 0x75 : 0xEB );
 }
 
 bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
