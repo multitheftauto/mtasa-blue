@@ -210,6 +210,9 @@ public:
     virtual bool                SetCheatEnabled             ( const char* szCheatName, bool bEnable ) = 0;
     virtual void                ResetCheats                 () = 0;
 
+    virtual bool                IsMoonEasterEggEnabled      () = 0;
+    virtual void                SetMoonEasterEggEnabled     ( bool bEnable ) = 0;
+
     virtual CWeapon *           CreateWeapon                ( void ) = 0;
     virtual CWeaponStat *       CreateWeaponStat            ( eWeaponType weaponType, eWeaponSkill weaponSkill ) = 0;
 

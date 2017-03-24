@@ -569,6 +569,9 @@ void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 {
+    if ( !strcmp ( szCheatName, PROP_SNIPER_MOON ) )
+        return IsMoonEasterEggEnabled ();
+
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -577,6 +580,12 @@ bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 
 bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 {
+    if ( !strcmp( szCheatName, PROP_SNIPER_MOON ) )
+    {
+        SetMoonEasterEggEnabled ( bEnable );
+        return true;
+    }
+
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -589,6 +598,8 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 
 void CGameSA::ResetCheats ()
 {
+    SetMoonEasterEggEnabled ( false );
+
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
         if ( it->second->m_byAddress > (BYTE*)0x8A4000 )
@@ -597,6 +608,17 @@ void CGameSA::ResetCheats ()
             MemPut < BYTE > ( it->second->m_byAddress, 0 );
         it->second->m_bEnabled = false;
     }
+}
+
+bool CGameSA::IsMoonEasterEggEnabled ()
+{
+    return *(unsigned char *)0x73ABCF == 0x75;
+}
+
+void CGameSA::SetMoonEasterEggEnabled ( bool bEnable )
+{
+    // replace JNZ with JMP (short)
+    MemPut < BYTE > ( 0x73ABCF, bEnable ? 0x75 : 0xEB );
 }
 
 bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )

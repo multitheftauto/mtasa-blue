@@ -87,6 +87,8 @@
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
+#define PROP_SNIPER_MOON            "snipermoon"
+
 struct SCheatSA {
     BYTE*   m_byAddress; //Cheat Address
     bool    m_bEnabled; //Cheat State
@@ -212,6 +214,9 @@ public:
     bool                    IsCheatEnabled          ( const char* szCheatName );
     bool                    SetCheatEnabled         ( const char* szCheatName, bool bEnable );
     void                    ResetCheats             ();
+
+    bool                    IsMoonEasterEggEnabled  ();
+    void                    SetMoonEasterEggEnabled ( bool bEnabled );
 
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();
