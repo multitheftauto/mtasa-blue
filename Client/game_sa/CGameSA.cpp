@@ -569,7 +569,7 @@ void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 {
-    if ( !strcmp ( szCheatName, MOON_EASTER_EGG ) )
+    if ( !strcmp ( szCheatName, PROP_SNIPER_MOON ) )
         return IsMoonEasterEggEnabled ();
 
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
@@ -580,7 +580,7 @@ bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 
 bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 {
-    if ( !strcmp( szCheatName, MOON_EASTER_EGG ) )
+    if ( !strcmp( szCheatName, PROP_SNIPER_MOON ) )
     {
         SetMoonEasterEggEnabled ( bEnable );
         return true;
