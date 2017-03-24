@@ -57,7 +57,7 @@ if os.get() == "windows" then
 end
 
 -- Build shared version for the publicsdk
-project "Lua_Server_publicsdk"
+project "Lua_Server_Static"
 	language "C++"
 	targetdir("%{wks.location}../Shared/publicsdk/lib")
 	targetname "lua5.1"
@@ -76,13 +76,15 @@ project "Lua_Server_publicsdk"
 	}
 
 	local luapath = _SCRIPT_DIR.."/src/"
-	local targetpath = "%{wks.location}../Shared/publicsdk/include/"
+	local targetpath = "%{wks.location}/../Shared/publicsdk/include/"
 
 	postbuildcommands {
 		"{COPY} "..luapath.."lua.h "..targetpath,
 		"{COPY} "..luapath.."luaconf.h "..targetpath,
 		"{COPY} "..luapath.."lauxlib.h "..targetpath,
 		"{COPY} "..luapath.."lualib.h "..targetpath
+
+		"{COPY} %{wks.location}../Shared/publicsdk/lib/lua5.1.so "..buildpath("
 	}
 
 	filter "system:windows"

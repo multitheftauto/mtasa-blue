@@ -26,8 +26,6 @@ solution "ml_base"
 		includedirs { "include" }
 		libdirs { "lib" }
 
-		links { "lua5.1" }
-
 		vpaths {
 			["Headers/*"] = "**.h",
 			["Sources/*"] = "**.cpp",
@@ -39,3 +37,16 @@ solution "ml_base"
 			"**.cpp",
 			"**.h"
 		}
+
+		filter {"system:linux", "platforms:x86" }
+			linkoptions { "-Wl,-rpath=mods/deathmatch" }
+
+		filter {"system:linux", "platforms:64" }
+                        linkoptions { "-Wl,-rpath=x64" }
+
+		filter "system:linux"
+			linkoptions { "-l:lua5.1.so" }
+
+		filter "system:windows"
+			links { "lua5.1" }
+
