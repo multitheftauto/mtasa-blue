@@ -33,10 +33,10 @@ project "Lua_Server"
 		targetdir(buildpath("server/x64"))
 
 	filter {"system:linux", "platforms:x86"}
-		postbuildcommands { "{COPY} "..buildpath("server/mods/deathmatch").."lua5.1 %{wks.location}/../Shared/publicsdk/lib/" }
+		postbuildcommands { "{COPY} "..buildpath("server/mods/deathmatch").."lua5.1.so %{wks.location}/../Shared/publicsdk/lib/" }
 	
 	filter {"system:linux", "platforms:x64"}
-		postbuildcommands { "{COPY} "..buildpath("server/x64").."lua5.1 %{wks.location}/../Shared/publicsdk/lib/" }
+		postbuildcommands { "{COPY} "..buildpath("server/x64").."lua5.1.so %{wks.location}/../Shared/publicsdk/lib/" }
 
 
 if os.get() == "windows" then
