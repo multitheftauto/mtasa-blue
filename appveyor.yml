@@ -5,6 +5,7 @@ configuration:
   - Release
 
 before_build:
+  - choco install curl
   - utils\premake5 install_cef
   - utils\premake5 vs2015
 
