@@ -89,6 +89,7 @@
 
 #define PROP_RANDOM_FOLIAGE         "randomfoliage"
 #define PROP_SNIPER_MOON            "snipermoon"
+#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
 
 struct SCheatSA {
     BYTE*   m_byAddress; //Cheat Address
@@ -221,6 +222,9 @@ public:
 
     bool                    IsMoonEasterEggEnabled  ();
     void                    SetMoonEasterEggEnabled ( bool bEnabled );
+
+    bool                    IsExtraAirResistanceEnabled  ();
+    void                    SetExtraAirResistanceEnabled ( bool bEnable );
 
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();

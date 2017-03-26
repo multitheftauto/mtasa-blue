@@ -575,6 +575,9 @@ bool CGameSA::IsCheatEnabled ( const char* szCheatName )
     if ( !strcmp ( szCheatName, PROP_SNIPER_MOON ) )
         return IsMoonEasterEggEnabled ();
 
+    if ( !strcmp ( szCheatName, PROP_EXTRA_AIR_RESISTANCE ) )
+        return IsExtraAirResistanceEnabled ();
+
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -594,6 +597,12 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
         SetMoonEasterEggEnabled ( bEnable );
         return true;
     }
+  
+    if ( !strcmp( szCheatName, PROP_EXTRA_AIR_RESISTANCE ) )
+    {
+        SetExtraAirResistanceEnabled ( bEnable );
+        return true;
+    }
 
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
@@ -608,8 +617,8 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 void CGameSA::ResetCheats ()
 {
     SetRandomFoliageEnabled ( true );
-
     SetMoonEasterEggEnabled ( false );
+    SetExtraAirResistanceEnabled ( true );
 
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
@@ -643,6 +652,16 @@ void CGameSA::SetMoonEasterEggEnabled ( bool bEnable )
 {
     // replace JNZ with JMP (short)
     MemPut < BYTE > ( 0x73ABCF, bEnable ? 0x75 : 0xEB );
+}
+
+bool CGameSA::IsExtraAirResistanceEnabled ()
+{
+    return *(unsigned char *)0x72DDD9 == 0x01;
+}
+
+void CGameSA::SetExtraAirResistanceEnabled ( bool bEnable )
+{
+    MemPut < BYTE > ( 0x72DDD9, bEnable ? 0x01 : 0x00 );
 }
 
 bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
