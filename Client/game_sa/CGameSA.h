@@ -87,6 +87,7 @@
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
+#define PROP_RANDOM_FOLIAGE         "randomfoliage"
 #define PROP_SNIPER_MOON            "snipermoon"
 
 struct SCheatSA {
@@ -214,6 +215,9 @@ public:
     bool                    IsCheatEnabled          ( const char* szCheatName );
     bool                    SetCheatEnabled         ( const char* szCheatName, bool bEnable );
     void                    ResetCheats             ();
+
+    bool                    IsRandomFoliageEnabled  ();
+    void                    SetRandomFoliageEnabled ( bool bEnable );
 
     bool                    IsMoonEasterEggEnabled  ();
     void                    SetMoonEasterEggEnabled ( bool bEnabled );

@@ -569,6 +569,9 @@ void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 {
+    if (!strcmp ( szCheatName, PROP_RANDOM_FOLIAGE ))
+        return IsRandomFoliageEnabled ();
+
     if ( !strcmp ( szCheatName, PROP_SNIPER_MOON ) )
         return IsMoonEasterEggEnabled ();
 
@@ -580,6 +583,12 @@ bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 
 bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 {
+    if (!strcmp ( szCheatName, PROP_RANDOM_FOLIAGE ))
+    {
+        SetRandomFoliageEnabled ( bEnable );
+        return true;
+    }
+  
     if ( !strcmp( szCheatName, PROP_SNIPER_MOON ) )
     {
         SetMoonEasterEggEnabled ( bEnable );
@@ -598,6 +607,8 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 
 void CGameSA::ResetCheats ()
 {
+    SetRandomFoliageEnabled ( true );
+
     SetMoonEasterEggEnabled ( false );
 
     std::map < std::string, SCheatSA* >::iterator it;
@@ -608,6 +619,19 @@ void CGameSA::ResetCheats ()
             MemPut < BYTE > ( it->second->m_byAddress, 0 );
         it->second->m_bEnabled = false;
     }
+}
+
+bool CGameSA::IsRandomFoliageEnabled ()
+{
+    return *(unsigned char *)0x5DD01B == 0x74;
+}
+
+void CGameSA::SetRandomFoliageEnabled ( bool bEnabled )
+{
+    // 0xEB skip random foliage generation
+    MemPut < BYTE > ( 0x5DD01B, bEnabled ? 0x74 : 0xEB );
+    // 0x74 destroy random foliage loaded
+    MemPut < BYTE > ( 0x5DC536, bEnabled ? 0x75 : 0x74 );
 }
 
 bool CGameSA::IsMoonEasterEggEnabled ()
