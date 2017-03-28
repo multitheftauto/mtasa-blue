@@ -289,13 +289,9 @@ int CLuaPedDefs::GetPedWeapon ( lua_State* luaVM )
         if ( ucSlot == 0xFF )
             ucSlot = pPed->GetCurrentWeaponSlot ();
 
-        CWeapon* pWeapon = pPed->GetWeapon ( (eWeaponSlot) ucSlot );
-        if ( pWeapon )
-        {
-            unsigned char ucWeapon = pWeapon->GetType ();
-            lua_pushnumber ( luaVM, ucWeapon );
-            return 1;
-        }
+        unsigned char ucWeapon = pPed->GetWeaponType( (eWeaponSlot)ucSlot );
+        lua_pushnumber ( luaVM, ucWeapon );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

@@ -2155,6 +2155,22 @@ CWeapon* CClientPed::GetWeapon ( void )
     return NULL;
 }
 
+eWeaponType CClientPed::GetWeaponType(eWeaponSlot slot)
+{
+    if ( slot >= WEAPONSLOT_MAX )
+        return WEAPONTYPE_UNARMED;
+
+    if ( m_pPlayerPed )
+    {
+        CWeapon* pWeapon = GetWeapon(slot);
+        if ( pWeapon )
+        {
+            return pWeapon->GetType();
+        }
+        return WEAPONTYPE_UNARMED;
+    }
+    return m_WeaponTypes[slot];
+}
 
 void CClientPed::RemoveWeapon ( eWeaponType weaponType )
 {
@@ -2257,6 +2273,49 @@ bool CClientPed::HasWeapon ( eWeaponType weaponType )
 
     return false;
 }
+
+
+//
+// Check and attempt to fix weapons for remote players
+//
+void CClientPed::ValidateRemoteWeapons( void )
+{
+    // Must be streamed in remote player
+    if( !m_pPlayerPed || IsLocalPlayer() || GetType() != CCLIENTPLAYER )
+        return;
+
+    // Check everything matches
+    bool bMismatch = false;
+    for ( uint i = 0; i < WEAPONSLOT_MAX; i++ )
+    {
+        eWeaponType slotWeaponType = GetWeaponType((eWeaponSlot)i);
+        if ( m_WeaponTypes[i] != slotWeaponType )
+        {
+            SString strPlayerName = ((CClientPlayer*)this)->GetNick();
+            AddReportLog(5430, SString( "Mismatch in slot %d  Wanted type:%d  Got type:%d (%s)", i, m_WeaponTypes[i], slotWeaponType, *strPlayerName ), 30);
+            bMismatch = true;
+        }
+    }
+
+    if ( !bMismatch )
+    {
+        // All fine. Save current slot
+        m_CurrentWeaponSlot = m_pPlayerPed->GetCurrentWeaponSlot();
+        return;
+    }
+
+    // Fix wrongness
+    for ( uint i = 0; i < WEAPONSLOT_MAX; i++ )
+    {
+        if ( m_WeaponTypes[i] != WEAPONTYPE_UNARMED )
+        {
+            bool bSetAsCurrent = (i == m_CurrentWeaponSlot);
+            GiveWeapon(m_WeaponTypes[i], m_usWeaponAmmo[i], bSetAsCurrent);
+        }
+    }
+    m_pPlayerPed->SetCurrentWeaponSlot(m_CurrentWeaponSlot);
+}
+
 
 eMovementState CClientPed::GetMovementState ( void )
 {
@@ -2792,6 +2851,8 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
             if ( item.bCurrentWeapon )
                 pWeapon->SetAsCurrentWeapon ( );
         }
+
+        ValidateRemoteWeapons();
     }
 }
 
