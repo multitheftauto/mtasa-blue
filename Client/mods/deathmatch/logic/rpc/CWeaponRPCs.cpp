@@ -34,7 +34,7 @@ void CWeaponRPCs::GiveWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
         SWeaponAmmoSync ammo ( weaponType.data.ucWeaponType, true, false );
         if ( bitStream.Read ( &ammo ) )
         {
-            bool bGiveWeapon = bitStream.ReadBit ();
+            bool bSetAsCurrent = bitStream.ReadBit ();
             unsigned char ucWeaponID = weaponType.data.ucWeaponType;
             unsigned short usAmmo = ammo.data.usTotalAmmo;
 
@@ -51,12 +51,9 @@ void CWeaponRPCs::GiveWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
                         if ( usAmmo > 9999 ) usAmmo = 9999;
 
                         // Give the local player the weapon
-                        CWeapon* pPlayerWeapon = NULL;
                         if ( ucWeaponID != 0 )
                         {
-                            pPlayerWeapon = pPed->GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usAmmo );
-                            if ( pPlayerWeapon && bGiveWeapon )
-                                pPlayerWeapon->SetAsCurrentWeapon ();
+                            pPed->GiveWeapon ( static_cast < eWeaponType > ( ucWeaponID ), usAmmo, bSetAsCurrent );
                             
                             // Store the ammo so it's not lost if a ped is streamed out
                             if ( pPed->GetType () == CCLIENTPED )
@@ -76,7 +73,7 @@ void CWeaponRPCs::GiveWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
                             {
                                 eWeaponType unarmedWeapon = oldWeapon->GetType();
                                 pPed->RemoveWeapon ( unarmedWeapon );
-                                if ( bGiveWeapon || pPed->GetCurrentWeaponSlot() == WEAPONSLOT_TYPE_UNARMED )
+                                if ( bSetAsCurrent || pPed->GetCurrentWeaponSlot() == WEAPONSLOT_TYPE_UNARMED )
                                 {
                                     oldWeapon = NULL;
                                     if ( unarmedWeapon == WEAPONTYPE_BRASSKNUCKLE )
@@ -107,7 +104,7 @@ void CWeaponRPCs::GiveWeapon ( CClientEntity* pSource, NetBitStreamInterface& bi
                             {
                                 // Probably the ped is streamed out
                                 pPed->GiveWeapon ( WEAPONTYPE_UNARMED, 1 );
-                                if ( bGiveWeapon )
+                                if ( bSetAsCurrent )
                                     pPed->SetCurrentWeaponSlot ( WEAPONSLOT_TYPE_UNARMED );
                             }
                         }

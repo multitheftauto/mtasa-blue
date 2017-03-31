@@ -2093,6 +2093,8 @@ bool CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
                     // Don't allow doing gang driveby while unarmed
                     if ( IsDoingGangDriveby () )
                         SetDoingGangDriveby ( false );
+                    m_CurrentWeaponSlot = weaponSlot;
+                    return true;
                 }
                 else
                 {
@@ -2844,7 +2846,7 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
             m_RestoreWeaponList.pop_front();
 
             // Give our Weapon back after deleting to reload the model
-            CWeapon * pWeapon = GiveWeapon ( item.eWeaponID, item.dwAmmo );
+            CWeapon * pWeapon = GiveWeapon ( item.eWeaponID, item.dwAmmo, item.bCurrentWeapon );
 
             // Reset our states
             pWeapon->SetAmmoInClip ( item.dwClipAmmo );
@@ -3496,11 +3498,7 @@ void CClientPed::UpdateKeysync ( bool bCleanup )
                                     CWeapon* pSlotWeapon = GetWeapon ( eCurrentSlot );
                                     if ( pSlotWeapon )
                                     {
-                                        pPlayerWeapon = GiveWeapon ( pSlotWeapon->GetType (), pData->usWeaponAmmo );
-                                        if ( pPlayerWeapon )
-                                        {
-                                            pPlayerWeapon->SetAsCurrentWeapon ();
-                                        }
+                                        pPlayerWeapon = GiveWeapon ( pSlotWeapon->GetType (), pData->usWeaponAmmo, true );
                                     }
                                 }
 
