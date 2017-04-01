@@ -31,7 +31,7 @@ project "Deathmatch"
 		}
 	
 	links {
-		"pthread", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib"
+		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib"
 	}
 	
 	vpaths {
@@ -58,14 +58,14 @@ project "Deathmatch"
 	filter "system:windows"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
-		links { "ws2_32", "Lua_Server" }
+		links { "ws2_32" }
 
 	filter {"system:windows", "toolset:*120*"}
 		links { "Psapi.lib" }
 		
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
-		links { "rt", "Lua_Server_Static" }
+		links { "rt" }
 	
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
