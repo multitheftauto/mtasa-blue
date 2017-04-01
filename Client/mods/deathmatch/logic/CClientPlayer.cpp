@@ -260,13 +260,20 @@ void CClientPlayer::SetNametagText ( const char * szText )
     }
 }
 
-
+// Only called for remote players
 void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fBackupDamage, uchar ucBackupHitZone, CClientPlayer* pBackupDamagedPlayer )
 {
     if ( m_pPlayerPed )
     {
         g_pApplyDamageLastDamagedPed = NULL;
         g_fApplyDamageLastAmount = 0;
+
+        // Ensure remote player has the weapon
+        if ( weaponType != GetCurrentWeaponType() )
+        {
+            GiveWeapon(weaponType, 99, true);
+            AddReportLog(5432, SString("DischargeWeapon adding missing weapon %d (%s)", weaponType, GetNick()), 30);
+        }
 
         // Check weapon matches and is enabled for bullet sync
         if ( weaponType == GetCurrentWeaponType () &&
