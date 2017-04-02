@@ -260,6 +260,7 @@ public:
     bool                        SetCurrentWeaponSlot        ( eWeaponSlot weaponSlot );
     eWeaponSlot                 GetCurrentWeaponSlot        ( void );
     eWeaponType                 GetCurrentWeaponType        ( void );
+    eWeaponType                 GetWeaponType               ( eWeaponSlot slot );
     CWeapon*                    GetWeapon                   ( void );
     CWeapon*                    GetWeapon                   ( eWeaponSlot weaponSlot );
     CWeapon*                    GetWeapon                   ( eWeaponType weaponType );
@@ -267,6 +268,7 @@ public:
     void                        RemoveWeapon                ( eWeaponType weaponType );
     void                        RemoveAllWeapons            ( void );
     bool                        IsCurrentWeaponUsingBulletSync ( void );
+    void                        ValidateRemoteWeapons       ( void );
 
     std::map<eMovementState,std::string> m_MovementStateNames;
     eMovementState              GetMovementState            ( void );

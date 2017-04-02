@@ -3099,6 +3099,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     Arguments.PushElement ( pVehicle );        // vehicle
                                     Arguments.PushNumber ( ucOccupiedSeat );    // seat
                                     Arguments.PushBoolean ( false );            // jacker
+                                    Arguments.PushBoolean ( false );            // forcedByScript
                                     pPlayer->CallEvent ( "onPlayerVehicleExit", Arguments );
 
                                     // Call the vehicle->player event
@@ -3106,6 +3107,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     Arguments2.PushElement ( pPlayer );         // player
                                     Arguments2.PushNumber ( ucOccupiedSeat );    // seat
                                     Arguments2.PushBoolean ( false );            // jacker
+                                    Arguments2.PushBoolean ( false );            // forcedByScript
                                     pVehicle->CallEvent ( "onVehicleExit", Arguments2 );
                                 }
                             }
@@ -3160,6 +3162,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 Arguments.PushElement ( pVehicle );        // vehicle
                                 Arguments.PushNumber ( ucOccupiedSeat );    // seat
                                 Arguments.PushBoolean ( false );            // jacker
+                                Arguments.PushBoolean ( false );            // forcedByScript
                                 pPlayer->CallEvent ( "onPlayerVehicleExit", Arguments );
 
                                 // Call the vehicle->player event
@@ -3167,6 +3170,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 Arguments2.PushElement ( pPlayer );        // player
                                 Arguments2.PushNumber ( ucOccupiedSeat );    // seat
                                 Arguments2.PushBoolean ( false );            // jacker
+                                Arguments2.PushBoolean ( false );            // forcedByScript
                                 pVehicle->CallEvent ( "onVehicleExit", Arguments2 );
                             }
 
@@ -3205,6 +3209,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     ArgumentsExit.PushElement ( pVehicle );        // vehicle
                                     ArgumentsExit.PushNumber ( 0 );                 // seat
                                     ArgumentsExit.PushElement ( pPlayer );         // jacker
+                                    ArgumentsExit.PushBoolean ( false );            // forcedByScript
                                     pJacked->CallEvent ( "onPlayerVehicleExit", ArgumentsExit );
 
                                     // Execute the vehicle->vehicle script function for the jacked player
@@ -3212,6 +3217,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     ArgumentsExit2.PushElement ( pJacked );         // player
                                     ArgumentsExit2.PushNumber ( 0 );                 // seat
                                     ArgumentsExit2.PushElement ( pPlayer );         // jacker
+                                    ArgumentsExit2.PushBoolean ( false );            // forcedByScript
                                     pVehicle->CallEvent ( "onVehicleExit", ArgumentsExit2 );
 
 

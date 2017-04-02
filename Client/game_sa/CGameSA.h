@@ -87,6 +87,10 @@
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
+#define PROP_RANDOM_FOLIAGE         "randomfoliage"
+#define PROP_SNIPER_MOON            "snipermoon"
+#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
+
 struct SCheatSA {
     BYTE*   m_byAddress; //Cheat Address
     bool    m_bEnabled; //Cheat State
@@ -212,6 +216,15 @@ public:
     bool                    IsCheatEnabled          ( const char* szCheatName );
     bool                    SetCheatEnabled         ( const char* szCheatName, bool bEnable );
     void                    ResetCheats             ();
+
+    bool                    IsRandomFoliageEnabled  ();
+    void                    SetRandomFoliageEnabled ( bool bEnable );
+
+    bool                    IsMoonEasterEggEnabled  ();
+    void                    SetMoonEasterEggEnabled ( bool bEnabled );
+
+    bool                    IsExtraAirResistanceEnabled  ();
+    void                    SetExtraAirResistanceEnabled ( bool bEnable );
 
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();
