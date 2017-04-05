@@ -418,7 +418,7 @@ void CGame::DoPulse ( void )
 
     CLOCK_SET_SECTION( "CGame::DoPulse" );
     CLOCK1( "HTTPDownloadManager" );
-    g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
+    GetRemoteCalls()->ProcessQueuedFiles();
     g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
     UNCLOCK1( "HTTPDownloadManager" );
 

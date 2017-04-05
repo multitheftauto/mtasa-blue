@@ -121,6 +121,27 @@ namespace SharedUtil
         return uiCount;
     }
 
+    // Find key in const collection
+    template < class T, class V, class TR, class V2 >
+    const T* MapFindByValue( const std::map < T, V, TR >& collection, const V2& value )
+    {
+        typename std::map < T, V, TR > ::const_iterator it = collection.begin();
+        for ( ; it != collection.end () ; ++it )
+        {
+            if ( it->second == value )
+            {
+                return &it->first;
+            }
+        }
+        return nullptr;
+    }
+
+    // Returns true if the value is in the collection
+    template < class T, class V, class TR, class V2 >
+    bool MapContainsValue( const std::map < T, V, TR >& collection, const V2& value )
+    {
+        return MapFindByValue( collection, value ) != nullptr;
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     //

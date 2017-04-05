@@ -22,8 +22,9 @@ namespace EDownloadMode
     enum EDownloadModeType
     {
         NONE,
-        CALL_REMOTE,
         ASE,
+        CALL_REMOTE_FIRST,
+        CALL_REMOTE_LAST = CALL_REMOTE_FIRST + 100,
     };
 }
 using EDownloadMode::EDownloadModeType;
