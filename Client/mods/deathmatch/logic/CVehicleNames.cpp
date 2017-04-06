@@ -69,14 +69,7 @@ static const SFixedArray < unsigned char, 212 > ucVehicleTypes =
 
 bool CVehicleNames::IsValidModel ( unsigned long ulModel )
 {
-    return ( // Valid range?
-             ulModel >= 400 && ulModel < 610 &&
-             
-             // Exclude trailers
-             ulModel != 435 && ulModel != 450 &&
-             ulModel != 591 && ulModel != 606 &&
-             ulModel != 607 && ulModel != 584 &&
-             ulModel != 608 );
+    return ulModel >= 400 && ulModel <= 611;
 }
 
 
