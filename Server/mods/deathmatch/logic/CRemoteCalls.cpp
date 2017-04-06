@@ -86,15 +86,15 @@ bool CRemoteCalls::CallExists ( CRemoteCall * call )
     return false;
 }
 
-// Map quene index into download manager id
+// Map queue index into download manager id
 EDownloadModeType CRemoteCalls::GetDownloadModeFromQueueIndex( uint uiIndex )
 {
-    uiIndex %= ( EDownloadMode::CALL_REMOTE_LAST - EDownloadMode::CALL_REMOTE_FIRST );
-    uiIndex += EDownloadMode::CALL_REMOTE_FIRST;
+    uiIndex %= MAX_CALL_REMOTE_QUEUES;
+    uiIndex += EDownloadMode::CALL_REMOTE;
     return (EDownloadModeType)uiIndex;
 }
 
-// Map quene name to download manager id
+// Map queue name to download manager id
 EDownloadModeType CRemoteCalls::GetDownloadModeForQueueName( const SString& strQueueName )
 {
     uint* pIndex = MapFind( m_QueueIndexMap, strQueueName );

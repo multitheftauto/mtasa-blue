@@ -1179,8 +1179,7 @@ void CClientGame::DoPulses ( void )
         // Pulse DownloadFiles if we're transferring stuff
         GetResourceFileDownloadManager()->DoPulse();
         DownloadSingularResourceFiles ();
-        g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
-        g_pNet->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE_ANY_HOST)->ProcessQueuedFiles();
+        GetRemoteCalls()->ProcessQueuedFiles();
     }
 
     // Not waiting for local connect?

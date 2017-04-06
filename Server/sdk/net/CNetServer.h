@@ -17,14 +17,16 @@
 #include "ns_playerid.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
+#define MAX_CALL_REMOTE_QUEUES  100
+
 namespace EDownloadMode
 {
     enum EDownloadModeType
     {
         NONE,
         ASE,
-        CALL_REMOTE_FIRST,
-        CALL_REMOTE_LAST = CALL_REMOTE_FIRST + 100,
+        CALL_REMOTE,
+        CALL_REMOTE_LAST = CALL_REMOTE + MAX_CALL_REMOTE_QUEUES - 1,
     };
 }
 using EDownloadMode::EDownloadModeType;

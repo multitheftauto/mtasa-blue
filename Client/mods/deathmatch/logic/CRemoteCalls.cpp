@@ -31,21 +31,21 @@ CRemoteCalls::~CRemoteCalls()
 }
 
 
-void CRemoteCalls::Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
+void CRemoteCalls::Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
 {
-    m_calls.push_back ( new CRemoteCall ( szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction, uiConnectionAttempts, uiConnectTimeoutMs ) );
+    m_calls.push_back ( new CRemoteCall ( szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs ) );
     m_calls.back ()->MakeCall ();
 }
 
-void CRemoteCalls::Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
+void CRemoteCalls::Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
 {
-    m_calls.push_back ( new CRemoteCall ( szURL, arguments, luaMain, iFunction, uiConnectionAttempts, uiConnectTimeoutMs ) );
+    m_calls.push_back ( new CRemoteCall ( szURL, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs ) );
     m_calls.back ()->MakeCall ();
 }
 
-void CRemoteCalls::Call ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
+void CRemoteCalls::Call ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
 {
-    m_calls.push_back ( new CRemoteCall ( szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction, uiConnectionAttempts, uiConnectTimeoutMs ) );
+    m_calls.push_back ( new CRemoteCall ( szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs ) );
     m_calls.back ()->MakeCall ();
 }
 
@@ -86,9 +86,60 @@ bool CRemoteCalls::CallExists ( CRemoteCall * call )
     return false;
 }
 
+// Map queue index into download manager id
+EDownloadModeType CRemoteCalls::GetDownloadModeFromQueueIndex( uint uiIndex, bool bAnyHost )
+{
+    uiIndex %= MAX_CALL_REMOTE_QUEUES;
+    uiIndex += bAnyHost ? EDownloadMode::CALL_REMOTE_ANY_HOST : EDownloadMode::CALL_REMOTE_RESTRICTED;
+    return (EDownloadModeType)uiIndex;
+}
+
+// Map queue name to download manager id
+EDownloadModeType CRemoteCalls::GetDownloadModeForQueueName( const SString& strQueueName, bool bAnyHost )
+{
+    uint* pIndex = MapFind( m_QueueIndexMap, strQueueName );
+    if ( pIndex )
+    {
+        return GetDownloadModeFromQueueIndex( *pIndex, bAnyHost );
+    }
+    else
+    {
+        // Find lowest unused index
+        uint idx = 0;
+        while( MapContainsValue( m_QueueIndexMap, idx ) )
+        {
+            idx++;
+        }
+        // Add new mapping
+        MapSet( m_QueueIndexMap, strQueueName, idx );
+        return GetDownloadModeFromQueueIndex( idx, bAnyHost );
+    }
+}
+
+
+void CRemoteCalls::ProcessQueuedFiles( void )
+{
+    for ( auto iter = m_QueueIndexMap.cbegin(); iter != m_QueueIndexMap.cend(); )
+    {
+        EDownloadModeType downloadMode = GetDownloadModeFromQueueIndex( iter->second, false );
+        EDownloadModeType downloadModeAnyIp = GetDownloadModeFromQueueIndex( iter->second, true );
+        if ( g_pNet->GetHTTPDownloadManager( downloadMode )->ProcessQueuedFiles()
+          && g_pNet->GetHTTPDownloadManager( downloadModeAnyIp )->ProcessQueuedFiles() )
+        {
+            // Queue empty, so remove name mapping if not default queue
+            if ( iter->first != CALL_REMOTE_DEFAULT_QUEUE_NAME )
+            {
+                iter = m_QueueIndexMap.erase( iter );
+                continue;
+            }
+        }
+        ++iter;
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
-CRemoteCall::CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
+CRemoteCall::CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
 {
     m_VM = luaMain;
     m_iFunction = iFunction;
@@ -98,12 +149,13 @@ CRemoteCall::CRemoteCall ( const char * szServerHost, const char * szResourceNam
     m_bIsFetch = false;
 
     m_strURL = SString ( "http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName );
+    m_strQueueName = strQueueName;
     m_uiConnectionAttempts = uiConnectionAttempts;
     m_uiConnectTimeoutMs = uiConnectTimeoutMs;
 }
 
 //arbitary URL version
-CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
+CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
 {
     m_VM = luaMain;
     m_iFunction = iFunction;
@@ -113,12 +165,13 @@ CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMa
     m_bIsFetch = false;
 
     m_strURL = szURL;
+    m_strQueueName = strQueueName;
     m_uiConnectionAttempts = uiConnectionAttempts;
     m_uiConnectTimeoutMs = uiConnectTimeoutMs;
 }
 
 //Fetch version
-CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
+CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs )
     : m_FetchArguments ( *fetchArguments )
 {
     m_VM = luaMain;
@@ -129,6 +182,7 @@ CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, c
     m_bIsFetch = true;
 
     m_strURL = szURL;
+    m_strQueueName = strQueueName;
     m_uiConnectionAttempts = uiConnectionAttempts;
     m_uiConnectTimeoutMs = uiConnectTimeoutMs;
 }
@@ -140,18 +194,11 @@ CRemoteCall::~CRemoteCall ()
 
 void CRemoteCall::MakeCall()
 {
-    if (g_pCore->GetWebCore()->GetDomainState(g_pCore->GetWebCore()->GetDomainFromURL(m_strURL)) == eURLState::WEBPAGE_ALLOWED)
-    {
-        // Bypass IP check if we are allowed to access the URL
-        CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE_ANY_HOST);
-        pDownloadManager->QueueFile(m_strURL, NULL, 0, m_strData.c_str(), m_strData.length(), m_bPostBinary, this, DownloadFinishedCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs);
-    }
-    else
-    {
-        // Proceed with the normal way (IP check in net module)
-        CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE);
-        pDownloadManager->QueueFile(m_strURL, NULL, 0, m_strData.c_str(), m_strData.length(), m_bPostBinary, this, DownloadFinishedCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs);
-    }
+    // Bypass net module IP check if we are allowed to access the URL
+    bool bAnyHost = (g_pCore->GetWebCore()->GetDomainState(g_pCore->GetWebCore()->GetDomainFromURL(m_strURL)) == eURLState::WEBPAGE_ALLOWED);
+    EDownloadModeType downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);
+    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(downloadMode);
+    pDownloadManager->QueueFile(m_strURL, NULL, 0, m_strData.c_str(), m_strData.length(), m_bPostBinary, this, DownloadFinishedCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs);
 }
 
 void CRemoteCall::DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )

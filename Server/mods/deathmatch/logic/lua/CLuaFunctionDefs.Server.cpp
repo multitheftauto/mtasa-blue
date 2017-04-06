@@ -21,7 +21,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#define MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11269"
+#define MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT           "1.3.5"
 
