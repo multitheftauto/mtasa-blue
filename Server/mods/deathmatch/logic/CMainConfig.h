@@ -88,7 +88,6 @@ public:
     inline int                      GetEnableClientChecks           ( void )        { return m_iEnableClientChecks; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
     inline const std::string&       GetAuthFile                     ( void )        { return m_strAuthFile; };
-    inline bool                     GetAutoUpdateAntiCheatEnabled   ( void )        { return m_bAutoUpdateAntiCheatEnabled; };
     inline bool                     GetJoinFloodProtectionEnabled   ( void )        { return m_bJoinFloodProtectionEnabled; };
     inline bool                     GetScriptDebugLogEnabled        ( void )        { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty (); };
     inline const std::string&       GetScriptDebugLogFile           ( void )        { return m_strScriptDebugLogFile; };
@@ -182,7 +181,6 @@ private:
     int                             m_iEnableClientChecks;
     std::string                     m_strLogFile;
     std::string                     m_strAuthFile;
-    bool                            m_bAutoUpdateAntiCheatEnabled;
     bool                            m_bJoinFloodProtectionEnabled;
     bool                            m_bScriptDebugLogEnabled;
     std::string                     m_strScriptDebugLogFile;

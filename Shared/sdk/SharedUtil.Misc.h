@@ -1467,6 +1467,31 @@ namespace SharedUtil
 
     ///////////////////////////////////////////////////////////////
     //
+    // ReadCommaSeparatedList
+    //
+    // Split comma separated values into an array.
+    // Removes leading/trailing spaces and empty items
+    //
+    ///////////////////////////////////////////////////////////////
+    inline
+    void ReadCommaSeparatedList(const SString& strInput, std::vector<SString>& outList)
+    {
+        strInput.Split(",", outList);
+        // Remove surrounding spaces for each item
+        for ( auto iter = outList.begin(); iter != outList.end(); )
+        {
+            SString& strItem = *iter;
+            strItem = strItem.TrimEnd(" ").TrimStart(" ");
+            if ( strItem.empty() )
+                iter = outList.erase(iter);
+            else
+                ++iter;
+        }
+    }
+
+
+    ///////////////////////////////////////////////////////////////
+    //
     // CFilterMap
     //
     // Change the string "+all,-{1000~2006},+2003,-{2050},-2611,-{3120},-{4002~4100},+{4010~4020}"

@@ -6532,6 +6532,9 @@ void CClientGame::OutputServerInfo( void )
 //////////////////////////////////////////////////////////////////
 void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMessage, uint uiSendLimitForThisId )
 {
+    g_pCore->GetConsole()->Print(strMessage);
+    AddReportLog(3400 + uiId, strMessage + g_pNet->GetConnectedServer(true), 10);
+
     if ( uiSendLimitForThisId )
     {
         uint& uiCount = MapGet( m_SentMessageIds, uiId );

@@ -1093,6 +1093,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post ( RwFrame* pFrameResult, DWORD
 
     // Couldn't find a replacement frame id
     SString strMsg ( "No frame for vehicle:%d  frameId:%d  (calledfrom:%08x)", iModelId, id, calledFrom );
+    AddReportLog ( 5413, SString ( "GetFrameFromId - %s", *strMsg ) );
     LogEvent ( 5413, "Model frame error", "GetFrameFromId", strMsg );
 
     return NULL;
