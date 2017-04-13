@@ -499,8 +499,8 @@ bool CMainConfig::Load ( void )
     SString strGroupList;
     if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList, 1 ) != IS_SUCCESS )
     {
-        // If not defined in conf file, then default to disabled
-        strGroupList = "";
+        // If not defined in conf file, then default to Admin
+        strGroupList = "Admin";
     }
     ReadCommaSeparatedList(strGroupList, m_AuthSerialGroupList);
 
@@ -509,6 +509,16 @@ bool CMainConfig::Load ( void )
     {
         m_bAuthSerialHttpEnabled = true;
     }
+
+    // auth_serial_http_ip_exceptions
+    SString strIpsString;
+    GetString(m_pRootNode, "auth_serial_http_ip_exceptions", strIpsString);
+    ReadCommaSeparatedList(strIpsString, m_AuthSerialHttpIpExceptionList);
+
+    // owner_email_address
+    SString strEmailsString;
+    GetString(m_pRootNode, "owner_email_address", strEmailsString);
+    ReadCommaSeparatedList(strEmailsString, m_OwnerEmailAddressList);
 
     // Check settings in this list here
     const std::vector < SIntSetting >& settingList = GetIntSettingList ();
