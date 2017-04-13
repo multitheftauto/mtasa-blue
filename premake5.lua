@@ -31,6 +31,9 @@ workspace "MTASA"
 		"vendor",
 		"Shared/sdk", 
 	}
+	
+	 -- I know linking bcrypt here is ugly, but SharedUtil depends on it, thus it's required everywhere
+	links { "bcrypt" }
 
 	defines { 
 		"_CRT_SECURE_NO_WARNINGS",
@@ -134,6 +137,7 @@ workspace "MTASA"
 		include "Shared/XML"
 		
 		group "Vendor"
+		include "vendor/bcrypt"
 		include "vendor/cryptopp"
 		include "vendor/ehs"
 		include "vendor/google-breakpad"

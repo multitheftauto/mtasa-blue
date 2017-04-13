@@ -19,6 +19,8 @@ void CLuaCryptDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "teaDecode", TeaDecode );
     CLuaCFunctions::AddFunction ( "base64Encode", Base64encode );
     CLuaCFunctions::AddFunction ( "base64Decode", Base64decode );
+    CLuaCFunctions::AddFunction("passwordHash", PasswordHash);
+    CLuaCFunctions::AddFunction("passwordVerify", PasswordVerify);
 }
 
 int CLuaCryptDefs::Md5 ( lua_State* luaVM )
@@ -171,5 +173,80 @@ int CLuaCryptDefs::Base64decode ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
+{
+//  string password_hash(string password, string algorithm, table options = {})
+    SString password;
+    PasswordHashFunction algorithm;
+    std::unordered_map<SString, SString> options;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(password);
+    argStream.ReadEnumString(algorithm);
+    argStream.ReadStringMap(options, true);
+
+    if (!argStream.HasErrors())
+    {
+        if (algorithm == PasswordHashFunction::Bcrypt)
+        {
+            // Set default value to 10
+            if (options["cost"].empty())
+                options["cost"] = "10";
+
+            std::stringstream ss(options["cost"]);
+            std::size_t cost;
+            ss >> cost;
+
+            if (!ss.fail())
+            {
+                SString hash = SharedUtil::BcryptHash(password, options["salt"], cost);
+                if (!hash.empty())
+                {
+                    lua_pushstring(luaVM, hash);
+                    return 1;
+                }
+                else
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'salt'");
+            }
+            else
+                m_pScriptDebugging->LogWarning(luaVM, "Invalid value for field 'cost'");
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
+{
+//  bool passwordVerify(string password, string hash)
+    SString password;
+    SString hash;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(password);
+    argStream.ReadString(hash);
+
+    if (!argStream.HasErrors())
+    {
+        if (hash.BeginsWith("$2y$"))
+        {
+            lua_pushboolean(luaVM, SharedUtil::BcryptVerify(password, hash));
+            return 1;
+        }
+        else
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "Passed unknown hash");
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
     return 1;
 }
