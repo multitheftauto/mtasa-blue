@@ -1005,7 +1005,7 @@ public:
 
                 if (keyType == LUA_TSTRING && (valueType == LUA_TSTRING || valueType == LUA_TNUMBER))
                 {
-                    outMap.insert({ lua_tostring(m_luaVM, -2), lua_tostring(m_luaVM, -1) });
+                    outMap.insert({ SStringX(lua_tostring(m_luaVM, -2)), SStringX(lua_tostring(m_luaVM, -1)) });
                     lua_pop(m_luaVM, 1);
                 }
             }
