@@ -33,7 +33,7 @@ workspace "MTASA"
 	}
 	
 	 -- I know linking bcrypt here is ugly, but SharedUtil depends on it, thus it's required everywhere
-	links { "bcrypt" }
+	links { "blowfish_bcrypt" }
 
 	defines { 
 		"_CRT_SECURE_NO_WARNINGS",

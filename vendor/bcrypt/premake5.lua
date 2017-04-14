@@ -1,7 +1,7 @@
-project "bcrypt"
+project "blowfish_bcrypt"
 	language "C++"
 	kind "StaticLib"
-	targetname "bcrypt"
+	targetname "blowfish_bcrypt"
 	
 	vpaths { 
 		["Headers/*"] = "*.h",
