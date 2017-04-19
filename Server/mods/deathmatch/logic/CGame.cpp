@@ -274,6 +274,9 @@ CGame::~CGame ( void )
     // Stop networking
     Stop ();
 
+    // Stop async task scheduler
+    SAFE_DELETE(m_pAsyncTaskScheduler);
+
      // Destroy our stuff
     SAFE_DELETE( m_pResourceManager );
 
@@ -483,6 +486,8 @@ void CGame::DoPulse ( void )
 
     CLOCK_CALL1( m_pLatentTransferManager->DoPulse (); );
 
+    CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
+
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
 
@@ -596,6 +601,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     const SString strServerIPList = m_pMainConfig->GetServerIPList ();
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
+
+    // Start async task scheduler
+    m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2);
 
     // Create the account manager
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );

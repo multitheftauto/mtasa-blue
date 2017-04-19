@@ -266,6 +266,7 @@ public:
     inline CCustomWeaponManager*    GetCustomWeaponManager      ( void )        { return m_pCustomWeaponManager; }
     inline CFunctionUseLogger*      GetFunctionUseLogger        ( void )        { return m_pFunctionUseLogger; }
     inline CMasterServerAnnouncer*  GetMasterServerAnnouncer    ( void )        { return m_pMasterServerAnnouncer; }
+    inline SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler(void )        { return m_pAsyncTaskScheduler; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -588,6 +589,8 @@ private:
     SString                     m_strPrevMinClientKickRequirement;
     SString                     m_strPrevMinClientConnectRequirement;
     SString                     m_strPrevLowestConnectedPlayerVersion;
+
+    SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
 };
 
 #endif
