@@ -18,6 +18,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
 
 extern CGame * g_pGame;
 
@@ -130,6 +131,11 @@ bool CMainConfig::Load ( void )
     {
         CLogger::ErrorPrintf ( "Missing root node ('config')\n" );
         return false;
+    }
+
+    if (AddMissingSettings())
+    {
+        Save();
     }
 
     // Name
@@ -848,6 +854,54 @@ bool CMainConfig::Save ( void )
 
     // No file
     return false;
+}
+
+
+//
+// Compare against default config and add missing nodes.
+// Returns true if nodes were added.
+//
+bool CMainConfig::AddMissingSettings(void)
+{
+    // Load template
+    const char *szTemplateText =
+        #include MTA_SERVER_CONF_TEMPLATE
+    ;
+    SString strTemplateFilename = PathJoin(g_pServerInterface->GetServerModPath(), "resource-cache", "conf.template");
+    FileSave(strTemplateFilename, szTemplateText);
+    CXMLFile* pFileTemplate = g_pServerInterface->GetXML()->CreateXML(strTemplateFilename);
+    CXMLNode* pRootNodeTemplate = pFileTemplate && pFileTemplate->Parse() ? pFileTemplate->GetRootNode() : nullptr;
+    if (!pRootNodeTemplate)
+    {
+        CLogger::ErrorPrintf("Can't parse '%s'\n", *strTemplateFilename);
+        return false;
+    }
+
+    // Check that each item in the template also exists in the server config
+    bool bChanged = false;
+    CXMLNode* pPrevNode = nullptr;
+    for(auto it = pRootNodeTemplate->ChildrenBegin(); it != pRootNodeTemplate->ChildrenEnd(); ++it)
+    {
+        CXMLNode* pNodeTemplate = *it;
+        SString strNodeName = pNodeTemplate->GetTagName();
+        CXMLNode* pNode = m_pRootNode->FindSubNode(strNodeName);
+        if (!pNode)
+        {
+            CLogger::LogPrintf("Adding missing '%s' to mtaserver.conf\n", *strNodeName);
+            SString strNodeValue = pNodeTemplate->GetTagContent();
+            SString strNodeComment = pNodeTemplate->GetCommentText();
+            pNode = m_pRootNode->CreateSubNode(strNodeName, pPrevNode);
+            pNode->SetTagContent(strNodeValue);
+            pNode->SetCommentText(strNodeComment, true);
+            bChanged = true;
+        }
+        pPrevNode = pNode;
+    }
+
+    // Clean up
+    g_pServerInterface->GetXML()->DeleteXML(pFileTemplate);
+    FileDelete(strTemplateFilename);
+    return bChanged;
 }
 
 

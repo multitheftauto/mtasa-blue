@@ -1467,16 +1467,16 @@ namespace SharedUtil
 
     ///////////////////////////////////////////////////////////////
     //
-    // ReadCommaSeparatedList
+    // ReadTokenSeparatedList
     //
-    // Split comma separated values into an array.
+    // Split token separated values into an array.
     // Removes leading/trailing spaces and empty items
     //
     ///////////////////////////////////////////////////////////////
     inline
-    void ReadCommaSeparatedList(const SString& strInput, std::vector<SString>& outList)
+    void ReadTokenSeparatedList(const SString& strDelim, const SString& strInput, std::vector<SString>& outList)
     {
-        strInput.Split(",", outList);
+        strInput.Split(strDelim, outList);
         // Remove surrounding spaces for each item
         for ( auto iter = outList.begin(); iter != outList.end(); )
         {
@@ -1487,6 +1487,12 @@ namespace SharedUtil
             else
                 ++iter;
         }
+    }
+
+    inline
+    void ReadCommaSeparatedList(const SString& strInput, std::vector<SString>& outList)
+    {
+        return ReadTokenSeparatedList(",", strInput, outList);
     }
 
 

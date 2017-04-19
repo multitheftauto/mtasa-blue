@@ -153,6 +153,7 @@ public:
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
     bool                            GetSettingTable                 ( const SString& strName, const char** szAttribNames, uint uiNumAttribNames, CLuaArguments* outTable );
+    bool                            AddMissingSettings              ( void );
 
     CConsole*                       m_pConsole;
     CLuaManager*                    m_pLuaManager;
