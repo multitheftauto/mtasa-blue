@@ -988,6 +988,42 @@ public:
 
 
     //
+    // Reads a table as key-value string pair
+    //
+    void ReadStringMap(std::unordered_map<SString, SString>& outMap, bool defaultEmpty = false)
+    {
+        outMap.clear();
+
+        int argument = lua_type(m_luaVM, m_iIndex);
+        if (argument == LUA_TTABLE)
+        {
+            lua_pushnil(m_luaVM);
+            while (lua_next(m_luaVM, m_iIndex) != 0)
+            {
+                int keyType = lua_type(m_luaVM, -2);
+                int valueType = lua_type(m_luaVM, -1);
+
+                if (keyType == LUA_TSTRING && (valueType == LUA_TSTRING || valueType == LUA_TNUMBER))
+                {
+                    outMap.insert({ SStringX(lua_tostring(m_luaVM, -2)), SStringX(lua_tostring(m_luaVM, -1)) });
+                    lua_pop(m_luaVM, 1);
+                }
+            }
+            ++m_iIndex;
+            return;
+        }
+        else if (defaultEmpty && (argument == LUA_TNONE || argument == LUA_TNIL))
+        {
+            ++m_iIndex;
+            return;
+        }
+
+        SetTypeError("table");
+        ++m_iIndex;
+    }
+
+
+    //
     // Read a function, but don't do it yet due to Lua stack issues
     //
     void ReadFunction ( CLuaFunctionRef& outValue, int defaultValue = -2 )

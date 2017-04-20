@@ -301,6 +301,9 @@ CClientGame::CClientGame ( bool bLocalPlay )
     CLuaFunctionDefs::Initialize ( m_pLuaManager, m_pScriptDebugging, this );
     CLuaDefs::Initialize ( this, m_pLuaManager, m_pScriptDebugging );
 
+    // Start async task scheduler
+    m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2);
+
     // Disable the enter/exit vehicle key button (we want to handle this button ourselves)
     g_pMultiplayer->DisableEnterExitVehicleKey ( true );
 
@@ -390,6 +393,9 @@ CClientGame::~CClientGame ( void )
     // Hide the transfer box incase it is showing
     m_pTransferBox->Hide();
     m_pBigPacketTransferBox->Hide();
+
+    // Stop async task scheduler
+    SAFE_DELETE(m_pAsyncTaskScheduler);
 
     SAFE_DELETE( m_pVoiceRecorder );
 
@@ -1179,8 +1185,7 @@ void CClientGame::DoPulses ( void )
         // Pulse DownloadFiles if we're transferring stuff
         GetResourceFileDownloadManager()->DoPulse();
         DownloadSingularResourceFiles ();
-        g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
-        g_pNet->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE_ANY_HOST)->ProcessQueuedFiles();
+        GetRemoteCalls()->ProcessQueuedFiles();
     }
 
     // Not waiting for local connect?
@@ -1305,6 +1310,9 @@ void CClientGame::DoPulses ( void )
 
     // Send screen shot data
     ProcessDelayedSendList ();
+
+    // Collect async task scheduler results
+    m_pAsyncTaskScheduler->CollectResults();
 
     TIMING_CHECKPOINT( "-CClientGame::DoPulses" );
 }
@@ -6533,6 +6541,9 @@ void CClientGame::OutputServerInfo( void )
 //////////////////////////////////////////////////////////////////
 void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMessage, uint uiSendLimitForThisId )
 {
+    g_pCore->GetConsole()->Print(strMessage);
+    AddReportLog(3400 + uiId, strMessage + g_pNet->GetConnectedServer(true), 10);
+
     if ( uiSendLimitForThisId )
     {
         uint& uiCount = MapGet( m_SentMessageIds, uiId );

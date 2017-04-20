@@ -459,7 +459,6 @@ int CLuaResourceDefs::LoadString ( lua_State* luaVM )
             SString strMessage ( "argument 1 is invalid. Please re-compile at http://luac.mtasa.com/", 0 );
             argStream.SetCustomError ( strMessage );
             cpBuffer = NULL;
-            g_pCore->GetConsole ()->Print ( argStream.GetFullErrorMessage () );
             g_pClientGame->TellServerSomethingImportant ( 1004, argStream.GetFullErrorMessage (), 3 );
         }
 
@@ -540,7 +539,6 @@ int CLuaResourceDefs::Load ( lua_State* luaVM )
             SString strMessage ( "argument 2 is invalid. Please re-compile at http://luac.mtasa.com/", 0 );
             argStream.SetCustomError ( strMessage );
             cpBuffer = NULL;
-            g_pCore->GetConsole ()->Print ( argStream.GetFullErrorMessage () );
             g_pClientGame->TellServerSomethingImportant ( 1005, argStream.GetFullErrorMessage (), 3 );
         }
 

@@ -176,10 +176,19 @@ bool CDynamicLibrary::CheckMtaVersion( const char* szLibName )
     FUNC_GetMtaVersion* pfnGetMtaVersion = (FUNC_GetMtaVersion*) ( GetProcedureAddress ( "GetLibMtaVersion" ) );
     if ( pfnGetMtaVersion )
         pfnGetMtaVersion( buffer, sizeof( buffer ) );
-    if ( strVersionCore != buffer )
+    SString strVersionLibrary = buffer;
+    if ( strVersionCore != strVersionLibrary )
     {
-        Print( "ERROR: '%s' library version is '%s' (Expected '%s')\n", szLibName, buffer, *strVersionCore );
-        Print( "\n** REINSTALL MTA **\n" );
+        Print( "ERROR: '%s' library version is '%s' (Expected '%s')\n", szLibName, *strVersionLibrary, *strVersionCore );
+        if ( MTASA_VERSION_BUILD == 0 )
+        {
+            int iBuildLibrary = atoi(strVersionLibrary.SubStr(8));
+            Print ( "\n(If this is a custom build,\n" );
+            Print ( " 1. Set MTASA_VERSION_BUILD in version.h to %d\n", iBuildLibrary  );
+            Print ( " 2. Rebuild)\n\n\n" );
+        }
+        else
+            Print( "\n** REINSTALL MTA **\n\n" );
         return false;
     }
 

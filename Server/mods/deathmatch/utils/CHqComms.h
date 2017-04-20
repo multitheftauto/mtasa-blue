@@ -45,7 +45,7 @@ public:
             m_Stage = HQCOMMS_STAGE_QUERY;
 
             CBitStream bitStream;
-            bitStream->Write( (char)3 );    // Data version
+            bitStream->Write( (char)4 );    // Data version
             bitStream->WriteStr( g_pGame->GetConfig()->GetServerIP() );
             bitStream->Write( g_pGame->GetConfig()->GetServerPort() );
             bitStream->WriteStr( CStaticFunctionDefinitions::GetVersionSortable() );
@@ -79,6 +79,12 @@ public:
 
             bitStream->WriteStr( MTA_OS_STRING );
             bitStream->WriteStr( g_pGame->GetConfig()->GetServerIPList() );
+
+            bitStream->Write( g_pGame->GetConfig()->IsDatabaseCredentialsProtectionEnabled() ? 1 : 0 );
+            bitStream->Write( g_pGame->GetConfig()->IsFakeLagCommandEnabled() ? 1 : 0 );
+            bitStream->Write( g_pGame->GetConfig()->GetAuthSerialHttpEnabled() ? 1 : 0 );
+            bitStream->WriteStr( SString::Join(",", g_pGame->GetConfig()->GetAuthSerialGroupList()) );
+            bitStream->WriteStr( SString::Join(",", g_pGame->GetConfig()->GetOwnerEmailAddressList()) );
 
             // Send request
             this->AddRef();     // Keep object alive

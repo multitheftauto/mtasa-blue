@@ -37,6 +37,7 @@ CSettings::CSettings ( void )
     m_iMaxAnisotropic = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
     m_pWindow = NULL;
     m_bBrowserListsChanged = false;
+    m_bBrowserListsLoadEnabled = false;
     CreateGUI ();
 
     // Disable progress animation if required
@@ -59,7 +60,7 @@ void CSettings::CreateGUI ( void )
     if ( m_pWindow )
         DestroyGUI ();
 
-    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabInterface, *pTabBrowser, *pTabAdvanced;
+    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabInterface, *pTabAdvanced;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -114,6 +115,7 @@ void CSettings::CreateGUI ( void )
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
     m_pTabs->SetPosition ( tabPanelPosition );
     m_pTabs->SetSize ( tabPanelSize );
+    m_pTabs->SetSelectionHandler( GUI_CALLBACK( &CSettings::OnTabChanged, this ) );
 
     pTabMultiplayer = m_pTabs->CreateTab ( _("Multiplayer") );
     pTabVideo = m_pTabs->CreateTab ( _("Video") );
@@ -121,7 +123,7 @@ void CSettings::CreateGUI ( void )
     pTabBinds = m_pTabs->CreateTab ( _("Binds") );
     pTabControls = m_pTabs->CreateTab ( _("Controls") );
     pTabInterface = m_pTabs->CreateTab ( _("Interface") );
-    pTabBrowser = m_pTabs->CreateTab ( _("Web Browser") );
+    m_pTabBrowser = m_pTabs->CreateTab ( _("Web Browser") );
     pTabAdvanced = m_pTabs->CreateTab ( _("Advanced") );
 
     // Create buttons
@@ -1133,73 +1135,73 @@ void CSettings::CreateGUI ( void )
     /**
      * Webbrowser tab
      **/
-    m_pLabelBrowserGeneral = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("General") ) );
+    m_pLabelBrowserGeneral = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabBrowser, _("General") ) );
     m_pLabelBrowserGeneral->SetPosition ( CVector2D ( 10.0f, 12.0f ) );
     m_pLabelBrowserGeneral->GetPosition ( vecTemp );
     m_pLabelBrowserGeneral->AutoSize ( NULL, 5.0f );
     m_pLabelBrowserGeneral->SetFont ( "default-bold-small" );
 
-    m_pCheckBoxRemoteBrowser = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabBrowser, _("Enable remote websites"), true ) );
+    m_pCheckBoxRemoteBrowser = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTabBrowser, _("Enable remote websites"), true ) );
     m_pCheckBoxRemoteBrowser->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pCheckBoxRemoteBrowser->GetPosition ( vecTemp );
     m_pCheckBoxRemoteBrowser->AutoSize ( NULL, 20.0f );
 
-    m_pCheckBoxRemoteJavascript = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabBrowser, _("Enable Javascript on remote websites"), true ) );
+    m_pCheckBoxRemoteJavascript = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTabBrowser, _("Enable Javascript on remote websites"), true ) );
     m_pCheckBoxRemoteJavascript->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
     m_pCheckBoxRemoteJavascript->GetPosition ( vecTemp );
     m_pCheckBoxRemoteJavascript->AutoSize ( NULL, 20.0f );
 
-    m_pLabelBrowserCustomBlacklist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("Custom blacklist") ) );
+    m_pLabelBrowserCustomBlacklist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabBrowser, _("Custom blacklist") ) );
     m_pLabelBrowserCustomBlacklist->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pLabelBrowserCustomBlacklist->GetPosition ( vecTemp );
     m_pLabelBrowserCustomBlacklist->AutoSize ( NULL, 5.0f );
     m_pLabelBrowserCustomBlacklist->SetFont ( "default-bold-small" );
 
-    m_pEditBrowserBlacklistAdd = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabBrowser ) );
+    m_pEditBrowserBlacklistAdd = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTabBrowser ) );
     m_pEditBrowserBlacklistAdd->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
     m_pEditBrowserBlacklistAdd->GetPosition ( vecTemp );
     m_pEditBrowserBlacklistAdd->SetSize ( CVector2D ( 191.0f, 22.0f ) );
     m_pEditBrowserBlacklistAdd->SetText ( _("Enter a domain e.g. google.com") );
 
-    m_pButtonBrowserBlacklistAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Block") ) );
+    m_pButtonBrowserBlacklistAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTabBrowser, _("Block") ) );
     m_pButtonBrowserBlacklistAdd->SetPosition ( CVector2D ( vecTemp.fX + m_pEditBrowserBlacklistAdd->GetSize ().fX + 2.0f, vecTemp.fY ) );
     m_pButtonBrowserBlacklistAdd->SetSize ( CVector2D ( 64.0f, 22.0f ) );
 
-    m_pGridBrowserBlacklist = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( pTabBrowser ) );
+    m_pGridBrowserBlacklist = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTabBrowser ) );
     m_pGridBrowserBlacklist->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pGridBrowserBlacklist->GetPosition ( vecTemp );
     m_pGridBrowserBlacklist->SetSize ( CVector2D ( 256.0f, 150.0f ) );
     m_pGridBrowserBlacklist->AddColumn ( _("Domain"), 0.9f );
 
-    m_pButtonBrowserBlacklistRemove = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Remove domain") ) );
+    m_pButtonBrowserBlacklistRemove = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTabBrowser, _("Remove domain") ) );
     m_pButtonBrowserBlacklistRemove->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + m_pGridBrowserBlacklist->GetSize ().fY + 5.0f ) );
     m_pButtonBrowserBlacklistRemove->SetSize ( CVector2D ( 140.0f, 22.0f ) );
 
     m_pLabelBrowserCustomBlacklist->GetPosition ( vecTemp ); // Reset vecTemp
 
-    m_pLabelBrowserCustomWhitelist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("Custom whitelist") ) );
+    m_pLabelBrowserCustomWhitelist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabBrowser, _("Custom whitelist") ) );
     m_pLabelBrowserCustomWhitelist->SetPosition ( CVector2D ( 292.0f , vecTemp.fY ) );
     m_pLabelBrowserCustomWhitelist->GetPosition ( vecTemp );
     m_pLabelBrowserCustomWhitelist->AutoSize ( NULL, 5.0f );
     m_pLabelBrowserCustomWhitelist->SetFont ( "default-bold-small" );
 
-    m_pEditBrowserWhitelistAdd = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabBrowser ) );
+    m_pEditBrowserWhitelistAdd = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTabBrowser ) );
     m_pEditBrowserWhitelistAdd->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
     m_pEditBrowserWhitelistAdd->GetPosition ( vecTemp );
     m_pEditBrowserWhitelistAdd->SetSize ( CVector2D ( 191.0f, 22.0f ) );
     m_pEditBrowserWhitelistAdd->SetText ( _("Enter a domain e.g. google.com") );
 
-    m_pButtonBrowserWhitelistAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Allow") ) );
+    m_pButtonBrowserWhitelistAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTabBrowser, _("Allow") ) );
     m_pButtonBrowserWhitelistAdd->SetPosition ( CVector2D ( vecTemp.fX + m_pEditBrowserWhitelistAdd->GetSize ().fX + 2.0f, vecTemp.fY ) );
     m_pButtonBrowserWhitelistAdd->SetSize ( CVector2D ( 64.0f, 22.0f ) );
 
-    m_pGridBrowserWhitelist = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( pTabBrowser ) );
+    m_pGridBrowserWhitelist = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTabBrowser ) );
     m_pGridBrowserWhitelist->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pGridBrowserWhitelist->GetPosition ( vecTemp );
     m_pGridBrowserWhitelist->SetSize ( CVector2D ( 256.0f, 150.0f ) );
     m_pGridBrowserWhitelist->AddColumn ( _("Domain"), 0.9f );
 
-    m_pButtonBrowserWhitelistRemove = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Remove domain") ) );
+    m_pButtonBrowserWhitelistRemove = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTabBrowser, _("Remove domain") ) );
     m_pButtonBrowserWhitelistRemove->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + m_pGridBrowserWhitelist->GetSize ().fY + 5.0f ) );
     m_pButtonBrowserWhitelistRemove->SetSize ( CVector2D ( 140.0f, 22.0f ) );
 
@@ -2902,20 +2904,38 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "browser_remote_websites", bVar ); m_pCheckBoxRemoteBrowser->SetSelected ( bVar );
     CVARS_GET ( "browser_remote_javascript", bVar ); m_pCheckBoxRemoteJavascript->SetSelected ( bVar );
 
+    ReloadBrowserLists();
+}
+
+void CSettings::ReloadBrowserLists( void )
+{
     m_pGridBrowserBlacklist->Clear ();
     m_pGridBrowserWhitelist->Clear ();
     m_bBrowserListsChanged = false;
-
-    auto pWebCore = g_pCore->GetWebCore();
-    std::vector<std::pair<SString, bool>> customBlacklist;
-    pWebCore->GetFilterEntriesByType( customBlacklist, eWebFilterType::WEBFILTER_USER );
-    for ( std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter )
+    if ( m_bBrowserListsLoadEnabled )
     {
-        if ( iter->second == false )
-            m_pGridBrowserBlacklist->SetItemText( m_pGridBrowserBlacklist->AddRow (), 1, iter->first );
-        else
-            m_pGridBrowserWhitelist->SetItemText( m_pGridBrowserWhitelist->AddRow (), 1, iter->first );
+        auto pWebCore = g_pCore->GetWebCore();
+        std::vector<std::pair<SString, bool>> customBlacklist;
+        pWebCore->GetFilterEntriesByType( customBlacklist, eWebFilterType::WEBFILTER_USER );
+        for ( std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter )
+        {
+            if ( iter->second == false )
+                m_pGridBrowserBlacklist->SetItemText( m_pGridBrowserBlacklist->AddRow (), 1, iter->first );
+            else
+                m_pGridBrowserWhitelist->SetItemText( m_pGridBrowserWhitelist->AddRow (), 1, iter->first );
+        }
     }
+}
+
+bool CSettings::OnTabChanged( CGUIElement* pElement )
+{
+    if ( pElement == m_pTabBrowser && !m_bBrowserListsLoadEnabled )
+    {
+        // Load browser lists when tab is selected for the first time
+        m_bBrowserListsLoadEnabled = true;
+        ReloadBrowserLists();
+    }
+    return true;
 }
 
 void CSettings::SaveData ( void )
@@ -3212,23 +3232,26 @@ void CSettings::SaveData ( void )
         CVARS_SET ( "browser_remote_javascript", m_pCheckBoxRemoteJavascript->GetSelected () );
     }
 
-    auto pWebCore = g_pCore->GetWebCore();
-    std::vector<SString> customBlacklist;
-    for ( int i = 0; i < m_pGridBrowserBlacklist->GetRowCount (); ++i )
+    if ( m_bBrowserListsLoadEnabled )
     {
-        customBlacklist.push_back ( m_pGridBrowserBlacklist->GetItemText ( i, 1 ) );
-    }
-    pWebCore->WriteCustomList( "customblacklist", customBlacklist );
+        auto pWebCore = g_pCore->GetWebCore();
+        std::vector<SString> customBlacklist;
+        for ( int i = 0; i < m_pGridBrowserBlacklist->GetRowCount (); ++i )
+        {
+            customBlacklist.push_back ( m_pGridBrowserBlacklist->GetItemText ( i, 1 ) );
+        }
+        pWebCore->WriteCustomList( "customblacklist", customBlacklist );
 
-    std::vector<SString> customWhitelist;
-    for ( int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i )
-    {
-        customWhitelist.push_back( m_pGridBrowserWhitelist->GetItemText( i, 1 ) );
-    }
-    pWebCore->WriteCustomList( "customwhitelist", customWhitelist );
+        std::vector<SString> customWhitelist;
+        for ( int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i )
+        {
+            customWhitelist.push_back( m_pGridBrowserWhitelist->GetItemText( i, 1 ) );
+        }
+        pWebCore->WriteCustomList( "customwhitelist", customWhitelist );
         
-    if ( m_bBrowserListsChanged )
-        bBrowserSettingChanged = true;
+        if ( m_bBrowserListsChanged )
+            bBrowserSettingChanged = true;
+    }
 
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues ();

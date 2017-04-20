@@ -91,6 +91,7 @@ typedef float               FLOAT;      //  32
 #endif
 #include "SharedUtil.Profiling.h"
 #include "SharedUtil.Logging.h"
+#include "SharedUtil.AsyncTaskScheduler.h"
 #include "CFastList.h"
 #include "CDuplicateLineFilter.h"
 

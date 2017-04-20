@@ -150,6 +150,7 @@ protected:
     // Keep these protected so we can access them in the event handlers of CClientGame
     CGUIElement*        m_pWindow;
     CGUITabPanel*       m_pTabs;
+    CGUITab*            m_pTabBrowser;
     CGUIButton*         m_pButtonOK;
     CGUIButton*         m_pButtonCancel;
     CGUILabel*          m_pLabelNick;
@@ -333,6 +334,7 @@ protected:
     CGUIGridList*       m_pGridBrowserWhitelist;
     CGUIButton*         m_pButtonBrowserWhitelistRemove;
     bool                m_bBrowserListsChanged;
+    bool                m_bBrowserListsLoadEnabled;
 
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );
@@ -380,6 +382,8 @@ protected:
     bool                OnWindowedClick         ( CGUIElement* pElement );
     bool                OnShowAdvancedSettingDescription ( CGUIElement* pElement );
     bool                OnHideAdvancedSettingDescription ( CGUIElement* pElement );
+    bool                OnTabChanged            ( CGUIElement* pElement );
+    void                ReloadBrowserLists      ( void );
 
 private:
     void                ProcessKeyBinds         ( void );

@@ -350,7 +350,9 @@ int CServerImpl::Run ( int iArgumentCount, char* szArguments [] )
             Print ( "Network module not compatible! (Expected 0x%x, got 0x%x)\n", MTA_DM_SERVER_NET_MODULE_VERSION, (uint)ulNetModuleVersion );
             Print ( "Press Q to shut down the server!\n" );
             Print ( "\n\n\n(If this is a custom build,\n" );
-            Print ( " check MTASA_VERSION_TYPE in version.h is set correctly)\n" );
+            Print ( " 1. Update source to latest\n" );
+            Print ( " 2. Get latest net module (run install-data)\n" );
+            Print ( " 3. Check MTASA_VERSION_TYPE in version.h is set correctly)\n" );
             WaitForKey ( 'q' );
             DestroyWindow ( );
             return ERROR_NETWORK_LIBRARY_FAILED;

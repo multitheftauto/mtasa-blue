@@ -19,6 +19,7 @@
 
 #include "StdInc.h"
 
+#define MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT          "1.3.5"
 
 int CLuaFunctionDefs::CreateExplosion ( lua_State* luaVM )
@@ -1839,11 +1840,14 @@ int CLuaFunctionDefs::GetFPSLimit ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
 {
-//  bool fetchRemote ( string URL [, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
     CScriptArgReader argStream ( luaVM );
-    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts; uint uiConnectTimeoutMs;
+    SString strURL; SString strQueueName; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts; uint uiConnectTimeoutMs;
 
     argStream.ReadString ( strURL );
+    if ( argStream.NextIsString () )
+        MinClientReqCheck ( argStream, MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used" );
+    argStream.ReadIfNextIsString ( strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME );
     argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
     if ( argStream.NextIsNumber () )
         MinClientReqCheck ( argStream, MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
@@ -1859,7 +1863,7 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
         CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( luaMain )
         {
-            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
+            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs );
             lua_pushboolean ( luaVM, true );
             return 1;
         }
