@@ -554,6 +554,15 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         return false;
     }
 
+    // Check json has precision mod - #8853 (toJSON passes wrong floats)
+    json_object* pJsonObject = json_object_new_double(5.12345678901234);
+    SString strJsonResult = json_object_to_json_string_ext(pJsonObject, JSON_C_TO_STRING_PLAIN);
+    json_object_put(pJsonObject);
+    if (strJsonResult != "5.12345678901234")
+    {
+        CLogger::ErrorPrintf("JSON built without precision modification\n");
+    }
+
     // Grab the path to the main config
     SString strBuffer;
     const char* szMainConfig;
@@ -564,6 +573,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     else
     {
         strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf" );
+        m_bUsingMtaServerConf = true;
     }
     m_pMainConfig->SetFileName ( strBuffer );
 
@@ -907,14 +917,25 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Flush any pending master server announce messages
     g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
 
-    if ( m_pMainConfig->GetAuthSerialEnabled() )
+    // Warnings only if not editor or local server
+    if (IsUsingMtaServerConf())
     {
-        CLogger::LogPrintf( "Authorized serial account protection is enabled for the ACL group(s): `%s`  See http:""//mtasa.com/authserial\n",
-                            *SString::Join( ",", m_pMainConfig->GetAuthSerialGroupList() ) );
-    }
-    else
-    {
-        CLogger::LogPrint( "Authorized serial account protection is DISABLED. See http:""//mtasa.com/authserial\n" );
+        // Authorized serial account protection
+        if ( m_pMainConfig->GetAuthSerialEnabled() )
+        {
+            CLogger::LogPrintf( "Authorized serial account protection is enabled for the ACL group(s): `%s`  See http:""//mtasa.com/authserial\n",
+                                *SString::Join( ",", m_pMainConfig->GetAuthSerialGroupList() ) );
+        }
+        else
+        {
+            CLogger::LogPrint( "Authorized serial account protection is DISABLED. See http:""//mtasa.com/authserial\n" );
+        }
+
+        // Owner email address
+        if (m_pMainConfig->GetOwnerEmailAddressList().empty())
+        {
+            CLogger::LogPrintf("WARNING: <owner_email_address> not set\n");
+        }
     }
 
     // Done

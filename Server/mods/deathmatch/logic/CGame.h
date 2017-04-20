@@ -404,6 +404,7 @@ public:
     bool                        IsBelowMinimumClient            ( const SString& strVersion );
     bool                        IsBelowRecommendedClient        ( const SString& strVersion );
     void                        ApplyAseSetting             ( void );
+    bool                        IsUsingMtaServerConf            ( void ) { return m_bUsingMtaServerConf; }
 
 private:
     void                        AddBuiltInEvents            ( void );
@@ -517,6 +518,7 @@ private:
     float                       m_fAircraftMaxVelocity;
     float                       m_fAircraftMaxVelocity_Sq;
     bool                        m_bOcclusionsEnabled;
+    bool                        m_bUsingMtaServerConf;
 
     unsigned char               m_ucTrafficLightState;
     bool                        m_bTrafficLightsLocked;

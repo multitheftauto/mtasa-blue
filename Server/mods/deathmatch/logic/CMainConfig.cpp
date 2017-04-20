@@ -863,6 +863,10 @@ bool CMainConfig::Save ( void )
 //
 bool CMainConfig::AddMissingSettings(void)
 {
+    // Only mtaserver.conf is currently supported
+    if (!g_pGame->IsUsingMtaServerConf())
+        return false;
+
     // Load template
     const char *szTemplateText =
         #include MTA_SERVER_CONF_TEMPLATE
