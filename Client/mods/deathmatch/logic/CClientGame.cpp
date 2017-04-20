@@ -1179,8 +1179,7 @@ void CClientGame::DoPulses ( void )
         // Pulse DownloadFiles if we're transferring stuff
         GetResourceFileDownloadManager()->DoPulse();
         DownloadSingularResourceFiles ();
-        g_pNet->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
-        g_pNet->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE_ANY_HOST)->ProcessQueuedFiles();
+        GetRemoteCalls()->ProcessQueuedFiles();
     }
 
     // Not waiting for local connect?
@@ -6533,6 +6532,9 @@ void CClientGame::OutputServerInfo( void )
 //////////////////////////////////////////////////////////////////
 void CClientGame::TellServerSomethingImportant( uint uiId, const SString& strMessage, uint uiSendLimitForThisId )
 {
+    g_pCore->GetConsole()->Print(strMessage);
+    AddReportLog(3400 + uiId, strMessage + g_pNet->GetConnectedServer(true), 10);
+
     if ( uiSendLimitForThisId )
     {
         uint& uiCount = MapGet( m_SentMessageIds, uiId );

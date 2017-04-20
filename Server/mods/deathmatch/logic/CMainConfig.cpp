@@ -79,7 +79,6 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iHTTPThreadCount = 8;
     m_iHTTPDosThreshold = 20;
     m_iEnableClientChecks = -1;
-    m_bAutoUpdateAntiCheatEnabled = true;
     m_bJoinFloodProtectionEnabled = true;
     m_bScriptDebugLogEnabled = false;
     m_uiScriptDebugLogLevel = 0;
@@ -299,9 +298,8 @@ bool CMainConfig::Load ( void )
         {
             SString strDisableAC;
             GetString ( m_pRootNode, "disableac", strDisableAC );
-            strDisableAC = strDisableAC.Replace( " ", "" );
             std::vector < SString > tagACList;
-            strDisableAC.Split ( ",", tagACList );
+            ReadCommaSeparatedList(strDisableAC, tagACList);
             for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
                 if ( isdigit((uchar)***it) )
                 {
@@ -320,9 +318,8 @@ bool CMainConfig::Load ( void )
         {
             SString strEnableSD;
             GetString ( m_pRootNode, "enablesd", strEnableSD );
-            strEnableSD = strEnableSD.Replace( " ", "" );
             std::vector < SString > tagSDList;
-            strEnableSD.Split ( ",", tagSDList );
+            ReadCommaSeparatedList(strEnableSD, tagSDList);
             for ( std::vector < SString >::iterator it = tagSDList.begin () ; it != tagSDList.end () ; ++it )
                 if ( isdigit((uchar)***it) )
                 {
@@ -355,12 +352,9 @@ bool CMainConfig::Load ( void )
     {
         SString strEnable;
         GetString ( m_pRootNode, "enable_diagnostic", strEnable );
-        strEnable = strEnable.Replace( " ", "" );
         std::vector < SString > tagList;
-        strEnable.Split ( ",", tagList );
-        for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
-            if ( (*it).length () )
-                MapInsert ( m_EnableDiagnosticMap, *it );
+        ReadCommaSeparatedList(strEnable, tagList);
+        m_EnableDiagnosticMap = std::set<SString>(tagList.begin(), tagList.end());
     }
 
     // Grab the server password
@@ -505,25 +499,26 @@ bool CMainConfig::Load ( void )
     SString strGroupList;
     if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList, 1 ) != IS_SUCCESS )
     {
-        // If not defined in conf file, then default to disabled
-        strGroupList = "";
+        // If not defined in conf file, then default to Admin
+        strGroupList = "Admin";
     }
-    strGroupList.Split( ",", m_AuthSerialGroupList );
-    for ( auto iter = m_AuthSerialGroupList.begin() ; iter != m_AuthSerialGroupList.end() ; )
-    {
-        SString& strGroup = *iter;
-        strGroup = strGroup.TrimEnd( " " ).TrimStart( " " );
-        if ( strGroup.empty() )
-            iter = m_AuthSerialGroupList.erase( iter );
-        else
-            ++iter;
-    }
+    ReadCommaSeparatedList(strGroupList, m_AuthSerialGroupList);
 
     // auth_serial_http
     if ( GetBoolean( m_pRootNode, "auth_serial_http", m_bAuthSerialHttpEnabled ) != IS_SUCCESS )
     {
         m_bAuthSerialHttpEnabled = true;
     }
+
+    // auth_serial_http_ip_exceptions
+    SString strIpsString;
+    GetString(m_pRootNode, "auth_serial_http_ip_exceptions", strIpsString);
+    ReadCommaSeparatedList(strIpsString, m_AuthSerialHttpIpExceptionList);
+
+    // owner_email_address
+    SString strEmailsString;
+    GetString(m_pRootNode, "owner_email_address", strEmailsString);
+    ReadCommaSeparatedList(strEmailsString, m_OwnerEmailAddressList);
 
     // Check settings in this list here
     const std::vector < SIntSetting >& settingList = GetIntSettingList ();
@@ -1351,11 +1346,11 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         SString strCurSD;
         GetSetting( "enablesd", strCurSD );
         std::vector < SString > curSDList;
-        strCurSD.Replace( " ", "" ).Split ( ",", curSDList );
+        ReadCommaSeparatedList(strCurSD, curSDList);
 
         // Get new setting as as list of ids
         std::vector < SString > newSDList;
-        strValue.Replace( " ", "" ).Split( ",", newSDList );
+        ReadCommaSeparatedList(strValue, newSDList);
 
         // Merge
         std::set < uint > comboSDMap;
@@ -1387,17 +1382,13 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
     {
         if ( true )
         {
-            m_EnableDiagnosticMap.clear();
-            SString strEnableDiagnostic = strValue.Replace( " ", "" );
             std::vector < SString > tagList;
-            strEnableDiagnostic.Split ( ",", tagList );
-            for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
-            if ( (*it).length () )
-                MapInsert ( m_EnableDiagnosticMap, *it );
+            ReadCommaSeparatedList(strValue, tagList);
+            m_EnableDiagnosticMap = std::set<SString>(tagList.begin(), tagList.end());
 
             if ( bSave )
             {
-                SetString ( m_pRootNode, "enable_diagnostic", strEnableDiagnostic );
+                SetString ( m_pRootNode, "enable_diagnostic", SString::Join(",", tagList) );
                 Save ();
             }
             return true;

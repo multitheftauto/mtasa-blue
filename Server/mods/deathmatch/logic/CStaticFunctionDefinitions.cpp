@@ -4239,6 +4239,7 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CElement* pElement )
                 Arguments.PushElement ( pVehicle );        // vehicle
                 Arguments.PushNumber ( ucOccupiedSeat );    // seat
                 Arguments.PushBoolean ( false );            // jacker
+                Arguments.PushBoolean ( true );             // forcedByScript
                 pPlayer->CallEvent ( "onPlayerVehicleExit", Arguments );
 
                 // Call the vehicle->player event
@@ -4246,6 +4247,7 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CElement* pElement )
                 Arguments2.PushElement ( pPlayer );         // player
                 Arguments2.PushNumber ( ucOccupiedSeat );    // seat
                 Arguments2.PushBoolean ( false );            // jacker
+                Arguments2.PushBoolean ( true );              // forcedByScript
                 pVehicle->CallEvent ( "onVehicleExit", Arguments2 );
             }
              // Remove him from the vehicle

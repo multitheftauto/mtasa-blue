@@ -307,10 +307,3 @@ _Pvt_Extensions
 Bin/
 Build/
 InstallFiles/
-
-# publicsdk ignores
-Shared/publicsdk/include/lauxlib.h
-Shared/publicsdk/include/lua.h
-Shared/publicsdk/include/luaconf.h
-Shared/publicsdk/include/lualib.h
-Shared/publicsdk/lib/

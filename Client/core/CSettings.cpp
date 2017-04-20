@@ -2906,18 +2906,15 @@ void CSettings::LoadData ( void )
     m_pGridBrowserWhitelist->Clear ();
     m_bBrowserListsChanged = false;
 
-    if ( g_pCore->IsWebCoreLoaded() )
+    auto pWebCore = g_pCore->GetWebCore();
+    std::vector<std::pair<SString, bool>> customBlacklist;
+    pWebCore->GetFilterEntriesByType( customBlacklist, eWebFilterType::WEBFILTER_USER );
+    for ( std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter )
     {
-        auto pWebCore = g_pCore->GetWebCore();
-        std::vector<std::pair<SString, bool>> customBlacklist;
-        pWebCore->GetFilterEntriesByType( customBlacklist, eWebFilterType::WEBFILTER_USER );
-        for ( std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter )
-        {
-            if ( iter->second == false )
-                m_pGridBrowserBlacklist->SetItemText( m_pGridBrowserBlacklist->AddRow (), 1, iter->first );
-            else
-                m_pGridBrowserWhitelist->SetItemText( m_pGridBrowserWhitelist->AddRow (), 1, iter->first );
-        }
+        if ( iter->second == false )
+            m_pGridBrowserBlacklist->SetItemText( m_pGridBrowserBlacklist->AddRow (), 1, iter->first );
+        else
+            m_pGridBrowserWhitelist->SetItemText( m_pGridBrowserWhitelist->AddRow (), 1, iter->first );
     }
 }
 
@@ -3215,26 +3212,23 @@ void CSettings::SaveData ( void )
         CVARS_SET ( "browser_remote_javascript", m_pCheckBoxRemoteJavascript->GetSelected () );
     }
 
-    if ( g_pCore->IsWebCoreLoaded() )
+    auto pWebCore = g_pCore->GetWebCore();
+    std::vector<SString> customBlacklist;
+    for ( int i = 0; i < m_pGridBrowserBlacklist->GetRowCount (); ++i )
     {
-        auto pWebCore = g_pCore->GetWebCore();
-        std::vector<SString> customBlacklist;
-        for ( int i = 0; i < m_pGridBrowserBlacklist->GetRowCount (); ++i )
-        {
-            customBlacklist.push_back ( m_pGridBrowserBlacklist->GetItemText ( i, 1 ) );
-        }
-        pWebCore->WriteCustomList( "customblacklist", customBlacklist );
-
-        std::vector<SString> customWhitelist;
-        for ( int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i )
-        {
-            customWhitelist.push_back( m_pGridBrowserWhitelist->GetItemText( i, 1 ) );
-        }
-        pWebCore->WriteCustomList( "customwhitelist", customWhitelist );
-        
-        if ( m_bBrowserListsChanged )
-            bBrowserSettingChanged = true;
+        customBlacklist.push_back ( m_pGridBrowserBlacklist->GetItemText ( i, 1 ) );
     }
+    pWebCore->WriteCustomList( "customblacklist", customBlacklist );
+
+    std::vector<SString> customWhitelist;
+    for ( int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i )
+    {
+        customWhitelist.push_back( m_pGridBrowserWhitelist->GetItemText( i, 1 ) );
+    }
+    pWebCore->WriteCustomList( "customwhitelist", customWhitelist );
+        
+    if ( m_bBrowserListsChanged )
+        bBrowserSettingChanged = true;
 
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues ();

@@ -1520,10 +1520,9 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
 
             if ( pWeapon )
             {
-                CWeapon* pPlayerWeapon = pPlayer->GiveWeapon ( static_cast < eWeaponType > ( ucCurrentWeapon ), usWeaponAmmo );
+                CWeapon* pPlayerWeapon = pPlayer->GiveWeapon ( static_cast < eWeaponType > ( ucCurrentWeapon ), usWeaponAmmo, true );
                 if ( pPlayerWeapon )
                 {
-                    pPlayerWeapon->SetAsCurrentWeapon ();
                     pPlayerWeapon->SetAmmoTotal ( BitStream.Version () >= 0x44 ? ammo.data.usTotalAmmo : 9999 );
                     pPlayerWeapon->SetAmmoInClip ( usWeaponAmmo );
                 }

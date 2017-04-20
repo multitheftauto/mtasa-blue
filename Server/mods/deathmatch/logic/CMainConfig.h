@@ -88,7 +88,6 @@ public:
     inline int                      GetEnableClientChecks           ( void )        { return m_iEnableClientChecks; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
     inline const std::string&       GetAuthFile                     ( void )        { return m_strAuthFile; };
-    inline bool                     GetAutoUpdateAntiCheatEnabled   ( void )        { return m_bAutoUpdateAntiCheatEnabled; };
     inline bool                     GetJoinFloodProtectionEnabled   ( void )        { return m_bJoinFloodProtectionEnabled; };
     inline bool                     GetScriptDebugLogEnabled        ( void )        { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty (); };
     inline const std::string&       GetScriptDebugLogFile           ( void )        { return m_strScriptDebugLogFile; };
@@ -126,9 +125,12 @@ public:
     bool                            GetCrashDumpUploadEnabled       ( void ) const              { return m_bCrashDumpUploadEnabled != 0; }
     bool                            GetFilterDuplicateLogLinesEnabled ( void ) const            { return m_bFilterDuplicateLogLinesEnabled != 0; }
     bool                            IsAuthSerialGroup               ( const SString& strGroup ) const   { return ListContains ( m_AuthSerialGroupList, strGroup ); };
+    bool                            IsAuthSerialHttpIpException     ( const SString& strIp ) const      { return ListContains ( m_AuthSerialHttpIpExceptionList, strIp ); }
     bool                            GetAuthSerialEnabled            ( void ) const                      { return !m_AuthSerialGroupList.empty(); };
     bool                            GetAuthSerialHttpEnabled        ( void ) const                      { return m_bAuthSerialHttpEnabled && GetAuthSerialEnabled(); };
     const std::vector< SString >&   GetAuthSerialGroupList          ( void ) const                      { return m_AuthSerialGroupList; }
+    const std::vector< SString >&   GetAuthSerialHttpIpExceptionList( void ) const                      { return m_AuthSerialHttpIpExceptionList; }
+    const std::vector< SString >&   GetOwnerEmailAddressList        ( void ) const                      { return m_OwnerEmailAddressList; }
     bool                            IsDatabaseCredentialsProtectionEnabled ( void ) const               { return m_bDatabaseCredentialsProtectionEnabled != 0; }
     bool                            IsFakeLagCommandEnabled         ( void ) const                      { return m_bFakeLagCommandEnabled != 0; }
 
@@ -182,7 +184,6 @@ private:
     int                             m_iEnableClientChecks;
     std::string                     m_strLogFile;
     std::string                     m_strAuthFile;
-    bool                            m_bAutoUpdateAntiCheatEnabled;
     bool                            m_bJoinFloodProtectionEnabled;
     bool                            m_bScriptDebugLogEnabled;
     std::string                     m_strScriptDebugLogFile;
@@ -195,6 +196,8 @@ private:
     std::set < SString >            m_EnableDiagnosticMap;
     std::vector < SString >         m_AuthSerialGroupList;
     bool                            m_bAuthSerialHttpEnabled;
+    std::vector<SString>            m_AuthSerialHttpIpExceptionList;
+    std::vector<SString>            m_OwnerEmailAddressList;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
     SString                         m_strIdFile;
