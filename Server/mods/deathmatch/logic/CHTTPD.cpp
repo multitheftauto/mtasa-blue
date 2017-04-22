@@ -181,9 +181,8 @@ ResponseCode CHTTPD::HandleRequest ( HttpRequest * ipoHttpRequest,
 
 ResponseCode CHTTPD::RequestLogin ( HttpRequest * ipoHttpRequest, HttpResponse * ipoHttpResponse )
 {
-    if ( m_strWarnMessageForIp == ipoHttpRequest->GetAddress() )
+    if ( m_WarnMessageTimer.Get() < 4000 && m_strWarnMessageForIp == ipoHttpRequest->GetAddress() )
     {
-        m_strWarnMessageForIp.clear();
         SString strMessage;
         strMessage += SString( "Your IP address ('%s') is not associated with an authorized serial.", ipoHttpRequest->GetAddress().c_str() );
         strMessage += SString( "<br/><a href='%s'>See here for more information</a>", "https:""//mtasa.com/authserialhttp" );
@@ -221,15 +220,21 @@ CAccount * CHTTPD::CheckAuthentication ( HttpRequest * ipoHttpRequest )
             if ( account )
             {
                 // Check that the password is right
-                if ( account->IsPassword ( authPassword.c_str () ) )
+                bool bSkipIpCheck;
+                if ( account->IsPassword( authPassword.c_str (), &bSkipIpCheck ) )
                 {
                     // Check that it isn't the Console account
                     std::string strAccountName = account->GetName ();
                     if ( strAccountName.compare ( CONSOLE_ACCOUNT_NAME ) != 0 )
                     {
-                        if ( !g_pGame->GetAccountManager()->IsHttpLoginAllowed( account, ipoHttpRequest->GetAddress() ) )
+                        // Do IP check if required
+                        if ( !bSkipIpCheck && !g_pGame->GetAccountManager()->IsHttpLoginAllowed( account, ipoHttpRequest->GetAddress() ) )
                         {
-                            m_strWarnMessageForIp = ipoHttpRequest->GetAddress();
+                            if (m_WarnMessageTimer.Get() > 8000 || m_strWarnMessageForIp != ipoHttpRequest->GetAddress())
+                            {
+                                m_strWarnMessageForIp = ipoHttpRequest->GetAddress();
+                                m_WarnMessageTimer.Reset();
+                            }
                             CLogger::AuthPrintf( "HTTP: Failed login for user '%s' because %s not associated with authorized serial\n", authName.c_str(), ipoHttpRequest->GetAddress().c_str() );
                             return m_pGuestAccount;
                         }

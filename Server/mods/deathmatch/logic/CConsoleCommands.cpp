@@ -1715,10 +1715,11 @@ bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArgume
     bool bList  = strAction == "list";
     bool bAllow = strAction == "";
     bool bRemove = strAction == "removelast";
+    bool bHttpPass = strAction == "httppass";
 
-    if ( ( !bList && !bAllow && !bRemove ) || strAccountName.empty() )
+    if ( ( !bList && !bAllow && !bRemove && !bHttpPass ) || strAccountName.empty() )
     {
-        pEchoClient->SendConsole( "Usage: authserial account_name [list|removelast]" );
+        pEchoClient->SendConsole( "Usage: authserial account_name [list|removelast|httppass]" );
         return false;
     }
 
@@ -1783,7 +1784,8 @@ bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArgume
         pEchoClient->SendConsole( SString( "authserial: No serials require authorization for '%s'", *strAccountName ) );
         return false;
     }
-    else // Remove
+    else
+    if ( bRemove )
     {
         // Find newest serial
         time_t tNewestDate = 0;
@@ -1807,6 +1809,22 @@ bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArgume
         pEchoClient->SendConsole( SString( "authserial: No serial usage for '%s'", *strAccountName ) );
         return false;
     }
+    else
+    if ( bHttpPass )
+    {
+        // Generate 7 digit random number
+        uint randomNumber;
+        g_pNetServer->GenerateRandomData(&randomNumber, sizeof(randomNumber));
+        randomNumber = (randomNumber % 8999999) + 1000000;
+        SString strHttpPassAppend("%u", randomNumber);
+
+        if (pClient->GetClientType() != CClient::CLIENT_CONSOLE)
+            pEchoClient->SendConsole(SString("authserial: HTTP password append for '%s' is now %s", *strAccountName, *strHttpPassAppend));
+        CLogger::LogPrintf("AUTHSERIAL: HTTP password append for '%s' is now %s\n", *strAccountName, *strHttpPassAppend);
+        pAccount->SetHttpPassAppend(strHttpPassAppend);
+        return true;
+    }
+    return false;
 }
 
 

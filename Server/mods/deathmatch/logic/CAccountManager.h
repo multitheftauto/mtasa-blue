@@ -150,7 +150,7 @@ public:
 
     CAccount*                   AddGuestAccount             ( const SString& strName );
     CAccount*                   AddConsoleAccount           ( const SString& strName );
-    CAccount*                   AddPlayerAccount            ( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial );
+    CAccount*                   AddPlayerAccount            ( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial, const SString& strHttpPassAppend );
     CAccount*                   AddNewPlayerAccount         ( const SString& strName, const SString& strPassword );
     bool                        RemoveAccount               ( CAccount* pAccount );
     bool                        IsAuthorizedSerialRequired  ( CAccount* pAccount );
