@@ -328,7 +328,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefs::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getLoadedModules", CLuaFunctionDefs::GetModules );
-    CLuaCFunctions::AddFunction ( "getModuleInfo", CLuaFunctionDefs::GetModuleInfo );
+    CLuaCFunctions::AddFunction( "getModuleInfo", CLuaFunctionDefs::GetModuleInfo );
+
+    CLuaCFunctions::AddFunction("setDevelopmentMode", CLuaFunctionDefs::SetDevelopmentMode);
+    CLuaCFunctions::AddFunction("getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode);
 
     // Backward compat functions at the end, so the new function name is used in ACL
 

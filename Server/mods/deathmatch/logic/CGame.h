@@ -406,6 +406,9 @@ public:
     void                        ApplyAseSetting             ( void );
     bool                        IsUsingMtaServerConf            ( void ) { return m_bUsingMtaServerConf; }
 
+    inline void                 SetDevelopmentMode          (bool enabled)  { m_DevelopmentModeEnabled = enabled; }
+    inline bool                 GetDevelopmentMode          ()              { return m_DevelopmentModeEnabled; }
+
 private:
     void                        AddBuiltInEvents            ( void );
     void                        RelayPlayerPuresync         ( class CPacket& Packet );
@@ -593,6 +596,8 @@ private:
     SString                     m_strPrevLowestConnectedPlayerVersion;
 
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
+
+    bool                        m_DevelopmentModeEnabled;
 };
 
 #endif
