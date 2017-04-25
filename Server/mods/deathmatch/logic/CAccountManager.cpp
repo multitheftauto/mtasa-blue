@@ -268,11 +268,11 @@ void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
 
     if (bCheckForErrors)
     {
-        m_pDatabaseManager->QueryWithCallbackf(m_hDbConnection, StaticDbCallback, this, strQuery);
+        m_pDatabaseManager->QueryWithCallback(m_hDbConnection, StaticDbCallback, this, strQuery);
     }
     else
     {
-        m_pDatabaseManager->Execf(m_hDbConnection, strQuery);
+        m_pDatabaseManager->Exec(m_hDbConnection, strQuery);
     }
 
     SaveAccountSerialUsage( pAccount );
