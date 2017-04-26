@@ -586,9 +586,9 @@ int CLuaUtilDefs::DebugSleep(lua_State* luaVM)
 
         // Process HTTP
 #ifdef MTA_CLIENT
-        g_pNet->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE_RESTRICTED)->ProcessQueuedFiles();
+        g_pClientGame->GetRemoteCalls()->ProcessQueuedFiles();
 #else
-        g_pNetServer->GetHTTPDownloadManager(EDownloadMode::CALL_REMOTE)->ProcessQueuedFiles();
+        g_pGame->GetRemoteCalls()->ProcessQueuedFiles();
 #endif
 
         // Sleep a bit
