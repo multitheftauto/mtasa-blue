@@ -42,7 +42,8 @@ public:
     void                OnPostFunction              ( lua_CFunction f, lua_State* luaVM );
     bool                OnPreEvent                  ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
     void                OnPostEvent                 ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
-
+    bool                OnPreEventFunction          ( const char * szName, const CLuaArguments & Arguments, CElement * pSource, CPlayer * pCaller, lua_State * functionLuaVM );
+    // void                OnPostEventFunction         ( const char * szName, const CLuaArguments & Arguments, CElement * pSource, CPlayer * pCaller, lua_CFunction f, lua_State * luaVM );
     bool                HasPostFunctionHooks        ( void ) const      { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
 
 protected:
@@ -57,5 +58,7 @@ protected:
     std::vector < SDebugHookCallInfo >  m_PostEventHookList;
     std::vector < SDebugHookCallInfo >  m_PreFunctionHookList;
     std::vector < SDebugHookCallInfo >  m_PostFunctionHookList;
+    std::vector < SDebugHookCallInfo >  m_PreEventFunctionHookList;
+    std::vector < SDebugHookCallInfo >  m_PostEventFunctionHookList;
     std::map< SString, std::vector<uint> > m_MaskArgumentsMap;
 };

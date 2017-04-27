@@ -193,6 +193,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     if ( bEnabled )
                         g_pCore->LogEvent ( 0, "Lua Event", pMapEvent->GetVM ()->GetScriptName (), szName );
 
+                    if ( !g_pClientGame->GetDebugHookManager()->OnPreEventFunction( szName, Arguments, pSource, NULL, pState ) )
+                        continue;
+
                     // Store the current values of the globals
                     lua_getglobal ( pState, "source" );
                     CLuaArgument OldSource ( pState, -1 );
@@ -242,7 +245,7 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
                     lua_pushstring ( pState, szName );
                     lua_setglobal ( pState, "eventName" );
-                    
+
                     // Call it
                     pMapEvent->Call ( Arguments );
                     bCalled = true;

@@ -46,6 +46,8 @@ namespace EDebugHook
         POST_EVENT,
         PRE_FUNCTION,
         POST_FUNCTION,
+        PRE_EVENT_FUNCTION,
+        POST_EVENT_FUNCTION
     };
 }
 using EDebugHook::EDebugHookType;

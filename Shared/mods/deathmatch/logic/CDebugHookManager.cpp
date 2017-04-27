@@ -61,6 +61,10 @@ std::vector < SDebugHookCallInfo >& CDebugHookManager::GetHookInfoListForType( E
         return m_PreEventHookList;
     if ( hookType == EDebugHook::POST_EVENT )
         return m_PostEventHookList;
+    if ( hookType == EDebugHook::PRE_EVENT_FUNCTION )
+        return m_PreEventFunctionHookList;
+    if ( hookType == EDebugHook::POST_EVENT_FUNCTION )
+        return m_PostEventFunctionHookList;
     if ( hookType == EDebugHook::PRE_FUNCTION )
         return m_PreFunctionHookList;
     dassert( hookType == EDebugHook::POST_FUNCTION );
@@ -132,7 +136,7 @@ bool CDebugHookManager::RemoveDebugHook( EDebugHookType hookType, const CLuaFunc
 ///////////////////////////////////////////////////////////////
 void CDebugHookManager::OnLuaMainDestroy( CLuaMain* pLuaMain )
 {
-    for( uint hookType = EDebugHook::PRE_EVENT ; hookType <= EDebugHook::POST_FUNCTION ; hookType++ )
+    for( uint hookType = EDebugHook::PRE_EVENT ; hookType <= EDebugHook::POST_EVENT_FUNCTION ; hookType++ )
     {
         std::vector < SDebugHookCallInfo >& hookInfoList = GetHookInfoListForType( (EDebugHookType)hookType );
         for( uint i = 0 ; i < hookInfoList.size() ; )
@@ -375,6 +379,131 @@ void CDebugHookManager::OnPostEvent( const char* szName, const CLuaArguments& Ar
 
 ///////////////////////////////////////////////////////////////
 //
+// CDebugHookManager::OnPreEventFunction
+//
+// Called before a MTA event function is called
+// Returns false if function call should be skipped
+//
+///////////////////////////////////////////////////////////////
+bool CDebugHookManager::OnPreEventFunction( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, lua_State* functionLuaVM )
+{
+    // DECLARE_PROFILER_SECTION( OnPreEventFunction )
+
+    if ( m_PreEventFunctionHookList.empty() )
+        return true;
+
+    // Check if name is not used
+    if ( !IsNameAllowed( szName, m_PreEventHookList ) )
+        return true;
+
+    CLuaMain* pEventLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
+    CResource* pEventResource = pEventLuaMain ? pEventLuaMain->GetResource() : NULL;
+
+    // Get file/line number for event
+    const char* szEventFilename = "";
+    int iEventLineNumber = 0;
+    lua_Debug eventDebugInfo;
+    lua_State* eventLuaVM = pEventLuaMain ? pEventLuaMain->GetVM() : NULL;
+    if ( eventLuaVM )
+        GetDebugInfo( eventLuaVM, eventDebugInfo, szEventFilename, iEventLineNumber );
+
+    // Get file/line number for function
+    const char* szFunctionFilename = "";
+    int iFunctionLineNumber = 0;
+    lua_Debug functionDebugInfo;
+    GetDebugInfo( functionLuaVM, functionDebugInfo, szFunctionFilename, iFunctionLineNumber );
+
+    CLuaMain* pFunctionLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine( functionLuaVM );
+    CResource* pFunctionResource = pFunctionLuaMain ? pFunctionLuaMain->GetResource() : NULL;
+
+    CLuaArguments NewArguments;
+    // resource eventResource, string eventName, element eventSource, element eventClient, string eventFilename, int eventLineNumber, table eventArguments, 
+    if ( pEventResource )
+        NewArguments.PushResource( pEventResource );
+    else
+        NewArguments.PushNil();
+
+    NewArguments.PushString( szName );
+    NewArguments.PushElement( pSource );
+    NewArguments.PushElement( pCaller );
+    NewArguments.PushString( szEventFilename );
+    NewArguments.PushNumber( iEventLineNumber );
+
+    if ( Arguments.Count( ) > 0 ) {
+        NewArguments.PushArguments( Arguments );
+        // NewArguments.PushTable( Arguments );
+    }
+    else
+        NewArguments.PushNil();
+
+    // ... resource functionResource, string functionFilename, int functionLineNumber
+    if ( pFunctionResource )
+        NewArguments.PushResource( pFunctionResource );
+    else
+        NewArguments.PushNil();
+
+    NewArguments.PushString( szFunctionFilename );
+    NewArguments.PushNumber( iFunctionLineNumber );
+
+    return CallHook( szName, m_PreEventFunctionHookList, NewArguments );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDebugHookManager::OnPostEventFunction
+//
+// Called after a MTA event function is called
+//
+///////////////////////////////////////////////////////////////
+/*void CDebugHookManager::OnPostEventFunction( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, lua_CFunction f, lua_State* luaVM )
+{
+    DECLARE_PROFILER_SECTION( OnPostEventFunction )
+
+    if ( m_PostEventFunctionHookList.empty() )
+        return;
+
+    CLuaCFunction* pFunction = CLuaCFunctions::GetFunction( f );
+    if ( !pFunction )
+        return;
+
+    const SString& strName = pFunction->GetName();
+    bool bNameMustBeExplicitlyAllowed = MustNameBeExplicitlyAllowed( strName );
+
+    // Check if name is not used
+    if ( !IsNameAllowed( strName, m_PostEventFunctionHookList, bNameMustBeExplicitlyAllowed ) )
+        return;
+
+    // Get file/line number
+    const char* szFilename = "";
+    int iLineNumber = 0;
+    lua_Debug debugInfo;
+    GetDebugInfo( luaVM, debugInfo, szFilename, iLineNumber );
+
+    CLuaMain* pSourceLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
+    CResource* pSourceResource = pSourceLuaMain ? pSourceLuaMain->GetResource() : NULL;
+
+    CLuaArguments NewArguments;
+    if ( pSourceResource )
+        NewArguments.PushResource( pSourceResource );
+    else
+        NewArguments.PushNil();
+    NewArguments.PushString( strName );
+    NewArguments.PushBoolean( true );
+    NewArguments.PushString( szFilename );
+    NewArguments.PushNumber( iLineNumber );
+
+    CLuaArguments FunctionArguments;
+    FunctionArguments.ReadArguments( luaVM );
+    MaybeMaskArgumentValues( strName, FunctionArguments );
+    NewArguments.PushArguments( FunctionArguments );
+
+    CallHook( strName, m_PostEventFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed );
+}*/
+
+
+///////////////////////////////////////////////////////////////
+//
 // CDebugHookManager::IsNameAllowed
 //
 // Returns true if there is a debughook which handles the name
@@ -457,6 +586,12 @@ bool CDebugHookManager::CallHook( const char* szName, const std::vector < SDebug
         }
 
         lua_State* pState = info.pLuaMain->GetVirtualMachine();
+
+        // in console: crun addDebugHook("preEventFunction", function(...)outputConsole("yes")end)
+        //             restart runcode
+        // pState == NULL on resource restart (event onClientResourceStart)
+        if ( !pState )
+            continue;
 
         // Save script MTA globals in case hook messes with them
         lua_getglobal ( pState, "source" );
