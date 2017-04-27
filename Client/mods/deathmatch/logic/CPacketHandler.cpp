@@ -1630,13 +1630,6 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                     case CClientGame::VEHICLE_NOTIFY_IN_RETURN:
                     {
-                        // Is he not getting in the vehicle yet?
-                        //if ( !pPlayer->IsGettingIntoVehicle () )
-                        {
-                            // Warp him in
-                            pPlayer->WarpIntoVehicle ( pVehicle, ucSeat );
-                        }
-
                         // Reset vehicle in out state
                         pPlayer->SetVehicleInOutState ( VEHICLE_INOUT_NONE );
 
@@ -1645,6 +1638,11 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                         {
                             g_pClientGame->m_bNoNewVehicleTask = false;
                             g_pClientGame->m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
+                        }
+                        else
+                        {
+                            // Warp him in. Don't do that for local player as he is already warped.
+                            pPlayer->WarpIntoVehicle ( pVehicle, ucSeat );
                         }
 
                         // Call the onClientPlayerEnterVehicle event
