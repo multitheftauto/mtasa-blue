@@ -29,6 +29,7 @@ class CVehicleSA;
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
 #include "CColPointSA.h"
+#include "CAEVehicleAudioEntitySA.h"
 
 #define SIZEOF_CHELI                            2584
 
@@ -322,17 +323,6 @@ struct CTrainFlags
     unsigned char unknown7 : 8;
 };
 
-
-// TODO: Size?
-class CAEVehicleAudioEntity
-{
-    BYTE pad1[154];
-public:
-    BYTE bCurrentRadioStation;
-private:
-    BYTE pad2;
-};
-
 class CAutoPilot
 {
     BYTE pad[56];
@@ -346,9 +336,7 @@ class CAutoPilot
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
-    CAEVehicleAudioEntity m_VehicleAudioEntity; // 312
-
-    int padaudio[108];
+    CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity; // 312
 
     tHandlingDataSA* pHandlingData;                             // +900
     tFlyingHandlingDataSA* pFlyingHandlingData;                 // +904
@@ -515,6 +503,7 @@ class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
     friend class CPoolsSA;
 private:
     CDamageManagerSA*           m_pDamageManager;
+    CAEVehicleAudioEntitySA*    m_pVehicleAudioEntity;
     CHandlingEntrySA*           m_pHandlingData;
     void*                       m_pSuspensionLines;
     bool                        m_bIsDerailable;
@@ -787,6 +776,8 @@ public:
     bool                        SetWindowOpenFlagState          ( unsigned char ucWindow, bool bState );
 
     void                        UpdateLandingGearPosition       ( );
+
+    CAEVehicleAudioEntitySA *   GetVehicleAudioEntity           ( void )  { return m_pVehicleAudioEntity; };
 
 private:
     void                        RecalculateSuspensionLines          ( void );
