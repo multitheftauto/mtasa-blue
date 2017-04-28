@@ -392,9 +392,6 @@ public:
 
     inline void                         SetInitiallyFadedOut            ( bool bFadedOut )              { m_bInitiallyFadedOut = bFadedOut; };
 
-    inline bool                         GetHudAreaNameDisabled          ( void )                        { return m_bHudAreaNameDisabled; };
-    inline void                         SetHudAreaNameDisabled          ( bool bDisabled )              { m_bHudAreaNameDisabled = bDisabled; };
-
     bool                                SetGlitchEnabled                ( unsigned char cGlitch, bool bEnabled );
     bool                                IsGlitchEnabled                 ( unsigned char cGlitch );
 
@@ -636,7 +633,6 @@ private:
     CLocalServer*                       m_pLocalServer;
     CLatentTransferManager*             m_pLatentTransferManager;
     bool                                m_bInitiallyFadedOut;
-    bool                                m_bHudAreaNameDisabled;
     CSingularFileDownloadManager*       m_pSingularFileDownloadManager;
     CGameEntityXRefManager*             m_pGameEntityXRefManager;
     CClientModelCacheManager*           m_pModelCacheManager;

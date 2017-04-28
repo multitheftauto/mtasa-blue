@@ -1918,10 +1918,6 @@ bool CStaticFunctionDefinitions::GivePedWeapon ( CClientEntity& Entity, uchar uc
 bool CStaticFunctionDefinitions::ShowPlayerHudComponent ( eHudComponent component, bool bShow )
 {
     g_pGame->GetHud ()->SetComponentVisible ( component, bShow );
-
-    if ( component == HUD_AREA_NAME || component == HUD_ALL )
-        g_pClientGame->SetHudAreaNameDisabled ( !bShow  );
-
     return true;
 }
 
@@ -4662,15 +4658,9 @@ bool CStaticFunctionDefinitions::FadeCamera ( bool bFadeIn, float fFadeTime, uns
     g_pClientGame->SetInitiallyFadedOut ( false );
 
     if ( bFadeIn )
-    {
         pCamera->FadeIn ( fFadeTime );
-        g_pGame->GetHud ()->SetComponentVisible ( HUD_AREA_NAME, !g_pClientGame->GetHudAreaNameDisabled () );
-    }
     else
-    {
         pCamera->FadeOut ( fFadeTime, ucRed, ucGreen, ucBlue );
-        g_pGame->GetHud ()->SetComponentVisible ( HUD_AREA_NAME, false );
-    }
 
     return true;
 }

@@ -218,8 +218,6 @@ void CHudSA::InitComponentList ( void )
                 { 1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3 },
                 { 1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3 },
                 { 1, HUD_CROSSHAIR, 1, FUNC_DrawCrosshair, 1, 0xCC, 0xC3 },
-                { 1, HUD_VITAL_STATS, 1, FUNC_DrawVitalStats, 1, 0xCC, 0xC3 },
-                { 0, HUD_HELP_TEXT, 1, FUNC_DrawHelpText, 1, 0xCC, 0xC3 },
             };
 
     for ( uint i = 0 ; i < NUMELMS( componentList ) ; i++ )

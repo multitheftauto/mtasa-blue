@@ -101,7 +101,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     m_bDamageSent = true;
     m_bShowNetstat = false;
     m_bShowFPS = false;    
-    m_bHudAreaNameDisabled = false;
     m_fGameSpeed = 1.0f;
     m_lMoney = 0;
     m_dwWanted = 0;
@@ -3548,9 +3547,6 @@ void CClientGame::Event_OnIngame ( void )
 
     // Disable parts of the Hud
     CHud* pHud = g_pGame->GetHud ();
-    pHud->SetComponentVisible ( HUD_HELP_TEXT, false );
-    pHud->SetComponentVisible ( HUD_VITAL_STATS, false );
-    pHud->SetComponentVisible ( HUD_AREA_NAME, false );
 
     g_pMultiplayer->DeleteAndDisableGangTags ();
 
@@ -5455,11 +5451,6 @@ void CClientGame::ResetMapInfo ( void )
 
     // Hud
     g_pGame->GetHud ()->SetComponentVisible ( HUD_ALL, true );
-    // Disable area names as they are on load until camera unfades
-    g_pGame->GetHud ()->SetComponentVisible ( HUD_AREA_NAME, false );
-    g_pGame->GetHud ()->SetComponentVisible ( HUD_VITAL_STATS, false );
-
-    m_bHudAreaNameDisabled = false;       
 
     // Gravity
     g_pMultiplayer->SetLocalPlayerGravity ( DEFAULT_GRAVITY );

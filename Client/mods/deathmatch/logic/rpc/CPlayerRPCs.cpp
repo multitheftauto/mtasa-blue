@@ -52,9 +52,6 @@ void CPlayerRPCs::ShowPlayerHudComponent ( NetBitStreamInterface& bitStream )
     {
         bool bShow = ( ucShow != 0 );
         g_pGame->GetHud ()->SetComponentVisible ( (eHudComponent)ucComponent, bShow );
-
-        if ( ucComponent == HUD_AREA_NAME || ucComponent == HUD_ALL )
-            g_pClientGame->SetHudAreaNameDisabled ( !bShow  );
     }        
 }
 

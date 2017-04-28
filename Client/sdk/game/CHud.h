@@ -32,8 +32,6 @@ enum eHudComponent
     HUD_WANTED,
     HUD_CROSSHAIR,
     HUD_ALL,
-    HUD_VITAL_STATS,
-    HUD_HELP_TEXT,
 };
 
 class CHud
