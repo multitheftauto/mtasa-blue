@@ -42,8 +42,8 @@ public:
     void                OnPostFunction              ( lua_CFunction f, lua_State* luaVM );
     bool                OnPreEvent                  ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
     void                OnPostEvent                 ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
-    bool                OnPreEventFunction          ( const char * szName, const CLuaArguments & Arguments, CElement * pSource, CPlayer * pCaller, lua_State * functionLuaVM );
-    // void                OnPostEventFunction         ( const char * szName, const CLuaArguments & Arguments, CElement * pSource, CPlayer * pCaller, lua_CFunction f, lua_State * luaVM );
+    bool                OnPreEventFunction          ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent );
+    void                OnPostEventFunction         ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent );
     bool                HasPostFunctionHooks        ( void ) const      { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
 
 protected:
