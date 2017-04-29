@@ -150,11 +150,11 @@ public:
     virtual void                    DoPulse                 ( void ) = 0;
     virtual SConnectionHandle       Connect                 ( const SString& strType, const SString& strHost, const SString& strUsername = "", const SString& strPassword = "", const SString& strOptions = "" ) = 0;
     virtual bool                    Disconnect              ( SConnectionHandle hConnection ) = 0;
-    virtual SString                 PrepareString           ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
+    virtual SString                 PrepareString           ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs = nullptr ) = 0;
     virtual SString                 PrepareStringf          ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
-    virtual CDbJobData*             Exec                    ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
+    virtual CDbJobData*             Exec                    ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs = nullptr ) = 0;
     virtual CDbJobData*             Execf                   ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
-    virtual CDbJobData*             QueryStart              ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs ) = 0;
+    virtual CDbJobData*             QueryStart              ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs = nullptr ) = 0;
     virtual CDbJobData*             QueryStartf             ( SConnectionHandle hConnection, const char* szQuery, ... ) = 0;
     virtual bool                    QueryPoll               ( CDbJobData* pJobData, uint ulTimeout ) = 0;
     virtual bool                    QueryFree               ( CDbJobData* pJobData ) = 0;
@@ -162,6 +162,7 @@ public:
     virtual const SString&          GetLastErrorMessage     ( void ) = 0;
     virtual bool                    IsLastErrorSuppressed   ( void ) = 0;
     virtual bool                    QueryWithResultf        ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... ) = 0;
+    virtual bool                    QueryWithCallback       ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery, CLuaArguments* pArgs = nullptr ) = 0;
     virtual bool                    QueryWithCallbackf      ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... ) = 0;
     virtual void                    SetLogLevel             ( EJobLogLevelType logLevel, const SString& strLogFilename ) = 0;
 };

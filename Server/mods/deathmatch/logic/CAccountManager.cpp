@@ -94,11 +94,18 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
         // Add unique index
 	    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE UNIQUE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY_U on userdata(userid,key)" );
     }
-    
+
     // Ensure old indexes are removed
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
+
+    // Check if httppass has been added yet
+	m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "PRAGMA table_info(accounts)");
+    if (ListContains(result->ColNames, "httppass") == false)
+    {
+        m_pDatabaseManager->Execf(m_hDbConnection, "ALTER TABLE accounts ADD COLUMN httppass TEXT");
+    }
 }
 
 
@@ -129,7 +136,7 @@ bool CAccountManager::Load( void )
     //Create a registry result
     CRegistryResult result;
     //Select all our required information from the accounts database
-    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT id,name,password,ip,serial from accounts" );
+    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT id,name,password,ip,serial,httppass from accounts" );
 
     //Initialize all our variables
     m_iAccounts = 0;
@@ -145,6 +152,7 @@ bool CAccountManager::Load( void )
         SString strPassword = (const char *)row[2].pVal;
         SString strIP = (const char *)row[3].pVal;
         SString strSerial = (const char *)row[4].pVal;
+        SString strHttpPassAppend = (const char *)row[5].pVal;
 
         // Check for overlong names and incorrect escapement
         bool bRemoveAccount = false;
@@ -181,7 +189,7 @@ bool CAccountManager::Load( void )
         }
 
         //Create a new account with the specified information
-        CAccount* pAccount = g_pGame->GetAccountManager ()->AddPlayerAccount ( strName, strPassword, iUserID, strIP, strSerial );
+        CAccount* pAccount = g_pGame->GetAccountManager ()->AddPlayerAccount ( strName, strPassword, iUserID, strIP, strSerial, strHttpPassAppend );
 
         if ( bChanged )
             pAccount->SetChanged ( bChanged );
@@ -245,27 +253,26 @@ void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
 {
     SString strName = pAccount->GetName();
     SString strPassword = pAccount->GetPasswordHash();
+    SString strHttpPassAppend = pAccount->GetHttpPassAppend();
     SString strIP = pAccount->GetIP();
     SString strSerial = pAccount->GetSerial();
     unsigned int iID = pAccount->GetID();
 
     m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO accounts (id, name, ip, serial, password) VALUES(?,?,?,?,?)", SQLITE_INTEGER, iID, SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
 
-    if ( bCheckForErrors )
+    SString strQuery;
+    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, "UPDATE accounts SET ip=?", SQLITE_TEXT, *strIP);
+    if (!strSerial.empty())
+        strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ",serial=?", SQLITE_TEXT, *strSerial);
+    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ",password=?, httppass=? WHERE name=?", SQLITE_TEXT, *strPassword, SQLITE_TEXT, *strHttpPassAppend, SQLITE_TEXT, *strName);
+
+    if (bCheckForErrors)
     {
-        if ( strSerial != "" )
-            m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
-        else
-            //If we don't have a serial then IP and password will suffice
-            m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+        m_pDatabaseManager->QueryWithCallback(m_hDbConnection, StaticDbCallback, this, strQuery);
     }
     else
     {
-        if ( strSerial != "" )
-            m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
-        else
-            //If we don't have a serial then IP and password will suffice
-            m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+        m_pDatabaseManager->Exec(m_hDbConnection, strQuery);
     }
 
     SaveAccountSerialUsage( pAccount );
@@ -872,9 +879,9 @@ CAccount* CAccountManager::AddConsoleAccount( const SString& strName )
     return pAccount;
 }
 
-CAccount* CAccountManager::AddPlayerAccount( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial )
+CAccount* CAccountManager::AddPlayerAccount( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial, const SString& strHttpPassAppend )
 {
-    CAccount* pAccount = new CAccount ( this, EAccountType::Player, strName, strPassword, iUserID, strIP, strSerial );
+    CAccount* pAccount = new CAccount ( this, EAccountType::Player, strName, strPassword, iUserID, strIP, strSerial, strHttpPassAppend );
     return pAccount;
 }
 
