@@ -634,12 +634,8 @@ bool CDebugHookManager::CallHook( const char* szName, const std::vector < SDebug
 
         lua_State* pState = info.pLuaMain->GetVirtualMachine();
 
-        // in console: crun addDebugHook("preEventFunction", function(...)outputConsole("yes")end)
-        //             restart runcode
-        // pState == NULL on resource restart (event onClientResourceStart)
-        if ( !pState ) {
+        if ( !pState )
             continue;
-        }
 
         // Save script MTA globals in case hook messes with them
         lua_getglobal ( pState, "source" );
