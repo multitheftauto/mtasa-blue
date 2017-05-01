@@ -542,5 +542,4 @@ class CWebBrowserItem : public CTextureItem
     virtual void    Resize                  (const CVector2D& size);
 
     IDirect3DSurface9*    m_pD3DRenderTargetSurface;
-    bool m_IsARGB = true;
 };

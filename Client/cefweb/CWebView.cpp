@@ -219,40 +219,20 @@ void CWebView::UpdateTexture()
             // Update changed state
             m_RenderData.changed = false;
 
-            if (m_pWebBrowserRenderItem->m_IsARGB)
+            if (m_RenderData.dirtyRects.size() > 0 && m_RenderData.dirtyRects[0].width == m_RenderData.width && m_RenderData.dirtyRects[0].height == m_RenderData.height)
             {
-                if (m_RenderData.dirtyRects.size() > 0 && m_RenderData.dirtyRects[0].width == m_RenderData.width && m_RenderData.dirtyRects[0].height == m_RenderData.height)
-                {
-                    // Update whole texture
-                    memcpy(surfaceData, sourceData, m_RenderData.width * m_RenderData.height * 4);
-                }
-                else
-                {
-                    // Update dirty rects
-                    for (auto& rect : m_RenderData.dirtyRects)
-                    {
-                        for (int y = rect.y; y < rect.y + rect.height; ++y)
-                        {
-                            int index = y * pitch + rect.x * 4;
-                            memcpy(&surfaceData[index], &sourceData[index], rect.width * 4);
-                        }
-                    }
-                }
+                // Update whole texture
+                memcpy(surfaceData, sourceData, m_RenderData.width * m_RenderData.height * 4);
             }
             else
             {
+                // Update dirty rects
                 for (auto& rect : m_RenderData.dirtyRects)
                 {
                     for (int y = rect.y; y < rect.y + rect.height; ++y)
                     {
-                        for (int x = rect.x; x < rect.x + rect.width; ++x)
-                        {
-                            int index = y * pitch + x * 4;
-                            const uint32_t sourcePixel = *reinterpret_cast<const std::uint32_t*>(&sourceData[index]);
-
-                            // Convert ABGR to ARGB
-                            *reinterpret_cast<std::uint32_t*>(&surfaceData[index]) = (sourcePixel & 0xFF00FF00) | ((sourcePixel & 0x00FF0000) >> 16) | ((sourcePixel & 0x000000FF) << 16);
-                        }
+                        int index = y * pitch + rect.x * 4;
+                        memcpy(&surfaceData[index], &sourceData[index], rect.width * 4);
                     }
                 }
             }
@@ -267,24 +247,10 @@ void CWebView::UpdateTexture()
             auto popupPitch = m_RenderData.popupRect.width * 4;
             for (int y = 0; y < m_RenderData.popupRect.height; ++y)
             {
-                if (m_pWebBrowserRenderItem->m_IsARGB)
-                {
-                    int sourceIndex = y * popupPitch;
-                    int destIndex = (y + m_RenderData.popupRect.y) * pitch + m_RenderData.popupRect.x * 4;
+                int sourceIndex = y * popupPitch;
+                int destIndex = (y + m_RenderData.popupRect.y) * pitch + m_RenderData.popupRect.x * 4;
 
-                    memcpy(&surfaceData[destIndex], &m_RenderData.popupBuffer[sourceIndex], popupPitch);
-                }
-                else
-                {
-                    for (int x = 0; x < m_RenderData.popupRect.width; ++x)
-                    {
-                        int sourceIndex = y * popupPitch + x * 4;
-                        int destIndex = (y + m_RenderData.popupRect.y) * pitch + (m_RenderData.popupRect.x + x) * 4;
-                        const uint32_t sourcePixel = *reinterpret_cast<const std::uint32_t*>(&m_RenderData.popupBuffer[sourceIndex]);
-
-                        *reinterpret_cast<std::uint32_t*>(&surfaceData[destIndex]) = (sourcePixel & 0xFF00FF00) | ((sourcePixel & 0x00FF0000) >> 16) | ((sourcePixel & 0x000000FF) << 16);
-                    }
-                }
+                memcpy(&surfaceData[destIndex], &m_RenderData.popupBuffer[sourceIndex], popupPitch);
             }
         }
 
