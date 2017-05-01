@@ -94,7 +94,17 @@ void CWebBrowserItem::CreateUnderlyingData ()
     assert ( !m_pD3DRenderTargetSurface );
     assert ( !m_pD3DTexture );
 
-    D3DXCreateTexture ( m_pDevice, m_uiSizeX, m_uiSizeY, 1, 0, D3DFMT_A8B8G8R8, D3DPOOL_MANAGED, (IDirect3DTexture9**)&m_pD3DTexture );
+    // Check if ABGR format is supported
+    D3DFORMAT textureFormat = D3DFMT_A8R8G8B8;
+    UINT numMipLevels = 1;
+    D3DXCheckTextureRequirements(m_pDevice, &m_uiSizeX, &m_uiSizeY, &numMipLevels, 0, &textureFormat, D3DPOOL_MANAGED);
+    m_IsARGB = textureFormat == D3DFMT_A8R8G8B8;
+
+    if (!m_IsARGB)
+        AddReportLog(9700, "ARGB format not supported", 1);
+
+    // Create texture
+    D3DXCreateTexture(m_pDevice, m_uiSizeX, m_uiSizeY, numMipLevels, 0, textureFormat, D3DPOOL_MANAGED, (IDirect3DTexture9**)&m_pD3DTexture);
     
     // Check texture created
     if ( !m_pD3DTexture )
