@@ -823,10 +823,10 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x56E871, 0x08 );
     MemPut < BYTE > ( 0x56E872, 0x00 );
 
-    // Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters 
+    /* Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters 
     // that was causing a crash - spent ages debugging, the crash happens if you create 40 or 
     // so vehicles that catch fire (upside down) then delete them, repeating a few times.
-    MemSet ((void*)0x4DCF87,0x90,6);
+    MemSet ((void*)0x4DCF87,0x90,6);*/
     
     /*
     // DISABLE CPed__RemoveBodyPart
