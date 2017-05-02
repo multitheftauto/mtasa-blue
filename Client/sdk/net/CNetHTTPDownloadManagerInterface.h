@@ -21,6 +21,7 @@ struct SHttpDownloadResult
     void* pObj;
     bool bSuccess;
     int iErrorCode;
+    const char* szHeaders;  // new line separated list of HTTP headers
 };
 
 // PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.
