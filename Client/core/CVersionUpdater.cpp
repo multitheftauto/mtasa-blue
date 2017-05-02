@@ -74,8 +74,8 @@ public:
     CNetHTTPDownloadManagerInterface* GetHTTP               ( void );
     void                GetSaveLocationList                 ( std::list < SString >& outSaveLocationList, const SString& strFilename );
     SString             GetResumableSaveLocation            ( const SString& strFilename, const SString& strMD5, uint iFilesize );
-    static void         StaticDownloadFinished              ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
-    void                DownloadFinished                    ( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode );
+    static void         StaticDownloadFinished              ( const SHttpDownloadResult& result );
+    void                DownloadFinished                    ( const SHttpDownloadResult& result );
 
     // Commands
     void                _UseMasterFetchURLs                 ( void );
@@ -3277,26 +3277,26 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
 // Handle when download finishes
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::StaticDownloadFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CVersionUpdater::StaticDownloadFinished ( const SHttpDownloadResult& result )
 {
-    ((CVersionUpdater*)pObj)->DownloadFinished( pCompletedData, completedLength, bSuccess, iErrorCode );
+    ((CVersionUpdater*)result.pObj)->DownloadFinished( result );
 }
 
-void CVersionUpdater::DownloadFinished( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode )
+void CVersionUpdater::DownloadFinished( const SHttpDownloadResult& result )
 {
-    if ( bSuccess )
+    if ( result.bSuccess )
     {
         m_JobInfo.downloadStatus = EDownloadStatus::Success;
-        m_JobInfo.iDownloadResultCode = iErrorCode;
+        m_JobInfo.iDownloadResultCode = result.iErrorCode;
         // Save data if a file wasn't used
-        m_JobInfo.downloadBuffer.resize( completedLength );
-        if ( completedLength > 0 )
-            memcpy ( &m_JobInfo.downloadBuffer[0], pCompletedData, completedLength );
+        m_JobInfo.downloadBuffer.resize( result.dataSize );
+        if ( result.dataSize > 0 )
+            memcpy ( &m_JobInfo.downloadBuffer[0], result.pData, result.dataSize );
     }
     else
     {
         m_JobInfo.downloadStatus = EDownloadStatus::Failure;
-        m_JobInfo.iDownloadResultCode = iErrorCode;
+        m_JobInfo.iDownloadResultCode = result.iErrorCode;
     }
 }
 

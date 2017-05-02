@@ -670,12 +670,12 @@ void CWebCore::GetFilterEntriesByType ( std::vector<std::pair<SString, bool>>& o
     }
 }
 
-void CWebCore::StaticFetchRevisionFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CWebCore::StaticFetchRevisionFinished ( const SHttpDownloadResult& result )
 {
-    CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
-    if ( bSuccess )
+    CWebCore* pWebCore = static_cast < CWebCore* > ( result.pObj );
+    if ( result.bSuccess )
     {
-        SString strData = pCompletedData;
+        SString strData = result.pData;
         SString strWhiteRevision, strBlackRevision;
         strData.Split ( ";", &strWhiteRevision, &strBlackRevision );
 
@@ -701,12 +701,12 @@ void CWebCore::StaticFetchRevisionFinished ( char* pCompletedData, size_t comple
     }
 }
 
-void CWebCore::StaticFetchWhitelistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CWebCore::StaticFetchWhitelistFinished ( const SHttpDownloadResult& result )
 {
-    if ( !bSuccess )
+    if ( !result.bSuccess )
         return;
 
-    CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
+    CWebCore* pWebCore = static_cast < CWebCore* > ( result.pObj );
     if ( !pWebCore->m_pXmlConfig )
         return;
 
@@ -715,7 +715,7 @@ void CWebCore::StaticFetchWhitelistFinished ( char* pCompletedData, size_t compl
 
     CXMLNode* pRootNode = pWebCore->m_pXmlConfig->GetRootNode ();
     std::vector<SString> whitelist;
-    SString strData = pCompletedData;
+    SString strData = result.pData;
     strData.Split ( ";", whitelist );
     CXMLNode* pListNode = pRootNode->FindSubNode ( "globalwhitelist" );
     if ( !pListNode )
@@ -744,12 +744,12 @@ void CWebCore::StaticFetchWhitelistFinished ( char* pCompletedData, size_t compl
 #endif
 }
 
-void CWebCore::StaticFetchBlacklistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CWebCore::StaticFetchBlacklistFinished ( const SHttpDownloadResult& result )
 {
-    if ( !bSuccess )
+    if ( !result.bSuccess )
         return;
 
-    CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
+    CWebCore* pWebCore = static_cast < CWebCore* > ( result.pObj );
     if ( !pWebCore->m_pXmlConfig )
         return;
 
@@ -758,7 +758,7 @@ void CWebCore::StaticFetchBlacklistFinished ( char* pCompletedData, size_t compl
 
     CXMLNode* pRootNode = pWebCore->m_pXmlConfig->GetRootNode ();
     std::vector<SString> blacklist;
-    SString strData = pCompletedData;
+    SString strData = result.pData;
     strData.Split ( ";", blacklist );
     CXMLNode* pListNode = pRootNode->FindSubNode ( "globalblacklist" );
     if ( !pListNode )
