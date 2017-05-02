@@ -201,46 +201,34 @@ void CRemoteCall::MakeCall()
     pDownloadManager->QueueFile(m_strURL, NULL, 0, m_strData.c_str(), m_strData.length(), m_bPostBinary, this, DownloadFinishedCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs);
 }
 
-void CRemoteCall::DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )
+void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
 {
-    //printf("Progress: %s\n", data);
-    if ( bSuccess )
+    CRemoteCall* pCall = (CRemoteCall*)result.pObj;
+    if (!g_pClientGame->GetRemoteCalls()->CallExists(pCall))
+        return;
+
+    CLuaArguments arguments;
+    if (result.bSuccess)
     {
-        CRemoteCall * call = (CRemoteCall*)obj;
-        if ( g_pClientGame->GetRemoteCalls()->CallExists(call) )
+        if (pCall->IsFetch())
         {
-            //printf("RECIEVED: %s\n", data);
-            CLuaArguments arguments;
-            if ( call->IsFetch () )
-            {
-                arguments.PushString ( std::string ( data, dataLength ) );
-                arguments.PushNumber ( 0 );
-                for ( uint i = 0 ; i < call->GetFetchArguments ().Count () ; i++ )
-                    arguments.PushArgument ( *( call->GetFetchArguments ()[i] ) );
-            }
-            else
-                arguments.ReadFromJSONString ( data );
-
-            arguments.Call ( call->m_VM, call->m_iFunction);   
-
-            g_pClientGame->GetRemoteCalls()->Remove(call); // delete ourselves
+            arguments.PushString(std::string(result.pData, result.dataSize));
+            arguments.PushNumber(0);
         }
+        else
+            arguments.ReadFromJSONString(result.pData);
     }
     else
     {
-        CRemoteCall * call = (CRemoteCall*)obj;
-        if ( g_pClientGame->GetRemoteCalls()->CallExists(call) )
-        {
-            CLuaArguments arguments;
-            arguments.PushString("ERROR");
-            arguments.PushNumber( iErrorCode );
-            if ( call->IsFetch () )
-                for ( uint i = 0 ; i < call->GetFetchArguments ().Count () ; i++ )
-                    arguments.PushArgument ( *( call->GetFetchArguments ()[i] ) );
-
-            arguments.Call ( call->m_VM, call->m_iFunction);   
-
-            g_pClientGame->GetRemoteCalls()->Remove(call); // delete ourselves
-        }
+        arguments.PushString("ERROR");
+        arguments.PushNumber(result.iErrorCode);
     }
+
+    // Append stored arguments
+    if (pCall->IsFetch())
+        for (uint i = 0; i < pCall->GetFetchArguments().Count(); i++ )
+            arguments.PushArgument(*(pCall->GetFetchArguments()[i]));
+
+    arguments.Call(pCall->m_VM, pCall->m_iFunction);
+    g_pClientGame->GetRemoteCalls()->Remove(pCall);
 }
