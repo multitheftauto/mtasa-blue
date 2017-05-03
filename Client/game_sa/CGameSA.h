@@ -90,7 +90,6 @@
 #define PROP_RANDOM_FOLIAGE         "randomfoliage"
 #define PROP_SNIPER_MOON            "snipermoon"
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
-#define PROP_TRAIN_CINEMA_CAMERA    "traincinemacamera"
 
 struct SCheatSA {
     BYTE*   m_byAddress; //Cheat Address
@@ -222,13 +221,10 @@ public:
     void                    SetRandomFoliageEnabled ( bool bEnable );
 
     bool                    IsMoonEasterEggEnabled  ();
-    void                    SetMoonEasterEggEnabled ( bool bEnable );
+    void                    SetMoonEasterEggEnabled ( bool bEnabled );
 
     bool                    IsExtraAirResistanceEnabled  ();
     void                    SetExtraAirResistanceEnabled ( bool bEnable );
-
-    bool                    IsTrainCinematicCameraEnabled ();
-    void                    SetTrainCinematicCameraEnabled ( bool bEnable );
 
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();

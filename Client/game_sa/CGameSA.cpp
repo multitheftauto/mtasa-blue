@@ -578,9 +578,6 @@ bool CGameSA::IsCheatEnabled ( const char* szCheatName )
     if ( !strcmp ( szCheatName, PROP_EXTRA_AIR_RESISTANCE ) )
         return IsExtraAirResistanceEnabled ();
 
-    if (!strcmp ( szCheatName, PROP_TRAIN_CINEMA_CAMERA ))
-        return IsTrainCinematicCameraEnabled ();
-
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -607,12 +604,6 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
         return true;
     }
 
-    if (!strcmp ( szCheatName, PROP_TRAIN_CINEMA_CAMERA ))
-    {
-        SetTrainCinematicCameraEnabled ( bEnable );
-        return true;
-    }
-
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -628,7 +619,6 @@ void CGameSA::ResetCheats ()
     SetRandomFoliageEnabled ( true );
     SetMoonEasterEggEnabled ( false );
     SetExtraAirResistanceEnabled ( true );
-    SetTrainCinematicCameraEnabled ( false );
 
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
@@ -645,12 +635,12 @@ bool CGameSA::IsRandomFoliageEnabled ()
     return *(unsigned char *)0x5DD01B == 0x74;
 }
 
-void CGameSA::SetRandomFoliageEnabled ( bool bEnable )
+void CGameSA::SetRandomFoliageEnabled ( bool bEnabled )
 {
     // 0xEB skip random foliage generation
-    MemPut < BYTE > ( 0x5DD01B, bEnable ? 0x74 : 0xEB );
+    MemPut < BYTE > ( 0x5DD01B, bEnabled ? 0x74 : 0xEB );
     // 0x74 destroy random foliage loaded
-    MemPut < BYTE > ( 0x5DC536, bEnable ? 0x75 : 0x74 );
+    MemPut < BYTE > ( 0x5DC536, bEnabled ? 0x75 : 0x74 );
 }
 
 bool CGameSA::IsMoonEasterEggEnabled ()
@@ -672,16 +662,6 @@ bool CGameSA::IsExtraAirResistanceEnabled ()
 void CGameSA::SetExtraAirResistanceEnabled ( bool bEnable )
 {
     MemPut < BYTE > ( 0x72DDD9, bEnable ? 0x01 : 0x00 );
-}
-
-bool CGameSA::IsTrainCinematicCameraEnabled ()
-{
-    return *(unsigned char *)0x52A535 == 0x01;
-}
-
-void CGameSA::SetTrainCinematicCameraEnabled ( bool bEnable )
-{
-    MemPut < BYTE > ( 0x52A535, bEnable ? 0x01 : 0x00 );
 }
 
 bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )

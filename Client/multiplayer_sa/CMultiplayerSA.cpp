@@ -739,8 +739,8 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x4EB3C1, 0x10 );
     MemPut < BYTE > ( 0x4EB3C2, 0x00 );
     
-    /* DISABLE cinematic camera for trains
-    MemPut < BYTE > ( 0x52A535, 0 );*/
+    // DISABLE cinematic camera for trains
+    MemPut < BYTE > ( 0x52A535, 0 );
 
     // DISABLE wanted levels for military zones
     MemPut < BYTE > ( 0x72DF0D, 0xEB );
