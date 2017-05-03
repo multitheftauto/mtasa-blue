@@ -262,9 +262,10 @@ void CWebCore::InitialiseWhiteAndBlacklist ( bool bAddHardcoded, bool bAddDynami
     if ( bAddDynamic )
     {
         // Hardcoded whitelist
-        static SString whitelist[] = { 
+        static SString whitelist[] = {
             "google.com", "youtube.com", "www.youtube-nocookie.com", "vimeo.com", "player.vimeo.com", "code.jquery.com",
             "myvideo.com", "mtasa.com", "multitheftauto.com", "mtavc.com", "www.googleapis.com", "ajax.googleapis.com",
+            "localhost", "127.0.0.1"
         };
 
         // Hardcoded blacklist
