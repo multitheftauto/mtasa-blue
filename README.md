@@ -34,23 +34,23 @@ Download and install the [EditorConfig](https://visualstudiogallery.msdn.microso
 
 ### Build Instructions
 #### Windows
-1. Execute `create-projects.bat`
-2. Open `Build\MTASA.sln`
+1. Execute `win-create-projects.bat`
+2. Open `MTASA.sln` in the `Build` directory
 3. Compile
-4. Install data files: `utils\premake5.exe install_data`
-5. Install resources: `utils\premake5.exe install_resources` (optional step)
+4. Execute: `win-install-data.bat`
 
 #### Linux
 1. Execute `utils/premake5_x86 gmake` (32-bit OS) or `utils/premake5_x64 gmake` (64-bit OS)
 2. `cd Build`
 3. Run `make config=release_x86` to build the 32-bit server and `make config=release_x64` to build the 64-bit server (or use `debug` instead of `release` to run an unoptimized debug build)
+4. Execute `linux-install-data.sh` (optional step)
 
 ### Premake FAQ
 #### How to add new C++ source files?
-Just execute `create-projects.bat`.
+Just execute `win-create-projects.bat`.
 
 ## License
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2016.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2017.
