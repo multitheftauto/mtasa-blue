@@ -9,8 +9,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CAEAUDIOHARDWARESA
-#define __CAEAUDIOHARDWARESA
+#pragma once
 
 #include "Common.h"
 #include <game/CAEAudioHardware.h>
@@ -35,5 +34,3 @@ public:
 private:
     CAEAudioHardwareSAInterface *       m_pInterface;
 };
-
-#endif

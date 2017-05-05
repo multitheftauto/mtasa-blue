@@ -9,8 +9,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CGAME_CAEAUDIOHARDWARE
-#define __CGAME_CAEAUDIOHARDWARE
+#pragma once
 
 enum eBankSlot : short
 {
@@ -67,5 +66,3 @@ public:
     virtual bool                        IsSoundBankLoaded                   ( short wSoundBankID, short wSoundBankSlotID ) = 0;
     virtual void                        LoadSoundBank                       ( short wSoundBankID, short wSoundBankSlotID ) = 0;
 };
-
-#endif

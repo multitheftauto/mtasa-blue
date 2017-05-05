@@ -9,8 +9,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CAEVEHICLEAUDIOENTITYSA
-#define __CAEVEHICLEAUDIOENTITYSA
+#pragma once
 
 #include "Common.h"
 #include "CAudioEngineSA.h"
@@ -255,5 +254,3 @@ public:
 private:
     CAEVehicleAudioEntitySAInterface *  m_pInterface;
 };
-
-#endif

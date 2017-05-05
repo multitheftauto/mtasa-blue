@@ -9,13 +9,10 @@
 *
 *****************************************************************************/
 
-#ifndef __CGAME_CAEVEHICLEAUDIOENTITY
-#define __CGAME_CAEVEHICLEAUDIOENTITY
+#pragma once
 
 class CAEVehicleAudioEntity
 {
 public:
     virtual void                        LoadDriverSounds                        ( void ) = 0;
 };
-
-#endif
