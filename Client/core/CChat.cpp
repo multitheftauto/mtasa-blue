@@ -140,10 +140,10 @@ void CChat::LoadCVars ( void )
     switch ( iHorizontal )
     {
     case Chat::Position::Horizontal::RIGHT:
-        fPosX = 1.0 - fRelativeWidth - fOffsetX;
+        fPosX = 1.0 - fRelativeWidth + fOffsetX;
         break;
     case Chat::Position::Horizontal::CENTER:
-        fPosX = (1.0 - fRelativeWidth) / 2 - fOffsetX;
+        fPosX = (1.0 - fRelativeWidth) / 2 + fOffsetX;
         break;
     case Chat::Position::Horizontal::LEFT:
     default:
@@ -153,10 +153,10 @@ void CChat::LoadCVars ( void )
     switch ( iVertical )
     {
     case Chat::Position::Vertical::BOTTOM:
-        fPosY = 1.0 - fRelativeHeight - fOffsetY;
+        fPosY = 1.0 - fRelativeHeight + fOffsetY;
         break;
     case Chat::Position::Vertical::CENTER:
-        fPosY = (1.0 - fRelativeHeight) / 2 - fOffsetY;
+        fPosY = (1.0 - fRelativeHeight) / 2 + fOffsetY;
         break;
     case Chat::Position::Vertical::TOP:
     default:
