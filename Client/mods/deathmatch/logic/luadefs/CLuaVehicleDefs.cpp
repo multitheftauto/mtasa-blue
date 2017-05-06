@@ -3482,11 +3482,9 @@ int CLuaVehicleDefs::GetHeliBladeCollisionsEnabled ( lua_State* luaVM )
 {
     //  bool getHeliBladeCollisionsEnabled ( vehicle theVehicle )
     CClientVehicle* pVehicle;
-    bool bEnabled = true;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
-    argStream.ReadBool ( bEnabled );
 
     if ( !argStream.HasErrors () )
     {

@@ -34,8 +34,8 @@ protected:
     void                    AddDownloadSize                 ( int iSize );
     bool                    DisableHttpServer               ( uint uiHttpServerIndex );
     bool                    BeginResourceFileDownload       ( CDownloadableResource* pDownloadableResource, uint uiHttpServerIndex );
-    static void             StaticDownloadFinished          ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
-    void                    DownloadFinished                ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    static void             StaticDownloadFinished          ( const SHttpDownloadResult& result );
+    void                    DownloadFinished                ( const SHttpDownloadResult& result );
     SString*                MakeDownloadContextString       ( CDownloadableResource* pDownloadableResource );
     CDownloadableResource*  ResolveDownloadContextString    ( SString* pString );
 

@@ -39,7 +39,7 @@ public:
                         CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
                         ~CRemoteCall ();
     void                MakeCall();
-    static void         DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode );
+    static void         DownloadFinishedCallback( const SHttpDownloadResult& result );
     CLuaMain *          GetVM() {return m_VM;};
     bool                IsFetch() {return m_bIsFetch;}
     CLuaArguments&      GetFetchArguments() {return m_FetchArguments;}

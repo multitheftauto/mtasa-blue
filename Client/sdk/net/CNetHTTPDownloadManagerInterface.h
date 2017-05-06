@@ -14,10 +14,20 @@
 
 #include <windows.h>
 
+struct SHttpDownloadResult
+{
+    const char* pData;
+    size_t dataSize;
+    void* pObj;
+    bool bSuccess;
+    int iErrorCode;
+    const char* szHeaders;  // new line separated list of HTTP headers
+};
+
 // PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.
-// If bSuccess is true, then pCompletedData/Length will be set or the output file will be ready.
+// If bSuccess is true, then pData+dataSize will be set or the output file will be ready.
 // If bSuccess is false, then iErrorCode and CNetHTTPDownloadManagerInterface->GetError() will reveal the problem.
-typedef void (*PFN_DOWNLOAD_FINISHED_CALLBACK) ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+typedef void (*PFN_DOWNLOAD_FINISHED_CALLBACK) ( const SHttpDownloadResult& result );
 
 class CNetHTTPDownloadManagerInterface
 {

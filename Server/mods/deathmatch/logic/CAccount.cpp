@@ -14,7 +14,7 @@
 
 #include "StdInc.h"
 
-CAccount::CAccount ( CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword, int iUserID, const std::string& strIP, const std::string& strSerial )
+CAccount::CAccount ( CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword, int iUserID, const std::string& strIP, const std::string& strSerial, const SString& strHttpPassAppend )
 {
     m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACCOUNT );
     m_pClient = NULL;
@@ -26,6 +26,7 @@ CAccount::CAccount ( CAccountManager* pManager, EAccountType accountType, const 
     m_iUserID = iUserID;
     m_strIP = strIP;
     m_strSerial = strSerial;
+    m_strHttpPassAppend = strHttpPassAppend;
 
     m_pManager->AddToList ( this );
 
@@ -65,9 +66,31 @@ void CAccount::SetClient( CClient* pClient )
 }
 
 
-bool CAccount::IsPassword ( const SString& strPassword )
+bool CAccount::IsPassword(const SString& strPassword, bool* pbUsedHttpPassAppend)
 {
-    return m_Password.IsPassword( strPassword );
+    if (pbUsedHttpPassAppend == nullptr)
+    {
+        return m_Password.IsPassword(strPassword);
+    }
+    else
+    {
+        if (m_Password.IsPassword(strPassword))
+        {
+            *pbUsedHttpPassAppend = false;
+            return true;
+        }
+        else
+        {
+            SString strPasswordHead = strPassword.Left(strPassword.length() - m_strHttpPassAppend.length());
+            SString strPasswordTail = strPassword.Right(m_strHttpPassAppend.length());
+            if (m_Password.IsPassword(strPasswordHead) && strPasswordTail == m_strHttpPassAppend)
+            {
+                *pbUsedHttpPassAppend = true;
+                return true;
+            }
+            return false;
+        }
+    }
 }
 
 
@@ -84,6 +107,13 @@ void CAccount::SetPassword ( const SString& strPassword )
 SString CAccount::GetPasswordHash ( void )
 {
     return m_Password.GetPasswordHash();
+}
+
+
+void CAccount::SetHttpPassAppend( const SString& strHttpPassAppend )
+{
+    m_strHttpPassAppend = strHttpPassAppend;
+    m_pManager->MarkAsChanged ( this );
 }
 
 

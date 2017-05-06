@@ -1240,3 +1240,31 @@ int CLuaFunctionDefs::GetPerformanceStats ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::SetDevelopmentMode(lua_State* luaVM)
+{
+    // bool setDevelopmentMode ( bool enable )
+    bool enable;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(enable);
+
+    if (!argStream.HasErrors())
+    {
+        g_pGame->SetDevelopmentMode(enable);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::GetDevelopmentMode(lua_State* luaVM)
+{
+    // bool getDevelopmentMode ()
+    lua_pushboolean(luaVM, g_pGame->GetDevelopmentMode());
+    return 1;
+}

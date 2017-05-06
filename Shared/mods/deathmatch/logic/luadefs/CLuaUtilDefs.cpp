@@ -38,6 +38,9 @@ void CLuaUtilDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "pregFind", PregFind );
     CLuaCFunctions::AddFunction ( "pregReplace", PregReplace );
     CLuaCFunctions::AddFunction ( "pregMatch", PregMatch );
+
+    // Debug functions
+    CLuaCFunctions::AddFunction("debugSleep", DebugSleep);
 }
 
 int CLuaUtilDefs::DisabledFunction ( lua_State* luaVM )
@@ -557,5 +560,46 @@ int CLuaUtilDefs::PregMatch ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaUtilDefs::DebugSleep(lua_State* luaVM)
+{
+    std::size_t milliseconds;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(milliseconds);
+
+    if (!argStream.HasErrors())
+    {
+#ifdef MTA_CLIENT
+        if (!g_pClientGame->GetDevelopmentMode())
+#else
+        if (!g_pGame->GetDevelopmentMode())
+#endif
+        {
+            m_pScriptDebugging->LogError(luaVM, "This function can only be used in development mode");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+
+        // Process HTTP
+#ifdef MTA_CLIENT
+        g_pClientGame->GetRemoteCalls()->ProcessQueuedFiles();
+#else
+        g_pGame->GetRemoteCalls()->ProcessQueuedFiles();
+#endif
+
+        // Sleep a bit
+        std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
     return 1;
 }

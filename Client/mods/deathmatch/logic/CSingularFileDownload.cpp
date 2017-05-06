@@ -50,18 +50,10 @@ CSingularFileDownload::~CSingularFileDownload ( void )
 }
 
 
-void CSingularFileDownload::DownloadFinishedCallBack ( char *data, size_t dataLength, void *obj, bool bSuccess, int iErrorCode )
+void CSingularFileDownload::DownloadFinishedCallBack ( const SHttpDownloadResult& result )
 {
-    if ( bSuccess )
-    {
-        CSingularFileDownload * pFile = (CSingularFileDownload*)obj;
-        pFile->CallFinished ( true );
-    }
-    else
-    {
-        CSingularFileDownload * pFile = (CSingularFileDownload*)obj;
-        pFile->CallFinished ( false );
-    }
+    CSingularFileDownload* pFile = (CSingularFileDownload*)result.pObj;
+    pFile->CallFinished(result.bSuccess);
 }
 
 
