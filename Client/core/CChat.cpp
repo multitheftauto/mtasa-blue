@@ -21,9 +21,9 @@ extern CCore* g_pCore;
 CChat * g_pChat = NULL;
 
 CChat::CChat ( CGUI* pManager, const CVector2D & vecPosition )
-{    
+{
     g_pChat = this;
-    m_pManager = pManager;  
+    m_pManager = pManager;
 
     // Calculate relative position (assuming a 800x600 native resolution for our defined CCHAT_* values)
     CVector2D vecResolution = m_pManager->GetResolution ();
@@ -125,6 +125,12 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_line_fade_out",           (unsigned int &)m_ulChatLineFadeOut );
     CVARS_GET ( "chat_font",                    (unsigned int &)Font ); SetChatFont ( (eChatFont)Font );
     CVARS_GET ( "chat_nickcompletion",          m_bNickCompletion );
+
+    float fX, fY;
+    CVARS_GET ( "chat_pos_x", fX );
+    CVARS_GET ( "chat_pos_y", fY );
+    m_vecBackgroundPosition = CVector2D( fX, fY ) * m_pManager->GetResolution();
+    m_pBackground->SetPosition( m_vecBackgroundPosition );
 
     // Modify default chat box to be like 'Transparent' preset
     SString strFlags;
@@ -591,7 +597,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 // If theres a command to call, call it
                 if ( !m_strCommand.empty () && !m_strInputText.empty () )
                     CCommands::GetSingleton().Execute ( m_strCommand.c_str (), m_strInputText.c_str () );
-            
+
                 SetInputVisible ( false );
 
                 m_fSmoothScrollResetTime = GetSecondCount ();
@@ -611,7 +617,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                         iFound = 0;
                     else
                         ++iFound;
-                    
+
                     SString strPlayerNamePart = strCurrentInput.substr ( iFound );
 
                     CModManager* pModManager = CModManager::GetSingletonPtr ();
@@ -674,7 +680,7 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                 }
                 break;
             }
-            
+
             default:
             {
                 // Clear last namepart when pressing letter
@@ -687,11 +693,11 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
 
                 // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
                 if ( MbUTF8ToUTF16(m_strInputText).size () < CHAT_MAX_CHAT_LENGTH )
-                {                    
+                {
                     if ( KeyboardArgs.codepoint >= 32 )
                     {
                         unsigned int uiCharacter = KeyboardArgs.codepoint;
-                        if ( uiCharacter < 127 ) // we have any char from ASCII 
+                        if ( uiCharacter < 127 ) // we have any char from ASCII
                         {
                             // injecting as is
                             m_strInputText += static_cast < char > ( KeyboardArgs.codepoint );
@@ -730,7 +736,7 @@ void CChat::SetVisible ( bool bVisible )
 
 
 void CChat::SetInputVisible ( bool bVisible )
-{    
+{
     if ( !IsVisible () )
         bVisible = false;
 
@@ -775,7 +781,7 @@ void CChat::SetChatFont ( eChatFont Font )
             break;
         case ChatFonts::CHAT_FONT_ARIAL:
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL, &fUsingDxFontScale, fReqestedDxFontScale, "chat" );
-            break;                
+            break;
     }
 
     m_fRcpUsingDxFontScale = 1 / fUsingDxFontScale;
@@ -873,14 +879,14 @@ CVector2D CChat::CalcInputSize ( void )
 void CChat::SetInputText ( const char* szText )
 {
     m_InputLine.Clear ();
-    
+
     CColor color = m_InputTextColor;
     const char* szRemainingText = m_InputLine.Format ( szText,
         ( m_vecInputSize.fX - ( 10.0f * m_vecScale.fX ) - m_InputLine.m_Prefix.GetWidth () ),
         color, false );
 
     CChatLine* pLine = NULL;
-    
+
     while ( szRemainingText && m_InputLine.m_ExtraLines.size () < 3 )
     {
         m_InputLine.m_ExtraLines.resize ( m_InputLine.m_ExtraLines.size () + 1 );
@@ -1134,7 +1140,7 @@ void CChatInputLine::Draw ( CVector2D& vecPosition, unsigned char ucAlpha, bool 
     m_Prefix.GetColor ( colPrefix );
     if ( colPrefix.A > 0 )
         m_Prefix.Draw ( vecPosition, colPrefix.A, bShadow, RenderBounds );
-    
+
     if ( g_pChat->m_InputTextColor.A > 0 && m_Sections.size () > 0 )
     {
         m_Sections [ 0 ].Draw ( CVector2D ( vecPosition.fX + m_Prefix.GetWidth (), vecPosition.fY ),
@@ -1185,7 +1191,7 @@ void CChatLineSection::Draw ( const CVector2D& vecPosition, unsigned char ucAlph
         if ( bShadow )
         {
             CRect2D drawShadowAt ( vecPosition.fX + 1.0f, vecPosition.fY + 1.0f, vecPosition.fX + 1000.0f, vecPosition.fY + 1000.0f );
-            CChat::DrawTextString ( m_strText.c_str (), drawShadowAt, 0.0f, drawShadowAt, 0, COLOR_ARGB ( ucAlpha, 0, 0, 0 ), g_pChat->m_vecScale.fX, g_pChat->m_vecScale.fY, RenderBounds );                
+            CChat::DrawTextString ( m_strText.c_str (), drawShadowAt, 0.0f, drawShadowAt, 0, COLOR_ARGB ( ucAlpha, 0, 0, 0 ), g_pChat->m_vecScale.fX, g_pChat->m_vecScale.fY, RenderBounds );
         }
         CRect2D drawAt ( vecPosition.fX, vecPosition.fY, vecPosition.fX + 1000.0f, vecPosition.fY + 1000.0f );
         CChat::DrawTextString ( m_strText.c_str (), drawAt, 0.0f, drawAt, 0, COLOR_ARGB ( ucAlpha, m_Color.R, m_Color.G, m_Color.B ), g_pChat->m_vecScale.fX, g_pChat->m_vecScale.fY, RenderBounds );

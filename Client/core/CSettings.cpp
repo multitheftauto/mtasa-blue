@@ -985,7 +985,7 @@ void CSettings::CreateGUI ( void )
         );
 
         // Add a small indent for edit boxes
-        fIndentX += 10.0f;
+        fIndentX += 20.0f;
 
         // Cache position and size from color tab panel (for positioning and height)
         pColorTabPanel->GetPosition ( vecTemp );
@@ -1000,14 +1000,37 @@ void CSettings::CreateGUI ( void )
         pChatOptionsPanel->SetSize ( CVector2D ( fBGSizeX, fBGSizeY ) );
 
         // Size of lines and gaps
-        float fLineSizeY = 30;
+        float fLineSizeY = 25;
         float fLineGapY = 4;
 
         // Layout tab
         CGUITab* pLayoutTab = pChatOptionsPanel->CreateTab ( _("Layout") );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, _("Lines:") ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, "X:" ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 10.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+        pLabel->SetAlwaysOnTop ( true );
+
+        m_pChatPosX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
+        m_pChatPosX->SetPosition ( CVector2D ( vecTemp.fX + 12.0f, vecTemp.fY - 2.0f ) );
+        m_pChatPosX->GetPosition ( vecTemp );
+        m_pChatPosX->SetSize ( CVector2D ( 70.0f, 24.0f ) );
+        m_pChatPosX->SetAlwaysOnTop ( true );
+
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, "Y:" ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX + 75.0f, vecTemp.fY + 2.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+        pLabel->SetAlwaysOnTop ( true );
+
+        m_pChatPosY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
+        m_pChatPosY->SetPosition ( CVector2D ( vecTemp.fX + 12.0f, vecTemp.fY - 2.0f ) );
+        m_pChatPosY->SetSize ( CVector2D ( 70.0f, 24.0f ) );
+        m_pChatPosY->SetAlwaysOnTop ( true );
+
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, _("Lines:") ) );
+        pLabel->SetPosition ( CVector2D ( 10.0f, vecTemp.fY + fLineSizeY + fLineGapY ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( );
         pLabel->SetAlwaysOnTop ( true );
@@ -2882,6 +2905,8 @@ void CSettings::LoadData ( void )
     {
     }
 
+    CVARS_GET ( "chat_pos_x", strVar ); m_pChatPosX->SetText( strVar.c_str() );
+    CVARS_GET ( "chat_pos_y", strVar ); m_pChatPosY->SetText( strVar.c_str() );
     CVARS_GET ( "chat_width", strVar ); m_pChatWidth->SetText ( strVar.c_str () );
     CVARS_GET ( "chat_css_style_text", bVar ); m_pChatCssText->SetSelected ( bVar );
     CVARS_GET ( "chat_css_style_background", bVar ); m_pChatCssBackground->SetSelected ( bVar );
@@ -3195,6 +3220,8 @@ void CSettings::SaveData ( void )
     strVar = m_pChatScaleX->GetText () + " " + m_pChatScaleY->GetText ();
     CVARS_SET ( "chat_scale", strVar );
     CVARS_SET ( "chat_lines", m_pChatLines->GetText () );
+    CVARS_SET ( "chat_pos_x", m_pChatPosX->GetText () );
+    CVARS_SET ( "chat_pos_y", m_pChatPosY->GetText () );
     CVARS_SET ( "chat_width", m_pChatWidth->GetText () );
     CVARS_SET ( "chat_css_style_text", m_pChatCssText->GetSelected () );
     CVARS_SET ( "chat_css_style_background", m_pChatCssBackground->GetSelected () );
@@ -3548,6 +3575,14 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
                 catch(...)
                 {
                 }
+            }
+            else if ( strTag == "pos_x" )
+            {
+                m_pChatPosX->SetText ( strValue.c_str () );
+            }
+            else if ( strTag == "pos_y" )
+            {
+                m_pChatPosY->SetText ( strValue.c_str () );
             }
             else if ( strTag == "width" )
             {

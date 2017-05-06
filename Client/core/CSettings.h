@@ -307,6 +307,8 @@ protected:
     CGUIScrollPane*     m_pPaneChatFont;
     CGUIRadioButton*    m_pRadioChatFont    [ ChatFonts::CHAT_FONT_MAX ];
 
+    CGUIEdit*           m_pChatPosX;
+    CGUIEdit*           m_pChatPosY;
     CGUIEdit*           m_pChatLines;
     CGUIEdit*           m_pChatScaleX;
     CGUIEdit*           m_pChatScaleY;
