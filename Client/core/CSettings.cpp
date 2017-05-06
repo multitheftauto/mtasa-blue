@@ -930,10 +930,10 @@ void CSettings::CreateGUI ( void )
     pColorTabPanel->SetPosition ( CVector2D ( 10.0f, 150.0f ) );
     pColorTabPanel->SetSize ( CVector2D ( fColorTabPanelWidth, 150.0f ) );
 
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_BG, strChatBG, pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_TEXT, strChatText, pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_BG, strInputBG, pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, strInputText, pColorTabPanel );
+    CreateChatColorTab ( Chat::ColorType::BG, strChatBG, pColorTabPanel );
+    CreateChatColorTab ( Chat::ColorType::TEXT, strChatText, pColorTabPanel );
+    CreateChatColorTab ( Chat::ColorType::INPUT_BG, strInputBG, pColorTabPanel );
+    CreateChatColorTab ( Chat::ColorType::INPUT_TEXT, strInputText, pColorTabPanel );
 
     // Cache position and size from color tab panel (for positioning and height)
     pColorTabPanel->GetPosition ( vecTemp );
@@ -957,22 +957,22 @@ void CSettings::CreateGUI ( void )
     float fFontNamesMarginY = 22.0f;
     float fLineHeight = 20.0f;
 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetSelected ( true );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetPosition ( CVector2D ( 0.0f, fFontNamesMarginY ) );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
+    m_pRadioChatFont [ Chat::Font::DEFAULT ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma" ) ); 
+    m_pRadioChatFont [ Chat::Font::DEFAULT ]->SetSelected ( true );
+    m_pRadioChatFont [ Chat::Font::DEFAULT ]->SetPosition ( CVector2D ( 0.0f, fFontNamesMarginY ) );
+    m_pRadioChatFont [ Chat::Font::DEFAULT ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Verdana" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ]->SetPosition ( CVector2D ( 0.0f, fLineHeight * 1 + fFontNamesMarginY ) );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
+    m_pRadioChatFont [ Chat::Font::CLEAR ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Verdana" ) ); 
+    m_pRadioChatFont [ Chat::Font::CLEAR ]->SetPosition ( CVector2D ( 0.0f, fLineHeight * 1 + fFontNamesMarginY ) );
+    m_pRadioChatFont [ Chat::Font::CLEAR ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma Bold" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ]->SetPosition ( CVector2D ( 0.0f, fLineHeight * 2 + fFontNamesMarginY ) );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
+    m_pRadioChatFont [ Chat::Font::BOLD ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma Bold" ) ); 
+    m_pRadioChatFont [ Chat::Font::BOLD ]->SetPosition ( CVector2D ( 0.0f, fLineHeight * 2 + fFontNamesMarginY ) );
+    m_pRadioChatFont [ Chat::Font::BOLD ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Arial" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ]->SetPosition ( CVector2D ( 0.0f, fLineHeight * 3 + fFontNamesMarginY ) );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
+    m_pRadioChatFont [ Chat::Font::ARIAL ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Arial" ) ); 
+    m_pRadioChatFont [ Chat::Font::ARIAL ]->SetPosition ( CVector2D ( 0.0f, fLineHeight * 3 + fFontNamesMarginY ) );
+    m_pRadioChatFont [ Chat::Font::ARIAL ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
 
     // Misc. Options
     {
@@ -2879,15 +2879,15 @@ void CSettings::LoadData ( void )
     else if ( iVar == 1 ) m_pUpdateAutoInstallCombo->SetText ( "Default" );
 
     // Chat
-    LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_BG, "chat_color" );
-    LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_TEXT, "chat_text_color" );
-    LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_INPUT_BG, "chat_input_color" );
-    LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, "chat_input_text_color" );
+    LoadChatColorFromCVar ( Chat::ColorType::BG, "chat_color" );
+    LoadChatColorFromCVar ( Chat::ColorType::TEXT, "chat_text_color" );
+    LoadChatColorFromCVar ( Chat::ColorType::INPUT_BG, "chat_input_color" );
+    LoadChatColorFromCVar ( Chat::ColorType::INPUT_TEXT, "chat_input_text_color" );
 
     unsigned int uiFont;
     CVARS_GET ( "chat_font", uiFont );
-    if ( uiFont >= ChatFonts::CHAT_FONT_MAX )
-        uiFont = ChatFonts::CHAT_FONT_DEFAULT;
+    if ( uiFont >= Chat::Font::MAX )
+        uiFont = Chat::Font::DEFAULT;
     m_pRadioChatFont [ uiFont ]->SetSelected ( true );
 
     CVARS_GET ( "chat_lines", strVar ); m_pChatLines->SetText ( strVar.c_str () );
@@ -3204,11 +3204,11 @@ void CSettings::SaveData ( void )
     }
 
     // Chat
-    SaveChatColor ( ChatColorTypes::CHAT_COLOR_BG, "chat_color" );
-    SaveChatColor ( ChatColorTypes::CHAT_COLOR_TEXT, "chat_text_color" );
-    SaveChatColor ( ChatColorTypes::CHAT_COLOR_INPUT_BG, "chat_input_color" );
-    SaveChatColor ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, "chat_input_text_color" );
-    for ( int iFont = 0; iFont < ChatColorTypes::CHAT_COLOR_MAX; iFont ++ )
+    SaveChatColor ( Chat::ColorType::BG, "chat_color" );
+    SaveChatColor ( Chat::ColorType::TEXT, "chat_text_color" );
+    SaveChatColor ( Chat::ColorType::INPUT_BG, "chat_input_color" );
+    SaveChatColor ( Chat::ColorType::INPUT_TEXT, "chat_input_text_color" );
+    for ( int iFont = 0; iFont < Chat::ColorType::MAX; iFont ++ )
     {
         if ( m_pRadioChatFont [ iFont ]->GetSelected( ) )
         {
@@ -3325,7 +3325,7 @@ void CSettings::AddKeyBindSection ( char* szSectionName )
     m_pKeyBindSections.push_back ( new SKeyBindSection ( szSectionName ) ); 
 }
 
-void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CGUITabPanel* pParent )
+void CSettings::CreateChatColorTab ( eChatColorType eType, const char* szName, CGUITabPanel* pParent )
 {
     CVector2D vecTemp;
 
@@ -3395,7 +3395,7 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     m_pChatAlpha [ eType ]->SetProperty ( "StepSize", "0.004" );
 }
 
-void CSettings::LoadChatColorFromCVar ( ChatColorType eType, const char* szCVar )
+void CSettings::LoadChatColorFromCVar ( eChatColorType eType, const char* szCVar )
 {
     // Load the color according to the cvars and update the gui
     CColor pColor;
@@ -3403,7 +3403,7 @@ void CSettings::LoadChatColorFromCVar ( ChatColorType eType, const char* szCVar 
     SetChatColorValues ( eType, pColor );
 }
 
-void CSettings::SaveChatColor ( ChatColorType eType, const char* szCVar )
+void CSettings::SaveChatColor ( eChatColorType eType, const char* szCVar )
 {
     // Save the color to the cvar if it's different
     CColor pColor, pOldColor;
@@ -3414,7 +3414,7 @@ void CSettings::SaveChatColor ( ChatColorType eType, const char* szCVar )
         CVARS_SET ( szCVar, pColor );
 }
 
-CColor CSettings::GetChatColorValues ( ChatColorType eType )
+CColor CSettings::GetChatColorValues ( eChatColorType eType )
 {
     // Retrieve the color according to the scrollbar values
     CColor pColor;
@@ -3425,7 +3425,7 @@ CColor CSettings::GetChatColorValues ( ChatColorType eType )
     return pColor;
 }
 
-void CSettings::SetChatColorValues ( ChatColorType eType, CColor pColor )
+void CSettings::SetChatColorValues ( eChatColorType eType, CColor pColor )
 {
     // Set the scrollbar position based on the color
     m_pChatRed [ eType ]->SetScrollPosition ( ( float ) pColor.R / 255.0f );
@@ -3477,7 +3477,7 @@ void CSettings::LoadSkins()
     }   
 }
 
-void CSettings::LoadChatColorFromString ( ChatColorType eType, const string& strColor )
+void CSettings::LoadChatColorFromString ( eChatColorType eType, const string& strColor )
 {
     CColor pColor;
     stringstream ss( strColor );
@@ -3535,27 +3535,27 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
         {
             if ( strTag == "color_text" )
             {
-                LoadChatColorFromString ( ChatColorTypes::CHAT_COLOR_TEXT, strValue );
+                LoadChatColorFromString ( Chat::ColorType::TEXT, strValue );
             }
             else if ( strTag == "color_background" )
             {
-                LoadChatColorFromString ( ChatColorTypes::CHAT_COLOR_BG, strValue );
+                LoadChatColorFromString ( Chat::ColorType::BG, strValue );
             }
             else if ( strTag == "color_input_text" )
             {
-                LoadChatColorFromString ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, strValue );
+                LoadChatColorFromString ( Chat::ColorType::INPUT_TEXT, strValue );
             }
             else if ( strTag == "color_input_background" )
             {
-                LoadChatColorFromString ( ChatColorTypes::CHAT_COLOR_INPUT_BG, strValue );
+                LoadChatColorFromString ( Chat::ColorType::INPUT_BG, strValue );
             }
             else if ( strTag == "font" )
             {
                 int iValue;
                 pSubNode->GetTagContent ( iValue );
                 
-                if ( iValue < 0 || iValue >= ChatFonts::CHAT_FONT_MAX )
-                    iValue = ChatFonts::CHAT_FONT_DEFAULT;
+                if ( iValue < 0 || iValue >= Chat::Font::MAX )
+                    iValue = Chat::Font::DEFAULT;
                 m_pRadioChatFont [ iValue ]->SetSelected ( true );
             }
             else if ( strTag == "lines" )
@@ -3786,14 +3786,14 @@ bool CSettings::OnChatRedChanged ( CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
     int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
 
-    if ( pScrollBar == m_pChatRed [ ChatColorTypes::CHAT_COLOR_BG ] )
-        m_pChatRedValue [ ChatColorTypes::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatRed [ ChatColorTypes::CHAT_COLOR_TEXT ] )
-        m_pChatRedValue [ ChatColorTypes::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatRed [ ChatColorTypes::CHAT_COLOR_INPUT_BG ] )
-        m_pChatRedValue [ ChatColorTypes::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatRed [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT ] )
-        m_pChatRedValue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    if ( pScrollBar == m_pChatRed [ Chat::ColorType::BG ] )
+        m_pChatRedValue [ Chat::ColorType::BG ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatRed [ Chat::ColorType::TEXT ] )
+        m_pChatRedValue [ Chat::ColorType::TEXT ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatRed [ Chat::ColorType::INPUT_BG ] )
+        m_pChatRedValue [ Chat::ColorType::INPUT_BG ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatRed [ Chat::ColorType::INPUT_TEXT ] )
+        m_pChatRedValue [ Chat::ColorType::INPUT_TEXT ]->SetText ( SString("%i", iValue).c_str() );
 
     return true;
 }
@@ -3803,14 +3803,14 @@ bool CSettings::OnChatGreenChanged ( CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
     int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
 
-    if ( pScrollBar == m_pChatGreen [ ChatColorTypes::CHAT_COLOR_BG ] )
-        m_pChatGreenValue [ ChatColorTypes::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatGreen [ ChatColorTypes::CHAT_COLOR_TEXT ] )
-        m_pChatGreenValue [ ChatColorTypes::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatGreen [ ChatColorTypes::CHAT_COLOR_INPUT_BG ] )
-        m_pChatGreenValue [ ChatColorTypes::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatGreen [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT ] )
-        m_pChatGreenValue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    if ( pScrollBar == m_pChatGreen [ Chat::ColorType::BG ] )
+        m_pChatGreenValue [ Chat::ColorType::BG ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatGreen [ Chat::ColorType::TEXT ] )
+        m_pChatGreenValue [ Chat::ColorType::TEXT]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatGreen [ Chat::ColorType::INPUT_BG ] )
+        m_pChatGreenValue [ Chat::ColorType::INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatGreen [ Chat::ColorType::INPUT_TEXT ] )
+        m_pChatGreenValue [ Chat::ColorType::INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
 
     return true;
 }
@@ -3820,14 +3820,14 @@ bool CSettings::OnChatBlueChanged ( CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
     int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
 
-    if ( pScrollBar == m_pChatBlue [ ChatColorTypes::CHAT_COLOR_BG ] )
-        m_pChatBlueValue [ ChatColorTypes::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatBlue [ ChatColorTypes::CHAT_COLOR_TEXT ] )
-        m_pChatBlueValue [ ChatColorTypes::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatBlue [ ChatColorTypes::CHAT_COLOR_INPUT_BG ] )
-        m_pChatBlueValue [ ChatColorTypes::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatBlue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT ] )
-        m_pChatBlueValue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    if ( pScrollBar == m_pChatBlue [ Chat::ColorType::BG ] )
+        m_pChatBlueValue [ Chat::ColorType::BG ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatBlue [ Chat::ColorType::TEXT ] )
+        m_pChatBlueValue [ Chat::ColorType::TEXT]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatBlue [ Chat::ColorType::INPUT_BG ] )
+        m_pChatBlueValue [ Chat::ColorType::INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatBlue [ Chat::ColorType::INPUT_TEXT ] )
+        m_pChatBlueValue [ Chat::ColorType::INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
 
     return true;
 }
@@ -3837,14 +3837,14 @@ bool CSettings::OnChatAlphaChanged ( CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
     int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
 
-    if ( pScrollBar == m_pChatAlpha [ ChatColorTypes::CHAT_COLOR_BG ] )
-        m_pChatAlphaValue [ ChatColorTypes::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatAlpha [ ChatColorTypes::CHAT_COLOR_TEXT ] )
-        m_pChatAlphaValue [ ChatColorTypes::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatAlpha [ ChatColorTypes::CHAT_COLOR_INPUT_BG ] )
-        m_pChatAlphaValue [ ChatColorTypes::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatAlpha [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT ] )
-        m_pChatAlphaValue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    if ( pScrollBar == m_pChatAlpha [ Chat::ColorType::BG ] )
+        m_pChatAlphaValue [ Chat::ColorType::BG ]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatAlpha [ Chat::ColorType::TEXT ] )
+        m_pChatAlphaValue [ Chat::ColorType::TEXT]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatAlpha [ Chat::ColorType::INPUT_BG ] )
+        m_pChatAlphaValue [ Chat::ColorType::INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
+    else if ( pScrollBar == m_pChatAlpha [ Chat::ColorType::INPUT_TEXT ] )
+        m_pChatAlphaValue [ Chat::ColorType::INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
 
     return true;
 }

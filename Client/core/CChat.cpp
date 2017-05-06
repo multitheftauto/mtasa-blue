@@ -767,19 +767,19 @@ void CChat::SetChatFont ( eChatFont Font )
     float fReqestedDxFontScale = std::max( m_vecScale.fX, m_vecScale.fY );
     switch ( Font )
     {
-        case ChatFonts::CHAT_FONT_DEFAULT:
+        case Chat::Font::DEFAULT:
             pFont = g_pCore->GetGUI ()->GetDefaultFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT, &fUsingDxFontScale, fReqestedDxFontScale, "chat" );
             break;
-        case ChatFonts::CHAT_FONT_CLEAR:
+        case Chat::Font::CLEAR:
             pFont = g_pCore->GetGUI ()->GetClearFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_CLEAR, &fUsingDxFontScale, fReqestedDxFontScale, "chat" );
             break;
-        case ChatFonts::CHAT_FONT_BOLD:
+        case Chat::Font::BOLD:
             pFont = g_pCore->GetGUI ()->GetBoldFont ();
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_DEFAULT_BOLD, &fUsingDxFontScale, fReqestedDxFontScale, "chat" );
             break;
-        case ChatFonts::CHAT_FONT_ARIAL:
+        case Chat::Font::ARIAL:
             pDXFont = g_pCore->GetGraphics ()->GetFont ( FONT_ARIAL, &fUsingDxFontScale, fReqestedDxFontScale, "chat" );
             break;
     }

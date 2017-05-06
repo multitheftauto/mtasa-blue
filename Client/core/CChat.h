@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CCHAT_H
-#define __CCHAT_H
+#pragma once
 
 #include "CGUI.h"
 #include <core/CCoreInterface.h>
@@ -300,5 +299,3 @@ protected:
 
     bool                        m_bNickCompletion;
 };
-
-#endif
