@@ -126,10 +126,44 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_font",                    (unsigned int &)Font ); SetChatFont ( (eChatFont)Font );
     CVARS_GET ( "chat_nickcompletion",          m_bNickCompletion );
 
-    float fX, fY;
-    CVARS_GET ( "chat_pos_x", fX );
-    CVARS_GET ( "chat_pos_y", fY );
-    m_vecBackgroundPosition = CVector2D( fX, fY ) * m_pManager->GetResolution();
+    CVector2D vecResolution = m_pManager->GetResolution();
+    float fLineDifference = CChat::GetFontHeight ( m_vecScale.fY );
+    float fRelativeWidth = (m_vecBackgroundSize.fX / vecResolution.fX), 
+          fRelativeHeight = ((m_vecBackgroundSize.fY + fLineDifference * 1.25f) / vecResolution.fY);
+
+    int iHorizontal, iVertical;
+    float fOffsetX, fOffsetY, fPosX, fPosY;
+    CVARS_GET ( "chat_position_offset_x", fOffsetX );
+    CVARS_GET ( "chat_position_offset_y", fOffsetY );
+    CVARS_GET ( "chat_position_horizontal", iHorizontal );
+    CVARS_GET ( "chat_position_vertical", iVertical );
+    switch ( iHorizontal )
+    {
+    case Chat::Position::Horizontal::RIGHT:
+        fPosX = 1.0 - fRelativeWidth - fOffsetX;
+        break;
+    case Chat::Position::Horizontal::CENTER:
+        fPosX = (1.0 - fRelativeWidth) / 2 - fOffsetX;
+        break;
+    case Chat::Position::Horizontal::LEFT:
+    default:
+        fPosX = fOffsetX;
+        break;
+    }
+    switch ( iVertical )
+    {
+    case Chat::Position::Vertical::BOTTOM:
+        fPosY = 1.0 - fRelativeHeight - fOffsetY;
+        break;
+    case Chat::Position::Vertical::CENTER:
+        fPosY = (1.0 - fRelativeHeight) / 2 - fOffsetY;
+        break;
+    case Chat::Position::Vertical::TOP:
+    default:
+        fPosY = fOffsetY;
+        break;
+    }
+    m_vecBackgroundPosition = CVector2D( fPosX, fPosY ) * vecResolution;
     m_pBackground->SetPosition( m_vecBackgroundPosition );
 
     // Modify default chat box to be like 'Transparent' preset

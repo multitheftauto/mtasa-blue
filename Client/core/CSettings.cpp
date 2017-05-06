@@ -985,7 +985,7 @@ void CSettings::CreateGUI ( void )
         );
 
         // Add a small indent for edit boxes
-        fIndentX += 20.0f;
+        fIndentX += 10.0f;
 
         // Cache position and size from color tab panel (for positioning and height)
         pColorTabPanel->GetPosition ( vecTemp );
@@ -1006,66 +1006,36 @@ void CSettings::CreateGUI ( void )
         // Layout tab
         CGUITab* pLayoutTab = pChatOptionsPanel->CreateTab ( _("Layout") );
 
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, "X:" ) );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, _("Lines:") ) );
         pLabel->SetPosition ( CVector2D ( 10.0f, 10.0f ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
-
-        m_pChatPosX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
-        m_pChatPosX->SetPosition ( CVector2D ( vecTemp.fX + 12.0f, vecTemp.fY - 2.0f ) );
-        m_pChatPosX->GetPosition ( vecTemp );
-        m_pChatPosX->SetSize ( CVector2D ( 70.0f, 24.0f ) );
-        m_pChatPosX->SetAlwaysOnTop ( true );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, "Y:" ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX + 75.0f, vecTemp.fY + 2.0f ) );
-        pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
-
-        m_pChatPosY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
-        m_pChatPosY->SetPosition ( CVector2D ( vecTemp.fX + 12.0f, vecTemp.fY - 2.0f ) );
-        m_pChatPosY->SetSize ( CVector2D ( 70.0f, 24.0f ) );
-        m_pChatPosY->SetAlwaysOnTop ( true );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, _("Lines:") ) );
-        pLabel->SetPosition ( CVector2D ( 10.0f, vecTemp.fY + fLineSizeY + fLineGapY ) );
-        pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
 
         m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "" ) );
         m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
         m_pChatLines->SetSize ( CVector2D ( 80.0f, 24.0f ) );
-        m_pChatLines->SetAlwaysOnTop ( true );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, _("Scale:") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
 
         m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
         m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
         m_pChatScaleX->SetSize ( CVector2D ( 35.0f, 24.0f ) );
-        m_pChatScaleX->SetAlwaysOnTop ( true );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, "x") );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 37.0f, vecTemp.fY + 2.0f ) );
         pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
 
         m_pChatScaleY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
         m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 45.0f, vecTemp.fY - 2.0f ) );
         m_pChatScaleY->SetSize ( CVector2D ( 35.0f, 24.0f ) );
-        m_pChatScaleY->SetAlwaysOnTop ( true );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, _("Width:") ) );
         pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
         pLabel->GetPosition ( vecTemp );
         pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
 
         m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
         m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
@@ -1121,6 +1091,68 @@ void CSettings::CreateGUI ( void )
                             m_pChatCssText->GetPosition().fY ) 
                           );
         }
+        
+        // Position tab
+        float fComboWidth = 100.0f;
+
+        CGUITab* pPositionTab = pChatOptionsPanel->CreateTab( _("Position") );
+        pChatOptionsPanel->SetSelectedTab( pPositionTab );
+
+        fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
+            _("Horizontal:"),
+            _("Vertical:"),
+            _("X-Offset:"),
+            _("Y-Offset:")
+        );
+
+        // Add a small indent for edit boxes
+        fIndentX += 10.0f;
+
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pPositionTab, _("Horizontal:") ) );
+        pLabel->SetPosition ( CVector2D ( 10.0f, 10.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+
+        m_pChatHorizontalCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pPositionTab, "" ) );
+        m_pChatHorizontalCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+        m_pChatHorizontalCombo->SetSize ( CVector2D ( fComboWidth, 85.0f ) );
+        m_pChatHorizontalCombo->AddItem ( _("Left") )->SetData( (void *) Chat::Position::Horizontal::LEFT );
+        m_pChatHorizontalCombo->AddItem ( _("Center") )->SetData( (void *) Chat::Position::Horizontal::CENTER );
+        m_pChatHorizontalCombo->AddItem ( _("Right") )->SetData( (void *) Chat::Position::Horizontal::RIGHT );
+        m_pChatHorizontalCombo->SetReadOnly ( true );
+        m_pChatHorizontalCombo->SetSelectedItemByIndex( 0 );
+
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pPositionTab, _("Vertical:") ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+
+        m_pChatVerticalCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pPositionTab, "" ) );
+        m_pChatVerticalCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+        m_pChatVerticalCombo->SetSize ( CVector2D ( fComboWidth, 85.0f ) );
+        m_pChatVerticalCombo->AddItem ( _("Top") )->SetData( (void *) Chat::Position::Vertical::TOP );
+        m_pChatVerticalCombo->AddItem ( _("Center") )->SetData( (void *) Chat::Position::Vertical::CENTER );
+        m_pChatVerticalCombo->AddItem ( _("Bottom") )->SetData( (void *) Chat::Position::Vertical::BOTTOM );
+        m_pChatVerticalCombo->SetReadOnly ( true );
+        m_pChatVerticalCombo->SetSelectedItemByIndex( 0 );
+
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pPositionTab, _("X-Offset:") ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+
+        m_pChatOffsetX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pPositionTab, "") );
+        m_pChatOffsetX->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatOffsetX->SetSize ( CVector2D ( fComboWidth, 24.0f ) );
+
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pPositionTab, _("Y-Offset:") ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+
+        m_pChatOffsetY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pPositionTab, "") );
+        m_pChatOffsetY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatOffsetY->SetSize ( CVector2D ( fComboWidth, 24.0f ) );
 
         // Cache position and size from font panel
         m_pPaneChatFont->GetPosition ( vecTemp );
@@ -2905,8 +2937,6 @@ void CSettings::LoadData ( void )
     {
     }
 
-    CVARS_GET ( "chat_pos_x", strVar ); m_pChatPosX->SetText( strVar.c_str() );
-    CVARS_GET ( "chat_pos_y", strVar ); m_pChatPosY->SetText( strVar.c_str() );
     CVARS_GET ( "chat_width", strVar ); m_pChatWidth->SetText ( strVar.c_str () );
     CVARS_GET ( "chat_css_style_text", bVar ); m_pChatCssText->SetSelected ( bVar );
     CVARS_GET ( "chat_css_style_background", bVar ); m_pChatCssBackground->SetSelected ( bVar );
@@ -2920,7 +2950,21 @@ void CSettings::LoadData ( void )
         CVARS_GET ( "chat_line_fade_out", iVar ); 
         SetMilliseconds ( m_pChatLineFadeout, iVar );
     }
-    
+
+    // Chat position
+    CVARS_GET ( "chat_position_horizontal", iVar );
+    if ( iVar > Chat::Position::Horizontal::RIGHT )
+        iVar = Chat::Position::Horizontal::LEFT;
+    m_pChatHorizontalCombo->SetSelectedItemByIndex( iVar );
+
+    CVARS_GET ( "chat_position_vertical", iVar );
+    if ( iVar > Chat::Position::Vertical::BOTTOM )
+        iVar = Chat::Position::Vertical::TOP;
+    m_pChatVerticalCombo->SetSelectedItemByIndex( iVar );
+
+    CVARS_GET ( "chat_position_offset_x", strVar ); m_pChatOffsetX->SetText( strVar.c_str() );
+    CVARS_GET ( "chat_position_offset_y", strVar ); m_pChatOffsetY->SetText( strVar.c_str() );
+
     // Interface
     CVARS_GET ( "server_can_flash_window", bVar ); m_pFlashWindow->SetSelected ( bVar );
     CVARS_GET ( "allow_tray_notifications", bVar ); m_pTrayBalloon->SetSelected ( bVar );
@@ -3220,14 +3264,25 @@ void CSettings::SaveData ( void )
     strVar = m_pChatScaleX->GetText () + " " + m_pChatScaleY->GetText ();
     CVARS_SET ( "chat_scale", strVar );
     CVARS_SET ( "chat_lines", m_pChatLines->GetText () );
-    CVARS_SET ( "chat_pos_x", m_pChatPosX->GetText () );
-    CVARS_SET ( "chat_pos_y", m_pChatPosY->GetText () );
     CVARS_SET ( "chat_width", m_pChatWidth->GetText () );
     CVARS_SET ( "chat_css_style_text", m_pChatCssText->GetSelected () );
     CVARS_SET ( "chat_css_style_background", m_pChatCssBackground->GetSelected () );
     CVARS_SET ( "chat_nickcompletion", m_pChatNickCompletion->GetSelected () );
     CVARS_SET ( "chat_line_life", GetMilliseconds ( m_pChatLineLife ) );
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
+
+    CVARS_SET ( "chat_position_offset_x", m_pChatOffsetX->GetText() );
+    CVARS_SET ( "chat_position_offset_y", m_pChatOffsetY->GetText() );
+    if ( CGUIListItem* pSelected = m_pChatHorizontalCombo->GetSelectedItem() )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "chat_position_horizontal", iSelected );
+    }
+    if ( CGUIListItem* pSelected = m_pChatVerticalCombo->GetSelectedItem() )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "chat_position_vertical", iSelected );
+    }
 
     // Interface
     CVARS_SET ( "server_can_flash_window", m_pFlashWindow->GetSelected ( ) );
@@ -3576,13 +3631,31 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
                 {
                 }
             }
-            else if ( strTag == "pos_x" )
+            else if ( strTag == "position_horizontal" )
             {
-                m_pChatPosX->SetText ( strValue.c_str () );
+                int iValue;
+                pSubNode->GetTagContent ( iValue );
+
+                if ( iValue >= Chat::Position::Horizontal::LEFT && iValue <= Chat::Position::Horizontal::RIGHT ) {
+                    m_pChatHorizontalCombo->SetSelectedItemByIndex( iValue );
+                }
             }
-            else if ( strTag == "pos_y" )
+            else if ( strTag == "position_vertical" )
             {
-                m_pChatPosY->SetText ( strValue.c_str () );
+                int iValue;
+                pSubNode->GetTagContent ( iValue );
+
+                if ( iValue >= Chat::Position::Vertical::TOP && iValue <= Chat::Position::Vertical::BOTTOM ) {
+                    m_pChatVerticalCombo->SetSelectedItemByIndex( iValue );
+                }
+            }
+            else if ( strTag == "offset_x" )
+            {
+                m_pChatOffsetX->SetText ( strValue.c_str () );
+            }
+            else if ( strTag == "offset_y" )
+            {
+                m_pChatOffsetY->SetText ( strValue.c_str () );
             }
             else if ( strTag == "width" )
             {
