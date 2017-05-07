@@ -1096,7 +1096,6 @@ void CSettings::CreateGUI ( void )
         float fComboWidth = 100.0f;
 
         CGUITab* pPositionTab = pChatOptionsPanel->CreateTab( _("Position") );
-        pChatOptionsPanel->SetSelectedTab( pPositionTab );
 
         fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
             _("Horizontal:"),
