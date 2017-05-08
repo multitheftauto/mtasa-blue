@@ -486,7 +486,7 @@ void CAudioEngineSA::ResetWorldSounds ( void )
     m_DisabledWorldSounds = CRanges ();
 }
 
-void CAudioEngineSA::SetWorldSoundHandler ( WorldSoundHandler * pHandler )
+void CAudioEngineSA::SetWorldSoundHandler ( WorldSoundHandler pHandler )
 {
     m_pWorldSoundHandler = pHandler;
 }
@@ -496,8 +496,13 @@ bool CAudioEngineSA::OnWorldSound ( CAESound* pAESound )
     if ( !IsWorldSoundEnabled ( pAESound->usGroup, pAESound->usIndex ) )
         return false;
 
-    if ( m_pWorldSoundHandler )
-        m_pWorldSoundHandler ( pAESound->usGroup, pAESound->usIndex );
+    if ( m_pWorldSoundHandler ) {
+        bool bCanceled = !m_pWorldSoundHandler ( pAESound->usGroup, pAESound->usIndex, pAESound->pGameEntity, pAESound->m_vCurrPosn );
+
+        if ( bCanceled ) {
+            return false;
+        }
+    }
 
     return true;
 }

@@ -9,13 +9,12 @@
 *
 *****************************************************************************/
 
-#ifndef __CGAME_AUDIOENGINE
-#define __CGAME_AUDIOENGINE
+#pragma once
 
 #include <windows.h>
 #include "CVehicle.h"
 
-typedef void ( WorldSoundHandler ) ( uint uiGroup, uint uiIndex );
+using WorldSoundHandler = bool (*) ( uint uiGroup, uint uiIndex, CEntitySAInterface* pEntityInterface, const CVector& vecPosition );
 
 enum eSurfaceType
 {
@@ -60,9 +59,7 @@ public:
     virtual VOID                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled ) = 0;
     virtual bool                        IsWorldSoundEnabled             ( uint uiGroup, uint uiIndex ) = 0;
     virtual void                        ResetWorldSounds                ( void ) = 0;
-    virtual void                        SetWorldSoundHandler            ( WorldSoundHandler * pHandler ) = 0;
+    virtual void                        SetWorldSoundHandler            ( WorldSoundHandler pHandler ) = 0;
     virtual void                        ReportBulletHit                 ( CEntity * pEntity, unsigned char ucSurfaceType, CVector * pvecPosition, float f_2 ) = 0;
     virtual void                        ReportWeaponEvent               ( int iEvent, eWeaponType weaponType, CPhysical * pPhysical ) = 0;
 };
-
-#endif
