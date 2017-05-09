@@ -3343,7 +3343,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
     //* text_scale - Returns text scale
 
     CCVarsInterface* pCVars = g_pCore->GetCVars ();
-    float iNumber;
+    int iNumber;
     float fNumber;
     pCVars->Get("chat_font", fNumber);
     lua_newtable ( luaVM );
@@ -3361,11 +3361,11 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
     pCVars->Get("chat_position_offset_y", fNumber);
     lua_pushnumber ( luaVM, fNumber );
     lua_setfield ( luaVM, -2, "chat_position_offset_y" );
-    pCVars->Get("chat_position_horizontal", fNumber);
-    lua_pushnumber ( luaVM, fNumber );
+    pCVars->Get("chat_position_horizontal", iNumber);
+    lua_pushnumber ( luaVM, iNumber );
     lua_setfield ( luaVM, -2, "chat_position_horizontal" );
-    pCVars->Get("chat_position_vertical", fNumber);
-    lua_pushnumber ( luaVM, fNumber );
+    pCVars->Get("chat_position_vertical", iNumber);
+    lua_pushnumber ( luaVM, iNumber );
     lua_setfield ( luaVM, -2, "chat_position_vertical" );
     pCVars->Get("chat_css_style_text", fNumber);
     lua_pushnumber ( luaVM, fNumber );
