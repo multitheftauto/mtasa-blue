@@ -88,7 +88,7 @@ public:
 
             // Send request
             this->AddRef();     // Keep object alive
-            GetDownloadManager()->QueueFile( m_strURL, NULL, 0, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this, StaticDownloadFinishedCallback, false, 2 );
+            GetDownloadManager()->QueueFile( m_strURL, NULL, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this, StaticDownloadFinishedCallback, false, 2 );
         }
     }
 

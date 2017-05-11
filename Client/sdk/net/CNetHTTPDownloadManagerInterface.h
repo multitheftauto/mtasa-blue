@@ -44,8 +44,8 @@ public:
     virtual bool            ProcessQueuedFiles  ( void ) = 0;
 
     // Queue a file to download
-    // szPostHeaders is a new line separated list of HTTP headers. Examples at https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
-    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, double dSize = 0, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false, void * objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false, uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false, const char* szPostHeaders = NULL ) = 0;
+    // szRequestHeaders is a new line separated list of HTTP headers. Examples at https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
+    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false, void * objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false, uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false, const char* szRequestHeaders = nullptr, const char* szRequestMethod = nullptr ) = 0;
 
     // Limit number of concurrent http client connections
     virtual void            SetMaxConnections   ( int iMaxConnections ) = 0;
