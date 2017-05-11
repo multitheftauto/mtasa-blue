@@ -895,14 +895,16 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                         pAccount->SetPassword( szNewPassword );
 
                         // Tell the client
-                        pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
-                        CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password", GetAdminNameForLog ( pClient ).c_str () );
+                        if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                            pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
+                        CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password\n", GetAdminNameForLog ( pClient ).c_str () );
                         return true;
                     }
                     else
                     {
-                        pEchoClient->SendEcho ( "chgmypass: Bad old password" );
-                        CLogger::LogPrintf ( "ACCOUNTS: %s failed to change their account password", GetAdminNameForLog ( pClient ).c_str () );
+                        if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                            pEchoClient->SendEcho ( "chgmypass: Bad old password" );
+                        CLogger::LogPrintf ( "ACCOUNTS: %s failed to change their account password (Bad old password)\n", GetAdminNameForLog ( pClient ).c_str () );
                    }
                 }
                 else
@@ -958,10 +960,11 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                         g_pGame->GetAccountManager ()->AddNewPlayerAccount ( szNick, szPassword );
 
                         // Tell the user
-                        pClient->SendEcho ( SString ( "addaccount: Added account '%s' with password '%s'", szNick, szPassword ) );
+                        if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                            pClient->SendEcho ( SString ( "addaccount: Added account '%s' with password '%s'", szNick, szPassword ) );
 
                         // Tell the console
-                        CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s' with password '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
+                        CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick );
                         return true;
                     }
                     else
@@ -1027,7 +1030,8 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
             }
 
             // Tell the client
-            pEchoClient->SendEcho ( SString ( "delaccount: Account '%s' deleted", szArguments ) );
+            if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                pEchoClient->SendEcho ( SString ( "delaccount: Account '%s' deleted", szArguments ) );
 
             // Tell the console
             CLogger::LogPrintf ( "ACCOUNTS: %s deleted account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szArguments );
@@ -1071,10 +1075,11 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
                 pAccount->SetPassword ( szPassword );
 
                 // Tell the client
-                pEchoClient->SendEcho ( SString ( "chgpass: %s's password changed to '%s'", szNick, szPassword ) );
+                if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                    pEchoClient->SendEcho ( SString ( "chgpass: %s's password changed to '%s'", szNick, szPassword ) );
 
                 // Tell the console
-                CLogger::LogPrintf ( "ACCOUNTS: %s changed %s's password to '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
+                CLogger::LogPrintf ( "ACCOUNTS: %s changed %s's password\n", GetAdminNameForLog ( pClient ).c_str (), szNick );
                 return true;
             }
             else
