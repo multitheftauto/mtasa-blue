@@ -1827,6 +1827,17 @@ bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArgume
     return false;
 }
 
+bool CConsoleCommands::ReloadAcl(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
+{
+    if (g_pGame->GetACLManager()->Reload())
+    {
+        pClient->SendEcho("reloadacl: ACL successfully reloaded");
+        return true;
+    }
+    pClient->SendEcho("reloadacl: ACL failed to reload, fix any errors and run again");
+    return false;
+}
+
 
 bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {

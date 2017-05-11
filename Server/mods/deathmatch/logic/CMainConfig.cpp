@@ -834,6 +834,7 @@ bool CMainConfig::LoadExtended ( void )
 
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
     RegisterCommand ( "authserial", CConsoleCommands::AuthorizeSerial, false );
+    RegisterCommand ( "reloadacl", CConsoleCommands::ReloadAcl, false );
     RegisterCommand ( "debugjoinflood", CConsoleCommands::DebugJoinFlood, false );
     RegisterCommand ( "debuguptime", CConsoleCommands::DebugUpTime, false );
     RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );
