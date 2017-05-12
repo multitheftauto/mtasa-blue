@@ -1416,14 +1416,17 @@ int CLuaFunctionDefs::GetRainLevel ( lua_State* luaVM )
 int CLuaFunctionDefs::SetRainLevel ( lua_State* luaVM )
 {
 //  bool setRainLevel ( float amount )
-    float fAmount;
+    float fRainLevel;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( fAmount );
+    argStream.ReadNumber ( fRainLevel );
 
     if ( !argStream.HasErrors () )
     {
-        g_pGame->GetWeather ()->SetAmountOfRain ( fAmount );
+        // Clamp amount of rain to avoid game freezing/crash
+        fRainLevel = Clamp( 0.0f, fRainLevel, 10.0f );
+
+        g_pGame->GetWeather ()->SetAmountOfRain ( fRainLevel );
 
         lua_pushboolean ( luaVM, true );
         return 1;
