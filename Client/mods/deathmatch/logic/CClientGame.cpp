@@ -2817,7 +2817,6 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientPedChoke", "", NULL, false );
     m_Events.AddEvent ( "onClientPedHeliKilled", "heli", NULL, false );
     m_Events.AddEvent ( "onClientPedHitByWaterCannon", "vehicle", NULL, false );
-    m_Events.AddEvent ( "onClientPedSound", "group, index, x, y, z", NULL, false );
 
     // Vehicle events
     m_Events.AddEvent ( "onClientVehicleRespawn", "", NULL, false );
@@ -2927,6 +2926,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientFileDownloadComplete", "fileName, success", NULL, false );
 
     m_Events.AddEvent ( "onClientWeaponFire", "ped, x, y, z", NULL, false );
+
+    m_Events.AddEvent ( "onClientWorldSound", "group, index, x, y, z", NULL, false );
 }
 
 
@@ -6403,18 +6404,20 @@ bool CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex, CEntitySAInter
     if ( pEntityInterface ) {
         CClientEntity* pEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity( pEntityInterface );
 
-        if ( pEntity && ( pEntity->GetType() == CCLIENTPED || pEntity->GetType() == CCLIENTPLAYER ) ) {
-            CLuaArguments Arguments;
-            Arguments.PushNumber( uiGroup );
-            Arguments.PushNumber( uiIndex );
-            Arguments.PushNumber( vecPosition.fX );
-            Arguments.PushNumber( vecPosition.fY );
-            Arguments.PushNumber( vecPosition.fZ );
-            bool bCanceled = !pEntity->CallEvent( "onClientPedSound", Arguments, pEntity != m_pRootEntity );
+        if ( !pEntity ) {
+            pEntity = m_pRootEntity;
+        }
 
-            if ( bCanceled ) {
-                return false;
-            }
+        CLuaArguments Arguments;
+        Arguments.PushNumber( uiGroup );
+        Arguments.PushNumber( uiIndex );
+        Arguments.PushNumber( vecPosition.fX );
+        Arguments.PushNumber( vecPosition.fY );
+        Arguments.PushNumber( vecPosition.fZ );
+        bool bCanceled = !pEntity->CallEvent( "onClientWorldSound", Arguments, pEntity != m_pRootEntity );
+
+        if ( bCanceled ) {
+            return false;
         }
     }
 
