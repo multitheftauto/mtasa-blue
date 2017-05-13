@@ -4630,7 +4630,7 @@ bool CStaticFunctionDefinitions::SetCameraTarget ( CClientEntity * pEntity )
                 // TODO: stream in the player here (needs to be done through the streamer)
 
                 // Put the focus on that player
-                m_pCamera->SetFocus ( pPlayer, MODE_BEHINDCAR, false );
+                m_pCamera->SetFocus ( pPlayer, MODE_CAM_ON_A_STRING, false );
             }
             break;
         }
