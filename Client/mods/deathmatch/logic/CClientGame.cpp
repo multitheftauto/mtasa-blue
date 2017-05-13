@@ -6404,20 +6404,18 @@ bool CClientGame::WorldSoundHandler ( uint uiGroup, uint uiIndex, CEntitySAInter
     if ( pEntityInterface ) {
         CClientEntity* pEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity( pEntityInterface );
 
-        if ( !pEntity ) {
-            pEntity = m_pRootEntity;
-        }
+        if ( pEntity && ( pEntity->GetType() == CCLIENTPED || pEntity->GetType() == CCLIENTPLAYER ) ) {
+            CLuaArguments Arguments;
+            Arguments.PushNumber( uiGroup );
+            Arguments.PushNumber( uiIndex );
+            Arguments.PushNumber( vecPosition.fX );
+            Arguments.PushNumber( vecPosition.fY );
+            Arguments.PushNumber( vecPosition.fZ );
+            bool bCanceled = !pEntity->CallEvent( "onClientWorldSound", Arguments, pEntity != m_pRootEntity );
 
-        CLuaArguments Arguments;
-        Arguments.PushNumber( uiGroup );
-        Arguments.PushNumber( uiIndex );
-        Arguments.PushNumber( vecPosition.fX );
-        Arguments.PushNumber( vecPosition.fY );
-        Arguments.PushNumber( vecPosition.fZ );
-        bool bCanceled = !pEntity->CallEvent( "onClientWorldSound", Arguments, pEntity != m_pRootEntity );
-
-        if ( bCanceled ) {
-            return false;
+            if ( bCanceled ) {
+                return false;
+            }
         }
     }
 
