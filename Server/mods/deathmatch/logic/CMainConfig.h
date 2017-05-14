@@ -133,6 +133,7 @@ public:
     const std::vector< SString >&   GetOwnerEmailAddressList        ( void ) const                      { return m_OwnerEmailAddressList; }
     bool                            IsDatabaseCredentialsProtectionEnabled ( void ) const               { return m_bDatabaseCredentialsProtectionEnabled != 0; }
     bool                            IsFakeLagCommandEnabled         ( void ) const                      { return m_bFakeLagCommandEnabled != 0; }
+    bool                            IsAdvancedModeEnabled           ( void ) const                      { return m_bAdvancedMode != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
