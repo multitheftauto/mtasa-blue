@@ -12,13 +12,13 @@
 // String map with parsing helpers like CScriptArgReader
 //
 template<class V>
-class CStringMapReader : public std::unordered_map<SString, V>
+class CStringMapReader : public std::map<SString, V>
 {
 public:
     void ReadString(const SString& strKeyName, SString& strOutValue, const char* szDefaultValue)
     {
         V* pstrValue = MapFind(*this, strKeyName);
-        strOutValue = pstrValue ? *pstrValue : szDefaultValue;
+        strOutValue = pstrValue ? **pstrValue : szDefaultValue;
     }
 
     template<typename T, typename U>

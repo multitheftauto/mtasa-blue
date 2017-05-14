@@ -3,6 +3,7 @@
 //
 // Server version file
 //
+#pragma once
 
 //
 // To compile a public server:
