@@ -24,7 +24,7 @@
 #define MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT           "1.3.5"
-#define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_TABLE             "1.5.4-9.11334"
+#define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_TABLE             "1.5.4-9.11342"
 
 
 int CLuaFunctionDefs::GetMaxPlayers ( lua_State* luaVM )
@@ -659,6 +659,9 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
         optionsMap.ReadString("queueName", strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME);
         optionsMap.ReadString("postData", httpRequestOptions.strPostData, "");
         optionsMap.ReadBool("postIsBinary", httpRequestOptions.bPostBinary, false);
+        optionsMap.ReadNumber("maxRedirects", httpRequestOptions.uiMaxRedirects, 8);
+        optionsMap.ReadString("authUsername", httpRequestOptions.strAuthUsername, "");
+        optionsMap.ReadString("authPassword", httpRequestOptions.strAuthPassword, "");
 
         CStringMap headersMap;
         optionsMap.ReadStringMap("headers", headersMap);

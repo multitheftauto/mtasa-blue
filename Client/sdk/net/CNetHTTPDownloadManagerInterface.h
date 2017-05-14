@@ -21,6 +21,9 @@ struct SHttpRequestOptions
     uint uiConnectTimeoutMs = 10000;
     SString strRequestMethod;
     std::map<SString,SString> requestHeaders;
+    uint uiMaxRedirects = 8;
+    SString strAuthUsername;
+    SString strAuthPassword;
 };
 
 struct SHttpDownloadResult
