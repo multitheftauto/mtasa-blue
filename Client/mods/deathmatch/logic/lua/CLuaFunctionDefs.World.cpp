@@ -21,6 +21,7 @@
 
 #define MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT          "1.3.5"
+#define MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE             "1.5.4-9.11334"
 
 int CLuaFunctionDefs::CreateExplosion ( lua_State* luaVM )
 {
@@ -1844,34 +1845,73 @@ int CLuaFunctionDefs::GetFPSLimit ( lua_State* luaVM )
 int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
 {
 //  bool fetchRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, table options ], callback callbackFunction[, table callbackArguments ] )
     CScriptArgReader argStream ( luaVM );
-    SString strURL; SString strQueueName; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts; uint uiConnectTimeoutMs;
+    SString strURL; SHttpRequestOptions httpRequestOptions; SString strQueueName; CLuaFunctionRef iLuaFunction; CLuaArguments callbackArguments;
 
     argStream.ReadString ( strURL );
-    if ( argStream.NextIsString () )
-        MinClientReqCheck ( argStream, MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used" );
-    argStream.ReadIfNextIsString ( strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME );
-    argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
-    if ( argStream.NextIsNumber () )
-        MinClientReqCheck ( argStream, MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
-    argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
-    argStream.ReadFunction ( iLuaFunction );
-    argStream.ReadString ( strPostData, "" );
-    argStream.ReadBool ( bPostBinary, false );
-    argStream.ReadLuaArguments ( args );
-    argStream.ReadFunctionComplete ();
-
-    if ( !argStream.HasErrors () )
+    if (!argStream.NextIsTable())
     {
-        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( luaMain )
+        if ( argStream.NextIsString () )
+            MinClientReqCheck ( argStream, MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used" );
+        argStream.ReadIfNextIsString ( strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME );
+        argStream.ReadIfNextIsNumber ( httpRequestOptions.uiConnectionAttempts, 10 );
+        if ( argStream.NextIsNumber () )
+            MinClientReqCheck ( argStream, MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+        argStream.ReadIfNextIsNumber ( httpRequestOptions.uiConnectTimeoutMs, 10000 );
+        argStream.ReadFunction ( iLuaFunction );
+        argStream.ReadString ( httpRequestOptions.strPostData, "" );
+        argStream.ReadBool ( httpRequestOptions.bPostBinary, false );
+        argStream.ReadLuaArguments ( callbackArguments );
+        argStream.ReadFunctionComplete ();
+
+        if ( !argStream.HasErrors () )
         {
-            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs );
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( luaMain )
+            {
+                httpRequestOptions.bIsLegacy = true;
+                g_pClientGame->GetRemoteCalls()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
     else
+    {
+        MinClientReqCheck(argStream, MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE, "'options' table is being used");
+        CStringMap optionsMap;
+
+        argStream.ReadStringMap(optionsMap);
+        argStream.ReadFunction(iLuaFunction);
+        if ( argStream.NextIsTable() )
+            argStream.ReadLuaArgumentsTable(callbackArguments);
+        argStream.ReadFunctionComplete();
+
+        optionsMap.ReadNumber("connectionAttempts", httpRequestOptions.uiConnectionAttempts, 10);
+        optionsMap.ReadNumber("connectTimeout", httpRequestOptions.uiConnectTimeoutMs, 10000);
+        optionsMap.ReadString("method", httpRequestOptions.strRequestMethod, "");
+        optionsMap.ReadString("queueName", strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME);
+        optionsMap.ReadString("postData", httpRequestOptions.strPostData, "");
+        optionsMap.ReadBool("postIsBinary", httpRequestOptions.bPostBinary, false);
+
+        CStringMap headersMap;
+        optionsMap.ReadStringMap("headers", headersMap);
+        httpRequestOptions.requestHeaders.insert(headersMap.begin(), headersMap.end());
+
+        if (!argStream.HasErrors())
+        {
+            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+            if (luaMain)
+            {
+                g_pClientGame->GetRemoteCalls ()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+    }
+    
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );

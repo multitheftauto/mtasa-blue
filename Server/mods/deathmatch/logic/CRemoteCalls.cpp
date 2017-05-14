@@ -49,6 +49,12 @@ void CRemoteCalls::Call ( const char * szURL, CLuaArguments * fetchArguments, co
     m_calls.back ()->MakeCall ();
 }
 
+void CRemoteCalls::Call ( const char * szURL, CLuaArguments * fetchArguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, const SHttpRequestOptions& options )
+{
+    m_calls.push_back ( new CRemoteCall ( szURL, fetchArguments, luaMain, iFunction, strQueueName, options ) );
+    m_calls.back ()->MakeCall ();
+}
+
 void CRemoteCalls::Remove ( CLuaMain * lua )
 {
     list<CRemoteCall *> trash;
@@ -142,14 +148,14 @@ CRemoteCall::CRemoteCall ( const char * szServerHost, const char * szResourceNam
     m_VM = luaMain;
     m_iFunction = iFunction;
 
-    arguments->WriteToJSONString ( m_strData, true );
-    m_bPostBinary = false;
+    arguments->WriteToJSONString ( m_options.strPostData, true );
+    m_options.bPostBinary = false;
     m_bIsFetch = false;
 
     m_strURL = SString ( "http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName );
     m_strQueueName = strQueueName;
-    m_uiConnectionAttempts = uiConnectionAttempts;
-    m_uiConnectTimeoutMs = uiConnectTimeoutMs;
+    m_options.uiConnectionAttempts = uiConnectionAttempts;
+    m_options.uiConnectTimeoutMs = uiConnectTimeoutMs;
 }
 
 //arbitary URL version
@@ -158,14 +164,14 @@ CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMa
     m_VM = luaMain;
     m_iFunction = iFunction;
 
-    arguments->WriteToJSONString ( m_strData, true );
-    m_bPostBinary = false;
+    arguments->WriteToJSONString ( m_options.strPostData, true );
+    m_options.bPostBinary = false;
     m_bIsFetch = false;
 
     m_strURL = szURL;
     m_strQueueName = strQueueName;
-    m_uiConnectionAttempts = uiConnectionAttempts;
-    m_uiConnectTimeoutMs = uiConnectTimeoutMs;
+    m_options.uiConnectionAttempts = uiConnectionAttempts;
+    m_options.uiConnectTimeoutMs = uiConnectTimeoutMs;
 }
 
 //Fetch version
@@ -175,14 +181,26 @@ CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, c
     m_VM = luaMain;
     m_iFunction = iFunction;
 
-    m_strData = strPostData;
-    m_bPostBinary = bPostBinary;
+    m_options.strPostData = strPostData;
+    m_options.bPostBinary = bPostBinary;
     m_bIsFetch = true;
 
     m_strURL = szURL;
     m_strQueueName = strQueueName;
-    m_uiConnectionAttempts = uiConnectionAttempts;
-    m_uiConnectTimeoutMs = uiConnectTimeoutMs;
+    m_options.uiConnectionAttempts = uiConnectionAttempts;
+    m_options.uiConnectTimeoutMs = uiConnectTimeoutMs;
+}
+
+//Fetch version #2
+CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, const SHttpRequestOptions& options )
+    : m_FetchArguments ( *fetchArguments )
+{
+    m_VM = luaMain;
+    m_iFunction = iFunction;
+    m_bIsFetch = true;
+    m_strURL = szURL;
+    m_strQueueName = strQueueName;
+    m_options = options;
 }
 
 
@@ -192,9 +210,9 @@ CRemoteCall::~CRemoteCall ()
 
 void CRemoteCall::MakeCall()
 {
-    EDownloadModeType downloadMode = g_pGame->GetRemoteCalls()->GetDownloadModeForQueueName( m_strQueueName );
-    CNetHTTPDownloadManagerInterface * downloadManager = g_pNetServer->GetHTTPDownloadManager( downloadMode );
-    downloadManager->QueueFile ( m_strURL, NULL, m_strData.c_str (), m_strData.length (), m_bPostBinary, this, DownloadFinishedCallback, false, m_uiConnectionAttempts, m_uiConnectTimeoutMs );
+    EDownloadModeType downloadMode = g_pGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName);
+    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNetServer->GetHTTPDownloadManager(downloadMode);
+    pDownloadManager->QueueFile( m_strURL, NULL, this, DownloadFinishedCallback, false, m_options, false, false );
 }
 
 void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
@@ -204,20 +222,48 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
         return;
 
     CLuaArguments arguments;
-    if (result.bSuccess)
+    if (pCall->IsLegacy())
     {
-        if (pCall->IsFetch())
+        if (result.bSuccess)
         {
-            arguments.PushString(std::string(result.pData, result.dataSize));
-            arguments.PushNumber(0);
+            if (pCall->IsFetch())
+            {
+                arguments.PushString(std::string(result.pData, result.dataSize));
+                arguments.PushNumber(0);
+            }
+            else
+                arguments.ReadFromJSONString(result.pData);
         }
         else
-            arguments.ReadFromJSONString(result.pData);
+        {
+            arguments.PushString("ERROR");
+            arguments.PushNumber(result.iErrorCode);
+        }
+
     }
     else
     {
-        arguments.PushString("ERROR");
-        arguments.PushNumber(result.iErrorCode);
+        // Append response body
+        arguments.PushString(std::string(result.pData, result.dataSize));
+
+        // Append info table
+        CLuaArguments info;
+        info.PushString("success");
+        info.PushBoolean(result.iErrorCode >= 200 && result.iErrorCode <= 299);
+        info.PushString("statusCode");
+        info.PushNumber(result.iErrorCode);
+
+        // Headers as a subtable
+        CLuaArguments headers;
+        for (auto iter : result.headers )
+        {
+            headers.PushString(iter.first);
+            headers.PushString(iter.second);
+        }
+        info.PushString("headers");
+        info.PushTable(&headers);
+
+        arguments.PushTable(&info);
     }
 
     // Append stored arguments

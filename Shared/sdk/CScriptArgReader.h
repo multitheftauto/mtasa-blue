@@ -11,6 +11,7 @@
 *****************************************************************************/
 #pragma once
 #include <limits>
+#include "CStringMap.h"
 
 #ifdef MTA_CLIENT
     #include "CScriptDebugging.h"
@@ -952,11 +953,30 @@ public:
         m_iIndex++;
     }
 
+    //
+    // Read a table of CLuaArguments
+    //
+    void ReadLuaArgumentsTable(CLuaArguments& outLuaArguments)
+    {
+        int iArgument = lua_type(m_luaVM, m_iIndex);
+        if (iArgument == LUA_TTABLE)
+        {
+            for (lua_pushnil(m_luaVM); lua_next(m_luaVM, m_iIndex) != 0 ; lua_pop( m_luaVM, 1))
+            {
+                outLuaArguments.ReadArgument(m_luaVM, -1);
+            }
+            m_iIndex++;
+            return;
+        }
+
+        SetTypeError( "table" );
+        m_iIndex++;
+    }
 
     //
     // Read a table of strings
     //
-    void ReadStringTable ( std::vector < SString >& outList, bool bDefaultEmpty = false )
+    void ReadStringTable ( std::vector < SString >& outList )
     {
         outList.clear();
 
@@ -975,45 +995,22 @@ public:
             m_iIndex++;
             return;
         }
-        else
-        if ( bDefaultEmpty && ( iArgument == LUA_TNONE || iArgument == LUA_TNIL ) )
-        {
-            m_iIndex++;
-            return;
-        }
 
         SetTypeError ( "table" );
         m_iIndex++;
     }
 
-
     //
     // Reads a table as key-value string pair
     //
-    void ReadStringMap(std::unordered_map<SString, SString>& outMap, bool defaultEmpty = false)
+    void ReadStringMap(CStringMap& outMap)
     {
         outMap.clear();
 
         int argument = lua_type(m_luaVM, m_iIndex);
         if (argument == LUA_TTABLE)
         {
-            lua_pushnil(m_luaVM);
-            while (lua_next(m_luaVM, m_iIndex) != 0)
-            {
-                int keyType = lua_type(m_luaVM, -2);
-                int valueType = lua_type(m_luaVM, -1);
-
-                if (keyType == LUA_TSTRING && (valueType == LUA_TSTRING || valueType == LUA_TNUMBER))
-                {
-                    outMap.insert({ SStringX(lua_tostring(m_luaVM, -2)), SStringX(lua_tostring(m_luaVM, -1)) });
-                }
-                lua_pop(m_luaVM, 1);
-            }
-            ++m_iIndex;
-            return;
-        }
-        else if (defaultEmpty && (argument == LUA_TNONE || argument == LUA_TNIL))
-        {
+            InternalReadStringMap(outMap,m_iIndex);
             ++m_iIndex;
             return;
         }
@@ -1021,7 +1018,38 @@ public:
         SetTypeError("table");
         ++m_iIndex;
     }
-
+protected:
+    void InternalReadStringMap(CStringMap& outMap, int iIndex)
+    {
+        lua_pushnil(m_luaVM);
+        while (lua_next(m_luaVM, iIndex) != 0)
+        {
+            int keyType = lua_type(m_luaVM, -2);
+            int valueType = lua_type(m_luaVM, -1);
+            if (keyType == LUA_TSTRING )
+            {
+                SStringMapValue value;
+                if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
+                {
+                    value = (lua_tostring(m_luaVM, -1));
+                }
+                else
+                if (valueType == LUA_TBOOLEAN)
+                {
+                    value = (lua_toboolean(m_luaVM, -1) ? "1" : "0");
+                }
+                else
+                if (valueType == LUA_TTABLE)
+                {
+                    // Recurse
+                    InternalReadStringMap(value.subMap, lua_gettop(m_luaVM));
+                }
+                outMap.insert({ SStringX(lua_tostring(m_luaVM, -2)), value });
+            }
+            lua_pop(m_luaVM, 1);
+        }
+    }
+public:
 
     //
     // Read a function, but don't do it yet due to Lua stack issues
