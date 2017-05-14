@@ -697,6 +697,12 @@ int CLuaFunctionDefs::GetServerHttpPort ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaFunctionDefs::GetAdvancedMode(lua_State* luaVM)
+{
+    lua_pushboolean(luaVM, g_pGame->GetConfig()->IsAdvancedModeEnabled() == 1 ? true : false );
+    return 1;
+}
+
 
 int CLuaFunctionDefs::GetServerIP ( lua_State* luaVM )
 {
