@@ -22,8 +22,8 @@ struct SHttpRequestOptions
     SString strRequestMethod;
     std::map<SString,SString> requestHeaders;
     uint uiMaxRedirects = 8;
-    SString strAuthUsername;
-    SString strAuthPassword;
+    SString strUsername;
+    SString strPassword;
 };
 
 struct SHttpDownloadResult

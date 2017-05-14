@@ -1895,8 +1895,8 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
         optionsMap.ReadString("postData", httpRequestOptions.strPostData, "");
         optionsMap.ReadBool("postIsBinary", httpRequestOptions.bPostBinary, false);
         optionsMap.ReadNumber("maxRedirects", httpRequestOptions.uiMaxRedirects, 8);
-        optionsMap.ReadString("authUsername", httpRequestOptions.strAuthUsername, "");
-        optionsMap.ReadString("authPassword", httpRequestOptions.strAuthPassword, "");
+        optionsMap.ReadString("username", httpRequestOptions.strUsername, "");
+        optionsMap.ReadString("password", httpRequestOptions.strPassword, "");
 
         CStringMap headersMap;
         optionsMap.ReadStringMap("headers", headersMap);
