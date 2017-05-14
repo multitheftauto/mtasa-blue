@@ -19,8 +19,7 @@
 
 class CSettings;
 
-#ifndef __CSETTINGS_H
-#define __CSETTINGS_H
+#pragma once
 
 #include <core/CCoreInterface.h>
 #include "CMainMenu.h"
@@ -136,6 +135,7 @@ protected:
     // Keep these protected so we can access them in the event handlers of CClientGame
     CGUIElement*        m_pWindow;
     CGUITabPanel*       m_pTabs;
+    CGUITab*            m_pTabInterface;
     CGUITab*            m_pTabBrowser;
     CGUIButton*         m_pButtonOK;
     CGUIButton*         m_pButtonCancel;
@@ -290,6 +290,8 @@ protected:
     CGUILabel*          m_pChatBlueValue    [ Chat::ColorType::MAX ];
     CGUILabel*          m_pChatAlphaValue   [ Chat::ColorType::MAX ];
 
+    CGUIStaticImage*    m_pChatColorPreview [ Chat::ColorType::MAX ];
+
     CGUIScrollPane*     m_pPaneChatFont;
     CGUIRadioButton*    m_pRadioChatFont    [ Chat::Font::MAX ];
 
@@ -377,6 +379,9 @@ protected:
     void                ReloadBrowserLists      ( void );
 
 private:
+    void                CreateInterfaceTabGUI   ( void );
+    void                UpdateChatColorPreview  ( eChatColorType eType );
+
     void                ProcessKeyBinds         ( void );
     void                ProcessJoypad           ( void );
 
@@ -420,5 +425,3 @@ private:
     std::list < SKeyBindSection *> m_pKeyBindSections;
 
 };
-
-#endif
