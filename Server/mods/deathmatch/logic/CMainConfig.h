@@ -230,6 +230,7 @@ private:
     int                             m_bFilterDuplicateLogLinesEnabled;
     int                             m_bDatabaseCredentialsProtectionEnabled;
     int                             m_bFakeLagCommandEnabled;
+    bool                            m_bAdvancedMode;
 };
 
 #endif
