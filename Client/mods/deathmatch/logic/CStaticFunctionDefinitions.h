@@ -188,6 +188,7 @@ public:
     static bool                         SetPedFootBloodEnabled              ( CClientEntity& Entity, bool bHasFootBlood );
     static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedAimTarget                     ( CClientEntity& Entity, CVector & vecTarget );
+    static bool                         SetPedStat                          ( CClientEntity& Entity, ushort usStat, float fValue );
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
     static bool                         RemovePedFromVehicle                ( CClientPed* pPed );
     static bool                         WarpPedIntoVehicle                  ( CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat );

@@ -77,6 +77,7 @@ void CLuaPedDefs::LoadFunctions ( void ) {
     CLuaCFunctions::AddFunction ( "setPedFootBloodEnabled", SetPedFootBloodEnabled );
     CLuaCFunctions::AddFunction ( "setPedCameraRotation", SetPedCameraRotation );
     CLuaCFunctions::AddFunction ( "setPedAimTarget", SetPedAimTarget );
+    CLuaCFunctions::AddFunction ( "setPedStat", SetPedStat );
     CLuaCFunctions::AddFunction ( "warpPedIntoVehicle", WarpPedIntoVehicle );
     CLuaCFunctions::AddFunction ( "removePedFromVehicle", RemovePedFromVehicle );
     CLuaCFunctions::AddFunction ( "setPedOxygenLevel", SetPedOxygenLevel );
@@ -159,6 +160,7 @@ void CLuaPedDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setAimTarget", "setPedAimTarget" );
     lua_classfunction ( luaVM, "setLookAt", "setPedLookAt" );
     lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
+    lua_classfunction ( luaVM, "setStat", "setPedStat" );
     lua_classfunction ( luaVM, "giveWeapon", "givePedWeapon" );
 
     lua_classvariable ( luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle );
@@ -1802,6 +1804,38 @@ int CLuaPedDefs::SetPedAimTarget ( lua_State* luaVM )
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaPedDefs::SetPedStat ( lua_State* luaVM )
+{
+    // Verify the argument
+    CClientEntity* pEntity = NULL;
+    unsigned short usStat = 0;
+    float fValue = 0;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadNumber ( usStat );
+    argStream.ReadNumber ( fValue );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        // Check the stat and value
+        if ( usStat > NUM_PLAYER_STATS - 1 || fValue < 0.0f || fValue > 1000.0f )
+            argStream.SetCustomError ( "Stat must be 0 to 342 and value must be 0 to 1000." );
+        else if ( CStaticFunctionDefinitions::SetPedStat ( *pEntity, usStat, fValue ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+
+    if ( argStream.HasErrors ( ) )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+
+    // Failed
     lua_pushboolean ( luaVM, false );
     return 1;
 }
