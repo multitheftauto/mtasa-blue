@@ -2352,6 +2352,11 @@ bool CStaticFunctionDefinitions::SetPedStat ( CClientEntity & Entity, ushort usS
             return false;
 
         Ped.SetStat ( usStat, fValue );
+
+        // Rebuild model if the stat is visual
+        if (usStat == 21 || usStat == 23)
+            Ped.RebuildModel();
+
         return true;
     }
     return false;
