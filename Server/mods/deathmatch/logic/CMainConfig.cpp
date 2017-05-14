@@ -96,6 +96,7 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iBackupInterval = 3;
     m_iBackupAmount = 5;
     m_bSyncMapElementData = true;
+    m_bAdvancedMode = false;
 }
 
 
@@ -541,6 +542,13 @@ bool CMainConfig::Load ( void )
     {
         GetInteger ( m_pRootNode, "lightsync_rate", g_TickRateSettings.iLightSync );
         g_TickRateSettings.iLightSync = Clamp ( 200, g_TickRateSettings.iLightSync, 4000 );
+    }
+    // Advanced mode, unlock io, os and package and disable InitSecurity();
+    iTemp = m_bAdvancedMode;
+    iResult = GetInteger(m_pRootNode, "advanced_mode", iTemp, 0, 1);
+    if (iResult == IS_SUCCESS)
+    {
+        m_bAdvancedMode = iTemp ? true : false;
     }
 
     ApplyNetOptions ();
