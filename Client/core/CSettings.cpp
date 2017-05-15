@@ -2089,10 +2089,10 @@ void CSettings::CreateInterfaceTabGUI( void )
         {
             SString strHorizontal   = _("Horizontal:"),
                     strVertical     = _("Vertical:"),
-                    strInputAlign   = _("Input:"),
+                    strTextAlign    = _("Text-Align:"),
                     strXOffset      = _("X-Offset:"),
                     strYOffset      = _("Y-Offset:");
-            fIndentX = pManager->CGUI_GetMaxTextExtent ( "default-normal", strHorizontal, strVertical, strXOffset, strYOffset, strInputAlign ) + 10.0f;
+            fIndentX = pManager->CGUI_GetMaxTextExtent ( "default-normal", strHorizontal, strVertical, strXOffset, strYOffset, strTextAlign ) + 10.0f;
 
             pTabLayout->GetSize ( vecSize );
             fComboWidth = std::min ( 150.0f, vecSize.fX - fMarginX - fIndentX - 10.0f );
@@ -2131,18 +2131,18 @@ void CSettings::CreateInterfaceTabGUI( void )
             m_pChatVerticalCombo->SetReadOnly ( true );
             m_pChatVerticalCombo->SetSelectedItemByIndex( 0 );
 
-            /*pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strInputAlign ) );
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strTextAlign ) );
             pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
             pLabel->GetPosition ( vecTemp );
             pLabel->AutoSize ( );
 
-            auto pComboBox = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabLayout, "" ) );
-            pComboBox->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
-            pComboBox->SetSize ( CVector2D ( fComboWidth, 85.0f ) );
-            pComboBox->AddItem ( _("Left") )->SetData( (void *) Chat::Position::Horizontal::LEFT );
-            pComboBox->AddItem ( _("Right") )->SetData( (void *) Chat::Position::Horizontal::RIGHT );
-            pComboBox->SetReadOnly ( true );
-            pComboBox->SetSelectedItemByIndex( 0 );*/
+            m_pChatTextAlignCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabLayout, "" ) );
+            m_pChatTextAlignCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+            m_pChatTextAlignCombo->SetSize ( CVector2D ( fComboWidth, 85.0f ) );
+            m_pChatTextAlignCombo->AddItem ( _("Left") )->SetData( (void *) Chat::Text::Align::LEFT );
+            m_pChatTextAlignCombo->AddItem ( _("Right") )->SetData( (void *) Chat::Text::Align::RIGHT );
+            m_pChatTextAlignCombo->SetReadOnly ( true );
+            m_pChatTextAlignCombo->SetSelectedItemByIndex( 0 );
 
             pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strXOffset ) );
             pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
@@ -3023,12 +3023,17 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "chat_position_horizontal", iVar );
     if ( iVar > Chat::Position::Horizontal::RIGHT )
         iVar = Chat::Position::Horizontal::LEFT;
-    m_pChatHorizontalCombo->SetSelectedItemByIndex( iVar );
+    m_pChatHorizontalCombo->SetSelectedItemByIndex ( iVar );
 
     CVARS_GET ( "chat_position_vertical", iVar );
     if ( iVar > Chat::Position::Vertical::BOTTOM )
         iVar = Chat::Position::Vertical::TOP;
-    m_pChatVerticalCombo->SetSelectedItemByIndex( iVar );
+    m_pChatVerticalCombo->SetSelectedItemByIndex ( iVar );
+
+    CVARS_GET ( "chat_text_alignment", iVar );
+    if ( iVar > Chat::Text::Align::RIGHT )
+        iVar = Chat::Text::Align::LEFT;
+    m_pChatTextAlignCombo->SetSelectedItemByIndex ( iVar );
 
     CVARS_GET ( "chat_position_offset_x", strVar ); m_pChatOffsetX->SetText( strVar.c_str() );
     CVARS_GET ( "chat_position_offset_y", strVar ); m_pChatOffsetY->SetText( strVar.c_str() );
@@ -3350,6 +3355,11 @@ void CSettings::SaveData ( void )
     {
         int iSelected = ( int ) pSelected->GetData();
         CVARS_SET ( "chat_position_vertical", iSelected );
+    }
+    if ( CGUIListItem* pSelected = m_pChatTextAlignCombo->GetSelectedItem() )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "chat_text_alignment", iSelected );
     }
 
     // Interface
@@ -3768,7 +3778,7 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
                 pSubNode->GetTagContent ( iValue );
 
                 if ( iValue >= Chat::Position::Horizontal::LEFT && iValue <= Chat::Position::Horizontal::RIGHT ) {
-                    m_pChatHorizontalCombo->SetSelectedItemByIndex( iValue );
+                    m_pChatHorizontalCombo->SetSelectedItemByIndex ( iValue );
                 }
             }
             else if ( strTag == "position_vertical" )
@@ -3777,7 +3787,16 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
                 pSubNode->GetTagContent ( iValue );
 
                 if ( iValue >= Chat::Position::Vertical::TOP && iValue <= Chat::Position::Vertical::BOTTOM ) {
-                    m_pChatVerticalCombo->SetSelectedItemByIndex( iValue );
+                    m_pChatVerticalCombo->SetSelectedItemByIndex ( iValue );
+                }
+            }
+            else if ( strTag == "text_alignment" )
+            {
+                int iValue;
+                pSubNode->GetTagContent ( iValue );
+
+                if ( iValue >= Chat::Text::Align::LEFT && iValue <= Chat::Text::Align::RIGHT ) {
+                    m_pChatTextAlignCombo->SetSelectedItemByIndex ( iValue );
                 }
             }
             else if ( strTag == "offset_x" )

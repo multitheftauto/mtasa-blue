@@ -241,10 +241,11 @@ void CClientVariables::ValidateValues ( void )
     ClampValue ( "chat_width",              0.5f,                       4.f );
     ClampValue ( "chat_line_life",          1000,                       120000000 );
     ClampValue ( "chat_line_fade_out",      1000,                       30000000 );
-    ClampValue ( "chat_position_offset_x",  0.0f,                       1.0f );
-    ClampValue ( "chat_position_offset_y",  0.0f,                       1.0f );
+    ClampValue ( "chat_position_offset_x",  -1.0f,                       1.0f );
+    ClampValue ( "chat_position_offset_y",  -1.0f,                       1.0f );
     ClampValue ( "chat_position_horizontal",Chat::Position::Horizontal::LEFT, Chat::Position::Horizontal::RIGHT );
     ClampValue ( "chat_position_vertical",  Chat::Position::Vertical::TOP, Chat::Position::Vertical::BOTTOM );
+    ClampValue ( "chat_text_alignment",     Chat::Text::Align::LEFT,    Chat::Text::Align::RIGHT );
     ClampValue ( "text_scale",              0.8f,                       3.0f );
     ClampValue ( "mtavolume",               0.0f,                       1.0f );
     ClampValue ( "voicevolume",             0.0f,                       1.0f );
@@ -292,8 +293,9 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "chat_nickcompletion",        true );                         // chatbox nick completion
     DEFAULT ( "chat_position_offset_x",     0.0125f );                      // chatbox relative x position offset
     DEFAULT ( "chat_position_offset_y",     0.015f );                       // chatbox relative y position offset
-    DEFAULT ( "chat_position_horizontal",   Chat::Position::Horizontal::LEFT); // chatbox horizontal position
-    DEFAULT ( "chat_position_vertical",     Chat::Position::Vertical::TOP); // chatbox vertical position
+    DEFAULT ( "chat_position_horizontal",   Chat::Position::Horizontal::LEFT ); // chatbox horizontal position
+    DEFAULT ( "chat_position_vertical",     Chat::Position::Vertical::TOP ); // chatbox vertical position
+    DEFAULT ( "chat_text_alignment",        Chat::Text::Align::LEFT );      // chatbox horizontal text alignment
     DEFAULT ( "server_can_flash_window",    true );                         // allow server to flash the window
     DEFAULT ( "allow_tray_notifications",   true );                         // allow scripts to create tray balloon notifications
     DEFAULT ( "text_scale",                 1.0f );                         // text scale

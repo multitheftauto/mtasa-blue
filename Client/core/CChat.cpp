@@ -57,6 +57,11 @@ CChat::CChat ( CGUI* pManager, const CVector2D & vecPosition )
     m_pCacheTexture = NULL;
     m_iCacheTextureRevision = 0;
     m_iReportCount = 0;
+    m_fPositionOffsetX = 0.0125;
+    m_fPositionOffsetY = 0.0150;
+    m_ePositionHorizontal = Chat::Position::Horizontal::LEFT;
+    m_ePositionVertical = Chat::Position::Vertical::TOP;
+    m_eTextAlign = Chat::Text::Align::LEFT;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage ();
@@ -125,46 +130,11 @@ void CChat::LoadCVars ( void )
     CVARS_GET ( "chat_line_fade_out",           (unsigned int &)m_ulChatLineFadeOut );
     CVARS_GET ( "chat_font",                    (unsigned int &)Font ); SetChatFont ( (eChatFont)Font );
     CVARS_GET ( "chat_nickcompletion",          m_bNickCompletion );
-
-    CVector2D vecResolution = m_pManager->GetResolution();
-    float fLineDifference = CChat::GetFontHeight ( m_vecScale.fY );
-    float fRelativeWidth = (m_vecBackgroundSize.fX / vecResolution.fX), 
-          fRelativeHeight = ((m_vecBackgroundSize.fY + fLineDifference * 1.25f) / vecResolution.fY);
-
-    int iHorizontal, iVertical;
-    float fOffsetX, fOffsetY, fPosX, fPosY;
-    CVARS_GET ( "chat_position_offset_x", fOffsetX );
-    CVARS_GET ( "chat_position_offset_y", fOffsetY );
-    CVARS_GET ( "chat_position_horizontal", iHorizontal );
-    CVARS_GET ( "chat_position_vertical", iVertical );
-    switch ( iHorizontal )
-    {
-    case Chat::Position::Horizontal::RIGHT:
-        fPosX = 1.0 - fRelativeWidth + fOffsetX;
-        break;
-    case Chat::Position::Horizontal::CENTER:
-        fPosX = (1.0 - fRelativeWidth) / 2 + fOffsetX;
-        break;
-    case Chat::Position::Horizontal::LEFT:
-    default:
-        fPosX = fOffsetX;
-        break;
-    }
-    switch ( iVertical )
-    {
-    case Chat::Position::Vertical::BOTTOM:
-        fPosY = 1.0 - fRelativeHeight + fOffsetY;
-        break;
-    case Chat::Position::Vertical::CENTER:
-        fPosY = (1.0 - fRelativeHeight) / 2 + fOffsetY;
-        break;
-    case Chat::Position::Vertical::TOP:
-    default:
-        fPosY = fOffsetY;
-        break;
-    }
-    m_vecBackgroundPosition = CVector2D( fPosX, fPosY ) * vecResolution;
-    m_pBackground->SetPosition( m_vecBackgroundPosition );
+    CVARS_GET ( "chat_position_offset_x",       m_fPositionOffsetX );
+    CVARS_GET ( "chat_position_offset_y",       m_fPositionOffsetY );
+    CVARS_GET ( "chat_position_horizontal",     (unsigned int &)m_ePositionHorizontal );
+    CVARS_GET ( "chat_position_vertical",       (unsigned int &)m_ePositionVertical );
+    CVARS_GET ( "chat_text_alignment",          (unsigned int &)m_eTextAlign );
 
     // Modify default chat box to be like 'Transparent' preset
     SString strFlags;
@@ -317,8 +287,6 @@ void CChat::Draw ( bool bUseCacheTexture )
 //
 void CChat::DrawDrawList ( const SDrawList& drawList, const CVector2D& topLeftOffset )
 {
-    CGraphics::GetSingleton ().BeginDrawBatch ();
-
     CVector2D chatTopLeft ( drawList.renderBounds.fX1, drawList.renderBounds.fY1 );
     CVector2D chatBotRight ( drawList.renderBounds.fX2, drawList.renderBounds.fY2 );
     CVector2D chatSize = chatBotRight - chatTopLeft;
@@ -329,9 +297,10 @@ void CChat::DrawDrawList ( const SDrawList& drawList, const CVector2D& topLeftOf
     chatBounds.fX2 += topLeftOffset.fX;
     chatBounds.fY2 += topLeftOffset.fY;
 
-    for ( uint i = 0 ; i < drawList.lineItemList.size () ; i++ )
+    CGraphics::GetSingleton ().BeginDrawBatch ();
+
+    for ( const auto & item : drawList.lineItemList )
     {
-        const SDrawListLineItem& item = drawList.lineItemList[i];
         m_Lines [ item.uiLine ].Draw ( item.vecPosition - chatTopLeft + topLeftOffset, item.ucAlpha, drawList.bShadow, chatBounds );
     }
 
@@ -347,6 +316,7 @@ void CChat::GetDrawList ( SDrawList& outDrawList )
 {
     float fLineDifference = CChat::GetFontHeight ( m_vecScale.fY );
     CVector2D vecPosition ( m_vecBackgroundPosition.fX + ( 5.0f * m_vecScale.fX ), m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY - ( fLineDifference * 1.25f ) );
+    float fMaxLineWidth = m_vecBackgroundSize.fX - ( 10.0f * m_vecScale.fX );
     unsigned long ulTime = GetTickCount32 ();
     float fRcpChatLineFadeOut = 1.0f / m_ulChatLineFadeOut;
     bool bShadow = ( m_Color.A * m_fBackgroundAlpha == 0.f );
@@ -400,9 +370,15 @@ void CChat::GetDrawList ( SDrawList& outDrawList )
 
         if ( fLineAlpha > 0.f )
         {
+            CVector2D vecOffset;
+
+            if ( m_eTextAlign == Chat::Text::Align::RIGHT ) {
+                vecOffset.fX = fMaxLineWidth - m_Lines[ uiLine ].GetWidth();
+            }
+
             SDrawListLineItem item;
             item.uiLine = uiLine;
-            item.vecPosition = vecPosition;
+            item.vecPosition = vecPosition + vecOffset;
             item.ucAlpha = static_cast < unsigned char >( fLineAlpha * 255.0f );
             outDrawList.lineItemList.push_back( item );
         }
@@ -570,8 +546,10 @@ void CChat::ClearInput ( void )
     m_strInputText.clear ();
     m_InputLine.Clear ();
     m_vecInputSize = CalcInputSize ();
-    if ( m_pInput )
+    if ( m_pInput ) {
         m_pInput->SetSize ( m_vecInputSize );
+        UpdatePosition();
+    }
 }
 
 void CChat::ScrollUp ()
@@ -774,7 +752,7 @@ void CChat::SetInputVisible ( bool bVisible )
     if ( !IsVisible () )
         bVisible = false;
 
-    if ( bVisible )
+    if ( !bVisible )
     {
         ClearInput ();
     }
@@ -854,11 +832,6 @@ void CChat::UpdateGUI ( void )
     m_vecBackgroundPosition.fY = Round ( m_vecBackgroundPosition.fY );
     m_pBackground->SetSize ( m_vecBackgroundSize );
 
-    m_vecInputPosition = CVector2D (
-        m_vecBackgroundPosition.fX,
-        m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY
-    );
-
     // Make sure there is enough room for all the lines
     uint uiMaxNumLines = g_pCore->GetGraphics ()->GetViewportHeight () / std::max ( 1.f, CChat::GetFontHeight ( m_vecScale.fY ) ) - 3;
     if ( m_uiNumLines > uiMaxNumLines )
@@ -867,8 +840,59 @@ void CChat::UpdateGUI ( void )
     m_vecInputSize = CalcInputSize ();
     if ( m_pInput )
     {
-        m_pInput->SetPosition ( m_vecInputPosition );
         m_pInput->SetSize ( m_vecInputSize );
+    }
+
+    UpdatePosition();
+}
+
+
+void CChat::UpdatePosition ( void )
+{
+    CVector2D vecResolution = m_pManager->GetResolution();
+
+    float fRelativeWidth = ( m_vecBackgroundSize.fX / vecResolution.fX ), 
+          fRelativeHeight = ( ( m_vecBackgroundSize.fY + m_vecInputSize.fY ) / vecResolution.fY ),
+          fPosX, fPosY;
+ 
+    switch ( m_ePositionHorizontal )
+    {
+    case Chat::Position::Horizontal::RIGHT:
+        fPosX = 1.0 - fRelativeWidth + m_fPositionOffsetX;
+        break;
+    case Chat::Position::Horizontal::CENTER:
+        fPosX = (1.0 - fRelativeWidth) / 2 + m_fPositionOffsetX;
+        break;
+    case Chat::Position::Horizontal::LEFT:
+    default:
+        fPosX = m_fPositionOffsetX;
+        break;
+    }
+
+    switch ( m_ePositionVertical )
+    {
+    case Chat::Position::Vertical::BOTTOM:
+        fPosY = 1.0 - fRelativeHeight + m_fPositionOffsetY;
+        break;
+    case Chat::Position::Vertical::CENTER:
+        fPosY = (1.0 - fRelativeHeight) / 2 + m_fPositionOffsetY;
+        break;
+    case Chat::Position::Vertical::TOP:
+    default:
+        fPosY = m_fPositionOffsetY;
+        break;
+    }
+
+    m_vecBackgroundPosition = CVector2D ( fPosX, fPosY ) * vecResolution;
+    m_vecInputPosition = CVector2D (
+        m_vecBackgroundPosition.fX,
+        m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY
+    );
+
+    m_pBackground->SetPosition ( m_vecBackgroundPosition );
+
+    if ( m_pInput ) {
+        m_pInput->SetPosition ( m_vecInputPosition );
     }
 }
 
@@ -936,8 +960,10 @@ void CChat::SetInputText ( const char* szText )
         m_strInputText.resize ( szRemainingText - szText );
 
     m_vecInputSize = CalcInputSize ();
-    if ( m_pInput )
+    if ( m_pInput ) {
         m_pInput->SetSize ( m_vecInputSize );
+        UpdatePosition();
+    }
 }
 
 
@@ -1080,7 +1106,7 @@ const char* CChatLine::Format ( const char* szStringAnsi, float fWidth, CColor& 
         {
             float fSectionWidth = CChat::GetTextExtent ( UTF16ToMbUTF8 ( strSectionStart.substr ( 0 , uiSeekPos ) ).c_str (), g_pChat->m_vecScale.fX );
 
-            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || fPrevSectionsWidth + fSectionWidth > fWidth )
+            if ( *szSectionEnd == '\0' || *szSectionEnd == '\n' || std::ceil(fPrevSectionsWidth + fSectionWidth) > fWidth )
             {
                 bLastSection = true;
                 break;
@@ -1237,7 +1263,7 @@ float CChatLineSection::GetWidth ()
 {
     if ( m_fCachedWidth < 0.0f || m_strText.size () != m_uiCachedLength )
     {
-        m_fCachedWidth = CChat::GetTextExtent ( m_strText.c_str (), g_pChat->m_vecScale.fX ) / std::max ( 0.01f, g_pChat->m_vecScale.fX );
+        m_fCachedWidth = std::ceil ( CChat::GetTextExtent ( m_strText.c_str (), g_pChat->m_vecScale.fX ) / std::max ( 0.01f, g_pChat->m_vecScale.fX ) );
         m_uiCachedLength = m_strText.size ();
     }
     return m_fCachedWidth * g_pChat->m_vecScale.fX;

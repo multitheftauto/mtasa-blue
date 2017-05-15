@@ -231,6 +231,7 @@ private:
 
 protected:
     void                        UpdateGUI               ( void );
+    void                        UpdatePosition          ( void );
     void                        UpdateSmoothScroll      ( float* pfPixelScroll, int *piLineScroll );
     void                        DrawDrawList            ( const SDrawList& drawList, const CVector2D& topLeftOffset = CVector2D ( 0, 0 ) );
     void                        GetDrawList             ( SDrawList& outDrawList );
@@ -247,6 +248,12 @@ protected:
     CChatInputLine              m_InputLine;
     SString                     m_strLastPlayerNamePart;
     SString                     m_strLastPlayerName;
+
+    float                       m_fPositionOffsetX;
+    float                       m_fPositionOffsetY;
+    eChatPositionHorizontal     m_ePositionHorizontal;
+    eChatPositionVertical       m_ePositionVertical;
+    eChatTextAlign              m_eTextAlign;
 
     CGUI*                       m_pManager;
     CGUIFont*                   m_pFont;

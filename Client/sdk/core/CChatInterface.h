@@ -33,7 +33,7 @@ namespace Chat {
 
     namespace Position {
         namespace Horizontal {
-            enum : int {
+            enum eHorizontal: int {
                 LEFT = 0,
                 CENTER = 1,
                 RIGHT = 2
@@ -41,14 +41,26 @@ namespace Chat {
         }
 
         namespace Vertical {
-            enum : int {
+            enum eVertical: int {
                 TOP = 0,
                 CENTER = 1,
                 BOTTOM = 2
             };
         }
     }
+
+    namespace Text {
+        namespace Align {
+            enum eAlign: int {
+                LEFT = 0,
+                RIGHT = 1
+            };
+        }
+    }
 }
 
-typedef Chat::Font::eFont eChatFont;
-typedef Chat::ColorType::eType eChatColorType;
+typedef Chat::Font::eFont                       eChatFont;
+typedef Chat::ColorType::eType                  eChatColorType;
+typedef Chat::Text::Align::eAlign               eChatTextAlign;
+typedef Chat::Position::Horizontal::eHorizontal eChatPositionHorizontal;
+typedef Chat::Position::Vertical::eVertical     eChatPositionVertical;

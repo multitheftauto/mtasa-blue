@@ -297,6 +297,7 @@ protected:
 
     CGUIComboBox*       m_pChatHorizontalCombo;
     CGUIComboBox*       m_pChatVerticalCombo;
+    CGUIComboBox*       m_pChatTextAlignCombo;
     CGUIEdit*           m_pChatOffsetX;
     CGUIEdit*           m_pChatOffsetY;
 
