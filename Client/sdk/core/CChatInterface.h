@@ -10,9 +10,12 @@
 
 #pragma once
 
-namespace Chat {
-    namespace ColorType {
-        enum eType {
+namespace Chat
+{
+    namespace ColorType
+    {
+        enum eType
+        {
             BG = 0,
             TEXT,
             INPUT_BG,
@@ -21,8 +24,10 @@ namespace Chat {
         };
     }
 
-    namespace Font {
-        enum eFont {
+    namespace Font
+    {
+        enum eFont
+        {
             DEFAULT,
             CLEAR,
             BOLD,
@@ -31,17 +36,22 @@ namespace Chat {
         };
     }
 
-    namespace Position {
-        namespace Horizontal {
-            enum eHorizontal: int {
+    namespace Position
+    {
+        namespace Horizontal
+        {
+            enum eHorizontal: int
+            {
                 LEFT = 0,
                 CENTER = 1,
                 RIGHT = 2
             };
         }
 
-        namespace Vertical {
-            enum eVertical: int {
+        namespace Vertical
+        {
+            enum eVertical: int
+            {
                 TOP = 0,
                 CENTER = 1,
                 BOTTOM = 2
@@ -49,9 +59,12 @@ namespace Chat {
         }
     }
 
-    namespace Text {
-        namespace Align {
-            enum eAlign: int {
+    namespace Text
+    {
+        namespace Align
+        {
+            enum eAlign: int
+            {
                 LEFT = 0,
                 RIGHT = 1
             };

@@ -57,8 +57,8 @@ CChat::CChat ( CGUI* pManager, const CVector2D & vecPosition )
     m_pCacheTexture = NULL;
     m_iCacheTextureRevision = 0;
     m_iReportCount = 0;
-    m_fPositionOffsetX = 0.0125;
-    m_fPositionOffsetY = 0.0150;
+    m_fPositionOffsetX = 0.0125f;
+    m_fPositionOffsetY = 0.0150f;
     m_ePositionHorizontal = Chat::Position::Horizontal::LEFT;
     m_ePositionVertical = Chat::Position::Vertical::TOP;
     m_eTextAlign = Chat::Text::Align::LEFT;
@@ -192,7 +192,8 @@ void CChat::Draw ( bool bUseCacheTexture )
         return;
 
     // Is it time to update all the chat related cvars?
-    if( m_iCVarsRevision != CClientVariables::GetSingleton ().GetRevision () ) {
+    if( m_iCVarsRevision != CClientVariables::GetSingleton ().GetRevision () )
+    {
         m_iCVarsRevision = CClientVariables::GetSingleton ().GetRevision ();
         LoadCVars ();
         UpdateGUI ();
@@ -222,6 +223,7 @@ void CChat::Draw ( bool bUseCacheTexture )
     {
         SAFE_RELEASE( m_pCacheTexture );
     }
+
     // Create rendertarget if required
     if ( !m_pCacheTexture && ( CTickCount::Now () - m_lastRenderTargetCreationFail ).ToLongLong () > 60000 )
     {
@@ -372,7 +374,8 @@ void CChat::GetDrawList ( SDrawList& outDrawList )
         {
             CVector2D vecOffset;
 
-            if ( m_eTextAlign == Chat::Text::Align::RIGHT ) {
+            if ( m_eTextAlign == Chat::Text::Align::RIGHT )
+            {
                 vecOffset.fX = fMaxLineWidth - m_Lines[ uiLine ].GetWidth();
             }
 
@@ -546,7 +549,9 @@ void CChat::ClearInput ( void )
     m_strInputText.clear ();
     m_InputLine.Clear ();
     m_vecInputSize = CalcInputSize ();
-    if ( m_pInput ) {
+
+    if ( m_pInput )
+    {
         m_pInput->SetSize ( m_vecInputSize );
         UpdatePosition();
     }
@@ -648,7 +653,8 @@ bool CChat::CharacterKeyHandler ( CGUIKeyEventArgs KeyboardArgs )
                             // Check if there is another player after our last result
                             if ( m_strLastPlayerName.size () != 0 )
                             {
-                                if ( strPlayerName.CompareI ( m_strLastPlayerName ) ) {
+                                if ( strPlayerName.CompareI ( m_strLastPlayerName ) )
+                                {
                                     m_strLastPlayerName.clear ();
                                     if ( *iter == vPlayerNames.back () )
                                     {
@@ -891,7 +897,8 @@ void CChat::UpdatePosition ( void )
 
     m_pBackground->SetPosition ( m_vecBackgroundPosition );
 
-    if ( m_pInput ) {
+    if ( m_pInput )
+    {
         m_pInput->SetPosition ( m_vecInputPosition );
     }
 }
@@ -960,7 +967,9 @@ void CChat::SetInputText ( const char* szText )
         m_strInputText.resize ( szRemainingText - szText );
 
     m_vecInputSize = CalcInputSize ();
-    if ( m_pInput ) {
+
+    if ( m_pInput )
+    {
         m_pInput->SetSize ( m_vecInputSize );
         UpdatePosition();
     }
@@ -996,7 +1005,9 @@ float CChat::GetFontHeight ( float fScale )
     {
         return g_pChat->m_pFont->GetFontHeight ( fScale );
     }
+
     fScale *= g_pChat->m_fRcpUsingDxFontScale;
+
     return g_pCore->GetGraphics ()->GetDXFontHeight ( fScale, g_pChat->m_pDXFont );
 }
 
@@ -1010,7 +1021,9 @@ float CChat::GetTextExtent ( const char * szText, float fScale )
     {
         return g_pChat->m_pFont->GetTextExtent ( szText, fScale );
     }
+
     fScale *= g_pChat->m_fRcpUsingDxFontScale;
+
     return g_pCore->GetGraphics ()->GetDXTextExtent ( szText, fScale, g_pChat->m_pDXFont );
 }
 
@@ -1036,8 +1049,7 @@ void CChat::DrawTextString ( const char * szText, CRect2D DrawArea, float fZ, CR
             if ( DrawArea.fY1 + fLineHeight - RenderBounds.fY1 > 1 )
                g_pCore->GetGraphics ()->DrawText ( ( int ) DrawArea.fX1, ( int ) RenderBounds.fY1, ( int ) DrawArea.fX2, ( int ) DrawArea.fY1 + fLineHeight, ulColor, szText, fScaleX, fScaleY, DT_LEFT | DT_BOTTOM | DT_SINGLELINE , g_pChat->m_pDXFont );
         }
-        else
-        if ( DrawArea.fY1 + fLineHeight > RenderBounds.fY2 )
+        else if ( DrawArea.fY1 + fLineHeight > RenderBounds.fY2 )
         {
             // Clip text at the bottom
             if ( RenderBounds.fY2 - DrawArea.fY1 > 1 )

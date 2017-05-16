@@ -1350,10 +1350,12 @@ void CSettings::ShowDisconnectQuestion ( void )
 
 bool CSettings::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 {
-    if ( Args.pWindow == m_pBindsList ) {
+    if ( Args.pWindow == m_pBindsList )
+    {
         OnBindsListClick ( m_pBindsList );
         return true;
     }
+
     return false;
 }
 
@@ -1361,7 +1363,8 @@ bool CSettings::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 void CSettings::Update ( void )
 {
     // Once each 30 frames
-    if ( m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL ) {
+    if ( m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL )
+    {
 
         UpdateJoypadTab ();
 
@@ -1717,7 +1720,6 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
 {
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
 
-
     //gameSettings->SetMipMappingEnabled (); // Doesn't appear to even be enabled
     gameSettings->SetFieldOfView( 70 );
     gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
@@ -1854,7 +1856,8 @@ bool CSettings::OnBindsDefaultClick ( CGUIElement* pElement )
 
 void CSettings::CreateInterfaceTabGUI( void )
 {
-    if ( !m_pTabInterface ) {
+    if ( !m_pTabInterface )
+    {
         return;
     }
 
@@ -1899,7 +1902,8 @@ void CSettings::CreateInterfaceTabGUI( void )
         std::map<SString, SString> availableLanguagesMap = g_pCore->GetLocalization()->GetAvailableLanguages();
         availableLanguagesMap["English"] = "en_US";
 
-        for (const auto& language : availableLanguagesMap ) {
+        for (const auto& language : availableLanguagesMap )
+        {
             m_pInterfaceLanguageSelector->AddItem( language.first )->SetData( language.second );
         }
 
@@ -2184,14 +2188,16 @@ void CSettings::CreateInterfaceTabGUI( void )
             vecTemp.fY += 30.0f - ( fLineSizeY + fLineGapY );
             fIndentX = 0;
 
-            std::map < Chat::Font::eFont, const char * > FontMap = {
+            std::map < Chat::Font::eFont, const char * > FontMap =
+            {
                 { Chat::Font::DEFAULT,  "Tahoma" },
                 { Chat::Font::CLEAR,    "Verdana" },
                 { Chat::Font::BOLD,     "Tahoma Bold" },
                 { Chat::Font::ARIAL,    "Arial" }
             };
 
-            for ( const auto & Font : FontMap ) {
+            for ( const auto & Font : FontMap )
+            {
                 float textExtent = pManager->GetTextExtent( Font.second ) + 20.0f;
                 fIndentX = std::max ( fIndentX, textExtent );
 
@@ -2241,7 +2247,8 @@ void CSettings::CreateInterfaceTabGUI( void )
 
 void CSettings::UpdateChatColorPreview( eChatColorType eType )
 {
-    if ( !m_pChatColorPreview[eType] ) {
+    if ( !m_pChatColorPreview[eType] )
+    {
         return;
     }
    
@@ -2371,7 +2378,8 @@ void CSettings::ProcessKeyBinds ( void )
                 if ( pPriKey )
                 {
                     // If the primary key is different than the original one
-                    if ( pPriKey != pBind->boundKey ) {
+                    if ( pPriKey != pBind->boundKey )
+                    {
                         // Did we have any keys with the same "up" state?
                         CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind( pBind );
                         if ( pUpBind )
@@ -2475,12 +2483,15 @@ bool CSettings::OnBindsListClick ( CGUIElement* pElement )
             m_bCaptureKey = true;
 
             // Determine if the primary or secondary column was selected
-            if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ ) {
+            if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ )
+            {
                 // Create a messagebox to notify the user
                 //SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
                 SString strText = _("Press a key to bind, or escape to clear");
                 CCore::GetSingleton ().ShowMessageBox ( _("Binding a primary key"), strText, MB_ICON_QUESTION );
-            } else {
+            }
+            else
+            {
                 // Create a messagebox to notify the user
                 //sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
                 SString strText = _("Press a key to bind, or escape to clear");
@@ -2547,6 +2558,7 @@ bool CSettings::ProcessMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
         m_bCaptureKey = false;
         return true;
     }
+
     return false;
 }
 
@@ -3575,11 +3587,13 @@ void CSettings::CreateChatColorTab ( eChatColorType eType, const char* szName, C
         pPreviewImage->SetPosition ( CVector2D ( 10.0f, 10.0f ) );
         pPreviewImage->SetSize ( CVector2D ( fSize - 20.0f, fSize - 20.0f ) );
         
-        if ( pPreviewImage->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\radarset\\01.png" ) ) ) {
+        if ( pPreviewImage->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\radarset\\01.png" ) ) )
+        {
             m_pChatColorPreview[eType] = pPreviewImage;
             UpdateChatColorPreview(eType);
         }
-        else {
+        else
+        {
             m_pChatColorPreview[eType] = nullptr;
             delete pPreviewButton;
             pPreviewImage = nullptr;
@@ -3774,7 +3788,8 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
                 int iValue;
                 pSubNode->GetTagContent ( iValue );
 
-                if ( iValue >= Chat::Position::Horizontal::LEFT && iValue <= Chat::Position::Horizontal::RIGHT ) {
+                if ( iValue >= Chat::Position::Horizontal::LEFT && iValue <= Chat::Position::Horizontal::RIGHT )
+                {
                     m_pChatHorizontalCombo->SetSelectedItemByIndex ( iValue );
                 }
             }
@@ -3783,7 +3798,8 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
                 int iValue;
                 pSubNode->GetTagContent ( iValue );
 
-                if ( iValue >= Chat::Position::Vertical::TOP && iValue <= Chat::Position::Vertical::BOTTOM ) {
+                if ( iValue >= Chat::Position::Vertical::TOP && iValue <= Chat::Position::Vertical::BOTTOM )
+                {
                     m_pChatVerticalCombo->SetSelectedItemByIndex ( iValue );
                 }
             }
@@ -3792,7 +3808,8 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
                 int iValue;
                 pSubNode->GetTagContent ( iValue );
 
-                if ( iValue >= Chat::Text::Align::LEFT && iValue <= Chat::Text::Align::RIGHT ) {
+                if ( iValue >= Chat::Text::Align::LEFT && iValue <= Chat::Text::Align::RIGHT )
+                {
                     m_pChatTextAlignCombo->SetSelectedItemByIndex ( iValue );
                 }
             }
@@ -4006,8 +4023,10 @@ bool CSettings::OnChatRedChanged ( CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar *>(pElement);
     int iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType ) {
-        if ( pScrollBar == m_pChatRed[eType] ) {
+    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType )
+    {
+        if ( pScrollBar == m_pChatRed[eType] )
+        {
             m_pChatRedValue[eType]->SetText(SString("%i", iValue).c_str());
             UpdateChatColorPreview(static_cast<eChatColorType>(eType));
             return true;
@@ -4022,8 +4041,10 @@ bool CSettings::OnChatGreenChanged ( CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar *>(pElement);
     int iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType ) {
-        if ( pScrollBar == m_pChatGreen[eType] ) {
+    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType )
+    {
+        if ( pScrollBar == m_pChatGreen[eType] )
+        {
             m_pChatGreenValue[eType]->SetText(SString("%i", iValue).c_str());
             UpdateChatColorPreview(static_cast<eChatColorType>(eType));
             return true;
@@ -4038,8 +4059,10 @@ bool CSettings::OnChatBlueChanged ( CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar *>(pElement);
     int iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType ) {
-        if ( pScrollBar == m_pChatBlue[eType] ) {
+    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType )
+    {
+        if ( pScrollBar == m_pChatBlue[eType] )
+        {
             m_pChatBlueValue[eType]->SetText(SString("%i", iValue).c_str());
             UpdateChatColorPreview(static_cast<eChatColorType>(eType));
             return true;
@@ -4054,8 +4077,10 @@ bool CSettings::OnChatAlphaChanged ( CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar *>(pElement);
     int iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType ) {
-        if ( pScrollBar == m_pChatAlpha[eType] ) {
+    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType )
+    {
+        if ( pScrollBar == m_pChatAlpha[eType] )
+        {
             m_pChatAlphaValue[eType]->SetText(SString("%i", iValue).c_str());
             UpdateChatColorPreview(static_cast<eChatColorType>(eType));
             return true;
