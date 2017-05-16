@@ -2209,9 +2209,6 @@ void CSettings::CreateInterfaceTabGUI( void )
 
         // Options
         {
-            float fFontNamesMarginY = 100.0f;
-            float fLineHeight = 20.0f;
-
             pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabOptions, _("Options") ) );
             pLabel->SetPosition ( CVector2D ( fMarginX, 10.0f ) );
             pLabel->GetPosition ( vecTemp );
