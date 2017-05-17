@@ -22,7 +22,7 @@ bool CChatEchoPacket::Write ( NetBitStreamInterface& BitStream ) const
 
     // Write the client's ID
     if ( BitStream.Version() >= 0x06B ) {
-        BitStream.Write ( GetSourceElement() ? GetSourceElement()->GetID() : NULL );
+        BitStream.Write ( GetSourceElement() ? GetSourceElement()->GetID() : INVALID_ELEMENT_ID );
     }
 
     // Too short?
