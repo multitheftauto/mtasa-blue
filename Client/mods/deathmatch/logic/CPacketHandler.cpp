@@ -1311,11 +1311,8 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
                 StripControlCodes ( szMessage, ' ' );
 
                 // Determine the event source entity
-                CClientEntity * pEntity = g_pClientGame->GetRootEntity();
-
-                if ( pClient ) {
-                    pEntity = pClient;
-                }
+                CClientEntity * pRootEntity = g_pClientGame->GetRootEntity();
+                CClientEntity * pEntity = pClient ? pClient : pRootEntity;
 
                 // Call an event
                 CLuaArguments Arguments;
@@ -1323,7 +1320,7 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
                 Arguments.PushNumber ( ucRed );
                 Arguments.PushNumber ( ucGreen );
                 Arguments.PushNumber ( ucBlue );
-                bool bCancelled = !pEntity->CallEvent ( "onClientChatMessage", Arguments, false );
+                bool bCancelled = !pEntity->CallEvent ( "onClientChatMessage", Arguments, pEntity != pRootEntity );
                 if ( !bCancelled )
                 {
                     // Echo it
