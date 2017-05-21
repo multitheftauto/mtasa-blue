@@ -1476,6 +1476,7 @@ void CGame::AddBuiltInEvents ( void )
 
     // Player events
     m_Events.AddEvent ( "onPlayerConnect", "player", NULL, false );
+    m_Events.AddEvent ( "onPlayerTryConnect", "player", NULL, false );
     m_Events.AddEvent ( "onPlayerChat", "text", NULL, false );
     m_Events.AddEvent ( "onPlayerDamage", "attacker, weapon, bodypart, loss", NULL, false );
     m_Events.AddEvent ( "onPlayerVehicleEnter", "vehicle, seat, jacked", NULL, false );
@@ -1604,6 +1605,15 @@ void CGame::Packet_PlayerJoin ( const NetServerPlayerID& Source )
     }
 }
 
+void onPlayerTryConnect(const char* type, const char* nick, const char* ip, const char* serial, const char* version) {
+    CLuaArguments Arguments;
+    Arguments.PushString(type);
+    Arguments.PushString(nick);
+    Arguments.PushString(ip);
+    Arguments.PushString(serial);
+    Arguments.PushString(version);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onPlayerTryConnect", Arguments);
+}
 
 void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 {
@@ -1660,6 +1670,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
             if ( !CheckNickProvided ( szNick ) ) // check the nick is valid
             {
                 // Tell the console
+                onPlayerTryConnect("invalid_nickname", szNick, strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
                 CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid nickname) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                 // Tell the player the problem
@@ -1713,6 +1724,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                 if ( IsBelowMinimumClient ( pPlayer->GetPlayerVersion () ) )
                                 {
                                     // Tell the console
+									onPlayerTryConnect("client_version_is_below_minimum", szNick, strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                     // Tell the player
@@ -1760,6 +1772,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                         strBanMessage += " (" + strDurationDesc + ")";
 
                                     // Tell the console
+                                    onPlayerTryConnect("ip_is_banned", szNick, strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (IP is banned%s) (%s)\n", szNick, strBanMessage.c_str (), strIPAndSerial.c_str () );
 
                                     // Tell the player he's banned
@@ -1771,6 +1784,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                                      m_pBanManager->IsAccountBanned ( pPlayer->GetSerialUser ().c_str () ) )
                                 {
                                     // Tell the console
+                                    onPlayerTryConnect("account_is_banned", szNick, strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
                                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Account is banned) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                     CBan* pBan = m_pBanManager->GetBanFromAccount( pPlayer->GetSerialUser ().c_str () );
@@ -1808,6 +1822,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                             else
                             {
                                 // Tell the console
+                                onPlayerTryConnect("join_flood", szNick, strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
                                 CLogger::LogPrintf ( "CONNECT: %s failed to connect (Join flood) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                                 // Tell the player the problem
@@ -1817,6 +1832,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                         else
                         {
                             // Tell the console
+                            onPlayerTryConnect("wrong_password", szNick, strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
                             CLogger::LogPrintf ( "CONNECT: %s failed to connect (Wrong password) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                             // Tell the player the password was wrong
@@ -1826,6 +1842,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                     else
                     {
                         // Tell the console
+                        onPlayerTryConnect("bad_version", szNick, strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
                         CLogger::LogPrintf ( "CONNECT: %s failed to connect (Bad version) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                         // Tell the player the problem
@@ -1867,6 +1884,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 else
                 {
                     // Tell the console
+                    onPlayerTryConnect("nick_already_in_use", szNick, strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
                     CLogger::LogPrintf ( "CONNECT: %s failed to connect (Nick already in use) (%s)\n", szNick, strIPAndSerial.c_str () );
 
                     // Tell the player the problem
@@ -1876,6 +1894,7 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
             else
             {
                 // Tell the console
+                onPlayerTryConnect("invalid_nickname", szNick, strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
                 CLogger::LogPrintf ( "CONNECT: %s failed to connect (Invalid nickname)\n", pPlayer->GetSourceIP () );
 
                 // Tell the player the problem
