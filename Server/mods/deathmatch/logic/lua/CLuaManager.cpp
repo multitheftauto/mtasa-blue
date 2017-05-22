@@ -253,7 +253,8 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Util funcs
     CLuaCFunctions::AddFunction ( "gettok", CLuaFunctionDefs::GetTok );
-
+    CLuaCFunctions::AddFunction ( "scanDir", CLuaFunctionDefs::ScanDir );
+    
     // Loaded map funcs
     CLuaCFunctions::AddFunction ( "getRootElement", CLuaFunctionDefs::GetRootElement );
     CLuaCFunctions::AddFunction ( "loadMapData", CLuaFunctionDefs::LoadMapData );
