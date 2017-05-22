@@ -166,7 +166,7 @@ public:
 
     LUA_DECLARE(SetDevelopmentMode);
     LUA_DECLARE(GetDevelopmentMode);
-
+    LUA_DECLARE(ScanDir);
 private:
     // Static references to objects
     static CBlipManager*                                m_pBlipManager;
