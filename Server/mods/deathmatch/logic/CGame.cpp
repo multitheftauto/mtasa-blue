@@ -1604,6 +1604,7 @@ void CGame::Packet_PlayerJoin ( const NetServerPlayerID& Source )
     }
 }
 
+
 void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
 {
     // Grab the nick
