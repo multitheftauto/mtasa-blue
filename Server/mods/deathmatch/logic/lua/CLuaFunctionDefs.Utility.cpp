@@ -82,3 +82,66 @@ int CLuaFunctionDefs::GetTok ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::ScanDir(lua_State* luaVM)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+    {
+        lua_pushboolean(luaVM, false);
+        lua_pushboolean(luaVM, false);
+        return 2;
+    }
+    CResource* pThisResource = pLuaMain->GetResource();
+    if (!pThisResource)
+    {
+        lua_pushboolean(luaVM, false);
+        lua_pushboolean(luaVM, false);
+        return 2;
+    }
+    SString strInputPath;
+    SString strAbsPath;
+    SString strMetaPath;
+    CResource* pResource = pThisResource;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strInputPath);
+    if (CResourceManager::ParseResourcePathInput(strInputPath, pResource, &strAbsPath, &strMetaPath))
+    {
+        CheckCanModifyOtherResource(argStream, pThisResource, pResource);
+        CheckCanAccessOtherResourceFile(argStream, pThisResource, pResource, strAbsPath);
+        if (!argStream.HasErrors())
+        {
+            std::vector < SString > itemList;
+            itemList = FindFiles(strAbsPath, false, true);
+
+            // table for dirs
+            lua_newtable(luaVM);
+
+            // Check each item
+            for (uint i = 0; i < itemList.size(); i++)
+            {
+                SString strName = itemList[i];
+                lua_pushnumber(luaVM, i + 1);
+                lua_pushstring(luaVM, strName.c_str());
+                lua_settable(luaVM, -3);
+            }
+            itemList = FindFiles(strAbsPath, true, false);
+
+            // table for files
+            lua_newtable(luaVM);
+
+            // Check each item
+            for (uint i = 0; i < itemList.size(); i++)
+            {
+                SString strName = itemList[i];
+                lua_pushnumber(luaVM, i + 1);
+                lua_pushstring(luaVM, strName.c_str());
+                lua_settable(luaVM, -3);
+            }
+            return 2;
+        }
+    }
+    lua_pushboolean(luaVM, false);
+    lua_pushboolean(luaVM, false);
+    return 2;
+}
