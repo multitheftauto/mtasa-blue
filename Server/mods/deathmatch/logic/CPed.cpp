@@ -55,7 +55,7 @@ CPed::CPed ( CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsig
     memset ( &m_Weapons[0], 0, sizeof ( m_Weapons ) );
     m_ucAlpha = 255;
     m_pContactElement = NULL;
-    m_bIsDead = true;
+    m_bIsDead = false;
     m_bSpawned = false;
     m_fRotation = 0.0f;
     m_pTargetedEntity = NULL;
