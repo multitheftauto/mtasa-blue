@@ -1,4 +1,5 @@
 #!/bin/bash
+
 if [[ "$(uname -m)" == 'x86_64' ]]; then
     PREMAKE5=utils/premake5_x64
     CONFIG=release_x64
