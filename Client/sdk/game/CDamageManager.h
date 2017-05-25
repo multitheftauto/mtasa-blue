@@ -130,13 +130,13 @@ public:
     virtual BYTE            GetEngineStatus         ( void ) = 0;
     virtual VOID            SetEngineStatus         ( BYTE bEngineState ) = 0;
     virtual BYTE            GetDoorStatus           ( eDoors bDoor ) = 0;
-    virtual VOID            SetDoorStatus           ( eDoors bDoor, BYTE bDoorStatus ) = 0;
+    virtual VOID            SetDoorStatus           ( eDoors bDoor, BYTE bDoorStatus, bool bSpawnComponent = true ) = 0;
     virtual BYTE            GetWheelStatus          ( eWheels bTire ) = 0;
     virtual VOID            SetWheelStatus          ( eWheels bTire, BYTE bTireStatus ) = 0;
     virtual BYTE            GetPanelStatus          ( BYTE bPanel ) = 0;
     virtual unsigned long   GetPanelStatus          ( void ) = 0;
-    virtual VOID            SetPanelStatus          ( BYTE bPanel, BYTE bPanelStatus ) = 0;
-    virtual void            SetPanelStatus          ( unsigned long ulStatus ) = 0;
+    virtual VOID            SetPanelStatus          ( BYTE bPanel, BYTE bPanelStatus, bool bSpawnComponent = true ) = 0;
+    virtual void            SetPanelStatus          ( unsigned long ulStatus, bool bSpawnComponent = true ) = 0;
     virtual BYTE            GetLightStatus          ( BYTE bLight ) = 0;
     virtual unsigned char   GetLightStatus          ( void ) = 0;
     virtual VOID            SetLightStatus          ( BYTE bLight, BYTE bLightStatus  ) = 0;

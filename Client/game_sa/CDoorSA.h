@@ -62,6 +62,7 @@ public:
     BOOL            IsFullyOpen (  );
     VOID            Open ( float fOpenRatio );
     eDoorState      GetDoorState() { return (eDoorState)this->GetInterface()->m_nDoorState; };
+    void            SetDoorState ( unsigned char ucState ) { GetInterface()->m_nDoorState = ucState; };
 };
 
 #endif

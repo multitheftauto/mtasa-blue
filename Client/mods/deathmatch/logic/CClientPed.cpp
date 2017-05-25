@@ -1403,7 +1403,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
 
     // Driverseat
     if ( uiSeat == 0 )
-    {       
+    {
         // Force the vehicle we're warping into to be streamed in
         // if the local player is entering it. This is so we don't
         // get screwed up with camera not following and similar issues.
@@ -1518,7 +1518,10 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bSkipWarpIfGettingOut )
 
     if ( pVehicle )
     {
-        pVehicle->SetSwingingDoorsAllowed ( false );
+        if ( m_bIsLocalPlayer )
+        {
+            pVehicle->SetSwingingDoorsAllowed ( false );
+        }
 
         // Warp the player out of the vehicle
         CVehicle* pGameVehicle = pVehicle->m_pVehicle;

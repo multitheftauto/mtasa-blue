@@ -34,50 +34,60 @@ BYTE CDamageManagerSA::GetDoorStatus ( eDoors bDoor )
     return NULL;
 }
 
-VOID CDamageManagerSA::SetDoorStatus ( eDoors bDoor, BYTE bDoorStatus )
+VOID CDamageManagerSA::SetDoorStatus ( eDoors bDoor, BYTE bDoorStatus, bool bFlyingComponent )
 {
     DEBUG_TRACE("VOID CDamageManagerSA::SetDoorStatus ( eDoors bDoor, BYTE bDoorStatus )");
 
     if ( bDoor < MAX_DOORS )
     {
+        unsigned char ucOldStatus = internalInterface->Door[bDoor];
         // Different from before?
-        if ( internalInterface->Door [bDoor] != bDoorStatus )
+        if ( ucOldStatus != bDoorStatus )
         {
+            bool bOldBashed = ucOldStatus == DT_DOOR_BASHED || ucOldStatus == DT_DOOR_BASHED_AND_SWINGING_FREE;
+            bool bNewBashed = bDoorStatus == DT_DOOR_BASHED || bDoorStatus == DT_DOOR_BASHED_AND_SWINGING_FREE;
+
             // Set it
             internalInterface->Door [bDoor] = bDoorStatus;
 
-            // Are we making it intact?
-            if ( bDoorStatus == DT_DOOR_INTACT || bDoorStatus == DT_DOOR_SWINGING_FREE )
+            // Update door model (only if needed - this gonna shut the door)
+            if ( bOldBashed != bNewBashed || bDoorStatus == DT_DOOR_MISSING || ucOldStatus == DT_DOOR_MISSING )
             {
-                // Grab the car node index for the given door id
-                static int s_iCarNodeIndexes [6] = { 0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09 };
+                // Fix it
+                if ( bDoorStatus == DT_DOOR_INTACT || bDoorStatus == DT_DOOR_SWINGING_FREE )
+                {
+                    // Grab the car node index for the given door id
+                    static int s_iCarNodeIndexes[6] = { 0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09 };
 
-                // Call CAutomobile::FixDoor to update the model
-                DWORD dwFunc = 0x6A35A0;
-                DWORD dwThis = (DWORD) internalEntityInterface;
-                int iCarNodeIndex = s_iCarNodeIndexes [bDoor];
-                DWORD dwDoor = (DWORD) bDoor;
-                _asm
-                {
-                    mov     ecx, dwThis
-                    push    dwDoor
-                    push    iCarNodeIndex
-                    call    dwFunc
+                    // Call CAutomobile::FixDoor to update the model
+                    DWORD dwFunc = 0x6A35A0;
+                    DWORD dwThis = ( DWORD ) internalEntityInterface;
+                    int iCarNodeIndex = s_iCarNodeIndexes[bDoor];
+                    DWORD dwDoor = ( DWORD ) bDoor;
+                    _asm
+                    {
+                        mov     ecx, dwThis
+                        push    dwDoor
+                        push    iCarNodeIndex
+                        call    dwFunc
+                    }
                 }
-            }
-            else
-            {
-                // Call CAutomobile::SetDoorDamage to update the model
-                DWORD dwFunc = 0x6B1600;
-                DWORD dwThis = (DWORD) internalEntityInterface;
-                DWORD dwDoor = (DWORD) bDoor;
-                bool bUnknown = false;
-                _asm
+
+                // Broke it
+                if ( bNewBashed || bDoorStatus == DT_DOOR_MISSING || ucOldStatus == DT_DOOR_MISSING )
                 {
-                    mov     ecx, dwThis
-                    push    bUnknown
-                    push    dwDoor
-                    call    dwFunc
+                    // Call CAutomobile::SetDoorDamage to update the model
+                    DWORD dwFunc = 0x6B1600;
+                    DWORD dwThis = ( DWORD ) internalEntityInterface;
+                    DWORD dwDoor = ( DWORD ) bDoor;
+                    bool bNoFlyingComponent = !bFlyingComponent;
+                    _asm
+                    {
+                        mov     ecx, dwThis
+                        push    bNoFlyingComponent
+                        push    dwDoor
+                        call    dwFunc
+                    }
                 }
             }
         }
@@ -104,7 +114,7 @@ VOID CDamageManagerSA::SetWheelStatus ( eWheels bWheel, BYTE bTireStatus )
     }
 }
 
-VOID CDamageManagerSA::SetPanelStatus ( BYTE bPanel, BYTE bPanelStatus )
+VOID CDamageManagerSA::SetPanelStatus ( BYTE bPanel, BYTE bPanelStatus, bool bFlyingComponent )
 {
     DEBUG_TRACE("BYTE CDamageManagerSA::SetPanelStatus ( BYTE bLight, BYTE bPanelStatus )");
 
@@ -150,11 +160,16 @@ VOID CDamageManagerSA::SetPanelStatus ( BYTE bPanel, BYTE bPanelStatus )
                 // Call CAutomobile::SetPanelDamage to update the vehicle
                 dwFunction = 0x6B1480;
                 dwThis = (DWORD) internalEntityInterface;
-                bool bUnknown = false;
+                bool bNoFlyingComponent = !bFlyingComponent;
+                if ( bPanel == WINDSCREEN_PANEL )
+                {
+                    bNoFlyingComponent = bFlyingComponent;
+                }
+
                 _asm
                 {
                     mov     ecx, dwThis
-                    push    bUnknown
+                    push    bNoFlyingComponent
                     push    dwPanel
                     call    dwFunction
                 }
@@ -163,13 +178,13 @@ VOID CDamageManagerSA::SetPanelStatus ( BYTE bPanel, BYTE bPanelStatus )
     }
 }
 
-void CDamageManagerSA::SetPanelStatus ( unsigned long ulStatus )
+void CDamageManagerSA::SetPanelStatus ( unsigned long ulStatus, bool bFlyingComponent )
 {
     unsigned int uiIndex;
 
     for ( uiIndex = 0; uiIndex < MAX_PANELS; uiIndex++ )
     {
-        SetPanelStatus ( static_cast < eDoors > ( uiIndex ), static_cast < unsigned char > ( ulStatus ) );
+        SetPanelStatus ( static_cast < eDoors > ( uiIndex ), static_cast < unsigned char > ( ulStatus ), bFlyingComponent );
         ulStatus >>= 4;
     }
 }

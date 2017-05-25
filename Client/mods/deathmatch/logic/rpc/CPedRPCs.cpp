@@ -216,6 +216,27 @@ void CPedRPCs::WarpPedIntoVehicle ( CClientEntity* pSource, NetBitStreamInterfac
             if ( pVehicle )
             {
                 CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPed, pVehicle, ucSeat );
+
+                // Driver seat?
+                if ( ucSeat == 0 )
+                {
+                    // Driver door open?
+                    if ( pVehicle->GetDoorStatus ( 2 ) != DT_DOOR_MISSING && pVehicle->GetDoorOpenRatio ( 2 ) > 0 )
+                    {
+                        if ( pPed->IsLocalPlayer () )
+                        {
+                            // Fix driver door ajar state so player will be able to close it
+                            pVehicle->SetDoorAjarStatus ( 2, true );
+                        }
+                        else
+                        {
+                            // Do otherwise so remotes won't see it closing (it will come from syncer)
+                            // (however this creates ugly effect because doors move but there is no closing door animation)
+                            // TODO: remove this when closing door check will be added to CClientVehicle::SetDoorOpenRatio
+                            pVehicle->SetDoorAjarStatus ( 2, false );
+                        }
+                    }
+                }
             }
         }
     }

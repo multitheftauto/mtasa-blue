@@ -267,9 +267,12 @@ public:
     unsigned char               GetPanelStatus          ( unsigned char ucPanel );
     unsigned char               GetLightStatus          ( unsigned char ucLight );
 
-    void                        SetDoorStatus           ( unsigned char ucDoor, unsigned char ucStatus );
+    void                        SetDoorAjarStatus       ( unsigned char ucDoor, bool bAjar );
+    bool                        GetDoorAjarStatus       ( unsigned char ucDoor );
+
+    void                        SetDoorStatus           ( unsigned char ucDoor, unsigned char ucStatus, bool bFlyingComponent = true );
     void                        SetWheelStatus          ( unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true );
-    void                        SetPanelStatus          ( unsigned char ucPanel, unsigned char ucStatus );
+    void                        SetPanelStatus          ( unsigned char ucPanel, unsigned char ucStatus, bool bFlyingComponent = true );
     void                        SetLightStatus          ( unsigned char ucLight, unsigned char ucStatus );
     bool                        GetWheelMissing         ( unsigned char ucWheel, const SString& strWheelName = "" );
 
@@ -295,6 +298,7 @@ public:
     void                        SetAlpha                ( unsigned char ucAlpha );
 
     CClientPed*                 GetOccupant             ( int iSeat = 0 ) const;
+    CClientPed*                 GetOccupyingPed         ( unsigned char uiSeat ) const;
     CClientPed*                 GetControllingPlayer    ( void );
     void                        ClearForOccupants       ( void );
 

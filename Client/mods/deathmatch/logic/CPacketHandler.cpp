@@ -581,13 +581,17 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             int iHours = static_cast < int > ( Duration / 3600 );
             Duration = Duration % 3600;
             int iMins = static_cast < int > ( Duration / 60 );
+            Duration = Duration % 60;
+            int iSeconds = static_cast < int > ( Duration );
 
             if ( iDays )
-                strReason += SString(_tn( "%d day", "%d days", iDays ),iDays) += iHours ? " " : "";
+                strReason += SString( _tn( "%d day", "%d days", iDays ), iDays ) += (iHours || iMins) ? " " : "";
             if ( iHours )
-                strReason += SString(_tn( "%d hour", "%d hours", iHours ),iHours)  += iMins ? " " : "";
+                strReason += SString( _tn( "%d hour", "%d hours", iHours ), iHours )  += iMins ? " " : "";
             if ( iMins )
-                strReason += SString(_tn( "%d minute", "%d minutes", iMins ),iMins);
+                strReason += SString( _tn( "%d minute", "%d minutes", iMins ), iMins ) += iSeconds?  " " : "";
+            if ( !iDays && !iHours && iSeconds )
+                strReason += SString( _tn( "%d second", "%d seconds", iSeconds ), iSeconds );
         }
 
         // Display the error
@@ -1630,11 +1634,24 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                     case CClientGame::VEHICLE_NOTIFY_IN_RETURN:
                     {
+                        bool bEnteringThis = pPlayer->IsGettingIntoVehicle () && pVehicle == pPlayer->m_pOccupyingVehicle;
+
                         // Is he not getting in the vehicle yet?
                         //if ( !pPlayer->IsGettingIntoVehicle () )
                         {
                             // Warp him in
                             pPlayer->WarpIntoVehicle ( pVehicle, ucSeat );
+                        }
+
+                        if ( bEnteringThis )
+                        {
+                            // WarpIntoVehicle can premature kill entering task which can freeze door mid-closing
+                            // So shut the door
+                            float fRatio = pVehicle->GetDoorOpenRatio ( pPlayer->m_ucEnteringDoor );
+                            if ( fRatio > 0 )
+                            {
+                                pVehicle->SetDoorOpenRatio ( pPlayer->m_ucEnteringDoor, 0, 0, true );
+                            }
                         }
 
                         // Reset vehicle in out state
@@ -1902,6 +1919,13 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
                                 {
                                     g_pClientGame->m_bIsGettingJacked = false;
                                     g_pClientGame->m_bIsJackingVehicle = false;
+
+                                    // Fix driver door ajar state if he jacked from passenger side
+                                    // so he will be able to close it
+                                    if ( pInsidePlayer->m_ucEnteringDoor == 3 && pVehicle->GetDoorAjarStatus ( 2 ) == false )
+                                    {
+                                        pVehicle->SetDoorAjarStatus ( 2, true );
+                                    }
                                 }
 
                                 // Reset vehicle in out state

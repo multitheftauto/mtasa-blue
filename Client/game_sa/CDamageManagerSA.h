@@ -57,13 +57,13 @@ public:
     BYTE            GetEngineStatus         (  );
     VOID            SetEngineStatus         ( BYTE bEngineState );
     BYTE            GetDoorStatus           ( eDoors bDoor );
-    VOID            SetDoorStatus           ( eDoors bDoor, BYTE bDoorStatus );
+    VOID            SetDoorStatus           ( eDoors bDoor, BYTE bDoorStatus, bool bFlyingComponent = true );
     BYTE            GetWheelStatus          ( eWheels bWheel );
     VOID            SetWheelStatus          ( eWheels bWheel, BYTE bTireStatus );
     BYTE            GetPanelStatus          ( BYTE bPanel );
     unsigned long   GetPanelStatus          ( void );
-    VOID            SetPanelStatus          ( BYTE bPanel, BYTE bPanelStatus );
-    void            SetPanelStatus          ( unsigned long ulStatus );
+    VOID            SetPanelStatus          ( BYTE bPanel, BYTE bPanelStatus, bool bFlyingComponent = true );
+    void            SetPanelStatus          ( unsigned long ulStatus, bool bFlyingComponent = true );
     BYTE            GetLightStatus          ( BYTE bLight );
     unsigned char   GetLightStatus          ( void );
     VOID            SetLightStatus          ( BYTE bLight, BYTE bLightStatus );
