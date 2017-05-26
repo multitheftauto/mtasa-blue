@@ -21,7 +21,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 	
-	flags { "C++11" }
+	cppdialect "C++11"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
@@ -31,15 +31,13 @@ workspace "MTASA"
 		"vendor",
 		"Shared/sdk", 
 	}
-	
-	 -- I know linking bcrypt here is ugly, but SharedUtil depends on it, thus it's required everywhere
-	links { "blowfish_bcrypt" }
 
 	defines { 
 		"_CRT_SECURE_NO_WARNINGS",
 		"_SCL_SECURE_NO_WARNINGS",
 		"_CRT_NONSTDC_NO_DEPRECATE",
-		"NOMINMAX"
+		"NOMINMAX",
+		"_TIMESPEC_DEFINED"
 	}
 		
 	-- Helper function for output path 
@@ -69,15 +67,12 @@ workspace "MTASA"
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
 		os.mkdir("Build/Symbols")
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
-
-	filter {"system:windows", "toolset:*140*"}
-		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
 	
 	filter {"system:windows", "toolset:*_xp*"}
 		buildoptions { "/Zc:threadSafeInit-" } -- Fix Windows XP not initialising TLS early
 	
 	filter "system:windows"
-		toolset "v140"
+		toolset "v141"
 		flags { "StaticRuntime" }
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
@@ -95,7 +90,7 @@ workspace "MTASA"
 		vectorextensions "SSE2"
 	
 	-- Only build the client on Windows
-	if os.get() == "windows" then
+	if os.target() == "windows" then
 		group "Client"
 		include "Client/ceflauncher"
 		include "Client/ceflauncher_DLL"
