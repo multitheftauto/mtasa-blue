@@ -2739,6 +2739,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
         m_pVehicle->SetGravity ( &m_vecGravity );
         m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
+        m_pVehicle->SetRadioStatus ( 0 );
 
         if ( IsNitroInstalled() )
         {

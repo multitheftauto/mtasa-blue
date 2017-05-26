@@ -88,4 +88,5 @@ public:
     LUA_DECLARE_OOP ( WarpPedIntoVehicle );
     LUA_DECLARE ( RemovePedFromVehicle );
     LUA_DECLARE ( SetPedOxygenLevel );
+    LUA_DECLARE ( SetPedStat );
 };

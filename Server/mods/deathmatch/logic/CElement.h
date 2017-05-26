@@ -239,6 +239,7 @@ protected:
     void                                        FindAllChildrenByTypeIndex  ( unsigned int uiTypeHash, lua_State* pLua, unsigned int& uiIndex );
 
     void                                        CallEventNoParent           ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL );
+    void                                        CallEventNoParentSlow       ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL );
     void                                        CallParentEvent             ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL );
 
 

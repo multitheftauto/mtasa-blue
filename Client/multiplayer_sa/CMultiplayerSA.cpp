@@ -282,6 +282,8 @@ DWORD RETURN_CObject_ProcessCollision = 0x548DD1;
 DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
 #define HOOKPOS_CGlass_WindowRespondsToCollision           0x71BC40
 DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
+#define HOOKPOS_CGlass__BreakGlassPhysically                0x71D14B
+DWORD RETURN_CGlass__BreakGlassPhysically = 0x71D150;
 
 #define HOOKPOS_FxManager_c__DestroyFxSystem                0x4A989A
 
@@ -499,6 +501,7 @@ void HOOK_CObject_ProcessDamage ();
 void HOOK_CObject_ProcessBreak ();
 void HOOK_CObject_ProcessCollision ();
 void HOOK_CGlass_WindowRespondsToCollision ();
+void HOOK_CGlass__BreakGlassPhysically ();
 
 void HOOK_FxManager_c__DestroyFxSystem ();
 
@@ -706,6 +709,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CObject_ProcessBreak, (DWORD)HOOK_CObject_ProcessBreak, 5 );
     HookInstall ( HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10 );
     HookInstall ( HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8 );
+    HookInstall ( HOOKPOS_CGlass__BreakGlassPhysically, (DWORD)HOOK_CGlass__BreakGlassPhysically, 5 );
 
     // Post-destruction hook for FxSystems
     HookInstall ( HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
@@ -6604,6 +6608,41 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision ()
         _asm
         {
             popad
+            retn
+        }
+    }
+}
+
+// Called when glass object is being broken by ped melee attack
+DWORD dummy_404350 = 0x404350;
+void _declspec(naked) HOOK_CGlass__BreakGlassPhysically ()
+{
+    _asm
+    {
+        mov     pDamagedObject, esi
+    }
+    // we can't get attacker from here
+    pObjectAttacker = NULL;
+
+    if ( TriggerObjectBreakEvent () )
+    {
+        _asm
+        {
+            // restore replaced part
+            push    dummy_404350
+            // jump outside of the hook
+            jmp     RETURN_CGlass__BreakGlassPhysically
+        }
+    }
+    else
+    {
+        _asm
+        {
+            pop     edi
+            pop     esi
+            pop     ebp
+            pop     ebx
+            add     esp, 0BCh
             retn
         }
     }

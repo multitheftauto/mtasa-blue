@@ -230,8 +230,7 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload( CDownloadableResou
 
     SString* pstrContext = MakeDownloadContextString( pResourceFile );
     SString strFilename = pResourceFile->GetName();
-    double dDownloadSize = pResourceFile->GetDownloadSize();
-    bool bUniqueDownload = pHTTP->QueueFile( strHTTPDownloadURLFull, strFilename, dDownloadSize, NULL, 0, false, pstrContext, StaticDownloadFinished, g_pClientGame->IsLocalGame(), serverInfo.uiConnectionAttempts, serverInfo.uiConnectTimeoutMs, true );
+    bool bUniqueDownload = pHTTP->QueueFile( strHTTPDownloadURLFull, strFilename, NULL, 0, false, pstrContext, StaticDownloadFinished, g_pClientGame->IsLocalGame(), serverInfo.uiConnectionAttempts, serverInfo.uiConnectTimeoutMs, true );
     if ( !bUniqueDownload )
     {
         // TODO - If piggybacking on another matching download, then adjust progress bar

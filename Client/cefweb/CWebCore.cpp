@@ -491,7 +491,7 @@ bool CWebCore::UpdateListsFromMaster ()
             OutputDebugLine ( "Updating white- and blacklist..." );
         #endif
             g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=getrev", BROWSER_UPDATE_URL),
-                NULL, 0, NULL, 0, false, this, &CWebCore::StaticFetchRevisionFinished, false, 3 );
+                NULL, NULL, 0, false, this, &CWebCore::StaticFetchRevisionFinished, false, 3 );
 
             pLastUpdateNode->SetTagContent ( SString ( "%d", (long long)currentTime ) );
             m_pXmlConfig->Write ();
@@ -686,7 +686,7 @@ void CWebCore::StaticFetchRevisionFinished ( const SHttpDownloadResult& result )
             if ( iWhiteListRevision > pWebCore->m_iWhitelistRevision )
             {
                 g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=fetchwhite", BROWSER_UPDATE_URL ),
-                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchWhitelistFinished, false, 3 );
+                    NULL, NULL, 0, false, pWebCore, &CWebCore::StaticFetchWhitelistFinished, false, 3 );
 
                 pWebCore->m_iWhitelistRevision = iWhiteListRevision;
             }
@@ -694,7 +694,7 @@ void CWebCore::StaticFetchRevisionFinished ( const SHttpDownloadResult& result )
             if ( iBlackListRevision > pWebCore->m_iBlacklistRevision )
             {
                 g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=fetchblack", BROWSER_UPDATE_URL),
-                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchBlacklistFinished, false, 3 );
+                    NULL, NULL, 0, false, pWebCore, &CWebCore::StaticFetchBlacklistFinished, false, 3 );
 
                 pWebCore->m_iBlacklistRevision = iBlackListRevision;
             }

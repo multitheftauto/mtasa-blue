@@ -3263,7 +3263,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     m_JobInfo.downloadStatus = EDownloadStatus::Running;
     m_JobInfo.iDownloadResultCode = 0;
     GetHTTP()->Reset();
-    GetHTTP()->QueueFile( strQueryURL, m_JobInfo.strResumableSaveLocation, 0, NULL, 0, false, this, StaticDownloadFinished, false, 10, 10000, false, true );
+    GetHTTP()->QueueFile( strQueryURL, m_JobInfo.strResumableSaveLocation, NULL, 0, false, this, StaticDownloadFinished, false, 10, 10000, false, true );
     m_strLastQueryURL = strQueryURL;
     OutputDebugLine( SString ( "[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
     return RES_OK;
@@ -3416,7 +3416,7 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
     // Send data. Doesn't check if it was received.
     //
     GetHTTP()->Reset();
-    GetHTTP()->QueueFile( strQueryURL, NULL, 0, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
+    GetHTTP()->QueueFile( strQueryURL, NULL, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
 
     return RES_OK;
 }

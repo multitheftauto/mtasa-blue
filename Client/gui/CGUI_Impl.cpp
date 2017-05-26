@@ -543,6 +543,34 @@ float CGUI_Impl::GetCurrentServerCursorAlpha ( void )
 }
 
 
+eCursorType CGUI_Impl::GetCursorType ( void )
+{
+    auto image = CEGUI::MouseCursor::getSingleton ( ).getImage ( );
+
+    if ( image == nullptr )
+        return CURSORTYPE_NONE;
+
+    auto imageName = image->getName ( );
+
+    if ( !imageName.compare ( "MouseArrow" ) )
+        return CURSORTYPE_DEFAULT;
+    else if ( !imageName.compare ( "NSSizingCursorImage" ) )
+        return CURSORTYPE_SIZING_NS;
+    else if ( !imageName.compare ( "EWSizingCursorImage" ) )
+        return CURSORTYPE_SIZING_EW;
+    else if ( !imageName.compare ( "NWSESizingCursorImage" ) )
+        return CURSORTYPE_SIZING_NWSE;
+    else if ( !imageName.compare ( "NESWSizingCursorImage" ) )
+        return CURSORTYPE_SIZING_NESW;
+    else if ( !imageName.compare ( "MouseEsWeCursor" ) )
+        return CURSORTYPE_SIZING_ESWE;
+    else if ( !imageName.compare ( "MouseMoveCursor" ) )
+        return CURSORTYPE_MOVE;
+    else
+        return CURSORTYPE_DEFAULT;
+}
+
+
 void CGUI_Impl::AddChild ( CGUIElement_Impl* pChild )
 {
     m_pTop->addChildWindow ( pChild->GetWindow () );
