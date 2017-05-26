@@ -84,7 +84,7 @@ function os.expanddir_wildcard(from, to)
 end
 
 function os.md5_file(path)
-	if os.host() == "windows" then
+	if os.get() == "windows" then
 		local s = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
 		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
 	else
@@ -95,7 +95,7 @@ end
 function os.extract_archive(archive_path, target_path, override)
 	local flags = override and "-aoa" or "-aos"
 
-	if os.host() == "windows" then
+	if os.get() == "windows" then
 		os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	else
 		os.executef("7z x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)

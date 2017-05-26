@@ -7,7 +7,7 @@ project "CEFLauncher"
 	includedirs { "../sdk" }
 	
 	links { "CEFLauncher DLL"}
-	entrypoint "WinMainCRTStartup"
+	flags { "WinMain" }
 
 	vpaths { 
 		["Headers/*"] = "**.h",

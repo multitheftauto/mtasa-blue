@@ -21,7 +21,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 	
-	cppdialect "C++11"
+	flags { "C++11" }
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
@@ -95,7 +95,7 @@ workspace "MTASA"
 		vectorextensions "SSE2"
 	
 	-- Only build the client on Windows
-	if os.target() == "windows" then
+	if os.get() == "windows" then
 		group "Client"
 		include "Client/ceflauncher"
 		include "Client/ceflauncher_DLL"
