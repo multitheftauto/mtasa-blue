@@ -308,3 +308,5 @@ Bin/
 Build/
 InstallFiles/
 utils/vswhere.exe
+utils/DXFiles.zip
+utils/DXFiles/
