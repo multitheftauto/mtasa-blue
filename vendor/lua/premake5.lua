@@ -26,7 +26,7 @@ project "Lua_Server"
 		targetdir(buildpath("server/x64"))
 
 
-if os.get() == "windows" then
+if os.target() == "windows" then
 	project "Lua_Client"
 		language "C++"
 		kind "SharedLib"
