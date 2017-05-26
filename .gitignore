@@ -307,3 +307,4 @@ _Pvt_Extensions
 Bin/
 Build/
 InstallFiles/
+utils/vswhere.exe
