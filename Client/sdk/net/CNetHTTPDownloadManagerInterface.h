@@ -12,7 +12,19 @@
 #ifndef __CNETHTTPDOWNLOADMANAGERINTERFACE_H
 #define __CNETHTTPDOWNLOADMANAGERINTERFACE_H
 
-#include <windows.h>
+struct SHttpRequestOptions
+{
+    bool bIsLegacy = false;         // true = old error behaviour
+    SString strPostData;
+    bool bPostBinary = false;       // false = truncate data to first null character and send as text/plain (true = send as application/octet-stream)
+    uint uiConnectionAttempts = 10;
+    uint uiConnectTimeoutMs = 10000;
+    SString strRequestMethod;
+    std::map<SString,SString> requestHeaders;
+    uint uiMaxRedirects = 8;
+    SString strUsername;
+    SString strPassword;
+};
 
 struct SHttpDownloadResult
 {
@@ -21,11 +33,15 @@ struct SHttpDownloadResult
     void* pObj;
     bool bSuccess;
     int iErrorCode;
+    std::map<SString,SString> headers;
 };
 
 // PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.
 // If bSuccess is true, then pData+dataSize will be set or the output file will be ready.
 // If bSuccess is false, then iErrorCode and CNetHTTPDownloadManagerInterface->GetError() will reveal the problem.
+// When iErrorCode is 400-599:
+//      If bIsLegacy is true, then bSuccess is false and pData+dataSize contain nothing
+//      If bIsLegacy is false, then bSuccess is true and pData+dataSize contain the server response
 typedef void (*PFN_DOWNLOAD_FINISHED_CALLBACK) ( const SHttpDownloadResult& result );
 
 class CNetHTTPDownloadManagerInterface
@@ -43,8 +59,8 @@ public:
     virtual bool            ProcessQueuedFiles  ( void ) = 0;
 
     // Queue a file to download
-    // szPostHeaders is a new line separated list of HTTP headers. Examples at https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
-    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, double dSize = 0, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false, void * objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false, uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false, const char* szPostHeaders = NULL ) = 0;
+    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false, void * objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false, uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false ) = 0;
+    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, void * objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false, const SHttpRequestOptions& options = SHttpRequestOptions(), bool bCheckContents = false, bool bResumeFile = false ) = 0;
 
     // Limit number of concurrent http client connections
     virtual void            SetMaxConnections   ( int iMaxConnections ) = 0;

@@ -2341,6 +2341,27 @@ bool CStaticFunctionDefinitions::SetPedAimTarget ( CClientEntity & Entity, CVect
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedStat ( CClientEntity & Entity, ushort usStat, float fValue )
+{
+    RUN_CHILDREN ( SetPedStat ( **iter, usStat, fValue ) )
+    if ( IS_PED ( &Entity ) && Entity.IsLocalEntity ( ) )
+    {
+        CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        // Dont let them set visual stats if they don't have the CJ model
+        if ( ( usStat == 21 /* FAT */ || usStat == 23 /* BODY_MUSCLE */ ) && Ped.GetModel ( ) != 0 )
+            return false;
+
+        Ped.SetStat ( usStat, fValue );
+
+        // Rebuild model if the stat is visual
+        if (usStat == 21 || usStat == 23)
+            Ped.RebuildModel();
+
+        return true;
+    }
+    return false;
+}
+
 
 bool CStaticFunctionDefinitions::SetPedOnFire ( CClientEntity & Entity, bool bOnFire )
 {
@@ -4771,6 +4792,13 @@ eInputMode CStaticFunctionDefinitions::GUIGetInputMode ( void )
 {
     return m_pGUI->GetGUIInputMode();
 }
+
+
+eCursorType CStaticFunctionDefinitions::GUIGetCursorType ( void )
+{
+    return m_pGUI->GetCursorType ( );
+}
+
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative )
 {

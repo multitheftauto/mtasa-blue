@@ -181,13 +181,13 @@ int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
 //  string password_hash(string password, string algorithm, table options = {} [, function callback])
     SString password;
     PasswordHashFunction algorithm;
-    std::unordered_map<SString, SString> options;
+    CStringMap options;
     CLuaFunctionRef luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(password);
     argStream.ReadEnumString(algorithm);
-    argStream.ReadStringMap(options, true);
+    argStream.ReadStringMap(options);
 
     if (argStream.NextIsFunction())
     {

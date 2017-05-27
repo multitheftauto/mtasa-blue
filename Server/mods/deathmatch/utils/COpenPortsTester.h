@@ -47,7 +47,7 @@ public:
         }
 
         // Send request
-        GetDownloadManager()->QueueFile ( strURL, NULL, 0, "", 0, true, this, DownloadFinishedCallback, false, 1, 15000 );
+        GetDownloadManager()->QueueFile ( strURL, NULL, "", 0, true, this, DownloadFinishedCallback, false, 1, 15000 );
 
         CLogger::LogPrintfNoStamp ( "Testing ports...\n" );
 
