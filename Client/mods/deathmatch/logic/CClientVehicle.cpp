@@ -1498,6 +1498,10 @@ unsigned char CClientVehicle::GetWheelStatus ( unsigned char ucWheel )
     return 0;
 }
 
+bool CClientVehicle::IsWheelCollided ( unsigned char ucWheel )
+{
+    return m_pVehicle->IsWheelCollided ( ucWheel );
+}
 
 unsigned char CClientVehicle::GetPanelStatus ( unsigned char ucPanel )
 {

@@ -2033,6 +2033,26 @@ void CVehicleSA::SetBikeWheelStatus ( BYTE bWheel, BYTE bStatus )
     else if ( bWheel == 1 ) * ( BYTE * ) ( (DWORD)this->GetInterface() + 0x65D ) = bStatus;
 }
 
+bool CVehicleSA::IsWheelCollided ( BYTE bWheel )
+{
+    DWORD dwAddr = ( DWORD )this->GetInterface();
+
+    switch ( *( BYTE * )( dwAddr + 0x590 ) )
+    {
+        case 0:
+            if ( bWheel < 4 )
+                return  *( float * )( dwAddr + 0x7F4 + bWheel * sizeof ( float ) ) == 4.f;
+            break;
+
+        case 9:
+            if ( bWheel < 2 )
+                return  *( float * )( dwAddr + 0x730 + ( bWheel * sizeof ( float ) * 2 ) ) == 4.f ||
+                        *( float * )( dwAddr + 0x730 + ( bWheel * sizeof ( float ) * 2 ) + sizeof ( float ) ) == 4.f;
+            break;
+    }
+    return false;
+}
+
 void CVehicleSA::SetTaxiLightOn ( bool bLightOn )
 {
     DEBUG_TRACE("void CVehicleSA::SetTaxiLight ( bool bLightOn )");

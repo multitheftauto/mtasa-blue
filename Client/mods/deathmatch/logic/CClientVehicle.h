@@ -264,6 +264,7 @@ public:
     bool                        HasDamageModel          ( void )                            { return m_bHasDamageModel; }
     unsigned char               GetDoorStatus           ( unsigned char ucDoor );
     unsigned char               GetWheelStatus          ( unsigned char ucWheel );
+    bool                        IsWheelCollided         ( unsigned char ucWheel );
     unsigned char               GetPanelStatus          ( unsigned char ucPanel );
     unsigned char               GetLightStatus          ( unsigned char ucLight );
 

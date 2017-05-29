@@ -492,6 +492,12 @@ IMPLEMENT_ENUM_BEGIN ( eCursorType )
     ADD_ENUM ( CURSORTYPE_SEG_SIZING,   "segment_sizing" )  // segment sizing cursor (note: not in use)
 IMPLEMENT_ENUM_END ( "cursor-type" )
 
+IMPLEMENT_ENUM_BEGIN ( eWheels )
+    ADD_ENUM ( FRONT_LEFT_WHEEL,    "front_left" )
+    ADD_ENUM ( REAR_LEFT_WHEEL,     "rear_left" )
+    ADD_ENUM ( FRONT_RIGHT_WHEEL,   "front_right" )
+    ADD_ENUM ( REAR_RIGHT_WHEEL,    "rear_right" )
+IMPLEMENT_ENUM_END ( "wheels" )
 
 //
 // Get best guess at name of userdata type
