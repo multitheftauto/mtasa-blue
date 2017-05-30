@@ -497,7 +497,7 @@ IMPLEMENT_ENUM_BEGIN ( eWheels )
     ADD_ENUM ( REAR_LEFT_WHEEL,     "rear_left" )
     ADD_ENUM ( FRONT_RIGHT_WHEEL,   "front_right" )
     ADD_ENUM ( REAR_RIGHT_WHEEL,    "rear_right" )
-IMPLEMENT_ENUM_END ( "wheels" )
+IMPLEMENT_ENUM_END ( "wheel-position" )
 
 //
 // Get best guess at name of userdata type

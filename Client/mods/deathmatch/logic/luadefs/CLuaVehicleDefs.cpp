@@ -925,9 +925,10 @@ int CLuaVehicleDefs::IsVehicleWheelCollided ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
         lua_pushboolean ( luaVM, pVehicle->IsWheelCollided ( wheel ) );
     else
+    {
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-    
-    lua_pushboolean ( luaVM, false );
+        lua_pushboolean ( luaVM, false );
+    }
     return 1;
 }
 
