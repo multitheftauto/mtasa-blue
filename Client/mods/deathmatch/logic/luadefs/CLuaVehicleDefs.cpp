@@ -917,7 +917,7 @@ int CLuaVehicleDefs::GetVehicleWheelStates ( lua_State* luaVM )
 
 int CLuaVehicleDefs::IsVehicleWheelCollided ( lua_State* luaVM )
 {
-    CClientVehicle* pVehicle = NULL; eWheels wheel;
+    CClientVehicle* pVehicle = nullptr; eWheels wheel;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
     argStream.ReadEnumStringOrNumber ( wheel );
@@ -925,8 +925,9 @@ int CLuaVehicleDefs::IsVehicleWheelCollided ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
         lua_pushboolean ( luaVM, pVehicle->IsWheelCollided ( wheel ) );
     else
-        lua_pushboolean ( luaVM, false );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
 
