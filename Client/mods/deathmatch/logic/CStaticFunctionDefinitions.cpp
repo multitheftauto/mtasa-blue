@@ -7443,9 +7443,9 @@ bool CStaticFunctionDefinitions::FxAddFootSplash ( CVector & vecPosition )
     return true;
 }
 
-CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, const SString &strFxName, const CVector &vecPosition)
+CClientEffect* CStaticFunctionDefinitions::CreateEffect( CResource& Resource, const SString &strFxName, const CVector &vecPosition, bool bSoundEnable )
 {
-    CClientEffect * pFx =  m_pManager->GetEffectManager()->Create(strFxName, vecPosition, INVALID_ELEMENT_ID);
+    CClientEffect * pFx =  m_pManager->GetEffectManager()->Create( strFxName, vecPosition, INVALID_ELEMENT_ID, bSoundEnable );
     if ( pFx )
         pFx->SetParent ( Resource.GetResourceDynamicEntity () );
     return pFx;
