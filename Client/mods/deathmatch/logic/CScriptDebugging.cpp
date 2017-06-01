@@ -380,6 +380,21 @@ void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& l
     if ( uiMinimumDebugLevel > 2 )
         strText = SString ( "%s%s", szPrePend, szMessage );
 
+    switch ( uiMinimumDebugLevel )
+    {
+        case 1:
+            ucRed = 255, ucGreen = 0, ucBlue = 0;
+            break;
+        case 2:
+            ucRed = 255, ucGreen = 128, ucBlue = 0;
+            break;
+        case 3:
+            ucRed = 0, ucGreen = 255, ucBlue = 0;
+            break;
+        default:
+            break;
+    }
+
     if ( !m_bTriggeringOnClientDebugMessage )
     {
         m_bTriggeringOnClientDebugMessage = true;
@@ -400,24 +415,16 @@ void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& l
             Arguments.PushNumber ( luaDebugInfo.iLine );
         else
             Arguments.PushNil ( );
+
+        // Push the colors
+        Arguments.PushNumber ( ucRed );
+        Arguments.PushNumber ( ucGreen );
+        Arguments.PushNumber ( ucBlue );
         
         // Call onClientDebugMessage
         g_pClientGame->GetRootEntity ( )->CallEvent ( "onClientDebugMessage", Arguments, false );
 
         m_bTriggeringOnClientDebugMessage = false;
-    }
-
-    switch ( uiMinimumDebugLevel )
-    {
-        case 1:
-            ucRed = 255, ucGreen = 0, ucBlue = 0;
-            break;
-        case 2:
-            ucRed = 255, ucGreen = 128, ucBlue = 0;
-            break;
-        case 3:
-            ucRed = 0, ucGreen = 255, ucBlue = 0;
-            break;
     }
 
     m_DuplicateLineFilter.AddLine( { strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue } );
