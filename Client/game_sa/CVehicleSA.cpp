@@ -2147,7 +2147,7 @@ CObject * CVehicleSA::SpawnFlyingComponent ( int i_1, unsigned int ui_2 )
 }
 
 
-void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
+void CVehicleSA::SetWheelVisibility ( eWheelPosition wheel, bool bVisible )
 {    
     CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
     RwFrame * pFrame = NULL;
@@ -2177,7 +2177,7 @@ void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
 }
 
 
-CVector CVehicleSA::GetWheelPosition ( eWheels wheel )
+CVector CVehicleSA::GetWheelPosition ( eWheelPosition wheel )
 {
     switch (wheel)
     {

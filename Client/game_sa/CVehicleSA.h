@@ -736,8 +736,8 @@ public:
     inline void                 SetHeadLightColor               ( const SColor color )  { m_HeadLightColor = color; }
 
     CObject *                   SpawnFlyingComponent            ( int i_1, unsigned int ui_2 );
-    void                        SetWheelVisibility              ( eWheels wheel, bool bVisible );
-    CVector                     GetWheelPosition                ( eWheels wheel );
+    void                        SetWheelVisibility              ( eWheelPosition wheel, bool bVisible );
+    CVector                     GetWheelPosition                ( eWheelPosition wheel );
 
     bool                        IsHeliSearchLightVisible        ( void );
     void                        SetHeliSearchLightVisible       ( bool bVisible );

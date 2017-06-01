@@ -1487,7 +1487,7 @@ unsigned char CClientVehicle::GetWheelStatus ( unsigned char ucWheel )
         if ( m_pVehicle )
         {
             if ( HasDamageModel () )
-                return m_pVehicle->GetDamageManager ()->GetWheelStatus ( static_cast < eWheels > ( ucWheel ) );
+                return m_pVehicle->GetDamageManager ()->GetWheelStatus ( static_cast < eWheelPosition > ( ucWheel ) );
             if ( m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2 )
                 return m_pVehicle->GetBikeWheelStatus ( ucWheel );
         }
@@ -1563,10 +1563,10 @@ void CClientVehicle::SetWheelStatus ( unsigned char ucWheel, unsigned char ucSta
             // Do we have a damage model?
             if ( HasDamageModel () )
             {
-                m_pVehicle->GetDamageManager ()->SetWheelStatus ( ( eWheels ) ( ucWheel ), ucGTAStatus );
+                m_pVehicle->GetDamageManager ()->SetWheelStatus ( ( eWheelPosition ) ( ucWheel ), ucGTAStatus );
                 
                 // Update the wheel's visibility
-                m_pVehicle->SetWheelVisibility ( ( eWheels ) ucWheel, ( ucStatus != DT_WHEEL_MISSING ) );
+                m_pVehicle->SetWheelVisibility ( ( eWheelPosition ) ucWheel, ( ucStatus != DT_WHEEL_MISSING ) );
             }
             else if ( m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2 )
                 m_pVehicle->SetBikeWheelStatus ( ucWheel, ucGTAStatus );

@@ -917,7 +917,7 @@ int CLuaVehicleDefs::GetVehicleWheelStates ( lua_State* luaVM )
 
 int CLuaVehicleDefs::IsVehicleWheelCollided ( lua_State* luaVM )
 {
-    CClientVehicle* pVehicle = nullptr; eWheels wheel;
+    CClientVehicle* pVehicle = nullptr; eWheelPosition wheel;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pVehicle );
     argStream.ReadEnumStringOrNumber ( wheel );
