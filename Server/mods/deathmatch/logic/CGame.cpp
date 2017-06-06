@@ -937,6 +937,15 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
             CLogger::LogPrintf("WARNING: <owner_email_address> not set\n");
         }
     }
+    
+    if (m_pMainConfig->IsAdvancedModeEnabled())
+    {
+        CLogger::LogPrint("Advanced mode: Enabled!\n");
+    }
+    else
+    {
+        CLogger::LogPrint("Advanced mode: Disabled!\n");
+    }
 
     // Done
     // If you're ever going to change this message, update the "server ready" determination

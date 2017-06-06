@@ -122,7 +122,7 @@ public:
     LUA_DECLARE ( SetServerPassword );
     LUA_DECLARE ( GetServerConfigSetting );
     LUA_DECLARE ( SetServerConfigSetting );
-
+    LUA_DECLARE ( GetAdvancedMode );
     LUA_DECLARE ( shutdown );
 
     // Util functions to make scripting easier for the end user

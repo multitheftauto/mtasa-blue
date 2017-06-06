@@ -191,8 +191,25 @@ void CLuaMain::InitVM ( void )
     luaopen_debug ( m_luaVM );
     luaopen_utf8 ( m_luaVM );
 
-    // Initialize security restrictions. Very important to prevent lua trojans and viruses!
-    InitSecurity ();
+    // Enable package,io and os lib. Hosting providers can disable this.
+    if (g_pGame->GetConfig()->IsAdvancedModeEnabled()) {
+        lua_pushcfunction(m_luaVM, luaopen_package);
+        lua_pushstring(m_luaVM, "package");
+        lua_call(m_luaVM, 1, 0);
+
+        lua_pushcfunction(m_luaVM, luaopen_io);
+        lua_pushstring(m_luaVM, "io");
+        lua_call(m_luaVM, 1, 0);
+
+        lua_pushcfunction(m_luaVM, luaopen_os);
+        lua_pushstring(m_luaVM, "os");
+        lua_call(m_luaVM, 1, 0);
+    }
+    else
+    {
+        // Initialize security restrictions. Very important to prevent lua trojans and viruses!
+        InitSecurity();
+    }
 
     // Registering C functions
     CLuaCFunctions::RegisterFunctionsWithVM ( m_luaVM );
