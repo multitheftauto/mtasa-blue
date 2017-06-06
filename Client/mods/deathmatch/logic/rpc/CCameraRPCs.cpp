@@ -119,23 +119,15 @@ void CCameraRPCs::FadeCamera ( NetBitStreamInterface& bitStream )
         g_pClientGame->SetInitiallyFadedOut ( false );
 
         if ( ucFadeIn )
-        {
             m_pCamera->FadeIn ( fFadeTime );
-            g_pGame->GetHud ()->SetComponentVisible ( HUD_AREA_NAME, !g_pClientGame->GetHudAreaNameDisabled () );
-        }
         else
         {
             unsigned char ucRed = 0;
             unsigned char ucGreen = 0;
             unsigned char ucBlue = 0;
             
-            if ( bitStream.Read ( ucRed ) &&
-                 bitStream.Read ( ucGreen ) &&
-                 bitStream.Read ( ucBlue ) )
-            {
+            if ( bitStream.Read ( ucRed ) && bitStream.Read ( ucGreen ) && bitStream.Read ( ucBlue ) )
                 m_pCamera->FadeOut ( fFadeTime, ucRed, ucGreen, ucBlue );
-                g_pGame->GetHud ()->SetComponentVisible ( HUD_AREA_NAME, false );
-            }
         }
     }
 }

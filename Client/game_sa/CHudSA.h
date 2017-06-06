@@ -43,9 +43,7 @@
 #define FUNC_PrintHealthForPlayer   0x589270
 #define FUNC_PrintBreathForPlayer   0x589190
 #define FUNC_PrintArmourForPlayer   0x5890A0
-#define FUNC_DrawVitalStats         0x589650
 #define FUNC_DrawVehicleName        0x58AEA0
-#define FUNC_DrawHelpText           0x58B6E0
 #define FUNC_DrawAreaName           0x58AA50
 #define FUNC_DrawRadar              0x58A330
 #define FUNC_DrawRadarPlanB         0x58A335

@@ -1263,7 +1263,17 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (void*)0x53E9C6, 0x90, 6 );
 
     // Disable radar map hiding when pressing TAB (action key) while on foot
-    MemSet ( (void *)0x58FC3E, 0x90, 14 );
+    MemPut < BYTE > ( 0x58FC3C, 0xEB );
+
+    // Disable help text
+    MemPut < BYTE > ( 0x58B6E0, 0xC3 );
+
+    // Zone name doesn't lock when the camera is fade
+    MemPut < DWORD > ( 0x58AE94, 0x58AB30 );
+    MemPut < BYTE >  ( 0x58AB82, 0x90 );
+    MemPut < BYTE >  ( 0x58AB83, 0xE9 );
+    MemPut < DWORD > ( 0x58AE98, 0x58ABB2 );
+    MemPut < BYTE >  ( 0x58ABFB, 0xEB );
 
     // No intro movies kthx
     if ( version == VERSION_US_10 )
