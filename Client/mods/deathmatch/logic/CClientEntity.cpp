@@ -803,18 +803,22 @@ void CClientEntity::CallEventNoParent ( const char* szName, const CLuaArguments&
     // Call it on all our children
     if ( ! m_Children.empty () )
     {
-        CChildListType ::const_iterator iter = m_Children.begin ();
-        for ( ; iter != m_Children.end (); iter++ )
+        CElementListSnapshot* pList = GetChildrenListSnapshot();
+        pList->AddRef();    // Keep list alive during use
+        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ )
         {
             CClientEntity* pEntity = *iter;
-
-            if ( !pEntity->m_pEventManager || pEntity->m_pEventManager->HasEvents () || !pEntity->m_Children.empty () )
+            if ( !pEntity->IsBeingDeleted() )
             {
-                pEntity->CallEventNoParent ( szName, Arguments, pSource );
-                if ( m_bBeingDeleted )
-                    break;
+                if ( !pEntity->m_pEventManager || pEntity->m_pEventManager->HasEvents () || !pEntity->m_Children.empty () )
+                {
+                    pEntity->CallEventNoParent ( szName, Arguments, pSource );
+                    if ( m_bBeingDeleted )
+                        break;
+                }
             }
         }
+        pList->Release();
     }
 }
 
