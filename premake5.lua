@@ -12,6 +12,7 @@ if ci and ci:lower() == "true" then
 else 
 	CI_BUILD = false
 end 
+local GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
@@ -43,6 +44,17 @@ workspace "MTASA"
 	-- Helper function for output path 
 	buildpath = function(p) return "%{wks.location}/../Bin/"..p.."/" end
 	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} %{wks.location}../Bin/"..p.."/" end 
+
+	if GLIBC_COMPAT then 
+		filter { "system:linux" }
+			includedirs "utils/compat"
+			linkoptions "-static-libstdc++ -static-libgcc"
+			forceincludes  { "glibc_version.h" }
+		filter { "system:linux", "platforms:x86" }
+			libdirs { "utils/compat/x86" }
+		filter { "system:linux", "platforms:x64" }
+			libdirs { "utils/compat/x64" }
+	end
 	
 	filter "platforms:x86"
 		architecture "x86"

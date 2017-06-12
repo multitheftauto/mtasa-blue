@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PREMAKE5=utils/premake5
-if [ "$1" -eq "32" ]; then
+if [[ $1 = "32" ]]; then
     CONFIG=release_x86
 else
     CONFIG=release_x64
@@ -15,5 +15,6 @@ rm -Rf Bin/
 $PREMAKE5 gmake
 
 # Build!
+NUM_CORES=$(grep -c ^processor /proc/cpuinfo)
 cd Build/
-make config=$CONFIG all
+make -j$NUM_CORES config=$CONFIG all
