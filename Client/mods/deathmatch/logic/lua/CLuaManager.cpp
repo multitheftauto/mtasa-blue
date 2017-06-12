@@ -214,6 +214,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaPedDefs::IsPedDead );
     CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "setControlState", CLuaPedDefs::SetPedControlState);
+    CLuaCFunctions::AddFunction ( "getControlState", CLuaPedDefs::GetPedControlState);
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
     // Event funcs
@@ -368,7 +370,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );
     CLuaCFunctions::AddFunction ( "unbindKey", CLuaFunctionDefs::UnbindKey );
     CLuaCFunctions::AddFunction ( "getKeyState", CLuaFunctionDefs::GetKeyState );    
-    CLuaCFunctions::AddFunction ( "getControlState", CLuaFunctionDefs::GetControlState );
     CLuaCFunctions::AddFunction ( "getAnalogControlState", CLuaFunctionDefs::GetAnalogControlState );
     CLuaCFunctions::AddFunction ( "setAnalogControlState", CLuaFunctionDefs::SetAnalogControlState );
     CLuaCFunctions::AddFunction ( "isControlEnabled", CLuaFunctionDefs::IsControlEnabled );
@@ -378,7 +379,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getCommandsBoundToKey", CLuaFunctionDefs::GetCommandsBoundToKey );
     CLuaCFunctions::AddFunction ( "getKeyBoundToCommand", CLuaFunctionDefs::GetKeyBoundToCommand );
     
-    CLuaCFunctions::AddFunction ( "setControlState", CLuaFunctionDefs::SetControlState );
     CLuaCFunctions::AddFunction ( "toggleControl", CLuaFunctionDefs::ToggleControl );
     CLuaCFunctions::AddFunction ( "toggleAllControls", CLuaFunctionDefs::ToggleAllControls );
 

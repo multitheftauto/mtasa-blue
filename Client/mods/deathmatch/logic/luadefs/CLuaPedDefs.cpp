@@ -1061,10 +1061,13 @@ int CLuaPedDefs::GetPedClothes ( lua_State* luaVM )
 int CLuaPedDefs::GetPedControlState ( lua_State* luaVM )
 {
     // Verify the argument
-    CClientPed* pPed = NULL;
+    CClientPed* pPed = CStaticFunctionDefinitions::GetLocalPlayer();
     SString strControl = "";
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pPed );
+
+    if (argStream.NextIsUserData ()) {
+        argStream.ReadUserData (pPed);
+    }
     argStream.ReadString ( strControl );
 
     if ( !argStream.HasErrors () )
@@ -1597,11 +1600,14 @@ int CLuaPedDefs::RemovePedClothes ( lua_State* luaVM )
 int CLuaPedDefs::SetPedControlState ( lua_State* luaVM )
 {
     // Verify the argument
-    CClientEntity* pEntity = NULL;
+    CClientEntity* pEntity = CStaticFunctionDefinitions::GetLocalPlayer();
     SString strControl = "";
     bool bState = false;
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pEntity );
+
+    if (argStream.NextIsUserData ()) {
+        argStream.ReadUserData (pEntity);
+    }
     argStream.ReadString ( strControl );
     argStream.ReadBool ( bState );
 

@@ -1604,6 +1604,10 @@ bool CStaticFunctionDefinitions::GetPedClothes ( CClientPed & Ped, unsigned char
 
 bool CStaticFunctionDefinitions::GetPedControlState ( CClientPed & Ped, const char * szControl, bool & bState )
 {
+    if (&Ped == GetLocalPlayer ()) {
+        return GetControlState (szControl, bState);
+    }
+
     if ( Ped.GetType () == CCLIENTPLAYER )
     {
         CControllerState cs;
@@ -1628,10 +1632,12 @@ bool CStaticFunctionDefinitions::GetPedControlState ( CClientPed & Ped, const ch
             return true;
         }
     }
+
     if ( Ped.m_Pad.GetControlState ( szControl, bState ) )
     {
         return true;
     }
+
     return false;
 }
 
@@ -2223,6 +2229,11 @@ bool CStaticFunctionDefinitions::SetPedControlState ( CClientEntity & Entity, co
     if ( IS_PED ( &Entity ) )
     {
         CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        
+        if (&Ped == GetLocalPlayer ()) {
+            return SetControlState ( szControl, bState );
+        }
+
         if ( Ped.m_Pad.SetControlState ( szControl, bState ) )
         {
             return true;
