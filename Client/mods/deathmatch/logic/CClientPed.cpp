@@ -5062,6 +5062,7 @@ bool CClientPed::IsGettingOutOfVehicle ( void )
                     switch ( pSubTask->GetTaskType () )
                     {
                         case TASK_SIMPLE_CAR_GET_OUT:
+                        case TASK_SIMPLE_CAR_JUMP_OUT:
                         case TASK_SIMPLE_CAR_CLOSE_DOOR_FROM_OUTSIDE:
                         {
                             return true;

@@ -1447,6 +1447,10 @@ void CMultiplayerSA::InitHooks()
     MemSet ( (void*) 0x6D6517, 0x90, 2 );
     MemSet ( (void*) 0x6D0E43, 0x90, 2 );
 
+    // Fix killing ped during car jacking (#4319)
+    // by using CTaskComplexLeaveCar instead of CTaskComplexLeaveCarAndDie
+    MemPut < BYTE > ( 0x63F576, 0xEB );
+
 
     InitHooks_CrashFixHacks ();
 
