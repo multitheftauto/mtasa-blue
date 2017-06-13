@@ -4,6 +4,9 @@ FROM jetbrains/teamcity-agent:latest
 # Default value is 0 (manual build)
 ENV AS_BUILDAGENT 0
 
+# Set default target platform to 64-bits
+ENV BUILD_BITS 64
+
 # Install dependencies to install the latest gcc
 RUN apt-get update && \
     apt-get install -y software-properties-common wget && \
@@ -21,6 +24,9 @@ WORKDIR /build
 
 # Copy entrypoint script
 COPY utils/docker-entrypoint.sh /docker-entrypoint.sh
+
+# Add GLIB compat
+COPY utils/compat /compat
 
 # Set entrypoint
 ENTRYPOINT bash /docker-entrypoint.sh

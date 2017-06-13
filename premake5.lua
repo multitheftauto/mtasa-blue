@@ -47,13 +47,13 @@ workspace "MTASA"
 
 	if GLIBC_COMPAT then 
 		filter { "system:linux" }
-			includedirs "utils/compat"
+			includedirs "/compat"
 			linkoptions "-static-libstdc++ -static-libgcc"
 			forceincludes  { "glibc_version.h" }
 		filter { "system:linux", "platforms:x86" }
-			libdirs { "utils/compat/x86" }
+			libdirs { "/compat/x86" }
 		filter { "system:linux", "platforms:x64" }
-			libdirs { "utils/compat/x64" }
+			libdirs { "/compat/x64" }
 	end
 	
 	filter "platforms:x86"
