@@ -1,4 +1,4 @@
-FROM jetbrains/teamcity-agent:latest
+FROM jetbrains/teamcity-minimal-agent:latest
 
 # Set to 1 to configure this image as Teamcity build agent
 # Default value is 0 (manual build)
@@ -14,7 +14,7 @@ RUN apt-get update && \
 
 # Install latest gcc and libs
 RUN dpkg --add-architecture i386 && apt-get update && \
-    apt-get install -y ca-certificates git build-essential gcc-multilib g++-multilib gcc-6-multilib g++-6-multilib curl \
+    apt-get install -y ca-certificates git build-essential gcc-multilib g++-multilib gcc-6-multilib g++-6-multilib curl subversion ncftp \
         libncursesw5-dev libmysqlclient-dev \
         lib32ncursesw5-dev libncursesw5-dev:i386
 
