@@ -6,7 +6,7 @@ premake.modules.compose_files = {}
 local BIN_DIR = "Bin"
 local DATA_DIR = "Shared/data/MTA San Andreas"
 local OUTPUT_DIR = "InstallFiles"
-local WINDOWS = os.get() == "windows"
+local WINDOWS = os.host() == "windows"
 
 newaction {
 	trigger = "compose_files",

@@ -30,8 +30,9 @@ project "Deathmatch"
 			"."
 		}
 	
+	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib"
+		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
 	}
 	
 	vpaths {
@@ -59,9 +60,6 @@ project "Deathmatch"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
 		links { "ws2_32" }
-
-	filter {"system:windows", "toolset:*120*"}
-		links { "Psapi.lib" }
 		
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point

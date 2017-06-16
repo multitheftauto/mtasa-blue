@@ -85,8 +85,10 @@ namespace SharedUtil
     unsigned int    HashString                  ( const char* szString );
     unsigned int    HashString                  ( const char* szString, unsigned int length );
 
+#ifdef SDK_WITH_BCRYPT
     SString         BcryptHash                  (const SString& password, SString salt = "", std::size_t cost = 10);
     bool            BcryptVerify                (const SString& password, const SString& hash);
+#endif
 
     SString         ConvertDataToHexString      ( const void* pData, uint uiLength );
     void            ConvertHexStringToData      ( const SString& strString, void* pOutData, uint uiLength );

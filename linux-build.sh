@@ -1,11 +1,10 @@
 #!/bin/bash
 
-if [[ "$(uname -m)" == 'x86_64' ]]; then
-    PREMAKE5=utils/premake5_x64
-    CONFIG=release_x64
-else
-    PREMAKE5=utils/premake5_x86
+PREMAKE5=utils/premake5
+if [ "$1" -eq "32" ]; then
     CONFIG=release_x86
+else
+    CONFIG=release_x64
 fi
 
 # Clean old build files
