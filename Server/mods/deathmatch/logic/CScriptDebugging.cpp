@@ -22,7 +22,7 @@ CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
     m_uiLogFileLevel = 0;
     m_uiHtmlLogLevel = 0;
     m_pLogFile = NULL;
-    m_bTriggeringOnDebugMessage = false;
+    m_bTriggeringMessageEvent = false;
 }
 
 CScriptDebugging::~CScriptDebugging ( void )
@@ -116,70 +116,6 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
     }
 
     return false;
-}
-
-void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
-{
-    SString strText = ComposeErrorMessage( szPrePend, luaDebugInfo, szMessage );
-
-    // Create a different message if type is "INFO"
-    if ( uiMinimumDebugLevel > 2 )
-        strText = SString ( "%s%s", szPrePend, szMessage );
-
-    switch ( uiMinimumDebugLevel )
-    {
-        case 1:
-            ucRed = 255, ucGreen = 0, ucBlue = 0;
-            break;
-        case 2:
-            ucRed = 255, ucGreen = 128, ucBlue = 0;
-            break;
-        case 3:
-            ucRed = 0, ucGreen = 255, ucBlue = 0;
-            break;
-        default:
-            break;
-    }
-
-    // Check whether onDebugMessage is currently being triggered
-    if ( !m_bTriggeringOnDebugMessage )
-    {
-        // Make sure the state of onDebugMessage being triggered can be retrieved later
-        m_bTriggeringOnDebugMessage = true;
-
-        // Prepare onDebugMessage
-        CLuaArguments Arguments;
-        Arguments.PushString ( szMessage );
-        Arguments.PushNumber ( uiMinimumDebugLevel );
-
-        // Push the file name (if any)
-        if ( !luaDebugInfo.strFile.empty() )
-            Arguments.PushString ( luaDebugInfo.strFile );
-        else
-            Arguments.PushNil ( );
-
-        // Push the line (if any)
-        if ( luaDebugInfo.iLine != INVALID_LINE_NUMBER )
-            Arguments.PushNumber ( luaDebugInfo.iLine );
-        else
-            Arguments.PushNil ( );
-
-        // Push the colors
-        Arguments.PushNumber ( ucRed );
-        Arguments.PushNumber ( ucGreen );
-        Arguments.PushNumber ( ucBlue );
-        
-        // Call onDebugMessage
-        g_pGame->GetMapManager ( )->GetRootElement ( )->CallEvent ( "onDebugMessage", Arguments );
-
-        // Reset trigger state, so onDebugMessage can be called again at a later moment
-        m_bTriggeringOnDebugMessage = false;
-    }
-
-    m_DuplicateLineFilter.AddLine( { strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue } );
-    if ( g_pGame->GetConfig()->GetFilterDuplicateLogLinesEnabled() == false )
-        m_DuplicateLineFilter.Flush();
-    UpdateLogOutput();
 }
 
 void CScriptDebugging::UpdateLogOutput( void )

@@ -155,6 +155,82 @@ void CScriptDebugging::LogCustom (lua_State* luaVM, const char* szMessage)
     LogWarning (luaVM, "%s", szMessage);
 }
 
+
+void CScriptDebugging::LogString (const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+{
+    SString strText = ComposeErrorMessage (szPrePend, luaDebugInfo, szMessage);
+
+    // Create a different message if type is "INFO"
+    if (uiMinimumDebugLevel > 2)
+        strText = SString ("%s%s", szPrePend, szMessage);
+
+    switch (uiMinimumDebugLevel)
+    {
+    case 1:
+        ucRed = 255, ucGreen = 0, ucBlue = 0;
+        break;
+    case 2:
+        ucRed = 255, ucGreen = 128, ucBlue = 0;
+        break;
+    case 3:
+        ucRed = 0, ucGreen = 255, ucBlue = 0;
+        break;
+    default:
+        break;
+    }
+
+    // Check whether on(Client)DebugMessage is currently being triggered
+    if (!m_bTriggeringMessageEvent)
+    {
+        // Make sure the state of on(Client)DebugMessage being triggered can be retrieved later
+        m_bTriggeringMessageEvent = true;
+
+        // Prepare onDebugMessage
+        CLuaArguments Arguments;
+        Arguments.PushString (szMessage);
+        Arguments.PushNumber (uiMinimumDebugLevel);
+
+        // Push the file name (if any)
+        if (!luaDebugInfo.strFile.empty ())
+            Arguments.PushString (luaDebugInfo.strFile);
+        else
+            Arguments.PushNil ();
+
+        // Push the line (if any)
+        if (luaDebugInfo.iLine != INVALID_LINE_NUMBER)
+            Arguments.PushNumber (luaDebugInfo.iLine);
+        else
+            Arguments.PushNil ();
+
+        // Push the colors
+        Arguments.PushNumber (ucRed);
+        Arguments.PushNumber (ucGreen);
+        Arguments.PushNumber (ucBlue);
+
+        // Call on(Client)DebugMessage
+#ifdef MTA_CLIENT
+        g_pClientGame->GetRootEntity ()->CallEvent ("onClientDebugMessage", Arguments, false);
+#else
+        g_pGame->GetMapManager ()->GetRootElement ()->CallEvent ("onDebugMessage", Arguments);
+#endif
+
+        // Reset trigger state, so onDebugMessage can be called again at a later moment
+        m_bTriggeringMessageEvent = false;
+    }
+
+    m_DuplicateLineFilter.AddLine ({ strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue });
+
+#ifdef MTA_CLIENT
+    if (g_pCore->GetCVars ()->GetValue < bool > ("filter_duplicate_log_lines") == false)
+#else
+    if (g_pGame->GetConfig ()->GetFilterDuplicateLogLinesEnabled () == false)
+#endif
+    {
+        m_DuplicateLineFilter.Flush ();
+    }
+    UpdateLogOutput ();
+}
+
 //
 // Get best debug info we possibly can from the relevent lua state
 //
