@@ -1,6 +1,6 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
 *  FILE:        core/CClientVariables.h
 *  PURPOSE:     Header file for client variable class
@@ -11,8 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CCLIENTVARIABLES_H
-#define __CCLIENTVARIABLES_H
+#pragma once
 
 #include <string>
 #include "CSingleton.h"
@@ -78,5 +77,3 @@ private:
     CXMLNode        *m_pStorage;
     int             m_iRevision;
 };
-
-#endif
