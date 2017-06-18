@@ -1,7 +1,7 @@
 project "mbedtls"
 	language "C"
 	kind "StaticLib"
-	targetname "curl"
+	targetname "mbedtls"
 
 	defines { "MBEDTLS_ZLIB_SUPPORT" }
 	includedirs { "include", "../zlib" }

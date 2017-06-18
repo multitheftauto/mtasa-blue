@@ -32,7 +32,7 @@ project "Deathmatch"
 	
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
+		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
 	}
 	
 	vpaths {
@@ -59,11 +59,13 @@ project "Deathmatch"
 	filter "system:windows"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
-		links { "ws2_32" }
+		links { "ws2_32", "pthread" }
 		
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
 		links { "rt" }
+		buildoptions { "-pthread" }
+		linkoptions { "-pthread" }
 	
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

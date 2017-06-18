@@ -78,6 +78,18 @@
 #  include "config-vxworks.h"
 #endif
 
+#ifdef __linux__
+#  include "config-linux.h"
+#endif
+
+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#  include "config-linux.h"
+#endif
+
+#ifdef __APPLE__ && __MACH__
+#  include "config-osx.h"
+#endif
+
 #endif /* HAVE_CONFIG_H */
 
 /* ================================================================ */
@@ -124,7 +136,18 @@
 /*  please, do it beyond the point further indicated in this file.  */
 /* ================================================================ */
 
-#include <curl/curl.h>
+/*
+ * libcurl's external interface definitions are also used internally,
+ * and might also include required system header files to define them.
+ */
+
+#include <curl/curlbuild.h>
+
+/*
+ * Compile time sanity checks must also be done when building the library.
+ */
+
+#include <curl/curlrules.h>
 
 /*
  * Ensure that no one is using the old SIZEOF_CURL_OFF_T macro
