@@ -27,8 +27,8 @@ project "curl"
 	}
 
 	filter { "system:windows" }
-		defines { "USE_SCHANNEL", "USE_WINDOWS_SSPI" }
-		links "crypt32"
+		defines { "USE_SCHANNEL", "USE_WINDOWS_SSPI", "USE_WIN32_IDN", "WANT_IDN_PROTOTYPES" }
+		links { "crypt32", "Normaliz" }
 
 	filter { "system:macosx" }
 		defines { "USE_DARWINSSL" }
