@@ -86,7 +86,7 @@ void CCameraRPCs::SetCameraTarget ( NetBitStreamInterface& bitStream )
                     else
                     {
                         // Put the focus on that player
-                        m_pCamera->SetFocus ( pPlayer, MODE_BEHINDCAR, false );
+                        m_pCamera->SetFocus ( pPlayer, MODE_CAM_ON_A_STRING, false );
                     }
                     break;
                 }
