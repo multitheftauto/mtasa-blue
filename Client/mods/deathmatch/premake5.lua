@@ -61,6 +61,9 @@ project "Client Deathmatch"
 	configuration "windows"
 		buildoptions { "-Zm180" }
 	
+	filter {"system:windows", "toolset:*_xp*"}
+		links { "Psapi.lib" }
+
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
 		

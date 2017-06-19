@@ -55,12 +55,15 @@ project "Deathmatch"
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",
 	}
-	
+
 	filter "system:windows"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
 		links { "ws2_32", "pthread" }
 		
+	filter {"system:windows", "toolset:*_xp*"}
+		links { "Psapi.lib" }
+
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
 		links { "rt" }
