@@ -136,9 +136,9 @@ public:
 
     // Components
     LUA_DECLARE ( SetVehicleComponentPosition );
-    LUA_DECLARE ( GetVehicleComponentPosition );
+    LUA_DECLARE_OOP ( GetVehicleComponentPosition );
     LUA_DECLARE ( SetVehicleComponentRotation );
-    LUA_DECLARE ( GetVehicleComponentRotation );
+    LUA_DECLARE_OOP ( GetVehicleComponentRotation );
     LUA_DECLARE ( ResetVehicleComponentPosition );
     LUA_DECLARE ( ResetVehicleComponentRotation );
     LUA_DECLARE ( SetVehicleComponentVisible );
