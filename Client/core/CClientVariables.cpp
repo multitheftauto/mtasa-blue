@@ -271,15 +271,16 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "console_size",               CVector2D ( 200, 200 ) );       // console size
     DEFAULT ( "serverbrowser_size",         CVector2D ( 720.0f, 495.0f ) ); // serverbrowser size
     DEFAULT ( "fps_limit",                  100 );                          // frame limiter
-    DEFAULT ( "chat_font",                  0 );                            // chatbox font type
-    DEFAULT ( "chat_lines",                 7 );                            // chatbox lines
-    DEFAULT ( "chat_color",                 CColor (0,0,128,100) );         // chatbox color
+    DEFAULT ( "chat_font",                  2 );                            // chatbox font type
+    DEFAULT ( "chat_lines",                 10 );                           // chatbox lines
+    DEFAULT ( "chat_color",                 CColor (0,0,0,0) );             // chatbox background color
     DEFAULT ( "chat_text_color",            CColor (172,213,254,255) );     // chatbox text color
-    DEFAULT ( "chat_input_color",           CColor (0,0,191,110) );         // chatbox input color
-    DEFAULT ( "chat_input_prefix_color",    CColor (172,213,254,255) );     // chatbox prefix input color
-    DEFAULT ( "chat_input_text_color",      CColor (172,213,254,255) );     // chatbox text input color
+    DEFAULT ( "chat_input_color",           CColor (0,0,0,0) );             // chatbox input background color
+    DEFAULT ( "chat_input_prefix_color",    CColor (172,213,254,255) );     // chatbox input prefix color
+    DEFAULT ( "chat_input_text_color",      CColor (172,213,254,255) );     // chatbox input text color
     DEFAULT ( "chat_scale",                 CVector2D ( 1.0f, 1.0f ) );     // chatbox scale
-    DEFAULT ( "chat_width",                 1.0f );                         // chatbox width
+    DEFAULT ( "chat_width",                 1.5f );                         // chatbox width
+
     DEFAULT ( "chat_css_style_text",        false );                        // chatbox css/hl style text
     DEFAULT ( "chat_css_style_background",  false );                        // chatbox css/hl style background
     DEFAULT ( "chat_line_life",             12000 );                        // chatbox line life time

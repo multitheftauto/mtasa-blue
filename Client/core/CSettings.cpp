@@ -1014,7 +1014,7 @@ void CSettings::CreateGUI ( void )
 
         m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "" ) );
         m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
-        m_pChatLines->SetSize ( CVector2D ( 80.0f, 24.0f ) );
+        m_pChatLines->SetSize ( CVector2D ( 110.0f, 24.0f ) );
         m_pChatLines->SetAlwaysOnTop ( true );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, _("Scale:") ) );
@@ -1025,17 +1025,17 @@ void CSettings::CreateGUI ( void )
 
         m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
         m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
-        m_pChatScaleX->SetSize ( CVector2D ( 35.0f, 24.0f ) );
+        m_pChatScaleX->SetSize ( CVector2D ( 50.0f, 24.0f ) );
         m_pChatScaleX->SetAlwaysOnTop ( true );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, "x") );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 37.0f, vecTemp.fY + 2.0f ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 52.0f, vecTemp.fY + 2.0f ) );
         pLabel->AutoSize ( );
         pLabel->SetAlwaysOnTop ( true );
 
         m_pChatScaleY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
-        m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 45.0f, vecTemp.fY - 2.0f ) );
-        m_pChatScaleY->SetSize ( CVector2D ( 35.0f, 24.0f ) );
+        m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 60.0f, vecTemp.fY - 2.0f ) );
+        m_pChatScaleY->SetSize ( CVector2D ( 50.0f, 24.0f ) );
         m_pChatScaleY->SetAlwaysOnTop ( true );
 
         pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pLayoutTab, _("Width:") ) );
@@ -1046,7 +1046,7 @@ void CSettings::CreateGUI ( void )
 
         m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pLayoutTab, "") );
         m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
-        m_pChatWidth->SetSize ( CVector2D ( 80.0f, 24.0f ) );
+        m_pChatWidth->SetSize ( CVector2D ( 110.0f, 24.0f ) );
         m_pChatWidth->SetAlwaysOnTop ( true );
 
         // Fading tab
@@ -2029,7 +2029,7 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
 
     CVARS_SET ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 
-    CVARS_SET ( "mapalpha", 140.25f);
+    CVARS_SET ( "mapalpha", 155);
 
     // Display restart required message if required
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != m_pComboAntiAliasing->GetSelectedItemIndex ();
@@ -2874,9 +2874,9 @@ void CSettings::LoadData ( void )
         CVARS_GET ( "chat_scale", strVar );
         stringstream ss( strVar );
         ss >> strVar;
-        m_pChatScaleX->SetText ( strVar.c_str () );
+        m_pChatScaleX->SetText ( SString( "%1.1f", atof( strVar.c_str() ) ) );
         ss >> strVar;
-        m_pChatScaleY->SetText ( strVar.c_str () );
+        m_pChatScaleY->SetText ( SString( "%1.1f", atof( strVar.c_str() ) ) );
     }
     catch (...)
     {

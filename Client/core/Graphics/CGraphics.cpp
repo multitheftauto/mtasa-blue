@@ -74,7 +74,7 @@ CGraphics::~CGraphics ( void )
 }
 
 
-void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
+void CGraphics::DrawString ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
 {   
     if ( g_pCore->IsWindowMinimized () )
         return;
@@ -120,7 +120,7 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
 }
 
 
-void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... )
+void CGraphics::DrawString ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... )
 {
     char szBuffer [ 1024 ];
     va_list ap;
@@ -128,7 +128,7 @@ void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, 
     VSNPRINTF ( szBuffer, 1024, szText, ap );
     va_end ( ap );
 
-    DrawText ( iX, iY, iX, iY, dwColor, szBuffer, fScale, fScale, DT_NOCLIP );
+    DrawString ( iX, iY, iX, iY, dwColor, szBuffer, fScale, fScale, DT_NOCLIP );
 }
 
 
@@ -839,7 +839,7 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
 }
 
 
-void CGraphics::DrawTextQueued ( float fLeft, float fTop,
+void CGraphics::DrawStringQueued ( float fLeft, float fTop,
                                  float fRight, float fBottom,
                                  unsigned long dwColor,
                                  const char* szText,
@@ -1918,7 +1918,7 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
                 const uint uiMessageWidth = GetDXTextExtent( m_strProgressMessage );
                 const uint uiMessagePosX = uiViewportWidth / 2 - uiMessageWidth / 2;
                 const DWORD dwMessageColor = 0xA0FFFFFF;
-                DrawText( uiMessagePosX, uiViewportHeight - 57, dwMessageColor, 1, "%s", *m_strProgressMessage );
+                DrawString( uiMessagePosX, uiViewportHeight - 57, dwMessageColor, 1, "%s", *m_strProgressMessage );
             }
 
             if ( m_ProgressSpinnerTexture )

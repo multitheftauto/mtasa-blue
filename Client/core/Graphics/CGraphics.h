@@ -78,8 +78,8 @@ public:
     void                CalcScreenCoors         ( CVector * vecWorld, CVector * vecScreen );
 
     // DirectX drawing functions
-    void                DrawText                ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont * pDXFont = NULL );
-    void                DrawText                ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... );
+    void                DrawString              ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont * pDXFont = NULL );
+    void                DrawString              ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... );
     void                DrawLine3D              ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f );
     void                DrawRectangle           ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false );
 
@@ -165,7 +165,7 @@ public:
                                                   unsigned long ulColor,
                                                   bool bPostGUI );
 
-    void                DrawTextQueued          ( float iLeft, float iTop,
+    void                DrawStringQueued        ( float iLeft, float iTop,
                                                   float iRight, float iBottom,
                                                   unsigned long dwColor,
                                                   const char* wszText,
