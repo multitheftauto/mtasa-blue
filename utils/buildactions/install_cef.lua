@@ -13,7 +13,7 @@ newaction {
 
 	execute = function()
 		-- Only execute on Windows
-		if os.get() ~= "windows" then return end
+		if os.host() ~= "windows" then return end
 
 		-- Download md5
 		local correct_checksum, result_string = http.get(CEF_URL_MD5)

@@ -39,11 +39,12 @@ public:
         ReadNumber(strKeyName, bOutValue, bDefaultValue);
     }
 
-    void ReadStringMap(const SString& strKeyName, CStringMapReader& outMap)
+    template<typename T>
+    void ReadStringMap(const SString& strKeyName, T& outMap)
     {
         V* pstrValue = MapFind(*this, strKeyName);
         if (pstrValue)
-            outMap = pstrValue->subMap;
+            outMap.insert(pstrValue->subMap.begin(), pstrValue->subMap.end());
     }
 };
 

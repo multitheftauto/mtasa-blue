@@ -1,10 +1,6 @@
 #!/bin/bash
 
-if [[ "$(uname -m)" == 'x86_64' ]]; then
-    PREMAKE5=utils/premake5_x64
-else
-    PREMAKE5=utils/premake5_x86
-fi
+PREMAKE5=utils/premake5
 
 # Install data files
 $PREMAKE5 install_data

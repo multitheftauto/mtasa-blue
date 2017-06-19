@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -33,41 +33,27 @@
 typedef unsigned long   u_int32_t;
 
 
-/* System API wrapper prototypes and definitions to support ASCII parameters. */
+/* System API wrapper prototypes & definitions to support ASCII parameters. */
 
 #include <sys/socket.h>
 #include <netdb.h>
-#include <qsossl.h>
 #include <gskssl.h>
 #include <qsoasync.h>
 #include <gssapi.h>
 
-extern int      Curl_getaddrinfo_a(const char * nodename, const char * servname,
-                                   const struct addrinfo * hints,
-                                   struct addrinfo * * res);
+extern int Curl_getaddrinfo_a(const char *nodename,
+                              const char *servname,
+                              const struct addrinfo *hints,
+                              struct addrinfo **res);
 #define getaddrinfo             Curl_getaddrinfo_a
 
 
-extern int      Curl_getnameinfo_a(const struct sockaddr * sa,
-                                   curl_socklen_t salen,
-                                   char * nodename, curl_socklen_t nodenamelen,
-                                   char * servname, curl_socklen_t servnamelen,
-                                   int flags);
+extern int Curl_getnameinfo_a(const struct sockaddr *sa,
+                              curl_socklen_t salen,
+                              char *nodename, curl_socklen_t nodenamelen,
+                              char *servname, curl_socklen_t servnamelen,
+                              int flags);
 #define getnameinfo             Curl_getnameinfo_a
-
-
-/* SSL wrappers. */
-
-extern int      Curl_SSL_Init_Application_a(SSLInitApp * init_app);
-#define SSL_Init_Application    Curl_SSL_Init_Application_a
-
-
-extern int      Curl_SSL_Init_a(SSLInit * init);
-#define SSL_Init                Curl_SSL_Init_a
-
-
-extern char *   Curl_SSL_Strerror_a(int sslreturnvalue, SSLErrorMsg * serrmsgp);
-#define SSL_Strerror            Curl_SSL_Strerror_a
 
 
 /* GSKit wrappers. */
@@ -93,7 +79,7 @@ extern int      Curl_gsk_secure_soc_init(gsk_handle my_session_handle);
 
 extern int      Curl_gsk_attribute_set_buffer_a(gsk_handle my_gsk_handle,
                                                 GSK_BUF_ID bufID,
-                                                const char * buffer,
+                                                const char *buffer,
                                                 int bufSize);
 #define gsk_attribute_set_buffer        Curl_gsk_attribute_set_buffer_a
 
@@ -109,29 +95,29 @@ extern int      Curl_gsk_attribute_set_numeric_value(gsk_handle my_gsk_handle,
 
 extern int      Curl_gsk_attribute_set_callback(gsk_handle my_gsk_handle,
                                                 GSK_CALLBACK_ID callBackID,
-                                                void * callBackAreaPtr);
+                                                void *callBackAreaPtr);
 #define gsk_attribute_set_callback      Curl_gsk_attribute_set_callback
 
 extern int      Curl_gsk_attribute_get_buffer_a(gsk_handle my_gsk_handle,
                                                 GSK_BUF_ID bufID,
-                                                const char * * buffer,
-                                                int * bufSize);
+                                                const char **buffer,
+                                                int *bufSize);
 #define gsk_attribute_get_buffer        Curl_gsk_attribute_get_buffer_a
 
 extern int      Curl_gsk_attribute_get_enum(gsk_handle my_gsk_handle,
                                             GSK_ENUM_ID enumID,
-                                            GSK_ENUM_VALUE * enumValue);
+                                            GSK_ENUM_VALUE *enumValue);
 #define gsk_attribute_get_enum  Curl_gsk_attribute_get_enum
 
 extern int      Curl_gsk_attribute_get_numeric_value(gsk_handle my_gsk_handle,
                                                      GSK_NUM_ID numID,
-                                                     int * numValue);
+                                                     int *numValue);
 #define gsk_attribute_get_numeric_value Curl_gsk_attribute_get_numeric_value
 
 extern int      Curl_gsk_attribute_get_cert_info(gsk_handle my_gsk_handle,
                                  GSK_CERT_ID certID,
-                                 const gsk_cert_data_elem * * certDataElem,
-                                 int * certDataElementCount);
+                                 const gsk_cert_data_elem **certDataElem,
+                                 int *certDataElementCount);
 #define gsk_attribute_get_cert_info     Curl_gsk_attribute_get_cert_info
 
 extern int      Curl_gsk_secure_soc_misc(gsk_handle my_session_handle,
@@ -139,13 +125,13 @@ extern int      Curl_gsk_secure_soc_misc(gsk_handle my_session_handle,
 #define gsk_secure_soc_misc     Curl_gsk_secure_soc_misc
 
 extern int      Curl_gsk_secure_soc_read(gsk_handle my_session_handle,
-                                         char * readBuffer,
-                                         int readBufSize, int * amtRead);
+                                         char *readBuffer,
+                                         int readBufSize, int *amtRead);
 #define gsk_secure_soc_read     Curl_gsk_secure_soc_read
 
 extern int      Curl_gsk_secure_soc_write(gsk_handle my_session_handle,
-                                          char * writeBuffer,
-                                          int writeBufSize, int * amtWritten);
+                                          char *writeBuffer,
+                                          int writeBufSize, int *amtWritten);
 #define gsk_secure_soc_write    Curl_gsk_secure_soc_write
 
 extern const char *     Curl_gsk_strerror_a(int gsk_return_value);
@@ -216,15 +202,22 @@ extern OM_uint32 Curl_gss_delete_sec_context_a(OM_uint32 * minor_status,
 
 extern int Curl_os400_connect(int sd, struct sockaddr * destaddr, int addrlen);
 extern int Curl_os400_bind(int sd, struct sockaddr * localaddr, int addrlen);
-extern int Curl_os400_sendto(int sd, char * buffer, int buflen, int flags,
-            struct sockaddr * dstaddr, int addrlen);
-extern int Curl_os400_recvfrom(int sd, char * buffer, int buflen, int flags,
-                                struct sockaddr * fromaddr, int * addrlen);
+extern int Curl_os400_sendto(int sd, char *buffer, int buflen, int flags,
+                             struct sockaddr * dstaddr, int addrlen);
+extern int Curl_os400_recvfrom(int sd, char *buffer, int buflen, int flags,
+                               struct sockaddr *fromaddr, int *addrlen);
 
 #define connect                 Curl_os400_connect
 #define bind                    Curl_os400_bind
 #define sendto                  Curl_os400_sendto
 #define recvfrom                Curl_os400_recvfrom
 
+#ifdef HAVE_LIBZ
+#define zlibVersion             Curl_os400_zlibVersion
+#define inflateInit_            Curl_os400_inflateInit_
+#define inflateInit2_           Curl_os400_inflateInit2_
+#define inflate                 Curl_os400_inflate
+#define inflateEnd              Curl_os400_inflateEnd
+#endif
 
 #endif /* HEADER_CURL_SETUP_OS400_H */

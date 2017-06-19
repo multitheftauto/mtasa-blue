@@ -29,7 +29,7 @@ matrix:
         NIGHTLY_UPLOAD=0
     
 before_script:
-  - wget https://github.com/sbx320/premake5-travis/blob/master/premake5?raw=true -O ./premake5 &&
+  - wget https://mirror.mtasa.com/bdata/premake5-travis -O ./premake5 &&
     chmod +x ./premake5 &&
     ./premake5 gmake && 
     cd Build

@@ -22,7 +22,7 @@ newaction {
 		os.mkdir(BIN_DIR)
 		
 		-- Copy data files
-		if os.get() == "windows" then
+		if os.host() == "windows" then
 			os.copydir(DATA_DIR, BIN_DIR)
 		end
 

@@ -65,7 +65,7 @@ static int      inet_pton6(const char *src, unsigned char *dst);
 int
 Curl_inet_pton(int af, const char *src, void *dst)
 {
-  switch (af) {
+  switch(af) {
   case AF_INET:
     return (inet_pton4(src, (unsigned char *)dst));
 #ifdef ENABLE_IPV6
@@ -103,7 +103,8 @@ inet_pton4(const char *src, unsigned char *dst)
   while((ch = *src++) != '\0') {
     const char *pch;
 
-    if((pch = strchr(digits, ch)) != NULL) {
+    pch = strchr(digits, ch);
+    if(pch) {
       unsigned int val = *tp * 10 + (unsigned int)(pch - digits);
 
       if(saw_digit && *tp == 0)
@@ -169,7 +170,8 @@ inet_pton6(const char *src, unsigned char *dst)
   while((ch = *src++) != '\0') {
     const char *pch;
 
-    if((pch = strchr((xdigits = xdigits_l), ch)) == NULL)
+    pch = strchr((xdigits = xdigits_l), ch);
+    if(!pch)
       pch = strchr((xdigits = xdigits_u), ch);
     if(pch != NULL) {
       val <<= 4;
@@ -188,8 +190,8 @@ inet_pton6(const char *src, unsigned char *dst)
       }
       if(tp + INT16SZ > endp)
         return (0);
-      *tp++ = (unsigned char) (val >> 8) & 0xff;
-      *tp++ = (unsigned char) val & 0xff;
+      *tp++ = (unsigned char) ((val >> 8) & 0xff);
+      *tp++ = (unsigned char) (val & 0xff);
       saw_xdigit = 0;
       val = 0;
       continue;
@@ -205,8 +207,8 @@ inet_pton6(const char *src, unsigned char *dst)
   if(saw_xdigit) {
     if(tp + INT16SZ > endp)
       return (0);
-    *tp++ = (unsigned char) (val >> 8) & 0xff;
-    *tp++ = (unsigned char) val & 0xff;
+    *tp++ = (unsigned char) ((val >> 8) & 0xff);
+    *tp++ = (unsigned char) (val & 0xff);
   }
   if(colonp != NULL) {
     /*

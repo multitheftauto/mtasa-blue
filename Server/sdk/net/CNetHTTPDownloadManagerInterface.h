@@ -16,7 +16,8 @@ struct SHttpRequestOptions
 {
     bool bIsLegacy = false;         // true = old error behaviour
     SString strPostData;
-    bool bPostBinary = false;       // false = truncate data to first null character and send as text/plain (true = send as application/octet-stream)
+    bool bPostBinary = false;       // false = truncate strPostData to first null character and send as text/plain (true = send as application/octet-stream)
+    std::map<SString,SString> formFields;   // If set, send items as multipart/formdata (and ignore strPostData)
     uint uiConnectionAttempts = 10;
     uint uiConnectTimeoutMs = 10000;
     SString strRequestMethod;

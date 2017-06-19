@@ -87,7 +87,7 @@ private:
     unsigned int                    m_uiHtmlLogLevel;
     FILE*                           m_pLogFile;
     list < class CPlayer* >         m_Players;
-    bool                            m_bTriggeringOnDebugMessage;
+    bool                            m_bTriggeringMessageEvent;
     SLuaDebugInfo                   m_SavedLuaDebugInfo;
     std::list < CLuaMain* >         m_LuaMainStack;
     CDuplicateLineFilter < SLogLine > m_DuplicateLineFilter;
