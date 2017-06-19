@@ -491,6 +491,8 @@ void CSettingsSA::SetRadarMode ( eRadarMode hudMode )
 float ms_fFOV = 70;
 float ms_fFOVCar = 70;
 float ms_fFOVCarMax = 100;  // at high vehicle velocity
+bool ms_bFOVPlayerFromScript = false;
+bool ms_bFOVVehicleFromScript = false;
 
 // consider moving this to the camera class - qaisjp
 float CSettingsSA::GetFieldOfViewPlayer ( void )
@@ -508,22 +510,39 @@ float CSettingsSA::GetFieldOfViewVehicleMax ( void )
     return ms_fFOVCarMax;
 }
 
-void CSettingsSA::SetFieldOfView ( float fAngle )
+void CSettingsSA::UpdateFieldOfViewFromSettings( void )
 {
-    SetFieldOfViewPlayer ( fAngle );
-    SetFieldOfViewVehicle ( fAngle );
+    float fFieldOfView;
+    g_pCore->GetCVars()->Get( "fov", fFieldOfView );
+    fFieldOfView = Clamp( 70.f, fFieldOfView, 100.f );
+    SetFieldOfViewPlayer( fFieldOfView, false );
+    SetFieldOfViewVehicle( fFieldOfView, false );
+    SetFieldOfViewVehicleMax( 100, false );
 }
-    
-void CSettingsSA::SetFieldOfViewPlayer ( float fAngle )
+
+void CSettingsSA::ResetFieldOfViewFromScript( void )
 {
+    ms_bFOVPlayerFromScript = false;
+    ms_bFOVVehicleFromScript = false;
+    UpdateFieldOfViewFromSettings();
+}
+
+void CSettingsSA::SetFieldOfViewPlayer ( float fAngle, bool bFromScript )
+{
+    if ( !bFromScript && ms_bFOVPlayerFromScript )
+        return;
+    ms_bFOVPlayerFromScript = bFromScript;
     ms_fFOV = fAngle;
     MemPut < void* > ( 0x0522F3A, &ms_fFOV );
     MemPut < void* > ( 0x0522F5D, &ms_fFOV );
     MemPut < float > ( 0x0522F7A, ms_fFOV );
 }
 
-void CSettingsSA::SetFieldOfViewVehicle ( float fAngle )
+void CSettingsSA::SetFieldOfViewVehicle ( float fAngle, bool bFromScript )
 {
+    if ( !bFromScript && ms_bFOVVehicleFromScript )
+        return;
+    ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCar = fAngle;
     MemPut < void* > ( 0x0524B76, &ms_fFOVCar );
     MemPut < void* > ( 0x0524B9A, &ms_fFOVCar );
@@ -532,8 +551,11 @@ void CSettingsSA::SetFieldOfViewVehicle ( float fAngle )
     MemPut < float > ( 0x0524BE4, ms_fFOVCar );
 }
 
-void CSettingsSA::SetFieldOfViewVehicleMax ( float fAngle )
+void CSettingsSA::SetFieldOfViewVehicleMax ( float fAngle, bool bFromScript )
 {
+    if ( !bFromScript && ms_bFOVVehicleFromScript )
+        return;
+    ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCarMax = fAngle;
     MemPut < void* > ( 0x0524BB4, &ms_fFOVCarMax );
     MemPut < float > ( 0x0524BC5, ms_fFOVCarMax );

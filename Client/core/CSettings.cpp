@@ -2008,13 +2008,6 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
 {
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
 
-
-    //gameSettings->SetMipMappingEnabled (); // Doesn't appear to even be enabled
-    gameSettings->SetFieldOfView( 70 );
-    gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
-    gameSettings->SetBrightness ( 253 );
-    gameSettings->SetFXQuality ( 2 );
-    gameSettings->SetAntiAliasing ( 1, true );
     CVARS_SET ("aspect_ratio", ASPECT_RATIO_AUTO );
     CVARS_SET ("fov", 70 );
     CVARS_SET ("anisotropic", 0 );
@@ -2023,6 +2016,11 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     CVARS_SET ( "heat_haze", true );
     CVARS_SET ( "tyre_smoke_enabled", true );
     CVARS_SET ( "high_detail_vehicles", false );
+    gameSettings->UpdateFieldOfViewFromSettings();
+    gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
+    gameSettings->SetBrightness ( 253 );
+    gameSettings->SetFXQuality ( 2 );
+    gameSettings->SetAntiAliasing ( 1, true );
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false, FULLSCREEN_STANDARD );
@@ -3022,6 +3020,7 @@ void CSettings::SaveData ( void )
     // iFieldOfView
     int iFieldOfView = std::min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
     CVARS_SET ( "fov", iFieldOfView );
+    gameSettings->UpdateFieldOfViewFromSettings();
 
     // Anisotropic filtering
     int iAnisotropic = std::min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );

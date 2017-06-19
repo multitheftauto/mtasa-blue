@@ -5453,11 +5453,7 @@ void CClientGame::ResetMapInfo ( void )
     m_pCamera->FadeOut ( 0.0f, 0, 0, 0 );    
     g_pGame->GetWorld ()->SetCurrentArea ( 0 );
     m_pCamera->SetFocusToLocalPlayer ();
-
-    float fFOV;
-    g_pCore->GetCVars ()->Get ( "fov", fFOV );
-    g_pGame->GetSettings ()->SetFieldOfView ( Clamp ( 70.f, fFOV, 100.f ) );
-    g_pGame->GetSettings ()->SetFieldOfViewVehicleMax ( 100 );
+    g_pGame->GetSettings ()->ResetFieldOfViewFromScript();
 
     // Dimension
     SetAllDimensions ( 0 );
