@@ -1111,8 +1111,9 @@ void CSettings::CreateGUI ( void )
         pLabel->GetSize ( vecSize );
         pLabel->SetFont ( "default-bold-small" );
 
+        fLineHeight = 17.0f;
         m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Hide background when not typing") ) );
-        m_pChatCssBackground->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fFontNamesMarginY ) );
+        m_pChatCssBackground->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fFontNamesMarginY - 2 ) );
         m_pChatCssBackground->GetPosition ( vecTemp );
         m_pChatCssBackground->AutoSize ( NULL, 20.0f );
 
@@ -1130,6 +1131,11 @@ void CSettings::CreateGUI ( void )
         m_pTrayBalloon->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineHeight ) );
         m_pTrayBalloon->GetPosition ( vecTemp );
         m_pTrayBalloon->AutoSize ( NULL, 20.0f );
+
+        m_pChatTextBlackOutline = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabInterface, _("Chat text black outline") ) );
+        m_pChatTextBlackOutline->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineHeight ) );
+        m_pChatTextBlackOutline->GetPosition ( vecTemp );
+        m_pChatTextBlackOutline->AutoSize ( NULL, 20.0f );
     }
 
     /**
@@ -2884,6 +2890,7 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "chat_css_style_text", bVar ); m_pChatCssText->SetSelected ( bVar );
     CVARS_GET ( "chat_css_style_background", bVar ); m_pChatCssBackground->SetSelected ( bVar );
     CVARS_GET ( "chat_nickcompletion", bVar ); m_pChatNickCompletion->SetSelected ( bVar );
+    CVARS_GET ( "chat_text_outline", bVar ); m_pChatTextBlackOutline->SetSelected ( bVar );
 
     {
         int iVar;
@@ -3198,6 +3205,7 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "chat_css_style_text", m_pChatCssText->GetSelected () );
     CVARS_SET ( "chat_css_style_background", m_pChatCssBackground->GetSelected () );
     CVARS_SET ( "chat_nickcompletion", m_pChatNickCompletion->GetSelected () );
+    CVARS_SET ( "chat_text_outline", m_pChatTextBlackOutline->GetSelected() );
     CVARS_SET ( "chat_line_life", GetMilliseconds ( m_pChatLineLife ) );
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
 

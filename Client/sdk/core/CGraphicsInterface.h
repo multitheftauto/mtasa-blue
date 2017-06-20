@@ -73,7 +73,7 @@ public:
     virtual void                    CalcWorldCoors      ( CVector * vecScreen, CVector * vecWorld ) = 0;
     virtual void                    CalcScreenCoors     ( CVector * vecWorld, CVector * vecScreen ) = 0;
 
-    virtual void                    DrawString          ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont * pDXFont = NULL ) = 0;
+    virtual void                    DrawString          ( int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY, unsigned long ulFormat, ID3DXFont * pDXFont = NULL, bool bOutline = false ) = 0;
     virtual void                    DrawString          ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... ) = 0;
 
     virtual void                    DrawLine3D          ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f ) = 0;

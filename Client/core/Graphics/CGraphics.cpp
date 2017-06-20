@@ -74,7 +74,7 @@ CGraphics::~CGraphics ( void )
 }
 
 
-void CGraphics::DrawString ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
+void CGraphics::DrawString ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont, bool bOutline )
 {   
     if ( g_pCore->IsWindowMinimized () )
         return;
@@ -114,6 +114,8 @@ void CGraphics::DrawString ( int uiLeft, int uiTop, int uiRight, int uiBottom, u
             // Convert to UTF16
             std::wstring strText = MbUTF8ToUTF16(szText);
 
+            if ( bOutline )
+                DrawStringBlurred( rect, ulColor & 0xFF000000, strText.c_str(), ulFormat, pDXFont );
             pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
         EndDrawBatch ();
     }        
@@ -129,6 +131,45 @@ void CGraphics::DrawString ( int iX, int iY, unsigned long dwColor, float fScale
     va_end ( ap );
 
     DrawString ( iX, iY, iX, iY, dwColor, szBuffer, fScale, fScale, DT_NOCLIP );
+}
+
+// Slow
+void CGraphics::DrawStringBlurred(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont)
+{
+    // Blur definition
+    const float E = 0;
+    const float D = 0.33f;
+    const float C = 0.66f;
+    const float B = 1;
+    const float A = 0;
+    static const float kernelData[] = {
+                            E, D, D, D, E,
+                            D, C, B, C, D,
+                            D, B, A, B, D,
+                            D, C, B, C, D,
+                            E, D, D, D, E };
+    const uint uiKernelSizeX = 5;
+    const uint uiKernelSizeY = 5;
+    const float* pKernel = kernelData;
+
+    // Apply definition
+    int iInputAlpha = (ulColor & 0xFF000000) >> 24;
+    iInputAlpha = iInputAlpha * iInputAlpha / 256;
+    for (uint y = 0; y < uiKernelSizeY; y++)
+    {
+        for (uint x = 0; x < uiKernelSizeX; x++)
+        {
+            float fAlpha = *pKernel++;
+            if ( fAlpha == 0 )
+                continue;
+            uint uiUseAlpha = (uint)(iInputAlpha * fAlpha);
+            uint uiUseColor = (uiUseAlpha << 24) | (ulColor & 0x00FFFFFF);
+            int iOffsetX = x - (uiKernelSizeX - 1) / 2;
+            int iOffsetY = y - (uiKernelSizeY - 1) / 2;
+            RECT useRect = {rect.left + iOffsetX, rect.top + iOffsetY, rect.right + iOffsetX, rect.bottom + iOffsetY};        
+            pDXFont->DrawTextW(m_pDXSprite, szText, -1, &useRect, ulFormat, uiUseColor);
+        }
+    }
 }
 
 
