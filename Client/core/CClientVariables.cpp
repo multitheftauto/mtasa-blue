@@ -275,6 +275,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "chat_lines",                 10 );                           // chatbox lines
     DEFAULT ( "chat_color",                 CColor (0,0,0,0) );             // chatbox background color
     DEFAULT ( "chat_text_color",            CColor (172,213,254,255) );     // chatbox text color
+    DEFAULT ( "chat_text_outline",          false );
     DEFAULT ( "chat_input_color",           CColor (0,0,0,0) );             // chatbox input background color
     DEFAULT ( "chat_input_prefix_color",    CColor (172,213,254,255) );     // chatbox input prefix color
     DEFAULT ( "chat_input_text_color",      CColor (172,213,254,255) );     // chatbox input text color
