@@ -855,7 +855,7 @@ void CJoystickManager::ReadCurrentState ( void )
             int x = 20;
             int y = 20;//pGraphics->GetViewportHeight() / 2;
             pGraphics->DrawRectQueued( x, y, 350, 150, 0xaf000000, true );
-            pGraphics->DrawTextQueued( x+10, y+10, 0, 0, 0xFFFFFFFF, strStatus, 1, 1, DT_NOCLIP, NULL, true );
+            pGraphics->DrawStringQueued( x+10, y+10, 0, 0, 0xFFFFFFFF, strStatus, 1, 1, DT_NOCLIP, NULL, true );
         }
     }
 }
@@ -1148,7 +1148,7 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
                                 cs.ShockButtonR,
                                 cs.m_bPedWalk );
 
-    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 150, 0xFFFFFFFF, 1, strBuffer );
+    CCore::GetSingleton ().GetGraphics ()->DrawString ( 20, 150, 0xFFFFFFFF, 1, strBuffer );
 
     strBuffer = SString::Printf ( "VehicleMouseLook: %u\n"
                                 "LeftStickX: %u\n"
@@ -1161,7 +1161,7 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
                                 cs.RightStickX,
                                 cs.RightStickY );
 
-    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 450, 0xFFFFFFFF, 1, strBuffer );
+    CCore::GetSingleton ().GetGraphics ()->DrawString ( 20, 450, 0xFFFFFFFF, 1, strBuffer );
 
 
     strBuffer = SString::Printf (
@@ -1181,7 +1181,7 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
                                 m_JoystickState.rgfAxis[6]
                             );
 
-    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 550, 0xFFFFFFFF, 1, strBuffer );
+    CCore::GetSingleton ().GetGraphics ()->DrawString ( 20, 550, 0xFFFFFFFF, 1, strBuffer );
 
 #endif
 #endif

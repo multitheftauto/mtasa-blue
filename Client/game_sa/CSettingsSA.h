@@ -150,10 +150,11 @@ public:
     eRadarMode              GetRadarMode                ( void );
     void                    SetRadarMode                ( eRadarMode hudMode );
 
-    void                    SetFieldOfView              ( float fAngle );
-    void                    SetFieldOfViewPlayer        ( float fAngle );
-    void                    SetFieldOfViewVehicle       ( float fAngle );
-    void                    SetFieldOfViewVehicleMax    ( float fAngle );
+    void                    UpdateFieldOfViewFromSettings   ( void );
+    void                    ResetFieldOfViewFromScript      ( void );
+    void                    SetFieldOfViewPlayer            ( float fAngle, bool bFromScript );
+    void                    SetFieldOfViewVehicle           ( float fAngle, bool bFromScript );
+    void                    SetFieldOfViewVehicleMax        ( float fAngle, bool bFromScript );
     float                   GetFieldOfViewPlayer        ( void );
     float                   GetFieldOfViewVehicle       ( void );
     float                   GetFieldOfViewVehicleMax    ( void );

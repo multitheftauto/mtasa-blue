@@ -6199,12 +6199,12 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         OutputDebugLine ( SStringX ( "[AsyncLoading] " ) ++ status );
-        g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
+        g_pCore->GetGraphics ()->DrawString ( 10, 220, -1, 1, status );
 
         std::vector < SString > lineList;
         strAround.Split ( "\n", lineList );
         for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
-            g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
+            g_pCore->GetGraphics ()->DrawString ( 10, 230 + i * 10, -1, 1, lineList[i] );
     #endif
 }
 

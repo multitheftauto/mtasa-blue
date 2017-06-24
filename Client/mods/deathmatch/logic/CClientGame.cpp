@@ -846,14 +846,14 @@ void CClientGame::DoPulsePostFrame ( void )
         if ( g_pGame->IsASyncLoadingEnabled ( true ) )
         {
             unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled () ? uiHeight - 7 : uiHeight - 12;
-            pGraphics->DrawText ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
+            pGraphics->DrawString ( uiWidth - 5, uiPosY, 0x80ffffff, 1, "*" );
         }
 
         // Draw notice text if dx test mode is enabled
         if ( g_pCore->GetGraphics ()->GetRenderItemManager ()->GetTestMode () )
         {
             unsigned int uiPosY = uiHeight - 30;
-            pGraphics->DrawText ( uiWidth - 155, uiPosY, 0x40ffffff, 1, "dx test mode enabled" );
+            pGraphics->DrawString ( uiWidth - 155, uiPosY, 0x40ffffff, 1, "dx test mode enabled" );
         }
 
         // Draw notice text if diagnostic mode enabled
@@ -861,7 +861,7 @@ void CClientGame::DoPulsePostFrame ( void )
         if ( diagnosticDebug == EDiagnosticDebug::LOG_TIMING_0000 )
         {
             unsigned int uiPosY = uiHeight - 30;
-            pGraphics->DrawText ( uiWidth - 185, uiPosY, 0xffffff00, 1, "Debug setting: #0000 Log timing" );
+            pGraphics->DrawString ( uiWidth - 185, uiPosY, 0xffffff00, 1, "Debug setting: #0000 Log timing" );
         }
 
         // Draw network trouble message if required
@@ -869,7 +869,7 @@ void CClientGame::DoPulsePostFrame ( void )
         {
             int iPosX = uiWidth / 2;             // Half way across
             int iPosY = uiHeight * 45 / 100;     // 45/100 down
-            g_pCore->GetGraphics ()->DrawText ( iPosX, iPosY, iPosX, iPosY, COLOR_ARGB ( 255, 255, 0, 0 ), "*** NETWORK TROUBLE ***", 2.0f, 2.0f, DT_NOCLIP | DT_CENTER );
+            g_pCore->GetGraphics ()->DrawString ( iPosX, iPosY, iPosX, iPosY, COLOR_ARGB ( 255, 255, 0, 0 ), "*** NETWORK TROUBLE ***", 2.0f, 2.0f, DT_NOCLIP | DT_CENTER );
         }
 
         // Adjust the streaming memory limit.
@@ -3180,13 +3180,13 @@ void CClientGame::DrawWeaponsyncData ( CClientPlayer* pPlayer )
 
             yoffset = 0;
             strTemp.Format ( "Ammo in clip: %d", pWeapon->GetAmmoInClip () );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+            g_pCore->GetGraphics ()->DrawString ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+            g_pCore->GetGraphics ()->DrawString ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
 
             yoffset = 15;
             strTemp.Format ( "State: %d", pWeapon->GetState() );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-            g_pCore->GetGraphics ()->DrawText ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+            g_pCore->GetGraphics ()->DrawString ( ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, ( int ) vecScreenPosition.fX + 1, ( int ) vecScreenPosition.fY + 1 + yoffset, COLOR_ARGB ( 255, 255, 255, 255 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+            g_pCore->GetGraphics ()->DrawString ( ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, ( int ) vecScreenPosition.fX, ( int ) vecScreenPosition.fY + yoffset, COLOR_ARGB ( 255, 0, 0, 0 ), strTemp, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
         }
     }
 }
@@ -5453,11 +5453,7 @@ void CClientGame::ResetMapInfo ( void )
     m_pCamera->FadeOut ( 0.0f, 0, 0, 0 );    
     g_pGame->GetWorld ()->SetCurrentArea ( 0 );
     m_pCamera->SetFocusToLocalPlayer ();
-
-    float fFOV;
-    g_pCore->GetCVars ()->Get ( "fov", fFOV );
-    g_pGame->GetSettings ()->SetFieldOfView ( Clamp ( 70.f, fFOV, 100.f ) );
-    g_pGame->GetSettings ()->SetFieldOfViewVehicleMax ( 100 );
+    g_pGame->GetSettings ()->ResetFieldOfViewFromScript();
 
     // Dimension
     SetAllDimensions ( 0 );

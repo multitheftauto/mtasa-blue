@@ -82,7 +82,7 @@ public:
 
     CChatLineSection&           operator =              ( const CChatLineSection& other );
 
-    void                        Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );
+    void                        Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, bool bOutline, const CRect2D& RenderBounds );
     float                       GetWidth                ( void );
     inline const char*          GetText                 ( void )            { return m_strText.c_str (); }
     void                        SetText                 ( const char* szText )  { m_strText = szText; }
@@ -102,7 +102,7 @@ public:
                                 CChatLine               ( void );
 
     virtual const char*         Format                  ( const char* szText, float fWidth, CColor& color, bool bColorCoded );
-    virtual void                Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, const CRect2D& RenderBounds );    
+    virtual void                Draw                    ( const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, bool bOutline, const CRect2D& RenderBounds );    
     virtual float               GetWidth                ( void );
     bool                        IsActive                ( void )    { return m_bActive; }
     void                        SetActive               ( bool bActive )    { m_bActive = bActive; }
@@ -120,7 +120,7 @@ protected:
 class CChatInputLine : public CChatLine
 {
 public:
-    void                        Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow );
+    void                        Draw                    ( CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, bool bOutline );
     void                        Clear                   ( void );
 
     CChatLineSection            m_Prefix;
@@ -157,6 +157,7 @@ struct SDrawList
 {
     CRect2D                             renderBounds;
     bool                                bShadow;
+    bool                                bOutline;
     std::vector < SDrawListLineItem >   lineItemList;
 
     bool operator!= ( const SDrawList& other ) const
@@ -167,6 +168,7 @@ struct SDrawList
     {
         if ( lineItemList.size () != other.lineItemList.size ()
           || bShadow != other.bShadow
+          || bOutline != other.bOutline
           || renderBounds != other.renderBounds )
             return false;
 
@@ -213,7 +215,7 @@ public:
 
     static float                GetFontHeight           ( float fScale = 1.0f );
     static float                GetTextExtent           ( const char * szText, float fScale = 1.0f );
-    static void                 DrawTextString          ( const char * szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY, const CRect2D& RenderBounds );
+    static void                 DrawTextString          ( const char * szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX, float fScaleY, bool bOutline, const CRect2D& RenderBounds );
 
     void                        SetColor                ( const CColor& Color );
     void                        SetInputColor           ( const CColor& Color );
@@ -280,6 +282,7 @@ protected:
     CColor                      m_InputTextColor;
     bool                        m_bCssStyleText;
     bool                        m_bCssStyleBackground;
+    bool                        m_bTextBlackOutline;
     unsigned long               m_ulChatLineLife;
     unsigned long               m_ulChatLineFadeOut;
     bool                        m_bUseCEGUI;

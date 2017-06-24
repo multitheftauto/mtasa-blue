@@ -79,7 +79,7 @@ int CLuaModule::_LoadModule ( void )
         strError = SString( "%d", GetLastError() );
     SetCurrentDirectory( strSavedCurrentDirectory );
 #else
-    m_hModule = dlopen ( m_szFileName, RTLD_NOW );
+    m_hModule = dlopen ( m_szFileName, RTLD_NOW | RTLD_DEEPBIND );
     if ( m_hModule == NULL )
         strError = dlerror();
 #endif

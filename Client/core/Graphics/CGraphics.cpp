@@ -74,7 +74,7 @@ CGraphics::~CGraphics ( void )
 }
 
 
-void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont )
+void CGraphics::DrawString ( int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY, unsigned long ulFormat, LPD3DXFONT pDXFont, bool bOutline )
 {   
     if ( g_pCore->IsWindowMinimized () )
         return;
@@ -114,13 +114,15 @@ void CGraphics::DrawText ( int uiLeft, int uiTop, int uiRight, int uiBottom, uns
             // Convert to UTF16
             std::wstring strText = MbUTF8ToUTF16(szText);
 
+            if ( bOutline )
+                DrawStringBlurred( rect, ulColor & 0xFF000000, strText.c_str(), ulFormat, pDXFont );
             pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
         EndDrawBatch ();
     }        
 }
 
 
-void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... )
+void CGraphics::DrawString ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... )
 {
     char szBuffer [ 1024 ];
     va_list ap;
@@ -128,7 +130,46 @@ void CGraphics::DrawText ( int iX, int iY, unsigned long dwColor, float fScale, 
     VSNPRINTF ( szBuffer, 1024, szText, ap );
     va_end ( ap );
 
-    DrawText ( iX, iY, iX, iY, dwColor, szBuffer, fScale, fScale, DT_NOCLIP );
+    DrawString ( iX, iY, iX, iY, dwColor, szBuffer, fScale, fScale, DT_NOCLIP );
+}
+
+// Slow
+void CGraphics::DrawStringBlurred(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont)
+{
+    // Blur definition
+    const float E = 0;
+    const float D = 0.33f;
+    const float C = 0.66f;
+    const float B = 1;
+    const float A = 0;
+    static const float kernelData[] = {
+                            E, D, D, D, E,
+                            D, C, B, C, D,
+                            D, B, A, B, D,
+                            D, C, B, C, D,
+                            E, D, D, D, E };
+    const uint uiKernelSizeX = 5;
+    const uint uiKernelSizeY = 5;
+    const float* pKernel = kernelData;
+
+    // Apply definition
+    int iInputAlpha = (ulColor & 0xFF000000) >> 24;
+    iInputAlpha = iInputAlpha * iInputAlpha / 256;
+    for (uint y = 0; y < uiKernelSizeY; y++)
+    {
+        for (uint x = 0; x < uiKernelSizeX; x++)
+        {
+            float fAlpha = *pKernel++;
+            if ( fAlpha == 0 )
+                continue;
+            uint uiUseAlpha = (uint)(iInputAlpha * fAlpha);
+            uint uiUseColor = (uiUseAlpha << 24) | (ulColor & 0x00FFFFFF);
+            int iOffsetX = x - (uiKernelSizeX - 1) / 2;
+            int iOffsetY = y - (uiKernelSizeY - 1) / 2;
+            RECT useRect = {rect.left + iOffsetX, rect.top + iOffsetY, rect.right + iOffsetX, rect.bottom + iOffsetY};        
+            pDXFont->DrawTextW(m_pDXSprite, szText, -1, &useRect, ulFormat, uiUseColor);
+        }
+    }
 }
 
 
@@ -839,7 +880,7 @@ void CGraphics::DrawTextureQueued ( float fX, float fY,
 }
 
 
-void CGraphics::DrawTextQueued ( float fLeft, float fTop,
+void CGraphics::DrawStringQueued ( float fLeft, float fTop,
                                  float fRight, float fBottom,
                                  unsigned long dwColor,
                                  const char* szText,
@@ -1918,7 +1959,7 @@ void CGraphics::DrawProgressMessage( bool bPreserveBackbuffer )
                 const uint uiMessageWidth = GetDXTextExtent( m_strProgressMessage );
                 const uint uiMessagePosX = uiViewportWidth / 2 - uiMessageWidth / 2;
                 const DWORD dwMessageColor = 0xA0FFFFFF;
-                DrawText( uiMessagePosX, uiViewportHeight - 57, dwMessageColor, 1, "%s", *m_strProgressMessage );
+                DrawString( uiMessagePosX, uiViewportHeight - 57, dwMessageColor, 1, "%s", *m_strProgressMessage );
             }
 
             if ( m_ProgressSpinnerTexture )
