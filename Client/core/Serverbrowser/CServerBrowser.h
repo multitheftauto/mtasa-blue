@@ -102,7 +102,8 @@ public:
 
     CServerListItem*    FindSelectedServer      ( ServerBrowserType Type );
     CServerListItem*    FindServerFromRow       ( ServerBrowserType Type, int iRow );
-    CServerListItem*    FindServer              ( std::string strHost, unsigned short usPort );
+    CServerListItem*    FindServer              ( const std::string& strHost, unsigned short usPort );
+    unsigned short      FindServerHttpPort      ( const std::string& strHost, unsigned short usPort );
     int                 FindRowFromServer       ( ServerBrowserType Type, const CServerListItem * pServer );
     void                UpdateSelectedServerPlayerList ( ServerBrowserType Type );
     void                GetVisibleEndPointList  ( std::vector < SAddressPort >& outEndpointList );

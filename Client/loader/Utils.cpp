@@ -1390,11 +1390,26 @@ bool Is32bitProcess ( DWORD processID )
 ///////////////////////////////////////////////////////////////////////////
 void TerminateProcess( DWORD dwProcessID, uint uiExitCode )
 {
-    HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, dwProcessID );
-    if ( hProcess )
+    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
+    if ( hModule )
     {
-        TerminateProcess( hProcess, uiExitCode );
-        CloseHandle( hProcess );
+        typedef bool (*PFNTerminateProcess) ( uint, uint );
+        PFNTerminateProcess pfnTerminateProcess = static_cast< PFNTerminateProcess > ( static_cast < PVOID > ( GetProcAddress ( hModule, "NtTerminateProcess" ) ) );
+
+        if ( pfnTerminateProcess )
+        {
+            bool bResult = pfnTerminateProcess ( dwProcessID, uiExitCode );
+            AddReportLog ( 8070, SString ( "TerminateProcess %d result: %d", dwProcessID, bResult ) );
+        }
+        else
+        {
+            HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, dwProcessID );
+            if ( hProcess )
+            {
+                TerminateProcess( hProcess, uiExitCode );
+                CloseHandle( hProcess );
+            }
+        }
     }
 }
 

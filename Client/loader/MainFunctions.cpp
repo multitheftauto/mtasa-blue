@@ -566,6 +566,7 @@ void HandleIfGTAIsAlreadyRunning( void )
     {
         if ( MessageBoxUTF8 ( 0, _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"), _("Information")+_E("CL10"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
         {
+            TerminateOtherMTAIfRunning();
             TerminateGTAIfRunning ();
             if ( IsGTARunning () )
             {
