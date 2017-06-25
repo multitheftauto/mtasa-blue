@@ -2043,7 +2043,7 @@ CServerListItem* CServerBrowser::FindServerFromRow ( ServerBrowserType Type, int
 // Finds a server at any point in the active list
 //
 /////////////////////////////////////////////////////////////////
-CServerListItem* CServerBrowser::FindServer ( std::string strHost, unsigned short usPort )
+CServerListItem* CServerBrowser::FindServer ( const std::string& strHost, unsigned short usPort )
 {
     ServerBrowserType Type = GetCurrentServerBrowserType ();
     CServerList * pList = GetServerList ( Type );
@@ -2059,6 +2059,26 @@ CServerListItem* CServerBrowser::FindServer ( std::string strHost, unsigned shor
     return NULL;
 }
 
+
+/////////////////////////////////////////////////////////////////
+//
+// CServerBrowser::FindServerHttpPort
+//
+// Finds a server http port. Returns 0 if not found.
+//
+/////////////////////////////////////////////////////////////////
+unsigned short CServerBrowser::FindServerHttpPort ( const std::string& strHost, unsigned short usPort )
+{
+    CServerList * pList = GetServerList ( ServerBrowserTypes::INTERNET );
+    CServerListIterator i, i_b = pList->IteratorBegin (), i_e = pList->IteratorEnd (); 
+    for ( CServerListIterator i = i_b; i != i_e; i++ )
+    {
+        CServerListItem * pServer = *i;
+        if ( pServer->strHost == strHost && pServer->usGamePort == usPort )
+            return pServer->m_usHttpPort;
+    }
+    return 0;
+}
 
 
 /////////////////////////////////////////////////////////////////
