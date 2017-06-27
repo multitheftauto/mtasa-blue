@@ -82,6 +82,7 @@ void CLuaPedDefs::LoadFunctions ( void ) {
     CLuaCFunctions::AddFunction ( "removePedFromVehicle", RemovePedFromVehicle );
     CLuaCFunctions::AddFunction ( "setPedOxygenLevel", SetPedOxygenLevel );
     CLuaCFunctions::AddFunction ( "givePedWeapon", GivePedWeapon );
+    CLuaCFunctions::AddFunction ( "isPedReloadingWeapon", IsPedReloadingWeapon );
 }
 
 void CLuaPedDefs::AddClass ( lua_State* luaVM )
@@ -162,6 +163,7 @@ void CLuaPedDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setWalkingStyle", "setPedWalkingStyle" );
     lua_classfunction ( luaVM, "setStat", "setPedStat" );
     lua_classfunction ( luaVM, "giveWeapon", "givePedWeapon" );
+    lua_classfunction ( luaVM, "isReloadingWeapon", "isPedReloadingWeapon" );
 
     lua_classvariable ( luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle );
     lua_classvariable ( luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat" );
@@ -1027,6 +1029,25 @@ int CLuaPedDefs::GivePedWeapon ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaPedDefs::IsPedReloadingWeapon(lua_State* luaVM)
+{
+    // Verify the argument
+    CClientPed* pPed = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, pPed->IsReloadingWeapon());
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
