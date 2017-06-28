@@ -447,7 +447,7 @@ int CLuaEngineDefs::EngineRequestModel ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         eClientModelType eModelType;
-        if ( stricmp( strModelType, "ped" ) == 0 )
+        if ( strModelType == "ped" )
         {
             eModelType = CCLIENTMODELPED;
         }
@@ -461,7 +461,6 @@ int CLuaEngineDefs::EngineRequestModel ( lua_State* luaVM )
 
         CClientModel * pModel = new CClientModel( m_pManager, iModelID, eModelType );
         pModel->Allocate ();
-        m_pManager->GetModelManager ()->Add ( pModel );
 
         lua_pushinteger ( luaVM, iModelID );
         return 1;
