@@ -3598,6 +3598,9 @@ void CClientGame::Event_OnIngame ( void )
     g_pGame->GetWaterManager ()->SetWaterDrawnLast ( true );
     m_pCamera->SetCameraClip ( true, true );
 
+    // Deallocates all custom models
+    m_pManager->GetModelManager ()->RemoveAll ();
+
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer ( m_pManager, m_LocalID, true );
     if ( m_pLocalPlayer )

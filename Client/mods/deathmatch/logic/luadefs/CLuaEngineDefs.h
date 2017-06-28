@@ -26,6 +26,8 @@ public:
     LUA_DECLARE ( EngineRestoreCOL );
     LUA_DECLARE ( EngineReplaceModel );
     LUA_DECLARE ( EngineRestoreModel );
+    LUA_DECLARE ( EngineRequestModel );
+    LUA_DECLARE ( EngineFreeModel );
     LUA_DECLARE ( EngineReplaceMatchingAtomics );
     LUA_DECLARE ( EngineReplaceWheelAtomics );
     LUA_DECLARE ( EnginePositionAtomic );

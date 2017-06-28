@@ -162,7 +162,7 @@ public:
     virtual CPointLights        * GetPointLights () = 0;
 
     virtual CWeaponInfo         * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD)=0;
-    virtual CModelInfo          * GetModelInfo(DWORD dwModelID)=0;
+    virtual CModelInfo          * GetModelInfo(DWORD dwModelID, bool bCanBeInvalid=false)=0;
 
     virtual DWORD               GetSystemTime (  )=0;
     virtual BOOL                IsAtMenu (  )=0;

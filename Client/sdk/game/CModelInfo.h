@@ -106,6 +106,7 @@ public:
     virtual class CBaseModelInfoSAInterface *     GetInterface            ( void ) = 0;
 
     virtual DWORD           GetModel                () = 0;
+    virtual bool            IsPlayerModel           () = 0;
     virtual BOOL            IsBoat                  () = 0;
     virtual BOOL            IsCar                   () = 0;
     virtual BOOL            IsTrain                 () = 0;
@@ -136,6 +137,7 @@ public:
     virtual void            RemoveRef               ( bool bRemoveExtraGTARef = false ) = 0;
     virtual int             GetRefCount             () = 0;
     virtual bool            ForceUnload             ( void ) = 0;
+    virtual void            DeallocateModel         ( void ) = 0;
 
     virtual float           GetDistanceFromCentreOfMassToBaseOfModel () = 0;
 
@@ -169,6 +171,7 @@ public:
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void            MakeCustomModel         ( void ) = 0;
     virtual RwObject*       GetRwObject             ( void ) = 0;
+    virtual void            MakePedModel            ( char * szTexture ) = 0;
 
 
     virtual SVehicleSupportedUpgrades               GetVehicleSupportedUpgrades         ( void ) = 0;
