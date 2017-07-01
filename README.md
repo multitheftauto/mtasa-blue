@@ -51,12 +51,12 @@ If you have problems resolving the required dependencies or want maximum compati
 
 64-bit target:
 ```
-docker run -it -v `pwd`:/mtasa-blue multitheftauto/mtasa-blue
+docker run -it -v `pwd`:/build multitheftauto/mtasa-blue
 ```
 
 32-bit target:
 ```
-docker run -it -v `pwd`:/mtasa-blue -e BUILD_BITS=32 multitheftauto/mtasa-blue
+docker run -it -v `pwd`:/build -e BUILD_BITS=32 multitheftauto/mtasa-blue
 ```
 If the current directory is a valid git repository clone, it will use this as the build source. If not, it will create a (shallow) clone. After compiling, you will find the resulting binaries in `./Bin`.
 
