@@ -1132,7 +1132,7 @@ void CSettings::CreateGUI ( void )
         m_pTrayBalloon->GetPosition ( vecTemp );
         m_pTrayBalloon->AutoSize ( NULL, 20.0f );
 
-        m_pChatTextBlackOutline = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabInterface, _("Chat text black outline") ) );
+        m_pChatTextBlackOutline = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabInterface, _("Chat text black/white outline") ) );
         m_pChatTextBlackOutline->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineHeight ) );
         m_pChatTextBlackOutline->GetPosition ( vecTemp );
         m_pChatTextBlackOutline->AutoSize ( NULL, 20.0f );
