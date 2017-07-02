@@ -10,6 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define MIN_CLIENT_REQ_GETVEHICLECOMPONENT_OOP      "1.5.4-9.11520"
 
 void CLuaVehicleDefs::LoadFunctions ( void )
 {
@@ -3087,6 +3088,13 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentPosition ( lua_State* luaVM )
         CVector vecPosition;
         if ( pVehicle->GetComponentPosition ( strComponent, vecPosition, outputBase ) )
         {
+            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETVEHICLECOMPONENT_OOP))
+            {
+                lua_pushnumber(luaVM, vecPosition.fX);
+                lua_pushnumber(luaVM, vecPosition.fY);
+                lua_pushnumber(luaVM, vecPosition.fZ);
+                return 3;
+            }
             lua_pushvector ( luaVM, vecPosition );
             return 1;
         }
@@ -3178,6 +3186,13 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentRotation ( lua_State* luaVM )
         {
             // Script uses degrees
             ConvertRadiansToDegrees ( vecRotation );
+            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETVEHICLECOMPONENT_OOP))
+            {
+                lua_pushnumber(luaVM, vecRotation.fX);
+                lua_pushnumber(luaVM, vecRotation.fY);
+                lua_pushnumber(luaVM, vecRotation.fZ);
+                return 3;
+            }
             lua_pushvector ( luaVM, vecRotation );
             return 1;
         }

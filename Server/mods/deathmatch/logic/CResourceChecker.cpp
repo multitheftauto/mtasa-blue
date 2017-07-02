@@ -23,6 +23,8 @@ extern CNetServer* g_pRealNetServer;
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckResourceForIssues( CResource* pResource, const string& strResourceZip )
 {
+    m_strMinClientReqFromMetaXml = pResource->GetMinClientReqFromMetaXml();
+    m_strMinServerReqFromMetaXml = pResource->GetMinServerReqFromMetaXml();
     m_strReqClientVersion = "";
     m_strReqServerVersion = "";
     m_strReqClientReason = "";
@@ -324,32 +326,17 @@ void CResourceChecker::CheckMetaFileForIssues ( const string& strPath, const str
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::CheckMetaSourceForIssues ( CXMLNode* pRootNode, const string& strFileName, const string& strResourceName, ECheckerModeType checkerMode, bool* pbOutHasChanged )
 {
-    // Find the client and server version requirements
-    SString strMinClientReqFromMetaXml = "";
-    SString strMinServerReqFromMetaXml = "";
-    CXMLNode* pNodeMinMtaVersion = pRootNode->FindSubNode ( "min_mta_version", 0 );
-
-    if ( pNodeMinMtaVersion )
-    {
-        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "server" ) )
-            strMinServerReqFromMetaXml = pAttr->GetValue ();
-        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "client" ) )
-            strMinClientReqFromMetaXml = pAttr->GetValue ();
-        if ( CXMLAttribute* pAttr = pNodeMinMtaVersion->GetAttributes ().Find ( "both" ) )
-            strMinServerReqFromMetaXml = strMinClientReqFromMetaXml = pAttr->GetValue ();
-    }
-
-    // Is it right?
-    if ( m_strReqClientVersion > strMinClientReqFromMetaXml || m_strReqServerVersion > strMinServerReqFromMetaXml )
+    // Check min_mta_version is correct
+    if ( m_strReqClientVersion > m_strMinClientReqFromMetaXml || m_strReqServerVersion > m_strMinServerReqFromMetaXml )
     {
         // It's not right. What to do?
         if ( checkerMode == ECheckerMode::WARNINGS )
         {
             SString strTemp = "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least ";
-            if ( m_strReqClientVersion > strMinClientReqFromMetaXml )
+            if ( m_strReqClientVersion > m_strMinClientReqFromMetaXml )
                 strTemp += SString ( "client %s because of '%s')", *m_strReqClientVersion, *m_strReqClientReason );
             else
-            if ( m_strReqServerVersion > strMinServerReqFromMetaXml )
+            if ( m_strReqServerVersion > m_strMinServerReqFromMetaXml )
                 strTemp += SString ( "server %s because of '%s')", *m_strReqServerVersion, *m_strReqServerReason );
 
             CLogger::LogPrint ( SString ( "WARNING: %s %s\n", strResourceName.c_str (), *strTemp ) );
@@ -358,6 +345,7 @@ void CResourceChecker::CheckMetaSourceForIssues ( CXMLNode* pRootNode, const str
         if ( checkerMode == ECheckerMode::UPGRADE )
         {
             // Create min_mta_version node if required
+            CXMLNode* pNodeMinMtaVersion = pRootNode->FindSubNode("min_mta_version", 0);
             if ( !pNodeMinMtaVersion )
                 pNodeMinMtaVersion = pRootNode->CreateSubNode ( "min_mta_version" );
 
@@ -692,8 +680,8 @@ long CResourceChecker::FindLuaIdentifier ( const char* szLuaSource, long* plOutL
 ///////////////////////////////////////////////////////////////
 bool CResourceChecker::UpgradeLuaFunctionName ( const string& strFunctionName, bool bClientScript, string& strOutUpgraded )
 {
-    string strHow;
-    ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strHow );
+    string strHow, strVersion;
+    ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strHow, strVersion );
 
     if ( what == ECheckerWhat::REPLACED )
     {
@@ -714,8 +702,8 @@ bool CResourceChecker::UpgradeLuaFunctionName ( const string& strFunctionName, b
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionName, const string& strFileName, const string& strResourceName, bool bClientScript, unsigned long ulLineNumber )
 {
-    string strHow;
-    ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strHow );
+    string strHow, strVersion;
+    ECheckerWhatType what = GetLuaFunctionNameUpgradeInfo ( strFunctionName, bClientScript, strHow, strVersion );
 
     if ( what == ECheckerWhat::NONE )
         return;
@@ -731,6 +719,11 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
     {
         strTemp.Format ( "%s no longer works. %s", strFunctionName.c_str (), strHow.c_str () );
     }
+    else
+    if ( what == ECheckerWhat::MODIFIED )
+    {
+        strTemp.Format ( "%s %s because <min_mta_version> %s setting in meta.xml is below %s", strFunctionName.c_str (), strHow.c_str (), bClientScript ? "Client" : "Server", strVersion.c_str() );
+    }
 
     CLogger::LogPrint ( SString ( "WARNING: %s/%s(Line %lu) [%s] %s\n", strResourceName.c_str (), strFileName.c_str (), ulLineNumber, bClientScript ? "Client" : "Server", *strTemp ) );
 }
@@ -743,7 +736,7 @@ void CResourceChecker::IssueLuaFunctionNameWarnings ( const string& strFunctionN
 //
 //
 ///////////////////////////////////////////////////////////////
-ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool bClientScript, string& strOutHow )
+ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string& strFunctionName, bool bClientScript, string& strOutHow, string& strOutVersion )
 {
     static CHashMap < SString, SDeprecatedItem* > clientUpgradeInfoMap;
     static CHashMap < SString, SDeprecatedItem* > serverUpgradeInfoMap;
@@ -764,6 +757,15 @@ ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo ( const string&
         return ECheckerWhat::NONE;     // Nothing found
 
     strOutHow = pItem->strNewName;
+    strOutVersion = pItem->strVersion;
+    if (!strOutVersion.empty())
+    {
+        // Function behaviour depends on min_mta_version setting
+        const SString& strMinReqFromMetaXml = bClientScript ? m_strMinClientReqFromMetaXml : m_strMinServerReqFromMetaXml;
+        if (strMinReqFromMetaXml < strOutVersion)
+            return ECheckerWhat::MODIFIED;
+        return ECheckerWhat::NONE;
+    }
     return pItem->bRemoved ? ECheckerWhat::REMOVED : ECheckerWhat::REPLACED;
 }
 
