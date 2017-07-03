@@ -331,6 +331,8 @@ int CLuaPlayerDefs::SetPlayerName ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPlayerName ( pElement, strName ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -343,6 +345,7 @@ int CLuaPlayerDefs::SetPlayerName ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPlayerDefs::DetonateSatchels ( lua_State* luaVM )
 {
@@ -367,6 +370,7 @@ int CLuaPlayerDefs::DetonateSatchels ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::GetPlayerFromName ( lua_State* luaVM )
 {
     SString strName;
@@ -390,6 +394,7 @@ int CLuaPlayerDefs::GetPlayerFromName ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPlayerDefs::GetPlayerMoney ( lua_State* luaVM )
 {
@@ -500,6 +505,7 @@ int CLuaPlayerDefs::GetPlayerWantedLevel ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::GetAlivePlayers ( lua_State* luaVM )
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
@@ -581,6 +587,7 @@ int CLuaPlayerDefs::GetPlayerIdleTime ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPlayerDefs::IsPlayerScoreboardForced ( lua_State* luaVM )
 {
@@ -681,7 +688,6 @@ int CLuaPlayerDefs::GetPlayerNametagColor ( lua_State* luaVM )
 }
 
 
-
 int CLuaPlayerDefs::GetPlayerSerial ( lua_State* luaVM )
 {
     CPlayer* pPlayer; uint uiIndex;
@@ -730,6 +736,7 @@ int CLuaPlayerDefs::GetPlayerUserName ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::GetPlayerCommunityID ( lua_State* luaVM )
 {
     CPlayer* pPlayer;
@@ -754,7 +761,6 @@ int CLuaPlayerDefs::GetPlayerCommunityID ( lua_State* luaVM )
 }
 
 
-
 int CLuaPlayerDefs::SetPlayerMoney ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -768,6 +774,8 @@ int CLuaPlayerDefs::SetPlayerMoney ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPlayerMoney ( pElement, lMoney, bInstant ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -782,7 +790,6 @@ int CLuaPlayerDefs::SetPlayerMoney ( lua_State* luaVM )
 }
 
 
-
 int CLuaPlayerDefs::GivePlayerMoney ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -794,6 +801,8 @@ int CLuaPlayerDefs::GivePlayerMoney ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::GivePlayerMoney ( pElement, lMoney ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -839,6 +848,8 @@ int CLuaPlayerDefs::SpawnPlayer ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SpawnPlayer ( pElement, vecPosition, fRotation, ulModel, ucInterior, usDimension, pTeam ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -866,6 +877,8 @@ int CLuaPlayerDefs::ShowPlayerHudComponent ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::ShowPlayerHudComponent ( pElement, component, bShow ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -900,6 +913,8 @@ int CLuaPlayerDefs::TakePlayerScreenShot ( lua_State* luaVM )
         CResource * pResource = pLuaMain ? pLuaMain->GetResource () : NULL;
         if ( pResource )
         {
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
             if ( CStaticFunctionDefinitions::TakePlayerScreenShot ( pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource ) )
             {
                 lua_pushboolean ( luaVM, true );
@@ -914,6 +929,7 @@ int CLuaPlayerDefs::TakePlayerScreenShot ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::SetPlayerWantedLevel ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -925,6 +941,8 @@ int CLuaPlayerDefs::SetPlayerWantedLevel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPlayerWantedLevel ( pElement, uiWantedLevel ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -940,6 +958,7 @@ int CLuaPlayerDefs::SetPlayerWantedLevel ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::ForcePlayerMap ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -951,6 +970,8 @@ int CLuaPlayerDefs::ForcePlayerMap ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::ForcePlayerMap ( pElement, bForce ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -976,6 +997,8 @@ int CLuaPlayerDefs::SetPlayerNametagText ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPlayerNametagText ( pElement, strText ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1015,6 +1038,8 @@ int CLuaPlayerDefs::SetPlayerNametagColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPlayerNametagColor ( pElement, bRemoveOverride, ucR, ucG, ucB ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1028,6 +1053,7 @@ int CLuaPlayerDefs::SetPlayerNametagColor ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::SetPlayerNametagShowing ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1039,6 +1065,8 @@ int CLuaPlayerDefs::SetPlayerNametagShowing ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPlayerNametagShowing ( pElement, bShowing ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1064,6 +1092,8 @@ int CLuaPlayerDefs::SetPlayerMuted ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPlayerMuted ( pElement, bMuted ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1077,6 +1107,7 @@ int CLuaPlayerDefs::SetPlayerMuted ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::SetPlayerBlurLevel ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1088,6 +1119,8 @@ int CLuaPlayerDefs::SetPlayerBlurLevel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPlayerBlurLevel ( pElement, ucLevel ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1130,6 +1163,7 @@ int CLuaPlayerDefs::RedirectPlayer ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::TakePlayerMoney ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1141,6 +1175,8 @@ int CLuaPlayerDefs::TakePlayerMoney ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::TakePlayerMoney ( pElement, lMoney ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1202,6 +1238,7 @@ int CLuaPlayerDefs::IsPlayerNametagShowing ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::GetPlayerTeam ( lua_State* luaVM )
 {
     CPlayer* pPlayer;
@@ -1224,7 +1261,6 @@ int CLuaPlayerDefs::GetPlayerTeam ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
 
 
 int CLuaPlayerDefs::IsPlayerMuted ( lua_State* luaVM )
@@ -1264,6 +1300,7 @@ int CLuaPlayerDefs::GetRandomPlayer ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPlayerDefs::GetPlayerCount ( lua_State* luaVM )
 {
     unsigned int uiPlayerCount = CStaticFunctionDefinitions::GetPlayerCount ();
@@ -1288,6 +1325,8 @@ int CLuaPlayerDefs::SetPlayerAmmo ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPlayerAmmo ( pElement, ucSlot, usAmmo, usAmmoInClip ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1459,7 +1498,6 @@ int CLuaPlayerDefs::BindKey ( lua_State* luaVM )
 }
 
 
-
 int CLuaPlayerDefs::UnbindKey ( lua_State* luaVM )
 {
     CPlayer* pPlayer;
@@ -1515,7 +1553,6 @@ int CLuaPlayerDefs::UnbindKey ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
 
 
 int CLuaPlayerDefs::IsKeyBound ( lua_State* luaVM )
@@ -1768,6 +1805,8 @@ int CLuaPlayerDefs::SetControlState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPlayer );
+
         if ( CStaticFunctionDefinitions::SetControlState ( pPlayer, strControl, bState ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1780,6 +1819,7 @@ int CLuaPlayerDefs::SetControlState ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPlayerDefs::ToggleControl ( lua_State* luaVM )
 {
@@ -1794,6 +1834,8 @@ int CLuaPlayerDefs::ToggleControl ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPlayer );
+
         if ( CStaticFunctionDefinitions::ToggleControl ( pPlayer, strControl, bState ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1823,6 +1865,8 @@ int CLuaPlayerDefs::ToggleAllControls ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPlayer );
+
         if ( CStaticFunctionDefinitions::ToggleAllControls ( pPlayer, bGTAControls, bMTAControls, bEnabled ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1866,6 +1910,7 @@ int CLuaPlayerDefs::PlaySoundFrontEnd ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPlayerDefs::KickPlayer ( lua_State* luaVM )
 {
@@ -1952,6 +1997,8 @@ int CLuaPlayerDefs::ShowCursor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPlayer );
+
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain && CStaticFunctionDefinitions::ShowCursor ( pPlayer, pLuaMain, bShow, bToggleControls ) )
         {
@@ -1990,7 +2037,6 @@ int CLuaPlayerDefs::ShowChat ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
 
 
 int CLuaPlayerDefs::BanPlayer ( lua_State* luaVM )
@@ -2097,6 +2143,7 @@ int CLuaPlayerDefs::PlayMissionAudio ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPlayerDefs::PreloadMissionAudio ( lua_State* luaVM )
 {

@@ -169,7 +169,6 @@ void CLuaPedDefs::AddClass ( lua_State* luaVM )
 }
 
 
-
 int CLuaPedDefs::GetValidPedModels ( lua_State* luaVM )
 {
     int iIndex = 0;
@@ -186,6 +185,7 @@ int CLuaPedDefs::GetValidPedModels ( lua_State* luaVM )
 
     return 1;
 }
+
 
 int CLuaPedDefs::CreatePed ( lua_State* luaVM )
 {
@@ -229,8 +229,6 @@ int CLuaPedDefs::CreatePed ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
-
 
 
 int CLuaPedDefs::GetPedWeapon ( lua_State* luaVM )
@@ -287,6 +285,7 @@ int CLuaPedDefs::GetPedWeaponSlot ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPedDefs::reloadPedWeapon ( lua_State* luaVM )
 {
     CElement* pPed;
@@ -296,6 +295,8 @@ int CLuaPedDefs::reloadPedWeapon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPed );
+
         if ( CStaticFunctionDefinitions::reloadPedWeapon ( pPed ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -308,6 +309,7 @@ int CLuaPedDefs::reloadPedWeapon ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPedDefs::IsPedDoingGangDriveby ( lua_State* luaVM )
 {
@@ -454,6 +456,7 @@ int CLuaPedDefs::SetPedAnimation ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPedDefs::SetPedAnimationProgress ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -485,7 +488,6 @@ int CLuaPedDefs::SetPedAnimationProgress ( lua_State* luaVM )
 }
 
 
-
 int CLuaPedDefs::SetPedWeaponSlot ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -511,7 +513,6 @@ int CLuaPedDefs::SetPedWeaponSlot ( lua_State* luaVM )
 }
 
 
-
 int CLuaPedDefs::SetPedOnFire ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -523,6 +524,8 @@ int CLuaPedDefs::SetPedOnFire ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedOnFire ( pElement, bOnFire ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -537,7 +540,6 @@ int CLuaPedDefs::SetPedOnFire ( lua_State* luaVM )
 }
 
 
-
 int CLuaPedDefs::SetPedHeadless ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -549,6 +551,8 @@ int CLuaPedDefs::SetPedHeadless ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedHeadless ( pElement, bHeadless ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -574,6 +578,8 @@ int CLuaPedDefs::SetPedFrozen ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedFrozen ( pElement, bFrozen ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -586,6 +592,7 @@ int CLuaPedDefs::SetPedFrozen ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPedDefs::GetPedAmmoInClip ( lua_State* luaVM )
 {
@@ -669,7 +676,6 @@ int CLuaPedDefs::GetPedArmor ( lua_State* luaVM )
 }
 
 
-
 int CLuaPedDefs::GetPedOccupiedVehicle ( lua_State* luaVM )
 {
     CPed* pPed;
@@ -717,6 +723,7 @@ int CLuaPedDefs::GetPedOccupiedVehicleSeat ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPedDefs::GetPedRotation ( lua_State* luaVM )
 {
     CPed* pPed;
@@ -739,8 +746,6 @@ int CLuaPedDefs::GetPedRotation ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
-
 
 
 int CLuaPedDefs::IsPedChoking ( lua_State* luaVM )
@@ -801,7 +806,6 @@ int CLuaPedDefs::IsPedDucked ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
 
 
 int CLuaPedDefs::IsPedInVehicle ( lua_State* luaVM )
@@ -872,8 +876,6 @@ int CLuaPedDefs::GetPedTarget ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
-
 
 
 int CLuaPedDefs::GetPedClothes ( lua_State* luaVM )
@@ -951,9 +953,6 @@ int CLuaPedDefs::IsPedOnGround ( lua_State* luaVM )
 }
 
 
-
-
-
 int CLuaPedDefs::GetPedFightingStyle ( lua_State* luaVM )
 {
     CPed* pPed;
@@ -1026,7 +1025,6 @@ int CLuaPedDefs::GetPedGravity ( lua_State* luaVM )
 }
 
 
-
 int CLuaPedDefs::GetPedContactElement ( lua_State* luaVM )
 {
     CPed* pPed;
@@ -1062,6 +1060,8 @@ int CLuaPedDefs::SetPedArmor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedArmor ( pElement, fArmor ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1093,6 +1093,8 @@ int CLuaPedDefs::KillPed ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::KillPed ( pElement, pKiller, ucKillerWeapon, ucBodyPart, bStealth ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1119,6 +1121,8 @@ int CLuaPedDefs::SetPedRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedRotation ( pElement, fRotation, bNewWay ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1147,6 +1151,8 @@ int CLuaPedDefs::SetPedStat ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedStat ( pElement, usStat, fValue ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1159,6 +1165,7 @@ int CLuaPedDefs::SetPedStat ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPedDefs::AddPedClothes ( lua_State* luaVM )
 {
@@ -1173,9 +1180,10 @@ int CLuaPedDefs::AddPedClothes ( lua_State* luaVM )
     argStream.ReadString ( strModel );
     argStream.ReadNumber ( ucType );
 
-
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::AddPedClothes ( pElement, strTexture, strModel, ucType ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1189,6 +1197,7 @@ int CLuaPedDefs::AddPedClothes ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaPedDefs::RemovePedClothes ( lua_State* luaVM )
 {
@@ -1206,6 +1215,8 @@ int CLuaPedDefs::RemovePedClothes ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::RemovePedClothes ( pElement, ucType, strTexture.empty () ? NULL : strTexture.c_str (), strModel.empty () ? NULL : strModel.c_str () ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1219,6 +1230,7 @@ int CLuaPedDefs::RemovePedClothes ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPedDefs::GivePedJetPack ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1228,6 +1240,8 @@ int CLuaPedDefs::GivePedJetPack ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::GivePedJetPack ( pElement ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1241,6 +1255,7 @@ int CLuaPedDefs::GivePedJetPack ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPedDefs::RemovePedJetPack ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1250,6 +1265,8 @@ int CLuaPedDefs::RemovePedJetPack ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::RemovePedJetPack ( pElement ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1263,6 +1280,7 @@ int CLuaPedDefs::RemovePedJetPack ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPedDefs::SetPedFightingStyle ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1274,6 +1292,8 @@ int CLuaPedDefs::SetPedFightingStyle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedFightingStyle ( pElement, ucStyle ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1299,6 +1319,8 @@ int CLuaPedDefs::SetPedMoveAnim ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedMoveAnim ( pElement, iMoveAnim ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1312,6 +1334,7 @@ int CLuaPedDefs::SetPedMoveAnim ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPedDefs::SetPedGravity ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1323,6 +1346,8 @@ int CLuaPedDefs::SetPedGravity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedGravity ( pElement, fGravity ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1337,7 +1362,6 @@ int CLuaPedDefs::SetPedGravity ( lua_State* luaVM )
 }
 
 
-
 int CLuaPedDefs::SetPedChoking ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1349,6 +1373,8 @@ int CLuaPedDefs::SetPedChoking ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedChoking ( pElement, bChoking ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1376,6 +1402,8 @@ int CLuaPedDefs::WarpPedIntoVehicle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPed );
+
         if ( CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPed, pVehicle, uiSeat ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1407,6 +1435,8 @@ int CLuaPedDefs::OOP_WarpPedIntoVehicle ( lua_State* luaVM )
     {
         if ( !argStream.HasErrors () )
         {
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPed );
+
             if ( CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPed, pVehicle, uiSeat ) )
             {
                 lua_pushboolean ( luaVM, true );
@@ -1420,6 +1450,8 @@ int CLuaPedDefs::OOP_WarpPedIntoVehicle ( lua_State* luaVM )
     {
         if ( !argStream.HasErrors () )
         {
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPed );
+
             if ( CStaticFunctionDefinitions::RemovePedFromVehicle ( pPed ) )
             {
                 lua_pushboolean ( luaVM, true );
@@ -1445,6 +1477,8 @@ int CLuaPedDefs::RemovePedFromVehicle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::RemovePedFromVehicle ( pElement ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1458,6 +1492,7 @@ int CLuaPedDefs::RemovePedFromVehicle ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPedDefs::SetPedDoingGangDriveby ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1469,6 +1504,8 @@ int CLuaPedDefs::SetPedDoingGangDriveby ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetPedDoingGangDriveby ( pElement, bDoingGangDriveby ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1496,6 +1533,8 @@ int CLuaPedDefs::GiveWeapon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::GiveWeapon ( pElement, weaponType, usAmmo, bSetAsCurrent ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1522,6 +1561,8 @@ int CLuaPedDefs::TakeWeapon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::TakeWeapon ( pElement, weaponType, usAmmo ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1535,6 +1576,7 @@ int CLuaPedDefs::TakeWeapon ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaPedDefs::TakeAllWeapons ( lua_State* luaVM )
 {
     CElement* pElement;
@@ -1544,6 +1586,8 @@ int CLuaPedDefs::TakeAllWeapons ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::TakeAllWeapons ( pElement ) )
         {
             lua_pushboolean ( luaVM, true );
