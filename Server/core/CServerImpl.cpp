@@ -19,9 +19,12 @@
 #include "CCrashHandler.h"
 #include "MTAPlatform.h"
 #include "ErrorCodes.h"
+
 #include <clocale>
 #include <cstdio>
 #include <signal.h>
+#include <stdlib.h>
+
 #ifdef WIN32
     #include <Mmsystem.h>
     #include <io.h>
@@ -49,6 +52,7 @@ bool g_bNoCrashHandler = false;
 
 #ifdef WIN32
 CServerImpl::CServerImpl ( CThreadCommandQueue* pThreadCommandQueue )
+    : m_vecScreenBuffer ( 256, CHAR_INFO ( ) )
 #else
 CServerImpl::CServerImpl ( void )
 #endif
@@ -602,62 +606,70 @@ void CServerImpl::ShowInfoTag ( char* szTag )
 {
     if ( g_bSilent || g_bNoTopBar || g_bNoCurses )
         return;
+    
 #ifdef WIN32
-    // Windows console code
-        // Get the console's width
-        CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
-        if ( !GetConsoleScreenBufferInfo( m_hConsole, &ScrnBufferInfo ) )
-            return;
+    // Get the console's width
+    CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
 
-        COORD BufferSize = { ScrnBufferInfo.dwSize.X, 1 };
-        COORD TopLeft = { 0, ScrnBufferInfo.srWindow.Top };
-        SMALL_RECT Region = { 0, ScrnBufferInfo.srWindow.Top, ScrnBufferInfo.dwSize.X, 1 };
+    if ( !GetConsoleScreenBufferInfo ( m_hConsole, &ScrnBufferInfo ) )
+        return;
 
-        // If the screenbuffer doesn't exist yet, or if the tag is changed
-        if ( m_ScrnBuffer == NULL || strcmp ( szTag, m_szTag ) )
+    auto bScreenBufferResized = false;
+
+    if ( m_vecScreenBuffer.size ( ) != ScrnBufferInfo.dwSize.X ) {
+        m_vecScreenBuffer.resize ( ScrnBufferInfo.dwSize.X, CHAR_INFO ( ) );
+        bScreenBufferResized = true;
+    }
+
+    COORD BufferSize = { ScrnBufferInfo.dwSize.X, 1 };
+    COORD TopLeft = { 0, ScrnBufferInfo.srWindow.Top };
+    SMALL_RECT Region = { 0, ScrnBufferInfo.srWindow.Top, ScrnBufferInfo.dwSize.X, 1 };
+
+    // If the screenbuffer doesn't exist yet, or if the tag is changed
+    if ( bScreenBufferResized || strcmp ( szTag, m_szTag ) )
+    {
+        auto ScrnBufferCount = 0;
+
+        strcpy ( m_szTag, szTag );
+
+        // Construct the screenbuffer
+        for ( auto i = 0; i < ScrnBufferInfo.dwSize.X; i++ )
         {
-            int ScrnBufferCount = 0;
-            strcpy(m_szTag, szTag);
-
-            // Construct the screenbuffer
-            for ( int i = 0 ; i < ScrnBufferInfo.dwSize.X ; i++ )
+            if ( i >= 80 || szTag [ i ] == '\0' )
             {
-                if ( szTag[i] == NULL )
+                // No more tag data, so fill it up with spaces and break the loop
+                for ( auto j = ScrnBufferCount ; j < ScrnBufferInfo.dwSize.X; j++ )
                 {
-                    // No more tag data, so fill it up with spaces and break the loop
-                    for ( int j = ScrnBufferCount ; j < ScrnBufferInfo.dwSize.X ; j++ )
-                    {
-                        m_ScrnBuffer[j].Char.UnicodeChar = L' ';
-                        m_ScrnBuffer[j].Attributes = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE;
-                    }
-                    break;
-                } else {
-                    // The color interpreter
-                    switch ( ( unsigned char ) ( szTag[i] ) )
-                    {
-                        case 128: m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; break;
-                        case 129: m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; break;
-                        case 130: m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_RED; break;
-                        case 131: m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_GREEN; break;
-                        case 132: m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_BLUE; break;
-                        case 133: m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_RED; break;
-                        case 134: m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_GREEN; break;
-                        case 135: m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_BLUE; break;
-                        default: m_ScrnBuffer[ScrnBufferCount].Attributes = 0; break;
-                    }
-
-                    if ( (unsigned char)szTag[i] > 127 ) {
-                        // If this is a color code, skip to the next character, so we can color that one
-                        i++;
-                    }
-                    m_ScrnBuffer[ScrnBufferCount].Char.UnicodeChar = szTag[i];
-
-                    // Enable a grey background
-                    m_ScrnBuffer[ScrnBufferCount++].Attributes |= ( BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE );
+                    m_vecScreenBuffer [ j ].Char.UnicodeChar = L' ';
+                    m_vecScreenBuffer [ j ].Attributes = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE;
                 }
+            } else {
+                // The color interpreter
+                switch ( static_cast < unsigned char > ( szTag [ i ] ) )
+                {
+                    case 128: m_vecScreenBuffer [ ScrnBufferCount ].Attributes = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; break;
+                    case 129: m_vecScreenBuffer [ ScrnBufferCount ].Attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; break;
+                    case 130: m_vecScreenBuffer [ ScrnBufferCount ].Attributes = FOREGROUND_RED; break;
+                    case 131: m_vecScreenBuffer [ ScrnBufferCount ].Attributes = FOREGROUND_GREEN; break;
+                    case 132: m_vecScreenBuffer [ ScrnBufferCount ].Attributes = FOREGROUND_BLUE; break;
+                    case 133: m_vecScreenBuffer [ ScrnBufferCount ].Attributes = FOREGROUND_INTENSITY | FOREGROUND_RED; break;
+                    case 134: m_vecScreenBuffer [ ScrnBufferCount ].Attributes = FOREGROUND_INTENSITY | FOREGROUND_GREEN; break;
+                    case 135: m_vecScreenBuffer [ ScrnBufferCount ].Attributes = FOREGROUND_INTENSITY | FOREGROUND_BLUE; break;
+                    default:  m_vecScreenBuffer [ ScrnBufferCount ].Attributes = 0; break;
+                }
+
+                if ( static_cast < unsigned char > ( szTag [ i ] ) > 127 )
+                    i++; // If this is a color code, skip to the next character, so we can color that one
+
+                m_vecScreenBuffer [ ScrnBufferCount ].Char.UnicodeChar = szTag [ i ];
+
+                // Enable a grey background
+                m_vecScreenBuffer [ ScrnBufferCount++ ].Attributes |= ( BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE );
             }
-        }
-        WriteConsoleOutputW ( m_hConsole, m_ScrnBuffer, BufferSize, TopLeft, &Region);
+        };
+    }
+
+    WriteConsoleOutputW ( m_hConsole, m_vecScreenBuffer.data ( ), BufferSize, TopLeft, &Region );
 #else
     // Linux curses variant, so much easier :)
     int iAttr = COLOR_PAIR ( 1 );
