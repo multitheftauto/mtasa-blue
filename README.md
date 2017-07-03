@@ -30,7 +30,7 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
 ### IDE Setup
-Download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) to automatically set up your IDE for the correct formatting.
+If not using Visual Studio 2017, download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) plugin to automatically set up your IDE for the correct formatting.
 
 ### Build Instructions
 #### Windows
