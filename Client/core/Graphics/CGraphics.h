@@ -82,7 +82,7 @@ public:
     void                DrawString              ( int iX, int iY, unsigned long dwColor, float fScale, const char * szText, ... );
     void                DrawLine3D              ( const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f );
     void                DrawRectangle           ( float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false );
-    void                DrawStringBlurred       ( const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont );
+    void                DrawStringOutline       ( const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont );
 
     void                SetBlendMode            ( EBlendModeType blendMode );
     EBlendModeType      GetBlendMode            ( void );

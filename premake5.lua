@@ -12,7 +12,7 @@ if ci and ci:lower() == "true" then
 else 
 	CI_BUILD = false
 end 
-local GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
+GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
@@ -22,7 +22,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 	
-	cppdialect "C++11"
+	cppdialect "C++14"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
