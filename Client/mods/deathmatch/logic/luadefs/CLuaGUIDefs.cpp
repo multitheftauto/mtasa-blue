@@ -3333,6 +3333,11 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
     //* chat_input_prefix_color - Returns the color of the input prefix text
     //* chat_input_text_color - Returns the color of the text in the chatbox input
     //* chat_scale - Returns the scale of the text in the chatbox
+    //* chat_position_offset_x - Returns the position offset of the chatbox on the x axis
+    //* chat_position_offset_y - Returns the position offset of the chatbox on the y axis
+    //* chat_position_horizontal - Returns the horizontal position of the chatbox
+    //* chat_position_vertical - Returns the vertical position of the chatbox
+    //* chat_text_alignment - Returns the horizontal alignment of the chatbox text
     //* chat_width - Returns the scale of the background width
     //* chat_css_style_text - Returns whether text fades out over time
     //* chat_css_style_background - Returns whether the background fades out over time
@@ -3342,6 +3347,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
     //* text_scale - Returns text scale
 
     CCVarsInterface* pCVars = g_pCore->GetCVars ();
+    int iNumber;
     float fNumber;
     pCVars->Get("chat_font", fNumber);
     lua_newtable ( luaVM );
@@ -3353,6 +3359,21 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
     pCVars->Get("chat_width", fNumber);
     lua_pushnumber ( luaVM, fNumber );
     lua_setfield ( luaVM, -2, "chat_width" );
+    pCVars->Get("chat_position_offset_x", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_position_offset_x" );
+    pCVars->Get("chat_position_offset_y", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_position_offset_y" );
+    pCVars->Get("chat_position_horizontal", iNumber);
+    lua_pushnumber ( luaVM, iNumber );
+    lua_setfield ( luaVM, -2, "chat_position_horizontal" );
+    pCVars->Get("chat_position_vertical", iNumber);
+    lua_pushnumber ( luaVM, iNumber );
+    lua_setfield ( luaVM, -2, "chat_position_vertical" );
+    pCVars->Get("chat_text_alignment", iNumber);
+    lua_pushnumber ( luaVM, iNumber );
+    lua_setfield ( luaVM, -2, "chat_text_alignment" );
     pCVars->Get("chat_css_style_text", fNumber);
     lua_pushnumber ( luaVM, fNumber );
     lua_setfield ( luaVM, -2, "chat_css_style_text" );
@@ -3494,6 +3515,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
         lua_settable( luaVM, -3 );
         lua_setfield ( luaVM, -2, "chat_scale" );
     }
+
     return 1;
 }
 
