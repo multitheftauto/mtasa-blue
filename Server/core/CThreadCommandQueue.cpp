@@ -20,22 +20,20 @@
 void CThreadCommandQueue::Add ( const char* szCommand )
 {
     // Add command to queue thread-safe
-    m_Mutex.lock ( );
+    std::lock_guard < std::mutex > lock ( m_Mutex );
     m_Commands.push ( szCommand );
-    m_Mutex.unlock ( );
 }
-
 
 void CThreadCommandQueue::Process ( bool& bRequestedQuit, CModManagerImpl* pModManager )
 {
     // Lock the critical section
-    m_Mutex.lock ( );
+    std::lock_guard < std::mutex > lock ( m_Mutex );
 
     // Got commands to process?
     while ( !m_Commands.empty ( ) )
     {
         // Grab the string
-        auto str = m_Commands.front ( );
+        const auto& str = m_Commands.front ( );
 
         // Check for the most important command: quit and exit.
         if ( str == "quit" || str == "exit" )
@@ -46,9 +44,6 @@ void CThreadCommandQueue::Process ( bool& bRequestedQuit, CModManagerImpl* pModM
         // Remove it from the queue
         m_Commands.pop ( );
     }
-
-    // Unlock the critical section
-    m_Mutex.unlock ( );
 }
 
 #endif
