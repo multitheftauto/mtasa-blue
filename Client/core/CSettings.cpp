@@ -1720,12 +1720,6 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
 {
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
 
-    //gameSettings->SetMipMappingEnabled (); // Doesn't appear to even be enabled
-    gameSettings->SetFieldOfView( 70 );
-    gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
-    gameSettings->SetBrightness ( 253 );
-    gameSettings->SetFXQuality ( 2 );
-    gameSettings->SetAntiAliasing ( 1, true );
     CVARS_SET ("aspect_ratio", ASPECT_RATIO_AUTO );
     CVARS_SET ("fov", 70 );
     CVARS_SET ("anisotropic", 0 );
@@ -1734,13 +1728,18 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     CVARS_SET ( "heat_haze", true );
     CVARS_SET ( "tyre_smoke_enabled", true );
     CVARS_SET ( "high_detail_vehicles", false );
+    gameSettings->UpdateFieldOfViewFromSettings();
+    gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
+    gameSettings->SetBrightness ( 253 );
+    gameSettings->SetFXQuality ( 2 );
+    gameSettings->SetAntiAliasing ( 1, true );
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false, FULLSCREEN_STANDARD );
 
     CVARS_SET ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 
-    CVARS_SET ( "mapalpha", 140.25f);
+    CVARS_SET ( "mapalpha", 155);
 
     // Display restart required message if required
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != m_pComboAntiAliasing->GetSelectedItemIndex ();
@@ -2240,6 +2239,11 @@ void CSettings::CreateInterfaceTabGUI( void )
             m_pTrayBalloon->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
             m_pTrayBalloon->GetPosition ( vecTemp );
             m_pTrayBalloon->AutoSize ( NULL, 20.0f );
+
+            m_pChatTextBlackOutline = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabOptions, _("Chat text black/white outline") ) );
+            m_pChatTextBlackOutline->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            m_pChatTextBlackOutline->GetPosition ( vecTemp );
+            m_pChatTextBlackOutline->AutoSize ( NULL, 20.0f );
         }
     }
 }
@@ -3006,9 +3010,9 @@ void CSettings::LoadData ( void )
         CVARS_GET ( "chat_scale", strVar );
         stringstream ss( strVar );
         ss >> strVar;
-        m_pChatScaleX->SetText ( strVar.c_str () );
+        m_pChatScaleX->SetText ( SString( "%1.1f", atof( strVar.c_str() ) ) );
         ss >> strVar;
-        m_pChatScaleY->SetText ( strVar.c_str () );
+        m_pChatScaleY->SetText ( SString( "%1.1f", atof( strVar.c_str() ) ) );
     }
     catch (...)
     {
@@ -3018,6 +3022,7 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "chat_css_style_text", bVar ); m_pChatCssText->SetSelected ( bVar );
     CVARS_GET ( "chat_css_style_background", bVar ); m_pChatCssBackground->SetSelected ( bVar );
     CVARS_GET ( "chat_nickcompletion", bVar ); m_pChatNickCompletion->SetSelected ( bVar );
+    CVARS_GET ( "chat_text_outline", bVar ); m_pChatTextBlackOutline->SetSelected ( bVar );
 
     {
         int iVar;
@@ -3173,6 +3178,7 @@ void CSettings::SaveData ( void )
     // iFieldOfView
     int iFieldOfView = std::min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
     CVARS_SET ( "fov", iFieldOfView );
+    gameSettings->UpdateFieldOfViewFromSettings();
 
     // Anisotropic filtering
     int iAnisotropic = std::min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
@@ -3350,6 +3356,7 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "chat_css_style_text", m_pChatCssText->GetSelected () );
     CVARS_SET ( "chat_css_style_background", m_pChatCssBackground->GetSelected () );
     CVARS_SET ( "chat_nickcompletion", m_pChatNickCompletion->GetSelected () );
+    CVARS_SET ( "chat_text_outline", m_pChatTextBlackOutline->GetSelected() );
     CVARS_SET ( "chat_line_life", GetMilliseconds ( m_pChatLineLife ) );
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
 

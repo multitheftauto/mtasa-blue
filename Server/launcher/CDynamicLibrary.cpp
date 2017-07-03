@@ -39,7 +39,7 @@ bool CDynamicLibrary::Load ( const char* szFilename )
     #ifdef WIN32
         m_hModule = LoadLibrary ( szFilename );
     #else
-        m_hModule = dlopen ( szFilename, RTLD_NOW );
+        m_hModule = dlopen ( szFilename, RTLD_NOW | RTLD_DEEPBIND );
     
     // Output error if needed
     if ( !m_hModule )

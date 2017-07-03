@@ -1,11 +1,17 @@
 #!/bin/bash
 
-if [[ "$(uname -m)" == 'x86_64' ]]; then
-    PREMAKE5=utils/premake5_x64
-    CONFIG=release_x64
+# Find premake binary location
+if [ "$(uname)" == "Darwin" ]; then
+    PREMAKE5=utils/premake5-macos
 else
-    PREMAKE5=utils/premake5_x86
+    PREMAKE5=utils/premake5
+fi
+
+# 32bit vs 64bit
+if [[ $1 = "32" ]]; then
     CONFIG=release_x86
+else
+    CONFIG=release_x64
 fi
 
 # Clean old build files
@@ -15,6 +21,13 @@ rm -Rf Bin/
 # Generate makefiles
 $PREMAKE5 gmake
 
+# Number of cores
+if [ "$(uname)" == "Darwin" ]; then
+    NUM_CORES=$(sysctl -n hw.ncpu)
+else
+    NUM_CORES=$(grep -c ^processor /proc/cpuinfo)
+fi
+
 # Build!
 cd Build/
-make config=$CONFIG all
+make -j$NUM_CORES config=$CONFIG all

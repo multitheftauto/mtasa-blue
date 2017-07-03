@@ -1053,18 +1053,22 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
     }
 
     // Call it on all our children
-    CChildListType ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
+    CElementListSnapshot* pList = GetChildrenListSnapshot();
+    pList->AddRef();    // Keep list alive during use
+    for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ )
     {
         CElement* pElement = *iter;
-
-        if ( !pElement->m_pEventManager || pElement->m_pEventManager->HasEvents () || !pElement->m_Children.empty () )
+        if ( !pElement->IsBeingDeleted() )
         {
-            pElement->CallEventNoParent ( szName, Arguments, pSource, pCaller );
-            if ( m_bIsBeingDeleted )
-                break;
+            if ( !pElement->m_pEventManager || pElement->m_pEventManager->HasEvents () || !pElement->m_Children.empty () )
+            {
+                pElement->CallEventNoParent ( szName, Arguments, pSource, pCaller );
+                if ( m_bIsBeingDeleted )
+                    break;
+            }
         }
     }
+    pList->Release();
 }
 
 

@@ -1390,11 +1390,26 @@ bool Is32bitProcess ( DWORD processID )
 ///////////////////////////////////////////////////////////////////////////
 void TerminateProcess( DWORD dwProcessID, uint uiExitCode )
 {
-    HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, dwProcessID );
-    if ( hProcess )
+    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
+    if ( hModule )
     {
-        TerminateProcess( hProcess, uiExitCode );
-        CloseHandle( hProcess );
+        typedef bool (*PFNTerminateProcess) ( uint, uint );
+        PFNTerminateProcess pfnTerminateProcess = static_cast< PFNTerminateProcess > ( static_cast < PVOID > ( GetProcAddress ( hModule, "NtTerminateProcess" ) ) );
+
+        if ( pfnTerminateProcess )
+        {
+            bool bResult = pfnTerminateProcess ( dwProcessID, uiExitCode );
+            AddReportLog ( 8070, SString ( "TerminateProcess %d result: %d", dwProcessID, bResult ) );
+        }
+        else
+        {
+            HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, dwProcessID );
+            if ( hProcess )
+            {
+                TerminateProcess( hProcess, uiExitCode );
+                CloseHandle( hProcess );
+            }
+        }
     }
 }
 
@@ -1989,31 +2004,27 @@ void BsodDetectionOnGameEnd( void )
 // Message to advise against running certain other programs
 //
 //////////////////////////////////////////////////////////
-void ForbodenProgramsMessage ( void )
+void ForbodenProgramsMessage(void)
 {
-    std::vector < SString > forbodenList;
-    forbodenList.push_back( "ProcessHacker" );
-    forbodenList.push_back( "CheatEngine" );
-
-    SString strResult;
-    for ( auto processId : MyEnumProcesses( true ) )
+    std::vector<SString> forbodenList = {"ProcessHacker", "CheatEngine", "PCHunter"};
+    std::vector<SString> foundList;
+    for (auto processId : MyEnumProcesses(true))
     {
-        SString strPathFilename = GetProcessPathFilename ( processId );
-        SString strFilename = ExtractFilename( strPathFilename );
-        for ( auto forbodenName : forbodenList )
+        SString strFilename = ExtractFilename(GetProcessPathFilename(processId));
+        for (const auto& forbodenName : forbodenList)
         {
-            if ( strFilename.Replace( " ", "" ).BeginsWithI( forbodenName ) )
-                strResult += strFilename + "\n";
+            if (strFilename.Replace(" ", "").BeginsWithI(forbodenName) )
+                foundList.push_back(strFilename);
         }
     }
 
-    if ( !strResult.empty() )
+    if (!foundList.empty())
     {
         SString strMessage = _("Please terminate the following programs before continuing:");
         strMessage += "\n\n";
-        strMessage += strResult;
-        DisplayErrorMessageBox ( strMessage, _E("CL39"), "forboden-programs" );
-        WriteDebugEventAndReport( 6550, SString( "Showed forboden programs list (%s)", *strResult.Replace( "\n", "" ) ) );
+        strMessage += SString::Join("\n", foundList);
+        DisplayErrorMessageBox(strMessage, _E("CL39"), "forboden-programs");
+        WriteDebugEventAndReport(6550, SString( "Showed forboden programs list (%s)", *SString::Join(",", foundList)));
     }
 }
 

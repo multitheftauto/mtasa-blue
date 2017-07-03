@@ -489,6 +489,7 @@ namespace SharedUtil
         return c;
     }
 
+#ifdef SDK_WITH_BCRYPT
     constexpr const std::size_t HashBufferSize = 60 + 1;
 	SString BcryptHash(const SString& password, SString salt, std::size_t cost)
 	{
@@ -525,7 +526,7 @@ namespace SharedUtil
 
         return strcmp(checkedHashBuffer, hash.c_str()) == 0;
 	}
-
+#endif
 
     SString ConvertDataToHexString( const void* pData, uint uiLength )
     {

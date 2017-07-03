@@ -46,7 +46,7 @@ bool CDynamicLibrary::Load ( const char* szFilename )
         }
 
     #else
-        m_hModule = dlopen ( szFilename, RTLD_NOW );
+        m_hModule = dlopen ( szFilename, RTLD_NOW | RTLD_DEEPBIND );
     
         // Output error if needed
         if ( !m_hModule )

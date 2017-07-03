@@ -32,14 +32,23 @@ project "Dbconmy"
 		"*.cpp"
 	}
 	
-	filter "system:not windows"
+	filter "system:linux"
 		includedirs { "/usr/include/mysql" }
-		links { "mysqlclient", "rt" }
+		links { "rt" }
 
-	filter {"system:linux", "platforms:x86"}
-		libdirs { "/usr/lib32/mysql" }
-	filter {"system:linux", "platforms:x64"}
-		libdirs { "/usr/lib64/mysql" }
+	if GLIBC_COMPAT then 			
+		filter { "system:linux" }
+			buildoptions { "-pthread" }
+			linkoptions { "-l:libmysqlclient.a", "-pthread" }
+			links { "z", "dl", "m" }
+	else 
+		filter "system:linux"
+			links { "mysqlclient" }
+		filter {"system:linux", "platforms:x86"}
+			libdirs { "/usr/lib32/mysql" }
+		filter {"system:linux", "platforms:x64"}
+			libdirs { "/usr/lib64/mysql" }
+	end 
 	
 	filter { "system:windows", "platforms:x64" }
 		links { "../../vendor/mysql/lib/x64/libmysql.lib" }

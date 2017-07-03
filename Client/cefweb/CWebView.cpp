@@ -65,8 +65,12 @@ void CWebView::Initialise ()
         browserSettings.javascript = bEnabledJavascript ? cef_state_t::STATE_ENABLED : cef_state_t::STATE_DISABLED;
     }
 
+    // Set background color to opaque white if transparency is disabled
+    if (!m_bIsTransparent)
+        browserSettings.background_color = 0xffffffff;
+
     CefWindowInfo windowInfo;
-    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow (), m_bIsTransparent );
+    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow () );
 
     CefBrowserHost::CreateBrowser ( windowInfo, this, "", browserSettings, nullptr );
 }

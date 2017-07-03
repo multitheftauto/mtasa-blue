@@ -22,6 +22,7 @@
 #define MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT          "1.3.5"
 #define MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE             "1.5.4-9.11342"
+#define MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_FORMFIELDS        "1.5.4-9.11413"
 
 int CLuaFunctionDefs::CreateExplosion ( lua_State* luaVM )
 {
@@ -1879,7 +1880,6 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
     }
     else
     {
-        MinClientReqCheck(argStream, MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE, "'options' table is being used");
         CStringMap optionsMap;
 
         argStream.ReadStringMap(optionsMap);
@@ -1897,10 +1897,13 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
         optionsMap.ReadNumber("maxRedirects", httpRequestOptions.uiMaxRedirects, 8);
         optionsMap.ReadString("username", httpRequestOptions.strUsername, "");
         optionsMap.ReadString("password", httpRequestOptions.strPassword, "");
+        optionsMap.ReadStringMap("headers", httpRequestOptions.requestHeaders);
+        optionsMap.ReadStringMap("formFields", httpRequestOptions.formFields);
 
-        CStringMap headersMap;
-        optionsMap.ReadStringMap("headers", headersMap);
-        httpRequestOptions.requestHeaders.insert(headersMap.begin(), headersMap.end());
+        if (httpRequestOptions.formFields.empty())
+            MinClientReqCheck(argStream, MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE, "'options' table is being used");
+        else
+            MinClientReqCheck(argStream, MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_FORMFIELDS, "'formFields' is being used");
 
         if (!argStream.HasErrors())
         {

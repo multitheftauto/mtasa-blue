@@ -315,6 +315,8 @@ namespace
         { false, "setObjectStatic",                "setElementFrozen" },
         { false, "isPlayerDead",                   "isPedDead" },
         { false, "showPlayerHudComponent",         "setPlayerHudComponentVisible" },
+        { false, "setControlState",                "setPedControlState" },
+        { false, "getControlState",                "getPedControlState" },
         // Edit
         { false, "guiEditSetCaratIndex",           "guiEditSetCaretIndex" },
         { false, "guiMemoSetCaratIndex",           "guiMemoSetCaretIndex" },

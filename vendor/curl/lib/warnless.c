@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -170,6 +170,28 @@ int curlx_ultosi(unsigned long ulnum)
   return (int)(ulnum & (unsigned long) CURL_MASK_SINT);
 
 #ifdef __INTEL_COMPILER
+#  pragma warning(pop)
+#endif
+}
+
+/*
+** unsigned size_t to signed curl_off_t
+*/
+
+curl_off_t curlx_uztoso(size_t uznum)
+{
+#ifdef __INTEL_COMPILER
+#  pragma warning(push)
+#  pragma warning(disable:810) /* conversion may lose significant bits */
+#elif defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable:4310) /* cast truncates constant value */
+#endif
+
+  DEBUGASSERT(uznum <= (size_t) CURL_MASK_SCOFFT);
+  return (curl_off_t)(uznum & (size_t) CURL_MASK_SCOFFT);
+
+#if defined(__INTEL_COMPILER) || defined(_MSC_VER)
 #  pragma warning(pop)
 #endif
 }
@@ -360,6 +382,63 @@ int curlx_sztosi(ssize_t sznum)
 }
 
 /*
+** unsigned int to unsigned short
+*/
+
+unsigned short curlx_uitous(unsigned int uinum)
+{
+#ifdef __INTEL_COMPILER
+#  pragma warning(push)
+#  pragma warning(disable:810) /* conversion may lose significant bits */
+#endif
+
+  DEBUGASSERT(uinum <= (unsigned int) CURL_MASK_USHORT);
+  return (unsigned short) (uinum & (unsigned int) CURL_MASK_USHORT);
+
+#ifdef __INTEL_COMPILER
+#  pragma warning(pop)
+#endif
+}
+
+/*
+** unsigned int to unsigned char
+*/
+
+unsigned char curlx_uitouc(unsigned int uinum)
+{
+#ifdef __INTEL_COMPILER
+#  pragma warning(push)
+#  pragma warning(disable:810) /* conversion may lose significant bits */
+#endif
+
+  DEBUGASSERT(uinum <= (unsigned int) CURL_MASK_UCHAR);
+  return (unsigned char) (uinum & (unsigned int) CURL_MASK_UCHAR);
+
+#ifdef __INTEL_COMPILER
+#  pragma warning(pop)
+#endif
+}
+
+/*
+** unsigned int to signed int
+*/
+
+int curlx_uitosi(unsigned int uinum)
+{
+#ifdef __INTEL_COMPILER
+#  pragma warning(push)
+#  pragma warning(disable:810) /* conversion may lose significant bits */
+#endif
+
+  DEBUGASSERT(uinum <= (unsigned int) CURL_MASK_SINT);
+  return (int) (uinum & (unsigned int) CURL_MASK_SINT);
+
+#ifdef __INTEL_COMPILER
+#  pragma warning(pop)
+#endif
+}
+
+/*
 ** signed int to unsigned size_t
 */
 
@@ -399,6 +478,20 @@ curl_socket_t curlx_sitosk(int i)
 }
 
 #endif /* USE_WINSOCK */
+
+#if defined(WIN32) || defined(_WIN32)
+
+ssize_t curlx_read(int fd, void *buf, size_t count)
+{
+  return (ssize_t)read(fd, buf, curlx_uztoui(count));
+}
+
+ssize_t curlx_write(int fd, const void *buf, size_t count)
+{
+  return (ssize_t)write(fd, buf, curlx_uztoui(count));
+}
+
+#endif /* WIN32 || _WIN32 */
 
 #if defined(__INTEL_COMPILER) && defined(__unix__)
 

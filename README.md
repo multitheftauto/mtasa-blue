@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Multi Theft Auto is based on code injection and hooking techniques whereby the game is manipulated without altering any original files supplied with the game. The software functions as a game engine that installs itself as an extension of the original game, adding core functionality such as networking and GUI rendering while exposing the original game's engine functionality through a scripting language.
+Multi Theft Auto is based on code injection and hooking techniques whereby the game is manipulated without altering any original files supplied with the game. The software functions as a game engine that installs itself as an extension of the original game, adding core functionality such as networking and GUI rendering while exposing the original game's engine functionality through a scripting language. 
 
 Originally founded back in early 2003 as an experimental piece of C/C++ software, Multi Theft Auto has since grown into an advanced multiplayer platform for gamers and third-party developers. Our software provides a minimal sandbox style gameplay that can be extended through the Lua scripting language in many ways, allowing servers to run custom created game modes with custom content for up to hundreds of online players.
 
@@ -40,10 +40,25 @@ Download and install the [EditorConfig](https://visualstudiogallery.msdn.microso
 4. Execute: `win-install-data.bat`
 
 #### Linux
-1. Execute `utils/premake5_x86 gmake` (32-bit OS) or `utils/premake5_x64 gmake` (64-bit OS)
+Building MTA:SA is only supported on 64-bit Linux OSes. You can however cross-compile a 32-bit version using _gcc-multilib_.
+1. Execute `utils/premake5 gmake`
 2. `cd Build`
 3. Run `make config=release_x86` to build the 32-bit server and `make config=release_x64` to build the 64-bit server (or use `debug` instead of `release` to run an unoptimized debug build)
 4. Execute `linux-install-data.sh` (optional step)
+
+#### Linux: Docker Build Environment
+If you have problems resolving the required dependencies or want maximum compatibility, you can use our dockerized build environment that ships all needed dependencies. We also use this environment to build the official binaries.
+
+64-bit target:
+```
+docker run -it -v `pwd`:/build multitheftauto/mtasa-blue
+```
+
+32-bit target:
+```
+docker run -it -v `pwd`:/build -e BUILD_BITS=32 multitheftauto/mtasa-blue
+```
+If the current directory is a valid git repository clone, it will use this as the build source. If not, it will create a (shallow) clone. After compiling, you will find the resulting binaries in `./Bin`.
 
 ### Premake FAQ
 #### How to add new C++ source files?

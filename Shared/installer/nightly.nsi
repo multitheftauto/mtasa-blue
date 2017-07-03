@@ -658,7 +658,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\game_sa.dll"
         File "${FILES_ROOT}\mta\multiplayer_sa.dll"
         File "${FILES_ROOT}\mta\netc.dll"
-        File "${FILES_ROOT}\mta\libcurl.dll"
         File "${FILES_ROOT}\mta\loader.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         File "${FILES_ROOT}\mta\cefweb.dll"
@@ -809,7 +808,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${FILES_ROOT}\mta\xmll.dll"
         File "${SERVER_FILES_ROOT}\MTA Server.exe"
         File "${SERVER_FILES_ROOT}\net.dll"
-        File "${FILES_ROOT}\mta\libcurl.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         ${LogText} "-Section end - SERVER CORE"
     SectionEnd

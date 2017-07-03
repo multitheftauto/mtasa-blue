@@ -309,6 +309,7 @@ protected:
     CGUICheckBox*       m_pChatCssBackground;
     CGUICheckBox*       m_pChatNickCompletion;
     CGUICheckBox*       m_pChatCssText;
+    CGUICheckBox*       m_pChatTextBlackOutline;
     CGUIEdit*           m_pChatLineLife;
     CGUIEdit*           m_pChatLineFadeout;
     CGUICheckBox*       m_pFlashWindow;
