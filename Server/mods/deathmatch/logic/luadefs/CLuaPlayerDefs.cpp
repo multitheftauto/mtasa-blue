@@ -331,7 +331,7 @@ int CLuaPlayerDefs::SetPlayerName ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPlayerName ( pElement, strName ) )
         {
@@ -774,7 +774,7 @@ int CLuaPlayerDefs::SetPlayerMoney ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPlayerMoney ( pElement, lMoney, bInstant ) )
         {
@@ -801,7 +801,7 @@ int CLuaPlayerDefs::GivePlayerMoney ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::GivePlayerMoney ( pElement, lMoney ) )
         {
@@ -848,7 +848,7 @@ int CLuaPlayerDefs::SpawnPlayer ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SpawnPlayer ( pElement, vecPosition, fRotation, ulModel, ucInterior, usDimension, pTeam ) )
         {
@@ -877,7 +877,7 @@ int CLuaPlayerDefs::ShowPlayerHudComponent ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::ShowPlayerHudComponent ( pElement, component, bShow ) )
         {
@@ -913,7 +913,7 @@ int CLuaPlayerDefs::TakePlayerScreenShot ( lua_State* luaVM )
         CResource * pResource = pLuaMain ? pLuaMain->GetResource () : NULL;
         if ( pResource )
         {
-            VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
             if ( CStaticFunctionDefinitions::TakePlayerScreenShot ( pElement, sizeX, sizeY, tag, quality, maxBandwidth, maxPacketSize, pResource ) )
             {
@@ -941,7 +941,7 @@ int CLuaPlayerDefs::SetPlayerWantedLevel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPlayerWantedLevel ( pElement, uiWantedLevel ) )
         {
@@ -970,7 +970,7 @@ int CLuaPlayerDefs::ForcePlayerMap ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::ForcePlayerMap ( pElement, bForce ) )
         {
@@ -997,7 +997,7 @@ int CLuaPlayerDefs::SetPlayerNametagText ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPlayerNametagText ( pElement, strText ) )
         {
@@ -1038,7 +1038,7 @@ int CLuaPlayerDefs::SetPlayerNametagColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPlayerNametagColor ( pElement, bRemoveOverride, ucR, ucG, ucB ) )
         {
@@ -1065,7 +1065,7 @@ int CLuaPlayerDefs::SetPlayerNametagShowing ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPlayerNametagShowing ( pElement, bShowing ) )
         {
@@ -1092,7 +1092,7 @@ int CLuaPlayerDefs::SetPlayerMuted ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPlayerMuted ( pElement, bMuted ) )
         {
@@ -1119,7 +1119,7 @@ int CLuaPlayerDefs::SetPlayerBlurLevel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPlayerBlurLevel ( pElement, ucLevel ) )
         {
@@ -1175,7 +1175,7 @@ int CLuaPlayerDefs::TakePlayerMoney ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::TakePlayerMoney ( pElement, lMoney ) )
         {
@@ -1325,7 +1325,7 @@ int CLuaPlayerDefs::SetPlayerAmmo ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPlayerAmmo ( pElement, ucSlot, usAmmo, usAmmoInClip ) )
         {
@@ -1805,7 +1805,7 @@ int CLuaPlayerDefs::SetControlState ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pPlayer );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPlayer );
 
         if ( CStaticFunctionDefinitions::SetControlState ( pPlayer, strControl, bState ) )
         {
@@ -1834,7 +1834,7 @@ int CLuaPlayerDefs::ToggleControl ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pPlayer );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPlayer );
 
         if ( CStaticFunctionDefinitions::ToggleControl ( pPlayer, strControl, bState ) )
         {
@@ -1865,7 +1865,7 @@ int CLuaPlayerDefs::ToggleAllControls ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pPlayer );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPlayer );
 
         if ( CStaticFunctionDefinitions::ToggleAllControls ( pPlayer, bGTAControls, bMTAControls, bEnabled ) )
         {
@@ -1997,7 +1997,7 @@ int CLuaPlayerDefs::ShowCursor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pPlayer );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPlayer );
 
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain && CStaticFunctionDefinitions::ShowCursor ( pPlayer, pLuaMain, bShow, bToggleControls ) )

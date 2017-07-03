@@ -295,7 +295,7 @@ int CLuaPedDefs::reloadPedWeapon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pPed );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPed );
 
         if ( CStaticFunctionDefinitions::reloadPedWeapon ( pPed ) )
         {
@@ -524,7 +524,7 @@ int CLuaPedDefs::SetPedOnFire ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedOnFire ( pElement, bOnFire ) )
         {
@@ -551,7 +551,7 @@ int CLuaPedDefs::SetPedHeadless ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedHeadless ( pElement, bHeadless ) )
         {
@@ -578,7 +578,7 @@ int CLuaPedDefs::SetPedFrozen ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedFrozen ( pElement, bFrozen ) )
         {
@@ -1060,7 +1060,7 @@ int CLuaPedDefs::SetPedArmor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedArmor ( pElement, fArmor ) )
         {
@@ -1093,7 +1093,7 @@ int CLuaPedDefs::KillPed ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::KillPed ( pElement, pKiller, ucKillerWeapon, ucBodyPart, bStealth ) )
         {
@@ -1121,7 +1121,7 @@ int CLuaPedDefs::SetPedRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedRotation ( pElement, fRotation, bNewWay ) )
         {
@@ -1151,7 +1151,7 @@ int CLuaPedDefs::SetPedStat ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedStat ( pElement, usStat, fValue ) )
         {
@@ -1182,7 +1182,7 @@ int CLuaPedDefs::AddPedClothes ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::AddPedClothes ( pElement, strTexture, strModel, ucType ) )
         {
@@ -1215,7 +1215,7 @@ int CLuaPedDefs::RemovePedClothes ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::RemovePedClothes ( pElement, ucType, strTexture.empty () ? NULL : strTexture.c_str (), strModel.empty () ? NULL : strModel.c_str () ) )
         {
@@ -1240,7 +1240,7 @@ int CLuaPedDefs::GivePedJetPack ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::GivePedJetPack ( pElement ) )
         {
@@ -1265,7 +1265,7 @@ int CLuaPedDefs::RemovePedJetPack ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::RemovePedJetPack ( pElement ) )
         {
@@ -1292,7 +1292,7 @@ int CLuaPedDefs::SetPedFightingStyle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedFightingStyle ( pElement, ucStyle ) )
         {
@@ -1319,7 +1319,7 @@ int CLuaPedDefs::SetPedMoveAnim ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedMoveAnim ( pElement, iMoveAnim ) )
         {
@@ -1346,7 +1346,7 @@ int CLuaPedDefs::SetPedGravity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedGravity ( pElement, fGravity ) )
         {
@@ -1373,7 +1373,7 @@ int CLuaPedDefs::SetPedChoking ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedChoking ( pElement, bChoking ) )
         {
@@ -1402,7 +1402,7 @@ int CLuaPedDefs::WarpPedIntoVehicle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pPed );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPed );
 
         if ( CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPed, pVehicle, uiSeat ) )
         {
@@ -1435,7 +1435,7 @@ int CLuaPedDefs::OOP_WarpPedIntoVehicle ( lua_State* luaVM )
     {
         if ( !argStream.HasErrors () )
         {
-            VerifyPlayerIsJoinedUsage ( luaVM, pPed );
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPed );
 
             if ( CStaticFunctionDefinitions::WarpPedIntoVehicle ( pPed, pVehicle, uiSeat ) )
             {
@@ -1450,7 +1450,7 @@ int CLuaPedDefs::OOP_WarpPedIntoVehicle ( lua_State* luaVM )
     {
         if ( !argStream.HasErrors () )
         {
-            VerifyPlayerIsJoinedUsage ( luaVM, pPed );
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pPed );
 
             if ( CStaticFunctionDefinitions::RemovePedFromVehicle ( pPed ) )
             {
@@ -1477,7 +1477,7 @@ int CLuaPedDefs::RemovePedFromVehicle ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::RemovePedFromVehicle ( pElement ) )
         {
@@ -1504,7 +1504,7 @@ int CLuaPedDefs::SetPedDoingGangDriveby ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetPedDoingGangDriveby ( pElement, bDoingGangDriveby ) )
         {
@@ -1533,7 +1533,7 @@ int CLuaPedDefs::GiveWeapon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::GiveWeapon ( pElement, weaponType, usAmmo, bSetAsCurrent ) )
         {
@@ -1561,7 +1561,7 @@ int CLuaPedDefs::TakeWeapon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::TakeWeapon ( pElement, weaponType, usAmmo ) )
         {
@@ -1586,7 +1586,7 @@ int CLuaPedDefs::TakeAllWeapons ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::TakeAllWeapons ( pElement ) )
         {

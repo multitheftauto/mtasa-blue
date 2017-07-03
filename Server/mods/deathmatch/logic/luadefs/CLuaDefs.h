@@ -63,7 +63,7 @@ public:
     static bool         CanUseFunction               ( const char* szFunction, lua_State* luaVM, bool bRestricted );
     static int          CanUseFunction               ( lua_CFunction f, lua_State* luaVM );
     static void         DidUseFunction               ( lua_CFunction f, lua_State* luaVM );
-    static void         VerifyPlayerIsJoinedUsage    ( lua_State* luaVM, CElement* pElement );
+    static void         LogWarningIfPlayerHasNotJoinedYet    ( lua_State* luaVM, CElement* pElement );
 
 // This is just for the Lua funcs. Please don't public this and use it other
 // places in the server.

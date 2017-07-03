@@ -1157,7 +1157,7 @@ int CLuaElementDefs::setElementAttachedOffsets ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementAttachedOffsets ( pElement, vecPosition, vecRotation ) )
         {
@@ -1496,7 +1496,7 @@ int CLuaElementDefs::setElementID ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementID ( pElement, strId ) )
         {
@@ -1528,7 +1528,7 @@ int CLuaElementDefs::setElementData ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
@@ -1566,7 +1566,7 @@ int CLuaElementDefs::removeElementData ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
@@ -1613,7 +1613,7 @@ int CLuaElementDefs::setElementMatrix ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementMatrix ( pElement, matrix ) )
         {
@@ -1641,7 +1641,7 @@ int CLuaElementDefs::setElementParent ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementParent ( pElement, pParent ) )
         {
@@ -1681,7 +1681,7 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         // Set the position
         if ( CStaticFunctionDefinitions::SetElementPosition ( pElement, vecPosition, bWarp ) )
@@ -1711,7 +1711,7 @@ int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         // Set the rotation
         if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, bNewWay ) )
@@ -1740,7 +1740,7 @@ int CLuaElementDefs::OOP_setElementRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         CMatrix matrix;
 
@@ -1791,7 +1791,7 @@ int CLuaElementDefs::setElementVelocity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         // Set the velocity
         if ( CStaticFunctionDefinitions::SetElementVelocity ( pElement, vecVelocity ) )
@@ -1820,7 +1820,7 @@ int CLuaElementDefs::setElementVisibleTo ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementVisibleTo ( pElement, pReference, bVisible ) )
         {
@@ -1849,7 +1849,7 @@ int CLuaElementDefs::setElementInterior ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         unsigned char ucInterior = static_cast < unsigned char > ( uiInterior );
         if ( CStaticFunctionDefinitions::SetElementInterior ( pElement, ucInterior, bSetPosition, vecPosition ) )
@@ -1890,7 +1890,7 @@ int CLuaElementDefs::setElementDimension ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( bMakeVisibleInAllDimensions )
         {
@@ -1944,7 +1944,7 @@ int CLuaElementDefs::attachElements ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::AttachElements ( pElement, pAttachedToElement, vecPosition, vecRotation ) )
         {
@@ -1971,7 +1971,7 @@ int CLuaElementDefs::detachElements ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::DetachElements ( pElement, pAttachedToElement ) )
         {
@@ -1998,7 +1998,7 @@ int CLuaElementDefs::setElementAlpha ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementAlpha ( pElement, ucAlpha ) )
         {
@@ -2050,7 +2050,7 @@ int CLuaElementDefs::setElementHealth ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementHealth ( pElement, fHealth ) )
         {
@@ -2077,7 +2077,7 @@ int CLuaElementDefs::setElementModel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementModel ( pElement, usModel ) )
         {
@@ -2130,7 +2130,7 @@ int CLuaElementDefs::setElementCollisionsEnabled ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementCollisionsEnabled ( pElement, bEnable ) )
         {
@@ -2157,7 +2157,7 @@ int CLuaElementDefs::setElementFrozen ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pElement );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
 
         if ( CStaticFunctionDefinitions::SetElementFrozen ( pElement, bFrozen ) )
         {
@@ -2259,7 +2259,7 @@ int CLuaElementDefs::setElementCallPropagationEnabled ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        VerifyPlayerIsJoinedUsage ( luaVM, pEntity );
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pEntity );
 
         if ( CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( pEntity, bEnable ) )
         {

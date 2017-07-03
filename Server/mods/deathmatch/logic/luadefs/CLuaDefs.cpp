@@ -253,15 +253,15 @@ void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
 //
 // Prints a warning message in script-debug if the element is a player and not joined yet
 //
-void CLuaDefs::VerifyPlayerIsJoinedUsage ( lua_State* luaVM, CElement* pElement )
+void CLuaDefs::LogWarningIfPlayerHasNotJoinedYet ( lua_State* luaVM, CElement* pElement )
 {
-    static auto szNotjoinedPlayerUsageWarning = "Modifying players before onPlayerJoin can cause desynchronization";
+    static auto szWarningText = "Modifying players before onPlayerJoin can cause desynchronization";
 
     if ( pElement && IS_PLAYER ( pElement ) )
     {
         auto pPlayer = static_cast < CPlayer * > ( pElement );
 
         if ( !pPlayer->IsJoined() )
-            m_pScriptDebugging->LogWarning ( luaVM, "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), szNotjoinedPlayerUsageWarning );
+            m_pScriptDebugging->LogWarning ( luaVM, "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), szWarningText );
     }
 }
