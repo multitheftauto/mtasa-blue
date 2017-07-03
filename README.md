@@ -44,7 +44,7 @@ Building MTA:SA is only supported on 64-bit Linux OSes. You can however cross-co
 1. Execute `utils/premake5 gmake`
 2. `cd Build`
 3. Run `make config=release_x86` to build the 32-bit server and `make config=release_x64` to build the 64-bit server (or use `debug` instead of `release` to run an unoptimized debug build)
-4. Execute `linux-install-data.sh` (optional step)
+4. Execute `linux-install-data.sh` (optional step).
 
 #### Linux: Docker Build Environment
 If you have problems resolving the required dependencies or want maximum compatibility, you can use our dockerized build environment that ships all needed dependencies. We also use this environment to build the official binaries.
