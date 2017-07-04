@@ -4167,10 +4167,14 @@ void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
             pInTask->Destroy ();
         }        
 
-        // If we're a remote player, make sure we can't fall off
+        // If we're a remote player
         if ( !m_bIsLocalPlayer )
         {
+            // Make sure we can't fall off
             SetCanBeKnockedOffBike ( false );
+
+            // Load driver sounds (GTA does it when local player enter vehicle)
+            pGameVehicle->GetVehicleAudioEntity ()->LoadDriverSounds ();
         }
 
         // Jax: make sure our camera is fixed on the new vehicle

@@ -19,6 +19,7 @@
 #include "CHandlingManager.h"
 #include "CDoor.h"
 #include "CWeaponInfo.h"
+#include "CAEVehicleAudioEntity.h"
 
 #include <CVector.h>
 
@@ -315,6 +316,7 @@ public:
     virtual void                 UpdateLandingGearPosition              ( void ) = 0;
     virtual bool                 SetPlateText                           ( const SString& strText ) = 0;
     virtual bool                 SetWindowOpenFlagState                 ( unsigned char ucWindow, bool bState ) = 0;
+    virtual CAEVehicleAudioEntity * GetVehicleAudioEntity               ( void ) = 0;
 };
 
 #endif
