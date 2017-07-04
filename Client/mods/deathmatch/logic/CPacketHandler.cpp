@@ -1268,6 +1268,7 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
     // unsigned char    (1)     - green
     // unsigned char    (1)     - blue
     // unsigned char    (1)     - color-coded
+    // ElementID        (2)     - client (if typed by a player)
     // unsigned char    (x)     - message
 
     // Read out the color
@@ -1275,14 +1276,28 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
     unsigned char ucGreen;
     unsigned char ucBlue;
     bool ucColorCoded;
+
+    CClientEntity * pClient = nullptr;
+
     if ( bitStream.Read ( ucRed ) &&
          bitStream.Read ( ucGreen ) &&
          bitStream.Read ( ucBlue ) &&
          bitStream.ReadBit ( ucColorCoded ) )
     {
-        // Valid length?
+        // Read the client's ID
+        int iNumberOfBytesUsed;
 
-        int iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed () - 4;
+        if ( bitStream.Version() >= 0x06B ) {
+            ElementID ClientID;
+            bitStream.Read( ClientID );
+            pClient = ( ClientID != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement( ClientID ) : nullptr;
+            iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - 6;
+        }
+        else {
+            iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - 4;
+        }
+
+        // Valid length?
         if ( iNumberOfBytesUsed >= MIN_CHATECHO_LENGTH  )
         {
             // Read the message into a buffer
@@ -1295,13 +1310,17 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
                 // Strip it for bad characters
                 StripControlCodes ( szMessage, ' ' );
 
+                // Determine the event source entity
+                CClientEntity * pRootEntity = g_pClientGame->GetRootEntity();
+                CClientEntity * pEntity = pClient ? pClient : pRootEntity;
+
                 // Call an event
                 CLuaArguments Arguments;
                 Arguments.PushString ( szMessage );
                 Arguments.PushNumber ( ucRed );
                 Arguments.PushNumber ( ucGreen );
                 Arguments.PushNumber ( ucBlue );
-                bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
+                bool bCancelled = !pEntity->CallEvent ( "onClientChatMessage", Arguments, pEntity != pRootEntity );
                 if ( !bCancelled )
                 {
                     // Echo it

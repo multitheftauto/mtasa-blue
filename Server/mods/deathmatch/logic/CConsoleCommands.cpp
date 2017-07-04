@@ -361,13 +361,15 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szInArguments, CCli
                                 }
 
                                 // Broadcast the message to all clients
-                                pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( strEcho, ucR, ucG, ucB, true ) );
+                                auto ChatEchoPacket = CChatEchoPacket ( strEcho, ucR, ucG, ucB, true );
+                                ChatEchoPacket.SetSourceElement( pPlayer );
+                                pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( ChatEchoPacket );
 
                                 // Call onChatMessage if players chat message was delivered
                                 CLuaArguments Arguments2;
                                 Arguments2.PushString ( szArguments );
                                 Arguments2.PushElement ( pPlayer );
-                                static_cast < CPlayer* > ( pClient )->CallEvent ( "onChatMessage", Arguments2 );
+                                pPlayer->CallEvent ( "onChatMessage", Arguments2 );
                             }
 
                             break;
