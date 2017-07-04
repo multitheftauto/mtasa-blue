@@ -416,7 +416,8 @@ struct {
     1011, "bnt_b_sc_p_m", 1010, "nto_b_tw", 1009, "nto_b_s", 1008, "nto_b_l", 1007, "wg_l_b_ssk", 1006, "rf_b_sc_r",
     1005, "bnt_b_sc_l", 1004, "bnt_b_sc_m", 1003, "spl_b_mab_m", 1002, "spl_b_bar_m", 1001, "spl_b_bab_m", 1000, "spl_b_mar_m",
     321, "Regular_Dildo", 322, "Vibrator", 323, "White_Dildo", 324, "Vibrator_unused", 325, "Flowers", 326, "Cane",
-    327, "Box_small_unused", 328, "Box_long_unused", 330, "Phone", 331, "Brass_Knuckles", 333, "Golf_Club", 334, "Night_Stick",
+    327, "Box_small_unused", 328, "Box_long_unused", 330, "Phone", 331, "Brass_Knuckles", 333, "Golf_Club",
+    334, "Night_Strick", 334, "Night_Stick", // Typo in first pair retained for backwards compatibility
     335, "Knife", 336, "Baseball_Bat", 337, "Shovel", 338, "Pool_Cue", 339, "Katana", 341, "Chainsaw",
     342, "Grenade", 343, "Tear_Gas", 344, "Molotov_Cocktail", 345, "Missile", 346, "Pistol", 347, "Silenced_Pistol",
     348, "Desert_Eagle", 349, "Shotgun", 350, "Sawn-Off_Shotgun", 351, "Combat_Shotgun", 352, "Uzi", 353, "MP5",
