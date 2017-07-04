@@ -1391,6 +1391,26 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     SetSunbathing ( false );
     KillAnimation ();
 
+    if ( m_pPlayerPed )
+    {
+        // Fall tasks
+        KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
+        // Swim tasks
+        KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+        // Jump & vehicle enter/exit & custom animation tasks
+        KillTask ( TASK_PRIORITY_PRIMARY );
+
+        KillTaskSecondary ( TASK_SECONDARY_ATTACK );
+
+        // check we aren't in the fall and get up task
+        CTask * pTaskPhysicalResponse = m_pTaskManager->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+        // check our physical response task
+        if ( pTaskPhysicalResponse && strcmp ( pTaskPhysicalResponse->GetTaskName ( ), "TASK_COMPLEX_FALL_AND_GET_UP" ) == 0 )
+        {
+            m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+        }
+    }
+
     // Eventually remove us from a previous vehicle
     RemoveFromVehicle ();
     //m_uiOccupyingSeat = uiSeat;
@@ -4138,17 +4158,6 @@ void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
 {
     if ( m_pPlayerPed )
     {
-        // Reset whatever task
-        m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
-
-        // check we aren't in the fall and get up task
-        CTask * pTaskPhysicalResponse = m_pTaskManager->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-        // check our physical response task
-        if ( pTaskPhysicalResponse && strcmp ( pTaskPhysicalResponse->GetTaskName ( ), "TASK_COMPLEX_FALL_AND_GET_UP" ) == 0 )
-        {
-            m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-        }
-
         // Create a task to warp the player in and execute it
         CTaskSimpleCarSetPedInAsDriver* pInTask = g_pGame->GetTasks ()->CreateTaskSimpleCarSetPedInAsDriver ( pGameVehicle );
         if ( pInTask )
