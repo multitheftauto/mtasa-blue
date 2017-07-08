@@ -847,7 +847,7 @@ void CChat::UpdatePosition ( void )
         break;
     }
 
-    m_vecBackgroundPosition = CVector2D ( fPosX, fPosY ) * vecResolution;
+    m_vecBackgroundPosition = CVector2D ( std::floor ( fPosX * vecResolution.fX ), std::floor ( fPosY * vecResolution.fY ) );
     m_vecInputPosition = CVector2D (
         m_vecBackgroundPosition.fX,
         m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY
