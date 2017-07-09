@@ -57,18 +57,25 @@ CDebugHookManager::~CDebugHookManager( void )
 ///////////////////////////////////////////////////////////////
 std::vector < SDebugHookCallInfo >& CDebugHookManager::GetHookInfoListForType( EDebugHookType hookType )
 {
-    if ( hookType == EDebugHook::PRE_EVENT )
-        return m_PreEventHookList;
-    if ( hookType == EDebugHook::POST_EVENT )
-        return m_PostEventHookList;
-    if ( hookType == EDebugHook::PRE_EVENT_FUNCTION )
-        return m_PreEventFunctionHookList;
-    if ( hookType == EDebugHook::POST_EVENT_FUNCTION )
-        return m_PostEventFunctionHookList;
-    if ( hookType == EDebugHook::PRE_FUNCTION )
-        return m_PreFunctionHookList;
-    dassert( hookType == EDebugHook::POST_FUNCTION );
-    return m_PostFunctionHookList;
+    switch ( hookType )
+    {
+        case EDebugHookType::PRE_EVENT:
+            return m_PreEventHookList;
+        case EDebugHookType::POST_EVENT:
+            return m_PostEventHookList;
+        case EDebugHookType::PRE_FUNCTION:
+            return m_PreFunctionHookList;
+        case EDebugHookType::POST_FUNCTION:
+            return m_PostFunctionHookList;
+        case EDebugHookType::PRE_EVENT_FUNCTION:
+            return m_PreEventFunctionHookList;
+        case EDebugHookType::POST_EVENT_FUNCTION:
+            return m_PostEventFunctionHookList;
+        case EDebugHookType::MAX_DEBUG_HOOK_TYPE:
+        default:
+            dassert ( hookType == EDebugHook::POST_FUNCTION );
+            return m_PostFunctionHookList;
+    }
 }
 
 
@@ -136,7 +143,7 @@ bool CDebugHookManager::RemoveDebugHook( EDebugHookType hookType, const CLuaFunc
 ///////////////////////////////////////////////////////////////
 void CDebugHookManager::OnLuaMainDestroy( CLuaMain* pLuaMain )
 {
-    for( uint hookType = EDebugHook::PRE_EVENT ; hookType <= EDebugHook::POST_EVENT_FUNCTION ; hookType++ )
+    for( uint hookType = EDebugHook::PRE_EVENT ; hookType < EDebugHook::MAX_DEBUG_HOOK_TYPE ; hookType++ )
     {
         std::vector < SDebugHookCallInfo >& hookInfoList = GetHookInfoListForType( (EDebugHookType)hookType );
         for( uint i = 0 ; i < hookInfoList.size() ; )
