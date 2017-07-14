@@ -31,7 +31,6 @@ namespace
         SetApplicationSetting ( "is-admin",         IsUserAdmin () ? "1" : "0" );
         SetApplicationSettingInt ( "last-server-ip", 0 );
         SetApplicationSetting ( "real-os-build",    SString ( "%d", GetRealOSVersion ().dwBuild ) );
-        SetApplicationSettingInt ( "vs2013-runtime-installed",  IsVS2013RuntimeInstalled () ? 1 : 0 );
     }
 
     // Comms between 'Admin' and 'User' processes

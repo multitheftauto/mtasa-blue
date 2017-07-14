@@ -38,7 +38,9 @@ bool CClientVariables::Load ( void )
 
     // Load the cvars
     m_pStorage = pRoot->FindSubNode ( CONFIG_NODE_CVARS );
-    if ( !m_pStorage ) {
+
+    if ( !m_pStorage )
+    {
         // Non-existant, create a new node
         m_pStorage = pRoot->CreateSubNode ( CONFIG_NODE_CVARS );
     }
@@ -59,9 +61,12 @@ bool CClientVariables::Get ( const std::string& strVariable, CVector &val )
     strVal = Node ( strVariable )->GetTagContent ();
     ss.str ( strVal );
 
-    try {
+    try
+    {
         ss >> val.fX >> val.fY >> val.fZ;
-    } catch (...) {
+    } 
+    catch (...)
+    {
         return false;
     }
 
@@ -78,9 +83,12 @@ bool CClientVariables::Get ( const std::string& strVariable, CVector2D &val )
     strVal = Node ( strVariable )->GetTagContent ();
     ss.str ( strVal );
 
-    try {
+    try
+    {
         ss >> val.fX >> val.fY;
-    } catch (...) {
+    }
+    catch (...)
+    {
         return false;
     }
 
@@ -98,13 +106,16 @@ bool CClientVariables::Get ( const std::string& strVariable, CColor &val )
     strVal = Node ( strVariable )->GetTagContent ();
     ss.str ( strVal );
 
-    try {
+    try
+    {
         ss >> iR >> iG >> iB >> iA;
         val.R = iR;
         val.G = iG;
         val.B = iB;
         val.A = iA;
-    } catch (...) {
+    } 
+    catch (...)
+    {
         return false;
     }
 
@@ -161,7 +172,9 @@ CXMLNode* CClientVariables::Node ( const std::string& strVariable )
 
     // Try and grab the sub node
     pNode = m_pStorage->FindSubNode ( strVariable.c_str () );
-    if ( !pNode ) {
+
+    if ( !pNode )
+    {
         // Non-existant, create a new sub node
         pNode = m_pStorage->CreateSubNode ( strVariable.c_str () );
     }
@@ -227,24 +240,29 @@ void CClientVariables::ValidateValues ( void )
     uint uiViewportWidth = CCore::GetSingleton().GetGraphics ()->GetViewportWidth ();
     uint uiViewportHeight = CCore::GetSingleton().GetGraphics ()->GetViewportHeight ();
 
-    ClampValue ( "console_pos",             CVector2D ( 0, 0 ),         CVector2D ( uiViewportWidth - 32, uiViewportHeight - 32 ) );
-    ClampValue ( "console_size",            CVector2D ( 50, 50 ),       CVector2D ( uiViewportWidth - 32, uiViewportHeight - 32 ) );
-    ClampValue ( "fps_limit",               0,                          100 );
-    ClampValue ( "chat_font",               0,                          3 );
-    ClampValue ( "chat_lines",              3,                          62 );
-    ClampValue ( "chat_color",              CColor (0,0,0,0),           CColor (255,255,255,255) );
-    ClampValue ( "chat_text_color",         CColor (0,0,0,128),         CColor (255,255,255,255) );
-    ClampValue ( "chat_input_color",        CColor (0,0,0,0),           CColor (255,255,255,255) );
-    ClampValue ( "chat_input_prefix_color", CColor (0,0,0,128),         CColor (255,255,255,255) );
-    ClampValue ( "chat_input_text_color",   CColor (0,0,0,128),         CColor (255,255,255,255) );
-    ClampValue ( "chat_scale",              CVector2D ( 0.5f, 0.5f ),   CVector2D ( 3, 3 ) );
-    ClampValue ( "chat_width",              0.5f,                       4.f );
-    ClampValue ( "chat_line_life",          1000,                       120000000 );
-    ClampValue ( "chat_line_fade_out",      1000,                       30000000 );
-    ClampValue ( "text_scale",              0.8f,                       3.0f );
-    ClampValue ( "mtavolume",               0.0f,                       1.0f );
-    ClampValue ( "voicevolume",             0.0f,                       1.0f );
-    ClampValue ( "mapalpha",                0,                          255 );
+    ClampValue ( "console_pos",              CVector2D ( 0, 0 ),                CVector2D ( uiViewportWidth - 32, uiViewportHeight - 32 ) );
+    ClampValue ( "console_size",             CVector2D ( 50, 50 ),              CVector2D ( uiViewportWidth - 32, uiViewportHeight - 32 ) );
+    ClampValue ( "fps_limit",                0,                                 100 );
+    ClampValue ( "chat_font",                0,                                 3 );
+    ClampValue ( "chat_lines",               3,                                 62 );
+    ClampValue ( "chat_color",               CColor (0,0,0,0),                  CColor (255,255,255,255) );
+    ClampValue ( "chat_text_color",          CColor (0,0,0,128),                CColor (255,255,255,255) );
+    ClampValue ( "chat_input_color",         CColor (0,0,0,0),                  CColor (255,255,255,255) );
+    ClampValue ( "chat_input_prefix_color",  CColor (0,0,0,128),                CColor (255,255,255,255) );
+    ClampValue ( "chat_input_text_color",    CColor (0,0,0,128),                CColor (255,255,255,255) );
+    ClampValue ( "chat_scale",               CVector2D ( 0.5f, 0.5f ),          CVector2D ( 3, 3 ) );
+    ClampValue ( "chat_width",               0.5f,                              4.f );
+    ClampValue ( "chat_line_life",           1000,                              120000000 );
+    ClampValue ( "chat_line_fade_out",       1000,                              30000000 );
+    ClampValue ( "chat_position_offset_x",   -1.0f,                             1.0f );
+    ClampValue ( "chat_position_offset_y",   -1.0f,                             1.0f );
+    ClampValue ( "chat_position_horizontal", Chat::Position::Horizontal::LEFT,  Chat::Position::Horizontal::RIGHT );
+    ClampValue ( "chat_position_vertical",   Chat::Position::Vertical::TOP,     Chat::Position::Vertical::BOTTOM );
+    ClampValue ( "chat_text_alignment",      Chat::Text::Align::LEFT,           Chat::Text::Align::RIGHT );
+    ClampValue ( "text_scale",               0.8f,                              3.0f );
+    ClampValue ( "mtavolume",                0.0f,                              1.0f );
+    ClampValue ( "voicevolume",              0.0f,                              1.0f );
+    ClampValue ( "mapalpha",                 0,                                 255 );
 }
 
 
@@ -254,9 +272,9 @@ void CClientVariables::LoadDefaults ( void )
                                 Set(__x,__y)
     #define _S(__x)             std::string(__x)
 
-    if(!Exists("nick"))
+    if (!Exists("nick"))
     {
-        DEFAULT ( "nick",                       _S(CNickGen::GetRandomNickname()) );       // nickname
+        DEFAULT ( "nick",                   _S(CNickGen::GetRandomNickname()) );       // nickname
         CCore::GetSingleton ().RequestNewNickOnStart();  // Request the user to set a new nickname
     }
 
@@ -288,6 +306,11 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "chat_line_fade_out",         3000 );                         // chatbox line fade out time
     DEFAULT ( "chat_use_cegui",             false );                        // chatbox uses cegui
     DEFAULT ( "chat_nickcompletion",        true );                         // chatbox nick completion
+    DEFAULT ( "chat_position_offset_x",     0.0125f );                      // chatbox relative x position offset
+    DEFAULT ( "chat_position_offset_y",     0.015f );                       // chatbox relative y position offset
+    DEFAULT ( "chat_position_horizontal",   Chat::Position::Horizontal::LEFT ); // chatbox horizontal position
+    DEFAULT ( "chat_position_vertical",     Chat::Position::Vertical::TOP ); // chatbox vertical position
+    DEFAULT ( "chat_text_alignment",        Chat::Text::Align::LEFT );      // chatbox horizontal text alignment
     DEFAULT ( "server_can_flash_window",    true );                         // allow server to flash the window
     DEFAULT ( "allow_tray_notifications",   true );                         // allow scripts to create tray balloon notifications
     DEFAULT ( "text_scale",                 1.0f );                         // text scale

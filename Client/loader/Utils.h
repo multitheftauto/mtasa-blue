@@ -73,7 +73,6 @@ SOSVersionInfo  GetRealOSVersion                    ( void );
 bool            IsWindows10OrGreater                ( void );
 bool            IsWindows10Threshold2OrGreater      ( void );
 
-bool            IsVS2013RuntimeInstalled            ( void );
 BOOL            IsUserAdmin                         ( void );
 
 void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );

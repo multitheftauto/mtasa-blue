@@ -1123,20 +1123,6 @@ bool IsWindows10Threshold2OrGreater ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// IsVS2013RuntimeInstalled
-//
-// Only checks registry settings, so install could still be invalid
-//
-///////////////////////////////////////////////////////////////
-bool IsVS2013RuntimeInstalled( void )
-{
-    SString strInstall = GetSystemRegistryValue( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\12.0\\RuntimeMinimum", "Install" );
-    return strInstall == "\x01";
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // IsUserAdmin
 //
 //

@@ -56,6 +56,7 @@ void CLuaResourceDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getResourceMapRootElement", getResourceMapRootElement );
     CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", getResourceExportedFunctions );
     CLuaCFunctions::AddFunction ( "getResourceOrganizationalPath", getResourceOrganizationalPath);
+    CLuaCFunctions::AddFunction ( "isResourceArchived", isResourceArchived );
 
     // Set stuff
     CLuaCFunctions::AddFunction ( "setResourceInfo", setResourceInfo );
@@ -116,6 +117,7 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getName", "getResourceName" );
     lua_classfunction ( luaVM, "getState", "getResourceState" );
     lua_classfunction ( luaVM, "getACLRequests", "getResourceACLRequests" );
+    lua_classfunction ( luaVM, "isArchived", "isResourceArchived" );
 
     lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
     lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
@@ -126,6 +128,7 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "name", "renameResource", "getResourceName" );
     lua_classvariable ( luaVM, "rootElement", NULL, "getResourceRootElement" );
     lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
+    lua_classvariable ( luaVM, "archived", NULL, "isResourceArchived" );
     lua_classvariable ( luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason" );
     //lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
     //lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
@@ -1430,5 +1433,25 @@ int CLuaResourceDefs::Load( lua_State* luaVM )
         m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+int CLuaResourceDefs::isResourceArchived (lua_State* luaVM)
+{
+    //  bool isResourceArchived ( resource theResource )
+    CResource* pResource;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pResource);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean ( luaVM, pResource->IsResourceZip() );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushnil ( luaVM );
     return 1;
 }
