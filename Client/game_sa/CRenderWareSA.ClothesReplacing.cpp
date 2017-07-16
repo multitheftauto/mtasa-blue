@@ -114,10 +114,17 @@ bool CRenderWareSA::HasClothesReplacementChanged( void )
 // then maybe switch to replacement txd file data
 //
 ////////////////////////////////////////////////////////////////
+
 bool _cdecl OnCStreaming_RequestModel_Mid ( int flags, SImgGTAItemInfo* pImgGTAInfo )
 {
+	uchar ucPlayerImgID = *(int*)(0x008E48D8);
+	//Platinum Edit 15.1:
+	// Check that Player.img has been added to the CImgDescriptor array
+	if (ucPlayerImgID == 0)
+		return false;
+
     // Check is player.img 
-    if ( pImgGTAInfo->ucImgId != 5 )
+    if ( pImgGTAInfo->ucImgId != ucPlayerImgID)
         return false;
 
     // Early out if no clothes textures to replace with
@@ -164,7 +171,9 @@ bool _cdecl OnCStreaming_RequestModel_Mid ( int flags, SImgGTAItemInfo* pImgGTAI
     }
 
     // Set results
-    iReturnFileId = ((int)pImgGTAInfo - 0x08E4CC0) / 20;
+	//Platinum edit for ModelInfo - CStreaming::ms_aInfoForModel 11.3
+	iReturnFileId = ((int)pImgGTAInfo - *(int*)(0x408ADA + 3)) / 20;
+    //iReturnFileId = ((int)pImgGTAInfo - 0x08E4CC0) / 20;
     pReturnBuffer = pReplacementFileData;
 
     // Update flags
@@ -186,8 +195,8 @@ void _declspec(naked) HOOK_CStreaming_RequestModel_Mid()
     _asm
     {
         pushad
-        push    esi
-        push    ebx
+        push    esi	// pImgGTAInfo
+        push    ebx	// flags
         call    OnCStreaming_RequestModel_Mid
         add     esp, 4*2
         cmp     al, 0

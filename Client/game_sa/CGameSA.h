@@ -40,7 +40,10 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-#define     MODELINFO_MAX                   26000       // Actual max is 25755
+//Platinum edit ModelInfo_Max
+static const int MODELINFO_MAX = (*(int*)(0x5B8AFA + 2) - *(int*)(0x408ADA + 3)) / 0x14;
+//#define     MODELINFO_MAX                   FILE_TYPE_COUNT_OF_IDS //26000       // Actual max is 25755
+//#define     MODELINFO_MAX                   26000       // Actual max is 25755
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -106,7 +109,9 @@ class CGameSA : public CGame
 
 private:
     CWeaponInfo         * WeaponInfos[NUM_WeaponInfosTotal];
-    CModelInfoSA        ModelInfo[MODELINFO_MAX];
+	//Platinum Edit
+	CModelInfoSA* ModelInfo = new CModelInfoSA[MODELINFO_MAX];
+	//CModelInfoSA        ModelInfo[MODELINFO_MAX];
 public:
     ZERO_ON_NEW
 

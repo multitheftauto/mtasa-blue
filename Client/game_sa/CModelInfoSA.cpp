@@ -355,11 +355,15 @@ VOID CModelInfoSA::Request( EModelRequestType requestType, const char* szTag )
         uint uiAnimFileIndex = GetAnimFileIndex ();
         if ( uiAnimFileIndex != 0xffffffff )
         {
-            uint uiAnimId = uiAnimFileIndex + 25575;
+			//Platinum edit new RRR BASE ID
+			uint uiAnimId = uiAnimFileIndex + FILE_TYPE_RRR_BASE_ID;
+
+            //uint uiAnimId = uiAnimFileIndex + 25575;
             CModelInfoSA* pAnim = static_cast < CModelInfoSA* > ( pGame->GetModelInfo ( uiAnimId ) );
             if ( !pAnim )
             {
-                if ( uiAnimId != 25714 )
+				//Platinum Edit
+                if ( uiAnimId != (FILE_TYPE_RRR_BASE_ID + 139))
                     LogEvent ( 505, "Model no anim", "", SString ( "%d (%d)", m_dwModelID, uiAnimId ) );
             }
             else
@@ -490,7 +494,7 @@ BOOL CModelInfoSA::DoIsLoaded ( )
     BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
     m_pInterface = ppModelInfo [ m_dwModelID ];
 
-    if ( bLoaded && m_dwModelID < 20000 )
+    if ( bLoaded && m_dwModelID < FILE_TYPE_TXD_BASE_ID)
     {
         // Check rw object is there
         if ( !m_pInterface || !m_pInterface->pRwObject )
@@ -543,7 +547,10 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel ( )
     _asm
     {
         mov     eax, ModelID
-        mov     eax, ARRAY_ModelInfo[eax*4]
+		//Platinum Edit: 18.7
+		mov ecx, ARRAY_ModelInfo;
+		mov eax, [ecx + eax * 4];
+        //mov     eax, ARRAY_ModelInfo[eax*4]
         mov     eax, [eax+20]
         cmp     eax, 0
         jz      skip
@@ -665,7 +672,6 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
                 // Log info
                 OutputDebugString ( SString ( "Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex, i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols ) );
                 // Assert in debug
-                #if MTA_DEBUG
                     assert ( pEntity->vtbl->DeleteRwObject == 0x00534030 );
                 #endif
                 pSectorEntry = (DWORD *)pSectorEntry [ 1 ];
@@ -855,7 +861,10 @@ short CModelInfoSA::GetAvailableVehicleMod ( unsigned short usUpgrade )
         {
             mov     eax, ModelID
             movsx   edx, usUpgrade
-            mov     eax, ARRAY_ModelInfo[eax*4]
+			//Platinum Edit: 18.5
+			mov ecx, ARRAY_ModelInfo;
+			mov eax, [ecx + eax * 4];
+            //mov     eax, ARRAY_ModelInfo[eax*4]
             mov     ax, [eax+edx*2+0x2D6]
             mov     sreturn, ax
         }
@@ -896,14 +905,15 @@ void CModelInfoSA::SetCustomCarPlateText ( const char * szText )
     {
         push    ecx
         mov     ecx, ModelID
-        mov     ecx, ARRAY_ModelInfo[ecx*4]
+		//Platinum Edit: 18.0
+		mov edx, ARRAY_ModelInfo;
+		mov ecx, [edx + ecx * 4];
+        //mov     ecx, ARRAY_ModelInfo[ecx*4]
         add     ecx, 40
         mov     szStoredText, ecx
         pop     ecx
     }
 
-    if ( szText ) 
-        strncpy ( szStoredText, szText, 8 );
     else
         szStoredText[0] = 0;
 }
@@ -916,7 +926,9 @@ unsigned int CModelInfoSA::GetNumRemaps ( void )
     _asm
     {
         mov     ecx, ModelID
-        mov     ecx, ARRAY_ModelInfo[ecx*4]
+		mov edx, ARRAY_ModelInfo;
+		mov ecx, [edx + ecx * 4];
+        //mov     ecx, ARRAY_ModelInfo[ecx*4]
         call    dwFunc
         mov     uiReturn, eax
     }
@@ -1017,7 +1029,10 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
         _asm
         {
             mov     ecx, ModelID
-            mov     ecx, ARRAY_ModelInfo[ecx*4]
+			//Platinum Edit: 18.1
+			mov edx, ARRAY_ModelInfo;
+			mov ecx, [edx + ecx * 4];
+            //mov     ecx, ARRAY_ModelInfo[ecx*4]
             push    1
             push    pColModelInterface
             call    dwFunc
@@ -1071,7 +1086,10 @@ void CModelInfoSA::RestoreColModel ( void )
             _asm
             {
                 mov     ecx, ModelID
-                mov     ecx, ARRAY_ModelInfo[ecx*4]
+				//Platinum Edit: 18.2
+				mov edx, ARRAY_ModelInfo;
+				mov ecx, [edx + ecx * 4];
+                //mov     ecx, ARRAY_ModelInfo[ecx*4]
                 push    1
                 push    dwOriginalColModelInterface
                 call    dwFunc

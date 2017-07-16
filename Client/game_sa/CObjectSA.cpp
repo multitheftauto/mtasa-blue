@@ -119,15 +119,18 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
     // this gets the level for a colmodel (colmodel+40)
     dwFunc = 0x4107A0;
     _asm
-    {
-        mov     eax, dwModel
-        mov     eax, 0xA9B0C8[eax*4]
-        mov     eax, [eax+20]
-        movzx   eax, byte ptr [eax+40]
-        push    eax
-        call    dwFunc
-        add     esp, 4
-    }
+	{
+		mov     eax, dwModel
+		//Platinum Edit
+		mov ecx, ARRAY_ModelInfo;
+		mov     eax, [ecx + eax * 4]
+		//mov     eax, 0xA9B0C8[eax*4]
+		mov     eax, [eax + 20]
+		movzx   eax, byte ptr[eax + 40]
+		push    eax
+		call    dwFunc
+		add     esp, 4
+	}
 
 #else
 
@@ -211,15 +214,18 @@ CObjectSA::~CObjectSA( )
                 // REMOVE ref to colstore thingy
                 dwFunc = 0x4107D0;
                 _asm
-                {
-                    mov     eax, dwModelID
-                    mov     eax, 0xA9B0C8[eax*4]
-                    mov     eax, [eax+20]
-                    movzx   eax, byte ptr [eax+40]
-                    push    eax
-                    call    dwFunc
-                    add     esp, 4
-                }
+				{
+					mov     eax, dwModel
+					//Platinum Edit: 18.8
+					mov ecx, ARRAY_ModelInfo;
+					mov     eax, [ecx + eax * 4]
+					//mov     eax, 0xA9B0C8[eax*4]
+					mov     eax, [eax + 20]
+					movzx   eax, byte ptr[eax + 40]
+					push    eax
+					call    dwFunc
+					add     esp, 4
+			}
 #endif
             }
         }

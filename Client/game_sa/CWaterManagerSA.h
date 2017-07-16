@@ -42,11 +42,19 @@ typedef bool (__cdecl *GetWaterLevel_t)(float fX, float fY, float fZ, float* pfL
 #define NUM_DefWaterQuads                  0x12D
 #define NUM_DefWaterTriangles              0x6
 #define NUM_DefWaterZonePolys              0x2BC
-#define NUM_NewWaterVertices               0x600        // Sizes of replacement pools in MTA
-#define NUM_NewWaterQuads                  0x200
-#define NUM_NewWaterTriangles              0x20
-#define NUM_NewWaterZonePolys              0x400
-#define NUM_WaterZones                     (12 * 12)
+
+//Platinum Edit - 12.7
+#define NUM_NewWaterVertices               0x2680//0x600        // Sizes of replacement pools in MTA 
+#define NUM_NewWaterQuads                  0x9C4 //0x200
+#define NUM_NewWaterTriangles              0x18 //0x20
+#define NUM_NewWaterZonePolys              0xDB1 //0x400
+#define NUM_WaterZones                     (24 * 24)
+
+//#define NUM_NewWaterVertices               0x600        // Sizes of replacement pools in MTA
+//#define NUM_NewWaterQuads                  0x200
+//#define NUM_NewWaterTriangles              0x20
+//#define NUM_NewWaterZonePolys              0x400
+//#define NUM_WaterZones                     (12 * 12)
 
 #define ARRAY_WaterVertices                0xC22910
 #define ARRAY_WaterQuads                   0xC21C90

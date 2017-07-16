@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#include "gamesa_renderware.h"
 #include "CRenderWareSA.ShaderMatching.h"
 
 #define ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName        0x06FDF40
@@ -109,7 +110,9 @@ void _declspec(naked) HOOK_CTxdStore_SetupTxdParent ()
 ////////////////////////////////////////////////////////////////
 void _cdecl OnStreamingRemoveTxd ( DWORD dwTxdId )
 {
-    ushort usTxdId = (ushort)dwTxdId - 20000;
+	//Platinum Edit 11.7
+    ushort usTxdId = (ushort)dwTxdId - FILE_TYPE_TXD_BASE_ID;
+	//ushort usTxdId = (ushort)dwTxdId - 20000;
     // Ensure there are no previous events for this txd
     ms_txdStreamEventList.remove ( STxdStreamEvent ( true, usTxdId ) );
     ms_txdStreamEventList.remove ( STxdStreamEvent ( false, usTxdId ) );

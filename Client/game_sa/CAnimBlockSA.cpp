@@ -22,8 +22,10 @@ void CAnimBlockSA::Request ( EModelRequestType requestType, bool bAllowBlockingF
 {
     if ( IsLoaded () )
         return;
-
-    DWORD dwModelID = GetIndex() + 25575;
+	//Platinum EDIT new RRR BASE ID
+	int FILE_TYPE_RRR_BASE_ID = *(int*)(0x4594A1 + 2);
+	DWORD dwModelID = GetIndex() + FILE_TYPE_RRR_BASE_ID;
+    //DWORD dwModelID = GetIndex() + 25575;
 
     if ( requestType == BLOCKING )
     {

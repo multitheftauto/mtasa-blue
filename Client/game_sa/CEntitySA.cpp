@@ -247,8 +247,9 @@ VOID CEntitySA::SetPosition( CVector * vecPosition )
 void CEntitySA::RestoreLastGoodPhysicsState ( void )
 {
     // Validate m_LastGoodPosition
+	//Platinum Edit 15.5
     if ( !IsValidPosition ( m_LastGoodPosition ) )
-        m_LastGoodPosition = CVector ( 6000, (float)( rand () % 2000 ), 1000 );
+        m_LastGoodPosition = CVector ( 24000, (float)( rand () % 2000 ), 1000 );
 
     CMatrix matrix;
     matrix.vPos = m_LastGoodPosition;
