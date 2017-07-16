@@ -336,11 +336,11 @@ private:
 //
 // Check for various number problems
 //
-
+//Platinum Edit 15.3 : double all the values except Z
 inline bool IsValidPosition ( const CVector& vec )
 {
-    if ( vec.fX < -16000 || vec.fX > 16000 || std::isnan ( vec.fX )
-        || vec.fY < -16000 || vec.fY > 16000 || std::isnan ( vec.fY )
+    if ( vec.fX < -32000 || vec.fX > 32000 || std::isnan ( vec.fX )
+        || vec.fY < -32000 || vec.fY > 32000 || std::isnan ( vec.fY )
         || vec.fZ < -5000 || vec.fZ > 100000 || std::isnan ( vec.fZ ) )
         return false;          
     return true;

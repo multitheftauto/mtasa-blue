@@ -26,7 +26,10 @@ class CPedModelInfoSAInterface;
 
 #define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
 
-#define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
+//Platinum Edit new ModelLoadedArray pointer
+static const DWORD ARRAY_ModelLoaded = (*(int*)(0x408ADA + 3) + 0x10);
+//#define     ARRAY_ModelLoaded               0x8E4CD0 // ##SA##
+
 
 #define     FUNC_CStreaming__HasModelLoaded 0x4044C0
 
@@ -38,7 +41,10 @@ class CPedModelInfoSAInterface;
 #define     DWORD_AtomicsReplacerModelID    0xB71840
 #define     FUNC_AtomicsReplacer            0x537150
 
-#define     ARRAY_ModelInfo                 0xA9B0C8
+//Platinum Edit new ARRAY_ModelInfo pointer
+static const DWORD		ARRAY_ModelInfo = (*(int*)(0x40122D));
+//#define     ARRAY_ModelInfo                 0xA9B0C8 // ##SA##
+
 #define     CLASS_CText                     0xC1B340
 #define     FUNC_CText_Get                  0x6A0050
 #define     FUNC_GetModelFlags              0x4044E0

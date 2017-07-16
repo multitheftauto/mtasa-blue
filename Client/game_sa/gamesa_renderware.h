@@ -25,6 +25,14 @@ class CColModelSAInterface;
 /*****************************************************************************/
 /** Renderware functions                                                    **/
 /*****************************************************************************/
+//New Platinum Constants
+const int FILE_TYPE_TXD_BASE_ID = *(int*)(0x407104 + 2);
+const int FILE_TYPE_COL_BASE_ID = *(int*)(0x410344 + 2);
+const int FILE_TYPE_IPL_BASE_ID = *(int*)(0x4044F4 + 2);
+const int FILE_TYPE_DAT_BASE_ID = *(int*)(0x44E4C4 + 1);
+const int FILE_TYPE_IFP_BASE_ID = *(int*)(0x40C1A4 + 1);
+const int FILE_TYPE_RRR_BASE_ID = *(int*)(0x4594A1 + 2);
+const int FILE_TYPE_SCM_BASE_ID = *(int*)(0x40C1C4 + 1);
 
 /* RenderWare macros */
 #define RpGetFrame(__c)            ((RwFrame*)(((RwObject *)(__c))->parent))

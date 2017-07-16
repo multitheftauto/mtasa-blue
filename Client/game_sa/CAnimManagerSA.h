@@ -58,7 +58,11 @@
 #define FUNC_CAnimManager_LoadAnimFiles                     0x4d5620
 #define ARRAY_CAnimManager_AnimAssocGroups                  0xb4ea34
 #define ARRAY_CAnimManager_Animations                       0xb4ea40
-#define ARRAY_CAnimManager_AnimBlocks                       0xb5d4a0
+
+//Platinum Edit - Get NEW Fastman Array
+#define ARRAY_CAnimManager_AnimBlocks                       *reinterpret_cast<uint32_t*>(0x4C51CD + 1) //0xb5d4a0
+//#define ARRAY_CAnimManager_AnimBlocks                       0xb5d4a0
+
 #define VAR_CAnimManager_NumAnimAssocDefinitions            0xb4ea28
 #define VAR_CAnimManager_NumAnimations                      0xb4ea2c
 #define VAR_CAnimManager_NumAnimBlocks                      0xb4ea30

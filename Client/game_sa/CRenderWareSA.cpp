@@ -695,18 +695,20 @@ void CRenderWareSA::TxdForceUnload( ushort usTxdId, bool bDestroyTextures )
 ////////////////////////////////////////////////////////////////
 ushort CRenderWareSA::GetTXDIDForModelID ( ushort usModelID )
 {
-    if ( usModelID >= 20000 && usModelID < 25000 )
-    {
-        // Get global TXD ID instead
-        return usModelID - 20000;
-    }
+	//Platinum Edit 11.5
+	if (usModelID >= FILE_TYPE_TXD_BASE_ID && usModelID < FILE_TYPE_COL_BASE_ID)
+	{
+		// Get global TXD ID instead
+		return usModelID - FILE_TYPE_TXD_BASE_ID;
+	}
     else
     {
         // Get the CModelInfo's TXD ID
 
         // Ensure valid
-        if ( usModelID >= 20000 || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID] )
-            return 0;
+		//Platinum Edit 11.6
+		if (usModelID >= FILE_TYPE_TXD_BASE_ID || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
+			return 0;
 
         return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
     }

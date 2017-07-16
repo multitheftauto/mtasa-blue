@@ -46,6 +46,20 @@ CGameSA::CGameSA()
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
 
+	//Platinum Edit: 19.0 - Use MTA.DAT instead of GTA.DAT(0x0863B10) .. Change the 5th byte
+	MemPut < BYTE >(0x0863B15, 'M');
+
+	/*
+	char *y = (char*)(0x0863B10);
+	char text[258];
+	sprintf(text, "Current Game: %s. Please lower the id limits. - Platinum(SAxVCxLC).", y);
+	MessageBox(NULL, text, "", MB_OK); 
+	*/
+
+
+
+	ModelInfo = new CModelInfoSA[MODELINFO_MAX];
+
     SetInitialVirtualProtect();
 
     // Initialize the offsets
@@ -174,12 +188,15 @@ CGameSA::CGameSA()
     m_pPools->SetPoolCapacity ( TASK_POOL, 5000 );                  // Default is 500
     m_pPools->SetPoolCapacity ( OBJECT_POOL, MAX_OBJECTS );         // Default is 350
     m_pPools->SetPoolCapacity ( EVENT_POOL, 5000 );                 // Default is 200
-    m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 12000 );            // Default is 10150
+	//Platinum Edit - 12.4
+    //m_pPools->SetPoolCapacity ( COL_MODEL_POOL, 30150);            // Default is 10150
+	//m_pPools->SetPoolCapacity(COL_MODEL_POOL, 12000);            // Default is 10150
     m_pPools->SetPoolCapacity ( ENV_MAP_MATERIAL_POOL, 16000 );     // Default is 4096
     m_pPools->SetPoolCapacity ( ENV_MAP_ATOMIC_POOL, 4000 );        // Default is 1024
     m_pPools->SetPoolCapacity ( SPEC_MAP_MATERIAL_POOL, 16000 );    // Default is 4096
     m_pPools->SetPoolCapacity ( ENTRY_INFO_NODE_POOL, MAX_ENTRY_INFO_NODES );           // Default is 500
     m_pPools->SetPoolCapacity ( POINTER_DOUBLE_LINK_POOL, MAX_POINTER_DOUBLE_LINKS );   // Default is 3200
+
     dassert( m_pPools->GetPoolCapacity ( POINTER_SINGLE_LINK_POOL ) == MAX_POINTER_SINGLE_LINKS );
 
     // Increase streaming object instances list size
@@ -203,6 +220,8 @@ CGameSA::~CGameSA ( void )
 {
     delete reinterpret_cast < CPlayerInfoSA* > ( m_pPlayerInfo );
 
+	//Platinum Edit - Delete the ModelInfo Array
+	delete[] ModelInfo;
     
     for ( int i = 0; i < NUM_WeaponInfosTotal; i++ )
     {
