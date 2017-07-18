@@ -294,6 +294,14 @@ DWORD RETURN_CTaskSimplyGangDriveBy__ProcessPed = 0x62D5AC;
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex             = 0x4EA2A0;
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex_Regenerate  = 0x04EA286;
 
+#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli     0x4FE9B9
+DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyHeli      = 0x4FEDFB;
+DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli         = FUNC_CAEVehicleAudioEntity__ProcessAIHeli;
+
+#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp     0x4FD96D
+DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp      = 0x4FDFAB;
+DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp         = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
+
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
 FLOAT fFalseHeading;
@@ -509,6 +517,9 @@ void HOOK_CTaskSimpleGangDriveBy__ProcessPed();
 
 void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( );
 
+void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli ();
+void HOOK_CAEVehicleAudioEntity__ProcessDummyProp ();
+
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
@@ -723,6 +734,9 @@ void CMultiplayerSA::InitHooks()
         // CAERadioTrackManager::ChooseMusicTrackIndex hook for fixing a crash with the steam audio files
         HookInstall(HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex, (DWORD) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex, 10);
     }
+
+    HookInstall ( HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli, (DWORD) HOOK_CAEVehicleAudioEntity__ProcessDummyHeli, 5 );
+    HookInstall ( HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD) HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5 );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -6921,5 +6935,35 @@ void _declspec(naked) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( )
         mov ecx, dwNumberOfTracks
         // jump back to normal processing
         jmp RETURN_CAERadioTrackManager__ChooseMusicTrackIndex
+    }
+}
+
+// Use AI heli rotor sound if player sound bank is not loaded
+void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyHeli ()
+{
+    _asm
+    {
+        // push our argument
+        push    [esp+8Ch+4]
+        mov     ecx, esi
+        // call twin function
+        call    dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli
+        // go back
+        jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyHeli
+    }
+}
+
+// Use AI plane propeller sound if player sound bank is not loaded
+void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp ()
+{
+    _asm
+    {
+        // push our argument
+        push    [esp+98h+4]
+        mov     ecx, esi
+        // call twin function
+        call    dwFUNC_CAEVehicleAudioEntity__ProcessAIProp
+        // go back
+        jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
     }
 }

@@ -41,6 +41,8 @@
 #define FUNC_CAudioEngine_ReportBulletHit                   0x506ec0
 #define FUNC_CAudioEngine_ReportWeaponEvent                 0x506f40
 
+#define FUNC_CAESound__Stop                     0x4EF1C0
+
 class CAudioEngineSAInterface
 {
 };

@@ -121,6 +121,9 @@
 #define FUNC_CAEVehicleAudioEntity__ProcessVehicle                                     0x501E10
 #define FUNC_CAEVehicleAudioEntity__Service                                            0x502280
 
+#define FUNC_CAESoundManager__CancelSoundsInBankSlot                                   0x4EFC60
+#define VAR_pAESoundManager                                                            0xB62CB0
+
 struct tVehicleAudioSettings
 {
     char    m_nVehicleSoundType;
@@ -250,6 +253,7 @@ class CAEVehicleAudioEntitySA : public CAEVehicleAudioEntity
 public:
                                         CAEVehicleAudioEntitySA                 ( CAEVehicleAudioEntitySAInterface * pInterface );
     void                                LoadDriverSounds                        ( void );
+    void                                StopVehicleEngineSound                  ( unsigned char ucSlot );
 
 private:
     CAEVehicleAudioEntitySAInterface *  m_pInterface;

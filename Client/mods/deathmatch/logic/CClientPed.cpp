@@ -1475,6 +1475,12 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
                         pInTask->ProcessPed ( m_pPlayerPed );
                         pInTask->Destroy ();
                     }
+
+                    if ( m_bIsLocalPlayer )
+                    {
+                        // Load accelerate sound bank so we can hear proper engine sound as passenger
+                        pGameVehicle->GetVehicleAudioEntity ()->LoadDriverSounds ();
+                    }
                 }
             }
 
@@ -4172,9 +4178,6 @@ void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
         {
             // Make sure we can't fall off
             SetCanBeKnockedOffBike ( false );
-
-            // Load driver sounds (GTA does it when local player enter vehicle)
-            pGameVehicle->GetVehicleAudioEntity ()->LoadDriverSounds ();
         }
 
         // Jax: make sure our camera is fixed on the new vehicle
