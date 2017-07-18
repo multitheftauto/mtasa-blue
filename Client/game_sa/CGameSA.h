@@ -85,7 +85,7 @@
 #define CHEAT_FULLWEAPONAIMING      "fullweaponaiming"
 #define CHEAT_INFINITEHEALTH        "infinitehealth"
 #define CHEAT_NEVERWANTED           "neverwanted"
-#define CHEAT_HEALTARMORMONEY       "healtharmormoney"
+#define CHEAT_HEALTARMORMONEY       "hesoyam"
 
 #define PROP_RANDOM_FOLIAGE         "randomfoliage"
 #define PROP_SNIPER_MOON            "snipermoon"
