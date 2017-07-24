@@ -230,18 +230,22 @@ int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
                             // Execute time-consuming task
                             return SharedUtil::BcryptHash(password, salt, cost);
 
-                        }, [luaFunctionRef, pLuaMain](const SString& hash) {
-                            CLuaArguments arguments;
-
-                            if (hash.empty())
+                        }, [luaFunctionRef](const SString& hash) {
+                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                            if (pLuaMain)
                             {
-                                m_pScriptDebugging->LogCustom(pLuaMain->GetVM(), "Invalid value for field 'salt'");
-                                arguments.PushBoolean(false);
-                            }
-                            else
-                                arguments.PushString(hash);
+                                CLuaArguments arguments;
 
-                            arguments.Call(pLuaMain, luaFunctionRef);
+                                if (hash.empty())
+                                {
+                                    m_pScriptDebugging->LogCustom(pLuaMain->GetVM(), "Invalid value for field 'salt'");
+                                    arguments.PushBoolean(false);
+                                }
+                                else
+                                    arguments.PushString(hash);
+
+                                arguments.Call(pLuaMain, luaFunctionRef);
+                            }
                         });
 
                         lua_pushboolean(luaVM, true);
@@ -295,11 +299,14 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
                         // Execute time-consuming task
                         return SharedUtil::BcryptVerify(password, hash);
 
-                    }, [luaFunctionRef, pLuaMain](const bool& correct) {
-                        CLuaArguments arguments;
-                        arguments.PushBoolean(correct);
-
-                        arguments.Call(pLuaMain, luaFunctionRef);
+                    }, [luaFunctionRef](const bool& correct) {
+                        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                        if (pLuaMain)
+                        {
+                            CLuaArguments arguments;
+                            arguments.PushBoolean(correct);
+                            arguments.Call(pLuaMain, luaFunctionRef);
+                        }
                     });
 
                     lua_pushboolean(luaVM, true);
