@@ -1,9 +1,4 @@
-Bin/
-Build/
-InstallFiles/
-utils/vswhere.exe
-utils/DXFiles.zip
-utils/DXFiles/
+# Note: there are things added at the end of this generated snippet by gitignore.io
 
 # Created by https://www.gitignore.io/api/osx,c++,linux,windows,visualstudio,premake-gmake,visualstudiocode
 
@@ -410,3 +405,14 @@ __pycache__/
 # should be stored in the .pubxml.user file.
 
 # End of https://www.gitignore.io/api/osx,c++,linux,windows,visualstudio,premake-gmake,visualstudiocode
+
+
+Bin/
+Build/
+InstallFiles/
+utils/vswhere.exe
+utils/DXFiles.zip
+utils/DXFiles/
+!*.so
+!*.dll
+!*.exe
