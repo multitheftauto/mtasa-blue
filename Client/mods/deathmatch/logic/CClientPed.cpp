@@ -150,7 +150,8 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_fTargetRotation = 0.0f;
     m_bTargetAkimboUp = false;
     m_bIsChoking = false;
-    m_ulLastTimeAimed = 0;
+    m_ulLastTimeBeganAiming = 0;
+    m_ulLastTimeEndedAiming = 0;
     m_ulLastTimeBeganCrouch = 0;
     m_ulLastTimeBeganStand = 0; //Standing after crouching
     m_ulLastTimeMovedWhileCrouched = 0; //Moved while crouching
@@ -2957,10 +2958,9 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
     CTask* pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
     if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
     {
-        if ( m_ulLastTimeAimed == 0 )
-        {
-            m_ulLastTimeAimed = ulNow;
-        }
+        if ( m_ulLastTimeBeganAiming == 0 )
+            m_ulLastTimeBeganAiming = ulNow;
+        
         if ( m_ulLastTimeBeganStand >= ulNow - 200.0f*fSpeedRatio )
         {
             if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTMOVE ) )
@@ -2979,12 +2979,21 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
         if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG ) )
         {
             if ( Current.RightShoulder1 == 0 && Current.LeftShoulder1 == 0 && Current.ButtonCircle == 0 )
+            {
                 Current.ShockButtonL = 0;
+                // The above checks can be dodged by pressing one of the keys quickly enough, so use a hard
+                // timer as well.
+                m_ulLastTimeEndedAiming = ulNow;
+            }
+            // We carry on blocking the crouch key for 600ms after someone has ended aiming
+            else if ( m_ulLastTimeEndedAiming != 0 && m_ulLastTimeEndedAiming >= ulNow - 600.0f*fSpeedRatio ) {
+                Current.ShockButtonL = 0;
+            }
         }
     }
     else
     {
-        m_ulLastTimeAimed = 0;
+        m_ulLastTimeBeganAiming = 0;
         // If we have the aim button pressed but aren't aiming, we're probably sprinting
         // If we're sprinting with an MP5,Deagle,Fire Extinguisher,Spray can, we shouldnt be able to shoot 
         // These weapons are weapons you can run with, but can't run with while aiming
@@ -3006,7 +3015,7 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
         if ( m_ulLastTimeBeganCrouch == 0 )
             m_ulLastTimeBeganCrouch = ulNow;
             // No longer aiming if we're in the process of crouching
-            m_ulLastTimeAimed = 0;
+            m_ulLastTimeBeganAiming = 0;
     }
     else
     {
@@ -3042,8 +3051,8 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
         }
     }
     // If we just started aiming, make sure they dont try and crouch
-    else if ( (m_ulLastTimeAimed != 0 &&
-              m_ulLastTimeAimed >= ulNow - 300.0f*fSpeedRatio) || 
+    else if ( (m_ulLastTimeBeganAiming != 0 &&
+              m_ulLastTimeBeganAiming >= ulNow - 300.0f*fSpeedRatio) || 
               (ulNow - m_ulLastTimeFired) <= 300.0f*fSpeedRatio )
     {
         if ( !g_pClientGame->IsGlitchEnabled (  CClientGame::GLITCH_FASTFIRE ) )
