@@ -79,7 +79,7 @@ private:
 #ifdef WIN32
 #define _DECLSPEC_EX extern "C" _declspec(dllexport) 
 #else
-#define _DECLSPEC_EX extern "C" 
+#define _DECLSPEC_EX extern "C" __attribute__ ((visibility ("default")))
 #endif
 
 // Maximum number of players that can be packed in a single lightweight puresync packet

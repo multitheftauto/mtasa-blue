@@ -100,6 +100,7 @@ workspace "MTASA"
 
 	filter "system:linux"
 		vectorextensions "SSE2"
+		buildoptions { "-fvisibility=hidden" }
 	
 	-- Only build the client on Windows
 	if os.target() == "windows" then
