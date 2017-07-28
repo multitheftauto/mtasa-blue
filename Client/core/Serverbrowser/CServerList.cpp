@@ -635,12 +635,12 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
 
     // Get player nicks
     vecPlayers.clear ();
-    while ( i < nLength )
+    while ( i < nLength - 4 )
     {
         std::string strPlayer;
         try
         {
-            if ( ReadString ( strPlayer, szBuffer, i, nLength ) )
+            if ( ReadString ( strPlayer, szBuffer, i, nLength - 4 ) )
             {
                 // Remove color code, unless that results in an empty string
                 SString strResult = RemoveColorCodes ( strPlayer.c_str () );
@@ -655,6 +655,10 @@ bool CServerListItem::ParseQuery ( const char * szBuffer, unsigned int nLength )
             // yeah that's what I thought.
             return false;
         }
+    }
+    if (i + 4 == nLength)
+    {
+        fResSize = *(float*)&szBuffer[i];
     }
 
     bScanned = true;

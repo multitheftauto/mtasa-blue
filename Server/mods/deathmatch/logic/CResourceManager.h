@@ -88,6 +88,7 @@ public:
     bool                        StartResource                   ( CResource* pResource, list < CResource* > * dependents = NULL, bool bStartedManually = false, bool bStartIncludedResources = true, bool bConfigs = true, bool bMaps = true, bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true, bool bClientFiles = true );
     bool                        Reload                          ( CResource* pResource );
     bool                        StopAllResources                ( void );
+    uint64                      GetTotalResourcesSize           ( void );
 
     void                        QueueResource                   ( CResource* pResource, eResourceQueue eQueueType, const sResourceStartFlags* Flags, list < CResource* > * dependents = NULL );
     void                        ProcessQueue                    ( void );

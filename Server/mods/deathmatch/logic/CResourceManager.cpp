@@ -725,6 +725,21 @@ bool CResourceManager::StopAllResources ( void )
     return true;
 }
 
+uint64 CResourceManager::GetTotalResourcesSize(void)
+{
+    uint64 uiTotalSize = 0;
+    list < CResource* > ::const_iterator iter = m_resources.begin();
+    for (; iter != m_resources.end(); iter++)
+    {
+        CResource* pResource = *iter;
+        if (pResource->IsActive())
+        {
+            uiTotalSize += pResource->GetResourceSize();
+        }
+    }
+    return uiTotalSize;
+}
+
 
 void CResourceManager::QueueResource ( CResource* pResource, eResourceQueue eQueueType, const sResourceStartFlags* Flags, list < CResource* > * dependents )
 {

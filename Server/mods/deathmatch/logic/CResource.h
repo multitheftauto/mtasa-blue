@@ -205,6 +205,7 @@ private:
     bool                    m_bSyncMapElementDataDefined;
 
     CChecksum               m_metaChecksum;     // Checksum of meta.xml last time this was loaded, generated in GenerateChecksums()
+    uint64                  m_uiResourceSize;
 
     unsigned short          m_usNetID; // resource ID    
     uint                    m_uiScriptID;
@@ -292,6 +293,7 @@ public:
     bool                    StopAllResourceItems ( void );    
 
     bool                    GenerateChecksums ( void );
+    uint64                  GetResourceSize ( void ) { return m_uiResourceSize; }
     const CChecksum&        GetLastMetaChecksum ( void ) { return m_metaChecksum; }
     bool                    HasResourceChanged ( void );
     void                    ApplyUpgradeModifications ( void );

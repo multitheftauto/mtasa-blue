@@ -599,6 +599,7 @@ void CResource::SetInfoValue ( const char * szKey, const char * szValue, bool bS
 bool CResource::GenerateChecksums ( void )
 {
     bool bOk = true;
+    uint64 uiResourceSize = 0;
 
     list < CResourceFile* > ::iterator iterf = m_resourceFiles.begin ();
     for ( ; iterf != m_resourceFiles.end (); iterf++ )
@@ -657,6 +658,7 @@ bool CResource::GenerateChecksums ( void )
                         if ( pResourceFile->IsNoClientCache () )
                             FileDelete ( pResourceFile->GetCachedPathFilename ( true ) );
                     }
+                    uiResourceSize += uiFileSize;
                 }
                 break;
 
@@ -672,6 +674,7 @@ bool CResource::GenerateChecksums ( void )
     {
         m_metaChecksum = CChecksum::GenerateChecksumFromFile ( strPath );
     }
+    m_uiResourceSize = uiResourceSize;
 
     return bOk;
 }

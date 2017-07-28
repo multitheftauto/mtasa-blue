@@ -458,15 +458,17 @@ void CServerBrowser::CreateTab ( ServerBrowserType type, const char* szName )
     m_hPlayers [ type ] = m_pServerList [ type ]->AddColumn ( _("Players"), 0.2f );
     m_hPing [ type ] = m_pServerList [ type ]->AddColumn ( _("Ping"), 0.2f );
     m_hGame [ type ] = m_pServerList [ type ]->AddColumn ( _("Gamemode"), 0.2f );
+    m_hResSize [ type ] = m_pServerList [ type ]->AddColumn ( _("Size"), 0.2f );
 
     // NB. SetColumnWidth seems to start from 0
     m_pServerList [ type ]->SetColumnWidth ( m_hVersion [ type ], 25, false );
     m_pServerList [ type ]->SetColumnWidth ( m_hLocked [ type ], 16, false );
     m_pServerList [ type ]->SetColumnWidth ( m_hPlayers [ type ], 70, false );
     m_pServerList [ type ]->SetColumnWidth ( m_hPing [ type ], 35, false );
+    m_pServerList [ type ]->SetColumnWidth ( m_hResSize[ type ], 70, false );
 
     // We give Name and Gamemode 65% and 35% of the remaining length respectively
-    float fRemainingWidth = fWidth - 25 - 16 - 70 - 35 - 50; // All the fixed sizes plus 50 for the scrollbar
+    float fRemainingWidth = fWidth - 25 - 16 - 70 - 35 - 70 - 50; // All the fixed sizes plus 50 for the scrollbar
     
     m_pServerList [ type ]->SetColumnWidth ( m_hGame [ type ], fRemainingWidth*0.35, false );
     m_pServerList [ type ]->SetColumnWidth ( m_hName [ type ], fRemainingWidth*0.65, false );
@@ -965,6 +967,50 @@ void CServerBrowser::UpdateHistoryList ( void )
     }
 }
 
+SString GetDataUnit(unsigned long long ullInput)
+{
+    // Convert it to a float
+    float fInput = static_cast < float > (ullInput);
+
+    // Bytes per sec?
+    if (fInput < 1024)
+    {
+        return SString("%u B", (uint)ullInput);
+    }
+
+    // Kilobytes per sec?
+    fInput /= 1024;
+    if (fInput < 1024)
+    {
+        return SString("%.2f kB", fInput);
+    }
+
+    // Megabytes per sec?
+    fInput /= 1024;
+    if (fInput < 1024)
+    {
+        return SString("%.2f MB", fInput);
+    }
+
+    // Gigabytes per sec?
+    fInput /= 1024;
+    if (fInput < 1024)
+    {
+        return SString("%.2f GB", fInput);
+    }
+
+    // Terrabytes per sec?
+    fInput /= 1024;
+    if (fInput < 1024)
+    {
+        return SString("%.2f TB", fInput);
+    }
+
+    // Unknown
+    SString strUnknown = "X";
+    return strUnknown;
+}
+
 void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const ServerBrowserType Type )
 {
     bool bIncludeEmpty  = m_pIncludeEmpty [ Type ]->GetSelected ();
@@ -1075,12 +1121,16 @@ void CServerBrowser::AddServerToList ( const CServerListItem * pServer, const Se
         const SString strPing             = pServer->nPing == 9999 ? "" : SString ( "%d", pServer->nPing );
         const SString strPingSortKey      = SString ( "%04d-", pServer->nPing ) + pServer->strTieBreakSortKey;
 
+        const SString strResSize          = GetDataUnit(static_cast < unsigned long long > ( pServer->fResSize * 1024 ) );
+        const SString strResSizeSortKey   = SString ( "-", 0 ) + pServer->strTieBreakSortKey; // TODO
+
         // The row index could change at any point here if list sorting is enabled
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hVersion [ Type ], strVersion, false, false, true, strVersionSortKey );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hName [ Type ],    pServer->strName, false, false, true, pServer->strNameSortKey );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hGame [ Type ],    pServer->strGameMode, false, false, true );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPlayers [ Type ], strPlayers, false, false, true, strPlayersSortKey );
         iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hPing [ Type ],    strPing, false, false, true, strPingSortKey );
+        iIndex = m_pServerList [ Type ]->SetItemText ( iIndex, m_hResSize [ Type ], strResSize, false, false, true, strResSizeSortKey );
 
         // Locked icon
         m_pServerList [ Type ]->SetItemImage ( iIndex, m_hLocked [ Type ], pServer->bPassworded ? m_pLockedIcon : NULL );
