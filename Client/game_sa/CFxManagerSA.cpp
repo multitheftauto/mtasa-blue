@@ -17,7 +17,7 @@ CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector
     const CVector * pvecPosition = &vecPosition;
     DWORD dwThis = ( DWORD ) m_pInterface;
     DWORD dwFunc = FUNC_FxManager_c__CreateFxSystem;
-    DWORD dwReturn = 0;
+    CFxSystemSAInterface* pFxSystem;
 
     _asm
     {
@@ -27,19 +27,18 @@ CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector
         push    pvecPosition
         push    szBlueprint
         call    dwFunc
-        mov     dwReturn, eax
+        mov     pFxSystem, eax
     }
 
-    if ( dwReturn != 0 )
+    if (pFxSystem)
     {
-        if ( !bSoundEnable )
-            * ( DWORD * )( ( DWORD )dwReturn + 0x100 ) = NULL;
+        if (!bSoundEnable)
+            pFxSystem->audioEntity.audio = nullptr;
 
-        CFxSystemSA* pFxSystemSA = new CFxSystemSA((CFxSystemSAInterface*)dwReturn);
+        CFxSystemSA* pFxSystemSA = new CFxSystemSA(pFxSystem);
         return pFxSystemSA;
     }
-    else
-        return NULL;
+    return nullptr;
 }
 
 void CFxManagerSA::DestroyFxSystem(CFxSystem* pFxSystem)
