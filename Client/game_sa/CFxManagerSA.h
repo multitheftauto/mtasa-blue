@@ -62,7 +62,7 @@ class CFxManagerSA : public CFxManager
 public:
                     CFxManagerSA( CFxManagerSAInterface * pInterface )    { m_pInterface = pInterface; }
     // CFxManager interface
-    CFxSystem*      CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char bSkipCameraFrustumCheck );
+    CFxSystem*      CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char bSkipCameraFrustumCheck, bool bSoundEnable );
     void            DestroyFxSystem( CFxSystem* pFxSystem );
     void            OnFxSystemSAInterfaceDestroyed ( CFxSystemSAInterface* pFxSystemSAInterface );
 

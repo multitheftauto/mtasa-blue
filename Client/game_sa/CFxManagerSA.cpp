@@ -12,12 +12,13 @@
 #include "StdInc.h"
 
 
-CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char bSkipCameraFrustumCheck )
+CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char bSkipCameraFrustumCheck, bool bSoundEnable )
 {
     const CVector * pvecPosition = &vecPosition;
     DWORD dwThis = ( DWORD ) m_pInterface;
     DWORD dwFunc = FUNC_FxManager_c__CreateFxSystem;
     DWORD dwReturn = 0;
+
     _asm
     {
         mov     ecx, dwThis
@@ -28,8 +29,12 @@ CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector
         call    dwFunc
         mov     dwReturn, eax
     }
+
     if ( dwReturn != 0 )
     {
+        if ( !bSoundEnable )
+            * ( DWORD * )( ( DWORD )dwReturn + 0x100 ) = NULL;
+
         CFxSystemSA* pFxSystemSA = new CFxSystemSA((CFxSystemSAInterface*)dwReturn);
         return pFxSystemSA;
     }
