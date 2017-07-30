@@ -85,6 +85,7 @@ workspace "MTASA"
 	
 	filter "system:windows"
 		toolset "v141_xp"
+		vectorextensions "SSE"
 		flags { "StaticRuntime" }
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
