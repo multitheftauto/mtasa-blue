@@ -490,18 +490,20 @@ int CLuaEffectDefs::fxAddFootSplash ( lua_State* luaVM )
 
 int CLuaEffectDefs::CreateEffect ( lua_State* luaVM )
 {
-    // bool createEffect ( string fxName, float posX, float posY, float posZ[, float rotX, float rotY, float rotZ, float drawDistance] )
+    // bool createEffect ( string fxName, float posX, float posY, float posZ[, float rotX, float rotY, float rotZ, float drawDistance, bool soundEnable = false] )
 
     CVector vecPosition;
     CVector vecRotation;
     SString strFxName;
-    float fDrawDistance;
+    float   fDrawDistance;
+    bool    bSoundEnable;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strFxName );
     argStream.ReadVector3D ( vecPosition );
     argStream.ReadVector3D ( vecRotation, CVector ( 0, 0, 0 ) );
     argStream.ReadNumber ( fDrawDistance, 0 );
+    argStream.ReadBool ( bSoundEnable, false );
 
     if ( !argStream.HasErrors () )
     {
@@ -512,7 +514,7 @@ int CLuaEffectDefs::CreateEffect ( lua_State* luaVM )
             if ( pResource )
             {
                 // Create it and return it
-                CClientEffect * pFx = CStaticFunctionDefinitions::CreateEffect ( *pResource, strFxName, vecPosition );
+                CClientEffect * pFx = CStaticFunctionDefinitions::CreateEffect ( *pResource, strFxName, vecPosition, bSoundEnable );
                 if ( pFx != NULL )
                 {
                     pFx->SetRotationDegrees ( vecRotation );

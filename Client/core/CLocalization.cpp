@@ -136,7 +136,7 @@ void CLocalization::LogCallback( const std::string& str )
 //
 // Global interface
 //
-extern "C" _declspec(dllexport) CLocalizationInterface* __cdecl L10n_CreateLocalization ( SString strLocale )
+MTAEXPORT CLocalizationInterface* __cdecl L10n_CreateLocalization ( SString strLocale )
 {
     // Eventually create a localization interface
     if ( !g_pLocalization )
