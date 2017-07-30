@@ -153,15 +153,21 @@
 */
 #if defined(LUA_BUILD_AS_DLL)
 
-#if defined(LUA_CORE) || defined(LUA_LIB)
-#define LUA_API __declspec(dllexport)
+#ifdef LUA_WIN
+	#if defined(LUA_CORE) || defined(LUA_LIB)
+		#define LUA_API __declspec(dllexport)
+	#else
+		#define LUA_API __declspec(dllimport)
+	#endif
 #else
-#define LUA_API __declspec(dllimport)
+	#if defined(LUA_CORE) || defined(LUA_LIB)
+		#define LUA_API extern __attribute__((visibility("default")))
+	#endif
 #endif
 
 #else
 
-#define LUA_API		extern __attribute__((visibility("default")))
+#define LUA_API		extern
 
 #endif
 
