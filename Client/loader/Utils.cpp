@@ -933,6 +933,63 @@ bool HasGTAPath ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// GetPEFileOffsets
+//
+// Get some commonly used file offsets
+//
+///////////////////////////////////////////////////////////////
+void GetPEFileOffsets(SPEFileOffsets& outOffsets, const SString& strGTAEXEPath)
+{
+    outOffsets = {0};
+    long NtHeaders = 0;
+    ReadFileValue(strGTAEXEPath, NtHeaders, offsetof(IMAGE_DOS_HEADER, e_lfanew));
+    outOffsets.TimeDateStamp = NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.TimeDateStamp);
+    outOffsets.Characteristics = NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.Characteristics);
+    outOffsets.AddressOfEntryPoint = NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader.AddressOfEntryPoint);
+    outOffsets.DllCharacteristics = NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader.DllCharacteristics);
+
+    ushort usSizeOfOptionalHeader = 0;
+    ReadFileValue(strGTAEXEPath, usSizeOfOptionalHeader, NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.SizeOfOptionalHeader));
+    ReadFileValue(strGTAEXEPath, outOffsets.sections[0].PointerToRawData, NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader) + usSizeOfOptionalHeader + offsetof(IMAGE_SECTION_HEADER, PointerToRawData));
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// GetGtaFileVersion
+//
+// Hardcoded numbers used:
+//  0x44 - File offset 0x44 is zero in legacy DOS stub. Encrypted exe does not have this.
+//  0x347ADD is the section offset equivalent of 0x748ADD as used in CGameSA::FindGameVersion
+//  0x53FF and 0x840F are also used in CGameSA::FindGameVersion
+//
+///////////////////////////////////////////////////////////////
+EGtaFileVersion GetGtaFileVersion(const SString& strGTAEXEPath)
+{
+    SPEFileOffsets fileOffsets;
+    GetPEFileOffsets(fileOffsets, strGTAEXEPath);
+
+    char bIsEncypted = false;
+    ushort usIdBytes = 0;
+    ReadFileValue(strGTAEXEPath, bIsEncypted, 0x44);
+    ReadFileValue(strGTAEXEPath, usIdBytes, 0x347ADD + fileOffsets.sections[0].PointerToRawData);
+
+    EGtaFileVersion versionType = EGtaFileVersion::Unknown;
+    if (usIdBytes == 0x53FF)
+        versionType = EGtaFileVersion::US;
+    else
+    if (usIdBytes == 0x840F)
+        versionType = EGtaFileVersion::EU;
+    else
+    if (bIsEncypted)
+        versionType = EGtaFileVersion::Encrypted;
+
+    return versionType;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // FindFilesRecursive
 //
 // Return a list of files inside strPath
