@@ -15,6 +15,7 @@ struct SExePatchedStatus
     bool bDep;
     bool bNvightmare;
     bool bAltModules;
+    bool bEntryPoint;
 
     bool operator!= ( const SExePatchedStatus& other ) const    { return !operator==( other ); }
     bool operator== ( const SExePatchedStatus& other ) const
@@ -23,7 +24,8 @@ struct SExePatchedStatus
                && bLargeMem == other.bLargeMem
                && bDep == other.bDep
                && bNvightmare == other.bNvightmare
-               && bAltModules == other.bAltModules;
+               && bAltModules == other.bAltModules
+               && bEntryPoint == other.bEntryPoint;
     }
 };
 
@@ -59,3 +61,5 @@ EPatchResult        UpdatePatchStatusLargeMem       ( const SString& strGTAEXEPa
 EPatchResult        UpdatePatchStatusDep            ( const SString& strGTAEXEPath, EPatchMode mode );
 bool                GetPatchRequirementAltModules   ( void );
 EPatchResult        UpdatePatchStatusAltModules     ( const SString& strGTAEXEPath, EPatchMode mode );
+bool                GetPatchRequirementEntryPoint   ( void );
+EPatchResult        UpdatePatchStatusEntryPoint     ( const SString& strGTAEXEPath, EPatchMode mode );
