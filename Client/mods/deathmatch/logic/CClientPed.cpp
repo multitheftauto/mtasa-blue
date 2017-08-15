@@ -287,6 +287,20 @@ CClientPed::~CClientPed ( void )
         g_pMultiplayer->RemoveRemoteDataStorage ( m_pPlayerPed );
         g_pMultiplayer->DestroyRemoteDataStorage ( m_remoteDataStorage );
         m_remoteDataStorage = NULL;
+
+        CClientVehicle * pVehicle = GetOccupiedVehicle ();
+        if ( m_pPlayerPed && pVehicle && GetOccupiedVehicleSeat () == 0 )
+        {
+            if ( g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == pVehicle )
+            {
+                CVehicle * pGameVehicle = pVehicle->GetGameVehicle ();
+                if ( pGameVehicle )
+                {
+                    // Driver from local player vehicle is being destroyed
+                    pGameVehicle->GetVehicleAudioEntity ()->JustGotOutOfVehicleAsDriver ();
+                }
+            }
+        }
     }
 
     // We have a player model?
@@ -1440,6 +1454,12 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         {
             // Warp him in
             InternalWarpIntoVehicle ( pGameVehicle );
+
+            if ( m_bIsLocalPlayer || g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == pVehicle )
+            {
+                // Tell vehicle audio we have driver
+                pGameVehicle->GetVehicleAudioEntity ()->JustGotInVehicleAsDriver ();
+            }
         }
 
         // Update the vehicle and us so we know we've occupied it
@@ -1477,10 +1497,10 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
                         pInTask->Destroy ();
                     }
 
-                    if ( m_bIsLocalPlayer )
+                    if ( m_bIsLocalPlayer && pVehicle->IsDriven () )
                     {
-                        // Load accelerate sound bank so we can hear proper engine sound as passenger
-                        pGameVehicle->GetVehicleAudioEntity ()->LoadDriverSounds ();
+                        // Tell vehicle audio we have driver
+                        pGameVehicle->GetVehicleAudioEntity ()->JustGotInVehicleAsDriver ();
                     }
                 }
             }
@@ -1551,6 +1571,17 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bSkipWarpIfGettingOut )
         CVehicle* pGameVehicle = pVehicle->m_pVehicle;
         if ( pGameVehicle )
         {
+            // Did he really was in vehicle and is there driver?
+            if ( pVehicle != m_pOccupyingVehicle && pVehicle->GetOccupant () )
+            {
+                // Local player left vehicle or got abandoned by remote driver
+                if ( ( m_bIsLocalPlayer || ( m_uiOccupiedVehicleSeat == 0 && g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == pVehicle ) ) )
+                {
+                    // Tell vehicle audio the driver left
+                    pGameVehicle->GetVehicleAudioEntity ()->JustGotOutOfVehicleAsDriver ();
+                }
+            }
+
             // If vehicle was deleted during exit, don't skip warp. Fixes player getting stuck and going invisible.
             if ( pVehicle->IsBeingDeleted() )
                 bSkipWarpIfGettingOut = false;
