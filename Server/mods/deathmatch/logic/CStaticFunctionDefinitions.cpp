@@ -8399,19 +8399,25 @@ bool CStaticFunctionDefinitions::IsInsideRadarArea ( CRadarArea* pRadarArea, con
 {
     assert ( pRadarArea );
 
-    CVector vecTemp = pRadarArea->GetPosition ();
-    CVector2D vecSize = pRadarArea->GetSize ();
-    // Remove this line if the position of radar areas isnt in the center
-    //vecTemp -= ( CVector ( vecSize.fX, vecSize.fY, 0.0f ) * CVector ( 0.5f, 0.5f, 0.5f ) );
+    CVector vecAreaPosition = pRadarArea->GetPosition ();
+    CVector2D vecAreaSize = pRadarArea->GetSize ();
+
     bInside = false;
-    // Do the calc from the bottom left
-    if ( vecPosition.fX >= vecTemp.fX && vecPosition.fX <= ( vecTemp.fX + vecSize.fX ) )
+
+    // Calculate boundaries and make sure they're in ascending order,
+    // so it is always safe to start checking from the bottom-left corner
+    std::pair<float, float> fHorizontalBounds = std::minmax ( vecAreaPosition.fX, vecAreaPosition.fX + vecAreaSize.fX );
+    std::pair<float, float> fVerticalBounds = std::minmax ( vecAreaPosition.fY, vecAreaPosition.fY + vecAreaSize.fY );
+
+    // Do the calc from the bottom-left corner
+    if ( vecPosition.fX >= fHorizontalBounds.first && vecPosition.fX <= fHorizontalBounds.second )
     {
-        if ( vecPosition.fY >= vecTemp.fY && vecPosition.fY <= ( vecTemp.fY + vecSize.fY ) )
+        if ( vecPosition.fY >= fVerticalBounds.first && vecPosition.fY <= fVerticalBounds.second )
         {
             bInside = true;
         }
     }
+
     return true;
 }
 
