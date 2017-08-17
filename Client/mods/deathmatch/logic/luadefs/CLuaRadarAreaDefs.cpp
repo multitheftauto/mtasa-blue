@@ -146,7 +146,7 @@ int CLuaRadarAreaDefs::GetRadarAreaSize ( lua_State* luaVM )
 
 int CLuaRadarAreaDefs::OOP_GetRadarAreaSize ( lua_State* luaVM )
 {
-    //  float, float getRadarAreaSize ( radararea theRadararea )
+    //  vector2 getRadarAreaSize ( radararea theRadararea )
     CClientRadarArea* pRadarArea;
 
     CScriptArgReader argStream ( luaVM );
