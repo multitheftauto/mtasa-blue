@@ -49,7 +49,7 @@ void CLuaRadarAreaDefs::AddClass ( lua_State* luaVM )
 
 int CLuaRadarAreaDefs::CreateRadarArea ( lua_State* luaVM )
 {
-    //  radararea createRadarArea ( float leftX, float bottomY, float sizeX, float sizeY, [ int r = 255, int g = 0, int b = 0, int a = 255, element visibleTo = getRootElement() ] )
+    //  radararea createRadarArea ( float startPosX, float startPosY, float sizeX, float sizeY, [ int r = 255, int g = 0, int b = 0, int a = 255, element visibleTo = getRootElement() ] )
     CVector2D vecPosition; CVector2D vecSize; float dRed; float dGreen; float dBlue; float dAlpha;
 
     CScriptArgReader argStream ( luaVM );
