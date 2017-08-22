@@ -130,6 +130,7 @@ SString         PadLeft                             ( const SString& strText, ui
 bool            IsDeviceSelectionDialogOpen         ( DWORD dwThreadId );
 std::vector < DWORD > MyEnumProcesses               ( bool bInclude64bit = false, bool bIncludeCurrent = false );
 SString         GetProcessPathFilename              ( DWORD processID );
+SString         GetProcessFilename                  ( DWORD processID );
 void            WriteDebugEventAndReport            ( uint uiId, const SString& strText );
 WString         ReadCompatibilityEntries            ( const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags );
 bool            WriteCompatibilityEntries           ( const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags, const WString& strNewData );

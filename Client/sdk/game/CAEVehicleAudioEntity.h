@@ -29,5 +29,6 @@ enum eVehicleAudioType
 class CAEVehicleAudioEntity
 {
 public:
-    virtual void                        LoadDriverSounds                        ( void ) = 0;
+    virtual void                        JustGotInVehicleAsDriver                ( void ) = 0;
+    virtual void                        JustGotOutOfVehicleAsDriver             ( void ) = 0;
 };

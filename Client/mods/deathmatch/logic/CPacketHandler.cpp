@@ -1653,10 +1653,9 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                     case CClientGame::VEHICLE_NOTIFY_IN_RETURN:
                     {
-                        // Is he not getting in the vehicle yet?
-                        //if ( !pPlayer->IsGettingIntoVehicle () )
+                        if ( !pPlayer->IsLocalPlayer () || pPlayer->GetOccupiedVehicle () != pVehicle )
                         {
-                            // Warp him in
+                            // Warp him in. Don't do that for local player as he is already sitting inside.
                             pPlayer->WarpIntoVehicle ( pVehicle, ucSeat );
                         }
 

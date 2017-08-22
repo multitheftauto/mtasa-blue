@@ -351,6 +351,7 @@ WString devicePathToWin32Path ( const WString& strDevicePath )
 
 typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPWSTR lpExeName, __inout PDWORD lpdwSize);
 
+
 ///////////////////////////////////////////////////////////////////////////
 //
 // GetProcessPathFilename
@@ -433,6 +434,35 @@ SString GetProcessPathFilename ( DWORD processID )
     }
 
     return "";
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetProcessFilename
+//
+// More reliable than GetProcessPathFilename, but no path
+//
+///////////////////////////////////////////////////////////////////////////
+SString GetProcessFilename(DWORD processID)
+{
+    SString strFilename;
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32W pe = {sizeof(PROCESSENTRY32W)};
+    if( Process32FirstW(hSnapshot, &pe))
+    {
+    	do
+        {
+    		if (pe.th32ProcessID == processID)
+            {
+                strFilename = ToUTF8(pe.szExeFile);
+                break;
+    		}
+    	}
+        while( Process32NextW(hSnapshot, &pe));
+    }
+    CloseHandle(hSnapshot);
+    return strFilename;
 }
 
 

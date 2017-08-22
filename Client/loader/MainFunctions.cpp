@@ -388,16 +388,28 @@ void HandleNotUsedMainMenu ( void )
         }
     }
 
-    // Check if Evolve is active
-    for ( auto processId : MyEnumProcesses( true ) )
+    // Check if problem processes are active
+    struct
     {
-        SString strFilename = ExtractFilename( GetProcessPathFilename( processId ) );
-        if ( strFilename.BeginsWithI( "Evolve" ) )
+        const char* szFilename;
+        const char* szProductName;
+        const char* szTrouble;
+    } procItems[] = {
+        {"Evolve", "Evolve", "not-used-menu-evolve"},
+        {"GbpSv.exe", "GAS Tecnologia - G-Buster Browser Defense", "not-used-menu-gbpsv"}};
+    for (uint i = 0; i < NUMELMS(procItems); i++ )
+    {
+        for ( auto processId : MyEnumProcesses( true ) )
         {
-            SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
-            strMessage += "\n\nEvolve";
-            DisplayErrorMessageBox ( strMessage, _E("CL43"), "not-used-menu-evolve" );
-            break;
+            SString strFilename = GetProcessFilename( processId );
+            if ( strFilename.BeginsWithI( procItems[i].szFilename ) )
+            {
+                SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
+                strMessage += "\n\n";
+                strMessage += procItems[i].szProductName;
+                DisplayErrorMessageBox ( strMessage, _E("CL43"), procItems[i].szTrouble );
+                break;
+            }
         }
     }
 }
