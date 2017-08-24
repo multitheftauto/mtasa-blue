@@ -56,7 +56,6 @@ void CWebView::Initialise ()
     browserSettings.universal_access_from_file_urls = cef_state_t::STATE_DISABLED; // Also filtered by resource interceptor, but set this nevertheless
     browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
-    browserSettings.javascript_open_windows = cef_state_t::STATE_DISABLED;
 
     browserSettings.plugins = cef_state_t::STATE_DISABLED;
     if ( !m_bIsLocal )
