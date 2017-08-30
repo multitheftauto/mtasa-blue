@@ -1463,11 +1463,11 @@ void CMultiplayerSA::InitHooks()
 
     // Disable vehicle audio driver logic so MTA can reimplement it (#9681)
     // Disable updating m_bPlayerDriver in CAEVehicleAudioEntity::Service
-    MemSet ( (void*) 0x5023B2, 0x90, 6 );
+    MemSetFast ( (void*) 0x5023B2, 0x90, 6 );
     // Disable call to CAEVehicleAudioEntity::JustGotInVehicleAsDriver
-    MemSet ( (void*) 0x5023E1, 0x90, 5 );
+    MemSetFast( (void*) 0x5023E1, 0x90, 5 );
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
-    MemSet ( (void*) 0x502341, 0x90, 5 );
+    MemSetFast( (void*) 0x502341, 0x90, 5 );
 
 
     InitHooks_CrashFixHacks ();
