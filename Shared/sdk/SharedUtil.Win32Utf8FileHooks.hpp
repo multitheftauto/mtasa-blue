@@ -31,18 +31,8 @@ The hooks in this file modify the following functions to work correctly with utf
     MoveFile
     DeleteFile
     GetModuleHandle
-    sopen_s
-    _chdir
-    _mkdir
-    _rmdir
-    remove
-    rename
 
-The following will also work correctly with utf8 strings as they eventually call the above hooked functions:
-
-    fopen
-    unlink
-    fstream
+Some more will also work correctly with utf8 strings as they eventually call the above hooked functions
 
 BUT
     * Many other functions are not hooked and will need utf8 conversions when used, like these:
@@ -61,136 +51,11 @@ namespace SharedUtil
 
     /////////////////////////////////////////////////////////////
     //
-    // Function defs
-    //
-    /////////////////////////////////////////////////////////////
-
-    typedef
-    HANDLE
-    (WINAPI
-    *FUNC_CreateFileA)(
-        __in     LPCSTR lpFileName,
-        __in     DWORD dwDesiredAccess,
-        __in     DWORD dwShareMode,
-        __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-        __in     DWORD dwCreationDisposition,
-        __in     DWORD dwFlagsAndAttributes,
-        __in_opt HANDLE hTemplateFile
-        );
-
-    typedef
-    HMODULE
-    (WINAPI
-    *FUNC_LoadLibraryA)(
-        __in LPCSTR lpLibFileName
-        );
-
-    typedef
-    HMODULE
-    (WINAPI
-    *FUNC_LoadLibraryExA)(
-        __in       LPCSTR lpLibFileName,
-        __reserved HANDLE hFile,
-        __in       DWORD dwFlags
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_SetDllDirectoryA)(
-        __in_opt LPCSTR lpPathName
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_SetCurrentDirectoryA)(
-        __in LPCSTR lpPathName
-        );
-
-    typedef int  (WINAPI *FUNC_AddFontResourceExA)( __in LPCSTR name, __in DWORD fl, __reserved PVOID res);
-    typedef BOOL (WINAPI *FUNC_RemoveFontResourceExA)( __in LPCSTR name, __in DWORD fl, __reserved PVOID pdv);
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_RemoveDirectoryA)(
-        __in LPCSTR lpPathName
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_GetDiskFreeSpaceExA)(
-        __in_opt  LPCSTR lpDirectoryName,
-        __out_opt PULARGE_INTEGER lpFreeBytesAvailableToCaller,
-        __out_opt PULARGE_INTEGER lpTotalNumberOfBytes,
-        __out_opt PULARGE_INTEGER lpTotalNumberOfFreeBytes
-        );
-
-    typedef
-    DWORD
-    (WINAPI
-    *FUNC_GetFileAttributesA)(
-        __in LPCSTR lpFileName
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_SetFileAttributesA)(
-        __in LPCSTR lpFileName,
-        __in DWORD dwFileAttributes
-        );
-
-    typedef HINSTANCE (STDAPICALLTYPE *FUNC_ShellExecuteA)(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters,
-        LPCSTR lpDirectory, INT nShowCmd);
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_CreateDirectoryA)(
-        __in     LPCSTR lpPathName,
-        __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_CopyFileA)(
-        __in LPCSTR lpExistingFileName,
-        __in LPCSTR lpNewFileName,
-        __in BOOL bFailIfExists
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_MoveFileA)(
-        __in LPCSTR lpExistingFileName,
-        __in LPCSTR lpNewFileName
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_DeleteFileA)(
-        __in LPCSTR lpFileName
-        );
-
-    typedef
-    HMODULE
-    (WINAPI
-    *FUNC_GetModuleHandleA)(
-        __in_opt LPCSTR lpModuleName
-        );
-
-    /////////////////////////////////////////////////////////////
-    //
     // Hook variables
     //
     /////////////////////////////////////////////////////////////
     #define HOOKVAR(name) \
+        using FUNC_##name = decltype(&name); \
         FUNC_##name pfn##name;
 
     HOOKVAR( CreateFileA )
