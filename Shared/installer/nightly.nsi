@@ -661,6 +661,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\loader.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         File "${FILES_ROOT}\mta\cefweb.dll"
+        File "${FILES_ROOT}\mta\libwow64.dll"
+        File "${FILES_ROOT}\mta\wow64_helper.exe"
         
         SetOutPath "$INSTDIR\MTA"
         File "${FILES_ROOT}\mta\libcef.dll"
@@ -1090,10 +1092,14 @@ Section Uninstall
 
     RmDir /r "$INSTDIR\MTA\cgui"
     RmDir /r "$INSTDIR\MTA\data"
+    RmDir /r "$INSTDIR\MTA\CEF"
+    RmDir /r "$INSTDIR\MTA\locale"
     Delete "$INSTDIR\MTA\*.dll"
-    Delete "$INSTDIR\MTA\*.ax"
-    Delete "$INSTDIR\MTA\*.txt"
+    Delete "$INSTDIR\MTA\*.exe"
+    Delete "$INSTDIR\MTA\*.dmp"
+    Delete "$INSTDIR\MTA\*.log"
     Delete "$INSTDIR\MTA\*.dat"
+    Delete "$INSTDIR\MTA\*.bin"
 
     RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
     ; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
