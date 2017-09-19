@@ -96,6 +96,7 @@ bool            IsWindows10OrGreater                ( void );
 bool            IsWindows10Threshold2OrGreater      ( void );
 
 BOOL            IsUserAdmin                         ( void );
+void            RelaunchAsAdmin                     (const SString& strCmdLine, const SString& strReason);
 
 void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );
 bool            Is32bitProcess                      ( DWORD processID );
