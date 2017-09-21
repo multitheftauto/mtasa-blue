@@ -58,6 +58,9 @@ void CLuaObjectDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "breakable", "setObjectBreakable", "isObjectBreakable" );
     lua_classvariable ( luaVM, "mass", "setObjectMass", "getObjectMass" );
 
+    // Add deprecated methods for backwards compatibility
+    lua_classfunction(luaVM, "toggleObjectRespawn", "toggleObjectRespawn");
+
     lua_registerclass ( luaVM, "Object", "Element" );
 }
 
