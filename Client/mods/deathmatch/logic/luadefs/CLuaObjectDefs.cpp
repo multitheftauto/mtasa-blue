@@ -44,7 +44,7 @@ void CLuaObjectDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "stop", "stopObject" );
     lua_classfunction ( luaVM, "break", "breakObject" );
     lua_classfunction ( luaVM, "respawn", "respawnObject" );
-    lua_classfunction ( luaVM, "toggleObjectRespawn", "toggleObjectRespawn" );
+    lua_classfunction ( luaVM, "toggleRespawn", "toggleObjectRespawn" );
 
     lua_classfunction ( luaVM, "getScale", "getObjectScale" );
     lua_classfunction ( luaVM, "isBreakable", "isObjectBreakable" );
