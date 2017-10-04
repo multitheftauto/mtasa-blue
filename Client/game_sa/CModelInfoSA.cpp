@@ -936,6 +936,25 @@ void* CModelInfoSA::SetVehicleSuspensionData ( void* pSuspensionLines )
     return pOrigSuspensionLines;
 }
 
+
+CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
+{
+    if (!IsVehicle())
+        return CVector();
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    return pVehicleModel->pVisualInfo->exhaustPosition;
+}
+
+void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& position)
+{
+    if (!IsVehicle())
+        return;
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    pVehicleModel->pVisualInfo->exhaustPosition = position;
+}
+
 void CModelInfoSA::SetCustomModel ( RpClump* pClump )
 {
     // Error

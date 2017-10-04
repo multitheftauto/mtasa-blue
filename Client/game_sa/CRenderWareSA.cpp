@@ -375,18 +375,18 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
             if ( dwFunc == FUNC_LoadVehicleModel )
             {
                 CVehicleModelInfoSAInterface* pVehicleModelInfoInterface = (CVehicleModelInfoSAInterface*)pModelInfo->GetInterface ();
-                if ( pVehicleModelInfoInterface->pSomeInfo )
+                if ( pVehicleModelInfoInterface->pVisualInfo )
                 {
                     DWORD dwDeleteFunc = FUNC_CVehicleStructure_delete;
-                    CVehicleStructure* pSomeInfo = pVehicleModelInfoInterface->pSomeInfo;
+                    CVehicleModelVisualInfoSAInterface* info = pVehicleModelInfoInterface->pVisualInfo;
                     __asm
                     {
-                        mov     eax, pSomeInfo
+                        mov     eax, info
                         push    eax
                         call    dwDeleteFunc
                         add     esp, 4
                     }
-                    pVehicleModelInfoInterface->pSomeInfo = NULL;
+                    pVehicleModelInfoInterface->pVisualInfo = nullptr;
                 }
             }
 

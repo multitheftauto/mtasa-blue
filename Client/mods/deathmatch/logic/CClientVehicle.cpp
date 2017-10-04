@@ -4878,6 +4878,22 @@ bool CClientVehicle::DoesSupportUpgrade ( const SString& strFrameName )
     return true;
 }
 
+void CClientVehicle::SetModelExhaustPosition(unsigned short modelID, const CVector& position)
+{
+    auto pModelInfo = g_pGame->GetModelInfo(modelID);
+    if (pModelInfo)
+        pModelInfo->SetVehicleExhaustFumesPosition(position);
+}
+
+CVector CClientVehicle::GetModelExhaustPosition(unsigned short modelID)
+{
+    auto pModelInfo = g_pGame->GetModelInfo(modelID);
+    if (pModelInfo)
+        return pModelInfo->GetVehicleExhaustFumesPosition();
+
+    return CVector();
+}
+
 bool CClientVehicle::OnVehicleFallThroughMap ( )
 {
     // if we have fallen through the map a small number of times
