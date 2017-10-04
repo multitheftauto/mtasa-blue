@@ -127,6 +127,8 @@ void CLuaVehicleDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehiclePlateText", SetVehiclePlateText );
     CLuaCFunctions::AddFunction ( "setHeliBladeCollisionsEnabled", SetHeliBladeCollisionsEnabled );
     CLuaCFunctions::AddFunction ( "setVehicleWindowOpen", SetVehicleWindowOpen );
+    CLuaCFunctions::AddFunction("setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition);
+    CLuaCFunctions::AddFunction("getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition);
 }
 
 
@@ -3550,3 +3552,51 @@ int CLuaVehicleDefs::IsVehicleWindowOpen ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
+{
+    // bool setVehicleModelExhaustPosition(int modelID, float x, float y, float z)
+    unsigned short modelID; CVector position;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(modelID);
+    argStream.ReadVector3D(position);
+
+    if (!argStream.HasErrors())
+    {
+        CClientVehicle::SetModelExhaustFumesPosition(modelID, position);
+
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
+{
+    // bool getVehicleModelExhaustPosition(int modelID)
+    unsigned short modelID;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(modelID);
+
+    if (!argStream.HasErrors())
+    {
+        CVector position = CClientVehicle::GetModelExhaustFumesPosition(modelID);
+
+        lua_pushnumber(luaVM, position.fX);
+        lua_pushnumber(luaVM, position.fY);
+        lua_pushnumber(luaVM, position.fZ);
+        return 3;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+

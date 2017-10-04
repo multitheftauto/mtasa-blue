@@ -1250,17 +1250,20 @@ Return Value:
 }
 
 
-static SString HashBuffer ( char* pData, uint uiLength )
+//////////////////////////////////////////////////////////
+//
+// RelaunchAsAdmin
+//
+// Relaunch as admin if user agrees
+//
+//////////////////////////////////////////////////////////
+void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason)
 {
-    DWORD dwSum1 = 0;
-    DWORD dwSum2 = 0x1234;
-    for ( uint i = 0 ; i < uiLength ; i++ )
-    {
-        dwSum1 += pData[i];
-        dwSum2 += pData[i];
-        dwSum2 ^= ( dwSum2 << 2 ) + 0x93;
-    }
-    return SString ( "%08x%08x%08x", dwSum1, dwSum2, uiLength );
+    HideSplash();
+    AddReportLog(7115, SString("Loader - Request to elevate privilages (%s)", *strReason));
+    MessageBoxUTF8(NULL, SString ( _("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *strReason), "Multi Theft Auto: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+    ReleaseSingleInstanceMutex();
+    ShellExecuteNonBlocking("runas", PathJoin(GetMTASAPath(), MTA_EXE_NAME), strCmdLine);            
 }
 
 

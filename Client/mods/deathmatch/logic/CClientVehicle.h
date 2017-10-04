@@ -494,6 +494,9 @@ public:
 
     void                        SetHeliBladeCollisionsEnabled              ( bool bEnable )                    { m_bEnableHeliBladeCollisions = bEnable; }
 
+    static void                 SetModelExhaustFumesPosition(unsigned short modelID, const CVector& position);
+    static CVector              GetModelExhaustFumesPosition(unsigned short modelID);
+
     bool                        OnVehicleFallThroughMap                    ( );
 
 protected:

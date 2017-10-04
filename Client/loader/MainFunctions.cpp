@@ -1094,7 +1094,11 @@ int LaunchGame ( SString strCmdLine )
     SString strMtaDir = PathJoin( strMTASAPath, "mta" );
 
     SetDllDirectory( strMtaDir );
-    CheckService ( CHECK_SERVICE_PRE_CREATE );
+    if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())
+    {
+        RelaunchAsAdmin(strCmdLine, _("Fix configuration issue"));
+        ExitProcess(EXIT_OK);
+    }
 
     // Do some D3D things
     BeginD3DStuff();
@@ -1143,9 +1147,8 @@ int LaunchGame ( SString strCmdLine )
         if ( dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin )
         {
             // Try to relaunch as admin if not done so already
-            ReleaseSingleInstanceMutex ();
-            ShellExecuteNonBlocking( "runas", PathJoin ( strMTASAPath, MTA_EXE_NAME ), strCmdLine + " /done-admin" );            
-            return 5;
+            RelaunchAsAdmin(strCmdLine + " /done-admin", _("Fix elevation required error"));
+            ExitProcess(EXIT_OK);
         }
         else
         {
