@@ -127,8 +127,8 @@ void CLuaVehicleDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setVehiclePlateText", SetVehiclePlateText );
     CLuaCFunctions::AddFunction ( "setHeliBladeCollisionsEnabled", SetHeliBladeCollisionsEnabled );
     CLuaCFunctions::AddFunction ( "setVehicleWindowOpen", SetVehicleWindowOpen );
-    CLuaCFunctions::AddFunction("setVehicleModelExhaustPosition", SetVehicleModelExhaustPosition);
-    CLuaCFunctions::AddFunction("getVehicleModelExhaustPosition", GetVehicleModelExhaustPosition);
+    CLuaCFunctions::AddFunction("setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition);
+    CLuaCFunctions::AddFunction("getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition);
 }
 
 
@@ -3553,7 +3553,7 @@ int CLuaVehicleDefs::IsVehicleWindowOpen ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaVehicleDefs::SetVehicleModelExhaustPosition(lua_State* luaVM)
+int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
     // bool setVehicleModelExhaustPosition(int modelID, float x, float y, float z)
     unsigned short modelID; CVector position;
@@ -3564,7 +3564,7 @@ int CLuaVehicleDefs::SetVehicleModelExhaustPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CClientVehicle::SetModelExhaustPosition(modelID, position);
+        CClientVehicle::SetModelExhaustFumesPosition(modelID, position);
 
         lua_pushboolean(luaVM, true);
         return 1;
@@ -3576,9 +3576,9 @@ int CLuaVehicleDefs::SetVehicleModelExhaustPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::GetVehicleModelExhaustPosition(lua_State* luaVM)
+int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
-    // bool getVehicleModelExhaustPosition(int modelID, float x, float y, float z)
+    // bool getVehicleModelExhaustPosition(int modelID)
     unsigned short modelID;
 
     CScriptArgReader argStream(luaVM);
@@ -3586,7 +3586,7 @@ int CLuaVehicleDefs::GetVehicleModelExhaustPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CVector position = CClientVehicle::GetModelExhaustPosition(modelID);
+        CVector position = CClientVehicle::GetModelExhaustFumesPosition(modelID);
 
         lua_pushnumber(luaVM, position.fX);
         lua_pushnumber(luaVM, position.fY);
