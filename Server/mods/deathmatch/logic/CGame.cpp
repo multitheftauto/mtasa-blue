@@ -1655,7 +1655,11 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 strPlayerVersion = SStringX ( strPlayerVersionTemp );
             }
         #if MTASA_VERSION_TYPE < VERSION_TYPE_UNSTABLE
-            strPlayerVersion = Packet.GetPlayerVersion();
+            if (atoi(ExtractVersionStringBuildNumber(Packet.GetPlayerVersion())) != 0)
+            {
+                // Use player version from packet if it contains a valid build number
+                strPlayerVersion = Packet.GetPlayerVersion();
+            }
         #endif
 
             SString strIP = pPlayer->GetSourceIP ();
