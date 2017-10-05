@@ -503,7 +503,7 @@ bool CMainConfig::Load ( void )
 
     // auth_serial_groups
     SString strGroupList;
-    if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList, 1 ) != IS_SUCCESS )
+    if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList ) != IS_SUCCESS )
     {
         // If not defined in conf file, then default to Admin
         strGroupList = "Admin";
