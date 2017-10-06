@@ -58,7 +58,7 @@ public:
     static bool                 GetElementPosition                  ( CElement* pElement, CVector& vecPosition );
     static bool                 GetElementRotation                  ( CElement* pElement, CVector& vecRotation, eEulerRotationOrder rotationOrder );
     static bool                 GetElementVelocity                  ( CElement* pElement, CVector& vecVelocity );
-    static bool                 GetElementAngularVelocity           ( CElement* pElement, CVector& vecAngularVelocity );
+    static bool                 GetElementTurnVelocity              ( CElement* pElement, CVector& vecTurnVelocity );
     static bool                 GetElementInterior                  ( CElement* pElement, unsigned char& ucInterior );
     static bool                 IsElementWithinColShape             ( CElement* pElement, CColShape* pColShape, bool& bWithin );
     static bool                 IsElementWithinMarker               ( CElement* pElement, CMarker* pMarker, bool& bWithin );
@@ -90,7 +90,7 @@ public:
     static bool                 SetElementPosition                  ( CElement* pElement, const CVector& vecPosition, bool bWarp = true );
     static bool                 SetElementRotation                  ( CElement* pElement, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay );
     static bool                 SetElementVelocity                  ( CElement* pElement, const CVector& vecVelocity );
-    static bool                 SetElementAngularVelocity           ( CElement* pElement, const CVector& vecAngularVelocity );
+    static bool                 SetElementTurnVelocity              ( CElement* pElement, const CVector& vecTurnVelocity );
     static bool                 SetElementVisibleTo                 ( CElement* pElement, CElement* pReference, bool bVisible );
     static bool                 SetElementInterior                  ( CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
     static bool                 SetElementDimension                 ( CElement* pElement, unsigned short usDimension );
@@ -241,7 +241,7 @@ public:
     static CPed*                GetVehicleOccupant                  ( CVehicle* pVehicle, unsigned int uiSeat );
     static CPed*                GetVehicleController                ( CVehicle* pVehicle );
     static bool                 GetVehicleRotation                  ( CVehicle* pVehicle, CVector& vecRotation );
-    static bool                 GetVehicleAngularVelocity           ( CVehicle* pVehicle, CVector& vecAngularVelocity );
+    static bool                 GetVehicleTurnVelocity              ( CVehicle* pVehicle, CVector& vecTurnVelocity );
     static bool                 GetVehicleTurretPosition            ( CVehicle* pVehicle, CVector2D& vecPosition );
     static bool                 IsVehicleLocked                     ( CVehicle* pVehicle, bool& bLocked );
     static bool                 GetVehicleUpgradeOnSlot             ( CVehicle* pVehicle, unsigned char ucSlot, unsigned short& usUpgrade );
@@ -294,7 +294,7 @@ public:
     static bool                 SetVehicleRotation                  ( CElement* pElement, const CVector& vecRotation );
     static bool                 SetVehicleSirensOn                  ( CElement* pElement, bool bSirensOn );
     static bool                 SetVehicleTaxiLightOn               ( CElement* pElement, bool bTaxiLightState );
-    static bool                 SetVehicleAngularVelocity           ( CElement* pElement, const CVector& vecAngularVelocity );
+    static bool                 SetVehicleTurnVelocity              ( CElement* pElement, const CVector& vecTurnVelocity );
     static bool                 AddVehicleUpgrade                   ( CElement* pElement, unsigned short usUpgrade );
     static bool                 AddAllVehicleUpgrades               ( CElement* pElement );
     static bool                 RemoveVehicleUpgrade                ( CElement* pElement, unsigned short usUpgrade );

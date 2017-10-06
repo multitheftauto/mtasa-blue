@@ -529,7 +529,7 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CClientEntity& Entity, CVe
 }
 
 
-bool CStaticFunctionDefinitions::GetElementAngularVelocity ( CClientEntity& Entity, CVector& vecAngularVelocity )
+bool CStaticFunctionDefinitions::GetElementTurnVelocity ( CClientEntity& Entity, CVector& vecTurnVelocity )
 {
     int iType = Entity.GetType ();
     switch ( iType )
@@ -538,20 +538,20 @@ bool CStaticFunctionDefinitions::GetElementAngularVelocity ( CClientEntity& Enti
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-            Ped.GetTurnSpeed ( vecAngularVelocity );
+            Ped.GetTurnSpeed ( vecTurnVelocity );
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.GetTurnSpeed ( vecAngularVelocity );
+            Vehicle.GetTurnSpeed ( vecTurnVelocity );
             break;
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            Object.GetTurnSpeed ( vecAngularVelocity );
+            Object.GetTurnSpeed ( vecTurnVelocity );
             break;
         }
         default: return false;
@@ -1222,9 +1222,9 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CClientEntity& Entity, con
 }
 
 
-bool CStaticFunctionDefinitions::SetElementAngularVelocity ( CClientEntity& Entity, const CVector& vecAngularVelocity )
+bool CStaticFunctionDefinitions::SetElementTurnVelocity ( CClientEntity& Entity, const CVector& vecTurnVelocity )
 {
-    RUN_CHILDREN ( SetElementAngularVelocity ( **iter, vecAngularVelocity ) )
+    RUN_CHILDREN ( SetElementTurnVelocity ( **iter, vecTurnVelocity ) )
 
     int iType = Entity.GetType ();
     switch ( iType )
@@ -1233,20 +1233,20 @@ bool CStaticFunctionDefinitions::SetElementAngularVelocity ( CClientEntity& Enti
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-            Ped.SetTurnSpeed ( vecAngularVelocity );
+            Ped.SetTurnSpeed ( vecTurnVelocity );
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-            Vehicle.SetTurnSpeed ( vecAngularVelocity );
+            Vehicle.SetTurnSpeed ( vecTurnVelocity );
             break;
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast < CClientObject& > ( Entity );
-            Object.SetTurnSpeed ( vecAngularVelocity );
+            Object.SetTurnSpeed ( vecTurnVelocity );
             break;
         }
         default: return false;
@@ -2912,14 +2912,14 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn ( CClientEntity& Entity, boo
 }
 
 
-bool CStaticFunctionDefinitions::SetVehicleAngularVelocity ( CClientEntity& Entity, const CVector& vecAngularVelocity )
+bool CStaticFunctionDefinitions::SetVehicleTurnVelocity ( CClientEntity& Entity, const CVector& vecTurnVelocity )
 {
-    RUN_CHILDREN ( SetVehicleAngularVelocity ( **iter, vecAngularVelocity ) )
+    RUN_CHILDREN ( SetVehicleTurnVelocity ( **iter, vecTurnVelocity ) )
 
     if ( IS_VEHICLE ( &Entity ) )
     {
         CClientVehicle& Vehicle = static_cast < CClientVehicle& > ( Entity );
-        Vehicle.SetTurnSpeed ( vecAngularVelocity );
+        Vehicle.SetTurnSpeed ( vecTurnVelocity );
         return true;
     }
 

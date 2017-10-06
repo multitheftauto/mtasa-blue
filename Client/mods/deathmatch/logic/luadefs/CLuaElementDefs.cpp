@@ -25,7 +25,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementPosition", GetElementPosition );
     CLuaCFunctions::AddFunction ( "getElementRotation", GetElementRotation );
     CLuaCFunctions::AddFunction ( "getElementVelocity", GetElementVelocity );
-    CLuaCFunctions::AddFunction ( "getElementAngularVelocity", GetElementAngularVelocity );
+    CLuaCFunctions::AddFunction ( "getElementAngularVelocity", GetElementTurnVelocity );
     CLuaCFunctions::AddFunction ( "getElementType", GetElementType );
     CLuaCFunctions::AddFunction ( "getElementChildren", GetElementChildren );
     CLuaCFunctions::AddFunction ( "getElementChild", GetElementChild );
@@ -75,7 +75,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementPosition", SetElementPosition );
     CLuaCFunctions::AddFunction ( "setElementRotation", SetElementRotation );
     CLuaCFunctions::AddFunction ( "setElementVelocity", SetElementVelocity );
-    CLuaCFunctions::AddFunction ( "setElementAngularVelocity", SetElementAngularVelocity );
+    CLuaCFunctions::AddFunction ( "setElementAngularVelocity", SetElementTurnVelocity );
     CLuaCFunctions::AddFunction ( "setElementInterior", SetElementInterior );
     CLuaCFunctions::AddFunction ( "setElementDimension", SetElementDimension );
     CLuaCFunctions::AddFunction ( "attachElements", AttachElements );
@@ -136,7 +136,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getRotation", OOP_GetElementRotation );
     lua_classfunction ( luaVM, "getMatrix", OOP_GetElementMatrix );
     lua_classfunction ( luaVM, "getVelocity", OOP_GetElementVelocity );
-    lua_classfunction ( luaVM, "getAngularVelocity", OOP_GetElementAngularVelocity );
+    lua_classfunction ( luaVM, "getAngularVelocity", OOP_GetElementTurnVelocity );
     lua_classfunction ( luaVM, "getByType", "getElementsByType" );
     lua_classfunction ( luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "getElementDistanceFromCentreOfMassToBaseOfModel" );
     lua_classfunction ( luaVM, "getRadius", "getElementRadius" );
@@ -162,7 +162,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setRotation", OOP_SetElementRotation );
     lua_classfunction ( luaVM, "setMatrix", "setElementMatrix" );
     lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
-    lua_classfunction ( luaVM, "setAngularVelocity", "setElementAngularVelocity" );
+    lua_classfunction ( luaVM, "setAngularVelocity", "setElementTurnVelocity" );
     lua_classfunction ( luaVM, "setInterior", "setElementInterior" );
     lua_classfunction ( luaVM, "setDimension", "setElementDimension" );
     lua_classfunction ( luaVM, "setAlpha", "setElementAlpha" );
@@ -206,7 +206,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "rotation", OOP_SetElementRotation, OOP_GetElementRotation );
     lua_classvariable ( luaVM, "matrix", SetElementMatrix, OOP_GetElementMatrix );
     lua_classvariable ( luaVM, "velocity", SetElementVelocity, OOP_GetElementVelocity );
-    lua_classvariable ( luaVM, "turnVelocity", SetElementAngularVelocity, OOP_GetElementAngularVelocity );
+    lua_classvariable ( luaVM, "angularVelocity", SetElementTurnVelocity, OOP_GetElementTurnVelocity );
     lua_classvariable ( luaVM, "isElement", NULL, "isElement" );
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
@@ -619,7 +619,7 @@ int CLuaElementDefs::OOP_GetElementVelocity ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaElementDefs::GetElementAngularVelocity ( lua_State* luaVM )
+int CLuaElementDefs::GetElementTurnVelocity ( lua_State* luaVM )
 {
     // Verify the argument
     CClientEntity* pEntity = NULL;
@@ -629,13 +629,13 @@ int CLuaElementDefs::GetElementAngularVelocity ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         // Grab the turn velocity
-        CVector vecAngularVelocity;
-        if ( CStaticFunctionDefinitions::GetElementAngularVelocity ( *pEntity, vecAngularVelocity ) )
+        CVector vecTurnVelocity;
+        if ( CStaticFunctionDefinitions::GetElementTurnVelocity ( *pEntity, vecTurnVelocity ) )
         {
             // Return it
-            lua_pushnumber ( luaVM, vecAngularVelocity.fX );
-            lua_pushnumber ( luaVM, vecAngularVelocity.fY );
-            lua_pushnumber ( luaVM, vecAngularVelocity.fZ );
+            lua_pushnumber ( luaVM, vecTurnVelocity.fX );
+            lua_pushnumber ( luaVM, vecTurnVelocity.fY );
+            lua_pushnumber ( luaVM, vecTurnVelocity.fZ );
             return 3;
         }
     }
@@ -647,7 +647,7 @@ int CLuaElementDefs::GetElementAngularVelocity ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaElementDefs::OOP_GetElementAngularVelocity ( lua_State* luaVM )
+int CLuaElementDefs::OOP_GetElementTurnVelocity ( lua_State* luaVM )
 {
     CClientEntity* pEntity = NULL;
 
@@ -656,10 +656,10 @@ int CLuaElementDefs::OOP_GetElementAngularVelocity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CVector vecAngularVelocity;
-        CStaticFunctionDefinitions::GetElementAngularVelocity ( *pEntity, vecAngularVelocity );
+        CVector vecTurnVelocity;
+        CStaticFunctionDefinitions::GetElementTurnVelocity ( *pEntity, vecTurnVelocity );
 
-        lua_pushvector ( luaVM, vecAngularVelocity );
+        lua_pushvector ( luaVM, vecTurnVelocity );
         return 1;
     }
     else
@@ -1946,20 +1946,20 @@ int CLuaElementDefs::SetElementVelocity ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaElementDefs::SetElementAngularVelocity ( lua_State* luaVM )
+int CLuaElementDefs::SetElementTurnVelocity ( lua_State* luaVM )
 {
     CClientEntity* pEntity;
-    CVector vecAngularVelocity;
+    CVector vecTurnVelocity;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadVector3D ( vecAngularVelocity );
+    argStream.ReadVector3D ( vecTurnVelocity );
 
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
         // Set the turn velocity
-        if ( CStaticFunctionDefinitions::SetElementAngularVelocity ( *pEntity, vecAngularVelocity ) )
+        if ( CStaticFunctionDefinitions::SetElementTurnVelocity ( *pEntity, vecTurnVelocity ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
