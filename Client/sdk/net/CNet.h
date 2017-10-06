@@ -17,6 +17,8 @@
 #include "net/bitstream.h"
 #include "CNetHTTPDownloadManagerInterface.h"
 
+#define MAX_CALL_REMOTE_QUEUES  100
+
 namespace EDownloadMode
 {
     enum EDownloadModeType
@@ -24,12 +26,16 @@ namespace EDownloadMode
         NONE,
         CORE_ASE_LIST,
         CORE_UPDATER,
+        WEBBROWSER_LISTS,
+        CORE_LAST,                      // Download modes after this one will be reset on server disconnect
         RESOURCE_INITIAL_FILES_INTERNAL,
         RESOURCE_INITIAL_FILES_EXTERNAL,
         RESOURCE_SINGULAR_FILES,
-        CALL_REMOTE,
-        WEBBROWSER_LISTS,
         CONNECT_TCP_SEND,
+        CALL_REMOTE_RESTRICTED,
+        CALL_REMOTE_RESTRICTED_LAST = CALL_REMOTE_RESTRICTED + MAX_CALL_REMOTE_QUEUES - 1,
+        CALL_REMOTE_ANY_HOST,
+        CALL_REMOTE_ANY_HOST_LAST = CALL_REMOTE_ANY_HOST + MAX_CALL_REMOTE_QUEUES - 1,
     };
 }
 using EDownloadMode::EDownloadModeType;

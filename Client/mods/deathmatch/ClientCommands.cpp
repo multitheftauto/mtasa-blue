@@ -34,9 +34,6 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
     // Has the core already handled this command?
     if ( !bHandled )
     {
-        //char szBuffer [256];
-        CLuaArguments Arguments;
-
         const char* szCommandBufferPointer = szCommand;
 
         if ( !bHandleRemotely )
@@ -44,33 +41,6 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
             // Is the command "say" and the arguments start with '/' ? (command comes from the chatbox)
             if ( stricmp ( szCommand, "chatboxsay" ) == 0 )
             {
-                /* This code seems redundant, the chatbox now properly simulates commands.
-                // His line starts with '/'?
-                if ( *szArguments == '/' )
-                {
-                    // Copy the characters after the slash to the 0 terminator to a seperate buffer
-                    strncpy ( szBuffer, &szArguments [ 1 ], 256 );
-                    szBuffer [ 255 ] = 0;
-
-                    // Split it into command and arguments
-                    char* szNewCommand = strtok ( szBuffer, " " );
-                    char* szNewArguments = strtok ( NULL, "\0" );
-                    if ( szNewCommand )
-                    {
-                        // Execute it as another command
-                        if ( szNewArguments )
-                        {
-                            g_pCore->GetCommands ()->Execute ( szNewCommand, szNewArguments );
-                        }
-                        else
-                        {
-                            g_pCore->GetCommands ()->Execute ( szNewCommand, "" );
-                        }
-
-                        return true;
-                    }
-                }
-                */
                 szCommandBufferPointer = "say";
             }
         }
@@ -90,11 +60,21 @@ bool COMMAND_Executed ( const char* szCommand, const char* szArguments, bool bHa
         g_pClientGame->GetRegisteredCommands ()->ProcessCommand ( szCommandBufferPointer, szArguments );
 
         // Call the onClientConsole event
-        Arguments.PushString ( strClumpedCommand );
+        auto pLocalPlayer = g_pClientGame->GetLocalPlayer();
 
-        // Call the event on the local player's onClientConsole first
-        if ( g_pClientGame->GetLocalPlayer () )
-            g_pClientGame->GetLocalPlayer ()->CallEvent ( "onClientConsole", Arguments, true );
+        if ( pLocalPlayer ) {
+            CLuaArguments Arguments;
+
+            // Censor input for /login command
+            if ( !stricmp( szCommandBufferPointer, "login" ) ) {
+                Arguments.PushString( SString( "%s ***", szCommandBufferPointer ) ); 
+            }
+            else {
+                Arguments.PushString( strClumpedCommand );
+            }
+
+            pLocalPlayer->CallEvent( "onClientConsole", Arguments, true );
+        }
 
         // Write the chatlength and the content
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream ();

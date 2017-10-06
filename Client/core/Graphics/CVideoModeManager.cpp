@@ -52,6 +52,8 @@ private:
     bool                GameResMatchesCurrentAdapter ( void );
     SString             MakeResolutionString        ( uint uiWidth, uint uiHeight, uint uiDepth, uint uiAdapter );
 
+    void                UpdateMonitor               ();
+
     unsigned long       m_ulForceBackBufferWidth;
     unsigned long       m_ulForceBackBufferHeight;
     unsigned long       m_ulForceBackBufferColorDepth;
@@ -271,6 +273,9 @@ void CVideoModeManager::OnGainFocus ( void )
     }
     m_bPendingGainFocus = false;
 
+    // Update monitor info
+    UpdateMonitor();
+
     if ( IsDisplayModeFullScreenWindow() )
     {
         // Change only if needed
@@ -315,6 +320,9 @@ void CVideoModeManager::OnLoseFocus ( void )
 
     if ( m_ulForceBackBufferWidth == 0 )
         return;
+
+    // Update monitor info
+    UpdateMonitor();
 
     if ( IsDisplayModeFullScreenWindow() )
     {
@@ -647,6 +655,22 @@ SString CVideoModeManager::MakeResolutionString ( uint uiWidth, uint uiHeight, u
     if ( uiAdapter > 0 )
         strRes += SString( "x%d", uiAdapter );
     return strRes;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::UpdateMonitor
+//
+// Updates the stored monitor ref to match the monitor
+// with the largest intersection (in borderless window mode)
+//
+///////////////////////////////////////////////////////////////
+void CVideoModeManager::UpdateMonitor()
+{
+    if (IsDisplayModeFullScreenWindow())
+    {
+        m_hCurrentMonitor = MonitorFromWindow(m_hDeviceWindow, MONITOR_DEFAULTTONEAREST);
+    }
 }
 
 

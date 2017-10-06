@@ -13,6 +13,8 @@
 #ifndef __CREMOTECALLS_H
 #define __CREMOTECALLS_H
 #include "lua/CLuaArguments.h"
+#define CALL_REMOTE_DEFAULT_QUEUE_NAME  "default"
+
 /*
 This represents a single live remote call. Calls are live until the call returns 
 i.e. the http client has downloaded all the data returned
@@ -20,25 +22,25 @@ i.e. the http client has downloaded all the data returned
 class CRemoteCall
 {
 private:
-    std::string         m_strData;
-    bool                m_bPostBinary;
     bool                m_bIsFetch;
     class CLuaMain *    m_VM;
     CLuaFunctionRef     m_iFunction;
     SString             m_strURL;
-    uint                m_uiConnectionAttempts;
-    uint                m_uiConnectTimeoutMs;
+    SString             m_strQueueName;
     CLuaArguments       m_FetchArguments;
+    SHttpRequestOptions m_options; 
 
 public:
-                        CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
-                        CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
-                        CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
+                        CRemoteCall ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
+                        CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
+                        CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
+                        CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, const SHttpRequestOptions& options );
                         ~CRemoteCall ();
     void                MakeCall();
-    static void         DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode );
+    static void         DownloadFinishedCallback( const SHttpDownloadResult& result );
     CLuaMain *          GetVM() {return m_VM;};
     bool                IsFetch() {return m_bIsFetch;}
+    bool                IsLegacy() {return m_options.bIsLegacy;}
     CLuaArguments&      GetFetchArguments() {return m_FetchArguments;}
 };
 
@@ -51,15 +53,20 @@ class CRemoteCalls
 {
 private:
     std::list<CRemoteCall*> m_calls;
+    std::map<SString,uint> m_QueueIndexMap;
 public:
                         CRemoteCalls();
                         ~CRemoteCalls();
 
-    void                Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
-    void                Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
-    void                Call ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
+    void                Call ( const char * szServerHost, const char * szResourceName, const char * szFunctionName, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
+    void                Call ( const char * szURL, CLuaArguments * arguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
+    void                Call ( const char * szURL, CLuaArguments * fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs );
+    void                Call ( const char * szURL, CLuaArguments * fetchArguments, CLuaMain * luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName, const SHttpRequestOptions& options );
     void                Remove ( CLuaMain * luaMain );
     void                Remove ( CRemoteCall * call );
     bool                CallExists ( CRemoteCall * call );
+    void                ProcessQueuedFiles ( void );
+    EDownloadModeType   GetDownloadModeForQueueName( const SString& strQueueName, bool bAnyHost );
+    EDownloadModeType   GetDownloadModeFromQueueIndex( uint uiIndex, bool bAnyHost );
 };
 #endif

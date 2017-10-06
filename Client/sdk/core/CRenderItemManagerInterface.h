@@ -124,6 +124,7 @@ struct SDxStatus
         eAspectRatio    aspectRatio;
         bool            bHUDMatchAspectRatio;
         float           fFieldOfView;
+        bool            bHighDetailVehicles;
     } settings;
 };
 

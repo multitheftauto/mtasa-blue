@@ -150,7 +150,8 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_fTargetRotation = 0.0f;
     m_bTargetAkimboUp = false;
     m_bIsChoking = false;
-    m_ulLastTimeAimed = 0;
+    m_ulLastTimeBeganAiming = 0;
+    m_ulLastTimeEndedAiming = 0;
     m_ulLastTimeBeganCrouch = 0;
     m_ulLastTimeBeganStand = 0; //Standing after crouching
     m_ulLastTimeMovedWhileCrouched = 0; //Moved while crouching
@@ -286,6 +287,20 @@ CClientPed::~CClientPed ( void )
         g_pMultiplayer->RemoveRemoteDataStorage ( m_pPlayerPed );
         g_pMultiplayer->DestroyRemoteDataStorage ( m_remoteDataStorage );
         m_remoteDataStorage = NULL;
+
+        CClientVehicle * pVehicle = GetOccupiedVehicle ();
+        if ( m_pPlayerPed && pVehicle && GetOccupiedVehicleSeat () == 0 )
+        {
+            if ( g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == pVehicle )
+            {
+                CVehicle * pGameVehicle = pVehicle->GetGameVehicle ();
+                if ( pGameVehicle )
+                {
+                    // Driver from local player vehicle is being destroyed
+                    pGameVehicle->GetVehicleAudioEntity ()->JustGotOutOfVehicleAsDriver ();
+                }
+            }
+        }
     }
 
     // We have a player model?
@@ -1391,6 +1406,26 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     SetSunbathing ( false );
     KillAnimation ();
 
+    if ( m_pPlayerPed )
+    {
+        // Fall tasks
+        KillTask ( TASK_PRIORITY_EVENT_RESPONSE_TEMP );
+        // Swim tasks
+        KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
+        // Jump & vehicle enter/exit & custom animation tasks
+        KillTask ( TASK_PRIORITY_PRIMARY );
+
+        KillTaskSecondary ( TASK_SECONDARY_ATTACK );
+
+        // check we aren't in the fall and get up task
+        CTask * pTaskPhysicalResponse = m_pTaskManager->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+        // check our physical response task
+        if ( pTaskPhysicalResponse && strcmp ( pTaskPhysicalResponse->GetTaskName ( ), "TASK_COMPLEX_FALL_AND_GET_UP" ) == 0 )
+        {
+            m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
+        }
+    }
+
     // Eventually remove us from a previous vehicle
     RemoveFromVehicle ();
     //m_uiOccupyingSeat = uiSeat;
@@ -1419,6 +1454,12 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         {
             // Warp him in
             InternalWarpIntoVehicle ( pGameVehicle );
+
+            if ( m_bIsLocalPlayer || g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == pVehicle )
+            {
+                // Tell vehicle audio we have driver
+                pGameVehicle->GetVehicleAudioEntity ()->JustGotInVehicleAsDriver ();
+            }
         }
 
         // Update the vehicle and us so we know we've occupied it
@@ -1454,6 +1495,12 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
                         pInTask->SetIsWarpingPedIntoCar ();
                         pInTask->ProcessPed ( m_pPlayerPed );
                         pInTask->Destroy ();
+                    }
+
+                    if ( m_bIsLocalPlayer && pVehicle->IsDriven () )
+                    {
+                        // Tell vehicle audio we have driver
+                        pGameVehicle->GetVehicleAudioEntity ()->JustGotInVehicleAsDriver ();
                     }
                 }
             }
@@ -1524,6 +1571,17 @@ CClientVehicle * CClientPed::RemoveFromVehicle ( bool bSkipWarpIfGettingOut )
         CVehicle* pGameVehicle = pVehicle->m_pVehicle;
         if ( pGameVehicle )
         {
+            // Did he really was in vehicle and is there driver?
+            if ( pVehicle != m_pOccupyingVehicle && pVehicle->GetOccupant () )
+            {
+                // Local player left vehicle or got abandoned by remote driver
+                if ( ( m_bIsLocalPlayer || ( m_uiOccupiedVehicleSeat == 0 && g_pClientGame->GetLocalPlayer ()->GetOccupiedVehicle () == pVehicle ) ) )
+                {
+                    // Tell vehicle audio the driver left
+                    pGameVehicle->GetVehicleAudioEntity ()->JustGotOutOfVehicleAsDriver ();
+                }
+            }
+
             // If vehicle was deleted during exit, don't skip warp. Fixes player getting stuck and going invisible.
             if ( pVehicle->IsBeingDeleted() )
                 bSkipWarpIfGettingOut = false;
@@ -1870,6 +1928,10 @@ void CClientPed::Kill ( eWeaponType weaponType, unsigned char ucBodypart, bool b
     // Stop pressing buttons
     SetControllerState ( CControllerState () );
 
+    // Remove goggles #9477
+    if ( IsWearingGoggles ( ) )
+        SetWearingGoggles ( false, false );
+
     m_bDead = true;
 }
 
@@ -2089,6 +2151,8 @@ bool CClientPed::SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )
                     // Don't allow doing gang driveby while unarmed
                     if ( IsDoingGangDriveby () )
                         SetDoingGangDriveby ( false );
+                    m_CurrentWeaponSlot = weaponSlot;
+                    return true;
                 }
                 else
                 {
@@ -2151,6 +2215,22 @@ CWeapon* CClientPed::GetWeapon ( void )
     return NULL;
 }
 
+eWeaponType CClientPed::GetWeaponType(eWeaponSlot slot)
+{
+    if ( slot >= WEAPONSLOT_MAX )
+        return WEAPONTYPE_UNARMED;
+
+    if ( m_pPlayerPed )
+    {
+        CWeapon* pWeapon = GetWeapon(slot);
+        if ( pWeapon )
+        {
+            return pWeapon->GetType();
+        }
+        return WEAPONTYPE_UNARMED;
+    }
+    return m_WeaponTypes[slot];
+}
 
 void CClientPed::RemoveWeapon ( eWeaponType weaponType )
 {
@@ -2253,6 +2333,49 @@ bool CClientPed::HasWeapon ( eWeaponType weaponType )
 
     return false;
 }
+
+
+//
+// Check and attempt to fix weapons for remote players
+//
+void CClientPed::ValidateRemoteWeapons( void )
+{
+    // Must be streamed in remote player
+    if( !m_pPlayerPed || IsLocalPlayer() || GetType() != CCLIENTPLAYER )
+        return;
+
+    // Check everything matches
+    bool bMismatch = false;
+    for ( uint i = 0; i < WEAPONSLOT_MAX; i++ )
+    {
+        eWeaponType slotWeaponType = GetWeaponType((eWeaponSlot)i);
+        if ( m_WeaponTypes[i] != slotWeaponType )
+        {
+            SString strPlayerName = ((CClientPlayer*)this)->GetNick();
+            AddReportLog(5430, SString( "Mismatch in slot %d  Wanted type:%d  Got type:%d (%s)", i, m_WeaponTypes[i], slotWeaponType, *strPlayerName ), 30);
+            bMismatch = true;
+        }
+    }
+
+    if ( !bMismatch )
+    {
+        // All fine. Save current slot
+        m_CurrentWeaponSlot = m_pPlayerPed->GetCurrentWeaponSlot();
+        return;
+    }
+
+    // Fix wrongness
+    for ( uint i = 0; i < WEAPONSLOT_MAX; i++ )
+    {
+        if ( m_WeaponTypes[i] != WEAPONTYPE_UNARMED )
+        {
+            bool bSetAsCurrent = (i == m_CurrentWeaponSlot);
+            GiveWeapon(m_WeaponTypes[i], m_usWeaponAmmo[i], bSetAsCurrent);
+        }
+    }
+    m_pPlayerPed->SetCurrentWeaponSlot(m_CurrentWeaponSlot);
+}
+
 
 eMovementState CClientPed::GetMovementState ( void )
 {
@@ -2781,13 +2904,15 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
             m_RestoreWeaponList.pop_front();
 
             // Give our Weapon back after deleting to reload the model
-            CWeapon * pWeapon = GiveWeapon ( item.eWeaponID, item.dwAmmo );
+            CWeapon * pWeapon = GiveWeapon ( item.eWeaponID, item.dwAmmo, item.bCurrentWeapon );
 
             // Reset our states
             pWeapon->SetAmmoInClip ( item.dwClipAmmo );
             if ( item.bCurrentWeapon )
                 pWeapon->SetAsCurrentWeapon ( );
         }
+
+        ValidateRemoteWeapons();
     }
 }
 
@@ -2864,10 +2989,9 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
     CTask* pTask = m_pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
     if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
     {
-        if ( m_ulLastTimeAimed == 0 )
-        {
-            m_ulLastTimeAimed = ulNow;
-        }
+        if ( m_ulLastTimeBeganAiming == 0 )
+            m_ulLastTimeBeganAiming = ulNow;
+        
         if ( m_ulLastTimeBeganStand >= ulNow - 200.0f*fSpeedRatio )
         {
             if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_FASTMOVE ) )
@@ -2886,12 +3010,21 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
         if ( !g_pClientGame->IsGlitchEnabled ( CClientGame::GLITCH_CROUCHBUG ) )
         {
             if ( Current.RightShoulder1 == 0 && Current.LeftShoulder1 == 0 && Current.ButtonCircle == 0 )
+            {
                 Current.ShockButtonL = 0;
+                // The above checks can be dodged by pressing one of the keys quickly enough, so use a hard
+                // timer as well.
+                m_ulLastTimeEndedAiming = ulNow;
+            }
+            // We carry on blocking the crouch key for 600ms after someone has ended aiming
+            else if ( m_ulLastTimeEndedAiming != 0 && m_ulLastTimeEndedAiming >= ulNow - 600.0f*fSpeedRatio ) {
+                Current.ShockButtonL = 0;
+            }
         }
     }
     else
     {
-        m_ulLastTimeAimed = 0;
+        m_ulLastTimeBeganAiming = 0;
         // If we have the aim button pressed but aren't aiming, we're probably sprinting
         // If we're sprinting with an MP5,Deagle,Fire Extinguisher,Spray can, we shouldnt be able to shoot 
         // These weapons are weapons you can run with, but can't run with while aiming
@@ -2913,7 +3046,7 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
         if ( m_ulLastTimeBeganCrouch == 0 )
             m_ulLastTimeBeganCrouch = ulNow;
             // No longer aiming if we're in the process of crouching
-            m_ulLastTimeAimed = 0;
+            m_ulLastTimeBeganAiming = 0;
     }
     else
     {
@@ -2949,8 +3082,8 @@ void CClientPed::ApplyControllerStateFixes ( CControllerState& Current )
         }
     }
     // If we just started aiming, make sure they dont try and crouch
-    else if ( (m_ulLastTimeAimed != 0 &&
-              m_ulLastTimeAimed >= ulNow - 300.0f*fSpeedRatio) || 
+    else if ( (m_ulLastTimeBeganAiming != 0 &&
+              m_ulLastTimeBeganAiming >= ulNow - 300.0f*fSpeedRatio) || 
               (ulNow - m_ulLastTimeFired) <= 300.0f*fSpeedRatio )
     {
         if ( !g_pClientGame->IsGlitchEnabled (  CClientGame::GLITCH_FASTFIRE ) )
@@ -3431,11 +3564,7 @@ void CClientPed::UpdateKeysync ( bool bCleanup )
                                     CWeapon* pSlotWeapon = GetWeapon ( eCurrentSlot );
                                     if ( pSlotWeapon )
                                     {
-                                        pPlayerWeapon = GiveWeapon ( pSlotWeapon->GetType (), pData->usWeaponAmmo );
-                                        if ( pPlayerWeapon )
-                                        {
-                                            pPlayerWeapon->SetAsCurrentWeapon ();
-                                        }
+                                        pPlayerWeapon = GiveWeapon ( pSlotWeapon->GetType (), pData->usWeaponAmmo, true );
                                     }
                                 }
 
@@ -4075,17 +4204,6 @@ void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
 {
     if ( m_pPlayerPed )
     {
-        // Reset whatever task
-        m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
-
-        // check we aren't in the fall and get up task
-        CTask * pTaskPhysicalResponse = m_pTaskManager->GetTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-        // check our physical response task
-        if ( pTaskPhysicalResponse && strcmp ( pTaskPhysicalResponse->GetTaskName ( ), "TASK_COMPLEX_FALL_AND_GET_UP" ) == 0 )
-        {
-            m_pTaskManager->RemoveTask ( TASK_PRIORITY_PHYSICAL_RESPONSE );
-        }
-
         // Create a task to warp the player in and execute it
         CTaskSimpleCarSetPedInAsDriver* pInTask = g_pGame->GetTasks ()->CreateTaskSimpleCarSetPedInAsDriver ( pGameVehicle );
         if ( pInTask )
@@ -4095,9 +4213,10 @@ void CClientPed::InternalWarpIntoVehicle ( CVehicle* pGameVehicle )
             pInTask->Destroy ();
         }        
 
-        // If we're a remote player, make sure we can't fall off
+        // If we're a remote player
         if ( !m_bIsLocalPlayer )
         {
+            // Make sure we can't fall off
             SetCanBeKnockedOffBike ( false );
         }
 
@@ -4300,7 +4419,7 @@ bool CClientPed::IsChoking ( void )
 }
 
 
-void CClientPed::SetWearingGoggles ( bool bWearing )
+void CClientPed::SetWearingGoggles ( bool bWearing, bool animationEnabled )
 {
     if ( m_pPlayerPed )
     {
@@ -4310,10 +4429,13 @@ void CClientPed::SetWearingGoggles ( bool bWearing )
             m_pPlayerPed->SetGogglesState ( bWearing );
 
             // Are our goggle anims loaded?
-            CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( "GOGGLES" );
-            if ( pBlock->IsLoaded () )
+            if (animationEnabled)
             {
-                BlendAnimation ( ANIM_GROUP_GOGGLES, ANIM_ID_GOGGLES_ON, 4.0f );
+                CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock("GOGGLES");
+                if (pBlock->IsLoaded())
+                {
+                    BlendAnimation(ANIM_GROUP_GOGGLES, ANIM_ID_GOGGLES_ON, 4.0f);
+                }
             }
         }
     }
@@ -6133,12 +6255,12 @@ void CClientPed::HandleWaitingForGroundToLoad ( void )
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         OutputDebugLine ( SStringX ( "[AsyncLoading] " ) ++ status );
-        g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
+        g_pCore->GetGraphics ()->DrawString ( 10, 220, -1, 1, status );
 
         std::vector < SString > lineList;
         strAround.Split ( "\n", lineList );
         for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
-            g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
+            g_pCore->GetGraphics ()->DrawString ( 10, 230 + i * 10, -1, 1, lineList[i] );
     #endif
 }
 

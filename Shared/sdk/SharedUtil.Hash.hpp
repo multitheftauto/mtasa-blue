@@ -12,6 +12,16 @@
 
 #include "sha1.hpp"
 #include "sha2.hpp"
+#include <random>
+#include <algorithm>
+
+namespace bcrypt
+{
+    extern "C"
+    {
+        #include <bcrypt/ow-crypt.h>
+    }
+}
 
 namespace SharedUtil
 {
@@ -479,6 +489,44 @@ namespace SharedUtil
         return c;
     }
 
+#ifdef SDK_WITH_BCRYPT
+    constexpr const std::size_t HashBufferSize = 60 + 1;
+	SString BcryptHash(const SString& password, SString salt, std::size_t cost)
+	{
+        if (salt.empty())
+        {
+            std::random_device random;
+            std::mt19937 generator(random());
+
+            char saltBuffer[32];
+            std::generate_n(saltBuffer, sizeof(saltBuffer), generator);
+
+            char saltBase64Buffer[30];
+            bcrypt::crypt_gensalt_rn("$2y$", cost, saltBuffer, sizeof(saltBuffer), saltBase64Buffer, sizeof(saltBase64Buffer));
+            salt = SStringX(saltBase64Buffer);
+        }
+        else
+        {
+            salt = SString("$2y$%02u$%s", cost, salt.substr(0, 22).c_str());
+        }
+
+        if (salt.size() != 29)
+            return "";
+
+        char hashBuffer[HashBufferSize];
+        bcrypt::crypt_rn(password.c_str(), salt.c_str(), hashBuffer, sizeof(hashBuffer));
+
+        return SStringX(hashBuffer);
+	}
+
+	bool BcryptVerify(const SString& password, const SString& hash)
+	{
+        char checkedHashBuffer[HashBufferSize];
+        bcrypt::crypt_rn(password.c_str(), hash.c_str(), checkedHashBuffer, sizeof(checkedHashBuffer));
+
+        return strcmp(checkedHashBuffer, hash.c_str()) == 0;
+	}
+#endif
 
     SString ConvertDataToHexString( const void* pData, uint uiLength )
     {

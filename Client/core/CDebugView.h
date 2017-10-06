@@ -28,6 +28,10 @@ public:
 
     void        Draw                    ( bool bUseCacheTexture );
     void        Output                  ( const char* szText, bool bColorCoded );
+
+protected:
+    // Debug view doesn't support position changes unlike chat box
+    void        UpdatePosition          ( void ) { };
 };
 
 #endif

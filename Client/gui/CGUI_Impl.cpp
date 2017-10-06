@@ -67,7 +67,7 @@ CGUI_Impl::CGUI_Impl ( IDirect3DDevice9* pDevice )
     SetDefaultGuiWorkingDirectory ( CalcMTASAPath ( "MTA" ) );
 
     // Set logging to Informative for debug and Standard for release
-#if _DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
     CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Informative );
 #else
     CEGUI::Logger::getSingleton().setLoggingLevel ( CEGUI::Standard );
@@ -543,6 +543,34 @@ float CGUI_Impl::GetCurrentServerCursorAlpha ( void )
 }
 
 
+eCursorType CGUI_Impl::GetCursorType ( void )
+{
+    auto image = CEGUI::MouseCursor::getSingleton ( ).getImage ( );
+
+    if ( image == nullptr )
+        return CURSORTYPE_NONE;
+
+    auto imageName = image->getName ( );
+
+    if ( !imageName.compare ( "MouseArrow" ) )
+        return CURSORTYPE_DEFAULT;
+    else if ( !imageName.compare ( "NSSizingCursorImage" ) )
+        return CURSORTYPE_SIZING_NS;
+    else if ( !imageName.compare ( "EWSizingCursorImage" ) )
+        return CURSORTYPE_SIZING_EW;
+    else if ( !imageName.compare ( "NWSESizingCursorImage" ) )
+        return CURSORTYPE_SIZING_NWSE;
+    else if ( !imageName.compare ( "NESWSizingCursorImage" ) )
+        return CURSORTYPE_SIZING_NESW;
+    else if ( !imageName.compare ( "MouseEsWeCursor" ) )
+        return CURSORTYPE_SIZING_ESWE;
+    else if ( !imageName.compare ( "MouseMoveCursor" ) )
+        return CURSORTYPE_MOVE;
+    else
+        return CURSORTYPE_DEFAULT;
+}
+
+
 void CGUI_Impl::AddChild ( CGUIElement_Impl* pChild )
 {
     m_pTop->addChildWindow ( pChild->GetWindow () );
@@ -864,12 +892,18 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
                                 CloseClipboard();
                                 return true;
                             }
-                            strEditText = WndEdit->getText ();
+
+                            strEditText = WndEdit->getText();
                             iSelectionStart = WndEdit->getSelectionStartIndex ();
                             iSelectionLength = WndEdit->getSelectionLength();
                             iMaxLength = WndEdit->getMaxTextLength();
                             iCaratIndex = WndEdit->getCaratIndex();
                             bReplaceNewLines = false;
+
+                            // Plus one character, because there is always an extra '\n' in
+                            // MultiLineEditbox's text data and it causes MaxLength limit to 
+                            // be exceeded during pasting the text
+                            iMaxLength += 1;
                         }
 
                         std::wstring strClipboardText = ClipboardBuffer;
@@ -901,7 +935,7 @@ bool CGUI_Impl::Event_KeyDown ( const CEGUI::EventArgs& Args )
 
                         // Put the editbox's data into a string and insert the data if it has not reached it's maximum text length
                         std::wstring tmp = MbUTF8ToUTF16(strEditText.c_str());
-                        if ( ( strClipboardText.length () + tmp.length () ) < iMaxLength )
+                        if ( ( strClipboardText.length () + tmp.length () - iSelectionLength ) <= iMaxLength )
                         {
                             // Are there characters selected?
                             size_t sizeCaratIndex = 0;

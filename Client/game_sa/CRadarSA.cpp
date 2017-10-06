@@ -196,7 +196,7 @@ VOID CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const
     {
         push    eax
 
-        push    0
+        push    1           //bool
         lea     eax, abgr
         push    eax
         lea     eax, myRect

@@ -11,10 +11,10 @@
 #include <stdio.h>
 #include "shellapi.h"
 #include <Wscapi.h>
-
 #include <shlobj.h>
 #include <Psapi.h>
 #include <time.h>
+#include <fstream>
 
 #include "..\sdk\core\CLocalizationInterface.h"
 extern CLocalizationInterface* g_pLocalization;

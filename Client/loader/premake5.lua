@@ -42,9 +42,6 @@ project "Loader"
 			"loader.rc",
 			"resource/splash.bmp"
 		}
-
-	filter {"system:windows", "toolset:*120*"}
-		links { "Psapi.lib" }
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 

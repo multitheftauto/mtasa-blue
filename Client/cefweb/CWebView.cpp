@@ -53,11 +53,9 @@ void CWebView::Initialise ()
     CefBrowserSettings browserSettings;
     browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit ();
     browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
-    browserSettings.caret_browsing = cef_state_t::STATE_ENABLED;
     browserSettings.universal_access_from_file_urls = cef_state_t::STATE_DISABLED; // Also filtered by resource interceptor, but set this nevertheless
     browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
-    browserSettings.javascript_open_windows = cef_state_t::STATE_DISABLED;
 
     browserSettings.plugins = cef_state_t::STATE_DISABLED;
     if ( !m_bIsLocal )
@@ -66,8 +64,12 @@ void CWebView::Initialise ()
         browserSettings.javascript = bEnabledJavascript ? cef_state_t::STATE_ENABLED : cef_state_t::STATE_DISABLED;
     }
 
+    // Set background color to opaque white if transparency is disabled
+    if (!m_bIsTransparent)
+        browserSettings.background_color = 0xffffffff;
+
     CefWindowInfo windowInfo;
-    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow (), m_bIsTransparent );
+    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow () );
 
     CefBrowserHost::CreateBrowser ( windowInfo, this, "", browserSettings, nullptr );
 }
@@ -94,7 +96,7 @@ bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled, const SStri
         return false; // Invalid URL
 
     // Are we allowed to browse this website?
-    if ( bFilterEnabled && g_pCore->GetWebCore ()->GetURLState ( UTF16ToMbUTF8 ( urlParts.host.str ), true ) != eURLState::WEBPAGE_ALLOWED )
+    if ( bFilterEnabled && g_pCore->GetWebCore ()->GetDomainState ( UTF16ToMbUTF8 ( urlParts.host.str ), true ) != eURLState::WEBPAGE_ALLOWED )
         return false;
 
     // Load it!
@@ -761,7 +763,7 @@ bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFram
         SString host = UTF16ToMbUTF8 ( urlParts.host.str );
         if ( host != "mta" )
         {
-            if ( IsLocal () || g_pCore->GetWebCore ()->GetURLState ( host, true ) != eURLState::WEBPAGE_ALLOWED )
+            if ( IsLocal () || g_pCore->GetWebCore ()->GetDomainState ( host, true ) != eURLState::WEBPAGE_ALLOWED )
                 bResult = true; // Block remote here
             else
                 bResult = false; // Allow
@@ -827,7 +829,7 @@ CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBro
             if ( IsLocal () )
                 return RV_CANCEL; // Block remote requests in local mode generally
 
-            eURLState urlState = g_pCore->GetWebCore ()->GetURLState ( domain, true );
+            eURLState urlState = g_pCore->GetWebCore ()->GetDomainState ( domain, true );
             if ( urlState != eURLState::WEBPAGE_ALLOWED )
             {
                 // Trigger onClientBrowserResourceBlocked event

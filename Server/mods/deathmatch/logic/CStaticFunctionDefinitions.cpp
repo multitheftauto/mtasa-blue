@@ -4299,6 +4299,7 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CElement* pElement )
                 Arguments.PushElement ( pVehicle );        // vehicle
                 Arguments.PushNumber ( ucOccupiedSeat );    // seat
                 Arguments.PushBoolean ( false );            // jacker
+                Arguments.PushBoolean ( true );             // forcedByScript
                 pPlayer->CallEvent ( "onPlayerVehicleExit", Arguments );
 
                 // Call the vehicle->player event
@@ -4306,6 +4307,7 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle ( CElement* pElement )
                 Arguments2.PushElement ( pPlayer );         // player
                 Arguments2.PushNumber ( ucOccupiedSeat );    // seat
                 Arguments2.PushBoolean ( false );            // jacker
+                Arguments2.PushBoolean ( true );              // forcedByScript
                 pVehicle->CallEvent ( "onVehicleExit", Arguments2 );
             }
              // Remove him from the vehicle
@@ -8361,6 +8363,44 @@ bool CStaticFunctionDefinitions::StopObject ( CElement* pElement )
     return false;
 }
 
+
+bool CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions ( CElement* pElement, bool bVisible, unsigned short usNewDimension )
+{
+    RUN_CHILDREN ( SetObjectVisibleInAllDimensions ( *iter, bVisible, usNewDimension ) )
+
+    if ( IS_OBJECT ( pElement ) )
+    {
+        CObject* pObject = static_cast < CObject* > ( pElement );
+
+        pObject->SetVisibleInAllDimensions ( bVisible );
+
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteBit ( bVisible );
+        BitStream.pBitStream->Write ( usNewDimension );
+        m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_OBJECT_VISIBLE_IN_ALL_DIMENSIONS, *BitStream.pBitStream ) );
+
+        // As setObjectVisibleInAllDimensions already takes care of setting the client-side dimension we need to update it here too
+        if ( !bVisible )
+            pObject->SetDimension ( usNewDimension );
+
+        return true;
+    }
+
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions ( CElement* pElement )
+{
+    if ( IS_OBJECT ( pElement ) )
+    {
+        CObject* pObject = static_cast < CObject* > ( pElement );
+
+        return pObject->IsVisibleInAllDimensions();
+    }
+
+    return false;
+}
 
 CRadarArea* CStaticFunctionDefinitions::CreateRadarArea ( CResource* pResource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color, CElement* pVisibleTo )
 {

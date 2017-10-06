@@ -272,6 +272,11 @@ public:
     void                    NotifyRenderingGrass            ( bool bIsRenderingGrass );
     bool                    IsRenderingGrass                ( void )                { return m_bIsRenderingGrass; }
     bool                    GetRightSizeTxdEnabled          ( void );
+    const char*             GetProductRegistryPath          ( void )                { return SharedUtil::GetProductRegistryPath(); }
+    const char*             GetProductCommonDataDir         ( void )                { return SharedUtil::GetProductCommonDataDir(); }
+    const char*             GetProductVersion               ( void )                { return SharedUtil::GetProductVersion(); }
+    void                    SetFakeLagCommandEnabled        ( bool bEnabled )       { m_bFakeLagCommandEnabled = bEnabled; }
+    bool                    IsFakeLagCommandEnabled         ( void )                { return m_bFakeLagCommandEnabled; }
 
 private:
     // Core devices.
@@ -360,6 +365,7 @@ private:
     SString                     m_strDummyProgressType;
     bool                        m_bDummyProgressUpdateAlways;
     bool                        m_bIsRenderingGrass;
+    bool                        m_bFakeLagCommandEnabled;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

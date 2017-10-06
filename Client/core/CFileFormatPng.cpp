@@ -128,7 +128,7 @@ void ReadDataFromInputStream(png_structp png_ptr, png_bytep outBytes, png_size_t
 // png to XRGB
 //
 ///////////////////////////////////////////////////////////////
-bool PngDecode ( const void* pData, uint uiDataSize, CBuffer& outBuffer, uint& uiOutWidth, uint& uiOutHeight )
+bool PngDecode ( const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& uiOutWidth, uint& uiOutHeight )
 {
     CBuffer inBuffer ( pData, uiDataSize );
     CBufferReadStream stream ( inBuffer );
@@ -189,21 +189,25 @@ bool PngDecode ( const void* pData, uint uiDataSize, CBuffer& outBuffer, uint& u
     ///////////////////////////////////////////////////
     uiOutWidth = width;
     uiOutHeight = height;
-    outBuffer.SetSize ( width * height * 4 );
 
-    switch(colorType)
+    if ( pOutBuffer )
     {
-       case PNG_COLOR_TYPE_RGB:
-          ParseRGB(outBuffer, png_ptr, info_ptr, width, height);
-          break;
+        pOutBuffer->SetSize ( width * height * 4 );
 
-       case PNG_COLOR_TYPE_RGB_ALPHA:
-          ParseRGBA(outBuffer, png_ptr, info_ptr, width, height);
-          break;
+        switch(colorType)
+        {
+           case PNG_COLOR_TYPE_RGB:
+              ParseRGB(*pOutBuffer, png_ptr, info_ptr, width, height);
+              break;
 
-       default:
-          png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-          return false;
+           case PNG_COLOR_TYPE_RGB_ALPHA:
+              ParseRGBA(*pOutBuffer, png_ptr, info_ptr, width, height);
+              break;
+
+           default:
+              png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+              return false;
+        }
     }
 
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
@@ -278,11 +282,10 @@ bool PngEncode ( uint uiWidth, uint uiHeight, const void* pData, uint uiDataSize
 //
 // PngGetDimensions
 //
-// This needs optimizing
+//
 //
 ///////////////////////////////////////////////////////////////
 bool PngGetDimensions ( const void* pData, uint uiDataSize, uint& uiOutWidth, uint& uiOutHeight )
 {
-    CBuffer temp;
-    return PngDecode ( pData, uiDataSize, temp, uiOutWidth, uiOutHeight );
+    return PngDecode ( pData, uiDataSize, nullptr, uiOutWidth, uiOutHeight );
 }

@@ -23,6 +23,7 @@
 #include "CCVarsInterface.h"
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
+#include "CChatInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -33,13 +34,6 @@ class CNet;
 class CGame;
 class CModelCacheManager;
 class CLocalizationInterface;
-
-namespace ChatFonts
-{
-    enum eChatFont { CHAT_FONT_DEFAULT,CHAT_FONT_CLEAR,CHAT_FONT_BOLD,CHAT_FONT_ARIAL,CHAT_FONT_MAX };
-}
-
-using ChatFonts::eChatFont;
 
 enum eCoreVersion
 {
@@ -172,6 +166,10 @@ public:
     virtual bool                    GetRequiredDisplayResolution    ( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions ) = 0;
     virtual void                    NotifyRenderingGrass            ( bool bIsRenderingGrass ) = 0;
     virtual bool                    GetRightSizeTxdEnabled          ( void ) = 0;
+    virtual const char*             GetProductRegistryPath          ( void ) = 0;
+    virtual const char*             GetProductCommonDataDir         ( void ) = 0;
+    virtual const char*             GetProductVersion               ( void ) = 0;
+    virtual void                    SetFakeLagCommandEnabled        ( bool bEnabled ) = 0;
 };
 
 class CClientTime

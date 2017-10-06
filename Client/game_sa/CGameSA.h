@@ -87,6 +87,10 @@
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
+#define PROP_RANDOM_FOLIAGE         "randomfoliage"
+#define PROP_SNIPER_MOON            "snipermoon"
+#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
+
 struct SCheatSA {
     BYTE*   m_byAddress; //Cheat Address
     bool    m_bEnabled; //Cheat State
@@ -131,6 +135,7 @@ public:
     inline CTheCarGenerators        * GetTheCarGenerators()     { DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");return m_pTheCarGenerators; };
     inline CAERadioTrackManager     * GetAERadioTrackManager()  { DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");return m_pCAERadioTrackManager; };
     inline CAudioEngine             * GetAudioEngine()          { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
+    inline CAEAudioHardware         * GetAEAudioHardware()      { DEBUG_TRACE("CAEAudioHardware     * GetAEAudioHardware()");return m_pAEAudioHardware; };
     inline CAudioEngine             * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
     inline CAudioContainer          * GetAudioContainer()       { DEBUG_TRACE("CAudio     * GetAudioContainer()");return m_pAudioContainer; };
     inline CMenuManager             * GetMenuManager()          { DEBUG_TRACE("CMenuManager         * GetMenuManager()");return m_pMenuManager; };
@@ -213,6 +218,15 @@ public:
     bool                    SetCheatEnabled         ( const char* szCheatName, bool bEnable );
     void                    ResetCheats             ();
 
+    bool                    IsRandomFoliageEnabled  ();
+    void                    SetRandomFoliageEnabled ( bool bEnable );
+
+    bool                    IsMoonEasterEggEnabled  ();
+    void                    SetMoonEasterEggEnabled ( bool bEnabled );
+
+    bool                    IsExtraAirResistanceEnabled  ();
+    void                    SetExtraAirResistanceEnabled ( bool bEnable );
+
     bool                    VerifySADataFileNames   ();
     bool                    PerformChecks           ();
     int&                    GetCheckStatus          ( void )            { return m_iCheckStatus; }
@@ -283,6 +297,7 @@ private:
     CTheCarGenerators           * m_pTheCarGenerators;
     CAERadioTrackManager        * m_pCAERadioTrackManager;
     CAudioEngine                * m_pAudioEngine;
+    CAEAudioHardware            * m_pAEAudioHardware;
     CAudioContainer             * m_pAudioContainer;
     CMenuManager                * m_pMenuManager;
     CText                       * m_pText;

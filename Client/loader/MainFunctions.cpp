@@ -388,16 +388,28 @@ void HandleNotUsedMainMenu ( void )
         }
     }
 
-    // Check if Evolve is active
-    for ( auto processId : MyEnumProcesses( true ) )
+    // Check if problem processes are active
+    struct
     {
-        SString strFilename = ExtractFilename( GetProcessPathFilename( processId ) );
-        if ( strFilename.BeginsWithI( "Evolve" ) )
+        const char* szFilename;
+        const char* szProductName;
+        const char* szTrouble;
+    } procItems[] = {
+        {"Evolve", "Evolve", "not-used-menu-evolve"},
+        {"GbpSv.exe", "GAS Tecnologia - G-Buster Browser Defense", "not-used-menu-gbpsv"}};
+    for (uint i = 0; i < NUMELMS(procItems); i++ )
+    {
+        for ( auto processId : MyEnumProcesses( true ) )
         {
-            SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
-            strMessage += "\n\nEvolve";
-            DisplayErrorMessageBox ( strMessage, _E("CL43"), "not-used-menu-evolve" );
-            break;
+            SString strFilename = GetProcessFilename( processId );
+            if ( strFilename.BeginsWithI( procItems[i].szFilename ) )
+            {
+                SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
+                strMessage += "\n\n";
+                strMessage += procItems[i].szProductName;
+                DisplayErrorMessageBox ( strMessage, _E("CL43"), procItems[i].szTrouble );
+                break;
+            }
         }
     }
 }
@@ -566,6 +578,7 @@ void HandleIfGTAIsAlreadyRunning( void )
     {
         if ( MessageBoxUTF8 ( 0, _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"), _("Information")+_E("CL10"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
         {
+            TerminateOtherMTAIfRunning();
             TerminateGTAIfRunning ();
             if ( IsGTARunning () )
             {
@@ -1081,7 +1094,11 @@ int LaunchGame ( SString strCmdLine )
     SString strMtaDir = PathJoin( strMTASAPath, "mta" );
 
     SetDllDirectory( strMtaDir );
-    CheckService ( CHECK_SERVICE_PRE_CREATE );
+    if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())
+    {
+        RelaunchAsAdmin(strCmdLine, _("Fix configuration issue"));
+        ExitProcess(EXIT_OK);
+    }
 
     // Do some D3D things
     BeginD3DStuff();
@@ -1130,9 +1147,8 @@ int LaunchGame ( SString strCmdLine )
         if ( dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin )
         {
             // Try to relaunch as admin if not done so already
-            ReleaseSingleInstanceMutex ();
-            ShellExecuteNonBlocking( "runas", PathJoin ( strMTASAPath, MTA_EXE_NAME ), strCmdLine + " /done-admin" );            
-            return 5;
+            RelaunchAsAdmin(strCmdLine + " /done-admin", _("Fix elevation required error"));
+            ExitProcess(EXIT_OK);
         }
         else
         {

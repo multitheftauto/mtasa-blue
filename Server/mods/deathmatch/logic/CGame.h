@@ -266,6 +266,7 @@ public:
     inline CCustomWeaponManager*    GetCustomWeaponManager      ( void )        { return m_pCustomWeaponManager; }
     inline CFunctionUseLogger*      GetFunctionUseLogger        ( void )        { return m_pFunctionUseLogger; }
     inline CMasterServerAnnouncer*  GetMasterServerAnnouncer    ( void )        { return m_pMasterServerAnnouncer; }
+    inline SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler(void )        { return m_pAsyncTaskScheduler; }
 
     void                        JoinPlayer                  ( CPlayer& Player );
     void                        InitialDataStream           ( CPlayer& Player );
@@ -403,6 +404,10 @@ public:
     bool                        IsBelowMinimumClient            ( const SString& strVersion );
     bool                        IsBelowRecommendedClient        ( const SString& strVersion );
     void                        ApplyAseSetting             ( void );
+    bool                        IsUsingMtaServerConf            ( void ) { return m_bUsingMtaServerConf; }
+
+    inline void                 SetDevelopmentMode          (bool enabled)  { m_DevelopmentModeEnabled = enabled; }
+    inline bool                 GetDevelopmentMode          ()              { return m_DevelopmentModeEnabled; }
 
 private:
     void                        AddBuiltInEvents            ( void );
@@ -516,6 +521,7 @@ private:
     float                       m_fAircraftMaxVelocity;
     float                       m_fAircraftMaxVelocity_Sq;
     bool                        m_bOcclusionsEnabled;
+    bool                        m_bUsingMtaServerConf;
 
     unsigned char               m_ucTrafficLightState;
     bool                        m_bTrafficLightsLocked;
@@ -588,6 +594,10 @@ private:
     SString                     m_strPrevMinClientKickRequirement;
     SString                     m_strPrevMinClientConnectRequirement;
     SString                     m_strPrevLowestConnectedPlayerVersion;
+
+    SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
+
+    bool                        m_DevelopmentModeEnabled;
 };
 
 #endif

@@ -665,7 +665,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
                 // Log info
                 OutputDebugString ( SString ( "Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex, i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols ) );
                 // Assert in debug
-                #if _DEBUG
+                #if MTA_DEBUG
                     assert ( pEntity->vtbl->DeleteRwObject == 0x00534030 );
                 #endif
                 pSectorEntry = (DWORD *)pSectorEntry [ 1 ];
@@ -934,6 +934,25 @@ void* CModelInfoSA::SetVehicleSuspensionData ( void* pSuspensionLines )
     void* pOrigSuspensionLines = pColData->pSuspensionLines;
     pColData->pSuspensionLines = pSuspensionLines;
     return pOrigSuspensionLines;
+}
+
+
+CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
+{
+    if (!IsVehicle())
+        return CVector();
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    return pVehicleModel->pVisualInfo->exhaustPosition;
+}
+
+void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& position)
+{
+    if (!IsVehicle())
+        return;
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    pVehicleModel->pVisualInfo->exhaustPosition = position;
 }
 
 void CModelInfoSA::SetCustomModel ( RpClump* pClump )

@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -246,7 +246,8 @@
 /* Define to 1 if you have the IoctlSocket camel case function. */
 /* #undef HAVE_IOCTLSOCKET_CAMEL */
 
-/* Define to 1 if you have a working IoctlSocket camel case FIONBIO function. */
+/* Define to 1 if you have a working IoctlSocket camel case FIONBIO
+   function. */
 /* #undef HAVE_IOCTLSOCKET_CAMEL_FIONBIO */
 
 /* Define to 1 if you have the <io.h> header file. */
@@ -436,9 +437,6 @@
 /* Define to 1 if you have the `socket' function. */
 #define HAVE_SOCKET 1
 
-/* Define this if you have the SPNEGO library fbopenssl */
-/* #undef HAVE_SPNEGO */
-
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
 #define HAVE_SSL_H 1
@@ -581,7 +579,8 @@
 #define PACKAGE "curl"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "a suitable curl mailing list => http://curl.haxx.se/mail/"
+#define PACKAGE_BUGREPORT \
+  "a suitable curl mailing list => https://curl.haxx.se/mail/"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "curl"
@@ -647,7 +646,7 @@
 /* #undef USE_OPENSSL */
 
 /* if SSL is enabled */
-/* #undef USE_SSLEAY */
+/* #undef USE_OPENSSL */
 
 /* to enable SSPI support */
 /* #undef USE_WINDOWS_SSPI */

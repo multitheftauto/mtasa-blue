@@ -375,12 +375,12 @@ SString SharedUtil::GetSystemTempPath ( void )
 
 SString SharedUtil::GetMTADataPath ( void )
 {
-    return PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", GetMajorVersionString () );
+    return PathJoin ( GetSystemCommonAppDataPath(), GetProductCommonDataDir(), GetMajorVersionString () );
 }
 
 SString SharedUtil::GetMTADataPathCommon ( void )
 {
-    return PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", "Common" );
+    return PathJoin ( GetSystemCommonAppDataPath(), GetProductCommonDataDir(), "Common" );
 }
 
 SString SharedUtil::GetMTATempPath ( void )
@@ -661,10 +661,11 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
     DIR *Dir;
     struct dirent *DirEntry;
 
-    // Remove any filename matching characters
-    SString strSearchDirectory = PathJoin( strMatch.SplitLeft( "/", NULL, -1 ), "/" );
+    // Extract any filename matching characters
+    SString strFileMatch;
+    SString strSearchDirectory = PathJoin( PathConform( strMatch ).SplitLeft( "/", &strFileMatch, -1 ), "/" );
 
-    if ( ( Dir = opendir ( strMatch ) ) )
+    if ( ( Dir = opendir ( strSearchDirectory ) ) )
     {
         while ( ( DirEntry = readdir ( Dir ) ) != NULL )
         {
@@ -674,7 +675,13 @@ std::vector < SString > SharedUtil::FindFiles ( const SString& strMatch, bool bF
                 struct stat Info;
                 bool bIsDir = false;
 
-                SString strPath = PathJoin ( strMatch, DirEntry->d_name );
+                // Do wildcard matching if required
+                if ( !strFileMatch.empty() && !WildcardMatch( strFileMatch, DirEntry->d_name ) )
+                {
+                    continue;
+                }
+
+                SString strPath = PathJoin ( strSearchDirectory, DirEntry->d_name );
 
                 // Determine the file stats
                 if ( lstat ( strPath, &Info ) != -1 )

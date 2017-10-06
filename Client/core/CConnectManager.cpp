@@ -89,6 +89,10 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     // Save the nick too
     CVARS_SET ( "nick", std::string ( szNick ) );
 
+    // Reset fake lag
+    CCore::GetSingleton().SetFakeLagCommandEnabled( false );
+    pNet->SetFakeLag( 0, 0, 0, 0 );
+
     // Reset the network
     pNet->Reset ();
     assert ( pNet->GetServerBitStreamVersion () == 0 );
@@ -142,7 +146,7 @@ bool CConnectManager::Connect ( const char* szHost, unsigned short usPort, const
     m_pServerItem = new CServerListItem ( m_Address, m_usPort );
     m_pServerItem->m_iTimeoutLength = 2000;
     m_bIsDetectingVersion = true;
-    OpenServerFirewall( m_Address, 80, true );
+    OpenServerFirewall( m_Address, CServerBrowser::GetSingletonPtr()->FindServerHttpPort(m_strHost, m_usPort), true );
 
     // Display the status box
     SString strBuffer ( _("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort );
@@ -462,14 +466,12 @@ void CConnectManager::OnServerExists ( void )
 //
 void CConnectManager::OpenServerFirewall( in_addr Address, ushort usHttpPort, bool bHighPriority )
 {
-    if ( usHttpPort == 0 )
-        usHttpPort = 80;
-
     uint uiTimeOut;
     if ( bHighPriority )
     {
         // Clear previously queued requests if this is high priority
         g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CONNECT_TCP_SEND )->Reset();
+        g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CONNECT_TCP_SEND )->SetMaxConnections(2);
         uiTimeOut = 2000;
     }
     else
@@ -477,6 +479,16 @@ void CConnectManager::OpenServerFirewall( in_addr Address, ushort usHttpPort, bo
         uiTimeOut = 1000;
     }
 
-    SString strDummyUrl( "http://%s:%d/mta_client_firewall_probe/", inet_ntoa( Address ), usHttpPort );
-    g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CONNECT_TCP_SEND )->QueueFile( strDummyUrl, NULL, 0, "", 0, true, NULL, NULL, false, 1, uiTimeOut );
+    if ( usHttpPort )
+    {
+        // Send to server http port if known
+        SString strDummyUrl( "http://%s:%d/mta_client_firewall_probe/", inet_ntoa( Address ), usHttpPort );
+        g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CONNECT_TCP_SEND )->QueueFile( strDummyUrl, NULL, "", 0, true, NULL, NULL, false, 1, uiTimeOut );
+    }
+    if ( usHttpPort == 0 || bHighPriority )
+    {
+        // Send to standard http port
+        SString strDummyUrl( "http://%s/mta_client_firewall_probe/", inet_ntoa( Address ) );
+        g_pCore->GetNetwork()->GetHTTPDownloadManager( EDownloadMode::CONNECT_TCP_SEND )->QueueFile( strDummyUrl, NULL, "", 0, true, NULL, NULL, false, 1, uiTimeOut );
+    }
 }

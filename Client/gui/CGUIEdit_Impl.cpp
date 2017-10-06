@@ -35,6 +35,8 @@ CGUIEdit_Impl::CGUIEdit_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent, const char
     // Register our event
     m_pWindow->subscribeEvent ( CEGUI::Editbox::EventKeyDown, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnKeyDown, this ) );
     m_pWindow->subscribeEvent ( CEGUI::Editbox::EventTextChanged, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnTextChanged, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Editbox::EventRenderingEnded, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnRenderingEnded, this ) );
+    m_pWindow->subscribeEvent ( CEGUI::Editbox::EventRenderingStarted, CEGUI::Event::Subscriber ( &CGUIEdit_Impl::Event_OnRenderingStarted, this ) );
     AddEvents ();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the pManager
@@ -165,6 +167,18 @@ void CGUIEdit_Impl::SetTextChangedHandler ( GUI_CALLBACK Callback )
 }
 
 
+void CGUIEdit_Impl::SetRenderingEndedHandler ( GUI_CALLBACK Callback )
+{
+    m_OnRenderingEnded = Callback;
+}
+
+
+void CGUIEdit_Impl::SetRenderingStartedHandler ( GUI_CALLBACK Callback )
+{
+    m_OnRenderingStarted = Callback;
+}
+
+
 bool CGUIEdit_Impl::ActivateOnTab ( void )
 {
     // Only select this as active if its visible and writable
@@ -182,6 +196,22 @@ bool CGUIEdit_Impl::Event_OnTextChanged ( const CEGUI::EventArgs& e )
 {
     if ( m_OnTextChanged )
         m_OnTextChanged ( reinterpret_cast < CGUIElement* > ( this ) );
+    return true;
+}
+
+
+bool CGUIEdit_Impl::Event_OnRenderingEnded ( const CEGUI::EventArgs& e )
+{
+    if ( m_OnRenderingEnded )
+        m_OnRenderingEnded ( reinterpret_cast < CGUIElement* > ( this ) );
+    return true;
+}
+
+
+bool CGUIEdit_Impl::Event_OnRenderingStarted ( const CEGUI::EventArgs& e )
+{
+    if ( m_OnRenderingStarted )
+        m_OnRenderingStarted ( reinterpret_cast < CGUIElement* > ( this ) );
     return true;
 }
 

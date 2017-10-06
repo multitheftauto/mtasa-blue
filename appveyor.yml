@@ -1,15 +1,20 @@
 version: ci-{build}
-os: Visual Studio 2015
+os: Visual Studio 2017
 
 configuration:
   - Release
 
 before_build:
+  - choco install curl
+  - curl -o utils/DXFiles.zip https://mirror.mtasa.com/bdata/DXFiles.zip
+  - 7z e utils/DXFiles.zip -outils/DXFiles -spf
+  - set DXSDK_DIR=%CD%\utils\DXFiles\
+  - echo Using DXSDK_DIR %DXSDK_DIR%
   - utils\premake5 install_cef
-  - utils\premake5 vs2015
+  - utils\premake5 vs2017
+  - utils\premake5 install_data
 
 after_build:
-  - utils\premake5 install_data
   - utils\premake5 compose_files
   - 7z a InstallFiles.zip InstallFiles
   - cmd: if "%APPVEYOR_PULL_REQUEST_TITLE%" == "" if "%APPVEYOR_REPO_TAG%" == "false" curl -i -F "branch_name=%APPVEYOR_REPO_BRANCH%" -F "commit_hash=%APPVEYOR_REPO_COMMIT%" -F "commit_title=%APPVEYOR_REPO_COMMIT_MESSAGE%" -F build_type=windows32 -F "secret=%UPLOAD_SECRET%" -F build_upload=@InstallFiles.zip https://nightlytest.mtasa.com/api/upload

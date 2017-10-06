@@ -293,29 +293,6 @@ int CLuaFunctionDefs::GetKeyState ( lua_State * luaVM )
     return 1;
 }
 
-
-int CLuaFunctionDefs::GetControlState ( lua_State * luaVM )
-{
-    SString strControlState = "";
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strControlState );
-
-    if ( !argStream.HasErrors ( ) )
-    {
-        bool bState;
-        if ( CStaticFunctionDefinitions::GetControlState ( strControlState , bState ) )
-        {
-            lua_pushboolean ( luaVM, bState );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 int CLuaFunctionDefs::GetAnalogControlState ( lua_State * luaVM )
 {
     SString strControlState = "";
@@ -636,7 +613,7 @@ int CLuaFunctionDefs::GetCommandsBoundToKey ( lua_State* luaVM )
                         if ( strcmp ( strKey, pCommandBind->boundKey->szKey ) == 0 )
                         {
                             lua_pushstring ( luaVM, pCommandBind->szCommand );
-                            lua_pushstring ( luaVM, ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' ) ? pCommandBind->szArguments : "" );
+                            lua_pushstring ( luaVM, ( pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' && pCommandBind->bScriptCreated ) ? pCommandBind->szArguments : "" );
                             lua_settable ( luaVM, -3 );
                         }
                     }
@@ -693,31 +670,6 @@ int CLuaFunctionDefs::GetKeyBoundToCommand ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
-
-
-int CLuaFunctionDefs::SetControlState ( lua_State * luaVM )
-{
-    SString strControl = "";
-    bool bState = false;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strControl );
-    argStream.ReadBool ( bState );
-
-    if ( !argStream.HasErrors ( ) )
-    {
-        if ( CStaticFunctionDefinitions::SetControlState ( strControl, bState ) )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
-    lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
 
 int CLuaFunctionDefs::ToggleControl ( lua_State * luaVM )
 {

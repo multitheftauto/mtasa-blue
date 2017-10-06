@@ -194,7 +194,7 @@ namespace SharedUtil
     public:
         CPerModuleTickCount ( void )
         {
-    #ifdef _DEBUG
+    #ifdef MTA_DEBUG
             m_TimeSinceUpdated.SetMaxIncrement ( 500 );
     #endif
             m_ResultValue.Initialize ( GetTickCount64_ () );
@@ -202,7 +202,7 @@ namespace SharedUtil
 
         long long Get ( void )
         {
-    #ifdef _DEBUG
+    #ifdef MTA_DEBUG
             if ( m_TimeSinceUpdated.Get () > 10000 )
             {
                 m_TimeSinceUpdated.Reset ();
@@ -214,7 +214,7 @@ namespace SharedUtil
 
         void Update ( void )
         {
-    #ifdef _DEBUG
+    #ifdef MTA_DEBUG
             m_TimeSinceUpdated.Reset ();
     #endif
             m_ResultValue.SetValue ( GetTickCount64_ () );
@@ -222,7 +222,7 @@ namespace SharedUtil
     
     protected:
         CThreadResultValue < long long > m_ResultValue;
-    #ifdef _DEBUG
+    #ifdef MTA_DEBUG
         CElapsedTime    m_TimeSinceUpdated;
     #endif
     };

@@ -37,10 +37,6 @@ namespace SharedUtil
     void SetCommonRegistryValue ( const SString& strPath, const SString& strName, const SString& strValue );
     SString GetCommonRegistryValue ( const SString& strPath, const SString& strName );
 
-    // Get/set registry values for particular version using the old (HKCU) layout
-    void SetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName, const SString& strValue );
-    SString GetVersionRegistryValueLegacy ( const SString& strVersion, const SString& strPath, const SString& strName );
-
 
     bool ShellExecuteBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
     bool ShellExecuteNonBlocking ( const SString& strAction, const SString& strFile, const SString& strParameters = "", const SString& strDirectory = "", int nShowCmd = 1 );
@@ -122,6 +118,13 @@ namespace SharedUtil
     bool            WatchDogWasLastRunCrash         ( void );
     void            WatchDogSetLastRunCrash         ( bool bOn );
     void            WatchDogUserDidInteractWithMenu ( void );
+
+    void            SetProductRegistryPath          ( const SString& strRegistryPath );
+    const SString&  GetProductRegistryPath          ( void );
+    void            SetProductCommonDataDir         ( const SString& strCommonDataDir );
+    const SString&  GetProductCommonDataDir         ( void );
+    void            SetProductVersion               ( const SString& strVersion );
+    const SString&  GetProductVersion               ( void );
 
     // BrowseToSolution flags
     enum
@@ -1285,11 +1288,12 @@ namespace SharedUtil
     //
     enum eDummy { };
 
+    template<class T>
     struct CEnumInfo
     {
         struct SEnumItem
         {
-            int iValue;
+            T iValue;
             const char* szName;
         };
 
@@ -1343,16 +1347,17 @@ namespace SharedUtil
     };
 
 
-    #define DECLARE_ENUM( T ) \
-        CEnumInfo*             GetEnumInfo     ( const T& ); \
+    #define DECLARE_ENUM2(T, U) \
+        CEnumInfo<U>*          GetEnumInfo     ( const T& ); \
         inline const SString&  EnumToString    ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->FindName    ( (eDummy)value ); }\
         inline bool            StringToEnum    ( const SString& strName, T& outResult )     { return GetEnumInfo ( *(T*)0 )->FindValue   ( strName, (eDummy&)outResult ); }\
         inline const SString&  GetEnumTypeName ( const T& )                                 { return GetEnumInfo ( *(T*)0 )->GetTypeName (); }\
         inline bool            EnumValueValid  ( const T& value )                           { return GetEnumInfo ( *(T*)0 )->ValueValid  ( (eDummy)value ); }\
 
-    #define IMPLEMENT_ENUM_BEGIN(cls) \
-        CEnumInfo* GetEnumInfo( const cls& ) \
+    #define IMPLEMENT_ENUM_BEGIN2(T, U) \
+        CEnumInfo<U>* GetEnumInfo( const T& ) \
         { \
+            using CEnumInfo = CEnumInfo<U>; \
             static const CEnumInfo::SEnumItem items[] = {
 
     #define IMPLEMENT_ENUM_END(name) \
@@ -1366,6 +1371,16 @@ namespace SharedUtil
 
     #define ADD_ENUM(value,name) {value, name},
     #define ADD_ENUM1(value)     {value, #value},
+
+    // enum
+    #define DECLARE_ENUM(T)                                             DECLARE_ENUM2(T, int)
+    #define IMPLEMENT_ENUM_BEGIN(T)                                     IMPLEMENT_ENUM_BEGIN2(T, int)
+
+    // enum class
+    #define DECLARE_ENUM_CLASS(T)                                       DECLARE_ENUM2(T, T)
+    #define IMPLEMENT_ENUM_CLASS_BEGIN(T)                               IMPLEMENT_ENUM_BEGIN2(T, T)
+    #define IMPLEMENT_ENUM_CLASS_END(name)                              IMPLEMENT_ENUM_END(name)
+    #define IMPLEMENT_ENUM_CLASS_END_DEFAULTS(name,defvalue,defname)    IMPLEMENT_ENUM_END_DEFAULTS(name,defvalue,defname)
 
 
     //
@@ -1447,6 +1462,37 @@ namespace SharedUtil
         wild++;
       }
       return !*wild;
+    }
+
+
+    ///////////////////////////////////////////////////////////////
+    //
+    // ReadTokenSeparatedList
+    //
+    // Split token separated values into an array.
+    // Removes leading/trailing spaces and empty items
+    //
+    ///////////////////////////////////////////////////////////////
+    inline
+    void ReadTokenSeparatedList(const SString& strDelim, const SString& strInput, std::vector<SString>& outList)
+    {
+        strInput.Split(strDelim, outList);
+        // Remove surrounding spaces for each item
+        for ( auto iter = outList.begin(); iter != outList.end(); )
+        {
+            SString& strItem = *iter;
+            strItem = strItem.TrimEnd(" ").TrimStart(" ");
+            if ( strItem.empty() )
+                iter = outList.erase(iter);
+            else
+                ++iter;
+        }
+    }
+
+    inline
+    void ReadCommaSeparatedList(const SString& strInput, std::vector<SString>& outList)
+    {
+        return ReadTokenSeparatedList(",", strInput, outList);
     }
 
 

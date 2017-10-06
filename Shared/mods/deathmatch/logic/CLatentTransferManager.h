@@ -99,7 +99,7 @@ struct SSendStatus
     int     iStartTimeMsOffset;     // Est. start time (Negative if already started)
     int     iEndTimeMsOffset;       // Est. end time 
     int     iTotalSize;
-    int     iPercentComplete;       // How much done
+    double  dPercentComplete;       // How much done
 };
 
 

@@ -433,7 +433,8 @@ int CLuaFunctionDefs::AddDebugHook ( lua_State* luaVM )
     CScriptArgReader argStream( luaVM );
     argStream.ReadEnumString( hookType );
     argStream.ReadFunction( callBack );
-    argStream.ReadStringTable( allowedNames, true );
+    if ( argStream.NextIsTable() )
+        argStream.ReadStringTable( allowedNames );
     argStream.ReadFunctionComplete ();
 
     if ( !argStream.HasErrors() )

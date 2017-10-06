@@ -25,6 +25,8 @@ typedef void ( InRenderer ) ( void );
 #include "CAnimBlock.h"
 #include "CAnimManager.h"
 #include "CAudioEngine.h"
+#include "CAEAudioHardware.h"
+#include "CAEVehicleAudioEntity.h"
 #include "CAudioContainer.h"
 #include "CCam.h"
 #include "CCamera.h"
@@ -136,6 +138,7 @@ public:
     virtual CPad                * GetPad()=0;
     virtual CAERadioTrackManager* GetAERadioTrackManager()=0;
     virtual CAudioEngine        * GetAudioEngine()=0;
+    virtual CAEAudioHardware    * GetAEAudioHardware()=0;
     virtual CAudioEngine        * GetAudio()=0;
     virtual CAudioContainer     * GetAudioContainer()=0;
     virtual CMenuManager        * GetMenuManager()=0;
@@ -209,6 +212,12 @@ public:
     virtual bool                IsCheatEnabled              ( const char* szCheatName ) = 0;
     virtual bool                SetCheatEnabled             ( const char* szCheatName, bool bEnable ) = 0;
     virtual void                ResetCheats                 () = 0;
+
+    virtual bool                IsRandomFoliageEnabled      () = 0;
+    virtual void                SetRandomFoliageEnabled     ( bool bEnable ) = 0;
+
+    virtual bool                IsMoonEasterEggEnabled      () = 0;
+    virtual void                SetMoonEasterEggEnabled     ( bool bEnable ) = 0;
 
     virtual CWeapon *           CreateWeapon                ( void ) = 0;
     virtual CWeaponStat *       CreateWeaponStat            ( eWeaponType weaponType, eWeaponSkill weaponSkill ) = 0;

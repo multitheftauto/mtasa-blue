@@ -9,13 +9,12 @@
 *
 *****************************************************************************/
 
+#pragma once
+
 class CGUI;
 
-#ifndef __CGUI_H
-#define __CGUI_H
-
+#include "CGUIEnumDefs.h"
 #include "CGUIElement.h"
-
 #include "CGUIButton.h"
 #include "CGUICallback.h"
 #include "CGUICheckBox.h"
@@ -45,35 +44,6 @@ class CGUI;
 #define CGUI_ICON_MESSAGEBOX_ERROR      "cgui\\images\\error.png"
 #define CGUI_ICON_SERVER_PASSWORD       "cgui\\images\\locked.png"
 #define CGUI_GetMaxTextExtent(...) GetMaxTextExtent(__VA_ARGS__, SString())
-
-// Message box types
-enum CMessageBoxFlag
-{
-    MB_BUTTON_NONE = 0,
-    MB_BUTTON_OK = 1,
-    MB_BUTTON_CANCEL = 2,
-    MB_BUTTON_YES = 4,
-    MB_BUTTON_NO = 8,
-    MB_ICON_INFO = 16,
-    MB_ICON_QUESTION = 32,
-    MB_ICON_WARNING = 64,
-    MB_ICON_ERROR = 128,
-};
-
-// Input handler switcher
-enum eInputChannel
-{ 
-    INPUT_CORE = 0,
-    INPUT_MOD = 1,
-    INPUT_CHANNEL_COUNT = 2,
-};
-
-enum eInputMode
-{
-    INPUTMODE_ALLOW_BINDS = 0,
-    INPUTMODE_NO_BINDS = 1,
-    INPUTMODE_NO_BINDS_ON_EDIT = 2,
-};
 
 #define CHECK_CHANNEL(channel) assert ( channel >= 0 && channel < INPUT_CHANNEL_COUNT )
 
@@ -158,6 +128,7 @@ public:
     virtual bool                IsCursorEnabled         ( void ) = 0;
     virtual void                SetCursorAlpha          ( float fAlpha, bool bOnlyCurrentServer = false ) = 0;
     virtual float               GetCurrentServerCursorAlpha ( void ) = 0;
+    virtual eCursorType         GetCursorType           ( void ) = 0;
 
     virtual CVector2D           GetResolution           ( void ) = 0;
     virtual void                SetResolution           ( float fWidth, float fHeight ) = 0;
@@ -202,5 +173,3 @@ public:
     virtual CGUIWindow*         LoadLayout                  ( CGUIElement* pParent, const SString& strFilename ) = 0;
     virtual bool                LoadImageset                ( const SString& strFilename ) = 0;
 };
-
-#endif

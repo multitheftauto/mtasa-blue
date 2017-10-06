@@ -232,11 +232,8 @@ int CLuaElementDefs::IsElement ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
-        {
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
 
     // Failed
@@ -253,18 +250,13 @@ int CLuaElementDefs::GetElementID ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Get its ID and return it
+        const SString& strName = pEntity->GetName ();
+        if ( strName.length () > 0 )
         {
-            // Get its ID and return it
-            const SString& strName = pEntity->GetName ();
-            if ( strName.length () > 0 )
-            {
-                lua_pushstring ( luaVM, strName );
-                return 1;
-            }
+            lua_pushstring ( luaVM, strName );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -479,21 +471,16 @@ int CLuaElementDefs::GetElementPosition ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab the position
+        CVector vecPosition;
+        if ( CStaticFunctionDefinitions::GetElementPosition ( *pEntity, vecPosition ) )
         {
-            // Grab the position
-            CVector vecPosition;
-            if ( CStaticFunctionDefinitions::GetElementPosition ( *pEntity, vecPosition ) )
-            {
-                // Return it
-                lua_pushnumber ( luaVM, vecPosition.fX );
-                lua_pushnumber ( luaVM, vecPosition.fY );
-                lua_pushnumber ( luaVM, vecPosition.fZ );
-                return 3;
-            }
+            // Return it
+            lua_pushnumber ( luaVM, vecPosition.fX );
+            lua_pushnumber ( luaVM, vecPosition.fY );
+            lua_pushnumber ( luaVM, vecPosition.fZ );
+            return 3;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -537,21 +524,16 @@ int CLuaElementDefs::GetElementRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab the rotation
+        CVector vecRotation;
+        if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation, rotationOrder ) )
         {
-            // Grab the rotation
-            CVector vecRotation;
-            if ( CStaticFunctionDefinitions::GetElementRotation ( *pEntity, vecRotation, rotationOrder ) )
-            {
-                // Return it
-                lua_pushnumber ( luaVM, vecRotation.fX );
-                lua_pushnumber ( luaVM, vecRotation.fY );
-                lua_pushnumber ( luaVM, vecRotation.fZ );
-                return 3;
-            }
+            // Return it
+            lua_pushnumber ( luaVM, vecRotation.fX );
+            lua_pushnumber ( luaVM, vecRotation.fY );
+            lua_pushnumber ( luaVM, vecRotation.fZ );
+            return 3;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -596,22 +578,16 @@ int CLuaElementDefs::GetElementVelocity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        // Grab the element, verify it
-        if ( pEntity )
+        // Grab the velocity
+        CVector vecVelocity;
+        if ( CStaticFunctionDefinitions::GetElementVelocity ( *pEntity, vecVelocity ) )
         {
-            // Grab the velocity
-            CVector vecVelocity;
-            if ( CStaticFunctionDefinitions::GetElementVelocity ( *pEntity, vecVelocity ) )
-            {
-                // Return it
-                lua_pushnumber ( luaVM, vecVelocity.fX );
-                lua_pushnumber ( luaVM, vecVelocity.fY );
-                lua_pushnumber ( luaVM, vecVelocity.fZ );
-                return 3;
-            }
+            // Return it
+            lua_pushnumber ( luaVM, vecVelocity.fX );
+            lua_pushnumber ( luaVM, vecVelocity.fY );
+            lua_pushnumber ( luaVM, vecVelocity.fZ );
+            return 3;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -702,18 +678,13 @@ int CLuaElementDefs::GetElementType ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Get its typename
+        const char* szTypeName = pEntity->GetTypeName ();
+        if ( szTypeName )
         {
-            // Get its typename
-            const char* szTypeName = pEntity->GetTypeName ();
-            if ( szTypeName )
-            {
-                lua_pushstring ( luaVM, szTypeName );
-                return 1;
-            }
+            lua_pushstring ( luaVM, szTypeName );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -737,33 +708,28 @@ int CLuaElementDefs::GetElementChildren ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            if ( pEntity )
+            if ( !argStream.NextIsString () )
             {
-                if ( !argStream.NextIsString () )
-                {
-                    // Create a new table
-                    lua_newtable ( luaVM );
+                // Create a new table
+                lua_newtable ( luaVM );
 
-                    // Add all the elements with a matching type to it
-                    pEntity->GetChildren ( luaVM );
-                    return 1;
-                }
-                else if ( argStream.NextIsString () )
-                {
-                    SString strType = "";
-                    argStream.ReadString ( strType );
-                    // Create a new table
-                    lua_newtable ( luaVM );
+                // Add all the elements with a matching type to it
+                pEntity->GetChildren ( luaVM );
+                return 1;
+            }
+            else if ( argStream.NextIsString () )
+            {
+                SString strType = "";
+                argStream.ReadString ( strType );
+                // Create a new table
+                lua_newtable ( luaVM );
 
-                    // Add all the elements with a matching type to it
-                    pEntity->GetChildrenByType ( strType.c_str (), luaVM );
-                    return 1;
-                }
-                else
-                    m_pScriptDebugging->LogBadType ( luaVM );
+                // Add all the elements with a matching type to it
+                pEntity->GetChildrenByType ( strType.c_str (), luaVM );
+                return 1;
             }
             else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+                m_pScriptDebugging->LogBadType ( luaVM );
         }
     }
     else
@@ -786,18 +752,13 @@ int CLuaElementDefs::GetElementChild ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab the child
+        CClientEntity* pChild = CStaticFunctionDefinitions::GetElementChild ( *pEntity, uiIndex );
+        if ( pChild )
         {
-            // Grab the child
-            CClientEntity* pChild = CStaticFunctionDefinitions::GetElementChild ( *pEntity, uiIndex );
-            if ( pChild )
-            {
-                lua_pushelement ( luaVM, pChild );
-                return 1;
-            }
+            lua_pushelement ( luaVM, pChild );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -817,15 +778,10 @@ int CLuaElementDefs::GetElementChildrenCount ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
-        {
-            // Grab the count
-            unsigned int uiCount = pEntity->CountChildren ();
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( uiCount ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        // Grab the count
+        unsigned int uiCount = pEntity->CountChildren ();
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( uiCount ) );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -845,18 +801,13 @@ int CLuaElementDefs::GetElementParent ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab the parent and return it
+        CClientEntity* pParent = pEntity->GetParent ();
+        if ( pParent )
         {
-            // Grab the parent and return it
-            CClientEntity* pParent = pEntity->GetParent ();
-            if ( pParent )
-            {
-                lua_pushelement ( luaVM, pParent );
-                return 1;
-            }
+            lua_pushelement ( luaVM, pParent );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -929,18 +880,13 @@ int CLuaElementDefs::GetElementInterior ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab the interior and return it
+        unsigned char ucInterior;
+        if ( CStaticFunctionDefinitions::GetElementInterior ( *pEntity, ucInterior ) )
         {
-            // Grab the interior and return it
-            unsigned char ucInterior;
-            if ( CStaticFunctionDefinitions::GetElementInterior ( *pEntity, ucInterior ) )
-            {
-                lua_pushnumber ( luaVM, ucInterior );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, ucInterior );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -962,22 +908,10 @@ int CLuaElementDefs::IsElementWithinColShape ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        // Valid element?
-        if ( pEntity )
-        {
-            // Valid colshape?
-            if ( pColShape )
-            {
-                // Check if it's within
-                bool bWithin = pEntity->CollisionExists ( pColShape );
-                lua_pushboolean ( luaVM, bWithin );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "colshape", 2 );
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        // Check if it's within
+        bool bWithin = pEntity->CollisionExists ( pColShape );
+        lua_pushboolean ( luaVM, bWithin );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1031,32 +965,27 @@ int CLuaElementDefs::GetElementsWithinColShape ( lua_State* luaVM )
             // Grab optional type arg
             const char* szType = strType == "" ? NULL : strType.c_str ();
 
-            if ( pColShape )
-            {
-                // Create a new table
-                lua_newtable ( luaVM );
+            // Create a new table
+            lua_newtable ( luaVM );
 
-                // Add all the elements within the shape to it
-                unsigned int uiIndex = 0;
-                CFastList < CClientEntity* > ::iterator iter = pColShape->CollidersBegin ();
-                for ( ; iter != pColShape->CollidersEnd (); iter++ )
+            // Add all the elements within the shape to it
+            unsigned int uiIndex = 0;
+            CFastList < CClientEntity* > ::iterator iter = pColShape->CollidersBegin ();
+            for ( ; iter != pColShape->CollidersEnd (); iter++ )
+            {
+                if ( szType == NULL || strcmp ( ( *iter )->GetTypeName (), szType ) == 0 )
                 {
-                    if ( szType == NULL || strcmp ( ( *iter )->GetTypeName (), szType ) == 0 )
+                    if ( !( *iter )->IsBeingDeleted () )
                     {
-                        if ( !( *iter )->IsBeingDeleted () )
-                        {
-                            lua_pushnumber ( luaVM, ++uiIndex );
-                            lua_pushelement ( luaVM, *iter );
-                            lua_settable ( luaVM, -3 );
-                        }
+                        lua_pushnumber ( luaVM, ++uiIndex );
+                        lua_pushelement ( luaVM, *iter );
+                        lua_settable ( luaVM, -3 );
                     }
                 }
-
-                // We're returning 1 table
-                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "colshape", 1 );
+
+            // We're returning 1 table
+            return 1;
         }
     }
     else
@@ -1077,15 +1006,19 @@ int CLuaElementDefs::GetElementDimension ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions ( *pEntity ) )
         {
-            // Grab the dimension
-            unsigned short usDimension = pEntity->GetDimension ();
-            lua_pushnumber ( luaVM, usDimension );
+            // The entity is visible in all dimensions, just return -1
+            lua_pushnumber ( luaVM, -1 );
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        {
+            // Grab the dimension and return it
+            unsigned short usDimension = pEntity->GetDimension ();
+            lua_pushnumber ( luaVM, usDimension );
+            return 1;   
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1105,23 +1038,18 @@ int CLuaElementDefs::GetElementBoundingBox ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab the bounding box and return it
+        CVector vecMin, vecMax;
+        if ( CStaticFunctionDefinitions::GetElementBoundingBox ( *pEntity, vecMin, vecMax ) )
         {
-            // Grab the bounding box and return it
-            CVector vecMin, vecMax;
-            if ( CStaticFunctionDefinitions::GetElementBoundingBox ( *pEntity, vecMin, vecMax ) )
-            {
-                lua_pushnumber ( luaVM, vecMin.fX );
-                lua_pushnumber ( luaVM, vecMin.fY );
-                lua_pushnumber ( luaVM, vecMin.fZ );
-                lua_pushnumber ( luaVM, vecMax.fX );
-                lua_pushnumber ( luaVM, vecMax.fY );
-                lua_pushnumber ( luaVM, vecMax.fZ );
-                return 6;
-            }
+            lua_pushnumber ( luaVM, vecMin.fX );
+            lua_pushnumber ( luaVM, vecMin.fY );
+            lua_pushnumber ( luaVM, vecMin.fZ );
+            lua_pushnumber ( luaVM, vecMax.fX );
+            lua_pushnumber ( luaVM, vecMax.fY );
+            lua_pushnumber ( luaVM, vecMax.fZ );
+            return 6;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1141,18 +1069,13 @@ int CLuaElementDefs::GetElementRadius ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab its radius and return it
+        float fRadius = 0.0f;
+        if ( CStaticFunctionDefinitions::GetElementRadius ( *pEntity, fRadius ) )
         {
-            // Grab its radius and return it
-            float fRadius = 0.0f;
-            if ( CStaticFunctionDefinitions::GetElementRadius ( *pEntity, fRadius ) )
-            {
-                lua_pushnumber ( luaVM, fRadius );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, fRadius );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1271,18 +1194,13 @@ int CLuaElementDefs::GetElementDistanceFromCentreOfMassToBaseOfModel ( lua_State
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab the distance and return it
+        float fDistance;
+        if ( CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel ( *pEntity, fDistance ) )
         {
-            // Grab the distance and return it
-            float fDistance;
-            if ( CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel ( *pEntity, fDistance ) )
-            {
-                lua_pushnumber ( luaVM, fDistance );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, fDistance );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1302,15 +1220,10 @@ int CLuaElementDefs::IsElementLocal ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
-        {
-            // Return whether it's local or not
-            bool bLocal = pEntity->IsLocalEntity ();
-            lua_pushboolean ( luaVM, bLocal );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        // Return whether it's local or not
+        bool bLocal = pEntity->IsLocalEntity ();
+        lua_pushboolean ( luaVM, bLocal );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1332,22 +1245,16 @@ int CLuaElementDefs::GetElementAttachedOffsets ( lua_State* luaVM )
     {
         CVector vecPosition, vecRotation;
 
-        // Valid element?
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::GetElementAttachedOffsets ( *pEntity, vecPosition, vecRotation ) )
         {
-            if ( CStaticFunctionDefinitions::GetElementAttachedOffsets ( *pEntity, vecPosition, vecRotation ) )
-            {
-                lua_pushnumber ( luaVM, vecPosition.fX );
-                lua_pushnumber ( luaVM, vecPosition.fY );
-                lua_pushnumber ( luaVM, vecPosition.fZ );
-                lua_pushnumber ( luaVM, vecRotation.fX );
-                lua_pushnumber ( luaVM, vecRotation.fY );
-                lua_pushnumber ( luaVM, vecRotation.fZ );
-                return 6;
-            }
+            lua_pushnumber ( luaVM, vecPosition.fX );
+            lua_pushnumber ( luaVM, vecPosition.fY );
+            lua_pushnumber ( luaVM, vecPosition.fZ );
+            lua_pushnumber ( luaVM, vecRotation.fX );
+            lua_pushnumber ( luaVM, vecRotation.fY );
+            lua_pushnumber ( luaVM, vecRotation.fZ );
+            return 6;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1367,18 +1274,13 @@ int CLuaElementDefs::GetElementAlpha ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab its alpha level and return it
+        unsigned char ucAlpha;
+        if ( CStaticFunctionDefinitions::GetElementAlpha ( *pEntity, ucAlpha ) )
         {
-            // Grab its alpha level and return it
-            unsigned char ucAlpha;
-            if ( CStaticFunctionDefinitions::GetElementAlpha ( *pEntity, ucAlpha ) )
-            {
-                lua_pushnumber ( luaVM, ucAlpha );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, ucAlpha );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1398,18 +1300,13 @@ int CLuaElementDefs::GetElementHealth ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Grab the health and return it
+        float fHealth;
+        if ( CStaticFunctionDefinitions::GetElementHealth ( *pEntity, fHealth ) )
         {
-            // Grab the health and return it
-            float fHealth;
-            if ( CStaticFunctionDefinitions::GetElementHealth ( *pEntity, fHealth ) )
-            {
-                lua_pushnumber ( luaVM, fHealth );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, fHealth );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1429,17 +1326,12 @@ int CLuaElementDefs::GetElementModel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        unsigned short usModel;
+        if ( CStaticFunctionDefinitions::GetElementModel ( *pEntity, usModel ) )
         {
-            unsigned short usModel;
-            if ( CStaticFunctionDefinitions::GetElementModel ( *pEntity, usModel ) )
-            {
-                lua_pushnumber ( luaVM, usModel );
-                return 1;
-            }
+            lua_pushnumber ( luaVM, usModel );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1459,17 +1351,12 @@ int CLuaElementDefs::GetElementColShape ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        CClientEntity* pColShape = static_cast < CClientEntity* > ( CStaticFunctionDefinitions::GetElementColShape ( pEntity ) );
+        if ( pColShape )
         {
-            CClientEntity* pColShape = static_cast < CClientEntity* > ( CStaticFunctionDefinitions::GetElementColShape ( pEntity ) );
-            if ( pColShape )
-            {
-                lua_pushelement ( luaVM, pColShape );
-                return 1;
-            }
+            lua_pushelement ( luaVM, pColShape );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1489,14 +1376,11 @@ int CLuaElementDefs::IsElementInWater ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        bool bInWater = false;
+        if ( CStaticFunctionDefinitions::IsElementInWater ( *pEntity, bInWater ) )
         {
-            bool bInWater = false;
-            if ( CStaticFunctionDefinitions::IsElementInWater ( *pEntity, bInWater ) )
-            {
-                lua_pushboolean ( luaVM, bInWater );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bInWater );
+            return 1;
         }
     }
     else
@@ -1516,14 +1400,11 @@ int CLuaElementDefs::IsElementSyncer ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        bool bIsSyncer = false;
+        if ( CStaticFunctionDefinitions::IsElementSyncer ( *pEntity, bIsSyncer ) )
         {
-            bool bIsSyncer = false;
-            if ( CStaticFunctionDefinitions::IsElementSyncer ( *pEntity, bIsSyncer ) )
-            {
-                lua_pushboolean ( luaVM, bIsSyncer );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bIsSyncer );
+            return 1;
         }
     }
     else
@@ -1544,14 +1425,11 @@ int CLuaElementDefs::IsElementCollidableWith ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity && pWithEntity )
+        bool bCanCollide;
+        if ( CStaticFunctionDefinitions::IsElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
         {
-            bool bCanCollide;
-            if ( CStaticFunctionDefinitions::IsElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
-            {
-                lua_pushboolean ( luaVM, bCanCollide );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bCanCollide );
+            return 1;
         }
     }
     else
@@ -1571,11 +1449,8 @@ int CLuaElementDefs::IsElementDoubleSided ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
-        {
-            lua_pushboolean ( luaVM, pEntity->IsDoubleSided () );
-            return 1;
-        }
+        lua_pushboolean ( luaVM, pEntity->IsDoubleSided () );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1593,16 +1468,11 @@ int CLuaElementDefs::GetElementCollisionsEnabled ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::GetElementCollisionsEnabled ( *pEntity ) )
         {
-            if ( CStaticFunctionDefinitions::GetElementCollisionsEnabled ( *pEntity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1621,17 +1491,12 @@ int CLuaElementDefs::IsElementFrozen ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        bool bFrozen;
+        if ( CStaticFunctionDefinitions::IsElementFrozen ( *pEntity, bFrozen ) )
         {
-            bool bFrozen;
-            if ( CStaticFunctionDefinitions::IsElementFrozen ( *pEntity, bFrozen ) )
-            {
-                lua_pushboolean ( luaVM, bFrozen );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bFrozen );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1650,28 +1515,23 @@ int CLuaElementDefs::IsElementStreamedIn ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Is this a streaming compatible class?
+        if ( pEntity->IsStreamingCompatibleClass () )
         {
-            // Is this a streaming compatible class?
-            if ( pEntity->IsStreamingCompatibleClass () )
-            {
-                CClientStreamElement* pStreamElement = static_cast < CClientStreamElement* > ( pEntity );
+            CClientStreamElement* pStreamElement = static_cast < CClientStreamElement* > ( pEntity );
 
-                // Return whether or not this class is streamed in
-                lua_pushboolean ( luaVM, pStreamElement->IsStreamedIn () );
-                return 1;
-            }
-            else if ( pEntity->GetType () == CCLIENTSOUND )
-            {
-                CClientSound* pSound = static_cast < CClientSound* > ( pEntity );
-                lua_pushboolean ( luaVM, pSound->IsSoundStopped () ? false : true );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogWarning ( luaVM, "%s; element is not streaming compatible\n", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+            // Return whether or not this class is streamed in
+            lua_pushboolean ( luaVM, pStreamElement->IsStreamedIn () );
+            return 1;
+        }
+        else if ( pEntity->GetType () == CCLIENTSOUND )
+        {
+            CClientSound* pSound = static_cast < CClientSound* > ( pEntity );
+            lua_pushboolean ( luaVM, pSound->IsSoundStopped () ? false : true );
+            return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogWarning ( luaVM, "%s; element is not streaming compatible\n", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1691,27 +1551,22 @@ int CLuaElementDefs::IsElementStreamable ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Is this a streaming compatible class?
+        if ( pEntity->IsStreamingCompatibleClass () )
         {
-            // Is this a streaming compatible class?
-            if ( pEntity->IsStreamingCompatibleClass () )
-            {
-                CClientStreamElement* pStreamElement = static_cast < CClientStreamElement* > ( pEntity );
+            CClientStreamElement* pStreamElement = static_cast < CClientStreamElement* > ( pEntity );
 
-                bool bStreamable = ( pStreamElement->GetTotalStreamReferences () == 0 );
-                // Return whether or not this element is set to never be streamed out
-                lua_pushboolean ( luaVM, bStreamable );
-                return 1;
-            }
-            else
-                m_pScriptDebugging->LogWarning ( luaVM, "%s; element is not streaming compatible\n", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
-
-            // Return false, we're not streamable
-            lua_pushboolean ( luaVM, false );
+            bool bStreamable = ( pStreamElement->GetTotalStreamReferences () == 0 );
+            // Return whether or not this element is set to never be streamed out
+            lua_pushboolean ( luaVM, bStreamable );
             return 1;
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+            m_pScriptDebugging->LogWarning ( luaVM, "%s; element is not streaming compatible\n", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
+
+        // Return false, we're not streamable
+        lua_pushboolean ( luaVM, false );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1731,18 +1586,13 @@ int CLuaElementDefs::IsElementOnScreen ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Return whether we're on the screen or not
+        bool bOnScreen;
+        if ( CStaticFunctionDefinitions::IsElementOnScreen ( *pEntity, bOnScreen ) )
         {
-            // Return whether we're on the screen or not
-            bool bOnScreen;
-            if ( CStaticFunctionDefinitions::IsElementOnScreen ( *pEntity, bOnScreen ) )
-            {
-                lua_pushboolean ( luaVM, bOnScreen );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, bOnScreen );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1815,17 +1665,12 @@ int CLuaElementDefs::DestroyElement ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Destroy it
+        if ( CStaticFunctionDefinitions::DestroyElement ( *pEntity ) )
         {
-            // Destroy it
-            if ( CStaticFunctionDefinitions::DestroyElement ( *pEntity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1846,17 +1691,12 @@ int CLuaElementDefs::SetElementID ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // It returns false if we tried to change ID of server-created element
+        if ( CStaticFunctionDefinitions::SetElementID ( *pEntity, strKey.c_str () ) )
         {
-            // It returns false if we tried to change ID of server-created element
-            if ( CStaticFunctionDefinitions::SetElementID ( *pEntity, strKey.c_str () ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -1993,18 +1833,12 @@ int CLuaElementDefs::SetElementPosition ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        // Valid?
-        if ( pEntity )
+        // Try to set the position
+        if ( CStaticFunctionDefinitions::SetElementPosition ( *pEntity, vecPosition, bWarp ) )
         {
-            // Try to set the position
-            if ( CStaticFunctionDefinitions::SetElementPosition ( *pEntity, vecPosition, bWarp ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2097,17 +1931,12 @@ int CLuaElementDefs::SetElementVelocity ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Set the velocity
+        if ( CStaticFunctionDefinitions::SetElementVelocity ( *pEntity, vecVelocity ) )
         {
-            // Set the velocity
-            if ( CStaticFunctionDefinitions::SetElementVelocity ( *pEntity, vecVelocity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2157,24 +1986,14 @@ int CLuaElementDefs::SetElementParent ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
-        {
-            if ( pParent )
-            {
-                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
 
-                // Change the parent
-                if ( CStaticFunctionDefinitions::SetElementParent ( *pEntity, *pParent, pLuaMain ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 2 );
+        // Change the parent
+        if ( CStaticFunctionDefinitions::SetElementParent ( *pEntity, *pParent, pLuaMain ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2219,18 +2038,12 @@ int CLuaElementDefs::SetElementInterior ( lua_State* luaVM )
                 }
             }
 
-            // Valid element?
-            if ( pEntity )
+            // Set the interior
+            if ( CStaticFunctionDefinitions::SetElementInterior ( *pEntity, uiInterior, bSetPosition, vecPosition ) )
             {
-                // Set the interior
-                if ( CStaticFunctionDefinitions::SetElementInterior ( *pEntity, uiInterior, bSetPosition, vecPosition ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
         }
         else
             m_pScriptDebugging->LogBadType ( luaVM );
@@ -2247,27 +2060,58 @@ int CLuaElementDefs::SetElementInterior ( lua_State* luaVM )
 int CLuaElementDefs::SetElementDimension ( lua_State* luaVM )
 {
     CClientEntity* pEntity;
-    unsigned short usDimension = 0;
+    int iDimension = 0;
+    bool bMakeVisibleInAllDimensions = false;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadNumber ( usDimension );
+    argStream.ReadNumber ( iDimension );
+
+    if ( iDimension == -1 )
+    {
+        if ( IS_OBJECT ( pEntity ) )
+            bMakeVisibleInAllDimensions = true;
+        else
+            argStream.SetCustomError ( "The -1 value can be used only in objects!" );
+    }
+    else
+        if ( iDimension < 0 || iDimension > 65535 )
+            argStream.SetCustomError ( "Invalid dimension range specified!" );
 
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        // Valid?
-        if ( pEntity )
+        if ( bMakeVisibleInAllDimensions )
         {
-            // Change the dimension
-            if ( CStaticFunctionDefinitions::SetElementDimension ( *pEntity, usDimension ) )
+            // Set the object visible in all dimensions
+            if ( CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions ( *pEntity, true ) )
             {
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
         }
         else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        {
+            // If it's an object and is visible in all dimensions
+            if ( IS_OBJECT ( pEntity ) && CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions ( *pEntity ) )
+            {
+                // Make it not visible in all dimensions and set its dimension
+                if ( CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions ( *pEntity, false, (unsigned short)iDimension ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+            {
+                // Just change the dimension
+                if ( CStaticFunctionDefinitions::SetElementDimension ( *pEntity, (unsigned short)iDimension ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2293,24 +2137,12 @@ int CLuaElementDefs::AttachElements ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        // Valid element?
-        if ( pEntity )
+        // Try to attach them
+        if ( CStaticFunctionDefinitions::AttachElements ( *pEntity, *pAttachedToEntity, vecPosition, vecRotation ) )
         {
-            // Valid host element?
-            if ( pAttachedToEntity )
-            {
-                // Try to attach them
-                if ( CStaticFunctionDefinitions::AttachElements ( *pEntity, *pAttachedToEntity, vecPosition, vecRotation ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
-            }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "element", 2 );
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2333,18 +2165,12 @@ int CLuaElementDefs::DetachElements ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        // Valid?
-        if ( pEntity )
+        // Try to detach
+        if ( CStaticFunctionDefinitions::DetachElements ( *pEntity, pAttachedToEntity ) )
         {
-            // Try to detach
-            if ( CStaticFunctionDefinitions::DetachElements ( *pEntity, pAttachedToEntity ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2370,17 +2196,11 @@ int CLuaElementDefs::SetElementAttachedOffsets ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        // Valid element?
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetElementAttachedOffsets ( *pEntity, vecPosition, vecRotation ) )
         {
-            if ( CStaticFunctionDefinitions::SetElementAttachedOffsets ( *pEntity, vecPosition, vecRotation ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2402,16 +2222,11 @@ int CLuaElementDefs::SetElementCollisionsEnabled ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetElementCollisionsEnabled ( *pEntity, bEnabled ) )
         {
-            if ( CStaticFunctionDefinitions::SetElementCollisionsEnabled ( *pEntity, bEnabled ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2433,16 +2248,11 @@ int CLuaElementDefs::SetElementCollidableWith ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity && pWithEntity )
+        if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
         {
-            if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2463,15 +2273,10 @@ int CLuaElementDefs::SetElementDoubleSided ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
-        {
-            // Grab the chosen value and set it
-            pEntity->SetDoubleSided ( bDoubleSided );
-            lua_pushboolean ( luaVM, true );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
+        // Grab the chosen value and set it
+        pEntity->SetDoubleSided ( bDoubleSided );
+        lua_pushboolean ( luaVM, true );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2493,16 +2298,11 @@ int CLuaElementDefs::SetElementFrozen ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetElementFrozen ( *pEntity, bFrozen ) )
         {
-            if ( CStaticFunctionDefinitions::SetElementFrozen ( *pEntity, bFrozen ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2524,16 +2324,11 @@ int CLuaElementDefs::SetElementAlpha ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetElementAlpha ( *pEntity, ucAlpha ) )
         {
-            if ( CStaticFunctionDefinitions::SetElementAlpha ( *pEntity, ucAlpha ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2555,16 +2350,11 @@ int CLuaElementDefs::SetElementHealth ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetElementHealth ( *pEntity, fHealth ) )
         {
-            if ( CStaticFunctionDefinitions::SetElementHealth ( *pEntity, fHealth ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2586,16 +2376,11 @@ int CLuaElementDefs::SetElementModel ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetElementModel ( *pEntity, usModel ) )
         {
-            if ( CStaticFunctionDefinitions::SetElementModel ( *pEntity, usModel ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -2617,35 +2402,30 @@ int CLuaElementDefs::SetElementStreamable ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        // Is this a streaming compatible class?
+        if ( pEntity->IsStreamingCompatibleClass () )
         {
-            // Is this a streaming compatible class?
-            if ( pEntity->IsStreamingCompatibleClass () )
+            CClientStreamElement* pStreamElement = static_cast < CClientStreamElement* > ( pEntity );
+
+            // TODO: maybe use a better VM-based reference system (rather than a boolean one)
+            if ( bStreamable && ( pStreamElement->GetStreamReferences ( true ) > 0 ) )
             {
-                CClientStreamElement* pStreamElement = static_cast < CClientStreamElement* > ( pEntity );
-
-                // TODO: maybe use a better VM-based reference system (rather than a boolean one)
-                if ( bStreamable && ( pStreamElement->GetStreamReferences ( true ) > 0 ) )
-                {
-                    pStreamElement->RemoveStreamReference ( true );
-                }
-                else if ( !bStreamable && ( pStreamElement->GetStreamReferences ( true ) == 0 ) )
-                {
-                    pStreamElement->AddStreamReference ( true );
-                }
-                else
-                {
-                    lua_pushboolean ( luaVM, false );
-                    return 1;
-                }
-
-                // Return success
-                lua_pushboolean ( luaVM, true );
+                pStreamElement->RemoveStreamReference ( true );
+            }
+            else if ( !bStreamable && ( pStreamElement->GetStreamReferences ( true ) == 0 ) )
+            {
+                pStreamElement->AddStreamReference ( true );
+            }
+            else
+            {
+                lua_pushboolean ( luaVM, false );
                 return 1;
             }
+
+            // Return success
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

@@ -9,7 +9,7 @@ project "Client Launcher"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
-	flags { "WinMain" }
+	entrypoint "WinMainCRTStartup"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",

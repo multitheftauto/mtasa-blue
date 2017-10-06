@@ -35,6 +35,8 @@ void HOOK_GetFxQuality ();
 DWORD RETURN_StoreShadowForVehicle =        0x70BDA9;
 void HOOK_StoreShadowForVehicle ();
 
+float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance;
+
 CSettingsSA::CSettingsSA ( void )
 {
     m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
@@ -47,6 +49,9 @@ CSettingsSA::CSettingsSA ( void )
     m_iDesktopWidth = 0;
     m_iDesktopHeight = 0;
     MemPut < BYTE > ( 0x6FF420, 0xC3 );     // Truncate CalculateAspectRatio
+
+    MemPut ( 0x732926, &ms_fVehicleLODDistance );
+    MemPut ( 0x732940, &ms_fTrainPlaneLODDistance );
 
     // Set "radar map and radar" as default radar mode
     SetRadarMode ( RADAR_MODE_ALL );
@@ -486,6 +491,8 @@ void CSettingsSA::SetRadarMode ( eRadarMode hudMode )
 float ms_fFOV = 70;
 float ms_fFOVCar = 70;
 float ms_fFOVCarMax = 100;  // at high vehicle velocity
+bool ms_bFOVPlayerFromScript = false;
+bool ms_bFOVVehicleFromScript = false;
 
 // consider moving this to the camera class - qaisjp
 float CSettingsSA::GetFieldOfViewPlayer ( void )
@@ -503,22 +510,39 @@ float CSettingsSA::GetFieldOfViewVehicleMax ( void )
     return ms_fFOVCarMax;
 }
 
-void CSettingsSA::SetFieldOfView ( float fAngle )
+void CSettingsSA::UpdateFieldOfViewFromSettings( void )
 {
-    SetFieldOfViewPlayer ( fAngle );
-    SetFieldOfViewVehicle ( fAngle );
+    float fFieldOfView;
+    g_pCore->GetCVars()->Get( "fov", fFieldOfView );
+    fFieldOfView = Clamp( 70.f, fFieldOfView, 100.f );
+    SetFieldOfViewPlayer( fFieldOfView, false );
+    SetFieldOfViewVehicle( fFieldOfView, false );
+    SetFieldOfViewVehicleMax( 100, false );
 }
-    
-void CSettingsSA::SetFieldOfViewPlayer ( float fAngle )
+
+void CSettingsSA::ResetFieldOfViewFromScript( void )
 {
+    ms_bFOVPlayerFromScript = false;
+    ms_bFOVVehicleFromScript = false;
+    UpdateFieldOfViewFromSettings();
+}
+
+void CSettingsSA::SetFieldOfViewPlayer ( float fAngle, bool bFromScript )
+{
+    if ( !bFromScript && ms_bFOVPlayerFromScript )
+        return;
+    ms_bFOVPlayerFromScript = bFromScript;
     ms_fFOV = fAngle;
     MemPut < void* > ( 0x0522F3A, &ms_fFOV );
     MemPut < void* > ( 0x0522F5D, &ms_fFOV );
     MemPut < float > ( 0x0522F7A, ms_fFOV );
 }
 
-void CSettingsSA::SetFieldOfViewVehicle ( float fAngle )
+void CSettingsSA::SetFieldOfViewVehicle ( float fAngle, bool bFromScript )
 {
+    if ( !bFromScript && ms_bFOVVehicleFromScript )
+        return;
+    ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCar = fAngle;
     MemPut < void* > ( 0x0524B76, &ms_fFOVCar );
     MemPut < void* > ( 0x0524B9A, &ms_fFOVCar );
@@ -527,11 +551,49 @@ void CSettingsSA::SetFieldOfViewVehicle ( float fAngle )
     MemPut < float > ( 0x0524BE4, ms_fFOVCar );
 }
 
-void CSettingsSA::SetFieldOfViewVehicleMax ( float fAngle )
+void CSettingsSA::SetFieldOfViewVehicleMax ( float fAngle, bool bFromScript )
 {
+    if ( !bFromScript && ms_bFOVVehicleFromScript )
+        return;
+    ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCarMax = fAngle;
     MemPut < void* > ( 0x0524BB4, &ms_fFOVCarMax );
     MemPut < float > ( 0x0524BC5, ms_fFOVCarMax );
+}
+
+
+////////////////////////////////////////////////
+//
+// Vehicles LOD draw distance
+//
+////////////////////////////////////////////////
+void CSettingsSA::SetVehiclesLODDistance ( float fVehiclesLODDistance, float fTrainsPlanesLODDistance )
+{
+    ms_fVehicleLODDistance = fVehiclesLODDistance;
+    ms_fTrainPlaneLODDistance = fTrainsPlanesLODDistance;
+}
+
+void CSettingsSA::ResetVehiclesLODDistance ( void )
+{
+    bool bHighDetailVehicles;
+    g_pCore->GetCVars()->Get ( "high_detail_vehicles", bHighDetailVehicles );
+
+    if ( bHighDetailVehicles )
+    {
+        ms_fVehicleLODDistance = MAX_VEHICLE_LOD_DISTANCE;
+        ms_fTrainPlaneLODDistance = MAX_VEHICLE_LOD_DISTANCE;
+    }
+    else
+    {
+        ms_fVehicleLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE;
+        ms_fTrainPlaneLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE * TRAIN_LOD_DISTANCE_MULTIPLIER;
+    }
+}
+
+void CSettingsSA::GetVehiclesLODDistance ( float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance )
+{
+    fVehiclesLODDistance = ms_fVehicleLODDistance;
+    fTrainsPlanesLODDistance = ms_fTrainPlaneLODDistance;
 }
 
 

@@ -55,6 +55,8 @@ void CLuaResourceDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getResourceDynamicElementRoot", getResourceDynamicElementRoot );
     CLuaCFunctions::AddFunction ( "getResourceMapRootElement", getResourceMapRootElement );
     CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", getResourceExportedFunctions );
+    CLuaCFunctions::AddFunction ( "getResourceOrganizationalPath", getResourceOrganizationalPath);
+    CLuaCFunctions::AddFunction ( "isResourceArchived", isResourceArchived );
 
     // Set stuff
     CLuaCFunctions::AddFunction ( "setResourceInfo", setResourceInfo );
@@ -106,6 +108,7 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot" );
     lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
     lua_classfunction ( luaVM, "getExportedFunctions", "getResourceExportedFunctions" );
+    lua_classfunction ( luaVM, "getOrganizationalPath", "getResourceOrganizationalPath");
     lua_classfunction ( luaVM, "getLastStartTime", "getResourceLastStartTime" );
     lua_classfunction ( luaVM, "getLoadTime", "getResourceLoadTime" );
     lua_classfunction ( luaVM, "getInfo", "getResourceInfo" );
@@ -114,15 +117,18 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getName", "getResourceName" );
     lua_classfunction ( luaVM, "getState", "getResourceState" );
     lua_classfunction ( luaVM, "getACLRequests", "getResourceACLRequests" );
+    lua_classfunction ( luaVM, "isArchived", "isResourceArchived" );
 
     lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
     lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
+    lua_classvariable ( luaVM, "organizationalPath", nullptr, "getResourceOrganizationalPath" );
     lua_classvariable ( luaVM, "lastStartTime", NULL, "getResourceLastStartTime" );
     lua_classvariable ( luaVM, "aclRequests", NULL, "getResourceACLRequests" );
     lua_classvariable ( luaVM, "loadTime", NULL, "getResourceLoadTime" );
     lua_classvariable ( luaVM, "name", "renameResource", "getResourceName" );
     lua_classvariable ( luaVM, "rootElement", NULL, "getResourceRootElement" );
     lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
+    lua_classvariable ( luaVM, "archived", NULL, "isResourceArchived" );
     lua_classvariable ( luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason" );
     //lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
     //lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
@@ -1062,6 +1068,41 @@ int CLuaResourceDefs::getResourceExportedFunctions ( lua_State* luaVM )
     return 1;
 }
 
+
+int CLuaResourceDefs::getResourceOrganizationalPath ( lua_State* luaVM )
+{
+    // string getResourceOrganizationalPath ( resource theResource )
+    // Returns a string representing the resource organizational path, false if invalid resource was provided. 
+
+    CResource* pResource;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pResource );
+    
+    if ( !argStream.HasErrors() )
+    {
+        SString strOrganizationalPath = m_pResourceManager->GetResourceOrganizationalPath ( pResource );
+        
+        if ( !strOrganizationalPath.empty() )
+        {
+            // Normalize path separator, it is always slash on resources side
+            ReplaceOccurrencesInString ( strOrganizationalPath, "\\", "/" );
+
+            // The leading separator won't be needed
+            strOrganizationalPath = strOrganizationalPath.TrimStart ( "/" );
+        }
+        
+        lua_pushstring ( luaVM, strOrganizationalPath );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+     
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaResourceDefs::call ( lua_State* luaVM )
 {
     CResource* pResource;
@@ -1392,5 +1433,25 @@ int CLuaResourceDefs::Load( lua_State* luaVM )
         m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+int CLuaResourceDefs::isResourceArchived (lua_State* luaVM)
+{
+    //  bool isResourceArchived ( resource theResource )
+    CResource* pResource;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pResource);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean ( luaVM, pResource->IsResourceZip() );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushnil ( luaVM );
     return 1;
 }

@@ -31,6 +31,11 @@ public:
     virtual float           GetScrollbarDocumentSize    ( void ) = 0;
     virtual float           GetScrollbarPageSize        ( void ) = 0;
 
+    virtual void            SetSelection            ( unsigned int uiStart, unsigned int uiEnd ) = 0;
+    virtual unsigned int    GetSelectionStart       ( void ) = 0;
+    virtual unsigned int    GetSelectionEnd         ( void ) = 0;
+    virtual unsigned int    GetSelectionLength      ( void ) = 0;
+
     virtual void            EnsureCaratIsVisible    ( void ) = 0;
 
     virtual void            SetTextChangedHandler   ( const GUI_CALLBACK & Callback ) = 0;

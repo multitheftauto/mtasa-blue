@@ -22,7 +22,7 @@ class CXMLNode: public CXMLCommon
 public:
     virtual                     ~CXMLNode           ( void ) {};
 
-    virtual CXMLNode*           CreateSubNode       ( const char* szTagName ) = 0;
+    virtual CXMLNode*           CreateSubNode       ( const char* szTagName, CXMLNode* pInsertAfter = nullptr ) = 0;
     virtual void                DeleteSubNode       ( CXMLNode* pNode ) = 0;
     virtual void                DeleteAllSubNodes   ( void ) = 0;
 
@@ -61,6 +61,8 @@ public:
     virtual bool                IsValid             ( void ) = 0;
 
     virtual SString             GetAttributeValue   ( const SString& strAttributeName ) = 0;
+    virtual SString             GetCommentText      ( void ) = 0;
+    virtual void                SetCommentText      ( const char* szCommentText, bool bLeadingBlankLine = false ) = 0;
 };
 
 #endif

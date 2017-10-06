@@ -28,6 +28,7 @@ public:
     virtual bool                FreeCommand                 ( CDbJobData* pJobData ) = 0;
     virtual CDbJobData*         FindCommandFromId           ( SDbJobId id ) = 0;
     virtual void                IgnoreConnectionResults     ( SConnectionHandle connectionHandle ) = 0;
+    virtual bool                UsesConnection              ( SConnectionHandle connectionHandle ) = 0;
 };
 
 CDatabaseJobQueue* NewDatabaseJobQueue ( void );

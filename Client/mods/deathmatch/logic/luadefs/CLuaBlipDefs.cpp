@@ -132,32 +132,26 @@ int CLuaBlipDefs::CreateBlipAttachedTo ( lua_State* luaVM )
     // Element in place?
     if ( !argStream.HasErrors () )
     {
-        // Grab the element and verify it
-        if ( pEntity )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-            if ( pLuaMain )
+            CResource* pResource = pLuaMain->GetResource ();
+            if ( pResource )
             {
-                CResource* pResource = pLuaMain->GetResource ();
-                if ( pResource )
+                // Create the blip
+                CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo ( *pResource, *pEntity, ucIcon, ucSize, color, sOrdering, usVisibleDistance );
+                if ( pMarker )
                 {
-                    // Create the blip
-                    CClientRadarMarker* pMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo ( *pResource, *pEntity, ucIcon, ucSize, color, sOrdering, usVisibleDistance );
-                    if ( pMarker )
+                    CElementGroup * pGroup = pResource->GetElementGroup ();
+                    if ( pGroup )
                     {
-                        CElementGroup * pGroup = pResource->GetElementGroup ();
-                        if ( pGroup )
-                        {
-                            pGroup->Add ( pMarker );
-                        }
-                        lua_pushelement ( luaVM, pMarker );
-                        return 1;
+                        pGroup->Add ( pMarker );
                     }
+                    lua_pushelement ( luaVM, pMarker );
+                    return 1;
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -176,14 +170,9 @@ int CLuaBlipDefs::GetBlipIcon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
-        {
-            unsigned char ucIcon = static_cast < unsigned char > ( pMarker->GetSprite () );
-            lua_pushnumber ( luaVM, ucIcon );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+        unsigned char ucIcon = static_cast < unsigned char > ( pMarker->GetSprite () );
+        lua_pushnumber ( luaVM, ucIcon );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -202,14 +191,9 @@ int CLuaBlipDefs::GetBlipSize ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
-        {
-            unsigned char ucSize = static_cast < unsigned char > ( pMarker->GetScale () );
-            lua_pushnumber ( luaVM, ucSize );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+        unsigned char ucSize = static_cast < unsigned char > ( pMarker->GetScale () );
+        lua_pushnumber ( luaVM, ucSize );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -228,17 +212,12 @@ int CLuaBlipDefs::GetBlipColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
-        {
-            SColor color = pMarker->GetColor ();
-            lua_pushnumber ( luaVM, color.R );
-            lua_pushnumber ( luaVM, color.G );
-            lua_pushnumber ( luaVM, color.B );
-            lua_pushnumber ( luaVM, color.A );
-            return 4;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+        SColor color = pMarker->GetColor ();
+        lua_pushnumber ( luaVM, color.R );
+        lua_pushnumber ( luaVM, color.G );
+        lua_pushnumber ( luaVM, color.B );
+        lua_pushnumber ( luaVM, color.A );
+        return 4;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -257,14 +236,9 @@ int CLuaBlipDefs::GetBlipOrdering ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
-        {
-            short sOrdering = pMarker->GetOrdering ();
-            lua_pushnumber ( luaVM, sOrdering );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+        short sOrdering = pMarker->GetOrdering ();
+        lua_pushnumber ( luaVM, sOrdering );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -283,14 +257,9 @@ int CLuaBlipDefs::GetBlipVisibleDistance ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pMarker )
-        {
-            unsigned short usVisibleDistance = pMarker->GetVisibleDistance ();
-            lua_pushnumber ( luaVM, usVisibleDistance );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "blip", 1 );
+        unsigned short usVisibleDistance = pMarker->GetVisibleDistance ();
+        lua_pushnumber ( luaVM, usVisibleDistance );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -310,16 +279,11 @@ int CLuaBlipDefs::SetBlipIcon ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetBlipIcon ( *pEntity, ucIcon ) )
         {
-            if ( CStaticFunctionDefinitions::SetBlipIcon ( *pEntity, ucIcon ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -339,16 +303,11 @@ int CLuaBlipDefs::SetBlipSize ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetBlipSize ( *pEntity, ucSize ) )
         {
-            if ( CStaticFunctionDefinitions::SetBlipSize ( *pEntity, ucSize ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -371,16 +330,11 @@ int CLuaBlipDefs::SetBlipColor ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetBlipColor ( *pEntity, color ) )
         {
-            if ( CStaticFunctionDefinitions::SetBlipColor ( *pEntity, color ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -400,16 +354,11 @@ int CLuaBlipDefs::SetBlipOrdering ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetBlipOrdering ( *pEntity, sOrdering ) )
         {
-            if ( CStaticFunctionDefinitions::SetBlipOrdering ( *pEntity, sOrdering ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -429,16 +378,11 @@ int CLuaBlipDefs::SetBlipVisibleDistance ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pEntity )
+        if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( *pEntity, usVisibleDistance ) )
         {
-            if ( CStaticFunctionDefinitions::SetBlipVisibleDistance ( *pEntity, usVisibleDistance ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

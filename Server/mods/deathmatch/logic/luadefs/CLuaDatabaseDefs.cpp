@@ -274,11 +274,14 @@ int CLuaDatabaseDefs::DbConnect ( lua_State* luaVM )
                 // Add logging options
                 bool bLoggingEnabled;
                 SString strLogTag;
-                // Read value of 'log' and 'tag' if already set, otherwise use default
+                SString strQueueName;
+                // Set default values if required
                 GetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled, 1 );
                 GetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag, "script" );
+                GetOption < CDbOptionsMap > ( strOptions, "queue", strQueueName, (strType == "mysql") ? strHost : DB_SQLITE_QUEUE_NAME_DEFAULT );
                 SetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled );
                 SetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag );
+                SetOption < CDbOptionsMap > ( strOptions, "queue", strQueueName );
                 // Do connect
                 SConnectionHandle connection = g_pGame->GetDatabaseManager ()->Connect ( strType, strHost, strUsername, strPassword, strOptions );
                 if ( connection == INVALID_DB_HANDLE )
@@ -322,13 +325,7 @@ int CLuaDatabaseDefs::DbQuery ( lua_State* luaVM )
         argStream.ReadFunction ( iLuaFunction );
         if ( argStream.NextIsTable () )
         {
-            lua_pushnil ( luaVM );      // Loop through our table, beginning at the first key
-            while ( lua_next ( luaVM, argStream.m_iIndex ) != 0 )
-            {
-                callbackArgs.ReadArgument ( luaVM, -1 );    // Ignore the index at -2, and just read the value
-                lua_pop ( luaVM, 1 );                       // Remove the item and keep the key for the next iteration
-            }
-            argStream.m_iIndex++;
+            argStream.ReadLuaArgumentsTable( callbackArgs );
         }
     }
     argStream.ReadUserData ( pElement );
@@ -385,13 +382,7 @@ int CLuaDatabaseDefs::OOP_DbQuery ( lua_State* luaVM )
         argStream.ReadFunction ( iLuaFunction );
         if ( argStream.NextIsTable () )
         {
-            lua_pushnil ( luaVM );      // Loop through our table, beginning at the first key
-            while ( lua_next ( luaVM, argStream.m_iIndex ) != 0 )
-            {
-                callbackArgs.ReadArgument ( luaVM, -1 );    // Ignore the index at -2, and just read the value
-                lua_pop ( luaVM, 1 );                       // Remove the item and keep the key for the next iteration
-            }
-            argStream.m_iIndex++;
+            argStream.ReadLuaArgumentsTable( callbackArgs );
         }
     }
     argStream.ReadString ( strQuery );

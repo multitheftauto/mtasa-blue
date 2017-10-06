@@ -143,7 +143,7 @@ int CLuaVector2Defs::Destroy ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         delete pVector;
-
+        lua_addtotalbytes(luaVM, -LUA_GC_EXTRA_BYTES);
         lua_pushboolean ( luaVM, true );
         return 1;
     }

@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -174,6 +174,15 @@
 
 /* Define if you have GSS API. */
 #define HAVE_GSSAPI
+
+/* Define if you have the GNU gssapi libraries */
+#undef HAVE_GSSGNU
+
+/* Define if you have the Heimdal gssapi libraries */
+#define HAVE_GSSHEIMDAL
+
+/* Define if you have the MIT gssapi libraries */
+#undef HAVE_GSSMIT
 
 /* Define if you have the `ucb' library (-lucb). */
 #undef HAVE_LIBUCB
@@ -528,11 +537,14 @@
 /* Define to the function return type for send. */
 #define SEND_TYPE_RETV int
 
-/* Define to use the QsoSSL package. */
-#define USE_QSOSSL
-
 /* Define to use the GSKit package. */
-#undef USE_GSKIT
+#define USE_GSKIT
+
+/* Define to use the OS/400 crypto library. */
+#define USE_OS400CRYPTO
+
+/* Define to use Unix sockets. */
+#define USE_UNIX_SOCKETS
 
 /* Use the system keyring as the default CA bundle. */
 #define CURL_CA_BUNDLE  "/QIBM/UserData/ICSS/Cert/Server/DEFAULT.KDB"

@@ -230,8 +230,7 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload( CDownloadableResou
 
     SString* pstrContext = MakeDownloadContextString( pResourceFile );
     SString strFilename = pResourceFile->GetName();
-    double dDownloadSize = pResourceFile->GetDownloadSize();
-    bool bUniqueDownload = pHTTP->QueueFile( strHTTPDownloadURLFull, strFilename, dDownloadSize, NULL, 0, false, pstrContext, StaticDownloadFinished, g_pClientGame->IsLocalGame(), serverInfo.uiConnectionAttempts, serverInfo.uiConnectTimeoutMs, true );
+    bool bUniqueDownload = pHTTP->QueueFile( strHTTPDownloadURLFull, strFilename, NULL, 0, false, pstrContext, StaticDownloadFinished, g_pClientGame->IsLocalGame(), serverInfo.uiConnectionAttempts, serverInfo.uiConnectTimeoutMs, true );
     if ( !bUniqueDownload )
     {
         // TODO - If piggybacking on another matching download, then adjust progress bar
@@ -248,9 +247,9 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload( CDownloadableResou
 // Callback when file download has finished
 //
 ///////////////////////////////////////////////////////////////
-void CResourceFileDownloadManager::StaticDownloadFinished( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CResourceFileDownloadManager::StaticDownloadFinished( const SHttpDownloadResult& result )
 {
-    g_pClientGame->GetResourceFileDownloadManager()->DownloadFinished( pCompletedData, completedLength, pObj, bSuccess, iErrorCode );
+    g_pClientGame->GetResourceFileDownloadManager()->DownloadFinished( result );
 }
 
 
@@ -261,14 +260,14 @@ void CResourceFileDownloadManager::StaticDownloadFinished( char* pCompletedData,
 // Callback when file download has finished
 //
 ///////////////////////////////////////////////////////////////
-void CResourceFileDownloadManager::DownloadFinished( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CResourceFileDownloadManager::DownloadFinished( const SHttpDownloadResult& result )
 {
-    CDownloadableResource* pResourceFile = ResolveDownloadContextString( (SString*)pObj );
+    CDownloadableResource* pResourceFile = ResolveDownloadContextString( (SString*)result.pObj );
     if ( !pResourceFile )
         return;
 
     assert( ListContains( m_ActiveFileDownloadList, pResourceFile ) );
-    if ( bSuccess )
+    if ( result.bSuccess )
     {
         CChecksum checksum = CChecksum::GenerateChecksumFromFile( pResourceFile->GetName() );
         if ( checksum != pResourceFile->GetServerChecksum() )
@@ -297,7 +296,7 @@ void CResourceFileDownloadManager::DownloadFinished( char* pCompletedData, size_
             {
                 // Was re-added - Add size again to total.
                 AddDownloadSize( pResourceFile->GetDownloadSize() );
-                SString strMessage( "External HTTP file download error:[%d] %s (Disabling External HTTP) [%s]", iErrorCode, *strHTTPError, *ConformResourcePath( pResourceFile->GetName() ) );
+                SString strMessage( "External HTTP file download error:[%d] %s (Disabling External HTTP) [%s]", result.iErrorCode, *strHTTPError, *ConformResourcePath( pResourceFile->GetName() ) );
                 g_pClientGame->TellServerSomethingImportant( 1012, strMessage, 3 );
                 return;
             }

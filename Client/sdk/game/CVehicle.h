@@ -19,6 +19,7 @@
 #include "CHandlingManager.h"
 #include "CDoor.h"
 #include "CWeaponInfo.h"
+#include "CAEVehicleAudioEntity.h"
 
 #include <CVector.h>
 
@@ -225,6 +226,7 @@ public:
     virtual void                SetHeliRotorSpeed                       ( float fSpeed ) = 0;
     virtual void                SetTaxiLightOn                          ( bool bLightState ) = 0;
     virtual void                SetExplodeTime                          ( unsigned long ulTime ) = 0;
+    virtual void                SetRadioStatus                          ( bool bStatus ) = 0;
 
     virtual void                SetNitroCount                           ( char cNitroCount ) = 0;
     virtual void                SetNitroLevel                           ( float fNitroLevel ) = 0;
@@ -314,6 +316,7 @@ public:
     virtual void                 UpdateLandingGearPosition              ( void ) = 0;
     virtual bool                 SetPlateText                           ( const SString& strText ) = 0;
     virtual bool                 SetWindowOpenFlagState                 ( unsigned char ucWindow, bool bState ) = 0;
+    virtual CAEVehicleAudioEntity * GetVehicleAudioEntity               ( void ) = 0;
 };
 
 #endif

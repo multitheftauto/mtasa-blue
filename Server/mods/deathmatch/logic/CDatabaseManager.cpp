@@ -10,7 +10,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-#include "CDatabaseJobQueue.h"
+#include "CDatabaseJobQueueManager.h"
 SString InsertQueryArgumentsSqlite ( const SString& strQuery, CLuaArguments* pArgs );
 SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArgs );
 SString InsertQueryArgumentsSqlite ( const char* szQuery, va_list vl );
@@ -34,11 +34,11 @@ public:
     virtual void                    DoPulse                     ( void );
     virtual SConnectionHandle       Connect                     ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
     virtual bool                    Disconnect                  ( SConnectionHandle hConnection );
-    virtual SString                 PrepareString               ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual SString                 PrepareString               ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs = nullptr );
     virtual SString                 PrepareStringf              ( SConnectionHandle hConnection, const char* szQuery, ... );
-    virtual CDbJobData*             Exec                        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual CDbJobData*             Exec                        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs = nullptr );
     virtual CDbJobData*             Execf                       ( SConnectionHandle hConnection, const char* szQuery, ... );
-    virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs = nullptr );
     virtual CDbJobData*             QueryStartf                 ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual bool                    QueryPoll                   ( CDbJobData* pJobData, uint ulTimeout );
     virtual bool                    QueryFree                   ( CDbJobData* pJobData );
@@ -46,6 +46,7 @@ public:
     virtual const SString&          GetLastErrorMessage         ( void )                    { return m_strLastErrorMessage; }
     virtual bool                    IsLastErrorSuppressed       ( void )                    { return m_bLastErrorSuppressed; }
     virtual bool                    QueryWithResultf            ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... );
+    virtual bool                    QueryWithCallback           ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery, CLuaArguments* pArgs = nullptr );
     virtual bool                    QueryWithCallbackf          ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... );
     virtual void                    SetLogLevel                 ( EJobLogLevelType logLevel, const SString& strLogFilename );
 
@@ -55,7 +56,7 @@ public:
     void                            ClearLastErrorMessage       ( void )                                            { m_strLastErrorMessage.clear (); m_bLastErrorSuppressed = false; }
     void                            SetLastErrorMessage         ( const SString& strMsg, bool bSuppressed = false ) { m_strLastErrorMessage = strMsg; m_bLastErrorSuppressed = bSuppressed; }
 
-    CDatabaseJobQueue*                          m_JobQueue;
+    CDatabaseJobQueueManager*                   m_JobQueue;
     std::map < SConnectionHandle, SString >     m_ConnectionTypeMap;
     SString                                     m_strLastErrorMessage;
     bool                                        m_bLastErrorSuppressed;
@@ -80,7 +81,7 @@ CDatabaseManager* NewDatabaseManager ( void )
 ///////////////////////////////////////////////////////////////
 CDatabaseManagerImpl::CDatabaseManagerImpl ( void )
 {
-    m_JobQueue = NewDatabaseJobQueue ();
+    m_JobQueue = new CDatabaseJobQueueManager();
 }
 
 
@@ -117,12 +118,12 @@ void CDatabaseManagerImpl::DoPulse ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseManagerImpl::DatabaseConnect
+// CDatabaseManagerImpl::Connect
 //
 // strType is one of the supported database types i.e. "sqlite"
 //
 ///////////////////////////////////////////////////////////////
-uint CDatabaseManagerImpl::Connect ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions )
+SConnectionHandle CDatabaseManagerImpl::Connect ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions )
 {
     ClearLastErrorMessage ();
 
@@ -142,8 +143,8 @@ uint CDatabaseManagerImpl::Connect ( const SString& strType, const SString& strH
     }
 
     // Process result
-    MapSet ( m_ConnectionTypeMap, pJobData->result.connectionHandle, strType );
-    return pJobData->result.connectionHandle;
+    MapSet ( m_ConnectionTypeMap, pJobData->command.connectionHandle, strType );
+    return pJobData->command.connectionHandle;
 }
 
 
@@ -167,6 +168,12 @@ bool CDatabaseManagerImpl::Disconnect ( uint hConnection )
 
     // Start disconnect
     CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::DISCONNECT, hConnection, "" );
+    if ( !pJobData )
+    {
+        SetLastErrorMessage( "Invalid connection" );
+        MapRemove( m_ConnectionTypeMap, hConnection );
+        return false;
+    }
 
     // Complete disconnect
     m_JobQueue->PollCommand ( pJobData, -1 );
@@ -231,6 +238,11 @@ CDbJobData* CDatabaseManagerImpl::Exec ( SConnectionHandle hConnection, const SS
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    if ( !pJobData )
+    {
+        SetLastErrorMessage( "Invalid connection" );
+        return nullptr;
+    }
 
     // Ignore result
     m_JobQueue->FreeCommand ( pJobData );
@@ -290,6 +302,11 @@ CDbJobData* CDatabaseManagerImpl::Execf ( SConnectionHandle hConnection, const c
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    if ( !pJobData )
+    {
+        SetLastErrorMessage( "Invalid connection" );
+        return nullptr;
+    }
 
     // Ignore result
     m_JobQueue->FreeCommand ( pJobData );
@@ -319,7 +336,13 @@ CDbJobData* CDatabaseManagerImpl::QueryStart ( SConnectionHandle hConnection, co
     SString strEscapedQuery = InsertQueryArguments ( hConnection, strQuery, pArgs );
 
     // Start query
-    return m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    if ( !pJobData )
+    {
+        SetLastErrorMessage( "Invalid connection" );
+        return nullptr;
+    }
+    return pJobData;
 }
 
 
@@ -348,7 +371,13 @@ CDbJobData* CDatabaseManagerImpl::QueryStartf ( SConnectionHandle hConnection, c
     SString strEscapedQuery = InsertQueryArguments ( hConnection, szQuery, vl );
 
     // Start query
-    return m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    if ( !pJobData )
+    {
+        SetLastErrorMessage( "Invalid connection" );
+        return nullptr;
+    }
+    return pJobData;
 }
 
 
@@ -378,6 +407,11 @@ bool CDatabaseManagerImpl::QueryWithResultf ( SConnectionHandle hConnection, CRe
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    if ( !pJobData )
+    {
+        SetLastErrorMessage( "Invalid connection" );
+        return false;
+    }
 
     // Wait for result
     QueryPoll ( pJobData, -1 );
@@ -395,6 +429,42 @@ bool CDatabaseManagerImpl::QueryWithResultf ( SConnectionHandle hConnection, CRe
             *pResult = pJobData->result.registryResult;
         return true;
     }
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::QueryWithCallback
+//
+// Start a query and direct the result through a callback
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseManagerImpl::QueryWithCallback ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery, CLuaArguments* pArgs )
+{
+    ClearLastErrorMessage ();
+
+    // Check connection
+    if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
+    {
+        SetLastErrorMessage ( "Invalid connection" );
+        return false;
+    }
+
+    // Insert arguments with correct escapement
+    SString strEscapedQuery = InsertQueryArguments ( hConnection, strQuery, pArgs );
+
+    // Start query
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    if ( !pJobData )
+    {
+        SetLastErrorMessage( "Invalid connection" );
+        return false;
+    }
+
+    // Set callback vars
+    pJobData->SetCallback ( pfnDbResult, pCallbackContext );
+
+    return true;
 }
 
 
@@ -424,6 +494,11 @@ bool CDatabaseManagerImpl::QueryWithCallbackf ( SConnectionHandle hConnection, P
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    if ( !pJobData )
+    {
+        SetLastErrorMessage( "Invalid connection" );
+        return false;
+    }
 
     // Set callback vars
     pJobData->SetCallback ( pfnDbResult, pCallbackContext );
@@ -492,11 +567,7 @@ CDbJobData* CDatabaseManagerImpl::GetQueryFromId ( SDbJobId id )
 ///////////////////////////////////////////////////////////////
 void CDatabaseManagerImpl::SetLogLevel ( EJobLogLevelType logLevel, const SString& strLogFilename )
 {
-    CDbOptionsMap argMap;
-    argMap.Set ( "name", strLogFilename );
-    argMap.Set ( "level", logLevel );
-    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::SETLOGLEVEL, 0, argMap.ToString () );
-    m_JobQueue->FreeCommand ( pJobData );
+    return m_JobQueue->SetLogLevel( logLevel, strLogFilename );
 }
 
 ///////////////////////////////////////////////////////////////

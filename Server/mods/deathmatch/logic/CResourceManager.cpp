@@ -1378,7 +1378,7 @@ void CResourceManager::LoadBlockedFileReasons( void )
 {
     CDatabaseManager* pDatabaseManager = g_pGame->GetDatabaseManager();
     SString strDatabaseFilename = PathJoin ( g_pGame->GetConfig()->GetSystemDatabasesPath(), BLOCKED_DB_FILE_NAME );
-    SDbConnectionId hDbConnection = pDatabaseManager->Connect( "sqlite", strDatabaseFilename );
+    SDbConnectionId hDbConnection = pDatabaseManager->Connect( "sqlite", strDatabaseFilename, "", "", "queue=" DB_SQLITE_QUEUE_NAME_INTERNAL );
 
     CDbJobData* pJobData = pDatabaseManager->QueryStartf( hDbConnection, "SELECT `hash`,`reason` from " BLOCKED_DB_TABLE_NAME );
     pDatabaseManager->QueryPoll( pJobData, -1 );
@@ -1413,7 +1413,7 @@ void CResourceManager::SaveBlockedFileReasons( void )
 {
     CDatabaseManager* pDatabaseManager = g_pGame->GetDatabaseManager ();
     SString strDatabaseFilename = PathJoin( g_pGame->GetConfig()->GetSystemDatabasesPath(), BLOCKED_DB_FILE_NAME );
-    SDbConnectionId hDbConnection = pDatabaseManager->Connect( "sqlite", strDatabaseFilename );
+    SDbConnectionId hDbConnection = pDatabaseManager->Connect( "sqlite", strDatabaseFilename, "", "", "queue=" DB_SQLITE_QUEUE_NAME_INTERNAL );
 
     pDatabaseManager->Execf ( hDbConnection, "DROP TABLE " BLOCKED_DB_TABLE_NAME );
     pDatabaseManager->Execf ( hDbConnection, "CREATE TABLE IF NOT EXISTS " BLOCKED_DB_TABLE_NAME " (`hash` TEXT,`reason` TEXT)" );

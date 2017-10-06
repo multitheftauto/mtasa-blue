@@ -81,3 +81,13 @@ void CLuaShared::AddClasses(lua_State* luaVM)
     CLuaFileDefs::AddClass ( luaVM );
     CLuaXMLDefs::AddClass ( luaVM );
 }
+
+
+SharedUtil::CAsyncTaskScheduler* CLuaShared::GetAsyncTaskScheduler()
+{
+#ifdef MTA_CLIENT
+    return g_pClientGame->GetAsyncTaskScheduler();
+#else
+    return g_pGame->GetAsyncTaskScheduler();
+#endif
+}

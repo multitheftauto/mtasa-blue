@@ -103,7 +103,7 @@ int main ( int argc, char* argv [] )
             printf ( "  -u                   Disable output buffering and flush instantly (useful for screenlog)\n" );
 #ifndef WIN32
             printf ( "  -x                   Disable simplified crash reports (To allow core dumps)\n" );
-            printf ( "  -q                   Do not add " LINUX_LIBS_PATH " directory to library search path\n" );
+            printf ( "  -q                   Do not add " LINUX_LIBS_PATH " directory to library search path and relaunch\n" );
 #endif
             printf ( "  -D [PATH]            Use as base directory\n" );
             printf ( "  --config [FILE]      Alternate mtaserver.conf file\n" );

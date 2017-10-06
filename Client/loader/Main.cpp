@@ -14,7 +14,7 @@
 
 #include "StdInc.h"
 #include "SharedUtil.Win32Utf8FileHooks.hpp"
-#if defined(_DEBUG) 
+#if defined(MTA_DEBUG) 
     #include "SharedUtil.Tests.hpp"
 #endif
 
@@ -30,12 +30,11 @@
 //      4. By 'MTA San Andreas.exe' during auto-update (in a temporary directory somewhere) (Which may then call it again as admin)
 //
 ///////////////////////////////////////////////////////////////
-extern "C" _declspec(dllexport)
-int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+MTAEXPORT int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
     AddUtf8FileHooks();
 
-#if defined(_DEBUG) 
+#if defined(MTA_DEBUG) 
     SharedUtil_Tests ();
 #endif
 
