@@ -441,7 +441,13 @@ public:
     RwTexture* m_pCustomPlateTexture;
 
     //1420
-    BYTE Padding225[20];
+    BYTE Padding225[4];
+
+    //1424
+    BYTE m_type;                    // 0 = car/plane, 5 = boat, 6 = train, 9 = bike
+
+    //1425
+    BYTE Padding226[15];
 
     //1440
     unsigned char m_ucTrackNodeID;  // Current node on train tracks
@@ -493,7 +499,6 @@ public:
     RwFrame * pWindscreen;
     RwFrame * pExhaust;
 
-
     // Hacked in from jb-contribs branch
     RwFrame * pSpecialParts[5]; // 1688
     RwFrame * pExtraParts[5]; // 1708
@@ -504,11 +509,17 @@ public:
     CColPointSAInterface WheelFrontRightColPoint;
     CColPointSAInterface WheelRearRightColPoint;
 
-    BYTE padding280[260];
+    BYTE padding275[32];
+    // 2036
+    float wheelCollisionState[MAX_WHEELS];
+
+    // 2052
+    BYTE padding280[224];
+
     // 2276
     float m_fBurningTime;
 };
-static_assert(sizeof(CVehicleSAInterface) == 1688 + 576 + 4 , "Invalid size for CVehicleSAInterface");
+static_assert(sizeof(CVehicleSAInterface) == 1688 + 576 + 4 + 12 , "Invalid size for CVehicleSAInterface");
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
@@ -727,7 +738,7 @@ public:
     BYTE                        GetBikeWheelStatus              ( BYTE bWheel );
     void                        SetBikeWheelStatus              ( BYTE bWheel, BYTE bStatus );
 
-    bool                        IsWheelCollided                 ( BYTE bWheel );
+    bool                        IsWheelCollided                 ( BYTE eWheelPosition );
 
     void                        GetGravity                      ( CVector* pvecGravity ) const  { *pvecGravity = m_vecGravity; }
     void                        SetGravity                      ( const CVector* pvecGravity );
