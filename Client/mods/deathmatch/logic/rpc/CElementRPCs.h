@@ -25,7 +25,7 @@ public:
     DECLARE_ELEMENT_RPC ( RemoveElementData );
     DECLARE_ELEMENT_RPC ( SetElementPosition );
     DECLARE_ELEMENT_RPC ( SetElementVelocity );
-    DECLARE_ELEMENT_RPC ( SetElementTurnVelocity );
+    DECLARE_ELEMENT_RPC ( SetElementAngularVelocity );
     DECLARE_ELEMENT_RPC ( SetElementInterior );
     DECLARE_ELEMENT_RPC ( SetElementDimension );
     DECLARE_ELEMENT_RPC ( AttachElements );

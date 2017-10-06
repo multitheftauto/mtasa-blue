@@ -23,7 +23,7 @@ void CElementRPCs::LoadFunctions ( void )
     AddHandler ( REMOVE_ELEMENT_DATA,            RemoveElementData,           "RemoveElementData" );
     AddHandler ( SET_ELEMENT_POSITION,           SetElementPosition,          "SetElementPosition" );
     AddHandler ( SET_ELEMENT_VELOCITY,           SetElementVelocity,          "SetElementVelocity" );
-    AddHandler ( SET_ELEMENT_TURNSPEED,          SetElementTurnVelocity,      "SetElementTurnVelocity" );
+    AddHandler ( SET_ELEMENT_ANGULAR_VELOCITY,   SetElementAngularVelocity,   "SetElementAngularVelocity" );
     AddHandler ( SET_ELEMENT_INTERIOR,           SetElementInterior,          "SetElementInterior" );
     AddHandler ( SET_ELEMENT_DIMENSION,          SetElementDimension,         "SetElementDimension" );
     AddHandler ( ATTACH_ELEMENTS,                AttachElements,              "AttachElements" );
@@ -223,13 +223,13 @@ void CElementRPCs::SetElementVelocity ( CClientEntity* pSource, NetBitStreamInte
 }
 
 
-void CElementRPCs::SetElementTurnVelocity ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementAngularVelocity ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
 {
     // Read out the entity id and the turn speed
-    CVector vecTurnVelocity;
-    if ( bitStream.Read ( vecTurnVelocity.fX ) &&
-         bitStream.Read ( vecTurnVelocity.fY ) &&
-         bitStream.Read ( vecTurnVelocity.fZ ) )
+    CVector vecAngularVelocity;
+    if ( bitStream.Read ( vecAngularVelocity.fX ) &&
+         bitStream.Read ( vecAngularVelocity.fY ) &&
+         bitStream.Read ( vecAngularVelocity.fZ ) )
     {
         switch ( pSource->GetType () )
         {
@@ -238,14 +238,14 @@ void CElementRPCs::SetElementTurnVelocity ( CClientEntity* pSource, NetBitStream
             {
                 CClientPed* pPed = static_cast < CClientPed* > ( pSource );
 
-                pPed->SetTurnSpeed ( vecTurnVelocity );
+                pPed->SetTurnSpeed ( vecAngularVelocity );
 
                 break;
             }
             case CCLIENTVEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );                    
-                pVehicle->SetTurnSpeed ( vecTurnVelocity );
+                pVehicle->SetTurnSpeed ( vecAngularVelocity );
 
                 break;
             }
@@ -253,7 +253,7 @@ void CElementRPCs::SetElementTurnVelocity ( CClientEntity* pSource, NetBitStream
             case CCLIENTWEAPON:
             {
                 CClientObject * pObject = static_cast < CClientObject * > ( pSource );
-                pObject->SetTurnSpeed ( vecTurnVelocity );
+                pObject->SetTurnSpeed ( vecAngularVelocity );
                 
                 break;
             }

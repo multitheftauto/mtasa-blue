@@ -1270,7 +1270,7 @@ bool CStaticFunctionDefinitions::GetElementVelocity ( CElement* pElement, CVecto
 }
 
 
-bool CStaticFunctionDefinitions::GetElementTurnVelocity ( CElement* pElement, CVector& vecTurnVelocity )
+bool CStaticFunctionDefinitions::GetElementAngularVelocity ( CElement* pElement, CVector& vecAngularVelocity )
 {
     assert ( pElement );
 
@@ -1280,7 +1280,7 @@ bool CStaticFunctionDefinitions::GetElementTurnVelocity ( CElement* pElement, CV
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            vecTurnVelocity = pVehicle->GetTurnSpeed ();
+            vecAngularVelocity = pVehicle->GetTurnSpeed ();
 
             break;
         }
@@ -1447,10 +1447,10 @@ bool CStaticFunctionDefinitions::SetElementVelocity ( CElement* pElement, const 
 }
 
 
-bool CStaticFunctionDefinitions::SetElementTurnVelocity ( CElement* pElement, const CVector& vecTurnVelocity )
+bool CStaticFunctionDefinitions::SetElementAngularVelocity ( CElement* pElement, const CVector& vecAngularVelocity )
 {
     assert ( pElement );
-    RUN_CHILDREN( SetElementTurnVelocity ( *iter, vecTurnVelocity ) )
+    RUN_CHILDREN( SetElementAngularVelocity ( *iter, vecAngularVelocity ) )
 
     int iType = pElement->GetType ();
     switch ( iType )
@@ -1464,7 +1464,7 @@ bool CStaticFunctionDefinitions::SetElementTurnVelocity ( CElement* pElement, co
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            pVehicle->SetTurnSpeed ( vecTurnVelocity );
+            pVehicle->SetTurnSpeed ( vecAngularVelocity );
 
             break;
         }
@@ -1478,10 +1478,10 @@ bool CStaticFunctionDefinitions::SetElementTurnVelocity ( CElement* pElement, co
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( vecTurnVelocity.fX );
-    BitStream.pBitStream->Write ( vecTurnVelocity.fY );
-    BitStream.pBitStream->Write ( vecTurnVelocity.fZ );
-    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_TURNSPEED, *BitStream.pBitStream ) );
+    BitStream.pBitStream->Write ( vecAngularVelocity.fX );
+    BitStream.pBitStream->Write ( vecAngularVelocity.fY );
+    BitStream.pBitStream->Write ( vecAngularVelocity.fZ );
+    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_ANGULAR_VELOCITY, *BitStream.pBitStream ) );
 
     return true;
 }
@@ -5106,11 +5106,11 @@ bool CStaticFunctionDefinitions::GetVehicleRotation ( CVehicle* pVehicle, CVecto
 }
 
 
-bool CStaticFunctionDefinitions::GetVehicleTurnVelocity ( CVehicle* pVehicle, CVector& vecTurnVelocity )
+bool CStaticFunctionDefinitions::GetVehicleAngularVelocity ( CVehicle* pVehicle, CVector& vecAngularVelocity )
 {
     assert ( pVehicle );
 
-    vecTurnVelocity = pVehicle->GetTurnSpeed ();
+    vecAngularVelocity = pVehicle->GetTurnSpeed ();
     return true;
 }
 
@@ -6575,20 +6575,20 @@ bool CStaticFunctionDefinitions::SetVehicleTaxiLightOn ( CElement* pElement, boo
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleTurnVelocity ( CElement* pElement, const CVector& vecTurnVelocity )
+bool CStaticFunctionDefinitions::SetVehicleAngularVelocity ( CElement* pElement, const CVector& vecAngularVelocity )
 {
     assert ( pElement );
-    RUN_CHILDREN( SetVehicleTurnVelocity ( *iter, vecTurnVelocity ) )
+    RUN_CHILDREN( SetVehicleAngularVelocity ( *iter, vecAngularVelocity ) )
 
     if ( IS_VEHICLE ( pElement ) )
     {
         CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-        pVehicle->SetTurnSpeed ( vecTurnVelocity );
+        pVehicle->SetTurnSpeed ( vecAngularVelocity );
 
         CBitStream BitStream;
-        BitStream.pBitStream->Write ( vecTurnVelocity.fX );
-        BitStream.pBitStream->Write ( vecTurnVelocity.fY );
-        BitStream.pBitStream->Write ( vecTurnVelocity.fZ );
+        BitStream.pBitStream->Write ( vecAngularVelocity.fX );
+        BitStream.pBitStream->Write ( vecAngularVelocity.fY );
+        BitStream.pBitStream->Write ( vecAngularVelocity.fZ );
         m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pVehicle, SET_VEHICLE_TURNSPEED, *BitStream.pBitStream ) );
         return true;
     }

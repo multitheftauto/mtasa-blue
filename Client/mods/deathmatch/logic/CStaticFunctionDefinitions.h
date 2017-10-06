@@ -68,7 +68,7 @@ public:
     static bool                         GetElementPosition                  ( CClientEntity& Entity, CVector & vecPosition );
     static bool                         GetElementRotation                  ( CClientEntity& Entity, CVector & vecRotation, eEulerRotationOrder rotationOrder );
     static bool                         GetElementVelocity                  ( CClientEntity& Entity, CVector& vecVelocity );
-    static bool                         GetElementTurnVelocity              ( CClientEntity& Entity, CVector& vecTurnVelocity );
+    static bool                         GetElementAngularVelocity           ( CClientEntity& Entity, CVector& vecAngularVelocity );
     static bool                         GetElementInterior                  ( CClientEntity& Entity, unsigned char& ucInterior );
     static bool                         GetElementBoundingBox               ( CClientEntity& Entity, CVector &vecMin, CVector &vecMax );
     static bool                         GetElementRadius                    ( CClientEntity& Entity, float &fRadius );
@@ -98,7 +98,7 @@ public:
     static bool                         SetElementPosition                  ( CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true );
     static bool                         SetElementRotation                  ( CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay );
     static bool                         SetElementVelocity                  ( CClientEntity& Element, const CVector& vecVelocity );
-    static bool                         SetElementTurnVelocity              ( CClientEntity& Element, const CVector& vecTurnVelocity );
+    static bool                         SetElementAngularVelocity           ( CClientEntity& Element, const CVector& vecAngularVelocity );
     static bool                         SetElementParent                    ( CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain );
     static bool                         SetElementInterior                  ( CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition );
     static bool                         SetElementDimension                 ( CClientEntity& Entity, unsigned short usDimension );
@@ -238,7 +238,7 @@ public:
     static bool                         SetVehicleDoorsUndamageable         ( CClientEntity& Entity, bool bDoorsUndamageable );
     static bool                         SetVehicleRotation                  ( CClientEntity& Entity, const CVector& vecRotation );
     static bool                         SetVehicleSirensOn                  ( CClientEntity& Entity, bool bSirensOn );
-    static bool                         SetVehicleTurnVelocity              ( CClientEntity& Entity, const CVector& vecTurnVelocity );
+    static bool                         SetVehicleAngularVelocity           ( CClientEntity& Entity, const CVector& vecAngularVelocity );
     static bool                         AddVehicleUpgrade                   ( CClientEntity& Entity, unsigned short usUpgrade );
     static bool                         AddAllVehicleUpgrades               ( CClientEntity& Entity );
     static bool                         RemoveVehicleUpgrade                ( CClientEntity& Entity, unsigned short usUpgrade );
