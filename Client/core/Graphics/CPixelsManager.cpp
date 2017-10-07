@@ -290,8 +290,8 @@ bool CPixelsManager::GetSurfacePixels ( IDirect3DSurface9* pD3DSurface, CPixels&
     uint PixelsRectWidth = GetRectWidth ( PixelsRect );
     uint PixelsRectHeight = GetRectHeight ( PixelsRect );
 
-    uint CopyWidth = Min ( SurfRectWidth, PixelsRectWidth );
-    uint CopyHeight = Min ( SurfRectHeight, PixelsRectHeight );
+    uint CopyWidth = std::min ( SurfRectWidth, PixelsRectWidth );
+    uint CopyHeight = std::min ( SurfRectHeight, PixelsRectHeight );
 
     // Prepare pixels
     uint ulPixelsPitch = uiPixelsWidth * XRGB_BYTES_PER_PIXEL;
@@ -414,8 +414,8 @@ bool CPixelsManager::SetSurfacePixels ( IDirect3DSurface9* pD3DSurface, const CP
     uint PixelsRectWidth = GetRectWidth ( PixelsRect );
     uint PixelsRectHeight = GetRectHeight ( PixelsRect );
 
-    uint CopyWidth = Min ( SurfRectWidth, PixelsRectWidth );
-    uint CopyHeight = Min ( SurfRectHeight, PixelsRectHeight );
+    uint CopyWidth = std::min ( SurfRectWidth, PixelsRectWidth );
+    uint CopyHeight = std::min ( SurfRectHeight, PixelsRectHeight );
 
     // Prepare pixels
     uint ulPixelsPitch = uiPixelsWidth * XRGB_BYTES_PER_PIXEL;
@@ -709,7 +709,7 @@ bool CPixelsManager::ChangePixelsFormat ( const CPixels& oldPixels, CPixels& new
         if ( oldFormat == EPixelsFormat::JPEG )
         {
             uint uiWidth, uiHeight;
-            if ( JpegDecode ( oldPixels.GetData (), oldPixels.GetSize (), newPixels.buffer, uiWidth, uiHeight ) )
+            if ( JpegDecode ( oldPixels.GetData (), oldPixels.GetSize (), &newPixels.buffer, uiWidth, uiHeight ) )
             {
                 newPixels.buffer.SetSize ( uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL );
                 return SetPlainDimensions ( newPixels, uiWidth, uiHeight );
@@ -719,7 +719,7 @@ bool CPixelsManager::ChangePixelsFormat ( const CPixels& oldPixels, CPixels& new
         if ( oldFormat == EPixelsFormat::PNG )
         {
             uint uiWidth, uiHeight;
-            if ( PngDecode ( oldPixels.GetData (), oldPixels.GetSize (), newPixels.buffer, uiWidth, uiHeight ) )
+            if ( PngDecode ( oldPixels.GetData (), oldPixels.GetSize (), &newPixels.buffer, uiWidth, uiHeight ) )
             {
                 newPixels.buffer.SetSize ( uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL );
                 return SetPlainDimensions ( newPixels, uiWidth, uiHeight );
@@ -824,24 +824,24 @@ int CPixelsManager::GetRectHeight ( const RECT& rc )
 bool CPixelsManager::ClipRects ( const POINT& SrcSize, RECT& SrcRect, const POINT& DestSize, RECT& DestRect )
 {
     // Left bounds
-    int LowestLeft = Min ( SrcRect.left, DestRect.left );
-    int MoveX = Max ( -LowestLeft, 0 );
+    int LowestLeft = std::min ( SrcRect.left, DestRect.left );
+    int MoveX = std::max ( -LowestLeft, 0 );
     SrcRect.left += MoveX;
     DestRect.left += MoveX;
 
     // Top bounds
-    int LowestTop = Min ( SrcRect.top, DestRect.top );
-    int MoveY = Max ( -LowestTop, 0 );
+    int LowestTop = std::min ( SrcRect.top, DestRect.top );
+    int MoveY = std::max ( -LowestTop, 0 );
     SrcRect.top += MoveY;
     DestRect.top += MoveY;
 
     // Right bounds
-    SrcRect.right = Min ( SrcRect.right, SrcSize.x );
-    DestRect.right = Min ( DestRect.right, DestSize.x );
+    SrcRect.right = std::min ( SrcRect.right, SrcSize.x );
+    DestRect.right = std::min ( DestRect.right, DestSize.x );
 
     // Bottom bounds
-    SrcRect.bottom = Min ( SrcRect.bottom, SrcSize.y );
-    DestRect.bottom = Min ( DestRect.bottom, DestSize.y );
+    SrcRect.bottom = std::min ( SrcRect.bottom, SrcSize.y );
+    DestRect.bottom = std::min ( DestRect.bottom, DestSize.y );
 
     if ( SrcRect.right - SrcRect.left > 0 && SrcRect.bottom - SrcRect.top > 0 &&
          DestRect.right - DestRect.left > 0 && DestRect.bottom - DestRect.top > 0 )

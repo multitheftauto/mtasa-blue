@@ -260,13 +260,20 @@ void CClientPlayer::SetNametagText ( const char * szText )
     }
 }
 
-
+// Only called for remote players
 void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fBackupDamage, uchar ucBackupHitZone, CClientPlayer* pBackupDamagedPlayer )
 {
     if ( m_pPlayerPed )
     {
         g_pApplyDamageLastDamagedPed = NULL;
         g_fApplyDamageLastAmount = 0;
+
+        // Ensure remote player has the weapon
+        if ( weaponType != GetCurrentWeaponType() )
+        {
+            GiveWeapon(weaponType, 99, true);
+            AddReportLog(5432, SString("DischargeWeapon adding missing weapon %d (%s)", weaponType, GetNick()), 30);
+        }
 
         // Check weapon matches and is enabled for bullet sync
         if ( weaponType == GetCurrentWeaponType () &&
@@ -311,8 +318,8 @@ void CClientPlayer::DischargeWeapon ( eWeaponType weaponType, const CVector& vec
                 float fPreviousArmor = pBackupDamagedPlayer->m_fArmor;
 
                 // Calculate how much damage should be applied to health/armor
-                float fArmorDamage = Min( fBackupDamage, pBackupDamagedPlayer->m_fArmor ); 
-                float fHealthDamage = Min( fBackupDamage - fArmorDamage, pBackupDamagedPlayer->m_fHealth );
+                float fArmorDamage = std::min( fBackupDamage, pBackupDamagedPlayer->m_fArmor );
+                float fHealthDamage = std::min( fBackupDamage - fArmorDamage, pBackupDamagedPlayer->m_fHealth );
 
                 float fNewArmor = pBackupDamagedPlayer->m_fArmor - fArmorDamage;
                 float fNewHealth = pBackupDamagedPlayer->m_fHealth - fHealthDamage;

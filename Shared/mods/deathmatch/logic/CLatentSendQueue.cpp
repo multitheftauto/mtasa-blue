@@ -64,7 +64,7 @@ void CLatentSendQueue::DoPulse ( int iTimeMsBetweenCalls )
         }
     }
 
-    m_uiCurrentRate = Max < uint > ( MIN_SEND_RATE, m_uiCurrentRate );
+    m_uiCurrentRate = std::max < uint > ( MIN_SEND_RATE, m_uiCurrentRate );
 
     // How many bytes to send this pulse
     int iBytesToSendThisPulse = iTimeMsBetweenCalls * m_uiCurrentRate / 1000;
@@ -118,11 +118,11 @@ void CLatentSendQueue::DoPulse ( int iTimeMsBetweenCalls )
 
         // Align to next boundary
         pBitStream->AlignWriteToByteBoundary ();
-        uint uiMaxDataSize = Max < int > ( 10, uiMaxPacketSize - pBitStream->GetNumberOfBytesUsed () );
+        uint uiMaxDataSize = std::max < int > ( 10, uiMaxPacketSize - pBitStream->GetNumberOfBytesUsed () );
 
         // Calc how much data to send
         uint uiDataOffset = activeTx.uiReadPosition;
-        uint uiSizeToSend = Min ( uiMaxDataSize, activeTx.bufferRef->GetSize () - activeTx.uiReadPosition );
+        uint uiSizeToSend = std::min( uiMaxDataSize, activeTx.bufferRef->GetSize () - activeTx.uiReadPosition );
         activeTx.uiReadPosition += uiSizeToSend;
 
         pBitStream->Write ( (ushort)uiSizeToSend );
@@ -155,7 +155,7 @@ SSendHandle CLatentSendQueue::AddSend ( CBufferRef bufferRef, uint uiRate, ushor
     newTx.usResourceNetId = usResourceNetId;
 
     // Current rate is highest queued item
-    m_uiCurrentRate = Max ( m_uiCurrentRate, newTx.uiRate );
+    m_uiCurrentRate = std::max ( m_uiCurrentRate, newTx.uiRate );
 
     return newTx.uiId;
 }
@@ -230,7 +230,7 @@ bool CLatentSendQueue::GetSendStatus ( SSendHandle handle, SSendStatus* pOutSend
             pOutSendStatus->iStartTimeMsOffset = iTimeMsBefore - iter->iEstSendDurationMsUsed;
             pOutSendStatus->iEndTimeMsOffset = iTimeMsBefore + iter->iEstSendDurationMsRemaining;
             pOutSendStatus->iTotalSize = iter->bufferRef->GetSize ();
-            pOutSendStatus->iPercentComplete = iter->uiReadPosition * 100 / Max ( 1, pOutSendStatus->iTotalSize );
+            pOutSendStatus->dPercentComplete = iter->uiReadPosition * 100.0 / std::max ( 1, pOutSendStatus->iTotalSize );
             return true;
         }
         iTimeMsBefore += iter->iEstSendDurationMsRemaining;
@@ -272,7 +272,7 @@ void CLatentSendQueue::UpdateEstimatedDurations ( void )
     {
         SSendItem& tx = *iter;
 
-        uiUsingRate = Max ( uiUsingRate, tx.uiRate );
+        uiUsingRate = std::max ( uiUsingRate, tx.uiRate );
         tx.iEstSendDurationMsRemaining = tx.bufferRef->GetSize () * 1000 / uiUsingRate;
         tx.iEstSendDurationMsUsed = 0;
 
@@ -300,7 +300,7 @@ void CLatentSendQueue::PostQueueRemove ( void )
     // Recalculate the current transfer rate
     m_uiCurrentRate = MIN_SEND_RATE;
     for ( std::list < SSendItem >::iterator iter = m_TxQueue.begin () ; iter != m_TxQueue.end () ; ++iter )
-        m_uiCurrentRate = Max ( m_uiCurrentRate, iter->uiRate );
+        m_uiCurrentRate = std::max ( m_uiCurrentRate, iter->uiRate );
 }
 
 

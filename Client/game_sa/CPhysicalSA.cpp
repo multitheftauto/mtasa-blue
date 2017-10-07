@@ -110,16 +110,7 @@ VOID CPhysicalSA::SetMoveSpeed(CVector * vecMoveSpeed)
 VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)");
-    DWORD dwFunc = FUNC_GetTurnSpeed;
-    DWORD dwThis = (DWORD)((CPhysicalSAInterface *)this->GetInterface());
-    DWORD dwReturn = 0;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
-    MemCpyFast ((void *)dwReturn, vecTurnSpeed, sizeof(CVector));
+    ((CPhysicalSAInterface *)this->GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
 }
 
 float CPhysicalSA::GetMass ( void )
@@ -393,4 +384,13 @@ void CPhysicalSA::SetLighting ( float fLighting )
 {
     CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
     pInterface->m_fLighting = fLighting;
+}
+
+void CPhysicalSA::SetFrozen ( bool bFrozen )
+{
+    CPhysicalSAInterface * pInterface = (CPhysicalSAInterface *)this->GetInterface();
+
+    pInterface->bDontApplySpeed = bFrozen;
+    // Don't enable friction for static objects
+    pInterface->bDisableFriction = ( bFrozen || pInterface->m_fMass >= PHYSICAL_MAXMASS );
 }

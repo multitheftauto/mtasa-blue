@@ -465,11 +465,33 @@ IMPLEMENT_ENUM_BEGIN(eFieldOfViewMode)
     ADD_ENUM(FOV_MODE_AIMING, "aiming")
 IMPLEMENT_ENUM_END("fieldofview-mode")
 
+IMPLEMENT_ENUM_BEGIN(eTrayIconType)
+    ADD_ENUM(ICON_TYPE_DEFAULT, "default")
+    ADD_ENUM(ICON_TYPE_INFO, "info")
+    ADD_ENUM(ICON_TYPE_WARNING, "warning")
+    ADD_ENUM(ICON_TYPE_ERROR, "error")
+IMPLEMENT_ENUM_END("tray-icon-type")
+
 IMPLEMENT_ENUM_BEGIN ( eJSONPrettyType )
     ADD_ENUM ( JSONPRETTY_SPACES, "spaces" )
     ADD_ENUM ( JSONPRETTY_NONE, "none" )
     ADD_ENUM ( JSONPRETTY_TABS, "tabs" )
 IMPLEMENT_ENUM_END ( "json-pretty-type" )
+
+IMPLEMENT_ENUM_BEGIN ( eCursorType )
+    ADD_ENUM ( CURSORTYPE_NONE,         "none" )            // cursor has no image
+    ADD_ENUM ( CURSORTYPE_DEFAULT,      "arrow" )           // default cursor
+    ADD_ENUM ( CURSORTYPE_SIZING_NS,    "sizing_ns" )       // N-S (up-down) sizing cursor
+    ADD_ENUM ( CURSORTYPE_SIZING_EW,    "sizing_ew" )       // E-W (left-right) sizing cursor
+    ADD_ENUM ( CURSORTYPE_SIZING_NWSE,  "sizing_nwse" )     // NW-SE diagonal sizing cursor
+    ADD_ENUM ( CURSORTYPE_SIZING_NESW,  "sizing_nesw" )     // NE-SW diagonal sizing cursor
+    ADD_ENUM ( CURSORTYPE_SIZING_ESWE,  "sizing_eswe" )     // ES-WE horizontal sizing cursor
+    ADD_ENUM ( CURSORTYPE_MOVE,         "move" )            // move cursor
+    ADD_ENUM ( CURSORTYPE_DRAG,         "container_drag" )  // drag container cursor (note: not in use)
+    ADD_ENUM ( CURSORTYPE_SEG_MOVING,   "segment_moving" )  // segment moving cursor (note: not in use)
+    ADD_ENUM ( CURSORTYPE_SEG_SIZING,   "segment_sizing" )  // segment sizing cursor (note: not in use)
+IMPLEMENT_ENUM_END ( "cursor-type" )
+
 
 //
 // Get best guess at name of userdata type
@@ -636,8 +658,9 @@ bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix )
 
 //
 // Check min client is correct
+// Return false if below required
 //
-void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
+bool MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
 {
     CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine ( argStream.m_luaVM );
     if ( pLuaMain )
@@ -648,11 +671,14 @@ void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, 
             if ( pResource->GetMinClientReq () < szVersionReq )
             {
                 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
-                    argStream.SetVersionWarning ( szVersionReq, "client", szReason );
+                    if (szReason)
+                        argStream.SetVersionWarning ( szVersionReq, "client", szReason );
                 #endif
+                return false;
             }
         }
     }
+    return true;
 }
 
 //
@@ -726,4 +752,22 @@ uint GetWeaponPropertyFlagBit( eWeaponProperty weaponProperty )
     uint uiFlagIndex = ( weaponProperty - WEAPON_FLAG_FIRST );
     uint uiFlagBit = 1 << uiFlagIndex;
     return uiFlagBit;
+}
+
+
+//
+// Set error if pThisResource does not have permission to modify pOtherResource
+//
+void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 )
+{
+    // No operation on the client
+}
+
+
+//
+// Set error if resource file access is blocked due to reasons
+//
+void CheckCanAccessOtherResourceFile( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly )
+{
+    // No operation on the client
 }

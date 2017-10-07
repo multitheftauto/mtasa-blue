@@ -55,6 +55,8 @@ public:
     virtual float       GetLighting                 ( void ) = 0;
     virtual void        SetLighting                 ( float fLighting ) = 0;
 
+    virtual void        SetFrozen                   ( bool bFrozen ) = 0;
+
 /*  virtual VOID        SetMass(FLOAT fMass)=0;
     virtual FLOAT       GetMass()=0;
     virtual VOID        SetTurnMass(FLOAT fTurnMass)=0;

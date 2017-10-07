@@ -75,8 +75,8 @@ public:
     unsigned int                    GetVoiceQuality                 ( void )        { return m_ucVoiceQuality; };
     unsigned int                    GetVoiceBitrate                 ( void )        { return m_uiVoiceBitrate; };
 
-    bool                            GetAseInternetPushEnabled       ( void )        { return m_iAseMode == 2; }
-    bool                            GetAseInternetListenEnabled     ( void )        { return m_iAseMode == 1; }
+    bool                            GetAseInternetPushEnabled       ( void )        { return m_iAseMode == 2 && !IsFakeLagCommandEnabled(); }
+    bool                            GetAseInternetListenEnabled     ( void )        { return m_iAseMode == 1 && !IsFakeLagCommandEnabled(); }
     bool                            GetAseLanListenEnabled          ( void )        { return m_bDontBroadcastLan ? false : true; }
     unsigned short                  GetHTTPPort                     ( void );
     inline eHTTPDownloadType        GetHTTPDownloadType             ( void )        { return m_ucHTTPDownloadType; };
@@ -88,7 +88,6 @@ public:
     inline int                      GetEnableClientChecks           ( void )        { return m_iEnableClientChecks; };
     inline const std::string&       GetLogFile                      ( void )        { return m_strLogFile; };
     inline const std::string&       GetAuthFile                     ( void )        { return m_strAuthFile; };
-    inline bool                     GetAutoUpdateAntiCheatEnabled   ( void )        { return m_bAutoUpdateAntiCheatEnabled; };
     inline bool                     GetJoinFloodProtectionEnabled   ( void )        { return m_bJoinFloodProtectionEnabled; };
     inline bool                     GetScriptDebugLogEnabled        ( void )        { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty (); };
     inline const std::string&       GetScriptDebugLogFile           ( void )        { return m_strScriptDebugLogFile; };
@@ -100,7 +99,6 @@ public:
     SString                         GetMinClientVersion             ( void )                    { return m_strMinClientVersion; }
     const SString&                  GetRecommendedClientVersion     ( void )                    { return m_strRecommendedClientVersion; }
     int                             GetMinClientVersionAutoUpdate   ( void )                    { return m_iMinClientVersionAutoUpdate; }
-    inline bool                     IsAutoLoginEnabled              ( )                         { return m_bAutoLogin; }
     const SString&                  GetIdFile                       ( void )                    { return m_strIdFile; }
     bool                            GetThreadNetEnabled             ( void )                    { return m_bThreadNetEnabled; }
     const SString&                  GetGlobalDatabasesPath          ( void )                    { return m_strGlobalDatabasesPath; }
@@ -124,9 +122,17 @@ public:
     bool                            GetUseAltPulseOrder             ( void ) const              { return m_bUseAltPulseOrder != 0; }
     const SString&                  GetLoadstringLogFilename        ( void ) const              { return m_strLoadstringLogFilename; }
     bool                            GetLoadstringLogEnabled         ( void ) const              { return !m_strLoadstringLogFilename.empty(); }
-    bool                            GetBadNetBulletFixEnabled       ( void ) const              { return m_bBadNetBulletFixEnabled != 0; }
     bool                            GetCrashDumpUploadEnabled       ( void ) const              { return m_bCrashDumpUploadEnabled != 0; }
     bool                            GetFilterDuplicateLogLinesEnabled ( void ) const            { return m_bFilterDuplicateLogLinesEnabled != 0; }
+    bool                            IsAuthSerialGroup               ( const SString& strGroup ) const   { return ListContains ( m_AuthSerialGroupList, strGroup ); };
+    bool                            IsAuthSerialHttpIpException     ( const SString& strIp ) const      { return ListContains ( m_AuthSerialHttpIpExceptionList, strIp ); }
+    bool                            GetAuthSerialEnabled            ( void ) const                      { return !m_AuthSerialGroupList.empty(); };
+    bool                            GetAuthSerialHttpEnabled        ( void ) const                      { return m_bAuthSerialHttpEnabled && GetAuthSerialEnabled(); };
+    const std::vector< SString >&   GetAuthSerialGroupList          ( void ) const                      { return m_AuthSerialGroupList; }
+    const std::vector< SString >&   GetAuthSerialHttpIpExceptionList( void ) const                      { return m_AuthSerialHttpIpExceptionList; }
+    const std::vector< SString >&   GetOwnerEmailAddressList        ( void ) const                      { return m_OwnerEmailAddressList; }
+    bool                            IsDatabaseCredentialsProtectionEnabled ( void ) const               { return m_bDatabaseCredentialsProtectionEnabled != 0; }
+    bool                            IsFakeLagCommandEnabled         ( void ) const                      { return m_bFakeLagCommandEnabled != 0; }
 
     SString                         GetSetting                      ( const SString& configSetting );
     bool                            GetSetting                      ( const SString& configSetting, SString& strValue );
@@ -147,6 +153,7 @@ public:
 private:
     void                            RegisterCommand                 ( const char* szName, FCommandHandler* pFunction, bool bRestricted );
     bool                            GetSettingTable                 ( const SString& strName, const char** szAttribNames, uint uiNumAttribNames, CLuaArguments* outTable );
+    bool                            AddMissingSettings              ( void );
 
     CConsole*                       m_pConsole;
     CLuaManager*                    m_pLuaManager;
@@ -178,7 +185,6 @@ private:
     int                             m_iEnableClientChecks;
     std::string                     m_strLogFile;
     std::string                     m_strAuthFile;
-    bool                            m_bAutoUpdateAntiCheatEnabled;
     bool                            m_bJoinFloodProtectionEnabled;
     bool                            m_bScriptDebugLogEnabled;
     std::string                     m_strScriptDebugLogFile;
@@ -189,9 +195,12 @@ private:
     int                             m_bDontBroadcastLan;
     std::set < SString >            m_DisableComboACMap;
     std::set < SString >            m_EnableDiagnosticMap;
+    std::vector < SString >         m_AuthSerialGroupList;
+    bool                            m_bAuthSerialHttpEnabled;
+    std::vector<SString>            m_AuthSerialHttpIpExceptionList;
+    std::vector<SString>            m_OwnerEmailAddressList;
     SString                         m_strMinClientVersion;
     SString                         m_strRecommendedClientVersion;
-    bool                            m_bAutoLogin;
     SString                         m_strIdFile;
     SString                         m_strGlobalDatabasesPath;
     SString                         m_strSystemDatabasesPath;
@@ -216,9 +225,10 @@ private:
     SString                         m_strLoadstringLogFilename;
     int                             m_iMinClientVersionAutoUpdate;
     int                             m_iServerLogicFpsLimit;
-    int                             m_bBadNetBulletFixEnabled;
     int                             m_bCrashDumpUploadEnabled;
     int                             m_bFilterDuplicateLogLinesEnabled;
+    int                             m_bDatabaseCredentialsProtectionEnabled;
+    int                             m_bFakeLagCommandEnabled;
 };
 
 #endif

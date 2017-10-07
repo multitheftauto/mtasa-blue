@@ -31,7 +31,6 @@ class CLocalGUI;
 #include "CMainMenu.h"
 #include "CSetCursorPosHook.h"
 #include "CSingleton.h"
-#include "CCommunityRegistration.h"
 #include "CVersionUpdater.h"
 #include "CNewsBrowser.h"
 
@@ -62,7 +61,7 @@ public:
     void                Restore                     ( void );
 
     void                DrawMouseCursor             ( void );
-    void                SetCursorPos                ( int iX, int iY, bool bForce = false );
+    void                SetCursorPos                ( int iX, int iY, bool bForce = false, bool overrideStored = true );
 
     CConsole*           GetConsole                  ( void );
     void                SetConsoleVisible           ( bool bVisible );
@@ -87,8 +86,6 @@ public:
     bool                IsDebugViewVisible          ( void );
     void                EchoDebug                   ( const char* szText );
 
-    CCommunityRegistration* GetCommunityRegistration ( void )               { return &m_CommunityRegistration; };
-
     bool                ProcessMessage              ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     bool                InputGoesToGUI              ( void );
     inline bool         IsCursorForcedVisible       ( void )                { return m_bForceCursorVisible; }
@@ -108,7 +105,6 @@ private:
     CChat*                  m_pChat;
     CDebugView*             m_pDebugView;
 
-    CCommunityRegistration  m_CommunityRegistration;
     CVersionUpdaterInterface* m_pVersionUpdater;
 
 

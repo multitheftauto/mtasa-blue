@@ -15,9 +15,12 @@
 
 extern CGame* g_pGame;
 
-CClient::CClient ( void )
+CClient::CClient ( bool bAddGuestAccount )
 {
-    m_pAccount = new CAccount ( g_pGame->GetAccountManager (), false, GUEST_ACCOUNT_NAME );
+    if ( bAddGuestAccount )
+    {
+        m_pAccount = g_pGame->GetAccountManager ()->AddGuestAccount ( GUEST_ACCOUNT_NAME );
+    }
 }
 
 

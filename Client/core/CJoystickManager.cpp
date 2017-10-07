@@ -114,6 +114,7 @@ struct SInputDeviceInfo
         long    lMax;
         long    lMin;
         DWORD   dwType;
+        float   fAutoDeadZoneSample;
     } axis[7];
 };
 
@@ -193,6 +194,8 @@ private:
     bool                    m_bXInputDeviceAttached;
     uint                    m_uiXInputReattachDelay;
     CElapsedTime            m_XInputReattachTimer;
+    bool                    m_bAutoDeadZoneEnabled;
+    int                     m_iAutoDeadZoneCounter;
 
     // Used during axis binding
     bool                    m_bCaptureAxis;
@@ -232,6 +235,9 @@ CJoystickManagerInterface* GetJoystickManager ( void )
 ///////////////////////////////////////////////////////////////
 CJoystickManager::CJoystickManager ( void )
 {
+    m_iAutoDeadZoneCounter = 20;
+    m_bAutoDeadZoneEnabled = true;
+
     // See if we have a XInput compatible device
     XINPUT_CAPABILITIES Capabilities;
     DWORD dwStatus = XInputGetCapabilities( 0, XINPUT_FLAG_GAMEPAD, &Capabilities );
@@ -724,6 +730,9 @@ void CJoystickManager::ReadCurrentState ( void )
                             );
         }
 
+        if ( m_iAutoDeadZoneCounter )
+            m_iAutoDeadZoneCounter--;
+
         // Read axes
         for ( int a = 0 ; a < NUMELMS ( m_DevInfo.axis )  &&  a < NUMELMS ( m_JoystickState.rgfAxis ); a++ )
         {
@@ -738,20 +747,37 @@ void CJoystickManager::ReadCurrentState ( void )
                 // (-min - half(size)) * 2.f / size
                 float fResult = ( (&js.lX)[a] - lMin - lSize / 2 ) * 2.f / lSize;
 
-                // Remap test
-                //fResult = powf ( fabs( fResult ), 1.5f ) * ( fResult < 0 ? -1.f : 1.f );
-
                 // Apply saturation
                 float Saturation = m_DevInfo.iSaturation * (1/100.f);
                 fResult += fResult * ( 1 - Saturation );
 
-                // Apply dead zone
+                // Handle dead zone
                 float DeadZone = m_DevInfo.iDeadZone * (1/100.f);
 
-                if ( fResult >= 0.f  )
-                    fResult = Max ( 0.f, fResult - DeadZone );
+                // Handle auto dead zone detection
+                if ( m_iAutoDeadZoneCounter > 1 )
+                {
+                    // Sample phase - Record lowest axis value
+                    if ( abs(fResult) < m_DevInfo.axis[a].fAutoDeadZoneSample || m_DevInfo.axis[a].fAutoDeadZoneSample == 0.f )
+                        m_DevInfo.axis[a].fAutoDeadZoneSample = abs(fResult);
+                }
                 else
-                    fResult = Min ( 0.f, fResult + DeadZone );
+                {
+                    // Use auto dead zone if required
+                    int iAutoDeadZone = m_DevInfo.axis[a].fAutoDeadZoneSample * 110;
+                    if ( iAutoDeadZone < 30 && iAutoDeadZone > m_DevInfo.iDeadZone && m_bAutoDeadZoneEnabled )
+                    {
+                        DeadZone = iAutoDeadZone * (1/100.f);
+                        if ( m_iAutoDeadZoneCounter == 1 )
+                            WriteDebugEvent ( SString( "CJoystickManager - Changing deadzone for axis %d from %d to %d", a, m_DevInfo.iDeadZone, iAutoDeadZone ) );
+                    }
+                }
+
+                // Apply dead zone
+                if ( fResult >= 0.f  )
+                    fResult = std::max ( 0.f, fResult - DeadZone );
+                else
+                    fResult = std::min ( 0.f, fResult + DeadZone );
 
                 fResult = fResult * ( 1 / ( 1 - DeadZone ) );
 
@@ -829,7 +855,7 @@ void CJoystickManager::ReadCurrentState ( void )
             int x = 20;
             int y = 20;//pGraphics->GetViewportHeight() / 2;
             pGraphics->DrawRectQueued( x, y, 350, 150, 0xaf000000, true );
-            pGraphics->DrawTextQueued( x+10, y+10, 0, 0, 0xFFFFFFFF, strStatus, 1, 1, DT_NOCLIP, NULL, true );
+            pGraphics->DrawStringQueued( x+10, y+10, 0, 0, 0xFFFFFFFF, strStatus, 1, 1, DT_NOCLIP, NULL, true );
         }
     }
 }
@@ -1055,9 +1081,9 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
         float value = m_JoystickState.rgfAxis[ line.SourceAxisIndex ];
 
         if ( line.SourceAxisDir == eDirPos )
-            value = Max ( 0.f, value );
+            value = std::max ( 0.f, value );
         else
-            value = -Min ( 0.f, value );
+            value = -std::min ( 0.f, value );
 
         if ( line.OutputAxisDir == eDirNeg )
             value = -value;
@@ -1122,7 +1148,7 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
                                 cs.ShockButtonR,
                                 cs.m_bPedWalk );
 
-    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 150, 0xFFFFFFFF, 1, strBuffer );
+    CCore::GetSingleton ().GetGraphics ()->DrawString ( 20, 150, 0xFFFFFFFF, 1, strBuffer );
 
     strBuffer = SString::Printf ( "VehicleMouseLook: %u\n"
                                 "LeftStickX: %u\n"
@@ -1135,7 +1161,7 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
                                 cs.RightStickX,
                                 cs.RightStickY );
 
-    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 450, 0xFFFFFFFF, 1, strBuffer );
+    CCore::GetSingleton ().GetGraphics ()->DrawString ( 20, 450, 0xFFFFFFFF, 1, strBuffer );
 
 
     strBuffer = SString::Printf (
@@ -1155,7 +1181,7 @@ void CJoystickManager::ApplyAxes ( CControllerState& cs, bool bInVehicle )
                                 m_JoystickState.rgfAxis[6]
                             );
 
-    CCore::GetSingleton ().GetGraphics ()->DrawText ( 20, 550, 0xFFFFFFFF, 1, strBuffer );
+    CCore::GetSingleton ().GetGraphics ()->DrawString ( 20, 550, 0xFFFFFFFF, 1, strBuffer );
 
 #endif
 #endif
@@ -1201,6 +1227,8 @@ int CJoystickManager::GetSaturation ( void )
 void CJoystickManager::SetDeadZone ( int iDeadZone )
 {
     m_SettingsRevision++;
+    if ( iDeadZone != m_DevInfo.iDeadZone )
+        m_bAutoDeadZoneEnabled = false;     // Disable auto dead zone on change (user edit)
     m_DevInfo.iDeadZone = Clamp( 0, iDeadZone, 49 );
 }
 

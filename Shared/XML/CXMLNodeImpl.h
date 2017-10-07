@@ -26,7 +26,7 @@ public:
                             CXMLNodeImpl        ( class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node );
                             ~CXMLNodeImpl       ( void );
 
-    CXMLNode*               CreateSubNode       ( const char* szTagName );
+    CXMLNode*               CreateSubNode       ( const char* szTagName, CXMLNode* pInsertBefore = nullptr );
     void                    DeleteSubNode       ( CXMLNode* pNode ) { delete pNode; };
     void                    DeleteAllSubNodes   ( void );
 
@@ -77,6 +77,8 @@ public:
     bool                    IsValid             ( void ) { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
 
     virtual SString         GetAttributeValue   ( const SString& strAttributeName );
+    virtual SString         GetCommentText      ( void );
+    virtual void            SetCommentText      ( const char* szCommentText, bool bLeadingBlankLine = false );
 
 private:
     bool                    StringToLong        ( const char* szString, long& lValue );

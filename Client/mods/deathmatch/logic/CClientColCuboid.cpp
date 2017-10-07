@@ -40,7 +40,7 @@ CSphere CClientColCuboid::GetWorldBoundingSphere ( void )
 {
     CSphere sphere;
     sphere.vecPosition  = m_vecPosition + m_vecSize * 0.5f;
-    sphere.fRadius      = Max ( Max ( m_vecSize.fX, m_vecSize.fY ), m_vecSize.fZ ) * 0.5f;
+    sphere.fRadius      = std::max ( std::max ( m_vecSize.fX, m_vecSize.fY ), m_vecSize.fZ ) * 0.5f;
     return sphere;
 }
 
@@ -55,13 +55,13 @@ void CClientColCuboid::DebugRender ( const CVector& vecPosition, float fDrawRadi
     CVector vecSize = m_vecSize;
 
     SColorARGB color ( 128, 0, 255, 0 );
-    float fLineWidth = 4.f + pow ( Max ( Max ( m_vecSize.fX, m_vecSize.fY ), m_vecSize.fZ ) * 0.5f, 0.5f );
+    float fLineWidth = 4.f + pow ( std::max ( std::max ( m_vecSize.fX, m_vecSize.fY ), m_vecSize.fZ ) * 0.5f, 0.5f );
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics ();
 
     // Calc required detail level
-    uint uiNumSlicesX = Max ( 2, Round ( sqrt ( vecSize.fX ) * 1.5f ) );
-    uint uiNumSlicesY = Max ( 2, Round ( sqrt ( vecSize.fY ) * 1.5f ) );
-    uint uiNumSlicesZ = Max ( 2, Round ( sqrt ( vecSize.fZ ) * 2.0f ) );
+    uint uiNumSlicesX = std::max ( 2, Round ( sqrt ( vecSize.fX ) * 1.5f ) );
+    uint uiNumSlicesY = std::max ( 2, Round ( sqrt ( vecSize.fY ) * 1.5f ) );
+    uint uiNumSlicesZ = std::max ( 2, Round ( sqrt ( vecSize.fZ ) * 2.0f ) );
 
     // Draw Slices Z
     {

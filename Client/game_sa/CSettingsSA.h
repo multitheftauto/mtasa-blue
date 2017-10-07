@@ -36,6 +36,11 @@
 
 #define FUNC_SetAntiAliasing    0x7F8A90
 
+#define DEFAULT_VEHICLE_LOD_DISTANCE    ( 70.0f )
+// Default train distance is 150, so make it relative to default vehicle distance
+#define TRAIN_LOD_DISTANCE_MULTIPLIER   ( 2.14f )
+#define MAX_VEHICLE_LOD_DISTANCE        ( 500.0f )
+
 struct CSettingsSAInterface // see code around 0x57CE9A for where these are
 {
     BYTE pad1[4];
@@ -145,13 +150,18 @@ public:
     eRadarMode              GetRadarMode                ( void );
     void                    SetRadarMode                ( eRadarMode hudMode );
 
-    void                    SetFieldOfView              ( float fAngle );
-    void                    SetFieldOfViewPlayer        ( float fAngle );
-    void                    SetFieldOfViewVehicle       ( float fAngle );
-    void                    SetFieldOfViewVehicleMax    ( float fAngle );
+    void                    UpdateFieldOfViewFromSettings   ( void );
+    void                    ResetFieldOfViewFromScript      ( void );
+    void                    SetFieldOfViewPlayer            ( float fAngle, bool bFromScript );
+    void                    SetFieldOfViewVehicle           ( float fAngle, bool bFromScript );
+    void                    SetFieldOfViewVehicleMax        ( float fAngle, bool bFromScript );
     float                   GetFieldOfViewPlayer        ( void );
     float                   GetFieldOfViewVehicle       ( void );
     float                   GetFieldOfViewVehicleMax    ( void );
+
+    void                    SetVehiclesLODDistance      ( float fVehiclesLODDistance, float fTrainsPlanesLODDistance );
+    void                    ResetVehiclesLODDistance    ( void );
+    void                    GetVehiclesLODDistance      ( float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance );
 
     void                    Save                        ( void );
 

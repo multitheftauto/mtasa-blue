@@ -27,6 +27,7 @@ SExePatchedStatus GetExePatchedStatus( bool bUseExeCopy )
     status.bDep         = UpdatePatchStatusDep       ( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
     status.bNvightmare  = UpdatePatchStatusNvightmare( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
     status.bAltModules  = UpdatePatchStatusAltModules( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
+    status.bEntryPoint  = UpdatePatchStatusEntryPoint( strGTAEXEPath, PATCH_CHECK ) == PATCH_CHECK_RESULT_ON;
 
     return status;
 }
@@ -44,9 +45,10 @@ SExePatchedStatus GetExePatchRequirements( void )
     SExePatchedStatus status;
     status.bTimestamp   = GetApplicationSettingInt ( "aero-enabled" ) ? true : false;
     status.bLargeMem    = true;
-    status.bDep         = true;
+    status.bDep         = GetGtaFileVersion(GetExePathFilename(false)) != EGtaFileVersion::Encrypted;
     status.bNvightmare  = GetApplicationSettingInt( "nvhacks", "optimus-export-enablement" ) ? true : false;
     status.bAltModules  = GetPatchRequirementAltModules();
+    status.bEntryPoint  = GetPatchRequirementEntryPoint();
 
     return status;
 }
@@ -70,6 +72,7 @@ bool SetExePatchedStatus( bool bUseExeCopy, const SExePatchedStatus& status )
     bReqAdmin |= UpdatePatchStatusDep       ( strGTAEXEPath, status.bDep        ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusNvightmare( strGTAEXEPath, status.bNvightmare ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusAltModules( strGTAEXEPath, status.bAltModules ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
+    bReqAdmin |= UpdatePatchStatusEntryPoint( strGTAEXEPath, status.bEntryPoint ? PATCH_SET_ON : PATCH_SET_OFF ) == PATCH_SET_RESULT_REQ_ADMIN;
 
     return !bReqAdmin;
 }
@@ -92,6 +95,9 @@ bool ShouldUseExeCopy( void )
 
     if ( GetPatchRequirementAltModules() )
         strUseCopyReason += " AltModules";
+
+    if ( GetPatchRequirementEntryPoint() )
+        strUseCopyReason += " EntryPoint";
 
     if ( RequiresAltTabFix() )
         strUseCopyReason += " AltTabFix";
@@ -157,6 +163,8 @@ SString GetPatchExeAdminReason( bool bUseExeCopy, const SExePatchedStatus& reqSt
     if ( status.bNvightmare != reqStatus.bNvightmare )
         return _("Update graphics driver compliance");
     if ( status.bAltModules != reqStatus.bAltModules )
+        return _("Fix file issues");
+    if ( status.bEntryPoint != reqStatus.bEntryPoint )
         return _("Fix file issues");
     return _("Copy main executable to avoid graphic driver issues");
 }
@@ -235,20 +243,12 @@ SString GetUsingExePathFilename( void )
 //////////////////////////////////////////////////////////
 EPatchResult UpdatePatchStatusTimestamp( const SString& strGTAEXEPath, EPatchMode mode )
 {
+    SPEFileOffsets fileOffsets;
+    GetPEFileOffsets(fileOffsets, strGTAEXEPath);
+
     // Get the top byte of the file link timestamp
     uchar ucTimeStamp = 0;
-    FILE* fh = fopen ( strGTAEXEPath, "rb" );
-    if ( fh )
-    {
-        if ( !fseek ( fh, 0x8B, SEEK_SET ) )
-        {
-            if ( fread ( &ucTimeStamp, sizeof ( ucTimeStamp ), 1, fh ) != 1 )
-            {
-                ucTimeStamp = 0;
-            }
-        }
-        fclose ( fh );
-    }
+    ReadFileValue(strGTAEXEPath, ucTimeStamp, fileOffsets.TimeDateStamp + 3);
 
     const uchar AERO_DISABLED = 0x42;
     const uchar AERO_ENABLED  = 0x43;
@@ -273,17 +273,10 @@ EPatchResult UpdatePatchStatusTimestamp( const SString& strGTAEXEPath, EPatchMod
         if ( ucTimeStamp != ucTimeStampRequired )
         {
             // Change needed!
-            SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen ( strGTAEXEPath, "r+b" );
-            if ( !fh )
+            if (!WriteFileValue(strGTAEXEPath, ucTimeStampRequired, fileOffsets.TimeDateStamp + 3))
             {
                 return PATCH_SET_RESULT_REQ_ADMIN;
             }
-            if ( !fseek ( fh, 0x8B, SEEK_SET ) )
-            {
-                fwrite ( &ucTimeStampRequired, sizeof ( ucTimeStampRequired ), 1, fh );
-            }
-            fclose ( fh );
         }
     }
     return PATCH_SET_RESULT_OK;
@@ -299,39 +292,10 @@ EPatchResult UpdatePatchStatusTimestamp( const SString& strGTAEXEPath, EPatchMod
 //////////////////////////////////////////////////////////
 EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode mode )
 {
-    // Get file position of IMAGE_FILE_HEADER->Characteristics
-    uint uiFilePosition = 0;
-    FILE* fh = fopen ( strGTAEXEPath, "rb" );
-    if ( fh )
-    {
-        // 60 is offset of IMAGE_DOS_HEADER->e_lfanew
-        if ( !fseek ( fh, 60, SEEK_SET ) )
-        {
-            long e_lfanew;
-            if ( fread ( &e_lfanew, sizeof ( e_lfanew ), 1, fh ) == 1 )
-            {
-                // 4 is offset of IMAGE_NT_HEADERS->FileHeader
-                // 18 is offset of IMAGE_FILE_HEADER->Characteristics
-                uiFilePosition = e_lfanew + 4 + 18;
-            }
-        }
-        fclose ( fh );
-    }
-
-    // Get the value from the header
+    SPEFileOffsets fileOffsets;
+    GetPEFileOffsets(fileOffsets, strGTAEXEPath);
     ushort usCharacteristics = 0;
-    fh = fopen ( strGTAEXEPath, "rb" );
-    if ( fh )
-    {
-        if ( !fseek ( fh, uiFilePosition, SEEK_SET ) )
-        {
-            if ( fread ( &usCharacteristics, sizeof ( usCharacteristics ), 1, fh ) != 1 )
-            {
-                usCharacteristics = 0;
-            }
-        }
-        fclose ( fh );
-    }
+    ReadFileValue(strGTAEXEPath, usCharacteristics, fileOffsets.Characteristics);
 
     const ushort LARGEMEM_DISABLED = 0x10f;
     const ushort LARGEMEM_ENABLED  = 0x12f;
@@ -354,22 +318,15 @@ EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode
         if ( usCharacteristics != usCharacteristicsRequired )
         {
             // Change needed!
-            SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen ( strGTAEXEPath, "r+b" );
-            if ( !fh )
+            if (!WriteFileValue(strGTAEXEPath, usCharacteristicsRequired, fileOffsets.Characteristics))
             {
                 return PATCH_SET_RESULT_REQ_ADMIN;
             }
-            if ( !fseek ( fh, uiFilePosition, SEEK_SET ) )
-            {
-                fwrite ( &usCharacteristicsRequired, sizeof ( usCharacteristicsRequired ), 1, fh );
-            }
-            fclose ( fh );
         }
     }
     else
     {
-        WriteDebugEventAndReport ( 9805, SString ( "Unable to set LARGE_ADDRESS_AWARE [FilePosition=0x%x Characteristics=0x%x]", uiFilePosition, usCharacteristics ) );
+        WriteDebugEventAndReport ( 9805, SString ( "Unable to set LARGE_ADDRESS_AWARE [FilePosition=0x%x Characteristics=0x%x]", fileOffsets.Characteristics, usCharacteristics ) );
     }
     return PATCH_SET_RESULT_OK;
 }
@@ -384,53 +341,37 @@ EPatchResult UpdatePatchStatusLargeMem( const SString& strGTAEXEPath, EPatchMode
 //////////////////////////////////////////////////////////
 EPatchResult UpdatePatchStatusDep( const SString& strGTAEXEPath, EPatchMode mode )
 {
-    // Get the value from the header
-    ulong ulDllCharacteristics = 0;
-    FILE* fh = fopen ( strGTAEXEPath, "rb" );
-    if ( fh )
-    {
-        if ( !fseek ( fh, 0xDC, SEEK_SET ) )
-        {
-            if ( fread ( &ulDllCharacteristics, sizeof ( ulDllCharacteristics ), 1, fh ) != 1 )
-            {
-                ulDllCharacteristics = 0;
-            }
-        }
-        fclose ( fh );
-    }
+    SPEFileOffsets fileOffsets;
+    GetPEFileOffsets(fileOffsets, strGTAEXEPath);
 
-    const ulong DEP_DISABLED = 0x00000002;
-    const ulong DEP_ENABLED  = 0x01000002;
+    // Get the value from the header
+    ushort usDllCharacteristics = 0;
+    ReadFileValue(strGTAEXEPath, usDllCharacteristics, fileOffsets.DllCharacteristics);
+
+    const ushort DEP_DISABLED = 0x0000;
+    const ushort DEP_ENABLED  = 0x0100;
 
     // Return status if just checking
     if ( mode == PATCH_CHECK )
     {
-        if ( ulDllCharacteristics == DEP_ENABLED )
+        if ( usDllCharacteristics == DEP_ENABLED )
             return PATCH_CHECK_RESULT_ON;
         return PATCH_CHECK_RESULT_OFF;
     }
 
     // Check it's a value we're expecting
-    bool bCanChangeDepSetting = ( ulDllCharacteristics == DEP_DISABLED || ulDllCharacteristics == DEP_ENABLED );
+    bool bCanChangeDepSetting = ( usDllCharacteristics == DEP_DISABLED || usDllCharacteristics == DEP_ENABLED );
 
     if ( bCanChangeDepSetting )
     {
-        ulong ulDllCharacteristicsRequired = ( mode == PATCH_SET_ON ) ? DEP_ENABLED : DEP_DISABLED;
-        dassert( ulDllCharacteristicsRequired == DEP_ENABLED );
-        if ( ulDllCharacteristics != ulDllCharacteristicsRequired )
+        ushort usDllCharacteristicsRequired = ( mode == PATCH_SET_ON ) ? DEP_ENABLED : DEP_DISABLED;
+        if ( usDllCharacteristics != usDllCharacteristicsRequired )
         {
             // Change needed!
-            SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen ( strGTAEXEPath, "r+b" );
-            if ( !fh )
+            if (!WriteFileValue(strGTAEXEPath, usDllCharacteristicsRequired, fileOffsets.DllCharacteristics))
             {
                 return PATCH_SET_RESULT_REQ_ADMIN;
             }
-            if ( !fseek ( fh, 0xDC, SEEK_SET ) )
-            {
-                fwrite ( &ulDllCharacteristicsRequired, sizeof ( ulDllCharacteristicsRequired ), 1, fh );
-            }
-            fclose ( fh );
         }
     }
     return PATCH_SET_RESULT_OK;
@@ -487,7 +428,7 @@ EPatchResult UpdatePatchStatusNvightmare( const SString& strGTAEXEPath, EPatchMo
     bool bHasExportTable = true;
     uint uiExportValue = 0;
     bool bUnknownBytes = false;
-    FILE* fh = fopen( strGTAEXEPath, "rb" );
+    FILE* fh = File::Fopen( strGTAEXEPath, "rb" );
     bool bFileError = ( fh == NULL );
     if( !bFileError )
     {
@@ -548,7 +489,7 @@ EPatchResult UpdatePatchStatusNvightmare( const SString& strGTAEXEPath, EPatchMo
         {
             // Change needed!
             SetFileAttributes( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-            FILE* fh = fopen( strGTAEXEPath, "r+b" );
+            FILE* fh = File::Fopen( strGTAEXEPath, "r+b" );
             if ( !fh )
             {
                 return PATCH_SET_RESULT_REQ_ADMIN;
@@ -668,7 +609,7 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
     uint uiNumOldNames = 0;
     uint uiNumNewNames = 0;
 
-    FILE* fh = fopen ( strGTAEXEPath, "rb" );
+    FILE* fh = File::Fopen ( strGTAEXEPath, "rb" );
     if ( fh )
     {
         for ( uint i = 0 ; i < NUMELMS( searchList ) ; i++ )
@@ -729,7 +670,7 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
         assert( !strGTAEXEPath.EndsWithI( "gta_sa.exe" ) );
 
         SetFileAttributes ( strGTAEXEPath, FILE_ATTRIBUTE_NORMAL );
-        FILE* fh = fopen ( strGTAEXEPath, "r+b" );
+        FILE* fh = File::Fopen ( strGTAEXEPath, "r+b" );
         if ( !fh )
         {
             return PATCH_SET_RESULT_REQ_ADMIN;
@@ -755,4 +696,82 @@ EPatchResult UpdatePatchStatusAltModules( const SString& strGTAEXEPath, EPatchMo
     }
 
     return PATCH_SET_RESULT_OK;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// UpdatePatchStatusEntryPoint
+//
+// Fix AddressOfEntryPoint incase of corruption
+//
+//////////////////////////////////////////////////////////
+EPatchResult UpdatePatchStatusEntryPoint(const SString& strGTAEXEPath, EPatchMode mode)
+{
+    SPEFileOffsets fileOffsets;
+    GetPEFileOffsets(fileOffsets, strGTAEXEPath);
+
+    // Get address from the file
+    uint uiCurrentEntryPoint = 0;
+    ReadFileValue(strGTAEXEPath, uiCurrentEntryPoint, fileOffsets.AddressOfEntryPoint);
+
+    // Calc required address
+    std::map<EGtaFileVersion, uint> versionEntryPoints = {{EGtaFileVersion::US, 0x0424570}, {EGtaFileVersion::EU, 0x04245B0}, {EGtaFileVersion::Encrypted, 0x0EFFE40}};
+    uint uiRequiredEntryPoint = MapFindRef(versionEntryPoints, GetGtaFileVersion(strGTAEXEPath));
+
+    if (mode == PATCH_CHECK)
+    {
+        if (uiCurrentEntryPoint == uiRequiredEntryPoint)
+            return PATCH_CHECK_RESULT_ON;
+        return PATCH_CHECK_RESULT_OFF;
+    }
+
+    // Check it's a value that should be fixed
+    bool bCanChangeEntryPoint = (uiCurrentEntryPoint > 0x1170000) || (uiCurrentEntryPoint == uiRequiredEntryPoint);
+    if (bCanChangeEntryPoint)
+    {
+        if (mode == PATCH_SET_ON && uiCurrentEntryPoint != uiRequiredEntryPoint)
+        {
+            // Change needed! Can't do this to gta_sa.exe
+            assert(!strGTAEXEPath.EndsWithI("gta_sa.exe"));
+            if (!WriteFileValue(strGTAEXEPath, uiRequiredEntryPoint, fileOffsets.AddressOfEntryPoint))
+            {
+                return PATCH_SET_RESULT_REQ_ADMIN;
+            }
+        }
+    }
+    else
+    {
+        WriteDebugEventAndReport(9806, SString ("Unable to set AddressOfEntryPoint [FilePosition=0x%x EntryPoint=0x%x]", fileOffsets.AddressOfEntryPoint, uiCurrentEntryPoint));
+    }
+    return PATCH_SET_RESULT_OK;
+}
+
+
+//////////////////////////////////////////////////////////
+//
+// GetPatchRequirementEntryPoint
+//
+// Return true if AddressOfEntryPoint in gta_sa.exe should be fixed (in proxy_sa.exe)
+//
+//////////////////////////////////////////////////////////
+bool GetPatchRequirementEntryPoint( void )
+{
+    // Only do file check once per launch
+    static bool bDone = false;
+    static bool bMismatch = false;
+
+    if (!bDone)
+    {
+        SString strGTAExePath = GetExePathFilename(false);
+        if ( !strGTAExePath.empty() )
+        {
+            bMismatch = (UpdatePatchStatusEntryPoint(strGTAExePath, PATCH_CHECK) == PATCH_CHECK_RESULT_OFF);
+        }
+        bDone = true;
+
+        if (bMismatch)
+            WriteDebugEvent("PatchRequirementEntryPoint: Need to change entry point");
+    }
+    return bMismatch;
 }

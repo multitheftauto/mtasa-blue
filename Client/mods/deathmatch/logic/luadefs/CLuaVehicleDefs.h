@@ -134,11 +134,14 @@ public:
     LUA_DECLARE ( SetHeliBladeCollisionsEnabled );
     LUA_DECLARE ( SetVehicleWindowOpen );
 
+    LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
+    LUA_DECLARE(GetVehicleModelExhaustFumesPosition);
+
     // Components
     LUA_DECLARE ( SetVehicleComponentPosition );
-    LUA_DECLARE ( GetVehicleComponentPosition );
+    LUA_DECLARE_OOP ( GetVehicleComponentPosition );
     LUA_DECLARE ( SetVehicleComponentRotation );
-    LUA_DECLARE ( GetVehicleComponentRotation );
+    LUA_DECLARE_OOP ( GetVehicleComponentRotation );
     LUA_DECLARE ( ResetVehicleComponentPosition );
     LUA_DECLARE ( ResetVehicleComponentRotation );
     LUA_DECLARE ( SetVehicleComponentVisible );

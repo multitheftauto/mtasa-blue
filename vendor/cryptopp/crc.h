@@ -31,7 +31,7 @@ public:
 	void Update(const byte *input, size_t length);
 	void TruncatedFinal(byte *hash, size_t size);
 	unsigned int DigestSize() const {return DIGESTSIZE;}
-    static const char * StaticAlgorithmName() {return "CRC32";}
+    CRYPTOPP_CONSTEXPR static const char *StaticAlgorithmName() {return "CRC32";}
     std::string AlgorithmName() const {return StaticAlgorithmName();}
 
 	void UpdateByte(byte b) {m_crc = m_tab[CRC32_INDEX(m_crc) ^ b] ^ CRC32_SHIFTED(m_crc);}
@@ -47,6 +47,7 @@ private:
 
 //! \brief CRC-32C Checksum Calculation
 //! \details Uses CRC polynomial 0x82F63B78
+//! \since Crypto++ 5.6.4
 class CRC32C : public HashTransformation
 {
 public:
@@ -55,7 +56,7 @@ public:
 	void Update(const byte *input, size_t length);
 	void TruncatedFinal(byte *hash, size_t size);
 	unsigned int DigestSize() const {return DIGESTSIZE;}
-    static const char * StaticAlgorithmName() {return "CRC32C";}
+    CRYPTOPP_CONSTEXPR static const char *StaticAlgorithmName() {return "CRC32C";}
     std::string AlgorithmName() const {return StaticAlgorithmName();}
 
 	void UpdateByte(byte b) {m_crc = m_tab[CRC32_INDEX(m_crc) ^ b] ^ CRC32_SHIFTED(m_crc);}

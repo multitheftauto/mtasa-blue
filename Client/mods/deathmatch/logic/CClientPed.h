@@ -260,6 +260,7 @@ public:
     bool                        SetCurrentWeaponSlot        ( eWeaponSlot weaponSlot );
     eWeaponSlot                 GetCurrentWeaponSlot        ( void );
     eWeaponType                 GetCurrentWeaponType        ( void );
+    eWeaponType                 GetWeaponType               ( eWeaponSlot slot );
     CWeapon*                    GetWeapon                   ( void );
     CWeapon*                    GetWeapon                   ( eWeaponSlot weaponSlot );
     CWeapon*                    GetWeapon                   ( eWeaponType weaponType );
@@ -267,6 +268,7 @@ public:
     void                        RemoveWeapon                ( eWeaponType weaponType );
     void                        RemoveAllWeapons            ( void );
     bool                        IsCurrentWeaponUsingBulletSync ( void );
+    void                        ValidateRemoteWeapons       ( void );
 
     std::map<eMovementState,std::string> m_MovementStateNames;
     eMovementState              GetMovementState            ( void );
@@ -301,7 +303,7 @@ public:
     void                        SetChoking                  ( bool bChoking );
     bool                        IsChoking                   ( void );
   
-    void                        SetWearingGoggles           ( bool bWearing );
+    void                        SetWearingGoggles           ( bool bWearing, bool animationEnabled = true );
     bool                        IsWearingGoggles            ( bool bCheckMoving = false );
     bool                        IsMovingGoggles             ( bool & bPuttingOn );
 
@@ -519,7 +521,8 @@ public:
     CControllerState*           m_lastControllerState;
     CRemoteDataStorage*         m_remoteDataStorage;
     unsigned long               m_ulLastTimeFired;
-    unsigned long               m_ulLastTimeAimed;
+    unsigned long               m_ulLastTimeBeganAiming;
+    unsigned long               m_ulLastTimeEndedAiming;
     unsigned long               m_ulLastTimeBeganCrouch;
     unsigned long               m_ulLastTimeBeganStand;
     unsigned long               m_ulLastTimeMovedWhileCrouched;

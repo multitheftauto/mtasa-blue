@@ -61,7 +61,7 @@ void CLuaFileDefs::AddClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "pos", "fileSetPos", "fileGetPos" );
     lua_classvariable ( luaVM, "size", nullptr, "fileGetSize" );
-    lua_classvariable ( luaVM, "isEOF", nullptr, "fileIsEOF" );
+    lua_classvariable ( luaVM, "eof", nullptr, "fileIsEOF" );
     lua_classvariable ( luaVM, "path", nullptr, "fileGetPath" );
 
     lua_registerclass ( luaVM, "File" );
@@ -91,58 +91,48 @@ int CLuaFileDefs::fileOpen ( lua_State* luaVM )
             CResource* pResource = pThisResource;
             if ( CResourceManager::ParseResourcePathInput ( strInputPath, pResource, &strAbsPath, &strMetaPath ) )
             {
-
+                CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pResource, strAbsPath, &bReadOnly );
+                if ( !argStream.HasErrors() )
+                {
 #ifndef MTA_CLIENT // IF SERVER
-                // Do we have permissions?
-                if ( pResource != pThisResource &&
-                    !m_pACLManager->CanObjectUseRight ( pThisResource->GetName (),
-                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                        "ModifyOtherObjects",
-                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                        false ) )
-                {
-                    m_pScriptDebugging->LogError ( luaVM, "fileOpen failed; ModifyOtherObjects in ACL denied resource %s to access %s", *pThisResource->GetName (), *pResource->GetName () );
-                    lua_pushboolean ( luaVM, false );
-                    return 1;
-                }
-
-                // Create the file to create
-                CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID (), strMetaPath, DEFAULT_MAX_FILESIZE );
+                    // Create the file to create
+                    CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID (), strMetaPath, DEFAULT_MAX_FILESIZE );
 #else
-                eAccessType accessType = strInputPath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
-                CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID (), strMetaPath, DEFAULT_MAX_FILESIZE, accessType );                
+                    eAccessType accessType = strInputPath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
+                    CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID (), strMetaPath, DEFAULT_MAX_FILESIZE, accessType );                
 #endif
-
-                // Try to load it
-                if ( pFile->Load ( pResource, bReadOnly ? CScriptFile::MODE_READ : CScriptFile::MODE_READWRITE ) )
-                {
-#ifdef MTA_CLIENT
-                    // Make it a child of the resource's file root
-                    pFile->SetParent ( pResource->GetResourceDynamicEntity () );
-#endif
-                    // Grab its owner resource
-                    CResource* pParentResource = pLuaMain->GetResource ();
-                    if ( pParentResource )
+                    // Try to load it
+                    if ( pFile->Load ( pResource, bReadOnly ? CScriptFile::MODE_READ : CScriptFile::MODE_READWRITE ) )
                     {
-                        // Add it to the scrpt resource element group
-                        CElementGroup* pGroup = pParentResource->GetElementGroup ();
-                        if ( pGroup )
+#ifdef MTA_CLIENT
+                        // Make it a child of the resource's file root
+                        pFile->SetParent ( pResource->GetResourceDynamicEntity () );
+#endif
+                        // Grab its owner resource
+                        CResource* pParentResource = pLuaMain->GetResource ();
+                        if ( pParentResource )
                         {
-                            pGroup->Add ( pFile );
+                            // Add it to the scrpt resource element group
+                            CElementGroup* pGroup = pParentResource->GetElementGroup ();
+                            if ( pGroup )
+                            {
+                                pGroup->Add ( pFile );
+                            }
                         }
+
+                        // Success. Return the file.
+                        lua_pushelement ( luaVM, pFile );
+                        return 1;
                     }
+                    else
+                    {
+                        // Delete the file again
+                        delete pFile;
 
-                    // Success. Return the file.
-                    lua_pushelement ( luaVM, pFile );
-                    return 1;
-                }
-                else
-                {
-                    // Delete the file again
-                    delete pFile;
-
-                    // Output error
-                    argStream.SetCustomError ( SString ( "unable to load file '%s'", *strInputPath ) );
+                        // Output error
+                        argStream.SetCustomError ( SString ( "unable to load file '%s'", *strInputPath ) );
+                    }
                 }
             }
         }
@@ -196,62 +186,53 @@ int CLuaFileDefs::fileCreate ( lua_State* luaVM )
         CResource* pResource = pThisResource;
         if ( CResourceManager::ParseResourcePathInput ( strInputPath, pResource, &strAbsPath, &strMetaPath ) )
         {
-#ifdef MTA_CLIENT
-            // Inform file verifier
-            g_pClientGame->GetResourceManager ()->OnFileModifedByScript ( strAbsPath, "fileCreate" );
-#else
-            // Do we have permissions?
-            if ( pResource != pThisResource &&
-                !m_pACLManager->CanObjectUseRight ( pThisResource->GetName (),
-                    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                    "ModifyOtherObjects",
-                    CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                    false ) )
-            {
-                m_pScriptDebugging->LogError ( luaVM, "fileCreate failed; ModifyOtherObjects in ACL denied resource %s to access %s", *pThisResource->GetName (), *pResource->GetName () );
-
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
-#endif
-
-            // Make sure the destination folder exist so we can create the file
-            MakeSureDirExists ( strAbsPath );
-
-            // Create the file to create
-#ifdef MTA_CLIENT
-            eAccessType accessType = strInputPath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
-            CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID (), strMetaPath, DEFAULT_MAX_FILESIZE, accessType );
-#else
-            CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID (), strMetaPath, DEFAULT_MAX_FILESIZE );
-#endif
-
-            // Try to load it
-            if ( pFile->Load ( pResource, CScriptFile::MODE_CREATE ) )
+            CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pResource, strAbsPath );
+            if ( !argStream.HasErrors() )
             {
 #ifdef MTA_CLIENT
-                // Make it a child of the resource's file root
-                pFile->SetParent ( pResource->GetResourceDynamicEntity () );
+                // Inform file verifier
+                g_pClientGame->GetResourceManager ()->OnFileModifedByScript ( strAbsPath, "fileCreate" );
 #endif
 
-                // Add it to the scrpt resource element group
-                CElementGroup* pGroup = pThisResource->GetElementGroup ();
-                if ( pGroup )
+                // Make sure the destination folder exist so we can create the file
+                MakeSureDirExists ( strAbsPath );
+
+                // Create the file to create
+#ifdef MTA_CLIENT
+                eAccessType accessType = strInputPath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
+                CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID (), strMetaPath, DEFAULT_MAX_FILESIZE, accessType );
+#else
+                CScriptFile* pFile = new CScriptFile ( pThisResource->GetScriptID (), strMetaPath, DEFAULT_MAX_FILESIZE );
+#endif
+
+                // Try to load it
+                if ( pFile->Load ( pResource, CScriptFile::MODE_CREATE ) )
                 {
-                    pGroup->Add ( pFile );
+#ifdef MTA_CLIENT
+                    // Make it a child of the resource's file root
+                    pFile->SetParent ( pResource->GetResourceDynamicEntity () );
+#endif
+
+                    // Add it to the scrpt resource element group
+                    CElementGroup* pGroup = pThisResource->GetElementGroup ();
+                    if ( pGroup )
+                    {
+                        pGroup->Add ( pFile );
+                    }
+
+                    // Success. Return the file.
+                    lua_pushelement ( luaVM, pFile );
+                    return 1;
                 }
+                else
+                {
+                    // Delete the file again
+                    delete pFile;
 
-                // Success. Return the file.
-                lua_pushelement ( luaVM, pFile );
-                return 1;
-            }
-            else
-            {
-                // Delete the file again
-                delete pFile;
-
-                // Output error
-                argStream.SetCustomError ( SString ( "Unable to create %s", *strInputPath ), "File error" );
+                    // Output error
+                    argStream.SetCustomError ( SString ( "Unable to create %s", *strInputPath ), "File error" );
+                }
             }
         }
     }
@@ -342,16 +323,10 @@ int CLuaFileDefs::fileCopy ( lua_State* luaVM )
         if ( CResourceManager::ParseResourcePathInput ( strInputSrcPath, pSrcResource, &strSrcAbsPath ) &&
             CResourceManager::ParseResourcePathInput ( strInputDestPath, pDestResource, &strDestAbsPath ) )
         {
-#ifndef MTA_CLIENT
-            // Do we have permissions?
-            if ( ( pSrcResource == pThisResource &&
-                pDestResource == pThisResource ) ||
-                m_pACLManager->CanObjectUseRight ( pThisResource->GetName (),
-                    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                    "ModifyOtherObjects",
-                    CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                    false ) )
-#endif
+            CheckCanModifyOtherResource( argStream, pThisResource, pSrcResource, pDestResource );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pSrcResource, strSrcAbsPath );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pDestResource, strDestAbsPath );
+            if ( !argStream.HasErrors() )
             {
                 // Does `current` file path exist and `new` file path doesn't exist?
                 if ( FileExists ( strSrcAbsPath ) )
@@ -385,21 +360,6 @@ int CLuaFileDefs::fileCopy ( lua_State* luaVM )
                     argStream.SetCustomError ( SString ( "Source file doesn't exist (%s)", *strInputSrcPath ), "Operation failed" );
                 }
             }
-#ifndef MTA_CLIENT
-            else {
-                // Make permissions error message
-                SString strWho;
-                if ( pThisResource != pSrcResource )
-                    strWho += pSrcResource->GetName ();
-                if ( pThisResource != pDestResource )
-                {
-                    if ( !strWho.empty () )
-                        strWho += " and ";
-                    strWho += pDestResource->GetName ();
-                }
-                argStream.SetCustomError ( SString ( "ModifyOtherObjects in ACL denied resource %s to access %s", *pThisResource->GetName (), *strWho ), "ACL issue" );
-            }
-#endif
         }
     }
 
@@ -451,16 +411,10 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
         if ( CResourceManager::ParseResourcePathInput ( strInputSrcPath, pSrcResource, &strSrcAbsPath ) &&
                 CResourceManager::ParseResourcePathInput ( strInputDestPath, pDestResource, &strDestAbsPath ) )
         {
-#ifndef MTA_CLIENT
-            // Do we have permissions?
-            if ( ( pSrcResource == pThisResource && 
-                    pDestResource == pThisResource ) ||
-                    m_pACLManager->CanObjectUseRight ( pThisResource->GetName (),
-                                                    CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                                    "ModifyOtherObjects",
-                                                    CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                    false ) )
-#endif
+            CheckCanModifyOtherResource( argStream, pThisResource, pSrcResource, pDestResource );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pSrcResource, strSrcAbsPath );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pDestResource, strDestAbsPath );
+            if ( !argStream.HasErrors() )
             {
                 // Does `current` file path exist and `new` file path doesn't exist?
                 if ( FileExists(strSrcAbsPath) )
@@ -493,21 +447,6 @@ int CLuaFileDefs::fileRename ( lua_State* luaVM )
                     m_pScriptDebugging->LogWarning ( luaVM, "fileRename failed; source file doesn't exist" );
                 }
             }
-#ifndef MTA_CLIENT
-            else {
-                // Make permissions error message
-                SString strWho;
-                if ( pThisResource != pSrcResource )
-                    strWho += pSrcResource->GetName ();
-                if ( pThisResource != pDestResource )
-                {
-                    if ( !strWho.empty () )
-                        strWho += " and ";
-                    strWho += pDestResource->GetName ();
-                }
-                argStream.SetCustomError ( SString ( "ModifyOtherObjects in ACL denied resource %s to access %s", *pThisResource->GetName (), *strWho ), "ACL issue" );
-            }
-#endif
         }
     }
     
@@ -541,37 +480,24 @@ int CLuaFileDefs::fileDelete ( lua_State* luaVM )
             CResource* pResource = pThisResource;
             if ( CResourceManager::ParseResourcePathInput ( strInputPath, pResource, &strAbsPath ) )
             {
+                CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                CheckCanAccessOtherResourceFile( argStream, pThisResource, pResource, strAbsPath );
+                if ( !argStream.HasErrors() )
+                {
 #ifdef MTA_CLIENT
-                // Inform file verifier
-                g_pClientGame->GetResourceManager ()->OnFileModifedByScript ( strAbsPath, "fileDelete" );
-#else
-                // Error if we do not have permissions
-                if ( pResource != pThisResource &&
-                    !m_pACLManager->CanObjectUseRight ( pThisResource->GetName (),
-                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                        "ModifyOtherObjects",
-                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                        false ) )
-                {
-                    // Log an error
-                    argStream.SetCustomError ( SString ( "resource %s cannot access %s", *pThisResource->GetName(), *pResource->GetName() ), "ModifyOtherObjects denied in ACL" );
-                    m_pScriptDebugging->LogError ( luaVM, argStream.GetFullErrorMessage () );
-
-                    // Return false
-                    lua_pushboolean ( luaVM, false );
-                    return 1;
-                }
+                    // Inform file verifier
+                    g_pClientGame->GetResourceManager ()->OnFileModifedByScript ( strAbsPath, "fileDelete" );
 #endif
-
-                if ( FileDelete ( strAbsPath ) )
-                {
-                    // If file removed successfully, return true
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                    if ( FileDelete ( strAbsPath ) )
+                    {
+                        // If file removed successfully, return true
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
                 
-                // Output error "Operation failed @ 'fileDelete' [strInputPath]"
-                argStream.SetCustomError ( strInputPath, "Operation failed" );
+                    // Output error "Operation failed @ 'fileDelete' [strInputPath]"
+                    argStream.SetCustomError ( strInputPath, "Operation failed" );
+                }
             }
         }
     }
@@ -691,7 +617,7 @@ int CLuaFileDefs::fileWrite ( lua_State* luaVM )
         long lBytesWritten = 0; // Total bytes written
         
         // While we're not out of string arguments
-        // (we will always have one string because we validated it above)
+        // (we will always have at least one string because we validated it above)
         while ( argStream.NextIsString () )
         {
             // Grab argument and length
@@ -811,7 +737,11 @@ int CLuaFileDefs::fileGetPath ( lua_State* luaVM )
             // we need to prepend :resourceName to the path
             if ( pThisResource != pFileResource )
             {
+#ifdef MTA_CLIENT
+                strFilePath = SString ( ":%s/%s", pFileResource->GetName (), *strFilePath );
+#else
                 strFilePath = SString ( ":%s/%s", *pFileResource->GetName (), *strFilePath );
+#endif
             }
 
             lua_pushlstring ( luaVM, strFilePath, strFilePath.length () );

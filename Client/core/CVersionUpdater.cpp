@@ -74,8 +74,8 @@ public:
     CNetHTTPDownloadManagerInterface* GetHTTP               ( void );
     void                GetSaveLocationList                 ( std::list < SString >& outSaveLocationList, const SString& strFilename );
     SString             GetResumableSaveLocation            ( const SString& strFilename, const SString& strMD5, uint iFilesize );
-    static void         StaticDownloadFinished              ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
-    void                DownloadFinished                    ( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode );
+    static void         StaticDownloadFinished              ( const SHttpDownloadResult& result );
+    void                DownloadFinished                    ( const SHttpDownloadResult& result );
 
     // Commands
     void                _UseMasterFetchURLs                 ( void );
@@ -926,7 +926,7 @@ std::vector < SString > CVersionUpdater::MakeServerList ( const CDataInfoSet& da
             if ( iPriorityA > iPriorityB )
             {
                 std::swap ( a, b );
-                i = Max ( i - 2, -1 );
+                i = std::max ( i - 2, -1 );
             }
         }
 
@@ -1524,21 +1524,6 @@ void CVersionUpdater::_CheckSidegradeRequirements ( void )
     // Validate
     bool bVersionMatch = ( strLaunchVersion == m_strSidegradeVersion );
     bool bLaunchPathValid = ( strLaunchHash == CMD5Hasher::CalculateHexString ( m_strSidegradePath ) );
-
-    if ( !bVersionMatch || !bLaunchPathValid )
-    {
-        // Try again with datum from legacy registry settings
-        if ( m_strSidegradeVersion == "1.0" )
-        {
-            m_strSidegradePath = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path" );
-            strLaunchHash = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path Hash" );
-            strLaunchVersion = GetVersionRegistryValueLegacy ( m_strSidegradeVersion, "", "Last Run Path Version" );
-
-            // Re-validate
-            bVersionMatch = ( strLaunchVersion == m_strSidegradeVersion );
-            bLaunchPathValid = ( strLaunchHash == CMD5Hasher::CalculateHexString ( m_strSidegradePath ) );
-        }
-    }
 
     if ( bVersionMatch && bLaunchPathValid )
     {
@@ -2789,7 +2774,7 @@ int CVersionUpdater::_PollDownload ( void )
                         return RES_OK;
                     }
                     if ( m_JobInfo.bShowDownloadPercent )
-                        GetQuestionBox ().SetMessage ( SString ( _("%3d %% completed"), m_JobInfo.uiBytesDownloaded * 100 / Max < unsigned int > ( 1, m_JobInfo.iFilesize ) ) );
+                        GetQuestionBox ().SetMessage ( SString ( _("%3d %% completed"), m_JobInfo.uiBytesDownloaded * 100 / std::max < unsigned int > ( 1, m_JobInfo.iFilesize ) ) );
                     if ( m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500 )
                         GetQuestionBox ().AppendMessage ( SString ( _("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000 ) );
                     else
@@ -2912,7 +2897,7 @@ void CVersionUpdater::_ShouldSendCrashDump ( void )
             if ( a.GetAttribute ( "date" ) > b.GetAttribute ( "date" ) )
             {
                 std::swap ( a, b );
-                i = Max ( i - 2, -1 );
+                i = std::max ( i - 2, -1 );
             }
         }
 
@@ -3164,7 +3149,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     {
         SString strGTARootDir;
         CFilePathTranslator().GetGTARootDirectory( strGTARootDir );
-        if ( FILE* fh = fopen( PathJoin( strGTARootDir, "audio", "SFX", "SPC_EA" ), "rb" ) )
+        if ( FILE* fh = File::Fopen( PathJoin( strGTARootDir, "audio", "SFX", "SPC_EA" ), "rb" ) )
         {
             strSoundCut = "y";
             fseek( fh, 0x38BDC80, SEEK_SET );
@@ -3177,25 +3162,13 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
         }
     }
 
-    // Get version of installed VS2015 runtime
-    SString strVS2015Version = "0";
-    SString strVS2015Install = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\14.0\\RuntimeMinimum", "Install" );
-    if ( strVS2015Install == "\x01" )
-    {
-        strVS2015Version = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\14.0\\RuntimeMinimum", "Version" );
-    }
-
+    bool bSecureBootEnabled = (GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled") == "\x01");
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager ()->GetDxStatus ( dxStatus );
     CGameSettings* gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
     SString strVideoCard = SStringX ( g_pDeviceState->AdapterState.Name ).Left ( 30 );
-    {
-        LOCAL_FUNCTION_START
-            static bool IsNotAlnum ( int c ) { return !isalnum(c); }
-        LOCAL_FUNCTION_END
-        std::replace_if( strVideoCard.begin(), strVideoCard.end(), LOCAL_FUNCTION::IsNotAlnum, '_' ); 
-    }
+    std::replace_if(strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
     SString strSystemStats ( "1_%d_%d_%d_%d_%d"
                              "_%d%d%d%d"
                              "_%s"
@@ -3232,16 +3205,16 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
                              , dxStatus.videoCard.depthBufferFormat
                            );
 
-    SString strSystemStats3 ( "3_%d"
+    SString strSystemStats3 ( "3_0"     // Was VS2013 runtime installed
                              "_%s"
                              "_%s"
                              "_%d"
-                             "_%s"
-                             , GetApplicationSettingInt( "vs2013-runtime-installed" )
+                             "_0"       // Was VS2015 runtime version
+                             "_%d"
                              , *GetApplicationSetting ( "real-os-build" )
                              , *GetApplicationSetting ( "locale" ).Replace( "_", "-" )
                              , (uint)FileSize( PathJoin( GetSystemSystemPath(), "normaliz.dll" ) )
-                             , *strVS2015Version
+                             , bSecureBootEnabled
                            );
 
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );
@@ -3283,7 +3256,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     m_JobInfo.downloadStatus = EDownloadStatus::Running;
     m_JobInfo.iDownloadResultCode = 0;
     GetHTTP()->Reset();
-    GetHTTP()->QueueFile( strQueryURL, m_JobInfo.strResumableSaveLocation, 0, NULL, 0, false, this, StaticDownloadFinished, false, 10, 10000, false, true );
+    GetHTTP()->QueueFile( strQueryURL, m_JobInfo.strResumableSaveLocation, NULL, 0, false, this, StaticDownloadFinished, false, 10, 10000, false, true );
     m_strLastQueryURL = strQueryURL;
     OutputDebugLine( SString ( "[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
     return RES_OK;
@@ -3297,26 +3270,26 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
 // Handle when download finishes
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::StaticDownloadFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CVersionUpdater::StaticDownloadFinished ( const SHttpDownloadResult& result )
 {
-    ((CVersionUpdater*)pObj)->DownloadFinished( pCompletedData, completedLength, bSuccess, iErrorCode );
+    ((CVersionUpdater*)result.pObj)->DownloadFinished( result );
 }
 
-void CVersionUpdater::DownloadFinished( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode )
+void CVersionUpdater::DownloadFinished( const SHttpDownloadResult& result )
 {
-    if ( bSuccess )
+    if ( result.bSuccess )
     {
         m_JobInfo.downloadStatus = EDownloadStatus::Success;
-        m_JobInfo.iDownloadResultCode = iErrorCode;
+        m_JobInfo.iDownloadResultCode = result.iErrorCode;
         // Save data if a file wasn't used
-        m_JobInfo.downloadBuffer.resize( completedLength );
-        if ( completedLength > 0 )
-            memcpy ( &m_JobInfo.downloadBuffer[0], pCompletedData, completedLength );
+        m_JobInfo.downloadBuffer.resize( result.dataSize );
+        if ( result.dataSize > 0 )
+            memcpy ( &m_JobInfo.downloadBuffer[0], result.pData, result.dataSize );
     }
     else
     {
         m_JobInfo.downloadStatus = EDownloadStatus::Failure;
-        m_JobInfo.iDownloadResultCode = iErrorCode;
+        m_JobInfo.iDownloadResultCode = result.iErrorCode;
     }
 }
 
@@ -3436,7 +3409,7 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
     // Send data. Doesn't check if it was received.
     //
     GetHTTP()->Reset();
-    GetHTTP()->QueueFile( strQueryURL, NULL, 0, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
+    GetHTTP()->QueueFile( strQueryURL, NULL, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
 
     return RES_OK;
 }

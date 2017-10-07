@@ -94,4 +94,14 @@ namespace SharedUtil
 
     WString         FromUTF8                        ( const SString& strPath );
     SString         ToUTF8                          ( const WString& strPath );
+
+    namespace File
+    {
+        FILE*       Fopen                           (const char* szFilename, const char* szMode);
+        int         Mkdir                           (const char* szPath, int iMode=0775);
+        int         Chdir                           (const char* szPath);
+        int         Rmdir                           (const char* szPath);
+        int         Delete                          (const char* szFilename);
+        int         Rename                          (const char* szOldFilename, const char * szNewFilename);
+    }
 }

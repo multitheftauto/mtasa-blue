@@ -238,6 +238,13 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     bool bIsDoubleSided = pObject->IsDoubleSided ();
                     BitStream.WriteBit ( bIsDoubleSided );
 
+                    // Visible in all dimensions
+                    if ( BitStream.Version ( ) >= 0x068 )
+                    {
+                        bool bIsVisibleInAllDimensions = pObject->IsVisibleInAllDimensions();
+                        BitStream.WriteBit ( bIsVisibleInAllDimensions );
+                    }
+
                     // Moving
                     const CPositionRotationAnimation* pMoveAnimation = pObject->GetMoveAnimation ();
                     if ( pMoveAnimation )
@@ -275,9 +282,9 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                         BitStream.Write( vecScale.fX );
                     }
 
-                    // Static
-                    bool bStatic = pObject->IsStatic ();
-                    BitStream.WriteBit ( bStatic );
+                    // Frozen
+                    bool bFrozen = pObject->IsFrozen ();
+                    BitStream.WriteBit ( bFrozen );
 
                     // Health
                     SObjectHealthSync health;
@@ -713,7 +720,7 @@ bool CEntityAddPacket::Write ( NetBitStreamInterface& BitStream ) const
                     BitStream.WriteCompressed ( pBlip->m_sOrdering );
 
                     // Write the visible distance - 14 bits allows 16383.
-                    SIntegerSync < unsigned short, 14 > visibleDistance ( Min ( pBlip->m_usVisibleDistance, (unsigned short)16383 ) );
+                    SIntegerSync < unsigned short, 14 > visibleDistance ( std::min ( pBlip->m_usVisibleDistance, (unsigned short)16383 ) );
                     BitStream.Write ( &visibleDistance );
 
                     // Write the icon

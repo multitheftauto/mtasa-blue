@@ -32,7 +32,7 @@ public:
     void        IdleHandler                     ( void );
     void        RestreamModel                   ( unsigned short usModel );
 
-    bool        WebsiteRequestResultHandler     ( const std::vector<SString>& newPages );
+    bool        WebsiteRequestResultHandler     ( const std::unordered_set<SString>& newPages );
 
     bool        ProcessCommand                  ( const char* szCommandLine );
     //bool        ProcessInput                    ( CInputMessage* pInputMessage );

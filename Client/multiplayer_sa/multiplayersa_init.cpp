@@ -25,8 +25,7 @@ CCoreInterface* g_pCore = NULL;
 // to differentiate between versions.  MUST be called at least once
 // in order for proper initialization to occur.
 
-extern "C" _declspec(dllexport)
-CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
+MTAEXPORT CMultiplayer* InitMultiplayerInterface(CCoreInterface* pCore)
 {   
     // set the internal pointer to the game class
     pGameInterface = pCore->GetGame ();

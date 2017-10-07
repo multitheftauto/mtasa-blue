@@ -42,7 +42,7 @@ public:
     virtual void                Printf                  ( const char* szFormat, ... ) = 0;
 
     virtual bool                RegisterFunction        ( lua_State * luaVM, const char *szFunctionName, lua_CFunction Func ) = 0;
-    virtual bool                GetResourceName         ( lua_State * luaVM, std::string &strName ) = 0;
+    virtual bool                GetResourceName         ( lua_State * luaVM, std::string &strName ) = 0; // This function might not work if module and MTA were compiled with different compiler versions
     virtual CChecksum           GetResourceMetaChecksum ( lua_State * luaVM ) = 0;
     virtual CChecksum           GetResourceFileChecksum ( lua_State * luaVM, const char* szFile ) = 0;
 };
@@ -58,6 +58,10 @@ public:
     virtual const char*         GetOperatingSystemName  ( ) = 0;
 
     virtual lua_State*          GetResourceFromName     ( const char* szResourceName ) = 0;
+
+    // GetResourceName above doesn't work if module and MTA were compiled with different compiler versions
+    virtual bool                GetResourceName         ( lua_State* luaVM, char* szName, size_t length ) = 0;
+    virtual bool                GetResourceFilePath     ( lua_State* luaVM, const char* fileName, char* path, size_t length ) = 0;
 };
 
 #endif

@@ -13,16 +13,7 @@
 #include "CDatabaseType.h"
 #include "CDynamicLibrary.h"
 
-#ifdef WIN32
-    #ifdef MTA_DEBUG
-        #define LIB_DBCONMY "dbconmy_d.dll"
-    #else
-        #define LIB_DBCONMY "dbconmy.dll"
-    #endif
-#else
-    #define LIB_DBCONMY "./dbconmy.so"
-#endif
-
+#define LIB_DBCONMY "dbconmy" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
 
 ///////////////////////////////////////////////////////////////
 //
@@ -51,6 +42,7 @@ public:
     NewDatabaseConnectionMySql_t*                   m_pfnNewDatabaseConnection;
     std::map < SString, CDatabaseConnection* >      m_SharedConnectionMap;
     std::set < CDatabaseConnection* >               m_AllConnectionMap;
+    SString                                         m_strStatsKeyHead;
 };
 
 
@@ -186,6 +178,10 @@ CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const
     if ( pConnection )
         MapInsert ( m_AllConnectionMap, pConnection );
 
+    // For stats
+    SString strQueueName;
+    GetOption<CDbOptionsMap>( strOptions, "queue", strQueueName );
+    m_strStatsKeyHead = SString( "dbcon mysql [%s] ", *strQueueName );
     UpdateStats ();
 
     return pConnection;
@@ -230,7 +226,7 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql ( CDatab
 void CDatabaseTypeMySql::UpdateStats ( void )
 {
     // Remove all lines with this key
-    CPerfStatDebugTable::GetSingleton ()->RemoveLines ( "dbcon mysql*" );
+    CPerfStatDebugTable::GetSingleton ()->RemoveLines ( m_strStatsKeyHead + "*" );
 
     int iIndex = 0;
     std::set < CDatabaseConnection* > unsharedConnectionMap = m_AllConnectionMap;
@@ -242,7 +238,7 @@ void CDatabaseTypeMySql::UpdateStats ( void )
         CDatabaseConnection* pConnection = iter->second;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), 0
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( m_strStatsKeyHead + SString( "%d", iIndex++ ), 0
                                                           ,"Database connection: mysql (shared)"
                                                           ,*strShareKey
                                                           ,*SString ( "Share count: %d", pConnection->GetShareCount () )
@@ -258,7 +254,7 @@ void CDatabaseTypeMySql::UpdateStats ( void )
         CDatabaseConnection* pConnection = *iter;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( *SString ( "dbcon mysql %d", iIndex++ ), 0
+        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( m_strStatsKeyHead + SString( "%d", iIndex++ ), 0
                                                           ,"Database connection: mysql (unshared)"
                                                           ,*pConnection->m_strOtherTag
                                                           ,*SString ( "Refs: %d", pConnection->GetShareCount () )
@@ -328,7 +324,7 @@ SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArg
             {
                 double dNumber = pArgument->GetNumber ();
                 if ( dNumber == floor ( dNumber ) )
-                    strParsedQuery += SString ( "%" PRId64, (long long)dNumber );
+                    strParsedQuery += SString ( "%lld", (long long)dNumber );
                 else
                     strParsedQuery += SString ( "%f", dNumber );
             }
@@ -387,6 +383,13 @@ SString InsertQueryArgumentsMySql ( const char* szQuery, va_list vl )
                 {
                     int iValue = va_arg( vl, int );
                     strParsedQuery += SString ( "%d", iValue );
+                }
+                break;
+
+                case SQLITE_INTEGER64:
+                {
+                    long long int llValue = va_arg( vl, long long int );
+                    strParsedQuery += SString( "%lld", llValue );
                 }
                 break;
 

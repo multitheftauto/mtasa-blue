@@ -9,7 +9,7 @@ project "Client Launcher"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
-	flags { "WinMain" }
+	entrypoint "WinMainCRTStartup"
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
@@ -25,6 +25,7 @@ project "Client Launcher"
 	}
 	
 	filter "system:windows"
+		flags { "StaticRuntime" } 
 		files {
 			"NEU/GDFImp.gdf.xml",
 			"GDFImp.rc",

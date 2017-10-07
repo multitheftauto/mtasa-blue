@@ -69,6 +69,7 @@ typedef float               FLOAT;      //  32
 
 #define _E(code) SString(" [%s]",code)
 
+#include "SharedUtil.Legacy.h"
 #include "SharedUtil.Map.h"
 #if defined(SHARED_UTIL_WITH_HASH_MAP) || defined(SHARED_UTIL_WITH_FAST_HASH_MAP)
     #include "SharedUtil.HashMap.h"
@@ -90,6 +91,7 @@ typedef float               FLOAT;      //  32
 #endif
 #include "SharedUtil.Profiling.h"
 #include "SharedUtil.Logging.h"
+#include "SharedUtil.AsyncTaskScheduler.h"
 #include "CFastList.h"
 #include "CDuplicateLineFilter.h"
 

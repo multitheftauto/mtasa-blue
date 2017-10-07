@@ -38,8 +38,10 @@ public:
     virtual void                SetCaretAtEnd           ( void ) = 0;
     virtual unsigned int        GetCaretIndex           ( void ) = 0;
 
-    virtual void                SetTextAcceptedHandler  ( GUI_CALLBACK Callback ) = 0;
-    virtual void                SetTextChangedHandler   ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetTextAcceptedHandler      ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetTextChangedHandler       ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetRenderingEndedHandler    ( GUI_CALLBACK Callback ) = 0;
+    virtual void                SetRenderingStartedHandler  ( GUI_CALLBACK Callback ) = 0;
 };
 
 #endif

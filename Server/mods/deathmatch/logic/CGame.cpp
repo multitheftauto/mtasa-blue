@@ -274,6 +274,9 @@ CGame::~CGame ( void )
     // Stop networking
     Stop ();
 
+    // Stop async task scheduler
+    SAFE_DELETE(m_pAsyncTaskScheduler);
+
      // Destroy our stuff
     SAFE_DELETE( m_pResourceManager );
 
@@ -404,7 +407,7 @@ void CGame::DoPulse ( void )
 
     // Update the progress rotator
     uchar ucDelta = (uchar)llCurrentTime - ucProgressSkip;
-    ushort usReqDelta = 80 - ( 100 - Min < ushort > ( 100, m_usFPS ) ) / 5;
+    ushort usReqDelta = 80 - ( 100 - std::min < ushort > ( 100, m_usFPS ) ) / 5;
     
     if ( ucDelta > usReqDelta ) {
         // Clamp ucProgress between 0 and 3
@@ -418,7 +421,7 @@ void CGame::DoPulse ( void )
 
     CLOCK_SET_SECTION( "CGame::DoPulse" );
     CLOCK1( "HTTPDownloadManager" );
-    g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::CALL_REMOTE )->ProcessQueuedFiles ();
+    GetRemoteCalls()->ProcessQueuedFiles();
     g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
     UNCLOCK1( "HTTPDownloadManager" );
 
@@ -482,6 +485,8 @@ void CGame::DoPulse ( void )
     CLOCK_CALL1( m_lightsyncManager.DoPulse (); );
 
     CLOCK_CALL1( m_pLatentTransferManager->DoPulse (); );
+
+    CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
 
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
@@ -549,6 +554,15 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         return false;
     }
 
+    // Check json has precision mod - #8853 (toJSON passes wrong floats)
+    json_object* pJsonObject = json_object_new_double(5.12345678901234);
+    SString strJsonResult = json_object_to_json_string_ext(pJsonObject, JSON_C_TO_STRING_PLAIN);
+    json_object_put(pJsonObject);
+    if (strJsonResult != "5.12345678901234")
+    {
+        CLogger::ErrorPrintf("JSON built without precision modification\n");
+    }
+
     // Grab the path to the main config
     SString strBuffer;
     const char* szMainConfig;
@@ -559,6 +573,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     else
     {
         strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf" );
+        m_bUsingMtaServerConf = true;
     }
     m_pMainConfig->SetFileName ( strBuffer );
 
@@ -597,17 +612,20 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
 
+    // Start async task scheduler
+    m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2);
+
     // Create the account manager
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );
     m_pDatabaseManager = NewDatabaseManager ();
+    m_pDebugHookManager = new CDebugHookManager ();
     m_pLuaCallbackManager = new CLuaCallbackManager ();
     m_pRegistryManager = new CRegistryManager ();
-    m_pAccountManager = new CAccountManager ( NULL, strBuffer );
+    m_pAccountManager = new CAccountManager ( strBuffer );
 
     // Create and start the HTTP server
     m_pHTTPD = new CHTTPD;
     m_pLatentTransferManager = new CLatentTransferManager ();
-    m_pDebugHookManager = new CDebugHookManager ();
 
     // Enable it if required
     if ( m_pMainConfig->IsHTTPEnabled () )
@@ -618,19 +636,6 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         {
             CLogger::ErrorPrintf ( "Could not start HTTP server on interface '%s' and port '%u'!\n", strUseIP.c_str (), m_pMainConfig->GetHTTPPort () );
             return false;
-        }
-    }
-
-    if ( m_pMainConfig->GetAseInternetListenEnabled() )
-    {
-        // Check if IP is one of the most common private IP addresses
-        in_addr serverIp;
-        serverIp.s_addr = inet_addr( strServerIP );
-        uchar a = ( (uchar*)&serverIp.s_addr )[0];
-        uchar b = ( (uchar*)&serverIp.s_addr )[1];
-        if ( a == 10 || a == 127 || ( a == 169 && b == 254 ) || ( a == 192 && b == 168 ) )
-        {
-            CLogger::LogPrintf ( "WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
         }
     }
 
@@ -716,6 +721,25 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Show startup messages from net module
     PrintLogOutputFromNetModule();
 
+    // Show some warnings if applicable
+    if ( m_pMainConfig->IsFakeLagCommandEnabled() )
+    {
+        CLogger::LogPrintf ( "WARNING: ase disabled due to fakelag command\n" );
+    }
+
+    if ( m_pMainConfig->GetAseInternetListenEnabled() )
+    {
+        // Check if IP is one of the most common private IP addresses
+        in_addr serverIp;
+        serverIp.s_addr = inet_addr( strServerIP );
+        uchar a = ( (uchar*)&serverIp.s_addr )[0];
+        uchar b = ( (uchar*)&serverIp.s_addr )[1];
+        if ( a == 10 || a == 127 || ( a == 169 && b == 254 ) || ( a == 192 && b == 168 ) )
+        {
+            CLogger::LogPrintf ( "WARNING: Private IP '%s' with ase enabled! Use: <serverip>auto</serverip>\n", *strServerIP );
+        }
+    }
+
     // Check accounts database and print message if there is a problem
     if ( !m_pAccountManager->IntegrityCheck () )
         return false;
@@ -738,7 +762,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
         // Create cache readme
         SString strReadmeFilename ( "%s/DO_NOT_MODIFY_Readme.txt", strResourceCachePath.c_str () );
-        FILE *fh = fopen ( strReadmeFilename, "w" );
+        FILE *fh = File::Fopen ( strReadmeFilename, "w" );
         if ( fh )
         {
             fprintf ( fh, "---------------------------------------------------------------------------\n" );
@@ -828,9 +852,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     m_pRegistry->IntegrityCheck ();
 
     // Load the accounts
-    strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "accounts.xml" );
-    m_pAccountManager->SetFileName ( strBuffer );
-    m_pAccountManager->SmartLoad ();
+    m_pAccountManager->Load ();
 
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket );
@@ -894,6 +916,27 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
 
     // Flush any pending master server announce messages
     g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
+
+    // Warnings only if not editor or local server
+    if (IsUsingMtaServerConf())
+    {
+        // Authorized serial account protection
+        if ( m_pMainConfig->GetAuthSerialEnabled() )
+        {
+            CLogger::LogPrintf( "Authorized serial account protection is enabled for the ACL group(s): `%s`  See http:""//mtasa.com/authserial\n",
+                                *SString::Join( ",", m_pMainConfig->GetAuthSerialGroupList() ) );
+        }
+        else
+        {
+            CLogger::LogPrint( "Authorized serial account protection is DISABLED. See http:""//mtasa.com/authserial\n" );
+        }
+
+        // Owner email address
+        if (m_pMainConfig->GetOwnerEmailAddressList().empty())
+        {
+            CLogger::LogPrintf("WARNING: <owner_email_address> not set\n");
+        }
+    }
 
     // Done
     // If you're ever going to change this message, update the "server ready" determination
@@ -1325,28 +1368,6 @@ void CGame::InitialDataStream ( CPlayer& Player )
 
     marker.Set ( "onPlayerJoin" );
 
-    // If auto-login is enabled, try and log him in
-    if ( m_pAccountManager->IsAutoLoginEnabled () )
-    {
-        std::string strIP = Player.GetSourceIP ();
-        std::string strPlayerSerial = Player.GetSerial();
-        CAccount* pAccount = m_pAccountManager->Get ( Player.GetNick (), strIP.c_str () );
-        if ( pAccount )
-        {
-            if ( !pAccount->GetClient ( ) )
-            {
-                m_pAccountManager->LogIn ( &Player, &Player, pAccount, true );
-            }
-            else
-            {
-                CLogger::AuthPrintf ( "LOGIN: %s failed to login in as '%s' (IP: %s  Serial: %s) due to the account already being in use.\n", Player.GetNick (), pAccount->GetName ().c_str (), strIP.c_str (), strPlayerSerial.c_str () );
-                Player.SendEcho ( "auto-login: You could not login because your account is already in use." );
-            }
-        }
-    }
-
-    marker.Set ( "AutoLogin" );
-
     // Register them on the lightweight sync manager.
     m_lightsyncManager.RegisterPlayer ( &Player );
 
@@ -1633,6 +1654,13 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 strExtra = SStringX ( strExtraTemp );
                 strPlayerVersion = SStringX ( strPlayerVersionTemp );
             }
+        #if MTASA_VERSION_TYPE < VERSION_TYPE_UNSTABLE
+            if (atoi(ExtractVersionStringBuildNumber(Packet.GetPlayerVersion())) != 0)
+            {
+                // Use player version from packet if it contains a valid build number
+                strPlayerVersion = Packet.GetPlayerVersion();
+            }
+        #endif
 
             SString strIP = pPlayer->GetSourceIP ();
             SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", strIP.c_str (), strSerial.c_str (), strPlayerVersion.c_str () );
@@ -2296,11 +2324,6 @@ void CGame::Packet_Bulletsync ( CBulletsyncPacket& Packet )
     CPlayer* pPlayer = Packet.GetSourcePlayer ();
     if ( pPlayer && pPlayer->IsJoined () )
     {
-        // Remove bad net fix data if disabled
-        if ( !GetConfig()->GetBadNetBulletFixEnabled() )
-        {
-            Packet.m_DamagedPlayerID = INVALID_ELEMENT_ID;
-        }
         // Relay to other players
         RelayNearbyPacket ( Packet );
 
@@ -3112,6 +3135,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     Arguments.PushElement ( pVehicle );        // vehicle
                                     Arguments.PushNumber ( ucOccupiedSeat );    // seat
                                     Arguments.PushBoolean ( false );            // jacker
+                                    Arguments.PushBoolean ( false );            // forcedByScript
                                     pPlayer->CallEvent ( "onPlayerVehicleExit", Arguments );
 
                                     // Call the vehicle->player event
@@ -3119,6 +3143,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     Arguments2.PushElement ( pPlayer );         // player
                                     Arguments2.PushNumber ( ucOccupiedSeat );    // seat
                                     Arguments2.PushBoolean ( false );            // jacker
+                                    Arguments2.PushBoolean ( false );            // forcedByScript
                                     pVehicle->CallEvent ( "onVehicleExit", Arguments2 );
                                 }
                             }
@@ -3173,6 +3198,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 Arguments.PushElement ( pVehicle );        // vehicle
                                 Arguments.PushNumber ( ucOccupiedSeat );    // seat
                                 Arguments.PushBoolean ( false );            // jacker
+                                Arguments.PushBoolean ( false );            // forcedByScript
                                 pPlayer->CallEvent ( "onPlayerVehicleExit", Arguments );
 
                                 // Call the vehicle->player event
@@ -3180,6 +3206,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                 Arguments2.PushElement ( pPlayer );        // player
                                 Arguments2.PushNumber ( ucOccupiedSeat );    // seat
                                 Arguments2.PushBoolean ( false );            // jacker
+                                Arguments2.PushBoolean ( false );            // forcedByScript
                                 pVehicle->CallEvent ( "onVehicleExit", Arguments2 );
                             }
 
@@ -3218,6 +3245,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     ArgumentsExit.PushElement ( pVehicle );        // vehicle
                                     ArgumentsExit.PushNumber ( 0 );                 // seat
                                     ArgumentsExit.PushElement ( pPlayer );         // jacker
+                                    ArgumentsExit.PushBoolean ( false );            // forcedByScript
                                     pJacked->CallEvent ( "onPlayerVehicleExit", ArgumentsExit );
 
                                     // Execute the vehicle->vehicle script function for the jacked player
@@ -3225,6 +3253,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                     ArgumentsExit2.PushElement ( pJacked );         // player
                                     ArgumentsExit2.PushNumber ( 0 );                 // seat
                                     ArgumentsExit2.PushElement ( pPlayer );         // jacker
+                                    ArgumentsExit2.PushBoolean ( false );            // forcedByScript
                                     pVehicle->CallEvent ( "onVehicleExit", ArgumentsExit2 );
 
 
@@ -4023,7 +4052,7 @@ void CGame::HandleBackup ( void )
     {
         SString strName = fileList[f];
         const SString strCheck = "0000-00-00.zip";
-        for ( uint i = 0 ; i < Min ( strCheck.length (), strName.length () ) ; i++ )
+        for ( uint i = 0 ; i < std::min( strCheck.length (), strName.length () ) ; i++ )
             if ( !isdigit( (uchar)strName[i] ) || !isdigit( (uchar)strCheck[i] ) )
                 if ( strName[i] != strCheck[i] )
                 {

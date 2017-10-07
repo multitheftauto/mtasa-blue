@@ -25,11 +25,6 @@
 NAMESPACE_BEGIN(CryptoPP)
 
 #ifndef CRYPTOPP_MS_STYLE_INLINE_ASSEMBLY
-
-// MacPorts/GCC does not provide constructor(priority). Apple/GCC and Fink/GCC do provide it.
-#define HAVE_GCC_CONSTRUCTOR1 (__GNUC__ && (CRYPTOPP_INIT_PRIORITY > 0) && ((CRYPTOPP_GCC_VERSION >= 40300) || (CRYPTOPP_LLVM_CLANG_VERSION >= 20900) || (_INTEL_COMPILER >= 300)) && !(MACPORTS_GCC_COMPILER > 0))
-#define HAVE_GCC_CONSTRUCTOR0 (__GNUC__ && (CRYPTOPP_INIT_PRIORITY > 0) && !(MACPORTS_GCC_COMPILER > 0))
-
 extern "C" {
     typedef void (*SigHandler)(int);
 };
@@ -101,9 +96,11 @@ bool CpuId(word32 input, word32 output[4])
 	if (oldHandler == SIG_ERR)
 		return false;
 
+# ifndef __MINGW32__
 	volatile sigset_t oldMask;
 	if (sigprocmask(0, NULL, (sigset_t*)&oldMask))
 		return false;
+# endif
 
 	if (setjmp(s_jmpNoCPUID))
 		result = false;
@@ -123,7 +120,10 @@ bool CpuId(word32 input, word32 output[4])
 		);
 	}
 
+# ifndef __MINGW32__
 	sigprocmask(SIG_SETMASK, (sigset_t*)&oldMask, NULL);
+# endif
+
 	signal(SIGILL, oldHandler);
 	return result;
 #endif
@@ -160,9 +160,11 @@ static bool TrySSE2()
 	if (oldHandler == SIG_ERR)
 		return false;
 
+# ifndef __MINGW32__
 	volatile sigset_t oldMask;
 	if (sigprocmask(0, NULL, (sigset_t*)&oldMask))
 		return false;
+# endif
 
 	if (setjmp(s_jmpNoSSE2))
 		result = false;
@@ -176,16 +178,22 @@ static bool TrySSE2()
 #endif
 	}
 
+# ifndef __MINGW32__
 	sigprocmask(SIG_SETMASK, (sigset_t*)&oldMask, NULL);
+# endif
+
 	signal(SIGILL, oldHandler);
 	return result;
 #endif
 }
 
-bool g_x86DetectionDone = false;
-bool g_hasMMX = false, g_hasISSE = false, g_hasSSE2 = false, g_hasSSSE3 = false, g_hasSSE4 = false, g_hasAESNI = false, g_hasCLMUL = false, g_isP4 = false, g_hasRDRAND = false, g_hasRDSEED = false;
-bool g_hasPadlockRNG = false, g_hasPadlockACE = false, g_hasPadlockACE2 = false, g_hasPadlockPHE = false, g_hasPadlockPMM = false;
-word32 g_cacheLineSize = CRYPTOPP_L1_CACHE_LINE_SIZE;
+bool CRYPTOPP_SECTION_INIT g_x86DetectionDone = false;
+bool CRYPTOPP_SECTION_INIT g_hasMMX = false, CRYPTOPP_SECTION_INIT g_hasISSE = false, CRYPTOPP_SECTION_INIT g_hasSSE2 = false, CRYPTOPP_SECTION_INIT g_hasSSSE3 = false;
+bool CRYPTOPP_SECTION_INIT g_hasSSE4 = false, CRYPTOPP_SECTION_INIT g_hasAESNI = false, CRYPTOPP_SECTION_INIT g_hasCLMUL = false, CRYPTOPP_SECTION_INIT g_isP4 = false;
+bool CRYPTOPP_SECTION_INIT g_hasRDRAND = false, CRYPTOPP_SECTION_INIT g_hasRDSEED = false;
+bool CRYPTOPP_SECTION_INIT g_hasPadlockRNG = false, CRYPTOPP_SECTION_INIT g_hasPadlockACE = false, CRYPTOPP_SECTION_INIT g_hasPadlockACE2 = false;
+bool CRYPTOPP_SECTION_INIT g_hasPadlockPHE = false, CRYPTOPP_SECTION_INIT g_hasPadlockPMM = false;
+word32 CRYPTOPP_SECTION_INIT g_cacheLineSize = CRYPTOPP_L1_CACHE_LINE_SIZE;
 
 static inline bool IsIntel(const word32 output[4])
 {
@@ -205,7 +213,7 @@ static inline bool IsAMD(const word32 output[4])
 
 static inline bool IsVIA(const word32 output[4])
 {
-	// This is the "CentaurHauls" string. Some non-PadLock can return "VIA VIA VIA ".
+	// This is the "CentaurHauls" string. Some non-PadLock's can return "VIA VIA VIA "
 	return (output[1] /*EBX*/ == 0x746e6543) &&
 		(output[2] /*ECX*/ == 0x736c7561) &&
 		(output[3] /*EDX*/ == 0x48727561);
@@ -281,16 +289,7 @@ void DetectX86Features()
 		static const unsigned int  PMM_FLAGS = (0x3 << 12);
 
 		CpuId(0xC0000000, cpuid);
-		if (cpuid[0] < 0xC0000001)
-		{
-			// No extended features
-			g_hasPadlockRNG  = false;
-			g_hasPadlockACE  = false;
-			g_hasPadlockACE2 = false;
-			g_hasPadlockPHE  = false;
-			g_hasPadlockPMM  = false;
-		}
-		else
+		if (cpuid[0] >= 0xC0000001)
 		{
 			// Extended features available
 			CpuId(0xC0000001, cpuid);
@@ -324,10 +323,10 @@ void DetectX86Features()
 // The following does not work well either. Its appears to be missing constants, and it does not detect Aarch32 execution environments on Aarch64
 // http://community.arm.com/groups/android-community/blog/2014/10/10/runtime-detection-of-cpu-features-on-an-armv8-a-cpu
 //
-bool g_ArmDetectionDone = false;
-bool g_hasNEON = false, g_hasCRC32 = false, g_hasAES = false, g_hasSHA1 = false, g_hasSHA2 = false;
-
-word32 g_cacheLineSize = CRYPTOPP_L1_CACHE_LINE_SIZE;
+bool CRYPTOPP_SECTION_INIT g_ArmDetectionDone = false;
+bool CRYPTOPP_SECTION_INIT g_hasNEON = false, CRYPTOPP_SECTION_INIT g_hasPMULL = false, CRYPTOPP_SECTION_INIT g_hasCRC32 = false;
+bool CRYPTOPP_SECTION_INIT g_hasAES = false, CRYPTOPP_SECTION_INIT g_hasSHA1 = false, CRYPTOPP_SECTION_INIT g_hasSHA2 = false;
+word32 CRYPTOPP_SECTION_INIT g_cacheLineSize = CRYPTOPP_L1_CACHE_LINE_SIZE;
 
 #ifndef CRYPTOPP_MS_STYLE_INLINE_ASSEMBLY
 extern "C"
@@ -336,6 +335,12 @@ extern "C"
 	static void SigIllHandlerNEON(int)
 	{
 		longjmp(s_jmpNoNEON, 1);
+	}
+
+	static jmp_buf s_jmpNoPMULL;
+	static void SigIllHandlerPMULL(int)
+	{
+		longjmp(s_jmpNoPMULL, 1);
 	}
 
 	static jmp_buf s_jmpNoCRC32;
@@ -430,6 +435,77 @@ static bool TryNEON()
 #else
 	return false;
 #endif  // CRYPTOPP_BOOL_NEON_INTRINSICS_AVAILABLE
+}
+
+static bool TryPMULL()
+{
+#if (CRYPTOPP_BOOL_ARM_CRYPTO_INTRINSICS_AVAILABLE)
+# if defined(CRYPTOPP_MS_STYLE_INLINE_ASSEMBLY)
+	volatile bool result = true;
+	__try
+	{
+		const poly64_t a1={2}, b1={3};
+		const poly64x2_t a2={4,5}, b2={6,7};
+		const poly64x2_t a3={0x8080808080808080,0xa0a0a0a0a0a0a0a0}, b3={0xc0c0c0c0c0c0c0c0, 0xe0e0e0e0e0e0e0e0};
+
+		const poly128_t r1 = vmull_p64(a1, b1);
+		const poly128_t r2 = vmull_high_p64(a2, b2);
+		const poly128_t r3 = vmull_high_p64(a3, b3);
+
+		// Also see https://github.com/weidai11/cryptopp/issues/233.
+		const uint64x2_t& t1 = vreinterpretq_u64_p128(r1);  // {6,0}
+		const uint64x2_t& t2 = vreinterpretq_u64_p128(r2);  // {24,0}
+		const uint64x2_t& t3 = vreinterpretq_u64_p128(r3);  // {bignum,bignum}
+
+		result = !!(vgetq_lane_u64(t1,0) == 0x06 && vgetq_lane_u64(t1,1) == 0x00 && vgetq_lane_u64(t2,0) == 0x1b &&
+			vgetq_lane_u64(t2,1) == 0x00 &&	vgetq_lane_u64(t3,0) == 0x6c006c006c006c00 && vgetq_lane_u64(t3,1) == 0x6c006c006c006c00);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		return false;
+	}
+	return result;
+# else
+	// longjmp and clobber warnings. Volatile is required.
+	// http://github.com/weidai11/cryptopp/issues/24 and http://stackoverflow.com/q/7721854
+	volatile bool result = true;
+
+	volatile SigHandler oldHandler = signal(SIGILL, SigIllHandlerPMULL);
+	if (oldHandler == SIG_ERR)
+		return false;
+
+	volatile sigset_t oldMask;
+	if (sigprocmask(0, NULL, (sigset_t*)&oldMask))
+		return false;
+
+	if (setjmp(s_jmpNoPMULL))
+		result = false;
+	else
+	{
+		const poly64_t a1={2}, b1={3};
+		const poly64x2_t a2={4,5}, b2={6,7};
+		const poly64x2_t a3={0x8080808080808080,0xa0a0a0a0a0a0a0a0}, b3={0xc0c0c0c0c0c0c0c0, 0xe0e0e0e0e0e0e0e0};
+
+		const poly128_t r1 = vmull_p64(a1, b1);
+		const poly128_t r2 = vmull_high_p64(a2, b2);
+		const poly128_t r3 = vmull_high_p64(a3, b3);
+
+		// Linaro is missing vreinterpretq_u64_p128. Also see https://github.com/weidai11/cryptopp/issues/233.
+		const uint64x2_t& t1 = (uint64x2_t)(r1);  // {6,0}
+		const uint64x2_t& t2 = (uint64x2_t)(r2);  // {24,0}
+		const uint64x2_t& t3 = (uint64x2_t)(r3);  // {bignum,bignum}
+
+		result = !!(vgetq_lane_u64(t1,0) == 0x06 && vgetq_lane_u64(t1,1) == 0x00 && vgetq_lane_u64(t2,0) == 0x1b &&
+			vgetq_lane_u64(t2,1) == 0x00 &&	vgetq_lane_u64(t3,0) == 0x6c006c006c006c00 && vgetq_lane_u64(t3,1) == 0x6c006c006c006c00);
+	}
+
+	sigprocmask(SIG_SETMASK, (sigset_t*)&oldMask, NULL);
+	signal(SIGILL, oldHandler);
+	return result;
+# endif
+#else
+	return false;
+#endif  // CRYPTOPP_BOOL_ARM_CRYPTO_INTRINSICS_AVAILABLE
 }
 
 static bool TryCRC32()
@@ -666,6 +742,7 @@ void DetectArmFeatures()
 #endif
 {
 	g_hasNEON = TryNEON();
+	g_hasPMULL = TryPMULL();
 	g_hasCRC32 = TryCRC32();
 	g_hasAES = TryAES();
 	g_hasSHA1 = TrySHA1();

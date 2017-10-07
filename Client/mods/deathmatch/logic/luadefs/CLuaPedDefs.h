@@ -62,8 +62,6 @@ public:
     LUA_DECLARE ( IsPedFootBloodEnabled );
     LUA_DECLARE ( GetPedCameraRotation );
     LUA_DECLARE ( IsPedOnFire );
-    LUA_DECLARE ( GetWeaponProperty );
-    LUA_DECLARE ( GetOriginalWeaponProperty );
     LUA_DECLARE ( GetPedOxygenLevel );
     LUA_DECLARE ( IsPedDead );
 
@@ -90,4 +88,5 @@ public:
     LUA_DECLARE_OOP ( WarpPedIntoVehicle );
     LUA_DECLARE ( RemovePedFromVehicle );
     LUA_DECLARE ( SetPedOxygenLevel );
+    LUA_DECLARE ( SetPedStat );
 };

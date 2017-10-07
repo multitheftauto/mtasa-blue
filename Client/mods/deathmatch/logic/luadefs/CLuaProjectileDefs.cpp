@@ -68,31 +68,26 @@ int CLuaProjectileDefs::CreateProjectile ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pCreator )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if ( pLuaMain )
         {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-            if ( pLuaMain )
+            CResource * pResource = pLuaMain->GetResource ();
+            if ( pResource )
             {
-                CResource * pResource = pLuaMain->GetResource ();
-                if ( pResource )
+                CClientProjectile * pProjectile = CStaticFunctionDefinitions::CreateProjectile ( *pResource, *pCreator, ucWeaponType, vecOrigin, fForce, pTarget, vecRotation, vecMoveSpeed, usModel );
+                if ( pProjectile )
                 {
-                    CClientProjectile * pProjectile = CStaticFunctionDefinitions::CreateProjectile ( *pResource, *pCreator, ucWeaponType, vecOrigin, fForce, pTarget, vecRotation, vecMoveSpeed, usModel );
-                    if ( pProjectile )
+                    CElementGroup * pGroup = pResource->GetElementGroup ();
+                    if ( pGroup )
                     {
-                        CElementGroup * pGroup = pResource->GetElementGroup ();
-                        if ( pGroup )
-                        {
-                            pGroup->Add ( (CClientEntity*) pProjectile );
-                        }
-
-                        lua_pushelement ( luaVM, pProjectile );
-                        return 1;
+                        pGroup->Add ( (CClientEntity*) pProjectile );
                     }
+
+                    lua_pushelement ( luaVM, pProjectile );
+                    return 1;
                 }
             }
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "element", 1 );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -109,14 +104,9 @@ int CLuaProjectileDefs::GetProjectileType ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pProjectile )
-        {
-            unsigned char ucWeapon = pProjectile->GetWeaponType ();
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucWeapon ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "projectile", 1 );
+        unsigned char ucWeapon = pProjectile->GetWeaponType ();
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( ucWeapon ) );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -133,22 +123,17 @@ int CLuaProjectileDefs::GetProjectileTarget ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pProjectile )
+        unsigned char ucWeapon = pProjectile->GetWeaponType ();
+        if ( ucWeapon == WEAPONTYPE_ROCKET_HS )
         {
-            unsigned char ucWeapon = pProjectile->GetWeaponType ();
-            if ( ucWeapon == WEAPONTYPE_ROCKET_HS )
-            {
-                lua_pushelement ( luaVM, pProjectile->GetTargetEntity () );
-                return 1;
-            }
-            else if ( ucWeapon == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
-            {
-                lua_pushelement ( luaVM, pProjectile->GetSatchelAttachedTo () );
-                return 1;
-            }
+            lua_pushelement ( luaVM, pProjectile->GetTargetEntity () );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "projectile", 1 );
+        else if ( ucWeapon == WEAPONTYPE_REMOTE_SATCHEL_CHARGE )
+        {
+            lua_pushelement ( luaVM, pProjectile->GetSatchelAttachedTo () );
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -166,13 +151,8 @@ int CLuaProjectileDefs::GetProjectileCreator ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pProjectile )
-        {
-            lua_pushelement ( luaVM, pProjectile->GetCreator () );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "projectile", 1 );
+        lua_pushelement ( luaVM, pProjectile->GetCreator () );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -190,13 +170,8 @@ int CLuaProjectileDefs::GetProjectileForce ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( pProjectile )
-        {
-            lua_pushnumber ( luaVM, static_cast < lua_Number > ( pProjectile->GetForce () ) );
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "projectile", 1 );
+        lua_pushnumber ( luaVM, static_cast < lua_Number > ( pProjectile->GetForce () ) );
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );

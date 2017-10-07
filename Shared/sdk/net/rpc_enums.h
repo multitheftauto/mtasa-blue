@@ -253,5 +253,8 @@ enum eElementRPCFunctions
     SET_TRAIN_TRACK,
     SET_TRAIN_POSITION,
 
+    SET_OBJECT_VISIBLE_IN_ALL_DIMENSIONS,
+
+    
     NUM_RPC_FUNCS
 };

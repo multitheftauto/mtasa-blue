@@ -180,6 +180,8 @@ Page custom CustomDirectoryPage CustomDirectoryPageLeave
 !insertmacro MUI_LANGUAGE "English"
 ;@INSERT_TRANSLATIONS@
 
+LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
+LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access may be requested for Vista and up]\n\n\
@@ -193,6 +195,7 @@ LangString  DESC_Section10          ${LANG_ENGLISH} "Create a Start Menu group f
 LangString  DESC_Section11          ${LANG_ENGLISH} "Create a Desktop Shortcut for the MTA:SA Client."
 LangString  DESC_Section12          ${LANG_ENGLISH} "Register mtasa:// protocol for browser clickable-ness."
 LangString  DESC_Section13          ${LANG_ENGLISH} "Add to Windows Games Explorer (if present)."
+LangString  DESC_DirectX            ${LANG_ENGLISH} "Install or update DirectX (if required)."
 LangString  DESC_Section1           ${LANG_ENGLISH} "The core components required to run Multi Theft Auto."
 LangString  DESC_Section2           ${LANG_ENGLISH} "The MTA:SA modification, allowing you to play online."
 ;LangString DESC_Section3           ${LANG_ENGLISH} "The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
@@ -229,6 +232,13 @@ Function .onInit
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
     
+	
+	${If} ${AtMostWinVista}
+		MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
+		ExecShell "open" "http://mtasa.com"
+		Quit
+	${EndIf}
+
     File /oname=$TEMP\image.bmp "connect.bmp"
     
     ; #############################################
@@ -287,7 +297,7 @@ Function .onInit
             StrCpy $ShowLastUsed "1"
         ${EndIf}
     ${EndIf}
-    
+
     ; Try to find previously saved GTA:SA install path
     ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
     ${If} $2 == "" 
@@ -414,7 +424,8 @@ ShowUnInstDetails show
 LangString INST_STARTMENU_GROUP     ${LANG_ENGLISH} "Start menu group"
 LangString INST_DESKTOP_ICON        ${LANG_ENGLISH} "Desktop icon"
 LangString INST_PROTOCOL            ${LANG_ENGLISH} "Register mtasa:// protocol"
-LangString INST_GAMES_EXPLORER  ${LANG_ENGLISH} "Add to Games Explorer"
+LangString INST_GAMES_EXPLORER      ${LANG_ENGLISH} "Add to Games Explorer"
+LangString INST_DIRECTX             ${LANG_ENGLISH} "Install DirectX"
 
 Section "$(INST_STARTMENU_GROUP)" SEC10
     SectionIn 1 2
@@ -436,6 +447,18 @@ Section "$(INST_GAMES_EXPLORER)" SEC13
     StrCpy $AddToGameExplorer 1
 SectionEnd
 
+Section "$(INST_DIRECTX)" SEC_DIRECTX
+    SectionIn 1 2
+    SetOutPath "$TEMP"
+    File "${FILES_ROOT}\redist\dxwebsetup.exe"
+    DetailPrint "Running DirectX Setup..."
+    ExecWait '"$TEMP\dxwebsetup.exe" /Q'
+    DetailPrint "Finished DirectX Setup"
+    Delete "$TEMP\dxwebsetup.exe"
+    SetOutPath "$INSTDIR"
+SectionEnd
+
+
 LangString INST_SEC_CLIENT      ${LANG_ENGLISH} "Game client"
 LangString INST_SEC_SERVER      ${LANG_ENGLISH} "Dedicated server"
 LangString INST_SEC_CORE            ${LANG_ENGLISH} "Core components"
@@ -454,8 +477,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
     Section "$(INST_SEC_CORE)" SEC01
         SectionIn 1 RO ; section is required
         ${LogText} "+Section begin - CLIENT CORE"
-
-        Call UpdateVCRedistributables
 
         SetShellVarContext all
 
@@ -549,63 +570,45 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         
         #############################################################
         # Patch our San Andreas .exe if it is required
-            
-        IfFileExists $GTA_DIR\gta_sa.exe 0 TrySteamExe
-            # Check gta_sa.exe is greater than 1MB (Previous Steam patching may have failed)
-            ${GetSize} "$GTA_DIR" "/M=gta_sa.exe /S=0M /G=0" $0 $1 $2
-            StrCmp "$0" "0" TrySteamExe
-            !insertmacro GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5
-            DetailPrint "gta_sa.exe successfully detected ($ExeMD5)"
-            ${LogText} "GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
-            ${Switch} $ExeMD5
-                ${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
-                ${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
-                ${Case} "d84326ba0e0ace89f87288ffe7504da4" #EU 3.00 Steam Mac
-                ${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
-                ${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
-                ${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
-                ${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
-                ${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
-                ${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
-                ${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
-                ${Case} "185f0970f5913d0912a89789af175ffe" #?? ?.?? 4,496,063 bytes
-                    #Create a backup of the GTA exe before patching
-                    CopyFiles "$GTA_DIR\gta_sa.exe" "$GTA_DIR\gta_sa.exe.bak"
-                    Call InstallPatch
-                    ${If} $PatchInstalled == "1"
-                        Goto CompletePatchProc
-                    ${EndIf}
-                    Goto NoExeFound
-                    ${Break}
-                ${Default}
-                    Goto CompletePatchProc #This gta_sa.exe doesn't need patching, let's continue
-                    ${Break}
-            ${EndSwitch}
-        TrySteamExe:
-            # Try with gta-sa.exe, then testapp.exe
-            nsArray::SetList array "gta-sa.exe" "testapp.exe" /end
+            nsArray::SetList array "gta_sa.exe" "gta-sa.exe" "testapp.exe" /end
             ${ForEachIn} array $0 $1
-                IfFileExists $GTA_DIR\$1 0 TrySteamNext
+                IfFileExists $GTA_DIR\$1 0 TryNextExe
+                ${GetSize} "$GTA_DIR" "/M=$1 /S=0M /G=0" $0 $3 $4
+                StrCmp "$0" "0" TryNextExe
                 !insertmacro GetMD5 $GTA_DIR\$1 $ExeMD5
                 DetailPrint "$1 successfully detected ($ExeMD5)"
                 ${LogText} "GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
                 ${Switch} $ExeMD5
+                    ${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
+                    ${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
+                    ${Case} "d84326ba0e0ace89f87288ffe7504da4" #EU 3.00 Steam Mac
+                    ${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
+                    ${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
+                    ${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
+                    ${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
+                    ${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
+                    ${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
+                    ${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
+                    ${Case} "185f0970f5913d0912a89789af175ffe" #?? ?.?? 4,496,063 bytes
                     ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam                   2007-12-04 11:50:50     5697536
                     ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update) 2014-10-14 21:58:05     5971456
                     ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update) 2014-12-01 20:43:21     5971456
-                        #Copy gta-sa.exe to gta_sa.exe and commence patching process
+                    ${Case} "d9cb35c898d3298ca904a63e10ee18d7" #DE 3.02 Steam (2014 Dec update) 2016-08-11 20:57:22     5971456
+                        #Copy to gta_sa.exe and commence patching process
                         CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
                         Call InstallPatch
                         ${If} $PatchInstalled == "1"
                             Goto CompletePatchProc
                         ${EndIf}
-                        Goto TrySteamNext
+                        Goto TryNextExe
                         ${Break}
                     ${Default}
-                        Goto TrySteamNext
+                        ${If} $1 == "gta_sa.exe"
+                            Goto CompletePatchProc #This gta_sa.exe doesn't need patching, let's continue
+                        ${EndIf}
                         ${Break}
                 ${EndSwitch}
-            TrySteamNext:
+                TryNextExe:
             ${Next}
 
         NoExeFound:
@@ -655,11 +658,14 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\game_sa.dll"
         File "${FILES_ROOT}\mta\multiplayer_sa.dll"
         File "${FILES_ROOT}\mta\netc.dll"
-        File "${FILES_ROOT}\mta\libcurl.dll"
         File "${FILES_ROOT}\mta\loader.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
+        File "${FILES_ROOT}\mta\cefweb.dll"
+        File "${FILES_ROOT}\mta\libwow64.dll"
+        File "${FILES_ROOT}\mta\wow64_helper.exe"
         
         SetOutPath "$INSTDIR\MTA"
+		File "${FILES_ROOT}\mta\chrome_elf.dll"
         File "${FILES_ROOT}\mta\libcef.dll"
         File "${FILES_ROOT}\mta\icudtl.dat"
         File "${FILES_ROOT}\mta\libEGL.dll"
@@ -706,6 +712,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\vvo.dll"
             File "${FILES_ROOT}\mta\vvof.dll"
             File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
+            File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
 
             File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
             File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
@@ -797,15 +804,12 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         ${LogText} "+Section begin - SERVER CORE"
         SectionIn 1 2 RO ; section is required
         
-        Call UpdateVCRedistributables
-
         SetOutPath "$INSTDIR\server"
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\core.dll"
         File "${FILES_ROOT}\mta\xmll.dll"
         File "${SERVER_FILES_ROOT}\MTA Server.exe"
         File "${SERVER_FILES_ROOT}\net.dll"
-        File "${FILES_ROOT}\mta\libcurl.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         ${LogText} "-Section end - SERVER CORE"
     SectionEnd
@@ -976,6 +980,7 @@ LangString INST_SEC_DEVELOPER ${LANG_ENGLISH}   "Development"
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_Section11)
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC12} $(DESC_Section12)
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC13} $(DESC_Section13)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SEC_DIRECTX} $(DESC_DirectX)
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} $(DESC_Section1)
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} $(DESC_Section2)
     ;!insertmacro MUI_DESCRIPTION_TEXT ${SEC03} $(DESC_Section3)
@@ -1086,10 +1091,14 @@ Section Uninstall
 
     RmDir /r "$INSTDIR\MTA\cgui"
     RmDir /r "$INSTDIR\MTA\data"
+    RmDir /r "$INSTDIR\MTA\CEF"
+    RmDir /r "$INSTDIR\MTA\locale"
     Delete "$INSTDIR\MTA\*.dll"
-    Delete "$INSTDIR\MTA\*.ax"
-    Delete "$INSTDIR\MTA\*.txt"
+    Delete "$INSTDIR\MTA\*.exe"
+    Delete "$INSTDIR\MTA\*.dmp"
+    Delete "$INSTDIR\MTA\*.log"
     Delete "$INSTDIR\MTA\*.dat"
+    Delete "$INSTDIR\MTA\*.bin"
 
     RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
     ; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
@@ -1126,131 +1135,6 @@ Function SkipDirectoryPage
     Abort
 FunctionEnd
 
-
-;====================================================================================
-; Download and install Microsoft Visual Studio redistributables if required
-;====================================================================================
-Function UpdateVCRedistributables
-    Call IsVC12RedistributableInstalled
-    ${If} $0 != "1"
-        Call InstallVC12Redistributable
-    ${EndIf}
-    Call IsVC14RedistributableInstalled
-    ${If} $0 != "1"
-        Call InstallVC14Redistributable
-    ${EndIf}
-FunctionEnd
-
-
-;====================================================================================
-; Download and install Microsoft Visual Studio 2013 redistributable
-;====================================================================================
-Var REDISTVC12
-
-LangString MSGBOX_VC12RED_ERROR1 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2013 redistributable"
-LangString MSGBOX_VC12RED_ERROR2 ${LANG_ENGLISH}    "Unable to install Microsoft Visual Studio 2013 redistributable"
-LangString MSGBOX_VC12RED_ERROR3 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2013 redistributable.\
-$\r$\nHowever installation will continue.\
-$\r$\nPlease reinstall if there are problems later."
-Function InstallVC12Redistributable
-    ${LogText} "+Function begin - InstallVC12Redistributable"
-    DetailPrint "Installing Microsoft Visual Studio 2013 redistributable ..."
-    StrCpy $REDISTVC12 "$TEMP\vcredist12_x86.exe"
-    NSISdl::download "http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe" $REDISTVC12
-    Pop $0
-
-    ${If} $0 != "success"
-        DetailPrint "* Download of Microsoft Visual Studio 2013 redistributable failed:"
-        DetailPrint "* $0"
-        DetailPrint "* Installation continuing anyway"
-        MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR3)"
-    ${Else}
-        ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
-        ; /quiet = 'This option will suppress all UI and perform an install.'
-        ExecWait '"$REDISTVC12" /quiet'
-        Call IsVC12RedistributableInstalled
-        ${If} $0 != "1"
-            DetailPrint "* Some error occured installing Microsoft Visual Studio 2013 redistributable"
-            DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
-            DetailPrint "* Installation continuing anyway"
-            MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR2)"
-            MessageBox MB_ICONSTOP "$(MSGBOX_VC12RED_ERROR3)"
-        ${EndIf}
-    ${EndIf}
-
-    ${LogText} "-Function end - InstallVC12Redistributable"
-FunctionEnd
-
-;----------------------------------------
-; Out $0 = result   ("1" = yes, "0" = no)
-Function IsVC12RedistributableInstalled
-    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum" "Install"
-    ${If} $0 != "1"
-        StrCpy $0 "0"
-    ${EndIf}
-FunctionEnd
-
-
-;====================================================================================
-; Download and install Microsoft Visual Studio 2015 redistributable
-;====================================================================================
-!define VC14_REDIST_VER    "14.0.24210"     ; Version number of update 3
-Var REDISTVC14
-
-LangString MSGBOX_VC14RED_ERROR1 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2015 redistributable"
-LangString MSGBOX_VC14RED_ERROR2 ${LANG_ENGLISH}    "Unable to install Microsoft Visual Studio 2015 redistributable"
-LangString MSGBOX_VC14RED_ERROR3 ${LANG_ENGLISH}    "Unable to download Microsoft Visual Studio 2015 redistributable.\
-$\r$\nHowever installation will continue.\
-$\r$\nPlease reinstall if there are problems later."
-Function InstallVC14Redistributable
-    ${LogText} "+Function begin - InstallVC14Redistributable"
-    DetailPrint "Installing Microsoft Visual Studio 2015 redistributable ..."
-    StrCpy $REDISTVC14 "$TEMP\vcredist14_x86.exe"
-    NSISdl::download "http://mirror.multitheftauto.com/mtasa/installer/9875/vc_redist_2015u3.x86.exe" $REDISTVC14
-    Pop $0
-
-    ${If} $0 != "success"
-        DetailPrint "* Download of Microsoft Visual Studio 2015 redistributable failed:"
-        DetailPrint "* $0"
-        DetailPrint "* Installation continuing anyway"
-        MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR3)"
-    ${Else}
-        ; /passive = 'This option will display a progress dialog (but requires no user interaction) and perform an install.'
-        ; /quiet = 'This option will suppress all UI and perform an install.'
-        ExecWait '"$REDISTVC14" /quiet'
-        Call IsVC14RedistributableInstalled
-        ${If} $0 != "1"
-            DetailPrint "* Some error occured installing Microsoft Visual Studio 2015 redistributable"
-            DetailPrint "* It is required in order to run Multi Theft Auto : San Andreas"
-            DetailPrint "* Installation continuing anyway"
-            MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR2)"
-            MessageBox MB_ICONSTOP "$(MSGBOX_VC14RED_ERROR3)"
-        ${EndIf}
-    ${EndIf}
-
-    ${LogText} "-Function end - InstallVC14Redistributable"
-FunctionEnd
-
-;----------------------------------------
-; Out $0 = result   ("1" = yes, "0" = no)
-Function IsVC14RedistributableInstalled
-    ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Install"
-    ${If} $0 == "1" 
-        ReadRegDWORD $0 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\14.0\RuntimeMinimum" "Version"
-
-        ; ${VersionCompare} "[Version1]" "[Version2]" $result
-        ;   0 = Versions are equal
-        ;   1 = Version1 is newer
-        ;   2 = Version2 is newer
-        ${VersionCompare} $0 ${VC14_REDIST_VER} $1
-        ${If} $1 != "2"     ; Version2 is not newer
-            StrCpy $0 "1"
-            Return
-        ${EndIf}
-
-    ${EndIf}
-    StrCpy $0 "0"
-FunctionEnd
 
 ;====================================================================================
 ; Patcher related functions
@@ -2255,8 +2139,8 @@ Function CustomDirectoryPageUpdateINSTDIR
     ${EndSwitch}
 FunctionEnd
 
-; Out <stack> = "1" - Is Windows Classic
 Function IsWindowsClassicTheme
+; Out <stack> = "1" - Is Windows Classic
     System::Call "UxTheme::IsThemeActive() i .r3"
     StrCpy $1 "1"
     ${If} $3 == 1

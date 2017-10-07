@@ -24,6 +24,7 @@ std::map < unsigned short, int > CModelInfoSA::ms_RestreamTxdIDMap;
 std::map < DWORD, float > CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::set < uint > CModelInfoSA::ms_ReplacedColModels;
 std::map < DWORD, BYTE > CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::unordered_map<CVehicleModelInfoSAInterface*, CVector> CModelInfoSA::ms_ModelDefaultVehicleFumesPosition;
 
 CModelInfoSA::CModelInfoSA ( void )
 {
@@ -254,23 +255,25 @@ BOOL CModelInfoSA::IsVehicle ( )
     return m_dwModelID >= 400 && m_dwModelID <= 611;
 }   
 
-bool CModelInfoSA::IsPlayerModel ( )
+bool CModelInfoSA::IsPlayerModel()
 {
-    return ( ( m_dwModelID >= 0 && m_dwModelID <= 312 ) || m_dwModelID == 329 || m_dwModelID == 340 || m_dwModelID == 382 ||
-         m_dwModelID == 383 || m_dwModelID == 398 || m_dwModelID == 399 || ( m_dwModelID >= 612 &&  m_dwModelID <= 614 ) ||
-         m_dwModelID == 662 || m_dwModelID == 663 || ( m_dwModelID >= 665 && m_dwModelID <= 699 ) ||
-         ( m_dwModelID >= 793 && m_dwModelID <= 799 ) || ( m_dwModelID >= 907 && m_dwModelID <= 909 ) || 
-         m_dwModelID == 965 || m_dwModelID == 999 || ( m_dwModelID >= 1194 && m_dwModelID <= 1206 ) ||
-         m_dwModelID == 1326 || m_dwModelID == 1573 || m_dwModelID == 1699 || m_dwModelID == 2883 || m_dwModelID == 2884 ||
-         ( m_dwModelID >= 3176 && m_dwModelID <= 3197 ) || ( m_dwModelID >= 3215 && m_dwModelID <= 3220 ) ||
-         m_dwModelID == 3245 || m_dwModelID == 3247 || m_dwModelID == 3248 || m_dwModelID == 3251 || m_dwModelID == 3254 ||
-         m_dwModelID == 3266 || m_dwModelID == 3348 || m_dwModelID == 3349 || m_dwModelID == 3416 || m_dwModelID == 3429 ||
-         m_dwModelID == 3610 || m_dwModelID == 3611 || m_dwModelID == 3784 || m_dwModelID == 3870 || m_dwModelID == 3871 ||
-         m_dwModelID == 3883 || m_dwModelID == 3889 || m_dwModelID == 3974 || ( m_dwModelID >= 4542 && m_dwModelID <= 4549 ) ||
-         m_dwModelID == 5090 || m_dwModelID == 5104 || ( m_dwModelID >= 3136 && m_dwModelID <= 3166 ) ||
-         ( m_dwModelID >= 3194 && m_dwModelID <= 3213 ) || ( m_dwModelID >= 3222 && m_dwModelID <= 3240 ) ||
-         ( m_dwModelID >= 4763 && m_dwModelID <= 4805 ) || ( m_dwModelID >= 5376 && m_dwModelID <= 5389 )
-        );
+    return (m_dwModelID == 0 ||
+        m_dwModelID == 1 ||
+        m_dwModelID == 2 ||
+        m_dwModelID == 7 ||
+        (m_dwModelID >= 9 &&
+            m_dwModelID != 208 &&
+            m_dwModelID != 149 &&
+            m_dwModelID != 119 &&
+            m_dwModelID != 86 &&
+            m_dwModelID != 74 &&
+            m_dwModelID != 65 &&
+            m_dwModelID != 42 &&
+            m_dwModelID <= 272) ||
+            (m_dwModelID >= 274 &&
+                m_dwModelID <= 288) ||
+                (m_dwModelID >= 290 &&
+                    m_dwModelID <= 312));
 }
 
 BOOL CModelInfoSA::IsUpgrade ( void )
@@ -604,10 +607,10 @@ void CModelInfoSA::SetLODDistance ( float fDistance )
     float fMaximumValue = Lerp ( 325.f, fDrawDistanceSetting, 170.f );
 
     // Ensure fDistance is in range
-    fDistance = Min ( fDistance, fMaximumValue );
+    fDistance = std::min ( fDistance, fMaximumValue );
 #endif
     // Limit to 325.f as it goes horrible after that
-    fDistance = Min ( fDistance, 325.f );
+    fDistance = std::min ( fDistance, 325.f );
     m_pInterface = ppModelInfo [ m_dwModelID ];
     if ( m_pInterface )
     {
@@ -663,7 +666,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
                 // Log info
                 OutputDebugString ( SString ( "Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex, i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols ) );
                 // Assert in debug
-                #if _DEBUG
+                #if MTA_DEBUG
                     assert ( pEntity->vtbl->DeleteRwObject == 0x00534030 );
                 #endif
                 pSectorEntry = (DWORD *)pSectorEntry [ 1 ];
@@ -932,6 +935,43 @@ void* CModelInfoSA::SetVehicleSuspensionData ( void* pSuspensionLines )
     void* pOrigSuspensionLines = pColData->pSuspensionLines;
     pColData->pSuspensionLines = pSuspensionLines;
     return pOrigSuspensionLines;
+}
+
+
+CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
+{
+    if (!IsVehicle())
+        return CVector();
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    return pVehicleModel->pVisualInfo->exhaustPosition;
+}
+
+void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& position)
+{
+    if (!IsVehicle())
+        return;
+
+    // Store default position in map
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    auto iter = ms_ModelDefaultVehicleFumesPosition.find(pVehicleModel);
+    if (iter == ms_ModelDefaultVehicleFumesPosition.end())
+    {
+        ms_ModelDefaultVehicleFumesPosition.insert({ pVehicleModel, pVehicleModel->pVisualInfo->exhaustPosition });
+    }
+
+    // Set fumes position
+    pVehicleModel->pVisualInfo->exhaustPosition = position;
+}
+
+void CModelInfoSA::ResetAllVehicleExhaustFumes()
+{
+    for (auto& info : ms_ModelDefaultVehicleFumesPosition)
+    {
+        CVehicleModelInfoSAInterface* pVehicleModel = info.first;
+        pVehicleModel->pVisualInfo->exhaustPosition = info.second;
+    }
+    ms_ModelDefaultVehicleFumesPosition.clear();
 }
 
 void CModelInfoSA::SetCustomModel ( RpClump* pClump )
@@ -1221,7 +1261,7 @@ void OnMY_NodeNameStreamRead( RwStream* stream, char* pDest, uint uiSize )
 {
     // Calc sizes
     const uint uiMaxBufferSize = 24;
-    uint uiAmountToRead = Min( uiMaxBufferSize - 1, uiSize );
+    uint uiAmountToRead = std::min( uiMaxBufferSize - 1, uiSize );
     uint uiAmountToSkip = uiSize - uiAmountToRead;
 
     // Read good bit

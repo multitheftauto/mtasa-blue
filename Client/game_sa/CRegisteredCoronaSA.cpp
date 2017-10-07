@@ -119,6 +119,8 @@ VOID CRegisteredCoronaSA::Init(DWORD Identifier)
     DEBUG_TRACE("VOID CRegisteredCoronaSA::Init(DWORD Identifier)");
     internalInterface->Identifier = Identifier;
     this->SetSize(2.5f);
+    internalInterface->bIsAttachedToEntity = false;
+    internalInterface->pEntityAttachedTo = NULL;
     internalInterface->NormalAngle = 0.0f;
     internalInterface->Range = 450.0f;
     internalInterface->PullTowardsCam = 1.5f;

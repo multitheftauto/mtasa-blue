@@ -524,7 +524,7 @@ void CElementRPCs::SetElementFrozen ( CClientEntity* pSource, NetBitStreamInterf
             case CCLIENTOBJECT:
             {
                 CClientObject* pObject = static_cast < CClientObject * > ( pSource );
-                pObject->SetStatic ( bFrozen );
+                pObject->SetFrozen ( bFrozen );
                 break;
             }
         }

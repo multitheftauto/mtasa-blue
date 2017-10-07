@@ -169,7 +169,7 @@ void CNetworkStats::Draw ( void )
                                         fBackWidth + 10, fBackHeight + 20,
                                         0x78000000, true );
 
-    g_pCore->GetGraphics ()->DrawTextQueued ( fX, fY,
+    g_pCore->GetGraphics ()->DrawStringQueued ( fX, fY,
                                               fX, fY,
                                               0xFFFFFFFF,
                                               strBuffer,

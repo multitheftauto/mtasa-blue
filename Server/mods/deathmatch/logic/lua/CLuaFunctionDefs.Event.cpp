@@ -380,7 +380,7 @@ int CLuaFunctionDefs::GetLatentEventStatus ( lua_State* luaVM )
             lua_settable ( luaVM, -3 );
 
             lua_pushstring ( luaVM, "percentComplete" );
-            lua_pushinteger ( luaVM, sendStatus.iPercentComplete );
+            lua_pushnumber  ( luaVM, sendStatus.dPercentComplete );
             lua_settable ( luaVM, -3 );
             return 1;
         }
@@ -428,7 +428,8 @@ int CLuaFunctionDefs::AddDebugHook ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadEnumString ( hookType );
     argStream.ReadFunction ( callBack );
-    argStream.ReadStringTable ( allowedNames, true );
+    if ( argStream.NextIsTable() )
+        argStream.ReadStringTable ( allowedNames );
     argStream.ReadFunctionComplete ();
 
     if ( !argStream.HasErrors () )

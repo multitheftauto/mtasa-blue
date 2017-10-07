@@ -312,7 +312,7 @@ int CLuaDrawingDefs::DxDrawText ( lua_State* luaVM )
         if ( bWordBreak )           ulFormat |= DT_WORDBREAK;
         if ( !bClip )               ulFormat |= DT_NOCLIP;
 
-        g_pCore->GetGraphics ()->DrawTextQueued (
+        g_pCore->GetGraphics ()->DrawStringQueued (
             vecTopLeft.fX, vecTopLeft.fY,
             vecBottomRight.fX, vecBottomRight.fY,
             color,
@@ -1212,6 +1212,9 @@ int CLuaDrawingDefs::DxGetStatus ( lua_State* luaVM )
         lua_pushnumber ( luaVM, dxStatus.settings.fFieldOfView );
         lua_settable ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "SettingHighDetailVehicles" );
+        lua_pushboolean ( luaVM, dxStatus.settings.bHighDetailVehicles );
+        lua_settable ( luaVM, -3 );
         return 1;
     }
     else
@@ -1273,7 +1276,7 @@ int CLuaDrawingDefs::DxSetTexturePixels ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CVector2D vecEndPosition = vecEndPosition + vecSize;
+        CVector2D vecEndPosition = vecPosition + vecSize;
         RECT rc = { (int) vecPosition.fX, (int) vecPosition.fY, (int) vecEndPosition.fX, (int) vecEndPosition.fY };
         if ( g_pCore->GetGraphics ()->GetPixelsManager ()->SetTexturePixels ( pTexture->GetTextureItem ()->m_pD3DTexture, pixels, vecSize.fY == 0 ? NULL : &rc, surfaceIndex ) )
         {

@@ -2461,7 +2461,7 @@ void CClientVehicle::StreamedInPulse ( void )
                     {
                         // Apply turn speed limit
                         float fLength = vecTurnSpeed.Normalize ();
-                        fLength = Min ( fLength, 0.02f );
+                        fLength = std::min( fLength, 0.02f );
                         vecTurnSpeed *= fLength;
 
                         m_pVehicle->SetTurnSpeed ( &vecTurnSpeed );
@@ -2739,6 +2739,7 @@ void CClientVehicle::Create ( void )
         m_pVehicle->SetSmokeTrailEnabled ( m_bSmokeTrail );
         m_pVehicle->SetGravity ( &m_vecGravity );
         m_pVehicle->SetHeadLightColor ( m_HeadLightColor );
+        m_pVehicle->SetRadioStatus ( 0 );
 
         if ( IsNitroInstalled() )
         {
@@ -3667,7 +3668,6 @@ void CClientVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOO
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
-        case VT_BLOODRA:
             memset ( &ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS );
 
             // Keep the bonet and boot intact
@@ -4423,7 +4423,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
         g_pGame->GetStreaming()->LoadAllRequestedModels ( false, "CClientVehicle::HandleWaitingForGroundToLoad" );
 
     // Start out with a fairly big radius to check, and shrink it down over time
-    float fUseRadius = 50.0f * ( 1.f - Max ( 0.f, m_fObjectsAroundTolerance ) );
+    float fUseRadius = 50.0f * ( 1.f - std::max ( 0.f, m_fObjectsAroundTolerance ) );
 
     // Gather up some flags
     CClientObjectManager* pObjectManager = g_pClientGame->GetObjectManager ();
@@ -4447,7 +4447,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
     if ( ( !bHasModel || !bMTALoaded ) && m_fObjectsAroundTolerance < 1.f )
     {
         m_fGroundCheckTolerance = 0.f;
-        m_fObjectsAroundTolerance = Min ( 1.f, m_fObjectsAroundTolerance + 0.01f );
+        m_fObjectsAroundTolerance = std::min( 1.f, m_fObjectsAroundTolerance + 0.01f );
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
             status += ( "  FreezeUntilCollisionLoaded - wait" );
         #endif
@@ -4457,7 +4457,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
         // Models should be loaded, but sometimes the collision is still not ready
         // Do a ground distance check to make sure.
         // Make the check tolerance larger with each passing frame
-        m_fGroundCheckTolerance = Min ( 1.f, m_fGroundCheckTolerance + 0.01f );
+        m_fGroundCheckTolerance = std::min( 1.f, m_fGroundCheckTolerance + 0.01f );
         float fDist = GetDistanceFromGround ();
         float fUseDist = fDist * ( 1.f - m_fGroundCheckTolerance );
         if ( fUseDist > -0.2f && fUseDist < 1.5f )
@@ -4474,12 +4474,12 @@ void CClientVehicle::HandleWaitingForGroundToLoad ( void )
 
     #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         OutputDebugLine ( SStringX ( "[AsyncLoading] " ) + status );
-        g_pCore->GetGraphics ()->DrawText ( 10, 220, -1, 1, status );
+        g_pCore->GetGraphics ()->DrawString ( 10, 220, -1, 1, status );
 
         std::vector < SString > lineList;
         strAround.Split ( "\n", lineList );
         for ( unsigned int i = 0 ; i < lineList.size () ; i++ )
-            g_pCore->GetGraphics ()->DrawText ( 10, 230 + i * 10, -1, 1, lineList[i] );
+            g_pCore->GetGraphics ()->DrawString ( 10, 230 + i * 10, -1, 1, lineList[i] );
     #endif
 }
 
@@ -4876,6 +4876,22 @@ bool CClientVehicle::DoesSupportUpgrade ( const SString& strFrameName )
         return m_pVehicle->DoesSupportUpgrade ( strFrameName );
     }
     return true;
+}
+
+void CClientVehicle::SetModelExhaustFumesPosition(unsigned short modelID, const CVector& position)
+{
+    auto pModelInfo = g_pGame->GetModelInfo(modelID);
+    if (pModelInfo)
+        pModelInfo->SetVehicleExhaustFumesPosition(position);
+}
+
+CVector CClientVehicle::GetModelExhaustFumesPosition(unsigned short modelID)
+{
+    auto pModelInfo = g_pGame->GetModelInfo(modelID);
+    if (pModelInfo)
+        return pModelInfo->GetVehicleExhaustFumesPosition();
+
+    return CVector();
 }
 
 bool CClientVehicle::OnVehicleFallThroughMap ( )

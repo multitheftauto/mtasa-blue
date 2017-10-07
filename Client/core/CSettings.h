@@ -19,8 +19,7 @@
 
 class CSettings;
 
-#ifndef __CSETTINGS_H
-#define __CSETTINGS_H
+#pragma once
 
 #include <core/CCoreInterface.h>
 #include "CMainMenu.h"
@@ -74,20 +73,6 @@ struct SKeyBindSection
 
 class CColor;
 
-namespace ChatColorTypes
-{
-    enum ChatColorType
-    {
-        CHAT_COLOR_BG = 0,
-        CHAT_COLOR_TEXT,
-        CHAT_COLOR_INPUT_BG,
-        CHAT_COLOR_INPUT_TEXT,
-        CHAT_COLOR_MAX
-    };
-}
-
-using ChatColorTypes::ChatColorType;
-
 enum
 {
     FULLSCREEN_STANDARD,
@@ -134,9 +119,6 @@ public:
     void                RemoveKeyBindSection    ( char * szSectionName );
     void                RemoveAllKeyBindSections ( void );
 
-    static void         OnLoginCallback         ( bool bResult, char* szError, void* obj );
-    void                OnLoginStateChange      ( bool bResult );
-
     void                RequestNewNickname      ( void );
     void                ShowRestartQuestion     ( void );
     void                ShowDisconnectQuestion  ( void );
@@ -153,6 +135,8 @@ protected:
     // Keep these protected so we can access them in the event handlers of CClientGame
     CGUIElement*        m_pWindow;
     CGUITabPanel*       m_pTabs;
+    CGUITab*            m_pTabInterface;
+    CGUITab*            m_pTabBrowser;
     CGUIButton*         m_pButtonOK;
     CGUIButton*         m_pButtonCancel;
     CGUILabel*          m_pLabelNick;
@@ -180,6 +164,7 @@ protected:
 	CGUICheckBox*       m_pCheckBoxGrass;
 	CGUICheckBox*       m_pCheckBoxHeatHaze;
     CGUICheckBox*       m_pCheckBoxTyreSmokeParticles;
+    CGUICheckBox*       m_pCheckBoxHighDetailVehicles;
     CGUILabel*          m_pFieldOfViewLabel;
     CGUIScrollBar*      m_pFieldOfView;
     CGUILabel*          m_pFieldOfViewValueLabel;
@@ -272,14 +257,6 @@ protected:
     std::vector < CGUIButton* > m_pJoypadButtons;
     int                         m_JoypadSettingsRevision;
 
-    CGUILabel*          m_pLabelCommunity;
-    CGUILabel*          m_pLabelUser;
-    CGUILabel*          m_pLabelPass;
-    CGUIEdit*           m_pEditUser;
-    CGUIEdit*           m_pEditPass;
-    CGUIButton*         m_pButtonLogin;
-    CGUIButton*         m_pButtonRegister;
-
     CGUILabel*          m_pControlsMouseLabel;
     CGUICheckBox*       m_pInvertMouse;
     CGUICheckBox*       m_pSteerWithMouse;
@@ -303,18 +280,26 @@ protected:
     CGUIComboBox*       m_pChatPresets;
     CGUIButton*         m_pChatLoadPreset;
 
-    CGUIScrollBar*      m_pChatRed          [ ChatColorTypes::CHAT_COLOR_MAX ];
-    CGUIScrollBar*      m_pChatGreen        [ ChatColorTypes::CHAT_COLOR_MAX ];
-    CGUIScrollBar*      m_pChatBlue         [ ChatColorTypes::CHAT_COLOR_MAX ];
-    CGUIScrollBar*      m_pChatAlpha        [ ChatColorTypes::CHAT_COLOR_MAX ];
+    CGUIScrollBar*      m_pChatRed          [ Chat::ColorType::MAX ];
+    CGUIScrollBar*      m_pChatGreen        [ Chat::ColorType::MAX ];
+    CGUIScrollBar*      m_pChatBlue         [ Chat::ColorType::MAX ];
+    CGUIScrollBar*      m_pChatAlpha        [ Chat::ColorType::MAX ];
 
-    CGUILabel*          m_pChatRedValue     [ ChatColorTypes::CHAT_COLOR_MAX ];
-    CGUILabel*          m_pChatGreenValue   [ ChatColorTypes::CHAT_COLOR_MAX ];
-    CGUILabel*          m_pChatBlueValue    [ ChatColorTypes::CHAT_COLOR_MAX ];
-    CGUILabel*          m_pChatAlphaValue   [ ChatColorTypes::CHAT_COLOR_MAX ];
+    CGUILabel*          m_pChatRedValue     [ Chat::ColorType::MAX ];
+    CGUILabel*          m_pChatGreenValue   [ Chat::ColorType::MAX ];
+    CGUILabel*          m_pChatBlueValue    [ Chat::ColorType::MAX ];
+    CGUILabel*          m_pChatAlphaValue   [ Chat::ColorType::MAX ];
+
+    CGUIStaticImage*    m_pChatColorPreview [ Chat::ColorType::MAX ];
 
     CGUIScrollPane*     m_pPaneChatFont;
-    CGUIRadioButton*    m_pRadioChatFont    [ ChatFonts::CHAT_FONT_MAX ];
+    CGUIRadioButton*    m_pRadioChatFont    [ Chat::Font::MAX ];
+
+    CGUIComboBox*       m_pChatHorizontalCombo;
+    CGUIComboBox*       m_pChatVerticalCombo;
+    CGUIComboBox*       m_pChatTextAlignCombo;
+    CGUIEdit*           m_pChatOffsetX;
+    CGUIEdit*           m_pChatOffsetY;
 
     CGUIEdit*           m_pChatLines;
     CGUIEdit*           m_pChatScaleX;
@@ -324,14 +309,15 @@ protected:
     CGUICheckBox*       m_pChatCssBackground;
     CGUICheckBox*       m_pChatNickCompletion;
     CGUICheckBox*       m_pChatCssText;
+    CGUICheckBox*       m_pChatTextBlackOutline;
     CGUIEdit*           m_pChatLineLife;
     CGUIEdit*           m_pChatLineFadeout;
     CGUICheckBox*       m_pFlashWindow;
+    CGUICheckBox*       m_pTrayBalloon;
 
     CGUILabel*          m_pLabelBrowserGeneral;
     CGUICheckBox*       m_pCheckBoxRemoteBrowser;
     CGUICheckBox*       m_pCheckBoxRemoteJavascript;
-    CGUICheckBox*       m_pCheckBoxBrowserPluginsEnabled;
     CGUILabel*          m_pLabelBrowserCustomBlacklist;
     CGUIEdit*           m_pEditBrowserBlacklistAdd;
     CGUIButton*         m_pButtonBrowserBlacklistAdd;
@@ -343,6 +329,7 @@ protected:
     CGUIGridList*       m_pGridBrowserWhitelist;
     CGUIButton*         m_pButtonBrowserWhitelistRemove;
     bool                m_bBrowserListsChanged;
+    bool                m_bBrowserListsLoadEnabled;
 
     bool                OnJoypadTextChanged     ( CGUIElement* pElement );
     bool                OnAxisSelectClick       ( CGUIElement* pElement );
@@ -353,8 +340,6 @@ protected:
     bool                OnBindsListClick        ( CGUIElement* pElement );
     bool                OnOKButtonClick         ( CGUIElement* pElement );
     bool                OnCancelButtonClick     ( CGUIElement* pElement );
-    bool                OnLoginButtonClick      ( CGUIElement* pElement );
-    bool                OnRegisterButtonClick   ( CGUIElement* pElement );
     bool                OnFieldOfViewChanged    ( CGUIElement* pElement );
     bool                OnDrawDistanceChanged   ( CGUIElement* pElement );
     bool                OnBrightnessChanged     ( CGUIElement* pElement );
@@ -392,8 +377,13 @@ protected:
     bool                OnWindowedClick         ( CGUIElement* pElement );
     bool                OnShowAdvancedSettingDescription ( CGUIElement* pElement );
     bool                OnHideAdvancedSettingDescription ( CGUIElement* pElement );
+    bool                OnTabChanged            ( CGUIElement* pElement );
+    void                ReloadBrowserLists      ( void );
 
 private:
+    void                CreateInterfaceTabGUI   ( void );
+    void                UpdateChatColorPreview  ( eChatColorType eType );
+
     void                ProcessKeyBinds         ( void );
     void                ProcessJoypad           ( void );
 
@@ -402,12 +392,12 @@ private:
     void                LoadSkins               ( void );
 
     void                LoadChatPresets         ( void );
-    void                CreateChatColorTab      ( ChatColorType eType, const char* szName, CGUITabPanel* pParent );
-    void                LoadChatColorFromCVar   ( ChatColorType eType, const char* szCVar );
-    void                LoadChatColorFromString ( ChatColorType eType, const std::string& strColor );
-    void                SaveChatColor           ( ChatColorType eType, const char* szCVar );
-    CColor              GetChatColorValues      ( ChatColorType eType );
-    void                SetChatColorValues      ( ChatColorType eType, CColor pColor );
+    void                CreateChatColorTab      ( eChatColorType eType, const char* szName, CGUITabPanel* pParent );
+    void                LoadChatColorFromCVar   ( eChatColorType eType, const char* szCVar );
+    void                LoadChatColorFromString ( eChatColorType eType, const std::string& strColor );
+    void                SaveChatColor           ( eChatColorType eType, const char* szCVar );
+    CColor              GetChatColorValues      ( eChatColorType eType );
+    void                SetChatColorValues      ( eChatColorType eType, CColor pColor );
     int                 GetMilliseconds         ( CGUIEdit* pEdit );
     void                SetMilliseconds         ( CGUIEdit* pEdit, int milliseconds );
 
@@ -437,5 +427,3 @@ private:
     std::list < SKeyBindSection *> m_pKeyBindSections;
 
 };
-
-#endif

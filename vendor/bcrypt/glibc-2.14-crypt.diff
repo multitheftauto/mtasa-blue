@@ -1,0 +1,55 @@
+diff -urp glibc-2.14.orig/crypt/Makefile glibc-2.14/crypt/Makefile
+--- glibc-2.14.orig/crypt/Makefile	2011-05-31 04:12:33 +0000
++++ glibc-2.14/crypt/Makefile	2011-07-16 21:40:56 +0000
+@@ -22,6 +22,7 @@
+ subdir	:= crypt
+ 
+ headers := crypt.h
++headers += gnu-crypt.h ow-crypt.h
+ 
+ extra-libs := libcrypt
+ extra-libs-others := $(extra-libs)
+@@ -29,6 +30,8 @@ extra-libs-others := $(extra-libs)
+ libcrypt-routines := crypt-entry md5-crypt sha256-crypt sha512-crypt crypt \
+ 		     crypt_util
+ 
++libcrypt-routines += crypt_blowfish x86 crypt_gensalt wrapper
++
+ tests := cert md5c-test sha256c-test sha512c-test
+ 
+ distribute := ufc-crypt.h crypt-private.h ufc.c speeds.c README.ufc-crypt \
+diff -urp glibc-2.14.orig/crypt/Versions glibc-2.14/crypt/Versions
+--- glibc-2.14.orig/crypt/Versions	2011-05-31 04:12:33 +0000
++++ glibc-2.14/crypt/Versions	2011-07-16 21:40:56 +0000
+@@ -1,5 +1,6 @@
+ libcrypt {
+   GLIBC_2.0 {
+     crypt; crypt_r; encrypt; encrypt_r; fcrypt; setkey; setkey_r;
++    crypt_rn; crypt_ra; crypt_gensalt; crypt_gensalt_rn; crypt_gensalt_ra;
+   }
+ }
+diff -urp glibc-2.14.orig/crypt/crypt-entry.c glibc-2.14/crypt/crypt-entry.c
+--- glibc-2.14.orig/crypt/crypt-entry.c	2011-05-31 04:12:33 +0000
++++ glibc-2.14/crypt/crypt-entry.c	2011-07-16 21:40:56 +0000
+@@ -82,7 +82,7 @@ extern struct crypt_data _ufc_foobar;
+  */
+ 
+ char *
+-__crypt_r (key, salt, data)
++__des_crypt_r (key, salt, data)
+      const char *key;
+      const char *salt;
+      struct crypt_data * __restrict data;
+@@ -137,6 +137,7 @@ __crypt_r (key, salt, data)
+   _ufc_output_conversion_r (res[0], res[1], salt, data);
+   return data->crypt_3_buf;
+ }
++#if 0
+ weak_alias (__crypt_r, crypt_r)
+ 
+ char *
+@@ -177,3 +178,4 @@ __fcrypt (key, salt)
+   return crypt (key, salt);
+ }
+ #endif
++#endif

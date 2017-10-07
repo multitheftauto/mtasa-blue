@@ -158,7 +158,7 @@ CPerfStatBandwidthUsageImpl::CPerfStatBandwidthUsageImpl ( void )
 {
     m_strCategoryName = "Bandwidth usage";
     SString strDatabaseFilename = PathJoin ( g_pGame->GetConfig ()->GetSystemDatabasesPath (), "stats.db" );
-    m_DatabaseConnection = g_pGame->GetDatabaseManager ()->Connect ( "sqlite", strDatabaseFilename );
+    m_DatabaseConnection = g_pGame->GetDatabaseManager ()->Connect ( "sqlite", strDatabaseFilename, "", "", "queue=" DB_SQLITE_QUEUE_NAME_INTERNAL );
     LoadStats ();
 }
 
@@ -273,15 +273,15 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
             const CRegistryResultRow& row = *iter;
             SString strType = (const char*)row[0].pVal;
             uint uiIndex = static_cast < uint > ( row[1].nVal );
-            float GameRecv = Max ( 0.f, row[2].fVal );
-            float GameSent = Max ( 0.f, row[3].fVal );
-            float HttpSent = Max ( 0.f, row[4].fVal );
+            float GameRecv = std::max ( 0.f, row[2].fVal );
+            float GameSent = std::max ( 0.f, row[3].fVal );
+            float HttpSent = std::max ( 0.f, row[4].fVal );
             float GameRecvBlocked = 0;
             if ( result->nColumns >= 6 )
-                GameRecvBlocked = Max ( 0.f, row[5].fVal );
+                GameRecvBlocked = std::max ( 0.f, row[5].fVal );
             float GameResent = 0;
             if ( result->nColumns >= 7 )
-                GameResent = Max ( 0.f, row[6].fVal );
+                GameResent = std::max ( 0.f, row[6].fVal );
 
             uint uiType = BWStatNameToIndex ( strType );
 
@@ -314,7 +314,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats ( void )
         int iHoursElpased = uiStatsHoursNow - uiStatsHoursThen;
 
         // Max elapsed time of 13 months
-        iHoursElpased = Min ( iHoursElpased, 730 * 13 );
+        iHoursElpased = std::min( iHoursElpased, 730 * 13 );
 
         // Skip forward in time to clear out past data
         for ( int i = iHoursElpased - 1 ; i >= 0; i-- )
@@ -403,7 +403,7 @@ void CPerfStatBandwidthUsageImpl::DoPulse ( void )
     // Record once every 5 seconds
     if ( llTime >= m_llNextRecordTime )
     {
-        m_llNextRecordTime = Max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
+        m_llNextRecordTime = std::max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
         RecordStats ();
     }
 
@@ -434,14 +434,14 @@ void CPerfStatBandwidthUsageImpl::RecordStats ( void )
     if ( !g_pNetServer->GetBandwidthStatistics ( &liveStats ) )
         return;
 
-    long long llDeltaGameBytesSent = Max < long long > ( 0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount );
-    long long llDeltaGameBytesRecv = Max < long long > ( 0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount );
-    long long llDeltaGameBytesRecvBlocked = Max < long long > ( 0LL, liveStats.llIncomingUDPByteCountBlocked - m_PrevLiveStats.llIncomingUDPByteCountBlocked );
-    long long llDeltaUDPByteResentCount = Max < long long > ( 0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount );
+    long long llDeltaGameBytesSent = std::max < long long > ( 0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount );
+    long long llDeltaGameBytesRecv = std::max < long long > ( 0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount );
+    long long llDeltaGameBytesRecvBlocked = std::max < long long > ( 0LL, liveStats.llIncomingUDPByteCountBlocked - m_PrevLiveStats.llIncomingUDPByteCountBlocked );
+    long long llDeltaUDPByteResentCount = std::max < long long > ( 0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount );
     m_PrevLiveStats = liveStats;
 
     long long llHttpTotalBytesSent = EHS::StaticGetTotalBytesSent ();
-    long long llDeltaHttpBytesSent = Max ( 0LL, llHttpTotalBytesSent - m_llPrevHttpTotalBytesSent );
+    long long llDeltaHttpBytesSent = std::max ( 0LL, llHttpTotalBytesSent - m_llPrevHttpTotalBytesSent );
     m_llPrevHttpTotalBytesSent = llHttpTotalBytesSent;
 
     // Add to the history arrays

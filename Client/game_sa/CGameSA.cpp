@@ -66,6 +66,7 @@ CGameSA::CGameSA()
 
     DEBUG_TRACE("CGameSA::CGameSA()");
     this->m_pAudioEngine            = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
+    this->m_pAEAudioHardware        = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
     this->m_pAudioContainer         = new CAudioContainerSA();
     this->m_pWorld                  = new CWorldSA();
     this->m_pPools                  = new CPoolsSA();
@@ -240,6 +241,7 @@ CGameSA::~CGameSA ( void )
     delete reinterpret_cast < CPoolsSA* > ( m_pPools );
     delete reinterpret_cast < CWorldSA* > ( m_pWorld );
     delete reinterpret_cast < CAudioEngineSA* > ( m_pAudioEngine );
+    delete reinterpret_cast < CAEAudioHardwareSA* > ( m_pAEAudioHardware );
     delete reinterpret_cast < CAudioContainerSA* > ( m_pAudioContainer );
     delete reinterpret_cast < CPointLightsSA * > ( m_pPointLights );
 }
@@ -465,6 +467,9 @@ void CGameSA::Reset ( void )
         // Restore the HUD
         m_pHud->Disable ( false );
         m_pHud->SetComponentVisible ( HUD_ALL, true );
+
+        // Restore model exhaust fumes positions
+        CModelInfoSA::ResetAllVehicleExhaustFumes();
     }
 }
 
@@ -569,6 +574,15 @@ void CGameSA::SetMinuteDuration ( unsigned long ulTime )
 
 bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 {
+    if (!strcmp ( szCheatName, PROP_RANDOM_FOLIAGE ))
+        return IsRandomFoliageEnabled ();
+
+    if ( !strcmp ( szCheatName, PROP_SNIPER_MOON ) )
+        return IsMoonEasterEggEnabled ();
+
+    if ( !strcmp ( szCheatName, PROP_EXTRA_AIR_RESISTANCE ) )
+        return IsExtraAirResistanceEnabled ();
+
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -577,6 +591,24 @@ bool CGameSA::IsCheatEnabled ( const char* szCheatName )
 
 bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 {
+    if (!strcmp ( szCheatName, PROP_RANDOM_FOLIAGE ))
+    {
+        SetRandomFoliageEnabled ( bEnable );
+        return true;
+    }
+  
+    if ( !strcmp( szCheatName, PROP_SNIPER_MOON ) )
+    {
+        SetMoonEasterEggEnabled ( bEnable );
+        return true;
+    }
+  
+    if ( !strcmp( szCheatName, PROP_EXTRA_AIR_RESISTANCE ) )
+    {
+        SetExtraAirResistanceEnabled ( bEnable );
+        return true;
+    }
+
     std::map < std::string, SCheatSA* >::iterator it = m_Cheats.find ( szCheatName );
     if ( it == m_Cheats.end () )
         return false;
@@ -589,6 +621,10 @@ bool CGameSA::SetCheatEnabled ( const char* szCheatName, bool bEnable )
 
 void CGameSA::ResetCheats ()
 {
+    SetRandomFoliageEnabled ( true );
+    SetMoonEasterEggEnabled ( false );
+    SetExtraAirResistanceEnabled ( true );
+
     std::map < std::string, SCheatSA* >::iterator it;
     for ( it = m_Cheats.begin (); it != m_Cheats.end (); it++ ) {
         if ( it->second->m_byAddress > (BYTE*)0x8A4000 )
@@ -597,6 +633,40 @@ void CGameSA::ResetCheats ()
             MemPut < BYTE > ( it->second->m_byAddress, 0 );
         it->second->m_bEnabled = false;
     }
+}
+
+bool CGameSA::IsRandomFoliageEnabled ()
+{
+    return *(unsigned char *)0x5DD01B == 0x74;
+}
+
+void CGameSA::SetRandomFoliageEnabled ( bool bEnabled )
+{
+    // 0xEB skip random foliage generation
+    MemPut < BYTE > ( 0x5DD01B, bEnabled ? 0x74 : 0xEB );
+    // 0x74 destroy random foliage loaded
+    MemPut < BYTE > ( 0x5DC536, bEnabled ? 0x75 : 0x74 );
+}
+
+bool CGameSA::IsMoonEasterEggEnabled ()
+{
+    return *(unsigned char *)0x73ABCF == 0x75;
+}
+
+void CGameSA::SetMoonEasterEggEnabled ( bool bEnable )
+{
+    // replace JNZ with JMP (short)
+    MemPut < BYTE > ( 0x73ABCF, bEnable ? 0x75 : 0xEB );
+}
+
+bool CGameSA::IsExtraAirResistanceEnabled ()
+{
+    return *(unsigned char *)0x72DDD9 == 0x01;
+}
+
+void CGameSA::SetExtraAirResistanceEnabled ( bool bEnable )
+{
+    MemPut < BYTE > ( 0x72DDD9, bEnable ? 0x01 : 0x00 );
 }
 
 bool CGameSA::GetJetpackWeaponEnabled ( eWeaponType weaponType )
@@ -725,29 +795,6 @@ void CGameSA::SetupSpecialCharacters ( void )
     ModelInfo[316].MakePedModel ( "COPGRL2" );
     ModelInfo[317].MakePedModel ( "NURGRL2" );
     */
-    // #7935 - Add peds to unused IDs so that servers can add mods to these skins
-    ushort skins[] = {
-        3, 4, 5, 6, 8, 42, 65, 74, 86, 119, 149, 208, 273, 289, 329, 340, 382, 383, 398, 399,
-        612, 613, 614, 662, 663, 665, 666, 667, 668, 699, 793, 794, 795, 796, 797, 798, 799, 907,
-        908, 909, 965, 999, 1194, 1195, 1196, 1197, 1198, 1199, 1200, 1201, 1202, 1203, 1204, 1205,
-        1206, 1326, 1573, 1699, 2883, 2884, 3136, 3137, 3138, 3139, 3140, 3141, 3142, 3143, 3144,
-        3145, 3146, 3147, 3148, 3149, 3150, 3151, 3152, 3153, 3154, 3155, 3156, 3157, 3158, 3159,
-        3160, 3161, 3162, 3163, 3164, 3165, 3166, 3176, 3177, 3179, 3180, 3181, 3182, 3183,
-        3184, 3185, 3186, 3188, 3189, 3190, 3191, 3192, 3194, 3195, 3196, 3197, 3198, 3199, 3200,
-        3201, 3202, 3203, 3204, 3205, 3206, 3207, 3208, 3209, 3210, 3211, 3212, 3213, 3215,
-        3216, 3217, 3218, 3219, 3220, 3222, 3223, 3224, 3225, 3226, 3227, 3228, 3229, 3230, 3231,
-        3232, 3233, 3234, 3235, 3236, 3237, 3238, 3239, 3240, 3245, 3247, 3248, 3251, 3254,
-        3266, 3348, 3349, 3416, 3429, 3610, 3611, 3784, 3870, 3871, 3883, 3889, 3974, 4542, 4543,
-        4544, 4545, 4546, 4547, 4548, 4549, 4763, 4764, 4765, 4766, 4767, 4768, 4769, 4770, 4771,
-        4772, 4773, 4774, 4775, 4776, 4777, 4778, 4779, 4780, 4781, 4782, 4783, 4784, 4785, 4786,
-        4787, 4788, 4789, 4790, 4791, 4792, 4793, 4794, 4795, 4796, 4797, 4798, 4799, 4800, 4801,
-        4802, 4803, 4804, 4805, 5090, 5104, 5376, 5377, 5378, 5379, 5380, 5381, 5382, 5383,
-        5384, 5385, 5386, 5387, 5388, 5389
-    };
-    for ( ushort i = 0; i < sizeof ( skins ) / sizeof ( ushort ); i++ )
-    {
-        ModelInfo[ skins[i] ].MakePedModel ( "PSYCHO" ); 
-    }
 }
 
 // Well, has it?

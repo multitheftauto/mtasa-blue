@@ -183,11 +183,17 @@ CCore::CCore ( void )
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+
+    // Create tray icon
+    m_pTrayIcon = new CTrayIcon ( );
 }
 
 CCore::~CCore ( void )
 {
     WriteDebugEvent ( "CCore::~CCore" );
+
+    // Destroy tray icon
+    delete m_pTrayIcon;
 
     // Delete the mod manager
     delete m_pModManager;
@@ -225,7 +231,7 @@ CCore::~CCore ( void )
     delete m_pGraphics;
 
     // Delete the web
-    SAFE_DELETE ( m_pWebCore );
+    DestroyWeb ();
 
     // Delete lazy subsystems
     DestroyGUI ();
@@ -605,19 +611,13 @@ void CCore::ApplyGameSettings ( void )
     CVARS_GET ( "classic_controls", bval ); pController->SetClassicControls ( bval );
     CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
     CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal, CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) );
-    CVARS_GET ( "fov",              iVal ); iVal = Clamp ( 70, iVal, 100 ); m_pGame->GetSettings ()->SetFieldOfView ( iVal );
     CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
     CVARS_GET ( "heat_haze",        bval ); m_pMultiplayer->SetHeatHazeEnabled ( bval );
     CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
     CVARS_GET ( "tyre_smoke_enabled", bval ); m_pMultiplayer->SetTyreSmokeEnabled ( bval );
+    m_pGame->GetSettings ()->UpdateFieldOfViewFromSettings();
+    m_pGame->GetSettings ()->ResetVehiclesLODDistance ( );
     pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
-}
-
-void CCore::ApplyCommunityState ( void )
-{
-    bool bLoggedIn = g_pCore->GetCommunity()->IsLoggedIn();
-    if ( bLoggedIn )
-        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow()->OnLoginStateChange ( true );
 }
 
 void CCore::SetConnected ( bool bConnected )
@@ -913,8 +913,19 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
 
     if ( m_Loader.IsOk () == false )
     {
-        SString strMessage( "Error loading %s module! (%s)", *strName.ToLower (), *m_Loader.GetLastErrorMessage () );
-        BrowseToSolution ( "module-not-loadable&name=" + strModuleName, ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
+        SString strMessage( "Error loading '%s' module!\n%s", *strName, *m_Loader.GetLastErrorMessage () );
+        SString strType = "module-not-loadable&name=" + strModuleName;
+
+        // Extra message if d3d9.dll exists
+        SString strD3dModuleFilename = PathJoin( GetLaunchPath(), "d3d9.dll" );
+        if ( FileExists( strD3dModuleFilename ) )
+        {
+            strMessage += "\n\n";
+            strMessage += _("TO FIX, REMOVE THIS FILE:") + "\n";
+            strMessage += strD3dModuleFilename;
+            strType += "&d3d9=1";
+        }
+        BrowseToSolution ( strType, ASK_GO_ONLINE | EXIT_GAME_FIRST, strMessage );
     }
     // Restore current directory
     SetCurrentDirectory ( strSavedCwd );
@@ -1148,24 +1159,21 @@ void CCore::DestroyNetwork ( )
 }
 
 
-void CCore::InitialiseWeb ()
+CWebCoreInterface* CCore::GetWebCore ()
 {
-    // Don't initialise webcore twice
-    // Also disable webbrowser stuff if this PC still uses deprecated, vulnerable software e.g. XP
-    if ( m_pWebCore || !IsWindows7OrGreater() )
-        return;
-
-    // Ensure DllDirectory has not been changed
-    SString strDllDirectory = GetSystemDllDirectory();
-    SString strRequiredDllDirectory = CalcMTASAPath( "mta" );
-    if ( strRequiredDllDirectory.EqualsI( strDllDirectory ) == false )
+    if ( m_pWebCore == nullptr )
     {
-        AddReportLog( 3118, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *strRequiredDllDirectory ) );
-        SetDllDirectory( strRequiredDllDirectory );
+        m_pWebCore = CreateModule < CWebCoreInterface > ( m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this );
     }
+    return m_pWebCore;
+}
 
-    m_pWebCore = new CWebCore;
-    m_pWebCore->Initialise ();
+
+void CCore::DestroyWeb ()
+{
+    WriteDebugEvent ( "CCore::DestroyWeb" );
+    SAFE_DELETE( m_pWebCore );
+    m_WebCoreModule.UnloadModule();
 }
 
 
@@ -1237,8 +1245,6 @@ void CCore::DoPostFramePulse ( )
         ApplyGameSettings ();
 
         m_pGUI->SelectInputHandlers( INPUT_CORE );
-
-        m_Community.Initialize ();
     }
 
     if ( m_pGame->GetSystemState () == 5 ) // GS_INIT_ONCE
@@ -1345,8 +1351,6 @@ void CCore::DoPostFramePulse ( )
     GetGraphStats ()->Draw();
     m_pConnectManager->DoPulse ();
 
-    m_Community.DoPulse ();
-
     TIMING_CHECKPOINT( "-CorePostFrame2" );
 }
 
@@ -1369,6 +1373,9 @@ void CCore::OnModUnload ( )
     // Clear web whitelist
     if ( m_pWebCore )
         m_pWebCore->ResetFilter ();
+
+    // Destroy tray icon
+    m_pTrayIcon->DestroyTrayIcon ( );
 }
 
 
@@ -1410,10 +1417,7 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "showmemstat",       _("shows the memory statistics"),      CCommandFuncs::ShowMemStat );
     m_pCommands->Add ( "showframegraph",    _("shows the frame timing graph"),     CCommandFuncs::ShowFrameGraph );
     m_pCommands->Add ( "jinglebells",       "",                                    CCommandFuncs::JingleBells );
-
-#if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
-#endif
 }
 
 
@@ -2040,14 +2044,14 @@ void CCore::CalculateStreamingMemoryRange ( void )
     fMaxAmount += fMaxAmount * fSizeScale;
 
     // Apply cap dependant on video memory
-    fMaxAmount = Min ( fMaxAmount, iVideoMemoryMB * 2.f );
-    fMinAmount = Min ( fMinAmount, iVideoMemoryMB * 1.f );
+    fMaxAmount = std::min ( fMaxAmount, iVideoMemoryMB * 2.f );
+    fMinAmount = std::min ( fMinAmount, iVideoMemoryMB * 1.f );
 
     // Apply 96MB lower limit
-    fMaxAmount = Max ( fMaxAmount, 96.f );
+    fMaxAmount = std::max ( fMaxAmount, 96.f );
 
     // Apply gap limit
-    fMinAmount = fMaxAmount - Max ( fMaxAmount - fMinAmount, 32.f );
+    fMinAmount = fMaxAmount - std::max ( fMaxAmount - fMinAmount, 32.f );
 
     m_fMinStreamingMemory = fMinAmount;
     m_fMaxStreamingMemory = fMaxAmount;

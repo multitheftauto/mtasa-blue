@@ -849,6 +849,9 @@ int CLuaWorldDefs::setRainLevel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors ( ) )
     {
+        // Clamp amount of rain to avoid game freezing/crash
+        fRainLevel = Clamp( 0.0f, fRainLevel, 10.0f );
+
         if ( CStaticFunctionDefinitions::SetRainLevel ( fRainLevel ) )
         {
             lua_pushboolean ( luaVM, true );

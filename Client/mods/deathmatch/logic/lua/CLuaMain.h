@@ -65,10 +65,10 @@ public:
 
     inline class CResource*         GetResource             ( void )                        { return m_pResource; }
 
-    CXMLFile *                      CreateXML               ( const char* szFilename );
+    CXMLFile *                      CreateXML               ( const char* szFilename, bool bUseIDs = true, bool bReadOnly = false );
     void                            DestroyXML              ( CXMLFile* pFile );
     void                            DestroyXML              ( CXMLNode* pRootNode );
-    void                            SaveXML                 ( CXMLNode * pRootNode );
+    bool                            SaveXML                 ( CXMLNode * pRootNode );
     unsigned long                   GetXMLFileCount         ( void ) const                  { return m_XMLFiles.size (); };
     unsigned long                   GetTimerCount           ( void ) const                  { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount () : 0; };
     unsigned long                   GetElementCount         ( void ) const;

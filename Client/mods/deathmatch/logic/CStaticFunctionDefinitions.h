@@ -55,6 +55,10 @@ public:
     static bool                         GetClipboard                        ( SString& strText );
     static bool                         SetWindowFlashing                   ( bool flash, uint count );
 
+    // Notification funcs
+    static bool                         CreateTrayNotification              ( SString strText, eTrayIconType eType, bool useSound );
+    static bool                         IsTrayNotificationEnabled           ( void );
+
     // Element get funcs
     static CClientEntity*               GetRootElement                      ( void );
     static CClientEntity*               GetElementByID                      ( const char* szID, unsigned int uiIndex );
@@ -184,6 +188,7 @@ public:
     static bool                         SetPedFootBloodEnabled              ( CClientEntity& Entity, bool bHasFootBlood );
     static bool                         SetPedCameraRotation                ( CClientEntity& Entity, float fRotation );
     static bool                         SetPedAimTarget                     ( CClientEntity& Entity, CVector & vecTarget );
+    static bool                         SetPedStat                          ( CClientEntity& Entity, ushort usStat, float fValue );
     static bool                         SetPedOnFire                        ( CClientEntity& Entity, bool bOnFire );
     static bool                         RemovePedFromVehicle                ( CClientPed* pPed );
     static bool                         WarpPedIntoVehicle                  ( CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat );
@@ -269,7 +274,6 @@ public:
 
     // Object get funcs
     static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );
-    static bool                         IsObjectStatic                      ( CClientObject& Object, bool & bStatic );
     static bool                         GetObjectScale                      ( CClientObject& Object, CVector& vecScale );
     static bool                         IsObjectBreakable                   ( CClientObject& Object, bool& bBreakable );
     static bool                         GetObjectMass                       ( CClientObject& Object, float& fMass );
@@ -278,6 +282,7 @@ public:
     static bool                         GetObjectElasticity                 ( CClientObject& Object, float& fElasticity );
     static bool                         GetObjectBuoyancyConstant           ( CClientObject& Object, float& fBuoyancyConstant );
     static bool                         GetObjectCenterOfMass               ( CClientObject& Object, CVector& vecCenterOfMass );
+    static bool                         IsObjectVisibleInAllDimensions      ( CClientEntity& Entity );
 
     // Object set funcs
     static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
@@ -295,6 +300,7 @@ public:
     static bool                         SetObjectElasticity                 ( CClientEntity& Entity, float fElasticity );
     static bool                         SetObjectBuoyancyConstant           ( CClientEntity& Entity, float fBuoyancyConstant );
     static bool                         SetObjectCenterOfMass               ( CClientEntity& Entity, const CVector& vecCenterOfMass );
+    static bool                         SetObjectVisibleInAllDimensions     ( CClientEntity& Entity, bool bVisible, unsigned short usNewDimension = 0 );
 
     // Radar-area get funcs
     static CClientRadarArea*            CreateRadarArea                     ( CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color );
@@ -395,23 +401,24 @@ public:
     static bool                         GUIGetInputEnabled                  ( void );
     static eInputMode                   GUIGetInputMode                     ( void );
     static void                         GUISetInputMode                     ( eInputMode inputMode );
+    static eCursorType                  GUIGetCursorType                    ( void );
 
-    static CClientGUIElement*           GUICreateWindow                     ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative );
-    static CClientGUIElement*           GUICreateLabel                      ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateButton                     ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateEdit                       ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateMemo                       ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateGridList                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateTabPanel                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateScrollPane                 ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateWindow                     ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative );
+    static CClientGUIElement*           GUICreateLabel                      ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateButton                     ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateEdit                       ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateMemo                       ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateGridList                   ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateTabPanel                   ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateScrollPane                 ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative, CClientGUIElement* pParent );
     static CClientGUIElement*           GUICreateTab                        ( CLuaMain& LuaMain, const char *szCaption, CClientGUIElement *pParent );
-    static CClientGUIElement*           GUICreateProgressBar                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateScrollBar                  ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bHorizontal, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateCheckBox                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bChecked, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateRadioButton                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateStaticImage                ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strFile, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateComboBox                   ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
-    static CClientGUIElement*           GUICreateBrowser                    ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bIsLocal, bool bIsTransparent, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateProgressBar                ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateScrollBar                  ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bHorizontal, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateCheckBox                   ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bChecked, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateRadioButton                ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateStaticImage                ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const SString& strFile, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateComboBox                   ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent );
+    static CClientGUIElement*           GUICreateBrowser                    ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal, bool bIsTransparent, bool bRelative, CClientGUIElement* pParent );
 
     
     static bool                         GUIStaticImageLoadImage             ( CClientEntity& Element, const SString& strDir );
@@ -639,7 +646,7 @@ public:
     static bool                         FxAddWaterSplash                    ( CVector & vecPosition );
     static bool                         FxAddBulletSplash                   ( CVector & vecPosition );
     static bool                         FxAddFootSplash                     ( CVector & vecPosition );
-    static CClientEffect*               CreateEffect                        ( CResource& Resource, const SString& strFxName, const CVector& vecPosition );
+    static CClientEffect*               CreateEffect                        ( CResource& Resource, const SString& strFxName, const CVector& vecPosition, bool bSoundEnable );
 
     // Sound funcs
     static CClientSound*                PlaySound                           ( CResource* pResource, const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle );

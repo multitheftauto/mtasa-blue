@@ -145,30 +145,42 @@ bool CCommands::Execute ( const char* szCommand, const char* szParametersIn, boo
         }
     }
 
-    // Is it a cvar? (syntax: cvar[ = value])
-    std::string val = std::string ( szCommand ) + " " + std::string ( szParameters ? szParameters : "" );
-    unsigned int nOpIndex = val.find ( '=' );
-    std::string key = val.substr ( 0, nOpIndex );
-    if (val.find(" = ") != std::string::npos) {
-        key = val.substr ( 0, nOpIndex-1 );
-    }
-    if ( CClientVariables::GetSingleton ().Exists ( key ) && !bIsScriptedBind ) {
-        std::stringstream ss;
+    // Recompose the original command text
+    std::string val = std::string (szCommand) + " " + std::string (szParameters ? szParameters : "");
 
-        // Determine whether this is an atomic get or set query
-        if ( nOpIndex != std::string::npos ) {
-            // (set) some_cvar=value
-            val = val.substr ( nOpIndex + 1 );
-            TrimWhiteSpace ( val );
-            CVARS_SET ( key, val );
-        } else {
-            // (get) some_cvar
-            CVARS_GET ( key, val );
+    // Is it a cvar? (syntax: cvar[ = value])
+    {
+        // Check to see if '=' exists
+        unsigned int nOpIndex = val.find ('=');
+        std::string key = val.substr (0, nOpIndex);
+
+        // Check to see if ' =' exists
+        if (val.find (" =") != std::string::npos) {
+            key = val.substr (0, nOpIndex - 1);
         }
-        ss << key << " = " << val;
-        val = ss.str ();
-        CCore::GetSingleton ().GetConsole ()->Print ( val.c_str () );
-        return true;
+
+        TrimWhiteSpace (key);
+
+        // Handle the cvar if it exists
+        if (CClientVariables::GetSingleton ().Exists (key) && !bIsScriptedBind) {
+            std::stringstream ss;
+
+            // Determine whether this is an atomic get or set query
+            if (nOpIndex != std::string::npos) {
+                // (set) some_cvar=value
+                val = val.substr (nOpIndex + 1);
+                TrimWhiteSpace (val);
+                CVARS_SET (key, val);
+            }
+            else {
+                // (get) some_cvar
+                CVARS_GET (key, val);
+            }
+            ss << key << " = " << val;
+            val = ss.str ();
+            CCore::GetSingleton ().GetConsole ()->Print (val.c_str ());
+            return true;
+        }
     }
 
     // HACK: if its a 'nick' command, save it here

@@ -135,7 +135,7 @@ void CClientColPolygon::DebugRender ( const CVector& vecPosition, float fDrawRad
     int iSkipEndSlices = 4;
 
     // Calc required detail level
-    uint uiNumSlices = Max ( 2 + iSkipEndSlices * 2, Round ( sqrt ( fDrawRadius * 2.0f ) * 2.0f ) );
+    uint uiNumSlices = std::max ( 2 + iSkipEndSlices * 2, Round ( sqrt ( fDrawRadius * 2.0f ) * 2.0f ) );
 
     // Draw Slices
     {

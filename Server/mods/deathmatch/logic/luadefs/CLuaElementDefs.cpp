@@ -124,6 +124,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setPosition", "setElementPosition" );
     lua_classfunction ( luaVM, "setRotation", "setElementRotation" );
     lua_classfunction ( luaVM, "setVelocity", "setElementVelocity" );
+    lua_classfunction ( luaVM, "setVisibleTo", "setElementVisibleTo" );
     lua_classfunction ( luaVM, "setMatrix", "setElementMatrix" );
     lua_classfunction ( luaVM, "setID", "setElementID" );
     lua_classfunction ( luaVM, "setInterior", "setElementInterior" );
@@ -200,6 +201,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_registerclass ( luaVM, "Element" );
 }
 
+
 int CLuaElementDefs::createElement ( lua_State* luaVM )
 {
 //  element createElement ( string elementType, [ string elementID ] )
@@ -267,6 +269,7 @@ int CLuaElementDefs::destroyElement ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaElementDefs::cloneElement ( lua_State* luaVM )
 {
@@ -596,6 +599,7 @@ int CLuaElementDefs::getElementPosition ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaElementDefs::OOP_getElementPosition ( lua_State* luaVM )
 {
     CElement* pElement = NULL;
@@ -616,6 +620,7 @@ int CLuaElementDefs::OOP_getElementPosition ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaElementDefs::getElementMatrix ( lua_State* luaVM )
 {
@@ -698,6 +703,7 @@ int CLuaElementDefs::getElementMatrix ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaElementDefs::OOP_getElementMatrix ( lua_State* luaVM )
 {
     CElement* pEntity = NULL;
@@ -750,6 +756,7 @@ int CLuaElementDefs::getElementRotation ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaElementDefs::OOP_getElementRotation ( lua_State* luaVM )
 {
     CElement* pElement = NULL;
@@ -775,6 +782,7 @@ int CLuaElementDefs::OOP_getElementRotation ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaElementDefs::getElementVelocity ( lua_State* luaVM )
 {
@@ -804,6 +812,7 @@ int CLuaElementDefs::getElementVelocity ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaElementDefs::OOP_getElementVelocity ( lua_State* luaVM )
 {
     CElement* pElement = NULL;
@@ -825,6 +834,7 @@ int CLuaElementDefs::OOP_getElementVelocity ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaElementDefs::getElementType ( lua_State* luaVM )
 {
@@ -896,6 +906,7 @@ int CLuaElementDefs::getElementInterior ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaElementDefs::isElementWithinMarker ( lua_State* luaVM )
 {
@@ -995,11 +1006,20 @@ int CLuaElementDefs::getElementDimension ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        unsigned short usDimension;
-        if ( CStaticFunctionDefinitions::GetElementDimension ( pElement, usDimension ) )
+        if ( IS_OBJECT ( pElement ) && CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions ( pElement ) )
         {
-            lua_pushnumber ( luaVM, usDimension );
+            // The object is visible in all dimensions, just return -1
+            lua_pushnumber ( luaVM, -1 );
             return 1;
+        }
+        else
+        {
+            unsigned short usDimension;
+            if ( CStaticFunctionDefinitions::GetElementDimension ( pElement, usDimension ) )
+            {
+                lua_pushnumber ( luaVM, usDimension );
+                return 1;
+            }
         }
     }
     else
@@ -1137,6 +1157,8 @@ int CLuaElementDefs::setElementAttachedOffsets ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementAttachedOffsets ( pElement, vecPosition, vecRotation ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1332,6 +1354,7 @@ int CLuaElementDefs::getElementSyncer ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaElementDefs::getElementCollisionsEnabled ( lua_State* luaVM )
 {
 //  bool getElementCollisionsEnabled ( element theElement )
@@ -1473,6 +1496,8 @@ int CLuaElementDefs::setElementID ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementID ( pElement, strId ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1503,6 +1528,8 @@ int CLuaElementDefs::setElementData ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
                 // Warn and truncate if key is too long
@@ -1539,6 +1566,8 @@ int CLuaElementDefs::removeElementData ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
+            LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
             if ( strKey.length () > MAX_CUSTOMDATA_NAME_LENGTH )
             {
                 // Warn and truncate if key is too long
@@ -1584,6 +1613,8 @@ int CLuaElementDefs::setElementMatrix ( lua_State* luaVM )
     // Verify the arguments
     if ( !argStream.HasErrors ( ) )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementMatrix ( pElement, matrix ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1610,6 +1641,8 @@ int CLuaElementDefs::setElementParent ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementParent ( pElement, pParent ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1648,6 +1681,8 @@ int CLuaElementDefs::setElementPosition ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         // Set the position
         if ( CStaticFunctionDefinitions::SetElementPosition ( pElement, vecPosition, bWarp ) )
         {
@@ -1676,6 +1711,8 @@ int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         // Set the rotation
         if ( CStaticFunctionDefinitions::SetElementRotation ( pElement, vecRotation, rotationOrder, bNewWay ) )
         {
@@ -1690,6 +1727,7 @@ int CLuaElementDefs::setElementRotation ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaElementDefs::OOP_setElementRotation ( lua_State* luaVM )
 {
     // element.rotation = Vector3
@@ -1702,6 +1740,8 @@ int CLuaElementDefs::OOP_setElementRotation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         CMatrix matrix;
 
         // fill in our matrix
@@ -1739,6 +1779,7 @@ int CLuaElementDefs::OOP_setElementRotation ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaElementDefs::setElementVelocity ( lua_State* luaVM )
 {
 //  bool setElementVelocity ( element theElement, float speedX, float speedY, float speedZ )
@@ -1750,6 +1791,8 @@ int CLuaElementDefs::setElementVelocity ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         // Set the velocity
         if ( CStaticFunctionDefinitions::SetElementVelocity ( pElement, vecVelocity ) )
         {
@@ -1777,6 +1820,8 @@ int CLuaElementDefs::setElementVisibleTo ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementVisibleTo ( pElement, pReference, bVisible ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1804,6 +1849,8 @@ int CLuaElementDefs::setElementInterior ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         unsigned char ucInterior = static_cast < unsigned char > ( uiInterior );
         if ( CStaticFunctionDefinitions::SetElementInterior ( pElement, ucInterior, bSetPosition, vecPosition ) )
         {
@@ -1822,18 +1869,58 @@ int CLuaElementDefs::setElementInterior ( lua_State* luaVM )
 int CLuaElementDefs::setElementDimension ( lua_State* luaVM )
 {
 //  bool setElementDimension ( element theElement, int dimension )
-    CElement* pElement; ushort usDimension;
+    CElement* pElement;
+    int iDimension = 0;
+    bool bMakeVisibleInAllDimensions = false;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pElement );
-    argStream.ReadNumber ( usDimension );
+    argStream.ReadNumber ( iDimension );
+
+    if ( iDimension == -1 )
+    {
+        if ( IS_OBJECT ( pElement ) )
+            bMakeVisibleInAllDimensions = true;
+        else
+            argStream.SetCustomError ( "The -1 value can be used only in objects!" );
+    }
+    else
+        if ( iDimension < 0 || iDimension > 65535 )
+            argStream.SetCustomError ( "Invalid dimension range specified!" );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetElementDimension ( pElement, usDimension ) )
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
+        if ( bMakeVisibleInAllDimensions )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            // Set the object visible in all dimensions
+            if ( CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions ( pElement, true ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+        {
+            // If it's an object and is visible in all dimensions
+            if ( IS_OBJECT ( pElement ) && CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions ( pElement ) )
+            {
+                // Make it not visible in all dimensions and set its dimension
+                if ( CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions ( pElement, false, (unsigned short)iDimension ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+            {
+                if ( CStaticFunctionDefinitions::SetElementDimension ( pElement, (unsigned short)iDimension ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
         }
     }
     else
@@ -1857,6 +1944,8 @@ int CLuaElementDefs::attachElements ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::AttachElements ( pElement, pAttachedToElement, vecPosition, vecRotation ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1882,6 +1971,8 @@ int CLuaElementDefs::detachElements ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::DetachElements ( pElement, pAttachedToElement ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1907,6 +1998,8 @@ int CLuaElementDefs::setElementAlpha ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementAlpha ( pElement, ucAlpha ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1957,6 +2050,8 @@ int CLuaElementDefs::setElementHealth ( lua_State* luaVM )
 
     if ( !argStream.HasErrors() )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementHealth ( pElement, fHealth ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1982,6 +2077,8 @@ int CLuaElementDefs::setElementModel ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementModel ( pElement, usModel ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -1994,6 +2091,7 @@ int CLuaElementDefs::setElementModel ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaElementDefs::setElementSyncer ( lua_State* luaVM )
 {
@@ -2020,6 +2118,7 @@ int CLuaElementDefs::setElementSyncer ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaElementDefs::setElementCollisionsEnabled ( lua_State* luaVM )
 {
 //  bool setElementCollisionsEnabled ( element theElement, bool enabled )
@@ -2031,6 +2130,8 @@ int CLuaElementDefs::setElementCollisionsEnabled ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementCollisionsEnabled ( pElement, bEnable ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -2044,6 +2145,7 @@ int CLuaElementDefs::setElementCollisionsEnabled ( lua_State* luaVM )
     return 1;
 }
 
+
 int CLuaElementDefs::setElementFrozen ( lua_State* luaVM )
 {
 //  bool setElementFrozen ( element theElement, bool freezeStatus )
@@ -2055,6 +2157,8 @@ int CLuaElementDefs::setElementFrozen ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pElement );
+
         if ( CStaticFunctionDefinitions::SetElementFrozen ( pElement, bFrozen ) )
         {
             lua_pushboolean ( luaVM, true );
@@ -2092,6 +2196,7 @@ int CLuaElementDefs::getLowLODElement ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
 
 int CLuaElementDefs::setLowLODElement ( lua_State* luaVM )
 {
@@ -2154,6 +2259,8 @@ int CLuaElementDefs::setElementCallPropagationEnabled ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
+        LogWarningIfPlayerHasNotJoinedYet ( luaVM, pEntity );
+
         if ( CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( pEntity, bEnable ) )
         {
             lua_pushboolean ( luaVM, true );

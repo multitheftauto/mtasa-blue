@@ -43,10 +43,10 @@ class CCore;
 #include "CKeyBinds.h"
 #include "CMouseControl.h"
 #include "CScreenShot.h"
-#include "CCommunity.h"
 #include <xml/CXML.h>
 #include <ijsify.h>
-#include <Webbrowser/CWebCore.h>
+#include <core/CWebCoreInterface.h>
+#include "CTrayIcon.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -106,9 +106,9 @@ public:
     CKeyBindsInterface*     GetKeyBinds                     ( void );
     CMouseControl*          GetMouseControl                 ( void )                { return m_pMouseControl; };
     CLocalGUI*              GetLocalGUI                     ( void );
-    CCommunityInterface*    GetCommunity                    ( void )                { return &m_Community; };
     CLocalizationInterface* GetLocalization                 ( void )                { return g_pLocalization; };
-    CWebCoreInterface*      GetWebCore                      ( void )                { return m_pWebCore; };
+    CWebCoreInterface*      GetWebCore                      ( void );
+    CTrayIconInterface*     GetTrayIcon                     ( void )                { return m_pTrayIcon; };
 
     void                    SaveConfig                      ( bool bWaitUntilFinished = false );
 
@@ -148,7 +148,6 @@ public:
     // Configuration
     void                    ApplyConsoleSettings            ( void );
     void                    ApplyGameSettings               ( void );
-    void                    ApplyCommunityState             ( void );
     void                    UpdateRecentlyPlayed            ( void );
 
     // Net
@@ -185,7 +184,8 @@ public:
     void                    DestroyGUI                      ( void );
 
     // Web
-    void                    InitialiseWeb                   ( void );
+    bool                    IsWebCoreLoaded                 ( void )                { return m_pWebCore != nullptr; }
+    void                    DestroyWeb                      ( void );
 
     // Hooks
     void                    ApplyHooks                      ( void );
@@ -272,6 +272,11 @@ public:
     void                    NotifyRenderingGrass            ( bool bIsRenderingGrass );
     bool                    IsRenderingGrass                ( void )                { return m_bIsRenderingGrass; }
     bool                    GetRightSizeTxdEnabled          ( void );
+    const char*             GetProductRegistryPath          ( void )                { return SharedUtil::GetProductRegistryPath(); }
+    const char*             GetProductCommonDataDir         ( void )                { return SharedUtil::GetProductCommonDataDir(); }
+    const char*             GetProductVersion               ( void )                { return SharedUtil::GetProductVersion(); }
+    void                    SetFakeLagCommandEnabled        ( bool bEnabled )       { m_bFakeLagCommandEnabled = bEnabled; }
+    bool                    IsFakeLagCommandEnabled         ( void )                { return m_bFakeLagCommandEnabled; }
 
 private:
     // Core devices.
@@ -286,8 +291,8 @@ private:
     // Instances (put new classes here!)
     CXMLFile*                   m_pConfigFile;
     CClientVariables            m_ClientVariables;
-    CCommunity                  m_Community;
-    CWebCore*                   m_pWebCore = nullptr;
+    CWebCoreInterface*          m_pWebCore = nullptr;
+    CTrayIcon*                  m_pTrayIcon;
 
     // Hook interfaces.
     CMessageLoopHook *          m_pMessageLoopHook;
@@ -307,6 +312,7 @@ private:
     CModuleLoader               m_NetModule;
     CModuleLoader               m_XMLModule;
     CModuleLoader               m_GUIModule;
+    CModuleLoader               m_WebCoreModule;
 
     // Mod manager
     CModManager*                m_pModManager; 
@@ -359,6 +365,7 @@ private:
     SString                     m_strDummyProgressType;
     bool                        m_bDummyProgressUpdateAlways;
     bool                        m_bIsRenderingGrass;
+    bool                        m_bFakeLagCommandEnabled;
 
     // Command line
     static void                 ParseCommandLine                ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions = NULL );

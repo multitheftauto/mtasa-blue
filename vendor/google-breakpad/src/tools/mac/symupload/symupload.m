@@ -82,15 +82,6 @@ static NSArray *ModuleDataForSymbolFile(NSString *file) {
 }
 
 //=============================================================================
-static NSString *CompactIdentifier(NSString *uuid) {
-  NSMutableString *str = [NSMutableString stringWithString:uuid];
-  [str replaceOccurrencesOfString:@"-" withString:@"" options:0
-                            range:NSMakeRange(0, [str length])];
-  
-  return str;
-}
-
-//=============================================================================
 static void Start(Options *options) {
   NSURL *url = [NSURL URLWithString:options->uploadURLStr];
   HTTPMultipartUpload *ul = [[HTTPMultipartUpload alloc] initWithURL:url];

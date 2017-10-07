@@ -37,6 +37,7 @@
 
 #include "breakpad_googletest_includes.h"
 #include "client/linux/handler/exception_handler.h"
+#include "client/linux/handler/microdump_extra_info.h"
 #include "client/linux/microdump_writer/microdump_writer.h"
 #include "common/linux/eintr_wrapper.h"
 #include "common/linux/ignore_ret.h"
@@ -50,10 +51,20 @@ namespace {
 
 typedef testing::Test MicrodumpWriterTest;
 
-void CrashAndGetMicrodump(
-    const MappingList& mappings,
+MicrodumpExtraInfo MakeMicrodumpExtraInfo(
     const char* build_fingerprint,
     const char* product_info,
+    const char* gpu_fingerprint) {
+  MicrodumpExtraInfo info;
+  info.build_fingerprint = build_fingerprint;
+  info.product_info = product_info;
+  info.gpu_fingerprint = gpu_fingerprint;
+  return info;
+}
+
+void CrashAndGetMicrodump(
+    const MappingList& mappings,
+    const MicrodumpExtraInfo& microdump_extra_info,
     scoped_array<char>* buf) {
   int fds[2];
   ASSERT_NE(-1, pipe(fds));
@@ -85,7 +96,7 @@ void CrashAndGetMicrodump(
   ASSERT_NE(-1, dup2(err_fd, STDERR_FILENO));
 
   ASSERT_TRUE(WriteMicrodump(child, &context, sizeof(context), mappings,
-      build_fingerprint, product_info));
+                             microdump_extra_info));
 
   // Revert stderr back to the console.
   dup2(save_err, STDERR_FILENO);
@@ -107,12 +118,12 @@ void CrashAndGetMicrodump(
       buf->get(), "-----END BREAKPAD MICRODUMP-----"));
 }
 
-void CheckMicrodumpContents(const string &microdum_content,
-                            const string &expected_fingerprint,
-                            const string &expected_product_info) {
-  std::istringstream iss(microdum_content);
+void CheckMicrodumpContents(const string& microdump_content,
+                            const MicrodumpExtraInfo& expected_info) {
+  std::istringstream iss(microdump_content);
   bool did_find_os_info = false;
   bool did_find_product_info = false;
+  bool did_find_gpu_info = false;
   for (string line; std::getline(iss, line);) {
     if (line.find("O ") == 0) {
       std::istringstream os_info_tokens(line);
@@ -130,15 +141,33 @@ void CheckMicrodumpContents(const string &microdum_content,
 
       // Check that the build fingerprint is in the right place.
       os_info_tokens >> token;
-      ASSERT_EQ(expected_fingerprint, token);
+      if (expected_info.build_fingerprint)
+        ASSERT_EQ(expected_info.build_fingerprint, token);
       did_find_os_info = true;
     } else if (line.find("V ") == 0) {
-      ASSERT_EQ("V " + expected_product_info, line);
+      if (expected_info.product_info)
+        ASSERT_EQ(string("V ") + expected_info.product_info, line);
       did_find_product_info = true;
+    } else if (line.find("G ") == 0) {
+      if (expected_info.gpu_fingerprint)
+        ASSERT_EQ(string("G ") + expected_info.gpu_fingerprint, line);
+      did_find_gpu_info = true;
     }
   }
   ASSERT_TRUE(did_find_os_info);
   ASSERT_TRUE(did_find_product_info);
+  ASSERT_TRUE(did_find_gpu_info);
+}
+
+void CheckMicrodumpContents(const string& microdump_content,
+                            const string& expected_fingerprint,
+                            const string& expected_product_info,
+                            const string& expected_gpu_fingerprint) {
+  CheckMicrodumpContents(
+      microdump_content,
+      MakeMicrodumpExtraInfo(expected_fingerprint.c_str(),
+                             expected_product_info.c_str(),
+                             expected_gpu_fingerprint.c_str()));
 }
 
 TEST(MicrodumpWriterTest, BasicWithMappings) {
@@ -163,7 +192,7 @@ TEST(MicrodumpWriterTest, BasicWithMappings) {
   mappings.push_back(mapping);
 
   scoped_array<char> buf;
-  CrashAndGetMicrodump(mappings, NULL, NULL, &buf);
+  CrashAndGetMicrodump(mappings, MicrodumpExtraInfo(), &buf);
 
 #ifdef __LP64__
   ASSERT_NE(static_cast<char*>(0), strstr(
@@ -187,19 +216,42 @@ TEST(MicrodumpWriterTest, BuildFingerprintAndProductInfo) {
   const char kProductInfo[] = "MockProduct:42.0.2311.99";
   const char kBuildFingerprint[] =
       "aosp/occam/mako:5.1.1/LMY47W/12345678:userdegbug/dev-keys";
+  const char kGPUFingerprint[] =
+      "Qualcomm;Adreno (TM) 330;OpenGL ES 3.0 V@104.0 AU@  (GIT@Id3510ff6dc)";
+  const MicrodumpExtraInfo kMicrodumpExtraInfo(
+      MakeMicrodumpExtraInfo(kBuildFingerprint, kProductInfo, kGPUFingerprint));
   scoped_array<char> buf;
   MappingList no_mappings;
 
-  CrashAndGetMicrodump(no_mappings, kBuildFingerprint, kProductInfo, &buf);
-  CheckMicrodumpContents(string(buf.get()), kBuildFingerprint, kProductInfo);
+  CrashAndGetMicrodump(no_mappings, kMicrodumpExtraInfo, &buf);
+  CheckMicrodumpContents(string(buf.get()), kMicrodumpExtraInfo);
 }
 
 TEST(MicrodumpWriterTest, NoProductInfo) {
   const char kBuildFingerprint[] = "foobar";
+  const char kGPUFingerprint[] = "bazqux";
   scoped_array<char> buf;
   MappingList no_mappings;
 
-  CrashAndGetMicrodump(no_mappings, kBuildFingerprint, NULL, &buf);
-  CheckMicrodumpContents(string(buf.get()), kBuildFingerprint, "UNKNOWN:0.0.0.0");
+  const MicrodumpExtraInfo kMicrodumpExtraInfoNoProductInfo(
+      MakeMicrodumpExtraInfo(kBuildFingerprint, NULL, kGPUFingerprint));
+
+  CrashAndGetMicrodump(no_mappings, kMicrodumpExtraInfoNoProductInfo, &buf);
+  CheckMicrodumpContents(string(buf.get()), kBuildFingerprint,
+                         "UNKNOWN:0.0.0.0", kGPUFingerprint);
+}
+
+TEST(MicrodumpWriterTest, NoGPUInfo) {
+  const char kProductInfo[] = "bazqux";
+  const char kBuildFingerprint[] = "foobar";
+  scoped_array<char> buf;
+  MappingList no_mappings;
+
+  const MicrodumpExtraInfo kMicrodumpExtraInfoNoGPUInfo(
+      MakeMicrodumpExtraInfo(kBuildFingerprint, kProductInfo, NULL));
+
+  CrashAndGetMicrodump(no_mappings, kMicrodumpExtraInfoNoGPUInfo, &buf);
+  CheckMicrodumpContents(string(buf.get()), kBuildFingerprint,
+                         kProductInfo, "UNKNOWN");
 }
 }  // namespace

@@ -61,15 +61,16 @@ static RwObject* ReplacePartsCB ( RwObject * object, SReplaceParts * data )
 }
 
 // RpClumpForAllAtomics callback used to add atomics to a vehicle
-static RpAtomic* AddAllAtomicsCB (RpAtomic * atomic, RpClump * data)
+static bool AddAllAtomicsCB (RpAtomic * atomic, void * pClump)
 {
+    RpClump * data = reinterpret_cast<RpClump*>(pClump);
     RwFrame * pFrame = RpGetFrame ( data );
 
     // add the atomic to the frame
     RpAtomicSetFrame ( atomic, pFrame );
     RpClumpAddAtomic ( data, atomic );
 
-    return atomic;
+    return true;
 }
 
 // RpClumpForAllAtomics struct and callback used to replace all wheels with a given wheel model
@@ -80,8 +81,9 @@ struct SReplaceWheels
     RpAtomicContainer *pReplacements;           // replacement atomics
     unsigned int uiReplacements;                // number of replacements
 };
-static RpAtomic* ReplaceWheelsCB (RpAtomic * atomic, SReplaceWheels * data)
+static bool ReplaceWheelsCB (RpAtomic * atomic, void * pData)
 {
+    SReplaceWheels* data = reinterpret_cast<SReplaceWheels*>(pData);
     RwFrame * Frame = RpGetFrame ( atomic );
 
     // find our wheel atomics
@@ -106,7 +108,7 @@ static RpAtomic* ReplaceWheelsCB (RpAtomic * atomic, SReplaceWheels * data)
         }
     }
 
-    return atomic;
+    return true;
 }
 
 // RpClumpForAllAtomics struct and callback used to replace all atomics for a vehicle
@@ -116,10 +118,12 @@ struct SReplaceAll
     RpAtomicContainer *pReplacements;           // replacement atomics
     unsigned int uiReplacements;                // number of replacements
 };
-static RpAtomic* ReplaceAllCB (RpAtomic * atomic, SReplaceAll * data)
+static bool ReplaceAllCB (RpAtomic * atomic, void* pData)
 {
+    SReplaceAll *data = reinterpret_cast<SReplaceAll *>(pData);
     RwFrame * Frame = RpGetFrame ( atomic );
-    if ( Frame == NULL ) return atomic;
+    if ( Frame == NULL ) 
+        return true;
 
     // find a replacement atomic
     for ( unsigned int i = 0; i < data->uiReplacements; i++ ) {
@@ -146,7 +150,7 @@ static RpAtomic* ReplaceAllCB (RpAtomic * atomic, SReplaceAll * data)
         }
     }
 
-    return atomic;
+    return true;
 }
 
 // RpClumpForAllAtomics struct and callback used to load the atomics from a specific clump into a container
@@ -155,8 +159,9 @@ struct SLoadAtomics
     RpAtomicContainer *pReplacements;           // replacement atomics
     unsigned int uiReplacements;                // number of replacements
 };
-static RpAtomic* LoadAtomicsCB (RpAtomic * atomic, SLoadAtomics * data)
+static bool LoadAtomicsCB (RpAtomic * atomic, void * pData)
 {
+    SLoadAtomics* data = reinterpret_cast<SLoadAtomics*>(pData);
     RwFrame * Frame = RpGetFrame(atomic);
 
     // add the atomic to the container
@@ -166,7 +171,7 @@ static RpAtomic* LoadAtomicsCB (RpAtomic * atomic, SLoadAtomics * data)
     // and increment the counter
     data->uiReplacements++;
 
-    return atomic;
+    return true;
 }
 
 
@@ -294,15 +299,11 @@ RpClump * CRenderWareSA::ReadDFF ( const SString& strFilename, const CBuffer& fi
 //
 void CRenderWareSA::GetClumpAtomicList ( RpClump* pClump, std::vector < RpAtomic* >& outAtomicList )
 {
-    LOCAL_FUNCTION_START
-        static RpAtomic* GetClumpAtomicListCB ( RpAtomic* pAtomic, std::vector < RpAtomic* >* pData )
-        {
-            pData->push_back ( pAtomic );
-            return pAtomic;
-        }
-    LOCAL_FUNCTION_END
-
-    RpClumpForAllAtomics ( pClump, LOCAL_FUNCTION::GetClumpAtomicListCB, &outAtomicList );
+    RpClumpForAllAtomics(pClump, [](RpAtomic* pAtomic, void* pData)
+    {
+        reinterpret_cast<std::vector < RpAtomic* >*>(pData)->push_back(pAtomic);
+        return true;
+    }, &outAtomicList);
 }
 
 
@@ -374,18 +375,18 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
             if ( dwFunc == FUNC_LoadVehicleModel )
             {
                 CVehicleModelInfoSAInterface* pVehicleModelInfoInterface = (CVehicleModelInfoSAInterface*)pModelInfo->GetInterface ();
-                if ( pVehicleModelInfoInterface->pSomeInfo )
+                if ( pVehicleModelInfoInterface->pVisualInfo )
                 {
                     DWORD dwDeleteFunc = FUNC_CVehicleStructure_delete;
-                    CVehicleStructure* pSomeInfo = pVehicleModelInfoInterface->pSomeInfo;
+                    CVehicleModelVisualInfoSAInterface* info = pVehicleModelInfoInterface->pVisualInfo;
                     __asm
                     {
-                        mov     eax, pSomeInfo
+                        mov     eax, info
                         push    eax
                         call    dwDeleteFunc
                         add     esp, 4
                     }
-                    pVehicleModelInfoInterface->pSomeInfo = NULL;
+                    pVehicleModelInfoInterface->pVisualInfo = nullptr;
                 }
             }
 
@@ -464,7 +465,7 @@ unsigned int CRenderWareSA::LoadAtomics ( RpClump * pClump, RpAtomicContainer * 
     // iterate through all atomics in the clump
     SLoadAtomics data = {0};
     data.pReplacements = pAtomics;
-    RpClumpForAllAtomics ( pClump, ( void * ) LoadAtomicsCB, &data );
+    RpClumpForAllAtomics ( pClump, LoadAtomicsCB, &data );
     
     // return the number of atomics that were added to the container
     return data.uiReplacements;
@@ -476,12 +477,13 @@ typedef struct
     unsigned short usTxdID;
     RpClump* pClump;
 } SAtomicsReplacer;
-RpAtomic* AtomicsReplacer ( RpAtomic* pAtomic, SAtomicsReplacer* pData )
+bool AtomicsReplacer ( RpAtomic* pAtomic, void* data )
 {
+    SAtomicsReplacer* pData = reinterpret_cast<SAtomicsReplacer*>(data);
     ( (void (*)(RpAtomic*, void*))FUNC_AtomicsReplacer ) ( pAtomic, pData->pClump );
     // The above function adds a reference to the model's TXD. Remove it again.
     CTxdStore_RemoveRef ( pData->usTxdID );
-    return pAtomic;
+    return true;
 }
 
 void CRenderWareSA::ReplaceAllAtomicsInModel ( RpClump * pNew, unsigned short usModelID )

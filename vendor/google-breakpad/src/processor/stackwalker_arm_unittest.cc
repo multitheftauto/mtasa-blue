@@ -370,7 +370,7 @@ TEST_F(GetCallerFrame, ScanFirstFrame) {
     .D32(0xF0000000)                    // more junk
     .D32(0x0000000D)
 
-    .Append(96, 0)                      // more space
+    .Append(136, 0)                     // more space
 
     .D32(return_address2)               // actual return address
                                         // (won't be found)

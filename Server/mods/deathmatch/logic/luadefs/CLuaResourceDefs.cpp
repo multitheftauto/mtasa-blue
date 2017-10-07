@@ -55,6 +55,8 @@ void CLuaResourceDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getResourceDynamicElementRoot", getResourceDynamicElementRoot );
     CLuaCFunctions::AddFunction ( "getResourceMapRootElement", getResourceMapRootElement );
     CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", getResourceExportedFunctions );
+    CLuaCFunctions::AddFunction ( "getResourceOrganizationalPath", getResourceOrganizationalPath);
+    CLuaCFunctions::AddFunction ( "isResourceArchived", isResourceArchived );
 
     // Set stuff
     CLuaCFunctions::AddFunction ( "setResourceInfo", setResourceInfo );
@@ -106,6 +108,7 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot" );
     lua_classfunction ( luaVM, "getRootElement", "getResourceRootElement" );
     lua_classfunction ( luaVM, "getExportedFunctions", "getResourceExportedFunctions" );
+    lua_classfunction ( luaVM, "getOrganizationalPath", "getResourceOrganizationalPath");
     lua_classfunction ( luaVM, "getLastStartTime", "getResourceLastStartTime" );
     lua_classfunction ( luaVM, "getLoadTime", "getResourceLoadTime" );
     lua_classfunction ( luaVM, "getInfo", "getResourceInfo" );
@@ -114,15 +117,18 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getName", "getResourceName" );
     lua_classfunction ( luaVM, "getState", "getResourceState" );
     lua_classfunction ( luaVM, "getACLRequests", "getResourceACLRequests" );
+    lua_classfunction ( luaVM, "isArchived", "isResourceArchived" );
 
     lua_classvariable ( luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot" );
     lua_classvariable ( luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions" );
+    lua_classvariable ( luaVM, "organizationalPath", nullptr, "getResourceOrganizationalPath" );
     lua_classvariable ( luaVM, "lastStartTime", NULL, "getResourceLastStartTime" );
     lua_classvariable ( luaVM, "aclRequests", NULL, "getResourceACLRequests" );
     lua_classvariable ( luaVM, "loadTime", NULL, "getResourceLoadTime" );
     lua_classvariable ( luaVM, "name", "renameResource", "getResourceName" );
     lua_classvariable ( luaVM, "rootElement", NULL, "getResourceRootElement" );
     lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
+    lua_classvariable ( luaVM, "archived", NULL, "isResourceArchived" );
     lua_classvariable ( luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason" );
     //lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
     //lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
@@ -284,13 +290,8 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
 
                 if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, &strPath, NULL ) )
                 {
-                    // Do we have permissions?
-                    if ( pResource == pThisResource ||
-                         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                                        "ModifyOtherObjects",
-                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                        false ) )
+                    CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                    if ( !argStream.HasErrors() )
                     {
                         // Add the resource map and return it if we succeeded
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceMap ( pResource, strPath, strMetaName, usDimension, pLUA );
@@ -301,12 +302,11 @@ int CLuaResourceDefs::addResourceMap ( lua_State* luaVM )
                         }
                     }
                 }
-                else
-                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
     }
-    else
+
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -354,13 +354,8 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
 
                 if ( CResourceManager::ParseResourcePathInput ( strMapName, pResource, &strPath, &strConfigName ) )
                 {
-                    // Do we have permissions?
-                    if ( pResource == pThisResource ||
-                         m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                                        "ModifyOtherObjects",
-                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                        false ) )
+                    CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                    if ( !argStream.HasErrors() )
                     {
                         // Add the resource map and return it if we succeeded
                         CXMLNode* pXMLNode = CStaticFunctionDefinitions::AddResourceConfig ( pResource, strPath, strConfigName, iType, pLUA );
@@ -374,7 +369,8 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
             }
         }
     }
-    else
+
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -384,22 +380,32 @@ int CLuaResourceDefs::addResourceConfig ( lua_State* luaVM )
 
 int CLuaResourceDefs::removeResourceFile ( lua_State* luaVM )
 {
-    CResource * pResource;
+    CResource * pOtherResource;
     SString strFileName;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pResource );
+    argStream.ReadUserData ( pOtherResource );
     argStream.ReadString ( strFileName );
 
     if ( !argStream.HasErrors ( ) )
     {
-        if ( CStaticFunctionDefinitions::RemoveResourceFile ( pResource, strFileName ) )
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        CResource* pThisResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+        if ( pThisResource )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            CheckCanModifyOtherResource( argStream, pThisResource, pOtherResource );
+            CheckCanAccessOtherResourceFile( argStream, pThisResource, pOtherResource, strFileName );
+            if ( !argStream.HasErrors() )
+            {
+                if ( CStaticFunctionDefinitions::RemoveResourceFile ( pOtherResource, strFileName ) )
+                {
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }
+            }
         }
     }
-    else
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -740,12 +746,8 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
             CResource* pThisResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                if ( pResource == pThisResource ||
-                    m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                                        "ModifyOtherObjects",
-                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                                        false ) )
+                CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+                if ( !argStream.HasErrors() )
                 {
                     if ( pResource->IsLoaded() )
                     {
@@ -755,12 +757,10 @@ int CLuaResourceDefs::setResourceInfo ( lua_State* luaVM )
                         return 1;
                     }
                 }
-                else
-                    m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pResource->GetName ().c_str () );
             }
         }
     }
-    else
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
@@ -781,15 +781,9 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
 
         if ( pThisResource && CResourceManager::ParseResourcePathInput ( strConfigName, pResource, NULL, &strMetaPath ) )
         {
-            // We have access to modify other resource?
-            if (pResource == pThisResource ||
-                m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(),
-                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                "ModifyOtherObjects",
-                CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                false))
+            CheckCanModifyOtherResource( argStream, pThisResource, pResource );
+            if ( !argStream.HasErrors() )
             {
-
                 list<CResourceFile *> * resourceFileList = pResource->GetFiles();
                 list<CResourceFile *>::iterator iterd = resourceFileList->begin();
                 for (; iterd != resourceFileList->end(); ++iterd)
@@ -808,10 +802,6 @@ int CLuaResourceDefs::getResourceConfig ( lua_State* luaVM )
                         }
                     }
                 }
-            }
-            else
-            {
-                argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource '%s' to access '%s'", pThisResource->GetName().c_str(), pResource->GetName().c_str()), "Access denied");
             }
         }
     }
@@ -1077,6 +1067,41 @@ int CLuaResourceDefs::getResourceExportedFunctions ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+
+int CLuaResourceDefs::getResourceOrganizationalPath ( lua_State* luaVM )
+{
+    // string getResourceOrganizationalPath ( resource theResource )
+    // Returns a string representing the resource organizational path, false if invalid resource was provided. 
+
+    CResource* pResource;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pResource );
+    
+    if ( !argStream.HasErrors() )
+    {
+        SString strOrganizationalPath = m_pResourceManager->GetResourceOrganizationalPath ( pResource );
+        
+        if ( !strOrganizationalPath.empty() )
+        {
+            // Normalize path separator, it is always slash on resources side
+            ReplaceOccurrencesInString ( strOrganizationalPath, "\\", "/" );
+
+            // The leading separator won't be needed
+            strOrganizationalPath = strOrganizationalPath.TrimStart ( "/" );
+        }
+        
+        lua_pushstring ( luaVM, strOrganizationalPath );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+     
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
 
 int CLuaResourceDefs::call ( lua_State* luaVM )
 {
@@ -1355,9 +1380,17 @@ int CLuaResourceDefs::Load( lua_State* luaVM )
             if ( returnValues.Count() )
             {
                 CLuaArgument* returnedValue = *returnValues.IterBegin();
-                if ( returnedValue->GetType() == LUA_TSTRING )
+                int iType = returnedValue->GetType();
+                if (iType == LUA_TNIL)
+                    break;
+
+                else if (iType == LUA_TSTRING)
                 {
-                    strInput += returnedValue->GetString();
+                    std::string str = returnedValue->GetString();
+                    if (str.length() == 0)
+                        break;
+
+                    strInput += str;
                     continue;
                 }
             }
@@ -1400,5 +1433,25 @@ int CLuaResourceDefs::Load( lua_State* luaVM )
         m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+int CLuaResourceDefs::isResourceArchived (lua_State* luaVM)
+{
+    //  bool isResourceArchived ( resource theResource )
+    CResource* pResource;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pResource);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean ( luaVM, pResource->IsResourceZip() );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushnil ( luaVM );
     return 1;
 }

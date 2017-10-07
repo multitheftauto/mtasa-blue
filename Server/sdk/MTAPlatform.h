@@ -22,13 +22,7 @@ extern "C" bool g_bNoTopBar;
     #else
         #define MTA_OS_STRING   "Windows"
     #endif
-
     #define MTA_LIB_EXTENSION   ".dll"
-    #if defined(_DEBUG)
-        #define MTA_LIB_SUFFIX  "_d"
-    #else
-        #define MTA_LIB_SUFFIX
-    #endif
 #elif defined(__linux__)
     #ifdef __x86_64__
         #define MTA_OS_STRING   "GNU/Linux x64"
@@ -36,17 +30,20 @@ extern "C" bool g_bNoTopBar;
         #define MTA_OS_STRING   "GNU/Linux"
     #endif
     #define MTA_LIB_EXTENSION   ".so"
-    #define MTA_LIB_SUFFIX
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #define MTA_OS_STRING       "BSD"
     #define MTA_LIB_EXTENSION   ".so"
-    #define MTA_LIB_SUFFIX
 #elif defined(__APPLE__) && defined(__MACH__)
     #define MTA_OS_STRING       "Mac OS X"
     #define MTA_LIB_EXTENSION   ".so"
-    #define MTA_LIB_SUFFIX
 #else
     #error "Unsupported operating system"
+#endif
+
+#if defined(MTA_DEBUG)
+    #define MTA_LIB_SUFFIX  "_d"
+#else
+    #define MTA_LIB_SUFFIX
 #endif
 
 /** Multi-platform defines **/
@@ -83,13 +80,6 @@ extern "C" bool g_bNoTopBar;
     #include <sys/time.h>
     #include <sys/times.h>
     
-    // Non-standard hash include
-    #if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))
-        #include <hash_fun.h>
-    #else
-        #include <ext/hash_fun.h>
-    #endif
-
     #define MAX_PATH 255
 
     #ifndef stricmp
@@ -109,17 +99,7 @@ extern "C" bool g_bNoTopBar;
     // Itoa replacement function
     char* itoa ( int value, char* result, int base );
 
-    // Hash function
-    namespace __gnu_cxx
-    {
-        template<> struct hash < std::string >
-        {
-            size_t operator()( const std::string& str ) const
-            {
-                return hash< const char* >()( str.c_str() );
-            }   
-        };
-    }
+    
 #endif
 
 // This function should be used instead of mkdir to preserve multiplatform

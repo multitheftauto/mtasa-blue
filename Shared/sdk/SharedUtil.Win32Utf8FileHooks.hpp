@@ -31,18 +31,8 @@ The hooks in this file modify the following functions to work correctly with utf
     MoveFile
     DeleteFile
     GetModuleHandle
-    sopen_s
-    _chdir
-    _mkdir
-    _rmdir
-    remove
-    rename
 
-The following will also work correctly with utf8 strings as they eventually call the above hooked functions:
-
-    fopen
-    unlink
-    fstream
+Some more will also work correctly with utf8 strings as they eventually call the above hooked functions
 
 BUT
     * Many other functions are not hooked and will need utf8 conversions when used, like these:
@@ -56,207 +46,8 @@ BUT
 */
 
 
-//
-// Determine file name of Microsoft Visual Studio C/C++ Runtime dll
-//
-#if _MSC_VER == 1500        // MSVC++ 9.0 (Visual Studio 2008)
-    #ifdef _DEBUG
-        #define MSVCR_DLL "msvcr90d.dll"
-    #else
-        #define MSVCR_DLL "msvcr90.dll"
-    #endif
-#elif _MSC_VER == 1800      // MSVC++ 12.0 (Visual Studio 2013)
-    #ifdef _DEBUG
-        #define MSVCR_DLL "msvcr120d.dll"
-    #else
-        #define MSVCR_DLL "msvcr120.dll"
-    #endif
-#elif _MSC_VER == 1900      // MSVC++ 14.0 (Visual Studio 2015)
-    #ifdef _DEBUG
-        #define MSVCR_DLL "ucrtbased.dll"
-    #else
-        #define MSVCR_DLL "ucrtbase.dll"
-    #endif
-#else
-    #error "Insert VCR info"
-#endif
-
-
 namespace SharedUtil
 {
-
-    /////////////////////////////////////////////////////////////
-    //
-    // Function defs
-    //
-    /////////////////////////////////////////////////////////////
-
-    typedef
-    HANDLE
-    (WINAPI
-    *FUNC_CreateFileA)(
-        __in     LPCSTR lpFileName,
-        __in     DWORD dwDesiredAccess,
-        __in     DWORD dwShareMode,
-        __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-        __in     DWORD dwCreationDisposition,
-        __in     DWORD dwFlagsAndAttributes,
-        __in_opt HANDLE hTemplateFile
-        );
-
-    typedef
-    HMODULE
-    (WINAPI
-    *FUNC_LoadLibraryA)(
-        __in LPCSTR lpLibFileName
-        );
-
-    typedef
-    HMODULE
-    (WINAPI
-    *FUNC_LoadLibraryExA)(
-        __in       LPCSTR lpLibFileName,
-        __reserved HANDLE hFile,
-        __in       DWORD dwFlags
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_SetDllDirectoryA)(
-        __in_opt LPCSTR lpPathName
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_SetCurrentDirectoryA)(
-        __in LPCSTR lpPathName
-        );
-
-    typedef int  (WINAPI *FUNC_AddFontResourceExA)( __in LPCSTR name, __in DWORD fl, __reserved PVOID res);
-    typedef BOOL (WINAPI *FUNC_RemoveFontResourceExA)( __in LPCSTR name, __in DWORD fl, __reserved PVOID pdv);
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_RemoveDirectoryA)(
-        __in LPCSTR lpPathName
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_GetDiskFreeSpaceExA)(
-        __in_opt  LPCSTR lpDirectoryName,
-        __out_opt PULARGE_INTEGER lpFreeBytesAvailableToCaller,
-        __out_opt PULARGE_INTEGER lpTotalNumberOfBytes,
-        __out_opt PULARGE_INTEGER lpTotalNumberOfFreeBytes
-        );
-
-    typedef
-    DWORD
-    (WINAPI
-    *FUNC_GetFileAttributesA)(
-        __in LPCSTR lpFileName
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_SetFileAttributesA)(
-        __in LPCSTR lpFileName,
-        __in DWORD dwFileAttributes
-        );
-
-    typedef HINSTANCE (STDAPICALLTYPE *FUNC_ShellExecuteA)(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters,
-        LPCSTR lpDirectory, INT nShowCmd);
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_CreateDirectoryA)(
-        __in     LPCSTR lpPathName,
-        __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_CopyFileA)(
-        __in LPCSTR lpExistingFileName,
-        __in LPCSTR lpNewFileName,
-        __in BOOL bFailIfExists
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_MoveFileA)(
-        __in LPCSTR lpExistingFileName,
-        __in LPCSTR lpNewFileName
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_DeleteFileA)(
-        __in LPCSTR lpFileName
-        );
-
-    typedef
-    HMODULE
-    (WINAPI
-    *FUNC_GetModuleHandleA)(
-        __in_opt LPCSTR lpModuleName
-        );
-
-    typedef
-    errno_t
-    (__cdecl
-    *FUNC__sopen_s)(
-        _Out_ int * _FileHandle,
-        _In_z_ const char * _Filename,
-        _In_ int _OpenFlag,
-        _In_ int _ShareFlag,
-        _In_ int _PermissionMode
-        );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC__chdir) (
-            const char *_Path
-            );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC__mkdir) (
-            const char *_Path
-            );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC__rmdir) (
-            const char *_Path
-            );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC_remove) (
-            const char *_Filename
-            );
-
-    typedef
-    int
-    (__cdecl
-    *FUNC_rename) (
-            const char *_OldFilename,
-            const char *_NewFilename
-            );
 
     /////////////////////////////////////////////////////////////
     //
@@ -264,6 +55,7 @@ namespace SharedUtil
     //
     /////////////////////////////////////////////////////////////
     #define HOOKVAR(name) \
+        using FUNC_##name = decltype(&name); \
         FUNC_##name pfn##name;
 
     HOOKVAR( CreateFileA )
@@ -283,12 +75,6 @@ namespace SharedUtil
     HOOKVAR( MoveFileA )
     HOOKVAR( DeleteFileA )
     HOOKVAR( GetModuleHandleA )
-    HOOKVAR( _sopen_s )
-    HOOKVAR( _chdir )
-    HOOKVAR( _mkdir )
-    HOOKVAR( _rmdir )
-    HOOKVAR( remove )
-    HOOKVAR( rename )
 
 
 #ifdef MTA_CLIENT
@@ -507,45 +293,6 @@ namespace SharedUtil
         return GetModuleHandleW( FromUTF8( lpModuleName ) );
     }
 
-    errno_t
-    __cdecl
-    My_sopen_s(
-        _Out_ int * _FileHandle,
-        _In_z_ const char * _Filename,
-        _In_ int _OpenFlag,
-        _In_ int _ShareFlag,
-        _In_ int _PermissionMode
-    )
-    {
-        return _wsopen_s( _FileHandle, FromUTF8( _Filename ), _OpenFlag, _ShareFlag, _PermissionMode );
-    }
-
-
-    int __cdecl My_chdir( const char *_Path )
-    {
-        return _wchdir( FromUTF8( _Path ) );
-    }
-
-    int __cdecl My_mkdir( const char *_Path )
-    {
-        return _wmkdir( FromUTF8( _Path ) );
-    }
-
-    int __cdecl My_rmdir( const char *_Path )
-    {
-        return _wrmdir( FromUTF8( _Path ) );
-    }
-
-    int __cdecl Myremove( const char * _Filename )
-    {
-        return _wremove( FromUTF8( _Filename ) );
-    }
-
-    int __cdecl Myrename( const char * _OldFilename, const char * _NewFilename )
-    {
-        return _wrename( FromUTF8( _OldFilename ), FromUTF8( _NewFilename ) );
-    }
-
     /////////////////////////////////////////////////////////////
     //
     // Hook adding
@@ -574,12 +321,6 @@ namespace SharedUtil
         ADDHOOK( "Kernel32.dll", MoveFileA )
         ADDHOOK( "Kernel32.dll", DeleteFileA )
         ADDHOOK( "Kernel32.dll", GetModuleHandleA )
-        ADDHOOK( MSVCR_DLL, _sopen_s )
-        ADDHOOK( MSVCR_DLL, _chdir )
-        ADDHOOK( MSVCR_DLL, _mkdir )
-        ADDHOOK( MSVCR_DLL, _rmdir )
-        ADDHOOK( MSVCR_DLL, remove )
-        ADDHOOK( MSVCR_DLL, rename )
     }
 
 
@@ -615,11 +356,5 @@ namespace SharedUtil
         DELHOOK( MoveFileA )
         DELHOOK( DeleteFileA )
         DELHOOK( GetModuleHandleA )
-        DELHOOK( _sopen_s )
-        DELHOOK( _chdir )
-        DELHOOK( _mkdir )
-        DELHOOK( _rmdir )
-        DELHOOK( remove )
-        DELHOOK( rename )
     }
 }

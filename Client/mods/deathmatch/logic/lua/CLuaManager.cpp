@@ -214,6 +214,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isPlayerDead", CLuaPedDefs::IsPedDead );
     CLuaCFunctions::AddFunction ( "guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex );
     CLuaCFunctions::AddFunction ( "guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex );
+    CLuaCFunctions::AddFunction ( "setControlState", CLuaPedDefs::SetPedControlState);
+    CLuaCFunctions::AddFunction ( "getControlState", CLuaPedDefs::GetPedControlState);
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 
     // Event funcs
@@ -239,6 +241,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setClipboard", CLuaFunctionDefs::SetClipboard );
     //CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
     CLuaCFunctions::AddFunction ( "setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing );
+
+    // Notification funcs
+    CLuaCFunctions::AddFunction ( "createTrayNotification", CLuaFunctionDefs::CreateTrayNotification );
+    CLuaCFunctions::AddFunction ( "isTrayNotificationEnabled", CLuaFunctionDefs::IsTrayNotificationEnabled );
 
     // Clothes and body functions
     CLuaCFunctions::AddFunction ( "getBodyPartName", CLuaFunctionDefs::GetBodyPartName );
@@ -295,6 +301,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getInteriorFurnitureEnabled", CLuaFunctionDefs::GetInteriorFurnitureEnabled );
     CLuaCFunctions::AddFunction ( "getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance );
     CLuaCFunctions::AddFunction ( "getNearClipDistance", CLuaFunctionDefs::GetNearClipDistance );
+    CLuaCFunctions::AddFunction ( "getVehiclesLODDistance", CLuaFunctionDefs::GetVehiclesLODDistance );
     CLuaCFunctions::AddFunction ( "getFogDistance", CLuaFunctionDefs::GetFogDistance );
     CLuaCFunctions::AddFunction ( "getSunColor", CLuaFunctionDefs::GetSunColor );
     CLuaCFunctions::AddFunction ( "getSunSize", CLuaFunctionDefs::GetSunSize );
@@ -339,6 +346,8 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "resetFarClipDistance", CLuaFunctionDefs::ResetFarClipDistance );
     CLuaCFunctions::AddFunction ( "setNearClipDistance", CLuaFunctionDefs::SetNearClipDistance );
     CLuaCFunctions::AddFunction ( "resetNearClipDistance", CLuaFunctionDefs::ResetNearClipDistance );
+    CLuaCFunctions::AddFunction ( "setVehiclesLODDistance", CLuaFunctionDefs::SetVehiclesLODDistance );
+    CLuaCFunctions::AddFunction ( "resetVehiclesLODDistance", CLuaFunctionDefs::ResetVehiclesLODDistance );
     CLuaCFunctions::AddFunction ( "setFogDistance", CLuaFunctionDefs::SetFogDistance );
     CLuaCFunctions::AddFunction ( "resetFogDistance", CLuaFunctionDefs::ResetFogDistance );
     CLuaCFunctions::AddFunction ( "setSunColor", CLuaFunctionDefs::SetSunColor );
@@ -361,7 +370,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "bindKey", CLuaFunctionDefs::BindKey );
     CLuaCFunctions::AddFunction ( "unbindKey", CLuaFunctionDefs::UnbindKey );
     CLuaCFunctions::AddFunction ( "getKeyState", CLuaFunctionDefs::GetKeyState );    
-    CLuaCFunctions::AddFunction ( "getControlState", CLuaFunctionDefs::GetControlState );
     CLuaCFunctions::AddFunction ( "getAnalogControlState", CLuaFunctionDefs::GetAnalogControlState );
     CLuaCFunctions::AddFunction ( "setAnalogControlState", CLuaFunctionDefs::SetAnalogControlState );
     CLuaCFunctions::AddFunction ( "isControlEnabled", CLuaFunctionDefs::IsControlEnabled );
@@ -371,7 +379,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getCommandsBoundToKey", CLuaFunctionDefs::GetCommandsBoundToKey );
     CLuaCFunctions::AddFunction ( "getKeyBoundToCommand", CLuaFunctionDefs::GetKeyBoundToCommand );
     
-    CLuaCFunctions::AddFunction ( "setControlState", CLuaFunctionDefs::SetControlState );
     CLuaCFunctions::AddFunction ( "toggleControl", CLuaFunctionDefs::ToggleControl );
     CLuaCFunctions::AddFunction ( "toggleAllControls", CLuaFunctionDefs::ToggleAllControls );
 

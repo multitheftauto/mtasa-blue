@@ -187,7 +187,7 @@ void CShaderInstance::SetFloatsValue ( D3DXHANDLE hHandle, const float* pfValues
 {
     SShaderValue* pParam = GetParam ( hHandle );
     // Set as float
-    uiCount = Min ( uiCount, NUMELMS( pParam->floatList ) );
+    uiCount = std::min ( uiCount, NUMELMS( pParam->floatList ) );
     pParam->cType = 'f';
     memcpy ( pParam->floatList, pfValues, sizeof ( float ) * uiCount );
     pParam->cCount = uiCount;

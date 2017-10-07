@@ -20,6 +20,7 @@ void CObjectRPCs::LoadFunctions ( void )
     AddHandler ( MOVE_OBJECT, MoveObject, "MoveObject" );
     AddHandler ( STOP_OBJECT, StopObject, "StopObject" );
     AddHandler ( SET_OBJECT_SCALE, SetObjectScale, "SetObjectScale" );
+    AddHandler ( SET_OBJECT_VISIBLE_IN_ALL_DIMENSIONS, SetObjectVisibleInAllDimensions, "SetObjectVisibleInAllDimensions" );
 }
 
 
@@ -107,5 +108,22 @@ void CObjectRPCs::SetObjectScale ( CClientEntity* pSource, NetBitStreamInterface
              bitStream.Read ( vecScale.fZ );
         }
         pObject->SetScale ( vecScale );
+    }
+}
+
+
+void CObjectRPCs::SetObjectVisibleInAllDimensions ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+{
+    CDeathmatchObject* pObject = static_cast < CDeathmatchObject* > (m_pObjectManager->Get ( pSource->GetID ( ) ));
+
+    if ( pObject )
+    {
+        bool bVisible;
+        unsigned short usNewDimension;
+
+        bitStream.ReadBit ( bVisible );
+        bitStream.Read ( usNewDimension );
+
+        pObject->SetVisibleInAllDimensions ( bVisible, usNewDimension );
     }
 }

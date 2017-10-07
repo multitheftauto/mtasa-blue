@@ -298,7 +298,7 @@ void CClientModelCacheManagerImpl::ProcessPlayerList ( std::map < ushort, float 
                 }
 
                 // Extrapolate position
-                float fSecondsToAdd = Min ( 6000UL, ulSyncAge + 2000 ) * 0.001f;
+                float fSecondsToAdd = std::min( 6000UL, ulSyncAge + 2000 ) * 0.001f;
                 CVector vecPosition;
                 pPlayer->GetPosition ( vecPosition );
                 CVector vecNewPosition = vecPosition + vecVelocity * fSecondsToAdd;
@@ -363,7 +363,7 @@ void CClientModelCacheManagerImpl::ProcessPedList ( std::map < ushort, float >& 
                 vecVelocity *= m_fGameFps;
 
                 // Extrapolate position for 2 seconds time
-                float fSecondsToAdd = Min ( 6000UL, ulSyncAge + 2000 ) * 0.001f;
+                float fSecondsToAdd = std::min( 6000UL, ulSyncAge + 2000 ) * 0.001f;
                 CVector vecPosition;
                 pPed->GetPosition ( vecPosition );
                 CVector vecNewPosition = vecPosition + vecVelocity * fSecondsToAdd;
@@ -438,7 +438,7 @@ void CClientModelCacheManagerImpl::ProcessVehicleList ( std::map < ushort, float
                 }
 
                 // Extrapolate position for 2 seconds time
-                float fSecondsToAdd = Min ( 6000UL, ulSyncAge + 2000 ) * 0.001f;
+                float fSecondsToAdd = std::min( 6000UL, ulSyncAge + 2000 ) * 0.001f;
                 CVector vecPosition;
                 pVehicle->GetPosition ( vecPosition );
                 CVector vecNewPosition = vecPosition + vecVelocity * fSecondsToAdd;

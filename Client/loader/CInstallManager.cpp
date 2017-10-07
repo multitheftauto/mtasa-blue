@@ -31,7 +31,6 @@ namespace
         SetApplicationSetting ( "is-admin",         IsUserAdmin () ? "1" : "0" );
         SetApplicationSettingInt ( "last-server-ip", 0 );
         SetApplicationSetting ( "real-os-build",    SString ( "%d", GetRealOSVersion ().dwBuild ) );
-        SetApplicationSettingInt ( "vs2013-runtime-installed",  IsVS2013RuntimeInstalled () ? 1 : 0 );
     }
 
     // Comms between 'Admin' and 'User' processes
@@ -588,11 +587,13 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
         RemoveDirectory ( ExtractPath ( strTestFilePath ) );
     }
 
+#if MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
     // Check reg key exists
     {
         if ( GetRegistryValue ( "", "Last Install Location" ).empty () )
             ShowLayoutError ( "[Registry key not present]" );   // Can't find reg key
     }
+#endif
 
     // Check reg key writable
     {
@@ -636,15 +637,11 @@ SString CInstallManager::_ProcessLayoutChecks ( void )
         }
     }
 
-    // If aero option reg entry doesn't exist in new, but does in old place, move it
+    // Set aero option if reg entry doesn't exist
     {
         if ( GetApplicationSetting ( "aero-enabled" ).empty () )
         {
-            SString strLegacyValue = GetVersionRegistryValueLegacy ( GetMajorVersionString (), PathJoin ( "Settings", "general" ), "aero-enabled" );
-            if ( !strLegacyValue.empty () )
-                SetApplicationSettingInt ( "aero-enabled", atoi ( strLegacyValue ) );
-            else
-                SetApplicationSettingInt ( "aero-enabled", 1 );
+            SetApplicationSettingInt ( "aero-enabled", 1 );
         }
     }
 
@@ -708,7 +705,7 @@ SString CInstallManager::_ProcessLangFileChecks( void )
 
     // Get language that will be used
     SString strSettingsFilename = PathJoin( GetSystemPersonalPath(), "GTA San Andreas User Files", "gta_sa.set" );
-    FILE* fh = fopen( strSettingsFilename, "rb" );
+    FILE* fh = File::Fopen( strSettingsFilename, "rb" );
     if ( fh )
     {
         fseek( fh, 0xB3B, SEEK_SET );

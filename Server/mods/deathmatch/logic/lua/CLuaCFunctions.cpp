@@ -43,8 +43,8 @@ CLuaCFunctions::~CLuaCFunctions ()
 
 CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f, bool bRestricted )
 {
-    ms_pFunctionPtrLow = Min < void* > ( ms_pFunctionPtrLow, (void*)f );
-    ms_pFunctionPtrHigh = Max < void* > ( ms_pFunctionPtrHigh, (void*)f );
+    ms_pFunctionPtrLow = std::min < void* > ( ms_pFunctionPtrLow, (void*)f );
+    ms_pFunctionPtrHigh = std::max < void* > ( ms_pFunctionPtrHigh, (void*)f );
 
     // Already have a function by this name?
     CLuaCFunction* pFunction = GetFunction ( szName );
@@ -78,7 +78,7 @@ void CLuaCFunctions::RemoveFunction ( const SString& strName )
 CLuaCFunction* CLuaCFunctions::GetFunction ( lua_CFunction f )
 {
     // Quick cull of unknown pointer range
-    if ( f < ms_pFunctionPtrLow || f > ms_pFunctionPtrHigh )
+    if ( reinterpret_cast<void*>(f) < ms_pFunctionPtrLow || reinterpret_cast<void*>(f) > ms_pFunctionPtrHigh )
         return NULL;
 
     CFastHashMap < lua_CFunction, CLuaCFunction* >::iterator it;
@@ -108,7 +108,7 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
 bool CLuaCFunctions::IsNotFunction ( lua_CFunction f )
 {
     // Return true if unknown pointer range
-    return ( f < ms_pFunctionPtrLow || f > ms_pFunctionPtrHigh );
+    return ( reinterpret_cast<void*>(f) < ms_pFunctionPtrLow || reinterpret_cast<void*>(f) > ms_pFunctionPtrHigh );
 }
 
 

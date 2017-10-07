@@ -129,7 +129,7 @@ void CGraphStats::AddTimingPoint( const char* szName )
         int Dups = frameTime / 33000;
         if ( Dups > 0 )
         {
-            Dups = Min( 100, Dups );
+            Dups = std::min( 100, Dups );
             for ( std::map < SString, SGraphStatLine >::iterator iter = m_LineList.begin() ; iter != m_LineList.end() ; ++iter )
 	        {
 	            SGraphStatLine* pLine = &iter->second;
@@ -171,7 +171,7 @@ void CGraphStats::AddTimingPoint( const char* szName )
         {
             int f = rand() % NUMELMS( md5.data );
             int t = rand() % 3;
-            p[t] = Min( 255, p[t] + p[f] + 1 );
+            p[t] = std::min( 255, p[t] + p[f] + 1 );
         } 
 	    pLine->color = SColorRGBA( p[0], p[1], p[2] ,255 );
     }
@@ -207,7 +207,7 @@ void CGraphStats::Draw ( void )
 
     uint uiViewportHeight = pGraphics->GetViewportHeight();
     uint uiOriginX = 10;
-    uint uiOriginY = Min < int > ( 500, uiViewportHeight - 10 );
+    uint uiOriginY = std::min < int > ( 500, uiViewportHeight - 10 );
     uint uiSizeX = GRAPHSTAT_HISTORY_SIZE;
     uint uiSizeY = 150;
     uint uiRangeY = 100;    // 100ms

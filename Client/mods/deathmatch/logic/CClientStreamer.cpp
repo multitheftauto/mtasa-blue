@@ -207,8 +207,11 @@ void CClientStreamer::SetDimension ( unsigned short usDimension )
             pElement = *iter;
             if ( pElement->IsStreamedIn () )
             {
-                // Unstream it
-                m_ToStreamOut.push_back ( pElement );
+                if ( !pElement->IsVisibleInAllDimensions ( ) )
+                {
+                    // Unstream it
+                    m_ToStreamOut.push_back ( pElement );
+                }
             }
         }
     }
@@ -506,7 +509,7 @@ void CClientStreamer::Restream ( bool bMovedFar )
         else
         {
             // Same dimension as us?
-            if ( pElement->GetDimension () == m_usDimension )
+            if ( pElement->GetDimension () == m_usDimension || pElement->IsVisibleInAllDimensions() )
             {
                 // Too far away? Stop here.
                 if ( fElementDistanceExp > m_fMaxDistanceExp )

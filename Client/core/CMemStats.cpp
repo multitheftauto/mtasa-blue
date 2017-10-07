@@ -236,7 +236,7 @@ namespace
             for ( uint i = 0 ; i < m_ColumnList.size () ; i++ )
             {
                 const SColumn& column = m_ColumnList[i];
-                g_pGraphics->DrawTextQueued ( fX, fY, fX + column.uiWidth, fY, 0xFFFFFFFF, column.strText, 1, 1, DT_NOCLIP | column.uiAlignment, NULL, true, true );
+                g_pGraphics->DrawStringQueued ( fX, fY, fX + column.uiWidth, fY, 0xFFFFFFFF, column.strText, 1, 1, DT_NOCLIP | column.uiAlignment, NULL, true, true );
                 fX += column.uiWidth;
             }
         }
@@ -407,13 +407,13 @@ void CMemStats::Draw ( void )
 
     if ( bHoldingPageUp )
     {
-        m_fPosY = Max ( 0.f, m_fPosY - 10 );
+        m_fPosY = std::max ( 0.f, m_fPosY - 10 );
     }
     if ( bHoldingPageDown )
     {
         float fScrollHeight = fTotalHeight - ( fResHeight - 200 );
         if ( fScrollHeight > 0 )
-            m_fPosY = Min ( fScrollHeight, m_fPosY + 10 );
+            m_fPosY = std::min ( fScrollHeight, m_fPosY + 10 );
     }
 }
 
@@ -447,7 +447,7 @@ void CMemStats::UpdateFrameStats ( void )
 
     for ( uint i = 0 ; i < NUMELMS( nowList ) ; i++ )
     {
-        maxList[i]->iLockedCount = Max ( maxList[i]->iLockedCount, nowList[i]->iLockedCount - prevList[i]->iLockedCount );
+        maxList[i]->iLockedCount = std::max ( maxList[i]->iLockedCount, nowList[i]->iLockedCount - prevList[i]->iLockedCount );
         prevList[i]->iLockedCount = nowList[i]->iLockedCount;
     }
 }

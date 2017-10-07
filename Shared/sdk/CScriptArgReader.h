@@ -11,6 +11,7 @@
 *****************************************************************************/
 #pragma once
 #include <limits>
+#include "CStringMap.h"
 
 #ifdef MTA_CLIENT
     #include "CScriptDebugging.h"
@@ -566,6 +567,47 @@ public:
 
 
     //
+    // Force-reads next argument as string
+    //
+    void ReadAnyAsString(SString& outValue)
+    {
+        if (luaL_callmeta(m_luaVM, m_iIndex, "__tostring"))
+        {
+            auto oldIndex = m_iIndex;
+            m_iIndex = -1;
+            ReadAnyAsString(outValue);
+
+            lua_pop(m_luaVM, 1); // Clean up stack
+            m_iIndex = oldIndex + 1;
+            return;
+        }
+        
+        switch (lua_type(m_luaVM, m_iIndex))
+        {
+        case LUA_TNUMBER:
+        case LUA_TSTRING:
+            outValue = lua_tostring(m_luaVM, m_iIndex);
+            break;
+        case LUA_TBOOLEAN:
+            outValue = lua_toboolean(m_luaVM, m_iIndex) ? "true" : "false";
+            break;
+        case LUA_TNIL:
+            outValue = "nil";
+            break;
+        case LUA_TNONE:
+            outValue = "";
+            SetTypeError("non-none");
+            break;
+        default:
+            outValue = SString("%s: %p", luaL_typename(m_luaVM, m_iIndex), lua_topointer(m_luaVM, m_iIndex));
+            break;
+        }
+
+        ++m_iIndex;
+    }
+
+
+    //
     // Read next string as a string reference
     //
     void ReadCharStringRef ( SCharStringRef& outValue )
@@ -911,11 +953,30 @@ public:
         m_iIndex++;
     }
 
+    //
+    // Read a table of CLuaArguments
+    //
+    void ReadLuaArgumentsTable(CLuaArguments& outLuaArguments)
+    {
+        int iArgument = lua_type(m_luaVM, m_iIndex);
+        if (iArgument == LUA_TTABLE)
+        {
+            for (lua_pushnil(m_luaVM); lua_next(m_luaVM, m_iIndex) != 0 ; lua_pop( m_luaVM, 1))
+            {
+                outLuaArguments.ReadArgument(m_luaVM, -1);
+            }
+            m_iIndex++;
+            return;
+        }
+
+        SetTypeError( "table" );
+        m_iIndex++;
+    }
 
     //
     // Read a table of strings
     //
-    void ReadStringTable ( std::vector < SString >& outList, bool bDefaultEmpty = false )
+    void ReadStringTable ( std::vector < SString >& outList )
     {
         outList.clear();
 
@@ -934,17 +995,61 @@ public:
             m_iIndex++;
             return;
         }
-        else
-        if ( bDefaultEmpty && ( iArgument == LUA_TNONE || iArgument == LUA_TNIL ) )
-        {
-            m_iIndex++;
-            return;
-        }
 
         SetTypeError ( "table" );
         m_iIndex++;
     }
 
+    //
+    // Reads a table as key-value string pair
+    //
+    void ReadStringMap(CStringMap& outMap)
+    {
+        outMap.clear();
+
+        int argument = lua_type(m_luaVM, m_iIndex);
+        if (argument == LUA_TTABLE)
+        {
+            InternalReadStringMap(outMap,m_iIndex);
+            ++m_iIndex;
+            return;
+        }
+
+        SetTypeError("table");
+        ++m_iIndex;
+    }
+protected:
+    void InternalReadStringMap(CStringMap& outMap, int iIndex)
+    {
+        lua_pushnil(m_luaVM);
+        while (lua_next(m_luaVM, iIndex) != 0)
+        {
+            int keyType = lua_type(m_luaVM, -2);
+            int valueType = lua_type(m_luaVM, -1);
+            if (keyType == LUA_TSTRING )
+            {
+                SStringMapValue value;
+                if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
+                {
+                    value = (lua_tostring(m_luaVM, -1));
+                }
+                else
+                if (valueType == LUA_TBOOLEAN)
+                {
+                    value = (lua_toboolean(m_luaVM, -1) ? "1" : "0");
+                }
+                else
+                if (valueType == LUA_TTABLE)
+                {
+                    // Recurse
+                    InternalReadStringMap(value.subMap, lua_gettop(m_luaVM));
+                }
+                outMap.insert({ SStringX(lua_tostring(m_luaVM, -2)), value });
+            }
+            lua_pop(m_luaVM, 1);
+        }
+    }
+public:
 
     //
     // Read a function, but don't do it yet due to Lua stack issues

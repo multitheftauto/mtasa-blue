@@ -157,7 +157,7 @@ VOID CCheckpointSA::Remove()
     }
     else
     {
-        #ifdef _DEBUG
+        #ifdef MTA_DEBUG
         //OutputDebugString ( "Couldn't find marker for checkpoint!" );
         #endif
     }

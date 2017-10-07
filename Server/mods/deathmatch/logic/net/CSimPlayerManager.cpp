@@ -383,12 +383,6 @@ bool CSimPlayerManager::HandleBulletSync ( const NetServerPlayerID& Socket, NetB
 
         if ( pPacket->Read ( *BitStream ) )
         {
-            // Remove bad net fix data if disabled
-            if ( !g_pGame->GetConfig()->GetBadNetBulletFixEnabled() )
-            {
-                pPacket->m_Cache.DamagedPlayerID = INVALID_ELEMENT_ID;
-            }
-
             // Relay it to nearbyers
             Broadcast ( *pPacket, pSourceSimPlayer->GetPuresyncSendList () );
         }

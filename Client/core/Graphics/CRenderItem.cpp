@@ -18,11 +18,12 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItem::PostConstruct ( CRenderItemManager* pManager )
+void CRenderItem::PostConstruct ( CRenderItemManager* pManager, bool bIncludeInMemoryStats )
 {
     m_pManager = pManager;
     m_pDevice = pManager->m_pDevice;
     m_iRefCount = 1;
+    m_bIncludeInMemoryStats = bIncludeInMemoryStats;
     m_pManager->NotifyContructRenderItem ( this );
 }
 

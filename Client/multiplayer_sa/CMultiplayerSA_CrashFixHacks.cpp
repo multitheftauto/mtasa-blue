@@ -1093,6 +1093,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post ( RwFrame* pFrameResult, DWORD
 
     // Couldn't find a replacement frame id
     SString strMsg ( "No frame for vehicle:%d  frameId:%d  (calledfrom:%08x)", iModelId, id, calledFrom );
+    AddReportLog ( 5413, SString ( "GetFrameFromId - %s", *strMsg ) );
     LogEvent ( 5413, "Model frame error", "GetFrameFromId", strMsg );
 
     return NULL;
@@ -1573,6 +1574,40 @@ void _declspec(naked) HOOK_printf ()
 }
 
 
+////////////////////////////////////////////////////////////////////////
+//
+// RwMatrixMultiply
+//
+// Check for invalid matix pointer
+//
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_RwMatrixMultiply_US             0x7F18B0
+#define HOOKSIZE_RwMatrixMultiply_US            6
+#define HOOKCHECK_RwMatrixMultiply_US           0x8B
+#define HOOKPOS_RwMatrixMultiply_EU             0x7F18F0
+#define HOOKSIZE_RwMatrixMultiply_EU            6
+#define HOOKCHECK_RwMatrixMultiply_EU           0x8B
+DWORD RETURN_RwMatrixMultiply_US =              0x7F18B6;
+DWORD RETURN_RwMatrixMultiply_EU =              0x7F18F6;
+DWORD RETURN_RwMatrixMultiply_BOTH =            0;
+void _declspec(naked) HOOK_RwMatrixMultiply()
+{
+    _asm
+    {
+        mov     eax, [esp+0Ch]
+        cmp     eax, 0x480
+        jb      cont  // Skip code if eax is low
+
+        mov     ecx, dword ptr ds:[0C979BCh] 
+        jmp     RETURN_RwMatrixMultiply_BOTH
+
+cont:
+        CRASH_AVERTED(31)
+        retn
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -1619,6 +1654,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
     EZHookInstallChecked ( CAnimManager_CreateAnimAssocGroups );
     EZHookInstall ( CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask );
     EZHookInstallChecked ( printf );
+    EZHookInstallChecked ( RwMatrixMultiply );
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

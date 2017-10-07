@@ -1,19 +1,31 @@
 # Please ensure your changes or patch meets minimum requirements.
-#   The minimum requirements are below, and they are 2.8.5. Please
-#   do not check in something for 2.8.12. To test your changes,
-#   please set up a Ubuntu 12.04 LTS system. Then, manually install
-#   Cmake 2.8.5 from http://cmake.org/Wiki/CMake_Released_Versions.
+#   The minimum requirements are 2.8.5. They roughly equate to Ubuntu 12.04 LTS
+#   Please do not check in something for 2.8.12 or 3.5.0. To test your changes,
+#   please set up a Ubuntu 12.04 LTS system. Then, manually install Cmake 2.8.5
+#   from http://cmake.org/Wiki/CMake_Released_Versions.
 
 cmake_minimum_required(VERSION 2.8.5 FATAL_ERROR)
 
 project(cryptopp)
 
+# Make RelWithDebInfo the default (it does e.g. add '-O2 -g -DNDEBUG' for GNU)
+#   If not in multi-configuration environments, no explicit build type or CXX 
+#   flags are set by the user and if we are the root CMakeLists.txt file.
+if (NOT CMAKE_CONFIGURATION_TYPES AND 
+    NOT CMAKE_NO_BUILD_TYPE AND
+    NOT CMAKE_BUILD_TYPE AND
+    NOT CMAKE_CXX_FLAGS AND
+    CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+	set(CMAKE_BUILD_TYPE RelWithDebInfo)
+endif()
+
 set(cryptopp_VERSION_MAJOR 5)
 set(cryptopp_VERSION_MINOR 6)
-set(cryptopp_VERSION_PATCH 3)
+set(cryptopp_VERSION_PATCH 5)
 
 include(GNUInstallDirs)
 include(TestBigEndian)
+include(CheckCXXCompilerFlag)
 
 #============================================================================
 # Settable options
@@ -33,12 +45,23 @@ set(CRYPTOPP_DATA_DIR "" CACHE PATH "Crypto++ test data directory")
 # Internal compiler options
 #============================================================================
 
+# Stop hiding the damn output...
+# set(CMAKE_VERBOSE_MAKEFILE on)
+
+# Always 1 ahead in Master. Also see http://groups.google.com/forum/#!topic/cryptopp-users/SFhqLDTQPG4
+set(LIB_VER ${cryptopp_VERSION_MAJOR}${cryptopp_VERSION_MINOR}${cryptopp_VERSION_PATCH})
+
+# Only set when cross-compiling, http://www.vtk.org/Wiki/CMake_Cross_Compiling
+if (NOT (CMAKE_SYSTEM_VERSION AND CMAKE_SYSTEM_PROCESSOR))
+	set(CRYPTOPP_CROSS_COMPILE 1)
+else()
+	set(CRYPTOPP_CROSS_COMPILE 0)
+endif()
+
 # Don't use RPATH's. The resulting binary could fail a security audit.
 if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
   set(CMAKE_MACOSX_RPATH 0)
 endif()
-
-set(LIB_VER ${cryptopp_VERSION_MAJOR}${cryptopp_VERSION_MINOR}${cryptopp_VERSION_PATCH})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 	add_definitions(-wd68 -wd186 -wd279 -wd327 -wd161 -wd3180)
@@ -63,12 +86,92 @@ if(NOT CRYPTOPP_DATA_DIR STREQUAL "")
 	add_definitions(-DCRYPTOPP_DATA_DIR="${CRYPTOPP_DATA_DIR}")
 endif()
 
+# We need the output 'uname -s' for Unix and Linux system detection
+if (NOT CRYPTOPP_CROSS_COMPILE)
+	set (UNAME_CMD "uname")
+	set (UNAME_ARG "-s")
+	execute_process(COMMAND ${UNAME_CMD} ${UNAME_ARG}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		RESULT_VARIABLE UNAME_RESULT
+		OUTPUT_VARIABLE UNAME_SYSTEM)
+		string(REGEX REPLACE "\n$" "" UNAME_SYSTEM "${UNAME_SYSTEM}")
+endif()
+
+# We need the output 'uname -m' for Unix and Linux platform detection
+if (NOT CRYPTOPP_CROSS_COMPILE)
+	set (UNAME_CMD "uname")
+	set (UNAME_ARG "-m")
+	execute_process(COMMAND ${UNAME_CMD} ${UNAME_ARG}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		RESULT_VARIABLE UNAME_RESULT
+		OUTPUT_VARIABLE UNAME_MACHINE)
+	string(REGEX REPLACE "\n$" "" UNAME_MACHINE "${UNAME_MACHINE}")
+endif()
+
 if(WINDOWS_STORE OR WINDOWS_PHONE)
 	if("${CMAKE_SYSTEM_VERSION}" MATCHES "10\\.0.*")
 		SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /D\"_WIN32_WINNT=0x0A00\"" )
 	endif()
 	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /FI\"winapifamily.h\"" )
 endif()
+
+# Enable PIC for all targets except Windows and 32-bit x86.
+#   Avoid on 32-bit x86 due to register pressures.
+if ((NOT CRYPTOPP_CROSS_COMPILE) AND (NOT (WINDOWS OR WINDOWS_STORE OR WINDOWS_PHONE)))
+	# Use Regex; match i386, i486, i586 and i686
+	if (NOT (${UNAME_MACHINE} MATCHES "i.86"))
+		SET(CMAKE_POSITION_INDEPENDENT_CODE 1)
+	endif()
+endif()
+
+# -march=native for GCC, Clang and ICC in any version that does support it.
+if ((NOT CRYPTOPP_CROSS_COMPILE) AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU|Intel"))
+	CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+	if (COMPILER_OPT_ARCH_NATIVE_SUPPORTED AND NOT CMAKE_CXX_FLAGS MATCHES "-march=")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+	endif()
+endif()
+
+# Solaris specific 
+if ((NOT CRYPTOPP_CROSS_COMPILE) AND "${UNAME_SYSTEM}" STREQUAL "SunOS")
+	# SunCC needs -native
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "SunPro")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -native")
+	endif()
+
+	# Determine 32-bit vs 64-bit
+	set (ISA_CMD "isainfo")
+	set (ISA_ARG "-b")
+	execute_process(COMMAND ${ISA_CMD} ${ISA_ARG}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		RESULT_VARIABLE ISA_RESULT
+		OUTPUT_VARIABLE ISA_INFO)
+	string(REGEX REPLACE "\n$" "" ISA_INFO "${ISA_INFO}")
+
+	# Set 64-bit or 32-bit
+	if ("${ISA_INFO}" STREQUAL "64")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+	else()
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+	endif()
+
+	# GCC needs to enable use of '/'
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,--divide")
+	endif()
+
+	# SunCC needs -native
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "SunPro")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -template=no%extdef")
+	endif()
+endif()
+
+# Link is driven through the compiler, but CXXFLAGS are not used. Also see
+#   http://public.kitware.com/pipermail/cmake/2003-June/003967.html
+if (NOT (WINDOWS OR WINDOWS_STORE OR WINDOWS_PHONE))
+	SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_FLAGS}")
+endif()
+
 #============================================================================
 # Sources & headers
 #============================================================================
@@ -77,13 +180,14 @@ endif()
 file(GLOB cryptopp_HEADERS *.h)
 
 # Test sources. You can use the GNUmakefile to generate the list: `make sources`.
-file(GLOB cryptopp_SOURCES_TEST bench1.cpp bench2.cpp test.cpp validat1.cpp validat2.cpp validat3.cpp adhoc.cpp datatest.cpp regtest.cpp fipsalgt.cpp dlltest.cpp fipstest.cpp)
+file(GLOB cryptopp_SOURCES_TEST test.cpp bench1.cpp bench2.cpp validat1.cpp validat2.cpp validat3.cpp adhoc.cpp datatest.cpp regtest.cpp fipsalgt.cpp dlltest.cpp fipstest.cpp)
 
 # Library sources. You can use the GNUmakefile to generate the list: `make sources`.
 file(GLOB cryptopp_SOURCES *.cpp)
 list(REMOVE_ITEM cryptopp_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/cryptlib.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/cpu.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/integer.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/pch.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/simple.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/winpipes.cpp
@@ -93,6 +197,7 @@ list(REMOVE_ITEM cryptopp_SOURCES
 set(cryptopp_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/cryptlib.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/cpu.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/integer.cpp
 		${cryptopp_SOURCES}
 		)
 
@@ -157,32 +262,6 @@ if (BUILD_SHARED)
 	endif()
 endif()
 
-# Set PIC
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-	# Enables -fPIC on all 64-bit platforms
-	if(NOT CMAKE_VERSION VERSION_LESS 2.8.9)	# POSITION_INDEPENDENT_CODE support
-		set_target_properties(cryptopp-object PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-	elseif(NOT CMAKE_VERSION VERSION_LESS 2.8.8)	# Object library support
-		get_target_property(flags_old cryptopp-object COMPILE_FLAGS)
-		set_target_properties(cryptopp-object PROPERTIES COMPILE_FLAGS "${flags_old} -fPIC")
-	else()
-		if (BUILD_STATIC)
-			get_target_property(flags_old_static cryptopp-static COMPILE_FLAGS)
-			if(NOT flags_old_static)
-				set(flags_old_static "")
-			endif()
-			set_target_properties(cryptopp-static PROPERTIES COMPILE_FLAGS "${flags_old_static} -fPIC")
-		endif()
-		if (BUILD_SHARED)
-			get_target_property(flags_old_shared cryptopp-shared COMPILE_FLAGS)
-			if(NOT flags_old_shared)
-				set(flags_old_shared "")
-			endif()
-			set_target_properties(cryptopp-shared PROPERTIES COMPILE_FLAGS "${flags_old_shared} -fPIC")
-		endif()
-	endif()
-endif()
-
 # Set filenames for targets to be "cryptopp"
 if(NOT MSVC)
 	set(COMPAT_VERSION ${cryptopp_VERSION_MAJOR}.${cryptopp_VERSION_MINOR})
@@ -213,12 +292,23 @@ endif()
 #============================================================================
 # Third-party libraries
 #============================================================================
+
 if(WIN32)
 	if (BUILD_STATIC)
 		target_link_libraries(cryptopp-static ws2_32)
 	endif()
 	if (BUILD_SHARED)
 		target_link_libraries(cryptopp-shared ws2_32)
+	endif()
+endif()
+
+# This may need to be expanded to "Solaris"
+if ("${UNAME_SYSTEM}" STREQUAL "SunOS")
+	if (BUILD_STATIC)
+		target_link_libraries(cryptopp-static nsl socket)
+	endif()
+	if (BUILD_SHARED)
+		target_link_libraries(cryptopp-shared nsl socket)
 	endif()
 endif()
 
@@ -233,6 +323,7 @@ endif()
 #============================================================================
 # Tests
 #============================================================================
+
 enable_testing()
 if(BUILD_TESTING)
 	add_executable(cryptest ${cryptopp_SOURCES_TEST})
@@ -258,6 +349,7 @@ endif()
 #============================================================================
 # Doxygen documentation
 #============================================================================
+
 if(BUILD_DOCUMENTATION)
 	find_package(Doxygen REQUIRED)
 
@@ -282,11 +374,19 @@ endif()
 #============================================================================
 # Install
 #============================================================================
+
 set(export_name "cryptopp-targets")
 
 # Runtime package
 if (BUILD_SHARED)
-	install(TARGETS cryptopp-shared EXPORT ${export_name} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	install(
+			TARGETS cryptopp-shared
+			EXPORT ${export_name}
+			DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+			LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	)
 endif()
 
 # Development package
@@ -310,8 +410,18 @@ if(BUILD_TESTING)
 	install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/TestVectors DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cryptopp)
 endif()
 
-
 # Documentation
 if(BUILD_DOCUMENTATION)
 	install(DIRECTORY "${out_source_DOCS_DIR}" DESTINATION ${CMAKE_INSTALL_DOCDIR})
+endif()
+
+# Print a configuration summary. We want CXX and CXXFLAGS, but they are not includd in ALL.
+if (NOT CMAKE_VERSION VERSION_LESS 3.0.2)
+	include(FeatureSummary)
+	message(STATUS "Compiler: ${CXX}")
+	message(STATUS "Flags: ${CMAKE_CXX_FLAGS}")
+	message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+	feature_summary(WHAT ALL
+		VAR cryptoppFeatures)
+        message(STATUS "${cryptoppFeatures}")
 endif()

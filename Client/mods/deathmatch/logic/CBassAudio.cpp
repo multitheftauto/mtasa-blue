@@ -183,9 +183,9 @@ bool CBassAudio::BeginLoadingMedia ( void )
 
         if ( !m_pBuffer )
         {
-            m_pSound = BASS_StreamCreateFile ( false, m_strPath, 0, 0, lCreateFlags );
+            m_pSound = BASS_StreamCreateFile ( false, FromUTF8(m_strPath), 0, 0, lCreateFlags|BASS_UNICODE );
             if ( !m_pSound )
-                m_pSound = BASS_MusicLoad ( false, m_strPath, 0, 0, BASS_MUSIC_RAMP|BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE, 0 );  // Try again
+                m_pSound = BASS_MusicLoad ( false, FromUTF8(m_strPath), 0, 0, BASS_MUSIC_RAMP|BASS_MUSIC_PRESCAN|BASS_STREAM_DECODE|BASS_UNICODE, 0 );  // Try again
             if ( !m_pSound && m_b3D )
                 m_pSound = ConvertFileToMono ( m_strPath );                       // Last try if 3D
         }
@@ -249,7 +249,7 @@ bool CBassAudio::BeginLoadingMedia ( void )
 //
 HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
 {
-    HSTREAM decoder = BASS_StreamCreateFile ( false, strPath, 0, 0, BASS_STREAM_DECODE | BASS_SAMPLE_MONO ); // open file for decoding
+    HSTREAM decoder = BASS_StreamCreateFile ( false, FromUTF8(strPath), 0, 0, BASS_STREAM_DECODE|BASS_SAMPLE_MONO|BASS_UNICODE ); // open file for decoding
     if ( !decoder )
         return 0; // failed
     DWORD length = static_cast <DWORD> ( BASS_ChannelGetLength ( decoder, BASS_POS_BYTE ) ); // get the length
@@ -359,7 +359,7 @@ void CBassAudio::PlayStreamIntern ( void* arguments )
         UnlockCallbackId();
 
         // This can take a while
-        HSTREAM pSound = BASS_StreamCreateURL ( strURL, 0, lFlags, NULL, NULL );
+        HSTREAM pSound = BASS_StreamCreateURL ( FromUTF8(strURL), 0, lFlags|BASS_UNICODE, NULL, NULL );
 
         CBassAudio* pBassAudio = LockCallbackId( arguments );
         if ( pBassAudio )
@@ -749,10 +749,10 @@ float CBassAudio::GetSoundBPM ( void )
     {
         float fData = 0.0f;
         // open the same file as played but for bpm decoding detection
-        DWORD bpmChan = BASS_StreamCreateFile ( false, m_strPath, 0, 0, BASS_STREAM_DECODE );
+        DWORD bpmChan = BASS_StreamCreateFile ( false, FromUTF8(m_strPath), 0, 0, BASS_STREAM_DECODE|BASS_UNICODE );
         if ( !bpmChan ) 
         {
-            bpmChan = BASS_MusicLoad ( false, m_strPath, 0, 0, BASS_MUSIC_DECODE|BASS_MUSIC_PRESCAN, 0 );
+            bpmChan = BASS_MusicLoad ( false, FromUTF8(m_strPath), 0, 0, BASS_MUSIC_DECODE|BASS_MUSIC_PRESCAN|BASS_UNICODE, 0 );
         }
         // detect bpm in background and return progress in GetBPM_ProgressCallback function
         if ( bpmChan ) 

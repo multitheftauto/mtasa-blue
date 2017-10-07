@@ -15,8 +15,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CREGISTEREDCOMMANDS_H
-#define __CREGISTEREDCOMMANDS_H
+#pragma once
 
 #include <list>
 
@@ -45,6 +44,9 @@ public:
 
     bool                                CommandExists                   ( const char* szKey, class CLuaMain* pLuaMain = NULL );
 
+    void                                GetCommands                     ( lua_State* luaVM );
+    void                                GetCommands                     ( lua_State* luaVM, CLuaMain* pTargetLuaMain );
+
     bool                                ProcessCommand                  ( const char* szKey, const char* szArguments, class CClient* pClient );
 
 private:
@@ -59,5 +61,3 @@ private:
 
     class CAccessControlListManager*    m_pACLManager;
 };
-
-#endif

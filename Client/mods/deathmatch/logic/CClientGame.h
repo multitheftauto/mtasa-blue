@@ -306,6 +306,8 @@ public:
     CRemoteCalls*                       GetRemoteCalls                  ( void )        { return m_pRemoteCalls; }
     CResourceFileDownloadManager*       GetResourceFileDownloadManager  ( void )        { return m_pResourceFileDownloadManager; }
 
+    inline SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler       ( void )        { return m_pAsyncTaskScheduler; }
+
     // Status toggles
     void                                ShowNetstat                     ( int iCmd );
     void                                ShowEaeg                        ( bool bShow );
@@ -434,7 +436,7 @@ public:
     void                                ChangeFloatPrecision            ( bool bHigh );
     bool                                IsHighFloatPrecision            ( void ) const;
 
-    bool                                TriggerBrowserRequestResultEvent( const std::vector<SString>& newPages );
+    bool                                TriggerBrowserRequestResultEvent( const std::unordered_set<SString>& newPages );
     void                                RestreamModel                   ( unsigned short usModel );
 
 private:
@@ -793,6 +795,8 @@ private:
     std::set < SString >                m_AllowKeyUpMap;
     uint                                m_uiPrecisionCallDepth;
     SString                             m_strFileCacheRoot;
+
+    SharedUtil::CAsyncTaskScheduler*    m_pAsyncTaskScheduler;
 };
 
 extern CClientGame* g_pClientGame;

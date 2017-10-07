@@ -525,7 +525,7 @@ RTREE_QUAL::~RTree()
 RTREE_TEMPLATE
 void RTREE_QUAL::Insert(const ELEMTYPE a_min[NUMDIMS], const ELEMTYPE a_max[NUMDIMS], const DATATYPE& a_dataId)
 {
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
   for(int index=0; index<NUMDIMS; ++index)
   {
     ASSERT(a_min[index] <= a_max[index]);
@@ -547,7 +547,7 @@ void RTREE_QUAL::Insert(const ELEMTYPE a_min[NUMDIMS], const ELEMTYPE a_max[NUMD
 RTREE_TEMPLATE
 void RTREE_QUAL::Remove(const ELEMTYPE a_min[NUMDIMS], const ELEMTYPE a_max[NUMDIMS], const DATATYPE& a_dataId)
 {
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
   for(int index=0; index<NUMDIMS; ++index)
   {
     ASSERT(a_min[index] <= a_max[index]);
@@ -569,7 +569,7 @@ void RTREE_QUAL::Remove(const ELEMTYPE a_min[NUMDIMS], const ELEMTYPE a_max[NUMD
 RTREE_TEMPLATE
 void RTREE_QUAL::Search(const ELEMTYPE a_min[NUMDIMS], const ELEMTYPE a_max[NUMDIMS], std::vector < DATATYPE >& resultList )
 {
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
   for(int index=0; index<NUMDIMS; ++index)
   {
     ASSERT(a_min[index] <= a_max[index]);
@@ -975,7 +975,7 @@ bool RTREE_QUAL::InsertRect(Rect* a_rect, const DATATYPE& a_id, Node** a_root, i
 {
   ASSERT(a_rect && a_root);
   ASSERT(a_level >= 0 && a_level <= (*a_root)->m_level);
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
   for(int index=0; index < NUMDIMS; ++index)
   {
     ASSERT(a_rect->m_min[index] <= a_rect->m_max[index]);
@@ -1125,8 +1125,8 @@ typename RTREE_QUAL::Rect RTREE_QUAL::CombineRect(Rect* a_rectA, Rect* a_rectB)
 
   for(int index = 0; index < NUMDIMS; ++index)
   {
-    newRect.m_min[index] = Min(a_rectA->m_min[index], a_rectB->m_min[index]);
-    newRect.m_max[index] = Max(a_rectA->m_max[index], a_rectB->m_max[index]);
+    newRect.m_min[index] = std::min(a_rectA->m_min[index], a_rectB->m_min[index]);
+    newRect.m_max[index] = std::max(a_rectA->m_max[index], a_rectB->m_max[index]);
   }
 
   return newRect;

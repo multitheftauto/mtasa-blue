@@ -31,7 +31,7 @@ public:
                         CSingularFileDownload           ( CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum serverChecksum );
                         ~CSingularFileDownload          ( void );
 
-        static void     DownloadFinishedCallBack       ( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode );
+        static void     DownloadFinishedCallBack       ( const SHttpDownloadResult& result );
 
         bool            DoesClientAndServerChecksumMatch ( void );
 

@@ -54,9 +54,9 @@ void CLatentTransferManager::DoPulse ( void )
     // Smooth out time between calls, with more resistance when rising
     int iBetweenCallsChange = iDeltaTimeMs - m_iTimeMsBetweenCalls;
     if ( iBetweenCallsChange > 0 )
-        m_iTimeMsBetweenCalls += Min ( iBetweenCallsChange, Max ( 1, m_iTimeMsBetweenCalls / 10 ) );   // 10% max when rising
+        m_iTimeMsBetweenCalls += std::min( iBetweenCallsChange, std::max ( 1, m_iTimeMsBetweenCalls / 10 ) );   // 10% max when rising
     else
-        m_iTimeMsBetweenCalls -= Min ( -iBetweenCallsChange, Max ( 1, m_iTimeMsBetweenCalls / 5 ) );  // 20% max when falling
+        m_iTimeMsBetweenCalls -= std::min( -iBetweenCallsChange, std::max ( 1, m_iTimeMsBetweenCalls / 5 ) );  // 20% max when falling
 
     m_iTimeMsBetweenCalls = Clamp ( 1, m_iTimeMsBetweenCalls, 100 );
 

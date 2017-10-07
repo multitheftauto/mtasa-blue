@@ -33,7 +33,7 @@ class CNetAPI;
 // SYNC SETTINGS
 #define TICK_RATE       ( g_TickRateSettings.iPureSync )
 #define CAM_SYNC_RATE   ( g_TickRateSettings.iCamSync )
-#define TICK_RATE_AIM   ( Min ( TICK_RATE, g_TickRateSettings.iKeySyncRotation ) )  // Keysync or puresync update the aim, so use the shortest interval
+#define TICK_RATE_AIM   ( std::min ( TICK_RATE, g_TickRateSettings.iKeySyncRotation ) )  // Keysync or puresync update the aim, so use the shortest interval
 
 enum eServerRPCFunctions
 {

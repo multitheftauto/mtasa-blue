@@ -107,8 +107,8 @@ protected:
 
     template<typename T> void ReadRadioArchive(std::ifstream& stream, T& value, std::size_t len = 1)
     {
-        static uint8 xor[] = { 0xEA, 0x3A, 0xC4, 0xA1, 0x9A, 0xA8, 0x14, 0xF3, 0x48, 0xB0, 0xD7, 0x23, 0x9D, 0xE8, 0xFF, 0xF1 };
-        uint8 xorPosition = stream.tellg() % sizeof(xor);
+        static uint8 xorkey[] = { 0xEA, 0x3A, 0xC4, 0xA1, 0x9A, 0xA8, 0x14, 0xF3, 0x48, 0xB0, 0xD7, 0x23, 0x9D, 0xE8, 0xFF, 0xF1 };
+        uint8 xorPosition = stream.tellg() % sizeof(xorkey);
 
         stream.read((char*) &value, sizeof(T) * len);
 
@@ -116,10 +116,10 @@ protected:
         // see gta_sa.exe @ 0x4F17D0
         for (unsigned int i = 0; i < sizeof(T) * len; ++i)
         {
-            ((char*) &value)[i] ^= xor[xorPosition];
+            ((char*) &value)[i] ^= xorkey[xorPosition];
 
             xorPosition++;
-            if (xorPosition >= sizeof(xor))
+            if (xorPosition >= sizeof(xorkey))
                 xorPosition = 0;
 
         }

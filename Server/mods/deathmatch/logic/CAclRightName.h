@@ -7,7 +7,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
-
+#pragma once
 
 //
 // Encapsulate a right name as a name and type

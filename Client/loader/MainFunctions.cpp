@@ -42,7 +42,7 @@ CLocalizationInterface* g_pLocalization = new CLocalizationDummy();
 // Start localization thingmy
 //
 //////////////////////////////////////////////////////////
-void InitLocalization( bool bNoFail )
+void InitLocalization( bool bShowErrors )
 {
     static bool bDone = false;
     if ( bDone )
@@ -53,7 +53,7 @@ void InitLocalization( bool bNoFail )
     SString strCoreDLL = PathJoin( GetLaunchPath(), "mta", MTA_DLL_NAME );
     if ( !FileExists ( strCoreDLL ) )
     {
-        if ( !bNoFail )
+        if ( !bShowErrors )
             return;
         DisplayErrorMessageBox ( ("Load failed.  Please ensure that "
                             "the file core.dll is in the modules "
@@ -66,31 +66,44 @@ void InitLocalization( bool bNoFail )
     const SString strMTASAPath = GetMTASAPath ();
     SetDllDirectory( PathJoin( strMTASAPath, "mta" ) );
 
-    // See if xinput is loadable (XInput9_1_0.dll is core.dll dependency)
-    HMODULE hXInputModule = LoadLibrary( "XInput9_1_0.dll" );
-    if ( hXInputModule )
-        FreeLibrary( hXInputModule );
-    else
+    DWORD dwPrevMode = SetErrorMode( SEM_FAILCRITICALERRORS );
+    // See if xinput is loadable (core.dll dependency)
+    for ( const SString& strModuleName : std::vector<SString>({"XInput9_1_0", "xinput1_3"}) )
     {
-        // If not, do hack to use dll supplied with MTA
-        SString strDest = PathJoin( strMTASAPath, "mta", "XInput9_1_0.dll" );
-        if ( !FileExists( strDest ) )
+        HMODULE hXInputModule = LoadLibrary( strModuleName + ".dll" );
+        if ( hXInputModule )
         {
-            SString strSrc = PathJoin( strMTASAPath, "mta", "XInput9_1_0_mta.dll" );       
-            FileCopy( strSrc, strDest );
+            FreeLibrary( hXInputModule );
+        }
+        else
+        {
+            // If xinput is not loadable, do hack to use dll supplied with MTA
+            SString strDest = PathJoin( strMTASAPath, "mta", strModuleName + ".dll" );
+            if ( !FileExists( strDest ) )
+            {
+                SString strSrc = PathJoin( strMTASAPath, "mta", strModuleName + "_mta.dll" );
+                if ( !FileExists( strSrc ) )
+                {
+                    // dll might only exist in launch directory during auto-update
+                    strSrc = PathJoin( GetLaunchPath(), "mta", strModuleName + "_mta.dll" );
+                }
+                FileCopy( strSrc, strDest );
+            }
         }
     }
 
-    // Check if the core can be loaded - failure may mean msvcr90.dll or d3dx9_40.dll etc is not installed
+    // Check if the core can be loaded - failure may mean d3dx9_40.dll etc is not installed
     // Use LOAD_WITH_ALTERED_SEARCH_PATH so the strCoreDLL path is searched first for dependent dlls
+    if ( bShowErrors )
+        SetErrorMode( dwPrevMode );
     HMODULE hCoreModule = LoadLibraryEx( strCoreDLL, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
+    SetErrorMode( dwPrevMode );
     if ( hCoreModule == NULL )
     {
-        if ( !bNoFail )
+        if ( !bShowErrors )
             return;
         DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2013 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed."), _E("CL24"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
+                            "the latest DirectX is correctly installed."), _E("CL24"), "core-not-loadable" );
         return ExitProcess( EXIT_ERROR );
     }
 
@@ -108,12 +121,11 @@ void InitLocalization( bool bNoFail )
     CLocalizationInterface* pLocalization = pFunc(strLocale);
     if ( pLocalization == NULL )
     {
-        if ( !bNoFail )
+        if ( !bShowErrors )
             return;
 
-        DisplayErrorMessageBox ( ("Loading core failed.  Please ensure that \n"
-                            "Microsoft Visual C++ 2013 Redistributable Package (x86) \n"
-                            "and the latest DirectX is correctly installed."), _E("CL26"), "vc-redist-missing" );  // Core.dll load failed.  Ensure VC++ Redists and DX are installed
+        DisplayErrorMessageBox ( ("Loading localization failed.  Please ensure that \n"
+                            "the latest DirectX is correctly installed."), _E("CL26"), "localization-not-loadable" );
         FreeLibrary ( hCoreModule );
         return ExitProcess( EXIT_ERROR );
     }
@@ -376,16 +388,28 @@ void HandleNotUsedMainMenu ( void )
         }
     }
 
-    // Check if Evolve is active
-    for ( auto processId : MyEnumProcesses( true ) )
+    // Check if problem processes are active
+    struct
     {
-        SString strFilename = ExtractFilename( GetProcessPathFilename( processId ) );
-        if ( strFilename.BeginsWithI( "Evolve" ) )
+        const char* szFilename;
+        const char* szProductName;
+        const char* szTrouble;
+    } procItems[] = {
+        {"Evolve", "Evolve", "not-used-menu-evolve"},
+        {"GbpSv.exe", "GAS Tecnologia - G-Buster Browser Defense", "not-used-menu-gbpsv"}};
+    for (uint i = 0; i < NUMELMS(procItems); i++ )
+    {
+        for ( auto processId : MyEnumProcesses( true ) )
         {
-            SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
-            strMessage += "\n\nEvolve";
-            DisplayErrorMessageBox ( strMessage, _E("CL43"), "not-used-menu-evolve" );
-            break;
+            SString strFilename = GetProcessFilename( processId );
+            if ( strFilename.BeginsWithI( procItems[i].szFilename ) )
+            {
+                SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
+                strMessage += "\n\n";
+                strMessage += procItems[i].szProductName;
+                DisplayErrorMessageBox ( strMessage, _E("CL43"), procItems[i].szTrouble );
+                break;
+            }
         }
     }
 }
@@ -447,7 +471,10 @@ void PreLaunchWatchDogs ( void )
     // Check for unclean stop on previous run
 #ifndef MTA_DEBUG
     if ( WatchDogIsSectionOpen ( "L0" ) )
+	{
         WatchDogSetUncleanStop ( true );    // Flag to maybe do things differently if MTA exit code on last run was not 0
+		CheckAndShowFileOpenFailureMessage();
+	}
     else
 #endif
         WatchDogSetUncleanStop ( false );
@@ -551,6 +578,7 @@ void HandleIfGTAIsAlreadyRunning( void )
     {
         if ( MessageBoxUTF8 ( 0, _("An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"), _("Information")+_E("CL10"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST ) == IDYES )
         {
+            TerminateOtherMTAIfRunning();
             TerminateGTAIfRunning ();
             if ( IsGTARunning () )
             {
@@ -1066,7 +1094,11 @@ int LaunchGame ( SString strCmdLine )
     SString strMtaDir = PathJoin( strMTASAPath, "mta" );
 
     SetDllDirectory( strMtaDir );
-    CheckService ( CHECK_SERVICE_PRE_CREATE );
+    if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())
+    {
+        RelaunchAsAdmin(strCmdLine, _("Fix configuration issue"));
+        ExitProcess(EXIT_OK);
+    }
 
     // Do some D3D things
     BeginD3DStuff();
@@ -1115,9 +1147,8 @@ int LaunchGame ( SString strCmdLine )
         if ( dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin )
         {
             // Try to relaunch as admin if not done so already
-            ReleaseSingleInstanceMutex ();
-            ShellExecuteNonBlocking( "runas", PathJoin ( strMTASAPath, MTA_EXE_NAME ), strCmdLine + " /done-admin" );            
-            return 5;
+            RelaunchAsAdmin(strCmdLine + " /done-admin", _("Fix elevation required error"));
+            ExitProcess(EXIT_OK);
         }
         else
         {

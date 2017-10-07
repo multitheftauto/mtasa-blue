@@ -58,12 +58,12 @@ void CClientTextDisplay::Render ( void )
         if ( m_ulFormat & DT_BOTTOM )
             m_ulFormat |= DT_SINGLELINE;
 
-        unsigned int uiShadowOffset = Max ( 1, (int)(m_fScale * m_fGlobalScale) );
+        unsigned int uiShadowOffset = std::max ( 1, (int)(m_fScale * m_fGlobalScale) );
         SColorRGBA rgbaShadowColor ( 0, 0, 0, m_Color.A * m_ucShadowAlpha / 255 );
 
         if ( rgbaShadowColor.A > 0 )
-            g_pCore->GetGraphics ()->DrawText ( uiX + uiShadowOffset, uiY + uiShadowOffset, uiX + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_strCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
-        g_pCore->GetGraphics ()->DrawText ( uiX, uiY, uiX, uiY, m_Color, m_strCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
+            g_pCore->GetGraphics ()->DrawString ( uiX + uiShadowOffset, uiY + uiShadowOffset, uiX + uiShadowOffset, uiY + uiShadowOffset, rgbaShadowColor, m_strCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
+        g_pCore->GetGraphics ()->DrawString ( uiX, uiY, uiX, uiY, m_Color, m_strCaption, m_fScale * m_fGlobalScale, m_fScale * m_fGlobalScale, m_ulFormat | DT_NOCLIP );        
     }
 }
 

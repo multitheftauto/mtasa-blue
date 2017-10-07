@@ -162,7 +162,7 @@ void WriteProcessMemoryChecked( HANDLE hProcess, void* dest, const void* src, ui
     if ( oldvalues )
     {
         char temp[30];
-        uint numBytesToCheck = Min( sizeof( temp ), size );
+        uint numBytesToCheck = std::min( sizeof( temp ), size );
         SIZE_T numBytesRead = 0;
         _ReadProcessMemory ( hProcess, dest, temp, numBytesToCheck, &numBytesRead );
         if ( memcmp( temp, oldvalues, numBytesToCheck ) )
@@ -178,7 +178,7 @@ void WriteProcessMemoryChecked( HANDLE hProcess, void* dest, const void* src, ui
     // Verify bytes were written ok
     {
         char temp[30];
-        uint numBytesToCheck = Min( sizeof( temp ), size );
+        uint numBytesToCheck = std::min( sizeof( temp ), size );
         SIZE_T numBytesRead = 0;
         _ReadProcessMemory ( hProcess, dest, temp, numBytesToCheck, &numBytesRead );
         if ( memcmp( temp, src, numBytesToCheck ) || numBytesRead != numBytesToCheck )
@@ -351,6 +351,7 @@ WString devicePathToWin32Path ( const WString& strDevicePath )
 
 typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPWSTR lpExeName, __inout PDWORD lpdwSize);
 
+
 ///////////////////////////////////////////////////////////////////////////
 //
 // GetProcessPathFilename
@@ -433,6 +434,35 @@ SString GetProcessPathFilename ( DWORD processID )
     }
 
     return "";
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+// GetProcessFilename
+//
+// More reliable than GetProcessPathFilename, but no path
+//
+///////////////////////////////////////////////////////////////////////////
+SString GetProcessFilename(DWORD processID)
+{
+    SString strFilename;
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32W pe = {sizeof(PROCESSENTRY32W)};
+    if( Process32FirstW(hSnapshot, &pe))
+    {
+    	do
+        {
+    		if (pe.th32ProcessID == processID)
+            {
+                strFilename = ToUTF8(pe.szExeFile);
+                break;
+    		}
+    	}
+        while( Process32NextW(hSnapshot, &pe));
+    }
+    CloseHandle(hSnapshot);
+    return strFilename;
 }
 
 
@@ -698,12 +728,6 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
         SetRegistryValue ( "", "Last Run Path Hash", strHash );
         SetRegistryValue ( "", "Last Run Path Version", MTA_DM_ASE_VERSION );
 
-        // Also save for legacy 1.0 to see
-        SString strThisVersion = SStringX ( MTA_DM_ASE_VERSION ).TrimEnd ( "n" );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path", strLaunchPathFilename );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Hash", strHash );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Version", MTA_DM_ASE_VERSION );
-
         // Strip the module name out of the path.
         SString strLaunchPath = GetLaunchPath();
 
@@ -792,11 +816,6 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 
     // Try HKLM "SOFTWARE\\Multi Theft Auto: San Andreas All\\Common\\"
     pathList.push_back ( GetCommonRegistryValue ( "", "GTA:SA Path" ) );
-    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.0\\"
-    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.0", "", "GTA:SA Path" ) );
-    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.1\\"
-    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.1", "", "GTA:SA Path Backup" ) );
-
 
     // Unicode character check on first one
     if ( strlen( pathList[0].c_str () ) )
@@ -944,6 +963,63 @@ bool HasGTAPath ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// GetPEFileOffsets
+//
+// Get some commonly used file offsets
+//
+///////////////////////////////////////////////////////////////
+void GetPEFileOffsets(SPEFileOffsets& outOffsets, const SString& strGTAEXEPath)
+{
+    outOffsets = {0};
+    long NtHeaders = 0;
+    ReadFileValue(strGTAEXEPath, NtHeaders, offsetof(IMAGE_DOS_HEADER, e_lfanew));
+    outOffsets.TimeDateStamp = NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.TimeDateStamp);
+    outOffsets.Characteristics = NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.Characteristics);
+    outOffsets.AddressOfEntryPoint = NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader.AddressOfEntryPoint);
+    outOffsets.DllCharacteristics = NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader.DllCharacteristics);
+
+    ushort usSizeOfOptionalHeader = 0;
+    ReadFileValue(strGTAEXEPath, usSizeOfOptionalHeader, NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.SizeOfOptionalHeader));
+    ReadFileValue(strGTAEXEPath, outOffsets.sections[0].PointerToRawData, NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader) + usSizeOfOptionalHeader + offsetof(IMAGE_SECTION_HEADER, PointerToRawData));
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// GetGtaFileVersion
+//
+// Hardcoded numbers used:
+//  0x44 - File offset 0x44 is zero in legacy DOS stub. Encrypted exe does not have this.
+//  0x347ADD is the section offset equivalent of 0x748ADD as used in CGameSA::FindGameVersion
+//  0x53FF and 0x840F are also used in CGameSA::FindGameVersion
+//
+///////////////////////////////////////////////////////////////
+EGtaFileVersion GetGtaFileVersion(const SString& strGTAEXEPath)
+{
+    SPEFileOffsets fileOffsets;
+    GetPEFileOffsets(fileOffsets, strGTAEXEPath);
+
+    char bIsEncypted = false;
+    ushort usIdBytes = 0;
+    ReadFileValue(strGTAEXEPath, bIsEncypted, 0x44);
+    ReadFileValue(strGTAEXEPath, usIdBytes, 0x347ADD + fileOffsets.sections[0].PointerToRawData);
+
+    EGtaFileVersion versionType = EGtaFileVersion::Unknown;
+    if (usIdBytes == 0x53FF)
+        versionType = EGtaFileVersion::US;
+    else
+    if (usIdBytes == 0x840F)
+        versionType = EGtaFileVersion::EU;
+    else
+    if (bIsEncypted)
+        versionType = EGtaFileVersion::Encrypted;
+
+    return versionType;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // FindFilesRecursive
 //
 // Return a list of files inside strPath
@@ -996,7 +1072,7 @@ void FindRelevantFiles ( const SString& strPath, std::vector < SString >& outFil
             // Update progress bar if visible
             int NumItems = outFilePathList.size () + outDirPathList.size ();
             int MaxItems = ( MaxFiles ? MaxFiles : 25000 ) + ( MaxDirs ? MaxDirs : 5000 );
-            if ( UpdateProgress ( Min ( NumItems, MaxItems ), MaxItems * 2, "Checking files..." ) )
+            if ( UpdateProgress ( std::min ( NumItems, MaxItems ), MaxItems * 2, "Checking files..." ) )
                 return;
         }
 
@@ -1134,20 +1210,6 @@ bool IsWindows10Threshold2OrGreater ( void )
 
 ///////////////////////////////////////////////////////////////
 //
-// IsVS2013RuntimeInstalled
-//
-// Only checks registry settings, so install could still be invalid
-//
-///////////////////////////////////////////////////////////////
-bool IsVS2013RuntimeInstalled( void )
-{
-    SString strInstall = GetSystemRegistryValue( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\12.0\\RuntimeMinimum", "Install" );
-    return strInstall == "\x01";
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // IsUserAdmin
 //
 //
@@ -1188,17 +1250,20 @@ Return Value:
 }
 
 
-static SString HashBuffer ( char* pData, uint uiLength )
+//////////////////////////////////////////////////////////
+//
+// RelaunchAsAdmin
+//
+// Relaunch as admin if user agrees
+//
+//////////////////////////////////////////////////////////
+void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason)
 {
-    DWORD dwSum1 = 0;
-    DWORD dwSum2 = 0x1234;
-    for ( uint i = 0 ; i < uiLength ; i++ )
-    {
-        dwSum1 += pData[i];
-        dwSum2 += pData[i];
-        dwSum2 ^= ( dwSum2 << 2 ) + 0x93;
-    }
-    return SString ( "%08x%08x%08x", dwSum1, dwSum2, uiLength );
+    HideSplash();
+    AddReportLog(7115, SString("Loader - Request to elevate privilages (%s)", *strReason));
+    MessageBoxUTF8(NULL, SString ( _("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *strReason), "Multi Theft Auto: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+    ReleaseSingleInstanceMutex();
+    ShellExecuteNonBlocking("runas", PathJoin(GetMTASAPath(), MTA_EXE_NAME), strCmdLine);            
 }
 
 
@@ -1284,6 +1349,10 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
     HMODULE hModule = GetLibraryHandle ( strFilename, &dwLastError );
     if ( hModule )
     {
+        typedef void (*PFNINITNETREV) ( const char*, const char*, const char* );
+        PFNINITNETREV pfnInitNetRev = static_cast < PFNINITNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "InitNetRev" ) ) );
+        if ( pfnInitNetRev )
+            pfnInitNetRev ( GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion() );
         typedef unsigned short (*PFNGETNETREV) ( void );
         PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
         if ( pfnGetNetRev )
@@ -1397,11 +1466,26 @@ bool Is32bitProcess ( DWORD processID )
 ///////////////////////////////////////////////////////////////////////////
 void TerminateProcess( DWORD dwProcessID, uint uiExitCode )
 {
-    HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, dwProcessID );
-    if ( hProcess )
+    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
+    if ( hModule )
     {
-        TerminateProcess( hProcess, uiExitCode );
-        CloseHandle( hProcess );
+        typedef bool (*PFNTerminateProcess) ( uint, uint );
+        PFNTerminateProcess pfnTerminateProcess = static_cast< PFNTerminateProcess > ( static_cast < PVOID > ( GetProcAddress ( hModule, "NtTerminateProcess" ) ) );
+
+        if ( pfnTerminateProcess )
+        {
+            bool bResult = pfnTerminateProcess ( dwProcessID, uiExitCode );
+            AddReportLog ( 8070, SString ( "TerminateProcess %d result: %d", dwProcessID, bResult ) );
+        }
+        else
+        {
+            HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, dwProcessID );
+            if ( hProcess )
+            {
+                TerminateProcess( hProcess, uiExitCode );
+                CloseHandle( hProcess );
+            }
+        }
     }
 }
 
@@ -1636,7 +1720,7 @@ void DirectoryCopy ( SString strSrcBase, SString strDestBase, bool bShowProgress
         fProgress += 0.5f;
         fUseProgress = fProgress;
         if ( fUseProgress > 50 )
-            fUseProgress = Min ( 100.f, pow ( fUseProgress - 50, 0.6f ) + 50 );
+            fUseProgress = std::min ( 100.f, pow ( fUseProgress - 50, 0.6f ) + 50 );
 
         SString strPathHereBaseRel = toDoList.front ();
         toDoList.pop_front ();
@@ -1687,7 +1771,7 @@ stop_copy:
         }
         else
         {
-            fUseProgress = Max ( 90.f, fUseProgress );
+            fUseProgress = std::max ( 90.f, fUseProgress );
             UpdateProgress ( (int)fUseProgress, 100, _("Finishing...") );
             Sleep ( 1000 );
             UpdateProgress ( 100, 100, _("Done!") );
@@ -1750,7 +1834,7 @@ void MaybeShowCopySettingsDialog ( void )
     // Copy some directories if empty
     SString strCurrentNewsDir = PathJoin ( GetMTADataPath (), "news" );
 
-    SString strPreviousDataPath = PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", strPreviousVersion );
+    SString strPreviousDataPath = PathJoin ( GetSystemCommonAppDataPath(), GetProductCommonDataDir(), strPreviousVersion );
     SString strPreviousNewsDir = PathJoin ( strPreviousDataPath, "news" );
 
     if ( IsDirectoryEmpty( strCurrentNewsDir ) && DirectoryExists( strPreviousNewsDir ) )
@@ -1771,6 +1855,7 @@ bool CheckAndShowFileOpenFailureMessage ( void )
 
     if ( !strFilename.empty () )
     {
+	    SetApplicationSetting( "diagnostics", "gta-fopen-fail", "" );
         SString strMsg ( _("GTA:SA had trouble opening the file '%s'"), *strFilename );
         DisplayErrorMessageBox ( strMsg, _E("CL31"), SString( "gta-fopen-fail&name=%s", *strFilename ) );
         return true;
@@ -1995,31 +2080,27 @@ void BsodDetectionOnGameEnd( void )
 // Message to advise against running certain other programs
 //
 //////////////////////////////////////////////////////////
-void ForbodenProgramsMessage ( void )
+void ForbodenProgramsMessage(void)
 {
-    std::vector < SString > forbodenList;
-    forbodenList.push_back( "ProcessHacker" );
-    forbodenList.push_back( "CheatEngine" );
-
-    SString strResult;
-    for ( auto processId : MyEnumProcesses( true ) )
+    std::vector<SString> forbodenList = {"ProcessHacker", "CheatEngine", "PCHunter"};
+    std::vector<SString> foundList;
+    for (auto processId : MyEnumProcesses(true))
     {
-        SString strPathFilename = GetProcessPathFilename ( processId );
-        SString strFilename = ExtractFilename( strPathFilename );
-        for ( auto forbodenName : forbodenList )
+        SString strFilename = ExtractFilename(GetProcessPathFilename(processId));
+        for (const auto& forbodenName : forbodenList)
         {
-            if ( strFilename.Replace( " ", "" ).BeginsWithI( forbodenName ) )
-                strResult += strFilename + "\n";
+            if (strFilename.Replace(" ", "").BeginsWithI(forbodenName) )
+                foundList.push_back(strFilename);
         }
     }
 
-    if ( !strResult.empty() )
+    if (!foundList.empty())
     {
         SString strMessage = _("Please terminate the following programs before continuing:");
         strMessage += "\n\n";
-        strMessage += strResult;
-        DisplayErrorMessageBox ( strMessage, _E("CL39"), "forboden-programs" );
-        WriteDebugEventAndReport( 6550, SString( "Showed forboden programs list (%s)", *strResult.Replace( "\n", "" ) ) );
+        strMessage += SString::Join("\n", foundList);
+        DisplayErrorMessageBox(strMessage, _E("CL39"), "forboden-programs");
+        WriteDebugEventAndReport(6550, SString( "Showed forboden programs list (%s)", *SString::Join(",", foundList)));
     }
 }
 

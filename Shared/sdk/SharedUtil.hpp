@@ -20,10 +20,10 @@
 #include "SharedUtil.File.hpp"
 #include "SharedUtil.Time.hpp"
 #include "SharedUtil.Game.hpp"
-#include "SharedUtil.Math.hpp"
 #include "SharedUtil.Hash.hpp"
 #if defined(SHARED_UTIL_WITH_SYS_INFO)
     #include "SharedUtil.SysInfo.hpp"
 #endif
 #include "SharedUtil.Profiling.hpp"
 #include "SharedUtil.Logging.hpp"
+#include "SharedUtil.AsyncTaskScheduler.hpp"

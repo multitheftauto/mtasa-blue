@@ -243,7 +243,11 @@ public:
             resultList.push_back ( &iter->second );
         }
 
-        sort_inline ( resultList.begin (), resultList.end (), ( const SSectionInfo* a, const SSectionInfo* b ) { return a->totalTime > b->totalTime; } );
+        std::sort(resultList.begin(), resultList.end(), 
+            [](const SSectionInfo* a, const SSectionInfo* b) 
+        { 
+            return a->totalTime > b->totalTime; 
+        });
 
 
         // Output to string

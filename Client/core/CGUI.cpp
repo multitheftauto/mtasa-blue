@@ -152,10 +152,6 @@ void CLocalGUI::CreateWindows ( bool bGameIsAlreadyLoaded )
     m_pConsole = new CConsole ( pGUI );
     m_pConsole->SetVisible ( false );
 
-    // Create community registration window
-    m_CommunityRegistration.CreateWindows ();
-    m_CommunityRegistration.SetVisible ( false );
-
     // Create our news headlines if we're already ingame
     if ( bGameIsAlreadyLoaded )
         m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
@@ -204,7 +200,6 @@ void CLocalGUI::DestroyObjects ( void )
 
 void CLocalGUI::DoPulse ( void )
 {
-    m_CommunityRegistration.DoPulse ();
     m_pVersionUpdater->DoPulse ();
 
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
@@ -530,10 +525,9 @@ void CLocalGUI::EchoChat ( const char* szText, bool bColorCoded )
 
 bool CLocalGUI::IsWebRequestGUIVisible ()
 {
-    auto pWebCore = g_pCore->GetWebCore ();
-    if ( pWebCore )
+    if ( g_pCore->IsWebCoreLoaded () )
     {
-        return pWebCore->IsRequestsGUIVisible ();
+        return g_pCore->GetWebCore ()->IsRequestsGUIVisible ();
     }
     return false;
 }
@@ -767,8 +761,15 @@ void CLocalGUI::UpdateCursor ( void )
             CCore::GetSingleton ().GetGame ()->GetPad ()->Disable ( false );
             CCore::GetSingleton ().GetGame ()->GetPad ()->Clear ();*/
 
+            // Update stored position
+            POINT point;
+            GetCursorPos(&point);
+
+            m_StoredMousePosition.x = point.x;
+            m_StoredMousePosition.y = point.y;
+
             // Set the mouse back to the center of the screen (to prevent the game from reacting to its movement)
-            SetCursorPos ( dwWidth / 2, dwHeight / 2 );
+            SetCursorPos ( dwWidth / 2, dwHeight / 2, false, false );
 
             // Disable our mouse cursor
             CSetCursorPosHook::GetSingleton ( ).EnableSetCursorPos ();
@@ -812,11 +813,14 @@ DWORD CLocalGUI::TranslateScanCodeToGUIKey ( DWORD dwCharacter )
     }
 }
 
-void CLocalGUI::SetCursorPos ( int iX, int iY, bool bForce )
+void CLocalGUI::SetCursorPos ( int iX, int iY, bool bForce, bool overrideStored )
 {
     // Update the stored position
-    m_StoredMousePosition.x = iX;
-    m_StoredMousePosition.y = iY;
+    if (overrideStored)
+    {
+        m_StoredMousePosition.x = iX;
+        m_StoredMousePosition.y = iY;
+    }
 
     // Apply the position
     if ( bForce )

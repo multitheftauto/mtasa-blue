@@ -178,7 +178,7 @@ void CPerfStatLuaMemoryImpl::UpdateLuaMemory ( CLuaMain* pLuaMain, int iMemUsed 
 
     pLuaMainMemory->Delta += iMemUsed - pLuaMainMemory->Current;
     pLuaMainMemory->Current = iMemUsed;
-    pLuaMainMemory->Max = Max ( pLuaMainMemory->Max, pLuaMainMemory->Current );
+    pLuaMainMemory->Max = std::max ( pLuaMainMemory->Max, pLuaMainMemory->Current );
 
     pLuaMainMemory->OpenXMLFiles = pLuaMain->GetXMLFileCount ();
     pLuaMainMemory->OpenFiles = pLuaMain->GetOpenFileCount ();

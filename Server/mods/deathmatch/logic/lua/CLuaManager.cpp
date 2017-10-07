@@ -233,6 +233,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "addCommandHandler", CLuaFunctionDefs::AddCommandHandler );
     CLuaCFunctions::AddFunction ( "removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler );
     CLuaCFunctions::AddFunction ( "executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler );
+    CLuaCFunctions::AddFunction ( "getCommandHandlers", CLuaFunctionDefs::GetCommandHandlers );
 
     // Server standard funcs
     CLuaCFunctions::AddFunction ( "getMaxPlayers", CLuaFunctionDefs::GetMaxPlayers );
@@ -327,7 +328,10 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData );
     CLuaCFunctions::AddFunction ( "getNetworkStats", CLuaFunctionDefs::GetNetworkStats );
     CLuaCFunctions::AddFunction ( "getLoadedModules", CLuaFunctionDefs::GetModules );
-    CLuaCFunctions::AddFunction ( "getModuleInfo", CLuaFunctionDefs::GetModuleInfo );
+    CLuaCFunctions::AddFunction( "getModuleInfo", CLuaFunctionDefs::GetModuleInfo );
+
+    CLuaCFunctions::AddFunction("setDevelopmentMode", CLuaFunctionDefs::SetDevelopmentMode);
+    CLuaCFunctions::AddFunction("getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode);
 
     // Backward compat functions at the end, so the new function name is used in ACL
 

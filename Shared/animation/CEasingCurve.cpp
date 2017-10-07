@@ -12,7 +12,7 @@
 
 #include "CEasingCurve.h"
 
-#include "EasingEquations.cpp" //Included from cpp to separate just visually maths equations from framework
+#include "EasingEquations.hpp" //Included from cpp to separate just visually maths equations from framework
 
 //For easing functions that require more parameters than time (like amplitude, period, overshot)
 class CComplexEasingFunction

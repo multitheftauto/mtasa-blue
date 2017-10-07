@@ -1,0 +1,505 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-01-18 20:19\n"
+"PO-Revision-Date: 2015-09-05 15:28+0000\n"
+"Last-Translator: Eren <erenyucel38@hotmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
+"Translators: Furkan \"furkanozden\" Özden; Avenger; Semih; Darkneblade; "
+"Oguzcan \"Cena\" Uyar; Colegon; Samurai; Mert; Dan \"Talidan\" Chowdhury; "
+"WindowsOttoman; RaceXtreme; Oguzcan; ccw; Cynydlan; Eren \"Eren07\" Yücel; "
+"TRFURKAN; velona77\n"
+"X-POOTLE-MTIME: 1441466906.0\n"
+
+#. WELCOME_TEXT
+#: ../Shared/installer/nightly.nsi:183
+msgid ""
+"This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n"
+"\n"
+"It is recommended that you close all other applications before starting Setup.\n"
+"\n"
+"[Admin access may be requested for Vista and up]\n"
+"\n"
+"Click Next to continue."
+msgstr ""
+"Bu sihirbaz kurulum ve güncelleştirme için size eşlik edecek. $(^Name) "
+"${REVISION_TAG}\n"
+"\n"
+"Kurulum başlamadan önce arka planda çalışan uygulamaları kapatmanız "
+"önerilir. Setup.\n"
+"\n"
+"[Admin access may be requested for Vista and up]\n"
+"\n"
+"Devam etmek için tıklayın."
+
+#. HEADER_Text
+#: ../Shared/installer/nightly.nsi:184
+msgid "Grand Theft Auto: San Andreas location"
+msgstr "Grand Theft Auto: San Andreas konumu"
+
+#. DIRECTORY_Text_Dest
+#: ../Shared/installer/nightly.nsi:185
+msgid "Grand Theft Auto: San Andreas folder"
+msgstr "Grand Theft Auto: San Andreas klasörü"
+
+#. DIRECTORY_Text_Top
+#: ../Shared/installer/nightly.nsi:186
+msgid ""
+"Please select your Grand Theft Auto: San Andreas folder.$\n"
+"$\n"
+"You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
+"$\n"
+"Click Install to begin installing."
+msgstr ""
+"Lütfen Grand Theft Auto: San Andreas folder.$\n"
+" oyununun kurulu olduğu yeri seçin.$\n"
+"Grand Theft Auto: San Andreas 1.0 yüklü olması gerekir. MTA:SA, diğer "
+"sürümleri desteklemez.$\n"
+"$\n"
+"Kurulumu başlatmak için tıklayın."
+
+#. DESC_Section10
+#: ../Shared/installer/nightly.nsi:189
+msgid "Create a Start Menu group for installed applications"
+msgstr "Yüklü uygulamalar için başlat menüsü grubu oluştur."
+
+#. DESC_Section11
+#: ../Shared/installer/nightly.nsi:190
+msgid "Create a Desktop Shortcut for the MTA:SA Client."
+msgstr "MTA:SA masaüstü kısayolu oluştur."
+
+#. DESC_Section12
+#: ../Shared/installer/nightly.nsi:191
+msgid "Register mtasa:// protocol for browser clickable-ness."
+msgstr "Tarayıcınızda tıklanabilir mtasa:// protokolü için kaydolun."
+
+#. DESC_Section13
+#: ../Shared/installer/nightly.nsi:192
+msgid "Add to Windows Games Explorer (if present)."
+msgstr "Windows Games Tarayıcısına ekleyin. (Varsa)"
+
+#. DESC_Section1
+#: ../Shared/installer/nightly.nsi:193
+msgid "The core components required to run Multi Theft Auto."
+msgstr "Temel bileşenler Multi Theft Auto çalıştırmak için gerekli."
+
+#. DESC_Section2
+#: ../Shared/installer/nightly.nsi:194
+msgid "The MTA:SA modification, allowing you to play online."
+msgstr "MTA : SA Değişiktir . Online oynamak için sizi bekliyor ."
+
+#. DESC_SectionGroupServer
+#: ../Shared/installer/nightly.nsi:197
+msgid ""
+"The Multi Theft Auto Server. This allows you to host games from your "
+"computer. This requires a fast internet connection."
+msgstr ""
+"Multi Theft Auto Sunucusu. Bu bilgisayarınızdan oyunlar için ev sahipliği "
+"sağlar. Bu hızlı bir internet bağlantısı gerektirir."
+
+#. DESC_Section4
+#: ../Shared/installer/nightly.nsi:198
+msgid "The Multi Theft Auto server. This is a required component."
+msgstr "Multi Theft Auto sunucusu. Bu gerekli bir bileşenidir."
+
+#. DESC_Section5
+#: ../Shared/installer/nightly.nsi:199
+msgid "The MTA:SA modification for the server."
+msgstr "MTA:SA bu sunucu için özelleştirilmiş."
+
+#. DESC_Section6
+#: ../Shared/installer/nightly.nsi:200
+msgid "This is a set of required resources for your server."
+msgstr "Bu sunucu için gerekli kaynakların listesi."
+
+#. DESC_Section7
+#: ../Shared/installer/nightly.nsi:201
+msgid "This is an optional set of gamemodes and maps for your server."
+msgstr "Bu sunucu için oyun modları ve haritaların isteğe bağlı bir kümesidir."
+
+#. DESC_Section8
+#: ../Shared/installer/nightly.nsi:202
+msgid ""
+"The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
+"for use in gamemodes for MTA."
+msgstr ""
+"MTA:SA 1.0 Harita Editörü. Kendi haritalarınızı oluşturmak için "
+"kullanabilirsiniz."
+
+#. DESC_Section9
+#: ../Shared/installer/nightly.nsi:203
+msgid ""
+"This is the SDK for creating binary modules for the MTA server. Only install"
+" if you have a good understanding of C++!"
+msgstr ""
+"SDK, MTA sunucuları için ikili modül oluşturmada kullanılır. Sadece C++ "
+"dilini biliyorsanız kurun!"
+
+#. DESC_SectionGroupDev
+#: ../Shared/installer/nightly.nsi:205
+msgid ""
+"Development code and tools that aid in the creation of mods for Multi Theft "
+"Auto"
+msgstr ""
+"Geliştirici kodları ve araçlar Multi Theft Auto için mod oluşturmada "
+"yardımcı olur"
+
+#. DESC_SectionGroupClient
+#: ../Shared/installer/nightly.nsi:206
+msgid "The client is the program you run to play on a Multi Theft Auto server"
+msgstr ""
+"İstemci bir Multi Theft Auto sunucusu üzerinde oynamak için çalışan bir "
+"programdır"
+
+#. INST_CLIENTSERVER
+#: ../Shared/installer/nightly.nsi:406
+msgid "Client and Server"
+msgstr "İstemci ve Sunucu"
+
+#. INST_SERVER
+#: ../Shared/installer/nightly.nsi:407
+msgid "Server only"
+msgstr "Sadece sunucu"
+
+#. INST_STARTMENU_GROUP
+#: ../Shared/installer/nightly.nsi:421
+msgid "Start menu group"
+msgstr "Başlat menüsü"
+
+#. INST_DESKTOP_ICON
+#: ../Shared/installer/nightly.nsi:422
+msgid "Desktop icon"
+msgstr "Masaüstü simgesi"
+
+#. INST_PROTOCOL
+#: ../Shared/installer/nightly.nsi:423
+msgid "Register mtasa:// protocol"
+msgstr "mtasa:// protokolüne kaydol"
+
+#. INST_GAMES_EXPLORER
+#: ../Shared/installer/nightly.nsi:424
+msgid "Add to Games Explorer"
+msgstr "Oyun tarayıcısına ekle"
+
+#. INST_SEC_CLIENT
+#: ../Shared/installer/nightly.nsi:446
+msgid "Game client"
+msgstr "Oyun istemcisi"
+
+#. INST_SEC_SERVER
+#: ../Shared/installer/nightly.nsi:447
+msgid "Dedicated server"
+msgstr "Özel sunucu"
+
+#. INST_SEC_CORE
+#: ../Shared/installer/nightly.nsi:448
+msgid "Core components"
+msgstr "Çekirdek bileşenleri"
+
+#. INST_SEC_GAME
+#: ../Shared/installer/nightly.nsi:449
+msgid "Game module"
+msgstr "Oyun Modülü"
+
+#. INFO_INPLACE_UPGRADE
+#: ../Shared/installer/nightly.nsi:451
+msgid "Performing in-place upgrade..."
+msgstr "Yerinde yükseltme gerçekleştirme ..."
+
+#. INFO_UPDATE_PERMISSIONS
+#: ../Shared/installer/nightly.nsi:452
+msgid "Updating permissions. This could take a few minutes..."
+msgstr "Güncelleme Yapılıyor . Birkaç dakika alabilir ..."
+
+#. MSGBOX_INVALID_GTASA
+#: ../Shared/installer/nightly.nsi:455
+msgid ""
+"A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\r"
+"$\n"
+"However installation will continue.$\r"
+"$\n"
+"Please reinstall if there are problems later."
+msgstr ""
+"Grand Theft Auto : San Andreas ' ın gerekli versiyonuna ulaşılamadı.$\r$\n"
+"Ancak kurulum devam edecektir.$\r$\n"
+"Eğer sorunlar devam ederse terkar yükleyin."
+
+#. INST_SEC_CORE_RESOURCES
+#: ../Shared/installer/nightly.nsi:456
+msgid "Core Resources"
+msgstr "Çekirdek Dosyaları"
+
+#. INST_SEC_OPTIONAL_RESOURCES
+#: ../Shared/installer/nightly.nsi:457
+msgid "Optional Resources"
+msgstr "Opyisonal Kanyaklar"
+
+#. INST_SEC_EDITOR
+#: ../Shared/installer/nightly.nsi:458
+msgid "Editor"
+msgstr "Dünleyici"
+
+#. INST_SEC_DEVELOPER
+#: ../Shared/installer/nightly.nsi:973
+msgid "Development"
+msgstr "Geliştirme"
+
+#. UNINST_SUCCESS
+#: ../Shared/installer/nightly.nsi:1018
+msgid "$(^Name) was successfully removed from your computer."
+msgstr "$(^Name) sizin bilgisayarınızdan sorunsuz bir şekilde silindi ."
+
+#. UNINST_FAIL
+#: ../Shared/installer/nightly.nsi:1025
+msgid "Uninstallation has failed!"
+msgstr "Kaldırma hatası oluştu !"
+
+#. UNINST_REQUEST
+#: ../Shared/installer/nightly.nsi:1033
+msgid ""
+"Are you sure you want to completely remove $(^Name) and all of its "
+"components?"
+msgstr "Tamamen $(^Name) bileşenlerini kaldırmak istiyormusunuz"
+
+#. UNINST_REQUEST_NOTE
+#: ../Shared/installer/nightly.nsi:1036
+msgid ""
+"Uninstalling before update?$\r"
+"$\n"
+"It is not necessary to uninstall before installing a new version of MTA:SA$\r"
+"$\n"
+"Run the new installer to upgrade and preserve your settings."
+msgstr ""
+
+#. UNINST_DATA_REQUEST
+#: ../Shared/installer/nightly.nsi:1047
+msgid ""
+"Would you like to keep your data files (such as resources, screenshots and "
+"server configuration)? If you click no, any resources, configurations or "
+"screenshots you have created will be lost."
+msgstr ""
+"(Örneğin kaynaklar, ekran görüntüleri ve sunucu yapılandırma gibi) veri "
+"dosyalarınızı korumak ister misiniz? Hiçbir tuşuna tıklarsanız, "
+"oluşturduğunuz herhangi bir kaynak, yapılandırmalar veya ekran kaybolur."
+
+#. MSGBOX_VSRED_ERROR1
+#: ../Shared/installer/nightly.nsi:1142
+msgid "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
+msgstr ""
+"Microsoft Visual Studio 2008 SP1 yeniden dağıtılabilir , indirilemiyor ."
+
+#. MSGBOX_VSRED_ERROR2
+#: ../Shared/installer/nightly.nsi:1143
+msgid "Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
+msgstr "Microsoft Visual Studio 2008 SP1 redistributable , indirilemiyor"
+
+#. MSGBOX_VSRED_ERROR3
+#: ../Shared/installer/nightly.nsi:1146
+msgid ""
+"Unable to download Microsoft Visual Studio 2008 SP1 redistributable.$\r"
+"$\n"
+"However installation will continue.$\r"
+"$\n"
+"Please reinstall if there are problems later."
+msgstr ""
+"Microsoft Visual Studio 2008 SP1 redistributable , indiriliemiyor .$\r$\n"
+"Ancak kurulum devam edecektir.$\r$\n"
+"Lütfen tekrar kurun eğer bir sorun olursa"
+
+#. MSGBOX_VC12RED_ERROR1
+#: ../Shared/installer/nightly.nsi:1193
+#, fuzzy
+msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
+msgstr ""
+"Microsoft Visual Studio 2008 SP1 yeniden dağıtılabilir , indirilemiyor ."
+
+#. MSGBOX_VC12RED_ERROR2
+#: ../Shared/installer/nightly.nsi:1194
+#, fuzzy
+msgid "Unable to install Microsoft Visual Studio 2013 redistributable"
+msgstr "Microsoft Visual Studio 2008 SP1 redistributable , indirilemiyor"
+
+#. MSGBOX_VC12RED_ERROR3
+#: ../Shared/installer/nightly.nsi:1197
+msgid ""
+"Unable to download Microsoft Visual Studio 2013 redistributable.$\r"
+"$\n"
+"However installation will continue.$\r"
+"$\n"
+"Please reinstall if there are problems later."
+msgstr ""
+
+#. MSGBOX_PATCH_FAIL1
+#: ../Shared/installer/nightly.nsi:1244
+msgid ""
+"Unable to download the patch file for your version of Grand Theft Auto: San "
+"Andreas"
+msgstr "Grand Theft Auto: San Andreas patch dosyası indirilemiyor "
+
+#. MSGBOX_PATCH_FAIL2
+#: ../Shared/installer/nightly.nsi:1245
+msgid ""
+"Unable to install the patch file for your version of Grand Theft Auto: San "
+"Andreas"
+msgstr "Grand Theft Auto: San Andreas versiyon paketin indirilemiyor"
+
+#. UAC_RIGHTS1
+#: ../Shared/installer/nightly.nsi:1286
+msgid "This installer requires admin access, try again"
+msgstr "Bu kurcu admin ulaşımı gerektiriyor , tekrar deneyin"
+
+#. UAC_RIGHTS_UN
+#: ../Shared/installer/nightly.nsi:1287
+msgid "This uninstaller requires admin access, try again"
+msgstr "Bu kurucu admin ulaşımı istiyor , tekrar deneyin"
+
+#. UAC_RIGHTS3
+#: ../Shared/installer/nightly.nsi:1288
+msgid "Logon service not running, aborting!"
+msgstr "Oturum Açma hizmeti iptal, çalışmıyor!"
+
+#. UAC_RIGHTS4
+#: ../Shared/installer/nightly.nsi:1289
+msgid "Unable to elevate"
+msgstr "Yükseltilemedi"
+
+#. INST_MTA_CONFLICT
+#: ../Shared/installer/nightly.nsi:1843
+msgid ""
+"A different major version of MTA ($1) already exists at that path.$\n"
+"$\n"
+"MTA is designed for major versions to be installed in different paths.$\n"
+" Are you sure you want to overwrite MTA $1 at $INSTDIR ?"
+msgstr ""
+"MTA ($1) farklı bir ana sürüm zaten yolda bulunmaktadır. $\n"
+"$\n"
+"MTA farklı yollar kurulacak büyük sürümleri için tasarlanmıştır. $\n"
+"Eğer  $INSTDIR de MTA $1 üzerine yazmak istediğinizden emin misiniz?"
+
+#. INST_GTA_CONFLICT
+#: ../Shared/installer/nightly.nsi:1846
+msgid ""
+"MTA cannot be installed into the same directory as GTA:SA.$\n"
+"$\n"
+"Do you want to use the default install directory$\n"
+"$DEFAULT_INSTDIR ?"
+msgstr ""
+
+#. INST_GTA_ERROR1
+#: ../Shared/installer/nightly.nsi:1848
+msgid ""
+"The selected directory does not exist.$\n"
+"$\n"
+"Please select the GTA:SA install directory"
+msgstr ""
+"Seçilmiş sözlük bulunamiyor.$\n"
+"$\n"
+"Lütfen GTA:SA kurulum yerini seçiniz"
+
+#. INST_GTA_ERROR2
+#: ../Shared/installer/nightly.nsi:1850
+msgid ""
+"Could not find GTA:SA installed at $GTA_DIR $\n"
+"$\n"
+"Are you sure you want to continue ?"
+msgstr ""
+"GTA:SA , $GTA_DIR da bulunamıyor $\n"
+"$\n"
+"Devam etmek istediğinize eminmisiniz"
+
+#. INST_CHOOSE_LOC_TOP
+#: ../Shared/installer/nightly.nsi:1966
+msgid "Choose Install Location"
+msgstr "Kurulum dilini seçiniz"
+
+#. INST_CHOOSE_LOC
+#: ../Shared/installer/nightly.nsi:1967
+msgid ""
+"Choose the folder in which to install ${PRODUCT_NAME_NO_VER} "
+"${PRODUCT_VERSION}"
+msgstr ""
+"Lütfen ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION},kurulacak klorsörü seçiniz"
+
+#. INST_CHOOSE_LOC2
+#: ../Shared/installer/nightly.nsi:1969
+msgid ""
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
+"To install in a different folder, click Browse and select another folder.$\n"
+"$\n"
+" Click Next to continue."
+msgstr ""
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} kurulacaktır takip edilecek "
+"klosöre.$\n"
+"Önemli bir klosore kurmak için Browseye basın ve başka bir klosör seçin$\n"
+"$\n"
+"Devam için Next'e basın"
+
+#. INST_CHOOSE_LOC3
+#: ../Shared/installer/nightly.nsi:1970
+msgid "Destination Folder"
+msgstr "Hedef Klosör"
+
+#. INST_CHOOSE_LOC_BROWSE
+#: ../Shared/installer/nightly.nsi:1971
+msgid "Browse..."
+msgstr "Gözat..."
+
+#. INST_CHOOSE_LOC_DEFAULT
+#: ../Shared/installer/nightly.nsi:1972
+msgid "Default"
+msgstr "Varolan"
+
+#. INST_CHOOSE_LOC_LAST_USED
+#: ../Shared/installer/nightly.nsi:1973
+msgid "Last used"
+msgstr "Son kullanılmış"
+
+#. INST_CHOOSE_LOC_CUSTOM
+#: ../Shared/installer/nightly.nsi:1974
+msgid "Custom"
+msgstr "Özel"
+
+#. INST_CHOOSE_LOC4
+#: ../Shared/installer/nightly.nsi:2145
+msgid ""
+"Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
+msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} dosyasını burada seçiniz :"
+
+#. INST_LOC_OW
+#: ../Shared/installer/nightly.nsi:2163
+msgid ""
+"Warning: A different major version of MTA ($1) already exists at that path."
+msgstr "Uyarı : Önemli bir major sürümü zaten bu sürümde çıkar"
+
+#. INST_LOC_UPGRADE
+#: ../Shared/installer/nightly.nsi:2164
+msgid "Installation type:  Upgrade"
+msgstr "Kurulum tipi:~ ~ güncelleme"
+
+#. NETTEST_TITLE1
+#: ../Shared/installer/nightly.nsi:2407
+msgid "Online update"
+msgstr ""
+
+#. NETTEST_TITLE2
+#: ../Shared/installer/nightly.nsi:2408
+msgid "Checking for update information"
+msgstr ""
+
+#. NETTEST_STATUS1
+#: ../Shared/installer/nightly.nsi:2409
+msgid "Checking for installer update information..."
+msgstr ""
+
+#. NETTEST_STATUS2
+#: ../Shared/installer/nightly.nsi:2410
+msgid "Please ensure your firewall is not blocking"
+msgstr ""

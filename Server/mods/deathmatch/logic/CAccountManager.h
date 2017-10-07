@@ -17,7 +17,6 @@ class CAccountManager;
 #define __CACCOUNTMANAGER_H
 
 #include "CAccount.h"
-#include "CXMLConfig.h"
 typedef uint SDbConnectionId;
 
 #define GUEST_ACCOUNT_NAME          "guest"
@@ -119,56 +118,53 @@ bool ListContains ( const CMappedAccountList& itemList, const T& item )
 //
 // CAccountManager
 //
-class CAccountManager: public CXMLConfig
+class CAccountManager
 {
     friend class CAccount;
 public:
-                                CAccountManager             ( const char* szFileName, SString strBuffer );
+                                CAccountManager             ( const SString& strDbPathFilename );
                                 ~CAccountManager            ( void );
 
     void                        DoPulse                     ( void );
 
     bool                        Load                        ( void );
-    bool                        Load                        ( CXMLNode* pParent );
-    bool                        LoadSetting                 ( CXMLNode* pNode );
     bool                        Save                        ( void );
-    bool                        Save                        ( CXMLNode* pParent );
     void                        Save                        ( CAccount* pParent, bool bCheckForErrors = true );
 
     bool                        SaveSettings                ( void );
     bool                        IntegrityCheck              ( void );
 
-    CAccount*                   Get                         ( const char* szName, bool bRegistered = true );
-    CAccount*                   Get                         ( const char* szName, const char* szIP );
+    CAccount*                   Get                         ( const char* szName );
     CAccount*                   GetAccountFromScriptID      ( uint uiScriptID );
     SString                     GetActiveCaseVariation      ( const SString& strName );
 
-    bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, const char* szNick, const char* szPassword );
-    bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, CAccount* pAccount, bool bAutoLogin = false );
+    bool                        LogIn                       ( CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword );
     bool                        LogOut                      ( CClient* pClient, CClient* pEchoClient );
 
-    inline bool                 IsAutoLoginEnabled          ( void )                    { return m_bAutoLogin; }
-    inline void                 SetAutoLoginEnabled         ( bool bEnabled )           { m_bAutoLogin = bEnabled; }
-
-    std::shared_ptr<CLuaArgument> GetAccountData              ( CAccount* pAccount, const char* szKey );
+    std::shared_ptr<CLuaArgument> GetAccountData            ( CAccount* pAccount, const char* szKey );
     bool                        SetAccountData              ( CAccount* pAccount, const char* szKey, const SString& strValue, int iType );
     bool                        CopyAccountData             ( CAccount* pFromAccount, CAccount* pToAccount );
     bool                        GetAllAccountData           ( CAccount* pAccount, lua_State* pLua );
 
     void                        GetAccountsBySerial         ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
 
-    bool                        ConvertXMLToSQL             ( const char* szFileName );
-    bool                        LoadXML                     ( CXMLNode* pParent );
-    void                        SmartLoad                   ( void );
-    void                        Register                    ( CAccount* pAccount );
-    void                        RemoveAccount               ( CAccount* pAccount );
+    CAccount*                   AddGuestAccount             ( const SString& strName );
+    CAccount*                   AddConsoleAccount           ( const SString& strName );
+    CAccount*                   AddPlayerAccount            ( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial, const SString& strHttpPassAppend );
+    CAccount*                   AddNewPlayerAccount         ( const SString& strName, const SString& strPassword );
+    bool                        RemoveAccount               ( CAccount* pAccount );
+    bool                        IsAuthorizedSerialRequired  ( CAccount* pAccount );
+    bool                        IsHttpLoginAllowed          ( CAccount* pAccount, const SString& strIp );
+
 protected:
     void                        AddToList                   ( CAccount* pAccount )      { m_List.push_back ( pAccount ); }
     void                        RemoveFromList              ( CAccount* pAccount );
 
     void                        MarkAsChanged               ( CAccount* pAccount );
     void                        ChangingName                ( CAccount* pAccount, const SString& strOldName, const SString& strNewName );
-    void                        ClearSQLDatabase            ( void );
+    void                        LoadAccountSerialUsage      ( CAccount* pAccount );
+    void                        SaveAccountSerialUsage      ( CAccount* pAccount );
+
 public:
     void                        RemoveAll                   ( void );
     static void                 StaticDbCallback            ( CDbJobData* pJobData, void* pContext );
@@ -183,15 +179,11 @@ public:
 
 protected:
     CMappedAccountList          m_List;
-
-    bool                        m_bAutoLogin;
-
     bool                        m_bChangedSinceSaved;
     long long                   m_llLastTimeSaved;
     CConnectHistory             m_AccountProtect;
     SDbConnectionId             m_hDbConnection;
     CDatabaseManager*           m_pDatabaseManager;
-    bool                        m_bLoadXML;
     int                         m_iAccounts;
 };
 

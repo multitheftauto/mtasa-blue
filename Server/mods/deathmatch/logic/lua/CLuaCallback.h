@@ -8,6 +8,7 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+#pragma once
 
 //
 // For saving a Lua callback function and arguments until needed

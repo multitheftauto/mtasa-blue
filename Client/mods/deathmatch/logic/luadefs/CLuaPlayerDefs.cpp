@@ -549,14 +549,6 @@ int CLuaPlayerDefs::SetPlayerNametagShowing ( lua_State* luaVM )
 
 int CLuaPlayerDefs::GetPlayerUserName ( lua_State* luaVM )
 {
-    std::string strUser;
-
-    g_pCore->GetCommunity ()->GetUsername ( strUser );
-    if ( !strUser.empty () )
-    {
-        lua_pushstring ( luaVM, strUser.c_str () );
-        return 1;
-    }
     lua_pushboolean ( luaVM, false );
     return 1;
 }

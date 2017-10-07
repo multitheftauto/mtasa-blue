@@ -14,7 +14,6 @@
 
 #include "CConsoleInterface.h"
 #include "CCommandsInterface.h"
-#include "CCommunityInterface.h"
 #include "CRenderItemManagerInterface.h"
 #include "CScreenGrabberInterface.h"
 #include "CPixelsManagerInterface.h"
@@ -23,6 +22,8 @@
 #include "CKeyBindsInterface.h"
 #include "CCVarsInterface.h"
 #include "CWebCoreInterface.h"
+#include "CTrayIconInterface.h"
+#include "CChatInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -33,13 +34,6 @@ class CNet;
 class CGame;
 class CModelCacheManager;
 class CLocalizationInterface;
-
-namespace ChatFonts
-{
-    enum eChatFont { CHAT_FONT_DEFAULT,CHAT_FONT_CLEAR,CHAT_FONT_BOLD,CHAT_FONT_ARIAL,CHAT_FONT_MAX };
-}
-
-using ChatFonts::eChatFont;
 
 enum eCoreVersion
 {
@@ -79,9 +73,9 @@ public:
     virtual CKeyBindsInterface*         GetKeyBinds                     ( void ) = 0;
     virtual CXMLNode*                   GetConfig                       ( void ) = 0;
     virtual CCVarsInterface*            GetCVars                        ( void ) = 0;
-    virtual CCommunityInterface*        GetCommunity                    ( void ) = 0;
     virtual CLocalizationInterface*     GetLocalization                 ( void ) = 0;
     virtual CWebCoreInterface*          GetWebCore                      ( void ) = 0;
+    virtual CTrayIconInterface*         GetTrayIcon                     ( void ) = 0;
     
 
     // Temporary functions for r1
@@ -110,6 +104,7 @@ public:
     virtual void                    SetConnected                    ( bool bConnected ) = 0;
     virtual void                    SetOfflineMod                   ( bool bOffline ) = 0;
     virtual void                    ApplyHooks3                     ( bool bEnable ) = 0;
+    virtual bool                    IsWebCoreLoaded                 ( void ) = 0;
 
     virtual bool                    IsConnected                     ( void ) = 0;
     virtual bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true ) = 0;
@@ -171,6 +166,10 @@ public:
     virtual bool                    GetRequiredDisplayResolution    ( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions ) = 0;
     virtual void                    NotifyRenderingGrass            ( bool bIsRenderingGrass ) = 0;
     virtual bool                    GetRightSizeTxdEnabled          ( void ) = 0;
+    virtual const char*             GetProductRegistryPath          ( void ) = 0;
+    virtual const char*             GetProductCommonDataDir         ( void ) = 0;
+    virtual const char*             GetProductVersion               ( void ) = 0;
+    virtual void                    SetFakeLagCommandEnabled        ( bool bEnabled ) = 0;
 };
 
 class CClientTime

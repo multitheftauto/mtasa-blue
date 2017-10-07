@@ -29,6 +29,7 @@
 #define FUNC_CPhysical_RemoveFromMovingList     0x542860
 
 #define PHYSICAL_MAXNOOFCOLLISIONRECORDS        6
+#define PHYSICAL_MAXMASS                        99999.0
 
 class CPhysicalSAInterface : public CEntitySAInterface
 {
@@ -50,7 +51,7 @@ public:
     uint32 bBroken : 1;
     uint32 b0x800 : 1; // ref @ 0x6F5CF0
     uint32 b0x1000 : 1;//
-    uint32 b0x2000 : 1;//
+    uint32 bDontApplySpeed : 1;//
     uint32 b0x4000 : 1;//
     uint32 b0x8000 : 1;//
 
@@ -156,6 +157,8 @@ public:
 
     float       GetLighting                 ( void );
     void        SetLighting                 ( float fLighting );
+
+    void        SetFrozen                   ( bool bFrozen );
 
     /*
     VOID        SetMassMultiplier(FLOAT fMassMultiplier);

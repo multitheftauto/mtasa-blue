@@ -56,7 +56,7 @@ void CLuaVehicleDefs::LoadFunctions()
     CLuaCFunctions::AddFunction ( "isTrainDerailable", IsTrainDerailable );
     CLuaCFunctions::AddFunction ( "getTrainDirection", GetTrainDirection );
     CLuaCFunctions::AddFunction ( "getTrainSpeed", GetTrainSpeed );
-    CLuaCFunctions::AddFunction ( "getTrainTrack", GetTrainTrack );
+    //CLuaCFunctions::AddFunction ( "getTrainTrack", GetTrainTrack );
     CLuaCFunctions::AddFunction ( "getTrainPosition", GetTrainPosition );
     CLuaCFunctions::AddFunction ( "isVehicleBlown", IsVehicleBlown );
     CLuaCFunctions::AddFunction ( "getVehicleHeadLightColor", GetVehicleHeadLightColor );
@@ -101,7 +101,7 @@ void CLuaVehicleDefs::LoadFunctions()
     CLuaCFunctions::AddFunction ( "setTrainDerailable", SetTrainDerailable );
     CLuaCFunctions::AddFunction ( "setTrainDirection", SetTrainDirection );
     CLuaCFunctions::AddFunction ( "setTrainSpeed", SetTrainSpeed );
-    CLuaCFunctions::AddFunction ( "setTrainTrack", SetTrainTrack );
+    //CLuaCFunctions::AddFunction ( "setTrainTrack", SetTrainTrack );
     CLuaCFunctions::AddFunction ( "setTrainPosition", SetTrainPosition );
     CLuaCFunctions::AddFunction ( "setVehicleHeadLightColor", SetVehicleHeadLightColor );
     CLuaCFunctions::AddFunction ( "setVehicleTurretPosition", SetVehicleTurretPosition );
@@ -156,7 +156,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getSirens", "getVehicleSirens" );
     lua_classfunction ( luaVM, "getDirection", "getTrainDirection" );
     lua_classfunction ( luaVM, "getTrainSpeed", "getTrainSpeed" );
-    lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
+    //lua_classfunction ( luaVM, "getTrack", "getTrainTrack" );
     lua_classfunction ( luaVM, "getTrainPosition", "getTrainPosition" );
     lua_classfunction ( luaVM, "getHeadLightColor", "getVehicleHeadLightColor" );
     lua_classfunction ( luaVM, "getColor", "getVehicleColor" );
@@ -215,7 +215,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setDerailable", "setTrainDerailable" );
     lua_classfunction ( luaVM, "setDerailed", "setTrainDerailed" );
     lua_classfunction ( luaVM, "setDirection", "setTrainDirection" );
-    lua_classfunction ( luaVM, "setTrack", "setTrainTrack" );
+    //lua_classfunction ( luaVM, "setTrack", "setTrainTrack" );
     lua_classfunction ( luaVM, "setTrainPosition", "setTrainPosition" );
     lua_classfunction ( luaVM, "setTrainSpeed", "setTrainSpeed" ); // Reduce confusion
 
@@ -226,7 +226,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "blown", "blowVehicle", "isVehicleBlown" );
     lua_classvariable ( luaVM, "direction", "setTrainDirection", "getTrainDirection" );
     lua_classvariable ( luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed" );
-    lua_classvariable ( luaVM, "track", "setTrainTrack", "getTrainTrack" );
+    //lua_classvariable ( luaVM, "track", "setTrainTrack", "getTrainTrack" );
     lua_classvariable ( luaVM, "trainPosition", "setTrainPosition", "getTrainPosition" );
     lua_classvariable ( luaVM, "taxiLightOn", "setVehicleTaxiLightOn", "isVehicleTaxiLightOn" );
     lua_classvariable ( luaVM, "fuelTankExplodable", "setVehicleFuelTankExplodable", "isVehicleFuelTankExplodable" );
@@ -561,16 +561,11 @@ int CLuaVehicleDefs::RemoveVehicleSirens ( lua_State* luaVM )
 
     if ( argStream.HasErrors () == false )
     {
-        if ( pVehicle )
+        if ( CStaticFunctionDefinitions::RemoveVehicleSirens ( pVehicle ) )
         {
-            if ( CStaticFunctionDefinitions::RemoveVehicleSirens ( pVehicle ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM );
@@ -601,16 +596,11 @@ int CLuaVehicleDefs::SetVehicleSirens ( lua_State* luaVM )
         argStream.ReadNumber ( tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha, 0 );
         if ( argStream.HasErrors () == false )
         {
-            if ( pVehicle )
+            if ( CStaticFunctionDefinitions::SetVehicleSirens ( pVehicle, ucSirenID, tSirenInfo ) )
             {
-                if ( CStaticFunctionDefinitions::SetVehicleSirens ( pVehicle, ucSirenID, tSirenInfo ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
         }
         else
             m_pScriptDebugging->LogBadType ( luaVM );
@@ -632,44 +622,39 @@ int CLuaVehicleDefs::GetVehicleSirenParams ( lua_State* luaVM )
     argStream.ReadUserData ( pVehicle );
     if ( argStream.HasErrors () == false )
     {
-        if ( pVehicle )
-        {
-            tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Create a new table
-            lua_newtable ( luaVM );
+        tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Create a new table
+        lua_newtable ( luaVM );
 
-            lua_pushstring ( luaVM, "SirenCount" );
-            lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenCount );
-            lua_settable ( luaVM, -3 ); // End of SirenCount Property
+        lua_pushstring ( luaVM, "SirenCount" );
+        lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenCount );
+        lua_settable ( luaVM, -3 ); // End of SirenCount Property
 
-            lua_pushstring ( luaVM, "SirenType" );
-            lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenType );
-            lua_settable ( luaVM, -3 ); // End of SirenType Property
+        lua_pushstring ( luaVM, "SirenType" );
+        lua_pushnumber ( luaVM, tSirenInfo.m_ucSirenType );
+        lua_settable ( luaVM, -3 ); // End of SirenType Property
 
-            lua_pushstring ( luaVM, "Flags" );
-            lua_newtable ( luaVM );
+        lua_pushstring ( luaVM, "Flags" );
+        lua_newtable ( luaVM );
 
-            lua_pushstring ( luaVM, "360" );
-            lua_pushboolean ( luaVM, tSirenInfo.m_b360Flag );
-            lua_settable ( luaVM, -3 ); // End of 360 Property
+        lua_pushstring ( luaVM, "360" );
+        lua_pushboolean ( luaVM, tSirenInfo.m_b360Flag );
+        lua_settable ( luaVM, -3 ); // End of 360 Property
 
-            lua_pushstring ( luaVM, "DoLOSCheck" );
-            lua_pushboolean ( luaVM, tSirenInfo.m_bDoLOSCheck );
-            lua_settable ( luaVM, -3 ); // End of DoLOSCheck Property
+        lua_pushstring ( luaVM, "DoLOSCheck" );
+        lua_pushboolean ( luaVM, tSirenInfo.m_bDoLOSCheck );
+        lua_settable ( luaVM, -3 ); // End of DoLOSCheck Property
 
-            lua_pushstring ( luaVM, "UseRandomiser" );
-            lua_pushboolean ( luaVM, tSirenInfo.m_bUseRandomiser );
-            lua_settable ( luaVM, -3 ); // End of UseRandomiser Property
+        lua_pushstring ( luaVM, "UseRandomiser" );
+        lua_pushboolean ( luaVM, tSirenInfo.m_bUseRandomiser );
+        lua_settable ( luaVM, -3 ); // End of UseRandomiser Property
 
-            lua_pushstring ( luaVM, "Silent" );
-            lua_pushboolean ( luaVM, tSirenInfo.m_bSirenSilent );
-            lua_settable ( luaVM, -3 ); // End of Silent Property
+        lua_pushstring ( luaVM, "Silent" );
+        lua_pushboolean ( luaVM, tSirenInfo.m_bSirenSilent );
+        lua_settable ( luaVM, -3 ); // End of Silent Property
 
-            lua_settable ( luaVM, -3 ); // End of Flags table
+        lua_settable ( luaVM, -3 ); // End of Flags table
 
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+        return 1;
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM );
@@ -688,57 +673,52 @@ int CLuaVehicleDefs::GetVehicleSirens ( lua_State* luaVM )
     argStream.ReadUserData ( pVehicle );
     if ( argStream.HasErrors () == false )
     {
-        if ( pVehicle )
+        tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Create a new table
+        lua_newtable ( luaVM );
+
+        for ( int i = 0; i < tSirenInfo.m_ucSirenCount; i++ )
         {
-            tSirenInfo = pVehicle->m_tSirenBeaconInfo;// Create a new table
+            lua_pushnumber ( luaVM, i + 1 );
             lua_newtable ( luaVM );
 
-            for ( int i = 0; i < tSirenInfo.m_ucSirenCount; i++ )
-            {
-                lua_pushnumber ( luaVM, i + 1 );
-                lua_newtable ( luaVM );
+            SSirenBeaconInfo info = tSirenInfo.m_tSirenInfo[i];
 
-                SSirenBeaconInfo info = tSirenInfo.m_tSirenInfo[i];
+            lua_pushstring ( luaVM, "Min_Alpha" );
+            lua_pushnumber ( luaVM, info.m_dwMinSirenAlpha );
+            lua_settable ( luaVM, -3 ); // End of Min_Alpha property
 
-                lua_pushstring ( luaVM, "Min_Alpha" );
-                lua_pushnumber ( luaVM, info.m_dwMinSirenAlpha );
-                lua_settable ( luaVM, -3 ); // End of Min_Alpha property
+            lua_pushstring ( luaVM, "Red" );
+            lua_pushnumber ( luaVM, info.m_RGBBeaconColour.R );
+            lua_settable ( luaVM, -3 ); // End of Red property
 
-                lua_pushstring ( luaVM, "Red" );
-                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.R );
-                lua_settable ( luaVM, -3 ); // End of Red property
+            lua_pushstring ( luaVM, "Green" );
+            lua_pushnumber ( luaVM, info.m_RGBBeaconColour.G );
+            lua_settable ( luaVM, -3 ); // End of Green property
 
-                lua_pushstring ( luaVM, "Green" );
-                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.G );
-                lua_settable ( luaVM, -3 ); // End of Green property
+            lua_pushstring ( luaVM, "Blue" );
+            lua_pushnumber ( luaVM, info.m_RGBBeaconColour.B );
+            lua_settable ( luaVM, -3 ); // End of Blue property
 
-                lua_pushstring ( luaVM, "Blue" );
-                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.B );
-                lua_settable ( luaVM, -3 ); // End of Blue property
+            lua_pushstring ( luaVM, "Alpha" );
+            lua_pushnumber ( luaVM, info.m_RGBBeaconColour.A );
+            lua_settable ( luaVM, -3 ); // End of Alpha property
 
-                lua_pushstring ( luaVM, "Alpha" );
-                lua_pushnumber ( luaVM, info.m_RGBBeaconColour.A );
-                lua_settable ( luaVM, -3 ); // End of Alpha property
+            lua_pushstring ( luaVM, "x" );
+            lua_pushnumber ( luaVM, info.m_vecSirenPositions.fX );
+            lua_settable ( luaVM, -3 ); // End of X property
 
-                lua_pushstring ( luaVM, "x" );
-                lua_pushnumber ( luaVM, info.m_vecSirenPositions.fX );
-                lua_settable ( luaVM, -3 ); // End of X property
+            lua_pushstring ( luaVM, "y" );
+            lua_pushnumber ( luaVM, info.m_vecSirenPositions.fY );
+            lua_settable ( luaVM, -3 ); // End of Y property
 
-                lua_pushstring ( luaVM, "y" );
-                lua_pushnumber ( luaVM, info.m_vecSirenPositions.fY );
-                lua_settable ( luaVM, -3 ); // End of Y property
+            lua_pushstring ( luaVM, "z" );
+            lua_pushnumber ( luaVM, info.m_vecSirenPositions.fZ );
+            lua_settable ( luaVM, -3 ); // End of Z property
 
-                lua_pushstring ( luaVM, "z" );
-                lua_pushnumber ( luaVM, info.m_vecSirenPositions.fZ );
-                lua_settable ( luaVM, -3 ); // End of Z property
-
-                lua_settable ( luaVM, -3 ); // End of Table
-            }
-
-            return 1;
+            lua_settable ( luaVM, -3 ); // End of Table
         }
-        else
-            m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
+
+        return 1;
     }
     else
         m_pScriptDebugging->LogBadType ( luaVM );
@@ -767,16 +747,11 @@ int CLuaVehicleDefs::GiveVehicleSirens ( lua_State* luaVM )
         argStream.ReadBool ( tSirenInfo.m_bSirenSilent, false );
         if ( argStream.HasErrors () == false )
         {
-            if ( pVehicle )
+            if ( CStaticFunctionDefinitions::GiveVehicleSirens ( pVehicle, ucSirenType, ucSirenCount, tSirenInfo ) )
             {
-                if ( CStaticFunctionDefinitions::GiveVehicleSirens ( pVehicle, ucSirenType, ucSirenCount, tSirenInfo ) )
-                {
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }
+                lua_pushboolean ( luaVM, true );
+                return 1;
             }
-            else
-                m_pScriptDebugging->LogBadPointer ( luaVM, "vehicle", 1 );
         }
         else
             m_pScriptDebugging->LogBadType ( luaVM );

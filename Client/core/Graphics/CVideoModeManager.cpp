@@ -52,6 +52,8 @@ private:
     bool                GameResMatchesCurrentAdapter ( void );
     SString             MakeResolutionString        ( uint uiWidth, uint uiHeight, uint uiDepth, uint uiAdapter );
 
+    void                UpdateMonitor               ();
+
     unsigned long       m_ulForceBackBufferWidth;
     unsigned long       m_ulForceBackBufferHeight;
     unsigned long       m_ulForceBackBufferColorDepth;
@@ -271,6 +273,9 @@ void CVideoModeManager::OnGainFocus ( void )
     }
     m_bPendingGainFocus = false;
 
+    // Update monitor info
+    UpdateMonitor();
+
     if ( IsDisplayModeFullScreenWindow() )
     {
         // Change only if needed
@@ -316,6 +321,9 @@ void CVideoModeManager::OnLoseFocus ( void )
     if ( m_ulForceBackBufferWidth == 0 )
         return;
 
+    // Update monitor info
+    UpdateMonitor();
+
     if ( IsDisplayModeFullScreenWindow() )
     {
         if ( !IsMultiMonitor() || IsMinimizeEnabled() )
@@ -329,10 +337,18 @@ void CVideoModeManager::OnLoseFocus ( void )
                 memset( &dmScreenSettings, 0, sizeof( dmScreenSettings ) );
                 dmScreenSettings.dmSize = sizeof( dmScreenSettings );
 
-                dmScreenSettings.dmFields = 0;
-
-                if( ChangeDisplaySettingsEx( GetCurrentAdapterDeviceName(), &dmScreenSettings, NULL, CDS_RESET, NULL ) != DISP_CHANGE_SUCCESSFUL )
+                if ( !EnumDisplaySettings( GetCurrentAdapterDeviceName(), ENUM_REGISTRY_SETTINGS, &dmScreenSettings ) )
+                {
+                    AddReportLog( 7340, SString( "EnumDisplaySettings failed for %s", *GetCurrentAdapterDeviceName() ) );
                     return;
+                }
+
+                int iChangeResult = ChangeDisplaySettingsEx( GetCurrentAdapterDeviceName(), &dmScreenSettings, NULL, CDS_RESET, NULL );
+                if ( iChangeResult != DISP_CHANGE_SUCCESSFUL )
+                {
+                    AddReportLog( 7341, SString( "ChangeDisplaySettingsEx failed for %s (%d)", *GetCurrentAdapterDeviceName(), iChangeResult ) );
+                    return;
+                }
             }
         }
     }
@@ -641,6 +657,22 @@ SString CVideoModeManager::MakeResolutionString ( uint uiWidth, uint uiHeight, u
     return strRes;
 }
 
+///////////////////////////////////////////////////////////////
+//
+// CVideoModeManager::UpdateMonitor
+//
+// Updates the stored monitor ref to match the monitor
+// with the largest intersection (in borderless window mode)
+//
+///////////////////////////////////////////////////////////////
+void CVideoModeManager::UpdateMonitor()
+{
+    if (IsDisplayModeFullScreenWindow())
+    {
+        m_hCurrentMonitor = MonitorFromWindow(m_hDeviceWindow, MONITOR_DEFAULTTONEAREST);
+    }
+}
+
 
 ///////////////////////////////////////////////////////////////
 //
@@ -712,5 +744,5 @@ SString CVideoModeManager::GetCurrentAdapterDeviceName( void )
     monitorInfo.cbSize = sizeof( MONITORINFOEX );
     if ( GetMonitorInfo( m_hCurrentMonitor, &monitorInfo ) )
         return monitorInfo.szDevice;
-    return "";
+   return "";
 }

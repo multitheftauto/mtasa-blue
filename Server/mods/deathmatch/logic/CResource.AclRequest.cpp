@@ -89,13 +89,50 @@ void CResource::RemoveAutoPermissions ( void )
 
 ///////////////////////////////////////////////////////////////
 //
+// CResource::HasAutoPermissions
+//
+// Check if all requested permissions already exist somewhere
+//
+///////////////////////////////////////////////////////////////
+bool CResource::HasAutoPermissions ( CXMLNode* pNodeAclRequest )
+{
+    for ( uint uiIndex = 0 ; true ; uiIndex++ )
+    {
+        CXMLNode* pNodeRight = pNodeAclRequest->FindSubNode ( "right", uiIndex );
+        if ( !pNodeRight )
+            break;
+
+        CAclRightName aclRight ( pNodeRight->GetAttributeValue ( "name" ) );
+        bool bAccessRequired = StringToBool ( pNodeRight->GetAttributeValue ( "access" ) );
+
+        if ( bAccessRequired &&
+            g_pGame->GetACLManager()->CanObjectUseRight ( GetName(),
+                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                aclRight.GetName(),
+                aclRight.GetType(),
+                false ) == false )
+        {
+            // At least one right does not exist
+            return false;
+        }
+    }
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CResource::RefreshAutoPermissions
 //
 // Update group and acl used aclrequest items
 //
 ///////////////////////////////////////////////////////////////
-bool CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
+void CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
 {
+    // Check if permissions already active
+    if ( HasAutoPermissions( pNodeAclRequest ) )
+        return;
+
     // Ensure group and acl exist
     CAccessControlListGroup* pAutoGroup = g_pGame->GetACLManager()->AddGroup ( GetAutoGroupName () );
     pAutoGroup->AddACL ( GetAutoAcl () );
@@ -131,7 +168,7 @@ bool CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
             if ( !request.rightName.IsValid () || !StringToBool ( pNodeRight->GetAttributeValue ( "access" ) ) )
             {
                 CLogger::ErrorPrintf ( "Invalid aclrequest line in %s (%s)\n", GetName ().c_str (), *request.rightName.GetFullName () );
-                return false;
+                return;
             }
 
             CommitAclRequest ( request );
@@ -153,8 +190,6 @@ bool CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
     {
         CLogger::LogPrintf ( "Resource '%s' requests some acl rights. Use the command 'aclrequest list %s'\n", GetName ().c_str (), GetName ().c_str () );
     }
-
-    return bHasPending;
 }
 
 

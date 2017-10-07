@@ -31,6 +31,7 @@
 
 # Ignore common compiled artifacts.
 *~
+*.dwo
 *.o
 lib*.a
 /breakpad.pc
@@ -45,13 +46,14 @@ lib*.a
 /src/tools/linux/md2core/minidump-2-core
 /src/tools/linux/symupload/minidump_upload
 /src/tools/linux/symupload/sym_upload
+/src/tools/mac/dump_syms/dump_syms
 
 # Ignore autotools generated artifacts.
 .deps
 .dirstamp
 autom4te.cache/
 /config.cache
-#config.h
+config.h
 /config.log
 /config.status
 /Makefile
@@ -65,12 +67,17 @@ stamp-h1
 *.vcproj
 *.vcxproj
 
+# Ignore GYP generated Makefiles
+src/Makefile
+*.Makefile
+*.target.mk
+
 # Ignore compiled Python files.
 *.pyc
 
 # Ignore directories gclient syncs.
 src/testing
-#src/third_party/glog
+src/third_party/glog
 src/third_party/lss
 src/third_party/protobuf
 src/tools/gyp

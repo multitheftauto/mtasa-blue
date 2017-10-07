@@ -282,6 +282,8 @@ DWORD RETURN_CObject_ProcessCollision = 0x548DD1;
 DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
 #define HOOKPOS_CGlass_WindowRespondsToCollision           0x71BC40
 DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
+#define HOOKPOS_CGlass__BreakGlassPhysically                0x71D14B
+DWORD RETURN_CGlass__BreakGlassPhysically = 0x71D150;
 
 #define HOOKPOS_FxManager_c__DestroyFxSystem                0x4A989A
 
@@ -291,6 +293,14 @@ DWORD RETURN_CTaskSimplyGangDriveBy__ProcessPed = 0x62D5AC;
 #define HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex 0x4EA296
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex             = 0x4EA2A0;
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex_Regenerate  = 0x04EA286;
+
+#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli     0x4FE9B9
+DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyHeli      = 0x4FEDFB;
+DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli         = FUNC_CAEVehicleAudioEntity__ProcessAIHeli;
+
+#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp     0x4FD96D
+DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp      = 0x4FDFAB;
+DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp         = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -499,12 +509,16 @@ void HOOK_CObject_ProcessDamage ();
 void HOOK_CObject_ProcessBreak ();
 void HOOK_CObject_ProcessCollision ();
 void HOOK_CGlass_WindowRespondsToCollision ();
+void HOOK_CGlass__BreakGlassPhysically ();
 
 void HOOK_FxManager_c__DestroyFxSystem ();
 
 void HOOK_CTaskSimpleGangDriveBy__ProcessPed();
 
 void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( );
+
+void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli ();
+void HOOK_CAEVehicleAudioEntity__ProcessDummyProp ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -706,6 +720,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CObject_ProcessBreak, (DWORD)HOOK_CObject_ProcessBreak, 5 );
     HookInstall ( HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10 );
     HookInstall ( HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8 );
+    HookInstall ( HOOKPOS_CGlass__BreakGlassPhysically, (DWORD)HOOK_CGlass__BreakGlassPhysically, 5 );
 
     // Post-destruction hook for FxSystems
     HookInstall ( HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
@@ -719,6 +734,9 @@ void CMultiplayerSA::InitHooks()
         // CAERadioTrackManager::ChooseMusicTrackIndex hook for fixing a crash with the steam audio files
         HookInstall(HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex, (DWORD) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex, 10);
     }
+
+    HookInstall ( HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli, (DWORD) HOOK_CAEVehicleAudioEntity__ProcessDummyHeli, 5 );
+    HookInstall ( HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD) HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5 );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -823,10 +841,12 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x56E871, 0x08 );
     MemPut < BYTE > ( 0x56E872, 0x00 );
 
-    // Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters 
+    // Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters
     // that was causing a crash - spent ages debugging, the crash happens if you create 40 or 
     // so vehicles that catch fire (upside down) then delete them, repeating a few times.
-    MemSet ((void*)0x4DCF87,0x90,6);
+    // MemSet ((void*)0x4DCF87,0x90,6);
+    //
+    // The above MemSet was commented out because of mantis#8590, gh#124, see c20d2adc5
     
     /*
     // DISABLE CPed__RemoveBodyPart
@@ -1440,6 +1460,14 @@ void CMultiplayerSA::InitHooks()
     // Skip vehicle type check in CVehicle::SetupRender & CVehicle::ResetAfterRender (fix for #8158)
     MemSet ( (void*) 0x6D6517, 0x90, 2 );
     MemSet ( (void*) 0x6D0E43, 0x90, 2 );
+
+    // Disable vehicle audio driver logic so MTA can reimplement it (#9681)
+    // Disable updating m_bPlayerDriver in CAEVehicleAudioEntity::Service
+    MemSetFast ( (void*) 0x5023B2, 0x90, 6 );
+    // Disable call to CAEVehicleAudioEntity::JustGotInVehicleAsDriver
+    MemSetFast( (void*) 0x5023E1, 0x90, 5 );
+    // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
+    MemSetFast( (void*) 0x502341, 0x90, 5 );
 
 
     InitHooks_CrashFixHacks ();
@@ -3325,7 +3353,7 @@ static void SetEntityAlphaHooked ( DWORD dwEntity, DWORD dwCallback, DWORD dwAlp
 static RpMaterial* HOOK_GetAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
     ucCurrentAlpha[ uiAlphaIdx ] = pMaterial->color.a;
-    uiAlphaIdx = Min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
+    uiAlphaIdx = std::min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
 
     return pMaterial;
 }
@@ -3338,7 +3366,7 @@ static RpMaterial* HOOK_SetAlphaValues ( RpMaterial* pMaterial, unsigned char uc
 static RpMaterial* HOOK_RestoreAlphaValues ( RpMaterial* pMaterial, unsigned char ucAlpha )
 {
     pMaterial->color.a = ucCurrentAlpha[ uiAlphaIdx ];
-    uiAlphaIdx = Min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
+    uiAlphaIdx = std::min( uiAlphaIdx + 1, NUMELMS( ucCurrentAlpha ) - 1 );
 
     return pMaterial;
 }
@@ -3471,7 +3499,7 @@ static void SetObjectAlpha ()
                 // For some weird reason, gang tags don't appear unsprayed
                 // if we don't set their alpha to a value less than 255.
                 bObjectIsAGangTag = true;
-                GetAlphaAndSetNewValues ( SharedUtil::Min ( pObject->GetAlpha (), (unsigned char)254 ) );
+                GetAlphaAndSetNewValues ( std::min ( pObject->GetAlpha (), (unsigned char)254 ) );
              }
              else
                 GetAlphaAndSetNewValues ( pObject->GetAlpha () );
@@ -4856,9 +4884,9 @@ void CVehicle_GetHeadLightColor ( CVehicleSAInterface * pInterface, float fR, fl
     }
     
     // Scale our color values to the defaults ..looks dodgy but its needed!
-    ulHeadLightR = (unsigned char) Min ( 255.f, color.R * ( 1 / 255.0f ) * fR );
-    ulHeadLightG = (unsigned char) Min ( 255.f, color.G * ( 1 / 255.0f ) * fG );
-    ulHeadLightB = (unsigned char) Min ( 255.f, color.B * ( 1 / 255.0f ) * fB );
+    ulHeadLightR = (unsigned char) std::min ( 255.f, color.R * ( 1 / 255.0f ) * fR );
+    ulHeadLightG = (unsigned char) std::min ( 255.f, color.G * ( 1 / 255.0f ) * fG );
+    ulHeadLightB = (unsigned char) std::min ( 255.f, color.B * ( 1 / 255.0f ) * fB );
 }
 
 CVehicleSAInterface * pHeadLightBeamVehicleInterface = NULL;
@@ -5597,7 +5625,7 @@ void _cdecl CheckMatrix ( float* pMatrix )
         for ( uint i = 12 ; i < 15 ; i++ )
         {
             float f = pMatrix[i];
-            if ( f < -10 || f > 10 || _isnan( f ) )
+            if ( f < -10 || f > 10 || std::isnan( f ) )
                 bFix = true;
         }
     }
@@ -6607,6 +6635,41 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision ()
     }
 }
 
+// Called when glass object is being broken by ped melee attack
+DWORD dummy_404350 = 0x404350;
+void _declspec(naked) HOOK_CGlass__BreakGlassPhysically ()
+{
+    _asm
+    {
+        mov     pDamagedObject, esi
+    }
+    // we can't get attacker from here
+    pObjectAttacker = NULL;
+
+    if ( TriggerObjectBreakEvent () )
+    {
+        _asm
+        {
+            // restore replaced part
+            push    dummy_404350
+            // jump outside of the hook
+            jmp     RETURN_CGlass__BreakGlassPhysically
+        }
+    }
+    else
+    {
+        _asm
+        {
+            pop     edi
+            pop     esi
+            pop     ebp
+            pop     ebx
+            add     esp, 0BCh
+            retn
+        }
+    }
+}
+
 void * pFxSystemToBeDestroyed;
 void FxManager_c__DestroyFxSystem()
 {
@@ -6880,5 +6943,35 @@ void _declspec(naked) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( )
         mov ecx, dwNumberOfTracks
         // jump back to normal processing
         jmp RETURN_CAERadioTrackManager__ChooseMusicTrackIndex
+    }
+}
+
+// Use AI heli rotor sound if player sound bank is not loaded
+void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyHeli ()
+{
+    _asm
+    {
+        // push our argument
+        push    [esp+8Ch+4]
+        mov     ecx, esi
+        // call twin function
+        call    dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli
+        // go back
+        jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyHeli
+    }
+}
+
+// Use AI plane propeller sound if player sound bank is not loaded
+void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp ()
+{
+    _asm
+    {
+        // push our argument
+        push    [esp+98h+4]
+        mov     ecx, esi
+        // call twin function
+        call    dwFUNC_CAEVehicleAudioEntity__ProcessAIProp
+        // go back
+        jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
     }
 }

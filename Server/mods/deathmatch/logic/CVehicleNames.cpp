@@ -52,17 +52,7 @@ static const SFixedArray < SVehicleName, 212 > VehicleNames =
 
 bool CVehicleNames::IsValidModel ( unsigned long ulModel )
 {
-    return ( // Trains
-             ulModel >= 400 && ulModel < 610 &&
-             /*ulModel != 449 && ulModel != 537 &&
-             ulModel != 538 && ulModel != 569 &&
-             ulModel != 590 &&*/
-             
-             // Trailers
-             ulModel != 435 && ulModel != 450 &&
-             ulModel != 591 && ulModel != 606 &&
-             ulModel != 607 && ulModel != 584 &&
-             ulModel != 608 );
+    return ulModel >= 400 && ulModel <= 611;
 }
 
 

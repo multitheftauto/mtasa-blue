@@ -56,6 +56,9 @@ public:
     void                            GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
     void                            SetMoveSpeed            ( const CVector& vecMoveSpeed );
 
+    void                            GetTurnSpeed            ( CVector& vecTurnSpeed ) const;
+    void                            SetTurnSpeed            ( const CVector& vecTurnSpeed );
+
     void                            GetOrientation          ( CVector& vecPosition, CVector& vecRotationRadians );
     virtual void                    SetOrientation          ( const CVector& vecPosition, const CVector& vecRotationRadians );
 
@@ -75,8 +78,8 @@ public:
 
     void                            Render                  ( void );
 
-    inline bool                     IsStatic                ( void )                            { return m_bIsStatic; }
-    void                            SetStatic               ( bool bStatic );
+    inline bool                     IsFrozen                ( void )                            { return m_bIsFrozen; }
+    void                            SetFrozen               ( bool bFrozen );
     
     inline unsigned char            GetAlpha                ( void )                            { return m_ucAlpha; }   
     void                            SetAlpha                ( unsigned char ucAlpha );
@@ -108,6 +111,9 @@ public:
     void                            GetCenterOfMass         ( CVector& vecCenterOfMass) const;
     void                            SetCenterOfMass         ( const CVector& vecCenterOfMass);
 
+    inline bool                     IsVisibleInAllDimensions  ( void )                          { return m_bVisibleInAllDimensions; };
+    void                            SetVisibleInAllDimensions ( bool bVisible, unsigned short usNewDimension = 0 );
+
     void                            ReCreate                ( void );
     void                            UpdateVisibility        ( void );
 
@@ -135,7 +141,7 @@ protected:
     CVector                             m_vecPosition;
     CVector                             m_vecRotation;
     bool                                m_bIsVisible;
-    bool                                m_bIsStatic;
+    bool                                m_bIsFrozen;
     bool                                m_bUsesCollision;
     unsigned char                       m_ucAlpha;
     CVector                             m_vecScale;
@@ -144,13 +150,15 @@ protected:
     bool                                m_bBeingRespawned;
     bool                                m_bRespawnEnabled;
     float                               m_fMass;
-	float                               m_fTurnMass;
-	float                               m_fAirResistance;
-	float                               m_fElasticity;
-	float                               m_fBuoyancyConstant;
+    float                               m_fTurnMass;
+    float                               m_fAirResistance;
+    float                               m_fElasticity;
+    float                               m_fBuoyancyConstant;
     CVector                             m_vecCenterOfMass;
+    bool                                m_bVisibleInAllDimensions = false;
 
     CVector                             m_vecMoveSpeed;
+    CVector                             m_vecTurnSpeed;
 
     const bool                          m_bIsLowLod;            // true if this object is low LOD
     CClientObject*                      m_pLowLodObject;        // Pointer to low LOD version of this object

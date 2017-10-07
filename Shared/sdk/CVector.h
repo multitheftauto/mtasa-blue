@@ -16,7 +16,7 @@
 #include <windows.h>
 #endif
 
-#include <math.h>
+#include <cmath>
 
 #define FLOAT_EPSILON 0.0001f
 #include "CVector4D.h"
@@ -96,7 +96,7 @@ public:
     CVector GetOtherAxis ( void ) const
     {
         CVector vecResult;
-        if ( abs( fX ) > abs( fY ) )
+        if ( std::abs( fX ) > std::abs( fY ) )
 	        vecResult = CVector( fZ, 0, -fX );
         else
 	        vecResult = CVector( 0, -fZ, fY );

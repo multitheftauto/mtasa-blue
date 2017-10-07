@@ -19,7 +19,10 @@
 
 #include "StdInc.h"
 
+#define MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME                "1.5.3-9.11270"
 #define MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT          "1.3.5"
+#define MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE             "1.5.4-9.11342"
+#define MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_FORMFIELDS        "1.5.4-9.11413"
 
 int CLuaFunctionDefs::CreateExplosion ( lua_State* luaVM )
 {
@@ -1415,14 +1418,17 @@ int CLuaFunctionDefs::GetRainLevel ( lua_State* luaVM )
 int CLuaFunctionDefs::SetRainLevel ( lua_State* luaVM )
 {
 //  bool setRainLevel ( float amount )
-    float fAmount;
+    float fRainLevel;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( fAmount );
+    argStream.ReadNumber ( fRainLevel );
 
     if ( !argStream.HasErrors () )
     {
-        g_pGame->GetWeather ()->SetAmountOfRain ( fAmount );
+        // Clamp amount of rain to avoid game freezing/crash
+        fRainLevel = Clamp( 0.0f, fRainLevel, 10.0f );
+
+        g_pGame->GetWeather ()->SetAmountOfRain ( fRainLevel );
 
         lua_pushboolean ( luaVM, true );
         return 1;
@@ -1539,6 +1545,49 @@ int CLuaFunctionDefs::ResetNearClipDistance ( lua_State* luaVM )
 {
     g_pMultiplayer->RestoreNearClipDistance ();
 
+    lua_pushboolean ( luaVM, true );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetVehiclesLODDistance ( lua_State* luaVM )
+{
+//  float float getVehiclesLODDistance ( )
+    float fVehiclesDistance, fTrainsPlanesDistance;
+
+    g_pGame->GetSettings()->GetVehiclesLODDistance ( fVehiclesDistance, fTrainsPlanesDistance );
+    lua_pushnumber ( luaVM, fVehiclesDistance );
+    lua_pushnumber ( luaVM, fTrainsPlanesDistance );
+    return 2;
+}
+
+int CLuaFunctionDefs::SetVehiclesLODDistance ( lua_State* luaVM )
+{
+//  bool setVehiclesLODDistance ( float vehiclesDistance, float trainsAndPlanesDistance = vehiclesDistance * 2.14 )
+    float fVehiclesDistance, fTrainsPlanesDistance;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadNumber ( fVehiclesDistance );
+    fVehiclesDistance = Clamp ( 0.0f, fVehiclesDistance, 500.0f );
+
+    // Default train distance is 2.14 times bigger than normal vehicles
+    argStream.ReadNumber ( fTrainsPlanesDistance, Clamp ( 0.0f, fVehiclesDistance * 2.14f, 500.0f ) );
+
+    if ( !argStream.HasErrors () )
+    {
+        g_pGame->GetSettings()->SetVehiclesLODDistance ( fVehiclesDistance, fTrainsPlanesDistance );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::ResetVehiclesLODDistance ( lua_State* luaVM )
+{
+    g_pGame->GetSettings()->ResetVehiclesLODDistance ();
     lua_pushboolean ( luaVM, true );
     return 1;
 }
@@ -1796,32 +1845,79 @@ int CLuaFunctionDefs::GetFPSLimit ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
 {
-//  bool fetchRemote ( string URL [, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, table options ], callback callbackFunction[, table callbackArguments ] )
     CScriptArgReader argStream ( luaVM );
-    SString strURL; CLuaFunctionRef iLuaFunction; SString strPostData; bool bPostBinary; CLuaArguments args; uint uiConnectionAttempts; uint uiConnectTimeoutMs;
+    SString strURL; SHttpRequestOptions httpRequestOptions; SString strQueueName; CLuaFunctionRef iLuaFunction; CLuaArguments callbackArguments;
 
     argStream.ReadString ( strURL );
-    argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
-    if ( argStream.NextIsNumber () )
-        MinClientReqCheck ( argStream, MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
-    argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
-    argStream.ReadFunction ( iLuaFunction );
-    argStream.ReadString ( strPostData, "" );
-    argStream.ReadBool ( bPostBinary, false );
-    argStream.ReadLuaArguments ( args );
-    argStream.ReadFunctionComplete ();
-
-    if ( !argStream.HasErrors () )
+    if (!argStream.NextIsTable())
     {
-        CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( luaMain )
+        if ( argStream.NextIsString () )
+            MinClientReqCheck ( argStream, MIN_CLIENT_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used" );
+        argStream.ReadIfNextIsString ( strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME );
+        argStream.ReadIfNextIsNumber ( httpRequestOptions.uiConnectionAttempts, 10 );
+        if ( argStream.NextIsNumber () )
+            MinClientReqCheck ( argStream, MIN_CLIENT_REQ_FETCHREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+        argStream.ReadIfNextIsNumber ( httpRequestOptions.uiConnectTimeoutMs, 10000 );
+        argStream.ReadFunction ( iLuaFunction );
+        argStream.ReadString ( httpRequestOptions.strPostData, "" );
+        argStream.ReadBool ( httpRequestOptions.bPostBinary, false );
+        argStream.ReadLuaArguments ( callbackArguments );
+        argStream.ReadFunctionComplete ();
+
+        if ( !argStream.HasErrors () )
         {
-            g_pClientGame->GetRemoteCalls()->Call ( strURL, &args, strPostData, bPostBinary, luaMain, iLuaFunction, uiConnectionAttempts, uiConnectTimeoutMs );
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+            if ( luaMain )
+            {
+                httpRequestOptions.bIsLegacy = true;
+                g_pClientGame->GetRemoteCalls()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
     }
     else
+    {
+        CStringMap optionsMap;
+
+        argStream.ReadStringMap(optionsMap);
+        argStream.ReadFunction(iLuaFunction);
+        if ( argStream.NextIsTable() )
+            argStream.ReadLuaArgumentsTable(callbackArguments);
+        argStream.ReadFunctionComplete();
+
+        optionsMap.ReadNumber("connectionAttempts", httpRequestOptions.uiConnectionAttempts, 10);
+        optionsMap.ReadNumber("connectTimeout", httpRequestOptions.uiConnectTimeoutMs, 10000);
+        optionsMap.ReadString("method", httpRequestOptions.strRequestMethod, "");
+        optionsMap.ReadString("queueName", strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME);
+        optionsMap.ReadString("postData", httpRequestOptions.strPostData, "");
+        optionsMap.ReadBool("postIsBinary", httpRequestOptions.bPostBinary, false);
+        optionsMap.ReadNumber("maxRedirects", httpRequestOptions.uiMaxRedirects, 8);
+        optionsMap.ReadString("username", httpRequestOptions.strUsername, "");
+        optionsMap.ReadString("password", httpRequestOptions.strPassword, "");
+        optionsMap.ReadStringMap("headers", httpRequestOptions.requestHeaders);
+        optionsMap.ReadStringMap("formFields", httpRequestOptions.formFields);
+
+        if (httpRequestOptions.formFields.empty())
+            MinClientReqCheck(argStream, MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_TABLE, "'options' table is being used");
+        else
+            MinClientReqCheck(argStream, MIN_CLIENT_REQ_CALLREMOTE_OPTIONS_FORMFIELDS, "'formFields' is being used");
+
+        if (!argStream.HasErrors())
+        {
+            CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+            if (luaMain)
+            {
+                g_pClientGame->GetRemoteCalls ()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+    }
+    
+    if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );

@@ -68,14 +68,14 @@ namespace
         rwInOutMatrix.pos = (RwV3d&)vecPosition;
     }
 
-    RpAtomic* ClumpDumpCB (RpAtomic* pAtomic, void * data)
+    bool ClumpDumpCB (RpAtomic* pAtomic, void * data)
     {
         CVehicleSA * pVehicleSA = (CVehicleSA *)data;
         RwFrame* pFrame = RpGetFrame ( pAtomic );   
         pVehicleSA->AddComponent ( pFrame, false );
         //g_pCore->GetConsole()->Print ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
         //OutputDebugLine ( SString ( "Atomic:%08x  Frame:%08x %s", pAtomic, pFrame, pFrame ? pFrame->szName : "" ) );
-        return pAtomic;
+        return true;
     }
 
     void ClumpDump ( RpClump* pClump, CVehicleSA * pVehicleSA )
@@ -265,6 +265,8 @@ void CVehicleSA::Init ( void )
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
     this->m_pDamageManager = new CDamageManagerSA( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+    
+    this->m_pVehicleAudioEntity = new CAEVehicleAudioEntitySA ( &GetVehicleInterface()->m_VehicleAudioEntity );
 
     // Replace the handling interface with our own to prevent handlig.cfg cheats and allow custom handling stuff.
     // We don't use SA's array because we want one handling per vehicle type and also allow custom handlings
@@ -342,6 +344,12 @@ CVehicleSA::~CVehicleSA()
             {
                 delete m_pDamageManager;
                 m_pDamageManager = NULL;
+            }
+
+            if ( m_pVehicleAudioEntity )
+            {
+                delete m_pVehicleAudioEntity;
+                m_pVehicleAudioEntity = NULL;
             }
 
             if ( m_pSuspensionLines )

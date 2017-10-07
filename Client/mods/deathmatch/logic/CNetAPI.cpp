@@ -1060,10 +1060,10 @@ void WriteCameraOrientation ( const CVector& vecPositionBase, NetBitStreamInterf
     CVector vecCamOffset = vecPositionBase - vecCamPosition;
 
     // Calc biggest value
-    float fMaxRelValue = Max ( abs ( vecCamOffset.fX ), Max ( abs ( vecCamOffset.fY ), abs ( vecCamOffset.fZ ) ) );
+    float fMaxRelValue = std::max ( abs ( vecCamOffset.fX ), std::max ( abs ( vecCamOffset.fY ), abs ( vecCamOffset.fZ ) ) );
 
     // Calc biggest value if used absolute position
-    float fMaxAbsValue = Max ( abs ( vecCamPosition.fX ), Max ( abs ( vecCamPosition.fY ), abs ( vecCamPosition.fZ ) ) );
+    float fMaxAbsValue = std::max ( abs ( vecCamPosition.fX ), std::max ( abs ( vecCamPosition.fY ), abs ( vecCamPosition.fZ ) ) );
 
     // Choose which one
     bool bUseAbsolutePosition;
@@ -1520,10 +1520,9 @@ void CNetAPI::ReadVehiclePuresync ( CClientPlayer* pPlayer, CClientVehicle* pVeh
 
             if ( pWeapon )
             {
-                CWeapon* pPlayerWeapon = pPlayer->GiveWeapon ( static_cast < eWeaponType > ( ucCurrentWeapon ), usWeaponAmmo );
+                CWeapon* pPlayerWeapon = pPlayer->GiveWeapon ( static_cast < eWeaponType > ( ucCurrentWeapon ), usWeaponAmmo, true );
                 if ( pPlayerWeapon )
                 {
-                    pPlayerWeapon->SetAsCurrentWeapon ();
                     pPlayerWeapon->SetAmmoTotal ( BitStream.Version () >= 0x44 ? ammo.data.usTotalAmmo : 9999 );
                     pPlayerWeapon->SetAmmoInClip ( usWeaponAmmo );
                 }
@@ -2166,7 +2165,7 @@ void CNetAPI::ReadLightweightSync ( CClientPlayer* pPlayer, NetBitStreamInterfac
         ulong ulElapsedTime = CClientTime::GetTime () - pPlayer->GetLastPuresyncTime ();
         vecCalcedVelocity = pos.data.vecPosition - pPlayer->GetLastPuresyncPosition ();
         float fDistance = vecCalcedVelocity.Normalize ();
-        float fSpeed = fDistance / Max( 0.01f, ulElapsedTime * 0.001f );
+        float fSpeed = fDistance / std::max( 0.01f, ulElapsedTime * 0.001f );
         vecCalcedVelocity *= fSpeed;
 
         pPlayer->SetPosition ( pos.data.vecPosition );

@@ -14,8 +14,6 @@
 void CLuaBrowserDefs::LoadFunctions ( void )
 {
     // Define browser functions
-    CLuaCFunctions::AddFunction( "isBrowserSupported", IsBrowserSupported );
-
     std::map<const char*, lua_CFunction> functions
         {
             { "createBrowser", CreateBrowser },
@@ -52,36 +50,10 @@ void CLuaBrowserDefs::LoadFunctions ( void )
         };
 
     // Add browser functions
-    if ( g_pCore->GetWebCore () )
+    for ( const auto& pair : functions )
     {
-        for ( const auto& pair : functions )
-        {
-            CLuaCFunctions::AddFunction ( pair.first, pair.second );
-        }
+        CLuaCFunctions::AddFunction ( pair.first, pair.second );
     }
-    else
-    {
-        for ( const auto& pair : functions )
-        {
-            CLuaCFunctions::AddFunction( pair.first, [](lua_State* luaVM) -> int {
-                // Show message box eventually
-                static bool messageBoxShown = false;
-                if ( !messageBoxShown )
-                {
-                    g_pCore->ShowMessageBox(_("Unsupported OS"),
-                        _("This server uses browser functions that are not supported on your PC. If you click OK, you are aware that your PC is vulnerable to malware and will most likely join a botnet soon"),
-                        MB_BUTTON_OK | MB_ICON_WARNING);
-                    
-                    messageBoxShown = true;
-                }
-
-                g_pCore->DebugPrintfColor ( "Called browser function on unsupported, vulnerable operating system. Please upgrade your OS as soon as possible", 255, 0, 0 );
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            } );
-        }
-    }
-    
 }
 
 
@@ -90,7 +62,6 @@ void CLuaBrowserDefs::AddClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "create", "createBrowser" );
-    lua_classfunction ( luaVM, "isSupported", "isBrowserSupported" );
     lua_classfunction ( luaVM, "loadURL", "loadBrowserURL" );
     lua_classfunction ( luaVM, "isLoading", "isBrowserLoading" );
     lua_classfunction ( luaVM, "injectMouseMove", "injectBrowserMouseMove" );
@@ -181,12 +152,6 @@ int CLuaBrowserDefs::CreateBrowser ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaBrowserDefs::IsBrowserSupported ( lua_State* luaVM )
-{
-    lua_pushboolean ( luaVM, g_pCore->GetWebCore() != nullptr );
-    return 1;
-}
-
 int CLuaBrowserDefs::RequestBrowserDomains ( lua_State* luaVM )
 {
     //  bool requestBrowserDomains ( table domains, bool isURL [, function callback ] )
@@ -209,7 +174,7 @@ int CLuaBrowserDefs::RequestBrowserDomains ( lua_State* luaVM )
             }
         }
 
-        WebRequestCallback callback = [=] ( bool bAllow, const std::vector<SString>& domains ) {
+        WebRequestCallback callback = [=] ( bool bAllow, const std::unordered_set<SString>& domains ) {
             // Test if luaVM is still available
             if ( m_pLuaManager->IsLuaVMValid ( luaVM ) && VERIFY_FUNCTION ( callbackFunction ) )
             {
@@ -557,7 +522,7 @@ int CLuaBrowserDefs::IsBrowserDomainBlocked ( lua_State* luaVM )
 
         if ( !strURL.empty () )
         {
-            lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetURLState ( strURL ) != eURLState::WEBPAGE_ALLOWED );
+            lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetDomainState ( strURL ) != eURLState::WEBPAGE_ALLOWED );
             return 1;
         }
     }
@@ -681,7 +646,7 @@ int CLuaBrowserDefs::GetBrowserSettings ( lua_State* luaVM )
     lua_settable ( luaVM, -3 );
 
     lua_pushstring ( luaVM, "PluginsEnabled" );
-    lua_pushboolean ( luaVM, g_pCore->GetWebCore ()->GetPluginsEnabled () );
+    lua_pushboolean ( luaVM, false );
     lua_settable ( luaVM, -3 );
 
     return 1;
@@ -702,7 +667,7 @@ int CLuaBrowserDefs::GetBrowserSource ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain && VERIFY_FUNCTION ( callbackFunction ) )
         {
-            pWebBrowser->GetSourceCode ( [callbackFunction, pLuaMain] ( const std::string& code ) {
+            pWebBrowser->GetSourceCode ( [callbackFunction, pLuaMain, pWebBrowser] ( const std::string& code ) {
                 /*
                 This function should not be called when the resource is about to stop as
                 stopping the resource destroys the browser element and thus cancels the
@@ -713,6 +678,7 @@ int CLuaBrowserDefs::GetBrowserSource ( lua_State* luaVM )
                     CLuaArguments arguments;
                     // TODO: Use SCharStringRef/direct string access instead of copying strings around
                     arguments.PushString ( code );
+                    arguments.PushElement(pWebBrowser);
                     arguments.Call ( pLuaMain, callbackFunction );
                 }
             } );
@@ -883,13 +849,11 @@ int CLuaBrowserDefs::ReloadBrowserPage( lua_State* luaVM )
 int CLuaBrowserDefs::GUICreateBrowser ( lua_State* luaVM )
 {
     //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; bool bIsLocal; bool bIsTransparent; bool bIsRelative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; bool bIsLocal; bool bIsTransparent; bool bIsRelative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadBool ( bIsLocal );
     argStream.ReadBool ( bIsTransparent );
     argStream.ReadBool ( bIsRelative );
@@ -906,7 +870,7 @@ int CLuaBrowserDefs::GUICreateBrowser ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, x, y, width, height, bIsLocal, bIsTransparent, bIsRelative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }

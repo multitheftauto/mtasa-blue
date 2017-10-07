@@ -361,13 +361,15 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szInArguments, CCli
                                 }
 
                                 // Broadcast the message to all clients
-                                pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( strEcho, ucR, ucG, ucB, true ) );
+                                auto ChatEchoPacket = CChatEchoPacket ( strEcho, ucR, ucG, ucB, true );
+                                ChatEchoPacket.SetSourceElement( pPlayer );
+                                pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( ChatEchoPacket );
 
                                 // Call onChatMessage if players chat message was delivered
                                 CLuaArguments Arguments2;
                                 Arguments2.PushString ( szArguments );
                                 Arguments2.PushElement ( pPlayer );
-                                static_cast < CPlayer* > ( pClient )->CallEvent ( "onChatMessage", Arguments2 );
+                                pPlayer->CallEvent ( "onChatMessage", Arguments2 );
                             }
 
                             break;
@@ -895,14 +897,16 @@ bool CConsoleCommands::ChgMyPass ( CConsole* pConsole, const char* szArguments, 
                         pAccount->SetPassword( szNewPassword );
 
                         // Tell the client
-                        pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
-                        CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password", GetAdminNameForLog ( pClient ).c_str () );
+                        if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                            pEchoClient->SendEcho ( SString ( "chgmypass: Your password was changed to '%s'", szNewPassword ) );
+                        CLogger::LogPrintf ( "ACCOUNTS: %s changed their account password\n", GetAdminNameForLog ( pClient ).c_str () );
                         return true;
                     }
                     else
                     {
-                        pEchoClient->SendEcho ( "chgmypass: Bad old password" );
-                        CLogger::LogPrintf ( "ACCOUNTS: %s failed to change their account password", GetAdminNameForLog ( pClient ).c_str () );
+                        if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                            pEchoClient->SendEcho ( "chgmypass: Bad old password" );
+                        CLogger::LogPrintf ( "ACCOUNTS: %s failed to change their account password (Bad old password)\n", GetAdminNameForLog ( pClient ).c_str () );
                    }
                 }
                 else
@@ -955,15 +959,14 @@ bool CConsoleCommands::AddAccount ( CConsole* pConsole, const char* szArguments,
                     // Try creating the account
                     if ( !g_pGame->GetAccountManager ()->Get ( szNick ) )
                     {
-                        CAccount* pAccount = new CAccount ( g_pGame->GetAccountManager (), true, szNick );
-                        pAccount->SetPassword ( szPassword );
-                        g_pGame->GetAccountManager ()->Register( pAccount );
+                        g_pGame->GetAccountManager ()->AddNewPlayerAccount ( szNick, szPassword );
 
                         // Tell the user
-                        pClient->SendEcho ( SString ( "addaccount: Added account '%s' with password '%s'", szNick, szPassword ) );
+                        if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                            pClient->SendEcho ( SString ( "addaccount: Added account '%s' with password '%s'", szNick, szPassword ) );
 
                         // Tell the console
-                        CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s' with password '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
+                        CLogger::LogPrintf ( "ACCOUNTS: %s added account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick );
                         return true;
                     }
                     else
@@ -1021,15 +1024,20 @@ bool CConsoleCommands::DelAccount ( CConsole* pConsole, const char* szArguments,
                 pAccountClient->SendEcho ( SString ( "logout: You were logged out of account '%s' due to it being deleted", szArguments ) );
             }
 
+            // Delete it
+            if ( !g_pGame->GetAccountManager ()->RemoveAccount ( pAccount ) )
+            {
+                pEchoClient->SendEcho ( "delaccount: Unable to delete account" );
+                return false;
+            }
+
             // Tell the client
-            pEchoClient->SendEcho ( SString ( "delaccount: Account '%s' deleted", szArguments ) );
+            if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                pEchoClient->SendEcho ( SString ( "delaccount: Account '%s' deleted", szArguments ) );
 
             // Tell the console
             CLogger::LogPrintf ( "ACCOUNTS: %s deleted account '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szArguments );
 
-            // Delete it
-            g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
-            delete pAccount;
             return true;
         }
         else
@@ -1069,10 +1077,11 @@ bool CConsoleCommands::ChgPass ( CConsole* pConsole, const char* szArguments, CC
                 pAccount->SetPassword ( szPassword );
 
                 // Tell the client
-                pEchoClient->SendEcho ( SString ( "chgpass: %s's password changed to '%s'", szNick, szPassword ) );
+                if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                    pEchoClient->SendEcho ( SString ( "chgpass: %s's password changed to '%s'", szNick, szPassword ) );
 
                 // Tell the console
-                CLogger::LogPrintf ( "ACCOUNTS: %s changed %s's password to '%s'\n", GetAdminNameForLog ( pClient ).c_str (), szNick, szPassword );
+                CLogger::LogPrintf ( "ACCOUNTS: %s changed %s's password\n", GetAdminNameForLog ( pClient ).c_str (), szNick );
                 return true;
             }
             else
@@ -1597,7 +1606,7 @@ bool CConsoleCommands::OpenPortsTest ( CConsole* pConsole, const char* szArgumen
 
 bool CConsoleCommands::SetDbLogLevel ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debugdb", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
@@ -1624,7 +1633,7 @@ bool CConsoleCommands::SetDbLogLevel ( CConsole* pConsole, const char* szArgumen
 
 bool DoAclRequest ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "aclrequest", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
@@ -1694,11 +1703,147 @@ bool CConsoleCommands::AclRequest ( CConsole* pConsole, const char* szArguments,
 }
 
 
+bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
+{
+    if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+    {
+        if ( !g_pGame->GetACLManager()->CanObjectUseRight( pClient->GetAccount()->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "authserial", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
+        {
+            pEchoClient->SendConsole( "authserial: You do not have sufficient rights to use this command." );
+            return false;
+        }
+    }
+
+    std::vector < SString > parts;
+    SStringX( szArguments ).Split( " ", parts );
+    const SString& strAccountName   = parts.size() > 0 ? parts[0] : "";
+    const SString& strAction        = parts.size() > 1 ? parts[1] : "";
+
+    bool bList  = strAction == "list";
+    bool bAllow = strAction == "";
+    bool bRemove = strAction == "removelast";
+    bool bHttpPass = strAction == "httppass";
+
+    if ( ( !bList && !bAllow && !bRemove && !bHttpPass ) || strAccountName.empty() )
+    {
+        pEchoClient->SendConsole( "Usage: authserial account_name [list|removelast|httppass]" );
+        return false;
+    }
+
+    CAccount* pAccount = g_pGame->GetAccountManager()->Get( strAccountName );
+    if ( !pAccount )
+    {
+        pEchoClient->SendConsole( SString( "authserial: No known account for '%s'", *strAccountName ) );
+        return false;
+    }
+
+    if ( bList )
+    {
+        // List authserial info
+        if ( pAccount->GetSerialUsageList().empty() )
+        {
+            pEchoClient->SendConsole( SString( "authserial: No serial usage for '%s'", *strAccountName ) );
+            return true;
+        }
+        pEchoClient->SendConsole( SString( "authserial: Serial usage for '%s':", *strAccountName ) );
+        for ( const auto& info : pAccount->GetSerialUsageList() )
+        {
+            char szAddedDate[64], szAuthDate[64], szLastLoginDate[64], szLastLoginHttpDate[64];
+            strftime( szAddedDate, 32, "%Y-%m-%d %H:%M", localtime( &info.tAddedDate ) );
+            strftime( szAuthDate, 32, "%Y-%m-%d %H:%M", localtime( &info.tAuthDate ) );
+            strftime( szLastLoginDate, 32, "%Y-%m-%d %H:%M", localtime( &info.tLastLoginDate ) );
+            strftime( szLastLoginHttpDate, 32, "%Y-%m-%d %H:%M", localtime( &info.tLastLoginHttpDate ) );
+            pEchoClient->SendConsole( SString( "  Serial: %s", *info.strSerial ) );
+            pEchoClient->SendConsole( SString( "    Added: %s (%s)", szAddedDate, *info.strAddedIp ) );
+            if ( info.IsAuthorized() )
+            {
+                if ( info.strAuthWho.empty() )
+                    pEchoClient->SendConsole( SString( "    Authorized: %s", szAuthDate ) );
+                else
+                    pEchoClient->SendConsole( SString( "    Authorized: %s (by %s)", szAuthDate, *info.strAuthWho ) );
+            }
+            if ( info.tLastLoginDate )
+            {
+                pEchoClient->SendConsole( SString( "    Last login: %s (%s)", szLastLoginDate, *info.strLastLoginIp ) );
+            }
+            if ( info.tLastLoginHttpDate )
+            {
+                pEchoClient->SendConsole( SString( "    Http login: %s ", szLastLoginHttpDate ) );
+            }
+        }
+        return true;
+    }
+    else
+    if ( bAllow )
+    {
+        // Authorize pending serial (there should be no more than one)
+        for ( const auto& info : pAccount->GetSerialUsageList() )
+        {
+            if ( !info.IsAuthorized() )
+            {
+                if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                    pEchoClient->SendConsole( SString( "authserial: Serial %s is authorized for '%s'", *info.strSerial, *strAccountName ) );
+                CLogger::LogPrintf( "AUTHSERIAL: Serial %s is authorized for '%s' (by %s)\n", *info.strSerial, *strAccountName, GetAdminNameForLog( pClient ).c_str() );
+                pAccount->AuthorizeSerial( info.strSerial, GetAdminNameForLog( pClient ) );
+                return true;
+            }
+        }
+        pEchoClient->SendConsole( SString( "authserial: No serials require authorization for '%s'", *strAccountName ) );
+        return false;
+    }
+    else
+    if ( bRemove )
+    {
+        // Find newest serial
+        time_t tNewestDate = 0;
+        SString strNewestSerial;
+        for ( const auto& info : pAccount->GetSerialUsageList() )
+        {
+            if ( info.tAddedDate >= tNewestDate )
+            {
+                tNewestDate = info.tAddedDate;
+                strNewestSerial = info.strSerial;
+            }
+        }
+        if ( !strNewestSerial.empty() )
+        {
+            if ( pClient->GetClientType() != CClient::CLIENT_CONSOLE )
+                pEchoClient->SendConsole( SString( "authserial: Serial %s is removed for '%s'", *strNewestSerial, *strAccountName ) );
+            CLogger::LogPrintf( "AUTHSERIAL: Serial %s is removed for '%s' (by %s)\n", *strNewestSerial, *strAccountName, GetAdminNameForLog( pClient ).c_str() );
+            pAccount->RemoveSerial( strNewestSerial );
+            return true;
+        }
+        pEchoClient->SendConsole( SString( "authserial: No serial usage for '%s'", *strAccountName ) );
+        return false;
+    }
+    else
+    if ( bHttpPass )
+    {
+        // Generate 7 digit random number
+        uint randomNumber;
+        g_pNetServer->GenerateRandomData(&randomNumber, sizeof(randomNumber));
+        randomNumber = (randomNumber % 8999999) + 1000000;
+        SString strHttpPassAppend("%u", randomNumber);
+
+        if (pClient->GetClientType() != CClient::CLIENT_CONSOLE)
+            pEchoClient->SendConsole(SString("authserial: HTTP password append for '%s' is now %s", *strAccountName, *strHttpPassAppend));
+        CLogger::LogPrintf("AUTHSERIAL: HTTP password append for '%s' is now %s\n", *strAccountName, *strHttpPassAppend);
+        pAccount->SetHttpPassAppend(strHttpPassAppend);
+        return true;
+    }
+    return false;
+}
+
+
 bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-#if defined(MTA_DEBUG) || defined(MTA_BETA)
+    if ( !g_pGame->GetConfig()->IsFakeLagCommandEnabled() )
+    {
+        pEchoClient->SendConsole( "sfakelag is not enabled" );
+        return false;
+    }
 
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "sfakelag", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
@@ -1726,14 +1871,13 @@ bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CC
     g_pGame->GetConfig ()->SetFakeLag ( iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit );
     pEchoClient->SendConsole ( SString ( "Server send lag is now: %d%% packet loss and %d extra ping with %d extra ping variance and %d KBPS limit", iPacketLoss, iExtraPing, iExtraPingVary, iKBPSLimit ) );
 
-#endif
     return true;
 }
 
 
 bool CConsoleCommands::DebugJoinFlood ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debugjoinflood", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {
@@ -1757,7 +1901,7 @@ bool CConsoleCommands::DebugJoinFlood ( CConsole* pConsole, const char* szArgume
 
 bool CConsoleCommands::DebugUpTime ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
-    if ( !pClient->GetClientType () == CClient::CLIENT_CONSOLE )
+    if ( pClient->GetClientType () != CClient::CLIENT_CONSOLE )
     {
         if ( !g_pGame->GetACLManager()->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_USER, "debuguptime", CAccessControlListRight::RIGHT_TYPE_COMMAND, false ) )
         {

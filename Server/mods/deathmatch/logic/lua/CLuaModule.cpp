@@ -52,7 +52,7 @@ CLuaModule::~CLuaModule ( void )
 #ifdef WIN32
 bool IsModule32Bit( const SString& strExpectedPathFilename )
 {
-    FILE* fh = fopen( strExpectedPathFilename, "rb" );
+    FILE* fh = File::Fopen( strExpectedPathFilename, "rb" );
     fseek( fh, 60, SEEK_SET );
     int offset = 0;
     fread( &offset, sizeof( offset ), 1, fh );
@@ -402,4 +402,37 @@ lua_State* CLuaModule::GetResourceFromName ( const char* szResourceName )
     }
 
     return NULL;
+}
+
+bool CLuaModule::GetResourceName(lua_State* luaVM, char* szName, size_t length)
+{
+    std::string resourceName;
+    if (GetResourceName(luaVM, resourceName))
+    {
+        std::strncpy(szName, resourceName.c_str(), length);
+        return true;
+    }
+
+    return false;
+}
+
+bool CLuaModule::GetResourceFilePath(lua_State* luaVM, const char* fileName, char* path, size_t length)
+{
+    if (!luaVM)
+        return false;
+
+    CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return false;
+
+    std::string p;
+    if (!pResource->GetFilePath(fileName, p))
+        return false;
+
+    std::strncpy(path, p.c_str(), length);
+    return true;
 }

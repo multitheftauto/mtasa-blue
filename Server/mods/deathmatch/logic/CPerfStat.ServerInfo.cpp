@@ -20,7 +20,6 @@
 #endif
 
 extern SThreadCPUTimesStore g_SyncThreadCPUTimes;
-extern SThreadCPUTimesStore g_DatabaseThreadCPUTimes;
 
 namespace
 {
@@ -171,7 +170,7 @@ void CPerfStatServerInfoImpl::DoPulse ( void )
     // Record once every 5 seconds
     if ( llTime >= m_llNextRecordTime )
     {
-        m_llNextRecordTime = Max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
+        m_llNextRecordTime = std::max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
         RecordStats ();
     }
 }
@@ -192,14 +191,14 @@ void CPerfStatServerInfoImpl::RecordStats ( void )
         return;
 
     // Save sample period deltas
-    m_llDeltaGameBytesSent = Max < long long > ( 0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount );
-    m_llDeltaGameBytesRecv = Max < long long > ( 0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount );
-    m_llDeltaGameBytesRecvBlocked = Max < long long > ( 0LL, liveStats.llIncomingUDPByteCountBlocked - m_PrevLiveStats.llIncomingUDPByteCountBlocked );
-    m_llDeltaGamePacketsSent = Max < long long > ( 0LL, liveStats.llOutgoingUDPPacketCount - m_PrevLiveStats.llOutgoingUDPPacketCount );
-    m_llDeltaGamePacketsRecv = Max < long long > ( 0LL, liveStats.llIncomingUDPPacketCount - m_PrevLiveStats.llIncomingUDPPacketCount );
-    m_llDeltaGamePacketsRecvBlocked = Max < long long > ( 0LL, liveStats.llIncomingUDPPacketCountBlocked - m_PrevLiveStats.llIncomingUDPPacketCountBlocked );
-    m_llDeltaGameBytesResent = Max < long long > ( 0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount );
-    m_llDeltaGameMessagesResent = Max < long long > ( 0LL, liveStats.llOutgoingUDPMessageResentCount - m_PrevLiveStats.llOutgoingUDPMessageResentCount );
+    m_llDeltaGameBytesSent = std::max < long long > ( 0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount );
+    m_llDeltaGameBytesRecv = std::max < long long > ( 0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount );
+    m_llDeltaGameBytesRecvBlocked = std::max < long long > ( 0LL, liveStats.llIncomingUDPByteCountBlocked - m_PrevLiveStats.llIncomingUDPByteCountBlocked );
+    m_llDeltaGamePacketsSent = std::max < long long > ( 0LL, liveStats.llOutgoingUDPPacketCount - m_PrevLiveStats.llOutgoingUDPPacketCount );
+    m_llDeltaGamePacketsRecv = std::max < long long > ( 0LL, liveStats.llIncomingUDPPacketCount - m_PrevLiveStats.llIncomingUDPPacketCount );
+    m_llDeltaGamePacketsRecvBlocked = std::max < long long > ( 0LL, liveStats.llIncomingUDPPacketCountBlocked - m_PrevLiveStats.llIncomingUDPPacketCountBlocked );
+    m_llDeltaGameBytesResent = std::max < long long > ( 0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount );
+    m_llDeltaGameMessagesResent = std::max < long long > ( 0LL, liveStats.llOutgoingUDPMessageResentCount - m_PrevLiveStats.llOutgoingUDPMessageResentCount );
     m_PrevLiveStats = liveStats;
 
     // Save sample period length
@@ -371,7 +370,6 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     m_InfoList.push_back ( StringPair ( "Logic thread CPU",  MakeCPUUsageString( m_MainThreadCPUTimes ) ) );
     m_InfoList.push_back ( StringPair ( "Sync thread CPU",   MakeCPUUsageString( g_SyncThreadCPUTimes ) ) );
     m_InfoList.push_back ( StringPair ( "Raknet thread CPU", MakeCPUUsageString( m_PrevLiveStats.threadCPUTimes ) ) );
-    m_InfoList.push_back ( StringPair ( "DB thread CPU",     MakeCPUUsageString( g_DatabaseThreadCPUTimes ) ) );
 
     if ( bIncludeDebugInfo )
     {
@@ -390,7 +388,6 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
         m_InfoList.push_back ( StringPair ( "Logic thread core #",       SString ( "%d", m_MainThreadCPUTimes.uiProcessorNumber ) ) );
         m_InfoList.push_back ( StringPair ( "Sync thread core #",        SString ( "%d", g_SyncThreadCPUTimes.uiProcessorNumber ) ) );
         m_InfoList.push_back ( StringPair ( "Raknet thread core #",      SString ( "%d", m_PrevLiveStats.threadCPUTimes.uiProcessorNumber ) ) );
-        m_InfoList.push_back ( StringPair ( "DB thread core #",          SString ( "%d", g_DatabaseThreadCPUTimes.uiProcessorNumber ) ) );
 
         m_InfoList.push_back ( StringPair ( "Lowest connected player version",  g_pGame->GetPlayerManager()->GetLowestConnectedPlayerVersion() ) );
     }
@@ -441,7 +438,7 @@ void CPerfStatServerInfoImpl::GetStats ( CPerfStatResult* pResult, const std::ma
     // Output rows
     std::vector < StringPair >* columnList[] = { &m_InfoList, &m_StatusList, &m_OptionsList };
 
-    uint uiMaxRows = Max ( Max ( m_InfoList.size (), m_StatusList.size () ), m_OptionsList.size () );
+    uint uiMaxRows = std::max ( std::max ( m_InfoList.size (), m_StatusList.size () ), m_OptionsList.size () );
     for ( uint i = 0 ; i < uiMaxRows ; i++ )
     {
         SString* row = pResult->AddRow ();

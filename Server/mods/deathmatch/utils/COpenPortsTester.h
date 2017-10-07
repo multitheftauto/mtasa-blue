@@ -47,7 +47,7 @@ public:
         }
 
         // Send request
-        GetDownloadManager()->QueueFile ( strURL, NULL, 0, "", 0, true, this, DownloadFinishedCallback, false, 1, 15000 );
+        GetDownloadManager()->QueueFile ( strURL, NULL, "", 0, true, this, DownloadFinishedCallback, false, 1, 15000 );
 
         CLogger::LogPrintfNoStamp ( "Testing ports...\n" );
 
@@ -58,21 +58,21 @@ public:
     //
     // Process response from remote
     //
-    static void DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )
+    static void DownloadFinishedCallback( const SHttpDownloadResult& result )
     {
-        COpenPortsTester* pOpenPortsTester = (COpenPortsTester*)obj;
-        if ( bSuccess )
+        COpenPortsTester* pOpenPortsTester = (COpenPortsTester*)result.pObj;
+        if ( result.bSuccess )
         {
             pOpenPortsTester->m_iPortTestStage = 0;
-            if ( iErrorCode != 200 )
+            if ( result.iErrorCode != 200 )
             {
-                CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u: %s)\n", iErrorCode, GetDownloadManager()->GetError() );
+                CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u: %s)\n", result.iErrorCode, GetDownloadManager()->GetError() );
             }
             else
             {
                 // Parse each test result
                 uint uiLinesOutput = 0;
-                SStringX strResult( data, dataLength );
+                SStringX strResult( result.pData, result.dataSize );
                 std::vector < SString > parts;
                 strResult.Split( "&", parts );
                 for ( uint i = 0 ; i < parts.size () ; i++ )
@@ -123,7 +123,7 @@ public:
         else
         {
             pOpenPortsTester->m_iPortTestStage = 0;
-            CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u %s)\n", iErrorCode, GetDownloadManager()->GetError() );
+            CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u %s)\n", result.iErrorCode, GetDownloadManager()->GetError() );
         }
     }
 

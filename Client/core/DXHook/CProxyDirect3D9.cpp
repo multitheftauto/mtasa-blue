@@ -655,12 +655,12 @@ void AddCapsReport( UINT Adapter, IDirect3D9* pDirect3D, IDirect3DDevice9* pD3DD
     }
     WriteDebugEvent( SString( "CapsReport - CreateVertexDeclarations MatchesCaps:%d/%d", uiNumMatchesCaps, uiNumItems ) );
 
-    DWORD MaxActiveLights = Min( DeviceCaps9.MaxActiveLights, pGTACaps9->MaxActiveLights );
+    DWORD MaxActiveLights = std::min( DeviceCaps9.MaxActiveLights, pGTACaps9->MaxActiveLights );
     pGTACaps9->MaxActiveLights = MaxActiveLights;
     D3DCaps9.MaxActiveLights = MaxActiveLights;
     DeviceCaps9.MaxActiveLights = MaxActiveLights;
 
-    DWORD MaxVertexBlendMatrixIndex = Min( DeviceCaps9.MaxVertexBlendMatrixIndex, pGTACaps9->MaxVertexBlendMatrixIndex );
+    DWORD MaxVertexBlendMatrixIndex = std::min( DeviceCaps9.MaxVertexBlendMatrixIndex, pGTACaps9->MaxVertexBlendMatrixIndex );
     pGTACaps9->MaxVertexBlendMatrixIndex = MaxVertexBlendMatrixIndex;
     D3DCaps9.MaxVertexBlendMatrixIndex = MaxVertexBlendMatrixIndex;
     DeviceCaps9.MaxVertexBlendMatrixIndex = MaxVertexBlendMatrixIndex;

@@ -9,13 +9,19 @@
 
 # libcurl has sources that provide functions named curlx_* that aren't part of
 # the official API, but we re-use the code here to avoid duplication.
-CURLX_ONES = \
+CURLX_CFILES = \
 	../lib/strtoofft.c \
-	../lib/strdup.c \
-	../lib/rawstr.c \
-	../lib/nonblock.c
+	../lib/nonblock.c \
+	../lib/warnless.c
+
+CURLX_HFILES = \
+	../lib/curl_setup.h \
+	../lib/strtoofft.h \
+	../lib/nonblock.h \
+	../lib/warnless.h
 
 CURL_CFILES = \
+	slist_wc.c \
 	tool_binmode.c \
 	tool_bname.c \
 	tool_cb_dbg.c \
@@ -46,6 +52,7 @@ CURL_CFILES = \
 	tool_panykey.c \
 	tool_paramhlp.c \
 	tool_parsecfg.c \
+	tool_strdup.c \
 	tool_setopt.c \
 	tool_sleep.c \
 	tool_urlglob.c \
@@ -56,6 +63,7 @@ CURL_CFILES = \
 	tool_xattr.c
 
 CURL_HFILES = \
+	slist_wc.h \
 	tool_binmode.h \
 	tool_bname.h \
 	tool_cb_dbg.h \
@@ -90,6 +98,7 @@ CURL_HFILES = \
 	tool_setopt.h \
 	tool_setup.h \
 	tool_sleep.h \
+	tool_strdup.h \
 	tool_urlglob.h \
 	tool_util.h \
 	tool_version.h \
@@ -98,5 +107,7 @@ CURL_HFILES = \
 	tool_writeout.h \
 	tool_xattr.h
 
-curl_SOURCES = $(CURL_CFILES) $(CURLX_ONES) $(CURL_HFILES)
+CURL_RCFILES = curl.rc
 
+# curl_SOURCES is special and gets assigned in src/Makefile.am
+CURL_FILES = $(CURL_CFILES) $(CURLX_CFILES) $(CURL_HFILES)

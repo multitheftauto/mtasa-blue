@@ -116,12 +116,14 @@ void CMessageLoopHook::MaybeRefreshMsgQueue( void )
     	  || msg.message == WM_VSCROLL
     	  ) 
     	  return; 
-    if ( PeekMessage( &msg, NULL, 0, 0,PM_REMOVE ) )
-    {
-    	TranslateMessage( &msg );
-    	DispatchMessage( &msg );
-    }
+
+    // Voodoo
+    uint uiUnusedMessageId = 0x3039;
+    PostMessage( m_HookedWindowHandle, uiUnusedMessageId, 0, 0 );
+    PeekMessage( &msg, NULL, uiUnusedMessageId, uiUnusedMessageId, PM_REMOVE );
+    PeekMessage( &msg, NULL, uiUnusedMessageId, uiUnusedMessageId, PM_REMOVE );
 }
+
 
 LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd, 
                                                     UINT uMsg, 
@@ -413,7 +415,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
             // If it was a question mark character, we may have an unprocessed unicode character
             if ( uMsg == WM_CHAR && wParam == 0x3F )
             {
-                wchar_t* wcsUnicode = new wchar_t[1];
+                wchar_t* wcsUnicode = new wchar_t;
                 ToUnicodeEx ( m_LastVirtualKeyCode, m_LastScanCode, m_LastKeyboardState, wcsUnicode, 1, 0, GetKeyboardLayout(0) );
                 wParam = (WPARAM)wcsUnicode[0];
                 delete wcsUnicode;

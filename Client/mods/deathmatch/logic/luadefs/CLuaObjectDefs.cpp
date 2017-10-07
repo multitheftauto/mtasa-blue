@@ -54,7 +54,7 @@ void CLuaObjectDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "stop", "stopObject" );
     lua_classfunction ( luaVM, "break", "breakObject" );
     lua_classfunction ( luaVM, "respawn", "respawnObject" );
-    lua_classfunction ( luaVM, "toggleObjectRespawn", "toggleObjectRespawn" );
+    lua_classfunction ( luaVM, "toggleRespawn", "toggleObjectRespawn" );
 
     lua_classfunction ( luaVM, "getScale", "getObjectScale" );
     lua_classfunction ( luaVM, "isBreakable", "isObjectBreakable" );
@@ -72,6 +72,9 @@ void CLuaObjectDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "elasticity", "setObjectElasticity", "getObjectElasticity" );
     lua_classvariable ( luaVM, "buoyancy", "setObjectBuoyancyConstant", "getObjectBuoyancyConstant" );
     lua_classvariable ( luaVM, "centermass", "setObjectCenterOfMass", "getObjectCenterOfMass" );
+
+    // Add deprecated methods for backwards compatibility
+    lua_classfunction(luaVM, "toggleObjectRespawn", "toggleObjectRespawn");
 
     lua_registerclass ( luaVM, "Object", "Element" );
 }
@@ -138,7 +141,7 @@ int CLuaObjectDefs::IsObjectStatic ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         bool bStatic;
-        if ( CStaticFunctionDefinitions::IsObjectStatic ( *pObject, bStatic ) )
+        if ( CStaticFunctionDefinitions::IsElementFrozen ( *pObject, bStatic ) )
         {
             lua_pushboolean ( luaVM, bStatic );
             return 1;
@@ -459,15 +462,15 @@ int CLuaObjectDefs::SetObjectScale ( lua_State* luaVM )
 int CLuaObjectDefs::SetObjectStatic ( lua_State* luaVM )
 {
 //  bool setObjectStatic ( object theObject, bool toggle )
-    CClientEntity* pEntity; bool bStatic;
+    CClientObject* pObject; bool bStatic;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pEntity );
+    argStream.ReadUserData ( pObject );
     argStream.ReadBool ( bStatic );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetObjectStatic ( *pEntity, bStatic ) )
+        if ( CStaticFunctionDefinitions::SetElementFrozen ( *pObject, bStatic ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;

@@ -47,4 +47,4 @@ project "Loader"
 		flags { "ExcludeFromBuild" } 
 	
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }

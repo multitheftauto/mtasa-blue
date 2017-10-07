@@ -34,7 +34,6 @@ class CServerBrowser;
 #include "CMainMenu.h"
 #include "CServerList.h"
 #include "CSingleton.h"
-#include "CCommunityLogin.h"
 #include "CServerInfo.h"
 #include <ctime>
 
@@ -103,7 +102,8 @@ public:
 
     CServerListItem*    FindSelectedServer      ( ServerBrowserType Type );
     CServerListItem*    FindServerFromRow       ( ServerBrowserType Type, int iRow );
-    CServerListItem*    FindServer              ( std::string strHost, unsigned short usPort );
+    CServerListItem*    FindServer              ( const std::string& strHost, unsigned short usPort );
+    unsigned short      FindServerHttpPort      ( const std::string& strHost, unsigned short usPort );
     int                 FindRowFromServer       ( ServerBrowserType Type, const CServerListItem * pServer );
     void                UpdateSelectedServerPlayerList ( ServerBrowserType Type );
     void                GetVisibleEndPointList  ( std::vector < SAddressPort >& outEndpointList );
@@ -138,9 +138,6 @@ protected:
     CGUIElement*        m_pTopWindow;
     CGUITabPanel*       m_pPanel;
     CGUIStaticImage*    m_pLockedIcon;
-
-    // Classes
-    CCommunityLogin     m_pCommunityLogin;
   
     // Tab controls
     CGUITab*            m_pTab [ SERVER_BROWSER_TYPE_COUNT ];

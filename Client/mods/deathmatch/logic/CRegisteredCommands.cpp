@@ -159,7 +159,7 @@ bool CRegisteredCommands::ProcessCommand ( const char* szKey, const char* szArgu
         if ( iCompareResult == 0 )
         {
             // Call it
-            CallCommandHandler ( (*iter)->pLuaMain, (*iter)->iLuaFunction, szKey, szArguments );
+            CallCommandHandler ( (*iter)->pLuaMain, (*iter)->iLuaFunction, (*iter)->strKey, szArguments );
             bHandled = true;
         }
     }

@@ -18,6 +18,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
+#define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
 
 extern CGame * g_pGame;
 
@@ -79,13 +80,11 @@ CMainConfig::CMainConfig ( CConsole* pConsole, CLuaManager* pLuaMain ): CXMLConf
     m_iHTTPThreadCount = 8;
     m_iHTTPDosThreshold = 20;
     m_iEnableClientChecks = -1;
-    m_bAutoUpdateAntiCheatEnabled = true;
     m_bJoinFloodProtectionEnabled = true;
     m_bScriptDebugLogEnabled = false;
     m_uiScriptDebugLogLevel = 0;
     m_bDontBroadcastLan = false;
     m_usFPSLimit = 36;
-    m_bAutoLogin = false;
     m_uiVoiceSampleRate = 1;
     m_ucVoiceQuality = 4;
     m_bVoiceEnabled = false;
@@ -132,6 +131,11 @@ bool CMainConfig::Load ( void )
     {
         CLogger::ErrorPrintf ( "Missing root node ('config')\n" );
         return false;
+    }
+
+    if (AddMissingSettings())
+    {
+        Save();
     }
 
     // Name
@@ -300,9 +304,8 @@ bool CMainConfig::Load ( void )
         {
             SString strDisableAC;
             GetString ( m_pRootNode, "disableac", strDisableAC );
-            strDisableAC = strDisableAC.Replace( " ", "" );
             std::vector < SString > tagACList;
-            strDisableAC.Split ( ",", tagACList );
+            ReadCommaSeparatedList(strDisableAC, tagACList);
             for ( std::vector < SString >::iterator it = tagACList.begin () ; it != tagACList.end () ; ++it )
                 if ( isdigit((uchar)***it) )
                 {
@@ -311,21 +314,18 @@ bool CMainConfig::Load ( void )
                 }
         }
 
-        // Add support for SD #12, #14, #15, #16, #20, #22 and #28 (defaults to disabled)
-        MapInsert ( m_DisableComboACMap, "12" );
-        MapInsert ( m_DisableComboACMap, "14" );
-        MapInsert ( m_DisableComboACMap, "15" );
-        MapInsert ( m_DisableComboACMap, "16" );
-        MapInsert ( m_DisableComboACMap, "20" );
-        MapInsert ( m_DisableComboACMap, "22" );
-        MapInsert ( m_DisableComboACMap, "28" );
+        // Add support for detections which default to disabled
+        const char* defaultDisabledList[] = { "12", "14", "15", "16", "20", "22", "23", "28", "31", "32", "33", "34", "35", "36" };
+        for( uint i = 0 ; i < NUMELMS(defaultDisabledList) ; i++ )
+        {
+            MapInsert( m_DisableComboACMap, defaultDisabledList[i] );
+        }
 
         {
             SString strEnableSD;
             GetString ( m_pRootNode, "enablesd", strEnableSD );
-            strEnableSD = strEnableSD.Replace( " ", "" );
             std::vector < SString > tagSDList;
-            strEnableSD.Split ( ",", tagSDList );
+            ReadCommaSeparatedList(strEnableSD, tagSDList);
             for ( std::vector < SString >::iterator it = tagSDList.begin () ; it != tagSDList.end () ; ++it )
                 if ( isdigit((uchar)***it) )
                 {
@@ -358,12 +358,9 @@ bool CMainConfig::Load ( void )
     {
         SString strEnable;
         GetString ( m_pRootNode, "enable_diagnostic", strEnable );
-        strEnable = strEnable.Replace( " ", "" );
         std::vector < SString > tagList;
-        strEnable.Split ( ",", tagList );
-        for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
-            if ( (*it).length () )
-                MapInsert ( m_EnableDiagnosticMap, *it );
+        ReadCommaSeparatedList(strEnable, tagList);
+        m_EnableDiagnosticMap = std::set<SString>(tagList.begin(), tagList.end());
     }
 
     // Grab the server password
@@ -488,8 +485,6 @@ bool CMainConfig::Load ( void )
     GetInteger ( m_pRootNode, "backup_copies", m_iBackupAmount );
     m_iBackupAmount = Clamp ( 0, m_iBackupAmount, 100 );
 
-    GetBoolean ( m_pRootNode, "autologin", m_bAutoLogin );
-
     // bandwidth_reduction
     GetString ( m_pRootNode, "bandwidth_reduction", m_strBandwidthReductionMode );
     ApplyBandwidthReductionMode ();
@@ -505,6 +500,31 @@ bool CMainConfig::Load ( void )
     // threadnet - Default to on at startup
     m_bThreadNetEnabled = true;
     ApplyThreadNetEnabled ();
+
+    // auth_serial_groups
+    SString strGroupList;
+    if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList ) != IS_SUCCESS )
+    {
+        // If not defined in conf file, then default to Admin
+        strGroupList = "Admin";
+    }
+    ReadCommaSeparatedList(strGroupList, m_AuthSerialGroupList);
+
+    // auth_serial_http
+    if ( GetBoolean( m_pRootNode, "auth_serial_http", m_bAuthSerialHttpEnabled ) != IS_SUCCESS )
+    {
+        m_bAuthSerialHttpEnabled = true;
+    }
+
+    // auth_serial_http_ip_exceptions
+    SString strIpsString;
+    GetString(m_pRootNode, "auth_serial_http_ip_exceptions", strIpsString);
+    ReadCommaSeparatedList(strIpsString, m_AuthSerialHttpIpExceptionList);
+
+    // owner_email_address
+    SString strEmailsString;
+    GetString(m_pRootNode, "owner_email_address", strEmailsString);
+    ReadCommaSeparatedList(strEmailsString, m_OwnerEmailAddressList);
 
     // Check settings in this list here
     const std::vector < SIntSetting >& settingList = GetIntSettingList ();
@@ -813,11 +833,10 @@ bool CMainConfig::LoadExtended ( void )
     RegisterCommand ( "reloadbans", CConsoleCommands::ReloadBans, false );
 
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
+    RegisterCommand ( "authserial", CConsoleCommands::AuthorizeSerial, false );
     RegisterCommand ( "debugjoinflood", CConsoleCommands::DebugJoinFlood, false );
     RegisterCommand ( "debuguptime", CConsoleCommands::DebugUpTime, false );
-#if defined(MTA_DEBUG) || defined(MTA_BETA)
     RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );
-#endif
     return true;
 }
 
@@ -835,6 +854,58 @@ bool CMainConfig::Save ( void )
 
     // No file
     return false;
+}
+
+
+//
+// Compare against default config and add missing nodes.
+// Returns true if nodes were added.
+//
+bool CMainConfig::AddMissingSettings(void)
+{
+    // Only mtaserver.conf is currently supported
+    if (!g_pGame->IsUsingMtaServerConf())
+        return false;
+
+    // Load template
+    const char *szTemplateText =
+        #include MTA_SERVER_CONF_TEMPLATE
+    ;
+    SString strTemplateFilename = PathJoin(g_pServerInterface->GetServerModPath(), "resource-cache", "conf.template");
+    FileSave(strTemplateFilename, szTemplateText);
+    CXMLFile* pFileTemplate = g_pServerInterface->GetXML()->CreateXML(strTemplateFilename);
+    CXMLNode* pRootNodeTemplate = pFileTemplate && pFileTemplate->Parse() ? pFileTemplate->GetRootNode() : nullptr;
+    if (!pRootNodeTemplate)
+    {
+        CLogger::ErrorPrintf("Can't parse '%s'\n", *strTemplateFilename);
+        return false;
+    }
+
+    // Check that each item in the template also exists in the server config
+    bool bChanged = false;
+    CXMLNode* pPrevNode = nullptr;
+    for(auto it = pRootNodeTemplate->ChildrenBegin(); it != pRootNodeTemplate->ChildrenEnd(); ++it)
+    {
+        CXMLNode* pNodeTemplate = *it;
+        SString strNodeName = pNodeTemplate->GetTagName();
+        CXMLNode* pNode = m_pRootNode->FindSubNode(strNodeName);
+        if (!pNode)
+        {
+            CLogger::LogPrintf("Adding missing '%s' to mtaserver.conf\n", *strNodeName);
+            SString strNodeValue = pNodeTemplate->GetTagContent();
+            SString strNodeComment = pNodeTemplate->GetCommentText();
+            pNode = m_pRootNode->CreateSubNode(strNodeName, pPrevNode);
+            pNode->SetTagContent(strNodeValue);
+            pNode->SetCommentText(strNodeComment, true);
+            bChanged = true;
+        }
+        pPrevNode = pNode;
+    }
+
+    // Clean up
+    g_pServerInterface->GetXML()->DeleteXML(pFileTemplate);
+    FileDelete(strTemplateFilename);
+    return bChanged;
 }
 
 
@@ -944,7 +1015,7 @@ unsigned int CMainConfig::GetHardMaxPlayers ( void )
 
 unsigned int CMainConfig::GetMaxPlayers ( void )
 {
-    return SharedUtil::Min ( GetHardMaxPlayers(), m_uiSoftMaxPlayers );
+    return std::min( GetHardMaxPlayers(), m_uiSoftMaxPlayers );
 }
 
 unsigned short CMainConfig::GetHTTPPort ( void )
@@ -969,7 +1040,7 @@ int CMainConfig::GetPendingWorkToDoSleepTime ( void )
     if ( m_iPendingWorkToDoSleepTime != -1 )
     {
         if ( m_bThreadNetEnabled )
-            return Max ( 0, m_iPendingWorkToDoSleepTime );
+            return std::max ( 0, m_iPendingWorkToDoSleepTime );
         else
             return m_iPendingWorkToDoSleepTime;
     }
@@ -986,7 +1057,7 @@ int CMainConfig::GetNoWorkToDoSleepTime ( void )
 {
     if ( m_iNoWorkToDoSleepTime != -1 )
     {
-        return Max ( 10, m_iNoWorkToDoSleepTime );
+        return std::max ( 10, m_iNoWorkToDoSleepTime );
     }
 
     // -1 means auto
@@ -1333,11 +1404,11 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
         SString strCurSD;
         GetSetting( "enablesd", strCurSD );
         std::vector < SString > curSDList;
-        strCurSD.Replace( " ", "" ).Split ( ",", curSDList );
+        ReadCommaSeparatedList(strCurSD, curSDList);
 
         // Get new setting as as list of ids
         std::vector < SString > newSDList;
-        strValue.Replace( " ", "" ).Split( ",", newSDList );
+        ReadCommaSeparatedList(strValue, newSDList);
 
         // Merge
         std::set < uint > comboSDMap;
@@ -1369,17 +1440,13 @@ bool CMainConfig::SetSetting ( const SString& strName, const SString& strValue, 
     {
         if ( true )
         {
-            m_EnableDiagnosticMap.clear();
-            SString strEnableDiagnostic = strValue.Replace( " ", "" );
             std::vector < SString > tagList;
-            strEnableDiagnostic.Split ( ",", tagList );
-            for ( std::vector < SString >::iterator it = tagList.begin () ; it != tagList.end () ; ++it )
-            if ( (*it).length () )
-                MapInsert ( m_EnableDiagnosticMap, *it );
+            ReadCommaSeparatedList(strValue, tagList);
+            m_EnableDiagnosticMap = std::set<SString>(tagList.begin(), tagList.end());
 
             if ( bSave )
             {
-                SetString ( m_pRootNode, "enable_diagnostic", strEnableDiagnostic );
+                SetString ( m_pRootNode, "enable_diagnostic", SString::Join(",", tagList) );
                 Save ();
             }
             return true;
@@ -1450,9 +1517,10 @@ const std::vector < SIntSetting >& CMainConfig::GetIntSettingList ( void )
             { false, false, 0,      1,      2,      "compact_internal_databases",           &m_iCompactInternalDatabases,               NULL },
             { true, true,   0,      1,      2,      "minclientversion_auto_update",         &m_iMinClientVersionAutoUpdate,             NULL },
             { true, true,   0,      0,      100,    "server_logic_fps_limit",               &m_iServerLogicFpsLimit,                    NULL },
-            { true, true,   0,      1,      1,      "bad_net_bullet_fix",                   &m_bBadNetBulletFixEnabled,                 NULL },
             { true, true,   0,      1,      1,      "crash_dump_upload",                    &m_bCrashDumpUploadEnabled,                 NULL },
             { true, true,   0,      1,      1,      "filter_duplicate_log_lines",           &m_bFilterDuplicateLogLinesEnabled,         NULL },
+            { false, false, 0,      1,      1,      "database_credentials_protection",      &m_bDatabaseCredentialsProtectionEnabled,   NULL },
+            { false, false, 0,      0,      1,      "fakelag",                              &m_bFakeLagCommandEnabled,                  NULL },
         };
 
     static std::vector < SIntSetting > settingsList;

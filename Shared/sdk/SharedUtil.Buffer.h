@@ -138,7 +138,7 @@ namespace SharedUtil
 
         CBuffer Tail( uint uiAmount ) const
         {
-            uiAmount = Min ( uiAmount, GetSize () );
+            uiAmount = std::min( uiAmount, GetSize () );
             return Mid ( GetSize () - uiAmount, uiAmount );
         }
 

@@ -146,7 +146,7 @@ bool CLogger::SetLogFile ( const char* szLogFile )
         MakeSureDirExists ( szLogFile );
 
         // Create the file
-        m_pLogFile = fopen ( szLogFile, "a+" );
+        m_pLogFile = File::Fopen ( szLogFile, "a+" );
         return m_pLogFile != NULL;
     }
 
@@ -171,7 +171,7 @@ bool CLogger::SetAuthFile ( const char* szAuthFile )
         MakeSureDirExists ( szAuthFile );
 
         // Create the file
-        m_pAuthFile = fopen ( szAuthFile, "a+" );
+        m_pAuthFile = File::Fopen ( szAuthFile, "a+" );
         return m_pAuthFile != NULL;
     }
 

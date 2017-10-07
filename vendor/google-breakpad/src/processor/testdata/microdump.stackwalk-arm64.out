@@ -3,6 +3,8 @@ Operating system: Android
 CPU: arm64
      2 CPUs
 
+GPU: UNKNOWN
+
 Crash reason:  
 Crash address: 0x0
 Process uptime: not available

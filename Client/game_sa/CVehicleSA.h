@@ -29,6 +29,7 @@ class CVehicleSA;
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
 #include "CColPointSA.h"
+#include "CAEVehicleAudioEntitySA.h"
 
 #define SIZEOF_CHELI                            2584
 
@@ -322,17 +323,6 @@ struct CTrainFlags
     unsigned char unknown7 : 8;
 };
 
-
-// TODO: Size?
-class CAEVehicleAudioEntity
-{
-    BYTE pad1[154];
-public:
-    BYTE bCurrentRadioStation;
-private:
-    BYTE pad2;
-};
-
 class CAutoPilot
 {
     BYTE pad[56];
@@ -346,9 +336,7 @@ class CAutoPilot
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
-    CAEVehicleAudioEntity m_VehicleAudioEntity; // 312
-
-    int padaudio[108];
+    CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity; // 312
 
     tHandlingDataSA* pHandlingData;                             // +900
     tFlyingHandlingDataSA* pFlyingHandlingData;                 // +904
@@ -515,6 +503,7 @@ class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
     friend class CPoolsSA;
 private:
     CDamageManagerSA*           m_pDamageManager;
+    CAEVehicleAudioEntitySA*    m_pVehicleAudioEntity;
     CHandlingEntrySA*           m_pHandlingData;
     void*                       m_pSuspensionLines;
     bool                        m_bIsDerailable;
@@ -701,7 +690,8 @@ public:
     void                        SetAdjustablePropertyValue              ( unsigned short usAdjustableProperty ) { *reinterpret_cast < unsigned short* > ( reinterpret_cast < unsigned int > ( m_pInterface ) + 2156 ) = usAdjustableProperty; };
     void                        SetHeliRotorSpeed                       ( float fSpeed )                        { *reinterpret_cast < float* > ( reinterpret_cast < unsigned int > ( m_pInterface ) + 2124 ) = fSpeed; };
     void                        SetExplodeTime                          ( unsigned long ulTime )                { *reinterpret_cast < unsigned long* > ( reinterpret_cast < unsigned int > ( m_pInterface ) + 1240 ) = ulTime; };
-    
+    void                        SetRadioStatus                          ( bool bStatus )                        { *reinterpret_cast < unsigned char* > ( reinterpret_cast < unsigned int  > (m_pInterface ) + 0x1D3 ) = bStatus; };
+
     void                        SetNitroCount                           ( char cNitroCount )                { GetVehicleInterface ()->m_nNitroBoosts = cNitroCount; }
     void                        SetNitroLevel                           ( float fLevel );
 
@@ -748,8 +738,6 @@ public:
 
     CVehicleSAInterface*        GetVehicleInterface             ()  { return (CVehicleSAInterface*) m_pInterface; }
 
-    bool                        CheckVTBL                       ( void ) { return (m_pInterface->vtbl && (DWORD)m_pInterface->vtbl == VTBL_CPlaceable); }
-
     bool                        DoesVehicleHaveSirens           ( void ) { return m_tSirenInfo.m_bOverrideSirens; }
 
     void                        GiveVehicleSirens               ( unsigned char ucSirenType, unsigned char ucSirenCount );
@@ -789,6 +777,8 @@ public:
     bool                        SetWindowOpenFlagState          ( unsigned char ucWindow, bool bState );
 
     void                        UpdateLandingGearPosition       ( );
+
+    CAEVehicleAudioEntitySA *   GetVehicleAudioEntity           ( void )  { return m_pVehicleAudioEntity; };
 
 private:
     void                        RecalculateSuspensionLines          ( void );

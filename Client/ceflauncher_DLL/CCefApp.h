@@ -53,10 +53,10 @@ public:
         }
     }
 
-    virtual void OnRegisterCustomSchemes ( CefRefPtr < CefSchemeRegistrar > registrar ) override
+    virtual void OnRegisterCustomSchemes ( CefRawPtr < CefSchemeRegistrar > registrar ) override
     {
         // Register custom MTA scheme (has to be called in all proceseses)
-        registrar->AddCustomScheme ( "mtalocal", false, false, false );
+        registrar->AddCustomScheme ( "mtalocal", false, false, false, false, false, true );
     }
 
 
@@ -68,7 +68,7 @@ public:
         CefRefPtr<CV8Handler> handler = new CV8Handler ( frame );
 
         // Create MTA object
-        CefRefPtr<CefV8Value> mtaObject = CefV8Value::CreateObject ( NULL );
+        CefRefPtr<CefV8Value> mtaObject = CefV8Value::CreateObject ( nullptr, nullptr );
 
         // Bind V8 --> C++ functions
         V8Helpers::BindV8Function ( handler, mtaObject, "triggerEvent", Javascript_triggerEvent );

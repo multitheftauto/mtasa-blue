@@ -46,6 +46,10 @@ IMPLEMENT_ENUM_BEGIN( EHashFunction::EHashFunctionType )
     ADD_ENUM ( EHashFunction::SHA512,          "sha512" )
 IMPLEMENT_ENUM_END( "hash-function" )
 
+IMPLEMENT_ENUM_CLASS_BEGIN(PasswordHashFunction)
+    ADD_ENUM(PasswordHashFunction::Bcrypt, "bcrypt")
+IMPLEMENT_ENUM_CLASS_END("password-hash-function")
+
 IMPLEMENT_ENUM_BEGIN( ePacketID )
     ADD_ENUM1( PACKET_ID_SERVER_JOIN )
     ADD_ENUM1( PACKET_ID_SERVER_JOIN_DATA )

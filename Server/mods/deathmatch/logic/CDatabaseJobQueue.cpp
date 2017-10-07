@@ -14,8 +14,6 @@
 #include "CDatabaseJobQueue.h"
 #include "SharedUtil.Thread.h"
 
-SThreadCPUTimesStore g_DatabaseThreadCPUTimes;
-
 typedef CFastList < CDbJobData* > CJobQueueType;
 
 ///////////////////////////////////////////////////////////////
@@ -38,6 +36,7 @@ public:
     virtual bool                FreeCommand                 ( CDbJobData* pJobData );
     virtual CDbJobData*         FindCommandFromId           ( SDbJobId id );
     virtual void                IgnoreConnectionResults     ( SConnectionHandle connectionHandle );
+    virtual bool                UsesConnection              ( SConnectionHandle connectionHandle );
 
 protected:
     void                        StopThread                  ( void );
@@ -54,10 +53,8 @@ protected:
     void                        ProcessQuery                ( CDbJobData* pJobData );
     void                        ProcessFlush                ( CDbJobData* pJobData );
     void                        ProcessSetLogLevel          ( CDbJobData* pJobData );
-    uint                        MakeHandleForConnection     ( CDatabaseConnection* pConnection );
     CDatabaseConnection*        GetConnectionFromHandle     ( SConnectionHandle connectionHandle );
     void                        RemoveHandleForConnection   ( SConnectionHandle connectionHandle, CDatabaseConnection* pConnection );
-    SConnectionHandle           GetNextConnectionHandle     ( void );
     void                        LogResult                   ( CDbJobData* pJobData );
     void                        LogString                   ( const SString& strText );
 
@@ -71,8 +68,6 @@ protected:
     std::set < SConnectionHandle >      m_PendingFlushMap;
 
     // Other thread variables
-    SConnectionHandle                                       m_ConnectionHandleCounter;
-    std::map < SConnectionHandle, CDatabaseConnection* >    m_HandleConnectionMap;
     std::map < SString, CDatabaseType* >                    m_DatabaseTypeMap;
     uint                                                    m_uiConnectionCountWarnThresh;
     EJobLogLevelType                                        m_LogLevel;
@@ -86,6 +81,7 @@ protected:
         CJobQueueType                               m_CommandQueue;
         CJobQueueType                               m_ResultQueue;
         CComboMutex                                 m_Mutex;
+        std::map < SConnectionHandle, CDatabaseConnection* >    m_HandleConnectionMap;
     } shared;
 };
 
@@ -208,6 +204,7 @@ CDbJobData* CDatabaseJobQueueImpl::AddCommand ( EJobCommandType jobType, SConnec
     pJobData->command.type = jobType;
     pJobData->command.connectionHandle = connectionHandle;
     pJobData->command.strData = strData;
+    pJobData->command.pJobQueue = this;
 
     // Add to queue
     shared.m_Mutex.Lock ();
@@ -306,8 +303,15 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
 
     shared.m_Mutex.Lock ();
 
+    // Log to console if connection count is creeping up
+    if ( shared.m_HandleConnectionMap.size() > m_uiConnectionCountWarnThresh )
+    {
+        m_uiConnectionCountWarnThresh = shared.m_HandleConnectionMap.size() * 2;
+        CLogger::LogPrintf( "Notice: There are now %d database connections\n", shared.m_HandleConnectionMap.size() );
+    }
+
     // Log to console if job count is creeping up
-    m_uiJobCount10sMin = Min < uint > ( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
+    m_uiJobCount10sMin = std::min < uint > ( m_uiJobCount10sMin, m_ActiveJobHandles.size () );
     if ( m_uiJobCount10sMin > m_uiJobCountWarnThresh )
     {
         m_uiJobCountWarnThresh = m_uiJobCount10sMin * 2;
@@ -389,7 +393,7 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
         }
 
         CElapsedTime timer;
-        shared.m_Mutex.Wait ( Min( uiTimeout, 1000U ) );
+        shared.m_Mutex.Wait (std::min( uiTimeout, 1000U ) );
         uint uiDelta = (uint)timer.Get() + 1;
         uiTotalWaitTime += uiDelta;
 
@@ -512,6 +516,20 @@ void CDatabaseJobQueueImpl::IgnoreJobResults ( CDbJobData* pJobData )
 }
 
 
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::UsesConnection
+//
+// Return true if supplied connection is used by this queue
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseJobQueueImpl::UsesConnection( SConnectionHandle connectionHandle )
+{
+    return GetConnectionFromHandle( connectionHandle ) != nullptr;
+}
+
+
+
 //
 //
 //
@@ -547,8 +565,6 @@ void* CDatabaseJobQueueImpl::ThreadProc ( void )
     shared.m_Mutex.Lock ();
     while ( !shared.m_bTerminateThread )
     {
-        UpdateThreadCPUTimes( g_DatabaseThreadCPUTimes );
-
         // Is there a waiting command?
         if ( shared.m_CommandQueue.empty () )
         {
@@ -666,12 +682,13 @@ void CDatabaseJobQueueImpl::ProcessConnect ( CDbJobData* pJobData )
     if ( pTypeManager->GetDataSourceTag () != "mysql" )
         pConnection->m_SuppressedErrorCodes.clear ();
 
-    // Get handle from CDatabaseConnection*
-    SConnectionHandle connectionHandle = MakeHandleForConnection ( pConnection );
+    // Associate handle with CDatabaseConnection*
+    shared.m_Mutex.Lock();
+    MapSet( shared.m_HandleConnectionMap, pJobData->command.connectionHandle, pConnection );
+    shared.m_Mutex.Unlock();
 
     // Set result
     pJobData->result.status = EJobResult::SUCCESS;
-    pJobData->result.connectionHandle = connectionHandle;
 }
 
 
@@ -779,50 +796,6 @@ void CDatabaseJobQueueImpl::ProcessSetLogLevel ( CDbJobData* pJobData )
 
 ///////////////////////////////////////////////////////////////
 //
-// CDatabaseJobQueueImpl::GetNextConnectionHandle
-//
-// Return handle within correct range
-//
-///////////////////////////////////////////////////////////////
-SConnectionHandle CDatabaseJobQueueImpl::GetNextConnectionHandle ( void )
-{
-    do
-    {
-        m_ConnectionHandleCounter++;
-        m_ConnectionHandleCounter &= 0x000FFFFF;
-        m_ConnectionHandleCounter |= 0x00200000;
-        // TODO - check when all (1,048,575) ids are in use
-    }
-    while ( MapContains ( m_HandleConnectionMap, m_ConnectionHandleCounter ) );
-
-    // Keep track of number of database connections
-    if ( m_HandleConnectionMap.size () > m_uiConnectionCountWarnThresh )
-    {
-        m_uiConnectionCountWarnThresh = m_HandleConnectionMap.size () * 2;
-        CLogger::LogPrintf ( "Notice: There are now %d database connections\n", m_HandleConnectionMap.size () );
-    }
-
-    return m_ConnectionHandleCounter;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CDatabaseJobQueueImpl::MakeHandleForConnection
-//
-//
-//
-///////////////////////////////////////////////////////////////
-SConnectionHandle CDatabaseJobQueueImpl::MakeHandleForConnection ( CDatabaseConnection* pConnection )
-{
-    SConnectionHandle connectionHandle = GetNextConnectionHandle ();
-    MapSet ( m_HandleConnectionMap, connectionHandle, pConnection );
-    return connectionHandle;
-}
-
-
-///////////////////////////////////////////////////////////////
-//
 // CDatabaseJobQueueImpl::GetConnectionFromHandle
 //
 //
@@ -830,7 +803,10 @@ SConnectionHandle CDatabaseJobQueueImpl::MakeHandleForConnection ( CDatabaseConn
 ///////////////////////////////////////////////////////////////
 CDatabaseConnection* CDatabaseJobQueueImpl::GetConnectionFromHandle ( SConnectionHandle connectionHandle )
 {
-    return MapFindRef ( m_HandleConnectionMap, connectionHandle );
+    shared.m_Mutex.Lock();
+    CDatabaseConnection* pConnection = MapFindRef ( shared.m_HandleConnectionMap, connectionHandle );
+    shared.m_Mutex.Unlock();
+    return pConnection;
 }
 
 
@@ -843,10 +819,12 @@ CDatabaseConnection* CDatabaseJobQueueImpl::GetConnectionFromHandle ( SConnectio
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::RemoveHandleForConnection ( SConnectionHandle connectionHandle, CDatabaseConnection* pConnection )
 {
-    if ( !MapContains ( m_HandleConnectionMap, connectionHandle ) )
+    shared.m_Mutex.Lock();
+    if ( !MapContains ( shared.m_HandleConnectionMap, connectionHandle ) )
         CLogger::ErrorPrintf ( "RemoveHandleForConnection: Serious problem here\n" );
 
-    MapRemove ( m_HandleConnectionMap, connectionHandle );
+    MapRemove ( shared.m_HandleConnectionMap, connectionHandle );
+    shared.m_Mutex.Unlock();
 }
 
 

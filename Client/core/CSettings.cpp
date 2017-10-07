@@ -27,13 +27,6 @@ using namespace std;
 #define CORE_SETTINGS_HEADERS           3
 #define CORE_SETTINGS_HEADER_SPACER     " "
 #define CORE_SETTINGS_NO_KEY            " "
-#define CORE_SETTINGS_COMMUNITY_TEXT    \
-    "Multi Theft Auto: Community is a voluntary community service offering everything\n" \
-    "from third-party resources to user-based statistics.\n" \
-    "\n" \
-    "If you have already registered at community.mtasa.com,\n" \
-    "you can fill in your account details below to complete your registration.\n" \
-    "This computer will then automatically link to your personal account."
 
 extern CCore* g_pCore;
 extern SBindableGTAControl g_bcControls[];
@@ -44,6 +37,7 @@ CSettings::CSettings ( void )
     m_iMaxAnisotropic = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
     m_pWindow = NULL;
     m_bBrowserListsChanged = false;
+    m_bBrowserListsLoadEnabled = false;
     CreateGUI ();
 
     // Disable progress animation if required
@@ -66,7 +60,7 @@ void CSettings::CreateGUI ( void )
     if ( m_pWindow )
         DestroyGUI ();
 
-    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabCommunity, *pTabInterface, *pTabBrowser, *pTabAdvanced;
+    CGUITab *pTabMultiplayer, *pTabVideo, *pTabAudio, *pTabBinds, *pTabControls, *pTabAdvanced;
     CGUI *pManager = g_pCore->GetGUI ();
 
     // Init
@@ -121,16 +115,16 @@ void CSettings::CreateGUI ( void )
     m_pTabs = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pWindow ) );
     m_pTabs->SetPosition ( tabPanelPosition );
     m_pTabs->SetSize ( tabPanelSize );
+    m_pTabs->SetSelectionHandler( GUI_CALLBACK( &CSettings::OnTabChanged, this ) );
 
     pTabMultiplayer = m_pTabs->CreateTab ( _("Multiplayer") );
     pTabVideo = m_pTabs->CreateTab ( _("Video") );
     pTabAudio = m_pTabs->CreateTab ( _("Audio") );
     pTabBinds = m_pTabs->CreateTab ( _("Binds") );
     pTabControls = m_pTabs->CreateTab ( _("Controls") );
-    pTabInterface = m_pTabs->CreateTab ( _("Interface") );
-    pTabBrowser = m_pTabs->CreateTab ( _("Web Browser") );
+    m_pTabInterface = m_pTabs->CreateTab ( _("Interface") );
+    m_pTabBrowser = m_pTabs->CreateTab ( _("Web Browser") );
     pTabAdvanced = m_pTabs->CreateTab ( _("Advanced") );
-    pTabCommunity = m_pTabs->CreateTab ( _("Community") );
 
     // Create buttons
     //  OK button
@@ -364,52 +358,6 @@ void CSettings::CreateGUI ( void )
     m_hPriKey = m_pBindsList->AddColumn ( _("KEY"), 0.24f );
     for ( int k = 0 ; k < SecKeyNum ; k++ )
         m_hSecKeys[k] = m_pBindsList->AddColumn ( _("ALT. KEY"), 0.24f );
-
-    /**
-     *  Community tab
-     **/
-
-    m_pTabs->DeleteTab ( pTabCommunity );
-
-    m_pLabelCommunity = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, CORE_SETTINGS_COMMUNITY_TEXT ) );
-    m_pLabelCommunity->SetPosition ( CVector2D ( 0.022f, 0.043f ), true );
-    m_pLabelCommunity->SetSize ( CVector2D ( 9.956f, 4.414f ), true );
-    //m_pLabelCommunity->AutoSize ( CORE_SETTINGS_COMMUNITY_TEXT );
-
-    m_pLabelUser = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, _("Username:") ) );
-    m_pLabelUser->SetPosition ( CVector2D ( 0.022f, 0.46f ), true );
-    m_pLabelUser->GetPosition ( vecTemp, false );
-    m_pLabelUser->AutoSize ( );
-
-    m_pLabelPass = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabCommunity, _("Password:") ) );
-    m_pLabelPass->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-    m_pLabelPass->AutoSize ( );
-
-    m_pEditUser = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabCommunity ) );
-    m_pEditUser->SetPosition ( CVector2D ( 0.16f, 0.45f ), true );
-    m_pEditUser->GetPosition ( vecTemp, false );
-    m_pEditUser->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-    m_pEditUser->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnLoginButtonClick, this ) );
-//    m_pEditUser->SetMaxLength ( 64 );
-
-    m_pEditPass = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabCommunity ) );
-    m_pEditPass->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-    m_pEditPass->GetPosition ( vecTemp, false );
-    m_pEditPass->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-//    m_pEditPass->SetMaxLength ( 64 );
-    m_pEditPass->SetMasked ( true );
-    m_pEditPass->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnLoginButtonClick, this ) );
-
-    m_pButtonLogin = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, _("Login") ) );
-    m_pButtonLogin->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-    m_pButtonLogin->GetPosition ( vecTemp, false );
-    m_pButtonLogin->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-    m_pButtonLogin->SetZOrderingEnabled ( false );
-
-    m_pButtonRegister = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabCommunity, _("Register") ) );
-    m_pButtonRegister->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32 ) );
-    m_pButtonRegister->SetSize ( CVector2D ( 168.0f, 24.0f ) );
-    m_pButtonRegister->SetZOrderingEnabled ( false );
 
     /**
      *	Multiplayer tab
@@ -837,6 +785,10 @@ void CSettings::CreateGUI ( void )
     m_pCheckBoxTyreSmokeParticles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 90.0f ) );
     m_pCheckBoxTyreSmokeParticles->AutoSize ( NULL, 20.0f );
 
+    m_pCheckBoxHighDetailVehicles = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Render vehicles always in high detail"), true ) );
+    m_pCheckBoxHighDetailVehicles->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 110.0f ) );
+    m_pCheckBoxHighDetailVehicles->AutoSize ( NULL, 20.0f );
+
     float fPosY =  vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabVideo, _("Full Screen Minimize"), true ) );
     m_pCheckBoxMinimize->SetPosition ( CVector2D ( vecTemp.fX + 245.0f, fPosY + 30.0f ) );
@@ -887,342 +839,78 @@ void CSettings::CreateGUI ( void )
     /**
      * Interface/chat Tab
      **/
-    {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("General") ) );
-        pLabel->SetPosition ( CVector2D ( 10.0f, 12.0f ) );
-        pLabel->AutoSize ( NULL, 5.0f );
-        pLabel->SetFont ( "default-bold-small" );
-    }
-
-    fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
-        _("Language:"),
-        _("Skin:"),
-        _("Presets:")
-    ) + 5.0f;
-
-    {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Language:") ) );
-        pLabel->SetPosition ( CVector2D ( 10.0f, 35.0f ) );
-        pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( );
-    }
-
-    m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface, "English" ) );
-    m_pInterfaceLanguageSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 33.0f ) );
-    m_pInterfaceLanguageSelector->SetSize ( CVector2D ( 350.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
-    m_pInterfaceLanguageSelector->SetReadOnly ( true );
-
-    // Grab languages and populate
-    std::map<SString,SString> m_LanguageMap = g_pCore->GetLocalization()->GetAvailableLanguages();
-    m_LanguageMap["English"] = "en_US";
-    std::map<SString,SString>::const_iterator itr;
-    for(itr = m_LanguageMap.begin(); itr != m_LanguageMap.end(); ++itr)
-    {
-        CGUIListItem* pItem = m_pInterfaceLanguageSelector->AddItem((*itr).first );
-        pItem->SetData ( (*itr).second );
-    }
-
-    {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Skin:") ) );
-        pLabel->SetPosition ( CVector2D ( 10.0f, 65.0f ) );
-        pLabel->AutoSize ( );
-    }
-
-    m_pInterfaceSkinSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
-    m_pInterfaceSkinSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 63.0f ) );
-    m_pInterfaceSkinSelector->SetSize ( CVector2D ( 350.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
-    m_pInterfaceSkinSelector->SetReadOnly ( true );
-
-    {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Chat") ) );
-        pLabel->SetPosition ( CVector2D ( 10.0f, 90.0f ) );
-        pLabel->AutoSize ( );
-        pLabel->SetFont ( "default-bold-small" );
-    }
-
-
-    // Presets
-
-    {
-        CGUILabel* pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Presets:") ) );
-        pLabel->SetPosition ( CVector2D ( 10.0f, 112.0f ) );
-        pLabel->AutoSize ( );
-    }
-
-    m_pChatPresets = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabInterface ) );
-    m_pChatPresets->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, 110.0f ) );
-    m_pChatPresets->SetSize ( CVector2D ( 350.0f - ( vecTemp.fX + fIndentX ), 200.0f ) );
-    m_pChatPresets->SetReadOnly ( true );
-
-    m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabInterface, _("Load") ) );
-    m_pChatLoadPreset->SetPosition ( CVector2D ( 360.0f, 110.0f ) );
-    m_pChatLoadPreset->SetSize ( CVector2D ( 100.0f, 24.0f ) );
-    m_pChatLoadPreset->SetZOrderingEnabled ( false );
-
-    // Color selection
-    SString strChatBG = _("Chat BG");
-    SString strChatText = _("Chat Text");
-    SString strInputBG = _("Input BG");
-    SString strInputText = _("Input Text");
-
-    float fColorTabsTextWidth = pManager->GetTextExtent( strChatBG )
-                                + pManager->GetTextExtent( strChatText )
-                                + pManager->GetTextExtent( strInputBG )
-                                + pManager->GetTextExtent( strInputText );
-
-    // Add 20 for each tab
-    fColorTabsTextWidth += 20 * 4;
-    float fColorTabPanelWidth = Max( 400.f, fColorTabsTextWidth );
-
-    CGUITabPanel* pColorTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( pTabInterface ) );
-    pColorTabPanel->SetPosition ( CVector2D ( 10.0f, 150.0f ) );
-    pColorTabPanel->SetSize ( CVector2D ( fColorTabPanelWidth, 150.0f ) );
-
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_BG, strChatBG, pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_TEXT, strChatText, pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_BG, strInputBG, pColorTabPanel );
-    CreateChatColorTab ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, strInputText, pColorTabPanel );
-
-    // Font Selection
-    m_pPaneChatFont = reinterpret_cast < CGUIScrollPane* > ( pManager->CreateScrollPane ( pTabInterface ) ); 
-    m_pPaneChatFont->SetProperty ( "ContentPaneAutoSized", "False" );
-    m_pPaneChatFont->SetPosition ( CVector2D ( 10.0f, 310.0f ) );
-    m_pPaneChatFont->SetSize ( CVector2D ( 250.0f, 33.0f ) );
-
-    CGUILabel* pFontLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pPaneChatFont, _("Font:") ) );
-    pFontLabel->SetPosition ( CVector2D ( 0.0f, 8.0f ) );
-    pFontLabel->GetPosition ( vecTemp, false );
-    pFontLabel->AutoSize ( );
-    pFontLabel->GetSize ( vecSize, false );
-
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetSelected ( true );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, 0.0f ) );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_DEFAULT ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
-
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Verdana" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ]->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 120.0f, 0.0f ) );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_CLEAR ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
-
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Tahoma Bold" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ]->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 5.0f, 18.0f ) );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_BOLD ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
-
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ] = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( m_pPaneChatFont, "Arial" ) ); 
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ]->SetPosition ( CVector2D ( vecTemp.fX + vecSize.fX + 120.0f, 18.0f ) );
-    m_pRadioChatFont [ ChatFonts::CHAT_FONT_ARIAL ]->SetSize ( CVector2D ( 100.0f, 15.0f ) );
-
-    // Misc. Options
-    {
-        CGUILabel* pLabel;
-
-        fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
-            _("Lines:"),
-            _("Scale:"),
-            _("Width:")
-        );
-
-        // Sizes of things
-        float fLabelsWidth = fIndentX;
-        float fEditsWidth = 80;
-        float fLineSizeY = 24;
-        float fLineGapY = 4;
-
-        // Position
-        vecTemp.fX = 602 - fEditsWidth - fLabelsWidth;
-        vecTemp.fY = 199;
-
-        // Background pane in case of overlap with the color panel
-        float fBGSizeX = fEditsWidth + fLabelsWidth;
-        float fBGSizeY = fLineSizeY * 3 + fLineGapY * 2;       
-        float fBGBorder = 10;
-        CGUITabPanel* pMiscOptionsBG = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( pTabInterface ) );
-        pMiscOptionsBG->SetPosition( CVector2D( vecTemp.fX - fBGBorder, vecTemp.fY - fBGBorder - 5 ) );
-        pMiscOptionsBG->SetSize( CVector2D( fBGSizeX + fBGBorder * 2, fBGSizeY + fBGBorder * 2 + 2 ) );
-        pMiscOptionsBG->SetAlpha( 1 );
-        pMiscOptionsBG->SetZOrderingEnabled( false );
-        pMiscOptionsBG->SetAlwaysOnTop( true );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Lines:") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
-        pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
-
-        m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
-        m_pChatLines->SetSize ( CVector2D ( 80.0f, 24.0f ) );
-        m_pChatLines->SetAlwaysOnTop ( true );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Scale:") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
-        pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
-
-        m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
-        m_pChatScaleX->SetSize ( CVector2D ( 35.0f, 24.0f ) );
-        m_pChatScaleX->SetAlwaysOnTop ( true );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, "x" ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 37.0f, vecTemp.fY + 2.0f ) );
-        pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
-
-        m_pChatScaleY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 45.0f, vecTemp.fY - 2.0f ) );
-        m_pChatScaleY->SetSize ( CVector2D ( 35.0f, 24.0f ) );
-        m_pChatScaleY->SetAlwaysOnTop ( true );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("Width:") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
-        pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( );
-        pLabel->SetAlwaysOnTop ( true );
-
-        m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
-        m_pChatWidth->SetSize ( CVector2D ( 80.0f, 24.0f ) );
-        m_pChatWidth->SetAlwaysOnTop ( true );
-
-
-        vecTemp.fX = 440;
-        vecTemp.fY = 216;
-        fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal",
-            _("after"),
-            _("for")
-        );
-
-        m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Fade out old lines") ) );
-        m_pChatCssText->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 95.5f ) );
-        m_pChatCssText->AutoSize ( NULL, 20.0f );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("after") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 122.5f ) );
-        pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ();
-
-        m_pChatLineLife = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatLineLife->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
-        m_pChatLineLife->SetSize ( CVector2D ( 45.0f, 24.0f ) );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("sec") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 55.0f, vecTemp.fY ) );
-        pLabel->AutoSize ( );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("for") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 28.0f ) );
-        pLabel->GetPosition ( vecTemp );
-        pLabel->AutoSize ( );
-
-        m_pChatLineFadeout = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabInterface, "" ) );
-        m_pChatLineFadeout->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
-        m_pChatLineFadeout->SetSize ( CVector2D ( 45.0f, 24.0f ) );
-
-        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabInterface, _("sec") ) );
-        pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 55.0f, vecTemp.fY ) );
-        pLabel->AutoSize ( );
-
-        if ( m_pChatCssText->GetSize().fX > 170 )
-        {
-            m_pChatCssText->SetPosition ( 
-                CVector2D ( pLabel->GetPosition().fX + pLabel->GetSize().fX - m_pChatCssText->GetSize().fX, 
-                            m_pChatCssText->GetPosition().fY ) 
-                          );
-        }
-
-        m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabInterface, _("Hide background when not typing") ) );  //!ACHTUNG: This is nasty.  Use a wrapped textbox
-        m_pChatCssBackground->SetPosition ( CVector2D ( 10.0f, 350.0f ) );
-        m_pChatCssBackground->GetPosition ( vecTemp );
-        m_pChatCssBackground->AutoSize ( NULL, 20.0f );
-
-        m_pChatNickCompletion = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabInterface, _( "Nickname completion using the \"Tab\" key" ) ) );
-        m_pChatNickCompletion->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
-        m_pChatNickCompletion->GetPosition ( vecTemp );
-        m_pChatNickCompletion->AutoSize ( NULL, 20.0f );
-
-        m_pFlashWindow = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabInterface, _("Allow server to flash the window") ) );
-        m_pFlashWindow->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
-        m_pFlashWindow->GetPosition ( vecTemp );
-        m_pFlashWindow->AutoSize ( NULL, 20.0f );
-    }
+    CreateInterfaceTabGUI();
 
     /**
      * Webbrowser tab
      **/
-    m_pLabelBrowserGeneral = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("General") ) );
+    m_pLabelBrowserGeneral = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabBrowser, _("General") ) );
     m_pLabelBrowserGeneral->SetPosition ( CVector2D ( 10.0f, 12.0f ) );
     m_pLabelBrowserGeneral->GetPosition ( vecTemp );
     m_pLabelBrowserGeneral->AutoSize ( NULL, 5.0f );
     m_pLabelBrowserGeneral->SetFont ( "default-bold-small" );
 
-    m_pCheckBoxRemoteBrowser = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabBrowser, _("Enable remote websites"), true ) );
+    m_pCheckBoxRemoteBrowser = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTabBrowser, _("Enable remote websites"), true ) );
     m_pCheckBoxRemoteBrowser->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 29.0f ) );
     m_pCheckBoxRemoteBrowser->GetPosition ( vecTemp );
     m_pCheckBoxRemoteBrowser->AutoSize ( NULL, 20.0f );
 
-    m_pCheckBoxRemoteJavascript = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabBrowser, _("Enable Javascript on remote websites"), true ) );
+    m_pCheckBoxRemoteJavascript = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( m_pTabBrowser, _("Enable Javascript on remote websites"), true ) );
     m_pCheckBoxRemoteJavascript->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
     m_pCheckBoxRemoteJavascript->GetPosition ( vecTemp );
     m_pCheckBoxRemoteJavascript->AutoSize ( NULL, 20.0f );
 
-    m_pCheckBoxBrowserPluginsEnabled = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox(pTabBrowser, _("Enable plugins (like Flash, Silverlight; Java is disabled by default)"), true ) );
-    m_pCheckBoxBrowserPluginsEnabled->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
-    m_pCheckBoxBrowserPluginsEnabled->GetPosition ( vecTemp );
-    m_pCheckBoxBrowserPluginsEnabled->AutoSize ( NULL, 20.0f );
-
-    m_pLabelBrowserCustomBlacklist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("Custom blacklist") ) );
+    m_pLabelBrowserCustomBlacklist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabBrowser, _("Custom blacklist") ) );
     m_pLabelBrowserCustomBlacklist->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
     m_pLabelBrowserCustomBlacklist->GetPosition ( vecTemp );
     m_pLabelBrowserCustomBlacklist->AutoSize ( NULL, 5.0f );
     m_pLabelBrowserCustomBlacklist->SetFont ( "default-bold-small" );
 
-    m_pEditBrowserBlacklistAdd = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabBrowser ) );
+    m_pEditBrowserBlacklistAdd = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTabBrowser ) );
     m_pEditBrowserBlacklistAdd->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
     m_pEditBrowserBlacklistAdd->GetPosition ( vecTemp );
     m_pEditBrowserBlacklistAdd->SetSize ( CVector2D ( 191.0f, 22.0f ) );
     m_pEditBrowserBlacklistAdd->SetText ( _("Enter a domain e.g. google.com") );
 
-    m_pButtonBrowserBlacklistAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Block") ) );
+    m_pButtonBrowserBlacklistAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTabBrowser, _("Block") ) );
     m_pButtonBrowserBlacklistAdd->SetPosition ( CVector2D ( vecTemp.fX + m_pEditBrowserBlacklistAdd->GetSize ().fX + 2.0f, vecTemp.fY ) );
     m_pButtonBrowserBlacklistAdd->SetSize ( CVector2D ( 64.0f, 22.0f ) );
 
-    m_pGridBrowserBlacklist = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( pTabBrowser ) );
+    m_pGridBrowserBlacklist = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTabBrowser ) );
     m_pGridBrowserBlacklist->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pGridBrowserBlacklist->GetPosition ( vecTemp );
     m_pGridBrowserBlacklist->SetSize ( CVector2D ( 256.0f, 150.0f ) );
     m_pGridBrowserBlacklist->AddColumn ( _("Domain"), 0.9f );
 
-    m_pButtonBrowserBlacklistRemove = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Remove domain") ) );
+    m_pButtonBrowserBlacklistRemove = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTabBrowser, _("Remove domain") ) );
     m_pButtonBrowserBlacklistRemove->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + m_pGridBrowserBlacklist->GetSize ().fY + 5.0f ) );
     m_pButtonBrowserBlacklistRemove->SetSize ( CVector2D ( 140.0f, 22.0f ) );
 
     m_pLabelBrowserCustomBlacklist->GetPosition ( vecTemp ); // Reset vecTemp
 
-    m_pLabelBrowserCustomWhitelist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabBrowser, _("Custom whitelist") ) );
+    m_pLabelBrowserCustomWhitelist = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabBrowser, _("Custom whitelist") ) );
     m_pLabelBrowserCustomWhitelist->SetPosition ( CVector2D ( 292.0f , vecTemp.fY ) );
     m_pLabelBrowserCustomWhitelist->GetPosition ( vecTemp );
     m_pLabelBrowserCustomWhitelist->AutoSize ( NULL, 5.0f );
     m_pLabelBrowserCustomWhitelist->SetFont ( "default-bold-small" );
 
-    m_pEditBrowserWhitelistAdd = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabBrowser ) );
+    m_pEditBrowserWhitelistAdd = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( m_pTabBrowser ) );
     m_pEditBrowserWhitelistAdd->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
     m_pEditBrowserWhitelistAdd->GetPosition ( vecTemp );
     m_pEditBrowserWhitelistAdd->SetSize ( CVector2D ( 191.0f, 22.0f ) );
     m_pEditBrowserWhitelistAdd->SetText ( _("Enter a domain e.g. google.com") );
 
-    m_pButtonBrowserWhitelistAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Allow") ) );
+    m_pButtonBrowserWhitelistAdd = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTabBrowser, _("Allow") ) );
     m_pButtonBrowserWhitelistAdd->SetPosition ( CVector2D ( vecTemp.fX + m_pEditBrowserWhitelistAdd->GetSize ().fX + 2.0f, vecTemp.fY ) );
     m_pButtonBrowserWhitelistAdd->SetSize ( CVector2D ( 64.0f, 22.0f ) );
 
-    m_pGridBrowserWhitelist = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( pTabBrowser ) );
+    m_pGridBrowserWhitelist = reinterpret_cast < CGUIGridList* > ( pManager->CreateGridList ( m_pTabBrowser ) );
     m_pGridBrowserWhitelist->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 32.0f ) );
     m_pGridBrowserWhitelist->GetPosition ( vecTemp );
     m_pGridBrowserWhitelist->SetSize ( CVector2D ( 256.0f, 150.0f ) );
     m_pGridBrowserWhitelist->AddColumn ( _("Domain"), 0.9f );
 
-    m_pButtonBrowserWhitelistRemove = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( pTabBrowser, _("Remove domain") ) );
+    m_pButtonBrowserWhitelistRemove = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTabBrowser, _("Remove domain") ) );
     m_pButtonBrowserWhitelistRemove->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + m_pGridBrowserWhitelist->GetSize ().fY + 5.0f ) );
     m_pButtonBrowserWhitelistRemove->SetSize ( CVector2D ( 140.0f, 22.0f ) );
 
@@ -1325,16 +1013,16 @@ void CSettings::CreateGUI ( void )
     vecTemp.fY += fLineHeight;
 
     // Process priority
-    m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Process priority:" ) );
+    m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Process priority:") ) );
     m_pPriorityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pPriorityLabel->AutoSize ( );
 
     m_pPriorityCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pPriorityCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pPriorityCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
-    m_pPriorityCombo->AddItem ( "Normal" )->SetData ( (void*)0 );
-    m_pPriorityCombo->AddItem ( "Above normal" )->SetData ( (void*)1 );
-    m_pPriorityCombo->AddItem ( "High" )->SetData ( (void*)2 );
+    m_pPriorityCombo->AddItem ( _("Normal") )->SetData ( (void*)0 );
+    m_pPriorityCombo->AddItem ( _("Above normal") )->SetData ( (void*)1 );
+    m_pPriorityCombo->AddItem ( _("High") )->SetData ( (void*)2 );
     m_pPriorityCombo->SetReadOnly ( true );
     vecTemp.fY += 29;
 
@@ -1486,19 +1174,17 @@ void CSettings::CreateGUI ( void )
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY = 354 + 35;
+    vecTemp.fY = 354 + 10;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "" ) );
-    m_pAdvancedSettingDescriptionLabel->SetPosition ( CVector2D ( 0, vecTemp.fY ) );
+    m_pAdvancedSettingDescriptionLabel->SetPosition ( CVector2D ( vecTemp.fX + 10.f, vecTemp.fY ) );
     m_pAdvancedSettingDescriptionLabel->SetFont ( "default-bold-small" );
-    m_pAdvancedSettingDescriptionLabel->SetSize ( CVector2D ( tabPanelSize.fX, 95.0f ) );
+    m_pAdvancedSettingDescriptionLabel->SetSize ( CVector2D ( 500.0f, 95.0f ) );
     m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign ( CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP );
 
     // Set up the events
     m_pWindow->SetEnterKeyHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
     m_pButtonOK->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnOKButtonClick, this ) );
-    m_pButtonCancel->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnCancelButtonClick, this ) );
-    m_pButtonLogin->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnLoginButtonClick, this ) );
-    m_pButtonRegister->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnRegisterButtonClick, this ) );
+    m_pButtonCancel->SetClickHandler(GUI_CALLBACK(&CSettings::OnCancelButtonClick, this));
     m_pChatLoadPreset->SetClickHandler ( GUI_CALLBACK( &CSettings::OnChatLoadPresetClick, this ) );
     m_pInterfaceLanguageSelector->SetSelectionHandler ( GUI_CALLBACK(&CSettings::OnLanguageChanged, this) );
     m_pInterfaceSkinSelector->SetSelectionHandler ( GUI_CALLBACK(&CSettings::OnSkinChanged, this) );
@@ -1523,10 +1209,6 @@ void CSettings::CreateGUI ( void )
     m_pButtonBrowserBlacklistRemove->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserBlacklistRemove, this ) );
     m_pButtonBrowserWhitelistAdd->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserWhitelistAdd, this ) );
     m_pButtonBrowserWhitelistRemove->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnBrowserWhitelistRemove, this ) );
-    /*
-    // Give a warning if no community account settings were stored in config
-    CCore::GetSingleton ().ShowMessageBox ( CORE_SETTINGS_COMMUNITY_WARNING, _("Multi Theft Auto: Community settings"), MB_ICON_WARNING );
-    */
 
     // Set up the events for advanced description 
     m_pPriorityLabel->SetMouseEnterHandler ( GUI_CALLBACK ( &CSettings::OnShowAdvancedSettingDescription, this ) );
@@ -1668,10 +1350,12 @@ void CSettings::ShowDisconnectQuestion ( void )
 
 bool CSettings::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 {
-    if ( Args.pWindow == m_pBindsList ) {
+    if ( Args.pWindow == m_pBindsList )
+    {
         OnBindsListClick ( m_pBindsList );
         return true;
     }
+
     return false;
 }
 
@@ -1679,7 +1363,8 @@ bool CSettings::OnMouseDoubleClick ( CGUIMouseEventArgs Args )
 void CSettings::Update ( void )
 {
     // Once each 30 frames
-    if ( m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL ) {
+    if ( m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL )
+    {
 
         UpdateJoypadTab ();
 
@@ -1809,6 +1494,11 @@ void CSettings::UpdateVideoTab ( void )
     bool bTyreSmokeEnabled;
     CVARS_GET ( "tyre_smoke_enabled", bTyreSmokeEnabled );
     m_pCheckBoxTyreSmokeParticles->SetSelected ( bTyreSmokeEnabled );
+
+    // High detail vehicles
+    bool bHighDetailVehicles;
+    CVARS_GET ( "high_detail_vehicles", bHighDetailVehicles );
+    m_pCheckBoxHighDetailVehicles->SetSelected ( bHighDetailVehicles );
 
     PopulateResolutionComboBox();
     
@@ -2030,13 +1720,6 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
 {
     CGameSettings * gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
 
-
-    //gameSettings->SetMipMappingEnabled (); // Doesn't appear to even be enabled
-    gameSettings->SetFieldOfView( 70 );
-    gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
-    gameSettings->SetBrightness ( 253 );
-    gameSettings->SetFXQuality ( 2 );
-    gameSettings->SetAntiAliasing ( 1, true );
     CVARS_SET ("aspect_ratio", ASPECT_RATIO_AUTO );
     CVARS_SET ("fov", 70 );
     CVARS_SET ("anisotropic", 0 );
@@ -2044,13 +1727,19 @@ bool CSettings::OnVideoDefaultClick ( CGUIElement* pElement )
     CVARS_SET ( "grass", true );
     CVARS_SET ( "heat_haze", true );
     CVARS_SET ( "tyre_smoke_enabled", true );
+    CVARS_SET ( "high_detail_vehicles", false );
+    gameSettings->UpdateFieldOfViewFromSettings();
+    gameSettings->SetDrawDistance( 1.19625f ); // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
+    gameSettings->SetBrightness ( 253 );
+    gameSettings->SetFXQuality ( 2 );
+    gameSettings->SetAntiAliasing ( 1, true );
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager ()->SetVideoMode ( 0, false, false, FULLSCREEN_STANDARD );
 
     CVARS_SET ( "streaming_memory", g_pCore->GetMaxStreamingMemory () );
 
-    CVARS_SET ( "mapalpha", 140.25f);
+    CVARS_SET ( "mapalpha", 155);
 
     // Display restart required message if required
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing () != m_pComboAntiAliasing->GetSelectedItemIndex ();
@@ -2163,6 +1852,427 @@ bool CSettings::OnBindsDefaultClick ( CGUIElement* pElement )
     return true;
 }
 
+
+void CSettings::CreateInterfaceTabGUI( void )
+{
+    if ( !m_pTabInterface )
+    {
+        return;
+    }
+
+    CGUILabel* pLabel;
+    CVector2D vecTemp;
+    CGUI *pManager = g_pCore->GetGUI();
+
+    CVector2D vecSize;
+    m_pTabInterface->GetParent()->GetSize( vecSize );
+    vecSize.fX -= 20.0f;
+    vecSize.fY -= 20.0f;
+
+    SString strLanguage = _("Language:"),
+            strSkin     = _("Skin:"),
+            strPresets  = _("Presets:");
+    float fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal", strLanguage, strSkin, strPresets ) + 10.0f;
+
+    float fComboWidth = std::min( 250.0f, vecSize.fX - ( 10.0f + fIndentX + 20.0f ) );
+
+    //
+    // General
+    //
+    {
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabInterface, _("General") ) );
+        pLabel->SetPosition ( CVector2D ( 10.0f, 5.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( NULL, 5.0f );
+        pLabel->SetFont ( "default-bold-small" );
+
+        // Language
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabInterface, strLanguage ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+
+        m_pInterfaceLanguageSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pTabInterface, "English" ) );
+        m_pInterfaceLanguageSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+        m_pInterfaceLanguageSelector->SetSize ( CVector2D ( fComboWidth, 200.0f ) );
+        m_pInterfaceLanguageSelector->SetReadOnly ( true );
+
+        // Grab languages and populate
+        std::map<SString, SString> availableLanguagesMap = g_pCore->GetLocalization()->GetAvailableLanguages();
+        availableLanguagesMap["English"] = "en_US";
+
+        for (const auto& language : availableLanguagesMap )
+        {
+            m_pInterfaceLanguageSelector->AddItem( language.first )->SetData( language.second );
+        }
+
+        // Skin
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabInterface, strSkin ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 25.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+    
+        m_pInterfaceSkinSelector = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pTabInterface ) );
+        m_pInterfaceSkinSelector->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+        m_pInterfaceSkinSelector->SetSize ( CVector2D ( fComboWidth, 200.0f ) );
+        m_pInterfaceSkinSelector->SetReadOnly ( true );
+    }
+
+    //
+    // Chat
+    //
+    {
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabInterface, _("Chat") ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+        pLabel->SetFont ( "default-bold-small" );
+
+        // Presets
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( m_pTabInterface, strPresets ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 20.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+
+        m_pChatPresets = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( m_pTabInterface ) );
+        m_pChatPresets->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+        m_pChatPresets->SetSize ( CVector2D ( fComboWidth, 200.0f ) );
+        m_pChatPresets->SetReadOnly ( true );
+
+        m_pChatLoadPreset = reinterpret_cast < CGUIButton* > ( pManager->CreateButton ( m_pTabInterface, _("Load") ) );
+        m_pChatLoadPreset->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + fComboWidth + 10.0f, vecTemp.fY - 2.0f ) );
+        m_pChatLoadPreset->SetSize ( CVector2D ( 100.0f, 24.0f ) );
+        m_pChatLoadPreset->SetZOrderingEnabled ( false );
+    }
+
+    // Create section tabpanel
+    auto pTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( m_pTabInterface ) );
+    pTabPanel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 40.0f ) );
+    pTabPanel->SetSize ( CVector2D( vecSize.fX, vecSize.fY - ( vecTemp.fY + 55.0f ) ) );
+    pTabPanel->GetSize ( vecSize );
+
+    auto pTabColors = pTabPanel->CreateTab( _("Colors") );
+    auto pTabLayout  = pTabPanel->CreateTab( _("Layout") );
+    auto pTabOptions = pTabPanel->CreateTab( _("Options") );
+
+    //
+    // Colors
+    //
+    {
+        SString strChatBG       = _("Chat Background"),
+                strChatText     = _("Chat Text"),
+                strInputBG      = _("Input Background"),
+                strInputText    = _("Input Text");
+
+        CGUITabPanel* pColorTabPanel = reinterpret_cast < CGUITabPanel* > ( pManager->CreateTabPanel ( pTabColors ) );
+        pColorTabPanel->SetPosition ( CVector2D ( 10.0f, 10.0f ) );
+        pColorTabPanel->SetSize ( CVector2D ( vecSize.fX - 20.0f, vecSize.fY - 45.0f ) );
+
+        CreateChatColorTab ( Chat::ColorType::BG, strChatBG, pColorTabPanel );
+        CreateChatColorTab ( Chat::ColorType::TEXT, strChatText, pColorTabPanel );
+        CreateChatColorTab ( Chat::ColorType::INPUT_BG, strInputBG, pColorTabPanel );
+        CreateChatColorTab ( Chat::ColorType::INPUT_TEXT, strInputText, pColorTabPanel );
+    }
+
+    //
+    // Layout
+    //
+    {
+        // Size of lines and gaps
+        float fLineSizeY = 25;
+        float fLineGapY = 12;
+        float fMarginX = 0;
+
+        // Size
+        {
+            SString strLines = _("Lines:"),
+                    strScale = _("Scale:"),
+                    strWidth = _("Width:");
+            fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal", strLines, strScale, strWidth ) + 10.0f;
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, _("Size") ) );
+            pLabel->SetPosition ( CVector2D ( 10.0f, 10.0f ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( NULL, 5.0f );
+            pLabel->SetFont ( "default-bold-small" );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strLines ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatLines = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabLayout, "" ) );
+            m_pChatLines->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 3.0f ) );
+            m_pChatLines->SetSize ( CVector2D ( 50.0f, fLineSizeY ) );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strScale ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatScaleX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabLayout, "") );
+            m_pChatScaleX->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 3.0f ) );
+            m_pChatScaleX->SetSize ( CVector2D ( 50.0f, fLineSizeY ) );
+            m_pChatScaleX->GetSize ( vecSize );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, "x") );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + vecSize.fX + 3.0f, vecTemp.fY ) );
+            pLabel->AutoSize ( );
+
+            m_pChatScaleY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabLayout, "") );
+            m_pChatScaleY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + vecSize.fX + 10.0f, vecTemp.fY - 3.0f ) );
+            m_pChatScaleY->SetSize ( CVector2D ( 50.0f, fLineSizeY ) );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strWidth ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatWidth = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabLayout, "") );
+            m_pChatWidth->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 3.0f ) );
+            m_pChatWidth->SetSize ( CVector2D ( 110.0f, 24.0f ) );
+
+            m_pChatWidth->GetPosition ( vecTemp );
+            m_pChatWidth->GetSize ( vecSize );
+            fMarginX = vecTemp.fX + vecSize.fX + 30.0f;
+        }
+
+        // Fading
+        {
+            SString strAfter = _("after"),
+                    strFor   = _("for"),
+                    strSec   = _("sec");
+            fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal", strAfter, strFor ) + 10.0f;
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, _("Fading") ) );
+            pLabel->SetPosition ( CVector2D ( fMarginX, 10.0f ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( NULL, 5.0f );
+            pLabel->SetFont ( "default-bold-small" );
+
+            m_pChatCssText = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabLayout, _("Fade out old lines") ) );
+            m_pChatCssText->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+            m_pChatCssText->GetPosition ( vecTemp );
+            m_pChatCssText->AutoSize ( NULL, 20.0f );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strAfter ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatLineLife = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabLayout, "" ) );
+            m_pChatLineLife->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 3.0f ) );
+            m_pChatLineLife->SetSize ( CVector2D ( 50.0f, fLineSizeY ) );
+            m_pChatLineLife->GetSize ( vecSize );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strSec ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + vecSize.fX + 5.0f, vecTemp.fY ) );
+            pLabel->AutoSize ( );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strFor ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatLineFadeout = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabLayout, "" ) );
+            m_pChatLineFadeout->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 3.0f ) );
+            m_pChatLineFadeout->SetSize ( CVector2D ( 50.0f, fLineSizeY ) );
+            m_pChatLineFadeout->GetSize ( vecSize );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strSec ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + vecSize.fX + 5.0f, vecTemp.fY ) );
+            pLabel->AutoSize ( );
+
+            m_pChatCssText->GetPosition ( vecTemp );
+            m_pChatCssText->GetSize ( vecSize );
+            fMarginX = vecTemp.fX + std::max(vecSize.fX, fIndentX + pManager->GetTextExtent(strSec) + 50.0f) + 30.0f;
+        }
+
+        // Position
+        {
+            SString strHorizontal   = _("Horizontal:"),
+                    strVertical     = _("Vertical:"),
+                    strTextAlign    = _("Text-Align:"),
+                    strXOffset      = _("X-Offset:"),
+                    strYOffset      = _("Y-Offset:");
+            fIndentX = pManager->CGUI_GetMaxTextExtent ( "default-normal", strHorizontal, strVertical, strXOffset, strYOffset, strTextAlign ) + 10.0f;
+
+            pTabLayout->GetSize ( vecSize );
+            fComboWidth = std::min ( 150.0f, vecSize.fX - fMarginX - fIndentX - 10.0f );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, _("Position") ) );
+            pLabel->SetPosition ( CVector2D ( fMarginX, 10.0f ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( NULL, 5.0f );
+            pLabel->SetFont ( "default-bold-small" );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strHorizontal ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatHorizontalCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabLayout, "" ) );
+            m_pChatHorizontalCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+            m_pChatHorizontalCombo->SetSize ( CVector2D ( fComboWidth, 85.0f ) );
+            m_pChatHorizontalCombo->AddItem ( _("Left") )->SetData( (void *) Chat::Position::Horizontal::LEFT );
+            m_pChatHorizontalCombo->AddItem ( _("Center") )->SetData( (void *) Chat::Position::Horizontal::CENTER );
+            m_pChatHorizontalCombo->AddItem ( _("Right") )->SetData( (void *) Chat::Position::Horizontal::RIGHT );
+            m_pChatHorizontalCombo->SetReadOnly ( true );
+            m_pChatHorizontalCombo->SetSelectedItemByIndex( 0 );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strVertical ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatVerticalCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabLayout, "" ) );
+            m_pChatVerticalCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+            m_pChatVerticalCombo->SetSize ( CVector2D ( fComboWidth, 85.0f ) );
+            m_pChatVerticalCombo->AddItem ( _("Top") )->SetData( (void *) Chat::Position::Vertical::TOP );
+            m_pChatVerticalCombo->AddItem ( _("Center") )->SetData( (void *) Chat::Position::Vertical::CENTER );
+            m_pChatVerticalCombo->AddItem ( _("Bottom") )->SetData( (void *) Chat::Position::Vertical::BOTTOM );
+            m_pChatVerticalCombo->SetReadOnly ( true );
+            m_pChatVerticalCombo->SetSelectedItemByIndex( 0 );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strTextAlign ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatTextAlignCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabLayout, "" ) );
+            m_pChatTextAlignCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
+            m_pChatTextAlignCombo->SetSize ( CVector2D ( fComboWidth, 85.0f ) );
+            m_pChatTextAlignCombo->AddItem ( _("Left") )->SetData( (void *) Chat::Text::Align::LEFT );
+            m_pChatTextAlignCombo->AddItem ( _("Right") )->SetData( (void *) Chat::Text::Align::RIGHT );
+            m_pChatTextAlignCombo->SetReadOnly ( true );
+            m_pChatTextAlignCombo->SetSelectedItemByIndex( 0 );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strXOffset ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatOffsetX = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabLayout, "") );
+            m_pChatOffsetX->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 3.0f ) );
+            m_pChatOffsetX->SetSize ( CVector2D ( fComboWidth, fLineSizeY ) );
+
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabLayout, strYOffset ) );
+            pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( );
+
+            m_pChatOffsetY = reinterpret_cast < CGUIEdit* > ( pManager->CreateEdit ( pTabLayout, "") );
+            m_pChatOffsetY->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 3.0f ) );
+            m_pChatOffsetY->SetSize ( CVector2D ( fComboWidth, fLineSizeY ) );
+        }
+    }
+
+    //
+    // Options
+    //
+    {
+        // Size of lines and gaps
+        float fLineSizeY = 20;
+        float fLineGapY = 5;
+        float fMarginX = 0;
+
+        // Fonts
+        {
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabOptions, _("Font") ) );
+            pLabel->SetPosition ( CVector2D ( 10.0f, 10.0f ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( NULL, 5.0f );
+            pLabel->SetFont ( "default-bold-small" );
+
+            vecTemp.fY += 30.0f - ( fLineSizeY + fLineGapY );
+            fIndentX = 0;
+
+            std::map < Chat::Font::eFont, const char * > FontMap =
+            {
+                { Chat::Font::DEFAULT,  "Tahoma" },
+                { Chat::Font::CLEAR,    "Verdana" },
+                { Chat::Font::BOLD,     "Tahoma Bold" },
+                { Chat::Font::ARIAL,    "Arial" }
+            };
+
+            for ( const auto & Font : FontMap )
+            {
+                float textExtent = pManager->GetTextExtent( Font.second ) + 20.0f;
+                fIndentX = std::max ( fIndentX, textExtent );
+
+                auto pRadioButton = reinterpret_cast < CGUIRadioButton* > ( pManager->CreateRadioButton ( pTabOptions, Font.second ) );
+                pRadioButton->SetSelected ( Font.first == Chat::Font::DEFAULT );
+                pRadioButton->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+                pRadioButton->GetPosition ( vecTemp );
+                pRadioButton->AutoSize ( NULL, 20.0f );
+
+                m_pRadioChatFont[ Font.first ] = pRadioButton;
+            }
+
+            fMarginX = vecTemp.fX + fIndentX + 30.0f;
+        }
+
+        // Options
+        {
+            pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabOptions, _("Options") ) );
+            pLabel->SetPosition ( CVector2D ( fMarginX, 10.0f ) );
+            pLabel->GetPosition ( vecTemp );
+            pLabel->AutoSize ( NULL, 5.0f );
+            pLabel->SetFont ( "default-bold-small" );
+
+            m_pChatCssBackground = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox( pTabOptions, _("Hide background when not typing") ) );
+            m_pChatCssBackground->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+            m_pChatCssBackground->GetPosition ( vecTemp );
+            m_pChatCssBackground->AutoSize ( NULL, 20.0f );
+
+            m_pChatNickCompletion = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabOptions, _( "Nickname completion using the \"Tab\" key" ) ) );
+            m_pChatNickCompletion->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY) );
+            m_pChatNickCompletion->GetPosition ( vecTemp );
+            m_pChatNickCompletion->AutoSize ( NULL, 20.0f );
+
+            m_pFlashWindow = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabOptions, _("Allow server to flash the window") ) );
+            m_pFlashWindow->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            m_pFlashWindow->GetPosition ( vecTemp );
+            m_pFlashWindow->AutoSize ( NULL, 20.0f );
+
+            m_pTrayBalloon = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabOptions, _("Allow tray balloon notifications") ) );
+            m_pTrayBalloon->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            m_pTrayBalloon->GetPosition ( vecTemp );
+            m_pTrayBalloon->AutoSize ( NULL, 20.0f );
+
+            m_pChatTextBlackOutline = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabOptions, _("Chat text black/white outline") ) );
+            m_pChatTextBlackOutline->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+            m_pChatTextBlackOutline->GetPosition ( vecTemp );
+            m_pChatTextBlackOutline->AutoSize ( NULL, 20.0f );
+        }
+    }
+}
+
+
+void CSettings::UpdateChatColorPreview( eChatColorType eType )
+{
+    if ( !m_pChatColorPreview[eType] )
+    {
+        return;
+    }
+   
+    uchar iRed    = 0xFF & static_cast<int>(std::floor(m_pChatRed[eType]->GetScrollPosition() * 255.0f + 0.5f));
+    uchar iGreen  = 0xFF & static_cast<int>(std::floor(m_pChatGreen[eType]->GetScrollPosition() * 255.0f + 0.5f));
+    uchar iBlue   = 0xFF & static_cast<int>(std::floor(m_pChatBlue[eType]->GetScrollPosition() * 255.0f + 0.5f));
+    uchar iAlpha  = 0xFF & static_cast<int>(std::floor(m_pChatAlpha[eType]->GetScrollPosition() * 255.0f + 0.5f));
+    
+    // AARRGGBB = 8
+    char szARGB[9];
+    sprintf_s(szARGB, "%02x%02x%02x%02x", iAlpha, iRed, iGreen, iBlue);
+
+    // tl:AARRGGBB tr:AARRGGBB bl:AARRGGBB br:AARRGGBB = 48
+    char szValue[49];
+    sprintf_s(szValue, "tl:%s tr:%s bl:%s br:%s", szARGB, szARGB, szARGB, szARGB);
+    
+    m_pChatColorPreview[eType]->SetProperty("ImageColours", szValue);
+}
+
+
 // Saves the keybinds
 void CSettings::ProcessKeyBinds ( void )
 {
@@ -2272,7 +2382,8 @@ void CSettings::ProcessKeyBinds ( void )
                 if ( pPriKey )
                 {
                     // If the primary key is different than the original one
-                    if ( pPriKey != pBind->boundKey ) {
+                    if ( pPriKey != pBind->boundKey )
+                    {
                         // Did we have any keys with the same "up" state?
                         CCommandBind* pUpBind = pKeyBinds->FindMatchingUpBind( pBind );
                         if ( pUpBind )
@@ -2376,12 +2487,15 @@ bool CSettings::OnBindsListClick ( CGUIElement* pElement )
             m_bCaptureKey = true;
 
             // Determine if the primary or secondary column was selected
-            if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ ) {
+            if ( m_pBindsList->GetItemColumnIndex ( pItem ) == 1/*m_hPriKey  Note: handle is not the same as index */ )
+            {
                 // Create a messagebox to notify the user
                 //SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
                 SString strText = _("Press a key to bind, or escape to clear");
                 CCore::GetSingleton ().ShowMessageBox ( _("Binding a primary key"), strText, MB_ICON_QUESTION );
-            } else {
+            }
+            else
+            {
                 // Create a messagebox to notify the user
                 //sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
                 SString strText = _("Press a key to bind, or escape to clear");
@@ -2448,6 +2562,7 @@ bool CSettings::ProcessMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
         m_bCaptureKey = false;
         return true;
     }
+
     return false;
 }
 
@@ -2726,84 +2841,6 @@ bool CSettings::OnCancelButtonClick ( CGUIElement* pElement )
     return true;
 }
 
-
-bool CSettings::OnLoginButtonClick ( CGUIElement* pElement )
-{
-    if ( strcmp ( m_pButtonLogin->GetText().c_str(), "Login" ) == 0 )
-    {
-        if ( m_pEditUser->GetText().empty() ||
-            m_pEditPass->GetText().empty() )
-        {
-            g_pCore->ShowMessageBox ( _("Login Error"), _("Invalid username/password"), MB_BUTTON_OK | MB_ICON_ERROR );
-            return true;
-        }
-        else
-        {
-            m_pEditUser->SetEnabled ( false );
-            m_pEditPass->SetEnabled ( false );
-            m_pButtonLogin->SetEnabled ( false );
-            m_pButtonLogin->SetText ( _("Logging in...") );
-
-            // Hash password
-            char szPassword[33];
-            std::string strPassword;
-            MD5 Password;
-            CMD5Hasher Hasher;
-            Hasher.Calculate ( m_pEditPass->GetText ().c_str(), m_pEditPass->GetText().length(), Password );
-            Hasher.ConvertToHex ( Password, szPassword );
-            strPassword = std::string ( szPassword );
-
-            // Check if we need to use the stored password
-            std::string strCommunityPassword;
-            CVARS_GET ( "community_password", strCommunityPassword );
-            if ( m_pEditPass->GetText ().compare ( strCommunityPassword ) == 0 )
-                strPassword = strCommunityPassword;
-
-            // Store the user/pass and log in using community
-            CCommunity *pCommunity = CCommunity::GetSingletonPtr ();
-            pCommunity->SetUsername ( m_pEditUser->GetText () );
-            pCommunity->SetPassword ( strPassword );
-            CVARS_SET ( "community_username", m_pEditUser->GetText () );
-            CVARS_SET ( "community_password", strPassword );
-            pCommunity->Login ( OnLoginCallback, this );
-        }
-        return false;
-    }
-    else
-    {
-        CCommunity::GetSingleton ().Logout ();
-        m_pEditPass->SetText ( "" );
-    }
-    return true;
-}
-
-
-bool CSettings::OnRegisterButtonClick ( CGUIElement* pElement )
-{
-    g_pCore->GetLocalGUI()->GetCommunityRegistration()->Open ();
-    return true;
-}
-
-
-void CSettings::OnLoginCallback ( bool bResult, char* szError, void* obj )
-{   // This callback function is called by CCommunity whenever an error has occurred
-    if ( !bResult )
-    {
-        g_pCore->ShowMessageBox ( _("Login Error"), szError, MB_BUTTON_OK | MB_ICON_ERROR );
-    }
-}
-
-
-void CSettings::OnLoginStateChange ( bool bResult )
-{   // This function is called by CCommunity whenever the logged-in status changes
-    m_pEditUser->SetEnabled ( !bResult );
-    m_pEditPass->SetEnabled ( !bResult );
-    m_pButtonLogin->SetText ( ( bResult ) ? _("Logout") : _("Login") );
-    m_pButtonLogin->SetEnabled ( true );
-    m_pButtonRegister->SetVisible ( !bResult );
-}
-
-
 void CSettings::LoadData ( void )
 {
     // Ensure CVARS ranges ok
@@ -2840,12 +2877,6 @@ void CSettings::LoadData ( void )
     m_pMouseSensitivity->SetScrollPosition ( gameSettings->GetMouseSensitivity () );
     pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
     m_pVerticalAimSensitivity->SetScrollPosition( pController->GetVerticalAimSensitivity() );
-
-    // Community
-    CVARS_GET ( "community_username", strVar );
-    if ( !strVar.empty () ) m_pEditUser->SetText ( strVar.c_str () );
-    CVARS_GET ( "community_password", strVar );
-    if ( !strVar.empty () ) m_pEditPass->SetText ( strVar.c_str () );
 
     // Audio
     m_ucOldRadioVolume = gameSettings->GetRadioVolume();
@@ -2909,9 +2940,9 @@ void CSettings::LoadData ( void )
     // Process priority
     int iVar;
     CVARS_GET ( "process_priority", iVar );
-    if ( iVar == 0 ) m_pPriorityCombo->SetText ( "Normal" );
-    else if ( iVar == 1 ) m_pPriorityCombo->SetText ( "Above normal" );
-    else if ( iVar == 2 ) m_pPriorityCombo->SetText ( "High" );
+    if ( iVar == 0 ) m_pPriorityCombo->SetText ( _("Normal") );
+    else if ( iVar == 1 ) m_pPriorityCombo->SetText ( _("Above normal") );
+    else if ( iVar == 2 ) m_pPriorityCombo->SetText ( _("High") );
     int PriorityClassList[] = { NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS };
     SetPriorityClass( GetCurrentProcess(), PriorityClassList[ CVARS_GET_VALUE < int > ( "process_priority" ) % 3 ] );
 
@@ -2961,15 +2992,15 @@ void CSettings::LoadData ( void )
     else if ( iVar == 1 ) m_pUpdateAutoInstallCombo->SetText ( "Default" );
 
     // Chat
-    LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_BG, "chat_color" );
-    LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_TEXT, "chat_text_color" );
-    LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_INPUT_BG, "chat_input_color" );
-    LoadChatColorFromCVar ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, "chat_input_text_color" );
+    LoadChatColorFromCVar ( Chat::ColorType::BG, "chat_color" );
+    LoadChatColorFromCVar ( Chat::ColorType::TEXT, "chat_text_color" );
+    LoadChatColorFromCVar ( Chat::ColorType::INPUT_BG, "chat_input_color" );
+    LoadChatColorFromCVar ( Chat::ColorType::INPUT_TEXT, "chat_input_text_color" );
 
     unsigned int uiFont;
     CVARS_GET ( "chat_font", uiFont );
-    if ( uiFont >= ChatFonts::CHAT_FONT_MAX )
-        uiFont = ChatFonts::CHAT_FONT_DEFAULT;
+    if ( uiFont >= Chat::Font::MAX )
+        uiFont = Chat::Font::DEFAULT;
     m_pRadioChatFont [ uiFont ]->SetSelected ( true );
 
     CVARS_GET ( "chat_lines", strVar ); m_pChatLines->SetText ( strVar.c_str () );
@@ -2979,9 +3010,9 @@ void CSettings::LoadData ( void )
         CVARS_GET ( "chat_scale", strVar );
         stringstream ss( strVar );
         ss >> strVar;
-        m_pChatScaleX->SetText ( strVar.c_str () );
+        m_pChatScaleX->SetText ( SString( "%1.1f", atof( strVar.c_str() ) ) );
         ss >> strVar;
-        m_pChatScaleY->SetText ( strVar.c_str () );
+        m_pChatScaleY->SetText ( SString( "%1.1f", atof( strVar.c_str() ) ) );
     }
     catch (...)
     {
@@ -2991,6 +3022,7 @@ void CSettings::LoadData ( void )
     CVARS_GET ( "chat_css_style_text", bVar ); m_pChatCssText->SetSelected ( bVar );
     CVARS_GET ( "chat_css_style_background", bVar ); m_pChatCssBackground->SetSelected ( bVar );
     CVARS_GET ( "chat_nickcompletion", bVar ); m_pChatNickCompletion->SetSelected ( bVar );
+    CVARS_GET ( "chat_text_outline", bVar ); m_pChatTextBlackOutline->SetSelected ( bVar );
 
     {
         int iVar;
@@ -3000,20 +3032,45 @@ void CSettings::LoadData ( void )
         CVARS_GET ( "chat_line_fade_out", iVar ); 
         SetMilliseconds ( m_pChatLineFadeout, iVar );
     }
+
+    // Chat position
+    CVARS_GET ( "chat_position_horizontal", iVar );
+    if ( iVar > Chat::Position::Horizontal::RIGHT )
+        iVar = Chat::Position::Horizontal::LEFT;
+    m_pChatHorizontalCombo->SetSelectedItemByIndex ( iVar );
+
+    CVARS_GET ( "chat_position_vertical", iVar );
+    if ( iVar > Chat::Position::Vertical::BOTTOM )
+        iVar = Chat::Position::Vertical::TOP;
+    m_pChatVerticalCombo->SetSelectedItemByIndex ( iVar );
+
+    CVARS_GET ( "chat_text_alignment", iVar );
+    if ( iVar > Chat::Text::Align::RIGHT )
+        iVar = Chat::Text::Align::LEFT;
+    m_pChatTextAlignCombo->SetSelectedItemByIndex ( iVar );
+
+    CVARS_GET ( "chat_position_offset_x", strVar ); m_pChatOffsetX->SetText( strVar.c_str() );
+    CVARS_GET ( "chat_position_offset_y", strVar ); m_pChatOffsetY->SetText( strVar.c_str() );
+
+    // Interface
     CVARS_GET ( "server_can_flash_window", bVar ); m_pFlashWindow->SetSelected ( bVar );
+    CVARS_GET ( "allow_tray_notifications", bVar ); m_pTrayBalloon->SetSelected ( bVar );
 
     // Browser
     CVARS_GET ( "browser_remote_websites", bVar ); m_pCheckBoxRemoteBrowser->SetSelected ( bVar );
     CVARS_GET ( "browser_remote_javascript", bVar ); m_pCheckBoxRemoteJavascript->SetSelected ( bVar );
-    CVARS_GET ( "browser_plugins", bVar ); m_pCheckBoxBrowserPluginsEnabled->SetSelected ( bVar );
 
+    ReloadBrowserLists();
+}
+
+void CSettings::ReloadBrowserLists( void )
+{
     m_pGridBrowserBlacklist->Clear ();
     m_pGridBrowserWhitelist->Clear ();
     m_bBrowserListsChanged = false;
-
-    auto pWebCore = CCore::GetSingleton().GetWebCore();
-    if ( pWebCore )
+    if ( m_bBrowserListsLoadEnabled )
     {
+        auto pWebCore = g_pCore->GetWebCore();
         std::vector<std::pair<SString, bool>> customBlacklist;
         pWebCore->GetFilterEntriesByType( customBlacklist, eWebFilterType::WEBFILTER_USER );
         for ( std::vector<std::pair<SString, bool>>::iterator iter = customBlacklist.begin(); iter != customBlacklist.end(); ++iter )
@@ -3024,6 +3081,17 @@ void CSettings::LoadData ( void )
                 m_pGridBrowserWhitelist->SetItemText( m_pGridBrowserWhitelist->AddRow (), 1, iter->first );
         }
     }
+}
+
+bool CSettings::OnTabChanged( CGUIElement* pElement )
+{
+    if ( pElement == m_pTabBrowser && !m_bBrowserListsLoadEnabled )
+    {
+        // Load browser lists when tab is selected for the first time
+        m_bBrowserListsLoadEnabled = true;
+        ReloadBrowserLists();
+    }
+    return true;
 }
 
 void CSettings::SaveData ( void )
@@ -3108,11 +3176,12 @@ void CSettings::SaveData ( void )
     SetApplicationSettingInt ( "customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0 );
 
     // iFieldOfView
-    int iFieldOfView = Min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
+    int iFieldOfView = std::min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
     CVARS_SET ( "fov", iFieldOfView );
+    gameSettings->UpdateFieldOfViewFromSettings();
 
     // Anisotropic filtering
-    int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
+    int iAnisotropic = std::min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
     CVARS_SET( "anisotropic", iAnisotropic );
 
     // Visual FX Quality
@@ -3164,6 +3233,10 @@ void CSettings::SaveData ( void )
     bool bTyreSmokeEnabled = m_pCheckBoxTyreSmokeParticles->GetSelected ();
     CVARS_SET ( "tyre_smoke_enabled", bTyreSmokeEnabled );
     g_pCore->GetMultiplayer ()->SetTyreSmokeEnabled ( bTyreSmokeEnabled );
+
+    // High detail vehicles (just set cvar, real change occur on next connect)
+    bool bHighDetailVehicles = m_pCheckBoxHighDetailVehicles->GetSelected ();
+    CVARS_SET ( "high_detail_vehicles", bHighDetailVehicles );
 
     // Fast clothes loading
     if ( CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem () )
@@ -3263,11 +3336,11 @@ void CSettings::SaveData ( void )
     }
 
     // Chat
-    SaveChatColor ( ChatColorTypes::CHAT_COLOR_BG, "chat_color" );
-    SaveChatColor ( ChatColorTypes::CHAT_COLOR_TEXT, "chat_text_color" );
-    SaveChatColor ( ChatColorTypes::CHAT_COLOR_INPUT_BG, "chat_input_color" );
-    SaveChatColor ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, "chat_input_text_color" );
-    for ( int iFont = 0; iFont < ChatColorTypes::CHAT_COLOR_MAX; iFont ++ )
+    SaveChatColor ( Chat::ColorType::BG, "chat_color" );
+    SaveChatColor ( Chat::ColorType::TEXT, "chat_text_color" );
+    SaveChatColor ( Chat::ColorType::INPUT_BG, "chat_input_color" );
+    SaveChatColor ( Chat::ColorType::INPUT_TEXT, "chat_input_text_color" );
+    for ( int iFont = 0; iFont < Chat::ColorType::MAX; iFont ++ )
     {
         if ( m_pRadioChatFont [ iFont ]->GetSelected( ) )
         {
@@ -3283,9 +3356,31 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "chat_css_style_text", m_pChatCssText->GetSelected () );
     CVARS_SET ( "chat_css_style_background", m_pChatCssBackground->GetSelected () );
     CVARS_SET ( "chat_nickcompletion", m_pChatNickCompletion->GetSelected () );
+    CVARS_SET ( "chat_text_outline", m_pChatTextBlackOutline->GetSelected() );
     CVARS_SET ( "chat_line_life", GetMilliseconds ( m_pChatLineLife ) );
     CVARS_SET ( "chat_line_fade_out", GetMilliseconds ( m_pChatLineFadeout ) );
-    CVARS_SET ( "server_can_flash_window", m_pFlashWindow->GetSelected () );
+
+    CVARS_SET ( "chat_position_offset_x", m_pChatOffsetX->GetText() );
+    CVARS_SET ( "chat_position_offset_y", m_pChatOffsetY->GetText() );
+    if ( CGUIListItem* pSelected = m_pChatHorizontalCombo->GetSelectedItem() )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "chat_position_horizontal", iSelected );
+    }
+    if ( CGUIListItem* pSelected = m_pChatVerticalCombo->GetSelectedItem() )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "chat_position_vertical", iSelected );
+    }
+    if ( CGUIListItem* pSelected = m_pChatTextAlignCombo->GetSelectedItem() )
+    {
+        int iSelected = ( int ) pSelected->GetData();
+        CVARS_SET ( "chat_text_alignment", iSelected );
+    }
+
+    // Interface
+    CVARS_SET ( "server_can_flash_window", m_pFlashWindow->GetSelected ( ) );
+    CVARS_SET ( "allow_tray_notifications", m_pTrayBalloon->GetSelected ( ) );
 
     // Set our new skin last, as it'll destroy all our GUI
     pItem = m_pInterfaceSkinSelector->GetSelectedItem ();
@@ -3300,25 +3395,22 @@ void CSettings::SaveData ( void )
     CVARS_SET ( "streaming_memory", value );
 
     // Webbrowser settings
-    bool bOldRemoteWebsites, bOldRemoteJavascript, bOldPlugins;
+    bool bOldRemoteWebsites, bOldRemoteJavascript;
     CVARS_GET ( "browser_remote_websites", bOldRemoteWebsites );
     CVARS_GET ( "browser_remote_javascript", bOldRemoteJavascript );
-    CVARS_GET ( "browser_plugins", bOldPlugins );
 
     bool bBrowserSettingChanged = false;
     if ( bOldRemoteWebsites != m_pCheckBoxRemoteBrowser->GetSelected()
-        || bOldRemoteJavascript != m_pCheckBoxRemoteJavascript->GetSelected()
-        || bOldPlugins != m_pCheckBoxBrowserPluginsEnabled->GetSelected())
+        || bOldRemoteJavascript != m_pCheckBoxRemoteJavascript->GetSelected())
     {
         bBrowserSettingChanged = true;
         CVARS_SET ( "browser_remote_websites", m_pCheckBoxRemoteBrowser->GetSelected () );
         CVARS_SET ( "browser_remote_javascript", m_pCheckBoxRemoteJavascript->GetSelected () );
-        CVARS_SET ("browser_plugins", m_pCheckBoxBrowserPluginsEnabled->GetSelected () );
     }
 
-    auto pWebCore = CCore::GetSingleton().GetWebCore();
-    if ( pWebCore )
+    if ( m_bBrowserListsLoadEnabled )
     {
+        auto pWebCore = g_pCore->GetWebCore();
         std::vector<SString> customBlacklist;
         for ( int i = 0; i < m_pGridBrowserBlacklist->GetRowCount (); ++i )
         {
@@ -3336,7 +3428,6 @@ void CSettings::SaveData ( void )
         if ( m_bBrowserListsChanged )
             bBrowserSettingChanged = true;
     }
-    
 
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues ();
@@ -3383,7 +3474,7 @@ void CSettings::AddKeyBindSection ( char* szSectionName )
     m_pKeyBindSections.push_back ( new SKeyBindSection ( szSectionName ) ); 
 }
 
-void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CGUITabPanel* pParent )
+void CSettings::CreateChatColorTab ( eChatColorType eType, const char* szName, CGUITabPanel* pParent )
 {
     CVector2D vecTemp;
 
@@ -3392,68 +3483,133 @@ void CSettings::CreateChatColorTab ( ChatColorType eType, const char* szName, CG
     CGUITab* pTab = pParent->CreateTab ( szName );
     CGUILabel* pLabel;
 
-    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Red:") ) );
-    pLabel->SetPosition ( CVector2D ( 0.05f, 0.065f ), true );
-    pLabel->GetPosition ( vecTemp, false );
-    pLabel->AutoSize ( _("Red:") );
+    // Size of lines and gaps
+    float fLineSizeY = 20;
+    float fLineGapY = 12;
+    float fMarginX = 0;
+    float fIndentX = 0;
 
-    m_pChatRedValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
-    m_pChatRedValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
-    m_pChatRedValue [ eType ]->AutoSize ( "255 " );
+    //
+    // Color
+    //
+    {
+        SString strRed          = _("Red:"),
+                strGreen        = _("Green:"),
+                strBlue         = _("Blue:"),
+                strTransparency = _("Transparency:");
+        fIndentX = pManager->CGUI_GetMaxTextExtent( "default-normal", strRed, strGreen, strBlue, strTransparency ) + 10.0f;
 
-    m_pChatRed [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
-    m_pChatRed [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
-    m_pChatRed [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
-    m_pChatRed [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatRedChanged, this ) );
-    m_pChatRed [ eType ]->SetProperty ( "StepSize", "0.004" );
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Color") ) );
+        pLabel->SetPosition ( CVector2D ( 10.0f, 10.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( NULL, 5.0f );
+        pLabel->SetFont ( "default-bold-small" );
 
-    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Green:") ) );
-    pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
-    pLabel->GetPosition ( vecTemp, false );
-    pLabel->AutoSize ( _("Green:") );
+        // Red
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, strRed ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
 
-    m_pChatGreenValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
-    m_pChatGreenValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
-    m_pChatGreenValue [ eType ]->AutoSize ( "255 " );
+        m_pChatRed [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
+        m_pChatRed [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatRed [ eType ]->SetSize ( CVector2D ( 175.0f, fLineSizeY ) );
+        m_pChatRed [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatRedChanged, this ) );
+        m_pChatRed [ eType ]->SetProperty ( "StepSize", "0.004" );
 
-    m_pChatGreen [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
-    m_pChatGreen [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
-    m_pChatGreen [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
-    m_pChatGreen [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatGreenChanged, this ) );
-    m_pChatGreen [ eType ]->SetProperty ( "StepSize", "0.004" );
+        m_pChatRedValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
+        m_pChatRedValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 185.0f, vecTemp.fY) );
+        m_pChatRedValue [ eType ]->AutoSize ( "255 " );
 
-    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Blue:") ) );
-    pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
-    pLabel->GetPosition ( vecTemp, false );
-    pLabel->AutoSize ( _("Blue:") );
+        // Green
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, strGreen ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
 
-    m_pChatBlueValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
-    m_pChatBlueValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
-    m_pChatBlueValue [ eType ]->AutoSize ( "255 " );
+        m_pChatGreen [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
+        m_pChatGreen [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatGreen [ eType ]->SetSize ( CVector2D ( 175.0f, fLineSizeY ) );
+        m_pChatGreen [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatGreenChanged, this ) );
+        m_pChatGreen [ eType ]->SetProperty ( "StepSize", "0.004" );
 
-    m_pChatBlue [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
-    m_pChatBlue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
-    m_pChatBlue [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
-    m_pChatBlue [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatBlueChanged, this ) );
-    m_pChatBlue [ eType ]->SetProperty ( "StepSize", "0.004" );
+        m_pChatGreenValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
+        m_pChatGreenValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 185.0f, vecTemp.fY) );
+        m_pChatGreenValue [ eType ]->AutoSize ( "255 " );
 
-    pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Transparency:") ) );
-    pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f ) );
-    pLabel->GetPosition ( vecTemp, false );
-    pLabel->AutoSize ( _("Transparency:") );
+        // Blue
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, strBlue ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
 
-    m_pChatAlphaValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
-    m_pChatAlphaValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 270.0f, vecTemp.fY) );
-    m_pChatAlphaValue [ eType ]->AutoSize ( "255 " );
+        m_pChatBlue [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
+        m_pChatBlue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatBlue [ eType ]->SetSize ( CVector2D ( 175.0f, fLineSizeY ) );
+        m_pChatBlue [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatBlueChanged, this ) );
+        m_pChatBlue [ eType ]->SetProperty ( "StepSize", "0.004" );
 
-    m_pChatAlpha [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
-    m_pChatAlpha [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + 90.0f, vecTemp.fY ) );
-    m_pChatAlpha [ eType ]->SetSize ( CVector2D ( 175.0f, 20.0f ) );
-    m_pChatAlpha [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatAlphaChanged, this ) );
-    m_pChatAlpha [ eType ]->SetProperty ( "StepSize", "0.004" );
+        m_pChatBlueValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
+        m_pChatBlueValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 185.0f, vecTemp.fY) );
+        m_pChatBlueValue [ eType ]->AutoSize ( "255 " );
+
+        // Transparency
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, strTransparency ) );
+        pLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( );
+
+        m_pChatAlpha [ eType ] = reinterpret_cast < CGUIScrollBar* > ( pManager->CreateScrollBar ( true, pTab ) );
+        m_pChatAlpha [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 2.0f ) );
+        m_pChatAlpha [ eType ]->SetSize ( CVector2D ( 175.0f, fLineSizeY ) );
+        m_pChatAlpha [ eType ]->SetOnScrollHandler ( GUI_CALLBACK( &CSettings::OnChatAlphaChanged, this ) );
+        m_pChatAlpha [ eType ]->SetProperty ( "StepSize", "0.004" );
+
+        m_pChatAlphaValue [ eType ] = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, "0" ) );
+        m_pChatAlphaValue [ eType ]->SetPosition ( CVector2D ( vecTemp.fX + fIndentX + 185.0f, vecTemp.fY) );
+        m_pChatAlphaValue [ eType ]->AutoSize ( "255 " );
+
+        fMarginX = vecTemp.fX + fIndentX + 185.0f + pManager->GetTextExtent("255") + 30.0f;
+    }
+
+    //
+    // Preview
+    //
+    {
+        pLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTab, _("Preview") ) );
+        pLabel->SetPosition ( CVector2D ( fMarginX, 10.0f ) );
+        pLabel->GetPosition ( vecTemp );
+        pLabel->AutoSize ( NULL, 5.0f );
+        pLabel->SetFont ( "default-bold-small" );
+
+        float fSize = fLineSizeY * 4 + fLineGapY * 3;
+
+        auto pPreviewButton = pManager->CreateButton ( pTab );
+        pPreviewButton->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 30.0f - 2.0f ) );
+        pPreviewButton->SetSize ( CVector2D ( fSize, fSize ) );
+        pPreviewButton->SetAlpha ( 1.0f );
+        pPreviewButton->Deactivate ( );
+
+        auto pPreviewImage = pManager->CreateStaticImage ( pPreviewButton );
+        pPreviewImage->SetPosition ( CVector2D ( 10.0f, 10.0f ) );
+        pPreviewImage->SetSize ( CVector2D ( fSize - 20.0f, fSize - 20.0f ) );
+        
+        if ( pPreviewImage->LoadFromFile ( CalcMTASAPath ( "MTA\\cgui\\images\\radarset\\01.png" ) ) )
+        {
+            m_pChatColorPreview[eType] = pPreviewImage;
+            UpdateChatColorPreview(eType);
+        }
+        else
+        {
+            m_pChatColorPreview[eType] = nullptr;
+            delete pPreviewButton;
+            pPreviewImage = nullptr;
+            pPreviewButton = nullptr;
+        }
+    }
 }
 
-void CSettings::LoadChatColorFromCVar ( ChatColorType eType, const char* szCVar )
+void CSettings::LoadChatColorFromCVar ( eChatColorType eType, const char* szCVar )
 {
     // Load the color according to the cvars and update the gui
     CColor pColor;
@@ -3461,7 +3617,7 @@ void CSettings::LoadChatColorFromCVar ( ChatColorType eType, const char* szCVar 
     SetChatColorValues ( eType, pColor );
 }
 
-void CSettings::SaveChatColor ( ChatColorType eType, const char* szCVar )
+void CSettings::SaveChatColor ( eChatColorType eType, const char* szCVar )
 {
     // Save the color to the cvar if it's different
     CColor pColor, pOldColor;
@@ -3472,7 +3628,7 @@ void CSettings::SaveChatColor ( ChatColorType eType, const char* szCVar )
         CVARS_SET ( szCVar, pColor );
 }
 
-CColor CSettings::GetChatColorValues ( ChatColorType eType )
+CColor CSettings::GetChatColorValues ( eChatColorType eType )
 {
     // Retrieve the color according to the scrollbar values
     CColor pColor;
@@ -3483,7 +3639,7 @@ CColor CSettings::GetChatColorValues ( ChatColorType eType )
     return pColor;
 }
 
-void CSettings::SetChatColorValues ( ChatColorType eType, CColor pColor )
+void CSettings::SetChatColorValues ( eChatColorType eType, CColor pColor )
 {
     // Set the scrollbar position based on the color
     m_pChatRed [ eType ]->SetScrollPosition ( ( float ) pColor.R / 255.0f );
@@ -3535,7 +3691,7 @@ void CSettings::LoadSkins()
     }   
 }
 
-void CSettings::LoadChatColorFromString ( ChatColorType eType, const string& strColor )
+void CSettings::LoadChatColorFromString ( eChatColorType eType, const string& strColor )
 {
     CColor pColor;
     stringstream ss( strColor );
@@ -3593,27 +3749,27 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
         {
             if ( strTag == "color_text" )
             {
-                LoadChatColorFromString ( ChatColorTypes::CHAT_COLOR_TEXT, strValue );
+                LoadChatColorFromString ( Chat::ColorType::TEXT, strValue );
             }
             else if ( strTag == "color_background" )
             {
-                LoadChatColorFromString ( ChatColorTypes::CHAT_COLOR_BG, strValue );
+                LoadChatColorFromString ( Chat::ColorType::BG, strValue );
             }
             else if ( strTag == "color_input_text" )
             {
-                LoadChatColorFromString ( ChatColorTypes::CHAT_COLOR_INPUT_TEXT, strValue );
+                LoadChatColorFromString ( Chat::ColorType::INPUT_TEXT, strValue );
             }
             else if ( strTag == "color_input_background" )
             {
-                LoadChatColorFromString ( ChatColorTypes::CHAT_COLOR_INPUT_BG, strValue );
+                LoadChatColorFromString ( Chat::ColorType::INPUT_BG, strValue );
             }
             else if ( strTag == "font" )
             {
                 int iValue;
                 pSubNode->GetTagContent ( iValue );
                 
-                if ( iValue < 0 || iValue >= ChatFonts::CHAT_FONT_MAX )
-                    iValue = ChatFonts::CHAT_FONT_DEFAULT;
+                if ( iValue < 0 || iValue >= Chat::Font::MAX )
+                    iValue = Chat::Font::DEFAULT;
                 m_pRadioChatFont [ iValue ]->SetSelected ( true );
             }
             else if ( strTag == "lines" )
@@ -3633,6 +3789,44 @@ bool CSettings::OnChatLoadPresetClick( CGUIElement* pElement )
                 catch(...)
                 {
                 }
+            }
+            else if ( strTag == "position_horizontal" )
+            {
+                int iValue;
+                pSubNode->GetTagContent ( iValue );
+
+                if ( iValue >= Chat::Position::Horizontal::LEFT && iValue <= Chat::Position::Horizontal::RIGHT )
+                {
+                    m_pChatHorizontalCombo->SetSelectedItemByIndex ( iValue );
+                }
+            }
+            else if ( strTag == "position_vertical" )
+            {
+                int iValue;
+                pSubNode->GetTagContent ( iValue );
+
+                if ( iValue >= Chat::Position::Vertical::TOP && iValue <= Chat::Position::Vertical::BOTTOM )
+                {
+                    m_pChatVerticalCombo->SetSelectedItemByIndex ( iValue );
+                }
+            }
+            else if ( strTag == "text_alignment" )
+            {
+                int iValue;
+                pSubNode->GetTagContent ( iValue );
+
+                if ( iValue >= Chat::Text::Align::LEFT && iValue <= Chat::Text::Align::RIGHT )
+                {
+                    m_pChatTextAlignCombo->SetSelectedItemByIndex ( iValue );
+                }
+            }
+            else if ( strTag == "offset_x" )
+            {
+                m_pChatOffsetX->SetText ( strValue.c_str () );
+            }
+            else if ( strTag == "offset_y" )
+            {
+                m_pChatOffsetY->SetText ( strValue.c_str () );
             }
             else if ( strTag == "width" )
             {
@@ -3730,7 +3924,7 @@ bool CSettings::OnSkinChanged ( CGUIElement* pElement )
 
 bool CSettings::OnFieldOfViewChanged ( CGUIElement* pElement )
 {
-    int iFieldOfView = Min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
+    int iFieldOfView = std::min < int > ( 4, ( m_pFieldOfView->GetScrollPosition () ) * ( 4 + 1 ) ) * 5 + 70;
 
     m_pFieldOfViewValueLabel->SetText ( SString("%i", iFieldOfView).c_str() );
     return true;
@@ -3754,7 +3948,7 @@ bool CSettings::OnBrightnessChanged ( CGUIElement* pElement )
 
 bool CSettings::OnAnisotropicChanged ( CGUIElement* pElement )
 {
-    int iAnisotropic = Min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
+    int iAnisotropic = std::min < int > ( m_iMaxAnisotropic, ( m_pAnisotropic->GetScrollPosition () ) * ( m_iMaxAnisotropic + 1 ) );
 
     SString strLabel;
     if ( iAnisotropic > 0 )
@@ -3833,70 +4027,74 @@ bool CSettings::OnVoiceVolumeChanged ( CGUIElement* pElement)
 
 bool CSettings::OnChatRedChanged ( CGUIElement* pElement)
 {
-    CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
-    int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
+    CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar *>(pElement);
+    int iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    if ( pScrollBar == m_pChatRed [ ChatColorTypes::CHAT_COLOR_BG ] )
-        m_pChatRedValue [ ChatColorTypes::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatRed [ ChatColorTypes::CHAT_COLOR_TEXT ] )
-        m_pChatRedValue [ ChatColorTypes::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatRed [ ChatColorTypes::CHAT_COLOR_INPUT_BG ] )
-        m_pChatRedValue [ ChatColorTypes::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatRed [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT ] )
-        m_pChatRedValue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType )
+    {
+        if ( pScrollBar == m_pChatRed[eType] )
+        {
+            m_pChatRedValue[eType]->SetText(SString("%i", iValue).c_str());
+            UpdateChatColorPreview(static_cast<eChatColorType>(eType));
+            return true;
+        }
+    }
 
-    return true;
+    return false;
 }
 
 bool CSettings::OnChatGreenChanged ( CGUIElement* pElement)
 {
-    CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
-    int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
+    CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar *>(pElement);
+    int iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    if ( pScrollBar == m_pChatGreen [ ChatColorTypes::CHAT_COLOR_BG ] )
-        m_pChatGreenValue [ ChatColorTypes::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatGreen [ ChatColorTypes::CHAT_COLOR_TEXT ] )
-        m_pChatGreenValue [ ChatColorTypes::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatGreen [ ChatColorTypes::CHAT_COLOR_INPUT_BG ] )
-        m_pChatGreenValue [ ChatColorTypes::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatGreen [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT ] )
-        m_pChatGreenValue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType )
+    {
+        if ( pScrollBar == m_pChatGreen[eType] )
+        {
+            m_pChatGreenValue[eType]->SetText(SString("%i", iValue).c_str());
+            UpdateChatColorPreview(static_cast<eChatColorType>(eType));
+            return true;
+        }
+    }
 
-    return true;
+    return false;
 }
 
 bool CSettings::OnChatBlueChanged ( CGUIElement* pElement)
 {
-    CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
-    int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
+    CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar *>(pElement);
+    int iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    if ( pScrollBar == m_pChatBlue [ ChatColorTypes::CHAT_COLOR_BG ] )
-        m_pChatBlueValue [ ChatColorTypes::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatBlue [ ChatColorTypes::CHAT_COLOR_TEXT ] )
-        m_pChatBlueValue [ ChatColorTypes::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatBlue [ ChatColorTypes::CHAT_COLOR_INPUT_BG ] )
-        m_pChatBlueValue [ ChatColorTypes::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatBlue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT ] )
-        m_pChatBlueValue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType )
+    {
+        if ( pScrollBar == m_pChatBlue[eType] )
+        {
+            m_pChatBlueValue[eType]->SetText(SString("%i", iValue).c_str());
+            UpdateChatColorPreview(static_cast<eChatColorType>(eType));
+            return true;
+        }
+    }
 
-    return true;
+    return false;
 }
 
 bool CSettings::OnChatAlphaChanged ( CGUIElement* pElement)
 {
-    CGUIScrollBar* pScrollBar = reinterpret_cast < CGUIScrollBar* > ( pElement );
-    int iValue = ( (float)pScrollBar->GetScrollPosition () * 255.0f );
+    CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar *>(pElement);
+    int iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    if ( pScrollBar == m_pChatAlpha [ ChatColorTypes::CHAT_COLOR_BG ] )
-        m_pChatAlphaValue [ ChatColorTypes::CHAT_COLOR_BG ]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatAlpha [ ChatColorTypes::CHAT_COLOR_TEXT ] )
-        m_pChatAlphaValue [ ChatColorTypes::CHAT_COLOR_TEXT]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatAlpha [ ChatColorTypes::CHAT_COLOR_INPUT_BG ] )
-        m_pChatAlphaValue [ ChatColorTypes::CHAT_COLOR_INPUT_BG]->SetText ( SString("%i", iValue).c_str() );
-    else if ( pScrollBar == m_pChatAlpha [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT ] )
-        m_pChatAlphaValue [ ChatColorTypes::CHAT_COLOR_INPUT_TEXT]->SetText ( SString("%i", iValue).c_str() );
+    for ( int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType )
+    {
+        if ( pScrollBar == m_pChatAlpha[eType] )
+        {
+            m_pChatAlphaValue[eType]->SetText(SString("%i", iValue).c_str());
+            UpdateChatColorPreview(static_cast<eChatColorType>(eType));
+            return true;
+        }
+    }
 
-    return true;
+    return false;
 }
 
 bool CSettings::OnUpdateButtonClick ( CGUIElement* pElement )

@@ -229,11 +229,9 @@ int CLuaDatabaseDefs::DbConnect ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if ( pLuaMain )
+        CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource ( luaVM );
+        if ( pThisResource )
         {
-            CResource* pThisResource = pLuaMain->GetResource ();
-
             // If type is sqlite, and has a host, try to resolve path
             if ( strType == "sqlite" && !strHost.empty () )
             {
@@ -243,11 +241,12 @@ int CLuaDatabaseDefs::DbConnect ( lua_State* luaVM )
                     strHost = strHost.SubStr ( 1 );
                     if ( !IsValidFilePath ( strHost ) )
                     {
-                        m_pScriptDebugging->LogError ( luaVM, "%s failed; host path not valid", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ) );
-                        lua_pushboolean ( luaVM, false );
-                        return 1;
+                        argStream.SetCustomError( SString( "host path %s not valid", *strHost ) );
                     }
-                    strHost = PathJoin ( g_pGame->GetConfig ()->GetGlobalDatabasesPath (), strHost );
+                    else
+                    {
+                        strHost = PathJoin ( g_pGame->GetConfig ()->GetGlobalDatabasesPath (), strHost );
+                    }
                 }
                 else
                 {
@@ -255,62 +254,59 @@ int CLuaDatabaseDefs::DbConnect ( lua_State* luaVM )
 
                     // Parse path
                     CResource* pPathResource = pThisResource;
-                    if ( CResourceManager::ParseResourcePathInput ( strHost, pPathResource, &strAbsPath, NULL ) )
+                    if ( CResourceManager::ParseResourcePathInput ( strHost, pPathResource, &strAbsPath ) )
                     {
-                        if ( pPathResource == pThisResource ||
-                            m_pACLManager->CanObjectUseRight ( pThisResource->GetName ().c_str (),
-                                CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
-                                "ModifyOtherObjects",
-                                CAccessControlListRight::RIGHT_TYPE_GENERAL,
-                                false ) )
-                        {
-                            strHost = strAbsPath;
-                        }
-                        else
-                        {
-                            m_pScriptDebugging->LogError ( luaVM, "%s failed; ModifyOtherObjects in ACL denied resource %s to access %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), pThisResource->GetName ().c_str (), pPathResource->GetName ().c_str () );
-                            lua_pushboolean ( luaVM, false );
-                            return 1;
-                        }
+                        strHost = strAbsPath;
+                        CheckCanModifyOtherResource( argStream, pThisResource, pPathResource );
                     }
                     else
                     {
-                        m_pScriptDebugging->LogError ( luaVM, "%s failed; host path %s not found", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *strHost );
-                        lua_pushboolean ( luaVM, false );
-                        return 1;
+                        argStream.SetCustomError( SString( "host path %s not found", *strHost ) );
                     }
                 }
             }
-            // Add logging options
-            bool bLoggingEnabled;
-            SString strLogTag;
-            // Read value of 'log' and 'tag' if already set, otherwise use default
-            GetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled, 1 );
-            GetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag, "script" );
-            SetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled );
-            SetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag );
-            // Do connect
-            SConnectionHandle connection = g_pGame->GetDatabaseManager ()->Connect ( strType, strHost, strUsername, strPassword, strOptions );
-            if ( connection == INVALID_DB_HANDLE )
-            {
-                m_pScriptDebugging->LogError ( luaVM, "%s failed; %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), *g_pGame->GetDatabaseManager ()->GetLastErrorMessage () );
-                lua_pushboolean ( luaVM, false );
-                return 1;
-            }
 
-            // Use an element to wrap the connection for auto disconnected when the resource stops
-            CDatabaseConnectionElement* pElement = new CDatabaseConnectionElement ( NULL, connection );
-            CElementGroup * pGroup = pThisResource->GetElementGroup ();
-            if ( pGroup )
+            if ( !argStream.HasErrors() )
             {
-                pGroup->Add ( pElement );
-            }
+                if ( strType == "mysql" )
+                    pThisResource->SetUsingDbConnectMysql( true );
 
-            lua_pushelement ( luaVM, pElement );
-            return 1;
+                // Add logging options
+                bool bLoggingEnabled;
+                SString strLogTag;
+                SString strQueueName;
+                // Set default values if required
+                GetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled, 1 );
+                GetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag, "script" );
+                GetOption < CDbOptionsMap > ( strOptions, "queue", strQueueName, (strType == "mysql") ? strHost : DB_SQLITE_QUEUE_NAME_DEFAULT );
+                SetOption < CDbOptionsMap > ( strOptions, "log", bLoggingEnabled );
+                SetOption < CDbOptionsMap > ( strOptions, "tag", strLogTag );
+                SetOption < CDbOptionsMap > ( strOptions, "queue", strQueueName );
+                // Do connect
+                SConnectionHandle connection = g_pGame->GetDatabaseManager ()->Connect ( strType, strHost, strUsername, strPassword, strOptions );
+                if ( connection == INVALID_DB_HANDLE )
+                {
+                    argStream.SetCustomError( g_pGame->GetDatabaseManager()->GetLastErrorMessage() );
+                }
+                else
+                {
+                    // Use an element to wrap the connection for auto disconnected when the resource stops
+                    // Don't set a parent because the element should not be accessible from other resources
+                    CDatabaseConnectionElement* pElement = new CDatabaseConnectionElement ( NULL, connection );
+                    CElementGroup * pGroup = pThisResource->GetElementGroup ();
+                    if ( pGroup )
+                    {
+                        pGroup->Add ( pElement );
+                    }
+
+                    lua_pushelement ( luaVM, pElement );
+                    return 1;
+                }
+            }
         }
     }
-    else
+
+    if ( argStream.HasErrors() )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
@@ -329,13 +325,7 @@ int CLuaDatabaseDefs::DbQuery ( lua_State* luaVM )
         argStream.ReadFunction ( iLuaFunction );
         if ( argStream.NextIsTable () )
         {
-            lua_pushnil ( luaVM );      // Loop through our table, beginning at the first key
-            while ( lua_next ( luaVM, argStream.m_iIndex ) != 0 )
-            {
-                callbackArgs.ReadArgument ( luaVM, -1 );    // Ignore the index at -2, and just read the value
-                lua_pop ( luaVM, 1 );                       // Remove the item and keep the key for the next iteration
-            }
-            argStream.m_iIndex++;
+            argStream.ReadLuaArgumentsTable( callbackArgs );
         }
     }
     argStream.ReadUserData ( pElement );
@@ -392,13 +382,7 @@ int CLuaDatabaseDefs::OOP_DbQuery ( lua_State* luaVM )
         argStream.ReadFunction ( iLuaFunction );
         if ( argStream.NextIsTable () )
         {
-            lua_pushnil ( luaVM );      // Loop through our table, beginning at the first key
-            while ( lua_next ( luaVM, argStream.m_iIndex ) != 0 )
-            {
-                callbackArgs.ReadArgument ( luaVM, -1 );    // Ignore the index at -2, and just read the value
-                lua_pop ( luaVM, 1 );                       // Remove the item and keep the key for the next iteration
-            }
-            argStream.m_iIndex++;
+            argStream.ReadLuaArgumentsTable( callbackArgs );
         }
     }
     argStream.ReadString ( strQuery );

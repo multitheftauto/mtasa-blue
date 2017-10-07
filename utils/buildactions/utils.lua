@@ -23,7 +23,7 @@
 -- @returns
 --    True if successful, otherwise nil.
 --
-function os.copydir(src_dir, dst_dir, filter, single_dst_dir)
+function os.copydir(src_dir, dst_dir, filter, single_dst_dir, skip_existing)
 	if not os.isdir(src_dir) then error(src_dir .. " is not an existing directory!") end
 	filter = filter or "**"
 	src_dir = src_dir .. "/"
@@ -36,20 +36,30 @@ function os.copydir(src_dir, dst_dir, filter, single_dst_dir)
 	os.chdir( dir ) -- change current directory back to root
 
 	local counter = 0
+	local skipped = 0
 	for k, v in ipairs(matches) do
 		local target = iif(single_dst_dir, path.getname(v), v)
 		--make sure, that directory exists or os.copyfile() fails
 		os.mkdir( path.getdirectory(dst_dir .. target))
-		if os.copyfile( src_dir .. v, dst_dir .. target) then
-			counter = counter + 1
+		if skip_existing and os.isfile( dst_dir .. target ) then
+			skipped = skipped + 1
+		else
+			if os.copyfile( src_dir .. v, dst_dir .. target) then
+				counter = counter + 1
+			end
 		end
 	end
 
-	if counter == #matches then
-		print( counter .. " files copied.")
+	if counter + skipped == #matches then
+		if counter ~= 0 then
+			print( counter .. " files copied.")
+		end
+		if skipped ~= 0 then
+			print( skipped .. " existing files not updated.")
+		end
 		return true
 	else
-		print( "Error: " .. counter .. "/" .. #matches .. " files copied.")
+		print( "Error: " .. #matches - counter - skipped .. "/" .. #matches .. " files failed to copy.")
 		return nil
 	end
 end
@@ -74,7 +84,7 @@ function os.expanddir_wildcard(from, to)
 end
 
 function os.md5_file(path)
-	if os.get() == "windows" then
+	if os.host() == "windows" then
 		local s = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
 		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
 	else
@@ -85,9 +95,20 @@ end
 function os.extract_archive(archive_path, target_path, override)
 	local flags = override and "-aoa" or "-aos"
 
-	if os.get() == "windows" then
+	if os.host() == "windows" then
 		os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	else
 		os.executef("7z x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
+	end
+end
+
+function http.download_print_errors(url, file, options)
+	local result_str, response_code = http.download(url, file, options)
+	if result_str ~= "OK" then
+		print( "\nERROR: Failed to download " .. url .. "\n" .. result_str )
+		if response_code == 0 then
+			-- No response code means server was unreachable
+			print( "Check premake5 is not blocked by firewall rules" )
+		end
 	end
 end

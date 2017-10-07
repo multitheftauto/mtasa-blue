@@ -148,8 +148,8 @@ bool CPixelsManager::GetVolumePixels ( IDirect3DVolume9* pD3DSurface, CPixels& o
     uint PixelsRectWidth = GetRectWidth ( PixelsRect );
     uint PixelsRectHeight = GetRectHeight ( PixelsRect );
 
-    uint CopyWidth = Min ( SurfRectWidth, PixelsRectWidth );
-    uint CopyHeight = Min ( SurfRectHeight, PixelsRectHeight );
+    uint CopyWidth = std::min ( SurfRectWidth, PixelsRectWidth );
+    uint CopyHeight = std::min ( SurfRectHeight, PixelsRectHeight );
 
     // Prepare pixels
     uint ulPixelsPitch = uiPixelsWidth * XRGB_BYTES_PER_PIXEL;
@@ -272,8 +272,8 @@ bool CPixelsManager::SetVolumePixels ( IDirect3DVolume9* pD3DSurface, const CPix
     uint PixelsRectWidth = GetRectWidth ( PixelsRect );
     uint PixelsRectHeight = GetRectHeight ( PixelsRect );
 
-    uint CopyWidth = Min ( SurfRectWidth, PixelsRectWidth );
-    uint CopyHeight = Min ( SurfRectHeight, PixelsRectHeight );
+    uint CopyWidth = std::min ( SurfRectWidth, PixelsRectWidth );
+    uint CopyHeight = std::min ( SurfRectHeight, PixelsRectHeight );
 
     // Prepare pixels
     uint ulPixelsPitch = uiPixelsWidth * XRGB_BYTES_PER_PIXEL;
