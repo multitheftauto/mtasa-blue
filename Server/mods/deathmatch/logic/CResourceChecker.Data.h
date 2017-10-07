@@ -318,8 +318,8 @@ namespace
         { false, "showPlayerHudComponent",         "setPlayerHudComponentVisible" },
         { false, "setControlState",                "setPedControlState" },
         { false, "getControlState",                "getPedControlState" },
-        { false, "getVehicleAngularVelocity",      "getElementAngularVelocity" },
-        { false, "setVehicleAngularVelocity",      "setElementAngularVelocity" },
+        { false, "getVehicleTurnVelocity",         "getElementAngularVelocity" },
+        { false, "setVehicleTurnVelocity",         "setElementAngularVelocity" },
         // Edit
         { false, "guiEditSetCaratIndex",           "guiEditSetCaretIndex" },
         { false, "guiMemoSetCaratIndex",           "guiMemoSetCaretIndex" },
@@ -382,8 +382,8 @@ namespace
         { false, "attachElementToElement",         "attachElements" },
         { false, "detachElementFromElement",       "detachElements" },
         { false, "showPlayerHudComponent",         "setPlayerHudComponentVisible"},
-        { false, "getVehicleAngularVelocity",      "getElementAngularVelocity" },
-        { false, "setVehicleAngularVelocity",      "setElementAngularVelocity" },
+        { false, "getVehicleTurnVelocity",         "getElementAngularVelocity" },
+        { false, "setVehicleTurnVelocity",         "setElementAngularVelocity" },
         // XML
         { false, "xmlNodeGetSubNodes",             "xmlNodeGetChildren" },
         { false, "xmlCreateSubNode",               "xmlCreateChild" },
