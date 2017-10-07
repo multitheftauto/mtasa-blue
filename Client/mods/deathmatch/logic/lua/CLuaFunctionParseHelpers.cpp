@@ -658,8 +658,9 @@ bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix )
 
 //
 // Check min client is correct
+// Return false if below required
 //
-void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
+bool MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason )
 {
     CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine ( argStream.m_luaVM );
     if ( pLuaMain )
@@ -670,11 +671,14 @@ void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, 
             if ( pResource->GetMinClientReq () < szVersionReq )
             {
                 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
-                    argStream.SetVersionWarning ( szVersionReq, "client", szReason );
+                    if (szReason)
+                        argStream.SetVersionWarning ( szVersionReq, "client", szReason );
                 #endif
+                return false;
             }
         }
     }
+    return true;
 }
 
 //
