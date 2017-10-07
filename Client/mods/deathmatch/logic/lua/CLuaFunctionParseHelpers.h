@@ -276,7 +276,7 @@ void MixedReadDxFontString ( CScriptArgReader& argStream, eFontType& outFontType
 void MixedReadGuiFontString ( CScriptArgReader& argStream, SString& strFontName, const char* szDefaultFontName, CClientGuiFont*& poutGuiFontElement );
 void MixedReadMaterialString ( CScriptArgReader& argStream, CClientMaterial*& pMaterialElement );
 bool ReadMatrix ( lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix );
-void MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason );
+bool MinClientReqCheck ( CScriptArgReader& argStream, const char* szVersionReq, const char* szReason = nullptr );
 void ReadPregFlags( CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions );
 void CheckCanModifyOtherResource( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 = nullptr );
 void CheckCanAccessOtherResourceFile( CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly = nullptr );
