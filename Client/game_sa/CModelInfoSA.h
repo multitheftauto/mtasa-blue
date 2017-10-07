@@ -270,8 +270,10 @@ protected:
     static std::map < unsigned short, int > ms_RestreamTxdIDMap;
     static std::map < DWORD, float > ms_ModelDefaultLodDistanceMap;
     static std::map < DWORD, BYTE > ms_ModelDefaultAlphaTransparencyMap;
+    static std::unordered_map<CVehicleModelInfoSAInterface*, CVector> ms_ModelDefaultVehicleFumesPosition;
     bool                            m_bAddedRefForCollision;
     SVehicleSupportedUpgrades       m_ModelSupportedUpgrades;
+
 public:
     static std::set < uint >        ms_ReplacedColModels;
 
@@ -340,6 +342,7 @@ public:
     void*                           SetVehicleSuspensionData( void* pSuspensionLines );
     CVector                         GetVehicleExhaustFumesPosition() override;
     void                            SetVehicleExhaustFumesPosition(const CVector& position) override;
+    static void                     ResetAllVehicleExhaustFumes();
 
     // ONLY use for peds
     void                            GetVoice                ( short* psVoiceType, short* psVoice );
