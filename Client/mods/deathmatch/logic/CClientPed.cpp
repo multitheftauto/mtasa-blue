@@ -1413,7 +1413,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         // Swim tasks
         KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
         // Jump & vehicle enter/exit & custom animation tasks
-        KillTask ( TASK_PRIORITY_PRIMARY );
+        m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
 
         KillTaskSecondary ( TASK_SECONDARY_ATTACK );
 
