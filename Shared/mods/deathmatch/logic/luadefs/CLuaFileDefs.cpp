@@ -40,7 +40,8 @@ void CLuaFileDefs::AddClass ( lua_State* luaVM )
 
     lua_classmetamethod ( luaVM, "__gc", fileCloseGC );
 
-    lua_classfunction ( luaVM, "create", "fileOpen" );
+    lua_classfunction ( luaVM, "create", "fileOpen" ); // backward compatibility
+    lua_classfunction ( luaVM, "open", "fileOpen" );
     lua_classfunction ( luaVM, "new", "fileCreate" );
     lua_classfunction ( luaVM, "exists", "fileExists" );
     lua_classfunction ( luaVM, "copy", "fileCopy" );
