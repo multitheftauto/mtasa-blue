@@ -46,11 +46,11 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
     m_bBreakingDisabled = false;
     m_bRespawnEnabled = true;
     m_fMass = -1.0f;
-	m_fTurnMass = -1.0f;
-	m_fAirResistance = -1.0f;
-	m_fElasticity = -1.0f;
-	m_fBuoyancyConstant = -1.0f;
-	m_vecCenterOfMass = CVector(0.0f, 0.0f, 0.0f);
+    m_fTurnMass = -1.0f;
+    m_fAirResistance = -1.0f;
+    m_fElasticity = -1.0f;
+    m_fBuoyancyConstant = -1.0f;
+    m_vecCenterOfMass = CVector(0.0f, 0.0f, 0.0f);
 
     m_pModelInfo = g_pGame->GetModelInfo ( usModel );
 
@@ -556,7 +556,7 @@ void CClientObject::Create ( void )
                 if ( m_fAirResistance != -1.0f )    m_pObject->SetAirResistance ( m_fAirResistance );
                 if ( m_fElasticity != -1.0f )       m_pObject->SetElasticity( m_fElasticity );
                 if ( m_fBuoyancyConstant != -1.0f ) m_pObject->SetBuoyancyConstant( m_fBuoyancyConstant );
-				if ( m_vecCenterOfMass.fX != 0.0f ||
+                if ( m_vecCenterOfMass.fX != 0.0f ||
                      m_vecCenterOfMass.fY != 0.0f ||
                      m_vecCenterOfMass.fZ != 0.0f)  m_pObject->SetCenterOfMass( m_vecCenterOfMass );
                 

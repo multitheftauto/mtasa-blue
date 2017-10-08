@@ -135,7 +135,7 @@ public:
     void        SetElasticity               ( float fElasticity );
     float       GetBuoyancyConstant         ( void );
     void        SetBuoyancyConstant         ( float fBuoyancyConstant );
-	void        GetCenterOfMass             ( CVector & vecCenterOfMass );
+    void        GetCenterOfMass             ( CVector & vecCenterOfMass );
     void        SetCenterOfMass             ( CVector & vecCenterOfMass );
 
     void        ProcessCollision            ( void );

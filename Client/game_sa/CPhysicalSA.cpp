@@ -175,7 +175,7 @@ void CPhysicalSA::SetBuoyancyConstant ( float fBuoyancyConstant )
 
 void CPhysicalSA::GetCenterOfMass ( CVector & vecCenterOfMass )
 {
-	vecCenterOfMass = ((CPhysicalSAInterface *)this->GetInterface())->m_vecCenterOfMass;
+    vecCenterOfMass = ((CPhysicalSAInterface *)this->GetInterface())->m_vecCenterOfMass;
 }
 
 

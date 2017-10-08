@@ -1105,7 +1105,6 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
             {
                 Vehicle.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX ) );            
             }
-			
             break;
         }
         case CCLIENTOBJECT:
@@ -3780,26 +3779,26 @@ bool CStaticFunctionDefinitions::GetObjectMass ( CClientObject& Object, float& f
 
 bool CStaticFunctionDefinitions::GetObjectTurnMass ( CClientObject& Object, float& fTurnMass )
 {
-	fTurnMass = Object.GetTurnMass ();
-	return true;
+    fTurnMass = Object.GetTurnMass ();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetObjectAirResistance ( CClientObject& Object, float& fAirResistance )
 {
-	fAirResistance = Object.GetAirResistance ();
-	return true;
+    fAirResistance = Object.GetAirResistance ();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetObjectElasticity ( CClientObject& Object, float& fElasticity )
 {
-	fElasticity = Object.GetElasticity ();
-	return true;
+    fElasticity = Object.GetElasticity ();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetObjectBuoyancyConstant ( CClientObject& Object, float& fBuoyancyConstant )
 {
-	fBuoyancyConstant = Object.GetBuoyancyConstant ();
-	return true;
+    fBuoyancyConstant = Object.GetBuoyancyConstant ();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetObjectCenterOfMass ( CClientObject & Object, CVector& vecCenterOfMass )
