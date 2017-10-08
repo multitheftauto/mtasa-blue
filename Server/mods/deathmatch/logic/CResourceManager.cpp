@@ -850,11 +850,11 @@ void CResourceManager::ProcessQueue ( void )
         }
         else if ( sItem.eQueue == QUEUE_REFRESH )
         {
-            Refresh();
+            Refresh( false, sItem.pResource ? sItem.pResource->GetName() : "" );
         }
         else if ( sItem.eQueue == QUEUE_REFRESHALL )
         {
-            Refresh( true );
+            Refresh( true, sItem.pResource ? sItem.pResource->GetName() : "" );
         }
     }
 
