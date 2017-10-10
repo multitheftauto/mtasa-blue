@@ -1515,6 +1515,11 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     // Turn on the radio if local player and it's not already on.
     if ( m_bIsLocalPlayer )
     {
+        CVehicle* pGameVehicle = pVehicle->m_pVehicle;
+        if ( pGameVehicle )
+        {
+            pGameVehicle->GetVehicleAudioEntity ()->TurnOnRadioForVehicle ();
+        }
         StartRadio ();
     }
 

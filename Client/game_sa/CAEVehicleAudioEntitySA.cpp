@@ -40,6 +40,17 @@ void CAEVehicleAudioEntitySA::JustGotOutOfVehicleAsDriver ( void )
     }
 }
 
+void CAEVehicleAudioEntitySA::TurnOnRadioForVehicle ( void )
+{
+    DWORD dwFunc = FUNC_CAEVehicleAudioEntity__TurnOnRadioForVehicle;
+    DWORD dwThis = (DWORD) m_pInterface;
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+}
+
 void CAEVehicleAudioEntitySA::StopVehicleEngineSound ( unsigned char ucSlot )
 {
     DWORD dwFunc = FUNC_CAESound__Stop;

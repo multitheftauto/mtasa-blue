@@ -31,4 +31,5 @@ class CAEVehicleAudioEntity
 public:
     virtual void                        JustGotInVehicleAsDriver                ( void ) = 0;
     virtual void                        JustGotOutOfVehicleAsDriver             ( void ) = 0;
+    virtual void                        TurnOnRadioForVehicle                   ( void ) = 0;
 };
