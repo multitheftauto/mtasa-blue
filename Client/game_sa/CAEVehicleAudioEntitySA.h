@@ -256,6 +256,7 @@ public:
                                         CAEVehicleAudioEntitySA                 ( CAEVehicleAudioEntitySAInterface * pInterface );
     void                                JustGotInVehicleAsDriver                ( void );
     void                                JustGotOutOfVehicleAsDriver             ( void );
+    void                                TurnOnRadioForVehicle                   ( void );
     void                                StopVehicleEngineSound                  ( unsigned char ucSlot );
 
 private:

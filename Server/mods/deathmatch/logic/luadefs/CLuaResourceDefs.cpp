@@ -1196,17 +1196,19 @@ int CLuaResourceDefs::call ( lua_State* luaVM )
 
 int CLuaResourceDefs::refreshResources ( lua_State* luaVM )
 {
-    bool bRefreshAll;
+//  bool refreshResources ( [ bool refreshAll = false, resource onlyThisResource = nil ] )
+    bool bRefreshAll; CResource* pResource;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadBool ( bRefreshAll, false );
+    argStream.ReadUserData(pResource, nullptr);
 
     if ( !argStream.HasErrors ( ) )
     {
         if ( bRefreshAll )
-            m_pResourceManager->QueueResource( NULL, CResourceManager::QUEUE_REFRESHALL, NULL );
+            m_pResourceManager->QueueResource( pResource, CResourceManager::QUEUE_REFRESHALL, NULL );
         else
-            m_pResourceManager->QueueResource( NULL, CResourceManager::QUEUE_REFRESH, NULL );
+            m_pResourceManager->QueueResource( pResource, CResourceManager::QUEUE_REFRESH, NULL );
 
         lua_pushboolean ( luaVM, true );
         return 1;

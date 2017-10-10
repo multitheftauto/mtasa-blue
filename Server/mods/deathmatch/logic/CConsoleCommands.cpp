@@ -135,7 +135,7 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
 bool CConsoleCommands::RefreshResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     BeginConsoleOutputCapture ( pEchoClient );
-    g_pGame->GetResourceManager ()->Refresh ( false, "", SStringX( szArguments ) == "t" );
+    g_pGame->GetResourceManager ()->Refresh ( false, szArguments );
     EndConsoleOutputCapture ( pEchoClient, "refresh completed" );
     return true;
 }
@@ -143,7 +143,7 @@ bool CConsoleCommands::RefreshResources ( CConsole* pConsole, const char* szArgu
 bool CConsoleCommands::RefreshAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     BeginConsoleOutputCapture ( pEchoClient );
-    g_pGame->GetResourceManager ()->Refresh ( true );
+    g_pGame->GetResourceManager ()->Refresh ( true, szArguments );
     EndConsoleOutputCapture ( pEchoClient, "refreshall completed" );
     return true;
 }
