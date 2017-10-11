@@ -201,6 +201,14 @@ public:
     CElapsedTime    m_StuckTimer;
 };
 
+// For NtQuerySystemInformation
+#define STATUS_INFO_LENGTH_MISMATCH	((NTSTATUS)0xC0000004L)
+#define SystemProcessImageNameInformation ((SYSTEM_INFORMATION_CLASS)88)
+typedef struct _SYSTEM_PROCESS_IMAGE_NAME_INFORMATION
+{
+    HANDLE ProcessId;
+    UNICODE_STRING ImageName;
+} SYSTEM_PROCESS_IMAGE_NAME_INFORMATION, *PSYSTEM_PROCESS_IMAGE_NAME_INFORMATION;
 
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5
@@ -242,6 +250,8 @@ public:
     #define _InitializeProcThreadAttributeList  __InitializeProcThreadAttributeList()
     #define _DeleteProcThreadAttributeList      __DeleteProcThreadAttributeList()
     #define _UpdateProcThreadAttribute          __UpdateProcThreadAttribute()
+    #define _QueryFullProcessImageNameW         __QueryFullProcessImageNameW()
+    #define _NtQuerySystemInformation           __NtQuerySystemInformation()
 
     DEFFUNCTION( "kernel32", Virt,ualAll,ocEx )
     DEFFUNCTION( "kernel32", Virt,ualPro,tectEx )
@@ -254,5 +264,7 @@ public:
     DEFFUNCTION( "kernel32", Initiali,zeProcT,hreadAttributeList )
     DEFFUNCTION( "kernel32", Dele,teProcT,hreadAttributeList )
     DEFFUNCTION( "kernel32", Upda,teProcT,hreadAttribute )
+    DEFFUNCTION( "kernel32", QueryFullProcessImageNam,e,W )
+    DEFFUNCTION( "ntdll", NtQuerySystemInformati,o,n )
 
 #endif

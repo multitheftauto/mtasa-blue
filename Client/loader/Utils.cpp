@@ -349,9 +349,6 @@ WString devicePathToWin32Path ( const WString& strDevicePath )
 }
 
 
-typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPWSTR lpExeName, __inout PDWORD lpdwSize);
-
-
 ///////////////////////////////////////////////////////////////////////////
 //
 // GetProcessPathFilename
@@ -361,17 +358,7 @@ typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hP
 ///////////////////////////////////////////////////////////////////////////
 SString GetProcessPathFilename ( DWORD processID )
 {
-    static LPFN_QueryFullProcessImageNameW fnQueryFullProcessImageNameW = NULL;
-    static bool bDoneGetProcAddress = false;
-    if ( !bDoneGetProcAddress )
-    {
-        // Find 'QueryFullProcessImageNameA'
-        bDoneGetProcAddress = true;
-        HMODULE hModule = GetModuleHandle ( "Kernel32.dll" );
-        fnQueryFullProcessImageNameW = static_cast < LPFN_QueryFullProcessImageNameW > ( static_cast < PVOID > ( GetProcAddress( hModule, "QueryFullProcessImageNameW" ) ) );
-    }
-
-    if ( fnQueryFullProcessImageNameW )
+    if ( _QueryFullProcessImageNameW )
     {
         for ( int i = 0 ; i < 2 ; i++ )
         {
@@ -380,7 +367,7 @@ SString GetProcessPathFilename ( DWORD processID )
             {
                 WCHAR szProcessName[MAX_PATH] = L"";
                 DWORD dwSize = NUMELMS(szProcessName);
-                DWORD bOk = fnQueryFullProcessImageNameW ( hProcess, 0, szProcessName, &dwSize );
+                DWORD bOk = _QueryFullProcessImageNameW ( hProcess, 0, szProcessName, &dwSize );
                 CloseHandle( hProcess );
                 if ( bOk )
                 {
@@ -430,6 +417,23 @@ SString GetProcessPathFilename ( DWORD processID )
                     }
                 }
             }
+        }
+    }
+
+    if ( _NtQuerySystemInformation )
+    {
+        SYSTEM_PROCESS_IMAGE_NAME_INFORMATION info;
+        WCHAR szProcessName[MAX_PATH] = L"";
+        info.ProcessId = (HANDLE)processID;
+        info.ImageName.Length = 0;
+        info.ImageName.MaximumLength = sizeof(szProcessName);
+        info.ImageName.Buffer = szProcessName;
+
+        NTSTATUS status = _NtQuerySystemInformation(SystemProcessImageNameInformation, &info, sizeof(info), NULL);
+        if (NT_SUCCESS(status))
+        {
+            WString strProcessName = WStringX(info.ImageName.Buffer, info.ImageName.Length / 2);
+            return ToUTF8(devicePathToWin32Path(strProcessName));
         }
     }
 
@@ -1260,7 +1264,7 @@ Return Value:
 void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason)
 {
     HideSplash();
-    AddReportLog(7115, SString("Loader - Request to elevate privilages (%s)", *strReason));
+    AddReportLog(7115, SString("Loader - Request to elevate privileges (%s)", *strReason));
     MessageBoxUTF8(NULL, SString ( _("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *strReason), "Multi Theft Auto: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
     ReleaseSingleInstanceMutex();
     ShellExecuteNonBlocking("runas", PathJoin(GetMTASAPath(), MTA_EXE_NAME), strCmdLine);            
