@@ -24,7 +24,7 @@ void CLuaObjectDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getObjectTurnMass", GetObjectTurnMass );
     CLuaCFunctions::AddFunction ( "getObjectAirResistance", GetObjectAirResistance );
     CLuaCFunctions::AddFunction ( "getObjectElasticity", GetObjectElasticity );
-    CLuaCFunctions::AddFunction ( "getObjectBuoyancyConstant", GetObjectBuoyancyConstant );
+    CLuaCFunctions::AddFunction ( "getObjectBuoyancy", GetObjectBuoyancyConstant );
     CLuaCFunctions::AddFunction ( "getObjectCenterOfMass", GetObjectCenterOfMass );
 
     // Object set funcs
@@ -40,7 +40,7 @@ void CLuaObjectDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setObjectTurnMass", SetObjectTurnMass );
     CLuaCFunctions::AddFunction ( "setObjectAirResistance", SetObjectAirResistance );
     CLuaCFunctions::AddFunction ( "setObjectElasticity", SetObjectElasticity );
-    CLuaCFunctions::AddFunction ( "setObjectBuoyancyConstant", SetObjectBuoyancyConstant );
+    CLuaCFunctions::AddFunction ( "setObjectBuoyancy", SetObjectBuoyancyConstant );
     CLuaCFunctions::AddFunction ( "setObjectCenterOfMass", SetObjectCenterOfMass );
 }
 
@@ -67,11 +67,11 @@ void CLuaObjectDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "scale", "setObjectScale", "getObjectScale" );
     lua_classvariable ( luaVM, "breakable", "setObjectBreakable", "isObjectBreakable" );
     lua_classvariable ( luaVM, "mass", "setObjectMass", "getObjectMass" );
-    lua_classvariable ( luaVM, "turnmass", "setObjectTurnMass", "getObjectTurnMass" );
-    lua_classvariable ( luaVM, "resistance", "setObjectAirResistance", "getObjectAirResistance" );
+    lua_classvariable ( luaVM, "turnMass", "setObjectTurnMass", "getObjectTurnMass" );
+    lua_classvariable ( luaVM, "airResistance", "setObjectAirResistance", "getObjectAirResistance" );
     lua_classvariable ( luaVM, "elasticity", "setObjectElasticity", "getObjectElasticity" );
-    lua_classvariable ( luaVM, "buoyancy", "setObjectBuoyancyConstant", "getObjectBuoyancyConstant" );
-    lua_classvariable ( luaVM, "centermass", "setObjectCenterOfMass", "getObjectCenterOfMass" );
+    lua_classvariable ( luaVM, "buoyancy", "setObjectBuoyancy", "getObjectBuoyancy" );
+    lua_classvariable ( luaVM, "centerOfMass", "setObjectCenterOfMass", "getObjectCenterOfMass" );
 
     // Add deprecated methods for backwards compatibility
     lua_classfunction(luaVM, "toggleObjectRespawn", "toggleObjectRespawn");
@@ -312,7 +312,7 @@ int CLuaObjectDefs::GetObjectElasticity ( lua_State* luaVM )
 
 int CLuaObjectDefs::GetObjectBuoyancyConstant ( lua_State* luaVM )
 {
-//  float getObjectBuoyancyConstant ( object theObject )
+//  float getObjectBuoyancy ( object theObject )
     CClientObject* pObject; float fBuoyancyConstant;
 
     CScriptArgReader argStream ( luaVM );
@@ -684,7 +684,7 @@ int CLuaObjectDefs::SetObjectElasticity ( lua_State* luaVM )
 
 int CLuaObjectDefs::SetObjectBuoyancyConstant ( lua_State* luaVM )
 {
-//  bool setObjectBuoyancyConstant ( object theObject, float fBuoyancyConstant )
+//  bool setObjectBuoyancy ( object theObject, float fBuoyancyConstant )
     CClientEntity* pEntity; float fBuoyancyConstant;
 
     CScriptArgReader argStream ( luaVM );
