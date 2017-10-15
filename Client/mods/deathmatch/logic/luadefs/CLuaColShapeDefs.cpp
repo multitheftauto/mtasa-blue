@@ -219,9 +219,22 @@ int CLuaColShapeDefs::CreateColRectangle ( lua_State* luaVM )
 
 int CLuaColShapeDefs::CreateColPolygon ( lua_State* luaVM )
 {
+    //  colshape createColPolygon ( float fX, float fY, float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, ... )
+
     CVector2D vecPosition;
+    std::vector < CVector2D > vecPointList;
     CScriptArgReader argStream ( luaVM );
+
+    // Get position
     argStream.ReadVector2D ( vecPosition );
+
+    // Get first 3 required points
+    for ( uint i = 0; i < 3; i++ )
+    {
+        CVector2D vecPoint;
+        argStream.ReadVector2D ( vecPoint );
+        vecPointList.push_back ( vecPoint );
+    }
 
     if ( !argStream.HasErrors () )
     {
@@ -235,11 +248,18 @@ int CLuaColShapeDefs::CreateColPolygon ( lua_State* luaVM )
                 CClientColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon ( *pResource, vecPosition );
                 if ( pShape )
                 {
-                    // Get the points
-                    while ( argStream.NextCouldBeNumber () && argStream.NextCouldBeNumber ( 1 ) )
+                    // Get additional points
+                    while ( argStream.NextIsVector2D () )
                     {
-                        argStream.ReadVector2D ( vecPosition );
-                        pShape->AddPoint ( vecPosition );
+                        CVector2D vecPoint;
+                        argStream.ReadVector2D ( vecPoint );
+                        vecPointList.push_back ( vecPoint );
+                    }
+
+                    // Add all points
+                    for( uint i = 0 ; i < vecPointList.size() ; i++ )
+                    {
+                        pShape->AddPoint( vecPointList[i] );
                     }
 
                     CElementGroup * pGroup = pResource->GetElementGroup ();
