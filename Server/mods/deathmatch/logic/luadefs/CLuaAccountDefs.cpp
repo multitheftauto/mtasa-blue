@@ -27,6 +27,8 @@ void CLuaAccountDefs::LoadFunctions ()
     CLuaCFunctions::AddFunction ( "getAccounts", GetAccounts );
     CLuaCFunctions::AddFunction ( "getAccountSerial", GetAccountSerial );
     CLuaCFunctions::AddFunction ( "getAccountsBySerial", GetAccountsBySerial );
+    CLuaCFunctions::AddFunction ( "getAccountIP", GetAccountIP );
+    CLuaCFunctions::AddFunction ( "getAccountsByIP", GetAccountsByIP );
 
     // Account set functions
     CLuaCFunctions::AddFunction ( "addAccount", AddAccount );
@@ -42,6 +44,7 @@ void CLuaAccountDefs::AddClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "getAll", "getAccounts" );
     lua_classfunction ( luaVM, "getAllBySerial", "getAccountsBySerial" );
+    lua_classfunction ( luaVM, "getAllByIP", "getAccountsByIP" );
     lua_classfunction ( luaVM, "getFromPlayer", "getPlayerAccount" );
     lua_classfunction ( luaVM, "logPlayerOut", "logOut" );
 
@@ -54,6 +57,7 @@ void CLuaAccountDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setPassword", "setAccountPassword" );
 
     lua_classfunction ( luaVM, "getSerial", "getAccountSerial" );
+    lua_classfunction ( luaVM, "getIP", "getAccountIP" );
     lua_classfunction ( luaVM, "getData", "getAccountData" );
     lua_classfunction ( luaVM, "getAllData", "getAllAccountData" );
     lua_classfunction ( luaVM, "getName", "getAccountName" );
@@ -62,6 +66,7 @@ void CLuaAccountDefs::AddClass ( lua_State* luaVM )
 
     lua_classvariable ( luaVM, "serial", NULL, "getAccountSerial" );
     lua_classvariable ( luaVM, "name", NULL, "getAccountName" );
+    lua_classvariable ( luaVM, "ip", NULL, "getAccountIP" );
     lua_classvariable ( luaVM, "player", NULL, "getAccountPlayer" );
     lua_classvariable ( luaVM, "guest", NULL, "isGuestAccount" );
     lua_classvariable ( luaVM, "password", "setAccountPassword", NULL );
@@ -279,6 +284,51 @@ int CLuaAccountDefs::GetAccountsBySerial ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaAccountDefs::GetAccountIP( lua_State* luaVM ) {
+    //  string getAccountSerial ( account theAccount )
+    CAccount* pAccount;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadUserData( pAccount );
+
+    if ( !argStream.HasErrors() ) {
+        SString strIP;
+        if ( CStaticFunctionDefinitions::GetAccountIP( pAccount, strIP ) ) {
+            lua_pushstring( luaVM, strIP );
+            return 1;
+        }
+    } else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean( luaVM, false );
+    return 1;
+}
+
+int CLuaAccountDefs::GetAccountsByIP( lua_State* luaVM ) {
+    //  table getAccountsByIP ( string ip )
+    SString strIP;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadString( strIP );
+
+    if ( !argStream.HasErrors() ) {
+        lua_newtable( luaVM );
+        std::vector<CAccount*> accounts;
+
+        CStaticFunctionDefinitions::GetAccountsByIP( strIP, accounts );
+        for ( unsigned int i = 0; i < accounts.size(); ++i ) {
+            lua_pushnumber( luaVM, i + 1 );
+            lua_pushaccount( luaVM, accounts[i] );
+            lua_settable( luaVM, -3 );
+        }
+        return 1;
+    } else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean( luaVM, false );
     return 1;
 }
 

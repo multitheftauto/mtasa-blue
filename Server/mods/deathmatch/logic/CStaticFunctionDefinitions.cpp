@@ -11213,6 +11213,21 @@ bool CStaticFunctionDefinitions::GetAccountsBySerial ( const SString& strSerial,
 }
 
 
+bool CStaticFunctionDefinitions::GetAccountIP( CAccount* pAccount, SString& strIP ) {
+    bool bRegistered = pAccount->IsRegistered();
+    if ( bRegistered )
+        strIP = pAccount->GetIP();
+
+    return bRegistered;
+}
+
+
+bool CStaticFunctionDefinitions::GetAccountsByIP( const SString& strIP, std::vector<CAccount*>& outAccounts ) {
+    m_pAccountManager->GetAccountsByIP( strIP, outAccounts );
+    return true;
+}
+
+
 CAccount* CStaticFunctionDefinitions::AddAccount ( const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError )
 {
     // Check for case variations if not allowed
