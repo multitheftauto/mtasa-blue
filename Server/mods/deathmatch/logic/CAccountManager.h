@@ -164,6 +164,7 @@ protected:
     void                        ChangingName                ( CAccount* pAccount, const SString& strOldName, const SString& strNewName );
     void                        LoadAccountSerialUsage      ( CAccount* pAccount );
     void                        SaveAccountSerialUsage      ( CAccount* pAccount );
+    void                        ReconnectToDatabase         (void);
 
 public:
     void                        RemoveAll                   ( void );
@@ -185,6 +186,7 @@ protected:
     SDbConnectionId             m_hDbConnection;
     CDatabaseManager*           m_pDatabaseManager;
     int                         m_iAccounts;
+    SString                     m_strDbPathFilename;
 };
 
 

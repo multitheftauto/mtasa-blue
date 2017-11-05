@@ -22,16 +22,11 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
     m_bChangedSinceSaved = false;
     m_iAccounts = 1;
     m_pDatabaseManager = g_pGame->GetDatabaseManager ();
+    m_strDbPathFilename = strDbPathFilename;
+    m_hDbConnection = INVALID_DB_HANDLE;
 
     //Load internal.db
-    SString strOptions;
-#ifdef WITH_ACCOUNT_QUERY_LOGGING
-    g_pGame->GetDatabaseManager ()->SetLogLevel ( EJobLogLevel::ALL, g_pGame->GetConfig ()->GetDbLogFilename () );
-    SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
-    SetOption < CDbOptionsMap > ( strOptions, "tag", "accounts" );
-#endif
-    SetOption < CDbOptionsMap > ( strOptions, "queue", DB_SQLITE_QUEUE_NAME_INTERNAL );
-    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( strDbPathFilename ), "", "", strOptions );
+    ReconnectToDatabase();
 
     // Check if new installation
     CRegistryResult result;
@@ -116,6 +111,25 @@ CAccountManager::~CAccountManager ( void )
     //Delete our save file
     m_pDatabaseManager->Disconnect ( m_hDbConnection );
     RemoveAll ();
+}
+
+
+void CAccountManager::ReconnectToDatabase(void)
+{
+    if (m_hDbConnection != INVALID_DB_HANDLE)
+    {
+        m_pDatabaseManager->Disconnect(m_hDbConnection);
+    }
+
+    //Load internal.db
+    SString strOptions;
+#ifdef WITH_ACCOUNT_QUERY_LOGGING
+    g_pGame->GetDatabaseManager ()->SetLogLevel ( EJobLogLevel::ALL, g_pGame->GetConfig ()->GetDbLogFilename () );
+    SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
+    SetOption < CDbOptionsMap > ( strOptions, "tag", "accounts" );
+#endif
+    SetOption < CDbOptionsMap > ( strOptions, "queue", DB_SQLITE_QUEUE_NAME_INTERNAL );
+    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( m_strDbPathFilename ), "", "", strOptions );
 }
 
 
@@ -926,8 +940,16 @@ void CAccountManager::DbCallback ( CDbJobData* pJobData )
 {
     if ( m_pDatabaseManager->QueryPoll ( pJobData, 0 ) )
     {
-        if ( pJobData->result.status == EJobResult::FAIL ) 
+        if ( pJobData->result.status == EJobResult::FAIL )
+        {
             CLogger::LogPrintf ( "ERROR: While updating account with '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
+            if (pJobData->result.strReason.ContainsI("missing database"))
+            {
+                // Try reconnection
+                CLogger::LogPrintf("INFO: Reconnecting to accounts database\n");
+                ReconnectToDatabase();
+            }
+        }
     }
     else
     {
