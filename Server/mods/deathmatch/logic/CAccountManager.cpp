@@ -867,6 +867,18 @@ void CAccountManager::GetAccountsBySerial ( const SString& strSerial, std::vecto
     }
 }
 
+void CAccountManager::GetAccountsByIP( const SString& strIP, std::vector<CAccount*>& outAccounts ) {
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf( m_hDbConnection, &result, "SELECT name FROM accounts WHERE added_ip = ?", SQLITE_TEXT, strIP.c_str() );
+
+    for ( CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter ) {
+        const CRegistryResultRow& row = *iter;
+
+        CAccount* pAccount = Get( (const char*) row[1].pVal );
+        outAccounts.push_back( pAccount );
+    }
+}
+
 CAccount* CAccountManager::AddGuestAccount( const SString& strName )
 {
     CAccount* pAccount = new CAccount ( this, EAccountType::Guest, strName );
