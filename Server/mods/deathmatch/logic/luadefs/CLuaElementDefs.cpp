@@ -296,6 +296,10 @@ int CLuaElementDefs::cloneElement ( lua_State* luaVM )
 
                 if ( pNewElement )
                 {
+                    CElementGroup * pGroup = pResource->GetElementGroup ();
+                    if ( pGroup ) {
+                        pGroup->Add ( pNewElement );
+                    }
                     lua_pushelement ( luaVM, pNewElement );
                     return 1;
                 }
