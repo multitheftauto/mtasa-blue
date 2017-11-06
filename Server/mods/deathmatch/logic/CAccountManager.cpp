@@ -874,7 +874,7 @@ void CAccountManager::GetAccountsByIP( const SString& strIP, std::vector<CAccoun
     for ( CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter ) {
         const CRegistryResultRow& row = *iter;
 
-        CAccount* pAccount = Get( (const char*) row[1].pVal );
+        CAccount* pAccount = Get( (const char*) row[0].pVal );
         outAccounts.push_back( pAccount );
     }
 }
@@ -886,7 +886,7 @@ void CAccountManager::GetAccountByID ( const unsigned& ID, CAccount* outAccount 
     for ( CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter ) {
         const CRegistryResultRow& row = *iter;
 
-        outAccount = Get( (const char*) row[1].pVal );
+        outAccount = Get( (const char*) row[0].pVal );
         break;
     }
 }
