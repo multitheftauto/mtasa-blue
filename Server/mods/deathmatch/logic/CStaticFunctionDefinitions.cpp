@@ -11195,6 +11195,12 @@ bool CStaticFunctionDefinitions::GetAllAccountData ( lua_State* pLua, CAccount* 
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetAccountsByData ( const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts )
+{
+    m_pAccountManager->GetAccountsByData ( dataName, value, outAccounts );
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::GetAccountSerial ( CAccount* pAccount, SString& strSerial )
 {

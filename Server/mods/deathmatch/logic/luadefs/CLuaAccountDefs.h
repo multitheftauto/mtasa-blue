@@ -30,6 +30,7 @@ public:
     LUA_DECLARE ( IsGuestAccount );
     LUA_DECLARE ( GetAccountData );
     LUA_DECLARE ( GetAllAccountData );
+    LUA_DECLARE ( GetAccountsByData );
     LUA_DECLARE ( GetAccountSerial );
     LUA_DECLARE ( GetAccountsBySerial );
     LUA_DECLARE ( GetAccountIP );
