@@ -38,6 +38,7 @@ void CLuaAccountDefs::LoadFunctions ()
     CLuaCFunctions::AddFunction ( "removeAccount", RemoveAccount );
     CLuaCFunctions::AddFunction ( "setAccountPassword", SetAccountPassword );
     CLuaCFunctions::AddFunction ( "setAccountData", SetAccountData );
+    CLuaCFunctions::AddFunction ( "setAccountName", SetAccountName );
     CLuaCFunctions::AddFunction ( "copyAccountData", CopyAccountData );
 }
 
@@ -59,6 +60,7 @@ void CLuaAccountDefs::AddClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "setData", "setAccountData" );
     lua_classfunction ( luaVM, "setPassword", "setAccountPassword" );
+    lua_classfunction ( luaVM, "setName", "setAccountName" );
 
     lua_classfunction ( luaVM, "getSerial", "getAccountSerial" );
     lua_classfunction ( luaVM, "getIP", "getAccountIP" );
@@ -70,7 +72,7 @@ void CLuaAccountDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isGuest", "isGuestAccount" );
 
     lua_classvariable ( luaVM, "serial", NULL, "getAccountSerial" );
-    lua_classvariable ( luaVM, "name", NULL, "getAccountName" );
+    lua_classvariable ( luaVM, "name", "setAccountName", "getAccountName" );
     lua_classvariable ( luaVM, "ip", NULL, "getAccountIP" );
     lua_classvariable ( luaVM, "id", NULL, "getAccountID" );
     lua_classvariable ( luaVM, "player", NULL, "getAccountPlayer" );
@@ -460,6 +462,30 @@ int CLuaAccountDefs::RemoveAccount ( lua_State* luaVM )
     if ( argStream.HasErrors () )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaAccountDefs::SetAccountName ( lua_State* luaVM ) {
+    // bool setAccountPassword ( account theAccount, string name[, bool allowCaseVariations = false ] )
+    CAccount* pAccount; 
+    SString strNewName;
+    bool bAllowCaseVariations;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pAccount );
+    argStream.ReadString ( strNewName );
+    argStream.ReadBool ( bAllowCaseVariations, false );
+
+    SString strError;
+    if ( !argStream.HasErrors() ) {
+        if ( CStaticFunctionDefinitions::SetAccountName ( pAccount, strNewName, bAllowCaseVariations, strError ) ) {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    } else 
+         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     lua_pushboolean ( luaVM, false );
     return 1;
 }

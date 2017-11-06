@@ -11332,6 +11332,34 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
 }
 
 
+bool CStaticFunctionDefinitions::SetAccountName ( CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError )
+{
+    assert ( pAccount );
+    assert ( !strNewName.empty() );
+
+    if ( pAccount->IsRegistered () ) {
+            // Check for case variations if not allowed
+        if ( !bAllowCaseVariations ) {
+            SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation( strNewName );
+            if ( !strCaseVariation.empty() ) {
+                strOutError = SString( "Already an account using a case variation of that name ('%s')", *strCaseVariation );
+                return NULL;
+            }
+        }
+
+        if ( m_pAccountManager->Get( strNewName ) != NULL ) {
+            strOutError = "Account already exists";
+        } else if ( !CAccountManager::IsValidNewAccountName( strNewName ) ) {
+            strOutError = "Name invalid";
+        } else {
+            pAccount->SetName ( strNewName );
+            return true;
+        }
+    }
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::SetAccountPassword ( CAccount* pAccount, SString strPassword, CAccountPassword::EAccountPasswordType ePasswordType )
 {
     assert ( pAccount );
