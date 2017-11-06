@@ -25,6 +25,7 @@ void CLuaAccountDefs::LoadFunctions ()
     CLuaCFunctions::AddFunction ( "getAllAccountData", GetAllAccountData );
     CLuaCFunctions::AddFunction ( "getAccount", GetAccount );
     CLuaCFunctions::AddFunction ( "getAccounts", GetAccounts );
+    CLuaCFunctions::AddFunction ( "getAccountsByData", GetAccountsByData );
     CLuaCFunctions::AddFunction ( "getAccountSerial", GetAccountSerial );
     CLuaCFunctions::AddFunction ( "getAccountsBySerial", GetAccountsBySerial );
     CLuaCFunctions::AddFunction ( "getAccountIP", GetAccountIP );
@@ -45,6 +46,7 @@ void CLuaAccountDefs::AddClass ( lua_State* luaVM )
     lua_newclass ( luaVM );
 
     lua_classfunction ( luaVM, "getAll", "getAccounts" );
+    lua_classfunction ( luaVM, "getAllByData", "getAccountsByData" );
     lua_classfunction ( luaVM, "getAllBySerial", "getAccountsBySerial" );
     lua_classfunction ( luaVM, "getAllByIP", "getAccountsByIP" );
     lua_classfunction ( luaVM, "getFromPlayer", "getPlayerAccount" );
