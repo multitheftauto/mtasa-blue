@@ -11228,6 +11228,21 @@ bool CStaticFunctionDefinitions::GetAccountsByIP( const SString& strIP, std::vec
 }
 
 
+bool CStaticFunctionDefinitions::GetAccountID( CAccount* pAccount, unsigned& ID ) {
+    bool bRegistered = pAccount->IsRegistered();
+    if ( bRegistered )
+        ID = pAccount->GetID();
+
+    return bRegistered;
+}
+
+
+bool CStaticFunctionDefinitions::GetAccountByID( const unsigned& ID, CAccount* outAccount ) {
+    m_pAccountManager->GetAccountByID( ID, outAccount );
+    return true;
+}
+
+
 CAccount* CStaticFunctionDefinitions::AddAccount ( const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError )
 {
     // Check for case variations if not allowed
