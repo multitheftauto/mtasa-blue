@@ -22,7 +22,7 @@ class CColPolygon : public CColShape
 public:
                                 CColPolygon         ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, CXMLNode* pNode = NULL );
 
-    virtual CColPolygon*        Clone               ( CColManager* pManager );
+    CColPolygon*                Clone               ( CColManager* pManager );
     virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType               GetShapeType        ( void )                { return COLSHAPE_POLYGON; }
