@@ -21,6 +21,7 @@ class CColCircle : public CColShape
 public:
                     CColCircle      ( CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, CXMLNode* pNode = NULL, bool bIsPartnered = false );
 
+    virtual CColCircle*     Clone   ( CColManager* pManager );
     virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType   GetShapeType    ( void )            { return COLSHAPE_CIRCLE; }

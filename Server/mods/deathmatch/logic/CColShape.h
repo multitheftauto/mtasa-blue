@@ -32,6 +32,7 @@ public:
                                 CColShape           ( class CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL, bool bIsPartnered = false );
     virtual                     ~CColShape          ( void );
 
+    virtual CColShape*          Clone               ( CColManager* pManager );
     virtual eColShapeType       GetShapeType        ( void ) = 0;
 
     void                        Unlink              ( void );

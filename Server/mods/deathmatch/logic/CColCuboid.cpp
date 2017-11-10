@@ -22,6 +22,12 @@ CColCuboid::CColCuboid ( CColManager* pManager, CElement* pParent, const CVector
 }
 
 
+CColCuboid* CColCuboid::Clone ( CColManager* pManager ) 
+{
+    return new CColCuboid ( pManager, this->m_pParent, this->m_vecPosition, this->m_vecSize, this->m_pXMLNode );
+}
+
+
 bool CColCuboid::DoHitDetection  ( const CVector& vecNowPosition )
 {
     // FIXME: What about radius?
