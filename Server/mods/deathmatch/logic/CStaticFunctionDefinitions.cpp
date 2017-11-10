@@ -11343,7 +11343,7 @@ bool CStaticFunctionDefinitions::SetAccountName ( CAccount* pAccount, SString st
             SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation( strNewName );
             if ( !strCaseVariation.empty() ) {
                 strOutError = SString( "Already an account using a case variation of that name ('%s')", *strCaseVariation );
-                return NULL;
+                return false;
             }
         }
 
