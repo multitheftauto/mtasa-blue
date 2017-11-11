@@ -518,6 +518,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
              CColShape* pColShape = static_cast < CColShape* > ( pElement );
              
              pNewElement = pColShape->Clone ( m_pColManager );
+             break;
         }
     }
 
