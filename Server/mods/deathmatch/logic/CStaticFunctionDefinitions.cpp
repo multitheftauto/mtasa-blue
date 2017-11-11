@@ -515,10 +515,10 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
         }
         case CElement::COLSHAPE:
         {  
-             CColShape* pColShape = static_cast < CColShape* > ( pElement );
+            CColShape* pColShape = static_cast < CColShape* > ( pElement );
              
-             pNewElement = pColShape->Clone ( m_pColManager );
-             break;
+            pNewElement = pColShape->Clone ( m_pColManager );
+            break;
         }
     }
 
