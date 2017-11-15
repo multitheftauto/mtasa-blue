@@ -639,6 +639,8 @@ public:
     static bool                 GetAllAccountData                   ( lua_State* pLua, CAccount* pAccount );
     static bool                 GetAccountSerial                    ( CAccount* pAccount, SString& strSerial );
     static bool                 GetAccountsBySerial                 ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
+    static bool                 GetAccountID                        ( CAccount* pAccount, unsigned& ID );		
+    static bool                 GetAccountByID                      ( const unsigned& ID, CAccount* outAccount );
 
     // Account set funcs
     static CAccount*            AddAccount                          ( const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError );

@@ -147,6 +147,7 @@ public:
     bool                        GetAllAccountData           ( CAccount* pAccount, lua_State* pLua );
 
     void                        GetAccountsBySerial         ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
+    void                        GetAccountByID              ( const unsigned& ID, CAccount* outAccount );
 
     CAccount*                   AddGuestAccount             ( const SString& strName );
     CAccount*                   AddConsoleAccount           ( const SString& strName );

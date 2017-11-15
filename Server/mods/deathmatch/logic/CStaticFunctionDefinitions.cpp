@@ -11212,6 +11212,22 @@ bool CStaticFunctionDefinitions::GetAccountsBySerial ( const SString& strSerial,
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetAccountID( CAccount* pAccount, unsigned& ID ) 
+{		
+    bool bRegistered = pAccount->IsRegistered();		
+    if ( bRegistered )		
+        ID = pAccount->GetID();		
+		
+    return bRegistered;		
+}		
+		
+		
+bool CStaticFunctionDefinitions::GetAccountByID( const unsigned& ID, CAccount* outAccount ) 
+{		
+    m_pAccountManager->GetAccountByID( ID, outAccount );		
+    return true;		
+}
+
 
 CAccount* CStaticFunctionDefinitions::AddAccount ( const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError )
 {
