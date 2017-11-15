@@ -881,7 +881,7 @@ void CAccountManager::GetAccountsByIP( const SString& strIP, std::vector<CAccoun
 
 void CAccountManager::GetAccountsByData ( const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts ) {
     CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf( m_hDbConnection, &result, "SELECT acc.name FROM accounts acc, userdata dat WHERE dat.key = ? AND dat.value = ? AND dat.userid = acc.id", SQLITE_TEXT, dataName.c_str(), value.c_str() );
+    m_pDatabaseManager->QueryWithResultf( m_hDbConnection, &result, "SELECT acc.name FROM accounts acc, userdata dat WHERE dat.key = ? AND dat.value = ? AND dat.userid = acc.id", SQLITE_TEXT, dataName.c_str(), SQLITE_TEXT, value.c_str() );
 
     for ( CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter ) {
         const CRegistryResultRow& row = *iter;
