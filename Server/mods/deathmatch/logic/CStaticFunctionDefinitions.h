@@ -642,8 +642,6 @@ public:
     static bool                 GetAccountsBySerial                 ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
     static bool                 GetAccountIP                        ( CAccount* pAccount, SString& strIP );
     static bool                 GetAccountsByIP                     ( const SString& strIP, std::vector<CAccount*>& outAccounts );
-    static bool                 GetAccountID                        ( CAccount* pAccount, unsigned& ID );
-    static bool                 GetAccountByID                      ( const unsigned& ID, CAccount* outAccount );
 
     // Account set funcs
     static CAccount*            AddAccount                          ( const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError );

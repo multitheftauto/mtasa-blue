@@ -35,8 +35,6 @@ public:
     LUA_DECLARE ( GetAccountsBySerial );
     LUA_DECLARE ( GetAccountIP );
     LUA_DECLARE ( GetAccountsByIP );
-    LUA_DECLARE ( GetAccountID );
-    LUA_DECLARE ( GetAccountByID );
 
     // Account set funcs
     LUA_DECLARE ( AddAccount );
