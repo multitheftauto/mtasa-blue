@@ -238,7 +238,8 @@ int CLuaAccountDefs::GetAccounts ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaAccountDefs::GetAccountsByData( lua_State* luaVM ) {
+int CLuaAccountDefs::GetAccountsByData( lua_State* luaVM ) 
+{
     //  table GetAccountsByData ( string dataName, string value )
     SString dataName;
     SString value;
@@ -247,18 +248,21 @@ int CLuaAccountDefs::GetAccountsByData( lua_State* luaVM ) {
     argStream.ReadString( dataName );
     argStream.ReadString ( value );
 
-    if ( !argStream.HasErrors() ) {
+    if ( !argStream.HasErrors() ) 
+    {
         lua_newtable( luaVM );
         std::vector<CAccount*> accounts;
 
         CStaticFunctionDefinitions::GetAccountsByData( dataName, value, accounts );
-        for ( unsigned int i = 0; i < accounts.size(); ++i ) {
+        for ( unsigned int i = 0; i < accounts.size(); ++i ) 
+        {
             lua_pushnumber( luaVM, i + 1 );
             lua_pushaccount( luaVM, accounts[i] );
             lua_settable( luaVM, -3 );
         }
         return 1;
-    } else
+    } 
+    else
         m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean( luaVM, false );
@@ -325,38 +329,45 @@ int CLuaAccountDefs::GetAccountIP( lua_State* luaVM ) {
     CScriptArgReader argStream( luaVM );
     argStream.ReadUserData( pAccount );
 
-    if ( !argStream.HasErrors() ) {
+    if ( !argStream.HasErrors() ) 
+    {
         SString strIP;
-        if ( CStaticFunctionDefinitions::GetAccountIP( pAccount, strIP ) ) {
+        if ( CStaticFunctionDefinitions::GetAccountIP( pAccount, strIP ) ) 
+        {
             lua_pushstring( luaVM, strIP );
             return 1;
         }
-    } else
+    } 
+    else
         m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean( luaVM, false );
     return 1;
 }
 
-int CLuaAccountDefs::GetAccountsByIP( lua_State* luaVM ) {
+int CLuaAccountDefs::GetAccountsByIP( lua_State* luaVM ) 
+{
     //  table getAccountsByIP ( string ip )
     SString strIP;
 
     CScriptArgReader argStream( luaVM );
     argStream.ReadString( strIP );
 
-    if ( !argStream.HasErrors() ) {
+    if ( !argStream.HasErrors() ) 
+    {
         lua_newtable( luaVM );
         std::vector<CAccount*> accounts;
 
         CStaticFunctionDefinitions::GetAccountsByIP( strIP, accounts );
-        for ( unsigned int i = 0; i < accounts.size(); ++i ) {
+        for ( unsigned int i = 0; i < accounts.size(); ++i ) 
+        {
             lua_pushnumber( luaVM, i + 1 );
             lua_pushaccount( luaVM, accounts[i] );
             lua_settable( luaVM, -3 );
         }
         return 1;
-    } else
+    } 
+    else
         m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean( luaVM, false );
