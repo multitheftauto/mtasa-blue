@@ -11324,21 +11324,29 @@ bool CStaticFunctionDefinitions::SetAccountName ( CAccount* pAccount, SString st
     assert ( pAccount );
     assert ( !strNewName.empty() );
 
-    if ( pAccount->IsRegistered () ) {
+    if ( pAccount->IsRegistered () ) 
+    {
             // Check for case variations if not allowed
-        if ( !bAllowCaseVariations ) {
+        if ( !bAllowCaseVariations ) 
+        {
             SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation( strNewName );
-            if ( !strCaseVariation.empty() ) {
+            if ( !strCaseVariation.empty() ) 
+            {
                 strOutError = SString( "Already an account using a case variation of that name ('%s')", *strCaseVariation );
                 return false;
             }
         }
 
-        if ( m_pAccountManager->Get( strNewName ) != NULL ) {
+        if ( m_pAccountManager->Get( strNewName ) != NULL ) 
+        {
             strOutError = "Account already exists";
-        } else if ( !CAccountManager::IsValidNewAccountName( strNewName ) ) {
+        } 
+        else if ( !CAccountManager::IsValidNewAccountName( strNewName ) ) 
+        {
             strOutError = "Name invalid";
-        } else {
+        } 
+        else 
+        {
             pAccount->SetName ( strNewName );
             return true;
         }

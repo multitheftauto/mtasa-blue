@@ -432,7 +432,8 @@ int CLuaAccountDefs::RemoveAccount ( lua_State* luaVM )
 }
 
 
-int CLuaAccountDefs::SetAccountName ( lua_State* luaVM ) {
+int CLuaAccountDefs::SetAccountName ( lua_State* luaVM ) 
+{
     // bool setAccountPassword ( account theAccount, string name[, bool allowCaseVariations = false ] )
     CAccount* pAccount; 
     SString strNewName;
@@ -444,12 +445,15 @@ int CLuaAccountDefs::SetAccountName ( lua_State* luaVM ) {
     argStream.ReadBool ( bAllowCaseVariations, false );
 
     SString strError;
-    if ( !argStream.HasErrors() ) {
-        if ( CStaticFunctionDefinitions::SetAccountName ( pAccount, strNewName, bAllowCaseVariations, strError ) ) {
+    if ( !argStream.HasErrors() ) 
+    {
+        if ( CStaticFunctionDefinitions::SetAccountName ( pAccount, strNewName, bAllowCaseVariations, strError ) ) 
+        {
             lua_pushboolean ( luaVM, true );
             return 1;
         }
-    } else 
+    } 
+    else 
          m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     lua_pushboolean ( luaVM, false );
     return 1;
