@@ -391,8 +391,8 @@ CClientGame::~CClientGame ( void )
     #endif
 
     // Hide the transfer box incase it is showing
-    m_pTransferBox->Hide();
-    m_pBigPacketTransferBox->Hide();
+    m_pTransferBox->Hide( true );
+    m_pBigPacketTransferBox->Hide( true );
 
     // Stop async task scheduler
     SAFE_DELETE(m_pAsyncTaskScheduler);
@@ -2875,6 +2875,9 @@ void CClientGame::AddBuiltInEvents ( void )
     // Cursor events
     m_Events.AddEvent ( "onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false );
     m_Events.AddEvent ( "onClientCursorMove", "relativeX, relativeX, absoluteX, absoluteY, worldX, worldY, worldZ", NULL, false );
+
+    // Trasnfer box event
+    m_Events.AddEvent( "onTransferBoxStateChange", "currentStatus, totalSize", NULL, false );
 
     // Marker events
     m_Events.AddEvent ( "onClientMarkerHit", "entity, matchingDimension", NULL, false );
@@ -6011,7 +6014,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
         {
             // Switch off progress box
             m_bReceivingBigPacket = false;
-            m_pBigPacketTransferBox->Hide ();
+            m_pBigPacketTransferBox->Hide ( true );
         }
         return;
     }
@@ -6021,7 +6024,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     {
         m_bReceivingBigPacket = true;
         m_ulBigPacketSize = ulTotalSize;
-        m_pBigPacketTransferBox->Hide ();
+        m_pBigPacketTransferBox->Hide ( true );
         m_pBigPacketTransferBox->AddToTotalSize ( ulTotalSize );
         m_pBigPacketTransferBox->Show ();
     }

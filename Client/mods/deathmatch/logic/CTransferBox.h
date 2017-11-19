@@ -38,7 +38,7 @@ public:
     virtual                             ~CTransferBox                           ( void );
 
     void                                Show                                    ( void );
-    void                                Hide                                    ( void );
+    void                                Hide                                    ( bool resetTotalSize );
 
     void                                SetInfo                                 ( double dDownloadSizeNow, CTransferBox::Type eTransferType = CTransferBox::NORMAL );
 
@@ -49,6 +49,7 @@ public:
     inline bool                         IsVisible                               ( void )            { return m_pWindow->IsVisible (); };
 
     inline void                         AddToTotalSize                          ( double dSize )    { m_dTotalSize += dSize; };
+    double                              GetTotalSize                            ( void )              { return m_dTotalSize; };
 
 private:
     CGUIWindow*                         m_pWindow;

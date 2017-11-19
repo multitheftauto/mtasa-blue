@@ -104,12 +104,14 @@ void CTransferBox::Show ( void )
     g_pCore->GetGUI ()->SetTransferBoxVisible ( true );
 }
 
-void CTransferBox::Hide ( void )
+void CTransferBox::Hide ( bool resetTotalSize)
 {
     m_pWindow->SetVisible ( false );
     g_pCore->GetGUI ()->SetTransferBoxVisible ( false );
-
-    m_dTotalSize = 0;
+    if ( resetTotalSize )
+    {
+        m_dTotalSize = 0;
+    }
 }
 
 void CTransferBox::SetInfo ( double dDownloadSizeNow, CTransferBox::Type eTransferType )
