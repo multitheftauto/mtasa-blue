@@ -391,8 +391,8 @@ CClientGame::~CClientGame ( void )
     #endif
 
     // Hide the transfer box incase it is showing
-    m_pTransferBox->Hide( );
-    m_pBigPacketTransferBox->Hide( );
+    m_pTransferBox->Hide();
+    m_pBigPacketTransferBox->Hide();
 
     // Stop async task scheduler
     SAFE_DELETE(m_pAsyncTaskScheduler);
