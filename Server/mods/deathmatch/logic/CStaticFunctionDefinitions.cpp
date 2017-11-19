@@ -11201,6 +11201,12 @@ bool CStaticFunctionDefinitions::GetAllAccountData ( lua_State* pLua, CAccount* 
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetAccountsByData ( const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts )
+{
+    m_pAccountManager->GetAccountsByData ( dataName, value, outAccounts );
+    return true;
+}
+
 
 bool CStaticFunctionDefinitions::GetAccountSerial ( CAccount* pAccount, SString& strSerial )
 {
@@ -11215,6 +11221,23 @@ bool CStaticFunctionDefinitions::GetAccountSerial ( CAccount* pAccount, SString&
 bool CStaticFunctionDefinitions::GetAccountsBySerial ( const SString& strSerial, std::vector<CAccount*>& outAccounts )
 {
     m_pAccountManager->GetAccountsBySerial ( strSerial, outAccounts );
+    return true;
+}
+
+
+bool CStaticFunctionDefinitions::GetAccountIP( CAccount* pAccount, SString& strIP ) 
+{
+    bool bRegistered = pAccount->IsRegistered();
+    if ( bRegistered )
+        strIP = pAccount->GetIP();
+
+    return bRegistered;
+}
+
+
+bool CStaticFunctionDefinitions::GetAccountsByIP( const SString& strIP, std::vector<CAccount*>& outAccounts ) 
+{
+    m_pAccountManager->GetAccountsByIP( strIP, outAccounts );
     return true;
 }
 
@@ -11298,6 +11321,42 @@ bool CStaticFunctionDefinitions::RemoveAccount ( CAccount* pAccount )
         return g_pGame->GetAccountManager ()->RemoveAccount ( pAccount );
     }
 
+    return false;
+}
+
+
+bool CStaticFunctionDefinitions::SetAccountName ( CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError )
+{
+    assert ( pAccount );
+    assert ( !strNewName.empty() );
+
+    if ( pAccount->IsRegistered () ) 
+    {
+            // Check for case variations if not allowed
+        if ( !bAllowCaseVariations ) 
+        {
+            SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation( strNewName );
+            if ( !strCaseVariation.empty() ) 
+            {
+                strOutError = SString( "Already an account using a case variation of that name ('%s')", *strCaseVariation );
+                return false;
+            }
+        }
+
+        if ( m_pAccountManager->Get( strNewName ) != NULL ) 
+        {
+            strOutError = "Account already exists";
+        } 
+        else if ( !CAccountManager::IsValidNewAccountName( strNewName ) ) 
+        {
+            strOutError = "Name invalid";
+        } 
+        else 
+        {
+            pAccount->SetName ( strNewName );
+            return true;
+        }
+    }
     return false;
 }
 
