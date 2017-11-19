@@ -22,9 +22,19 @@
 int CLuaFunctionDefs::AddCommandHandler ( lua_State* luaVM )
 {
 //  bool addCommandHandler ( string commandName, function handlerFunction, [bool caseSensitive = true] )
-    SString strKey; CLuaFunctionRef iLuaFunction; bool bCaseSensitive;
-
+    SString strKey;
+    std::vector < CPlayer* > vecKey;
+    CLuaFunctionRef iLuaFunction; bool bCaseSensitive;
+    
     CScriptArgReader argStream ( luaVM );
+    if (argStream.NextIsTable())
+    {
+        std::vector < CPlayer* > sendList;
+    }
+    else
+    {
+
+    }
     argStream.ReadString ( strKey );
     argStream.ReadFunction ( iLuaFunction );
     argStream.ReadBool ( bCaseSensitive, true );
