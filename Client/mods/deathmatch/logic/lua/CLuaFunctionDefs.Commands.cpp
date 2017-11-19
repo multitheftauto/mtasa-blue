@@ -21,21 +21,23 @@
 
 int CLuaFunctionDefs::AddCommandHandler ( lua_State* luaVM )
 {
-//  bool addCommandHandler ( string commandName, function handlerFunction, [bool caseSensitive = true] )
+//  bool addCommandHandler ( string/table commandName, function handlerFunction, [bool caseSensitive = true] )
     SString strKey;
-    std::vector < CPlayer* > vecKey;
+    std::vector < SString > vecKey;
+    bool bType;
     CLuaFunctionRef iLuaFunction; bool bCaseSensitive;
     
     CScriptArgReader argStream ( luaVM );
-    if (argStream.NextIsTable())
+    if ( argStream.NextIsTable() )
     {
-        std::vector < CPlayer* > sendList;
+        argStream.ReadStringTable( vecKey );
+        bType = false;
     }
     else
     {
-
+        argStream.ReadString( strKey );
+        bType = true;
     }
-    argStream.ReadString ( strKey );
     argStream.ReadFunction ( iLuaFunction );
     argStream.ReadBool ( bCaseSensitive, true );
     argStream.ReadFunctionComplete ();
@@ -46,10 +48,28 @@ int CLuaFunctionDefs::AddCommandHandler ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            // Add them to our list over command handlers
-            if ( m_pRegisteredCommands->AddCommand ( pLuaMain, strKey, iLuaFunction, bCaseSensitive ) )
+            if ( bType )
             {
-                lua_pushboolean ( luaVM, true );
+                // Add them to our list over command handlers
+                if ( strKey == "" || m_pRegisteredCommands->AddCommand(pLuaMain, strKey, iLuaFunction, bCaseSensitive) )
+                {
+                    lua_pushboolean( luaVM, true );
+                    return 1;
+                }
+            }
+            else
+            {
+                // Add them to our list over command handlers from table {"command1","command2",...}
+                bool bCommandError = false;
+                for (uint i = 0; i < vecKey.size(); i++)
+                {
+                    if ( vecKey[i] == "" || !m_pRegisteredCommands->AddCommand(pLuaMain, vecKey[i], iLuaFunction, bCaseSensitive) )
+                    {
+                        bCommandError = true;
+                        break;
+                    }
+                }
+                lua_pushboolean( luaVM, !bCommandError );
                 return 1;
             }
         }
