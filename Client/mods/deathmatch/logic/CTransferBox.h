@@ -38,7 +38,7 @@ public:
     virtual                             ~CTransferBox                           ( void );
 
     void                                Show                                    ( void );
-    void                                Hide                                    ( bool resetTotalSize );
+    void                                Hide                                    ( void );
 
     void                                SetInfo                                 ( double dDownloadSizeNow, CTransferBox::Type eTransferType = CTransferBox::NORMAL );
 

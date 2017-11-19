@@ -145,12 +145,10 @@ void CResourceFileDownloadManager::DoPulse( void )
     GetTransferBox()->DoPulse();
 
     CLuaArguments Arguments;
+    Arguments.PushString( "progress" );
     Arguments.PushNumber( uiDownloadSizeTotal );
     Arguments.PushNumber( GetTransferBox()->GetTotalSize() );
-    if ( !g_pClientGame->GetLocalPlayer()->CallEvent( "onTransferBoxStateChange", Arguments, false ) )
-    {
-        GetTransferBox()->Hide( false );
-    };
+    g_pClientGame->GetLocalPlayer()->CallEvent( "onTransferBoxProgressChange", Arguments, false );
 
     // Check if completed downloading current group
     if ( m_ActiveFileDownloadList.empty() )
@@ -159,7 +157,7 @@ void CResourceFileDownloadManager::DoPulse( void )
         if ( m_PendingFileDownloadList.empty() )
         {
             m_bIsTransferingFiles = false;
-            GetTransferBox()->Hide ( true );
+            GetTransferBox()->Hide ( );
         }
 
         // Load our newly ready resources
