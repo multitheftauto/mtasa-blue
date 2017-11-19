@@ -6014,7 +6014,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
         {
             // Switch off progress box
             m_bReceivingBigPacket = false;
-            m_pBigPacketTransferBox->Hide ( );
+            m_pBigPacketTransferBox->Hide ();
         }
         return;
     }
@@ -6024,7 +6024,7 @@ void CClientGame::NotifyBigPacketProgress ( unsigned long ulBytesReceived, unsig
     {
         m_bReceivingBigPacket = true;
         m_ulBigPacketSize = ulTotalSize;
-        m_pBigPacketTransferBox->Hide ( );
+        m_pBigPacketTransferBox->Hide ();
         m_pBigPacketTransferBox->AddToTotalSize ( ulTotalSize );
         m_pBigPacketTransferBox->Show ();
     }
