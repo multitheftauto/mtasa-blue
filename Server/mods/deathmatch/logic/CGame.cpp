@@ -1423,7 +1423,7 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
             Arguments.PushBoolean ( false );
         }
         Player.bIsQuit = true;
-        Player.CallEvent("onPlayerQuit", Arguments);
+        Player.CallEvent ( "onPlayerQuit", Arguments );
 
         // Tell the map manager
         m_pMapManager->OnPlayerQuit ( Player );
