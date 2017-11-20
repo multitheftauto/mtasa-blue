@@ -128,7 +128,7 @@ public:
     void                        DoPulse                     ( void );
 
     bool                        Load                        ( void );
-    bool                        Save                        ( void );
+    void                        Save                        ( bool bForce = false );
     void                        Save                        ( CAccount* pParent, bool bCheckForErrors = true );
 
     bool                        SaveSettings                ( void );
