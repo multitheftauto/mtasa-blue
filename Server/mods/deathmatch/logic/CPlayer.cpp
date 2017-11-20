@@ -106,6 +106,7 @@ CPlayer::CPlayer ( CPlayerManager* pPlayerManager, class CScriptDebugging* pScri
     m_UpdateNearListTimer.SetMaxIncrement ( 500, true );
     m_LastReceivedSyncTimer.SetUseModuleTickCount( true );
     m_ConnectedTimer.SetUseModuleTickCount( true );
+    bIsQuit = false;
 }
 
 
