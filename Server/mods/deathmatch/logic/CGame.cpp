@@ -1422,6 +1422,7 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
             Arguments.PushBoolean ( false );
             Arguments.PushBoolean ( false );
         }
+
         Player.bIsQuit = true;
         Player.CallEvent ( "onPlayerQuit", Arguments );
 
