@@ -11476,7 +11476,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
     // Make sure we have a player
     assert ( pPlayer );
     if ( pPlayer->IsQuit() ) {
-        return false;
+        return NULL;
     }
     // Initialize variables
     CBan* pBan = NULL;
