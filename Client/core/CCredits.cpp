@@ -127,7 +127,7 @@ CCredits::CCredits ( void )
                               "Fedor Sinev\n"
                               "zneext\n"
                               "ZRec\n"
-                              "4O4\n"
+                              "Pawelo / 4O4\n"
                               "Sergeanur\n"
                               "AleksCore\n"
                               "tederis\n"
