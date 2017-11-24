@@ -3470,7 +3470,9 @@ bool CStaticFunctionDefinitions::RedirectPlayer ( CElement* pElement, const char
     if ( IS_PLAYER ( pElement ) )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
-
+        if ( pPlayer->IsQuit() ) {
+            return false;
+        }
         unsigned char ucHostLength = static_cast < unsigned char > ( strlen ( szHost ) );
 
         CBitStream BitStream;
