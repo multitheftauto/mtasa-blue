@@ -138,6 +138,7 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
 
     // Grab our resource
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+    SString strError = "";
     if ( pLuaMain )
     {
         SString strFileInput;
@@ -184,6 +185,7 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
                             }
                         }
 
+                        xmlFile->GetLastError ( strError );
                         // Destroy it if we failed
                         pLuaMain->DestroyXML ( xmlFile );
                     }
@@ -196,7 +198,8 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
     }
 
     lua_pushboolean ( luaVM, false );
-    return 1;
+    lua_pushstring ( luaVM, strError );
+    return 2;
 }
 
 int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
