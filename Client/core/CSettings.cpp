@@ -375,6 +375,17 @@ void CSettings::CreateGUI ( void )
     m_pEditNick->SetMaxLength ( MAX_PLAYER_NICK_LENGTH );
     m_pEditNick->SetTextAcceptedHandler( GUI_CALLBACK( &CSettings::OnOKButtonClick, this ) );
 
+    m_pRandomNick = reinterpret_cast < CGUIButton* > ( pManager->CreateButton( pTabMultiplayer, "" ) );
+    m_pRandomNick->SetPosition ( CVector2D ( vecSize.fX + vecTemp.fX + 50.0f + 178.0f + 2.0f, vecTemp.fY - 1.0f ), false );
+    m_pRandomNick->SetSize ( CVector2D ( 26.0f, 26.0f ), false);
+    m_pRandomNick->SetClickHandler ( GUI_CALLBACK ( &CSettings::OnRandomNickname, this ) );
+    m_pRandomNick->SetZOrderingEnabled ( false );
+    m_pRandomNickIcon = reinterpret_cast < CGUIStaticImage* > ( pManager->CreateStaticImage( m_pRandomNick ) );
+    m_pRandomNickIcon->SetSize ( CVector2D( 1, 1 ), true );
+    m_pRandomNickIcon->LoadFromFile ("cgui\\images\\serverbrowser\\refresh.png" );
+    m_pRandomNickIcon->SetProperty ( "MousePassThroughEnabled", "True" );
+    m_pRandomNickIcon->SetProperty ( "DistributeCapturedInputs", "True" );
+
     m_pSavePasswords = reinterpret_cast < CGUICheckBox* > ( pManager->CreateCheckBox ( pTabMultiplayer, _("Save server passwords"), true ) );
     m_pSavePasswords->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY + 50.0f ) );
     m_pSavePasswords->GetPosition ( vecTemp, false );
@@ -2823,6 +2834,11 @@ bool CSettings::OnOKButtonClick ( CGUIElement* pElement )
     return true;
 }
 
+bool CSettings::OnRandomNickname(CGUIElement* pElement)
+{
+    m_pEditNick->SetText ( CNickGen::GetRandomNickname() );
+    return true;
+}
 
 bool CSettings::OnCancelButtonClick ( CGUIElement* pElement )
 {

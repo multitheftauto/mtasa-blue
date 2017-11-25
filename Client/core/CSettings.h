@@ -140,6 +140,8 @@ protected:
     CGUIButton*         m_pButtonOK;
     CGUIButton*         m_pButtonCancel;
     CGUILabel*          m_pLabelNick;
+    CGUIButton*         m_pRandomNick;
+    CGUIStaticImage*    m_pRandomNickIcon;
     CGUIEdit*           m_pEditNick;
     CGUICheckBox*       m_pSavePasswords;
     CGUICheckBox*       m_pAutoRefreshBrowser;
@@ -379,6 +381,7 @@ protected:
     bool                OnHideAdvancedSettingDescription ( CGUIElement* pElement );
     bool                OnTabChanged            ( CGUIElement* pElement );
     void                ReloadBrowserLists      ( void );
+    bool                OnRandomNickname        ( CGUIElement* pElement );
 
 private:
     void                CreateInterfaceTabGUI   ( void );
