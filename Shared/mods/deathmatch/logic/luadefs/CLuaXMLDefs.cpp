@@ -186,6 +186,7 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
                         }
 
                         xmlFile->GetLastError ( strError );
+                        argStream.SetCustomError(strError, SString("Unable to read XML file %s", strFileInput.c_str()));
                         // Destroy it if we failed
                         pLuaMain->DestroyXML ( xmlFile );
                     }
@@ -198,8 +199,7 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
     }
 
     lua_pushboolean ( luaVM, false );
-    lua_pushstring ( luaVM, strError );
-    return 2;
+    return 1;
 }
 
 int CLuaXMLDefs::xmlCopyFile ( lua_State* luaVM )
