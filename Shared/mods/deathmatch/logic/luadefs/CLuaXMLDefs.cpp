@@ -138,7 +138,6 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
 
     // Grab our resource
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-    SString strError = "";
     if ( pLuaMain )
     {
         SString strFileInput;
@@ -185,8 +184,6 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
                             }
                         }
 
-                        xmlFile->GetLastError ( strError );
-                        argStream.SetCustomError(strError, SString("Unable to read XML file %s", strFileInput.c_str()));
                         // Destroy it if we failed
                         pLuaMain->DestroyXML ( xmlFile );
                     }
