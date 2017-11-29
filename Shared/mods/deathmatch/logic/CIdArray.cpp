@@ -77,11 +77,11 @@ SArrayId CIdArray::PopUniqueId ( void* pObject, EIdClassType idClass )
     assert ( bSuccess );
 
     // Checks
-    assert ( ( ulPhysicalIndex != INVALID_ARRAY_ID ) &&
-            ( ulPhysicalIndex <= m_uiCapacity ) &&
-            ( m_Elements.size () > ulPhysicalIndex ) &&
-            ( m_Elements [ ulPhysicalIndex ].pObject == NULL ) &&
-            ( m_Elements [ ulPhysicalIndex ].idClass == EIdClass::NONE ) );
+	assert( ulPhysicalIndex != INVALID_ARRAY_ID );
+	assert( ulPhysicalIndex <= m_uiCapacity );
+	assert( m_Elements.size () > ulPhysicalIndex );
+	assert( m_Elements [ ulPhysicalIndex ].pObject == nullptr );
+	assert( m_Elements [ ulPhysicalIndex ].idClass == EIdClass::NONE );
 
     m_Elements [ ulPhysicalIndex ].pObject = pObject;
     m_Elements [ ulPhysicalIndex ].idClass = idClass;
@@ -100,10 +100,10 @@ void CIdArray::PushUniqueId ( void* pObject, EIdClassType idClass, SArrayId id )
     SArrayId ulPhysicalIndex = id - SHARED_ARRAY_BASE_ID;
 
     // Checks
-    assert ( ( id != INVALID_ARRAY_ID ) &&
-            ( ulPhysicalIndex <= m_uiCapacity ) &&
-            ( m_Elements [ ulPhysicalIndex ].pObject == pObject ) &&
-            ( m_Elements [ ulPhysicalIndex ].idClass == idClass ) );
+	assert( id != INVALID_ARRAY_ID );
+	assert( ulPhysicalIndex <= m_uiCapacity );
+	assert( m_Elements [ ulPhysicalIndex ].pObject == pObject );
+	assert( m_Elements [ ulPhysicalIndex ].idClass == idClass );
 
     m_IDStack.Push ( ulPhysicalIndex );
     m_Elements [ ulPhysicalIndex ].pObject = NULL;

@@ -107,7 +107,7 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
 CAccountManager::~CAccountManager ( void )
 {
     //Save everything
-    Save ();
+    Save (true);
     //Delete our save file
     m_pDatabaseManager->Disconnect ( m_hDbConnection );
     RemoveAll ();
@@ -296,19 +296,21 @@ void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
 }
 
 
-bool CAccountManager::Save ( void )
+void CAccountManager::Save ( bool bForce )
 {
-    // Attempted save now
-    m_bChangedSinceSaved = false;
-
-    for ( auto pAccount : m_List )
+    if (m_bChangedSinceSaved || bForce)
     {
-        if ( pAccount->IsRegistered () && pAccount->HasChanged () && !pAccount->IsConsoleAccount ()  )
+        // Attempted save now
+        m_bChangedSinceSaved = false;
+
+        for ( auto pAccount : m_List )
         {
-            Save ( pAccount );
+            if ( pAccount->IsRegistered () && pAccount->HasChanged () && !pAccount->IsConsoleAccount ()  )
+            {
+                Save ( pAccount );
+            }
         }
     }
-    return true;
 }
 
 
@@ -869,6 +871,7 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
 
 void CAccountManager::GetAccountsBySerial ( const SString& strSerial, std::vector<CAccount*>& outAccounts )
 {
+    Save();
     CRegistryResult result;
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM accounts WHERE serial = ?", SQLITE_TEXT, strSerial.c_str () );
 
@@ -877,7 +880,40 @@ void CAccountManager::GetAccountsBySerial ( const SString& strSerial, std::vecto
         const CRegistryResultRow& row = *iter;
         
         CAccount* pAccount = Get ( (const char*)row[0].pVal );
-        outAccounts.push_back ( pAccount );
+        if (pAccount)
+            outAccounts.push_back ( pAccount );
+    }
+}
+
+void CAccountManager::GetAccountsByIP( const SString& strIP, std::vector<CAccount*>& outAccounts ) 
+{
+    Save();
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf( m_hDbConnection, &result, "SELECT name FROM accounts WHERE added_ip = ?", SQLITE_TEXT, strIP.c_str() );
+
+    for ( CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter ) 
+    {
+        const CRegistryResultRow& row = *iter;
+
+        CAccount* pAccount = Get( (const char*) row[0].pVal );
+        if (pAccount)
+            outAccounts.push_back( pAccount );
+    }
+}
+
+void CAccountManager::GetAccountsByData ( const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts ) 
+{
+    Save();
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf( m_hDbConnection, &result, "SELECT acc.name FROM accounts acc, userdata dat WHERE dat.key = ? AND dat.value = ? AND dat.userid = acc.id", SQLITE_TEXT, dataName.c_str(), SQLITE_TEXT, value.c_str() );
+
+    for ( CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter ) 
+    {
+        const CRegistryResultRow& row = *iter;
+
+        CAccount* pAccount = Get( (const char*) row[0].pVal );
+        if (pAccount)
+            outAccounts.push_back( pAccount );
     }
 }
 
