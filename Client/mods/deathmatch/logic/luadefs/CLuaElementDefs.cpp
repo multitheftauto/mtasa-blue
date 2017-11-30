@@ -2156,24 +2156,49 @@ int CLuaElementDefs::SetElementCollisionsEnabled ( lua_State* luaVM )
 int CLuaElementDefs::SetElementCollidableWith ( lua_State* luaVM )
 {
     CClientEntity* pEntity = NULL;
-    CClientEntity* pWithEntity = NULL;
     bool bCanCollide = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    argStream.ReadUserData ( pWithEntity );
-    argStream.ReadBool ( bCanCollide );
-
-    // Verify the arguments
-    if ( !argStream.HasErrors () )
+    // bool setElementCollidableWith ( element theElement, element withElement, bool enabled ) 
+    if ( argStream.NextIsUserData() ) 
     {
-        if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
+        CClientEntity* pWithEntity = NULL;
+        argStream.ReadUserData ( pWithEntity );
+        argStream.ReadBool ( bCanCollide );
+
+        // Verify the arguments
+        if ( !argStream.HasErrors () )
         {
-            lua_pushboolean ( luaVM, true );
-            return 1;
+            if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
         }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    // bool setElementCollidableWith ( element theElement, string withType, bool enabled )  
+    else     
+    {
+        SString strType; 
+        bool bOnlyCreated;
+        argStream.ReadString ( strType );
+        argStream.ReadBool ( bCanCollide );
+        argStream.ReadBool ( bOnlyCreated, false );
+
+        // Verify the arguments
+        if ( !argStream.HasErrors () )
+        {
+            if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, strType.c_str (), bCanCollide, bOnlyCreated ) )
+            {
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    }
 
     lua_pushboolean ( luaVM, false );
     return 1;
