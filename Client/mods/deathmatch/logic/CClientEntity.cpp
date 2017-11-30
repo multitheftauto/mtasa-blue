@@ -1455,6 +1455,41 @@ void CClientEntity::RemoveEntityFromRoot ( unsigned int uiTypeHash, CClientEntit
         CClientEntity::RemoveEntityFromRoot ( (*iter)->GetTypeHash (), *iter );
 }
 
+
+CFastList < CClientEntity* > CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, bool bStreamedIn )
+{
+    CFastList < CClientEntity* > entities;
+
+    t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
+    if ( find != ms_mapEntitiesFromRoot.end () )
+    {
+        CFromRootListType& listEntities = find->second;
+        CClientEntity* pEntity;
+        unsigned int uiIndex = 0;
+
+        for ( CFromRootListType::reverse_iterator i = listEntities.rbegin ();
+            i != listEntities.rend ();
+            ++i )
+        {
+            pEntity = *i;
+
+            // Only streamed in elements?
+            if ( !bStreamedIn || !pEntity->IsStreamingCompatibleClass () ||
+                reinterpret_cast < CClientStreamElement* > ( pEntity )->IsStreamedIn () )
+            {
+                if ( !pEntity->IsBeingDeleted () )
+                {
+                    // Add it to the table
+                    entities.push_back ( pEntity );
+                }
+            }
+        }
+    }
+
+    return entities;
+}
+
+
 void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn )
 {
 #if CHECK_ENTITIES_FROM_ROOT
