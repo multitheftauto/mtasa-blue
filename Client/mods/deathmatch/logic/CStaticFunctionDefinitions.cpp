@@ -3603,6 +3603,47 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Enti
 }
 
 
+bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Entity, const char* szTypeName, bool bCanCollide, bool bOnlyCreated )
+{
+    switch ( Entity.GetType () )
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        case CCLIENTOBJECT:
+        case CCLIENTVEHICLE:
+        {
+            switch ( CClientEntity::GetTypeID ( szTypeName ) )
+            {
+                case CCLIENTPLAYER:
+                case CCLIENTPED:
+                case CCLIENTOBJECT:
+                case CCLIENTVEHICLE:
+                {
+                    CFastList < CClientEntity* > entities = CClientEntity::GetEntitiesFromRoot ( HashString ( szTypeName ), false );
+
+                    CChildListType::const_iterator iter = entities.begin ();
+                    for ( ; iter != entities.end (); iter++ )
+                    {
+                        CClientEntity* pEntity = *iter;
+                        Entity.SetCollidableWith ( pEntity, bCanCollide );
+                    }
+
+                    if ( !bOnlyCreated ) 
+                    {
+
+                    }
+
+                    return true;
+                }
+                default: break;
+            }
+        }
+    }
+
+    return false;
+}
+
+
 bool CStaticFunctionDefinitions::SetElementFrozen ( CClientEntity& Entity, bool bFrozen )
 {
     switch ( Entity.GetType () )
