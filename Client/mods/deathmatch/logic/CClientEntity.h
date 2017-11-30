@@ -373,11 +373,13 @@ protected:
 public:
     // Optimization for getElementsByType starting at root
     static void                     StartupEntitiesFromRoot ( );
+    static CFastList < CClientEntity* > GetEntitiesFromRoot ( unsigned int uiTypeHash, bool bStreamedIn );
 private:
     static bool                     IsFromRoot              ( CClientEntity* pEntity );
     static void                     AddEntityFromRoot       ( unsigned int uiTypeHash, CClientEntity* pEntity, bool bDebugCheck = true );
     static void                     RemoveEntityFromRoot    ( unsigned int uiTypeHash, CClientEntity* pEntity );
     static void                     GetEntitiesFromRoot     ( unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn );
+    
 
 #if CHECK_ENTITIES_FROM_ROOT
     static void                     _CheckEntitiesFromRoot      ( unsigned int uiTypeHash );
