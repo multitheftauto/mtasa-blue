@@ -184,7 +184,8 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
                             }
                         }
 
-                        if ( FileExists ( strPath ) ) {
+                        if ( FileExists ( strPath ) )
+                        {
                             SString strError;
                             xmlFile->GetLastError ( strError );
                             if ( !strError.empty( ) )
