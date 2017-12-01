@@ -60,13 +60,9 @@ CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned 
         m_pManager->OnLowLODElementCreated ();
 
     // Check DisableCollisions //
-    if ( !m_DisabledCollisions.empty () )
+    for ( CClientEntity * entity : m_DisabledCollisions )
     {
-        std::list < CClientEntity * > ::iterator iter = m_DisabledCollisions.begin ();
-        for ( ; iter != m_DisabledCollisions.end (); iter++ )
-        {
-            SetCollidableWith ( *iter, false );
-        }
+        SetCollidableWith ( entity, false );
     }
 }
 

@@ -182,13 +182,9 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
     m_bJustStreamedIn = false;
 
     // Check DisableCollisions //
-    if ( !m_DisabledCollisions.empty () )
+    for ( CClientEntity * entity : m_DisabledCollisions )
     {
-        list < CClientEntity * > ::iterator iter = m_DisabledCollisions.begin ();
-        for ( ; iter != m_DisabledCollisions.end (); iter++ )
-        {
-            SetCollidableWith ( *iter, false );
-        }
+        SetCollidableWith ( entity, false );
     }
 }
 
