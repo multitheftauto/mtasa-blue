@@ -3612,7 +3612,7 @@ bool CStaticFunctionDefinitions::SetElementCollidableWithType ( CClientEntity & 
         case CCLIENTOBJECT:
         case CCLIENTVEHICLE:
             break;
-        default: return;
+        default: return false;
     }
 
     unsigned int uiType = CClientEntity::GetTypeID ( szTypeName );
@@ -3624,7 +3624,7 @@ bool CStaticFunctionDefinitions::SetElementCollidableWithType ( CClientEntity & 
         case CCLIENTOBJECT:
         case CCLIENTVEHICLE:
             break;
-        default: return;
+        default: return false;
     }
 
     // Change CollidableWith for all elements of this type on the server
