@@ -21,9 +21,11 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 extern CClientGame* g_pClientGame;
 std::set < const CClientEntity* > ms_AttachedVehiclesToIgnore;
-std::list < CClientEntity* > CClientVehicle::m_DisabledCollisions;
+list < CClientEntity* > CClientVehicle::m_DisabledCollisions;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
 #pragma warning(disable:4311)

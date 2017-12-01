@@ -17,9 +17,10 @@
 #include "StdInc.h"
 
 using std::vector;
+using std::list;
 
 extern CClientGame* g_pClientGame;
-std::list < CClientEntity* > CClientPed::m_DisabledCollisions;
+list < CClientEntity* > CClientPed::m_DisabledCollisions;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
