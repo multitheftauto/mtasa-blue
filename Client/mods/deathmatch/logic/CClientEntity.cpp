@@ -173,6 +173,12 @@ CClientEntity::~CClientEntity ( void )
     SAFE_RELEASE( m_pChildrenListSnapshot );
     g_pCore->GetGraphics ()->GetRenderItemManager ()->RemoveClientEntityRefs ( this );
     g_pCore->UpdateDummyProgress();
+
+    // Remove from m_DisabledCollisions
+    CClientPlayer::m_DisabledCollisions.remove ( this );
+    CClientPed::m_DisabledCollisions.remove ( this );
+    CClientObject::m_DisabledCollisions.remove ( this );
+    CClientVehicle::m_DisabledCollisions.remove ( this );
 }
 
 
@@ -1648,6 +1654,7 @@ void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollid
     }
     // Set in the other entity as well
     pEntity->SetCollidableWith ( this, bCanCollide );
+    g_pCore->GetConsole ()->Printf ( "Collision toggle: ", bCanCollide );
 }
 
 
