@@ -3611,66 +3611,65 @@ bool CStaticFunctionDefinitions::SetElementCollidableWithType ( CClientEntity & 
         case CCLIENTPED:
         case CCLIENTOBJECT:
         case CCLIENTVEHICLE:
+            break;
+        default: return;
+    }
+
+    unsigned int uiType = CClientEntity::GetTypeID ( szTypeName );
+
+    switch ( uiType )
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        case CCLIENTOBJECT:
+        case CCLIENTVEHICLE:
+            break;
+        default: return;
+    }
+
+    // Change CollidableWith for all elements of this type on the server
+    CFastList < CClientEntity* > entities = CClientEntity::GetEntitiesFromRoot ( HashString ( szTypeName ), false );
+
+    CChildListType::const_iterator iter = entities.begin ();
+    for ( ; iter != entities.end (); iter++ )
+    {
+        CClientEntity* pEntity = *iter;
+        Entity.SetCollidableWith ( pEntity, bCanCollide );
+    }
+
+    // Save it so new created elements also have to consider CollidableWith
+    if ( !bOnlyWithCreated ) 
+    {
+        switch ( uiType )
         {
-            unsigned int uiType = CClientEntity::GetTypeID ( szTypeName );
-
-            switch ( uiType )
-            {
-                case CCLIENTPLAYER:
-                case CCLIENTPED:
-                case CCLIENTOBJECT:
-                case CCLIENTVEHICLE:
-                {
-                    // Change CollidableWith for all elements of this type on the server
-                    CFastList < CClientEntity* > entities = CClientEntity::GetEntitiesFromRoot ( HashString ( szTypeName ), false );
-
-                    CChildListType::const_iterator iter = entities.begin ();
-                    for ( ; iter != entities.end (); iter++ )
-                    {
-                        CClientEntity* pEntity = *iter;
-                        Entity.SetCollidableWith ( pEntity, bCanCollide );
-                    }
-
-                    // Save it so new created elements also have to consider CollidableWith
-                    if ( !bOnlyWithCreated ) 
-                    {
-                        switch ( uiType )
-                        {
-                            case CCLIENTPLAYER:
-                                if ( bCanCollide )
-                                    CClientPlayer::m_DisabledCollisions.remove ( &Entity );
-                                else
-                                    CClientPlayer::m_DisabledCollisions.push_back ( &Entity );
-                                break;
-                            case CCLIENTPED:
-                                if ( bCanCollide )
-                                    CClientPed::m_DisabledCollisions.remove ( &Entity );
-                                else 
-                                    CClientPed::m_DisabledCollisions.push_back ( &Entity );
-                                break;
-                            case CCLIENTOBJECT:
-                                if ( bCanCollide )
-                                    CClientObject::m_DisabledCollisions.remove ( &Entity );
-                                else
-                                    CClientObject::m_DisabledCollisions.push_back ( &Entity );
-                                break;
-                            case CCLIENTVEHICLE:
-                                if ( bCanCollide )
-                                    CClientVehicle::m_DisabledCollisions.remove ( &Entity );
-                                else
-                                    CClientVehicle::m_DisabledCollisions.push_back ( &Entity );
-                                break;
-                        }
-                    }
-
-                    return true;
-                }
-                default: break;
-            }
+            case CCLIENTPLAYER:
+                if ( bCanCollide )
+                    CClientPlayer::m_DisabledCollisions.remove ( &Entity );
+                else
+                    CClientPlayer::m_DisabledCollisions.push_back ( &Entity );
+                break;
+            case CCLIENTPED:
+                if ( bCanCollide )
+                    CClientPed::m_DisabledCollisions.remove ( &Entity );
+                else 
+                    CClientPed::m_DisabledCollisions.push_back ( &Entity );
+                break;
+            case CCLIENTOBJECT:
+                if ( bCanCollide )
+                    CClientObject::m_DisabledCollisions.remove ( &Entity );
+                else
+                    CClientObject::m_DisabledCollisions.push_back ( &Entity );
+                break;
+            case CCLIENTVEHICLE:
+                if ( bCanCollide )
+                    CClientVehicle::m_DisabledCollisions.remove ( &Entity );
+                else
+                    CClientVehicle::m_DisabledCollisions.push_back ( &Entity );
+                break;
         }
     }
 
-    return false;
+    return true;
 }
 
 
