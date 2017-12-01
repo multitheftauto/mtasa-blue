@@ -20,6 +20,7 @@ using std::list;
 using std::vector;
 
 extern CClientGame* g_pClientGame;
+list < CClientEntity* > CClientPed::m_DisabledCollisions;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -241,6 +242,16 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
         SetStat ( MAX_HEALTH, 569.0f );     // Default max_health stat
 
         SetArmor ( 0.0f );
+    }
+
+    // Check DisableCollisions //
+    if ( !m_DisabledCollisions.empty () )
+    {
+        list < CClientEntity * > ::iterator iter = m_DisabledCollisions.begin ();
+        for ( ; iter != m_DisabledCollisions.end (); iter++ )
+        {
+            SetCollidableWith ( *iter, false );
+        }
     }
 }
 

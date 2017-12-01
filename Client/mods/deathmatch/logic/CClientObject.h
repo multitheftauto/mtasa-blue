@@ -153,6 +153,7 @@ protected:
 public:
     CObject*                            m_pObject;
     SLastSyncedObjectData               m_LastSyncedData;
+    static std::list < CClientEntity * >   m_DisabledCollisions;
 };
 
 #endif

@@ -16,9 +16,13 @@
 *****************************************************************************/
 
 #include <StdInc.h>
+
+using std::list;
+
 int g_iDamageEventLimit = -1;
 extern float g_fApplyDamageLastAmount;
 extern CClientPed* g_pApplyDamageLastDamagedPed;
+list < CClientEntity* > CClientPlayer::m_DisabledCollisions;
 
 CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsLocalPlayer ) : ClassInit ( this ), CClientPed ( pManager, 0, ID, bIsLocalPlayer )
 {
@@ -87,6 +91,16 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
 
     // Add us to the player list
     m_pManager->GetPlayerManager ()->AddToList ( this );
+
+    // Check DisableCollisions //
+    if ( !m_DisabledCollisions.empty () )
+    {
+        std::list < CClientEntity * > ::iterator iter = m_DisabledCollisions.begin ();
+        for ( ; iter != m_DisabledCollisions.end (); iter++ )
+        {
+            SetCollidableWith ( *iter, false );
+        }
+    }
 
 #ifdef MTA_DEBUG
     m_bShowingWepdata = false;

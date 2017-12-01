@@ -120,6 +120,7 @@ public:
     CVector                         m_vecPrevBulletSyncStart;
     CVector                         m_vecPrevBulletSyncEnd;
     uchar                           m_ucPrevBulletSyncOrderCounter;
+    static std::list < CClientEntity * >   m_DisabledCollisions;
 private:
     bool                            m_bIsLocalPlayer;
     SString                         m_strNick;

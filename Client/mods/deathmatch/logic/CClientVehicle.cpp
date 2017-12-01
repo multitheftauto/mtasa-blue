@@ -25,6 +25,7 @@ using std::list;
 
 extern CClientGame* g_pClientGame;
 std::set < const CClientEntity* > ms_AttachedVehiclesToIgnore;
+std::list < CClientEntity* > CClientVehicle::m_DisabledCollisions;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
 #pragma warning(disable:4311)
@@ -179,6 +180,16 @@ CClientVehicle::CClientVehicle ( CClientManager* pManager, ElementID ID, unsigne
 
     // We've not yet been streamed in 
     m_bJustStreamedIn = false;
+
+    // Check DisableCollisions //
+    if ( !m_DisabledCollisions.empty () )
+    {
+        list < CClientEntity * > ::iterator iter = m_DisabledCollisions.begin ();
+        for ( ; iter != m_DisabledCollisions.end (); iter++ )
+        {
+            SetCollidableWith ( *iter, false );
+        }
+    }
 }
 
 

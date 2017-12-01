@@ -646,6 +646,8 @@ public:
 
     CVector                     m_vecPrevTargetPosition;
     uint                        m_uiForceLocalCounter;
+
+    static std::list < CClientEntity * >   m_DisabledCollisions;
 };
 
 #endif

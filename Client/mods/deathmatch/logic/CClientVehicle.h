@@ -686,6 +686,7 @@ public:
     SSirenInfo                  m_tSirenBeaconInfo;
     std::map<SString, SVehicleComponentData>  m_ComponentData;
     bool                        m_bAsyncLoadingDisabled;
+    static std::list < CClientEntity * >   m_DisabledCollisions;
 
 };
 
