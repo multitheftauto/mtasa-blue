@@ -175,10 +175,19 @@ CClientEntity::~CClientEntity ( void )
     g_pCore->UpdateDummyProgress();
 
     // Remove from m_DisabledCollisions
-    CClientPlayer::m_DisabledCollisions.remove ( this );
-    CClientPed::m_DisabledCollisions.remove ( this );
-    CClientObject::m_DisabledCollisions.remove ( this );
-    CClientVehicle::m_DisabledCollisions.remove ( this );
+    switch ( this->GetType () )
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        case CCLIENTOBJECT:
+        case CCLIENTVEHICLE:
+            CClientPlayer::m_DisabledCollisions.remove ( this );
+            CClientPed::m_DisabledCollisions.remove ( this );
+            CClientObject::m_DisabledCollisions.remove ( this );
+            CClientVehicle::m_DisabledCollisions.remove ( this );
+            break;
+        default: break;
+    }
 }
 
 
@@ -1654,7 +1663,6 @@ void CClientEntity::SetCollidableWith ( CClientEntity * pEntity, bool bCanCollid
     }
     // Set in the other entity as well
     pEntity->SetCollidableWith ( this, bCanCollide );
-    g_pCore->GetConsole ()->Printf ( "Collision toggle: ", bCanCollide );
 }
 
 
