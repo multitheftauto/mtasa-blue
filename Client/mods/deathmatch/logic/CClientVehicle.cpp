@@ -21,8 +21,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 extern CClientGame* g_pClientGame;
 std::set < const CClientEntity* > ms_AttachedVehiclesToIgnore;
 std::list < CClientEntity* > CClientVehicle::m_DisabledCollisions;

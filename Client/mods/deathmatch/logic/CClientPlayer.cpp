@@ -17,12 +17,10 @@
 
 #include <StdInc.h>
 
-using std::list;
-
 int g_iDamageEventLimit = -1;
 extern float g_fApplyDamageLastAmount;
 extern CClientPed* g_pApplyDamageLastDamagedPed;
-list < CClientEntity* > CClientPlayer::m_DisabledCollisions;
+std::list < CClientEntity* > CClientPlayer::m_DisabledCollisions;
 
 CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsLocalPlayer ) : ClassInit ( this ), CClientPed ( pManager, 0, ID, bIsLocalPlayer )
 {

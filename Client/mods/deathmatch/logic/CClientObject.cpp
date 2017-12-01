@@ -21,9 +21,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-using std::list;
-
-list < CClientEntity* > CClientObject::m_DisabledCollisions;
+std::list < CClientEntity* > CClientObject::m_DisabledCollisions;
 
 CClientObject::CClientObject ( CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod )
     : ClassInit ( this )
