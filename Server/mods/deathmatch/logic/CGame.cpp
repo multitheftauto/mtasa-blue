@@ -1471,6 +1471,7 @@ void CGame::AddBuiltInEvents ( void )
 
     // Pickup events
     m_Events.AddEvent ( "onPickupHit", "player", NULL, false );
+    m_Events.AddEvent ( "onPickupLeave", "player", NULL, false );
     m_Events.AddEvent ( "onPickupUse", "player", NULL, false );
     m_Events.AddEvent ( "onPickupSpawn", "", NULL, false );
 
@@ -1489,6 +1490,7 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerMarkerHit", "marker, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onPlayerMarkerLeave", "marker, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onPlayerPickupHit", "pickup", NULL, false );
+    m_Events.AddEvent ( "onPlayerPickupLeave", "pickup", NULL, false );
     m_Events.AddEvent ( "onPlayerPickupUse", "pickup", NULL, false );
     m_Events.AddEvent ( "onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false );
     m_Events.AddEvent ( "onPlayerContact", "previous, current", NULL, false );
