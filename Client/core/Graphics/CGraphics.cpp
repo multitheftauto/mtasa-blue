@@ -648,7 +648,7 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
         if (bColorCoded)
             RemoveColorCodesInPlaceW(strText);
 
-        // DT_CALCRECT does not take space characters at the end of a line 
+        // DT_CALCRECT may not take space characters at the end of a line 
         // into consideration for the rect size.
         // Count the amount of space characters at the end
         int iSpaceCount = 0;
@@ -669,6 +669,8 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
             SIZE size;
             GetTextExtentPoint32W( dc, L" ", 1, &size );
             iAdditionalPixels = iSpaceCount * size.cx;
+            // Remove trailing spaces from the text
+            strText = strText.Left(strText.length() - iSpaceCount);
         }
         
         // Compute the size of the text itself 

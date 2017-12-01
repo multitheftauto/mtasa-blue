@@ -4063,22 +4063,28 @@ bool CStaticFunctionDefinitions::SetRadarAreaFlashing ( CClientRadarArea* RadarA
 
 bool CStaticFunctionDefinitions::IsInsideRadarArea ( CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside )
 {
-    if ( RadarArea )
+    assert ( RadarArea );
+
+    CVector2D vecAreaPosition = RadarArea->GetPosition ();
+    CVector2D vecAreaSize = RadarArea->GetSize ();
+
+    inside = false;
+
+    // Calculate boundaries and make sure they're in ascending order,
+    // so it is always safe to start checking from the bottom-left corner
+    std::pair<float, float> fHorizontalBounds = std::minmax ( vecAreaPosition.fX, vecAreaPosition.fX + vecAreaSize.fX );
+    std::pair<float, float> fVerticalBounds = std::minmax ( vecAreaPosition.fY, vecAreaPosition.fY + vecAreaSize.fY );
+
+    // Do the calc from the bottom-left corner
+    if ( vecPosition.fX >= fHorizontalBounds.first && vecPosition.fX <= fHorizontalBounds.second )
     {
-        CVector2D vecRadarPos = RadarArea->GetPosition();
-        CVector2D vecRadarSize = RadarArea->GetSize();
-        float fMaxX = vecRadarPos.fX + vecRadarSize.fX;
-        float fMaxY = vecRadarPos.fY + vecRadarSize.fY;
-        if ( vecPosition.fX >= vecRadarPos.fX && vecPosition.fX <= fMaxX )
+        if ( vecPosition.fY >= fVerticalBounds.first && vecPosition.fY <= fVerticalBounds.second )
         {
-            if ( vecPosition.fY >= vecRadarPos.fY && vecPosition.fY <= fMaxY )
-            {
-                inside = true;
-            }
+            inside = true;
         }
-        return true;
     }
-    return false;
+
+    return true;
 }
 
 
