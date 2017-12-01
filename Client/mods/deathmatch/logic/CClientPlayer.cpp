@@ -95,7 +95,7 @@ CClientPlayer::CClientPlayer ( CClientManager* pManager, ElementID ID, bool bIsL
     // Check DisableCollisions //
     if ( !m_DisabledCollisions.empty () )
     {
-        std::list < CClientEntity * > ::iterator iter = m_DisabledCollisions.begin ();
+        list < CClientEntity * > ::iterator iter = m_DisabledCollisions.begin ();
         for ( ; iter != m_DisabledCollisions.end (); iter++ )
         {
             SetCollidableWith ( *iter, false );
