@@ -88,6 +88,7 @@ public:
     LUA_DECLARE ( SetElementStreamable );
     LUA_DECLARE ( SetElementModel );
     LUA_DECLARE ( SetElementCollidableWith );
+    LUA_DECLARE ( SetElementCollidableWithType );
     LUA_DECLARE ( SetElementDoubleSided );
     LUA_DECLARE ( SetElementFrozen );
     LUA_DECLARE ( SetLowLodElement );

@@ -3603,7 +3603,7 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Enti
 }
 
 
-bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Entity, const char* szTypeName, bool bCanCollide, bool bOnlyCreated )
+bool CStaticFunctionDefinitions::SetElementCollidableWithType ( CClientEntity & Entity, const char* szTypeName, bool bCanCollide, bool bOnlyWithCreated )
 {
     switch ( Entity.GetType () )
     {
@@ -3612,13 +3612,16 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Enti
         case CCLIENTOBJECT:
         case CCLIENTVEHICLE:
         {
-            switch ( CClientEntity::GetTypeID ( szTypeName ) )
+            unsigned int uiType = CClientEntity::GetTypeID ( szTypeName );
+
+            switch ( uiType )
             {
                 case CCLIENTPLAYER:
                 case CCLIENTPED:
                 case CCLIENTOBJECT:
                 case CCLIENTVEHICLE:
                 {
+                    // Change CollidableWith for all elements of this type on the server
                     CFastList < CClientEntity* > entities = CClientEntity::GetEntitiesFromRoot ( HashString ( szTypeName ), false );
 
                     CChildListType::const_iterator iter = entities.begin ();
@@ -3628,9 +3631,36 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith ( CClientEntity & Enti
                         Entity.SetCollidableWith ( pEntity, bCanCollide );
                     }
 
-                    if ( !bOnlyCreated ) 
+                    // Save it so new created elements also have to consider CollidableWith
+                    if ( !bOnlyWithCreated ) 
                     {
-
+                        switch ( uiType )
+                        {
+                            case CCLIENTPLAYER:
+                                if ( bCanCollide )
+                                    CClientPlayer::m_DisabledCollisions.remove ( &Entity );
+                                else
+                                    CClientPlayer::m_DisabledCollisions.push_back ( &Entity );
+                                break;
+                            case CCLIENTPED:
+                                if ( bCanCollide )
+                                    CClientPed::m_DisabledCollisions.remove ( &Entity );
+                                else 
+                                    CClientPed::m_DisabledCollisions.push_back ( &Entity );
+                                break;
+                            case CCLIENTOBJECT:
+                                if ( bCanCollide )
+                                    CClientObject::m_DisabledCollisions.remove ( &Entity );
+                                else
+                                    CClientObject::m_DisabledCollisions.push_back ( &Entity );
+                                break;
+                            case CCLIENTVEHICLE:
+                                if ( bCanCollide )
+                                    CClientVehicle::m_DisabledCollisions.remove ( &Entity );
+                                else
+                                    CClientVehicle::m_DisabledCollisions.push_back ( &Entity );
+                                break;
+                        }
                     }
 
                     return true;

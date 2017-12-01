@@ -85,6 +85,7 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementStreamable", SetElementStreamable );
     CLuaCFunctions::AddFunction ( "setElementCollisionsEnabled", SetElementCollisionsEnabled );
     CLuaCFunctions::AddFunction ( "setElementCollidableWith", SetElementCollidableWith );
+    CLuaCFunctions::AddFunction ( "setElementCollidableWithType", SetElementCollidableWithType );
     CLuaCFunctions::AddFunction ( "setElementDoubleSided", SetElementDoubleSided );
     CLuaCFunctions::AddFunction ( "setElementFrozen", SetElementFrozen );
     CLuaCFunctions::AddFunction ( "setLowLODElement", SetLowLodElement );
@@ -167,6 +168,7 @@ void CLuaElementDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setModel", "setElementModel" );
     lua_classfunction ( luaVM, "setCollisionsEnabled", "setElementCollisionsEnabled" );
     lua_classfunction ( luaVM, "setCollidableWith", "setElementCollidableWith" );
+    lua_classfunction ( luaVM, "setCollidableWithType", "setElementCollidableWithType" );
     lua_classfunction ( luaVM, "setFrozen", "setElementFrozen" );
     lua_classfunction ( luaVM, "setLowLOD", "setLowLODElement" );
     lua_classfunction ( luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled" );
@@ -2156,54 +2158,56 @@ int CLuaElementDefs::SetElementCollisionsEnabled ( lua_State* luaVM )
 int CLuaElementDefs::SetElementCollidableWith ( lua_State* luaVM )
 {
     CClientEntity* pEntity = NULL;
+    CClientEntity* pWithEntity = NULL;
     bool bCanCollide = true;
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pEntity );
-    // bool setElementCollidableWith ( element theElement, element withElement, bool enabled ) 
-    if ( argStream.NextIsUserData() ) 
-    {
-        CClientEntity* pWithEntity = NULL;
-        argStream.ReadUserData ( pWithEntity );
-        argStream.ReadBool ( bCanCollide );
+    argStream.ReadUserData ( pWithEntity );
+    argStream.ReadBool ( bCanCollide );
 
-        // Verify the arguments
-        if ( !argStream.HasErrors () )
-        {
-            if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
-    }
-    // bool setElementCollidableWith ( element theElement, string withType, bool enabled )  
-    else     
+    // Verify the arguments
+    if ( !argStream.HasErrors () )
     {
-        SString strType; 
-        bool bOnlyCreated;
-        argStream.ReadString ( strType );
-        argStream.ReadBool ( bCanCollide );
-        argStream.ReadBool ( bOnlyCreated, false );
-
-        // Verify the arguments
-        if ( !argStream.HasErrors () )
+        if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, *pWithEntity, bCanCollide ) )
         {
-            if ( CStaticFunctionDefinitions::SetElementCollidableWith ( *pEntity, strType.c_str (), bCanCollide, bOnlyCreated ) )
-            {
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
     }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
 }
 
+
+int CLuaElementDefs::SetElementCollidableWithType ( lua_State* luaVM ) {
+    // bool SetElementCollidableWithType ( element theElement, string withType, bool enabled, bool onlyWithCreated = false )  
+    CClientEntity* pEntity = NULL;
+    SString strType;
+    bool bCanCollide = true;
+    bool bOnlyWithCreated = false;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strType );
+    argStream.ReadBool ( bCanCollide );
+    argStream.ReadBool ( bOnlyWithCreated, false );
+
+    // Verify the arguments
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetElementCollidableWithType ( *pEntity, strType.c_str (), bCanCollide, bOnlyWithCreated ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
 
 int CLuaElementDefs::SetElementDoubleSided ( lua_State* luaVM )
 {

@@ -108,7 +108,7 @@ public:
     static bool                         SetElementModel                     ( CClientEntity& Entity, unsigned short usModel );
     static bool                         SetElementCollisionsEnabled         ( CClientEntity& Entity, bool bEnabled );
     static bool                         SetElementCollidableWith            ( CClientEntity& Entity, CClientEntity& ThisEntity, bool bCanCollide );
-    static bool                         SetElementCollidableWith            ( CClientEntity& Entity, const char* szTypeName, bool bCanCollide, bool bOnlyCreated );
+    static bool                         SetElementCollidableWithType        ( CClientEntity& Entity, const char* szTypeName, bool bCanCollide, bool bOnlyWithCreated );
     static bool                         SetElementFrozen                    ( CClientEntity& Entity, bool bFrozen );
     static bool                         SetLowLodElement                    ( CClientEntity& Entity, CClientEntity* pLowLodEntity );
     static bool                         SetElementCallPropagationEnabled    ( CClientEntity& Entity, bool bEnabled );
