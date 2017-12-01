@@ -2183,7 +2183,7 @@ int CLuaElementDefs::SetElementCollidableWith ( lua_State* luaVM )
 
 
 int CLuaElementDefs::SetElementCollidableWithType ( lua_State* luaVM ) {
-    // bool SetElementCollidableWithType ( element theElement, string withType, bool enabled[, bool onlyWithCreated = false] )  
+    // bool setElementCollidableWithType ( element theElement, string withType, bool enabled[, bool onlyWithCreated = false] )  
     CClientEntity* pEntity = NULL;
     SString strType;
     bool bCanCollide = true;
