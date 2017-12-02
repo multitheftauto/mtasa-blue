@@ -104,6 +104,22 @@ CPed::~CPed ( void )
 }
 
 
+CElement* CPed::Clone ( bool* bAddEntity, CResource* pResource )
+{
+    CPed* pTemp = m_pPedManager->Create ( GetModel (), GetParentEntity (), NULL );
+    if ( pTemp )
+    {
+        pTemp->SetPosition ( GetPosition () );
+        pTemp->SetRotation ( GetRotation () );
+        pTemp->SetHealth ( GetHealth () );
+        pTemp->SetArmor ( GetArmor () );
+        pTemp->SetSyncable ( IsSyncable () );
+    }
+
+    return pTemp;
+}
+
+
 void CPed::Unlink ( void )
 {
     // Remove us from the Ped manager
