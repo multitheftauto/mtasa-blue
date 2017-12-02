@@ -24,6 +24,8 @@ public:
                                 CBlip                    ( CElement* pParent, CXMLNode* pNode, class CBlipManager* pBlipManager );
                                 ~CBlip                   ( void );
 
+    CElement*                   Clone                    ( bool* bAddEntity, CResource* pResource );
+
     void                        Unlink                   ( void );
     bool                        ReadSpecialData          ( void );
 

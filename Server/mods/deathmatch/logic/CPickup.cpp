@@ -61,6 +61,23 @@ CPickup::~CPickup ( void )
 }
 
 
+CElement* CPickup::Clone ( bool* bAddEntity, CResource* pResource )
+{
+    CPickup* pTemp = m_pPickupManager->Create ( GetParentEntity () );
+    if ( pTemp )
+    {
+        pTemp->SetPickupType ( GetPickupType () );
+        pTemp->SetPickupType ( GetPickupType () );
+        pTemp->SetModel ( GetModel () );
+        pTemp->SetWeaponType ( GetWeaponType () );
+        pTemp->SetAmmo ( GetAmmo () );
+        pTemp->SetRespawnIntervals ( GetRespawnIntervals () );
+    }
+
+    return pTemp;
+}
+
+
 void CPickup::Unlink ( void )
 {
     // Remove us from the pickup manager's list

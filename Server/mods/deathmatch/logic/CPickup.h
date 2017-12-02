@@ -95,6 +95,8 @@ public:
                                     CPickup                     ( CElement* pParent, CXMLNode* pNode, class CPickupManager* pPickupManager, CColManager* pColManager );
                                     ~CPickup                    ( void );
 
+    CElement*                       Clone                       ( bool* bAddEntity, CResource* pResource );
+
     bool                            IsEntity                    ( void )                    { return true; }
 
     void                            Unlink                      ( void );

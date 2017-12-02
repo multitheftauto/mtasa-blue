@@ -50,6 +50,24 @@ CMarker::~CMarker ( void )
 }
 
 
+CElement* CMarker::Clone ( bool* bAddEntity, CResource* pResource )
+{
+    CMarker* pTemp = m_pMarkerManager->Create ( GetParentEntity () );
+    if ( pTemp )
+    {
+        pTemp->SetMarkerType ( GetMarkerType () );
+        pTemp->SetColor ( GetColor () );
+        pTemp->SetSize ( GetSize () );
+
+        if ( pResource->HasStarted () )
+            pTemp->Sync ( true );
+        bAddEntity = false;
+    }
+
+    return pTemp;
+}
+
+
 void CMarker::Unlink ( void )
 {
     // Remove us from the marker manager
