@@ -175,19 +175,10 @@ CClientEntity::~CClientEntity ( void )
     g_pCore->UpdateDummyProgress();
 
     // Remove from m_DisabledCollisions
-    switch ( this->GetType () )
-    {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
-        case CCLIENTOBJECT:
-        case CCLIENTVEHICLE:
-            CClientPlayer::m_DisabledCollisions.remove ( this );
-            CClientPed::m_DisabledCollisions.remove ( this );
-            CClientObject::m_DisabledCollisions.remove ( this );
-            CClientVehicle::m_DisabledCollisions.remove ( this );
-            break;
-        default: break;
-    }
+    CClientPlayer::m_DisabledCollisions.remove ( this );
+    CClientPed::m_DisabledCollisions.remove ( this );
+    CClientObject::m_DisabledCollisions.remove ( this );
+    CClientVehicle::m_DisabledCollisions.remove ( this );
 }
 
 
