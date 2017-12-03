@@ -93,7 +93,7 @@ public:
                                                 CElement                    ( CElement* pParent, CXMLNode* pNode = NULL );
     virtual                                     ~CElement                   ( void );
 
-    virtual CElement*                           Clone                       ( bool* bAddEntity, CResource* pResource ) {};
+    virtual CElement*                           Clone                       ( bool* bAddEntity, CResource* pResource ) { return nullptr; };
     bool                                        IsCloneable                 ( void );
 
     inline bool                                 IsBeingDeleted              ( void )                        { return m_bIsBeingDeleted; };
