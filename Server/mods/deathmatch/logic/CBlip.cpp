@@ -47,7 +47,7 @@ CElement* CBlip::Clone ( bool* bAddEntity, CResource* pResource )
 
         if ( pResource->HasStarted () )
             pTemp->Sync ( true );
-        bAddEntity = false;
+        *bAddEntity = false;
     }
 
     return pTemp;
