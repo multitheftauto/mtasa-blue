@@ -331,16 +331,13 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
         }
     }
 
-    if ( !pElement->IsCloneable () )
-        return NULL;
-
     // Can't clone the root
     if ( pElement == m_pMapManager->GetRootElement () )
-        return NULL;
+        return nullptr;
 
     CElement* pParent = pElement->GetParentEntity ();
     if ( pParent && !pParent->IsCloneable () )
-        return NULL;
+        return nullptr;
 
     bool bAddEntity = true;
     CElement* pNewElement = pElement->Clone ( &bAddEntity, pResource );
