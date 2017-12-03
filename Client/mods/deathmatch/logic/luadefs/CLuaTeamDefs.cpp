@@ -33,6 +33,7 @@ void CLuaTeamDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getFriendlyFire", "getTeamFriendlyFire" );
     lua_classfunction ( luaVM, "getName", "getTeamName" );
     lua_classfunction ( luaVM, "getColor", "getTeamColor" );
+    lua_classfunction ( luaVM, "getPlayers", "getPlayersInTeam" );
 
     lua_classvariable ( luaVM, "playerCount", NULL, "countPlayersInTeam" );
     lua_classvariable ( luaVM, "friendlyFire", NULL, "getTeamFriendlyFire" );
