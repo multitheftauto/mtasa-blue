@@ -83,19 +83,8 @@ CObject::~CObject ( void )
 
 
 CElement* CObject::Clone ( bool* bAddEntity, CResource* pResource )
-{
-    CObject* pTemp = m_pObjectManager->Create ( GetParentEntity (), NULL, IsLowLod () );
-    if ( pTemp )
-    {
-        CVector vecRotation;
-        GetRotation ( vecRotation );
-        pTemp->SetRotation ( vecRotation );
-        pTemp->SetModel ( GetModel () );
-        pTemp->SetParentObject ( GetParentEntity () );
-        pTemp->SetLowLodObject ( GetLowLodObject () );
-    }
-
-    return pTemp;
+{    
+    return new CObject ( *this ); 
 }
 
 
