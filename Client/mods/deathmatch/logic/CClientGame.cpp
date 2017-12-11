@@ -2877,7 +2877,7 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientCursorMove", "relativeX, relativeX, absoluteX, absoluteY, worldX, worldY, worldZ", NULL, false );
 
     // Transfer box event
-    m_Events.AddEvent( "onTransferBoxStateChange", "type, currentStatus, totalSize", NULL, false );
+    m_Events.AddEvent( "onTransferBoxProgressChange", "type, currentStatus, totalSize", NULL, false );
 
     // Marker events
     m_Events.AddEvent ( "onClientMarkerHit", "entity, matchingDimension", NULL, false );
