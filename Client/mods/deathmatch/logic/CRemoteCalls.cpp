@@ -215,8 +215,12 @@ CRemoteCall::~CRemoteCall ()
 
 void CRemoteCall::MakeCall()
 {
+    // GetDomainFromURL requires protocol://, but curl does not (defaults to http)
+    SString strDomain = g_pCore->GetWebCore()->GetDomainFromURL(m_strURL);
+    if (strDomain.empty())
+        strDomain = g_pCore->GetWebCore()->GetDomainFromURL("http://" + m_strURL);
     // Bypass net module IP check if we are allowed to access the URL
-    bool bAnyHost = (g_pCore->GetWebCore()->GetDomainState(g_pCore->GetWebCore()->GetDomainFromURL(m_strURL)) == eURLState::WEBPAGE_ALLOWED);
+    bool bAnyHost = (g_pCore->GetWebCore()->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
     EDownloadModeType downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);
     CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(downloadMode);
     pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, false, m_options, false, false);
