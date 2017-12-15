@@ -630,8 +630,8 @@ namespace SharedUtil
             if ( m_Queue.size () > 0 )
             {
                 T ID = m_Queue.back();
-                m_Queue.pop_back ();
                 dest = ID;
+                m_Queue.pop_back ();
                 return true;
             }
 

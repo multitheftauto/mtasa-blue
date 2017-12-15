@@ -74,7 +74,7 @@ SArrayId CIdArray::PopUniqueId ( void* pObject, EIdClassType idClass )
     }
 
     // Grab the next unused ID
-    SArrayId ulPhysicalIndex;
+    SArrayId ulPhysicalIndex = INVALID_ARRAY_ID;
     bool bSuccess = m_IDStack.Pop ( ulPhysicalIndex );
     assert ( bSuccess );
 
@@ -129,6 +129,7 @@ void CIdArray::PushUniqueId ( void* pObject, EIdClassType idClass, SArrayId id )
     dassert ( m_bInitialized );
 
     // Map to index
+    assert( id >= SHARED_ARRAY_BASE_ID );
     SArrayId ulPhysicalIndex = id - SHARED_ARRAY_BASE_ID;
 
     // Checks
