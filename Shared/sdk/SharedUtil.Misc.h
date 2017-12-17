@@ -85,6 +85,7 @@ namespace SharedUtil
     // For tracking results of new features
     //
     void            AddReportLog                    ( uint uiId, const SString& strText, uint uiAmountLimit = 0 );
+    void            AddExceptionReportLog           ( uint uiId, const char* szExceptionName, const char* szExceptionText );
     void            SetReportLogContents            ( const SString& strText );
     SString         GetReportLogContents            ( void );
     SString         GetReportLogProcessTag          ( void );
