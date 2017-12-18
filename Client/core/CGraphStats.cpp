@@ -20,6 +20,7 @@ namespace
 	    std::vector < TIMEUS >          dataHistory;
 	    int								iDataPos;
 	    SColor							color;
+        const char*                     szName;
     };
 }
 
@@ -162,6 +163,7 @@ void CGraphStats::AddTimingPoint( const char* szName )
         memset( &pLine->dataHistory[ 0 ], 0, pLine->dataHistory.size() );
 	    pLine->iDataPos = 0;
 	    pLine->prevData = 0;
+        pLine->szName   = szName;
 
         // Random color based on line name
         MD5 md5;
@@ -212,19 +214,17 @@ void CGraphStats::Draw ( void )
     uint uiSizeY = 150;
     uint uiRangeY = 100;    // 100ms
     float fLineScale = 1/1000.f / uiRangeY * uiSizeY;
+    float fHalfLineHeight = pGraphics->GetDXFontHeight() / 2;
 
-    // Backgrounf box
+    // Backgroung box
 	pGraphics->DrawRectQueued( uiOriginX,  uiOriginY - uiSizeY,  uiSizeX, uiSizeY, SColorRGBA( 0, 0, 0, 128 ), true );
 
 	// Draw data line.
-    for ( std::map < SString, SGraphStatLine >::iterator iter = m_LineList.begin() ; iter != m_LineList.end() ; ++iter )
+    for ( const auto& dataLine : m_LineList )
 	{
-	    SGraphStatLine& line = iter->second;
-
-		int iDataPos = line.iDataPos;
-		int iDataPosPrev = iDataPos;
-		if ( iDataPos == -1 )
-			iDataPos = GRAPHSTAT_HISTORY_SIZE - 1;
+	    const SGraphStatLine& line = dataLine.second;
+        int iDataPos = line.iDataPos;
+        int iDataPosPrev = iDataPos;
 
         for ( int i = uiSizeX - 1 ; i > 0 ; i-- )
         {
@@ -238,5 +238,9 @@ void CGraphStats::Draw ( void )
 
 			pGraphics->DrawLineQueued( uiOriginX + i - 1,  uiOriginY - fY0,  uiOriginX + i,  uiOriginY - fY1, 1, line.color, true );
         }
+
+        float fX = uiOriginX + uiSizeX + 2;
+        float fY = uiOriginY - line.dataHistory[ line.iDataPos ] * fLineScale - fHalfLineHeight;
+        pGraphics->DrawStringQueued( fX, fY, fX, fY, line.color, line.szName, 1.0f, 1.0f, DT_NOCLIP, nullptr, true );
 	}
 }
