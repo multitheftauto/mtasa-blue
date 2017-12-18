@@ -20,7 +20,7 @@ namespace
 	    std::vector < TIMEUS >          dataHistory;
 	    int								iDataPos;
 	    SColor							color;
-        const char*                     szName;
+        std::string                     strName;
     };
 }
 
@@ -163,7 +163,7 @@ void CGraphStats::AddTimingPoint( const char* szName )
         memset( &pLine->dataHistory[ 0 ], 0, pLine->dataHistory.size() );
 	    pLine->iDataPos = 0;
 	    pLine->prevData = 0;
-        pLine->szName   = szName;
+        pLine->strName  = szName;
 
         // Random color based on line name
         MD5 md5;
@@ -241,6 +241,6 @@ void CGraphStats::Draw ( void )
 
         float fX = uiOriginX + uiSizeX + 2;
         float fY = uiOriginY - line.dataHistory[ line.iDataPos ] * fLineScale - fHalfLineHeight;
-        pGraphics->DrawStringQueued( fX, fY, fX, fY, line.color, line.szName, 1.0f, 1.0f, DT_NOCLIP, nullptr, true );
+        pGraphics->DrawStringQueued( fX, fY, fX, fY, line.color, line.strName.c_str(), 1.0f, 1.0f, DT_NOCLIP, nullptr, true );
 	}
 }
