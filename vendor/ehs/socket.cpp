@@ -355,12 +355,15 @@ bool Socket::IsAtError( int inTimeoutMilliseconds )
 {
     pollfd fds[1] = { 0 };
     fds[0].fd = nAcceptSocket;
-    fds[0].events = POLLERR;
+    fds[0].events = POLLIN | POLLOUT;
     int ret = poll(fds, 1, inTimeoutMilliseconds);
     if (ret == 0)
         return false;     // Not error
     if (ret == -1)
         return true;    // select error
+    if (ret > 0)
+        if (fds[0].revents & (POLLERR | POLLHUP | POLLNVAL))
+            return true;    // poll error
 
-    return true;
+    return false;
 }

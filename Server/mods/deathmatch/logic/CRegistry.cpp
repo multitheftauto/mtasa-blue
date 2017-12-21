@@ -363,7 +363,7 @@ bool CRegistry::Select ( const std::string& strColumns, const std::string& strTa
     if ( !strWhere.empty () )
         strQuery += " WHERE " + strWhere;
     if ( uiLimit > 0 )
-        strQuery += " LIMIT " + to_string(uiLimit);
+        strQuery += " LIMIT " + std::to_string(uiLimit);
 
     if ( m_bOpened == false )
 	{
