@@ -1,8 +1,8 @@
-project "Client SDK"
+project "Server SDK"
 	language "C++"
 	kind "StaticLib"
 	targetname "sdk"
-	
+		
 	vpaths { 
 		["Headers/*"] = { "**.h", "**.hpp" },
 		["*"] = "premake5.lua"
