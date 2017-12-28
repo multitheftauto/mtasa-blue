@@ -17,7 +17,7 @@ class CLuaMain;
 
 #pragma once
 
-#include "CLuaTimerManager.h"
+#include "lua/CLuaTimerManager.h"
 #include "lua/CLuaVector2.h"
 #include "lua/CLuaVector3.h"
 #include "lua/CLuaVector4.h"

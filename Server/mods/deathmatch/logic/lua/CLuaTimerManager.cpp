@@ -1,15 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/lua/CLuaTimerManager.cpp
+*  FILE:        Shared/mods/deathmatch/logic/lua/CLuaTimerManager.cpp
 *  PURPOSE:     Lua timer manager class
-*  DEVELOPERS:  Oliver Brown <>
-*               Christian Myhre Lundheim <>
-*               Jax <>
-*               Cecill Etheredge <>
-*               Marcus Bauer <mabako@gmail.com>
-*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *

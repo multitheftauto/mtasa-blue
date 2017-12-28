@@ -32,7 +32,7 @@ class CAccessControlListManager;
 #pragma once
 #include "LuaCommon.h"
 #include "CLuaMain.h"
-#include "CLuaTimerManager.h"
+#include "lua/CLuaTimerManager.h"
 
 #define LUA_ERROR() lua_pushboolean ( luaVM, false ); return 0;
 #define LUA_DECLARE(x) static int x ( lua_State * luaVM ); 

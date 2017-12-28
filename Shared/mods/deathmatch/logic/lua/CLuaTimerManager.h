@@ -1,12 +1,9 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/logic/lua/CLuaTimerManager.h
+*  FILE:        Shared/mods/deathmatch/logic/lua/CLuaTimerManager.h
 *  PURPOSE:     Lua timer manager class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Jax <>
-*               Cecill Etheredge <ijsf@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -14,8 +11,7 @@
 
 class CLuaTimerManager;
 
-#ifndef __CLUATIMERMANAGER_H
-#define __CLUATIMERMANAGER_H
+#pragma once
 
 #include "LuaCommon.h"
 #include "CLuaTimer.h"
@@ -47,5 +43,3 @@ private:
     CLuaTimer*                  m_pPendingDelete;
     CLuaTimer*                  m_pProcessingTimer;
 };
-
-#endif
