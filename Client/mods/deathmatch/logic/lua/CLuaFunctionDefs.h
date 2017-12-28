@@ -24,7 +24,7 @@ class CLuaFunctionDefinitions;
 
 #include "LuaCommon.h"
 #include "CLuaMain.h"
-#include "lua/CLuaTimerManager.h"
+#include "CLuaTimerManager.h"
 
 class CRegisteredCommands;
 

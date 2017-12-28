@@ -1,9 +1,13 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto
+*  PROJECT:     Multi Theft Auto v1.0
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        Shared/mods/shared_logic/logic/lua/CLuaTimer.h
+*  FILE:        mods/shared_logic/logic/lua/CLuaTimer.h
 *  PURPOSE:     Lua timer class
+*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
+*               Jax <>
+*               Cecill Etheredge <ijsf@gmx.net>
+*               Florian Busse <flobu@gmx.net>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -11,7 +15,8 @@
 
 class CLuaTimer;
 
-#pragma once
+#ifndef __CLUATIMER_H
+#define __CLUATIMER_H
 
 // Define includes
 #include "LuaCommon.h"
@@ -54,3 +59,5 @@ private:
     uint                    m_uiScriptID;
     SLuaDebugInfo           m_LuaDebugInfo;
 };
+
+#endif
