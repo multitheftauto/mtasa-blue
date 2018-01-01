@@ -770,7 +770,8 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
 
     // Option settings
     CGameSettings* gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
-    outStatus.settings.bWindowed = false;
+    outStatus.settings.bWindowed = GetVideoModeManager()->IsDisplayModeWindowed();
+    outStatus.settings.iFullScreenStyle = GetVideoModeManager()->GetFullScreenStyle();
     outStatus.settings.iFXQuality = gameSettings->GetFXQuality(); ;
     outStatus.settings.iDrawDistance = ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f * 100;
     outStatus.settings.iAntiAliasing = gameSettings->GetAntiAliasing() - 1;
@@ -786,7 +787,6 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.settings.bHighDetailVehicles = false;
 
     CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
-    CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
     CVARS_GET ( "volumetric_shadows",   outStatus.settings.bVolumetricShadows );
     CVARS_GET ( "allow_screen_upload",  outStatus.settings.bAllowScreenUpload );
     CVARS_GET ( "grass",                outStatus.settings.bGrassEffect );
