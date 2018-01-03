@@ -373,9 +373,6 @@ bool Socket::IsAtError( int inTimeoutMilliseconds )
         return false;     // Not error
     if (ret == -1)
         return true;    // select error
-    if (ret > 0)
-        if (fds[0].revents & (POLLERR | POLLHUP | POLLNVAL))
-            return true;    // poll error
 
-    return false;
+    return true;
 }
