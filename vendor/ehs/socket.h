@@ -74,7 +74,7 @@ Zac Hansen ( xaxxon@slackworks.com )
     #define E_WOULDBLOCK EWOULDBLOCK
     #define GetLastSocketError() errno
     #define SOCKET_ERROR (-1)
-    #define INVALID_SOCKET (0)
+    #define INVALID_SOCKET (-1)
     #ifndef Sleep
         #define Sleep(x) usleep((x)*1000)
     #endif

@@ -728,6 +728,47 @@ void SharedUtil::AddReportLog ( uint uiId, const SString& strText, uint uiAmount
     }
 }
 
+
+//
+// Track results of new features by avoiding heap memory allocations
+// Avoid using this function if you have plenty of memory available
+//
+void SharedUtil::AddExceptionReportLog ( uint uiId, const char * szExceptionName, const char * szExceptionText )
+{
+    constexpr size_t BOILERPLATE_SIZE           = 46;
+    constexpr size_t MAX_EXCEPTION_NAME_SIZE    = 64;
+    constexpr size_t MAX_EXCEPTION_TEXT_SIZE    = 256;
+    static char szOutput [ BOILERPLATE_SIZE + MAX_EXCEPTION_NAME_SIZE + MAX_EXCEPTION_TEXT_SIZE ] = { 0 };
+
+    SYSTEMTIME s = { 0 };
+    GetSystemTime ( &s );
+
+    sprintf_s ( szOutput, "%u: %04hu-%02hu-%02hu %02hu:%02hu:%02hu - Caught %.*s exception: %.*s\n",
+        uiId, 
+        s.wYear, s.wMonth,  s.wDay,
+        s.wHour, s.wMinute, s.wSecond,
+        MAX_EXCEPTION_NAME_SIZE, szExceptionName, 
+        MAX_EXCEPTION_TEXT_SIZE, szExceptionText
+    );
+
+    OutputDebugString ( "[ReportLog] " );
+    OutputDebugString ( &szOutput[0] );
+
+    try
+    {
+        SString strMessage = szOutput;
+        SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
+        MakeSureDirExists ( strPathFilename );
+        FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length ( ) );
+    }
+    catch ( std::bad_alloc& )
+    {
+        // At the time of writing this function, it is only called from other 'try-catch' blocks
+        // so we can assume we literally ran out of all available memory here and ignore the exception
+    }
+}
+
+
 void SharedUtil::SetReportLogContents ( const SString& strText )
 {
     SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );

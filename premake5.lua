@@ -138,7 +138,8 @@ workspace "MTASA"
 		include "Server/dbconmy"
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
-		
+		include "Server/sdk"
+
 		group "Shared"
 		include "Shared"
 		include "Shared/XML"
