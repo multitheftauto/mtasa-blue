@@ -14,6 +14,8 @@
 
 struct SHttpRequestOptions
 {
+    SHttpRequestOptions() {}
+    SHttpRequestOptions(const struct SHttpRequestOptionsTx& in);
     bool bIsLegacy = false;         // true = old error behaviour
     SString strPostData;
     bool bPostBinary = false;       // false = truncate strPostData to first null character and send as text/plain (true = send as application/octet-stream)
@@ -34,8 +36,107 @@ struct SHttpDownloadResult
     void* pObj;
     bool bSuccess;
     int iErrorCode;
-    std::map<SString,SString> headers;
+    const char* szHeaders;
 };
+
+// For transferring SString to net module
+struct SStringContent
+{
+    void operator=(const SString& other)
+    {
+        length = other.length();
+        pData = *other;
+    }
+    operator SString(void) const
+    {
+        return SStringX(pData, length);
+    }
+    size_t length = 0;
+    const char* pData = nullptr;
+};
+
+// For transferring std::map<SString,SString> to net module
+struct SStringMapContent
+{
+    ~SStringMapContent()
+    {
+        delete[] pItems;
+    }
+    void operator=(const std::map<SString,SString>& other)
+    {
+        numItems = other.size() * 2;
+        pItems = new SStringContent[numItems];
+        size_t pos = 0;
+        for (const auto& iter : other)
+        {
+            pItems[pos++] = iter.first;
+            pItems[pos++] = iter.second;
+        }
+        assert(pos == numItems);
+    }
+    operator std::map<SString,SString>(void) const
+    {
+        std::map<SString,SString> result;
+        for(size_t i = 0; i < numItems; i += 2)
+        {
+            result[pItems[i]] = pItems[i + 1];
+        }
+        return result;
+    }
+    size_t numItems = 0;
+    SStringContent* pItems = nullptr;
+};
+
+// For transferring SHttpRequestOptions to net module
+struct SHttpRequestOptionsTx
+{
+    SHttpRequestOptionsTx() {}
+    SHttpRequestOptionsTx(const SHttpRequestOptions& in);
+    bool bIsLegacy = false;
+    SStringContent strPostData;
+    bool bPostBinary = false;
+    SStringMapContent formFields;
+    uint uiConnectionAttempts = 10;
+    uint uiConnectTimeoutMs = 10000;
+    SStringContent strRequestMethod;
+    SStringMapContent requestHeaders;
+    uint uiMaxRedirects = 8;
+    SStringContent strUsername;
+    SStringContent strPassword;
+};
+
+// Convert SHttpRequestOptionsTx to SHttpRequestOptions
+inline SHttpRequestOptions::SHttpRequestOptions(const SHttpRequestOptionsTx& in)
+{
+    bIsLegacy = in.bIsLegacy;
+    strPostData = in.strPostData;
+    bPostBinary = in.bPostBinary;
+    formFields = in.formFields;
+    uiConnectionAttempts = in.uiConnectionAttempts;
+    uiConnectTimeoutMs = in.uiConnectTimeoutMs;
+    strRequestMethod = in.strRequestMethod;
+    requestHeaders = in.requestHeaders;
+    uiMaxRedirects = in.uiMaxRedirects;
+    strUsername = in.strUsername;
+    strPassword = in.strPassword;
+}
+
+// Convert SHttpRequestOptions to SHttpRequestOptionsTx
+inline SHttpRequestOptionsTx::SHttpRequestOptionsTx(const SHttpRequestOptions& in)
+{
+    bIsLegacy = in.bIsLegacy;
+    strPostData = in.strPostData;
+    bPostBinary = in.bPostBinary;
+    formFields = in.formFields;
+    uiConnectionAttempts = in.uiConnectionAttempts;
+    uiConnectTimeoutMs = in.uiConnectTimeoutMs;
+    strRequestMethod = in.strRequestMethod;
+    requestHeaders = in.requestHeaders;
+    uiMaxRedirects = in.uiMaxRedirects;
+    strUsername = in.strUsername;
+    strPassword = in.strPassword;
+}
+
 
 // PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.
 // If bSuccess is true, then pData+dataSize will be set or the output file will be ready.
@@ -61,7 +162,7 @@ public:
 
     // Queue a file to download
     virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false, void * objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false, uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false ) = 0;
-    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, void * objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false, const SHttpRequestOptions& options = SHttpRequestOptions(), bool bCheckContents = false, bool bResumeFile = false ) = 0;
+    virtual bool            QueueFile           ( const char* szURL, const char* szOutputFile, void * objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false, const SHttpRequestOptionsTx& options = SHttpRequestOptionsTx(), bool bCheckContents = false, bool bResumeFile = false ) = 0;
 
     // Limit number of concurrent http client connections
     virtual void            SetMaxConnections   ( int iMaxConnections ) = 0;
