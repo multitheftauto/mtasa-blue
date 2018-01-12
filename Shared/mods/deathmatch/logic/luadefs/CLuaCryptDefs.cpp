@@ -127,7 +127,7 @@ int CLuaCryptDefs::TeaDecode ( lua_State* luaVM )
     {
         SString result = SharedUtil::Base64decode(str);
         SharedUtil::TeaDecode ( result, key, &str );
-        lua_pushstring ( luaVM, str );
+        lua_pushlstring ( luaVM, str, str.length () );
         return 1;
     }
     else
