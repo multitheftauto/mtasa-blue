@@ -101,10 +101,8 @@ int CLuaCryptDefs::TeaEncode ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         SString result;
-        SString humanReadableResult;
         SharedUtil::TeaEncode ( str, key, &result );
-        humanReadableResult = SharedUtil::Base64encode(result);
-        lua_pushstring ( luaVM, humanReadableResult );
+        lua_pushlstring ( luaVM, result, result.length() );
         return 1;
     }
     else
@@ -125,9 +123,9 @@ int CLuaCryptDefs::TeaDecode ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString result = SharedUtil::Base64decode(str);
-        SharedUtil::TeaDecode ( result, key, &str );
-        lua_pushlstring ( luaVM, str, str.length () );
+        SString result;
+        SharedUtil::TeaDecode ( str, key, &result );
+        lua_pushlstring ( luaVM, result, result.length () );
         return 1;
     }
     else
