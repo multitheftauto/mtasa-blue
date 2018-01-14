@@ -21,6 +21,8 @@ void CLuaCryptDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "base64Decode", Base64decode );
     CLuaCFunctions::AddFunction("passwordHash", PasswordHash);
     CLuaCFunctions::AddFunction("passwordVerify", PasswordVerify);
+    CLuaCFunctions::AddFunction ( "encryptString", EncryptString );
+    CLuaCFunctions::AddFunction ( "decryptString", DecryptString );
 }
 
 int CLuaCryptDefs::Md5 ( lua_State* luaVM )
@@ -101,8 +103,10 @@ int CLuaCryptDefs::TeaEncode ( lua_State* luaVM )
     if ( !argStream.HasErrors () )
     {
         SString result;
+        SString humanReadableResult;
         SharedUtil::TeaEncode ( str, key, &result );
-        lua_pushlstring ( luaVM, result, result.length() );
+        humanReadableResult = SharedUtil::Base64encode(result);
+        lua_pushstring ( luaVM, humanReadableResult );
         return 1;
     }
     else
@@ -123,9 +127,9 @@ int CLuaCryptDefs::TeaDecode ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString result;
-        SharedUtil::TeaDecode ( str, key, &result );
-        lua_pushlstring ( luaVM, result, result.length () );
+        SString result = SharedUtil::Base64decode(str);
+        SharedUtil::TeaDecode ( result, key, &str );
+        lua_pushstring ( luaVM, str );
         return 1;
     }
     else
@@ -321,5 +325,79 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaCryptDefs::EncryptString ( lua_State* luaVM )
+{
+    StringEncryptFunction algorithm;
+    SString data;
+    SString key;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( algorithm );
+    argStream.ReadString ( data );
+    argStream.ReadString ( key );
+
+    if ( !argStream.HasErrors () )
+    {
+        switch ( algorithm )
+        {
+            case StringEncryptFunction::TEA:
+            {
+                SString result;
+                SharedUtil::TeaEncode ( data, key, &result );
+                lua_pushlstring ( luaVM, result, result.length () );
+                break;
+            }
+            default:
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                lua_pushboolean ( luaVM, false );
+            }
+        }
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaCryptDefs::DecryptString ( lua_State* luaVM )
+{
+    StringEncryptFunction algorithm;
+    SString data;
+    SString key;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( algorithm );
+    argStream.ReadString ( data );
+    argStream.ReadString ( key );
+
+    if ( !argStream.HasErrors () )
+    {
+        switch ( algorithm )
+        {
+            case StringEncryptFunction::TEA:
+            {
+                SString result;
+                SharedUtil::TeaDecode ( data, key, &result );
+                lua_pushlstring ( luaVM, result, result.length () );
+                break;
+            }
+            default:
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                lua_pushboolean ( luaVM, false );
+            }
+        }
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }
