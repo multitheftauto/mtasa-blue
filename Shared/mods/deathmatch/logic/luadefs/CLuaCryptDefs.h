@@ -25,6 +25,6 @@ public:
     LUA_DECLARE ( Base64decode );
     LUA_DECLARE(PasswordHash);
     LUA_DECLARE(PasswordVerify);
-    LUA_DECLARE ( EncryptString );
-    LUA_DECLARE ( DecryptString );
+    LUA_DECLARE ( EncodeString );
+    LUA_DECLARE ( DecodeString );
 };

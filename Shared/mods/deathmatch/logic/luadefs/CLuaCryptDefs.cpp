@@ -21,8 +21,8 @@ void CLuaCryptDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "base64Decode", Base64decode );
     CLuaCFunctions::AddFunction("passwordHash", PasswordHash);
     CLuaCFunctions::AddFunction("passwordVerify", PasswordVerify);
-    CLuaCFunctions::AddFunction ( "encryptString", EncryptString );
-    CLuaCFunctions::AddFunction ( "decryptString", DecryptString );
+    CLuaCFunctions::AddFunction ( "encodeString", EncodeString );
+    CLuaCFunctions::AddFunction ( "decodeString", DecodeString );
 }
 
 int CLuaCryptDefs::Md5 ( lua_State* luaVM )
@@ -328,7 +328,7 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCryptDefs::EncryptString ( lua_State* luaVM )
+int CLuaCryptDefs::EncodeString ( lua_State* luaVM )
 {
     StringEncryptFunction algorithm;
     SString data;
@@ -365,7 +365,7 @@ int CLuaCryptDefs::EncryptString ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaCryptDefs::DecryptString ( lua_State* luaVM )
+int CLuaCryptDefs::DecodeString ( lua_State* luaVM )
 {
     StringEncryptFunction algorithm;
     SString data;
