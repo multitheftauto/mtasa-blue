@@ -332,12 +332,12 @@ int CLuaCryptDefs::EncodeString ( lua_State* luaVM )
 {
     StringEncryptFunction algorithm;
     SString data;
-    SString key;
+    CStringMap options;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadEnumString ( algorithm );
     argStream.ReadString ( data );
-    argStream.ReadString ( key );
+    argStream.ReadStringMap ( options );
 
     if ( !argStream.HasErrors () )
     {
@@ -346,7 +346,7 @@ int CLuaCryptDefs::EncodeString ( lua_State* luaVM )
             case StringEncryptFunction::TEA:
             {
                 SString result;
-                SharedUtil::TeaEncode ( data, key, &result );
+                SharedUtil::TeaEncode ( data, options["key"], &result );
                 lua_pushlstring ( luaVM, result, result.length () );
                 break;
             }
@@ -369,12 +369,12 @@ int CLuaCryptDefs::DecodeString ( lua_State* luaVM )
 {
     StringEncryptFunction algorithm;
     SString data;
-    SString key;
+    CStringMap options;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadEnumString ( algorithm );
     argStream.ReadString ( data );
-    argStream.ReadString ( key );
+    argStream.ReadStringMap ( options );
 
     if ( !argStream.HasErrors () )
     {
@@ -383,7 +383,7 @@ int CLuaCryptDefs::DecodeString ( lua_State* luaVM )
             case StringEncryptFunction::TEA:
             {
                 SString result;
-                SharedUtil::TeaDecode ( data, key, &result );
+                SharedUtil::TeaDecode ( data, options["key"], &result );
                 lua_pushlstring ( luaVM, result, result.length () );
                 break;
             }
