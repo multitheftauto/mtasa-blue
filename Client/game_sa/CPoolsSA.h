@@ -98,6 +98,7 @@ public:
     void                    DeleteAllPeds       ( );
 
     CEntity*                GetEntity           ( DWORD* pGameInterface );
+    uint                    GetModelIdFromClump (RpClump* pRpClump);
 
     // Others
     CBuilding*              AddBuilding         ( DWORD dwModelID );
@@ -105,8 +106,6 @@ public:
     CVehicle*               AddTrain            ( CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF );
 
     int                     GetNumberOfUsedSpaces   ( ePools pools );
-    void                    DumpPoolsStatus         ( );
-
     int                     GetPoolDefaultCapacity  ( ePools pool );
     int                     GetPoolCapacity         ( ePools pool );
     void                    SetPoolCapacity         ( ePools pool, int iValue );
