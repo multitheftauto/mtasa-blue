@@ -276,7 +276,7 @@ public:
 
     CVehicle *                                  GetJackingVehicle           ( void )                        { return m_pJackingVehicle; }
     void                                        SetJackingVehicle           ( CVehicle * pVehicle );
-    bool                                        IsQuit                      ( void )                        { return bIsQuit; }
+    bool                                        IsLeavingServer             ( void )                        { return m_bIsLeavingServer; }
 public:
 
     //
@@ -352,7 +352,7 @@ public:
     uint                                        m_uiD3d9Size;
     SString                                     m_strD3d9Md5;
     SString                                     m_strD3d9Sha256;
-    bool                                        bIsQuit;
+    bool                                        m_bIsLeavingServer;
 private:
     SLightweightSyncData                        m_lightweightSyncData;
 

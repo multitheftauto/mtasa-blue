@@ -3470,7 +3470,7 @@ bool CStaticFunctionDefinitions::RedirectPlayer ( CElement* pElement, const char
     if ( IS_PLAYER ( pElement ) )
     {
         CPlayer* pPlayer = static_cast < CPlayer* > ( pElement );
-        if ( pPlayer->IsQuit() ) {
+        if ( pPlayer->IsLeavingServer() ) {
             return false;
         }
         unsigned char ucHostLength = static_cast < unsigned char > ( strlen ( szHost ) );
@@ -11429,7 +11429,7 @@ bool CStaticFunctionDefinitions::KickPlayer ( CPlayer* pPlayer, SString strRespo
 {
     // Make sure we have a player
     assert ( pPlayer );
-    if ( pPlayer->IsQuit() ) {
+    if ( pPlayer->IsLeavingServer() ) {
         return false;
     }
     // If our responsible string is too long, crop it to size and display ... in the end so it's obvious it's cropped
@@ -11477,8 +11477,8 @@ CBan* CStaticFunctionDefinitions::BanPlayer ( CPlayer* pPlayer, bool bIP, bool b
 {
     // Make sure we have a player
     assert ( pPlayer );
-    if ( pPlayer->IsQuit() ) {
-        return NULL;
+    if ( pPlayer->IsLeavingServer() ) {
+        return nullptr;
     }
     // Initialize variables
     CBan* pBan = NULL;

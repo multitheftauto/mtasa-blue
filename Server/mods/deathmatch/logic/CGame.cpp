@@ -1378,7 +1378,7 @@ void CGame::InitialDataStream ( CPlayer& Player )
 
 void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer )
 {
-    if ( Player.bIsQuit ) {   // prevent multiple kick one player
+    if ( Player.m_bIsLeavingServer) {   // prevent multiple kick one player
         return;
     }
     // Grab quit reaason
@@ -1423,7 +1423,7 @@ void CGame::QuitPlayer ( CPlayer& Player, CClient::eQuitReasons Reason, bool bSa
             Arguments.PushBoolean ( false );
         }
 
-        Player.bIsQuit = true;
+        Player.m_bIsLeavingServer = true;
         Player.CallEvent ( "onPlayerQuit", Arguments );
 
         // Tell the map manager
