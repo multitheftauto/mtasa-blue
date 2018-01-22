@@ -968,7 +968,7 @@ void CAccountManager::StaticDbCallback ( CDbJobData* pJobData, void* pContext )
         ((CAccountManager*)pContext)->DbCallback ( pJobData );
 #ifdef MTA_DEBUG
     else
-        CLogger::LogPrintf ( "DEBUGINFO: StaticDbCallback stage was %d for '%s'\n", pJobData->stage, *pJobData->command.strData );
+        CLogger::LogPrintf ( "DEBUGINFO: StaticDbCallback stage was %d for '%s'\n", pJobData->stage, *pJobData->GetCommandStringForLog() );
 #endif
 }
 
@@ -978,7 +978,7 @@ void CAccountManager::DbCallback ( CDbJobData* pJobData )
     {
         if ( pJobData->result.status == EJobResult::FAIL )
         {
-            CLogger::LogPrintf ( "ERROR: While updating account with '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
+            CLogger::LogPrintf ( "ERROR: While updating account with '%s': %s.\n", *pJobData->GetCommandStringForLog(), *pJobData->result.strReason );
             if (pJobData->result.strReason.ContainsI("missing database"))
             {
                 // Try reconnection
@@ -989,7 +989,7 @@ void CAccountManager::DbCallback ( CDbJobData* pJobData )
     }
     else
     {
-        CLogger::LogPrintf ( "ERROR: Something worrying happened in DbCallback '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
+        CLogger::LogPrintf ( "ERROR: Something worrying happened in DbCallback '%s': %s.\n", *pJobData->GetCommandStringForLog(), *pJobData->result.strReason );
     }
 }
 
