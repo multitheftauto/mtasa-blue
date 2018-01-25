@@ -85,6 +85,11 @@ int CLuaBlipDefs::CreateBlip ( lua_State* luaVM )
     else
         argStream.ReadUserData ( pVisibleTo, m_pRootElement );
 
+    if (!CBlipManager::IsValidIcon(ucIcon))
+    {
+        argStream.SetCustomError("Invalid icon");
+    }
+
     if ( !argStream.HasErrors () )
     {
         CLuaMain* pLuaMain = g_pGame->GetLuaManager ()->GetVirtualMachine ( luaVM );
@@ -139,6 +144,11 @@ int CLuaBlipDefs::CreateBlipAttachedTo ( lua_State* luaVM )
         pVisibleTo = NULL;
     else
         argStream.ReadUserData ( pVisibleTo, m_pRootElement );
+
+    if (!CBlipManager::IsValidIcon(ucIcon))
+    {
+        argStream.SetCustomError("Invalid icon");
+    }
 
     if ( !argStream.HasErrors () )
     {
