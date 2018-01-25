@@ -2871,6 +2871,8 @@ void CClientGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onClientRender", "", NULL, false );
     m_Events.AddEvent ( "onClientMinimize", "", NULL, false );
     m_Events.AddEvent ( "onClientRestore", "", NULL, false );
+    m_Events.AddEvent ( "onClientFocus", "", NULL, false);
+    m_Events.AddEvent ( "onClientLostFocus", "", NULL, false);
 
     // Cursor events
     m_Events.AddEvent ( "onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false );
@@ -3957,6 +3959,24 @@ void CClientGame::IdleHandler ( void )
 
             if ( g_pCore->GetCVars ()->GetValue < bool > ( "mute_mta_when_minimized" )  )
                 m_pManager->GetSoundManager ()->SetMinimizeMuted ( true );
+        }
+    }
+    if ( g_pCore->IsFocused() )
+    {
+        if (!m_bWasMinimized)
+        {
+            m_bWasMinimized = true;
+            CLuaArguments Arguments;
+            m_pRootEntity->CallEvent("onClientMTAFocus", Arguments, false);
+        }
+    }
+    else
+    {
+        if (m_bWasMinimized)
+        {
+            m_bWasMinimized = false;
+            CLuaArguments Arguments;
+            m_pRootEntity->CallEvent("onClientMTALostFocus", Arguments, false);
         }
     }
 
