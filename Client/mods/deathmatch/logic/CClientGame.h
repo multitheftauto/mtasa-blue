@@ -740,7 +740,7 @@ private:
     bool                                m_bBeingDeleted;        // To enable speedy disconnect
 
     bool                                m_bWasMinimized;
-    bool                                m_bWasFocus;
+    bool                                m_bWasFocused;
 
     // Cache for speeding up collision processing
 public:

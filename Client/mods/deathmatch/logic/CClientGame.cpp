@@ -3963,18 +3963,18 @@ void CClientGame::IdleHandler ( void )
     }
     if ( g_pCore->IsFocused() )
     {
-        if (!m_bWasMinimized)
+        if (!m_bWasFocused)
         {
-            m_bWasMinimized = true;
+            m_bWasFocused = true;
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent("onClientMTAFocus", Arguments, false);
         }
     }
     else
     {
-        if (m_bWasMinimized)
+        if (m_bWasFocused)
         {
-            m_bWasMinimized = false;
+            m_bWasFocused = false;
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent("onClientMTALostFocus", Arguments, false);
         }
