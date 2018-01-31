@@ -379,7 +379,7 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
                 {
                     DWORD dwDeleteFunc = FUNC_CVehicleStructure_delete;
                     CVehicleModelVisualInfoSAInterface* info = pVehicleModelInfoInterface->pVisualInfo;
-                    __asm
+                    _asm
                     {
                         mov     eax, info
                         push    eax
@@ -392,7 +392,7 @@ void CRenderWareSA::ReplaceModel ( RpClump* pNew, unsigned short usModelID, DWOR
 
             // ModelInfo::SetClump
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface ();
-            __asm
+            _asm
             {
                 mov     ecx, pModelInfoInterface
                 push    pNewClone

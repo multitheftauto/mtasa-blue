@@ -1712,10 +1712,13 @@ namespace SharedUtil
                     return 0;
     #else
                     // This should work on XP
-                    _asm {mov eax, 1}
-                    _asm {cpuid}
-                    _asm {shr ebx, 24}
-                    _asm {mov eax, ebx}
+                    _asm
+                    {
+                        mov eax, 1
+                        cpuid
+                        shr ebx, 24
+                        mov eax, ebx
+                    }
     #endif
 #else
                     // This should work on Linux

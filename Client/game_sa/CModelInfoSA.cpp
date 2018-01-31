@@ -677,7 +677,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
-                    __asm
+                    _asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -701,7 +701,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
-                    __asm
+                    _asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -1067,7 +1067,8 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
 
         // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
         DWORD func = 0x5B2C20;
-        __asm {
+        _asm
+        {
             push    pColModelInterface
             push    ModelID
             call    func
@@ -1117,7 +1118,8 @@ void CModelInfoSA::RestoreColModel ( void )
 
             // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
             DWORD func = 0x5B2C20;
-            __asm {
+            _asm
+            {
                 push    dwOriginalColModelInterface
                 push    ModelID
                 call    func
